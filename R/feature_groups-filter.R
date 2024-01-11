@@ -41,6 +41,22 @@ intensityFilter <- function(fGroups, absThreshold, relThreshold, negate = FALSE)
     }))
 }
 
+minMaxIntensityFilter <- function(fGroups, absThreshold, relThreshold, negate = FALSE)
+{
+    if (length(fGroups) == 0)
+        return(fGroups)
+    
+    threshold <- getHighestAbsValue(absThreshold, relThreshold, max(sapply(groupTable(fGroups), max)))
+    if (threshold == 0)
+        return(fGroups)
+    
+    return(doFGroupsFilter(fGroups, "min max intensity", c(threshold, negate), function(fGroups)
+    {
+        compF <- if (negate) function(x, ...) max(x) >= threshold else function(x, ...) max(x) < threshold
+        delete(fGroups, j = compF)
+    }, "minMaxIntensity"))
+}
+
 blankFilter <- function(fGroups, threshold, negate = FALSE)
 {
     anaInfo <- analysisInfo(fGroups)
@@ -519,6 +535,7 @@ minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, ne
 #' @export
 setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMinIntensity = NULL,
                                               preAbsMinIntensity = NULL, preRelMinIntensity = NULL,
+                                              absMinMaxIntensity = NULL, relMinMaxIntensity = NULL,
                                               absMinAnalyses = NULL, relMinAnalyses = NULL,
                                               absMinReplicates = NULL, relMinReplicates = NULL,
                                               absMinFeatures = NULL, relMinFeatures = NULL,
@@ -537,9 +554,10 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
     
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertNumber, . ~ absMinIntensity + relMinIntensity + preAbsMinIntensity + preRelMinIntensity +
-               absMinAnalyses + relMinAnalyses + absMinReplicates + relMinReplicates + absMinFeatures + relMinFeatures +
-               absMinReplicateAbundance + relMinReplicateAbundance + absMinConc + relMinConc + absMaxTox + relMaxTox +
-               absMinConcTox + relMinConcTox + maxReplicateIntRSD + blankThreshold,
+               absMinIntensity + relMinIntensity + absMinAnalyses + relMinAnalyses + absMinReplicates +
+               relMinReplicates + absMinFeatures + relMinFeatures + absMinReplicateAbundance +
+               relMinReplicateAbundance + absMinConc + relMinConc + absMaxTox + relMaxTox + absMinConcTox +
+               relMinConcTox + maxReplicateIntRSD + blankThreshold,
            lower = 0, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
     aapply(assertRange, . ~ retentionRange + mzRange + mzDefectRange + chromWidthRange, null.ok = TRUE,
            fixed = list(add = ac))
@@ -593,6 +611,7 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
         obj <- maybeDoFilter(replicateAbundanceFilter, absMinReplicateAbundance, relMinReplicateAbundance, maxReplicateIntRSD)
 
 
+    obj <- maybeDoFilter(minMaxIntensityFilter, absMinMaxIntensity, relMinMaxIntensity)
     obj <- maybeDoFilter(minAnalysesFilter, absMinAnalyses, relMinAnalyses)
     obj <- maybeDoFilter(minReplicatesFilter, absMinReplicates, relMinReplicates)
     obj <- maybeDoFilter(minFeaturesFilter, absMinFeatures, relMinFeatures)

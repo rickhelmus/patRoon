@@ -285,6 +285,9 @@ test_that("delete and filter", {
     expect_gte(minInt(filter(fgOpenMS, relMinIntensity = 0.2), TRUE), 0.2)
     expect_gte(minInt(filter(fgOpenMS, preAbsMinIntensity = 1500), FALSE), 1500)
     expect_gte(minInt(filter(fgOpenMS, preRelMinIntensity = 0.2), TRUE), 0.2)
+    expect_true(all(sapply(groupTable(filter(fgOpenMS, absMinMaxIntensity = 1E6)), function(x) max(x) >= 1E6)))
+    expect_true(all(sapply(groupTable(filter(fgOpenMS, relMinMaxIntensity = 0.5)),
+                           function(x) max(x) >= (0.5 * max(groupTable(fgOpenMS))))))
 
     expect_range(groupInfo(filter(fgOpenMS, retentionRange = c(120, 200)))$rts, c(120, 200))
     # expect_equivalent(filter(fgOpenMS, retentionRange = c(0, Inf)), fgOpenMS)

@@ -189,8 +189,8 @@ doFGAADTGroups <- function(fGroups, intColNames, average, averageBy, areas, addQ
         {
             for (icol in intColNames)
             {
-                # NOTE: intColNames will just be "intensity" if averaging by .all
-                anas <- if (averageBy == ".all") anaInfo$analysis else anaInfo[get(averageBy) == icol]$analysis
+                # NOTE: intColNames will just be "intensity" if averaging by fGroups
+                anas <- if (averageBy == "fGroups") anaInfo$analysis else anaInfo[get(averageBy) == icol]$analysis
                 concs[, (paste0(icol, "_conc")) := aggrVec(unlist(.SD), averageFunc), .SDcols = anas, by = seq_len(nrow(concs))]
             }
             concs[, (anaInfo$analysis) := NULL]
@@ -252,7 +252,7 @@ doFGAADTFeatures <- function(fGroups, fgTab, intColNames, average, averageBy, ad
         fgTab <- removeDTColumnsIfPresent(fgTab, featureQualityNames(group = FALSE, scores = TRUE))
     
     by <- "group"
-    if (averageBy != ".all")
+    if (averageBy != "fGroups")
         by <- c(by, "average_group")
     
     if (isFALSE(average))
@@ -262,7 +262,7 @@ doFGAADTFeatures <- function(fGroups, fgTab, intColNames, average, averageBy, ad
     }
     else
     {
-        if (averageBy != ".all")
+        if (averageBy != "fGroups")
             featTab[, average_group := anaInfo[[averageBy]][match(analysis, anaInfo$analysis)]]
         
         featTab <- removeDTColumnsIfPresent(featTab, c("isocount", "analysis", "ID", "set"))
@@ -273,7 +273,7 @@ doFGAADTFeatures <- function(fGroups, fgTab, intColNames, average, averageBy, ad
     
     # prepare main table for merge
     
-    if (averageBy != ".all")
+    if (averageBy != "fGroups")
     {
         # Melt by intensity column to get the proper format. Afterwards, we remove the dummy intensity column, as we
         # want the raw feature intensity data.
@@ -337,7 +337,7 @@ doFGAADTFeatures <- function(fGroups, fgTab, intColNames, average, averageBy, ad
     
     # restore order
     fgTab[, gorder := match(group, names(fGroups))]
-    if (averageBy != ".all")
+    if (averageBy != "fGroups")
     {
         fgTab[, aorder := match(average_group, unique(anaInfo[[averageBy]]))]
         setorderv(fgTab, c("gorder", "aorder"))
@@ -383,16 +383,16 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
     if (length(fGroups) == 0)
         return(data.table(mz = numeric(), ret = numeric(), group = character()))
 
-    intColNames <- if (averageBy == ".all") "intensity" else getADTIntCols(unique(anaInfo[[averageBy]]))    
-    if (!isFALSE(regression) && (sum(!is.na(anaInfo[[regression]]) < 2) || averageBy == ".all"))
+    intColNames <- if (averageBy == "fGroups") "intensity" else getADTIntCols(unique(anaInfo[[averageBy]]))    
+    if (!isFALSE(regression) && (sum(!is.na(anaInfo[[regression]]) < 2) || averageBy == "fGroups"))
         regression <- FALSE
     addQualities <- !isFALSE(qualities) && qualities %in% c("both", "quality") && hasFGroupScores(fGroups)
     addScores <- !isFALSE(qualities) && qualities %in% c("both", "score") && hasFGroupScores(fGroups)
     
     if (!isFALSE(regression))
     {
-        if (averageBy == ".all")
-            stop("Cannot perform regression if averageBy=\".all\"", call. = FALSE)
+        if (averageBy == "fGroups")
+            stop("Cannot perform regression if averageBy=\"fGroups\"", call. = FALSE)
         if (!is.null(regressionBy) && !isFALSE(average))
             checkAnaInfoAggrGrouping(anaInfo, "averaged", averageBy, regressionBy)
     }

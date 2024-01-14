@@ -140,18 +140,18 @@ assertAndPrepareAnaInfo <- function(x, ..., add = NULL)
     return(x)
 }
 
-assertAndPrepareAnaInfoBy <- function(x, anaInfo, withFGroup, .var.name = checkmate::vname(x), add = NULL)
+assertAndPrepareAnaInfoBy <- function(x, anaInfo, withFGroups, .var.name = checkmate::vname(x), add = NULL)
 {
     ch <- names(anaInfo)
-    if (withFGroup)
-        ch <- c(ch, ".all")
+    if (withFGroups)
+        ch <- c(ch, "fGroups")
     
     checkmate::assert(
         checkmate::checkFlag(x),
         checkmate::checkChoice(x, ch),
         .var.name = .var.name, add = add
     )
-    if (isTRUE(x))
+    if (isTRUE(x) || x == "rGroups")
         x <- "group"
     else if (isFALSE(x))
         x <- "analysis"

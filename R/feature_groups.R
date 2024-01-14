@@ -608,7 +608,7 @@ setMethod("averageGroups", "featureGroups", function(fGroups, areas, normalized,
     
     gNames <- names(fGroups)
     
-    if (by == ".all")
+    if (by == "fGroups")
         gTable <- gTable[, lapply(.SD, doAvg)]
     else
     {

@@ -24,12 +24,14 @@
 - Misc
     - bg MS/MS subtraction
     - don't try to do MetFrag/PubChem with MP (by default) or warn, also add docs why
-    - retain RTs of parents with convertToSuspects()
     - MSPL filter to remove mass peaks with X Da higher m/z than precursor
+        - do by default in newProject()?
     - delete() for screenInfo
         - `fGroups <- delete(fGroups, z = screenInfo(fGroups)$SMILES %in% rmSMILES)`
         - `fGroups <- delete(fGroups, z = function(scr) scr$SMILES %in% rmSMILES)`
     - export TPsLogicTransformations so it can be easily modified
+        - export dataset --> add docs
+        - instead of accepting NULL, default args to logic/libform TPs to exported data
 
 - tests
     - IDL filter
@@ -73,6 +75,7 @@
             - only works with features==T and cols must be numeric if average==T
         - make new page with all as.data.table() methods
     - minimum max intensity feature filter
+    - maxMZOverPrecMS/maxMZOverPrecMSMS MSPL filters
     - plotInt()
         - xnames --> xNames
         - new args: areas, xBy, groupBy, averageFunc, regression
@@ -115,6 +118,7 @@
     - sets features: ion_mz column
     - sets fGroups: ion_mz column in @annotations
     - minimum max intensity feature filter
+    - maxMZOverPrecMS/maxMZOverPrecMSMS MSPL filters
 
 ## Ext
 

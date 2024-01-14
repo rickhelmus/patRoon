@@ -470,7 +470,8 @@ setMethod("delete", "MSPeakLists", function(obj, i = NULL, j = NULL, k = NULL, r
 #' @export
 setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntThr = NULL, relMSIntThr = NULL,
                                             relMSMSIntThr = NULL, topMSPeaks = NULL, topMSMSPeaks = NULL,
-                                            minMSMSPeaks = NULL, isolatePrec = NULL, deIsotopeMS = FALSE,
+                                            minMSMSPeaks = NULL, maxMZOverPrecMS = NULL, maxMZOverPrecMSMS = NULL,
+                                            isolatePrec = NULL, deIsotopeMS = FALSE,
                                             deIsotopeMSMS = FALSE, withMSMS = FALSE, annotatedBy = NULL,
                                             retainPrecursorMSMS = TRUE, reAverage = FALSE,
                                             negate = FALSE)
@@ -479,8 +480,8 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
         isolatePrec <- getDefIsolatePrecParams()
 
     ac <- checkmate::makeAssertCollection()
-    aapply(checkmate::assertNumber, . ~ absMSIntThr + absMSMSIntThr + relMSIntThr + relMSMSIntThr,
-           lower = 0, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ absMSIntThr + absMSMSIntThr + relMSIntThr + relMSMSIntThr + maxMZOverPrecMS +
+               maxMZOverPrecMSMS, lower = 0, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertCount, . ~ topMSPeaks + topMSMSPeaks + minMSMSPeaks, positive = TRUE,
            null.ok = TRUE, fixed = list(add = ac))
     assertPListIsolatePrecParams(isolatePrec, add = ac)
@@ -499,8 +500,8 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
         return(obj)
 
     hash <- makeHash(obj, absMSIntThr, absMSMSIntThr, relMSIntThr, relMSMSIntThr, topMSPeaks, topMSMSPeaks, minMSMSPeaks,
-                     isolatePrec, deIsotopeMS, deIsotopeMSMS, withMSMS, annotatedBy, retainPrecursorMSMS, reAverage,
-                     negate)
+                     maxMZOverPrecMS, maxMZOverPrecMSMS, isolatePrec, deIsotopeMS, deIsotopeMSMS, withMSMS, annotatedBy,
+                     retainPrecursorMSMS, reAverage, negate)
     cache <- loadCacheData("filterMSPeakLists", hash)
     if (!is.null(cache))
         return(cache)
@@ -518,7 +519,8 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
         
         if (type == "MS")
         {
-            plF <- doMSPeakListFilter(plF, absMSIntThr, relMSIntThr, topMSPeaks, NULL, deIsotopeMS, TRUE, negate)
+            plF <- doMSPeakListFilter(plF, absMSIntThr, relMSIntThr, topMSPeaks, NULL, maxMZOverPrecMS, deIsotopeMS,
+                                      TRUE, plF[precursor == TRUE]$mz, negate)
             if (!is.null(isolatePrec))
                 plF <- isolatePrecInMSPeakList(plF, isolatePrec, negate)
         }
@@ -551,8 +553,17 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
                 }
             }
 
-            plF <- doMSPeakListFilter(plF, absMSMSIntThr, relMSMSIntThr, topMSMSPeaks, minMSMSPeaks, deIsotopeMSMS,
-                                      retainPrecursorMSMS, negate)
+            precMZ <- plF[precursor == TRUE]$mz
+            if (length(precMZ) == 0)
+            {
+                # try to get precursor mz from MS peak list instead
+                precMZ <- if (!is.null(ana))
+                    obj[[ana, grp]]$MS[precursor == TRUE]$mz
+                else
+                    obj[[grp]]$MS[precursor == TRUE]$mz
+            }
+            plF <- doMSPeakListFilter(plF, absMSMSIntThr, relMSMSIntThr, topMSMSPeaks, minMSMSPeaks, maxMZOverPrecMSMS,
+                                      deIsotopeMSMS, retainPrecursorMSMS, precMZ, negate)
         }
         
         return(!pl$ID %in% plF$ID)

@@ -55,6 +55,31 @@ reGenerateFTIndex <- function(fGroups)
 }
 isFGSet <- function(fGroups) inherits(fGroups, "featureGroupsSet")
 
+calcFeatureRegression <- function(xvec, ints)
+{
+    NARet <- list(RSQ = NA_real_, intercept = NA_real_, slope = NA_real_, p = NA_real_, lm = NULL)
+    
+    notna <- !is.na(xvec)
+    if (!any(notna) || length(xvec) == 1)
+        return(NARet)
+    
+    ints <- ints[notna]
+    ints[ints == 0] <- NA
+    if (all(is.na(ints)))
+        return(NARet)
+    
+    rlm <- lm(ints ~ xvec[notna])
+    suppressWarnings(reg <- summary(rlm))
+    slope <- pv <- NA_real_
+    if (nrow(reg[["coefficients"]]) > 1)
+    {
+        slope <- reg[["coefficients"]][2, 1]
+        pv <- reg[["coefficients"]][2, 4]
+    }
+    
+    return(list(RSQ = reg[["r.squared"]], intercept = reg[["coefficients"]][1, 1], slope = slope, p = pv, lm = rlm))
+}
+
 featureQualities <- function()
 {
     checkPackage("MetaClean")

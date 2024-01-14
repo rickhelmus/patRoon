@@ -3,31 +3,7 @@ NULL
 
 getADTIntCols <- function(wh) paste0(wh, "_intensity")
 stripADTIntSuffix <- function(cols) sub("_intensity$", "", cols)
-getFeatureRegressionCols <- function() c("RSQ", "intercept", "slope", "p")
-
-calcFeatureRegression <- function(xvec, ints)
-{
-    NARet <- setNames(as.list(rep(NA_real_, 4)), getFeatureRegressionCols())
-    
-    notna <- !is.na(xvec)
-    if (!any(notna) || length(xvec) == 1)
-        return(NARet)
-    
-    ints <- ints[notna]
-    ints[ints == 0] <- NA
-    if (all(is.na(ints)))
-        return(NARet)
-    
-    suppressWarnings(reg <- summary(lm(ints ~ xvec[notna])))
-    slope <- pv <- NA_real_
-    if (nrow(reg[["coefficients"]]) > 1)
-    {
-        slope <- reg[["coefficients"]][2, 1]
-        pv <- reg[["coefficients"]][2, 4]
-    }
-    
-    return(list(RSQ = reg[["r.squared"]], intercept = reg[["coefficients"]][1, 1], slope = slope, p = pv))
-}
+getADTRegCols <- function() c("RSQ", "intercept", "slope", "p")
 
 mergeScreenInfoWithDT <- function(tab, scrInfo, collapseSuspects, onlyHits)
 {
@@ -70,7 +46,7 @@ doFGAADTGroups <- function(fGroups, intColNames, average, averageBy, areas, addQ
         {
             xvec <- anaInfo[, mean(get(regression)), by = averageBy][[2]]
             regr <- sapply(gTable, calcFeatureRegression, xvec = xvec, simplify = FALSE)
-            ret <- cbind(ret, rbindlist(regr))
+            ret <- cbind(ret, rbindlist(regr[getADTRegCols()]))
         }
         else
         {
@@ -81,7 +57,8 @@ doFGAADTGroups <- function(fGroups, intColNames, average, averageBy, areas, addQ
                 rbIntCols <- getADTIntCols(unique(rbAnaInfo[[averageBy]]))
                 rbRows <- match(rbIntCols, intColNames)
                 
-                regr <- sapply(gTable[rbRows], calcFeatureRegression, xvec = rbxvec, simplify = FALSE)
+                regr <- sapply(gTable[rbRows], function(ints) calcFeatureRegression(rbxvec, ints)[getADTRegCols()],
+                               simplify = FALSE)
                 regr <- rbindlist(regr)
                 setnames(regr, paste0(names(regr), "_", rb))
                 ret <- cbind(ret, regr)
@@ -334,13 +311,13 @@ doFGAADTFeatures <- function(fGroups, fgTab, intColNames, average, averageBy, ad
         if (!is.null(regressionBy))
         {
             # combine split regression columns
-            fgTab[, (c(getFeatureRegressionCols(), "regression_group")) := {
+            fgTab[, (c(getADTRegCols(), "regression_group")) := {
                 # get corresponding regressionBy value from average group
                 rb <- anaInfo[get(averageBy) == average_group][[regressionBy]][1]
-                c(mget(paste0(getFeatureRegressionCols(), "_", rb)), rb)
+                c(mget(paste0(getADTRegCols(), "_", rb)), rb)
             }, by = "average_group"]
             # remove specific regression columns
-            regByCols <- grep(sprintf("^(%s)_(%s)$", paste0(getFeatureRegressionCols(), collapse = "|"),
+            regByCols <- grep(sprintf("^(%s)_(%s)$", paste0(getADTRegCols(), collapse = "|"),
                                       paste0(unique(anaInfo[[regressionBy]]), collapse = "|")),
                               names(fgTab), value = TRUE)
             fgTab[, (regByCols) := NULL]
@@ -354,7 +331,7 @@ doFGAADTFeatures <- function(fGroups, fgTab, intColNames, average, averageBy, ad
                 "ID", "ret", "mz", "ion_mz", "intensity", "area", "intensity_rel", "area_rel")
     colord <- c(colord, setdiff(names(featTab), c(colord, qualCols)))
     colord <- c(colord, grep("group_(ion_mz|adduct)", names(fgTab), value = TRUE), "neutralMass", "x_reg",
-                getFeatureRegressionCols(), "regression_group", featureQualityNames(),
+                getADTRegCols(), "regression_group", featureQualityNames(),
                 featureQualityNames(scores = TRUE))
     setcolorder(fgTab, intersect(colord, names(fgTab)))
     

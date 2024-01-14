@@ -73,6 +73,9 @@
             - only works with features==T and cols must be numeric if average==T
         - make new page with all as.data.table() methods
     - minimum max intensity feature filter
+    - plotInt()
+        - xnames --> xNames
+        - new args: areas, xBy, groupBy, averageFunc, regression
 
 - NEWS
     - specSimParamsMatch --> specSimParams
@@ -104,6 +107,10 @@
         - intensity cols are suffixed
             - clarify that same columns are used for areas?
         - adduct column: now split per set and renamed to group_adduct
+    - plotInt()
+        - xnames --> xNames
+        - new args: areas, xBy, groupBy, averageFunc, regression
+        - removed sets method, replaced by groupBy
     - sets workflows/screening: fixed getAllSuspCols() --> may affect formRank/compRank, filter() and reporting
     - sets features: ion_mz column
     - sets fGroups: ion_mz column in @annotations

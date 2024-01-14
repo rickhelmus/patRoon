@@ -397,9 +397,7 @@ genHTMLReportPlotsIntPlots <- function(fGroups, settings, outPath, parallel)
     
     mainArgs <- list(average = TRUE, normalize = TRUE, plotArgs = list(bty = "l"))
     if (isFGSet(fGroups))
-        mainArgs <- c(mainArgs, list(sets = TRUE))
-    else
-        mainArgs <- c(mainArgs, list(col = "black"))
+        mainArgs <- c(mainArgs, list(groupBy = "set", showLegend = TRUE))
     
     doApply("sapply", parallel, names(fGroups), function(grp)
     {

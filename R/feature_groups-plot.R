@@ -23,10 +23,7 @@ NULL
 #' @param \dots passed to \code{\link[base]{plot}} (\code{plot}, \code{plotChroms}, \code{plotTICs} and
 #'   \code{plotBPCs}), \pkg{\link{VennDiagram}} plotting functions (\code{plotVenn}), \code{\link{chordDiagram}}
 #'   (\code{plotChord}) or \code{\link[UpSetR]{upset}} (\code{plotUpSet}).
-#' @param sets \setsWF For \code{plotInt}: if \code{TRUE} then feature intensities are plot per set (order follows the
-#'   \link[=analysis-information]{analysis information}).
-#'
-#'   For \code{plotVenn}: If \code{TRUE} then the \code{which} argument changes its meaning and is used to specify the
+#' @param sets \setsWF If \code{TRUE} then the \code{which} argument changes its meaning and is used to specify the
 #'   names of the sets to be compared.
 #'
 #' @inheritParams featureGroups-class
@@ -184,29 +181,181 @@ setMethod("plotHash", "featureGroups", function(x, ...)
 #'
 #' @rdname feature-plotting
 #' @export
-setMethod("plotInt", "featureGroups", function(obj, average = FALSE, normalized = FALSE, xnames = TRUE,
-                                               showLegend = FALSE, pch = 20, type = "b", lty = 3, col = NULL,
-                                               plotArgs = NULL, linesArgs = NULL)
+setMethod("plotInt", "featureGroups", function(obj, average = FALSE, averageFunc = mean, areas = FALSE,
+                                               normalized = FALSE, xBy = NULL, xNames = TRUE, groupBy = "fGroups",
+                                               regression = FALSE, showLegend = FALSE, pch = 20,
+                                               type = if (regression) "p" else "b", lty = 3,
+                                               col = NULL, plotArgs = NULL, linesArgs = NULL)
 {
-    aapply(checkmate::assertFlag, . ~ average + normalized + xnames + showLegend)
-    aapply(checkmate::assertList, . ~ plotArgs + linesArgs, null.ok = TRUE)
-    doPlotFeatInts(obj, average, normalized, xnames, showLegend, pch, type, lty, col, plotArgs, linesArgs,
-                   doSets = FALSE)    
+    anaInfo <- analysisInfo(obj)
+    
+    ac <- checkmate::makeAssertCollection()
+    aapply(checkmate::assertFlag, . ~ average + areas + normalized + xNames + regression + showLegend,
+           fixed = list(add = ac))
+    checkmate::assertFunction(averageFunc, add = ac)
+    checkmate::assertChoice(xBy, c("rGroups", names(anaInfo)), null.ok = TRUE, add = ac)
+    checkmate::assertChoice(groupBy, c("fGroups", "rGroups", names(anaInfo)), null.ok = TRUE, add = ac)
+    aapply(checkmate::assertList, . ~ plotArgs + linesArgs, null.ok = TRUE, fixed = list(add = ac))
+    checkmate::reportAssertions(ac)
+
+    averageBy <- assertAndPrepareAnaInfoBy(average, anaInfo, FALSE)
+    
+    if (is.null(xBy))
+        xBy <- averageBy
+    else
+    {
+        if (xBy == "rGroups")
+            xBy <- "group"
+        checkAnaInfoAggrGrouping(anaInfo, "averaged", averageBy, xBy)
+    }
+    
+    if (is.null(groupBy))
+    {
+        if (showLegend)
+            showLegend <- FALSE
+    }
+    else
+    {
+        if (groupBy == "rGroups")
+            groupBy <- "group"
+        checkAnaInfoAggrGrouping(anaInfo, "averaged", averageBy, groupBy)
+    }
+    
+    if (length(obj) == 0)
+    {
+        noDataPlot()
+        return(invisible(NULL))
+    }
+
+    obj <- maybeAutoNormalizeFGroups(obj)
+    
+    intTab <- if (isFALSE(average))
+        copy(groupTable(obj, areas, normalized))
+    else
+        averageGroups(obj, areas, normalized, averageBy, averageFunc)
+    
+    intTab[, avgGroup := unique(anaInfo[[averageBy]])]
+    intTab[, x := anaInfo[[xBy]][match(avgGroup, anaInfo[[averageBy]])]]
+    intTab[, xnum := match(x, unique(anaInfo[[xBy]]))]
+    if (!is.null(groupBy) && groupBy != "fGroups")
+        intTab[, xgroup := anaInfo[[groupBy]][match(avgGroup, anaInfo[[averageBy]])]]
+    
+    if (is.null(groupBy))
+    {
+        if (is.null(col))
+            col <- "black"
+    }
+    else
+    {
+        labs <- if (groupBy == "fGroups") names(obj) else unique(intTab$xgroup)
+        if (is.null(col))
+            col <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(length(labs))
+        else
+            col <- rep(col, length.out = length(labs))
+        names(col) <- labs
+    }
+
+    xNum <- is.numeric(intTab$x)
+    
+    if (regression && !xNum)
+    {
+        stop("The data in the analysis information column specified by xBy should be numeric for regression calculations",
+             call. = FALSE)
+    }
+
+    regList <- if (regression)
+    {
+        sapply(intTab[, names(obj), with = FALSE], function(ints)
+        {
+            if (is.null(groupBy) || groupBy == "fGroups")
+                calcFeatureRegression(intTab$x, ints)
+            else
+            {
+                sapply(unique(intTab$xgroup), function(xg)
+                {
+                    wh <- intTab[, .I[xgroup == xg]]
+                    calcFeatureRegression(intTab$x[wh], ints[wh])
+                }, simplify = FALSE)
+            }
+        }, simplify = FALSE)
+    }
+    else
+        NULL
+    
+    oldp <- par(no.readonly = TRUE)
+    if (showLegend)
+    {
+        makeLegend <- function(x, y, ...)
+        {
+            leg <- names(col)
+            if (regression)
+            {
+                RSQs <- if (groupBy == "fGroups") sapply(regList, "[[", "RSQ") else sapply(regList[[1]], "[[", "RSQ")
+                RSQs <- sprintf("%.2f", RSQs)
+                leg <- mapply(leg, RSQs, FUN = function(l, r) as.expression(bquote(.(l) ~ "(" ~ R^2 ~ .(r) ~ ")")))
+            }
+            return(legend(x, y, leg, col = col, pch = pch, text.col = col, xpd = NA, ncol = 1,
+                          cex = 0.75, bty = "n", ...))
+        }
+        
+        plot.new()
+        leg <- makeLegend(0, 0, plot = FALSE)
+        lw <- (grconvertX(leg$rect$w, to = "ndc") - grconvertX(0, to = "ndc"))
+        par(omd = c(0, 1 - lw, 0, 1), new = TRUE)
+    }
+    
+    maxX <- if (xNum) max(intTab$x) else uniqueN(intTab$x)
+    do.call(plot, c(list(x = NULL, xlim = c(0, maxX), ylim = c(0, max(intTab[, names(obj), with = FALSE])),
+                         type = "n", xlab = "", ylab = "Intensity", xaxt = "n"), plotArgs))
+    
+    if (xNum)
+        axis(1)
+    else if (xNames)
+        axis(1, seq_len(uniqueN(intTab$x)), unique(intTab$x), las = 2)
+    else
+        axis(1, seq_len(maxX), seq_len(maxX))
+
+    linesArgs <- c(list(type = type, pch = pch, lty = lty), linesArgs)
+    usr <- par("usr")
+    
+    makeLine <- function(y, col, xgrp = NULL)
+    {
+        irows <- if (is.null(xgrp)) seq_len(nrow(intTab)) else intTab[, .I[xgroup == xgrp]]
+        x <- if (xNum) intTab$x[irows] else intTab$xnum[irows]
+        do.call(lines, c(list(x = x, y = y, col = col), linesArgs))
+        
+        if (regression)
+        {
+            if (!is.null(regList[[grp]][["lm"]]))
+            {
+                lm <- if (!is.null(xgrp)) regList[[grp]][[xgrp]] else regList[[grp]]
+                # from https://stackoverflow.com/a/10046370
+                clip(min(x), max(x), min(y), max(y))
+                abline(lm, col = col)
+                do.call("clip", as.list(usr))  # reset to plot region (from ?clip examples)
+            }
+        }
+    }
+    
+    for (grp in names(obj))
+    {
+        if (is.null(groupBy) || groupBy == "fGroups")
+            makeLine(intTab[[grp]], col[if (is.null(groupBy)) 1 else grp])
+        else
+        {
+            for (xgrp in unique(intTab$xgroup))
+                makeLine(intTab[xgroup == xgrp][[grp]], col[xgrp], xgrp = xgrp)
+        }
+    }
+    
+    if (showLegend)
+        makeLegend(par("usr")[2], par("usr")[4])
+    
+    par(oldp)
 })
 
-#' @rdname feature-plotting
-#' @export
-setMethod("plotInt", "featureGroupsSet", function(obj, average = FALSE, normalized = FALSE, xnames = !sets,
-                                                  showLegend = sets, pch = 20, type = "b", lty = 3, col = NULL,
-                                                  plotArgs = NULL, linesArgs = NULL, sets = FALSE)
-{
-    aapply(checkmate::assertFlag, . ~ average + normalized + xnames + showLegend + sets)
-    aapply(checkmate::assertList, . ~ plotArgs + linesArgs, null.ok = TRUE)
-    doPlotFeatInts(obj, average, normalized, xnames, showLegend, pch, type, lty, col, plotArgs, linesArgs,
-                   doSets = sets)    
-})
-
-setMethod("plotIntHash", "featureGroups", function(obj, average = FALSE, ...) makeHash(groupTable(obj), average, ...))
+# NOTE: anaInfo is included in cases where xBy/groupBy args are used
+setMethod("plotIntHash", "featureGroups", function(obj, ...) makeHash(groupTable(obj), analysisInfo(obj), ...))
 
 #' @details \code{plotChord} Generates a chord diagram which can be used to
 #'   visualize shared presence of feature groups between analyses or replicate

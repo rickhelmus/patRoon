@@ -17,10 +17,9 @@
     - rename group col to replicate and warn for deprecation (like blank/ref column)
     - see if MSPL sets anaInfo can be replaced by non-exported slot with named vector with sets for each ana
     - properly handle NA values for custom cols?
-    - plotVenn sets method: deprecate sets arg?
+    - plotVenn sets method: deprecate/remove sets arg?
     - FC: select multiple groups and/or anaInfo cols?
     - plotChord/report(): report sets as outer groups? make it optional?
-    - ".all" --> "fGroup"?
     
 - Misc
     - bg MS/MS subtraction
@@ -62,7 +61,8 @@
             - anaInfo col possible
     - as.data.table()
         - average arg
-            - different for features==T&&average==T
+            - different for features==T&&average==T --> fGroups
+            - rGroups also supported
         - regressionBy arg
             - mention that "set" can be used for sets workflows
             - regressionBy column with features=T
@@ -97,7 +97,7 @@
         - outerGroups --> groupBy and now expects anaInfo column name
     - as.data.table()
         - average arg
-            - .all replaces average==T if features==T and also supports features==F
+            - "fGroups" replaces average==T if features==T and also supports features==F
         - regressionBy arg
         - regression for features==F&&average==T: use average conc instead of first of each replicate
         - FC now possible with features==T

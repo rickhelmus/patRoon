@@ -181,7 +181,7 @@ if (doSIRIUS)
     
     calcTabFeats <- as.data.table(fGroupsCompsC, features = TRUE)
     calcTabFeatsNoColl <- as.data.table(fGroupsSuspDuplC, features = TRUE, collapseSuspects = NULL)
-    calcTabFeatsAvg <- as.data.table(fGroupsCompsC, features = TRUE, average = ".all")
+    calcTabFeatsAvg <- as.data.table(fGroupsCompsC, features = TRUE, average = "fGroups")
 }
 
 test_that("as.data.table functionality", {

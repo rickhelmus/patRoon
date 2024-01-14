@@ -35,12 +35,7 @@ if (length(components) > 0)
     
     plotIntMainArgs <- list(average = TRUE, normalize = TRUE)
     if (isFGSet(rmdVars$fGroups))
-    {
-        plotIntMainArgs <- c(plotIntMainArgs, list(sets = TRUE))
-    } else
-    {
-        plotIntMainArgs <- c(plotIntMainArgs, list(col = "black"))
-    }
+        plotIntMainArgs <- c(plotIntMainArgs, list(groupBy = "set", showLegend = TRUE))
     
     parentPlots <- setNames(Map(split(cInfo, seq_len(nrow(cInfo))), seq_len(nrow(cInfo)), f = function(parentRow, i)
     {

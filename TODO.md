@@ -36,9 +36,6 @@
     - delete() for screenInfo
         - `fGroups <- delete(fGroups, z = screenInfo(fGroups)$SMILES %in% rmSMILES)`
         - `fGroups <- delete(fGroups, z = function(scr) scr$SMILES %in% rmSMILES)`
-    - export TPsLogicTransformations so it can be easily modified
-        - export dataset --> add docs
-        - instead of accepting NULL, default args to logic/libform TPs to exported data
 
 - tests
     - IDL filter
@@ -126,6 +123,8 @@
     - sets fGroups: ion_mz column in @annotations
     - minimum max intensity feature filter
     - maxMZOverPrecMS/maxMZOverPrecMSMS MSPL filters
+    - The default metabolic logic transformations are now accessible through the `TPLogicTransformations()` function.
+    
 
 ## Ext
 

@@ -6,7 +6,7 @@ NULL
 getTPLogicTransformations <- function(transformations)
 {
     if (is.null(transformations))
-        transformations <- patRoon:::TPsLogicTransformations # stored inside R/sysdata.rda
+        transformations <- TPLogicTransformations()
     
     if (is.data.table(transformations))
         ret <- copy(transformations)

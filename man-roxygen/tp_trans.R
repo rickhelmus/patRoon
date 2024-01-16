@@ -1,5 +1,6 @@
 #' @param transformations A \code{data.frame} with transformation reactions to be used for calculating the TPs (see
-#'   details below). If \code{NULL}, a default table from Schollee \emph{et al.} is used (see references).
+#'   details below). If \code{NULL}, a default table from Schollee \emph{et al.} is used, that can be obtained with
+#'   \code{\link{TPLogicTransformations}}.
 #'
 #' @section Transformation reactions: The \code{transformations} argument specifies custom rules to calculate
 #'   transformation products. This should be a \code{data.frame} with the following columns: \itemize{

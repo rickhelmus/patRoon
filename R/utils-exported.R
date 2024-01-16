@@ -579,3 +579,19 @@ getSIRIUSToken <- function(user)
     
     return(ret)
 }
+
+#' Obtain default rules for metabolic logic
+#'
+#' This function returns a \code{data.frame} with the default rules for metabolic logic, which can be used by
+#' \code{\link{generateTPsLogic}} and \code{\link{genFormulaTPLibrary}}.
+#'
+#' @return A \code{data.frame} with columns describing each transformation rule.
+#'
+#' @section Source: The table is based on the work done by Schollee \emph{et al.} (see references).
+#'
+#' @references \insertRef{Scholle2015}{patRoon}
+#' @export
+TPLogicTransformations <- function()
+{
+    return(patRoon:::TPsLogicTransformations) # stored inside R/sysdata.rda
+}

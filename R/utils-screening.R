@@ -212,6 +212,38 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, skipInvalid)
     return(ret[])
 }
 
+delScreening <- function(fGroups, j, k)
+{
+    scr <- copy(screenInfo(fGroups))
+    
+    ac <- checkmate::makeAssertCollection()
+    if (!is.function(j))
+        j <- assertDeleteArgAndToChr(j, names(fGroups), add = ac)
+    checkmate::assert(
+        checkmate::checkFunction(k),
+        checkmate::checkChoice(k, unique(scr$name)),
+        checkmate::checkScalarNA(k),
+        .var.name = "k", add = ac
+    )
+    checkmate::reportAssertions(ac)
+    
+    if (is.null(j))
+        j <- names(fGroups)
+    
+    scr[, keep := TRUE]
+    
+    if (is.na(k))
+        scr[group %chin% j, keep := FALSE]
+    else if (is.function(k))
+        scr[group %chin% j, keep := !k(.SD)]
+    else
+        scr[group %chin% j, keep := !name %chin% k]
+    
+    scr <- scr[keep == TRUE][, keep := NULL][]
+    fGroups@screenInfo <- scr
+    return(fGroups)
+}
+
 doSuspectFilter <- function(obj, onlyHits, selectHitsBy, selectBestFGroups, maxLevel, maxFormRank, maxCompRank,
                             minAnnSimForm, minAnnSimComp, minAnnSimBoth, absMinFragMatches, relMinFragMatches, minRF,
                             maxLC50, negate)

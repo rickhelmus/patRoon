@@ -126,6 +126,21 @@ syncScreeningSetObjects <- function(obj)
     return(obj)
 }
 
+updateSOScreeningInfo <- function(obj)
+{
+    newsi <- screenInfo(obj)
+    
+    obj@setObjects <- lapply(obj@setObjects, function(so)
+    {
+        sosi <- copy(screenInfo(so))
+        sosi[, keep := FALSE]
+        sosi[newsi, keep := TRUE, on = c("group", "name")] # mark overlap
+        so@screenInfo <- sosi[keep == TRUE, -"keep"]
+        return(so)
+    })
+    return(obj)
+}
+
 #' @param set \setsWF The name of the set.
 #' @param sets \setsWF A \code{character} with name(s) of the sets to keep (or remove if \code{negate=TRUE}).
 #'
@@ -206,8 +221,16 @@ setMethod("[", c("featureGroupsScreeningSet", "ANY", "ANY", "missing"), function
 
 #' @rdname featureGroupsScreening-class
 #' @export
-setMethod("delete", "featureGroupsScreeningSet", function(obj, i = NULL, j = NULL, ...)
+setMethod("delete", "featureGroupsScreeningSet", function(obj, i = NULL, j = NULL, k = NULL, ...)
 {
+    if (!is.null(k))
+    {
+        if (!is.null(i))
+            stop("Cannot specify i and k arguments simultaneously.", call. = FALSE)
+        obj <- delScreening(obj, j, k)
+        return(updateSOScreeningInfo(obj))
+    }
+    
     oldn <- length(obj)
     obj <- callNextMethod()
     if (length(obj) != oldn)
@@ -321,21 +344,10 @@ setMethod("filter", "featureGroupsScreeningSet", function(obj, ..., onlyHits = N
     obj <- doSuspectFilter(obj, onlyHits = NULL, selectHitsBy, selectBestFGroups, maxLevel, maxFormRank, maxCompRank,
                            minAnnSimForm, minAnnSimComp, minAnnSimBoth, absMinFragMatches, relMinFragMatches, minRF,
                            maxLC50, negate)
-    newsi <- screenInfo(obj)
     suspFiltered <- !isTRUE(all.equal(oldsi, screenInfo(obj)))
     
     if (suspFiltered)
-    {
-        # update setObjects
-        obj@setObjects <- lapply(obj@setObjects, function(so)
-        {
-            sosi <- copy(screenInfo(so))
-            sosi[, keep := FALSE]
-            sosi[newsi, keep := TRUE, on = c("group", "name")] # mark overlap
-            so@screenInfo <- sosi[keep == TRUE, -"keep"]
-            return(so)
-        })
-    }
+        obj <- updateSOScreeningInfo(obj)
     
     if (!is.null(onlyHits))
         obj <- doSuspectFilter(obj, onlyHits = onlyHits, selectHitsBy = NULL, selectBestFGroups = FALSE, maxLevel = NULL,

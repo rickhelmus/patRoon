@@ -154,8 +154,15 @@ setMethod("[", c("featureGroupsScreening", "ANY", "ANY", "missing"), function(x,
 
 #' @rdname featureGroupsScreening-class
 #' @export
-setMethod("delete", "featureGroupsScreening", function(obj, i = NULL, j = NULL, ...)
+setMethod("delete", "featureGroupsScreening", function(obj, i = NULL, j = NULL, k = NULL, ...)
 {
+    if (!is.null(k))
+    {
+        if (!is.null(i))
+            stop("Cannot specify i and k arguments simultaneously.", call. = FALSE)
+        return(delScreening(obj, j, k))
+    }
+    
     obj <- callNextMethod()
     obj@screenInfo <- obj@screenInfo[group %in% names(obj)]
     return(obj)

@@ -26,15 +26,15 @@
     - don't try to do MetFrag/PubChem with MP (by default) or warn, also add docs why
     - MSPL filter to remove mass peaks with X Da higher m/z than precursor
         - do by default in newProject()?
-    - delete() for screenInfo
-        - `fGroups <- delete(fGroups, z = screenInfo(fGroups)$SMILES %in% rmSMILES)`
-        - `fGroups <- delete(fGroups, z = function(scr) scr$SMILES %in% rmSMILES)`
 
 - tests
     - IDL filter
     - annSim: jaccard (as was done for suspects)
     - as.data.table()
         - changed/new average, regression, regressionBy args
+    - delete() for screening
+        - check if SOs are properly synced
+        - test if k=NA works
     
 - docs
     - specSimParams --> specSimParamsMatch
@@ -76,6 +76,7 @@
     - plotInt()
         - xnames --> xNames
         - new args: areas, xBy, groupBy, averageFunc, regression
+    - filter() for screening: k arg, including NA to clearout results for fGroups specified by j (or all if j==NULL)
 
 - NEWS
     - specSimParamsMatch --> specSimParams
@@ -117,7 +118,8 @@
     - minimum max intensity feature filter
     - maxMZOverPrecMS/maxMZOverPrecMSMS MSPL filters
     - The default metabolic logic transformations are now accessible through the `TPLogicTransformations()` function.
-    
+    - filter() for screening: k arg
+
 
 ## Ext
 

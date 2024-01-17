@@ -348,7 +348,7 @@ setMethod("as.data.table", "MSPeakLists", function(x, fGroups = NULL, averaged =
 #' @template delete
 #' @param k A vector with analyses (\code{character} with names or \code{integer} with indices) for which the data
 #'   should be deleted. If \code{k!=NULL} then deletions will \emph{not} occur on group averaged peak lists. Otherwise,
-#'   if \code{k=NULL} then deltion occurs on \emph{both} group averaged and analysis specific peak lists.
+#'   if \code{k=NULL} then deletion occurs on \emph{both} group averaged and analysis specific peak lists.
 #' @export
 setMethod("delete", "MSPeakLists", function(obj, i = NULL, j = NULL, k = NULL, reAverage = FALSE, ...)
 {

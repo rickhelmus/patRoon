@@ -255,20 +255,19 @@ setMethod("getEICsForFeatures", "featuresSet", function(features)
     return(EICs)
 })
 
-averageSpectraMZR <- function(spectra, hd, clusterMzWindow, topMost, minIntensityPre,
-                              minIntensityPost, avgFun, method, precursor,
-                              pruneMissingPrecursor, retainPrecursor)
+averageSpectraMZR <- function(spectra, hd, clusterMzWindow, topMost, minIntensityPre, minIntensityPost, minAbundance,
+                              avgFun, method, precursor, pruneMissingPrecursor, retainPrecursor)
 {
     if (nrow(hd) == 0) # no spectra, return empty spectrum
-        return(emptyMSPeakList())
+        return(emptyMSPeakList("feat_abundance", NULL))
 
     sp <- spectra$spectra[hd$seqNum]
     # convert to peaklist format
     sp <- lapply(sp, function(spec) setnames(as.data.table(spec), c("mz", "intensity")))
     sp <- lapply(sp, assignPrecursorToMSPeakList, precursor)
 
-    return(averageSpectra(sp, clusterMzWindow, topMost, minIntensityPre, minIntensityPost,
-                          avgFun, method, pruneMissingPrecursor, retainPrecursor))
+    return(averageSpectra(sp, clusterMzWindow, topMost, minIntensityPre, minIntensityPost, minAbundance,
+                          "feat_abundance", avgFun, NULL, method, TRUE, pruneMissingPrecursor, retainPrecursor))
 }
 
 verifyDataCentroided <- function(anaInfo)

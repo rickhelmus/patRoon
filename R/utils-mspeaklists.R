@@ -1,5 +1,14 @@
-emptyMSPeakList <- function() data.table(mz = numeric(), intensity = numeric(), precursor = logical())
-
+emptyMSPeakList <- function(abundanceColumn, avgCols)
+{
+    ret <- data.table(mz = numeric(), intensity = numeric())
+    if (!is.null(abundanceColumn))
+        ret[, (abundanceColumn) := numeric()]
+    if (!is.null(avgCols))
+        ret[, (avgCols) := numeric()]
+    ret[, precursor := logical()]
+    return(ret)
+}
+    
 
 #' Parameters for averaging MS peak list data
 #'
@@ -23,6 +32,8 @@ emptyMSPeakList <- function() data.table(mz = numeric(), intensity = numeric(), 
 #' by \code{topMost}) before averaging.
 #'
 #' \item \code{minIntensityPost} MS peaks with intensities below this value will be removed after averaging.
+#' 
+#' \item \code{minAbundance} Minimum relative abundance of an MS peak across the spectra that are averaged (\samp{0-1}).
 #'
 #' \item \code{avgFun} Function that is used to calculate average \emph{m/z} values.
 #'
@@ -33,7 +44,7 @@ emptyMSPeakList <- function() data.table(mz = numeric(), intensity = numeric(), 
 #'
 #' \item \code{pruneMissingPrecursorMS} For MS data only: if \code{TRUE} then peak lists without a precursor peak are
 #' removed. Note that even when this is set to \code{FALSE}, functionality that relies on MS (not MS/MS) peak lists
-#' (\emph{e.g.} formulae calulcation) will still skip calculation if a precursor is not found.
+#' (\emph{e.g.} formulae calculation) will still skip calculation if a precursor is not found.
 #'
 #' \item \code{retainPrecursorMSMS} For MS/MS data only: if \code{TRUE} then always retain the precursor mass peak even
 #' if is not amongst the \code{topMost} peaks. Note that MS precursor mass peaks are always kept. Furthermore, note that
@@ -65,6 +76,7 @@ getDefAvgPListParams <- function(...)
                 topMost = 50,
                 minIntensityPre = 500,
                 minIntensityPost = 500,
+                minAbundance = 0,
                 avgFun = mean,
                 method = "hclust",
                 pruneMissingPrecursorMS = TRUE,
@@ -168,16 +180,16 @@ getDefSpecSimParams <- function(...)
 
 # align & average spectra by clustering or between peak distances
 # code inspired from msProcess R package: https://github.com/zeehio/msProcess
-averageSpectra <- function(spectra, clusterMzWindow, topMost, minIntensityPre, minIntensityPost,
-                           avgFun, method, pruneMissingPrecursor, retainPrecursor)
+averageSpectra <- function(spectra, clusterMzWindow, topMost, minIntensityPre, minIntensityPost, minAbundance,
+                           abundanceColumn, avgFun, avgCols, method, assignPrecursor, pruneMissingPrecursor,
+                           retainPrecursor)
 {
     if (length(spectra) == 0) # no spectra, return empty spectrum
-        return(emptyMSPeakList())
+        return(emptyMSPeakList(abundanceColumn, avgCols))
 
     spectra <- lapply(spectra, function(s)
     {
         s <- s[intensity >= minIntensityPre]
-
         if (nrow(s) > topMost)
         {
             ord <- order(s$intensity, decreasing = TRUE)
@@ -189,11 +201,16 @@ averageSpectra <- function(spectra, clusterMzWindow, topMost, minIntensityPre, m
         return(s)
     })
 
+    spcount <- length(spectra) # un-filtered count
     spcomb <- rbindlist(spectra, idcol = "spid")
-    setorder(spcomb, mz)
+    setorderv(spcomb, "mz")
 
     if (nrow(spcomb) < 2 || length(spectra) < 2)
-        return(spcomb[, -"spid"])
+    {
+        if (!is.null(abundanceColumn))
+            spcomb[, (abundanceColumn) := 1 / spcount]
+        return(spcomb[, names(emptyMSPeakList(abundanceColumn, avgCols)), with = FALSE])
+    }
 
     if (method == "hclust")
     {
@@ -210,22 +227,50 @@ averageSpectra <- function(spectra, clusterMzWindow, topMost, minIntensityPre, m
     if (any(spcomb[, .(dup = anyDuplicated(spid)), key = cluster][["dup"]] > 0))
         warning("During spectral averaging multiple masses from the same spectrum were clustered, consider tweaking clusterMzWindow!\n")
 
-    spcount <- length(spectra)
-    ret <- spcomb[, .(mz = avgFun(mz), intensity = sum(intensity) / spcount), by = cluster][, cluster := NULL]
+    doAvgPL <- function(sps, by, intN)
+    {
+        if (!is.null(avgCols))
+            sps[, (avgCols) := lapply(.SD, mean), .SDcols = avgCols, by = by]
+        sps[, c("mz", "intensity") := .(avgFun(mz), sum(intensity) / if (!is.null(intN)) intN else .N), by = by]
+        return(unique(sps, by = by))
+    }
+    
+    # average in two steps:
+    # 1. same mass peaks from same analysis (regular intensity average)
+    # 2. same mass peaks (intensity average over all considered spectra)
+    
+    ret <- doAvgPL(spcomb, c("cluster", "spid"), NULL)
+    
+    # do abundance calculation _after_ removing duplicated mass peaks from same spectra
+    if (!is.null(abundanceColumn))
+    {
+        ret[, (abundanceColumn) := .N / spcount, by = "cluster"]
+        ret <- ret[get(abundanceColumn) >= minAbundance]
+    }
+    
+    ret <- doAvgPL(ret, "cluster", spcount)
+    ret[, c("cluster", "spid") := NULL]
+    setcolorder(ret, c("mz", "intensity", abundanceColumn, avgCols))
+    
+    if (nrow(ret) == 0)
+        return(ret)
 
-    # update precursor flags
-    precMZs <- spcomb[precursor == TRUE, mz]
-    if (length(precMZs) > 0)
-        precMZ <- mean(precMZs)
+    if (assignPrecursor)
+    {
+        precMZs <- spcomb[precursor == TRUE, mz]
+        if (length(precMZs) > 0)
+            ret <- assignPrecursorToMSPeakList(ret, mean(precMZs))
+        else
+            ret[, precursor := FALSE]
+    }
     else
-        precMZ <- -1
-    ret <- assignPrecursorToMSPeakList(ret, precMZ)
-
+        ret[, precursor := FALSE]
+    
     # post intensity filter
     ret <- ret[intensity >= minIntensityPost]
-
+    
     if (pruneMissingPrecursor && !any(ret$precursor))
-        return(emptyMSPeakList())
+        return(emptyMSPeakList(abundanceColumn, avgCols))
 
     return(ret)
 }
@@ -315,8 +360,8 @@ deIsotopeMSPeakList <- function(MSPeakList, negate)
     return(MSPeakList[unique_iso])
 }
 
-doMSPeakListFilter <- function(pList, absIntThr, relIntThr, topMost, minPeaks, maxMZOverPrec, deIsotope,
-                               retainPrecursor, precursorMZ, negate)
+doMSPeakListFilter <- function(pList, absIntThr, relIntThr, topMost, minPeaks, maxMZOverPrec, minAbundanceFeat,
+                               minAbundanceFGroup, deIsotope, retainPrecursor, precursorMZ, negate)
 {
     ret <- pList
 
@@ -343,6 +388,11 @@ doMSPeakListFilter <- function(pList, absIntThr, relIntThr, topMost, minPeaks, m
         pred <- if (negate) function(x) x >= thr else function(x) x < thr
         ret <- ret[pred(mz)]
     }
+    
+    if (!is.null(minAbundanceFeat))
+        ret <- ret[intPred(feat_abundance, minAbundanceFeat)]
+    if (!is.null(minAbundanceFGroup))
+        ret <- ret[intPred(fgroup_abundance, minAbundanceFGroup)]
     
     if (deIsotope)
         ret <- deIsotopeMSPeakList(ret, negate)

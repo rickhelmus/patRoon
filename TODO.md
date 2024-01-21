@@ -30,6 +30,11 @@
     
 - Misc
     - bg MS/MS subtraction
+        - select conditions
+            - header: ms level, min ret time (or range?), min basepeak intensity
+            - spectrum: min intensity, topMost (eg 25)
+            - general: clusterMzWindow
+            - average: min rel abundance in all analyses, min abundance in all spectra
     - don't try to do MetFrag/PubChem with MP (by default) or warn, also add docs why
     - MSPL filter to remove mass peaks with X Da higher m/z than precursor
         - do by default in newProject()?
@@ -84,6 +89,10 @@
         - xnames --> xNames
         - new args: areas, xBy, groupBy, averageFunc, regression
     - filter() for screening: k arg, including NA to clearout results for fGroups specified by j (or all if j==NULL)
+    - MS/MS bg subtraction
+        - abundance filter args
+        - abundance columns in mspl
+        - abundance parameter in average params
 
 - NEWS
     - specSimParamsMatch --> specSimParams
@@ -126,7 +135,10 @@
     - maxMZOverPrecMS/maxMZOverPrecMSMS MSPL filters
     - The default metabolic logic transformations are now accessible through the `TPLogicTransformations()` function.
     - filter() for screening: k arg
-
+    - MS/MS bg subtraction
+        - abundance filter args
+        - abundance columns in mspl
+        - abundance parameter in average params
 
 ## Ext
 

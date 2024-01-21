@@ -380,7 +380,8 @@ setMethod("convertToSuspects", "MSLibrary", function(obj, adduct, spectrumType =
         
         avgPL <- averageSpectra(pls, avgSpecParams$clusterMzWindow, avgSpecParams$topMost,
                                 avgSpecParams$minIntensityPre, avgSpecParams$minIntensityPost,
-                                avgSpecParams$avgFun, avgSpecParams$method, FALSE, avgSpecParams$retainPrecursorMSMS)
+                                avgSpecParams$minAbundance, "abundance", avgSpecParams$avgFun, NULL,
+                                avgSpecParams$method, FALSE, FALSE, avgSpecParams$retainPrecursorMSMS)
         doProgress()
         paste0(avgPL$mz, collapse = ";")
     }

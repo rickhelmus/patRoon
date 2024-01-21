@@ -133,18 +133,18 @@ setMethod("averageMSPeakLists", "MSPeakLists", function(obj)
             plistsMS <- lapply(pLists, function(pl) pl[[gNames[grpi]]][["MS"]])
             plistsMS <- pruneList(plistsMS, checkZeroRows = TRUE)
             avgPLMS <- averageSpectra(plistsMS, obj@avgPeakListArgs$clusterMzWindow, obj@avgPeakListArgs$topMost,
-                                      obj@avgPeakListArgs$minIntensityPre,
-                                      obj@avgPeakListArgs$minIntensityPost,
-                                      obj@avgPeakListArgs$avgFun, obj@avgPeakListArgs$method,
+                                      obj@avgPeakListArgs$minIntensityPre, obj@avgPeakListArgs$minIntensityPost,
+                                      obj@avgPeakListArgs$minAbundance, "fgroup_abundance", obj@avgPeakListArgs$avgFun,
+                                      "feat_abundance", obj@avgPeakListArgs$method, TRUE,
                                       obj@avgPeakListArgs$pruneMissingPrecursorMS, TRUE)
             
             plistsMSMS <- lapply(pLists, function(pl) pl[[gNames[grpi]]][["MSMS"]])
             plistsMSMS <- pruneList(plistsMSMS, checkZeroRows = TRUE)
             avgPLMSMS <- averageSpectra(plistsMSMS, obj@avgPeakListArgs$clusterMzWindow, obj@avgPeakListArgs$topMost,
-                                        obj@avgPeakListArgs$minIntensityPre,
-                                        obj@avgPeakListArgs$minIntensityPost,
-                                        obj@avgPeakListArgs$avgFun, obj@avgPeakListArgs$method,
-                                        FALSE, obj@avgPeakListArgs$retainPrecursorMSMS)
+                                        obj@avgPeakListArgs$minIntensityPre, obj@avgPeakListArgs$minIntensityPost,
+                                        obj@avgPeakListArgs$minAbundance, "fgroup_abundance", obj@avgPeakListArgs$avgFun,
+                                        "feat_abundance", obj@avgPeakListArgs$method, TRUE, FALSE,
+                                        obj@avgPeakListArgs$retainPrecursorMSMS)
             
             results <- pruneList(list(MS = if (nrow(avgPLMS) > 0) avgPLMS else NULL,
                                       MSMS = if (nrow(avgPLMSMS) > 0) avgPLMSMS else NULL))
@@ -471,6 +471,8 @@ setMethod("delete", "MSPeakLists", function(obj, i = NULL, j = NULL, k = NULL, r
 setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntThr = NULL, relMSIntThr = NULL,
                                             relMSMSIntThr = NULL, topMSPeaks = NULL, topMSMSPeaks = NULL,
                                             minMSMSPeaks = NULL, maxMZOverPrecMS = NULL, maxMZOverPrecMSMS = NULL,
+                                            minAbundanceFeatMS = NULL, minAbundanceFeatMSMS = NULL,
+                                            minAbundanceFGroupMS = NULL, minAbundanceFGroupMSMS = NULL,
                                             isolatePrec = NULL, deIsotopeMS = FALSE,
                                             deIsotopeMSMS = FALSE, withMSMS = FALSE, annotatedBy = NULL,
                                             retainPrecursorMSMS = TRUE, reAverage = FALSE,
@@ -481,7 +483,8 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
 
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertNumber, . ~ absMSIntThr + absMSMSIntThr + relMSIntThr + relMSMSIntThr + maxMZOverPrecMS +
-               maxMZOverPrecMSMS, lower = 0, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
+               maxMZOverPrecMSMS + minAbundanceFeatMS + minAbundanceFeatMSMS + minAbundanceFGroupMS +
+               minAbundanceFGroupMSMS, lower = 0, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertCount, . ~ topMSPeaks + topMSMSPeaks + minMSMSPeaks, positive = TRUE,
            null.ok = TRUE, fixed = list(add = ac))
     assertPListIsolatePrecParams(isolatePrec, add = ac)
@@ -500,7 +503,8 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
         return(obj)
 
     hash <- makeHash(obj, absMSIntThr, absMSMSIntThr, relMSIntThr, relMSMSIntThr, topMSPeaks, topMSMSPeaks, minMSMSPeaks,
-                     maxMZOverPrecMS, maxMZOverPrecMSMS, isolatePrec, deIsotopeMS, deIsotopeMSMS, withMSMS, annotatedBy,
+                     maxMZOverPrecMS, maxMZOverPrecMSMS, minAbundanceFeatMS, minAbundanceFeatMSMS, minAbundanceFGroupMS,
+                     minAbundanceFGroupMSMS, isolatePrec, deIsotopeMS, deIsotopeMSMS, withMSMS, annotatedBy,
                      retainPrecursorMSMS, reAverage, negate)
     cache <- loadCacheData("filterMSPeakLists", hash)
     if (!is.null(cache))
@@ -519,8 +523,10 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
         
         if (type == "MS")
         {
-            plF <- doMSPeakListFilter(plF, absMSIntThr, relMSIntThr, topMSPeaks, NULL, maxMZOverPrecMS, deIsotopeMS,
-                                      TRUE, plF[precursor == TRUE]$mz, negate)
+            plF <- doMSPeakListFilter(plF, absMSIntThr, relMSIntThr, topMSPeaks, NULL, maxMZOverPrecMS,
+                                      minAbundanceFeatMS, if (is.null(ana)) minAbundanceFGroupMS else NULL,
+                                      deIsotopeMS, TRUE,
+                                      plF[precursor == TRUE]$mz, negate)
             if (!is.null(isolatePrec))
                 plF <- isolatePrecInMSPeakList(plF, isolatePrec, negate)
         }
@@ -563,6 +569,7 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
                     obj[[grp]]$MS[precursor == TRUE]$mz
             }
             plF <- doMSPeakListFilter(plF, absMSMSIntThr, relMSMSIntThr, topMSMSPeaks, minMSMSPeaks, maxMZOverPrecMSMS,
+                                      minAbundanceFeatMSMS, if (is.null(ana)) minAbundanceFGroupMSMS else NULL,
                                       deIsotopeMSMS, retainPrecursorMSMS, precMZ, negate)
         }
         

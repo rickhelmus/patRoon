@@ -164,6 +164,9 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
     }
     
     gInfoParents <- groupInfo(fGroups); gInfoTPs <- groupInfo(fGroupsTPs)
+    haveFormulas <- !is.null(formulas) && length(formulas) > 0
+    haveCompounds <- !is.null(compounds) && length(compounds) > 0
+    mode <- if (!is.null(TPs)) "TPs" else if (isScreening(fGroups) && (haveFormulas || haveCompounds)) "unkScr" else "unk"
     
     cat("Linking parents and TPs ...\n")
     
@@ -213,7 +216,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
     #   - for full unknowns: simply get component from prepareComponent(), no candidate table
 
     compInfo <- TPFGMapping <- NULL
-    if (!is.null(TPs))
+    if (mode == "TPs")
     {
         compInfo <- linkParentsToFGroups(TPs, fGroups)
         setnames(compInfo, paste0("parent_", names(compInfo)))
@@ -227,7 +230,14 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
         setcolorder(compInfo, c("parent_name", "parent_group", "parent_rt", "parent_mz"))
         TPFGMapping <- linkTPsToFGroups(TPs, fGroupsTPs)
     }
-    # UNDONE: handle unknowns from screening
+    else if (mode == "unkScr")
+    {
+        compInfo <- subsetDTColumnsIfPresent(screenInfo(fGroups), c("name", "group", "formula", "SMILES", "InChI",
+                                                                    "InChIKey", "neutralMass", "molNeutralized"))
+        setnames(compInfo, paste0("parent_", names(compInfo)))
+        compInfo[, c("parent_rt", "parent_mz") := gInfoParents[parent_group, c("rts", "mzs")]]
+        setcolorder(compInfo, c("parent_name", "parent_group", "parent_rt", "parent_mz"))
+    }
     else
         compInfo <- data.table(parent_group = names(fGroups), parent_name = names(fGroups))
     compInfo[, name := paste0("CMP", .I)]
@@ -237,7 +247,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
     compList <- Map(compInfo$parent_name, compInfo$parent_group, f = function(parn, parfg)
     {
         cmpTab <- parentForm <- NULL
-        if (!is.null(TPs))
+        if (mode == "TPs")
         {
             parentForm <- parents(TPs)[name == parn][["formula"]][1]
             parentSMILES <- parents(TPs)[name == parn][["SMILES"]][1]
@@ -247,7 +257,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
             candidates <- getTPComponCandidatesScr(TPs, parn, parentForm, TPFGMapping)
             cmpTab <- data.table(group = names(candidates), candidates = candidates)
 
-            if (!is.null(formulas) && haveParForm)
+            if (haveFormulas && haveParForm)
             {
                 candidates <- getTPComponCandidatesUnkAnn(formulas, parentForm, NULL)
                 if (length(candidates) > 0)
@@ -257,7 +267,36 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
                 }
             }
             
-            if (!is.null(compounds) && haveParForm && haveParSMI)
+            if (haveCompounds && haveParForm && haveParSMI)
+            {
+                candidates <- getTPComponCandidatesUnkAnn(compounds, parentForm, parentSMILES)
+                if (length(candidates) > 0)
+                {
+                    cmpTab <- merge(cmpTab, data.table(group = names(candidates), candidatesComp = candidates),
+                                    by = "group", all = TRUE, sort = FALSE)
+                }
+            }
+        }
+        else if (mode == "unkScr")
+        {
+            parentForm <- screenInfo(fGroups)[name == parn][["formula"]][1]
+            parentSMILES <- screenInfo(fGroups)[name == parn][["SMILES"]][1]
+            haveParForm <- !is.null(parentForm) && !is.na(parentForm)
+            haveParSMI <- !is.null(parentSMILES) && !is.na(parentSMILES)
+            
+            cmpTab <- data.table(group = character(), candidates = list())
+            
+            if (haveFormulas && haveParForm)
+            {
+                candidates <- getTPComponCandidatesUnkAnn(formulas, parentForm, NULL)
+                if (length(candidates) > 0)
+                {
+                    cmpTab <- merge(cmpTab, data.table(group = names(candidates), candidatesForm = candidates),
+                                    by = "group", all = TRUE, sort = FALSE)
+                }
+            }
+            
+            if (haveCompounds && haveParForm && haveParSMI)
             {
                 candidates <- getTPComponCandidatesUnkAnn(compounds, parentForm, parentSMILES)
                 if (length(candidates) > 0)

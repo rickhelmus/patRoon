@@ -155,7 +155,7 @@ doReportHTML <- function(fGroups, MSPeakLists, formulas, compounds, compsCluster
         if (length(wh) == 0)
         {} # nothing
         else if (settings$general$selfContained)
-            p[wh] <- knitr::image_uri(p[wh])
+            p[wh] <- sapply(p[wh], knitr::image_uri)
         else
             p[wh] <- file.path("report_files", "plots", basename(p[wh])) # make paths relative for correct HTML links
         return(p)

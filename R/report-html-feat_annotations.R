@@ -349,10 +349,18 @@ reportHTMLUtils$methods(
             scr <- screenInfo(objects$fGroups)
             if (!is.null(scr[["formula"]]))
             {
-                tab[neutral_formula %chin% scr$formula, suspect := {
-                    paste0(unique(scr[formula == neutral_formula]$name), collapse = ", ")
-                }, by = "neutral_formula"]
+                wh <- which(tab$neutral_formula %chin% scr$formula)
+                if (length(wh) == 0)
+                    tab[, suspect := ""]
+                else
+                {
+                    tab[wh, suspect := {
+                        paste0(unique(scr[formula == neutral_formula]$name), collapse = ", ")
+                    }, by = "neutral_formula"]
+                }
             }
+            else
+                tab[, suspect := ""]
         }
         
         getFormDetails <- function(index)
@@ -468,10 +476,15 @@ reportHTMLUtils$methods(
             {
                 scr <- data.table::copy(scr)
                 scr[, IK1 := getIKBlock1(InChIKey)]
-                tab[UID %chin% scr$IK1, suspect := {
+                wh <- which(tab$UID %chin% scr$IK1)
+                if (length(wh) == 0)
+                    tab[, suspect := ""]
+                tab[wh, suspect := {
                     paste0(unique(scr[IK1 == UID[1]]$name), collapse = ", ")
                 }, by = "UID"]
             }
+            else
+                tab[, suspect := ""]
         }
         
         tab <- removeDTColumnsIfPresent(tab, c("InChIKey", "UID"))

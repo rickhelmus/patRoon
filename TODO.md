@@ -23,6 +23,7 @@
     
 - Misc
     - bg MS/MS subtraction
+        - default abundance filtering while averaging? or apply filter in newProject()
         - select conditions
             - header: ms level, min ret time (or range?), min basepeak intensity
             - spectrum: min intensity, topMost (eg 25)
@@ -86,6 +87,7 @@
         - abundance filter args
         - abundance columns in mspl
         - abundance parameter in average params
+        - getBGMSMSPeaks()
 
 - NEWS
     - specSimParamsMatch --> specSimParams
@@ -132,6 +134,7 @@
         - abundance filter args
         - abundance columns in mspl
         - abundance parameter in average params
+        - getBGMSMSPeaks()
 
 ## Ext
 

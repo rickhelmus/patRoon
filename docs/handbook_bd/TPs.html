@@ -61,7 +61,7 @@
 <link href="libs/vis-9.1.0/vis-network.min.css" rel="stylesheet" />
 <script src="libs/vis-9.1.0/vis-network.min.js"></script>
 <script src="libs/visNetwork-binding-2.1.2/visNetwork.js"></script>
-<script src="libs/plotly-binding-4.10.3/plotly.js"></script>
+<script src="libs/plotly-binding-4.10.4/plotly.js"></script>
 <script src="libs/typedarray-0.1/typedarray.min.js"></script>
 <link href="libs/crosstalk-1.2.1/css/crosstalk.min.css" rel="stylesheet" />
 <script src="libs/crosstalk-1.2.1/js/crosstalk.min.js"></script>
@@ -365,8 +365,8 @@ div.csl-indent {
 <h1><span class="header-section-number">7</span> Transformation product screening<a href="TPs.html#TPs" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>This chapter describes the various functionality for screening of <em>transformation products</em> (TPs), which are introduced since <code>patRoon</code> 2.0. Screening for TPs, i.e. chemicals that are formed from a <em>parent</em> chemical by e.g. chemical or biological processes, has broad applications. For this reason, the TP screening related functionality is designed to be flexible, thus allowing one to use a workflow that is best suited for a particular study.</p>
 <p>Regardless, the TP screening workflow in <code>patRoon</code> can be roughly summarized as follows:</p>
-<div id="htmlwidget-a759a4dc32d61bae9b5f" style="width:500px;height:90px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-a759a4dc32d61bae9b5f">{"x":{"diagram":"\ndigraph Workflow {\n  graph [ rankdir = LR ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Parent screening\" -> \"Obtaining TPs\" -> \"TP screening\" -> \"Linking parent/TPs\"\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-443bb10527badf89b71d" style="width:500px;height:90px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-443bb10527badf89b71d">{"x":{"diagram":"\ndigraph Workflow {\n  graph [ rankdir = LR ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Parent screening\" -> \"Obtaining TPs\" -> \"TP screening\" -> \"Linking parent/TPs\"\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <ul>
 <li><strong>Parent screening</strong> During this step a common <code>patRoon</code> workflow is used to screen for the parent chemicals of interest. This could be a full non-target analysis with compound annotation or a relative simple suspect or target screening.</li>
 <li><strong>Obtaining TPs</strong> Data is obtained of potential TPs for the parents of interest. The TPs may originate from a library or predicted <em>in-silico</em>. Note that in some workflows this step is omitted (discussed later).</li>

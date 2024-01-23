@@ -335,6 +335,64 @@ getEICs <- function(file, ranges)
     return(doGetEICs(file, as.data.table(ranges)))
 }
 
+#' @export
+getBGMSMSPeaks <- function(anaInfo, rGroups = NULL, MSLevel = 2, retentionRange = NULL, minBPIntensity = 5000,
+                           avgSpectraParams = getDefAvgPListParams(minAbundance = 0.1, topMost = 25),
+                           avgAnalysesParams = getDefAvgPListParams(minAbundance = 0.8, topMost = 25), parallel = TRUE)
+{
+    ac <- checkmate::makeAssertCollection()
+    anaInfo <- assertAndPrepareAnaInfo(anaInfo, c("mzXML", "mzML"), verifyCentroided = TRUE, add = ac)
+    checkmate::assertChoice(rGroups, unique(anaInfo$group), null.ok = TRUE, add = ac)
+    checkmate::assertCount(MSLevel, positive = TRUE, add = ac)
+    assertRange(retentionRange, null.ok = TRUE, add = ac)
+    checkmate::assertNumber(minBPIntensity, na.ok = FALSE, add = ac)
+    checkmate::assertFlag(parallel, add = ac)
+    aapply(assertAvgPListParams, . ~ avgSpectraParams + avgAnalysesParams, fixed = list(add = ac))
+    checkmate::reportAssertions(ac)
+    
+    cacheDB <- openCacheDBScope()
+    baseHash <- makeHash(MSLevel, retentionRange, minBPIntensity, avgSpectraParams, avgAnalysesParams)
+    
+    if (!is.null(rGroups))
+        anaInfo <- anaInfo[group %in% rGroups]
+    
+    printf("Averaging the spectra for each of the %d analyses\n", nrow(anaInfo))
+    blSpecs <- doApply("Map", parallel, anaInfo$analysis, anaInfo$path, f = function(ana, path)
+    {
+        fp <- getMzMLOrMzXMLAnalysisPath(ana, path, mustExist = TRUE)
+        hash <- makeHash(baseHash, makeFileHash(fp))
+        avgsp <- loadCacheData("avgBGMSMS", hash, cacheDB)
+        
+        if (is.null(avgsp))
+        {
+            specs <- loadSpectra(fp, verbose = FALSE, cacheDB = cacheDB)
+            specsHd <- specs$header[specs$header$msLevel == MSLevel &
+                                        (is.null(retentionRange) | specs$header$retentionTime %inrange% retentionRange) &
+                                        specs$header$basePeakIntensity >= minBPIntensity]
+            # convert to peaklist format
+            sps <- lapply(specs$spectra[specsHd$seqNum], function(spec) setnames(as.data.table(spec), c("mz", "intensity")))
+            avgsp <- averageSpectra(sps, avgSpectraParams$clusterMzWindow, avgSpectraParams$topMost,
+                                    avgSpectraParams$minIntensityPre, avgSpectraParams$minIntensityPost,
+                                    avgSpectraParams$minAbundance, "spectra_abundance", avgSpectraParams$avgFun, NULL,
+                                    avgSpectraParams$method, FALSE, FALSE, FALSE)
+            saveCacheData("avgBGMSMS", avgsp, hash, cacheDB)
+        }
+        
+        doProgress()
+        return(avgsp)
+    })
+    
+    printf("Averaging analyses averaged spectra... ")
+    ret <- averageSpectra(blSpecs, avgAnalysesParams$clusterMzWindow, avgAnalysesParams$topMost,
+                          avgAnalysesParams$minIntensityPre, avgAnalysesParams$minIntensityPost,
+                          avgAnalysesParams$minAbundance, "analyses_abundance", avgAnalysesParams$avgFun, NULL,
+                          avgAnalysesParams$method, FALSE, FALSE, FALSE)
+    ret[, precursor := NULL]
+    printf("Done!\n")
+    
+    return(ret[])
+}
+
 #' Extracted Ion Chromatogram parameters
 #'
 #' Parameters for creation of extracted ion chromatograms.

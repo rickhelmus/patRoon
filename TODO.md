@@ -33,6 +33,13 @@
     - MSPL filter to remove mass peaks with X Da higher m/z than precursor
         - do by default in newProject()?
 
+- TP scoring
+    - Optionally force TP retDir calculation with same algorithm (rcdk/obabel)
+        - Make option in generateTPs methods?
+        - Make option in componentsTPs for unk compounds (and maybe override scr?)
+        --> now always uses rcdk/obabel, also support XLogPs from annotation data?
+    - Do TP_retDir calculation with LogP tolerance, also for existing code 
+
 - tests
     - IDL filter
     - annSim: jaccard (as was done for suspects)

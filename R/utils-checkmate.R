@@ -782,6 +782,9 @@ checkQuantEluent <- function(x, fGroups)
 }
 assertQuantEluent <- checkmate::makeAssertionFunction(checkQuantEluent)
 
+checkXLogPMethod <- function(x) checkmate::checkChoice(x, c("rcdk", "obabel", "none"))
+assertXLogPMethod <- checkmate::makeAssertionFunction(checkXLogPMethod)
+
 # from https://github.com/mllg/checkmate/issues/115
 aapply = function(fun, formula, ..., fixed = list())
 {

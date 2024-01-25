@@ -136,7 +136,7 @@ generateTPsCTS <- function(parents, transLibrary, generations = 1, errorRetries 
     aapply(checkmate::assertCount, . ~ generations + errorRetries, positive = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + neutralChemProps + neutralizeTPs + calcSims +
                parallel, fixed = list(add = ac))
-    checkmate::assertChoice(calcLogP, c("rcdk", "obabel", "none"), add = ac)
+    assertXLogPMethod(calcLogP, add = ac)
     aapply(checkmate::assertString, . ~ fpType + fpSimMethod, min.chars = 1, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     

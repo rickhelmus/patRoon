@@ -1352,6 +1352,68 @@ setMethod("calculateTox", "featureGroups", function(fGroups, featureAnn)
 })
 
 
+#' @describeIn featureGroups Obtain the total ion chromatogram/s (TICs) of the analyses (`i`).
+#' @param msLevels Integer vector with the ms levels (i.e., 1 for MS1 and 2 for MS2) 
+#' to obtain TIC traces.
+#' @param retentionRange Range of retention time (in seconds) to collect TIC traces.
+#' Should be a numeric vector with length of two containing the min/max values. 
+#' Set to NULL to ignore.
+#' @aliases getTICs
+#' @export
+setMethod("getTICs", "featureGroups", function(obj, i = NULL, retentionRange = NULL, msLevels = c(1, 2))
+{
+  getTICs(obj@features, i, retentionRange, msLevels)
+})
+
+
+#' @describeIn featureGroups Plots the total ion chromatogram/s (TICs) of the analyses (`i`).
+#' @param retMin Plot retention time in minutes (instead of seconds).
+#' @param title Character string used for title of the plot. If \code{NULL} a title will be automatically generated.
+#' @param colourBy Sets the automatic colour selection: "none" for a single 
+#' colour or "analyses"/"replicates" for a distinct colour per replicate/analysis.
+#' @param showLegend Plot a legend if TRUE.
+#' @template plot-lim
+#' @aliases plotTICs
+#' @export
+setMethod("plotTICs", "featureGroups", function(obj,
+                                                i = NULL,
+                                                retentionRange = NULL,
+                                                msLevels = 1,
+                                                retMin = FALSE,
+                                                title = NULL,
+                                                colourBy = c("none", "analyses", "replicates"),
+                                                showLegend = TRUE,
+                                                xlim = NULL, ylim = NULL, ...)
+{
+  plotTICs(obj@features, i, retentionRange, msLevels, retMin, title, colourBy, showLegend, xlim, ylim, ...)
+})
+
+
+#' @describeIn featureGroups Obtain the base peak chromatogram/s (BPCs) of the analyses.
+#' @aliases getBPCs
+#' @export
+setMethod("getBPCs", "featureGroups", function(obj, i = NULL, retentionRange = NULL, msLevels = c(1, 2))
+{
+  getBPCs(obj@features, i, retentionRange, msLevels)
+})
+
+#' @describeIn featureGroups Plots the base peak chromatogram/s (BPCs) of the analyses (`i`).
+#' @aliases plotBPCs
+#' @export
+setMethod("plotBPCs", "featureGroups", function(obj,
+                                                i = NULL,
+                                                retentionRange = NULL,
+                                                msLevels = 1,
+                                                retMin = FALSE,
+                                                title = NULL,
+                                                colourBy = c("none", "analyses", "replicates"),
+                                                showLegend = TRUE,
+                                                xlim = NULL, ylim = NULL, ...)
+{
+  plotBPCs(obj@features, i, retentionRange, msLevels, retMin, title, colourBy, showLegend, xlim, ylim, ...)
+})
+
+
 #' Grouping of features
 #'
 #' Group equal features across analyses.

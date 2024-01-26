@@ -1,6 +1,25 @@
 #' @include main.R
 NULL
 
+getHeaders <- function(path, rtRange, MSLevel, verbose = FALSE)
+{
+  
+  if (verbose)
+    printf("Loading spectra headers for '%s'...\n", path)
+  
+  msf <- mzR::openMSfile(path)
+  hd <- as.data.table(mzR::header(msf))
+  mzR::close(msf)
+  
+  if (!is.null(MSLevel))
+    hd <- hd[msLevel %in% MSLevel, ]
+  
+  if (!is.null(rtRange))
+    hd <- hd[numGTE(retentionTime, rtRange[1]) & numLTE(retentionTime, rtRange[2]), ]
+
+  return(hd)
+}
+
 loadSpectra <- function(path, rtRange = NULL, verbose = TRUE, cacheDB = NULL)
 {
     # NOTE: limit length as this function may be called frequently

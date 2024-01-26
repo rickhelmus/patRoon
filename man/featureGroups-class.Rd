@@ -53,6 +53,14 @@
 \alias{calculatePeakQualities,featureGroups-method}
 \alias{selectIons,featureGroups-method}
 \alias{normInts,featureGroups-method}
+\alias{getTICs,featureGroups-method}
+\alias{getTICs}
+\alias{plotTICs,featureGroups-method}
+\alias{plotTICs}
+\alias{getBPCs,featureGroups-method}
+\alias{getBPCs}
+\alias{plotBPCs,featureGroups-method}
+\alias{plotBPCs}
 \alias{featureGroupsSet-class}
 \alias{featureGroupsSet}
 \alias{sets,featureGroupsSet-method}
@@ -218,6 +226,38 @@ normInts(
   ISTDRTWindow = 120,
   ISTDMZWindow = 300,
   minISTDs = 3,
+  ...
+)
+
+\S4method{getTICs}{featureGroups}(obj, i = NULL, retentionRange = NULL, msLevels = c(1, 2))
+
+\S4method{plotTICs}{featureGroups}(
+  obj,
+  i = NULL,
+  retentionRange = NULL,
+  msLevels = 1,
+  retMin = FALSE,
+  title = NULL,
+  colourBy = c("none", "analyses", "replicates"),
+  showLegend = TRUE,
+  xlim = NULL,
+  ylim = NULL,
+  ...
+)
+
+\S4method{getBPCs}{featureGroups}(obj, i = NULL, retentionRange = NULL, msLevels = c(1, 2))
+
+\S4method{plotBPCs}{featureGroups}(
+  obj,
+  i = NULL,
+  retentionRange = NULL,
+  msLevels = 1,
+  retMin = FALSE,
+  title = NULL,
+  colourBy = c("none", "analyses", "replicates"),
+  showLegend = TRUE,
+  xlim = NULL,
+  ylim = NULL,
   ...
 )
 
@@ -414,6 +454,25 @@ values are: \code{"adduct"} (ignore isotope annotation), \code{"isotope"} (ignor
 \command{OpenMS} is used to find features, it already removes any detected non-monoisotopic features by default.
 Hence, in such case setting \code{chargeMismatch="adduct"} is more appropriate.}
 
+\item{retentionRange}{Range of retention time (in seconds) to collect TIC traces.
+Should be a numeric vector with length of two containing the min/max values. 
+Set to NULL to ignore.}
+
+\item{msLevels}{Integer vector with the ms levels (i.e., 1 for MS1 and 2 for MS2) 
+to obtain TIC traces.}
+
+\item{retMin}{Plot retention time in minutes (instead of seconds).}
+
+\item{title}{Character string used for title of the plot. If \code{NULL} a title will be automatically generated.}
+
+\item{colourBy}{Sets the automatic colour selection: "none" for a single 
+colour or "analyses"/"replicates" for a distinct colour per replicate/analysis.}
+
+\item{showLegend}{Plot a legend if TRUE.}
+
+\item{xlim, ylim}{Sets the plot size limits used by
+\code{\link[graphics]{plot}}. Set to \code{NULL} for automatic plot sizing.}
+
 \item{set}{\setsWF The name of the set.}
 
 \item{reGroup}{\setsWF Set to \code{TRUE} to re-group the features after the adduct annotations are changed. See the
@@ -539,6 +598,14 @@ be used to manually correct adduct assignments afterwards if necessary.
 
 \item \code{normInts(featureGroups)}: Provides various methods to normalizes feature intensities for each sample analysis or of
 all features within a feature group. See the \verb{Feature intensity normalization} section below.
+
+\item \code{getTICs(featureGroups)}: Obtain the total ion chromatogram/s (TICs) of the analyses (`i`).
+
+\item \code{plotTICs(featureGroups)}: Plots the total ion chromatogram/s (TICs) of the analyses (`i`).
+
+\item \code{getBPCs(featureGroups)}: Obtain the base peak chromatogram/s (BPCs) of the analyses.
+
+\item \code{plotBPCs(featureGroups)}: Plots the base peak chromatogram/s (BPCs) of the analyses (`i`).
 
 }}
 \section{Slots}{

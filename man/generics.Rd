@@ -25,6 +25,10 @@
 \alias{groupNames}
 \alias{plotChord}
 \alias{plotChroms}
+\alias{getTICs}
+\alias{plotTICs}
+\alias{getBPCs}
+\alias{plotBPCs}
 \alias{plotGraph}
 \alias{plotInt}
 \alias{plotScores}
@@ -100,6 +104,14 @@ groupNames(obj)
 plotChord(obj, addSelfLinks = FALSE, addRetMzPlots = TRUE, ...)
 
 plotChroms(obj, ...)
+
+getTICs(obj, ...)
+
+plotTICs(obj, ...)
+
+getBPCs(obj, ...)
+
+plotBPCs(obj, ...)
 
 plotGraph(obj, ...)
 
@@ -296,7 +308,7 @@ please refer to the linked method documentation for each generic.
     \item Methods are defined for: \code{\link[=getFeatures,featureGroups-method]{featureGroups}}.
 }
 
-\code{getMCS} Calculcates the maximum common substructure.
+\code{getMCS} Calculates the maximum common substructure.
 
 \itemize{
     \item Methods are defined for: \code{\link[=getMCS,compounds-method]{compounds}}; \code{\link[=getMCS,compoundsCluster-method]{compoundsCluster}}.
@@ -318,6 +330,30 @@ please refer to the linked method documentation for each generic.
 
 \itemize{
     \item Methods are defined for: \code{\link[=plotChroms,components-method]{components}}; \code{\link[=plotChroms,featureGroups-method]{featureGroups}}.
+}
+
+\code{getTICs} gets total ion chromatogram(s).
+
+\itemize{
+    \item Methods are defined for: \code{\link[=getTICs,featureGroups-method]{featureGroups}}; \code{\link[=getTICs,features-method]{features}}.
+}
+
+\code{plotTICs} plots total ion chromatogram(s).
+
+\itemize{
+    \item Methods are defined for: \code{\link[=plotTICs,featureGroups-method]{featureGroups}}; \code{\link[=plotTICs,features-method]{features}}.
+}
+
+\code{getBPCs} gets base peak chromatogram(s).
+
+\itemize{
+    \item Methods are defined for: \code{\link[=getBPCs,featureGroups-method]{featureGroups}}; \code{\link[=getBPCs,features-method]{features}}.
+}
+
+\code{plotBPCs} plots base peak chromatogram(s).
+
+\itemize{
+    \item Methods are defined for: \code{\link[=plotBPCs,featureGroups-method]{featureGroups}}; \code{\link[=plotBPCs,features-method]{features}}.
 }
 
 \code{plotGraph} Plots an interactive network graph.

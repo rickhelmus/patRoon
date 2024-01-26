@@ -414,6 +414,337 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
 })
 
 
+#' @describeIn features Obtain the total ion chromatogram/s (TICs) of the analyses.
+#' @param msLevels Integer vector with the ms levels (i.e., 1 for MS1 and 2 for MS2) 
+#' to obtain TIC traces.
+#' @aliases getTICs
+#' @export
+setMethod("getTICs", "features", function(obj, i = NULL, retentionRange = NULL, msLevels = 1)
+{
+  ac <- checkmate::makeAssertCollection()
+  
+  msLevels <- as.integer(msLevels)
+  checkmate::assert(checkmate::check_integer(msLevels, min.len = 1, lower = 1), add = ac)
+  
+  anaInfo <- analysisInfo(obj)
+  
+  if (!is.null(i))
+  {
+    if (is.character(i)) {
+      checkmate::assert(checkmate::check_choice(i, anaInfo$analysis), add = ac)
+      anaInfo <- anaInfo[anaInfo$analysis %in% i, ]
+    } else if (is.integer(i)) {
+      i <- as.integer(i)
+      checkmate::assert(checkmate::check_integer(i, min.len = 1, lower = 1, upper = nrow(anaInfo), max.len = nrow(anaInfo)), add = ac)
+      anaInfo <- anaInfo[i, ]
+    }
+  }
+  
+  checkmate::reportAssertions(ac)
+  
+  filePaths <- getMzMLOrMzXMLAnalysisPath(anaInfo$analysis, anaInfo$path, mustExist = TRUE)
+  
+  res <- lapply(filePaths, function(fpath)
+  {
+    hd <- getHeaders(fpath, retentionRange, msLevels)
+    data.table("ret" = hd$retentionTime, "msLevel" = hd$msLevel, "intensity" = hd$totIonCurrent)
+  })
+  
+  names(res) <- anaInfo$analysis
+  group <- anaInfo$group
+  names(group) <- anaInfo$analysis
+  res <- rbindlist(res, idcol = "analysis")
+  res$group <- group[res$analysis]
+  setcolorder(res, c("analysis", "group"))
+  res
+})
+
+
+#' @describeIn features Obtain the base peak chromatogram/s (BPCs) of the analyses.
+#' @aliases getBPCs
+#' @export
+setMethod("getBPCs", "features", function(obj, i = NULL, retentionRange = NULL, msLevels = 1)
+{
+  ac <- checkmate::makeAssertCollection()
+  
+  msLevels <- as.integer(msLevels)
+  checkmate::assert(checkmate::check_integer(msLevels, min.len = 1, lower = 1), add = ac)
+  
+  anaInfo <- analysisInfo(obj)
+  
+  if (!is.null(i))
+  {
+    if (is.character(i)) {
+      checkmate::assert(checkmate::check_choice(i, anaInfo$analysis), add = ac)
+      anaInfo <- anaInfo[anaInfo$analysis %in% i, ]
+    } else if (is.integer(i)) {
+      i <- as.integer(i)
+      checkmate::assert(checkmate::check_integer(i, min.len = 1, lower = 1, upper = nrow(anaInfo), max.len = nrow(anaInfo)), add = ac)
+      anaInfo <- anaInfo[i, ]
+    }
+  }
+  
+  checkmate::reportAssertions(ac)
+  
+  filePaths <- getMzMLOrMzXMLAnalysisPath(anaInfo$analysis, anaInfo$path, mustExist = TRUE)
+  
+  res <- lapply(filePaths, function(fpath)
+  {
+    hd <- getHeaders(fpath, retentionRange, msLevels)
+    data.table("ret" = hd$retentionTime, "msLevel" = hd$msLevel, "mz" = hd$basePeakMZ, "intensity" = hd$basePeakIntensity)
+  })
+  
+  names(res) <- anaInfo$analysis
+  group <- anaInfo$group
+  names(group) <- anaInfo$analysis
+  res <- rbindlist(res, idcol = "analysis")
+  res$group <- group[res$analysis]
+  setcolorder(res, c("analysis", "group"))
+  res
+})
+
+
+#' @describeIn features Plots the base peak chromatogram/s (BPCs) of the analyses.
+#' @param retMin Plot retention time in minutes (instead of seconds).
+#' @param title Character string used for title of the plot. If \code{NULL} a title will be automatically generated.
+#' @param colourBy Sets the automatic colour selection: "none" for a single 
+#' colour or "analyses"/"replicates" for a distinct colour per replicate/analysis.
+#' @param showLegend Plot a legend if TRUE.
+#' @template plot-lim
+#' @aliases plotTICs
+#' @export
+setMethod("plotTICs", "features", function(obj,
+                                           i = NULL,
+                                           retentionRange = NULL,
+                                           msLevels = 1,
+                                           retMin = FALSE,
+                                           title = NULL,
+                                           colourBy = c("none", "analyses", "replicates"),
+                                           showLegend = TRUE,
+                                           xlim = NULL, ylim = NULL, ...)
+{
+  ac <- checkmate::makeAssertCollection()
+  aapply(checkmate::assertSubset, . ~ i , list(analyses(obj)), empty.ok = TRUE, fixed = list(add = ac))
+  checkmate::assertString(title, null.ok = TRUE, add = ac)
+  colourBy <- checkmate::matchArg(colourBy, c("none", "analyses", "replicates"), add = ac)
+  assertXYLim(xlim, ylim, add = ac)
+  checkmate::reportAssertions(ac)
+  
+  if (showLegend && colourBy == "none")
+    showLegend <- FALSE
+
+  data <- getTICs(obj, i, retentionRange, msLevels)
+  
+  if (length(obj) == 0 || nrow(data) == 0)
+  {
+    noDataPlot()
+    return(invisible(NULL))
+  }
+  
+  anaInfo <- analysisInfo(obj)
+  anaInfo <- anaInfo[anaInfo$analysis %chin% unique(data$analysis), ]
+  anas <- anaInfo$analysis
+  anaCount <- length(anas)
+  replicates <- unique(anaInfo$group)
+  
+  if (colourBy == "replicates")
+  {
+    PlotColors <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(length(replicates))
+    names(PlotColors) <- replicates
+  }
+  else if (colourBy == "analyses")
+  {
+    PlotColors <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(anaCount)
+    names(PlotColors) <- anas
+  }
+  else
+    PlotColors <- "blue"
+  
+  fillColors <- adjustcolor(PlotColors, alpha.f = 0.35)
+  names(fillColors) <- names(PlotColors)
+  
+  if (is.null(xlim))
+  {
+    xlim <- c(min(data$ret), max(data$ret))
+  }
+  if (is.null(ylim))
+  {
+    plotIntMax <- max(data$intensity)
+    ylim <- c(0, plotIntMax * 1.1)
+  }
+  
+  if (is.null(title))
+  {
+    if (anaCount == 1)
+      title <- sprintf("Analysis '%s'", anas[1])
+    else
+      title <- sprintf("%d analyses", anaCount)
+  }
+  
+  if (showLegend)
+  {
+    makeLegend <- function(x, y, ...)
+    {
+      texts <- if (colourBy == "replicates") replicates else anas
+      return(legend(x, y, texts, col = PlotColors[texts],
+                    text.col = PlotColors[texts], lty = 1,
+                    xpd = NA, ncol = 1, cex = 0.75, bty = "n", ...))
+    }
+    
+    plot.new()
+    leg <- makeLegend(0, 0, plot = FALSE)
+    lw <- (grconvertX(leg$rect$w, to = "ndc") - grconvertX(0, to = "ndc"))
+    lw <- min(lw, 0.5) # don't make it too wide
+    withr::local_par(list(omd = c(0, 1 - lw, 0, 1), new = TRUE))
+  }
+  
+  plot(0, type = "n", main = title, xlab = sprintf("Retention time (%s)", if (retMin) "min." else "sec."),
+       ylab = "Intensity", xlim = xlim, ylim = ylim, ...)
+  
+  effectiveXlim <- par("usr")[c(1, 2)]
+  effectiveYlim <- par("usr")[c(3, 4)]
+  
+  for (ana in anas)
+  {
+    anadt <- data[analysis %in% ana, ]
+    
+    if (nrow(anadt) == 0)
+      next
+    
+    if (colourBy == "replicates")
+      colInd <- anaInfo$group[match(ana, anaInfo$analysis)]
+    else if (colourBy == "analyses")
+      colInd <- ana
+    else
+      colInd <- 1
+    
+    points(if (retMin) anadt$ret / 60 else anadt$ret, anadt$intensity, type = "l", col = PlotColors[colInd])
+  }
+  
+  if (showLegend)
+    makeLegend(par("usr")[2], par("usr")[4])
+  
+})
+
+
+#' @describeIn features Plots the base peak chromatogram/s (BPCs) of the analyses.
+#' @aliases plotBPCs
+#' @export
+setMethod("plotBPCs", "features", function(obj,
+                                           i = NULL,
+                                           retentionRange = NULL,
+                                           msLevels = 1,
+                                           retMin = FALSE,
+                                           title = NULL,
+                                           colourBy = c("none", "analyses", "replicates"),
+                                           showLegend = TRUE,
+                                           xlim = NULL, ylim = NULL, ...)
+{
+  
+  ac <- checkmate::makeAssertCollection()
+  aapply(checkmate::assertSubset, . ~ i , list(analyses(obj)), empty.ok = TRUE, fixed = list(add = ac))
+  checkmate::assertString(title, null.ok = TRUE, add = ac)
+  colourBy <- checkmate::matchArg(colourBy, c("none", "analyses", "replicates"), add = ac)
+  assertXYLim(xlim, ylim, add = ac)
+  checkmate::reportAssertions(ac)
+  
+  if (showLegend && colourBy == "none")
+    showLegend <- FALSE
+  
+  data <- getBPCs(obj, i, retentionRange, msLevels)
+  
+  if (length(obj) == 0 || nrow(data) == 0)
+  {
+    noDataPlot()
+    return(invisible(NULL))
+  }
+  
+  anaInfo <- analysisInfo(obj)
+  anaInfo <- anaInfo[anaInfo$analysis %chin% unique(data$analysis), ]
+  anas <- anaInfo$analysis
+  anaCount <- length(anas)
+  replicates <- unique(anaInfo$group)
+  
+  if (colourBy == "replicates")
+  {
+    PlotColors <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(length(replicates))
+    names(PlotColors) <- replicates
+  }
+  else if (colourBy == "analyses")
+  {
+    PlotColors <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(anaCount)
+    names(PlotColors) <- anas
+  }
+  else
+    PlotColors <- "blue"
+  
+  fillColors <- adjustcolor(PlotColors, alpha.f = 0.35)
+  names(fillColors) <- names(PlotColors)
+  
+  if (is.null(xlim))
+  {
+    xlim <- c(min(data$ret), max(data$ret))
+  }
+  if (is.null(ylim))
+  {
+    plotIntMax <- max(data$intensity)
+    ylim <- c(0, plotIntMax * 1.1)
+  }
+  
+  if (is.null(title))
+  {
+    if (anaCount == 1)
+      title <- sprintf("Analysis '%s'", anas[1])
+    else
+      title <- sprintf("%d analyses", anaCount)
+  }
+  
+  if (showLegend)
+  {
+    makeLegend <- function(x, y, ...)
+    {
+      texts <- if (colourBy == "replicates") replicates else anas
+      return(legend(x, y, texts, col = PlotColors[texts],
+                    text.col = PlotColors[texts], lty = 1,
+                    xpd = NA, ncol = 1, cex = 0.75, bty = "n", ...))
+    }
+    
+    plot.new()
+    leg <- makeLegend(0, 0, plot = FALSE)
+    lw <- (grconvertX(leg$rect$w, to = "ndc") - grconvertX(0, to = "ndc"))
+    lw <- min(lw, 0.5) # don't make it too wide
+    withr::local_par(list(omd = c(0, 1 - lw, 0, 1), new = TRUE))
+  }
+  
+  plot(0, type = "n", main = title, xlab = sprintf("Retention time (%s)", if (retMin) "min." else "sec."),
+       ylab = "Intensity", xlim = xlim, ylim = ylim, ...)
+  
+  effectiveXlim <- par("usr")[c(1, 2)]
+  effectiveYlim <- par("usr")[c(3, 4)]
+  
+  for (ana in anas)
+  {
+    anadt <- data[analysis %in% ana, ]
+    
+    if (nrow(anadt) == 0)
+      next
+    
+    if (colourBy == "replicates")
+      colInd <- anaInfo$group[match(ana, anaInfo$analysis)]
+    else if (colourBy == "analyses")
+      colInd <- ana
+    else
+      colInd <- 1
+    
+    points(if (retMin) anadt$ret / 60 else anadt$ret, anadt$intensity, type = "l", col = PlotColors[colInd])
+  }
+  
+  if (showLegend)
+    makeLegend(par("usr")[2], par("usr")[4])
+  
+})
+
+
 #' Finding features
 #'
 #' Automatically find features.

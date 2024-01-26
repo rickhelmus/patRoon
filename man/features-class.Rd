@@ -20,6 +20,14 @@
 \alias{$,features-method}
 \alias{delete,features-method}
 \alias{calculatePeakQualities,features-method}
+\alias{getTICs,features-method}
+\alias{getTICs}
+\alias{getBPCs,features-method}
+\alias{getBPCs}
+\alias{plotTICs,features-method}
+\alias{plotTICs}
+\alias{plotBPCs,features-method}
+\alias{plotBPCs}
 \alias{featuresSet-class}
 \alias{featuresSet}
 \alias{sets,featuresSet-method}
@@ -87,6 +95,38 @@
 
 \S4method{calculatePeakQualities}{features}(obj, weights, flatnessFactor, parallel = TRUE)
 
+\S4method{getTICs}{features}(obj, i = NULL, retentionRange = NULL, msLevels = 1)
+
+\S4method{getBPCs}{features}(obj, i = NULL, retentionRange = NULL, msLevels = 1)
+
+\S4method{plotTICs}{features}(
+  obj,
+  i = NULL,
+  retentionRange = NULL,
+  msLevels = 1,
+  retMin = FALSE,
+  title = NULL,
+  colourBy = c("none", "analyses", "replicates"),
+  showLegend = TRUE,
+  xlim = NULL,
+  ylim = NULL,
+  ...
+)
+
+\S4method{plotBPCs}{features}(
+  obj,
+  i = NULL,
+  retentionRange = NULL,
+  msLevels = 1,
+  retMin = FALSE,
+  title = NULL,
+  colourBy = c("none", "analyses", "replicates"),
+  showLegend = TRUE,
+  xlim = NULL,
+  ylim = NULL,
+  ...
+)
+
 \S4method{sets}{featuresSet}(obj)
 
 \S4method{show}{featuresSet}(object)
@@ -149,6 +189,21 @@ Example: \code{weights=c(ApexBoundaryRatioScore=0.5, GaussianSimilarityScore=2)}
 
 \item{parallel}{If set to \code{TRUE} then code is executed in parallel through the \CRANpkg{futures} package. Please
 see the parallelization section in the handbook for more details.}
+
+\item{msLevels}{Integer vector with the ms levels (i.e., 1 for MS1 and 2 for MS2) 
+to obtain TIC traces.}
+
+\item{retMin}{Plot retention time in minutes (instead of seconds).}
+
+\item{title}{Character string used for title of the plot. If \code{NULL} a title will be automatically generated.}
+
+\item{colourBy}{Sets the automatic colour selection: "none" for a single 
+colour or "analyses"/"replicates" for a distinct colour per replicate/analysis.}
+
+\item{showLegend}{Plot a legend if TRUE.}
+
+\item{xlim, ylim}{Sets the plot size limits used by
+\code{\link[graphics]{plot}}. Set to \code{NULL} for automatic plot sizing.}
 
 \item{sets}{\setsWF For \code{[} and \code{filter}: a \code{character} with name(s) of the sets to keep (or remove if
 \code{negate=TRUE}).}
@@ -218,6 +273,14 @@ Similarity}, \verb{Sharpness}, \verb{Triangle Peak Area Similarity Ratio} and \v
 by normalizing all feature values (unless the quality metric definition has a fixed range) and scale from \samp{0}
 (worst) to \samp{1} (best). Then, a \verb{totalScore} for each feature is calculated by the (weighted) sum of all
 score values.
+
+\item \code{getTICs(features)}: Obtain the total ion chromatogram/s (TICs) of the analyses.
+
+\item \code{getBPCs(features)}: Obtain the base peak chromatogram/s (BPCs) of the analyses.
+
+\item \code{plotTICs(features)}: Plots the base peak chromatogram/s (BPCs) of the analyses.
+
+\item \code{plotBPCs(features)}: Plots the base peak chromatogram/s (BPCs) of the analyses.
 
 }}
 \section{Slots}{

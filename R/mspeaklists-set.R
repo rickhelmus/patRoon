@@ -201,7 +201,7 @@ setMethod("delete", "MSPeakListsSet", function(obj, i = NULL, j = NULL, k = NULL
 
 #' @rdname MSPeakLists-class
 #' @export
-setMethod("filter", "MSPeakListsSet", function(obj, ..., annotatedBy = NULL, retainPrecursorMSMS = TRUE,
+setMethod("filter", "MSPeakListsSet", function(obj, ..., annotatedBy = NULL, retainPrecursor = TRUE,
                                                reAverage = FALSE, negate = FALSE, sets = NULL)
 {
     ac <- checkmate::makeAssertCollection()
@@ -238,13 +238,13 @@ setMethod("filter", "MSPeakListsSet", function(obj, ..., annotatedBy = NULL, ret
     if (...length() > 0 || !is.null(annotatedBy))
     {
         if (is.null(annotatedBy))
-            obj@setObjects <- lapply(obj@setObjects, filter, ..., retainPrecursorMSMS = retainPrecursorMSMS,
+            obj@setObjects <- lapply(obj@setObjects, filter, ..., retainPrecursor = retainPrecursor,
                                      reAverage = reAverage, negate = negate)
         else
         {
             obj@setObjects <- Map(obj@setObjects, annotatedByList, f = function(so, ab)
             {
-                filter(so, ..., annotatedBy = ab, retainPrecursorMSMS = retainPrecursorMSMS,
+                filter(so, ..., annotatedBy = ab, retainPrecursor = retainPrecursor,
                        reAverage = reAverage, negate = negate)
             })
         }

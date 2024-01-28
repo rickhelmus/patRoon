@@ -637,8 +637,13 @@ getBinnedPLPair <- function(MSPeakLists, groupNames, analyses, MSLevel, specSimP
             dummySpec <- function(PLP)
             {
                 if (is.null(PLP))
-                    return(data.table(ID = integer(), mz = numeric(), intensity = numeric(), precursor = logical(),
-                                      mergedBy = character()))
+                {
+                    emptyPL <- emptyMSPeakList(if (is.null(analyses)) "fgroup_abundance" else "feat_abundance",
+                                               if (is.null(analyses)) "feat_abundance" else NULL)
+                    emptyPL[, c("ID", "mergedBy") := character()]
+                    setcolorder(emptyPL, "ID")
+                    return(emptyPL)
+                }
                 sp <- PLP$specs[[1]]
                 sp[, mergedBy := uniqueName]
                 sp[, intensity := intensity / max(intensity)]

@@ -98,6 +98,8 @@
         - abundance parameter in average params
         - getBGMSMSPeaks()
         - new/shortened filter() args
+        - removeMZs and mzWindow filter() args
+            - removeMZs list for sets
 
 - NEWS
     - specSimParamsMatch --> specSimParams
@@ -146,6 +148,7 @@
         - abundance parameter in average params
         - getBGMSMSPeaks()
         - new/shortened filter() args
+        - removeMZs and mzWindow filter() args
 
 ## Ext
 

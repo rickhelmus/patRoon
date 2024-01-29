@@ -131,46 +131,45 @@ test_that("delete and filter", {
     expect_equal(delete(plists, k = character()), plists)
     expect_length(delete(plists), 0)
     
-    expect_gte(checkIntLimit(filter(plists, absMSIntThr = 2500), FALSE, TRUE, FALSE), 2500)
-    expect_gte(checkIntLimit(filter(plists, absMSMSIntThr = 2500), FALSE, TRUE, TRUE), 2500)
-    expect_lte(checkIntLimit(filter(plists, absMSIntThr = 2500, negate = TRUE), FALSE, FALSE, FALSE), 2500)
-    expect_lte(checkIntLimit(filter(plists, absMSMSIntThr = 2500, negate = TRUE), FALSE, FALSE, TRUE), 2500)
+    expect_gte(checkIntLimit(filter(plists, MSLevel = 1, absMinIntensity = 2500), FALSE, TRUE, FALSE), 2500)
+    expect_gte(checkIntLimit(filter(plists, MSLevel = 2, absMinIntensity = 2500), FALSE, TRUE, TRUE), 2500)
+    expect_lte(checkIntLimit(filter(plists, MSLevel = 1, absMinIntensity = 2500, negate = TRUE), FALSE, FALSE, FALSE), 2500)
+    expect_lte(checkIntLimit(filter(plists, MSLevel = 2, absMinIntensity = 2500, negate = TRUE), FALSE, FALSE, TRUE), 2500)
 
-    expect_gte(checkIntLimit(filter(plists, relMSIntThr = 0.2), TRUE, TRUE, FALSE, plists), 0.2)
-    expect_gte(checkIntLimit(filter(plists, relMSMSIntThr = 0.2), TRUE, TRUE, TRUE, plists), 0.2)
-    expect_lte(checkIntLimit(filter(plists, relMSIntThr = 0.2, negate = TRUE), TRUE, FALSE, FALSE, plists), 0.2)
-    expect_lte(checkIntLimit(filter(plists, relMSMSIntThr = 0.2, negate = TRUE), TRUE, FALSE, TRUE, plists), 0.2)
+    expect_gte(checkIntLimit(filter(plists, MSLevel = 1, relMinIntensity = 0.2), TRUE, TRUE, FALSE, plists), 0.2)
+    expect_gte(checkIntLimit(filter(plists, MSLevel = 2, relMinIntensity = 0.2), TRUE, TRUE, TRUE, plists), 0.2)
+    expect_lte(checkIntLimit(filter(plists, MSLevel = 1, relMinIntensity = 0.2, negate = TRUE), TRUE, FALSE, FALSE, plists), 0.2)
+    expect_lte(checkIntLimit(filter(plists, MSLevel = 2, relMinIntensity = 0.2, negate = TRUE), TRUE, FALSE, TRUE, plists), 0.2)
 
-    expect_lte(checkPeaksLimit(filter(plists, topMSPeaks = 5), FALSE, FALSE), 5)
-    expect_lte(checkPeaksLimit(filter(plists, topMSMSPeaks = 5), FALSE, TRUE), 5)
-    expect_lte(checkPeaksLimit(filter(plists, topMSPeaks = 5, negate = TRUE), FALSE, FALSE), 5)
-    expect_lte(checkPeaksLimit(filter(plists, topMSMSPeaks = 5, negate = TRUE), FALSE, TRUE), 5)
+    expect_lte(checkPeaksLimit(filter(plists, MSLevel = 1, topMostPeaks = 5), FALSE, FALSE), 5)
+    expect_lte(checkPeaksLimit(filter(plists, MSLevel = 2, topMostPeaks = 5), FALSE, TRUE), 5)
+    expect_lte(checkPeaksLimit(filter(plists, MSLevel = 1, topMostPeaks = 5, negate = TRUE), FALSE, FALSE), 5)
+    expect_lte(checkPeaksLimit(filter(plists, MSLevel = 2, topMostPeaks = 5, negate = TRUE), FALSE, TRUE), 5)
 
     expect_true(all(sapply(averagedPeakLists(plistsMSMS), function(pl) !is.null(pl[["MSMS"]]))))
     expect_true(all(sapply(averagedPeakLists(filter(plists, withMSMS = TRUE, negate = TRUE)),
                            function(pl) is.null(pl[["MSMS"]]))))
 
-    expect_lte(length(filter(plists, topMSMSPeaks = 5, retainPrecursorMSMS = FALSE)),
-               length(filter(plists, topMSMSPeaks = 5)))
+    expect_lte(length(filter(plists, MSLevel = 2, topMostPeaks = 5, retainPrecursor = FALSE)),
+               length(filter(plists, MSLevel = 2, topMostPeaks = 5)))
 
     # isotopes for MS peak lists should not exceed M+5 (default)
     expect_lte(max(as.data.table(filter(
-        plists, isolatePrec = getDefIsolatePrecParams()))[type == "MS", diff(range(mz)), by = isoTestBy][["V1"]]), 5)
+        plists, MSLevel = 1, isolatePrec = getDefIsolatePrecParams()))[type == "MS", diff(range(mz)), by = isoTestBy][["V1"]]), 5)
     # half with z=2
     expect_lte(max(as.data.table(filter(
-        plists, isolatePrec = getDefIsolatePrecParams(z=2)))[type == "MS", diff(range(mz)), by = isoTestBy][["V1"]]), 2.5)
+        plists, MSLevel = 1, isolatePrec = getDefIsolatePrecParams(z=2)))[type == "MS", diff(range(mz)), by = isoTestBy][["V1"]]), 2.5)
 
     # UNDONE: deisotope?
 })
 
-plistsEmpty <- removePrecursors(filter(plists, absMSIntThr = 1E9, absMSMSIntThr = 1E9))
-plistsEmptyMS <- removePrecursors(filter(plists, absMSIntThr = 1E9))
+plistsEmpty <- removePrecursors(filter(plists, absMinIntensity = 1E9))
+plistsEmptyMS <- removePrecursors(filter(plists, MSLevel = 1, absMinIntensity = 1E9))
 
 test_that("empty object", {
     expect_length(plistsEmpty, 0)
     expect_length(delete(plistsEmpty), 0)
-    expect_length(filter(plistsEmpty, relMSIntThr = 0.2, relMSMSIntThr = 0.2, topMSPeaks = 10,
-                         topMSMSPeaks = 10), 0)
+    expect_length(filter(plistsEmpty, relMinIntensity = 0.2, topMostPeaks = 10), 0)
     expect_length(generateMSPeakLists(getEmptyTestFGroups(), "mzr"), 0)
     expect_lt(length(plistsEmptyMS), length(plists))
     expect_gt(length(plistsEmptyMS), 0)

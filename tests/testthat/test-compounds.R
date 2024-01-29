@@ -215,7 +215,7 @@ verifyMSPLAnFilter <- function(mspl, obj1, obj2 = NULL, negate = FALSE)
     if (!is.null(obj2))
         allObj <- c(allObj, list(obj2))
     
-    msplF <- filter(mspl, annotatedBy = allObj, retainPrecursorMSMS = FALSE, negate = negate)
+    msplF <- filter(mspl, MSLevel = 2, annotatedBy = allObj, retainPrecursor = FALSE, negate = negate)
     if (length(msplF) == 0)
         return(succeed("Empty MSPL"))
     

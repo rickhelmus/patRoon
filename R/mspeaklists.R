@@ -471,8 +471,8 @@ setMethod("delete", "MSPeakLists", function(obj, i = NULL, j = NULL, k = NULL, r
 setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity = NULL, relMinIntensity = NULL,
                                             topMostPeaks = NULL, minPeaks = NULL, maxMZOverPrec = NULL,
                                             minAbundanceFeat = NULL, minAbundanceFGroup = NULL, isolatePrec = NULL,
-                                            deIsotope = FALSE, withMSMS = FALSE, annotatedBy = NULL,
-                                            retainPrecursor = TRUE, reAverage = FALSE, negate = FALSE)
+                                            deIsotope = FALSE, removeMZs = NULL, withMSMS = FALSE, annotatedBy = NULL,
+                                            retainPrecursor = TRUE, mzWindow = 0.005, reAverage = FALSE, negate = FALSE)
 {
     if (is.logical(isolatePrec) && isolatePrec == TRUE)
         isolatePrec <- getDefIsolatePrecParams()
@@ -485,6 +485,12 @@ setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity 
     assertPListIsolatePrecParams(isolatePrec, add = ac)
     aapply(checkmate::assertFlag, . ~ deIsotope + withMSMS + retainPrecursor + reAverage + negate,
            fixed = list(add = ac))
+    if (is.data.frame(removeMZs)) # output of getBGMSMSPeaks()
+    {
+        assertHasNames(removeMZs, "mz", add = ac)
+        removeMZs <- removeMZs[["mz"]]
+    }
+    checkmate::assertNumeric(removeMZs, lower = 0, finite = TRUE, any.missing = FALSE, null.ok = TRUE, add = ac)
     checkmate::assert(
         checkmate::checkNull(annotatedBy),
         checkmate::checkClass(annotatedBy, "formulas"),
@@ -492,6 +498,7 @@ setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity 
         checkmate::checkList(annotatedBy, c("formulas", "compounds"), any.missing = FALSE, min.len = 1, unique = TRUE),
         .var.name = "annotatedBy"
     )
+    checkmate::assertNumber(mzWindow, na.ok = FALSE, lower = 0, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
     checkArgForLev <- function(lev, arg, isSet)
@@ -509,8 +516,8 @@ setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity 
         return(obj)
 
     hash <- makeHash(obj, MSLevel, absMinIntensity, relMinIntensity, topMostPeaks, minPeaks, maxMZOverPrec,
-                     minAbundanceFeat, minAbundanceFGroup, isolatePrec, deIsotope, withMSMS, annotatedBy,
-                     retainPrecursor, reAverage, negate)
+                     minAbundanceFeat, minAbundanceFGroup, isolatePrec, deIsotope, removeMZs, withMSMS, annotatedBy,
+                     retainPrecursor, mzWindow, reAverage, negate)
     cache <- loadCacheData("filterMSPeakLists", hash)
     if (!is.null(cache))
         return(cache)
@@ -532,8 +539,8 @@ setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity 
                 return(FALSE)
             
             plF <- doMSPeakListFilter(plF, absMinIntensity, relMinIntensity, topMostPeaks, NULL, maxMZOverPrec,
-                                      minAbundanceFeat, if (is.null(ana)) minAbundanceFGroup else NULL, deIsotope,
-                                      TRUE, plF[precursor == TRUE]$mz, negate)
+                                      minAbundanceFeat, if (is.null(ana)) minAbundanceFGroup else NULL,
+                                      deIsotope, removeMZs, TRUE, plF[precursor == TRUE]$mz, mzWindow, negate)
             if (!is.null(isolatePrec))
                 plF <- isolatePrecInMSPeakList(plF, isolatePrec, negate)
         }
@@ -580,7 +587,7 @@ setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity 
             }
             plF <- doMSPeakListFilter(plF, absMinIntensity, relMinIntensity, topMostPeaks, minPeaks, maxMZOverPrec,
                                       minAbundanceFeat, if (is.null(ana)) minAbundanceFGroup else NULL, deIsotope,
-                                      retainPrecursor, precMZ, negate)
+                                      removeMZs, retainPrecursor, precMZ, mzWindow, negate)
         }
         
         return(!pl$ID %in% plF$ID)

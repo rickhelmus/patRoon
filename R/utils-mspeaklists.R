@@ -361,7 +361,8 @@ deIsotopeMSPeakList <- function(MSPeakList, negate)
 }
 
 doMSPeakListFilter <- function(pList, absIntThr, relIntThr, topMost, minPeaks, maxMZOverPrec, minAbundanceFeat,
-                               minAbundanceFGroup, deIsotope, retainPrecursor, precursorMZ, negate)
+                               minAbundanceFGroup, deIsotope, removeMZs, retainPrecursor, precursorMZ, mzWindow,
+                               negate)
 {
     ret <- pList
 
@@ -397,6 +398,14 @@ doMSPeakListFilter <- function(pList, absIntThr, relIntThr, topMost, minPeaks, m
     if (deIsotope)
         ret <- deIsotopeMSPeakList(ret, negate)
 
+    if (!is.null(removeMZs) && nrow(ret) > 0 && length(removeMZs) > 0)
+    {
+        pred <- function(mz) sapply(mz, function(x) !any(numLTE(abs(x - removeMZs), mzWindow)))
+        if (negate)
+            pred <- Negate(pred)
+        ret <- ret[pred(mz)]
+    }
+    
     # re-add precursor if necessary
     if (retainPrecursor && !any(ret$precursor))
     {

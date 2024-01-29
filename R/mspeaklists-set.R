@@ -194,11 +194,14 @@ setMethod("delete", "MSPeakListsSet", function(obj, ...)
 
 #' @rdname MSPeakLists-class
 #' @export
-setMethod("filter", "MSPeakListsSet", function(obj, ..., annotatedBy = NULL, retainPrecursor = TRUE,
-                                               reAverage = FALSE, negate = FALSE, sets = NULL)
+setMethod("filter", "MSPeakListsSet", function(obj, ..., removeMZs = NULL, withMSMS = FALSE, annotatedBy = NULL,
+                                               retainPrecursor = TRUE, mzWindow = 0.005, reAverage = FALSE,
+                                               negate = FALSE, sets = NULL)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(negate, add = ac)
+    checkmate::assertList(removeMZs, types = c("data.frame", "numeric"), any.missing = FALSE, len = length(sets(obj)),
+                          null.ok = TRUE, add = ac)
     checkmate::assert(
         checkmate::checkNull(annotatedBy),
         checkmate::checkClass(annotatedBy, "formulasSet"),
@@ -209,17 +212,20 @@ setMethod("filter", "MSPeakListsSet", function(obj, ..., annotatedBy = NULL, ret
     )
     assertSets(obj, sets, TRUE, add = ac)
     checkmate::reportAssertions(ac)
+
+    removeMZsList <- if (!is.null(removeMZs)) removeMZsList else rep(list(NULL), length(sets(obj)))
     
-    annotatedByList <- NULL
-    if (!is.null(annotatedBy))
+    annotatedByList <- if (!is.null(annotatedBy))
     {
         # unset objects before passing them to parent method
         
         if (!is.list(annotatedBy))
-            annotatedByList <- lapply(sets(obj), unset, obj = annotatedBy)
+            lapply(sets(obj), unset, obj = annotatedBy)
         else
-            annotatedByList <- lapply(sets(obj), function(s) lapply(annotatedBy, unset, set = s))
+            lapply(sets(obj), function(s) lapply(annotatedBy, unset, set = s))
     }
+    else
+        rep(list(NULL), length(sets(obj)))
     
     if (!is.null(sets) && length(sets) > 0)
     {
@@ -228,20 +234,13 @@ setMethod("filter", "MSPeakListsSet", function(obj, ..., annotatedBy = NULL, ret
         obj <- obj[, sets = sets]
     }
     
-    if (...length() > 0 || !is.null(annotatedBy))
+    if (...length() > 0 || !is.null(removeMZs) || withMSMS || !is.null(annotatedBy))
     {
-        if (is.null(annotatedBy))
-            obj@setObjects <- lapply(obj@setObjects, filter, ..., retainPrecursor = retainPrecursor,
-                                     reAverage = reAverage, negate = negate)
-        else
+        obj@setObjects <- Map(obj@setObjects, removeMZsList, annotatedByList, f = function(so, rm, ab)
         {
-            obj@setObjects <- Map(obj@setObjects, annotatedByList, f = function(so, ab)
-            {
-                filter(so, ..., annotatedBy = ab, retainPrecursor = retainPrecursor,
-                       reAverage = reAverage, negate = negate)
-            })
-        }
-        
+            filter(so, ..., removeMZs = rm, withMSMS = withMSMS, annotatedBy = ab, retainPrecursor = retainPrecursor,
+                   mzWindow = mzWindow, reAverage = reAverage, negate = negate)
+        })
         # synchronize other objects
         cat("Synchronizing set objects...\n")
         obj <- syncMSPeakListsSetObjects(obj)

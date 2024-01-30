@@ -17,9 +17,10 @@
     - rename group col to replicate and warn for deprecation (like blank/ref column)
     - see if MSPL sets anaInfo can be replaced by non-exported slot with named vector with sets for each ana
     - properly handle NA values for custom cols?
-    - plotVenn sets method: deprecate/remove sets arg?
+    - plotVenn/unique sets methods: deprecate/remove sets arg?
     - FC: select multiple groups and/or anaInfo cols?
     - plotChord/report(): report sets as outer groups? make it optional?
+    - plotVenn() (and others?): handle wrong input for which --> see unique()
     
 - Misc
     - bg MS/MS subtraction
@@ -54,7 +55,7 @@
         - doc methods (eg add limitations)
         - doc that anaInfo shouldn't be changed by reference?
     - new subset args (ni, reorder, reorder sets)
-    - plotVenn(): aggregate arg
+    - plotVenn()/unique(): aggregate arg
     - plotUpSet()
         - aggregate arg
         - nsets can be NULL
@@ -105,7 +106,7 @@
         - colourBy --> groupBy
             - "none" --> NULL
             - anaInfo col possible
-    - plotVenn(): aggregate arg
+    - plotVenn()/unique(): aggregate arg
     - plotUpSet():
         - aggregate arg
         - nsets can be/defaults to NULL

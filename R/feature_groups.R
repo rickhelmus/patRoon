@@ -682,48 +682,46 @@ setMethod("export", "featureGroups", function(obj, type, out)
 #'   overlap between the specified replicate groups for the \code{which}
 #'   parameter.
 #' @export
-setMethod("unique", "featureGroups", function(x, which, relativeTo = NULL, outer = FALSE)
+setMethod("unique", "featureGroups", function(x, which, aggregate = TRUE, relativeTo = NULL, outer = FALSE)
 {
+    anaInfo <- analysisInfo(x)
+    aggregate <- assertAndPrepareAnaInfoBy(aggregate, anaInfo, FALSE)
+    groups <- unique(anaInfo[[aggregate]])
+    
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertCharacter(which, min.len = 1, min.chars = 1, any.missing = FALSE, add = ac)
-    checkmate::assertSubset(which, replicateGroups(x), empty.ok = FALSE, add = ac)
-    checkmate::assertCharacter(relativeTo, min.len = 1, min.chars = 1, any.missing = FALSE,
-                               null.ok = TRUE, add = ac)
+    checkmate::assertSubset(which, groups, empty.ok = FALSE, add = ac)
+    checkmate::assertSubset(relativeTo, groups, empty.ok = TRUE, add = ac)
     checkmate::assertFlag(outer, add = ac)
     checkmate::reportAssertions(ac)
 
-    if (is.null(relativeTo))
-        relativeTo <- replicateGroups(x)
+    if (length(relativeTo) == 0)
+        relativeTo <- groups
     else
     {
         relativeTo <- union(which, relativeTo)
-        x <- replicateGroupFilter(x, relativeTo, verbose = FALSE)
+        x <- x[anaInfo[[aggregate]] %in% relativeTo]
     }
 
-    anaInfo <- analysisInfo(x)
-    rGroups <- unique(anaInfo$group)
-
-    if (all(rGroups %in% which) && !outer)
+    if (setequal(groups, which) && !outer)
         return(x) # nothing to do...
 
-    # Split by selected and other replicate groups
-    selFGroups <- replicateGroupFilter(x, which, verbose = FALSE)
+    # Split by selected and others
+    selFGroups <- x[anaInfo[[aggregate]] %in% which]
+    otherGroups <- setdiff(relativeTo, which)
     
-    otherFGNames <- setdiff(relativeTo, which)
-    # NOTE: check length here to avoid ending up with an empty 'otherFGroups'
-    # below, which yields warnings with XCMS.
-    if (length(otherFGNames) > 0)
+    # NOTE: check length here to avoid ending up with an empty 'otherFGroups' below, which yields warnings with XCMS.
+    if (length(otherGroups) > 0)
     {
         # pick out all feature groups NOT present in others
-        otherFGroups <- replicateGroupFilter(x, otherFGNames, verbose = FALSE)
+        otherFGroups <- x[anaInfo[[aggregate]] %in% otherGroups]
         ret <- selFGroups[, setdiff(names(selFGroups), names(otherFGroups))]
     }
     else
         ret <- selFGroups
     
-    # remove all that is in at least 2 replicate groups
+    # remove all that is in >1 groups
     if (outer && length(which) > 1)
-        ret <- minReplicatesFilter(ret, absThreshold = 2, negate = TRUE, verbose = FALSE)
+        ret <- delete(ret, j = function(ints, ...) uniqueN(anaInfo[[aggregate]][ints != 0]) > 1)
 
     return(ret)
 })

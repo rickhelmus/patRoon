@@ -46,7 +46,8 @@ doFGAADTGroups <- function(fGroups, intColNames, average, averageBy, areas, addQ
         {
             xvec <- anaInfo[, mean(get(regression)), by = averageBy][[2]]
             regr <- sapply(gTable, calcFeatureRegression, xvec = xvec, simplify = FALSE)
-            ret <- cbind(ret, rbindlist(regr[getADTRegCols()]))
+            regr <- lapply(regr, "[", getADTRegCols())
+            ret <- cbind(ret, rbindlist(regr))
         }
         else
         {

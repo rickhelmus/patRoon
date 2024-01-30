@@ -4,6 +4,8 @@
 * Fixed: `report()`: don't show (empty) annotations column in feature data if no feature annotations are present
 * Fixed: featureGroups annotations slot is properly updated if all features are removed from a set
 * Fixed: `as.data.table()` method for `features`: properly handle empty objects
+* Fixed: `filter()` method for `MSPeakListsSet`: properly handle case where `sets` argument is combined with other filters.
+
 
 
 # patRoon 2.3.2

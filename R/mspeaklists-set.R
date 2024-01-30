@@ -213,7 +213,7 @@ setMethod("filter", "MSPeakListsSet", function(obj, ..., removeMZs = NULL, withM
     assertSets(obj, sets, TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
-    removeMZsList <- if (!is.null(removeMZs)) removeMZsList else rep(list(NULL), length(sets(obj)))
+    removeMZsList <- if (!is.null(removeMZs)) removeMZs else rep(list(NULL), length(sets(obj)))
     
     annotatedByList <- if (!is.null(annotatedBy))
     {
@@ -227,13 +227,16 @@ setMethod("filter", "MSPeakListsSet", function(obj, ..., removeMZs = NULL, withM
     else
         rep(list(NULL), length(sets(obj)))
     
+    names(removeMZsList) <- names(annotatedByList) <- sets(obj)
+    
     if (!is.null(sets) && length(sets) > 0)
     {
         if (negate)
             sets <- setdiff(get("sets", pos = 2)(obj), sets)
         obj <- obj[, sets = sets]
+        removeMZsList <- removeMZsList[sets(obj)]; annotatedByList <- annotatedByList[sets(obj)]
     }
-    
+
     if (...length() > 0 || !is.null(removeMZs) || withMSMS || !is.null(annotatedBy))
     {
         obj@setObjects <- Map(obj@setObjects, removeMZsList, annotatedByList, f = function(so, rm, ab)

@@ -826,20 +826,12 @@ setMethod("plotVenn", "featureGroups", function(obj, which = NULL, aggregate = T
 
 #' @rdname feature-plotting
 #' @export
-setMethod("plotVenn", "featureGroupsSet", function(obj, which = NULL, ..., sets = FALSE)
+setMethod("plotVenn", "featureGroupsSet", function(obj, which = NULL, aggregate = TRUE, ..., sets = FALSE)
 {
     checkmate::assertFlag(sets)
     if (sets)
-    {
-        mySets <- get("sets", pos = 2)(obj)
-        if (is.null(which))
-            which <- mySets
-        else
-            checkmate::assertSubset(which, mySets)
-        ai <- analysisInfo(obj)
-        which = sapply(which, function(s) ai[set == s]$group, simplify = FALSE)
-    }
-    callNextMethod(obj, which = which, ...)
+        aggregate <- "set"
+    callNextMethod(obj, which = which, aggregate = aggregate, ...)
 })
 
 setMethod("plotVennHash", "featureGroups", function(obj, ...)

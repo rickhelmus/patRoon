@@ -215,38 +215,16 @@ setMethod("unique", "featureGroupsSet", function(x, which, ..., sets = FALSE)
 
 #' @rdname featureGroups-class
 #' @export
-setMethod("overlap", "featureGroupsSet", function(fGroups, which, exclusive, sets = FALSE)
+setMethod("overlap", "featureGroupsSet", function(fGroups, which, aggregate, exclusive, sets = FALSE)
 {
-    mySets <- get("sets", pos = 2)(fGroups)
-    
     checkmate::assertFlag(sets)
     
-    ac <- checkmate::makeAssertCollection()
-    checkmate::assert(checkmate::checkSubset(which, if (sets) mySets else replicateGroups(fGroups), empty.ok = FALSE),
-                      checkmate::checkList(which, "character", any.missing = FALSE),
-                      .var.name = "which", add = ac)
-    checkmate::assertFlag(exclusive, add = ac)
-    checkmate::reportAssertions(ac)
-    
+    mySets <- get("sets", pos = 2)(fGroups)
+
     if (sets)
-    {
-        if (is.list(which))
-            stop("which cannot be a list when sets=TRUE", call. = FALSE)
-        
-        if (length(which) < 2 || length(fGroups) == 0)
-            return(fGroups) # nothing to do...
-        
-        if (exclusive)
-            ret <- unique(fGroups, which = which, sets = TRUE)
-        else
-            ret <- fGroups[, sets = which]
-        
-        ret <- minSetsFGroupsFilter(ret, relThreshold = 1, verbose = FALSE)
-    }
-    else
-        ret <- callNextMethod(fGroups, which = which, exclusive = exclusive)
+        aggregate <- "set"
     
-    return(ret)
+    return(callNextMethod(fGroups, which = which, aggregate = aggregate, exclusive = exclusive))
 })
 
 #' @rdname featureGroups-class

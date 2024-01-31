@@ -18,6 +18,7 @@
     - see if MSPL sets anaInfo can be replaced by non-exported slot with named vector with sets for each ana
     - properly handle NA values for custom cols?
     - plotVenn/unique sets methods: deprecate/remove sets arg?
+    - plotVenn()/overlap: deprecate/remove list arg for which?
     - FC: select multiple groups and/or anaInfo cols?
     - plotChord/report(): report sets as outer groups? make it optional?
     - plotVenn() (and others?): handle wrong input for which --> see unique()
@@ -55,7 +56,8 @@
         - doc methods (eg add limitations)
         - doc that anaInfo shouldn't be changed by reference?
     - new subset args (ni, reorder, reorder sets)
-    - plotVenn()/unique(): aggregate arg
+    - plotVenn()/unique()/overlap(): aggregate arg
+    - overlap(): which can be NULL
     - plotUpSet()
         - aggregate arg
         - nsets can be NULL
@@ -106,7 +108,8 @@
         - colourBy --> groupBy
             - "none" --> NULL
             - anaInfo col possible
-    - plotVenn()/unique(): aggregate arg
+    - plotVenn()/unique()/overlap(): aggregate arg
+    - overlap(): which can be NULL
     - plotUpSet():
         - aggregate arg
         - nsets can be/defaults to NULL

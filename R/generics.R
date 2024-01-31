@@ -50,7 +50,7 @@ setGeneric("groupInfo", function(fGroups) standardGeneric("groupInfo"))
 setGeneric("unique", function(x, incomparables = FALSE, ...) standardGeneric("unique"))
 
 #' @rdname featureGroups-class
-setGeneric("overlap", function(fGroups, which, exclusive = FALSE, ...) standardGeneric("overlap"))
+setGeneric("overlap", function(fGroups, which = NULL, aggregate = TRUE, exclusive = FALSE, ...) standardGeneric("overlap"))
 
 #' @rdname featureGroups-class
 setGeneric("selectIons", function(fGroups, components, prefAdduct, ...) standardGeneric("selectIons"))

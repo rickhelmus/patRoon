@@ -732,26 +732,32 @@ setMethod("unique", "featureGroups", function(x, which, aggregate = TRUE, relati
 #'   not unique to the given replicate groups.
 #' @aliases overlap
 #' @export
-setMethod("overlap", "featureGroups", function(fGroups, which, exclusive)
+setMethod("overlap", "featureGroups", function(fGroups, which, aggregate, exclusive)
 {
-    rGroups <- replicateGroups(fGroups)
+    anaInfo <- analysisInfo(fGroups)
+    aggregate <- assertAndPrepareAnaInfoBy(aggregate, anaInfo, FALSE)
+    groups <- unique(anaInfo[[aggregate]])
     
     ac <- checkmate::makeAssertCollection()
-    checkmate::assert(checkmate::checkSubset(which, rGroups, empty.ok = FALSE),
+    checkmate::assert(checkmate::checkSubset(which, groups, empty.ok = FALSE),
                       checkmate::checkList(which, "character", any.missing = FALSE),
+                      checkmate::checkNull(which),
                       .var.name = "which", add = ac)
     checkmate::assertFlag(exclusive, add = ac)
     checkmate::reportAssertions(ac)
 
+    if (is.null(which))
+        which <- groups
+    
     if (length(which) < 2 || length(fGroups) == 0)
         return(fGroups) # nothing to do...
 
-    fGroupsList <- lapply(which, replicateGroupFilter, fGroups = fGroups, verbose = FALSE)
+    fGroupsList <- lapply(which, function(w) fGroups[anaInfo[get(aggregate) %in% w]$analysis])
     ov <- Reduce(intersect, lapply(fGroupsList, names))
     ret <- fGroups[, ov]
 
     if (exclusive)
-        ret <- unique(ret, which = unlist(which))
+        ret <- unique(ret, which = unlist(which), aggregate = aggregate)
     
     return(ret)
 })

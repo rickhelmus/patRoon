@@ -200,17 +200,12 @@ setMethod("export", "featureGroupsSet", function(obj, type, out, set) export(uns
 
 #' @rdname featureGroups-class
 #' @export
-setMethod("unique", "featureGroupsSet", function(x, which, ..., sets = FALSE)
+setMethod("unique", "featureGroupsSet", function(x, which, aggregate = TRUE, ..., sets = FALSE)
 {
     checkmate::assertFlag(sets)
     if (sets)
-    {
-        mySets <- get("sets", pos = 2)(x)
-        checkmate::assertSubset(which, mySets, empty.ok = FALSE, add = ac)
-        ai <- analysisInfo(x)
-        which <- unique(ai[set %in% which]$group)
-    }
-    callNextMethod(x, which = which, ...)
+        aggregate <- "set"
+    callNextMethod(x, which = which, aggregate = aggregate, ...)
 })
 
 #' @rdname featureGroups-class
@@ -218,12 +213,8 @@ setMethod("unique", "featureGroupsSet", function(x, which, ..., sets = FALSE)
 setMethod("overlap", "featureGroupsSet", function(fGroups, which, aggregate, exclusive, sets = FALSE)
 {
     checkmate::assertFlag(sets)
-    
-    mySets <- get("sets", pos = 2)(fGroups)
-
     if (sets)
         aggregate <- "set"
-    
     return(callNextMethod(fGroups, which = which, aggregate = aggregate, exclusive = exclusive))
 })
 

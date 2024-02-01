@@ -117,7 +117,7 @@ getTPComponCandidatesScr <- function(TPs, parentName, parentFormula, TPFGMapping
     }, simplify = FALSE))
 }
 
-getTPComponCandidatesUnkAnn <- function(featAnn, parentFormula, parentSMILES, calcLogP)
+getTPComponCandidatesUnkAnn <- function(featAnn, parentFGroup, parentFormula, parentSMILES, parentInChIKey, calcLogP)
 {
     retDirs <- NULL
     if (calcLogP != "none" && !is.null(parentSMILES))
@@ -137,13 +137,20 @@ getTPComponCandidatesUnkAnn <- function(featAnn, parentFormula, parentSMILES, ca
         }
     }
     
+    # UNDONE: skip parent fGroup
+    
+    parentAnn <- if (!is.null(parentInChIKey) && parentFGroup %in% groupNames(featAnn))
+        featAnn[[parentFGroup]][UID == getIKBlock1(parentInChIKey)]
+    else
+        NULL
+    
     return(sapply(annotations(featAnn), function(ann)
     {
         tab <- copy(ann)
-        tab <- subsetDTColumnsIfPresent(tab, c("compoundName", "SMILES", "InChI", "InChIKey", "neutral_formula"))
         setnames(tab, "neutral_formula", "formula")
         
         # UNDONE: calculate TP score+metrics, frag/NLMatches, apply thresholds
+        # UNDONE: unset annotation objects?
         
         if (!is.null(tab[["formula"]]))
             tab[, formulaDiff := sapply(formula, getFormulaDiffText, form2 = parentFormula)]
@@ -151,6 +158,21 @@ getTPComponCandidatesUnkAnn <- function(featAnn, parentFormula, parentSMILES, ca
         # UNDONE: also support XLogP from feat annotations?
         if (!is.null(retDirs))
             tab[, TP_retDir := retDirs[SMILES]]
+        
+        if (!is.null(parentAnn) && nrow(parentAnn) == 1)
+        {
+            tab[, c("fragMatches", "NLMatches") := {
+                fi <- fragInfo[[1]]
+                if (nrow(fi) > 0)
+                    list(sum(fi$ion_formula %chin% parentAnn$fragInfo[[1]]$ion_formula),
+                         sum(fi$neutral_loss %chin% parentAnn$fragInfo[[1]]$neutral_loss))
+                else
+                    list(NA_integer_, NA_integer_)
+            }, by = seq_len(nrow(tab))]
+        }
+
+        tab <- subsetDTColumnsIfPresent(tab, c("compoundName", "SMILES", "InChI", "InChIKey", "neutral_formula",
+                                               "fragMatches", "NLMatches"))
         
         return(tab)
     }, simplify = FALSE))
@@ -273,6 +295,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
         {
             parentForm <- parents(TPs)[name == parn][["formula"]][1]
             parentSMILES <- parents(TPs)[name == parn][["SMILES"]][1]
+            parentIK <- parents(TPs)[name == parn][["InChIKey"]][1]
             haveParForm <- !is.null(parentForm) && !is.na(parentForm)
             haveParSMI <- !is.null(parentSMILES) && !is.na(parentSMILES)
             
@@ -281,7 +304,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
 
             if (haveFormulas && haveParForm)
             {
-                candidates <- getTPComponCandidatesUnkAnn(formulas, parentForm, NULL, calcLogP)
+                candidates <- getTPComponCandidatesUnkAnn(formulas, parfg, parentForm, NULL, NULL, calcLogP)
                 if (length(candidates) > 0)
                 {
                     cmpTab <- merge(cmpTab, data.table(group = names(candidates), candidatesForm = candidates),
@@ -291,7 +314,8 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
             
             if (haveCompounds && haveParForm && haveParSMI)
             {
-                candidates <- getTPComponCandidatesUnkAnn(compounds, parentForm, parentSMILES, calcLogP)
+                candidates <- getTPComponCandidatesUnkAnn(compounds, parfg, parentForm, parentSMILES, parentIK,
+                                                          calcLogP)
                 if (length(candidates) > 0)
                 {
                     cmpTab <- merge(cmpTab, data.table(group = names(candidates), candidatesComp = candidates),
@@ -303,6 +327,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
         {
             parentForm <- screenInfo(fGroups)[name == parn][["formula"]][1]
             parentSMILES <- screenInfo(fGroups)[name == parn][["SMILES"]][1]
+            parentIK <- screenInfo(fGroups)[name == parn][["InChIKey"]][1]
             haveParForm <- !is.null(parentForm) && !is.na(parentForm)
             haveParSMI <- !is.null(parentSMILES) && !is.na(parentSMILES)
             
@@ -310,7 +335,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
             
             if (haveFormulas && haveParForm)
             {
-                candidates <- getTPComponCandidatesUnkAnn(formulas, parentForm, NULL, calcLogP)
+                candidates <- getTPComponCandidatesUnkAnn(formulas, parfg, parentForm, NULL, NULL, calcLogP)
                 if (length(candidates) > 0)
                 {
                     cmpTab <- merge(cmpTab, data.table(group = names(candidates), candidatesForm = candidates),
@@ -320,7 +345,8 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
             
             if (haveCompounds && haveParForm && haveParSMI)
             {
-                candidates <- getTPComponCandidatesUnkAnn(compounds, parentForm, parentSMILES, calcLogP)
+                candidates <- getTPComponCandidatesUnkAnn(compounds, parfg, parentForm, parentSMILES, parentIK,
+                                                          calcLogP)
                 if (length(candidates) > 0)
                 {
                     cmpTab <- merge(cmpTab, data.table(group = names(candidates), candidatesComp = candidates),

@@ -18,11 +18,10 @@
     - see if MSPL sets anaInfo can be replaced by non-exported slot with named vector with sets for each ana
     - properly handle NA values for custom cols?
     - plotVenn/unique sets methods: deprecate/remove sets arg?
-    - plotVenn()/overlap: deprecate/remove list arg for which?
+    - plotVenn()/overlap/plotUpSet(): deprecate/remove list arg for which?
     - FC: select multiple groups and/or anaInfo cols?
     - plotChord/report(): report sets as outer groups? make it optional?
-    - plotVenn() (and others?): handle wrong input for which --> see unique()
-    
+
 - Misc
     - bg MS/MS subtraction
         - default abundance filtering while averaging? or apply filter in newProject()

@@ -795,17 +795,14 @@ setMethod("plotChromsHash", "featureGroups", function(obj, analysis = analyses(o
 setMethod("plotVenn", "featureGroups", function(obj, which = NULL, aggregate = TRUE, ...)
 {
     anaInfo <- analysisInfo(obj)
-    
-    ac <- checkmate::makeAssertCollection()
-    checkmate::assert(checkmate::checkCharacter(which, min.chars = 1, min.len = 1, any.missing = FALSE),
-                      checkmate::checkList(which, "character", any.missing = FALSE),
-                      checkmate::checkNull(which),
-                      .var.name = "which", add = ac)
-    aggregate <- assertAndPrepareAnaInfoBy(aggregate, anaInfo, FALSE, add = ac)
-    checkmate::reportAssertions(ac)
-
+    aggregate <- assertAndPrepareAnaInfoBy(aggregate, anaInfo, FALSE)
     groups <- unique(anaInfo[[aggregate]])
     
+    checkmate::assert(checkmate::checkSubset(which, groups, empty.ok = FALSE),
+                      checkmate::checkList(which, "character", any.missing = FALSE),
+                      checkmate::checkNull(which),
+                      .var.name = "which")
+
     if (is.null(which))
         which <- groups
 
@@ -850,18 +847,18 @@ setMethod("plotUpSet", "featureGroups", function(obj, which = NULL, aggregate = 
                                                  nintersects = NA, ...)
 {
     anaInfo <- analysisInfo(obj)
+    aggregate <- assertAndPrepareAnaInfoBy(aggregate, anaInfo, FALSE)
+    groups <- unique(anaInfo[[aggregate]])
     
     ac <- checkmate::makeAssertCollection()
-    checkmate::assert(checkmate::checkCharacter(which, min.chars = 1, min.len = 1, any.missing = FALSE),
+    checkmate::assert(checkmate::checkSubset(which, groups, empty.ok = FALSE),
                       checkmate::checkList(which, "character", any.missing = FALSE),
                       checkmate::checkNull(which),
                       .var.name = "which", add = ac)
-    aggregate <- assertAndPrepareAnaInfoBy(aggregate, anaInfo, FALSE, add = ac)
     checkmate::assertCount(nsets, positive = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertCount(nintersects, positive = TRUE, na.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
-    groups <- unique(anaInfo[[aggregate]])
     if (is.null(which))
         which <- groups
     
@@ -872,6 +869,7 @@ setMethod("plotUpSet", "featureGroups", function(obj, which = NULL, aggregate = 
 
     gt <- as.data.table(obj, average = aggregate)
     gt <- gt[, getADTIntCols(which), with = FALSE] # isolate relevant columns
+    setnames(gt, stripADTIntSuffix(names(gt)))
     gt[, (names(gt)) := lapply(.SD, function(x) as.integer(x > 0))]
     
     if (sum(sapply(gt, function(x) any(x > 0))) < 2)

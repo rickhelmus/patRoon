@@ -287,8 +287,8 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
     compInfo[, name := paste0("CMP", .I)]
     setcolorder(compInfo, "name")
     
-    # UNDONE: progressbar, do in parallel?, is it enough to get candidates per parent suspect instead of parent suspect+fg? 
-    compList <- Map(compInfo$parent_name, compInfo$parent_group, f = function(parn, parfg)
+    # UNDONE: is it enough to get candidates per parent suspect instead of parent suspect+fg? 
+    compList <- doApply("Map", FALSE, compInfo$parent_name, compInfo$parent_group, f = function(parn, parfg)
     {
         cmpTab <- parentForm <- NULL
         if (mode == "TPs")
@@ -357,10 +357,15 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
         else
             cmpTab <- data.table(group = names(fGroupsTPs))
         
-        return(prepareComponent(cmpTab, parfg, parentForm))
+        cmpTab <- prepareComponent(cmpTab, parfg, parentForm)
+        doProgress()
+        return(cmpTab)
     })
-browser()
+    
 
+    # UNDONE!!
+    return(componentsTPs(componentInfo = compInfo[], components = compList, fromTPs = !is.null(TPs)))
+    
     if (FALSE)
     {
         

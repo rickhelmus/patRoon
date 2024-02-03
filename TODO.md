@@ -41,7 +41,8 @@
         - Make option in generateTPs methods?
         - Make option in componentsTPs for unk compounds (and maybe override scr?)
         --> now always uses rcdk/obabel, also support XLogPs from annotation data?
-    - Do TP_retDir calculation with LogP tolerance, also for existing code 
+    - Do TP_retDir calculation with LogP tolerance, also for existing code
+    - update patRoonInst for new deps?
 
 - tests
     - IDL filter
@@ -102,6 +103,8 @@
         - new/shortened filter() args
         - removeMZs and mzWindow filter() args
             - removeMZs list for sets
+    - generateComponentsTPs()
+        - new args
 
 - NEWS
     - specSimParamsMatch --> specSimParams
@@ -152,6 +155,9 @@
         - getBGMSMSPeaks()
         - new/shortened filter() args
         - removeMZs and mzWindow filter() args
+    - generateComponentsTPs()
+        - new args
+
 
 ## Ext
 

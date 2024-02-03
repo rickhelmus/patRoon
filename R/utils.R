@@ -86,7 +86,7 @@ moveDTColumn <- function(dt, col, after)
     return(dt)
 }
 
-checkPackage <- function(pkg, gh = NULL, ghSubDir = NULL)
+checkPackage <- function(pkg, gh = NULL, ghSubDir = NULL, bioc = FALSE)
 {
     # from http://stackoverflow.com/a/20333756
     if (!requireNamespace(pkg, quietly = TRUE))
@@ -96,6 +96,8 @@ checkPackage <- function(pkg, gh = NULL, ghSubDir = NULL)
             args <- if (!is.null(ghSubDir)) sprintf("'%s', subdir = '%s')", gh, ghSubDir) else sprintf("'%s'", gh)
             stop(sprintf("Please install %s from github: remotes::install_github(%s)", pkg, args), call. = FALSE)
         }
+        else if (bioc)
+            stop(sprintf("Please install %s: BiocManager::install('%s')", pkg, pkg), call. = FALSE)
         else
             stop(sprintf("Please install %s: install.packages('%s')", pkg, pkg), call. = FALSE)
     }
@@ -680,14 +682,17 @@ getAllMergedConsCols <- function(targetCols, allCols, mConsNames)
 
 getDuplicatedStrings <- function(x) names(which(table(x) > 1))
 
-doApply <- function(applyf, doPar, data, ...)
+doApply <- function(applyf, doPar, data, ..., prog = TRUE)
 {
+    args <- list(...)
     if (doPar)
     {
         applyf <- get(paste0("future_", applyf), envir = asNamespace("future.apply"))
-        return(withProg(length(data), doPar, do.call(applyf, list(data, ..., future.seed = TRUE))))
+        args <- c(args, list(future.seed = TRUE))
     }
-    withProg(length(data), doPar, do.call(applyf, list(data, ...)))
+    if (prog)
+        return(withProg(length(data), doPar, do.call(applyf, c(list(data), args))))
+    return(do.call(applyf, c(list(data), args)))
 }
 
 getMS2QuantRes <- function(calibrants, unknowns, eluent, organicModifier, pHAq, allFPs)

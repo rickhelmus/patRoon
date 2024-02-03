@@ -132,7 +132,9 @@ Suggests:
     pkgload,
     splashR,
     MS2Quant,
-    MS2Tox
+    MS2Tox,
+    ChemmineR,
+    fmcsR
 LinkingTo:
     Rcpp,
     rapidjsonr

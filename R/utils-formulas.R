@@ -552,3 +552,15 @@ setFormulaPLID <- function(formList, MSPeakLists, absAlignMzDev)
     
     return(formList)
 }
+
+calcFormulaFit <- function(formula1, formula2)
+{
+    calcOneWay <- function(f1, f2)
+    {
+        f1ElCount <- sum(splitFormulaToList(f1))
+        fSub <- splitFormulaToList(subtractFormula(f2, f1))
+        f1ElMissing <- sum(abs(fSub[fSub < 0]))
+        return((f1ElCount - f1ElMissing) / f1ElCount)
+    }
+    return(max(calcOneWay(formula1, formula2), calcOneWay(formula2, formula1)))
+}

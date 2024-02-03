@@ -154,7 +154,10 @@ getTPComponCandidatesUnkAnn <- function(featAnn, parentFGroup, parentFormula, pa
         # UNDONE: unset annotation objects?
         
         if (!is.null(tab[["formula"]]))
+        {
             tab[, formulaDiff := sapply(formula, getFormulaDiffText, form2 = parentFormula)]
+            tab[, fitFormula := sapply(formula, calcFormulaFit, parentFormula)]
+        }
         
         if (!is.null(parentSMILES) && !is.null(tab[["SMILES"]]))
         {
@@ -178,7 +181,7 @@ getTPComponCandidatesUnkAnn <- function(featAnn, parentFGroup, parentFormula, pa
             }, by = seq_len(nrow(tab))]
         }
 
-        tab <- subsetDTColumnsIfPresent(tab, c("compoundName", "SMILES", "InChI", "InChIKey", "neutral_formula",
+        tab <- subsetDTColumnsIfPresent(tab, c("compoundName", "SMILES", "InChI", "InChIKey", "formula", "fitFormula",
                                                "fitCompound", "fragMatches", "NLMatches"))
         
         return(tab)

@@ -459,3 +459,46 @@ predictLC50SMILES <- function(SMILES, LC50Mode, concUnit)
     
     return(LC50s[])
 }
+
+getFMCS <- function(refSMILES, otherSMILES, parallel, au = 1, bu = 4, matching.mode = "aromatic", ...)
+{
+    checkPackage("ChemmineR", bioc = TRUE)
+    checkPackage("fmcsR", bioc = TRUE)
+    
+    # ChemmineR cannot do SMILES conversion on Windows, so first convert to a temporary SDF file with RCDK. This also
+    # makes aromatic rings look better...
+    
+    otherSMILESUn <- unique(otherSMILES)
+    SDFPaths <- doApply("sapply", parallel, c(refSMILES, otherSMILESUn), prog = FALSE, function(SMI)
+    {
+        mol <- patRoon:::getMoleculesFromSMILES(SMI, doTyping = TRUE, emptyIfFails = FALSE)
+        if (!patRoon:::isValidMol(mol[[1]]))
+        {
+            warning("Could not calculate molecular fit: failed to parse SMILES: ", SMI, call. = FALSE)
+            return(NULL)
+        }
+        
+        mol <- rcdk::generate.2d.coordinates(mol[[1]])
+        
+        sdfFile <- tempfile(fileext = ".sdf")
+        rcdk::write.molecules(mol, sdfFile, together = TRUE)
+        return(sdfFile)
+    })
+    
+    if (is.null(SDFPaths[refSMILES]))
+        return(list())
+    
+    refSDF <- ChemmineR::read.SDFset(SDFPaths[refSMILES])
+    return(setNames(doApply("lapply", parallel, SDFPaths[otherSMILESUn], prog = FALSE, function(p)
+    {
+        oSDF <- ChemmineR::read.SDFset(p)
+        f <- fmcsR::fmcs(refSDF[[1]], oSDF[[1]], au = au, bu = bu, matching.mode = matching.mode, ...)
+        return(f)
+    }), otherSMILESUn))
+}
+
+calcStructFitFMCS <- function(...)
+{
+    fmcs <- getFMCS(..., fast = TRUE)
+    return(sapply(fmcs, "[", "Overlap_Coefficient"))
+}

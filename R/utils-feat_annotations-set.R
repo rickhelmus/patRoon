@@ -131,6 +131,11 @@ makeFeatAnnSetConsensus <- function(setObjects, origFGNames, setThreshold, setTh
         
         ct[, c("setCoverageAnn", "setCoverage") := .(setsMergedCount / setsCount, setsMergedCount / sCount)]
         ct[, c("setsCount", "setsMergedCount") := NULL]
+        
+        # assign non-set specific annSims
+        asnames <- getAllMergedConsCols("annSim", names(ct), names(setObjects))
+        ct[, annSim := do.call(pmax, c(.SD, list(na.rm = TRUE))), .SDcols = asnames]
+        
         return(ct)
     })
     

@@ -500,5 +500,5 @@ getFMCS <- function(refSMILES, otherSMILES, parallel, au = 1, bu = 4, matching.m
 calcStructFitFMCS <- function(...)
 {
     fmcs <- getFMCS(..., fast = TRUE)
-    return(sapply(fmcs, "[", "Overlap_Coefficient"))
+    return(sapply(fmcs, "[[", "Overlap_Coefficient", USE.NAMES = FALSE))
 }

@@ -138,14 +138,12 @@ getTPComponCandidatesUnkAnn <- function(featAnn, parentFGroup, parentFormula, pa
         }
     }
     
-    # UNDONE: skip parent fGroup
-    
     parentAnn <- if (!is.null(parentInChIKey) && parentFGroup %in% groupNames(featAnn))
         featAnn[[parentFGroup]][UID == getIKBlock1(parentInChIKey)]
     else
         NULL
     
-    return(sapply(annotations(featAnn), function(ann)
+    return(sapply(annotations(featAnn)[setdiff(groupNames(featAnn), parentFGroup)], function(ann)
     {
         tab <- copy(ann)
         setnames(tab, "neutral_formula", "formula")

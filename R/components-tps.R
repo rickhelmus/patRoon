@@ -150,14 +150,15 @@ getTPComponCandidatesUnkAnn <- function(featAnn, parentFGroup, parentFormula, pa
         tab <- copy(ann)
         setnames(tab, "neutral_formula", "formula")
         
-        # UNDONE: calculate TP score+metrics, apply thresholds
+        # UNDONE: apply thresholds
         # UNDONE: unset annotation objects?
+
+        # UNDONE: also support XLogP from feat annotations?
+        if (!is.null(retDirs))
+            tab[, TP_retDir := retDirs[SMILES]]
         
-        if (!is.null(tab[["formula"]]))
-        {
-            tab[, formulaDiff := sapply(formula, getFormulaDiffText, form2 = parentFormula)]
-            tab[, fitFormula := sapply(formula, calcFormulaFit, parentFormula)]
-        }
+        tab[, formulaDiff := sapply(formula, getFormulaDiffText, form2 = parentFormula)]
+        tab[, fitFormula := sapply(formula, calcFormulaFit, parentFormula)]
         
         if (!is.null(parentSMILES) && !is.null(tab[["SMILES"]]))
         {
@@ -176,10 +177,6 @@ getTPComponCandidatesUnkAnn <- function(featAnn, parentFGroup, parentFormula, pa
             }
         }
 
-        # UNDONE: also support XLogP from feat annotations?
-        if (!is.null(retDirs))
-            tab[, TP_retDir := retDirs[SMILES]]
-        
         if (!is.null(parentAnn) && nrow(parentAnn) == 1)
         {
             tab[, c("fragMatches", "NLMatches") := {
@@ -192,8 +189,14 @@ getTPComponCandidatesUnkAnn <- function(featAnn, parentFGroup, parentFormula, pa
             }, by = seq_len(nrow(tab))]
         }
 
-        tab <- subsetDTColumnsIfPresent(tab, c("compoundName", "SMILES", "InChI", "InChIKey", "formula", "fitFormula",
-                                               "fitCompound", "suspSim", "suspSimSMILES", "fragMatches", "NLMatches"))
+        if (!is.null(tab[["fitCompound"]]))
+            tab[, TP_score := pmax(NAToZero(fitCompound), NAToZero(suspSim)) + NAToZero(annSim)]
+        else
+            tab[, TP_score := NAToZero(fitFormula) + NAToZero(annSim)]
+        
+        tab <- subsetDTColumnsIfPresent(tab, c("compoundName", "SMILES", "InChI", "InChIKey", "formula", "annSim",
+                                               "fitFormula", "fitCompound", "suspSim", "suspSimSMILES", "fragMatches",
+                                               "NLMatches", "TP_score"))
         
         return(tab)
     }, simplify = FALSE))

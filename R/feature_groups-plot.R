@@ -281,7 +281,7 @@ setMethod("plotInt", "featureGroups", function(obj, average = FALSE, averageFunc
     }
     else
         NULL
-    
+
     oldp <- par(no.readonly = TRUE)
     if (showLegend)
     {
@@ -306,7 +306,7 @@ setMethod("plotInt", "featureGroups", function(obj, average = FALSE, averageFunc
     
     maxX <- if (xNum) max(intTab$x) else uniqueN(intTab$x)
     do.call(plot, c(list(x = NULL, xlim = c(0, maxX), ylim = c(0, max(intTab[, names(obj), with = FALSE])),
-                         type = "n", xlab = "", ylab = "Intensity", xaxt = "n"), plotArgs))
+                         type = "n", xlab = if (xNum) xBy else "", ylab = "Intensity", xaxt = "n"), plotArgs))
     
     if (xNum)
         axis(1)
@@ -318,17 +318,18 @@ setMethod("plotInt", "featureGroups", function(obj, average = FALSE, averageFunc
     linesArgs <- c(list(type = type, pch = pch, lty = lty), linesArgs)
     usr <- par("usr")
     
-    makeLine <- function(y, col, xgrp = NULL)
+    makeLine <- function(grp, col, xgrp = NULL)
     {
+        y <- if (!is.null(xgrp)) intTab[xgroup == xgrp][[grp]] else intTab[[grp]]
         irows <- if (is.null(xgrp)) seq_len(nrow(intTab)) else intTab[, .I[xgroup == xgrp]]
         x <- if (xNum) intTab$x[irows] else intTab$xnum[irows]
         do.call(lines, c(list(x = x, y = y, col = col), linesArgs))
         
         if (regression)
         {
-            if (!is.null(regList[[grp]][["lm"]]))
+            lm <- if (!is.null(xgrp)) regList[[grp]][[xgrp]][["lm"]] else regList[[grp]][["lm"]]
+            if (!is.null(lm))
             {
-                lm <- if (!is.null(xgrp)) regList[[grp]][[xgrp]] else regList[[grp]]
                 # from https://stackoverflow.com/a/10046370
                 clip(min(x), max(x), min(y), max(y))
                 abline(lm, col = col)
@@ -340,11 +341,11 @@ setMethod("plotInt", "featureGroups", function(obj, average = FALSE, averageFunc
     for (grp in names(obj))
     {
         if (is.null(groupBy) || groupBy == "fGroups")
-            makeLine(intTab[[grp]], col[if (is.null(groupBy)) 1 else grp])
+            makeLine(grp, col[if (is.null(groupBy)) 1 else grp])
         else
         {
             for (xgrp in unique(intTab$xgroup))
-                makeLine(intTab[xgroup == xgrp][[grp]], col[xgrp], xgrp = xgrp)
+                makeLine(grp, col[xgrp], xgrp = xgrp)
         }
     }
     

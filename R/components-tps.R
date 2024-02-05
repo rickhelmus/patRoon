@@ -586,15 +586,42 @@ setMethod("collapseComponents", "componentsTPs", function(obj)
 
 #' @describeIn componentsTPs Returns all component data as a \code{\link{data.table}}.
 #' @export
-setMethod("as.data.table", "componentsTPs", function(x)
+setMethod("as.data.table", "componentsTPs", function(x, candidates = FALSE)
 {
-    # as regular method, but get rid of double links column when merging
-    # components / componentInfo
+    checkmate::assertFlag(candidates)
     
+    # get rid of double links column when merging components / componentInfo
     if (length(x) > 0)
         x@componentInfo <- x@componentInfo[, -"links"]
     
-    return(callNextMethod(x))
+    ret <- callNextMethod(x)
+    
+    ccols <- c("candidates", "candidatesForm", "candidatesComp")
+    ctypes <- setNames(c("suspect", "unknownFormula", "unknownCompound"), ccols)
+    if (candidates)
+    {
+        for (col in ccols)
+        {
+            if (is.null(ret[[col]]))
+                next
+            
+            ret[, (col) := Map(name, group, get(col), f = function(cmpName, grp, tab)
+            {
+                tab <- copy(tab)
+                tab[, c("cmpName", "group", "candidate_type") := .(cmpName, grp, ctypes[col])]
+                setnames(tab, "name", "candidate_name", skip_absent = TRUE)
+                setcolorder(tab, "candidate_type")
+                return(tab)
+            })]
+            
+            allc <- rbindlist(ret[[col]], fill = TRUE)
+            ret <- merge(ret, allc, by.x = c("name", "group"), by.y = c("cmpName", "group"), all.x = TRUE, sort = FALSE)
+        }
+    }
+    
+    ret <- removeDTColumnsIfPresent(ret, ccols)
+    
+    return(ret)
 })
 
 #' @describeIn componentsTPs Provides various rule based filtering options to clean and prioritize TP data.

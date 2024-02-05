@@ -2,6 +2,8 @@
 
 * Fixed: `as.data.table()` method for `featureGroups`: `normConcToTox` argument was ignored (not for `featureGroupsScreening`)
 * Various reporting fixes for screening results from suspect lists without formula/SMILES data.
+* `generateAnalysisInfo()`: try to equalize the output and input directory order
+
 
 # patRoon 2.3.1
 

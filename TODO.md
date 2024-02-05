@@ -106,6 +106,7 @@
             - removeMZs list for sets
     - generateComponentsTPs()
         - new args
+        - as.data.table candidates arg
 
 - NEWS
     - specSimParamsMatch --> specSimParams
@@ -158,6 +159,7 @@
         - removeMZs and mzWindow filter() args
     - generateComponentsTPs()
         - new args
+        - as.data.table candidates arg
 
 
 ## Ext

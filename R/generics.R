@@ -456,6 +456,11 @@ setGeneric("featureTable", function(obj, ...) standardGeneric("featureTable"))
 #' @template generics
 setGeneric("filter", function(obj, ...) standardGeneric("filter"))
 
+#' @templateVar func getBPCs
+#' @templateVar desc gets base peak chromatogram(s).
+#' @template generics
+setGeneric("getBPCs", function(obj, ...) standardGeneric("getBPCs"))
+
 #' @templateVar func getFeatures
 #' @templateVar desc returns the object's \code{\link{features}} object.
 #' @template generics
@@ -466,10 +471,20 @@ setGeneric("getFeatures", function(obj) standardGeneric("getFeatures"))
 #' @template generics
 setGeneric("getMCS", function(obj, ...) standardGeneric("getMCS"))
 
+#' @templateVar func getTICs
+#' @templateVar desc gets total ion chromatogram(s).
+#' @template generics
+setGeneric("getTICs", function(obj, ...) standardGeneric("getTICs"))
+
 #' @templateVar func groupNames
 #' @templateVar desc returns a \code{character} vector with the names of the feature groups for which data is present in this object.
 #' @template generics
 setGeneric("groupNames", function(obj) standardGeneric("groupNames"))
+
+#' @templateVar func plotBPCs
+#' @templateVar desc plots base peak chromatogram(s).
+#' @template generics
+setGeneric("plotBPCs", function(obj, ...) standardGeneric("plotBPCs"))
 
 #' @templateVar func plotChord
 #' @templateVar desc plots a Chord diagram to assess overlapping data.
@@ -482,26 +497,6 @@ setGeneric("plotChord", function(obj, addSelfLinks = FALSE, addRetMzPlots = TRUE
 #' @templateVar desc plots extracted ion chromatogram(s).
 #' @template generics
 setGeneric("plotChroms", function(obj, ...) standardGeneric("plotChroms"))
-
-#' @templateVar func getTICs
-#' @templateVar desc gets total ion chromatogram(s).
-#' @template generics
-setGeneric("getTICs", function(obj, ...) standardGeneric("getTICs"))
-
-#' @templateVar func plotTICs
-#' @templateVar desc plots total ion chromatogram(s).
-#' @template generics
-setGeneric("plotTICs", function(obj, ...) standardGeneric("plotTICs"))
-
-#' @templateVar func getBPCs
-#' @templateVar desc gets base peak chromatogram(s).
-#' @template generics
-setGeneric("getBPCs", function(obj, ...) standardGeneric("getBPCs"))
-
-#' @templateVar func plotBPCs
-#' @templateVar desc plots base peak chromatogram(s).
-#' @template generics
-setGeneric("plotBPCs", function(obj, ...) standardGeneric("plotBPCs"))
 
 #' @templateVar func plotGraph
 #' @templateVar desc Plots an interactive network graph.
@@ -534,6 +529,11 @@ setGeneric("plotSpectrum", function(obj, ...) standardGeneric("plotSpectrum"))
 #' @templateVar desc plots a chemical structure.
 #' @template generics
 setGeneric("plotStructure", function(obj, ...) standardGeneric("plotStructure"))
+
+#' @templateVar func plotTICs
+#' @templateVar desc plots total ion chromatogram(s).
+#' @template generics
+setGeneric("plotTICs", function(obj, ...) standardGeneric("plotTICs"))
 
 #' @templateVar func plotVenn
 #' @templateVar desc plots a Venn diagram to assess unique and overlapping data.

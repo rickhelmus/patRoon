@@ -857,3 +857,29 @@ setMethod("plotGraph", "featureGroups", function(obj, onlyPresent = TRUE, width 
 #' @param set \setsWF The set for which data must be plotted.
 #' @export
 setMethod("plotGraph", "featureGroupsSet", function(obj, onlyPresent = TRUE, set, ...) plotGraph(unset(obj, set), onlyPresent = onlyPresent, ...))
+
+#' @describeIn featureGroups Plots the total ion chromatogram/s (TICs) of the analyses.
+#' @param retMin Plot retention time in minutes (instead of seconds).
+#' @param title Character string used for title of the plot. If \code{NULL} a title will be automatically generated.
+#' @param colourBy Sets the automatic colour selection: "none" for a single 
+#' colour or "analyses"/"rGroups" for a distinct colour per analysis or analysis replicate group.
+#' @param showLegend Plot a legend if TRUE.
+#' @template plot-lim
+#' @aliases plotTICs
+#' @export
+setMethod("plotTICs", "featureGroups", function(obj, retentionRange = NULL, MSLevel = 1, retMin = FALSE, title = NULL,
+                                                colourBy = c("none", "analyses", "rGroups"), showLegend = TRUE,
+                                                xlim = NULL, ylim = NULL, ...)
+{
+    plotTICs(obj@features, retentionRange, MSLevel, retMin, title, colourBy, showLegend, xlim, ylim, ...)
+})
+
+#' @describeIn featureGroups Plots the base peak chromatogram/s (BPCs) of the analyses.
+#' @aliases plotBPCs
+#' @export
+setMethod("plotBPCs", "featureGroups", function(obj, retentionRange = NULL, MSLevel = 1, retMin = FALSE, title = NULL,
+                                                colourBy = c("none", "analyses", "rGroups"), showLegend = TRUE,
+                                                xlim = NULL, ylim = NULL, ...)
+{
+    plotBPCs(obj@features, retentionRange, MSLevel, retMin, title, colourBy, showLegend, xlim, ylim, ...)
+})

@@ -544,3 +544,116 @@ doPlotFeatInts <- function(obj, average, normalized, xnames, showLegend, pch, ty
 }
 
 withSVGLite <- withr::with_(function(file, ...) svglite::svglite(file, ...), function(old) dev.off())
+
+doPlotHeaders <- function(obj, what = "tic", retentionRange, MSLevel, retMin = FALSE, title = NULL, 
+                          colourBy = c("none", "analyses", "rGroups"), showLegend = TRUE, xlim = NULL, ylim = NULL, ...)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertString(title, null.ok = TRUE, add = ac)
+    colourBy <- checkmate::matchArg(colourBy, c("none", "analyses", "rGroups"), add = ac)
+    assertXYLim(xlim, ylim, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (showLegend && colourBy == "none")
+        showLegend <- FALSE
+    
+    if ("tic" %in% what) {
+        data <- getTICs(obj, retentionRange, MSLevel)
+    } else if ("bpc" %in% what) {
+        data <- getBPCs(obj, retentionRange, MSLevel)
+    } else {
+        data <- data.table()
+    }
+    
+    
+    if (nrow(data) == 0)
+    {
+        noDataPlot()
+        return(invisible(NULL))
+    }
+    
+    anaInfo <- analysisInfo(obj)
+    
+    anaInfo <- anaInfo[anaInfo$analysis %chin% unique(data$analysis), ]
+    anas <- anaInfo$analysis
+    anaCount <- length(anas)
+    replicates <- unique(anaInfo$group)
+    
+    if (colourBy == "rGroups")
+    {
+        PlotColors <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(length(replicates))
+        names(PlotColors) <- replicates
+    }
+    else if (colourBy == "analyses")
+    {
+        PlotColors <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(anaCount)
+        names(PlotColors) <- anas
+    }
+    else
+        PlotColors <- "blue"
+    
+    fillColors <- adjustcolor(PlotColors, alpha.f = 0.35)
+    names(fillColors) <- names(PlotColors)
+    
+    if (is.null(xlim))
+    {
+        xlim <- c(min(data$ret), max(data$ret))
+    }
+    if (is.null(ylim))
+    {
+        plotIntMax <- max(data$intensity)
+        ylim <- c(0, plotIntMax * 1.1)
+    }
+    
+    if (is.null(title))
+    {
+        if (anaCount == 1)
+            title <- sprintf("Analysis '%s'", anas[1])
+        else
+            title <- sprintf("%d analyses", anaCount)
+    }
+    
+    if (showLegend)
+    {
+        makeLegend <- function(x, y, ...)
+        {
+            texts <- if (colourBy == "rGroups") replicates else anas
+            return(legend(x, y, texts, col = PlotColors[texts],
+                          text.col = PlotColors[texts], lty = 1,
+                          xpd = NA, ncol = 1, cex = 0.75, bty = "n", ...))
+        }
+        
+        plot.new()
+        leg <- makeLegend(0, 0, plot = FALSE)
+        lw <- (grconvertX(leg$rect$w, to = "ndc") - grconvertX(0, to = "ndc"))
+        lw <- min(lw, 0.5) # don't make it too wide
+        withr::local_par(list(omd = c(0, 1 - lw, 0, 1), new = TRUE))
+    }
+    
+    plot(0, type = "n", main = title, xlab = sprintf("Retention time (%s)", if (retMin) "min." else "sec."),
+         ylab = "Intensity", xlim = xlim, ylim = ylim, ...)
+    
+    effectiveXlim <- par("usr")[c(1, 2)]
+    effectiveYlim <- par("usr")[c(3, 4)]
+    
+    for (ana in anas)
+    {
+        anadt <- data[analysis %in% ana, ]
+        
+        if (nrow(anadt) == 0)
+            next
+        
+        if (colourBy == "rGroups")
+            colInd <- anaInfo$group[match(ana, anaInfo$analysis)]
+        else if (colourBy == "analyses")
+            colInd <- ana
+        else
+            colInd <- 1
+        
+        points(if (retMin) anadt$ret / 60 else anadt$ret, anadt$intensity, type = "l", col = PlotColors[colInd])
+    }
+    
+    if (showLegend)
+        makeLegend(par("usr")[2], par("usr")[4])
+    
+}

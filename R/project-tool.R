@@ -92,6 +92,7 @@ getScriptCode <- function(input, analyses)
                 list(name = "paths", value = unique(anaTable$path), quote = TRUE),
                 list(name = "groups", value = anaTable$group, quote = TRUE),
                 list(name = "blanks", value = anaTable$blank, quote = TRUE),
+                list(name = "concs", value = anaTable$conc),
                 list(name = "norm_concs", value = anaTable$norm_conc)
             ))
             if (any(anaTable$exclude))
@@ -701,7 +702,7 @@ doCreateProject <- function(input, analyses)
         
         # Make analysis table
         if (input$generateAnaInfo == "table")
-            write.csv(anas[!anas$exclude, c("path", "analysis", "group", "blank", "norm_conc")],
+            write.csv(anas[!anas$exclude, c("path", "analysis", "group", "blank", "conc", "norm_conc")],
                       file.path(input$destinationPath, tableFile), row.names = FALSE)
         
         return(anas)
@@ -1316,8 +1317,8 @@ newProject <- function(destPath = NULL)
                     contextMenu = FALSE, manualColumnResize = TRUE)
 
     emptyAnaTable <- function() data.table(exclude = logical(0), analysis = character(0), format = character(0),
-                                           group = character(0), blank = character(0), norm_conc = numeric(0),
-                                           path = character(0))
+                                           group = character(0), blank = character(0), conc = numeric(0), 
+                                           norm_conc = numeric(0), path = character(0))
     
     server <- function(input, output, session)
     {
@@ -1331,7 +1332,7 @@ newProject <- function(destPath = NULL)
                            c(list(rValues[[rvName]], height = 250, maxRows = nrow(rValues[[rvName]])),
                              hotOpts)) %>%
                 rhandsontable::hot_col(c("group", "blank"), readOnly = FALSE, type = "text") %>%
-                rhandsontable::hot_col("norm_conc", readOnly = FALSE, type = "numeric") %>%
+                rhandsontable::hot_col(c("conc", "norm_conc"), readOnly = FALSE, type = "numeric") %>%
                 rhandsontable::hot_col("exclude", readOnly = FALSE, type = "checkbox")
             
             return(hot)
@@ -1486,7 +1487,7 @@ newProject <- function(destPath = NULL)
             if (!is.null(input[[name]]) && input[[name]]$params$maxRows > 0)
             {
                 df <- rhandsontable::hot_to_r(input[[name]])
-                rValues[[rvName]][, c("exclude", "group", "blank", "norm_conc") := .(df$exclude, df$group, df$blank, df$norm_conc)]
+                rValues[[rvName]][, c("exclude", "group", "blank", "conc", "norm_conc") := .(df$exclude, df$group, df$blank, df$conc, df$norm_conc)]
             }
         }
         observeEvent(input$analysesHot, doObserveAnaHot("analysesHot", "analyses"))
@@ -1501,8 +1502,8 @@ newProject <- function(destPath = NULL)
 
                 if (length(files) > 0)
                 {
-                    dt <- data.table(path = dirname(files), analysis = simplifyAnalysisNames(files),
-                                     group = "", blank = "", norm_conc = NA_real_)
+                    dt <- data.table(exclude= FALSE, path = dirname(files), analysis = simplifyAnalysisNames(files),
+                                     group = "", blank = "", conc = NA_real_, norm_conc = NA_real_)
 
                     msExts <- MSFileExtensions()
                     dt[, format := sapply(tolower(tools::file_ext(files)), function(ext)
@@ -1512,8 +1513,8 @@ newProject <- function(destPath = NULL)
 
                     dt[, format := paste0(.SD$format, collapse = ", "), by = .(path, analysis)]
                     dt <- unique(dt, by = c("analysis", "path"))
-                    dt$exclude <- FALSE
-                    setcolorder(dt, c("exclude", "analysis", "format", "group", "blank", "norm_conc", "path"))
+         
+                    setcolorder(dt, c("exclude", "analysis", "format", "group", "blank", "conc", "norm_conc", "path"))
 
                     rvName <- getCurAnaRVName()
                     rValues[[rvName]] <- rbind(rValues[[rvName]], dt)
@@ -1522,41 +1523,38 @@ newProject <- function(destPath = NULL)
         })
 
         observeEvent(input$addAnalysesCSV, {
-            csvFile <- rstudioapi::selectFile(path = "~/", filter = "csv files (*.csv)")
-            if (!is.null(csvFile))
+          csvFile <- rstudioapi::selectFile(path = "~/", filter = "csv files (*.csv)")
+          if (!is.null(csvFile))
+          {
+            csvTab <- tryCatch(fread(csvFile, select = c("path", "analysis", "group", "blank"),
+                                     colClasses = "character"),
+                               error = function(e) FALSE, warning = function(w) FALSE)
+            if (is.logical(csvTab))
+              rstudioapi::showDialog("Error", "Failed to open/parse selected csv file!", "")
+            else if (nrow(csvTab) > 0)
             {
-                csvTab <- tryCatch(fread(csvFile, select = c("path", "analysis", "group", "blank"),
-                                         colClasses = "character"),
-                                   error = function(e) FALSE, warning = function(w) FALSE)
-                if (is.logical(csvTab))
-                    rstudioapi::showDialog("Error", "Failed to open/parse selected csv file!", "")
-                else if (nrow(csvTab) > 0)
+              msExts <- MSFileExtensions()
+              msFiles <- normalizePath(listMSFiles(csvTab$path, MSFileFormats()), winslash = "/")
+              msFilesNoExt <- tools::file_path_sans_ext(msFiles)
+              formats <- mapply(csvTab$analysis, csvTab$path, FUN = function(ana, path)
+              {
+                fps <- msFiles[msFilesNoExt == file.path(path, ana)]
+                if (length(fps) == 0)
+                  return("")
+                ret <- sapply(tolower(tools::file_ext(fps)), function(ext)
                 {
-                    msExts <- MSFileExtensions()
-                    msFiles <- normalizePath(listMSFiles(csvTab$path, MSFileFormats()), winslash = "/")
-                    msFilesNoExt <- tools::file_path_sans_ext(msFiles)
-                    formats <- mapply(csvTab$analysis, csvTab$path, FUN = function(ana, path)
-                    {
-                        fps <- msFiles[msFilesNoExt == file.path(path, ana)]
-                        if (length(fps) == 0)
-                            return("")
-                        ret <- sapply(tolower(tools::file_ext(fps)), function(ext)
-                        {
-                            paste0(names(msExts)[sapply(msExts, function(e) ext %in% tolower(e))], collapse = "/")
-                        })
-                        return(paste0(ret, collapse = ", "))
-                    })
-
-                    csvTab[, format := formats]
-                    csvTab <- csvTab[nzchar(format)] # prune unknown files (might have been removed?)
-                    
-                    if (is.null(csvTab[["norm_conc"]])) # older files lack this column
-                        csvTab[, norm_conc := NA_real_]
-                    csvTab$exclude <- FALSE
-                    rvName <- getCurAnaRVName()
-                    rValues[[rvName]] <- rbind(rValues[[rvName]], csvTab)
-                }
+                  paste0(names(msExts)[sapply(msExts, function(e) ext %in% tolower(e))], collapse = "/")
+                })
+                return(paste0(ret, collapse = ", "))
+              })
+              
+              csvTab[, format := formats]
+              csvTab <- csvTab[nzchar(format)] # prune unknown files (might have been removed?)
+              
+              rvName <- getCurAnaRVName()
+              rValues[[rvName]] <- rbind(rValues[[rvName]], csvTab, fill=TRUE)
             }
+          }
         })
 
         observeEvent(input$convAlgo, {

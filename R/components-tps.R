@@ -113,6 +113,7 @@ getTPComponCandidatesScr <- function(TPs, parentName, parentFormula, TPFGMapping
         setnames(tab, "retDir", "TP_retDir")
         if (!is.null(tab[["formula"]]) && !is.null(parentFormula))
             tab[, formulaDiff := sapply(formula, getFormulaDiffText, form2 = parentFormula)]
+        tab[, UID := name]
         return(tab)
     }, simplify = FALSE))
 }
@@ -165,7 +166,7 @@ getTPComponCandidatesUnkAnn <- function(featAnn, parentFGroup, parentFormula, pa
             
             if (!is.null(suspTPsSMILES) && length(suspTPsSMILES) > 0)
             {
-                tab[, c("suspSim", "suspSimSMILES") := rbindlist(doApply(lapply, parallel, SMILES, function(SMI)
+                tab[, c("suspSim", "suspSimSMILES") := rbindlist(doApply("lapply", parallel, SMILES, function(SMI)
                 {
                     dists <- sapply(suspTPsSMILES, patRoon:::distSMILES, SMI1 = SMI, fpType = fpType,
                                     fpSimMethod = fpSimMethod)
@@ -187,17 +188,44 @@ getTPComponCandidatesUnkAnn <- function(featAnn, parentFGroup, parentFormula, pa
             }, by = seq_len(nrow(tab))]
         }
 
-        if (!is.null(tab[["fitCompound"]]))
+        # UNDONE: also do TP score w/out suspSim (ie when TPs=NULL)?
+        if (!is.null(tab[["fitCompound"]]) && !is.null(tab[["suspSim"]]))
             tab[, TP_score := pmax(NAToZero(fitCompound), NAToZero(suspSim)) + NAToZero(annSim)]
         else
             tab[, TP_score := NAToZero(fitFormula) + NAToZero(annSim)]
         
         tab <- subsetDTColumnsIfPresent(tab, c("compoundName", "SMILES", "InChI", "InChIKey", "formula", "annSim",
                                                "fitFormula", "fitCompound", "suspSim", "suspSimSMILES", "fragMatches",
-                                               "NLMatches", "TP_score"))
+                                               "NLMatches", "TP_score", "UID"))
         
         return(tab)
     }, simplify = FALSE))
+}
+
+mergeTPComponCandidatesTab <- function(compTab)
+{
+    ccols <- c("candidates", "candidatesForm", "candidatesComp")
+    ctypes <- setNames(c("suspect", "unknownFormula", "unknownCompound"), ccols)
+    
+    for (col in ccols)
+    {
+        if (is.null(compTab[[col]]))
+            next
+        
+        compTab[, (col) := Map(name, group, get(col), f = function(cmpName, grp, tab)
+        {
+            tab <- copy(tab)
+            tab[, c("cmpName", "group", "candidate_type") := .(cmpName, grp, ctypes[col])]
+            setnames(tab, c("name", "UID"), c("candidate_name", "candidate_UID"), skip_absent = TRUE)
+            setcolorder(tab, "candidate_type")
+            return(tab)
+        })]
+        
+        allc <- rbindlist(compTab[[col]], fill = TRUE)
+        compTab <- merge(compTab, allc, by.x = c("name", "group"), by.y = c("cmpName", "group"), all.x = TRUE, sort = FALSE)
+    }
+    
+    return(compTab)
 }
 
 doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLists, formulas, compounds, minRTDiff,
@@ -307,8 +335,6 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
     }
     else
         compInfo <- data.table(parent_group = names(fGroups), parent_name = names(fGroups))
-    compInfo[, name := paste0("CMP", .I)]
-    setcolorder(compInfo, "name")
 
     mainGetCandArgs <- if (mode != "unk")
     {
@@ -369,7 +395,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
             haveParForm <- !is.null(parentForm) && !is.na(parentForm)
             haveParSMI <- !is.null(parentSMILES) && !is.na(parentSMILES)
             
-            cmpTab <- data.table(group = character(), candidates = list())
+            cmpTab <- data.table(group = character())
             
             if (haveFormulas && haveParForm)
             {
@@ -399,136 +425,53 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, ignoreParents, TPs, MSPeakLi
             }
         }
         else
+        {
             cmpTab <- data.table(group = names(fGroupsTPs))
+            cmpTab[, TP_name := paste0(parfg, "-TP", seq_len(nrow(cmpTab)))]
+        }
         
         cmpTab <- prepareComponent(cmpTab, parfg, parentForm)
         doProgress()
         return(cmpTab)
     })
     
-
-    # UNDONE!!
-    return(componentsTPs(componentInfo = compInfo[], components = compList, fromTPs = !is.null(TPs)))
-    
-    if (FALSE)
+    if (nrow(compInfo) > 0)
     {
-        
-    compTab <- NULL
-    if (is.null(TPs))
-    {
-        # simply link each given parent with all given TPs, while relying on filter() to get sensible components
-        
-        parentCount <- length(fGroups)
-        prog <- openProgBar(0, parentCount)
-        
-        compTab <- rbindlist(Map(names(fGroups), seq_len(parentCount), f = function(grp, i)
-        {
-            grpsTPs <- names(fGroupsTPs)
-            
-            comp <- data.table(group = grpsTPs, parent_group = grp)
-            comp <- prepareComponent(comp, grp)
-            
-            # NOTE: name afterwards as the component may have been filtered
-            comp[, TP_name := paste0(grp, "-TP", seq_len(nrow(comp)))]
-            
-            setTxtProgressBar(prog, i)
-            
-            return(comp)
-        }), idcol = "parent_name")
-        
-        close(prog)
-    }
-    else
-    {
-        # for every parent:
-        #   - check for any matching fGroups (based on mass)
-        #   - if none, skip
-        #   - similarly, check which parents are present (only mz)
-        #   - for any fGroup that matches the parent:
-        #       - filter TPs (retention, intensity, ...)
-        
-        parentFGMapping <- linkParentsToFGroups(TPs, fGroups)
-        TPFGMapping <- linkTPsToFGroups(TPs, fGroupsTPs)
-        pars <- parents(TPs)
-        
-        parentCount <- length(names(TPs))
-        prog <- openProgBar(0, parentCount)
-        
-        compTab <- rbindlist(Map(names(TPs), products(TPs), seq_len(parentCount), f = function(pname, prods, i)
-        {
-            parentFGs <- parentFGMapping[name == pname][["group"]]
-            TPs <- TPFGMapping[TP_name %in% prods$name]
-            
-            if (length(parentFGs) == 0 || nrow(TPs) == 0)
-                comps <- NULL
-            else
-            {
-                # limit columns a bit to not bloat components too much
-                # UNDONE: column selection OK?
-                prodCols <- c("name", "SMILES", "InChI", "InChIKey", "formula", "molNeutralized", "CID", "mass",
-                              "retDir", "trans_add", "trans_sub", "deltaMZ", "similarity", "mergedBy", "coverage")
-                prods <- prods[, intersect(names(prods), prodCols), with = FALSE]
-                prods <- unique(prods, by = "name") # omit duplicates from different routes
-                
-                comps <- rbindlist(sapply(parentFGs, function(parentFG)
-                {
-                    ret <- merge(TPs, prods, by.x = "TP_name", by.y = "name")
-                    setnames(ret, "retDir", "TP_retDir")
-                    
-                    ret <- prepareComponent(ret, parentFG)
-                    
-                    if (!is.null(ret[["formula"]])) # eg TRUE for BT
-                    {
-                        parentForm <- pars[name == pname]$formula
-                        ret[, formulaDiff := sapply(formula, getFormulaDiffText, form2 = parentForm)]
-                    }
-                    
-                    return(ret)
-                }, simplify = FALSE), idcol = "parent_group")
-            }
-            
-            setTxtProgressBar(prog, i)
-            
-            return(comps)
-        }), idcol = "parent_name")
-        
-        close(prog)
-    }
-    
-    }
-    
-    if (nrow(compTab) > 0)
-    {
-        compTab[, name := paste0("CMP", .GRP), by = c("parent_name", "parent_group")]
-        compTab[, links := list(list(unique(name))), by = c("TP_name", "group")] # link to other components having this TP
-        compTab[, links := mapply(links, name, FUN = setdiff)] # remove self-links
-        
-        compList <- split(compTab[, -"name"], by = c("parent_name", "parent_group"), keep.by = FALSE)
-        
-        compInfo <- unique(compTab[, c("name", "parent_name", "parent_group")])
-        
-        if (!is.null(TPs))
-        {
-            pars <- parents(TPs)
-            cols <- c("formula", "SMILES", "InChI", "InChIKey", "CID", "neutralMass", "molNeutralized")
-            cols <- intersect(names(pars), cols)
-            cols <- cols[sapply(cols, function(cl) any(!is.na(pars[[cl]])))]
-            targetCols <- paste0("parent_", cols)
-            compInfo[, (targetCols) := pars[match(parent_name, pars$name), cols, with = FALSE]]
-            compInfo[, c("parent_rt", "parent_mz") := gInfoParents[parent_group, c("rts", "mzs")]]
-            setcolorder(compInfo, c("name", "parent_name", "parent_group", "parent_rt", "parent_mz"))
-        }
-        
         compInfo[, size := sapply(compList, nrow)]
-        compInfo[, links := lapply(compList, function(cmp) unique(unlist(cmp$links)))] # overall links
-        setcolorder(compInfo, "name")
+        whNotEmpty <- compInfo[size != 0, which = TRUE]
+        compList <- compList[whNotEmpty]
+        compInfo <- compInfo[whNotEmpty]
         
+        compInfo[, name := paste0("CMP", .I)]
+        setcolorder(compInfo, "name")
         names(compList) <- compInfo$name
-    }
-    else
-    {
-        compInfo <- data.table()
-        compList <- list()
+        
+        compListTab <- rbindlist(compList, idcol = "name", fill = TRUE)
+        compListTab <- mergeTPComponCandidatesTab(compListTab)
+        compListTab[, links := list(list(unique(name))), by = c("candidate_UID", "group")] # link to other components having this TP
+        compListTab[, links := mapply(links, name, FUN = setdiff)] # remove self-links
+        
+        compList <- Map(names(compList), compList, f = function(cmpName, cmpTab)
+        {
+            for (col in c("candidates", "candidatesForm", "candidatesComp"))
+            {
+                if (is.null(cmpTab[[col]]))
+                    next
+                cmpTab[, (col) := Map(group, get(col), f = function(grp, ct)
+                {
+                    ct <- copy(ct)
+                    ct[compListTab[name == cmpName & group == grp], links := i.links, on = c(UID = "candidate_UID")]
+                    return(ct)
+                })]
+            }
+            return(cmpTab)
+        })
+        
+        # compTab[, links := list(list(unique(name))), by = c("TP_name", "group")] # link to other components having this TP
+        # compTab[, links := mapply(links, name, FUN = setdiff)] # remove self-links
+        
+        # UNDONE
+        # compInfo[, links := lapply(compList, function(cmp) unique(unlist(cmp$links)))] # overall links
     }
     
     printf("Linked %d parents with %d TPs.\n", nrow(compInfo),
@@ -596,30 +539,10 @@ setMethod("as.data.table", "componentsTPs", function(x, candidates = FALSE)
     
     ret <- callNextMethod(x)
     
-    ccols <- c("candidates", "candidatesForm", "candidatesComp")
-    ctypes <- setNames(c("suspect", "unknownFormula", "unknownCompound"), ccols)
     if (candidates)
-    {
-        for (col in ccols)
-        {
-            if (is.null(ret[[col]]))
-                next
-            
-            ret[, (col) := Map(name, group, get(col), f = function(cmpName, grp, tab)
-            {
-                tab <- copy(tab)
-                tab[, c("cmpName", "group", "candidate_type") := .(cmpName, grp, ctypes[col])]
-                setnames(tab, "name", "candidate_name", skip_absent = TRUE)
-                setcolorder(tab, "candidate_type")
-                return(tab)
-            })]
-            
-            allc <- rbindlist(ret[[col]], fill = TRUE)
-            ret <- merge(ret, allc, by.x = c("name", "group"), by.y = c("cmpName", "group"), all.x = TRUE, sort = FALSE)
-        }
-    }
+        ret <- mergeTPComponCandidatesTab(ret)
     
-    ret <- removeDTColumnsIfPresent(ret, ccols)
+    ret <- removeDTColumnsIfPresent(ret, c("candidates", "candidatesForm", "candidatesComp"))
     
     return(ret)
 })

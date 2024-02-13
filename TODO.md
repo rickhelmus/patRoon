@@ -109,6 +109,7 @@
     - generateComponentsTPs()
         - new args
         - as.data.table candidates arg
+        - update for TPComponParams
 
 - NEWS
     - specSimParamsMatch --> specSimParams
@@ -162,6 +163,7 @@
     - generateComponentsTPs()
         - new args
         - as.data.table candidates arg
+        - changes due to TPComponParams
 
 
 ## Ext

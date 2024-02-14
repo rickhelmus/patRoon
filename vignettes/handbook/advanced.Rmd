@@ -85,7 +85,7 @@ For IS normalization an internal standard list should be specified with the prop
 patRoonData::ISTDListPos[1:5, ]
 ```
 
-As can be seen from above, labelled isotopes can be specified with square brackets, _e.g._ [2H] for deuterium.
+As can be seen from above, labelled isotopes can be specified with square brackets, _e.g._ [2]H for deuterium.
 
 The next step is to perform the normalization with `normInts()`:
 

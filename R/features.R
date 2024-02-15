@@ -417,106 +417,52 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
 #' @describeIn features Obtain the total ion chromatogram/s (TICs) of the analyses.
 #' @param MSLevel Integer vector with the ms levels (i.e., 1 for MS1 and 2 for MS2) 
 #' to obtain TIC traces.
+#' @author Ricardo Cunha, \email{cunha@@iuta.de}
 #' @aliases getTICs
 #' @export
 setMethod("getTICs", "features", function(obj, retentionRange = NULL, MSLevel = 1)
 {
-    ac <- checkmate::makeAssertCollection()
-    
-    MSLevel <- as.integer(MSLevel)
-    
-    checkmate::assert(checkmate::check_integer(MSLevel, min.len = 1, lower = 1), add = ac)
-    
-    anaInfo <- analysisInfo(obj)
-    
-    checkmate::reportAssertions(ac)
-    
-    filePaths <- getMzMLOrMzXMLAnalysisPath(anaInfo$analysis, anaInfo$path, mustExist = TRUE)
-    
-    res <- lapply(filePaths, function(fpath)
-    {
-        hd <- getHeaders(fpath, retentionRange, MSLevel)
-        data.table("ret" = hd$retentionTime, "MSLevel" = hd$msLevel, "intensity" = hd$totIonCurrent)
-    })
-    
-    names(res) <- anaInfo$analysis
-    res <- rbindlist(res, idcol = "analysis")
-    
-    if (nrow(res) > 0)
-    {
-        group <- anaInfo$group
-        names(group) <- anaInfo$analysis
-        res$group <- group[res$analysis]
-        setcolorder(res, c("analysis", "group"))
-    }
-    
-    return(res)
+    getTICs(analysisInfo(obj), retentionRange, MSLevel)
 })
 
 
 #' @describeIn features Obtain the base peak chromatogram/s (BPCs) of the analyses.
+#' @author Ricardo Cunha, \email{cunha@@iuta.de}
 #' @aliases getBPCs
 #' @export
 setMethod("getBPCs", "features", function(obj, retentionRange = NULL, MSLevel = 1)
 {
-    ac <- checkmate::makeAssertCollection()
-  
-    MSLevel <- as.integer(MSLevel)
-    
-    checkmate::assert(checkmate::check_integer(MSLevel, min.len = 1, lower = 1), add = ac)
-  
-    anaInfo <- analysisInfo(obj)
-  
-    checkmate::reportAssertions(ac)
-    
-    filePaths <- getMzMLOrMzXMLAnalysisPath(anaInfo$analysis, anaInfo$path, mustExist = TRUE)
-    
-    res <- lapply(filePaths, function(fpath)
-    {
-        hd <- getHeaders(fpath, retentionRange, MSLevel)
-        data.table("ret" = hd$retentionTime, "MSLevel" = hd$msLevel, "mz" = hd$basePeakMZ, "intensity" = hd$basePeakIntensity)
-    })
-    
-    names(res) <- anaInfo$analysis
-    res <- rbindlist(res, idcol = "analysis")
-    
-    if (nrow(res) > 0)
-    {
-        group <- anaInfo$group
-        names(group) <- anaInfo$analysis
-        res$group <- group[res$analysis]
-        setcolorder(res, c("analysis", "group"))
-    }
-    
-    return(res)
+    getBPCs(analysisInfo(obj), retentionRange, MSLevel)
 })
 
 
-#' @describeIn features Plots the base peak chromatogram/s (BPCs) of the analyses.
+#' @describeIn features Plots the TICs of the analyses.
 #' @param retMin Plot retention time in minutes (instead of seconds).
 #' @param title Character string used for title of the plot. If \code{NULL} a title will be automatically generated.
 #' @param colourBy Sets the automatic colour selection: "none" for a single 
 #' colour or "analyses"/"rGroups" for a distinct colour per analysis or analysis replicate group.
 #' @param showLegend Plot a legend if TRUE.
 #' @template plot-lim
+#' @author Ricardo Cunha, \email{cunha@@iuta.de}
 #' @aliases plotTICs
 #' @export
 setMethod("plotTICs", "features", function(obj, retentionRange = NULL, MSLevel = 1, retMin = FALSE, title = NULL, 
                                            colourBy = c("none", "analyses", "rGroups"), showLegend = TRUE, xlim = NULL, 
                                            ylim = NULL, ...)
 {
-    doPlotHeaders(obj, what = "tic", retentionRange, MSLevel, retMin, title, colourBy, showLegend, xlim, ylim, ...)
+    plotTICs(analysisInfo(obj), retentionRange, MSLevel, retMin, title, colourBy, showLegend, xlim, ylim, ...)
 })
 
 
-#' @describeIn features Plots the base peak chromatogram/s (BPCs) of the analyses.
+#' @describeIn features Plots the BPCs of the analyses.
+#' @author Ricardo Cunha, \email{cunha@@iuta.de}
 #' @aliases plotBPCs
 #' @export
 setMethod("plotBPCs", "features", function(obj, retentionRange = NULL, MSLevel = 1, retMin = FALSE, title = NULL,
                                            colourBy = c("none", "analyses", "rGroups"), showLegend = TRUE, xlim = NULL, 
                                            ylim = NULL, ...)
 {
-    doPlotHeaders(obj, what = "bpc", retentionRange, MSLevel, retMin, title, colourBy, showLegend, xlim, ylim, ...)
+    plotBPCs(analysisInfo(obj), retentionRange, MSLevel, retMin, title, colourBy, showLegend, xlim, ylim, ...)
 })
 
 

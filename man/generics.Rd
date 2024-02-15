@@ -20,21 +20,21 @@
 \alias{export}
 \alias{featureTable}
 \alias{filter}
+\alias{getBPCs}
 \alias{getFeatures}
 \alias{getMCS}
+\alias{getTICs}
 \alias{groupNames}
+\alias{plotBPCs}
 \alias{plotChord}
 \alias{plotChroms}
-\alias{getTICs}
-\alias{plotTICs}
-\alias{getBPCs}
-\alias{plotBPCs}
 \alias{plotGraph}
 \alias{plotInt}
 \alias{plotScores}
 \alias{plotSilhouettes}
 \alias{plotSpectrum}
 \alias{plotStructure}
+\alias{plotTICs}
 \alias{plotVenn}
 \alias{plotUpSet}
 \alias{predictRespFactors}
@@ -95,23 +95,21 @@ featureTable(obj, ...)
 
 filter(obj, ...)
 
+getBPCs(obj, ...)
+
 getFeatures(obj)
 
 getMCS(obj, ...)
 
+getTICs(obj, ...)
+
 groupNames(obj)
+
+plotBPCs(obj, ...)
 
 plotChord(obj, addSelfLinks = FALSE, addRetMzPlots = TRUE, ...)
 
 plotChroms(obj, ...)
-
-getTICs(obj, ...)
-
-plotTICs(obj, ...)
-
-getBPCs(obj, ...)
-
-plotBPCs(obj, ...)
 
 plotGraph(obj, ...)
 
@@ -124,6 +122,8 @@ plotSilhouettes(obj, kSeq, ...)
 plotSpectrum(obj, ...)
 
 plotStructure(obj, ...)
+
+plotTICs(obj, ...)
 
 plotVenn(obj, ...)
 
@@ -302,6 +302,12 @@ please refer to the linked method documentation for each generic.
     \item Methods are defined for: \code{\link[=filter,components-method]{components}}; \code{\link[=filter,componentsSet-method]{componentsSet}}; \code{\link[=filter,componentsTPs-method]{componentsTPs}}; \code{\link[=filter,compounds-method]{compounds}}; \code{\link[=filter,compoundsSet-method]{compoundsSet}}; \code{\link[=filter,featureAnnotations-method]{featureAnnotations}}; \code{\link[=filter,featureGroups-method]{featureGroups}}; \code{\link[=filter,featureGroupsScreening-method]{featureGroupsScreening}}; \code{\link[=filter,featureGroupsScreeningSet-method]{featureGroupsScreeningSet}}; \code{\link[=filter,featureGroupsSet-method]{featureGroupsSet}}; \code{\link[=filter,features-method]{features}}; \code{\link[=filter,featuresSet-method]{featuresSet}}; \code{\link[=filter,formulasSet-method]{formulasSet}}; \code{\link[=filter,MSLibrary-method]{MSLibrary}}; \code{\link[=filter,MSPeakLists-method]{MSPeakLists}}; \code{\link[=filter,MSPeakListsSet-method]{MSPeakListsSet}}; \code{\link[=filter,transformationProducts-method]{transformationProducts}}; \code{\link[=filter,transformationProductsStructure-method]{transformationProductsStructure}}.
 }
 
+\code{getBPCs} gets base peak chromatogram(s).
+
+\itemize{
+    \item Methods are defined for: \code{\link[=getBPCs,featureGroups-method]{featureGroups}}; \code{\link[=getBPCs,features-method]{features}}.
+}
+
 \code{getFeatures} returns the object's \code{\link{features}} object.
 
 \itemize{
@@ -314,10 +320,22 @@ please refer to the linked method documentation for each generic.
     \item Methods are defined for: \code{\link[=getMCS,compounds-method]{compounds}}; \code{\link[=getMCS,compoundsCluster-method]{compoundsCluster}}.
 }
 
+\code{getTICs} gets total ion chromatogram(s).
+
+\itemize{
+    \item Methods are defined for: \code{\link[=getTICs,featureGroups-method]{featureGroups}}; \code{\link[=getTICs,features-method]{features}}.
+}
+
 \code{groupNames} returns a \code{character} vector with the names of the feature groups for which data is present in this object.
 
 \itemize{
     \item Methods are defined for: \code{\link[=groupNames,components-method]{components}}; \code{\link[=groupNames,compoundsCluster-method]{compoundsCluster}}; \code{\link[=groupNames,featureAnnotations-method]{featureAnnotations}}; \code{\link[=groupNames,featureGroups-method]{featureGroups}}; \code{\link[=groupNames,MSPeakLists-method]{MSPeakLists}}.
+}
+
+\code{plotBPCs} plots base peak chromatogram(s).
+
+\itemize{
+    \item Methods are defined for: \code{\link[=plotBPCs,featureGroups-method]{featureGroups}}; \code{\link[=plotBPCs,features-method]{features}}.
 }
 
 \code{plotChord} plots a Chord diagram to assess overlapping data.
@@ -330,30 +348,6 @@ please refer to the linked method documentation for each generic.
 
 \itemize{
     \item Methods are defined for: \code{\link[=plotChroms,components-method]{components}}; \code{\link[=plotChroms,featureGroups-method]{featureGroups}}.
-}
-
-\code{getTICs} gets total ion chromatogram(s).
-
-\itemize{
-    \item Methods are defined for: \code{\link[=getTICs,featureGroups-method]{featureGroups}}; \code{\link[=getTICs,features-method]{features}}.
-}
-
-\code{plotTICs} plots total ion chromatogram(s).
-
-\itemize{
-    \item Methods are defined for: \code{\link[=plotTICs,featureGroups-method]{featureGroups}}; \code{\link[=plotTICs,features-method]{features}}.
-}
-
-\code{getBPCs} gets base peak chromatogram(s).
-
-\itemize{
-    \item Methods are defined for: \code{\link[=getBPCs,featureGroups-method]{featureGroups}}; \code{\link[=getBPCs,features-method]{features}}.
-}
-
-\code{plotBPCs} plots base peak chromatogram(s).
-
-\itemize{
-    \item Methods are defined for: \code{\link[=plotBPCs,featureGroups-method]{featureGroups}}; \code{\link[=plotBPCs,features-method]{features}}.
 }
 
 \code{plotGraph} Plots an interactive network graph.
@@ -390,6 +384,12 @@ please refer to the linked method documentation for each generic.
 
 \itemize{
     \item Methods are defined for: \code{\link[=plotStructure,compounds-method]{compounds}}; \code{\link[=plotStructure,compoundsCluster-method]{compoundsCluster}}.
+}
+
+\code{plotTICs} plots total ion chromatogram(s).
+
+\itemize{
+    \item Methods are defined for: \code{\link[=plotTICs,featureGroups-method]{featureGroups}}; \code{\link[=plotTICs,features-method]{features}}.
 }
 
 \code{plotVenn} plots a Venn diagram to assess unique and overlapping data.

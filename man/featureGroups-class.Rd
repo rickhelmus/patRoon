@@ -2,8 +2,8 @@
 % Please edit documentation in R/generics.R, R/feature_groups.R,
 %   R/feature_groups-set.R, R/feature_groups-bruker.R,
 %   R/feature_groups-envimass.R, R/feature_groups-kpic2.R,
-%   R/feature_groups-openms.R, R/feature_groups-sirius.R,
-%   R/feature_groups-xcms.R, R/feature_groups-xcms3.R
+%   R/feature_groups-openms.R, R/feature_groups-plot.R,
+%   R/feature_groups-sirius.R, R/feature_groups-xcms.R, R/feature_groups-xcms3.R
 \docType{class}
 \name{groupTable}
 \alias{groupTable}
@@ -55,12 +55,8 @@
 \alias{normInts,featureGroups-method}
 \alias{getTICs,featureGroups-method}
 \alias{getTICs}
-\alias{plotTICs,featureGroups-method}
-\alias{plotTICs}
 \alias{getBPCs,featureGroups-method}
 \alias{getBPCs}
-\alias{plotBPCs,featureGroups-method}
-\alias{plotBPCs}
 \alias{featureGroupsSet-class}
 \alias{featureGroupsSet}
 \alias{sets,featureGroupsSet-method}
@@ -88,6 +84,10 @@
 \alias{delete,featureGroupsKPIC2-method}
 \alias{featureGroupsOpenMS-class}
 \alias{featureGroupsOpenMS}
+\alias{plotTICs,featureGroups-method}
+\alias{plotTICs}
+\alias{plotBPCs,featureGroups-method}
+\alias{plotBPCs}
 \alias{featureGroupsSIRIUS-class}
 \alias{featureGroupsSIRIUS}
 \alias{featureGroupsXCMS-class}
@@ -229,37 +229,9 @@ normInts(
   ...
 )
 
-\S4method{getTICs}{featureGroups}(obj, i = NULL, retentionRange = NULL, msLevels = c(1, 2))
+\S4method{getTICs}{featureGroups}(obj, retentionRange = NULL, MSLevel = c(1, 2))
 
-\S4method{plotTICs}{featureGroups}(
-  obj,
-  i = NULL,
-  retentionRange = NULL,
-  msLevels = 1,
-  retMin = FALSE,
-  title = NULL,
-  colourBy = c("none", "analyses", "replicates"),
-  showLegend = TRUE,
-  xlim = NULL,
-  ylim = NULL,
-  ...
-)
-
-\S4method{getBPCs}{featureGroups}(obj, i = NULL, retentionRange = NULL, msLevels = c(1, 2))
-
-\S4method{plotBPCs}{featureGroups}(
-  obj,
-  i = NULL,
-  retentionRange = NULL,
-  msLevels = 1,
-  retMin = FALSE,
-  title = NULL,
-  colourBy = c("none", "analyses", "replicates"),
-  showLegend = TRUE,
-  xlim = NULL,
-  ylim = NULL,
-  ...
-)
+\S4method{getBPCs}{featureGroups}(obj, retentionRange = NULL, MSLevel = c(1, 2))
 
 \S4method{sets}{featureGroupsSet}(obj)
 
@@ -300,6 +272,32 @@ normInts(
 \S4method{unset}{featureGroupsSet}(obj, set)
 
 \S4method{delete}{featureGroupsKPIC2}(obj, ...)
+
+\S4method{plotTICs}{featureGroups}(
+  obj,
+  retentionRange = NULL,
+  MSLevel = 1,
+  retMin = FALSE,
+  title = NULL,
+  colourBy = c("none", "analyses", "rGroups"),
+  showLegend = TRUE,
+  xlim = NULL,
+  ylim = NULL,
+  ...
+)
+
+\S4method{plotBPCs}{featureGroups}(
+  obj,
+  retentionRange = NULL,
+  MSLevel = 1,
+  retMin = FALSE,
+  title = NULL,
+  colourBy = c("none", "analyses", "rGroups"),
+  showLegend = TRUE,
+  xlim = NULL,
+  ylim = NULL,
+  ...
+)
 
 \S4method{delete}{featureGroupsXCMS}(obj, ...)
 
@@ -458,20 +456,8 @@ Hence, in such case setting \code{chargeMismatch="adduct"} is more appropriate.}
 Should be a numeric vector with length of two containing the min/max values. 
 Set to NULL to ignore.}
 
-\item{msLevels}{Integer vector with the ms levels (i.e., 1 for MS1 and 2 for MS2) 
+\item{MSLevel}{Integer vector with the ms levels (i.e., 1 for MS1 and 2 for MS2) 
 to obtain TIC traces.}
-
-\item{retMin}{Plot retention time in minutes (instead of seconds).}
-
-\item{title}{Character string used for title of the plot. If \code{NULL} a title will be automatically generated.}
-
-\item{colourBy}{Sets the automatic colour selection: "none" for a single 
-colour or "analyses"/"replicates" for a distinct colour per replicate/analysis.}
-
-\item{showLegend}{Plot a legend if TRUE.}
-
-\item{xlim, ylim}{Sets the plot size limits used by
-\code{\link[graphics]{plot}}. Set to \code{NULL} for automatic plot sizing.}
 
 \item{set}{\setsWF The name of the set.}
 
@@ -482,6 +468,18 @@ colour or "analyses"/"replicates" for a distinct colour per replicate/analysis.}
 
   For \code{overlap} and \code{unique}: If \code{TRUE} then the \code{which} argument changes its meaning and is used
   to specify the names of the sets to be compared.}
+
+\item{retMin}{Plot retention time in minutes (instead of seconds).}
+
+\item{title}{Character string used for title of the plot. If \code{NULL} a title will be automatically generated.}
+
+\item{colourBy}{Sets the automatic colour selection: "none" for a single 
+colour or "analyses"/"rGroups" for a distinct colour per analysis or analysis replicate group.}
+
+\item{showLegend}{Plot a legend if TRUE.}
+
+\item{xlim, ylim}{Sets the plot size limits used by
+\code{\link[graphics]{plot}}. Set to \code{NULL} for automatic plot sizing.}
 }
 \value{
 \code{delete} returns the object for which the specified data was removed.
@@ -599,13 +597,13 @@ be used to manually correct adduct assignments afterwards if necessary.
 \item \code{normInts(featureGroups)}: Provides various methods to normalizes feature intensities for each sample analysis or of
 all features within a feature group. See the \verb{Feature intensity normalization} section below.
 
-\item \code{getTICs(featureGroups)}: Obtain the total ion chromatogram/s (TICs) of the analyses (`i`).
-
-\item \code{plotTICs(featureGroups)}: Plots the total ion chromatogram/s (TICs) of the analyses (`i`).
+\item \code{getTICs(featureGroups)}: Obtain the total ion chromatogram/s (TICs) of the analyses.
 
 \item \code{getBPCs(featureGroups)}: Obtain the base peak chromatogram/s (BPCs) of the analyses.
 
-\item \code{plotBPCs(featureGroups)}: Plots the base peak chromatogram/s (BPCs) of the analyses (`i`).
+\item \code{plotTICs(featureGroups)}: Plots the total ion chromatogram/s (TICs) of the analyses.
+
+\item \code{plotBPCs(featureGroups)}: Plots the base peak chromatogram/s (BPCs) of the analyses.
 
 }}
 \section{Slots}{
@@ -757,4 +755,7 @@ by \code{adducts<-} and \code{selectIons} when these methods perform a re-groupi
 \seealso{
 \code{\link{groupFeatures}} for generating feature groups, \link{feature-filtering} and
   \link{feature-plotting} for more advanced \code{featureGroups} methods.
+}
+\author{
+Ricardo Cunha, \email{cunha@iuta.de}
 }

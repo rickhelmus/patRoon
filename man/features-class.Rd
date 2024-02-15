@@ -95,18 +95,17 @@
 
 \S4method{calculatePeakQualities}{features}(obj, weights, flatnessFactor, parallel = TRUE)
 
-\S4method{getTICs}{features}(obj, i = NULL, retentionRange = NULL, msLevels = 1)
+\S4method{getTICs}{features}(obj, retentionRange = NULL, MSLevel = 1)
 
-\S4method{getBPCs}{features}(obj, i = NULL, retentionRange = NULL, msLevels = 1)
+\S4method{getBPCs}{features}(obj, retentionRange = NULL, MSLevel = 1)
 
 \S4method{plotTICs}{features}(
   obj,
-  i = NULL,
   retentionRange = NULL,
-  msLevels = 1,
+  MSLevel = 1,
   retMin = FALSE,
   title = NULL,
-  colourBy = c("none", "analyses", "replicates"),
+  colourBy = c("none", "analyses", "rGroups"),
   showLegend = TRUE,
   xlim = NULL,
   ylim = NULL,
@@ -115,12 +114,11 @@
 
 \S4method{plotBPCs}{features}(
   obj,
-  i = NULL,
   retentionRange = NULL,
-  msLevels = 1,
+  MSLevel = 1,
   retMin = FALSE,
   title = NULL,
-  colourBy = c("none", "analyses", "replicates"),
+  colourBy = c("none", "analyses", "rGroups"),
   showLegend = TRUE,
   xlim = NULL,
   ylim = NULL,
@@ -190,7 +188,7 @@ Example: \code{weights=c(ApexBoundaryRatioScore=0.5, GaussianSimilarityScore=2)}
 \item{parallel}{If set to \code{TRUE} then code is executed in parallel through the \CRANpkg{futures} package. Please
 see the parallelization section in the handbook for more details.}
 
-\item{msLevels}{Integer vector with the ms levels (i.e., 1 for MS1 and 2 for MS2) 
+\item{MSLevel}{Integer vector with the ms levels (i.e., 1 for MS1 and 2 for MS2) 
 to obtain TIC traces.}
 
 \item{retMin}{Plot retention time in minutes (instead of seconds).}
@@ -198,7 +196,7 @@ to obtain TIC traces.}
 \item{title}{Character string used for title of the plot. If \code{NULL} a title will be automatically generated.}
 
 \item{colourBy}{Sets the automatic colour selection: "none" for a single 
-colour or "analyses"/"replicates" for a distinct colour per replicate/analysis.}
+colour or "analyses"/"rGroups" for a distinct colour per analysis or analysis replicate group.}
 
 \item{showLegend}{Plot a legend if TRUE.}
 
@@ -278,9 +276,9 @@ score values.
 
 \item \code{getBPCs(features)}: Obtain the base peak chromatogram/s (BPCs) of the analyses.
 
-\item \code{plotTICs(features)}: Plots the base peak chromatogram/s (BPCs) of the analyses.
+\item \code{plotTICs(features)}: Plots the TICs of the analyses.
 
-\item \code{plotBPCs(features)}: Plots the base peak chromatogram/s (BPCs) of the analyses.
+\item \code{plotBPCs(features)}: Plots the BPCs of the analyses.
 
 }}
 \section{Slots}{
@@ -320,4 +318,7 @@ For \code{calculatePeakQualities}: sometimes \pkg{MetaClean} may return \code{NA
 }
 \seealso{
 \code{\link{findFeatures}}
+}
+\author{
+Ricardo Cunha, \email{cunha@iuta.de}
 }

@@ -865,6 +865,7 @@ setMethod("plotGraph", "featureGroupsSet", function(obj, onlyPresent = TRUE, set
 #' colour or "analyses"/"rGroups" for a distinct colour per analysis or analysis replicate group.
 #' @param showLegend Plot a legend if TRUE.
 #' @template plot-lim
+#' @author Ricardo Cunha, \email{cunha@@iuta.de}
 #' @aliases plotTICs
 #' @export
 setMethod("plotTICs", "featureGroups", function(obj, retentionRange = NULL, MSLevel = 1, retMin = FALSE, title = NULL,
@@ -875,6 +876,7 @@ setMethod("plotTICs", "featureGroups", function(obj, retentionRange = NULL, MSLe
 })
 
 #' @describeIn featureGroups Plots the base peak chromatogram/s (BPCs) of the analyses.
+#' @author Ricardo Cunha, \email{cunha@@iuta.de}
 #' @aliases plotBPCs
 #' @export
 setMethod("plotBPCs", "featureGroups", function(obj, retentionRange = NULL, MSLevel = 1, retMin = FALSE, title = NULL,

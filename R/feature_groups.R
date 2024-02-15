@@ -1357,19 +1357,21 @@ setMethod("calculateTox", "featureGroups", function(fGroups, featureAnn)
 #' @param retentionRange Range of retention time (in seconds) to collect TIC traces.
 #' Should be a numeric vector with length of two containing the min/max values. 
 #' Set to NULL to ignore.
+#' @author Ricardo Cunha, \email{cunha@@iuta.de}
 #' @aliases getTICs
 #' @export
 setMethod("getTICs", "featureGroups", function(obj, retentionRange = NULL, MSLevel = c(1, 2))
 {
-  getTICs(obj@features, retentionRange, MSLevel)
+    getTICs(obj@features, retentionRange, MSLevel)
 })
 
 #' @describeIn featureGroups Obtain the base peak chromatogram/s (BPCs) of the analyses.
+#' @author Ricardo Cunha, \email{cunha@@iuta.de}
 #' @aliases getBPCs
 #' @export
 setMethod("getBPCs", "featureGroups", function(obj, retentionRange = NULL, MSLevel = c(1, 2))
 {
-  getBPCs(obj@features, retentionRange, MSLevel)
+    getBPCs(obj@features, retentionRange, MSLevel)
 })
 
 #' Grouping of features

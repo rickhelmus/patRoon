@@ -572,12 +572,10 @@ doPlotHeaders <- function(obj, what = "tic", retentionRange, MSLevel, retMin = F
         return(invisible(NULL))
     }
     
-    anaInfo <- analysisInfo(obj)
-    
-    anaInfo <- anaInfo[anaInfo$analysis %chin% unique(data$analysis), ]
-    anas <- anaInfo$analysis
+    obj <- obj[obj$analysis %chin% unique(data$analysis), ]
+    anas <- obj$analysis
     anaCount <- length(anas)
-    replicates <- unique(anaInfo$group)
+    replicates <- unique(obj$group)
     
     if (colourBy == "rGroups")
     {
@@ -644,7 +642,7 @@ doPlotHeaders <- function(obj, what = "tic", retentionRange, MSLevel, retMin = F
             next
         
         if (colourBy == "rGroups")
-            colInd <- anaInfo$group[match(ana, anaInfo$analysis)]
+            colInd <- obj$group[match(ana, obj$analysis)]
         else if (colourBy == "analyses")
             colInd <- ana
         else

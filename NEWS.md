@@ -3,7 +3,7 @@
 * Fixed: `as.data.table()` method for `featureGroups`: `normConcToTox` argument was ignored (not for `featureGroupsScreening`)
 * Various reporting fixes for screening results from suspect lists without formula/SMILES data.
 * `generateAnalysisInfo()`: try to equalize the output and input directory order
-
+* Added get and plot methods for total ion chromatograms (TICs) and base peak chromatograms (BPCs) for the analysisInfo `data.frame`, `features` and `featureGroups` class as: `getTICs()`, `getBPCs()`, `plotTICs()` and `plotBPCs()`.
 
 # patRoon 2.3.1
 

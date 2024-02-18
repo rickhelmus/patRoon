@@ -45,6 +45,7 @@
     - update patRoonInst for new deps?
     - candidate type names OK?
     - further limit candidate columns? Can get quite excessive
+    - add new algos to generateTPs()
 
 - tests
     - IDL filter

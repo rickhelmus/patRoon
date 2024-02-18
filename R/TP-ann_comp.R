@@ -80,9 +80,8 @@ getTPsCompounds <- function(annTable, parName, parFormula, parSMILES, parLogP, e
 
 #' @export
 generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, extraOptsFMCSR = NULL, skipInvalid = TRUE,
-                               prefCalcChemProps = TRUE, neutralChemProps = FALSE, neutralizeTPs = TRUE,
-                               calcLogP = "rcdk", calcSims = FALSE, fpType = "extended", fpSimMethod = "tanimoto",
-                               parallel = TRUE)
+                               prefCalcChemProps = TRUE, neutralChemProps = FALSE, calcLogP = "rcdk", calcSims = FALSE,
+                               fpType = "extended", fpSimMethod = "tanimoto", parallel = TRUE)
 {
     # UNDONE: support >1 generations? Probably not really worthwhile...
     
@@ -99,8 +98,8 @@ generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, extraOptsFMCSR
         assertSuspectList(parents, needsAdduct = FALSE, skipInvalid = TRUE, add = ac)
     checkmate::assertClass(compounds, "compounds", add = ac)
     checkmate::assertClass(TPsRef, "transformationProductsStructure", null.ok = TRUE, add = ac)
-    aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + neutralChemProps + neutralizeTPs + calcSims +
-               parallel, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + neutralChemProps + calcSims + parallel,
+           fixed = list(add = ac))
     assertXLogPMethod(calcLogP, add = ac)
     aapply(checkmate::assertString, . ~ fpType + fpSimMethod, min.chars = 1, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
@@ -137,7 +136,7 @@ generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, extraOptsFMCSR
         names(parsSplit) <- parents$name
         
         baseHash <- makeHash(compounds, TPsRef, extraOptsFMCSR, skipInvalid, prefCalcChemProps, neutralChemProps,
-                             neutralizeTPs, calcLogP, calcSims, fpType, fpSimMethod)
+                             calcLogP, calcSims, fpType, fpSimMethod)
         setHash <- makeHash(parents, baseHash)
         cachedSet <- loadCacheSet("TPsAnnComp", setHash, cacheDB)
         hashes <- sapply(parsSplit, function(par) makeHash(baseHash, par[, c("name", "SMILES", "formula")],

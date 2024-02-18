@@ -159,6 +159,7 @@ Collate:
     'TP.R'
     'TP-structure.R'
     'TP-CTS.R'
+    'TP-ann_comp.R'
     'TP-biotransformer.R'
     'TP-formula.R'
     'TP-library.R'

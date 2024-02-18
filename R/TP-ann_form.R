@@ -9,8 +9,7 @@ setMethod("initialize", "transformationProductsAnnForm",
           function(.Object, ...) callNextMethod(.Object, algorithm = "ann_form", ...))
 
 # NOTE: this function is called by a withProg() block, so handles progression updates
-# UNDONE: does parallel make sense here?
-getTPsFormulas <- function(annTable, parName, parFormula, parallel)
+getTPsFormulas <- function(annTable, parName, parFormula)
 {
     tab <- copy(annTable)
     setnames(tab, "neutral_formula", "formula")
@@ -38,8 +37,8 @@ getTPsFormulas <- function(annTable, parName, parFormula, parallel)
     
     tab[, TP_score := NAToZero(fitFormula) + NAToZero(annSim)]
     
-    tab <- subsetDTColumnsIfPresent(tab, c("group", "ID", "parent_ID", "chem_ID", "generation", "formula", "annSim",
-                                           "fitFormula", "TP_score"))
+    tab <- subsetDTColumnsIfPresent(tab, c("group", "name", "ID", "parent_ID", "chem_ID", "generation", "formula",
+                                           "annSim", "fitFormula", "TP_score"))
     
     doProgress()
     
@@ -100,12 +99,12 @@ generateTPsAnnForm <- function(parents, formulas, skipInvalid = TRUE, prefCalcCh
         newResults <- list()
         if (length(parsTBD) > 0)
         {
-            newResults <- withProg(length(parsTBD), FALSE, sapply(parsSplit[parsTBD], function(par)
+            newResults <- doApply("sapply", parallel, parsSplit[parsTBD], function(par)
             {
-                nr <- getTPsFormulas(annTable, par$name, par$formula, parallel)
+                nr <- getTPsFormulas(annTable, par$name, par$formula)
                 saveCacheData("TPsAnnForm", nr, hashes[[par$name]], cacheDB)
                 return(nr)
-            }, simplify = FALSE))
+            }, simplify = FALSE)
             newResults <- pruneList(newResults, checkZeroRows = TRUE)
         }
         

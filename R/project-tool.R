@@ -1502,7 +1502,7 @@ newProject <- function(destPath = NULL)
 
                 if (length(files) > 0)
                 {
-                    dt <- data.table(exclude= FALSE, path = dirname(files), analysis = simplifyAnalysisNames(files),
+                    dt <- data.table(exclude = FALSE, path = dirname(files), analysis = simplifyAnalysisNames(files),
                                      group = "", blank = "", conc = NA_real_, norm_conc = NA_real_)
 
                     msExts <- MSFileExtensions()

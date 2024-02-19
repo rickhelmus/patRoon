@@ -36,3 +36,5 @@ vignettes/*.pdf
 inst/doc
 src/patRoon.dll
 src/patRoon.so
+.vscode/settings.json
+.gitignore

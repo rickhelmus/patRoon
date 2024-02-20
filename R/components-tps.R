@@ -5,20 +5,6 @@
 #' @include feature_groups-screening-set.R
 NULL
 
-#' @export
-getDefTPComponParams <- function(...)
-{
-    def <- list(
-        ignoreParents = FALSE,
-        minRTDiff = 20,
-        calcLogP = "rcdk",
-        fpType = "extended",
-        fpSimMethod = "tanimoto"
-    )
-    
-    return(modifyList(def, list(...)))
-}
-
 genTPSpecSimilarities <- function(obj, groupName1, groupName2, specSimParams, ...)
 {
     # NOTE: groupName2 may have duplicate group names, which will be removed by intersect below. We don't need to repeat
@@ -186,25 +172,25 @@ mergeTPComponCandidatesTab <- function(compTab)
     return(compTab)
 }
 
-doGenComponentsTPs <- function(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, compounds, TPComponParams,
+doGenComponentsTPs <- function(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, compounds, ignoreParents, minRTDiff,
                                specSimParams, parallel)
 {
     if (length(fGroups) == 0 || (!is.null(TPs) && length(TPs) == 0))
         return(componentsTPs(componentInfo = data.table(), components = list(), fromTPs = !is.null(TPs)))
 
     fromTPs <- !is.null(TPs)
-    hash <- makeHash(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, compounds, TPComponParams, specSimParams)
+    hash <- makeHash(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, compounds, ignoreParents, minRTDiff, specSimParams)
     cd <- loadCacheData("componentsTPs", hash)
     if (!is.null(cd))
         return(cd)
     
-    if (TPComponParams$ignoreParents)
+    if (ignoreParents)
         fGroupsTPs <- delete(fGroupsTPs, j = names(fGroups))
     
     if (length(fGroupsTPs) == 0)
     {
         msg <- "fGroupsTPs is doesn't contain any feature groups"
-        if (TPComponParams$ignoreParents)
+        if (ignoreParents)
             msg <- paste(msg, "or doesn't contain any unique feature groups")
         warning(msg, call. = FALSE)
         
@@ -228,8 +214,8 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, 
         cmp[, retDiff := ret - gInfoParents[parentFG, "rts"]]
         cmp[, mzDiff := mz - gInfoParents[parentFG, "mzs"]]
         
-        cmp[, retDir := fcase((retDiff + TPComponParams$minRTDiff) < 0, -1,
-                             (retDiff - TPComponParams$minRTDiff) > 0, 1,
+        cmp[, retDir := fcase((retDiff + minRTDiff) < 0, -1,
+                             (retDiff - minRTDiff) > 0, 1,
                              default = 0)]
         
         if (!is.null(MSPeakLists))
@@ -363,6 +349,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, 
         }
     }
     
+    # UNDONE: update counting for candidates
     printf("Linked %d parents with %d TPs.\n", nrow(compInfo),
            if (length(compList) > 0) sum(sapply(compList, nrow)) else 0)
     
@@ -694,14 +681,15 @@ setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked = TRUE, width =
 #' @export
 setMethod("generateComponentsTPs", "featureGroups", function(fGroups, fGroupsTPs = fGroups, TPs = NULL,
                                                              MSPeakLists = NULL, formulas = NULL, compounds = NULL,
-                                                             TPComponParams = getDefTPComponParams(),
+                                                             ignoreParents = FALSE, minRTDiff = 20,
                                                              specSimParams = getDefSpecSimParams(), parallel = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertClass, . ~ fGroupsTPs + TPs + MSPeakLists + formulas + compounds,
            c("featureGroups", "transformationProducts", "MSPeakLists", "formulas", "compounds"),
            null.ok = c(FALSE, TRUE, TRUE, TRUE, TRUE), fixed = list(add = ac))
-    assertTPComponParams(TPComponParams, add = ac)
+    checkmate::assertFlag(ignoreParents, add = add)
+    checkmate::assertNumber(minRTDiff, lower = 0, finite = TRUE, add = add)
     assertSpecSimParams(specSimParams, add = ac)
     checkmate::assertFlag(parallel, add = ac)
     checkmate::reportAssertions(ac)
@@ -710,22 +698,23 @@ setMethod("generateComponentsTPs", "featureGroups", function(fGroups, fGroupsTPs
         (!inherits(fGroups, "featureGroupsScreening") || !inherits(fGroupsTPs, "featureGroupsScreening")))
         stop("Input feature groups need to be screened for parents/TPs!")
 
-    return(doGenComponentsTPs(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, compounds, TPComponParams, specSimParams,
-                              parallel))
+    return(doGenComponentsTPs(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, compounds, ignoreParents, minRTDiff,
+                              specSimParams, parallel))
 })
 
 #' @rdname generateComponentsTPs
 #' @export
 setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroupsTPs = fGroups, TPs = NULL,
                                                                 MSPeakLists = NULL, formulas = NULL, compounds = NULL,
-                                                                TPComponParams = getDefTPComponParams(),
+                                                                ignoreParents = FALSE, minRTDiff = 20,
                                                                 specSimParams = getDefSpecSimParams(), parallel = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertClass, . ~ fGroupsTPs + TPs + MSPeakLists + formulas + compounds,
            c("featureGroupsSet", "transformationProducts", "MSPeakListsSet", "formulasSet", "compoundsSet"),
            null.ok = c(FALSE, TRUE, TRUE, TRUE, TRUE), fixed = list(add = ac))
-    assertTPComponParams(TPComponParams, add = ac)
+    checkmate::assertFlag(ignoreParents, add = add)
+    checkmate::assertNumber(minRTDiff, lower = 0, finite = TRUE, add = add)
     assertSpecSimParams(specSimParams, add = ac)
     checkmate::assertFlag(parallel, add = ac)
     checkmate::reportAssertions(ac)
@@ -734,7 +723,7 @@ setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroups
         (!inherits(fGroups, "featureGroupsScreeningSet") || !inherits(fGroupsTPs, "featureGroupsScreeningSet")))
         stop("Input feature groups need to be screened for parents/TPs!")
     
-    ret <- doGenComponentsTPs(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, compounds, TPComponParams,
+    ret <- doGenComponentsTPs(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, compounds, ignoreParents, minRTDiff,
                               specSimParams, parallel)
     
     # UNDONE: more efficient method to get set specific fGroups?

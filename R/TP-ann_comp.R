@@ -29,7 +29,6 @@ getTPsCompounds <- function(annTable, parName, parFormula, parSMILES, parLogP, e
                               default = 0)] # NOTE: default should also handle NAs
     }
     
-    tab[, formulaDiff := sapply(formula, getFormulaDiffText, form2 = parFormula)]
     tab[, fitFormula := sapply(formula, calcFormulaFit, parFormula)]
     
     if (!is.null(parSMILES) && !is.null(tab[["SMILES"]]))
@@ -48,19 +47,6 @@ getTPsCompounds <- function(annTable, parName, parFormula, parSMILES, parLogP, e
             }, prog = FALSE))]
         }
     }
-    
-    # UNDONE: don't do here? Maybe just in components and for all TPs types    
-    # if (!is.null(parentAnn) && nrow(parentAnn) == 1)
-    # {
-    #     tab[, c("fragMatches", "NLMatches") := {
-    #         fi <- fragInfo[[1]]
-    #         if (nrow(fi) > 0)
-    #             list(sum(fi$ion_formula %chin% parentAnn$fragInfo[[1]]$ion_formula),
-    #                  sum(fi$neutral_loss %chin% parentAnn$fragInfo[[1]]$neutral_loss))
-    #         else
-    #             list(NA_integer_, NA_integer_)
-    #     }, by = seq_len(nrow(tab))]
-    # }
     
     # UNDONE: also do TP score w/out suspSim (ie when TPs=NULL)?
     if (!is.null(tab[["fitCompound"]]) && !is.null(tab[["suspSim"]]))

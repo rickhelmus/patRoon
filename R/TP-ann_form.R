@@ -19,22 +19,7 @@ getTPsFormulas <- function(annTable, parName, parFormula)
     # UNDONE: apply thresholds
     # UNDONE: unset annotation objects?
     
-    tab[, formulaDiff := sapply(formula, getFormulaDiffText, form2 = parFormula)]
     tab[, fitFormula := sapply(formula, calcFormulaFit, parFormula)]
-
-    # UNDONE: don't do here? Maybe just in components and for all TPs types    
-    # if (!is.null(parentAnn) && nrow(parentAnn) == 1)
-    # {
-    #     tab[, c("fragMatches", "NLMatches") := {
-    #         fi <- fragInfo[[1]]
-    #         if (nrow(fi) > 0)
-    #             list(sum(fi$ion_formula %chin% parentAnn$fragInfo[[1]]$ion_formula),
-    #                  sum(fi$neutral_loss %chin% parentAnn$fragInfo[[1]]$neutral_loss))
-    #         else
-    #             list(NA_integer_, NA_integer_)
-    #     }, by = seq_len(nrow(tab))]
-    # }
-    
     tab[, TP_score := NAToZero(fitFormula) + NAToZero(annSim)]
     
     tab <- subsetDTColumnsIfPresent(tab, c("group", "name", "ID", "parent_ID", "chem_ID", "generation", "formula",

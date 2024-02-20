@@ -109,91 +109,61 @@ genTPAnnSimilarities <- function(parentFG, TPFGs, MSPeakLists, formulas, compoun
                 neutralLossMatches = NLMatches))
 }
 
-getTPComponCandidatesScr <- function(prods, parentInfo)
+getTPComponCandidatesScr <- function(prods, TPGroups, MSPeakLists, formulas, compounds, parFG, parFormula, parIK)
 {
+    if (nrow(prods) == 0)
+        return(NULL)
+    
     # limit columns a bit to not bloat components too much
     # UNDONE: column selection OK?
     tab <- copy(prods)
-    tab <- subsetDTColumnsIfPresent(tab, c("name", "SMILES", "InChI", "InChIKey", "formula",
-                                               "molNeutralized", "CID", "mass", "retDir", "trans_add",
-                                               "trans_sub", "deltaMZ", "similarity", "mergedBy", "coverage"))
+    tab <- subsetDTColumnsIfPresent(tab, c("name", "compoundName", "SMILES", "InChI", "InChIKey", "formula",
+                                           "molNeutralized", "CID", "mass", "retDir", "trans_add",
+                                           "trans_sub", "deltaMZ", "similarity", "fitFormula", "fitCompound", "suspSim",
+                                            "suspSimSMILES", "TP_score", "mergedBy", "coverage"))
     tab <- unique(tab, by = "name") # omit duplicates from different routes
-    setnames(tab, "retDir", "TP_retDir")
-    if (!is.null(tab[["formula"]]) && !is.null(parentInfo$formula))
-        tab[, formulaDiff := sapply(formula, getFormulaDiffText, form2 = parentInfo$formula)]
-    tab[, UID := name]
-    tab[, type := "suspect"]
-    setcolorder(tab, "type")
-    
-    return(tab)
-}
+    setnames(tab, "retDir", "TP_retDir", skip_absent = TRUE)
+    if (!is.null(tab[["formula"]]) && !is.null(parFormula))
+        tab[, formulaDiff := sapply(formula, getFormulaDiffText, form2 = parFormula)]
 
-getTPComponCandidatesUnkAnn <- function(annTable, annXLogPs, parentFGroup, parentInfo, parentAnn, extraOptsFMCSR,
-                                        suspTPsSMILES, fpType, fpSimMethod, parallel)
-{
-    retDirs <- if (!is.null(parentInfo$XLogP) && !is.null(annXLogPs))
+    getAnnPL <- function(featAnn, grp, UID, ...)
     {
-        retDirs <- fcase(annLogPs < parentInfo$XLogP, -1,
-                         annLogPs > parentInfo$XLogP, 1,
-                         default = 0) # NOTE: default should also handle NAs
-        names(retDirs) <- names(annXLogPs)
+        if (is.null(UID) || is.null(featAnn) || is.null(MSPeakLists) || !grp %chin% groupNames(featAnn))
+            return(NULL)
+        wh <- which(UID == featAnn[[grp]]$UID)
+        if (length(wh) == 0)
+            return(NULL)
+        return(annotatedPeakList(featAnn, groupName = grp, index = wh, MSPeakLists = MSPeakLists, onlyAnnotated = TRUE,
+                                 ...))
     }
-    else
-        NULL
-
-    tab <- copy(annTable)
-    setnames(tab, c("compoundName", "neutral_formula"), c("name", "formula"), skip_absent = TRUE)
-    tab[, type := if (!is.null(tab[["SMILES"]])) "unknownCompound" else "unknownFormula"]
-    
-    # UNDONE: apply thresholds
-    # UNDONE: unset annotation objects?
-    
-    # UNDONE: also support XLogP from feat annotations?
-    if (!is.null(retDirs))
-        tab[, TP_retDir := retDirs[SMILES]]
-    
-    tab[, formulaDiff := sapply(formula, getFormulaDiffText, form2 = parentInfo$formula)]
-    tab[, fitFormula := sapply(formula, calcFormulaFit, parentInfo$formula)]
-    
-    if (!is.null(parentInfo$SMILES) && !is.null(tab[["SMILES"]]))
+    getFragNLs <- function(grp, InChIKey, formula)
     {
-        compFits <- do.call(calcStructFitFMCS, c(list(parentInfo$SMILES, tab$SMILES, parallel), extraOptsFMCSR))
-        tab[SMILES %chin% names(compFits), fitCompound := compFits[SMILES]]
+        fAPL <- getAnnPL(formulas, grp, formula)
+        cAPL <- getAnnPL(compounds, grp, getIKBlock1(InChIKey))
+        APL <- rbindlist(list(fAPL, cAPL), fill = TRUE)
+        if (nrow(APL) == 0)
+            return(NULL)
+        return(unique(APL[, c("ion_formula", "neutral_loss"), with = FALSE]))
+    }
+
+    hasForm <- !is.null(tab[["formula"]]); hasIK <- !is.null(tab[["InChIKey"]])
+    if ((hasForm && !is.null(formulas)) || (hasIK && !is.null(compounds)))
+    {
+        parFragNLs <- getFragNLs(parFG, parIK, parFormula)    
         
-        if (!is.null(suspTPsSMILES) && length(suspTPsSMILES) > 0)
+        if (!is.null(parFragNLs) && nrow(parFragNLs) > 0)
         {
-            tab[, c("suspSim", "suspSimSMILES") := rbindlist(doApply("lapply", parallel, SMILES, function(SMI)
-            {
-                dists <- sapply(suspTPsSMILES, patRoon:::distSMILES, SMI1 = SMI, fpType = fpType,
-                                fpSimMethod = fpSimMethod)
-                wh <- which.max(dists)
-                return(list(dists[wh], suspTPsSMILES[wh]))
-            }, prog = FALSE))]
+            tab[, c("fragMatches", "NLMatches") := {
+                fragNLs <- getFragNLs(TPGroups[.I], if (hasIK) NAToNULL(InChIKey) else NULL,
+                                      if (hasForm) NAToNULL(formula) else NULL)
+                if (!is.null(fragNLs) && nrow(fragNLs) > 0)
+                    list(sum(fragNLs$ion_formula %chin% parFragNLs$ion_formula),
+                         sum(fragNLs$neutral_loss %chin% parFragNLs$neutral_loss))
+                else
+                    list(NA_integer_, NA_integer_)
+            }, by = seq_len(nrow(tab))]
         }
-    }
-    
-    if (!is.null(parentAnn) && nrow(parentAnn) == 1)
-    {
-        tab[, c("fragMatches", "NLMatches") := {
-            fi <- fragInfo[[1]]
-            if (nrow(fi) > 0)
-                list(sum(fi$ion_formula %chin% parentAnn$fragInfo[[1]]$ion_formula),
-                     sum(fi$neutral_loss %chin% parentAnn$fragInfo[[1]]$neutral_loss))
-            else
-                list(NA_integer_, NA_integer_)
-        }, by = seq_len(nrow(tab))]
-    }
-    
-    # UNDONE: also do TP score w/out suspSim (ie when TPs=NULL)?
-    if (!is.null(tab[["fitCompound"]]) && !is.null(tab[["suspSim"]]))
-        tab[, TP_score := pmax(NAToZero(fitCompound), NAToZero(suspSim)) + NAToZero(annSim)]
-    else
-        tab[, TP_score := NAToZero(fitFormula) + NAToZero(annSim)]
-    
-    tab <- subsetDTColumnsIfPresent(tab, c("type", "name", "SMILES", "InChI", "InChIKey", "formula", "annSim",
-                                           "fitFormula", "fitCompound", "suspSim", "suspSimSMILES", "fragMatches",
-                                           "NLMatches", "TP_score", "UID"))
-    
+    }        
     return(tab)
 }
 
@@ -206,8 +176,7 @@ mergeTPComponCandidatesTab <- function(compTab)
     {
         tab <- copy(tab)
         tab[, c("cmpName", "group") := .(cmpName, grp)]
-        setnames(tab, c("type", "name", "UID"), c("candidate_type", "candidate_name", "candidate_UID"),
-                 skip_absent = TRUE)
+        setnames(tab, "name", "candidate_name")
         return(tab)
     })]
     
@@ -218,13 +187,13 @@ mergeTPComponCandidatesTab <- function(compTab)
 }
 
 doGenComponentsTPs <- function(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, compounds, TPComponParams,
-                               specSimParams, extraOptsFMCSR, parallel)
+                               specSimParams, parallel)
 {
     if (length(fGroups) == 0 || (!is.null(TPs) && length(TPs) == 0))
         return(componentsTPs(componentInfo = data.table(), components = list(), fromTPs = !is.null(TPs)))
 
-    hash <- makeHash(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, compounds, TPComponParams, specSimParams,
-                     extraOptsFMCSR)
+    fromTPs <- !is.null(TPs)
+    hash <- makeHash(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, compounds, TPComponParams, specSimParams)
     cd <- loadCacheData("componentsTPs", hash)
     if (!is.null(cd))
         return(cd)
@@ -239,23 +208,13 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, 
             msg <- paste(msg, "or doesn't contain any unique feature groups")
         warning(msg, call. = FALSE)
         
-        return(componentsTPs(componentInfo = data.table(), components = list(), fromTPs = !is.null(TPs)))
+        return(componentsTPs(componentInfo = data.table(), components = list(), fromTPs = fromTPs))
     }
     
     gInfoParents <- groupInfo(fGroups); gInfoTPs <- groupInfo(fGroupsTPs)
     haveFormulas <- !is.null(formulas) && length(formulas) > 0
     haveCompounds <- !is.null(compounds) && length(compounds) > 0
-    mode <- if (!is.null(TPs)) "TPs" else if (isScreening(fGroups) && (haveFormulas || haveCompounds)) "unkScr" else "unk"
 
-    getAllCompXLogPs <- function()
-    {
-        if (TPComponParams$calcLogP == "none" || !haveCompounds)
-            return(list())
-        annSMIs <- unique(as.data.table(compounds)[["SMILES"]])
-        return(sapply(annSMIs, calculateLogP, TPComponParams$calcLogP, FALSE))
-    }
-    allCompXLogPs <- NULL # filled in with above function if needed
-    
     cat("Linking parents and TPs ...\n")
     
     prepareComponent <- function(cmp, parentFG)
@@ -293,26 +252,6 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, 
         return(cmp)
     }
     
-    getParentInfo <- function(tab, getXLogP)
-    {
-        ret <- as.list(tab[, c("formula", "SMILES", "InChIKey"), with = FALSE])
-        ret[sapply(ret, is.na)] <- NULL
-        if (!is.null(ret[["SMILES"]]) && getXLogP && TPComponParams$calcLogP != "none")
-        {
-            if (is.null(allCompXLogPs))
-                allCompXLogPs <<- getAllCompXLogPs()
-            # get parent XLogP from compounds data if possible, otherwise calculate
-            ret$XLogP <- allCompXLogPs[[ret$SMILES]]
-            if (is.null(ret[["XLogP"]]))
-            {
-                ret$XLogP <- calculateLogP(ret$SMILES, TPComponParams$calcLogP, FALSE)
-                if (is.na(ret$XLogP))
-                    ret$XLogP <- NULL
-            }
-        }
-        return(ret)            
-    }
-    
     # figure out components
     #   - for scr+unknowns: each component is a unique parent_name/parent_group pair --> parentFGMapping
     #   - for unknowns: each component is a unique susp name/group pair (ie scr table with these 2 cols)
@@ -324,7 +263,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, 
     #   - for full unknowns: simply get component from prepareComponent(), no candidate table
 
     compInfo <- TPFGMapping <- NULL
-    if (mode == "TPs")
+    if (fromTPs)
     {
         compInfo <- linkParentsToFGroups(TPs, fGroups)
         setnames(compInfo, paste0("parent_", names(compInfo)))
@@ -338,76 +277,24 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, 
         setcolorder(compInfo, c("parent_name", "parent_group", "parent_rt", "parent_mz"))
         TPFGMapping <- linkTPsToFGroups(TPs, fGroupsTPs)
     }
-    else if (mode == "unkScr")
-    {
-        compInfo <- subsetDTColumnsIfPresent(screenInfo(fGroups), c("name", "group", "formula", "SMILES", "InChI",
-                                                                    "InChIKey", "neutralMass", "molNeutralized"))
-        setnames(compInfo, paste0("parent_", names(compInfo)))
-        compInfo[, c("parent_rt", "parent_mz") := gInfoParents[parent_group, c("rts", "mzs")]]
-        setcolorder(compInfo, c("parent_name", "parent_group", "parent_rt", "parent_mz"))
-    }
     else
         compInfo <- data.table(parent_group = names(fGroups), parent_name = names(fGroups))
 
-    mainGetUnkCandArgs <- if (mode != "unk")
-    {
-        list(extraOptsFMCSR = extraOptsFMCSR, suspTPsSMILES = NULL, fpType = TPComponParams$fpType,
-             fpSimMethod = TPComponParams$fpSimMethod, parallel = parallel)
-    }
-    else
-        NULL
-    
     compList <- doApply("Map", FALSE, compInfo$parent_name, compInfo$parent_group, f = function(parn, parfg)
     {
         cmpTab <- NULL
-        
-        if (mode == "TPs" || mode == "unkScr")
+        if (fromTPs)
         {
-            if (mode == "TPs")
-            {
-                parInfo <- getParentInfo(parents(TPs)[name == parn][1], haveCompounds)
-                allFGCandidates <- unique(TPFGMapping$group)
-            }
-            else # unkScr
-            {
-                parInfo <- getParentInfo(screenInfo(fGroups)[name == parn][1], haveCompounds)
-                allFGCandidates <- character()
-            }
-            
-            if (haveFormulas)
-                allFGCandidates <- union(allFGCandidates, groupNames(formulas))
-            if (haveCompounds)
-                allFGCandidates <- union(allFGCandidates, groupNames(compounds))
+            parRow <- parents(TPs)[name == parn][1]
+            parForm <- NAToNULL(parRow[["formula"]]); parIK <- NAToNULL(parRow[["InChIKey"]])
+            allFGCandidates <- unique(TPFGMapping$group)
             allFGCandidates <- setdiff(allFGCandidates, parfg)
             allFGCandidates <- intersect(allFGCandidates, names(fGroupsTPs))
-            
             candidates <- pruneList(sapply(allFGCandidates, function(candFG)
             {
-                candScr <- candForm <- candComp <- data.table()
-                if (mode == "TPs" && !is.null(products(TPs)[[parn]]))
-                {
-                    candScr <- getTPComponCandidatesScr(products(TPs)[[parn]][name %chin% TPFGMapping[group == candFG]],
-                                                        parInfo)
-                }
-                if (haveFormulas && !is.null(formulas[[candFG]]))
-                {
-                    candForm <- do.call(getTPComponCandidatesUnkAnn,
-                                        modifyList(mainGetUnkCandArgs, list(annTable = formulas[[candFG]],
-                                                                            parentInfo = parInfo,
-                                                                            parentAnn = formulas[[parfg]][UID == parInfo$formula])))
-                }
-                if (haveCompounds && !is.null(compounds[[candFG]]))
-                {
-                    candComp <- do.call(getTPComponCandidatesUnkAnn,
-                                        modifyList(mainGetUnkCandArgs, list(annTable = compounds[[candFG]],
-                                                                            parentAnn = compounds[[parfg]],
-                                                                            parentInfo = parInfo,
-                                                                            parentAnn = compounds[[parfg]][UID == getIKBlock1(parInfo$InChIKey)],
-                                                                            suspTPsSMILES = TPs[[parn]]$SMILES)))
-                }
-                return(rbind(candScr, candForm, candComp, fill = TRUE))
+                getTPComponCandidatesScr(products(TPs)[[parn]][name %chin% TPFGMapping[group == candFG]$TP_name],
+                                         candFG, MSPeakLists, formulas, compounds, parfg, parForm, parIK)
             }, simplify = FALSE), checkZeroRows = TRUE)
- 
             cmpTab <- data.table(group = names(candidates), candidates = candidates)
         }
         else
@@ -415,7 +302,6 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, 
             cmpTab <- data.table(group = names(fGroupsTPs))
             cmpTab[, TP_name := paste0(parfg, "-TP", seq_len(nrow(cmpTab)))]
         }
-        
         cmpTab <- prepareComponent(cmpTab, parfg)
         doProgress()
         return(cmpTab)
@@ -432,13 +318,14 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, 
         setcolorder(compInfo, "name")
         names(compList) <- compInfo$name
 
-        if (mode != "unk")
+        if (fromTPs)
         {
             # generate candidate links
             
             compListTab <- rbindlist(compList, idcol = "name", fill = TRUE)
             compListTab <- mergeTPComponCandidatesTab(compListTab)
-            compListTab[, links := list(list(unique(name))), by = c("candidate_UID", "group")]
+            # UNDONE: change candidate_name to something more unique when we support multiple TPs objects
+            compListTab[, links := list(list(unique(name))), by = c("candidate_name", "group")]
             compListTab[, links := Map(links, name, f = setdiff)] # remove self-links
         
             compList <- Map(names(compList), compList, f = function(cmpName, cmpTab)
@@ -447,7 +334,8 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, 
                 cmpTab[, candidates := Map(group, candidates, f = function(grp, ct)
                 {
                     ct <- copy(ct)
-                    ct[compListTab[name == cmpName & group == grp], links := i.links, on = c(UID = "candidate_UID")]
+                    # UNDONE: as above
+                    ct[compListTab[name == cmpName & group == grp], links := i.links, on = c(name = "candidate_name")]
                     return(ct)
                 })]
                 return(cmpTab)
@@ -478,7 +366,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, 
     printf("Linked %d parents with %d TPs.\n", nrow(compInfo),
            if (length(compList) > 0) sum(sapply(compList, nrow)) else 0)
     
-    ret <- componentsTPs(componentInfo = compInfo[], components = compList, fromTPs = !is.null(TPs))
+    ret <- componentsTPs(componentInfo = compInfo[], components = compList, fromTPs = fromTPs)
     saveCacheData("componentsTPs", ret, hash)
     
     return(ret)
@@ -807,8 +695,7 @@ setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked = TRUE, width =
 setMethod("generateComponentsTPs", "featureGroups", function(fGroups, fGroupsTPs = fGroups, TPs = NULL,
                                                              MSPeakLists = NULL, formulas = NULL, compounds = NULL,
                                                              TPComponParams = getDefTPComponParams(),
-                                                             specSimParams = getDefSpecSimParams(),
-                                                             extraOptsFMCSR = NULL, parallel = TRUE)
+                                                             specSimParams = getDefSpecSimParams(), parallel = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertClass, . ~ fGroupsTPs + TPs + MSPeakLists + formulas + compounds,
@@ -816,7 +703,6 @@ setMethod("generateComponentsTPs", "featureGroups", function(fGroups, fGroupsTPs
            null.ok = c(FALSE, TRUE, TRUE, TRUE, TRUE), fixed = list(add = ac))
     assertTPComponParams(TPComponParams, add = ac)
     assertSpecSimParams(specSimParams, add = ac)
-    checkmate::assertList(extraOptsFMCSR, null.ok = TRUE, add = ac)
     checkmate::assertFlag(parallel, add = ac)
     checkmate::reportAssertions(ac)
     
@@ -825,7 +711,7 @@ setMethod("generateComponentsTPs", "featureGroups", function(fGroups, fGroupsTPs
         stop("Input feature groups need to be screened for parents/TPs!")
 
     return(doGenComponentsTPs(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, compounds, TPComponParams, specSimParams,
-                              extraOptsFMCSR, parallel))
+                              parallel))
 })
 
 #' @rdname generateComponentsTPs
@@ -833,8 +719,7 @@ setMethod("generateComponentsTPs", "featureGroups", function(fGroups, fGroupsTPs
 setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroupsTPs = fGroups, TPs = NULL,
                                                                 MSPeakLists = NULL, formulas = NULL, compounds = NULL,
                                                                 TPComponParams = getDefTPComponParams(),
-                                                                specSimParams = getDefSpecSimParams(),
-                                                                extraOptsFMCSR = NULL, parallel = TRUE)
+                                                                specSimParams = getDefSpecSimParams(), parallel = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertClass, . ~ fGroupsTPs + TPs + MSPeakLists + formulas + compounds,
@@ -842,7 +727,6 @@ setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroups
            null.ok = c(FALSE, TRUE, TRUE, TRUE, TRUE), fixed = list(add = ac))
     assertTPComponParams(TPComponParams, add = ac)
     assertSpecSimParams(specSimParams, add = ac)
-    checkmate::assertList(extraOptsFMCSR, null.ok = TRUE, add = ac)
     checkmate::assertFlag(parallel, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -851,7 +735,7 @@ setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroups
         stop("Input feature groups need to be screened for parents/TPs!")
     
     ret <- doGenComponentsTPs(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, compounds, TPComponParams,
-                              specSimParams, extraOptsFMCSR, parallel)
+                              specSimParams, parallel)
     
     # UNDONE: more efficient method to get set specific fGroups?
     gNamesTPsSets <- sapply(sets(fGroupsTPs), function(s) names(fGroupsTPs[, sets = s]), simplify = FALSE)

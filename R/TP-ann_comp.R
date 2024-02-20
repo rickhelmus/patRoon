@@ -98,6 +98,7 @@ generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, extraOptsFMCSR
         assertSuspectList(parents, needsAdduct = FALSE, skipInvalid = TRUE, add = ac)
     checkmate::assertClass(compounds, "compounds", add = ac)
     checkmate::assertClass(TPsRef, "transformationProductsStructure", null.ok = TRUE, add = ac)
+    checkmate::assertList(extraOptsFMCSR, null.ok = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + neutralChemProps + calcSims + parallel,
            fixed = list(add = ac))
     assertXLogPMethod(calcLogP, add = ac)

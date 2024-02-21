@@ -10,7 +10,7 @@ setMethod("initialize", "transformationProductsAnnComp",
 
 # NOTE: this function is called by a withProg() block, so handles progression updates
 getTPsCompounds <- function(annTable, parName, parFormula, parSMILES, parLogP, extraOptsFMCSR, suspTPsSMILES, fpType,
-                            fpSimMethod, parallel)
+                            fpSimMethod, minFitFormula, minFitCompound, minSimSusp, parallel)
 {
     tab <- copy(annTable)
     setnames(tab, "neutral_formula", "formula")
@@ -30,8 +30,9 @@ getTPsCompounds <- function(annTable, parName, parFormula, parSMILES, parLogP, e
     }
     
     tab[, fitFormula := sapply(formula, calcFormulaFit, parFormula)]
+    tab <- tab[numGTE(fitFormula, minFitFormula)]
     
-    if (!is.null(parSMILES) && !is.null(tab[["SMILES"]]))
+    if (nrow(tab) > 0 && !is.null(parSMILES))
     {
         compFits <- do.call(calcStructFitFMCS, c(list(parSMILES, tab$SMILES, parallel), extraOptsFMCSR))
         tab[SMILES %chin% names(compFits), fitCompound := compFits[SMILES]]
@@ -45,6 +46,7 @@ getTPsCompounds <- function(annTable, parName, parFormula, parSMILES, parLogP, e
                 wh <- which.max(dists)
                 return(list(dists[wh], suspTPsSMILES[wh]))
             }, prog = FALSE))]
+            tab <- tab[numGTE(fitCompound, minFitCompound) | numGTE(suspSim, minSimSusp)]
         }
     }
     
@@ -65,9 +67,10 @@ getTPsCompounds <- function(annTable, parName, parFormula, parSMILES, parLogP, e
 
 
 #' @export
-generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, extraOptsFMCSR = NULL, skipInvalid = TRUE,
-                               prefCalcChemProps = TRUE, neutralChemProps = FALSE, calcLogP = "rcdk", calcSims = FALSE,
-                               fpType = "extended", fpSimMethod = "tanimoto", parallel = TRUE)
+generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, minFitFormula = 0, minFitCompound = 0, minSimSusp = 0,
+                               extraOptsFMCSR = NULL, skipInvalid = TRUE, prefCalcChemProps = TRUE,
+                               neutralChemProps = FALSE, calcLogP = "rcdk", calcSims = FALSE, fpType = "extended",
+                               fpSimMethod = "tanimoto", parallel = TRUE)
 {
     # UNDONE: support >1 generations? Probably not really worthwhile...
     
@@ -84,6 +87,7 @@ generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, extraOptsFMCSR
         assertSuspectList(parents, needsAdduct = FALSE, skipInvalid = TRUE, add = ac)
     checkmate::assertClass(compounds, "compounds", add = ac)
     checkmate::assertClass(TPsRef, "transformationProductsStructure", null.ok = TRUE, add = ac)
+    aapply(checkmate::assertNumber, . ~ minFitFormula + minFitCompound + minSimSusp, fixed = list(add = ac))
     checkmate::assertList(extraOptsFMCSR, null.ok = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + neutralChemProps + calcSims + parallel,
            fixed = list(add = ac))
@@ -146,7 +150,7 @@ generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, extraOptsFMCSR
             {
                 nr <- getTPsCompounds(annTable, par$name, par$formula, par$SMILES, par[["logP"]], extraOptsFMCSR,
                                       if (!is.null(TPsRef)) TPsRef[[par$name]]$SMILES else NULL,
-                                      fpType, fpSimMethod, parallel)
+                                      fpType, fpSimMethod, minFitFormula, minFitCompound, minSimSusp, parallel)
                 saveCacheData("TPsAnnComp", nr, hashes[[par$name]], cacheDB)
                 return(nr)
             }, simplify = FALSE))

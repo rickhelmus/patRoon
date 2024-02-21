@@ -27,10 +27,10 @@ test_that("BPCs", {
 })
 
 test_that("test plot TICs and BPCs", {
-    expect_plot(plotTICs(anaInfoOne))
-    expect_plot(plotTICs(fList, colourBy = "rGroups", MSLevel = 1))
-    expect_plot(plotTICs(fgOpenMS[2:4, ], colourBy = "rGroups", MSLevel = 2))
-    expect_plot(plotBPCs(anaInfo[2:3, ]))
-    expect_plot(plotTICs(fList[1, ]))
-    expect_plot(plotTICs(fgOpenMS[1, ]))
+    expect_doppel("raw-tic", function() plotTICs(anaInfoOne))
+    expect_doppel("raw-tic-col", function() plotTICs(fList, colourBy = "rGroups", MSLevel = 1))
+    expect_doppel("raw-ms2", function() plotTICs(fgOpenMS[2:4, ], colourBy = "rGroups", MSLevel = 2))
+    expect_doppel("raw-bpc", function() plotBPCs(anaInfo[2:3, ]))
+    expect_doppel("raw-tic-feat", function() plotTICs(fList[1, ]))
+    expect_doppel("raw-tic-fg", function() plotTICs(fgOpenMS[1, ]))
 })

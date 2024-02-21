@@ -1523,40 +1523,40 @@ newProject <- function(destPath = NULL)
         })
 
         observeEvent(input$addAnalysesCSV, {
-          csvFile <- rstudioapi::selectFile(path = "~/", filter = "csv files (*.csv)")
-          if (!is.null(csvFile))
-          {
-            csvTab <- tryCatch(fread(csvFile, select = c("path", "analysis", "group", "blank"),
-                                     colClasses = "character"),
-                               error = function(e) FALSE, warning = function(w) FALSE)
-            if (is.logical(csvTab))
-              rstudioapi::showDialog("Error", "Failed to open/parse selected csv file!", "")
-            else if (nrow(csvTab) > 0)
+            csvFile <- rstudioapi::selectFile(path = "~/", filter = "csv files (*.csv)")
+            if (!is.null(csvFile))
             {
-              msExts <- MSFileExtensions()
-              msFiles <- normalizePath(listMSFiles(csvTab$path, MSFileFormats()), winslash = "/")
-              msFilesNoExt <- tools::file_path_sans_ext(msFiles)
-              formats <- mapply(csvTab$analysis, csvTab$path, FUN = function(ana, path)
-              {
-                fps <- msFiles[msFilesNoExt == file.path(path, ana)]
-                if (length(fps) == 0)
-                  return("")
-                ret <- sapply(tolower(tools::file_ext(fps)), function(ext)
+                csvTab <- tryCatch(fread(csvFile, select = c("path", "analysis", "group", "blank"),
+                                         colClasses = "character"),
+                                   error = function(e) FALSE, warning = function(w) FALSE)
+                if (is.logical(csvTab))
+                    rstudioapi::showDialog("Error", "Failed to open/parse selected csv file!", "")
+                else if (nrow(csvTab) > 0)
                 {
-                  paste0(names(msExts)[sapply(msExts, function(e) ext %in% tolower(e))], collapse = "/")
-                })
-                return(paste0(ret, collapse = ", "))
-              })
-              
-              csvTab[, format := formats]
-              csvTab <- csvTab[nzchar(format)] # prune unknown files (might have been removed?)
-              
-              rvName <- getCurAnaRVName()
-              rValues[[rvName]] <- rbind(rValues[[rvName]], csvTab, fill=TRUE)
+                    msExts <- MSFileExtensions()
+                    msFiles <- normalizePath(listMSFiles(csvTab$path, MSFileFormats()), winslash = "/")
+                    msFilesNoExt <- tools::file_path_sans_ext(msFiles)
+                    formats <- mapply(csvTab$analysis, csvTab$path, FUN = function(ana, path)
+                    {
+                        fps <- msFiles[msFilesNoExt == file.path(path, ana)]
+                        if (length(fps) == 0)
+                            return("")
+                        ret <- sapply(tolower(tools::file_ext(fps)), function(ext)
+                        {
+                            paste0(names(msExts)[sapply(msExts, function(e) ext %in% tolower(e))], collapse = "/")
+                        })
+                        return(paste0(ret, collapse = ", "))
+                    })
+                    
+                    csvTab[, format := formats]
+                    csvTab <- csvTab[nzchar(format)] # prune unknown files (might have been removed?)
+                    
+                    rvName <- getCurAnaRVName()
+                    rValues[[rvName]] <- rbind(rValues[[rvName]], csvTab, fill=TRUE)
+                }
             }
-          }
         })
-
+        
         observeEvent(input$convAlgo, {
             from <- switch(input$convAlgo,
                            pwiz = MSFileFormats("pwiz"),

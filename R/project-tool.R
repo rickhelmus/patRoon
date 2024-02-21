@@ -1552,7 +1552,7 @@ newProject <- function(destPath = NULL)
                     csvTab <- csvTab[nzchar(format)] # prune unknown files (might have been removed?)
                     
                     rvName <- getCurAnaRVName()
-                    rValues[[rvName]] <- rbind(rValues[[rvName]], csvTab, fill=TRUE)
+                    rValues[[rvName]] <- rbind(rValues[[rvName]], csvTab, fill = TRUE)
                 }
             }
         })

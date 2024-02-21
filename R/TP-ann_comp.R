@@ -39,26 +39,26 @@ getTPsCompounds <- function(annTable, parName, parFormula, parSMILES, parLogP, e
         
         if (!is.null(suspTPsSMILES) && length(suspTPsSMILES) > 0)
         {
-            tab[, c("suspSim", "suspSimSMILES") := rbindlist(doApply("lapply", parallel, SMILES, function(SMI)
+            tab[, c("simSusp", "simSuspSMILES") := rbindlist(doApply("lapply", parallel, SMILES, function(SMI)
             {
                 dists <- sapply(suspTPsSMILES, patRoon:::distSMILES, SMI1 = SMI, fpType = fpType,
                                 fpSimMethod = fpSimMethod)
                 wh <- which.max(dists)
                 return(list(dists[wh], suspTPsSMILES[wh]))
             }, prog = FALSE))]
-            tab <- tab[numGTE(fitCompound, minFitCompound) | numGTE(suspSim, minSimSusp)]
+            tab <- tab[numGTE(fitCompound, minFitCompound) | numGTE(simSusp, minSimSusp)]
         }
     }
     
-    # UNDONE: also do TP score w/out suspSim (ie when TPs=NULL)?
-    if (!is.null(tab[["fitCompound"]]) && !is.null(tab[["suspSim"]]))
-        tab[, TP_score := pmax(NAToZero(fitCompound), NAToZero(suspSim)) + NAToZero(annSim)]
+    # UNDONE: also do TP score w/out simSusp (ie when TPs=NULL)?
+    if (!is.null(tab[["fitCompound"]]) && !is.null(tab[["simSusp"]]))
+        tab[, TP_score := pmax(NAToZero(fitCompound), NAToZero(simSusp)) + NAToZero(annSim)]
     else
         tab[, TP_score := NAToZero(fitFormula) + NAToZero(annSim)]
     
     tab <- subsetDTColumnsIfPresent(tab, c("group", "name", "ID", "parent_ID", "chem_ID", "generation", "compoundName",
                                            "SMILES", "InChI", "InChIKey", "formula", "logP", "retDir", "annSim",
-                                           "fitFormula", "fitCompound", "suspSim", "suspSimSMILES", "TP_score"))
+                                           "fitFormula", "fitCompound", "simSusp", "simSuspSMILES", "TP_score"))
     
     doProgress()
     

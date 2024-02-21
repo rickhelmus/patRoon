@@ -557,14 +557,12 @@ doPlotHeaders <- function(obj, what = "tic", retentionRange, MSLevel, retMin = F
     if (showLegend && colourBy == "none")
         showLegend <- FALSE
     
-    if ("tic" %in% what) {
+    if ("tic" %in% what)
         data <- getTICs(obj, retentionRange, MSLevel)
-    } else if ("bpc" %in% what) {
+    else if ("bpc" %in% what)
         data <- getBPCs(obj, retentionRange, MSLevel)
-    } else {
+    else
         data <- data.table()
-    }
-    
     
     if (nrow(data) == 0)
     {

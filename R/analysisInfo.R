@@ -20,13 +20,8 @@ NULL
 setMethod("getTICs", "data.frame", function(obj, retentionRange = NULL, MSLevel = 1)
 {
     ac <- checkmate::makeAssertCollection()
-    
-    MSLevel <- as.integer(MSLevel)
-    
-    checkmate::assert(checkmate::check_integer(MSLevel, min.len = 1, lower = 1), add = ac)
-    
-    obj <- assertAndPrepareAnaInfo(obj)
-    
+    checkmate::assertIntegerish(MSLevel, min.len = 1, lower = 1, add = ac)
+    obj <- assertAndPrepareAnaInfo(obj, add = ac)
     checkmate::reportAssertions(ac)
     
     filePaths <- getMzMLOrMzXMLAnalysisPath(obj$analysis, obj$path, mustExist = TRUE)
@@ -58,13 +53,8 @@ setMethod("getTICs", "data.frame", function(obj, retentionRange = NULL, MSLevel 
 setMethod("getBPCs", "data.frame", function(obj, retentionRange = NULL, MSLevel = 1)
 {
     ac <- checkmate::makeAssertCollection()
-    
-    MSLevel <- as.integer(MSLevel)
-    
-    checkmate::assert(checkmate::check_integer(MSLevel, min.len = 1, lower = 1), add = ac)
-    
-    obj <- assertAndPrepareAnaInfo(obj)
-    
+    checkmate::assertIntegerish(MSLevel, min.len = 1, lower = 1, add = ac)
+    obj <- assertAndPrepareAnaInfo(obj, add = ac)
     checkmate::reportAssertions(ac)
     
     filePaths <- getMzMLOrMzXMLAnalysisPath(obj$analysis, obj$path, mustExist = TRUE)

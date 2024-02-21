@@ -36,9 +36,11 @@
         --> now always uses rcdk/obabel, also support XLogPs from annotation data?
     - Do TP_retDir calculation with LogP tolerance, also for existing code
     - update patRoonInst for new deps?
-    - candidate type names OK?
     - further limit candidate columns? Can get quite excessive
     - add new algos to generateTPs()
+    - thresholds: also separate fitCompound/simSusps?
+    - min TP score? maybe as filter as it won't affect performance
+    - TPsComp: RT direction pre-filter
 
 - tests
     - IDL filter

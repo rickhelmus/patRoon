@@ -9,7 +9,7 @@ setMethod("initialize", "transformationProductsAnnForm",
           function(.Object, ...) callNextMethod(.Object, algorithm = "ann_form", ...))
 
 # NOTE: this function is called by a withProg() block, so handles progression updates
-getTPsFormulas <- function(annTable, parName, parFormula)
+getTPsFormulas <- function(annTable, parName, parFormula, minFitFormula)
 {
     tab <- copy(annTable)
     setnames(tab, "neutral_formula", "formula")
@@ -24,6 +24,8 @@ getTPsFormulas <- function(annTable, parName, parFormula)
     
     tab <- subsetDTColumnsIfPresent(tab, c("group", "name", "ID", "parent_ID", "chem_ID", "generation", "formula",
                                            "annSim", "fitFormula", "TP_score"))
+
+    tab <- tab[numGTE(fitFormula, minFitFormula)]
     
     doProgress()
     
@@ -32,7 +34,7 @@ getTPsFormulas <- function(annTable, parName, parFormula)
 
 
 #' @export
-generateTPsAnnForm <- function(parents, formulas, skipInvalid = TRUE, prefCalcChemProps = TRUE,
+generateTPsAnnForm <- function(parents, formulas, minFitFormula = 0, skipInvalid = TRUE, prefCalcChemProps = TRUE,
                                neutralChemProps = FALSE, parallel = TRUE)
 {
     # UNDONE: support >1 generations? Probably not really worthwhile...
@@ -49,6 +51,7 @@ generateTPsAnnForm <- function(parents, formulas, skipInvalid = TRUE, prefCalcCh
     if (is.data.frame(parents))
         assertSuspectList(parents, needsAdduct = FALSE, skipInvalid = TRUE, add = ac)
     checkmate::assertClass(formulas, "formulas", add = ac)
+    checkmate::assertNumber(minFitFormula, add = ac)
     aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + neutralChemProps + parallel,
            fixed = list(add = ac))
     checkmate::reportAssertions(ac)
@@ -86,7 +89,7 @@ generateTPsAnnForm <- function(parents, formulas, skipInvalid = TRUE, prefCalcCh
         {
             newResults <- doApply("sapply", parallel, parsSplit[parsTBD], function(par)
             {
-                nr <- getTPsFormulas(annTable, par$name, par$formula)
+                nr <- getTPsFormulas(annTable, par$name, par$formula, minFitFormula)
                 saveCacheData("TPsAnnForm", nr, hashes[[par$name]], cacheDB)
                 return(nr)
             }, simplify = FALSE)

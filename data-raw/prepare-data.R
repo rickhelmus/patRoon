@@ -18,7 +18,7 @@ PubChemTransformations <- data.table::fread(transFile)
 # convert column names to generic patRoon format
 setnames(PubChemTransformations,
          c("predecessor", "predecessorcid", "successor", "successorcid", "predecessorEM", "successorEM", "XlogPDiff"),
-         c("parent_name", "parent_CID", "TP_name", "TP_CID", "parent_neutralMass", "TP_neutralMass", "LogPDiff"))
+         c("parent_name", "parent_CID", "TP_name", "TP_CID", "parent_neutralMass", "TP_neutralMass", "logPDiff"))
 
 # merge duplicates rows: these may occur eg when different sources exist
 # NOTE: this doesn't take into account different CIDs, hence, only the first will remain
@@ -42,7 +42,7 @@ PubChemTransformations[, c("parent_formula", "TP_formula", "parent_InChI", "TP_I
                                 patRoon:::babelConvert(parent_SMILES, "smi", "inchi", mustWork = TRUE),
                                 patRoon:::babelConvert(TP_SMILES, "smi", "inchi", mustWork = TRUE))]
 
-PubChemTransformations[is.na(LogPDiff), LogPDiff := 0]
+PubChemTransformations[is.na(logPDiff), logPDiff := 0]
 
 # clear unneeded columns
 PubChemTransformations <- PubChemTransformations[, -c("CID_to_CID", "IK_to_IK", "IKFB_to_IKFB",

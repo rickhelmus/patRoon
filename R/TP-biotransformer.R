@@ -29,13 +29,13 @@ BTMPFinishHandler <- function(cmd)
     
     results <- fread(cmd$outFile, colClasses = c("Precursor ID" = "character", Synonyms = "character",
                                                  "Molecular formula" = "character"))
-    
+
     # Simplify/harmonize columns a bit
     setnames(results,
-             c("Molecular formula", "Major Isotope Mass", "Reaction", "Reaction ID", "Metabolite ID", "Precursor ID",
-               "Precursor ALogP", "Enzyme(s)", "Biosystem"),
-             c("formula", "neutralMass", "transformation", "transformation_ID", "chem_ID", "parent_chem_ID", "parent_ALogP",
-               "enzyme", "biosystem"))
+             c("Molecular formula", "Major Isotope Mass", "ALogP", "Reaction", "Reaction ID", "Metabolite ID",
+               "Precursor ID", "Precursor ALogP", "Enzyme(s)", "Biosystem"),
+             c("formula", "neutralMass", "logP", "transformation", "transformation_ID", "chem_ID", "parent_chem_ID",
+               "parent_logP", "enzyme", "biosystem"))
     results[!nzchar(parent_chem_ID), parent_chem_ID := 0L]
     for (col in c("chem_ID", "parent_chem_ID"))
         set(results, i = NULL, j = col, value = as.integer(sub("^BTM", "", results[[col]])))
@@ -71,10 +71,6 @@ BTMPFinishHandler <- function(cmd)
     
     # Assign some unique identifier
     ret[, name := paste0(cmd$parent, "-TP", chem_ID)]
-
-    # NOTE: take the _original_ parent ALogP as reference
-    parALogP <- ret[is.na(parent_ID)]$parent_ALogP[1]
-    ret[, retDir := fifelse(ALogP < parALogP, -1, 1)]
 
     setcolorder(ret, c("name", "ID", "parent_ID", "chem_ID", "SMILES", "InChI", "InChIKey", "formula", "neutralMass"))
     
@@ -179,8 +175,9 @@ BTMPPrepareHandler <- function(cmd)
 #' @export
 generateTPsBioTransformer <- function(parents, type = "env", generations = 2, maxExpGenerations = generations + 2,
                                       extraOpts = NULL, skipInvalid = TRUE, prefCalcChemProps = TRUE,
-                                      neutralChemProps = FALSE, neutralizeTPs = TRUE, calcSims = FALSE,
-                                      fpType = "extended", fpSimMethod = "tanimoto", MP = FALSE)
+                                      neutralChemProps = FALSE, neutralizeTPs = TRUE, calcLogP = "rcdk",
+                                      forceCalcLogP = FALSE, calcSims = FALSE, fpType = "extended",
+                                      fpSimMethod = "tanimoto", MP = FALSE)
 {
     checkmate::assert(
         checkmate::checkClass(parents, "data.frame"),
@@ -197,8 +194,10 @@ generateTPsBioTransformer <- function(parents, type = "env", generations = 2, ma
     checkmate::assertCount(generations, positive = TRUE, add = ac)
     checkmate::assertCount(maxExpGenerations, positive = TRUE, add = ac)
     checkmate::assertCharacter(extraOpts, null.ok = TRUE, add = ac)
-    aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + neutralChemProps + neutralizeTPs + calcSims + MP,
+    aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + neutralChemProps + neutralizeTPs +
+               forceCalcLogP + calcSims + MP,
            fixed = list(add = ac))
+    assertXLogPMethod(calcLogP, add = ac)
     aapply(checkmate::assertString, . ~ fpType + fpSimMethod, min.chars = 1, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
@@ -225,7 +224,15 @@ generateTPsBioTransformer <- function(parents, type = "env", generations = 2, ma
 
     results <- pruneList(results, checkZeroRows = TRUE)
     parents <- parents[name %in% names(results)]
+    
+    # copy parent logPs to parent info tab
+    parents[, logP := sapply(results, function(prod)
+    {
+        logP <- prod[is.na(parent_ID)]$parent_logP[1]
+        return(if (length(logP) == 0) NA_real_ else logP)
+    })]
 
-    return(transformationProductsBT(calcSims = calcSims, fpType = fpType, fpSimMethod = fpSimMethod, parents = parents,
+    return(transformationProductsBT(calcLogP = calcLogP, forceCalcLogP = forceCalcLogP, forceCalcRetDir = TRUE,
+                                    calcSims = calcSims, fpType = fpType, fpSimMethod = fpSimMethod, parents = parents,
                                     products = results))
 }

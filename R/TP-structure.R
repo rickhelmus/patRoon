@@ -34,7 +34,9 @@ NULL
 transformationProductsStructure <- setClass("transformationProductsStructure",
                                             contains = c("VIRTUAL", "transformationProducts"))
 
-setMethod("initialize", "transformationProductsStructure", function(.Object, calcSims, fpType, fpSimMethod, ...)
+setMethod("initialize", "transformationProductsStructure", function(.Object, calcLogP, forceCalcLogP,
+                                                                    forceCalcRetDir, calcSims, fpType, fpSimMethod,
+                                                                    doRetDirs = TRUE, ...)
 {
     .Object <- callNextMethod(.Object, ...)
     
@@ -57,6 +59,34 @@ setMethod("initialize", "transformationProductsStructure", function(.Object, cal
     
     if (rmNeutTPs > 0)
         printf(sprintf("Removed %d TPs that were duplicates after neutralization.\n", rmNeutTPs))
+
+    if (doRetDirs)
+    {
+        printf("Assigning retDirs...")
+        .Object@parents <- maybeCalcTPLogPs(parents(.Object), calcLogP, forceCalcLogP)
+        pspl <- split(parents(.Object), seq_len(nrow(parents(.Object))))
+        .Object@products <- Map(products(.Object), pspl, f = getTPsRetDir,
+                                MoreArgs = list(calcLogP = calcLogP, forceCalcLogP = forceCalcLogP,
+                                                forceCalcRetDir = forceCalcRetDir))
+        
+        .Object@products <- Map(products(.Object), pspl, f = function(prod, parRow)
+        {
+            if (!forceCalcRetDir && !is.null(prod[["retDir"]]) && !anyNA(prod$retDir))
+                return(prod)
+            
+            wh <- if (!forceCalcRetDir && !is.null(prod[["retDir"]]))
+                is.na(prod$retDir)
+            else
+                rep(TRUE, nrow(prod))
+            
+            prod <- maybeCalcTPLogPs(prod, calcLogP, forceCalcLogP, wh)
+            return(getTPsRetDir(prod, parentRow, calcLogP, forceCalcLogP, wh))
+        })
+        
+        
+        
+        printf("Done!\n")
+    }
     
     if (calcSims)
     {

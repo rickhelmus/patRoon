@@ -30,17 +30,13 @@
         - do by default in newProject()?
 
 - TP components
-    - Optionally force TP retDir calculation with same algorithm (rcdk/obabel)
-        - Make option in generateTPs methods?
-        - Make option in componentsTPs for unk compounds (and maybe override scr?)
-        --> now always uses rcdk/obabel, also support XLogPs from annotation data?
     - update patRoonInst for new deps?
     - further limit candidate columns? Can get quite excessive
     - add new algos to generateTPs()
     - TPsComp
         - min TP score? maybe as filter as it won't affect performance
         - thresholds: also separate fitCompound/simSusps?
-        - Do TP_retDir calculation with LogP tolerance, also for other algos
+    - Do TP_retDir calculation with LogP tolerance
 
 - tests
     - IDL filter
@@ -105,7 +101,8 @@
     - generateComponentsTPs()
         - new args
         - as.data.table candidates arg
-        - update for TPComponParams
+    - generateTPs()
+        - ann_comp/ann_form algos
 
 - NEWS
     - specSimParamsMatch --> specSimParams
@@ -160,6 +157,10 @@
         - new args
         - as.data.table candidates arg
         - changes due to TPComponParams
+    - generateTPs()
+        - consistent "logP" naming, also for compounds
+        - consistent calculation and configuration of logP/retDir calculation for all TP structure algos
+        - new ann_form/ann_comp args
 
 
 ## Ext

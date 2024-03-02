@@ -9,41 +9,34 @@ setMethod("initialize", "transformationProductsAnnComp",
           function(.Object, ...) callNextMethod(.Object, algorithm = "ann_comp", ...))
 
 # NOTE: this function is called by a withProg() block, so handles progression updates
-getTPsCompounds <- function(annTable, parName, parFormula, parSMILES, parLogP, parRT, extraOptsFMCSR, simSuspSMILES,
+getTPsCompounds <- function(annTable, parentRow, calcLogP, forceCalcLogP, extraOptsFMCSR, simSuspSMILES,
                             fpType, fpSimMethod, minRTDiff, minFitFormula, minFitCompound, minSimSusp, parallel)
 {
     tab <- copy(annTable)
     setnames(tab, "neutral_formula", "formula")
     
-    tab[, c("name", "ID", "parent_ID", "chem_ID", "generation") := .(paste0(parName, "-TP", .I), .I, NA_integer_, .I, 1)]
+    tab[, c("name", "ID", "parent_ID", "chem_ID", "generation") := .(paste0(parentRow$name, "-TP", .I), .I, NA_integer_, .I, 1)]
     
     # UNDONE: apply thresholds
     # UNDONE: unset annotation objects?
-    
-    # UNDONE: also support XLogP from feat annotations?
-    # UNDONE: logP tolerance
-    if (!is.null(annTable[["logP"]]))
+
+    tab <- getTPsRetDir(tab, parentRow, calcLogP, forceCalcLogP)
+
+    if (!is.null(minRTDiff) && !is.null(parentRow[["rt"]]) && !is.na(parentRow$rt) && !is.null(tab[["ret"]]))
     {
-        tab[, retDir := fcase(logP < parLogP, -1,
-                              logP > parLogP, 1,
-                              default = 0)] # NOTE: default should also handle NAs
-    }
-    
-    if (!is.null(minRTDiff) && !is.null(parRT) && !is.na(parRT) && !is.null(tab[["ret"]]))
-    {
-        tab[, retDiff := ret - parRT]
+        tab[, retDiff := ret - parentRow$rt]
         tab[, featRetDir := fcase((retDiff + minRTDiff) < 0, -1,
                                   (retDiff - minRTDiff) > 0, 1,
                                   default = 0)]
         tab <- tab[retDir == 0 | featRetDir == 0 | retDir == featRetDir]
     }
     
-    tab[, fitFormula := sapply(formula, calcFormulaFit, parFormula)]
+    tab[, fitFormula := sapply(formula, calcFormulaFit, parentRow$formula)]
     tab <- tab[numGTE(fitFormula, minFitFormula)]
     
-    if (nrow(tab) > 0 && !is.null(parSMILES))
+    if (nrow(tab) > 0 && !is.null(parentRow$SMILES))
     {
-        compFits <- do.call(calcStructFitFMCS, c(list(parSMILES, tab$SMILES, parallel), extraOptsFMCSR))
+        compFits <- do.call(calcStructFitFMCS, c(list(parentRow$SMILES, tab$SMILES, parallel), extraOptsFMCSR))
         tab[SMILES %chin% names(compFits), fitCompound := compFits[SMILES]]
         
         if (!is.null(simSuspSMILES) && length(simSuspSMILES) > 0)
@@ -78,8 +71,9 @@ getTPsCompounds <- function(annTable, parName, parFormula, parSMILES, parLogP, p
 #' @export
 generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, fGroupsComps = NULL, minRTDiff = 0, minFitFormula = 0,
                                minFitCompound = 0, minSimSusp = 0, extraOptsFMCSR = NULL, skipInvalid = TRUE,
-                               prefCalcChemProps = TRUE, neutralChemProps = FALSE, calcLogP = "rcdk", calcSims = FALSE,
-                               fpType = "extended", fpSimMethod = "tanimoto", parallel = TRUE)
+                               prefCalcChemProps = TRUE, neutralChemProps = FALSE, calcLogP = "rcdk",
+                               forceCalcLogP = FALSE, calcSims = FALSE, fpType = "extended", fpSimMethod = "tanimoto",
+                               parallel = TRUE)
 {
     # UNDONE: support >1 generations? Probably not really worthwhile...
     
@@ -101,8 +95,8 @@ generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, fGroupsComps =
     aapply(checkmate::assertNumber, . ~ minFitFormula + minFitCompound + minSimSusp, finite = TRUE,
            fixed = list(add = ac))
     checkmate::assertList(extraOptsFMCSR, null.ok = TRUE, add = ac)
-    aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + neutralChemProps + calcSims + parallel,
-           fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + neutralChemProps + forceCalcLogP + calcSims +
+               parallel, fixed = list(add = ac))
     assertXLogPMethod(calcLogP, add = ac)
     aapply(checkmate::assertString, . ~ fpType + fpSimMethod, min.chars = 1, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
@@ -116,43 +110,37 @@ generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, fGroupsComps =
         cacheDB <- openCacheDBScope()
         annTable <- as.data.table(compounds, fGroups = fGroupsComps)
         
-        # UNDONE: move to general code used also by other algos
         if (calcLogP != "none")
         {
-            allSMILESLogP <- union(parentsTab$SMILES, annTable$SMILES)
+            if (!is.null(annTable[["XlogP"]]) && !is.null(annTable[["AlogP"]]))
+                setnames(annTable, "XlogP", "logP") # prefer XlogP if both are available
+            else
+                setnames(annTable, c("XlogP", "AlogP"), c("logP", "logP"), skip_absent = TRUE)
             
-            ph <- makeHash(allSMILESLogP, calcLogP)
-            allLogP <- loadCacheData("TPsAnnCompLogP", ph, cacheDB)
-            if (is.null(allLogP))
+            if (!is.null(fGroupsComps) && isScreening(parents))
             {
-                printf("Calculating log P values... ")
-                allLogP <- calculateLogP(allSMILESLogP, method = calcLogP, mustWork = FALSE)
-                names(allLogP) <- allSMILESLogP
-                saveCacheData("TPsAnnCompLogP", allLogP, ph, cacheDB)
-                printf("Done!\n")
+                # figure out parent RTs & groups from screening data
+                gi <- groupInfo(parents)
+                hasRT <- !is.null(parentsTab[["rt"]])
+                parentsTab[, rt := {
+                    parn <- name
+                    scr <- screenInfo(parents)[name == parn]
+                    if (nrow(scr) != 1)
+                        if (hasRT) hasRT else NA_real_ # unclear which feature group to consider
+                    else
+                        gi[scr$group, "rts"]
+                }, by = seq_len(nrow(parentsTab))]
             }
-            annTable[, logP := allLogP[SMILES]]
-            parentsTab[, logP := allLogP[SMILES]]
             
-            # figure out RTs
-            if (!is.null(fGroupsComps))
+            # try to figure out log Ps from annotation data
+            if (!is.null(parentsTab[["InChIKey"]]) && !is.null(annTable[["logP"]]))
             {
-                # parents: get from fGroups if possible, otherwise fall back to suspect RTs
-                if (isScreening(parents))
-                {
-                    
-                    gi <- groupInfo(parents)
-                    hasRT <- !is.null(parentsTab[["rt"]])
-                    parentsTab[, rt := {
-                        parn <- name
-                        scr <- screenInfo(parents)[name == parn]
-                        if (nrow(scr) != 1)
-                            if (hasRT) rt else NA_real_
-                        else
-                            gi[scr$group, "rts"]
-                    }, by = seq_len(nrow(parentsTab))]
-                }
+                parentsTab <- merge(parentsTab, annTable[, c("InChIKey", "logP"), with = FALSE], by = "InChIKey",
+                                    all.x = TRUE, sort = FALSE)
             }
+            
+            parentsTab <- maybeCalcTPLogPs(parentsTab, calcLogP, forceCalcLogP)
+            annTable <- maybeCalcTPLogPs(annTable, calcLogP, forceCalcLogP)
         }
         
         parsSplit <- split(parentsTab, seq_len(nrow(parentsTab)))
@@ -182,9 +170,8 @@ generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, fGroupsComps =
             newResults <- withProg(length(parsTBD), FALSE, sapply(parsSplit[parsTBD], function(par)
             {
                 sss <- if (!is.null(TPsRef) && !is.null(TPsRef[[par$name]])) TPsRef[[par$name]]$SMILES else NULL
-                nr <- getTPsCompounds(annTable, par$name, par$formula, par$SMILES, par[["logP"]], par[["rt"]],
-                                      extraOptsFMCSR, sss, fpType, fpSimMethod, minRTDiff, minFitFormula,
-                                      minFitCompound, minSimSusp, parallel)
+                nr <- getTPsCompounds(annTable, par, calcLogP, forceCalcLogP, extraOptsFMCSR, sss, fpType, fpSimMethod,
+                                      minRTDiff, minFitFormula, minFitCompound, minSimSusp, parallel)
                 saveCacheData("TPsAnnComp", nr, hashes[[par$name]], cacheDB)
                 return(nr)
             }, simplify = FALSE))
@@ -199,6 +186,9 @@ generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, fGroupsComps =
         parentsTab <- parentsTab[name %in% names(results)]
     }
     
-    return(transformationProductsAnnComp(calcSims = calcSims, fpType = fpType, fpSimMethod = fpSimMethod,
-                                         parents = parentsTab, products = results))
+    # NOTE: retDirs were already calculated when gathering TPs so these could be used as a pre-filter. Hence, skip
+    # retDir calculation in the constructor.
+    return(transformationProductsAnnComp(doRetDirs = FALSE, calcLogP = FALSE, forceCalcLogP = FALSE,
+                                         forceCalcRetDir = FALSE, calcSims = calcSims, fpType = fpType,
+                                         fpSimMethod = fpSimMethod, parents = parentsTab, products = results))
 }

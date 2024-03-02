@@ -52,6 +52,60 @@ getTPParents <- function(parents, skipInvalid, prefCalcChemProps, neutralChemPro
     return(parents)
 }
 
+# used for parent and TP tables
+maybeCalcTPLogPs <- function(tab, calcLogP, forceCalcLogP, which = rep(TRUE, nrow(tab)))
+{
+    if (calcLogP == "none")
+        return(tab)
+
+    if (!forceCalcLogP && !is.null(tab[["logP"]]))
+        which <- is.na(tab[which]$logP)
+    
+    if (!any(which))
+        return(tab)
+    
+    tab <- copy(tab)
+    
+    allSMILESLogP <- unique(tab[which]$SMILES)
+    ph <- makeHash(allSMILESLogP, calcLogP) # UNDONE: convert to cache set? Or don't cache?
+    allLogP <- loadCacheData("TPsLogP", ph)
+    if (is.null(allLogP))
+    {
+        allLogP <- calculateLogP(allSMILESLogP, method = calcLogP, mustWork = FALSE)
+        names(allLogP) <- allSMILESLogP
+        saveCacheData("TPsLogP", allLogP, ph)
+    }
+    
+    tab[which, calc_logP := allLogP[SMILES]]
+    
+    return(tab[])
+}
+
+getTPsRetDir <- function(TPsTab, parentRow, calcLogP, forceCalcLogP, which = rep(TRUE, nrow(TPsTab)))
+{
+    TPsTab <- copy(TPsTab)
+    
+    # UNDONE: log tolerance
+    
+    TPsTab[which, retDir := NA_integer_]
+    
+    # first try from non-post-calculated log Ps
+    if (!forceCalcLogP)
+    {
+        if (!is.null(parentRow[["logP"]]) && !is.null(TPsTab[["logP"]]))
+            TPsTab[which, retDir := fifelse(logP < parentRow$logP, -1L, 1L)]
+        if (!is.null(TPsTab[["logPDiff"]]))
+            TPsTab[which & is.na(retDir), retDir := fifelse(logPDiff < 0, -1L, 1L)]
+    }
+    # then from post-calculated log Ps
+    if (calcLogP != "none" && !is.null(parentRow[["calc_logP"]]) && !is.null(TPsTab[["calc_logP"]]))
+        TPsTab[which & is.na(retDir), retDir := fifelse(calc_logP < parentRow$calc_logP, -1L, 1L)]
+
+    setnafill(TPsTab, fill = 0L, cols = "retDir")
+    
+    return(TPsTab[])
+}
+
 doConvertToMFDB <- function(prodAll, parents, out, includeParents)
 {
     # UNDONE: cache?
@@ -221,16 +275,15 @@ getProductsFromLib <- function(TPLibrary, TPLibrarySel, generations, matchGenera
         cols <- grep("^TP_", names(r), value = TRUE)
         setnames(r, cols, sub("^TP_", "", cols))
         
-        r[, retDir := 0] # may be changed below
         r[, generation := gen]
         
         r[, ID := curTPIDs[pn] + seq_len(nrow(r))]
         curTPIDs[pn] <<- curTPIDs[pn] + nrow(r)
         r[, parent_ID := pid]
         
-        # make it additive so LogPDiff corresponds to the original parent
-        if (!is.null(r[["LogPDiff"]]) && !is.null(prvLogPDiff))
-            r[, LogPDiff := LogPDiff + prvLogPDiff]
+        # make it additive so logPDiff corresponds to the original parent
+        if (!is.null(r[["logPDiff"]]) && !is.null(prvLogPDiff))
+            r[, logPDiff := logPDiff + prvLogPDiff]
         
         return(r)
     }
@@ -246,7 +299,7 @@ getProductsFromLib <- function(TPLibrary, TPLibrarySel, generations, matchGenera
                 nexttps <- rbindlist(lapply(split(tps, seq_len(nrow(tps))), function(tpRow)
                 {
                     nt <- copy(TPLibrary[get(paste0("parent_", matchGenerationsBy)) == tpRow[[matchGenerationsBy]]])
-                    return(prepTPs(nt, pn, tpRow$ID, gen, tpRow$LogPDiff))
+                    return(prepTPs(nt, pn, tpRow$ID, gen, tpRow$logPDiff))
                 }))
                 return(rbind(r, nexttps))
             })
@@ -264,23 +317,6 @@ getProductsFromLib <- function(TPLibrary, TPLibrarySel, generations, matchGenera
         set(r, j = "name", value = paste0(pn, "-TP", r$chem_ID))
     })
 
-    if (!is.null(TPLibrarySel[["retDir"]]))
-    {
-        results <- Map(results, TPLibrarySel[match(names(results), parent_name)]$retDir,
-                       f = data.table::set, MoreArgs = list(i = NULL, j = "retDir"))
-    }
-    else if (!is.null(TPLibrarySel[["parent_LogP"]]) && !is.null(TPLibrarySel[["TP_LogP"]]))
-    {
-        results <- Map(results, TPLibrarySel[match(names(results), parent_name)]$parent_LogP,
-                       f = function(r, pLogP) set(r, j = "retDir", value = fifelse(r$LogP < pLogP, -1, 1)))
-    }
-    else if (!is.null(TPLibrarySel[["LogPDiff"]]))
-    {
-        results <- lapply(results, function(x) set(x, j = "retDir", value = fcase(x$LogPDiff < 0, -1,
-                                                                                  x$LogPDiff > 0, 1,
-                                                                                  default = 0)))
-    }
-    
     results <- pruneList(results, checkZeroRows = TRUE)
 
     return(results)
@@ -342,6 +378,10 @@ prepareDataForTPLibrary <- function(parents, TPLibrary, generations, matchParent
             TPLibrary[, parent_name_lib := parent_name] # store original
             TPLibrary[, parent_name := parents[match(dataLib, dataSusp)]$name]
         }
+
+        # copy logPs if available
+        if (!is.null(TPLibrary[["parent_logP"]]))
+            parents[, logP := TPLibrary[match(dataSusp, dataLib)]$parent_logP]
         
         # only take data in both
         dataInBoth <- intersect(dataLib, dataSusp)

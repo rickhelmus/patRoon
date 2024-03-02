@@ -86,7 +86,8 @@ unifyMFNames <- function(mfr, scoreTypesMF)
                  Identification = "identification",
                  KnownUse = "knownUse",
                  FPSum = "annoTypeCount", # Nov2019 version (rename to Jan2020 version)
-                 AnnoTypeCount = "annoTypeCount", # Jan2020 version
+                 AnnoTypeCount = "annoTypeCount", # Jan2020 version,
+                 XLogP = "XlogP",
                  
                  # PubChem OECD PFAS
                  Name = "compoundName",
@@ -155,9 +156,7 @@ unifyMFNames <- function(mfr, scoreTypesMF)
                  # database generated from TP prediction
                  molNeutralized = "molNeutralized",
                  parent = "parent",
-                 ALogP = "ALogP",
-                 LogP = "LogP",
-                 XLogP = "XLogP",
+                 logP = "logP",
                  transformation = "transformation",
                  enzyme = "enzyme",
                  evidencedoi = "evidencedoi"

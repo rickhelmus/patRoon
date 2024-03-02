@@ -13,7 +13,7 @@ setMethod("initialize", "transformationProductsCTS",
           function(.Object, ...) callNextMethod(.Object, algorithm = "cts", ...))
 
 # NOTE: this function is called by a withProg() block, so handles progression updates
-runCTS <- function(parentRow, transLibrary, generations, errorRetries, neutralizeTPs, calcLogP)
+runCTS <- function(parentRow, transLibrary, generations, errorRetries, neutralizeTPs)
 {
     CTSURL <- "https://qed.epa.gov/cts/rest/metabolizer/run"
     # CTSURL <- "https://qed.epacdx.net/cts/rest/metabolizer/run" # older version??
@@ -52,14 +52,6 @@ runCTS <- function(parentRow, transLibrary, generations, errorRetries, neutraliz
     setnames(ret, c("smiles", "routes"), c("SMILES", "transformation"))
     
     ret <- prepareChemTable(ret, prefCalcChemProps = FALSE, neutralChemProps = neutralizeTPs, verbose = FALSE)
-    
-    if (calcLogP != "none")
-    {
-        ret[, LogP := calculateLogP(SMILES, method = calcLogP, mustWork = FALSE)]
-        ret[, retDir := fifelse(LogP < parentRow$LogP, -1, 1)]
-    }
-    else
-        ret[, retDir := 0]
     
     # convert row IDs to unique IDs
     ret[, chem_ID := match(InChIKey, unique(InChIKey))]
@@ -119,7 +111,8 @@ runCTS <- function(parentRow, transLibrary, generations, errorRetries, neutraliz
 #' @export
 generateTPsCTS <- function(parents, transLibrary, generations = 1, errorRetries = 3, skipInvalid = TRUE,
                            prefCalcChemProps = TRUE, neutralChemProps = FALSE, neutralizeTPs = TRUE, calcLogP = "rcdk",
-                           calcSims = FALSE, fpType = "extended", fpSimMethod = "tanimoto", parallel = TRUE)
+                           forceCalcLogP = FALSE, calcSims = FALSE, fpType = "extended", fpSimMethod = "tanimoto",
+                           parallel = TRUE)
 {
     checkmate::assert(
         checkmate::checkClass(parents, "data.frame"),
@@ -138,8 +131,8 @@ generateTPsCTS <- function(parents, transLibrary, generations = 1, errorRetries 
                                             "combined_photolysis_abiotic_hydrolysis",
                                             "pfas_environmental", "pfas_metabolism"), add = ac)
     aapply(checkmate::assertCount, . ~ generations + errorRetries, positive = TRUE, fixed = list(add = ac))
-    aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + neutralChemProps + neutralizeTPs + calcSims +
-               parallel, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + neutralChemProps + neutralizeTPs +
+               forceCalcLogP + calcSims + parallel, fixed = list(add = ac))
     assertXLogPMethod(calcLogP, add = ac)
     aapply(checkmate::assertString, . ~ fpType + fpSimMethod, min.chars = 1, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
@@ -152,26 +145,11 @@ generateTPsCTS <- function(parents, transLibrary, generations = 1, errorRetries 
     {
         cacheDB <- openCacheDBScope()
         
-        if (calcLogP != "none")
-        {
-            ph <- makeHash(parents, calcLogP)
-            cd <- loadCacheData("TPsCTSLogP", ph, cacheDB)
-            if (is.null(cd))
-            {
-                printf("Calculating parent LogP values... ")
-                parents[, LogP := calculateLogP(SMILES, method = calcLogP, mustWork = FALSE)]
-                printf("Done!\n")
-                saveCacheData("TPsCTSLogP", parents, ph, cacheDB)
-            }
-            else
-                parents <- cd
-        }
-        
         parsSplit <- split(parents, seq_len(nrow(parents)))
         names(parsSplit) <- parents$name
         
         baseHash <- makeHash(transLibrary, generations, errorRetries, skipInvalid, prefCalcChemProps,
-                             neutralChemProps, neutralizeTPs, calcLogP, calcSims, fpType, fpSimMethod)
+                             neutralChemProps, neutralizeTPs, calcSims, fpType, fpSimMethod)
         setHash <- makeHash(parents, baseHash)
         cachedSet <- loadCacheSet("TPsCTS", setHash, cacheDB)
         hashes <- sapply(parsSplit, function(par) makeHash(baseHash, par[, c("name", "SMILES")], with = FALSE))
@@ -190,7 +168,7 @@ generateTPsCTS <- function(parents, transLibrary, generations = 1, errorRetries 
         if (length(parsTBD) > 0)
         {
             newResults <- doApply("sapply", parallel, parsSplit[parsTBD], patRoon:::runCTS, transLibrary, generations,
-                                  errorRetries, neutralizeTPs, calcLogP, simplify = FALSE)
+                                  errorRetries, neutralizeTPs, simplify = FALSE)
 
             for (pn in names(newResults))
             {
@@ -209,6 +187,7 @@ generateTPsCTS <- function(parents, transLibrary, generations = 1, errorRetries 
         parents <- parents[name %in% names(results)]
     }
     
-    return(transformationProductsCTS(calcSims = calcSims, fpType = fpType, fpSimMethod = fpSimMethod,
+    return(transformationProductsCTS(calcLogP = calcLogP, forceCalcLogP = forceCalcLogP, forceCalcRetDir = TRUE,
+                                     calcSims = calcSims, fpType = fpType, fpSimMethod = fpSimMethod,
                                      parents = parents, products = results))
 }

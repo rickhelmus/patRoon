@@ -566,19 +566,6 @@ assertSpecSimParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
                   .var.name = .var.name, add = add)
 }
 
-assertTPComponParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
-{
-    checkmate::assertList(x, names = "unique", .var.name = .var.name) # no add: should fail
-    
-    assertListVal(x, "ignoreParents", checkmate::assertFlag, .var.name = .var.name, add = add)
-    assertListVal(x, "minRTDiff", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
-    assertListVal(x, "calcLogP", assertXLogPMethod, .var.name = .var.name, add = add)
-    assertListVal(x, "fpType", checkmate::assertString, min.chars = 1, .var.name = .var.name, add = add)
-    assertListVal(x, "fpSimMethod", checkmate::assertString, min.chars = 1, .var.name = .var.name, add = add)
-    
-    invisible(NULL)
-}
-
 assertCheckSession <- function(x, mustExist, null.ok = FALSE, .var.name = checkmate::vname(x), add = NULL)
 {
     if (null.ok && is.null(x))

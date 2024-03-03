@@ -34,9 +34,7 @@ NULL
 transformationProductsStructure <- setClass("transformationProductsStructure",
                                             contains = c("VIRTUAL", "transformationProducts"))
 
-setMethod("initialize", "transformationProductsStructure", function(.Object, calcLogP, forceCalcLogP,
-                                                                    forceCalcRetDir, calcSims, fpType, fpSimMethod,
-                                                                    doRetDirs = TRUE, ...)
+setMethod("initialize", "transformationProductsStructure", function(.Object, TPStructParams, doRetDirs = TRUE, ...)
 {
     .Object <- callNextMethod(.Object, ...)
     
@@ -63,32 +61,28 @@ setMethod("initialize", "transformationProductsStructure", function(.Object, cal
     if (doRetDirs)
     {
         printf("Assigning retDirs...")
-        .Object@parents <- maybeCalcTPLogPs(parents(.Object), calcLogP, forceCalcLogP)
+        .Object@parents <- maybeCalcTPLogPs(parents(.Object), TPStructParams$calcLogP, TPStructParams$forceCalcLogP)
         pspl <- split(parents(.Object), seq_len(nrow(parents(.Object))))
-        .Object@products <- Map(products(.Object), pspl, f = getTPsRetDir,
-                                MoreArgs = list(calcLogP = calcLogP, forceCalcLogP = forceCalcLogP,
-                                                forceCalcRetDir = forceCalcRetDir))
-        
+
         .Object@products <- Map(products(.Object), pspl, f = function(prod, parRow)
         {
-            if (!forceCalcRetDir && !is.null(prod[["retDir"]]) && !anyNA(prod$retDir))
+            if (!TPStructParams$forceCalcRetDir && !is.null(prod[["retDir"]]) && !anyNA(prod$retDir))
                 return(prod)
             
-            wh <- if (!forceCalcRetDir && !is.null(prod[["retDir"]]))
+            wh <- if (!TPStructParams$forceCalcRetDir && !is.null(prod[["retDir"]]))
                 is.na(prod$retDir)
             else
                 rep(TRUE, nrow(prod))
             
-            prod <- maybeCalcTPLogPs(prod, calcLogP, forceCalcLogP, wh)
-            return(getTPsRetDir(prod, parentRow, calcLogP, forceCalcLogP, wh))
+            prod <- maybeCalcTPLogPs(prod, TPStructParams$calcLogP, TPStructParams$forceCalcLogP, wh)
+            return(getTPsRetDir(prod, parRow, TPStructParams$calcLogP, TPStructParams$forceCalcLogP,
+                                TPStructParams$minLogPDiff, wh))
         })
-        
-        
         
         printf("Done!\n")
     }
     
-    if (calcSims)
+    if (TPStructParams$calcSims)
     {
         hash <- makeHash(.Object)
         cd <- loadCacheData("TPsParentSims", hash)
@@ -101,7 +95,8 @@ setMethod("initialize", "transformationProductsStructure", function(.Object, cal
             .Object@products <- withProg(nrow(parents(.Object)), FALSE, Map(products(.Object), pspl, f = function(pr, pa)
             {
                 pr <- copy(pr)
-                pr[, similarity := sapply(SMILES, distSMILES, SMI1 = pa$SMILES, fpType = fpType, fpSimMethod = fpSimMethod)]
+                pr[, similarity := sapply(SMILES, distSMILES, SMI1 = pa$SMILES, fpType = TPStructParams$fpType,
+                                          fpSimMethod = TPStructParams$fpSimMethod)]
                 doProgress()
                 return(pr)
             }))

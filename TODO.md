@@ -36,7 +36,6 @@
     - TPsComp
         - min TP score? maybe as filter as it won't affect performance
         - thresholds: also separate fitCompound/simSusps?
-    - Do TP_retDir calculation with LogP tolerance
 
 - tests
     - IDL filter
@@ -103,6 +102,8 @@
         - as.data.table candidates arg
     - generateTPs()
         - ann_comp/ann_form algos
+        - forceCalcRetDir: only relevant for library atm, clearly mention its use in genTPsLib docs
+        - TPStructParams: all parameters, explain when logPs are calculated (ie if both parent/TP is absent)
 
 - NEWS
     - specSimParamsMatch --> specSimParams
@@ -161,6 +162,8 @@
         - consistent "logP" naming, also for compounds
         - consistent calculation and configuration of logP/retDir calculation for all TP structure algos
         - new ann_form/ann_comp args
+        - TPStructParams
+        - log P tolerance for retDir calculation
 
 
 ## Ext

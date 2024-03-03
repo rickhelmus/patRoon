@@ -286,8 +286,8 @@ setMethod("filter", "transformationProducts", function(obj, properties = NULL, v
 #' @templateVar what generate transformation products
 #' @templateVar ex1 generateTPsBioTransformer
 #' @templateVar ex2 generateTPsLogic
-#' @templateVar algos biotransformer,logic,library,library_formula,cts
-#' @templateVar algosSuffix BioTransformer,Logic,Library,LibraryFormula,CTS
+#' @templateVar algos biotransformer,logic,library,library_formula,cts,ann_form,ann_comp
+#' @templateVar algosSuffix BioTransformer,Logic,Library,LibraryFormula,CTS,AnnForm,AnnComp
 #' @templateVar ret transformationProducts
 #' @template generic-algo
 #'
@@ -301,14 +301,17 @@ setMethod("filter", "transformationProducts", function(obj, properties = NULL, v
 #' @export
 generateTPs <- function(algorithm, ...)
 {
-    checkmate::assertChoice(algorithm, c("biotransformer", "logic", "library", "library_formula", "cts"))
+    checkmate::assertChoice(algorithm, c("biotransformer", "logic", "library", "library_formula", "cts", "ann_form",
+                                         "ann_comp"))
     
     f <- switch(algorithm,
                 biotransformer = generateTPsBioTransformer,
                 logic = generateTPsLogic,
                 library = generateTPsLibrary,
                 library_formula = generateTPsLibraryFormula,
-                cts = generateTPsCTS)
+                cts = generateTPsCTS,
+                ann_form = generateTPsAnnForm,
+                ann_comp = generateTPsAnnComp)
     
     f(...)
 }

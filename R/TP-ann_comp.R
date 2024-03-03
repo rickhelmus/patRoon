@@ -56,15 +56,15 @@ getTPsCompounds <- function(annTable, parentRow, TPStructParams, extraOptsFMCSR,
             tab[, c("simSusp", "simSuspSMILES") := .(NA_real_, NA_character_)]
 
         tab <- tab[numGTE(fitCompound, minFitCompOrSimSusp[1]) | numGTE(NAToZero(simSusp), minFitCompOrSimSusp[2])]
-        tab[, TP_score := pmax(fitCompound, NAToZero(simSusp)) + NAToZero(annSim)]
+        tab[, TPScore := pmax(fitCompound, NAToZero(simSusp)) + NAToZero(annSim)]
     }
     else
-        tab[, c("fitCompound", "simSusp", "TP_score") := numeric()]
+        tab[, c("fitCompound", "simSusp", "TPScore") := numeric()]
     
         
     tab <- subsetDTColumnsIfPresent(tab, c("group", "name", "ID", "parent_ID", "chem_ID", "generation", "compoundName",
                                            "SMILES", "InChI", "InChIKey", "formula", "logP", "retDir", "annSim",
-                                           "fitFormula", "fitCompound", "simSusp", "simSuspSMILES", "TP_score"))
+                                           "fitFormula", "fitCompound", "simSusp", "simSuspSMILES", "TPScore"))
     
     doProgress()
     
@@ -73,8 +73,8 @@ getTPsCompounds <- function(annTable, parentRow, TPStructParams, extraOptsFMCSR,
 
 
 #' @export
-generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, fGroupsComps = NULL, minRTDiff = 0, minFitFormula = 0,
-                               minFitCompound = 0, minSimSusp = 0, minFitCompoundOrSimSusp = c(0, 0),
+generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, fGroupsComps = NULL, minRTDiff = 20, minFitFormula = 0,
+                               minFitCompound = 0, minSimSusp = 0, minFitCompOrSimSusp = c(0, 0),
                                extraOptsFMCSR = NULL, skipInvalid = TRUE, prefCalcChemProps = TRUE,
                                neutralChemProps = FALSE, TPStructParams = getDefTPStructParams(), parallel = TRUE)
 {
@@ -98,7 +98,7 @@ generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, fGroupsComps =
     checkmate::assertNumber(minRTDiff, lower = 0, finite = TRUE, null.ok = TRUE, add = add)
     aapply(checkmate::assertNumber, . ~ minFitFormula + minFitCompound + minSimSusp, lower = 0, finite = TRUE,
            fixed = list(add = ac))
-    checkmate::assertNumeric(minFitCompoundOrSimSusp, lower = 0, finite = TRUE, len = 2, add = ac)
+    checkmate::assertNumeric(minFitCompOrSimSusp, lower = 0, finite = TRUE, len = 2, add = ac)
     checkmate::assertList(extraOptsFMCSR, null.ok = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + neutralChemProps + parallel,
            fixed = list(add = ac))
@@ -151,7 +151,7 @@ generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, fGroupsComps =
         names(parsSplit) <- parentsTab$name
         
         baseHash <- makeHash(compounds, TPsRef, fGroupsComps, minRTDiff, minFitFormula, minFitCompound, minSimSusp,
-                             minFitCompoundOrSimSusp, extraOptsFMCSR, skipInvalid, prefCalcChemProps, neutralChemProps,
+                             minFitCompOrSimSusp, extraOptsFMCSR, skipInvalid, prefCalcChemProps, neutralChemProps,
                              TPStructParams)
         setHash <- makeHash(parentsTab, baseHash)
         cachedSet <- loadCacheSet("TPsAnnComp", setHash, cacheDB)
@@ -175,7 +175,7 @@ generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, fGroupsComps =
             {
                 sss <- if (!is.null(TPsRef) && !is.null(TPsRef[[par$name]])) TPsRef[[par$name]]$SMILES else NULL
                 nr <- getTPsCompounds(annTable, par, TPStructParams, extraOptsFMCSR, sss, minRTDiff, minFitFormula,
-                                      minFitCompound, minSimSusp, minFitCompoundOrSimSusp, parallel)
+                                      minFitCompound, minSimSusp, minFitCompOrSimSusp, parallel)
                 saveCacheData("TPsAnnComp", nr, hashes[[par$name]], cacheDB)
                 return(nr)
             }, simplify = FALSE))

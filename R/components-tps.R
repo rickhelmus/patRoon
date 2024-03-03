@@ -106,7 +106,7 @@ getTPComponCandidatesScr <- function(prods, TPGroups, MSPeakLists, formulas, com
     tab <- subsetDTColumnsIfPresent(tab, c("name", "compoundName", "SMILES", "InChI", "InChIKey", "formula",
                                            "molNeutralized", "CID", "mass", "retDir", "trans_add",
                                            "trans_sub", "deltaMZ", "similarity", "fitFormula", "fitCompound", "simSusp",
-                                            "simSuspSMILES", "TP_score", "mergedBy", "coverage"))
+                                            "simSuspSMILES", "TPScore", "mergedBy", "coverage"))
     tab <- unique(tab, by = "name") # omit duplicates from different routes
     setnames(tab, "retDir", "TP_retDir", skip_absent = TRUE)
     if (!is.null(tab[["formula"]]) && !is.null(parFormula))

@@ -20,10 +20,10 @@ getTPsFormulas <- function(annTable, parName, parFormula, minFitFormula)
     # UNDONE: unset annotation objects?
     
     tab[, fitFormula := sapply(formula, calcFormulaFit, parFormula)]
-    tab[, TP_score := fitFormula + NAToZero(annSim)]
+    tab[, TPScore := fitFormula + NAToZero(annSim)]
     
     tab <- subsetDTColumnsIfPresent(tab, c("group", "name", "ID", "parent_ID", "chem_ID", "generation", "formula",
-                                           "annSim", "fitFormula", "TP_score"))
+                                           "annSim", "fitFormula", "TPScore"))
 
     tab <- tab[numGTE(fitFormula, minFitFormula)]
     

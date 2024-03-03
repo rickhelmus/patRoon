@@ -32,8 +32,6 @@
 - TP components
     - update patRoonInst for new deps?
     - further limit candidate columns? Can get quite excessive
-    - add new algos to generateTPs()
-    - TPsComp/TPsForm: filter()
         
 
 - tests
@@ -103,6 +101,8 @@
         - ann_comp/ann_form algos
         - forceCalcRetDir: only relevant for library atm, clearly mention its use in genTPsLib docs
         - TPStructParams: all parameters, explain when logPs are calculated (ie if both parent/TP is absent)
+        - TPsComp/TPsForm: filter()
+
 
 - NEWS
     - specSimParamsMatch --> specSimParams

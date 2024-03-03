@@ -35,7 +35,7 @@ getTPsCompounds <- function(annTable, parentRow, TPStructParams, extraOptsFMCSR,
     tab[, fitFormula := sapply(formula, calcFormulaFit, parentRow$formula)]
     tab <- tab[numGTE(fitFormula, minFitFormula)]
     
-    if (nrow(tab) > 0 && !is.null(parentRow$SMILES))
+    if (nrow(tab) > 0)
     {
         compFits <- do.call(calcStructFitFMCS, c(list(parentRow$SMILES, tab$SMILES, parallel), extraOptsFMCSR))
         tab[SMILES %chin% names(compFits), fitCompound := compFits[SMILES]]
@@ -49,16 +49,17 @@ getTPsCompounds <- function(annTable, parentRow, TPStructParams, extraOptsFMCSR,
                 wh <- which.max(dists)
                 return(list(dists[wh], simSuspSMILES[wh]))
             }, prog = FALSE))]
-            tab <- tab[numGTE(fitCompound, minFitCompound) | numGTE(simSusp, minSimSusp)]
         }
+        else
+            tab[, c("simSusp", "simSuspSMILES") := .(NA_real_, NA_character_)]
+
+        tab <- tab[numGTE(fitCompound, minFitCompound) | numGTE(NAToZero(simSusp), minSimSusp)]
+        tab[, TP_score := pmax(fitCompound, NAToZero(simSusp)) + NAToZero(annSim)]
     }
-    
-    # UNDONE: also do TP score w/out simSusp (ie when TPs=NULL)?
-    if (!is.null(tab[["fitCompound"]]) && !is.null(tab[["simSusp"]]))
-        tab[, TP_score := pmax(NAToZero(fitCompound), NAToZero(simSusp)) + NAToZero(annSim)]
     else
-        tab[, TP_score := NAToZero(fitFormula) + NAToZero(annSim)]
+        tab[, c("fitCompound", "simSusp", "TP_score") := numeric()]
     
+        
     tab <- subsetDTColumnsIfPresent(tab, c("group", "name", "ID", "parent_ID", "chem_ID", "generation", "compoundName",
                                            "SMILES", "InChI", "InChIKey", "formula", "logP", "retDir", "annSim",
                                            "fitFormula", "fitCompound", "simSusp", "simSuspSMILES", "TP_score"))

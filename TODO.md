@@ -33,9 +33,8 @@
     - update patRoonInst for new deps?
     - further limit candidate columns? Can get quite excessive
     - add new algos to generateTPs()
-    - TPsComp
-        - min TP score? maybe as filter as it won't affect performance
-        - thresholds: also separate fitCompound/simSusps?
+    - TPsComp/TPsForm: filter()
+        
 
 - tests
     - IDL filter

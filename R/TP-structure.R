@@ -212,9 +212,6 @@ setMethod("filter", "transformationProductsStructure", function(obj, ..., remove
             obj <- delete(obj, j = function(tab, ...) !pred(tab$similarity))
         }
         
-        obj@products <- pruneList(obj@products, checkZeroRows = TRUE)
-        obj@parents <- obj@parents[name %in% names(obj@products)]
-        
         saveCacheData("filterTPs", obj, hash)
     }
     

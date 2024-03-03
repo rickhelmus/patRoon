@@ -566,6 +566,20 @@ assertSpecSimParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
                   .var.name = .var.name, add = add)
 }
 
+assertTPStructParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
+{
+    checkmate::assertList(x, names = "unique", .var.name = .var.name) # no add: should fail
+
+    assertListVal(x, "calcLogP", checkmate::assertChoice, choices = c("rcdk", "obabel", "none"), .var.name = .var.name,
+                  add = add)
+    assertListVal(x, "forceCalcLogP", checkmate::assertFlag, .var.name = .var.name, add = add)
+    assertListVal(x, "forceCalcRetDir", checkmate::assertFlag, .var.name = .var.name, add = add)
+    assertListVal(x, "minLogPDiff", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
+    assertListVal(x, "calcSims", checkmate::assertFlag, .var.name = .var.name, add = add)
+    assertListVal(x, "fpType", checkmate::assertString, min.chars = 1, .var.name = .var.name, add = add)
+    assertListVal(x, "fpSimMethod", checkmate::assertString, min.chars = 1, .var.name = .var.name, add = add)
+}
+
 assertCheckSession <- function(x, mustExist, null.ok = FALSE, .var.name = checkmate::vname(x), add = NULL)
 {
     if (null.ok && is.null(x))
@@ -782,8 +796,6 @@ checkQuantEluent <- function(x, fGroups)
 }
 assertQuantEluent <- checkmate::makeAssertionFunction(checkQuantEluent)
 
-checkXLogPMethod <- function(x) checkmate::checkChoice(x, c("rcdk", "obabel", "none"))
-assertXLogPMethod <- checkmate::makeAssertionFunction(checkXLogPMethod)
 
 # from https://github.com/mllg/checkmate/issues/115
 aapply = function(fun, formula, ..., fixed = list())

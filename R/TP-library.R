@@ -42,9 +42,8 @@ setMethod("initialize", "transformationProductsLibrary",
 #' @export
 generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, generations = 1, skipInvalid = TRUE,
                                prefCalcChemProps = TRUE, neutralChemProps = FALSE, neutralizeTPs = FALSE,
-                               matchParentsBy = "InChIKey", matchGenerationsBy = "InChIKey", calcLogP = "rcdk",
-                               forceCalcLogP = FALSE, forceCalcRetDir = FALSE, calcSims = FALSE, fpType = "extended",
-                               fpSimMethod = "tanimoto")
+                               matchParentsBy = "InChIKey", matchGenerationsBy = "InChIKey",
+                               TPStructParams = getDefTPStructParams())
 {
     # UNDONE: default match by IK or IK1?
     
@@ -70,17 +69,15 @@ generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, generations = 1
     if (is.data.frame(parents))
         assertSuspectList(parents, needsAdduct = FALSE, skipInvalid = TRUE, add = ac)
     checkmate::assertCount(generations, positive = TRUE, add = ac)
-    aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + neutralChemProps + neutralizeTPs +
-               forceCalcLogP + forceCalcRetDir + calcSims, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + neutralChemProps + neutralizeTPs,
+           fixed = list(add = ac))
     aapply(checkmate::assertChoice, . ~ matchParentsBy + matchGenerationsBy, null.ok = FALSE,
            fixed = list(choices = c("InChIKey", "InChIKey1", "InChI", "SMILES", "formula", "name"), add = ac))
-    assertXLogPMethod(calcLogP, add = ac)
-    aapply(checkmate::assertString, . ~ fpType + fpSimMethod, min.chars = 1, fixed = list(add = ac))
+    assertTPStructParams(TPStructParams, add = ac)
     checkmate::reportAssertions(ac)
     
     hash <- makeHash(parents, TPLibrary, generations, skipInvalid, prefCalcChemProps, neutralChemProps, neutralizeTPs,
-                     matchParentsBy, matchGenerationsBy, calcLogP, forceCalcLogP, forceCalcRetDir, calcSims, fpType,
-                     fpSimMethod)
+                     matchParentsBy, matchGenerationsBy, TPStructParams)
     cd <- loadCacheData("TPsLib", hash)
     if (!is.null(cd))
         return(cd)
@@ -93,9 +90,8 @@ generateTPsLibrary <- function(parents = NULL, TPLibrary = NULL, generations = 1
     
     prep <- prepareDataForTPLibrary(parents, TPLibrary, generations, matchParentsBy, matchGenerationsBy, "InChIKey",
                                     neutralizeTPs)
-    ret <- transformationProductsLibrary(calcLogP = calcLogP, forceCalcLogP = forceCalcLogP,
-                                         forceCalcRetDir = forceCalcRetDir, calcSims = calcSims, fpType = fpType,
-                                         fpSimMethod = fpSimMethod, parents = prep$parents, products = prep$products)
+    ret <- transformationProductsLibrary(TPStructParams = TPStructParams, parents = prep$parents,
+                                         products = prep$products)
     saveCacheData("TPsLib", ret, hash)
     return(ret)
 }

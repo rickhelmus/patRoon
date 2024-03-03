@@ -54,8 +54,13 @@ maybeCalcTPLogPs <- function(tab, calcLogP, forceCalcLogP, which = rep(TRUE, nro
     if (calcLogP == "none")
         return(tab)
 
-    if (!forceCalcLogP && !is.null(tab[["logP"]]))
-        which <- is.na(tab[which]$logP)
+    if (!forceCalcLogP)
+    {
+        if (!is.null(tab[["logP"]]))
+            which <- is.na(tab[which]$logP)
+        if (!is.null(tab[["logPDiff"]]))
+            which <- is.na(tab[which]$logPDiff)
+    }
     
     if (!any(which))
         return(tab)
@@ -77,25 +82,29 @@ maybeCalcTPLogPs <- function(tab, calcLogP, forceCalcLogP, which = rep(TRUE, nro
     return(tab[])
 }
 
-getTPsRetDir <- function(TPsTab, parentRow, calcLogP, forceCalcLogP, which = rep(TRUE, nrow(TPsTab)))
+getTPsRetDir <- function(TPsTab, parentRow, calcLogP, forceCalcLogP, minLogPDiff, which = rep(TRUE, nrow(TPsTab)))
 {
+    getRetDir <- function(logPDiff)
+    {
+        fcase((logPDiff + minLogPDiff) < 0L, -1L,
+              (logPDiff - minLogPDiff) > 0L, 1L,
+              default = 0L)
+    }
+    
     TPsTab <- copy(TPsTab)
-    
-    # UNDONE: log tolerance
-    
     TPsTab[which, retDir := NA_integer_]
     
     # first try from non-post-calculated log Ps
     if (!forceCalcLogP)
     {
         if (!is.null(parentRow[["logP"]]) && !is.null(TPsTab[["logP"]]))
-            TPsTab[which, retDir := fifelse(logP < parentRow$logP, -1L, 1L)]
+            TPsTab[which, retDir := getRetDir(logP - parentRow$logP)]
         if (!is.null(TPsTab[["logPDiff"]]))
-            TPsTab[which & is.na(retDir), retDir := fifelse(logPDiff < 0, -1L, 1L)]
+            TPsTab[which & is.na(retDir), retDir := getRetDir(logPDiff)]
     }
     # then from post-calculated log Ps
     if (calcLogP != "none" && !is.null(parentRow[["calc_logP"]]) && !is.null(TPsTab[["calc_logP"]]))
-        TPsTab[which & is.na(retDir), retDir := fifelse(calc_logP < parentRow$calc_logP, -1L, 1L)]
+        TPsTab[which & is.na(retDir), retDir := getRetDir(calc_logP - parentRow$calc_logP)]
 
     setnafill(TPsTab, fill = 0L, cols = "retDir")
     
@@ -380,4 +389,20 @@ prepareDataForTPLibrary <- function(parents, TPLibrary, generations, matchParent
     products <- products[match(parents$name, names(products))] # sync order
     
     return(list(parents = parents, products = products))
+}
+
+#' @export
+getDefTPStructParams <- function(...)
+{
+    def <- list(
+        calcLogP = "rcdk",
+        forceCalcLogP = FALSE,
+        forceCalcRetDir = FALSE,
+        minLogPDiff = 1,
+        calcSims = FALSE,
+        fpType = "extended",
+        fpSimMethod = "tanimoto"
+    )
+    
+    return(modifyList(def, list(...)))
 }

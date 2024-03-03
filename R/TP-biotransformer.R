@@ -175,9 +175,8 @@ BTMPPrepareHandler <- function(cmd)
 #' @export
 generateTPsBioTransformer <- function(parents, type = "env", generations = 2, maxExpGenerations = generations + 2,
                                       extraOpts = NULL, skipInvalid = TRUE, prefCalcChemProps = TRUE,
-                                      neutralChemProps = FALSE, neutralizeTPs = TRUE, calcLogP = "rcdk",
-                                      forceCalcLogP = FALSE, calcSims = FALSE, fpType = "extended",
-                                      fpSimMethod = "tanimoto", MP = FALSE)
+                                      neutralChemProps = FALSE, neutralizeTPs = TRUE,
+                                      TPStructParams = getDefTPStructParams(), MP = FALSE)
 {
     checkmate::assert(
         checkmate::checkClass(parents, "data.frame"),
@@ -194,17 +193,15 @@ generateTPsBioTransformer <- function(parents, type = "env", generations = 2, ma
     checkmate::assertCount(generations, positive = TRUE, add = ac)
     checkmate::assertCount(maxExpGenerations, positive = TRUE, add = ac)
     checkmate::assertCharacter(extraOpts, null.ok = TRUE, add = ac)
-    aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + neutralChemProps + neutralizeTPs +
-               forceCalcLogP + calcSims + MP,
+    aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + neutralChemProps + neutralizeTPs + MP,
            fixed = list(add = ac))
-    assertXLogPMethod(calcLogP, add = ac)
-    aapply(checkmate::assertString, . ~ fpType + fpSimMethod, min.chars = 1, fixed = list(add = ac))
+    assertTPStructParams(TPStructParams, add = ac)
     checkmate::reportAssertions(ac)
 
     parents <- getTPParents(parents, skipInvalid, prefCalcChemProps, neutralChemProps)
 
     baseHash <- makeHash(type, generations, maxExpGenerations, extraOpts, prefCalcChemProps, neutralChemProps,
-                         neutralizeTPs, skipInvalid, fpType, fpSimMethod)
+                         neutralizeTPs, skipInvalid, TPStructParams)
     setHash <- makeHash(parents, baseHash)
     
     cmdQueue <- Map(parents$name, parents$SMILES, f = getBaseBTCmd,
@@ -232,7 +229,5 @@ generateTPsBioTransformer <- function(parents, type = "env", generations = 2, ma
         return(if (length(logP) == 0) NA_real_ else logP)
     })]
 
-    return(transformationProductsBT(calcLogP = calcLogP, forceCalcLogP = forceCalcLogP, forceCalcRetDir = TRUE,
-                                    calcSims = calcSims, fpType = fpType, fpSimMethod = fpSimMethod, parents = parents,
-                                    products = results))
+    return(transformationProductsBT(TPStructParams = TPStructParams, parents = parents, products = results))
 }

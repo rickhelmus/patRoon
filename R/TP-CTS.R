@@ -110,9 +110,8 @@ runCTS <- function(parentRow, transLibrary, generations, errorRetries, neutraliz
 #'
 #' @export
 generateTPsCTS <- function(parents, transLibrary, generations = 1, errorRetries = 3, skipInvalid = TRUE,
-                           prefCalcChemProps = TRUE, neutralChemProps = FALSE, neutralizeTPs = TRUE, calcLogP = "rcdk",
-                           forceCalcLogP = FALSE, calcSims = FALSE, fpType = "extended", fpSimMethod = "tanimoto",
-                           parallel = TRUE)
+                           prefCalcChemProps = TRUE, neutralChemProps = FALSE, neutralizeTPs = TRUE,
+                           TPStructParams = getDefTPStructParams(), parallel = TRUE)
 {
     checkmate::assert(
         checkmate::checkClass(parents, "data.frame"),
@@ -132,9 +131,8 @@ generateTPsCTS <- function(parents, transLibrary, generations = 1, errorRetries 
                                             "pfas_environmental", "pfas_metabolism"), add = ac)
     aapply(checkmate::assertCount, . ~ generations + errorRetries, positive = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + neutralChemProps + neutralizeTPs +
-               forceCalcLogP + calcSims + parallel, fixed = list(add = ac))
-    assertXLogPMethod(calcLogP, add = ac)
-    aapply(checkmate::assertString, . ~ fpType + fpSimMethod, min.chars = 1, fixed = list(add = ac))
+               parallel, fixed = list(add = ac))
+    assertTPStructParams(TPStructParams, add = ac)
     checkmate::reportAssertions(ac)
     
     parents <- getTPParents(parents, skipInvalid, prefCalcChemProps, neutralChemProps)
@@ -149,7 +147,7 @@ generateTPsCTS <- function(parents, transLibrary, generations = 1, errorRetries 
         names(parsSplit) <- parents$name
         
         baseHash <- makeHash(transLibrary, generations, errorRetries, skipInvalid, prefCalcChemProps,
-                             neutralChemProps, neutralizeTPs, calcSims, fpType, fpSimMethod)
+                             neutralChemProps, neutralizeTPs, TPStructParams)
         setHash <- makeHash(parents, baseHash)
         cachedSet <- loadCacheSet("TPsCTS", setHash, cacheDB)
         hashes <- sapply(parsSplit, function(par) makeHash(baseHash, par[, c("name", "SMILES")], with = FALSE))
@@ -187,7 +185,5 @@ generateTPsCTS <- function(parents, transLibrary, generations = 1, errorRetries 
         parents <- parents[name %in% names(results)]
     }
     
-    return(transformationProductsCTS(calcLogP = calcLogP, forceCalcLogP = forceCalcLogP, forceCalcRetDir = TRUE,
-                                     calcSims = calcSims, fpType = fpType, fpSimMethod = fpSimMethod,
-                                     parents = parents, products = results))
+    return(transformationProductsCTS(TPStructParams = TPStructParams, parents = parents, products = results))
 }

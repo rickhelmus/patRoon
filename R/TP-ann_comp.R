@@ -8,6 +8,69 @@ transformationProductsAnnComp <- setClass("transformationProductsAnnComp", conta
 setMethod("initialize", "transformationProductsAnnComp",
           function(.Object, ...) callNextMethod(.Object, algorithm = "ann_comp", ...))
 
+#' @export
+setMethod("filter", "transformationProductsAnnComp", function(obj, ..., minFitFormula = 0, minFitCompound = 0,
+                                                              minSimSusp = 0, minFitCompOrSimSusp = c(0, 0),
+                                                              minTPScore = 0, topMost = NULL, verbose = TRUE,
+                                                              negate = FALSE)
+{
+    ac <- checkmate::makeAssertCollection()
+    aapply(checkmate::assertNumber, . ~ minFitFormula + minFitCompound + minSimSusp, lower = 0, finite = TRUE,
+           fixed = list(add = ac))
+    checkmate::assertNumeric(minFitCompOrSimSusp, lower = 0, finite = TRUE, len = 2, add = ac)
+    checkmate::assertCount(topMost, positive = TRUE, null.ok = TRUE, add = ac)
+    aapply(checkmate::assertFlag, . ~ verbose + negate, fixed = list(add = ac))
+    checkmate::reportAssertions(ac)
+    
+    if (length(obj) == 0)
+        return(obj)
+    
+    oldn <- length(obj)
+    
+    hash <- makeHash(obj, minFitFormula, minFitCompound, minSimSusp, minFitCompOrSimSusp, minTPScore, topMost, negate)
+    cache <- loadCacheData("filterTPs", hash)
+    if (!is.null(cache))
+        obj <- cache
+    else
+    {
+        aboveThr <- function(x, t) t == 0 | is.na(x) | (negate & (x < t)) | (!negate & numGTE(x, t))
+
+        obj <- delete(obj, j = function(tab, ...)
+        {
+            return(!(aboveThr(tab$fitFormula, minFitFormula) &
+                         aboveThr(tab$fitCompound, minFitCompound) &
+                         aboveThr(tab$simSusp, minSimSusp) &
+                         (aboveThr(tab$fitCompound, minFitCompOrSimSusp[1]) | aboveThr(tab$simSusp, minFitCompOrSimSusp[2])) &
+                         aboveThr(tab$TPScore, minTPScore)))
+        })
+        
+        if (!is.null(topMost))
+        {
+            obj <- delete(obj, j = function(tab, ...)
+            {
+                if (nrow(tab) <= topMost)
+                    return(FALSE)
+                ord <- order(tab$TPScore, decreasing = !negate)
+                return(ord[-seq_len(topMost)])
+            })
+        }
+
+        saveCacheData("filterTPs", obj, hash)
+    }
+    
+    if (...length() > 0)
+        obj <- callNextMethod(obj, ..., verbose = FALSE, negate = negate)
+    
+    if (verbose)
+    {
+        newn <- length(obj)
+        printf("Done! Filtered %d (%.2f%%) TPs. Remaining: %d\n", oldn - newn, if (oldn == 0) 0 else (1-(newn/oldn))*100, newn)
+    }
+    
+    return(obj)
+})
+
+
 # NOTE: this function is called by a withProg() block, so handles progression updates
 getTPsCompounds <- function(annTable, parentRow, TPStructParams, extraOptsFMCSR, simSuspSMILES, minRTDiff,
                             minFitFormula, minFitCompound, minSimSusp, minFitCompOrSimSusp, parallel)

@@ -10,7 +10,7 @@ setMethod("initialize", "transformationProductsAnnComp",
 
 # NOTE: this function is called by a withProg() block, so handles progression updates
 getTPsCompounds <- function(annTable, parentRow, TPStructParams, extraOptsFMCSR, simSuspSMILES, minRTDiff,
-                            minFitFormula, minFitCompound, minSimSusp, parallel)
+                            minFitFormula, minFitCompound, minSimSusp, minFitCompOrSimSusp, parallel)
 {
     tab <- copy(annTable)
     setnames(tab, "neutral_formula", "formula")
@@ -39,8 +39,9 @@ getTPsCompounds <- function(annTable, parentRow, TPStructParams, extraOptsFMCSR,
     {
         compFits <- do.call(calcStructFitFMCS, c(list(parentRow$SMILES, tab$SMILES, parallel), extraOptsFMCSR))
         tab[SMILES %chin% names(compFits), fitCompound := compFits[SMILES]]
+        tab <- tab[numGTE(fitCompound, minFitCompound)]
         
-        if (!is.null(simSuspSMILES) && length(simSuspSMILES) > 0)
+        if (nrow(tab) >0 && !is.null(simSuspSMILES) && length(simSuspSMILES) > 0)
         {
             tab[, c("simSusp", "simSuspSMILES") := rbindlist(doApply("lapply", parallel, SMILES, function(SMI)
             {
@@ -49,11 +50,12 @@ getTPsCompounds <- function(annTable, parentRow, TPStructParams, extraOptsFMCSR,
                 wh <- which.max(dists)
                 return(list(dists[wh], simSuspSMILES[wh]))
             }, prog = FALSE))]
+            tab <- tab[numGTE(NAToZero(simSusp), minSimSusp)]
         }
         else
             tab[, c("simSusp", "simSuspSMILES") := .(NA_real_, NA_character_)]
 
-        tab <- tab[numGTE(fitCompound, minFitCompound) | numGTE(NAToZero(simSusp), minSimSusp)]
+        tab <- tab[numGTE(fitCompound, minFitCompOrSimSusp[1]) | numGTE(NAToZero(simSusp), minFitCompOrSimSusp[2])]
         tab[, TP_score := pmax(fitCompound, NAToZero(simSusp)) + NAToZero(annSim)]
     }
     else
@@ -72,9 +74,9 @@ getTPsCompounds <- function(annTable, parentRow, TPStructParams, extraOptsFMCSR,
 
 #' @export
 generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, fGroupsComps = NULL, minRTDiff = 0, minFitFormula = 0,
-                               minFitCompound = 0, minSimSusp = 0, extraOptsFMCSR = NULL, skipInvalid = TRUE,
-                               prefCalcChemProps = TRUE, neutralChemProps = FALSE,
-                               TPStructParams = getDefTPStructParams(), parallel = TRUE)
+                               minFitCompound = 0, minSimSusp = 0, minFitCompoundOrSimSusp = c(0, 0),
+                               extraOptsFMCSR = NULL, skipInvalid = TRUE, prefCalcChemProps = TRUE,
+                               neutralChemProps = FALSE, TPStructParams = getDefTPStructParams(), parallel = TRUE)
 {
     # UNDONE: support >1 generations? Probably not really worthwhile...
     # UNDONE: doc that FP params are also used for suspSim
@@ -94,8 +96,9 @@ generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, fGroupsComps =
     checkmate::assertClass(TPsRef, "transformationProductsStructure", null.ok = TRUE, add = ac)
     checkmate::assertClass(fGroupsComps, "featureGroups", null.ok = TRUE, add = ac)
     checkmate::assertNumber(minRTDiff, lower = 0, finite = TRUE, null.ok = TRUE, add = add)
-    aapply(checkmate::assertNumber, . ~ minFitFormula + minFitCompound + minSimSusp, finite = TRUE,
+    aapply(checkmate::assertNumber, . ~ minFitFormula + minFitCompound + minSimSusp, lower = 0, finite = TRUE,
            fixed = list(add = ac))
+    checkmate::assertNumeric(minFitCompoundOrSimSusp, lower = 0, finite = TRUE, len = 2, add = ac)
     checkmate::assertList(extraOptsFMCSR, null.ok = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + neutralChemProps + parallel,
            fixed = list(add = ac))
@@ -148,7 +151,8 @@ generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, fGroupsComps =
         names(parsSplit) <- parentsTab$name
         
         baseHash <- makeHash(compounds, TPsRef, fGroupsComps, minRTDiff, minFitFormula, minFitCompound, minSimSusp,
-                             extraOptsFMCSR, skipInvalid, prefCalcChemProps, neutralChemProps, TPStructParams)
+                             minFitCompoundOrSimSusp, extraOptsFMCSR, skipInvalid, prefCalcChemProps, neutralChemProps,
+                             TPStructParams)
         setHash <- makeHash(parentsTab, baseHash)
         cachedSet <- loadCacheSet("TPsAnnComp", setHash, cacheDB)
         hashes <- sapply(parsSplit, function(par) makeHash(baseHash, par[, c("name", "SMILES", "formula")],
@@ -171,7 +175,7 @@ generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, fGroupsComps =
             {
                 sss <- if (!is.null(TPsRef) && !is.null(TPsRef[[par$name]])) TPsRef[[par$name]]$SMILES else NULL
                 nr <- getTPsCompounds(annTable, par, TPStructParams, extraOptsFMCSR, sss, minRTDiff, minFitFormula,
-                                      minFitCompound, minSimSusp, parallel)
+                                      minFitCompound, minSimSusp, minFitCompoundOrSimSusp, parallel)
                 saveCacheData("TPsAnnComp", nr, hashes[[par$name]], cacheDB)
                 return(nr)
             }, simplify = FALSE))

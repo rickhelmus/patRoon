@@ -647,8 +647,7 @@ getBinnedPLPair <- function(MSPeakLists, groupNames, analyses, MSLevel, specSimP
             {
                 if (is.null(PLP))
                 {
-                    emptyPL <- emptyMSPeakList(if (is.null(analyses)) "fgroup_abundance" else "feat_abundance",
-                                               if (is.null(analyses)) "feat_abundance" else NULL)
+                    emptyPL <- emptyMSPeakList(NULL, NULL)
                     emptyPL[, c("ID", "mergedBy") := character()]
                     setcolorder(emptyPL, "ID")
                     return(emptyPL)
@@ -656,6 +655,7 @@ getBinnedPLPair <- function(MSPeakLists, groupNames, analyses, MSLevel, specSimP
                 sp <- PLP$specs[[1]]
                 sp[, mergedBy := uniqueName]
                 sp[, intensity := intensity / max(intensity)]
+                sp <- removeDTColumnsIfPresent(sp, c("fgroup_abundance", "feat_abundance"))
                 return(sp)
             }
             return(list(spec1 = dummySpec(PLP1), spec2 = dummySpec(PLP2)))

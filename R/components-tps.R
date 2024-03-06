@@ -73,8 +73,8 @@ genTPAnnSimilarities <- function(parentFG, TPFGs, MSPeakLists, formulas, compoun
     annPLParent <- getAllAnnPLs(parentFG)
     
     if (is.null(annPLParent))
-        return(list(fragmentMatches = rep(NA_integer_, length(TPFGs)),
-                    neutralLossMatches = rep(NA_integer_, length(TPFGs))))
+        return(list(totalFragmentMatches = rep(NA_integer_, length(TPFGs)),
+                    totalNeutralLossMatches = rep(NA_integer_, length(TPFGs))))
     
     parentFrags <- unique(annPLParent$ion_formula); parentNLs <- unique(annPLParent$neutral_loss)
     annPLTPs <- lapply(TPFGs, getAllAnnPLs)
@@ -91,8 +91,8 @@ genTPAnnSimilarities <- function(parentFG, TPFGs, MSPeakLists, formulas, compoun
         return(sum(unique(ann$neutral_loss) %chin% parentNLs))
     })
     
-    return(list(fragmentMatches = fragMatches,
-                neutralLossMatches = NLMatches))
+    return(list(totalFragmentMatches = fragMatches,
+                totalNeutralLossMatches = NLMatches))
 }
 
 getTPComponCandidatesScr <- function(prods, TPGroups, MSPeakLists, formulas, compounds, parFG, parFormula, parIK)
@@ -139,7 +139,7 @@ getTPComponCandidatesScr <- function(prods, TPGroups, MSPeakLists, formulas, com
         
         if (!is.null(parFragNLs) && nrow(parFragNLs) > 0)
         {
-            tab[, c("fragMatches", "NLMatches") := {
+            tab[, c("fragmentMatches", "neutralLossMatches") := {
                 fragNLs <- getFragNLs(TPGroups[.I], if (hasIK) NAToNULL(InChIKey) else NULL,
                                       if (hasForm) NAToNULL(formula) else NULL)
                 if (!is.null(fragNLs) && nrow(fragNLs) > 0)
@@ -508,8 +508,8 @@ setMethod("filter", "componentsTPs", function(obj, ..., retDirMatch = FALSE,
             ct <- minColFilter(ct, "specSimilarity", minSpecSim)
             ct <- minColFilter(ct, "specSimilarityPrec", minSpecSimPrec)
             ct <- minColFilter(ct, "specSimilarityBoth", minSpecSimBoth)
-            ct <- minColFilter(ct, "fragmentMatches", minFragMatches)
-            ct <- minColFilter(ct, "neutralLossMatches", minNLMatches)
+            ct <- minColFilter(ct, "totalFragmentMatches", minFragMatches)
+            ct <- minColFilter(ct, "totalNeutralLossMatches", minNLMatches)
             
             if (!is.null(formulas))
             {
@@ -653,16 +653,16 @@ setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked = TRUE, width =
 #'   data using the \code{"precursor"} and \code{"both"} method, respectively (see \link[=specSimParams]{MS spectral
 #'   similarity parameters} for more details).
 #'
-#'   \item \code{fragmentMatches} The number of MS/MS fragment formula annotations that overlap between the TP and
+#'   \item \code{totalFragmentMatches} The number of MS/MS fragment formula annotations that overlap between the TP and
 #'   parent. If both the \code{formulas} and \code{compounds} arguments are specified then the annotation data is pooled
 #'   prior to calculation. Note that only unique matches are counted. Furthermore, note that annotations from \emph{all}
-#'   candidates are considered, even if the formula/structure of the parent/TP is known. Hence, \code{fragmentMatches}
+#'   candidates are considered, even if the formula/structure of the parent/TP is known. Hence, \code{totalFragmentMatches}
 #'   is mainly useful when little or no chemical information is known on the parents/TPs, \emph{i.e.}, when
 #'   \code{TPs=NULL} or originates from \code{\link{generateTPsLogic}}. Since annotations for all candidates are used,
 #'   it is highly recommended that the annotation objects are first processed with the \code{\link{filter}} method, for
 #'   instance, to select only the top ranked candidates.
 #'
-#'   \item \code{neutralLossMatches} As \code{fragmentMatches}, but counting overlapping neutral loss formulae.
+#'   \item \code{totalNeutralLossMatches} As \code{totalFragmentMatches}, but counting overlapping neutral loss formulae.
 #'
 #'   \item \code{retDir} The retention time direction of the TP relative to its parent. See Details in
 #'   \link{componentsTPs}. If TP data was specified, the expected direction is stored in \code{TP_retDir}.
@@ -768,7 +768,7 @@ setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroups
                         # calculate per set spectrum similarities
                         sims <- genTPAnnSimilarities(parentFG, cmp$group, unsetMSPeakLists[[s]], unsetFormulas[[s]],
                                                      unsetCompounds[[s]])
-                        annColNames <- paste0(c("fragmentMatches", "neutralLossMatches"), "-", s)
+                        annColNames <- paste0(c("totalFragmentMatches", "totalNeutralLossMatches"), "-", s)
                         cmp[, (annColNames) := sims]
                     }
                 }

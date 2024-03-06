@@ -188,7 +188,7 @@ reportHTMLUtils$methods(
         {
             if (grepl("^specSimilarity", col))
                 set(tab, j = col, value = round(tab[[col]], 2))
-            else if (col %chin% c("fragmentMatches", "neutralLossMatches"))
+            else if (col %chin% c("totalFragmentMatches", "totalNeutralLossMatches"))
                 set(tab, j = col, value = round(tab[[col]], 0))
             else if (col != "cmpID")
                 set(tab, j = col, value = NULL)

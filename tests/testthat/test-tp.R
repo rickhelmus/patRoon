@@ -347,7 +347,7 @@ test_that("TP componentization", {
     
     checkmate::expect_names(names(as.data.table(componTPsAnn)), must.include = c("specSimilarity", "specSimilarityPrec",
                                                                                  "specSimilarityBoth",
-                                                                                 "fragmentMatches",
+                                                                                 "totalFragmentMatches",
                                                                                  "neutralLossMatches"))
     checkmate::expect_names(names(as.data.table(componTPsAnnPL)), must.include = c("specSimilarity", "specSimilarityPrec",
                                                                                    "specSimilarityBoth"))
@@ -398,12 +398,12 @@ test_that("TP component usage", {
     expect_gte(getMinCompTblVal(filter(componTPsAnn, minSpecSim = 0.2), "specSimilarity"), 0.2)
     expect_gte(getMinCompTblVal(filter(componTPsAnn, minSpecSimPrec = 0.2), "specSimilarityPrec"), 0.2)
     expect_gte(getMinCompTblVal(filter(componTPsAnn, minSpecSimBoth = 0.2), "specSimilarityBoth"), 0.2)
-    expect_gte(getMinCompTblVal(filter(componTPsAnn, minFragMatches = 2), "fragmentMatches"), 2)
-    expect_gte(getMinCompTblVal(filter(componTPsAnn, minNLMatches = 2), "neutralLossMatches"), 2)
+    expect_gte(getMinCompTblVal(filter(componTPsAnn, minFragMatches = 2), "totalFragmentMatches"), 2)
+    expect_gte(getMinCompTblVal(filter(componTPsAnn, minNLMatches = 2), "totalNeutralLossMatches"), 2)
     
     expect_lt(getMaxCompTblVal(filter(componTPsAnn, minSpecSim = 0.2, negate = TRUE), "specSimilarity"), 0.2)
     expect_lt(getMaxCompTblVal(filter(componTPsAnn, minSpecSimPrec = 0.2, negate = TRUE), "specSimilarityPrec"), 0.2)
     expect_lt(getMaxCompTblVal(filter(componTPsAnn, minSpecSimBoth = 0.3, negate = TRUE), "specSimilarityBoth"), 0.3)
-    expect_lt(getMaxCompTblVal(filter(componTPsAnn, minFragMatches = 2, negate = TRUE), "fragmentMatches"), 2)
-    expect_lt(getMaxCompTblVal(filter(componTPsAnn, minNLMatches = 4, negate = TRUE), "neutralLossMatches"), 4)
+    expect_lt(getMaxCompTblVal(filter(componTPsAnn, minFragMatches = 2, negate = TRUE), "totalFragmentMatches"), 2)
+    expect_lt(getMaxCompTblVal(filter(componTPsAnn, minNLMatches = 4, negate = TRUE), "totalNeutralLossMatches"), 4)
 })

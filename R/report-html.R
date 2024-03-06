@@ -99,7 +99,7 @@ reportHTMLUtils$methods(
     hasComponentInfo = function() hasComponents() && !hasComponentsIntClust() && !hasComponentsSpecClust(),
     hasComponentsTPs = function() hasObj("components") && inherits(objects$components, "componentsTPs"),
     hasComponentsFromTPs = function() hasComponentsTPs() && objects$components@fromTPs,
-    hasTPSims = function() hasComponentsTPs() && any(c("specSimilarity", "fragmentMatches") %in% names(as.data.table(objects$components))),
+    hasTPSims = function() hasComponentsTPs() && any(c("specSimilarity", "totalFragmentMatches") %in% names(as.data.table(objects$components))),
     hasTPs = function() !is.null(objects[["TPs"]]) && hasComponentsTPs(),
     hasTPGraphs = function() hasTPs() && inherits(objects$TPs, c("transformationProductsStructure", "transformationProductsFormula")) && settings$TPs$graphs,
     hasMSPL = function() hasObj("MSPeakLists"),

@@ -167,7 +167,7 @@ doPlotTPGraph <- function(TPTab, parents, cmpTab, structuresMax, prune, onlyComp
     if (!is.null(cmpTab))
     {
         TPTab <- TPTab[parent %chin% cmpTab$parent_name] # omit missing root parents
-        TPTab[, present := name_orig %chin% cmpTab$TP_name]
+        TPTab[, present := name_orig %chin% cmpTab$candidate_name]
         
         TPTab[, childPresent := FALSE]
         markChildPresent <- function(TPNames)

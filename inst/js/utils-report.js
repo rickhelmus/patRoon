@@ -222,7 +222,7 @@ function updateFeatTabRowSel(rowValues, rowIndex)
         if (document.getElementById('suspAnnTab'))
             Reactable.setFilter('suspAnnTab', 'suspID', rowValues.susp_name + '-' + rowValues.group);
         if (document.getElementById('similarityTab'))
-            Reactable.setFilter('similarityTab', 'cmpID', rowValues.component + '-' + rowValues.cmpIndex);
+            Reactable.setFilter('similarityTab', 'cmpID', rowValues.component + '-' + rowValues.group);
         
         showTPGraph(rowValues.component);
     }

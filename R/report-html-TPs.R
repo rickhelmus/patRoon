@@ -10,8 +10,11 @@ genHTMLReportPlotsTPs <- function(fGroups, components, MSPeakLists, formulas, co
     
     scr <- if (isScreening(fGroups)) screenInfo(fGroups) else NULL
     
+    cmpTabSplit <- split(as.data.table(components, candidates = TRUE), by = "name")
+    cInfoSplit <- split(componentInfo(components), seq_len(length(components)))
+
     cat("Generate TP similarity plots...\n")
-    return(doApply("Map", parallel, names(components), componentTable(components), split(componentInfo(components), seq_len(length(components))), f = function(cmpName, cmpTab, cmpInfoRow)
+    return(doApply("Map", parallel, names(components), cmpTabSplit, cInfoSplit, f = function(cmpName, cmpTab, cmpInfoRow)
     {
         ret <- mapply(split(cmpTab, seq_len(nrow(cmpTab))), seq_len(nrow(cmpTab)), FUN = function(ctRow, ctInd)
         {
@@ -20,31 +23,30 @@ genHTMLReportPlotsTPs <- function(fGroups, components, MSPeakLists, formulas, co
             
             # try to plot a mirror spectrum: use compounds if possible, otherwise try formulas or finally peak lists
             plSpecArgs <- list()
-            
-            if (isScreening(fGroups))
+            if (!is.null(compounds) && !is.null(cmpInfoRow[["parent_InChIKey"]]) && !is.null(ctRow[["InChIKey"]]) &&
+                all(c(cmpInfoRow$parent_group, ctRow$group) %chin% groupNames(compounds)))
             {
-                scrParRow <- scr[name == cmpInfoRow$parent_name & group == cmpInfoRow$parent_group]
-                scrTPRow <- scr[name == ctRow$TP_name & group == ctRow$group]
-                if (!is.null(compounds) && !is.null(scr[["compRank"]]) &&
-                    all(c(cmpInfoRow$parent_group, ctRow$group) %chin% groupNames(compounds)) &&
-                    nrow(scrTPRow) == 1 && !is.na(scrParRow$compRank) && !is.na(scrTPRow$compRank))
+                pwh <- match(getIKBlock1(cmpInfoRow$parent_InChIKey), compounds[[cmpInfoRow$parent_group]]$UID)
+                tpwh <- match(getIKBlock1(ctRow$InChIKey), compounds[[ctRow$group]]$UID)
+                if (!is.na(pwh) && !is.na(tpwh))
                 {
-                    plSpecArgs <- list(obj = compounds, formulas = formulas,
-                                       index = c(scrParRow$compRank, scrTPRow$compRank), MSPeakLists = MSPeakLists,
-                                       plotStruct = FALSE)
-                }
-                else if (!is.null(formulas) && !is.null(scr[["formRank"]]) &&
-                         all(c(cmpInfoRow$parent_group, ctRow$group) %chin% groupNames(formulas)) &&
-                         nrow(scrTPRow) == 1 && !is.na(scrParRow$formRank) && !is.na(scrTPRow$formRank) &&
-                         !is.null(MSPeakLists[[cmpInfoRow$parent_group]][["MSMS"]]) &&
-                         !is.null(MSPeakLists[[ctRow$group]][["MSMS"]]))
-                {
-                    plSpecArgs <- list(obj = formulas,
-                                       index = c(scrParRow$formRank, scrTPRow$formRank),
-                                       MSPeakLists = MSPeakLists)
+                    plSpecArgs <- list(obj = compounds, formulas = formulas, index = c(pwh, tpwh),
+                                       MSPeakLists = MSPeakLists, plotStruct = FALSE)
                 }
             }
             
+            if (length(plSpecArgs) == 0 && !is.null(formulas) && !is.null(cmpInfoRow[["parent_formula"]]) &&
+                !is.null(ctRow[["formula"]]) &&
+                all(c(cmpInfoRow$parent_group, ctRow$group) %chin% groupNames(formulas)) &&
+                !is.null(MSPeakLists[[cmpInfoRow$parent_group]][["MSMS"]]) &&
+                !is.null(MSPeakLists[[ctRow$group]][["MSMS"]]))
+            {
+                pwh <- match(cmpInfoRow$parent_formula, formulas[[cmpInfoRow$parent_group]]$UID)
+                tpwh <- match(ctRow$formula, formulas[[ctRow$group]]$UID)
+                if (!is.na(pwh) && !is.na(tpwh))
+                    plSpecArgs <- list(obj = formulas, index = c(pwh, tpwh), MSPeakLists = MSPeakLists)
+            }
+
             if (length(plSpecArgs) == 0 && !is.null(MSPeakLists[[cmpInfoRow$parent_group]][["MSMS"]]) &&
                 !is.null(MSPeakLists[[ctRow$group]][["MSMS"]]))
             {
@@ -76,18 +78,18 @@ reportHTMLUtils$methods(
         tabTPsFeat <- getFGTable(objects$fGroups, if (fromTPs) NULL else ",", settings$features$retMin,
                                  settings$features$aggregateConcs, settings$features$aggregateTox)
         
-        tabCompon <- as.data.table(objects$components)
+        tabCompon <- as.data.table(objects$components, candidates = TRUE)
         tabCompon <- tabCompon[parent_group %chin% names(objects$fGroups)]
         tabCompon <- subsetDTColumnsIfPresent(tabCompon, c("name", "parent_name", "parent_group", "group", "TP_retDir",
-                                                           "TP_name", "retDir", "retDiff", "mzDiff", "formulaDiff",
+                                                           "candidate_name", "retDir", "retDiff", "mzDiff", "formulaDiff",
                                                            "specSimilarity", "mergedBy"))
         tabCompon[, cmpIndex := seq_len(.N), by = "name"]
         
         if (fromTPs)
         {
-            tabTPs <- merge(tabCompon, tabTPsFeat, by.x = c("group", "TP_name"), by.y = c("group", "susp_name"),
+            tabTPs <- merge(tabCompon, tabTPsFeat, by.x = c("group", "candidate_name"), by.y = c("group", "susp_name"),
                             sort = FALSE)
-            setnames(tabTPs, c("name", "TP_name", "parent_name"),
+            setnames(tabTPs, c("name", "candidate_name", "parent_name"),
                      c("component", "susp_name", "parent_susp_name"), skip_absent = TRUE)
         }
         else
@@ -136,7 +138,7 @@ reportHTMLUtils$methods(
         groupDefs <- getFGGroupDefs(tabTPs, groupBy, rgs)
         # squeeze in TP column
         groupDefs <- c(groupDefs[1:2],
-                       list(reactable::colGroup("TP", columns = intersect(c("TP_name", "retDiff", "mzDiff",
+                       list(reactable::colGroup("TP", columns = intersect(c("candidate_name", "retDiff", "mzDiff",
                                                                             "formulaDiff", "retDir",
                                                                             "specSimilarity", "mergedBy"),
                                                                           names(tabTPs)),
@@ -159,8 +161,8 @@ reportHTMLUtils$methods(
         colDefs$TP_retDir <- reactable::colDef(show = FALSE)
         
         # these are grouped
-        if (!is.null(tabTPs[["TP_name"]]))
-            colDefs$TP_name <- reactable::colDef("name")
+        if (!is.null(tabTPs[["candidate_name"]]))
+            colDefs$candidate_name <- reactable::colDef("name")
         colDefs$retDiff <- reactable::colDef(name = "\U0394 ret")
         colDefs$mzDiff <- reactable::colDef(name = "\U0394 mz")
         if (!is.null(tabTPs[["formulaDiff"]]))
@@ -180,7 +182,7 @@ reportHTMLUtils$methods(
     genTPSimTable = function()
     {
         tab <- as.data.table(objects$components)
-        tab[, cmpID := paste0(name[1], "-", seq_len(.N)), by = "name"] # make unique IDs
+        tab[, cmpID := paste0(name, "-", group)] # make unique IDs
         tab[, name := NULL]
         cols <- data.table::copy(names(tab))
         

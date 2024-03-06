@@ -339,12 +339,12 @@ TPsDT <- rbindlist(Map(cTable, seq_along(cTable), names(cTable), f = function(cm
         }
     }
     
-    if (any(grepl("^(specSimilarity|fragmentMatches|neutralLossMatches)", names(cmp))))
+    if (any(grepl("^(specSimilarity|totalFragmentMatches|totalNeutralLossMatches)", names(cmp))))
     {
         ret[, similarity := sapply(splitCmp, function(cr)
         {
             simt <- makeTPTab(cr, c("specSimilarity", "specSimilarityPrec", "specSimilarityBoth",
-                                    "fragmentMatches", "neutralLossMatches"))
+                                    "totalFragmentMatches", "totalNeutralLossMatches"))
             return(simt)
         })]
     }

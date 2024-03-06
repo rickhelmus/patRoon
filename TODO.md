@@ -39,7 +39,9 @@
 - TP components
     - update patRoonInst for new deps?
     - further limit candidate columns? Can get quite excessive
-        
+    - update filter for candidate specific frag/NL matches
+    - report()
+        - report also candidate specific frag/NL matches? Or either?
 
 - tests
     - IDL filter
@@ -49,6 +51,8 @@
     - delete() for screening
         - check if SOs are properly synced
         - test if k=NA works
+    - TP components
+        - filter for candidate specific frag/NL matches
     
 - docs
     - specSimParams --> specSimParamsMatch
@@ -104,6 +108,7 @@
     - generateComponentsTPs()
         - new args
         - as.data.table candidates arg
+        - candidate specific frag/NL matches
     - generateTPs()
         - ann_comp/ann_form algos
         - forceCalcRetDir: only relevant for library atm, clearly mention its use in genTPsLib docs
@@ -163,7 +168,7 @@
     - generateComponentsTPs()
         - new args
         - as.data.table candidates arg
-        - changes due to TPComponParams
+        - candidate specific frag/NL matches
     - generateTPs()
         - consistent "logP" naming, also for compounds
         - consistent calculation and configuration of logP/retDir calculation for all TP structure algos

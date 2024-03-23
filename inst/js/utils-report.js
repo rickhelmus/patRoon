@@ -28,7 +28,7 @@ function getSelFGTableElement()
 }
 
 function getNavTab(which)
-{
+{return undefined; // UNDONE
     // HACK: the following functions work their way up from a child element to the relevant parent, since it seems no
     // class or ID can be set for bslib::nav_tab_card()
 
@@ -59,9 +59,9 @@ function getNavTab(which)
     return el;
 }
 
-function setDetailsRatio(fr1, fr2)
+function setDetailsTablesRatio(fr1, fr2)
 {
-    let el = document.getElementById("detailsLayout");
+    let el = document.getElementById("detailsTablesLayout");
     el.style["grid-template-rows"] = `${fr1}fr ${fr2}fr`;
 }
 
@@ -71,7 +71,8 @@ function updateView(sel)
     getFGTableElements().forEach(el => el.style.display = (el.id === tid) ? "" : "none");
     document.getElementById("fg-expand").style.display = (sel !== "Plain") ? "" : "none";
     
-    document.getElementsByClassName("bottomLayout")[0].style["grid-template-columns"] = (sel === "Plain") ? "1fr" : "1fr 2fr";
+    // UNDONE
+    // document.getElementsByClassName("bottomLayout")[0].style["grid-template-columns"] = (sel === "Plain") ? "1fr" : "1fr 2fr";
     
     getViews().forEach(function(v)
     {
@@ -99,8 +100,20 @@ function updateView(sel)
             }
         }
     }
+    
     if (getViews().includes("TPs") && document.getElementById("similarity_spec"))
         showFeatureTab("Parent similarity", sel === "TPs");
+    
+    let tpc = document.getElementById("TPCandidatesCard");
+    if (tpc)
+    {
+        // NOTE: we need to toggle the visibility of wrapped containers for cards!
+        tpc.parentElement.classList.toggle("d-none", sel !== "TPs");
+        document.getElementById("parentCard").parentElement.classList.toggle("d-none", sel !== "TPs");
+        document.getElementById("detailsTopRowLayout").style["grid-template-columns"] = (sel === "TPs") ? "1fr 1fr" : "1fr";
+    }
+    
+    document.getElementById("detailsLayout").style["grid-template-columns"] = (sel === "TPs") ? "1fr 5fr" : "1fr";
     
     const r = Reactable.getInstance(tid).rowsById[Reactable.getState(tid).meta.selectedRow];
     updateFeatTabRowSel(r.values, r.index);
@@ -212,8 +225,9 @@ function updateFeatTabRowSel(rowValues, rowIndex)
         {
             document.getElementById('struct_view-parent').src = reportPlots.structs[rowValues.parent_susp_InChIKey] || "";
             Reactable.setFilter('parentInfoTab', 'name', rowValues.parent_susp_name);
-            document.getElementById('struct_view-tp').src = reportPlots.structs[rowValues.susp_InChIKey] || "";
-            Reactable.setFilter('TPInfoTab', 'name', rowValues.susp_name);
+            // UNDONE: move to separate tab
+            /*document.getElementById('struct_view-tp').src = reportPlots.structs[rowValues.susp_InChIKey] || "";
+            Reactable.setFilter('TPInfoTab', 'name', rowValues.susp_name);*/
         }
         
         if (Object.keys(reportPlots.TPs).length > 0)
@@ -251,6 +265,18 @@ function showFeatQualityCols(show)
 {
     const cols = Reactable.getState("featuresTab").meta.featQualCols;
     cols.forEach(col => Reactable.toggleHideColumn("featuresTab", col, !show));
+}
+
+function advanceTPCompon(dir)
+{
+    // based on https://stackoverflow.com/a/11556996
+    let el = document.getElementById("TPCompon-select");
+    let newIndex = el.selectedIndex + dir;
+    if (newIndex < 0)
+        newIndex = el.options.length - 1;
+    else if (newIndex >= el.options.length)
+        newIndex = 0;
+    el.options[newIndex].selected = true;
 }
 
 function showTPGraph(cmp)

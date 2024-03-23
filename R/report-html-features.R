@@ -64,10 +64,6 @@ getFGTable <- function(fGroups, colSusp, retMin, concAggrParams, toxAggrParams)
     return(tab)
 }
 
-getFGColSepStyle <- function() list(borderLeft = "1px solid DarkGrey")
-
-getFGColGrpStartCols <- function(groupDefs) sapply(groupDefs[-1], function(col) col$columns[1])
-
 featGroupTabHasSusps <- function(tab) !is.null(tab[["susp_d_mz"]]) # HACK: this column should always be there if there are (non-collapsed) suspect results
 
 getFeatGroupColDefs <- function(tab)
@@ -120,7 +116,7 @@ getFeatGroupColDefs <- function(tab)
 
 getFGGroupDefs <- function(tab, groupBy, rgs)
 {
-    colSepStyle <- getFGColSepStyle()
+    colSepStyle <- getMainReactColSepStyle()
     hasSusp <- featGroupTabHasSusps(tab)
     isGrouped <- !is.null(groupBy)
     featScoreNames <- intersect(featureQualityNames(scores = TRUE), names(tab))
@@ -163,10 +159,6 @@ makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, setting
         }
         return(gd)
     }
-
-    # sync column order
-    tab <- copy(tab)
-    setcolorder(tab, unlist(lapply(groupDefs, "[[", "columns")))
     
     if (settings$features$chromatograms$small || settings$features$chromatograms$large)
     {
@@ -243,40 +235,6 @@ makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, setting
         colDefs[c("hasMSMS", "hasFormulas", "hasCompounds")] <- list(reactable::colDef(show = FALSE))
     }
     
-    
-    colSepStyle <- getFGColSepStyle()
-    grpStartCols <- getFGColGrpStartCols(groupDefs)
-    
-    bgstyle <- htmlwidgets::JS(sprintf("function(rowInfo, column, state)
-{
-    let ret = { }
-    const gby = state.groupBy;
-    if (gby.length !== 0)
-    {
-        if (rowInfo.level === 0)
-        {
-            ret.background = 'lightcyan';
-            //ret.color = 'white';
-        }
-        else if (gby.length > 1 && rowInfo.level === 1 && column.id !== gby[0])
-            ret.background = '#f7ffff';
-    }
-    
-    if ([ %s ].includes(column.id))
-        ret.borderLeft = '%s';
-
-    return ret;
-}", paste0("'", grpStartCols, "'", collapse = ","), colSepStyle))
-    
-    for (col in grpStartCols)
-        colDefs[[col]]$headerStyle <- colSepStyle
-    
-    colDefs <- lapply(colDefs, function(cd)
-    {
-        cd$style <- bgstyle
-        return(cd)
-    })
-    
     groupCols <- lapply(groupDefs, "[[", "columns")
     names(groupCols) <- sapply(groupDefs, "[[", "name")
     colToggles <- list(
@@ -287,40 +245,12 @@ makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, setting
         chrom_large = "chrom_large"
     )
     
-    colDefs <- setReactNumRangeFilters(id, tab, colDefs)
-    
-    onClick = htmlwidgets::JS("function(rowInfo, column)
-{
-    updateFeatTabRowSel(rowInfo.values, rowInfo.index);
-}")
-    
     CSVCols <- setdiff(names(tab), c("chrom_small", "chrom_large", "annotations", "hasMSMS", "hasFormulas",
                                      "hasCompounds"))
     
-    headThemeStyle <- list(padding = "2px 4px")
-    rt <- makeReactable(tab, id, highlight = TRUE, onClick = onClick, defaultExpanded = TRUE, columns = colDefs,
-                        defaultColDef = reactable::colDef(style = bgstyle), columnGroups = groupDefs,
-                        filterable = FALSE, pagination = TRUE,
-                        theme = reactable::reactableTheme(headerStyle = headThemeStyle,
-                                                          groupHeaderStyle = headThemeStyle,
-                                                          cellPadding = "2px 4px"),
-                        meta = list(selectedRow = 0, colToggles = colToggles, CSVCols = CSVCols),
-                        rowStyle = htmlwidgets::JS("function(rowInfo, state)
-{
-    const sel = state.meta.selectedRow;
-    let ret = { cursor: 'pointer' };
-    if (sel != null && rowInfo != undefined && rowInfo.index === sel)
-    {
-        ret.background = '#eee';
-        ret.fontWeight = 'bold';
-    }
-    return ret;
-}"), ...)
-    
-    if (!visible)
-        rt <- htmlwidgets::onRender(rt, htmlwidgets::JS("function(el, x) { el.style.display = 'none'; }"))
-    
-    return(rt)
+    return(makeMainResultsReactable(tab = tab, id = id, colDefs = colDefs, groupDefs = groupDefs,
+                                    visible = visible, updateRowFunc = "updateFeatTabRowSel",
+                                    meta = list(colToggles = colToggles, CSVCols = CSVCols), ...))
 }
 
 genHTMLReportPlotsChromsLarge <- function(fGroups, settings, outPath, EICs, EICParams, parallel)

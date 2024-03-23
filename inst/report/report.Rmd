@@ -11,9 +11,16 @@ output:
         theme:
             version: 5
             bootswatch: cerulean
+            card-spacer-x: 0.5px
             card-spacer-y: 0.5px
             zindex-modal-backdrop: 1070
             zindex-modal: 1075
+            accordion-body-padding-x: 0
+            accordion-body-padding-y: 0
+            accordion-button-padding-x: 1.25em
+            accordion-button-padding-y: 0.2em
+            nav-link-padding-x: 0.5rem
+            nav-link-padding-y: 0.25rem
         includes:
             before_body: modal.html
 ---
@@ -27,6 +34,10 @@ knitr::opts_chunk$set(echo = FALSE, fig.keep = "all", fig.retina = 1, dpi = 72)
 /* mitigate margin-top introduced by upcoming bslib */
 .section.level1, .section.level2 {
     margin-top: 0;
+}
+
+.btn-sm, .btn-group-sm>.btn {
+    --bs-btn-padding-y: 0.10em;
 }
 
 pre, code {

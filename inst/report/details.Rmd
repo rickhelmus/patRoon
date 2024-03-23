@@ -45,324 +45,414 @@ doSelParent <- utils$hasComponentsTPs() && (settings$features$chromatograms$larg
 mdprintf("Generating report parts: ")
 
 bslib::layout_column_wrap(
-    id = "detailsLayout",
     width = 1,
     height = "100%",
-    style = "padding-bottom: 10px; padding-right: 10px; grid-template-rows: 1fr 1fr;",
-    bslib::card(
-        full_screen = TRUE,
-        bslib::card_header("Feature groups"),
-        bsCardBodyNoFill(
-            class = "mt-2",
-            htmltools::withTags({
-                callIncl(div, class = "pb-1",
-                    label("for" = "view-select", "View"),
-                    callIncl(select, name = "view", id = "view-select", onChange = "updateView(this.value)",
-                           style = list("margin-right" = "10px", "margin-top" = " 3px"),
-                           option(value = "Plain", "Plain"),
-                           maybeIncl(utils$hasSuspects(), option(value = "Suspects", "Suspects")),
-                           maybeIncl(utils$hasInternalStandards(), option(value = "ISTDs", "Internal standards")),
-                           maybeIncl(utils$hasComponents(), option(value = "Components", "Components")),
-                           maybeIncl(utils$hasComponentsTPs(), option(value = "TPs", "Transformation products"))
-                    ),
+    gap = 0,
+    style = "padding-bottom: 5px; padding-right: 5px; grid-template-rows: auto 1fr;",
+    
+    htmltools::withTags({
+        div(class = "pb-1",
+            label("for" = "view-select", "View"),
+            callIncl(select, name = "view", id = "view-select", onChange = "updateView(this.value)",
+                     style = list("margin-right" = "10px", "margin-top" = "3px"),
+                     option(value = "Plain", "Plain"),
+                     maybeIncl(utils$hasSuspects(), option(value = "Suspects", "Suspects")),
+                     maybeIncl(utils$hasInternalStandards(), option(value = "ISTDs", "Internal standards")),
+                     maybeIncl(utils$hasComponents(), option(value = "Components", "Components")),
+                     maybeIncl(utils$hasComponentsTPs(), option(value = "TPs", "Transformation products"))
+            ),
+            div(class = "float-right",
+                div(class = "btn-group btn-group-sm mx-1", role = "group", "aria-label" = "ratio group",
+                    input(type = "radio", class = "btn-check", name = "ratiobtn", id = "ratio21",
+                          autocomplete = "off", onChange = 'setDetailsTablesRatio(2, 1)'),
+                    label(class = "btn btn-outline-primary", "for" = "ratio21", "2:1"),
+                    input(type = "radio", class = "btn-check", name = "ratiobtn", id = "ratio32",
+                          autocomplete = "off", onChange = 'setDetailsTablesRatio(3, 2)'),
+                    label(class = "btn btn-outline-primary", "for" = "ratio32", "3:2"),
+                    input(type = "radio", class = "btn-check", name = "ratiobtn", id = "ratio11",
+                          autocomplete = "off", onChange = 'setDetailsTablesRatio(1, 1)', checked = TRUE),
+                    label(class = "btn btn-outline-primary", "for" = "ratio11", "1:1"),
+                    input(type = "radio", class = "btn-check", name = "ratiobtn", id = "ratio23",
+                          autocomplete = "off", onChange = 'setDetailsTablesRatio(2, 3)'),
+                    label(class = "btn btn-outline-primary", "for" = "ratio23", "2:3"),
+                    input(type = "radio", class = "btn-check", name = "ratiobtn", id = "ratio12",
+                          autocomplete = "off", onChange = 'setDetailsTablesRatio(1, 2)'),
+                    label(class = "btn btn-outline-primary", "for" = "ratio12", "1:2")
+                ),
+            )
+        )
+    }),
+    
+    callIncl(bslib::layout_column_wrap,
+        id = "detailsLayout",
+        style = "grid-template-columns: 1fr 5fr;",
+        heights_equal = "row",
+        gap = 5,
 
-                    input(type = "checkbox", id = "fg-cols-info", onChange = 'showFGCols("group", this.checked)',
-                          checked = TRUE),
-                    label("for" = "fg-cols-info", "Group info"),
-                    input(type = "checkbox", id = "fg-cols-int", onChange = 'showFGCols("intensities", this.checked)',
-                          checked = TRUE),
-                    label("for" = "fg-cols-int", "Intensities"),
-                    maybeIncl(utils$hasConcs(), input(type = "checkbox", id = "fg-cols-concs",
-                                                      onChange = 'showFGCols("concentrations", this.checked)',
-                                                      checked = TRUE)),
-                    maybeIncl(utils$hasConcs(), label("for" = "fg-cols-concs", "Concentrations")),
-                    maybeIncl(utils$hasFQualities(), input(type = "checkbox", id = "fg-cols-qual",
-                                                           onChange = 'showFGCols("qualities", this.checked)')),
-                    maybeIncl(utils$hasFQualities(), label("for" = "fg-cols-qual", "Quality scores")),
-                    maybeIncl(settings$features$chromatograms$large, input(type = "checkbox", id = "fg-large-chroms",
-                                                                  onChange = 'showFGCols("chrom_large", this.checked)')),
-                    maybeIncl(settings$features$chromatograms$large, label("for" = "fg-large-chroms", "Large chromatograms")),
-                    input(type = "checkbox", id = "fg-filter", onChange = 'toggleFGFilters(this.checked)'),
-                    label("for" = "fg-filter", style = list("margin-right" = "10px"), "Filters"),
-                    
-                    button(type = "button", class = "btn btn-primary btn-sm",
-                           onClick = "downloadCSV(getSelFGTableElement(), 'featureGroups.csv')", "Download CSV"),
-                    button(type = "button", class = "btn btn-primary btn-sm", id = "fg-expand",
-                           onClick = "Reactable.toggleAllRowsExpanded(getSelFGTableElement())",
-                           style = list(display = "none"), "Expand/collapse"),
-                    
-                    div(class = "float-right",
-                        label("for" = "fg-search", "Search"),
-                        input(type = "text", id = "fg-search", oninput="Reactable.setSearch(getSelFGTableElement(), this.value)"),
-                        
-                        div(class = "btn-group btn-group-sm mx-1", role = "group", "aria-label" = "ratio group",
-                            input(type = "radio", class = "btn-check", name = "ratiobtn", id = "ratio21",
-                                  autocomplete = "off", onChange = 'setDetailsRatio(2, 1)'),
-                            label(class = "btn btn-outline-primary", "for" = "ratio21", "2:1"),
-                            input(type = "radio", class = "btn-check", name = "ratiobtn", id = "ratio32",
-                                  autocomplete = "off", onChange = 'setDetailsRatio(3, 2)'),
-                            label(class = "btn btn-outline-primary", "for" = "ratio32", "3:2"),
-                            input(type = "radio", class = "btn-check", name = "ratiobtn", id = "ratio11",
-                                  autocomplete = "off", onChange = 'setDetailsRatio(1, 1)', checked = TRUE),
-                            label(class = "btn btn-outline-primary", "for" = "ratio11", "1:1"),
-                            input(type = "radio", class = "btn-check", name = "ratiobtn", id = "ratio23",
-                                  autocomplete = "off", onChange = 'setDetailsRatio(2, 3)'),
-                            label(class = "btn btn-outline-primary", "for" = "ratio23", "2:3"),
-                            input(type = "radio", class = "btn-check", name = "ratiobtn", id = "ratio12",
-                                  autocomplete = "off", onChange = 'setDetailsRatio(1, 2)'),
-                            label(class = "btn btn-outline-primary", "for" = "ratio12", "1:2")
+        maybeIncl(utils$hasComponentsTPs(), bslib::card(
+            id = "parentCard",
+            bslib::card_header("Parent"),
+            bsCardBodyNoFill(
+                htmltools::withTags({
+                    div(
+                        style = "display: flex;",
+                        select(name = "TPCompon", id = "TPCompon-select", #onChange = "updateView(this.value)",
+                               style = "min-width: 0;",
+                               lapply(utils$getTPComponNames(), function(n) option(value = n, n))),
+
+                        div(class = "btn-group btn-group-sm mx-1", role = "group", "aria-label" = "advance TP compon group",
+                            style = "align-self: flex-start;",
+                            button(type = "button", class = "btn btn-light btn-sm", onClick = "advanceTPCompon(-1)",
+                                   bsicons::bs_icon("caret-left-fill")),
+                            button(type = "button", class = "btn btn-light btn-sm", onClick = "advanceTPCompon(1)",
+                                   bsicons::bs_icon("caret-right-fill"))
                         ),
                     )
-                )
-            })
-        ),
-        callIncl(bslib::card_body_fill,
-            utils$genFGTablePlain(),
-            maybeIncl(utils$hasSuspects(), utils$genFGTableSuspects()),
-            maybeIncl(utils$hasInternalStandards(), utils$genFGTableISTDs()),
-            maybeIncl(utils$hasComponents(), utils$genFGTableComponents()),
-            maybeIncl(utils$hasComponentsTPs(), utils$genFGTableTPs())
-        ),
-    ),
-    callIncl(bslib::layout_column_wrap,
-        fixed = list(width = NULL),
-        style = htmltools::css(grid_template_columns = "1fr 2fr"),
-        heights_equal = "row",
-        class = "bottomLayout",
-        maybeIncl(utils$hasSuspects(), bslib::navs_tab_card(
-            title = "Selected suspect",
-            full_screen = TRUE,
-            bslib::nav(
-                "Suspect",
-                bsCardBodyNoFill(
-                    class = "propTabAndImg pt-2",
-                    utils$genSuspInfoTable("suspInfoTab"),
-                    htmltools::img(id = "struct_view-suspect", style = "min-width: 20%;")
-                )
+                })
             ),
+
+            bslib::card_body(
+                padding = 0,
+                callIncl(bslib::accordion,
+                         maybeIncl(settings$features$chromatograms$large, bslib::accordion_panel(
+                             "Chromatogram",
+                             bslib::card_body_fill(htmltools::img(id = "chrom_view-tp"))
+                         )),
+                         maybeIncl(utils$hasComponentsFromTPs(), bslib::accordion_panel(
+                             "Structure",
+                             bsCardBodyNoFill(
+                                 htmltools::img(id = "struct_view-parent", style = "min-width: 20%;")
+                             ),
+                         )),
+                         maybeIncl(utils$hasComponentsFromTPs(), bslib::accordion_panel(
+                             "Screening",
+                             bsCardBodyNoFill(
+                                 utils$genSuspInfoTable("parentInfoTab"),
+                             ),
+                         )),
+                         maybeIncl(settings$features$intensityPlots, bslib::accordion_panel(
+                             "Intensities",
+                             class = "mt-2",
+                             bslib::card_body_fill(htmltools::img(id = "int_plot-parent"))
+                         )),
+                         maybeIncl(utils$hasTPGraphs() && utils$hasComponentsFromTPs(), bslib::accordion_panel(
+                             "Transformations",
+                             bslib::card(
+                                 full_screen = TRUE,
+                                 style = "margin-bottom: 0px;",
+                                 bslib::card_body(height = "200px", utils$genTPGraphs())
+                             )
+                         ))
+                )
+            )
         )),
-        maybeIncl(utils$hasInternalStandards(), bslib::navs_tab_card(
-            title = "Selected internal standard",
-            full_screen = TRUE,
-            bslib::nav(
-                "Internal standard",
-                bsCardBodyNoFill(
-                    class = "propTabAndImg pt-2",
-                    utils$genISTDInfoTable(),
-                    htmltools::img(id = "struct_view-istd", style = "min-width: 20%;")
-                )
+
+        bslib::layout_column_wrap(
+            id = "detailsTablesLayout",
+            width = 1,
+            style = "grid-template-rows: 1fr 1fr;",
+            gap = 5,
+            callIncl(bslib::layout_column_wrap,
+                     fixed = list(width = NULL),
+                     style = "grid-template-columns: 1fr;",
+                     id = "detailsTopRowLayout",
+                     gap = 5,
+                     heights_equal = "row",
+                     bslib::card(
+                         full_screen = TRUE,
+                         bslib::card_header("Feature groups"),
+                         bsCardBodyNoFill(
+                             class = "mt-2",
+                             htmltools::withTags({
+                                 callIncl(div, class = "pb-1",
+                                          input(type = "checkbox", id = "fg-cols-info", onChange = 'showFGCols("group", this.checked)',
+                                                checked = TRUE),
+                                          label("for" = "fg-cols-info", "Group info"),
+                                          input(type = "checkbox", id = "fg-cols-int", onChange = 'showFGCols("intensities", this.checked)',
+                                                checked = TRUE),
+                                          label("for" = "fg-cols-int", "Intensities"),
+                                          maybeIncl(utils$hasConcs(), input(type = "checkbox", id = "fg-cols-concs",
+                                                                            onChange = 'showFGCols("concentrations", this.checked)',
+                                                                            checked = TRUE)),
+                                          maybeIncl(utils$hasConcs(), label("for" = "fg-cols-concs", "Concentrations")),
+                                          maybeIncl(utils$hasFQualities(), input(type = "checkbox", id = "fg-cols-qual",
+                                                                                 onChange = 'showFGCols("qualities", this.checked)')),
+                                          maybeIncl(utils$hasFQualities(), label("for" = "fg-cols-qual", "Quality scores")),
+                                          maybeIncl(settings$features$chromatograms$large, input(type = "checkbox", id = "fg-large-chroms",
+                                                                                                 onChange = 'showFGCols("chrom_large", this.checked)')),
+                                          maybeIncl(settings$features$chromatograms$large, label("for" = "fg-large-chroms", "Large chromatograms")),
+                                          input(type = "checkbox", id = "fg-filter", onChange = 'toggleFGFilters(this.checked)'),
+                                          label("for" = "fg-filter", style = list("margin-right" = "10px"), "Filters"),
+                                          
+                                          button(type = "button", class = "btn btn-primary btn-sm",
+                                                 onClick = "downloadCSV(getSelFGTableElement(), 'featureGroups.csv')", "Download CSV"),
+                                          button(type = "button", class = "btn btn-primary btn-sm", id = "fg-expand",
+                                                 onClick = "Reactable.toggleAllRowsExpanded(getSelFGTableElement())",
+                                                 style = list(display = "none"), "Expand/collapse"),
+
+                                          div(class = "float-right",
+                                              label("for" = "fg-search", "Search"),
+                                              input(type = "text", id = "fg-search", oninput="Reactable.setSearch(getSelFGTableElement(), this.value)"),
+                                          )
+                                 )
+                             })
+                         ),
+                         callIncl(bslib::card_body_fill,
+                                  utils$genFGTablePlain(),
+                                  maybeIncl(utils$hasSuspects(), utils$genFGTableSuspects()),
+                                  maybeIncl(utils$hasInternalStandards(), utils$genFGTableISTDs()),
+                                  maybeIncl(utils$hasComponents(), utils$genFGTableComponents()),
+                                  maybeIncl(utils$hasComponentsTPs(), utils$genFGTableTPs())
+                         )
+                     ),
+                     
+                     maybeIncl(utils$hasComponentsTPs(), bslib::card(
+                         full_screen = TRUE,
+                         id = "TPCandidatesCard",
+                         bslib::card_header("TP candidates"),
+                         bslib::card_body_fill(utils$genTPCandidatesTable())
+                     ))
             ),
-        )),
-        maybeIncl(utils$hasComponents(), callIncl(bslib::navs_tab_card,
-            title = "Selected component",
-            full_screen = TRUE,
-            bslib::nav(
-                "Chromatogram",
-                bslib::card_body_fill(htmltools::img(id = "chrom_view-component"))
-            ),
-            bslib::nav(
-                "Spectrum",
-                bslib::card_body_fill(htmltools::img(id = "spectrum_view-component"))
-            ),
-            maybeIncl(utils$hasComponentsIntClust(), bslib::nav(
-                "Profile",
-                bslib::card_body_fill(
-                    htmltools::img(id = "profileRel_view-component"),
-                    htmltools::img(id = "profileAbs_view-component")
-                )
-            )),
-            maybeIncl(utils$hasComponentInfo(), bslib::nav(
-                "Component info",
-                bsCardBodyNoFill(
-                    class = "pt-2",
-                    utils$genComponentInfoTable(),
-                )
+            callIncl(bslib::layout_column_wrap,
+                     fixed = list(width = NULL),
+                     # style = htmltools::css(grid_template_columns = "1fr 2fr"),
+                     heights_equal = "row",
+                     class = "bottomLayout",
+                     # maybeIncl(utils$hasSuspects(), bslib::navs_tab_card(
+                     #     title = "Selected suspect",
+                     #     full_screen = TRUE,
+                     #     bslib::nav(
+                     #         "Suspect",
+                     #         bsCardBodyNoFill(
+                     #             class = "propTabAndImg pt-2",
+                     #             utils$genSuspInfoTable("suspInfoTab"),
+                     #             htmltools::img(id = "struct_view-suspect", style = "min-width: 20%;")
+                     #         )
+                     #     ),
+                     # )),
+                     # maybeIncl(utils$hasInternalStandards(), bslib::navs_tab_card(
+                     #     title = "Selected internal standard",
+                     #     full_screen = TRUE,
+                     #     bslib::nav(
+                     #         "Internal standard",
+                     #         bsCardBodyNoFill(
+                     #             class = "propTabAndImg pt-2",
+                     #             utils$genISTDInfoTable(),
+                     #             htmltools::img(id = "struct_view-istd", style = "min-width: 20%;")
+                     #         )
+                     #     ),
+                     # )),
+                     # maybeIncl(utils$hasComponents(), callIncl(bslib::navs_tab_card,
+                     #     title = "Selected component",
+                     #     full_screen = TRUE,
+                     #     bslib::nav(
+                     #         "Chromatogram",
+                     #         bslib::card_body_fill(htmltools::img(id = "chrom_view-component"))
+                     #     ),
+                     #     bslib::nav(
+                     #         "Spectrum",
+                     #         bslib::card_body_fill(htmltools::img(id = "spectrum_view-component"))
+                     #     ),
+                     #     maybeIncl(utils$hasComponentsIntClust(), bslib::nav(
+                     #         "Profile",
+                     #         bslib::card_body_fill(
+                     #             htmltools::img(id = "profileRel_view-component"),
+                     #             htmltools::img(id = "profileAbs_view-component")
+                     #         )
+                     #     )),
+                     #     maybeIncl(utils$hasComponentInfo(), bslib::nav(
+                     #         "Component info",
+                     #         bsCardBodyNoFill(
+                     #             class = "pt-2",
+                     #             utils$genComponentInfoTable(),
+                     #         )
+                     #     ))
+                     # )),
+                     # maybeIncl(doSelParent, callIncl(bslib::navs_tab_card,
+                     #     title = "Selected parent",
+                     #     full_screen = TRUE,
+                     #     maybeIncl(settings$features$chromatograms$large, bslib::nav(
+                     #         "Chromatogram",
+                     #         bslib::card_body_fill(htmltools::img(id = "chrom_view-tp"))
+                     #     )),
+                     #     maybeIncl(utils$hasComponentsFromTPs(), bslib::nav(
+                     #         "Suspects",
+                     #         bsCardBodyNoFill(class = "mx-auto", htmltools::strong("Parent")),
+                     #         bsCardBodyNoFill(
+                     #             class = "propTabAndImg",
+                     #             utils$genSuspInfoTable("parentInfoTab"),
+                     #             htmltools::img(id = "struct_view-parent", style = "min-width: 20%;")
+                     #         ),
+                     #         bsCardBodyNoFill(class = "mx-auto", htmltools::strong("Transformation product")),
+                     #         bsCardBodyNoFill(
+                     #             class = "propTabAndImg",
+                     #             utils$genSuspInfoTable("TPInfoTab"),
+                     #             htmltools::img(id = "struct_view-tp", style = "min-width: 20%;")
+                     #         )
+                     #     )),
+                     #     maybeIncl(settings$features$intensityPlots, bslib::nav(
+                     #         "Intensities",
+                     #         class = "mt-2",
+                     #         bslib::card_body_fill(htmltools::img(id = "int_plot-parent"))
+                     #     )),
+                     #     maybeIncl(utils$hasTPGraphs() && utils$hasComponentsFromTPs(), bslib::nav(
+                     #         "Transformations",
+                     #         bslib::card_body_fill(utils$genTPGraphs())
+                     #     ))
+                     # )),
+                     callIncl(bslib::navs_tab_card,
+                              title = "Selection data",
+                              id = "fGroupSelTabs",
+                              full_screen = TRUE,
+                              bslib::nav(
+                                  "Features",
+                                  bsCardBodyNoFill(
+                                      class = "mt-2",
+                                      htmltools::withTags({
+                                          callIncl(div, class = "pb-1",
+                                                   label("for" = "features-groupBy", "Group by"),
+                                                   callIncl(select, id = "features-groupBy", onChange = "Reactable.setGroupBy('featuresTab', [ this.value ])",
+                                                            style = list("margin-right" = "10px", "margin-top" = " 3px"),
+                                                            option(value = "", "None"),
+                                                            option(value = "rGroup", "Replicate group"),
+                                                            maybeIncl(utils$hasSets(), option(value = "set", "Set"))
+                                                   ),
+
+                                                   maybeIncl(utils$hasFQualities(), input(type = "checkbox", id = "features-cols-qual",
+                                                                                          onChange = 'showFeatQualityCols(this.checked)')),
+                                                   maybeIncl(utils$hasFQualities(), label("for" = "features-cols-qual", "Quality scores")),
+                                                   input(type = "checkbox", id = "features-filter", onChange = 'toggleFeatFilters(this.checked)'),
+                                                   label("for" = "features-filter", style = list("margin-right" = "10px"), "Filters"),
+
+                                                   button(type = "button", class = "btn btn-primary btn-sm",
+                                                          onClick = "downloadCSV('featuresTab', 'features.csv')", "Download CSV"),
+                                                   button(type = "button", class = "btn btn-primary btn-sm", id = "feat-expand",
+                                                          onClick = "Reactable.toggleAllRowsExpanded('featuresTab')", "Expand/collapse")
+                                          )
+                                      })
+                                  ),
+                                  bslib::card_body_fill(utils$genFeaturesTable())
+                              ),
+                              maybeIncl(utils$hasConcs(), bslib::nav(
+                                  "Concentrations",
+                                  bsCardBodyNoFill(
+                                      class = "mt-2",
+                                      htmltools::withTags({
+                                          div(class = "pb-1",
+                                              input(type = "checkbox", id = "concs-filter", onChange = 'toggleConcsFilters(this.checked)'),
+                                              label("for" = "concs-filter", style = list("margin-right" = "10px"), "Filters"),
+                                              button(type = "button", class = "btn btn-primary btn-sm",
+                                                     onClick = "downloadCSV('concsTab', 'concentrations.csv')", "Download CSV")
+                                          )
+                                      })
+                                  ),
+                                  bslib::card_body_fill(utils$genConcsTable())
+                              )),
+                              maybeIncl(utils$hasTox(), bslib::nav(
+                                  "Toxicities",
+                                  bsCardBodyNoFill(
+                                      class = "mt-2",
+                                      htmltools::withTags({
+                                          div(class = "pb-1",
+                                              input(type = "checkbox", id = "tox-filter", onChange = 'toggleToxFilters(this.checked)'),
+                                              label("for" = "tox-filter", style = list("margin-right" = "10px"), "Filters"),
+                                              button(type = "button", class = "btn btn-primary btn-sm",
+                                                     onClick = "downloadCSV('toxTab', 'toxicities.csv')", "Download CSV")
+                                          )
+                                      })
+                                  ),
+                                  bslib::card_body_fill(utils$genToxTable())
+                              )),
+                              maybeIncl(settings$features$intensityPlots, bslib::nav(
+                                  "Intensities",
+                                  class = "mt-2",
+                                  bslib::card_body_fill(htmltools::img(id = "int_plot"))
+                              )),
+                              maybeIncl(utils$hasMSPL(), bslib::nav(
+                                  "MS peak lists",
+                                  callIncl(bsCardBodyNoFill,
+                                           style = "display: grid; grid-template-columns: 1fr 1fr; column-gap: 50px; justify-items:center;",
+                                           htmltools::strong("MS"),
+                                           htmltools::strong("MS/MS"),
+                                           maybeIncl(settings$MSPeakLists$spectra, htmltools::img(id = "spectrumMS", style = "min-width: 20%;")),
+                                           maybeIncl(settings$MSPeakLists$spectra, htmltools::img(id = "spectrumMSMS", style = "min-width: 20%;")),
+                                           utils$genMSPLTable(1),
+                                           utils$genMSPLTable(2)
+                                  )
+                              )),
+                              maybeIncl(utils$hasFormulas(), bslib::nav(
+                                  "Formulas",
+                                  bsCardBodyNoFill(
+                                      class = "mt-2",
+                                      htmltools::withTags({
+                                          div(class = "pb-1",
+                                              input(type = "checkbox", id = "formulas-filter", onChange = 'toggleFormFilters(this.checked)'),
+                                              label("for" = "formulas-filter", style = list("margin-right" = "10px"), "Filters"),
+                                              input(type = "checkbox", id = "formulas-susp_only", onChange = 'toggleAnnOnlySusp("formulas", this.checked)'),
+                                              label("for" = "formulas-susp_only", "Suspect only"),
+                                              button(type = "button", class = "btn btn-primary btn-sm",
+                                                     onClick = "downloadCSV('formulasTab', 'formulas.csv')", "Download CSV"),
+                                              button(type = "button", class = "btn btn-primary btn-sm", id = "form-expand",
+                                                     onClick = "Reactable.toggleAllRowsExpanded('formulasTab')", "Expand/collapse"),
+                                          )
+                                      })
+                                  ),
+                                  bslib::card_body_fill(utils$genFormulasTable())
+                              )),
+                              maybeIncl(utils$hasCompounds(), bslib::nav(
+                                  "Compounds",
+                                  bsCardBodyNoFill(
+                                      class = "mt-2",
+                                      htmltools::withTags({
+                                          div(class = "pb-1",
+                                              label("for" = "compounds-groupBy", "Group by"),
+                                              select(id = "compounds-groupBy", onChange = "Reactable.setGroupBy('compoundsTab', [ this.value ])",
+                                                     style = list("margin-right" = "10px", "margin-top" = " 3px"),
+                                                     option(value = "", "None"),
+                                                     option(value = "neutral_formula", "Formula")
+                                              ),
+
+                                              input(type = "checkbox", id = "compounds-filter", onChange = 'toggleCompFilters(this.checked)'),
+                                              label("for" = "compounds-filter", "Filters"),
+                                              input(type = "checkbox", id = "compounds-susp_only", onChange = 'toggleAnnOnlySusp("compounds", this.checked)'),
+                                              label("for" = "compounds-susp_only", "Suspect only"),
+
+                                              button(type = "button", class = "btn btn-primary btn-sm ms-2",
+                                                     onClick = "downloadCSV('compoundsTab', 'compounds.csv')", "Download CSV"),
+                                              button(type = "button", class = "btn btn-primary btn-sm", id = "comp-expand",
+                                                     onClick = "Reactable.toggleAllRowsExpanded('compoundsTab')", "Expand/collapse"),
+
+                                              a(class = "ms-2", id = "openMF", target = "_blank", "MetFrag Web"),
+                                          )
+                                      })
+                                  ),
+                                  bslib::card_body_fill(utils$genCompoundsTable())
+                              )),
+                              maybeIncl(utils$hasCompsCluster(), bslib::nav(
+                                  "Compounds clusters",
+                                  bslib::card_body_fill(
+                                      htmltools::img(id = "comps_cluster-dendro"),
+                                      utils$genCompClustsImgs()
+                                  )
+                              )),
+                              maybeIncl(utils$hasSuspAnn(), bslib::nav(
+                                  "Suspect annotation",
+                                  bslib::card_body_fill(
+                                      htmltools::div(style = "margin: 20px;", utils$genSuspAnnTable())
+                                  )
+                              )),
+                              maybeIncl(utils$hasTPSims(), bslib::nav(
+                                  "Parent similarity",
+                                  bsCardBodyNoFill(
+                                      class = "parentSim",
+                                      utils$genTPSimTable(),
+                                      # hide img if image is unavailable: https://stackoverflow.com/a/22051972
+                                      htmltools::img(id = "similarity_spec", style = "display: none;",
+                                                     onerror = "this.style.display='none'")
+                                  )
+                              ))
+                     )
             ))
-        )),
-        maybeIncl(doSelParent, callIncl(bslib::navs_tab_card,
-            title = "Selected parent",
-            full_screen = TRUE,
-            maybeIncl(settings$features$chromatograms$large, bslib::nav(
-                "Chromatogram",
-                bslib::card_body_fill(htmltools::img(id = "chrom_view-tp"))
-            )),
-            maybeIncl(utils$hasComponentsFromTPs(), bslib::nav(
-                "Suspects",
-                bsCardBodyNoFill(class = "mx-auto", htmltools::strong("Parent")),
-                bsCardBodyNoFill(
-                    class = "propTabAndImg",
-                    utils$genSuspInfoTable("parentInfoTab"),
-                    htmltools::img(id = "struct_view-parent", style = "min-width: 20%;")
-                ),
-                bsCardBodyNoFill(class = "mx-auto", htmltools::strong("Transformation product")),
-                bsCardBodyNoFill(
-                    class = "propTabAndImg",
-                    utils$genSuspInfoTable("TPInfoTab"),
-                    htmltools::img(id = "struct_view-tp", style = "min-width: 20%;")
-                )
-            )),
-            maybeIncl(settings$features$intensityPlots, bslib::nav(
-                "Intensities",
-                class = "mt-2",
-                bslib::card_body_fill(htmltools::img(id = "int_plot-parent"))
-            )),
-            maybeIncl(utils$hasTPGraphs() && utils$hasComponentsFromTPs(), bslib::nav(
-                "Transformations",
-                bslib::card_body_fill(utils$genTPGraphs())
-            ))
-        )),
-        callIncl(bslib::navs_tab_card,
-            title = "Selected feature group",
-            id = "fGroupSelTabs",
-            full_screen = TRUE,
-            bslib::nav(
-                "Features",
-                bsCardBodyNoFill(
-                    class = "mt-2",
-                    htmltools::withTags({
-                        callIncl(div, class = "pb-1",
-                            label("for" = "features-groupBy", "Group by"),
-                            callIncl(select, id = "features-groupBy", onChange = "Reactable.setGroupBy('featuresTab', [ this.value ])",
-                                     style = list("margin-right" = "10px", "margin-top" = " 3px"),
-                                     option(value = "", "None"),
-                                     option(value = "rGroup", "Replicate group"),
-                                     maybeIncl(utils$hasSets(), option(value = "set", "Set"))
-                            ),
-                            
-                            maybeIncl(utils$hasFQualities(), input(type = "checkbox", id = "features-cols-qual",
-                                                                   onChange = 'showFeatQualityCols(this.checked)')),
-                            maybeIncl(utils$hasFQualities(), label("for" = "features-cols-qual", "Quality scores")),
-                            input(type = "checkbox", id = "features-filter", onChange = 'toggleFeatFilters(this.checked)'),
-                            label("for" = "features-filter", style = list("margin-right" = "10px"), "Filters"),
-                            
-                            button(type = "button", class = "btn btn-primary btn-sm",
-                                   onClick = "downloadCSV('featuresTab', 'features.csv')", "Download CSV"),
-                            button(type = "button", class = "btn btn-primary btn-sm", id = "feat-expand",
-                                   onClick = "Reactable.toggleAllRowsExpanded('featuresTab')", "Expand/collapse")
-                        )
-                    })
-                ),
-                bslib::card_body_fill(utils$genFeaturesTable())
-            ),
-            maybeIncl(utils$hasConcs(), bslib::nav(
-                "Concentrations",
-                bsCardBodyNoFill(
-                    class = "mt-2",
-                    htmltools::withTags({
-                        div(class = "pb-1",
-                            input(type = "checkbox", id = "concs-filter", onChange = 'toggleConcsFilters(this.checked)'),
-                            label("for" = "concs-filter", style = list("margin-right" = "10px"), "Filters"),
-                            button(type = "button", class = "btn btn-primary btn-sm",
-                                   onClick = "downloadCSV('concsTab', 'concentrations.csv')", "Download CSV")
-                        )
-                    })
-                ),
-                bslib::card_body_fill(utils$genConcsTable())
-            )),
-            maybeIncl(utils$hasTox(), bslib::nav(
-                "Toxicities",
-                bsCardBodyNoFill(
-                    class = "mt-2",
-                    htmltools::withTags({
-                        div(class = "pb-1",
-                            input(type = "checkbox", id = "tox-filter", onChange = 'toggleToxFilters(this.checked)'),
-                            label("for" = "tox-filter", style = list("margin-right" = "10px"), "Filters"),
-                            button(type = "button", class = "btn btn-primary btn-sm",
-                                   onClick = "downloadCSV('toxTab', 'toxicities.csv')", "Download CSV")
-                        )
-                    })
-                ),
-                bslib::card_body_fill(utils$genToxTable())
-            )),
-            maybeIncl(settings$features$intensityPlots, bslib::nav(
-                "Intensities",
-                class = "mt-2",
-                bslib::card_body_fill(htmltools::img(id = "int_plot"))
-            )),
-            maybeIncl(utils$hasMSPL(), bslib::nav(
-                "MS peak lists",
-                callIncl(bsCardBodyNoFill,
-                    style = "display: grid; grid-template-columns: 1fr 1fr; column-gap: 50px; justify-items:center;",
-                    htmltools::strong("MS"),
-                    htmltools::strong("MS/MS"),
-                    maybeIncl(settings$MSPeakLists$spectra, htmltools::img(id = "spectrumMS", style = "min-width: 20%;")),
-                    maybeIncl(settings$MSPeakLists$spectra, htmltools::img(id = "spectrumMSMS", style = "min-width: 20%;")),
-                    utils$genMSPLTable(1),
-                    utils$genMSPLTable(2)
-                )
-            )),
-            maybeIncl(utils$hasFormulas(), bslib::nav(
-                "Formulas",
-                bsCardBodyNoFill(
-                    class = "mt-2",
-                    htmltools::withTags({
-                        div(class = "pb-1",
-                            input(type = "checkbox", id = "formulas-filter", onChange = 'toggleFormFilters(this.checked)'),
-                            label("for" = "formulas-filter", style = list("margin-right" = "10px"), "Filters"),
-                            input(type = "checkbox", id = "formulas-susp_only", onChange = 'toggleAnnOnlySusp("formulas", this.checked)'),
-                            label("for" = "formulas-susp_only", "Suspect only"),
-                            button(type = "button", class = "btn btn-primary btn-sm",
-                                   onClick = "downloadCSV('formulasTab', 'formulas.csv')", "Download CSV"),
-                            button(type = "button", class = "btn btn-primary btn-sm", id = "form-expand",
-                                   onClick = "Reactable.toggleAllRowsExpanded('formulasTab')", "Expand/collapse"),
-                        )
-                    })
-                ),
-                bslib::card_body_fill(utils$genFormulasTable())
-            )),
-            maybeIncl(utils$hasCompounds(), bslib::nav(
-                "Compounds",
-                bsCardBodyNoFill(
-                    class = "mt-2",
-                    htmltools::withTags({
-                        div(class = "pb-1",
-                            label("for" = "compounds-groupBy", "Group by"),
-                            select(id = "compounds-groupBy", onChange = "Reactable.setGroupBy('compoundsTab', [ this.value ])",
-                                   style = list("margin-right" = "10px", "margin-top" = " 3px"),
-                                   option(value = "", "None"),
-                                   option(value = "neutral_formula", "Formula")
-                            ),
-                            
-                            input(type = "checkbox", id = "compounds-filter", onChange = 'toggleCompFilters(this.checked)'),
-                            label("for" = "compounds-filter", "Filters"),
-                            input(type = "checkbox", id = "compounds-susp_only", onChange = 'toggleAnnOnlySusp("compounds", this.checked)'),
-                            label("for" = "compounds-susp_only", "Suspect only"),
-                            
-                            button(type = "button", class = "btn btn-primary btn-sm ms-2",
-                                   onClick = "downloadCSV('compoundsTab', 'compounds.csv')", "Download CSV"),
-                            button(type = "button", class = "btn btn-primary btn-sm", id = "comp-expand",
-                                   onClick = "Reactable.toggleAllRowsExpanded('compoundsTab')", "Expand/collapse"),
-                            
-                            a(class = "ms-2", id = "openMF", target = "_blank", "MetFrag Web"),
-                        )
-                    })
-                ),
-                bslib::card_body_fill(utils$genCompoundsTable())
-            )),
-            maybeIncl(utils$hasCompsCluster(), bslib::nav(
-                "Compounds clusters",
-                bslib::card_body_fill(
-                    htmltools::img(id = "comps_cluster-dendro"),
-                    utils$genCompClustsImgs()
-                )
-            )),
-            maybeIncl(utils$hasSuspAnn(), bslib::nav(
-                "Suspect annotation",
-                bslib::card_body_fill(
-                    htmltools::div(style = "margin: 20px;", utils$genSuspAnnTable())
-                )
-            )),
-            maybeIncl(utils$hasTPSims(), bslib::nav(
-                "Parent similarity",
-                bsCardBodyNoFill(
-                    class = "parentSim",
-                    utils$genTPSimTable(),
-                    # hide img if image is unavailable: https://stackoverflow.com/a/22051972
-                    htmltools::img(id = "similarity_spec", style = "display: none;",
-                                   onerror = "this.style.display='none'")
-                )
-            ))
-        )
     )
 )
 

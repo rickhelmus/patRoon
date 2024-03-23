@@ -71,6 +71,14 @@ genHTMLReportPlotsTPs <- function(fGroups, components, MSPeakLists, formulas, co
 }
 
 reportHTMLUtils$methods(
+    getTPComponNames = function()
+    {
+        if (objects$components@fromTPs)
+            paste0(names(objects$components), " (", componentInfo(objects$components)$parent_name, ")")
+        else
+            names(objects$components)
+    },
+    
     genFGTableTPs = function()
     {
         fromTPs <- objects$components@fromTPs
@@ -178,6 +186,63 @@ reportHTMLUtils$methods(
         makeFGReactable(tabTPs, "detailsTabTPs", FALSE, plots, settings = settings, objects = objects,
                         groupBy = groupBy, colDefs = colDefs, groupDefs = groupDefs)
     },
+    
+    genTPCandidatesTable = function()
+    {
+        # UNDONE: don't call this when !fromTPs
+        
+        candidatesTab <- rbindlist(lapply(componentTable(objects$components), function(cmp)
+        {
+            allc <- rbindlist(cmp$candidates, fill = TRUE, idcol = "groupInd")
+            allc[, group := cmp$group[groupInd]][, groupInd := NULL]
+            return(allc)
+        }), fill = TRUE, idcol = "component")
+        
+        # UNDONE: do this, but elsewhere
+        # tabCompon <- tabCompon[parent_group %chin% names(objects$fGroups)]
+        candidatesTab <- subsetDTColumnsIfPresent(candidatesTab, c("component", "group", "name", "CID", "TP_retDir",
+                                                                   "formula", "formulaDiff", "fragmentMatches",
+                                                                   "neutralLossMatches", "mergedBy", "molNeutralized",
+                                                                   "InChIKey"))
+        
+        # UNDONE: need this?
+        # tabCompon[, cmpIndex := seq_len(.N), by = "name"]
+        
+        scr <- data.table::copy(screenInfo(objects$fGroups))
+        scr <- subsetDTColumnsIfPresent(scr, c("group", "name", "estIDLevel", "d_rt", "d_mz", "sets"))
+        candidatesTab <- merge(candidatesTab, scr, by = c("group", "name"), sort = FALSE)
+
+
+        # add parent intensities & screening info
+        # UNDONE: add this to parent side widget
+        # rgs <- replicateGroups(objects$fGroups)
+        # tabTPsPar <- unique(subsetDTColumnsIfPresent(tabTPsFeat,
+        #                                              c("group", rgs,
+        #                                                paste0("susp_", c("estIDLevel", "d_rt", "d_mz", "sets",
+        #                                                                  "InChIKey")))),
+        #                     by = "group")
+        # setnames(tabTPsPar, paste0("parent_", names(tabTPsPar)))
+        # tabTPs <- merge(tabTPs, tabTPsPar, by = "parent_group", sort = FALSE, all.x = TRUE)
+        
+        colDefs <- list()
+
+        formCell <- function(value) htmltools::span(dangerouslySetInnerHTML = list("__html" = subscriptFormulaHTML(value, charges = FALSE)))
+        if (!is.null(candidatesTab[["formula"]]))
+            colDefs$formula <- reactable::colDef(cell = formCell)
+        if (!is.null(candidatesTab[["formulaDiff"]]))
+            colDefs$formulaDiff <- reactable::colDef(name = "\U0394 formula", cell = formCell)
+        
+        # internally used variables
+        for (col in c("component", "group", "InChIKey"))
+        {
+            if (!is.null(candidatesTab[[col]]))
+                colDefs[[col]] <- reactable::colDef(show = FALSE)
+        }
+        # same for cmpIndex
+        # colDefs$cmpIndex <- reactable::colDef(show = FALSE)
+        
+        makeReactable(candidatesTab, "TPCandidatesTab", filterable = FALSE, pagination = TRUE, columns = colDefs)
+    },
 
     genTPSimTable = function()
     {
@@ -206,7 +271,7 @@ reportHTMLUtils$methods(
         pars <- parents(objects$TPs)
         
         # NOTE: bit less height to avoid scrollbar in card
-        mainArgs <- list(objects$TPs, components = objects$components, width = "100%", height = "97%")
+        mainArgs <- list(objects$TPs, components = objects$components, width = "100%", height = "85%")
         if (inherits(objects$TPs, "transformationProductsStructure"))
             mainArgs <- c(mainArgs, list(structuresMax = settings$TPs$graphStructuresMax))
         

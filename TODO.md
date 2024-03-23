@@ -33,8 +33,11 @@
     - update patRoonInst for new deps?
     - further limit candidate columns? Can get quite excessive
     - update filter for candidate specific frag/NL matches
+    - add set specific frag/NL matches for candidates
+    - sync topMost filter for ann TPs
     - report()
         - report also candidate specific frag/NL matches? Or either?
+        - BUG: JS errors when fGroups are subset/do not contain TPs anymore?
 
 - tests
     - IDL filter

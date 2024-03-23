@@ -1,3 +1,8 @@
+getMainReactColSepStyle <- function() list(borderLeft = "1px solid DarkGrey")
+
+getReactColGrpStartCols <- function(groupDefs) sapply(groupDefs[-1], function(col) col$columns[1])
+
+
 reactSelFilterButton <- function(id, name, target, ocFunc, title)
 {
     htmltools::tags$button(class = "btn btn-secondary btn-sm", "data-bs-toggle" = "modal",
@@ -145,6 +150,69 @@ makePropReactable <- function(tab, id, idcol = FALSE, minPropWidth = 150, minVal
     
     return(makeReactableCompact(tab, id = id, columns = colDefs, ...))
 }
+
+makeMainResultsReactable <- function(tab, id, colDefs, groupDefs, visible, updateRowFunc, meta, ...)
+{
+    # sync column order
+    tab <- copy(tab)
+    setcolorder(tab, unlist(lapply(groupDefs, "[[", "columns")))
+    
+    colSepStyle <- getMainReactColSepStyle()
+    grpStartCols <- getReactColGrpStartCols(groupDefs)
+    
+    bgstyle <- htmlwidgets::JS(sprintf("function(rowInfo, column, state)
+{
+    let ret = { }
+    if ([ %s ].includes(column.id))
+        ret.borderLeft = '%s';
+    return ret;
+}", paste0("'", grpStartCols, "'", collapse = ","), colSepStyle))
+    
+    for (col in grpStartCols)
+        colDefs[[col]]$headerStyle <- colSepStyle
+    
+    colDefs <- lapply(colDefs, function(cd)
+    {
+        cd$style <- bgstyle
+        return(cd)
+    })
+    
+    groupCols <- lapply(groupDefs, "[[", "columns")
+    names(groupCols) <- sapply(groupDefs, "[[", "name")
+
+    colDefs <- setReactNumRangeFilters(id, tab, colDefs)
+    
+    onClick = htmlwidgets::JS(sprintf("function(rowInfo, column)
+{
+    %s(rowInfo.values, rowInfo.index);
+}", updateRowFunc))
+    
+    headThemeStyle <- list(padding = "2px 4px")
+    rt <- makeReactable(tab, id, highlight = TRUE, onClick = onClick, columns = colDefs,
+                        defaultColDef = reactable::colDef(style = bgstyle), columnGroups = groupDefs,
+                        filterable = FALSE, pagination = TRUE,
+                        theme = reactable::reactableTheme(headerStyle = headThemeStyle,
+                                                          groupHeaderStyle = headThemeStyle,
+                                                          cellPadding = "2px 4px"),
+                        meta = modifyList(meta, list(selectedRow = 0)),
+                        rowStyle = htmlwidgets::JS("function(rowInfo, state)
+{
+    const sel = state.meta.selectedRow;
+    let ret = { cursor: 'pointer' };
+    if (sel != null && rowInfo != undefined && rowInfo.index === sel)
+    {
+        ret.background = '#eee';
+        ret.fontWeight = 'bold';
+    }
+    return ret;
+}"), ...)
+    
+    if (!visible)
+        rt <- htmlwidgets::onRender(rt, htmlwidgets::JS("function(el, x) { el.style.display = 'none'; }"))
+    
+    return(rt)
+}
+
 
 getHTMLReportPlotPath <- function(outPath)
 {

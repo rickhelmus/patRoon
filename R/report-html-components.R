@@ -90,7 +90,8 @@ reportHTMLUtils$methods(
         
         cmpGrpCols <- setdiff(names(ctab), c("component", "group"))
         if (length(cmpGrpCols) > 0)
-            groupDefs <- c(groupDefs, list(reactable::colGroup("component", cmpGrpCols, headerStyle = getFGColSepStyle())))
+            groupDefs <- c(groupDefs, list(reactable::colGroup("component", cmpGrpCols,
+                                                               headerStyle = getMainReactColSepStyle())))
         
         makeFGReactable(tab, "detailsTabComponents", colDefs = colDefs, groupDefs = groupDefs, visible = FALSE,
                         plots = plots, settings = settings, objects = objects, groupBy = "component")

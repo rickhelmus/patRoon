@@ -150,7 +150,7 @@ reportHTMLUtils$methods(
                                                                             "formulaDiff", "retDir",
                                                                             "specSimilarity", "mergedBy"),
                                                                           names(tabTPs)),
-                                                headerStyle = getFGColSepStyle())),
+                                                headerStyle = getMainReactColSepStyle())),
                        groupDefs[seq(3, length(groupDefs))])
         
         colDefs <- getFeatGroupColDefs(tabTPs)

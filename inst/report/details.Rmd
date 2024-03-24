@@ -32,6 +32,11 @@ Details
 
 </style>
 
+```{r results='asis',eval=utils$hasComponentsFromTPs()}
+# add TP component parent infos as JS global
+printf("<script>const TPComponParentInfo = JSON.parse('%s');</script>\n", utils$getTPParentInfoJSON())
+```
+
 ##
 
 ```{r, echo = FALSE,eval=TRUE}
@@ -96,9 +101,9 @@ bslib::layout_column_wrap(
                 htmltools::withTags({
                     div(
                         style = "display: flex;",
-                        select(name = "TPCompon", id = "TPCompon-select", #onChange = "updateView(this.value)",
+                        select(name = "TPCompon", id = "TPCompon-select", onChange = "updateTPCompon(this.value)",
                                style = "min-width: 0;",
-                               lapply(utils$getTPComponNames(), function(n) option(value = n, n))),
+                               Map(utils$getTPComponIDs(), utils$getTPComponNames(), f = function(v, n) option(value = v, n))),
 
                         div(class = "btn-group btn-group-sm mx-1", role = "group", "aria-label" = "advance TP compon group",
                             style = "align-self: flex-start;",

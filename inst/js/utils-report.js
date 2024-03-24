@@ -41,7 +41,7 @@ function getNavTab(which)
     {
         // For TPs it's a bit more complicated as all the tabs of the panel are optional
         // NOTE: we don't have to check TP graphs, as struct_view-parent will then always be present
-        el = document.getElementById("chrom_view-tp") ||
+        el = document.getElementById("chrom_view-parent") ||
              document.getElementById("struct_view-parent") ||
              document.getElementById("int_plot-parent");
     }

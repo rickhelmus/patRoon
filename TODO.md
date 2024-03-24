@@ -38,7 +38,6 @@
     - report()
         - report also candidate specific frag/NL matches? Or either?
         - BUG: JS errors when fGroups are subset/do not contain TPs anymore?
-        - BUG: TP graphs are generated for all parents, even if subset
         - report parent properties that used to be in aggregated fields
             - group, intensities, estIDLevel, d_rt, d_mz, sets
             --> skip intensities, add rest to info table?
@@ -176,7 +175,8 @@
         - new ann_form/ann_comp args
         - TPStructParams
         - log P tolerance for retDir calculation
-
+    - report()
+        - fixed: TP graphs were generated for components with absent (parent) fGroups
 
 ## Ext
 

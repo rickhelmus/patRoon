@@ -71,19 +71,28 @@ genHTMLReportPlotsTPs <- function(fGroups, components, MSPeakLists, formulas, co
 }
 
 reportHTMLUtils$methods(
-    getTPComponIDs = function() names(objects$components),
+    getTPComponObj = function()
+    {
+        # remove any data from missing fGroups (i.e. those removed after creating the components)
+        gNames <- names(objects$fGroups)
+        ret <- objects$components[, gNames]
+        ret <- ret[componentInfo(ret)$parent_group %chin% gNames]
+        return(ret)
+    },
+    
+    getTPComponIDs = function() names(getTPComponObj()),
 
     getTPComponNames = function()
     {
         ret <- getTPComponIDs()
         if (objects$components@fromTPs)
-            ret <- paste0(ret, " (", componentInfo(objects$components)$parent_name, ")")
+            ret <- paste0(ret, " (", componentInfo(getTPComponObj())$parent_name, ")")
         return(ret)
     },
 
     getTPParentInfoJSON = function()
     {
-        cInfo <- componentInfo(objects$components)
+        cInfo <- componentInfo(getTPComponObj())
         cInfo <- subsetDTColumnsIfPresent(cInfo, c("name", "parent_name", "parent_group", "parent_InChIKey"))
         setnames(cInfo, c("name", "parent_name", "parent_group", "parent_InChIKey"),
                  c("cmpName", "name", "group", "InChIKey"),
@@ -94,12 +103,12 @@ reportHTMLUtils$methods(
     
     genFGTableTPsOld = function()
     {
-        fromTPs <- objects$components@fromTPs
+        fromTPs <- getTPComponObj()@fromTPs
         
         tabTPsFeat <- getFGTable(objects$fGroups, if (fromTPs) NULL else ",", settings$features$retMin,
                                  settings$features$aggregateConcs, settings$features$aggregateTox)
         
-        tabCompon <- as.data.table(objects$components, candidates = TRUE)
+        tabCompon <- as.data.table(getTPComponObj(), candidates = TRUE)
         tabCompon <- tabCompon[parent_group %chin% names(objects$fGroups)]
         tabCompon <- subsetDTColumnsIfPresent(tabCompon, c("name", "parent_name", "parent_group", "group", "TP_retDir",
                                                            "candidate_name", "retDir", "retDiff", "mzDiff", "formulaDiff",
@@ -205,7 +214,7 @@ reportHTMLUtils$methods(
         tabTPsFeat <- getFGTable(objects$fGroups, ",", settings$features$retMin,
                                  settings$features$aggregateConcs, settings$features$aggregateTox)
         
-        tabCompon <- as.data.table(objects$components)
+        tabCompon <- as.data.table(getTPComponObj())
         tabCompon <- tabCompon[parent_group %chin% names(objects$fGroups)]
         tabCompon <- subsetDTColumnsIfPresent(tabCompon, c("name", "parent_name", "parent_group", "group",
                                                            "retDir", "retDiff", "mzDiff", "specSimilarity"))
@@ -255,15 +264,13 @@ reportHTMLUtils$methods(
     {
         # UNDONE: don't call this when !fromTPs
         
-        candidatesTab <- rbindlist(lapply(componentTable(objects$components), function(cmp)
+        candidatesTab <- rbindlist(lapply(componentTable(getTPComponObj()), function(cmp)
         {
             allc <- rbindlist(cmp$candidates, fill = TRUE, idcol = "groupInd")
             allc[, group := cmp$group[groupInd]][, groupInd := NULL]
             return(allc)
         }), fill = TRUE, idcol = "component")
         
-        # UNDONE: do this, but elsewhere
-        # tabCompon <- tabCompon[parent_group %chin% names(objects$fGroups)]
         candidatesTab <- subsetDTColumnsIfPresent(candidatesTab, c("component", "group", "name", "CID", "TP_retDir",
                                                                    "formula", "formulaDiff", "fragmentMatches",
                                                                    "neutralLossMatches", "mergedBy", "molNeutralized",
@@ -312,7 +319,7 @@ reportHTMLUtils$methods(
 
     genTPSimTable = function()
     {
-        tab <- as.data.table(objects$components)
+        tab <- as.data.table(getTPComponObj())
         tab[, cmpID := paste0(name, "-", group)] # make unique IDs
         tab[, name := NULL]
         cols <- data.table::copy(names(tab))
@@ -333,11 +340,12 @@ reportHTMLUtils$methods(
     
     genTPGraphs = function()
     {
-        cInfo <- componentInfo(objects$components)
+        compObj <- getTPComponObj()
+        cInfo <- componentInfo(compObj)
         pars <- parents(objects$TPs)
         
         # NOTE: bit less height to avoid scrollbar in card
-        mainArgs <- list(objects$TPs, components = objects$components, width = "100%", height = "85%")
+        mainArgs <- list(objects$TPs, components = compObj, width = "100%", height = "85%")
         if (inherits(objects$TPs, "transformationProductsStructure"))
             mainArgs <- c(mainArgs, list(structuresMax = settings$TPs$graphStructuresMax))
         

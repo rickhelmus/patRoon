@@ -257,7 +257,7 @@ function showFeatQualityCols(show)
     cols.forEach(col => Reactable.toggleHideColumn("featuresTab", col, !show));
 }
 
-function updateTPCompon(cmpName)
+function updateTPCompon(cmpName, activateFG = true)
 {
     const chromEl = document.getElementById('chrom_view-parent');
     const intEl = document.getElementById('int_plot-parent');
@@ -278,14 +278,17 @@ function updateTPCompon(cmpName)
     
     showTPGraph(cmpName);
     
-    const tabID = getSelFGTableElement();
-    Reactable.setFilter(tabID, 'component', cmpName);
+    Reactable.setFilter("detailsTabTPs", "component", cmpName);
+
+    if (activateFG)
+    {
+        // activate first row
+        // UNDONE: does this work properly with paging?
+        const data = Array.from(Reactable.getInstance("detailsTabTPs").data);
+        const firstRowInd = data.findIndex(el => el.component === cmpName);
     
-    // activate first row
-    // UNDONE: does this work properly with paging?
-    const data = Array.from(Reactable.getInstance(tabID).data);
-    const firstRowInd = data.findIndex(el => el.component === cmpName);
-    updateFeatTabRowSel(data[firstRowInd], firstRowInd);
+        updateFeatTabRowSel(data[firstRowInd], firstRowInd);
+    }
 }
 
 function advanceTPCompon(dir)
@@ -557,6 +560,10 @@ $(document).ready(function() {
     });
     
     updateView("Plain");
+    
+    let el = document.getElementById("TPCompon-select")
+    if (el)
+        updateTPCompon(el.options[0].value, false);
     
     document.getElementById("filterRangeModal").addEventListener('shown.bs.modal', () => {
         document.getElementById("filtNumMin").focus();

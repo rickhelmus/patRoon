@@ -117,7 +117,6 @@ getFeatGroupColDefs <- function(tab)
 getFGGroupDefs <- function(tab, groupBy, rgs)
 {
     colSepStyle <- getMainReactColSepStyle()
-    hasSusp <- featGroupTabHasSusps(tab)
     isGrouped <- !is.null(groupBy)
     featScoreNames <- intersect(featureQualityNames(scores = TRUE), names(tab))
     concCols <- intersect(c(paste0(rgs, "_conc"), "conc_types"), names(tab))
@@ -130,12 +129,6 @@ getFGGroupDefs <- function(tab, groupBy, rgs)
                                                              grep("^ISTD_assigned", names(tab), value = TRUE)),
                                                            names(tab)),
                             headerStyle = if (isGrouped) colSepStyle else NULL),
-        if (hasSusp) reactable::colGroup("screening",
-                                         columns = intersect(c("susp_d_rt", "susp_d_mz", "susp_estIDLevel", "susp_sets"),
-                                                             names(tab)),
-                                         headerStyle = colSepStyle)
-        # may still be suspects, but collapsed
-        else if (!is.null(tab[["susp_name"]])) reactable::colGroup("suspect", "susp_name", headerStyle = colSepStyle) else NULL,
         reactable::colGroup("intensity", columns = getADTIntCols(rgs), headerStyle = colSepStyle),
         if (length(concCols) > 0) reactable::colGroup("concentrations", columns = concCols, headerStyle = colSepStyle) else NULL,
         if (!is.null(tab[["LC50"]])) reactable::colGroup("toxicity", columns = c("LC50", "LC50_types"),
@@ -144,6 +137,15 @@ getFGGroupDefs <- function(tab, groupBy, rgs)
                                                             headerStyle = colSepStyle) else NULL
     )))
 }
+
+getScrGroupDefs <- function(tab)
+{
+    suspCols <- intersect(c("susp_name", "susp_d_rt", "susp_d_mz", "susp_estIDLevel", "susp_sets"), names(tab))
+    return(list(
+        reactable::colGroup("screening", columns = suspCols, headerStyle = getMainReactColSepStyle())
+    ))
+}
+
 
 makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, settings, objects, ...)
 {

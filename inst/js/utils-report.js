@@ -209,23 +209,6 @@ function updateFeatTabRowSel(rowValues, rowIndex)
     }
     else if (tabEl === "detailsTabTPs")
     {
-        const chromEl = document.getElementById('chrom_view-tp');
-        const intEl = document.getElementById('int_plot-parent');
-        
-        if (chromEl)
-            chromEl.src = reportPlots.chromsLarge[rowValues.parent_group];
-        if (intEl)
-            intEl.src = reportPlots.intPlots[rowValues.parent_group];
-        
-        if (document.getElementById('parentInfoTab'))
-        {
-            document.getElementById('struct_view-parent').src = reportPlots.structs[rowValues.parent_susp_InChIKey] || "";
-            Reactable.setFilter('parentInfoTab', 'name', rowValues.parent_susp_name);
-            // UNDONE: move to separate tab
-            /*document.getElementById('struct_view-tp').src = reportPlots.structs[rowValues.susp_InChIKey] || "";
-            Reactable.setFilter('TPInfoTab', 'name', rowValues.susp_name);*/
-        }
-        
         if (Object.keys(reportPlots.TPs).length > 0)
         {
             const specSimEl = document.getElementById('similarity_spec');
@@ -233,13 +216,24 @@ function updateFeatTabRowSel(rowValues, rowIndex)
             specSimEl.style.display = ''; // may have been hidden if a previous img didn't exist
         }
         
+        Reactable.setFilter('TPCandidatesTab', 'component', rowValues.component);
+        Reactable.setFilter('TPCandidatesTab', 'group', rowValues.group);
+        // activate first row
+        // UNDONE: does this work properly with paging?
+        const TPCandInstData = Array.from(Reactable.getInstance("TPCandidatesTab").data);
+        const firstRowInd = TPCandInstData.findIndex(el => el.component === rowValues.component && el.group === rowValues.group);
+        updateTPCandTabRowSel(TPCandInstData[firstRowInd], firstRowInd);
+        
         if (document.getElementById('suspAnnTab'))
             Reactable.setFilter('suspAnnTab', 'suspID', rowValues.susp_name + '-' + rowValues.group);
         if (document.getElementById('similarityTab'))
             Reactable.setFilter('similarityTab', 'cmpID', rowValues.component + '-' + rowValues.group);
-        
-        showTPGraph(rowValues.component);
     }
+}
+
+function updateTPCandTabRowSel(rowValues, rowIndex)
+{
+    Reactable.setMeta("TPCandidatesTab", { selectedRow: rowIndex });
 }
 
 function showFGCols(column, show)
@@ -263,6 +257,37 @@ function showFeatQualityCols(show)
     cols.forEach(col => Reactable.toggleHideColumn("featuresTab", col, !show));
 }
 
+function updateTPCompon(cmpName)
+{
+    const chromEl = document.getElementById('chrom_view-parent');
+    const intEl = document.getElementById('int_plot-parent');
+    
+    if (chromEl)
+        chromEl.src = reportPlots.chromsLarge[TPComponParentInfo[cmpName].group];
+    if (intEl)
+        intEl.src = reportPlots.intPlots[TPComponParentInfo[cmpName].group];
+    
+    if (document.getElementById('parentInfoTab'))
+    {
+        document.getElementById('struct_view-parent').src = reportPlots.structs[TPComponParentInfo[cmpName].InChIKey] || "";
+        Reactable.setFilter('parentInfoTab', 'name', TPComponParentInfo[cmpName].name);
+        // UNDONE: move to separate tab
+        /*document.getElementById('struct_view-tp').src = reportPlots.structs[rowValues.susp_InChIKey] || "";
+        Reactable.setFilter('TPInfoTab', 'name', rowValues.susp_name);*/
+    }
+    
+    showTPGraph(cmpName);
+    
+    const tabID = getSelFGTableElement();
+    Reactable.setFilter(tabID, 'component', cmpName);
+    
+    // activate first row
+    // UNDONE: does this work properly with paging?
+    const data = Array.from(Reactable.getInstance(tabID).data);
+    const firstRowInd = data.findIndex(el => el.component === cmpName);
+    updateFeatTabRowSel(data[firstRowInd], firstRowInd);
+}
+
 function advanceTPCompon(dir)
 {
     // based on https://stackoverflow.com/a/11556996
@@ -273,6 +298,7 @@ function advanceTPCompon(dir)
     else if (newIndex >= el.options.length)
         newIndex = 0;
     el.options[newIndex].selected = true;
+    updateTPCompon(el.options[newIndex].value);
 }
 
 function showTPGraph(cmp)

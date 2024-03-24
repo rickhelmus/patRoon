@@ -4,7 +4,10 @@
 
 function getViews()
 {
-    return Array.from(document.getElementById("view-select").options).map(o => o.value);
+    let ret = Array.from(document.getElementById("view-select").options).map(o => o.value);
+    if (ret.includes("TPs"))
+        ret.push("TPsParents"); // HACK: add parents sub-view of TP view
+    return ret;
 }
 
 function getFGTableIDs()
@@ -24,7 +27,10 @@ function getFGTableInstances()
 
 function getSelFGTableElement()
 {
-    return "detailsTab" + document.getElementById("view-select").value;
+    let sel = document.getElementById("view-select").value;
+    if (sel === "TPs" && document.getElementById("viewTPDetailsParents").checked)
+        sel = "TPsParents";
+    return "detailsTab" + sel;
 }
 
 function getNavTab(which)
@@ -67,6 +73,9 @@ function setDetailsTablesRatio(fr1, fr2)
 
 function updateView(sel)
 {
+    if (sel === "TPs" && document.getElementById("viewTPDetailsParents").checked)
+        sel = "TPsParents"; // HACK: parents sub-view
+    
     tid = "detailsTab" + sel;
     getFGTableElements().forEach(el => el.style.display = (el.id === tid) ? "" : "none");
     document.getElementById("fg-expand").style.display = (sel !== "Plain") ? "" : "none";
@@ -104,16 +113,19 @@ function updateView(sel)
     if (getViews().includes("TPs") && document.getElementById("similarity_spec"))
         showFeatureTab("Parent similarity", sel === "TPs");
     
+    const isTPsOrParsView = (sel === "TPs" || sel === "TPsParents");
     let tpc = document.getElementById("TPCandidatesCard");
     if (tpc)
     {
         // NOTE: we need to toggle the visibility of wrapped containers for cards!
         tpc.parentElement.classList.toggle("d-none", sel !== "TPs");
-        document.getElementById("parentCard").parentElement.classList.toggle("d-none", sel !== "TPs");
+        document.getElementById("parentCard").parentElement.classList.toggle("d-none", !isTPsOrParsView);
+        
+        document.getElementById("TPsParBtGrp").classList.toggle("d-none", !isTPsOrParsView);
         document.getElementById("detailsTopRowLayout").style["grid-template-columns"] = (sel === "TPs") ? "1fr 1fr" : "1fr";
     }
     
-    document.getElementById("detailsLayout").style["grid-template-columns"] = (sel === "TPs") ? "1fr 5fr" : "1fr";
+    document.getElementById("detailsLayout").style["grid-template-columns"] = (isTPsOrParsView) ? "1fr 5fr" : "1fr";
     
     const r = Reactable.getInstance(tid).rowsById[Reactable.getState(tid).meta.selectedRow];
     updateFeatTabRowSel(r.values, r.index);
@@ -233,6 +245,11 @@ function updateFeatTabRowSel(rowValues, rowIndex)
         if (document.getElementById('similarityTab'))
             Reactable.setFilter('similarityTab', 'cmpID', rowValues.component + '-' + rowValues.group);
     }
+    else if (tabEl === "detailsTabTPsParents")
+    {
+        document.getElementById("TPCompon-select").value = rowValues.component;
+        updateTPCompon(rowValues.component, false);
+    }
 }
 
 function updateTPCandTabRowSel(rowValues, rowIndex)
@@ -282,17 +299,16 @@ function updateTPCompon(cmpName, activateFG = true)
     
     showTPGraph(cmpName);
     
-    Reactable.setFilter("detailsTabTPs", "component", cmpName);
-
     if (activateFG)
     {
-        // activate first row
-        // UNDONE: does this work properly with paging?
-        const data = Array.from(Reactable.getInstance("detailsTabTPs").data);
+        // activate proper FG table row: for the parents view switch to the selected component, otherwise to the first row
+        const data = Array.from(Reactable.getInstance(getSelFGTableElement()).data);
         const firstRowInd = data.findIndex(el => el.component === cmpName);
-    
         updateFeatTabRowSel(data[firstRowInd], firstRowInd);
     }
+    
+    if (!document.getElementById("viewTPDetailsParents").checked)
+        Reactable.setFilter("detailsTabTPs", "component", cmpName);
 }
 
 function advanceTPCompon(dir)

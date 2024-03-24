@@ -66,6 +66,15 @@ bslib::layout_column_wrap(
                      maybeIncl(utils$hasComponents(), option(value = "Components", "Components")),
                      maybeIncl(utils$hasComponentsTPs(), option(value = "TPs", "Transformation products"))
             ),
+            div(class = "btn-group btn-group-sm mx-1", role = "group", "aria-label" = "TP_parent group",
+                id = "TPsParBtGrp",
+                input(type = "radio", class = "btn-check", name = "tpparbtn", id = "viewTPDetailsParents",
+                      autocomplete = "off", onChange = 'updateView("TPs")'),
+                label(class = "btn btn-outline-primary", "for" = "viewTPDetailsParents", "Parents"),
+                input(type = "radio", class = "btn-check", name = "tpparbtn", id = "viewTPDetailsTPs",
+                      autocomplete = "off", onChange = 'updateView("TPs")', checked = TRUE),
+                label(class = "btn btn-outline-primary", "for" = "viewTPDetailsTPs", "TPs"),
+            ),
             div(class = "float-right",
                 div(class = "btn-group btn-group-sm mx-1", role = "group", "aria-label" = "ratio group",
                     input(type = "radio", class = "btn-check", name = "ratiobtn", id = "ratio21",
@@ -208,6 +217,7 @@ bslib::layout_column_wrap(
                                   maybeIncl(utils$hasSuspects(), utils$genFGTableSuspects()),
                                   maybeIncl(utils$hasInternalStandards(), utils$genFGTableISTDs()),
                                   maybeIncl(utils$hasComponents(), utils$genFGTableComponents()),
+                                  maybeIncl(utils$hasComponentsTPs(), utils$genFGTableTPsParents()),
                                   maybeIncl(utils$hasComponentsTPs(), utils$genFGTableTPs())
                          )
                      ),

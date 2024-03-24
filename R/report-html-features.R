@@ -147,13 +147,14 @@ getFGGroupDefs <- function(tab, groupBy, rgs)
 
 makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, settings, objects, ...)
 {
-    addToGroupDefs <- function(gd, grp, col)
+    addToGroupDefs <- function(gd, grp, col, after = NULL)
     {
         for (i in seq_along(gd))
         {
             if (gd[[i]]$name == grp)
             {
-                gd[[i]]$columns <- c(gd[[i]]$columns, col)
+                after <- if (is.null(after)) length(gd[[i]]$columns) else which(gd[[i]]$columns == after)
+                gd[[i]]$columns <- append(gd[[i]]$columns, col, after = after)
                 break
             }
         }
@@ -194,7 +195,7 @@ makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, setting
                                                      cell = function(value, index) htmltools::img(src = plots$chromsLarge[[value]]))
         }
         
-        groupDefs <- addToGroupDefs(groupDefs, "feature", cols)
+        groupDefs <- addToGroupDefs(groupDefs, "feature", cols, after = "group")
     }
     
     if (any(c("MSPeakLists", "formulas", "compounds") %in% names(pruneList(objects))))

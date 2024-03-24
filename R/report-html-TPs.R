@@ -208,6 +208,25 @@ reportHTMLUtils$methods(
         makeFGReactable(tabTPs, "detailsTabTPs", FALSE, plots, settings = settings, objects = objects,
                         groupBy = groupBy, colDefs = colDefs, groupDefs = groupDefs)
     },
+
+    genFGTableTPsParents = function()
+    {
+        compObj <- getTPComponObj()
+        cInfo <- componentInfo(compObj)
+        cInfo <- subsetDTColumnsIfPresent(cInfo, c("name", "parent_name", "parent_group", "parent_formula",
+                                                   "parent_neutralMass"))
+        tab <- getFGTable(objects$fGroups[, cInfo$parent_group], NULL, settings$features$retMin,
+                          settings$features$aggregateConcs, settings$features$aggregateTox)
+        
+        tab <- merge(tab, cInfo, by.x = "group", by.y = "parent_group", sort = FALSE)
+        setnames(tab, "name", "component")
+        
+        groupDefs <- getFGGroupDefs(tab, NULL, replicateGroups(objects$fGroups))
+        colDefs <- getFeatGroupColDefs(tab)
+        
+        makeFGReactable(tab, "detailsTabTPsParents", FALSE, plots, settings = settings, objects = objects,
+                        colDefs = colDefs, groupDefs = groupDefs)
+    },
     
     genFGTableTPs = function()
     {
@@ -215,7 +234,6 @@ reportHTMLUtils$methods(
                                  settings$features$aggregateConcs, settings$features$aggregateTox)
         
         tabCompon <- as.data.table(getTPComponObj())
-        tabCompon <- tabCompon[parent_group %chin% names(objects$fGroups)]
         tabCompon <- subsetDTColumnsIfPresent(tabCompon, c("name", "parent_name", "parent_group", "group",
                                                            "retDir", "retDiff", "mzDiff", "specSimilarity"))
         tabCompon[, cmpIndex := seq_len(.N), by = "name"]

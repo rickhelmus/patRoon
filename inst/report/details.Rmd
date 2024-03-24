@@ -116,8 +116,9 @@ bslib::layout_column_wrap(
                 callIncl(bslib::accordion,
                          maybeIncl(settings$features$chromatograms$large, bslib::accordion_panel(
                              "Chromatogram",
-                             bslib::card_body_fill(htmltools::img(id = "chrom_view-tp"))
+                             bslib::card_body_fill(htmltools::img(id = "chrom_view-parent"))
                          )),
+                         # UNDONE: only include if there actually are structures
                          maybeIncl(utils$hasComponentsFromTPs(), bslib::accordion_panel(
                              "Structure",
                              bsCardBodyNoFill(

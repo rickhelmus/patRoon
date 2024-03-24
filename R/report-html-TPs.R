@@ -71,15 +71,28 @@ genHTMLReportPlotsTPs <- function(fGroups, components, MSPeakLists, formulas, co
 }
 
 reportHTMLUtils$methods(
+    getTPComponIDs = function() names(objects$components),
+
     getTPComponNames = function()
     {
+        ret <- getTPComponIDs()
         if (objects$components@fromTPs)
-            paste0(names(objects$components), " (", componentInfo(objects$components)$parent_name, ")")
-        else
-            names(objects$components)
+            ret <- paste0(ret, " (", componentInfo(objects$components)$parent_name, ")")
+        return(ret)
+    },
+
+    getTPParentInfoJSON = function()
+    {
+        cInfo <- componentInfo(objects$components)
+        cInfo <- subsetDTColumnsIfPresent(cInfo, c("name", "parent_name", "parent_group", "parent_InChIKey"))
+        setnames(cInfo, c("name", "parent_name", "parent_group", "parent_InChIKey"),
+                 c("cmpName", "name", "group", "InChIKey"),
+                 skip_absent = TRUE)
+        splt <- lapply(split(cInfo, by = "cmpName", keep.by = FALSE), as.list)
+        return(jsonlite::toJSON(splt, auto_unbox = TRUE))
     },
     
-    genFGTableTPs = function()
+    genFGTableTPsOld = function()
     {
         fromTPs <- objects$components@fromTPs
         
@@ -187,6 +200,57 @@ reportHTMLUtils$methods(
                         groupBy = groupBy, colDefs = colDefs, groupDefs = groupDefs)
     },
     
+    genFGTableTPs = function()
+    {
+        tabTPsFeat <- getFGTable(objects$fGroups, ",", settings$features$retMin,
+                                 settings$features$aggregateConcs, settings$features$aggregateTox)
+        
+        tabCompon <- as.data.table(objects$components)
+        tabCompon <- tabCompon[parent_group %chin% names(objects$fGroups)]
+        tabCompon <- subsetDTColumnsIfPresent(tabCompon, c("name", "parent_name", "parent_group", "group",
+                                                           "retDir", "retDiff", "mzDiff", "specSimilarity"))
+        tabCompon[, cmpIndex := seq_len(.N), by = "name"]
+        
+        tabTPs <- merge(tabCompon, tabTPsFeat, by = "group", sort = FALSE)
+        setnames(tabTPs, "name", "component")
+        # tabTPs <- removeDTColumnsIfPresent(tabTPs, "susp_name")
+        
+        # NOTE: below values may be in components but then from suspect list
+        tabTPs[, c("parent_ret", "parent_mz") := groupInfo(objects$fGroups)[parent_group, ]]
+        
+        for (col in intersect(c("parent_ret", "retDiff"), names(tabTPs)))
+        {
+            if (settings$features$retMin)
+                tabTPs[, (col) := get(col) / 60]
+            tabTPs[, (col) := round(get(col), 2)]
+        }
+        if (!is.null(tabTPs[["specSimilarity"]]))
+            tabTPs[, specSimilarity := round(specSimilarity, 2)]
+        for (col in c("parent_mz", "mzDiff"))
+            tabTPs[, (col) := round(get(col), 5)]
+        
+        groupDefs <- getFGGroupDefs(tabTPs, NULL, replicateGroups(objects$fGroups))
+        # squeeze in TP column
+        groupDefs <- c(groupDefs[1:2],
+                       list(reactable::colGroup("TP", columns = intersect(c("retDiff", "mzDiff", "retDir",
+                                                                            "specSimilarity"),
+                                                                          names(tabTPs)),
+                                                headerStyle = getMainReactColSepStyle())),
+                       groupDefs[seq(3, length(groupDefs))])
+        
+        colDefs <- getFeatGroupColDefs(tabTPs)
+        
+        colDefs$retDiff <- reactable::colDef(name = "\U0394 ret")
+        colDefs$mzDiff <- reactable::colDef(name = "\U0394 mz")
+        
+        # internally used variables
+        colDefs$component <- reactable::colDef(show = FALSE, filterMethod = reactExactFilter())
+        colDefs$cmpIndex <- reactable::colDef(show = FALSE)
+        
+        makeFGReactable(tabTPs, "detailsTabTPs", FALSE, plots, settings = settings, objects = objects,
+                        colDefs = colDefs, groupDefs = groupDefs)
+    },
+    
     genTPCandidatesTable = function()
     {
         # UNDONE: don't call this when !fromTPs
@@ -236,12 +300,14 @@ reportHTMLUtils$methods(
         for (col in c("component", "group", "InChIKey"))
         {
             if (!is.null(candidatesTab[[col]]))
-                colDefs[[col]] <- reactable::colDef(show = FALSE)
+                colDefs[[col]] <- reactable::colDef(show = T)
         }
+        colDefs$component$filterMethod <- colDefs$group$filterMethod <- reactExactFilter()
         # same for cmpIndex
         # colDefs$cmpIndex <- reactable::colDef(show = FALSE)
         
-        makeReactable(candidatesTab, "TPCandidatesTab", filterable = FALSE, pagination = TRUE, columns = colDefs)
+        makeMainResultsReactable(candidatesTab, "TPCandidatesTab", colDefs = colDefs, groupDefs = list(),
+                                 visible = TRUE, updateRowFunc = "updateTPCandTabRowSel", meta = list())
     },
 
     genTPSimTable = function()

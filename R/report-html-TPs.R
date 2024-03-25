@@ -213,7 +213,7 @@ reportHTMLUtils$methods(
     {
         compObj <- getTPComponObj()
         cInfo <- componentInfo(compObj)
-        cInfo <- subsetDTColumnsIfPresent(cInfo, c("name", "parent_name", "parent_group"))
+        cInfo <- subsetDTColumnsIfPresent(cInfo, c("name", "parent_name", "parent_group", "parent_InChIKey"))
         tab <- getFGTable(objects$fGroups[, cInfo$parent_group], NULL, settings$features$retMin,
                           settings$features$aggregateConcs, settings$features$aggregateTox)
         
@@ -227,6 +227,14 @@ reportHTMLUtils$methods(
         groupDefs <- getFGGroupDefs(tab, NULL, replicateGroups(objects$fGroups))
         groupDefs <- append(groupDefs, getScrGroupDefs(tab), after = 1)
         colDefs <- getFeatGroupColDefs(tab)
+        
+        if (!is.null(tab[["parent_InChIKey"]]))
+        {
+            tab[, structure := plots$structs[parent_InChIKey]]
+            tab[, parent_InChIKey := NULL]
+            colDefs$structure <- reactable::colDef(cell = getReactImgCell, minWidth = 125)
+            groupDefs[[2]]$columns <- append(groupDefs[[2]]$columns, "structure", after = 1) # set after susp name
+        }
         
         makeFGReactable(tab, "detailsTabTPsParents", FALSE, plots, settings = settings, objects = objects,
                         colDefs = colDefs, groupDefs = groupDefs)
@@ -322,7 +330,14 @@ reportHTMLUtils$methods(
                                                                                names(candidatesTab)),
                                                      headerStyle = getMainReactColSepStyle())))
         
-        colDefs <- getFeatGroupColDefs(candidatesTab)
+        colDefs <- getFeatGroupColDefs(candidatesTab) # UNDONE: split function like groupDefs
+        
+        if (!is.null(candidatesTab[["InChIKey"]]))
+        {
+            candidatesTab[, structure := plots$structs[InChIKey]]
+            colDefs$structure <- reactable::colDef(cell = getReactImgCell, minWidth = 125)
+            groupDefs[[1]]$columns <- append(groupDefs[[1]]$columns, "structure", after = 1) # set after TP susp name
+        }
         
         formCell <- function(value) htmltools::span(dangerouslySetInnerHTML = list("__html" = subscriptFormulaHTML(value, charges = FALSE)))
         if (!is.null(candidatesTab[["formula"]]))

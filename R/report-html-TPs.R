@@ -227,6 +227,7 @@ reportHTMLUtils$methods(
         groupDefs <- getFGGroupDefs(tab, NULL, replicateGroups(objects$fGroups))
         groupDefs <- append(groupDefs, getScrGroupDefs(tab), after = 1)
         colDefs <- getFeatGroupColDefs(tab)
+        colDefs <- modifyList(colDefs, getScrColDefs(tab))
         
         if (!is.null(tab[["parent_InChIKey"]]))
         {
@@ -330,7 +331,7 @@ reportHTMLUtils$methods(
                                                                                names(candidatesTab)),
                                                      headerStyle = getMainReactColSepStyle())))
         
-        colDefs <- getFeatGroupColDefs(candidatesTab) # UNDONE: split function like groupDefs
+        colDefs <- getScrColDefs(candidatesTab)
         
         if (!is.null(candidatesTab[["InChIKey"]]))
         {

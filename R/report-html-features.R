@@ -83,10 +83,34 @@ getFeatGroupColDefs <- function(tab)
     
     setCD("mz", "name", "m/z")
     setCD("ion_mz", "name", "ion m/z")
-    if (featGroupTabHasSusps(tab))
-        setCD("susp_name", "name", "suspect")
-    else
-        setCD("susp_name", "name", "name(s)")
+    setCD("susp_name", "name", "name(s)")
+
+    featScoreNames <- intersect(featureQualityNames(scores = TRUE), names(tab))
+    for (col in featScoreNames)
+    {
+        setCD(col, "name", sub("Score$", "", col))
+        setCD(col, "show", FALSE) # hidden by default, controlled by checkbox
+    }
+    
+    return(colDefs)
+}
+
+getScrColDefs <- function(tab)
+{
+    colDefs <- list()
+    
+    setCD <- function(col, field, value)
+    {
+        if (col %chin% names(tab))
+        {
+            if (is.null(colDefs[[col]]))
+                colDefs[[col]] <<- do.call(reactable::colDef, setNames(list(value), field))
+            else
+                colDefs[[col]][[field]] <<- value
+        }
+    }
+    
+    setCD("susp_name", "name", "suspect")
     setCD("susp_d_rt", "name", "\U0394 ret")
     setCD("susp_d_mz", "name", "\U0394 mz")
     setCD("susp_estIDLevel", "name", "estIDLevel") # UNDONE: tool-tip?
@@ -103,13 +127,6 @@ getFeatGroupColDefs <- function(tab)
     setCD("susp_sets", "name", "sets")
     # InChIKeys are only there for internal usage
     setCD("susp_InChIKey", "show", FALSE)
-    
-    featScoreNames <- intersect(featureQualityNames(scores = TRUE), names(tab))
-    for (col in featScoreNames)
-    {
-        setCD(col, "name", sub("Score$", "", col))
-        setCD(col, "show", FALSE) # hidden by default, controlled by checkbox
-    }
     
     return(colDefs)
 }

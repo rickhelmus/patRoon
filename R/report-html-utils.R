@@ -6,6 +6,8 @@ getMainReactColSepStyle <- function() list(borderLeft = "1px solid DarkGrey")
 
 getReactColGrpStartCols <- function(groupDefs) sapply(groupDefs[-1], function(col) col$columns[1])
 
+getReactImgCell <- function(value) htmltools::img(src = value, style = list("max-height" = "300px"))
+
 reactSelFilterButton <- function(id, name, target, ocFunc, title)
 {
     htmltools::tags$button(class = "btn btn-secondary btn-sm", "data-bs-toggle" = "modal",

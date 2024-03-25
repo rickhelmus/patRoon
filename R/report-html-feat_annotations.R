@@ -78,8 +78,6 @@ makeAnnScoreReact <- function(annRow, sets)
     return(makeAnnTitleTab("Scorings", makeAnnKable(ptab)))
 }
 
-getAnnReactImgCell <- function(value) htmltools::img(src = value, style = list("max-height" = "300px"))
-
 makeAnnReactable <- function(tab, id, detailsTabFunc = NULL, annPLTabFunc = NULL, scoreTabFunc = NULL, ...)
 {
     details <- if (is.null(detailsTabFunc))
@@ -409,8 +407,8 @@ reportHTMLUtils$methods(
             neutral_formula = reactable::colDef("formula",
                                                 cell = function(value) htmltools::span(dangerouslySetInnerHTML = list("__html" = subscriptFormulaHTML(value)))),
             neutralMass = reactable::colDef("neutral mass"),
-            spectrum = reactable::colDef(cell = getAnnReactImgCell, minWidth = 200),
-            scorings = reactable::colDef(cell = getAnnReactImgCell, minWidth = 200)
+            spectrum = reactable::colDef(cell = getReactImgCell, minWidth = 200),
+            scorings = reactable::colDef(cell = getReactImgCell, minWidth = 200)
         ))
         
         colDefs <- setReactNumRangeFilters("formulasTab", tab, colDefs)
@@ -585,9 +583,9 @@ reportHTMLUtils$methods(
             neutral_formula = reactable::colDef("formula",
                                                 cell = function(value) htmltools::span(dangerouslySetInnerHTML = list("__html" = subscriptFormulaHTML(value)))),
             neutralMass = if (!is.null(tab[["neutralMass"]])) reactable::colDef("neutral mass") else NULL,
-            structure = reactable::colDef(cell = getAnnReactImgCell, minWidth = 125),
-            spectrum = reactable::colDef(cell = getAnnReactImgCell, minWidth = 200),
-            scorings = reactable::colDef(cell = getAnnReactImgCell, minWidth = 200)
+            structure = reactable::colDef(cell = getReactImgCell, minWidth = 125),
+            spectrum = reactable::colDef(cell = getReactImgCell, minWidth = 200),
+            scorings = reactable::colDef(cell = getReactImgCell, minWidth = 200)
         ))
         
         colDefs <- setReactNumRangeFilters("compoundsTab", tab, colDefs)

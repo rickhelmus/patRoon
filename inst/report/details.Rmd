@@ -44,6 +44,25 @@ printf("<script>const TPComponParentInfo = JSON.parse('%s');</script>\n", utils$
 maybeIncl <- function(cond, tag) if (cond) tag else NULL
 callIncl <- function(f, ..., fixed = NULL) do.call(f, c(pruneList(list(...)), fixed))
 
+downCSVButton <- function(tab, file, quoteTab = TRUE)
+{
+    if (quoteTab)
+        tab <- paste0("'", tab, "'")
+    htmltools::tags$button(type = "button", class = "btn btn-secondary btn-sm",
+                           onClick = sprintf("downloadCSV(%s, '%s')", tab, file),
+                           bsicons::bs_icon("filetype-csv", size = "1.5em", title = "Download CSV"))
+}
+
+toggleExpandButton <- function(id, tab, quoteTab = TRUE)
+{
+    if (quoteTab)
+        tab <- paste0("'", tab, "'")
+    htmltools::tags$button(type = "button", class = "btn btn-secondary btn-sm", id = id,
+                           onClick = sprintf("Reactable.toggleAllRowsExpanded(%s)", tab),
+                           bsicons::bs_icon("caret-right-fill", size = "1.5em", title = "Expand/Collapse"))
+}
+
+
 doSelParent <- utils$hasComponentsTPs() && (settings$features$chromatograms$large || utils$hasComponentsFromTPs() ||
                                                 settings$features$chromatograms$intensityPlots)
 
@@ -199,11 +218,8 @@ bslib::layout_column_wrap(
                                           input(type = "checkbox", id = "fg-filter", onChange = 'toggleFGFilters(this.checked)'),
                                           label("for" = "fg-filter", style = list("margin-right" = "10px"), "Filters"),
                                           
-                                          button(type = "button", class = "btn btn-primary btn-sm",
-                                                 onClick = "downloadCSV(getSelFGTableElement(), 'featureGroups.csv')", "Download CSV"),
-                                          button(type = "button", class = "btn btn-primary btn-sm", id = "fg-expand",
-                                                 onClick = "Reactable.toggleAllRowsExpanded(getSelFGTableElement())",
-                                                 style = list(display = "none"), "Expand/collapse"),
+                                          downCSVButton("getSelFGTableElement()", "featureGroups.csv", quoteTab = FALSE),
+                                          toggleExpandButton("fg-expand", "getSelFGTableElement()", quoteTab = FALSE),
 
                                           div(class = "float-right",
                                               label("for" = "fg-search", "Search"),
@@ -340,10 +356,8 @@ bslib::layout_column_wrap(
                                                    input(type = "checkbox", id = "features-filter", onChange = 'toggleFeatFilters(this.checked)'),
                                                    label("for" = "features-filter", style = list("margin-right" = "10px"), "Filters"),
 
-                                                   button(type = "button", class = "btn btn-primary btn-sm",
-                                                          onClick = "downloadCSV('featuresTab', 'features.csv')", "Download CSV"),
-                                                   button(type = "button", class = "btn btn-primary btn-sm", id = "feat-expand",
-                                                          onClick = "Reactable.toggleAllRowsExpanded('featuresTab')", "Expand/collapse")
+                                                   downCSVButton("featuresTab", "features.csv"),
+                                                   toggleExpandButton("feat-expand", "featuresTab")
                                           )
                                       })
                                   ),
@@ -357,8 +371,7 @@ bslib::layout_column_wrap(
                                           div(class = "pb-1",
                                               input(type = "checkbox", id = "concs-filter", onChange = 'toggleConcsFilters(this.checked)'),
                                               label("for" = "concs-filter", style = list("margin-right" = "10px"), "Filters"),
-                                              button(type = "button", class = "btn btn-primary btn-sm",
-                                                     onClick = "downloadCSV('concsTab', 'concentrations.csv')", "Download CSV")
+                                              downCSVButton("concsTab", "concentrations.csv")
                                           )
                                       })
                                   ),
@@ -372,8 +385,7 @@ bslib::layout_column_wrap(
                                           div(class = "pb-1",
                                               input(type = "checkbox", id = "tox-filter", onChange = 'toggleToxFilters(this.checked)'),
                                               label("for" = "tox-filter", style = list("margin-right" = "10px"), "Filters"),
-                                              button(type = "button", class = "btn btn-primary btn-sm",
-                                                     onClick = "downloadCSV('toxTab', 'toxicities.csv')", "Download CSV")
+                                              downCSVButton("toxTab", "toxicities.csv")
                                           )
                                       })
                                   ),
@@ -406,10 +418,8 @@ bslib::layout_column_wrap(
                                               label("for" = "formulas-filter", style = list("margin-right" = "10px"), "Filters"),
                                               input(type = "checkbox", id = "formulas-susp_only", onChange = 'toggleAnnOnlySusp("formulas", this.checked)'),
                                               label("for" = "formulas-susp_only", "Suspect only"),
-                                              button(type = "button", class = "btn btn-primary btn-sm",
-                                                     onClick = "downloadCSV('formulasTab', 'formulas.csv')", "Download CSV"),
-                                              button(type = "button", class = "btn btn-primary btn-sm", id = "form-expand",
-                                                     onClick = "Reactable.toggleAllRowsExpanded('formulasTab')", "Expand/collapse"),
+                                              downCSVButton("formulasTab", "formulas.csv"),
+                                              toggleExpandButton("form-expand", "formulasTab")
                                           )
                                       })
                                   ),
@@ -433,10 +443,8 @@ bslib::layout_column_wrap(
                                               input(type = "checkbox", id = "compounds-susp_only", onChange = 'toggleAnnOnlySusp("compounds", this.checked)'),
                                               label("for" = "compounds-susp_only", "Suspect only"),
 
-                                              button(type = "button", class = "btn btn-primary btn-sm ms-2",
-                                                     onClick = "downloadCSV('compoundsTab', 'compounds.csv')", "Download CSV"),
-                                              button(type = "button", class = "btn btn-primary btn-sm", id = "comp-expand",
-                                                     onClick = "Reactable.toggleAllRowsExpanded('compoundsTab')", "Expand/collapse"),
+                                              downCSVButton("compoundsTab", "compounds.csv"),
+                                              toggleExpandButton("comp-expand", "compoundsTab"),
 
                                               a(class = "ms-2", id = "openMF", target = "_blank", "MetFrag Web"),
                                           )

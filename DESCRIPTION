@@ -93,6 +93,7 @@ Imports:
     flexdashboard,
     DT,
     bslib (>= 0.4.2),
+    bsicons,
     reactable (>= 0.4.1),
     magrittr,
     kableExtra,

@@ -487,8 +487,8 @@ reportHTMLUtils$methods(
             }
         }
         
-        tab[, rGroup := anaInfo[match(analysis, anaInfo$analysis), "group"]]
-        
+        tab[, rGroup := anaInfo[match(tab$analysis, analysis)]$group]
+
         colDefs <- list(
             group = reactable::colDef(show = FALSE, filterMethod = reactExactFilter()),
             rGroup = reactable::colDef("replicate group")

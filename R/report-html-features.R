@@ -70,7 +70,7 @@ getFGTable <- function(fGroups, colSusp, retMin, concAggrParams, toxAggrParams)
 
 featGroupTabHasSusps <- function(tab) !is.null(tab[["susp_d_mz"]]) # HACK: this column should always be there if there are (non-collapsed) suspect results
 
-getFeatGroupColDefs <- function(tab)
+getFeatGroupColDefs <- function(tab, rgs)
 {
     colDefs <- list()
     
@@ -89,6 +89,9 @@ getFeatGroupColDefs <- function(tab)
     setCD("ion_mz", "name", "ion m/z")
     setCD("susp_name", "name", "name(s)")
 
+    for (col in getADTIntCols(rgs))
+        setCD(col, "name", stripADTIntSuffix(col))
+    
     featScoreNames <- intersect(featureQualityNames(scores = TRUE), names(tab))
     for (col in featScoreNames)
     {
@@ -369,8 +372,9 @@ reportHTMLUtils$methods(
         mdprintf("Feature groups... ")
         tab <- getFGTable(objects$fGroups, ",", settings$features$retMin, settings$features$aggregateConcs,
                           settings$features$aggregateTox)
-        groupDefs <- getFGGroupDefs(tab, NULL, replicateGroups(objects$fGroups))
-        colDefs <- getFeatGroupColDefs(tab)
+        rgs <- replicateGroups(objects$fGroups)
+        groupDefs <- getFGGroupDefs(tab, NULL, rgs)
+        colDefs <- getFeatGroupColDefs(tab, rgs)
         makeFGReactable(tab, "detailsTabPlain", colDefs = colDefs, groupDefs = groupDefs, visible = TRUE, plots = plots,
                         settings = settings, objects = objects)
     },
@@ -378,8 +382,9 @@ reportHTMLUtils$methods(
     {
         tab <- getFGTable(objects$fGroups, NULL, settings$features$retMin, settings$features$aggregateConcs,
                           settings$features$aggregateTox)[!is.na(susp_name)]
-        groupDefs <- getFGGroupDefs(tab, "susp_name", replicateGroups(objects$fGroups))
-        colDefs <- getFeatGroupColDefs(tab)
+        rgs <- replicateGroups(objects$fGroups)
+        groupDefs <- getFGGroupDefs(tab, "susp_name", rgs)
+        colDefs <- getFeatGroupColDefs(tab, rgs)
         makeFGReactable(tab, "detailsTabSuspects", colDefs = colDefs, groupDefs = groupDefs, visible = FALSE,
                         plots = plots, settings = settings, objects = objects, groupBy = "susp_name")
     },
@@ -401,9 +406,10 @@ reportHTMLUtils$methods(
                                                                                 names(ftab), value = TRUE)))
         tab <- merge(ftab, istds, by = "group")
         tab <- roundFGTab(tab, objects$fGroups)
-        
-        groupDefs <- getFGGroupDefs(tab, "susp_name", replicateGroups(objects$fGroups))
-        colDefs <- getFeatGroupColDefs(tab)
+
+        rgs <- replicateGroups(objects$fGroups)        
+        groupDefs <- getFGGroupDefs(tab, "susp_name", rgs)
+        colDefs <- getFeatGroupColDefs(tab, rgs)
         colDefs$susp_name$name <- "Internal standard" # HACK
         makeFGReactable(tab, "detailsTabISTDs", colDefs = colDefs, groupDefs = groupDefs, visible = FALSE,
                         plots = plots, settings = settings, objects = objects, groupBy = "susp_name")

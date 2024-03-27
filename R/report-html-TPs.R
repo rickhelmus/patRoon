@@ -228,9 +228,10 @@ reportHTMLUtils$methods(
         
         setnames(tab, "name", "component")
 
-        groupDefs <- getFGGroupDefs(tab, NULL, replicateGroups(objects$fGroups))
+        rgs <- replicateGroups(objects$fGroups)
+        groupDefs <- getFGGroupDefs(tab, NULL, rgs, objects$fGroups)
         groupDefs <- append(groupDefs, getScrGroupDefs(tab), after = 1)
-        colDefs <- getFeatGroupColDefs(tab)
+        colDefs <- getFeatGroupColDefs(tab, objects$fGroups)
         colDefs <- modifyList(colDefs, getScrColDefs(tab))
         
         if (!is.null(tab[["parent_InChIKey"]]))
@@ -265,7 +266,8 @@ reportHTMLUtils$methods(
         if (!is.null(tabTPs[["specSimilarity"]]))
             tabTPs[, specSimilarity := round(specSimilarity, 2)]
         
-        groupDefs <- getFGGroupDefs(tabTPs, NULL, replicateGroups(objects$fGroups))
+        rgs <- replicateGroups(objects$fGroups)
+        groupDefs <- getFGGroupDefs(tabTPs, NULL, rgs, objects$fGroups)
         # squeeze in TP column
         groupDefs <- append(groupDefs,
                             list(reactable::colGroup("TP", columns = intersect(c("retDiff", "mzDiff", "retDir",
@@ -274,7 +276,7 @@ reportHTMLUtils$methods(
                                                      headerStyle = getMainReactColSepStyle())),
                             after = 1)
         
-        colDefs <- getFeatGroupColDefs(tabTPs)
+        colDefs <- getFeatGroupColDefs(tabTPs, objects$fGroups)
         
         colDefs$retDiff <- reactable::colDef(name = "\U0394 ret")
         colDefs$mzDiff <- reactable::colDef(name = "\U0394 mz")

@@ -89,6 +89,9 @@ getFeatGroupColDefs <- function(tab, fGroups)
     setCD("ion_mz", "name", "ion m/z")
     setCD("susp_name", "name", "name(s)")
 
+    for (col in getADTIntCols(rgs))
+        setCD(col, "name", stripADTIntSuffix(col))
+    
     featScoreNames <- intersect(getFeatureQualityNames(fGroups, scores = TRUE), names(tab))
     for (col in featScoreNames)
     {

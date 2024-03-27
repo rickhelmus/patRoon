@@ -556,6 +556,17 @@ function showFeatureTab(tabName, enable)
     }
 }
 
+function setTabGroupBy(tab, gb, expBtn = undefined)
+{
+    Reactable.setGroupBy(tab, [ gb ]);
+    
+    if (expBtn)
+    {
+        // hide toggle expand button if no grouping
+        document.getElementById(expBtn).style.display = (gb === "") ? "none" : "";
+    }
+}
+
 function downloadCSV(tab, out)
 {
     const cols = Reactable.getState(tab).meta.CSVCols;

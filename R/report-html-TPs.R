@@ -308,10 +308,11 @@ reportHTMLUtils$methods(
         
         candidatesTab <- merge(candidatesTab, scr, by = c("group", "name"), sort = FALSE)
 
-        # UNDONE: add susp_ prefix, mainly for getScrGroupDefs() --> keep this requirement?
+        # UNDONE: add susp_ prefix, mainly for getScrGroupDefs()/roundScrTab() --> keep this requirement?
         scols <- setdiff(names(scr), "group")
         setnames(candidatesTab, scols, paste0("susp_", scols))
         
+        candidatesTab <- roundScrTab(candidatesTab)
 
         # add parent intensities & screening info
         # UNDONE: add this to parent side widget

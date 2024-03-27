@@ -13,6 +13,14 @@ roundFGTab <- function(ftab, fGroups)
     return(ftab)    
 }
 
+roundScrTab <- function(ftab)
+{
+    ftab <- copy(ftab)
+    for (col in names(ftab)[(sapply(ftab, is.numeric))])
+        set(ftab, j = col, value = round(ftab[[col]], if (col == "susp_d_mz") 5 else 2))
+    return(ftab)    
+}
+
 getFGTable <- function(fGroups, colSusp, retMin, concAggrParams, toxAggrParams)
 {
     adtArgs <- list(fGroups, qualities = "score", average = TRUE, concAggrParams = concAggrParams,

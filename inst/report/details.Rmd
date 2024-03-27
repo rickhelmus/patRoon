@@ -53,11 +53,12 @@ downCSVButton <- function(tab, file, quoteTab = TRUE)
                            bsicons::bs_icon("filetype-csv", size = "1.5em", title = "Download CSV"))
 }
 
-toggleExpandButton <- function(id, tab, quoteTab = TRUE)
+toggleExpandButton <- function(id, tab, quoteTab = TRUE, visible = TRUE)
 {
     if (quoteTab)
         tab <- paste0("'", tab, "'")
     htmltools::tags$button(type = "button", class = "btn btn-secondary btn-sm", id = id,
+                           style = paste("display:", if (visible) "" else "none"),
                            onClick = sprintf("Reactable.toggleAllRowsExpanded(%s)", tab),
                            bsicons::bs_icon("caret-right-fill", size = "1.5em", title = "Expand/Collapse"))
 }
@@ -198,7 +199,7 @@ bslib::layout_column_wrap(
                          bsCardBodyNoFill(
                              class = "mt-2",
                              htmltools::withTags({
-                                 callIncl(div, class = "pb-1",
+                                 callIncl(div, class = "pb-1 ps-1",
                                           input(type = "checkbox", id = "fg-cols-info", onChange = 'showFGCols("group", this.checked)',
                                                 checked = TRUE),
                                           label("for" = "fg-cols-info", "Group info"),
@@ -219,12 +220,7 @@ bslib::layout_column_wrap(
                                           label("for" = "fg-filter", style = list("margin-right" = "10px"), "Filters"),
                                           
                                           downCSVButton("getSelFGTableElement()", "featureGroups.csv", quoteTab = FALSE),
-                                          toggleExpandButton("fg-expand", "getSelFGTableElement()", quoteTab = FALSE),
-
-                                          div(class = "float-right",
-                                              label("for" = "fg-search", "Search"),
-                                              input(type = "text", id = "fg-search", oninput="Reactable.setSearch(getSelFGTableElement(), this.value)"),
-                                          )
+                                          toggleExpandButton("fg-expand", "getSelFGTableElement()", quoteTab = FALSE)
                                  )
                              })
                          ),
@@ -242,6 +238,26 @@ bslib::layout_column_wrap(
                          full_screen = TRUE,
                          id = "TPCandidatesCard",
                          bslib::card_header("TP candidates"),
+                         bsCardBodyNoFill(
+                             class = "mt-2",
+                             htmltools::withTags({
+                                 div(class = "pb-1 ps-1",
+                                     label("for" = "TPCand-groupBy", "Group by"),
+                                     select(id = "TPCand-groupBy", onChange = "setTabGroupBy('TPCandidatesTab', this.value, 'tpcand-expand')",
+                                            style = list("margin-right" = "10px", "margin-top" = "3px"),
+                                            option(value = "", "None"),
+                                            option(value = "formula", "Formula"),
+                                            option(value = "formulaDiff", "\U0394 Formula")
+                                     ),
+
+                                     input(type = "checkbox", id = "fg-filter", onChange = 'toggleFGFilters(this.checked)'),
+                                     label("for" = "fg-filter", style = list("margin-right" = "10px"), "Filters"),
+                                     
+                                     downCSVButton("TPCandidatesTab", "TPCandidates.csv"),
+                                     toggleExpandButton("tpcand-expand", "TPCandidatesTab", visible = FALSE)
+                                 )
+                             })
+                         ),
                          bslib::card_body_fill(utils$genTPCandidatesTable())
                      ))
             ),
@@ -341,10 +357,10 @@ bslib::layout_column_wrap(
                                   bsCardBodyNoFill(
                                       class = "mt-2",
                                       htmltools::withTags({
-                                          callIncl(div, class = "pb-1",
+                                          callIncl(div, class = "pb-1 ps-1",
                                                    label("for" = "features-groupBy", "Group by"),
-                                                   callIncl(select, id = "features-groupBy", onChange = "Reactable.setGroupBy('featuresTab', [ this.value ])",
-                                                            style = list("margin-right" = "10px", "margin-top" = " 3px"),
+                                                   callIncl(select, id = "features-groupBy", onChange = "setTabGroupBy('featuresTab', this.value, 'feat-expand')",
+                                                            style = list("margin-right" = "10px", "margin-top" = "3px"),
                                                             option(value = "", "None"),
                                                             option(value = "rGroup", "Replicate group"),
                                                             maybeIncl(utils$hasSets(), option(value = "set", "Set"))
@@ -357,7 +373,7 @@ bslib::layout_column_wrap(
                                                    label("for" = "features-filter", style = list("margin-right" = "10px"), "Filters"),
 
                                                    downCSVButton("featuresTab", "features.csv"),
-                                                   toggleExpandButton("feat-expand", "featuresTab")
+                                                   toggleExpandButton("feat-expand", "featuresTab", visible = FALSE)
                                           )
                                       })
                                   ),
@@ -368,7 +384,7 @@ bslib::layout_column_wrap(
                                   bsCardBodyNoFill(
                                       class = "mt-2",
                                       htmltools::withTags({
-                                          div(class = "pb-1",
+                                          div(class = "pb-1 ps-1",
                                               input(type = "checkbox", id = "concs-filter", onChange = 'toggleConcsFilters(this.checked)'),
                                               label("for" = "concs-filter", style = list("margin-right" = "10px"), "Filters"),
                                               downCSVButton("concsTab", "concentrations.csv")
@@ -382,7 +398,7 @@ bslib::layout_column_wrap(
                                   bsCardBodyNoFill(
                                       class = "mt-2",
                                       htmltools::withTags({
-                                          div(class = "pb-1",
+                                          div(class = "pb-1 ps-1",
                                               input(type = "checkbox", id = "tox-filter", onChange = 'toggleToxFilters(this.checked)'),
                                               label("for" = "tox-filter", style = list("margin-right" = "10px"), "Filters"),
                                               downCSVButton("toxTab", "toxicities.csv")
@@ -413,7 +429,7 @@ bslib::layout_column_wrap(
                                   bsCardBodyNoFill(
                                       class = "mt-2",
                                       htmltools::withTags({
-                                          div(class = "pb-1",
+                                          div(class = "pb-1 ps-1",
                                               input(type = "checkbox", id = "formulas-filter", onChange = 'toggleFormFilters(this.checked)'),
                                               label("for" = "formulas-filter", style = list("margin-right" = "10px"), "Filters"),
                                               input(type = "checkbox", id = "formulas-susp_only", onChange = 'toggleAnnOnlySusp("formulas", this.checked)'),
@@ -430,9 +446,9 @@ bslib::layout_column_wrap(
                                   bsCardBodyNoFill(
                                       class = "mt-2",
                                       htmltools::withTags({
-                                          div(class = "pb-1",
+                                          div(class = "pb-1 ps-1",
                                               label("for" = "compounds-groupBy", "Group by"),
-                                              select(id = "compounds-groupBy", onChange = "Reactable.setGroupBy('compoundsTab', [ this.value ])",
+                                              select(id = "compounds-groupBy", onChange = "setTabGroupBy('compoundsTab', this.value)",
                                                      style = list("margin-right" = "10px", "margin-top" = " 3px"),
                                                      option(value = "", "None"),
                                                      option(value = "neutral_formula", "Formula")

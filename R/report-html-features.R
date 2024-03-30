@@ -168,9 +168,11 @@ getFGGroupDefs <- function(tab, groupBy, rgs)
 
 getScrGroupDefs <- function(tab)
 {
+    # NOTE: as the above function, the first group doesn't have a headerStyle (left border)
+    # as the group returned here is always the first, we don't set the headerStyle
     suspCols <- intersect(c("susp_name", "susp_d_rt", "susp_d_mz", "susp_estIDLevel", "susp_sets"), names(tab))
     return(list(
-        reactable::colGroup("screening", columns = suspCols, headerStyle = getMainReactColSepStyle())
+        reactable::colGroup("screening", columns = suspCols)
     ))
 }
 

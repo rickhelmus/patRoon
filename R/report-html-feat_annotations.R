@@ -414,8 +414,11 @@ reportHTMLUtils$methods(
         colDefs <- setReactNumRangeFilters("formulasTab", tab, colDefs)
         
         CSVCols <- setdiff(names(tab), c("spectrum", "scorings"))
+        internFilterable <- "group"
+        neverFilterable <- c(".details", "candidate", "spectrum", "scorings")
         ret <- makeAnnReactable(tab, "formulasTab", columns = colDefs, getFormDetails, getAnnPLDetails,
-                                getScoreDetails, meta = list(CSVCols = CSVCols))
+                                getScoreDetails, meta = list(CSVCols = CSVCols, internFilterable = internFilterable,
+                                                             neverFilterable = neverFilterable))
         saveCacheData("reportHTMLFormulas", ret, hash)
         return(ret)
     },
@@ -605,9 +608,12 @@ reportHTMLUtils$methods(
         })
         
         CSVCols <- setdiff(names(tab), c("structure", "spectrum", "scorings"))
-        
+        internFilterable <- "group"
+        neverFilterable <- c(".details", "candidate", "structure", "spectrum", "scorings")
         ret <- makeAnnReactable(tab, "compoundsTab", columns = colDefs, getCompDetails, getAnnPLDetails,
-                                getScoreDetails, meta = list(mfWebLinks = mfWebLinks, CSVCols = CSVCols))
+                                getScoreDetails, meta = list(mfWebLinks = mfWebLinks, CSVCols = CSVCols,
+                                                             internFilterable = internFilterable,
+                                                             neverFilterable = neverFilterable))
         saveCacheData("reportHTMLCompounds", ret, hash)
         return(ret)
     },

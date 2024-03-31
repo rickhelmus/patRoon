@@ -264,7 +264,7 @@ function showTabCols(id, columnGroup, show)
         Reactable.toggleHideColumn(id, cols, !show);
     
     // UNDONE: don't do this here
-    if (column === "chrom_large")
+    if (columnGroup === "chrom_large")
         Reactable.toggleHideColumn(id, "chrom_small", show);
 }
 
@@ -435,80 +435,34 @@ function applyFilterToggle(tab, nonFiltCol, keepGroup = false)
         Reactable.setFilter(tab, "group", grp); 
 }
 
-function toggleFGFilters(e)
+function toggleTabFilters(tableID, e)
 {
-    const tabIDs = getFGTableIDs();
-    tabIDs.forEach(function(id)
+    const getFiltMeta = function(varn)
     {
-        Reactable.getInstance(id).allColumns.forEach(function(col)
-        {
-            if (col.name !== "chromatogram") // UNDONE: do this more elegantly?
-                col.filterable = e;
-        })
-    })
+        let ret = Reactable.getState(tableID).meta[varn];
+        if (ret == undefined)
+            return [ ];
+        if (!Array.isArray(ret))
+            return [ ret ];
+        return ret;
+    }
     
-    // NOTE: we only have to do this on the active table as the rest will be re-drawn when activated
-    applyFilterToggle(getSelFGTableElement(), "chrom_small");
-}
+    const internFilterable = getFiltMeta("internFilterable");
+    const neverFilterable = getFiltMeta("neverFilterable");
 
-function toggleFeatFilters(e)
-{
-    // as above, for feature table
-    Reactable.getInstance("featuresTab").allColumns.forEach(function(col)
+    Reactable.getInstance(tableID).allColumns.forEach(function(col)
     {
-        if (col.name !== "chromatogram" && col.name !== "group") // UNDONE: do this more elegantly?
+        if (!internFilterable.includes(col.id) && !neverFilterable.includes(col.id))
             col.filterable = e;
     })
     
-    applyFilterToggle("featuresTab", "group", true);
-}
-
-function toggleConcsFilters(e)
-{
-    // as above, for feature table
-    Reactable.getInstance("concsTab").allColumns.forEach(function(col)
-    {
-        if (col.name !== "group") // UNDONE: do this more elegantly?
-            col.filterable = e;
-    })
+    // HACK: setting a filter will toggle the visibility if all filters were enabled/disabled
+    // NOTE: use a non filterable column so nothing gets reset
+    // NOTE: this somehow will reset all filter values, so restore internal filters if needed...
     
-    applyFilterToggle("concsTab", "group", true);
-}
-
-function toggleToxFilters(e)
-{
-    // as above, for feature table
-    Reactable.getInstance("toxTab").allColumns.forEach(function(col)
-    {
-        if (col.name !== "group") // UNDONE: do this more elegantly?
-            col.filterable = e;
-    })
-    
-    applyFilterToggle("toxTab", "group", true);
-}
-
-function toggleFormFilters(e)
-{
-    // as above, for formulas table
-    const skipCols = [ ".details", "group", "spectrum", "scorings" ];
-    Reactable.getInstance("formulasTab").allColumns.forEach(function(col)
-    {
-        if (!skipCols.includes(col.id)) // UNDONE: do this more elegantly?
-            col.filterable = e;
-    })
-    applyFilterToggle("formulasTab", "spectrum", true);
-}
-
-function toggleCompFilters(e)
-{
-    // as above, for compounds table
-    const skipCols = [ ".details", "group", "structure", "spectrum", "scorings" ];
-    Reactable.getInstance("compoundsTab").allColumns.forEach(function(col)
-    {
-        if (!skipCols.includes(col.id)) // UNDONE: do this more elegantly?
-            col.filterable = e;
-    })
-    applyFilterToggle("compoundsTab", "spectrum", true);
+    const curInternFilters = internFilterable.map(col => Reactable.getInstance(tableID).allColumns.find(c => c.id === col).filterValue);
+    Reactable.setFilter(tableID, internFilterable[0], undefined);
+    internFilterable.forEach(function(col, index) { Reactable.setFilter(tableID, col, curInternFilters[index]); } );
 }
 
 function toggleAnnOnlySusp(wh, e, r = undefined)

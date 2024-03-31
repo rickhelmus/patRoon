@@ -336,8 +336,7 @@ reportHTMLUtils$methods(
             ret <- htmltools::tagAppendChildren(
                 ret,
                 
-                # UNDONE: make JS function that accepts table ID --> requires metadata that says which columns should be left alone
-                input(type = "checkbox", id = id, onChange = 'toggleFGFilters(this.checked)'),
+                input(type = "checkbox", id = id, onChange = sprintf('toggleTabFilters("%s", this.checked)', tableID)),
                 label("for" = id, style = list("margin-right" = "10px"), "Filters"),
                 
                 tagsPreButtons,

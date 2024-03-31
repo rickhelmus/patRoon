@@ -38,6 +38,7 @@
     - report()
         - report also candidate specific frag/NL matches? Or either?
         - BUG: JS errors when fGroups are subset/do not contain TPs anymore?
+        - BUG: Visibility for Suspect only checkbox for formulas/compounds is only handled if suspects are annotated
         - report parent properties that used to be in aggregated fields
             - group, intensities, estIDLevel, d_rt, d_mz, sets
             --> skip intensities, add rest to info table?

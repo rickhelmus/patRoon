@@ -74,7 +74,9 @@ function updateView(sel)
     
     tid = "detailsTab" + sel;
     getFGTableElements().forEach(el => el.style.display = (el.id === tid) ? "" : "none");
-    document.getElementById("fg-expand").style.display = (sel !== "Plain") ? "" : "none";
+    
+    // UNDONE
+    //document.getElementById("fg-expand").style.display = (sel !== "Plain") ? "" : "none";
     
     // UNDONE
     // document.getElementsByClassName("bottomLayout")[0].style["grid-template-columns"] = (sel === "Plain") ? "1fr" : "1fr 2fr";
@@ -117,10 +119,10 @@ function updateView(sel)
         tpc.parentElement.classList.toggle("d-none", sel !== "TPs");
         document.getElementById("parentCard").parentElement.classList.toggle("d-none", !isTPsOrParsView);
         
-        document.getElementById("TPsParBtGrp").classList.toggle("d-none", !isTPsOrParsView);
         document.getElementById("detailsTopRowLayout").style["grid-template-columns"] = (sel === "TPs") ? "1fr 1fr" : "1fr";
     }
-    
+
+    document.getElementById("TPsParBtGrp").classList.toggle("d-none", !isTPsOrParsView);    
     document.getElementById("detailsLayout").style["grid-template-columns"] = (isTPsOrParsView) ? "1fr 5fr" : "1fr";
     
     const r = Reactable.getInstance(tid).rowsById[Reactable.getState(tid).meta.selectedRow];
@@ -253,25 +255,17 @@ function updateTPCandTabRowSel(rowValues, rowIndex)
     Reactable.setMeta("TPCandidatesTab", { selectedRow: rowIndex });
 }
 
-function showFGCols(column, show)
+function showTabCols(id, columnGroup, show)
 {
-    const tabIDs = getFGTableIDs();
-    tabIDs.forEach(function(id)
-    {
-        const cols = Reactable.getState(id).meta.colToggles[column];
-        if (Array.isArray(cols))
-            cols.forEach(col => Reactable.toggleHideColumn(id, col, !show));
-        else
-            Reactable.toggleHideColumn(id, cols, !show);
-    })
+    const cols = Reactable.getState(id).meta.colToggles[columnGroup];
+    if (Array.isArray(cols))
+        cols.forEach(col => Reactable.toggleHideColumn(id, col, !show));
+    else
+        Reactable.toggleHideColumn(id, cols, !show);
+    
+    // UNDONE: don't do this here
     if (column === "chrom_large")
-        tabIDs.forEach(id => Reactable.toggleHideColumn(id, "chrom_small", show));
-}
-
-function showFeatQualityCols(show)
-{
-    const cols = Reactable.getState("featuresTab").meta.featQualCols;
-    cols.forEach(col => Reactable.toggleHideColumn("featuresTab", col, !show));
+        Reactable.toggleHideColumn(id, "chrom_small", show);
 }
 
 function updateTPCompon(cmpName, activateFG = true)

@@ -285,9 +285,12 @@ makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, setting
     CSVCols <- setdiff(names(tab), c("chrom_small", "chrom_large", "annotations", "hasMSMS", "hasFormulas",
                                      "hasCompounds"))
     
+    neverFilterable <- c("chrom_small", "chrom_large")
+    
     return(makeMainResultsReactable(tab = tab, id = id, colDefs = colDefs, groupDefs = groupDefs,
                                     visible = visible, updateRowFunc = "updateFeatTabRowSel",
-                                    meta = list(colToggles = colToggles, CSVCols = CSVCols), ...))
+                                    meta = list(colToggles = colToggles, CSVCols = CSVCols,
+                                                neverFilterable = neverFilterable), ...))
 }
 
 genHTMLReportPlotsChromsLarge <- function(fGroups, settings, outPath, EICs, EICParams, parallel)
@@ -546,7 +549,8 @@ reportHTMLUtils$methods(
         CSVCols <- setdiff(names(tab), "chromatogram")
         
         makeReactable(tab, "featuresTab", compact = TRUE, defaultExpanded = TRUE, columns = colDefs, filterable = FALSE,
-                      meta = list(colToggles = list(qualities = fqn), CSVCols = CSVCols), pagination = TRUE)
+                      meta = list(colToggles = list(qualities = fqn), CSVCols = CSVCols, internFilterable = "group",
+                                  neverFilterable = "chromatogram"), pagination = TRUE)
     },
     
     genConcsTable = function()
@@ -574,7 +578,8 @@ reportHTMLUtils$methods(
         colDefs$type <- setReactSelRangeFilter("concsTab", reactable::colDef())
         colDefs <- setReactNumRangeFilters("concsTab", concs, colDefs)
         
-        makeReactable(concs, "concsTab", columns = colDefs, pagination = TRUE, filterable = FALSE)
+        makeReactable(concs, "concsTab", columns = colDefs, pagination = TRUE, filterable = FALSE,
+                      meta = list(internFilterable = "group", neverFilterable = "group"))
     },
 
     genToxTable = function()
@@ -602,7 +607,8 @@ reportHTMLUtils$methods(
         colDefs$type <- setReactSelRangeFilter("toxTab", reactable::colDef())
         colDefs <- setReactNumRangeFilters("toxTab", tox, colDefs)
         
-        makeReactable(tox, "toxTab", columns = colDefs, pagination = TRUE, filterable = FALSE)
+        makeReactable(tox, "toxTab", columns = colDefs, pagination = TRUE, filterable = FALSE,
+                      meta = list(internFilterable = "group", neverFilterable = "group"))
     },
     
     genSuspAnnTable = function()

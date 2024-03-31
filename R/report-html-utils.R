@@ -288,3 +288,80 @@ bsCardBodyNoFill <- function(...)
     else
         bslib::card_body(...)
 }
+
+reportHTMLUtils$methods(
+    makeToolbar = function(tableID, groupBy = NULL, columnToggles = NULL, toggleExpand = FALSE,
+                           toggleExpandDisableIfNoGrouping = TRUE, tagsPreButtons = NULL, tagsPostButtons = NULL)
+    {
+        makeID <- function(id) paste0(tableID, "-", id)
+        
+        htmltools::withTags({
+            ret <- div(class = "pt-2 pb-1 ps-1")
+            
+            toggleExpandID <- if (toggleExpand) makeID("toggleExpand") else NULL
+            
+            if (!is.null(groupBy))
+            {
+                id <- makeID("groupBy")
+                onChange <- sprintf("setTabGroupBy('%s', this.value, %s)", tableID,
+                                    if (is.null(toggleExpandID)) "undefined" else paste0('"', toggleExpandID, '"'))
+                ret <- htmltools::tagAppendChildren(
+                    ret,
+                    label("for" = makeID("groupBy"), "Group by"),
+                    select(id = makeID("groupBy"), onChange = onChange,
+                           style = list("margin-right" = "10px", "margin-top" = "3px"),
+                           lapply(pruneList(groupBy), function(o) option(value = o$value, o$name))
+                    )
+                )
+            }
+            
+            if (!is.null(columnToggles))
+            {
+                ret <- htmltools::tagAppendChildren(
+                    ret,
+                    lapply(pruneList(columnToggles), function(tc)
+                    {
+                        id <- makeID(paste0("cols-", tc$value))
+                        htmltools::tagList(
+                            input(type = "checkbox", id = id,
+                                  checked = if (!is.null(tc[["checked"]])) tc$checked else NULL,
+                                  onChange = sprintf('showTabCols("%s", "%s", this.checked)', tableID, tc$value)),
+                            label("for" = id, tc$name)
+                        )
+                    })
+                )
+            }
+            
+            id <- makeID("filter")
+            ret <- htmltools::tagAppendChildren(
+                ret,
+                
+                # UNDONE: make JS function that accepts table ID --> requires metadata that says which columns should be left alone
+                input(type = "checkbox", id = id, onChange = 'toggleFGFilters(this.checked)'),
+                label("for" = id, style = list("margin-right" = "10px"), "Filters"),
+                
+                tagsPreButtons,
+                
+                htmltools::tags$button(type = "button", class = "btn btn-secondary btn-sm",
+                                       onClick = sprintf("downloadCSV('%s', '%s')", tableID, paste0(tableID, ".csv")),
+                                       bsicons::bs_icon("filetype-csv", size = "1.5em", title = "Download CSV"))
+            )
+            
+            if (toggleExpand)
+            {
+                ret <- htmltools::tagAppendChildren(
+                    ret,
+                    # NOTE: button is hidden if toggleExpandDisableIfNoGrouping since the initial selection is assumed
+                    # to be no grouping.
+                    htmltools::tags$button(type = "button", class = "btn btn-secondary btn-sm", id = toggleExpandID,
+                                           style = paste("display:", if (!toggleExpandDisableIfNoGrouping) "" else "none"),
+                                           onClick = sprintf("Reactable.toggleAllRowsExpanded('%s')", tableID),
+                                           bsicons::bs_icon("caret-right-fill", size = "1.5em", title = "Expand/Collapse"))
+                )
+            }
+            
+            ret <- htmltools::tagAppendChild(ret, tagsPostButtons)
+            return(ret)
+        })
+    }
+)

@@ -542,7 +542,7 @@ reportHTMLUtils$methods(
         CSVCols <- setdiff(names(tab), "chromatogram")
         
         makeReactable(tab, "featuresTab", compact = TRUE, defaultExpanded = TRUE, columns = colDefs, filterable = FALSE,
-                      meta = list(featQualCols = fqn, CSVCols = CSVCols), pagination = TRUE)
+                      meta = list(colToggles = list(qualities = fqn), CSVCols = CSVCols), pagination = TRUE)
     },
     
     genConcsTable = function()

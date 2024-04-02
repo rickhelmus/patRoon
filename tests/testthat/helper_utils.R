@@ -402,6 +402,7 @@ expect_reportHTML <- function(object)
         # HACK: bslib sets random IDs on creation --> remove IDs to allow reproducible report generation
         lines <- readLines(path)
         lines <- gsub("data-tabsetid=\"[[:digit:]]+\"", "", lines)
+        lines <- gsub("bslib-card\\-[[:digit:]]+", "", lines)
         return(gsub("\"[#]?tab\\-[[:digit:]]+\\-[[:digit:]]+\"", "", lines))
     }
     
@@ -409,7 +410,7 @@ expect_reportHTML <- function(object)
     {
         rpLines <- uniqueLines(rpFile)
         act <- quasi_label(rlang::enquo(object))
-        expect(all.equal(rpLines, uniqueLines(rpFile)), "cached report differs")
+        expect(isTRUE(all.equal(rpLines, uniqueLines(rpFile))), "cached report differs")
     }
 
     invisible(act$val)

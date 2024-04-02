@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>6.4 Processing data | patRoon handbook</title>
   <meta name="description" content="6.4 Processing data | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.37 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.38 and GitBook 2.6.7" />
 
   <meta property="og:title" content="6.4 Processing data | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2024-02-14" />
+<meta name="date" content="2024-04-02" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -58,6 +58,7 @@
 <script src="libs/viz-1.8.2/viz.js"></script>
 <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
 <script src="libs/grViz-binding-1.0.11/grViz.js"></script>
+<link href="libs/htmltools-fill-0.5.8/fill.css" rel="stylesheet" />
 <link href="libs/vis-9.1.0/vis-network.min.css" rel="stylesheet" />
 <script src="libs/vis-9.1.0/vis-network.min.js"></script>
 <script src="libs/visNetwork-binding-2.1.2/visNetwork.js"></script>
@@ -366,6 +367,7 @@ div.csl-indent {
 <p>All data objects that are generated during a sets workflow <em>inherit</em> from the classes from a ‘regular’ workflow. This means that, with some minor exceptions, <em>all</em> of the data processing functionality discussed in the <a href="processing.html#processing">previous chapter</a> (e.g. subsetting, inspection, filtering, plotting, reporting) is also applicable to a sets workflow. For instance, the <code>as.data.table()</code> method can be used for general inspection:</p>
 <div class="sourceCode" id="cb164"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb164-1"><a href="processing-data.html#cb164-1" tabindex="-1"></a><span class="fu">as.data.table</span>(compounds)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="fu">c</span>(<span class="st">&quot;group&quot;</span>, <span class="st">&quot;score-positive&quot;</span>, <span class="st">&quot;score-negative&quot;</span>, <span class="st">&quot;compoundName&quot;</span>, <span class="st">&quot;set&quot;</span>)]</span></code></pre></div>
 <pre><code>#&gt;            group score-positive score-negative                           compoundName               set
+#&gt;           &lt;char&gt;          &lt;num&gt;          &lt;num&gt;                                 &lt;char&gt;            &lt;char&gt;
 #&gt; 1: M198_R317_273       3.386623       4.544840    3-(4-chlorophenyl)-1,1-dimethylurea positive,negative
 #&gt; 2: M198_R317_273       1.783536       2.026543    3-(3-chlorophenyl)-1,1-dimethylurea positive,negative
 #&gt; 3: M198_R317_273       1.775047       1.524093         1-(4-chlorophenyl)-3-ethylurea positive,negative

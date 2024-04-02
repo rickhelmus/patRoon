@@ -5,39 +5,39 @@
   <g stroke-linecap='round' stroke-linejoin='round' stroke='#000000' stroke-width='.53' fill='#3050F8'>
     <rect x='.0' y='.0' width='100.0' height='100.0' fill='none' stroke='none'/>
     <g id='mol1' class='mol'>
-      <line id='mol1bnd1' class='bond' x1='99.08' y1='66.3' x2='83.64' y2='57.42'/>
+      <line id='mol1bnd1' class='bond' x1='.92' y1='33.7' x2='16.36' y2='42.58'/>
       <g id='mol1bnd2' class='bond'>
-        <line x1='68.21' y1='66.33' x2='83.64' y2='57.42'/>
-        <line x1='68.21' y1='63.04' x2='80.78' y2='55.78'/>
+        <line x1='31.79' y1='33.67' x2='16.36' y2='42.58'/>
+        <line x1='31.79' y1='36.96' x2='19.22' y2='44.22'/>
       </g>
-      <line id='mol1bnd3' class='bond' x1='68.21' y1='66.33' x2='52.79' y2='57.43'/>
+      <line id='mol1bnd3' class='bond' x1='31.79' y1='33.67' x2='47.21' y2='42.57'/>
       <g id='mol1bnd4' class='bond'>
-        <line x1='52.79' y1='39.61' x2='52.79' y2='57.43'/>
-        <line x1='55.64' y1='41.26' x2='55.64' y2='55.78'/>
+        <line x1='47.21' y1='60.39' x2='47.21' y2='42.57'/>
+        <line x1='44.36' y1='58.74' x2='44.36' y2='44.22'/>
       </g>
-      <line id='mol1bnd5' class='bond' x1='52.79' y1='39.61' x2='68.16' y2='30.8'/>
+      <line id='mol1bnd5' class='bond' x1='47.21' y1='60.39' x2='31.84' y2='69.2'/>
       <g id='mol1bnd6' class='bond'>
-        <line x1='83.58' y1='39.7' x2='68.16' y2='30.8'/>
-        <line x1='80.74' y1='41.35' x2='68.16' y2='34.09'/>
+        <line x1='16.42' y1='60.3' x2='31.84' y2='69.2'/>
+        <line x1='19.26' y1='58.65' x2='31.84' y2='65.91'/>
       </g>
-      <line id='mol1bnd7' class='bond' x1='83.64' y1='57.42' x2='83.58' y2='39.7'/>
-      <line id='mol1bnd8' class='bond' x1='52.79' y1='57.43' x2='40.81' y2='64.34'/>
+      <line id='mol1bnd7' class='bond' x1='16.36' y1='42.58' x2='16.42' y2='60.3'/>
+      <line id='mol1bnd8' class='bond' x1='47.21' y1='42.57' x2='59.19' y2='35.66'/>
       <g id='mol1bnd9' class='bond'>
-        <line x1='33.2' y1='65.57' x2='24.68' y2='60.65'/>
-        <line x1='34.63' y1='63.1' x2='26.1' y2='58.18'/>
+        <line x1='66.8' y1='34.43' x2='75.32' y2='39.35'/>
+        <line x1='65.37' y1='36.9' x2='73.9' y2='41.82'/>
       </g>
       <g id='mol1bnd10' class='bond'>
-        <line x1='14.46' y1='54.75' x2='9.26' y2='51.74'/>
-        <line x1='15.89' y1='52.28' x2='10.68' y2='49.28'/>
+        <line x1='82.94' y1='43.75' x2='90.74' y2='48.26'/>
+        <line x1='81.51' y1='46.22' x2='89.32' y2='50.72'/>
       </g>
-      <path id='mol1atm8' class='atom' d='M39.89 63.09h-.78v5.29l-3.38 -5.29h-.9v6.47h.78v-5.25l3.35 5.25h.93v-6.47z' stroke='none'/>
+      <path id='mol1atm8' class='atom' d='M65.16 30.43h-.78v5.29l-3.38 -5.29h-.9v6.47h.78v-5.25l3.35 5.25h.93v-6.47z' stroke='none'/>
       <g id='mol1atm9' class='atom'>
-        <path d='M24.47 54.19h-.78v5.29l-3.38 -5.29h-.9v6.47h.78v-5.25l3.35 5.25h.93v-6.47z' stroke='none'/>
-        <path d='M18.67 54.0h-1.1v-1.1h-.37v1.1h-1.1v.37h1.1v1.1h.37v-1.1h1.1v-.37z' stroke='none'/>
+        <path d='M80.59 39.34h-.78v5.29l-3.38 -5.29h-.9v6.47h.78v-5.25l3.35 5.25h.93v-6.47z' stroke='none'/>
+        <path d='M83.9 39.16h-1.1v-1.1h-.37v1.1h-1.1v.37h1.1v1.1h.37v-1.1h1.1v-.37z' stroke='none'/>
       </g>
       <g id='mol1atm10' class='atom'>
-        <path d='M9.05 45.28h-.78v5.29l-3.38 -5.29h-.9v6.47h.78v-5.25l3.35 5.25h.93v-6.47z' stroke='none'/>
-        <path d='M3.25 45.1h-2.69v.37h2.69v-.37z' stroke='none'/>
+        <path d='M96.01 48.25h-.78v5.29l-3.38 -5.29h-.9v6.47h.78v-5.25l3.35 5.25h.93v-6.47z' stroke='none'/>
+        <path d='M99.44 48.06h-2.69v.37h2.69v-.37z' stroke='none'/>
       </g>
     </g>
   </g>

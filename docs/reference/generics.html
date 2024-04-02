@@ -137,11 +137,17 @@ please refer to the linked method documentation for each generic.</p>
 <span></span>
 <span><span class="fu">filter</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/patRoon/man/analysisinfo-dataframe.html" class="external-link">getBPCs</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
 <span><span class="fu">getFeatures</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">getMCS</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/patRoon/man/analysisinfo-dataframe.html" class="external-link">getTICs</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
 <span><span class="fu">groupNames</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/patRoon/man/analysisinfo-dataframe.html" class="external-link">plotBPCs</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">plotChord</span><span class="op">(</span><span class="va">obj</span>, addSelfLinks <span class="op">=</span> <span class="cn">FALSE</span>, addRetMzPlots <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
@@ -158,6 +164,8 @@ please refer to the linked method documentation for each generic.</p>
 <span><span class="fu">plotSpectrum</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">plotStructure</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/patRoon/man/analysisinfo-dataframe.html" class="external-link">plotTICs</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">plotVenn</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
@@ -287,12 +295,18 @@ average silhouette width calculation.</p></dd>
 <ul><li><p>Methods are defined for: <code><a href="featureGroups-class.html">featureGroups</a></code>; <code><a href="featureGroups-class.html">featureGroupsSet</a></code>; <code><a href="features-class.html">features</a></code>.</p></li>
 </ul><p><code>filter</code> provides various functionality to do post-filtering of data.</p>
 <ul><li><p>Methods are defined for: <code><a href="components-class.html">components</a></code>; <code><a href="components-class.html">componentsSet</a></code>; <code><a href="componentsTPs-class.html">componentsTPs</a></code>; <code><a href="compounds-class.html">compounds</a></code>; <code><a href="compounds-class.html">compoundsSet</a></code>; <code><a href="featureAnnotations-class.html">featureAnnotations</a></code>; <code><a href="feature-filtering.html">featureGroups</a></code>; <code><a href="featureGroupsScreening-class.html">featureGroupsScreening</a></code>; <code><a href="featureGroupsScreening-class.html">featureGroupsScreeningSet</a></code>; <code><a href="feature-filtering.html">featureGroupsSet</a></code>; <code><a href="features-class.html">features</a></code>; <code><a href="features-class.html">featuresSet</a></code>; <code><a href="formulas-class.html">formulasSet</a></code>; <code><a href="MSLibrary-class.html">MSLibrary</a></code>; <code><a href="MSPeakLists-class.html">MSPeakLists</a></code>; <code><a href="MSPeakLists-class.html">MSPeakListsSet</a></code>; <code><a href="transformationProducts-class.html">transformationProducts</a></code>; <code><a href="transformationProductsStructure-class.html">transformationProductsStructure</a></code>.</p></li>
+</ul><p><code>getBPCs</code> gets base peak chromatogram(s).</p>
+<ul><li><p>Methods are defined for: <code><a href="featureGroups-class.html">featureGroups</a></code>; <code><a href="features-class.html">features</a></code>.</p></li>
 </ul><p><code>getFeatures</code> returns the object's <code><a href="features-class.html">features</a></code> object.</p>
 <ul><li><p>Methods are defined for: <code><a href="featureGroups-class.html">featureGroups</a></code>.</p></li>
-</ul><p><code>getMCS</code> Calculcates the maximum common substructure.</p>
+</ul><p><code>getMCS</code> Calculates the maximum common substructure.</p>
 <ul><li><p>Methods are defined for: <code><a href="compounds-class.html">compounds</a></code>; <code><a href="compoundsCluster-class.html">compoundsCluster</a></code>.</p></li>
+</ul><p><code>getTICs</code> gets total ion chromatogram(s).</p>
+<ul><li><p>Methods are defined for: <code><a href="featureGroups-class.html">featureGroups</a></code>; <code><a href="features-class.html">features</a></code>.</p></li>
 </ul><p><code>groupNames</code> returns a <code>character</code> vector with the names of the feature groups for which data is present in this object.</p>
 <ul><li><p>Methods are defined for: <code><a href="components-class.html">components</a></code>; <code><a href="compoundsCluster-class.html">compoundsCluster</a></code>; <code><a href="featureAnnotations-class.html">featureAnnotations</a></code>; <code><a href="featureGroups-class.html">featureGroups</a></code>; <code><a href="MSPeakLists-class.html">MSPeakLists</a></code>.</p></li>
+</ul><p><code>plotBPCs</code> plots base peak chromatogram(s).</p>
+<ul><li><p>Methods are defined for: <code><a href="featureGroups-class.html">featureGroups</a></code>; <code><a href="features-class.html">features</a></code>.</p></li>
 </ul><p><code>plotChord</code> plots a Chord diagram to assess overlapping data.</p>
 <ul><li><p>Methods are defined for: <code><a href="feature-plotting.html">featureGroups</a></code>; <code><a href="featureGroups-compare.html">featureGroupsComparison</a></code>.</p></li>
 </ul><p><code>plotChroms</code> plots extracted ion chromatogram(s).</p>
@@ -309,6 +323,8 @@ average silhouette width calculation.</p></dd>
 <ul><li><p>Methods are defined for: <code><a href="components-class.html">components</a></code>; <code><a href="compounds-class.html">compounds</a></code>; <code><a href="compounds-class.html">compoundsSet</a></code>; <code><a href="formulas-class.html">formulas</a></code>; <code><a href="formulas-class.html">formulasSet</a></code>; <code><a href="MSPeakLists-class.html">MSPeakLists</a></code>; <code><a href="MSPeakLists-class.html">MSPeakListsSet</a></code>.</p></li>
 </ul><p><code>plotStructure</code> plots a chemical structure.</p>
 <ul><li><p>Methods are defined for: <code><a href="compounds-class.html">compounds</a></code>; <code><a href="compoundsCluster-class.html">compoundsCluster</a></code>.</p></li>
+</ul><p><code>plotTICs</code> plots total ion chromatogram(s).</p>
+<ul><li><p>Methods are defined for: <code><a href="featureGroups-class.html">featureGroups</a></code>; <code><a href="features-class.html">features</a></code>.</p></li>
 </ul><p><code>plotVenn</code> plots a Venn diagram to assess unique and overlapping data.</p>
 <ul><li><p>Methods are defined for: <code><a href="featureAnnotations-class.html">featureAnnotations</a></code>; <code><a href="feature-plotting.html">featureGroups</a></code>; <code><a href="featureGroups-compare.html">featureGroupsComparison</a></code>; <code><a href="feature-plotting.html">featureGroupsSet</a></code>; <code><a href="transformationProductsStructure-class.html">transformationProductsStructure</a></code>.</p></li>
 </ul><p><code>plotUpSet</code> plots an UpSet diagram to assess unique and overlapping data.</p>

@@ -86,7 +86,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Base class for grouped features.</h1>
-    <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/generics.R" class="external-link"><code>R/generics.R</code></a>, <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/feature_groups.R" class="external-link"><code>R/feature_groups.R</code></a>, <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/feature_groups-set.R" class="external-link"><code>R/feature_groups-set.R</code></a>, and 7 more</small>
+    <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/generics.R" class="external-link"><code>R/generics.R</code></a>, <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/feature_groups.R" class="external-link"><code>R/feature_groups.R</code></a>, <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/feature_groups-set.R" class="external-link"><code>R/feature_groups-set.R</code></a>, and 8 more</small>
     <div class="hidden name"><code>featureGroups-class.Rd</code></div>
     </div>
 
@@ -258,6 +258,12 @@ normInts(
   ...
 )
 
+# S4 method for featureGroups
+getTICs(obj, retentionRange = NULL, MSLevel = c(1, 2))
+
+# S4 method for featureGroups
+getBPCs(obj, retentionRange = NULL, MSLevel = c(1, 2))
+
 # S4 method for featureGroupsSet
 sets(obj)
 
@@ -312,6 +318,34 @@ unset(obj, set)
 
 # S4 method for featureGroupsKPIC2
 delete(obj, ...)
+
+# S4 method for featureGroups
+plotTICs(
+  obj,
+  retentionRange = NULL,
+  MSLevel = 1,
+  retMin = FALSE,
+  title = NULL,
+  colourBy = c("none", "analyses", "rGroups"),
+  showLegend = TRUE,
+  xlim = NULL,
+  ylim = NULL,
+  ...
+)
+
+# S4 method for featureGroups
+plotBPCs(
+  obj,
+  retentionRange = NULL,
+  MSLevel = 1,
+  retMin = FALSE,
+  title = NULL,
+  colourBy = c("none", "analyses", "rGroups"),
+  showLegend = TRUE,
+  xlim = NULL,
+  ylim = NULL,
+  ...
+)
 
 # S4 method for featureGroupsXCMS
 delete(obj, ...)
@@ -537,6 +571,17 @@ values are: <code>"adduct"</code> (ignore isotope annotation), <code>"isotope"</
 Hence, in such case setting <code>chargeMismatch="adduct"</code> is more appropriate.</p></dd>
 
 
+<dt>retentionRange</dt>
+<dd><p>Range of retention time (in seconds) to collect TIC traces.
+Should be a numeric vector with length of two containing the min/max values. 
+Set to NULL to ignore.</p></dd>
+
+
+<dt>MSLevel</dt>
+<dd><p>Integer vector with the ms levels (i.e., 1 for MS1 and 2 for MS2) 
+to obtain TIC traces.</p></dd>
+
+
 <dt>set</dt>
 <dd><p>(<strong>sets workflow</strong>) The name of the set.</p></dd>
 
@@ -550,6 +595,28 @@ Hence, in such case setting <code>chargeMismatch="adduct"</code> is more appropr
 <dd><p>(<strong>sets workflow</strong>) For <code>[</code>: a <code>character</code> with name(s) of the sets to keep.</p>
 <p>For <code>overlap</code> and <code>unique</code>: If <code>TRUE</code> then the <code>which</code> argument changes its meaning and is used
   to specify the names of the sets to be compared.</p></dd>
+
+
+<dt>retMin</dt>
+<dd><p>Plot retention time in minutes (instead of seconds).</p></dd>
+
+
+<dt>title</dt>
+<dd><p>Character string used for title of the plot. If <code>NULL</code> a title will be automatically generated.</p></dd>
+
+
+<dt>colourBy</dt>
+<dd><p>Sets the automatic colour selection: "none" for a single 
+colour or "analyses"/"rGroups" for a distinct colour per analysis or analysis replicate group.</p></dd>
+
+
+<dt>showLegend</dt>
+<dd><p>Plot a legend if TRUE.</p></dd>
+
+
+<dt>xlim, ylim</dt>
+<dd><p>Sets the plot size limits used by
+<code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></code>. Set to <code>NULL</code> for automatic plot sizing.</p></dd>
 
 </dl></div>
     <div id="value">
@@ -642,6 +709,10 @@ optimized and its results are reviewed with <code><a href="check-GUI.html">check
 be used to manually correct adduct assignments afterwards if necessary.</p></li>
 <li><p><code>normInts(featureGroups)</code>: Provides various methods to normalizes feature intensities for each sample analysis or of
 all features within a feature group. See the <code>Feature intensity normalization</code> section below.</p></li>
+<li><p><code>getTICs(featureGroups)</code>: Obtain the total ion chromatogram/s (TICs) of the analyses.</p></li>
+<li><p><code>getBPCs(featureGroups)</code>: Obtain the base peak chromatogram/s (BPCs) of the analyses.</p></li>
+<li><p><code>plotTICs(featureGroups)</code>: Plots the total ion chromatogram/s (TICs) of the analyses.</p></li>
+<li><p><code>plotBPCs(featureGroups)</code>: Plots the base peak chromatogram/s (BPCs) of the analyses.</p></li>
 </ul></div>
     <div id="slots">
     <h2>Slots</h2>
@@ -806,6 +877,10 @@ by <code>adducts&lt;-</code> and <code>selectIons</code> when these methods perf
     <h2>See also</h2>
     <div class="dont-index"><p><code><a href="groupFeatures.html">groupFeatures</a></code> for generating feature groups, <a href="feature-filtering.html">feature-filtering</a> and
   <a href="feature-plotting.html">feature-plotting</a> for more advanced <code>featureGroups</code> methods.</p></div>
+    </div>
+    <div id="author">
+    <h2>Author</h2>
+    <p>Ricardo Cunha, <a href="mailto:cunha@iuta.de">cunha@iuta.de</a></p>
     </div>
 
   </div>

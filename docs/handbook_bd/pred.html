@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>8.10 Predicting toxicities and concentrations (MS2Tox and MS2Quant integration) | patRoon handbook</title>
   <meta name="description" content="8.10 Predicting toxicities and concentrations (MS2Tox and MS2Quant integration) | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.37 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.38 and GitBook 2.6.7" />
 
   <meta property="og:title" content="8.10 Predicting toxicities and concentrations (MS2Tox and MS2Quant integration) | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2024-02-14" />
+<meta name="date" content="2024-04-02" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -58,6 +58,7 @@
 <script src="libs/viz-1.8.2/viz.js"></script>
 <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
 <script src="libs/grViz-binding-1.0.11/grViz.js"></script>
+<link href="libs/htmltools-fill-0.5.8/fill.css" rel="stylesheet" />
 <link href="libs/vis-9.1.0/vis-network.min.css" rel="stylesheet" />
 <script src="libs/vis-9.1.0/vis-network.min.js"></script>
 <script src="libs/visNetwork-binding-2.1.2/visNetwork.js"></script>
@@ -917,6 +918,7 @@ CN(C)CC(C1=CC=C(C=C1)OC)C2(CCCCC2)O
 <p>The raw toxicity and concentration data assigned to feature groups can be retrieved with the <code>toxicities()</code> and <code>concentrations()</code> method functions, respectively.</p>
 <div class="sourceCode" id="cb287"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb287-1"><a href="pred.html#cb287-1" tabindex="-1"></a><span class="fu">toxicities</span>(fGroupsSuspTox)</span></code></pre></div>
 <pre><code>#&gt;           group    type        candidate     candidate_name      LC50
+#&gt;          &lt;char&gt;  &lt;char&gt;           &lt;char&gt;             &lt;char&gt;     &lt;num&gt;
 #&gt; 1: M120_R268_30 suspect [nH]1nnc2ccccc12   1H-benzotriazole  59755.77
 #&gt; 2: M137_R249_53 suspect  NC(=O)Nc1ccccc1      N-Phenyl urea 101025.89
 #&gt; 3: M146_R225_70 suspect  Oc1ccc2ccccc2n1 2-Hydroxyquinoline  48833.62
@@ -924,6 +926,7 @@ CN(C)CC(C1=CC=C(C=C1)OC)C2(CCCCC2)O
 #&gt; 5: M146_R309_68 suspect  Oc1ccc2ccccc2n1 2-Hydroxyquinoline  48833.62</code></pre>
 <div class="sourceCode" id="cb289"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb289-1"><a href="pred.html#cb289-1" tabindex="-1"></a><span class="fu">concentrations</span>(fGroupsSuspConc)</span></code></pre></div>
 <pre><code>#&gt;           group    type        candidate     candidate_name standard-pos-1 standard-pos-2 standard-pos-3
+#&gt;          &lt;char&gt;  &lt;char&gt;           &lt;char&gt;             &lt;char&gt;          &lt;num&gt;          &lt;num&gt;          &lt;num&gt;
 #&gt; 1: M120_R268_30 suspect [nH]1nnc2ccccc12   1H-benzotriazole      43.070773      39.905306       35.21956
 #&gt; 2: M137_R249_53 suspect  NC(=O)Nc1ccccc1      N-Phenyl urea      18.485430      19.864756       17.36268
 #&gt; 3: M146_R225_70 suspect  Oc1ccc2ccccc2n1 2-Hydroxyquinoline      15.700200      17.662215       18.49330
@@ -932,6 +935,7 @@ CN(C)CC(C1=CC=C(C=C1)OC)C2(CCCCC2)O
 <p>If there were multiple candidates for a single feature group then these are split over the table rows:</p>
 <div class="sourceCode" id="cb291"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb291-1"><a href="pred.html#cb291-1" tabindex="-1"></a><span class="fu">toxicities</span>(fGroupsTox)</span></code></pre></div>
 <pre><code>#&gt;             group     type                  candidate                     candidate_name      LC50
+#&gt;            &lt;char&gt;   &lt;char&gt;                     &lt;char&gt;                             &lt;char&gt;     &lt;num&gt;
 #&gt;  1:  M120_R268_30 compound          C1=CC(=NC=C1N)C#N     5-aminopyridine-2-carbonitrile 132007.55
 #&gt;  2:  M120_R268_30 compound        C1=CC2=C(N=C1)N=CN2          1H-imidazo[4,5-b]pyridine 125872.29
 #&gt;  3:  M120_R268_30 compound          C1=CC2=NNN=C2C=C1                   2H-benzotriazole  65155.26
@@ -947,6 +951,7 @@ CN(C)CC(C1=CC=C(C=C1)OC)C2(CCCCC2)O
 <div class="sourceCode" id="cb293"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb293-1"><a href="pred.html#cb293-1" tabindex="-1"></a><span class="co"># </span><span class="al">NOTE</span><span class="co">: NA values are filtered and columns are subset for readability</span></span>
 <span id="cb293-2"><a href="pred.html#cb293-2" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroupsTox)[<span class="sc">!</span><span class="fu">is.na</span>(LC50), <span class="fu">c</span>(<span class="st">&quot;group&quot;</span>, <span class="st">&quot;LC50&quot;</span>, <span class="st">&quot;LC50_types&quot;</span>)]</span></code></pre></div>
 <pre><code>#&gt;            group      LC50 LC50_types
+#&gt;           &lt;char&gt;     &lt;num&gt;     &lt;char&gt;
 #&gt; 1:  M120_R268_30  98911.56   compound
 #&gt; 2:  M137_R249_53 149557.04   compound
 #&gt; 3:  M146_R309_68  41178.78   compound
@@ -954,6 +959,7 @@ CN(C)CC(C1=CC=C(C=C1)OC)C2(CCCCC2)O
 <div class="sourceCode" id="cb295"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb295-1"><a href="pred.html#cb295-1" tabindex="-1"></a>concCols <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;group&quot;</span>, <span class="fu">paste0</span>(<span class="fu">analyses</span>(fGroupsSuspConc), <span class="st">&quot;_conc&quot;</span>), <span class="st">&quot;conc_types&quot;</span>)</span>
 <span id="cb295-2"><a href="pred.html#cb295-2" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroupsSuspConc)[<span class="sc">!</span><span class="fu">is.na</span>(conc_types), concCols, with <span class="ot">=</span> <span class="cn">FALSE</span>]</span></code></pre></div>
 <pre><code>#&gt;           group standard-pos-1_conc standard-pos-2_conc standard-pos-3_conc conc_types
+#&gt;          &lt;char&gt;               &lt;num&gt;               &lt;num&gt;               &lt;num&gt;     &lt;char&gt;
 #&gt; 1: M120_R268_30           43.070773           39.905306            35.21956    suspect
 #&gt; 2: M137_R249_53           18.485430           19.864756            17.36268    suspect
 #&gt; 3: M146_R309_68            7.978394            8.646156             8.67157    suspect
@@ -963,6 +969,7 @@ CN(C)CC(C1=CC=C(C=C1)OC)C2(CCCCC2)O
 <div class="sourceCode" id="cb297"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb297-1"><a href="pred.html#cb297-1" tabindex="-1"></a><span class="co"># as above, but aggregate by taking maximum values</span></span>
 <span id="cb297-2"><a href="pred.html#cb297-2" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroupsTox, <span class="at">toxAggrParams =</span> <span class="fu">getDefPredAggrParams</span>(max))[<span class="sc">!</span><span class="fu">is.na</span>(LC50), <span class="fu">c</span>(<span class="st">&quot;group&quot;</span>, <span class="st">&quot;LC50&quot;</span>, <span class="st">&quot;LC50_types&quot;</span>)]</span></code></pre></div>
 <pre><code>#&gt;            group      LC50 LC50_types
+#&gt;           &lt;char&gt;     &lt;num&gt;     &lt;char&gt;
 #&gt; 1:  M120_R268_30 132007.55   compound
 #&gt; 2:  M137_R249_53 314718.38   compound
 #&gt; 3:  M146_R309_68  49051.68   compound

@@ -144,6 +144,40 @@ delete(obj, i = NULL, j = NULL, ...)
 # S4 method for features
 calculatePeakQualities(obj, weights, flatnessFactor, parallel = TRUE)
 
+# S4 method for features
+getTICs(obj, retentionRange = NULL, MSLevel = 1)
+
+# S4 method for features
+getBPCs(obj, retentionRange = NULL, MSLevel = 1)
+
+# S4 method for features
+plotTICs(
+  obj,
+  retentionRange = NULL,
+  MSLevel = 1,
+  retMin = FALSE,
+  title = NULL,
+  colourBy = c("none", "analyses", "rGroups"),
+  showLegend = TRUE,
+  xlim = NULL,
+  ylim = NULL,
+  ...
+)
+
+# S4 method for features
+plotBPCs(
+  obj,
+  retentionRange = NULL,
+  MSLevel = 1,
+  retMin = FALSE,
+  title = NULL,
+  colourBy = c("none", "analyses", "rGroups"),
+  showLegend = TRUE,
+  xlim = NULL,
+  ylim = NULL,
+  ...
+)
+
 # S4 method for featuresSet
 sets(obj)
 
@@ -241,6 +275,33 @@ Example: <code>weights=c(ApexBoundaryRatioScore=0.5, GaussianSimilarityScore=2)<
 see the parallelization section in the handbook for more details.</p></dd>
 
 
+<dt>MSLevel</dt>
+<dd><p>Integer vector with the ms levels (i.e., 1 for MS1 and 2 for MS2) 
+to obtain TIC traces.</p></dd>
+
+
+<dt>retMin</dt>
+<dd><p>Plot retention time in minutes (instead of seconds).</p></dd>
+
+
+<dt>title</dt>
+<dd><p>Character string used for title of the plot. If <code>NULL</code> a title will be automatically generated.</p></dd>
+
+
+<dt>colourBy</dt>
+<dd><p>Sets the automatic colour selection: "none" for a single 
+colour or "analyses"/"rGroups" for a distinct colour per analysis or analysis replicate group.</p></dd>
+
+
+<dt>showLegend</dt>
+<dd><p>Plot a legend if TRUE.</p></dd>
+
+
+<dt>xlim, ylim</dt>
+<dd><p>Sets the plot size limits used by
+<code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></code>. Set to <code>NULL</code> for automatic plot sizing.</p></dd>
+
+
 <dt>sets</dt>
 <dd><p>(<strong>sets workflow</strong>) For <code>[</code> and <code>filter</code>: a <code>character</code> with name(s) of the sets to keep (or remove if
 <code>negate=TRUE</code>).</p></dd>
@@ -307,6 +368,10 @@ Similarity</code>, <code>Sharpness</code>, <code>Triangle Peak Area Similarity R
 by normalizing all feature values (unless the quality metric definition has a fixed range) and scale from <samp>0</samp>
 (worst) to <samp>1</samp> (best). Then, a <code>totalScore</code> for each feature is calculated by the (weighted) sum of all
 score values.</p></li>
+<li><p><code>getTICs(features)</code>: Obtain the total ion chromatogram/s (TICs) of the analyses.</p></li>
+<li><p><code>getBPCs(features)</code>: Obtain the base peak chromatogram/s (BPCs) of the analyses.</p></li>
+<li><p><code>plotTICs(features)</code>: Plots the TICs of the analyses.</p></li>
+<li><p><code>plotBPCs(features)</code>: Plots the BPCs of the analyses.</p></li>
 </ul></div>
     <div id="slots">
     <h2>Slots</h2>
@@ -366,6 +431,10 @@ for access.</p></dd>
     <div id="see-also">
     <h2>See also</h2>
     <div class="dont-index"><p><code><a href="findFeatures.html">findFeatures</a></code></p></div>
+    </div>
+    <div id="author">
+    <h2>Author</h2>
+    <p>Ricardo Cunha, <a href="mailto:cunha@iuta.de">cunha@iuta.de</a></p>
     </div>
 
   </div>

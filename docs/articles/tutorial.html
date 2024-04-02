@@ -119,7 +119,7 @@
                         <h4 data-toc-skip class="author">Rick
 Helmus</h4>
             
-            <h4 data-toc-skip class="date">2024-02-14</h4>
+            <h4 data-toc-skip class="date">2024-04-02</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/vignettes/tutorial.Rmd" class="external-link"><code>vignettes/tutorial.Rmd</code></a></small>
       <div class="hidden name"><code>tutorial.Rmd</code></div>
@@ -154,8 +154,8 @@ detailed overview of <code>patRoon</code>. Instead, it serves as a quick
 introduction on how to use <code>patRoon</code> to setup and perform a
 full non-target analysis workflow.</p>
 <p>The workflow in this tutorial consists of the following steps:</p>
-<div id="htmlwidget-2130c418a120374c63f0" style="width:750px;height:100px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-2130c418a120374c63f0">{"x":{"diagram":"\ndigraph rmarkdown {\ngraph [ rankdir = LR ]\nnode [ shape = box,\n       fixedsize = true,\n       width = 2.2,\n       height = 1,\n       fontsize = 18,\n       fillcolor = darkseagreen1,\n       style = filled ]\n\"New project\" -> Features -> Annotation -> Reporting [ arrowhead = vee ]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-fbc4731c90f3894dd92a" style="width:750px;height:100px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-fbc4731c90f3894dd92a">{"x":{"diagram":"\ndigraph rmarkdown {\ngraph [ rankdir = LR ]\nnode [ shape = box,\n       fixedsize = true,\n       width = 2.2,\n       height = 1,\n       fontsize = 18,\n       fillcolor = darkseagreen1,\n       style = filled ]\n\"New project\" -> Features -> Annotation -> Reporting [ arrowhead = vee ]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div class="section level2">
 <h2 id="data">Data<a class="anchor" aria-label="anchor" href="#data"></a>
@@ -583,6 +583,7 @@ have a look at generated feature groups and their intensities
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="../reference/generics.html">as.data.table</a></span><span class="op">(</span><span class="va">fGroups</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;            group        ret       mz standard-pos-1 standard-pos-2 standard-pos-3</span></span>
+<span><span class="co">#&gt;           &lt;char&gt;      &lt;num&gt;    &lt;num&gt;          &lt;num&gt;          &lt;num&gt;          &lt;num&gt;</span></span>
 <span><span class="co">#&gt; 1:   M100_R28_65  27.990002 100.1120         304644         275468         283104</span></span>
 <span><span class="co">#&gt; 2:    M102_R7_94   7.132569 102.1277         342224         320876         327020</span></span>
 <span><span class="co">#&gt; 3: M109_R192_157 191.839167 109.0759         186612         187080         176756</span></span>
@@ -795,35 +796,38 @@ data from the previous step.</p>
 <span><span class="co">#&gt; Number of compounds: 740 (total), 41.1 (mean), 5 - 100 (min - max)</span></span></code></pre>
 <div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/generics.html">as.data.table</a></span><span class="op">(</span><span class="va">mslists</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt;                group type ID        mz intensity precursor</span></span>
-<span><span class="co">#&gt;    1:    M100_R28_65   MS  1  97.06466  33207.64     FALSE</span></span>
-<span><span class="co">#&gt;    2:    M100_R28_65   MS  2  98.97522 151933.58     FALSE</span></span>
-<span><span class="co">#&gt;    3:    M100_R28_65   MS  3 100.11197 214742.42      TRUE</span></span>
-<span><span class="co">#&gt;    4:    M100_R28_65   MS  4 101.05957  28490.67     FALSE</span></span>
-<span><span class="co">#&gt;    5:    M100_R28_65   MS  5 102.12770 282241.45     FALSE</span></span>
-<span><span class="co">#&gt;   ---                                                     </span></span>
-<span><span class="co">#&gt; 1514: M186_R293_1568 MSMS 29 125.09597  47036.71     FALSE</span></span>
-<span><span class="co">#&gt; 1515: M186_R293_1568 MSMS 37 142.15887  59948.36     FALSE</span></span>
-<span><span class="co">#&gt; 1516: M186_R293_1568 MSMS 39 144.17459 100887.24     FALSE</span></span>
-<span><span class="co">#&gt; 1517: M186_R293_1568 MSMS 47 186.22174 277026.44      TRUE</span></span>
-<span><span class="co">#&gt; 1518: M186_R293_1568 MSMS 48 187.22492  42499.82     FALSE</span></span></code></pre>
+<pre><code><span><span class="co">#&gt;                group   type    ID        mz intensity precursor</span></span>
+<span><span class="co">#&gt;               &lt;char&gt; &lt;char&gt; &lt;int&gt;     &lt;num&gt;     &lt;num&gt;    &lt;lgcl&gt;</span></span>
+<span><span class="co">#&gt;    1:    M100_R28_65     MS     1  97.06466  33207.64     FALSE</span></span>
+<span><span class="co">#&gt;    2:    M100_R28_65     MS     2  98.97522 151933.58     FALSE</span></span>
+<span><span class="co">#&gt;    3:    M100_R28_65     MS     3 100.11197 214742.42      TRUE</span></span>
+<span><span class="co">#&gt;    4:    M100_R28_65     MS     4 101.05957  28490.67     FALSE</span></span>
+<span><span class="co">#&gt;    5:    M100_R28_65     MS     5 102.12770 282241.45     FALSE</span></span>
+<span><span class="co">#&gt;   ---                                                          </span></span>
+<span><span class="co">#&gt; 1514: M186_R293_1568   MSMS    29 125.09597  47036.71     FALSE</span></span>
+<span><span class="co">#&gt; 1515: M186_R293_1568   MSMS    37 142.15887  59948.36     FALSE</span></span>
+<span><span class="co">#&gt; 1516: M186_R293_1568   MSMS    39 144.17459 100887.24     FALSE</span></span>
+<span><span class="co">#&gt; 1517: M186_R293_1568   MSMS    47 186.22174 277026.44      TRUE</span></span>
+<span><span class="co">#&gt; 1518: M186_R293_1568   MSMS    48 187.22492  42499.82     FALSE</span></span></code></pre>
 <div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/generics.html">as.data.table</a></span><span class="op">(</span><span class="va">formulas</span><span class="op">)</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">7</span><span class="op">]</span> <span class="co"># only show first columns for clarity</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt;              group neutral_formula ion_formula neutralMass ion_formula_mz       error dbe</span></span>
-<span><span class="co">#&gt;  1:    M100_R28_65          C6H13N      C6H14N     99.1048       100.1121  1.06666667   1</span></span>
-<span><span class="co">#&gt;  2:     M102_R7_94          C6H15N      C6H16N    101.1204       102.1277  0.26666667   0</span></span>
-<span><span class="co">#&gt;  3:  M109_R192_157          C6H8N2      C6H9N2    108.0687       109.0760  0.60000000   4</span></span>
-<span><span class="co">#&gt;  4:  M116_R316_229          C5H9NS     C5H10NS    115.0456       116.0529  1.20000000   2</span></span>
-<span><span class="co">#&gt;  5:  M120_R268_288          C6H5N3      C6H6N3    119.0483       120.0556  2.13333333   6</span></span>
-<span><span class="co">#&gt; ---                                                                                      </span></span>
-<span><span class="co">#&gt; 25: M180_R336_1410      C5H13N3O2S  C5H14N3O2S    179.0728       180.0801 -0.03333333   1</span></span>
-<span><span class="co">#&gt; 26: M183_R193_1487        C5H6N6O2    C5H7N6O2    182.0552       183.0625 -1.63333333   6</span></span>
-<span><span class="co">#&gt; 27: M183_R313_1489        C6H15O4P    C6H16O4P    182.0708       183.0781  2.93333333   0</span></span>
-<span><span class="co">#&gt; 28: M183_R313_1489        CH10N8OS    CH11N8OS    182.0698       183.0771 -2.40000000   1</span></span>
-<span><span class="co">#&gt; 29: M186_R293_1568         C12H27N     C12H28N    185.2143       186.2216  1.26666667   0</span></span></code></pre>
+<pre><code><span><span class="co">#&gt;              group neutral_formula ion_formula neutralMass ion_formula_mz       error   dbe</span></span>
+<span><span class="co">#&gt;             &lt;char&gt;          &lt;char&gt;      &lt;char&gt;       &lt;num&gt;          &lt;num&gt;       &lt;num&gt; &lt;num&gt;</span></span>
+<span><span class="co">#&gt;  1:    M100_R28_65          C6H13N      C6H14N     99.1048       100.1121  1.06666667     1</span></span>
+<span><span class="co">#&gt;  2:     M102_R7_94          C6H15N      C6H16N    101.1204       102.1277  0.26666667     0</span></span>
+<span><span class="co">#&gt;  3:  M109_R192_157          C6H8N2      C6H9N2    108.0687       109.0760  0.60000000     4</span></span>
+<span><span class="co">#&gt;  4:  M116_R316_229          C5H9NS     C5H10NS    115.0456       116.0529  1.20000000     2</span></span>
+<span><span class="co">#&gt;  5:  M120_R268_288          C6H5N3      C6H6N3    119.0483       120.0556  2.13333333     6</span></span>
+<span><span class="co">#&gt; ---                                                                                        </span></span>
+<span><span class="co">#&gt; 25: M180_R336_1410      C5H13N3O2S  C5H14N3O2S    179.0728       180.0801 -0.03333333     1</span></span>
+<span><span class="co">#&gt; 26: M183_R193_1487        C5H6N6O2    C5H7N6O2    182.0552       183.0625 -1.63333333     6</span></span>
+<span><span class="co">#&gt; 27: M183_R313_1489        C6H15O4P    C6H16O4P    182.0708       183.0781  2.93333333     0</span></span>
+<span><span class="co">#&gt; 28: M183_R313_1489        CH10N8OS    CH11N8OS    182.0698       183.0771 -2.40000000     1</span></span>
+<span><span class="co">#&gt; 29: M186_R293_1568         C12H27N     C12H28N    185.2143       186.2216  1.26666667     0</span></span></code></pre>
 <div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/generics.html">as.data.table</a></span><span class="op">(</span><span class="va">compounds</span><span class="op">)</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span> <span class="co"># only show first columns for clarity</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;               group explainedPeaks    score neutralMass                  SMILES</span></span>
+<span><span class="co">#&gt;              &lt;char&gt;          &lt;int&gt;    &lt;num&gt;       &lt;num&gt;                  &lt;char&gt;</span></span>
 <span><span class="co">#&gt;   1:  M109_R192_157              1 5.080113    108.0687         C1=CC(=CC=C1N)N</span></span>
 <span><span class="co">#&gt;   2:  M109_R192_157              1 5.016746    108.0687       C1=CC=C(C(=C1)N)N</span></span>
 <span><span class="co">#&gt;   3:  M109_R192_157              1 4.773151    108.0687         C1=CC=C(C=C1)NN</span></span>

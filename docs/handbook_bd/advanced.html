@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>6.5 Advanced | patRoon handbook</title>
   <meta name="description" content="6.5 Advanced | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.37 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.38 and GitBook 2.6.7" />
 
   <meta property="og:title" content="6.5 Advanced | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2024-02-14" />
+<meta name="date" content="2024-04-02" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -58,6 +58,7 @@
 <script src="libs/viz-1.8.2/viz.js"></script>
 <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
 <script src="libs/grViz-binding-1.0.11/grViz.js"></script>
+<link href="libs/htmltools-fill-0.5.8/fill.css" rel="stylesheet" />
 <link href="libs/vis-9.1.0/vis-network.min.css" rel="stylesheet" />
 <script src="libs/vis-9.1.0/vis-network.min.js"></script>
 <script src="libs/visNetwork-binding-2.1.2/visNetwork.js"></script>
@@ -391,8 +392,8 @@ div.csl-indent {
 <span id="cb169-8"><a href="advanced.html#cb169-8" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">makeSet</span>(fGroupsPos, fGroupsNeg, <span class="at">groupAlgo =</span> <span class="st">&quot;openms&quot;</span>,</span>
 <span id="cb169-9"><a href="advanced.html#cb169-9" tabindex="-1"></a>                   <span class="at">adducts =</span> <span class="fu">c</span>(<span class="st">&quot;[M+H]+&quot;</span>, <span class="st">&quot;[M-H]-&quot;</span>))</span></code></pre></div>
 <p>Visually, this workflow looks like this:</p>
-<div id="htmlwidget-1c9cee08467f5a19fe7d" style="width:250px;height:300px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-1c9cee08467f5a19fe7d">{"x":{"diagram":"\ndigraph Workflow {\n  graph [ rankdir = TB, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 0.6,\n         fontsize = 16,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Find features (+)\" -> \"Group features (+)\" -> \"filter (+)\" -> \"makeSet\"\n    \"Find features (-)\" -> \"Group features (-)\" -> \"filter (-)\" -> \"makeSet\"\n    \"makeSet\" -> \"...\"\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-2189c71b9bb68c53f664" style="width:250px;height:300px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-2189c71b9bb68c53f664">{"x":{"diagram":"\ndigraph Workflow {\n  graph [ rankdir = TB, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 0.6,\n         fontsize = 16,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Find features (+)\" -> \"Group features (+)\" -> \"filter (+)\" -> \"makeSet\"\n    \"Find features (-)\" -> \"Group features (-)\" -> \"filter (-)\" -> \"makeSet\"\n    \"makeSet\" -> \"...\"\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p>Of course, any other processing steps on the feature groups data such as subsetting and <a href="intReview.html#intReview">visually checking features</a> are also possible before the sets workflow is initiated. Furthermore, it is also possible to perform <a href="incorpAdductIso.html#incorpAdductIso">adduct annotations</a> prior to grouping, which is an alternative way to improve neutralization to what <a href="setsAdducts.html#setsAdducts">was discussed before</a>.</p>
 </div>
 <div id="inspecting-and-converting-set-objects" class="section level3 hasAnchor" number="6.5.2">

@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>8.7 MS libraries | patRoon handbook</title>
   <meta name="description" content="8.7 MS libraries | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.37 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.38 and GitBook 2.6.7" />
 
   <meta property="og:title" content="8.7 MS libraries | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2024-02-14" />
+<meta name="date" content="2024-04-02" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -58,6 +58,7 @@
 <script src="libs/viz-1.8.2/viz.js"></script>
 <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
 <script src="libs/grViz-binding-1.0.11/grViz.js"></script>
+<link href="libs/htmltools-fill-0.5.8/fill.css" rel="stylesheet" />
 <link href="libs/vis-9.1.0/vis-network.min.css" rel="stylesheet" />
 <script src="libs/vis-9.1.0/vis-network.min.js"></script>
 <script src="libs/visNetwork-binding-2.1.2/visNetwork.js"></script>
@@ -381,6 +382,7 @@ div.csl-indent {
 #&gt; Total annotated peaks: 0 (0.00%)</code></pre>
 <div class="sourceCode" id="cb255"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb255-1"><a href="MSLibraries.html#cb255-1" tabindex="-1"></a>mslibraryMSP[[<span class="dv">1</span>]] <span class="co"># MS/MS spectrum for first candidate</span></span></code></pre></div>
 <pre><code>#&gt;           mz  intensity
+#&gt;        &lt;num&gt;      &lt;num&gt;
 #&gt;  1: 135.0441   1.001001
 #&gt;  2: 161.0594   0.500501
 #&gt;  3: 163.0379   0.600601
@@ -394,6 +396,7 @@ div.csl-indent {
 #&gt; 48: 357.1401   0.300300</code></pre>
 <div class="sourceCode" id="cb257"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb257-1"><a href="MSLibraries.html#cb257-1" tabindex="-1"></a>mslibraryJSON[[<span class="st">&quot;SM801601&quot;</span>]] <span class="co"># a record with annotations</span></span></code></pre></div>
 <pre><code>#&gt;          mz  intensity annotation
+#&gt;       &lt;num&gt;      &lt;num&gt;     &lt;char&gt;
 #&gt; 1:  65.0388   0.100228       C5H5
 #&gt; 2:  91.0541   0.922448       C7H7
 #&gt; 3:  93.0573   5.489900      C6H7N
@@ -405,6 +408,7 @@ div.csl-indent {
 <div class="sourceCode" id="cb259"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb259-1"><a href="MSLibraries.html#cb259-1" tabindex="-1"></a> <span class="co"># overview of all metadata (select few columns for readability)</span></span>
 <span id="cb259-2"><a href="MSLibraries.html#cb259-2" tabindex="-1"></a><span class="fu">records</span>(mslibraryJSON)[, .(DB_ID, Name, InChIKey, formula)]</span></code></pre></div>
 <pre><code>#&gt;         DB_ID                              Name                    InChIKey         formula
+#&gt;        &lt;char&gt;                            &lt;char&gt;                      &lt;char&gt;          &lt;char&gt;
 #&gt;   1: SM800003                    1,2,3-Triazole QWENRTYMTSOGBR-UHFFFAOYSA-N          C2H3N3
 #&gt;   2: SM800201                   1-Naphthylamine RUFPHBVGCFYCNW-UHFFFAOYSA-N          C10H9N
 #&gt;   3: SM800553             2,3-Dihydroxybiphenyl YKOQAAJBYBTSBS-UHFFFAOYSA-N        C12H10O2
@@ -418,7 +422,9 @@ div.csl-indent {
 #&gt; 622: SM884952               Fipronil desulfinyl JWKXVHLIRTVXLD-UHFFFAOYSA-N    C12H4Cl2F6N4</code></pre>
 <div class="sourceCode" id="cb261"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb261-1"><a href="MSLibraries.html#cb261-1" tabindex="-1"></a><span class="co"># convert all data to a data.table (may be huge!)</span></span>
 <span id="cb261-2"><a href="MSLibraries.html#cb261-2" tabindex="-1"></a><span class="fu">as.data.table</span>(mslibraryMSP)[, .(DB_ID, SMILES, formula, mz, intensity)]</span></code></pre></div>
-<pre><code>#&gt;         DB_ID                                                         SMILES   formula       mz intensity
+<pre><code>#&gt; Key: &lt;DB_ID&gt;
+#&gt;         DB_ID                                                         SMILES   formula       mz intensity
+#&gt;        &lt;char&gt;                                                         &lt;char&gt;    &lt;char&gt;    &lt;num&gt;     &lt;num&gt;
 #&gt;   1: SMI00001 CN1CC2=C(C=CC3=C2OCO3)[C@@H]4[C@H]1C5=CC6=C(C=C5C[C@@H]4O)OCO6 C20H19NO5 135.0441  1.001001
 #&gt;   2: SMI00001 CN1CC2=C(C=CC3=C2OCO3)[C@@H]4[C@H]1C5=CC6=C(C=C5C[C@@H]4O)OCO6 C20H19NO5 161.0594  0.500501
 #&gt;   3: SMI00001 CN1CC2=C(C=CC3=C2OCO3)[C@@H]4[C@H]1C5=CC6=C(C=C5C[C@@H]4O)OCO6 C20H19NO5 163.0379  0.600601

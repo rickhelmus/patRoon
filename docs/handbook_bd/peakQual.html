@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>8.4 Chromatographic peak qualities | patRoon handbook</title>
   <meta name="description" content="8.4 Chromatographic peak qualities | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.37 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.38 and GitBook 2.6.7" />
 
   <meta property="og:title" content="8.4 Chromatographic peak qualities | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2024-02-14" />
+<meta name="date" content="2024-04-02" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -58,6 +58,7 @@
 <script src="libs/viz-1.8.2/viz.js"></script>
 <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
 <script src="libs/grViz-binding-1.0.11/grViz.js"></script>
+<link href="libs/htmltools-fill-0.5.8/fill.css" rel="stylesheet" />
 <link href="libs/vis-9.1.0/vis-network.min.css" rel="stylesheet" />
 <script src="libs/vis-9.1.0/vis-network.min.js"></script>
 <script src="libs/visNetwork-binding-2.1.2/visNetwork.js"></script>
@@ -379,6 +380,7 @@ div.csl-indent {
 <div class="sourceCode" id="cb243"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb243-1"><a href="peakQual.html#cb243-1" tabindex="-1"></a><span class="co"># (limit rows/columns for clarity)</span></span>
 <span id="cb243-2"><a href="peakQual.html#cb243-2" tabindex="-1"></a><span class="fu">as.data.table</span>(fList)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="dv">26</span><span class="sc">:</span><span class="dv">30</span>]</span></code></pre></div>
 <pre><code>#&gt;    GaussianSimilarityScore SharpnessScore TPASRScore ZigZagScore totalScore
+#&gt;                      &lt;num&gt;          &lt;num&gt;      &lt;num&gt;       &lt;num&gt;      &lt;num&gt;
 #&gt; 1:               0.6314046   3.443351e-02  0.9956949   0.9103221   6.302180
 #&gt; 2:               0.9633994   9.900530e-10  0.9944988   0.3565674   6.513205
 #&gt; 3:               0.3613087   7.565147e-10  0.8006569   0.9999449   5.651379
@@ -388,6 +390,7 @@ div.csl-indent {
 <span id="cb245-2"><a href="peakQual.html#cb245-2" tabindex="-1"></a><span class="co"># valid values are: &quot;quality&quot;, &quot;score&quot; or &quot;both&quot;</span></span>
 <span id="cb245-3"><a href="peakQual.html#cb245-3" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroups, <span class="at">qualities =</span> <span class="st">&quot;both&quot;</span>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="dv">25</span><span class="sc">:</span><span class="dv">29</span>]</span></code></pre></div>
 <pre><code>#&gt;    TPASRScore ZigZagScore ElutionShiftScore RetentionTimeCorrelationScore totalScore
+#&gt;         &lt;num&gt;       &lt;num&gt;             &lt;num&gt;                         &lt;num&gt;      &lt;num&gt;
 #&gt; 1:  0.7305554   0.9962254         0.8421657                     0.9955769   7.932541
 #&gt; 2:  0.0000000   0.9744541         0.9960804                     0.7746038   6.029360
 #&gt; 3:  0.6140008   0.9171568         0.9015949                     0.9776651   7.480675

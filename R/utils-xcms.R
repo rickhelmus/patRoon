@@ -226,9 +226,16 @@ setMethod("getXCMSnExp", "features", function(obj, verbose, loadRawData)
     {
         # create a dummy MSnExp object
         
+        # dummy spectra: 1 peak/analysis
+        # UNDONE: more columns needed?
+        dummySpecs <- data.frame(fileIdx = integer(), spIdx = integer(), seqNum = integer(), msLevel = integer(),
+                                 acquisitionNum = integer(), retentionTime = numeric(), precursorScanNum = integer())
+        rownames(dummySpecs) <- character()
+        
         anaInfo <- analysisInfo(obj)
         rawData <- new("OnDiskMSnExp", processingData = new("MSnProcess",
-                                                            files = anaInfo$analysis))
+                                                            files = anaInfo$analysis),
+                       featureData = new("AnnotatedDataFrame", data = dummySpecs))
         xcms::phenoData(rawData) <- new("NAnnotatedDataFrame",
                                         data.frame(sample_name = anaInfo$analysis,
                                                    sample_group = anaInfo$group,

@@ -18,7 +18,7 @@ jobs:
             GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
         name: Build ${{ inputs.R }}
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v4
               with:
                   repository: rickhelmus/patRoonDeps
                   token: ${{ secrets.PAT }}
@@ -53,7 +53,7 @@ jobs:
                   git diff --binary --cached --full-index > patRoonDeps-${{ inputs.R }}.diff
                   choco install dos2unix
                   dos2unix patRoonDeps-${{ inputs.R }}.diff
-            - uses: actions/upload-artifact@v3
+            - uses: actions/upload-artifact@v4
               name: Upload patch
               with:
                   name: patch-${{ inputs.R }}
@@ -69,7 +69,7 @@ jobs:
               env:
                   PATROONEXT_CACHE: ${{ github.workspace }}/pExtCache
               run: Rscript utils/make_bundle.R
-            - uses: actions/upload-artifact@v3
+            - uses: actions/upload-artifact@v4
               name: Upload bundle
               if:  ${{ inputs.makeBundle }}
               with:
@@ -83,20 +83,20 @@ jobs:
         name: Run tests directly
         if:  ${{ !inputs.makeBundle && inputs.doTests }}
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v4
               with:
                   repository: rickhelmus/patRoonDeps
                   token: ${{ secrets.PAT }}
                   path: patRoonDeps
             - name: Get patRoonDeps patch for oldrel
-              uses: actions/download-artifact@v3
+              uses: actions/download-artifact@v4
               with:
                   name: patch-oldrel
             - name: Apply patRoonDeps patch
               run: |
                   cd patRoonDeps
                   git apply ../patRoonDeps-oldrel.diff
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v4
               with:
                   path: patRoon
             - uses: actions/setup-java@v3
@@ -143,12 +143,12 @@ jobs:
         name: Run tests from bundle
         if:  ${{ inputs.makeBundle && inputs.doTests }}
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v4
               with:
                   path: patRoon
             - uses: r-lib/actions/setup-pandoc@v2
             - name: Get bundle
-              uses: actions/download-artifact@v3
+              uses: actions/download-artifact@v4
               with:
                   name: bundle
                   path: bundle
@@ -162,6 +162,10 @@ jobs:
             - name: dump PATH
               run: "echo PATH: ${PATH}"
               shell: bash
+            - name: Setup R tools
+              uses: r-lib/actions/setup-r@v2
+              with:
+                  install-r: false
             - name: Pre-Install R deps
               uses: r-lib/actions/setup-r-dependencies@v2
               with:

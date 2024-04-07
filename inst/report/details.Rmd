@@ -11,6 +11,50 @@ Details
     border-top-color: dodgerblue;
 }
 
+.mainLayout {
+    display: grid;
+    padding-bottom: 5px;
+    padding-right: 5px;
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+    grid-template-rows: auto 1fr 1fr;
+    grid-template-areas:
+        "hd hd   hd   hd   hd   hd   hd   hd   hd   hd"
+        "sd sd main main main main cand cand cand cand"
+        "sd sd   bt   bt   bt   bt   bt   bt   bt   bt"
+}
+
+div:has(> div.detailsHeaderbar) {
+    grid-area: hd;
+}
+
+div:has(> div.detailsSidebar) {
+    grid-area: sd;
+}
+
+div:has(> div.detailsBottombar) {
+    grid-area: bt;
+}
+
+div:has(> div.detailsBottombarFull) {
+    grid-area: bt / sd / bt / bt; 
+}
+
+div:has(> div.detailsMainTable) {
+    grid-area: main;
+}
+
+div:has(> div.detailsMainTableOnly) {
+    grid-area: main / main / main / cand;
+}
+
+div:has(> div.detailsMainTableFull) {
+    grid-area: main / sd / main / cand;
+}
+
+div:has(> div.detailsCandTable) {
+    grid-area: cand;
+}
+
 .propTabAndImg {
     display: flex;
     flex-wrap: nowrap;
@@ -40,6 +84,36 @@ printf("<script>const TPComponParentInfo = JSON.parse('%s');</script>\n", utils$
 ##
 
 ```{r, echo = FALSE,eval=TRUE}
+# small tools to make handling optional elements easier
+maybeIncl <- function(cond, tag) if (cond) tag else NULL
+callIncl <- function(f, ..., fixed = NULL) do.call(f, c(pruneList(list(...)), fixed))
+
+doSelParent <- utils$hasComponentsTPs() && (settings$features$chromatograms$large || utils$hasComponentsFromTPs() ||
+                                                settings$features$chromatograms$intensityPlots)
+
+mdprintf("Generating report parts: ")
+
+UIArgs <- list(
+    width = NULL,
+    height = "100%",
+    gap = 0,
+    class = "mainLayout"
+)
+
+UIArgs <- c(UIArgs, utils$pruneUI(c,
+    utils$genHeaderbar(),
+    utils$genDetailsPlainUI(),
+    utils$maybeInclUI(utils$hasComponentsTPs(), utils$genDetailsTPsUI()),
+    utils$genBottombar()
+))
+
+do.call(bslib::layout_column_wrap, UIArgs)
+
+mdprintf("Done!\n")
+```
+
+
+```{r, echo = FALSE,eval=FALSE}
 # small tools to make handling optional elements easier
 maybeIncl <- function(cond, tag) if (cond) tag else NULL
 callIncl <- function(f, ..., fixed = NULL) do.call(f, c(pruneList(list(...)), fixed))

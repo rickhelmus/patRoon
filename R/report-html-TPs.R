@@ -281,7 +281,7 @@ reportHTMLUtils$methods(
         colDefs$component <- reactable::colDef(show = FALSE, filterMethod = reactExactFilter())
         colDefs$cmpIndex <- reactable::colDef(show = FALSE)
         
-        makeFGReactable(tabTPs, "detailsTabTPs", FALSE, plots, settings = settings, objects = objects,
+        makeFGReactable(tabTPs, "detailsTabTPs", TRUE, plots, settings = settings, objects = objects,
                         colDefs = colDefs, groupDefs = groupDefs)
     },
     
@@ -410,6 +410,101 @@ reportHTMLUtils$methods(
 }")))
         })
         return(do.call(htmltools::tagList, hwidgets))
+    },
+    
+    genTPsSidebar = function()
+    {
+        bslib::card(
+            id = "parentCard",
+            class = "detailsSidebar",
+            detailsViewOfParent = "TPsParent TPsByGroup TPsBySuspect",
+            bslib::card_header("Parent"),
+            bsCardBodyNoFill(
+                htmltools::withTags({
+                    div(
+                        style = "display: flex;",
+                        select(name = "TPCompon", id = "TPCompon-select", onChange = "updateTPCompon(this.value)",
+                               style = "min-width: 0;",
+                               Map(getTPComponIDs(), getTPComponNames(), f = function(v, n) option(value = v, n))),
+                        
+                        div(class = "btn-group btn-group-sm mx-1", role = "group", "aria-label" = "advance TP compon group",
+                            style = "align-self: flex-start;",
+                            button(type = "button", class = "btn btn-light btn-sm", onClick = "advanceTPCompon(-1)",
+                                   bsicons::bs_icon("caret-left-fill")),
+                            button(type = "button", class = "btn btn-light btn-sm", onClick = "advanceTPCompon(1)",
+                                   bsicons::bs_icon("caret-right-fill"))
+                        ),
+                    )
+                })
+            ),
+            
+            bslib::card_body(
+                padding = 0,
+                pruneUI(bslib::accordion,
+                         maybeInclUI(settings$features$chromatograms$large, bslib::accordion_panel(
+                             "Chromatogram",
+                             bslib::card_body_fill(htmltools::img(id = "chrom_view-parent"))
+                         )),
+                         # UNDONE: only include if there actually are structures
+                         maybeInclUI(hasComponentsFromTPs(), bslib::accordion_panel(
+                             "Structure",
+                             bsCardBodyNoFill(
+                                 htmltools::img(id = "struct_view-parent", style = "min-width: 20%;")
+                             ),
+                         )),
+                         maybeInclUI(hasComponentsFromTPs(), bslib::accordion_panel(
+                             "Screening",
+                             bsCardBodyNoFill(
+                                 genSuspInfoTable("parentInfoTab"),
+                             ),
+                         )),
+                         maybeInclUI(settings$features$intensityPlots, bslib::accordion_panel(
+                             "Intensities",
+                             class = "mt-2",
+                             bslib::card_body_fill(htmltools::img(id = "int_plot-parent"))
+                         )),
+                         maybeInclUI(hasTPGraphs() && hasComponentsFromTPs(), bslib::accordion_panel(
+                             "Transformations",
+                             bslib::card(
+                                 full_screen = TRUE,
+                                 style = "margin-bottom: 0px;",
+                                 bslib::card_body(height = "200px", genTPGraphs())
+                             )
+                         ))
+                )
+            )
+        )
+    },
+    
+    genDetailsTPsUI = function()
+    {
+        list(
+            genTPsSidebar(),
+            
+            bslib::card(
+                class = "detailsMainTable",
+                detailsViewOfParent = "TPsByGroup",
+                full_screen = TRUE,
+                bslib::card_header("Feature groups"),
+                bsCardBodyNoFill(makeFGToolbar("detailsTabTPs")),
+                bslib::card_body(genFGTableTPs())
+            ),
+            
+            bslib::card(
+                class = "detailsCandTable",
+                detailsViewOfParent = "TPsByGroup TPsBySuspect",
+                full_screen = TRUE,
+                bslib::card_header("TP candidates"),
+                bsCardBodyNoFill(
+                    makeToolbar("TPCandidatesTab", groupBy = list(
+                        list(value = "", name = "None"),
+                        list(value = "formula", name = "Formula"),
+                        list(value = "formulaDiff", name = "\U0394 Formula")
+                    ), toggleExpand = TRUE)
+                ),
+                bslib::card_body_fill(genTPCandidatesTable())
+            )
+        )
     }
 )
 

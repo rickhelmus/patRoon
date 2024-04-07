@@ -290,6 +290,17 @@ bsCardBodyNoFill <- function(...)
 }
 
 reportHTMLUtils$methods(
+    # small tools to make handling optional elements easier
+    maybeInclUI = function(cond, tag) if (cond) tag else NULL,
+    pruneUI = function(f, ..., fixed = NULL) do.call(f, c(pruneList(list(...)), fixed)),
+    
+    conditionalTabPanel = function(title, view, ...)
+    {
+        # For tabs that can be made hidden/visible, we embed an attribute in the title so the JS support code can easily
+        # find the relevant element
+        bslib::nav_panel(htmltools::span(title, detailsView = view), ...)
+    },
+    
     makeToolbar = function(tableID, groupBy = NULL, columnToggles = NULL, toggleExpand = FALSE,
                            toggleExpandDisableIfNoGrouping = TRUE, tagsPreButtons = NULL, tagsPostButtons = NULL)
     {
@@ -362,5 +373,161 @@ reportHTMLUtils$methods(
             ret <- htmltools::tagAppendChild(ret, tagsPostButtons)
             return(ret)
         })
+    },
+    
+    genHeaderbar = function()
+    {
+        htmltools::withTags({
+            list(
+                div(class = "pb-1 detailsHeaderbar",
+                    label("for" = "view-select", "View"),
+                    pruneUI(select, name = "view", id = "view-select", onChange = "updateDetailsView(this.value)",
+                            style = list("margin-right" = "10px", "margin-top" = "3px"),
+                            option(value = "Plain", "Plain"),
+                            maybeInclUI(hasSuspects(), option(value = "Suspects", "Suspects")),
+                            maybeInclUI(hasInternalStandards(), option(value = "ISTDs", "Internal standards")),
+                            maybeInclUI(hasComponents(), option(value = "Components", "Components")),
+                            maybeInclUI(hasComponentsTPs(), option(value = "TPs", "Transformation products"))
+                    ),
+                    div(class = "btn-group btn-group-sm mx-1", role = "group", "aria-label" = "TP_parent group",
+                        id = "TPsParBtGrp",
+                        detailsView = "TPsParent TPsByGroup TPsBySuspect",
+                        input(type = "radio", class = "btn-check", name = "tpparbtn", id = "viewTPDetailsParents",
+                              autocomplete = "off", onChange = 'updateDetailsView("TPs")'),
+                        label(class = "btn btn-outline-primary", "for" = "viewTPDetailsParents", "Parents"),
+                        input(type = "radio", class = "btn-check", name = "tpparbtn", id = "viewTPDetailsTPs",
+                              autocomplete = "off", onChange = 'updateDetailsView("TPs")', checked = TRUE),
+                        label(class = "btn btn-outline-primary", "for" = "viewTPDetailsTPs", "TPs"),
+                    ),
+                    div(class = "float-right",
+                        div(class = "btn-group btn-group-sm mx-1", role = "group", "aria-label" = "ratio group",
+                            input(type = "radio", class = "btn-check", name = "ratiobtn", id = "ratio21",
+                                  autocomplete = "off", onChange = 'setDetailsTablesRatio(2, 1)'),
+                            label(class = "btn btn-outline-primary", "for" = "ratio21", "2:1"),
+                            input(type = "radio", class = "btn-check", name = "ratiobtn", id = "ratio32",
+                                  autocomplete = "off", onChange = 'setDetailsTablesRatio(3, 2)'),
+                            label(class = "btn btn-outline-primary", "for" = "ratio32", "3:2"),
+                            input(type = "radio", class = "btn-check", name = "ratiobtn", id = "ratio11",
+                                  autocomplete = "off", onChange = 'setDetailsTablesRatio(1, 1)', checked = TRUE),
+                            label(class = "btn btn-outline-primary", "for" = "ratio11", "1:1"),
+                            input(type = "radio", class = "btn-check", name = "ratiobtn", id = "ratio23",
+                                  autocomplete = "off", onChange = 'setDetailsTablesRatio(2, 3)'),
+                            label(class = "btn btn-outline-primary", "for" = "ratio23", "2:3"),
+                            input(type = "radio", class = "btn-check", name = "ratiobtn", id = "ratio12",
+                                  autocomplete = "off", onChange = 'setDetailsTablesRatio(1, 2)'),
+                            label(class = "btn btn-outline-primary", "for" = "ratio12", "1:2")
+                        )
+                    )
+                )
+            )
+        })
+    },
+    
+    genBottombar = function()
+    {
+        list(
+            bslib::layout_column_wrap(
+                class = "detailsBottombarFull",
+                id = "detailsBottombar",
+                bslib::navset_card_tab(
+                    title = "Selection data",
+                    id = "bottombarTabs",
+                    full_screen = TRUE,
+                    bslib::nav_panel(
+                        "Features",
+                        bsCardBodyNoFill(
+                            makeToolbar("featuresTab", groupBy = list(
+                                list(value = "", name = "None"),
+                                list(value = "rGroup", name = "Replicate group"),
+                                maybeInclUI(hasSets(), list(value = "set", name = "Set"))
+                            ), columnToggles = maybeInclUI(hasFQualities(), list(
+                                list(value = "qualities", name = "Quality scores")
+                            )), toggleExpand = TRUE)
+                        ),
+                        bslib::card_body_fill(genFeaturesTable())
+                    ),
+                    maybeInclUI(hasConcs(), bslib::nav_panel(
+                        "Concentrations",
+                        bsCardBodyNoFill(makeToolbar("concsTab")),
+                        bslib::card_body_fill(genConcsTable())
+                    )),
+                    maybeInclUI(hasTox(), bslib::nav_panel(
+                        "Toxicities",
+                        bsCardBodyNoFill(makeToolbar("toxTab")),
+                        bslib::card_body_fill(genToxTable())
+                    )),
+                    maybeInclUI(settings$features$intensityPlots, bslib::nav_panel(
+                        "Intensities",
+                        class = "mt-2",
+                        bslib::card_body_fill(htmltools::img(id = "int_plot"))
+                    )),
+                    maybeInclUI(hasMSPL(), bslib::nav_panel(
+                        "MS peak lists",
+                        pruneUI(bsCardBodyNoFill,
+                                style = "display: grid; grid-template-columns: 1fr 1fr; column-gap: 50px; justify-items:center;",
+                                htmltools::strong("MS"),
+                                htmltools::strong("MS/MS"),
+                                maybeInclUI(settings$MSPeakLists$spectra, htmltools::img(id = "spectrumMS", style = "min-width: 20%;")),
+                                maybeInclUI(settings$MSPeakLists$spectra, htmltools::img(id = "spectrumMSMS", style = "min-width: 20%;")),
+                                genMSPLTable(1),
+                                genMSPLTable(2)
+                        )
+                    )),
+                    maybeInclUI(hasFormulas(), bslib::nav_panel(
+                        "Formulas",
+                        bsCardBodyNoFill(
+                            bsCardBodyNoFill(
+                                makeToolbar("formulasTab", tagsPreButtons = htmltools::tagList(
+                                    htmltools::tags$input(type = "checkbox", id = "formulas-susp_only",
+                                                          onChange = 'toggleAnnOnlySusp("formulas", this.checked)'),
+                                    htmltools::tags$label("for" = "formulas-susp_only", "Suspect only")
+                                ), toggleExpand = TRUE, toggleExpandDisableIfNoGrouping = FALSE)
+                            )
+                        ),
+                        bslib::card_body_fill(genFormulasTable())
+                    )),
+                    maybeInclUI(hasCompounds(), bslib::nav_panel(
+                        "Compounds",
+                        bsCardBodyNoFill(
+                            makeToolbar("compoundsTab", groupBy = list(
+                                list(value = "", name = "None"),
+                                list(value = "neutral_formula", "Formula")
+                            ), tagsPreButtons = htmltools::tagList(
+                                htmltools::tags$input(type = "checkbox", id = "compounds-susp_only",
+                                                      onChange = 'toggleAnnOnlySusp("compounds", this.checked)'),
+                                htmltools::tags$label("for" = "compounds-susp_only", "Suspect only")
+                            ), tagsPostButtons = htmltools::a(class = "ms-2", id = "openMF", target = "_blank",
+                                                              "MetFrag Web"), toggleExpand = TRUE, toggleExpandDisableIfNoGrouping = FALSE)
+                            
+                        ),
+                        bslib::card_body_fill(genCompoundsTable())
+                    )),
+                    maybeInclUI(hasCompsCluster(), bslib::nav_panel(
+                        "Compounds clusters",
+                        bslib::card_body_fill(
+                            htmltools::img(id = "comps_cluster-dendro"),
+                            genCompClustsImgs()
+                        )
+                    )),
+                    maybeInclUI(hasSuspAnn(), conditionalTabPanel(
+                        "Suspect annotation",
+                        view = "Suspects TPsParents TPsByGroup TPsBySusp",
+                        bslib::card_body_fill(
+                            htmltools::div(style = "margin: 20px;", genSuspAnnTable())
+                        )
+                    )),
+                    maybeInclUI(hasTPSims(), conditionalTabPanel(
+                        "Parent similarity",
+                        view = "TPsByGroup TPsBySusp",
+                        bsCardBodyNoFill(
+                            class = "parentSim",
+                            genTPSimTable(),
+                            # hide img if image is unavailable: https://stackoverflow.com/a/22051972
+                            htmltools::img(id = "similarity_spec", style = "display: none;",
+                                           onerror = "this.style.display='none'")
+                        )
+                    ))
+                ))
+        )
     }
 )

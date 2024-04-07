@@ -630,6 +630,34 @@ reportHTMLUtils$methods(
         if (!is.null(set))
             args <- c(args, set = set)
         do.call(plotGraph, args)
+    },
+    
+    makeFGToolbar = function(tableID)
+    {
+        makeToolbar(tableID, columnToggles = list(
+            list(value = "group", name = "Group info", checked = TRUE),
+            list(value = "intensities", name = "Intensities", checked = TRUE),
+            maybeInclUI(hasConcs(), list(value = "concentrations", name = "Concentrations",
+                                       checked = TRUE)),
+            maybeInclUI(hasFQualities(), list(value = "qualities", name = "Quality scores")),
+            maybeInclUI(settings$features$chromatograms$large,
+                      list(value = "chrom_large", name = "Large chromatograms"))
+        ))
+        
+    },
+    
+    genDetailsPlainUI = function()
+    {
+        list(
+            bslib::card(
+                class = "detailsMainTableFull",
+                detailsViewOfParent = "Plain",
+                full_screen = TRUE,
+                bslib::card_header("Feature groups"),
+                bsCardBodyNoFill(makeFGToolbar("detailsTabPlain")),
+                bslib::card_body(genFGTablePlain())
+            )
+        )
     }
 )
 

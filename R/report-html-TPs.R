@@ -103,6 +103,9 @@ reportHTMLUtils$methods(
     
     genFGTableTPsOld = function()
     {
+        # UNDONE: remove function
+        
+        
         fromTPs <- getTPComponObj()@fromTPs
         
         tabTPsFeat <- getFGTable(objects$fGroups, if (fromTPs) NULL else ",", settings$features$retMin,
@@ -205,8 +208,8 @@ reportHTMLUtils$methods(
         # same for cmpIndex
         colDefs$cmpIndex <- reactable::colDef(show = FALSE)
         
-        makeFGReactable(tabTPs, "detailsTabTPs", FALSE, plots, settings = settings, objects = objects,
-                        groupBy = groupBy, colDefs = colDefs, groupDefs = groupDefs)
+        makeFGReactable(tabTPs, "detailsTabTPs", plots, settings = settings, objects = objects, groupBy = groupBy,
+                        colDefs = colDefs, groupDefs = groupDefs)
     },
 
     genFGTableTPsParents = function()
@@ -225,8 +228,9 @@ reportHTMLUtils$methods(
         setnames(tab, "name", "component")
 
         rgs <- replicateGroups(objects$fGroups)
-        groupDefs <- getFGGroupDefs(tab, NULL, rgs)
-        groupDefs <- append(groupDefs, getScrGroupDefs(tab), after = 1)
+        groupDefs <- list(reactable::colGroup("component", columns = "component"))
+        groupDefs <- append(groupDefs, getFGGroupDefs(tab, NULL, rgs))
+        groupDefs <- append(groupDefs, getScrGroupDefs(tab), after = 2)
         colDefs <- getFeatGroupColDefs(tab, rgs)
         colDefs <- modifyList(colDefs, getScrColDefs(tab))
         
@@ -238,8 +242,8 @@ reportHTMLUtils$methods(
             groupDefs[[2]]$columns <- append(groupDefs[[2]]$columns, "structure", after = 1) # set after susp name
         }
         
-        makeFGReactable(tab, "detailsTabTPsParents", FALSE, plots, settings = settings, objects = objects,
-                        colDefs = colDefs, groupDefs = groupDefs)
+        makeFGReactable(tab, "detailsTabTPsParents", plots, settings = settings, objects = objects, colDefs = colDefs,
+                        groupDefs = groupDefs, updateRowFunc = "updateTabRowSelTPsByParents", initView = "TPsParents")
     },
     
     genFGTableTPs = function()
@@ -281,8 +285,8 @@ reportHTMLUtils$methods(
         colDefs$component <- reactable::colDef(show = FALSE, filterMethod = reactExactFilter())
         colDefs$cmpIndex <- reactable::colDef(show = FALSE)
         
-        makeFGReactable(tabTPs, "detailsTabTPs", TRUE, plots, settings = settings, objects = objects,
-                        colDefs = colDefs, groupDefs = groupDefs)
+        makeFGReactable(tabTPs, "detailsTabTPs", plots, settings = settings, objects = objects, colDefs = colDefs,
+                        groupDefs = groupDefs, updateRowFunc = "updateTabRowSelTPsByGroup", initView = "TPsByGroup")
     },
     
     genTPCandidatesTable = function()
@@ -358,7 +362,7 @@ reportHTMLUtils$methods(
         colDefs$component$filterMethod <- colDefs$group$filterMethod <- reactExactFilter()
         
         makeMainResultsReactable(candidatesTab, "TPCandidatesTab", colDefs = colDefs, groupDefs = groupDefs,
-                                 visible = TRUE, updateRowFunc = "updateTPCandTabRowSel", meta = list())
+                                 updateRowFunc = "updateTabRowSelTPsCandidates", meta = list())
     },
 
     genTPSimTable = function()
@@ -417,7 +421,7 @@ reportHTMLUtils$methods(
         bslib::card(
             id = "parentCard",
             class = "detailsSidebar",
-            detailsViewOfParent = "TPsParent TPsByGroup TPsBySuspect",
+            detailsViewOfParent = "TPsParents TPsByGroup TPsBySuspect",
             bslib::card_header("Parent"),
             bsCardBodyNoFill(
                 htmltools::withTags({
@@ -482,10 +486,20 @@ reportHTMLUtils$methods(
             genTPsSidebar(),
             
             bslib::card(
+                class = "detailsMainTableOnly",
+                detailsViewOfParent = "TPsParents",
+                full_screen = TRUE,
+                bslib::card_header("Parents"),
+                bsCardBodyNoFill(makeFGToolbar("detailsTabTPsParents")),
+                bslib::card_body(genFGTableTPsParents())
+            ),
+            
+            
+            bslib::card(
                 class = "detailsMainTable",
                 detailsViewOfParent = "TPsByGroup",
                 full_screen = TRUE,
-                bslib::card_header("Feature groups"),
+                bslib::card_header("TPs Feature groups"),
                 bsCardBodyNoFill(makeFGToolbar("detailsTabTPs")),
                 bslib::card_body(genFGTableTPs())
             ),

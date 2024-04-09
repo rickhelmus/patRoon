@@ -72,7 +72,7 @@ getViewIDFromSel = function(sel)
     if (sel !== "TPs")
         return sel;
     if (document.getElementById("viewTPDetailsParents").checked)
-        return "TPsParent";
+        return "TPsParents";
 
     return "TPsByGroup"; // UNDONE: also handle by suspect
 }
@@ -106,7 +106,16 @@ function updateDetailsView(sel)
     bbar.classList.toggle("detailsBottombar", anySidebar);
     bbar.classList.toggle("detailsBottombarFull", !anySidebar);
     
+    // Init table row selection
+    document.querySelectorAll('[detailsViewTabInit=' + viewID + ']').forEach(function(el)
+    {
+        const meta = Reactable.getState(el.id).meta;
+        const r = Reactable.getInstance(el.id).rowsById[meta.selectedRow];
+        meta.updateRowFunc(r.values, r.index);
+    });
+    
     // UNDONE: Toggle elements with direct class set (parent/TP view, by group/susp view, susp only checkbox for annotations)
+    // UNDONE: disable suspect filter for formulas/compounds if widget is not visible anymore
     // UNDONE: update bottom bar tabs from table row selections
 }
 
@@ -134,6 +143,88 @@ function toggleBottomTab(tabEl, enable)
             tabAEl.classList.remove("active");
         }
     }
+}
+
+function updateTabRowSelFGroups(rowValues, rowIndex)
+{
+    const grp = rowValues.group;
+    
+    Reactable.setFilter('featuresTab', 'group', grp);
+    
+    if (document.getElementById('concsTab'))
+        Reactable.setFilter('concsTab', 'group', grp);
+    if (document.getElementById('toxTab'))
+        Reactable.setFilter('toxTab', 'group', grp);
+    
+    let intEl = document.getElementById('int_plot');
+    if (intEl)
+        intEl.src = reportPlots.intPlots[grp];
+    
+    if (document.getElementById('MSPLTab'))
+    {
+        Reactable.setFilter('MSPLTab', 'group', grp);
+        Reactable.setFilter('MSMSPLTab', 'group', grp);
+        let specEl = document.getElementById('spectrumMS');
+        if (specEl) // not present if !settings$MSPeakLists$spectra
+        {
+            // NOTE: undefined if filtered away
+            specEl.src = reportPlots.MSPeakLists[grp].MS || "";
+            document.getElementById('spectrumMSMS').src = reportPlots.MSPeakLists[grp].MSMS || "";
+        }
+    }
+
+    for (ann of [ "formulas", "compounds" ])
+    {
+        if (document.getElementById(ann + "Tab"))
+        {
+            Reactable.setFilter(ann + "Tab", "group", grp);
+            if (ann === "compounds")
+                document.getElementById('openMF').href = Reactable.getState('compoundsTab').meta.mfWebLinks[grp];
+        }
+    }
+    
+    const ccd = document.getElementById('comps_cluster-dendro');
+    if (ccd)
+    {
+        ccd.src = reportPlots.compsCluster[grp].dendro;
+        Array.from(document.getElementsByClassName('mcs')).forEach(el => el.style.display = (el.classList.contains('mcs-' + grp)) ? '' : 'none');
+    }
+}
+
+function updateTabRowSelTPsByParents(rowValues, rowIndex)
+{
+    updateTabRowSelFGroups(rowValues, rowIndex);
+    document.getElementById("TPCompon-select").value = rowValues.component;
+    updateTPCompon(rowValues.component, false);
+}
+
+function updateTabRowSelTPsByGroup(rowValues, rowIndex)
+{
+    Reactable.setFilter('TPCandidatesTab', 'component', rowValues.component);
+    Reactable.setFilter('TPCandidatesTab', 'group', rowValues.group);
+    // activate first row
+    // UNDONE: does this work properly with paging?
+    const TPCandInstData = Array.from(Reactable.getInstance("TPCandidatesTab").data);
+    const firstRowInd = TPCandInstData.findIndex(el => el.component === rowValues.component && el.group === rowValues.group);
+    updateTabRowSelTPsCandidates(TPCandInstData[firstRowInd], firstRowInd);
+}
+
+function updateTabRowSelTPsCandidates(rowValues, rowIndex)
+{
+    updateTabRowSelFGroups(rowValues, rowIndex);
+    
+    if (Object.keys(reportPlots.TPs).length > 0)
+    {
+        const specSimEl = document.getElementById('similarity_spec');
+        specSimEl.src = reportPlots.TPs[rowValues.component][rowValues.cmpIndex - 1];
+        specSimEl.style.display = ''; // may have been hidden if a previous img didn't exist
+    }
+    
+    if (document.getElementById('similarityTab'))
+        Reactable.setFilter('similarityTab', 'cmpID', rowValues.component + '-' + rowValues.group);
+
+    if (document.getElementById('suspAnnTab'))
+        Reactable.setFilter('suspAnnTab', 'suspID', rowValues.susp_name + '-' + rowValues.group);
 }
 
 function updateView(sel)

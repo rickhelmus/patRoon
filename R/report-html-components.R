@@ -95,8 +95,9 @@ reportHTMLUtils$methods(
             groupDefs <- c(groupDefs, list(reactable::colGroup("component", cmpGrpCols,
                                                                headerStyle = getMainReactColSepStyle())))
         
-        makeFGReactable(tab, "detailsTabComponents", colDefs = colDefs, groupDefs = groupDefs, visible = FALSE,
-                        plots = plots, settings = settings, objects = objects, groupBy = "component")
+        makeFGReactable(tab, "detailsTabComponents", colDefs = colDefs, groupDefs = groupDefs, plots = plots,
+                        settings = settings, objects = objects, groupBy = "component",
+                        updateRowFunc = "updateFGRowSelComponents", initView = "Components")
     },
     
     genComponentInfoTable = function()

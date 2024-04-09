@@ -177,7 +177,7 @@ getScrGroupDefs <- function(tab)
 }
 
 
-makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, settings, objects, ...)
+makeFGReactable <- function(tab, id, colDefs, groupDefs, plots, settings, objects, ...)
 {
     addToGroupDefs <- function(gd, grp, col, after = NULL)
     {
@@ -284,7 +284,6 @@ makeFGReactable <- function(tab, id, colDefs, groupDefs, visible, plots, setting
     neverFilterable <- c("chrom_small", "chrom_large")
     
     return(makeMainResultsReactable(tab = tab, id = id, colDefs = colDefs, groupDefs = groupDefs,
-                                    visible = visible, updateRowFunc = "updateFeatTabRowSel",
                                     meta = list(colToggles = colToggles, CSVCols = CSVCols,
                                                 neverFilterable = neverFilterable), ...))
 }
@@ -384,8 +383,9 @@ reportHTMLUtils$methods(
         rgs <- replicateGroups(objects$fGroups)
         groupDefs <- getFGGroupDefs(tab, NULL, rgs)
         colDefs <- getFeatGroupColDefs(tab, rgs)
-        makeFGReactable(tab, "detailsTabPlain", colDefs = colDefs, groupDefs = groupDefs, visible = TRUE, plots = plots,
-                        settings = settings, objects = objects)
+        makeFGReactable(tab, "detailsTabPlain", colDefs = colDefs, groupDefs = groupDefs, plots = plots,
+                        settings = settings, objects = objects, updateRowFunc = "updateTabRowSelFGroups",
+                        initView = "Plain")
     },
     genFGTableSuspects = function()
     {
@@ -394,8 +394,9 @@ reportHTMLUtils$methods(
         rgs <- replicateGroups(objects$fGroups)
         groupDefs <- getFGGroupDefs(tab, "susp_name", rgs)
         colDefs <- getFeatGroupColDefs(tab, rgs)
-        makeFGReactable(tab, "detailsTabSuspects", colDefs = colDefs, groupDefs = groupDefs, visible = FALSE,
-                        plots = plots, settings = settings, objects = objects, groupBy = "susp_name")
+        makeFGReactable(tab, "detailsTabSuspects", colDefs = colDefs, groupDefs = groupDefs, plots = plots,
+                        settings = settings, objects = objects, groupBy = "susp_name",
+                        updateRowFunc = "updateRowFGSelSuspects", initView = "Suspects")
     },
     genFGTableISTDs = function()
     {
@@ -420,8 +421,9 @@ reportHTMLUtils$methods(
         groupDefs <- getFGGroupDefs(tab, "susp_name", rgs)
         colDefs <- getFeatGroupColDefs(tab, rgs)
         colDefs$susp_name$name <- "Internal standard" # HACK
-        makeFGReactable(tab, "detailsTabISTDs", colDefs = colDefs, groupDefs = groupDefs, visible = FALSE,
-                        plots = plots, settings = settings, objects = objects, groupBy = "susp_name")
+        makeFGReactable(tab, "detailsTabISTDs", colDefs = colDefs, groupDefs = groupDefs, plots = plots,
+                        settings = settings, objects = objects, groupBy = "susp_name",
+                        updateRowFunc = "updateFGRowSelISTDs", initView = "ISTDs")
     },
 
     genSuspInfoTable = function(id)

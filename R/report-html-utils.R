@@ -152,7 +152,7 @@ makePropReactable <- function(tab, id, idcol = FALSE, minPropWidth = 150, minVal
     return(makeReactableCompact(tab, id = id, columns = colDefs, ...))
 }
 
-makeMainResultsReactable <- function(tab, id, colDefs, groupDefs, visible, updateRowFunc, meta, ...)
+makeMainResultsReactable <- function(tab, id, colDefs, groupDefs, updateRowFunc, meta, initView = NULL, ...)
 {
     # sync column order
     tab <- copy(tab)
@@ -185,8 +185,9 @@ makeMainResultsReactable <- function(tab, id, colDefs, groupDefs, visible, updat
     
     onClick = htmlwidgets::JS(sprintf("function(rowInfo, column)
 {
+    Reactable.setMeta('%s', { selectedRow: rowInfo.index });
     %s(rowInfo.values, rowInfo.index);
-}", updateRowFunc))
+}", id, updateRowFunc))
     
     headThemeStyle <- list(padding = "2px 4px")
     rt <- makeReactable(tab, id, highlight = TRUE, onClick = onClick, columns = colDefs,
@@ -195,7 +196,7 @@ makeMainResultsReactable <- function(tab, id, colDefs, groupDefs, visible, updat
                         theme = reactable::reactableTheme(headerStyle = headThemeStyle,
                                                           groupHeaderStyle = headThemeStyle,
                                                           cellPadding = "2px 4px"),
-                        meta = modifyList(meta, list(selectedRow = 0)),
+                        meta = modifyList(meta, list(selectedRow = 0, updateRowFunc = htmlwidgets::JS(updateRowFunc))),
                         rowStyle = htmlwidgets::JS("function(rowInfo, state)
 {
     const sel = state.meta.selectedRow;
@@ -208,8 +209,11 @@ makeMainResultsReactable <- function(tab, id, colDefs, groupDefs, visible, updat
     return ret;
 }"), ...)
     
-    if (!visible)
-        rt <- htmlwidgets::onRender(rt, htmlwidgets::JS("function(el, x) { el.style.display = 'none'; }"))
+    if (!is.null(initView))
+    {
+        # HACK: this seems to be the easiest way to set an element attribute...
+        rt <- htmlwidgets::onRender(rt, htmlwidgets::JS(sprintf("function(el, x) { el.setAttribute('detailsViewTabInit', '%s'); }", initView)))
+    }
     
     return(rt)
 }
@@ -391,7 +395,7 @@ reportHTMLUtils$methods(
                     ),
                     div(class = "btn-group btn-group-sm mx-1", role = "group", "aria-label" = "TP_parent group",
                         id = "TPsParBtGrp",
-                        detailsView = "TPsParent TPsByGroup TPsBySuspect",
+                        detailsView = "TPsParents TPsByGroup TPsBySuspect",
                         input(type = "radio", class = "btn-check", name = "tpparbtn", id = "viewTPDetailsParents",
                               autocomplete = "off", onChange = 'updateDetailsView("TPs")'),
                         label(class = "btn btn-outline-primary", "for" = "viewTPDetailsParents", "Parents"),

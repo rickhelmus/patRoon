@@ -188,7 +188,7 @@ doFGAADTGroups <- function(fGroups, intColNames, average, averageBy, areas, addQ
         
         if (!isFALSE(average))
         {
-            for (icol in intColNames)
+            for (icol in stripADTIntSuffix(intColNames))
             {
                 # NOTE: intColNames will just be "intensity" if averaging by fGroups
                 anas <- if (averageBy == "fGroups") anaInfo$analysis else anaInfo[get(averageBy) == icol]$analysis
@@ -282,10 +282,10 @@ doFGAADTFeatures <- function(fGroups, fgTab, intColNames, average, averageBy, ad
         
         concCols <- paste0(stripADTIntSuffix(intColNames), "_conc")
         if (all(concCols %in% names(fgTab)))
-            mCols <- c(mCols, list(conc = paste0(stripADTIntSuffix(intColNames), "_conc")))
+            mCols <- c(mCols, list(conc = concCols))
         
         fgTab <- melt(fgTab, measure.vars = mCols, variable.name = "average_group", variable.factor = FALSE,
-                    value.name = "intensity")
+                      value.name = "intensity")
         fgTab <- fgTab[intensity != 0]
         
         if (length(mCols) > 1)

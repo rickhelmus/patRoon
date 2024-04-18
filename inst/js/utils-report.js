@@ -539,7 +539,7 @@ function filtColSelModalInit(tab, col)
 
 function filtFeatAnnSelModalInit(tab)
 {
-    filtSelModalInit(tab, "annotations", [ "None", "MS/MS", "Formulas", "Compounds" ]);
+    filtSelModalInit(tab, "annotations", [ "None", "MS2", "Formulas", "Compounds" ]);
 }
 
 function filtSelModalInit(tab, col, vals)

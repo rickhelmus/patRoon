@@ -43,6 +43,13 @@
             - group, intensities, estIDLevel, d_rt, d_mz, sets
             --> skip intensities, add rest to info table?
             --> also store in global variable?
+        - refactor/redesign
+            - test select filter
+            - prefix cmp, tp etc columns
+            - cleanout old formatting and fitting functions and harmonize
+            - move main_columns to sysdata
+            - move all JS callbacks etc to js file(s)?
+            - improve code distribution over files 
 
 - tests
     - IDL filter

@@ -21,6 +21,39 @@ roundScrTab <- function(ftab)
     return(ftab)    
 }
 
+prepareFGReactTab <- function(tab, fGroups, MSPeakLists, formulas, compounds, settings)
+{
+    tab <- copy(tab)
+    
+    if (settings$features$chromatograms$small)
+        tab[, chrom_small := group]
+    if (settings$features$chromatograms$large)
+        tab[, chrom_large := group]
+    
+    if (!is.null(MSPeakLists) || !is.null(formulas) || !is.null(compounds))
+    {
+        tab[, annotations := {
+            grp <- group[1]
+            hasMSMS <- !is.null(MSPeakLists) && !is.null(MSPeakLists[[grp]]) && !is.null(MSPeakLists[[grp]][["MSMS"]])
+            hasForm <- !is.null(formulas) && !is.null(formulas[[grp]])
+            hasComp <- !is.null(compounds) && !is.null(compounds[[grp]])
+            ann <- c(if (hasMSMS) "MS2", if (hasForm) "Form", if (hasComp) "Comp")
+            paste0(ann, collapse = ";")
+        }, by = "group"]
+    }
+
+    if (isFGSet(fGroups))
+    {
+        # collapse adduct and ion_mz columns
+        combCols <- function(x) { x <- x[!is.na(x)]; return(if (length(x) == 0) "" else paste0(x, collapse = ";")) }
+        tab[, adduct := combCols(unlist(.SD)), .SDcols = paste0("adduct-", sets(fGroups)), by = seq_len(nrow(tab))]
+        tab[, ion_mz := combCols(unlist(.SD)), .SDcols = paste0("ion_mz-", sets(fGroups)), by = seq_len(nrow(tab))]
+        tab[, (grep("^(adduct|ion_mz)\\-", names(tab), value = TRUE)) := NULL]
+    }
+    
+    return(tab)
+}
+
 getFGTable <- function(fGroups, colSusp, retMin, concAggrParams, toxAggrParams)
 {
     adtArgs <- list(fGroups, qualities = "score", average = TRUE, concAggrParams = concAggrParams,
@@ -375,7 +408,7 @@ genHTMLReportPlotsIntPlots <- function(fGroups, settings, outPath, parallel)
 
 
 reportHTMLUtils$methods(
-    genFGTablePlain = function()
+    genFGTablePlainOld = function()
     {
         mdprintf("Feature groups... ")
         tab <- getFGTable(objects$fGroups, ",", settings$features$retMin, settings$features$aggregateConcs,
@@ -386,6 +419,16 @@ reportHTMLUtils$methods(
         makeFGReactable(tab, "detailsTabPlain", colDefs = colDefs, groupDefs = groupDefs, plots = plots,
                         settings = settings, objects = objects, updateRowFunc = "updateTabRowSelFGroups",
                         initView = "Plain")
+    },
+    genFGTablePlain = function()
+    {
+        mdprintf("Feature groups... ")
+        tab <- as.data.table(objects$fGroups, qualities = "score", average = TRUE, concAggrParams = settings$concAggrParams,
+                             toxAggrParams = settings$toxAggrParams)
+        tab <- prepareFGReactTab(tab, objects$fGroups, objects[["MSPeakLists"]], objects[["formulas"]],
+                                 objects[["compounds"]], settings)
+        makeMainResultsReactableNew(tab, "detailsTabPlain", settings$features$retMin, plots,
+                                    updateRowFunc = "updateTabRowSelFGroups", internFilterable = "group", initView = "Plain")
     },
     genFGTableSuspects = function()
     {
@@ -606,7 +649,7 @@ reportHTMLUtils$methods(
         colDefs <- setReactNumRangeFilters("toxTab", tox, colDefs)
         
         makeReactable(tox, "toxTab", columns = colDefs, pagination = TRUE, filterable = FALSE,
-                      meta = list(internFilterable = "group", neverFilterable = "group"))
+                      meta = list(internFilterable = "group", neverFilterable = NULL))
     },
     
     genSuspAnnTable = function()

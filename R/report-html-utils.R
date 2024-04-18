@@ -4,6 +4,126 @@ getReactColGrpStartCols <- function(groupDefs) sapply(groupDefs[-1], function(co
 
 getReactImgCell <- function(value) htmltools::img(src = value, style = list("max-height" = "300px"))
 
+makeReactCellRoundMerged <- function(rounding)
+{
+    return(function(value)
+    {
+        value <- round(as.numeric(strsplit(value, ";")[[1]]), rounding)
+        return(paste0(value, collapse = ";"))
+    })
+}
+
+makeReactCellSmallChrom <- function(hasLargeChrom, plots)
+{
+    return(function(value, index)
+    {
+        tag <- htmltools::img(src = plots$chromsSmall[[value]], style = list("max-height" = "20px"))
+        if (hasLargeChrom)
+            tag <- htmltools::tagAppendAttributes(tag, "data-srcZoom" = plots$chromsLarge[[value]])
+        else
+            tag <- htmltools::tagAppendAttributes(tag, class = "noZoomImg")
+        return(tag)
+    })
+}
+
+makeReactCellLargeChrom <- function(plots)
+{
+    return(function(value, index) htmltools::img(src = plots$chromsLarge[[value]]))
+}
+
+makeReactCellISTD <- function()
+{
+    function(value)
+    {
+        value <- wrapStr(gsub(",", ", ", value, fixed = TRUE), 50, "<br>")
+        htmltools::span(dangerouslySetInnerHTML = list("__html" = value))
+    }
+}
+
+makeReactCellAnnotations <- function()
+{
+    annTag <- function(bg, fg, ...) htmltools::span(style = list("border-radius" = "30px", padding = "4px 5px",
+                                                                 "margin-right" = "2px", "font-size" = "smaller",
+                                                                 "background-color" = bg, color = fg), ...)
+    
+    function(value)
+    {
+        tags <- list()
+        if (grepl("MS2", value, fixed = TRUE))
+            tags <- c(tags, list(annTag("#033c73", "white", "MS", htmltools::tags$sup("2"))))
+        if (grepl("Form", value, fixed = TRUE))
+            tags <- c(tags, list(annTag("#2d9ddd", "white", "Form")))
+        if (grepl("Comp", value, fixed = TRUE))
+            tags <- c(tags, list(annTag("grey", "white", "Comp")))
+        return(do.call(htmltools::tagList, tags))
+    }
+}
+
+makeReactCellIDL <- function()
+{
+    IDLCols <- getBrewerPal(5, "YlOrBr")
+    function(value)
+    {
+        nidl <- numericIDLevel(value)
+        htmltools::span(style = list("border-radius" = "30px", display = "inline-block", width = "2em",
+                                     "background-color" = IDLCols[nidl], color = if (nidl <= 2) "black" else "white",
+                                     "text-align" = "center", "font-weight" = "bold"),
+                        value)
+    }
+}
+
+makeReactCellFormula <- function()
+{
+    function(value) htmltools::span(dangerouslySetInnerHTML = list("__html" = subscriptFormulaHTML(value, charges = FALSE)))
+}
+
+makeReactFilterInputSelect <- function(id)
+{
+    # UNDONE: replace old reactSelectFilter() function with this one
+    function(values, name)
+    {
+        # from examples
+        htmltools::tags$select(
+            onchange = sprintf("Reactable.setFilter('%s', '%s', event.target.value || undefined)", id, name),
+            tags$option(value = "", "All"),
+            lapply(unique(values), tags$option),
+            "aria-label" = paste("Filter", name),
+            style = "width: 100%; height: 28px;"
+        )
+    }
+}
+
+makeReactFilterInputAnnotations <- function(id)
+{
+    function(values, name) reactSelFilterButton(id, name, "#filterSelModal",
+                                                "filtFeatAnnSelModalInit", "Select")
+}
+
+getReactFilterMethodExact <- function()
+{
+    # UNDONE: replace old reactExactFilter() by this function
+    
+    htmlwidgets::JS("function(rows, columnId, filterValue)
+{
+    return rows.filter(row => row.values[columnId] === filterValue);
+}")
+}
+
+getReactFilterMethodAnnotations <- function()
+{
+    htmlwidgets::JS("function(rows, columnId, filterValue)
+{
+    const MSMS = filterValue.has('MS2'), forms = filterValue.has('Formulas'), comps = filterValue.has('Compounds'),
+                 none = filterValue.has('None');
+    return rows.filter(function(row)
+    {
+        const rv = row.values.annotations.split(';');
+        const rMSMS = rv.includes('MS2'), rforms = rv.includes('Form'), rcomps = rv.includes('Comp');
+        return((none && !MSMS && !rforms && !rcomps) || MSMS && rMSMS || forms && rforms || comps && rcomps);
+    })                                       
+}")
+}
+
 reactSelFilterButton <- function(id, name, target, ocFunc, title)
 {
     htmltools::tags$button(class = "btn btn-secondary btn-sm", "data-bs-toggle" = "modal",
@@ -150,6 +270,138 @@ makePropReactable <- function(tab, id, idcol = FALSE, minPropWidth = 150, minVal
     }
     
     return(makeReactableCompact(tab, id = id, columns = colDefs, ...))
+}
+
+getReactColDefDB <- function(tab)
+{
+    colDefDB <- fread(system.file("report", "main_columns.csv", package = "patRoon"))
+    colDefDB[, isRegEx := grepl("^\\^|\\$$", name)]
+    colDefDB[isRegEx == TRUE, regex := name]
+    colDefDB <- colDefDB[isRegEx | name %chin% names(tab)] # subset
+    
+    # expand regex rows
+    colDefDBRegEx <- colDefDB[isRegEx == TRUE]
+    matchedCols <- rbindlist(lapply(split(colDefDBRegEx, seq_len(nrow(colDefDBRegEx))), function(row)
+    {
+        cols <- grep(row$regex, names(tab), value = TRUE)
+        if (length(cols) == 0)
+            return(NULL)
+        data.table(nameExp = cols, regex = row$regex)
+    }))
+    colDefDB <- merge(colDefDB, matchedCols, by = "regex", all.x = TRUE, sort = FALSE)
+    colDefDB[, name := fifelse(is.na(nameExp), name, nameExp)]
+    colDefDB <- colDefDB[isRegEx == FALSE | !is.na(nameExp)][, nameExp := NULL] # remove unmatched
+    
+    colDefDB[, displayName := fifelse(nzchar(displayName), displayName, name)]
+    colDefDB[isRegEx == TRUE & displayName == "strip", displayName := gsub(regex, "", name)]
+    
+    return(colDefDB)
+}
+
+makeMainResultsReactableNew <- function(tab, id, retMin, plots, updateRowFunc, internFilterable, initView = NULL, ...)
+{
+    tab <- copy(tab)
+    colDefDB <- getReactColDefDB(tab)
+    tab <- subsetDTColumnsIfPresent(tab, colDefDB$name)
+    setcolorder(tab, colDefDB$name)
+    
+    if (retMin)
+    {
+        for (col in colDefDB[formatting == "RT"]$name)
+            set(tab, j = col, value = tab[[col]] / 60)
+    }
+
+    colSepStyle <- getMainReactColSepStyle()
+    
+    groupDefs <- lapply(unique(colDefDB$group), function(cgrp)
+    {
+        reactable::colGroup(cgrp, colDefDB[group == cgrp]$name, headerStyle = colSepStyle)
+    })
+    
+    grpStartCols <- getReactColGrpStartCols(groupDefs)
+    headThemeStyle <- list(padding = "2px 4px")
+    bgstyle <- htmlwidgets::JS(sprintf("function(rowInfo, column, state)
+{
+    let ret = { }
+    if ([ %s ].includes(column.id))
+        ret.borderLeft = '%s';
+    return ret;
+}", paste0("'", grpStartCols, "'", collapse = ","), colSepStyle))
+    
+    # build reactable column defs: set display names, cell formatting, filters, visibility
+    colDefs <- sapply(names(tab), function(col)
+    {
+        cdrow <- colDefDB[name == col]
+        format <- if (cdrow$formatting != "round_merged" && !is.na(cdrow$rounding))
+            reactable::colFormat(digits = cdrow$rounding)
+        
+        cell <- switch(cdrow$formatting,
+                       round_merged = makeReactCellRoundMerged(cdrow$rounding),
+                       chromSmall = makeReactCellSmallChrom("chromLarge" %chin% tab$formatting, plots),
+                       chromLarge = makeReactCellLargeChrom(plots),
+                       ISTD = makeReactCellISTD(),
+                       annotations = makeReactCellAnnotations(),
+                       structure = getReactImgCell, # UNDONE: convert function to new closure style
+                       IDL = makeReactCellIDL(),
+                       formula = makeReactCellFormula(),
+                       NULL)
+        
+        filterInput <- switch(cdrow$filter,
+                              select = makeReactFilterInputSelect(id),
+                              annotations = makeReactFilterInputAnnotations(id),
+                              NULL)
+        filterMethod <- switch(cdrow$filter,
+                               exact = getReactFilterMethodExact(),
+                               annotations = getReactFilterMethodAnnotations())
+        
+        return(reactable::colDef(name = cdrow$displayName, show = !cdrow$hidden, format = format, cell = cell,
+                                 minWidth = if (!is.na(cdrow$minWidth)) cdrow$minWidth else 100,
+                                 align = if (nzchar(cdrow$align)) cdrow$align, style = bgstyle,
+                                 filterInput = filterInput, filterMethod = filterMethod))
+    }, simplify = FALSE)
+    colDefs <- setReactNumRangeFilters(id, tab, colDefs)
+    for (col in grpStartCols)
+        colDefs[[col]]$headerStyle <- colSepStyle
+    
+    onClick <- htmlwidgets::JS(sprintf("function(rowInfo, column)
+{
+    Reactable.setMeta('%s', { selectedRow: rowInfo.index });
+    %s(rowInfo.values, rowInfo.index);
+}", id, updateRowFunc))
+
+    colToggles <- sapply(unique(colDefDB[nzchar(colToggle)]$colToggle), function(ct) colDefDB[colToggle == ct]$name,
+                         simplify = FALSE)
+    
+    rowStyle <- htmlwidgets::JS("function(rowInfo, state)
+{
+    const sel = state.meta.selectedRow;
+    let ret = { cursor: 'pointer' };
+    if (sel != null && rowInfo != undefined && rowInfo.index === sel)
+    {
+        ret.background = '#eee';
+        ret.fontWeight = 'bold';
+    }
+    return ret;
+}")
+    
+    rt <- makeReactable(tab, id, highlight = TRUE, onClick = onClick, columns = colDefs,
+                        defaultColDef = reactable::colDef(style = bgstyle), columnGroups = groupDefs,
+                        filterable = FALSE, pagination = TRUE,
+                        theme = reactable::reactableTheme(headerStyle = headThemeStyle,
+                                                          groupHeaderStyle = headThemeStyle,
+                                                          cellPadding = "2px 4px"),
+                        meta = list(selectedRow = 0, updateRowFunc = htmlwidgets::JS(updateRowFunc),
+                                    CSVCols = colDefDB[CSV == TRUE]$name, colToggles = colToggles,
+                                    internFilterable = internFilterable),
+                        rowStyle = rowStyle, ...)
+    
+    if (!is.null(initView))
+    {
+        # HACK: this seems to be the easiest way to set an element attribute...
+        rt <- htmlwidgets::onRender(rt, htmlwidgets::JS(sprintf("function(el, x) { el.setAttribute('detailsViewTabInit', '%s'); }", initView)))
+    }
+    
+    return(rt)
 }
 
 makeMainResultsReactable <- function(tab, id, colDefs, groupDefs, updateRowFunc, meta, initView = NULL, ...)

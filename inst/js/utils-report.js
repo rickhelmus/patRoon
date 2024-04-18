@@ -620,9 +620,12 @@ function toggleTabFilters(tableID, e)
     // NOTE: use a non filterable column so nothing gets reset
     // NOTE: this somehow will reset all filter values, so restore internal filters if needed...
     
-    const curInternFilters = internFilterable.map(col => Reactable.getInstance(tableID).allColumns.find(c => c.id === col).filterValue);
+    let curInternFilters;
+    if (internFilterable !== undefined)
+        curInternFilters = internFilterable.map(col => Reactable.getInstance(tableID).allColumns.find(c => c.id === col).filterValue);
     Reactable.setFilter(tableID, internFilterable[0], undefined);
-    internFilterable.forEach(function(col, index) { Reactable.setFilter(tableID, col, curInternFilters[index]); } );
+    if (internFilterable !== undefined)
+        internFilterable.forEach(function(col, index) { Reactable.setFilter(tableID, col, curInternFilters[index]); } );
 }
 
 function toggleAnnOnlySusp(wh, e, r = undefined)

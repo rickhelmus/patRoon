@@ -243,7 +243,7 @@ reportHTMLUtils$methods(
         }
         
         makeFGReactable(tab, "detailsTabTPsParents", plots, settings = settings, objects = objects, colDefs = colDefs,
-                        groupDefs = groupDefs, updateRowFunc = "updateTabRowSelTPsByParents", initView = "TPsParents")
+                        groupDefs = groupDefs, updateRowFunc = "updateTabSelTPsByParents", initView = "TPsParents")
     },
     
     genFGTableTPs = function()
@@ -286,7 +286,7 @@ reportHTMLUtils$methods(
         colDefs$cmpIndex <- reactable::colDef(show = FALSE)
         
         makeFGReactable(tabTPs, "detailsTabTPs", plots, settings = settings, objects = objects, colDefs = colDefs,
-                        groupDefs = groupDefs, updateRowFunc = "updateTabRowSelTPsByGroup", initView = "TPsByGroup")
+                        groupDefs = groupDefs, updateRowFunc = "updateTabSelTPsByGroup", initView = "TPsByGroup")
     },
     
     genTPCandidatesTable = function()
@@ -362,7 +362,7 @@ reportHTMLUtils$methods(
         colDefs$component$filterMethod <- colDefs$group$filterMethod <- reactExactFilter()
         
         makeMainResultsReactable(candidatesTab, "TPCandidatesTab", colDefs = colDefs, groupDefs = groupDefs,
-                                 updateRowFunc = "updateTabRowSelTPsCandidates", meta = list())
+                                 updateRowFunc = "updateTabSelTPsCandidates", meta = list())
     },
 
     genTPSimTable = function()

@@ -145,7 +145,7 @@ function toggleBottomTab(tabEl, enable)
     }
 }
 
-function updateTabRowSelFGroups(rowValues, rowIndex)
+function updateTabSelFGroups(rowValues, rowIndex)
 {
     const grp = rowValues.group;
     
@@ -191,33 +191,33 @@ function updateTabRowSelFGroups(rowValues, rowIndex)
     }
 }
 
-function updateTabRowSelTPsByParents(rowValues, rowIndex)
+function updateTabSelSusByGroup(rowValues, rowIndex)
 {
-    updateTabRowSelFGroups(rowValues, rowIndex);
-    document.getElementById("TPCompon-select").value = rowValues.component;
-    updateTPCompon(rowValues.component, false);
-}
-
-function updateTabRowSelSuspectsByGroup(rowValues, rowIndex)
-{
-    Reactable.setFilter('detailsTabSuspectsCandidates', 'group', rowValues.group);
+    Reactable.setFilter('detailsTabSusCand', 'group', rowValues.group);
     // activate first row
     // UNDONE: does this work properly with paging?
     // UNDONE: make a function for this
     /*const TPCandInstData = Array.from(Reactable.getInstance("TPCandidatesTab").data);
     const firstRowInd = TPCandInstData.findIndex(el => el.component === rowValues.component && el.group === rowValues.group);
-    updateTabRowSelTPsCandidates(TPCandInstData[firstRowInd], firstRowInd);*/
+    updateTabSelTPsCandidates(TPCandInstData[firstRowInd], firstRowInd);*/
 }
 
-function updateTabRowSelSuspectsCandidates(rowValues, rowIndex)
+function updateTabSelSusCand(rowValues, rowIndex)
 {
-    updateTabRowSelFGroups(rowValues, rowIndex);
+    updateTabSelFGroups(rowValues, rowIndex);
     
     if (document.getElementById('suspAnnTab'))
         Reactable.setFilter('suspAnnTab', 'suspID', rowValues.susp_name + '-' + rowValues.group);
 }
 
-function updateTabRowSelTPsByGroup(rowValues, rowIndex)
+function updateTabSelTPsByParents(rowValues, rowIndex)
+{
+    updateTabSelFGroups(rowValues, rowIndex);
+    document.getElementById("TPCompon-select").value = rowValues.component;
+    updateTPCompon(rowValues.component, false);
+}
+
+function updateTabSelTPsByGroup(rowValues, rowIndex)
 {
     Reactable.setFilter('TPCandidatesTab', 'component', rowValues.component);
     Reactable.setFilter('TPCandidatesTab', 'group', rowValues.group);
@@ -225,12 +225,12 @@ function updateTabRowSelTPsByGroup(rowValues, rowIndex)
     // UNDONE: does this work properly with paging?
     const TPCandInstData = Array.from(Reactable.getInstance("TPCandidatesTab").data);
     const firstRowInd = TPCandInstData.findIndex(el => el.component === rowValues.component && el.group === rowValues.group);
-    updateTabRowSelTPsCandidates(TPCandInstData[firstRowInd], firstRowInd);
+    updateTabSelTPsCandidates(TPCandInstData[firstRowInd], firstRowInd);
 }
 
-function updateTabRowSelTPsCandidates(rowValues, rowIndex)
+function updateTabSelTPsCandidates(rowValues, rowIndex)
 {
-    updateTabRowSelFGroups(rowValues, rowIndex);
+    updateTabSelFGroups(rowValues, rowIndex);
     
     if (Object.keys(reportPlots.TPs).length > 0)
     {

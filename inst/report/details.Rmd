@@ -43,6 +43,10 @@ div:has(> div.detailsMainTable) {
     grid-area: main;
 }
 
+div:has(> div.detailsMainTableNoSB) {
+    grid-area: main / sd / main / main;
+}
+
 div:has(> div.detailsMainTableOnly) {
     grid-area: main / main / main / cand;
 }
@@ -103,6 +107,7 @@ UIArgs <- list(
 UIArgs <- c(UIArgs, utils$pruneUI(c,
     utils$genHeaderbar(),
     utils$genDetailsPlainUI(),
+    utils$maybeInclUI(utils$hasSuspects(), utils$genDetailsSuspectsUI()),
     utils$maybeInclUI(utils$hasComponentsTPs(), utils$genDetailsTPsUI()),
     utils$genBottombar()
 ))

@@ -408,30 +408,38 @@ genHTMLReportPlotsIntPlots <- function(fGroups, settings, outPath, parallel)
 
 
 reportHTMLUtils$methods(
-    genFGTablePlainOld = function()
-    {
-        mdprintf("Feature groups... ")
-        tab <- getFGTable(objects$fGroups, ",", settings$features$retMin, settings$features$aggregateConcs,
-                          settings$features$aggregateTox)
-        rgs <- replicateGroups(objects$fGroups)
-        groupDefs <- getFGGroupDefs(tab, NULL, rgs)
-        colDefs <- getFeatGroupColDefs(tab, rgs)
-        makeFGReactable(tab, "detailsTabPlain", colDefs = colDefs, groupDefs = groupDefs, plots = plots,
-                        settings = settings, objects = objects, updateRowFunc = "updateTabRowSelFGroups",
-                        initView = "Plain")
-    },
     genFGTablePlain = function()
     {
         mdprintf("Feature groups... ")
-        tab <- as.data.table(objects$fGroups, qualities = "score", average = TRUE, concAggrParams = settings$concAggrParams,
-                             toxAggrParams = settings$toxAggrParams)
+        tab <- as.data.table(objects$fGroups, qualities = "score", average = TRUE,
+                             concAggrParams = settings$concAggrParams, toxAggrParams = settings$toxAggrParams)
         tab <- prepareFGReactTab(tab, objects$fGroups, objects[["MSPeakLists"]], objects[["formulas"]],
                                  objects[["compounds"]], settings)
         makeMainResultsReactableNew(tab, "detailsTabPlain", settings$features$retMin, plots,
-                                    updateRowFunc = "updateTabRowSelFGroups", internFilterable = "group", initView = "Plain")
+                                    updateRowFunc = "updateTabRowSelFGroups", initView = "Plain")
+    },
+    genFGTableSuspectsByGroup = function()
+    {
+        tab <- as.data.table(objects$fGroups, qualities = "score", average = TRUE,
+                             concAggrParams = settings$concAggrParams, toxAggrParams = settings$toxAggrParams)
+        tab <- prepareFGReactTab(tab, objects$fGroups, objects[["MSPeakLists"]], objects[["formulas"]],
+                                 objects[["compounds"]], settings)
+        makeMainResultsReactableNew(tab, "detailsTabSuspectsByGroup", settings$features$retMin, plots,
+                                    updateRowFunc = "updateTabRowSelSuspectsByGroup", initView = "Suspects")
+    },
+    genSuspectsCandidatesTable = function()
+    {
+        tab <- as.data.table(objects$fGroups, qualities = "score", average = TRUE, collapseSuspects = NULL,
+                             concAggrParams = settings$concAggrParams, toxAggrParams = settings$toxAggrParams)
+        tab <- prepareFGReactTab(tab, objects$fGroups, objects[["MSPeakLists"]], objects[["formulas"]],
+                                 objects[["compounds"]], settings)
+        makeMainResultsReactableNew(tab, "detailsTabSuspectsCandidates", settings$features$retMin, plots,
+                                    updateRowFunc = "updateTabRowSelSuspectsCandidates",
+                                    internFilterable = c("group", "susp_name"), initView = "Suspects")
     },
     genFGTableSuspects = function()
     {
+        # UNDONE: remove
         tab <- getFGTable(objects$fGroups, NULL, settings$features$retMin, settings$features$aggregateConcs,
                           settings$features$aggregateTox)[!is.na(susp_name)]
         rgs <- replicateGroups(objects$fGroups)
@@ -441,6 +449,7 @@ reportHTMLUtils$methods(
                         settings = settings, objects = objects, groupBy = "susp_name",
                         updateRowFunc = "updateRowFGSelSuspects", initView = "Suspects")
     },
+    
     genFGTableISTDs = function()
     {
         istds <- data.table::copy(internalStandards(objects$fGroups))
@@ -701,6 +710,28 @@ reportHTMLUtils$methods(
                 bslib::card_header("Feature groups"),
                 bsCardBodyNoFill(makeFGToolbar("detailsTabPlain")),
                 bslib::card_body(genFGTablePlain())
+            )
+        )
+    },
+    
+    genDetailsSuspectsUI = function()
+    {
+        list(
+            bslib::card(
+                class = "detailsMainTableNoSB",
+                detailsViewOfParent = "Suspects",
+                full_screen = TRUE,
+                bslib::card_header("Feature groups"),
+                bsCardBodyNoFill(makeFGToolbar("detailsTabSuspectsByGroup")),
+                bslib::card_body(genFGTableSuspectsByGroup())
+            ),
+            bslib::card(
+                class = "detailsCandTable",
+                detailsViewOfParent = "Suspects",
+                full_screen = TRUE,
+                bslib::card_header("Candidates"),
+                bsCardBodyNoFill(makeFGToolbar("detailsTabSuspectsCandidates")),
+                bslib::card_body(genSuspectsCandidatesTable())
             )
         )
     }

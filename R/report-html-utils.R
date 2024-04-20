@@ -298,7 +298,8 @@ getReactColDefDB <- function(tab)
     return(colDefDB)
 }
 
-makeMainResultsReactableNew <- function(tab, id, retMin, plots, updateRowFunc, internFilterable, initView = NULL, ...)
+makeMainResultsReactableNew <- function(tab, id, retMin, plots, updateRowFunc, internFilterable = NULL, initView = NULL,
+                                        ...)
 {
     tab <- copy(tab)
     colDefDB <- getReactColDefDB(tab)

@@ -198,6 +198,25 @@ function updateTabRowSelTPsByParents(rowValues, rowIndex)
     updateTPCompon(rowValues.component, false);
 }
 
+function updateTabRowSelSuspectsByGroup(rowValues, rowIndex)
+{
+    Reactable.setFilter('detailsTabSuspectsCandidates', 'group', rowValues.group);
+    // activate first row
+    // UNDONE: does this work properly with paging?
+    // UNDONE: make a function for this
+    /*const TPCandInstData = Array.from(Reactable.getInstance("TPCandidatesTab").data);
+    const firstRowInd = TPCandInstData.findIndex(el => el.component === rowValues.component && el.group === rowValues.group);
+    updateTabRowSelTPsCandidates(TPCandInstData[firstRowInd], firstRowInd);*/
+}
+
+function updateTabRowSelSuspectsCandidates(rowValues, rowIndex)
+{
+    updateTabRowSelFGroups(rowValues, rowIndex);
+    
+    if (document.getElementById('suspAnnTab'))
+        Reactable.setFilter('suspAnnTab', 'suspID', rowValues.susp_name + '-' + rowValues.group);
+}
+
 function updateTabRowSelTPsByGroup(rowValues, rowIndex)
 {
     Reactable.setFilter('TPCandidatesTab', 'component', rowValues.component);
@@ -612,7 +631,7 @@ function toggleTabFilters(tableID, e)
 
     Reactable.getInstance(tableID).allColumns.forEach(function(col)
     {
-        if (!internFilterable.includes(col.id) && !neverFilterable.includes(col.id))
+        if ((!internFilterable || !internFilterable.includes(col.id)) && !neverFilterable.includes(col.id))
             col.filterable = e;
     })
     

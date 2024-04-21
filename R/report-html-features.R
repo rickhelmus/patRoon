@@ -425,7 +425,7 @@ reportHTMLUtils$methods(
         tab <- prepareFGReactTab(tab, objects$fGroups, objects[["MSPeakLists"]], objects[["formulas"]],
                                  objects[["compounds"]], settings)
         makeMainResultsReactableNew(tab, "SusByGroup", settings$features$retMin, plots,
-                                    updateRowFunc = "updateTabSelSusByGroup", initView = "Suspects")
+                                    updateRowFunc = "updateTabSelSusByGroup", initView = "SuspectsByGroup")
     },
     genMainTableSusCandSuspect = function()
     {
@@ -438,6 +438,30 @@ reportHTMLUtils$methods(
                                     updateRowFunc = "updateTabSelSusCandSuspect",
                                     internFilterable = "group")
     },
+    genMainTableSusBySuspect = function()
+    {
+        tab <- data.table::copy(screenInfo(objects$fGroups))
+        setnames(tab, paste0("susp_", names(tab)))
+        tab[, susp_groups := paste0(susp_group, collapse = ", "), by = "susp_name"]
+        tab <- unique(tab, by = "susp_name")
+        if (!is.null(tab[["susp_InChIKey"]]))
+            tab[, susp_structure := plots$structs[susp_InChIKey]]
+        makeMainResultsReactableNew(tab, "SusBySuspect", settings$features$retMin, plots,
+                                    updateRowFunc = "updateTabSelSusBySuspect", initView = "SuspectsBySuspect")
+    },
+    genMainTableSusCandGroup = function()
+    {
+        tab <- as.data.table(objects$fGroups, qualities = "score", average = TRUE, collapseSuspects = NULL,
+                             concAggrParams = settings$concAggrParams, toxAggrParams = settings$toxAggrParams)
+        tab <- prepareFGReactTab(tab, objects$fGroups, objects[["MSPeakLists"]], objects[["formulas"]],
+                                 objects[["compounds"]], settings)
+        # HACK: use a different name (and col definition) so that we get a hidden column used for filtering
+        setnames(tab, "susp_name", "susp_ID")
+        makeMainResultsReactableNew(tab, "SusCandGroup", settings$features$retMin, plots,
+                                    updateRowFunc = "updateTabSelSusCandGroup",
+                                    internFilterable = "susp_name")
+    },
+    
     genFGTableSuspects = function()
     {
         # UNDONE: remove
@@ -716,23 +740,27 @@ reportHTMLUtils$methods(
     
     genDetailsSuspectsUI = function()
     {
+        makeCard <- function(cl, dvp, hd, id, tab)
+        {
+            bslib::card(
+                class = cl,
+                detailsViewOfParent = dvp,
+                full_screen = TRUE,
+                bslib::card_header(hd),
+                bsCardBodyNoFill(makeFGToolbar("id")),
+                bslib::card_body(tab)
+            )            
+        }
+        
         list(
-            bslib::card(
-                class = "detailsMainTableNoSB",
-                detailsViewOfParent = "Suspects",
-                full_screen = TRUE,
-                bslib::card_header("Feature groups"),
-                bsCardBodyNoFill(makeFGToolbar("detailsTabSusByGroup")),
-                bslib::card_body(genMainTableSusByGroup())
-            ),
-            bslib::card(
-                class = "detailsCandTable",
-                detailsViewOfParent = "Suspects",
-                full_screen = TRUE,
-                bslib::card_header("Candidates"),
-                bsCardBodyNoFill(makeToolbar("detailsTabSusCandSuspect")),
-                bslib::card_body(genMainTableSusCandSuspect())
-            )
+            makeCard("detailsMainTableNoSB", "SuspectsByGroup", "Feature groups", "detailsTabSusByGroup",
+                     genMainTableSusByGroup()),
+            makeCard("detailsCandTable", "SuspectsByGroup", "Candidates", "detailsTabSusCandSuspect",
+                     genMainTableSusCandSuspect()),
+            makeCard("detailsMainTableNoSB", "SuspectsBySuspect", "Suspects", "detailsTabSusBySuspect",
+                     genMainTableSusBySuspect()),
+            makeCard("detailsCandTable", "SuspectsBySuspect", "Feature groups", "detailsTabSusCandGroup",
+                     genMainTableSusCandGroup())
         )
     }
 )

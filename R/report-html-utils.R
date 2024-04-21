@@ -272,12 +272,11 @@ makePropReactable <- function(tab, id, idcol = FALSE, minPropWidth = 150, minVal
     return(makeReactableCompact(tab, id = id, columns = colDefs, ...))
 }
 
-getReactColDefDB <- function(tab)
+getReactColDefDB <- function(tab, tabName)
 {
     colDefDB <- fread(system.file("report", "main_columns.csv", package = "patRoon"))
     colDefDB[, isRegEx := grepl("^\\^|\\$$", name)]
     colDefDB[isRegEx == TRUE, regex := name]
-    colDefDB <- colDefDB[isRegEx | name %chin% names(tab)] # subset
     
     # expand regex rows
     colDefDBRegEx <- colDefDB[isRegEx == TRUE]
@@ -288,21 +287,28 @@ getReactColDefDB <- function(tab)
             return(NULL)
         data.table(nameExp = cols, regex = row$regex)
     }))
-    colDefDB <- merge(colDefDB, matchedCols, by = "regex", all.x = TRUE, sort = FALSE)
-    colDefDB[, name := fifelse(is.na(nameExp), name, nameExp)]
-    colDefDB <- colDefDB[isRegEx == FALSE | !is.na(nameExp)][, nameExp := NULL] # remove unmatched
+    if (length(matchedCols) == 0)
+        colDefDB <- colDefDB[isRegEx == FALSE]
+    else
+    {
+        colDefDB <- merge(colDefDB, matchedCols, by = "regex", all.x = TRUE, sort = FALSE)
+        colDefDB[, name := fifelse(is.na(nameExp), name, nameExp)]
+        colDefDB <- colDefDB[isRegEx == FALSE | !is.na(nameExp)][, nameExp := NULL] # remove unmatched
+    }
     
     colDefDB[, displayName := fifelse(nzchar(displayName), displayName, name)]
     colDefDB[isRegEx == TRUE & displayName == "strip", displayName := gsub(regex, "", name)]
     
+    colDefDB <- colDefDB[get(tabName) == TRUE & name %chin% names(tab)] # subset
+    
     return(colDefDB)
 }
 
-makeMainResultsReactableNew <- function(tab, id, retMin, plots, updateRowFunc, internFilterable = NULL, initView = NULL,
-                                        ...)
+makeMainResultsReactableNew <- function(tab, tabName, retMin, plots, updateRowFunc, internFilterable = NULL,
+                                        initView = NULL, ...)
 {
     tab <- copy(tab)
-    colDefDB <- getReactColDefDB(tab)
+    colDefDB <- getReactColDefDB(tab, tabName)
     tab <- subsetDTColumnsIfPresent(tab, colDefDB$name)
     setcolorder(tab, colDefDB$name)
     
@@ -312,13 +318,12 @@ makeMainResultsReactableNew <- function(tab, id, retMin, plots, updateRowFunc, i
             set(tab, j = col, value = tab[[col]] / 60)
     }
 
+    id <- paste0("detailsTab", tabName)
     colSepStyle <- getMainReactColSepStyle()
-    
     groupDefs <- lapply(unique(colDefDB$group), function(cgrp)
     {
         reactable::colGroup(cgrp, colDefDB[group == cgrp]$name, headerStyle = colSepStyle)
     })
-    
     grpStartCols <- getReactColGrpStartCols(groupDefs)
     headThemeStyle <- list(padding = "2px 4px")
     bgstyle <- htmlwidgets::JS(sprintf("function(rowInfo, column, state)
@@ -370,9 +375,6 @@ makeMainResultsReactableNew <- function(tab, id, retMin, plots, updateRowFunc, i
     %s(rowInfo.values, rowInfo.index);
 }", id, updateRowFunc))
 
-    colToggles <- sapply(unique(colDefDB[nzchar(colToggle)]$colToggle), function(ct) colDefDB[colToggle == ct]$name,
-                         simplify = FALSE)
-    
     rowStyle <- htmlwidgets::JS("function(rowInfo, state)
 {
     const sel = state.meta.selectedRow;
@@ -384,6 +386,10 @@ makeMainResultsReactableNew <- function(tab, id, retMin, plots, updateRowFunc, i
     }
     return ret;
 }")
+
+    toColList <- function(col) sapply(unique(colDefDB[nzchar(get(col))][[col]]),
+                                      function(ct) colDefDB[get(col) == ct]$name,
+                                      simplify = FALSE)
     
     rt <- makeReactable(tab, id, highlight = TRUE, onClick = onClick, columns = colDefs,
                         defaultColDef = reactable::colDef(style = bgstyle), columnGroups = groupDefs,
@@ -392,7 +398,7 @@ makeMainResultsReactableNew <- function(tab, id, retMin, plots, updateRowFunc, i
                                                           groupHeaderStyle = headThemeStyle,
                                                           cellPadding = "2px 4px"),
                         meta = list(selectedRow = 0, updateRowFunc = htmlwidgets::JS(updateRowFunc),
-                                    CSVCols = colDefDB[CSV == TRUE]$name, colToggles = colToggles,
+                                    CSVCols = colDefDB[CSV == TRUE]$name, colToggles = toColList("colToggle"),
                                     internFilterable = internFilterable),
                         rowStyle = rowStyle, ...)
     

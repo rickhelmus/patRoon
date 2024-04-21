@@ -39,6 +39,7 @@
         - report also candidate specific frag/NL matches? Or either?
         - BUG: JS errors when fGroups are subset/do not contain TPs anymore?
         - BUG: Visibility for Suspect only checkbox for formulas/compounds is only handled if suspects are annotated
+        - test utf characters in column CSV file on Windows
         - report parent properties that used to be in aggregated fields
             - group, intensities, estIDLevel, d_rt, d_mz, sets
             --> skip intensities, add rest to info table?
@@ -49,7 +50,8 @@
             - cleanout old formatting and fitting functions and harmonize
             - move main_columns to sysdata
             - move all JS callbacks etc to js file(s)?
-            - improve code distribution over files 
+            - improve code distribution over files
+            - add featScores columns to CSV (or regex?)
 
 - tests
     - IDL filter

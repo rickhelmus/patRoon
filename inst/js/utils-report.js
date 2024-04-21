@@ -69,12 +69,19 @@ function setDetailsTablesRatio(fr1, fr2)
 
 getViewIDFromSel = function(sel)
 {
-    if (sel !== "TPs")
-        return sel;
-    if (document.getElementById("viewTPDetailsParents").checked)
-        return "TPsParents";
-
-    return "TPsByGroup"; // UNDONE: also handle by suspect
+    if (sel === "Suspects")
+    {
+        return (document.getElementById("viewSuspDetailsByGroup").checked) ? "SuspectsByGroup" : "SuspectsBySuspect";
+    }
+    
+    if (sel === "TPs")
+    {
+        if (document.getElementById("viewTPDetailsParents").checked)
+            return "TPsParents";
+        return "TPsByGroup"; // UNDONE: also handle by suspect
+    }
+    
+    return sel;
 }
 
 function updateDetailsView(sel)
@@ -203,14 +210,26 @@ function updateTabSelFGroups(rowValues, rowIndex)
 
 function updateTabSelSusByGroup(rowValues, rowIndex)
 {
+    updateTabSelFGroups(rowValues, rowIndex);
     Reactable.setFilter("detailsTabSusCandSuspect", "group", rowValues.group);
-    setTabSelFirstRow("detailsTabSusCandSuspect", el => el.group === rowValues.group)
+    setTabSelFirstRow("detailsTabSusCandSuspect", el => el.group === rowValues.group);
+}
+
+function updateTabSelSusBySuspect(rowValues, rowIndex)
+{
+    Reactable.setFilter("detailsTabSusCandGroup", "susp_ID", rowValues.susp_name);
+    setTabSelFirstRow("detailsTabSusCandGroup", el => el.susp_ID === rowValues.susp_name);
 }
 
 function updateTabSelSusCandSuspect(rowValues, rowIndex)
 {
+    if (document.getElementById('suspAnnTab'))
+        Reactable.setFilter('suspAnnTab', 'suspID', rowValues.susp_name + '-' + rowValues.group);
+}
+
+function updateTabSelSusCandGroup(rowValues, rowIndex)
+{
     updateTabSelFGroups(rowValues, rowIndex);
-    
     if (document.getElementById('suspAnnTab'))
         Reactable.setFilter('suspAnnTab', 'suspID', rowValues.susp_name + '-' + rowValues.group);
 }

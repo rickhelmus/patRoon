@@ -145,6 +145,16 @@ function toggleBottomTab(tabEl, enable)
     }
 }
 
+function setTabSelFirstRow(tabID, findRowFunc)
+{
+    // activate first row
+    // UNDONE: does this work properly with paging?
+    const instData = Array.from(Reactable.getInstance(tabID).data);
+    const firstRowInd = instData.findIndex(findRowFunc);
+    Reactable.setMeta(tabID, { selectedRow: firstRowInd });
+    Reactable.getState(tabID).meta.updateRowFunc(instData[firstRowInd], firstRowInd);
+}
+
 function updateTabSelFGroups(rowValues, rowIndex)
 {
     const grp = rowValues.group;
@@ -193,16 +203,11 @@ function updateTabSelFGroups(rowValues, rowIndex)
 
 function updateTabSelSusByGroup(rowValues, rowIndex)
 {
-    Reactable.setFilter('detailsTabSusCand', 'group', rowValues.group);
-    // activate first row
-    // UNDONE: does this work properly with paging?
-    // UNDONE: make a function for this
-    /*const TPCandInstData = Array.from(Reactable.getInstance("TPCandidatesTab").data);
-    const firstRowInd = TPCandInstData.findIndex(el => el.component === rowValues.component && el.group === rowValues.group);
-    updateTabSelTPsCandidates(TPCandInstData[firstRowInd], firstRowInd);*/
+    Reactable.setFilter("detailsTabSusCandSuspect", "group", rowValues.group);
+    setTabSelFirstRow("detailsTabSusCandSuspect", el => el.group === rowValues.group)
 }
 
-function updateTabSelSusCand(rowValues, rowIndex)
+function updateTabSelSusCandSuspect(rowValues, rowIndex)
 {
     updateTabSelFGroups(rowValues, rowIndex);
     

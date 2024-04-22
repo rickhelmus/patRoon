@@ -54,6 +54,16 @@ prepareFGReactTab <- function(tab, fGroups, MSPeakLists, formulas, compounds, se
     return(tab)
 }
 
+prepareSuspReactTab <- function(tab, plots)
+{
+    tab <- copy(tab)
+    
+    if (!is.null(tab[["susp_InChIKey"]]))
+        tab[, susp_structure := plots$structs[susp_InChIKey]]
+    
+    return(tab)
+}
+
 getFGTable <- function(fGroups, colSusp, retMin, concAggrParams, toxAggrParams)
 {
     adtArgs <- list(fGroups, qualities = "score", average = TRUE, concAggrParams = concAggrParams,
@@ -418,6 +428,7 @@ reportHTMLUtils$methods(
         makeMainResultsReactableNew(tab, "Plain", settings$features$retMin, plots,
                                     updateRowFunc = "updateTabSelFGroups", initView = "Plain")
     },
+    
     genMainTableSusByGroup = function()
     {
         tab <- as.data.table(objects$fGroups, qualities = "score", average = TRUE,
@@ -432,8 +443,7 @@ reportHTMLUtils$methods(
         tab <- data.table::copy(screenInfo(objects$fGroups))
         scols <- setdiff(names(tab), "group")
         setnames(tab, scols, paste0("susp_", scols))
-        if (!is.null(tab[["susp_InChIKey"]]))
-            tab[, susp_structure := plots$structs[susp_InChIKey]]
+        tab <- prepareSuspReactTab(tab, plots)
         makeMainResultsReactableNew(tab, "SusCandSuspect", settings$features$retMin, plots,
                                     updateRowFunc = "updateTabSelSusCandSuspect",
                                     internFilterable = "group")
@@ -444,8 +454,7 @@ reportHTMLUtils$methods(
         setnames(tab, paste0("susp_", names(tab)))
         tab[, susp_groups := paste0(susp_group, collapse = ", "), by = "susp_name"]
         tab <- unique(tab, by = "susp_name")
-        if (!is.null(tab[["susp_InChIKey"]]))
-            tab[, susp_structure := plots$structs[susp_InChIKey]]
+        tab <- prepareSuspReactTab(tab, plots)
         makeMainResultsReactableNew(tab, "SusBySuspect", settings$features$retMin, plots,
                                     updateRowFunc = "updateTabSelSusBySuspect", initView = "SuspectsBySuspect")
     },
@@ -459,7 +468,57 @@ reportHTMLUtils$methods(
         setnames(tab, "susp_name", "susp_ID")
         makeMainResultsReactableNew(tab, "SusCandGroup", settings$features$retMin, plots,
                                     updateRowFunc = "updateTabSelSusCandGroup",
-                                    internFilterable = "susp_name")
+                                    internFilterable = "susp_ID")
+    },
+
+    # HACK: the ISTD table is essentially the same as what screenInfo() returns for suspects. So the following functions
+    # do largely the same.
+    
+    genMainTableISTDsByGroup = function()
+    {
+        tab <- as.data.table(objects$fGroups, qualities = "score", average = TRUE,
+                             concAggrParams = settings$concAggrParams, toxAggrParams = settings$toxAggrParams)
+        tab <- prepareFGReactTab(tab, objects$fGroups, objects[["MSPeakLists"]], objects[["formulas"]],
+                                 objects[["compounds"]], settings)
+        makeMainResultsReactableNew(tab, "ISTDsByGroup", settings$features$retMin, plots,
+                                    updateRowFunc = "updateTabSelISTDsByGroup", initView = "ISTDsByGroup")
+    },
+    genMainTableISTDsCandISTD = function()
+    {
+        tab <- data.table::copy(internalStandards(objects$fGroups))
+        scols <- setdiff(names(tab), "group")
+        setnames(tab, scols, paste0("susp_", scols))
+        tab <- prepareSuspReactTab(tab, plots)
+        makeMainResultsReactableNew(tab, "ISTDsCandISTD", settings$features$retMin, plots,
+                                    updateRowFunc = "updateTabSelISTDsCandISTD", internFilterable = "group")
+    },
+    genMainTableISTDsByISTD = function()
+    {
+        tab <- data.table::copy(internalStandards(objects$fGroups))
+        setnames(tab, paste0("susp_", names(tab)))
+        tab[, susp_groups := paste0(susp_group, collapse = ", "), by = "susp_name"]
+        tab <- unique(tab, by = "susp_name")
+        tab <- prepareSuspReactTab(tab, plots)
+        makeMainResultsReactableNew(tab, "ISTDsByISTD", settings$features$retMin, plots,
+                                    updateRowFunc = "updateTabSelISTDsByISTD", initView = "ISTDsByISTD")
+    },
+    genMainTableISTDsCandGroup = function()
+    {
+        tab <- data.table::copy(internalStandards(objects$fGroups))
+        scols <- setdiff(names(tab), "group")
+        setnames(tab, scols, paste0("susp_", scols))
+        # HACK: use a different name (and col definition) so that we get a hidden column used for filtering
+        setnames(tab, "susp_name", "susp_ID")
+        
+        ftab <- as.data.table(objects$fGroups, qualities = "score", average = TRUE, collapseSuspects = NULL,
+                              concAggrParams = settings$concAggrParams, toxAggrParams = settings$toxAggrParams)
+        ftab <- prepareFGReactTab(tab, objects$fGroups, objects[["MSPeakLists"]], objects[["formulas"]],
+                                  objects[["compounds"]], settings)
+        
+        ftab <- merge(ftab, tab, by = "group")
+        
+        makeMainResultsReactableNew(ftab, "ISTDsCandGroup", settings$features$retMin, plots,
+                                    updateRowFunc = "updateTabSelISTDsCandGroup", internFilterable = "susp_ID")
     },
     
     genFGTableSuspects = function()

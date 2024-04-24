@@ -399,7 +399,8 @@ makeMainResultsReactableNew <- function(tab, tabName, retMin, plots, updateRowFu
                                                           cellPadding = "2px 4px"),
                         meta = list(selectedRow = 0, updateRowFunc = htmlwidgets::JS(updateRowFunc),
                                     CSVCols = colDefDB[CSV == TRUE]$name, colToggles = toColList("colToggle"),
-                                    internFilterable = internFilterable),
+                                    neverFilterable = colDefDB[neverFilter == TRUE]$name,
+                                    internFilterable = colDefDB[internFilter == TRUE]$name),
                         rowStyle = rowStyle, ...)
     
     if (!is.null(initView))

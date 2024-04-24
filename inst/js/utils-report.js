@@ -653,22 +653,20 @@ function toggleTabFilters(tableID, e)
     const internFilterable = getFiltMeta("internFilterable");
     const neverFilterable = getFiltMeta("neverFilterable");
 
-    Reactable.getInstance(tableID).allColumns.forEach(function(col)
+    const allColumns = Reactable.getInstance(tableID).allColumns;
+    allColumns.forEach(function(col)
     {
-        if ((!internFilterable || !internFilterable.includes(col.id)) && !neverFilterable.includes(col.id))
+        if (!internFilterable.includes(col.id) && !neverFilterable.includes(col.id))
             col.filterable = e;
     })
     
     // HACK: setting a filter will toggle the visibility if all filters were enabled/disabled
-    // NOTE: use a non filterable column so nothing gets reset
     // NOTE: this somehow will reset all filter values, so restore internal filters if needed...
     
     let curInternFilters;
-    if (internFilterable !== undefined)
-        curInternFilters = internFilterable.map(col => Reactable.getInstance(tableID).allColumns.find(c => c.id === col).filterValue);
-    Reactable.setFilter(tableID, internFilterable[0], undefined);
-    if (internFilterable !== undefined)
-        internFilterable.forEach(function(col, index) { Reactable.setFilter(tableID, col, curInternFilters[index]); } );
+    curInternFilters = internFilterable.map(col => Reactable.getInstance(tableID).allColumns.find(c => c.id === col).filterValue);
+    Reactable.setFilter(tableID, allColumns[0].id, undefined);
+    internFilterable.forEach(function(col, index) { Reactable.setFilter(tableID, col, curInternFilters[index]); } );
 }
 
 function toggleAnnOnlySusp(wh, e, r = undefined)

@@ -208,6 +208,11 @@ function updateTabSelFGroups(rowValues, rowIndex)
     }
 }
 
+function updateTabSelPlain(rowValues, rowIndex)
+{
+    updateTabSelFGroups(rowValues, rowIndex);
+}
+
 function updateTabSelSusByGroup(rowValues, rowIndex)
 {
     updateTabSelFGroups(rowValues, rowIndex);

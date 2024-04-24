@@ -304,8 +304,7 @@ getReactColDefDB <- function(tab, tabName)
     return(colDefDB)
 }
 
-makeMainResultsReactableNew <- function(tab, tabName, retMin, plots, updateRowFunc, internFilterable = NULL,
-                                        initView = NULL, ...)
+makeMainResultsReactableNew <- function(tab, tabName, retMin, plots, internFilterable = NULL, initView = NULL, ...)
 {
     tab <- copy(tab)
     colDefDB <- getReactColDefDB(tab, tabName)
@@ -368,6 +367,8 @@ makeMainResultsReactableNew <- function(tab, tabName, retMin, plots, updateRowFu
     colDefs <- setReactNumRangeFilters(id, tab, colDefs)
     for (col in grpStartCols)
         colDefs[[col]]$headerStyle <- colSepStyle
+    
+    updateRowFunc <- paste0("updateTabSel", tabName)
     
     onClick <- htmlwidgets::JS(sprintf("function(rowInfo, column)
 {

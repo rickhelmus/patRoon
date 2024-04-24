@@ -4,6 +4,8 @@
 * Various reporting fixes for screening results from suspect lists without formula/SMILES data.
 * `generateAnalysisInfo()`: try to equalize the output and input directory order
 * Added get and plot methods for total ion chromatograms (TICs) and base peak chromatograms (BPCs) for the analysisInfo `data.frame`, `features` and `featureGroups` class as: `getTICs()`, `getBPCs()`, `plotTICs()` and `plotBPCs()`.
+* Updated PubChem transformations to 0.1.9
+
 
 # patRoon 2.3.1
 

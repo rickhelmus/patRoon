@@ -342,7 +342,7 @@ makeMainResultsReactableNew <- function(tab, tabName, retMin, plots, internFilte
         
         cell <- switch(cdrow$formatting,
                        round_merged = makeReactCellRoundMerged(cdrow$rounding),
-                       chromSmall = makeReactCellSmallChrom("chromLarge" %chin% tab$formatting, plots),
+                       chromSmall = makeReactCellSmallChrom("chromLarge" %chin% colDefDB$formatting, plots),
                        chromLarge = makeReactCellLargeChrom(plots),
                        ISTD = makeReactCellISTD(),
                        annotations = makeReactCellAnnotations(),

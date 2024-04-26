@@ -108,6 +108,7 @@ UIArgs <- c(UIArgs, utils$pruneUI(c,
     utils$genHeaderbar(),
     utils$genDetailsPlainUI(),
     utils$maybeInclUI(utils$hasSuspects(), utils$genDetailsSuspectsUI()),
+    utils$maybeInclUI(utils$hasInternalStandards(), utils$genDetailsISTDsUI()),
     utils$maybeInclUI(utils$hasComponentsTPs(), utils$genDetailsTPsUI()),
     utils$genBottombar()
 ))

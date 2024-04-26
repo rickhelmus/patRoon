@@ -52,6 +52,7 @@
             - move all JS callbacks etc to js file(s)?
             - improve code distribution over files
             - add featScores columns to CSV (or regex?)
+            - re-add and check ISTDInfoTab
 
 - tests
     - IDL filter

@@ -56,12 +56,12 @@ getFGReactTab <- function(objects, settings, ...)
     return(tab)
 }
 
-getFGScreeningReactTab <- function(fGroups, plots)
+getFGScreeningReactTab <- function(tab, plots)
 {
-    tab <- copy(screenInfo(fGroups))
+    tab <- copy(tab)
     scols <- setdiff(names(tab), "group")
     setnames(tab, scols, paste0("susp_", scols))
-    if (!is.null(tab[["susp_InChIKey"]]))
+    if (!is.null(tab[["susp_InChIKey"]]) && !all(is.na(tab$susp_InChIKey)))
         tab[, susp_structure := plots$structs[susp_InChIKey]]
     return(tab)
 }
@@ -429,24 +429,24 @@ reportHTMLUtils$methods(
     
     genMainTableSusByGroup = function()
     {
-        makeMainResultsReactableNew(getFGReactTab(objects, settings), "SusByGroup", settings$features$retMin, plots,
-                                    initView = "SuspectsByGroup")
+        makeMainResultsReactableNew(getFGReactTab(objects, settings, onlyHits = TRUE), "SusByGroup",
+                                    settings$features$retMin, plots, initView = "SuspectsByGroup")
     },
     genMainTableSusCandSuspect = function()
     {
-        makeMainResultsReactableNew(getFGScreeningReactTab(objects$fGroups, plots), "SusCandSuspect",
+        makeMainResultsReactableNew(getFGScreeningReactTab(screenInfo(objects$fGroups), plots), "SusCandSuspect",
                                     settings$features$retMin, plots)
     },
     genMainTableSusBySuspect = function()
     {
-        tab <- getFGScreeningReactTab(objects$fGroups, plots)
+        tab <- getFGScreeningReactTab(screenInfo(objects$fGroups), plots)
         tab[, susp_groups := paste0(group, collapse = ", "), by = "susp_name"][, group := NULL]
         tab <- unique(tab, by = "susp_name")
         makeMainResultsReactableNew(tab, "SusBySuspect", settings$features$retMin, plots, initView = "SuspectsBySuspect")
     },
     genMainTableSusCandGroup = function()
     {
-        tab <- getFGReactTab(objects, settings, collapseSuspects = NULL)
+        tab <- getFGReactTab(objects, settings, collapseSuspects = NULL, onlyHits = TRUE)
         # HACK: use a different name (and col definition) so that we get a hidden column used for filtering
         setnames(tab, "susp_name", "susp_ID")
         makeMainResultsReactableNew(tab, "SusCandGroup", settings$features$retMin, plots)
@@ -457,44 +457,34 @@ reportHTMLUtils$methods(
     
     genMainTableISTDsByGroup = function()
     {
-        tab <- as.data.table(objects$fGroups, qualities = "score", average = TRUE,
-                             concAggrParams = settings$concAggrParams, toxAggrParams = settings$toxAggrParams)
-        tab <- prepareFGReactTab(tab, objects$fGroups, objects[["MSPeakLists"]], objects[["formulas"]],
-                                 objects[["compounds"]], settings)
+        tab <- getFGReactTab(objects, settings)
+        tab <- tab[group %chin% internalStandards(objects$fGroups)$group]
         makeMainResultsReactableNew(tab, "ISTDsByGroup", settings$features$retMin, plots, initView = "ISTDsByGroup")
     },
     genMainTableISTDsCandISTD = function()
     {
-        tab <- data.table::copy(internalStandards(objects$fGroups))
-        scols <- setdiff(names(tab), "group")
-        setnames(tab, scols, paste0("susp_", scols))
-        tab <- prepareSuspReactTab(tab, plots)
-        makeMainResultsReactableNew(tab, "ISTDsCandISTD", settings$features$retMin, plots)
+        makeMainResultsReactableNew(getFGScreeningReactTab(internalStandards(objects$fGroups), plots), "ISTDsCandISTD",
+                                    settings$features$retMin, plots)
     },
     genMainTableISTDsByISTD = function()
     {
-        tab <- data.table::copy(internalStandards(objects$fGroups))
-        setnames(tab, paste0("susp_", names(tab)))
-        tab[, susp_groups := paste0(susp_group, collapse = ", "), by = "susp_name"]
+        tab <- getFGScreeningReactTab(internalStandards(objects$fGroups), plots)
+        # UNDONE: give other name
+        tab[, susp_groups := paste0(group, collapse = ", "), by = "susp_name"][, group := NULL]
         tab <- unique(tab, by = "susp_name")
-        tab <- prepareSuspReactTab(tab, plots)
         makeMainResultsReactableNew(tab, "ISTDsByISTD", settings$features$retMin, plots, initView = "ISTDsByISTD")
     },
     genMainTableISTDsCandGroup = function()
     {
-        tab <- data.table::copy(internalStandards(objects$fGroups))
-        scols <- setdiff(names(tab), "group")
-        setnames(tab, scols, paste0("susp_", scols))
+        tab <- getFGScreeningReactTab(internalStandards(objects$fGroups), plots)
         # HACK: use a different name (and col definition) so that we get a hidden column used for filtering
         setnames(tab, "susp_name", "susp_ID")
-        
-        ftab <- as.data.table(objects$fGroups, qualities = "score", average = TRUE, collapseSuspects = NULL,
-                              concAggrParams = settings$concAggrParams, toxAggrParams = settings$toxAggrParams)
-        ftab <- prepareFGReactTab(tab, objects$fGroups, objects[["MSPeakLists"]], objects[["formulas"]],
-                                  objects[["compounds"]], settings)
-        
+
+        ftab <- getFGReactTab(objects, settings)
+        ftab <- ftab[group %chin% internalStandards(objects$fGroups)$group]
+                
         ftab <- merge(ftab, tab, by = "group")
-        
+
         makeMainResultsReactableNew(ftab, "ISTDsCandGroup", settings$features$retMin, plots)
     },
     
@@ -763,40 +753,29 @@ reportHTMLUtils$methods(
     genDetailsPlainUI = function()
     {
         list(
-            bslib::card(
-                class = "detailsMainTableFull",
-                detailsViewOfParent = "Plain",
-                full_screen = TRUE,
-                bslib::card_header("Feature groups"),
-                bsCardBodyNoFill(makeFGToolbar("detailsTabPlain")),
-                bslib::card_body(genMainTablePlain())
-            )
+            makeMainTableCard("detailsMainTableFull", "Plain", "Feature groups", genMainTablePlain())
         )
     },
     
     genDetailsSuspectsUI = function()
     {
-        makeCard <- function(cl, dvp, hd, id, tab)
-        {
-            bslib::card(
-                class = cl,
-                detailsViewOfParent = dvp,
-                full_screen = TRUE,
-                bslib::card_header(hd),
-                bsCardBodyNoFill(makeFGToolbar("id")),
-                bslib::card_body(tab)
-            )            
-        }
         
         list(
-            makeCard("detailsMainTableNoSB", "SuspectsByGroup", "Feature groups", "detailsTabSusByGroup",
-                     genMainTableSusByGroup()),
-            makeCard("detailsCandTable", "SuspectsByGroup", "Candidates", "detailsTabSusCandSuspect",
-                     genMainTableSusCandSuspect()),
-            makeCard("detailsMainTableNoSB", "SuspectsBySuspect", "Suspects", "detailsTabSusBySuspect",
-                     genMainTableSusBySuspect()),
-            makeCard("detailsCandTable", "SuspectsBySuspect", "Feature groups", "detailsTabSusCandGroup",
-                     genMainTableSusCandGroup())
+            makeMainTableCard("detailsMainTableNoSB", "SuspectsByGroup", "Feature groups", genMainTableSusByGroup()),
+            makeMainTableCard("detailsCandTable", "SuspectsByGroup", "Candidates", genMainTableSusCandSuspect()),
+            makeMainTableCard("detailsMainTableNoSB", "SuspectsBySuspect", "Suspects", genMainTableSusBySuspect()),
+            makeMainTableCard("detailsCandTable", "SuspectsBySuspect", "Feature groups", genMainTableSusCandGroup())
+        )
+    },
+    
+    genDetailsISTDsUI = function()
+    {
+        
+        list(
+            makeMainTableCard("detailsMainTableNoSB", "ISTDsByGroup", "Feature groups", genMainTableISTDsByGroup()),
+            makeMainTableCard("detailsCandTable", "ISTDsByGroup", "Candidates", genMainTableISTDsCandISTD()),
+            makeMainTableCard("detailsMainTableNoSB", "ISTDsByISTD", "Internal standards", genMainTableISTDsByISTD()),
+            makeMainTableCard("detailsCandTable", "ISTDsByISTD", "Feature groups", genMainTableISTDsCandGroup())
         )
     }
 )

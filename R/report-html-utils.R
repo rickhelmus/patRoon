@@ -640,6 +640,18 @@ reportHTMLUtils$methods(
         })
     },
     
+    makeMainTableCard = function(cl, dvp, hd, tab)
+    {
+        bslib::card(
+            class = cl,
+            detailsViewOfParent = dvp,
+            full_screen = TRUE,
+            bslib::card_header(hd),
+            bsCardBodyNoFill(makeFGToolbar(tab$elementId)),
+            bslib::card_body(tab)
+        )            
+    },
+    
     genHeaderbar = function()
     {
         htmltools::withTags({
@@ -664,15 +676,15 @@ reportHTMLUtils$methods(
                               autocomplete = "off", onChange = 'updateDetailsView("TPs")', checked = TRUE),
                         label(class = "btn btn-outline-primary", "for" = "viewTPDetailsTPs", "TPs"),
                     ),
-                    label("for" = "SuspByBtGrp", "Sort by", detailsView = "SuspectsByGroup SuspectsBySuspect"),
+                    label("for" = "SuspByBtGrp", "Sort by", detailsView = "SuspectsByGroup SuspectsBySuspect ISTDsByGroup ISTDsByISTD"),
                     div(class = "btn-group btn-group-sm mx-1", role = "group", "aria-label" = "suspect by group",
                         id = "SuspByBtGrp",
-                        detailsView = "SuspectsByGroup SuspectsBySuspect",
+                        detailsView = "SuspectsByGroup SuspectsBySuspect ISTDsByGroup ISTDsByISTD",
                         input(type = "radio", class = "btn-check", name = "tpparbtn", id = "viewSuspDetailsByGroup",
-                              autocomplete = "off", onChange = 'updateDetailsView("Suspects")', checked = TRUE),
+                              autocomplete = "off", onChange = 'updateDetailsView()', checked = TRUE),
                         label(class = "btn btn-outline-primary", "for" = "viewSuspDetailsByGroup", "Group"),
                         input(type = "radio", class = "btn-check", name = "tpparbtn", id = "viewSuspDetailsBySuspect",
-                              autocomplete = "off", onChange = 'updateDetailsView("Suspects")'),
+                              autocomplete = "off", onChange = 'updateDetailsView()'),
                         label(class = "btn btn-outline-primary", "for" = "viewSuspDetailsBySuspect", "Suspect"),
                     ),
                     div(class = "float-right",

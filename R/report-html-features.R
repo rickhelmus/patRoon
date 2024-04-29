@@ -483,7 +483,7 @@ reportHTMLUtils$methods(
         ftab <- getFGReactTab(objects, settings)
         ftab <- ftab[group %chin% internalStandards(objects$fGroups)$group]
                 
-        ftab <- merge(ftab, tab, by = "group")
+        ftab <- merge(tab, fab, by = "group")
 
         makeMainResultsReactableNew(ftab, "ISTDsCandGroup", settings$features$retMin, plots)
     },
@@ -750,32 +750,66 @@ reportHTMLUtils$methods(
         ))
     },
     
+    makeFGTableCard = function(tab, ...)
+    {
+        makeMainTableCard(tab, ..., hd = "Feature groups", toolbar = makeFGToolbar(tab$elementId))
+    },
+    makeCandTableCard = function(tab, ..., groupBy = NULL)
+    {
+        tb <- makeToolbar(tab$elementId, groupBy = groupBy, toggleExpand = !is.null(groupBy))
+        makeMainTableCard(tab, ..., toolbar = tb)
+    },
+    
     genDetailsPlainUI = function()
     {
         list(
-            makeMainTableCard("detailsMainTableFull", "Plain", "Feature groups", genMainTablePlain())
+            makeFGTableCard(genMainTablePlain(), "detailsMainTableFull", "Plain")
         )
     },
     
     genDetailsSuspectsUI = function()
     {
+        hasForms <- !is.null(screenInfo(objects$fGroups)[["formula"]])
+        groupBy <- if (hasForms)
+        {
+            list(
+                list(value = "", name = "None"),
+                list(value = "susp_formula", name = "Formula")
+            )
+        }
+        else
+            NULL
         
         list(
-            makeMainTableCard("detailsMainTableNoSB", "SuspectsByGroup", "Feature groups", genMainTableSusByGroup()),
-            makeMainTableCard("detailsCandTable", "SuspectsByGroup", "Candidates", genMainTableSusCandSuspect()),
-            makeMainTableCard("detailsMainTableNoSB", "SuspectsBySuspect", "Suspects", genMainTableSusBySuspect()),
-            makeMainTableCard("detailsCandTable", "SuspectsBySuspect", "Feature groups", genMainTableSusCandGroup())
+            makeFGTableCard(genMainTableSusByGroup(), "detailsMainTableNoSB", "SuspectsByGroup"),
+            makeCandTableCard(genMainTableSusCandSuspect(), "detailsCandTable", "SuspectsByGroup", "Candidates",
+                              groupBy = groupBy),
+            makeCandTableCard(genMainTableSusBySuspect(), "detailsMainTableNoSB", "SuspectsBySuspect", "Suspects",
+                              groupBy = groupBy),
+            makeFGTableCard(genMainTableSusCandGroup(), "detailsCandTable", "SuspectsBySuspect")
         )
     },
     
     genDetailsISTDsUI = function()
     {
+        hasForms <- !is.null(internalStandards(objects$fGroups)[["formula"]])
+        groupBy <- if (hasForms)
+        {
+            list(
+                list(value = "", name = "None"),
+                list(value = "susp_formula", name = "Formula")
+            )
+        }
+        else
+            NULL
         
         list(
-            makeMainTableCard("detailsMainTableNoSB", "ISTDsByGroup", "Feature groups", genMainTableISTDsByGroup()),
-            makeMainTableCard("detailsCandTable", "ISTDsByGroup", "Candidates", genMainTableISTDsCandISTD()),
-            makeMainTableCard("detailsMainTableNoSB", "ISTDsByISTD", "Internal standards", genMainTableISTDsByISTD()),
-            makeMainTableCard("detailsCandTable", "ISTDsByISTD", "Feature groups", genMainTableISTDsCandGroup())
+            makeFGTableCard(genMainTableISTDsByGroup(), "detailsMainTableNoSB", "ISTDsByGroup"),
+            makeCandTableCard(genMainTableISTDsCandISTD(), "detailsCandTable", "ISTDsByGroup", "Internal standards",
+                              groupBy = groupBy),
+            makeCandTableCard(genMainTableISTDsByISTD(), "detailsMainTableNoSB", "ISTDsByISTD", "Internal standards",
+                              groupBy = groupBy),
+            makeFGTableCard(genMainTableISTDsCandGroup(), "detailsCandTable", "ISTDsByISTD")
         )
     }
 )

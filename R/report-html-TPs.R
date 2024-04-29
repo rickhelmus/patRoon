@@ -70,6 +70,20 @@ genHTMLReportPlotsTPs <- function(fGroups, components, MSPeakLists, formulas, co
     }))
 }
 
+getTPCandReactTab <- function(obj, plots)
+{
+    ret <- rbindlist(lapply(componentTable(obj), function(cmp)
+    {
+        allc <- rbindlist(cmp$candidates, fill = TRUE, idcol = "groupInd")
+        allc[, group := cmp$group[groupInd]][, groupInd := NULL]
+        return(allc)
+    }), fill = TRUE, idcol = "cmpName")
+    setnames(ret, "name", "candidate_name")
+    if (!is.null(ret[["InChIKey"]]))
+        ret[, TP_structure := plots$structs[InChIKey]]
+    return(ret)
+}
+
 reportHTMLUtils$methods(
     getTPComponObj = function()
     {
@@ -211,7 +225,93 @@ reportHTMLUtils$methods(
         makeFGReactable(tabTPs, "detailsTabTPs", plots, settings = settings, objects = objects, groupBy = groupBy,
                         colDefs = colDefs, groupDefs = groupDefs)
     },
+    
+    genMainTableTPsParents = function()
+    {
+        compObj <- getTPComponObj()
+        cInfo <- componentInfo(compObj)
+        
+        tab <- getFGReactTab(objects, settings)
 
+        tab <- if (!is.null(cInfo[["parent_name"]]))
+            merge(cInfo, tab, by.x = c("parent_group", "parent_name"), by.y = c("group", "susp_name"))
+        else
+            merge(cInfo, tab, by.x = "parent_group", by.y = "group")
+        
+        setnames(tab, "name", "component")
+        tab <- tab[match(cInfo$name, component, nomatch = 0)] # restore component order
+
+        # used for table row selection by sidebar
+        tab[, cmpName := component]
+        
+        if (!is.null(tab[["parent_InChIKey"]]))
+            tab[, parent_structure := plots$structs[parent_InChIKey]]
+            
+        makeMainResultsReactableNew(tab, "TPsParents", settings$features$retMin, plots, initView = "TPsParents",
+                                    initTabFunc = "initTabTPsParents")
+    },
+    
+    genMainTableTPsByGroup = function()
+    {
+        ctab <- as.data.table(getTPComponObj())
+        setnames(ctab, "name", "cmpName")
+        ctab[, cmpIndex := seq_len(.N), by = "cmpName"]
+        ftab <- getFGReactTab(objects, settings)
+        tab <- merge(ctab, ftab, by = "group", sort = FALSE)
+        makeMainResultsReactableNew(tab, "TPsByGroup", settings$features$retMin, plots, initView = "TPsByGroup",
+                                    initTabFunc = "initTabTPs")
+    },
+    genMainTableTPsCandSuspect = function()
+    {
+        # UNDONE: handle non-screening cases: don't do this with ann TPs (don't just check if fGroups are suspects, as
+        # we still don't want to merge if they are with ann TPs)
+        
+        candTab <- getTPCandReactTab(getTPComponObj(), plots)
+        scr <- getFGScreeningReactTab(screenInfo(objects$fGroups), plots)
+        
+        # UNDONE: does this work if the same group/suspect is in multiple components?
+        candTab <- merge(candTab, scr, by.x = c("group", "candidate_name"), by.y = c("group", "susp_name"),
+                         sort = FALSE)
+
+        makeMainResultsReactableNew(candTab, "TPsCandSuspect", settings$features$retMin, plots)
+    },
+
+    genMainTableTPsBySuspect = function()
+    {
+        # UNDONE: handle non-screening cases: don't do this with ann TPs (don't just check if fGroups are suspects, as
+        # we still don't want to merge if they are with ann TPs)
+        
+        candTab <- getTPCandReactTab(getTPComponObj(), plots)
+        scr <- getFGScreeningReactTab(screenInfo(objects$fGroups), plots)
+        
+        candTab <- merge(candTab, scr, by.x = c("group", "candidate_name"), by.y = c("group", "susp_name"),
+                         sort = FALSE)
+        
+        candTab[, candidate_groups := paste0(group, collapse = ", "), by = "candidate_name"][, group := NULL]
+        candTab <- unique(candTab, by = "candidate_name")
+        makeMainResultsReactableNew(candTab, "TPsBySuspect", settings$features$retMin, plots, initView = "TPsBySuspect",
+                                    initTabFunc = "initTabTPs")
+    },
+    genMainTableTPsCandGroup = function()
+    {
+        # UNDONE: handle non-screening cases: don't do this with ann TPs (don't just check if fGroups are suspects, as
+        # we still don't want to merge if they are with ann TPs)
+        
+        ctab <- as.data.table(getTPComponObj(), candidates = TRUE)
+        setnames(ctab, "name", "cmpName")
+        ctab[, cmpIndex := seq_len(.N), by = "cmpName"]
+        
+        ftab <- getFGReactTab(objects, settings, collapseSuspects = NULL, onlyHits = TRUE)
+        # remove overlapping columns (eg er, mz)
+        ctab <- removeDTColumnsIfPresent(ctab, setdiff(names(ftab), "group"))
+        
+        tab <- merge(ctab, ftab, by.x = c("group", "candidate_name"), by.y = c("group", "susp_name"), sort = FALSE)
+        # HACK: use a different name (and col definition) so that we get a hidden column used for filtering
+        setnames(tab, "candidate_name", "candidate_ID")
+        makeMainResultsReactableNew(tab, "TPsCandGroup", settings$features$retMin, plots)
+    },
+    
+    
     genFGTableTPsParents = function()
     {
         compObj <- getTPComponObj()
@@ -482,42 +582,62 @@ reportHTMLUtils$methods(
     
     genDetailsTPsUI = function()
     {
+        hasForms <- !is.null(objects$components[[1]]$candidates[[1]][["formula"]])
+        groupBy <- if (hasForms)
+        {
+            list(
+                list(value = "", name = "None"),
+                list(value = "formula", name = "Formula"),
+                list(value = "formulaDiff", name = "\U0394 Formula")
+            )
+        }
+        else
+            NULL
+        
         list(
             genTPsSidebar(),
+
+            makeFGTableCard(genMainTableTPsParents(), "detailsMainTableOnly", "TPsParents"),
+            makeFGTableCard(genMainTableTPsByGroup(), "detailsMainTable", "TPsByGroup"),
+            makeCandTableCard(genMainTableTPsCandSuspect(), "detailsCandTable", "TPsByGroup", "TP candidates",
+                              groupBy = groupBy),
+            makeCandTableCard(genMainTableTPsBySuspect(), "detailsMainTable", "TPsBySuspect", "TP candidates",
+                              groupBy = groupBy),
+            makeFGTableCard(genMainTableTPsCandGroup(), "detailsCandTable", "TPsBySuspect")
             
-            bslib::card(
-                class = "detailsMainTableOnly",
-                detailsViewOfParent = "TPsParents",
-                full_screen = TRUE,
-                bslib::card_header("Parents"),
-                bsCardBodyNoFill(makeFGToolbar("detailsTabTPsParents")),
-                bslib::card_body(genFGTableTPsParents())
-            ),
+            # bslib::card(
+            #     class = "detailsMainTableOnly",
+            #     detailsViewOfParent = "TPsParents",
+            #     full_screen = TRUE,
+            #     bslib::card_header("Parents"),
+            #     bsCardBodyNoFill(makeFGToolbar("detailsTabTPsParents")),
+            #     bslib::card_body(genFGTableTPsParents())
+            # ),
             
             
-            bslib::card(
-                class = "detailsMainTable",
-                detailsViewOfParent = "TPsByGroup",
-                full_screen = TRUE,
-                bslib::card_header("TPs Feature groups"),
-                bsCardBodyNoFill(makeFGToolbar("detailsTabTPs")),
-                bslib::card_body(genFGTableTPs())
-            ),
+            # bslib::card(
+            #     class = "detailsMainTable",
+            #     detailsViewOfParent = "TPsByGroup",
+            #     full_screen = TRUE,
+            #     bslib::card_header("TPs Feature groups"),
+            #     bsCardBodyNoFill(makeFGToolbar("detailsTabTPs")),
+            #     bslib::card_body(genFGTableTPs())
+            # ),
             
-            bslib::card(
-                class = "detailsCandTable",
-                detailsViewOfParent = "TPsByGroup TPsBySuspect",
-                full_screen = TRUE,
-                bslib::card_header("TP candidates"),
-                bsCardBodyNoFill(
-                    makeToolbar("TPCandidatesTab", groupBy = list(
-                        list(value = "", name = "None"),
-                        list(value = "formula", name = "Formula"),
-                        list(value = "formulaDiff", name = "\U0394 Formula")
-                    ), toggleExpand = TRUE)
-                ),
-                bslib::card_body_fill(genTPCandidatesTable())
-            )
+            # bslib::card(
+            #     class = "detailsCandTable",
+            #     detailsViewOfParent = "TPsByGroup TPsBySuspect",
+            #     full_screen = TRUE,
+            #     bslib::card_header("TP candidates"),
+            #     bsCardBodyNoFill(
+            #         makeToolbar("TPCandidatesTab", groupBy = list(
+            #             list(value = "", name = "None"),
+            #             list(value = "formula", name = "Formula"),
+            #             list(value = "formulaDiff", name = "\U0394 Formula")
+            #         ), toggleExpand = TRUE)
+            #     ),
+            #     bslib::card_body_fill(genTPCandidatesTable())
+            # )
         )
     }
 )

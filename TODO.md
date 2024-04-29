@@ -53,6 +53,8 @@
             - improve code distribution over files
             - add featScores columns to CSV (or regex?)
             - re-add and check ISTDInfoTab
+        - add colDefs for new TP ann columns
+        - allow.cartesian needed for table merges for main tables?
 
 - tests
     - IDL filter

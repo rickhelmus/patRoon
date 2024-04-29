@@ -304,7 +304,8 @@ getReactColDefDB <- function(tab, tabName)
     return(colDefDB)
 }
 
-makeMainResultsReactableNew <- function(tab, tabName, retMin, plots, internFilterable = NULL, initView = NULL, ...)
+makeMainResultsReactableNew <- function(tab, tabName, retMin, plots, internFilterable = NULL, initView = NULL,
+                                        initTabFunc = "initMainTabDefault", ...)
 {
     tab <- copy(tab)
     colDefDB <- getReactColDefDB(tab, tabName)
@@ -399,6 +400,7 @@ makeMainResultsReactableNew <- function(tab, tabName, retMin, plots, internFilte
                                                           groupHeaderStyle = headThemeStyle,
                                                           cellPadding = "2px 4px"),
                         meta = list(selectedRow = 0, updateRowFunc = htmlwidgets::JS(updateRowFunc),
+                                    initTabFunc = htmlwidgets::JS(initTabFunc),
                                     CSVCols = colDefDB[CSV == TRUE]$name, colToggles = toColList("colToggle"),
                                     neverFilterable = colDefDB[neverFilter == TRUE]$name,
                                     internFilterable = colDefDB[internFilter == TRUE]$name),
@@ -640,20 +642,21 @@ reportHTMLUtils$methods(
         })
     },
     
-    makeMainTableCard = function(cl, dvp, hd, tab)
+    makeMainTableCard = function(tab, cl, dvp, hd, toolbar)
     {
         bslib::card(
             class = cl,
             detailsViewOfParent = dvp,
             full_screen = TRUE,
             bslib::card_header(hd),
-            bsCardBodyNoFill(makeFGToolbar(tab$elementId)),
+            bsCardBodyNoFill(toolbar),
             bslib::card_body(tab)
         )            
     },
     
     genHeaderbar = function()
     {
+        viewSusBy <- "SuspectsByGroup SuspectsBySuspect ISTDsByGroup ISTDsByISTD TPsByGroup TPsBySuspect"
         htmltools::withTags({
             list(
                 div(class = "pb-1 detailsHeaderbar",
@@ -676,14 +679,14 @@ reportHTMLUtils$methods(
                               autocomplete = "off", onChange = 'updateDetailsView("TPs")', checked = TRUE),
                         label(class = "btn btn-outline-primary", "for" = "viewTPDetailsTPs", "TPs"),
                     ),
-                    label("for" = "SuspByBtGrp", "Sort by", detailsView = "SuspectsByGroup SuspectsBySuspect ISTDsByGroup ISTDsByISTD"),
+                    label("for" = "SuspByBtGrp", "Sort by", detailsView = viewSusBy),
                     div(class = "btn-group btn-group-sm mx-1", role = "group", "aria-label" = "suspect by group",
                         id = "SuspByBtGrp",
-                        detailsView = "SuspectsByGroup SuspectsBySuspect ISTDsByGroup ISTDsByISTD",
-                        input(type = "radio", class = "btn-check", name = "tpparbtn", id = "viewSuspDetailsByGroup",
+                        detailsView = viewSusBy,
+                        input(type = "radio", class = "btn-check", name = "susbybtn", id = "viewSuspDetailsByGroup",
                               autocomplete = "off", onChange = 'updateDetailsView()', checked = TRUE),
                         label(class = "btn btn-outline-primary", "for" = "viewSuspDetailsByGroup", "Group"),
-                        input(type = "radio", class = "btn-check", name = "tpparbtn", id = "viewSuspDetailsBySuspect",
+                        input(type = "radio", class = "btn-check", name = "susbybtn", id = "viewSuspDetailsBySuspect",
                               autocomplete = "off", onChange = 'updateDetailsView()'),
                         label(class = "btn btn-outline-primary", "for" = "viewSuspDetailsBySuspect", "Suspect"),
                     ),

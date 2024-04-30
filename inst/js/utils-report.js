@@ -291,6 +291,11 @@ function updateTabSelISTDsCandGroup(rowValues, rowIndex)
         Reactable.setFilter('ISTDInfoTab', 'name', rowValues.susp_name);
 }
 
+function updateTabSelComponents(rowValues, rowIndex)
+{
+    updateTabSelFGroups(rowValues, rowIndex);
+}
+
 function updateTabSelTPsParents(rowValues, rowIndex)
 {
     updateTabSelFGroups(rowValues, rowIndex);
@@ -331,6 +336,14 @@ function initMainTabDefault(tabID)
     const meta = Reactable.getState(tabID).meta;
     const r = Reactable.getInstance(tabID).rowsById[meta.selectedRow];
     meta.updateRowFunc(r.values, r.index);
+}
+
+function initTabComponents(tabID)
+{
+    // UNDONE
+    /*const cmpName = document.getElementById("TPCompon-select").value;
+    setTabSelFirstRow(tabID, el => el.cmpName === cmpName)
+    Reactable.setFilter(tabID, "cmpName", cmpName);*/
 }
 
 function initTabTPsParents(tabID)

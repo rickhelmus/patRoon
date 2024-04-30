@@ -567,7 +567,36 @@ reportHTMLUtils$methods(
         # find the relevant element
         bslib::nav_panel(htmltools::span(title, detailsView = view), ...)
     },
-    
+
+    makeSideBar = function(dvp, hd, selID, selFunc, selIDs, selNames, advanceFunc, ...)
+    {
+        bslib::card(
+            class = "detailsSidebar",
+            detailsViewOfParent = dvp,
+            bslib::card_header(hd),
+            bsCardBodyNoFill(
+                htmltools::withTags({
+                    div(
+                        style = "display: flex;",
+                        select(id = selID, onChange = sprintf("%s(this.value)", selFunc),
+                               style = "min-width: 0;",
+                               Map(selIDs, selNames, f = function(v, n) option(value = v, n))),
+                        
+                        div(class = "btn-group btn-group-sm mx-1", role = "group", "aria-label" = "advance sidebar",
+                            style = "align-self: flex-start;",
+                            button(type = "button", class = "btn btn-light btn-sm", onClick = sprintf("%s(-1)", advanceFunc),
+                                   bsicons::bs_icon("caret-left-fill")),
+                            button(type = "button", class = "btn btn-light btn-sm", onClick = sprintf("%s(1)", advanceFunc),
+                                   bsicons::bs_icon("caret-right-fill"))
+                        ),
+                    )
+                })
+            ),
+            
+            ...
+        )
+    },
+
     makeToolbar = function(tableID, groupBy = NULL, columnToggles = NULL, toggleExpand = FALSE,
                            toggleExpandDisableIfNoGrouping = TRUE, tagsPreButtons = NULL, tagsPostButtons = NULL)
     {

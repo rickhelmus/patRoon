@@ -57,6 +57,23 @@ genHTMLReportPlotsComponents <- function(fGroups, components, settings, outPath,
 
 
 reportHTMLUtils$methods(
+    
+    genMainTableComponents = function()
+    {
+        ctab <- as.data.table(objects$components)
+        setnames(ctab, "name", "cmpName")
+        # HACK: if all intensities are one than these are dummy values (eg with intclust components)
+        if (all(ctab$intensity == 1))
+            ctab[, intensity := NULL]
+        
+        ftab <- getFGReactTab(objects, settings)
+        
+        tab <- merge(ctab, ftab, by = "group", sort = FALSE)
+        
+        makeMainResultsReactableNew(tab, "Components", settings$features$retMin, plots, initView = "Components",
+                                    initTabFunc = "initTabComponents")
+    },
+    
     genFGTableComponents = function()
     {
         tab <- getFGTable(objects$fGroups, ",", settings$features$retMin, settings$features$aggregateConcs,
@@ -117,6 +134,25 @@ reportHTMLUtils$methods(
         
         ptab <- makePropTab(tab, NULL, "name")
         makePropReactable(ptab, "componentInfoTab", "name", minPropWidth = 120, minValWidth = 150)
+    },
+    
+    genComponentsSidebar = function()
+    {
+        bd <- bslib::card_body(
+            padding = 0
+            # UNDONE
+        )
+        
+        makeSideBar("Components", "Component", "Compon-select", "updateCompon", names(objects$components),
+                    names(objects$components), "advanceCompon", bd)
+    },
+    
+    genDetailsComponentsUI = function()
+    {
+        list(
+            genComponentsSidebar(),
+            makeFGTableCard(genMainTableComponents(), "detailsMainTableOnly", "Components")
+        )
     },
     
     genIntClustHeatMap = function()

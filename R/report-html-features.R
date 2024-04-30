@@ -475,7 +475,7 @@ reportHTMLUtils$methods(
         ftab <- getFGReactTab(objects, settings)
         ftab <- ftab[group %chin% internalStandards(objects$fGroups)$group]
                 
-        ftab <- merge(tab, fab, by = "group")
+        ftab <- merge(tab, ftab, by = "group")
 
         makeMainResultsReactableNew(ftab, "ISTDsCandGroup", settings$features$retMin, plots)
     },

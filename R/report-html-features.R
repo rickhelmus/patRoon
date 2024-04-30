@@ -13,14 +13,6 @@ roundFGTab <- function(ftab, fGroups)
     return(ftab)    
 }
 
-roundScrTab <- function(ftab)
-{
-    ftab <- copy(ftab)
-    for (col in names(ftab)[(sapply(ftab, is.numeric))])
-        set(ftab, j = col, value = round(ftab[[col]], if (col == "susp_d_mz") 5 else 2))
-    return(ftab)    
-}
-
 getFGReactTab <- function(objects, settings, ...)
 {
     tab <- as.data.table(objects$fGroups, qualities = "score", average = TRUE,
@@ -486,47 +478,6 @@ reportHTMLUtils$methods(
         ftab <- merge(tab, fab, by = "group")
 
         makeMainResultsReactableNew(ftab, "ISTDsCandGroup", settings$features$retMin, plots)
-    },
-    
-    genFGTableSuspects = function()
-    {
-        # UNDONE: remove
-        tab <- getFGTable(objects$fGroups, NULL, settings$features$retMin, settings$features$aggregateConcs,
-                          settings$features$aggregateTox)[!is.na(susp_name)]
-        rgs <- replicateGroups(objects$fGroups)
-        groupDefs <- getFGGroupDefs(tab, "susp_name", rgs)
-        colDefs <- getFeatGroupColDefs(tab, rgs)
-        makeFGReactable(tab, "detailsTabSuspects", colDefs = colDefs, groupDefs = groupDefs, plots = plots,
-                        settings = settings, objects = objects, groupBy = "susp_name",
-                        updateRowFunc = "updateRowFGSelSuspects", initView = "Suspects")
-    },
-    
-    genFGTableISTDs = function()
-    {
-        istds <- data.table::copy(internalStandards(objects$fGroups))
-        istds <- subsetDTColumnsIfPresent(istds, c("name", "group", "InChIKey", "d_rt", "d_mz", "sets"))
-        if (settings$features$retMin)
-            istds[, d_rt := d_rt / 60]
-        
-        # HACK: the ISTD table is essentially the same as what screenInfo() returns for suspects. Rename the columns
-        # here, so that groupDefs etc are set like suspects.
-        rncols <- setdiff(names(istds), "group")
-        setnames(istds, rncols, paste0("susp_", rncols))
-        
-        ftab <- getFGTable(objects$fGroups, ",", settings$features$retMin, settings$features$aggregateConcs,
-                           settings$features$aggregateTox)
-        ftab <- removeDTColumnsIfPresent(ftab, c("susp_name", "susp_sets", grep("^ISTD_assigned",
-                                                                                names(ftab), value = TRUE)))
-        tab <- merge(ftab, istds, by = "group")
-        tab <- roundFGTab(tab, objects$fGroups)
-
-        rgs <- replicateGroups(objects$fGroups)        
-        groupDefs <- getFGGroupDefs(tab, "susp_name", rgs)
-        colDefs <- getFeatGroupColDefs(tab, rgs)
-        colDefs$susp_name$name <- "Internal standard" # HACK
-        makeFGReactable(tab, "detailsTabISTDs", colDefs = colDefs, groupDefs = groupDefs, plots = plots,
-                        settings = settings, objects = objects, groupBy = "susp_name",
-                        updateRowFunc = "updateFGRowSelISTDs", initView = "ISTDs")
     },
 
     genSuspInfoTable = function(id)

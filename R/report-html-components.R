@@ -139,8 +139,30 @@ reportHTMLUtils$methods(
     genComponentsSidebar = function()
     {
         bd <- bslib::card_body(
-            padding = 0
-            # UNDONE
+            padding = 0,
+            pruneUI(bslib::accordion,
+                    maybeInclUI(settings$features$chromatograms$large, bslib::accordion_panel(
+                        "Chromatogram",
+                        bslib::card_body_fill(htmltools::img(id = "chrom_view-component"))
+                    )),
+                    bslib::accordion_panel(
+                        "Spectrum",
+                        bslib::card_body_fill(htmltools::img(id = "spectrum_view-component"))
+                    ),
+                    maybeInclUI(hasComponentsIntClust(), bslib::accordion_panel(
+                        "Profile",
+                        bslib::card_body_fill(
+                            htmltools::img(id = "profileRel_view-component"),
+                            htmltools::img(id = "profileAbs_view-component")
+                        )
+                    )),
+                    maybeInclUI(hasComponentInfo(), bslib::accordion_panel(
+                        "Component info",
+                        bsCardBodyNoFill(
+                            genComponentInfoTable()
+                        )
+                    ))
+            )
         )
         
         makeSideBar("Components", "Component", "Compon-select", "updateCompon", names(objects$components),

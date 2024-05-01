@@ -56,6 +56,7 @@
         - add colDefs for new TP ann columns
         - allow.cartesian needed for table merges for main tables?
         - replace bsCardBodyNoFill() and update other depcreated bslib functions
+        - components: filter out unavailable fGroups
 
 - tests
     - IDL filter

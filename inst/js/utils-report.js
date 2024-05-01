@@ -340,17 +340,16 @@ function initMainTabDefault(tabID)
 
 function initTabComponents(tabID)
 {
-    // UNDONE
-    /*const cmpName = document.getElementById("TPCompon-select").value;
-    setTabSelFirstRow(tabID, el => el.cmpName === cmpName)
-    Reactable.setFilter(tabID, "cmpName", cmpName);*/
+    const cmpName = document.getElementById("Compon-select").value;
+    setTabSelFirstRow(tabID, el => el.cmpName === cmpName);
+    Reactable.setFilter(tabID, "cmpName", cmpName);
 }
 
 function initTabTPsParents(tabID)
 {
     const cmpName = document.getElementById("TPCompon-select").value;
     // switch to the selected component
-    setTabSelFirstRow(tabID, el => el.cmpName === cmpName)
+    setTabSelFirstRow(tabID, el => el.cmpName === cmpName);
 }
 
 function initTabTPs(tabID)
@@ -561,6 +560,27 @@ function showTabCols(id, columnGroup, show)
         Reactable.toggleHideColumn(id, "chrom_small", show);
 }
 
+function updateCompon(cmpName, activateFG = true)
+{
+    let chromEl = document.getElementById('chrom_view-component');
+    let specEl = document.getElementById('spectrum_view-component');
+    let profileRelEl = document.getElementById('profileRel_view-component');
+    let profileAbsEl = document.getElementById('profileAbs_view-component');
+    const pl = reportPlots.components.components[cmpName];
+    chromEl.src = pl.chrom;
+    specEl.src = pl.spec;
+    if (profileRelEl != undefined)
+    {
+        profileRelEl.src = pl.profileRel;
+        profileAbsEl.src = pl.profileAbs;
+    }
+    if (document.getElementById('componentInfoTab'))
+        Reactable.setFilter('componentInfoTab', 'name', cmpName);
+
+    if (activateFG)
+        initTabsInView(getViewIDFromSel());
+}
+
 function updateTPCompon(cmpName, activateFG = true)
 {
     const chromEl = document.getElementById('chrom_view-parent');
@@ -586,17 +606,29 @@ function updateTPCompon(cmpName, activateFG = true)
         initTabsInView(getViewIDFromSel());
 }
 
-function advanceTPCompon(dir)
+function advanceSelect(el, dir)
 {
     // based on https://stackoverflow.com/a/11556996
-    let el = document.getElementById("TPCompon-select");
     let newIndex = el.selectedIndex + dir;
     if (newIndex < 0)
         newIndex = el.options.length - 1;
     else if (newIndex >= el.options.length)
         newIndex = 0;
     el.options[newIndex].selected = true;
-    updateTPCompon(el.options[newIndex].value);
+}
+
+function advanceCompon(dir)
+{
+    let el = document.getElementById("Compon-select");
+    advanceSelect(el, dir);
+    updateCompon(el.value);
+}
+
+function advanceTPCompon(dir)
+{
+    let el = document.getElementById("TPCompon-select");
+    advanceSelect(el, dir);
+    updateTPCompon(el.value);
 }
 
 function showTPGraph(cmp)

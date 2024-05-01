@@ -853,8 +853,12 @@ $(document).ready(function() {
     });
     
     updateDetailsView("Plain");
-    
-    let el = document.getElementById("TPCompon-select")
+
+    let el = document.getElementById("Compon-select")
+    if (el)
+        updateCompon(el.options[0].value, false);
+        
+    el = document.getElementById("TPCompon-select")
     if (el)
         updateTPCompon(el.options[0].value, false);
     

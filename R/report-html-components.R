@@ -58,9 +58,15 @@ genHTMLReportPlotsComponents <- function(fGroups, components, settings, outPath,
 
 reportHTMLUtils$methods(
     
+    getComponObj = function()
+    {
+        # remove any data from missing fGroups (i.e. those removed after creating the components)
+        return(objects$components[, names(objects$fGroups)])
+    },
+    
     genMainTableComponents = function()
     {
-        ctab <- as.data.table(objects$components)
+        ctab <- as.data.table(getComponObj())
         setnames(ctab, "name", "cmpName")
         # HACK: if all intensities are one than these are dummy values (eg with intclust components)
         if (all(ctab$intensity == 1))
@@ -83,7 +89,7 @@ reportHTMLUtils$methods(
         groupDefs <- getFGGroupDefs(tab, "component", rgs)
         colDefs <- getFeatGroupColDefs(tab, rgs)
         
-        ctab <- as.data.table(objects$components)
+        ctab <- as.data.table(getComponObj())
         setnames(ctab, "name", "component")
         ctab <- removeDTColumnsIfPresent(ctab, c(
             # already present from features table
@@ -119,7 +125,7 @@ reportHTMLUtils$methods(
     
     genComponentInfoTable = function()
     {
-        tab <- componentInfo(objects$components)
+        tab <- componentInfo(getComponObj())
         tab <- removeDTColumnsIfPresent(tab, c("links", "size"))
         
         for (col in intersect(c("neutral_mass", "mz_increment"), names(tab)))
@@ -164,9 +170,9 @@ reportHTMLUtils$methods(
                     ))
             )
         )
-        
-        makeSideBar("Components", "Component", "Compon-select", "updateCompon", names(objects$components),
-                    names(objects$components), "advanceCompon", bd)
+        cmpNames <- names(getComponObj())
+        makeSideBar("Components", "Component", "Compon-select", "updateCompon", cmpNames, cmpNames,
+                    "advanceCompon", bd)
     },
     
     genDetailsComponentsUI = function()
@@ -184,6 +190,9 @@ reportHTMLUtils$methods(
     
     genComponNTGraph = function(s)
     {
+        if (!is.null(s) && length(objects$components[, sets = s]) == 0)
+            return(htmltools::div("No components for this set.")) # NOTE: plotGraph() will throw an error if no results
+        
         args <- list(objects$components, onlyLinked = TRUE, width = "100%", height = "100%")
         if (!is.null(s))
             args <- c(args, list(set = s))

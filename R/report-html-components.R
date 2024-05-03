@@ -80,49 +80,6 @@ reportHTMLUtils$methods(
                                     initTabFunc = "initTabComponents")
     },
     
-    genFGTableComponents = function()
-    {
-        tab <- getFGTable(objects$fGroups, ",", settings$features$retMin, settings$features$aggregateConcs,
-                          settings$features$aggregateTox)
-        
-        rgs <- replicateGroups(objects$fGroups)
-        groupDefs <- getFGGroupDefs(tab, "component", rgs)
-        colDefs <- getFeatGroupColDefs(tab, rgs)
-        
-        ctab <- as.data.table(getComponObj())
-        setnames(ctab, "name", "component")
-        ctab <- removeDTColumnsIfPresent(ctab, c(
-            # already present from features table
-            "ret", "mz",
-            
-            # general component properties
-            "mz_increment", "rt_increment", "ret_min", "ret_max", "ret_range",
-            replicateGroups(objects$fGroups), # nontarget: presence in replicate groups
-            "cmp_ret", "cmp_mz", "cmp_retsd", "neutral_mass", "cmp_ppm", "analysis", "size",
-            
-            # for graphs
-            "links"
-        ))
-        if (all(ctab$intensity == 1))
-            ctab[, intensity := NULL]
-        tab <- merge(tab, ctab, by = "group", sort = FALSE)
-        
-        if (!is.null(tab[["set"]]))
-        {
-            colDefs$set <- reactable::colDef(filterInput = function(values, name) reactSelectFilter("detailsTabComponents",
-                                                                                                    values, name))
-        }
-        
-        cmpGrpCols <- setdiff(names(ctab), c("component", "group"))
-        if (length(cmpGrpCols) > 0)
-            groupDefs <- c(groupDefs, list(reactable::colGroup("component", cmpGrpCols,
-                                                               headerStyle = getMainReactColSepStyle())))
-        
-        makeFGReactable(tab, "detailsTabComponents", colDefs = colDefs, groupDefs = groupDefs, plots = plots,
-                        settings = settings, objects = objects, groupBy = "component",
-                        updateRowFunc = "updateFGRowSelComponents", initView = "Components")
-    },
-    
     genComponentInfoTable = function()
     {
         tab <- componentInfo(getComponObj())

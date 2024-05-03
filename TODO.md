@@ -65,6 +65,7 @@
         - replace bsCardBodyNoFill() and update other depcreated bslib functions
         - components
             - collapse components (ie NT)?
+            - set and/or sets column?
 
 - tests
     - IDL filter

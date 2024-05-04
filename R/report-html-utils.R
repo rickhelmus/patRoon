@@ -623,7 +623,9 @@ reportHTMLUtils$methods(
     
     genHeaderbar = function()
     {
-        viewSusBy <- "SuspectsByGroup SuspectsBySuspect ISTDsByGroup ISTDsByISTD TPsByGroup TPsBySuspect"
+        viewSusBy <- "SuspectsByGroup SuspectsBySuspect ISTDsByGroup ISTDsByISTD"
+        if (hasComponentsFromTPs())
+            viewSusBy <- paste(viewSusBy, "TPsByGroup TPsBySuspect")
         htmltools::withTags({
             list(
                 div(class = "pb-1 detailsHeaderbar",

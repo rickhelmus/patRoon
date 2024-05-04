@@ -61,7 +61,8 @@ reportHTMLUtils$methods(
     getComponObj = function()
     {
         # remove any data from missing fGroups (i.e. those removed after creating the components)
-        return(objects$components[, names(objects$fGroups)])
+        # also collapse components so we don't have duplicate fGroups (i.e. needed for NT)
+        return(collapseComponents(objects$components[, names(objects$fGroups)]))
     },
     
     genMainTableComponents = function()

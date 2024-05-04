@@ -62,7 +62,7 @@
         - replace bsCardBodyNoFill() and update other depcreated bslib functions
         - components
             - set and/or sets column?
-        - make view for TPs w/out candidates
+        - make sure that TPs from ann work
 
 - tests
     - IDL filter

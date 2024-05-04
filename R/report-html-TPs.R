@@ -122,12 +122,12 @@ reportHTMLUtils$methods(
         
         tab <- getFGReactTab(objects, settings)
 
-        tab <- if (!is.null(cInfo[["parent_name"]]))
+        tab <- if (objects$components@fromTPs)
             merge(cInfo, tab, by.x = c("parent_group", "parent_name"), by.y = c("group", "susp_name"))
         else
             merge(cInfo, tab, by.x = "parent_group", by.y = "group")
         
-        setnames(tab, "name", "component")
+        setnames(tab, c("name", "parent_group"), c("component", "group"))
         tab <- tab[match(cInfo$name, component, nomatch = 0)] # restore component order
 
         # used for table row selection by sidebar
@@ -307,17 +307,26 @@ reportHTMLUtils$methods(
         else
             NULL
         
-        list(
+        ret <- list(
             genTPsSidebar(),
-
             makeFGTableCard(genMainTableTPsParents(), "detailsMainTableOnly", "TPsParents"),
-            makeFGTableCard(genMainTableTPsByGroup(), "detailsMainTable", "TPsByGroup"),
-            makeCandTableCard(genMainTableTPsCandSuspect(), "detailsCandTable", "TPsByGroup", "TP candidates",
-                              groupBy = groupBy),
-            makeCandTableCard(genMainTableTPsBySuspect(), "detailsMainTable", "TPsBySuspect", "TP candidates",
-                              groupBy = groupBy),
-            makeFGTableCard(genMainTableTPsCandGroup(), "detailsCandTable", "TPsBySuspect")
+            makeFGTableCard(genMainTableTPsByGroup(),
+                            if (objects$components@fromTPs) "detailsMainTable" else "detailsMainTableOnly",
+                            "TPsByGroup")
         )
+        
+        if (objects$components@fromTPs)
+        {
+            ret <- append(ret, list(
+                makeCandTableCard(genMainTableTPsCandSuspect(), "detailsCandTable", "TPsByGroup", "TP candidates",
+                                  groupBy = groupBy),
+                makeCandTableCard(genMainTableTPsBySuspect(), "detailsMainTable", "TPsBySuspect", "TP candidates",
+                                  groupBy = groupBy),
+                makeFGTableCard(genMainTableTPsCandGroup(), "detailsCandTable", "TPsBySuspect")
+            ))
+        }
+        
+        return(ret)
     }
 )
 

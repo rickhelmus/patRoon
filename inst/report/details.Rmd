@@ -80,7 +80,7 @@ div:has(> div.detailsCandTable) {
 
 </style>
 
-```{r results='asis',eval=utils$hasComponentsFromTPs()}
+```{r results='asis',eval=utils$hasComponentsTPs()}
 # add TP component parent infos as JS global
 printf("<script>const TPComponParentInfo = JSON.parse('%s');</script>\n", utils$getTPParentInfoJSON())
 ```

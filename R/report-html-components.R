@@ -146,7 +146,7 @@ reportHTMLUtils$methods(
         plotHeatMap(objects$components, interactive = TRUE) # UNDONE: make interactive configurable?
     },
     
-    genComponNTGraph = function(s)
+    genComponNTGraph = function(s = NULL)
     {
         if (!is.null(s) && length(objects$components[, sets = s]) == 0)
             return(htmltools::div("No components for this set.")) # NOTE: plotGraph() will throw an error if no results

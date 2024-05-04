@@ -304,7 +304,7 @@ getReactColDefDB <- function(tab, tabName)
     return(colDefDB)
 }
 
-makeMainResultsReactableNew <- function(tab, tabName, retMin, plots, internFilterable = NULL, initView = NULL,
+makeMainResultsReactableNew <- function(tab, tabName, retMin, plots, initView = NULL,
                                         initTabFunc = "initMainTabDefault", ...)
 {
     tab <- copy(tab)

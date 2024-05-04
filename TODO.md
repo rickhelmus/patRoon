@@ -35,15 +35,19 @@
     - update filter for candidate specific frag/NL matches
     - add set specific frag/NL matches for candidates
     - sync topMost filter for ann TPs
+    - collapseComponents(): not needed anymore? otherwise update
     - report()
         - report also candidate specific frag/NL matches? Or either?
         - BUG: JS errors when fGroups are subset/do not contain TPs anymore?
         - BUG: Visibility for Suspect only checkbox for formulas/compounds is only handled if suspects are annotated
         - test utf characters in column CSV file on Windows
+        - re-add suspect info/annotations tabs
+            - maybe merge both and show tables side by side?
         - report parent properties that used to be in aggregated fields
             - group, intensities, estIDLevel, d_rt, d_mz, sets
             --> skip intensities, add rest to info table?
             --> also store in global variable?
+            --> or add suspect annotation accordion in parent sidebar?
         - refactor/redesign
             - test select filter
             - prefix cmp, tp etc columns
@@ -57,8 +61,8 @@
         - allow.cartesian needed for table merges for main tables?
         - replace bsCardBodyNoFill() and update other depcreated bslib functions
         - components
-            - collapse components (ie NT)?
             - set and/or sets column?
+        - make view for TPs w/out candidates
 
 - tests
     - IDL filter

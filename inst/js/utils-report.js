@@ -306,9 +306,12 @@ function updateTabSelTPsParents(rowValues, rowIndex)
 function updateTabSelTPsByGroup(rowValues, rowIndex)
 {
     updateTabSelFGroupsTPs(rowValues, rowIndex);
-    Reactable.setFilter("detailsTabTPsCandSuspect", "group", rowValues.group);
-    Reactable.setFilter("detailsTabTPsCandSuspect", "cmpName", rowValues.cmpName);
-    setTabSelFirstRow("detailsTabTPsCandSuspect", el => el.cmpName === rowValues.cmpName && el.group === rowValues.group);
+    if (document.getElementById("detailsTabTPsCandSuspect")) // FALSE if TPs were reported w/out candidates
+    {
+        Reactable.setFilter("detailsTabTPsCandSuspect", "group", rowValues.group);
+        Reactable.setFilter("detailsTabTPsCandSuspect", "cmpName", rowValues.cmpName);
+        setTabSelFirstRow("detailsTabTPsCandSuspect", el => el.cmpName === rowValues.cmpName && el.group === rowValues.group);
+    }
 }
 
 function updateTabSelTPsCandSuspect(rowValues, rowIndex)

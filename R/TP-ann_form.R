@@ -62,6 +62,13 @@ setMethod("filter", "transformationProductsAnnForm", function(obj, ..., minFitFo
     return(obj)
 })
 
+setMethod("linkTPsToFGroups", "transformationProductsAnnForm", function(TPs, fGroups)
+{
+    ret <- as.data.table(TPs)[group %chin% names(fGroups), c("group", "name"), with = FALSE]
+    setnames(ret, "name", "TP_name")
+    return(ret)
+})
+
 
 # NOTE: this function is called by a withProg() block, so handles progression updates
 getTPsFormulas <- function(annTable, parName, parFormula, minFitFormula)

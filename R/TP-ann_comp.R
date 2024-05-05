@@ -70,6 +70,13 @@ setMethod("filter", "transformationProductsAnnComp", function(obj, ..., minFitFo
     return(obj)
 })
 
+setMethod("linkTPsToFGroups", "transformationProductsAnnComp", function(TPs, fGroups)
+{
+    ret <- as.data.table(TPs)[group %chin% names(fGroups), c("group", "name"), with = FALSE]
+    setnames(ret, "name", "TP_name")
+    return(ret)
+})
+
 
 # NOTE: this function is called by a withProg() block, so handles progression updates
 getTPsCompounds <- function(annTable, parentRow, TPStructParams, extraOptsFMCSR, simSuspSMILES, minRTDiff,

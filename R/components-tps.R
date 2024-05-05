@@ -308,7 +308,16 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, 
         setcolorder(compInfo, "name")
         names(compList) <- compInfo$name
 
-        if (fromTPs)
+        if (length(compList) == 0)
+        {
+            compList <- Map(names(compList), compList, f = function(cmpName, cmpTab)
+            {
+                cmpTab <- copy(cmpTab)
+                cmpTab[, links := list(list(character()))]
+                return(cmpTab)
+            })
+        }
+        else if (fromTPs)
         {
             # generate candidate links
             
@@ -330,9 +339,6 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, 
                 })]
                 return(cmpTab)
             })
-            
-            # overall links
-            compInfo[, links := lapply(name, function(cn) unique(unlist(compListTab[name == cn]$links)))]
         }
         else
         {
@@ -347,10 +353,10 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, 
                 cmpTab[compListTab[name == cmpName], links := i.links, on = "group"]
                 return(cmpTab)
             })
-            
-            # overall links
-            compInfo[, links := lapply(name, function(cn) unique(unlist(compListTab[name == cn]$links)))]
         }
+        
+        # overall links
+        compInfo[, links := lapply(name, function(cn) unique(unlist(compListTab[name == cn]$links)))]
     }
     
     # UNDONE: update counting for candidates

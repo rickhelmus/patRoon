@@ -70,6 +70,8 @@ setMethod("filter", "transformationProductsAnnComp", function(obj, ..., minFitFo
     return(obj)
 })
 
+setMethod("TPsFromScreening", "transformationProductsAnnComp", function(obj) FALSE)
+
 setMethod("linkTPsToFGroups", "transformationProductsAnnComp", function(TPs, fGroups)
 {
     ret <- as.data.table(TPs)[group %chin% names(fGroups), c("group", "name"), with = FALSE]

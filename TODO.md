@@ -130,6 +130,7 @@
         - new args
         - as.data.table candidates arg
         - candidate specific frag/NL matches
+        - new slots
     - generateTPs()
         - ann_comp/ann_form algos
         - forceCalcRetDir: only relevant for library atm, clearly mention its use in genTPsLib docs
@@ -190,6 +191,7 @@
         - new args
         - as.data.table candidates arg
         - candidate specific frag/NL matches
+        - new slots
     - generateTPs()
         - consistent "logP" naming, also for compounds
         - consistent calculation and configuration of logP/retDir calculation for all TP structure algos

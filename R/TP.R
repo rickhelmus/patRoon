@@ -138,8 +138,6 @@ setMethod("convertToSuspects", "transformationProducts", function(obj, includePa
     return(prodAll[])
 })
 
-setMethod("needsScreening", "transformationProducts", function(TPs) TRUE)
-
 setMethod("linkTPsToFGroups", "transformationProducts", function(TPs, fGroups)
 {
     TPNames <- as.data.table(TPs)$name

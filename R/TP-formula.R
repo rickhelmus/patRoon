@@ -23,6 +23,9 @@ NULL
 transformationProductsFormula <- setClass("transformationProductsFormula",
                                           contains = c("VIRTUAL", "transformationProducts"))
 
+setMethod("parentsFromScreening", "transformationProductsFormula", function(obj) TRUE)
+setMethod("TPsFromScreening", "transformationProductsFormula", function(obj) TRUE)
+
 setMethod("linkParentsToFGroups", "transformationProductsFormula", function(TPs, fGroups)
 {
     return(screenInfo(fGroups)[name %in% names(TPs), c("name", "group"), with = FALSE])

@@ -175,10 +175,16 @@ mergeTPComponCandidatesTab <- function(compTab)
 doGenComponentsTPs <- function(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, compounds, ignoreParents, minRTDiff,
                                specSimParams, parallel)
 {
-    if (length(fGroups) == 0 || (!is.null(TPs) && length(TPs) == 0))
-        return(componentsTPs(componentInfo = data.table(), components = list(), fromTPs = !is.null(TPs)))
-
     fromTPs <- !is.null(TPs)
+    parFromScr <- fromTPs && parentsFromScreening(TPs)
+    TPsFromScr <- fromTPs && TPsFromScreening(TPs)
+    
+    emptyRet <- componentsTPs(componentInfo = data.table(), components = list(), fromTPs = fromTPs,
+                              parentsFromScreening = parFromScr, TPsFromScreening = TPsFromScr)
+    
+    if (length(fGroups) == 0 || (!is.null(TPs) && length(TPs) == 0))
+        return(emptyRet)
+
     hash <- makeHash(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, compounds, ignoreParents, minRTDiff, specSimParams)
     cd <- loadCacheData("componentsTPs", hash)
     if (!is.null(cd))
@@ -194,7 +200,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, 
             msg <- paste(msg, "or doesn't contain any unique feature groups")
         warning(msg, call. = FALSE)
         
-        return(componentsTPs(componentInfo = data.table(), components = list(), fromTPs = fromTPs))
+        return(emptyRet)
     }
     
     gInfoParents <- groupInfo(fGroups); gInfoTPs <- groupInfo(fGroupsTPs)
@@ -359,7 +365,8 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, 
     printf("Linked %d parents with %d TPs.\n", nrow(compInfo),
            if (length(compList) > 0) sum(sapply(compList, nrow)) else 0)
     
-    ret <- componentsTPs(componentInfo = compInfo[], components = compList, fromTPs = fromTPs)
+    ret <- componentsTPs(componentInfo = compInfo[], components = compList, fromTPs = fromTPs,
+                         parentsFromScreening = parFromScr, TPsFromScreening = TPsFromScr)
     saveCacheData("componentsTPs", ret, hash)
     
     return(ret)
@@ -383,7 +390,9 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, 
 #'
 #' @template components_noint
 #' @export
-componentsTPs <- setClass("componentsTPs", contains = "components", slots = c(fromTPs = "logical"))
+componentsTPs <- setClass("componentsTPs", contains = "components", slots = c(fromTPs = "logical",
+                                                                              parentsFromScreening = "logical",
+                                                                              TPsFromScreening = "logical"))
 
 setMethod("initialize", "componentsTPs",
           function(.Object, ...) callNextMethod(.Object, ..., algorithm = "tp"))
@@ -408,6 +417,9 @@ setMethod("collapseComponents", "componentsTPs", function(obj)
     })
     return(obj)
 })
+
+setMethod("parentsFromScreening", "componentsTPs", function(obj) obj@parentsFromScreening)
+setMethod("TPsFromScreening", "componentsTPs", function(obj) obj@TPsFromScreening)
 
 #' @describeIn componentsTPs Returns all component data as a \code{\link{data.table}}.
 #' @export
@@ -700,8 +712,8 @@ setMethod("generateComponentsTPs", "featureGroups", function(fGroups, fGroupsTPs
     checkmate::assertFlag(parallel, add = ac)
     checkmate::reportAssertions(ac)
     
-    if (!is.null(TPs) && needsScreening(TPs) &&
-        (!inherits(fGroups, "featureGroupsScreening") || !inherits(fGroupsTPs, "featureGroupsScreening")))
+    if (!is.null(TPs) && (parentsFromScreening(TPs) || TPsFromScreening(TPs)) &&
+        (!isScreening(fGroups) || !isScreening(fGroupsTPs)))
         stop("Input feature groups need to be screened for parents/TPs!")
 
     return(doGenComponentsTPs(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, compounds, ignoreParents, minRTDiff,
@@ -725,8 +737,8 @@ setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroups
     checkmate::assertFlag(parallel, add = ac)
     checkmate::reportAssertions(ac)
 
-    if (!is.null(TPs) && needsScreening(TPs) &&
-        (!inherits(fGroups, "featureGroupsScreeningSet") || !inherits(fGroupsTPs, "featureGroupsScreeningSet")))
+    if (!is.null(TPs) && (parentsFromScreening(TPs) || TPsFromScreening(TPs)) &&
+        (!isScreening(fGroups) || !isScreening(fGroupsTPs)))
         stop("Input feature groups need to be screened for parents/TPs!")
     
     ret <- doGenComponentsTPs(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, compounds, ignoreParents, minRTDiff,

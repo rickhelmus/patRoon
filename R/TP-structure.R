@@ -122,6 +122,9 @@ setMethod("convertToMFDB", "transformationProductsStructure", function(TPs, out,
     doConvertToMFDB(prodAll, parents(TPs), out, includeParents)
 })
 
+setMethod("parentsFromScreening", "transformationProductsStructure", function(obj) TRUE)
+setMethod("TPsFromScreening", "transformationProductsStructure", function(obj) TRUE)
+
 setMethod("linkParentsToFGroups", "transformationProductsStructure", function(TPs, fGroups)
 {
     return(screenInfo(fGroups)[name %in% names(TPs), c("name", "group"), with = FALSE])

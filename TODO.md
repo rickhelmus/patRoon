@@ -11,6 +11,7 @@
     - let lib compounds use the same specsimParams default? Then annSim == libMatch by default.
     - remove support for annSimBoth in annotateSuspects? Or optionally calc for feat annotations and copy that?
         - either of these is preferred, as annSimBoth now needs separate specSimParams to annotateSuspects
+    - add annSims, IDLs etc to report
 - anaInfo
     - fGroups/feat subset
         - deprecate rGroups subset/filter param?
@@ -62,7 +63,6 @@
         - replace bsCardBodyNoFill() and update other depcreated bslib functions
         - components
             - set and/or sets column?
-        - make sure that TPs from ann work
 
 - tests
     - IDL filter

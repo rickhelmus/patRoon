@@ -99,7 +99,7 @@ reportHTMLUtils$methods(
     getTPComponNames = function()
     {
         ret <- getTPComponIDs()
-        if (objects$components@fromTPs)
+        if (parentsFromScreening(objects$components))
             ret <- paste0(ret, " (", componentInfo(getTPComponObj())$parent_name, ")")
         return(ret)
     },
@@ -122,7 +122,7 @@ reportHTMLUtils$methods(
         
         tab <- getFGReactTab(objects, settings)
 
-        tab <- if (objects$components@fromTPs)
+        tab <- if (parentsFromScreening(objects$components))
             merge(cInfo, tab, by.x = c("parent_group", "parent_name"), by.y = c("group", "susp_name"))
         else
             merge(cInfo, tab, by.x = "parent_group", by.y = "group")
@@ -152,29 +152,30 @@ reportHTMLUtils$methods(
     },
     genMainTableTPsCandSuspect = function()
     {
-        # UNDONE: handle non-screening cases: don't do this with ann TPs (don't just check if fGroups are suspects, as
-        # we still don't want to merge if they are with ann TPs)
-        
         candTab <- getTPCandReactTab(getTPComponObj(), plots)
-        scr <- getFGScreeningReactTab(screenInfo(objects$fGroups), plots)
         
-        # UNDONE: does this work if the same group/suspect is in multiple components?
-        candTab <- merge(candTab, scr, by.x = c("group", "candidate_name"), by.y = c("group", "susp_name"),
-                         sort = FALSE)
-
+        if (TPsFromScreening(objects$components))
+        {
+            scr <- getFGScreeningReactTab(screenInfo(objects$fGroups), plots)
+            # UNDONE: does this work if the same group/suspect is in multiple components?
+            candTab <- merge(candTab, scr, by.x = c("group", "candidate_name"), by.y = c("group", "susp_name"),
+                             sort = FALSE)
+        }
+        
         makeMainResultsReactableNew(candTab, "TPsCandSuspect", settings$features$retMin, plots)
     },
 
     genMainTableTPsBySuspect = function()
     {
-        # UNDONE: handle non-screening cases: don't do this with ann TPs (don't just check if fGroups are suspects, as
-        # we still don't want to merge if they are with ann TPs)
         
         candTab <- getTPCandReactTab(getTPComponObj(), plots)
-        scr <- getFGScreeningReactTab(screenInfo(objects$fGroups), plots)
         
-        candTab <- merge(candTab, scr, by.x = c("group", "candidate_name"), by.y = c("group", "susp_name"),
-                         sort = FALSE)
+        if (TPsFromScreening(objects$components))
+        {
+            scr <- getFGScreeningReactTab(screenInfo(objects$fGroups), plots)
+            candTab <- merge(candTab, scr, by.x = c("group", "candidate_name"), by.y = c("group", "susp_name"),
+                             sort = FALSE)
+        }
         
         candTab[, candidate_groups := paste0(group, collapse = ", "), by = "candidate_name"][, group := NULL]
         candTab <- unique(candTab, by = "candidate_name")
@@ -183,18 +184,22 @@ reportHTMLUtils$methods(
     },
     genMainTableTPsCandGroup = function()
     {
-        # UNDONE: handle non-screening cases: don't do this with ann TPs (don't just check if fGroups are suspects, as
-        # we still don't want to merge if they are with ann TPs)
-        
         ctab <- as.data.table(getTPComponObj(), candidates = TRUE)
         setnames(ctab, "name", "cmpName")
         ctab[, cmpIndex := seq_len(.N), by = "cmpName"]
+                
+        ftab <- getFGReactTab(objects, settings,
+                              collapseSuspects = if (TPsFromScreening(objects$components)) NULL else ",",
+                              onlyHits = TRUE)
         
-        ftab <- getFGReactTab(objects, settings, collapseSuspects = NULL, onlyHits = TRUE)
         # remove overlapping columns (eg er, mz)
         ctab <- removeDTColumnsIfPresent(ctab, setdiff(names(ftab), "group"))
         
-        tab <- merge(ctab, ftab, by.x = c("group", "candidate_name"), by.y = c("group", "susp_name"), sort = FALSE)
+        tab <- if (TPsFromScreening(objects$components))
+            merge(ctab, ftab, by.x = c("group", "candidate_name"), by.y = c("group", "susp_name"), sort = FALSE)
+        else
+            merge(ctab, ftab, by = "group", sort = FALSE)
+        
         # HACK: use a different name (and col definition) so that we get a hidden column used for filtering
         setnames(tab, "candidate_name", "candidate_ID")
         makeMainResultsReactableNew(tab, "TPsCandGroup", settings$features$retMin, plots)

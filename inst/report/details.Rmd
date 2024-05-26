@@ -87,12 +87,6 @@ printf("<script>const TPComponParentInfo = JSON.parse('%s');</script>\n", utils$
 ##
 
 ```{r, echo = FALSE,eval=TRUE}
-# small tools to make handling optional elements easier
-maybeIncl <- function(cond, tag) if (cond) tag else NULL
-callIncl <- function(f, ..., fixed = NULL) do.call(f, c(pruneList(list(...)), fixed))
-
-doSelParent <- utils$hasComponentsTPs() && (settings$features$chromatograms$large || utils$hasComponentsFromTPs() ||
-                                                settings$features$chromatograms$intensityPlots)
 
 mdprintf("Generating report parts: ")
 

@@ -1,152 +1,19 @@
 ---
 title: "report"
-author: "`r getPackageName(create = FALSE)`"
-date: "`r if (!settings$general$noDate) date() else '' `"
 output:
-    flexdashboard::flex_dashboard:
-        vertical_layout: fill
+    html_document:
         mathjax: null
         fig_mobile: false
         dev: svg
-        theme:
-            version: 5
-            bootswatch: cerulean
-            card-spacer-x: 0.5em
-            card-spacer-y: 0.5px
-            zindex-modal-backdrop: 1070
-            zindex-modal: 1075
-            accordion-body-padding-x: 0
-            accordion-body-padding-y: 0
-            accordion-button-padding-x: 1.25em
-            accordion-button-padding-y: 0.2em
-            nav-link-padding-x: 0.5rem
-            nav-link-padding-y: 0.25rem
         includes:
             before_body: modal.html
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, fig.keep = "all", fig.retina = 1, dpi = 72)
+```{r, echo=FALSE,warning=FALSE}
+utils$genMainUI()
 ```
 
-<style>
-
-/* mitigate margin-top introduced by upcoming bslib */
-.section.level1, .section.level2 {
-    margin-top: 0;
-}
-
-.btn-sm, .btn-group-sm>.btn {
-    --bs-btn-padding-y: 0.10em;
-}
-
-pre, code {
-    white-space: pre !important;
-    overflow-x: auto !important;
-    height: auto;
-    overflow-y: auto;
-}
-
-/* set positioning to allow scaling: https://stackoverflow.com/a/45144857 */
-/* UNDONE: doesn't work...
-.svglite {
-    position: absolute;
-    width: 100%;
-    height: auto;
-}*/
-
-/* Image zooming, based on https://stackoverflow.com/a/57694495 */
-.zoomDiv {
-    opacity: 0;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    z-index: 2000;
-    transform: translate(-50%, -50%);
-    box-shadow: 0px 0px 50px #888888;
-    max-height: 100%; 
-    overflow: auto;
-    cursor: zoom-out;
-    background: white;
-}
-
-.zoomImg {
-    width: 100%;
-    max-height: 80vh;
-}
-
-img:not(.zoomImg, .noZoomImg) {
-    cursor: zoom-in;
-    max-width: 100%;
-    max-height: 100%;
-}
-
-/* this sort-off prevents vertical scrolling after refreshing */
-/* UNDONE: doesn't always work, at least not in FF */
-html, body {
-    overflow: hidden;
-}
-
-</style>
-
-```{r results='asis'}
-# add plot paths as JS global
-printf("<script>const reportPlots = JSON.parse('%s');</script>\n", jsonlite::toJSON(plots))
-```
-
-Summary
-================
-
-##
-
-```{r, echo=FALSE}
-rightColumnCards <- list(
-    bslib::card(
-        bslib::card_header("Objects"),
-        bslib::card_body_fill(htmltools::pre(htmltools::code(objectsShow)))
-    )
-)
-
-if (!is.null(plots$overview$chord) || !is.null(plots$overview$venn) || !is.null(plots$overview$UpSet))
-{
-    tabs <- list()
-    makeTab <- function(title, plot) bslib::nav(title, bslib::card_body_fill(htmltools::HTML(utils$plotImg(plot))))
-    if (!is.null(plots$overview$chord))
-        tabs <- c(tabs, list(makeTab("Chord diagram", plots$overview$chord)))
-    if (!is.null(plots$overview$venn))
-        tabs <- c(tabs, list(makeTab("Venn diagram", plots$overview$venn)))
-    if (!is.null(plots$overview$UpSet))
-        tabs <- c(tabs, list(makeTab("UpSet diagram", plots$overview$UpSet)))
-    rightColumnCards <- c(rightColumnCards,
-                          list(style = "grid-template-rows: 2fr 3fr;",
-                               do.call(bslib::navs_tab_card, c(list(title = "Feature distribution"), tabs))))
-}
-
-bslib::layout_column_wrap(
-    width = 1/2,
-    height = "100%",
-    heights_equal = "row",
-    style = "padding-bottom: 10px; padding-right: 10px; grid-template-columns: 2fr 1fr;",
-    bslib::layout_column_wrap(
-        width = 1,
-        heights_equal = "row",
-        bslib::card(
-            bslib::card_header("Most intense feature of each group"),
-            bslib::card_body_fill(htmltools::HTML(utils$plotImg(plots$overview$chroms)))
-        ),
-        bslib::card(
-            bslib::card_header("Retention vs m/z"),
-            bslib::card_body_fill(htmltools::HTML(utils$plotImg(plots$overview$retMZ)))
-        )
-    ),
-    do.call(bslib::layout_column_wrap, c(list(
-        width = 1,
-        heights_equal = "row"
-    ), rightColumnCards))
-)
-```
-
-```{r child="details.Rmd"}
+```{r child="details.Rmd",eval=F}
 ```
 
 ```{r child="istds.Rmd",eval=utils$hasInternalStandards() && settings$internalStandards$graph}

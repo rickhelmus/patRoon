@@ -497,6 +497,33 @@ reportHTMLUtils$methods(
     maybeInclUI = function(cond, tag) if (cond) tag else NULL,
     pruneUI = function(f, ..., fixed = NULL) do.call(f, c(pruneList(list(...)), fixed)),
     
+    hasSuspects = function() isScreening(objects$fGroups) && nrow(screenInfo(objects$fGroups)) > 0,
+    hasSuspAnn = function() isSuspAnnotated(objects$fGroups) && nrow(screenInfo(objects$fGroups)) > 0,
+    hasInternalStandards = function() nrow(internalStandards(objects$fGroups)) > 0,
+    hasSets = function() isFGSet(objects$fGroups),
+    hasConcs = function() nrow(concentrations(objects$fGroups)) > 0,
+    hasTox = function() nrow(toxicities(objects$fGroups)) > 0,
+    hasFQualities = function() hasFGroupScores(objects$fGroups),
+    hasObj = function(name) !is.null(objects[[name]]) && length(intersect(names(objects$fGroups), groupNames(objects[[name]]))) > 0,
+    hasComponents = function() hasObj("components") && !inherits(objects$components, "componentsTPs"),
+    hasComponentsIntClust = function() hasComponents() && inherits(objects$components, "componentsIntClust"),
+    hasComponentsSpecClust = function() hasComponents() && inherits(objects$components, "componentsSpecClust"),
+    hasComponentsNT = function() hasComponents() && inherits(objects$components, c("componentsNT", "componentsNTSet")),
+    hasComponentInfo = function() hasComponents() && !hasComponentsIntClust() && !hasComponentsSpecClust(),
+    hasComponentsTPs = function() hasObj("components") && inherits(objects$components, "componentsTPs"),
+    hasComponentsFromTPs = function() hasComponentsTPs() && objects$components@fromTPs,
+    hasTPSims = function() hasComponentsTPs() && any(c("specSimilarity", "totalFragmentMatches") %in% names(as.data.table(objects$components))),
+    hasTPs = function() !is.null(objects[["TPs"]]) && hasComponentsTPs(),
+    hasTPGraphs = function() hasTPs() && inherits(objects$TPs, c("transformationProductsStructure", "transformationProductsFormula")) && settings$TPs$graphs,
+    hasMSPL = function() hasObj("MSPeakLists"),
+    hasFormulas = function() hasObj("formulas") && settings$formulas$include,
+    hasCompounds = function() hasObj("compounds"),
+    hasCompsCluster = function() hasObj("compsCluster"),
+    
+    getFGSets = function() sets(objects$fGroups),
+    
+    plotImg = function(p) paste0("<img src='", p, "'></img>"),
+    
     conditionalTabPanel = function(title, view, ...)
     {
         # For tabs that can be made hidden/visible, we embed an attribute in the title so the JS support code can easily

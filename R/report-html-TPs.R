@@ -299,8 +299,13 @@ reportHTMLUtils$methods(
             )
         )
         
-        makeSideBar("TPsParents TPsByGroup TPsBySuspect", "Parent", "TPCompon-select", "updateTPCompon",
-                    getTPComponIDs(), getTPComponNames(), "advanceTPCompon", bd)
+        parentInfo <- htmltools::HTML(sprintf("const TPComponParentInfo = JSON.parse('%s');", getTPParentInfoJSON()))
+        
+        htmltools::tagList(
+            htmltools::tags$script(parentInfo),
+            makeSideBar("TPsParents TPsByGroup TPsBySuspect", "Parent", "TPCompon-select", "updateTPCompon",
+                        getTPComponIDs(), getTPComponNames(), "advanceTPCompon", bd)
+        )
     },
     
     genDetailsTPsUI = function()

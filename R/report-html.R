@@ -84,32 +84,114 @@ reportHTMLUtils <- setRefClass("reportHTMLUtils",
                                fields = list(objects = "list", EICs = "list", plots = "list", settings = "list"))
 
 reportHTMLUtils$methods(
-    hasSuspects = function() isScreening(objects$fGroups) && nrow(screenInfo(objects$fGroups)) > 0,
-    hasSuspAnn = function() isSuspAnnotated(objects$fGroups) && nrow(screenInfo(objects$fGroups)) > 0,
-    hasInternalStandards = function() nrow(internalStandards(objects$fGroups)) > 0,
-    hasSets = function() isFGSet(objects$fGroups),
-    hasConcs = function() nrow(concentrations(objects$fGroups)) > 0,
-    hasTox = function() nrow(toxicities(objects$fGroups)) > 0,
-    hasFQualities = function() hasFGroupScores(objects$fGroups),
-    hasObj = function(name) !is.null(objects[[name]]) && length(intersect(names(objects$fGroups), groupNames(objects[[name]]))) > 0,
-    hasComponents = function() hasObj("components") && !inherits(objects$components, "componentsTPs"),
-    hasComponentsIntClust = function() hasComponents() && inherits(objects$components, "componentsIntClust"),
-    hasComponentsSpecClust = function() hasComponents() && inherits(objects$components, "componentsSpecClust"),
-    hasComponentsNT = function() hasComponents() && inherits(objects$components, c("componentsNT", "componentsNTSet")),
-    hasComponentInfo = function() hasComponents() && !hasComponentsIntClust() && !hasComponentsSpecClust(),
-    hasComponentsTPs = function() hasObj("components") && inherits(objects$components, "componentsTPs"),
-    hasComponentsFromTPs = function() hasComponentsTPs() && objects$components@fromTPs,
-    hasTPSims = function() hasComponentsTPs() && any(c("specSimilarity", "totalFragmentMatches") %in% names(as.data.table(objects$components))),
-    hasTPs = function() !is.null(objects[["TPs"]]) && hasComponentsTPs(),
-    hasTPGraphs = function() hasTPs() && inherits(objects$TPs, c("transformationProductsStructure", "transformationProductsFormula")) && settings$TPs$graphs,
-    hasMSPL = function() hasObj("MSPeakLists"),
-    hasFormulas = function() hasObj("formulas") && settings$formulas$include,
-    hasCompounds = function() hasObj("compounds"),
-    hasCompsCluster = function() hasObj("compsCluster"),
     
-    getFGSets = function() sets(objects$fGroups),
+    genSummaryUI = function()
+    {
+        objectsShow <- paste0(utils::capture.output({
+            for (o in c("fGroups", "MSPeakLists", "formulas", "compounds", "components", "TPs"))
+            {
+                if (!is.null(objects[[o]]))
+                {
+                    methods::show(objects[[o]])
+                    cat("\n")
+                }
+            }
+        }), collapse = "\n")
+        
+        rightColumnCards <- list(
+            bslib::card(
+                bslib::card_header("Objects"),
+                bslib::card_body_fill(htmltools::pre(htmltools::code(objectsShow)))
+            )
+        )
+        
+        if (!is.null(plots$overview$chord) || !is.null(plots$overview$venn) || !is.null(plots$overview$UpSet))
+        {
+            tabs <- list()
+            makeTab <- function(title, plot) bslib::nav(title, bslib::card_body_fill(htmltools::HTML(plotImg(plot))))
+            if (!is.null(plots$overview$chord))
+                tabs <- c(tabs, list(makeTab("Chord diagram", plots$overview$chord)))
+            if (!is.null(plots$overview$venn))
+                tabs <- c(tabs, list(makeTab("Venn diagram", plots$overview$venn)))
+            if (!is.null(plots$overview$UpSet))
+                tabs <- c(tabs, list(makeTab("UpSet diagram", plots$overview$UpSet)))
+            rightColumnCards <- c(rightColumnCards,
+                                  list(style = "grid-template-rows: 2fr 3fr;",
+                                       do.call(bslib::navs_tab_card, c(list(title = "Feature distribution"), tabs))))
+        }
+        
+        bslib::layout_column_wrap(
+            width = 1/2,
+            height = "100%",
+            heights_equal = "row",
+            style = "padding-bottom: 10px; padding-right: 10px; grid-template-columns: 2fr 1fr;",
+            bslib::layout_column_wrap(
+                width = 1,
+                heights_equal = "row",
+                bslib::card(
+                    bslib::card_header("Most intense feature of each group"),
+                    bslib::card_body_fill(htmltools::HTML(plotImg(plots$overview$chroms)))
+                ),
+                bslib::card(
+                    bslib::card_header("Retention vs m/z"),
+                    bslib::card_body_fill(htmltools::HTML(plotImg(plots$overview$retMZ)))
+                )
+            ),
+            do.call(bslib::layout_column_wrap, c(list(
+                width = 1,
+                heights_equal = "row"
+            ), rightColumnCards))
+        )
+    },
     
-    plotImg = function(p) paste0("<img src='", p, "'></img>")
+    genDetailsUI = function()
+    {
+        UIArgs <- list(
+            width = NULL,
+            height = "100%",
+            gap = 0,
+            class = "mainLayout"
+        )
+
+        mdprintf("Generating details report parts: ")
+        UIArgs <- c(UIArgs, pruneUI(c,
+                                    genHeaderbar(),
+                                    genDetailsPlainUI(),
+                                    maybeInclUI(hasSuspects(), genDetailsSuspectsUI()),
+                                    maybeInclUI(hasInternalStandards(), genDetailsISTDsUI()),
+                                    maybeInclUI(hasComponents(), genDetailsComponentsUI()),
+                                    maybeInclUI(hasComponentsTPs(), genDetailsTPsUI()),
+                                    genBottombar()
+        ))
+        mdprintf("Done!\n")
+
+        return(do.call(bslib::layout_column_wrap, UIArgs))        
+    },
+    
+    genMainUI = function()
+    {
+        plotsVar <- htmltools::HTML(sprintf("const reportPlots = JSON.parse('%s');", jsonlite::toJSON(plots)))
+        
+        ui <- bslib::page_navbar(
+            theme = bslib::bs_theme(version = 5, preset = "cerulean", "card-spacer-x" = "0.5em",
+                                    "card-spacer-y" = "0.5px", "zindex-modal-backdrop" = 1070,
+                                    "zindex-modal" = 1075, "accordion-body-padding-x" = 0,
+                                    "accordion-body-padding-y" = 0, "accordion-button-padding-x" = "1.25em",
+                                    "accordion-button-padding-y" = "0.2em", "nav-link-padding-x" = "0.5rem",
+                                    "nav-link-padding-y" = "0.25rem"),
+            title = "patRoon",
+            bslib::nav_panel(title = "Summary", genSummaryUI()),
+            bslib::nav_panel(title = "Details", genDetailsUI())
+        )
+        
+        return(htmltools::tagList(
+            htmltools::includeScript(system.file("js", "utils-report.js", package = "patRoon")),
+            htmltools::includeCSS(system.file("report", "report.css", package = "patRoon")),
+            htmltools::tags$script(plotsVar),
+            ui
+        ))
+    }
+    
 )
 
 
@@ -168,6 +250,7 @@ doReportHTML <- function(fGroups, MSPeakLists, formulas, compounds, compsCluster
                                            EICs = EICs, plots = reportEnv$plots, settings = settings)
     reportEnv$EICs <- EICs
     
+    # UNDONE: remove
     reportEnv$objectsShow <- paste0(utils::capture.output({
         for (o in pruneList(list(fGroups, MSPeakLists, formulas, compounds, components, TPs)))
         {

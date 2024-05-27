@@ -485,6 +485,33 @@ reportHTMLUtils$methods(
                               groupBy = groupBy),
             makeFGTableCard(genMainTableISTDsCandGroup(), "detailsCandTable", "ISTDsByISTD")
         )
+    },
+    
+    genISTDsGraphUI = function()
+    {
+        layoutArgs <- list(width = 1, height = "100%", style = "padding-bottom: 10px; padding-right: 10px;")
+        if (!hasSets())
+        {
+            do.call(bslib::layout_column_wrap, c(layoutArgs, list(
+                bslib::card(
+                    bslib::card_header("Internal standard assignments"),
+                    bslib::card_body(genISTDGraph())
+                )        
+            )))
+        }
+        else
+        {
+            navs <- lapply(getFGSets(), function(s)
+            {
+                bslib::nav(
+                    s,
+                    bslib::card_body(genISTDGraph(s))
+                )
+            })
+            do.call(bslib::layout_column_wrap, c(layoutArgs, list(
+                do.call(bslib::navs_tab_card, c(list(title = "Internal standard assignments"), navs))
+            )))
+        }
     }
 )
 

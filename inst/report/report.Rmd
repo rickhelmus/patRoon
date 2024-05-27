@@ -13,12 +13,6 @@ output:
 utils$genMainUI()
 ```
 
-```{r child="details.Rmd",eval=F}
-```
-
-```{r child="istds.Rmd",eval=utils$hasInternalStandards() && settings$internalStandards$graph}
-```
-
 ```{r child="components_int.Rmd",eval=utils$hasComponentsIntClust()}
 ```
 

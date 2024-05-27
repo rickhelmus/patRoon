@@ -181,7 +181,9 @@ reportHTMLUtils$methods(
                                     "nav-link-padding-y" = "0.25rem"),
             title = "patRoon",
             bslib::nav_panel(title = "Summary", genSummaryUI()),
-            bslib::nav_panel(title = "Details", genDetailsUI())
+            bslib::nav_panel(title = "Details", genDetailsUI()),
+            maybeInclUI(hasInternalStandards() && settings$internalStandards$graph,
+                        bslib::nav_panel(title = "Internal standards", genISTDsGraphUI()))
         )
         
         return(htmltools::tagList(

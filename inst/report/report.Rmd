@@ -12,12 +12,3 @@ output:
 ```{r, echo=FALSE,warning=FALSE}
 utils$genMainUI()
 ```
-
-```{r child="components_int.Rmd",eval=utils$hasComponentsIntClust()}
-```
-
-```{r child="components_spec.Rmd",eval=utils$hasComponentsSpecClust()}
-```
-
-```{r child="components_nt.Rmd",eval=utils$hasComponentsNT()}
-```

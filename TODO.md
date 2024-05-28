@@ -49,6 +49,8 @@
             - move all JS callbacks etc to js file(s)?
             - improve code distribution over files
             - add featScores columns to CSV (or regex?)
+            - move flexdashboard to Suggests (and remove completely if legacy reportHTML is removed)
+            - remove now unneeded .Rmd files
         - add colDefs for new TP ann columns
         - replace bsCardBodyNoFill() and update other depcreated bslib functions
         - components

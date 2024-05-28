@@ -180,10 +180,13 @@ reportHTMLUtils$methods(
                                     "accordion-button-padding-y" = "0.2em", "nav-link-padding-x" = "0.5rem",
                                     "nav-link-padding-y" = "0.25rem"),
             title = "patRoon",
-            bslib::nav_panel(title = "Summary", genSummaryUI()),
-            bslib::nav_panel(title = "Details", genDetailsUI()),
+            bslib::nav_panel("Summary", genSummaryUI()),
+            bslib::nav_panel("Details", genDetailsUI()),
             maybeInclUI(hasInternalStandards() && settings$internalStandards$graph,
-                        bslib::nav_panel(title = "Internal standards", genISTDsGraphUI()))
+                        bslib::nav_panel("Internal standards", genISTDsGraphUI())),
+            maybeInclUI(hasComponentsIntClust(), bslib::nav_panel("Intensity clusters", genComponIntClustUI())),
+            maybeInclUI(hasComponentsSpecClust(), bslib::nav_panel("Spectrum clusters", genComponSpecClustUI())),
+            maybeInclUI(hasComponentsNT(), bslib::nav_panel("Homologues series", genComponNTUI())),
         )
         
         return(htmltools::tagList(

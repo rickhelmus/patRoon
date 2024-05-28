@@ -155,6 +155,62 @@ reportHTMLUtils$methods(
         if (!is.null(s))
             args <- c(args, list(set = s))
         do.call(plotGraph, args)
+    },
+    
+    genComponIntClustUI = function()
+    {
+        bslib::layout_column_wrap(
+            width = 1/2,
+            height = "100%",
+            style = "padding-bottom: 10px; padding-right: 10px;",
+            bslib::card(
+                bslib::card_header("Heatmap"),
+                bslib::card_body(genIntClustHeatMap())
+            ),
+            bslib::card(
+                bslib::card_header("Dendrogram"),
+                bslib::card_body(htmltools::HTML(plotImg(plots$components$dendro)))
+            )
+        )
+    },
+    
+    genComponSpecClustUI = function()
+    {
+        bslib::layout_column_wrap(
+            width = 1,
+            height = "100%",
+            style = "padding-bottom: 10px; padding-right: 10px;",
+            bslib::card(
+                bslib::card_header("Dendrogram"),
+                bslib::card_body(htmltools::HTML(plotImg(plots$components$dendro)))
+            )
+        )
+    },
+    
+    genComponNTUI = function()
+    {
+        layoutArgs <- list(width = 1, height = "100%", style = "padding-bottom: 10px; padding-right: 10px;")
+        if (!hasSets())
+        {
+            do.call(bslib::layout_column_wrap, c(layoutArgs, list(
+                bslib::card(
+                    bslib::card_header("Linked series"),
+                    bslib::card_body(genComponNTGraph())
+                )        
+            )))
+        } else
+        {
+            navs <- lapply(getFGSets(), function(s)
+            {
+                bslib::nav(
+                    s,
+                    bslib::card_body(genComponNTGraph(s))
+                )
+            })
+            do.call(bslib::layout_column_wrap, c(layoutArgs, list(
+                do.call(bslib::navset_card_tab, c(list(title = "Linked series"), navs))
+            )))
+        }
     }
 )
 

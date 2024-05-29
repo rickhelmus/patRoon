@@ -72,7 +72,7 @@
 
 <style type="text/css">
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -82,7 +82,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -144,6 +144,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 div.csl-bib-body { }
 div.csl-entry {
   clear: both;
+  margin-bottom: 0em;
 }
 .hanging div.csl-entry {
   margin-left:2em;
@@ -504,17 +505,17 @@ div.csl-indent {
 <span id="cb60-2"><a href="inspecting-results.html#cb60-2" tabindex="-1"></a><span class="fu">as.data.table</span>(fList)[, <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]</span></code></pre></div>
 <pre><code>#&gt;             analysis                     ID     ret        mz      area intensity
 #&gt;               &lt;char&gt;                 &lt;char&gt;   &lt;num&gt;     &lt;num&gt;     &lt;num&gt;     &lt;num&gt;
-#&gt;    1:  solvent-pos-1 f_17477285248607503406  13.176  98.97537 4345232.0    391476
-#&gt;    2:  solvent-pos-1 f_14308204789371614665   7.181 100.11197  797112.1    426956
-#&gt;    3:  solvent-pos-1  f_5052607800171671784 192.178 100.11211 9609998.0    750532
-#&gt;    4:  solvent-pos-1  f_7293130803801421355  19.171 100.11217 5784411.0    370376
-#&gt;    5:  solvent-pos-1  f_5969291479283851049   4.786 100.11220  551723.6    567312
+#&gt;    1:  solvent-pos-1 f_16502928428135831550  13.176  98.97537 4345232.0    391476
+#&gt;    2:  solvent-pos-1 f_17122230781832214934   7.181 100.11197  797112.1    426956
+#&gt;    3:  solvent-pos-1  f_8500934789681252778 192.178 100.11211 9609998.0    750532
+#&gt;    4:  solvent-pos-1  f_9921452390076211896  19.171 100.11217 5784411.0    370376
+#&gt;    5:  solvent-pos-1  f_3469021758935781871   4.786 100.11220  551723.6    567312
 #&gt;   ---                                                                            
-#&gt; 2922: standard-pos-3  f_3815429574665922015 318.892 425.18866  666531.5    232636
-#&gt; 2923: standard-pos-3 f_11897030897392276655   9.114 427.03242  362024.1    114744
-#&gt; 2924: standard-pos-3  f_2053157463525125027 318.892 427.18678  200193.5     77768
-#&gt; 2925: standard-pos-3 f_14950121521146274696 382.682 432.23984  217612.9     97648
-#&gt; 2926: standard-pos-3  f_5632866879511585874   9.114 433.00457 3086864.0    912920</code></pre>
+#&gt; 2922: standard-pos-3  f_1534288938354419998 318.892 425.18866  666531.5    232636
+#&gt; 2923: standard-pos-3  f_6265264209210312959   9.114 427.03242  362024.1    114744
+#&gt; 2924: standard-pos-3 f_12876782668065374290 318.892 427.18678  200193.5     77768
+#&gt; 2925: standard-pos-3 f_10132828815214677043 382.682 432.23984  217612.9     97648
+#&gt; 2926: standard-pos-3  f_4401666300544712713   9.114 433.00457 3086864.0    912920</code></pre>
 <div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="inspecting-results.html#cb62-1" tabindex="-1"></a><span class="co"># Returns group info and intensity values for each feature group</span></span>
 <span id="cb62-2"><a href="inspecting-results.html#cb62-2" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroups, <span class="at">average =</span> <span class="cn">TRUE</span>) <span class="co"># average intensities for replicates</span></span></code></pre></div>
 <pre><code>#&gt;              group      ret       mz standard-pos

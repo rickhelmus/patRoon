@@ -79,10 +79,11 @@ test_that("verify feature group optimization output", {
     # expect_known_value(expInfoPrepForComp(fgOptXCMS, 1, 1), testFile("fg-opt-xcms"))
     # expect_known_show(fgOptXCMS, testFile("fg-opt-xcms-show", text = TRUE))
     
+    expect_known_value(expInfoPrepForComp(fgOptKPIC2, 1, 1), testFile("fg-opt-kpic2"))
+
+    skip_if(utils::packageVersion("xcms") < "4.2") # output changed a little
     expect_known_value(expInfoPrepForComp(fgOptXCMS3, 1, 1), testFile("fg-opt-xcms3"))
     # expect_known_show(fgOptXCMS3, testFile("fg-opt-xcms3-show", text = TRUE))
-    
-    expect_known_value(expInfoPrepForComp(fgOptKPIC2, 1, 1), testFile("fg-opt-kpic2"))
 })
 
 test_that("default param generators", {

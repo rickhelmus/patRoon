@@ -297,7 +297,7 @@ getReactColDefDB <- function(tab, tabName)
     }
     
     colDefDB[, displayName := fifelse(nzchar(displayName), displayName, name)]
-    colDefDB[isRegEx == TRUE & displayName == "strip", displayName := gsub(regex, "", name)]
+    colDefDB[isRegEx == TRUE & displayName == "strip", displayName := mapply(regex, name, FUN = gsub, MoreArgs = list(replacement = ""))]
     
     colDefDB <- colDefDB[get(tabName) == TRUE & name %chin% names(tab)] # subset
     
@@ -767,7 +767,7 @@ reportHTMLUtils$methods(
                     )),
                     maybeInclUI(hasSuspAnn(), conditionalTabPanel(
                         "Suspect annotation",
-                        view = "Suspects TPsParents TPsByGroup TPsBySusp",
+                        view = "SuspectsByGroup SuspectsBySuspect TPsParents TPsByGroup TPsBySusp",
                         bslib::card_body_fill(
                             htmltools::div(style = "margin: 20px;", genSuspAnnTable())
                         )

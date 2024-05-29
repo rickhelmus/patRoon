@@ -262,7 +262,7 @@ function updateTabSelSusCandGroup(rowValues, rowIndex)
 {
     updateTabSelFGroups(rowValues, rowIndex);
     if (document.getElementById('suspAnnTab'))
-        Reactable.setFilter('suspAnnTab', 'suspID', rowValues.susp_name + '-' + rowValues.group);
+        Reactable.setFilter('suspAnnTab', 'suspID', rowValues.susp_ID + '-' + rowValues.group);
 }
 
 function updateTabSelISTDsByGroup(rowValues, rowIndex)

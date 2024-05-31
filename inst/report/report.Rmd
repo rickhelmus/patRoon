@@ -11,7 +11,7 @@ output:
         theme:
             version: 5
             bootswatch: cerulean
-            card-spacer-x: 0.5px
+            card-spacer-x: 0.5em
             card-spacer-y: 0.5px
             zindex-modal-backdrop: 1070
             zindex-modal: 1075

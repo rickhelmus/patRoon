@@ -65,6 +65,8 @@ makeReactCellIDL <- function()
     function(value)
     {
         nidl <- numericIDLevel(value)
+        if (is.na(nidl))
+            return(htmltools::span(""))
         htmltools::span(style = list("border-radius" = "30px", display = "inline-block", width = "2em",
                                      "background-color" = IDLCols[nidl], color = if (nidl <= 2) "black" else "white",
                                      "text-align" = "center", "font-weight" = "bold"),
@@ -499,7 +501,7 @@ reportHTMLUtils$methods(
     {
         # For tabs that can be made hidden/visible, we embed an attribute in the title so the JS support code can easily
         # find the relevant element
-        bslib::nav_panel(htmltools::span(title, detailsView = view), ...)
+        bslib::nav_panel(htmltools::span(title, detailsViewTab = view), ...)
     },
 
     makeSideBar = function(dvp, hd, selID, selFunc, selIDs, selNames, advanceFunc, ...)

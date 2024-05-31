@@ -52,6 +52,6 @@ setMethod("plotGraph", "transformationProductsFormula", function(obj, which, com
     checkmate::reportAssertions(ac)
     
     doPlotTPGraph(as.data.table(obj[which]), parents(obj),
-                  cmpTab = if (!is.null(components)) as.data.table(components) else NULL, structuresMax = 0,
+                  cmpTab = if (!is.null(components)) as.data.table(components, candidates = TRUE) else NULL, structuresMax = 0,
                   prune = prune, onlyCompletePaths = onlyCompletePaths, width = width, height = height)
 })

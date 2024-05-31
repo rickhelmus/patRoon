@@ -157,7 +157,6 @@ reportHTMLUtils$methods(
         if (TPsFromScreening(objects$components))
         {
             scr <- getFGScreeningReactTab(screenInfo(objects$fGroups), plots)
-            # UNDONE: does this work if the same group/suspect is in multiple components?
             candTab <- merge(candTab, scr, by.x = c("group", "candidate_name"), by.y = c("group", "susp_name"),
                              sort = FALSE)
         }

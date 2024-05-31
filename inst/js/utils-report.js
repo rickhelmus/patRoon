@@ -120,7 +120,7 @@ function updateDetailsView(sel = undefined)
     // Toggle view dependent bottombar tabs (eg susp annotation)
     document.getElementById("bottombarTabs").querySelectorAll('[detailsViewTab]').forEach(function(el)
     {
-        toggleBottomTab(el, el.classList.contains(viewID));
+        toggleBottomTab(el, el.getAttribute("detailsViewTab").split(' ').includes(viewID));
     });
     
     // Expand bottom bar if no sidebar is visible
@@ -226,7 +226,7 @@ function updateTabSelFGroupsTPs(rowValues, rowIndex)
     if (Object.keys(reportPlots.TPs).length > 0)
     {
         const specSimEl = document.getElementById('similarity_spec');
-        specSimEl.src = reportPlots.TPs[rowValues.component][rowValues.cmpIndex - 1];
+        specSimEl.src = reportPlots.TPs[rowValues.cmpName][rowValues.cmpIndex - 1];
         specSimEl.style.display = ''; // may have been hidden if a previous img didn't exist
     }
     

@@ -248,6 +248,8 @@ function updateTabSelSusByGroup(rowValues, rowIndex)
 
 function updateTabSelSusCandSuspect(rowValues, rowIndex)
 {
+    if (document.getElementById('suspInfoTab'))
+        Reactable.setFilter('suspInfoTab', 'name', rowValues.susp_name);
     if (document.getElementById('suspAnnTab'))
         Reactable.setFilter('suspAnnTab', 'suspID', rowValues.susp_name + '-' + rowValues.group);
 }
@@ -261,6 +263,8 @@ function updateTabSelSusBySuspect(rowValues, rowIndex)
 function updateTabSelSusCandGroup(rowValues, rowIndex)
 {
     updateTabSelFGroups(rowValues, rowIndex);
+    if (document.getElementById('suspInfoTab'))
+        Reactable.setFilter('suspInfoTab', 'name', rowValues.susp_ID);
     if (document.getElementById('suspAnnTab'))
         Reactable.setFilter('suspAnnTab', 'suspID', rowValues.susp_ID + '-' + rowValues.group);
 }
@@ -301,6 +305,10 @@ function updateTabSelTPsParents(rowValues, rowIndex)
     updateTabSelFGroups(rowValues, rowIndex);
     document.getElementById("TPCompon-select").value = rowValues.component;
     updateTPCompon(rowValues.component, false);
+    if (document.getElementById('suspInfoTab'))
+        Reactable.setFilter('suspInfoTab', 'name', rowValues.parent_name);
+    if (document.getElementById('suspAnnTab'))
+        Reactable.setFilter('suspAnnTab', 'suspID', rowValues.parent_name + '-' + rowValues.group);
 }
 
 function updateTabSelTPsByGroup(rowValues, rowIndex)
@@ -316,8 +324,10 @@ function updateTabSelTPsByGroup(rowValues, rowIndex)
 
 function updateTabSelTPsCandSuspect(rowValues, rowIndex)
 {
+    if (document.getElementById('suspInfoTab'))
+        Reactable.setFilter('suspInfoTab', 'name', rowValues.candidate_name);
     if (document.getElementById('suspAnnTab'))
-        Reactable.setFilter('suspAnnTab', 'suspID', rowValues.susp_name + '-' + rowValues.group);
+        Reactable.setFilter('suspAnnTab', 'suspID', rowValues.candidate_name + '-' + rowValues.group);
 }
 
 function updateTabSelTPsBySuspect(rowValues, rowIndex)
@@ -330,8 +340,10 @@ function updateTabSelTPsBySuspect(rowValues, rowIndex)
 function updateTabSelTPsCandGroup(rowValues, rowIndex)
 {
     updateTabSelFGroupsTPs(rowValues, rowIndex);
+    if (document.getElementById('suspInfoTab'))
+        Reactable.setFilter('suspInfoTab', 'name', rowValues.candidate_ID);
     if (document.getElementById('suspAnnTab'))
-        Reactable.setFilter('suspAnnTab', 'suspID', rowValues.susp_name + '-' + rowValues.group);
+        Reactable.setFilter('suspAnnTab', 'suspID', rowValues.candidate_ID + '-' + rowValues.group);
 }
 
 function initMainTabDefault(tabID)
@@ -588,20 +600,19 @@ function updateTPCompon(cmpName, activateFG = true)
 {
     const chromEl = document.getElementById('chrom_view-parent');
     const intEl = document.getElementById('int_plot-parent');
+    const structEl = document.getElementById('struct_view-parent');
     
     if (chromEl)
         chromEl.src = reportPlots.chromsLarge[TPComponParentInfo[cmpName].group];
     if (intEl)
         intEl.src = reportPlots.intPlots[TPComponParentInfo[cmpName].group];
+    if (structEl)
+        structEl.src = reportPlots.structs[TPComponParentInfo[cmpName].InChIKey] || "";
     
-    if (document.getElementById('parentInfoTab'))
-    {
-        document.getElementById('struct_view-parent').src = reportPlots.structs[TPComponParentInfo[cmpName].InChIKey] || "";
-        Reactable.setFilter('parentInfoTab', 'name', TPComponParentInfo[cmpName].name);
-        // UNDONE: move to separate tab
-        /*document.getElementById('struct_view-tp').src = reportPlots.structs[rowValues.susp_InChIKey] || "";
-        Reactable.setFilter('TPInfoTab', 'name', rowValues.susp_name);*/
-    }
+    if (document.getElementById('parentSuspInfoTab'))
+        Reactable.setFilter('parentSuspInfoTab', 'name', TPComponParentInfo[cmpName].name);
+    if (document.getElementById('parentSuspAnnTab'))
+        Reactable.setFilter('parentSuspAnnTab', 'suspID', TPComponParentInfo[cmpName].name + "-" + TPComponParentInfo[cmpName].group);
     
     showTPGraph(cmpName);
 

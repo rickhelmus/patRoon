@@ -386,7 +386,7 @@ reportHTMLUtils$methods(
                       meta = list(internFilterable = "group", neverFilterable = NULL))
     },
     
-    genSuspAnnTable = function()
+    genSuspAnnTable = function(id)
     {
         tab <- as.data.table(objects$fGroups, collapseSuspects = NULL)
         mcn <- mergedConsensusNames(objects$fGroups)
@@ -400,7 +400,7 @@ reportHTMLUtils$methods(
             tab[, (rcols) := lapply(.SD, round, 2), .SDcols = rcols]
         
         ptab <- makePropTab(tab, if (isFGSet(objects$fGroups)) sets(objects$fGroups) else NULL, "suspID")
-        makePropReactable(ptab, "suspAnnTab", "suspID", minPropWidth = 150, minValWidth = 100)
+        makePropReactable(ptab, id, "suspID", minPropWidth = 150, minValWidth = 100)
     },
     
     genISTDGraph = function(set = NULL)

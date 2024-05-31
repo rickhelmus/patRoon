@@ -258,6 +258,7 @@ reportHTMLUtils$methods(
     
     genTPsSidebar = function()
     {
+        hasParStruct <- "parent_InChIKey" %in% names(componentInfo(objects$components))
         bd <- bslib::card_body(
             padding = 0,
             pruneUI(bslib::accordion,
@@ -265,18 +266,23 @@ reportHTMLUtils$methods(
                         "Chromatogram",
                         bslib::card_body_fill(htmltools::img(id = "chrom_view-parent"))
                     )),
-                    # UNDONE: only include if there actually are structures
-                    maybeInclUI(hasComponentsFromTPs(), bslib::accordion_panel(
+                    maybeInclUI(hasParStruct, bslib::accordion_panel(
                         "Structure",
                         bsCardBodyNoFill(
                             htmltools::img(id = "struct_view-parent", style = "min-width: 20%;")
-                        ),
+                        )
                     )),
-                    maybeInclUI(hasComponentsFromTPs(), bslib::accordion_panel(
-                        "Screening",
+                    maybeInclUI(parentsFromScreening(objects$components), bslib::accordion_panel(
+                        "Suspect information",
                         bsCardBodyNoFill(
-                            genSuspInfoTable("parentInfoTab"),
-                        ),
+                            genSuspInfoTable("parentSuspInfoTab"),
+                        )
+                    )),
+                    maybeInclUI(parentsFromScreening(objects$components) && hasSuspAnn(), bslib::accordion_panel(
+                        "Suspect annotation",
+                        bsCardBodyNoFill(
+                            genSuspAnnTable("parentSuspAnnTab")
+                        )
                     )),
                     maybeInclUI(settings$features$intensityPlots, bslib::accordion_panel(
                         "Intensities",

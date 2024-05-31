@@ -683,6 +683,15 @@ reportHTMLUtils$methods(
     
     genBottombar = function()
     {
+        suspInfoView <- "SuspectsByGroup SuspectsBySuspect"
+        if (hasComponentsFromTPs())
+        {
+            if (parentsFromScreening(objects$components))
+                suspInfoView <- paste(suspInfoView, "TPsParents")
+            if (TPsFromScreening(objects$components))
+                suspInfoView <- paste(suspInfoView, "TPsByGroup TPsBySusp")
+        }
+        
         list(
             bslib::layout_column_wrap(
                 class = "detailsBottombarFull",
@@ -767,12 +776,28 @@ reportHTMLUtils$methods(
                             genCompClustsImgs()
                         )
                     )),
-                    maybeInclUI(hasSuspAnn(), conditionalTabPanel(
-                        "Suspect annotation",
-                        view = "SuspectsByGroup SuspectsBySuspect TPsParents TPsByGroup TPsBySusp",
-                        bslib::card_body_fill(
-                            htmltools::div(style = "margin: 20px;", genSuspAnnTable())
+                    maybeInclUI(hasSuspects(), conditionalTabPanel(
+                        "Suspect information",
+                        view = suspInfoView,
+                        pruneUI(htmltools::div,
+                                # UNDONE: move all the styles to css
+                                style = "display: flex; gap: 40px;",
+                                htmltools::div(
+                                    style = "display: flex; flex-direction: column; align-items: center;",
+                                    htmltools::strong("Information"),
+                                    genSuspInfoTable("suspInfoTab"),
+                                ),
+                                maybeInclUI(hasSuspAnn(), htmltools::div(
+                                    style = "display: flex; flex-direction: column; align-items: center;",
+                                    htmltools::strong("Annotation"),
+                                    genSuspAnnTable("suspAnnTab")
+                                ))
                         )
+                    )),
+                    maybeInclUI(hasInternalStandards(), conditionalTabPanel(
+                        "Internal standard",
+                        view = "ISTDsByGroup ISTDsByISTD",
+                        bsCardBodyNoFill(style = "margin-top: 0px;", genISTDInfoTable())
                     )),
                     maybeInclUI(hasTPSims(), conditionalTabPanel(
                         "Parent similarity",

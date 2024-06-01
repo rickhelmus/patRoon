@@ -324,20 +324,18 @@ reportHTMLUtils$methods(
         
         ret <- list(
             genTPsSidebar(),
-            makeFGTableCard(genMainTableTPsParents(), "detailsMainTableOnly", "TPsParents"),
-            makeFGTableCard(genMainTableTPsByGroup(),
-                            if (objects$components@fromTPs) "detailsMainTable" else "detailsMainTableOnly",
-                            "TPsByGroup")
+            makeFGTableCard(genMainTableTPsParents(), TRUE, "TPsParents"),
+            makeFGTableCard(genMainTableTPsByGroup(), TRUE, "TPsByGroup")
         )
         
         if (objects$components@fromTPs)
         {
             ret <- append(ret, list(
-                makeCandTableCard(genMainTableTPsCandSuspect(), "detailsCandTable", "TPsByGroup", "TP candidates",
+                makeCandTableCard(genMainTableTPsCandSuspect(), FALSE, "TPsByGroup", "TP candidates",
                                   groupBy = groupBy),
-                makeCandTableCard(genMainTableTPsBySuspect(), "detailsMainTable", "TPsBySuspect", "TP candidates",
+                makeCandTableCard(genMainTableTPsBySuspect(), TRUE, "TPsBySuspect", "TP candidates",
                                   groupBy = groupBy),
-                makeFGTableCard(genMainTableTPsCandGroup(), "detailsCandTable", "TPsBySuspect")
+                makeFGTableCard(genMainTableTPsCandGroup(), FALSE, "TPsBySuspect")
             ))
         }
         

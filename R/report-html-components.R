@@ -137,7 +137,7 @@ reportHTMLUtils$methods(
     {
         list(
             genComponentsSidebar(),
-            makeFGTableCard(genMainTableComponents(), "detailsMainTableOnly", "Components")
+            makeFGTableCard(genMainTableComponents(), TRUE, "Components")
         )
     },
     

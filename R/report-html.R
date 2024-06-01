@@ -150,7 +150,7 @@ reportHTMLUtils$methods(
             width = NULL,
             height = "100%",
             gap = 0,
-            class = "mainLayout"
+            id = "detailsLayout"
         )
 
         mdprintf("Generating details report parts: ")

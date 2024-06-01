@@ -424,20 +424,23 @@ reportHTMLUtils$methods(
         ))
     },
     
-    makeFGTableCard = function(tab, ...)
+    mainTabToClass = function(main) if (main) "detailsMainTable" else "detailsCandTable",
+    
+    makeFGTableCard = function(tab, main, ...)
     {
-        makeMainTableCard(tab, ..., hd = "Feature groups", toolbar = makeFGToolbar(tab$elementId))
+        makeMainTableCard(tab, ..., cl = mainTabToClass(main), hd = "Feature groups",
+                          toolbar = makeFGToolbar(tab$elementId))
     },
-    makeCandTableCard = function(tab, ..., groupBy = NULL)
+    makeCandTableCard = function(tab, main, ..., groupBy = NULL)
     {
         tb <- makeToolbar(tab$elementId, groupBy = groupBy, toggleExpand = !is.null(groupBy))
-        makeMainTableCard(tab, ..., toolbar = tb)
+        makeMainTableCard(tab, ..., cl = mainTabToClass(main), toolbar = tb)
     },
     
     genDetailsPlainUI = function()
     {
         list(
-            makeFGTableCard(genMainTablePlain(), "detailsMainTableFull", "Plain")
+            makeFGTableCard(genMainTablePlain(), TRUE, "Plain")
         )
     },
     
@@ -455,12 +458,12 @@ reportHTMLUtils$methods(
             NULL
         
         list(
-            makeFGTableCard(genMainTableSusByGroup(), "detailsMainTableNoSB", "SuspectsByGroup"),
-            makeCandTableCard(genMainTableSusCandSuspect(), "detailsCandTable", "SuspectsByGroup", "Candidates",
+            makeFGTableCard(genMainTableSusByGroup(), TRUE, "SuspectsByGroup"),
+            makeCandTableCard(genMainTableSusCandSuspect(), FALSE, "SuspectsByGroup", "Candidates",
                               groupBy = groupBy),
-            makeCandTableCard(genMainTableSusBySuspect(), "detailsMainTableNoSB", "SuspectsBySuspect", "Suspects",
+            makeCandTableCard(genMainTableSusBySuspect(), TRUE, "SuspectsBySuspect", "Suspects",
                               groupBy = groupBy),
-            makeFGTableCard(genMainTableSusCandGroup(), "detailsCandTable", "SuspectsBySuspect")
+            makeFGTableCard(genMainTableSusCandGroup(), FALSE, "SuspectsBySuspect")
         )
     },
     
@@ -478,12 +481,12 @@ reportHTMLUtils$methods(
             NULL
         
         list(
-            makeFGTableCard(genMainTableISTDsByGroup(), "detailsMainTableNoSB", "ISTDsByGroup"),
-            makeCandTableCard(genMainTableISTDsCandISTD(), "detailsCandTable", "ISTDsByGroup", "Internal standards",
+            makeFGTableCard(genMainTableISTDsByGroup(), TRUE, "ISTDsByGroup"),
+            makeCandTableCard(genMainTableISTDsCandISTD(), FALSE, "ISTDsByGroup", "Internal standards",
                               groupBy = groupBy),
-            makeCandTableCard(genMainTableISTDsByISTD(), "detailsMainTableNoSB", "ISTDsByISTD", "Internal standards",
+            makeCandTableCard(genMainTableISTDsByISTD(), TRUE, "ISTDsByISTD", "Internal standards",
                               groupBy = groupBy),
-            makeFGTableCard(genMainTableISTDsCandGroup(), "detailsCandTable", "ISTDsByISTD")
+            makeFGTableCard(genMainTableISTDsCandGroup(), FALSE, "ISTDsByISTD")
         )
     },
     

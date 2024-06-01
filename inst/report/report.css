@@ -18,6 +18,7 @@ html, body {
     height: 100%;
 }
 
+/* Various hacks to make sure RMarkdown uses the full browser window and carry fill */
 .main-container {
     max-width: 100%;
     height: 100%;
@@ -28,10 +29,12 @@ html, body {
     flex-direction: column;
 }
 
+/* Make sure additional containers added by RMarkdown carry fill */
 .container-fluid {
     height: 100%;
 }
 
+/* get rid of RMarkdown header */
 #header {
     display: none;
 }
@@ -73,6 +76,49 @@ img:not(.zoomImg, .noZoomImg) {
     padding-right: 5px;
     grid-template-columns: repeat(10, minmax(0, 1fr));
     grid-template-rows: auto 1fr 1fr;
+    grid-template-areas:
+        "hd hd   hd   hd   hd   hd   hd   hd   hd   hd"
+        "sd sd main main main main cand cand cand cand"
+        "sd sd   bt   bt   bt   bt   bt   bt   bt   bt"
+}
+
+.detailsLayoutPlain, .detailsLayoutSuspectsByGroup, .detailsLayoutSuspectsBySuspect, .detailsLayoutISTDsByGroup,
+.detailsLayoutISTDsByISTD, .detailsLayoutComponents, .detailsLayoutTPsParents, .detailsLayoutTPsByGroup,
+.detailsLayoutTPsBySuspect {
+    grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+    display: grid;
+    padding-bottom: 5px;
+    padding-right: 5px;
+    grid-template-rows: auto 1fr 1fr;
+}
+
+.detailsLayoutPlain {
+    --cols: 1;
+    grid-template-areas:
+        "hd"
+        "main"
+        "bt"
+}
+
+.detailsLayoutSuspectsByGroup, .detailsLayoutSuspectsBySuspect, .detailsLayoutISTDsByGroup,
+.detailsLayoutISTDsByISTD {
+    --cols: 2;
+    grid-template-areas:
+        "hd   hd"
+        "main cand"
+        "bt   bt"
+}
+
+.detailsLayoutComponents, .detailsLayoutTPsParents {
+    --cols: 10;
+    grid-template-areas:
+        "hd hd   hd   hd   hd   hd   hd   hd   hd   hd"
+        "sd sd main main main main main main main main"
+        "sd sd   bt   bt   bt   bt   bt   bt   bt   bt"
+}
+
+.detailsLayoutTPsByGroup, .detailsLayoutTPsBySuspect {
+    --cols: 10;
     grid-template-areas:
         "hd hd   hd   hd   hd   hd   hd   hd   hd   hd"
         "sd sd main main main main cand cand cand cand"

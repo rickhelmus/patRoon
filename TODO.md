@@ -50,7 +50,8 @@
             - improve code distribution over files
             - add featScores columns to CSV (or regex?)
             - move flexdashboard to Suggests (and remove completely if legacy reportHTML is removed)
-            - remove now unneeded .Rmd files
+            - update toggleAnnOnlySusp(), setDetailsTablesRatio()
+            - finish up: set date+title (make it configurable?) and add patRoon link+logo?
         - add colDefs for new TP ann columns
         - replace bsCardBodyNoFill() and update other depcreated bslib functions
         - components

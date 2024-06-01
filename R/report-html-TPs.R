@@ -136,8 +136,8 @@ reportHTMLUtils$methods(
         if (!is.null(tab[["parent_InChIKey"]]))
             tab[, parent_structure := plots$structs[parent_InChIKey]]
             
-        makeMainResultsReactableNew(tab, "TPsParents", settings$features$retMin, plots, initView = "TPsParents",
-                                    initTabFunc = "initTabTPsParents")
+        makeMainResultsReactable(tab, "TPsParents", settings$features$retMin, plots, initView = "TPsParents",
+                                 initTabFunc = "initTabTPsParents")
     },
     
     genMainTableTPsByGroup = function()
@@ -147,8 +147,8 @@ reportHTMLUtils$methods(
         ctab[, cmpIndex := seq_len(.N), by = "cmpName"]
         ftab <- getFGReactTab(objects, settings)
         tab <- merge(ctab, ftab, by = "group", sort = FALSE)
-        makeMainResultsReactableNew(tab, "TPsByGroup", settings$features$retMin, plots, initView = "TPsByGroup",
-                                    initTabFunc = "initTabTPs")
+        makeMainResultsReactable(tab, "TPsByGroup", settings$features$retMin, plots, initView = "TPsByGroup",
+                                 initTabFunc = "initTabTPs")
     },
     genMainTableTPsCandSuspect = function()
     {
@@ -161,7 +161,7 @@ reportHTMLUtils$methods(
                              sort = FALSE)
         }
         
-        makeMainResultsReactableNew(candTab, "TPsCandSuspect", settings$features$retMin, plots)
+        makeMainResultsReactable(candTab, "TPsCandSuspect", settings$features$retMin, plots)
     },
 
     genMainTableTPsBySuspect = function()
@@ -178,8 +178,8 @@ reportHTMLUtils$methods(
         
         candTab[, candidate_groups := paste0(group, collapse = ", "), by = "candidate_name"][, group := NULL]
         candTab <- unique(candTab, by = "candidate_name")
-        makeMainResultsReactableNew(candTab, "TPsBySuspect", settings$features$retMin, plots, initView = "TPsBySuspect",
-                                    initTabFunc = "initTabTPs")
+        makeMainResultsReactable(candTab, "TPsBySuspect", settings$features$retMin, plots, initView = "TPsBySuspect",
+                                 initTabFunc = "initTabTPs")
     },
     genMainTableTPsCandGroup = function()
     {
@@ -201,7 +201,7 @@ reportHTMLUtils$methods(
         
         # HACK: use a different name (and col definition) so that we get a hidden column used for filtering
         setnames(tab, "candidate_name", "candidate_ID")
-        makeMainResultsReactableNew(tab, "TPsCandGroup", settings$features$retMin, plots)
+        makeMainResultsReactable(tab, "TPsCandGroup", settings$features$retMin, plots)
     },
     
     genTPSimTable = function()

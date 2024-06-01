@@ -138,33 +138,33 @@ reportHTMLUtils$methods(
     genMainTablePlain = function()
     {
         mdprintf("Feature groups... ")
-        makeMainResultsReactableNew(getFGReactTab(objects, settings), "Plain", settings$features$retMin, plots,
-                                    initView = "Plain")
+        makeMainResultsReactable(getFGReactTab(objects, settings), "Plain", settings$features$retMin, plots,
+                                 initView = "Plain")
     },
     
     genMainTableSusByGroup = function()
     {
-        makeMainResultsReactableNew(getFGReactTab(objects, settings, onlyHits = TRUE), "SusByGroup",
-                                    settings$features$retMin, plots, initView = "SuspectsByGroup")
+        makeMainResultsReactable(getFGReactTab(objects, settings, onlyHits = TRUE), "SusByGroup",
+                                 settings$features$retMin, plots, initView = "SuspectsByGroup")
     },
     genMainTableSusCandSuspect = function()
     {
-        makeMainResultsReactableNew(getFGScreeningReactTab(screenInfo(objects$fGroups), plots), "SusCandSuspect",
-                                    settings$features$retMin, plots)
+        makeMainResultsReactable(getFGScreeningReactTab(screenInfo(objects$fGroups), plots), "SusCandSuspect",
+                                 settings$features$retMin, plots)
     },
     genMainTableSusBySuspect = function()
     {
         tab <- getFGScreeningReactTab(screenInfo(objects$fGroups), plots)
         tab[, susp_groups := paste0(group, collapse = ", "), by = "susp_name"][, group := NULL]
         tab <- unique(tab, by = "susp_name")
-        makeMainResultsReactableNew(tab, "SusBySuspect", settings$features$retMin, plots, initView = "SuspectsBySuspect")
+        makeMainResultsReactable(tab, "SusBySuspect", settings$features$retMin, plots, initView = "SuspectsBySuspect")
     },
     genMainTableSusCandGroup = function()
     {
         tab <- getFGReactTab(objects, settings, collapseSuspects = NULL, onlyHits = TRUE)
         # HACK: use a different name (and col definition) so that we get a hidden column used for filtering
         setnames(tab, "susp_name", "susp_ID")
-        makeMainResultsReactableNew(tab, "SusCandGroup", settings$features$retMin, plots)
+        makeMainResultsReactable(tab, "SusCandGroup", settings$features$retMin, plots)
     },
 
     # HACK: the ISTD table is essentially the same as what screenInfo() returns for suspects. So the following functions
@@ -174,12 +174,12 @@ reportHTMLUtils$methods(
     {
         tab <- getFGReactTab(objects, settings)
         tab <- tab[group %chin% internalStandards(objects$fGroups)$group]
-        makeMainResultsReactableNew(tab, "ISTDsByGroup", settings$features$retMin, plots, initView = "ISTDsByGroup")
+        makeMainResultsReactable(tab, "ISTDsByGroup", settings$features$retMin, plots, initView = "ISTDsByGroup")
     },
     genMainTableISTDsCandISTD = function()
     {
-        makeMainResultsReactableNew(getFGScreeningReactTab(internalStandards(objects$fGroups), plots), "ISTDsCandISTD",
-                                    settings$features$retMin, plots)
+        makeMainResultsReactable(getFGScreeningReactTab(internalStandards(objects$fGroups), plots), "ISTDsCandISTD",
+                                 settings$features$retMin, plots)
     },
     genMainTableISTDsByISTD = function()
     {
@@ -187,7 +187,7 @@ reportHTMLUtils$methods(
         # UNDONE: give other name
         tab[, susp_groups := paste0(group, collapse = ", "), by = "susp_name"][, group := NULL]
         tab <- unique(tab, by = "susp_name")
-        makeMainResultsReactableNew(tab, "ISTDsByISTD", settings$features$retMin, plots, initView = "ISTDsByISTD")
+        makeMainResultsReactable(tab, "ISTDsByISTD", settings$features$retMin, plots, initView = "ISTDsByISTD")
     },
     genMainTableISTDsCandGroup = function()
     {
@@ -200,7 +200,7 @@ reportHTMLUtils$methods(
                 
         ftab <- merge(tab, ftab, by = "group")
 
-        makeMainResultsReactableNew(ftab, "ISTDsCandGroup", settings$features$retMin, plots)
+        makeMainResultsReactable(ftab, "ISTDsCandGroup", settings$features$retMin, plots)
     },
 
     genSuspInfoTable = function(id)

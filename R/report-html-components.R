@@ -81,8 +81,8 @@ reportHTMLUtils$methods(
         
         tab <- merge(ctab, ftab, by = "group", sort = FALSE)
         
-        makeMainResultsReactableNew(tab, "Components", settings$features$retMin, plots, initView = "Components",
-                                    initTabFunc = "initTabComponents")
+        makeMainResultsReactable(tab, "Components", settings$features$retMin, plots, initView = "Components",
+                                 initTabFunc = "initTabComponents")
     },
     
     genComponentInfoTable = function()

@@ -166,16 +166,15 @@ div:has(> div.detailsCandTable) {
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: center;
-    gap: 15px;"
+    gap: 15px;
 }
 
 .parentSim {
     display: flex;
     flex-wrap: wrap;
-    justify-content:
-    flex-start;
+    justify-content: flex-start;
     max-height: 100%;
     padding-top: 25px;
     align-items: flex-start;
-    gap: 40px;"
+    gap: 40px;
 }

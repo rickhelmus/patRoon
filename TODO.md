@@ -44,13 +44,12 @@
         - refactor/redesign
             - test select filter
             - prefix cmp, tp etc columns
-            - cleanout old formatting and fitting functions and harmonize
             - move main_columns to sysdata
             - move all JS callbacks etc to js file(s)?
             - improve code distribution over files
             - add featScores columns to CSV (or regex?)
             - move flexdashboard to Suggests (and remove completely if legacy reportHTML is removed)
-            - update toggleAnnOnlySusp(), setDetailsTablesRatio()
+            - update toggleAnnOnlySusp()
             - finish up: set date+title (make it configurable?) and add patRoon link+logo?
         - add colDefs for new TP ann columns
         - replace bsCardBodyNoFill() and update other depcreated bslib functions

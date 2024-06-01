@@ -725,7 +725,7 @@ reportHTMLUtils$methods(
         
         list(
             bslib::layout_column_wrap(
-                class = "detailsBottombarFull",
+                class = "detailsBottombar",
                 id = "detailsBottombar",
                 bslib::navset_card_tab(
                     title = "Selection data",

@@ -2,7 +2,10 @@ getMainReactColSepStyle <- function() list(borderLeft = "1px solid DarkGrey")
 
 getReactColGrpStartCols <- function(groupDefs) sapply(groupDefs[-1], function(col) col$columns[1])
 
-getReactImgCell <- function(value) htmltools::img(src = value, style = list("max-height" = "300px"))
+makeReactImgCell <- function()
+{
+    function(value) htmltools::img(src = value, style = list("max-height" = "300px"))
+}
 
 makeReactCellRoundMerged <- function(rounding)
 {
@@ -123,19 +126,19 @@ getReactFilterMethodAnnotations <- function()
 }")
 }
 
-reactSelFilterButton <- function(id, name, target, ocFunc, title)
-{
-    htmltools::tags$button(class = "btn btn-secondary btn-sm", "data-bs-toggle" = "modal",
-                           "data-bs-target" = target,
-                           onclick = sprintf("%s('%s', '%s')", ocFunc, id, name), title)
-}
-
-reactSuspectFilter <- function()
+getReactFilterMethodSuspect <- function()
 {
     htmlwidgets::JS("function(rows, columnId, filterValue)
 {
     return rows.filter(row => row.values[columnId] && row.values[columnId].split(', ').includes(filterValue));
 }")
+}
+
+reactSelFilterButton <- function(id, name, target, ocFunc, title)
+{
+    htmltools::tags$button(class = "btn btn-secondary btn-sm", "data-bs-toggle" = "modal",
+                           "data-bs-target" = target,
+                           onclick = sprintf("%s('%s', '%s')", ocFunc, id, name), title)
 }
 
 setReactNumRangeFilters <- function(id, tab, colDefs)
@@ -326,7 +329,7 @@ makeMainResultsReactable <- function(tab, tabName, retMin, plots, initView = NUL
                        chromLarge = makeReactCellLargeChrom(plots),
                        ISTD = makeReactCellISTD(),
                        annotations = makeReactCellAnnotations(),
-                       structure = getReactImgCell, # UNDONE: convert function to new closure style
+                       structure = makeReactImgCell(),
                        IDL = makeReactCellIDL(),
                        formula = makeReactCellFormula(),
                        NULL)

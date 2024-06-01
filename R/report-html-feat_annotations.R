@@ -399,12 +399,12 @@ reportHTMLUtils$methods(
         colDefs <- pruneList(list(
             group = reactable::colDef(show = FALSE, filterMethod = getReactFilterMethodExact()),
             candidate = reactable::colDef("#", minWidth = 15),
-            suspect = if (!is.null(tab[["suspect"]])) reactable::colDef("suspect(s)", filterMethod = reactSuspectFilter()) else NULL,
+            suspect = if (!is.null(tab[["suspect"]])) reactable::colDef("suspect(s)", filterMethod = getReactFilterMethodSuspect()) else NULL,
             neutral_formula = reactable::colDef("formula",
                                                 cell = function(value) htmltools::span(dangerouslySetInnerHTML = list("__html" = subscriptFormulaHTML(value)))),
             neutralMass = reactable::colDef("neutral mass"),
-            spectrum = reactable::colDef(cell = getReactImgCell, minWidth = 200),
-            scorings = reactable::colDef(cell = getReactImgCell, minWidth = 200)
+            spectrum = reactable::colDef(cell = makeReactImgCell(), minWidth = 200),
+            scorings = reactable::colDef(cell = makeReactImgCell(), minWidth = 200)
         ))
         
         colDefs <- setReactNumRangeFilters("formulasTab", tab, colDefs)
@@ -577,14 +577,14 @@ reportHTMLUtils$methods(
             group = reactable::colDef(show = FALSE, filterMethod = getReactFilterMethodExact()),
             candidate = reactable::colDef("#", minWidth = 15),
             compoundName = if (!is.null(tab[["compoundName"]])) reactable::colDef("compound", cell = getCompCell) else NULL,
-            suspect = if (!is.null(tab[["suspect"]])) reactable::colDef("suspect(s)", filterMethod = reactSuspectFilter()) else NULL,
+            suspect = if (!is.null(tab[["suspect"]])) reactable::colDef("suspect(s)", filterMethod = getReactFilterMethodSuspect()) else NULL,
             identifier = if (!is.null(tab[["identifier"]])) reactable::colDef(cell = function(value, index) htmltools::span(dangerouslySetInnerHTML = list("__html" = makeDBIdentLink(databases[index], value)))) else NULL,
             neutral_formula = reactable::colDef("formula",
                                                 cell = function(value) htmltools::span(dangerouslySetInnerHTML = list("__html" = subscriptFormulaHTML(value)))),
             neutralMass = if (!is.null(tab[["neutralMass"]])) reactable::colDef("neutral mass") else NULL,
-            structure = reactable::colDef(cell = getReactImgCell, minWidth = 125),
-            spectrum = reactable::colDef(cell = getReactImgCell, minWidth = 200),
-            scorings = reactable::colDef(cell = getReactImgCell, minWidth = 200)
+            structure = reactable::colDef(cell = makeReactImgCell(), minWidth = 125),
+            spectrum = reactable::colDef(cell = makeReactImgCell(), minWidth = 200),
+            scorings = reactable::colDef(cell = makeReactImgCell(), minWidth = 200)
         ))
         
         colDefs <- setReactNumRangeFilters("compoundsTab", tab, colDefs)

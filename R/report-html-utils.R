@@ -727,7 +727,7 @@ reportHTMLUtils$methods(
                     )),
                     maybeInclUI(hasMSPL(), bslib::nav_panel(
                         "MS peak lists",
-                        pruneUI(bsCardBodyNoFill,
+                        pruneUI(htmltools::div,
                                 style = "display: grid; grid-template-columns: 1fr 1fr; column-gap: 50px; justify-items:center;",
                                 htmltools::strong("MS"),
                                 htmltools::strong("MS/MS"),

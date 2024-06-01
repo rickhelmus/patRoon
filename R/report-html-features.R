@@ -288,7 +288,7 @@ reportHTMLUtils$methods(
         tab[, rGroup := anaInfo[match(tab$analysis, analysis)]$group]
 
         colDefs <- list(
-            group = reactable::colDef(show = FALSE, filterMethod = reactExactFilter()),
+            group = reactable::colDef(show = FALSE, filterMethod = getReactFilterMethodExact()),
             rGroup = reactable::colDef("replicate group")
         )
         if (!isFALSE(settings$features$chromatograms$features))
@@ -302,10 +302,7 @@ reportHTMLUtils$methods(
             })
         }
         if (!is.null(tab[["set"]]))
-        {
-            colDefs$set <- reactable::colDef(filterInput = function(values, name) reactSelectFilter("featuresTab",
-                                                                                                    values, name))
-        }
+            colDefs$set <- reactable::colDef(filterInput = makeReactFilterInputSelect("featuresTab"))
         
         fqn <- featureQualityNames(group = FALSE, scores = TRUE)
         for (col in fqn)

@@ -81,7 +81,6 @@ makeReactCellFormula <- function()
 
 makeReactFilterInputSelect <- function(id)
 {
-    # UNDONE: replace old reactSelectFilter() function with this one
     function(values, name)
     {
         # from examples
@@ -103,8 +102,6 @@ makeReactFilterInputAnnotations <- function(id)
 
 getReactFilterMethodExact <- function()
 {
-    # UNDONE: replace old reactExactFilter() by this function
-    
     htmlwidgets::JS("function(rows, columnId, filterValue)
 {
     return rows.filter(row => row.values[columnId] === filterValue);
@@ -133,32 +130,12 @@ reactSelFilterButton <- function(id, name, target, ocFunc, title)
                            onclick = sprintf("%s('%s', '%s')", ocFunc, id, name), title)
 }
 
-reactExactFilter <- function()
-{
-    htmlwidgets::JS("function(rows, columnId, filterValue)
-{
-    return rows.filter(row => row.values[columnId] === filterValue);
-}")
-}
-
 reactSuspectFilter <- function()
 {
     htmlwidgets::JS("function(rows, columnId, filterValue)
 {
     return rows.filter(row => row.values[columnId] && row.values[columnId].split(', ').includes(filterValue));
 }")
-}
-
-reactSelectFilter <- function(id, values, name)
-{
-    # from examples
-    htmltools::tags$select(
-        onchange = sprintf("Reactable.setFilter('%s', '%s', event.target.value || undefined)", id, name),
-        tags$option(value = "", "All"),
-        lapply(unique(values), tags$option),
-        "aria-label" = paste("Filter", name),
-        style = "width: 100%; height: 28px;"
-    )
 }
 
 setReactNumRangeFilters <- function(id, tab, colDefs)
@@ -258,7 +235,7 @@ makePropReactable <- function(tab, id, idcol = FALSE, minPropWidth = 150, minVal
     if (!isFALSE(idcol))
     {
         # exact match filter
-        colDefs[[idcol]] <- reactable::colDef(show = FALSE, filterMethod = reactExactFilter())
+        colDefs[[idcol]] <- reactable::colDef(show = FALSE, filterMethod = getReactFilterMethodExact())
     }
     
     for (col in names(tab))

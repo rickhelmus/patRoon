@@ -294,14 +294,14 @@ reportHTMLUtils$methods(
         tab[, precursor := NULL]
         
         colDefs <- list(
-            group = reactable::colDef(show = FALSE, filterMethod = reactExactFilter()),
+            group = reactable::colDef(show = FALSE, filterMethod = getReactFilterMethodExact()),
             mz = reactable::colDef(format = reactable::colFormat(digits = 5)),
             intensity = reactable::colDef(format = reactable::colFormat(digits = 0))
         )
         
         colDefs <- setReactNumRangeFilters(id, tab, colDefs)
         if (!is.null(tab[["set"]]))
-            colDefs$set <- reactable::colDef(filterInput = function(values, name) reactSelectFilter(id, values, name))
+            colDefs$set <- reactable::colDef(filterInput = makeReactFilterInputSelect(id))
         
         return(makeAnnReactable(tab, id, columns = colDefs, height = theight, filterable = TRUE,
                                 rowClass = function(index) if (isPrec[index]) "fw-bold" else ""))
@@ -401,7 +401,7 @@ reportHTMLUtils$methods(
         setcolorder(tab, intersect(c("candidate", "suspect"), names(tab)))
         
         colDefs <- pruneList(list(
-            group = reactable::colDef(show = FALSE, filterMethod = reactExactFilter()),
+            group = reactable::colDef(show = FALSE, filterMethod = getReactFilterMethodExact()),
             candidate = reactable::colDef("#", minWidth = 15),
             suspect = if (!is.null(tab[["suspect"]])) reactable::colDef("suspect(s)", filterMethod = reactSuspectFilter()) else NULL,
             neutral_formula = reactable::colDef("formula",
@@ -578,7 +578,7 @@ reportHTMLUtils$methods(
         setcolorder(tab, intersect(c("candidate", "compoundName", "suspect", "structure"), names(tab)))
         
         colDefs <- pruneList(list(
-            group = reactable::colDef(show = FALSE, filterMethod = reactExactFilter()),
+            group = reactable::colDef(show = FALSE, filterMethod = getReactFilterMethodExact()),
             candidate = reactable::colDef("#", minWidth = 15),
             compoundName = if (!is.null(tab[["compoundName"]])) reactable::colDef("compound", cell = getCompCell) else NULL,
             suspect = if (!is.null(tab[["suspect"]])) reactable::colDef("suspect(s)", filterMethod = reactSuspectFilter()) else NULL,

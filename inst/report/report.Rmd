@@ -9,6 +9,6 @@ output:
             before_body: modal.html
 ---
 
-```{r, echo=FALSE,warning=FALSE}
+```{r, echo=FALSE,warning=FALSE,message=FALSE}
 utils$genMainUI()
 ```

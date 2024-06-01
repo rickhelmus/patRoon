@@ -4,8 +4,8 @@
 
 function setDetailsTablesRatio(fr1, fr2)
 {
-    let el = document.getElementById("detailsTablesLayout");
-    el.style["grid-template-rows"] = `${fr1}fr ${fr2}fr`;
+    let el = document.getElementById("detailsLayout");
+    el.style["grid-template-rows"] = `auto ${fr1}fr ${fr2}fr`;
 }
 
 getViewIDFromSel = function(sel = undefined)

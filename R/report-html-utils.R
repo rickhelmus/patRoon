@@ -306,8 +306,8 @@ getReactColDefDB <- function(tab, tabName)
     return(colDefDB)
 }
 
-makeMainResultsReactableNew <- function(tab, tabName, retMin, plots, initView = NULL,
-                                        initTabFunc = "initMainTabDefault", ...)
+makeMainResultsReactable <- function(tab, tabName, retMin, plots, initView = NULL,
+                                     initTabFunc = "initMainTabDefault", ...)
 {
     tab <- copy(tab)
     colDefDB <- getReactColDefDB(tab, tabName)
@@ -423,36 +423,6 @@ getHTMLReportPlotPath <- function(outPath)
     plotPath <- file.path(outPath, "report_files", "plots")
     mkdirp(plotPath)
     return(plotPath)
-}
-
-makeHTMLReportPlotOld <- function(out, outPath, selfContained, code, ...)
-{
-    if (FALSE)
-    {
-        # UNDONE: while embedding the SVG directly would be nice, this seems to give major headaches with scaling,
-        # especially with Firefox... For now just base64 it :(
-        
-        if (selfContained)
-        {
-            svgstr <- svglite::svgstring(standalone = FALSE, fix_text_size = FALSE, ...)
-            on.exit(dev.off(), add = TRUE)
-            force(code)
-            ret <- as.character(svgstr())
-            
-            # replace fixed width/height properties to allow proper scaling (see https://stackoverflow.com/a/45144857).
-            # NOTE: use sub so that only header (first occurrence) is modified. Furthermore, note that the svglite css class
-            # is changed in report.Rmd.
-            # ret <- sub("width=\\'[[:graph:]]+\\'", "width='100%'", ret)
-            # ret <- sub("height=\\'[[:graph:]]+\\'", "height='auto'", ret)
-            return(ret)
-        }
-    }
-    
-    withSVGLite(file.path(getHTMLReportPlotPath(outPath), out), standalone = TRUE, code = code, ...)
-    return(getHTMLReportFinalPlotPath(out, selfContained))
-    
-    # UNDONE: object tag makes text selectable but messes up layout...
-    # return(paste0("<object data='", out, "' type='image/svg+xml' width=500 height=300></object>"))
 }
 
 makeHTMLReportPlot <- function(outPrefix, outPath, func, args, parParams = list(), cache = TRUE, doPrint = FALSE, ...)

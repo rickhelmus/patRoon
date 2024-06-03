@@ -119,13 +119,17 @@ reportHTMLUtils$methods(
     {
         compObj <- getTPComponObj()
         cInfo <- componentInfo(compObj)
-        
-        tab <- getFGReactTab(objects, settings)
 
         tab <- if (parentsFromScreening(objects$components))
-            merge(cInfo, tab, by.x = c("parent_group", "parent_name"), by.y = c("group", "susp_name"))
+        {
+            ft <- getFGReactTab(objects, settings, collapseSuspects = NULL, onlyHits = TRUE)
+            merge(cInfo, ft, by.x = c("parent_group", "parent_name"), by.y = c("group", "susp_name"))
+        }
         else
+        {
+            ft <- getFGReactTab(objects, settings)
             merge(cInfo, tab, by.x = "parent_group", by.y = "group")
+        }
         
         setnames(tab, c("name", "parent_group"), c("component", "group"))
         tab <- tab[match(cInfo$name, component, nomatch = 0)] # restore component order
@@ -186,7 +190,12 @@ reportHTMLUtils$methods(
         ctab <- as.data.table(getTPComponObj(), candidates = TRUE)
         setnames(ctab, "name", "cmpName")
         ctab[, cmpIndex := seq_len(.N), by = "cmpName"]
-                
+
+        ftab <- if (TPsFromScreening(objects$components))
+            getFGReactTab(objects, settings, collapseSuspects = NULL, onlyHits = TRUE)
+        else
+            getFGReactTab(objects, settings)
+        
         ftab <- getFGReactTab(objects, settings,
                               collapseSuspects = if (TPsFromScreening(objects$components)) NULL else ",",
                               onlyHits = TRUE)

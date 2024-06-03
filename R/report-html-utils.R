@@ -181,11 +181,24 @@ setReactSelRangeFilter <- function(id, colDef)
     return(colDef)
 }
 
-makeReactable <- function(tab, id, bordered = TRUE, pagination = FALSE, ...)
+makeReactable <- function(tab, id, bordered = TRUE, pagination = FALSE, initView = NULL, initTabFunc = "",
+                          meta = list(), ...)
 {
-    return(reactable::reactable(tab, elementId = id, resizable = TRUE, bordered = bordered, wrap = FALSE,
+    if (!is.null(initView))
+        meta <- modifyList(meta, list(initTabFunc = htmlwidgets::JS(initTabFunc)))
+    
+    ret <- reactable::reactable(tab, elementId = id, resizable = TRUE, bordered = bordered, wrap = FALSE,
                                 pagination = pagination, showPageSizeOptions = TRUE,
-                                pageSizeOptions = c(25, 50, 100, 250, 500), defaultPageSize = 50,...))
+                                pageSizeOptions = c(25, 50, 100, 250, 500), defaultPageSize = 50,
+                                meta = meta, ...)
+    
+    if (!is.null(initView))
+    {
+        # HACK: this seems to be the easiest way to set an element attribute...
+        ret <- htmlwidgets::onRender(ret, htmlwidgets::JS(sprintf("function(el, x) { el.setAttribute('detailsViewTabInit', '%s'); }", initView)))
+    }
+    
+    return(ret)
 }
 
 makeReactableCompact <- function(tab, id, ...)
@@ -286,8 +299,7 @@ getReactColDefDB <- function(tab, tabName)
     return(colDefDB)
 }
 
-makeMainResultsReactable <- function(tab, tabName, retMin, plots, initView = NULL,
-                                     initTabFunc = "initMainTabDefault", ...)
+makeMainResultsReactable <- function(tab, tabName, retMin, plots, initTabFunc = "initMainTabDefault", ...)
 {
     tab <- copy(tab)
     colDefDB <- getReactColDefDB(tab, tabName)
@@ -375,26 +387,17 @@ makeMainResultsReactable <- function(tab, tabName, retMin, plots, initView = NUL
                                       function(ct) colDefDB[get(col) == ct]$name,
                                       simplify = FALSE)
     
-    rt <- makeReactable(tab, id, highlight = TRUE, onClick = onClick, columns = colDefs,
-                        defaultColDef = reactable::colDef(style = bgstyle), columnGroups = groupDefs,
-                        filterable = FALSE, pagination = TRUE,
-                        theme = reactable::reactableTheme(headerStyle = headThemeStyle,
-                                                          groupHeaderStyle = headThemeStyle,
-                                                          cellPadding = "2px 4px"),
-                        meta = list(selectedRow = 0, updateRowFunc = htmlwidgets::JS(updateRowFunc),
-                                    initTabFunc = htmlwidgets::JS(initTabFunc),
-                                    CSVCols = colDefDB[CSV == TRUE]$name, colToggles = toColList("colToggle"),
-                                    neverFilterable = colDefDB[neverFilter == TRUE]$name,
-                                    internFilterable = colDefDB[internFilter == TRUE]$name),
-                        rowStyle = rowStyle, ...)
-    
-    if (!is.null(initView))
-    {
-        # HACK: this seems to be the easiest way to set an element attribute...
-        rt <- htmlwidgets::onRender(rt, htmlwidgets::JS(sprintf("function(el, x) { el.setAttribute('detailsViewTabInit', '%s'); }", initView)))
-    }
-    
-    return(rt)
+    return(makeReactable(tab, id, highlight = TRUE, onClick = onClick, columns = colDefs,
+                         defaultColDef = reactable::colDef(style = bgstyle), columnGroups = groupDefs,
+                         filterable = FALSE, pagination = TRUE,
+                         theme = reactable::reactableTheme(headerStyle = headThemeStyle,
+                                                           groupHeaderStyle = headThemeStyle,
+                                                           cellPadding = "2px 4px"), initTabFunc = initTabFunc,
+                         meta = list(selectedRow = 0, updateRowFunc = htmlwidgets::JS(updateRowFunc),
+                                     CSVCols = colDefDB[CSV == TRUE]$name, colToggles = toColList("colToggle"),
+                                     neverFilterable = colDefDB[neverFilter == TRUE]$name,
+                                     internFilterable = colDefDB[internFilter == TRUE]$name),
+                         rowStyle = rowStyle, ...))
 }
 
 
@@ -723,8 +726,11 @@ reportHTMLUtils$methods(
                             bsCardBodyNoFill(
                                 makeToolbar("formulasTab", tagsPreButtons = htmltools::tagList(
                                     htmltools::tags$input(type = "checkbox", id = "formulas-susp_only",
-                                                          onChange = 'toggleAnnOnlySusp("formulas", this.checked)'),
-                                    htmltools::tags$label("for" = "formulas-susp_only", "Suspect only")
+                                                          detailsView = suspInfoView,
+                                                          onChange = 'toggleAnnSuspFilter("formulas", this.checked)',
+                                                          checked = TRUE),
+                                    htmltools::tags$label("for" = "formulas-susp_only", detailsView = suspInfoView,
+                                                          "Suspect only")
                                 ), toggleExpand = TRUE, toggleExpandDisableIfNoGrouping = FALSE)
                             )
                         ),
@@ -738,8 +744,11 @@ reportHTMLUtils$methods(
                                 list(value = "neutral_formula", "Formula")
                             ), tagsPreButtons = htmltools::tagList(
                                 htmltools::tags$input(type = "checkbox", id = "compounds-susp_only",
-                                                      onChange = 'toggleAnnOnlySusp("compounds", this.checked)'),
-                                htmltools::tags$label("for" = "compounds-susp_only", "Suspect only")
+                                                      detailsView = suspInfoView,
+                                                      onChange = 'toggleAnnSuspFilter("compounds", this.checked)',
+                                                      checked = TRUE),
+                                htmltools::tags$label("for" = "compounds-susp_only", detailsView = suspInfoView,
+                                                      "Suspect only")
                             ), tagsPostButtons = htmltools::a(class = "ms-2", id = "openMF", target = "_blank",
                                                               "MetFrag Web"), toggleExpand = TRUE, toggleExpandDisableIfNoGrouping = FALSE)
                             

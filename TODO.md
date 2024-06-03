@@ -40,7 +40,6 @@
     - report()
         - report also candidate specific frag/NL matches? Or either?
         - BUG: JS errors when fGroups are subset/do not contain TPs anymore?
-        - BUG: Visibility for Suspect only checkbox for formulas/compounds is only handled if suspects are annotated
         - refactor/redesign
             - test select filter
             - prefix cmp, tp etc columns
@@ -53,6 +52,7 @@
             - finish up: set date+title (make it configurable?) and add patRoon link+logo?
         - add colDefs for new TP ann columns
         - replace bsCardBodyNoFill() and update other depcreated bslib functions
+        - TP sidebar: include fGroup name of parent somewhere
         - components
             - set and/or sets column?
 

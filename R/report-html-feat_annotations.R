@@ -414,7 +414,8 @@ reportHTMLUtils$methods(
         neverFilterable <- c(".details", "candidate", "spectrum", "scorings")
         ret <- makeAnnReactable(tab, "formulasTab", columns = colDefs, getFormDetails, getAnnPLDetails,
                                 getScoreDetails, meta = list(CSVCols = CSVCols, internFilterable = internFilterable,
-                                                             neverFilterable = neverFilterable))
+                                                             neverFilterable = neverFilterable),
+                                initView = "all", initTabFunc = "initTabAnn")
         saveCacheData("reportHTMLFormulas", ret, hash)
         return(ret)
     },
@@ -609,7 +610,8 @@ reportHTMLUtils$methods(
         ret <- makeAnnReactable(tab, "compoundsTab", columns = colDefs, getCompDetails, getAnnPLDetails,
                                 getScoreDetails, meta = list(mfWebLinks = mfWebLinks, CSVCols = CSVCols,
                                                              internFilterable = internFilterable,
-                                                             neverFilterable = neverFilterable))
+                                                             neverFilterable = neverFilterable),
+                                initView = "all", initTabFunc = "initTabAnn")
         saveCacheData("reportHTMLCompounds", ret, hash)
         return(ret)
     },

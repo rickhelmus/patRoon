@@ -31,10 +31,10 @@ getViewIDFromSel = function(sel = undefined)
 
 function initTabsInView(viewID)
 {
-    document.querySelectorAll('[detailsViewTabInit=' + viewID + ']').forEach(function(el)
+    document.querySelectorAll('[detailsViewTabInit=' + viewID + '], [detailsViewTabInit=all]').forEach(function(el)
     {
         const meta = Reactable.getState(el.id).meta;
-        meta.initTabFunc(el.id);
+        meta.initTabFunc(el.id, viewID);
     });
 }
 
@@ -168,6 +168,22 @@ function updateTabSelFGroupsTPs(rowValues, rowIndex)
         Reactable.setFilter('similarityTab', 'cmpID', rowValues.cmpName + '-' + rowValues.group);
 }
 
+function updateTabSelSusp(suspect, group)
+{
+    if (document.getElementById('suspInfoTab'))
+        Reactable.setFilter('suspInfoTab', 'name', suspect);
+    if (document.getElementById('suspAnnTab'))
+        Reactable.setFilter('suspAnnTab', 'suspID', suspect + '-' + group);  
+
+    for (ann of [ "formulas", "compounds" ])
+    {
+        const suspCheckEl = document.getElementById(ann + "-susp_only");
+        Reactable.setMeta(ann + "Tab", { suspectFilter: suspect });
+        if (!suspCheckEl.classList.contains("d-none") && suspCheckEl.checked)
+            applyAnnSuspFilter(ann, suspect);
+    }
+}
+
 function updateTabSelPlain(rowValues, rowIndex)
 {
     updateTabSelFGroups(rowValues, rowIndex);
@@ -182,10 +198,7 @@ function updateTabSelSusByGroup(rowValues, rowIndex)
 
 function updateTabSelSusCandSuspect(rowValues, rowIndex)
 {
-    if (document.getElementById('suspInfoTab'))
-        Reactable.setFilter('suspInfoTab', 'name', rowValues.susp_name);
-    if (document.getElementById('suspAnnTab'))
-        Reactable.setFilter('suspAnnTab', 'suspID', rowValues.susp_name + '-' + rowValues.group);
+    updateTabSelSusp(rowValues.susp_name, rowValues.group);
 }
 
 function updateTabSelSusBySuspect(rowValues, rowIndex)
@@ -197,10 +210,7 @@ function updateTabSelSusBySuspect(rowValues, rowIndex)
 function updateTabSelSusCandGroup(rowValues, rowIndex)
 {
     updateTabSelFGroups(rowValues, rowIndex);
-    if (document.getElementById('suspInfoTab'))
-        Reactable.setFilter('suspInfoTab', 'name', rowValues.susp_ID);
-    if (document.getElementById('suspAnnTab'))
-        Reactable.setFilter('suspAnnTab', 'suspID', rowValues.susp_ID + '-' + rowValues.group);
+    updateTabSelSusp(rowValues.susp_ID, rowValues.group);
 }
 
 function updateTabSelISTDsByGroup(rowValues, rowIndex)
@@ -239,10 +249,7 @@ function updateTabSelTPsParents(rowValues, rowIndex)
     updateTabSelFGroups(rowValues, rowIndex);
     document.getElementById("TPCompon-select").value = rowValues.component;
     updateTPCompon(rowValues.component, false);
-    if (document.getElementById('suspInfoTab'))
-        Reactable.setFilter('suspInfoTab', 'name', rowValues.parent_name);
-    if (document.getElementById('suspAnnTab'))
-        Reactable.setFilter('suspAnnTab', 'suspID', rowValues.parent_name + '-' + rowValues.group);
+    updateTabSelSusp(rowValues.parent_name, rowValues.group);
 }
 
 function updateTabSelTPsByGroup(rowValues, rowIndex)
@@ -258,10 +265,7 @@ function updateTabSelTPsByGroup(rowValues, rowIndex)
 
 function updateTabSelTPsCandSuspect(rowValues, rowIndex)
 {
-    if (document.getElementById('suspInfoTab'))
-        Reactable.setFilter('suspInfoTab', 'name', rowValues.candidate_name);
-    if (document.getElementById('suspAnnTab'))
-        Reactable.setFilter('suspAnnTab', 'suspID', rowValues.candidate_name + '-' + rowValues.group);
+    updateTabSelSusp(rowValues.candidate_name, rowValues.group);
 }
 
 function updateTabSelTPsBySuspect(rowValues, rowIndex)
@@ -274,38 +278,43 @@ function updateTabSelTPsBySuspect(rowValues, rowIndex)
 function updateTabSelTPsCandGroup(rowValues, rowIndex)
 {
     updateTabSelFGroupsTPs(rowValues, rowIndex);
-    if (document.getElementById('suspInfoTab'))
-        Reactable.setFilter('suspInfoTab', 'name', rowValues.candidate_ID);
-    if (document.getElementById('suspAnnTab'))
-        Reactable.setFilter('suspAnnTab', 'suspID', rowValues.candidate_ID + '-' + rowValues.group);
+    updateTabSelSusp(rowValues.candidate_ID, rowValues.group);
 }
 
-function initMainTabDefault(tabID)
+function initMainTabDefault(tabID, viewID)
 {
     const meta = Reactable.getState(tabID).meta;
     const r = Reactable.getInstance(tabID).rowsById[meta.selectedRow];
     meta.updateRowFunc(r.values, r.index);
 }
 
-function initTabComponents(tabID)
+function initTabComponents(tabID, viewID)
 {
     const cmpName = document.getElementById("Compon-select").value;
     setTabSelFirstRow(tabID, el => el.cmpName === cmpName);
     Reactable.setFilter(tabID, "cmpName", cmpName);
 }
 
-function initTabTPsParents(tabID)
+function initTabTPsParents(tabID, viewID)
 {
     const cmpName = document.getElementById("TPCompon-select").value;
     // switch to the selected component
     setTabSelFirstRow(tabID, el => el.cmpName === cmpName);
 }
 
-function initTabTPs(tabID)
+function initTabTPs(tabID, viewID)
 {
     const cmpName = document.getElementById("TPCompon-select").value;
     setTabSelFirstRow(tabID, el => el.cmpName === cmpName)
     Reactable.setFilter(tabID, "cmpName", cmpName);
+}
+
+function initTabAnn(tabID, viewID)
+{
+    const suspCheckEl = document.getElementById(ann + "-susp_only");
+    // disable suspect filter if current view does not have suspects
+    if (suspCheckEl.classList.contains("d-none"))
+        toggleAnnSuspFilter(tabID.replace(/Tab$/, ""), false);
 }
 
 function showTabCols(id, columnGroup, show)
@@ -532,17 +541,20 @@ function toggleTabFilters(tableID, e)
     internFilterable.forEach(function(col, index) { Reactable.setFilter(tableID, col, curInternFilters[index]); } );
 }
 
-function toggleAnnOnlySusp(wh, e, r = undefined)
+function applyAnnSuspFilter(ann, suspect = undefined)
 {
-    const tid = (wh === "formulas") ? "formulasTab" : "compoundsTab";
+    const elName = ann + "Tab";
+    if (suspect === undefined)
+        suspect = Reactable.getState(elName).meta.suspectFilter;
+    Reactable.setFilter(elName, "suspect", suspect);
+}
+
+function toggleAnnSuspFilter(ann, e)
+{
     if (!e)
-        Reactable.setFilter(tid, "suspect", undefined);
+        Reactable.setFilter(ann + "Tab", "suspect", undefined);
     else
-    {
-        const fgTab = getSelFGTableElement();
-        const curRow = r || Reactable.getState(fgTab).meta.selectedRow;
-        Reactable.setFilter(tid, "suspect", Reactable.getInstance(fgTab).rowsById[curRow].values.susp_name);
-    }
+        applyAnnSuspFilter(ann)
 }
 
 function setTabGroupBy(tab, gb, expBtn = undefined)

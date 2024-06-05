@@ -3,6 +3,9 @@ context("optimization")
 initXCMS()
 library(Biobase) # BUG: needed by XCMS with futures...
 
+# disable parallelization on covr as it seems to slow things down a lot
+doPar <- !requireNamespace("covr", quietly = TRUE) || !covr::in_covr()
+
 anaInfo <- getTestAnaInfo()[1:2, ]
 anaInfoOne <- getTestAnaInfo()[4, ]
 epAnaInfo <- makeMZXMLs(anaInfoOne)
@@ -19,15 +22,16 @@ file.copy(patRoon:::getMzMLAnalysisPath(anaInfoOne$analysis[1], anaInfoOne$path[
 
 ffOptOpenMS <- optimizeFeatureFinding(anaInfo, "openms", list(chromFWHM = c(5, 10), mzPPM = c(5, 15),
                                                               noiseThrInt = 3E4),
-                                      maxIterations = 2)
+                                      maxIterations = 2, parallel = doPar)
 # disable 'old' xcms for now to save testing time (both interfaces are fairly similar anyway)
 # ffOptXCMS <- optimizeFeatureFinding(anaInfo, "xcms", list(mzdiff = c(0.002, 0.006)))
 
-ffOptXCMS3 <- optimizeFeatureFinding(anaInfo, "xcms3", list(mzdiff = c(0.002, 0.006), noise = 3E4), maxIterations = 2)
+ffOptXCMS3 <- optimizeFeatureFinding(anaInfo, "xcms3", list(mzdiff = c(0.002, 0.006), noise = 3E4), maxIterations = 2,
+                                     parallel = doPar)
 ffOptEnviPick <- optimizeFeatureFinding(epAnaInfo, "envipick", list(dmzgap = c(10, 20), minpeak = 25),
-                                        maxIterations = 2)
+                                        maxIterations = 2, parallel = doPar)
 ffOptKPIC2 <- suppressWarnings(optimizeFeatureFinding(anaInfo, "kpic2", list(mztol = c(0.002, 0.01), level = 2E5, kmeans = TRUE),
-                                                      maxIterations = 2))
+                                                      maxIterations = 2, parallel = doPar))
 
 suppressWarnings(ffOptEmpty <- optimizeFeatureFinding(anaInfo, "openms", list(chromFWHM = c(5, 10), noiseThrInt = 1E9)))
 
@@ -36,14 +40,15 @@ ffXCMS3 <- findFeatures(anaInfo, "xcms3", xcms::CentWaveParam(noise = 3E4))
 ffKPIC2 <- suppressWarnings(findFeatures(anaInfo, "kpic2", level = 2E5))
 
 fgOptOpenMS <- optimizeFeatureGrouping(ffOpenMS, "openms",
-                                       list(maxGroupMZ = c(0.002, 0.007)), maxIterations = 2)
+                                       list(maxGroupMZ = c(0.002, 0.007)), maxIterations = 2, parallel = doPar)
 # fgOptXCMS <- optimizeFeatureGrouping(optimizedObject(ffOptXCMS), "xcms", list(groupArgs = list(bw = c(22, 28)),
 #                                                                               retcorArgs = list(method = "obiwarp")))
 fgOptXCMS3 <- optimizeFeatureGrouping(ffXCMS3, "xcms3",
-                                      list(groupParams = list(bw = c(22, 28))), maxIterations = 2)
+                                      list(groupParams = list(bw = c(22, 28))), maxIterations = 2, parallel = doPar)
 
 fgOptKPIC2 <- optimizeFeatureGrouping(ffKPIC2, "kpic2",
-                                      list(groupArgs = list(mz_tolerance = c(0.002, 0.01))), maxIterations = 2)
+                                      list(groupArgs = list(mz_tolerance = c(0.002, 0.01))), maxIterations = 2,
+                                      parallel = doPar)
 
 expInfoPrepForComp <- function(...)
 {
@@ -60,16 +65,17 @@ test_that("verify feature optimization output", {
     # expect_known_value(expInfoPrepForComp(ffOptXCMS, 1, 1), testFile("ff-opt-xcms"))
     # expect_known_show(ffOptXCMS, testFile("ff-opt-xcms-show", text = TRUE))
 
-    expect_known_value(expInfoPrepForComp(ffOptEnviPick, 1, 1), testFile("ff-opt-ep"))
-    # expect_known_show(ffOptEnviPick, testFile("ff-opt-ep-show", text = TRUE))
-    
-    expect_known_value(expInfoPrepForComp(ffOptKPIC2, 1, 1), testFile("ff-opt-kpic2"))
-
     expect_length(ffOptEmpty, 1)
 
     skip_if(utils::packageVersion("xcms") < "3.10") # output changed a little with 3.10
     expect_known_value(expInfoPrepForComp(ffOptXCMS3, 1, 1), testFile("ff-opt-xcms3"))
     # expect_known_show(ffOptXCMS3, testFile("ff-opt-xcms3-show", text = TRUE))
+    
+    # disabling parallelization slightly changes the output, as this is only for coverage testing we simply skip this check
+    skip_if(!doPar)
+    expect_known_value(expInfoPrepForComp(ffOptKPIC2, 1, 1), testFile("ff-opt-kpic2"))    
+    expect_known_value(expInfoPrepForComp(ffOptEnviPick, 1, 1), testFile("ff-opt-ep"))
+    # expect_known_show(ffOptEnviPick, testFile("ff-opt-ep-show", text = TRUE))
 })
 
 test_that("verify feature group optimization output", {
@@ -79,11 +85,13 @@ test_that("verify feature group optimization output", {
     # expect_known_value(expInfoPrepForComp(fgOptXCMS, 1, 1), testFile("fg-opt-xcms"))
     # expect_known_show(fgOptXCMS, testFile("fg-opt-xcms-show", text = TRUE))
     
-    expect_known_value(expInfoPrepForComp(fgOptKPIC2, 1, 1), testFile("fg-opt-kpic2"))
-
     skip_if(utils::packageVersion("xcms") < "4.2") # output changed a little
     expect_known_value(expInfoPrepForComp(fgOptXCMS3, 1, 1), testFile("fg-opt-xcms3"))
     # expect_known_show(fgOptXCMS3, testFile("fg-opt-xcms3-show", text = TRUE))
+    
+    # disabling parallelization slightly changes the output, as this is only for coverage testing we simply skip this check
+    skip_if(!doPar)
+    expect_known_value(expInfoPrepForComp(fgOptKPIC2, 1, 1), testFile("fg-opt-kpic2"))
 })
 
 test_that("default param generators", {

@@ -108,7 +108,7 @@ setMethod("$", "transformationProducts", function(x, name)
 # UNDONE: add more parent info?
 #' @describeIn transformationProducts Returns all TP data in a table.
 #' @export
-setMethod("as.data.table", "transformationProducts", function(x) rbindlist(products(x), idcol = "parent"))
+setMethod("as.data.table", "transformationProducts", function(x) rbindlist(products(x), idcol = "parent", fill = TRUE))
 
 #' @describeIn transformationProducts Converts this object to a suspect list that can be used as input for
 #'   \code{\link{screenSuspects}}.

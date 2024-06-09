@@ -93,34 +93,42 @@ makeAnnReactable <- function(tab, id, detailsTabFunc = NULL, annPLTabFunc = NULL
                          language = reactable::reactableLang(noData = "No annotations available"), ...))
 }
 
-genHTMLReportPlotsStructs <- function(fGroups, compounds, settings, outPath, parallel)
+genHTMLReportPlotsStructs <- function(fGroups, compounds, components, settings, outPath, parallel)
 {
-    scrStructInfo <- if (isScreening(fGroups)) screenInfo(fGroups)[, c("SMILES", "InChIKey"), with = FALSE] else NULL
+    scrStructInfo <- if (isScreening(fGroups)) screenInfo(fGroups)[, .(SMILES, IK1 = getIKBlock1(InChIKey))] else NULL
+    
     compStructInfo <- NULL
     if (!is.null(compounds) && length(compounds) != 0)
     {
-        compStructInfo <- subsetDTColumnsIfPresent(as.data.table(compounds), c("group", "SMILES", "InChIKey",
-                                                                               "InChIKey1"))
-        if (is.null(compStructInfo[["InChIKey"]])) # not present with eg SIRIUS
-        {
-            # fall back to first block. UNDONE: calculate InChIKey for SIRIUS results? Needs OpenBabel...
-            setnames(compStructInfo, "InChIKey1", "InChIKey")
-        }
+        compStructInfo <- as.data.table(compounds)[, .(group, SMILES, IK1 = UID)]
 
         compStructInfo[, index := seq_len(.N), by = "group"]
         compStructInfo <- compStructInfo[index <= settings$compounds$topMost]
-        compStructInfo <- removeDTColumnsIfPresent(compStructInfo, c("group", "index", "InChIKey1"))
+        compStructInfo <- removeDTColumnsIfPresent(compStructInfo, c("group", "index"))
     }
     
-    structInfo <- rbindlist(list(scrStructInfo, compStructInfo))
+    TPsStructInfo <- NULL
+    if (!is.null(components) && inherits(components, "componentsTPs") && length(components) > 0)
+    {
+        tab <- as.data.table(components, candidates = TRUE)
+        if (all(c("SMILES", "InChIKey") %chin% names(tab)))
+            TPsStructInfo <- tab[, .(SMILES, IK1 = getIKBlock1(InChIKey))]
+        if (all(c("parent_SMILES", "parent_InChIKey") %chin% names(tab)))
+            TPsStructInfo <- rbind(TPsStructInfo, tab[, .(SMILES = parent_SMILES, IK1 = getIKBlock1(parent_InChIKey))])
+        if (all(c("simSuspSMILES", "simSuspInChIKey") %chin% names(tab)))
+            TPsStructInfo <- rbind(TPsStructInfo, tab[, .(SMILES = simSuspSMILES, IK1 = getIKBlock1(simSuspInChIKey))])
+    }
+    
+    structInfo <- rbindlist(list(scrStructInfo, compStructInfo, TPsStructInfo))
     if (nrow(structInfo) > 0 && any(!is.na(structInfo$SMILES)))
     {
-        structInfo <- unique(structInfo[!is.na(SMILES)], by = "InChIKey")
+        structInfo <- unique(structInfo[!is.na(SMILES)], by = "IK1")
         cat("Generate structures...\n")
-        return(doApply("Map", parallel, structInfo$InChIKey, structInfo$SMILES, f = function(ik, smi)
+        return(doApply("Map", parallel, structInfo$IK1, structInfo$SMILES, f = function(ik1, smi)
         {
-            # NOTE: we use the InChIKey here instead of makeHash()
-            pf <- file.path(getHTMLReportPlotPath(outPath), paste0("struct-", ik, ".svg"))
+            # NOTE: we use the first block InChIKey here instead of makeHash()
+            # NOTE: we don't use the full IK, as this may be unavailable (e.g. SIRIUS)
+            pf <- file.path(getHTMLReportPlotPath(outPath), paste0("struct-", ik1, ".svg"))
             if (!file.exists(pf))
                 saveRCDKStructure(getMoleculesFromSMILES(smi)[[1]], "svg", pf, 100, 100)
             doProgress()
@@ -463,11 +471,7 @@ reportHTMLUtils$methods(
         if (!is.null(tab[["score"]]))
             tab[, score := round(score, 2)]
         
-        if (is.null(tab[["InChIKey"]])) # SIRIUS
-            tab[, structure := plots$structs[UID]]
-        else
-            tab[, structure := plots$structs[InChIKey]]
-        
+        tab[, structure := plots$structs[UID]]
         tab[, spectrum := plots$compounds[[group]]$spectra, by = "group"]
         tab[, scorings := plots$compounds[[group]]$scores, by = "group"]
         

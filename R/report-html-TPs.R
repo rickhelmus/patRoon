@@ -80,7 +80,9 @@ getTPCandReactTab <- function(obj, plots)
     }), fill = TRUE, idcol = "cmpName")
     setnames(ret, "name", "candidate_name")
     if (!is.null(ret[["InChIKey"]]))
-        ret[, TP_structure := plots$structs[InChIKey]]
+        ret[, TP_structure := plots$structs[getIKBlock1(InChIKey)]]
+    if (!is.null(ret[["simSuspInChIKey"]]))
+        ret[, simSuspStructure := plots$structs[getIKBlock1(simSuspInChIKey)]]
     return(ret)
 }
 
@@ -138,7 +140,7 @@ reportHTMLUtils$methods(
         tab[, cmpName := component]
         
         if (!is.null(tab[["parent_InChIKey"]]))
-            tab[, parent_structure := plots$structs[parent_InChIKey]]
+            tab[, parent_structure := plots$structs[getIKBlock1(parent_InChIKey)]]
             
         makeMainResultsReactable(tab, "TPsParents", settings$features$retMin, plots, initView = "TPsParents",
                                  initTabFunc = "initTabTPsParents")

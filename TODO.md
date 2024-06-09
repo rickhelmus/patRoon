@@ -32,6 +32,7 @@
 
 - TP components
     - update patRoonInst for new deps?
+    - hashing for all algos seem to take unnecessary variables (eg parent names, things for prepareChemTable() etc)
     - further limit candidate columns? Can get quite excessive
     - update filter for candidate specific frag/NL matches
     - add set specific frag/NL matches for candidates
@@ -46,15 +47,12 @@
             - move main_columns to sysdata
             - move all JS callbacks etc to js file(s)?
             - improve code distribution over files
-            - add featScores columns to CSV (or regex?)
             - move flexdashboard to Suggests (and remove completely if legacy reportHTML is removed)
-            - update toggleAnnOnlySusp()
             - finish up: set date+title (make it configurable?) and add patRoon link+logo?
-        - add colDefs for new TP ann columns
+            - set proper column group order
         - replace bsCardBodyNoFill() and update other depcreated bslib functions
         - TP sidebar: include fGroup name of parent somewhere
-        - components
-            - set and/or sets column?
+        - TP structures with fmcsR/depict (maybe later?)
 
 - tests
     - IDL filter
@@ -128,6 +126,7 @@
         - forceCalcRetDir: only relevant for library atm, clearly mention its use in genTPsLib docs
         - TPStructParams: all parameters, explain when logPs are calculated (ie if both parent/TP is absent)
         - TPsComp/TPsForm: filter()
+        - parallel=T is only useful with many candidates
 
 
 - NEWS

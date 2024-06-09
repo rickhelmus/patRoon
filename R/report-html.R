@@ -57,7 +57,7 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
     if (!is.null(compounds))
         compounds <- compounds[gNames]
     
-    ret$structs <- genHTMLReportPlotsStructs(fGroups, compounds, settings, outPath, parallel)
+    ret$structs <- genHTMLReportPlotsStructs(fGroups, compounds, components, settings, outPath, parallel)
     
     if (!is.null(MSPeakLists))
         ret$MSPeakLists <- genHTMLReportPlotsMSPeakLists(MSPeakLists[, gNames], settings, outPath, parallel)    
@@ -254,15 +254,6 @@ doReportHTML <- function(fGroups, MSPeakLists, formulas, compounds, compsCluster
                                                           TPs = TPs),
                                            EICs = EICs, plots = reportEnv$plots, settings = settings)
     reportEnv$EICs <- EICs
-    
-    # UNDONE: remove
-    reportEnv$objectsShow <- paste0(utils::capture.output({
-        for (o in pruneList(list(fGroups, MSPeakLists, formulas, compounds, components, TPs)))
-        {
-            show(o)
-            cat("\n")
-        }
-    }), collapse = "\n")
     
     # HACK: not sure what exactly happens here, but... kableExtra adds latex
     # dependencies by default, which then may cause serious memory leakage when

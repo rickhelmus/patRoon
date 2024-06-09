@@ -43,7 +43,7 @@ getFGScreeningReactTab <- function(tab, plots)
     scols <- setdiff(names(tab), "group")
     setnames(tab, scols, paste0("susp_", scols))
     if (!is.null(tab[["susp_InChIKey"]]) && !all(is.na(tab$susp_InChIKey)))
-        tab[, susp_structure := plots$structs[susp_InChIKey]]
+        tab[, susp_structure := plots$structs[getIKBlock1(susp_InChIKey)]]
     return(tab)
 }
 
@@ -329,15 +329,15 @@ reportHTMLUtils$methods(
     {
         concs <- data.table::copy(concentrations(objects$fGroups))
         
-        imgTag <- function(IK, cand) sprintf("<img src='%s' alt='%s' style='max-height: 300px;')></img>", plots$structs[IK], cand)
+        imgTag <- function(IK1, cand) sprintf("<img src='%s' alt='%s' style='max-height: 300px;')></img>", plots$structs[IK1], cand)
         
         concs[type == "SIRIUS_FP", candidate := subscriptFormulaHTML(candidate)]
-        concs[type == "suspect", candidate := imgTag(screenInfo(objects$fGroups)[match(candidate, SMILES)]$InChIKey,
+        concs[type == "suspect", candidate := imgTag(getIKBlock1(screenInfo(objects$fGroups)[match(candidate, SMILES)]$InChIKey),
                                                      candidate)]
         if (!is.null(objects[["compounds"]]))
         {
             cTab <- as.data.table(objects$compounds)
-            concs[type == "compound", candidate := imgTag(cTab[match(candidate, SMILES)]$InChIKey, candidate)]
+            concs[type == "compound", candidate := imgTag(cTab[match(candidate, SMILES)]$UID, candidate)]
         }
         
         colDefs <- list(
@@ -358,15 +358,15 @@ reportHTMLUtils$methods(
     {
         tox <- data.table::copy(toxicities(objects$fGroups))
         
-        imgTag <- function(IK, cand) sprintf("<img src='%s' alt='%s' style='max-height: 300px;')></img>", plots$structs[IK], cand)
+        imgTag <- function(IK1, cand) sprintf("<img src='%s' alt='%s' style='max-height: 300px;')></img>", plots$structs[IK1], cand)
         
         tox[type == "SIRIUS_FP", candidate := subscriptFormulaHTML(candidate)]
-        tox[type == "suspect", candidate := imgTag(screenInfo(objects$fGroups)[match(candidate, SMILES)]$InChIKey,
+        tox[type == "suspect", candidate := imgTag(getIKBlock1(screenInfo(objects$fGroups)[match(candidate, SMILES)]$InChIKey),
                                                      candidate)]
         if (!is.null(objects[["compounds"]]))
         {
             cTab <- as.data.table(objects$compounds)
-            tox[type == "compound", candidate := imgTag(cTab[match(candidate, SMILES)]$InChIKey, candidate)]
+            tox[type == "compound", candidate := imgTag(cTab[match(candidate, SMILES)]$UID, candidate)]
         }
         
         colDefs <- list(

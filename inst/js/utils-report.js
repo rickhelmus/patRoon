@@ -178,6 +178,8 @@ function updateTabSelSusp(suspect, group)
     for (ann of [ "formulas", "compounds" ])
     {
         const suspCheckEl = document.getElementById(ann + "-susp_only");
+        if (!suspCheckEl)
+            continue;
         Reactable.setMeta(ann + "Tab", { suspectFilter: suspect });
         if (!suspCheckEl.classList.contains("d-none") && suspCheckEl.checked)
             applyAnnSuspFilter(ann, suspect);

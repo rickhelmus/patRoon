@@ -81,8 +81,8 @@ setMethod("linkTPsToFGroups", "transformationProductsAnnComp", function(TPs, fGr
 
 
 # NOTE: this function is called by a withProg() block, so handles progression updates
-getTPsCompounds <- function(annTable, parentRow, TPStructParams, extraOptsFMCSR, simSuspSMILES, minRTDiff,
-                            minFitFormula, minFitCompound, minSimSusp, minFitCompOrSimSusp, parallel)
+getTPsCompounds <- function(annTable, parentRow, TPStructParams, extraOptsFMCSR, simSusps, minRTDiff,
+                            minFitFormula, minFitCompound, minSimSusp, minFitCompOrSimSusp, neutralizeTPs, parallel)
 {
     tab <- copy(annTable)
     setnames(tab, "neutral_formula", "formula")
@@ -113,19 +113,21 @@ getTPsCompounds <- function(annTable, parentRow, TPStructParams, extraOptsFMCSR,
         tab[SMILES %chin% names(compFits), fitCompound := compFits[SMILES]]
         tab <- tab[numGTE(fitCompound, minFitCompound)]
         
-        if (nrow(tab) >0 && !is.null(simSuspSMILES) && length(simSuspSMILES) > 0)
+        if (nrow(tab) > 0 && !is.null(simSusps) && nrow(simSusps) > 0)
         {
-            tab[, c("simSusp", "simSuspSMILES") := rbindlist(doApply("lapply", parallel, SMILES, function(SMI)
+            simSusps <- copy(simSusps)
+            setnames(simSusps, paste0("simSusp", names(simSusps)))
+            tab[, c("simSusp", names(simSusps)) := rbindlist(doApply("lapply", parallel, SMILES, function(SMI)
             {
-                dists <- sapply(simSuspSMILES, patRoon:::distSMILES, SMI1 = SMI, fpType = TPStructParams$fpType,
+                dists <- sapply(simSusps$simSuspSMILES, patRoon:::distSMILES, SMI1 = SMI, fpType = TPStructParams$fpType,
                                 fpSimMethod = TPStructParams$fpSimMethod)
                 wh <- which.max(dists)
-                return(list(dists[wh], simSuspSMILES[wh]))
+                return(c(list(dists[wh]), as.list(simSusps[wh])))
             }, prog = FALSE))]
             tab <- tab[numGTE(NAToZero(simSusp), minSimSusp)]
         }
         else
-            tab[, c("simSusp", "simSuspSMILES") := .(NA_real_, NA_character_)]
+            tab[, simSusp := NA_real_]
 
         tab <- tab[numGTE(fitCompound, minFitCompOrSimSusp[1]) | numGTE(NAToZero(simSusp), minFitCompOrSimSusp[2])]
         tab[, TPScore := pmax(fitCompound, NAToZero(simSusp)) + NAToZero(annSim)]
@@ -133,10 +135,13 @@ getTPsCompounds <- function(annTable, parentRow, TPStructParams, extraOptsFMCSR,
     else
         tab[, c("fitCompound", "simSusp", "TPScore") := numeric()]
     
-        
+    # NOTE: we also need to do this for eg SIRIUS which doesn't report InChIKeys
+    tab <- prepareChemTable(tab, prefCalcChemProps = FALSE, neutralChemProps = neutralizeTPs, verbose = FALSE)
+    
     tab <- subsetDTColumnsIfPresent(tab, c("group", "name", "ID", "parent_ID", "chem_ID", "generation", "compoundName",
                                            "SMILES", "InChI", "InChIKey", "formula", "logP", "retDir", "annSim",
-                                           "fitFormula", "fitCompound", "simSusp", "simSuspSMILES", "TPScore"))
+                                           "fitFormula", "fitCompound", "simSusp", "simSuspSMILES", "simSuspInChI",
+                                           "simSuspInChIKey", "TPScore"))
     
     doProgress()
     
@@ -148,7 +153,8 @@ getTPsCompounds <- function(annTable, parentRow, TPStructParams, extraOptsFMCSR,
 generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, fGroupsComps = NULL, minRTDiff = 20, minFitFormula = 0,
                                minFitCompound = 0, minSimSusp = 0, minFitCompOrSimSusp = c(0, 0),
                                extraOptsFMCSR = NULL, skipInvalid = TRUE, prefCalcChemProps = TRUE,
-                               neutralChemProps = FALSE, TPStructParams = getDefTPStructParams(), parallel = TRUE)
+                               neutralChemProps = FALSE, neutralizeTPs = TRUE, TPStructParams = getDefTPStructParams(),
+                               parallel = TRUE)
 {
     # UNDONE: support >1 generations? Probably not really worthwhile...
     # UNDONE: doc that FP params are also used for suspSim
@@ -172,7 +178,7 @@ generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, fGroupsComps =
            fixed = list(add = ac))
     checkmate::assertNumeric(minFitCompOrSimSusp, lower = 0, finite = TRUE, len = 2, add = ac)
     checkmate::assertList(extraOptsFMCSR, null.ok = TRUE, add = ac)
-    aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + neutralChemProps + parallel,
+    aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + neutralChemProps + neutralizeTPs + parallel,
            fixed = list(add = ac))
     assertTPStructParams(TPStructParams, add = ac)
     checkmate::reportAssertions(ac)
@@ -211,8 +217,10 @@ generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, fGroupsComps =
             # try to figure out log Ps from annotation data
             if (!is.null(parentsTab[["InChIKey"]]) && !is.null(annTable[["logP"]]))
             {
-                parentsTab <- merge(parentsTab, annTable[, c("InChIKey", "logP"), with = FALSE], by = "InChIKey",
+                parentsTab[, IK1 := getIKBlock1(parentsTab$InChIKey)]
+                parentsTab <- merge(parentsTab, annTable[, c("UID", "logP"), with = FALSE], by.x = "IK1", by.y = "UID",
                                     all.x = TRUE, sort = FALSE)
+                parentsTab[, IK1 := NULL]
             }
             
             parentsTab <- maybeCalcTPLogPs(parentsTab, TPStructParams$calcLogP, TPStructParams$forceCalcLogP)
@@ -223,7 +231,7 @@ generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, fGroupsComps =
         names(parsSplit) <- parentsTab$name
         
         baseHash <- makeHash(compounds, TPsRef, fGroupsComps, minRTDiff, minFitFormula, minFitCompound, minSimSusp,
-                             minFitCompOrSimSusp, extraOptsFMCSR, skipInvalid, prefCalcChemProps, neutralChemProps,
+                             minFitCompOrSimSusp, extraOptsFMCSR, skipInvalid, prefCalcChemProps, neutralizeTPs,
                              TPStructParams)
         setHash <- makeHash(parentsTab, baseHash)
         cachedSet <- loadCacheSet("TPsAnnComp", setHash, cacheDB)
@@ -245,9 +253,12 @@ generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, fGroupsComps =
         {
             newResults <- withProg(length(parsTBD), FALSE, sapply(parsSplit[parsTBD], function(par)
             {
-                sss <- if (!is.null(TPsRef) && !is.null(TPsRef[[par$name]])) TPsRef[[par$name]]$SMILES else NULL
-                nr <- getTPsCompounds(annTable, par, TPStructParams, extraOptsFMCSR, sss, minRTDiff, minFitFormula,
-                                      minFitCompound, minSimSusp, minFitCompOrSimSusp, parallel)
+                simSusps <- if (!is.null(TPsRef) && !is.null(TPsRef[[par$name]]))
+                    subsetDTColumnsIfPresent(TPsRef[[par$name]], c("SMILES", "InChI", "InChIKey"))
+                else
+                    NULL
+                nr <- getTPsCompounds(annTable, par, TPStructParams, extraOptsFMCSR, simSusps, minRTDiff, minFitFormula,
+                                      minFitCompound, minSimSusp, minFitCompOrSimSusp, neutralizeTPs, parallel)
                 saveCacheData("TPsAnnComp", nr, hashes[[par$name]], cacheDB)
                 return(nr)
             }, simplify = FALSE))

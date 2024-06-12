@@ -750,8 +750,8 @@ reportHTMLUtils$methods(
                                 htmltools::tags$label("for" = "compounds-susp_only", detailsView = suspInfoView,
                                                       "Suspect only")
                             ), tagsPostButtons = htmltools::a(class = "ms-2", id = "openMF", target = "_blank",
-                                                              "MetFrag Web"), toggleExpand = TRUE, toggleExpandDisableIfNoGrouping = FALSE)
-                            
+                                                              rel = "noopener noreferrer", "MetFrag Web"),
+                            toggleExpand = TRUE, toggleExpandDisableIfNoGrouping = FALSE)
                         ),
                         bslib::card_body_fill(genCompoundsTable())
                     )),

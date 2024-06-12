@@ -42,7 +42,6 @@
         - report also candidate specific frag/NL matches? Or either?
         - BUG: JS errors when fGroups are subset/do not contain TPs anymore?
         - refactor/redesign
-            - test select filter
             - prefix cmp, tp etc columns
             - move main_columns to sysdata
             - move all JS callbacks etc to js file(s)?
@@ -51,7 +50,6 @@
             - finish up: set date+title (make it configurable?) and add patRoon link+logo?
             - set proper column group order
         - replace bsCardBodyNoFill() and update other depcreated bslib functions
-        - TP sidebar: include fGroup name of parent somewhere
         - TP structures with fmcsR/depict (maybe later?)
 
 - tests

@@ -47,7 +47,9 @@
             - move all JS callbacks etc to js file(s)?
             - improve code distribution over files
             - move flexdashboard to Suggests (and remove completely if legacy reportHTML is removed)
-            - finish up: set date+title (make it configurable?) and add patRoon link+logo?
+            - finish up
+                - make title/href configurable?
+                - tweak eg card spacings
             - set proper column group order
         - replace bsCardBodyNoFill() and update other depcreated bslib functions
         - TP structures with fmcsR/depict (maybe later?)

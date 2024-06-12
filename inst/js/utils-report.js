@@ -355,6 +355,8 @@ function updateCompon(cmpName, activateFG = true)
 
 function updateTPCompon(cmpName, activateFG = true)
 {
+    Reactable.setFilter("TPParentInfoTab", "cmpName", cmpName)
+    
     const chromEl = document.getElementById('chrom_view-parent');
     const intEl = document.getElementById('int_plot-parent');
     const structEl = document.getElementById('struct_view-parent');

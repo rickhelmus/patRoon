@@ -117,6 +117,27 @@ reportHTMLUtils$methods(
         return(jsonlite::toJSON(splt, auto_unbox = TRUE))
     },
     
+    genTPParentInfoTable = function()
+    {
+        cInfo <- componentInfo(getTPComponObj())
+        cInfo <- subsetDTColumnsIfPresent(cInfo, c("name", "parent_name", "parent_group", "parent_formula"))
+        setnames(cInfo, "name", "cmpName")
+        setnames(cInfo, sub("^parent_", "", names(cInfo)))
+        gInfo <- groupInfo(objects$fGroups)[cInfo$group, c("rts", "mzs")]
+        
+        cInfo[, c("retention", "mz") := gInfo]
+        if (settings$features$retMin)
+            set(cInfo, j = "retention", value = cInfo$retention / 60)
+        set(cInfo, j = "retention", value = round(cInfo$retention, 2))
+        set(cInfo, j = "mz", value = round(cInfo$mz, 5))
+        
+        if (!is.null(cInfo[["formula"]]))
+            set(cInfo, j = "formula", value = subscriptFormulaHTML(cInfo$formula))
+        
+        ptab <- makePropTab(cInfo, NULL, "cmpName")
+        makePropReactable(ptab, "TPParentInfoTab", "cmpName", minPropWidth = 80, minValWidth = 150)
+    },
+    
     genMainTableTPsParents = function()
     {
         compObj <- getTPComponObj()
@@ -272,6 +293,12 @@ reportHTMLUtils$methods(
         bd <- bslib::card_body(
             padding = 0,
             pruneUI(bslib::accordion,
+                    bslib::accordion_panel(
+                        "Parent",
+                        bsCardBodyNoFill(
+                            genTPParentInfoTable()
+                        )
+                    ),
                     maybeInclUI(settings$features$chromatograms$large, bslib::accordion_panel(
                         "Chromatogram",
                         bslib::card_body_fill(htmltools::img(id = "chrom_view-parent"))

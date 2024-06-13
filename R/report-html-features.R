@@ -5,7 +5,7 @@ NULL
 getFGReactTab <- function(objects, settings, ...)
 {
     tab <- as.data.table(objects$fGroups, qualities = "score", average = TRUE,
-                         concAggrParams = settings$concAggrParams, toxAggrParams = settings$toxAggrParams, ...)
+                         concAggrParams = settings$features$aggregateConcs, toxAggrParams = settings$features$aggregateTox, ...)
     
     if (settings$features$chromatograms$small)
         tab[, chrom_small := group]

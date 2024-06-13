@@ -168,7 +168,7 @@ reportHTMLUtils$methods(
             tab[, parent_structure := plots$structs[getIKBlock1(parent_InChIKey)]]
             
         makeMainResultsReactable(tab, "TPsParents", settings$features$retMin, plots, initView = "TPsParents",
-                                 initTabFunc = "initTabTPsParents")
+                                 colGroupOrder = "component", initTabFunc = "initTabTPsParents")
     },
     
     genMainTableTPsByGroup = function()
@@ -179,7 +179,7 @@ reportHTMLUtils$methods(
         ftab <- getFGReactTab(objects, settings)
         tab <- merge(ctab, ftab, by = "group", sort = FALSE)
         makeMainResultsReactable(tab, "TPsByGroup", settings$features$retMin, plots, initView = "TPsByGroup",
-                                 initTabFunc = "initTabTPs")
+                                 colGroupOrder = c("feature", "TP"), initTabFunc = "initTabTPs")
     },
     genMainTableTPsCandSuspect = function()
     {
@@ -192,7 +192,7 @@ reportHTMLUtils$methods(
                              sort = FALSE)
         }
         
-        makeMainResultsReactable(candTab, "TPsCandSuspect", settings$features$retMin, plots)
+        makeMainResultsReactable(candTab, "TPsCandSuspect", settings$features$retMin, plots, colGroupOrder = "TP")
     },
 
     genMainTableTPsBySuspect = function()
@@ -237,7 +237,8 @@ reportHTMLUtils$methods(
         
         # HACK: use a different name (and col definition) so that we get a hidden column used for filtering
         setnames(tab, "candidate_name", "candidate_ID")
-        makeMainResultsReactable(tab, "TPsCandGroup", settings$features$retMin, plots)
+        makeMainResultsReactable(tab, "TPsCandGroup", settings$features$retMin, plots,
+                                 colGroupOrder = c("feature", "TP"))
     },
     
     genTPSimTable = function()

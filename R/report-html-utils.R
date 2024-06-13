@@ -311,22 +311,16 @@ makeMainResultsReactable <- function(tab, tabName, retMin, plots, initTabFunc = 
         for (col in colDefDB[formatting == "RT"]$name)
             set(tab, j = col, value = tab[[col]] / 60)
     }
-
+    
     id <- paste0("detailsTab", tabName)
     colSepStyle <- getMainReactColSepStyle()
-    groupDefs <- lapply(unique(colDefDB$group), function(cgrp)
+    colGroups <- unique(colDefDB$group[nzchar(colDefDB$group)])
+    groupDefs <- lapply(colGroups, function(cgrp)
     {
-        reactable::colGroup(cgrp, colDefDB[group == cgrp]$name, headerStyle = colSepStyle)
+        reactable::colGroup(cgrp, colDefDB[group == cgrp]$name, headerStyle = if (cgrp != colGroups[1]) colSepStyle)
     })
+    
     grpStartCols <- getReactColGrpStartCols(groupDefs)
-    headThemeStyle <- list(padding = "2px 4px")
-    bgstyle <- htmlwidgets::JS(sprintf("function(rowInfo, column, state)
-{
-    let ret = { }
-    if ([ %s ].includes(column.id))
-        ret.borderLeft = '%s';
-    return ret;
-}", paste0("'", grpStartCols, "'", collapse = ","), colSepStyle))
     
     # build reactable column defs: set display names, cell formatting, filters, visibility
     colDefs <- sapply(names(tab), function(col)
@@ -356,7 +350,7 @@ makeMainResultsReactable <- function(tab, tabName, retMin, plots, initTabFunc = 
         
         return(reactable::colDef(name = cdrow$displayName, show = !cdrow$hidden, format = format, cell = cell,
                                  minWidth = if (!is.na(cdrow$minWidth)) cdrow$minWidth else 100,
-                                 align = if (nzchar(cdrow$align)) cdrow$align, style = bgstyle,
+                                 align = if (nzchar(cdrow$align)) cdrow$align, style = if (col %in% grpStartCols) colSepStyle,
                                  filterInput = filterInput, filterMethod = filterMethod))
     }, simplify = FALSE)
     colDefs <- setReactNumRangeFilters(id, tab, colDefs)
@@ -387,9 +381,10 @@ makeMainResultsReactable <- function(tab, tabName, retMin, plots, initTabFunc = 
                                       function(ct) colDefDB[get(col) == ct]$name,
                                       simplify = FALSE)
     
+    headThemeStyle <- list(padding = "2px 4px")
+    
     return(makeReactable(tab, id, highlight = TRUE, onClick = onClick, columns = colDefs,
-                         defaultColDef = reactable::colDef(style = bgstyle), columnGroups = groupDefs,
-                         filterable = FALSE, pagination = TRUE,
+                         columnGroups = groupDefs, filterable = FALSE, pagination = TRUE,
                          theme = reactable::reactableTheme(headerStyle = headThemeStyle,
                                                            groupHeaderStyle = headThemeStyle,
                                                            cellPadding = "2px 4px"), initTabFunc = initTabFunc,

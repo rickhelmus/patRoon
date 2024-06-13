@@ -57,7 +57,6 @@
             - finish up
                 - make title/href configurable?
                 - tweak eg card spacings
-            - set proper column group order
         - replace bsCardBodyNoFill() and update other depcreated bslib functions
         - TP structures with fmcsR/depict (maybe later?)
 

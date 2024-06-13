@@ -299,10 +299,18 @@ getReactColDefDB <- function(tab, tabName)
     return(colDefDB)
 }
 
-makeMainResultsReactable <- function(tab, tabName, retMin, plots, initTabFunc = "initMainTabDefault", ...)
+makeMainResultsReactable <- function(tab, tabName, retMin, plots, colGroupOrder = NULL,
+                                     initTabFunc = "initMainTabDefault", ...)
 {
     tab <- copy(tab)
+    
     colDefDB <- getReactColDefDB(tab, tabName)
+    if (!is.null(colGroupOrder))
+    {
+        colDefDB[, ord := match(group, colGroupOrder)]
+        setorderv(colDefDB, "ord", na.last = TRUE)
+    }
+    
     tab <- subsetDTColumnsIfPresent(tab, colDefDB$name)
     setcolorder(tab, colDefDB$name)
     

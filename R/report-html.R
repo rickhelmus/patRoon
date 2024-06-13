@@ -123,10 +123,12 @@ reportHTMLUtils$methods(
         bslib::layout_column_wrap(
             width = 1/2,
             height = "100%",
+            gap = 10,
             heights_equal = "row",
             style = "padding-bottom: 10px; padding-right: 10px; grid-template-columns: 2fr 1fr;",
             bslib::layout_column_wrap(
                 width = 1,
+                gap = 10,
                 heights_equal = "row",
                 bslib::card(
                     bslib::card_header("Most intense feature of each group"),
@@ -149,7 +151,7 @@ reportHTMLUtils$methods(
         UIArgs <- list(
             width = NULL,
             height = "100%",
-            gap = 0,
+            gap = 10,
             id = "detailsLayout"
         )
 

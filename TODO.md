@@ -49,7 +49,6 @@
             - move flexdashboard to Suggests (and remove completely if legacy reportHTML is removed)
             - finish up
                 - make title/href configurable?
-                - tweak eg card spacings
         - replace bsCardBodyNoFill() and update other depcreated bslib functions
         - TP structures with fmcsR/depict (maybe later?)
 

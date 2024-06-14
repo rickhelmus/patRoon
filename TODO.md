@@ -39,7 +39,6 @@
     - sync topMost filter for ann TPs
     - collapseComponents(): not needed anymore? otherwise update
     - report()
-        - report also candidate specific frag/NL matches? Or either?
         - BUG: JS errors when fGroups are subset/do not contain TPs anymore?
         - refactor/redesign
             - prefix cmp, tp etc columns

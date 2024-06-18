@@ -36,6 +36,7 @@
     - further limit candidate columns? Can get quite excessive
     - update filter for candidate specific frag/NL matches
     - add set specific frag/NL matches for candidates
+        - report them?
     - sync topMost filter for ann TPs
     - collapseComponents(): not needed anymore? otherwise update
     - report()
@@ -48,7 +49,7 @@
             - move flexdashboard to Suggests (and remove completely if legacy reportHTML is removed)
             - finish up
                 - make title/href configurable?
-        - replace bsCardBodyNoFill() and update other depcreated bslib functions
+        - update min bslib version
         - TP structures with fmcsR/depict (maybe later?)
 
 - tests

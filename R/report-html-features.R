@@ -503,13 +503,13 @@ reportHTMLUtils$methods(
         {
             navs <- lapply(getFGSets(), function(s)
             {
-                bslib::nav(
+                bslib::nav_panel(
                     s,
                     bslib::card_body(genISTDGraph(s))
                 )
             })
             do.call(bslib::layout_column_wrap, c(layoutArgs, list(
-                do.call(bslib::navs_tab_card, c(list(title = "Internal standard assignments"), navs))
+                do.call(bslib::navset_card_tab, c(list(title = "Internal standard assignments"), navs))
             )))
         }
     }

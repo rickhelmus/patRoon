@@ -441,16 +441,7 @@ makeHTMLReportPlot <- function(outPrefix, outPath, func, args, parParams = list(
     return(ppath)
 }
 
-bsCardBodyNoFill <- function(...)
-{
-    if (packageVersion("bslib") > "0.4.2")
-    {
-        # this was the default for bslib 0.4.2
-        bslib::card_body(fillable = FALSE, fill = FALSE, ...)
-    }
-    else
-        bslib::card_body(...)
-}
+bsCardBodyNoFill <- function(...) bslib::card_body(fillable = FALSE, fill = FALSE, ...)
 
 reportHTMLUtils$methods(
     # small tools to make handling optional elements easier
@@ -698,22 +689,22 @@ reportHTMLUtils$methods(
                                 list(value = "qualities", name = "Quality scores")
                             )), toggleExpand = TRUE)
                         ),
-                        bslib::card_body_fill(genFeaturesTable())
+                        bslib::card_body(genFeaturesTable())
                     ),
                     maybeInclUI(hasConcs(), bslib::nav_panel(
                         "Concentrations",
                         bsCardBodyNoFill(makeToolbar("concsTab")),
-                        bslib::card_body_fill(genConcsTable())
+                        bslib::card_body(genConcsTable())
                     )),
                     maybeInclUI(hasTox(), bslib::nav_panel(
                         "Toxicities",
                         bsCardBodyNoFill(makeToolbar("toxTab")),
-                        bslib::card_body_fill(genToxTable())
+                        bslib::card_body(genToxTable())
                     )),
                     maybeInclUI(settings$features$intensityPlots, bslib::nav_panel(
                         "Intensities",
                         class = "mt-2",
-                        bslib::card_body_fill(htmltools::img(id = "int_plot"))
+                        bslib::card_body(htmltools::img(id = "int_plot"))
                     )),
                     maybeInclUI(hasMSPL(), bslib::nav_panel(
                         "MS peak lists",
@@ -741,7 +732,7 @@ reportHTMLUtils$methods(
                                 ), toggleExpand = TRUE, toggleExpandDisableIfNoGrouping = FALSE)
                             )
                         ),
-                        bslib::card_body_fill(genFormulasTable())
+                        bslib::card_body(genFormulasTable())
                     )),
                     maybeInclUI(hasCompounds(), bslib::nav_panel(
                         "Compounds",
@@ -760,11 +751,11 @@ reportHTMLUtils$methods(
                                                               rel = "noopener noreferrer", "MetFrag Web"),
                             toggleExpand = TRUE, toggleExpandDisableIfNoGrouping = FALSE)
                         ),
-                        bslib::card_body_fill(genCompoundsTable())
+                        bslib::card_body(genCompoundsTable())
                     )),
                     maybeInclUI(hasCompsCluster(), bslib::nav_panel(
                         "Compounds clusters",
-                        bslib::card_body_fill(
+                        bslib::card_body(
                             htmltools::img(id = "comps_cluster-dendro"),
                             genCompClustsImgs()
                         )

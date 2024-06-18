@@ -49,7 +49,6 @@
             - move flexdashboard to Suggests (and remove completely if legacy reportHTML is removed)
             - finish up
                 - make title/href configurable?
-        - update min bslib version
         - TP structures with fmcsR/depict (maybe later?)
 
 - tests

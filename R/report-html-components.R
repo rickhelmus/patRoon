@@ -107,15 +107,15 @@ reportHTMLUtils$methods(
             pruneUI(bslib::accordion,
                     maybeInclUI(settings$features$chromatograms$large, bslib::accordion_panel(
                         "Chromatogram",
-                        bslib::card_body_fill(htmltools::img(id = "chrom_view-component"))
+                        bslib::card_body(htmltools::img(id = "chrom_view-component"))
                     )),
                     bslib::accordion_panel(
                         "Spectrum",
-                        bslib::card_body_fill(htmltools::img(id = "spectrum_view-component"))
+                        bslib::card_body(htmltools::img(id = "spectrum_view-component"))
                     ),
                     maybeInclUI(hasComponentsIntClust(), bslib::accordion_panel(
                         "Profile",
-                        bslib::card_body_fill(
+                        bslib::card_body(
                             htmltools::img(id = "profileRel_view-component"),
                             htmltools::img(id = "profileAbs_view-component")
                         )
@@ -202,7 +202,7 @@ reportHTMLUtils$methods(
         {
             navs <- lapply(getFGSets(), function(s)
             {
-                bslib::nav(
+                bslib::nav_panel(
                     s,
                     bslib::card_body(genComponNTGraph(s))
                 )

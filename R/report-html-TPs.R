@@ -302,7 +302,7 @@ reportHTMLUtils$methods(
                     ),
                     maybeInclUI(settings$features$chromatograms$large, bslib::accordion_panel(
                         "Chromatogram",
-                        bslib::card_body_fill(htmltools::img(id = "chrom_view-parent"))
+                        bslib::card_body(htmltools::img(id = "chrom_view-parent"))
                     )),
                     maybeInclUI(hasParStruct, bslib::accordion_panel(
                         "Structure",
@@ -325,7 +325,7 @@ reportHTMLUtils$methods(
                     maybeInclUI(settings$features$intensityPlots, bslib::accordion_panel(
                         "Intensities",
                         class = "mt-2",
-                        bslib::card_body_fill(htmltools::img(id = "int_plot-parent"))
+                        bslib::card_body(htmltools::img(id = "int_plot-parent"))
                     )),
                     maybeInclUI(hasTPGraphs() && hasComponentsFromTPs(), bslib::accordion_panel(
                         "Transformations",

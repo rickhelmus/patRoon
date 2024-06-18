@@ -101,14 +101,14 @@ reportHTMLUtils$methods(
         rightColumnCards <- list(
             bslib::card(
                 bslib::card_header("Objects"),
-                bslib::card_body_fill(htmltools::pre(htmltools::code(objectsShow)))
+                bslib::card_body(htmltools::pre(htmltools::code(objectsShow)))
             )
         )
         
         if (!is.null(plots$overview$chord) || !is.null(plots$overview$venn) || !is.null(plots$overview$UpSet))
         {
             tabs <- list()
-            makeTab <- function(title, plot) bslib::nav(title, bslib::card_body_fill(htmltools::HTML(plotImg(plot))))
+            makeTab <- function(title, plot) bslib::nav_panel(title, bslib::card_body(htmltools::HTML(plotImg(plot))))
             if (!is.null(plots$overview$chord))
                 tabs <- c(tabs, list(makeTab("Chord diagram", plots$overview$chord)))
             if (!is.null(plots$overview$venn))
@@ -117,7 +117,7 @@ reportHTMLUtils$methods(
                 tabs <- c(tabs, list(makeTab("UpSet diagram", plots$overview$UpSet)))
             rightColumnCards <- c(rightColumnCards,
                                   list(style = "grid-template-rows: 2fr 3fr;",
-                                       do.call(bslib::navs_tab_card, c(list(title = "Feature distribution"), tabs))))
+                                       do.call(bslib::navset_card_tab, c(list(title = "Feature distribution"), tabs))))
         }
         
         bslib::layout_column_wrap(
@@ -132,11 +132,11 @@ reportHTMLUtils$methods(
                 heights_equal = "row",
                 bslib::card(
                     bslib::card_header("Most intense feature of each group"),
-                    bslib::card_body_fill(htmltools::HTML(plotImg(plots$overview$chroms)))
+                    bslib::card_body(htmltools::HTML(plotImg(plots$overview$chroms)))
                 ),
                 bslib::card(
                     bslib::card_header("Retention vs m/z"),
-                    bslib::card_body_fill(htmltools::HTML(plotImg(plots$overview$retMZ)))
+                    bslib::card_body(htmltools::HTML(plotImg(plots$overview$retMZ)))
                 )
             ),
             do.call(bslib::layout_column_wrap, c(list(

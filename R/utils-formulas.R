@@ -479,6 +479,8 @@ addMiscFormulaInfo <- function(formTable, adduct)
         formTable[, ion_formula := calculateIonFormula(neutral_formula, ..adduct)]
     if (is.null(formTable[["neutralMass"]]))
         formTable[, neutralMass := sapply(neutral_formula, getFormulaMass)]
+    if (is.null(formTable[["ion_formula_mz"]]))
+        formTable[, ion_formula_mz := sapply(neutralMass, calculateMasses, as.adduct(..adduct), type = "mz")]
     
     formTable[, fragInfo := Map(ion_formula, fragInfo, f = function(form, fi)
     {

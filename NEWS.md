@@ -24,6 +24,7 @@ When updating to this release, it **is important** to remove any cached data, i.
     * Fixed: predicted concentrations are now properly averaged with `features==TRUE` and `average==TRUE`
 * Updated PubChem transformations to 0.1.8
 * Improved documentation for `collapseSuspects` argument for `as.data.table()` method for suspect screening results
+* SIRIUS formula annotations: calculate `ion_formula_mz` column instead of taking it from SIRIUS data, as it rarely may not be available (issue #111)
 
 
 # patRoon 2.3

@@ -135,7 +135,8 @@ Suggests:
     MS2Tox
 LinkingTo:
     Rcpp,
-    rapidjsonr
+    rapidjsonr,
+    Rmstoolkitlib
 Config/Needs/pdeps:
     RDCOMClient,
     enviPick,
@@ -246,6 +247,7 @@ Collate:
     'formulas-genform.R'
     'formulas-set.R'
     'formulas-sirius.R'
+    'msdata.R'
     'mslibrary-json.R'
     'mslibrary-msp.R'
     'mspeaklists-bruker.R'

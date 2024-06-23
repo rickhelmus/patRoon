@@ -12,7 +12,7 @@
 class MSToolkitBackend
 {
 public:
-    typedef std::unique_ptr<MSToolkit::MSReader> ThreadDataType;
+    using ThreadDataType = std::unique_ptr<MSToolkit::MSReader>;
     
 private:
     std::string currentFile;

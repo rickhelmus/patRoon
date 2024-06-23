@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cctype>
 #include <locale>
+#include <memory>
 #include <cmath>
 
 // UNDONE: for some reason we have to include Rcpp.h here to make clusterNums() work properly, what's going on here?!?!

@@ -344,6 +344,8 @@ BEGIN_RCPP
 END_RCPP
 }
 
+RcppExport SEXP _rcpp_module_boot_MSToolkitBackend();
+
 static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_writeChromsToMzML", (DL_FUNC) &_patRoon_writeChromsToMzML, 2},
     {"_patRoon_readMSP", (DL_FUNC) &_patRoon_readMSP, 2},
@@ -367,6 +369,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_binSpectra", (DL_FUNC) &_patRoon_binSpectra, 5},
     {"_patRoon_calcSpecSimilarity", (DL_FUNC) &_patRoon_calcSpecSimilarity, 8},
     {"_patRoon_addFilesToOpenMSIni", (DL_FUNC) &_patRoon_addFilesToOpenMSIni, 3},
+    {"_rcpp_module_boot_MSToolkitBackend", (DL_FUNC) &_rcpp_module_boot_MSToolkitBackend, 0},
     {NULL, NULL, 0}
 };
 

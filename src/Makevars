@@ -8,6 +8,9 @@ CXX_STD = CXX14
 PKG_LIBS = $(SHLIB_OPENMP_CXXFLAGS)
 PKG_CXXFLAGS = $(SHLIB_OPENMP_CXXFLAGS)
 
+PKG_CXXFLAGS += $(shell echo 'Rmstoolkitlib::pkgconfig("PKG_CXXFLAGS")' | "${R_HOME}/bin/R" --vanilla --slave)
+PKG_LIBS += $(shell echo 'Rmstoolkitlib::pkgconfig("PKG_LIBS")' | "${R_HOME}/bin/R" --vanilla --slave)
+
 .PHONY: all clean inst
 
 all: GenForm $(SHLIB)

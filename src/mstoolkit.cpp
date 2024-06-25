@@ -4,8 +4,13 @@
 #include <cmath>
 
 #include "mstoolkit.h"
+#include "spectrum-raw.h"
 
-MSToolkitBackend::ThreadDataType MSToolkitBackend::getThreadData(void)
+int MSToolkitBackend::backends = 0;
+
+// [[Rcpp::interfaces(r, cpp)]]
+
+MSToolkitBackend::ThreadDataType MSToolkitBackend::getThreadData(void) const
 {
     ThreadDataType ret = std::make_unique<MSToolkit::MSReader>();
     ret->addFilter(MSToolkit::MS1);
@@ -13,13 +18,31 @@ MSToolkitBackend::ThreadDataType MSToolkitBackend::getThreadData(void)
     return ret;
 }
 
+SpectrumRaw MSToolkitBackend::readSpectrum(MSToolkitBackend::ThreadDataType &tdata, int index) const
+{
+    MSToolkit::Spectrum s;
+    
+    if (!tdata->readFile(currentFile.c_str(), s, index) || s.getScanNumber() == 0)
+        Rcpp::stop("Abort: invalid spectrum index: %d", index);
+
+    SpectrumRaw ret;
+    for(int i=0; i<s.size(); ++i)
+        ret.append(s.at(i).mz, s.at(i).intensity);
+        
+    return ret;
+}
+
+
 RCPP_MODULE(MSToolkitBackend)
 {
     Rcpp::class_<MSToolkitBackend>("MSToolkitBackend")
     
     .constructor()
     
+    .method("open", &MSToolkitBackend::open)
     .method("close", &MSToolkitBackend::close)
+    .method("getBackends", &MSToolkitBackend::getBackends)
+    
     ;
 }
 

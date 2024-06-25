@@ -5,6 +5,10 @@ writeChromsToMzML <- function(EICs, out) {
     invisible(.Call(`_patRoon_writeChromsToMzML`, EICs, out))
 }
 
+getMSSpectrum <- function(backend, index) {
+    .Call(`_patRoon_getMSSpectrum`, backend, index)
+}
+
 readMSP <- function(file, pc) {
     .Call(`_patRoon_readMSP`, file, pc)
 }
@@ -89,3 +93,7 @@ addFilesToOpenMSIni <- function(file, inFiles, outFiles) {
     invisible(.Call(`_patRoon_addFilesToOpenMSIni`, file, inFiles, outFiles))
 }
 
+# Register entry points for exported C++ functions
+methods::setLoadAction(function(ns) {
+    .Call(`_patRoon_RcppExport_registerCCallable`)
+})

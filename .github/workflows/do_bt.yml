@@ -182,5 +182,5 @@ jobs:
                   working-directory: patRoon
             - name: Test coverage
               run: covr::codecov()
-              working-directory: patRoon
+              working-directory: ${{ github.workspace }}/patRoon
               shell: Rscript {0}

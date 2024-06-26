@@ -173,9 +173,13 @@ jobs:
                       rcmdcheck
                       testthat
                       vdiffr
+                      covr
             - uses: r-lib/actions/check-r-package@v2
               with:
                   args: 'c("--no-manual")'
                   build_args: 'c("--no-manual", "--no-build-vignettes")'
                   error-on: '"error"'
                   working-directory: patRoon
+            - name: Test coverage
+              run: covr::codecov()
+              shell: Rscript {0}

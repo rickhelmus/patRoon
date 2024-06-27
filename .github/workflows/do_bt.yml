@@ -180,10 +180,3 @@ jobs:
                   build_args: 'c("--no-manual", "--no-build-vignettes")'
                   error-on: '"error"'
                   working-directory: patRoon
-            - name: Test coverage
-              run: |
-                  # disable flags as otherwise GenForm doesn't compile
-                  options(covr.flags = list(CXXFLAGS = '', LDFLAGS = ''))
-                  withr::with_envvar(list(NOT_CRAN = "true"), covr::codecov(quiet = FALSE, errorsAreFatal = FALSE, clean = FALSE))
-              working-directory: ${{ github.workspace }}/patRoon
-              shell: Rscript {0}

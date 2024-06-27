@@ -123,6 +123,8 @@ makeDBIdentLink <- function(db, ident)
     
     if (length(ident) == 0)
         return(character())
+    if (is.na(db) || is.na(ident))
+        return("NA")
     
     # CSI:FingerID/PubChemLite might return multiple identifiers, separated by ; or a space
     # set consensus results can also merge multiple identifiers

@@ -1,4 +1,4 @@
 #' @include main.R
 NULL
 
-Rcpp::loadModule("MSToolkitBackend", TRUE)
+Rcpp::loadModule("MSReadBackendMSTK", TRUE)

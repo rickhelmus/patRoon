@@ -11,32 +11,26 @@
 #include "MSObject.h"
 #include "Spectrum.h"
 
-class SpectrumRaw;
+#include "msdata.h"
 
-class MSToolkitBackend
+class MSReadBackendMSTK: public MSReadBackend
 {
-public:
-    using ThreadDataType = std::unique_ptr<MSToolkit::MSReader>;
-    
-private:
     std::string currentFile;
     static int backends; // UNDONE: for debugging
     
 public:
-    MSToolkitBackend(void) { ++backends; Rcpp::Rcout << "backends:" << backends << "\n"; }
-    MSToolkitBackend(const MSToolkitBackend &o) = delete;
-    ~MSToolkitBackend(void) { --backends; };
+    MSReadBackendMSTK(void) { ++backends; Rcpp::Rcout << "backends:" << backends << "\n"; }
+    MSReadBackendMSTK(const MSReadBackendMSTK &o) = delete;
+    ~MSReadBackendMSTK(void) { --backends; };
     
     int getBackends(void) const { return backends; }
     
-    void open(const std::string &file) { if (!currentFile.empty()) close(); currentFile = file; }
-    void close(void) { currentFile.clear(); }
-    
-    ThreadDataType getThreadData(void) const;
-    
-    SpectrumRaw readSpectrum(ThreadDataType &tdata, int index) const;
+    void open(const std::string &file) override { if (!currentFile.empty()) close(); currentFile = file; }
+    void close(void) override { currentFile.clear(); }
+    ThreadDataType getThreadData(void) const override;
+    SpectrumRaw readSpectrum(const ThreadDataType &tdata, int index) const override;
 };
 
-RCPP_EXPOSED_CLASS(MSToolkitBackend)
+RCPP_EXPOSED_CLASS(MSReadBackendMSTK)
 
 #endif

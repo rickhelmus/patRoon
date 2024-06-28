@@ -15,20 +15,19 @@
 
 class MSReadBackendMSTK: public MSReadBackend
 {
-    std::string currentFile;
     static int backends; // UNDONE: for debugging
+
+    void doOpen(const std::string &) override { }
+    void doClose(void) override { }
+    ThreadDataType doGetThreadData(void) const override;
+    SpectrumRaw doReadSpectrum(const ThreadDataType &tdata, int index) const override;
     
 public:
     MSReadBackendMSTK(void) { ++backends; Rcpp::Rcout << "backends:" << backends << "\n"; }
-    MSReadBackendMSTK(const MSReadBackendMSTK &o) = delete;
+    MSReadBackendMSTK(const MSReadBackendMSTK &) = delete;
     ~MSReadBackendMSTK(void) { --backends; };
     
     int getBackends(void) const { return backends; }
-    
-    void open(const std::string &file) override { if (!currentFile.empty()) close(); currentFile = file; }
-    void close(void) override { currentFile.clear(); }
-    ThreadDataType getThreadData(void) const override;
-    SpectrumRaw readSpectrum(const ThreadDataType &tdata, int index) const override;
 };
 
 RCPP_EXPOSED_CLASS(MSReadBackendMSTK)

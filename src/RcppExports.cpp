@@ -402,7 +402,7 @@ RcppExport SEXP _patRoon_RcppExport_registerCCallable() {
     return R_NilValue;
 }
 
-RcppExport SEXP _rcpp_module_boot_MSReadBackendMSTK();
+RcppExport SEXP _rcpp_module_boot_MSReadBackend();
 
 static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_writeChromsToMzML", (DL_FUNC) &_patRoon_writeChromsToMzML, 2},
@@ -430,7 +430,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_calcSpecSimilarity", (DL_FUNC) &_patRoon_calcSpecSimilarity, 8},
     {"_patRoon_calcAnnSims", (DL_FUNC) &_patRoon_calcAnnSims, 6},
     {"_patRoon_addFilesToOpenMSIni", (DL_FUNC) &_patRoon_addFilesToOpenMSIni, 3},
-    {"_rcpp_module_boot_MSReadBackendMSTK", (DL_FUNC) &_rcpp_module_boot_MSReadBackendMSTK, 0},
+    {"_rcpp_module_boot_MSReadBackend", (DL_FUNC) &_rcpp_module_boot_MSReadBackend, 0},
     {"_patRoon_RcppExport_registerCCallable", (DL_FUNC) &_patRoon_RcppExport_registerCCallable, 0},
     {NULL, NULL, 0}
 };

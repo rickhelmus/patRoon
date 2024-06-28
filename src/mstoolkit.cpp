@@ -25,9 +25,10 @@ SpectrumRaw MSToolkitBackend::readSpectrum(MSToolkitBackend::ThreadDataType &tda
     if (!tdata->readFile(currentFile.c_str(), s, index) || s.getScanNumber() == 0)
         Rcpp::stop("Abort: invalid spectrum index: %d", index);
 
-    SpectrumRaw ret;
+    SpectrumRaw ret(s.size());
+    ret.setTime(s.getRTime());
     for(int i=0; i<s.size(); ++i)
-        ret.append(s.at(i).mz, s.at(i).intensity);
+        ret.setPeak(i, s.at(i).mz, s.at(i).intensity);
         
     return ret;
 }

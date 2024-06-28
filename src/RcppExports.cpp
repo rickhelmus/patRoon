@@ -36,6 +36,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// getEICList
+Rcpp::List getEICList(const MSReadBackend& backend, const std::vector<double>& startMZs, const std::vector<double>& endMZs);
+RcppExport SEXP _patRoon_getEICList(SEXP backendSEXP, SEXP startMZsSEXP, SEXP endMZsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const MSReadBackend& >::type backend(backendSEXP);
+    Rcpp::traits::input_parameter< const std::vector<double>& >::type startMZs(startMZsSEXP);
+    Rcpp::traits::input_parameter< const std::vector<double>& >::type endMZs(endMZsSEXP);
+    rcpp_result_gen = Rcpp::wrap(getEICList(backend, startMZs, endMZs));
+    return rcpp_result_gen;
+END_RCPP
+}
 // readMSP
 Rcpp::List readMSP(Rcpp::CharacterVector file, Rcpp::LogicalVector pc);
 RcppExport SEXP _patRoon_readMSP(SEXP fileSEXP, SEXP pcSEXP) {
@@ -378,6 +391,7 @@ RcppExport SEXP _rcpp_module_boot_MSToolkitBackend();
 static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_writeChromsToMzML", (DL_FUNC) &_patRoon_writeChromsToMzML, 2},
     {"_patRoon_getMSSpectrum", (DL_FUNC) &_patRoon_getMSSpectrum, 2},
+    {"_patRoon_getEICList", (DL_FUNC) &_patRoon_getEICList, 3},
     {"_patRoon_readMSP", (DL_FUNC) &_patRoon_readMSP, 2},
     {"_patRoon_writeMSPLibrary", (DL_FUNC) &_patRoon_writeMSPLibrary, 3},
     {"_patRoon_readMoNAJSON", (DL_FUNC) &_patRoon_readMoNAJSON, 1},

@@ -10,16 +10,19 @@ public:
     
 private:
     // UNDONE: should intensities be double or int?
+    float time;
     NumVecType mzs, intensities;
     
 public:
     SpectrumRaw() = default;
-    SpectrumRaw(const NumVecType &m, const NumVecType &i) : mzs(m), intensities(i) { }
+    SpectrumRaw(float t, const NumVecType &m, const NumVecType &i) : time(t), mzs(m), intensities(i) { }
     SpectrumRaw(NumVecType::size_type size) : mzs(size), intensities(size) { }
     
+    float getTime(void) const { return time; }
     const auto &getMZs(void) const { return mzs; }
     const auto &getIntensities(void) const { return intensities; }
     
+    void setTime(float t) { time = t; }
     void append(double mz, double inten);
     void append(const SpectrumRaw &sp);
     void setPeak(NumVecType::size_type i, double mz, unsigned inten) { mzs[i] = mz; intensities[i] = inten; }

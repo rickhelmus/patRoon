@@ -25,12 +25,12 @@ BEGIN_RCPP
 END_RCPP
 }
 // getMSSpectrum
-Rcpp::DataFrame getMSSpectrum(const MSToolkitBackend& backend, int index);
+Rcpp::DataFrame getMSSpectrum(const MSReadBackend& backend, int index);
 RcppExport SEXP _patRoon_getMSSpectrum(SEXP backendSEXP, SEXP indexSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const MSToolkitBackend& >::type backend(backendSEXP);
+    Rcpp::traits::input_parameter< const MSReadBackend& >::type backend(backendSEXP);
     Rcpp::traits::input_parameter< int >::type index(indexSEXP);
     rcpp_result_gen = Rcpp::wrap(getMSSpectrum(backend, index));
     return rcpp_result_gen;
@@ -386,7 +386,7 @@ RcppExport SEXP _patRoon_RcppExport_registerCCallable() {
     return R_NilValue;
 }
 
-RcppExport SEXP _rcpp_module_boot_MSToolkitBackend();
+RcppExport SEXP _rcpp_module_boot_MSReadBackendMSTK();
 
 static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_writeChromsToMzML", (DL_FUNC) &_patRoon_writeChromsToMzML, 2},
@@ -413,7 +413,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_binSpectra", (DL_FUNC) &_patRoon_binSpectra, 5},
     {"_patRoon_calcSpecSimilarity", (DL_FUNC) &_patRoon_calcSpecSimilarity, 8},
     {"_patRoon_addFilesToOpenMSIni", (DL_FUNC) &_patRoon_addFilesToOpenMSIni, 3},
-    {"_rcpp_module_boot_MSToolkitBackend", (DL_FUNC) &_rcpp_module_boot_MSToolkitBackend, 0},
+    {"_rcpp_module_boot_MSReadBackendMSTK", (DL_FUNC) &_rcpp_module_boot_MSReadBackendMSTK, 0},
     {"_patRoon_RcppExport_registerCCallable", (DL_FUNC) &_patRoon_RcppExport_registerCCallable, 0},
     {NULL, NULL, 0}
 };

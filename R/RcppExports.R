@@ -9,6 +9,10 @@ getMSSpectrum <- function(backend, index) {
     .Call(`_patRoon_getMSSpectrum`, backend, index)
 }
 
+getEICList <- function(backend, startMZs, endMZs) {
+    .Call(`_patRoon_getEICList`, backend, startMZs, endMZs)
+}
+
 readMSP <- function(file, pc) {
     .Call(`_patRoon_readMSP`, file, pc)
 }

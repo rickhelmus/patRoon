@@ -1,13 +1,13 @@
 #include <Rcpp.h>
 #include <vector>
 
-#include "mstoolkit.h"
+#include "msdata.h"
 #include "spectrum-raw.h"
 
 namespace {
 
-template<typename OutType, typename BackendType, typename FuncType>
-OutType applyMSData(const BackendType &backend, const std::vector<int> &indices, FuncType func)
+template<typename OutType, typename FuncType>
+OutType applyMSData(const MSReadBackend &backend, const std::vector<int> &indices, FuncType func)
 {
     OutType ret;
     
@@ -23,9 +23,8 @@ OutType applyMSData(const BackendType &backend, const std::vector<int> &indices,
     
 }
 
-
 // [[Rcpp::export]]
-Rcpp::DataFrame getMSSpectrum(const MSToolkitBackend &backend, int index)
+Rcpp::DataFrame getMSSpectrum(const MSReadBackend &backend, int index)
 {
     const std::vector<int> indices(1, index);
     

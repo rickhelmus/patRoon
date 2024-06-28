@@ -10,7 +10,7 @@ int MSReadBackendMSTK::backends = 0;
 
 // [[Rcpp::interfaces(r, cpp)]]
 
-MSReadBackend::ThreadDataType MSReadBackendMSTK::getThreadData(void) const
+MSReadBackend::ThreadDataType MSReadBackendMSTK::doGetThreadData(void) const
 {
     auto ret = std::make_shared<MSToolkit::MSReader>();
     ret->addFilter(MSToolkit::MS1);
@@ -18,12 +18,12 @@ MSReadBackend::ThreadDataType MSReadBackendMSTK::getThreadData(void) const
     return ret;
 }
 
-SpectrumRaw MSReadBackendMSTK::readSpectrum(const ThreadDataType &tdata, int index) const
+SpectrumRaw MSReadBackendMSTK::doReadSpectrum(const ThreadDataType &tdata, int index) const
 {
     MSToolkit::Spectrum s;
     auto *msr = reinterpret_cast<MSToolkit::MSReader *>(tdata.get());
     
-    if (!msr->readFile(currentFile.c_str(), s, index) || s.getScanNumber() == 0)
+    if (!msr->readFile(getCurrentFile().c_str(), s, index) || s.getScanNumber() == 0)
         Rcpp::stop("Abort: invalid spectrum index: %d", index);
 
     SpectrumRaw ret(s.size());
@@ -34,19 +34,6 @@ SpectrumRaw MSReadBackendMSTK::readSpectrum(const ThreadDataType &tdata, int ind
     return ret;
 }
 
-
-RCPP_MODULE(MSReadBackendMSTK)
-{
-    Rcpp::class_<MSReadBackendMSTK>("MSReadBackendMSTK")
-    
-    .constructor()
-    
-    .method("open", &MSReadBackendMSTK::open)
-    .method("close", &MSReadBackendMSTK::close)
-    .method("getBackends", &MSReadBackendMSTK::getBackends)
-    
-    ;
-}
 
 #if 0
 using namespace MSToolkit;

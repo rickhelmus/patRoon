@@ -2,6 +2,7 @@
 #include <vector>
 
 #include "msdata.h"
+#include "mstoolkit.h"
 #include "spectrum-raw.h"
 
 namespace {
@@ -21,6 +22,37 @@ OutType applyMSData(const MSReadBackend &backend, const std::vector<int> &indice
     return ret;
 }
     
+}
+
+
+void MSReadBackend::open(const std::string &file)
+{
+    close();
+    doOpen(file);
+    currentFile = file;
+}
+
+void MSReadBackend::close(void)
+{
+    if (!currentFile.empty())
+    {
+        doClose();
+        currentFile.clear();
+    }
+}
+
+RCPP_MODULE(MSReadBackend)
+{
+    Rcpp::class_<MSReadBackend>("MSReadBackend")
+        .method("open", &MSReadBackend::open)
+        .method("close", &MSReadBackend::close)
+    ;
+    Rcpp::class_<MSReadBackendMSTK>("MSReadBackendMSTK")
+        .derives<MSReadBackend>("MSReadBackend")
+        .constructor()
+        .method("getBackends", &MSReadBackendMSTK::getBackends)
+    
+    ;
 }
 
 // [[Rcpp::export]]

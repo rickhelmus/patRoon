@@ -1,6 +1,6 @@
 #include "spectrum-raw.h"
 
-void SpectrumRaw::append(double mz, double inten)
+void SpectrumRaw::append(SpectrumRawTypes::Mass mz, SpectrumRawTypes::Intensity inten)
 {
     mzs.push_back(mz);
     intensities.push_back(inten);

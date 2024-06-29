@@ -30,7 +30,6 @@ private:
     virtual ThreadDataType doGetThreadData(void) const = 0;
     virtual SpectrumRaw doReadSpectrum(const ThreadDataType &tdata, int index) const = 0;
     
-    
 protected:
     void addSpecMetadata(const SpectrumRawMetadata &smd) { specMetadata.push_back(smd); }
     void addSpecMetadata(SpectrumRawMetadata &&smd) { specMetadata.emplace_back(std::move(smd)); }

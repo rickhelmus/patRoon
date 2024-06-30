@@ -16,16 +16,20 @@
 class MSReadBackendMSTK: public MSReadBackend
 {
     static int backends; // UNDONE: for debugging
+    bool metadataLoaded = false;
 
     void doOpen(const std::string &) override { }
-    void doClose(void) override { }
+    void doClose(void) override { metadataLoaded = false; }
     ThreadDataType doGetThreadData(void) const override;
     SpectrumRaw doReadSpectrum(const ThreadDataType &tdata, int index) const override;
     
+protected:
+    const SpectrumRawMetadata &doGetSpectrumRawMetadata(void) override;
+    
 public:
-    MSReadBackendMSTK(void) { ++backends; Rcpp::Rcout << "backends:" << backends << "\n"; }
+    MSReadBackendMSTK(void) { ++backends; Rcpp::Rcout << "constr: backends:" << backends << "\n"; }
     MSReadBackendMSTK(const MSReadBackendMSTK &) = delete;
-    ~MSReadBackendMSTK(void) { --backends; };
+    ~MSReadBackendMSTK(void) { --backends; Rcpp::Rcout << "destr: backends:" << backends << "\n"; };
     
     int getBackends(void) const { return backends; }
 };

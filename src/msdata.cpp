@@ -38,6 +38,8 @@ void MSReadBackend::close(void)
     {
         doClose();
         currentFile.clear();
+        specMetadata.first.clear();
+        specMetadata.second.clear();
     }
 }
 
@@ -51,7 +53,6 @@ RCPP_MODULE(MSReadBackend)
         .derives<MSReadBackend>("MSReadBackend")
         .constructor()
         .method("getBackends", &MSReadBackendMSTK::getBackends)
-    
     ;
 }
 
@@ -148,3 +149,30 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     return ret;
 }
 
+// [[Rcpp::export]]
+Rcpp::DataFrame getMSMetadata(MSReadBackend &backend, int msLevel)
+{
+    const auto &meta = backend.getSpecMetadata();
+    
+    if (msLevel == 1)
+        return(Rcpp::DataFrame::create(Rcpp::Named("scan") = meta.first.scans,
+                                       Rcpp::Named("time") = meta.first.times,
+                                       Rcpp::Named("TIC") = meta.first.TICs,
+                                       Rcpp::Named("BPC") = meta.first.BPCs));
+    
+    // msLevel == 2
+    
+    const auto size = meta.second.isolationRanges.size();
+    std::vector<SpectrumRawTypes::Mass> isolationMins(size), isolationMaxs(size);
+    for (size_t i=0; i<size; ++i)
+    {
+        isolationMins[i] = meta.second.isolationRanges[i].first;
+        isolationMaxs[i] = meta.second.isolationRanges[i].second;
+    }
+    
+    return Rcpp::DataFrame::create(Rcpp::Named("time") = meta.second.times,
+                                   Rcpp::Named("TIC") = meta.second.TICs,
+                                   Rcpp::Named("BPC") = meta.second.BPCs,
+                                   Rcpp::Named("isolationRangeMin") = isolationMins,
+                                   Rcpp::Named("isolationRangeMax") = isolationMaxs);
+}

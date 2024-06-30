@@ -13,6 +13,10 @@ getEICList <- function(backend, startMZs, endMZs) {
     .Call(`_patRoon_getEICList`, backend, startMZs, endMZs)
 }
 
+getMSMetadata <- function(backend, msLevel) {
+    .Call(`_patRoon_getMSMetadata`, backend, msLevel)
+}
+
 readMSP <- function(file, pc) {
     .Call(`_patRoon_readMSP`, file, pc)
 }

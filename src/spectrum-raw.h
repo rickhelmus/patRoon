@@ -6,11 +6,28 @@
 
 namespace SpectrumRawTypes {
 
+using Scan = unsigned;
 using Time = float;
 using Mass = float;
 using Intensity = float; // UNDONE: or unsigned?
 
+enum class MSLevel { MS1, MS2 };
+
 }
+
+struct SpectrumRawMetadataMS
+{
+    std::vector<SpectrumRawTypes::Scan> scans;
+    std::vector<SpectrumRawTypes::Time> times;
+    std::vector<SpectrumRawTypes::Intensity> TICs, BPCs;
+    void clear(void) { scans.clear(); times.clear(); TICs.clear(); BPCs.clear(); }
+};
+struct SpectrumRawMetadataMSMS: public SpectrumRawMetadataMS
+{
+    std::vector<std::pair<SpectrumRawTypes::Mass, SpectrumRawTypes::Mass>> isolationRanges;
+    void clear(void) { SpectrumRawMetadataMS::clear(); isolationRanges.clear(); } // NOTE: not virtual
+};
+using SpectrumRawMetadata = std::pair<SpectrumRawMetadataMS, SpectrumRawMetadataMSMS>;
 
 class SpectrumRaw
 {

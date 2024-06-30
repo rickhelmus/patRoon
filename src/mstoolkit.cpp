@@ -33,6 +33,41 @@ SpectrumRaw MSReadBackendMSTK::doReadSpectrum(const ThreadDataType &tdata, int i
     return ret;
 }
 
+const SpectrumRawMetadata &MSReadBackendMSTK::doGetSpectrumRawMetadata(void)
+{
+    if (!metadataLoaded && !getCurrentFile().empty())
+    {
+        metadataLoaded = true;
+        
+        MSToolkit::MSReader reader;
+        reader.addFilter(MSToolkit::MS1);
+        reader.addFilter(MSToolkit::MS2);
+        MSToolkit::Spectrum spec;
+        
+        SpectrumRawMetadata meta;
+        
+        while (reader.readFile(getCurrentFile().c_str(), spec, 0, true))
+        {
+            const bool isMS1 = spec.getMsLevel() == 1;
+            
+            SpectrumRawMetadataMS *curMS1MD = (isMS1) ? &meta.first : &meta.second;
+            curMS1MD->scans.push_back(spec.getScanNumber());
+            curMS1MD->times.push_back(spec.getRTime());
+            curMS1MD->TICs.push_back(spec.getTIC());
+            curMS1MD->BPCs.push_back(spec.getBPI());
+            
+            assert(curMS1MD->scans.size() == curMS1MD->times.size());
+            
+            if (!isMS1)
+                meta.second.isolationRanges.push_back(std::make_pair(spec.getSelWindowLower(), spec.getSelWindowUpper()));
+        }
+        
+        emplaceSpecMeta(std::move(meta));
+    }
+    
+    return MSReadBackend::doGetSpectrumRawMetadata();
+}
+
 
 #if 0
 using namespace MSToolkit;

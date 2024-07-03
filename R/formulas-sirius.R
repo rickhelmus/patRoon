@@ -106,7 +106,7 @@ processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
             {
                 # Precursor is always present in MS/MS spectrum: it's added by SIRIUS if necessary (with zero intensity).
                 # --> Remove it
-                fi <- fi[intensity != 0 | ion_formula != form]
+                fi <- fi[intensity != 0]
                 fi[, intensity := NULL]
                 return(fi)
             })]

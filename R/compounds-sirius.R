@@ -32,10 +32,12 @@ processSIRIUSCompounds <- function(msFName, outPath, MSMS, database, adduct, top
     if (length(resultPath) != 0) # zero for no results
     {
         summary <- file.path(resultPath, "structure_candidates.tsv")
-        if (file.exists(summary))
+        summaryForms <- file.path(resultPath, "formula_candidates.tsv")
+        if (file.exists(summary) && file.exists(summaryForms))
         {
             results <- fread(summary)
             results <- unifySirNames(results)
+            resultsForm <- fread(summaryForms)
             
             # NOTE: so far SIRIUS only has one score
             if (nrow(results) > 0)
@@ -64,12 +66,18 @@ processSIRIUSCompounds <- function(msFName, outPath, MSMS, database, adduct, top
                 fragInfo[, ionization := gsub(" ", "", ionization)]
                 fragInfo[, PLID := sapply(mz, function(omz) MSMS[which.min(abs(omz - mz))]$ID)]
                 
-                # each frag file always contains the precursor (even in input doesn't) --> use this to figure out which
-                # candidate(s) it belongs to
-                wh <- which(results$neutral_formula %in% fragInfo$formula) # UNDONE: check if it's really the precursor?
+                # it is quite a journey to see find the relevant fragment files, especially with non-standard adducts...
+                # 1. figure out, from the file name, to which formula candidate it belongs to
+                # 2. but, the formula that is part of the file name is some strange half-neutralized form
+                # 3. so dig in the formula summary file to which ionized formula this should belong to by looking at the 'precursorFormula' column
+                fragFileFormName <- getFormulaFromSIRIUSResFile(ff, "tsv")
+                fragFileFormNameNeutral <- resultsForm[match(fragFileFormName, precursorFormula)]$molecularFormula
+
+                wh <- which(results$neutral_formula %in% fragFileFormNameNeutral)
                 
-                # Remove zero intensity precursor peak since it wasn't actually present in the peak list
-                fragInfo <- fragInfo[intensity != 0 | formula != results$neutral_formula[wh[1]]]
+                # Remove zero intensity peaks that aren't actually present in the peak list. These seem to be precursor
+                # peaks, taking into account the various adduct forms of SIRIUS...
+                fragInfo <- fragInfo[intensity != 0]
                 
                 fragInfo[, c("rel.intensity", "exactmass", "intensity") := NULL]
                 

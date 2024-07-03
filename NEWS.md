@@ -6,6 +6,8 @@
 * Added get and plot methods for total ion chromatograms (TICs) and base peak chromatograms (BPCs) for the analysisInfo `data.frame`, `features` and `featureGroups` class as: `getTICs()`, `getBPCs()`, `plotTICs()` and `plotBPCs()`.
 * Updated PubChem transformations to 0.1.9
 * Fix: reporting compounds consensus with library algorithm would fail (issue #110)
+* SIRIUS formula annotations: calculate `ion_formula_mz` column instead of taking it from SIRIUS data, as it rarely may not be available (issue #111)
+* Fix: improve handling SIRIUS results for features with non-standard adduct assignments (issue #111)
 
 
 # patRoon 2.3.1
@@ -25,7 +27,6 @@ When updating to this release, it **is important** to remove any cached data, i.
     * Fixed: predicted concentrations are now properly averaged with `features==TRUE` and `average==TRUE`
 * Updated PubChem transformations to 0.1.8
 * Improved documentation for `collapseSuspects` argument for `as.data.table()` method for suspect screening results
-* SIRIUS formula annotations: calculate `ion_formula_mz` column instead of taking it from SIRIUS data, as it rarely may not be available (issue #111)
 
 
 # patRoon 2.3

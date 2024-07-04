@@ -4,12 +4,15 @@
 #include <stddef.h>
 #include <vector>
 
+#include "utils.h"
+
 namespace SpectrumRawTypes {
 
 using Scan = unsigned;
 using Time = float;
 using Mass = float;
 using Intensity = float; // UNDONE: or unsigned?
+using IsolationRange = NumRange<Mass>;
 
 enum class MSLevel { MS1, MS2 };
 
@@ -24,7 +27,7 @@ struct SpectrumRawMetadataMS
 };
 struct SpectrumRawMetadataMSMS: public SpectrumRawMetadataMS
 {
-    std::vector<std::pair<SpectrumRawTypes::Mass, SpectrumRawTypes::Mass>> isolationRanges;
+    std::vector<SpectrumRawTypes::IsolationRange> isolationRanges;
     void clear(void) { SpectrumRawMetadataMS::clear(); isolationRanges.clear(); } // NOTE: not virtual
 };
 using SpectrumRawMetadata = std::pair<SpectrumRawMetadataMS, SpectrumRawMetadataMSMS>;
@@ -56,4 +59,8 @@ public:
     void clear(void) { time = 0.0f; mzs.clear(); intensities.clear(); }
 };
 
+std::vector<SpectrumRawTypes::Scan> getSpecScanIndices(const SpectrumRawMetadata &specMeta,
+                                                       const NumRange<SpectrumRawTypes::Time> &timeRange,
+                                                       SpectrumRawTypes::MSLevel MSLevel,
+                                                       const NumRange<SpectrumRawTypes::Mass> &isoRange);
 #endif

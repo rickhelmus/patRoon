@@ -8,13 +8,13 @@
 namespace {
 
 template<typename OutType, typename FuncType>
-OutType applyMSData(const MSReadBackend &backend, const std::vector<int> &indices, FuncType func)
+OutType applyMSData(const MSReadBackend &backend, const std::vector<SpectrumRawTypes::Scan> &scans, FuncType func)
 {
     OutType ret;
     
     auto tdata = backend.getThreadData();
     
-    for (auto i : indices)
+    for (auto i : scans)
     {
         ret.push_back(func(backend.readSpectrum(tdata, i)));
     }
@@ -59,7 +59,7 @@ RCPP_MODULE(MSReadBackend)
 // [[Rcpp::export]]
 Rcpp::DataFrame getMSSpectrum(const MSReadBackend &backend, int index)
 {
-    const std::vector<int> indices(1, index);
+    const std::vector<SpectrumRawTypes::Scan> indices(1, index);
     
     const auto sfunc = [](const SpectrumRaw &spec)
     {
@@ -73,7 +73,7 @@ Rcpp::DataFrame getMSSpectrum(const MSReadBackend &backend, int index)
 }
 
 // [[Rcpp::export]]
-std::vector<SpectrumRawTypes::Scan> getScans(MSReadBackend &backend, SpectrumRawTypes::Mass timeStart,
+std::vector<SpectrumRawTypes::Scan> getScans(const MSReadBackend &backend, SpectrumRawTypes::Mass timeStart,
                                              SpectrumRawTypes::Mass timeEnd, int MSLevel,
                                              SpectrumRawTypes::Mass isoStart, SpectrumRawTypes::Mass isoEnd)
 {

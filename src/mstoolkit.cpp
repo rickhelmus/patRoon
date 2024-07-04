@@ -59,7 +59,7 @@ const SpectrumRawMetadata &MSReadBackendMSTK::doGetSpectrumRawMetadata(void)
             assert(curMS1MD->scans.size() == curMS1MD->times.size());
             
             if (!isMS1)
-                meta.second.isolationRanges.push_back(std::make_pair(spec.getSelWindowLower(), spec.getSelWindowUpper()));
+                meta.second.isolationRanges.emplace_back(NumRange<SpectrumRawTypes::Mass>(spec.getSelWindowLower(), spec.getSelWindowUpper()));
         }
         
         emplaceSpecMeta(std::move(meta));

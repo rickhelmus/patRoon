@@ -36,6 +36,22 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// getScans
+std::vector<SpectrumRawTypes::Scan> getScans(MSReadBackend& backend, SpectrumRawTypes::Mass timeStart, SpectrumRawTypes::Mass timeEnd, int MSLevel, SpectrumRawTypes::Mass isoStart, SpectrumRawTypes::Mass isoEnd);
+RcppExport SEXP _patRoon_getScans(SEXP backendSEXP, SEXP timeStartSEXP, SEXP timeEndSEXP, SEXP MSLevelSEXP, SEXP isoStartSEXP, SEXP isoEndSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< MSReadBackend& >::type backend(backendSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type timeStart(timeStartSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type timeEnd(timeEndSEXP);
+    Rcpp::traits::input_parameter< int >::type MSLevel(MSLevelSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type isoStart(isoStartSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type isoEnd(isoEndSEXP);
+    rcpp_result_gen = Rcpp::wrap(getScans(backend, timeStart, timeEnd, MSLevel, isoStart, isoEnd));
+    return rcpp_result_gen;
+END_RCPP
+}
 // getEICList
 Rcpp::List getEICList(const MSReadBackend& backend, const std::vector<SpectrumRawTypes::Mass>& startMZs, const std::vector<SpectrumRawTypes::Mass>& endMZs);
 RcppExport SEXP _patRoon_getEICList(SEXP backendSEXP, SEXP startMZsSEXP, SEXP endMZsSEXP) {
@@ -403,6 +419,7 @@ RcppExport SEXP _rcpp_module_boot_MSReadBackend();
 static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_writeChromsToMzML", (DL_FUNC) &_patRoon_writeChromsToMzML, 2},
     {"_patRoon_getMSSpectrum", (DL_FUNC) &_patRoon_getMSSpectrum, 2},
+    {"_patRoon_getScans", (DL_FUNC) &_patRoon_getScans, 6},
     {"_patRoon_getEICList", (DL_FUNC) &_patRoon_getEICList, 3},
     {"_patRoon_getMSMetadata", (DL_FUNC) &_patRoon_getMSMetadata, 2},
     {"_patRoon_readMSP", (DL_FUNC) &_patRoon_readMSP, 2},

@@ -73,6 +73,16 @@ Rcpp::DataFrame getMSSpectrum(const MSReadBackend &backend, int index)
 }
 
 // [[Rcpp::export]]
+std::vector<SpectrumRawTypes::Scan> getScans(MSReadBackend &backend, SpectrumRawTypes::Mass timeStart,
+                                             SpectrumRawTypes::Mass timeEnd, int MSLevel,
+                                             SpectrumRawTypes::Mass isoStart, SpectrumRawTypes::Mass isoEnd)
+{
+    return getSpecScanIndices(backend.getSpecMetadata(), NumRange<SpectrumRawTypes::Time>(timeStart, timeEnd),
+                              (MSLevel == 1) ? SpectrumRawTypes::MSLevel::MS1 : SpectrumRawTypes::MSLevel::MS2,
+                              NumRange<SpectrumRawTypes::Mass>(isoStart, isoEnd));
+}
+
+// [[Rcpp::export]]
 Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRawTypes::Mass> &startMZs,
                       const std::vector<SpectrumRawTypes::Mass> &endMZs)
 {
@@ -166,8 +176,8 @@ Rcpp::DataFrame getMSMetadata(MSReadBackend &backend, int msLevel)
     std::vector<SpectrumRawTypes::Mass> isolationMins(size), isolationMaxs(size);
     for (size_t i=0; i<size; ++i)
     {
-        isolationMins[i] = meta.second.isolationRanges[i].first;
-        isolationMaxs[i] = meta.second.isolationRanges[i].second;
+        isolationMins[i] = meta.second.isolationRanges[i].start;
+        isolationMaxs[i] = meta.second.isolationRanges[i].end;
     }
     
     return Rcpp::DataFrame::create(Rcpp::Named("time") = meta.second.times,

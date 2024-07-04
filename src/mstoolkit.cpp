@@ -18,13 +18,13 @@ MSReadBackend::ThreadDataType MSReadBackendMSTK::doGetThreadData(void) const
     return ret;
 }
 
-SpectrumRaw MSReadBackendMSTK::doReadSpectrum(const ThreadDataType &tdata, int index) const
+SpectrumRaw MSReadBackendMSTK::doReadSpectrum(const ThreadDataType &tdata, SpectrumRawTypes::Scan scan) const
 {
     MSToolkit::Spectrum s;
     auto *msr = reinterpret_cast<MSToolkit::MSReader *>(tdata.get());
     
-    if (!msr->readFile(getCurrentFile().c_str(), s, index) || s.getScanNumber() == 0)
-        Rcpp::stop("Abort: invalid spectrum index: %d", index);
+    if (!msr->readFile(getCurrentFile().c_str(), s, scan) || s.getScanNumber() == 0)
+        Rcpp::stop("Abort: invalid spectrum scan index: %d", scan);
 
     SpectrumRaw ret(s.getRTime(), s.size());
     for(int i=0; i<s.size(); ++i)
@@ -33,7 +33,7 @@ SpectrumRaw MSReadBackendMSTK::doReadSpectrum(const ThreadDataType &tdata, int i
     return ret;
 }
 
-const SpectrumRawMetadata &MSReadBackendMSTK::doGetSpectrumRawMetadata(void)
+const SpectrumRawMetadata &MSReadBackendMSTK::doGetSpectrumRawMetadata(void) const
 {
     if (!metadataLoaded && !getCurrentFile().empty())
     {

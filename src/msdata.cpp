@@ -86,11 +86,7 @@ std::vector<SpectrumRawTypes::Scan> getScans(const MSReadBackend &backend, Spect
 Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRawTypes::Mass> &startMZs,
                       const std::vector<SpectrumRawTypes::Mass> &endMZs)
 {
-    // UNDONE
-    std::vector<int> indices(300);
-    std::iota(indices.begin(), indices.end(), 1);
-    
-    // UNDONE
+    // UNDONE: keep this local here?
     struct EICPoint
     {
         SpectrumRawTypes::Time time;
@@ -111,14 +107,18 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         {
             ret.mzs[i] = ret.intensities[i] = 0.0;
 
-            for (size_t j = 0; j<spec.size(); ++j)
+            // NOTE: assume spec is mz sorted
+            const auto mzIt = std::lower_bound(spec.getMZs().begin(), spec.getMZs().end(), startMZs[i]);
+            if (mzIt == spec.getMZs().end())
+                continue;
+            
+            for (size_t j=std::distance(spec.getMZs().begin(), mzIt); j<spec.size(); ++j)
             {
                 const auto mz = spec.getMZs()[j];
                 
-                if (mz < startMZs[i])
-                    continue;
+                // NOTE: assume spec is mz sorted
                 if (mz > endMZs[i])
-                    break; // assume spec is mz sorted
+                    break; 
                 
                 const auto inten = spec.getIntensities()[j];
                 ret.intensities[i] += inten;
@@ -131,8 +131,9 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         
         return ret;
     };
-    
-    const auto EICPoints = applyMSData<std::vector<EICPoint>>(backend, indices, sfunc);
+
+    const auto &specMetaMS = backend.getSpecMetadata().first;
+    const auto EICPoints = applyMSData<std::vector<EICPoint>>(backend, specMetaMS.scans, sfunc);
     const auto EPSize = EICPoints.size();
     
     std::vector<SpectrumRawTypes::Time> times(EPSize);
@@ -154,7 +155,6 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                                          Rcpp::Named("intensity") = intensities,
                                          Rcpp::Named("mz") = mzs);
     }
-    
     
     return ret;
 }

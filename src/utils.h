@@ -2,6 +2,7 @@
 #define PATROON_UTILS_H
 
 #include <algorithm>
+#include <exception>
 #include <numeric>
 #include <string>
 #include <vector>
@@ -11,9 +12,9 @@ void rtrim(std::string &s);
 void trim(std::string &s);
 bool hasWS(const std::string &s);
 bool strStartsWith(const std::string &str, const std::string &pref);
-bool compareTol(double x, double y, double tol);
-bool numberLTE(double x, double y, double tol);
-bool numberGTE(double x, double y, double tol);
+bool compareTol(double x, double y, double tol = 1E-8);
+bool numberLTE(double x, double y, double tol = 1E-8);
+bool numberGTE(double x, double y, double tol = 1E-8);
 void normalizeNums(std::vector<double> &v);
 
 template <typename C> std::vector<size_t> getSortedInds(const C &cont)
@@ -71,6 +72,14 @@ public:
         if (exPtr)
             std::rethrow_exception(exPtr);
     }
+};
+
+template <typename T> struct NumRange
+{
+    T start, end;
+    NumRange(void) = default;
+    NumRange(T s, T e) : start(s), end(e) { }
+    bool inside(const NumRange &o, T tol = 1E-8) const { return numberGTE(start, o.start, tol) && numberLTE(end, o.end, tol); }
 };
 
 #endif

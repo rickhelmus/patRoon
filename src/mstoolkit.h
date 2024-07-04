@@ -29,7 +29,7 @@ protected:
 public:
     MSReadBackendMSTK(void) { ++backends; Rcpp::Rcout << "constr: backends:" << backends << "\n"; }
     MSReadBackendMSTK(const MSReadBackendMSTK &) = delete;
-    ~MSReadBackendMSTK(void) { --backends; Rcpp::Rcout << "destr: backends:" << backends << "\n"; };
+    ~MSReadBackendMSTK(void) { --backends; Rcpp::Rcout << "destr: backends:" << backends << "\n"; }
     
     int getBackends(void) const { return backends; }
 };

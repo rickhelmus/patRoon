@@ -13,18 +13,18 @@ protected:
 
 private:
     std::string currentFile;
-    SpectrumRawMetadata specMetadata;
+    mutable SpectrumRawMetadata specMetadata; // mutable to allow lazy loading
     
     virtual void doOpen(const std::string &file) = 0;
     virtual void doClose(void) = 0;
     virtual ThreadDataType doGetThreadData(void) const = 0;
-    virtual SpectrumRaw doReadSpectrum(const ThreadDataType &tdata, int index) const = 0;
+    virtual SpectrumRaw doReadSpectrum(const ThreadDataType &tdata, SpectrumRawTypes::Scan scan) const = 0;
     
 protected:
-    void emplaceSpecMeta(SpectrumRawMetadata &&msd) { specMetadata = std::move(msd); }
+    void emplaceSpecMeta(SpectrumRawMetadata &&msd) const { specMetadata = std::move(msd); }
     
-    // NOTE: not const: may lazy-load (eg MSTK) and not private to allow parent method calls
-    virtual const SpectrumRawMetadata &doGetSpectrumRawMetadata(void) { return specMetadata; }
+    // NOTE: not private to allow parent method calls
+    virtual const SpectrumRawMetadata &doGetSpectrumRawMetadata(void) const { return specMetadata; }
     
 public:
     virtual ~MSReadBackend(void) { close(); }
@@ -35,7 +35,7 @@ public:
 
     ThreadDataType getThreadData(void) const { return doGetThreadData(); }
     SpectrumRaw readSpectrum(const ThreadDataType &tdata, int index) const { return doReadSpectrum(tdata, index); };
-    const SpectrumRawMetadata &getSpecMetadata(void) { return doGetSpectrumRawMetadata(); }
+    const SpectrumRawMetadata &getSpecMetadata(void) const { return doGetSpectrumRawMetadata(); }
 };
 
 RCPP_EXPOSED_CLASS(MSReadBackend)

@@ -1,6 +1,10 @@
 #include <Rcpp.h>
 #include <vector>
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
 #include "msdata.h"
 #include "mstoolkit.h"
 #include "spectrum-raw.h"
@@ -10,14 +14,21 @@ namespace {
 template<typename OutType, typename FuncType>
 OutType applyMSData(const MSReadBackend &backend, const std::vector<SpectrumRawTypes::Scan> &scans, FuncType func)
 {
-    OutType ret;
-    
-    auto tdata = backend.getThreadData();
-    
-    for (auto i : scans)
+    OutType ret(scans.size());
+    ThreadExceptionHandler exHandler;
+
+    // UNDONE: make num_threads configurable
+    #pragma omp parallel num_threads(12)
     {
-        ret.push_back(func(backend.readSpectrum(tdata, i)));
+        auto tdata = backend.getThreadData();
+        #pragma omp for
+        for (size_t i=0; i<scans.size(); ++i)
+        {
+            exHandler.run([&]{ ret[i] = func(backend.readSpectrum(tdata, scans[i])); });
+        }
     }
+    
+    exHandler.reThrow();
     
     return ret;
 }
@@ -92,6 +103,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         SpectrumRawTypes::Time time;
         std::vector<SpectrumRawTypes::Mass> mzs;
         std::vector<SpectrumRawTypes::Intensity> intensities;
+        EICPoint(void) = default;
         EICPoint(size_t s) : mzs(s), intensities(s) { }
     };
     

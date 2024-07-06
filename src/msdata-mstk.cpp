@@ -3,7 +3,7 @@
 #include <iomanip>
 #include <cmath>
 
-#include "mstoolkit.h"
+#include "msdata-mstk.h"
 #include "spectrum-raw.h"
 
 int MSReadBackendMSTK::backends = 0;

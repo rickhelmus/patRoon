@@ -6,7 +6,7 @@
 #endif
 
 #include "msdata.h"
-#include "mstoolkit.h"
+#include "msdata-mstk.h"
 #include "spectrum-raw.h"
 
 namespace {

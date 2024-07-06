@@ -1,5 +1,5 @@
-#ifndef PATROON_MSTOOLKIT_H
-#define PATROON_MSTOOLKIT_H
+#ifndef PATROON_MSTK_H
+#define PATROON_MSTK_H
 
 #include <Rcpp.h>
 

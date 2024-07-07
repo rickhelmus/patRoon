@@ -26,7 +26,7 @@ SpectrumRaw MSReadBackendMSTK::doReadSpectrum(const ThreadDataType &tdata, Spect
     if (!msr->readFile(getCurrentFile().c_str(), s, scan) || s.getScanNumber() == 0)
         Rcpp::stop("Abort: invalid spectrum scan index: %d", scan);
 
-    SpectrumRaw ret(s.getRTime(), s.size());
+    SpectrumRaw ret(s.size());
     for(int i=0; i<s.size(); ++i)
         ret.setPeak(i, s.at(i).mz, s.at(i).intensity);
         

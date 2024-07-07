@@ -27,6 +27,8 @@ protected:
     virtual const SpectrumRawMetadata &doGetSpectrumRawMetadata(void) const { return specMetadata; }
     
 public:
+    MSReadBackend(void) = default;
+    MSReadBackend(const MSReadBackend &) = delete;
     virtual ~MSReadBackend(void) { }
     
     void open(const std::string &file);

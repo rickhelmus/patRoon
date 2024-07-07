@@ -6,6 +6,7 @@
 #endif
 
 #include "msdata.h"
+#include "msdata-mem.h"
 #include "msdata-mstk.h"
 #include "spectrum-raw.h"
 
@@ -60,6 +61,12 @@ RCPP_MODULE(MSReadBackend)
         .method("open", &MSReadBackend::open)
         .method("close", &MSReadBackend::close)
     ;
+    Rcpp::class_<MSReadBackendMem>("MSReadBackendMem")
+        .derives<MSReadBackend>("MSReadBackend")
+        .constructor()
+        .method("setSpecMetadata", &MSReadBackendMem::setSpecMetadata)
+        .method("setSpectra", &MSReadBackendMem::setSpectra)
+    ;
     Rcpp::class_<MSReadBackendMSTK>("MSReadBackendMSTK")
         .derives<MSReadBackend>("MSReadBackend")
         .constructor()
@@ -100,7 +107,6 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     // UNDONE: keep this local here?
     struct EICPoint
     {
-        SpectrumRawTypes::Time time;
         std::vector<SpectrumRawTypes::Mass> mzs;
         std::vector<SpectrumRawTypes::Intensity> intensities;
         EICPoint(void) = default;
@@ -113,8 +119,6 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     {
         EICPoint ret(EICCount);
         
-        ret.time = spec.getTime();
-
         for (size_t i=0; i<EICCount; ++i)
         {
             ret.mzs[i] = ret.intensities[i] = 0.0;
@@ -148,10 +152,6 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     const auto EICPoints = applyMSData<std::vector<EICPoint>>(backend, specMetaMS.scans, sfunc);
     const auto EPSize = EICPoints.size();
     
-    std::vector<SpectrumRawTypes::Time> times(EPSize);
-    for (size_t i=0; i<EPSize; ++i)
-        times[i] = EICPoints[i].time;
-    
     Rcpp::List ret(EICCount);
     for (size_t i=0; i<EICCount; ++i)
     {
@@ -163,7 +163,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
             intensities[j] = EICPoints[j].intensities[i];
         }
 
-        ret[i] = Rcpp::DataFrame::create(Rcpp::Named("time") = times,
+        ret[i] = Rcpp::DataFrame::create(Rcpp::Named("time") = specMetaMS.times,
                                          Rcpp::Named("intensity") = intensities,
                                          Rcpp::Named("mz") = mzs);
     }

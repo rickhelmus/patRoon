@@ -1,5 +1,11 @@
 # Priority
 
+## msdata
+- check assumptions about data being sorted
+    - meatadata: scans, RTs, mobilities
+    - spectra: m/z, (mobilities)
+- don't make open() required for memory backend (eg check flag instead of non-empty file in close())
+
 ## IMS
 
 - MT

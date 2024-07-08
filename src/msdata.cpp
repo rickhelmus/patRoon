@@ -8,6 +8,7 @@
 #include "msdata.h"
 #include "msdata-mem.h"
 #include "msdata-mstk.h"
+#include "msdata-sc.h"
 #include "spectrum-raw.h"
 
 namespace {
@@ -71,6 +72,10 @@ RCPP_MODULE(MSReadBackend)
         .derives<MSReadBackend>("MSReadBackend")
         .constructor()
         .method("getBackends", &MSReadBackendMSTK::getBackends)
+    ;
+    Rcpp::class_<MSReadBackendSC>("MSReadBackendSC")
+        .derives<MSReadBackend>("MSReadBackend")
+        .constructor()
     ;
 }
 

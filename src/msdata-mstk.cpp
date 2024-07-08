@@ -52,7 +52,7 @@ const SpectrumRawMetadata &MSReadBackendMSTK::doGetSpectrumRawMetadata(void) con
             
             SpectrumRawMetadataMS *curMS1MD = (isMS1) ? &meta.first : &meta.second;
             curMS1MD->scans.push_back(spec.getScanNumber());
-            curMS1MD->times.push_back(spec.getRTime());
+            curMS1MD->times.push_back(spec.getRTime() * 60); // NOTE: MSTK takes minutes
             curMS1MD->TICs.push_back(spec.getTIC());
             curMS1MD->BPCs.push_back(spec.getBPI());
             

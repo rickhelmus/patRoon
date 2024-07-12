@@ -2,6 +2,7 @@
 #define PATROON_SPECTRUM_RAW_H
 
 #include <stddef.h>
+#include <algorithm>
 #include <vector>
 
 #include "utils.h"
@@ -23,12 +24,30 @@ struct SpectrumRawMetadataMS
     std::vector<SpectrumRawTypes::Scan> scans;
     std::vector<SpectrumRawTypes::Time> times;
     std::vector<SpectrumRawTypes::Intensity> TICs, BPCs;
+    SpectrumRawMetadataMS(void) = default;
+    SpectrumRawMetadataMS(size_t s) : scans(s), times(s), TICs(s), BPCs(s) { }
     void clear(void) { scans.clear(); times.clear(); TICs.clear(); BPCs.clear(); }
+    void append(const SpectrumRawMetadataMS &other)
+    {
+        scans.insert(scans.end(), other.scans.begin(), other.scans.end());
+        times.insert(times.end(), other.times.begin(), other.times.end());
+        TICs.insert(TICs.end(), other.TICs.begin(), other.TICs.end());
+        BPCs.insert(BPCs.end(), other.BPCs.begin(), other.BPCs.end());
+    }
 };
 struct SpectrumRawMetadataMSMS: public SpectrumRawMetadataMS
 {
     std::vector<SpectrumRawTypes::IsolationRange> isolationRanges;
-    void clear(void) { SpectrumRawMetadataMS::clear(); isolationRanges.clear(); } // NOTE: not virtual
+    SpectrumRawMetadataMSMS(void) = default;
+    SpectrumRawMetadataMSMS(size_t s) : SpectrumRawMetadataMS(s), isolationRanges(s) { }
+    
+    // NOTE: not virtual, to keep the class simple
+    void clear(void) { SpectrumRawMetadataMS::clear(); isolationRanges.clear(); }
+    void append(const SpectrumRawMetadataMSMS &other)
+    {
+        SpectrumRawMetadataMS::append(other);
+        isolationRanges.insert(isolationRanges.end(), other.isolationRanges.begin(), other.isolationRanges.end());
+    }
 };
 using SpectrumRawMetadata = std::pair<SpectrumRawMetadataMS, SpectrumRawMetadataMSMS>;
 

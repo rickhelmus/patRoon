@@ -3,7 +3,7 @@
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -25,13 +25,13 @@
       <ul class="nav navbar-nav"><li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-     
+
   </a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Reference
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -44,7 +44,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Tutorial
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -57,7 +57,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Handbook
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -73,14 +73,14 @@
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/rickhelmus/patRoon" class="external-link">
     <span class="fa fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -95,316 +95,318 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre><code>groupTable(object, ...)
-
-groupFeatIndex(fGroups)
-
-groupInfo(fGroups)
-
-unique(x, incomparables = FALSE, ...)
-
-overlap(fGroups, which, exclusive = FALSE, ...)
-
-selectIons(fGroups, components, prefAdduct, ...)
-
-groupQualities(fGroups)
-
-groupScores(fGroups)
-
-internalStandards(fGroups)
-
-internalStandardAssignments(fGroups, ...)
-
-normInts(
-  fGroups,
-  featNorm = "none",
-  groupNorm = FALSE,
-  normFunc = max,
-  standards = NULL,
-  ISTDRTWindow = 120,
-  ISTDMZWindow = 300,
-  minISTDs = 3,
-  ...
-)
-
-# S4 method for featureGroups
-names(x)
-
-# S4 method for featureGroups
-analyses(obj)
-
-# S4 method for featureGroups
-replicateGroups(obj)
-
-# S4 method for featureGroups
-groupNames(obj)
-
-# S4 method for featureGroups
-length(x)
-
-# S4 method for featureGroups
-show(object)
-
-# S4 method for featureGroups
-groupTable(object, areas = FALSE, normalized = FALSE)
-
-# S4 method for featureGroups
-analysisInfo(obj)
-
-# S4 method for featureGroups
-groupInfo(fGroups)
-
-# S4 method for featureGroups
-featureTable(obj)
-
-# S4 method for featureGroups
-getFeatures(obj)
-
-# S4 method for featureGroups
-groupFeatIndex(fGroups)
-
-# S4 method for featureGroups
-groupQualities(fGroups)
-
-# S4 method for featureGroups
-groupScores(fGroups)
-
-# S4 method for featureGroups
-annotations(obj)
-
-# S4 method for featureGroups
-internalStandards(fGroups)
-
-# S4 method for featureGroups
-internalStandardAssignments(fGroups)
-
-# S4 method for featureGroups
-adducts(obj)
-
-# S4 method for featureGroups
-adducts(obj) &lt;- value
-
-# S4 method for featureGroups
-concentrations(fGroups)
-
-# S4 method for featureGroups
-toxicities(fGroups)
-
-# S4 method for featureGroups,ANY,ANY,missing
-[(x, i, j, ..., rGroups, results, drop = TRUE)
-
-# S4 method for featureGroups,ANY,ANY
-[[(x, i, j)
-
-# S4 method for featureGroups
-$(x, name)
-
-# S4 method for featureGroups
-delete(obj, i = NULL, j = NULL, ...)
-
-# S4 method for featureGroups
-export(obj, type, out)
-
-# S4 method for featureGroups
-as.data.table(
-  x,
-  average = FALSE,
-  areas = FALSE,
-  features = FALSE,
-  qualities = FALSE,
-  regression = FALSE,
-  averageFunc = mean,
-  normalized = FALSE,
-  FCParams = NULL,
-  concAggrParams = getDefPredAggrParams(),
-  toxAggrParams = getDefPredAggrParams(),
-  normConcToTox = FALSE
-)
-
-# S4 method for featureGroups
-unique(x, which, relativeTo = NULL, outer = FALSE)
-
-# S4 method for featureGroups
-overlap(fGroups, which, exclusive)
-
-# S4 method for featureGroups
-calculatePeakQualities(
-  obj,
-  weights,
-  flatnessFactor,
-  avgFunc = mean,
-  parallel = TRUE
-)
-
-# S4 method for featureGroups
-selectIons(
-  fGroups,
-  components,
-  prefAdduct,
-  onlyMonoIso = TRUE,
-  chargeMismatch = "adduct"
-)
-
-# S4 method for featureGroups
-normInts(
-  fGroups,
-  featNorm = "none",
-  groupNorm = FALSE,
-  normFunc = max,
-  standards = NULL,
-  ISTDRTWindow = 120,
-  ISTDMZWindow = 300,
-  minISTDs = 3,
-  ...
-)
-
-# S4 method for featureGroups
-getTICs(obj, retentionRange = NULL, MSLevel = c(1, 2))
-
-# S4 method for featureGroups
-getBPCs(obj, retentionRange = NULL, MSLevel = c(1, 2))
-
-# S4 method for featureGroupsSet
-sets(obj)
-
-# S4 method for featureGroupsSet
-internalStandardAssignments(fGroups, set = NULL)
-
-# S4 method for featureGroupsSet
-adducts(obj, set, ...)
-
-# S4 method for featureGroupsSet
-adducts(obj, set, reGroup = TRUE) &lt;- value
-
-# S4 method for featureGroupsSet
-delete(obj, i = NULL, j = NULL, ...)
-
-# S4 method for featureGroupsSet
-show(object)
-
-# S4 method for featureGroupsSet
-featureTable(obj)
-
-# S4 method for featureGroupsSet,ANY,ANY,missing
-[(x, i, j, ..., rGroups, sets = NULL, drop = TRUE)
-
-# S4 method for featureGroupsSet
-export(obj, type, out, set)
-
-# S4 method for featureGroupsSet
-unique(x, which, ..., sets = FALSE)
-
-# S4 method for featureGroupsSet
-overlap(fGroups, which, exclusive, sets = FALSE)
-
-# S4 method for featureGroupsSet
-selectIons(fGroups, components, prefAdduct, ...)
-
-# S4 method for featureGroupsSet
-normInts(
-  fGroups,
-  featNorm = "none",
-  groupNorm = FALSE,
-  normFunc = max,
-  standards = NULL,
-  ISTDRTWindow = 120,
-  ISTDMZWindow = 300,
-  minISTDs = 3,
-  ...
-)
-
-# S4 method for featureGroupsSet
-unset(obj, set)
-
-# S4 method for featureGroupsKPIC2
-delete(obj, ...)
-
-# S4 method for featureGroups
-plotTICs(
-  obj,
-  retentionRange = NULL,
-  MSLevel = 1,
-  retMin = FALSE,
-  title = NULL,
-  colourBy = c("none", "analyses", "rGroups"),
-  showLegend = TRUE,
-  xlim = NULL,
-  ylim = NULL,
-  ...
-)
-
-# S4 method for featureGroups
-plotBPCs(
-  obj,
-  retentionRange = NULL,
-  MSLevel = 1,
-  retMin = FALSE,
-  title = NULL,
-  colourBy = c("none", "analyses", "rGroups"),
-  showLegend = TRUE,
-  xlim = NULL,
-  ylim = NULL,
-  ...
-)
-
-# S4 method for featureGroupsXCMS
-delete(obj, ...)
-
-# S4 method for featureGroupsXCMS3
-delete(obj, ...)</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">groupTable</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">groupFeatIndex</span><span class="op">(</span><span class="va">fGroups</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">groupInfo</span><span class="op">(</span><span class="va">fGroups</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">unique</span><span class="op">(</span><span class="va">x</span>, incomparables <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">overlap</span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">which</span>, exclusive <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">selectIons</span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">components</span>, <span class="va">prefAdduct</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">groupQualities</span><span class="op">(</span><span class="va">fGroups</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">groupScores</span><span class="op">(</span><span class="va">fGroups</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">internalStandards</span><span class="op">(</span><span class="va">fGroups</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">internalStandardAssignments</span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">normInts</span><span class="op">(</span></span>
+<span>  <span class="va">fGroups</span>,</span>
+<span>  featNorm <span class="op">=</span> <span class="st">"none"</span>,</span>
+<span>  groupNorm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  normFunc <span class="op">=</span> <span class="va">max</span>,</span>
+<span>  standards <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ISTDRTWindow <span class="op">=</span> <span class="fl">120</span>,</span>
+<span>  ISTDMZWindow <span class="op">=</span> <span class="fl">300</span>,</span>
+<span>  minISTDs <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
+<span><span class="fu"><a href="generics.html">names</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
+<span><span class="fu"><a href="generics.html">analyses</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
+<span><span class="fu"><a href="generics.html">replicateGroups</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
+<span><span class="fu"><a href="generics.html">groupNames</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
+<span><span class="fu"><a href="generics.html">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
+<span><span class="fu"><a href="generics.html">show</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
+<span><span class="fu">groupTable</span><span class="op">(</span><span class="va">object</span>, areas <span class="op">=</span> <span class="cn">FALSE</span>, normalized <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
+<span><span class="fu"><a href="generics.html">analysisInfo</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
+<span><span class="fu">groupInfo</span><span class="op">(</span><span class="va">fGroups</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
+<span><span class="fu"><a href="generics.html">featureTable</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
+<span><span class="fu"><a href="generics.html">getFeatures</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
+<span><span class="fu">groupFeatIndex</span><span class="op">(</span><span class="va">fGroups</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
+<span><span class="fu">groupQualities</span><span class="op">(</span><span class="va">fGroups</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
+<span><span class="fu">groupScores</span><span class="op">(</span><span class="va">fGroups</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
+<span><span class="fu"><a href="generics.html">annotations</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
+<span><span class="fu">internalStandards</span><span class="op">(</span><span class="va">fGroups</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
+<span><span class="fu">internalStandardAssignments</span><span class="op">(</span><span class="va">fGroups</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
+<span><span class="fu"><a href="generics.html">adducts</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
+<span><span class="fu"><a href="generics.html">adducts</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
+<span><span class="fu">concentrations</span><span class="op">(</span><span class="va">fGroups</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
+<span><span class="fu">toxicities</span><span class="op">(</span><span class="va">fGroups</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups,ANY,ANY,missing'</span></span>
+<span><span class="va">x</span><span class="op">[</span><span class="va">i</span>, <span class="va">j</span>, <span class="va">...</span>, <span class="va">rGroups</span>, <span class="va">results</span>, drop <span class="op">=</span> <span class="cn">TRUE</span><span class="op">]</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups,ANY,ANY'</span></span>
+<span><span class="va">x</span><span class="op">[[</span><span class="va">i</span>, <span class="va">j</span><span class="op">]</span><span class="op">]</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
+<span><span class="va">x</span><span class="op">$</span><span class="va">name</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
+<span><span class="fu"><a href="generics.html">delete</a></span><span class="op">(</span><span class="va">obj</span>, i <span class="op">=</span> <span class="cn">NULL</span>, j <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
+<span><span class="fu"><a href="generics.html">export</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">type</span>, <span class="va">out</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
+<span><span class="fu"><a href="generics.html">as.data.table</a></span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  average <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  areas <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  features <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  qualities <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  regression <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  averageFunc <span class="op">=</span> <span class="va">mean</span>,</span>
+<span>  normalized <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  FCParams <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  concAggrParams <span class="op">=</span> <span class="fu"><a href="pred-aggr-params.html">getDefPredAggrParams</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  toxAggrParams <span class="op">=</span> <span class="fu"><a href="pred-aggr-params.html">getDefPredAggrParams</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  normConcToTox <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
+<span><span class="fu">unique</span><span class="op">(</span><span class="va">x</span>, <span class="va">which</span>, relativeTo <span class="op">=</span> <span class="cn">NULL</span>, outer <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
+<span><span class="fu">overlap</span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">which</span>, <span class="va">exclusive</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
+<span><span class="fu"><a href="generics.html">calculatePeakQualities</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  <span class="va">weights</span>,</span>
+<span>  <span class="va">flatnessFactor</span>,</span>
+<span>  avgFunc <span class="op">=</span> <span class="va">mean</span>,</span>
+<span>  parallel <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
+<span><span class="fu">selectIons</span><span class="op">(</span></span>
+<span>  <span class="va">fGroups</span>,</span>
+<span>  <span class="va">components</span>,</span>
+<span>  <span class="va">prefAdduct</span>,</span>
+<span>  onlyMonoIso <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  chargeMismatch <span class="op">=</span> <span class="st">"adduct"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
+<span><span class="fu">normInts</span><span class="op">(</span></span>
+<span>  <span class="va">fGroups</span>,</span>
+<span>  featNorm <span class="op">=</span> <span class="st">"none"</span>,</span>
+<span>  groupNorm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  normFunc <span class="op">=</span> <span class="va">max</span>,</span>
+<span>  standards <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ISTDRTWindow <span class="op">=</span> <span class="fl">120</span>,</span>
+<span>  ISTDMZWindow <span class="op">=</span> <span class="fl">300</span>,</span>
+<span>  minISTDs <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/patRoon/man/analysisinfo-dataframe.html" class="external-link">getTICs</a></span><span class="op">(</span><span class="va">obj</span>, retentionRange <span class="op">=</span> <span class="cn">NULL</span>, MSLevel <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/patRoon/man/analysisinfo-dataframe.html" class="external-link">getBPCs</a></span><span class="op">(</span><span class="va">obj</span>, retentionRange <span class="op">=</span> <span class="cn">NULL</span>, MSLevel <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroupsSet'</span></span>
+<span><span class="fu"><a href="generics.html">sets</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroupsSet'</span></span>
+<span><span class="fu">internalStandardAssignments</span><span class="op">(</span><span class="va">fGroups</span>, set <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroupsSet'</span></span>
+<span><span class="fu"><a href="generics.html">adducts</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">set</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroupsSet'</span></span>
+<span><span class="fu"><a href="generics.html">adducts</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">set</span>, reGroup <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroupsSet'</span></span>
+<span><span class="fu"><a href="generics.html">delete</a></span><span class="op">(</span><span class="va">obj</span>, i <span class="op">=</span> <span class="cn">NULL</span>, j <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroupsSet'</span></span>
+<span><span class="fu"><a href="generics.html">show</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroupsSet'</span></span>
+<span><span class="fu"><a href="generics.html">featureTable</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroupsSet,ANY,ANY,missing'</span></span>
+<span><span class="va">x</span><span class="op">[</span><span class="va">i</span>, <span class="va">j</span>, <span class="va">...</span>, <span class="va">rGroups</span>, sets <span class="op">=</span> <span class="cn">NULL</span>, drop <span class="op">=</span> <span class="cn">TRUE</span><span class="op">]</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroupsSet'</span></span>
+<span><span class="fu"><a href="generics.html">export</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">type</span>, <span class="va">out</span>, <span class="va">set</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroupsSet'</span></span>
+<span><span class="fu">unique</span><span class="op">(</span><span class="va">x</span>, <span class="va">which</span>, <span class="va">...</span>, sets <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroupsSet'</span></span>
+<span><span class="fu">overlap</span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">which</span>, <span class="va">exclusive</span>, sets <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroupsSet'</span></span>
+<span><span class="fu">selectIons</span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">components</span>, <span class="va">prefAdduct</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroupsSet'</span></span>
+<span><span class="fu">normInts</span><span class="op">(</span></span>
+<span>  <span class="va">fGroups</span>,</span>
+<span>  featNorm <span class="op">=</span> <span class="st">"none"</span>,</span>
+<span>  groupNorm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  normFunc <span class="op">=</span> <span class="va">max</span>,</span>
+<span>  standards <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ISTDRTWindow <span class="op">=</span> <span class="fl">120</span>,</span>
+<span>  ISTDMZWindow <span class="op">=</span> <span class="fl">300</span>,</span>
+<span>  minISTDs <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroupsSet'</span></span>
+<span><span class="fu"><a href="generics.html">unset</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">set</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroupsKPIC2'</span></span>
+<span><span class="fu"><a href="generics.html">delete</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/patRoon/man/analysisinfo-dataframe.html" class="external-link">plotTICs</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  retentionRange <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  MSLevel <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  retMin <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  colourBy <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"analyses"</span>, <span class="st">"rGroups"</span><span class="op">)</span>,</span>
+<span>  showLegend <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  xlim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/patRoon/man/analysisinfo-dataframe.html" class="external-link">plotBPCs</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  retentionRange <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  MSLevel <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  retMin <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  colourBy <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"analyses"</span>, <span class="st">"rGroups"</span><span class="op">)</span>,</span>
+<span>  showLegend <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  xlim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroupsXCMS'</span></span>
+<span><span class="fu"><a href="generics.html">delete</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroupsXCMS3'</span></span>
+<span><span class="fu"><a href="generics.html">delete</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>...</dt>
+
+
+<dl><dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>For the <code>"["</code> operator: ignored.</p>
 <p>For <code>delete</code>: passed to the function specified as <code>j</code>.</p>
 <p>For <code>normInts</code>: passed to <code><a href="suspect-screening.html">screenSuspects</a></code> if <code>featNorm="istd"</code>.</p>
 <p>For <a href="sets-workflow.html">sets workflow</a> methods: further arguments passed to the base <code>featureGroups</code> method.</p></dd>
 
 
-<dt>fGroups, obj, x, object</dt>
+<dt id="arg-fgroups-obj-x-object">fGroups, obj, x, object<a class="anchor" aria-label="anchor" href="#arg-fgroups-obj-x-object"></a></dt>
 <dd><p><code>featureGroups</code> object to be accessed.</p></dd>
 
 
-<dt>which</dt>
+<dt id="arg-which">which<a class="anchor" aria-label="anchor" href="#arg-which"></a></dt>
 <dd><p>A character vector with replicate groups used for comparison.</p>
 <p>For <code>overlap</code>: can also be a <code>list</code> of <code>character</code> vectors with replicate groups to compare. For
   instance, <code>which=list(c("samp1", "samp2"), c("samp3", "samp4"))</code> returns the overlap between
   <code>"samp1"</code>+<code>"samp2"</code> and <code>"samp3"</code>+<code>"samp4"</code>.</p></dd>
 
 
-<dt>exclusive</dt>
+<dt id="arg-exclusive">exclusive<a class="anchor" aria-label="anchor" href="#arg-exclusive"></a></dt>
 <dd><p>If <code>TRUE</code> then all feature groups are removed that are
 not unique to the given replicate groups.</p></dd>
 
 
-<dt>components</dt>
+<dt id="arg-components">components<a class="anchor" aria-label="anchor" href="#arg-components"></a></dt>
 <dd><p>The <code>components</code> object that was generated for the given <code>featureGroups</code> object.
 Obviously, the components must be created with algorithms that support adduct/isotope annotations, such as those
 from <span class="pkg">RAMClustR</span> and <span class="pkg">cliqueMS</span>.</p></dd>
 
 
-<dt>prefAdduct</dt>
+<dt id="arg-prefadduct">prefAdduct<a class="anchor" aria-label="anchor" href="#arg-prefadduct"></a></dt>
 <dd><p>The 'preferred adduct' (see method description). This is often <code>"[M+H]+"</code> or <code>"[M-H]-"</code>.</p></dd>
 
 
-<dt>featNorm</dt>
+<dt id="arg-featnorm">featNorm<a class="anchor" aria-label="anchor" href="#arg-featnorm"></a></dt>
 <dd><p>The method applied for feature normalization: <code>"istd"</code>, <code>"tic"</code>, <code>"conc"</code> or
 <code>"none"</code>. See the <code>Feature intensity normalization</code> section for details.</p></dd>
 
 
-<dt>groupNorm</dt>
+<dt id="arg-groupnorm">groupNorm<a class="anchor" aria-label="anchor" href="#arg-groupnorm"></a></dt>
 <dd><p>If <code>TRUE</code> then group normalization is performed. See the <code>Feature intensity normalization</code>
 section for details.</p></dd>
 
 
-<dt>normFunc</dt>
+<dt id="arg-normfunc">normFunc<a class="anchor" aria-label="anchor" href="#arg-normfunc"></a></dt>
 <dd><p>A <code>function</code> to combine data for normalization. See the <code>Feature intensity normalization</code>
 section for details.</p></dd>
 
 
-<dt>standards</dt>
+<dt id="arg-standards">standards<a class="anchor" aria-label="anchor" href="#arg-standards"></a></dt>
 <dd><p>A <code>data.table</code> (or <code>data.frame</code>) with all internal standards. Should follow the format of
   a <a href="suspect-screening.html">suspect list</a>. Only used if <code>featNorm="istd"</code>. See the <code>Feature intensity
   normalization</code> section for details.</p>
@@ -412,35 +414,35 @@ section for details.</p></dd>
 <p>See the <code>suspects</code> argument to <code><a href="suspect-screening.html">screenSuspects</a></code> for more details.</p></dd>
 
 
-<dt>ISTDRTWindow, ISTDMZWindow</dt>
+<dt id="arg-istdrtwindow-istdmzwindow">ISTDRTWindow, ISTDMZWindow<a class="anchor" aria-label="anchor" href="#arg-istdrtwindow-istdmzwindow"></a></dt>
 <dd><p>The retention time and <em>m/z</em> windows for IS selection. Only used if
 <code>featNorm="istd"</code>. See the <code>Feature intensity normalization</code> section for details.</p></dd>
 
 
-<dt>minISTDs</dt>
+<dt id="arg-ministds">minISTDs<a class="anchor" aria-label="anchor" href="#arg-ministds"></a></dt>
 <dd><p>The minimum number of IS that should be assigned to each feature (if possible). Only used if
 <code>featNorm="istd"</code>. See the <code>Feature intensity normalization</code> section for details.</p></dd>
 
 
-<dt>areas</dt>
+<dt id="arg-areas">areas<a class="anchor" aria-label="anchor" href="#arg-areas"></a></dt>
 <dd><p>If set to <code>TRUE</code> then areas are considered instead of peak intensities.</p>
 <p>For <code>as.data.table</code>: ignored if <code>features=TRUE</code>, as areas of features are always reported.</p></dd>
 
 
-<dt>normalized</dt>
+<dt id="arg-normalized">normalized<a class="anchor" aria-label="anchor" href="#arg-normalized"></a></dt>
 <dd><p>If <code>TRUE</code> then normalized intensity data is used (see the <code>Feature intensity
   normalization</code> section.</p>
 <p>For <code>as.data.table</code>: if no normalization data is available (<em>e.g.</em> because <code>normInts</code> was not used)
   then an automatic group normalization is performed.</p></dd>
 
 
-<dt>value</dt>
+<dt id="arg-value">value<a class="anchor" aria-label="anchor" href="#arg-value"></a></dt>
 <dd><p>For <code>adducts&lt;-</code>: A <code>character</code> with adduct annotations assigned to each feature group. The
 length should equal the number of feature groups. Can be named with feature group names to customize the assignment
 order.</p></dd>
 
 
-<dt>i, j</dt>
+<dt id="arg-i-j">i, j<a class="anchor" aria-label="anchor" href="#arg-i-j"></a></dt>
 <dd><p>For <code>[</code>/<code>[[</code>: A numeric or character value which is used to select analyses/feature groups by
 their index or name, respectively (for the order/names see <code>analyses()/names()</code>).<br><br> For <code>[</code>: Can also be logical to perform logical selection
 (similar to regular vectors). If missing all analyses/feature groups are selected.<br><br> For <code>[[</code>: should be a scalar value. If <code>j</code> is not specified, <code>i</code> selects by feature groups instead.<br><br> For <code>delete</code>: The data to remove from. <code>i</code> are the
@@ -450,52 +452,52 @@ with a vector of the group intensities, the group name and any other arguments p
 function specifies the analyses of the features in the group to be removed (same format as <code>i</code>).</p></dd>
 
 
-<dt>rGroups</dt>
+<dt id="arg-rgroups">rGroups<a class="anchor" aria-label="anchor" href="#arg-rgroups"></a></dt>
 <dd><p>For <code>[</code>: An optional <code>character</code> vector: if specified only keep results for the given
 replicate groups (equivalent to the <code>rGroups</code> argument to <code><a href="feature-filtering.html">filter</a></code>).</p></dd>
 
 
-<dt>results</dt>
+<dt id="arg-results">results<a class="anchor" aria-label="anchor" href="#arg-results"></a></dt>
 <dd><p>Optional argument. If specified only feature groups with results in the specified object are kept. The
 class of <code>results</code> should be <code><a href="featureAnnotations-class.html">featureAnnotations</a></code> or <code><a href="components-class.html">components</a></code>. Multiple objects
 can be specified in a <code>list</code>: in this case a feature group is kept if it has a result in <em>any</em> of the
 objects (equivalent to the <code>results</code> argument to <code><a href="feature-filtering.html">filter</a></code>).</p></dd>
 
 
-<dt>drop</dt>
+<dt id="arg-drop">drop<a class="anchor" aria-label="anchor" href="#arg-drop"></a></dt>
 <dd><p>ignored.</p></dd>
 
 
-<dt>name</dt>
+<dt id="arg-name">name<a class="anchor" aria-label="anchor" href="#arg-name"></a></dt>
 <dd><p>The feature group name (partially matched).</p></dd>
 
 
-<dt>type</dt>
+<dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
 <dd><p>The export type: <code>"brukerpa"</code> (Bruker ProfileAnalysis), <code>"brukertasq"</code> (Bruker TASQ) or
 <code>"mzmine"</code> (MZmine).</p></dd>
 
 
-<dt>out</dt>
+<dt id="arg-out">out<a class="anchor" aria-label="anchor" href="#arg-out"></a></dt>
 <dd><p>The destination file for the exported data.</p></dd>
 
 
-<dt>average</dt>
+<dt id="arg-average">average<a class="anchor" aria-label="anchor" href="#arg-average"></a></dt>
 <dd><p>If <code>TRUE</code> then data within replicate groups are averaged.</p>
 <p>For <code>as.data.table</code>: if <code>features=TRUE</code> other feature properties are also averaged.</p></dd>
 
 
-<dt>features</dt>
+<dt id="arg-features">features<a class="anchor" aria-label="anchor" href="#arg-features"></a></dt>
 <dd><p>If <code>TRUE</code> then feature specific data will be added. If <code>average=TRUE</code> this data will be
 averaged for each feature group.</p></dd>
 
 
-<dt>qualities</dt>
+<dt id="arg-qualities">qualities<a class="anchor" aria-label="anchor" href="#arg-qualities"></a></dt>
 <dd><p>Adds feature (group) qualities (<code>qualities="quality"</code>), scores (<code>qualities="score"</code>) or
 both (<code>qualities="both"</code>), if this data is available (<em>i.e.</em> from <code>calculatePeakQualities</code>). If
 <code>qualities=FALSE</code> then nothing is reported.</p></dd>
 
 
-<dt>regression</dt>
+<dt id="arg-regression">regression<a class="anchor" aria-label="anchor" href="#arg-regression"></a></dt>
 <dd><p>Set to <code>TRUE</code> to add regression data for each feature group. For this a linear model is
 created (intensity/area [depending on <code>areas</code> argument] <em>vs</em> concentration). The model concentrations
 (e.g. of a set of standards) is derived from the <code>conc</code> column of the <a href="analysis-information.html">analysis
@@ -505,65 +507,65 @@ no <code>conc</code> column is present in the analysis information or when less 
 (<em>i.e.</em> the minimum amount).</p></dd>
 
 
-<dt>averageFunc</dt>
+<dt id="arg-averagefunc">averageFunc<a class="anchor" aria-label="anchor" href="#arg-averagefunc"></a></dt>
 <dd><p>Function used for averaging. Only used when <code>average=TRUE</code> or <code>FCParams != NULL</code>.</p></dd>
 
 
-<dt>FCParams</dt>
+<dt id="arg-fcparams">FCParams<a class="anchor" aria-label="anchor" href="#arg-fcparams"></a></dt>
 <dd><p>A parameter list to calculate Fold change data. See <code>getFCParams</code> for more details. Set to
 <code>NULL</code> to not perform FC calculations.</p></dd>
 
 
-<dt>concAggrParams, toxAggrParams</dt>
+<dt id="arg-concaggrparams-toxaggrparams">concAggrParams, toxAggrParams<a class="anchor" aria-label="anchor" href="#arg-concaggrparams-toxaggrparams"></a></dt>
 <dd><p>Parameters to aggregate calculated concentrations/toxicities (obtained with
 <code><a href="pred-quant.html">calculateConcs</a></code>/<code><a href="pred-tox.html">calculateTox</a></code>). See <a href="pred-aggr-params.html">prediction aggregation
 parameters</a> for more information. Set to <code>NULL</code> to omit this data.</p></dd>
 
 
-<dt>normConcToTox</dt>
+<dt id="arg-normconctotox">normConcToTox<a class="anchor" aria-label="anchor" href="#arg-normconctotox"></a></dt>
 <dd><p>Set to <code>TRUE</code> to normalize concentrations to toxicities. Only relevant if this data is
 present (see <code><a href="pred-quant.html">calculateConcs</a></code>/<code><a href="pred-tox.html">calculateTox</a></code>).</p></dd>
 
 
-<dt>relativeTo</dt>
+<dt id="arg-relativeto">relativeTo<a class="anchor" aria-label="anchor" href="#arg-relativeto"></a></dt>
 <dd><p>A character vector with replicate groups that should be
 used for unique comparison. If <code>NULL</code> then all replicate groups are
 used for comparison. Replicate groups specified in <code>which</code> are
 ignored.</p></dd>
 
 
-<dt>outer</dt>
+<dt id="arg-outer">outer<a class="anchor" aria-label="anchor" href="#arg-outer"></a></dt>
 <dd><p>If <code>TRUE</code> then only feature groups are kept which do not
 overlap between the specified replicate groups for the <code>which</code>
 parameter.</p></dd>
 
 
-<dt>weights</dt>
+<dt id="arg-weights">weights<a class="anchor" aria-label="anchor" href="#arg-weights"></a></dt>
 <dd><p>A named <code>numeric</code> vector that defines the weight for each score to calculate the
 <code>totalScore</code>. The names of the vector follow the score names. Unspecified weights are defaulted to <samp>1</samp>.
 Example: <code>weights=c(ApexBoundaryRatioScore=0.5, GaussianSimilarityScore=2)</code>.</p></dd>
 
 
-<dt>flatnessFactor</dt>
+<dt id="arg-flatnessfactor">flatnessFactor<a class="anchor" aria-label="anchor" href="#arg-flatnessfactor"></a></dt>
 <dd><p>Passed to <span class="pkg">MetaClean</span> as the <code>flatness.factor</code> argument to
 <code><a href="https://rdrr.io/pkg/MetaClean/man/calculateJaggedness.html" class="external-link">calculateJaggedness</a></code> and <code><a href="https://rdrr.io/pkg/MetaClean/man/calculateModality.html" class="external-link">calculateModality</a></code>.</p></dd>
 
 
-<dt>avgFunc</dt>
+<dt id="arg-avgfunc">avgFunc<a class="anchor" aria-label="anchor" href="#arg-avgfunc"></a></dt>
 <dd><p>The function used to average the peak qualities and scores for each feature group.</p></dd>
 
 
-<dt>parallel</dt>
+<dt id="arg-parallel">parallel<a class="anchor" aria-label="anchor" href="#arg-parallel"></a></dt>
 <dd><p>If set to <code>TRUE</code> then code is executed in parallel through the <a href="https://CRAN.R-project.org/package=futures" class="external-link"><span class="pkg">futures</span></a> package. Please
 see the parallelization section in the handbook for more details.</p></dd>
 
 
-<dt>onlyMonoIso</dt>
+<dt id="arg-onlymonoiso">onlyMonoIso<a class="anchor" aria-label="anchor" href="#arg-onlymonoiso"></a></dt>
 <dd><p>Set to <code>TRUE</code> to only keep feature groups that were annotated as monoisotopic. Feature groups
 are never removed by this setting if no isotope annotations are available.</p></dd>
 
 
-<dt>chargeMismatch</dt>
+<dt id="arg-chargemismatch">chargeMismatch<a class="anchor" aria-label="anchor" href="#arg-chargemismatch"></a></dt>
 <dd><p>Specifies how to deal with a mismatch in charge between adduct and isotope annotations. Valid
 values are: <code>"adduct"</code> (ignore isotope annotation), <code>"isotope"</code> (ignore adduct annotation), <code>"none"</code>
 (ignore both annotations) and <code>"ignore"</code> (don't check for charge mismatches). <em>Important</em>: when
@@ -571,71 +573,62 @@ values are: <code>"adduct"</code> (ignore isotope annotation), <code>"isotope"</
 Hence, in such case setting <code>chargeMismatch="adduct"</code> is more appropriate.</p></dd>
 
 
-<dt>retentionRange</dt>
+<dt id="arg-retentionrange">retentionRange<a class="anchor" aria-label="anchor" href="#arg-retentionrange"></a></dt>
 <dd><p>Range of retention time (in seconds) to collect TIC traces.
-Should be a numeric vector with length of two containing the min/max values. 
+Should be a numeric vector with length of two containing the min/max values.
 Set to NULL to ignore.</p></dd>
 
 
-<dt>MSLevel</dt>
-<dd><p>Integer vector with the ms levels (i.e., 1 for MS1 and 2 for MS2) 
+<dt id="arg-mslevel">MSLevel<a class="anchor" aria-label="anchor" href="#arg-mslevel"></a></dt>
+<dd><p>Integer vector with the ms levels (i.e., 1 for MS1 and 2 for MS2)
 to obtain TIC traces.</p></dd>
 
 
-<dt>set</dt>
+<dt id="arg-set">set<a class="anchor" aria-label="anchor" href="#arg-set"></a></dt>
 <dd><p>(<strong>sets workflow</strong>) The name of the set.</p></dd>
 
 
-<dt>reGroup</dt>
+<dt id="arg-regroup">reGroup<a class="anchor" aria-label="anchor" href="#arg-regroup"></a></dt>
 <dd><p>(<strong>sets workflow</strong>) Set to <code>TRUE</code> to re-group the features after the adduct annotations are changed. See the
 <code>Sets workflow</code> section for more details.</p></dd>
 
 
-<dt>sets</dt>
+<dt id="arg-sets">sets<a class="anchor" aria-label="anchor" href="#arg-sets"></a></dt>
 <dd><p>(<strong>sets workflow</strong>) For <code>[</code>: a <code>character</code> with name(s) of the sets to keep.</p>
 <p>For <code>overlap</code> and <code>unique</code>: If <code>TRUE</code> then the <code>which</code> argument changes its meaning and is used
   to specify the names of the sets to be compared.</p></dd>
 
 
-<dt>retMin</dt>
+<dt id="arg-retmin">retMin<a class="anchor" aria-label="anchor" href="#arg-retmin"></a></dt>
 <dd><p>Plot retention time in minutes (instead of seconds).</p></dd>
 
 
-<dt>title</dt>
+<dt id="arg-title">title<a class="anchor" aria-label="anchor" href="#arg-title"></a></dt>
 <dd><p>Character string used for title of the plot. If <code>NULL</code> a title will be automatically generated.</p></dd>
 
 
-<dt>colourBy</dt>
-<dd><p>Sets the automatic colour selection: "none" for a single 
+<dt id="arg-colourby">colourBy<a class="anchor" aria-label="anchor" href="#arg-colourby"></a></dt>
+<dd><p>Sets the automatic colour selection: "none" for a single
 colour or "analyses"/"rGroups" for a distinct colour per analysis or analysis replicate group.</p></dd>
 
 
-<dt>showLegend</dt>
+<dt id="arg-showlegend">showLegend<a class="anchor" aria-label="anchor" href="#arg-showlegend"></a></dt>
 <dd><p>Plot a legend if TRUE.</p></dd>
 
 
-<dt>xlim, ylim</dt>
+<dt id="arg-xlim-ylim">xlim, ylim<a class="anchor" aria-label="anchor" href="#arg-xlim-ylim"></a></dt>
 <dd><p>Sets the plot size limits used by
 <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></code>. Set to <code>NULL</code> for automatic plot sizing.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p><code>delete</code> returns the object for which the specified data was removed.</p>
-
-
+    <p><code>delete</code> returns the object for which the specified data was removed.</p>
 <p><code>calculatePeakQualities</code> returns a modified object amended with peak qualities and scores.</p>
-
-
 <p><code>selectIons</code> returns a <code>featureGroups</code> object with only the selected feature groups and amended
   with adduct annotations.</p>
-
-
-<p><code>normInts</code> returns a <code>featureGroups</code> object, amended with data in the <code>ISTDs</code> and</p>
-<p></p>
-<p><code>ISTDAssignments</code> slots if <code>featNorm="istd"</code>.</p>
+<p><code>normInts</code> returns a <code>featureGroups</code> object, amended with data in the <code>ISTDs</code> and
+  <code>ISTDAssignments</code> slots if <code>featNorm="istd"</code>.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -647,7 +640,7 @@ features across analyses.</p>
     </div>
     <div id="methods-by-generic-">
     <h2>Methods (by generic)</h2>
-    
+
 <ul><li><p><code>names(featureGroups)</code>: Obtain feature group names.</p></li>
 <li><p><code>analyses(featureGroups)</code>: returns a <code>character</code> vector with the names of the
 analyses for which data is present in this object.</p></li>
@@ -716,7 +709,7 @@ all features within a feature group. See the <code>Feature intensity normalizati
 </ul></div>
     <div id="slots">
     <h2>Slots</h2>
-    
+
 
 <dl><dt><code>groups</code></dt>
 <dd><p>Matrix (<code>data.table</code>) with intensities for each feature group (columns) per analysis (rows).
@@ -895,15 +888,15 @@ by <code>adducts&lt;-</code> and <code>selectIons</code> when these methods perf
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

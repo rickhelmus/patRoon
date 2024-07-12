@@ -3,7 +3,7 @@
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -25,13 +25,13 @@
       <ul class="nav navbar-nav"><li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-     
+
   </a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Reference
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -44,7 +44,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Tutorial
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -57,7 +57,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Handbook
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -73,14 +73,14 @@
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/rickhelmus/patRoon" class="external-link">
     <span class="fa fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -97,22 +97,22 @@
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">comparison</span><span class="op">(</span><span class="va">...</span>, <span class="va">groupAlgo</span>, groupArgs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>rtalign <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for featureGroups</span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
 <span><span class="fu">comparison</span><span class="op">(</span><span class="va">...</span>, <span class="va">groupAlgo</span>, groupArgs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>rtalign <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for featureGroupsComparison,missing</span></span>
+<span><span class="co"># S4 method for class 'featureGroupsComparison,missing'</span></span>
 <span><span class="fu"><a href="generics.html">plot</a></span><span class="op">(</span><span class="va">x</span>, retMin <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for featureGroupsComparison</span></span>
+<span><span class="co"># S4 method for class 'featureGroupsComparison'</span></span>
 <span><span class="fu"><a href="generics.html">plotVenn</a></span><span class="op">(</span><span class="va">obj</span>, which <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for featureGroupsComparison</span></span>
+<span><span class="co"># S4 method for class 'featureGroupsComparison'</span></span>
 <span><span class="fu"><a href="generics.html">plotUpSet</a></span><span class="op">(</span><span class="va">obj</span>, which <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for featureGroupsComparison</span></span>
+<span><span class="co"># S4 method for class 'featureGroupsComparison'</span></span>
 <span><span class="fu"><a href="generics.html">plotChord</a></span><span class="op">(</span><span class="va">obj</span>, addSelfLinks <span class="op">=</span> <span class="cn">FALSE</span>, addRetMzPlots <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for featureGroupsComparison</span></span>
+<span><span class="co"># S4 method for class 'featureGroupsComparison'</span></span>
 <span><span class="fu"><a href="generics.html">consensus</a></span><span class="op">(</span></span>
 <span>  <span class="va">obj</span>,</span>
 <span>  absMinAbundance <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -122,16 +122,18 @@
 <span>  verifyAnaInfo <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for featureGroupsSet</span></span>
+<span><span class="co"># S4 method for class 'featureGroupsSet'</span></span>
 <span><span class="fu">comparison</span><span class="op">(</span><span class="va">...</span>, <span class="va">groupAlgo</span>, groupArgs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>rtalign <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for featureGroupsComparisonSet</span></span>
+<span><span class="co"># S4 method for class 'featureGroupsComparisonSet'</span></span>
 <span><span class="fu"><a href="generics.html">consensus</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>...</dt>
+
+
+<dl><dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>For <code>comparison</code>: <code>featureGroups</code> objects that should
   be compared. If the arguments are named (<em>e.g.</em> <code>myGroups =
   fGroups</code>) then these are used for labelling, otherwise objects are
@@ -144,42 +146,42 @@
   method defined for <code><a href="featureGroups-class.html">featureGroups</a></code>.</p></dd>
 
 
-<dt>groupAlgo</dt>
+<dt id="arg-groupalgo">groupAlgo<a class="anchor" aria-label="anchor" href="#arg-groupalgo"></a></dt>
 <dd><p>The <code><a href="groupFeatures.html">feature grouping
 algorithm</a></code> that should be used for grouping <em>pseudo</em> features (see
 details). Valid values are: <code>"xcms"</code>, <code>xcms3</code>, <code>kpic2</code> or <code>"openms"</code>.</p></dd>
 
 
-<dt>groupArgs</dt>
+<dt id="arg-groupargs">groupArgs<a class="anchor" aria-label="anchor" href="#arg-groupargs"></a></dt>
 <dd><p>A <code>list</code> containing further parameters for
 <code><a href="groupFeatures.html">feature grouping</a></code>.</p></dd>
 
 
-<dt>x, obj</dt>
+<dt id="arg-x-obj">x, obj<a class="anchor" aria-label="anchor" href="#arg-x-obj"></a></dt>
 <dd><p>The <code>featureGroupsComparison</code> object.</p></dd>
 
 
-<dt>retMin</dt>
+<dt id="arg-retmin">retMin<a class="anchor" aria-label="anchor" href="#arg-retmin"></a></dt>
 <dd><p>If <code>TRUE</code> retention times are plotted as minutes (seconds otherwise).</p></dd>
 
 
-<dt>which</dt>
+<dt id="arg-which">which<a class="anchor" aria-label="anchor" href="#arg-which"></a></dt>
 <dd><p>A character vector specifying one or more labels of compared
 feature groups. For <code>plotVenn</code>: if <code>NULL</code> then all compared
 groups are used.</p></dd>
 
 
-<dt>addSelfLinks</dt>
+<dt id="arg-addselflinks">addSelfLinks<a class="anchor" aria-label="anchor" href="#arg-addselflinks"></a></dt>
 <dd><p>If <code>TRUE</code> then 'self-links' are added which
 represent non-shared data.</p></dd>
 
 
-<dt>addRetMzPlots</dt>
+<dt id="arg-addretmzplots">addRetMzPlots<a class="anchor" aria-label="anchor" href="#arg-addretmzplots"></a></dt>
 <dd><p>Set to <code>TRUE</code> to enable <em>m/z</em> <em>vs</em>
 retention time scatter plots.</p></dd>
 
 
-<dt>absMinAbundance, relMinAbundance</dt>
+<dt id="arg-absminabundance-relminabundance">absMinAbundance, relMinAbundance<a class="anchor" aria-label="anchor" href="#arg-absminabundance-relminabundance"></a></dt>
 <dd><p>Minimum absolute or relative
 (<samp>0-1</samp>) abundance across objects for a result to be kept. For
 instance, <code>relMinAbundance=0.5</code> means that a result should be present
@@ -188,7 +190,7 @@ ignore and keep all results. Limits cannot be set when <code>uniqueFrom</code> i
 not <code>NULL</code>.</p></dd>
 
 
-<dt>uniqueFrom</dt>
+<dt id="arg-uniquefrom">uniqueFrom<a class="anchor" aria-label="anchor" href="#arg-uniquefrom"></a></dt>
 <dd><p>Set this argument to only retain feature groups that are unique
 within one or more of the objects for which the consensus is made.
 Selection is done by setting the value of <code>uniqueFrom</code> to a
@@ -198,13 +200,13 @@ Selection is done by setting the value of <code>uniqueFrom</code> to a
 of the objects given for the consensus. Set to <code>NULL</code> to ignore.</p></dd>
 
 
-<dt>uniqueOuter</dt>
+<dt id="arg-uniqueouter">uniqueOuter<a class="anchor" aria-label="anchor" href="#arg-uniqueouter"></a></dt>
 <dd><p>If <code>uniqueFrom</code> is not <code>NULL</code> and if
 <code>uniqueOuter=TRUE</code>: only retain data that are also unique between
 objects specified in <code>uniqueFrom</code>.</p></dd>
 
 
-<dt>verifyAnaInfo</dt>
+<dt id="arg-verifyanainfo">verifyAnaInfo<a class="anchor" aria-label="anchor" href="#arg-verifyanainfo"></a></dt>
 <dd><p>If <code>FALSE</code> then the analysis information is not verified to be equal for all compared
 objects. This is mainly only useful when the data is the same but stored in different formats (<em>e.g.</em>
 <code>mzXML</code>/<code>mzML</code>).</p></dd>
@@ -212,25 +214,15 @@ objects. This is mainly only useful when the data is the same but stored in diff
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p><code>comparison</code> returns a <code><a href="featureGroupsComparison-class.html">featureGroupsComparison</a></code></p>
-
-
-<p>object.</p>
-
-
+    <p><code>comparison</code> returns a <code><a href="featureGroupsComparison-class.html">featureGroupsComparison</a></code>
+  object.</p>
 <p><code>plotVenn</code> (invisibly) returns a list with the following fields:</p><ul><li><p><code>gList</code> the <code>gList</code> object that was returned by
   the utilized <span class="pkg">VennDiagram</span> plotting function.</p></li>
 <li><p><code>areas</code> The total area for each plotted group.</p></li>
 <li><p><code>intersectionCounts</code> The number of intersections between groups.</p></li>
 </ul><p>The order for the <code>areas</code> and <code>intersectionCounts</code> fields is the same as the parameter order
-from the used plotting function (see <em>e.g.</em></p>
-<p></p>
-<p><code>draw.pairwise.venn</code> and
+from the used plotting function (see <em>e.g.</em> <code>draw.pairwise.venn</code> and
 <code>draw.triple.venn</code>).</p>
-
-
 <p><code>consensus</code> returns a <code><a href="featureGroups-class.html">featureGroups</a></code> object with a consensus from the compared feature
   groups.</p>
     </div>
@@ -272,15 +264,15 @@ output and generate a consensus.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

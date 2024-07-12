@@ -3,7 +3,7 @@
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -25,13 +25,13 @@
       <ul class="nav navbar-nav"><li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-     
+
   </a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Reference
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -44,7 +44,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Tutorial
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -57,7 +57,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Handbook
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -73,14 +73,14 @@
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/rickhelmus/patRoon" class="external-link">
     <span class="fa fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -97,7 +97,7 @@
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">replicateGroupSubtract</span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">rGroups</span>, threshold <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for featureGroups</span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
 <span><span class="fu"><a href="generics.html">filter</a></span><span class="op">(</span></span>
 <span>  <span class="va">obj</span>,</span>
 <span>  absMinIntensity <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -136,7 +136,7 @@
 <span>  negate <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for featureGroupsSet</span></span>
+<span><span class="co"># S4 method for class 'featureGroupsSet'</span></span>
 <span><span class="fu"><a href="generics.html">filter</a></span><span class="op">(</span></span>
 <span>  <span class="va">obj</span>,</span>
 <span>  <span class="va">...</span>,</span>
@@ -146,87 +146,89 @@
 <span>  relMinSets <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for featureGroups</span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
 <span><span class="fu">replicateGroupSubtract</span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">rGroups</span>, threshold <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>fGroups, obj</dt>
+
+
+<dl><dt id="arg-fgroups-obj">fGroups, obj<a class="anchor" aria-label="anchor" href="#arg-fgroups-obj"></a></dt>
 <dd><p><code><a href="featureGroups-class.html">featureGroups</a></code> object to which the filter is applied.</p></dd>
 
 
-<dt>rGroups</dt>
+<dt id="arg-rgroups">rGroups<a class="anchor" aria-label="anchor" href="#arg-rgroups"></a></dt>
 <dd><p>A character vector of replicate groups that should be kept (<code>filter</code>) or subtracted from
 (<code>replicateGroupSubtract</code>).</p></dd>
 
 
-<dt>threshold</dt>
+<dt id="arg-threshold">threshold<a class="anchor" aria-label="anchor" href="#arg-threshold"></a></dt>
 <dd><p>Minimum relative threshold (compared to mean intensity of
 replicate group being subtracted) for a feature group to be <em>not</em>
 removed. When <samp>0</samp> a feature group is always removed when present in
 the given replicate groups.</p></dd>
 
 
-<dt>absMinIntensity, relMinIntensity</dt>
+<dt id="arg-absminintensity-relminintensity">absMinIntensity, relMinIntensity<a class="anchor" aria-label="anchor" href="#arg-absminintensity-relminintensity"></a></dt>
 <dd><p>Minimum absolute/relative intensity for features to be kept. The relative
 intensity is determined from the feature with highest intensity (of
 all features from all groups). Set to <samp>0</samp> or <code>NULL</code> to skip this step.</p></dd>
 
 
-<dt>preAbsMinIntensity, preRelMinIntensity</dt>
+<dt id="arg-preabsminintensity-prerelminintensity">preAbsMinIntensity, preRelMinIntensity<a class="anchor" aria-label="anchor" href="#arg-preabsminintensity-prerelminintensity"></a></dt>
 <dd><p>As <code>absMinIntensity</code>/<code>relMinIntensity</code>, but applied
 <em>before</em> any other filters. This is typically used to speed-up subsequent filter steps. However, care must be
 taken that a sufficiently low value is chosen that is not expected to affect subsequent filtering steps. See below
 why this may be important.</p></dd>
 
 
-<dt>absMinAnalyses, relMinAnalyses</dt>
+<dt id="arg-absminanalyses-relminanalyses">absMinAnalyses, relMinAnalyses<a class="anchor" aria-label="anchor" href="#arg-absminanalyses-relminanalyses"></a></dt>
 <dd><p>Feature groups are only kept when they contain data for at least this (absolute
 or relative) amount of analyses. Set to <code>NULL</code> to ignore.</p></dd>
 
 
-<dt>absMinReplicates, relMinReplicates</dt>
+<dt id="arg-absminreplicates-relminreplicates">absMinReplicates, relMinReplicates<a class="anchor" aria-label="anchor" href="#arg-absminreplicates-relminreplicates"></a></dt>
 <dd><p>Feature groups are only kept when they contain data for at least this
 (absolute or relative) amount of replicates. Set to <code>NULL</code> to ignore.</p></dd>
 
 
-<dt>absMinFeatures, relMinFeatures</dt>
+<dt id="arg-absminfeatures-relminfeatures">absMinFeatures, relMinFeatures<a class="anchor" aria-label="anchor" href="#arg-absminfeatures-relminfeatures"></a></dt>
 <dd><p>Analyses are only kept when they contain at least this (absolute or relative)
 amount of features. Set to <code>NULL</code> to ignore.</p></dd>
 
 
-<dt>absMinReplicateAbundance, relMinReplicateAbundance</dt>
+<dt id="arg-absminreplicateabundance-relminreplicateabundance">absMinReplicateAbundance, relMinReplicateAbundance<a class="anchor" aria-label="anchor" href="#arg-absminreplicateabundance-relminreplicateabundance"></a></dt>
 <dd><p>Minimum absolute/relative abundance that a grouped feature
 should be present within a replicate group. If this minimum is not met all features within the replicate group are
 removed. Set to <code>NULL</code> to skip this step.</p></dd>
 
 
-<dt>absMinConc, relMinConc</dt>
+<dt id="arg-absminconc-relminconc">absMinConc, relMinConc<a class="anchor" aria-label="anchor" href="#arg-absminconc-relminconc"></a></dt>
 <dd><p>The minimum absolute/relative predicted concentration (calculated by
 <code><a href="pred-quant.html">calculateConcs</a></code>) assigned to a feature. The toxicities are first aggregated prior to filtering, as
 controlled by the <code>predAggrParams</code> argument. Also see the <code>removeNA</code> argument.</p></dd>
 
 
-<dt>absMaxTox, relMaxTox</dt>
+<dt id="arg-absmaxtox-relmaxtox">absMaxTox, relMaxTox<a class="anchor" aria-label="anchor" href="#arg-absmaxtox-relmaxtox"></a></dt>
 <dd><p>The maximum absolute/relative predicted toxicity (LC50) (calculated by
 <code><a href="pred-tox.html">calculateTox</a></code>) assigned to a feature group. The concentrations are first aggregated prior to
 filtering, as controlled by the <code>predAggrParams</code> argument. Also see the <code>removeNA</code> argument.</p></dd>
 
 
-<dt>absMinConcTox, relMinConcTox</dt>
+<dt id="arg-absminconctox-relminconctox">absMinConcTox, relMinConcTox<a class="anchor" aria-label="anchor" href="#arg-absminconctox-relminconctox"></a></dt>
 <dd><p>Like <code>absMinConc</code>/<code>relMinConc</code>, but instead considers the ratio between
 feature concentrations and the toxicity of the feature group. For instance, <code>absMinConcTox=0.1</code> means that the
 calculated concentration of a feature should be at least <samp>10%</samp> of its toxicity.</p></dd>
 
 
-<dt>maxReplicateIntRSD</dt>
+<dt id="arg-maxreplicateintrsd">maxReplicateIntRSD<a class="anchor" aria-label="anchor" href="#arg-maxreplicateintrsd"></a></dt>
 <dd><p>Maximum relative standard deviation (RSD) of intensity values for features within a
 replicate group. If the RSD is above this value all features within the replicate group are removed. Set to
 <code>NULL</code> to ignore.</p></dd>
 
 
-<dt>blankThreshold</dt>
+<dt id="arg-blankthreshold">blankThreshold<a class="anchor" aria-label="anchor" href="#arg-blankthreshold"></a></dt>
 <dd><p>Feature groups that are also present in blank analyses (see
 <a href="analysis-information.html">analysis info</a>) are filtered out unless their relative intensity is above this
 threshold. For instance, a value of <samp>5</samp> means that only features with an intensity five times higher than that
@@ -234,14 +236,14 @@ of the blank are kept. The relative intensity values between blanks and non-blan
 all non-zero blank intensities. Set to <code>NULL</code> to skip this step.</p></dd>
 
 
-<dt>retentionRange, mzRange, mzDefectRange, chromWidthRange</dt>
+<dt id="arg-retentionrange-mzrange-mzdefectrange-chromwidthrange">retentionRange, mzRange, mzDefectRange, chromWidthRange<a class="anchor" aria-label="anchor" href="#arg-retentionrange-mzrange-mzdefectrange-chromwidthrange"></a></dt>
 <dd><p>Range of retention time (in seconds), <em>m/z</em>, mass
 defect (defined as the decimal part of <em>m/z</em> values) or chromatographic peak width (in seconds), respectively.
 Features outside this range will be removed. Should be a numeric vector with length of two containing the min/max
 values. The maximum can be <code>Inf</code> to specify no maximum range. Set to <code>NULL</code> to skip this step.</p></dd>
 
 
-<dt>featQualityRange</dt>
+<dt id="arg-featqualityrange">featQualityRange<a class="anchor" aria-label="anchor" href="#arg-featqualityrange"></a></dt>
 <dd><p>Used to filter features by their peak qualities/scores
 (see <code><a href="generics.html">calculatePeakQualities</a></code>). Should be a named <code>list</code> with min/max ranges for each
 quality/score to be filtered (the <code><a href="featureQualityNames.html">featureQualityNames</a></code> function can be used to obtain valid names).
@@ -249,30 +251,30 @@ Example: <code>featQualityRange=list(ModalityScore=c(0.3, Inf),
 SymmetryScore=c(0.5, Inf))</code>. Set to <code>NULL</code> to ignore.</p></dd>
 
 
-<dt>groupQualityRange</dt>
+<dt id="arg-groupqualityrange">groupQualityRange<a class="anchor" aria-label="anchor" href="#arg-groupqualityrange"></a></dt>
 <dd><p>Like <code>featQualityRange</code>, but filters on group specific or averaged qualities/scores.</p></dd>
 
 
-<dt>results</dt>
+<dt id="arg-results">results<a class="anchor" aria-label="anchor" href="#arg-results"></a></dt>
 <dd><p>Only keep feature groups that have results in the object specified by <code>results</code>. Valid classes
 are <code><a href="featureAnnotations-class.html">featureAnnotations</a></code> (<em>e.g.</em> formula/compound annotations) and <code><a href="components-class.html">components</a></code>. Can
 also be a <code>list</code> with multiple objects: in this case a feature group is kept if it has a result in <em>any</em>
 of the objects. Set to <code>NULL</code> to ignore.</p></dd>
 
 
-<dt>removeBlanks</dt>
+<dt id="arg-removeblanks">removeBlanks<a class="anchor" aria-label="anchor" href="#arg-removeblanks"></a></dt>
 <dd><p>Set to <code>TRUE</code> to remove all analyses that belong to replicate groups that are specified as a
 blank in the <a href="analysis-information.html">analysis-information</a>. This is useful to simplify the analyses in the specified
 <code><a href="featureGroups-class.html">featureGroups</a></code> object after blank subtraction. When both <code>blankThreshold</code> and this argument are
 set, blank subtraction is performed prior to removing any analyses.</p></dd>
 
 
-<dt>removeISTDs</dt>
+<dt id="arg-removeistds">removeISTDs<a class="anchor" aria-label="anchor" href="#arg-removeistds"></a></dt>
 <dd><p>If <code>TRUE</code> then all feature groups marked as internal standard (IS) are removed. This requires
 IS assignments done by <code><a href="featureGroups-class.html">normInts</a></code>, see its documentation for more details.</p></dd>
 
 
-<dt>checkFeaturesSession</dt>
+<dt id="arg-checkfeaturessession">checkFeaturesSession<a class="anchor" aria-label="anchor" href="#arg-checkfeaturessession"></a></dt>
 <dd><p>If set then features and/or feature groups are removed that were selected for removal
 (see <a href="check-GUI.html">check-GUI</a>). The session files are typically generated with the <code><a href="check-GUI.html">checkFeatures</a></code> and
 <code><a href="check-GUI.html">predictCheckFeaturesSession</a></code> functions. The value of <code>checkFeaturesSession</code> should either by a
@@ -280,39 +282,37 @@ path to the session file or <code>TRUE</code>, in which case the default session
 then all non-selected features/feature groups are removed instead.</p></dd>
 
 
-<dt>predAggrParams</dt>
+<dt id="arg-predaggrparams">predAggrParams<a class="anchor" aria-label="anchor" href="#arg-predaggrparams"></a></dt>
 <dd><p>Parameters to aggregate calculated concentrations/toxicities (obtained with
 <code><a href="pred-quant.html">calculateConcs</a></code>/<code><a href="pred-tox.html">calculateTox</a></code>) prior to filtering data. See <a href="pred-aggr-params.html">prediction aggregation
 parameters</a> for more information.</p></dd>
 
 
-<dt>removeNA</dt>
+<dt id="arg-removena">removeNA<a class="anchor" aria-label="anchor" href="#arg-removena"></a></dt>
 <dd><p>Set to <code>TRUE</code> to remove <code>NA</code> values. Currently only applicable to the concentration and
 toxicity filters.</p></dd>
 
 
-<dt>negate</dt>
+<dt id="arg-negate">negate<a class="anchor" aria-label="anchor" href="#arg-negate"></a></dt>
 <dd><p>If set to <code>TRUE</code> then filtering operations are performed in opposite manner.</p></dd>
 
 
-<dt>...</dt>
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>For <a href="sets-workflow.html">sets workflow</a> methods: further arguments passed to the base <code><a href="featureGroups-class.html">featureGroups</a></code> method.</p></dd>
 
 
-<dt>sets</dt>
+<dt id="arg-sets">sets<a class="anchor" aria-label="anchor" href="#arg-sets"></a></dt>
 <dd><p>(<strong>sets workflow</strong>) A <code>character</code> with name(s) of the sets to keep (or remove if <code>negate=TRUE</code>).</p></dd>
 
 
-<dt>absMinSets, relMinSets</dt>
+<dt id="arg-absminsets-relminsets">absMinSets, relMinSets<a class="anchor" aria-label="anchor" href="#arg-absminsets-relminsets"></a></dt>
 <dd><p>(<strong>sets workflow</strong>) Feature groups are only kept when they contain data for at least this (absolute
 or relative) amount of sets. Set to <code>NULL</code> to ignore.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p>A filtered <code><a href="featureGroups-class.html">featureGroups</a></code> object. Feature groups that are filtered away have their intensity set
+    <p>A filtered <code><a href="featureGroups-class.html">featureGroups</a></code> object. Feature groups that are filtered away have their intensity set
   to zero. In case a feature group is not present in any of the analyses anymore it will be removed completely.</p>
     </div>
     <div id="details">
@@ -372,15 +372,15 @@ or relative) amount of sets. Set to <code>NULL</code> to ignore.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

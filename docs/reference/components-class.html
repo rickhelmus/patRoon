@@ -4,7 +4,7 @@ components commonly include adducts, isotopes and homologues."><!-- mathjax --><
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -26,13 +26,13 @@ components commonly include adducts, isotopes and homologues."><!-- mathjax --><
       <ul class="nav navbar-nav"><li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-     
+
   </a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Reference
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -45,7 +45,7 @@ components commonly include adducts, isotopes and homologues."><!-- mathjax --><
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Tutorial
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -58,7 +58,7 @@ components commonly include adducts, isotopes and homologues."><!-- mathjax --><
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Handbook
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -74,14 +74,14 @@ components commonly include adducts, isotopes and homologues."><!-- mathjax --><
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/rickhelmus/patRoon" class="external-link">
     <span class="fa fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -97,104 +97,106 @@ components commonly include adducts, isotopes and homologues."><!-- mathjax --><
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre><code>componentTable(obj)
-
-componentInfo(obj)
-
-findFGroup(obj, fGroup)
-
-# S4 method for components
-componentTable(obj)
-
-# S4 method for components
-componentInfo(obj)
-
-# S4 method for components
-groupNames(obj)
-
-# S4 method for components
-length(x)
-
-# S4 method for components
-names(x)
-
-# S4 method for components
-show(object)
-
-# S4 method for components,ANY,ANY,missing
-[(x, i, j, ..., drop = TRUE)
-
-# S4 method for components,ANY,ANY
-[[(x, i, j)
-
-# S4 method for components
-$(x, name)
-
-# S4 method for components
-delete(obj, i = NULL, j = NULL, ...)
-
-# S4 method for components
-as.data.table(x)
-
-# S4 method for components
-filter(
-  obj,
-  size = NULL,
-  adducts = NULL,
-  isotopes = NULL,
-  rtIncrement = NULL,
-  mzIncrement = NULL,
-  checkComponentsSession = NULL,
-  negate = FALSE,
-  verbose = TRUE
-)
-
-# S4 method for components
-findFGroup(obj, fGroup)
-
-# S4 method for components
-plotSpectrum(obj, index, markFGroup = NULL, xlim = NULL, ylim = NULL, ...)
-
-# S4 method for components
-plotChroms(obj, index, fGroups, EICParams = getDefEICParams(rtWindow = 5), ...)
-
-# S4 method for components
-consensus(obj, ...)
-
-# S4 method for componentsFeatures
-show(object)
-
-# S4 method for componentsSet
-show(object)
-
-# S4 method for componentsSet,ANY,ANY,missing
-[(x, i, j, ..., sets = NULL, drop = TRUE)
-
-# S4 method for componentsSet
-filter(obj, ..., negate = FALSE, sets = NULL)
-
-# S4 method for componentsSet
-delete(obj, i = NULL, j = NULL, ...)
-
-# S4 method for componentsSet
-consensus(obj, ...)
-
-# S4 method for componentsSet
-unset(obj, set)</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">componentTable</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">componentInfo</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">findFGroup</span><span class="op">(</span><span class="va">obj</span>, <span class="va">fGroup</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'components'</span></span>
+<span><span class="fu">componentTable</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'components'</span></span>
+<span><span class="fu">componentInfo</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'components'</span></span>
+<span><span class="fu"><a href="generics.html">groupNames</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'components'</span></span>
+<span><span class="fu"><a href="generics.html">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'components'</span></span>
+<span><span class="fu"><a href="generics.html">names</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'components'</span></span>
+<span><span class="fu"><a href="generics.html">show</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'components,ANY,ANY,missing'</span></span>
+<span><span class="va">x</span><span class="op">[</span><span class="va">i</span>, <span class="va">j</span>, <span class="va">...</span>, drop <span class="op">=</span> <span class="cn">TRUE</span><span class="op">]</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'components,ANY,ANY'</span></span>
+<span><span class="va">x</span><span class="op">[[</span><span class="va">i</span>, <span class="va">j</span><span class="op">]</span><span class="op">]</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'components'</span></span>
+<span><span class="va">x</span><span class="op">$</span><span class="va">name</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'components'</span></span>
+<span><span class="fu"><a href="generics.html">delete</a></span><span class="op">(</span><span class="va">obj</span>, i <span class="op">=</span> <span class="cn">NULL</span>, j <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'components'</span></span>
+<span><span class="fu"><a href="generics.html">as.data.table</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'components'</span></span>
+<span><span class="fu"><a href="generics.html">filter</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  size <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  adducts <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  isotopes <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  rtIncrement <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  mzIncrement <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  checkComponentsSession <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  negate <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'components'</span></span>
+<span><span class="fu">findFGroup</span><span class="op">(</span><span class="va">obj</span>, <span class="va">fGroup</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'components'</span></span>
+<span><span class="fu"><a href="generics.html">plotSpectrum</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">index</span>, markFGroup <span class="op">=</span> <span class="cn">NULL</span>, xlim <span class="op">=</span> <span class="cn">NULL</span>, ylim <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'components'</span></span>
+<span><span class="fu"><a href="generics.html">plotChroms</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">index</span>, <span class="va">fGroups</span>, EICParams <span class="op">=</span> <span class="fu"><a href="EICParams.html">getDefEICParams</a></span><span class="op">(</span>rtWindow <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'components'</span></span>
+<span><span class="fu"><a href="generics.html">consensus</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'componentsFeatures'</span></span>
+<span><span class="fu"><a href="generics.html">show</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'componentsSet'</span></span>
+<span><span class="fu"><a href="generics.html">show</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'componentsSet,ANY,ANY,missing'</span></span>
+<span><span class="va">x</span><span class="op">[</span><span class="va">i</span>, <span class="va">j</span>, <span class="va">...</span>, sets <span class="op">=</span> <span class="cn">NULL</span>, drop <span class="op">=</span> <span class="cn">TRUE</span><span class="op">]</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'componentsSet'</span></span>
+<span><span class="fu"><a href="generics.html">filter</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span>, negate <span class="op">=</span> <span class="cn">FALSE</span>, sets <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'componentsSet'</span></span>
+<span><span class="fu"><a href="generics.html">delete</a></span><span class="op">(</span><span class="va">obj</span>, i <span class="op">=</span> <span class="cn">NULL</span>, j <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'componentsSet'</span></span>
+<span><span class="fu"><a href="generics.html">consensus</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'componentsSet'</span></span>
+<span><span class="fu"><a href="generics.html">unset</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">set</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>obj, object, x</dt>
+
+
+<dl><dt id="arg-obj-object-x">obj, object, x<a class="anchor" aria-label="anchor" href="#arg-obj-object-x"></a></dt>
 <dd><p>The <code>component</code> object.</p></dd>
 
 
-<dt>fGroup</dt>
+<dt id="arg-fgroup">fGroup<a class="anchor" aria-label="anchor" href="#arg-fgroup"></a></dt>
 <dd><p>The name (thus a character) of the feature group that should be
 searched for.</p></dd>
 
 
-<dt>i, j</dt>
+<dt id="arg-i-j">i, j<a class="anchor" aria-label="anchor" href="#arg-i-j"></a></dt>
 <dd><p>For <code>[</code>/<code>[[</code>: A numeric or character value which is used to select components/feature groups by
 their index or name, respectively (for the order/names see <code>names()/groupNames()</code>).<br><br> For <code>[</code>: Can also be logical to perform logical selection
 (similar to regular vectors). If missing all components/feature groups are selected.<br><br> For <code>[[</code>: should be a scalar value. <code>j</code> is optional.<br><br> For <code>delete</code>: The data to remove from. <code>i</code> are the
@@ -204,7 +206,7 @@ with the component (a <code>data.table</code>), the component name and any other
 function specifies the feature groups to be removed (same format as <code>j</code>).</p></dd>
 
 
-<dt>...</dt>
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>For <code>delete</code>: passed to the function specified as <code>j</code>.</p>
 <p>For <code>plotChroms</code>: Further (optional) arguments passed to the
   <code>plotChroms</code> method for the <code><a href="featureGroups-class.html">featureGroups</a></code> class. Note that
@@ -213,23 +215,23 @@ function specifies the feature groups to be removed (same format as <code>j</cod
 <p>For <code>plotSpectrum</code>: Further arguments passed to
   <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></code>.</p>
 <p>For <code>consensus</code>: <code>components</code> objects that should be used to
-  generate the consensus.</p>  
+  generate the consensus.</p>
 <p>For <a href="sets-workflow.html">sets workflow</a> methods: further arguments passed to the base <code>components</code> method.</p></dd>
 
 
-<dt>drop</dt>
+<dt id="arg-drop">drop<a class="anchor" aria-label="anchor" href="#arg-drop"></a></dt>
 <dd><p>ignored.</p></dd>
 
 
-<dt>name</dt>
+<dt id="arg-name">name<a class="anchor" aria-label="anchor" href="#arg-name"></a></dt>
 <dd><p>The component name (partially matched).</p></dd>
 
 
-<dt>size</dt>
+<dt id="arg-size">size<a class="anchor" aria-label="anchor" href="#arg-size"></a></dt>
 <dd><p>Should be a two sized vector with the minimum/maximum size of a component. Set to <code>NULL</code> to ignore.</p></dd>
 
 
-<dt>adducts</dt>
+<dt id="arg-adducts">adducts<a class="anchor" aria-label="anchor" href="#arg-adducts"></a></dt>
 <dd><p>Remove any feature groups within components that do not match given adduct rules. If <code>adducts</code> is
 a logical then only results are kept when an adduct is assigned (<code>adducts=TRUE</code>) or not assigned
 (<code>adducts=FALSE</code>). Otherwise, if <code>adducts</code> contains one or more <code><a href="adduct-class.html">adduct</a></code> objects (or
@@ -237,74 +239,70 @@ something that can be converted to it with <code><a href="adduct-utils.html">as.
 adducts. Set to <code>NULL</code> to ignore this filter.</p></dd>
 
 
-<dt>isotopes</dt>
+<dt id="arg-isotopes">isotopes<a class="anchor" aria-label="anchor" href="#arg-isotopes"></a></dt>
 <dd><p>Only keep results that match a given isotope rule. If <code>isotopes</code> is a logical then only results
 are kept with (<code>isotopes=TRUE</code>) or without (<code>isotopes=FALSE</code>) isotope assignment. Otherwise
 <code>isotopes</code> should be a numeric vector with isotope identifiers to keep (<em>e.g.</em> <samp>0</samp> for monoisotopic
 results, <samp>1</samp> for <samp>M+1</samp> results etc.). Set to <code>NULL</code> to ignore this filter.</p></dd>
 
 
-<dt>rtIncrement, mzIncrement</dt>
+<dt id="arg-rtincrement-mzincrement">rtIncrement, mzIncrement<a class="anchor" aria-label="anchor" href="#arg-rtincrement-mzincrement"></a></dt>
 <dd><p>Should be a two sized vector with the minimum/maximum retention or mz increment of a
 homologous series. Set to <code>NULL</code> to ignore.</p></dd>
 
 
-<dt>checkComponentsSession</dt>
+<dt id="arg-checkcomponentssession">checkComponentsSession<a class="anchor" aria-label="anchor" href="#arg-checkcomponentssession"></a></dt>
 <dd><p>If set then components and/or feature groups are removed that were selected for removal
 (see <a href="check-GUI.html">check-GUI</a> and the <code><a href="check-GUI.html">checkComponents</a></code> function). The value of <code>checkComponentsSession</code>
 should either by a path to the session file or <code>TRUE</code>, in which case the default session file name is used. If
 <code>negate=TRUE</code> then all non-selected data is removed instead.</p></dd>
 
 
-<dt>negate</dt>
+<dt id="arg-negate">negate<a class="anchor" aria-label="anchor" href="#arg-negate"></a></dt>
 <dd><p>If <code>TRUE</code> then filters are applied in opposite manner.</p></dd>
 
 
-<dt>verbose</dt>
+<dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
 <dd><p>If set to <code>FALSE</code> then no text output is shown.</p></dd>
 
 
-<dt>index</dt>
+<dt id="arg-index">index<a class="anchor" aria-label="anchor" href="#arg-index"></a></dt>
 <dd><p>The index of the component. Can be a numeric index or a
 character with its name.</p></dd>
 
 
-<dt>markFGroup</dt>
+<dt id="arg-markfgroup">markFGroup<a class="anchor" aria-label="anchor" href="#arg-markfgroup"></a></dt>
 <dd><p>If specified (<em>i.e.</em> not <code>NULL</code>) this argument
 can be used to mark a feature group in the plotted spectrum. The value
 should be a character with the name of the feature group. Setting this to
 <code>NULL</code> will not mark any peak.</p></dd>
 
 
-<dt>xlim, ylim</dt>
+<dt id="arg-xlim-ylim">xlim, ylim<a class="anchor" aria-label="anchor" href="#arg-xlim-ylim"></a></dt>
 <dd><p>Sets the plot size limits used by
 <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></code>. Set to <code>NULL</code> for automatic plot sizing.</p></dd>
 
 
-<dt>fGroups</dt>
+<dt id="arg-fgroups">fGroups<a class="anchor" aria-label="anchor" href="#arg-fgroups"></a></dt>
 <dd><p>The <code><a href="featureGroups-class.html">featureGroups</a></code> object that was used to generate the components.</p></dd>
 
 
-<dt>EICParams</dt>
+<dt id="arg-eicparams">EICParams<a class="anchor" aria-label="anchor" href="#arg-eicparams"></a></dt>
 <dd><p>A named <code>list</code> with parameters used for extracted ion chromatogram (EIC) creation. See the
 <a href="EICParams.html">EIC parameters</a> documentation for more details.</p></dd>
 
 
-<dt>sets</dt>
+<dt id="arg-sets">sets<a class="anchor" aria-label="anchor" href="#arg-sets"></a></dt>
 <dd><p>(<strong>sets workflow</strong>) A <code>character</code> with name(s) of the sets to keep (or remove if <code>negate=TRUE</code>).</p></dd>
 
 
-<dt>set</dt>
+<dt id="arg-set">set<a class="anchor" aria-label="anchor" href="#arg-set"></a></dt>
 <dd><p>(<strong>sets workflow</strong>) The name of the set.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p><code>delete</code> returns the object for which the specified data was removed.</p>
-
-
+    <p><code>delete</code> returns the object for which the specified data was removed.</p>
 <p><code>consensus</code> returns a <code>components</code> object that is produced
   by merging multiple specified <code>components</code> objects.</p>
     </div>
@@ -314,7 +312,7 @@ should be a character with the name of the feature group. Setting this to
     </div>
     <div id="methods-by-generic-">
     <h2>Methods (by generic)</h2>
-    
+
 <ul><li><p><code>componentTable(components)</code>: Accessor method for the <code>components</code> slot of a
 <code>components</code> class. Each component is stored as a
 <code>data.table</code>.</p></li>
@@ -342,7 +340,7 @@ merge similar components.</p></li>
 </ul></div>
     <div id="slots">
     <h2>Slots</h2>
-    
+
 
 <dl><dt><code>components</code></dt>
 <dd><p>List of all components in this object. Use the
@@ -405,15 +403,15 @@ for each component. Use the <code>componentInfo</code> method for access.</p></d
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

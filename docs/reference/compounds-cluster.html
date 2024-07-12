@@ -5,7 +5,7 @@ common structure (MCS)."><!-- mathjax --><script src="https://cdnjs.cloudflare.c
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -27,13 +27,13 @@ common structure (MCS)."><!-- mathjax --><script src="https://cdnjs.cloudflare.c
       <ul class="nav navbar-nav"><li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-     
+
   </a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Reference
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -46,7 +46,7 @@ common structure (MCS)."><!-- mathjax --><script src="https://cdnjs.cloudflare.c
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Tutorial
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -59,7 +59,7 @@ common structure (MCS)."><!-- mathjax --><script src="https://cdnjs.cloudflare.c
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Handbook
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -75,14 +75,14 @@ common structure (MCS)."><!-- mathjax --><script src="https://cdnjs.cloudflare.c
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/rickhelmus/patRoon" class="external-link">
     <span class="fa fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -101,7 +101,7 @@ common structure (MCS).</p>
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">makeHCluster</span><span class="op">(</span><span class="va">obj</span>, method <span class="op">=</span> <span class="st">"complete"</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for compounds</span></span>
+<span><span class="co"># S4 method for class 'compounds'</span></span>
 <span><span class="fu">makeHCluster</span><span class="op">(</span></span>
 <span>  <span class="va">obj</span>,</span>
 <span>  <span class="va">method</span>,</span>
@@ -115,34 +115,34 @@ common structure (MCS).</p>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>obj</dt>
+
+
+<dl><dt id="arg-obj">obj<a class="anchor" aria-label="anchor" href="#arg-obj"></a></dt>
 <dd><p>The <code><a href="compounds-class.html">compounds</a></code> object to be clustered.</p></dd>
 
 
-<dt>method</dt>
+<dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
 <dd><p>The clustering method passed to <code><a href="https://rdrr.io/r/stats/hclust.html" class="external-link">hclust</a></code>.</p></dd>
 
 
-<dt>fpType</dt>
+<dt id="arg-fptype">fpType<a class="anchor" aria-label="anchor" href="#arg-fptype"></a></dt>
 <dd><p>The type of structural fingerprint that should be calculated. See the <code>type</code> argument of the
 <code>get.fingerprint</code> function of <a href="https://CRAN.R-project.org/package=rcdk" class="external-link"><span class="pkg">rcdk</span></a>.</p></dd>
 
 
-<dt>fpSimMethod</dt>
+<dt id="arg-fpsimmethod">fpSimMethod<a class="anchor" aria-label="anchor" href="#arg-fpsimmethod"></a></dt>
 <dd><p>The method for calculating similarities (i.e. not dissimilarity!). See the <code>method</code> argument
 of the <code>fp.sim.matrix</code> function of the <a href="https://CRAN.R-project.org/package=fingerprint" class="external-link"><span class="pkg">fingerprint</span></a> package.</p></dd>
 
 
-<dt>maxTreeHeight, deepSplit, minModuleSize</dt>
+<dt id="arg-maxtreeheight-deepsplit-minmodulesize">maxTreeHeight, deepSplit, minModuleSize<a class="anchor" aria-label="anchor" href="#arg-maxtreeheight-deepsplit-minmodulesize"></a></dt>
 <dd><p>Arguments used by
 <code>cutreeDynamicTree</code>.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p><code>makeHCluster</code> returns an <code><a href="compoundsCluster-class.html">compoundsCluster</a></code> object.</p>
+    <p><code>makeHCluster</code> returns an <code><a href="compoundsCluster-class.html">compoundsCluster</a></code> object.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -189,15 +189,15 @@ resulting clusters can then be characterized by evaluating their
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

@@ -3,7 +3,7 @@
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -25,13 +25,13 @@
       <ul class="nav navbar-nav"><li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-     
+
   </a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Reference
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -44,7 +44,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Tutorial
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -57,7 +57,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Handbook
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -73,14 +73,14 @@
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/rickhelmus/patRoon" class="external-link">
     <span class="fa fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -109,59 +109,59 @@
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>parents</dt>
+
+
+<dl><dt id="arg-parents">parents<a class="anchor" aria-label="anchor" href="#arg-parents"></a></dt>
 <dd><p>The parents for which transformation products should be obtained. This should be either a suspect list
 (see <a href="suspect-screening.html">suspect screening</a> for more information) or the resulting output of
 <code><a href="suspect-screening.html">screenSuspects</a></code>. The suspect (hits) are used as parents. If <code>NULL</code> then TPs for all parents in
 the library are obtained.</p></dd>
 
 
-<dt>TPLibrary</dt>
+<dt id="arg-tplibrary">TPLibrary<a class="anchor" aria-label="anchor" href="#arg-tplibrary"></a></dt>
 <dd><p>A <code>data.frame</code>. See the details below.</p></dd>
 
 
-<dt>generations</dt>
+<dt id="arg-generations">generations<a class="anchor" aria-label="anchor" href="#arg-generations"></a></dt>
 <dd><p>An <code>integer</code> that specifies the number of transformation generations. TPs for subsequent
 iterations obtained by repeating the library search where the TPs from the previous generation are considered
 parents.</p></dd>
 
 
-<dt>skipInvalid</dt>
+<dt id="arg-skipinvalid">skipInvalid<a class="anchor" aria-label="anchor" href="#arg-skipinvalid"></a></dt>
 <dd><p>If set to <code>TRUE</code> then the parents will be skipped (with a warning) for which insufficient
 information (<em>e.g.</em> SMILES) is available.</p></dd>
 
 
-<dt>prefCalcChemProps</dt>
+<dt id="arg-prefcalcchemprops">prefCalcChemProps<a class="anchor" aria-label="anchor" href="#arg-prefcalcchemprops"></a></dt>
 <dd><p>If <code>TRUE</code> then calculated chemical properties such as the formula and
 <acronym>InChIKey</acronym> are preferred over what is already present in the parent suspect list. For efficiency reasons it is
 recommended to set this to <code>TRUE</code>. See the <code>Validating and calculating chemical properties</code> section for
 more details.</p></dd>
 
 
-<dt>neutralChemProps</dt>
+<dt id="arg-neutralchemprops">neutralChemProps<a class="anchor" aria-label="anchor" href="#arg-neutralchemprops"></a></dt>
 <dd><p>If <code>TRUE</code> then the neutral form of the molecule is considered to calculate
 <acronym>SMILES</acronym>, formulae etc. Enabling this may improve feature matching when considering common adducts
 (<em>e.g.</em> <code>[M+H]+</code>, <code>[M-H]-</code>). See the <code>Validating and calculating chemical properties</code> section
 for more details.</p></dd>
 
 
-<dt>matchParentsBy</dt>
+<dt id="arg-matchparentsby">matchParentsBy<a class="anchor" aria-label="anchor" href="#arg-matchparentsby"></a></dt>
 <dd><p>A <code>character</code> that specifies how the input parents are matched with the data from the TP
 library. Valid options are: <code>"InChIKey"</code>, <code>"InChIKey1"</code>, <code>"InChI"</code>, <code>"SMILES"</code>,
 <code>"formula"</code>, <code>"name"</code>. If the parent from the TP library is matched with multiple input parents then only
 the first is considered.</p></dd>
 
 
-<dt>matchGenerationsBy</dt>
+<dt id="arg-matchgenerationsby">matchGenerationsBy<a class="anchor" aria-label="anchor" href="#arg-matchgenerationsby"></a></dt>
 <dd><p>Similar to <code>matchParentsBy</code>, but specifies how parents/TPs are matched when
 <code>generations&gt;1</code>.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p>The TPs are stored in an object derived from the <code><a href="transformationProductsFormula-class.html">transformationProductsFormula</a></code> class.</p>
+    <p>The TPs are stored in an object derived from the <code><a href="transformationProductsFormula-class.html">transformationProductsFormula</a></code> class.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -199,7 +199,7 @@ the first is considered.</p></dd>
 <p>The internal validation/calculation process performs the following steps:</p><ul><li><p>Validation of <acronym>SMILES</acronym>, <acronym>InChI</acronym>, <acronym>InChIKey</acronym> and formula data (if present). Invalid
   entries will be set to <code>NA</code>.</p></li>
 <li><p>If <code>neutralChemProps=TRUE</code> then chemical data (<acronym>SMILES</acronym>, formulae etc.) is neutralized by
-  (de-)protonation (using the <code class="command">--neutralized</code> option of <code class="command">OpenBabel</code>). An additional column
+  (de-)protonation (using the <code class="command">–neutralized</code> option of <code class="command">OpenBabel</code>). An additional column
   <code>molNeutralized</code> is added to mark those molecules that were neutralized. Note that neutralization requires
   either <acronym>SMILES</acronym> or <acronym>InChI</acronym> data to be available.</p></li>
 <li><p>The <acronym>SMILES</acronym> and <acronym>InChI</acronym> data are used to calculate missing or invalid <acronym>SMILES</acronym>,
@@ -241,15 +241,15 @@ the first is considered.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

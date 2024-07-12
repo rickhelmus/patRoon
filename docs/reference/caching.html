@@ -4,7 +4,7 @@ functions are primarily for internal use."><!-- mathjax --><script src="https://
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -26,13 +26,13 @@ functions are primarily for internal use."><!-- mathjax --><script src="https://
       <ul class="nav navbar-nav"><li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-     
+
   </a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Reference
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -45,7 +45,7 @@ functions are primarily for internal use."><!-- mathjax --><script src="https://
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Tutorial
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -58,7 +58,7 @@ functions are primarily for internal use."><!-- mathjax --><script src="https://
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Handbook
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -74,14 +74,14 @@ functions are primarily for internal use."><!-- mathjax --><script src="https://
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/rickhelmus/patRoon" class="external-link">
     <span class="fa fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -110,63 +110,65 @@ functions are primarily for internal use.</p>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>...</dt>
+
+
+<dl><dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Arguments/objects to be used for hashing.</p></dd>
 
 
-<dt>checkDT</dt>
+<dt id="arg-checkdt">checkDT<a class="anchor" aria-label="anchor" href="#arg-checkdt"></a></dt>
 <dd><p><code>logical</code>, set to <code>TRUE</code> with (a <code>list</code> with) <code>data.table</code>s to ensure reproducible
 hashing. Otherwise can be set to <code>FALSE</code> to improve performance.</p></dd>
 
 
-<dt>length</dt>
+<dt id="arg-length">length<a class="anchor" aria-label="anchor" href="#arg-length"></a></dt>
 <dd><p>Maximum file length to hash. Passed to <code>digest</code>.</p></dd>
 
 
-<dt>category</dt>
+<dt id="arg-category">category<a class="anchor" aria-label="anchor" href="#arg-category"></a></dt>
 <dd><p>The category of the object to be cached.</p></dd>
 
 
-<dt>hashes</dt>
+<dt id="arg-hashes">hashes<a class="anchor" aria-label="anchor" href="#arg-hashes"></a></dt>
 <dd><p>A <code>character</code> with one more hashes (<em>e.g.</em> obtained with <code>makeHash</code>) of the objects to
 be loaded.</p></dd>
 
 
-<dt>dbArg</dt>
+<dt id="arg-dbarg">dbArg<a class="anchor" aria-label="anchor" href="#arg-dbarg"></a></dt>
 <dd><p>Alternative connection to database. Default is <code>NULL</code> and uses the cache options as defined by
 <span class="option">patRoon.cache.fileName</span>. Mainly used internally to improve performance.</p></dd>
 
 
-<dt>simplify</dt>
+<dt id="arg-simplify">simplify<a class="anchor" aria-label="anchor" href="#arg-simplify"></a></dt>
 <dd><p>If <code>TRUE</code> and <code>length(hashes)==1</code> then the returned data is returned directly, otherwise
 the data is in a <code>list</code>.</p></dd>
 
 
-<dt>fixDTs</dt>
+<dt id="arg-fixdts">fixDTs<a class="anchor" aria-label="anchor" href="#arg-fixdts"></a></dt>
 <dd><p>Should be <code>TRUE</code> if cached data consists of (nested) <code>data.table</code>s. Otherwise can be
 <code>FALSE</code> to speed up loading.</p></dd>
 
 
-<dt>data</dt>
+<dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
 <dd><p>The object to be cached.</p></dd>
 
 
-<dt>hash</dt>
+<dt id="arg-hash">hash<a class="anchor" aria-label="anchor" href="#arg-hash"></a></dt>
 <dd><p>The hash string of the object to be cached (<em>e.g.</em> obtained with <code>makeHash</code>).</p></dd>
 
 
-<dt>what</dt>
+<dt id="arg-what">what<a class="anchor" aria-label="anchor" href="#arg-what"></a></dt>
 <dd><p>This argument describes what should be done. When <code>what = NULL</code> this function will list which tables
 are present along with an indication of their size (database rows). If <code>what = "all"</code> then the complete file
 will be removed. Otherwise, <code>what</code> should be a character string (a regular expression) that is used to match
 the table names that should be removed.</p></dd>
 
 
-<dt>file</dt>
+<dt id="arg-file">file<a class="anchor" aria-label="anchor" href="#arg-file"></a></dt>
 <dd><p>The cache file. If <code>NULL</code> then the value of the <code>patRoon.cache.fileName</code> option is used.</p></dd>
 
 
-<dt>vacuum</dt>
+<dt id="arg-vacuum">vacuum<a class="anchor" aria-label="anchor" href="#arg-vacuum"></a></dt>
 <dd><p>If <code>TRUE</code> then the <code>VACUUM</code> operation will be run on the cache database to reduce the file
 size. Setting this to <code>FALSE</code> might be handy to avoid long processing times on large cache databases.</p></dd>
 
@@ -194,15 +196,15 @@ size. Setting this to <code>FALSE</code> might be handy to avoid long processing
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

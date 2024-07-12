@@ -5,7 +5,7 @@ class are never created directly."><!-- mathjax --><script src="https://cdnjs.cl
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -27,13 +27,13 @@ class are never created directly."><!-- mathjax --><script src="https://cdnjs.cl
       <ul class="nav navbar-nav"><li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-     
+
   </a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Reference
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -46,7 +46,7 @@ class are never created directly."><!-- mathjax --><script src="https://cdnjs.cl
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Tutorial
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -59,7 +59,7 @@ class are never created directly."><!-- mathjax --><script src="https://cdnjs.cl
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Handbook
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -75,14 +75,14 @@ class are never created directly."><!-- mathjax --><script src="https://cdnjs.cl
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/rickhelmus/patRoon" class="external-link">
     <span class="fa fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -99,41 +99,43 @@ class are never created directly.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for workflowStep</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for class 'workflowStep'</span></span>
 <span><span class="fu"><a href="generics.html">algorithm</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for workflowStep</span></span>
+<span><span class="co"># S4 method for class 'workflowStep'</span></span>
 <span><span class="fu"><a href="generics.html">as.data.table</a></span><span class="op">(</span><span class="va">x</span>, keep.rownames <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for workflowStep</span></span>
+<span><span class="co"># S4 method for class 'workflowStep'</span></span>
 <span><span class="fu"><a href="generics.html">as.data.frame</a></span><span class="op">(</span><span class="va">x</span>, row.names <span class="op">=</span> <span class="cn">NULL</span>, optional <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for workflowStep</span></span>
+<span><span class="co"># S4 method for class 'workflowStep'</span></span>
 <span><span class="fu"><a href="generics.html">show</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>obj, x, object</dt>
+
+
+<dl><dt id="arg-obj-x-object">obj, x, object<a class="anchor" aria-label="anchor" href="#arg-obj-x-object"></a></dt>
 <dd><p>An object (derived from) this class.</p></dd>
 
 
-<dt>keep.rownames</dt>
+<dt id="arg-keep-rownames">keep.rownames<a class="anchor" aria-label="anchor" href="#arg-keep-rownames"></a></dt>
 <dd><p>Ignored.</p></dd>
 
 
-<dt>...</dt>
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Method specific arguments. Please see the documentation of the
 derived classes.</p></dd>
 
 
-<dt>row.names, optional</dt>
+<dt id="arg-row-names-optional">row.names, optional<a class="anchor" aria-label="anchor" href="#arg-row-names-optional"></a></dt>
 <dd><p>Ignored.</p></dd>
 
 </dl></div>
     <div id="methods-by-generic-">
     <h2>Methods (by generic)</h2>
-    
+
 <ul><li><p><code>algorithm(workflowStep)</code>: Returns the algorithm that was used to generate an
 object.</p></li>
 <li><p><code>as.data.table(workflowStep)</code>: Summarizes the data in this object and returns this
@@ -144,7 +146,7 @@ converts the result to a classic a <code>data.frame</code>.</p></li>
 </ul></div>
     <div id="slots">
     <h2>Slots</h2>
-    
+
 
 <dl><dt><code>algorithm</code></dt>
 <dd><p>The algorithm that was used to generate this object. Use the
@@ -238,15 +240,15 @@ converts the result to a classic a <code>data.frame</code>.</p></li>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

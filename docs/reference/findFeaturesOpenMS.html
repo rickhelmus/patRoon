@@ -5,7 +5,7 @@ TOPP tool (see http://www.openms.de) to find features."><!-- mathjax --><script 
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -27,13 +27,13 @@ TOPP tool (see http://www.openms.de) to find features."><!-- mathjax --><script 
       <ul class="nav navbar-nav"><li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-     
+
   </a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Reference
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -46,7 +46,7 @@ TOPP tool (see http://www.openms.de) to find features."><!-- mathjax --><script 
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Tutorial
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -59,7 +59,7 @@ TOPP tool (see http://www.openms.de) to find features."><!-- mathjax --><script 
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Handbook
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -75,14 +75,14 @@ TOPP tool (see http://www.openms.de) to find features."><!-- mathjax --><script 
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/rickhelmus/patRoon" class="external-link">
     <span class="fa fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -129,107 +129,107 @@ TOPP tool (see <a href="http://www.openms.de" class="external-link">http://www.o
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>analysisInfo</dt>
+
+
+<dl><dt id="arg-analysisinfo">analysisInfo<a class="anchor" aria-label="anchor" href="#arg-analysisinfo"></a></dt>
 <dd><p>A <code>data.frame</code> with <a href="analysis-information.html">Analysis information</a>.</p></dd>
 
 
-<dt>noiseThrInt</dt>
+<dt id="arg-noisethrint">noiseThrInt<a class="anchor" aria-label="anchor" href="#arg-noisethrint"></a></dt>
 <dd><p>Noise intensity threshold. Sets <code>algorithm:common:noise_threshold_int</code> option.</p></dd>
 
 
-<dt>chromSNR</dt>
+<dt id="arg-chromsnr">chromSNR<a class="anchor" aria-label="anchor" href="#arg-chromsnr"></a></dt>
 <dd><p>Minimum S/N of a mass trace. Sets <code>algorithm:common:chrom_peak_snr</code> option.</p></dd>
 
 
-<dt>chromFWHM</dt>
+<dt id="arg-chromfwhm">chromFWHM<a class="anchor" aria-label="anchor" href="#arg-chromfwhm"></a></dt>
 <dd><p>Expected chromatographic peak width (in seconds). Sets <code>algorithm:common:chrom_fwhm</code> option.</p></dd>
 
 
-<dt>mzPPM</dt>
+<dt id="arg-mzppm">mzPPM<a class="anchor" aria-label="anchor" href="#arg-mzppm"></a></dt>
 <dd><p>Allowed mass deviation (ppm) for trace detection. Sets <code>algorithm:mtd:mass_error_ppm</code>.</p></dd>
 
 
-<dt>reEstimateMTSD</dt>
+<dt id="arg-reestimatemtsd">reEstimateMTSD<a class="anchor" aria-label="anchor" href="#arg-reestimatemtsd"></a></dt>
 <dd><p>If <code>TRUE</code> then enables dynamic re-estimation of m/z variance during mass trace collection
 stage. Sets <code>algorithm:mtd:reestimate_mt_sd</code>.</p></dd>
 
 
-<dt>traceTermCriterion, traceTermOutliers, minSampleRate</dt>
+<dt id="arg-tracetermcriterion-tracetermoutliers-minsamplerate">traceTermCriterion, traceTermOutliers, minSampleRate<a class="anchor" aria-label="anchor" href="#arg-tracetermcriterion-tracetermoutliers-minsamplerate"></a></dt>
 <dd><p>Termination criterion for the extension of mass traces. See
 <a href="https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureFinderMetabo.html" class="external-link">FeatureFinderMetabo</a>.
  Sets the <code>algorithm:mtd:trace_termination_criterion</code>, <code>algorithm:mtd:trace_termination_outliers</code> and
 <code>algorithm:mtd:min_sample_rate</code> options, respectively.</p></dd>
 
 
-<dt>minTraceLength, maxTraceLength</dt>
+<dt id="arg-mintracelength-maxtracelength">minTraceLength, maxTraceLength<a class="anchor" aria-label="anchor" href="#arg-mintracelength-maxtracelength"></a></dt>
 <dd><p>Minimum/Maximum length of mass trace (seconds). Set negative value for maxlength
 to disable maximum. Sets <code>algorithm:mtd:min_trace_length</code> and <code>algorithm:mtd:min_trace_length</code>,
 respectively.</p></dd>
 
 
-<dt>widthFiltering, minFWHM, maxFWHM</dt>
+<dt id="arg-widthfiltering-minfwhm-maxfwhm">widthFiltering, minFWHM, maxFWHM<a class="anchor" aria-label="anchor" href="#arg-widthfiltering-minfwhm-maxfwhm"></a></dt>
 <dd><p>Enable filtering of unlikely peak widths. See
 <a href="https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureFinderMetabo.html" class="external-link">FeatureFinderMetabo</a>.
  Sets <code>algorithm:epd:width_filtering</code>, <code>algorithm:epd:min_fwhm</code> and <code>algorithm:epd:max_fwhm</code>,
 respectively.</p></dd>
 
 
-<dt>traceSNRFiltering</dt>
+<dt id="arg-tracesnrfiltering">traceSNRFiltering<a class="anchor" aria-label="anchor" href="#arg-tracesnrfiltering"></a></dt>
 <dd><p>If <code>TRUE</code> then apply post-filtering by signal-to-noise ratio after smoothing. Sets the
 <code>algorithm:epd:masstrace_snr_filtering</code> option.</p></dd>
 
 
-<dt>localRTRange, localMZRange</dt>
+<dt id="arg-localrtrange-localmzrange">localRTRange, localMZRange<a class="anchor" aria-label="anchor" href="#arg-localrtrange-localmzrange"></a></dt>
 <dd><p>Retention/MZ range where to look for coeluting/isotopic mass traces. Sets the
 <code>algorithm:ffm:local_rt_range</code> and <code>algorithm:ffm:local_mz_range</code> options, respectively.</p></dd>
 
 
-<dt>isotopeFilteringModel</dt>
+<dt id="arg-isotopefilteringmodel">isotopeFilteringModel<a class="anchor" aria-label="anchor" href="#arg-isotopefilteringmodel"></a></dt>
 <dd><p>Remove/score candidate assemblies based on isotope intensities. See
 <a href="https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureFinderMetabo.html" class="external-link">FeatureFinderMetabo</a>.
  Sets the <code>algorithm:ffm:isotope_filtering_model</code> option.</p></dd>
 
 
-<dt>MZScoring13C</dt>
+<dt id="arg-mzscoring-c">MZScoring13C<a class="anchor" aria-label="anchor" href="#arg-mzscoring-c"></a></dt>
 <dd><p>Use the 13C isotope as the expected shift for isotope mass traces. See
 <a href="https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureFinderMetabo.html" class="external-link">FeatureFinderMetabo</a>.
  Sets <code>algorithm:ffm:mz_scoring_13C</code>.</p></dd>
 
 
-<dt>useSmoothedInts</dt>
+<dt id="arg-usesmoothedints">useSmoothedInts<a class="anchor" aria-label="anchor" href="#arg-usesmoothedints"></a></dt>
 <dd><p>If <code>TRUE</code> then use LOWESS intensities instead of raw intensities. Sets the
 <code>algorithm:ffm:use_smoothed_intensities</code> option.</p></dd>
 
 
-<dt>extraOpts</dt>
+<dt id="arg-extraopts">extraOpts<a class="anchor" aria-label="anchor" href="#arg-extraopts"></a></dt>
 <dd><p>Named <code>list</code> containing extra options that will be passed to <code class="command">FeatureFinderMetabo</code>. Any
 options specified here will override any of the above. Example:
 <code>extraOpts=list("-algorithm:common:noise_threshold_int"=1000)</code> (corresponds to setting
 <code>noiseThrInt=1000</code>). Set to <code>NULL</code> to ignore.</p></dd>
 
 
-<dt>intSearchRTWindow</dt>
+<dt id="arg-intsearchrtwindow">intSearchRTWindow<a class="anchor" aria-label="anchor" href="#arg-intsearchrtwindow"></a></dt>
 <dd><p>Retention time window (in seconds, +/- feature retention time) that is used to find the
 closest data point to the retention time to obtain the intensity of a feature (this is needed since OpenMS does not
 provide this data).</p></dd>
 
 
-<dt>useFFMIntensities</dt>
+<dt id="arg-useffmintensities">useFFMIntensities<a class="anchor" aria-label="anchor" href="#arg-useffmintensities"></a></dt>
 <dd><p>If <code>TRUE</code> then peak intensities are directly loaded from <code class="command">FeatureFinderMetabo</code>
 output. Otherwise, intensities are loaded afterwards from the input <code class="file">mzML</code> files, which is potentially much
 slower, especially with many analyses files. However, <code>useFFMIntensities=TRUE</code> is still somewhat experimental,
 may be less accurate and requires a recent version of <code class="command">OpenMS</code> (&gt;=2.7).</p></dd>
 
 
-<dt>verbose</dt>
+<dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
 <dd><p>If set to <code>FALSE</code> then no text output is shown.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p>An object of a class which is derived from <code><a href="features-class.html">features</a></code>.</p>
+    <p>An object of a class which is derived from <code><a href="features-class.html">features</a></code>.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -255,7 +255,7 @@ may be less accurate and requires a recent version of <code class="command">Open
     <h2>References</h2>
     <p>Rost HL, Sachsenberg T, Aiche S, Bielow C, Weisser H, Aicheler F, Andreotti S, Ehrlich H, Gutenbrunner P, Kenar E, Liang X, Nahnsen S, Nilse L, Pfeuffer J, Rosenberger G, Rurik M, Schmitt U, Veit J, Walzer M, Wojnar D, Wolski WE, Schilling O, Choudhary JS, Malmstrom L, Aebersold R, Reinert K, Kohlbacher O (2016).
 “OpenMS: a flexible open-source software platform for mass spectrometry data analysis.”
-<em>Nature Methods</em>, <b>13</b>(9), 741--748.
+<em>Nature Methods</em>, <b>13</b>(9), 741–748.
 <a href="https://doi.org/10.1038/nmeth.3959" class="external-link">doi:10.1038/nmeth.3959</a>
 .
  <br><br><a href="https://pugixml.org/" class="external-link">pugixml</a> (via <a href="http://www.rcpp.org/" class="external-link">Rcpp</a>) is used to process OpenMS XML output. <br><br><br><br><br><br></p>
@@ -277,15 +277,15 @@ may be less accurate and requires a recent version of <code class="command">Open
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

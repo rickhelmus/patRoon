@@ -3,7 +3,7 @@
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -25,13 +25,13 @@
       <ul class="nav navbar-nav"><li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-     
+
   </a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Reference
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -44,7 +44,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Tutorial
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -57,7 +57,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Handbook
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -73,14 +73,14 @@
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/rickhelmus/patRoon" class="external-link">
     <span class="fa fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -95,159 +95,161 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre><code>screenInfo(obj)
-
-annotateSuspects(
-  fGroups,
-  MSPeakLists = NULL,
-  formulas = NULL,
-  compounds = NULL,
-  ...
-)
-
-# S4 method for featureGroupsScreening
-screenInfo(obj)
-
-# S4 method for featureGroupsScreening
-show(object)
-
-# S4 method for featureGroupsScreening,ANY,ANY,missing
-[(x, i, j, ..., rGroups, suspects = NULL, drop = TRUE)
-
-# S4 method for featureGroupsScreening
-delete(obj, i = NULL, j = NULL, ...)
-
-# S4 method for featureGroupsScreening
-as.data.table(x, ..., collapseSuspects = ",", onlyHits = FALSE)
-
-# S4 method for featureGroupsScreening
-annotateSuspects(
-  fGroups,
-  MSPeakLists,
-  formulas,
-  compounds,
-  absMzDev = 0.005,
-  specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
-  checkFragments = c("mz", "formula", "compound"),
-  formulasNormalizeScores = "max",
-  compoundsNormalizeScores = "max",
-  IDFile = system.file("misc", "IDLevelRules.yml", package = "patRoon"),
-  logPath = file.path("log", "ident")
-)
-
-# S4 method for featureGroupsScreening
-filter(
-  obj,
-  ...,
-  onlyHits = NULL,
-  selectHitsBy = NULL,
-  selectBestFGroups = FALSE,
-  maxLevel = NULL,
-  maxFormRank = NULL,
-  maxCompRank = NULL,
-  minAnnSimForm = NULL,
-  minAnnSimComp = NULL,
-  minAnnSimBoth = NULL,
-  absMinFragMatches = NULL,
-  relMinFragMatches = NULL,
-  minRF = NULL,
-  maxLC50 = NULL,
-  negate = FALSE
-)
-
-# S4 method for featureGroupsScreeningSet
-screenInfo(obj)
-
-# S4 method for featureGroupsScreeningSet
-show(object)
-
-# S4 method for featureGroupsScreeningSet,ANY,ANY,missing
-[(x, i, j, ..., rGroups, suspects = NULL, sets = NULL, drop = TRUE)
-
-# S4 method for featureGroupsScreeningSet
-delete(obj, i = NULL, j = NULL, ...)
-
-# S4 method for featureGroupsScreeningSet
-as.data.table(x, ..., collapseSuspects = ",", onlyHits = FALSE)
-
-# S4 method for featureGroupsScreeningSet
-annotateSuspects(
-  fGroups,
-  MSPeakLists,
-  formulas,
-  compounds,
-  absMzDev = 0.005,
-  specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
-  checkFragments = c("mz", "formula", "compound"),
-  formulasNormalizeScores = "max",
-  compoundsNormalizeScores = "max",
-  IDFile = system.file("misc", "IDLevelRules.yml", package = "patRoon"),
-  logPath = file.path("log", "ident")
-)
-
-# S4 method for featureGroupsScreeningSet
-filter(
-  obj,
-  ...,
-  onlyHits = NULL,
-  selectHitsBy = NULL,
-  selectBestFGroups = FALSE,
-  maxLevel = NULL,
-  maxFormRank = NULL,
-  maxCompRank = NULL,
-  minAnnSimForm = NULL,
-  minAnnSimComp = NULL,
-  minAnnSimBoth = NULL,
-  absMinFragMatches = NULL,
-  relMinFragMatches = NULL,
-  minRF = NULL,
-  maxLC50 = NULL,
-  negate = FALSE
-)
-
-# S4 method for featureGroupsScreeningSet
-unset(obj, set)</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">screenInfo</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">annotateSuspects</span><span class="op">(</span></span>
+<span>  <span class="va">fGroups</span>,</span>
+<span>  MSPeakLists <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  formulas <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  compounds <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroupsScreening'</span></span>
+<span><span class="fu">screenInfo</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroupsScreening'</span></span>
+<span><span class="fu"><a href="generics.html">show</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroupsScreening,ANY,ANY,missing'</span></span>
+<span><span class="va">x</span><span class="op">[</span><span class="va">i</span>, <span class="va">j</span>, <span class="va">...</span>, <span class="va">rGroups</span>, suspects <span class="op">=</span> <span class="cn">NULL</span>, drop <span class="op">=</span> <span class="cn">TRUE</span><span class="op">]</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroupsScreening'</span></span>
+<span><span class="fu"><a href="generics.html">delete</a></span><span class="op">(</span><span class="va">obj</span>, i <span class="op">=</span> <span class="cn">NULL</span>, j <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroupsScreening'</span></span>
+<span><span class="fu"><a href="generics.html">as.data.table</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, collapseSuspects <span class="op">=</span> <span class="st">","</span>, onlyHits <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroupsScreening'</span></span>
+<span><span class="fu">annotateSuspects</span><span class="op">(</span></span>
+<span>  <span class="va">fGroups</span>,</span>
+<span>  <span class="va">MSPeakLists</span>,</span>
+<span>  <span class="va">formulas</span>,</span>
+<span>  <span class="va">compounds</span>,</span>
+<span>  absMzDev <span class="op">=</span> <span class="fl">0.005</span>,</span>
+<span>  specSimParams <span class="op">=</span> <span class="fu"><a href="specSimParams.html">getDefSpecSimParams</a></span><span class="op">(</span>removePrecursor <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>  checkFragments <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mz"</span>, <span class="st">"formula"</span>, <span class="st">"compound"</span><span class="op">)</span>,</span>
+<span>  formulasNormalizeScores <span class="op">=</span> <span class="st">"max"</span>,</span>
+<span>  compoundsNormalizeScores <span class="op">=</span> <span class="st">"max"</span>,</span>
+<span>  IDFile <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"misc"</span>, <span class="st">"IDLevelRules.yml"</span>, package <span class="op">=</span> <span class="st">"patRoon"</span><span class="op">)</span>,</span>
+<span>  logPath <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"log"</span>, <span class="st">"ident"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroupsScreening'</span></span>
+<span><span class="fu"><a href="generics.html">filter</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  onlyHits <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  selectHitsBy <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  selectBestFGroups <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  maxLevel <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  maxFormRank <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  maxCompRank <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  minAnnSimForm <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  minAnnSimComp <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  minAnnSimBoth <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  absMinFragMatches <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  relMinFragMatches <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  minRF <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  maxLC50 <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  negate <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroupsScreeningSet'</span></span>
+<span><span class="fu">screenInfo</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroupsScreeningSet'</span></span>
+<span><span class="fu"><a href="generics.html">show</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroupsScreeningSet,ANY,ANY,missing'</span></span>
+<span><span class="va">x</span><span class="op">[</span><span class="va">i</span>, <span class="va">j</span>, <span class="va">...</span>, <span class="va">rGroups</span>, suspects <span class="op">=</span> <span class="cn">NULL</span>, sets <span class="op">=</span> <span class="cn">NULL</span>, drop <span class="op">=</span> <span class="cn">TRUE</span><span class="op">]</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroupsScreeningSet'</span></span>
+<span><span class="fu"><a href="generics.html">delete</a></span><span class="op">(</span><span class="va">obj</span>, i <span class="op">=</span> <span class="cn">NULL</span>, j <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroupsScreeningSet'</span></span>
+<span><span class="fu"><a href="generics.html">as.data.table</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, collapseSuspects <span class="op">=</span> <span class="st">","</span>, onlyHits <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroupsScreeningSet'</span></span>
+<span><span class="fu">annotateSuspects</span><span class="op">(</span></span>
+<span>  <span class="va">fGroups</span>,</span>
+<span>  <span class="va">MSPeakLists</span>,</span>
+<span>  <span class="va">formulas</span>,</span>
+<span>  <span class="va">compounds</span>,</span>
+<span>  absMzDev <span class="op">=</span> <span class="fl">0.005</span>,</span>
+<span>  specSimParams <span class="op">=</span> <span class="fu"><a href="specSimParams.html">getDefSpecSimParams</a></span><span class="op">(</span>removePrecursor <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>  checkFragments <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mz"</span>, <span class="st">"formula"</span>, <span class="st">"compound"</span><span class="op">)</span>,</span>
+<span>  formulasNormalizeScores <span class="op">=</span> <span class="st">"max"</span>,</span>
+<span>  compoundsNormalizeScores <span class="op">=</span> <span class="st">"max"</span>,</span>
+<span>  IDFile <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"misc"</span>, <span class="st">"IDLevelRules.yml"</span>, package <span class="op">=</span> <span class="st">"patRoon"</span><span class="op">)</span>,</span>
+<span>  logPath <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"log"</span>, <span class="st">"ident"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroupsScreeningSet'</span></span>
+<span><span class="fu"><a href="generics.html">filter</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  onlyHits <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  selectHitsBy <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  selectBestFGroups <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  maxLevel <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  maxFormRank <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  maxCompRank <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  minAnnSimForm <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  minAnnSimComp <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  minAnnSimBoth <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  absMinFragMatches <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  relMinFragMatches <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  minRF <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  maxLC50 <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  negate <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroupsScreeningSet'</span></span>
+<span><span class="fu"><a href="generics.html">unset</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">set</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>obj, object, x, fGroups</dt>
+
+
+<dl><dt id="arg-obj-object-x-fgroups">obj, object, x, fGroups<a class="anchor" aria-label="anchor" href="#arg-obj-object-x-fgroups"></a></dt>
 <dd><p>The <code>featureGroupsScreening</code> object.</p></dd>
 
 
-<dt>MSPeakLists, formulas, compounds</dt>
+<dt id="arg-mspeaklists-formulas-compounds">MSPeakLists, formulas, compounds<a class="anchor" aria-label="anchor" href="#arg-mspeaklists-formulas-compounds"></a></dt>
 <dd><p>Annotation data (<code><a href="MSPeakLists-class.html">MSPeakLists</a></code>, <code><a href="formulas-class.html">formulas</a></code> and
 <code><a href="compounds-class.html">compounds</a></code>) obtained for this <code>featureGroupsScreening</code> object. All arguments can be <code>NULL</code>
 to exclude it from the annotation.</p></dd>
 
 
-<dt>...</dt>
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Further arguments passed to the base method.</p></dd>
 
 
-<dt>i, j, rGroups</dt>
+<dt id="arg-i-j-rgroups">i, j, rGroups<a class="anchor" aria-label="anchor" href="#arg-i-j-rgroups"></a></dt>
 <dd><p>Used for subsetting data analyses, feature groups and
 replicate groups, see <code><a href="featureGroups-class.html">featureGroups</a></code>.</p></dd>
 
 
-<dt>suspects</dt>
+<dt id="arg-suspects">suspects<a class="anchor" aria-label="anchor" href="#arg-suspects"></a></dt>
 <dd><p>An optional <code>character</code> vector with suspect names. If
 specified, only <code>featureGroups</code> will be kept that are assigned to
 these suspects.</p></dd>
 
 
-<dt>drop</dt>
+<dt id="arg-drop">drop<a class="anchor" aria-label="anchor" href="#arg-drop"></a></dt>
 <dd><p>Ignored.</p></dd>
 
 
-<dt>collapseSuspects</dt>
+<dt id="arg-collapsesuspects">collapseSuspects<a class="anchor" aria-label="anchor" href="#arg-collapsesuspects"></a></dt>
 <dd><p>If a <code>character</code> then any suspects that were matched to the same feature group are
 collapsed to a single row and suspect names are separated by the value of <code>collapseSuspects</code>. If <code>NULL</code>
 then no collapsing occurs, and each suspect match is reported on a single row. See the <code>Suspect collapsing</code>
 section below for additional details.</p></dd>
 
 
-<dt>onlyHits</dt>
+<dt id="arg-onlyhits">onlyHits<a class="anchor" aria-label="anchor" href="#arg-onlyhits"></a></dt>
 <dd><p>For <code>as.data.table</code>: if <code>TRUE</code> then only feature groups with suspect hits are reported.</p>
 <p>For <code>filter</code></p><ul><li><p>if <code>negate=FALSE</code> and <code>onlyHits=TRUE</code> then all feature groups without suspect hits will be removed.
   Otherwise nothing will be done.</p></li>
@@ -257,16 +259,16 @@ section below for additional details.</p></dd>
 </ul></dd>
 
 
-<dt>absMzDev</dt>
+<dt id="arg-absmzdev">absMzDev<a class="anchor" aria-label="anchor" href="#arg-absmzdev"></a></dt>
 <dd><p>Maximum absolute <em>m/z</em> deviation.</p></dd>
 
 
-<dt>specSimParams</dt>
+<dt id="arg-specsimparams">specSimParams<a class="anchor" aria-label="anchor" href="#arg-specsimparams"></a></dt>
 <dd><p>A named <code>list</code> with parameters that influence the calculation of MS spectra similarities.
 See the <a href="specSimParams.html">spectral similarity parameters</a> documentation for more details.</p></dd>
 
 
-<dt>checkFragments</dt>
+<dt id="arg-checkfragments">checkFragments<a class="anchor" aria-label="anchor" href="#arg-checkfragments"></a></dt>
 <dd><p>Which type(s) of MS/MS fragments from workflow data should be checked to evaluate the number of
 suspect fragment matches (<em>i.e.</em> from the <code>fragments_mz</code>/<code>fragments_formula</code> columns in the suspect
 list). Valid values are: <code>"mz"</code>, <code>"formula"</code>, <code>"compounds"</code>. The former uses <em>m/z</em> values in
@@ -275,7 +277,7 @@ the given <code>formulas</code> or <code>compounds</code> objects. Multiple valu
 number of fragment matches will be reported.</p></dd>
 
 
-<dt>compoundsNormalizeScores, formulasNormalizeScores</dt>
+<dt id="arg-compoundsnormalizescores-formulasnormalizescores">compoundsNormalizeScores, formulasNormalizeScores<a class="anchor" aria-label="anchor" href="#arg-compoundsnormalizescores-formulasnormalizescores"></a></dt>
 <dd><p>A <code>character</code> that specifies how normalization of
 annotation scorings occurs. Either</p>
 <p><code>"max"</code> (normalize to max value) or <code>"minmax"</code> (perform min-max
@@ -288,16 +290,16 @@ results were removed after they were generated (<em>e.g.</em> by use of
 <code>filter</code>).</p></dd>
 
 
-<dt>IDFile</dt>
+<dt id="arg-idfile">IDFile<a class="anchor" aria-label="anchor" href="#arg-idfile"></a></dt>
 <dd><p>A file path to a YAML file with rules used for estimation of identification levels. See the
 <code>Suspect annotation</code> section for more details. If not specified then a default rules file will be used.</p></dd>
 
 
-<dt>logPath</dt>
+<dt id="arg-logpath">logPath<a class="anchor" aria-label="anchor" href="#arg-logpath"></a></dt>
 <dd><p>A directory path to store logging information. If <code>NULL</code> then logging is disabled.</p></dd>
 
 
-<dt>selectHitsBy</dt>
+<dt id="arg-selecthitsby">selectHitsBy<a class="anchor" aria-label="anchor" href="#arg-selecthitsby"></a></dt>
 <dd><p>Should be <code>"intensity"</code> or <code>"level"</code>. For cases where the same suspect is matched to
 multiple feature groups, only the suspect to the feature group with highest mean intensity
 (<code>selectHitsBy="intensity"</code>) or best identification level (<code>selectHitsBy="level"</code>) is kept. In case of
@@ -305,61 +307,56 @@ ties only the first hit is kept. Set to <code>NULL</code> to ignore this filter.
 hits with lowest mean intensity/poorest identification level are kept.</p></dd>
 
 
-<dt>selectBestFGroups</dt>
+<dt id="arg-selectbestfgroups">selectBestFGroups<a class="anchor" aria-label="anchor" href="#arg-selectbestfgroups"></a></dt>
 <dd><p>If <code>TRUE</code> then for any cases where a single feature group is matched to several
 suspects only the suspect assigned to the feature group with best identification score is kept. In case of ties
 only the first is kept.</p></dd>
 
 
-<dt>maxLevel, maxFormRank, maxCompRank, minAnnSimForm, minAnnSimComp, minAnnSimBoth</dt>
+<dt id="arg-maxlevel-maxformrank-maxcomprank-minannsimform-minannsimcomp-minannsimboth">maxLevel, maxFormRank, maxCompRank, minAnnSimForm, minAnnSimComp, minAnnSimBoth<a class="anchor" aria-label="anchor" href="#arg-maxlevel-maxformrank-maxcomprank-minannsimform-minannsimcomp-minannsimboth"></a></dt>
 <dd><p>Filter suspects by maximum
 identification level (<em>e.g.</em> <code>"3a"</code>), formula/compound rank or with minimum formula/compound/combined
 annotation similarity. Set to <code>NULL</code> to ignore.</p></dd>
 
 
-<dt>absMinFragMatches, relMinFragMatches</dt>
+<dt id="arg-absminfragmatches-relminfragmatches">absMinFragMatches, relMinFragMatches<a class="anchor" aria-label="anchor" href="#arg-absminfragmatches-relminfragmatches"></a></dt>
 <dd><p>Only retain suspects with this minimum number MS/MS matches with the
 fragments specified in the suspect list (<em>i.e.</em> <code>fragments_mz</code>/<code>fragments_formula</code>).
 <code>relMinFragMatches</code> sets the minimum that is relative (<samp>0-1</samp>) to the maximum number of MS/MS fragments
 specified in the <code>fragments_*</code> columns of the suspect list. Set to <code>NULL</code> to ignore.</p></dd>
 
 
-<dt>minRF</dt>
+<dt id="arg-minrf">minRF<a class="anchor" aria-label="anchor" href="#arg-minrf"></a></dt>
 <dd><p>Filter suspect hits by the given minimum predicted response factor (as calculated by
 <code><a href="generics.html">predictRespFactors</a></code>). Set to <code>NULL</code> to ignore.</p></dd>
 
 
-<dt>maxLC50</dt>
+<dt id="arg-maxlc-">maxLC50<a class="anchor" aria-label="anchor" href="#arg-maxlc-"></a></dt>
 <dd><p>Filter suspect hits by the given maximum toxicity (LC50) (as calculated by
 <code><a href="generics.html">predictTox</a></code>). Set to <code>NULL</code> to ignore.</p></dd>
 
 
-<dt>negate</dt>
+<dt id="arg-negate">negate<a class="anchor" aria-label="anchor" href="#arg-negate"></a></dt>
 <dd><p>If set to <code>TRUE</code> then filtering operations are performed in opposite manner.</p></dd>
 
 
-<dt>sets</dt>
+<dt id="arg-sets">sets<a class="anchor" aria-label="anchor" href="#arg-sets"></a></dt>
 <dd><p>(<strong>sets workflow</strong>) A <code>character</code> with name(s) of the sets to keep (or remove if <code>negate=TRUE</code>).</p></dd>
 
 
-<dt>set</dt>
+<dt id="arg-set">set<a class="anchor" aria-label="anchor" href="#arg-set"></a></dt>
 <dd><p>(<strong>sets workflow</strong>) The name of the set.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p><code>annotateSuspects</code> returns a <code>featureGroupsScreening</code> object, which is a</p>
-<p></p>
-<p><code><a href="featureGroups-class.html">featureGroups</a></code> object amended with annotation data.</p>
-
-
+    <p><code>annotateSuspects</code> returns a <code>featureGroupsScreening</code> object, which is a
+  <code><a href="featureGroups-class.html">featureGroups</a></code> object amended with annotation data.</p>
 <p><code>filter</code> returns a filtered <code>featureGroupsScreening</code> object.</p>
     </div>
     <div id="methods-by-generic-">
     <h2>Methods (by generic)</h2>
-    
+
 <ul><li><p><code>screenInfo(featureGroupsScreening)</code>: Returns a table with screening information
 (see <code>screenInfo</code> slot).</p></li>
 <li><p><code>show(featureGroupsScreening)</code>: Shows summary information for this object.</p></li>
@@ -380,7 +377,7 @@ feature groups that lost any suspect matches due to other filter steps.</p></li>
 </ul></div>
     <div id="slots">
     <h2>Slots</h2>
-    
+
 
 <dl><dt><code>screenInfo</code></dt>
 <dd><p>A (<code>data.table</code>) with results from suspect screening. This table will be amended with
@@ -537,12 +534,12 @@ annotation data when <code>annotateSuspects</code> is run.</p></dd>
     <h2>References</h2>
     <p>Schymanski EL, Jeon J, Gulde R, Fenner K, Ruff M, Singer HP, Hollender J (2014).
 “Identifying Small Molecules via High Resolution Mass Spectrometry: Communicating Confidence.”
-<em>Environmental Science and Technology</em>, <b>48</b>(4), 2097--2098.
+<em>Environmental Science and Technology</em>, <b>48</b>(4), 2097–2098.
 <a href="https://doi.org/10.1021/es5002105" class="external-link">doi:10.1021/es5002105</a>
 .
  <br><br> Stein SE, Scott DR (1994).
 “Optimization and testing of mass spectral library search algorithms for compound identification.”
-<em>Journal of the American Society for Mass Spectrometry</em>, <b>5</b>(9), 859--866.
+<em>Journal of the American Society for Mass Spectrometry</em>, <b>5</b>(9), 859–866.
 <a href="https://doi.org/10.1016/1044-0305%2894%2987009-8" class="external-link">doi:10.1016/1044-0305(94)87009-8</a>
 .</p>
     </div>
@@ -568,15 +565,15 @@ annotation data when <code>annotateSuspects</code> is run.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

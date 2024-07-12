@@ -1,411 +1,139 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/404.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/LICENSE-text.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/articles/tutorial.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/examples/report.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/index.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/news/index.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/COMStop.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/EICParams.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/MSLibrary-class.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/MSPeakLists-class.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/adduct-class.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/adduct-utils.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/analysis-information.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/analysisinfo-dataframe.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/bruker-utils.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/caching.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/check-GUI.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/components-class.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/componentsClust-class.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/componentsIntClust-class.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/componentsNT-class.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/componentsSpecClust-class.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/componentsTPs-class.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/compoundScorings.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/compounds-class.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/compounds-cluster.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/compoundsCluster-class.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/compoundsMF-class.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/compoundsSIRIUS-class.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/convertMSFiles.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/createCOMReference.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/defaultOpenMSAdducts.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/executeMultiProcess.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/feature-filtering.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/feature-optimization.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/feature-plotting.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/featureAnnotations-class.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/featureGroups-class.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/featureGroups-compare.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/featureGroupsComparison-class.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/featureGroupsScreening-class.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/featureQualityNames.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/features-class.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/findFeatures.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/findFeaturesBruker.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/findFeaturesEnviPick.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/findFeaturesKPIC2.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/findFeaturesOpenMS.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/findFeaturesSAFD.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/findFeaturesSIRIUS.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/findFeaturesXCMS.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/findFeaturesXCMS3.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/formulaScorings.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/formulas-class.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/formulasSIRIUS-class.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/genFormulaTPLibrary.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/generateComponents.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/generateComponentsCAMERA.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/generateComponentsCliqueMS.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/generateComponentsIntClust.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/generateComponentsNontarget.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/generateComponentsOpenMS.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/generateComponentsRAMClustR.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/generateComponentsSpecClust.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/generateComponentsTPs.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/generateCompounds.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/generateCompoundsLibrary.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/generateCompoundsMetFrag.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/generateCompoundsSIRIUS.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/generateFormulas.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/generateFormulasDA.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/generateFormulasGenForm.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/generateFormulasSIRIUS.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/generateMSPeakLists.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/generateMSPeakListsDA.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/generateMSPeakListsDAFMF.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/generateMSPeakListsMzR.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/generateTPs.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/generateTPsBioTransformer.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/generateTPsCTS.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/generateTPsLibrary.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/generateTPsLibraryFormula.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/generateTPsLogic.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/generics.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/getDefAvgPListParams.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/getEICs.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/getFCParams.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/getSIRIUSToken.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/groupFeatures.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/groupFeaturesKPIC2.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/groupFeaturesOpenMS.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/groupFeaturesSIRIUS.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/groupFeaturesXCMS.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/groupFeaturesXCMS3.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/importFeatureGroups.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/importFeatureGroupsBrukerPA.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/importFeatureGroupsBrukerTASQ.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/importFeatureGroupsEnviMass.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/importFeatureGroupsKPIC2.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/importFeatureGroupsXCMS.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/importFeatureGroupsXCMS3.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/importFeatures.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/importFeaturesEnviMass.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/importFeaturesKPIC2.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/importFeaturesXCMS.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/importFeaturesXCMS3.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/kpic2-conv.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/loadMSLibrary.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/loadMSLibraryMSP.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/loadMSLibraryMoNAJSON.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/makeSet.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/newProject.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/optimizationResult-class.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/patRoon-defunct.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/patRoon-deprecated.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/patRoon-package.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/pred-aggr-params.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/pred-quant.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/pred-tox.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/printPackageOpts.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/reporting-legacy.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/reporting.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/sets-workflow.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/specSimParams.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/suspect-screening.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/transformationProducts-class.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/transformationProductsFormula-class.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/transformationProductsStructure-class.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/verifyDependencies.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/withOpt.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/workflowStep-class.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/workflowStepSet-class.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/xcms-conv.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://rickhelmus.github.io/patRoon/404.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/LICENSE-text.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/articles/index.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/articles/tutorial.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/authors.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/examples/report.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/index.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/news/index.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/COMStop.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/EICParams.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/MSLibrary-class.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/MSPeakLists-class.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/adduct-class.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/adduct-utils.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/analysis-information.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/analysisinfo-dataframe.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/bruker-utils.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/caching.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/check-GUI.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/components-class.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/componentsClust-class.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/componentsIntClust-class.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/componentsNT-class.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/componentsSpecClust-class.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/componentsTPs-class.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/compoundScorings.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/compounds-class.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/compounds-cluster.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/compoundsCluster-class.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/compoundsMF-class.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/compoundsSIRIUS-class.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/convertMSFiles.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/createCOMReference.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/defaultOpenMSAdducts.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/executeMultiProcess.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/feature-filtering.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/feature-optimization.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/feature-plotting.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/featureAnnotations-class.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/featureGroups-class.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/featureGroups-compare.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/featureGroupsComparison-class.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/featureGroupsScreening-class.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/featureQualityNames.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/features-class.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/findFeatures.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/findFeaturesBruker.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/findFeaturesEnviPick.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/findFeaturesKPIC2.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/findFeaturesOpenMS.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/findFeaturesSAFD.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/findFeaturesSIRIUS.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/findFeaturesXCMS.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/findFeaturesXCMS3.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/formulaScorings.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/formulas-class.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/formulasSIRIUS-class.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/genFormulaTPLibrary.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/generateComponents.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/generateComponentsCAMERA.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/generateComponentsCliqueMS.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/generateComponentsIntClust.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/generateComponentsNontarget.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/generateComponentsOpenMS.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/generateComponentsRAMClustR.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/generateComponentsSpecClust.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/generateComponentsTPs.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/generateCompounds.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/generateCompoundsLibrary.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/generateCompoundsMetFrag.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/generateCompoundsSIRIUS.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/generateFormulas.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/generateFormulasDA.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/generateFormulasGenForm.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/generateFormulasSIRIUS.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/generateMSPeakLists.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/generateMSPeakListsDA.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/generateMSPeakListsDAFMF.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/generateMSPeakListsMzR.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/generateTPs.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/generateTPsBioTransformer.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/generateTPsCTS.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/generateTPsLibrary.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/generateTPsLibraryFormula.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/generateTPsLogic.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/generics.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/getDefAvgPListParams.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/getEICs.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/getFCParams.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/getSIRIUSToken.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/groupFeatures.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/groupFeaturesKPIC2.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/groupFeaturesOpenMS.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/groupFeaturesSIRIUS.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/groupFeaturesXCMS.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/groupFeaturesXCMS3.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/importFeatureGroups.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/importFeatureGroupsBrukerPA.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/importFeatureGroupsBrukerTASQ.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/importFeatureGroupsEnviMass.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/importFeatureGroupsKPIC2.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/importFeatureGroupsXCMS.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/importFeatureGroupsXCMS3.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/importFeatures.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/importFeaturesEnviMass.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/importFeaturesKPIC2.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/importFeaturesXCMS.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/importFeaturesXCMS3.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/index.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/kpic2-conv.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/loadMSLibrary.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/loadMSLibraryMSP.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/loadMSLibraryMoNAJSON.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/makeSet.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/newProject.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/optimizationResult-class.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/patRoon-defunct.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/patRoon-deprecated.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/patRoon-package.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/pred-aggr-params.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/pred-quant.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/pred-tox.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/printPackageOpts.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/reporting-legacy.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/reporting.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/sets-workflow.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/specSimParams.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/suspect-screening.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/transformationProducts-class.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/transformationProductsFormula-class.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/transformationProductsStructure-class.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/verifyDependencies.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/withOpt.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/workflowStep-class.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/workflowStepSet-class.html</loc></url>
+<url><loc>https://rickhelmus.github.io/patRoon/reference/xcms-conv.html</loc></url>
 </urlset>
+

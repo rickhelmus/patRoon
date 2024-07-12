@@ -3,7 +3,7 @@
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -25,13 +25,13 @@
       <ul class="nav navbar-nav"><li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-     
+
   </a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Reference
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -44,7 +44,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Tutorial
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -57,7 +57,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Handbook
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -73,14 +73,14 @@
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/rickhelmus/patRoon" class="external-link">
     <span class="fa fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -95,136 +95,138 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre><code># S4 method for features
-length(x)
-
-# S4 method for features
-show(object)
-
-# S4 method for features
-featureTable(obj)
-
-# S4 method for features
-analysisInfo(obj)
-
-# S4 method for features
-analyses(obj)
-
-# S4 method for features
-replicateGroups(obj)
-
-# S4 method for features
-as.data.table(x)
-
-# S4 method for features
-filter(
-  obj,
-  absMinIntensity = NULL,
-  relMinIntensity = NULL,
-  retentionRange = NULL,
-  mzRange = NULL,
-  mzDefectRange = NULL,
-  chromWidthRange = NULL,
-  qualityRange = NULL,
-  negate = FALSE
-)
-
-# S4 method for features,ANY,missing,missing
-[(x, i, j, ..., drop = TRUE)
-
-# S4 method for features,ANY,missing
-[[(x, i)
-
-# S4 method for features
-$(x, name)
-
-# S4 method for features
-delete(obj, i = NULL, j = NULL, ...)
-
-# S4 method for features
-calculatePeakQualities(obj, weights, flatnessFactor, parallel = TRUE)
-
-# S4 method for features
-getTICs(obj, retentionRange = NULL, MSLevel = 1)
-
-# S4 method for features
-getBPCs(obj, retentionRange = NULL, MSLevel = 1)
-
-# S4 method for features
-plotTICs(
-  obj,
-  retentionRange = NULL,
-  MSLevel = 1,
-  retMin = FALSE,
-  title = NULL,
-  colourBy = c("none", "analyses", "rGroups"),
-  showLegend = TRUE,
-  xlim = NULL,
-  ylim = NULL,
-  ...
-)
-
-# S4 method for features
-plotBPCs(
-  obj,
-  retentionRange = NULL,
-  MSLevel = 1,
-  retMin = FALSE,
-  title = NULL,
-  colourBy = c("none", "analyses", "rGroups"),
-  showLegend = TRUE,
-  xlim = NULL,
-  ylim = NULL,
-  ...
-)
-
-# S4 method for featuresSet
-sets(obj)
-
-# S4 method for featuresSet
-show(object)
-
-# S4 method for featuresSet
-as.data.table(x)
-
-# S4 method for featuresSet,ANY,missing,missing
-[(x, i, ..., sets = NULL, drop = TRUE)
-
-# S4 method for featuresSet
-filter(obj, ..., negate = FALSE, sets = NULL)
-
-# S4 method for featuresSet
-unset(obj, set)
-
-# S4 method for featuresKPIC2
-delete(obj, i = NULL, j = NULL, ...)
-
-# S4 method for featuresXCMS
-delete(obj, i = NULL, j = NULL, ...)
-
-# S4 method for featuresXCMS3
-delete(obj, i = NULL, j = NULL, ...)</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for class 'features'</span></span>
+<span><span class="fu"><a href="generics.html">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'features'</span></span>
+<span><span class="fu"><a href="generics.html">show</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'features'</span></span>
+<span><span class="fu"><a href="generics.html">featureTable</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'features'</span></span>
+<span><span class="fu"><a href="generics.html">analysisInfo</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'features'</span></span>
+<span><span class="fu"><a href="generics.html">analyses</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'features'</span></span>
+<span><span class="fu"><a href="generics.html">replicateGroups</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'features'</span></span>
+<span><span class="fu"><a href="generics.html">as.data.table</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'features'</span></span>
+<span><span class="fu"><a href="generics.html">filter</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  absMinIntensity <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  relMinIntensity <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  retentionRange <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  mzRange <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  mzDefectRange <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  chromWidthRange <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  qualityRange <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  negate <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'features,ANY,missing,missing'</span></span>
+<span><span class="va">x</span><span class="op">[</span><span class="va">i</span>, <span class="va">j</span>, <span class="va">...</span>, drop <span class="op">=</span> <span class="cn">TRUE</span><span class="op">]</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'features,ANY,missing'</span></span>
+<span><span class="va">x</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'features'</span></span>
+<span><span class="va">x</span><span class="op">$</span><span class="va">name</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'features'</span></span>
+<span><span class="fu"><a href="generics.html">delete</a></span><span class="op">(</span><span class="va">obj</span>, i <span class="op">=</span> <span class="cn">NULL</span>, j <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'features'</span></span>
+<span><span class="fu"><a href="generics.html">calculatePeakQualities</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">weights</span>, <span class="va">flatnessFactor</span>, parallel <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'features'</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/patRoon/man/analysisinfo-dataframe.html" class="external-link">getTICs</a></span><span class="op">(</span><span class="va">obj</span>, retentionRange <span class="op">=</span> <span class="cn">NULL</span>, MSLevel <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'features'</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/patRoon/man/analysisinfo-dataframe.html" class="external-link">getBPCs</a></span><span class="op">(</span><span class="va">obj</span>, retentionRange <span class="op">=</span> <span class="cn">NULL</span>, MSLevel <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'features'</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/patRoon/man/analysisinfo-dataframe.html" class="external-link">plotTICs</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  retentionRange <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  MSLevel <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  retMin <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  colourBy <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"analyses"</span>, <span class="st">"rGroups"</span><span class="op">)</span>,</span>
+<span>  showLegend <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  xlim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'features'</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/patRoon/man/analysisinfo-dataframe.html" class="external-link">plotBPCs</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  retentionRange <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  MSLevel <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  retMin <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  colourBy <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"analyses"</span>, <span class="st">"rGroups"</span><span class="op">)</span>,</span>
+<span>  showLegend <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  xlim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featuresSet'</span></span>
+<span><span class="fu"><a href="generics.html">sets</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featuresSet'</span></span>
+<span><span class="fu"><a href="generics.html">show</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featuresSet'</span></span>
+<span><span class="fu"><a href="generics.html">as.data.table</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featuresSet,ANY,missing,missing'</span></span>
+<span><span class="va">x</span><span class="op">[</span><span class="va">i</span>, <span class="va">...</span>, sets <span class="op">=</span> <span class="cn">NULL</span>, drop <span class="op">=</span> <span class="cn">TRUE</span><span class="op">]</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featuresSet'</span></span>
+<span><span class="fu"><a href="generics.html">filter</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span>, negate <span class="op">=</span> <span class="cn">FALSE</span>, sets <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featuresSet'</span></span>
+<span><span class="fu"><a href="generics.html">unset</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">set</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featuresKPIC2'</span></span>
+<span><span class="fu"><a href="generics.html">delete</a></span><span class="op">(</span><span class="va">obj</span>, i <span class="op">=</span> <span class="cn">NULL</span>, j <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featuresXCMS'</span></span>
+<span><span class="fu"><a href="generics.html">delete</a></span><span class="op">(</span><span class="va">obj</span>, i <span class="op">=</span> <span class="cn">NULL</span>, j <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featuresXCMS3'</span></span>
+<span><span class="fu"><a href="generics.html">delete</a></span><span class="op">(</span><span class="va">obj</span>, i <span class="op">=</span> <span class="cn">NULL</span>, j <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>obj, x, object</dt>
+
+
+<dl><dt id="arg-obj-x-object">obj, x, object<a class="anchor" aria-label="anchor" href="#arg-obj-x-object"></a></dt>
 <dd><p><code>features</code> object to be accessed</p></dd>
 
 
-<dt>absMinIntensity, relMinIntensity</dt>
+<dt id="arg-absminintensity-relminintensity">absMinIntensity, relMinIntensity<a class="anchor" aria-label="anchor" href="#arg-absminintensity-relminintensity"></a></dt>
 <dd><p>Minimum absolute/relative intensity for features to be kept. The relative
 intensity is determined from the feature with highest intensity (within the same analysis). Set to <samp>0</samp> or <code>NULL</code> to skip this step.</p></dd>
 
 
-<dt>retentionRange, mzRange, mzDefectRange, chromWidthRange</dt>
+<dt id="arg-retentionrange-mzrange-mzdefectrange-chromwidthrange">retentionRange, mzRange, mzDefectRange, chromWidthRange<a class="anchor" aria-label="anchor" href="#arg-retentionrange-mzrange-mzdefectrange-chromwidthrange"></a></dt>
 <dd><p>Range of retention time (in seconds), <em>m/z</em>, mass
 defect (defined as the decimal part of <em>m/z</em> values) or chromatographic peak width (in seconds), respectively.
 Features outside this range will be removed. Should be a numeric vector with length of two containing the min/max
 values. The maximum can be <code>Inf</code> to specify no maximum range. Set to <code>NULL</code> to skip this step.</p></dd>
 
 
-<dt>qualityRange</dt>
+<dt id="arg-qualityrange">qualityRange<a class="anchor" aria-label="anchor" href="#arg-qualityrange"></a></dt>
 <dd><p>Used to filter features by their peak qualities/scores
 (see <code><a href="generics.html">calculatePeakQualities</a></code>). Should be a named <code>list</code> with min/max ranges for each
 quality/score to be filtered (the <code><a href="featureQualityNames.html">featureQualityNames</a></code> function can be used to obtain valid names).
@@ -232,11 +234,11 @@ Example: <code>qualityRange=list(ModalityScore=c(0.3, Inf),
 SymmetryScore=c(0.5, Inf))</code>. Set to <code>NULL</code> to ignore.</p></dd>
 
 
-<dt>negate</dt>
+<dt id="arg-negate">negate<a class="anchor" aria-label="anchor" href="#arg-negate"></a></dt>
 <dd><p>If set to <code>TRUE</code> then filtering operations are performed in opposite manner.</p></dd>
 
 
-<dt>i, j</dt>
+<dt id="arg-i-j">i, j<a class="anchor" aria-label="anchor" href="#arg-i-j"></a></dt>
 <dd><p>For <code>[</code>/<code>[[</code>: A numeric or character value which is used to select analyses by
 their index or name, respectively (for the order/names see <code><a href="generics.html">analyses()</a></code>).<br><br> For <code>[</code>: Can also be logical to perform logical selection
 (similar to regular vectors). If missing all analyses are selected.<br><br> For <code>[[</code>: should be a scalar value.<br><br> For <code>delete</code>: The data to remove from. <code>i</code> are the
@@ -246,89 +248,80 @@ with the feature table (a <code>data.table</code>), the analysis name and any ot
 function specifies the feature indices (rows) to be removed (specified as an <code>integer</code> or <code>logical</code> vector).</p></dd>
 
 
-<dt>...</dt>
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>For <code>delete</code>: passed to the function specified as <code>j</code>.</p>
 <p>For <a href="sets-workflow.html">sets workflow</a> methods: further arguments passed to the base <code>features</code> method.</p></dd>
 
 
-<dt>drop</dt>
+<dt id="arg-drop">drop<a class="anchor" aria-label="anchor" href="#arg-drop"></a></dt>
 <dd><p>ignored.</p></dd>
 
 
-<dt>name</dt>
+<dt id="arg-name">name<a class="anchor" aria-label="anchor" href="#arg-name"></a></dt>
 <dd><p>The analysis name (partially matched).</p></dd>
 
 
-<dt>weights</dt>
+<dt id="arg-weights">weights<a class="anchor" aria-label="anchor" href="#arg-weights"></a></dt>
 <dd><p>A named <code>numeric</code> vector that defines the weight for each score to calculate the
 <code>totalScore</code>. The names of the vector follow the score names. Unspecified weights are defaulted to <samp>1</samp>.
 Example: <code>weights=c(ApexBoundaryRatioScore=0.5, GaussianSimilarityScore=2)</code>.</p></dd>
 
 
-<dt>flatnessFactor</dt>
+<dt id="arg-flatnessfactor">flatnessFactor<a class="anchor" aria-label="anchor" href="#arg-flatnessfactor"></a></dt>
 <dd><p>Passed to <span class="pkg">MetaClean</span> as the <code>flatness.factor</code> argument to
 <code><a href="https://rdrr.io/pkg/MetaClean/man/calculateJaggedness.html" class="external-link">calculateJaggedness</a></code> and <code><a href="https://rdrr.io/pkg/MetaClean/man/calculateModality.html" class="external-link">calculateModality</a></code>.</p></dd>
 
 
-<dt>parallel</dt>
+<dt id="arg-parallel">parallel<a class="anchor" aria-label="anchor" href="#arg-parallel"></a></dt>
 <dd><p>If set to <code>TRUE</code> then code is executed in parallel through the <a href="https://CRAN.R-project.org/package=futures" class="external-link"><span class="pkg">futures</span></a> package. Please
 see the parallelization section in the handbook for more details.</p></dd>
 
 
-<dt>MSLevel</dt>
-<dd><p>Integer vector with the ms levels (i.e., 1 for MS1 and 2 for MS2) 
+<dt id="arg-mslevel">MSLevel<a class="anchor" aria-label="anchor" href="#arg-mslevel"></a></dt>
+<dd><p>Integer vector with the ms levels (i.e., 1 for MS1 and 2 for MS2)
 to obtain TIC traces.</p></dd>
 
 
-<dt>retMin</dt>
+<dt id="arg-retmin">retMin<a class="anchor" aria-label="anchor" href="#arg-retmin"></a></dt>
 <dd><p>Plot retention time in minutes (instead of seconds).</p></dd>
 
 
-<dt>title</dt>
+<dt id="arg-title">title<a class="anchor" aria-label="anchor" href="#arg-title"></a></dt>
 <dd><p>Character string used for title of the plot. If <code>NULL</code> a title will be automatically generated.</p></dd>
 
 
-<dt>colourBy</dt>
-<dd><p>Sets the automatic colour selection: "none" for a single 
+<dt id="arg-colourby">colourBy<a class="anchor" aria-label="anchor" href="#arg-colourby"></a></dt>
+<dd><p>Sets the automatic colour selection: "none" for a single
 colour or "analyses"/"rGroups" for a distinct colour per analysis or analysis replicate group.</p></dd>
 
 
-<dt>showLegend</dt>
+<dt id="arg-showlegend">showLegend<a class="anchor" aria-label="anchor" href="#arg-showlegend"></a></dt>
 <dd><p>Plot a legend if TRUE.</p></dd>
 
 
-<dt>xlim, ylim</dt>
+<dt id="arg-xlim-ylim">xlim, ylim<a class="anchor" aria-label="anchor" href="#arg-xlim-ylim"></a></dt>
 <dd><p>Sets the plot size limits used by
 <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></code>. Set to <code>NULL</code> for automatic plot sizing.</p></dd>
 
 
-<dt>sets</dt>
+<dt id="arg-sets">sets<a class="anchor" aria-label="anchor" href="#arg-sets"></a></dt>
 <dd><p>(<strong>sets workflow</strong>) For <code>[</code> and <code>filter</code>: a <code>character</code> with name(s) of the sets to keep (or remove if
 <code>negate=TRUE</code>).</p></dd>
 
 
-<dt>set</dt>
+<dt id="arg-set">set<a class="anchor" aria-label="anchor" href="#arg-set"></a></dt>
 <dd><p>(<strong>sets workflow</strong>) The name of the set.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p><code>featureTable</code>: A <code>list</code> containing a</p>
-<p></p>
-<p><code>data.table</code> for each analysis with feature data</p>
-
-
+    <p><code>featureTable</code>: A <code>list</code> containing a
+  <code>data.table</code> for each analysis with feature data</p>
 <p><code>analysisInfo</code>: A <code>data.frame</code> containing a column with
   analysis name (<code>analysis</code>), its path (<code>path</code>), and other columns
   such as replicate group name (<code>group</code>) and blank reference
   (<code>blank</code>).</p>
-
-
 <p><code>delete</code> returns the object for which the specified data was removed.</p>
-
-
 <p><code>calculatePeakQualities</code> returns a modified object amended with peak qualities and scores.</p>
     </div>
     <div id="details">
@@ -341,7 +334,7 @@ and derived objects are created by 'feature finders' such as
     </div>
     <div id="methods-by-generic-">
     <h2>Methods (by generic)</h2>
-    
+
 <ul><li><p><code>length(features)</code>: Obtain total number of features.</p></li>
 <li><p><code>show(features)</code>: Shows summary information for this object.</p></li>
 <li><p><code>featureTable(features)</code>: Get table with feature information</p></li>
@@ -375,7 +368,7 @@ score values.</p></li>
 </ul></div>
     <div id="slots">
     <h2>Slots</h2>
-    
+
 
 <dl><dt><code>features</code></dt>
 <dd><p>List of features per analysis file. Use the
@@ -449,15 +442,15 @@ for access.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

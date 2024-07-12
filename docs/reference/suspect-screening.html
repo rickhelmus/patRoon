@@ -3,7 +3,7 @@
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -25,13 +25,13 @@
       <ul class="nav navbar-nav"><li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-     
+
   </a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Reference
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -44,7 +44,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Tutorial
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -57,7 +57,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Handbook
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -73,14 +73,14 @@
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/rickhelmus/patRoon" class="external-link">
     <span class="fa fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -108,7 +108,7 @@
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for featureGroups</span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
 <span><span class="fu">screenSuspects</span><span class="op">(</span></span>
 <span>  <span class="va">fGroups</span>,</span>
 <span>  <span class="va">suspects</span>,</span>
@@ -121,7 +121,7 @@
 <span>  <span class="va">onlyHits</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for featureGroupsScreening</span></span>
+<span><span class="co"># S4 method for class 'featureGroupsScreening'</span></span>
 <span><span class="fu">screenSuspects</span><span class="op">(</span></span>
 <span>  <span class="va">fGroups</span>,</span>
 <span>  <span class="va">suspects</span>,</span>
@@ -137,7 +137,7 @@
 <span></span>
 <span><span class="fu">genIDLevelRulesFile</span><span class="op">(</span><span class="va">out</span>, inLevels <span class="op">=</span> <span class="cn">NULL</span>, exLevels <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for featureGroupsSet</span></span>
+<span><span class="co"># S4 method for class 'featureGroupsSet'</span></span>
 <span><span class="fu">screenSuspects</span><span class="op">(</span></span>
 <span>  <span class="va">fGroups</span>,</span>
 <span>  <span class="va">suspects</span>,</span>
@@ -150,7 +150,7 @@
 <span>  <span class="va">onlyHits</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for featureGroupsScreeningSet</span></span>
+<span><span class="co"># S4 method for class 'featureGroupsScreeningSet'</span></span>
 <span><span class="fu">screenSuspects</span><span class="op">(</span></span>
 <span>  <span class="va">fGroups</span>,</span>
 <span>  <span class="va">suspects</span>,</span>
@@ -167,65 +167,67 @@
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>fGroups</dt>
+
+
+<dl><dt id="arg-fgroups">fGroups<a class="anchor" aria-label="anchor" href="#arg-fgroups"></a></dt>
 <dd><p>The <code><a href="featureGroups-class.html">featureGroups</a></code> object that should be screened.</p></dd>
 
 
-<dt>suspects</dt>
+<dt id="arg-suspects">suspects<a class="anchor" aria-label="anchor" href="#arg-suspects"></a></dt>
 <dd><p>A <code>data.frame</code> with suspect information. See the <code>Suspect list format</code> section below.</p>
 <p>(<strong>sets workflow</strong>) Can also be a <code>list</code> with suspect lists to be used for each set (otherwise the same suspect lists is
   used for all sets). The <code>list</code> can be named with the sets names to mark which suspect list is to be used with
   which set (<em>e.g.</em> <code>suspects=list(positive=suspsPos, negative=suspsNeg)</code>).</p></dd>
 
 
-<dt>rtWindow, mzWindow</dt>
+<dt id="arg-rtwindow-mzwindow">rtWindow, mzWindow<a class="anchor" aria-label="anchor" href="#arg-rtwindow-mzwindow"></a></dt>
 <dd><p>The retention time window (in seconds) and <em>m/z</em> window that will be used for matching
 a suspect (+/- feature data).</p></dd>
 
 
-<dt>adduct</dt>
+<dt id="arg-adduct">adduct<a class="anchor" aria-label="anchor" href="#arg-adduct"></a></dt>
 <dd><p>An <code><a href="adduct-class.html">adduct</a></code> object (or something that can be converted to it with <code><a href="adduct-utils.html">as.adduct</a></code>).
 Examples: <code>"[M-H]-"</code>, <code>"[M+Na]+"</code>. May be <code>NULL</code>, see <code>Suspect list format</code> and <code>Matching
 of suspect masses</code> sections below.</p></dd>
 
 
-<dt>skipInvalid</dt>
+<dt id="arg-skipinvalid">skipInvalid<a class="anchor" aria-label="anchor" href="#arg-skipinvalid"></a></dt>
 <dd><p>If set to <code>TRUE</code> then suspects with invalid data (<em>e.g.</em> missing names or other missing
 data) will be ignored with a warning. Similarly, any suspects for which mass calculation failed (when no <code>mz</code>
 column is present in the suspect list), for instance, due to invalid <code>SMILES</code>, will be ignored with a warning.</p></dd>
 
 
-<dt>prefCalcChemProps</dt>
+<dt id="arg-prefcalcchemprops">prefCalcChemProps<a class="anchor" aria-label="anchor" href="#arg-prefcalcchemprops"></a></dt>
 <dd><p>If <code>TRUE</code> then calculated chemical properties such as the formula and
 <acronym>InChIKey</acronym> are preferred over what is already present in the suspect list. For efficiency reasons it is
 recommended to set this to <code>TRUE</code>. See the <code>Validating and calculating chemical properties</code> section for
 more details.</p></dd>
 
 
-<dt>neutralChemProps</dt>
+<dt id="arg-neutralchemprops">neutralChemProps<a class="anchor" aria-label="anchor" href="#arg-neutralchemprops"></a></dt>
 <dd><p>If <code>TRUE</code> then the neutral form of the molecule is considered to calculate
 <acronym>SMILES</acronym>, formulae etc. Enabling this may improve feature matching when considering common adducts
 (<em>e.g.</em> <code>[M+H]+</code>, <code>[M-H]-</code>). See the <code>Validating and calculating chemical properties</code> section
 for more details.</p></dd>
 
 
-<dt>onlyHits</dt>
+<dt id="arg-onlyhits">onlyHits<a class="anchor" aria-label="anchor" href="#arg-onlyhits"></a></dt>
 <dd><p>If <code>TRUE</code> then all feature groups not matched by any of the suspects will be removed.</p></dd>
 
 
-<dt>amend</dt>
+<dt id="arg-amend">amend<a class="anchor" aria-label="anchor" href="#arg-amend"></a></dt>
 <dd><p>If <code>TRUE</code> then screening results will be <em>amended</em> to the original object.</p></dd>
 
 
-<dt>level</dt>
+<dt id="arg-level">level<a class="anchor" aria-label="anchor" href="#arg-level"></a></dt>
 <dd><p>The identification level to be converted.</p></dd>
 
 
-<dt>out</dt>
+<dt id="arg-out">out<a class="anchor" aria-label="anchor" href="#arg-out"></a></dt>
 <dd><p>The file path to the target file.</p></dd>
 
 
-<dt>inLevels, exLevels</dt>
+<dt id="arg-inlevels-exlevels">inLevels, exLevels<a class="anchor" aria-label="anchor" href="#arg-inlevels-exlevels"></a></dt>
 <dd><p>A <a href="https://rdrr.io/r/base/regex.html" class="external-link">regular expression</a> for the
 identification levels to include or exclude, respectively. For instance,
 <code>exLevels="4|5"</code> would exclude level 4 and 5 from the output file. Set
@@ -234,11 +236,8 @@ to <code>NULL</code> to ignore.</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p><code>screenSuspects</code> returns a <code><a href="featureGroupsScreening-class.html">featureGroupsScreening</a></code> object, which is a copy of the input</p>
-<p></p>
-<p><code>fGroups</code> object amended with additional screening information.</p>
+    <p><code>screenSuspects</code> returns a <code><a href="featureGroupsScreening-class.html">featureGroupsScreening</a></code> object, which is a copy of the input
+  <code>fGroups</code> object amended with additional screening information.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -306,7 +305,7 @@ possible, as it can significantly reduce the load on data interpretation.</p>
 <p>The internal validation/calculation process performs the following steps:</p><ul><li><p>Validation of <acronym>SMILES</acronym>, <acronym>InChI</acronym>, <acronym>InChIKey</acronym> and formula data (if present). Invalid
   entries will be set to <code>NA</code>.</p></li>
 <li><p>If <code>neutralChemProps=TRUE</code> then chemical data (<acronym>SMILES</acronym>, formulae etc.) is neutralized by
-  (de-)protonation (using the <code class="command">--neutralized</code> option of <code class="command">OpenBabel</code>). An additional column
+  (de-)protonation (using the <code class="command">–neutralized</code> option of <code class="command">OpenBabel</code>). An additional column
   <code>molNeutralized</code> is added to mark those molecules that were neutralized. Note that neutralization requires
   either <acronym>SMILES</acronym> or <acronym>InChI</acronym> data to be available.</p></li>
 <li><p>The <acronym>SMILES</acronym> and <acronym>InChI</acronym> data are used to calculate missing or invalid <acronym>SMILES</acronym>,
@@ -346,15 +345,15 @@ possible, as it can significantly reduce the load on data interpretation.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

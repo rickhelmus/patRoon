@@ -5,7 +5,7 @@ unrelated feature groups in a component) can easily be selected for removal."><!
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -27,13 +27,13 @@ unrelated feature groups in a component) can easily be selected for removal."><!
       <ul class="nav navbar-nav"><li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-     
+
   </a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Reference
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -46,7 +46,7 @@ unrelated feature groups in a component) can easily be selected for removal."><!
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Tutorial
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -59,7 +59,7 @@ unrelated feature groups in a component) can easily be selected for removal."><!
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Handbook
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -75,14 +75,14 @@ unrelated feature groups in a component) can easily be selected for removal."><!
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/rickhelmus/patRoon" class="external-link">
     <span class="fa fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -114,7 +114,7 @@ unrelated feature groups in a component) can easily be selected for removal.</p>
 <span>  clearSession <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for components</span></span>
+<span><span class="co"># S4 method for class 'components'</span></span>
 <span><span class="fu">checkComponents</span><span class="op">(</span></span>
 <span>  <span class="va">components</span>,</span>
 <span>  <span class="va">fGroups</span>,</span>
@@ -132,7 +132,7 @@ unrelated feature groups in a component) can easily be selected for removal.</p>
 <span>  overWrite <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for featureGroups</span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
 <span><span class="fu">checkFeatures</span><span class="op">(</span></span>
 <span>  <span class="va">fGroups</span>,</span>
 <span>  session <span class="op">=</span> <span class="st">"checked-features.yml"</span>,</span>
@@ -147,47 +147,49 @@ unrelated feature groups in a component) can easily be selected for removal.</p>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>fGroups</dt>
+
+
+<dl><dt id="arg-fgroups">fGroups<a class="anchor" aria-label="anchor" href="#arg-fgroups"></a></dt>
 <dd><p>A <code><a href="featureGroups-class.html">featureGroups</a></code> object.</p>
 <p>This should be the 'new' object for <code>importCheckFeaturesSession</code> for which the session needs to be imported.</p></dd>
 
 
-<dt>session</dt>
+<dt id="arg-session">session<a class="anchor" aria-label="anchor" href="#arg-session"></a></dt>
 <dd><p>The session file name.</p></dd>
 
 
-<dt>EICParams</dt>
+<dt id="arg-eicparams">EICParams<a class="anchor" aria-label="anchor" href="#arg-eicparams"></a></dt>
 <dd><p>A named <code>list</code> with parameters used for extracted ion chromatogram (EIC) creation. See the
 <a href="EICParams.html">EIC parameters</a> documentation for more details.</p></dd>
 
 
-<dt>clearSession</dt>
+<dt id="arg-clearsession">clearSession<a class="anchor" aria-label="anchor" href="#arg-clearsession"></a></dt>
 <dd><p>If <code>TRUE</code> the session will be completely cleared before starting the GUI. This effectively
 removes all selections for data removal.</p></dd>
 
 
-<dt>components</dt>
+<dt id="arg-components">components<a class="anchor" aria-label="anchor" href="#arg-components"></a></dt>
 <dd><p>The <code><a href="components-class.html">components</a></code> to be checked.</p></dd>
 
 
-<dt>sessionIn, sessionOut</dt>
+<dt id="arg-sessionin-sessionout">sessionIn, sessionOut<a class="anchor" aria-label="anchor" href="#arg-sessionin-sessionout"></a></dt>
 <dd><p>The file names for the input and output sessions.</p></dd>
 
 
-<dt>rtWindow</dt>
+<dt id="arg-rtwindow">rtWindow<a class="anchor" aria-label="anchor" href="#arg-rtwindow"></a></dt>
 <dd><p>The retention time window (seconds) used to relate 'old' with 'new' feature groups.</p></dd>
 
 
-<dt>mzWindow</dt>
+<dt id="arg-mzwindow">mzWindow<a class="anchor" aria-label="anchor" href="#arg-mzwindow"></a></dt>
 <dd><p>The <em>m/z</em> window (in Da) used to relate 'old' with 'new' feature groups.</p></dd>
 
 
-<dt>overWrite</dt>
+<dt id="arg-overwrite">overWrite<a class="anchor" aria-label="anchor" href="#arg-overwrite"></a></dt>
 <dd><p>Set to <code>TRUE</code> to overwrite the output session file if it already exists. If <code>FALSE</code>, the
 function will stop with an error message.</p></dd>
 
 
-<dt>model</dt>
+<dt id="arg-model">model<a class="anchor" aria-label="anchor" href="#arg-model"></a></dt>
 <dd><p>The model that was created with <span class="pkg">MetaClean</span> and that should be used to predict pass/fail data. If
 <code>NULL</code>, the example model of the <span class="pkg">MetaCleanData</span> package is used.</p></dd>
 
@@ -245,15 +247,15 @@ executed again. Furthermore, functionality is provided to import and export sess
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

@@ -3,7 +3,7 @@
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -25,13 +25,13 @@
       <ul class="nav navbar-nav"><li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-     
+
   </a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Reference
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -44,7 +44,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Tutorial
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -57,7 +57,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Handbook
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -73,14 +73,14 @@
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/rickhelmus/patRoon" class="external-link">
     <span class="fa fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -95,198 +95,191 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre><code>records(obj)
-
-spectra(obj)
-
-# S4 method for MSLibrary
-records(obj)
-
-# S4 method for MSLibrary
-spectra(obj)
-
-# S4 method for MSLibrary
-length(x)
-
-# S4 method for MSLibrary
-names(x)
-
-# S4 method for MSLibrary
-show(object)
-
-# S4 method for MSLibrary,ANY,missing,missing
-[(x, i, j, ..., drop = TRUE)
-
-# S4 method for MSLibrary,ANY,missing
-[[(x, i, j)
-
-# S4 method for MSLibrary
-$(x, name)
-
-# S4 method for MSLibrary
-as.data.table(x)
-
-# S4 method for MSLibrary
-delete(obj, i = NULL, j = NULL, ...)
-
-# S4 method for MSLibrary
-filter(
-  obj,
-  properties = NULL,
-  massRange = NULL,
-  mzRangeSpec = NULL,
-  relMinIntensity = NULL,
-  topMost = NULL,
-  onlyAnnotated = FALSE,
-  negate = FALSE
-)
-
-# S4 method for MSLibrary
-convertToSuspects(
-  obj,
-  adduct,
-  spectrumType = "MS2",
-  avgSpecParams = getDefAvgPListParams(minIntensityPre = 0, minIntensityPost = 2, topMost
-    = 10),
-  collapse = TRUE,
-  suspects = NULL,
-  prefCalcChemProps = TRUE,
-  neutralChemProps = FALSE
-)
-
-# S4 method for MSLibrary
-export(obj, type = "msp", out)
-
-# S4 method for MSLibrary,MSLibrary
-merge(x, y, ...)</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">records</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">spectra</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'MSLibrary'</span></span>
+<span><span class="fu">records</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'MSLibrary'</span></span>
+<span><span class="fu">spectra</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'MSLibrary'</span></span>
+<span><span class="fu"><a href="generics.html">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'MSLibrary'</span></span>
+<span><span class="fu"><a href="generics.html">names</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'MSLibrary'</span></span>
+<span><span class="fu"><a href="generics.html">show</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'MSLibrary,ANY,missing,missing'</span></span>
+<span><span class="va">x</span><span class="op">[</span><span class="va">i</span>, <span class="va">j</span>, <span class="va">...</span>, drop <span class="op">=</span> <span class="cn">TRUE</span><span class="op">]</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'MSLibrary,ANY,missing'</span></span>
+<span><span class="va">x</span><span class="op">[[</span><span class="va">i</span>, <span class="va">j</span><span class="op">]</span><span class="op">]</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'MSLibrary'</span></span>
+<span><span class="va">x</span><span class="op">$</span><span class="va">name</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'MSLibrary'</span></span>
+<span><span class="fu"><a href="generics.html">as.data.table</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'MSLibrary'</span></span>
+<span><span class="fu"><a href="generics.html">delete</a></span><span class="op">(</span><span class="va">obj</span>, i <span class="op">=</span> <span class="cn">NULL</span>, j <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'MSLibrary'</span></span>
+<span><span class="fu"><a href="generics.html">filter</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  properties <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  massRange <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  mzRangeSpec <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  relMinIntensity <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  topMost <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  onlyAnnotated <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  negate <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'MSLibrary'</span></span>
+<span><span class="fu"><a href="generics.html">convertToSuspects</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  <span class="va">adduct</span>,</span>
+<span>  spectrumType <span class="op">=</span> <span class="st">"MS2"</span>,</span>
+<span>  avgSpecParams <span class="op">=</span> <span class="fu"><a href="getDefAvgPListParams.html">getDefAvgPListParams</a></span><span class="op">(</span>minIntensityPre <span class="op">=</span> <span class="fl">0</span>, minIntensityPost <span class="op">=</span> <span class="fl">2</span>, topMost</span>
+<span>    <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>,</span>
+<span>  collapse <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  suspects <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  prefCalcChemProps <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  neutralChemProps <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'MSLibrary'</span></span>
+<span><span class="fu"><a href="generics.html">export</a></span><span class="op">(</span><span class="va">obj</span>, type <span class="op">=</span> <span class="st">"msp"</span>, <span class="va">out</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'MSLibrary,MSLibrary'</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>x, obj, object</dt>
+
+
+<dl><dt id="arg-x-obj-object">x, obj, object<a class="anchor" aria-label="anchor" href="#arg-x-obj-object"></a></dt>
 <dd><p><code>MSLibrary</code> object to be accessed.</p></dd>
 
 
-<dt>i</dt>
+<dt id="arg-i">i<a class="anchor" aria-label="anchor" href="#arg-i"></a></dt>
 <dd><p>For <code>[</code>/<code>[[</code>: A numeric or character value which is used to select records by
 their index or name, respectively (for the order/names see <code><a href="generics.html">names()</a></code>).<br><br> For <code>[</code>: Can also be logical to perform logical selection
 (similar to regular vectors). If missing all records are selected.<br><br> For <code>[[</code>: should be a scalar value.</p></dd>
 
 
-<dt>...</dt>
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Unused.</p></dd>
 
 
-<dt>drop, j</dt>
+<dt id="arg-drop-j">drop, j<a class="anchor" aria-label="anchor" href="#arg-drop-j"></a></dt>
 <dd><p>ignored.</p></dd>
 
 
-<dt>name</dt>
+<dt id="arg-name">name<a class="anchor" aria-label="anchor" href="#arg-name"></a></dt>
 <dd><p>The record name (partially matched).</p></dd>
 
 
-<dt>properties</dt>
+<dt id="arg-properties">properties<a class="anchor" aria-label="anchor" href="#arg-properties"></a></dt>
 <dd><p>A named <code>list</code> with properties to be filtered. Each item in the <code>list</code> should be named
 with the name of the property, and should be a vector with allowed values. To obtain the possible properties, run
 <em>e.g.</em> <code>names(records)</code>. Example: <code>properties=list(Instrument_type=c("LC-ESI-QTOF","LC-ESI-TOF"))</code>. Set to <code>NULL</code> to ignore.</p></dd>
 
 
-<dt>massRange</dt>
+<dt id="arg-massrange">massRange<a class="anchor" aria-label="anchor" href="#arg-massrange"></a></dt>
 <dd><p>Records with a neutral mass outside this range will be removed. Should be a two-sized <code>numeric</code>
 vector with the lower and upper mass range. Set to <code>NULL</code> to ignore.</p></dd>
 
 
-<dt>mzRangeSpec</dt>
+<dt id="arg-mzrangespec">mzRangeSpec<a class="anchor" aria-label="anchor" href="#arg-mzrangespec"></a></dt>
 <dd><p>Similar to the <code>massRange</code> argument, but removes any peaks from recorded mass spectra outside
 the given <em>m/z</em> range.</p></dd>
 
 
-<dt>relMinIntensity</dt>
+<dt id="arg-relminintensity">relMinIntensity<a class="anchor" aria-label="anchor" href="#arg-relminintensity"></a></dt>
 <dd><p>The minimum relative intensity (<samp>0-1</samp>) of a mass peak to be kept. Set to <code>NULL</code> to
 ignore.</p></dd>
 
 
-<dt>topMost</dt>
+<dt id="arg-topmost">topMost<a class="anchor" aria-label="anchor" href="#arg-topmost"></a></dt>
 <dd><p>Only keep <code>topMost</code> number of mass peaks for each spectrum. This filter is applied after others.
 Set to <code>NULL</code> to ignore.</p></dd>
 
 
-<dt>onlyAnnotated</dt>
+<dt id="arg-onlyannotated">onlyAnnotated<a class="anchor" aria-label="anchor" href="#arg-onlyannotated"></a></dt>
 <dd><p>If <code>TRUE</code> then only recorded spectra that are formula annotated are kept.</p></dd>
 
 
-<dt>negate</dt>
+<dt id="arg-negate">negate<a class="anchor" aria-label="anchor" href="#arg-negate"></a></dt>
 <dd><p>If <code>TRUE</code> then filters are performed in opposite manner.</p></dd>
 
 
-<dt>adduct</dt>
+<dt id="arg-adduct">adduct<a class="anchor" aria-label="anchor" href="#arg-adduct"></a></dt>
 <dd><p>An <code><a href="adduct-class.html">adduct</a></code> object (or something that can be converted to it with <code><a href="adduct-utils.html">as.adduct</a></code>).
 Any records with a different adduct (<code>Precursor_type</code>) are not considered. Alternatively, <code>adduct</code> can be
 set to <code>NULL</code> to not filter out any records. However, in this case <em>no</em> MS/MS fragments will be added to
 the returned suspect list.</p></dd>
 
 
-<dt>spectrumType</dt>
+<dt id="arg-spectrumtype">spectrumType<a class="anchor" aria-label="anchor" href="#arg-spectrumtype"></a></dt>
 <dd><p>A <code>character</code> vector which limits library records to the given spectrum types
 (<code>Spectrum_type</code> field, <em>e.g.</em> <code>"MS2"</code>). Set to <code>NULL</code> to allow all spectrum types.</p></dd>
 
 
-<dt>avgSpecParams</dt>
+<dt id="arg-avgspecparams">avgSpecParams<a class="anchor" aria-label="anchor" href="#arg-avgspecparams"></a></dt>
 <dd><p>A <code>list</code> with parameters used for averaging spectra. See <code><a href="getDefAvgPListParams.html">getDefAvgPListParams</a></code>
 for more details.</p></dd>
 
 
-<dt>collapse</dt>
+<dt id="arg-collapse">collapse<a class="anchor" aria-label="anchor" href="#arg-collapse"></a></dt>
 <dd><p>Whether records with the same first-block <acronym>InChIKey</acronym> should be collapsed. See the
 <code>Suspect conversion</code> section for details.</p></dd>
 
 
-<dt>suspects</dt>
+<dt id="arg-suspects">suspects<a class="anchor" aria-label="anchor" href="#arg-suspects"></a></dt>
 <dd><p>If not <code>NULL</code> then this should be a suspect list (see <code><a href="suspect-screening.html">screenSuspects</a></code>) which will
 be amended with spectra data. See the <code>Suspect conversion</code> section for details.</p></dd>
 
 
-<dt>prefCalcChemProps</dt>
+<dt id="arg-prefcalcchemprops">prefCalcChemProps<a class="anchor" aria-label="anchor" href="#arg-prefcalcchemprops"></a></dt>
 <dd><p>If <code>TRUE</code> then calculated chemical properties such as the formula and
 <acronym>InChIKey</acronym> are preferred over what is already present in the input suspect list to <code>convertToSuspects</code>. For efficiency reasons it is
 recommended to set this to <code>TRUE</code>. See the <code>Validating and calculating chemical properties</code> section for
 more details.</p></dd>
 
 
-<dt>neutralChemProps</dt>
+<dt id="arg-neutralchemprops">neutralChemProps<a class="anchor" aria-label="anchor" href="#arg-neutralchemprops"></a></dt>
 <dd><p>If <code>TRUE</code> then the neutral form of the molecule is considered to calculate
 <acronym>SMILES</acronym>, formulae etc. Enabling this may improve feature matching when considering common adducts
 (<em>e.g.</em> <code>[M+H]+</code>, <code>[M-H]-</code>). See the <code>Validating and calculating chemical properties</code> section
 for more details.</p></dd>
 
 
-<dt>type</dt>
+<dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
 <dd><p>The export type. Currently just <code>"msp"</code>.</p></dd>
 
 
-<dt>out</dt>
+<dt id="arg-out">out<a class="anchor" aria-label="anchor" href="#arg-out"></a></dt>
 <dd><p>The file path to the output library file.</p></dd>
 
 
-<dt>y</dt>
+<dt id="arg-y">y<a class="anchor" aria-label="anchor" href="#arg-y"></a></dt>
 <dd><p>The <code>MSLibrary</code> to be merged with <code>x</code>.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p><code>delete</code> returns the object for which the specified data was removed.</p>
-
-
+    <p><code>delete</code> returns the object for which the specified data was removed.</p>
 <p><code>filter</code> returns a filtered <code>MSLibrary</code> object.</p>
-
-
-<p><code>convertToSuspects</code> return a suspect list (<code>data.table</code>), which can be used with</p>
-<p></p>
-<p><code><a href="suspect-screening.html">screenSuspects</a></code>.</p>
-
-
+<p><code>convertToSuspects</code> return a suspect list (<code>data.table</code>), which can be used with
+  <code><a href="suspect-screening.html">screenSuspects</a></code>.</p>
 <p><code>merge</code> returns a merged <code>MSLibrary</code> object.</p>
     </div>
     <div id="details">
@@ -295,7 +288,7 @@ for more details.</p></dd>
     </div>
     <div id="methods-by-generic-">
     <h2>Methods (by generic)</h2>
-    
+
 <ul><li><p><code>records(MSLibrary)</code>: Accessor method for the <code>records</code> slot of an <code>MSLibrary</code> class.</p></li>
 <li><p><code>spectra(MSLibrary)</code>: Accessor method for the <code>spectra</code> slot of an <code>MSLibrary</code> class.</p></li>
 <li><p><code>length(MSLibrary)</code>: Obtains the total number of records stored.</p></li>
@@ -319,7 +312,7 @@ unique are added to <code>x</code>. Records that were already in <code>x</code> 
 </ul></div>
     <div id="slots">
     <h2>Slots</h2>
-    
+
 
 <dl><dt><code>records</code></dt>
 <dd><p>A <code>data.table</code> with metadata for all records. Use the <code>records</code> method for access.</p></dd>
@@ -366,7 +359,7 @@ the <code>spectra</code> method for access.</p></dd>
 <p>The internal validation/calculation process performs the following steps:</p><ul><li><p>Validation of <acronym>SMILES</acronym>, <acronym>InChI</acronym>, <acronym>InChIKey</acronym> and formula data (if present). Invalid
   entries will be set to <code>NA</code>.</p></li>
 <li><p>If <code>neutralChemProps=TRUE</code> then chemical data (<acronym>SMILES</acronym>, formulae etc.) is neutralized by
-  (de-)protonation (using the <code class="command">--neutralized</code> option of <code class="command">OpenBabel</code>). An additional column
+  (de-)protonation (using the <code class="command">–neutralized</code> option of <code class="command">OpenBabel</code>). An additional column
   <code>molNeutralized</code> is added to mark those molecules that were neutralized. Note that neutralization requires
   either <acronym>SMILES</acronym> or <acronym>InChI</acronym> data to be available.</p></li>
 <li><p>The <acronym>SMILES</acronym> and <acronym>InChI</acronym> data are used to calculate missing or invalid <acronym>SMILES</acronym>,
@@ -385,7 +378,7 @@ the <code>spectra</code> method for access.</p></dd>
     <h2>References</h2>
     <p>Wohlgemuth G, Mehta SS, Mejia RF, Neumann S, Pedrosa D, Pluskal T, Schymanski EL, Willighagen EL, Wilson M, Wishart DS, Arita M, Dorrestein PC, Bandeira N, Wang M, Schulze T, Salek RM, Steinbeck C, Nainala VC, Mistrik R, Nishioka T, Fiehn O (2016).
 “SPLASH,  a hashed identifier for mass spectra.”
-<em>Nature Biotechnology</em>, <b>34</b>(11), 1099--1101.
+<em>Nature Biotechnology</em>, <b>34</b>(11), 1099–1101.
 <a href="https://doi.org/10.1038/nbt.3689" class="external-link">doi:10.1038/nbt.3689</a>
 .
  <br><br><br><br><br><br></p>
@@ -412,15 +405,15 @@ the <code>spectra</code> method for access.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

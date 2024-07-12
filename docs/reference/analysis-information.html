@@ -3,7 +3,7 @@
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -25,13 +25,13 @@
       <ul class="nav navbar-nav"><li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-     
+
   </a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Reference
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -44,7 +44,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Tutorial
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -57,7 +57,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Handbook
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -73,14 +73,14 @@
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/rickhelmus/patRoon" class="external-link">
     <span class="fa fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -109,23 +109,25 @@
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>paths</dt>
+
+
+<dl><dt id="arg-paths">paths<a class="anchor" aria-label="anchor" href="#arg-paths"></a></dt>
 <dd><p>A character vector containing one or more file paths that should be used for finding the analyses.</p></dd>
 
 
-<dt>groups, blanks</dt>
+<dt id="arg-groups-blanks">groups, blanks<a class="anchor" aria-label="anchor" href="#arg-groups-blanks"></a></dt>
 <dd><p>An (optional) character vector containing replicate groups and blanks, respectively (will be
 recycled). If <code>groups</code> is an empty character string (<code>""</code>) the analysis name will be set as replicate
 group.</p></dd>
 
 
-<dt>concs</dt>
+<dt id="arg-concs">concs<a class="anchor" aria-label="anchor" href="#arg-concs"></a></dt>
 <dd><p>An optional numeric vector containing concentration values for each analysis. Can be <code>NA</code> if
 unknown. If the length of <code>concs</code> is less than the number of analyses the remainders will be set to <code>NA</code>.
 Set to <code>NULL</code> to not include concentration data.</p></dd>
 
 
-<dt>norm_concs</dt>
+<dt id="arg-norm-concs">norm_concs<a class="anchor" aria-label="anchor" href="#arg-norm-concs"></a></dt>
 <dd><p>An optional numeric vector containing concentrations used for <em>feature normalization</em> (see the
 <code>Feature intensity normalization</code> section in the <a href="featureGroups-class.html">featureGroups documentation</a>).
 <code>NA</code> values are allowed for analyses that should not be normalized (<em>e.g.</em> because no IS is present). If
@@ -133,12 +135,12 @@ the length of <code>norm_concs</code> is less than the number of analyses the re
 <code>NULL</code> to not include normalization concentration data.</p></dd>
 
 
-<dt>formats</dt>
+<dt id="arg-formats">formats<a class="anchor" aria-label="anchor" href="#arg-formats"></a></dt>
 <dd><p>A character vector of analyses file types to consider. Analyses not present in these formats will be
 ignored. For valid values see <code><a href="convertMSFiles.html">MSFileFormats</a></code>.</p></dd>
 
 
-<dt>path</dt>
+<dt id="arg-path">path<a class="anchor" aria-label="anchor" href="#arg-path"></a></dt>
 <dd><p>The path of the enviMass project.</p></dd>
 
 </dl></div>
@@ -198,15 +200,15 @@ necessary for the <code><a href="featureGroups-class.html">normInts</a></code> m
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

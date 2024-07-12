@@ -3,7 +3,7 @@
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -25,13 +25,13 @@
       <ul class="nav navbar-nav"><li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-     
+
   </a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Reference
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -44,7 +44,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Tutorial
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -57,7 +57,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Handbook
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -73,14 +73,14 @@
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/rickhelmus/patRoon" class="external-link">
     <span class="fa fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -97,7 +97,7 @@
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">generateComponentsTPs</span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for featureGroups</span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
 <span><span class="fu">generateComponentsTPs</span><span class="op">(</span></span>
 <span>  <span class="va">fGroups</span>,</span>
 <span>  fGroupsTPs <span class="op">=</span> <span class="va">fGroups</span>,</span>
@@ -110,7 +110,7 @@
 <span>  specSimParams <span class="op">=</span> <span class="fu"><a href="specSimParams.html">getDefSpecSimParams</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for featureGroupsSet</span></span>
+<span><span class="co"># S4 method for class 'featureGroupsSet'</span></span>
 <span><span class="fu">generateComponentsTPs</span><span class="op">(</span></span>
 <span>  <span class="va">fGroups</span>,</span>
 <span>  fGroupsTPs <span class="op">=</span> <span class="va">fGroups</span>,</span>
@@ -126,47 +126,47 @@
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>fGroups</dt>
+
+
+<dl><dt id="arg-fgroups">fGroups<a class="anchor" aria-label="anchor" href="#arg-fgroups"></a></dt>
 <dd><p>The input <code><a href="featureGroups-class.html">featureGroups</a></code> for componentization. See <code>fGroupsTPs</code>.</p></dd>
 
 
-<dt>fGroupsTPs</dt>
+<dt id="arg-fgroupstps">fGroupsTPs<a class="anchor" aria-label="anchor" href="#arg-fgroupstps"></a></dt>
 <dd><p>A <code><a href="featureGroups-class.html">featureGroups</a></code> object containing the feature groups that are expected to be
 transformation products. If a distinction between parents and TPs is not yet known, <code>fGroupsTPs</code> should equal
 the <code>fGroups</code> argument. Otherwise, <code>fGroups</code> should only contain the parent feature groups, and both
 <code>fGroups</code> and <code>fGroupsTPs</code> <em>must</em> be a subset of the same <code><a href="featureGroups-class.html">featureGroups</a></code> object.</p></dd>
 
 
-<dt>ignoreParents</dt>
+<dt id="arg-ignoreparents">ignoreParents<a class="anchor" aria-label="anchor" href="#arg-ignoreparents"></a></dt>
 <dd><p>If <code>TRUE</code> then feature groups present in both <code>fGroups</code> and <code>fGroupsTPs</code> are not
 considered as TPs.</p></dd>
 
 
-<dt>TPs</dt>
+<dt id="arg-tps">TPs<a class="anchor" aria-label="anchor" href="#arg-tps"></a></dt>
 <dd><p>A <code><a href="transformationProducts-class.html">transformationProducts</a></code> object. Set to <code>NULL</code> to perform linking without this data.</p></dd>
 
 
-<dt>MSPeakLists, formulas, compounds</dt>
+<dt id="arg-mspeaklists-formulas-compounds">MSPeakLists, formulas, compounds<a class="anchor" aria-label="anchor" href="#arg-mspeaklists-formulas-compounds"></a></dt>
 <dd><p>A <code><a href="MSPeakLists-class.html">MSPeakLists</a></code>/<code><a href="formulas-class.html">formulas</a></code>/<code><a href="compounds-class.html">compounds</a></code>
 object to calculate MS/MS or annotation similarities between parents and TPs. If <code>NULL</code> then this data is not
 calculated. For more details see the <code>Linking parents and transformation products</code> section below.</p></dd>
 
 
-<dt>minRTDiff</dt>
+<dt id="arg-minrtdiff">minRTDiff<a class="anchor" aria-label="anchor" href="#arg-minrtdiff"></a></dt>
 <dd><p>Minimum retention time (in seconds) difference between the parent and a TP to determine whether a TP
 elutes prior/after the parent (to calculate <code>retDir</code> values, see Details in <a href="componentsTPs-class.html">componentsTPs</a>))</p></dd>
 
 
-<dt>specSimParams</dt>
+<dt id="arg-specsimparams">specSimParams<a class="anchor" aria-label="anchor" href="#arg-specsimparams"></a></dt>
 <dd><p>A named <code>list</code> with parameters that influence the calculation of MS spectra similarities.
 See the <a href="specSimParams.html">spectral similarity parameters</a> documentation for more details.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p>The components are stored in objects derived from <code><a href="componentsTPs-class.html">componentsTPs</a></code>.</p>
+    <p>The components are stored in objects derived from <code><a href="componentsTPs-class.html">componentsTPs</a></code>.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -249,15 +249,15 @@ See the <a href="specSimParams.html">spectral similarity parameters</a> document
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

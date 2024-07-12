@@ -3,7 +3,7 @@
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -25,13 +25,13 @@
       <ul class="nav navbar-nav"><li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-     
+
   </a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Reference
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -44,7 +44,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Tutorial
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -57,7 +57,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Handbook
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -73,14 +73,14 @@
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/rickhelmus/patRoon" class="external-link">
     <span class="fa fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -114,56 +114,58 @@
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>parents</dt>
+
+
+<dl><dt id="arg-parents">parents<a class="anchor" aria-label="anchor" href="#arg-parents"></a></dt>
 <dd><p>The parents for which transformation products should be obtained. This can be (1) a suspect list (see
 <a href="suspect-screening.html">suspect screening</a> for more information), (2) the resulting output of
 <code><a href="suspect-screening.html">screenSuspects</a></code> or (3) a <code><a href="compounds-class.html">compounds</a></code> annotation object. In the former two cases, the
 suspect (hits) are used as parents, whereas in the latter case all candidates are used as parents.</p></dd>
 
 
-<dt>transLibrary</dt>
+<dt id="arg-translibrary">transLibrary<a class="anchor" aria-label="anchor" href="#arg-translibrary"></a></dt>
 <dd><p>A <code>character</code> specifying which transformation library should be used. Currently supported
 are: <code>"hydrolysis"</code>, <code>"abiotic_reduction"</code>, <code>"photolysis_unranked"</code>, <code>"photolysis_ranked"</code>,
 <code>"mammalian_metabolism"</code>, <code>"combined_abioticreduction_hydrolysis"</code>,
 <code>"combined_photolysis_abiotic_hydrolysis"</code>, <code>"pfas_environmental"</code>, <code>"pfas_metabolism"</code>.</p></dd>
 
 
-<dt>generations</dt>
+<dt id="arg-generations">generations<a class="anchor" aria-label="anchor" href="#arg-generations"></a></dt>
 <dd><p>An <code>integer</code> that specifies the number of transformation generations to predict.</p></dd>
 
 
-<dt>errorRetries</dt>
+<dt id="arg-errorretries">errorRetries<a class="anchor" aria-label="anchor" href="#arg-errorretries"></a></dt>
 <dd><p>The maximum number of connection retries. Sets the <code>times</code> argument to the
 <code><a href="https://httr.r-lib.org/reference/RETRY.html" class="external-link">http::RETRY</a></code> function.</p></dd>
 
 
-<dt>skipInvalid</dt>
+<dt id="arg-skipinvalid">skipInvalid<a class="anchor" aria-label="anchor" href="#arg-skipinvalid"></a></dt>
 <dd><p>If set to <code>TRUE</code> then the parents will be skipped (with a warning) for which insufficient
 information (<em>e.g.</em> SMILES) is available.</p></dd>
 
 
-<dt>prefCalcChemProps</dt>
+<dt id="arg-prefcalcchemprops">prefCalcChemProps<a class="anchor" aria-label="anchor" href="#arg-prefcalcchemprops"></a></dt>
 <dd><p>If <code>TRUE</code> then calculated chemical properties such as the formula and
 <acronym>InChIKey</acronym> are preferred over what is already present in the parent suspect list. For efficiency reasons it is
 recommended to set this to <code>TRUE</code>. See the <code>Validating and calculating chemical properties</code> section for
 more details.</p></dd>
 
 
-<dt>neutralChemProps</dt>
+<dt id="arg-neutralchemprops">neutralChemProps<a class="anchor" aria-label="anchor" href="#arg-neutralchemprops"></a></dt>
 <dd><p>If <code>TRUE</code> then the neutral form of the molecule is considered to calculate
 <acronym>SMILES</acronym>, formulae etc. Enabling this may improve feature matching when considering common adducts
 (<em>e.g.</em> <code>[M+H]+</code>, <code>[M-H]-</code>). See the <code>Validating and calculating chemical properties</code> section
 for more details.</p></dd>
 
 
-<dt>neutralizeTPs</dt>
+<dt id="arg-neutralizetps">neutralizeTPs<a class="anchor" aria-label="anchor" href="#arg-neutralizetps"></a></dt>
 <dd><p>If <code>TRUE</code> then all resulting TP structure information is neutralized. This argument has a
 similar meaning as <code>neutralChemProps</code>. This is defaulted to <code>TRUE</code> for prediction algorithms, as these
 may output charged molecules. <strong>NOTE:</strong> if neutrlization results in duplicate TPs, <em>i.e.</em> when the
 neutral form of the TP was also generated by the algorithm, then the neutralized TP <em>will be removed</em>.</p></dd>
 
 
-<dt>calcLogP</dt>
+<dt id="arg-calclogp">calcLogP<a class="anchor" aria-label="anchor" href="#arg-calclogp"></a></dt>
 <dd><p>A <code>character</code> specifying whether <code>Log P</code> values should be calculated with
 <code><a href="https://rdrr.io/pkg/rcdk/man/get.xlogp.html" class="external-link">rcdk::get.xlogp</a></code> (<code>calcLogP="rcdk"</code>),
 <a href="https://github.com/openbabel/openbabel" class="external-link">OpenBabel</a> (<code>calcLogP="obabel"</code>) or not at all
@@ -171,7 +173,7 @@ neutral form of the TP was also generated by the algorithm, then the neutralized
 order (<code>retDir</code>).</p></dd>
 
 
-<dt>calcSims</dt>
+<dt id="arg-calcsims">calcSims<a class="anchor" aria-label="anchor" href="#arg-calcsims"></a></dt>
 <dd><p>If set to <code>TRUE</code> then structural similarities between the parent and its TPs are calculated. A
 minimum similarity can be obtained by using the <a href="transformationProductsStructure-class.html">filter
 method</a>. May be useful under the assumption that parents and TPs who have a high structural similarity, also likely
@@ -179,26 +181,24 @@ have a high MS/MS spectral similarity (which can be evaluated after componentiza
 <code><a href="generateComponentsTPs.html">generateComponentsTPs</a></code>).</p></dd>
 
 
-<dt>fpType</dt>
+<dt id="arg-fptype">fpType<a class="anchor" aria-label="anchor" href="#arg-fptype"></a></dt>
 <dd><p>The type of structural fingerprint that should be calculated. See the <code>type</code> argument of the
 <code>get.fingerprint</code> function of <a href="https://CRAN.R-project.org/package=rcdk" class="external-link"><span class="pkg">rcdk</span></a>.</p></dd>
 
 
-<dt>fpSimMethod</dt>
+<dt id="arg-fpsimmethod">fpSimMethod<a class="anchor" aria-label="anchor" href="#arg-fpsimmethod"></a></dt>
 <dd><p>The method for calculating similarities (i.e. not dissimilarity!). See the <code>method</code> argument
 of the <code>fp.sim.matrix</code> function of the <a href="https://CRAN.R-project.org/package=fingerprint" class="external-link"><span class="pkg">fingerprint</span></a> package.</p></dd>
 
 
-<dt>parallel</dt>
+<dt id="arg-parallel">parallel<a class="anchor" aria-label="anchor" href="#arg-parallel"></a></dt>
 <dd><p>If set to <code>TRUE</code> then code is executed in parallel through the <a href="https://CRAN.R-project.org/package=futures" class="external-link"><span class="pkg">futures</span></a> package. Please
 see the parallelization section in the handbook for more details.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p>The TPs are stored in an object derived from the <code><a href="transformationProductsStructure-class.html">transformationProductsStructure</a></code> class.</p>
+    <p>The TPs are stored in an object derived from the <code><a href="transformationProductsStructure-class.html">transformationProductsStructure</a></code> class.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -223,7 +223,7 @@ see the parallelization section in the handbook for more details.</p></dd>
 <p>The internal validation/calculation process performs the following steps:</p><ul><li><p>Validation of <acronym>SMILES</acronym>, <acronym>InChI</acronym>, <acronym>InChIKey</acronym> and formula data (if present). Invalid
   entries will be set to <code>NA</code>.</p></li>
 <li><p>If <code>neutralChemProps=TRUE</code> then chemical data (<acronym>SMILES</acronym>, formulae etc.) is neutralized by
-  (de-)protonation (using the <code class="command">--neutralized</code> option of <code class="command">OpenBabel</code>). An additional column
+  (de-)protonation (using the <code class="command">–neutralized</code> option of <code class="command">OpenBabel</code>). An additional column
   <code>molNeutralized</code> is added to mark those molecules that were neutralized. Note that neutralization requires
   either <acronym>SMILES</acronym> or <acronym>InChI</acronym> data to be available.</p></li>
 <li><p>The <acronym>SMILES</acronym> and <acronym>InChI</acronym> data are used to calculate missing or invalid <acronym>SMILES</acronym>,
@@ -251,13 +251,13 @@ see the parallelization section in the handbook for more details.</p></dd>
 <em>Proceedings of the 8th International Congress on Environmental Modelling and Software</em>.
  <br><br> Tebes-Stevens C, Patel JM, Jones WJ, Weber EJ (2017).
 “Prediction of Hydrolysis Products of Organic Chemicals under Environmental pH Conditions.”
-<em>Environmental Science &amp; Technology</em>, <b>51</b>(9), 5008--5016.
+<em>Environmental Science &amp; Technology</em>, <b>51</b>(9), 5008–5016.
 <a href="https://doi.org/10.1021/acs.est.6b05412" class="external-link">doi:10.1021/acs.est.6b05412</a>
 .
  <br><br>
   Yuan C, Tebes-Stevens C, Weber EJ (2020).
 “Reaction Library to Predict Direct Photochemical Transformation Products of Environmental Organic Contaminants in Sunlit Aquatic Systems.”
-<em>Environmental Science &amp; Technology</em>, <b>54</b>(12), 7271--7279.
+<em>Environmental Science &amp; Technology</em>, <b>54</b>(12), 7271–7279.
 <a href="https://doi.org/10.1021/acs.est.0c00484" class="external-link">doi:10.1021/acs.est.0c00484</a>
 .
  <br><br> Yuan C, Tebes-Stevens C, Weber EJ (2021).
@@ -290,15 +290,15 @@ see the parallelization section in the handbook for more details.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

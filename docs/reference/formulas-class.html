@@ -3,7 +3,7 @@
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -25,13 +25,13 @@
       <ul class="nav navbar-nav"><li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-     
+
   </a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Reference
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -44,7 +44,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Tutorial
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -57,7 +57,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Handbook
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -73,14 +73,14 @@
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/rickhelmus/patRoon" class="external-link">
     <span class="fa fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -95,154 +95,156 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre><code># S4 method for formulas
-annotations(obj, features = FALSE)
-
-# S4 method for formulas
-analyses(obj)
-
-# S4 method for formulas
-defaultExclNormScores(obj)
-
-# S4 method for formulas
-show(object)
-
-# S4 method for formulas,ANY,ANY
-[[(x, i, j)
-
-# S4 method for formulas
-delete(obj, i = NULL, j = NULL, ...)
-
-# S4 method for formulas
-as.data.table(
-  x,
-  fGroups = NULL,
-  fragments = FALSE,
-  countElements = NULL,
-  countFragElements = NULL,
-  OM = FALSE,
-  normalizeScores = "none",
-  excludeNormScores = defaultExclNormScores(x),
-  average = FALSE
-)
-
-# S4 method for formulas
-annotatedPeakList(
-  obj,
-  index,
-  groupName,
-  analysis = NULL,
-  MSPeakLists,
-  onlyAnnotated = FALSE
-)
-
-# S4 method for formulas
-plotSpectrum(
-  obj,
-  index,
-  groupName,
-  analysis = NULL,
-  MSPeakLists,
-  title = NULL,
-  specSimParams = getDefSpecSimParams(),
-  mincex = 0.9,
-  xlim = NULL,
-  ylim = NULL,
-  ...
-)
-
-# S4 method for formulas
-plotScores(
-  obj,
-  index,
-  groupName,
-  analysis = NULL,
-  normalizeScores = "max",
-  excludeNormScores = defaultExclNormScores(obj)
-)
-
-# S4 method for formulas
-consensus(
-  obj,
-  ...,
-  absMinAbundance = NULL,
-  relMinAbundance = NULL,
-  uniqueFrom = NULL,
-  uniqueOuter = FALSE,
-  rankWeights = 1,
-  labels = NULL
-)
-
-# S4 method for formulasSet
-show(object)
-
-# S4 method for formulasSet
-delete(obj, i, j, ...)
-
-# S4 method for formulasSet,ANY,missing,missing
-[(x, i, j, ..., sets = NULL, updateConsensus = FALSE, drop = TRUE)
-
-# S4 method for formulasSet
-filter(obj, ..., sets = NULL, updateConsensus = FALSE, negate = FALSE)
-
-# S4 method for formulasSet
-plotSpectrum(
-  obj,
-  index,
-  groupName,
-  analysis = NULL,
-  MSPeakLists,
-  title = NULL,
-  specSimParams = getDefSpecSimParams(),
-  mincex = 0.9,
-  xlim = NULL,
-  ylim = NULL,
-  perSet = TRUE,
-  mirror = TRUE,
-  ...
-)
-
-# S4 method for formulasSet
-annotatedPeakList(obj, index, groupName, analysis = NULL, MSPeakLists, ...)
-
-# S4 method for formulasSet
-consensus(
-  obj,
-  ...,
-  absMinAbundance = NULL,
-  relMinAbundance = NULL,
-  uniqueFrom = NULL,
-  uniqueOuter = FALSE,
-  rankWeights = 1,
-  labels = NULL,
-  filterSets = FALSE,
-  setThreshold = 0,
-  setThresholdAnn = 0,
-  setAvgSpecificScores = FALSE
-)
-
-# S4 method for formulasSet
-unset(obj, set)
-
-# S4 method for formulasConsensusSet
-unset(obj, set)
-
-# S4 method for formulasSIRIUS
-delete(obj, i = NULL, j = NULL, ...)</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for class 'formulas'</span></span>
+<span><span class="fu"><a href="generics.html">annotations</a></span><span class="op">(</span><span class="va">obj</span>, features <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'formulas'</span></span>
+<span><span class="fu"><a href="generics.html">analyses</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'formulas'</span></span>
+<span><span class="fu"><a href="generics.html">defaultExclNormScores</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'formulas'</span></span>
+<span><span class="fu"><a href="generics.html">show</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'formulas,ANY,ANY'</span></span>
+<span><span class="va">x</span><span class="op">[[</span><span class="va">i</span>, <span class="va">j</span><span class="op">]</span><span class="op">]</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'formulas'</span></span>
+<span><span class="fu"><a href="generics.html">delete</a></span><span class="op">(</span><span class="va">obj</span>, i <span class="op">=</span> <span class="cn">NULL</span>, j <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'formulas'</span></span>
+<span><span class="fu"><a href="generics.html">as.data.table</a></span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  fGroups <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  fragments <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  countElements <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  countFragElements <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  OM <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  normalizeScores <span class="op">=</span> <span class="st">"none"</span>,</span>
+<span>  excludeNormScores <span class="op">=</span> <span class="fu"><a href="generics.html">defaultExclNormScores</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
+<span>  average <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'formulas'</span></span>
+<span><span class="fu"><a href="generics.html">annotatedPeakList</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  <span class="va">index</span>,</span>
+<span>  <span class="va">groupName</span>,</span>
+<span>  analysis <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">MSPeakLists</span>,</span>
+<span>  onlyAnnotated <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'formulas'</span></span>
+<span><span class="fu"><a href="generics.html">plotSpectrum</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  <span class="va">index</span>,</span>
+<span>  <span class="va">groupName</span>,</span>
+<span>  analysis <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">MSPeakLists</span>,</span>
+<span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  specSimParams <span class="op">=</span> <span class="fu"><a href="specSimParams.html">getDefSpecSimParams</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  mincex <span class="op">=</span> <span class="fl">0.9</span>,</span>
+<span>  xlim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'formulas'</span></span>
+<span><span class="fu"><a href="generics.html">plotScores</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  <span class="va">index</span>,</span>
+<span>  <span class="va">groupName</span>,</span>
+<span>  analysis <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  normalizeScores <span class="op">=</span> <span class="st">"max"</span>,</span>
+<span>  excludeNormScores <span class="op">=</span> <span class="fu"><a href="generics.html">defaultExclNormScores</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'formulas'</span></span>
+<span><span class="fu"><a href="generics.html">consensus</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  absMinAbundance <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  relMinAbundance <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  uniqueFrom <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  uniqueOuter <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  rankWeights <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  labels <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'formulasSet'</span></span>
+<span><span class="fu"><a href="generics.html">show</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'formulasSet'</span></span>
+<span><span class="fu"><a href="generics.html">delete</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">i</span>, <span class="va">j</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'formulasSet,ANY,missing,missing'</span></span>
+<span><span class="va">x</span><span class="op">[</span><span class="va">i</span>, <span class="va">j</span>, <span class="va">...</span>, sets <span class="op">=</span> <span class="cn">NULL</span>, updateConsensus <span class="op">=</span> <span class="cn">FALSE</span>, drop <span class="op">=</span> <span class="cn">TRUE</span><span class="op">]</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'formulasSet'</span></span>
+<span><span class="fu"><a href="generics.html">filter</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span>, sets <span class="op">=</span> <span class="cn">NULL</span>, updateConsensus <span class="op">=</span> <span class="cn">FALSE</span>, negate <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'formulasSet'</span></span>
+<span><span class="fu"><a href="generics.html">plotSpectrum</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  <span class="va">index</span>,</span>
+<span>  <span class="va">groupName</span>,</span>
+<span>  analysis <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">MSPeakLists</span>,</span>
+<span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  specSimParams <span class="op">=</span> <span class="fu"><a href="specSimParams.html">getDefSpecSimParams</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  mincex <span class="op">=</span> <span class="fl">0.9</span>,</span>
+<span>  xlim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  perSet <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  mirror <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'formulasSet'</span></span>
+<span><span class="fu"><a href="generics.html">annotatedPeakList</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">index</span>, <span class="va">groupName</span>, analysis <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">MSPeakLists</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'formulasSet'</span></span>
+<span><span class="fu"><a href="generics.html">consensus</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  absMinAbundance <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  relMinAbundance <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  uniqueFrom <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  uniqueOuter <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  rankWeights <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  labels <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  filterSets <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  setThreshold <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  setThresholdAnn <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  setAvgSpecificScores <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'formulasSet'</span></span>
+<span><span class="fu"><a href="generics.html">unset</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">set</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'formulasConsensusSet'</span></span>
+<span><span class="fu"><a href="generics.html">unset</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">set</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'formulasSIRIUS'</span></span>
+<span><span class="fu"><a href="generics.html">delete</a></span><span class="op">(</span><span class="va">obj</span>, i <span class="op">=</span> <span class="cn">NULL</span>, j <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>obj, x, object</dt>
+
+
+<dl><dt id="arg-obj-x-object">obj, x, object<a class="anchor" aria-label="anchor" href="#arg-obj-x-object"></a></dt>
 <dd><p>The <code>formulas</code> object.</p></dd>
 
 
-<dt>features</dt>
+<dt id="arg-features">features<a class="anchor" aria-label="anchor" href="#arg-features"></a></dt>
 <dd><p>If <code>TRUE</code> returns formula data for features, otherwise
 for feature groups.</p></dd>
 
 
-<dt>i, j</dt>
+<dt id="arg-i-j">i, j<a class="anchor" aria-label="anchor" href="#arg-i-j"></a></dt>
 <dd><p>For <code>[[</code>: If both <code>i</code> and <code>j</code> are specified then <code>i</code> specifies the analysis and
   <code>j</code> the feature group of the feature for which annotations should be returned. Otherwise <code>i</code> specifies
   the feature group for which group annotations should be returned. <code>i</code>/<code>j</code> can be specified as
@@ -250,19 +252,19 @@ for feature groups.</p></dd>
 <p>Otherwise passed to the <code><a href="featureAnnotations-class.html">featureAnnotations</a></code> method.</p></dd>
 
 
-<dt>...</dt>
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>For <code>plotSpectrum</code>: Further arguments passed to <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></code>.</p>
 <p>For <code>delete</code>: passed to the function specified as <code>j</code>.</p>
 <p>For <code>consensus</code>: Any further (and unique) <code>formulas</code> objects.</p>
 <p>For <a href="sets-workflow.html">sets workflow</a> methods: further arguments passed to the base <code>formulas</code> method.</p></dd>
 
 
-<dt>fGroups, fragments, countElements, countFragElements, OM</dt>
+<dt id="arg-fgroups-fragments-countelements-countfragelements-om">fGroups, fragments, countElements, countFragElements, OM<a class="anchor" aria-label="anchor" href="#arg-fgroups-fragments-countelements-countfragelements-om"></a></dt>
 <dd><p>Passed to the
 <code><a href="featureAnnotations-class.html">featureAnnotations</a></code> method.</p></dd>
 
 
-<dt>normalizeScores</dt>
+<dt id="arg-normalizescores">normalizeScores<a class="anchor" aria-label="anchor" href="#arg-normalizescores"></a></dt>
 <dd><p>A <code>character</code> that specifies how normalization of
 annotation scorings occurs. Either
 <code>"none"</code> (no normalization),
@@ -276,7 +278,7 @@ results were removed after they were generated (<em>e.g.</em> by use of
 <code>filter</code>).</p></dd>
 
 
-<dt>excludeNormScores</dt>
+<dt id="arg-excludenormscores">excludeNormScores<a class="anchor" aria-label="anchor" href="#arg-excludenormscores"></a></dt>
 <dd><p>A
   <code>character</code> vector specifying any compound scoring names that
   should <em>not</em> be normalized. Set to <code>NULL</code> to normalize all
@@ -287,59 +289,59 @@ results were removed after they were generated (<em>e.g.</em> by use of
   <code class="command">MetFrag</code> web interface.</p></dd>
 
 
-<dt>average</dt>
+<dt id="arg-average">average<a class="anchor" aria-label="anchor" href="#arg-average"></a></dt>
 <dd><p>If set to <code>TRUE</code> an 'average formula' is generated for each feature group by combining all
 elements from all candidates and averaging their amounts. This obviously leads to non-existing formulae, however,
 this data may be useful to deal with multiple candidate formulae per feature group when performing elemental
 characterization. Setting this to <code>TRUE</code> disables reporting of most other data.</p></dd>
 
 
-<dt>index</dt>
+<dt id="arg-index">index<a class="anchor" aria-label="anchor" href="#arg-index"></a></dt>
 <dd><p>The candidate index (row). For <code>plotSpectrum</code> two indices can be specified to compare spectra. In
 this case <code>groupName</code> and <code>analysis</code> (if not <code>NULL</code>) should specify values for the spectra to
 compare.</p></dd>
 
 
-<dt>groupName</dt>
+<dt id="arg-groupname">groupName<a class="anchor" aria-label="anchor" href="#arg-groupname"></a></dt>
 <dd><p>The name of the feature group (or feature groups when comparing spectra) to which the candidate
 belongs.</p></dd>
 
 
-<dt>analysis</dt>
+<dt id="arg-analysis">analysis<a class="anchor" aria-label="anchor" href="#arg-analysis"></a></dt>
 <dd><p>A <code>character</code> specifying the analysis (or analyses when comparing spectra) for which the
 annotated spectrum should be plotted. If <code>NULL</code> then annotation results for the complete feature group will be
 plotted.</p></dd>
 
 
-<dt>MSPeakLists</dt>
+<dt id="arg-mspeaklists">MSPeakLists<a class="anchor" aria-label="anchor" href="#arg-mspeaklists"></a></dt>
 <dd><p>The <code><a href="MSPeakLists-class.html">MSPeakLists</a></code> object that was used to generate the candidate</p></dd>
 
 
-<dt>onlyAnnotated</dt>
+<dt id="arg-onlyannotated">onlyAnnotated<a class="anchor" aria-label="anchor" href="#arg-onlyannotated"></a></dt>
 <dd><p>Set to <code>TRUE</code> to filter out any peaks that could
 not be annotated.</p></dd>
 
 
-<dt>title</dt>
+<dt id="arg-title">title<a class="anchor" aria-label="anchor" href="#arg-title"></a></dt>
 <dd><p>The title of the plot. Set to <code>NULL</code> for an automatically generated title.</p></dd>
 
 
-<dt>specSimParams</dt>
+<dt id="arg-specsimparams">specSimParams<a class="anchor" aria-label="anchor" href="#arg-specsimparams"></a></dt>
 <dd><p>A named <code>list</code> with parameters that influence the calculation of MS spectra similarities.
 See the <a href="specSimParams.html">spectral similarity parameters</a> documentation for more details.</p></dd>
 
 
-<dt>mincex</dt>
+<dt id="arg-mincex">mincex<a class="anchor" aria-label="anchor" href="#arg-mincex"></a></dt>
 <dd><p>The formula annotation labels are automatically scaled. The <code>mincex</code> argument forces a minimum
 <code>cex</code> value for readability.</p></dd>
 
 
-<dt>xlim, ylim</dt>
+<dt id="arg-xlim-ylim">xlim, ylim<a class="anchor" aria-label="anchor" href="#arg-xlim-ylim"></a></dt>
 <dd><p>Sets the plot size limits used by
 <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></code>. Set to <code>NULL</code> for automatic plot sizing.</p></dd>
 
 
-<dt>absMinAbundance, relMinAbundance</dt>
+<dt id="arg-absminabundance-relminabundance">absMinAbundance, relMinAbundance<a class="anchor" aria-label="anchor" href="#arg-absminabundance-relminabundance"></a></dt>
 <dd><p>Minimum absolute or relative
 (<samp>0-1</samp>) abundance across objects for a result to be kept. For
 instance, <code>relMinAbundance=0.5</code> means that a result should be present
@@ -348,7 +350,7 @@ ignore and keep all results. Limits cannot be set when <code>uniqueFrom</code> i
 not <code>NULL</code>.</p></dd>
 
 
-<dt>uniqueFrom</dt>
+<dt id="arg-uniquefrom">uniqueFrom<a class="anchor" aria-label="anchor" href="#arg-uniquefrom"></a></dt>
 <dd><p>Set this argument to only retain formulas that are unique
 within one or more of the objects for which the consensus is made.
 Selection is done by setting the value of <code>uniqueFrom</code> to a
@@ -358,77 +360,71 @@ Selection is done by setting the value of <code>uniqueFrom</code> to a
 of the objects given for the consensus. Set to <code>NULL</code> to ignore.</p></dd>
 
 
-<dt>uniqueOuter</dt>
+<dt id="arg-uniqueouter">uniqueOuter<a class="anchor" aria-label="anchor" href="#arg-uniqueouter"></a></dt>
 <dd><p>If <code>uniqueFrom</code> is not <code>NULL</code> and if
 <code>uniqueOuter=TRUE</code>: only retain data that are also unique between
 objects specified in <code>uniqueFrom</code>.</p></dd>
 
 
-<dt>rankWeights</dt>
+<dt id="arg-rankweights">rankWeights<a class="anchor" aria-label="anchor" href="#arg-rankweights"></a></dt>
 <dd><p>A numeric vector with weights of to calculate the mean
 ranking score for each candidate. The value will be re-cycled if necessary,
 hence, the default value of <samp>1</samp> means equal weights for all considered
 objects.</p></dd>
 
 
-<dt>labels</dt>
+<dt id="arg-labels">labels<a class="anchor" aria-label="anchor" href="#arg-labels"></a></dt>
 <dd><p>A <code>character</code> with names to use for labelling. If <code>NULL</code> labels are automatically generated.</p></dd>
 
 
-<dt>sets</dt>
+<dt id="arg-sets">sets<a class="anchor" aria-label="anchor" href="#arg-sets"></a></dt>
 <dd><p>(<strong>sets workflow</strong>) A <code>character</code> with name(s) of the sets to keep (or remove if <code>negate=TRUE</code>). Note: if
 <code>updateConsensus=FALSE</code> then the <code>setCoverage</code> column of the annotation results is not updated.</p></dd>
 
 
-<dt>updateConsensus</dt>
+<dt id="arg-updateconsensus">updateConsensus<a class="anchor" aria-label="anchor" href="#arg-updateconsensus"></a></dt>
 <dd><p>(<strong>sets workflow</strong>) If <code>TRUE</code> then the annonation consensus among set results is updated. See the
 <code>Sets workflows</code> section for more details.</p></dd>
 
 
-<dt>drop</dt>
+<dt id="arg-drop">drop<a class="anchor" aria-label="anchor" href="#arg-drop"></a></dt>
 <dd><p>Passed to the <code><a href="featureAnnotations-class.html">featureAnnotations</a></code> method.</p></dd>
 
 
-<dt>negate</dt>
+<dt id="arg-negate">negate<a class="anchor" aria-label="anchor" href="#arg-negate"></a></dt>
 <dd><p>Passed to the <code><a href="featureAnnotations-class.html">featureAnnotations</a></code> method.</p></dd>
 
 
-<dt>perSet, mirror</dt>
+<dt id="arg-perset-mirror">perSet, mirror<a class="anchor" aria-label="anchor" href="#arg-perset-mirror"></a></dt>
 <dd><p>(<strong>sets workflow</strong>) If <code>perSet=TRUE</code> then the set specific mass peaks are annotated separately.
 Furthermore, if <code>mirror=TRUE</code> (and there are two sets in the object) then a mirror plot is generated.</p></dd>
 
 
-<dt>filterSets</dt>
+<dt id="arg-filtersets">filterSets<a class="anchor" aria-label="anchor" href="#arg-filtersets"></a></dt>
 <dd><p>(<strong>sets workflow</strong>) Controls how algorithms concensus abundance filters are applied. See the <code>Sets
 workflows</code> section below.</p></dd>
 
 
-<dt>setThreshold, setThresholdAnn</dt>
+<dt id="arg-setthreshold-setthresholdann">setThreshold, setThresholdAnn<a class="anchor" aria-label="anchor" href="#arg-setthreshold-setthresholdann"></a></dt>
 <dd><p>(<strong>sets workflow</strong>) Thresholds used to create the annotation set consensus. See
 <code><a href="generateFormulas.html">generateFormulas</a></code>.</p></dd>
 
 
-<dt>setAvgSpecificScores</dt>
+<dt id="arg-setavgspecificscores">setAvgSpecificScores<a class="anchor" aria-label="anchor" href="#arg-setavgspecificscores"></a></dt>
 <dd><p>(<strong>sets workflow</strong>) If <code>TRUE</code> then set specific annotation scores (<em>e.g.</em> MS/MS and
 isotopic pattern match scores) are averaged for the set consensus. See <code><a href="generateFormulas.html">generateFormulas</a></code>.</p></dd>
 
 
-<dt>set</dt>
+<dt id="arg-set">set<a class="anchor" aria-label="anchor" href="#arg-set"></a></dt>
 <dd><p>(<strong>sets workflow</strong>) The name of the set.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p><code>annotations</code> returns a <code>list</code> containing for each feature
-  group (or feature if <code>features=TRUE</code>) a <code>data.table</code></p>
-
-
-<p>with an overview of all generated formulae and other data such as candidate
+    <p><code>annotations</code> returns a <code>list</code> containing for each feature
+  group (or feature if <code>features=TRUE</code>) a <code>data.table</code>
+  with an overview of all generated formulae and other data such as candidate
   scoring and MS/MS fragments.</p>
-
-
 <p><code>consensus</code> returns a <code>formulas</code> object that is produced by
   merging results from multiple <code>formulas</code> objects.</p>
     </div>
@@ -439,7 +435,7 @@ isotopic pattern match scores) are averaged for the set consensus. See <code><a 
     </div>
     <div id="methods-by-generic-">
     <h2>Methods (by generic)</h2>
-    
+
 <ul><li><p><code>annotations(formulas)</code>: Accessor method to obtain generated formulae.</p></li>
 <li><p><code>analyses(formulas)</code>: returns a <code>character</code> vector with the names of the
 analyses for which data is present in this object.</p></li>
@@ -465,7 +461,7 @@ the <code>rank</code> columns.</p></li>
 </ul></div>
     <div id="slots">
     <h2>Slots</h2>
-    
+
 
 <dl><dt><code>featureFormulas</code></dt>
 <dd><p>A <code>list</code> with all generated formulae for each analysis/feature group. Use the
@@ -554,15 +550,15 @@ create this object.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

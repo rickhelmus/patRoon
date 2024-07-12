@@ -4,7 +4,7 @@ CSI:FingerID for compound annotation."><!-- mathjax --><script src="https://cdnj
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -26,13 +26,13 @@ CSI:FingerID for compound annotation."><!-- mathjax --><script src="https://cdnj
       <ul class="nav navbar-nav"><li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-     
+
   </a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Reference
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -45,7 +45,7 @@ CSI:FingerID for compound annotation."><!-- mathjax --><script src="https://cdnj
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Tutorial
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -58,7 +58,7 @@ CSI:FingerID for compound annotation."><!-- mathjax --><script src="https://cdnj
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Handbook
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -74,14 +74,14 @@ CSI:FingerID for compound annotation."><!-- mathjax --><script src="https://cdnj
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/rickhelmus/patRoon" class="external-link">
     <span class="fa fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -99,7 +99,7 @@ CSI:FingerID for compound annotation."><!-- mathjax --><script src="https://cdnj
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">generateCompoundsSIRIUS</span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for featureGroups</span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
 <span><span class="fu">generateCompoundsSIRIUS</span><span class="op">(</span></span>
 <span>  <span class="va">fGroups</span>,</span>
 <span>  <span class="va">MSPeakLists</span>,</span>
@@ -122,7 +122,7 @@ CSI:FingerID for compound annotation."><!-- mathjax --><script src="https://cdnj
 <span>  dryRun <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for featureGroupsSet</span></span>
+<span><span class="co"># S4 method for class 'featureGroupsSet'</span></span>
 <span><span class="fu">generateCompoundsSIRIUS</span><span class="op">(</span></span>
 <span>  <span class="va">fGroups</span>,</span>
 <span>  <span class="va">MSPeakLists</span>,</span>
@@ -138,26 +138,28 @@ CSI:FingerID for compound annotation."><!-- mathjax --><script src="https://cdnj
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>fGroups</dt>
+
+
+<dl><dt id="arg-fgroups">fGroups<a class="anchor" aria-label="anchor" href="#arg-fgroups"></a></dt>
 <dd><p><code><a href="featureGroups-class.html">featureGroups</a></code> object which should be annotated. This should be the same or a subset of
 the object that was used to create the specified <code>MSPeakLists</code>. In the case of a subset only the remaining
 feature groups in the subset are considered.</p></dd>
 
 
-<dt>...</dt>
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>(<strong>sets workflow</strong>) Further arguments passed to the non-sets workflow method.</p></dd>
 
 
-<dt>MSPeakLists</dt>
+<dt id="arg-mspeaklists">MSPeakLists<a class="anchor" aria-label="anchor" href="#arg-mspeaklists"></a></dt>
 <dd><p>A <code><a href="MSPeakLists-class.html">MSPeakLists</a></code> object that was generated for the supplied <code>fGroups</code>.</p></dd>
 
 
-<dt>relMzDev</dt>
+<dt id="arg-relmzdev">relMzDev<a class="anchor" aria-label="anchor" href="#arg-relmzdev"></a></dt>
 <dd><p>Maximum relative deviation between the measured and candidate formula <em>m/z</em> values (in ppm).
 Sets the <span class="option">--ppm-max</span> command line option.</p></dd>
 
 
-<dt>adduct</dt>
+<dt id="arg-adduct">adduct<a class="anchor" aria-label="anchor" href="#arg-adduct"></a></dt>
 <dd><p>An <code><a href="adduct-class.html">adduct</a></code> object (or something that can be converted to it with <code><a href="adduct-utils.html">as.adduct</a></code>).
   Examples: <code>"[M-H]-"</code>, <code>"[M+Na]+"</code>. If the <code>featureGroups</code> object has
   adduct annotations then these are used if <code>adducts=NULL</code>.</p>
@@ -165,14 +167,14 @@ Sets the <span class="option">--ppm-max</span> command line option.</p></dd>
   adduct annotations will then always be used.</p></dd>
 
 
-<dt>projectPath, dryRun</dt>
+<dt id="arg-projectpath-dryrun">projectPath, dryRun<a class="anchor" aria-label="anchor" href="#arg-projectpath-dryrun"></a></dt>
 <dd><p>These are mainly for internal purposes. <code>projectPath</code> sets the output directory for
 the <code class="command">SIRIUS</code> output (a temporary directory if <code>NULL</code>). If <code>dryRun</code> is <code>TRUE</code> then no
 computations are done and only the results from <code>projectPath</code> are processed.</p>
 <p>(<strong>sets workflow</strong>) <code>projectPath</code> should be a <code>character</code> specifying the paths for each set.</p></dd>
 
 
-<dt>elements</dt>
+<dt id="arg-elements">elements<a class="anchor" aria-label="anchor" href="#arg-elements"></a></dt>
 <dd><p>Elements to be considered for formulae calculation. This will heavily affects the number of
 candidates! Always try to work with a minimal set by excluding elements you don't expect. The minimum/maximum
 number of elements can also be specified, for example: a value of <code>"C[5]H[10-15]O"</code> will only consider
@@ -180,45 +182,45 @@ formulae with up to five carbon atoms, between ten and fifteen hydrogen atoms an
 the <span class="option">--elements</span> command line  option.</p></dd>
 
 
-<dt>profile</dt>
+<dt id="arg-profile">profile<a class="anchor" aria-label="anchor" href="#arg-profile"></a></dt>
 <dd><p>Name of the configuration profile, for example: <span class="option">"qtof"</span>, <span class="option">"orbitrap"</span>,
 <span class="option">"fticr"</span>. Sets the <span class="option">--profile</span> commandline option.</p></dd>
 
 
-<dt>formulaDatabase</dt>
+<dt id="arg-formuladatabase">formulaDatabase<a class="anchor" aria-label="anchor" href="#arg-formuladatabase"></a></dt>
 <dd><p>If not <code>NULL</code>, use a database for retrieval of formula
 candidates. Possible values are: <span class="option">"pubchem"</span>, <span class="option">"bio"</span>, <span class="option">"kegg"</span>, <span class="option">"hmdb"</span>. Sets the
 <span class="option">--database</span> commandline option.</p></dd>
 
 
-<dt>fingerIDDatabase</dt>
+<dt id="arg-fingeriddatabase">fingerIDDatabase<a class="anchor" aria-label="anchor" href="#arg-fingeriddatabase"></a></dt>
 <dd><p>Database specifically used for <code class="command">CSI:FingerID</code>. If <code>NULL</code>, the value of the
 <code>formulaDatabase</code> parameter will be used or <code>"pubchem"</code> when that is also <code>NULL</code>. Sets the
 <span class="option">--fingerid-db</span> option.</p></dd>
 
 
-<dt>noise</dt>
+<dt id="arg-noise">noise<a class="anchor" aria-label="anchor" href="#arg-noise"></a></dt>
 <dd><p>Median intensity of the noise (<code>NULL</code> ignores this parameter). Sets the <span class="option">--noise</span>
 commandline option.</p></dd>
 
 
-<dt>cores</dt>
+<dt id="arg-cores">cores<a class="anchor" aria-label="anchor" href="#arg-cores"></a></dt>
 <dd><p>The number of cores <code class="command">SIRIUS</code> will use. If <code>NULL</code> then the default of all cores will be
 used.</p></dd>
 
 
-<dt>topMost</dt>
+<dt id="arg-topmost">topMost<a class="anchor" aria-label="anchor" href="#arg-topmost"></a></dt>
 <dd><p>Only keep this number of candidates (per feature group) with highest score. Set to <code>NULL</code> to
 always keep all candidates, however, please note that this may result in significant usage of CPU/RAM resources for
 large numbers of candidates.</p></dd>
 
 
-<dt>topMostFormulas</dt>
+<dt id="arg-topmostformulas">topMostFormulas<a class="anchor" aria-label="anchor" href="#arg-topmostformulas"></a></dt>
 <dd><p>Do not return more than this number of candidate formulae. Note that only compounds for these
 formulae will be searched. Sets the <span class="option">--candidates</span> commandline option.</p></dd>
 
 
-<dt>token</dt>
+<dt id="arg-token">token<a class="anchor" aria-label="anchor" href="#arg-token"></a></dt>
 <dd><p>A <code>character</code> string with the refresh token to be used for logging in with <code class="command">SIRIUS</code> (from
 version <samp>5</samp> only). The token can be obtained with the <code><a href="getSIRIUSToken.html">getSIRIUSToken</a></code> function, or by running
 <code class="command">SIRIUS</code> directly (<em>e.g.</em> with the <code class="command">login</code> command). See the
@@ -226,7 +228,7 @@ version <samp>5</samp> only). The token can be obtained with the <code><a href="
 information. If <code>NULL</code> then the log in is skipped.</p></dd>
 
 
-<dt>extraOptsGeneral, extraOptsFormula</dt>
+<dt id="arg-extraoptsgeneral-extraoptsformula">extraOptsGeneral, extraOptsFormula<a class="anchor" aria-label="anchor" href="#arg-extraoptsgeneral-extraoptsformula"></a></dt>
 <dd><p>a <code>character</code> vector with any extra commandline parameters for
 <code class="command">SIRIUS</code>. For <code class="command">SIRIUS</code> versions <code>&lt;4.4</code> there is no distinction between general and formula
 options. Otherwise commandline options specified in <code>extraOptsGeneral</code> are added prior to the <code>formula</code>
@@ -234,37 +236,35 @@ command, while options specified in <code>extraOptsFormula</code> are added in a
 manual for more details. Set to <code>NULL</code> to ignore.</p></dd>
 
 
-<dt>verbose</dt>
+<dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
 <dd><p>If <code>TRUE</code> then more output is shown in the terminal.</p></dd>
 
 
-<dt>splitBatches</dt>
+<dt id="arg-splitbatches">splitBatches<a class="anchor" aria-label="anchor" href="#arg-splitbatches"></a></dt>
 <dd><p>If <code>TRUE</code> then the calculations done by <code class="command">SIRIUS</code> will be evenly split over multiple
 <code class="command">SIRIUS</code> calls (which may be run in parallel depending on the <a href="patRoon-package.html">set package
 options</a>). If <code>splitBatches=FALSE</code> then all feature calculations are performed from a single <code class="command">SIRIUS</code>
 execution, which is often the fastest if calculations are performed on a single computer.</p></dd>
 
 
-<dt>setThreshold</dt>
+<dt id="arg-setthreshold">setThreshold<a class="anchor" aria-label="anchor" href="#arg-setthreshold"></a></dt>
 <dd><p>(<strong>sets workflow</strong>) Minimum abundance for a candidate among all sets (<samp>0-1</samp>). For instance, a value of
 <samp>1</samp> means that the candidate needs to be present in all the set data.</p></dd>
 
 
-<dt>setThresholdAnn</dt>
+<dt id="arg-setthresholdann">setThresholdAnn<a class="anchor" aria-label="anchor" href="#arg-setthresholdann"></a></dt>
 <dd><p>(<strong>sets workflow</strong>) As <code>setThreshold</code>, but only taking into account the set data that contain
 annotations for the feature group of the candidate.</p></dd>
 
 
-<dt>setAvgSpecificScores</dt>
+<dt id="arg-setavgspecificscores">setAvgSpecificScores<a class="anchor" aria-label="anchor" href="#arg-setavgspecificscores"></a></dt>
 <dd><p>(<strong>sets workflow</strong>) If <code>TRUE</code> then set specific scorings (<em>e.g.</em> MS/MS match) are also
 averaged.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p>A <code><a href="compoundsSIRIUS-class.html">compoundsSIRIUS</a></code> object.</p>
+    <p>A <code><a href="compoundsSIRIUS-class.html">compoundsSIRIUS</a></code> object.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -292,22 +292,22 @@ averaged.</p></dd>
     <h2>References</h2>
     <p>Duhrkop K, Fleischauer M, Ludwig M, Aksenov AA, Melnik AV, Meusel M, Dorrestein PC, Rousu J, Bocker S (2019).
 “SIRIUS 4: a rapid tool for turning tandem mass spectra into metabolite structure information.”
-<em>Nature Methods</em>, <b>16</b>(4), 299--302.
+<em>Nature Methods</em>, <b>16</b>(4), 299–302.
 <a href="https://doi.org/10.1038/s41592-019-0344-8" class="external-link">doi:10.1038/s41592-019-0344-8</a>
 .
  <br><br> Duhrkop K, Bocker S (2015).
 “Fragmentation Trees Reloaded.”
-In Przytycka TM (ed.), <em>Research in Computational Molecular Biology</em>, 65--79.
+In Przytycka TM (ed.), <em>Research in Computational Molecular Biology</em>, 65–79.
 ISBN 978-3-319-16706-0.
  <br><br>
   Duhrkop K, Shen H, Meusel M, Rousu J, Bocker S (2015).
 “Searching molecular structure databases with tandem mass spectra using CSI:FingerID.”
-<em>Proceedings of the National Academy of Sciences</em>, <b>112</b>(41), 12580--12585.
+<em>Proceedings of the National Academy of Sciences</em>, <b>112</b>(41), 12580–12585.
 <a href="https://doi.org/10.1073/pnas.1509788112" class="external-link">doi:10.1073/pnas.1509788112</a>
 .
  <br><br> Bocker S, Letzel MC, Liptak Z, Pervukhin A (2008).
 “SIRIUS: decomposing isotope patterns for metabolite identification.”
-<em>Bioinformatics</em>, <b>25</b>(2), 218--224.
+<em>Bioinformatics</em>, <b>25</b>(2), 218–224.
 <a href="https://doi.org/10.1093/bioinformatics/btn603" class="external-link">doi:10.1093/bioinformatics/btn603</a>
 .</p>
     </div>
@@ -328,15 +328,15 @@ ISBN 978-3-319-16706-0.
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

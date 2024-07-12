@@ -4,7 +4,7 @@ http://ipb-halle.github.io/MetFrag/)."><!-- mathjax --><script src="https://cdnj
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -26,13 +26,13 @@ http://ipb-halle.github.io/MetFrag/)."><!-- mathjax --><script src="https://cdnj
       <ul class="nav navbar-nav"><li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-     
+
   </a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Reference
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -45,7 +45,7 @@ http://ipb-halle.github.io/MetFrag/)."><!-- mathjax --><script src="https://cdnj
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Tutorial
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -58,7 +58,7 @@ http://ipb-halle.github.io/MetFrag/)."><!-- mathjax --><script src="https://cdnj
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Handbook
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -74,14 +74,14 @@ http://ipb-halle.github.io/MetFrag/)."><!-- mathjax --><script src="https://cdnj
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/rickhelmus/patRoon" class="external-link">
     <span class="fa fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -99,7 +99,7 @@ http://ipb-halle.github.io/MetFrag/)."><!-- mathjax --><script src="https://cdnj
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">generateCompoundsMetFrag</span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for featureGroups</span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
 <span><span class="fu">generateCompoundsMetFrag</span><span class="op">(</span></span>
 <span>  <span class="va">fGroups</span>,</span>
 <span>  <span class="va">MSPeakLists</span>,</span>
@@ -124,7 +124,7 @@ http://ipb-halle.github.io/MetFrag/)."><!-- mathjax --><script src="https://cdnj
 <span>  extraOpts <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for featureGroupsSet</span></span>
+<span><span class="co"># S4 method for class 'featureGroupsSet'</span></span>
 <span><span class="fu">generateCompoundsMetFrag</span><span class="op">(</span></span>
 <span>  <span class="va">fGroups</span>,</span>
 <span>  <span class="va">MSPeakLists</span>,</span>
@@ -146,62 +146,64 @@ http://ipb-halle.github.io/MetFrag/)."><!-- mathjax --><script src="https://cdnj
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>fGroups</dt>
+
+
+<dl><dt id="arg-fgroups">fGroups<a class="anchor" aria-label="anchor" href="#arg-fgroups"></a></dt>
 <dd><p><code><a href="featureGroups-class.html">featureGroups</a></code> object which should be annotated. This should be the same or a subset of
 the object that was used to create the specified <code>MSPeakLists</code>. In the case of a subset only the remaining
 feature groups in the subset are considered.</p></dd>
 
 
-<dt>...</dt>
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>(<strong>sets workflow</strong>) Further arguments passed to the non-sets workflow method.</p></dd>
 
 
-<dt>MSPeakLists</dt>
+<dt id="arg-mspeaklists">MSPeakLists<a class="anchor" aria-label="anchor" href="#arg-mspeaklists"></a></dt>
 <dd><p>A <code><a href="MSPeakLists-class.html">MSPeakLists</a></code> object that was generated for the supplied <code>fGroups</code>.</p></dd>
 
 
-<dt>method</dt>
+<dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
 <dd><p>Which method should be used for MetFrag execution: <code>"CL"</code> for <code class="command">MetFragCL</code> and <code>"R"</code>
 for <code class="command">MetFragR</code>. The former is usually much faster and recommended.</p></dd>
 
 
-<dt>timeout</dt>
+<dt id="arg-timeout">timeout<a class="anchor" aria-label="anchor" href="#arg-timeout"></a></dt>
 <dd><p>Maximum time (in seconds) before a metFrag query for a feature group is stopped. Also see
 <code>timeoutRetries</code> argument.</p></dd>
 
 
-<dt>timeoutRetries</dt>
+<dt id="arg-timeoutretries">timeoutRetries<a class="anchor" aria-label="anchor" href="#arg-timeoutretries"></a></dt>
 <dd><p>Maximum number of retries after reaching a timeout before completely skipping the metFrag query
 for a feature group. Also see <code>timeout</code> argument.</p></dd>
 
 
-<dt>errorRetries</dt>
+<dt id="arg-errorretries">errorRetries<a class="anchor" aria-label="anchor" href="#arg-errorretries"></a></dt>
 <dd><p>Maximum number of retries after an error occurred. This may be useful to handle e.g. connection
 errors.</p></dd>
 
 
-<dt>topMost</dt>
+<dt id="arg-topmost">topMost<a class="anchor" aria-label="anchor" href="#arg-topmost"></a></dt>
 <dd><p>Only keep this number of candidates (per feature group) with highest score. Set to <code>NULL</code> to
 always keep all candidates, however, please note that this may result in significant usage of CPU/RAM resources for
 large numbers of candidates.</p></dd>
 
 
-<dt>dbRelMzDev</dt>
+<dt id="arg-dbrelmzdev">dbRelMzDev<a class="anchor" aria-label="anchor" href="#arg-dbrelmzdev"></a></dt>
 <dd><p>Relative mass deviation (in ppm) for database search. Sets the
 <span class="option">DatabaseSearchRelativeMassDeviation</span> option.</p></dd>
 
 
-<dt>fragRelMzDev</dt>
+<dt id="arg-fragrelmzdev">fragRelMzDev<a class="anchor" aria-label="anchor" href="#arg-fragrelmzdev"></a></dt>
 <dd><p>Relative mass deviation (in ppm) for fragment matching. Sets the
 <span class="option">FragmentPeakMatchRelativeMassDeviation</span> option.</p></dd>
 
 
-<dt>fragAbsMzDev</dt>
+<dt id="arg-fragabsmzdev">fragAbsMzDev<a class="anchor" aria-label="anchor" href="#arg-fragabsmzdev"></a></dt>
 <dd><p>Absolute mass deviation (in Da) for fragment matching. Sets the
 <span class="option">FragmentPeakMatchAbsoluteMassDeviation</span> option.</p></dd>
 
 
-<dt>adduct</dt>
+<dt id="arg-adduct">adduct<a class="anchor" aria-label="anchor" href="#arg-adduct"></a></dt>
 <dd><p>An <code><a href="adduct-class.html">adduct</a></code> object (or something that can be converted to it with <code><a href="adduct-utils.html">as.adduct</a></code>).
   Examples: <code>"[M-H]-"</code>, <code>"[M+Na]+"</code>. If the <code>featureGroups</code> object has
   adduct annotations then these are used if <code>adducts=NULL</code>.</p>
@@ -209,25 +211,25 @@ large numbers of candidates.</p></dd>
   adduct annotations will then always be used.</p></dd>
 
 
-<dt>database</dt>
+<dt id="arg-database">database<a class="anchor" aria-label="anchor" href="#arg-database"></a></dt>
 <dd><p>Compound database to use. Valid values are: <code>"pubchem"</code>, <code>"chemspider"</code>,
 <code>"for-ident"</code>, <code>"comptox"</code>, <code>"pubchemlite"</code>, <code>"kegg"</code>, <code>"sdf"</code>, <code>"psv"</code> and
 <code>"csv"</code>. See section below for more information. Sets the <code>MetFragDatabaseType</code> option.</p></dd>
 
 
-<dt>extendedPubChem</dt>
+<dt id="arg-extendedpubchem">extendedPubChem<a class="anchor" aria-label="anchor" href="#arg-extendedpubchem"></a></dt>
 <dd><p>If <code>database="pubchem"</code>: whether to use the <em>extended</em> database that includes
 information for compound scoring (<em>i.e.</em> number of patents/PubMed references). Note that downloading
 candidates from this database might take extra time. Valid values are: <code>FALSE</code> (never use it), <code>TRUE</code>
 (always use it) or <code>"auto"</code> (default, use if specified scorings demand it).</p></dd>
 
 
-<dt>chemSpiderToken</dt>
+<dt id="arg-chemspidertoken">chemSpiderToken<a class="anchor" aria-label="anchor" href="#arg-chemspidertoken"></a></dt>
 <dd><p>A character string with the <a href="http://www.chemspider.com/AboutServices.aspx" class="external-link">ChemSpider
 security token</a> that should be set when the ChemSpider database is used. Sets the <span class="option">ChemSpiderToken</span> option.</p></dd>
 
 
-<dt>scoreTypes</dt>
+<dt id="arg-scoretypes">scoreTypes<a class="anchor" aria-label="anchor" href="#arg-scoretypes"></a></dt>
 <dd><p>A character vector defining the scoring types. See the <code>Scorings</code> section below for more
 information. Note that both generic and <code class="command">MetFrag</code> specific names are accepted (<em>i.e.</em> <code>name</code> and
 <code>metfrag</code> columns returned by <code><a href="compoundScorings.html">compoundScorings</a></code>). When a local database is used, the name should
@@ -235,12 +237,12 @@ match what is given there (<code>e.g</code> column names when <code>database=csv
 other scoring data, however, these are not used for ranking. Sets the <span class="option">MetFragScoreTypes</span> option.</p></dd>
 
 
-<dt>scoreWeights</dt>
+<dt id="arg-scoreweights">scoreWeights<a class="anchor" aria-label="anchor" href="#arg-scoreweights"></a></dt>
 <dd><p>Numeric vector containing weights of the used scoring types. Order is the same as set in
 <code>scoreTypes</code>. Values are recycled if necessary. Sets the <span class="option">MetFragScoreWeights</span> option.</p></dd>
 
 
-<dt>preProcessingFilters, postProcessingFilters</dt>
+<dt id="arg-preprocessingfilters-postprocessingfilters">preProcessingFilters, postProcessingFilters<a class="anchor" aria-label="anchor" href="#arg-preprocessingfilters-postprocessingfilters"></a></dt>
 <dd><p>A character vector defining pre/post filters applied before/after
 fragmentation and scoring (<em>e.g.</em> <code>"UnconnectedCompoundFilter"</code>, <code>"IsotopeFilter"</code>,
 <code>"ElementExclusionFilter"</code>). Some methods require further options to be set. For all filters and more
@@ -249,14 +251,14 @@ information refer to the <code>Candidate Filters</code> section on the
 <span class="option">MetFragPreProcessingCandidateFilter</span> and <code>MetFragPostProcessingCandidateFilter</code> options.</p></dd>
 
 
-<dt>maxCandidatesToStop</dt>
+<dt id="arg-maxcandidatestostop">maxCandidatesToStop<a class="anchor" aria-label="anchor" href="#arg-maxcandidatestostop"></a></dt>
 <dd><p>If more than this number of candidate structures are found then processing will be aborted
 and no results this feature group will be reported. Low values increase the chance of missing data, whereas too
 high values will use too much computer resources and signficantly slowdown the process. Sets the
 <span class="option">MaxCandidateLimitToStop</span> option.</p></dd>
 
 
-<dt>identifiers</dt>
+<dt id="arg-identifiers">identifiers<a class="anchor" aria-label="anchor" href="#arg-identifiers"></a></dt>
 <dd><p>A <code>list</code> containing for each feature group a character vector with database identifiers that
 should be used to find candidates for a feature group (the list should be named by feature group names). If
 <code>NULL</code> all relevant candidates will be retrieved from the specified database. An example usage scenario is to
@@ -266,33 +268,31 @@ will be searched by MetFrag that were generated by SIRIUS+CSI:FingerID. Sets the
 option.</p></dd>
 
 
-<dt>extraOpts</dt>
+<dt id="arg-extraopts">extraOpts<a class="anchor" aria-label="anchor" href="#arg-extraopts"></a></dt>
 <dd><p>A named <code>list</code> containing further settings <code class="command">MetFrag</code>. See the
 <a href="http://ipb-halle.github.io/MetFrag/projects/metfragr/" class="external-link">MetFragR</a> and
 <a href="http://ipb-halle.github.io/MetFrag/projects/metfragcl/" class="external-link">MetFrag CL</a> homepages for all available options. Set
 to <code>NULL</code> to ignore.</p></dd>
 
 
-<dt>setThreshold</dt>
+<dt id="arg-setthreshold">setThreshold<a class="anchor" aria-label="anchor" href="#arg-setthreshold"></a></dt>
 <dd><p>(<strong>sets workflow</strong>) Minimum abundance for a candidate among all sets (<samp>0-1</samp>). For instance, a value of
 <samp>1</samp> means that the candidate needs to be present in all the set data.</p></dd>
 
 
-<dt>setThresholdAnn</dt>
+<dt id="arg-setthresholdann">setThresholdAnn<a class="anchor" aria-label="anchor" href="#arg-setthresholdann"></a></dt>
 <dd><p>(<strong>sets workflow</strong>) As <code>setThreshold</code>, but only taking into account the set data that contain
 annotations for the feature group of the candidate.</p></dd>
 
 
-<dt>setAvgSpecificScores</dt>
+<dt id="arg-setavgspecificscores">setAvgSpecificScores<a class="anchor" aria-label="anchor" href="#arg-setavgspecificscores"></a></dt>
 <dd><p>(<strong>sets workflow</strong>) If <code>TRUE</code> then set specific scorings (<em>e.g.</em> MS/MS match) are also
 averaged.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p><code>generateCompoundsMetFrag</code> returns a <code><a href="compoundsMF-class.html">compoundsMF</a></code> object.</p>
+    <p><code>generateCompoundsMetFrag</code> returns a <code><a href="compoundsMF-class.html">compoundsMF</a></code> object.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -367,15 +367,15 @@ averaged.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

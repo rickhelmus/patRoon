@@ -5,7 +5,7 @@ reporting."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -27,13 +27,13 @@ reporting."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/
       <ul class="nav navbar-nav"><li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-     
+
   </a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Reference
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -46,7 +46,7 @@ reporting."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Tutorial
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -59,7 +59,7 @@ reporting."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Handbook
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -75,14 +75,14 @@ reporting."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/rickhelmus/patRoon" class="external-link">
     <span class="fa fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -171,7 +171,7 @@ formulae and tentatively identified compounds. This is the legacy interface, for
 <span>  noDate <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for featureGroups</span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
 <span><span class="fu">reportCSV</span><span class="op">(</span></span>
 <span>  <span class="va">fGroups</span>,</span>
 <span>  path <span class="op">=</span> <span class="st">"report"</span>,</span>
@@ -189,7 +189,7 @@ formulae and tentatively identified compounds. This is the legacy interface, for
 <span>  clearPath <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for featureGroups</span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
 <span><span class="fu">reportPDF</span><span class="op">(</span></span>
 <span>  <span class="va">fGroups</span>,</span>
 <span>  path <span class="op">=</span> <span class="st">"report"</span>,</span>
@@ -214,7 +214,7 @@ formulae and tentatively identified compounds. This is the legacy interface, for
 <span>  clearPath <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for featureGroups</span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
 <span><span class="fu">reportHTML</span><span class="op">(</span></span>
 <span>  <span class="va">fGroups</span>,</span>
 <span>  path <span class="op">=</span> <span class="st">"report"</span>,</span>
@@ -249,27 +249,29 @@ formulae and tentatively identified compounds. This is the legacy interface, for
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>fGroups</dt>
+
+
+<dl><dt id="arg-fgroups">fGroups<a class="anchor" aria-label="anchor" href="#arg-fgroups"></a></dt>
 <dd><p>The <code><a href="featureGroups-class.html">featureGroups</a></code> object that should be used for reporting data.</p></dd>
 
 
-<dt>path</dt>
+<dt id="arg-path">path<a class="anchor" aria-label="anchor" href="#arg-path"></a></dt>
 <dd><p>The destination file path for files generated during reporting. Will be generated if needed.</p></dd>
 
 
-<dt>reportFeatures</dt>
+<dt id="arg-reportfeatures">reportFeatures<a class="anchor" aria-label="anchor" href="#arg-reportfeatures"></a></dt>
 <dd><p>If set to <code>TRUE</code> then for each analysis a
 <code class="file">.csv</code> file will be generated with information about its detected
 features.</p></dd>
 
 
-<dt>formulas, compounds, compsCluster, components</dt>
+<dt id="arg-formulas-compounds-compscluster-components">formulas, compounds, compsCluster, components<a class="anchor" aria-label="anchor" href="#arg-formulas-compounds-compscluster-components"></a></dt>
 <dd><p>Further objects (<code><a href="formulas-class.html">formulas</a></code>, <code><a href="compounds-class.html">compounds</a></code>,
 <code><a href="compoundsCluster-class.html">compoundsCluster</a></code>, <code><a href="components-class.html">components</a></code>) that should be reported. Specify <code>NULL</code> to skip
 reporting a particular object.</p></dd>
 
 
-<dt>compoundsNormalizeScores, formulasNormalizeScores</dt>
+<dt id="arg-compoundsnormalizescores-formulasnormalizescores">compoundsNormalizeScores, formulasNormalizeScores<a class="anchor" aria-label="anchor" href="#arg-compoundsnormalizescores-formulasnormalizescores"></a></dt>
 <dd><p>A <code>character</code> that specifies how normalization of
 annotation scorings occurs. Either
 <code>"none"</code> (no normalization),
@@ -283,7 +285,7 @@ results were removed after they were generated (<em>e.g.</em> by use of
 <code>filter</code>).</p></dd>
 
 
-<dt>compoundsExclNormScores, formulasExclNormScores</dt>
+<dt id="arg-compoundsexclnormscores-formulasexclnormscores">compoundsExclNormScores, formulasExclNormScores<a class="anchor" aria-label="anchor" href="#arg-compoundsexclnormscores-formulasexclnormscores"></a></dt>
 <dd><p>A
   <code>character</code> vector specifying any compound scoring names that
   should <em>not</em> be normalized. Set to <code>NULL</code> to normalize all
@@ -294,91 +296,91 @@ results were removed after they were generated (<em>e.g.</em> by use of
   <code class="command">MetFrag</code> web interface.</p></dd>
 
 
-<dt>retMin</dt>
+<dt id="arg-retmin">retMin<a class="anchor" aria-label="anchor" href="#arg-retmin"></a></dt>
 <dd><p>If <code>TRUE</code> then report retention times in minutes (otherwise seconds).</p></dd>
 
 
-<dt>clearPath</dt>
+<dt id="arg-clearpath">clearPath<a class="anchor" aria-label="anchor" href="#arg-clearpath"></a></dt>
 <dd><p>If <code>TRUE</code> then the destination path will be (recursively) removed prior to reporting.</p></dd>
 
 
-<dt>reportFGroups</dt>
+<dt id="arg-reportfgroups">reportFGroups<a class="anchor" aria-label="anchor" href="#arg-reportfgroups"></a></dt>
 <dd><p>If <code>TRUE</code> then feature group data will be reported.</p></dd>
 
 
-<dt>formulasTopMost, compoundsTopMost</dt>
+<dt id="arg-formulastopmost-compoundstopmost">formulasTopMost, compoundsTopMost<a class="anchor" aria-label="anchor" href="#arg-formulastopmost-compoundstopmost"></a></dt>
 <dd><p>Only this amount of top ranked candidate formulae/compounds are reported.
 Lower values may significantly speed up reporting. Set to <code>NULL</code> to ignore.</p></dd>
 
 
-<dt>reportFormulaSpectra</dt>
+<dt id="arg-reportformulaspectra">reportFormulaSpectra<a class="anchor" aria-label="anchor" href="#arg-reportformulaspectra"></a></dt>
 <dd><p>If <code>TRUE</code> then explained MS/MS spectra (if available) for candidate formulae will be
 reported. Specifying <code>formulas</code> and setting this argument to <code>FALSE</code> still allows further annotation of
 compound MS/MS spectra.</p></dd>
 
 
-<dt>compoundsOnlyUsedScorings</dt>
+<dt id="arg-compoundsonlyusedscorings">compoundsOnlyUsedScorings<a class="anchor" aria-label="anchor" href="#arg-compoundsonlyusedscorings"></a></dt>
 <dd><p>If <code>TRUE</code> then only scorings are plotted that actually have been used to rank
 data (see the <code>scoreTypes</code> argument to <code><a href="generateCompoundsMetFrag.html">generateCompoundsMetFrag</a></code> for more details).</p></dd>
 
 
-<dt>MSPeakLists</dt>
+<dt id="arg-mspeaklists">MSPeakLists<a class="anchor" aria-label="anchor" href="#arg-mspeaklists"></a></dt>
 <dd><p>A <code><a href="MSPeakLists-class.html">MSPeakLists</a></code> object that is <em>mandatory</em> when spectra for formulae and/or
 compounds will be reported.</p></dd>
 
 
-<dt>EICGrid</dt>
+<dt id="arg-eicgrid">EICGrid<a class="anchor" aria-label="anchor" href="#arg-eicgrid"></a></dt>
 <dd><p>An integer vector in the form <code>c(columns, rows)</code> that is used to determine the plotting grid when
 reporting EICs in PDF files.</p></dd>
 
 
-<dt>EICParams</dt>
+<dt id="arg-eicparams">EICParams<a class="anchor" aria-label="anchor" href="#arg-eicparams"></a></dt>
 <dd><p>A named <code>list</code> with parameters used for extracted ion chromatogram (EIC) creation. See the
 <a href="EICParams.html">EIC parameters</a> documentation for more details.</p></dd>
 
 
-<dt>reportPlots</dt>
+<dt id="arg-reportplots">reportPlots<a class="anchor" aria-label="anchor" href="#arg-reportplots"></a></dt>
 <dd><p>A character vector specifying what should be plotted. Valid options are: <code>"chord"</code>,
 <code>"venn"</code>, <code>"upset"</code> (plot a chord, Venn and UpSet diagram, respectively), <code>"eics"</code> (plot EICs for
 individual feature groups) and <code>"formulas"</code> (plot annotated formula spectra). Set to <code>"none"</code> to plot
 none of these.</p></dd>
 
 
-<dt>includeMFWebLinks</dt>
+<dt id="arg-includemfweblinks">includeMFWebLinks<a class="anchor" aria-label="anchor" href="#arg-includemfweblinks"></a></dt>
 <dd><p>A <code>character</code> specifying to which feature groups a web link should be added in the
 annotation page to <a href="https://msbi.ipb-halle.de/MetFragBeta/index.xhtml" class="external-link">MetFragWeb</a>. Options are:
 <code>"compounds"</code> (only to those with compounds results), <code>"MSMS"</code> (only to those with MSMS peak lists) or
 <code>"none"</code>.</p></dd>
 
 
-<dt>interactiveHeat</dt>
+<dt id="arg-interactiveheat">interactiveHeat<a class="anchor" aria-label="anchor" href="#arg-interactiveheat"></a></dt>
 <dd><p>If <code>TRUE</code> an interactive heatmap HTML widget will be generated to display hierarchical
 clustering results. Set to <code>FALSE</code> for a 'regular' static plot.</p></dd>
 
 
-<dt>specSimParams</dt>
+<dt id="arg-specsimparams">specSimParams<a class="anchor" aria-label="anchor" href="#arg-specsimparams"></a></dt>
 <dd><p>A named <code>list</code> with parameters that influence the calculation of MS spectra similarities.
 See the <a href="specSimParams.html">spectral similarity parameters</a> documentation for more details.</p></dd>
 
 
-<dt>TPs</dt>
+<dt id="arg-tps">TPs<a class="anchor" aria-label="anchor" href="#arg-tps"></a></dt>
 <dd><p>A <code><a href="transformationProducts-class.html">transformationProducts</a></code> object that should used for plotting hierarchies. Ignored if
 <code>TPs=NULL</code> or <code>components</code> is not a <code>componentsTPs</code> object.</p></dd>
 
 
-<dt>TPGraphStructuresMax</dt>
+<dt id="arg-tpgraphstructuresmax">TPGraphStructuresMax<a class="anchor" aria-label="anchor" href="#arg-tpgraphstructuresmax"></a></dt>
 <dd><p>Maximum number of TP structures to plot in TP hierarchies, see the <code>TPs</code> argument.
 Sets the <code>structuresMax</code> argument to <code><a href="feature-plotting.html">plotGraph</a></code>.</p></dd>
 
 
-<dt>selfContained</dt>
+<dt id="arg-selfcontained">selfContained<a class="anchor" aria-label="anchor" href="#arg-selfcontained"></a></dt>
 <dd><p>If <code>TRUE</code> the output will be a standalone HTML file which contains all graphics and script
 dependencies. When <code>FALSE</code>, the latter will be placed in an additional directory (<code class="file">report_files</code>) which
 should remain present when viewing the output file. Especially on Windows, a non-self contained output might be
 desirable when reporting large amounts of data to prevent <code class="command">pandoc</code> from running out of memory.</p></dd>
 
 
-<dt>optimizePng</dt>
+<dt id="arg-optimizepng">optimizePng<a class="anchor" aria-label="anchor" href="#arg-optimizepng"></a></dt>
 <dd><p>If <code>TRUE</code> then <code class="command">pngquant</code> is used to reduce the size of generated graphics. A
 significant reduction in disk space usage may be seen, however, at the cost additional processing time. Multiple
 <code class="command">pngquant</code> processes will be executed in parallel, which can be configured with
@@ -386,11 +388,11 @@ significant reduction in disk space usage may be seen, however, at the cost addi
 <a href="patRoon-package.html">patRoon options</a>).</p></dd>
 
 
-<dt>openReport</dt>
+<dt id="arg-openreport">openReport<a class="anchor" aria-label="anchor" href="#arg-openreport"></a></dt>
 <dd><p>If set to <code>TRUE</code> then the output report file will be opened with the system browser.</p></dd>
 
 
-<dt>noDate</dt>
+<dt id="arg-nodate">noDate<a class="anchor" aria-label="anchor" href="#arg-nodate"></a></dt>
 <dd><p>If <code>TRUE</code> then the current date is not added to the report. This is mainly used for testing and
 its main purpose is to guarantees equal report files when <code>reportHTML()</code> is called multiple times with equal
 arguments.</p></dd>
@@ -454,15 +456,15 @@ compounds, clustering) that are desired to be reported need to be specified.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

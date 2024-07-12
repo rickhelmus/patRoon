@@ -3,7 +3,7 @@
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -25,13 +25,13 @@
       <ul class="nav navbar-nav"><li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-     
+
   </a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Reference
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -44,7 +44,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Tutorial
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -57,7 +57,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Handbook
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -73,14 +73,14 @@
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/rickhelmus/patRoon" class="external-link">
     <span class="fa fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -136,15 +136,17 @@
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>anaInfo</dt>
+
+
+<dl><dt id="arg-anainfo">anaInfo<a class="anchor" aria-label="anchor" href="#arg-anainfo"></a></dt>
 <dd><p><a href="analysis-information.html">Analysis info table</a></p></dd>
 
 
-<dt>method</dt>
+<dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
 <dd><p>The full path of the DataAnalysis method.</p></dd>
 
 
-<dt>close, save</dt>
+<dt id="arg-close-save">close, save<a class="anchor" aria-label="anchor" href="#arg-close-save"></a></dt>
 <dd><p>If <code>TRUE</code> then Bruker files are closed and saved after
 processing with DataAnalysis, respectively. Setting <code>close=TRUE</code>
 prevents that many analyses might be opened simultaneously in DataAnalysis,
@@ -153,80 +155,77 @@ which otherwise may use excessive memory or become slow. By default
 likely what you want as otherwise any processed data is lost.</p></dd>
 
 
-<dt>analysis</dt>
+<dt id="arg-analysis">analysis<a class="anchor" aria-label="anchor" href="#arg-analysis"></a></dt>
 <dd><p>Analysis name (without file extension).</p></dd>
 
 
-<dt>path</dt>
+<dt id="arg-path">path<a class="anchor" aria-label="anchor" href="#arg-path"></a></dt>
 <dd><p>path of the analysis.</p></dd>
 
 
-<dt>mz</dt>
+<dt id="arg-mz">mz<a class="anchor" aria-label="anchor" href="#arg-mz"></a></dt>
 <dd><p><em>m/z</em> (Da) value used for the chromatographic trace (if
 applicable).</p></dd>
 
 
-<dt>mzWindow</dt>
+<dt id="arg-mzwindow">mzWindow<a class="anchor" aria-label="anchor" href="#arg-mzwindow"></a></dt>
 <dd><p><em>m/z</em> window (in Da) used for the chromatographic trace
 (if applicable).</p></dd>
 
 
-<dt>ctype</dt>
+<dt id="arg-ctype">ctype<a class="anchor" aria-label="anchor" href="#arg-ctype"></a></dt>
 <dd><p>Type of the chromatographic trace. Valid options are:
 <code>"EIC"</code> (extracted ion chromatogram), <code>"TIC"</code> (total ion
 chromatogram, only for <code>addDAEIC</code>) and <code>"BPC"</code> (Base Peak
 Chromatogram).</p></dd>
 
 
-<dt>mtype</dt>
+<dt id="arg-mtype">mtype<a class="anchor" aria-label="anchor" href="#arg-mtype"></a></dt>
 <dd><p>MS filter for chromatographic trace. Valid values are:
 <code>"all"</code>, <code>"MS"</code>, <code>"MSMS"</code>, <code>"allMSMS"</code> and
 <code>"BBCID"</code>.</p></dd>
 
 
-<dt>polarity</dt>
+<dt id="arg-polarity">polarity<a class="anchor" aria-label="anchor" href="#arg-polarity"></a></dt>
 <dd><p>Polarity filter for chromatographic trace. Valid values:
 <code>"both"</code>, <code>"positive"</code> and <code>"negative"</code>.</p></dd>
 
 
-<dt>bgsubtr</dt>
+<dt id="arg-bgsubtr">bgsubtr<a class="anchor" aria-label="anchor" href="#arg-bgsubtr"></a></dt>
 <dd><p>If <code>TRUE</code> then background subtraction ('Spectral'
 algorithm) will be performed.</p></dd>
 
 
-<dt>fragpath</dt>
+<dt id="arg-fragpath">fragpath<a class="anchor" aria-label="anchor" href="#arg-fragpath"></a></dt>
 <dd><p>Precursor <em>m/z</em> used for MS/MS traces (<code>""</code> for
 none).</p></dd>
 
 
-<dt>name</dt>
+<dt id="arg-name">name<a class="anchor" aria-label="anchor" href="#arg-name"></a></dt>
 <dd><p>For <code>addDAEIC</code>: the name for the chromatographic trace. For
 <code>addAllEICs</code>: <code>TRUE</code> to automatically set EIC names. Set to
 <code>NULL</code> for none.</p></dd>
 
 
-<dt>hideDA</dt>
+<dt id="arg-hideda">hideDA<a class="anchor" aria-label="anchor" href="#arg-hideda"></a></dt>
 <dd><p>Hides DataAnalysis while adding the chromatographic trace
 (faster).</p></dd>
 
 
-<dt>fGroups</dt>
+<dt id="arg-fgroups">fGroups<a class="anchor" aria-label="anchor" href="#arg-fgroups"></a></dt>
 <dd><p>The <code><a href="featureGroups-class.html">featureGroups</a></code> object for which EICs should be made.</p></dd>
 
 
-<dt>onlyPresent</dt>
+<dt id="arg-onlypresent">onlyPresent<a class="anchor" aria-label="anchor" href="#arg-onlypresent"></a></dt>
 <dd><p>If <code>TRUE</code> then EICs are only generated for analyses
 where the feature was detected.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p><code>getDACalibrationError</code> returns a <code>data.frame</code> with a
-  column of all analyses (named <code>analysis</code>) and their mass error (named</p>
-<p></p>
-<p><code>error</code>).</p>
+    <p><code>getDACalibrationError</code> returns a <code>data.frame</code> with a
+  column of all analyses (named <code>analysis</code>) and their mass error (named
+  <code>error</code>).</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -276,15 +275,15 @@ required to be installed.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

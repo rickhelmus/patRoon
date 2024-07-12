@@ -3,7 +3,7 @@
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -25,13 +25,13 @@
       <ul class="nav navbar-nav"><li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-     
+
   </a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Reference
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -44,7 +44,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Tutorial
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -57,7 +57,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Handbook
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -73,14 +73,14 @@
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/rickhelmus/patRoon" class="external-link">
     <span class="fa fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -95,163 +95,165 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre><code>peakLists(obj, ...)
-
-averagedPeakLists(obj, ...)
-
-spectrumSimilarity(obj, ...)
-
-# S4 method for MSPeakLists
-peakLists(obj)
-
-# S4 method for MSPeakLists
-averagedPeakLists(obj)
-
-# S4 method for MSPeakLists
-analyses(obj)
-
-# S4 method for MSPeakLists
-groupNames(obj)
-
-# S4 method for MSPeakLists
-length(x)
-
-# S4 method for MSPeakLists
-show(object)
-
-# S4 method for MSPeakLists,ANY,ANY,missing
-[(x, i, j, ..., reAverage = FALSE, drop = TRUE)
-
-# S4 method for MSPeakLists,ANY,ANY
-[[(x, i, j)
-
-# S4 method for MSPeakLists
-$(x, name)
-
-# S4 method for MSPeakLists
-as.data.table(x, fGroups = NULL, averaged = TRUE)
-
-# S4 method for MSPeakLists
-delete(obj, i = NULL, j = NULL, k = NULL, reAverage = FALSE, ...)
-
-# S4 method for MSPeakLists
-filter(
-  obj,
-  absMSIntThr = NULL,
-  absMSMSIntThr = NULL,
-  relMSIntThr = NULL,
-  relMSMSIntThr = NULL,
-  topMSPeaks = NULL,
-  topMSMSPeaks = NULL,
-  minMSMSPeaks = NULL,
-  isolatePrec = NULL,
-  deIsotopeMS = FALSE,
-  deIsotopeMSMS = FALSE,
-  withMSMS = FALSE,
-  annotatedBy = NULL,
-  retainPrecursorMSMS = TRUE,
-  reAverage = FALSE,
-  negate = FALSE
-)
-
-# S4 method for MSPeakLists
-plotSpectrum(
-  obj,
-  groupName,
-  analysis = NULL,
-  MSLevel = 1,
-  title = NULL,
-  specSimParams = getDefSpecSimParams(),
-  xlim = NULL,
-  ylim = NULL,
-  ...
-)
-
-# S4 method for MSPeakLists
-spectrumSimilarity(
-  obj,
-  groupName1,
-  groupName2 = NULL,
-  analysis1 = NULL,
-  analysis2 = NULL,
-  MSLevel = 1,
-  specSimParams = getDefSpecSimParams(),
-  NAToZero = FALSE,
-  drop = TRUE
-)
-
-# S4 method for MSPeakListsSet
-analysisInfo(obj)
-
-# S4 method for MSPeakListsSet
-show(object)
-
-# S4 method for MSPeakListsSet,ANY,ANY,missing
-[(x, i, j, ..., reAverage = FALSE, sets = NULL, drop = TRUE)
-
-# S4 method for MSPeakListsSet
-as.data.table(x, fGroups = NULL, averaged = TRUE)
-
-# S4 method for MSPeakListsSet
-delete(obj, ...)
-
-# S4 method for MSPeakListsSet
-filter(
-  obj,
-  ...,
-  annotatedBy = NULL,
-  retainPrecursorMSMS = TRUE,
-  reAverage = FALSE,
-  negate = FALSE,
-  sets = NULL
-)
-
-# S4 method for MSPeakListsSet
-plotSpectrum(
-  obj,
-  groupName,
-  analysis = NULL,
-  MSLevel = 1,
-  title = NULL,
-  specSimParams = getDefSpecSimParams(),
-  xlim = NULL,
-  ylim = NULL,
-  perSet = TRUE,
-  mirror = TRUE,
-  ...
-)
-
-# S4 method for MSPeakListsSet
-spectrumSimilarity(
-  obj,
-  groupName1,
-  groupName2 = NULL,
-  analysis1 = NULL,
-  analysis2 = NULL,
-  MSLevel = 1,
-  specSimParams = getDefSpecSimParams(),
-  NAToZero = FALSE,
-  drop = TRUE
-)
-
-# S4 method for MSPeakListsSet
-unset(obj, set)
-
-getDefIsolatePrecParams(...)</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">peakLists</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">averagedPeakLists</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">spectrumSimilarity</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'MSPeakLists'</span></span>
+<span><span class="fu">peakLists</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'MSPeakLists'</span></span>
+<span><span class="fu">averagedPeakLists</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'MSPeakLists'</span></span>
+<span><span class="fu"><a href="generics.html">analyses</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'MSPeakLists'</span></span>
+<span><span class="fu"><a href="generics.html">groupNames</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'MSPeakLists'</span></span>
+<span><span class="fu"><a href="generics.html">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'MSPeakLists'</span></span>
+<span><span class="fu"><a href="generics.html">show</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'MSPeakLists,ANY,ANY,missing'</span></span>
+<span><span class="va">x</span><span class="op">[</span><span class="va">i</span>, <span class="va">j</span>, <span class="va">...</span>, reAverage <span class="op">=</span> <span class="cn">FALSE</span>, drop <span class="op">=</span> <span class="cn">TRUE</span><span class="op">]</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'MSPeakLists,ANY,ANY'</span></span>
+<span><span class="va">x</span><span class="op">[[</span><span class="va">i</span>, <span class="va">j</span><span class="op">]</span><span class="op">]</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'MSPeakLists'</span></span>
+<span><span class="va">x</span><span class="op">$</span><span class="va">name</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'MSPeakLists'</span></span>
+<span><span class="fu"><a href="generics.html">as.data.table</a></span><span class="op">(</span><span class="va">x</span>, fGroups <span class="op">=</span> <span class="cn">NULL</span>, averaged <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'MSPeakLists'</span></span>
+<span><span class="fu"><a href="generics.html">delete</a></span><span class="op">(</span><span class="va">obj</span>, i <span class="op">=</span> <span class="cn">NULL</span>, j <span class="op">=</span> <span class="cn">NULL</span>, k <span class="op">=</span> <span class="cn">NULL</span>, reAverage <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'MSPeakLists'</span></span>
+<span><span class="fu"><a href="generics.html">filter</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  absMSIntThr <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  absMSMSIntThr <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  relMSIntThr <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  relMSMSIntThr <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  topMSPeaks <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  topMSMSPeaks <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  minMSMSPeaks <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  isolatePrec <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  deIsotopeMS <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  deIsotopeMSMS <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  withMSMS <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  annotatedBy <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  retainPrecursorMSMS <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  reAverage <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  negate <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'MSPeakLists'</span></span>
+<span><span class="fu"><a href="generics.html">plotSpectrum</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  <span class="va">groupName</span>,</span>
+<span>  analysis <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  MSLevel <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  specSimParams <span class="op">=</span> <span class="fu"><a href="specSimParams.html">getDefSpecSimParams</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  xlim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'MSPeakLists'</span></span>
+<span><span class="fu">spectrumSimilarity</span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  <span class="va">groupName1</span>,</span>
+<span>  groupName2 <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  analysis1 <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  analysis2 <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  MSLevel <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  specSimParams <span class="op">=</span> <span class="fu"><a href="specSimParams.html">getDefSpecSimParams</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  NAToZero <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  drop <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'MSPeakListsSet'</span></span>
+<span><span class="fu"><a href="generics.html">analysisInfo</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'MSPeakListsSet'</span></span>
+<span><span class="fu"><a href="generics.html">show</a></span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'MSPeakListsSet,ANY,ANY,missing'</span></span>
+<span><span class="va">x</span><span class="op">[</span><span class="va">i</span>, <span class="va">j</span>, <span class="va">...</span>, reAverage <span class="op">=</span> <span class="cn">FALSE</span>, sets <span class="op">=</span> <span class="cn">NULL</span>, drop <span class="op">=</span> <span class="cn">TRUE</span><span class="op">]</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'MSPeakListsSet'</span></span>
+<span><span class="fu"><a href="generics.html">as.data.table</a></span><span class="op">(</span><span class="va">x</span>, fGroups <span class="op">=</span> <span class="cn">NULL</span>, averaged <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'MSPeakListsSet'</span></span>
+<span><span class="fu"><a href="generics.html">delete</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'MSPeakListsSet'</span></span>
+<span><span class="fu"><a href="generics.html">filter</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  annotatedBy <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  retainPrecursorMSMS <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  reAverage <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  negate <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  sets <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'MSPeakListsSet'</span></span>
+<span><span class="fu"><a href="generics.html">plotSpectrum</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  <span class="va">groupName</span>,</span>
+<span>  analysis <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  MSLevel <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  specSimParams <span class="op">=</span> <span class="fu"><a href="specSimParams.html">getDefSpecSimParams</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  xlim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  perSet <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  mirror <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'MSPeakListsSet'</span></span>
+<span><span class="fu">spectrumSimilarity</span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  <span class="va">groupName1</span>,</span>
+<span>  groupName2 <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  analysis1 <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  analysis2 <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  MSLevel <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  specSimParams <span class="op">=</span> <span class="fu"><a href="specSimParams.html">getDefSpecSimParams</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  NAToZero <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  drop <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'MSPeakListsSet'</span></span>
+<span><span class="fu"><a href="generics.html">unset</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">set</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">getDefIsolatePrecParams</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>obj, x, object</dt>
+
+
+<dl><dt id="arg-obj-x-object">obj, x, object<a class="anchor" aria-label="anchor" href="#arg-obj-x-object"></a></dt>
 <dd><p>The <code>MSPeakLists</code> object to access.</p></dd>
 
 
-<dt>...</dt>
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Further arguments passed to <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></code>.</p>
 <p>For <a href="sets-workflow.html">sets workflow</a> methods: further arguments passed to the base <code>MSPeakLists</code> method.</p></dd>
 
 
-<dt>i, j</dt>
+<dt id="arg-i-j">i, j<a class="anchor" aria-label="anchor" href="#arg-i-j"></a></dt>
 <dd><p>For <code>[</code>/<code>[[</code>: A numeric or character value which is used to select analyses/feature groups by
 their index or name, respectively (for the order/names see <code>analyses()/groupNames()</code>).<br><br> For <code>[</code>: Can also be logical to perform logical selection
 (similar to regular vectors). If missing all analyses/feature groups are selected.<br><br> For <code>[[</code>: should be a scalar value. If <code>j</code> is not specified, <code>i</code> selects by feature groups instead.<br><br> For <code>delete</code>: The data to remove from. <code>i</code> are the
@@ -261,114 +263,114 @@ with the peak list table (a <code>data.table</code>), feature group name, analys
 function specifies the peak list indices (rows) to be removed (specified as an <code>integer</code> or <code>logical</code> vector).</p></dd>
 
 
-<dt>reAverage</dt>
+<dt id="arg-reaverage">reAverage<a class="anchor" aria-label="anchor" href="#arg-reaverage"></a></dt>
 <dd><p>Set to <code>TRUE</code> to regenerate group averaged MS peak lists. <strong>NOTE</strong> it is very important
 that any annotation data relying on MS peak lists (formulae/compounds) are regenerated afterwards! Otherwise it is
 likely that <em>e.g.</em> plotting methods will use wrong MS/MS data.</p></dd>
 
 
-<dt>drop</dt>
+<dt id="arg-drop">drop<a class="anchor" aria-label="anchor" href="#arg-drop"></a></dt>
 <dd><p>If set to <code>TRUE</code> and if the comparison is made between two spectra then <code><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></code> is used
 to reduce the <code>matrix</code> return value to a <code>numeric</code> vector.</p></dd>
 
 
-<dt>name</dt>
+<dt id="arg-name">name<a class="anchor" aria-label="anchor" href="#arg-name"></a></dt>
 <dd><p>The feature group name (partially matched).</p></dd>
 
 
-<dt>fGroups</dt>
+<dt id="arg-fgroups">fGroups<a class="anchor" aria-label="anchor" href="#arg-fgroups"></a></dt>
 <dd><p>The <code><a href="featureGroups-class.html">featureGroups</a></code> object that was used to
 generate this object. If not <code>NULL</code> it is used to add feature group
 information (retention and <em>m/z</em> values).</p></dd>
 
 
-<dt>averaged</dt>
+<dt id="arg-averaged">averaged<a class="anchor" aria-label="anchor" href="#arg-averaged"></a></dt>
 <dd><p>If <code>TRUE</code> then feature group averaged peak list data is
 used.</p></dd>
 
 
-<dt>k</dt>
+<dt id="arg-k">k<a class="anchor" aria-label="anchor" href="#arg-k"></a></dt>
 <dd><p>A vector with analyses (<code>character</code> with names or <code>integer</code> with indices) for which the data
 should be deleted. If <code>k!=NULL</code> then deletions will <em>not</em> occur on group averaged peak lists. Otherwise,
 if <code>k=NULL</code> then deltion occurs on <em>both</em> group averaged and analysis specific peak lists.</p></dd>
 
 
-<dt>absMSIntThr, absMSMSIntThr, relMSIntThr, relMSMSIntThr</dt>
+<dt id="arg-absmsintthr-absmsmsintthr-relmsintthr-relmsmsintthr">absMSIntThr, absMSMSIntThr, relMSIntThr, relMSMSIntThr<a class="anchor" aria-label="anchor" href="#arg-absmsintthr-absmsmsintthr-relmsintthr-relmsmsintthr"></a></dt>
 <dd><p>Absolute/relative intensity threshold for MS or MS/MS peak
 lists. <code>NULL</code> for none.</p></dd>
 
 
-<dt>topMSPeaks, topMSMSPeaks</dt>
+<dt id="arg-topmspeaks-topmsmspeaks">topMSPeaks, topMSMSPeaks<a class="anchor" aria-label="anchor" href="#arg-topmspeaks-topmsmspeaks"></a></dt>
 <dd><p>Only consider this amount of MS or MS/MS peaks with highest intensity. <code>NULL</code> to
 consider all.</p></dd>
 
 
-<dt>minMSMSPeaks</dt>
+<dt id="arg-minmsmspeaks">minMSMSPeaks<a class="anchor" aria-label="anchor" href="#arg-minmsmspeaks"></a></dt>
 <dd><p>If the number of peaks in an MS/MS peak list (<strong>excluding</strong> the precursor peak) is lower
 than this it will be completely removed. Set to <code>NULL</code> to ignore.</p></dd>
 
 
-<dt>isolatePrec</dt>
+<dt id="arg-isolateprec">isolatePrec<a class="anchor" aria-label="anchor" href="#arg-isolateprec"></a></dt>
 <dd><p>If not <code>NULL</code> then value should be a <code>list</code> with parameters used for isolating the
 precursor and its isotopes in MS peak lists (see <code>Isolating precursor data</code>). Alternatively, <code>TRUE</code> to
 apply the filter with default settings (as given with <code>getDefIsolatePrecParams</code>).</p></dd>
 
 
-<dt>deIsotopeMS, deIsotopeMSMS</dt>
+<dt id="arg-deisotopems-deisotopemsms">deIsotopeMS, deIsotopeMSMS<a class="anchor" aria-label="anchor" href="#arg-deisotopems-deisotopemsms"></a></dt>
 <dd><p>Remove any isotopic peaks in MS or MS/MS peak lists. This may improve data
 processing steps which do not assume the presence of isotopic peaks (e.g. MetFrag for MS/MS). Note that
 <code>getMzRPeakLists</code> does not (yet) support flagging of isotopes.</p></dd>
 
 
-<dt>withMSMS</dt>
+<dt id="arg-withmsms">withMSMS<a class="anchor" aria-label="anchor" href="#arg-withmsms"></a></dt>
 <dd><p>If set to <code>TRUE</code> then only results will be retained for which MS/MS data is available. if
 <code>negate=TRUE</code> then only results <em>without</em> MS/MS data will be retained.</p></dd>
 
 
-<dt>annotatedBy</dt>
+<dt id="arg-annotatedby">annotatedBy<a class="anchor" aria-label="anchor" href="#arg-annotatedby"></a></dt>
 <dd><p>Either a <code><a href="formulas-class.html">formulas</a></code> or <code><a href="compounds-class.html">compounds</a></code> object, or a <code>list</code> with both. Any
 MS/MS peaks that are <em>not</em> annotated by any of the candidates in the specified objects are removed.</p></dd>
 
 
-<dt>retainPrecursorMSMS</dt>
+<dt id="arg-retainprecursormsms">retainPrecursorMSMS<a class="anchor" aria-label="anchor" href="#arg-retainprecursormsms"></a></dt>
 <dd><p>If <code>TRUE</code> then precursor peaks will never be filtered out from MS/MS peak lists (note
 that precursors are never removed from MS peak lists). The <code>negate</code> argument does not affect this setting.</p></dd>
 
 
-<dt>negate</dt>
+<dt id="arg-negate">negate<a class="anchor" aria-label="anchor" href="#arg-negate"></a></dt>
 <dd><p>If <code>TRUE</code> then filters are applied in opposite manner.</p></dd>
 
 
-<dt>groupName</dt>
+<dt id="arg-groupname">groupName<a class="anchor" aria-label="anchor" href="#arg-groupname"></a></dt>
 <dd><p>The name of the feature group for which a plot should be made. To compare spectra, two group names
 can be specified.</p></dd>
 
 
-<dt>analysis</dt>
+<dt id="arg-analysis">analysis<a class="anchor" aria-label="anchor" href="#arg-analysis"></a></dt>
 <dd><p>The name of the analysis for which a plot should be made. If <code>NULL</code> then data from the feature
 group averaged peak list is used. When comparing spectra, either <code>NULL</code> or the analyses for both spectra
 should be specified.</p></dd>
 
 
-<dt>MSLevel</dt>
+<dt id="arg-mslevel">MSLevel<a class="anchor" aria-label="anchor" href="#arg-mslevel"></a></dt>
 <dd><p>The MS level: <samp>1</samp> for regular MS, <samp>2</samp> for MSMS.</p></dd>
 
 
-<dt>title</dt>
+<dt id="arg-title">title<a class="anchor" aria-label="anchor" href="#arg-title"></a></dt>
 <dd><p>The title of the plot. If <code>NULL</code> a title will be automatically made.</p></dd>
 
 
-<dt>specSimParams</dt>
+<dt id="arg-specsimparams">specSimParams<a class="anchor" aria-label="anchor" href="#arg-specsimparams"></a></dt>
 <dd><p>A named <code>list</code> with parameters that influence the calculation of MS spectra similarities.
 See the <a href="specSimParams.html">spectral similarity parameters</a> documentation for more details.</p></dd>
 
 
-<dt>xlim, ylim</dt>
+<dt id="arg-xlim-ylim">xlim, ylim<a class="anchor" aria-label="anchor" href="#arg-xlim-ylim"></a></dt>
 <dd><p>Sets the plot size limits used by
 <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></code>. Set to <code>NULL</code> for automatic plot sizing.</p></dd>
 
 
-<dt>groupName1, groupName2</dt>
+<dt id="arg-groupname-groupname-">groupName1, groupName2<a class="anchor" aria-label="anchor" href="#arg-groupname-groupname-"></a></dt>
 <dd><p>The names of the feature groups for which the comparison should be made. If both
 arguments are specified then a comparison is made with the spectra specified by <code>groupName1</code> <em>vs</em> those
 specified by <code>groupName2</code>. The length of either can be <samp>&gt;1</samp> to generate a comparison matrix.
@@ -376,55 +378,44 @@ Alternatively, if <code>groupName2</code> is <code>NULL</code> then all the spec
 compared with eachother, <em>i.e.</em> resulting in a square similarity matrix.</p></dd>
 
 
-<dt>analysis1, analysis2</dt>
+<dt id="arg-analysis-analysis-">analysis1, analysis2<a class="anchor" aria-label="anchor" href="#arg-analysis-analysis-"></a></dt>
 <dd><p>The name of the analysis (analyses) for the comparison. If <code>NULL</code> then data from the
 feature group averaged peak list is used. Otherwise, should be the same length as
 <code>groupName1</code>/<code>groupName2</code>.</p></dd>
 
 
-<dt>NAToZero</dt>
+<dt id="arg-natozero">NAToZero<a class="anchor" aria-label="anchor" href="#arg-natozero"></a></dt>
 <dd><p>Set to <code>TRUE</code> to convert <code>NA</code> similarities (<em>i.e.</em> when no similarity could be
 calculated) to zero values.</p></dd>
 
 
-<dt>sets</dt>
+<dt id="arg-sets">sets<a class="anchor" aria-label="anchor" href="#arg-sets"></a></dt>
 <dd><p>(<strong>sets workflow</strong>) A <code>character</code> with name(s) of the sets to keep (or remove if <code>negate=TRUE</code>).</p></dd>
 
 
-<dt>perSet, mirror</dt>
+<dt id="arg-perset-mirror">perSet, mirror<a class="anchor" aria-label="anchor" href="#arg-perset-mirror"></a></dt>
 <dd><p>(<strong>sets workflow</strong>) If <code>perSet=TRUE</code> then the set specific mass peaks are annotated separately.
 Furthermore, if <code>mirror=TRUE</code> (and there are two sets in the object) then a mirror plot is generated.</p></dd>
 
 
-<dt>set</dt>
+<dt id="arg-set">set<a class="anchor" aria-label="anchor" href="#arg-set"></a></dt>
 <dd><p>(<strong>sets workflow</strong>) The name of the set.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p><code>peakLists</code> returns a nested list containing MS (and MS/MS where
-  available) peak lists per feature group and per analysis. The format is:</p>
-<p></p>
-<p><code>[[analysis]][[featureGroupName]][[MSType]][[PeakLists]]</code> where</p>
-<p></p>
-<p><code>MSType</code> is either <code>"MS"</code> or <code>"MSMS"</code> and <code>PeakLists</code> a</p>
-<p></p>
-<p><code>data.table</code> containing all <em>m/z</em> values (<code>mz</code></p>
-
-
-<p>column) and their intensities (<code>intensity</code> column). In addition, the
+    <p><code>peakLists</code> returns a nested list containing MS (and MS/MS where
+  available) peak lists per feature group and per analysis. The format is:
+  <code>[[analysis]][[featureGroupName]][[MSType]][[PeakLists]]</code> where
+  <code>MSType</code> is either <code>"MS"</code> or <code>"MSMS"</code> and <code>PeakLists</code> a
+  <code>data.table</code> containing all <em>m/z</em> values (<code>mz</code>
+  column) and their intensities (<code>intensity</code> column). In addition, the
   peak list tables may contain a <code>cmp</code> column which contains an unique
   alphabetical identifier to which isotopic cluster (or "compound") a mass
   belongs (only supported by MS peak lists generated by Bruker tools at the
   moment).</p>
-
-
 <p><code>averagedPeakLists</code> returns a nested list of feature group
   averaged peak lists in a similar format as <code>peakLists</code>.</p>
-
-
 <p><code>delete</code> returns the object for which the specified data was removed.</p>
     </div>
     <div id="details">
@@ -435,7 +426,7 @@ Furthermore, if <code>mirror=TRUE</code> (and there are two sets in the object) 
     </div>
     <div id="methods-by-generic-">
     <h2>Methods (by generic)</h2>
-    
+
 <ul><li><p><code>peakLists(MSPeakLists)</code>: Accessor method to obtain the MS peak lists.</p></li>
 <li><p><code>averagedPeakLists(MSPeakLists)</code>: Accessor method to obtain the feature group averaged
 MS peak lists.</p></li>
@@ -464,7 +455,7 @@ compared when two feature groups are specified.</p></li>
 </ul></div>
     <div id="slots">
     <h2>Slots</h2>
-    
+
 
 <dl><dt><code>peakLists</code></dt>
 <dd><p>Contains a list of all MS (and MS/MS) peak lists. Use the <code>peakLists</code> method for access.</p></dd>
@@ -570,15 +561,15 @@ for access.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

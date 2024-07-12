@@ -3,7 +3,7 @@
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -25,13 +25,13 @@
       <ul class="nav navbar-nav"><li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-     
+
   </a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Reference
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -44,7 +44,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Tutorial
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -57,7 +57,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Handbook
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -73,14 +73,14 @@
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/rickhelmus/patRoon" class="external-link">
     <span class="fa fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -97,7 +97,7 @@
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">generateFormulasGenForm</span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for featureGroups</span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
 <span><span class="fu">generateFormulasGenForm</span><span class="op">(</span></span>
 <span>  <span class="va">fGroups</span>,</span>
 <span>  <span class="va">MSPeakLists</span>,</span>
@@ -122,7 +122,7 @@
 <span>  batchSize <span class="op">=</span> <span class="fl">8</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for featureGroupsSet</span></span>
+<span><span class="co"># S4 method for class 'featureGroupsSet'</span></span>
 <span><span class="fu">generateFormulasGenForm</span><span class="op">(</span></span>
 <span>  <span class="va">fGroups</span>,</span>
 <span>  <span class="va">MSPeakLists</span>,</span>
@@ -137,26 +137,28 @@
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>fGroups</dt>
+
+
+<dl><dt id="arg-fgroups">fGroups<a class="anchor" aria-label="anchor" href="#arg-fgroups"></a></dt>
 <dd><p><code><a href="featureGroups-class.html">featureGroups</a></code> object for which formulae should be generated. This should be the same or
 a subset of the object that was used to create the specified <code>MSPeakLists</code>. In the case of a subset only the
 remaining feature groups in the subset are considered.</p></dd>
 
 
-<dt>...</dt>
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>(<strong>sets workflow</strong>) Further arguments passed to the non-sets workflow method.</p></dd>
 
 
-<dt>MSPeakLists</dt>
+<dt id="arg-mspeaklists">MSPeakLists<a class="anchor" aria-label="anchor" href="#arg-mspeaklists"></a></dt>
 <dd><p>An <code><a href="MSPeakLists-class.html">MSPeakLists</a></code> object that was generated for the supplied <code>fGroups</code>.</p></dd>
 
 
-<dt>relMzDev</dt>
+<dt id="arg-relmzdev">relMzDev<a class="anchor" aria-label="anchor" href="#arg-relmzdev"></a></dt>
 <dd><p>Maximum relative deviation between the measured and candidate formula <em>m/z</em> values (in ppm).
 Sets the <span class="option">ppm</span> command line option.</p></dd>
 
 
-<dt>adduct</dt>
+<dt id="arg-adduct">adduct<a class="anchor" aria-label="anchor" href="#arg-adduct"></a></dt>
 <dd><p>An <code><a href="adduct-class.html">adduct</a></code> object (or something that can be converted to it with <code><a href="adduct-utils.html">as.adduct</a></code>).
   Examples: <code>"[M-H]-"</code>, <code>"[M+Na]+"</code>. If the <code>featureGroups</code> object has
   adduct annotations then these are used if <code>adducts=NULL</code>.</p>
@@ -164,28 +166,28 @@ Sets the <span class="option">ppm</span> command line option.</p></dd>
   adduct annotations will then always be used.</p></dd>
 
 
-<dt>elements</dt>
+<dt id="arg-elements">elements<a class="anchor" aria-label="anchor" href="#arg-elements"></a></dt>
 <dd><p>Elements to be considered for formulae calculation. This will heavily affects the number of
 candidates! Always try to work with a minimal set by excluding elements you don't expect. Sets the <span class="option">el</span>
 command line option.</p></dd>
 
 
-<dt>hetero</dt>
+<dt id="arg-hetero">hetero<a class="anchor" aria-label="anchor" href="#arg-hetero"></a></dt>
 <dd><p>Only consider formulae with at least one hetero atom. Sets the <span class="option">het</span> commandline option.</p></dd>
 
 
-<dt>oc</dt>
+<dt id="arg-oc">oc<a class="anchor" aria-label="anchor" href="#arg-oc"></a></dt>
 <dd><p>Only consider organic formulae (<em>i.e.</em> with at least one carbon atom). Sets the <span class="option">oc</span>
 commandline option.</p></dd>
 
 
-<dt>thrMS, thrMSMS, thrComb</dt>
+<dt id="arg-thrms-thrmsms-thrcomb">thrMS, thrMSMS, thrComb<a class="anchor" aria-label="anchor" href="#arg-thrms-thrmsms-thrcomb"></a></dt>
 <dd><p>Sets the thresholds for the <code class="command">GenForm</code> MS score (<code>isoScore</code>), MS/MS score
 (<code>MSMSScore</code>) and combined score (<code>combMatch</code>). Sets the <span class="option">thms</span>/<span class="option">thmsms</span>/<span class="option">thcomb</span>
 command line options, respectively. Set to <code>NULL</code> for no threshold.</p></dd>
 
 
-<dt>maxCandidates</dt>
+<dt id="arg-maxcandidates">maxCandidates<a class="anchor" aria-label="anchor" href="#arg-maxcandidates"></a></dt>
 <dd><p>If this number of candidates are found then <code class="command">GenForm</code> aborts any further formula
 calculations. The number of candidates is determined <em>after</em> any formula filters, hence, the properties and
 'quality' of the candidates is influenced by options such as <code>oc</code> and <code>thrMS</code> arguments. Note that this
@@ -193,42 +195,42 @@ is different than <code>topMost</code>, which selects the candidates after <code
 <span class="option">max</span> command line option. Set to <samp>0</samp> or <code>Inf</code> for no maximum.</p></dd>
 
 
-<dt>extraOpts</dt>
+<dt id="arg-extraopts">extraOpts<a class="anchor" aria-label="anchor" href="#arg-extraopts"></a></dt>
 <dd><p>An optional character vector with any other command line options that will be passed to
 <code class="command">GenForm</code>. See the <code>GenForm options</code> section for all available command line options.</p></dd>
 
 
-<dt>calculateFeatures</dt>
+<dt id="arg-calculatefeatures">calculateFeatures<a class="anchor" aria-label="anchor" href="#arg-calculatefeatures"></a></dt>
 <dd><p>If <code>TRUE</code> fomulae are first calculated for all features
 prior to feature group assignment (see <code>Candidate assignment</code> in <code><a href="generateFormulas.html">generateFormulas</a></code>).</p></dd>
 
 
-<dt>featThreshold</dt>
+<dt id="arg-featthreshold">featThreshold<a class="anchor" aria-label="anchor" href="#arg-featthreshold"></a></dt>
 <dd><p>If <code>calculateFeatures=TRUE</code>: minimum presence (<samp>0-1</samp>) of a formula in all features
 before it is considered as a candidate for a feature group. For instance, <code>featThreshold=0.75</code> dictates that a
 formula should be present in at least 75% of the features inside a feature group.</p></dd>
 
 
-<dt>featThresholdAnn</dt>
+<dt id="arg-featthresholdann">featThresholdAnn<a class="anchor" aria-label="anchor" href="#arg-featthresholdann"></a></dt>
 <dd><p>As <code>featThreshold</code>, but only considers features with annotations. For instance,
 <code>featThresholdAnn=0.75</code> dictates that a formula should be present in at least 75% of the features with
 annotations inside a feature group. @param topMost Only keep this number of candidates
 (per feature group) with highest score.</p></dd>
 
 
-<dt>absAlignMzDev</dt>
+<dt id="arg-absalignmzdev">absAlignMzDev<a class="anchor" aria-label="anchor" href="#arg-absalignmzdev"></a></dt>
 <dd><p>When the group formula annotation consensus is made from feature annotations, the <em>m/z</em>
 values of annotated MS/MS fragments may slightly deviate from those of the corresponding group MS/MS peak list. The
 <code>absAlignMzDev</code> argument specifies the maximum <em>m/z</em> window used to re-align the mass peaks.</p></dd>
 
 
-<dt>MSMode</dt>
+<dt id="arg-msmode">MSMode<a class="anchor" aria-label="anchor" href="#arg-msmode"></a></dt>
 <dd><p>Whether formulae should be generated only from MS data (<code>"ms"</code>), MS/MS data (<code>"msms"</code>) or
 both (<code>"both"</code>). Selecting <code>"both"</code> will fall back to formula calculation with only MS data in case no
 MS/MS data is available.</p></dd>
 
 
-<dt>isolatePrec</dt>
+<dt id="arg-isolateprec">isolatePrec<a class="anchor" aria-label="anchor" href="#arg-isolateprec"></a></dt>
 <dd><p>Settings used for isolation of precursor mass peaks and their isotopes. This isolation is highly
 important for accurate isotope scoring of candidates, as non-relevant mass peaks will dramatically decrease the
 score. The value of <code>isolatePrec</code> should either be a <code>list</code> with parameters (see the
@@ -238,44 +240,42 @@ default parameters or <code>FALSE</code> for no isolation (<em>e.g.</em> when yo
 (unless <code>isolatePrec=FALSE</code>), hence any custom <code>z</code> setting is ignored.</p></dd>
 
 
-<dt>timeout</dt>
+<dt id="arg-timeout">timeout<a class="anchor" aria-label="anchor" href="#arg-timeout"></a></dt>
 <dd><p>Maximum time (in seconds) that a <code class="command">GenForm</code> command is allowed to execute. If this time is
 exceeded a warning is emitted and the command is terminated. See the notes section for more information on the need
 of timeouts.</p></dd>
 
 
-<dt>topMost</dt>
+<dt id="arg-topmost">topMost<a class="anchor" aria-label="anchor" href="#arg-topmost"></a></dt>
 <dd><p>Only keep this number of candidates (per feature group) with highest
 score.</p></dd>
 
 
-<dt>batchSize</dt>
+<dt id="arg-batchsize">batchSize<a class="anchor" aria-label="anchor" href="#arg-batchsize"></a></dt>
 <dd><p>Maximum number of <code class="command">GenForm</code> commands that should be run sequentially in each parallel
 process. Combining commands with short runtimes (such as <code class="command">GenForm</code>) can significantly increase parallel
 performance. For more information see <code><a href="executeMultiProcess.html">executeMultiProcess</a></code>. Note that this is ignored if
 <span class="option">patRoon.MP.method="future"</span>.</p></dd>
 
 
-<dt>setThreshold</dt>
+<dt id="arg-setthreshold">setThreshold<a class="anchor" aria-label="anchor" href="#arg-setthreshold"></a></dt>
 <dd><p>(<strong>sets workflow</strong>) Minimum abundance for a candidate among all sets (<samp>0-1</samp>). For instance, a value of
 <samp>1</samp> means that the candidate needs to be present in all the set data.</p></dd>
 
 
-<dt>setThresholdAnn</dt>
+<dt id="arg-setthresholdann">setThresholdAnn<a class="anchor" aria-label="anchor" href="#arg-setthresholdann"></a></dt>
 <dd><p>(<strong>sets workflow</strong>) As <code>setThreshold</code>, but only taking into account the set data that contain
 annotations for the feature group of the candidate.</p></dd>
 
 
-<dt>setAvgSpecificScores</dt>
+<dt id="arg-setavgspecificscores">setAvgSpecificScores<a class="anchor" aria-label="anchor" href="#arg-setavgspecificscores"></a></dt>
 <dd><p>(<strong>sets workflow</strong>) If <code>TRUE</code> then set specific scorings (<em>e.g.</em> MS/MS match) are also
 averaged.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p>A <code><a href="formulas-class.html">formulas</a></code> object containing all generated formulae.</p>
+    <p>A <code><a href="formulas-class.html">formulas</a></code> object containing all generated formulae.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -378,7 +378,7 @@ Explanation:
     <h2>References</h2>
     <p>Meringer M, Reinker S, Zhang J, Muller A (2011).
 “MS/MS Data Improves Automated Determination of Molecular Formulas by Mass Spectrometry.”
-<em>MATCH Commun. Math. Comput. Chem.</em>, <b>65</b>(2), 259--290.</p>
+<em>MATCH Commun. Math. Comput. Chem.</em>, <b>65</b>(2), 259–290.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -397,15 +397,15 @@ Explanation:
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

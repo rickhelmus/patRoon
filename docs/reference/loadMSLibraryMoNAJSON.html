@@ -4,7 +4,7 @@
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -26,13 +26,13 @@
       <ul class="nav navbar-nav"><li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-     
+
   </a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Reference
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -45,7 +45,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Tutorial
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -58,7 +58,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Handbook
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -74,14 +74,14 @@
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/rickhelmus/patRoon" class="external-link">
     <span class="fa fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -115,25 +115,27 @@
     </div>
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>file</dt>
+
+
+<dl><dt id="arg-file">file<a class="anchor" aria-label="anchor" href="#arg-file"></a></dt>
 <dd><p>A <code>character</code> string that specifies the file path to the JSON library.</p></dd>
 
 
-<dt>prefCalcChemProps</dt>
+<dt id="arg-prefcalcchemprops">prefCalcChemProps<a class="anchor" aria-label="anchor" href="#arg-prefcalcchemprops"></a></dt>
 <dd><p>If <code>TRUE</code> then calculated chemical properties such as the formula and
 <acronym>InChIKey</acronym> are preferred over what is already present in the MS library. For efficiency reasons it is
 recommended to set this to <code>TRUE</code>. See the <code>Validating and calculating chemical properties</code> section for
 more details.</p></dd>
 
 
-<dt>neutralChemProps</dt>
+<dt id="arg-neutralchemprops">neutralChemProps<a class="anchor" aria-label="anchor" href="#arg-neutralchemprops"></a></dt>
 <dd><p>If <code>TRUE</code> then the neutral form of the molecule is considered to calculate
 <acronym>SMILES</acronym>, formulae etc. Enabling this may improve feature matching when considering common adducts
 (<em>e.g.</em> <code>[M+H]+</code>, <code>[M-H]-</code>). See the <code>Validating and calculating chemical properties</code> section
 for more details.</p></dd>
 
 
-<dt>potAdducts, potAdductsLib</dt>
+<dt id="arg-potadducts-potadductslib">potAdducts, potAdductsLib<a class="anchor" aria-label="anchor" href="#arg-potadducts-potadductslib"></a></dt>
 <dd><p>If and how missing adducts (<code>Precursor_type</code> data) are guessed,
   <code>potAdducts</code> should be either:</p><ul><li><p><code>FALSE</code>: do not perform adduct guessing.</p></li>
 <li><p><code>TRUE</code>: guesses adducts based on a common set of known adducts (currently based on
@@ -144,19 +146,17 @@ for more details.</p></dd>
 </ul></dd>
 
 
-<dt>absMzDev</dt>
+<dt id="arg-absmzdev">absMzDev<a class="anchor" aria-label="anchor" href="#arg-absmzdev"></a></dt>
 <dd><p>The maximum absolute <em>m/z</em> deviation when guessing missing adducts.</p></dd>
 
 
-<dt>calcSPLASH</dt>
+<dt id="arg-calcsplash">calcSPLASH<a class="anchor" aria-label="anchor" href="#arg-calcsplash"></a></dt>
 <dd><p>If set to <code>TRUE</code> then missing <acronym>SPLASH</acronym> values will be calculated (see below).</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p>The loaded data is returned in an <code><a href="MSLibrary-class.html">MSLibrary</a></code> object.</p>
+    <p>The loaded data is returned in an <code><a href="MSLibrary-class.html">MSLibrary</a></code> object.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -164,7 +164,7 @@ for more details.</p></dd>
   <code>algorithm="json"</code>.</p>
 <p>This function uses <code>C++</code> with <a href="https://CRAN.R-project.org/package=Rcpp" class="external-link"><span class="pkg">Rcpp</span></a> and <a href="https://CRAN.R-project.org/package=rapidjsonr" class="external-link"><span class="pkg">rapidjsonr</span></a> to efficiently load and parse
   JSON files from <a href="https://mona.fiehnlab.ucdavis.edu/" class="external-link">MoNA</a>. An advantage compared to
-  <code><a href="loadMSLibraryMSP.html">loadMSLibraryMSP</a></code> is that this function supports loading spectral annotations.</p>  
+  <code><a href="loadMSLibraryMSP.html">loadMSLibraryMSP</a></code> is that this function supports loading spectral annotations.</p>
 <p>The record field names are converted to those used in <code class="file">.msp</code> files.</p>
     </div>
     <div id="automatic-curation-of-library-data">
@@ -203,7 +203,7 @@ for more details.</p></dd>
 <p>The internal validation/calculation process performs the following steps:</p><ul><li><p>Validation of <acronym>SMILES</acronym>, <acronym>InChI</acronym>, <acronym>InChIKey</acronym> and formula data (if present). Invalid
   entries will be set to <code>NA</code>.</p></li>
 <li><p>If <code>neutralChemProps=TRUE</code> then chemical data (<acronym>SMILES</acronym>, formulae etc.) is neutralized by
-  (de-)protonation (using the <code class="command">--neutralized</code> option of <code class="command">OpenBabel</code>). An additional column
+  (de-)protonation (using the <code class="command">–neutralized</code> option of <code class="command">OpenBabel</code>). An additional column
   <code>molNeutralized</code> is added to mark those molecules that were neutralized. Note that neutralization requires
   either <acronym>SMILES</acronym> or <acronym>InChI</acronym> data to be available.</p></li>
 <li><p>The <acronym>SMILES</acronym> and <acronym>InChI</acronym> data are used to calculate missing or invalid <acronym>SMILES</acronym>,
@@ -222,7 +222,7 @@ for more details.</p></dd>
     <h2>References</h2>
     <p>Wohlgemuth G, Mehta SS, Mejia RF, Neumann S, Pedrosa D, Pluskal T, Schymanski EL, Willighagen EL, Wilson M, Wishart DS, Arita M, Dorrestein PC, Bandeira N, Wang M, Schulze T, Salek RM, Steinbeck C, Nainala VC, Mistrik R, Nishioka T, Fiehn O (2016).
 “SPLASH,  a hashed identifier for mass spectra.”
-<em>Nature Biotechnology</em>, <b>34</b>(11), 1099--1101.
+<em>Nature Biotechnology</em>, <b>34</b>(11), 1099–1101.
 <a href="https://doi.org/10.1038/nbt.3689" class="external-link">doi:10.1038/nbt.3689</a>
 .
  <br><br> Ruttkies C, Schymanski EL, Wolf S, Hollender J, Neumann S (2016).
@@ -256,15 +256,15 @@ for more details.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

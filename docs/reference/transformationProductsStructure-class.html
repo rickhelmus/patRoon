@@ -3,7 +3,7 @@
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -25,13 +25,13 @@
       <ul class="nav navbar-nav"><li>
   <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
-     
+
   </a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Reference
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -44,7 +44,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Tutorial
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -57,7 +57,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Handbook
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -73,14 +73,14 @@
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/rickhelmus/patRoon" class="external-link">
     <span class="fa fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -95,10 +95,10 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for transformationProductsStructure</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for class 'transformationProductsStructure'</span></span>
 <span><span class="fu"><a href="generics.html">convertToMFDB</a></span><span class="op">(</span><span class="va">TPs</span>, <span class="va">out</span>, includeParents <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for transformationProductsStructure</span></span>
+<span><span class="co"># S4 method for class 'transformationProductsStructure'</span></span>
 <span><span class="fu"><a href="generics.html">filter</a></span><span class="op">(</span></span>
 <span>  <span class="va">obj</span>,</span>
 <span>  <span class="va">...</span>,</span>
@@ -110,7 +110,7 @@
 <span>  negate <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for transformationProductsStructure</span></span>
+<span><span class="co"># S4 method for class 'transformationProductsStructure'</span></span>
 <span><span class="fu"><a href="generics.html">plotGraph</a></span><span class="op">(</span></span>
 <span>  <span class="va">obj</span>,</span>
 <span>  <span class="va">which</span>,</span>
@@ -122,10 +122,10 @@
 <span>  height <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for transformationProductsStructure</span></span>
+<span><span class="co"># S4 method for class 'transformationProductsStructure'</span></span>
 <span><span class="fu"><a href="generics.html">plotVenn</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span>, commonParents <span class="op">=</span> <span class="cn">FALSE</span>, labels <span class="op">=</span> <span class="cn">NULL</span>, vennArgs <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for transformationProductsStructure</span></span>
+<span><span class="co"># S4 method for class 'transformationProductsStructure'</span></span>
 <span><span class="fu"><a href="generics.html">plotUpSet</a></span><span class="op">(</span></span>
 <span>  <span class="va">obj</span>,</span>
 <span>  <span class="va">...</span>,</span>
@@ -136,7 +136,7 @@
 <span>  upsetArgs <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for transformationProductsStructure</span></span>
+<span><span class="co"># S4 method for class 'transformationProductsStructure'</span></span>
 <span><span class="fu"><a href="generics.html">consensus</a></span><span class="op">(</span></span>
 <span>  <span class="va">obj</span>,</span>
 <span>  <span class="va">...</span>,</span>
@@ -150,42 +150,44 @@
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>out</dt>
+
+
+<dl><dt id="arg-out">out<a class="anchor" aria-label="anchor" href="#arg-out"></a></dt>
 <dd><p>The file name of the the output <code class="command">MetFrag</code> database.</p></dd>
 
 
-<dt>includeParents</dt>
+<dt id="arg-includeparents">includeParents<a class="anchor" aria-label="anchor" href="#arg-includeparents"></a></dt>
 <dd><p>Set to <code>TRUE</code> to include the parents in the database.</p></dd>
 
 
-<dt>obj, TPs</dt>
+<dt id="arg-obj-tps">obj, TPs<a class="anchor" aria-label="anchor" href="#arg-obj-tps"></a></dt>
 <dd><p><code>transformationProductsStructure</code> derived object to be accessed</p></dd>
 
 
-<dt>...</dt>
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>For <code>filter</code>: Further argument passed to the base
   <code><a href="transformationProducts-class.html">filter method</a></code>.</p>
 <p>For <code>plotVenn</code>, <code>plotUpSet</code> and <code>consensus</code>: further (unique) <code>transformationProductsStructure</code>
   objects.</p></dd>
 
 
-<dt>removeParentIsomers</dt>
+<dt id="arg-removeparentisomers">removeParentIsomers<a class="anchor" aria-label="anchor" href="#arg-removeparentisomers"></a></dt>
 <dd><p>If <code>TRUE</code> then TPs with an equal formula as their parent (isomers) are removed.</p></dd>
 
 
-<dt>removeTPIsomers</dt>
+<dt id="arg-removetpisomers">removeTPIsomers<a class="anchor" aria-label="anchor" href="#arg-removetpisomers"></a></dt>
 <dd><p>If <code>TRUE</code> then all TPs with equal formula as any sibling TPs (isomers) are removed.
 Unlike <code>removeDuplicates</code>, <em>all</em> TP candidates are removed (including the first match). This filter
 automatically sets <code>removeDuplicates=TRUE</code> to avoid complete removal of TPs with equal structure.</p></dd>
 
 
-<dt>removeDuplicates</dt>
+<dt id="arg-removeduplicates">removeDuplicates<a class="anchor" aria-label="anchor" href="#arg-removeduplicates"></a></dt>
 <dd><p>If <code>TRUE</code> then the TPs of a parent with duplicate structures (<acronym>SMILES</acronym>) are
 removed. Such duplicates may occur when different transformation pathways yield the same TPs. The first TP
 candidate with duplicate structure will be kept.</p></dd>
 
 
-<dt>minSimilarity</dt>
+<dt id="arg-minsimilarity">minSimilarity<a class="anchor" aria-label="anchor" href="#arg-minsimilarity"></a></dt>
 <dd><p>Minimum structure similarity (<samp>0-1</samp>) that a TP should have relative to its parent. This
 data is only available if the <code>calcSims</code> argument to <code><a href="generateTPs.html">generateTPs</a></code> was set to <code>TRUE</code>. May be
 useful under the assumption that parents and TPs who have a high structural similarity, also likely have a high
@@ -194,67 +196,67 @@ Any values that are <code>NA</code> are removed (which only occur when a consens
 have similarity information).</p></dd>
 
 
-<dt>verbose</dt>
+<dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
 <dd><p>If set to <code>FALSE</code> then no text output is shown.</p></dd>
 
 
-<dt>negate</dt>
+<dt id="arg-negate">negate<a class="anchor" aria-label="anchor" href="#arg-negate"></a></dt>
 <dd><p>If <code>TRUE</code> then filters are performed in opposite manner.</p></dd>
 
 
-<dt>which</dt>
+<dt id="arg-which">which<a class="anchor" aria-label="anchor" href="#arg-which"></a></dt>
 <dd><p>Either a <code>character</code> or <code>integer</code> vector with one or more names/indices of the parents to
 plot.</p></dd>
 
 
-<dt>components</dt>
+<dt id="arg-components">components<a class="anchor" aria-label="anchor" href="#arg-components"></a></dt>
 <dd><p>If specified (<em>i.e.</em> not <code>NULL</code>), a <code><a href="componentsTPs-class.html">componentsTPs</a></code> object that is used for
 matching the graph with screening results. The TPs that were found will be marked. See also the <code>prune</code> and
 <code>onlyCompletePaths</code> arguments.</p></dd>
 
 
-<dt>structuresMax</dt>
+<dt id="arg-structuresmax">structuresMax<a class="anchor" aria-label="anchor" href="#arg-structuresmax"></a></dt>
 <dd><p>An <code>integer</code> with the maximum number of structures to plot. Setting a maximum is mainly
 done to avoid long times needed to construct the graph.</p></dd>
 
 
-<dt>prune</dt>
+<dt id="arg-prune">prune<a class="anchor" aria-label="anchor" href="#arg-prune"></a></dt>
 <dd><p>If <code>TRUE</code> and <code>components</code> is set, then pathways without <em>any</em> detected TPs are not shown
 (pruned). See also the <code>onlyCompletePaths</code> and <code>components</code> arguments.</p></dd>
 
 
-<dt>onlyCompletePaths</dt>
+<dt id="arg-onlycompletepaths">onlyCompletePaths<a class="anchor" aria-label="anchor" href="#arg-onlycompletepaths"></a></dt>
 <dd><p>If <code>TRUE</code> and <code>components</code> is set, then only pathways are shown for which
 <em>all</em> TPs were detected. See also the <code>prune</code> and <code>components</code> arguments.</p></dd>
 
 
-<dt>width, height</dt>
+<dt id="arg-width-height">width, height<a class="anchor" aria-label="anchor" href="#arg-width-height"></a></dt>
 <dd><p>Passed to <code>visNetwork</code>.</p></dd>
 
 
-<dt>commonParents</dt>
+<dt id="arg-commonparents">commonParents<a class="anchor" aria-label="anchor" href="#arg-commonparents"></a></dt>
 <dd><p>Only consider TPs from parents that are common to all compared objects.</p></dd>
 
 
-<dt>labels</dt>
+<dt id="arg-labels">labels<a class="anchor" aria-label="anchor" href="#arg-labels"></a></dt>
 <dd><p>A <code>character</code> with names to use for labelling. If <code>NULL</code> labels are automatically generated.</p></dd>
 
 
-<dt>vennArgs</dt>
+<dt id="arg-vennargs">vennArgs<a class="anchor" aria-label="anchor" href="#arg-vennargs"></a></dt>
 <dd><p>A <code>list</code> with further arguments passed to <span class="pkg">VennDiagram</span> plotting functions. Set to
 <code>NULL</code> to ignore.</p></dd>
 
 
-<dt>nsets, nintersects</dt>
+<dt id="arg-nsets-nintersects">nsets, nintersects<a class="anchor" aria-label="anchor" href="#arg-nsets-nintersects"></a></dt>
 <dd><p>See <code><a href="https://rdrr.io/pkg/UpSetR/man/upset.html" class="external-link">upset</a></code>.</p></dd>
 
 
-<dt>upsetArgs</dt>
+<dt id="arg-upsetargs">upsetArgs<a class="anchor" aria-label="anchor" href="#arg-upsetargs"></a></dt>
 <dd><p>A list with any further arguments to be passed to
 <code><a href="https://rdrr.io/pkg/UpSetR/man/upset.html" class="external-link">upset</a></code>. Set to <code>NULL</code> to ignore.</p></dd>
 
 
-<dt>absMinAbundance, relMinAbundance</dt>
+<dt id="arg-absminabundance-relminabundance">absMinAbundance, relMinAbundance<a class="anchor" aria-label="anchor" href="#arg-absminabundance-relminabundance"></a></dt>
 <dd><p>Minimum absolute or relative
 (<samp>0-1</samp>) abundance across objects for a result to be kept. For
 instance, <code>relMinAbundance=0.5</code> means that a result should be present
@@ -263,7 +265,7 @@ ignore and keep all results. Limits cannot be set when <code>uniqueFrom</code> i
 not <code>NULL</code>.</p></dd>
 
 
-<dt>uniqueFrom</dt>
+<dt id="arg-uniquefrom">uniqueFrom<a class="anchor" aria-label="anchor" href="#arg-uniquefrom"></a></dt>
 <dd><p>Set this argument to only retain TPs that are unique
 within one or more of the objects for which the consensus is made.
 Selection is done by setting the value of <code>uniqueFrom</code> to a
@@ -273,7 +275,7 @@ Selection is done by setting the value of <code>uniqueFrom</code> to a
 of the objects given for the consensus. Set to <code>NULL</code> to ignore.</p></dd>
 
 
-<dt>uniqueOuter</dt>
+<dt id="arg-uniqueouter">uniqueOuter<a class="anchor" aria-label="anchor" href="#arg-uniqueouter"></a></dt>
 <dd><p>If <code>uniqueFrom</code> is not <code>NULL</code> and if
 <code>uniqueOuter=TRUE</code>: only retain data that are also unique between
 objects specified in <code>uniqueFrom</code>.</p></dd>
@@ -281,25 +283,15 @@ objects specified in <code>uniqueFrom</code>.</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p><code>filter</code> returns a filtered <code>transformationProductsStructure</code> object.</p>
-
-
+    <p><code>filter</code> returns a filtered <code>transformationProductsStructure</code> object.</p>
 <p><code>plotGraph</code> returns the result of <code>visNetwork</code>.</p>
-
-
 <p><code>plotVenn</code> (invisibly) returns a list with the following fields:</p><ul><li><p><code>gList</code> the <code>gList</code> object that was returned by
   the utilized <span class="pkg">VennDiagram</span> plotting function.</p></li>
 <li><p><code>areas</code> The total area for each plotted group.</p></li>
 <li><p><code>intersectionCounts</code> The number of intersections between groups.</p></li>
 </ul><p>The order for the <code>areas</code> and <code>intersectionCounts</code> fields is the same as the parameter order
-from the used plotting function (see <em>e.g.</em></p>
-<p></p>
-<p><code>draw.pairwise.venn</code> and
+from the used plotting function (see <em>e.g.</em> <code>draw.pairwise.venn</code> and
 <code>draw.triple.venn</code>).</p>
-
-
 <p><code>consensus</code> returns a <code>transformationProductsStructure</code> object that is produced by merging results
   from multiple <code>transformationProductsStructure</code> objects.</p>
     </div>
@@ -313,7 +305,7 @@ store their results. The methods defined for this class extend the functionality
     </div>
     <div id="methods-by-generic-">
     <h2>Methods (by generic)</h2>
-    
+
 <ul><li><p><code>convertToMFDB(transformationProductsStructure)</code>: Exports this object as a <code class="file">.csv</code> file that can be used as a <code class="command">MetFrag</code> local
 database. Any duplicate TPs (formed by different pathways or parents) will be merged based on their
 <acronym>InChIKey</acronym>.</p></li>
@@ -361,7 +353,7 @@ considered to originate from the same (original) parent.</p></li>
 , <a href="http://dx.doi.org/10.1093/bioinformatics/btx364" class="external-link">http://dx.doi.org/10.1093/bioinformatics/btx364</a>.
  <br><br> Lex A, Gehlenborg N, Strobelt H, Vuillemot R, Pfister H (2014).
 “UpSet: Visualization of Intersecting Sets.”
-<em>IEEE Transactions on Visualization and Computer Graphics</em>, <b>20</b>(12), 1983--1992.
+<em>IEEE Transactions on Visualization and Computer Graphics</em>, <b>20</b>(12), 1983–1992.
 <a href="https://doi.org/10.1109/tvcg.2014.2346248" class="external-link">doi:10.1109/tvcg.2014.2346248</a>
 .</p>
     </div>
@@ -382,15 +374,15 @@ considered to originate from the same (original) parent.</p></li>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

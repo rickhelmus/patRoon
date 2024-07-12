@@ -197,7 +197,8 @@ Rcpp::DataFrame getMSMetadata(MSReadBackend &backend, int msLevel)
         isolationMaxs[i] = meta.second.isolationRanges[i].end;
     }
     
-    return Rcpp::DataFrame::create(Rcpp::Named("time") = meta.second.times,
+    return Rcpp::DataFrame::create(Rcpp::Named("scan") = meta.second.scans,
+                                   Rcpp::Named("time") = meta.second.times,
                                    Rcpp::Named("TIC") = meta.second.TICs,
                                    Rcpp::Named("BPC") = meta.second.BPCs,
                                    Rcpp::Named("isolationRangeMin") = isolationMins,

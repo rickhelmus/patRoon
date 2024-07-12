@@ -670,6 +670,7 @@ getMS2QuantRes <- function(calibrants, unknowns, eluent, organicModifier, pHAq, 
     suppressMessages(utils::capture.output(pr <- MS2Quant::MS2Quant_quantify(quantFile, eluentFile,
                                                                              organic_modifier = organicModifier,
                                                                              pH_aq = pHAq, fingerprints = allFPs)))
+    rJava::.jgc()
     
     RFs <- as.data.table(pr$suspects_concentrations)
     
@@ -679,6 +680,7 @@ getMS2QuantRes <- function(calibrants, unknowns, eluent, organicModifier, pHAq, 
     RFs <- RFs[, c("identifier", "SMILES", "RF_pred"), with = FALSE]
     
     return(list(RFs = RFs[], MD = list(calibPlot = pr$logIE_logRF_calibration_plot,
+                                       individualPlots = pr$calibrants_separate_plots,
                                        linModel = pr$calibration_linear_model_summary)))
 }
 

@@ -8,6 +8,8 @@
 * Fix: reporting compounds consensus with library algorithm would fail (issue #110)
 * SIRIUS formula annotations: calculate `ion_formula_mz` column instead of taking it from SIRIUS data, as it rarely may not be available (issue #111)
 * Fix: improve handling SIRIUS results for features with non-standard adduct assignments (issue #111)
+* Store individual plots in `MS2QuantMeta` slots
+* force rJava GC to improve stability with MS2Quant predictions
 
 
 # patRoon 2.3.1

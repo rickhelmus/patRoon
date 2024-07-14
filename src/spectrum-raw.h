@@ -67,12 +67,24 @@ public:
     
     void append(SpectrumRawTypes::Mass mz, SpectrumRawTypes::Intensity inten);
     void append(const SpectrumRaw &sp);
+    void insert(size_t i, SpectrumRawTypes::Mass mz, SpectrumRawTypes::Intensity inten);
     void setPeak(size_t i, SpectrumRawTypes::Mass mz, SpectrumRawTypes::Intensity inten) { mzs[i] = mz; intensities[i] = inten; }
     
     auto size(void) const { return mzs.size(); }
     bool empty(void) const { return mzs.empty(); }
     void resize(size_t s) { mzs.resize(s); intensities.resize(s); }
     void clear(void) { mzs.clear(); intensities.clear(); }
+};
+
+struct SpectrumRawFilter
+{
+    SpectrumRawTypes::Intensity minIntensity;
+    NumRange<SpectrumRawTypes::Mass> mzRange;
+    unsigned topMost;
+    
+    SpectrumRawFilter &setMinIntensity(unsigned i) { minIntensity = i; return *this; }
+    SpectrumRawFilter &setMZRange(SpectrumRawTypes::Mass s, SpectrumRawTypes::Mass e) { mzRange.set(s, e); return *this; }
+    SpectrumRawFilter &setTopMost(unsigned t) { topMost = t; return *this; }
 };
 
 std::vector<SpectrumRawTypes::Scan> getSpecScanIndices(const SpectrumRawMetadata &specMeta,

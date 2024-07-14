@@ -195,6 +195,23 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// testSpecFilter
+Rcpp::DataFrame testSpecFilter(const std::vector<SpectrumRawTypes::Mass>& mzs, const std::vector<SpectrumRawTypes::Intensity>& ints, double mzMin, double mzMax, double minInt, unsigned topMost, double prec);
+RcppExport SEXP _patRoon_testSpecFilter(SEXP mzsSEXP, SEXP intsSEXP, SEXP mzMinSEXP, SEXP mzMaxSEXP, SEXP minIntSEXP, SEXP topMostSEXP, SEXP precSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Mass>& >::type mzs(mzsSEXP);
+    Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Intensity>& >::type ints(intsSEXP);
+    Rcpp::traits::input_parameter< double >::type mzMin(mzMinSEXP);
+    Rcpp::traits::input_parameter< double >::type mzMax(mzMaxSEXP);
+    Rcpp::traits::input_parameter< double >::type minInt(minIntSEXP);
+    Rcpp::traits::input_parameter< unsigned >::type topMost(topMostSEXP);
+    Rcpp::traits::input_parameter< double >::type prec(precSEXP);
+    rcpp_result_gen = Rcpp::wrap(testSpecFilter(mzs, ints, mzMin, mzMax, minInt, topMost, prec));
+    return rcpp_result_gen;
+END_RCPP
+}
 // initBrukerLibrary
 void initBrukerLibrary(const std::string& path);
 RcppExport SEXP _patRoon_initBrukerLibrary(SEXP pathSEXP) {
@@ -431,6 +448,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_writeFeatureXML", (DL_FUNC) &_patRoon_writeFeatureXML, 4},
     {"_patRoon_specDistMatrix", (DL_FUNC) &_patRoon_specDistMatrix, 7},
     {"_patRoon_specDistRect", (DL_FUNC) &_patRoon_specDistRect, 9},
+    {"_patRoon_testSpecFilter", (DL_FUNC) &_patRoon_testSpecFilter, 7},
     {"_patRoon_initBrukerLibrary", (DL_FUNC) &_patRoon_initBrukerLibrary, 1},
     {"_patRoon_collapseTIMSFrame", (DL_FUNC) &_patRoon_collapseTIMSFrame, 17},
     {"_patRoon_getTIMSPeakLists", (DL_FUNC) &_patRoon_getTIMSPeakLists, 15},

@@ -86,6 +86,7 @@ template <typename T> struct NumRange
     T start, end;
     NumRange(void) = default;
     NumRange(T s, T e) : start(s), end(e) { }
+    void set(T s, T e) { start = s; end = e; }
     bool inside(const NumRange &o, T tol = 1E-8) const { return numberGTE(start, o.start, tol) && numberLTE(end, o.end, tol); }
 };
 

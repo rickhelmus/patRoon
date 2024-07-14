@@ -57,6 +57,10 @@ specDistRect <- function(specList1, specList2, method, shift, precMZs1, precMZs2
     .Call(`_patRoon_specDistRect`, specList1, specList2, method, shift, precMZs1, precMZs2, mzWeight, intWeight, mzWindow)
 }
 
+testSpecFilter <- function(mzs, ints, mzMin, mzMax, minInt, topMost, prec) {
+    .Call(`_patRoon_testSpecFilter`, mzs, ints, mzMin, mzMax, minInt, topMost, prec)
+}
+
 initBrukerLibrary <- function(path) {
     invisible(.Call(`_patRoon_initBrukerLibrary`, path))
 }

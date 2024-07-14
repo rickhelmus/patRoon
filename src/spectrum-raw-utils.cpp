@@ -1,8 +1,21 @@
 #include <Rcpp.h>
 
 #include "spectrum-raw.h"
+#include "utils.h"
 
 #include <algorithm>
+
+namespace{
+
+SpectrumRaw flattenSpectra(const std::vector<SpectrumRaw> &spectra)
+{
+    SpectrumRaw ret;
+    for (const auto &sp : spectra)
+        ret.append(sp);
+    return ret;
+}
+
+}
 
 std::vector<SpectrumRawTypes::Scan> getSpecScanIndices(const SpectrumRawMetadata &specMeta,
                                                        const NumRange<SpectrumRawTypes::Time> &timeRange,
@@ -109,4 +122,65 @@ Rcpp::DataFrame testSpecFilter(const std::vector<SpectrumRawTypes::Mass> &mzs,
     const SpectrumRaw specF = filterSpectrumRaw(spec, fil, prec);
     return Rcpp::DataFrame::create(Rcpp::Named("mz") = specF.getMZs(),
                                    Rcpp::Named("intensity") = specF.getIntensities());
+}
+
+SpectrumRaw averageSpectraRaw(const std::vector<SpectrumRaw> &spectra, clusterMethod method,
+                              SpectrumRawTypes::Mass window, bool averageIntensities,
+                              SpectrumRawTypes::Intensity minIntensity, unsigned minAbundance)
+{
+    if (spectra.empty())
+        return SpectrumRaw();
+    
+    const auto flattenedSpecs = flattenSpectra(spectra);
+    if (flattenedSpecs.empty()) // all spectra are empty
+        return flattenedSpecs;
+    
+    const std::vector<int> clusts = clusterNums(flattenedSpecs.getMZs(), method, window);
+    const int maxClust = *(std::max_element(clusts.begin(), clusts.end()));
+    SpectrumRaw binnedSpectrum(maxClust + 1);
+    std::vector<unsigned> binSizes(maxClust + 1);
+    
+    // Rcpp::Rcout << "flattenedSpecs: " << flattenedSpecs.size() << "\n";
+    // Rcpp::Rcout << "maxClust: " << maxClust << "\n";
+    
+    // sum data for each cluster
+    for (size_t i=0; i<clusts.size(); ++i)
+    {
+        const size_t cl = clusts[i];
+        const SpectrumRawTypes::Intensity intenfl = flattenedSpecs.getIntensities()[i];
+        const SpectrumRawTypes::Mass mz = binnedSpectrum.getMZs()[cl] + (flattenedSpecs.getMZs()[i] *
+                                                                static_cast<SpectrumRawTypes::Mass>(intenfl));
+        const SpectrumRawTypes::Intensity inten = binnedSpectrum.getIntensities()[cl] + intenfl;
+        binnedSpectrum.setPeak(cl, mz, inten);
+        ++binSizes[cl];
+    }
+    
+    // average data
+    for (size_t i=0; i<binnedSpectrum.size(); ++i)
+    {
+        const SpectrumRawTypes::Mass mz = binnedSpectrum.getMZs()[i] / static_cast<SpectrumRawTypes::Mass>(binnedSpectrum.getIntensities()[i]);
+        SpectrumRawTypes::Intensity inten = binnedSpectrum.getIntensities()[i];
+        if (averageIntensities)
+            inten /= static_cast<SpectrumRawTypes::Intensity>(spectra.size());
+        binnedSpectrum.setPeak(i, mz, inten);
+    }
+    
+    // Rcpp::Rcout << "binnedSpectrum: " << binnedSpectrum.size() << "\n";
+    
+    // sort spectrum && pre-treat
+    const auto sortedInds = getSortedInds(binnedSpectrum.getMZs());
+    SpectrumRaw sortedSpectrum;
+    for (size_t i=0; i<sortedInds.size(); ++i)
+    {
+        const auto j = sortedInds[i];
+        if (minIntensity > 0 && binnedSpectrum.getIntensities()[j] < minIntensity)
+            continue;
+        if (binSizes[j] < minAbundance)
+            continue;
+        sortedSpectrum.append(binnedSpectrum.getMZs()[j], binnedSpectrum.getIntensities()[j]);
+    }
+    
+    // Rcpp::Rcout << "sortedSpectrum: " << sortedSpectrum.size() << "\n";
+    
+    return sortedSpectrum;
 }

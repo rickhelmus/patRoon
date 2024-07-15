@@ -75,6 +75,7 @@ template <typename T> struct NumRange
     void set(T s, T e) { start = s; end = e; }
     bool inside(const NumRange &o, T tol = 1E-8) const { return numberGTE(start, o.start, tol) && numberLTE(end, o.end, tol); }
 };
+template <typename T> NumRange<T> makeNumRange(T s, T e) { return NumRange<T>(s, e); }
 
 template <typename NumType> std::vector<int> clusterNums(const std::vector<NumType> &nums, clusterMethod method,
                                                          NumType window)

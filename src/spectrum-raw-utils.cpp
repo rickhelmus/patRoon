@@ -88,7 +88,6 @@ SpectrumRaw filterSpectrumRaw(const SpectrumRaw &spectrum, const SpectrumRawFilt
                                topMostInts.begin(), topMostInts.end(),
                                [](SpectrumRawTypes::Intensity i1, SpectrumRawTypes::Intensity i2) { return i1 > i2; });
         minInt = std::max(minInt, topMostInts.back());
-        Rcpp::Rcout << "tm: " << topMostInts.back() << "/" << topMostInts.size() << "/" << topMostInts.front() << "\n";
     }
     
     bool addedPrec = false;

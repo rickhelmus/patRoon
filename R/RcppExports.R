@@ -21,6 +21,10 @@ getMSMetadata <- function(backend, msLevel) {
     .Call(`_patRoon_getMSMetadata`, backend, msLevel)
 }
 
+getMSPeakLists <- function(backend, startTimes, endTimes, precursorMZs, MSLevel, isoWindow, method, mzWindow, minAbundance, topMost, minIntensityPre, minIntensityPost) {
+    .Call(`_patRoon_getMSPeakLists`, backend, startTimes, endTimes, precursorMZs, MSLevel, isoWindow, method, mzWindow, minAbundance, topMost, minIntensityPre, minIntensityPost)
+}
+
 readMSP <- function(file, pc) {
     .Call(`_patRoon_readMSP`, file, pc)
 }

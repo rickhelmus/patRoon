@@ -50,7 +50,7 @@ const SpectrumRawMetadata &MSReadBackendSC::doGetSpectrumRawMetadata(void) const
             if (!isMS1)
             {
                 const SpectrumRawTypes::Mass l = hd.precursor_mz[i] - hd.window_mzlow[i], h = hd.precursor_mz[i] + hd.window_mzhigh[i];
-                meta.second.isolationRanges.emplace_back(NumRange<SpectrumRawTypes::Mass>(l, h));
+                meta.second.isolationRanges.emplace_back(makeNumRange(l, h));
             }
         }
         

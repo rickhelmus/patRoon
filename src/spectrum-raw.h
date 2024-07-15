@@ -91,4 +91,10 @@ std::vector<SpectrumRawTypes::Scan> getSpecScanIndices(const SpectrumRawMetadata
                                                        const NumRange<SpectrumRawTypes::Time> &timeRange,
                                                        SpectrumRawTypes::MSLevel MSLevel,
                                                        const NumRange<SpectrumRawTypes::Mass> &isoRange);
+SpectrumRaw filterSpectrumRaw(const SpectrumRaw &spectrum, const SpectrumRawFilter &filter,
+                              SpectrumRawTypes::Mass precursor);
+SpectrumRaw averageSpectraRaw(const std::vector<SpectrumRaw> &spectra, clusterMethod method,
+                              SpectrumRawTypes::Mass window, bool averageIntensities,
+                              SpectrumRawTypes::Intensity minIntensity, unsigned minAbundance);
+
 #endif

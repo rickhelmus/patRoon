@@ -42,7 +42,7 @@ void MSReadBackendMem::setSpecMetadata(const Rcpp::DataFrame &mdMS, const Rcpp::
     const std::vector<SpectrumRawTypes::Mass> isoStarts = mdMSMS["isolationStart"];
     const std::vector<SpectrumRawTypes::Mass> isoEnds = mdMSMS["isolationEnd"];
     for (size_t i=0; i<isoStarts.size(); ++i)
-        meta.second.isolationRanges.push_back(NumRange<SpectrumRawTypes::Mass>(isoStarts[i], isoEnds[i]));
+        meta.second.isolationRanges.push_back(makeNumRange(isoStarts[i], isoEnds[i]));
     
     emplaceSpecMeta(std::move(meta));
 }

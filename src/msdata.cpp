@@ -13,8 +13,9 @@
 
 namespace {
 
-template<typename OutType, typename FuncType>
-OutType applyMSData(const MSReadBackend &backend, const std::vector<SpectrumRawTypes::Scan> &scans, FuncType func)
+template<typename OutType, typename FuncType, typename... Args>
+OutType applyMSData(const MSReadBackend &backend, const std::vector<SpectrumRawTypes::Scan> &scans, FuncType func,
+                    Args... args)
 {
     OutType ret(scans.size());
     ThreadExceptionHandler exHandler;
@@ -26,7 +27,7 @@ OutType applyMSData(const MSReadBackend &backend, const std::vector<SpectrumRawT
         #pragma omp for
         for (size_t i=0; i<scans.size(); ++i)
         {
-            exHandler.run([&]{ ret[i] = func(backend.readSpectrum(tdata, scans[i])); });
+            exHandler.run([&]{ ret[i] = func(backend.readSpectrum(tdata, scans[i]), args...); });
         }
     }
     
@@ -100,9 +101,9 @@ std::vector<SpectrumRawTypes::Scan> getScans(const MSReadBackend &backend, Spect
                                              SpectrumRawTypes::Mass timeEnd, int MSLevel,
                                              SpectrumRawTypes::Mass isoStart, SpectrumRawTypes::Mass isoEnd)
 {
-    return getSpecScanIndices(backend.getSpecMetadata(), NumRange<SpectrumRawTypes::Time>(timeStart, timeEnd),
+    return getSpecScanIndices(backend.getSpecMetadata(), makeNumRange(timeStart, timeEnd),
                               (MSLevel == 1) ? SpectrumRawTypes::MSLevel::MS1 : SpectrumRawTypes::MSLevel::MS2,
-                              NumRange<SpectrumRawTypes::Mass>(isoStart, isoEnd));
+                              makeNumRange(isoStart, isoEnd));
 }
 
 // [[Rcpp::export]]
@@ -177,7 +178,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
 }
 
 // [[Rcpp::export]]
-Rcpp::DataFrame getMSMetadata(MSReadBackend &backend, int msLevel)
+Rcpp::DataFrame getMSMetadata(const MSReadBackend &backend, int msLevel)
 {
     const auto &meta = backend.getSpecMetadata();
     
@@ -203,4 +204,52 @@ Rcpp::DataFrame getMSMetadata(MSReadBackend &backend, int msLevel)
                                    Rcpp::Named("BPC") = meta.second.BPCs,
                                    Rcpp::Named("isolationRangeMin") = isolationMins,
                                    Rcpp::Named("isolationRangeMax") = isolationMaxs);
+}
+
+// [[Rcpp::export]]
+Rcpp::List getMSPeakLists(const MSReadBackend &backend, const std::vector<SpectrumRawTypes::Time> &startTimes,
+                          const std::vector<SpectrumRawTypes::Time> &endTimes,
+                          const std::vector<SpectrumRawTypes::Mass> &precursorMZs, int MSLevel,
+                          SpectrumRawTypes::Mass isoWindow, const std::string &method,
+                          SpectrumRawTypes::Mass mzWindow, unsigned minAbundance, unsigned topMost,
+                          SpectrumRawTypes::Intensity minIntensityPre, SpectrumRawTypes::Intensity minIntensityPost)
+{
+    const auto entries = startTimes.size();
+    const auto clMethod = clustMethodFromStr(method);
+    const auto specMeta = backend.getSpecMetadata();
+    const auto specFilter = SpectrumRawFilter().setMinIntensity(minIntensityPre).setTopMost(topMost);
+    
+    std::vector<SpectrumRaw> averagedSpectra(entries);
+    ThreadExceptionHandler exHandler;
+
+    // NOTE: we could use applyMSData() here, but parallelizing the outer loop below is much faster
+    #pragma omp parallel num_threads(12)
+    {
+        auto tdata = backend.getThreadData();
+        
+        #pragma omp for
+        for (size_t i=0; i<entries; ++i)
+        {
+            exHandler.run([&]{
+                const auto scans = getSpecScanIndices(specMeta, makeNumRange(startTimes[i], endTimes[i]),
+                                                      (MSLevel == 1) ? SpectrumRawTypes::MSLevel::MS1 : SpectrumRawTypes::MSLevel::MS2,
+                                                      makeNumRange(precursorMZs[i] - isoWindow, precursorMZs[i] + isoWindow));
+                std::vector<SpectrumRaw> spectra(scans.size());
+                for (size_t j=0; j<scans.size(); ++j)
+                    spectra[j] = filterSpectrumRaw(backend.readSpectrum(tdata, scans[j]), specFilter, precursorMZs[i]);
+                averagedSpectra[i] = averageSpectraRaw(spectra, clMethod, mzWindow, true, minIntensityPost, minAbundance);
+            });
+        }
+    }
+    
+    exHandler.reThrow();
+    
+    Rcpp::List ret(entries);
+    for (size_t i=0; i<entries; ++i)
+    {
+        ret[i] = Rcpp::DataFrame::create(Rcpp::Named("mz") = averagedSpectra[i].getMZs(),
+                                         Rcpp::Named("intensity") = averagedSpectra[i].getIntensities());
+    }
+        
+    return ret;
 }

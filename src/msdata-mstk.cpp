@@ -45,10 +45,20 @@ SpectrumRaw MSReadBackendMSTK::doReadSpectrum(const ThreadDataType &tdata, Spect
     if (!msr->readFile(getCurrentFile().c_str(), s, scan) || s.getScanNumber() == 0)
         Rcpp::stop("Abort: invalid spectrum scan index: %d", scan);
 
-    SpectrumRaw ret(s.size());
-    for(int i=0; i<s.size(); ++i)
-        ret.setPeak(i, s.at(i).mz, s.at(i).intensity);
-        
+    const bool hasMob = s.hasIonMobilityArray();
+    SpectrumRaw ret(s.size(), hasMob);
+    
+    if (hasMob)
+    {
+        for(size_t i=0; i<ret.size(); ++i)
+            ret.setPeak(i, s.at(i).mz, s.at(i).intensity, s.atIM(i));
+    }
+    else
+    {
+        for(size_t i=0; i<ret.size(); ++i)
+            ret.setPeak(i, s.at(i).mz, s.at(i).intensity);
+    }
+    
     return ret;
 }
 
@@ -70,7 +80,7 @@ const SpectrumRawMetadata &MSReadBackendMSTK::doGetSpectrumRawMetadata(void) con
             SpectrumRawMetadata threadMeta;
             
             #pragma omp for schedule(static) nowait
-            for (size_t i=0; i<lastScan; ++i)
+            for (size_t i=1; i<=lastScan; ++i)
             {
                 exHandler.run([&]
                 {

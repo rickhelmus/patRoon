@@ -12,6 +12,7 @@ namespace SpectrumRawTypes {
 using Scan = unsigned;
 using Time = float;
 using Mass = float;
+using Mobility = float;
 using Intensity = float; // UNDONE: or unsigned?
 using IsolationRange = NumRange<Mass>;
 
@@ -55,20 +56,24 @@ class SpectrumRaw
 {
     std::vector<SpectrumRawTypes::Mass> mzs;
     std::vector<SpectrumRawTypes::Intensity> intensities;
+    std::vector<SpectrumRawTypes::Mobility> mobilities;
     
 public:
     SpectrumRaw(void) = default;
     SpectrumRaw(const std::vector<SpectrumRawTypes::Mass> &m,
                 const std::vector<SpectrumRawTypes::Intensity> &i) : mzs(m), intensities(i) { }
-    SpectrumRaw(size_t size) : mzs(size), intensities(size) { }
+    SpectrumRaw(size_t size, bool mobs = false) : mzs(size), intensities(size), mobilities((mobs) ? size : 0) { }
     
     const auto &getMZs(void) const { return mzs; }
     const auto &getIntensities(void) const { return intensities; }
+    const auto &getMobilities(void) const { return mobilities; }
     
     void append(SpectrumRawTypes::Mass mz, SpectrumRawTypes::Intensity inten);
     void append(const SpectrumRaw &sp);
     void insert(size_t i, SpectrumRawTypes::Mass mz, SpectrumRawTypes::Intensity inten);
     void setPeak(size_t i, SpectrumRawTypes::Mass mz, SpectrumRawTypes::Intensity inten) { mzs[i] = mz; intensities[i] = inten; }
+    void setPeak(size_t i, SpectrumRawTypes::Mass mz, SpectrumRawTypes::Intensity inten,
+                 SpectrumRawTypes::Mobility mob) { mzs[i] = mz; intensities[i] = inten; mobilities[i] = mob; }
     
     auto size(void) const { return mzs.size(); }
     bool empty(void) const { return mzs.empty(); }

@@ -92,6 +92,11 @@ Rcpp::DataFrame getMSSpectrum(const MSReadBackend &backend, int index)
     
     const std::vector<SpectrumRaw> spectra = applyMSData<std::vector<SpectrumRaw>>(backend, indices, sfunc);
     
+    if (!spectra[0].getMobilities().empty())
+        return Rcpp::DataFrame::create(Rcpp::Named("mz") = spectra[0].getMZs(),
+                                       Rcpp::Named("intensity") = spectra[0].getIntensities(),
+                                       Rcpp::Named("mobility") = spectra[0].getMobilities());
+    
     return Rcpp::DataFrame::create(Rcpp::Named("mz") = spectra[0].getMZs(),
                                    Rcpp::Named("intensity") = spectra[0].getIntensities());
 }

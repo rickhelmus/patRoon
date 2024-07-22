@@ -13,20 +13,17 @@
 class MSReadBackendMSTK: public MSReadBackend
 {
     static int backends; // UNDONE: for debugging
-    mutable bool metadataLoaded = false; // mutable: to allow lazy loading
 
     void doOpen(const std::string &) override { }
-    void doClose(void) override { metadataLoaded = false; }
+    void doClose(void) override { }
     ThreadDataType doGetThreadData(void) const override;
     SpectrumRaw doReadSpectrum(const ThreadDataType &tdata, SpectrumRawTypes::Scan scan) const override;
-    
-protected:
-    const SpectrumRawMetadata &doGetSpectrumRawMetadata(void) const override;
     
 public:
     MSReadBackendMSTK(void) { ++backends; Rcpp::Rcout << "constr: backends:" << backends << "\n"; }
     ~MSReadBackendMSTK(void) { --backends; Rcpp::Rcout << "destr: backends:" << backends << "\n"; }
-    
+
+    void generateSpecMetadata(void);
     int getBackends(void) const { return backends; }
 };
 

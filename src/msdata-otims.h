@@ -16,9 +16,6 @@ class MSReadBackendOTIMS: public MSReadBackend
     void doClose(void) override;
     ThreadDataType doGetThreadData(void) const override;
     SpectrumRaw doReadSpectrum(const ThreadDataType &tdata, SpectrumRawTypes::Scan scan) const override;
-    
-public:
-    void setSpecMetadata(const Rcpp::DataFrame &mdMS, const Rcpp::DataFrame &mdMSMS);
 };
 
 RCPP_EXPOSED_CLASS(MSReadBackendOTIMS)

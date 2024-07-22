@@ -62,62 +62,58 @@ SpectrumRaw MSReadBackendMSTK::doReadSpectrum(const ThreadDataType &tdata, Spect
     return ret;
 }
 
-const SpectrumRawMetadata &MSReadBackendMSTK::doGetSpectrumRawMetadata(void) const
+void MSReadBackendMSTK::generateSpecMetadata(void)
 {
-    if (!metadataLoaded && !getCurrentFile().empty())
-    {
-        metadataLoaded = true;
-        
-        const size_t lastScan = getMSTKLastScan(getCurrentFile());
-        SpectrumRawMetadata meta;
-        ThreadExceptionHandler exHandler;
+    if (getCurrentFile().empty())
+        return;
+    
+    const size_t lastScan = getMSTKLastScan(getCurrentFile());
+    SpectrumRawMetadata meta;
+    ThreadExceptionHandler exHandler;
 
-        // UNDONE: make num_threads configurable
-        #pragma omp parallel num_threads(12)
+    // UNDONE: make num_threads configurable
+    #pragma omp parallel num_threads(12)
+    {
+        auto rd = getMSTKReader();
+        MSToolkit::Spectrum spec;
+        SpectrumRawMetadata threadMeta;
+        
+        #pragma omp for schedule(static) nowait
+        for (size_t i=1; i<=lastScan; ++i)
         {
-            auto rd = getMSTKReader();
-            MSToolkit::Spectrum spec;
-            SpectrumRawMetadata threadMeta;
-            
-            #pragma omp for schedule(static) nowait
-            for (size_t i=1; i<=lastScan; ++i)
+            exHandler.run([&]
             {
-                exHandler.run([&]
-                {
-                    rd.readFile(getCurrentFile().c_str(), spec, i, true);
-                    const bool isMS1 = spec.getMsLevel() == 1;
-                    
-                    SpectrumRawMetadataMS *curMS1MD = (isMS1) ? &threadMeta.first : &threadMeta.second;
-                    curMS1MD->scans.push_back(spec.getScanNumber());
-                    curMS1MD->times.push_back(spec.getRTime() * 60); // NOTE: MSTK takes minutes
-                    curMS1MD->TICs.push_back(spec.getTIC());
-                    curMS1MD->BPCs.push_back(spec.getBPI());
-                    
-                    assert(curMS1MD->scans.size() == curMS1MD->times.size());
-                    
-                    if (!isMS1)
-                        threadMeta.second.isolationRanges.emplace_back(NumRange<SpectrumRawTypes::Mass>(spec.getSelWindowLower(), spec.getSelWindowUpper()));
-                });
-            }
-            
-            #pragma omp for schedule(static) ordered
-            for(int i=0; i<getOMPNumThreads(); ++i)
-            {
-                exHandler.run([&]
-                {
-                    #pragma omp ordered
-                    {
-                        meta.first.append(threadMeta.first);
-                        meta.second.append(threadMeta.second);
-                    }
-                });
-            }
+                rd.readFile(getCurrentFile().c_str(), spec, i, true);
+                const bool isMS1 = spec.getMsLevel() == 1;
+                
+                SpectrumRawMetadataMS *curMS1MD = (isMS1) ? &threadMeta.first : &threadMeta.second;
+                curMS1MD->scans.push_back(spec.getScanNumber());
+                curMS1MD->times.push_back(spec.getRTime() * 60); // NOTE: MSTK takes minutes
+                curMS1MD->TICs.push_back(spec.getTIC());
+                curMS1MD->BPCs.push_back(spec.getBPI());
+                
+                assert(curMS1MD->scans.size() == curMS1MD->times.size());
+                
+                if (!isMS1)
+                    threadMeta.second.isolationRanges.emplace_back(NumRange<SpectrumRawTypes::Mass>(spec.getSelWindowLower(), spec.getSelWindowUpper()));
+            });
         }
         
-        exHandler.reThrow();
-        
-        emplaceSpecMeta(std::move(meta));
+        #pragma omp for schedule(static) ordered
+        for(int i=0; i<getOMPNumThreads(); ++i)
+        {
+            exHandler.run([&]
+            {
+                #pragma omp ordered
+                {
+                    meta.first.append(threadMeta.first);
+                    meta.second.append(threadMeta.second);
+                }
+            });
+        }
     }
     
-    return MSReadBackend::doGetSpectrumRawMetadata();
+    exHandler.reThrow();
+    
+    emplaceSpecMeta(std::move(meta));
 }

@@ -56,12 +56,3 @@ SpectrumRaw MSReadBackendOTIMS::doReadSpectrum(const ThreadDataType &tdata, Spec
     
     return ret;
 }
-
-void MSReadBackendOTIMS::setSpecMetadata(const Rcpp::DataFrame &mdMS, const Rcpp::DataFrame &mdMSMS)
-{
-    SpectrumRawMetadata meta;
-
-    // UNDONE    
-
-    emplaceSpecMeta(std::move(meta));
-}

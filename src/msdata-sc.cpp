@@ -27,35 +27,31 @@ SpectrumRaw MSReadBackendSC::doReadSpectrum(const ThreadDataType &tdata, Spectru
     return ret;
 }
 
-const SpectrumRawMetadata &MSReadBackendSC::doGetSpectrumRawMetadata(void) const
+void MSReadBackendSC::generateSpecMetadata(void)
 {
-    if (!metadataLoaded && !getCurrentFile().empty())
+    if (getCurrentFile().empty())
+        return;
+
+    sc::MZML mzml(getCurrentFile());
+    const auto hd = mzml.get_spectra_headers();
+    
+    SpectrumRawMetadata meta;
+    for (size_t i=0; i<hd.index.size(); ++i)
     {
-        metadataLoaded = true;
-
-        sc::MZML mzml(getCurrentFile());
-        const auto hd = mzml.get_spectra_headers();
+        const bool isMS1 = hd.level[i] == 1;
         
-        SpectrumRawMetadata meta;
-        for (size_t i=0; i<hd.index.size(); ++i)
+        SpectrumRawMetadataMS *curMS1MD = (isMS1) ? &meta.first : &meta.second;
+        curMS1MD->scans.push_back(hd.index[i]);
+        curMS1MD->times.push_back(hd.rt[i]);
+        curMS1MD->TICs.push_back(hd.tic[i]);
+        curMS1MD->BPCs.push_back(hd.bpint[i]);
+        
+        if (!isMS1)
         {
-            const bool isMS1 = hd.level[i] == 1;
-            
-            SpectrumRawMetadataMS *curMS1MD = (isMS1) ? &meta.first : &meta.second;
-            curMS1MD->scans.push_back(hd.index[i]);
-            curMS1MD->times.push_back(hd.rt[i]);
-            curMS1MD->TICs.push_back(hd.tic[i]);
-            curMS1MD->BPCs.push_back(hd.bpint[i]);
-            
-            if (!isMS1)
-            {
-                const SpectrumRawTypes::Mass l = hd.precursor_mz[i] - hd.window_mzlow[i], h = hd.precursor_mz[i] + hd.window_mzhigh[i];
-                meta.second.isolationRanges.emplace_back(makeNumRange(l, h));
-            }
+            const SpectrumRawTypes::Mass l = hd.precursor_mz[i] - hd.window_mzlow[i], h = hd.precursor_mz[i] + hd.window_mzhigh[i];
+            meta.second.isolationRanges.emplace_back(makeNumRange(l, h));
         }
-        
-        emplaceSpecMeta(std::move(meta));
     }
-
-    return MSReadBackend::doGetSpectrumRawMetadata();
+    
+    emplaceSpecMeta(std::move(meta));
 }

@@ -8,6 +8,7 @@
 #include "msdata.h"
 #include "msdata-mem.h"
 #include "msdata-mstk.h"
+#include "msdata-otims.h"
 #include "msdata-sc.h"
 #include "spectrum-raw.h"
 
@@ -73,6 +74,11 @@ RCPP_MODULE(MSReadBackend)
         .derives<MSReadBackend>("MSReadBackend")
         .constructor()
         .method("getBackends", &MSReadBackendMSTK::getBackends)
+    ;
+    Rcpp::class_<MSReadBackendOTIMS>("MSReadBackendOTIMS")
+        .derives<MSReadBackend>("MSReadBackend")
+        .constructor()
+        .method("setSpecMetadata", &MSReadBackendOTIMS::setSpecMetadata)
     ;
     Rcpp::class_<MSReadBackendSC>("MSReadBackendSC")
         .derives<MSReadBackend>("MSReadBackend")

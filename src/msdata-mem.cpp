@@ -24,29 +24,6 @@ SpectrumRaw MSReadBackendMem::doReadSpectrum(const ThreadDataType &tdata, Spectr
     return SpectrumRaw(); // unreached
 }
 
-void MSReadBackendMem::setSpecMetadata(const Rcpp::DataFrame &mdMS, const Rcpp::DataFrame &mdMSMS)
-{
-    SpectrumRawMetadata meta;
-    
-    // MS
-    meta.first.scans = Rcpp::as<std::vector<SpectrumRawTypes::Scan>>(mdMS["scan"]);
-    meta.first.times = Rcpp::as<std::vector<SpectrumRawTypes::Time>>(mdMS["time"]);
-    meta.first.TICs = Rcpp::as<std::vector<SpectrumRawTypes::Intensity>>(mdMS["TIC"]);
-    meta.first.BPCs = Rcpp::as<std::vector<SpectrumRawTypes::Intensity>>(mdMS["BPC"]);
-    
-    // MSMS
-    meta.second.scans = Rcpp::as<std::vector<SpectrumRawTypes::Scan>>(mdMSMS["scan"]);
-    meta.second.times = Rcpp::as<std::vector<SpectrumRawTypes::Time>>(mdMSMS["time"]);
-    meta.second.TICs = Rcpp::as<std::vector<SpectrumRawTypes::Intensity>>(mdMSMS["TIC"]);
-    meta.second.BPCs = Rcpp::as<std::vector<SpectrumRawTypes::Intensity>>(mdMSMS["BPC"]);
-    const std::vector<SpectrumRawTypes::Mass> isoStarts = mdMSMS["isolationStart"];
-    const std::vector<SpectrumRawTypes::Mass> isoEnds = mdMSMS["isolationEnd"];
-    for (size_t i=0; i<isoStarts.size(); ++i)
-        meta.second.isolationRanges.push_back(makeNumRange(isoStarts[i], isoEnds[i]));
-    
-    emplaceSpecMeta(std::move(meta));
-}
-
 void MSReadBackendMem::setSpectra(const Rcpp::List &specList)
 {
     std::vector<SpectrumRaw> sps(specList.size());

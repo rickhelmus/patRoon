@@ -77,6 +77,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// setSpecMetadata
+void setSpecMetadata(MSReadBackend& backend, const Rcpp::DataFrame& mdMS, const Rcpp::DataFrame& mdMSMS);
+RcppExport SEXP _patRoon_setSpecMetadata(SEXP backendSEXP, SEXP mdMSSEXP, SEXP mdMSMSSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< MSReadBackend& >::type backend(backendSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::DataFrame& >::type mdMS(mdMSSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::DataFrame& >::type mdMSMS(mdMSMSSEXP);
+    setSpecMetadata(backend, mdMS, mdMSMS);
+    return R_NilValue;
+END_RCPP
+}
 // getMSPeakLists
 Rcpp::List getMSPeakLists(const MSReadBackend& backend, const std::vector<SpectrumRawTypes::Time>& startTimes, const std::vector<SpectrumRawTypes::Time>& endTimes, const std::vector<SpectrumRawTypes::Mass>& precursorMZs, int MSLevel, SpectrumRawTypes::Mass isoWindow, const std::string& method, SpectrumRawTypes::Mass mzWindow, unsigned minAbundance, unsigned topMost, SpectrumRawTypes::Intensity minIntensityPre, SpectrumRawTypes::Intensity minIntensityPost);
 RcppExport SEXP _patRoon_getMSPeakLists(SEXP backendSEXP, SEXP startTimesSEXP, SEXP endTimesSEXP, SEXP precursorMZsSEXP, SEXP MSLevelSEXP, SEXP isoWindowSEXP, SEXP methodSEXP, SEXP mzWindowSEXP, SEXP minAbundanceSEXP, SEXP topMostSEXP, SEXP minIntensityPreSEXP, SEXP minIntensityPostSEXP) {
@@ -461,6 +473,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_getScans", (DL_FUNC) &_patRoon_getScans, 6},
     {"_patRoon_getEICList", (DL_FUNC) &_patRoon_getEICList, 3},
     {"_patRoon_getMSMetadata", (DL_FUNC) &_patRoon_getMSMetadata, 2},
+    {"_patRoon_setSpecMetadata", (DL_FUNC) &_patRoon_setSpecMetadata, 3},
     {"_patRoon_getMSPeakLists", (DL_FUNC) &_patRoon_getMSPeakLists, 12},
     {"_patRoon_readMSP", (DL_FUNC) &_patRoon_readMSP, 2},
     {"_patRoon_writeMSPLibrary", (DL_FUNC) &_patRoon_writeMSPLibrary, 3},

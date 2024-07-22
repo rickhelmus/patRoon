@@ -1,4 +1,4 @@
-#ifndef PATROON_MSTOOLKIT_H
+#ifndef PATROON_MEM_H
 #define PATROON_MEM_H
 
 #include <Rcpp.h>
@@ -21,7 +21,6 @@ public:
     MSReadBackendMem(void) { }
     ~MSReadBackendMem(void) { }
     
-    void setSpecMetadata(const Rcpp::DataFrame &mdMS, const Rcpp::DataFrame &mdMSMS);
     void setSpectra(const Rcpp::List &specList);
 };
 

@@ -11,19 +11,16 @@
 
 class MSReadBackendSC: public MSReadBackend
 {
-    mutable bool metadataLoaded = false; // mutable: to allow lazy loading
-
     void doOpen(const std::string &) override { }
-    void doClose(void) override { metadataLoaded = false; }
+    void doClose(void) override { }
     ThreadDataType doGetThreadData(void) const override;
     SpectrumRaw doReadSpectrum(const ThreadDataType &tdata, SpectrumRawTypes::Scan scan) const override;
-    
-protected:
-    const SpectrumRawMetadata &doGetSpectrumRawMetadata(void) const override;
     
 public:
     MSReadBackendSC(void) { }
     ~MSReadBackendSC(void) { }
+    
+    void generateSpecMetadata(void);
 };
 
 RCPP_EXPOSED_CLASS(MSReadBackendSC)

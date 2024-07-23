@@ -13,6 +13,8 @@ specTROmetry nOn-target aNalysis_.
 
 ## Project news
 
+**July 2024** `patRoon 2.3.2` is now released. This is a small maintenance release with several important bug fixes and new functions to inspect raw MS data (thanks to Ricardo Cunha). Please see the [Project NEWS][NEWS] for more details.
+
 **December 2023** `patRoon 2.3.1` is now released. This is a small maintenance release with several bug fixes. The most important fix is a correction for the prediction of concentrations from SIRIUS fingerprints. Please see the [Project NEWS][NEWS] for more details and important notes on updating `patRoon`.
 
 **November 2023** `patRoon 2.3` is now released. The most significant changes include improved installation strategies and integration of [MS2Tox] and [MS2Quant] to predict feature toxicities and concentrations. Please see the [Project NEWS][NEWS] for more details and important notes on updating `patRoon`.

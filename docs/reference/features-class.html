@@ -250,6 +250,7 @@ function specifies the feature indices (rows) to be removed (specified as an <co
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>For <code>delete</code>: passed to the function specified as <code>j</code>.</p>
+<p>For <code>plotTICs</code> and <code>plotBPCs</code>: further arguments passed to <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></code>.</p>
 <p>For <a href="sets-workflow.html">sets workflow</a> methods: further arguments passed to the base <code>features</code> method.</p></dd>
 
 
@@ -291,8 +292,8 @@ to obtain TIC traces.</p></dd>
 
 
 <dt id="arg-colourby">colourBy<a class="anchor" aria-label="anchor" href="#arg-colourby"></a></dt>
-<dd><p>Sets the automatic colour selection: "none" for a single
-colour or "analyses"/"rGroups" for a distinct colour per analysis or analysis replicate group.</p></dd>
+<dd><p>Sets the automatic colour selection: "none" for a single colour or "analyses"/"rGroups" for a
+distinct colour per analysis or analysis replicate group.</p></dd>
 
 
 <dt id="arg-showlegend">showLegend<a class="anchor" aria-label="anchor" href="#arg-showlegend"></a></dt>
@@ -326,11 +327,9 @@ colour or "analyses"/"rGroups" for a distinct colour per analysis or analysis re
     </div>
     <div id="details">
     <h2>Details</h2>
-    <p>This class provides a way to store intensity, retention times, <em>m/z</em> and
-other data for all features in a set of analyses. The class is <code>virtual</code>
-and derived objects are created by 'feature finders' such as
-<code>findFeaturesOpenMS</code>, <code>findFeaturesXCMS</code> and
-<code>findFeaturesBruker</code>.</p>
+    <p>This class provides a way to store intensity, retention times, <em>m/z</em> and other data for all features in a set of
+analyses. The class is <code>virtual</code> and derived objects are created by 'feature finders' such as
+<code>findFeaturesOpenMS</code>, <code>findFeaturesXCMS</code> and <code>findFeaturesBruker</code>.</p>
     </div>
     <div id="methods-by-generic-">
     <h2>Methods (by generic)</h2>
@@ -371,13 +370,11 @@ score values.</p></li>
 
 
 <dl><dt><code>features</code></dt>
-<dd><p>List of features per analysis file. Use the
-<code>featureTable</code> method for access.</p></dd>
+<dd><p>List of features per analysis file. Use the <code>featureTable</code> method for access.</p></dd>
 
 
 <dt><code>analysisInfo</code></dt>
-<dd><p>Analysis group information. Use the <code>analysisInfo</code> method
-for access.</p></dd>
+<dd><p>Analysis group information. Use the <code>analysisInfo</code> method for access.</p></dd>
 
 
 </dl></div>
@@ -427,7 +424,8 @@ for access.</p></dd>
     </div>
     <div id="author">
     <h2>Author</h2>
-    <p>Ricardo Cunha, <a href="mailto:cunha@iuta.de">cunha@iuta.de</a></p>
+    <p>Rick Helmus &lt;<a href="mailto:r.helmus@uva.nl">r.helmus@uva.nl</a>&gt; and Ricardo Cunha &lt;<a href="mailto:cunha@iuta.de">cunha@iuta.de</a>&gt; (<code>getTICs</code>,
+  <code>getBPCs</code>, <code>plotTICs</code> and <code>plotBPCs</code> functions)</p>
     </div>
 
   </div>

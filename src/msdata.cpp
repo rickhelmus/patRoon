@@ -201,20 +201,60 @@ Rcpp::DataFrame getMSMetadata(const MSReadBackend &backend, int msLevel)
     
     // msLevel == 2
     
-    const auto size = meta.second.isolationRanges.size();
-    std::vector<SpectrumRawTypes::Mass> isolationMins(size), isolationMaxs(size);
-    for (size_t i=0; i<size; ++i)
+    if (!meta.second.isolationRanges.empty()) // non IMS
     {
-        isolationMins[i] = meta.second.isolationRanges[i].start;
-        isolationMaxs[i] = meta.second.isolationRanges[i].end;
+        const auto size = meta.second.isolationRanges.size();
+        std::vector<SpectrumRawTypes::Mass> isolationMins(size), isolationMaxs(size);
+        for (size_t i=0; i<size; ++i)
+        {
+            isolationMins[i] = meta.second.isolationRanges[i].start;
+            isolationMaxs[i] = meta.second.isolationRanges[i].end;
+        }
+        
+        return Rcpp::DataFrame::create(Rcpp::Named("scan") = meta.second.scans,
+                                       Rcpp::Named("time") = meta.second.times,
+                                       Rcpp::Named("TIC") = meta.second.TICs,
+                                       Rcpp::Named("BPC") = meta.second.BPCs,
+                                       Rcpp::Named("isolationRangeMin") = isolationMins,
+                                       Rcpp::Named("isolationRangeMax") = isolationMaxs);
     }
     
-    return Rcpp::DataFrame::create(Rcpp::Named("scan") = meta.second.scans,
-                                   Rcpp::Named("time") = meta.second.times,
-                                   Rcpp::Named("TIC") = meta.second.TICs,
-                                   Rcpp::Named("BPC") = meta.second.BPCs,
-                                   Rcpp::Named("isolationRangeMin") = isolationMins,
-                                   Rcpp::Named("isolationRangeMax") = isolationMaxs);
+    // MS2 / IMS --> convert to tidy format
+    
+    std::vector<SpectrumRawTypes::Scan> scans;
+    std::vector<SpectrumRawTypes::Time> times;
+    std::vector<SpectrumRawTypes::Intensity> TICs, BPCs;
+    std::vector<SpectrumRawTypes::Mass> isolationMins, isolationMaxs;
+    std::vector<SpectrumRawTypes::Scan> subScans, subScanEnds;
+    
+    for (size_t i=0; i<meta.second.scans.size(); ++i)
+    {
+        const frameMSMSInfo &fi = meta.second.MSMSFrames[i];
+        for (size_t j=0; j<fi.isolationRanges.size(); ++j)
+        {
+            scans.push_back(meta.second.scans[i]);
+            times.push_back(meta.second.times[i]);
+            TICs.push_back(meta.second.TICs[i]);
+            BPCs.push_back(meta.second.BPCs[i]);
+            isolationMins.push_back(fi.isolationRanges[j].start);
+            isolationMaxs.push_back(fi.isolationRanges[j].end);
+            subScans.push_back(fi.subScans[j]);
+            if (!fi.subScanEnds.empty())
+                subScanEnds.push_back(fi.subScanEnds[j]);
+        }
+    }
+    
+    auto ret = Rcpp::DataFrame::create(Rcpp::Named("scan") = scans,
+                                       Rcpp::Named("time") = times,
+                                       Rcpp::Named("TIC") = TICs,
+                                       Rcpp::Named("BPC") = BPCs,
+                                       Rcpp::Named("isolationRangeMin") = isolationMins,
+                                       Rcpp::Named("isolationRangeMax") = isolationMaxs,
+                                       Rcpp::Named("subScan") = subScans);
+    if (!subScanEnds.empty())
+        ret["subScanEnd"] = subScanEnds;
+    
+    return ret;
 }
 
 // [[Rcpp::export]]

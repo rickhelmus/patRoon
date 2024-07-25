@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2024-07-23" />
+<meta name="date" content="2024-07-25" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -543,7 +543,7 @@ div.csl-indent {
 <blockquote>
 <p><strong><em>NOTE</em></strong>: most filters only remove suspect hit results. Set <code>onlyHits=TRUE</code> to also remove any feature groups that end up without suspect hits.</p>
 </blockquote>
-<p>The <code>selectHitsBy</code> and <code>selectBestFGroups</code> filters are useful to remove duplicate hits (one suspect assigned to multiple feature groups or multiple feature groups assigned to the same suspect, respectively). The former selects based on either best identification level (<code>selectHitsBy="level"</code>) or highest mean intensity (<code>selectHitsBy="intensity"</code>). The <code>selectBestFGroups</code> can only be <code>TRUE</code>/<code>FALSE</code> and always selects by best identification level.</p>
+<p>The <code>selectHitsBy</code> and <code>selectBestFGroups</code> filters are useful to remove duplicate hits, i.e. the same suspect assigned to multiple feature groups or multiple suspects assigned to the same feature group, respectively. The former selects based on either best identification level (<code>selectHitsBy="level"</code>) or highest mean intensity (<code>selectHitsBy="intensity"</code>). The <code>selectBestFGroups</code> can only be <code>TRUE</code>/<code>FALSE</code> and always selects by best identification level.</p>
 <p>Some examples are shown below.</p>
 <div class="sourceCode" id="cb82"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb82-1"><a href="filtering.html#cb82-1" tabindex="-1"></a><span class="co"># only keep feature groups assigned to at least one suspect</span></span>
 <span id="cb82-2"><a href="filtering.html#cb82-2" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsSusp, <span class="at">onlyHits =</span> <span class="cn">TRUE</span>)</span>

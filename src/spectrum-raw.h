@@ -20,6 +20,12 @@ enum class MSLevel { MS1, MS2 };
 
 }
 
+struct frameMSMSInfo
+{
+    std::vector<SpectrumRawTypes::IsolationRange> isolationRanges;
+    std::vector<SpectrumRawTypes::Scan> subScans, subScanEnds;
+};
+
 struct SpectrumRawMetadataMS
 {
     std::vector<SpectrumRawTypes::Scan> scans;
@@ -39,15 +45,18 @@ struct SpectrumRawMetadataMS
 struct SpectrumRawMetadataMSMS: public SpectrumRawMetadataMS
 {
     std::vector<SpectrumRawTypes::IsolationRange> isolationRanges;
+    std::vector<frameMSMSInfo> MSMSFrames;
     SpectrumRawMetadataMSMS(void) = default;
-    SpectrumRawMetadataMSMS(size_t s) : SpectrumRawMetadataMS(s), isolationRanges(s) { }
+    SpectrumRawMetadataMSMS(size_t s, bool ims = false) : SpectrumRawMetadataMS(s),
+        isolationRanges((!ims) ? s : 0), MSMSFrames((ims) ? s : 0) { }
     
     // NOTE: not virtual, to keep the class simple
-    void clear(void) { SpectrumRawMetadataMS::clear(); isolationRanges.clear(); }
+    void clear(void) { SpectrumRawMetadataMS::clear(); isolationRanges.clear(); MSMSFrames.clear(); }
     void append(const SpectrumRawMetadataMSMS &other)
     {
         SpectrumRawMetadataMS::append(other);
         isolationRanges.insert(isolationRanges.end(), other.isolationRanges.begin(), other.isolationRanges.end());
+        MSMSFrames.insert(MSMSFrames.end(), other.MSMSFrames.begin(), other.MSMSFrames.end());
     }
 };
 using SpectrumRawMetadata = std::pair<SpectrumRawMetadataMS, SpectrumRawMetadataMSMS>;

@@ -20,9 +20,9 @@ NULL
 #'   c("effluent-A", "effluent-B"))}, will compare the features in replicate groups \samp{"influent-A/B"} against those
 #'   in \samp{"effluent-A/B"}. The names of the list are used for labelling in the plot, and will be made automatically
 #'   if not specified.
-#' @param \dots passed to \code{\link[base]{plot}} (\code{plot} and \code{plotChroms}), \pkg{\link{VennDiagram}}
-#'   plotting functions (\code{plotVenn}), \code{\link{chordDiagram}} (\code{plotChord}) or \code{\link[UpSetR]{upset}}
-#'   (\code{plotUpSet}).
+#' @param \dots passed to \code{\link[base]{plot}} (\code{plot}, \code{plotChroms}, \code{plotTICs} and
+#'   \code{plotBPCs}), \pkg{\link{VennDiagram}} plotting functions (\code{plotVenn}), \code{\link{chordDiagram}}
+#'   (\code{plotChord}) or \code{\link[UpSetR]{upset}} (\code{plotUpSet}).
 #' @param sets \setsWF For \code{plotInt}: if \code{TRUE} then feature intensities are plot per set (order follows the
 #'   \link[=analysis-information]{analysis information}).
 #'
@@ -38,6 +38,9 @@ NULL
 #'   \item \code{plotGraph} only plots data per set, and requires the \code{set} argument to be set.
 #'
 #'   }
+#' 
+#' @author Rick Helmus <\email{r.helmus@@uva.nl}> and Ricardo Cunha <\email{cunha@@iuta.de}> (\code{plotTICs} and
+#'   \code{plotBPCs} functions)
 #'
 #' @seealso \code{\link{featureGroups-class}}, \code{\link{groupFeatures}}
 #'
@@ -859,13 +862,6 @@ setMethod("plotGraph", "featureGroups", function(obj, onlyPresent = TRUE, width 
 setMethod("plotGraph", "featureGroupsSet", function(obj, onlyPresent = TRUE, set, ...) plotGraph(unset(obj, set), onlyPresent = onlyPresent, ...))
 
 #' @describeIn featureGroups Plots the total ion chromatogram/s (TICs) of the analyses.
-#' @param retMin Plot retention time in minutes (instead of seconds).
-#' @param title Character string used for title of the plot. If \code{NULL} a title will be automatically generated.
-#' @param colourBy Sets the automatic colour selection: "none" for a single 
-#' colour or "analyses"/"rGroups" for a distinct colour per analysis or analysis replicate group.
-#' @param showLegend Plot a legend if TRUE.
-#' @template plot-lim
-#' @author Ricardo Cunha, \email{cunha@@iuta.de}
 #' @export
 setMethod("plotTICs", "featureGroups", function(obj, retentionRange = NULL, MSLevel = 1, retMin = FALSE, title = NULL,
                                                 colourBy = c("none", "analyses", "rGroups"), showLegend = TRUE,
@@ -875,7 +871,6 @@ setMethod("plotTICs", "featureGroups", function(obj, retentionRange = NULL, MSLe
 })
 
 #' @describeIn featureGroups Plots the base peak chromatogram/s (BPCs) of the analyses.
-#' @author Ricardo Cunha, \email{cunha@@iuta.de}
 #' @export
 setMethod("plotBPCs", "featureGroups", function(obj, retentionRange = NULL, MSLevel = 1, retMin = FALSE, title = NULL,
                                                 colourBy = c("none", "analyses", "rGroups"), showLegend = TRUE,

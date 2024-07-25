@@ -48,7 +48,7 @@ generateComponentsCliqueMS(fGroups, ...)
 If \code{NULL} then the default adduct information from \pkg{cliqueMS} is used (\emph{i.e.} the
 \code{positive.adinfo}/\code{negative.adinfo} package datasets).}
 
-\item{absMzDev}{Maximum absolute \\emph{m/z} deviation.}
+\item{absMzDev}{Maximum absolute \emph{m/z} deviation.}
 
 \item{minSize}{The minimum size of a component. Smaller components than this size will be removed. See note below.}
 

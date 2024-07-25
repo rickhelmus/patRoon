@@ -450,12 +450,10 @@ values are: \code{"adduct"} (ignore isotope annotation), \code{"isotope"} (ignor
 \command{OpenMS} is used to find features, it already removes any detected non-monoisotopic features by default.
 Hence, in such case setting \code{chargeMismatch="adduct"} is more appropriate.}
 
-\item{retentionRange}{Range of retention time (in seconds) to collect TIC traces.
-Should be a numeric vector with length of two containing the min/max values. 
-Set to NULL to ignore.}
+\item{retentionRange}{Range of retention time (in seconds) to collect TIC traces. Should be a numeric vector with
+length of two containing the min/max values. Set to NULL to ignore.}
 
-\item{MSLevel}{Integer vector with the ms levels (i.e., 1 for MS1 and 2 for MS2) 
-to obtain TIC traces.}
+\item{MSLevel}{Integer vector with the ms levels (i.e., 1 for MS1 and 2 for MS2) to obtain TIC traces.}
 
 \item{set}{\setsWF The name of the set.}
 
@@ -471,8 +469,8 @@ to obtain TIC traces.}
 
 \item{title}{Character string used for title of the plot. If \code{NULL} a title will be automatically generated.}
 
-\item{colourBy}{Sets the automatic colour selection: "none" for a single 
-colour or "analyses"/"rGroups" for a distinct colour per analysis or analysis replicate group.}
+\item{colourBy}{Sets the automatic colour selection: "none" for a single colour or "analyses"/"rGroups" for a
+distinct colour per analysis or analysis replicate group.}
 
 \item{showLegend}{Plot a legend if TRUE.}
 
@@ -755,5 +753,6 @@ by \code{adducts<-} and \code{selectIons} when these methods perform a re-groupi
   \link{feature-plotting} for more advanced \code{featureGroups} methods.
 }
 \author{
-Ricardo Cunha, \email{cunha@iuta.de}
+Rick Helmus <\email{r.helmus@uva.nl}> and Ricardo Cunha <\email{cunha@iuta.de}> (\code{getTICs} and
+  \code{getBPCs} functions)
 }

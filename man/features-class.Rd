@@ -168,7 +168,9 @@ function specifies the feature indices (rows) to be removed (specified as an \co
 
 \item{\dots}{For \code{delete}: passed to the function specified as \code{j}.
 
-\setsPassedArgs1{features}}
+  For \code{plotTICs} and \code{plotBPCs}: further arguments passed to \code{\link[graphics]{plot}}.
+
+  \setsPassedArgs1{features}}
 
 \item{drop}{ignored.}
 
@@ -191,8 +193,8 @@ to obtain TIC traces.}
 
 \item{title}{Character string used for title of the plot. If \code{NULL} a title will be automatically generated.}
 
-\item{colourBy}{Sets the automatic colour selection: "none" for a single 
-colour or "analyses"/"rGroups" for a distinct colour per analysis or analysis replicate group.}
+\item{colourBy}{Sets the automatic colour selection: "none" for a single colour or "analyses"/"rGroups" for a
+distinct colour per analysis or analysis replicate group.}
 
 \item{showLegend}{Plot a legend if TRUE.}
 
@@ -221,11 +223,9 @@ colour or "analyses"/"rGroups" for a distinct colour per analysis or analysis re
 Holds information for all features present within a set of analysis.
 }
 \details{
-This class provides a way to store intensity, retention times, \emph{m/z} and
-other data for all features in a set of analyses. The class is \code{virtual}
-and derived objects are created by 'feature finders' such as
-\code{findFeaturesOpenMS}, \code{findFeaturesXCMS} and
-\code{findFeaturesBruker}.
+This class provides a way to store intensity, retention times, \emph{m/z} and other data for all features in a set of
+analyses. The class is \code{virtual} and derived objects are created by 'feature finders' such as
+\code{findFeaturesOpenMS}, \code{findFeaturesXCMS} and \code{findFeaturesBruker}.
 }
 \section{Methods (by generic)}{
 \itemize{
@@ -280,11 +280,9 @@ score values.
 \section{Slots}{
 
 \describe{
-\item{\code{features}}{List of features per analysis file. Use the
-\code{featureTable} method for access.}
+\item{\code{features}}{List of features per analysis file. Use the \code{featureTable} method for access.}
 
-\item{\code{analysisInfo}}{Analysis group information. Use the \code{analysisInfo} method
-for access.}
+\item{\code{analysisInfo}}{Analysis group information. Use the \code{analysisInfo} method for access.}
 }}
 
 \note{
@@ -316,5 +314,6 @@ For \code{calculatePeakQualities}: sometimes \pkg{MetaClean} may return \code{NA
 \code{\link{findFeatures}}
 }
 \author{
-Ricardo Cunha, \email{cunha@iuta.de}
+Rick Helmus <\email{r.helmus@uva.nl}> and Ricardo Cunha <\email{cunha@iuta.de}> (\code{getTICs},
+  \code{getBPCs}, \code{plotTICs} and \code{plotBPCs} functions)
 }

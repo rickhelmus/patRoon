@@ -42,6 +42,9 @@ NULL
 #'   \code{"samp1"}+\code{"samp2"} and \code{"samp3"}+\code{"samp4"}.
 #' @param FCParams A parameter list to calculate Fold change data. See \code{getFCParams} for more details. Set to
 #'   \code{NULL} to not perform FC calculations.
+#' @param MSLevel Integer vector with the ms levels (i.e., 1 for MS1 and 2 for MS2) to obtain TIC traces.
+#' @param retentionRange Range of retention time (in seconds) to collect TIC traces. Should be a numeric vector with
+#'   length of two containing the min/max values. Set to NULL to ignore.
 #'
 #' @templateVar seli analyses
 #' @templateVar selOrderi analyses()
@@ -78,6 +81,9 @@ NULL
 #' @slot concentrations,toxicities A \code{data.table} with predicted concentrations/toxicities for each feature group.
 #'   Assigned by the \code{\link{calculateConcs}}/\code{\link{calculateTox}} methods. Use the
 #'   \code{concentratrions}/\code{toxicities} methods for access.
+#'
+#' @author Rick Helmus <\email{r.helmus@@uva.nl}> and Ricardo Cunha <\email{cunha@@iuta.de}> (\code{getTICs} and
+#'   \code{getBPCs} functions)
 #'
 #' @templateVar class featureGroups
 #' @template class-hierarchy
@@ -1352,12 +1358,6 @@ setMethod("calculateTox", "featureGroups", function(fGroups, featureAnn)
 })
 
 #' @describeIn featureGroups Obtain the total ion chromatogram/s (TICs) of the analyses.
-#' @param MSLevel Integer vector with the ms levels (i.e., 1 for MS1 and 2 for MS2) 
-#' to obtain TIC traces.
-#' @param retentionRange Range of retention time (in seconds) to collect TIC traces.
-#' Should be a numeric vector with length of two containing the min/max values. 
-#' Set to NULL to ignore.
-#' @author Ricardo Cunha, \email{cunha@@iuta.de}
 #' @export
 setMethod("getTICs", "featureGroups", function(obj, retentionRange = NULL, MSLevel = c(1, 2))
 {
@@ -1365,7 +1365,6 @@ setMethod("getTICs", "featureGroups", function(obj, retentionRange = NULL, MSLev
 })
 
 #' @describeIn featureGroups Obtain the base peak chromatogram/s (BPCs) of the analyses.
-#' @author Ricardo Cunha, \email{cunha@@iuta.de}
 #' @export
 setMethod("getBPCs", "featureGroups", function(obj, retentionRange = NULL, MSLevel = c(1, 2))
 {

@@ -31,7 +31,7 @@ setMethod("initialize", "componentsCliqueMS",
 #' @param adductInfo Sets the \code{adinfo} argument to \code{\link[cliqueMS:getAnnotation]{cliqueMS::getAnnotation}}.
 #'   If \code{NULL} then the default adduct information from \pkg{cliqueMS} is used (\emph{i.e.} the
 #'   \code{positive.adinfo}/\code{negative.adinfo} package datasets).
-#' @param absMzDev Maximum absolute \\emph{m/z} deviation.
+#' @param absMzDev Maximum absolute \emph{m/z} deviation.
 #' @param extraOptsCli,extraOptsIso,extraOptsAnn Named \code{list} with further arguments to be passed to
 #'   \code{\link[cliqueMS:getCliques]{cliqueMS::getCliques}}, \code{\link[cliqueMS:getIsotopes]{cliqueMS::getIsotopes}}
 #'   and \code{\link[cliqueMS:getAnnotation]{cliqueMS::getAnnotation}}, respectively. Set to \code{NULL} to ignore.

@@ -122,9 +122,9 @@ feature groups that are unique to a replicate group are plotted.}
 \item{pch, type, lty}{Common plotting parameters passed to \emph{e.g.} \code{\link[graphics]{plot}}. For \code{plot}:
 if \code{pch=NULL} then values are automatically assigned.}
 
-\item{\dots}{passed to \code{\link[base]{plot}} (\code{plot} and \code{plotChroms}), \pkg{\link{VennDiagram}}
-plotting functions (\code{plotVenn}), \code{\link{chordDiagram}} (\code{plotChord}) or \code{\link[UpSetR]{upset}}
-(\code{plotUpSet}).}
+\item{\dots}{passed to \code{\link[base]{plot}} (\code{plot}, \code{plotChroms}, \code{plotTICs} and
+\code{plotBPCs}), \pkg{\link{VennDiagram}} plotting functions (\code{plotVenn}), \code{\link{chordDiagram}}
+(\code{plotChord}) or \code{\link[UpSetR]{upset}} (\code{plotUpSet}).}
 
 \item{obj, x}{\code{featureGroups} object to be used for plotting.}
 
@@ -273,4 +273,8 @@ Various plotting functions for feature group data.
 }
 \seealso{
 \code{\link{featureGroups-class}}, \code{\link{groupFeatures}}
+}
+\author{
+Rick Helmus <\email{r.helmus@uva.nl}> and Ricardo Cunha <\email{cunha@iuta.de}> (\code{plotTICs} and
+  \code{plotBPCs} functions)
 }

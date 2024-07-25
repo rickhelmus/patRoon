@@ -15,20 +15,16 @@ printFeatStats <- function(fList)
 #'
 #' Holds information for all features present within a set of analysis.
 #'
-#' This class provides a way to store intensity, retention times, \emph{m/z} and
-#' other data for all features in a set of analyses. The class is \code{virtual}
-#' and derived objects are created by 'feature finders' such as
-#' \code{findFeaturesOpenMS}, \code{findFeaturesXCMS} and
-#' \code{findFeaturesBruker}.
+#' This class provides a way to store intensity, retention times, \emph{m/z} and other data for all features in a set of
+#' analyses. The class is \code{virtual} and derived objects are created by 'feature finders' such as
+#' \code{findFeaturesOpenMS}, \code{findFeaturesXCMS} and \code{findFeaturesBruker}.
 #'
 #' @param obj,x,object \code{features} object to be accessed
 #'
 #' @seealso \code{\link{findFeatures}}
 #'
-#' @slot features List of features per analysis file. Use the
-#'   \code{featureTable} method for access.
-#' @slot analysisInfo Analysis group information. Use the \code{analysisInfo} method
-#'   for access.
+#' @slot features List of features per analysis file. Use the \code{featureTable} method for access.
+#' @slot analysisInfo Analysis group information. Use the \code{analysisInfo} method for access.
 #'
 #' @templateVar seli analyses
 #' @templateVar selOrderi analyses()
@@ -42,9 +38,20 @@ printFeatStats <- function(fList)
 #' @templateVar dollarOpName analysis
 #' @template sub_sel_del-args
 #'
+#' @param retMin Plot retention time in minutes (instead of seconds).
+#' @param title Character string used for title of the plot. If \code{NULL} a title will be automatically generated.
+#' @param colourBy Sets the automatic colour selection: "none" for a single colour or "analyses"/"rGroups" for a
+#'   distinct colour per analysis or analysis replicate group.
+#' @param showLegend Plot a legend if TRUE.
+#' @template plot-lim
 #' @param \dots For \code{delete}: passed to the function specified as \code{j}.
-#'   
+#'
+#'   For \code{plotTICs} and \code{plotBPCs}: further arguments passed to \code{\link[graphics]{plot}}.
+#'
 #'   \setsPassedArgs1{features}
+#'
+#' @author Rick Helmus <\email{r.helmus@@uva.nl}> and Ricardo Cunha <\email{cunha@@iuta.de}> (\code{getTICs},
+#'   \code{getBPCs}, \code{plotTICs} and \code{plotBPCs} functions)
 #'
 #' @templateVar class features
 #' @template class-hierarchy
@@ -417,7 +424,6 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
 #' @describeIn features Obtain the total ion chromatogram/s (TICs) of the analyses.
 #' @param MSLevel Integer vector with the ms levels (i.e., 1 for MS1 and 2 for MS2) 
 #' to obtain TIC traces.
-#' @author Ricardo Cunha, \email{cunha@@iuta.de}
 #' @export
 setMethod("getTICs", "features", function(obj, retentionRange = NULL, MSLevel = 1)
 {
@@ -426,7 +432,6 @@ setMethod("getTICs", "features", function(obj, retentionRange = NULL, MSLevel = 
 
 
 #' @describeIn features Obtain the base peak chromatogram/s (BPCs) of the analyses.
-#' @author Ricardo Cunha, \email{cunha@@iuta.de}
 #' @export
 setMethod("getBPCs", "features", function(obj, retentionRange = NULL, MSLevel = 1)
 {
@@ -435,13 +440,6 @@ setMethod("getBPCs", "features", function(obj, retentionRange = NULL, MSLevel = 
 
 
 #' @describeIn features Plots the TICs of the analyses.
-#' @param retMin Plot retention time in minutes (instead of seconds).
-#' @param title Character string used for title of the plot. If \code{NULL} a title will be automatically generated.
-#' @param colourBy Sets the automatic colour selection: "none" for a single 
-#' colour or "analyses"/"rGroups" for a distinct colour per analysis or analysis replicate group.
-#' @param showLegend Plot a legend if TRUE.
-#' @template plot-lim
-#' @author Ricardo Cunha, \email{cunha@@iuta.de}
 #' @export
 setMethod("plotTICs", "features", function(obj, retentionRange = NULL, MSLevel = 1, retMin = FALSE, title = NULL, 
                                            colourBy = c("none", "analyses", "rGroups"), showLegend = TRUE, xlim = NULL, 
@@ -452,7 +450,6 @@ setMethod("plotTICs", "features", function(obj, retentionRange = NULL, MSLevel =
 
 
 #' @describeIn features Plots the BPCs of the analyses.
-#' @author Ricardo Cunha, \email{cunha@@iuta.de}
 #' @export
 setMethod("plotBPCs", "features", function(obj, retentionRange = NULL, MSLevel = 1, retMin = FALSE, title = NULL,
                                            colourBy = c("none", "analyses", "rGroups"), showLegend = TRUE, xlim = NULL, 

@@ -41,12 +41,11 @@
 \arguments{
 \item{obj}{An \code{analysisInfo} data.frame object as obtained by \link[patRoon]{generateAnalysisInfo} function.}
 
-\item{retentionRange}{Range of retention time (in seconds), m/z, respectively. Should be a numeric vector with 
-length of two containing the min/max values. The maximum can be Inf to specify no maximum range. Set to NULL to skip 
-this step.}
+\item{retentionRange}{Range of retention time (in seconds), m/z, respectively. Should be a numeric vector with length
+of two containing the min/max values. The maximum can be Inf to specify no maximum range. Set to NULL to skip this
+step.}
 
-\item{MSLevel}{Integer vector with the ms levels (i.e., 1 for MS1 and 2 for MS2) 
-to obtain traces.}
+\item{MSLevel}{Integer vector with the ms levels (i.e., 1 for MS1 and 2 for MS2) to obtain traces.}
 
 \item{retMin}{Plot retention time in minutes (instead of seconds).}
 
@@ -59,6 +58,8 @@ colour or "analyses"/"rGroups" for a distinct colour per analysis or analysis re
 
 \item{xlim, ylim}{Sets the plot size limits used by
 \code{\link[graphics]{plot}}. Set to \code{NULL} for automatic plot sizing.}
+
+\item{\dots}{Further arguments passed to \code{\link[graphics]{plot}}.}
 }
 \description{
 Various parsing and plotting functions for the analysisInfo data.frame.

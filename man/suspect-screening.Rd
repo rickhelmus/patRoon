@@ -115,6 +115,8 @@ for more details.}
 
 \item{onlyHits}{If \code{TRUE} then all feature groups not matched by any of the suspects will be removed.}
 
+\item{\dots}{Further arguments specified to the methods.}
+
 \item{amend}{If \code{TRUE} then screening results will be \emph{amended} to the original object.}
 
 \item{level}{The identification level to be converted.}

@@ -3,13 +3,9 @@
 \name{analysisinfo-dataframe}
 \alias{analysisinfo-dataframe}
 \alias{getTICs,data.frame-method}
-\alias{getTICs}
 \alias{getBPCs,data.frame-method}
-\alias{getBPCs}
 \alias{plotTICs,data.frame-method}
-\alias{plotTICs}
 \alias{plotBPCs,data.frame-method}
-\alias{plotBPCs}
 \title{AnalysisInfo data.frame methods}
 \usage{
 \S4method{getTICs}{data.frame}(obj, retentionRange = NULL, MSLevel = 1)
@@ -43,7 +39,7 @@
 )
 }
 \arguments{
-\item{obj, x}{An \code{analysisInfo} data.frame object as obtained by \link[patRoon]{generateAnalysisInfo} function.}
+\item{obj}{An \code{analysisInfo} data.frame object as obtained by \link[patRoon]{generateAnalysisInfo} function.}
 
 \item{retentionRange}{Range of retention time (in seconds), m/z, respectively. Should be a numeric vector with 
 length of two containing the min/max values. The maximum can be Inf to specify no maximum range. Set to NULL to skip 

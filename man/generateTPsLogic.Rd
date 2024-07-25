@@ -18,6 +18,8 @@ generateTPsLogic(fGroups, minMass = 40, ...)
 \item{minMass}{A \code{numeric} that specifies the minimum mass of calculated TPs. If below this mass it will be
 removed.}
 
+\item{\dots}{Further arguments specified to the methods.}
+
 \item{adduct}{An \code{\link{adduct}} object (or something that can be converted to it with \code{\link{as.adduct}}).
   Examples: \code{"[M-H]-"}, \code{"[M+Na]+"}. If the \code{featureGroups} object has
   adduct annotations then these are used if \code{adducts=NULL}.

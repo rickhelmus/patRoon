@@ -3,7 +3,7 @@
 #'
 #' Various parsing and plotting functions for the analysisInfo data.frame.
 #'
-#' @param obj,x An \code{analysisInfo} data.frame object as obtained by \link[patRoon]{generateAnalysisInfo} function.
+#' @param obj An \code{analysisInfo} data.frame object as obtained by \link[patRoon]{generateAnalysisInfo} function.
 #' @param MSLevel Integer vector with the ms levels (i.e., 1 for MS1 and 2 for MS2) 
 #' to obtain traces.
 #' @param retentionRange Range of retention time (in seconds), m/z, respectively. Should be a numeric vector with 
@@ -15,7 +15,6 @@ NULL
 
 #' @describeIn analysisinfo-dataframe Obtain the total ion chromatogram/s (TICs) of the analyses.
 #' @author Ricardo Cunha, \email{cunha@@iuta.de}
-#' @aliases getTICs
 #' @export
 setMethod("getTICs", "data.frame", function(obj, retentionRange = NULL, MSLevel = 1)
 {
@@ -48,7 +47,6 @@ setMethod("getTICs", "data.frame", function(obj, retentionRange = NULL, MSLevel 
 
 #' @describeIn analysisinfo-dataframe Obtain the base peak chromatogram/s (BPCs) of the analyses.
 #' @author Ricardo Cunha, \email{cunha@@iuta.de}
-#' @aliases getBPCs
 #' @export
 setMethod("getBPCs", "data.frame", function(obj, retentionRange = NULL, MSLevel = 1)
 {
@@ -87,11 +85,10 @@ setMethod("getBPCs", "data.frame", function(obj, retentionRange = NULL, MSLevel 
 #' @param showLegend Plot a legend if TRUE.
 #' @template plot-lim
 #' @author Ricardo Cunha, \email{cunha@@iuta.de}
-#' @aliases plotTICs
 #' @export
 setMethod("plotTICs", "data.frame", function(obj, retentionRange = NULL, MSLevel = 1, retMin = FALSE, title = NULL, 
-                                           colourBy = c("none", "analyses", "rGroups"), showLegend = TRUE, xlim = NULL, 
-                                           ylim = NULL, ...)
+                                             colourBy = c("none", "analyses", "rGroups"), showLegend = TRUE, xlim = NULL, 
+                                             ylim = NULL, ...)
 {
     doPlotHeaders(obj, what = "tic", retentionRange, MSLevel, retMin, title, colourBy, showLegend, xlim, ylim, ...)
 })
@@ -99,11 +96,10 @@ setMethod("plotTICs", "data.frame", function(obj, retentionRange = NULL, MSLevel
 
 #' @describeIn analysisinfo-dataframe Plots the BPCs of the analyses.
 #' @author Ricardo Cunha, \email{cunha@@iuta.de}
-#' @aliases plotBPCs
 #' @export
 setMethod("plotBPCs", "data.frame", function(obj, retentionRange = NULL, MSLevel = 1, retMin = FALSE, title = NULL,
-                                           colourBy = c("none", "analyses", "rGroups"), showLegend = TRUE, xlim = NULL, 
-                                           ylim = NULL, ...)
+                                             colourBy = c("none", "analyses", "rGroups"), showLegend = TRUE, xlim = NULL, 
+                                             ylim = NULL, ...)
 {
     doPlotHeaders(obj, what = "bpc", retentionRange, MSLevel, retMin, title, colourBy, showLegend, xlim, ylim, ...)
 })

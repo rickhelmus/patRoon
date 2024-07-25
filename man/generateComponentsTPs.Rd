@@ -35,6 +35,8 @@ generateComponentsTPs(fGroups, ...)
 \arguments{
 \item{fGroups}{The input \code{\link{featureGroups}} for componentization. See \code{fGroupsTPs}.}
 
+\item{\dots}{Further arguments specified to the methods.}
+
 \item{fGroupsTPs}{A \code{\link{featureGroups}} object containing the feature groups that are expected to be
 transformation products. If a distinction between parents and TPs is not yet known, \code{fGroupsTPs} should equal
 the \code{fGroups} argument. Otherwise, \code{fGroups} should only contain the parent feature groups, and both

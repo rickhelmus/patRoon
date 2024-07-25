@@ -54,9 +54,7 @@
 \alias{selectIons,featureGroups-method}
 \alias{normInts,featureGroups-method}
 \alias{getTICs,featureGroups-method}
-\alias{getTICs}
 \alias{getBPCs,featureGroups-method}
-\alias{getBPCs}
 \alias{featureGroupsSet-class}
 \alias{featureGroupsSet}
 \alias{sets,featureGroupsSet-method}
@@ -85,9 +83,7 @@
 \alias{featureGroupsOpenMS-class}
 \alias{featureGroupsOpenMS}
 \alias{plotTICs,featureGroups-method}
-\alias{plotTICs}
 \alias{plotBPCs,featureGroups-method}
-\alias{plotBPCs}
 \alias{featureGroupsSIRIUS-class}
 \alias{featureGroupsSIRIUS}
 \alias{featureGroupsXCMS-class}
@@ -313,6 +309,8 @@ normInts(
   \setsPassedArgs1{featureGroups}}
 
 \item{fGroups, obj, x, object}{\code{featureGroups} object to be accessed.}
+
+\item{incomparables}{Ignored.}
 
 \item{which}{A character vector with replicate groups used for comparison.
 

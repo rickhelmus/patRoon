@@ -44,6 +44,7 @@ setGeneric("groupFeatIndex", function(fGroups) standardGeneric("groupFeatIndex")
 #' @rdname featureGroups-class
 setGeneric("groupInfo", function(fGroups) standardGeneric("groupInfo"))
 
+#' @param incomparables Ignored.
 #' @rdname featureGroups-class
 setGeneric("unique", function(x, incomparables = FALSE, ...) standardGeneric("unique"))
 
@@ -192,6 +193,7 @@ setGeneric("generateComponentsCliqueMS", function(fGroups, ...) standardGeneric(
 #' @rdname generateComponentsSpecClust
 setGeneric("generateComponentsSpecClust", function(fGroups, ...) standardGeneric("generateComponentsSpecClust"))
 
+#' @param \dots Further arguments specified to the methods.
 #' @rdname generateComponentsTPs
 setGeneric("generateComponentsTPs", function(fGroups, ...) standardGeneric("generateComponentsTPs"))
 
@@ -235,6 +237,7 @@ setGeneric("compoundViewer", function(fGroups, MSPeakLists, compounds) standardG
 
 ### clustering
 
+#' @param \dots further arguments specified to methods.
 #' @rdname compounds-cluster
 setGeneric("makeHCluster", function(obj, method = "complete", ...) standardGeneric("makeHCluster"))
 
@@ -254,6 +257,7 @@ setGeneric("parents", function(TPs) standardGeneric("parents"))
 #' @rdname transformationProducts-class
 setGeneric("products", function(TPs) standardGeneric("products"))
 
+#' @param \dots Further arguments specified to the methods.
 #' @rdname generateTPsLogic
 setGeneric("generateTPsLogic", function(fGroups, minMass = 40, ...) standardGeneric("generateTPsLogic"))
 
@@ -266,6 +270,7 @@ setGeneric("screenInfo", function(obj) standardGeneric("screenInfo"))
 setGeneric("annotateSuspects", function(fGroups, MSPeakLists = NULL, formulas = NULL,
                                         compounds = NULL, ...) standardGeneric("annotateSuspects"))
 
+#' @param \dots Further arguments specified to the methods.
 #' @rdname suspect-screening
 setGeneric("screenSuspects", function(fGroups, suspects, rtWindow = 12, mzWindow = 0.005, adduct = NULL,
                                       skipInvalid = TRUE, prefCalcChemProps = TRUE, neutralChemProps = FALSE,

@@ -1358,7 +1358,6 @@ setMethod("calculateTox", "featureGroups", function(fGroups, featureAnn)
 #' Should be a numeric vector with length of two containing the min/max values. 
 #' Set to NULL to ignore.
 #' @author Ricardo Cunha, \email{cunha@@iuta.de}
-#' @aliases getTICs
 #' @export
 setMethod("getTICs", "featureGroups", function(obj, retentionRange = NULL, MSLevel = c(1, 2))
 {
@@ -1367,7 +1366,6 @@ setMethod("getTICs", "featureGroups", function(obj, retentionRange = NULL, MSLev
 
 #' @describeIn featureGroups Obtain the base peak chromatogram/s (BPCs) of the analyses.
 #' @author Ricardo Cunha, \email{cunha@@iuta.de}
-#' @aliases getBPCs
 #' @export
 setMethod("getBPCs", "featureGroups", function(obj, retentionRange = NULL, MSLevel = c(1, 2))
 {

@@ -418,7 +418,6 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
 #' @param MSLevel Integer vector with the ms levels (i.e., 1 for MS1 and 2 for MS2) 
 #' to obtain TIC traces.
 #' @author Ricardo Cunha, \email{cunha@@iuta.de}
-#' @aliases getTICs
 #' @export
 setMethod("getTICs", "features", function(obj, retentionRange = NULL, MSLevel = 1)
 {
@@ -428,7 +427,6 @@ setMethod("getTICs", "features", function(obj, retentionRange = NULL, MSLevel = 
 
 #' @describeIn features Obtain the base peak chromatogram/s (BPCs) of the analyses.
 #' @author Ricardo Cunha, \email{cunha@@iuta.de}
-#' @aliases getBPCs
 #' @export
 setMethod("getBPCs", "features", function(obj, retentionRange = NULL, MSLevel = 1)
 {
@@ -444,7 +442,6 @@ setMethod("getBPCs", "features", function(obj, retentionRange = NULL, MSLevel = 
 #' @param showLegend Plot a legend if TRUE.
 #' @template plot-lim
 #' @author Ricardo Cunha, \email{cunha@@iuta.de}
-#' @aliases plotTICs
 #' @export
 setMethod("plotTICs", "features", function(obj, retentionRange = NULL, MSLevel = 1, retMin = FALSE, title = NULL, 
                                            colourBy = c("none", "analyses", "rGroups"), showLegend = TRUE, xlim = NULL, 
@@ -456,7 +453,6 @@ setMethod("plotTICs", "features", function(obj, retentionRange = NULL, MSLevel =
 
 #' @describeIn features Plots the BPCs of the analyses.
 #' @author Ricardo Cunha, \email{cunha@@iuta.de}
-#' @aliases plotBPCs
 #' @export
 setMethod("plotBPCs", "features", function(obj, retentionRange = NULL, MSLevel = 1, retMin = FALSE, title = NULL,
                                            colourBy = c("none", "analyses", "rGroups"), showLegend = TRUE, xlim = NULL, 

@@ -21,13 +21,9 @@
 \alias{delete,features-method}
 \alias{calculatePeakQualities,features-method}
 \alias{getTICs,features-method}
-\alias{getTICs}
 \alias{getBPCs,features-method}
-\alias{getBPCs}
 \alias{plotTICs,features-method}
-\alias{plotTICs}
 \alias{plotBPCs,features-method}
-\alias{plotBPCs}
 \alias{featuresSet-class}
 \alias{featuresSet}
 \alias{sets,featuresSet-method}

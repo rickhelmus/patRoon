@@ -226,7 +226,7 @@ Filter                                    | Classes                  | Remarks
 
 > **_NOTE_**: most filters only remove suspect hit results. Set `onlyHits=TRUE` to also remove any feature groups that end up without suspect hits.
 
-The `selectHitsBy` and `selectBestFGroups` filters are useful to remove duplicate hits (one suspect assigned to multiple feature groups or multiple feature groups assigned to the same suspect, respectively). The former selects based on either best identification level (`selectHitsBy="level"`) or highest mean intensity (`selectHitsBy="intensity"`). The `selectBestFGroups` can only be `TRUE`/`FALSE` and always selects by best identification level.
+The `selectHitsBy` and `selectBestFGroups` filters are useful to remove duplicate hits, i.e. the same suspect assigned to multiple feature groups or multiple suspects assigned to the same feature group, respectively. The former selects based on either best identification level (`selectHitsBy="level"`) or highest mean intensity (`selectHitsBy="intensity"`). The `selectBestFGroups` can only be `TRUE`/`FALSE` and always selects by best identification level.
 
 Some examples are shown below.
 

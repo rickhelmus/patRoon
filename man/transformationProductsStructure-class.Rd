@@ -84,7 +84,7 @@
 
 \item{removeTPIsomers}{If \code{TRUE} then all TPs with equal formula as any sibling TPs (isomers) are removed.
 Unlike \code{removeDuplicates}, \emph{all} TP candidates are removed (including the first match). This filter
-automatically sets \code{removeDuplicates=TRUE} to avoid complete removal of TPs with equal structure.}
+automatically sets \code{removeDuplicates=TRUE} so that TPs are only removed if with different structure.}
 
 \item{removeDuplicates}{If \code{TRUE} then the TPs of a parent with duplicate structures (\acronym{SMILES}) are
 removed. Such duplicates may occur when different transformation pathways yield the same TPs. The first TP

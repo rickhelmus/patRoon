@@ -110,14 +110,14 @@ setMethod("linkParentsToFGroups", "transformationProductsStructure", function(TP
 #' @param removeParentIsomers If \code{TRUE} then TPs with an equal formula as their parent (isomers) are removed.
 #' @param removeTPIsomers If \code{TRUE} then all TPs with equal formula as any sibling TPs (isomers) are removed.
 #'   Unlike \code{removeDuplicates}, \emph{all} TP candidates are removed (including the first match). This filter
-#'   automatically sets \code{removeDuplicates=TRUE} to avoid complete removal of TPs with equal structure.
+#'   automatically sets \code{removeDuplicates=TRUE} so that TPs are only removed if with different structure.
 #' @param minSimilarity Minimum structure similarity (\samp{0-1}) that a TP should have relative to its parent. This
 #'   data is only available if the \code{calcSims} argument to \code{\link{generateTPs}} was set to \code{TRUE}. May be
 #'   useful under the assumption that parents and TPs who have a high structural similarity, also likely have a high
 #'   MS/MS spectral similarity (which can be evaluated after componentization with \code{\link{generateComponentsTPs}}.
 #'   Any values that are \code{NA} are removed (which only occur when a consensus was made from objects that not all
 #'   have similarity information).
-#' 
+#'
 #' @inheritParams filter,transformationProducts-method
 #'
 #' @return \code{filter} returns a filtered \code{transformationProductsStructure} object.
@@ -164,7 +164,7 @@ setMethod("filter", "transformationProductsStructure", function(obj, ..., remove
                 }
                 if (removeTPIsomers)
                 {
-                    df <- getDuplicatedStrings(tab$formula)
+                    df <- getDuplicatedStrings(tab[keep == TRUE]$formula)
                     tab[keep == TRUE, keep := mark(!formula %chin% df)]
                 }
                 return(!tab$keep)

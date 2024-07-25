@@ -1,3 +1,8 @@
+# DEVEL
+
+* Fixed: The `removeTPIsomers` filter for `transformationProductsStructure` didn't actually apply the `removeDuplicates` filter.
+
+
 # patRoon 2.3.2
 
 * Fixed: `as.data.table()` method for `featureGroups`: `normConcToTox` argument was ignored (not for `featureGroupsScreening`)

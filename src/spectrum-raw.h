@@ -24,6 +24,8 @@ struct frameMSMSInfo
 {
     std::vector<SpectrumRawTypes::IsolationRange> isolationRanges;
     std::vector<SpectrumRawTypes::Scan> subScans, subScanEnds;
+    bool empty(void) const { return isolationRanges.empty(); }
+    void clear(void) { isolationRanges.clear(); subScans.clear(); subScanEnds.clear(); }
 };
 
 struct SpectrumRawMetadataMS

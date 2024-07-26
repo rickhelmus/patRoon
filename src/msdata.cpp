@@ -261,7 +261,7 @@ Rcpp::DataFrame getMSMetadata(const MSReadBackend &backend, int msLevel)
 void setSpecMetadata(MSReadBackend &backend, const Rcpp::DataFrame &mdMS, const Rcpp::DataFrame &mdMSMS)
 {
     SpectrumRawMetadata meta;
-    
+
     // MS
     meta.first.scans = Rcpp::as<std::vector<SpectrumRawTypes::Scan>>(mdMS["scan"]);
     meta.first.times = Rcpp::as<std::vector<SpectrumRawTypes::Time>>(mdMS["time"]);
@@ -269,14 +269,55 @@ void setSpecMetadata(MSReadBackend &backend, const Rcpp::DataFrame &mdMS, const 
     meta.first.BPCs = Rcpp::as<std::vector<SpectrumRawTypes::Intensity>>(mdMS["BPC"]);
     
     // MSMS
-    meta.second.scans = Rcpp::as<std::vector<SpectrumRawTypes::Scan>>(mdMSMS["scan"]);
-    meta.second.times = Rcpp::as<std::vector<SpectrumRawTypes::Time>>(mdMSMS["time"]);
-    meta.second.TICs = Rcpp::as<std::vector<SpectrumRawTypes::Intensity>>(mdMSMS["TIC"]);
-    meta.second.BPCs = Rcpp::as<std::vector<SpectrumRawTypes::Intensity>>(mdMSMS["BPC"]);
-    const std::vector<SpectrumRawTypes::Mass> isoStarts = mdMSMS["isolationStart"];
-    const std::vector<SpectrumRawTypes::Mass> isoEnds = mdMSMS["isolationEnd"];
-    for (size_t i=0; i<isoStarts.size(); ++i)
-        meta.second.isolationRanges.push_back(makeNumRange(isoStarts[i], isoEnds[i]));
+    std::vector<SpectrumRawTypes::Scan> R_scans = mdMSMS["scan"];
+    std::vector<SpectrumRawTypes::Time> R_times = mdMSMS["time"];
+    std::vector<SpectrumRawTypes::Intensity> R_TICs = mdMSMS["TIC"], R_BPCs = mdMSMS["BPC"];
+    std::vector<SpectrumRawTypes::Mass> R_isoStarts = mdMSMS["isolationRangeMin"], R_isoEnds = mdMSMS["isolationRangeMax"];
+    
+    const std::vector<std::string> cn = mdMSMS.names();
+    
+    if (std::find(cn.begin(), cn.end(), "isolationStart") != cn.end()) // non-IMS
+    {
+        meta.second.scans = std::move(R_scans);
+        meta.second.times = std::move(R_times);
+        meta.second.TICs = std::move(R_TICs);
+        meta.second.BPCs = std::move(R_BPCs);
+        
+        for (size_t i=0; i<R_isoStarts.size(); ++i)
+            meta.second.isolationRanges.emplace_back(makeNumRange(R_isoStarts[i], R_isoEnds[i]));
+    }
+    else
+    {
+        std::vector<SpectrumRawTypes::Scan> R_subScans = mdMSMS["subScan"], R_subScanEnds;
+        if (std::find(cn.begin(), cn.end(), "subScanEnd") != cn.end())
+            R_subScanEnds = Rcpp::as<std::vector<SpectrumRawTypes::Scan>>(mdMSMS["subScanEnd"]);
+        
+        SpectrumRawTypes::Scan curScan;
+        frameMSMSInfo curFI;
+        for (size_t i=0; i<R_scans.size(); ++i)
+        {
+            const SpectrumRawTypes::Scan sc = R_scans[i];
+            if (i == 0 || curScan != sc)
+            {
+                curScan = sc;
+                meta.second.scans.push_back(sc);
+                meta.second.times.push_back(R_times[i]);
+                meta.second.TICs.push_back(R_TICs[i]);
+                meta.second.BPCs.push_back(R_BPCs[i]);
+                if (!curFI.empty())
+                {
+                    meta.second.MSMSFrames.emplace_back(std::move(curFI));
+                    curFI.clear();
+                }
+            }
+            curFI.isolationRanges.emplace_back(makeNumRange(R_isoStarts[i], R_isoEnds[i]));
+            curFI.subScans.push_back(R_subScans[i]);
+            if (!R_subScanEnds.empty())
+                curFI.subScanEnds.push_back(R_subScanEnds[i]);
+        }
+        if (!curFI.empty())
+            meta.second.MSMSFrames.emplace_back(std::move(curFI));
+    }
     
     backend.emplaceSpecMeta(std::move(meta));
 }

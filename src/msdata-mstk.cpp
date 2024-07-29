@@ -16,26 +16,13 @@ MSToolkit::MSReader getMSTKReader(void)
     return ret;
 }
 
-}
-
-
-int MSReadBackendMSTK::backends = 0;
-
-// [[Rcpp::interfaces(r, cpp)]]
-
-MSReadBackend::ThreadDataType MSReadBackendMSTK::doGetThreadData(void) const
-{
-    return std::make_shared<MSToolkit::MSReader>(getMSTKReader());
-}
-
-SpectrumRaw MSReadBackendMSTK::doReadSpectrum(const ThreadDataType &tdata, SpectrumRawTypes::Scan scan) const
+SpectrumRaw getMSTKSpec(MSToolkit::MSReader *msr, const std::string &file, SpectrumRawTypes::Scan scan)
 {
     MSToolkit::Spectrum s;
-    auto *msr = reinterpret_cast<MSToolkit::MSReader *>(tdata.get());
     
-    if (!msr->readFile(getCurrentFile().c_str(), s, scan) || s.getScanNumber() == 0)
+    if (!msr->readFile(file.c_str(), s, scan) || s.getScanNumber() == 0)
         Rcpp::stop("Abort: invalid spectrum scan index: %d", scan);
-
+    
     const bool hasMob = s.hasIonMobilityArray();
     SpectrumRaw ret(s.size(), hasMob);
     
@@ -49,6 +36,38 @@ SpectrumRaw MSReadBackendMSTK::doReadSpectrum(const ThreadDataType &tdata, Spect
         for(size_t i=0; i<ret.size(); ++i)
             ret.setPeak(i, s.at(i).mz, s.at(i).intensity);
     }
+    
+    return ret;
+}
+
+}
+
+
+int MSReadBackendMSTK::backends = 0;
+
+// [[Rcpp::interfaces(r, cpp)]]
+
+MSReadBackend::ThreadDataType MSReadBackendMSTK::doGetThreadData(void) const
+{
+    return std::make_shared<MSToolkit::MSReader>(getMSTKReader());
+}
+
+SpectrumRaw MSReadBackendMSTK::doReadSpectrum(const ThreadDataType &tdata, SpectrumRawTypes::MSLevel MSLevel,
+                                              const SpectrumRawSelection &scanSel) const
+{
+    auto *msr = reinterpret_cast<MSToolkit::MSReader *>(tdata.get());
+    const auto &meta = getSpecMetadata();
+    
+    if (MSLevel == SpectrumRawTypes::MSLevel::MS1)
+        return getMSTKSpec(msr, getCurrentFile(), meta.first.scans[scanSel.index]);
+    if (scanSel.MSMSFrameIndices.empty())
+        return getMSTKSpec(msr, getCurrentFile(), meta.second.scans[scanSel.index]);
+    
+    // if we are here we need to get MS2 data from an IMS frame...
+ 
+    SpectrumRaw ret;
+    for (const auto i : scanSel.MSMSFrameIndices)
+        ret.append(getMSTKSpec(msr, getCurrentFile(), meta.second.MSMSFrames[scanSel.index].subScans[i]));
     
     return ret;
 }

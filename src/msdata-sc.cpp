@@ -8,6 +8,21 @@
 #include "StreamCraft/StreamCraft_utils.cpp"
 #undef PUGIXML_PATH
 
+namespace {
+
+SpectrumRaw getSCSpectrum(sc::MZML *mzml, SpectrumRawTypes::Scan scan)
+{
+    const auto s = mzml->get_spectrum(scan);
+    
+    SpectrumRaw ret(s.array_length);
+    // UNDONE: handle IMS data
+    for(int i=0; i<s.array_length; ++i)
+        ret.setPeak(i, s.binary_data[0][i], s.binary_data[1][i]); // UNDONE: OK to assume it's always this order?
+    return ret;
+}
+
+}
+
 // [[Rcpp::interfaces(r, cpp)]]
 
 MSReadBackend::ThreadDataType MSReadBackendSC::doGetThreadData(void) const
@@ -15,15 +30,23 @@ MSReadBackend::ThreadDataType MSReadBackendSC::doGetThreadData(void) const
     return std::make_shared<sc::MZML>(getCurrentFile());
 }
 
-SpectrumRaw MSReadBackendSC::doReadSpectrum(const ThreadDataType &tdata, SpectrumRawTypes::Scan scan) const
+SpectrumRaw MSReadBackendSC::doReadSpectrum(const ThreadDataType &tdata, SpectrumRawTypes::MSLevel MSLevel,
+                                            const SpectrumRawSelection &scanSel) const
 {
     auto *mzml = reinterpret_cast<sc::MZML *>(tdata.get());
-    const auto s = mzml->get_spectrum(scan);
+    const auto &meta = getSpecMetadata();
     
-    SpectrumRaw ret(s.array_length);
-    for(int i=0; i<s.array_length; ++i)
-        ret.setPeak(i, s.binary_data[0][i], s.binary_data[1][i]); // UNDONE: OK to assume it's always this order?
-        
+    if (MSLevel == SpectrumRawTypes::MSLevel::MS1)
+        return getSCSpectrum(mzml, meta.first.scans[scanSel.index]);
+    if (scanSel.MSMSFrameIndices.empty())
+        return getSCSpectrum(mzml, meta.second.scans[scanSel.index]);
+    
+    // if we are here we need to get MS2 data from an IMS frame...
+    
+    SpectrumRaw ret;
+    for (const auto i : scanSel.MSMSFrameIndices)
+        ret.append(getSCSpectrum(mzml, meta.second.MSMSFrames[scanSel.index].subScans[i]));
+    
     return ret;
 }
 

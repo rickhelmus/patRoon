@@ -103,7 +103,13 @@ struct SpectrumRawFilter
     SpectrumRawFilter &setTopMost(unsigned t) { topMost = t; return *this; }
 };
 
-std::vector<SpectrumRawTypes::Scan> getSpecScanIndices(const SpectrumRawMetadata &specMeta,
+struct SpectrumRawSelection
+{
+    SpectrumRawTypes::Scan index;
+    std::vector<size_t> MSMSFrameIndices;
+};
+
+std::vector<SpectrumRawSelection> getSpecRawSelections(const SpectrumRawMetadata &specMeta,
                                                        const NumRange<SpectrumRawTypes::Time> &timeRange,
                                                        SpectrumRawTypes::MSLevel MSLevel,
                                                        const NumRange<SpectrumRawTypes::Mass> &isoRange);

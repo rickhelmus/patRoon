@@ -37,7 +37,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // getScans
-std::vector<SpectrumRawTypes::Scan> getScans(const MSReadBackend& backend, SpectrumRawTypes::Mass timeStart, SpectrumRawTypes::Mass timeEnd, int MSLevel, SpectrumRawTypes::Mass isoStart, SpectrumRawTypes::Mass isoEnd);
+Rcpp::DataFrame getScans(const MSReadBackend& backend, SpectrumRawTypes::Mass timeStart, SpectrumRawTypes::Mass timeEnd, int MSLevel, SpectrumRawTypes::Mass isoStart, SpectrumRawTypes::Mass isoEnd);
 RcppExport SEXP _patRoon_getScans(SEXP backendSEXP, SEXP timeStartSEXP, SEXP timeEndSEXP, SEXP MSLevelSEXP, SEXP isoStartSEXP, SEXP isoEndSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;

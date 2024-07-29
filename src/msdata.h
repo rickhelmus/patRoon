@@ -18,7 +18,8 @@ private:
     virtual void doOpen(const std::string &file) = 0;
     virtual void doClose(void) = 0;
     virtual ThreadDataType doGetThreadData(void) const = 0;
-    virtual SpectrumRaw doReadSpectrum(const ThreadDataType &tdata, SpectrumRawTypes::Scan scan) const = 0;
+    virtual SpectrumRaw doReadSpectrum(const ThreadDataType &tdata, SpectrumRawTypes::MSLevel MSLevel,
+                                       const SpectrumRawSelection &scanSel) const = 0;
     
 public:
     MSReadBackend(void) = default;
@@ -30,7 +31,8 @@ public:
     const std::string &getCurrentFile(void) const { return currentFile; }
 
     ThreadDataType getThreadData(void) const { return doGetThreadData(); }
-    SpectrumRaw readSpectrum(const ThreadDataType &tdata, int index) const { return doReadSpectrum(tdata, index); };
+    SpectrumRaw readSpectrum(const ThreadDataType &tdata, SpectrumRawTypes::MSLevel MSLevel,
+                             const SpectrumRawSelection &scanSel) const { return doReadSpectrum(tdata, MSLevel, scanSel); };
     const SpectrumRawMetadata &getSpecMetadata(void) const { return specMetadata; }
     void emplaceSpecMeta(SpectrumRawMetadata &&msd) { specMetadata = std::move(msd); }
 };

@@ -36,9 +36,12 @@ MSReadBackend::ThreadDataType MSReadBackendOTIMS::doGetThreadData(void) const
     return std::make_shared<TIMSDecompBufferPair>(getTIMSDecompBuffers(handle->get_decomp_buffer_size()));
 }
 
-SpectrumRaw MSReadBackendOTIMS::doReadSpectrum(const ThreadDataType &tdata, SpectrumRawTypes::Scan scan) const
+SpectrumRaw MSReadBackendOTIMS::doReadSpectrum(const ThreadDataType &tdata, SpectrumRawTypes::MSLevel MSLevel,
+                                               const SpectrumRawSelection &scanSel) const
 {
-    auto &tframe = handle->get_frame(scan);
+    const auto &meta = getSpecMetadata();
+    const auto &metaMS = (MSLevel == SpectrumRawTypes::MSLevel::MS1) ? meta.first : meta.second;
+    auto &tframe = handle->get_frame(metaMS.scans[scanSel.index]);
     if (tframe.num_peaks == 0)
         return SpectrumRaw();
     
@@ -49,6 +52,8 @@ SpectrumRaw MSReadBackendOTIMS::doReadSpectrum(const ThreadDataType &tdata, Spec
     std::vector<double> mzs(tframe.num_peaks), mobilities(tframe.num_peaks);
     tframe.save_to_buffs(nullptr, IDs.data(), nullptr, intensities.data(), mzs.data(), mobilities.data(), nullptr);
     tframe.close();
+    
+    // UNDONE: subset frame spectra if needed
     
     SpectrumRaw ret(tframe.num_peaks, true);
     for(size_t i=0; i<ret.size(); ++i)

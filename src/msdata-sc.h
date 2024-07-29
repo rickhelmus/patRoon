@@ -14,7 +14,8 @@ class MSReadBackendSC: public MSReadBackend
     void doOpen(const std::string &) override { }
     void doClose(void) override { }
     ThreadDataType doGetThreadData(void) const override;
-    SpectrumRaw doReadSpectrum(const ThreadDataType &tdata, SpectrumRawTypes::Scan scan) const override;
+    SpectrumRaw doReadSpectrum(const ThreadDataType &tdata, SpectrumRawTypes::MSLevel MSLevel,
+                               const SpectrumRawSelection &scanSel) const override;
     
 public:
     MSReadBackendSC(void) { }

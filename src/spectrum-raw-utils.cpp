@@ -17,13 +17,15 @@ SpectrumRaw flattenSpectra(const std::vector<SpectrumRaw> &spectra)
 
 }
 
-std::vector<SpectrumRawTypes::Scan> getSpecScanIndices(const SpectrumRawMetadata &specMeta,
+std::vector<SpectrumRawSelection> getSpecRawSelections(const SpectrumRawMetadata &specMeta,
                                                        const NumRange<SpectrumRawTypes::Time> &timeRange,
                                                        SpectrumRawTypes::MSLevel MSLevel,
                                                        const NumRange<SpectrumRawTypes::Mass> &isoRange)
 {
     const SpectrumRawMetadataMS &metaMS = (MSLevel == SpectrumRawTypes::MSLevel::MS1) ? specMeta.first : specMeta.second;
-    std::vector<SpectrumRawTypes::Scan> ret;
+    std::vector<SpectrumRawSelection> ret;
+    const bool isMSMS = MSLevel == SpectrumRawTypes::MSLevel::MS2;
+    const bool isIMSMSMS = isMSMS && specMeta.second.isolationRanges.empty();
     
     const auto startIt = std::lower_bound(metaMS.times.begin(), metaMS.times.end(), timeRange.start);
     if (startIt != metaMS.times.end())
@@ -31,9 +33,21 @@ std::vector<SpectrumRawTypes::Scan> getSpecScanIndices(const SpectrumRawMetadata
         for (size_t i=std::distance(metaMS.times.begin(), startIt);
              i<metaMS.times.size() && metaMS.times[i]<=timeRange.end; ++i)
         {
-            if (MSLevel == SpectrumRawTypes::MSLevel::MS2 && !isoRange.inside(specMeta.second.isolationRanges[i]))
+            SpectrumRawSelection sel;
+            if (isIMSMSMS)
+            {
+                for (size_t j=0; j<specMeta.second.MSMSFrames[i].isolationRanges.size(); ++j)
+                {
+                    if (isoRange.overlap(specMeta.second.MSMSFrames[i].isolationRanges[j]))
+                        sel.MSMSFrameIndices.push_back(j);
+                }
+                if (sel.MSMSFrameIndices.empty())
+                    continue; // no MS/MS data for this one
+            }
+            else if (isMSMS && !isoRange.overlap(specMeta.second.isolationRanges[i]))
                 continue;
-            ret.push_back(metaMS.scans[i]);
+            sel.index = i;
+            ret.emplace_back(std::move(sel));
         }
     }
     

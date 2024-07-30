@@ -6,6 +6,12 @@ void SpectrumRaw::append(SpectrumRawTypes::Mass mz, SpectrumRawTypes::Intensity 
     intensities.push_back(inten);
 }
 
+void SpectrumRaw::append(SpectrumRawTypes::Mass mz, SpectrumRawTypes::Intensity inten, SpectrumRawTypes::Mobility mob)
+{
+    append(mz, inten);
+    mobilities.push_back(mob);
+}
+
 void SpectrumRaw::append(const SpectrumRaw &sp)
 {
     mzs.insert(mzs.end(), sp.getMZs().begin(), sp.getMZs().end());

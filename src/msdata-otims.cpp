@@ -52,12 +52,29 @@ SpectrumRaw MSReadBackendOTIMS::doReadSpectrum(const ThreadDataType &tdata, Spec
     std::vector<double> mzs(tframe.num_peaks), mobilities(tframe.num_peaks);
     tframe.save_to_buffs(nullptr, IDs.data(), nullptr, intensities.data(), mzs.data(), mobilities.data(), nullptr);
     tframe.close();
-    
-    // UNDONE: subset frame spectra if needed
-    
-    SpectrumRaw ret(tframe.num_peaks, true);
-    for(size_t i=0; i<ret.size(); ++i)
-        ret.setPeak(i, mzs[i], intensities[i], mobilities[i]);
+
+    SpectrumRaw ret;
+    for (size_t i=0; i<tframe.num_peaks; ++i)
+    {
+        if (!scanSel.MSMSFrameIndices.empty())
+        {
+            bool inRange = false;
+            const auto curScanID = IDs[i];
+            for (size_t j=0; j<scanSel.MSMSFrameIndices.size() && !inRange; ++j)
+            {
+                inRange = (curScanID >= meta.second.MSMSFrames[scanSel.index].subScans[j] &&
+                    curScanID <= meta.second.MSMSFrames[scanSel.index].subScanEnds[j]);
+            }
+            if (!inRange)
+            {
+                // try again with next scan: increment until last element (i will be incremented again in main for loop)
+                for (; i < (tframe.num_peaks-1) && IDs[i+1] == curScanID; ++i)
+                    ;
+                continue;
+            }
+        }
+        ret.append(mzs[i], intensities[i], mobilities[i]);
+    }
     
     return ret;
 }

@@ -300,7 +300,7 @@ void setSpecMetadata(MSReadBackend &backend, const Rcpp::DataFrame &mdMS, const 
     
     const std::vector<std::string> cn = mdMSMS.names();
     
-    if (std::find(cn.begin(), cn.end(), "isolationRangeMin") != cn.end()) // non-IMS
+    if (std::find(cn.begin(), cn.end(), "subScan") == cn.end()) // non-IMS
     {
         meta.second.scans = std::move(R_scans);
         meta.second.times = std::move(R_times);

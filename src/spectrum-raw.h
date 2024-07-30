@@ -80,6 +80,7 @@ public:
     const auto &getMobilities(void) const { return mobilities; }
     
     void append(SpectrumRawTypes::Mass mz, SpectrumRawTypes::Intensity inten);
+    void append(SpectrumRawTypes::Mass mz, SpectrumRawTypes::Intensity inten, SpectrumRawTypes::Mobility mob);
     void append(const SpectrumRaw &sp);
     void insert(size_t i, SpectrumRawTypes::Mass mz, SpectrumRawTypes::Intensity inten);
     void setPeak(size_t i, SpectrumRawTypes::Mass mz, SpectrumRawTypes::Intensity inten) { mzs[i] = mz; intensities[i] = inten; }

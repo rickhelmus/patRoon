@@ -164,5 +164,5 @@ void MSReadBackendMSTK::generateSpecMetadata(void)
         meta.second = std::move(metaMSMSFrames);
     }
 
-    emplaceSpecMeta(std::move(meta));
+    setSpecMetadata(std::move(meta));
 }

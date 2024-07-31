@@ -34,7 +34,7 @@ public:
     SpectrumRaw readSpectrum(const ThreadDataType &tdata, SpectrumRawTypes::MSLevel MSLevel,
                              const SpectrumRawSelection &scanSel) const { return doReadSpectrum(tdata, MSLevel, scanSel); };
     const SpectrumRawMetadata &getSpecMetadata(void) const { return specMetadata; }
-    void emplaceSpecMeta(SpectrumRawMetadata &&msd) { specMetadata = std::move(msd); }
+    void setSpecMetadata(SpectrumRawMetadata &&msd) { specMetadata = std::move(msd); }
 };
 
 RCPP_EXPOSED_CLASS(MSReadBackend)

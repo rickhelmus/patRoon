@@ -47,7 +47,7 @@ std::vector<SpectrumRawSelection> getSpecRawSelections(const SpectrumRawMetadata
             else if (isMSMS && !isoRange.overlap(specMeta.second.isolationRanges[i]))
                 continue;
             sel.index = i;
-            ret.emplace_back(std::move(sel));
+            ret.push_back(std::move(sel));
         }
     }
     

@@ -308,7 +308,7 @@ void setSpecMetadata(MSReadBackend &backend, const Rcpp::DataFrame &mdMS, const 
         meta.second.BPCs = std::move(R_BPCs);
         
         for (size_t i=0; i<R_isoStarts.size(); ++i)
-            meta.second.isolationRanges.emplace_back(makeNumRange(R_isoStarts[i], R_isoEnds[i]));
+            meta.second.isolationRanges.emplace_back(R_isoStarts[i], R_isoEnds[i]);
     }
     else
     {
@@ -330,20 +330,20 @@ void setSpecMetadata(MSReadBackend &backend, const Rcpp::DataFrame &mdMS, const 
                 meta.second.BPCs.push_back(R_BPCs[i]);
                 if (!curFI.empty())
                 {
-                    meta.second.MSMSFrames.emplace_back(std::move(curFI));
+                    meta.second.MSMSFrames.push_back(std::move(curFI));
                     curFI.clear();
                 }
             }
-            curFI.isolationRanges.emplace_back(makeNumRange(R_isoStarts[i], R_isoEnds[i]));
+            curFI.isolationRanges.emplace_back(R_isoStarts[i], R_isoEnds[i]);
             curFI.subScans.push_back(R_subScans[i]);
             if (!R_subScanEnds.empty())
                 curFI.subScanEnds.push_back(R_subScanEnds[i]);
         }
         if (!curFI.empty())
-            meta.second.MSMSFrames.emplace_back(std::move(curFI));
+            meta.second.MSMSFrames.push_back(std::move(curFI));
     }
     
-    backend.emplaceSpecMeta(std::move(meta));
+    backend.setSpecMetadata(std::move(meta));
 }
 
 // [[Rcpp::export]]

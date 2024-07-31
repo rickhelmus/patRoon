@@ -77,13 +77,94 @@ void MSReadBackendMSTK::generateSpecMetadata(void)
     if (getCurrentFile().empty())
         return;
 
-    auto rd = getMSTKReader();
+    auto MSTKReader = getMSTKReader();
     // load first spectrum to get file size and see if we have IMS data
-    MSToolkit::Spectrum spec;
-    rd.readFile(getCurrentFile().c_str(), spec, 0, true);
-    const size_t lastScan = rd.getLastScan();
-    const bool haveIMS = spec.hasIonMobilityArray();
+    MSToolkit::Spectrum firstSpec;
+    MSTKReader.readFile(getCurrentFile().c_str(), firstSpec, 0, true);
+    const size_t lastScan = MSTKReader.getLastScan();
+    const bool haveIMS = firstSpec.hasIonMobilityArray();
     
+    SpectrumRawMetadata meta;
+    
+    ThreadExceptionHandler exHandler;
+    
+    // UNDONE: make num_threads configurable
+    #pragma omp parallel num_threads(12)
+    {
+        auto rd = getMSTKReader();
+        MSToolkit::Spectrum spec;
+        SpectrumRawMetadata threadMeta;
+        
+        #pragma omp for schedule(static) nowait
+        for (size_t i=1; i<=lastScan; ++i)
+        {
+            exHandler.run([&]
+            {
+                rd.readFile(getCurrentFile().c_str(), spec, i, true);
+                const bool isMS1 = spec.getMsLevel() == 1;
+                
+                SpectrumRawMetadataMS *curMS1MD = (isMS1) ? &threadMeta.first : &threadMeta.second;
+                curMS1MD->scans.push_back(spec.getScanNumber());
+                curMS1MD->times.push_back(spec.getRTime() * 60); // NOTE: MSTK takes minutes
+                curMS1MD->TICs.push_back(spec.getTIC());
+                curMS1MD->BPCs.push_back(spec.getBPI());
+                
+                if (!isMS1)
+                    threadMeta.second.isolationRanges.emplace_back(spec.getSelWindowLower(), spec.getSelWindowUpper());
+            });
+        }
+        
+        #pragma omp for schedule(static) ordered
+        for(int i=0; i<getOMPNumThreads(); ++i)
+        {
+            exHandler.run([&]
+            {
+                #pragma omp ordered
+                {
+                    meta.first.append(threadMeta.first);
+                    meta.second.append(threadMeta.second);
+                }
+            });
+        }
+    }
+
+    exHandler.reThrow();
+    
+
+    if (haveIMS)
+    {
+        // For IMS-MS/MS data, the different spectra inside are frame are stored in separate spectra
+        // --> move these spectra to MSMSFrames structs, so our main table only contains separate frames
+        
+        SpectrumRawMetadataMSMS metaMSMSFrames;
+        for (size_t i=0; i<meta.second.scans.size(); ++i)
+        {
+            metaMSMSFrames.scans.push_back(meta.second.scans[i]);
+            metaMSMSFrames.times.push_back(meta.second.times[i]);
+            metaMSMSFrames.TICs.push_back(meta.second.TICs[i]);
+            metaMSMSFrames.BPCs.push_back(meta.second.BPCs[i]);
+            
+            frameMSMSInfo fi;
+            const auto curTime = meta.second.times[i];
+            bool finished = false;
+            while (!finished)
+            {
+                fi.isolationRanges.push_back(meta.second.isolationRanges[i]);
+                fi.subScans.push_back(meta.second.scans[i]);
+                ++i;
+                if (i > lastScan)
+                    break;
+                if (!compareTol(curTime, meta.second.times[i]))
+                    finished = true; // reached next frame
+            }
+            metaMSMSFrames.MSMSFrames.push_back(std::move(fi));
+            if (finished)
+                --i; // we reached one spec to far to find out we're finished
+        }
+        meta.second = std::move(metaMSMSFrames);
+    }
+    
+#if 0
     SpectrumRawMetadata meta;
     
     // UNDONE: disabled OpenMP for now
@@ -98,8 +179,6 @@ void MSReadBackendMSTK::generateSpecMetadata(void)
         curMS1MD->times.push_back(spec.getRTime() * 60); // NOTE: MSTK takes minutes
         curMS1MD->TICs.push_back(spec.getTIC());
         curMS1MD->BPCs.push_back(spec.getBPI());
-        
-        assert(curMS1MD->scans.size() == curMS1MD->times.size());
         
         if (!isMS1)
         {
@@ -129,7 +208,7 @@ void MSReadBackendMSTK::generateSpecMetadata(void)
         }
     }
     
-#if 0
+#elif 0
     // load first spectrum to get file size and see if we have IMS data
     auto rd = getMSTKReader();
     MSToolkit::Spectrum firstSpec;

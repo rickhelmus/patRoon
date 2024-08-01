@@ -15,6 +15,7 @@ using Mass = float;
 using Mobility = float;
 using Intensity = float; // UNDONE: or unsigned?
 using IsolationRange = NumRange<Mass>;
+using MobilityRange = NumRange<Mobility>;
 
 enum class MSLevel { MS1, MS2 };
 

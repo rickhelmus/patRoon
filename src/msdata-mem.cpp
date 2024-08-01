@@ -6,8 +6,11 @@
 // [[Rcpp::interfaces(r, cpp)]]
 
 SpectrumRaw MSReadBackendMem::doReadSpectrum(const ThreadDataType &tdata, SpectrumRawTypes::MSLevel MSLevel,
-                                             const SpectrumRawSelection &scanSel) const
+                                             const SpectrumRawSelection &scanSel,
+                                             const SpectrumRawTypes::MobilityRange &mobRange) const
 {
+    // UNDONE: handle mobRange
+    
     if (MSLevel == SpectrumRawTypes::MSLevel::MS1)
         return spectraMS[scanSel.index];
     if (scanSel.MSMSFrameIndices.empty())

@@ -37,7 +37,8 @@ MSReadBackend::ThreadDataType MSReadBackendOTIMS::doGetThreadData(void) const
 }
 
 SpectrumRaw MSReadBackendOTIMS::doReadSpectrum(const ThreadDataType &tdata, SpectrumRawTypes::MSLevel MSLevel,
-                                               const SpectrumRawSelection &scanSel) const
+                                               const SpectrumRawSelection &scanSel,
+                                               const SpectrumRawTypes::MobilityRange &mobRange) const
 {
     const auto &meta = getSpecMetadata();
     const auto &metaMS = (MSLevel == SpectrumRawTypes::MSLevel::MS1) ? meta.first : meta.second;
@@ -56,6 +57,15 @@ SpectrumRaw MSReadBackendOTIMS::doReadSpectrum(const ThreadDataType &tdata, Spec
     SpectrumRaw ret;
     for (size_t i=0; i<tframe.num_peaks; ++i)
     {
+        if (mobRange.isSet())
+        {
+            // NOTE: mobilities are sorted  from high to low
+            if (mobilities[i] > mobRange.start)
+                continue;
+            if (mobilities[i] < mobRange.end)
+                break;
+        }
+        
         if (!scanSel.MSMSFrameIndices.empty())
         {
             bool inRange = false;

@@ -16,7 +16,8 @@ class MSReadBackendMem: public MSReadBackend
     void doClose(void) override { spectraMS.clear(); spectraMS2.clear(); }
     ThreadDataType doGetThreadData(void) const override { return nullptr; };
     SpectrumRaw doReadSpectrum(const ThreadDataType &tdata, SpectrumRawTypes::MSLevel MSLevel,
-                               const SpectrumRawSelection &scanSel) const override;
+                               const SpectrumRawSelection &scanSel,
+                               const SpectrumRawTypes::MobilityRange &mobRange) const override;
     
 public:
     MSReadBackendMem(void) { }

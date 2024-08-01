@@ -10,12 +10,13 @@
 
 namespace {
 
-SpectrumRaw getSCSpectrum(sc::MZML *mzml, SpectrumRawTypes::Scan scan)
+SpectrumRaw getSCSpectrum(sc::MZML *mzml, SpectrumRawTypes::Scan scan,
+                          const SpectrumRawTypes::MobilityRange &mobRange)
 {
     const auto s = mzml->get_spectrum(scan);
     
     SpectrumRaw ret(s.array_length);
-    // UNDONE: handle IMS data
+    // UNDONE: handle IMS data/mobRange
     for(int i=0; i<s.array_length; ++i)
         ret.setPeak(i, s.binary_data[0][i], s.binary_data[1][i]); // UNDONE: OK to assume it's always this order?
     return ret;
@@ -31,21 +32,22 @@ MSReadBackend::ThreadDataType MSReadBackendSC::doGetThreadData(void) const
 }
 
 SpectrumRaw MSReadBackendSC::doReadSpectrum(const ThreadDataType &tdata, SpectrumRawTypes::MSLevel MSLevel,
-                                            const SpectrumRawSelection &scanSel) const
+                                            const SpectrumRawSelection &scanSel,
+                                            const SpectrumRawTypes::MobilityRange &mobRange) const
 {
     auto *mzml = reinterpret_cast<sc::MZML *>(tdata.get());
     const auto &meta = getSpecMetadata();
     
     if (MSLevel == SpectrumRawTypes::MSLevel::MS1)
-        return getSCSpectrum(mzml, meta.first.scans[scanSel.index]);
+        return getSCSpectrum(mzml, meta.first.scans[scanSel.index], mobRange);
     if (scanSel.MSMSFrameIndices.empty())
-        return getSCSpectrum(mzml, meta.second.scans[scanSel.index]);
+        return getSCSpectrum(mzml, meta.second.scans[scanSel.index], mobRange);
     
     // if we are here we need to get MS2 data from an IMS frame...
     
     SpectrumRaw ret;
     for (const auto i : scanSel.MSMSFrameIndices)
-        ret.append(getSCSpectrum(mzml, meta.second.MSMSFrames[scanSel.index].subScans[i]));
+        ret.append(getSCSpectrum(mzml, meta.second.MSMSFrames[scanSel.index].subScans[i], mobRange));
     
     return ret;
 }

@@ -73,7 +73,9 @@ template <typename T> struct NumRange
     NumRange(void) = default;
     NumRange(T s, T e) : start(s), end(e) { }
     void set(T s, T e) { start = s; end = e; }
+    bool isSet(void) const { return start != 0 || end != 0; }
     bool overlap(const NumRange &o, T tol = 1E-8) const { return numberLTE(start, o.end, tol) && numberGTE(end, o.start, tol); }
+    bool within(T v, T tol = 1E-8) const { return numberGTE(start, v, tol) && numberLTE(end, v, tol); }
 };
 template <typename T> NumRange<T> makeNumRange(T s, T e) { return NumRange<T>(s, e); }
 

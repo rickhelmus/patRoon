@@ -19,7 +19,8 @@ private:
     virtual void doClose(void) = 0;
     virtual ThreadDataType doGetThreadData(void) const = 0;
     virtual SpectrumRaw doReadSpectrum(const ThreadDataType &tdata, SpectrumRawTypes::MSLevel MSLevel,
-                                       const SpectrumRawSelection &scanSel) const = 0;
+                                       const SpectrumRawSelection &scanSel,
+                                       const SpectrumRawTypes::MobilityRange &mobRange) const = 0;
     
 public:
     MSReadBackend(void) = default;
@@ -32,7 +33,9 @@ public:
 
     ThreadDataType getThreadData(void) const { return doGetThreadData(); }
     SpectrumRaw readSpectrum(const ThreadDataType &tdata, SpectrumRawTypes::MSLevel MSLevel,
-                             const SpectrumRawSelection &scanSel) const { return doReadSpectrum(tdata, MSLevel, scanSel); };
+                             const SpectrumRawSelection &scanSel,
+                             const SpectrumRawTypes::MobilityRange &mobRange) const
+        { return doReadSpectrum(tdata, MSLevel, scanSel, mobRange); };
     const SpectrumRawMetadata &getSpecMetadata(void) const { return specMetadata; }
     void setSpecMetadata(SpectrumRawMetadata &&msd) { specMetadata = std::move(msd); }
 };

@@ -16,7 +16,8 @@ MSToolkit::MSReader getMSTKReader(void)
     return ret;
 }
 
-SpectrumRaw getMSTKSpec(MSToolkit::MSReader *msr, const std::string &file, SpectrumRawTypes::Scan scan)
+SpectrumRaw getMSTKSpec(MSToolkit::MSReader *msr, const std::string &file, SpectrumRawTypes::Scan scan,
+                        const SpectrumRawTypes::MobilityRange &mobRange)
 {
     MSToolkit::Spectrum s;
     
@@ -29,7 +30,10 @@ SpectrumRaw getMSTKSpec(MSToolkit::MSReader *msr, const std::string &file, Spect
     if (hasMob)
     {
         for(size_t i=0; i<ret.size(); ++i)
-            ret.setPeak(i, s.at(i).mz, s.at(i).intensity, s.atIM(i));
+        {
+            if (!mobRange.isSet() || mobRange.within(s.atIM(i)))
+                ret.setPeak(i, s.at(i).mz, s.at(i).intensity, s.atIM(i));
+        }
     }
     else
     {
@@ -53,21 +57,22 @@ MSReadBackend::ThreadDataType MSReadBackendMSTK::doGetThreadData(void) const
 }
 
 SpectrumRaw MSReadBackendMSTK::doReadSpectrum(const ThreadDataType &tdata, SpectrumRawTypes::MSLevel MSLevel,
-                                              const SpectrumRawSelection &scanSel) const
+                                              const SpectrumRawSelection &scanSel,
+                                              const SpectrumRawTypes::MobilityRange &mobRange) const
 {
     auto *msr = reinterpret_cast<MSToolkit::MSReader *>(tdata.get());
     const auto &meta = getSpecMetadata();
     
     if (MSLevel == SpectrumRawTypes::MSLevel::MS1)
-        return getMSTKSpec(msr, getCurrentFile(), meta.first.scans[scanSel.index]);
+        return getMSTKSpec(msr, getCurrentFile(), meta.first.scans[scanSel.index], mobRange);
     if (scanSel.MSMSFrameIndices.empty())
-        return getMSTKSpec(msr, getCurrentFile(), meta.second.scans[scanSel.index]);
+        return getMSTKSpec(msr, getCurrentFile(), meta.second.scans[scanSel.index], mobRange);
     
     // if we are here we need to get MS2 data from an IMS frame...
  
     SpectrumRaw ret;
     for (const auto i : scanSel.MSMSFrameIndices)
-        ret.append(getMSTKSpec(msr, getCurrentFile(), meta.second.MSMSFrames[scanSel.index].subScans[i]));
+        ret.append(getMSTKSpec(msr, getCurrentFile(), meta.second.MSMSFrames[scanSel.index].subScans[i], mobRange));
     
     return ret;
 }

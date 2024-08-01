@@ -16,8 +16,8 @@ namespace {
 
 template<typename OutType, typename FuncType, typename... Args>
 OutType applyMSData(const MSReadBackend &backend, SpectrumRawTypes::MSLevel MSLevel,
-                    const std::vector<SpectrumRawSelection> &scanSels, FuncType func,
-                    Args... args)
+                    const std::vector<SpectrumRawSelection> &scanSels,
+                    const SpectrumRawTypes::MobilityRange &mobRange, FuncType func, Args... args)
 {
     OutType ret(scanSels.size());
     ThreadExceptionHandler exHandler;
@@ -29,7 +29,7 @@ OutType applyMSData(const MSReadBackend &backend, SpectrumRawTypes::MSLevel MSLe
         #pragma omp for
         for (size_t i=0; i<scanSels.size(); ++i)
         {
-            exHandler.run([&]{ ret[i] = func(backend.readSpectrum(tdata, MSLevel, scanSels[i]), args...); });
+            exHandler.run([&]{ ret[i] = func(backend.readSpectrum(tdata, MSLevel, scanSels[i], mobRange), args...); });
         }
     }
     
@@ -98,7 +98,8 @@ Rcpp::DataFrame getMSSpectrum(const MSReadBackend &backend, int index)
         return spec;
     };
     
-    const auto spectra = applyMSData<std::vector<SpectrumRaw>>(backend, SpectrumRawTypes::MSLevel::MS1, sels, sfunc);
+    const auto spectra = applyMSData<std::vector<SpectrumRaw>>(backend, SpectrumRawTypes::MSLevel::MS1, sels,
+                                                               SpectrumRawTypes::MobilityRange(), sfunc);
     
     if (!spectra[0].getMobilities().empty())
         return Rcpp::DataFrame::create(Rcpp::Named("mz") = spectra[0].getMZs(),
@@ -142,6 +143,8 @@ Rcpp::DataFrame getScans(const MSReadBackend &backend, SpectrumRawTypes::Mass ti
 Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRawTypes::Mass> &startMZs,
                       const std::vector<SpectrumRawTypes::Mass> &endMZs)
 {
+    // UNDONE: IMS support: mobRange and don't make assumption things are m/z sorted
+    
     // UNDONE: keep this local here?
     struct EICPoint
     {
@@ -190,7 +193,8 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     std::vector<SpectrumRawSelection> sels(specMetaMS.scans.size());
     for (size_t i=0; i<specMetaMS.scans.size(); ++i)
         sels[i].index = i;
-    const auto EICPoints = applyMSData<std::vector<EICPoint>>(backend, SpectrumRawTypes::MSLevel::MS1, sels, sfunc);
+    const auto EICPoints = applyMSData<std::vector<EICPoint>>(backend, SpectrumRawTypes::MSLevel::MS1, sels,
+                                                              SpectrumRawTypes::MobilityRange(), sfunc);
     const auto EPSize = EICPoints.size();
     
     Rcpp::List ret(EICCount);
@@ -351,9 +355,12 @@ Rcpp::List getMSPeakLists(const MSReadBackend &backend, const std::vector<Spectr
                           const std::vector<SpectrumRawTypes::Time> &endTimes,
                           const std::vector<SpectrumRawTypes::Mass> &precursorMZs, int MSLevel,
                           SpectrumRawTypes::Mass isoWindow, const std::string &method,
-                          SpectrumRawTypes::Mass mzWindow, unsigned minAbundance, unsigned topMost,
+                          SpectrumRawTypes::Mass mzWindow, const std::vector<SpectrumRawTypes::Mobility> startMobs,
+                          const std::vector<SpectrumRawTypes::Mobility> endMobs, unsigned minAbundance, unsigned topMost,
                           SpectrumRawTypes::Intensity minIntensityPre, SpectrumRawTypes::Intensity minIntensityPost)
 {
+    // UNDONE: more IMS support: collapse frames and add mobility column to output
+    
     const auto entries = startTimes.size();
     const auto clMethod = clustMethodFromStr(method);
     const auto specMeta = backend.getSpecMetadata();
@@ -376,8 +383,10 @@ Rcpp::List getMSPeakLists(const MSReadBackend &backend, const std::vector<Spectr
                                                        MSLev,
                                                        makeNumRange(precursorMZs[i] - isoWindow, precursorMZs[i] + isoWindow));
                 std::vector<SpectrumRaw> spectra(sels.size());
+                const auto mobRange = makeNumRange(startMobs[i], endMobs[i]);
                 for (size_t j=0; j<sels.size(); ++j)
-                    spectra[j] = filterSpectrumRaw(backend.readSpectrum(tdata, MSLev, sels[j]), specFilter, precursorMZs[i]);
+                    spectra[j] = filterSpectrumRaw(backend.readSpectrum(tdata, MSLev, sels[j], mobRange), specFilter,
+                                                   precursorMZs[i]);
                 averagedSpectra[i] = averageSpectraRaw(spectra, clMethod, mzWindow, true, minIntensityPost, minAbundance);
             });
         }

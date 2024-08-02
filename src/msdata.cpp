@@ -141,49 +141,74 @@ Rcpp::DataFrame getScans(const MSReadBackend &backend, SpectrumRawTypes::Mass ti
 
 // [[Rcpp::export]]
 Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRawTypes::Mass> &startMZs,
-                      const std::vector<SpectrumRawTypes::Mass> &endMZs)
+                      const std::vector<SpectrumRawTypes::Mass> &endMZs,
+                      const std::vector<SpectrumRawTypes::Mobility> &startMobs,
+                      const std::vector<SpectrumRawTypes::Mobility> &endMobs)
 {
-    // UNDONE: IMS support: mobRange and don't make assumption things are m/z sorted
+    // UNDONE: compress output
     
     // UNDONE: keep this local here?
     struct EICPoint
     {
         std::vector<SpectrumRawTypes::Mass> mzs;
         std::vector<SpectrumRawTypes::Intensity> intensities;
+        std::vector<SpectrumRawTypes::Mobility> mobilities;
         EICPoint(void) = default;
-        EICPoint(size_t s) : mzs(s), intensities(s) { }
+        EICPoint(size_t s, bool hasMob) : mzs(s), intensities(s), mobilities((hasMob) ? s : 0) { }
     };
     
     const auto EICCount = startMZs.size();
     
     const auto sfunc = [&](const SpectrumRaw &spec)
     {
-        EICPoint ret(EICCount);
+        const bool hasMob = !spec.getMobilities().empty();
+        EICPoint ret(EICCount, hasMob);
         
         for (size_t i=0; i<EICCount; ++i)
         {
             ret.mzs[i] = ret.intensities[i] = 0.0;
-
-            // NOTE: assume spec is mz sorted
-            const auto mzIt = std::lower_bound(spec.getMZs().begin(), spec.getMZs().end(), startMZs[i]);
-            if (mzIt == spec.getMZs().end())
-                continue;
+            size_t startInd = 0;
             
-            for (size_t j=std::distance(spec.getMZs().begin(), mzIt); j<spec.size(); ++j)
+            // NOTE: for non-IMS data assume spec is mz sorted
+            
+            if (!hasMob)
+            {
+                // use lower bound to speedup search for first mass
+                const auto mzIt = std::lower_bound(spec.getMZs().begin(), spec.getMZs().end(), startMZs[i]);
+                if (mzIt == spec.getMZs().end())
+                    continue;
+                startInd = std::distance(spec.getMZs().begin(), mzIt);
+            }
+            
+            for (size_t j=startInd; j<spec.size(); ++j)
             {
                 const auto mz = spec.getMZs()[j];
+                const auto mob = (hasMob) ? spec.getMobilities()[j] : 0;
                 
-                // NOTE: assume spec is mz sorted
-                if (mz > endMZs[i])
+                if (hasMob)
+                {
+                    if (mz < startMZs[i] || mz > endMZs[i])
+                        continue;
+                    if (mob < startMobs[i] || mob > endMobs[i])
+                        continue; // UNDONE: optimize eg for TIMS data where mobilities are sorted?
+                }
+                else if (mz > endMZs[i])
                     break; 
                 
                 const auto inten = spec.getIntensities()[j];
                 ret.intensities[i] += inten;
                 ret.mzs[i] += mz * inten;
+                if (hasMob)
+                    ret.mobilities[i] += mob * inten;
             }
-            
+
             if (ret.intensities[i] > 0)
-                ret.mzs[i] /= ret.intensities[i]; // weighted mean
+            {
+                // weighted mean
+                ret.mzs[i] /= ret.intensities[i];
+                if (hasMob)
+                    ret.mobilities[i] /= ret.intensities[i];
+            }
         }
         
         return ret;
@@ -197,20 +222,37 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                                                               SpectrumRawTypes::MobilityRange(), sfunc);
     const auto EPSize = EICPoints.size();
     
+    if (EPSize == 0)
+        return Rcpp::List();
+    
+    // NOTE: assume all MS spectra have or have not IMS data
+    const bool hasMob = !EICPoints[0].mobilities.empty();
+    
     Rcpp::List ret(EICCount);
     for (size_t i=0; i<EICCount; ++i)
     {
         std::vector<SpectrumRawTypes::Mass> mzs(EPSize);
         std::vector<SpectrumRawTypes::Intensity> intensities(EPSize);
+        std::vector<SpectrumRawTypes::Mobility> mobilities((hasMob) ? EPSize : 0);
         for (size_t j=0; j<EPSize; ++j)
         {
             mzs[j] = EICPoints[j].mzs[i];
             intensities[j] = EICPoints[j].intensities[i];
+            if (hasMob)
+                mobilities[j] = EICPoints[j].mobilities[i];
         }
 
-        ret[i] = Rcpp::DataFrame::create(Rcpp::Named("time") = specMetaMS.times,
-                                         Rcpp::Named("intensity") = intensities,
-                                         Rcpp::Named("mz") = mzs);
+        auto df = Rcpp::DataFrame::create(Rcpp::Named("time") = specMetaMS.times,
+                                          Rcpp::Named("intensity") = intensities,
+                                          Rcpp::Named("mz") = mzs);
+        if (hasMob)
+        {
+            df["mobility"] = mobilities;
+            // HACK: above assignment converts df to a list: https://stackoverflow.com/a/59369233
+            df = Rcpp::DataFrame(df);
+        }
+        
+        ret[i] = df;
     }
     
     return ret;

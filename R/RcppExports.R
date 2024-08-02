@@ -13,8 +13,8 @@ getScans <- function(backend, timeStart, timeEnd, MSLevel, isoStart, isoEnd) {
     .Call(`_patRoon_getScans`, backend, timeStart, timeEnd, MSLevel, isoStart, isoEnd)
 }
 
-getEICList <- function(backend, startMZs, endMZs) {
-    .Call(`_patRoon_getEICList`, backend, startMZs, endMZs)
+getEICList <- function(backend, startMZs, endMZs, startMobs, endMobs) {
+    .Call(`_patRoon_getEICList`, backend, startMZs, endMZs, startMobs, endMobs)
 }
 
 getMSMetadata <- function(backend, msLevel) {

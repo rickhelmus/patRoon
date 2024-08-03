@@ -145,8 +145,6 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                       const std::vector<SpectrumRawTypes::Mobility> &startMobs,
                       const std::vector<SpectrumRawTypes::Mobility> &endMobs)
 {
-    // UNDONE: compress output
-    
     // UNDONE: keep this local here?
     struct EICPoint
     {
@@ -161,12 +159,11 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     
     const auto sfunc = [&](const SpectrumRaw &spec)
     {
-        const bool hasMob = !spec.getMobilities().empty();
+        const bool hasMob = spec.hasMobilities();
         EICPoint ret(EICCount, hasMob);
         
         for (size_t i=0; i<EICCount; ++i)
         {
-            ret.mzs[i] = ret.intensities[i] = 0.0;
             size_t startInd = 0;
             
             // NOTE: for non-IMS data assume spec is mz sorted
@@ -395,18 +392,23 @@ void setSpecMetadata(MSReadBackend &backend, const Rcpp::DataFrame &mdMS, const 
 // [[Rcpp::export]]
 Rcpp::List getMSPeakLists(const MSReadBackend &backend, const std::vector<SpectrumRawTypes::Time> &startTimes,
                           const std::vector<SpectrumRawTypes::Time> &endTimes,
-                          const std::vector<SpectrumRawTypes::Mass> &precursorMZs, int MSLevel,
+                          const std::vector<SpectrumRawTypes::Mass> &precursorMZs, bool withPrecursor, int MSLevel,
                           SpectrumRawTypes::Mass isoWindow, const std::string &method,
                           SpectrumRawTypes::Mass mzWindow, const std::vector<SpectrumRawTypes::Mobility> startMobs,
                           const std::vector<SpectrumRawTypes::Mobility> endMobs, unsigned minAbundance, unsigned topMost,
-                          SpectrumRawTypes::Intensity minIntensityPre, SpectrumRawTypes::Intensity minIntensityPost)
+                          SpectrumRawTypes::Intensity minIntensityIMS, SpectrumRawTypes::Intensity minIntensityPre,
+                          SpectrumRawTypes::Intensity minIntensityPost)
 {
-    // UNDONE: more IMS support: collapse frames and add mobility column to output
+    // UNDONE: add mobility column to output?
     
     const auto entries = startTimes.size();
     const auto clMethod = clustMethodFromStr(method);
     const auto specMeta = backend.getSpecMetadata();
     const auto specFilter = SpectrumRawFilter().setMinIntensity(minIntensityPre).setTopMost(topMost);
+    const auto specFilterIMS = SpectrumRawFilter()
+        .setMinIntensity(minIntensityIMS)
+        .setTopMost(topMost)
+        .setWithPrecursor(withPrecursor);
     const auto MSLev = (MSLevel == 1) ? SpectrumRawTypes::MSLevel::MS1 : SpectrumRawTypes::MSLevel::MS2;
     
     std::vector<SpectrumRaw> averagedSpectra(entries);
@@ -427,8 +429,18 @@ Rcpp::List getMSPeakLists(const MSReadBackend &backend, const std::vector<Spectr
                 std::vector<SpectrumRaw> spectra(sels.size());
                 const auto mobRange = makeNumRange(startMobs[i], endMobs[i]);
                 for (size_t j=0; j<sels.size(); ++j)
-                    spectra[j] = filterSpectrumRaw(backend.readSpectrum(tdata, MSLev, sels[j], mobRange), specFilter,
-                                                   precursorMZs[i]);
+                {
+                    auto spec = backend.readSpectrum(tdata, MSLev, sels[j], mobRange);
+                    if (!spec.getMobilities().empty())
+                    {
+                        spec = filterIMSFrame(spec, specFilterIMS, precursorMZs[i]);
+                        spec = averageSpectraRaw(spec, frameSubSpecCount(spec), clMethod,
+                                                 mzWindow, false, minIntensityPre, minAbundance);
+                    }
+                    else
+                        spec = filterSpectrumRaw(spec, specFilter, precursorMZs[i]);
+                    spectra[j] = std::move(spec);
+                }
                 averagedSpectra[i] = averageSpectraRaw(spectra, clMethod, mzWindow, true, minIntensityPost, minAbundance);
             });
         }

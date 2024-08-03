@@ -25,8 +25,8 @@ setSpecMetadata <- function(backend, mdMS, mdMSMS) {
     invisible(.Call(`_patRoon_setSpecMetadata`, backend, mdMS, mdMSMS))
 }
 
-getMSPeakLists <- function(backend, startTimes, endTimes, precursorMZs, MSLevel, isoWindow, method, mzWindow, startMobs, endMobs, minAbundance, topMost, minIntensityPre, minIntensityPost) {
-    .Call(`_patRoon_getMSPeakLists`, backend, startTimes, endTimes, precursorMZs, MSLevel, isoWindow, method, mzWindow, startMobs, endMobs, minAbundance, topMost, minIntensityPre, minIntensityPost)
+getMSPeakLists <- function(backend, startTimes, endTimes, precursorMZs, withPrecursor, MSLevel, isoWindow, method, mzWindow, startMobs, endMobs, minAbundance, topMost, minIntensityIMS, minIntensityPre, minIntensityPost) {
+    .Call(`_patRoon_getMSPeakLists`, backend, startTimes, endTimes, precursorMZs, withPrecursor, MSLevel, isoWindow, method, mzWindow, startMobs, endMobs, minAbundance, topMost, minIntensityIMS, minIntensityPre, minIntensityPost)
 }
 
 readMSP <- function(file, pc) {

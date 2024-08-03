@@ -80,18 +80,20 @@ public:
     const auto &getIntensities(void) const { return intensities; }
     const auto &getMobilities(void) const { return mobilities; }
     
+    bool hasMobilities(void) const { return !mobilities.empty(); }
+    
     void append(SpectrumRawTypes::Mass mz, SpectrumRawTypes::Intensity inten);
     void append(SpectrumRawTypes::Mass mz, SpectrumRawTypes::Intensity inten, SpectrumRawTypes::Mobility mob);
     void append(const SpectrumRaw &sp);
     void insert(size_t i, SpectrumRawTypes::Mass mz, SpectrumRawTypes::Intensity inten);
+    void insert(size_t i, SpectrumRawTypes::Mass mz, SpectrumRawTypes::Intensity inten, SpectrumRawTypes::Mobility mob);
     void setPeak(size_t i, SpectrumRawTypes::Mass mz, SpectrumRawTypes::Intensity inten) { mzs[i] = mz; intensities[i] = inten; }
     void setPeak(size_t i, SpectrumRawTypes::Mass mz, SpectrumRawTypes::Intensity inten,
                  SpectrumRawTypes::Mobility mob) { mzs[i] = mz; intensities[i] = inten; mobilities[i] = mob; }
     
     auto size(void) const { return mzs.size(); }
     bool empty(void) const { return mzs.empty(); }
-    void resize(size_t s) { mzs.resize(s); intensities.resize(s); }
-    void clear(void) { mzs.clear(); intensities.clear(); }
+    void clear(void) { mzs.clear(); intensities.clear(); mobilities.clear(); }
 };
 
 struct SpectrumRawFilter
@@ -99,10 +101,12 @@ struct SpectrumRawFilter
     SpectrumRawTypes::Intensity minIntensity;
     NumRange<SpectrumRawTypes::Mass> mzRange;
     unsigned topMost;
+    bool withPrecursor;
     
     SpectrumRawFilter &setMinIntensity(unsigned i) { minIntensity = i; return *this; }
     SpectrumRawFilter &setMZRange(SpectrumRawTypes::Mass s, SpectrumRawTypes::Mass e) { mzRange.set(s, e); return *this; }
     SpectrumRawFilter &setTopMost(unsigned t) { topMost = t; return *this; }
+    SpectrumRawFilter &setWithPrecursor(bool p) { withPrecursor = p; return *this; }
 };
 
 struct SpectrumRawSelection
@@ -117,8 +121,14 @@ std::vector<SpectrumRawSelection> getSpecRawSelections(const SpectrumRawMetadata
                                                        const NumRange<SpectrumRawTypes::Mass> &isoRange);
 SpectrumRaw filterSpectrumRaw(const SpectrumRaw &spectrum, const SpectrumRawFilter &filter,
                               SpectrumRawTypes::Mass precursor);
+SpectrumRaw filterIMSFrame(const SpectrumRaw &spectrum, const SpectrumRawFilter &filter,
+                           SpectrumRawTypes::Mass precursor);
+SpectrumRaw averageSpectraRaw(const SpectrumRaw &flattenedSpecs, size_t numSpecs, clusterMethod method,
+                              SpectrumRawTypes::Mass window, bool averageIntensities,
+                              SpectrumRawTypes::Intensity minIntensity, unsigned minAbundance);
 SpectrumRaw averageSpectraRaw(const std::vector<SpectrumRaw> &spectra, clusterMethod method,
                               SpectrumRawTypes::Mass window, bool averageIntensities,
                               SpectrumRawTypes::Intensity minIntensity, unsigned minAbundance);
+size_t frameSubSpecCount(const SpectrumRaw &frame);
 
 #endif

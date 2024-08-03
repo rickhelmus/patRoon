@@ -92,8 +92,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // getMSPeakLists
-Rcpp::List getMSPeakLists(const MSReadBackend& backend, const std::vector<SpectrumRawTypes::Time>& startTimes, const std::vector<SpectrumRawTypes::Time>& endTimes, const std::vector<SpectrumRawTypes::Mass>& precursorMZs, int MSLevel, SpectrumRawTypes::Mass isoWindow, const std::string& method, SpectrumRawTypes::Mass mzWindow, const std::vector<SpectrumRawTypes::Mobility> startMobs, const std::vector<SpectrumRawTypes::Mobility> endMobs, unsigned minAbundance, unsigned topMost, SpectrumRawTypes::Intensity minIntensityPre, SpectrumRawTypes::Intensity minIntensityPost);
-RcppExport SEXP _patRoon_getMSPeakLists(SEXP backendSEXP, SEXP startTimesSEXP, SEXP endTimesSEXP, SEXP precursorMZsSEXP, SEXP MSLevelSEXP, SEXP isoWindowSEXP, SEXP methodSEXP, SEXP mzWindowSEXP, SEXP startMobsSEXP, SEXP endMobsSEXP, SEXP minAbundanceSEXP, SEXP topMostSEXP, SEXP minIntensityPreSEXP, SEXP minIntensityPostSEXP) {
+Rcpp::List getMSPeakLists(const MSReadBackend& backend, const std::vector<SpectrumRawTypes::Time>& startTimes, const std::vector<SpectrumRawTypes::Time>& endTimes, const std::vector<SpectrumRawTypes::Mass>& precursorMZs, bool withPrecursor, int MSLevel, SpectrumRawTypes::Mass isoWindow, const std::string& method, SpectrumRawTypes::Mass mzWindow, const std::vector<SpectrumRawTypes::Mobility> startMobs, const std::vector<SpectrumRawTypes::Mobility> endMobs, unsigned minAbundance, unsigned topMost, SpectrumRawTypes::Intensity minIntensityIMS, SpectrumRawTypes::Intensity minIntensityPre, SpectrumRawTypes::Intensity minIntensityPost);
+RcppExport SEXP _patRoon_getMSPeakLists(SEXP backendSEXP, SEXP startTimesSEXP, SEXP endTimesSEXP, SEXP precursorMZsSEXP, SEXP withPrecursorSEXP, SEXP MSLevelSEXP, SEXP isoWindowSEXP, SEXP methodSEXP, SEXP mzWindowSEXP, SEXP startMobsSEXP, SEXP endMobsSEXP, SEXP minAbundanceSEXP, SEXP topMostSEXP, SEXP minIntensityIMSSEXP, SEXP minIntensityPreSEXP, SEXP minIntensityPostSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -101,6 +101,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Time>& >::type startTimes(startTimesSEXP);
     Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Time>& >::type endTimes(endTimesSEXP);
     Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Mass>& >::type precursorMZs(precursorMZsSEXP);
+    Rcpp::traits::input_parameter< bool >::type withPrecursor(withPrecursorSEXP);
     Rcpp::traits::input_parameter< int >::type MSLevel(MSLevelSEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type isoWindow(isoWindowSEXP);
     Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
@@ -109,9 +110,10 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Mobility> >::type endMobs(endMobsSEXP);
     Rcpp::traits::input_parameter< unsigned >::type minAbundance(minAbundanceSEXP);
     Rcpp::traits::input_parameter< unsigned >::type topMost(topMostSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minIntensityIMS(minIntensityIMSSEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minIntensityPre(minIntensityPreSEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minIntensityPost(minIntensityPostSEXP);
-    rcpp_result_gen = Rcpp::wrap(getMSPeakLists(backend, startTimes, endTimes, precursorMZs, MSLevel, isoWindow, method, mzWindow, startMobs, endMobs, minAbundance, topMost, minIntensityPre, minIntensityPost));
+    rcpp_result_gen = Rcpp::wrap(getMSPeakLists(backend, startTimes, endTimes, precursorMZs, withPrecursor, MSLevel, isoWindow, method, mzWindow, startMobs, endMobs, minAbundance, topMost, minIntensityIMS, minIntensityPre, minIntensityPost));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -478,7 +480,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_getEICList", (DL_FUNC) &_patRoon_getEICList, 5},
     {"_patRoon_getMSMetadata", (DL_FUNC) &_patRoon_getMSMetadata, 2},
     {"_patRoon_setSpecMetadata", (DL_FUNC) &_patRoon_setSpecMetadata, 3},
-    {"_patRoon_getMSPeakLists", (DL_FUNC) &_patRoon_getMSPeakLists, 14},
+    {"_patRoon_getMSPeakLists", (DL_FUNC) &_patRoon_getMSPeakLists, 16},
     {"_patRoon_readMSP", (DL_FUNC) &_patRoon_readMSP, 2},
     {"_patRoon_writeMSPLibrary", (DL_FUNC) &_patRoon_writeMSPLibrary, 3},
     {"_patRoon_readMoNAJSON", (DL_FUNC) &_patRoon_readMoNAJSON, 1},

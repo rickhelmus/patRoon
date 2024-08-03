@@ -69,7 +69,7 @@ SpectrumRaw filterSpectrumRaw(const SpectrumRaw &spectrum, const SpectrumRawFilt
              it!=spectrum.getMZs().end(); ++it)
         {
             const SpectrumRawTypes::Mass d = std::abs(precursor - *it);
-            if (minPrecMZDiff == -1.0 || d < minPrecMZDiff)
+            if (d <= precTol && (minPrecMZDiff == -1.0 || d < minPrecMZDiff))
             {
                 closestPrecMZInd = std::distance(spectrum.getMZs().begin(), it);
                 minPrecMZDiff = d;
@@ -78,6 +78,9 @@ SpectrumRaw filterSpectrumRaw(const SpectrumRaw &spectrum, const SpectrumRawFilt
                 break; // data is sorted: all next mzs will be greater and therefore with higher deviation
         }
     }
+    
+    if (filter.withPrecursor && minPrecMZDiff == -1.0)
+        return SpectrumRaw(); // no precursor present
     
     size_t startInd = 0, endInd = spectrum.size();
     if (filter.mzRange.start > 0)
@@ -94,6 +97,7 @@ SpectrumRaw filterSpectrumRaw(const SpectrumRaw &spectrum, const SpectrumRawFilt
     SpectrumRaw ret;
     SpectrumRawTypes::Intensity minInt = filter.minIntensity;
     const bool doTopMost = filter.topMost != 0 && (endInd - startInd) > filter.topMost;
+    const bool hasMob = spectrum.hasMobilities();
     
     if (doTopMost)
     {
@@ -109,7 +113,10 @@ SpectrumRaw filterSpectrumRaw(const SpectrumRaw &spectrum, const SpectrumRawFilt
     {
         if (spectrum.getIntensities()[i] >= minInt)
         {
-            ret.append(spectrum.getMZs()[i], spectrum.getIntensities()[i]);
+            if (hasMob)
+                ret.append(spectrum.getMZs()[i], spectrum.getIntensities()[i], spectrum.getMobilities()[i]);
+            else
+                ret.append(spectrum.getMZs()[i], spectrum.getIntensities()[i]);
             if (i == closestPrecMZInd)
                 addedPrec = true;
         }
@@ -118,8 +125,48 @@ SpectrumRaw filterSpectrumRaw(const SpectrumRaw &spectrum, const SpectrumRawFilt
     if (!addedPrec && closestPrecMZInd != spectrum.size())
     {
         const auto it = std::upper_bound(ret.getMZs().begin(), ret.getMZs().end(), spectrum.getMZs()[closestPrecMZInd]);
-        ret.insert(std::distance(ret.getMZs().begin(), it), spectrum.getMZs()[closestPrecMZInd],
-                   spectrum.getIntensities()[closestPrecMZInd]);
+        if (hasMob)
+        {
+            ret.insert(std::distance(ret.getMZs().begin(), it), spectrum.getMZs()[closestPrecMZInd],
+                       spectrum.getIntensities()[closestPrecMZInd], spectrum.getMobilities()[closestPrecMZInd]);
+        }
+        else
+        {
+            ret.insert(std::distance(ret.getMZs().begin(), it), spectrum.getMZs()[closestPrecMZInd],
+                       spectrum.getIntensities()[closestPrecMZInd]);
+        }
+    }
+    
+    return ret;
+}
+
+SpectrumRaw filterIMSFrame(const SpectrumRaw &frame, const SpectrumRawFilter &filter,
+                           SpectrumRawTypes::Mass precursor)
+{
+    if (frame.empty())
+        return frame;
+    
+    SpectrumRaw ret;
+    
+    // filter each sub-spectrum and combine spectra back to output frame
+    SpectrumRawTypes::Mobility curMob;
+    SpectrumRaw curSpec;
+    for (size_t i=0; ; ++i)
+    {
+        if (i == 0 || i >= frame.size() || curMob != frame.getMobilities()[i])
+        {
+            if (i > 0)
+            {
+                ret.append(filterSpectrumRaw(curSpec, filter, precursor));
+                curSpec.clear();
+            }
+            
+            if (i >= frame.size())
+                break; // done
+            
+            curMob = frame.getMobilities()[i];
+        }
+        curSpec.append(frame.getMZs()[i], frame.getIntensities()[i], frame.getMobilities()[i]);
     }
     
     return ret;
@@ -137,14 +184,10 @@ Rcpp::DataFrame testSpecFilter(const std::vector<SpectrumRawTypes::Mass> &mzs,
                                    Rcpp::Named("intensity") = specF.getIntensities());
 }
 
-SpectrumRaw averageSpectraRaw(const std::vector<SpectrumRaw> &spectra, clusterMethod method,
+SpectrumRaw averageSpectraRaw(const SpectrumRaw &flattenedSpecs, size_t numSpecs, clusterMethod method,
                               SpectrumRawTypes::Mass window, bool averageIntensities,
                               SpectrumRawTypes::Intensity minIntensity, unsigned minAbundance)
 {
-    if (spectra.empty())
-        return SpectrumRaw();
-    
-    const auto flattenedSpecs = flattenSpectra(spectra);
     if (flattenedSpecs.empty()) // all spectra are empty
         return flattenedSpecs;
     
@@ -174,7 +217,7 @@ SpectrumRaw averageSpectraRaw(const std::vector<SpectrumRaw> &spectra, clusterMe
         const SpectrumRawTypes::Mass mz = binnedSpectrum.getMZs()[i] / static_cast<SpectrumRawTypes::Mass>(binnedSpectrum.getIntensities()[i]);
         SpectrumRawTypes::Intensity inten = binnedSpectrum.getIntensities()[i];
         if (averageIntensities)
-            inten /= static_cast<SpectrumRawTypes::Intensity>(spectra.size());
+            inten /= static_cast<SpectrumRawTypes::Intensity>(numSpecs);
         binnedSpectrum.setPeak(i, mz, inten);
     }
     
@@ -196,4 +239,30 @@ SpectrumRaw averageSpectraRaw(const std::vector<SpectrumRaw> &spectra, clusterMe
     // Rcpp::Rcout << "sortedSpectrum: " << sortedSpectrum.size() << "\n";
     
     return sortedSpectrum;
+}
+
+SpectrumRaw averageSpectraRaw(const std::vector<SpectrumRaw> &spectra, clusterMethod method,
+                              SpectrumRawTypes::Mass window, bool averageIntensities,
+                              SpectrumRawTypes::Intensity minIntensity, unsigned minAbundance)
+{
+    if (spectra.empty())
+        return SpectrumRaw();
+    return averageSpectraRaw(flattenSpectra(spectra), spectra.size(), method, window, averageIntensities, minIntensity,
+                             minAbundance);
+}
+
+size_t frameSubSpecCount(const SpectrumRaw &frame)
+{
+    size_t ret = 0;
+    SpectrumRawTypes::Mobility curMob;
+    for (size_t i=0; i<frame.size(); ++i)
+    {
+        const auto m = frame.getMobilities()[i];
+        if (i == 0 || curMob != m)
+        {
+            ++ret;
+            curMob = m;
+        }
+    }
+    return ret;
 }

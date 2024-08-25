@@ -14,6 +14,7 @@ using Time = float;
 using Mass = float;
 using Mobility = float;
 using Intensity = float; // UNDONE: or unsigned?
+using TimeRange = NumRange<Time>;
 using IsolationRange = NumRange<Mass>;
 using MobilityRange = NumRange<Mobility>;
 
@@ -113,10 +114,16 @@ struct SpectrumRawSelection
 {
     SpectrumRawTypes::Scan index;
     std::vector<size_t> MSMSFrameIndices;
+    SpectrumRawSelection(void) = default;
+    SpectrumRawSelection(SpectrumRawTypes::Scan i) : index(i) { }
 };
 
 std::vector<SpectrumRawSelection> getSpecRawSelections(const SpectrumRawMetadata &specMeta,
                                                        const NumRange<SpectrumRawTypes::Time> &timeRange,
+                                                       SpectrumRawTypes::MSLevel MSLevel,
+                                                       const NumRange<SpectrumRawTypes::Mass> &isoRange);
+std::vector<SpectrumRawSelection> getSpecRawSelections(const SpectrumRawMetadata &specMeta,
+                                                       std::vector<SpectrumRawTypes::TimeRange> timeRanges,
                                                        SpectrumRawTypes::MSLevel MSLevel,
                                                        const NumRange<SpectrumRawTypes::Mass> &isoRange);
 SpectrumRaw filterSpectrumRaw(const SpectrumRaw &spectrum, const SpectrumRawFilter &filter,

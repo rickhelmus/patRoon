@@ -29,7 +29,8 @@ OutType applyMSData(const MSReadBackend &backend, SpectrumRawTypes::MSLevel MSLe
         #pragma omp for
         for (size_t i=0; i<scanSels.size(); ++i)
         {
-            exHandler.run([&]{ ret[i] = func(backend.readSpectrum(tdata, MSLevel, scanSels[i], mobRange), args...); });
+            exHandler.run([&]{ ret[i] = func(backend.readSpectrum(tdata, MSLevel, scanSels[i], mobRange), scanSels[i],
+                                             args...); });
         }
     }
     
@@ -37,7 +38,7 @@ OutType applyMSData(const MSReadBackend &backend, SpectrumRawTypes::MSLevel MSLe
     
     return ret;
 }
-    
+
 }
 
 
@@ -93,7 +94,7 @@ Rcpp::DataFrame getMSSpectrum(const MSReadBackend &backend, int index)
     SpectrumRawSelection sel; sel.index = index;
     const std::vector<SpectrumRawSelection> sels(1, sel);
     
-    const auto sfunc = [](const SpectrumRaw &spec)
+    const auto sfunc = [](const SpectrumRaw &spec, const SpectrumRawSelection &)
     {
         return spec;
     };
@@ -142,6 +143,8 @@ Rcpp::DataFrame getScans(const MSReadBackend &backend, SpectrumRawTypes::Mass ti
 // [[Rcpp::export]]
 Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRawTypes::Mass> &startMZs,
                       const std::vector<SpectrumRawTypes::Mass> &endMZs,
+                      const std::vector<SpectrumRawTypes::Time> &startTimes,
+                      const std::vector<SpectrumRawTypes::Time> &endTimes,
                       const std::vector<SpectrumRawTypes::Mobility> &startMobs,
                       const std::vector<SpectrumRawTypes::Mobility> &endMobs)
 {
@@ -156,14 +159,19 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     };
     
     const auto EICCount = startMZs.size();
+    const auto &specMetaMS = backend.getSpecMetadata().first;
     
-    const auto sfunc = [&](const SpectrumRaw &spec)
+    const auto sfunc = [&](const SpectrumRaw &spec, const SpectrumRawSelection &ssel)
     {
+        const auto time = specMetaMS.times[ssel.index];
         const bool hasMob = spec.hasMobilities();
         EICPoint ret(EICCount, hasMob);
         
         for (size_t i=0; i<EICCount; ++i)
         {
+            if (time < startTimes[i] || time > endTimes[i])
+                continue;
+            
             size_t startInd = 0;
             
             // NOTE: for non-IMS data assume spec is mz sorted
@@ -210,11 +218,12 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         
         return ret;
     };
-
-    const auto &specMetaMS = backend.getSpecMetadata().first;
-    std::vector<SpectrumRawSelection> sels(specMetaMS.scans.size());
-    for (size_t i=0; i<specMetaMS.scans.size(); ++i)
-        sels[i].index = i;
+    
+    std::vector<SpectrumRawTypes::TimeRange> timeRanges(EICCount);
+    for (size_t i=0; i<EICCount; ++i)
+        timeRanges.emplace_back(startTimes[i], endTimes[i]);
+    const auto sels = getSpecRawSelections(backend.getSpecMetadata(), timeRanges, SpectrumRawTypes::MSLevel::MS1,
+                                           SpectrumRawTypes::IsolationRange());
     const auto EICPoints = applyMSData<std::vector<EICPoint>>(backend, SpectrumRawTypes::MSLevel::MS1, sels,
                                                               SpectrumRawTypes::MobilityRange(), sfunc);
     const auto EPSize = EICPoints.size();
@@ -228,18 +237,23 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     Rcpp::List ret(EICCount);
     for (size_t i=0; i<EICCount; ++i)
     {
-        std::vector<SpectrumRawTypes::Mass> mzs(EPSize);
-        std::vector<SpectrumRawTypes::Intensity> intensities(EPSize);
-        std::vector<SpectrumRawTypes::Mobility> mobilities((hasMob) ? EPSize : 0);
+        std::vector<SpectrumRawTypes::Time> times;
+        std::vector<SpectrumRawTypes::Mass> mzs;
+        std::vector<SpectrumRawTypes::Intensity> intensities;
+        std::vector<SpectrumRawTypes::Mobility> mobilities;
         for (size_t j=0; j<EPSize; ++j)
         {
-            mzs[j] = EICPoints[j].mzs[i];
-            intensities[j] = EICPoints[j].intensities[i];
+            const auto t = specMetaMS.times[sels[j].index];
+            if (t < startTimes[i] || t > endTimes[i])
+                continue;
+            times.push_back(t);
+            mzs.push_back(EICPoints[j].mzs[i]);
+            intensities.push_back(EICPoints[j].intensities[i]);
             if (hasMob)
-                mobilities[j] = EICPoints[j].mobilities[i];
+                mobilities.push_back(EICPoints[j].mobilities[i]);
         }
-
-        auto df = Rcpp::DataFrame::create(Rcpp::Named("time") = specMetaMS.times,
+        
+        auto df = Rcpp::DataFrame::create(Rcpp::Named("time") = times,
                                           Rcpp::Named("intensity") = intensities,
                                           Rcpp::Named("mz") = mzs);
         if (hasMob)

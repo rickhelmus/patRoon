@@ -7,7 +7,6 @@
 - don't make open() required for memory backend (eg check flag instead of non-empty file in close())
 - EICs
     - compress output
-    - use time ranges --> only load spectrum if within at least one of the time ranges
 - make backend functions to test if mobility is sorted and which direction, so eg EICs and readSpectrum methods can optimize
 - MSPL
     - add mobility column?

@@ -17,6 +17,7 @@ SpectrumRaw flattenSpectra(const std::vector<SpectrumRaw> &spectra)
 
 }
 
+// UNDONE: remove this overload?
 std::vector<SpectrumRawSelection> getSpecRawSelections(const SpectrumRawMetadata &specMeta,
                                                        const NumRange<SpectrumRawTypes::Time> &timeRange,
                                                        SpectrumRawTypes::MSLevel MSLevel,
@@ -50,6 +51,61 @@ std::vector<SpectrumRawSelection> getSpecRawSelections(const SpectrumRawMetadata
             ret.push_back(std::move(sel));
         }
     }
+    
+    return ret;
+}
+
+// returns spectrum selections that cover all the spectra from given time ranges
+std::vector<SpectrumRawSelection> getSpecRawSelections(const SpectrumRawMetadata &specMeta,
+                                                       std::vector<SpectrumRawTypes::TimeRange> timeRanges,
+                                                       SpectrumRawTypes::MSLevel MSLevel,
+                                                       const NumRange<SpectrumRawTypes::Mass> &isoRange)
+{
+    std::vector<SpectrumRawSelection> ret;
+    if (timeRanges.empty())
+        return ret;
+    
+    const SpectrumRawMetadataMS &metaMS = (MSLevel == SpectrumRawTypes::MSLevel::MS1) ? specMeta.first : specMeta.second;
+    const bool isMSMS = MSLevel == SpectrumRawTypes::MSLevel::MS2;
+    const bool isIMSMSMS = isMSMS && specMeta.second.isolationRanges.empty();
+    
+    const auto trComp = [](const SpectrumRawTypes::TimeRange &t1, const SpectrumRawTypes::TimeRange &t2)
+    {
+        return t1.start < t2.start;
+    };
+    std::sort(timeRanges.begin(), timeRanges.end(), trComp);
+
+    const auto startIt = std::lower_bound(metaMS.times.begin(), metaMS.times.end(), timeRanges[0].start);
+    if (startIt != metaMS.times.end())
+    {
+        const auto startInd = std::distance(metaMS.times.begin(), startIt);
+        const auto endIt = std::upper_bound(startIt, metaMS.times.end(), timeRanges.back().end);
+        const auto endInd = std::distance(metaMS.times.begin(), endIt);
+        for (size_t i=startInd; i<endInd; ++i)
+        {
+            const auto t = metaMS.times[i];
+            bool inRange = false;
+            for (auto it=timeRanges.cbegin(); !inRange && it!=timeRanges.cend() && t >= it->start; ++it)
+                inRange = t <= it->end;
+            if (!inRange)
+                continue;
+            
+            SpectrumRawSelection sel(i);
+            if (isIMSMSMS)
+            {
+                for (size_t j=0; j<specMeta.second.MSMSFrames[i].isolationRanges.size(); ++j)
+                {
+                    if (isoRange.overlap(specMeta.second.MSMSFrames[i].isolationRanges[j]))
+                        sel.MSMSFrameIndices.push_back(j);
+                }
+                if (sel.MSMSFrameIndices.empty())
+                    continue; // no MS/MS data for this one
+            }
+            else if (isMSMS && !isoRange.overlap(specMeta.second.isolationRanges[i]))
+                continue;
+            ret.push_back(std::move(sel));
+        }
+    }    
     
     return ret;
 }

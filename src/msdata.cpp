@@ -1,4 +1,5 @@
 #include <Rcpp.h>
+#include <algorithm>
 #include <vector>
 
 #ifdef _OPENMP
@@ -15,11 +16,51 @@
 namespace {
 
 template<typename OutType, typename FuncType, typename... Args>
-OutType applyMSData(const MSReadBackend &backend, SpectrumRawTypes::MSLevel MSLevel,
-                    const std::vector<SpectrumRawSelection> &scanSels,
-                    const SpectrumRawTypes::MobilityRange &mobRange, FuncType func, Args... args)
+std::vector<std::vector<OutType>> applyMSData(const MSReadBackend &backend, SpectrumRawTypes::MSLevel MSLevel,
+                                              const std::vector<std::vector<SpectrumRawSelection>> &scanSels,
+                                              FuncType func, Args... args)
 {
-    OutType ret(scanSels.size());
+    /* This function will apply a callback on selected spectra. Multiple sets of spectra selections are supported, and
+     * the function is optimized to avoid reading the same spectra more than once in case of overlap between sets.
+     * 
+     * The code makes the following assumptions:
+     * - each set of SpectrumRawSelection objects is unique and sorted by index from low to high
+     * - the index of each SpectrumRawSelection in a set is unique
+     * - SpectrumRawSelection objects with the same index but different MSMSFrameIndices may occur across sets. Thus,
+     *   across sets the full object instead of merely the index should be compared.
+     * 
+     * As this function is the main driver for eg EICs and peak lists, this function was heavily optimized and therefore
+     * more complex.
+    */
+    
+    const auto entries = scanSels.size();
+    
+    // to compare spectra selections by just the index, i.e. within a selection set
+    const auto selCompInd = [](const SpectrumRawSelection &s, size_t i) { return s.index < i; };
+    
+    // collect all unique indices so we (1) can avoid >1 reads of a spectrum and (2) can easily use an OpenMP for loop below.
+    std::vector<size_t> allScanSelInds;
+    const size_t nspecs = (MSLevel == SpectrumRawTypes::MSLevel::MS1) ? backend.getSpecMetadata().first.scans.size() :
+        backend.getSpecMetadata().second.scans.size();
+    for (size_t i=0; i<nspecs; ++i)
+    {
+        // check if _any_ of the selection sets has this index
+        const bool inSels = std::any_of(scanSels.begin(), scanSels.end(), [&](const auto &sels)
+        {
+            // NOTE: std::binary_search doesn't seem to support comparator with different types (ie the selCompInd lambda)
+            // --> use std::lower_bound instead
+            const auto it = std::lower_bound(sels.begin(), sels.end(), i, selCompInd);
+            return it != sels.end() && it->index == i;
+        });
+        if (inSels)
+            allScanSelInds.push_back(i);
+    }
+    
+    // pre-allocate ret vector
+    std::vector<std::vector<OutType>> ret;
+    for (size_t i=0; i<entries; ++i)
+        ret.emplace_back(scanSels[i].size());
+    
     ThreadExceptionHandler exHandler;
 
     // UNDONE: make num_threads configurable
@@ -27,10 +68,39 @@ OutType applyMSData(const MSReadBackend &backend, SpectrumRawTypes::MSLevel MSLe
     {
         auto tdata = backend.getThreadData();
         #pragma omp for
-        for (size_t i=0; i<scanSels.size(); ++i)
+        for (const auto selInd : allScanSelInds)
         {
-            exHandler.run([&]{ ret[i] = func(backend.readSpectrum(tdata, MSLevel, scanSels[i], mobRange), scanSels[i],
-                                             args...); });
+            // UNDONE: handle mobility range? For now we stick with post-filtering, which makes the mob range argument
+            // to readSpectrum currently unused...
+            
+            /* In case multiple sets contain spectrum selection with index selInd, there is a chance that the
+             * SpectrumRawSelection objects still differ (see above). We therefore keep track of the selection of the
+             * previous set and if it differs perform a new spectrum read.
+             * 
+             * UNDONE: this could be optmized further by also storing and re-using spectra before the previous selection set
+            */ 
+            
+            SpectrumRaw curSpec;
+            SpectrumRawSelection curSel;
+            bool initSel = true;
+            
+            for (size_t j=0; j<entries; ++j)
+            {
+                const auto it = std::lower_bound(scanSels[j].begin(), scanSels[j].end(), selInd, selCompInd);
+                if (it == scanSels[j].end() || it->index != selInd)
+                    continue; // not found
+                
+                if (initSel || curSel != *it)
+                {
+                    initSel = false;
+                    curSel = *it;
+                    curSpec = backend.readSpectrum(tdata, MSLevel, curSel, SpectrumRawTypes::MobilityRange());
+                }
+                
+                // UNDONE: optimization could be further pushed by not using a 2d vector here?
+                const auto ind = std::distance(scanSels[j].begin(), it);
+                exHandler.run([&] { ret[j][ind] = func(curSpec, curSel, j, args...); });
+            }
         }
     }
     
@@ -91,24 +161,23 @@ RCPP_MODULE(MSReadBackend)
 // [[Rcpp::export]]
 Rcpp::DataFrame getMSSpectrum(const MSReadBackend &backend, int index)
 {
-    SpectrumRawSelection sel; sel.index = index;
-    const std::vector<SpectrumRawSelection> sels(1, sel);
+    const std::vector<std::vector<SpectrumRawSelection>> sels(1, std::vector<SpectrumRawSelection>{SpectrumRawSelection(index)});
     
-    const auto sfunc = [](const SpectrumRaw &spec, const SpectrumRawSelection &)
+    const auto sfunc = [](const SpectrumRaw &spec, const SpectrumRawSelection &, size_t)
     {
         return spec;
     };
     
-    const auto spectra = applyMSData<std::vector<SpectrumRaw>>(backend, SpectrumRawTypes::MSLevel::MS1, sels,
-                                                               SpectrumRawTypes::MobilityRange(), sfunc);
+    const auto spectra = applyMSData<SpectrumRaw>(backend, SpectrumRawTypes::MSLevel::MS1, sels, sfunc);
+    const auto &spec = spectra[0][0];
     
-    if (!spectra[0].getMobilities().empty())
-        return Rcpp::DataFrame::create(Rcpp::Named("mz") = spectra[0].getMZs(),
-                                       Rcpp::Named("intensity") = spectra[0].getIntensities(),
-                                       Rcpp::Named("mobility") = spectra[0].getMobilities());
+    if (!spec.getMobilities().empty())
+        return Rcpp::DataFrame::create(Rcpp::Named("mz") = spec.getMZs(),
+                                       Rcpp::Named("intensity") = spec.getIntensities(),
+                                       Rcpp::Named("mobility") = spec.getMobilities());
     
-    return Rcpp::DataFrame::create(Rcpp::Named("mz") = spectra[0].getMZs(),
-                                   Rcpp::Named("intensity") = spectra[0].getIntensities());
+    return Rcpp::DataFrame::create(Rcpp::Named("mz") = spec.getMZs(),
+                                   Rcpp::Named("intensity") = spec.getIntensities());
 }
 
 // [[Rcpp::export]]
@@ -148,115 +217,106 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                       const std::vector<SpectrumRawTypes::Mobility> &startMobs,
                       const std::vector<SpectrumRawTypes::Mobility> &endMobs)
 {
-    // UNDONE: keep this local here?
     struct EICPoint
     {
-        std::vector<SpectrumRawTypes::Mass> mzs;
-        std::vector<SpectrumRawTypes::Intensity> intensities;
-        std::vector<SpectrumRawTypes::Mobility> mobilities;
-        EICPoint(void) = default;
-        EICPoint(size_t s, bool hasMob) : mzs(s), intensities(s), mobilities((hasMob) ? s : 0) { }
+        SpectrumRawTypes::Mass mz = 0.0;
+        SpectrumRawTypes::Intensity intensity = 0;
+        SpectrumRawTypes::Mobility mobility = 0.0;
     };
     
     const auto EICCount = startMZs.size();
-    const auto &specMetaMS = backend.getSpecMetadata().first;
+    bool anySpecHasMob = false;
     
-    const auto sfunc = [&](const SpectrumRaw &spec, const SpectrumRawSelection &ssel)
+    const auto sfunc = [&](const SpectrumRaw &spec, const SpectrumRawSelection &ssel, size_t entry)
     {
-        const auto time = specMetaMS.times[ssel.index];
         const bool hasMob = spec.hasMobilities();
-        EICPoint ret(EICCount, hasMob);
+        EICPoint ret;
         
-        for (size_t i=0; i<EICCount; ++i)
+        size_t startInd = 0;
+        
+        // NOTE: for non-IMS data assume spec is mz sorted
+        
+        if (!hasMob)
         {
-            if (time < startTimes[i] || time > endTimes[i])
-                continue;
+            // use lower bound to speedup search for first mass
+            const auto mzIt = std::lower_bound(spec.getMZs().begin(), spec.getMZs().end(), startMZs[entry]);
+            if (mzIt == spec.getMZs().end())
+                return ret;
+            startInd = std::distance(spec.getMZs().begin(), mzIt);
+        }
+        else
+            anySpecHasMob = true;
+        
+        for (size_t j=startInd; j<spec.size(); ++j)
+        {
+            const auto mz = spec.getMZs()[j];
+            const auto mob = (hasMob) ? spec.getMobilities()[j] : 0;
             
-            size_t startInd = 0;
-            
-            // NOTE: for non-IMS data assume spec is mz sorted
-            
-            if (!hasMob)
+            if (hasMob)
             {
-                // use lower bound to speedup search for first mass
-                const auto mzIt = std::lower_bound(spec.getMZs().begin(), spec.getMZs().end(), startMZs[i]);
-                if (mzIt == spec.getMZs().end())
+                if (mz < startMZs[entry] || mz > endMZs[entry])
                     continue;
-                startInd = std::distance(spec.getMZs().begin(), mzIt);
+                if (mob < startMobs[entry] || mob > endMobs[entry])
+                    continue; // UNDONE: optimize eg for TIMS data where mobilities are sorted?
             }
+            else if (mz > endMZs[entry])
+                break; 
             
-            for (size_t j=startInd; j<spec.size(); ++j)
-            {
-                const auto mz = spec.getMZs()[j];
-                const auto mob = (hasMob) ? spec.getMobilities()[j] : 0;
-                
-                if (hasMob)
-                {
-                    if (mz < startMZs[i] || mz > endMZs[i])
-                        continue;
-                    if (mob < startMobs[i] || mob > endMobs[i])
-                        continue; // UNDONE: optimize eg for TIMS data where mobilities are sorted?
-                }
-                else if (mz > endMZs[i])
-                    break; 
-                
-                const auto inten = spec.getIntensities()[j];
-                ret.intensities[i] += inten;
-                ret.mzs[i] += mz * inten;
-                if (hasMob)
-                    ret.mobilities[i] += mob * inten;
-            }
+            const auto inten = spec.getIntensities()[j];
+            ret.intensity += inten;
+            ret.mz += mz * inten;
+            if (hasMob)
+                ret.mobility += mob * inten;
+        }
 
-            if (ret.intensities[i] > 0)
-            {
-                // weighted mean
-                ret.mzs[i] /= ret.intensities[i];
-                if (hasMob)
-                    ret.mobilities[i] /= ret.intensities[i];
-            }
+        if (ret.intensity > 0)
+        {
+            // weighted mean
+            ret.mz /= ret.intensity;
+            if (hasMob)
+                ret.mobility /= ret.intensity;
         }
         
         return ret;
     };
     
-    std::vector<SpectrumRawTypes::TimeRange> timeRanges(EICCount);
+    const auto &specMeta = backend.getSpecMetadata();
+    std::vector<std::vector<SpectrumRawSelection>> scanSels;
     for (size_t i=0; i<EICCount; ++i)
-        timeRanges.emplace_back(startTimes[i], endTimes[i]);
-    const auto sels = getSpecRawSelections(backend.getSpecMetadata(), timeRanges, SpectrumRawTypes::MSLevel::MS1,
-                                           SpectrumRawTypes::IsolationRange());
-    const auto EICPoints = applyMSData<std::vector<EICPoint>>(backend, SpectrumRawTypes::MSLevel::MS1, sels,
-                                                              SpectrumRawTypes::MobilityRange(), sfunc);
-    const auto EPSize = EICPoints.size();
+    {
+        scanSels.push_back(getSpecRawSelections(specMeta, makeNumRange(startTimes[i], endTimes[i]),
+                                                SpectrumRawTypes::MSLevel::MS1, SpectrumRawTypes::IsolationRange()));
+    }
     
-    if (EPSize == 0)
+    const auto allEICPoints = applyMSData<EICPoint>(backend, SpectrumRawTypes::MSLevel::MS1, scanSels, sfunc);
+    
+
+    if (allEICPoints.empty())
         return Rcpp::List();
-    
-    // NOTE: assume all MS spectra have or have not IMS data
-    const bool hasMob = !EICPoints[0].mobilities.empty();
-    
+
     Rcpp::List ret(EICCount);
     for (size_t i=0; i<EICCount; ++i)
     {
-        std::vector<SpectrumRawTypes::Time> times;
-        std::vector<SpectrumRawTypes::Mass> mzs;
-        std::vector<SpectrumRawTypes::Intensity> intensities;
-        std::vector<SpectrumRawTypes::Mobility> mobilities;
-        for (size_t j=0; j<EPSize; ++j)
+        // NOTE: assume all MS spectra have or have not IMS data (UNDONE?)
+        
+        const auto &points = allEICPoints[i];
+        std::vector<SpectrumRawTypes::Time> times(points.size());
+        std::vector<SpectrumRawTypes::Mass> mzs(points.size());
+        std::vector<SpectrumRawTypes::Intensity> intensities(points.size());
+        std::vector<SpectrumRawTypes::Mobility> mobilities((anySpecHasMob) ? points.size() : 0);
+        for (size_t j=0; j<points.size(); ++j)
         {
-            const auto t = specMetaMS.times[sels[j].index];
-            if (t < startTimes[i] || t > endTimes[i])
-                continue;
-            times.push_back(t);
-            mzs.push_back(EICPoints[j].mzs[i]);
-            intensities.push_back(EICPoints[j].intensities[i]);
-            if (hasMob)
-                mobilities.push_back(EICPoints[j].mobilities[i]);
+            times[j] = specMeta.first.times[scanSels[i][j].index];
+            mzs[j] = points[j].mz;
+            intensities[j] = points[j].intensity;
+            if (anySpecHasMob)
+                mobilities[j] = points[j].mobility;
         }
         
         auto df = Rcpp::DataFrame::create(Rcpp::Named("time") = times,
                                           Rcpp::Named("intensity") = intensities,
                                           Rcpp::Named("mz") = mzs);
-        if (hasMob)
+        if (anySpecHasMob)
         {
             df["mobility"] = mobilities;
             // HACK: above assignment converts df to a list: https://stackoverflow.com/a/59369233
@@ -417,57 +477,48 @@ Rcpp::List getMSPeakLists(const MSReadBackend &backend, const std::vector<Spectr
     
     const auto entries = startTimes.size();
     const auto clMethod = clustMethodFromStr(method);
+    const auto MSLev = (MSLevel == 1) ? SpectrumRawTypes::MSLevel::MS1 : SpectrumRawTypes::MSLevel::MS2;
     const auto specMeta = backend.getSpecMetadata();
     const auto specFilter = SpectrumRawFilter().setMinIntensity(minIntensityPre).setTopMost(topMost);
     const auto specFilterIMS = SpectrumRawFilter()
         .setMinIntensity(minIntensityIMS)
         .setTopMost(topMost)
         .setWithPrecursor(withPrecursor);
-    const auto MSLev = (MSLevel == 1) ? SpectrumRawTypes::MSLevel::MS1 : SpectrumRawTypes::MSLevel::MS2;
     
-    std::vector<SpectrumRaw> averagedSpectra(entries);
-    ThreadExceptionHandler exHandler;
-
-    // NOTE: we could use applyMSData() here, but parallelizing the outer loop below is much faster
-    #pragma omp parallel num_threads(12)
+    const auto &sfunc = [&](const SpectrumRaw &spec, const SpectrumRawSelection &ssel, size_t e)
     {
-        auto tdata = backend.getThreadData();
+        const bool hasMob = spec.hasMobilities();
         
-        #pragma omp for
-        for (size_t i=0; i<entries; ++i)
+        if (hasMob)
         {
-            exHandler.run([&]{
-                const auto sels = getSpecRawSelections(specMeta, makeNumRange(startTimes[i], endTimes[i]),
-                                                       MSLev,
-                                                       makeNumRange(precursorMZs[i] - isoWindow, precursorMZs[i] + isoWindow));
-                std::vector<SpectrumRaw> spectra(sels.size());
-                const auto mobRange = makeNumRange(startMobs[i], endMobs[i]);
-                for (size_t j=0; j<sels.size(); ++j)
-                {
-                    auto spec = backend.readSpectrum(tdata, MSLev, sels[j], mobRange);
-                    if (!spec.getMobilities().empty())
-                    {
-                        spec = filterIMSFrame(spec, specFilterIMS, precursorMZs[i]);
-                        spec = averageSpectraRaw(spec, frameSubSpecCount(spec), clMethod,
-                                                 mzWindow, false, minIntensityPre, minAbundance);
-                    }
-                    else
-                        spec = filterSpectrumRaw(spec, specFilter, precursorMZs[i]);
-                    spectra[j] = std::move(spec);
-                }
-                averagedSpectra[i] = averageSpectraRaw(spectra, clMethod, mzWindow, true, minIntensityPost, minAbundance);
-            });
+            const auto specf = filterIMSFrame(spec, specFilterIMS, precursorMZs[e],
+                                              makeNumRange(startMobs[e], endMobs[e]));
+            return averageSpectraRaw(specf, frameSubSpecCount(specf), clMethod, mzWindow, false, minIntensityPre,
+                                     minAbundance);
         }
+        return filterSpectrumRaw(spec, specFilter, precursorMZs[e]);
+    };
+    
+    std::vector<std::vector<SpectrumRawSelection>> scanSels;
+    for (size_t i=0; i<entries; ++i)
+    {
+        scanSels.push_back(getSpecRawSelections(specMeta, makeNumRange(startTimes[i], endTimes[i]), MSLev,
+                                                makeNumRange(precursorMZs[i] - isoWindow, precursorMZs[i] + isoWindow)));
     }
     
-    exHandler.reThrow();
+    const auto allSpectra = applyMSData<SpectrumRaw>(backend, MSLev, scanSels, sfunc);
     
+    std::vector<SpectrumRaw> averagedSpectra(entries);
+    #pragma omp parallel for num_threads(12)
+    for (size_t i=0; i<entries; ++i)
+        averagedSpectra[i] = averageSpectraRaw(allSpectra[i], clMethod, mzWindow, true, minIntensityPost, minAbundance);
+
     Rcpp::List ret(entries);
     for (size_t i=0; i<entries; ++i)
     {
         ret[i] = Rcpp::DataFrame::create(Rcpp::Named("mz") = averagedSpectra[i].getMZs(),
                                          Rcpp::Named("intensity") = averagedSpectra[i].getIntensities());
     }
-        
+
     return ret;
 }

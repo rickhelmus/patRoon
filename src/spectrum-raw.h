@@ -116,20 +116,18 @@ struct SpectrumRawSelection
     std::vector<size_t> MSMSFrameIndices;
     SpectrumRawSelection(void) = default;
     SpectrumRawSelection(SpectrumRawTypes::Scan i) : index(i) { }
+    bool operator==(const SpectrumRawSelection &o) const { return index == o.index && MSMSFrameIndices == o.MSMSFrameIndices; }
+    bool operator!=(const SpectrumRawSelection &o) const { return index != o.index || MSMSFrameIndices != o.MSMSFrameIndices; }
 };
 
 std::vector<SpectrumRawSelection> getSpecRawSelections(const SpectrumRawMetadata &specMeta,
                                                        const NumRange<SpectrumRawTypes::Time> &timeRange,
                                                        SpectrumRawTypes::MSLevel MSLevel,
                                                        const NumRange<SpectrumRawTypes::Mass> &isoRange);
-std::vector<SpectrumRawSelection> getSpecRawSelections(const SpectrumRawMetadata &specMeta,
-                                                       std::vector<SpectrumRawTypes::TimeRange> timeRanges,
-                                                       SpectrumRawTypes::MSLevel MSLevel,
-                                                       const NumRange<SpectrumRawTypes::Mass> &isoRange);
 SpectrumRaw filterSpectrumRaw(const SpectrumRaw &spectrum, const SpectrumRawFilter &filter,
                               SpectrumRawTypes::Mass precursor);
 SpectrumRaw filterIMSFrame(const SpectrumRaw &spectrum, const SpectrumRawFilter &filter,
-                           SpectrumRawTypes::Mass precursor);
+                           SpectrumRawTypes::Mass precursor, const SpectrumRawTypes::MobilityRange &mobRange);
 SpectrumRaw averageSpectraRaw(const SpectrumRaw &flattenedSpecs, size_t numSpecs, clusterMethod method,
                               SpectrumRawTypes::Mass window, bool averageIntensities,
                               SpectrumRawTypes::Intensity minIntensity, unsigned minAbundance);

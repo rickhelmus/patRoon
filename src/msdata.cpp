@@ -522,3 +522,121 @@ Rcpp::List getMSPeakLists(const MSReadBackend &backend, const std::vector<Spectr
 
     return ret;
 }
+
+// [[Rcpp::export]]
+Rcpp::List getMobilograms(const MSReadBackend &backend, const std::vector<SpectrumRawTypes::Mass> &startMZs,
+                          const std::vector<SpectrumRawTypes::Mass> &endMZs,
+                          const std::vector<SpectrumRawTypes::Time> &startTimes,
+                          const std::vector<SpectrumRawTypes::Time> &endTimes,
+                          const std::string &method, SpectrumRawTypes::Mobility mobWindow,
+                          SpectrumRawTypes::Intensity minIntensity)
+{
+    const auto entries = startTimes.size();
+    const auto clMethod = clustMethodFromStr(method);
+    const auto specMeta = backend.getSpecMetadata();
+    
+    struct EIM
+    {
+        std::vector<SpectrumRawTypes::Mobility> mobilities;
+        std::vector<SpectrumRawTypes::Intensity> intensities;
+        // UNDONE: also collect m/z?
+        EIM(void) = default;
+        EIM(size_t s) : mobilities(s), intensities(s) { }
+    };
+    
+    const auto &sfunc = [&](const SpectrumRaw &spec, const SpectrumRawSelection &ssel, size_t e)
+    {
+        if (!spec.hasMobilities())
+            Rcpp::stop("Cannot load mobilogram: no mobility data found!");
+        
+        EIM ret;
+        SpectrumRawTypes::Mobility curMob;
+        SpectrumRawTypes::Intensity curIntensity;
+        
+        for (size_t i=0; ; ++i)
+        {
+            const auto m = spec.getMobilities()[i];
+            if (i == 0 || i >= spec.size() || m != curMob)
+            {
+                if (i > 0)
+                {
+                    ret.mobilities.push_back(curMob);
+                    ret.intensities.push_back(curIntensity);
+                }
+                
+                if (i >= spec.size())
+                    break;
+                
+                curMob = m;
+                curIntensity = 0;
+            }
+            
+            const auto mz = spec.getMZs()[i];
+            if (numberLTE(mz, startMZs[e]) || numberGTE(mz, endMZs[e]))
+                continue;
+            
+            const auto inten = spec.getIntensities()[i];
+            if (inten < minIntensity)
+                continue;
+            
+            curIntensity += inten;
+        }
+        
+        return ret;
+    };
+    
+    std::vector<std::vector<SpectrumRawSelection>> scanSels;
+    for (size_t i=0; i<entries; ++i)
+    {
+        scanSels.push_back(getSpecRawSelections(specMeta, makeNumRange(startTimes[i], endTimes[i]),
+                                                SpectrumRawTypes::MSLevel::MS1, SpectrumRawTypes::IsolationRange()));
+    }
+    
+    const auto allEIMs = applyMSData<EIM>(backend, SpectrumRawTypes::MSLevel::MS1, scanSels, sfunc);
+    
+    std::vector<EIM> averageEIMs(entries);
+
+    #pragma omp parallel for num_threads(12)
+    for (size_t i=0; i<entries; ++i)
+    {
+        EIM flatEIM;
+        for (const EIM &eim : allEIMs[i])
+        {
+            std::copy(eim.mobilities.begin(), eim.mobilities.end(), std::back_inserter(flatEIM.mobilities));
+            std::copy(eim.intensities.begin(), eim.intensities.end(), std::back_inserter(flatEIM.intensities));
+        }
+        
+        const auto clusts = clusterNums(flatEIM.mobilities, clMethod, mobWindow);
+        const int maxClust = *(std::max_element(clusts.begin(), clusts.end()));
+        EIM avgEIM(maxClust + 1);
+        std::vector<size_t> clSizes(maxClust + 1);
+        
+        // sum data, averaging is done below
+        // NOTE: for now don't consider weighting averages, since there are likely to be clusters with zero intensities
+        for (size_t j=0; j<clusts.size(); ++j)
+        {
+            const size_t cl = clusts[j];
+            avgEIM.mobilities[cl] += flatEIM.mobilities[j];
+            avgEIM.intensities[cl] += flatEIM.intensities[j];
+            ++clSizes[cl];
+        }
+        
+        // average data
+        for (size_t j=0; j<avgEIM.mobilities.size(); ++j)
+        {
+            avgEIM.mobilities[j] /= static_cast<double>(clSizes[j]); // mean of all values
+            avgEIM.intensities[j] /= allEIMs[i].size(); // mean of values (including frames without this cluster)
+        }
+        
+        averageEIMs[i] = std::move(avgEIM);
+    }
+        
+    Rcpp::List ret(entries);
+    for (size_t i=0; i<entries; ++i)
+    {
+        ret[i] = Rcpp::DataFrame::create(Rcpp::Named("mobility") = averageEIMs[i].mobilities,
+                                         Rcpp::Named("intensity") = averageEIMs[i].intensities);
+    }
+    
+    return ret;
+}

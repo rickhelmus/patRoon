@@ -119,6 +119,24 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// getMobilograms
+Rcpp::List getMobilograms(const MSReadBackend& backend, const std::vector<SpectrumRawTypes::Mass>& startMZs, const std::vector<SpectrumRawTypes::Mass>& endMZs, const std::vector<SpectrumRawTypes::Time>& startTimes, const std::vector<SpectrumRawTypes::Time>& endTimes, const std::string& method, SpectrumRawTypes::Mobility mobWindow, SpectrumRawTypes::Intensity minIntensity);
+RcppExport SEXP _patRoon_getMobilograms(SEXP backendSEXP, SEXP startMZsSEXP, SEXP endMZsSEXP, SEXP startTimesSEXP, SEXP endTimesSEXP, SEXP methodSEXP, SEXP mobWindowSEXP, SEXP minIntensitySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const MSReadBackend& >::type backend(backendSEXP);
+    Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Mass>& >::type startMZs(startMZsSEXP);
+    Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Mass>& >::type endMZs(endMZsSEXP);
+    Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Time>& >::type startTimes(startTimesSEXP);
+    Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Time>& >::type endTimes(endTimesSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Mobility >::type mobWindow(mobWindowSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minIntensity(minIntensitySEXP);
+    rcpp_result_gen = Rcpp::wrap(getMobilograms(backend, startMZs, endMZs, startTimes, endTimes, method, mobWindow, minIntensity));
+    return rcpp_result_gen;
+END_RCPP
+}
 // readMSP
 Rcpp::List readMSP(Rcpp::CharacterVector file, Rcpp::LogicalVector pc);
 RcppExport SEXP _patRoon_readMSP(SEXP fileSEXP, SEXP pcSEXP) {
@@ -483,6 +501,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_getMSMetadata", (DL_FUNC) &_patRoon_getMSMetadata, 2},
     {"_patRoon_setSpecMetadata", (DL_FUNC) &_patRoon_setSpecMetadata, 3},
     {"_patRoon_getMSPeakLists", (DL_FUNC) &_patRoon_getMSPeakLists, 16},
+    {"_patRoon_getMobilograms", (DL_FUNC) &_patRoon_getMobilograms, 8},
     {"_patRoon_readMSP", (DL_FUNC) &_patRoon_readMSP, 2},
     {"_patRoon_writeMSPLibrary", (DL_FUNC) &_patRoon_writeMSPLibrary, 3},
     {"_patRoon_readMoNAJSON", (DL_FUNC) &_patRoon_readMoNAJSON, 1},

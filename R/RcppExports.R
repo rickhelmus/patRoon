@@ -29,6 +29,10 @@ getMSPeakLists <- function(backend, startTimes, endTimes, precursorMZs, withPrec
     .Call(`_patRoon_getMSPeakLists`, backend, startTimes, endTimes, precursorMZs, withPrecursor, MSLevel, isoWindow, method, mzWindow, startMobs, endMobs, minAbundance, topMost, minIntensityIMS, minIntensityPre, minIntensityPost)
 }
 
+getMobilograms <- function(backend, startMZs, endMZs, startTimes, endTimes, method, mobWindow, minIntensity) {
+    .Call(`_patRoon_getMobilograms`, backend, startMZs, endMZs, startTimes, endTimes, method, mobWindow, minIntensity)
+}
+
 readMSP <- function(file, pc) {
     .Call(`_patRoon_readMSP`, file, pc)
 }

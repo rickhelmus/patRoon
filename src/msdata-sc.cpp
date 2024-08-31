@@ -10,15 +10,33 @@
 
 namespace {
 
-SpectrumRaw getSCSpectrum(sc::MZML *mzml, SpectrumRawTypes::Scan scan,
-                          const SpectrumRawTypes::MobilityRange &mobRange)
+SpectrumRaw getSCSpectrum(sc::MZML *mzml, SpectrumRawTypes::Scan scan, const SpectrumRawTypes::MobilityRange &mobRange)
 {
     const auto s = mzml->get_spectrum(scan);
     
-    SpectrumRaw ret(s.array_length);
-    // UNDONE: handle IMS data/mobRange
-    for(int i=0; i<s.array_length; ++i)
-        ret.setPeak(i, s.binary_data[0][i], s.binary_data[1][i]); // UNDONE: OK to assume it's always this order?
+    const auto mobArrayIt = std::find(s.binary_names.cbegin(), s.binary_names.cend(), "ion_mobility");
+    const bool hasMob = mobArrayIt != s.binary_names.cend();
+    
+    SpectrumRaw ret(s.array_length, hasMob);
+    
+    // UNDONE: always safe to assume that m/z / intensity are in first two arrays?
+    
+    if (hasMob)
+    {
+        const size_t mobArrayInd = std::distance(s.binary_names.begin(), mobArrayIt);
+        for (int i=0; i<s.array_length; ++i)
+        {
+            const auto mob = s.binary_data[mobArrayInd][i];
+            if (!mobRange.isSet() || mobRange.within(mob))
+                ret.setPeak(i, s.binary_data[0][i], s.binary_data[1][i], mob);
+        }
+    }
+    else
+    {
+        for (int i=0; i<s.array_length; ++i)
+            ret.setPeak(i, s.binary_data[0][i], s.binary_data[1][i]);
+    }
+    
     return ret;
 }
 

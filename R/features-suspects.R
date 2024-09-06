@@ -15,7 +15,7 @@ findfeaturesSuspects <- function(analysisInfo, suspects, findPeaksAlgo, rtWindow
     checkmate::assertFlag(skipInvalid) # not in assert collection, should fail before assertSuspectList
     
     ac <- checkmate::makeAssertCollection()
-    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, verifyCentroided = TRUE, add = ac)
+    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, add = ac)
     assertSuspectList(suspects, needsAdduct = is.null(adduct), skipInvalid = skipInvalid, add = ac)
     checkmate::assertString(findPeaksAlgo, min.chars = 1, add = ac) # UNDONE check algo choice if findPeaks() will not be exported
     aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))

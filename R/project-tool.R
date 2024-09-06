@@ -901,7 +901,7 @@ getNewProjectUI <- function(destPath)
                             "input.convAlgo != \"\"",
                             fillRow(
                                 height = 90,
-                                selectInput("convFrom", "Input format", MSFileFormats(), multiple = FALSE,
+                                selectInput("convFrom", "Input format", getMSFileConversionFormats(), multiple = FALSE,
                                             width = "95%"),
                                 fillCol(
                                     flex = c(1, NA),
@@ -1498,7 +1498,7 @@ newProject <- function(destPath = NULL)
             anaDir <- rstudioapi::selectDirectory(path = "~/")
             if (!is.null(anaDir))
             {
-                files <- listMSFiles(anaDir, MSFileFormats())
+                files <- listMSFiles(anaDir, getMSFileFormats())
 
                 if (length(files) > 0)
                 {
@@ -1534,7 +1534,7 @@ newProject <- function(destPath = NULL)
                 else if (nrow(csvTab) > 0)
                 {
                     msExts <- MSFileExtensions()
-                    msFiles <- normalizePath(listMSFiles(csvTab$path, MSFileFormats()), winslash = "/")
+                    msFiles <- normalizePath(listMSFiles(csvTab$path, getMSFileFormats()), winslash = "/")
                     msFilesNoExt <- tools::file_path_sans_ext(msFiles)
                     formats <- mapply(csvTab$analysis, csvTab$path, FUN = function(ana, path)
                     {
@@ -1559,14 +1559,14 @@ newProject <- function(destPath = NULL)
         
         observeEvent(input$convAlgo, {
             from <- switch(input$convAlgo,
-                           pwiz = MSFileFormats("pwiz"),
+                           pwiz = getMSFileConversionFormats("pwiz"),
                            bruker = "bruker",
-                           openms = MSFileFormats("openms"),
+                           openms = getMSFileConversionFormats("openms"),
                            ""
                    )
             sel <- ""
             if (nzchar(input$convAlgo))
-                sel <- MSFileFormats(input$convAlgo, input$convAlgo != "openms")[1]
+                sel <- getMSFileConversionFormats(input$convAlgo, input$convAlgo != "openms")[1]
 
             updateSelectInput(session, "convFrom", choices = from, selected = sel)
         })

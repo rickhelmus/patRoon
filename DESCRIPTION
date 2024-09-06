@@ -285,6 +285,7 @@ Collate:
     'utils-features.R'
     'utils-formulas.R'
     'utils-mol.R'
+    'utils-msdata.R'
     'utils-mslibrary.R'
     'utils-mspeaklists.R'
     'utils-optimize.R'

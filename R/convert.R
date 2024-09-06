@@ -17,29 +17,18 @@
 #' @name convertMSFiles
 NULL
 
-MSFileExtensions <- function()
-{
-    list(thermo = "raw",
-         bruker = c("d", "yep", "baf", "fid"),
-         agilent = "d",
-         ab = "wiff",
-         waters = "raw",
-         mzXML = "mzXML",
-         mzML = "mzML")
-}
-
 MSFileFormatIsDir <- function(format, ext)
 {
     # UNDONE: is agilent .d also a directory?
     return((format == "bruker" && ext == "d") || (format == "waters" && ext == "raw"))
 }
 
-#' @details \code{MSFileFormats} returns a \code{character} with all supported
+#' @details \code{getMSFileConversionFormats} returns a \code{character} with all supported
 #'   input formats (see below).
 #' @param vendor If \code{TRUE} only vendor formats are returned.
 #' @rdname convertMSFiles
 #' @export
-MSFileFormats <- function(algorithm = "pwiz", vendor = FALSE)
+getMSFileConversionFormats <- function(algorithm = "pwiz", vendor = FALSE)
 {
     checkmate::assertChoice(algorithm, c("pwiz", "openms", "bruker"))
     checkmate::assertFlag(vendor)
@@ -102,21 +91,6 @@ listMSFiles <- function(dirs, from)
     files <- files[order(ord)]
 
     return(filterMSFileDirs(files, from))
-}
-
-getMSFilePaths <- function(files, paths, from, mustExist = FALSE)
-{
-    msFilePaths <- listMSFiles(paths, from)
-    msFilesNoExt <- tools::file_path_sans_ext(basename(msFilePaths))
-    found <- files %in% msFilesNoExt
-    
-    if (mustExist && any(!found))
-        stop(sprintf("The following analyses are not found with a correct data format (valid: %s): %s",
-                     paste0(from, collapse = ", "),
-                     paste0(files[!found], collapse = ", ")),
-             call. = FALSE)
-    
-    return(msFilePaths[match(files, msFilesNoExt, nomatch = 0)])
 }
 
 convertMSFilesPWiz <- function(inFiles, outFiles, to, centroid, filters, extraOpts, PWizBatchSize)

@@ -213,7 +213,7 @@ importFeatureGroupsXCMS3 <- function(xdata, analysisInfo)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(xdata, "XCMSnExp", add = ac)
-    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, c("mzXML", "mzML"), add = ac)
+    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, fileType = "centroid", add = ac)
     checkmate::reportAssertions(ac)
 
     if (length(xcms::hasFeatures(xdata)) == 0)

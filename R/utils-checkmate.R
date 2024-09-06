@@ -72,7 +72,12 @@ assertCharOrFactor <- function(x, empty.ok = FALSE, null.ok = FALSE, ..., .var.n
     )
 }
 
-assertAnalysisInfo <- function(x, allowedFormats = NULL, verifyCentroided = FALSE, null.ok = FALSE,
+assertMSFileType <- function(x, null.ok = FALSE, .var.name = checkmate::vname(x), add = NULL)
+{
+    checkmate::assertChoice(x, getMSFileTypes(), null.ok = null.ok, .var.name = .var.name, add = add)
+}
+
+assertAnalysisInfo <- function(x, fileType = NULL, allowedFormats = NULL, null.ok = FALSE,
                                .var.name = checkmate::vname(x), add = NULL)
 {
     if (is.null(x) && null.ok)
@@ -82,12 +87,21 @@ assertAnalysisInfo <- function(x, allowedFormats = NULL, verifyCentroided = FALS
         mc <- length(add$getMessages())
 
     checkmate::assertDataFrame(x, min.rows = 1, .var.name = .var.name, add = add)
-    assertHasNames(x, c("path", "analysis", "group", "blank"), .var.name = .var.name, add = add)
-
-    assertListVal(x, "path", checkmate::assertCharacter, any.missing = FALSE, .var.name = .var.name, add = add)
+    assertHasNames(x, c("analysis", "group", "blank"), .var.name = .var.name, add = add)
+    
     assertListVal(x, "analysis", checkmate::assertCharacter, any.missing = FALSE, .var.name = .var.name, add = add)
     assertListVal(x, "group", checkmate::assertCharacter, any.missing = FALSE, .var.name = .var.name, add = add)
     assertListVal(x, "blank", checkmate::assertCharacter, any.missing = TRUE, .var.name = .var.name, add = add)
+    
+    pathCols <- paste0("path_", getMSFileTypes())
+    if (!any(pathCols %in% names(x)))
+        stop(sprintf("%s does not contain any file paths! Please include at least one of: %s", .var.name,
+                     paste0(pathCols, collapse = ", ")), call. = FALSE)
+    for (col in pathCols)
+    {
+        if (!is.null(x[[col]]))
+            assertListVal(x, col, checkmate::assertCharacter, any.missing = FALSE, .var.name = .var.name, add = add)
+    }
 
     checkmate::assert(
         checkmate::checkNull(x[["norm_conc"]]),
@@ -100,18 +114,17 @@ assertAnalysisInfo <- function(x, allowedFormats = NULL, verifyCentroided = FALS
     # NOTE: this is only applicable if add != NULL, otherwise previous assertions will throw errors
     if (is.null(add) || length(add$getMessages()) == mc)
     {
-        checkmate::assertDirectoryExists(x$path, .var.name = .var.name, add = add)
+        if (!is.null(fileType))
+        {
+            checkmate::assertDirectoryExists(getPathsFromAnaInfo(x, fileType), .var.name = .var.name, add = add)
+            
+            if (is.null(allowedFormats))
+                allowedFormats <- getMSFileFormats(fileType)
+            
+            # stops if files are missing
+            getMSFilesFromAnaInfo(x, fileType, allowedFormats, mustExist = TRUE)
+        }
 
-        # UNDONE: more extensions? (e.g. mzData)
-        if (is.null(allowedFormats))
-            allowedFormats <- MSFileFormats()
-        
-        # stops if files are missing
-        getMSFilePaths(x$analysis, x$path, allowedFormats, mustExist = TRUE)
-
-        if (verifyCentroided)
-            verifyDataCentroided(x)
-        
         checkmate::assertVector(x$analysis, unique = TRUE, .var.name = paste0(.var.name, "$analysis"), add = add)
     }
 
@@ -123,19 +136,22 @@ assertAndPrepareAnaInfo <- function(x, ..., add = NULL)
     if (!is.null(add))
         mc <- length(add$getMessages())
 
+    checkmate::assertDataFrame(x)
+
+    x <- makeDT(x) # convert to DT or make a unique copy
+    x <- unFactorDT(x)
+
+    if (is.null(x[["path_centroid"]]) && !is.null(x[["path"]]))
+    {
+        warning("The usage of the 'path' column in the analysis information is deprecated. ",
+                "The column will be renamed to 'path_centroid', but this may not be what you want...", call. = FALSE)
+        setnames(x, "path", "path_centroid")
+    }
+    
     assertAnalysisInfo(x, ..., add = add)
 
     if ((is.null(add) || length(add$getMessages()) == mc) && !is.null(x))
     {
-        x <- makeDT(x) # convert to DT or make a unique copy
-        x <- unFactorDT(x)
-
-        if (is.null(x[["blank"]]) && !is.null(x[["ref"]]))
-        {
-            warning("The usage of a 'ref' column in the analysis information is deprecated. Please re-name this column to 'blank'.")
-            setnames(x, "ref", "blank")
-        }
-        
         if (!is.null(x[["norm_conc"]]))
             x[, norm_conc := as.numeric(norm_conc)]
         x[is.na(blank), blank := ""]

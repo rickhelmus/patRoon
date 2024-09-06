@@ -85,7 +85,7 @@ void MSReadBackendMSTK::generateSpecMetadata(void)
     auto MSTKReader = getMSTKReader();
     // load first spectrum to get file size and see if we have IMS data
     MSToolkit::Spectrum firstSpec;
-    MSTKReader.readFile(getCurrentFile().c_str(), firstSpec, 0, true);
+    MSTKReader.readFile(getCurrentFile().c_str(), firstSpec, 0);
     const size_t lastScan = MSTKReader.getLastScan();
     const bool haveIMS = firstSpec.hasIonMobilityArray();
     
@@ -105,7 +105,7 @@ void MSReadBackendMSTK::generateSpecMetadata(void)
         {
             exHandler.run([&]
             {
-                rd.readFile(getCurrentFile().c_str(), spec, i, true);
+                rd.readFile(getCurrentFile().c_str(), spec, i);
                 const bool isMS1 = spec.getMsLevel() == 1;
                 
                 SpectrumRawMetadataMS *curMS1MD = (isMS1) ? &threadMeta.first : &threadMeta.second;

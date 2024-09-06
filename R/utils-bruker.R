@@ -118,7 +118,7 @@ closeSaveDAFile <- function(DA, DAFind, close, save)
 setDAMethod <- function(anaInfo, method, close = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
-    anaInfo <- assertAndPrepareAnaInfo(anaInfo, "bruker", add = ac)
+    anaInfo <- assertAndPrepareAnaInfo(anaInfo, fileType = "raw", allowedFormats = "bruker", add = ac)
     checkmate::assertDirectoryExists(method, add = ac)
     checkmate::assertFlag(close, add = ac)
     checkmate::reportAssertions(ac)
@@ -152,7 +152,7 @@ setDAMethod <- function(anaInfo, method, close = TRUE)
 revertDAAnalyses <- function(anaInfo, close = TRUE, save = close)
 {
     ac <- checkmate::makeAssertCollection()
-    anaInfo <- assertAndPrepareAnaInfo(anaInfo, "bruker", add = ac)
+    anaInfo <- assertAndPrepareAnaInfo(anaInfo, fileType = "raw", allowedFormats = "bruker", add = ac)
     assertDACloseSaveArgs(close, save, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -182,7 +182,7 @@ revertDAAnalyses <- function(anaInfo, close = TRUE, save = close)
 recalibrarateDAFiles <- function(anaInfo, close = TRUE, save = close)
 {
     ac <- checkmate::makeAssertCollection()
-    anaInfo <- assertAndPrepareAnaInfo(anaInfo, "bruker")
+    anaInfo <- assertAndPrepareAnaInfo(anaInfo, fileType = "raw", allowedFormats = "bruker")
     assertDACloseSaveArgs(close, save, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -221,7 +221,7 @@ recalibrarateDAFiles <- function(anaInfo, close = TRUE, save = close)
 #' @export
 getDACalibrationError <- function(anaInfo)
 {
-    anaInfo <- assertAndPrepareAnaInfo(anaInfo, "bruker")
+    anaInfo <- assertAndPrepareAnaInfo(anaInfo, fileType = "raw", allowedFormats = "bruker")
 
     DA <- getDAApplication()
     hideDAInScope()

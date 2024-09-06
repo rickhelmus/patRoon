@@ -207,7 +207,16 @@
 - MSPL
     - add mobility column?
     - more extensively test filters/summing/averaging
+- anaInfo / file path retrieval
+    - update convertMSFiles() and newProject()
+    - update SAFD for profile or centroided
+    - update assertAndPrepareAnaInfo() usage where backends will be used (eg getBGMSMSPeaks())
 
+- NEWS
+    - MSFileFormats() --> getMSFileConversionFormats() / getMSFileFormats()
+
+- docs
+    - getMSFileFormats()
 
 ## IMS
 

@@ -4,6 +4,7 @@
     - check if ref docs are OK
     - add to handbook
     - add NEWS
+- update sysdata.rda
 
 ## TC
 

@@ -28,6 +28,23 @@ COMStop <- function(...)
 
 # nocov end
 
+#' @export
+getMSFileFormats <- function(fileType = NULL)
+{
+    assertMSFileType(fileType, null.ok = TRUE)
+    ret <- names(MSFileExtensions())
+    if (!is.null(fileType))
+    {
+        if (fileType == "raw")
+            ret <- setdiff(ret, c("mzXML", "mzML"))
+        else if (fileType == "ims")
+            ret <- "mzML"
+        else
+            ret <- c("mzXML", "mzML")
+    }
+    return(ret)
+}
+
 #' @details \code{generateAnalysisInfo} is an utility function that automatically generates a \code{data.frame} with
 #'   analysis information. It scans the directories specified from the \code{paths} argument for analyses, and uses this
 #'   to automatically fill in the \code{analysis} and \code{path} columns. Furthermore, this function also correctly
@@ -46,19 +63,19 @@ COMStop <- function(...)
 #'   the length of \code{norm_concs} is less than the number of analyses the remainders will be set to \code{NA}. Set to
 #'   \code{NULL} to not include normalization concentration data.
 #' @param formats A character vector of analyses file types to consider. Analyses not present in these formats will be
-#'   ignored. For valid values see \code{\link{MSFileFormats}}.
+#'   ignored. For valid values see \code{\link{getMSFileFormats}}.
 #'
 #' @rdname analysis-information
 #' @export
 generateAnalysisInfo <- function(paths, groups = "", blanks = "", concs = NULL, norm_concs = NULL,
-                                 formats = MSFileFormats())
+                                 formats = getMSFileFormats())
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertDirectoryExists(paths, access = "r", add = ac)
     checkmate::assertCharacter(groups, min.len = 1, add = ac)
     checkmate::assertCharacter(blanks, min.len = 1, add = ac)
     aapply(checkmate::assertNumeric, . ~ concs + norm_concs, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
-    checkmate::assertSubset(formats, MSFileFormats(), empty.ok = FALSE, add = ac)
+    checkmate::assertSubset(formats, getMSFileFormats(), empty.ok = FALSE, add = ac)
     checkmate::reportAssertions(ac)
     
     files <- listMSFiles(paths, formats)
@@ -345,7 +362,7 @@ getBGMSMSPeaks <- function(anaInfo, rGroups = NULL, MSLevel = 2, retentionRange 
                            avgAnalysesParams = getDefAvgPListParams(minAbundance = 0.8, topMost = 25), parallel = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
-    anaInfo <- assertAndPrepareAnaInfo(anaInfo, c("mzXML", "mzML"), verifyCentroided = TRUE, add = ac)
+    anaInfo <- assertAndPrepareAnaInfo(anaInfo, fileType = "centroid", add = ac)
     checkmate::assertChoice(rGroups, unique(anaInfo$group), null.ok = TRUE, add = ac)
     checkmate::assertCount(MSLevel, positive = TRUE, add = ac)
     assertRange(retentionRange, null.ok = TRUE, add = ac)

@@ -76,7 +76,7 @@ setMethod("delete", "featuresXCMS", function(obj, i = NULL, j = NULL, ...)
 findFeaturesXCMS <- function(analysisInfo, method = "centWave", ..., verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
-    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, verifyCentroided = TRUE, c("mzXML", "mzML"), add = ac)
+    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, fileType = "centroid", add = ac)
     checkmate::assertString(method, min.chars = 1, add = ac)
     checkmate::assertFlag(verbose, add = ac)
     checkmate::reportAssertions(ac)
@@ -135,7 +135,7 @@ importFeaturesXCMS <- function(xs, analysisInfo)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(xs, "xcmsSet", add = ac)
-    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, c("mzXML", "mzML"), verifyCentroided = TRUE, add = ac)
+    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, fileType = "centroid", add = ac)
     checkmate::reportAssertions(ac)
 
     feat <- importXCMSPeaks(xcms::peaks(xs), analysisInfo)

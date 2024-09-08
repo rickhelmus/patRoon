@@ -36,7 +36,7 @@ isXCMSClass <- function(cl, name) is(cl, getClass(name, where = "xcms"))
 
 readMSDataForXCMS3 <- function(anaInfo)
 {
-    anaFiles <- mapply(anaInfo$analysis, anaInfo$path, FUN = getMzMLOrMzXMLAnalysisPath, MoreArgs = list(mustExist = TRUE))
+    anaFiles <- getCentroidedMSFilesFromAnaInfo(anaInfo)
     return(MSnbase::readMSData(files = anaFiles,
                                pdata = Biobase::AnnotatedDataFrame(data.frame(sample_name = anaInfo$analysis,
                                                                               sample_group = anaInfo$group,
@@ -115,16 +115,10 @@ setMethod("getXCMSSet", "features", function(obj, verbose, loadRawData)
     xs <- new(getClassDef("xcmsSet", package = "xcms"))
     anaInfo <- analysisInfo(obj)
     
-    if (loadRawData)
-        verifyDataCentroided(anaInfo)
-    
     xcms::phenoData(xs) <- data.frame(class = anaInfo$group, row.names = anaInfo$analysis)
 
     if (loadRawData)
-        xcms::filepaths(xs) <- sapply(seq_len(nrow(anaInfo)),
-                                      function(i) getMzMLOrMzXMLAnalysisPath(anaInfo$analysis[i], anaInfo$path[i],
-                                                                             mustExist = TRUE),
-                                      USE.NAMES = FALSE)
+        xcms::filepaths(xs) <- getCentroidedMSFilesFromAnaInfo(anaInfo)
     else
         xcms::filepaths(xs) <- anaInfo$analysis # dummy paths
 
@@ -149,7 +143,7 @@ setMethod("getXCMSSet", "features", function(obj, verbose, loadRawData)
         
         if (loadRawData)
         {
-            xr <- loadXCMSRaw(anaInfo$analysis[i], anaInfo$path[i], verbose = verbose)[[1]]
+            xr <- loadXCMSRaw(xcms::filepaths(xs)[i], verbose = verbose)
             rlist$raw[[i]] <- xr@scantime
             rlist$corrected[[i]] <- xr@scantime
         }
@@ -362,24 +356,18 @@ setMethod("getXCMSnExp", "featuresSet", function(obj, ..., set) getXCMSnExp(unse
 #' @export
 setMethod("getXCMSnExp", "featureGroupsSet", function(obj, ..., set) getXCMSnExp(unset(obj, set), ...))
 
-loadXCMSRaw <- function(analyses, paths, cacheDB = NULL, verbose = TRUE)
+loadXCMSRaw <- function(filePath, cacheDB = NULL, verbose = TRUE)
 {
-    ret <- sapply(seq_along(analyses), function(anai)
+    hash <- makeFileHash(filePath)
+    xr <- loadCacheData("EICData", hash, cacheDB)
+    if (is.null(xr))
     {
-        p <- getMzMLOrMzXMLAnalysisPath(analyses[anai], paths[anai])
-        hash <- makeFileHash(p)
-        xr <- loadCacheData("EICData", hash, cacheDB)
-        if (is.null(xr))
-        {
-            if (verbose)
-                printf("Loading raw data from '%s'...\n", analyses[anai])
-            xr <- xcms::xcmsRaw(p, profstep = 0)
-            saveCacheData("EICData", xr, hash, cacheDB)
-        }
-        return(xr)
-    })
-    names(ret) <- analyses
-    return(ret)
+        if (verbose)
+            printf("Loading raw data from '%s'...\n", filePath)
+        xr <- xcms::xcmsRaw(filePath, profstep = 0)
+        saveCacheData("EICData", xr, hash, cacheDB)
+    }
+    return(xr)
 }
 
 importXCMSPeaks <- function(peaks, analysisInfo)

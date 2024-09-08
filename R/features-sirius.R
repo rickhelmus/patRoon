@@ -103,12 +103,12 @@ findFeaturesSIRIUS <- function(analysisInfo, verbose = TRUE)
     if (verbose)
         printf("Finding features with SIRIUS for %d analyses ...\n", anaCount)
 
-    cmdQueue <- Map(analysisInfo$analysis, analysisInfo$path, f = function(ana, path)
+    filePaths <- getCentroidedMSFilesFromAnaInfo(analysisInfo, "mzML")
+    cmdQueue <- Map(analysisInfo$analysis, filePaths, f = function(ana, fp)
     {
-        dfile <- getMzMLAnalysisPath(ana, path)
-        hash <- makeHash(makeFileHash(dfile))
+        hash <- makeHash(makeFileHash(fp))
         logf <- paste0(ana, ".txt")
-        return(list(hash = hash, dataFile = dfile, analysis = ana, logFile = logf))
+        return(list(hash = hash, dataFile = fp, analysis = ana, logFile = logf))
     })
     
     fList <- list()

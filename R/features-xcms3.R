@@ -60,9 +60,7 @@ findFeaturesXCMS3 <- function(analysisInfo, param = xcms::CentWaveParam(), ..., 
     checkmate::assertFlag(verbose, add = ac)
     checkmate::reportAssertions(ac)
 
-    files <- sapply(seq_len(nrow(analysisInfo)),
-                    function(i) getMzMLOrMzXMLAnalysisPath(analysisInfo$analysis[i], analysisInfo$path[i]),
-                    USE.NAMES = FALSE)
+    files <- getCentroidedMSFilesFromAnaInfo(analysisInfo)
 
     hash <- makeHash(analysisInfo[, c("analysis", "path", "group"), with = FALSE], do.call(makeFileHash, as.list(files)),
                      param)

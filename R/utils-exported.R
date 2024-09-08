@@ -377,10 +377,11 @@ getBGMSMSPeaks <- function(anaInfo, rGroups = NULL, MSLevel = 2, retentionRange 
     if (!is.null(rGroups))
         anaInfo <- anaInfo[group %in% rGroups]
     
+    filePaths <- getCentroidedMSFilesFromAnaInfo(anaInfo)
+    
     printf("Averaging the spectra for each of the %d analyses\n", nrow(anaInfo))
-    blSpecs <- doApply("Map", parallel, anaInfo$analysis, anaInfo$path, f = function(ana, path)
+    blSpecs <- doApply("Map", parallel, anaInfo$analysis, filePaths, f = function(ana, fp)
     {
-        fp <- getMzMLOrMzXMLAnalysisPath(ana, path, mustExist = TRUE)
         hash <- makeHash(baseHash, makeFileHash(fp))
         avgsp <- loadCacheData("avgBGMSMS", hash, cacheDB)
         

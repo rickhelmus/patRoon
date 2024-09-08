@@ -117,7 +117,7 @@ groupFeaturesSIRIUS <- function(analysisInfo, verbose = TRUE)
     checkmate::assertFlag(verbose, add = ac)
     checkmate::reportAssertions(ac)
     
-    inputFiles <- mapply(analysisInfo$analysis, analysisInfo$path, FUN = getMzMLAnalysisPath)
+    inputFiles <- getCentroidedMSFilesFromAnaInfo(analysisInfo, "mzML")
     
     hash <- makeHash(analysisInfo[, c("analysis", "path"), with = FALSE], lapply(inputFiles, makeFileHash))
     

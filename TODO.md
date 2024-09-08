@@ -211,6 +211,8 @@
 - anaInfo / file path retrieval
     - update convertMSFiles() and newProject()
     - update SAFD for profile or centroided
+        - also replace getMzXMLAnalysisPath()
+        - and does it support mzML now?
     - update assertAndPrepareAnaInfo() usage where backends will be used (eg getBGMSMSPeaks())
 
 - NEWS

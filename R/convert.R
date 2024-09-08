@@ -347,9 +347,11 @@ convertMSFiles <- function(files = NULL, outPath = NULL, dirs = TRUE,
         if (dirs)
         {
             dirs <- files[file.info(files, extra_cols = FALSE)$isdir]
-
-            # filter out analyses "files" (are actually directories)
-            dirs <- files[!sapply(tools::file_ext(dirs), MSFileFormatIsDir, format = from)]
+            dirs <- dirs[sapply(dirs, function(d)
+            {
+                # NOTE: with some formats the analysis files are directories --> remove these
+                !any(sapply(from, verifyFileForFormat, path = d))
+            })]
             
             dirFiles <- listMSFiles(dirs, from)
             files <- union(dirFiles, setdiff(files, dirs))

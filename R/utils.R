@@ -23,19 +23,6 @@ simplifyAnalysisNames <- function(slist)
     return(as.character(sapply(slist, function(s) baseName(tools::file_path_sans_ext(s)), USE.NAMES = F)))
 }
 
-getMzMLAnalysisPath <- function(file, path, mustExist = FALSE) getMSFilePaths(file, path, "mzML", mustExist)
-getMzXMLAnalysisPath <- function(file, path, mustExist = FALSE) getMSFilePaths(file, path, "mzXML", mustExist)
-
-getMzMLOrMzXMLAnalysisPath <- function(file, path, mustExist = FALSE)
-{
-    ret <- getMzMLAnalysisPath(file, path)
-    if (length(ret) == 0)
-        ret <- getMzXMLAnalysisPath(file, path)
-    if (mustExist && length(ret) == 0)
-        stop(sprintf("Analysis %s is not found as mzML or mzXML file.", file), call. = FALSE)
-    return(ret)
-}
-
 mergeAnaSubsetArgWithSets <- function(i, sets, anaInfo, reorder)
 {
     if (length(sets) == 0)

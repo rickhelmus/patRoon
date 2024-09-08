@@ -36,3 +36,6 @@ getMSFilesFromAnaInfo <- function(anaInfo, type, formats)
                  type, paste0(formats, collapse = ", "), paste0(anaInfo$analysis[missingAll], collapse = ", ")),
          call. = FALSE)
 }
+
+# shortcut for common case
+getCentroidedMSFilesFromAnaInfo <- function(anaInfo, formats = c("mzML", "mzXML")) getMSFilesFromAnaInfo(anaInfo, "centroid", formats)

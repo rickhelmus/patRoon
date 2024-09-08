@@ -131,12 +131,15 @@ assertAnalysisInfo <- function(x, fileType = NULL, allowedFormats = NULL, null.o
     invisible(NULL)
 }
 
-assertAndPrepareAnaInfo <- function(x, ..., add = NULL)
+assertAndPrepareAnaInfo <- function(x, ..., null.ok = FALSE, .var.name = checkmate::vname(x), add = NULL)
 {
+    if (is.null(x) && null.ok)
+        return(NULL)
+    
     if (!is.null(add))
         mc <- length(add$getMessages())
 
-    checkmate::assertDataFrame(x)
+    checkmate::assertDataFrame(x, .var.name = .var.name)
 
     x <- makeDT(x) # convert to DT or make a unique copy
     x <- unFactorDT(x)
@@ -148,7 +151,7 @@ assertAndPrepareAnaInfo <- function(x, ..., add = NULL)
         setnames(x, "path", "path_centroid")
     }
     
-    assertAnalysisInfo(x, ..., add = add)
+    assertAnalysisInfo(x, ..., .var.name = .var.name, add = add)
 
     if ((is.null(add) || length(add$getMessages()) == mc) && !is.null(x))
     {

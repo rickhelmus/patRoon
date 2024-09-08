@@ -16,17 +16,23 @@ getMSFileTypes <- function() c("centroid", "profile", "raw", "ims")
 
 getPathsFromAnaInfo <- function(anaInfo, type) return(anaInfo[[paste0("path_", type)]])
 
-getMSFilesFromAnaInfo <- function(anaInfo, type, formats, mustExist = FALSE)
+getMSFilesFromAnaInfo <- function(anaInfo, type, formats)
 {
-    msFilePaths <- listMSFiles(getPathsFromAnaInfo(anaInfo, type), formats)
-    msFilesNoExt <- tools::file_path_sans_ext(basename(msFilePaths))
-    found <- anaInfo$analysis %in% msFilesNoExt
+    missing <- list()
     
-    if (mustExist && any(!found))
+    # go through allowed formats one by one: otherwise the resulting file types could be mixed, which might be unwanted(?)
+    for (form in formats)
     {
-        stop(sprintf("The following analyses with type %s are not found with a correct data format (valid: %s): %s",
-                     type, paste0(formats, collapse = ", "), paste0(files[!found], collapse = ", ")), call. = FALSE)
+        msFilePaths <- listMSFiles(getPathsFromAnaInfo(anaInfo, type), form)
+        msFilesNoExt <- tools::file_path_sans_ext(basename(msFilePaths))
+        found <- anaInfo$analysis %in% msFilesNoExt
+        if (all(found)) # success!
+            return(msFilePaths[match(anaInfo$analysis, msFilesNoExt)])
+        missing[[form]] <- which(!found)
     }
-    
-    return(msFilePaths[match(anaInfo$analysis, msFilesNoExt, nomatch = 0)])
+
+    missingAll <- Reduce(intersect, missing)
+    stop(sprintf("The following analyses with type %s are not found with a correct data format (valid: %s): %s",
+                 type, paste0(formats, collapse = ", "), paste0(anaInfo$analysis[missingAll], collapse = ", ")),
+         call. = FALSE)
 }

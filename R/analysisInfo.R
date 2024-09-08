@@ -25,7 +25,7 @@ setMethod("getTICs", "data.frame", function(obj, retentionRange = NULL, MSLevel 
     obj <- assertAndPrepareAnaInfo(obj, add = ac)
     checkmate::reportAssertions(ac)
     
-    filePaths <- getMzMLOrMzXMLAnalysisPath(obj$analysis, obj$path, mustExist = TRUE)
+    filePaths <- getCentroidedMSFilesFromAnaInfo(obj)
     
     res <- lapply(filePaths, function(fpath)
     {
@@ -56,7 +56,7 @@ setMethod("getBPCs", "data.frame", function(obj, retentionRange = NULL, MSLevel 
     obj <- assertAndPrepareAnaInfo(obj, add = ac)
     checkmate::reportAssertions(ac)
     
-    filePaths <- getMzMLOrMzXMLAnalysisPath(obj$analysis, obj$path, mustExist = TRUE)
+    filePaths <- getCentroidedMSFilesFromAnaInfo(obj)
     
     res <- lapply(filePaths, function(fpath)
     {

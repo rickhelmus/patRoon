@@ -17,12 +17,6 @@
 #' @name convertMSFiles
 NULL
 
-MSFileFormatIsDir <- function(format, ext)
-{
-    # UNDONE: is agilent .d also a directory?
-    return((format == "bruker" && ext == "d") || (format == "waters" && ext == "raw"))
-}
-
 #' @details \code{getMSFileConversionFormats} returns a \code{character} with all supported
 #'   input formats (see below).
 #' @param vendor If \code{TRUE} only vendor formats are returned.
@@ -44,53 +38,6 @@ getMSFileConversionFormats <- function(algorithm = "pwiz", vendor = FALSE)
         ret <- setdiff(ret, c("mzXML", "mzML"))
 
     return(ret)
-}
-
-filterMSFileDirs <- function(files, from)
-{
-    if (length(files) == 0)
-        return(files)
-    
-    allFromExts <- MSFileExtensions()[from]
-    keep <- sapply(files, function(file)
-    {
-        fExt <- tools::file_ext(file)
-        
-        fromExts <- pruneList(lapply(allFromExts, function(f) f[tolower(f) %in% tolower(fExt)]), checkEmptyElements = TRUE)
-        if (length(fromExts) == 0)
-            return(FALSE)
-        
-        fromCheck <- names(fromExts)
-        shouldBeDir <- mapply(fromCheck, fromExts, SIMPLIFY = TRUE,
-                              FUN = function(format, exts) sapply(exts, MSFileFormatIsDir, format = format))
-        
-        if (!allSame(shouldBeDir))
-            return(TRUE) # can be either
-        
-        isDir <- file.info(file, extra_cols = FALSE)$isdir
-        if (all(shouldBeDir))
-            return(isDir)
-        return(!isDir)
-    })
-
-    return(files[keep])    
-}
-
-listMSFiles <- function(dirs, from)
-{
-    dirs <- normalizePath(unique(dirs), mustWork = FALSE, winslash = "/")
-    
-    allExts <- MSFileExtensions()
-    allExts <- unique(unlist(allExts[from]))
-
-    files <- list.files(dirs, full.names = TRUE, pattern = paste0(paste0(".+\\.", allExts, collapse = "|"), "$"),
-                        ignore.case = TRUE)
-    
-    # try to get to back to the original directory order
-    ord <- match(dirname(files), dirs)
-    files <- files[order(ord)]
-
-    return(filterMSFileDirs(files, from))
 }
 
 convertMSFilesPWiz <- function(inFiles, outFiles, to, centroid, filters, extraOpts, PWizBatchSize)

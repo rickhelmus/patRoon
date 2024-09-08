@@ -88,3 +88,29 @@ SpectrumRaw MSReadBackendOTIMS::doReadSpectrum(const ThreadDataType &tdata, Spec
     
     return ret;
 }
+
+// [[Rcpp::export]]
+bool initBrukerLibrary(const std::string &path)
+{
+    static std::string lastPath;
+    static bool succeeded = false;
+    
+    if (!lastPath.empty() && succeeded && path == lastPath)
+        return true; // already loaded
+    
+    try
+    {
+        setup_bruker(path);
+        succeeded = true;
+    }
+    catch(const std::runtime_error &e)
+    {
+        if (lastPath != path) // only warn the first time
+            Rcpp::warning("Failed to load Bruker TIMS library ('%s'): %s", path.c_str(), e.what());
+        succeeded = false;
+    }
+    
+    lastPath = path;
+    
+    return succeeded;
+}

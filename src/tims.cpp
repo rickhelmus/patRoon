@@ -383,12 +383,6 @@ EIX sortCompressEIX(const EIX &eix, bool compress, std::vector<size_t> *indOrder
 }
 
 // [[Rcpp::export]]
-void initBrukerLibrary(const std::string &path)
-{
-    setup_bruker(path);
-}
-
-// [[Rcpp::export]]
 Rcpp::DataFrame collapseTIMSFrame(const std::string &file, size_t frameID, const std::string &method, double mzWindow,
                                   double mzStart = 0.0, double mzEnd = 0.0, double mobilityStart = 0.0,
                                   double mobilityEnd = 0.0, unsigned minAbundance = 1, unsigned topMost = 0,

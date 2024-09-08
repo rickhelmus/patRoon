@@ -24,6 +24,40 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// initBrukerLibrary
+bool initBrukerLibrary(const std::string& path);
+static SEXP _patRoon_initBrukerLibrary_try(SEXP pathSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< const std::string& >::type path(pathSEXP);
+    rcpp_result_gen = Rcpp::wrap(initBrukerLibrary(path));
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _patRoon_initBrukerLibrary(SEXP pathSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_patRoon_initBrukerLibrary_try(pathSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error("%s", CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
 // getMSSpectrum
 Rcpp::DataFrame getMSSpectrum(const MSReadBackend& backend, int index);
 RcppExport SEXP _patRoon_getMSSpectrum(SEXP backendSEXP, SEXP indexSEXP) {
@@ -272,16 +306,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// initBrukerLibrary
-void initBrukerLibrary(const std::string& path);
-RcppExport SEXP _patRoon_initBrukerLibrary(SEXP pathSEXP) {
-BEGIN_RCPP
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const std::string& >::type path(pathSEXP);
-    initBrukerLibrary(path);
-    return R_NilValue;
-END_RCPP
-}
 // collapseTIMSFrame
 Rcpp::DataFrame collapseTIMSFrame(const std::string& file, size_t frameID, const std::string& method, double mzWindow, double mzStart, double mzEnd, double mobilityStart, double mobilityEnd, unsigned minAbundance, unsigned topMost, unsigned minIntensity, unsigned minIntensityPost, Rcpp::Nullable<Rcpp::IntegerVector> scanStartsN, Rcpp::Nullable<Rcpp::IntegerVector> scanEndsN, double precursorMZ, bool onlyWithPrecursor, bool flatten);
 RcppExport SEXP _patRoon_collapseTIMSFrame(SEXP fileSEXP, SEXP frameIDSEXP, SEXP methodSEXP, SEXP mzWindowSEXP, SEXP mzStartSEXP, SEXP mzEndSEXP, SEXP mobilityStartSEXP, SEXP mobilityEndSEXP, SEXP minAbundanceSEXP, SEXP topMostSEXP, SEXP minIntensitySEXP, SEXP minIntensityPostSEXP, SEXP scanStartsNSEXP, SEXP scanEndsNSEXP, SEXP precursorMZSEXP, SEXP onlyWithPrecursorSEXP, SEXP flattenSEXP) {
@@ -497,12 +521,14 @@ END_RCPP
 static int _patRoon_RcppExport_validate(const char* sig) { 
     static std::set<std::string> signatures;
     if (signatures.empty()) {
+        signatures.insert("bool(*initBrukerLibrary)(const std::string&)");
     }
     return signatures.find(sig) != signatures.end();
 }
 
 // registerCCallable (register entry points for exported C++ functions)
 RcppExport SEXP _patRoon_RcppExport_registerCCallable() { 
+    R_RegisterCCallable("patRoon", "_patRoon_initBrukerLibrary", (DL_FUNC)_patRoon_initBrukerLibrary_try);
     R_RegisterCCallable("patRoon", "_patRoon_RcppExport_validate", (DL_FUNC)_patRoon_RcppExport_validate);
     return R_NilValue;
 }
@@ -511,6 +537,7 @@ RcppExport SEXP _rcpp_module_boot_MSReadBackend();
 
 static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_writeChromsToMzML", (DL_FUNC) &_patRoon_writeChromsToMzML, 2},
+    {"_patRoon_initBrukerLibrary", (DL_FUNC) &_patRoon_initBrukerLibrary, 1},
     {"_patRoon_getMSSpectrum", (DL_FUNC) &_patRoon_getMSSpectrum, 2},
     {"_patRoon_getScans", (DL_FUNC) &_patRoon_getScans, 6},
     {"_patRoon_getEICList", (DL_FUNC) &_patRoon_getEICList, 7},
@@ -528,7 +555,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_specDistMatrix", (DL_FUNC) &_patRoon_specDistMatrix, 7},
     {"_patRoon_specDistRect", (DL_FUNC) &_patRoon_specDistRect, 9},
     {"_patRoon_testSpecFilter", (DL_FUNC) &_patRoon_testSpecFilter, 7},
-    {"_patRoon_initBrukerLibrary", (DL_FUNC) &_patRoon_initBrukerLibrary, 1},
     {"_patRoon_collapseTIMSFrame", (DL_FUNC) &_patRoon_collapseTIMSFrame, 17},
     {"_patRoon_getTIMSPeakLists", (DL_FUNC) &_patRoon_getTIMSPeakLists, 15},
     {"_patRoon_getTIMSEICs", (DL_FUNC) &_patRoon_getTIMSEICs, 7},

@@ -5,6 +5,10 @@ writeChromsToMzML <- function(EICs, out) {
     invisible(.Call(`_patRoon_writeChromsToMzML`, EICs, out))
 }
 
+initBrukerLibrary <- function(path) {
+    .Call(`_patRoon_initBrukerLibrary`, path)
+}
+
 getMSSpectrum <- function(backend, index) {
     .Call(`_patRoon_getMSSpectrum`, backend, index)
 }
@@ -71,10 +75,6 @@ specDistRect <- function(specList1, specList2, method, shift, precMZs1, precMZs2
 
 testSpecFilter <- function(mzs, ints, mzMin, mzMax, minInt, topMost, prec) {
     .Call(`_patRoon_testSpecFilter`, mzs, ints, mzMin, mzMax, minInt, topMost, prec)
-}
-
-initBrukerLibrary <- function(path) {
-    invisible(.Call(`_patRoon_initBrukerLibrary`, path))
 }
 
 collapseTIMSFrame <- function(file, frameID, method, mzWindow, mzStart = 0.0, mzEnd = 0.0, mobilityStart = 0.0, mobilityEnd = 0.0, minAbundance = 1L, topMost = 0L, minIntensity = 0L, minIntensityPost = 0L, scanStartsN = NULL, scanEndsN = NULL, precursorMZ = 0.0, onlyWithPrecursor = FALSE, flatten = FALSE) {

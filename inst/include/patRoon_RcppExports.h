@@ -24,6 +24,27 @@ namespace patRoon {
         }
     }
 
+    inline bool initBrukerLibrary(const std::string& path) {
+        typedef SEXP(*Ptr_initBrukerLibrary)(SEXP);
+        static Ptr_initBrukerLibrary p_initBrukerLibrary = NULL;
+        if (p_initBrukerLibrary == NULL) {
+            validateSignature("bool(*initBrukerLibrary)(const std::string&)");
+            p_initBrukerLibrary = (Ptr_initBrukerLibrary)R_GetCCallable("patRoon", "_patRoon_initBrukerLibrary");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p_initBrukerLibrary(Shield<SEXP>(Rcpp::wrap(path)));
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (Rcpp::internal::isLongjumpSentinel(rcpp_result_gen))
+            throw Rcpp::LongjumpException(rcpp_result_gen);
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
+        return Rcpp::as<bool >(rcpp_result_gen);
+    }
+
 }
 
 #endif // RCPP_patRoon_RCPPEXPORTS_H_GEN_

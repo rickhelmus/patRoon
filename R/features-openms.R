@@ -119,12 +119,12 @@ findFeaturesOpenMS <- function(analysisInfo, noiseThrInt = 1000, chromSNR = 3, c
                    isotopeFilteringModel, MZScoring13C, useSmoothedInts, extraOpts)
     paramsHash <- makeHash(params)
 
+    filePaths <- getCentroidedMSFilesFromAnaInfo(analysisInfo, "mzML")
     cmdQueue <- lapply(seq_len(nrow(analysisInfo)), function(anai)
     {
-        dfile <- getMzMLAnalysisPath(analysisInfo$analysis[anai], analysisInfo$path[anai])
-        hash <- makeHash(makeFileHash(dfile), paramsHash)
+        hash <- makeHash(makeFileHash(filePaths[anai]), paramsHash)
         logf <- paste0("ffm-", analysisInfo$analysis[anai], ".txt")
-        return(list(hash = hash, dataFile = dfile, logFile = logf))
+        return(list(hash = hash, dataFile = filePaths[anai], logFile = logf))
     })
     names(cmdQueue) <- analysisInfo$analysis
 

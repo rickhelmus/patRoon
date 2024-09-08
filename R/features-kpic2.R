@@ -128,7 +128,7 @@ findFeaturesKPIC2 <- function(analysisInfo, kmeans = TRUE, level = 1000, ..., pa
     checkmate::reportAssertions(ac)
 
     anas <- analysisInfo$analysis
-    filePaths <- mapply(getMzMLOrMzXMLAnalysisPath, anas, analysisInfo$path)
+    filePaths <- getCentroidedMSFilesFromAnaInfo(analysisInfo)
     baseHash <- makeHash(kmeans, level, list(...))
     hashes <- setNames(sapply(filePaths, function(fp) makeHash(baseHash, makeFileHash(fp))), anas)
     cachedData <- lapply(hashes, loadCacheData, category = "featuresKPIC2")
@@ -230,6 +230,7 @@ setMethod("getPICSet", "features", function(obj, loadRawData = TRUE)
     checkmate::assertFlag(loadRawData)
     
     anaInfo <- analysisInfo(obj)
+    filePaths <- getCentroidedMSFilesFromAnaInfo(anaInfo)
     fTable <- featureTable(obj)
     EICs <- if (loadRawData) getEICsForFeatures(obj) else NULL
     return(lapply(names(fTable), function(ana)
@@ -239,7 +240,7 @@ setMethod("getPICSet", "features", function(obj, loadRawData = TRUE)
         {
             anai <- match(ana, anaInfo$analysis)
             
-            ret$path = getMzMLOrMzXMLAnalysisPath(ana, anaInfo$path[anai], mustExist = TRUE)
+            ret$path = filePaths[anai]
             ret$scantime <- loadSpectra(ret$path, verbose = FALSE)$header$retentionTime
             
             if (!is.null(EICs[[ana]]))

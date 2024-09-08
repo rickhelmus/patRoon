@@ -62,6 +62,7 @@ setMethod("generateMSPeakListsMzR", "featureGroups", function(fGroups, maxMSRtWi
     ftindex <- groupFeatIndex(fGroups)
     fTable <- featureTable(fGroups)
     anaInfo <- analysisInfo(fGroups)
+    filePaths <- getCentroidedMSFilesFromAnaInfo(anaInfo)
     gTable <- groupTable(fGroups)
     gCount <- length(fGroups)
     gNames <- names(fGroups)
@@ -94,7 +95,6 @@ setMethod("generateMSPeakListsMzR", "featureGroups", function(fGroups, maxMSRtWi
     for (anai in seq_len(anaCount))
     {
         ana <- anaInfo$analysis[anai]
-        fp <- getMzMLOrMzXMLAnalysisPath(ana, anaInfo$path[anai], mustExist = TRUE)
         spectra <- NULL
 
         baseHash <- makeHash(ana, maxMSRtWindow, precursorMzWindow, topMost, avgFeatParams)
@@ -133,7 +133,7 @@ setMethod("generateMSPeakListsMzR", "featureGroups", function(fGroups, maxMSRtWi
                     rtRange <- c(max(rtRange[1], ft$ret - maxMSRtWindow), min(rtRange[2], ft$ret + maxMSRtWindow))
 
                 if (is.null(spectra))
-                    spectra <- loadSpectra(fp, verbose = FALSE)
+                    spectra <- loadSpectra(filePaths[anai], verbose = FALSE)
 
                 # NOTE: precursor is set here only for precursor assignment,
                 # keeping precursorMzWindow unset for the header makes sure that

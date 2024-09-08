@@ -52,7 +52,7 @@ findFeaturesEnviPick <- function(analysisInfo, ..., parallel = TRUE, verbose = T
         printf("Finding features with enviPick for %d analyses ...\n", anaCount)
 
     anas <- analysisInfo$analysis
-    filePaths <- mapply(getMzXMLAnalysisPath, anas, analysisInfo$path)
+    filePaths <- getCentroidedMSFilesFromAnaInfo(analysisInfo, "mzXML")
     baseHash <- makeHash(list(...))
     hashes <- setNames(sapply(filePaths, function(fp) makeHash(baseHash, makeFileHash(fp))), anas)
     cachedData <- lapply(hashes, loadCacheData, category = "featuresEnviPick")

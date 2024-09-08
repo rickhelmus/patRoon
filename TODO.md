@@ -215,9 +215,13 @@
         - and does it support mzML now?
     - update assertAndPrepareAnaInfo() usage where backends will be used (eg getBGMSMSPeaks())
 
+- test
+    - new verifyFileForFormat() usage is convertMSFiles()
+
 - NEWS
     - MSFileFormats() --> getMSFileConversionFormats() / getMSFileFormats()
     - new behavior of getMSFilesFromAnaInfo(): file types are checked one by one to avoid mixes and always checked to be present (mustExist was set a bit randomly...)
+    - better checking of analysis file directory checking (verifyFileForFormat())
 
 - docs
     - getMSFileFormats()

@@ -14,6 +14,59 @@ MSFileExtensions <- function()
 
 getMSFileTypes <- function() c("centroid", "profile", "raw", "ims")
 
+MSFileFormatIsDir <- function(format, ext)
+{
+    # UNDONE: is agilent .d also a directory?
+    return((format == "bruker" && ext == "d") || (format == "waters" && ext == "raw"))
+}
+
+filterMSFileDirs <- function(files, from)
+{
+    if (length(files) == 0)
+        return(files)
+    
+    allFromExts <- MSFileExtensions()[from]
+    keep <- sapply(files, function(file)
+    {
+        fExt <- tools::file_ext(file)
+        
+        fromExts <- pruneList(lapply(allFromExts, function(f) f[tolower(f) %in% tolower(fExt)]), checkEmptyElements = TRUE)
+        if (length(fromExts) == 0)
+            return(FALSE)
+        
+        fromCheck <- names(fromExts)
+        shouldBeDir <- mapply(fromCheck, fromExts, SIMPLIFY = TRUE,
+                              FUN = function(format, exts) sapply(exts, MSFileFormatIsDir, format = format))
+        
+        if (!allSame(shouldBeDir))
+            return(TRUE) # can be either
+        
+        isDir <- file.info(file, extra_cols = FALSE)$isdir
+        if (all(shouldBeDir))
+            return(isDir)
+        return(!isDir)
+    })
+    
+    return(files[keep])    
+}
+
+listMSFiles <- function(dirs, from)
+{
+    dirs <- normalizePath(unique(dirs), mustWork = FALSE, winslash = "/")
+    
+    allExts <- MSFileExtensions()
+    allExts <- unique(unlist(allExts[from]))
+    
+    files <- list.files(dirs, full.names = TRUE, pattern = paste0(paste0(".+\\.", allExts, collapse = "|"), "$"),
+                        ignore.case = TRUE)
+    
+    # try to get to back to the original directory order
+    ord <- match(dirname(files), dirs)
+    files <- files[order(ord)]
+    
+    return(filterMSFileDirs(files, from))
+}
+
 getPathsFromAnaInfo <- function(anaInfo, type) return(anaInfo[[paste0("path_", type)]])
 
 getMSFilesFromAnaInfo <- function(anaInfo, type, formats)

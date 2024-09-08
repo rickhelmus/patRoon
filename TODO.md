@@ -215,6 +215,7 @@
 
 - NEWS
     - MSFileFormats() --> getMSFileConversionFormats() / getMSFileFormats()
+    - new behavior of getMSFilesFromAnaInfo(): file types are checked one by one to avoid mixes and always checked to be present (mustExist was set a bit randomly...)
 
 - docs
     - getMSFileFormats()

@@ -135,6 +135,7 @@ RCPP_MODULE(MSReadBackend)
     Rcpp::class_<MSReadBackend>("MSReadBackend")
         .method("open", &MSReadBackend::open)
         .method("close", &MSReadBackend::close)
+        .method("getCurrentFile", &MSReadBackend::getCurrentFile)
     ;
     Rcpp::class_<MSReadBackendMem>("MSReadBackendMem")
         .derives<MSReadBackend>("MSReadBackend")

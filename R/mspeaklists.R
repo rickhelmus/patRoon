@@ -828,3 +828,115 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, algorithm, .
     f(fGroups, ...)
 })
 
+# UNDONE: this will replace generateMSPeakLists()
+# UNDONE: how to set algorithm slot?
+generateMSPeakListsNew <- function(fGroups, maxMSRtWindow = 5, precursorMzWindow = 4, topMost = NULL,
+                                   avgFeatParams = getDefAvgPListParams(),
+                                   avgFGroupParams = getDefAvgPListParams())
+{
+    # UNDONE: output doesn't match with classic mzR peaklists
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertNumber(maxMSRtWindow, lower = 1, finite = TRUE, null.ok = TRUE, add = ac)
+    checkmate::assertNumber(precursorMzWindow, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
+    checkmate::assertCount(topMost, positive = TRUE, null.ok = TRUE, add = ac)
+    assertAvgPListParams(avgFeatParams, add = ac)
+    assertAvgPListParams(avgFGroupParams, add = ac)
+    checkmate::reportAssertions(ac)
+
+    if (length(fGroups) == 0)
+        return(MSPeakLists(algorithm = "internal"))
+    
+    getMSPL <- function(backend, ft, params, MSLevel)
+    {
+        # UNDONE: set mobilities
+        ret <- getMSPeakLists(backend, ft$retmin, ft$retmax, ft$mz,
+                              withPrecursor = params$pruneMissingPrecursor, MSLevel = MSLevel,
+                              isoWindow = precursorMzWindow, method = params$method,
+                              mzWindow = params$clusterMzWindow,
+                              startMobs = rep(0, nrow(ft)), endMobs = rep(0, nrow(ft)),
+                              minAbundance = params$minAbundance, topMost = params$topMost,
+                              minIntensityIMS = params$minIntensityIMS,
+                              minIntensityPre = params$minIntensityPre,
+                              minIntensityPost = params$minIntensityPost)
+        
+        names(ret) <- ft$group
+        ret <- pruneList(ret, checkZeroRows = TRUE)
+        ret <- lapply(ret, setDT)
+        ret <- Map(ret, ft$mz[match(names(ret), ft$group)], f = assignPrecursorToMSPeakList)
+        
+        # UNDONE!!
+        ret <- lapply(ret, function(pl) { pl <- copy(pl); pl[, feat_abundance := 1] })
+        
+        return(ret)
+    }
+    
+    avgFeatParamsMS <- avgFeatParamsMSMS <-
+        avgFeatParams[setdiff(names(avgFeatParams), c("pruneMissingPrecursorMS", "retainPrecursorMSMS"))]
+    avgFeatParamsMS$retainPrecursor <- TRUE;
+    avgFeatParamsMS$pruneMissingPrecursor <- avgFeatParams$pruneMissingPrecursorMS
+    avgFeatParamsMSMS$pruneMissingPrecursor <- FALSE
+    avgFeatParamsMSMS$retainPrecursor <- avgFeatParams$retainPrecursorMSMS
+    
+    # UNDONE: make filter?
+    # UNDONE: maybe not so elegant, check later
+    if (!is.null(topMost) && topMost < length(analyses(fGroups)))
+    {
+        fGroups <- delete(fGroups, j = function(ints, ...)
+        {
+            sinds <- order(ints, decreasing = TRUE)
+            return(sinds[-seq_len(topMost)])
+        })
+    }
+    
+    fTable <- featureTable(fGroups)
+    gNames <- names(fGroups)
+    cacheDB <- openCacheDBScope()
+    
+    featurePLs <- applyMSData(analysisInfo(fGroups), function(ana, path, backend)
+    {
+        baseHash <- makeHash(getMSDataFileHash(path), maxMSRtWindow, precursorMzWindow, topMost, avgFeatParams)
+        
+        ft <- copy(fTable[[ana]][, c("mz", "ret", "retmin", "retmax", "group"), with = FALSE])
+        ft[, hash := makeHash(baseHash, .SD), by = seq_len(nrow(ft)), .SDcols = setdiff(names(ft), "group")]
+        
+        cachedData <- loadCacheData("MSPeakLists", ft$hash, cacheDB, simplify = FALSE)
+        if (!is.null(cachedData))
+            names(cachedData) <- ft$group[match(names(cachedData), ft$hash)]
+        
+        ft <- ft[!group %chin% names(cachedData)]
+        
+        if (nrow(ft) == 0)
+            return(cachedData) # all cached
+        
+        if (!is.null(maxMSRtWindow))
+        {
+            ft[, retmin := pmax(retmin, ret - maxMSRtWindow)]
+            ft[, retmax := pmin(retmax, ret + maxMSRtWindow)]
+        }
+        
+        openMSReadBackend(backend, path)
+        msplMS <- getMSPL(backend, ft, avgFeatParamsMS, 1)
+        msplMSMS <- getMSPL(backend, ft, avgFeatParamsMSMS, 2)
+
+        mspl <- sapply(union(names(msplMS), names(msplMSMS)), function(gn)
+        {
+            pruneList(list(MS = msplMS[[gn]], MSMS = msplMSMS[[gn]]))
+        }, simplify = FALSE)
+
+        if (length(cachedData) > 0)
+            mspl <- c(mspl, cachedData)
+        
+        mspl <- mspl[intersect(gNames, names(mspl))] # sync fg order
+
+        for (fg in names(mspl))
+            saveCacheData("MSPeakLists", mspl[[fg]], ft$hash[match(fg, ft$group)], cacheDB)
+        
+        doProgress()
+        
+        return(mspl)        
+    })
+    
+    return(MSPeakLists(peakLists = featurePLs, metadata = list(), avgPeakListArgs = avgFGroupParams,
+                       origFGNames = gNames, algorithm = "internal"))
+}

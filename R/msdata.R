@@ -73,6 +73,7 @@ setMSReadBackendMetadata <- function(backend, generator, fileHash = NULL, cacheD
 
 setMethod("initMSReadBackend", "Rcpp_MSReadBackendOTIMS", function(backend)
 {
+    # UNDONE: test with non-PASEF data
     setMSReadBackendMetadata(backend, function()
     {
         TIMSDB <- withr::local_db_connection(DBI::dbConnect(RSQLite::SQLite(),
@@ -166,7 +167,7 @@ openMSReadBackend <- function(backend, path)
     return(backend)
 }
 
-applyMSData <- function(anaInfo, func, applyf = "lapply", ...)
+applyMSData <- function(anaInfo, func, ...)
 {
     backends <- getOption("patRoon.MSBackends", character())
     
@@ -183,8 +184,8 @@ applyMSData <- function(anaInfo, func, applyf = "lapply", ...)
             backend <- createMSBackend(bn)
             # NOTE: disable future parallelization as the backends are already OpenMP parallelized
             # NOTE: the callback can return cached data so opening the file should happen there.
-            return(setNames(doApply(applyf, doPar = FALSE, data = filePaths, func, backend = backend, ...),
-                            anaInfo$analysis))
+            return(doApply("Map", doPar = FALSE, data = anaInfo$analysis, filePaths, f = func,
+                           MoreArgs = list(backend = backend, ...)))
         }
     }
     

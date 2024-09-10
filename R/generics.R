@@ -34,6 +34,7 @@ setGeneric("getEICsForFGroups", function(fGroups, analysis = analyses(fGroups), 
                                          ...) standardGeneric("getEICsForFGroups"))
 setGeneric("getEICsForFeatures", function(features) standardGeneric("getEICsForFeatures"))
 
+setGeneric("initMSReadBackend", function(backend) standardGeneric("initMSReadBackend"))
 
 ### Features and feature groups
 

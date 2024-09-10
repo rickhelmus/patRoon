@@ -15,6 +15,13 @@ MSFileExtensions <- function()
 
 getMSFileTypes <- function() c("centroid", "profile", "raw", "ims")
 
+getMSDataFileHash <- function(path)
+{
+    # NOTE: for hashing limit length as this function may be called frequently. The path is also included to make it
+    # hopefully sufficiently unique.
+    return(makeHash(path, makeFileHash(path, length = 8192)))
+}
+
 verifyFileForFormat <- function(path, format)
 {
     isDir <- file.info(path, extra_cols = FALSE)$isdir
@@ -69,14 +76,17 @@ listMSFiles <- function(dirs, from)
 
 getPathsFromAnaInfo <- function(anaInfo, type) return(anaInfo[[paste0("path_", type)]])
 
-getMSFilesFromAnaInfo <- function(anaInfo, type, formats)
+getMSFilesFromAnaInfo <- function(anaInfo, type, formats, mustExist = TRUE)
 {
     missing <- list()
     
     # go through allowed formats one by one: otherwise the resulting file types could be mixed, which might be unwanted(?)
     for (form in formats)
     {
-        msFilePaths <- listMSFiles(getPathsFromAnaInfo(anaInfo, type), form)
+        aip <- getPathsFromAnaInfo(anaInfo, type)
+        if (is.null(aip))
+            next
+        msFilePaths <- listMSFiles(aip, form)
         msFilesNoExt <- tools::file_path_sans_ext(basename(msFilePaths))
         found <- anaInfo$analysis %in% msFilesNoExt
         if (all(found)) # success!
@@ -84,6 +94,9 @@ getMSFilesFromAnaInfo <- function(anaInfo, type, formats)
         missing[[form]] <- which(!found)
     }
 
+    if (!mustExist)
+        return(NULL)
+    
     missingAll <- Reduce(intersect, missing)
     stop(sprintf("The following analyses with type %s are not found with a correct data format (valid: %s): %s",
                  type, paste0(formats, collapse = ", "), paste0(anaInfo$analysis[missingAll], collapse = ", ")),
@@ -91,4 +104,7 @@ getMSFilesFromAnaInfo <- function(anaInfo, type, formats)
 }
 
 # shortcut for common case
-getCentroidedMSFilesFromAnaInfo <- function(anaInfo, formats = c("mzML", "mzXML")) getMSFilesFromAnaInfo(anaInfo, "centroid", formats)
+getCentroidedMSFilesFromAnaInfo <- function(anaInfo, formats = c("mzML", "mzXML"), mustExist = TRUE)
+{
+    getMSFilesFromAnaInfo(anaInfo, "centroid", formats, mustExist)
+}

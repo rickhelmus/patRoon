@@ -7,11 +7,13 @@ defaultPkgOpts <- function(pkgname)
     ret <- list(cache.mode = "both",
                 checkCentroided = TRUE,
                 cache.fileName = "cache.sqlite",
+                MSBackends = c("opentims", "streamcraft", "mstoolkit", "mzr"),
                 MP.method = "classic",
                 # backwards compat
                 MP.maxProcs = getOption("patRoon.maxProcAmount", parallel::detectCores(logical = FALSE)),
                 MP.futureSched = 1.0,
                 MP.logPath = "log",
+                path.BrukerTIMS = "",
                 path.pwiz = "",
                 path.GenForm = "",
                 path.MetFragCL = getOption("patRoon.path.metFragCL", ""), # backwards compat
@@ -28,7 +30,7 @@ defaultPkgOpts <- function(pkgname)
 dumpPkgOpts <- function(printFunc)
 {
     for (opt in names(defaultPkgOpts(utils::packageName())))
-        printFunc(sprintf("- %s: \"%s\"", opt, getOption(opt)))
+        printFunc(sprintf("- %s: %s", opt, paste0('"', getOption(opt), '"', collapse = ", ")))
 }
 
 .onLoad <- function(libname, pkgname)

@@ -641,3 +641,53 @@ Rcpp::List getMobilograms(const MSReadBackend &backend, const std::vector<Spectr
     
     return ret;
 }
+
+// [[Rcpp::export]]
+Rcpp::NumericVector getPeakIntensities(const MSReadBackend &backend,
+                                       const std::vector<SpectrumRawTypes::Mass> &startMZs,
+                                       const std::vector<SpectrumRawTypes::Mass> &endMZs,
+                                       const std::vector<SpectrumRawTypes::Time> &times)
+{
+    const auto &specMeta = backend.getSpecMetadata().first;
+    const auto entries = startMZs.size();
+    std::vector<std::vector<SpectrumRawSelection>> scanSels(entries);
+    
+    if (entries == 0)
+        return Rcpp::NumericVector();
+
+    const auto sfunc = [&](const SpectrumRaw &spec, const SpectrumRawSelection &, size_t e)
+    {
+        const auto startIt = std::lower_bound(spec.getMZs().begin(), spec.getMZs().end(), startMZs[e]);
+        if (startIt == spec.getMZs().end())
+            return 0;
+        const auto endIt = std::upper_bound(startIt, spec.getMZs().end(), endMZs[e]);
+        const auto startInd = std::distance(spec.getMZs().begin(), startIt);
+        const auto endInd = std::distance(spec.getMZs().begin(), endIt);
+        return std::accumulate(spec.getIntensities().begin() + startInd, spec.getIntensities().begin() + endInd, 0);
+    };
+        
+    for (size_t i=0; i<entries; ++i)
+    {
+        // use lower bound to quickly find the index that matches the given scan time. However, since given RTs are
+        // possibly not exact and will not exactly match the actual scan times, it may be that the lower_bound() returns
+        // the first scan that is higher, while the previous may actually be closer. Hence, also check the previous scan
+        // and take the closest.
+        const auto it = std::lower_bound(specMeta.times.begin(), specMeta.times.end(), times[i]);
+        auto ind = std::distance(specMeta.times.begin(), it);
+        if (it != specMeta.times.begin()) // only check previous if there is one
+        {
+            const auto prevIt = std::prev(it);
+            if (it == specMeta.times.end() || (std::fabs(times[i] - *it) > std::fabs(times[i] - *prevIt)))
+                --ind; // use the previous if the RT was not matched or is less close
+        }
+        scanSels[i].emplace_back(ind);
+    }
+    
+    const auto ints = applyMSData<SpectrumRawTypes::Intensity>(backend, SpectrumRawTypes::MSLevel::MS1, scanSels, sfunc);
+    
+    auto ret = Rcpp::NumericVector(entries);
+    for (size_t i=0; i<entries; ++i)
+        ret[i] = (!ints[i].empty()) ? ints[i][0] : 0;
+    
+    return ret;
+}

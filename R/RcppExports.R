@@ -37,6 +37,10 @@ getMobilograms <- function(backend, startMZs, endMZs, startTimes, endTimes, meth
     .Call(`_patRoon_getMobilograms`, backend, startMZs, endMZs, startTimes, endTimes, method, mobWindow, minIntensity)
 }
 
+getPeakIntensities <- function(backend, startMZs, endMZs, times) {
+    .Call(`_patRoon_getPeakIntensities`, backend, startMZs, endMZs, times)
+}
+
 readMSP <- function(file, pc) {
     .Call(`_patRoon_readMSP`, file, pc)
 }

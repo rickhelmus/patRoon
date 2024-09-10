@@ -198,6 +198,7 @@
         - fixed: TP graphs were generated for components with absent (parent) fGroups
 
 ## msdata
+
 - check assumptions about data being sorted
     - meatadata: scans, RTs, mobilities
     - spectra: m/z, mobilities (see if this can be used to speedup eg MSTK)
@@ -214,6 +215,7 @@
         - also replace getMzXMLAnalysisPath()
         - and does it support mzML now?
     - update assertAndPrepareAnaInfo() usage where backends will be used (eg getBGMSMSPeaks())
+- the default backends now put mzR as last to ensure mobility data can be used, change this somehow?
 
 - test
     - new verifyFileForFormat() usage is convertMSFiles()
@@ -225,6 +227,7 @@
 
 - docs
     - getMSFileFormats()
+    - patRoon.MSBackends and patRoon.path.BrukerTIMS options
 
 ## IMS
 

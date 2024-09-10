@@ -41,6 +41,8 @@ setGeneric("getEICsForFeatures", function(features) standardGeneric("getEICsForF
 
 setGeneric("getKeptXCMSPeakInds", function(old, new, xd) standardGeneric("getKeptXCMSPeakInds"))
 
+setGeneric("initMSReadBackend", function(backend) standardGeneric("initMSReadBackend"))
+
 ### Features and feature groups
 
 #' @rdname featureGroups-class

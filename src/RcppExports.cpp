@@ -171,6 +171,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// getPeakIntensities
+Rcpp::NumericVector getPeakIntensities(const MSReadBackend& backend, const std::vector<SpectrumRawTypes::Mass>& startMZs, const std::vector<SpectrumRawTypes::Mass>& endMZs, const std::vector<SpectrumRawTypes::Time>& times);
+RcppExport SEXP _patRoon_getPeakIntensities(SEXP backendSEXP, SEXP startMZsSEXP, SEXP endMZsSEXP, SEXP timesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const MSReadBackend& >::type backend(backendSEXP);
+    Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Mass>& >::type startMZs(startMZsSEXP);
+    Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Mass>& >::type endMZs(endMZsSEXP);
+    Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Time>& >::type times(timesSEXP);
+    rcpp_result_gen = Rcpp::wrap(getPeakIntensities(backend, startMZs, endMZs, times));
+    return rcpp_result_gen;
+END_RCPP
+}
 // readMSP
 Rcpp::List readMSP(Rcpp::CharacterVector file, Rcpp::LogicalVector pc);
 RcppExport SEXP _patRoon_readMSP(SEXP fileSEXP, SEXP pcSEXP) {
@@ -545,6 +559,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_setSpecMetadata", (DL_FUNC) &_patRoon_setSpecMetadata, 3},
     {"_patRoon_getMSPeakLists", (DL_FUNC) &_patRoon_getMSPeakLists, 16},
     {"_patRoon_getMobilograms", (DL_FUNC) &_patRoon_getMobilograms, 8},
+    {"_patRoon_getPeakIntensities", (DL_FUNC) &_patRoon_getPeakIntensities, 4},
     {"_patRoon_readMSP", (DL_FUNC) &_patRoon_readMSP, 2},
     {"_patRoon_writeMSPLibrary", (DL_FUNC) &_patRoon_writeMSPLibrary, 3},
     {"_patRoon_readMoNAJSON", (DL_FUNC) &_patRoon_readMoNAJSON, 1},

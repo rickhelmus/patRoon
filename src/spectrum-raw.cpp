@@ -32,3 +32,23 @@ void SpectrumRaw::insert(size_t i, SpectrumRawTypes::Mass mz, SpectrumRawTypes::
     intensities.insert(intensities.begin() + i, inten);
     mobilities.insert(mobilities.begin() + i, mob);
 }
+
+void SpectrumRawAveraged::append(SpectrumRawTypes::Mass mz, SpectrumRawTypes::Intensity inten,
+                                 SpectrumRawTypes::PeakAbundance ab)
+{
+    SpectrumRaw::append(mz, inten);
+    abundances.push_back(ab);
+}
+
+void SpectrumRawAveraged::append(SpectrumRawTypes::Mass mz, SpectrumRawTypes::Intensity inten,
+                                 SpectrumRawTypes::PeakAbundance ab, SpectrumRawTypes::PeakAbundance avgPrvAb)
+{
+    append(mz, inten, ab);
+    averagedPreviousAbundance.push_back(avgPrvAb);
+}
+
+void SpectrumRawAveraged::append(const SpectrumRawAveraged &sp)
+{
+    SpectrumRaw::append(sp);
+    abundances.insert(abundances.end(), sp.getAbundances().begin(), sp.getAbundances().end());
+}

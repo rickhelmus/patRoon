@@ -320,6 +320,22 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// testAverageSpecRaw
+Rcpp::DataFrame testAverageSpecRaw(Rcpp::List specs, const std::string& method, SpectrumRawTypes::Mass window, bool averageIntensities, SpectrumRawTypes::Intensity minIntensity, unsigned minAbundance);
+RcppExport SEXP _patRoon_testAverageSpecRaw(SEXP specsSEXP, SEXP methodSEXP, SEXP windowSEXP, SEXP averageIntensitiesSEXP, SEXP minIntensitySEXP, SEXP minAbundanceSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type specs(specsSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type window(windowSEXP);
+    Rcpp::traits::input_parameter< bool >::type averageIntensities(averageIntensitiesSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minIntensity(minIntensitySEXP);
+    Rcpp::traits::input_parameter< unsigned >::type minAbundance(minAbundanceSEXP);
+    rcpp_result_gen = Rcpp::wrap(testAverageSpecRaw(specs, method, window, averageIntensities, minIntensity, minAbundance));
+    return rcpp_result_gen;
+END_RCPP
+}
 // collapseTIMSFrame
 Rcpp::DataFrame collapseTIMSFrame(const std::string& file, size_t frameID, const std::string& method, double mzWindow, double mzStart, double mzEnd, double mobilityStart, double mobilityEnd, unsigned minAbundance, unsigned topMost, unsigned minIntensity, unsigned minIntensityPost, Rcpp::Nullable<Rcpp::IntegerVector> scanStartsN, Rcpp::Nullable<Rcpp::IntegerVector> scanEndsN, double precursorMZ, bool onlyWithPrecursor, bool flatten);
 RcppExport SEXP _patRoon_collapseTIMSFrame(SEXP fileSEXP, SEXP frameIDSEXP, SEXP methodSEXP, SEXP mzWindowSEXP, SEXP mzStartSEXP, SEXP mzEndSEXP, SEXP mobilityStartSEXP, SEXP mobilityEndSEXP, SEXP minAbundanceSEXP, SEXP topMostSEXP, SEXP minIntensitySEXP, SEXP minIntensityPostSEXP, SEXP scanStartsNSEXP, SEXP scanEndsNSEXP, SEXP precursorMZSEXP, SEXP onlyWithPrecursorSEXP, SEXP flattenSEXP) {
@@ -570,6 +586,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_specDistMatrix", (DL_FUNC) &_patRoon_specDistMatrix, 7},
     {"_patRoon_specDistRect", (DL_FUNC) &_patRoon_specDistRect, 9},
     {"_patRoon_testSpecFilter", (DL_FUNC) &_patRoon_testSpecFilter, 7},
+    {"_patRoon_testAverageSpecRaw", (DL_FUNC) &_patRoon_testAverageSpecRaw, 6},
     {"_patRoon_collapseTIMSFrame", (DL_FUNC) &_patRoon_collapseTIMSFrame, 17},
     {"_patRoon_getTIMSPeakLists", (DL_FUNC) &_patRoon_getTIMSPeakLists, 15},
     {"_patRoon_getTIMSEICs", (DL_FUNC) &_patRoon_getTIMSEICs, 7},

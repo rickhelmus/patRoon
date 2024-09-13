@@ -256,6 +256,27 @@ SpectrumRaw averageSpectraRaw(const std::vector<SpectrumRaw> &spectra, clusterMe
                              minAbundance);
 }
 
+// [[Rcpp::export]]
+Rcpp::DataFrame testAverageSpecRaw(Rcpp::List specs, const std::string &method, SpectrumRawTypes::Mass window,
+                                   bool averageIntensities, SpectrumRawTypes::Intensity minIntensity,
+                                   unsigned minAbundance)
+{
+    const auto clMethod = clustMethodFromStr(method);
+    
+    std::vector<SpectrumRaw> spectra(specs.size());
+    for (size_t i=0; i<spectra.size(); ++i)
+    {
+        const Rcpp::DataFrame s = Rcpp::as<Rcpp::DataFrame>(specs[i]);
+        const std::vector<double> mzs = s[0];
+        const std::vector<double> intensities = s[1];
+        for (int j=0; j<s.nrow(); ++j)
+            spectra[i].append(mzs[j], intensities[j]);
+    }
+    
+    const auto avgsp = averageSpectraRaw(spectra, clMethod, window, averageIntensities, minIntensity, minAbundance);
+    return Rcpp::DataFrame::create(Rcpp::Named("mz") = avgsp.getMZs(), Rcpp::Named("intensity") = avgsp.getIntensities());
+}
+
 size_t frameSubSpecCount(const SpectrumRaw &frame)
 {
     size_t ret = 0;

@@ -864,9 +864,7 @@ generateMSPeakListsNew <- function(fGroups, maxMSRtWindow = 5, precursorMzWindow
         ret <- pruneList(ret, checkZeroRows = TRUE)
         ret <- lapply(ret, setDT)
         ret <- Map(ret, ft$mz[match(names(ret), ft$group)], f = assignPrecursorToMSPeakList)
-        
-        # UNDONE!!
-        ret <- lapply(ret, function(pl) { pl <- copy(pl); pl[, feat_abundance := 1] })
+        ret <- lapply(ret, function(pl) { setnames(pl, "abundance", "feat_abundance") })
         
         return(ret)
     }

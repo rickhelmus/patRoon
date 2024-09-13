@@ -130,25 +130,69 @@ setMethod("averageMSPeakLists", "MSPeakLists", function(obj)
         avgPLists <- makeEmptyListNamed(list())
     else if (is.null(avgPLists))
     {
+        if (T) {
+        allMSPLMS <- sapply(gNames, function(grp)
+        {
+            pruneList(lapply(pLists, function(pl) pl[[grp]][["MS"]]), checkZeroRows = TRUE)
+        }, simplify = FALSE)
+        allMSPLMSAvg <- averageSpectraList(allMSPLMS, obj@avgPeakListArgs$clusterMzWindow, obj@avgPeakListArgs$topMost,
+                                           obj@avgPeakListArgs$minIntensityPre, obj@avgPeakListArgs$minIntensityPost,
+                                           obj@avgPeakListArgs$minAbundance, obj@avgPeakListArgs$method, TRUE,
+                                           obj@avgPeakListArgs$pruneMissingPrecursorMS, TRUE)
+        names(allMSPLMSAvg) <- gNames
+        
+        allMSPLMSMS <- sapply(gNames, function(grp)
+        {
+            pruneList(lapply(pLists, function(pl) pl[[grp]][["MSMS"]]), checkZeroRows = TRUE)
+        }, simplify = FALSE)
+        allMSPLMSMSAvg <- averageSpectraList(allMSPLMSMS, obj@avgPeakListArgs$clusterMzWindow, obj@avgPeakListArgs$topMost,
+                                             obj@avgPeakListArgs$minIntensityPre, obj@avgPeakListArgs$minIntensityPost,
+                                             obj@avgPeakListArgs$minAbundance, obj@avgPeakListArgs$method, TRUE, FALSE,
+                                             obj@avgPeakListArgs$retainPrecursorMSMS)
+        names(allMSPLMSMSAvg) <- gNames
+        
+        avgPLists <- sapply(gNames, function(grp)
+        {
+            if (!any(allMSPLMSAvg[[grp]]$precursor) && nrow(allMSPLMSAvg[[grp]]) > 0)
+                warning(sprintf("Couldn't find back any precursor m/z from (averaged) MS peak list of group %s!", grp))
+
+            return(pruneList(list(MS = if (nrow(allMSPLMSAvg[[grp]]) > 0) allMSPLMSAvg[[grp]] else NULL,
+                                  MSMS = if (nrow(allMSPLMSMSAvg[[grp]]) > 0) allMSPLMSMSAvg[[grp]] else NULL)))
+        }, simplify = FALSE)
+        
+        avgPLists <- pruneList(avgPLists, checkEmptyElements = TRUE)
+        
+        }
+        else {
+        
         prog <- openProgBar(0, gCount)
         
         avgPLists <- lapply(seq_len(gCount), function(grpi)
         {
             plistsMS <- lapply(pLists, function(pl) pl[[gNames[grpi]]][["MS"]])
             plistsMS <- pruneList(plistsMS, checkZeroRows = TRUE)
-            avgPLMS <- averageSpectra(plistsMS, obj@avgPeakListArgs$clusterMzWindow, obj@avgPeakListArgs$topMost,
-                                      obj@avgPeakListArgs$minIntensityPre, obj@avgPeakListArgs$minIntensityPost,
-                                      obj@avgPeakListArgs$minAbundance, "fgroup_abundance", obj@avgPeakListArgs$avgFun,
-                                      "feat_abundance", obj@avgPeakListArgs$method, TRUE,
-                                      obj@avgPeakListArgs$pruneMissingPrecursorMS, TRUE)
+            # avgPLMS <- averageSpectra(plistsMS, obj@avgPeakListArgs$clusterMzWindow, obj@avgPeakListArgs$topMost,
+            #                           obj@avgPeakListArgs$minIntensityPre, obj@avgPeakListArgs$minIntensityPost,
+            #                           obj@avgPeakListArgs$minAbundance, "fgroup_abundance", obj@avgPeakListArgs$avgFun,
+            #                           "feat_abundance", obj@avgPeakListArgs$method, TRUE,
+            #                           obj@avgPeakListArgs$pruneMissingPrecursorMS, TRUE)
+            avgPLMS <- averageSpectra2(plistsMS, obj@avgPeakListArgs$clusterMzWindow, obj@avgPeakListArgs$topMost,
+                                       obj@avgPeakListArgs$minIntensityPre, obj@avgPeakListArgs$minIntensityPost,
+                                       obj@avgPeakListArgs$minAbundance, obj@avgPeakListArgs$method, TRUE,
+                                       obj@avgPeakListArgs$pruneMissingPrecursorMS, TRUE)
+            
             
             plistsMSMS <- lapply(pLists, function(pl) pl[[gNames[grpi]]][["MSMS"]])
             plistsMSMS <- pruneList(plistsMSMS, checkZeroRows = TRUE)
-            avgPLMSMS <- averageSpectra(plistsMSMS, obj@avgPeakListArgs$clusterMzWindow, obj@avgPeakListArgs$topMost,
-                                        obj@avgPeakListArgs$minIntensityPre, obj@avgPeakListArgs$minIntensityPost,
-                                        obj@avgPeakListArgs$minAbundance, "fgroup_abundance", obj@avgPeakListArgs$avgFun,
-                                        "feat_abundance", obj@avgPeakListArgs$method, TRUE, FALSE,
-                                        obj@avgPeakListArgs$retainPrecursorMSMS)
+            # avgPLMSMS <- averageSpectra(plistsMSMS, obj@avgPeakListArgs$clusterMzWindow, obj@avgPeakListArgs$topMost,
+            #                             obj@avgPeakListArgs$minIntensityPre, obj@avgPeakListArgs$minIntensityPost,
+            #                             obj@avgPeakListArgs$minAbundance, "fgroup_abundance", obj@avgPeakListArgs$avgFun,
+            #                             "feat_abundance", obj@avgPeakListArgs$method, TRUE, FALSE,
+            #                             obj@avgPeakListArgs$retainPrecursorMSMS)
+            avgPLMSMS <- averageSpectra2(plistsMSMS, obj@avgPeakListArgs$clusterMzWindow, obj@avgPeakListArgs$topMost,
+                                         obj@avgPeakListArgs$minIntensityPre, obj@avgPeakListArgs$minIntensityPost,
+                                         obj@avgPeakListArgs$minAbundance, obj@avgPeakListArgs$method, TRUE, FALSE,
+                                         obj@avgPeakListArgs$retainPrecursorMSMS)
             
             results <- pruneList(list(MS = if (nrow(avgPLMS) > 0) avgPLMS else NULL,
                                       MSMS = if (nrow(avgPLMSMS) > 0) avgPLMSMS else NULL))
@@ -165,6 +209,8 @@ setMethod("averageMSPeakLists", "MSPeakLists", function(obj)
 		
         setTxtProgressBar(prog, gCount)
         close(prog)
+        
+        }
         
         saveCacheData("MSPeakListsAvg", avgPLists, hash)
     }

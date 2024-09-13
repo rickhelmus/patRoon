@@ -17,6 +17,7 @@ using Intensity = float; // UNDONE: or unsigned?
 using TimeRange = NumRange<Time>;
 using IsolationRange = NumRange<Mass>;
 using MobilityRange = NumRange<Mobility>;
+using PeakAbundance = float;
 
 enum class MSLevel { MS1, MS2 };
 
@@ -97,6 +98,18 @@ public:
     void clear(void) { mzs.clear(); intensities.clear(); mobilities.clear(); }
 };
 
+class SpectrumRawAveraged: public SpectrumRaw
+{
+    std::vector<float> abundances;
+    
+public:
+    using SpectrumRaw::SpectrumRaw;
+    
+    const auto &getAbundances(void) const { return abundances; }
+    void append(SpectrumRawTypes::Mass mz, SpectrumRawTypes::Intensity inten, SpectrumRawTypes::PeakAbundance ab)
+    { SpectrumRaw::append(mz, inten); abundances.push_back(ab); }
+};
+
 struct SpectrumRawFilter
 {
     SpectrumRawTypes::Intensity minIntensity;
@@ -128,12 +141,14 @@ SpectrumRaw filterSpectrumRaw(const SpectrumRaw &spectrum, const SpectrumRawFilt
                               SpectrumRawTypes::Mass precursor);
 SpectrumRaw filterIMSFrame(const SpectrumRaw &spectrum, const SpectrumRawFilter &filter,
                            SpectrumRawTypes::Mass precursor, const SpectrumRawTypes::MobilityRange &mobRange);
-SpectrumRaw averageSpectraRaw(const SpectrumRaw &flattenedSpecs, size_t numSpecs, clusterMethod method,
-                              SpectrumRawTypes::Mass window, bool averageIntensities,
-                              SpectrumRawTypes::Intensity minIntensity, unsigned minAbundance);
-SpectrumRaw averageSpectraRaw(const std::vector<SpectrumRaw> &spectra, clusterMethod method,
-                              SpectrumRawTypes::Mass window, bool averageIntensities,
-                              SpectrumRawTypes::Intensity minIntensity, unsigned minAbundance);
+SpectrumRawAveraged averageSpectraRaw(const SpectrumRaw &flattenedSpecs, size_t numSpecs, clusterMethod method,
+                                      SpectrumRawTypes::Mass window, bool averageIntensities,
+                                      SpectrumRawTypes::Intensity minIntensity,
+                                      SpectrumRawTypes::PeakAbundance minAbundance);
+SpectrumRawAveraged averageSpectraRaw(const std::vector<SpectrumRaw> &spectra, clusterMethod method,
+                                      SpectrumRawTypes::Mass window, bool averageIntensities,
+                                      SpectrumRawTypes::Intensity minIntensity,
+                                      SpectrumRawTypes::PeakAbundance minAbundance);
 size_t frameSubSpecCount(const SpectrumRaw &frame);
 
 #endif

@@ -497,7 +497,7 @@ Rcpp::List getMSPeakLists(const MSReadBackend &backend, const std::vector<Spectr
         {
             const auto specf = filterIMSFrame(spec, specFilterIMS, precursorMZs[e],
                                               makeNumRange(startMobs[e], endMobs[e]));
-            return averageSpectraRaw(specf, frameSubSpecCount(specf), clMethod, mzWindow, false, minIntensityPre,
+            return averageSpectraRaw(specf, frameSubSpecIDs(specf), clMethod, mzWindow, false, minIntensityPre,
                                      minAbundance);
         }
         return filterSpectrumRaw(spec, specFilter, precursorMZs[e]);

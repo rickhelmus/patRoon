@@ -279,6 +279,105 @@ averageSpectra <- function(spectra, clusterMzWindow, topMost, minIntensityPre, m
     return(ret)
 }
 
+averageSpectra2 <- function(spectra, clusterMzWindow, topMost, minIntensityPre, minIntensityPost, minAbundance,
+                            method, assignPrecursor, pruneMissingPrecursor, retainPrecursor)
+{
+    if (length(spectra) == 0) # no spectra, return empty spectrum
+        return(emptyMSPeakList("abundance", NULL)) # UNDONE
+    
+    # pre-treat
+    spectra <- lapply(spectra, function(s)
+    {
+        s <- s[intensity >= minIntensityPre]
+        if (nrow(s) > topMost)
+        {
+            ord <- order(s$intensity, decreasing = TRUE)
+            keep <- ord[seq_len(topMost)]
+            if (retainPrecursor)
+                keep <- union(keep, which(s$precursor))
+            s <- s[keep]
+        }
+        return(s)
+    })
+    
+    avgSpec <- doAverageSpectra(spectra, method, clusterMzWindow, minIntensityPost, minAbundance)
+    
+    setDT(avgSpec)
+        
+    if (nrow(avgSpec) == 0)
+        return(avgSpec)
+    
+    if (assignPrecursor)
+    {
+        spcomb <- rbindlist(spectra)
+        precMZs <- spcomb[precursor == TRUE, mz]
+        if (length(precMZs) > 0)
+            avgSpec <- assignPrecursorToMSPeakList(avgSpec, mean(precMZs))
+        else
+            avgSpec[, precursor := FALSE]
+    }
+    else
+        avgSpec[, precursor := FALSE]
+    
+    if (pruneMissingPrecursor && !any(avgSpec$precursor))
+        avgSpec <- avgSpec[0]
+        
+    return(avgSpec)
+}
+
+averageSpectraList <- function(spectraList, clusterMzWindow, topMost, minIntensityPre, minIntensityPost, minAbundance,
+                               method, assignPrecursor, pruneMissingPrecursor, retainPrecursor)
+{
+    # pre-treat
+    spectraList <- lapply(spectraList, function(spectra)
+    {
+        lapply(spectra, function(s)
+        {
+            s <- s[intensity >= minIntensityPre]
+            if (nrow(s) > topMost)
+            {
+                ord <- order(s$intensity, decreasing = TRUE)
+                keep <- ord[seq_len(topMost)]
+                if (retainPrecursor)
+                    keep <- union(keep, which(s$precursor))
+                s <- s[keep]
+            }
+            return(s)
+        })
+    })
+
+    averagedSpectra <- doAverageSpectraList(spectraList, method, clusterMzWindow, minIntensityPost, minAbundance)
+
+    # post-treat
+    averagedSpectra <- lapply(seq_along(averagedSpectra), function(i)
+    {
+        avgSpec <- averagedSpectra[[i]]
+        setDT(avgSpec)
+        
+        if (nrow(avgSpec) == 0)
+            return(avgSpec)
+        
+        if (assignPrecursor)
+        {
+            spcomb <- rbindlist(spectraList[[i]])
+            precMZs <- spcomb[precursor == TRUE]$mz
+            if (length(precMZs) > 0)
+                avgSpec <- assignPrecursorToMSPeakList(avgSpec, mean(precMZs))
+            else
+                avgSpec[, precursor := FALSE]
+        }
+        else
+            avgSpec[, precursor := FALSE]
+        
+        if (pruneMissingPrecursor && !any(avgSpec$precursor))
+            avgSpec <- avgSpec[0]
+        
+        return(avgSpec)
+    })
+        
+    return(averagedSpectra)
+}
+
 # get corresponding mz of feature from MS peaklist
 getMZIndexFromMSPeakList <- function(featMZ, plist)
 {

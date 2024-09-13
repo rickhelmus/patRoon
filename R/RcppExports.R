@@ -81,6 +81,10 @@ testSpecFilter <- function(mzs, ints, mzMin, mzMax, minInt, topMost, prec) {
     .Call(`_patRoon_testSpecFilter`, mzs, ints, mzMin, mzMax, minInt, topMost, prec)
 }
 
+testAverageSpecRaw <- function(specs, method, window, averageIntensities, minIntensity, minAbundance) {
+    .Call(`_patRoon_testAverageSpecRaw`, specs, method, window, averageIntensities, minIntensity, minAbundance)
+}
+
 collapseTIMSFrame <- function(file, frameID, method, mzWindow, mzStart = 0.0, mzEnd = 0.0, mobilityStart = 0.0, mobilityEnd = 0.0, minAbundance = 1L, topMost = 0L, minIntensity = 0L, minIntensityPost = 0L, scanStartsN = NULL, scanEndsN = NULL, precursorMZ = 0.0, onlyWithPrecursor = FALSE, flatten = FALSE) {
     .Call(`_patRoon_collapseTIMSFrame`, file, frameID, method, mzWindow, mzStart, mzEnd, mobilityStart, mobilityEnd, minAbundance, topMost, minIntensity, minIntensityPost, scanStartsN, scanEndsN, precursorMZ, onlyWithPrecursor, flatten)
 }

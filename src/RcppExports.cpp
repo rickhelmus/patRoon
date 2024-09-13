@@ -320,19 +320,33 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// testAverageSpecRaw
-Rcpp::DataFrame testAverageSpecRaw(Rcpp::List specs, const std::string& method, SpectrumRawTypes::Mass window, bool averageIntensities, SpectrumRawTypes::Intensity minIntensity, SpectrumRawTypes::PeakAbundance minAbundance);
-RcppExport SEXP _patRoon_testAverageSpecRaw(SEXP specsSEXP, SEXP methodSEXP, SEXP windowSEXP, SEXP averageIntensitiesSEXP, SEXP minIntensitySEXP, SEXP minAbundanceSEXP) {
+// doAverageSpectra
+Rcpp::DataFrame doAverageSpectra(Rcpp::List specs, const std::string& method, SpectrumRawTypes::Mass window, SpectrumRawTypes::Intensity minIntensity, SpectrumRawTypes::PeakAbundance minAbundance);
+RcppExport SEXP _patRoon_doAverageSpectra(SEXP specsSEXP, SEXP methodSEXP, SEXP windowSEXP, SEXP minIntensitySEXP, SEXP minAbundanceSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::List >::type specs(specsSEXP);
     Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type window(windowSEXP);
-    Rcpp::traits::input_parameter< bool >::type averageIntensities(averageIntensitiesSEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minIntensity(minIntensitySEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::PeakAbundance >::type minAbundance(minAbundanceSEXP);
-    rcpp_result_gen = Rcpp::wrap(testAverageSpecRaw(specs, method, window, averageIntensities, minIntensity, minAbundance));
+    rcpp_result_gen = Rcpp::wrap(doAverageSpectra(specs, method, window, minIntensity, minAbundance));
+    return rcpp_result_gen;
+END_RCPP
+}
+// doAverageSpectraList
+Rcpp::List doAverageSpectraList(Rcpp::List specsList, const std::string& method, SpectrumRawTypes::Mass window, SpectrumRawTypes::Intensity minIntensity, SpectrumRawTypes::PeakAbundance minAbundance);
+RcppExport SEXP _patRoon_doAverageSpectraList(SEXP specsListSEXP, SEXP methodSEXP, SEXP windowSEXP, SEXP minIntensitySEXP, SEXP minAbundanceSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type specsList(specsListSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type window(windowSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minIntensity(minIntensitySEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::PeakAbundance >::type minAbundance(minAbundanceSEXP);
+    rcpp_result_gen = Rcpp::wrap(doAverageSpectraList(specsList, method, window, minIntensity, minAbundance));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -586,7 +600,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_specDistMatrix", (DL_FUNC) &_patRoon_specDistMatrix, 7},
     {"_patRoon_specDistRect", (DL_FUNC) &_patRoon_specDistRect, 9},
     {"_patRoon_testSpecFilter", (DL_FUNC) &_patRoon_testSpecFilter, 7},
-    {"_patRoon_testAverageSpecRaw", (DL_FUNC) &_patRoon_testAverageSpecRaw, 6},
+    {"_patRoon_doAverageSpectra", (DL_FUNC) &_patRoon_doAverageSpectra, 5},
+    {"_patRoon_doAverageSpectraList", (DL_FUNC) &_patRoon_doAverageSpectraList, 5},
     {"_patRoon_collapseTIMSFrame", (DL_FUNC) &_patRoon_collapseTIMSFrame, 17},
     {"_patRoon_getTIMSPeakLists", (DL_FUNC) &_patRoon_getTIMSPeakLists, 15},
     {"_patRoon_getTIMSEICs", (DL_FUNC) &_patRoon_getTIMSEICs, 7},

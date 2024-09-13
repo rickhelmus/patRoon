@@ -235,7 +235,7 @@ averageSpectra <- function(spectra, clusterMzWindow, topMost, minIntensityPre, m
     {
         if (!is.null(avgCols))
             sps[, (avgCols) := lapply(.SD, mean), .SDcols = avgCols, by = by]
-        sps[, c("mz", "intensity") := .(avgFun(mz), sum(intensity) / if (!is.null(intN)) intN else .N), by = by]
+        sps[, c("mz", "intensity") := .(avgFun(mz), sum(intensity) / intN), by = by]
         return(unique(sps, by = by))
     }
     
@@ -243,7 +243,7 @@ averageSpectra <- function(spectra, clusterMzWindow, topMost, minIntensityPre, m
     # 1. same mass peaks from same analysis (regular intensity average)
     # 2. same mass peaks (intensity average over all considered spectra)
     
-    ret <- doAvgPL(spcomb, c("cluster", "spid"), NULL)
+    ret <- doAvgPL(spcomb, c("cluster", "spid"), 1) # set intN==1 to sum merged peaks
     
     # do abundance calculation _after_ removing duplicated mass peaks from same spectra
     if (!is.null(abundanceColumn))

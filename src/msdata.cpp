@@ -481,11 +481,12 @@ Rcpp::List getMSPeakLists(const MSReadBackend &backend, const std::vector<Spectr
     const auto clMethod = clustMethodFromStr(method);
     const auto MSLev = (MSLevel == 1) ? SpectrumRawTypes::MSLevel::MS1 : SpectrumRawTypes::MSLevel::MS2;
     const auto specMeta = backend.getSpecMetadata();
-    const auto specFilter = SpectrumRawFilter().setMinIntensity(minIntensityPre).setTopMost(topMost);
-    const auto specFilterIMS = SpectrumRawFilter()
-        .setMinIntensity(minIntensityIMS)
+    const auto baseSpecFilter = SpectrumRawFilter()
         .setTopMost(topMost)
-        .setWithPrecursor(withPrecursor);
+        .setWithPrecursor(withPrecursor)
+        .setRetainPrecursor(retainPrecursor);
+    const auto specFilter = SpectrumRawFilter(baseSpecFilter).setMinIntensity(minIntensityPre);
+    const auto specFilterIMS = SpectrumRawFilter(baseSpecFilter).setMinIntensity(minIntensityIMS);
     
     // NOTE: for IMS data, averageSpectraRaw() is called which returns a SpectrumRawAveraged. Since we don't care about
     // the additional metadata from this class, we purposely slice it by explicitly specifying the lambda's return type.

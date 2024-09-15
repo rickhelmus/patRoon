@@ -76,20 +76,18 @@ SpectrumRaw filterSpectrumRaw(const SpectrumRaw &spectrum, const SpectrumRawFilt
     const SpectrumRawTypes::Mass precTol = 0.01; // UNDONE: configurable tolerance?
     size_t closestPrecMZInd = spectrum.size();
     SpectrumRawTypes::Mass minPrecMZDiff = -1.0;
-    if (precursor != 0.0)
+
+    for (auto it = std::lower_bound(spectrum.getMZs().begin(), spectrum.getMZs().end(), precursor - precTol);
+         it!=spectrum.getMZs().end(); ++it)
     {
-        for (auto it = std::lower_bound(spectrum.getMZs().begin(), spectrum.getMZs().end(), precursor - precTol);
-             it!=spectrum.getMZs().end(); ++it)
+        const SpectrumRawTypes::Mass d = std::abs(precursor - *it);
+        if (d <= precTol && (minPrecMZDiff == -1.0 || d < minPrecMZDiff))
         {
-            const SpectrumRawTypes::Mass d = std::abs(precursor - *it);
-            if (d <= precTol && (minPrecMZDiff == -1.0 || d < minPrecMZDiff))
-            {
-                closestPrecMZInd = std::distance(spectrum.getMZs().begin(), it);
-                minPrecMZDiff = d;
-            }
-            else
-                break; // data is sorted: all next mzs will be greater and therefore with higher deviation
+            closestPrecMZInd = std::distance(spectrum.getMZs().begin(), it);
+            minPrecMZDiff = d;
         }
+        else
+            break; // data is sorted: all next mzs will be greater and therefore with higher deviation
     }
     
     if (filter.withPrecursor && minPrecMZDiff == -1.0)
@@ -109,7 +107,7 @@ SpectrumRaw filterSpectrumRaw(const SpectrumRaw &spectrum, const SpectrumRawFilt
     
     SpectrumRaw ret;
     SpectrumRawTypes::Intensity minInt = filter.minIntensity;
-    const bool doTopMost = filter.topMost != 0 && (endInd - startInd) > filter.topMost;
+    const bool doTopMost = filter.topMost != 0 && ((endInd - startInd) + 1) > filter.topMost;
     const bool hasMob = spectrum.hasMobilities();
     
     if (doTopMost)
@@ -122,7 +120,7 @@ SpectrumRaw filterSpectrumRaw(const SpectrumRaw &spectrum, const SpectrumRawFilt
     }
     
     bool addedPrec = false;
-    for (size_t i=startInd; i<endInd; i++)
+    for (size_t i=startInd; i<endInd; ++i)
     {
         if (spectrum.getIntensities()[i] >= minInt)
         {
@@ -135,7 +133,8 @@ SpectrumRaw filterSpectrumRaw(const SpectrumRaw &spectrum, const SpectrumRawFilt
         }
     }
     
-    if (!addedPrec && closestPrecMZInd != spectrum.size())
+    if (filter.retainPrecursor && !addedPrec && closestPrecMZInd != spectrum.size() &&
+        spectrum.getIntensities()[closestPrecMZInd] >= filter.minIntensity)
     {
         const auto it = std::upper_bound(ret.getMZs().begin(), ret.getMZs().end(), spectrum.getMZs()[closestPrecMZInd]);
         if (hasMob)

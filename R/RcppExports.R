@@ -13,8 +13,8 @@ getMSSpectrum <- function(backend, index) {
     .Call(`_patRoon_getMSSpectrum`, backend, index)
 }
 
-getScans <- function(backend, timeStart, timeEnd, MSLevel, isoStart, isoEnd) {
-    .Call(`_patRoon_getScans`, backend, timeStart, timeEnd, MSLevel, isoStart, isoEnd)
+getScans <- function(backend, timeStart, timeEnd, MSLevel, prec) {
+    .Call(`_patRoon_getScans`, backend, timeStart, timeEnd, MSLevel, prec)
 }
 
 getEICList <- function(backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs) {
@@ -29,8 +29,8 @@ setSpecMetadata <- function(backend, mdMS, mdMSMS) {
     invisible(.Call(`_patRoon_setSpecMetadata`, backend, mdMS, mdMSMS))
 }
 
-getMSPeakLists <- function(backend, startTimes, endTimes, precursorMZs, withPrecursor, MSLevel, isoWindow, method, mzWindow, startMobs, endMobs, minAbundance, topMost, minIntensityIMS, minIntensityPre, minIntensityPost) {
-    .Call(`_patRoon_getMSPeakLists`, backend, startTimes, endTimes, precursorMZs, withPrecursor, MSLevel, isoWindow, method, mzWindow, startMobs, endMobs, minAbundance, topMost, minIntensityIMS, minIntensityPre, minIntensityPost)
+getMSPeakLists <- function(backend, startTimes, endTimes, precursorMZs, withPrecursor, retainPrecursor, MSLevel, method, mzWindow, startMobs, endMobs, minAbundance, topMost, minIntensityIMS, minIntensityPre, minIntensityPost) {
+    .Call(`_patRoon_getMSPeakLists`, backend, startTimes, endTimes, precursorMZs, withPrecursor, retainPrecursor, MSLevel, method, mzWindow, startMobs, endMobs, minAbundance, topMost, minIntensityIMS, minIntensityPre, minIntensityPost)
 }
 
 getMobilograms <- function(backend, startMZs, endMZs, startTimes, endTimes, method, mobWindow, minIntensity) {
@@ -79,6 +79,14 @@ specDistRect <- function(specList1, specList2, method, shift, precMZs1, precMZs2
 
 testSpecFilter <- function(mzs, ints, mzMin, mzMax, minInt, topMost, prec) {
     .Call(`_patRoon_testSpecFilter`, mzs, ints, mzMin, mzMax, minInt, topMost, prec)
+}
+
+testClusterNums <- function(nums, method, window) {
+    .Call(`_patRoon_testClusterNums`, nums, method, window)
+}
+
+testClusterNums2 <- function(nums, method, window) {
+    .Call(`_patRoon_testClusterNums2`, nums, method, window)
 }
 
 doAverageSpectra <- function(specs, method, window, minIntensity, minAbundance) {

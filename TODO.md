@@ -209,6 +209,13 @@
 - MSPL
     - add mobility column?
     - more extensively test filters/summing/averaging
+    - support withPrecursor in old DA/mzR algos?
+    - support withPrecursor in averageSpectraList()
+    - support bbCID data, ie no precursor window
+    - make methods for generateMSPeakLists(), including for sets
+    - settle on "diff" vs "distance" for averaging method
+    - check defaults for new averaging params
+    - get fully rid of precursorMzWindow and update NEWS/docs
 - anaInfo / file path retrieval
     - update convertMSFiles() and newProject()
     - update SAFD for profile or centroided
@@ -225,10 +232,12 @@
     - MSFileFormats() --> getMSFileConversionFormats() / getMSFileFormats()
     - new behavior of getMSFilesFromAnaInfo(): file types are checked one by one to avoid mixes and always checked to be present (mustExist was set a bit randomly...)
     - better checking of analysis file directory checking (verifyFileForFormat())
+    - new/changed PListParams
 
 - docs
     - getMSFileFormats()
     - patRoon.MSBackends and patRoon.path.BrukerTIMS options
+    - update PListParams
 
 ## IMS
 

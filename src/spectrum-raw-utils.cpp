@@ -201,6 +201,37 @@ Rcpp::DataFrame testSpecFilter(const std::vector<SpectrumRawTypes::Mass> &mzs,
                                    Rcpp::Named("intensity") = specF.getIntensities());
 }
 
+// [[Rcpp::export]]
+Rcpp::DataFrame testClusterNums(const std::vector<double> &nums, const std::string &method, double window)
+{
+    const auto cl = clusterNums(nums, clustMethodFromStr(method), window);
+    return Rcpp::DataFrame::create(Rcpp::Named("val") = nums, Rcpp::Named("clust") = cl);
+}
+
+// [[Rcpp::export]]
+std::vector<double> testClusterNums2(const std::vector<double> &nums, const std::string &method, double window)
+{
+    std::vector<int> ret(nums.size());
+    
+    // get distance matrix, derived from hclust-cpp example
+    const auto n = nums.size();
+    auto distm = std::make_unique<double[]>((n * (n-1)) / 2);
+    for (size_t i=0, k=0; i<n; ++i)
+    {
+        for (size_t j=i+1; j<n; ++j)
+        {
+            distm[k] = std::fabs(nums[i] - nums[j]);
+            ++k;
+        }
+    }
+    auto merge = std::make_unique<int[]>(2 * (n-1));
+    auto height = std::make_unique<double[]>(n - 1);
+    hclust_fast(n, distm.get(), HCLUST_METHOD_COMPLETE, merge.get(), height.get());
+    //cutree_cdist(n, merge.get(), height.get(), window, ret.data());
+    
+    return std::vector<double>(height.get(), height.get() + n);
+}
+
 SpectrumRawAveraged averageSpectraRaw(const SpectrumRawAveraged &flattenedSpecs, const std::vector<size_t> &specIDs,
                                       clusterMethod method, SpectrumRawTypes::Mass window, bool averageIntensities,
                                       SpectrumRawTypes::Intensity minIntensity,

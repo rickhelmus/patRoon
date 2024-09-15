@@ -210,12 +210,14 @@
     - add mobility column?
     - more extensively test filters/summing/averaging
     - support withPrecursor in old DA/mzR algos?
-    - support withPrecursor in averageSpectraList()
     - support bbCID data, ie no precursor window
     - make methods for generateMSPeakLists(), including for sets
     - settle on "diff" vs "distance" for averaging method
     - check defaults for new averaging params
     - get fully rid of precursorMzWindow and update NEWS/docs
+    - withPrecursor: now only applied prior to other filtering systems, change?
+        - if yes: adjust R and C++ code
+        - doc in any case
 - anaInfo / file path retrieval
     - update convertMSFiles() and newProject()
     - update SAFD for profile or centroided
@@ -227,6 +229,7 @@
 
 - test
     - new verifyFileForFormat() usage is convertMSFiles()
+    - new spec averaging params
 
 - NEWS
     - MSFileFormats() --> getMSFileConversionFormats() / getMSFileFormats()

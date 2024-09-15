@@ -835,6 +835,26 @@ generateMSPeakListsNew <- function(fGroups, maxMSRtWindow = 5, topMost = NULL, a
     if (length(fGroups) == 0)
         return(MSPeakLists(algorithm = "internal"))
     
+    # UNDONE!!
+    if (avgFeatParams$method == "distance")
+        avgFeatParams$method = "diff"
+    
+    avgFeatParamsMS <- avgFeatParamsMSMS <-
+        avgFeatParams[setdiff(names(avgFeatParams), c("withPrecursorMS", "pruneMissingPrecursorMS", "retainPrecursorMSMS"))]
+    avgFeatParamsMS$withPrecursor <- avgFeatParams$withPrecursorMS
+    avgFeatParamsMS$retainPrecursor <- TRUE;
+    avgFeatParamsMS$pruneMissingPrecursor <- avgFeatParams$pruneMissingPrecursorMS
+    avgFeatParamsMSMS$withPrecursor <- FALSE
+    avgFeatParamsMSMS$pruneMissingPrecursor <- FALSE
+    avgFeatParamsMSMS$retainPrecursor <- avgFeatParams$retainPrecursorMSMS
+    
+    # if topMost is specified, make list (topAna) of topMost intense analyses
+    topAna <- if (!is.null(topMost) && topMost < length(analyses(fGroups)))
+    {
+        anas <- analyses(fGroups)
+        sapply(groupTable(fGroups), function(ints) anas[order(ints, decreasing = TRUE)[seq_len(topMost)]])
+    }
+    
     getMSPL <- function(backend, ft, params, MSLevel)
     {
         # UNDONE: set mobilities
@@ -861,30 +881,6 @@ generateMSPeakListsNew <- function(fGroups, maxMSRtWindow = 5, topMost = NULL, a
         return(ret)
     }
     
-    # UNDONE!!
-    if (avgFeatParams$method == "distance")
-        avgFeatParams$method = "diff"
-    
-    avgFeatParamsMS <- avgFeatParamsMSMS <-
-        avgFeatParams[setdiff(names(avgFeatParams), c("withPrecursorMS", "pruneMissingPrecursorMS", "retainPrecursorMSMS"))]
-    avgFeatParamsMS$withPrecursor <- avgFeatParams$withPrecursorMS
-    avgFeatParamsMS$retainPrecursor <- TRUE;
-    avgFeatParamsMS$pruneMissingPrecursor <- avgFeatParams$pruneMissingPrecursorMS
-    avgFeatParamsMSMS$withPrecursor <- FALSE
-    avgFeatParamsMSMS$pruneMissingPrecursor <- FALSE
-    avgFeatParamsMSMS$retainPrecursor <- avgFeatParams$retainPrecursorMSMS
-    
-    # UNDONE: make filter?
-    # UNDONE: maybe not so elegant, check later
-    if (!is.null(topMost) && topMost < length(analyses(fGroups)))
-    {
-        fGroups <- delete(fGroups, j = function(ints, ...)
-        {
-            sinds <- order(ints, decreasing = TRUE)
-            return(sinds[-seq_len(topMost)])
-        })
-    }
-    
     fTable <- featureTable(fGroups)
     gNames <- names(fGroups)
     cacheDB <- openCacheDBScope()
@@ -894,6 +890,10 @@ generateMSPeakListsNew <- function(fGroups, maxMSRtWindow = 5, topMost = NULL, a
         baseHash <- makeHash(getMSDataFileHash(path), maxMSRtWindow, topMost, avgFeatParams)
         
         ft <- copy(fTable[[ana]][, c("mz", "ret", "retmin", "retmax", "group"), with = FALSE])
+        
+        if (!is.null(topMost))
+            ft <- ft[sapply(group, function(g) ana %in% topAna[[g]]) == TRUE]
+
         ft[, hash := makeHash(baseHash, .SD), by = seq_len(nrow(ft)), .SDcols = setdiff(names(ft), "group")]
         
         cachedData <- loadCacheData("MSPeakLists", ft$hash, cacheDB, simplify = FALSE)

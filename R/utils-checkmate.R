@@ -548,9 +548,13 @@ assertAvgPListParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
                   add = add)
     assertListVal(x, "minIntensityPost", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name,
                   add = add)
+    assertListVal(x, "minIntensityIMS", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name,
+                  add = add)
     assertListVal(x, "avgFun", checkmate::assertFunction, .var.name = .var.name, add = add)
     assertListVal(x, "method", checkmate::assertChoice, choices = c("distance", "hclust"), .var.name = .var.name,
                   add = add)
+    assertListVal(x, "withPrecursorMS", checkmate::assertFlag, .var.name = .var.name, add = add)
+    assertListVal(x, "pruneMissingPrecursorMS", checkmate::assertFlag, .var.name = .var.name, add = add)
     assertListVal(x, "retainPrecursorMSMS", checkmate::assertFlag, .var.name = .var.name, add = add)
 }
 

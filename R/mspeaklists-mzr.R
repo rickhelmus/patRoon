@@ -77,6 +77,9 @@ setMethod("generateMSPeakListsMzR", "featureGroups", function(fGroups, maxMSRtWi
     resultHashes <- vector("character", anaCount * gCount)
     resultHashCount <- 0
 
+    # UNDONE
+    avgFeatParams <- avgFeatParams[setdiff(names(avgFeatParams), c("withPrecursorMS", "minIntensityIMS"))]
+    
     avgFeatParamsMS <- avgFeatParamsMSMS <-
         avgFeatParams[setdiff(names(avgFeatParams), c("pruneMissingPrecursorMS", "retainPrecursorMSMS"))]
     avgFeatParamsMS$retainPrecursor <- TRUE;

@@ -328,13 +328,16 @@ averageSpectra2 <- function(spectra, clusterMzWindow, topMost, minIntensityPre, 
 }
 
 averageSpectraList <- function(spectraList, clusterMzWindow, topMost, minIntensityPre, minIntensityPost, minAbundance,
-                               method, assignPrecursor, pruneMissingPrecursor, retainPrecursor)
+                               method, assignPrecursor, withPrecursor, pruneMissingPrecursor, retainPrecursor)
 {
     # pre-treat
     spectraList <- lapply(spectraList, function(spectra)
     {
         lapply(spectra, function(s)
         {
+            if (withPrecursor && !any(s$precursor))
+                return(s[0])
+            
             s <- s[intensity >= minIntensityPre]
             if (nrow(s) > topMost)
             {

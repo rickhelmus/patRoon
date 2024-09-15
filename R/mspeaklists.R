@@ -138,6 +138,7 @@ setMethod("averageMSPeakLists", "MSPeakLists", function(obj)
         allMSPLMSAvg <- averageSpectraList(allMSPLMS, obj@avgPeakListArgs$clusterMzWindow, obj@avgPeakListArgs$topMost,
                                            obj@avgPeakListArgs$minIntensityPre, obj@avgPeakListArgs$minIntensityPost,
                                            obj@avgPeakListArgs$minAbundance, obj@avgPeakListArgs$method, TRUE,
+                                           obj@avgPeakListArgs$withPrecursorMS,
                                            obj@avgPeakListArgs$pruneMissingPrecursorMS, TRUE)
         names(allMSPLMSAvg) <- gNames
         
@@ -147,8 +148,8 @@ setMethod("averageMSPeakLists", "MSPeakLists", function(obj)
         }, simplify = FALSE)
         allMSPLMSMSAvg <- averageSpectraList(allMSPLMSMS, obj@avgPeakListArgs$clusterMzWindow, obj@avgPeakListArgs$topMost,
                                              obj@avgPeakListArgs$minIntensityPre, obj@avgPeakListArgs$minIntensityPost,
-                                             obj@avgPeakListArgs$minAbundance, obj@avgPeakListArgs$method, TRUE, FALSE,
-                                             obj@avgPeakListArgs$retainPrecursorMSMS)
+                                             obj@avgPeakListArgs$minAbundance, obj@avgPeakListArgs$method, TRUE,
+                                             FALSE, FALSE, obj@avgPeakListArgs$retainPrecursorMSMS)
         names(allMSPLMSMSAvg) <- gNames
         
         avgPLists <- sapply(gNames, function(grp)

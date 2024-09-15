@@ -822,13 +822,11 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, algorithm, .
 
 # UNDONE: this will replace generateMSPeakLists()
 # UNDONE: how to set algorithm slot?
-generateMSPeakListsNew <- function(fGroups, maxMSRtWindow = 5, precursorMzWindow = 4, topMost = NULL,
-                                   avgFeatParams = getDefAvgPListParams(),
+generateMSPeakListsNew <- function(fGroups, maxMSRtWindow = 5, topMost = NULL, avgFeatParams = getDefAvgPListParams(),
                                    avgFGroupParams = getDefAvgPListParams())
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertNumber(maxMSRtWindow, lower = 1, finite = TRUE, null.ok = TRUE, add = ac)
-    checkmate::assertNumber(precursorMzWindow, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertCount(topMost, positive = TRUE, null.ok = TRUE, add = ac)
     assertAvgPListParams(avgFeatParams, add = ac)
     assertAvgPListParams(avgFGroupParams, add = ac)
@@ -893,7 +891,7 @@ generateMSPeakListsNew <- function(fGroups, maxMSRtWindow = 5, precursorMzWindow
     
     featurePLs <- applyMSData(analysisInfo(fGroups), function(ana, path, backend)
     {
-        baseHash <- makeHash(getMSDataFileHash(path), maxMSRtWindow, precursorMzWindow, topMost, avgFeatParams)
+        baseHash <- makeHash(getMSDataFileHash(path), maxMSRtWindow, topMost, avgFeatParams)
         
         ft <- copy(fTable[[ana]][, c("mz", "ret", "retmin", "retmax", "group"), with = FALSE])
         ft[, hash := makeHash(baseHash, .SD), by = seq_len(nrow(ft)), .SDcols = setdiff(names(ft), "group")]

@@ -71,8 +71,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // getScans
-Rcpp::DataFrame getScans(const MSReadBackend& backend, SpectrumRawTypes::Mass timeStart, SpectrumRawTypes::Mass timeEnd, int MSLevel, SpectrumRawTypes::Mass isoStart, SpectrumRawTypes::Mass isoEnd);
-RcppExport SEXP _patRoon_getScans(SEXP backendSEXP, SEXP timeStartSEXP, SEXP timeEndSEXP, SEXP MSLevelSEXP, SEXP isoStartSEXP, SEXP isoEndSEXP) {
+Rcpp::DataFrame getScans(const MSReadBackend& backend, SpectrumRawTypes::Mass timeStart, SpectrumRawTypes::Mass timeEnd, int MSLevel, SpectrumRawTypes::Mass prec);
+RcppExport SEXP _patRoon_getScans(SEXP backendSEXP, SEXP timeStartSEXP, SEXP timeEndSEXP, SEXP MSLevelSEXP, SEXP precSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -80,9 +80,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type timeStart(timeStartSEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type timeEnd(timeEndSEXP);
     Rcpp::traits::input_parameter< int >::type MSLevel(MSLevelSEXP);
-    Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type isoStart(isoStartSEXP);
-    Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type isoEnd(isoEndSEXP);
-    rcpp_result_gen = Rcpp::wrap(getScans(backend, timeStart, timeEnd, MSLevel, isoStart, isoEnd));
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type prec(precSEXP);
+    rcpp_result_gen = Rcpp::wrap(getScans(backend, timeStart, timeEnd, MSLevel, prec));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -128,8 +127,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // getMSPeakLists
-Rcpp::List getMSPeakLists(const MSReadBackend& backend, const std::vector<SpectrumRawTypes::Time>& startTimes, const std::vector<SpectrumRawTypes::Time>& endTimes, const std::vector<SpectrumRawTypes::Mass>& precursorMZs, bool withPrecursor, int MSLevel, SpectrumRawTypes::Mass isoWindow, const std::string& method, SpectrumRawTypes::Mass mzWindow, const std::vector<SpectrumRawTypes::Mobility> startMobs, const std::vector<SpectrumRawTypes::Mobility> endMobs, SpectrumRawTypes::PeakAbundance minAbundance, unsigned topMost, SpectrumRawTypes::Intensity minIntensityIMS, SpectrumRawTypes::Intensity minIntensityPre, SpectrumRawTypes::Intensity minIntensityPost);
-RcppExport SEXP _patRoon_getMSPeakLists(SEXP backendSEXP, SEXP startTimesSEXP, SEXP endTimesSEXP, SEXP precursorMZsSEXP, SEXP withPrecursorSEXP, SEXP MSLevelSEXP, SEXP isoWindowSEXP, SEXP methodSEXP, SEXP mzWindowSEXP, SEXP startMobsSEXP, SEXP endMobsSEXP, SEXP minAbundanceSEXP, SEXP topMostSEXP, SEXP minIntensityIMSSEXP, SEXP minIntensityPreSEXP, SEXP minIntensityPostSEXP) {
+Rcpp::List getMSPeakLists(const MSReadBackend& backend, const std::vector<SpectrumRawTypes::Time>& startTimes, const std::vector<SpectrumRawTypes::Time>& endTimes, const std::vector<SpectrumRawTypes::Mass>& precursorMZs, bool withPrecursor, bool retainPrecursor, int MSLevel, const std::string& method, SpectrumRawTypes::Mass mzWindow, const std::vector<SpectrumRawTypes::Mobility> startMobs, const std::vector<SpectrumRawTypes::Mobility> endMobs, SpectrumRawTypes::PeakAbundance minAbundance, unsigned topMost, SpectrumRawTypes::Intensity minIntensityIMS, SpectrumRawTypes::Intensity minIntensityPre, SpectrumRawTypes::Intensity minIntensityPost);
+RcppExport SEXP _patRoon_getMSPeakLists(SEXP backendSEXP, SEXP startTimesSEXP, SEXP endTimesSEXP, SEXP precursorMZsSEXP, SEXP withPrecursorSEXP, SEXP retainPrecursorSEXP, SEXP MSLevelSEXP, SEXP methodSEXP, SEXP mzWindowSEXP, SEXP startMobsSEXP, SEXP endMobsSEXP, SEXP minAbundanceSEXP, SEXP topMostSEXP, SEXP minIntensityIMSSEXP, SEXP minIntensityPreSEXP, SEXP minIntensityPostSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -138,8 +137,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Time>& >::type endTimes(endTimesSEXP);
     Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Mass>& >::type precursorMZs(precursorMZsSEXP);
     Rcpp::traits::input_parameter< bool >::type withPrecursor(withPrecursorSEXP);
+    Rcpp::traits::input_parameter< bool >::type retainPrecursor(retainPrecursorSEXP);
     Rcpp::traits::input_parameter< int >::type MSLevel(MSLevelSEXP);
-    Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type isoWindow(isoWindowSEXP);
     Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type mzWindow(mzWindowSEXP);
     Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Mobility> >::type startMobs(startMobsSEXP);
@@ -149,7 +148,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minIntensityIMS(minIntensityIMSSEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minIntensityPre(minIntensityPreSEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minIntensityPost(minIntensityPostSEXP);
-    rcpp_result_gen = Rcpp::wrap(getMSPeakLists(backend, startTimes, endTimes, precursorMZs, withPrecursor, MSLevel, isoWindow, method, mzWindow, startMobs, endMobs, minAbundance, topMost, minIntensityIMS, minIntensityPre, minIntensityPost));
+    rcpp_result_gen = Rcpp::wrap(getMSPeakLists(backend, startTimes, endTimes, precursorMZs, withPrecursor, retainPrecursor, MSLevel, method, mzWindow, startMobs, endMobs, minAbundance, topMost, minIntensityIMS, minIntensityPre, minIntensityPost));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -317,6 +316,32 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< unsigned >::type topMost(topMostSEXP);
     Rcpp::traits::input_parameter< double >::type prec(precSEXP);
     rcpp_result_gen = Rcpp::wrap(testSpecFilter(mzs, ints, mzMin, mzMax, minInt, topMost, prec));
+    return rcpp_result_gen;
+END_RCPP
+}
+// testClusterNums
+Rcpp::DataFrame testClusterNums(const std::vector<double>& nums, const std::string& method, double window);
+RcppExport SEXP _patRoon_testClusterNums(SEXP numsSEXP, SEXP methodSEXP, SEXP windowSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::vector<double>& >::type nums(numsSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
+    Rcpp::traits::input_parameter< double >::type window(windowSEXP);
+    rcpp_result_gen = Rcpp::wrap(testClusterNums(nums, method, window));
+    return rcpp_result_gen;
+END_RCPP
+}
+// testClusterNums2
+std::vector<double> testClusterNums2(const std::vector<double>& nums, const std::string& method, double window);
+RcppExport SEXP _patRoon_testClusterNums2(SEXP numsSEXP, SEXP methodSEXP, SEXP windowSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::vector<double>& >::type nums(numsSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
+    Rcpp::traits::input_parameter< double >::type window(windowSEXP);
+    rcpp_result_gen = Rcpp::wrap(testClusterNums2(nums, method, window));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -583,7 +608,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_writeChromsToMzML", (DL_FUNC) &_patRoon_writeChromsToMzML, 2},
     {"_patRoon_initBrukerLibrary", (DL_FUNC) &_patRoon_initBrukerLibrary, 1},
     {"_patRoon_getMSSpectrum", (DL_FUNC) &_patRoon_getMSSpectrum, 2},
-    {"_patRoon_getScans", (DL_FUNC) &_patRoon_getScans, 6},
+    {"_patRoon_getScans", (DL_FUNC) &_patRoon_getScans, 5},
     {"_patRoon_getEICList", (DL_FUNC) &_patRoon_getEICList, 7},
     {"_patRoon_getMSMetadata", (DL_FUNC) &_patRoon_getMSMetadata, 2},
     {"_patRoon_setSpecMetadata", (DL_FUNC) &_patRoon_setSpecMetadata, 3},
@@ -600,6 +625,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_specDistMatrix", (DL_FUNC) &_patRoon_specDistMatrix, 7},
     {"_patRoon_specDistRect", (DL_FUNC) &_patRoon_specDistRect, 9},
     {"_patRoon_testSpecFilter", (DL_FUNC) &_patRoon_testSpecFilter, 7},
+    {"_patRoon_testClusterNums", (DL_FUNC) &_patRoon_testClusterNums, 3},
+    {"_patRoon_testClusterNums2", (DL_FUNC) &_patRoon_testClusterNums2, 3},
     {"_patRoon_doAverageSpectra", (DL_FUNC) &_patRoon_doAverageSpectra, 5},
     {"_patRoon_doAverageSpectraList", (DL_FUNC) &_patRoon_doAverageSpectraList, 5},
     {"_patRoon_collapseTIMSFrame", (DL_FUNC) &_patRoon_collapseTIMSFrame, 17},

@@ -80,9 +80,11 @@ getDefAvgPListParams <- function(...)
                 topMost = 50,
                 minIntensityPre = 500,
                 minIntensityPost = 500,
+                minIntensityIMS = 50, # UNDONE: good default?
                 minAbundance = 0,
                 avgFun = mean,
                 method = "hclust",
+                withPrecursorMS = TRUE,
                 pruneMissingPrecursorMS = TRUE,
                 retainPrecursorMSMS = TRUE)
     return(modifyList(def, list(...)))

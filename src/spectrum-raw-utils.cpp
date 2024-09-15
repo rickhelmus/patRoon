@@ -33,7 +33,7 @@ template<typename Spec> std::vector<size_t> flattenedSpecIDs(const std::vector<S
 std::vector<SpectrumRawSelection> getSpecRawSelections(const SpectrumRawMetadata &specMeta,
                                                        const NumRange<SpectrumRawTypes::Time> &timeRange,
                                                        SpectrumRawTypes::MSLevel MSLevel,
-                                                       const NumRange<SpectrumRawTypes::Mass> &isoRange)
+                                                       SpectrumRawTypes::Mass precursor)
 {
     const SpectrumRawMetadataMS &metaMS = (MSLevel == SpectrumRawTypes::MSLevel::MS1) ? specMeta.first : specMeta.second;
     std::vector<SpectrumRawSelection> ret;
@@ -51,13 +51,13 @@ std::vector<SpectrumRawSelection> getSpecRawSelections(const SpectrumRawMetadata
             {
                 for (size_t j=0; j<specMeta.second.MSMSFrames[i].isolationRanges.size(); ++j)
                 {
-                    if (isoRange.overlap(specMeta.second.MSMSFrames[i].isolationRanges[j]))
+                    if (specMeta.second.MSMSFrames[i].isolationRanges[j].within(precursor))
                         sel.MSMSFrameIndices.push_back(j);
                 }
                 if (sel.MSMSFrameIndices.empty())
                     continue; // no MS/MS data for this one
             }
-            else if (isMSMS && !isoRange.overlap(specMeta.second.isolationRanges[i]))
+            else if (isMSMS && !specMeta.second.isolationRanges[i].within(precursor))
                 continue;
             sel.index = i;
             ret.push_back(std::move(sel));

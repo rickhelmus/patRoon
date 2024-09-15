@@ -897,9 +897,8 @@ generateMSPeakListsNew <- function(fGroups, maxMSRtWindow = 5, precursorMzWindow
     {
         # UNDONE: set mobilities
         ret <- getMSPeakLists(backend, ft$retmin, ft$retmax, ft$mz,
-                              withPrecursor = params$pruneMissingPrecursor, MSLevel = MSLevel,
-                              isoWindow = precursorMzWindow, method = params$method,
-                              mzWindow = params$clusterMzWindow,
+                              withPrecursor = params$withPrecursor, retainPrecursor = params$retainPrecursor,
+                              MSLevel = MSLevel, method = params$method, mzWindow = params$clusterMzWindow,
                               startMobs = rep(0, nrow(ft)), endMobs = rep(0, nrow(ft)),
                               minAbundance = params$minAbundance, topMost = params$topMost,
                               minIntensityIMS = params$minIntensityIMS,
@@ -908,17 +907,28 @@ generateMSPeakListsNew <- function(fGroups, maxMSRtWindow = 5, precursorMzWindow
         
         names(ret) <- ft$group
         ret <- pruneList(ret, checkZeroRows = TRUE)
-        ret <- lapply(ret, setDT)
-        ret <- Map(ret, ft$mz[match(names(ret), ft$group)], f = assignPrecursorToMSPeakList)
-        ret <- lapply(ret, function(pl) { setnames(pl, "abundance", "feat_abundance") })
-        
+        ret <- Map(ret, ft$mz[match(names(ret), ft$group)], f = function(pl, pmz)
+        {
+            setDT(pl)
+            pl <- assignPrecursorToMSPeakList(pl, pmz)
+            if (params$pruneMissingPrecursor && !any(pl$precursor))
+                pl <- pl[0]
+            setnames(pl, "abundance", "feat_abundance")
+            return(pl)
+        })
         return(ret)
     }
     
+    # UNDONE!!
+    if (avgFeatParams$method == "distance")
+        avgFeatParams$method = "diff"
+    
     avgFeatParamsMS <- avgFeatParamsMSMS <-
-        avgFeatParams[setdiff(names(avgFeatParams), c("pruneMissingPrecursorMS", "retainPrecursorMSMS"))]
+        avgFeatParams[setdiff(names(avgFeatParams), c("withPrecursorMS", "pruneMissingPrecursorMS", "retainPrecursorMSMS"))]
+    avgFeatParamsMS$withPrecursor <- avgFeatParams$withPrecursorMS
     avgFeatParamsMS$retainPrecursor <- TRUE;
     avgFeatParamsMS$pruneMissingPrecursor <- avgFeatParams$pruneMissingPrecursorMS
+    avgFeatParamsMSMS$withPrecursor <- FALSE
     avgFeatParamsMSMS$pruneMissingPrecursor <- FALSE
     avgFeatParamsMSMS$retainPrecursor <- avgFeatParams$retainPrecursorMSMS
     

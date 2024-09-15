@@ -84,6 +84,9 @@ template <typename NumType> std::vector<int> clusterNums(const std::vector<NumTy
 {
     std::vector<int> ret(nums.size());
     
+    if (nums.size() < 2)
+        return ret; // no need to assign any clusters (for size==1 a one sized vector with value 0 will be returned)
+    
     if (method == clusterMethod::BIN || method == clusterMethod::DIFF)
     {
         const auto sortedNumInds = getSortedInds(nums);
@@ -132,7 +135,7 @@ template <typename NumType> std::vector<int> clusterNums(const std::vector<NumTy
         {
             for (size_t j=i+1; j<n; ++j)
             {
-                distm[k] = abs(nums[i] - nums[j]);
+                distm[k] = std::fabs(nums[i] - nums[j]);
                 ++k;
             }
         }

@@ -218,6 +218,7 @@
     - withPrecursor: now only applied prior to other filtering systems, change?
         - if yes: adjust R and C++ code
         - doc in any case
+    - replace averageSpectra() in mslibrary.R and update bgMSMS
 - anaInfo / file path retrieval
     - update convertMSFiles() and newProject()
     - update SAFD for profile or centroided

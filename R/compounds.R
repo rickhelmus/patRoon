@@ -212,13 +212,6 @@ setMethod("addFormulaScoring", "compounds", function(compounds, formulas, update
         else
             ct[, formulaScore := calculateScores(ct, forms)]
 
-        # update overall scoring
-        if (updateScore && any(ct$formulaScore > 0))
-        {
-            normFormScores <- ct$formulaScore / max(ct$formulaScore)
-            ct[, score := score + formulaScoreWeight * normFormScores]
-        }
-
         setTxtProgressBar(prog, grpi)
         return(ct)
     })

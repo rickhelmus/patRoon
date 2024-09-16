@@ -1,6 +1,8 @@
 # DEVEL
 
 * Fixed: The `removeTPIsomers` filter for `transformationProductsStructure` didn't actually apply the `removeDuplicates` filter.
+* Fixed: if `updateScores=TRUE` for the methods `addFormulaScoring()`, `predictRespFactors()` and `predictTox()` then `NaN` scores could be introduced if the `formulaScore` is zero.
+* Fixed: if `updateScores=TRUE` for the method `addFormulaScoring()` then the `score` would be updated twice.
 
 
 # patRoon 2.3.2

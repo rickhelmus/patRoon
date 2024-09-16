@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2024-07-25" />
+<meta name="date" content="2024-09-16" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -373,39 +373,39 @@ div.csl-indent {
 <col width="28%" />
 </colgroup>
 <thead>
-<tr class="header">
+<tr>
 <th>Workflow step</th>
 <th>Function</th>
 <th>Output S4 class</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td>Grouping features</td>
 <td><code>groupFeatures()</code></td>
 <td><code>featureGroupsSet</code></td>
 </tr>
-<tr class="even">
+<tr>
 <td>Suspect screening</td>
 <td><code>screenSuspects()</code></td>
 <td><code>featureGroupsScreeningSet</code></td>
 </tr>
-<tr class="odd">
+<tr>
 <td>MS peak lists</td>
 <td><code>generateMSPeakLists()</code></td>
 <td><code>MSPeakListsSet</code></td>
 </tr>
-<tr class="even">
+<tr>
 <td>Formula annotation</td>
 <td><code>generateFormulas()</code></td>
 <td><code>formulasSet</code></td>
 </tr>
-<tr class="odd">
+<tr>
 <td>Compound annotation</td>
 <td><code>generateCompounds()</code></td>
 <td><code>compoundsSet</code></td>
 </tr>
-<tr class="even">
+<tr>
 <td>Componentization</td>
 <td><code>generateComponents()</code></td>
 <td>algorithm dependent</td>
@@ -421,29 +421,29 @@ div.csl-indent {
 <col width="66%" />
 </colgroup>
 <thead>
-<tr class="header">
+<tr>
 <th>Workflow step</th>
 <th>Handling of set data</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td>Finding/Grouping features</td>
 <td>Neutralization of <em>m/z</em> values</td>
 </tr>
-<tr class="even">
+<tr>
 <td>Suspect screening</td>
 <td>Merging results from screening performed for each set</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>Componentization</td>
 <td>Algorithm dependent (discussed below)</td>
 </tr>
-<tr class="even">
+<tr>
 <td>MS peak lists</td>
 <td>MS data is obtained and stored per set. The final peak lists are combined (<em>not</em> averaged)</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>Formula/Compound annotation</td>
 <td>Annotation is performed for each set separately and used to generate a final consensus</td>
 </tr>
@@ -481,7 +481,7 @@ div.csl-indent {
 <col width="28%" />
 </colgroup>
 <thead>
-<tr class="header">
+<tr>
 <th>Candidate</th>
 <th>annotations</th>
 <th>candidate present</th>
@@ -490,21 +490,21 @@ div.csl-indent {
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td>#1</td>
 <td><code>+</code>, <code>-</code></td>
 <td><code>+</code>, <code>-</code></td>
 <td>Keep</td>
 <td>Keep</td>
 </tr>
-<tr class="even">
+<tr>
 <td>#2</td>
 <td><code>+</code>, <code>-</code></td>
 <td><code>+</code></td>
 <td>Remove</td>
 <td>Remove</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>#3</td>
 <td><code>+</code></td>
 <td><code>+</code></td>

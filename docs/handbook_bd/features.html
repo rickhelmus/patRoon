@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2024-07-25" />
+<meta name="date" content="2024-09-16" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -366,8 +366,8 @@ div.csl-indent {
 <div id="features" class="section level2 hasAnchor" number="4.3">
 <h2><span class="header-section-number">4.3</span> Features<a href="features.html#features" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Collecting features from the analyses consists of finding all features, grouping them across analyses (optionally after retention time alignment), and if desired suspect screening:</p>
-<div id="htmlwidget-f387c03fa8ed4e58cc06" style="width:500px;height:70px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-f387c03fa8ed4e58cc06">{"x":{"diagram":"\ndigraph Features {\n  graph [ rankdir = LR, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Find features\" -> \"Group features\"\n    \"Suspect screening\"\n    \"Group features\" -> \"Suspect screening\" [style=dashed]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-e88ee71c773f352a2303" style="width:500px;height:70px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-e88ee71c773f352a2303">{"x":{"diagram":"\ndigraph Features {\n  graph [ rankdir = LR, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Find features\" -> \"Group features\"\n    \"Suspect screening\"\n    \"Group features\" -> \"Suspect screening\" [style=dashed]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <div id="finding-and-grouping-features" class="section level3 hasAnchor" number="4.3.1">
 <h3><span class="header-section-number">4.3.1</span> Finding and grouping features<a href="features.html#finding-and-grouping-features" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Several algorithms are available for finding features. These are listed in the table below alongside their usage and general remarks.</p>
@@ -378,64 +378,64 @@ div.csl-indent {
 <col width="19%" />
 </colgroup>
 <thead>
-<tr class="header">
+<tr>
 <th>Algorithm</th>
 <th>Usage</th>
 <th>Remarks</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td><a href="http://openms.de/">OpenMS</a></td>
 <td><code>findFeatures(algorithm = "openms", ...)</code></td>
 <td>Uses the <a href="https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureFinderMetabo.html">FeatureFinderMetabo</a> algorithm</td>
 </tr>
-<tr class="even">
+<tr>
 <td><a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS</a></td>
 <td><code>findFeatures(algorithm = "xcms", ...)</code></td>
 <td>Uses <code>xcms::xcmsSet()</code> function</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS</a> (import)</td>
 <td><code>importFeatures(algorithm = "xcms", ...)</code></td>
 <td>Imports an existing <code>xcmsSet</code> object</td>
 </tr>
-<tr class="even">
+<tr>
 <td><a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS3</a></td>
 <td><code>findFeatures(algorithm = "xcms3", ...)</code></td>
 <td>Uses <code>xcms::findChromPeaks()</code> from the new XCMS3 interface</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS3</a> (import)</td>
 <td><code>importFeatures(algorithm = "xcms3", ...)</code></td>
 <td>Imports an existing <code>XCMSnExp</code> object</td>
 </tr>
-<tr class="even">
+<tr>
 <td><a href="https://cran.r-project.org/web/packages/enviPick/index.html">enviPick</a></td>
 <td><code>findFeatures(algorithm = "envipick", ...)</code></td>
 <td>Uses <code>enviPick::enviPickwrap()</code></td>
 </tr>
-<tr class="odd">
+<tr>
 <td><a href="https://github.com/hcji/KPIC2">KPIC2</a></td>
 <td><code>findFeatures(algorithm = "kpic2", ...)</code></td>
 <td>Uses the <a href="https://github.com/hcji/KPIC2">KPIC2</a> <code>R</code> package</td>
 </tr>
-<tr class="even">
+<tr>
 <td><a href="https://github.com/hcji/KPIC2">KPIC2</a> (import)</td>
 <td><code>importFeatures(algorithm = "kpic2", ...)</code></td>
 <td>Imports features from <a href="https://github.com/hcji/KPIC2">KPIC2</a></td>
 </tr>
-<tr class="odd">
+<tr>
 <td><a href="https://bio.informatik.uni-jena.de/software/sirius/">SIRIUS</a></td>
 <td><code>findFeatures(algorithm = "sirius", ...)</code></td>
 <td>Uses <a href="https://bio.informatik.uni-jena.de/software/sirius/">SIRIUS</a> to find features</td>
 </tr>
-<tr class="even">
+<tr>
 <td><a href="https://bitbucket.org/SSamanipour/safd.jl/src/master/">SAFD</a></td>
 <td><code>findFeatures(algorithm = "safd", ...)</code></td>
 <td>Uses the <a href="https://bitbucket.org/SSamanipour/safd.jl/src/master/">SAFD</a> algorithm (experimental)</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>DataAnalysis</td>
 <td><code>findFeatures(algorithm = "bruker", ...)</code></td>
 <td>Uses Find Molecular Features from DataAnalysis (Bruker only)</td>
@@ -449,37 +449,37 @@ div.csl-indent {
 <col width="83%" />
 </colgroup>
 <thead>
-<tr class="header">
+<tr>
 <th>Algorithm</th>
 <th>Common parameters</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td><a href="http://openms.de/">OpenMS</a></td>
 <td><code>noiseThrInt</code>, <code>chromSNR</code>, <code>chromFWHM</code>, <code>mzPPM</code>, <code>minFWHM</code>, <code>maxFWHM</code> (see <code>?findFeatures</code>)</td>
 </tr>
-<tr class="even">
+<tr>
 <td><a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS</a> / <a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS3</a></td>
 <td><code>peakwidth</code>, <code>mzdiff</code>, <code>prefilter</code>, <code>noise</code> (assuming default <code>centWave</code> algorithm, see <code>?findPeaks.centWave</code> / <code>?CentWaveParam</code>)</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><a href="https://cran.r-project.org/web/packages/enviPick/index.html">enviPick</a></td>
 <td><code>dmzgap</code>, <code>dmzdens</code>, <code>drtgap</code>, <code>drtsmall</code>, <code>drtdens</code>, <code>drtfill</code>, <code>drttotal</code>, <code>minpeak</code>, <code>minint</code>, <code>maxint</code> (see <code>?enviPickwrap</code>)</td>
 </tr>
-<tr class="even">
+<tr>
 <td><a href="https://github.com/hcji/KPIC2">KPIC2</a></td>
 <td><code>kmeans</code>, <code>level</code>, <code>min_snr</code> (see <code>?findFeatures</code> and <code>?getPIC</code> / <code>?getPIC.kmeans</code>)</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><a href="https://bio.informatik.uni-jena.de/software/sirius/">SIRIUS</a></td>
 <td>The <code>sirius</code> algorithm is currently parameterless</td>
 </tr>
-<tr class="even">
+<tr>
 <td><a href="https://bitbucket.org/SSamanipour/safd.jl/src/master/">SAFD</a></td>
 <td><code>mzRange</code>, <code>maxNumbIter</code>, <code>resolution</code>, <code>minInt</code> (see <code>?findFeatures</code>)</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>DataAnalysis</td>
 <td>See <em>Find</em> -&gt; <em>Parameters…</em> -&gt; <em>Molecular Features</em> in DataAnalysis.</td>
 </tr>
@@ -499,59 +499,59 @@ div.csl-indent {
 <col width="33%" />
 </colgroup>
 <thead>
-<tr class="header">
+<tr>
 <th>Algorithm</th>
 <th>Usage</th>
 <th>Remarks</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td><a href="http://openms.de/">OpenMS</a></td>
 <td><code>groupFeatures(algorithm = "openms", ...)</code></td>
 <td>Uses the <a href="https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureLinkerUnlabeled.html">FeatureLinkerUnlabeled</a> algorithm (and <a href="https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_MapAlignerPoseClustering.html">MapAlignerPoseClustering</a> for retention alignment)</td>
 </tr>
-<tr class="even">
+<tr>
 <td><a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS</a></td>
 <td><code>groupFeatures(algorithm = "xcms", ...)</code></td>
 <td>Uses <code>xcms::group()</code> <code>xcms::retcor()</code> functions</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS</a> (import)</td>
 <td><code>importFeatureGroupsXCMS(...)</code></td>
 <td>Imports an existing <code>xcmsSet</code> object.</td>
 </tr>
-<tr class="even">
+<tr>
 <td><a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS3</a></td>
 <td><code>groupFeatures(algorithm = "xcms3", ...)</code></td>
 <td>Uses <code>xcms::groupChromPeaks()</code> and <code>xcms::adjustRtime()</code> functions</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS3</a> (import)</td>
 <td><code>importFeatureGroupsXCMS3(...)</code></td>
 <td>Imports an existing <code>XCMSnExp</code> object.</td>
 </tr>
-<tr class="even">
+<tr>
 <td><a href="https://github.com/hcji/KPIC2">KPIC2</a></td>
 <td><code>groupFeatures(algorithm = "kpic2", ...)</code></td>
 <td>Uses the <a href="https://github.com/hcji/KPIC2">KPIC2</a> package</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><a href="https://github.com/hcji/KPIC2">KPIC2</a> (import)</td>
 <td><code>importFeatureGroupsKPIC2(...)</code></td>
 <td>Imports a <code>PIC set</code> object</td>
 </tr>
-<tr class="even">
+<tr>
 <td><a href="https://bio.informatik.uni-jena.de/software/sirius/">SIRIUS</a></td>
 <td><code>groupFeatures(anaInfo, algorithm = "sirius")</code></td>
 <td>Finds <em>and</em> groups features with <a href="https://bio.informatik.uni-jena.de/software/sirius/">SIRIUS</a></td>
 </tr>
-<tr class="odd">
+<tr>
 <td>ProfileAnalysis</td>
 <td><code>importFeatureGroups(algorithm = "brukerpa", ...)</code></td>
 <td>Import <code>.csv</code> file exported from Bruker ProfileAnalysis</td>
 </tr>
-<tr class="even">
+<tr>
 <td>TASQ</td>
 <td><code>importFeatureGroups(algorithm = "brukertasq", ...)</code></td>
 <td>Imports a <em>Global result table</em> (exported to Excel file and then saved as <code>.csv</code> file)</td>

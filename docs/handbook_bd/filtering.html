@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2024-07-25" />
+<meta name="date" content="2024-09-16" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -389,64 +389,64 @@ div.csl-indent {
 <col width="45%" />
 </colgroup>
 <thead>
-<tr class="header">
+<tr>
 <th>Filter</th>
 <th>Classes</th>
 <th>Remarks</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td><code>absMinIntensity</code>, <code>relMinIntensity</code></td>
 <td><code>features</code>, <code>featureGroups</code></td>
 <td>Minimum intensity</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>preAbsMinIntensity</code>, <code>preRelMinIntensity</code></td>
 <td><code>featureGroups</code></td>
 <td>Minimum intensity prior to other filtering (see below)</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>retentionRange</code>, <code>mzRange</code>, <code>mzDefectRange</code>, <code>chromWidthRange</code></td>
 <td><code>features</code>, <code>featureGroups</code></td>
 <td>Filter by feature properties</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>absMinAnalyses</code>, <code>relMinAnalyses</code></td>
 <td><code>featureGroups</code></td>
 <td>Minimum feature abundance in all analyses</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>absMinReplicates</code>, <code>relMinReplicates</code></td>
 <td><code>featureGroups</code></td>
 <td>Minimum feature abundance in different replicates</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>absMinFeatures</code>, <code>relMinFeatures</code></td>
 <td><code>featureGroups</code></td>
 <td>Only keep analyses with at least this amount of features</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>absMinReplicateAbundance</code>, <code>relMinReplicateAbundance</code></td>
 <td><code>featureGroups</code></td>
 <td>Minimum feature abundance in a replicate group</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>maxReplicateIntRSD</code></td>
 <td><code>featureGroups</code></td>
 <td>Maximum relative standard deviation of feature intensities in a replicate group.</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>blankThreshold</code></td>
 <td><code>featureGroups</code></td>
 <td>Minimum intensity factor above blank intensity</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>rGroups</code></td>
 <td><code>featureGroups</code></td>
 <td>Only keep (features of) these replicate groups</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>results</code></td>
 <td><code>featureGroups</code></td>
 <td>Only keep feature groups with formula/compound annotations or componentization results</td>
@@ -501,39 +501,39 @@ div.csl-indent {
 <col width="46%" />
 </colgroup>
 <thead>
-<tr class="header">
+<tr>
 <th>Filter</th>
 <th>Classes</th>
 <th>Remarks</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td><code>onlyHits</code></td>
 <td><code>featureGroupsScreening</code></td>
 <td>Only retain feature groups assigned to one or more suspects.</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>selectHitsBy</code></td>
 <td><code>featureGroupsScreening</code></td>
 <td>Select the feature group that matches best with a suspect (in case there are multiple).</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>selectBestFGroups</code></td>
 <td><code>featureGroupsScreening</code></td>
 <td>Select the suspect that matches best with a feature group (in case there are multiple).</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>maxLevel</code>, <code>maxFormRank</code>, <code>maxCompRank</code></td>
 <td><code>featureGroupsScreening</code></td>
 <td>Only retain suspect hits with identification/annotation ranks below a threshold.</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>minAnnSimForm</code>, <code>minAnnSimComp</code>, <code>minAnnSimBoth</code></td>
 <td><code>featureGroupsScreening</code></td>
 <td>Remove suspect hits with annotation similarity scores below this value.</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>absMinFragMatches</code>, <code>relMinFragMatches</code></td>
 <td><code>featureGroupsScreening</code></td>
 <td>Only keep suspect hits with a minimum (relative) number of fragment matches from the suspect list.</td>
@@ -563,64 +563,64 @@ div.csl-indent {
 <col width="39%" />
 </colgroup>
 <thead>
-<tr class="header">
+<tr>
 <th>Filter</th>
 <th>Classes</th>
 <th>Remarks</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td><code>absMSIntThr</code>, <code>absMSMSIntThr</code>, <code>relMSIntThr</code>, <code>relMSMSIntThr</code></td>
 <td><code>MSPeakLists</code></td>
 <td>Minimum intensity of mass peaks</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>topMSPeaks</code>, <code>topMSMSPeaks</code></td>
 <td><code>MSPeakLists</code></td>
 <td>Only keep most intense mass peaks</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>withMSMS</code></td>
 <td><code>MSPeakLists</code></td>
 <td>Only keep results with MS/MS data</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>minMSMSPeaks</code></td>
 <td><code>MSPeakLists</code></td>
 <td>Only keep an MS/MS peak list if it contains a minimum number of peaks (excluding the precursor peak)</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>annotatedBy</code></td>
 <td><code>MSPeakLists</code></td>
 <td>Only keep MS/MS peaks that have formula or compound annotations</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>minExplainedPeaks</code></td>
 <td><code>formulas</code>, <code>compounds</code></td>
 <td>Minimum number of annotated mass peaks</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>elements</code>, <code>fragElements</code>, <code>lossElements</code></td>
 <td><code>formulas</code>, <code>compounds</code></td>
 <td>Restrain elemental composition</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>topMost</code></td>
 <td><code>formulas</code>, <code>compounds</code></td>
 <td>Only keep highest ranked candidates</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>minScore</code>, <code>minFragScore</code>, <code>minFormulaScore</code></td>
 <td><code>compounds</code></td>
 <td>Minimum compound scorings</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>scoreLimits</code></td>
 <td><code>formulas</code>, <code>compounds</code></td>
 <td>Minimum/Maximum scorings</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>OM</code></td>
 <td><code>formulas</code>, <code>compounds</code></td>
 <td>Only keep candidates with likely elemental composition found in organic matter</td>
@@ -677,21 +677,21 @@ div.csl-indent {
 <col width="37%" />
 </colgroup>
 <thead>
-<tr class="header">
+<tr>
 <th>Filter</th>
 <th>Remarks</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td><code>size</code></td>
 <td>Minimum component size</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>adducts</code>, <code>isotopes</code></td>
 <td>Filter features by adduct/istopes annotation</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>rtIncrement</code>, <code>mzIncrement</code></td>
 <td>Filter homologs by retention/mz increment range</td>
 </tr>

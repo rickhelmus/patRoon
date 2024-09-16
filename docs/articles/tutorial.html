@@ -118,7 +118,7 @@
                         <h4 data-toc-skip class="author">Rick
 Helmus</h4>
             
-            <h4 data-toc-skip class="date">2024-07-25</h4>
+            <h4 data-toc-skip class="date">2024-09-16</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/vignettes/tutorial.Rmd" class="external-link"><code>vignettes/tutorial.Rmd</code></a></small>
       <div class="hidden name"><code>tutorial.Rmd</code></div>
@@ -827,17 +827,17 @@ data from the previous step.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/generics.html">as.data.table</a></span><span class="op">(</span><span class="va">compounds</span><span class="op">)</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span> <span class="co"># only show first columns for clarity</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;               group explainedPeaks    score neutralMass                  SMILES</span></span>
 <span><span class="co">#&gt;              &lt;char&gt;          &lt;int&gt;    &lt;num&gt;       &lt;num&gt;                  &lt;char&gt;</span></span>
-<span><span class="co">#&gt;   1:  M109_R192_157              1 5.080113    108.0687         C1=CC(=CC=C1N)N</span></span>
-<span><span class="co">#&gt;   2:  M109_R192_157              1 5.016746    108.0687       C1=CC=C(C(=C1)N)N</span></span>
-<span><span class="co">#&gt;   3:  M109_R192_157              1 4.773151    108.0687         C1=CC=C(C=C1)NN</span></span>
-<span><span class="co">#&gt;   4:  M109_R192_157              1 4.449049    108.0687       C1=CC(=CC(=C1)N)N</span></span>
-<span><span class="co">#&gt;   5:  M109_R192_157              1 3.979250    108.0687           CNC1=CC=CC=N1</span></span>
+<span><span class="co">#&gt;   1:  M109_R192_157              1 4.080113    108.0687         C1=CC(=CC=C1N)N</span></span>
+<span><span class="co">#&gt;   2:  M109_R192_157              1 4.016746    108.0687       C1=CC=C(C(=C1)N)N</span></span>
+<span><span class="co">#&gt;   3:  M109_R192_157              1 3.773151    108.0687         C1=CC=C(C=C1)NN</span></span>
+<span><span class="co">#&gt;   4:  M109_R192_157              1 3.449049    108.0687       C1=CC(=CC(=C1)N)N</span></span>
+<span><span class="co">#&gt;   5:  M109_R192_157              1 2.979250    108.0687           CNC1=CC=CC=N1</span></span>
 <span><span class="co">#&gt;  ---                                                                           </span></span>
-<span><span class="co">#&gt; 736: M186_R293_1568              3 3.864543    185.2143     CCCC(CCC)(CCC)N(C)C</span></span>
-<span><span class="co">#&gt; 737: M186_R293_1568              3 3.854816    185.2143     CCCC(CCC)(CC(C)C)NC</span></span>
-<span><span class="co">#&gt; 738: M186_R293_1568              3 3.843497    185.2143       CCCC(CCC)(CCC)NCC</span></span>
-<span><span class="co">#&gt; 739: M186_R293_1568              3 3.839884    185.2143 CCN(CC)C(C)(C)CC(C)(C)C</span></span>
-<span><span class="co">#&gt; 740: M186_R293_1568              3 3.825351    185.2143   CC(C)CC(C)NC(C)CC(C)C</span></span></code></pre>
+<span><span class="co">#&gt; 736: M186_R293_1568              3 2.864543    185.2143     CCCC(CCC)(CCC)N(C)C</span></span>
+<span><span class="co">#&gt; 737: M186_R293_1568              3 2.854816    185.2143     CCCC(CCC)(CC(C)C)NC</span></span>
+<span><span class="co">#&gt; 738: M186_R293_1568              3 2.843497    185.2143       CCCC(CCC)(CCC)NCC</span></span>
+<span><span class="co">#&gt; 739: M186_R293_1568              3 2.839884    185.2143 CCN(CC)C(C)(C)CC(C)(C)C</span></span>
+<span><span class="co">#&gt; 740: M186_R293_1568              3 2.825351    185.2143   CC(C)CC(C)NC(C)CC(C)C</span></span></code></pre>
 <div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/generics.html">plotSpectrum</a></span><span class="op">(</span><span class="va">mslists</span>, <span class="st">"M186_R293_1568"</span>, MSLevel <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <p><img src="tutorial_files/figure-html/plotSpectrum-1.png" width="576"></p>

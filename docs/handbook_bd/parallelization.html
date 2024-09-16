@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2024-07-25" />
+<meta name="date" content="2024-09-16" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -377,44 +377,44 @@ div.csl-indent {
 <col width="28%" />
 </colgroup>
 <thead>
-<tr class="header">
+<tr>
 <th>Function</th>
 <th>Purpose</th>
 <th>Remarks</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td><code>findFeatures</code></td>
 <td>Obtain feature data</td>
 <td>Only <code>envipick</code> and <code>kpic2</code> algorithms.</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>generateComponents</code></td>
 <td>Generate components</td>
 <td>Only <code>cliquems</code> algorithm.</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>report</code></td>
 <td>Reporting data</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>generateTPs</code></td>
 <td>Obtain transformation products</td>
 <td>Only <code>cts</code> algorithm.</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>optimizeFeatureFinding</code>, <code>optimizeFeatureGrouping</code></td>
 <td>Optimize feature finding/grouping parameters</td>
 <td>Discussed <a href="fOpt.html#fOpt">here</a>.</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>calculatePeakQualities</code></td>
 <td>Calculate feature (group) qualities</td>
 <td>Discussed <a href="peakQual.html#peakQual">here</a>.</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>predictTox</code> / <code>predictRespFactors</code></td>
 <td>Prediction of toxicities/concentrations }</td>
 <td>Only <code>compounds</code> methods. Discussed <a href="pred.html#pred">here</a>.</td>
@@ -439,64 +439,64 @@ div.csl-indent {
 <col width="33%" />
 </colgroup>
 <thead>
-<tr class="header">
+<tr>
 <th>Tool</th>
 <th>Used by</th>
 <th>Notes</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td><code>msConvert</code></td>
 <td><code>convertMSFiles(algorithm="pwiz", ...)</code></td>
 <td></td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>FileConverter</code></td>
 <td><code>convertMSFiles(algorithm="openms", ...)</code></td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>FeatureFinderMetabo</code></td>
 <td><code>findFeatures(algorithm="openms", ...)</code></td>
 <td></td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>julia</code></td>
 <td><code>findFeatures(algorithm="safd", ...)</code></td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>SIRIUS</code></td>
 <td><code>findFeatures(algorithm="sirius", ...)</code></td>
 <td></td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>MetaboliteAdductDecharger</code></td>
 <td><code>generateComponents(algorithm="openms", ...)</code></td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>GenForm</code></td>
 <td><code>generateFormulas(agorithm="genform", ...)</code></td>
 <td></td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>SIRIUS</code></td>
 <td><code>generateFormulas(agorithm="sirius", ...)</code>, <code>generateCompounds(agorithm="sirius", ...)</code></td>
 <td>Only if <code>splitBatches=TRUE</code></td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>MetFrag</code></td>
 <td><code>generateCompounds(agorithm="metfrag", ...)</code></td>
 <td></td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>pngquant</code></td>
 <td><code>reportHTML(...)</code></td>
 <td>Only if <code>optimizePng=TRUE</code></td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>BioTransformer</code></td>
 <td><code>generateTPs(algorithm = "biotransformer")</code></td>
 <td>Disabled by default (see <code>?generateTPs</code> for details).</td>
@@ -510,21 +510,21 @@ div.csl-indent {
 <col width="51%" />
 </colgroup>
 <thead>
-<tr class="header">
+<tr>
 <th><code>classic</code></th>
 <th><code>future</code></th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td>requires little or no configuration</td>
 <td>configuration needed to setup</td>
 </tr>
-<tr class="even">
+<tr>
 <td>works with all tools</td>
 <td>doesn’t work with <code>pngquant</code> and slower with <code>GenForm</code></td>
 </tr>
-<tr class="odd">
+<tr>
 <td>only supports parallelization on the local computer</td>
 <td>allows both local and cluster computing</td>
 </tr>

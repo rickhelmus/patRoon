@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2024-07-25" />
+<meta name="date" content="2024-09-16" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -373,69 +373,69 @@ div.csl-indent {
 <col width="34%" />
 </colgroup>
 <thead>
-<tr class="header">
+<tr>
 <th>Generic</th>
 <th>Classes</th>
 <th>Remarks</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td><code>length()</code></td>
 <td>All</td>
 <td>Returns the length of the object (e.g. number of features, compounds etc)</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>algorithm()</code></td>
 <td>All</td>
 <td>Returns the name of the algorithm used to generate the object.</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>groupNames()</code></td>
 <td>All</td>
 <td>Returns all the unique identitifiers (or names) of the feature groups for which this object contains results.</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>names()</code></td>
 <td><code>featureGroups</code>, <code>components</code></td>
 <td>Returns names of the feature groups (similar to <code>groupNames()</code>) or components</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>show()</code></td>
 <td>All</td>
 <td>Prints general information.</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>"[["</code> / <code>"$"</code> operators</td>
 <td>All</td>
 <td>Extract general information, see below.</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>as.data.table()</code> / <code>as.data.frame()</code></td>
 <td>All</td>
 <td>Convert data to a <code>data.table</code> or <code>data.frame</code>, see below.</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>analysisInfo()</code>, <code>analyses()</code>, <code>replicateGroups()</code></td>
 <td><code>features</code>, <code>featureGroups</code></td>
 <td>Returns the <a href="preparations.html#anaInfo">analysis information</a>, analyses or replicate groups for which this object contains data.</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>groupInfo()</code></td>
 <td><code>featureGroups</code></td>
 <td>Returns feature group information (<em>m/z</em> and retention time values).</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>screenInfo()</code></td>
 <td><code>featureGroupsScreening</code></td>
 <td>Returns information on hits from <a href="features.html#suspscr">suspect screening</a>.</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>componentInfo()</code></td>
 <td><code>components</code></td>
 <td>Returns information for all components.</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>annotatedPeakList()</code></td>
 <td><code>formulas</code>, <code>compounds</code></td>
 <td>Returns a table with annotated mass peaks (see below).</td>
@@ -505,17 +505,17 @@ div.csl-indent {
 <span id="cb60-2"><a href="inspecting-results.html#cb60-2" tabindex="-1"></a><span class="fu">as.data.table</span>(fList)[, <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]</span></code></pre></div>
 <pre><code>#&gt;             analysis                     ID     ret        mz      area intensity
 #&gt;               &lt;char&gt;                 &lt;char&gt;   &lt;num&gt;     &lt;num&gt;     &lt;num&gt;     &lt;num&gt;
-#&gt;    1:  solvent-pos-1  f_3742887680801498417  13.176  98.97537 4345232.0    391476
-#&gt;    2:  solvent-pos-1 f_10639318433847283617   7.181 100.11197  797112.1    426956
-#&gt;    3:  solvent-pos-1  f_8953427769001073681 192.178 100.11211 9609998.0    750532
-#&gt;    4:  solvent-pos-1 f_11916040756089211108  19.171 100.11217 5784411.0    370376
-#&gt;    5:  solvent-pos-1  f_5146408897393875687   4.786 100.11220  551723.6    567312
+#&gt;    1:  solvent-pos-1 f_17576239269628633242  13.176  98.97537 4345232.0    391476
+#&gt;    2:  solvent-pos-1     f_8529625339693073   7.181 100.11197  797112.1    426956
+#&gt;    3:  solvent-pos-1 f_18321143587927788407 192.178 100.11211 9609998.0    750532
+#&gt;    4:  solvent-pos-1  f_6254876062857105044  19.171 100.11217 5784411.0    370376
+#&gt;    5:  solvent-pos-1  f_6482848829339641287   4.786 100.11220  551723.6    567312
 #&gt;   ---                                                                            
-#&gt; 2922: standard-pos-3 f_16330302928051990894 318.892 425.18866  666531.5    232636
-#&gt; 2923: standard-pos-3 f_11961768216914770565   9.114 427.03242  362024.1    114744
-#&gt; 2924: standard-pos-3 f_16795373708354844190 318.892 427.18678  200193.5     77768
-#&gt; 2925: standard-pos-3 f_15891700759289806694 382.682 432.23984  217612.9     97648
-#&gt; 2926: standard-pos-3 f_10072657900205906114   9.114 433.00457 3086864.0    912920</code></pre>
+#&gt; 2922: standard-pos-3 f_13346448261972495425 318.892 425.18866  666531.5    232636
+#&gt; 2923: standard-pos-3  f_8368170879645479678   9.114 427.03242  362024.1    114744
+#&gt; 2924: standard-pos-3  f_1862414473286670714 318.892 427.18678  200193.5     77768
+#&gt; 2925: standard-pos-3   f_458960873746151405 382.682 432.23984  217612.9     97648
+#&gt; 2926: standard-pos-3  f_5089707007749003101   9.114 433.00457 3086864.0    912920</code></pre>
 <div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="inspecting-results.html#cb62-1" tabindex="-1"></a><span class="co"># Returns group info and intensity values for each feature group</span></span>
 <span id="cb62-2"><a href="inspecting-results.html#cb62-2" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroups, <span class="at">average =</span> <span class="cn">TRUE</span>) <span class="co"># average intensities for replicates</span></span></code></pre></div>
 <pre><code>#&gt;              group      ret       mz standard-pos

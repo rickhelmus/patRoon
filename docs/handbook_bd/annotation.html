@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2024-07-25" />
+<meta name="date" content="2024-09-16" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -366,8 +366,8 @@ div.csl-indent {
 <div id="annotation" class="section level2 hasAnchor" number="4.6">
 <h2><span class="header-section-number">4.6</span> Annotation<a href="annotation.html#annotation" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The annotation consists of collecting MS peak lists and then formula and/or compound annotation:</p>
-<div id="htmlwidget-deaea32669d024d97480" style="width:500px;height:120px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-deaea32669d024d97480">{"x":{"diagram":"\ndigraph Annotation {\n  graph [ rankdir = LR ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.3,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"MS peak lists\" -> \"Formula annotation\"\n    \"MS peak lists\" -> \"Compound annotation\"\n    \"Formula annotation\":n -> \"Suspect annotation\":n [style = dotted]\n    \"Compound annotation\":s -> \"Suspect annotation\":s [style = dotted]\n    \"Formula annotation\":e -> \"Compound annotation\":e [style = dotted, constraint = false]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-ee9d75c6cb9589fd9e10" style="width:500px;height:120px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-ee9d75c6cb9589fd9e10">{"x":{"diagram":"\ndigraph Annotation {\n  graph [ rankdir = LR ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.3,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"MS peak lists\" -> \"Formula annotation\"\n    \"MS peak lists\" -> \"Compound annotation\"\n    \"Formula annotation\":n -> \"Suspect annotation\":n [style = dotted]\n    \"Compound annotation\":s -> \"Suspect annotation\":s [style = dotted]\n    \"Formula annotation\":e -> \"Compound annotation\":e [style = dotted, constraint = false]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p>Note that compound annotation is normally not dependent upon formula annotation. However, formula data can be used to improve ranking of candidates afterwards by the <code>addFormulaScoring()</code> function, which will be discussed later in this section. Furthermore, suspect annotation is not mandatory, and may use data from peak lists, formulae and/or comounds.</p>
 <div id="ms-peak-lists" class="section level3 hasAnchor" number="4.6.1">
 <h3><span class="header-section-number">4.6.1</span> MS peak lists<a href="annotation.html#ms-peak-lists" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -378,24 +378,24 @@ div.csl-indent {
 <col width="44%" />
 </colgroup>
 <thead>
-<tr class="header">
+<tr>
 <th>Algorithm</th>
 <th>Usage</th>
 <th>Remarks</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td><a href="https://bioconductor.org/packages/release/bioc/html/mzR.html">mzR</a></td>
 <td><code>generateMSPeakLists(algorithm = "mzr", ...)</code></td>
 <td>Uses <a href="https://bioconductor.org/packages/release/bioc/html/mzR.html">mzR</a> for spectra retrieval. Recommended default.</td>
 </tr>
-<tr class="even">
+<tr>
 <td>DataAnalysis</td>
 <td><code>generateMSPeakLists(algorithm = "bruker", ...)</code></td>
 <td>Loads data after automatically generating MS and MS/MS spectra in DataAnalysis</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>DataAnalysis FMF</td>
 <td><code>generateMSPeakLists(algorithm = "brukerfmf", ...)</code></td>
 <td>Uses spectra from the <em>find molecular features</em> algorithm.</td>
@@ -419,39 +419,39 @@ div.csl-indent {
 <col width="55%" />
 </colgroup>
 <thead>
-<tr class="header">
+<tr>
 <th>Argument</th>
 <th>Algorithm(s)</th>
 <th>Remarks</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td><code>maxMSRtWindow</code></td>
 <td><code>mzr</code>, <code>bruker</code></td>
 <td>Maximum time window +/- the feature retention time (in seconds) to collect spectra for averaging. Higher values may significantly increase processing times.</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>precursorMzWindow</code></td>
 <td><code>mzr</code></td>
 <td>Maximum precursor <em>m/z</em> search window to find MS/MS spectra. Set to <code>NULL</code> to disable (i.e. for DIA experiments).</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>topMost</code></td>
 <td><code>mzr</code></td>
 <td>Only retain feature data for no more than this amount analyses with highest intensity. For instance, a value of <em>1</em> will only keep peak lists for the feature with highest intensity in a feature group.</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>bgsubtr</code></td>
 <td><code>bruker</code></td>
 <td>Perform background subtraction (if the spectra type supports this, e.g. MS and bbCID)</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>minMSIntensity</code>, <code>minMSMSIntensity</code></td>
 <td><code>bruker</code>, <code>brukerfmf</code></td>
 <td>Minimum MS and MS/MS intensity. Note that DataAnalysis reports many zero intensity peaks so a value of at least <em>1</em> is recommended.</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>MSMSType</code></td>
 <td><code>bruker</code></td>
 <td>The type of spectra that should be used for MSMS: <code>"BBCID"</code> for bbCID experiments, otherwise <code>"MSMS"</code> (the default).</td>
@@ -482,24 +482,24 @@ div.csl-indent {
 <col width="45%" />
 </colgroup>
 <thead>
-<tr class="header">
+<tr>
 <th>Algorithm</th>
 <th>Usage</th>
 <th>Remarks</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td><a href="https://sourceforge.net/projects/genform/">GenForm</a></td>
 <td><code>generateFormulas(algorithm = "genform", ...)</code></td>
 <td>Bundled with <code>patRoon</code>. Reasonable default.</td>
 </tr>
-<tr class="even">
+<tr>
 <td><a href="https://bio.informatik.uni-jena.de/software/sirius/">SIRIUS</a></td>
 <td><code>generateFormulas(algorithm = "sirius", ...)</code></td>
 <td>Requires MS/MS data.</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>DataAnalysis</td>
 <td><code>generateFormulas(algorithm = "bruker", ...)</code></td>
 <td>Requires FMF features (i.e. <code>findFeatures(algorithm = "bruker", ...)</code>). Uses <em>SmartFormula</em> algorithms.</td>
@@ -522,44 +522,44 @@ div.csl-indent {
 <col width="68%" />
 </colgroup>
 <thead>
-<tr class="header">
+<tr>
 <th>Argument</th>
 <th>Algorithm(s)</th>
 <th>Remarks</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td>relMzDev</td>
 <td><code>genform</code>, <code>sirius</code></td>
 <td>The maximum relative <em>m/z</em> deviation for a formula to be considered (in <em>ppm</em>).</td>
 </tr>
-<tr class="even">
+<tr>
 <td>elements</td>
 <td><code>genform</code>, <code>sirius</code></td>
 <td>Which elements to consider. By default <code>"CHNOP"</code>. Try to limit possible elements as much as possible.</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>calculateFeatures</td>
 <td><code>genform</code>, <code>sirius</code></td>
 <td>Whether formulae should be calculated first for all features (see discussion above) (always <code>TRUE</code> with DataAnalysis).</td>
 </tr>
-<tr class="even">
+<tr>
 <td>featThresholdAnn</td>
 <td>All</td>
 <td>Minimum relative amount (<em>0-1</em>) that a candidate formula for a feature group should be found among all annotated features (e.g. <em>1</em> means that a candidate is only considered if it was assigned to all annotated features).</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>adduct</td>
 <td>All</td>
 <td>The adduct to consider for calculation (e.g. <code>"[M+H]+"</code>, <code>"[M-H]-"</code>, more details in the <a href="adducts.html#adducts">adduct section</a>). Don’t set this when <a href="incorpAdductIso.html#incorpAdductIso">adduct annotations</a> are available.</td>
 </tr>
-<tr class="even">
+<tr>
 <td>MSMode</td>
 <td><code>genform</code>, <code>bruker</code></td>
 <td>Whether formulae should be generated only from MS data (<code>"ms"</code>), MS/MS data (<code>"msms"</code>) or both (<code>"both"</code>). The latter is default, see discussion above.</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>profile</td>
 <td><code>sirius</code></td>
 <td>Instrument profile, e.g. <code>"qtof"</code>, <code>"orbitrap"</code>, <code>"fticr"</code>.</td>
@@ -584,24 +584,24 @@ div.csl-indent {
 <col width="41%" />
 </colgroup>
 <thead>
-<tr class="header">
+<tr>
 <th>Algorithm</th>
 <th>Usage</th>
 <th>Remarks</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td><a href="http://ipb-halle.github.io/MetFrag/">MetFrag</a></td>
 <td><code>generateCompounds(algorithm = "metfrag", ...)</code></td>
 <td>Supports many databases (including offline and custom), matching MS/MS data with in-silico and library MS/MS data, and many other scorings to rank candidates.</td>
 </tr>
-<tr class="even">
+<tr>
 <td><a href="https://bio.informatik.uni-jena.de/software/sirius/">SIRIUS</a> with <a href="https://www.csi-fingerid.uni-jena.de/">CSI:FingerID</a></td>
 <td><code>generateCompounds(algorithm = "sirius", ...)</code></td>
 <td>Matches with in-silico MS/MS data, incorporates formula annotations to improve candidate selection.</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>Library</td>
 <td><code>generateCompounds(algorithm = "library", ...)</code></td>
 <td>Obtains candidates by matching MS/MS data with an offline MS library, <em>e.g.</em> obtained from <a href="https://massbank.eu/MassBank/">MassBank.eu</a> or <a href="https://mona.fiehnlab.ucdavis.edu/">MoNA</a>.</td>
@@ -621,54 +621,54 @@ div.csl-indent {
 <col width="35%" />
 </colgroup>
 <thead>
-<tr class="header">
+<tr>
 <th>Database</th>
 <th>Algorithm(s)</th>
 <th>Remarks</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td><code>pubchem</code></td>
 <td><code>"metfrag"</code>, <code>"sirius"</code></td>
 <td><a href="https://pubchem.ncbi.nlm.nih.gov/">PubChem</a> is currently the largest compound database and is used by default.</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>chemspider</code></td>
 <td><code>"metfrag"</code></td>
 <td><a href="http://www.chemspider.com/">ChemSpider</a> is another large database. Requires security token from <a href="http://www.chemspider.com/AboutServices.aspx">here</a> (see next section).</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>comptox</code></td>
 <td><code>"metfrag"</code></td>
 <td>The EPA <a href="https://comptox.epa.gov/dashboard">CompTox</a> contains many compounds and scorings relevant to environmental studies. Needs manual download (see next section).</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>pubchemlite</code></td>
 <td><code>"metfrag"</code></td>
 <td>A specialized subset of the PubChem database. Needs manual download (see next section).</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>for-ident</code></td>
 <td><code>"metfrag"</code></td>
 <td>The <a href="https://water.for-ident.org">FOR-IDENT</a> (STOFF-IDENT) database for water related substances.</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>kegg</code></td>
 <td><code>"metfrag"</code>, <code>"sirius"</code></td>
 <td>The <a href="https://www.genome.jp/kegg/">KEGG</a> database for biological compounds</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>hmdb</code></td>
 <td><code>"metfrag"</code>, <code>"sirius"</code></td>
 <td>The <a href="http://www.hmdb.ca/">HMDB</a> contains many human metabolites.</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>bio</code></td>
 <td><code>"sirius"</code></td>
 <td>Selects all supports biological databases.</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>csv</code>, <code>psv</code>, <code>sdf</code></td>
 <td><code>"metfrag"</code></td>
 <td>Custom database (see next section). <a href="https://raw.githubusercontent.com/rickhelmus/patRoon/master/tests/testthat/test_data/test-mf-db-isomers.csv">CSV example</a>.</td>
@@ -1699,49 +1699,49 @@ TRUE
 <col width="66%" />
 </colgroup>
 <thead>
-<tr class="header">
+<tr>
 <th>Level</th>
 <th>Description</th>
 <th>Rules</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td>1</td>
 <td>Target match</td>
 <td>Retention time deviates &lt;12 seconds from suspect list. At least <code>3</code> (or all if the suspect list contains less) fragments from the suspect list must match.</td>
 </tr>
-<tr class="even">
+<tr>
 <td>2a</td>
 <td>Good MS/MS library match</td>
 <td>Suspect is top ranked in the <code>compounds</code> results. The <code>individualMoNAScore</code> (MetFrag) or <code>libMatch</code> (Library algorithm) is at least <code>0.9</code> and no other candidates were matched with the MS library.</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>3a</td>
 <td>Fair library match</td>
 <td>The <code>individualMoNAScore</code> or <code>libMatch</code> is at least 0.4.</td>
 </tr>
-<tr class="even">
+<tr>
 <td>3b</td>
 <td>Known MS/MS match</td>
 <td>At least <code>3</code> (or all if the suspect list contains less) fragments from the suspect list must match.</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>3c</td>
 <td>Good in-silico MS/MS match</td>
 <td>The annotation MS/MS similarity (<code>annSimComp</code> column) is at least <code>0.7</code>.</td>
 </tr>
-<tr class="even">
+<tr>
 <td>4a</td>
 <td>Good formula MS/MS match</td>
 <td>Suspect is top ranked formula candidate, annotation MS/MS similarity (<code>annSimForm</code> column) is at least <code>0.7</code> and isotopic match (<code>isoScore</code>) of at least 0.5. The latter two scores are at least <code>0.2</code> higher than next best ranked candidate.</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>4b</td>
 <td>Good formula isotopic pattern match</td>
 <td>Suspect is top ranked formula candidate and isotopic match (<code>isoScore</code>) of at least <code>0.9</code> and at least <code>0.2</code> higher than next best ranked candidate.</td>
 </tr>
-<tr class="even">
+<tr>
 <td>5</td>
 <td>Unknown</td>
 <td>All else.</td>

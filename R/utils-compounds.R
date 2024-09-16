@@ -97,7 +97,7 @@ addCompoundScore <- function(compounds, scoreName, updateScore, scoreWeight)
     {
         compounds@groupAnnotations <- Map(groupNames(compounds), annotations(compounds), f = function(grp, ann)
         {
-            if (max(ann[[scoreName]] == 0))
+            if (max(ann[[scoreName]]) == 0)
                 return(ann)
             ann <- copy(ann)
             norm <- ann[[scoreName]] / max(ann[[scoreName]])

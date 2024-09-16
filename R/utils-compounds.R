@@ -108,7 +108,7 @@ addCompoundScore <- function(compounds, scoreName, updateScore, scoreWeight)
     
     compounds@scoreRanges <- Map(compounds@scoreRanges, annotations(compounds), f = function(sc, ann)
     {
-        if (max(ann[[scoreName]] == 0))
+        if (max(ann[[scoreName]]) == 0)
             return(sc)
         
         ret <- c(sc, setNames(list(range(ann[[scoreName]])), scoreName))

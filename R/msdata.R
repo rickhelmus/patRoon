@@ -82,18 +82,39 @@ setMethod("initMSReadBackend", "Rcpp_MSReadBackendOTIMS", function(backend)
             as.data.table(DBI::dbGetQuery(TIMSDB, sprintf("SELECT %s FROM %s", paste0(cols, collapse = ","), name)))
         }
         
-        frames <- getTIMSMetaTable("Frames", c("Id", "Time", "MsMsType", "SummedIntensities", "MaxIntensity"))
+        frames <- getTIMSMetaTable("Frames", c("Id", "Time", "ScanMode", "MsMsType", "SummedIntensities", "MaxIntensity"))
         setnames(frames, c("Id", "Time", "SummedIntensities", "MaxIntensity"), c("scan", "time", "TIC", "BPC"))
         framesMS <- frames[MsMsType == 0][, MsMsType := NULL]
-        framesMS2 <- frames[MsMsType != 0][, MsMsType := NULL]
-        PASEFInfo <- getTIMSMetaTable("PasefFrameMsMsInfo", c("Frame", "ScanNumBegin", "ScanNumEnd",
-                                                              "IsolationMz", "isolationWidth"))
-        setnames(PASEFInfo, c("Frame", "ScanNumBegin", "ScanNumEnd"), c("scan", "subScan", "subScanEnd"))
-        # UNDONE: do we need to divide by two?
-        PASEFInfo[, c("isolationRangeMin", "isolationRangeMax") := .(IsolationMz - IsolationWidth/2,
-                                                                     IsolationMz + IsolationWidth/2)]
-        PASEFInfo[, c("IsolationMz", "IsolationWidth") := NULL]
-        framesMS2 <- merge(framesMS2, PASEFInfo, by = "scan", sort = FALSE)
+        framesMS2 <- frames[MsMsType != 0]
+        
+        if (any(!framesMS2$ScanMode %in% c(0, 4, 8)))
+            warning("The OpenTIMS backend has only been tested with MS only, bbCID and PASEF data.", call. = FALSE)
+        
+        if (2 %in% framesMS2$MsMsType)
+        {
+            MSMSInfo <- getTIMSMetaTable("FrameMsMsInfo", c("Frame", "TriggerMass", "IsolationWidth"))
+            setnames(MSMSInfo, "Frame", "scan")
+            MSMSInfo[, c("isolationRangeMin", "isolationRangeMax") := .(TriggerMass - IsolationWidth/2,
+                                                                         TriggerMass + IsolationWidth/2)]
+            MSMSInfo[, c("TriggerMass", "IsolationWidth") := NULL]
+            framesMS2 <- merge(framesMS2, MSMSInfo, by = "scan", sort = FALSE)
+            
+            # zero out isolation range for isCID/bbCID (ie DIA)
+            framesMS2[ScanMode %in% c(3, 4), c("isolationRangeMin", "isolationRangeMax") := 0]
+        }
+        if (8 %in% framesMS2$MsMsType)
+        {
+            # DDA-PASEF
+            PASEFInfo <- getTIMSMetaTable("PasefFrameMsMsInfo", c("Frame", "ScanNumBegin", "ScanNumEnd",
+                                                                  "IsolationMz", "IsolationWidth"))
+            setnames(PASEFInfo, c("Frame", "ScanNumBegin", "ScanNumEnd"), c("scan", "subScan", "subScanEnd"))
+            PASEFInfo[, c("isolationRangeMin", "isolationRangeMax") := .(IsolationMz - IsolationWidth/2,
+                                                                         IsolationMz + IsolationWidth/2)]
+            PASEFInfo[, c("IsolationMz", "IsolationWidth") := NULL]
+            framesMS2 <- merge(framesMS2, PASEFInfo, by = "scan", sort = FALSE)
+        }
+        
+        framesMS2[, c("ScanMode", "MsMsType") := NULL]
         
         return(list(MS1 = framesMS, MS2 = framesMS2))
     })

@@ -219,6 +219,7 @@
         - if yes: adjust R and C++ code
         - doc in any case
     - replace averageSpectra() in mslibrary.R and update bgMSMS
+    - further test bbCID data
 - anaInfo / file path retrieval
     - update convertMSFiles() and newProject()
     - update SAFD for profile or centroided

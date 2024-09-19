@@ -29,11 +29,11 @@ template<typename Spec> std::vector<size_t> flattenedSpecIDs(const std::vector<S
 
 }
 
-// UNDONE: remove this overload?
 std::vector<SpectrumRawSelection> getSpecRawSelections(const SpectrumRawMetadata &specMeta,
                                                        const NumRange<SpectrumRawTypes::Time> &timeRange,
                                                        SpectrumRawTypes::MSLevel MSLevel,
-                                                       SpectrumRawTypes::Mass precursor)
+                                                       SpectrumRawTypes::Mass precursor,
+                                                       SpectrumRawTypes::Intensity minBPIntensity)
 {
     const SpectrumRawMetadataMS &metaMS = (MSLevel == SpectrumRawTypes::MSLevel::MS1) ? specMeta.first : specMeta.second;
     std::vector<SpectrumRawSelection> ret;
@@ -44,25 +44,30 @@ std::vector<SpectrumRawSelection> getSpecRawSelections(const SpectrumRawMetadata
     if (startIt != metaMS.times.end())
     {
         for (size_t i=std::distance(metaMS.times.begin(), startIt);
-             i<metaMS.times.size() && metaMS.times[i]<=timeRange.end; ++i)
+             i<metaMS.times.size() && (timeRange.end == 0 || metaMS.times[i]<=timeRange.end); ++i)
         {
-            SpectrumRawSelection sel;
+            if (minBPIntensity > 0 && metaMS.BPCs[i] < minBPIntensity)
+                continue;
+            
+            SpectrumRawSelection sel(i);
+            
+            // NOTE: if precursor is unset (0) then we also match all MS/MS spectra
+            
             if (isIMSMSMS)
             {
                 for (size_t j=0; j<specMeta.second.MSMSFrames[i].isolationRanges.size(); ++j)
                 {
                     // NOTE: isolation ranges may be unset for DIA (eg bbCID with OpenTIMS), in this case we match all MS/MS
                     // spectra/frames
-                    if (!specMeta.second.MSMSFrames[i].isolationRanges[j].isSet() ||
+                    if (!specMeta.second.MSMSFrames[i].isolationRanges[j].isSet() || precursor == 0.0 ||
                         specMeta.second.MSMSFrames[i].isolationRanges[j].within(precursor))
                         sel.MSMSFrameIndices.push_back(j);
                 }
                 if (sel.MSMSFrameIndices.empty())
                     continue; // no MS/MS data for this one
             }
-            else if (isMSMS && !specMeta.second.isolationRanges[i].within(precursor))
+            else if (isMSMS && precursor != 0.0 && !specMeta.second.isolationRanges[i].within(precursor))
                 continue;
-            sel.index = i;
             ret.push_back(std::move(sel));
         }
     }
@@ -80,17 +85,20 @@ SpectrumRaw filterSpectrumRaw(const SpectrumRaw &spectrum, const SpectrumRawFilt
     size_t closestPrecMZInd = spectrum.size();
     SpectrumRawTypes::Mass minPrecMZDiff = -1.0;
 
-    for (auto it = std::lower_bound(spectrum.getMZs().begin(), spectrum.getMZs().end(), precursor - precTol);
-         it!=spectrum.getMZs().end(); ++it)
+    if (precursor > 0.0)
     {
-        const SpectrumRawTypes::Mass d = std::abs(precursor - *it);
-        if (d <= precTol && (minPrecMZDiff == -1.0 || d < minPrecMZDiff))
+        for (auto it = std::lower_bound(spectrum.getMZs().begin(), spectrum.getMZs().end(), precursor - precTol);
+             it!=spectrum.getMZs().end(); ++it)
         {
-            closestPrecMZInd = std::distance(spectrum.getMZs().begin(), it);
-            minPrecMZDiff = d;
+            const SpectrumRawTypes::Mass d = std::abs(precursor - *it);
+            if (d <= precTol && (minPrecMZDiff == -1.0 || d < minPrecMZDiff))
+            {
+                closestPrecMZInd = std::distance(spectrum.getMZs().begin(), it);
+                minPrecMZDiff = d;
+            }
+            else
+                break; // data is sorted: all next mzs will be greater and therefore with higher deviation
         }
-        else
-            break; // data is sorted: all next mzs will be greater and therefore with higher deviation
     }
     
     if (filter.withPrecursor && minPrecMZDiff == -1.0)

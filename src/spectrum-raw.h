@@ -149,7 +149,8 @@ struct SpectrumRawSelection
 std::vector<SpectrumRawSelection> getSpecRawSelections(const SpectrumRawMetadata &specMeta,
                                                        const NumRange<SpectrumRawTypes::Time> &timeRange,
                                                        SpectrumRawTypes::MSLevel MSLevel,
-                                                       SpectrumRawTypes::Mass precursor);
+                                                       SpectrumRawTypes::Mass precursor,
+                                                       SpectrumRawTypes::Intensity minBPIntensity = 0);
 SpectrumRaw filterSpectrumRaw(const SpectrumRaw &spectrum, const SpectrumRawFilter &filter,
                               SpectrumRawTypes::Mass precursor);
 SpectrumRaw filterIMSFrame(const SpectrumRaw &spectrum, const SpectrumRawFilter &filter,

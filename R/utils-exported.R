@@ -357,17 +357,17 @@ getEICs <- function(file, ranges)
 }
 
 #' @export
-getBGMSMSPeaks <- function(anaInfo, rGroups = NULL, MSLevel = 2, retentionRange = NULL, minBPIntensity = 5000,
+getBGMSMSPeaks <- function(anaInfo, rGroups = NULL, MSLevel = 2, retentionRange = NULL, mobilityRange = NULL,
+                           minBPIntensity = 5000,
                            avgSpectraParams = getDefAvgPListParams(minAbundance = 0.1, topMost = 25),
-                           avgAnalysesParams = getDefAvgPListParams(minAbundance = 0.8, topMost = 25), parallel = TRUE)
+                           avgAnalysesParams = getDefAvgPListParams(minAbundance = 0.8, topMost = 25))
 {
     ac <- checkmate::makeAssertCollection()
-    anaInfo <- assertAndPrepareAnaInfo(anaInfo, fileType = "centroid", add = ac)
+    anaInfo <- assertAndPrepareAnaInfo(anaInfo, add = ac)
     checkmate::assertChoice(rGroups, unique(anaInfo$group), null.ok = TRUE, add = ac)
-    checkmate::assertCount(MSLevel, positive = TRUE, add = ac)
+    checkmate::assertChoice(MSLevel, 1:2, add = ac)
     assertRange(retentionRange, null.ok = TRUE, add = ac)
     checkmate::assertNumber(minBPIntensity, na.ok = FALSE, add = ac)
-    checkmate::assertFlag(parallel, add = ac)
     aapply(assertAvgPListParams, . ~ avgSpectraParams + avgAnalysesParams, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
@@ -376,39 +376,43 @@ getBGMSMSPeaks <- function(anaInfo, rGroups = NULL, MSLevel = 2, retentionRange 
     
     if (!is.null(rGroups))
         anaInfo <- anaInfo[group %in% rGroups]
-    
-    filePaths <- getCentroidedMSFilesFromAnaInfo(anaInfo)
+    if (is.null(retentionRange))
+        retentionRange <- c(0, 0)
+    if (is.null(mobilityRange))
+        mobilityRange <- c(0, 0)
     
     printf("Averaging the spectra for each of the %d analyses\n", nrow(anaInfo))
-    blSpecs <- doApply("Map", parallel, anaInfo$analysis, filePaths, f = function(ana, fp)
+    blSpecs <- applyMSData(anaInfo, function(ana, path, backend)
     {
-        hash <- makeHash(baseHash, makeFileHash(fp))
-        avgsp <- loadCacheData("avgBGMSMS", hash, cacheDB)
+        hash <- makeHash(baseHash, getMSDataFileHash(path))
+        cached <- loadCacheData("avgBGMSMS", hash, cacheDB)
+        if (!is.null(cached))
+            return(cached)
         
-        if (is.null(avgsp))
-        {
-            specs <- loadSpectra(fp, verbose = FALSE, cacheDB = cacheDB)
-            specsHd <- specs$header[specs$header$msLevel == MSLevel &
-                                        (is.null(retentionRange) | specs$header$retentionTime %inrange% retentionRange) &
-                                        specs$header$basePeakIntensity >= minBPIntensity]
-            # convert to peaklist format
-            sps <- lapply(specs$spectra[specsHd$seqNum], function(spec) setnames(as.data.table(spec), c("mz", "intensity")))
-            avgsp <- averageSpectra(sps, avgSpectraParams$clusterMzWindow, avgSpectraParams$topMost,
-                                    avgSpectraParams$minIntensityPre, avgSpectraParams$minIntensityPost,
-                                    avgSpectraParams$minAbundance, "spectra_abundance", avgSpectraParams$avgFun, NULL,
-                                    avgSpectraParams$method, FALSE, FALSE, FALSE)
-            saveCacheData("avgBGMSMS", avgsp, hash, cacheDB)
-        }
+        openMSReadBackend(backend, path)
         
+        avgsp <- getMSPeakLists(backend, retentionRange[1], retentionRange[2], 0,
+                                withPrecursor = FALSE, retainPrecursor = FALSE,
+                                MSLevel = MSLevel, method = avgSpectraParams$method,
+                                mzWindow = avgSpectraParams$clusterMzWindow,
+                                startMobs = mobilityRange[1], endMobs = mobilityRange[2],
+                                minAbundance = avgSpectraParams$minAbundance,
+                                topMost = avgSpectraParams$topMost,
+                                minIntensityIMS = avgSpectraParams$minIntensityIMS,
+                                minIntensityPre = avgSpectraParams$minIntensityPre,
+                                minIntensityPost = avgSpectraParams$minIntensityPost,
+                                minBPIntensity = minBPIntensity)[[1]]
+        setDT(avgsp)
+        saveCacheData("avgBGMSMS", avgsp, hash, cacheDB)
         doProgress()
         return(avgsp)
     })
+    blSpecs <- pruneList(blSpecs, checkZeroRows = TRUE)
     
     printf("Averaging analyses averaged spectra... ")
-    ret <- averageSpectra(blSpecs, avgAnalysesParams$clusterMzWindow, avgAnalysesParams$topMost,
-                          avgAnalysesParams$minIntensityPre, avgAnalysesParams$minIntensityPost,
-                          avgAnalysesParams$minAbundance, "analyses_abundance", avgAnalysesParams$avgFun, NULL,
-                          avgAnalysesParams$method, FALSE, FALSE, FALSE)
+    ret <- averageSpectraList(list(blSpecs), avgAnalysesParams$clusterMzWindow, avgAnalysesParams$topMost,
+                              avgAnalysesParams$minIntensityPre, avgAnalysesParams$minIntensityPost,
+                              avgAnalysesParams$minAbundance, avgAnalysesParams$method, FALSE, FALSE, FALSE, FALSE)[[1]]
     ret[, precursor := NULL]
     printf("Done!\n")
     

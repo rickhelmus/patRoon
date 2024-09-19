@@ -29,8 +29,8 @@ setSpecMetadata <- function(backend, mdMS, mdMSMS) {
     invisible(.Call(`_patRoon_setSpecMetadata`, backend, mdMS, mdMSMS))
 }
 
-getMSPeakLists <- function(backend, startTimes, endTimes, precursorMZs, withPrecursor, retainPrecursor, MSLevel, method, mzWindow, startMobs, endMobs, minAbundance, topMost, minIntensityIMS, minIntensityPre, minIntensityPost) {
-    .Call(`_patRoon_getMSPeakLists`, backend, startTimes, endTimes, precursorMZs, withPrecursor, retainPrecursor, MSLevel, method, mzWindow, startMobs, endMobs, minAbundance, topMost, minIntensityIMS, minIntensityPre, minIntensityPost)
+getMSPeakLists <- function(backend, startTimes, endTimes, precursorMZs, withPrecursor, retainPrecursor, MSLevel, method, mzWindow, startMobs, endMobs, minAbundance, topMost, minIntensityIMS, minIntensityPre, minIntensityPost, minBPIntensity) {
+    .Call(`_patRoon_getMSPeakLists`, backend, startTimes, endTimes, precursorMZs, withPrecursor, retainPrecursor, MSLevel, method, mzWindow, startMobs, endMobs, minAbundance, topMost, minIntensityIMS, minIntensityPre, minIntensityPost, minBPIntensity)
 }
 
 getMobilograms <- function(backend, startMZs, endMZs, startTimes, endTimes, method, mobWindow, minIntensity) {

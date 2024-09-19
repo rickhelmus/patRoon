@@ -59,14 +59,16 @@ RcppExport SEXP _patRoon_initBrukerLibrary(SEXP pathSEXP) {
     return rcpp_result_gen;
 }
 // getMSSpectrum
-Rcpp::DataFrame getMSSpectrum(const MSReadBackend& backend, int index);
-RcppExport SEXP _patRoon_getMSSpectrum(SEXP backendSEXP, SEXP indexSEXP) {
+Rcpp::DataFrame getMSSpectrum(const MSReadBackend& backend, int index, int MSLevel, int frameIndex);
+RcppExport SEXP _patRoon_getMSSpectrum(SEXP backendSEXP, SEXP indexSEXP, SEXP MSLevelSEXP, SEXP frameIndexSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const MSReadBackend& >::type backend(backendSEXP);
     Rcpp::traits::input_parameter< int >::type index(indexSEXP);
-    rcpp_result_gen = Rcpp::wrap(getMSSpectrum(backend, index));
+    Rcpp::traits::input_parameter< int >::type MSLevel(MSLevelSEXP);
+    Rcpp::traits::input_parameter< int >::type frameIndex(frameIndexSEXP);
+    rcpp_result_gen = Rcpp::wrap(getMSSpectrum(backend, index, MSLevel, frameIndex));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -607,7 +609,7 @@ RcppExport SEXP _rcpp_module_boot_MSReadBackend();
 static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_writeChromsToMzML", (DL_FUNC) &_patRoon_writeChromsToMzML, 2},
     {"_patRoon_initBrukerLibrary", (DL_FUNC) &_patRoon_initBrukerLibrary, 1},
-    {"_patRoon_getMSSpectrum", (DL_FUNC) &_patRoon_getMSSpectrum, 2},
+    {"_patRoon_getMSSpectrum", (DL_FUNC) &_patRoon_getMSSpectrum, 4},
     {"_patRoon_getScans", (DL_FUNC) &_patRoon_getScans, 5},
     {"_patRoon_getEICList", (DL_FUNC) &_patRoon_getEICList, 7},
     {"_patRoon_getMSMetadata", (DL_FUNC) &_patRoon_getMSMetadata, 2},

@@ -218,7 +218,7 @@
     - withPrecursor: now only applied prior to other filtering systems, change?
         - if yes: adjust R and C++ code
         - doc in any case
-    - replace averageSpectra() in mslibrary.R and update bgMSMS
+    - move bgMSMS to C++
     - further test bbCID data
         - also mixed bbCID/PASEF file (ie with different segments)
 - anaInfo / file path retrieval

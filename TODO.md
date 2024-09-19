@@ -210,7 +210,6 @@
     - add mobility column?
     - more extensively test filters/summing/averaging
     - support withPrecursor in old DA/mzR algos?
-    - support bbCID data, ie no precursor window
     - make methods for generateMSPeakLists(), including for sets
     - settle on "diff" vs "distance" for averaging method
     - check defaults for new averaging params
@@ -218,7 +217,6 @@
     - withPrecursor: now only applied prior to other filtering systems, change?
         - if yes: adjust R and C++ code
         - doc in any case
-    - move bgMSMS to C++
     - further test bbCID data
         - also mixed bbCID/PASEF file (ie with different segments)
 - anaInfo / file path retrieval
@@ -226,7 +224,7 @@
     - update SAFD for profile or centroided
         - also replace getMzXMLAnalysisPath()
         - and does it support mzML now?
-    - update assertAndPrepareAnaInfo() usage where backends will be used (eg getBGMSMSPeaks())
+    - update assertAndPrepareAnaInfo() usage where backends are used
 - the default backends now put mzR as last to ensure mobility data can be used, change this somehow?
 - does non-PASEF/DDA data works?
 

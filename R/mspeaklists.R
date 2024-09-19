@@ -863,9 +863,8 @@ generateMSPeakListsNew <- function(fGroups, maxMSRtWindow = 5, topMost = NULL, a
                               MSLevel = MSLevel, method = params$method, mzWindow = params$clusterMzWindow,
                               startMobs = rep(0, nrow(ft)), endMobs = rep(0, nrow(ft)),
                               minAbundance = params$minAbundance, topMost = params$topMost,
-                              minIntensityIMS = params$minIntensityIMS,
-                              minIntensityPre = params$minIntensityPre,
-                              minIntensityPost = params$minIntensityPost)
+                              minIntensityIMS = params$minIntensityIMS, minIntensityPre = params$minIntensityPre,
+                              minIntensityPost = params$minIntensityPost, minBPIntensity = 0)
         
         names(ret) <- ft$group
         ret <- pruneList(ret, checkZeroRows = TRUE)

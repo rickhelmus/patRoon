@@ -477,7 +477,7 @@ Rcpp::List getMSPeakLists(const MSReadBackend &backend, const std::vector<Spectr
                           const std::vector<SpectrumRawTypes::Mobility> endMobs,
                           SpectrumRawTypes::PeakAbundance minAbundance, unsigned topMost,
                           SpectrumRawTypes::Intensity minIntensityIMS, SpectrumRawTypes::Intensity minIntensityPre,
-                          SpectrumRawTypes::Intensity minIntensityPost)
+                          SpectrumRawTypes::Intensity minIntensityPost, SpectrumRawTypes::Intensity minBPIntensity)
 {
     // UNDONE: add mobility column to output?
     
@@ -512,7 +512,11 @@ Rcpp::List getMSPeakLists(const MSReadBackend &backend, const std::vector<Spectr
     for (size_t i=0; i<entries; ++i)
     {
         scanSels.push_back(getSpecRawSelections(specMeta, makeNumRange(startTimes[i], endTimes[i]), MSLev,
-                                                precursorMZs[i]));
+                                                precursorMZs[i], minBPIntensity));
+        /*Rcpp::Rcout << "ss: ";
+        for (const auto &ss : scanSels.back())
+            Rcpp::Rcout << ss.index << "/" << specMeta.second.scans[ss.index] << " ";
+        Rcpp::Rcout << "\n";*/
     }
     
     const auto allSpectra = applyMSData<SpectrumRaw>(backend, MSLev, scanSels, sfunc);

@@ -59,10 +59,10 @@ SpectrumRaw MSReadBackendOTIMS::doReadSpectrum(const ThreadDataType &tdata, Spec
     {
         if (mobRange.isSet())
         {
-            // NOTE: mobilities are sorted  from high to low
-            if (mobilities[i] > mobRange.start)
+            // NOTE: mobilities are sorted from high to low
+            if (mobilities[i] < mobRange.start)
                 continue;
-            if (mobilities[i] < mobRange.end)
+            if (mobilities[i] > mobRange.end)
                 break;
         }
         
@@ -72,8 +72,11 @@ SpectrumRaw MSReadBackendOTIMS::doReadSpectrum(const ThreadDataType &tdata, Spec
             const auto curScanID = IDs[i];
             for (size_t j=0; j<scanSel.MSMSFrameIndices.size() && !inRange; ++j)
             {
-                inRange = (curScanID >= meta.second.MSMSFrames[scanSel.index].subScans[j] &&
-                    curScanID <= meta.second.MSMSFrames[scanSel.index].subScanEnds[j]);
+                const auto ss = meta.second.MSMSFrames[scanSel.index].subScans[j];
+                const auto se = meta.second.MSMSFrames[scanSel.index].subScanEnds[j];
+                // NOTE: scan ranges are zero for isCID/bbCID
+                // NOTE: scan ends are exclusive
+                inRange = (ss == 0 && se == 0) || (curScanID >= ss && curScanID < se);
             }
             if (!inRange)
             {

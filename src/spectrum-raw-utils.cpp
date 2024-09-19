@@ -38,7 +38,7 @@ std::vector<SpectrumRawSelection> getSpecRawSelections(const SpectrumRawMetadata
     const SpectrumRawMetadataMS &metaMS = (MSLevel == SpectrumRawTypes::MSLevel::MS1) ? specMeta.first : specMeta.second;
     std::vector<SpectrumRawSelection> ret;
     const bool isMSMS = MSLevel == SpectrumRawTypes::MSLevel::MS2;
-    const bool isIMDDA = isMSMS && specMeta.second.isolationRanges.empty();
+    const bool isIMSMSMS = isMSMS && specMeta.second.isolationRanges.empty();
     
     const auto startIt = std::lower_bound(metaMS.times.begin(), metaMS.times.end(), timeRange.start);
     if (startIt != metaMS.times.end())
@@ -47,20 +47,20 @@ std::vector<SpectrumRawSelection> getSpecRawSelections(const SpectrumRawMetadata
              i<metaMS.times.size() && metaMS.times[i]<=timeRange.end; ++i)
         {
             SpectrumRawSelection sel;
-            if (isIMDDA)
+            if (isIMSMSMS)
             {
                 for (size_t j=0; j<specMeta.second.MSMSFrames[i].isolationRanges.size(); ++j)
                 {
-                    if (specMeta.second.MSMSFrames[i].isolationRanges[j].within(precursor))
+                    // NOTE: isolation ranges may be unset for DIA (eg bbCID with OpenTIMS), in this case we match all MS/MS
+                    // spectra/frames
+                    if (!specMeta.second.MSMSFrames[i].isolationRanges[j].isSet() ||
+                        specMeta.second.MSMSFrames[i].isolationRanges[j].within(precursor))
                         sel.MSMSFrameIndices.push_back(j);
                 }
                 if (sel.MSMSFrameIndices.empty())
                     continue; // no MS/MS data for this one
             }
-            // NOTE: isolation ranges may be unset for DIA (eg bbCID with OpenTIMS), in this case we match all MS/MS
-            // spectra/frames
-            else if (isMSMS && specMeta.second.isolationRanges[i].isSet() &&
-                     !specMeta.second.isolationRanges[i].within(precursor))
+            else if (isMSMS && !specMeta.second.isolationRanges[i].within(precursor))
                 continue;
             sel.index = i;
             ret.push_back(std::move(sel));

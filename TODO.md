@@ -220,6 +220,7 @@
         - doc in any case
     - replace averageSpectra() in mslibrary.R and update bgMSMS
     - further test bbCID data
+        - also mixed bbCID/PASEF file (ie with different segments)
 - anaInfo / file path retrieval
     - update convertMSFiles() and newProject()
     - update SAFD for profile or centroided

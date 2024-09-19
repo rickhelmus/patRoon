@@ -9,8 +9,8 @@ initBrukerLibrary <- function(path) {
     .Call(`_patRoon_initBrukerLibrary`, path)
 }
 
-getMSSpectrum <- function(backend, index) {
-    .Call(`_patRoon_getMSSpectrum`, backend, index)
+getMSSpectrum <- function(backend, index, MSLevel, frameIndex = -1L) {
+    .Call(`_patRoon_getMSSpectrum`, backend, index, MSLevel, frameIndex)
 }
 
 getScans <- function(backend, timeStart, timeEnd, MSLevel, prec) {

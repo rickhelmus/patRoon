@@ -373,21 +373,38 @@ setMethod("convertToSuspects", "MSLibrary", function(obj, adduct, spectrumType =
         stop("No records found (for input adduct/spectrum type)", call. = FALSE)
     libSpecs <- spectra(obj)
     
-    getAvgFrags <- function(specs, PrecursorMZ)
+    getAllAvgSpecs <- function(tab, recs)
     {
-        pls <- Map(specs, PrecursorMZ, f = function(sp, pmz)
-        {
-            sp <- copy(sp)[, c("mz", "intensity"), with = FALSE] # skip annotation, if present
-            sp <- assignPrecursorToMSPeakList(sp, pmz)
-            return(sp)
-        })
+        tab <- copy(tab)
         
-        avgPL <- averageSpectra(pls, avgSpecParams$clusterMzWindow, avgSpecParams$topMost,
-                                avgSpecParams$minIntensityPre, avgSpecParams$minIntensityPost,
-                                avgSpecParams$minAbundance, "abundance", avgSpecParams$avgFun, NULL,
-                                avgSpecParams$method, FALSE, FALSE, avgSpecParams$retainPrecursorMSMS)
-        doProgress()
-        paste0(avgPL$mz, collapse = ";")
+        allSpecs <- sapply(unique(tab$InChIKey1), function(IK1)
+        {
+            recsSub <- recs[InChIKey1 == IK1]
+            if (is.na(IK1) || nrow(recsSub) == 0)
+                return(NULL)
+            specs <- libSpecs[recsSub$DB_ID]
+            specs <- Map(specs, recsSub$PrecursorMZ, f = function(sp, pmz)
+            {
+                sp <- copy(sp)[, c("mz", "intensity"), with = FALSE] # skip annotation, if present
+                sp <- assignPrecursorToMSPeakList(sp, pmz)
+                return(sp)
+            })
+            return(specs)
+        }, simplify = FALSE)
+        allSpecs <- pruneList(allSpecs)
+        
+        averagedSpecs <- averageSpectraList(allSpecs, avgSpecParams$clusterMzWindow, avgSpecParams$topMost,
+                                            avgSpecParams$minIntensityPre, avgSpecParams$minIntensityPost,
+                                            avgSpecParams$minAbundance, avgSpecParams$method, FALSE, FALSE, FALSE,
+                                            FALSE)
+        names(averagedSpecs) <- names(allSpecs)
+        
+        ret[, fragments_mz := {
+            IK1 <- InChIKey1[1]
+            if (is.null(averagedSpecs[[IK1]])) "" else paste0(averagedSpecs[[IK1]]$mz, collapse = ";")
+        }, by = "InChIKey1"]
+        
+        return(ret)
     }
 
     if (calcMSMS)   
@@ -410,15 +427,7 @@ setMethod("convertToSuspects", "MSLibrary", function(obj, adduct, spectrumType =
         recs <- copy(libRecs)
         recs <- recs[!is.na(InChIKey) & !is.na(PrecursorMZ)]
         recs[, InChIKey1 := getIKBlock1(InChIKey)]
-        
-        withProg(uniqueN(ret$InChIKey1), FALSE, ret[, fragments_mz := sapply(InChIKey1, function(IK1)
-        {
-            recsSub <- recs[InChIKey1 == IK1]
-            if (is.na(IK1) || nrow(recsSub) == 0)
-                return("")
-            return(getAvgFrags(libSpecs[recsSub$DB_ID], recsSub$PrecursorMZ))
-        }), by = "InChIKey1"])
-        
+        ret <- getAllAvgSpecs(ret, recs)
         ret[, InChIKey1 := NULL]
         
         frCount <- sum(nzchar(ret$fragments_mz))
@@ -434,16 +443,9 @@ setMethod("convertToSuspects", "MSLibrary", function(obj, adduct, spectrumType =
             ret[, InChIKey1 := getIKBlock1(InChIKey)]
             
             if (calcMSMS)
-            {
-                frMZ <- withProg(uniqueN(ret$InChIKey1), FALSE, ret[, getAvgFrags(libSpecs[DB_ID], PrecursorMZ),
-                                                                    by = "InChIKey1"])
-                setnames(frMZ, "V1", "fragments_mz")
-                
-                ret <- unique(ret, by = "InChIKey1")
-                ret <- merge(ret, frMZ, by = "InChIKey1")
-            }
-            else
-                ret <- unique(ret, by = "InChIKey1")
+                ret <- getAllAvgSpecs(ret, ret)
+            
+            ret <- unique(ret, by = "InChIKey1")
         }
         else if (calcMSMS)
         {

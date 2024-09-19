@@ -160,16 +160,20 @@ RCPP_MODULE(MSReadBackend)
 }
 
 // [[Rcpp::export]]
-Rcpp::DataFrame getMSSpectrum(const MSReadBackend &backend, int index)
+Rcpp::DataFrame getMSSpectrum(const MSReadBackend &backend, int index, int MSLevel, int frameIndex = -1)
 {
-    const std::vector<std::vector<SpectrumRawSelection>> sels(1, std::vector<SpectrumRawSelection>{SpectrumRawSelection(index)});
+    SpectrumRawSelection sel(index);
+    if (MSLevel == 2 && frameIndex != -1)
+        sel.MSMSFrameIndices.push_back(frameIndex);
+    std::vector<std::vector<SpectrumRawSelection>> sels(1, std::vector<SpectrumRawSelection>{sel});
     
     const auto sfunc = [](const SpectrumRaw &spec, const SpectrumRawSelection &, size_t)
     {
         return spec;
     };
     
-    const auto spectra = applyMSData<SpectrumRaw>(backend, SpectrumRawTypes::MSLevel::MS1, sels, sfunc);
+    const auto MSLev = (MSLevel == 1) ? SpectrumRawTypes::MSLevel::MS1 : SpectrumRawTypes::MSLevel::MS2;
+    const auto spectra = applyMSData<SpectrumRaw>(backend, MSLev, sels, sfunc);
     const auto &spec = spectra[0][0];
     
     if (!spec.getMobilities().empty())

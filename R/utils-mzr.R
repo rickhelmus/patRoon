@@ -62,35 +62,6 @@ getSpectraHeader <- function(spectra, rtRange, MSLevel, precursor, precursorMzWi
     return(hd)
 }
 
-doGetEICs <- function(file, ranges, cacheDB = NULL)
-{
-    anaHash <- makeFileHash(file, length = 8192) # NOTE: limit length as this function may be called frequently
-    
-    # NOTE: subset columns here, so any additional columns from e.g. feature tables are not considered
-    hashes <- ranges[, makeHash(anaHash, .SD), by = seq_len(nrow(ranges)),
-                     .SDcols = c("retmin", "retmax", "mzmin", "mzmax")][[2]]
-    
-    cachedData <- loadCacheData(category = "mzREIC", hashes, dbArg = cacheDB, simplify = FALSE)
-    if (!is.null(cachedData) && length(cachedData) == nrow(ranges))
-        return(unname(cachedData)) # everything is in the cache
-    
-    spectra <- loadSpectra(file, verbose = FALSE, cacheDB = cacheDB)
-    EICs <- vector("list", nrow(ranges))
-    cachedInds <- if (!is.null(cachedData)) match(names(cachedData), hashes) else integer()
-    isCached <- if (!is.null(cachedData)) hashes %chin% names(cachedData) else rep(FALSE, nrow(ranges))
-    # NOTE: cachedData is 'subset' below to make sure any duplicate hashes are properly assigned
-    EICs[isCached] <- cachedData[match(hashes, names(cachedData), nomatch = 0)]
-
-    spectra <- loadSpectra(file, verbose = FALSE, cacheDB = cacheDB)
-    rangesToDo <- ranges[isCached == FALSE]
-    EICs[!isCached] <- loadEICs(spectra, rangesToDo$retmin, rangesToDo$retmax, rangesToDo$mzmin, rangesToDo$mzmax)
-    
-    for (i in which(!isCached))
-        saveCacheData("mzREIC", EICs[[i]], hashes[i], cacheDB)
-    
-    return(EICs)
-}
-
 setMethod("getEICFGroupInfo", "featureGroups", function(fGroups, analysis, groupName, EICParams)
 {
     takeAnalysis <- analysis # copy name to workaround DT access below
@@ -219,20 +190,12 @@ setMethod("getEICsForFGroups", "featureGroups", function(fGroups, analysis, grou
     takeAnalysis <- analysis # for DT subset below
     anaInfo <- analysisInfo(fGroups)[analysis %chin% takeAnalysis]
 
-    verifyDataCentroided(anaInfo)
-
     EICInfoTab <- getEICFGroupInfo(fGroups, analysis, groupName, EICParams)
     EICInfo <- split(rbindlist(EICInfoTab, idcol = "group"), by = "analysis")
     EICInfo <- EICInfo[intersect(anaInfo$analysis, names(EICInfo))] # sync order
     anaInfoEICs <- anaInfo[analysis %in% names(EICInfo)]
-    anaPaths <- getCentroidedMSFilesFromAnaInfo(anaInfoEICs)
 
-    # load EICs per analysis: we don't want to load multiple potentially large analysis files simultaneously. Before
-    # that, it's more efficient to first figure out for which feature groups EICs have to be generated per analysis.
-    # Furthermore, collect all retention ranges for EICs as these also have to be checked on a per group basis.
-    cacheDB <- openCacheDBScope()
-    EICs <- Map(anaPaths, EICInfo, f = doGetEICs, MoreArgs = list(cacheDB = cacheDB))
-    names(EICs) <- anaInfoEICs$analysis
+    EICs <- doGetEICs(anaInfoEICs, EICInfo)
     EICs <- Map(EICs, lapply(EICInfo, "[[", "group"), f = setNames)
     
     return(pruneList(EICs))
@@ -246,14 +209,7 @@ setMethod("getEICsForFeatures", "features", function(features)
     fTable <- featureTable(features)
     anaInfo <- analysisInfo(features)
     
-    verifyDataCentroided(anaInfo)
-    
-    cacheDB <- openCacheDBScope()
-    anaPaths <- getCentroidedMSFilesFromAnaInfo(anaInfo)
-    EICs <- Map(anaPaths, fTable, f = doGetEICs, MoreArgs = list(cacheDB = cacheDB))
-    names(EICs) <- anaInfo$analysis
-    
-    return(pruneList(EICs))
+    return(pruneList(doGetEICs(anaInfo, fTable)))
 })
 
 setMethod("getEICsForFeatures", "featuresSet", function(features)

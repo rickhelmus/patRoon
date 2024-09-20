@@ -209,8 +209,8 @@ applyMSData <- function(anaInfo, func, ...)
             backend <- createMSBackend(bn)
             # NOTE: disable future parallelization as the backends are already OpenMP parallelized
             # NOTE: the callback can return cached data so opening the file should happen there.
-            return(doApply("Map", doPar = FALSE, data = anaInfo$analysis, filePaths, f = func,
-                           MoreArgs = list(backend = backend, ...)))
+            return(doApply("Map", doPar = FALSE, data = anaInfo$analysis, filePaths, ..., f = func,
+                           MoreArgs = list(backend = backend)))
         }
     }
     

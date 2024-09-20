@@ -353,7 +353,9 @@ getEICs <- function(file, ranges)
     assertHasNames(ranges, c("mzmin", "mzmax", "retmin", "retmax"))
     checkmate::reportAssertions(ac)
     
-    return(doGetEICs(file, as.data.table(ranges)))
+    # UNDONE: set file type
+    dummyAI <- data.table(analysis = basename(tools::file_path_sans_ext(file)), path_centroid = dirname(file))
+    return(doGetEICs(dummyAI, list(as.data.table(ranges)))[[1]])
 }
 
 #' @export

@@ -12,6 +12,7 @@
     - add to handbook
     - add NEWS
 - update sysdata.rda
+- start using saveCacheDataList() on more places?
 
 ## TC
 
@@ -225,7 +226,10 @@
         - and does it support mzML now?
     - update assertAndPrepareAnaInfo() usage where backends are used
 - the default backends now put mzR as last to ensure mobility data can be used, change this somehow?
-- does non-PASEF/DDA data works?
+- getEICs()
+    - switch to anaInfo param (or optional?), otherwise add file type arg
+    - allow multiple files?
+    - see when we update/add similar raw data functions
 
 - test
     - new verifyFileForFormat() usage is convertMSFiles()
@@ -236,6 +240,7 @@
     - new behavior of getMSFilesFromAnaInfo(): file types are checked one by one to avoid mixes and always checked to be present (mustExist was set a bit randomly...)
     - better checking of analysis file directory checking (verifyFileForFormat())
     - new/changed PListParams
+    - (optimized getEICFGroupInfo() substantially)
 
 - docs
     - getMSFileFormats()

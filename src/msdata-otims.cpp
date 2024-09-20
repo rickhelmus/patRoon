@@ -42,20 +42,80 @@ SpectrumRaw MSReadBackendOTIMS::doReadSpectrum(const ThreadDataType &tdata, Spec
 {
     const auto &meta = getSpecMetadata();
     const auto &metaMS = (MSLevel == SpectrumRawTypes::MSLevel::MS1) ? meta.first : meta.second;
+
+    // UNDONE: It seems that OpenTIMS and/or TIMS-SDK have some odd multithreading issues. It should work, but doesn't.
+    // 
+    // what doesn't work (consistently...!)
+    // * trying to disable threading in TIMS-SDK via setting threads via OpenMP or OpenTIMS or OMP_NUM_THREADS
+    // * using thread local handles and/or buffers
+    // * save_to_buffs(): not converting mzs and mobilities (ie not using TIMS-SDK) seemed to sometimes imrove things,
+    //   but inconsistently. Putting only that function in a critical section is not sufficient.
+    // All or some of these issues are sometimes already triggered if called from a block with just one thread.
+    // Naming the critical sections seem important too.
+    //
+    // so far the 2nd approach below seems best, ie still sharing handles/buffers but using them in a critical section.
+    // But this needs more testing!
+    
+#if 0
+    // can be used if not called from OpenMP threading block
+    
+    
     auto &tframe = handle->get_frame(metaMS.scans[scanSel.index]);
-    if (tframe.num_peaks == 0)
-        return SpectrumRaw();
     
-    auto *bufs = reinterpret_cast<TIMSDecompBufferPair *>(tdata.get());
-    
-    tframe.decompress(bufs->second.get(), bufs->first.get());
     std::vector<uint32_t> IDs(tframe.num_peaks), intensities(tframe.num_peaks);
     std::vector<double> mzs(tframe.num_peaks), mobilities(tframe.num_peaks);
+    
+    auto *bufs = reinterpret_cast<TIMSDecompBufferPair *>(tdata.get());
+    tframe.decompress(bufs->second.get(), bufs->first.get());
     tframe.save_to_buffs(nullptr, IDs.data(), nullptr, intensities.data(), mzs.data(), mobilities.data(), nullptr);
     tframe.close();
+#elif 1
+    std::vector<uint32_t> IDs, intensities;
+    std::vector<double> mzs, mobilities;
 
+    #pragma omp critical (VeryCritical1)
+    {
+        auto &tframe = handle->get_frame(metaMS.scans[scanSel.index]);
+        
+        IDs.assign(tframe.num_peaks, 0); intensities.assign(tframe.num_peaks, 0.0);
+        mzs.assign(tframe.num_peaks, 0.0); mobilities.assign(tframe.num_peaks, 0.0);
+        
+        auto *bufs = reinterpret_cast<TIMSDecompBufferPair *>(tdata.get());
+        tframe.decompress(bufs->second.get(), bufs->first.get());
+        tframe.save_to_buffs(nullptr, IDs.data(), nullptr, intensities.data(), mzs.data(), mobilities.data(), nullptr);
+        tframe.close();
+    }
+#else
+    std::vector<uint32_t> IDs, intensities;
+    std::vector<double> mzs, mobilities;
+    
+    #pragma omp critical (VeryCritical1)
+    {
+        //omp_set_num_threads(1);
+        
+        
+        TimsDataHandle TDH(getCurrentFile());
+        auto &tframe = TDH.get_frame(metaMS.scans[scanSel.index]);
+        IDs.assign(tframe.num_peaks, 0); intensities.assign(tframe.num_peaks, 0.0);
+        mzs.assign(tframe.num_peaks, 0.0); mobilities.assign(tframe.num_peaks, 0.0);
+        
+        //auto &tframe = handle->get_frame(metaMS.scans[scanSel.index]);
+        /*if (tframe.num_peaks == 0)
+            return SpectrumRaw();*/
+        
+        //auto *bufs = reinterpret_cast<TIMSDecompBufferPair *>(tdata.get());
+        auto bufs = getTIMSDecompBuffers(TDH.get_decomp_buffer_size());
+        
+        tframe.decompress(bufs.second.get(), bufs.first.get());
+        //#pragma omp critical (VeryCritical1)
+        tframe.save_to_buffs(nullptr, IDs.data(), nullptr, intensities.data(), mzs.data(), mobilities.data(), nullptr);
+        //tframe.save_to_buffs(nullptr, IDs.data(), nullptr, intensities.data(), nullptr, nullptr, nullptr);
+        tframe.close();
+    }
+#endif
+    
     SpectrumRaw ret;
-    for (size_t i=0; i<tframe.num_peaks; ++i)
+    for (size_t i=0; i<IDs.size(); ++i)
     {
         if (mobRange.isSet())
         {
@@ -81,7 +141,7 @@ SpectrumRaw MSReadBackendOTIMS::doReadSpectrum(const ThreadDataType &tdata, Spec
             if (!inRange)
             {
                 // try again with next scan: increment until last element (i will be incremented again in main for loop)
-                for (; i < (tframe.num_peaks-1) && IDs[i+1] == curScanID; ++i)
+                for (; i < (IDs.size()-1) && IDs[i+1] == curScanID; ++i)
                     ;
                 continue;
             }

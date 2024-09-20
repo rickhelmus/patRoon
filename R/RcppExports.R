@@ -5,8 +5,12 @@ writeChromsToMzML <- function(EICs, out) {
     invisible(.Call(`_patRoon_writeChromsToMzML`, EICs, out))
 }
 
-initBrukerLibrary <- function(path) {
-    .Call(`_patRoon_initBrukerLibrary`, path)
+initBrukerLibrary <- function(path, force = FALSE) {
+    .Call(`_patRoon_initBrukerLibrary`, path, force)
+}
+
+walkSpectra <- function(backend) {
+    .Call(`_patRoon_walkSpectra`, backend)
 }
 
 getMSSpectrum <- function(backend, index, MSLevel, frameIndex = -1L) {
@@ -17,8 +21,8 @@ getScans <- function(backend, timeStart, timeEnd, MSLevel, prec) {
     .Call(`_patRoon_getScans`, backend, timeStart, timeEnd, MSLevel, prec)
 }
 
-getEICList <- function(backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs) {
-    .Call(`_patRoon_getEICList`, backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs)
+getEICList <- function(backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, compress) {
+    .Call(`_patRoon_getEICList`, backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, compress)
 }
 
 getMSMetadata <- function(backend, msLevel) {
@@ -33,8 +37,8 @@ getMSPeakLists <- function(backend, startTimes, endTimes, precursorMZs, withPrec
     .Call(`_patRoon_getMSPeakLists`, backend, startTimes, endTimes, precursorMZs, withPrecursor, retainPrecursor, MSLevel, method, mzWindow, startMobs, endMobs, minAbundance, topMost, minIntensityIMS, minIntensityPre, minIntensityPost, minBPIntensity)
 }
 
-getMobilograms <- function(backend, startMZs, endMZs, startTimes, endTimes, method, mobWindow, minIntensity) {
-    .Call(`_patRoon_getMobilograms`, backend, startMZs, endMZs, startTimes, endTimes, method, mobWindow, minIntensity)
+getMobilograms <- function(backend, startMZs, endMZs, startTimes, endTimes, method, mobWindow, minIntensity, compress) {
+    .Call(`_patRoon_getMobilograms`, backend, startMZs, endMZs, startTimes, endTimes, method, mobWindow, minIntensity, compress)
 }
 
 getPeakIntensities <- function(backend, startMZs, endMZs, times) {

@@ -24,17 +24,17 @@ namespace patRoon {
         }
     }
 
-    inline bool initBrukerLibrary(const std::string& path) {
-        typedef SEXP(*Ptr_initBrukerLibrary)(SEXP);
+    inline bool initBrukerLibrary(const std::string& path, bool force = false) {
+        typedef SEXP(*Ptr_initBrukerLibrary)(SEXP,SEXP);
         static Ptr_initBrukerLibrary p_initBrukerLibrary = NULL;
         if (p_initBrukerLibrary == NULL) {
-            validateSignature("bool(*initBrukerLibrary)(const std::string&)");
+            validateSignature("bool(*initBrukerLibrary)(const std::string&,bool)");
             p_initBrukerLibrary = (Ptr_initBrukerLibrary)R_GetCCallable("patRoon", "_patRoon_initBrukerLibrary");
         }
         RObject rcpp_result_gen;
         {
             RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p_initBrukerLibrary(Shield<SEXP>(Rcpp::wrap(path)));
+            rcpp_result_gen = p_initBrukerLibrary(Shield<SEXP>(Rcpp::wrap(path)), Shield<SEXP>(Rcpp::wrap(force)));
         }
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();

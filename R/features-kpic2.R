@@ -230,9 +230,19 @@ setMethod("getPICSet", "features", function(obj, loadRawData = TRUE)
     checkmate::assertFlag(loadRawData)
     
     anaInfo <- analysisInfo(obj)
-    filePaths <- getCentroidedMSFilesFromAnaInfo(anaInfo)
     fTable <- featureTable(obj)
     EICs <- if (loadRawData) getEICsForFeatures(obj) else NULL
+    MSMeta <- if (loadRawData)
+    {
+        applyMSData(anaInfo, showProgress = FALSE, func = function(ana, path, backend)
+        {
+            openMSReadBackend(backend, path)
+            ret <- getMSMetadata(backend, 1)
+            attr(ret, "path") <- path
+            return(ret)
+        })
+    }
+    
     return(lapply(names(fTable), function(ana)
     {
         ret <- list()
@@ -240,8 +250,8 @@ setMethod("getPICSet", "features", function(obj, loadRawData = TRUE)
         {
             anai <- match(ana, anaInfo$analysis)
             
-            ret$path = filePaths[anai]
-            ret$scantime <- loadSpectra(ret$path, verbose = FALSE)$header$retentionTime
+            ret$path = attr(MSMeta[[ana]], "path")
+            ret$scantime <- MSMeta[[ana]]$time
             
             if (!is.null(EICs[[ana]]))
             {
@@ -250,7 +260,7 @@ setMethod("getPICSet", "features", function(obj, loadRawData = TRUE)
                     setDT(eic)
                     setnames(eic, "intensity", "int")
                     eic[, mz := mz] # UNDONE? Could add actual m/z for each scan...
-                    eic[, scan := sapply(time, function(t) which.min(abs(t - ret$scantime)))]
+                    eic[, scan := sapply(time, function(t) MSMeta[[ana]][which.min(abs(t - MSMeta[[ana]]$time)), "scan"])]
                     return(as.matrix(eic[, c("scan", "int", "mz"), with = FALSE]))
                 })
                 ret$peaks <- Map(ret$pics, fTable[[ana]]$intensity, f = function(pic, int)

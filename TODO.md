@@ -226,12 +226,13 @@
     - update SAFD for profile or centroided
         - also replace getMzXMLAnalysisPath()
         - and does it support mzML now?
-    - update assertAndPrepareAnaInfo() usage where backends are used
 - the default backends now put mzR as last to ensure mobility data can be used, change this somehow?
 - getEICs()
     - switch to anaInfo param (or optional?), otherwise add file type arg
     - allow multiple files?
     - see when we update/add similar raw data functions
+- getPICSet() isn't limited by centroided data anymore
+
 
 - test
     - new verifyFileForFormat() usage is convertMSFiles()

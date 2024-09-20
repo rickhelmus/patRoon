@@ -25,20 +25,21 @@ BEGIN_RCPP
 END_RCPP
 }
 // initBrukerLibrary
-bool initBrukerLibrary(const std::string& path);
-static SEXP _patRoon_initBrukerLibrary_try(SEXP pathSEXP) {
+bool initBrukerLibrary(const std::string& path, bool force);
+static SEXP _patRoon_initBrukerLibrary_try(SEXP pathSEXP, SEXP forceSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< const std::string& >::type path(pathSEXP);
-    rcpp_result_gen = Rcpp::wrap(initBrukerLibrary(path));
+    Rcpp::traits::input_parameter< bool >::type force(forceSEXP);
+    rcpp_result_gen = Rcpp::wrap(initBrukerLibrary(path, force));
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP _patRoon_initBrukerLibrary(SEXP pathSEXP) {
+RcppExport SEXP _patRoon_initBrukerLibrary(SEXP pathSEXP, SEXP forceSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_patRoon_initBrukerLibrary_try(pathSEXP));
+        rcpp_result_gen = PROTECT(_patRoon_initBrukerLibrary_try(pathSEXP, forceSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -57,6 +58,17 @@ RcppExport SEXP _patRoon_initBrukerLibrary(SEXP pathSEXP) {
     }
     UNPROTECT(1);
     return rcpp_result_gen;
+}
+// walkSpectra
+int walkSpectra(const MSReadBackend& backend);
+RcppExport SEXP _patRoon_walkSpectra(SEXP backendSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const MSReadBackend& >::type backend(backendSEXP);
+    rcpp_result_gen = Rcpp::wrap(walkSpectra(backend));
+    return rcpp_result_gen;
+END_RCPP
 }
 // getMSSpectrum
 Rcpp::DataFrame getMSSpectrum(const MSReadBackend& backend, int index, int MSLevel, int frameIndex);
@@ -88,8 +100,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // getEICList
-Rcpp::List getEICList(const MSReadBackend& backend, const std::vector<SpectrumRawTypes::Mass>& startMZs, const std::vector<SpectrumRawTypes::Mass>& endMZs, const std::vector<SpectrumRawTypes::Time>& startTimes, const std::vector<SpectrumRawTypes::Time>& endTimes, const std::vector<SpectrumRawTypes::Mobility>& startMobs, const std::vector<SpectrumRawTypes::Mobility>& endMobs);
-RcppExport SEXP _patRoon_getEICList(SEXP backendSEXP, SEXP startMZsSEXP, SEXP endMZsSEXP, SEXP startTimesSEXP, SEXP endTimesSEXP, SEXP startMobsSEXP, SEXP endMobsSEXP) {
+Rcpp::List getEICList(const MSReadBackend& backend, const std::vector<SpectrumRawTypes::Mass>& startMZs, const std::vector<SpectrumRawTypes::Mass>& endMZs, const std::vector<SpectrumRawTypes::Time>& startTimes, const std::vector<SpectrumRawTypes::Time>& endTimes, const std::vector<SpectrumRawTypes::Mobility>& startMobs, const std::vector<SpectrumRawTypes::Mobility>& endMobs, bool compress);
+RcppExport SEXP _patRoon_getEICList(SEXP backendSEXP, SEXP startMZsSEXP, SEXP endMZsSEXP, SEXP startTimesSEXP, SEXP endTimesSEXP, SEXP startMobsSEXP, SEXP endMobsSEXP, SEXP compressSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -100,7 +112,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Time>& >::type endTimes(endTimesSEXP);
     Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Mobility>& >::type startMobs(startMobsSEXP);
     Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Mobility>& >::type endMobs(endMobsSEXP);
-    rcpp_result_gen = Rcpp::wrap(getEICList(backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs));
+    Rcpp::traits::input_parameter< bool >::type compress(compressSEXP);
+    rcpp_result_gen = Rcpp::wrap(getEICList(backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, compress));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -156,8 +169,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // getMobilograms
-Rcpp::List getMobilograms(const MSReadBackend& backend, const std::vector<SpectrumRawTypes::Mass>& startMZs, const std::vector<SpectrumRawTypes::Mass>& endMZs, const std::vector<SpectrumRawTypes::Time>& startTimes, const std::vector<SpectrumRawTypes::Time>& endTimes, const std::string& method, SpectrumRawTypes::Mobility mobWindow, SpectrumRawTypes::Intensity minIntensity);
-RcppExport SEXP _patRoon_getMobilograms(SEXP backendSEXP, SEXP startMZsSEXP, SEXP endMZsSEXP, SEXP startTimesSEXP, SEXP endTimesSEXP, SEXP methodSEXP, SEXP mobWindowSEXP, SEXP minIntensitySEXP) {
+Rcpp::List getMobilograms(const MSReadBackend& backend, const std::vector<SpectrumRawTypes::Mass>& startMZs, const std::vector<SpectrumRawTypes::Mass>& endMZs, const std::vector<SpectrumRawTypes::Time>& startTimes, const std::vector<SpectrumRawTypes::Time>& endTimes, const std::string& method, SpectrumRawTypes::Mobility mobWindow, SpectrumRawTypes::Intensity minIntensity, bool compress);
+RcppExport SEXP _patRoon_getMobilograms(SEXP backendSEXP, SEXP startMZsSEXP, SEXP endMZsSEXP, SEXP startTimesSEXP, SEXP endTimesSEXP, SEXP methodSEXP, SEXP mobWindowSEXP, SEXP minIntensitySEXP, SEXP compressSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -169,7 +182,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::Mobility >::type mobWindow(mobWindowSEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minIntensity(minIntensitySEXP);
-    rcpp_result_gen = Rcpp::wrap(getMobilograms(backend, startMZs, endMZs, startTimes, endTimes, method, mobWindow, minIntensity));
+    Rcpp::traits::input_parameter< bool >::type compress(compressSEXP);
+    rcpp_result_gen = Rcpp::wrap(getMobilograms(backend, startMZs, endMZs, startTimes, endTimes, method, mobWindow, minIntensity, compress));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -593,7 +607,7 @@ END_RCPP
 static int _patRoon_RcppExport_validate(const char* sig) { 
     static std::set<std::string> signatures;
     if (signatures.empty()) {
-        signatures.insert("bool(*initBrukerLibrary)(const std::string&)");
+        signatures.insert("bool(*initBrukerLibrary)(const std::string&,bool)");
     }
     return signatures.find(sig) != signatures.end();
 }
@@ -609,14 +623,15 @@ RcppExport SEXP _rcpp_module_boot_MSReadBackend();
 
 static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_writeChromsToMzML", (DL_FUNC) &_patRoon_writeChromsToMzML, 2},
-    {"_patRoon_initBrukerLibrary", (DL_FUNC) &_patRoon_initBrukerLibrary, 1},
+    {"_patRoon_initBrukerLibrary", (DL_FUNC) &_patRoon_initBrukerLibrary, 2},
+    {"_patRoon_walkSpectra", (DL_FUNC) &_patRoon_walkSpectra, 1},
     {"_patRoon_getMSSpectrum", (DL_FUNC) &_patRoon_getMSSpectrum, 4},
     {"_patRoon_getScans", (DL_FUNC) &_patRoon_getScans, 5},
-    {"_patRoon_getEICList", (DL_FUNC) &_patRoon_getEICList, 7},
+    {"_patRoon_getEICList", (DL_FUNC) &_patRoon_getEICList, 8},
     {"_patRoon_getMSMetadata", (DL_FUNC) &_patRoon_getMSMetadata, 2},
     {"_patRoon_setSpecMetadata", (DL_FUNC) &_patRoon_setSpecMetadata, 3},
     {"_patRoon_getMSPeakLists", (DL_FUNC) &_patRoon_getMSPeakLists, 17},
-    {"_patRoon_getMobilograms", (DL_FUNC) &_patRoon_getMobilograms, 8},
+    {"_patRoon_getMobilograms", (DL_FUNC) &_patRoon_getMobilograms, 9},
     {"_patRoon_getPeakIntensities", (DL_FUNC) &_patRoon_getPeakIntensities, 4},
     {"_patRoon_readMSP", (DL_FUNC) &_patRoon_readMSP, 2},
     {"_patRoon_writeMSPLibrary", (DL_FUNC) &_patRoon_writeMSPLibrary, 3},

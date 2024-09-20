@@ -69,9 +69,6 @@ setMethod("initialize", "featuresOpenMS",
 #'   options specified here will override any of the above. Example:
 #'   \code{extraOpts=list("-algorithm:common:noise_threshold_int"=1000)} (corresponds to setting
 #'   \code{noiseThrInt=1000}). Set to \code{NULL} to ignore.
-#' @param intSearchRTWindow Retention time window (in seconds, +/- feature retention time) that is used to find the
-#'   closest data point to the retention time to obtain the intensity of a feature (this is needed since OpenMS does not
-#'   provide this data).
 #' @param useFFMIntensities If \code{TRUE} then peak intensities are directly loaded from \command{FeatureFinderMetabo}
 #'   output. Otherwise, intensities are loaded afterwards from the input \file{mzML} files, which is potentially much
 #'   slower, especially with many analyses files. However, \code{useFFMIntensities=TRUE} is still somewhat experimental,
@@ -91,12 +88,12 @@ findFeaturesOpenMS <- function(analysisInfo, noiseThrInt = 1000, chromSNR = 3, c
                                minTraceLength = 3, maxTraceLength = -1, widthFiltering = "fixed", minFWHM = 1,
                                maxFWHM = 30, traceSNRFiltering = FALSE, localRTRange = 10, localMZRange = 6.5,
                                isotopeFilteringModel = "metabolites (5% RMS)", MZScoring13C = FALSE, useSmoothedInts = TRUE,
-                               extraOpts = NULL, intSearchRTWindow = 3, useFFMIntensities = FALSE, verbose = TRUE)
+                               extraOpts = NULL, useFFMIntensities = FALSE, verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, fileType = "centroid", allowedFormats = "mzML", add = ac)
     aapply(checkmate::assertNumber, . ~ noiseThrInt + chromSNR + chromFWHM + mzPPM + minSampleRate +
-               minTraceLength + minFWHM + maxFWHM + localRTRange + localMZRange + intSearchRTWindow,
+               minTraceLength + minFWHM + maxFWHM + localRTRange + localMZRange,
            lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertChoice(traceTermCriterion, c("sample_rate", "outlier"))
     checkmate::assertCount(traceTermOutliers, add = ac)
@@ -154,19 +151,13 @@ findFeaturesOpenMS <- function(analysisInfo, noiseThrInt = 1000, chromSNR = 3, c
         
         if (!intAvail)
         {
-            fList <- sapply(names(fList), function(ana)
-            {
-                if (verbose)
-                    printf("Loading peak intensities for '%s'...\n", ana)
-                
-                fts <- loadIntensities(cmdQueue[[ana]]$dataFile, fList[[ana]], intSearchRTWindow)
-                
-                # BUG: OpenMS sporadically reports features with 0 intensity
-                # (noticed this with a feature of only two datapoints in hull).
-                fts <- fts[intensity > 0]
-                
-                return(fts)
-            }, simplify = FALSE)
+            if (verbose)
+                printf("Loading peak intensities...\n")
+            
+            fList <- loadIntensities(analysisInfo, fList, verbose)
+            # BUG: OpenMS sporadically reports features with 0 intensity
+            # (noticed this with a feature of only two datapoints in hull).
+            fList <- lapply(fList, function(fts) fts[intensity > 0])
         }
     }
     
@@ -230,25 +221,32 @@ importFeatureXML <- function(ffile)
 }
 
 # OpenMS doesn't support peak intensities. Estimate them from retention times
-loadIntensities <- function(dfile, features, rtWindow)
+loadIntensities <- function(anaInfo, fList, verbose)
 {
-    if (nrow(features) == 0)
+    applyMSData(anaInfo, fList, types = "centroid", formats = "mzML", func = function(ana, path, backend, fTab)
     {
-        features[, intensity := 0]
-        return(features)
-    }
-    
-    hash <- makeHash(features, rtWindow)
-    cd <- loadCacheData("loadIntensities", hash)
-    if (!is.null(cd))
-        features[, intensity := cd]
-    else
-    {
-        spectra <- loadSpectra(dfile, verbose = FALSE)
-        features <- copy(features) # HACK: avoid sR crash caused by data.table
-        features[, intensity := loadEICIntensities(spectra, features, rtWindow)]
-        saveCacheData("loadIntensities", features$intensity, hash)
-    }
-
-    return(features)
+        if (nrow(fTab) == 0)
+        {
+            fTab[, intensity := numeric()]
+            return(fTab)
+        }
+        
+        fTab <- copy(fTab)
+        
+        hash <- makeHash(fTab)
+        cd <- loadCacheData("loadIntensities", hash)
+        if (!is.null(cd))
+            fTab[, intensity := cd]
+        else
+        {
+            openMSReadBackend(backend, path)
+            fTab[, intensity := getPeakIntensities(backend, fTab$mzmin, fTab$mzmax, fTab$ret)]
+            saveCacheData("loadIntensities", fTab$intensity, hash)
+        }
+        
+        if (verbose)
+            doProgress()
+        
+        return(fTab)
+    })
 }

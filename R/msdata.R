@@ -3,8 +3,11 @@ NULL
 
 Rcpp::loadModule("MSReadBackend", TRUE)
 
-maybeGetMSFilesForOTIMS <- function(anaInfo)
+maybeGetMSFilesForOTIMS <- function(anaInfo, types, formats)
 {
+    if (!"raw" %in% types || !"bruker_times" %in% formats)
+        return(NULL)
+    
     ret <- getMSFilesFromAnaInfo(anaInfo, "raw", "bruker_tims", mustExist = FALSE)
     if (!is.null(ret))
     {
@@ -16,29 +19,40 @@ maybeGetMSFilesForOTIMS <- function(anaInfo)
     return(ret)
 }
 
-maybeGetMSFilesForMzR <- function(anaInfo)
+maybeGetMSFilesForMzR <- function(anaInfo, types, formats)
 {
+    if (!"centroid" %in% types)
+        return(NULL)
     if (!requireNamespace("mzR", quietly = TRUE))
         return(NULL) # UNDONE: this will only be relevant when we actually make mzR a soft dependency
-    return(getCentroidedMSFilesFromAnaInfo(anaInfo, mustExist = FALSE))
+    return(getCentroidedMSFilesFromAnaInfo(anaInfo, formats = intersect(formats, c("mzML", "mzXML")),
+                                           mustExist = FALSE))
 }
 
-maybeGetMSFilesForSC <- function(anaInfo)
+maybeGetMSFilesForSC <- function(anaInfo, types, formats)
 {
+    if (!any(c("centroid", "ims") %in% types))
+        return(NULL)
+    
     # UNDONE: mechanism to prefer IM/centroided data
     ret <- getMSFilesFromAnaInfo(anaInfo, "ims", "mzML", FALSE)
     if (is.null(ret))
-        ret <- getCentroidedMSFilesFromAnaInfo(anaInfo, mustExist = FALSE)
+        ret <- getCentroidedMSFilesFromAnaInfo(anaInfo, formats = intersect(formats, c("mzML", "mzXML")),
+                                               mustExist = FALSE)
     return(ret)
 }
 
-maybeGetMSFilesForMSTK <- function(anaInfo)
+maybeGetMSFilesForMSTK <- function(anaInfo, types, formats)
 {
+    if (!any(c("centroid", "ims") %in% types))
+        return(NULL)
+    
     # UNDONE: mechanism to prefer IM/centroided data
     # UNDONE: check if MSTK was compiled in
     ret <- getMSFilesFromAnaInfo(anaInfo, "ims", "mzML", FALSE)
     if (is.null(ret))
-        ret <- getCentroidedMSFilesFromAnaInfo(anaInfo, mustExist = FALSE)
+        ret <- getCentroidedMSFilesFromAnaInfo(anaInfo, formats = intersect(formats, c("mzML", "mzXML")),
+                                               mustExist = FALSE)
     return(ret)
 }
 
@@ -192,24 +206,25 @@ openMSReadBackend <- function(backend, path)
     return(backend)
 }
 
-applyMSData <- function(anaInfo, func, ...)
+applyMSData <- function(anaInfo, func,  ..., types = getMSFileTypes(), formats = names(MSFileExtensions()),
+                        showProgress = TRUE)
 {
     backends <- getOption("patRoon.MSBackends", character())
     
     for (bn in backends)
     {
         filePaths <- switch(bn,
-                            opentims = maybeGetMSFilesForOTIMS(anaInfo),
-                            mzr = maybeGetMSFilesForMzR(anaInfo),
-                            streamcraft = maybeGetMSFilesForSC(anaInfo),
-                            mstoolkit = maybeGetMSFilesForMSTK(anaInfo),
+                            opentims = maybeGetMSFilesForOTIMS(anaInfo, types, formats),
+                            mzr = maybeGetMSFilesForMzR(anaInfo, types, formats),
+                            streamcraft = maybeGetMSFilesForSC(anaInfo, types, formats),
+                            mstoolkit = maybeGetMSFilesForMSTK(anaInfo, types, formats),
                             NULL)
         if (!is.null(filePaths))
         {
             backend <- createMSBackend(bn)
             # NOTE: disable future parallelization as the backends are already OpenMP parallelized
             # NOTE: the callback can return cached data so opening the file should happen there.
-            return(doApply("Map", doPar = FALSE, data = anaInfo$analysis, filePaths, ..., f = func,
+            return(doApply("Map", doPar = FALSE, prog = showProgress, data = anaInfo$analysis, filePaths, ..., f = func,
                            MoreArgs = list(backend = backend)))
         }
     }

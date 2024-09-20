@@ -205,6 +205,8 @@
     - meatadata: scans, RTs, mobilities
     - spectra: m/z, mobilities (see if this can be used to speedup eg MSTK)
 - don't make open() required for memory backend (eg check flag instead of non-empty file in close())
+- SC: also load mzXML
+- further verify if applyMSData() picks up the right backend/file format when types/formats are set
 - make backend functions to test if mobility is sorted and which direction, so eg EICs and readSpectrum methods can optimize
 - MSPL
     - add mobility column?
@@ -241,6 +243,7 @@
     - better checking of analysis file directory checking (verifyFileForFormat())
     - new/changed PListParams
     - (optimized getEICFGroupInfo() substantially)
+    - loading OpenMS peak intensities is much faster, removed now unneeded intSearchRTWindow arg
 
 - docs
     - getMSFileFormats()

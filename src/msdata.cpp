@@ -160,6 +160,39 @@ RCPP_MODULE(MSReadBackend)
 }
 
 // [[Rcpp::export]]
+int walkSpectra(const MSReadBackend &backend)
+{
+    const auto sfunc = [](const SpectrumRaw &spec, const SpectrumRawSelection &, size_t) { return spec.size(); };
+    const auto &meta = backend.getSpecMetadata();
+    
+    std::vector<std::vector<SpectrumRawSelection>> sels(1);
+    for (size_t i=0; i<meta.first.scans.size(); ++i)
+        sels[0].emplace_back(i);
+    
+    const auto ret = applyMSData<size_t>(backend, SpectrumRawTypes::MSLevel::MS1, sels, sfunc);
+    return std::accumulate(ret[0].begin(), ret[0].end(), 0);
+    
+#if 0
+    size_t ret = 0;
+    #pragma omp parallel num_threads(12)
+    {
+        auto tdata = backend.getThreadData();
+        #pragma omp for
+        for (size_t i=0; i<50 /*meta.first.scans.size()*/; ++i)
+        {
+            //#pragma omp critical (StupidNameHere1)
+            {
+            const auto s = backend.readSpectrum(tdata, SpectrumRawTypes::MSLevel::MS1, SpectrumRawSelection(i), SpectrumRawTypes::MobilityRange());
+            #pragma omp atomic
+            ret += s.size();
+            }
+        }
+    }
+    return ret;
+#endif
+}
+
+// [[Rcpp::export]]
 Rcpp::DataFrame getMSSpectrum(const MSReadBackend &backend, int index, int MSLevel, int frameIndex = -1)
 {
     SpectrumRawSelection sel(index);

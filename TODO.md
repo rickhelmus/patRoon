@@ -199,12 +199,11 @@
 
 ## msdata
 
+- Further test multithreading stability with OTIMS
 - check assumptions about data being sorted
     - meatadata: scans, RTs, mobilities
     - spectra: m/z, mobilities (see if this can be used to speedup eg MSTK)
 - don't make open() required for memory backend (eg check flag instead of non-empty file in close())
-- EICs
-    - compress output
 - make backend functions to test if mobility is sorted and which direction, so eg EICs and readSpectrum methods can optimize
 - MSPL
     - add mobility column?

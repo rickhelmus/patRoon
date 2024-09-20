@@ -253,22 +253,26 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                       const std::vector<SpectrumRawTypes::Time> &startTimes,
                       const std::vector<SpectrumRawTypes::Time> &endTimes,
                       const std::vector<SpectrumRawTypes::Mobility> &startMobs,
-                      const std::vector<SpectrumRawTypes::Mobility> &endMobs)
+                      const std::vector<SpectrumRawTypes::Mobility> &endMobs, bool compress)
 {
     struct EICPoint
     {
+        SpectrumRawTypes::Time time = 0.0;
         SpectrumRawTypes::Mass mz = 0.0;
         SpectrumRawTypes::Intensity intensity = 0;
         SpectrumRawTypes::Mobility mobility = 0.0;
     };
     
     const auto EICCount = startMZs.size();
+    const auto &specMeta = backend.getSpecMetadata();
     bool anySpecHasMob = false;
     
     const auto sfunc = [&](const SpectrumRaw &spec, const SpectrumRawSelection &ssel, size_t entry)
     {
         const bool hasMob = spec.hasMobilities();
         EICPoint ret;
+        
+        ret.time = specMeta.first.times[ssel.index];
         
         size_t startInd = 0;
         
@@ -318,7 +322,6 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         return ret;
     };
     
-    const auto &specMeta = backend.getSpecMetadata();
     std::vector<std::vector<SpectrumRawSelection>> scanSels;
     for (size_t i=0; i<EICCount; ++i)
     {
@@ -326,8 +329,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                                                 SpectrumRawTypes::MSLevel::MS1, 0));
     }
     
-    const auto allEICPoints = applyMSData<EICPoint>(backend, SpectrumRawTypes::MSLevel::MS1, scanSels, sfunc);
-    
+    auto allEICPoints = applyMSData<EICPoint>(backend, SpectrumRawTypes::MSLevel::MS1, scanSels, sfunc);
 
     if (allEICPoints.empty())
         return Rcpp::List();
@@ -337,14 +339,31 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     {
         // NOTE: assume all MS spectra have or have not IMS data (UNDONE?)
         
-        const auto &points = allEICPoints[i];
+        auto &points = allEICPoints[i];
+        
+        if (compress && points.size() >= 3)
+        {
+            for (auto it=std::next(points.begin()); it!=std::prev(points.end()); )
+            {
+                if (it->intensity == 0)
+                {
+                    if (std::prev(it)->intensity == 0 && std::next(it)->intensity == 0)
+                    {
+                        it = points.erase(it);
+                        continue;
+                    }
+                }
+                ++it;
+            }
+        }
+
         std::vector<SpectrumRawTypes::Time> times(points.size());
         std::vector<SpectrumRawTypes::Mass> mzs(points.size());
         std::vector<SpectrumRawTypes::Intensity> intensities(points.size());
         std::vector<SpectrumRawTypes::Mobility> mobilities((anySpecHasMob) ? points.size() : 0);
         for (size_t j=0; j<points.size(); ++j)
         {
-            times[j] = specMeta.first.times[scanSels[i][j].index];
+            times[j] = points[j].time;
             mzs[j] = points[j].mz;
             intensities[j] = points[j].intensity;
             if (anySpecHasMob)
@@ -576,7 +595,7 @@ Rcpp::List getMobilograms(const MSReadBackend &backend, const std::vector<Spectr
                           const std::vector<SpectrumRawTypes::Time> &startTimes,
                           const std::vector<SpectrumRawTypes::Time> &endTimes,
                           const std::string &method, SpectrumRawTypes::Mobility mobWindow,
-                          SpectrumRawTypes::Intensity minIntensity)
+                          SpectrumRawTypes::Intensity minIntensity, bool compress)
 {
     const auto entries = startTimes.size();
     const auto clMethod = clustMethodFromStr(method);
@@ -589,9 +608,10 @@ Rcpp::List getMobilograms(const MSReadBackend &backend, const std::vector<Spectr
         // UNDONE: also collect m/z?
         EIM(void) = default;
         EIM(size_t s) : mobilities(s), intensities(s) { }
+        void append(SpectrumRawTypes::Mobility m, SpectrumRawTypes::Intensity i) { mobilities.push_back(m); intensities.push_back(i); }
     };
     
-    const auto &sfunc = [&](const SpectrumRaw &spec, const SpectrumRawSelection &ssel, size_t e)
+    const auto &sfunc = [compress, minIntensity, &startMZs, &endMZs](const SpectrumRaw &spec, const SpectrumRawSelection &ssel, size_t e)
     {
         if (!spec.hasMobilities())
             Rcpp::stop("Cannot load mobilogram: no mobility data found!");
@@ -599,11 +619,9 @@ Rcpp::List getMobilograms(const MSReadBackend &backend, const std::vector<Spectr
         EIM ret;
         SpectrumRawTypes::Mobility curMob;
         SpectrumRawTypes::Intensity curIntensity;
-        
         for (size_t i=0; ; ++i)
         {
-            const auto m = spec.getMobilities()[i];
-            if (i == 0 || i >= spec.size() || m != curMob)
+            if (i == 0 || i >= spec.size() || curMob != spec.getMobilities()[i])
             {
                 if (i > 0)
                 {
@@ -614,7 +632,7 @@ Rcpp::List getMobilograms(const MSReadBackend &backend, const std::vector<Spectr
                 if (i >= spec.size())
                     break;
                 
-                curMob = m;
+                curMob = spec.getMobilities()[i];
                 curIntensity = 0;
             }
             
@@ -640,7 +658,7 @@ Rcpp::List getMobilograms(const MSReadBackend &backend, const std::vector<Spectr
     }
     
     const auto allEIMs = applyMSData<EIM>(backend, SpectrumRawTypes::MSLevel::MS1, scanSels, sfunc);
-    
+
     std::vector<EIM> averageEIMs(entries);
 
     #pragma omp parallel for num_threads(12)
@@ -652,6 +670,9 @@ Rcpp::List getMobilograms(const MSReadBackend &backend, const std::vector<Spectr
             std::copy(eim.mobilities.begin(), eim.mobilities.end(), std::back_inserter(flatEIM.mobilities));
             std::copy(eim.intensities.begin(), eim.intensities.end(), std::back_inserter(flatEIM.intensities));
         }
+        
+        if (flatEIM.mobilities.size() == 0)
+            continue;
         
         const auto clusts = clusterNums(flatEIM.mobilities, clMethod, mobWindow);
         const int maxClust = *(std::max_element(clusts.begin(), clusts.end()));
@@ -668,14 +689,34 @@ Rcpp::List getMobilograms(const MSReadBackend &backend, const std::vector<Spectr
             ++clSizes[cl];
         }
         
+        const auto EIMSize = avgEIM.mobilities.size();
+        
         // average data
-        for (size_t j=0; j<avgEIM.mobilities.size(); ++j)
+        for (size_t j=0; j<EIMSize; ++j)
         {
             avgEIM.mobilities[j] /= static_cast<double>(clSizes[j]); // mean of all values
             avgEIM.intensities[j] /= allEIMs[i].size(); // mean of values (including frames without this cluster)
         }
         
-        averageEIMs[i] = std::move(avgEIM);
+        // sort and compress data
+        const auto sInds = getSortedInds(avgEIM.mobilities);
+        EIM sortedEIM;
+        compress = compress && EIMSize >= 3; // we always keep first/last point, so need >=3 points
+        for (size_t i=0; i<EIMSize; ++i)
+        {
+            // if we want to (1) compress, (2) current intensity == 0, (3) is not the first sorted point, (4) is not the
+            // last point to check and (5) and not the last sorted point.
+            if (compress && avgEIM.intensities[sInds[i]] == 0 && sInds[i] > 0 && i < (EIMSize-1) &&
+                sInds[i] != (EIMSize-1))
+            {
+                const auto prevInt = avgEIM.intensities[sInds[i-1]], nextInt = avgEIM.intensities[sInds[i+1]];
+                if (prevInt == 0 && nextInt == 0)
+                    continue; // skip points with zero intensities that are neighbored by others.
+            }
+            sortedEIM.append(avgEIM.mobilities[i], avgEIM.intensities[i]);
+        }
+        
+        averageEIMs[i] = std::move(sortedEIM);
     }
         
     Rcpp::List ret(entries);

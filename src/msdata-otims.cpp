@@ -93,12 +93,12 @@ SpectrumRaw MSReadBackendOTIMS::doReadSpectrum(const ThreadDataType &tdata, Spec
 }
 
 // [[Rcpp::export]]
-bool initBrukerLibrary(const std::string &path)
+bool initBrukerLibrary(const std::string &path, bool force = false)
 {
     static std::string lastPath;
     static bool succeeded = false;
     
-    if (!lastPath.empty() && succeeded && path == lastPath)
+    if (!force && !lastPath.empty() && succeeded && path == lastPath)
         return true; // already loaded
     
     try

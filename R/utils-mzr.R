@@ -107,23 +107,30 @@ setMethod("getEICFGroupInfo", "featureGroups", function(fGroups, analysis, group
     featTab <- featTab[group %chin% groupName, c("group", "analysis", "intensity", "retmin", "retmax", "mzmin", "mzmax"),
                        with = FALSE]
     
+    # NOTE: we subset and split here in advance, as doing it in the loop below gets quite slow with many fGroups
+    featTabAnaSub <- featTab[analysis %chin% takeAnalysis]
+    featTabSplitGrp <- split(featTab, by = "group", keep.by = FALSE)
+    featTabAnaSubSplitGrp <- split(featTabAnaSub, by = "group", keep.by = FALSE)
+    
     return(sapply(groupName, function(fg)
     {
-        ret <- featTab[group == fg][, -"group"]
+        ret <- featTabAnaSubSplitGrp[[fg]]
+        if (is.null(ret))
+            ret <- featTabSplitGrp[[fg]][0] # not present for this analysis, take full table to get all columns
+        ret <- copy(ret)
         
         # add missing analyses if needed
-        if (!EICParams$onlyPresent && any(!analysis %chin% ret$analysis))
+        if (!EICParams$onlyPresent)
         {
-            ret <- rbind(ret, data.table(analysis = setdiff(analysis, ret$analysis), intensity = 0,
-                                         retmin = min(ret$retmin), retmax = max(ret$retmax),
-                                         mzmin = min(ret$mzmin) - EICParams$mzExpWindow,
-                                         mzmax = max(ret$mzmax) + EICParams$mzExpWindow))
+            if (any(!analysis %chin% ret$analysis))
+            {
+                ftAllAna <- featTabSplitGrp[[fg]]
+                ret <- rbind(ret, data.table(analysis = setdiff(analysis, ret$analysis), intensity = 0,
+                                             retmin = min(ftAllAna$retmin), retmax = max(ftAllAna$retmax),
+                                             mzmin = min(ftAllAna$mzmin) - EICParams$mzExpWindow,
+                                             mzmax = max(ftAllAna$mzmax) + EICParams$mzExpWindow))
+            }
         }
-        
-        # NOTE: do this after adding 'missing' analysis data to ensure RT/mz data from other feature data can be used
-        # above
-        # HACK: need to take copy of 'analysis' function parameter to avoid confusions with equally named DT column
-        ret <- ret[analysis %chin% takeAnalysis]
         
         if (!is.null(topMost))
         {

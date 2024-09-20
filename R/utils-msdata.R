@@ -108,3 +108,45 @@ getCentroidedMSFilesFromAnaInfo <- function(anaInfo, formats = c("mzML", "mzXML"
 {
     getMSFilesFromAnaInfo(anaInfo, "centroid", formats, mustExist)
 }
+
+doGetEICs <- function(anaInfo, EICInfoList, cacheDB = NULL)
+{
+    # UNDONE: handle mobilities
+    
+    if (is.null(cacheDB))
+        cacheDB <- openCacheDBScope()
+    
+    EICs <- applyMSData(anaInfo, EICInfoList, func = function(ana, path, backend, EICInfo)
+    {
+        anaHash <- makeHash(getMSDataFileHash(path))
+        
+        # NOTE: subset columns here, so any additional columns from e.g. feature tables are not considered
+        hashes <- EICInfo[, makeHash(anaHash, .SD), by = seq_len(nrow(EICInfo)),
+                          .SDcols = c("retmin", "retmax", "mzmin", "mzmax")][[2]]
+        
+        cachedData <- loadCacheData(category = "EICs", hashes, dbArg = cacheDB, simplify = FALSE)
+        if (!is.null(cachedData) && length(cachedData) == nrow(EICInfo))
+        {
+            doProgress()
+            return(unname(cachedData)) # everything is in the cache
+        }
+        
+        EICs <- vector("list", nrow(EICInfo))
+        cachedInds <- if (!is.null(cachedData)) match(names(cachedData), hashes) else integer()
+        isCached <- if (!is.null(cachedData)) hashes %chin% names(cachedData) else rep(FALSE, nrow(EICInfo))
+        # NOTE: cachedData is 'subset' below to make sure any duplicate hashes are properly assigned
+        EICs[isCached] <- cachedData[match(hashes, names(cachedData), nomatch = 0)]
+        
+        ToDo <- EICInfo[isCached == FALSE]
+        openMSReadBackend(backend, path)
+        EICs[!isCached] <- getEICList(backend, ToDo$mzmin, ToDo$mzmax, ToDo$retmin, ToDo$retmax, rep(0, nrow(ToDo)),
+                                      rep(0, nrow(ToDo)), TRUE)
+
+        saveCacheDataList("EICs", EICs[!isCached], hashes[!isCached], cacheDB)
+        
+        doProgress()
+        return(EICs)
+    })
+    
+    return(EICs)
+}

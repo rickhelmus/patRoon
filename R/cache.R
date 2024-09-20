@@ -144,6 +144,49 @@ dbWithWriteTransaction <- function(conn, code)
              db_abort = rollback, error = rollback, interrupt = rollback)
 }
 
+saveCacheDataList <- function(category, dataList, hashes, dbArg = NULL)
+{
+    if (getCacheMode() == "load" || getCacheMode() == "none" || length(dataList) == 0)
+        return(NULL)
+    
+    if (is.null(dbArg))
+        db <- openCacheDBScope()
+    else
+        db <- dbArg
+    
+    RSQLite::sqliteSetBusyHandler(db, 300 * 1000) # UNDONE: make configurable?
+    
+    dbWithWriteTransaction(db, {
+        DBI::dbExecute(db, sprintf("CREATE TABLE IF NOT EXISTS %s (hash TEXT UNIQUE, data BLOB)", category))
+        
+        for (i in seq_along(dataList))
+        {
+            data <- data.frame(d = I(list(fst::compress_fst(serialize(dataList[i], NULL, xdr = FALSE)))))
+            
+            # From https://stackoverflow.com/a/7353236: update if already exists, otherwise insert
+            DBI::dbExecute(db, sprintf("INSERT OR IGNORE INTO %s VALUES ('%s', :d)", category, hashes[i]), params = data)
+            DBI::dbExecute(db, sprintf("UPDATE %s SET data=(:d) WHERE changes()=0 AND hash='%s'", category, hashes[i]),
+                           params = data)
+        }
+        
+        # remove first row (from https://www.experts-exchange.com/questions/24926777/Delete-first-row-of-table.html) if
+        # too many rows
+        # if (DBI::dbGetQuery(db, sprintf("SELECT Count(*) FROM %s", category))[[1]] > getMaxCacheEntries())
+        #     DBI::dbExecute(db, sprintf("DELETE FROM %s WHERE ROWID in (SELECT min(ROWID) FROM %s)", category, category))
+        
+        # updated for multiple rows
+        tabN <- DBI::dbGetQuery(db, sprintf("SELECT Count(*) FROM %s", category))[[1]]
+        if (tabN > getMaxCacheEntries())
+        {
+            # remove first N rows: https://stackoverflow.com/a/10381812 (needs ordering, see bottom comment)
+            DBI::dbExecute(db, sprintf("DELETE FROM %s WHERE rowid IN (SELECT rowid FROM %s ORDER BY rowid LIMIT %d)",
+                                       category, category, tabN - getMaxCacheEntries()))
+        }
+    })
+    
+    invisible(NULL)
+}
+
 #' @details \code{saveCacheData} caches data in a database.   
 #'
 #' @param category The category of the object to be cached.
@@ -154,30 +197,7 @@ dbWithWriteTransaction <- function(conn, code)
 #' @export
 saveCacheData <- function(category, data, hash, dbArg = NULL)
 {
-    if (getCacheMode() == "load" || getCacheMode() == "none")
-        return(NULL)
-
-    if (is.null(dbArg))
-        db <- openCacheDBScope()
-    else
-        db <- dbArg
-
-    RSQLite::sqliteSetBusyHandler(db, 300 * 1000) # UNDONE: make configurable?
-
-    df <- data.frame(d = I(list(fst::compress_fst(serialize(data, NULL, xdr = FALSE)))))
-
-    dbWithWriteTransaction(db, {
-        DBI::dbExecute(db, sprintf("CREATE TABLE IF NOT EXISTS %s (hash TEXT UNIQUE, data BLOB)", category))
-
-        # From https://stackoverflow.com/a/7353236: update if already exists, otherwise insert
-        DBI::dbExecute(db, sprintf("INSERT OR IGNORE INTO %s VALUES ('%s', :d)", category, hash), params=df)
-        DBI::dbExecute(db, sprintf("UPDATE %s SET data=(:d) WHERE changes()=0 AND hash='%s'", category, hash), params=df)
-
-        # remove first row (from https://www.experts-exchange.com/questions/24926777/Delete-first-row-of-table.html) if
-        # too many rows
-        if (DBI::dbGetQuery(db, sprintf("SELECT Count(*) FROM %s", category))[[1]] > getMaxCacheEntries())
-            DBI::dbExecute(db, sprintf("DELETE FROM %s WHERE ROWID in (SELECT min(ROWID) FROM %s)", category, category))
-    })
+    saveCacheDataList(category, list(data), hash, dbArg)
 }
 
 loadCacheSet <- function(category, setHash, dbArg = NULL)

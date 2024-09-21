@@ -8,7 +8,7 @@ NULL
 SAFDMPFinishHandler <- function(cmd)
 {
     fExt <- if (cmd$cent) "_Cent_report.csv" else "_report.csv"
-    results <- fread(file.path(cmd$outPath, paste0(cmd$fileName, fExt)))
+    results <- fread(file.path(cmd$outPath, paste0(tools::file_path_sans_ext(cmd$fileName), fExt)))
     setnames(results,
              c("Nr", "Rt", "MeasMass", "RtStart", "RtEnd", "MinMass", "MaxMass", "Area", "Int",
                "FeatPurity", "MediRes"),
@@ -88,18 +88,14 @@ makeSAFDCommand <- function(inPath, fileName, cent, mzRange, maxNumbIter, maxTPe
 #' @inherit findFeatures return
 #' 
 #' @export
-findFeaturesSAFD <- function(analysisInfo, profPath = NULL, mzRange = c(0, 400), 
+findFeaturesSAFD <- function(analysisInfo, fileType = NULL, mzRange = c(0, 400), 
                              maxNumbIter = 1000, maxTPeakW = 300, resolution = 30000,
                              minMSW = 0.02, RThreshold = 0.75, minInt = 2000,
                              sigIncThreshold = 5, S2N = 2, minPeakWS = 3, verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
-    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, "mzXML", verifyCentroided = TRUE, add = ac)
-    if (!is.null(profPath))
-    {
-        checkmate::assertCharacter(profPath, min.chars = 1, min.len = 1, add = ac)
-        assertCanCreateDirs(profPath, add = ac)
-    }
+    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, add = ac)
+    checkmate::assertChoice(fileType, c("centroid", "profile"), null.ok = TRUE, add = ac)
     checkmate::assertNumeric(mzRange, lower = 0, finite = TRUE, any.missing = FALSE, len = 2, add = ac)
     aapply(checkmate::assertCount, . ~ maxNumbIter + maxTPeakW + resolution + sigIncThreshold +
                S2N, positive = TRUE, fixed = list(add = ac))
@@ -110,29 +106,36 @@ findFeaturesSAFD <- function(analysisInfo, profPath = NULL, mzRange = c(0, 400),
     
     if (mzRange[1] > mzRange[2])
         stop("First element of mzRange should be smaller than second.")
+
+    filePaths <- NULL
+    takeCent <- NULL
+    if (is.null(fileType))
+    {
+        filePaths <- getMSFilesFromAnaInfo(analysisInfo, "profile", c("mzML", "mzXML"), mustExist = FALSE)
+        takeCent <- is.null(filePaths)
+        if (is.null(filePaths))
+            filePaths <- getCentroidedMSFilesFromAnaInfo(analysisInfo, mustExist = FALSE)
+        if (is.null(filePaths))
+            stop("Couldn't find (a complete set) of profile or centroided data", call. = FALSE)
+    }
+    else
+    {
+        filePaths <- getMSFilesFromAnaInfo(analysisInfo, fileType, c("mzML", "mzXML"))
+        takeCent <- fileType == "centroid"
+    }
     
     anaCount <- nrow(analysisInfo)
-    if (!is.null(profPath))
-        profPath <- rep(profPath, length.out = anaCount)
     
-    params <- list(is.null(profPath), mzRange, maxNumbIter, maxTPeakW, resolution, minMSW, RThreshold, minInt,
+    params <- list(takeCent, mzRange, maxNumbIter, maxTPeakW, resolution, minMSW, RThreshold, minInt,
                    sigIncThreshold, S2N, minPeakWS)
     baseHash <- makeHash(params)
     
     if (verbose)
         printf("Finding features with SAFD for %d analyses ...\n", anaCount)
 
-    anaPaths <- if (is.null(profPath)) analysisInfo$path else profPath
-    cmdQueue <- Map(analysisInfo$analysis, anaPaths, f = function(ana, path)
+    cmdQueue <- Map(analysisInfo$analysis, filePaths, f = function(ana, fp)
     {
-        # fpNCDF <- getAnalysisPath(ana, path, "cdf") UNDONE: also support netcdf?
-        fp <- getMzXMLAnalysisPath(ana, path)
-        
-        if (length(fp) == 0)
-            stop(sprintf("Cannot find %s or %s\n", fpMZXML, fpNCDF))
-        
-        # UNDONE: really want to hash big files?
-        hash <- makeHash(makeFileHash(fp), params)
+        hash <- makeHash(getMSDataFileHash(fp), params)
         
         cmd <- do.call(makeSAFDCommand, c(list(dirname(fp), basename(fp)), params))
         

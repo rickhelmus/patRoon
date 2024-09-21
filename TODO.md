@@ -200,6 +200,7 @@
 
 ## msdata
 
+- replace makeFileHash() with getMSDataFileHash() on more places?
 - Further test multithreading stability with OTIMS
 - check assumptions about data being sorted
     - meatadata: scans, RTs, mobilities
@@ -210,6 +211,7 @@
 - make backend functions to test if mobility is sorted and which direction, so eg EICs and readSpectrum methods can optimize
 - MSPL
     - add mobility column?
+    - remove now unused avgParams (eg averaging func)
     - more extensively test filters/summing/averaging
     - support withPrecursor in old DA/mzR algos?
     - make methods for generateMSPeakLists(), including for sets
@@ -223,15 +225,11 @@
         - also mixed bbCID/PASEF file (ie with different segments)
 - anaInfo / file path retrieval
     - update convertMSFiles() and newProject()
-    - update SAFD for profile or centroided
-        - also replace getMzXMLAnalysisPath()
-        - and does it support mzML now?
 - the default backends now put mzR as last to ensure mobility data can be used, change this somehow?
 - getEICs()
     - switch to anaInfo param (or optional?), otherwise add file type arg
     - allow multiple files?
     - see when we update/add similar raw data functions
-- getPICSet() isn't limited by centroided data anymore
 
 
 - test
@@ -245,6 +243,7 @@
     - new/changed PListParams
     - (optimized getEICFGroupInfo() substantially)
     - loading OpenMS peak intensities is much faster, removed now unneeded intSearchRTWindow arg
+    - getPICSet() isn't limited by centroided data anymore
 
 - docs
     - getMSFileFormats()

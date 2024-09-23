@@ -391,11 +391,20 @@ Rcpp::DataFrame getMSMetadata(const MSReadBackend &backend, int msLevel)
 {
     const auto &meta = backend.getSpecMetadata();
     
+    const auto polsToInts = [](const auto &v)
+    {
+        std::vector<int> ret(v.size());
+        for (size_t i=0; i<v.size(); ++i)
+            ret[i] = static_cast<int>(v[i]);
+        return ret;
+    };
+    
     if (msLevel == 1)
-        return(Rcpp::DataFrame::create(Rcpp::Named("scan") = meta.first.scans,
+        return Rcpp::DataFrame::create(Rcpp::Named("scan") = meta.first.scans,
                                        Rcpp::Named("time") = meta.first.times,
                                        Rcpp::Named("TIC") = meta.first.TICs,
-                                       Rcpp::Named("BPC") = meta.first.BPCs));
+                                       Rcpp::Named("BPC") = meta.first.BPCs,
+                                       Rcpp::Named("polarity") = polsToInts(meta.first.polarities));
     
     // msLevel == 2
     
@@ -413,6 +422,7 @@ Rcpp::DataFrame getMSMetadata(const MSReadBackend &backend, int msLevel)
                                        Rcpp::Named("time") = meta.second.times,
                                        Rcpp::Named("TIC") = meta.second.TICs,
                                        Rcpp::Named("BPC") = meta.second.BPCs,
+                                       Rcpp::Named("polarity") = polsToInts(meta.second.polarities),
                                        Rcpp::Named("isolationRangeMin") = isolationMins,
                                        Rcpp::Named("isolationRangeMax") = isolationMaxs);
     }
@@ -422,6 +432,7 @@ Rcpp::DataFrame getMSMetadata(const MSReadBackend &backend, int msLevel)
     std::vector<SpectrumRawTypes::Scan> scans;
     std::vector<SpectrumRawTypes::Time> times;
     std::vector<SpectrumRawTypes::Intensity> TICs, BPCs;
+    std::vector<int> polaritiesInt;
     std::vector<SpectrumRawTypes::Mass> isolationMins, isolationMaxs;
     std::vector<SpectrumRawTypes::Scan> subScans, subScanEnds;
     
@@ -434,6 +445,7 @@ Rcpp::DataFrame getMSMetadata(const MSReadBackend &backend, int msLevel)
             times.push_back(meta.second.times[i]);
             TICs.push_back(meta.second.TICs[i]);
             BPCs.push_back(meta.second.BPCs[i]);
+            polaritiesInt.push_back(static_cast<int>(meta.second.polarities[i]));
             isolationMins.push_back(fi.isolationRanges[j].start);
             isolationMaxs.push_back(fi.isolationRanges[j].end);
             subScans.push_back(fi.subScans[j]);
@@ -446,6 +458,7 @@ Rcpp::DataFrame getMSMetadata(const MSReadBackend &backend, int msLevel)
                                        Rcpp::Named("time") = times,
                                        Rcpp::Named("TIC") = TICs,
                                        Rcpp::Named("BPC") = BPCs,
+                                       Rcpp::Named("polarity") = polaritiesInt,
                                        Rcpp::Named("isolationRangeMin") = isolationMins,
                                        Rcpp::Named("isolationRangeMax") = isolationMaxs,
                                        Rcpp::Named("subScan") = subScans);
@@ -458,6 +471,14 @@ Rcpp::DataFrame getMSMetadata(const MSReadBackend &backend, int msLevel)
 // [[Rcpp::export]]
 void setSpecMetadata(MSReadBackend &backend, const Rcpp::DataFrame &mdMS, const Rcpp::DataFrame &mdMSMS)
 {
+    const auto polsFromInts = [](const auto &v)
+    {
+        std::vector<SpectrumRawTypes::MSPolarity> ret(v.size());
+        for (size_t i=0; i<v.size(); ++i)
+            ret[i] = static_cast<SpectrumRawTypes::MSPolarity>(v[i]);
+        return ret;
+    };
+    
     SpectrumRawMetadata meta;
 
     // MS
@@ -465,11 +486,13 @@ void setSpecMetadata(MSReadBackend &backend, const Rcpp::DataFrame &mdMS, const 
     meta.first.times = Rcpp::as<std::vector<SpectrumRawTypes::Time>>(mdMS["time"]);
     meta.first.TICs = Rcpp::as<std::vector<SpectrumRawTypes::Intensity>>(mdMS["TIC"]);
     meta.first.BPCs = Rcpp::as<std::vector<SpectrumRawTypes::Intensity>>(mdMS["BPC"]);
+    meta.first.polarities = polsFromInts(Rcpp::as<std::vector<int>>(mdMS["polarity"]));
     
     // MSMS
     std::vector<SpectrumRawTypes::Scan> R_scans = mdMSMS["scan"];
     std::vector<SpectrumRawTypes::Time> R_times = mdMSMS["time"];
     std::vector<SpectrumRawTypes::Intensity> R_TICs = mdMSMS["TIC"], R_BPCs = mdMSMS["BPC"];
+    auto R_polarities = polsFromInts(Rcpp::as<std::vector<int>>(mdMSMS["polarity"]));
     std::vector<SpectrumRawTypes::Mass> R_isoStarts = mdMSMS["isolationRangeMin"], R_isoEnds = mdMSMS["isolationRangeMax"];
     
     const std::vector<std::string> cn = mdMSMS.names();
@@ -480,6 +503,7 @@ void setSpecMetadata(MSReadBackend &backend, const Rcpp::DataFrame &mdMS, const 
         meta.second.times = std::move(R_times);
         meta.second.TICs = std::move(R_TICs);
         meta.second.BPCs = std::move(R_BPCs);
+        meta.second.polarities = std::move(R_polarities);
         
         for (size_t i=0; i<R_isoStarts.size(); ++i)
             meta.second.isolationRanges.emplace_back(R_isoStarts[i], R_isoEnds[i]);
@@ -502,6 +526,7 @@ void setSpecMetadata(MSReadBackend &backend, const Rcpp::DataFrame &mdMS, const 
                 meta.second.times.push_back(R_times[i]);
                 meta.second.TICs.push_back(R_TICs[i]);
                 meta.second.BPCs.push_back(R_BPCs[i]);
+                meta.second.polarities.push_back(R_polarities[i]);
                 if (!curFI.empty())
                 {
                     meta.second.MSMSFrames.push_back(std::move(curFI));

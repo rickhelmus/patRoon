@@ -230,6 +230,11 @@
     - switch to anaInfo param (or optional?), otherwise add file type arg
     - allow multiple files?
     - see when we update/add similar raw data functions
+- clean old tims files
+- embed TIMS-SDK?
+- optionally link to MSTK depening on if it's available
+- SC: finish loading IMS metadata
+- MSTK: load polarities
 
 
 - test

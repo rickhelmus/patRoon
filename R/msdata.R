@@ -120,8 +120,14 @@ setMethod("initMSReadBackend", "Rcpp_MSReadBackendOTIMS", function(backend)
             return(ret)
         }
         
-        frames <- getTIMSMetaTable("Frames", c("Id", "Time", "ScanMode", "MsMsType", "SummedIntensities", "MaxIntensity"))
-        setnames(frames, c("Id", "Time", "SummedIntensities", "MaxIntensity"), c("scan", "time", "TIC", "BPC"))
+        frames <- getTIMSMetaTable("Frames", c("Id", "Time", "ScanMode", "MsMsType", "SummedIntensities",
+                                               "MaxIntensity", "Polarity"))
+        setnames(frames, c("Id", "Time", "SummedIntensities", "MaxIntensity", "Polarity"),
+                 c("scan", "time", "TIC", "BPC", "polarity"))
+        frames[, polarity := fcase(polarity == "+", 1L,
+                                   polarity == "-", -1L,
+                                   default = 0L)]
+        
         framesMS <- frames[MsMsType == 0][, MsMsType := NULL]
         framesMS2 <- frames[MsMsType != 0]
         
@@ -135,7 +141,7 @@ setMethod("initMSReadBackend", "Rcpp_MSReadBackendOTIMS", function(backend)
         # zero out isolation range for isCID/bbCID (ie DIA)
         framesMS2[ScanMode %in% c(3, 4), c("isolationRangeMin", "isolationRangeMax") := 0]
         framesMS2[, c("ScanMode", "MsMsType") := NULL]
-        
+
         return(list(MS1 = framesMS, MS2 = framesMS2))
     })
 })
@@ -154,10 +160,11 @@ setMethod("initMSReadBackend", "Rcpp_MSReadBackendMem", function(backend)
         
         setnames(hd, c("acquisitionNum", "retentionTime", "totIonCurrent", "basePeakIntensity"),
                  c("scan", "time", "TIC", "BPC"))
+        hd[polarity == 0, polarity := -1] # 0 is negative mode for mzR
         hd[, isolationRangeMin := precursorMZ - isolationWindowLowerOffset]
         hd[, isolationRangeMax := precursorMZ + isolationWindowUpperOffset]
         
-        cols <- c("scan", "time", "TIC", "BPC")
+        cols <- c("scan", "time", "TIC", "BPC", "polarity")
         
         return(list(MS1 = hd[msLevel == 1, cols, with = FALSE],
                     MS2 = hd[msLevel > 1, c(cols, "isolationRangeMin", "isolationRangeMax"), with = FALSE]))

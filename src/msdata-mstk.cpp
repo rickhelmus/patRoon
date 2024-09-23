@@ -113,6 +113,7 @@ void MSReadBackendMSTK::generateSpecMetadata(void)
                 curMS1MD->times.push_back(spec.getRTime() * 60); // NOTE: MSTK takes minutes
                 curMS1MD->TICs.push_back(spec.getTIC());
                 curMS1MD->BPCs.push_back(spec.getBPI());
+                curMS1MD->polarities.push_back(SpectrumRawTypes::MSPolarity::UNKNOWN); // UNDONE: MSTK doesn't load polarities yet
                 
                 if (!isMS1)
                     threadMeta.second.isolationRanges.emplace_back(spec.getSelWindowLower(), spec.getSelWindowUpper());
@@ -138,7 +139,7 @@ void MSReadBackendMSTK::generateSpecMetadata(void)
 
     if (haveIMS)
     {
-        // For IMS-MS/MS data, the different spectra inside are frame are stored in separate spectra
+        // For IMS-MS/MS data, the different spectra inside a frame are stored in separate spectra
         // --> move these spectra to MSMSFrames structs, so our main table only contains separate frames
         
         SpectrumRawMetadataMSMS metaMSMSFrames;
@@ -148,6 +149,7 @@ void MSReadBackendMSTK::generateSpecMetadata(void)
             metaMSMSFrames.times.push_back(meta.second.times[i]);
             metaMSMSFrames.TICs.push_back(meta.second.TICs[i]);
             metaMSMSFrames.BPCs.push_back(meta.second.BPCs[i]);
+            metaMSMSFrames.polarities.push_back(meta.second.polarities[i]);
             
             frameMSMSInfo fi;
             const auto curTime = meta.second.times[i];

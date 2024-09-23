@@ -20,6 +20,7 @@ using MobilityRange = NumRange<Mobility>;
 using PeakAbundance = float;
 
 enum class MSLevel { MS1, MS2 };
+enum class MSPolarity { POSITIVE = 1, NEGATIVE = -1, UNKNOWN = 0 };
 
 }
 
@@ -36,15 +37,17 @@ struct SpectrumRawMetadataMS
     std::vector<SpectrumRawTypes::Scan> scans;
     std::vector<SpectrumRawTypes::Time> times;
     std::vector<SpectrumRawTypes::Intensity> TICs, BPCs;
+    std::vector<SpectrumRawTypes::MSPolarity> polarities;
     SpectrumRawMetadataMS(void) = default;
-    SpectrumRawMetadataMS(size_t s) : scans(s), times(s), TICs(s), BPCs(s) { }
-    void clear(void) { scans.clear(); times.clear(); TICs.clear(); BPCs.clear(); }
+    SpectrumRawMetadataMS(size_t s) : scans(s), times(s), TICs(s), BPCs(s), polarities(s) { }
+    void clear(void) { scans.clear(); times.clear(); TICs.clear(); BPCs.clear(); polarities.clear(); }
     void append(const SpectrumRawMetadataMS &other)
     {
         scans.insert(scans.end(), other.scans.begin(), other.scans.end());
         times.insert(times.end(), other.times.begin(), other.times.end());
         TICs.insert(TICs.end(), other.TICs.begin(), other.TICs.end());
         BPCs.insert(BPCs.end(), other.BPCs.begin(), other.BPCs.end());
+        polarities.insert(polarities.end(), other.polarities.begin(), other.polarities.end());
     }
 };
 struct SpectrumRawMetadataMSMS: public SpectrumRawMetadataMS

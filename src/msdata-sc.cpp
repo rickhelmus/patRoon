@@ -88,6 +88,8 @@ void MSReadBackendSC::generateSpecMetadata(void)
         curMS1MD->times.push_back(hd.rt[i]);
         curMS1MD->TICs.push_back(hd.tic[i]);
         curMS1MD->BPCs.push_back(hd.bpint[i]);
+        // NOTE: a simple cast is sufficient as the enum values match the int values from SC
+        curMS1MD->polarities.push_back(static_cast<SpectrumRawTypes::MSPolarity>(hd.polarity[i]));
         
         if (!isMS1)
         {

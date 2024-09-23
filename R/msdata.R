@@ -5,7 +5,7 @@ Rcpp::loadModule("MSReadBackend", TRUE)
 
 maybeGetMSFilesForOTIMS <- function(anaInfo, types, formats)
 {
-    if (!"raw" %in% types || !"bruker_times" %in% formats)
+    if (!"raw" %in% types || !"bruker_tims" %in% formats)
         return(NULL)
     
     ret <- getMSFilesFromAnaInfo(anaInfo, "raw", "bruker_tims", mustExist = FALSE)

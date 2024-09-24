@@ -45,6 +45,14 @@ getPeakIntensities <- function(backend, startMZs, endMZs, times) {
     .Call(`_patRoon_getPeakIntensities`, backend, startMZs, endMZs, times)
 }
 
+collapseIMSFrames <- function(backend, mzStart, mzEnd, mobilityStart, mobilityEnd, method, mzWindow, minAbundance, topMost, minIntensityIMS, minIntensityPre) {
+    .Call(`_patRoon_collapseIMSFrames`, backend, mzStart, mzEnd, mobilityStart, mobilityEnd, method, mzWindow, minAbundance, topMost, minIntensityIMS, minIntensityPre)
+}
+
+testMS1Writer <- function(backend, out, mzStart, mzEnd, mobilityStart, mobilityEnd, method, mzWindow, minAbundance, topMost, minIntensityIMS, minIntensityPre) {
+    invisible(.Call(`_patRoon_testMS1Writer`, backend, out, mzStart, mzEnd, mobilityStart, mobilityEnd, method, mzWindow, minAbundance, topMost, minIntensityIMS, minIntensityPre))
+}
+
 readMSP <- function(file, pc) {
     .Call(`_patRoon_readMSP`, file, pc)
 }

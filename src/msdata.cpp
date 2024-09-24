@@ -803,6 +803,52 @@ Rcpp::NumericVector getPeakIntensities(const MSReadBackend &backend,
     
     return ret;
 }
+
+// [[Rcpp::export]]
+Rcpp::List collapseIMSFrames(const MSReadBackend &backend, SpectrumRawTypes::Mass mzStart, SpectrumRawTypes::Mass mzEnd,
+                             SpectrumRawTypes::Mobility mobilityStart, SpectrumRawTypes::Mobility mobilityEnd,
+                             const std::string &method, SpectrumRawTypes::Mass mzWindow,
+                             SpectrumRawTypes::PeakAbundance minAbundance, unsigned topMost,
+                             SpectrumRawTypes::Intensity minIntensityIMS, SpectrumRawTypes::Intensity minIntensityPre)
+{
+    const auto clMethod = clustMethodFromStr(method);
+    const auto filterP = SpectrumRawFilter()
+        .setMinIntensity(minIntensityIMS)
+        .setMZRange(mzStart, mzEnd)
+        .setTopMost(topMost);
+    const auto mobRange = makeNumRange(mobilityStart, mobilityEnd);
+    
+    const auto &sfunc = [&](const SpectrumRaw &spec, const SpectrumRawSelection &, size_t)
+    {
+        if (!spec.hasMobilities())
+            Rcpp::stop("Tried to collapse non-IMS data!");
+        
+        const auto specf = filterIMSFrame(spec, filterP, 0.0, mobRange);
+        return averageSpectraRaw(specf, frameSubSpecIDs(specf), clMethod, mzWindow, false, minIntensityPre,
+                                 minAbundance);
+    };
+    
+    const auto &specMeta = backend.getSpecMetadata().first;
+    std::vector<std::vector<SpectrumRawSelection>> scanSels(1);
+    for (size_t i=0; i<specMeta.scans.size(); ++i)
+        scanSels[0].emplace_back(i);
+    
+    const auto spectra = applyMSData<SpectrumRawAveraged>(backend, SpectrumRawTypes::MSLevel::MS1, scanSels, sfunc)[0];
+    
+    // NOTE: we return matrices so these can be directly consumed by mzR
+    Rcpp::List ret(spectra.size());
+    const auto coln = Rcpp::CharacterVector::create("mz", "intensity");
+    for (size_t i=0; i<spectra.size(); ++i)
+    {
+        Rcpp::NumericMatrix m(spectra[i].size(), 2);
+        Rcpp::NumericVector mzs = Rcpp::wrap(spectra[i].getMZs()), ints = Rcpp::wrap(spectra[i].getIntensities());
+        m(Rcpp::_, 0) = mzs; m(Rcpp::_, 1) = ints;
+        Rcpp::colnames(m) = coln;
+        ret[i] = m;
+    }
+    return ret;
+}
+
 // [[Rcpp::export]]
 void testMS1Writer(const MSReadBackend &backend, const std::string &out, SpectrumRawTypes::Mass mzStart,
                    SpectrumRawTypes::Mass mzEnd, SpectrumRawTypes::Mobility mobilityStart,

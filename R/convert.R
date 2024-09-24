@@ -146,33 +146,52 @@ convertMSFilesBruker <- function(inFiles, outFiles, to, centroid)
     invisible(NULL)
 }
 
-convertMSFilesTIMS <- function(inFiles, outFiles, mzRange = NULL, IMSRange = NULL, clMethod = "bin", mzWindow = 0.005,
-                               minAbundance = 1, topMost = NULL, minIntensityPre = NULL, minIntensityPost = NULL)
+collapseIMSFiles <- function(anaInfo, mzRange = NULL, mobilityRange = NULL, clMethod = "bin", mzWindow = 0.005,
+                             minAbundance = 0, topMost = NULL, minIntensityIMS = NULL, minIntensityPre = NULL,
+                             overWrite = FALSE)
 {
     # UNDONE: checkmate
+    # UNDONE: which default clust method?
     
-    fCount <- length(inFiles)
-    prog <- openProgBar(0, fCount)
-
-    for (i in seq_len(fCount))
+    fileTypes = c("raw", "ims"); formats <- list("bruker_tims", "mzml")
+    anaInfo <- assertAndPrepareAnaInfo(anaInfo, fileTypes = fileTypes, allowedFormats = formats)
+    
+    outDirs <- getPathsFromAnaInfo(anaInfo, "centroid")
+    if (is.null(outDirs) || anyNA(outDirs) || any(!nzchar(outDirs)))
+        stop("Please set a valid centroid path for all analyses in the analysis information.", call. = FALSE)
+    mkdirp(outDirs)
+    
+    printf("Collapsing all %d analyses ...\n", nrow(anaInfo))
+    applyMSData(anaInfo, outDirs, types = fileTypes, formats = formats, showProgress = FALSE, func = function(ana, path, backend, outd)
     {
-        db <- openTIMSMetaDBScope(f = inFiles[i])
-        frames <- getTIMSMetaTable(db, "Frames", c("Id", "Time", "MsMsType", "Polarity"))
-        frames <- frames[MsMsType == 0]
-        globalMD <- getTIMSMetaTable(db, "GlobalMetaData", c("Key", "Value"))
+        outp <- file.path(outd, paste0(ana, ".mzML"))
         
-        specs <- collapseTIMSSpectra(inFiles[i], frames$Id, NULLToZero(mzRange[1]), NULLToZero(mzRange[2]),
-                                     NULLToZero(IMSRange[1]), NULLToZero(IMSRange[2]), clMethod, mzWindow, minAbundance,
-                                     NULLToZero(topMost), NULLToZero(minIntensityPre), NULLToZero(minIntensityPost))
+        printf("%s --> %s ... ", path, outp)
         
-        header <- data.frame(seqNum = seq_along(specs),
+        if (!overWrite && file.exists(outp))
+        {
+            printf("skipped: already exists\n")
+            return(NULL)
+        }
+        
+        openMSReadBackend(backend, path)
+        
+        meta <- getMSMetadata(backend, 1)
+        spectra <- collapseIMSFrames(backend, NULLToZero(mzRange[1]), NULLToZero(mzRange[2]), NULLToZero(mobilityRange[1]),
+                                     NULLToZero(mobilityRange[2]), clMethod, mzWindow, minAbundance, NULLToZero(topMost),
+                                     NULLToZero(minIntensityIMS), NULLToZero(minIntensityPre))
+
+        specMZRange <- range(unlist(lapply(spectra, function(sp) range(sp[, "mz"]))))
+        
+        header <- data.frame(seqNum = seq_along(spectra),
+                             acquisitionNum = meta$scan,
                              msLevel = 1,
-                             polarity = fifelse(frames$Polarity == "+", 1, 0),
-                             peaksCount = sapply(specs, nrow), # UNDONE: correct?
-                             totIonCurrent = sapply(specs, function(sp) sum(sp[, "intensity"])),
-                             retentionTime = frames$Time,
-                             basePeakMZ = sapply(specs, function(sp) sp[which.max(sp[, "intensity"]), "mz"]),
-                             basePeakIntensity = sapply(specs, function(sp) max(sp[, "intensity"])),
+                             polarity = fifelse(meta$scan == 1, 1, 0),
+                             peaksCount = sapply(spectra, nrow), # UNDONE: correct?
+                             totIonCurrent = sapply(spectra, function(sp) sum(sp[, "intensity"])),
+                             retentionTime = meta$time,
+                             basePeakMZ = sapply(spectra, function(sp) sp[which.max(sp[, "intensity"]), "mz"]),
+                             basePeakIntensity = sapply(spectra, function(sp) max(sp[, "intensity"])),
                              collisionEnergy = NA_real_,
                              ionisationEnergy = 0,
                              lowMZ = 0,
@@ -191,17 +210,15 @@ convertMSFilesTIMS <- function(inFiles, outFiles, mzRange = NULL, IMSRange = NUL
                              ionMobilityDriftTime = NA_real_,
                              isolationWindowLowerOffset = NA_real_,
                              isolationWindowUpperOffset = NA_real_,
-                             scanWindowLowerLimit = as.numeric(globalMD[Key == "MzAcqRangeLower"]$Value),
-                             scanWindowUpperLimit = as.numeric(globalMD[Key == "MzAcqRangeUpper"]$Value))
-        header$acquisitionNum <- frames$Id
-        header$spectrumId <- paste0("scan=", frames$Id)
+                             # UNDONE: below are technically not scan limits, but might be good enough?
+                             scanWindowLowerLimit = specMZRange[1],
+                             scanWindowUpperLimit = specMZRange[2])
+        header$spectrumId <- paste0("scan=", meta$scan)
         
-        mzR::writeMSData(specs, outFiles[i], header)
-        
-        setTxtProgressBar(prog, i)
-    }
-    
-    setTxtProgressBar(prog, fCount)
+        mzR::writeMSData(spectra, outp, header)
+
+        printf("done!\n")
+    })
     
     invisible(NULL)
 }

@@ -201,6 +201,48 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// collapseIMSFrames
+Rcpp::List collapseIMSFrames(const MSReadBackend& backend, SpectrumRawTypes::Mass mzStart, SpectrumRawTypes::Mass mzEnd, SpectrumRawTypes::Mobility mobilityStart, SpectrumRawTypes::Mobility mobilityEnd, const std::string& method, SpectrumRawTypes::Mass mzWindow, SpectrumRawTypes::PeakAbundance minAbundance, unsigned topMost, SpectrumRawTypes::Intensity minIntensityIMS, SpectrumRawTypes::Intensity minIntensityPre);
+RcppExport SEXP _patRoon_collapseIMSFrames(SEXP backendSEXP, SEXP mzStartSEXP, SEXP mzEndSEXP, SEXP mobilityStartSEXP, SEXP mobilityEndSEXP, SEXP methodSEXP, SEXP mzWindowSEXP, SEXP minAbundanceSEXP, SEXP topMostSEXP, SEXP minIntensityIMSSEXP, SEXP minIntensityPreSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const MSReadBackend& >::type backend(backendSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type mzStart(mzStartSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type mzEnd(mzEndSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Mobility >::type mobilityStart(mobilityStartSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Mobility >::type mobilityEnd(mobilityEndSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type mzWindow(mzWindowSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::PeakAbundance >::type minAbundance(minAbundanceSEXP);
+    Rcpp::traits::input_parameter< unsigned >::type topMost(topMostSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minIntensityIMS(minIntensityIMSSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minIntensityPre(minIntensityPreSEXP);
+    rcpp_result_gen = Rcpp::wrap(collapseIMSFrames(backend, mzStart, mzEnd, mobilityStart, mobilityEnd, method, mzWindow, minAbundance, topMost, minIntensityIMS, minIntensityPre));
+    return rcpp_result_gen;
+END_RCPP
+}
+// testMS1Writer
+void testMS1Writer(const MSReadBackend& backend, const std::string& out, SpectrumRawTypes::Mass mzStart, SpectrumRawTypes::Mass mzEnd, SpectrumRawTypes::Mobility mobilityStart, SpectrumRawTypes::Mobility mobilityEnd, const std::string& method, SpectrumRawTypes::Mass mzWindow, SpectrumRawTypes::PeakAbundance minAbundance, unsigned topMost, SpectrumRawTypes::Intensity minIntensityIMS, SpectrumRawTypes::Intensity minIntensityPre);
+RcppExport SEXP _patRoon_testMS1Writer(SEXP backendSEXP, SEXP outSEXP, SEXP mzStartSEXP, SEXP mzEndSEXP, SEXP mobilityStartSEXP, SEXP mobilityEndSEXP, SEXP methodSEXP, SEXP mzWindowSEXP, SEXP minAbundanceSEXP, SEXP topMostSEXP, SEXP minIntensityIMSSEXP, SEXP minIntensityPreSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const MSReadBackend& >::type backend(backendSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type out(outSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type mzStart(mzStartSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type mzEnd(mzEndSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Mobility >::type mobilityStart(mobilityStartSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Mobility >::type mobilityEnd(mobilityEndSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type mzWindow(mzWindowSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::PeakAbundance >::type minAbundance(minAbundanceSEXP);
+    Rcpp::traits::input_parameter< unsigned >::type topMost(topMostSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minIntensityIMS(minIntensityIMSSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minIntensityPre(minIntensityPreSEXP);
+    testMS1Writer(backend, out, mzStart, mzEnd, mobilityStart, mobilityEnd, method, mzWindow, minAbundance, topMost, minIntensityIMS, minIntensityPre);
+    return R_NilValue;
+END_RCPP
+}
 // readMSP
 Rcpp::List readMSP(Rcpp::CharacterVector file, Rcpp::LogicalVector pc);
 RcppExport SEXP _patRoon_readMSP(SEXP fileSEXP, SEXP pcSEXP) {
@@ -633,6 +675,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_getMSPeakLists", (DL_FUNC) &_patRoon_getMSPeakLists, 17},
     {"_patRoon_getMobilograms", (DL_FUNC) &_patRoon_getMobilograms, 9},
     {"_patRoon_getPeakIntensities", (DL_FUNC) &_patRoon_getPeakIntensities, 4},
+    {"_patRoon_collapseIMSFrames", (DL_FUNC) &_patRoon_collapseIMSFrames, 11},
+    {"_patRoon_testMS1Writer", (DL_FUNC) &_patRoon_testMS1Writer, 12},
     {"_patRoon_readMSP", (DL_FUNC) &_patRoon_readMSP, 2},
     {"_patRoon_writeMSPLibrary", (DL_FUNC) &_patRoon_writeMSPLibrary, 3},
     {"_patRoon_readMoNAJSON", (DL_FUNC) &_patRoon_readMoNAJSON, 1},

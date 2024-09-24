@@ -40,7 +40,7 @@ getMSFileConversionFormats <- function(algorithm = "pwiz", vendor = FALSE)
     return(ret)
 }
 
-convertMSFilesPWiz <- function(inFiles, outFiles, to, centroid, filters, extraOpts, PWizBatchSize)
+convertMSFilesPWiz <- function(inFiles, outFiles, to, centroid, IMS, filters, extraOpts, PWizBatchSize)
 {
     if (centroid != FALSE)
     {
@@ -48,8 +48,13 @@ convertMSFilesPWiz <- function(inFiles, outFiles, to, centroid, filters, extraOp
             filters <- character()
         filters <- c(paste("peakPicking", if (is.character(centroid)) centroid else ""), filters)
     }
+    
+    if (is.na(IMS))
+        filters <- c(filters, "scanSumming sumMs1=1")
 
     mainArgs <- paste0("--", to)
+    if (!isFALSE(IMS))
+        mainArgs <- c(mainArgs, "--combineIonMobilitySpectra")
     if (!is.null(filters))
         mainArgs <- c(mainArgs, sapply(filters, function(f) c("--filter", f)))
     if (!is.null(extraOpts))
@@ -153,7 +158,7 @@ collapseIMSFiles <- function(anaInfo, mzRange = NULL, mobilityRange = NULL, clMe
     # UNDONE: checkmate
     # UNDONE: which default clust method?
     
-    fileTypes = c("raw", "ims"); formats <- list("bruker_tims", "mzml")
+    fileTypes = c("raw", "ims"); formats <- list("bruker_ims", "mzml")
     anaInfo <- assertAndPrepareAnaInfo(anaInfo, fileTypes = fileTypes, allowedFormats = formats)
     
     outDirs <- getPathsFromAnaInfo(anaInfo, "centroid")
@@ -316,86 +321,58 @@ collapseIMSFiles <- function(anaInfo, mzRange = NULL, mobilityRange = NULL, clMe
 #'
 #' @rdname convertMSFiles
 #' @export
-convertMSFiles <- function(files = NULL, outPath = NULL, dirs = TRUE,
-                           anaInfo = NULL, from = NULL, to = "mzML",
-                           overWrite = FALSE, algorithm = "pwiz",
-                           centroid = algorithm != "openms",
-                           filters = NULL, extraOpts = NULL, PWizBatchSize = 1)
+convertMSFilePaths <- function(files, formatFrom, formatTo = "mzML", outPath = NULL, dirs = TRUE, overWrite = FALSE,
+                               algorithm = "pwiz", centroid = algorithm != "openms", IMS = FALSE, filters = NULL,
+                               extraOpts = NULL, PWizBatchSize = 1)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertCharacter(files, min.len = 1, min.chars = 1, null.ok = !is.null(anaInfo), add = ac)
+    assertConvertMSFilesArgs(formatFrom, formatTo, overWrite, algorithm, filters, extraOpts, PWizBatchSize, add = ac)
+    checkmate::assertCharacter(files, min.len = 1, min.chars = 1, add = ac)
     checkmate::assertCharacter(outPath, min.chars = 1, min.len = 1, null.ok = TRUE, add = ac)
     assertCanCreateDirs(outPath, add = ac)
     checkmate::assertFlag(dirs, add = ac)
-    checkmate::assertChoice(to, c("mzXML", "mzML"), add = ac) # UNDONE: enough for now?
-    checkmate::assertFlag(overWrite, add = ac)
-    checkmate::assertChoice(algorithm, c("pwiz", "openms", "bruker"), add = ac)
     checkmate::assert(checkmate::checkFlag(centroid),
                       checkmate::checkChoice(centroid, c("vendor", "cwt")),
-                      .var.name = "centroid")
-    checkmate::assertCharacter(filters, min.chars = 1, null.ok = TRUE, add = ac)
-    checkmate::assertCharacter(extraOpts, null.ok = TRUE, add = ac)
-    checkmate::assertCount(PWizBatchSize, add = ac)
+                      .var.name = "centroid", add = ac)
+    checkmate::assertFlag(IMS, na.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
-
+    
     if (centroid != FALSE && algorithm == "openms")
-        stop("Centroiding with OpenMS is currently not supported.")
+        stop("Centroiding with OpenMS is currently not supported.", call. = FALSE)
     else if ((centroid == "vendor" || centroid == "cwt") && algorithm != "pwiz")
-        stop("Vendor/cwt centroiding is only supported when algorithm=\"pwiz\"")
-
-    if (dirs || !is.null(anaInfo)) # from arg needs to be used?
+        stop("Vendor/cwt centroiding is only supported when algorithm=\"pwiz\"", call. = FALSE)
+    if (!isFALSE(IMS) && algorithm != "pwiz")
+        stop("Handling of IMS data is only supported when algorithm=\"pwiz\"", call. = FALSE)
+    
+    if (dirs)
     {
-        if (algorithm == "pwiz")
-            from <- checkmate::matchArg(from, c("thermo", "bruker", "agilent", "ab", "waters", "mzXML", "mzML"),
-                                        several.ok = FALSE)
-        else if (algorithm == "openms")
-            from <- checkmate::matchArg(from, c("mzXML", "mzML"), several.ok = FALSE)
-        else # bruker
-            from <- checkmate::matchArg(from, "bruker")
-
-        if (from == to)
-            warning("Input and output formats are the same")
-    }
-
-    anaInfo <- assertAndPrepareAnaInfo(anaInfo, from, null.ok = !is.null(files))
-
-    if (!is.null(files))
-    {
-        if (dirs)
+        if (formatFrom == formatTo)
+            warning("Input and output formats are the same", call. = FALSE)
+        
+        dirs <- files[file.info(files, extra_cols = FALSE)$isdir]
+        dirs <- dirs[sapply(dirs, function(d)
         {
-            dirs <- files[file.info(files, extra_cols = FALSE)$isdir]
-            dirs <- dirs[sapply(dirs, function(d)
-            {
-                # NOTE: with some formats the analysis files are directories --> remove these
-                !any(sapply(from, verifyFileForFormat, path = d))
-            })]
-            
-            dirFiles <- listMSFiles(dirs, from)
-            files <- union(dirFiles, setdiff(files, dirs))
-        }
+            # NOTE: with some formats the analysis files are directories --> remove these
+            !any(sapply(formatFrom, verifyFileForFormat, path = d))
+        })]
+        
+        dirFiles <- listMSFiles(dirs, formatFrom)
+        files <- union(dirFiles, setdiff(files, dirs))
     }
-    else
-        files <- character()
-
-    if (!is.null(anaInfo))
-    {
-        afiles <- getMSFilePaths(anaInfo$analysis, anaInfo$path, from)
-        files <- union(files, afiles)
-    }
-
+    
     if (is.null(outPath))
         outPath <- dirname(files)
-
+    
     mkdirp(outPath)
-
+    
     # NOTE: use normalizePath() here to convert to backslashes on Windows: needed by msconvert
     outPath <- normalizePath(rep(outPath, length.out = length(files)), mustWork = TRUE)
     files <- normalizePath(files, mustWork = FALSE) # no mustWork, file existence will be checked later
-
+    
     basef <- basename(tools::file_path_sans_ext(files))
-    output <- normalizePath(file.path(outPath, paste0(basef, ".", to)),
+    output <- normalizePath(file.path(outPath, paste0(basef, ".", formatTo)),
                             mustWork = FALSE)
-
+    
     keepFiles <- sapply(seq_along(files), function(fi)
     {
         if (!file.exists(files[fi]))
@@ -406,17 +383,67 @@ convertMSFiles <- function(files = NULL, outPath = NULL, dirs = TRUE,
             return(TRUE)
         return(FALSE)
     }, USE.NAMES = FALSE)
-
+    
     if (is.logical(keepFiles) && any(keepFiles))
     {
         files <- files[keepFiles]
         output <- output[keepFiles]
-
+        
         if (algorithm == "pwiz")
-            convertMSFilesPWiz(files, output, to, centroid, filters, extraOpts, PWizBatchSize)
+            convertMSFilesPWiz(files, output, formatTo, centroid, IMS, filters, extraOpts, PWizBatchSize)
         else if (algorithm == "openms")
-            convertMSFilesOpenMS(files, output, to, extraOpts)
+            convertMSFilesOpenMS(files, output, formatTo, extraOpts)
         else # bruker
-            convertMSFilesBruker(files, output, to, centroid)
+            convertMSFilesBruker(files, output, formatTo, centroid)
     }
+}
+
+#' @export
+convertMSFilesAnaInfo <- function(anaInfo, typeFrom = "raw", typeTo = "centroid", formatFrom, formatTo = "mzML",
+                                  overWrite = FALSE, algorithm = "pwiz", centroidVendor = TRUE, filters = NULL,
+                                  extraOpts = NULL, PWizBatchSize = 1)
+{
+    validFromTypes <- switch(algorithm,
+                             pwiz = getMSFileTypes(),
+                             openms = c("centroid", "profile"),
+                             bruker = "raw")
+    validToTypes <- switch(algorithm,
+                           pwiz = c("ims", "profile", "centroid"),
+                           openms = c("centroid", "profile"),
+                           bruker = c("centroid", "profile"))
+    
+    ac <- checkmate::makeAssertCollection()
+    assertConvertMSFilesArgs(formatFrom, formatTo, overWrite, algorithm, filters, extraOpts, PWizBatchSize, add = ac)
+    checkmate::assertChoice(typeFrom, validFromTypes, add = ac)
+    checkmate::assertChoice(typeTo, validToTypes, add = ac)
+    checkmate::assertFlag(centroidVendor, add = ac)
+    checkmate::reportAssertions(ac)
+
+    anaInfo <- assertAndPrepareAnaInfo(anaInfo, typeFrom, formatFrom)
+    
+    outPath <- getPathsFromAnaInfo(anaInfo, typeTo)
+    if (is.null(outPath) || anyNA(outPath) || any(!nzchar(outPath)))
+        stop("Please properly configure the analysis info for the output type ", typeTo, call. = FALSE)
+    
+    files <- getMSFilesFromAnaInfo(anaInfo, typeFrom, formatFrom)
+
+    centroid <- if (typeTo == "profile")
+        FALSE
+    else if (centroidVendor)
+        "vendor"
+    else
+        TRUE
+    
+    IMS <- formatFrom %in% c("agilent_ims", "bruker_ims")
+    if (IMS)
+    {
+        if (typeTo == "profile")
+            stop("Converting IMS data to profile data is not supported.", call. = FALSE)
+        if (typeTo == "centroid")
+            IMS <- NA
+    }
+    
+    convertMSFilePaths(files, outPath, dirs = FALSE, formatFrom = formatFrom, formatTo = formatTo,
+                       overWrite = overWrite, algorithm = algorithm, centroid = centroid, IMS = IMS, filters = filters,
+                       extraOpts = extraOpts, PWizBatchSize = PWizBatchSize)
 }

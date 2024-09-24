@@ -5,8 +5,9 @@ MSFileExtensions <- function()
 {
     list(thermo = "raw",
          bruker = "d",
-         bruker_tims = "d",
+         bruker_ims = "d",
          agilent = "d",
+         agilent_ims = "d",
          ab = "wiff",
          waters = "raw",
          mzXML = "mzXML",
@@ -29,14 +30,16 @@ verifyFileForFormat <- function(path, format)
     {
         if (format == "agilent" && file.exists(file.path(path, "AcqData")))
             return(TRUE)
+        if (format == "agilent_ims" && file.exists(file.path(path, "AcqData")))
+            return(TRUE) # UNDONE: more checks?
         if (format == "bruker" && file.exists(file.path(path, "analysis.baf")))
             return(TRUE)
-        if (format == "bruker_tims" && file.exists(file.path(path, "analysis.tdf")))
+        if (format == "bruker_ims" && file.exists(file.path(path, "analysis.tdf")))
             return(TRUE)
         if (format == "waters")
             return(TRUE) # UNDONE: also more checks?
     }
-    return(!isDir && !format %in% c("agilent", "bruker", "bruker_tims", "waters"))
+    return(!isDir && !format %in% c("agilent", "agilent_ims", "bruker", "bruker_ims", "waters"))
 }
 
 filterMSFileDirs <- function(files, from)
@@ -114,6 +117,32 @@ getMSFilesFromAnaInfo <- function(anaInfo, types, formats, mustExist = TRUE)
                  paste0(types, collapse = ", "), paste0(unique(unlist(formats)), collapse = ", "),
                  paste0(anaInfo$analysis[missingAll], collapse = ", ")),
          call. = FALSE)
+}
+
+getAllMSFilesFromAnaInfo <- function(anaInfo, types, formats)
+{
+    if (!is.list(formats))
+    {
+        # formats can be a vector if only one type was specified (common scenario)
+        stopifnot(length(types) == 1)
+        formats <- list(formats)
+    }
+    
+    ret <- Map(types, formats, f = function(type, forms)
+    {
+        typePaths <- lapply(forms, function(f)
+        {
+            aip <- getPathsFromAnaInfo(anaInfo, type)
+            if (is.null(aip))
+                next
+            msFilePaths <- listMSFiles(aip, f)
+            msFilesNoExt <- tools::file_path_sans_ext(basename(msFilePaths))
+            found <- anaInfo$analysis %in% msFilesNoExt
+            return(msFilePaths[match(anaInfo$analysis[found], msFilesNoExt[found])])
+        })
+    })
+    
+    return(unique(unlist(ret)))
 }
 
 # shortcut for common case

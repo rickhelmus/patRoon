@@ -164,6 +164,9 @@ bool initBrukerLibrary(const std::string &path, bool force = false)
     try
     {
         setup_bruker(path);
+        // NOTE: this disables threading from TIMS-SDK, which otherwise seems to cause issues with the threading applied
+        // in patRoon
+        ThreadingManager::get_instance().set_opentims_threading();
         succeeded = true;
     }
     catch(const std::runtime_error &e)

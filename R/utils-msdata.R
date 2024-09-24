@@ -76,30 +76,43 @@ listMSFiles <- function(dirs, from)
 
 getPathsFromAnaInfo <- function(anaInfo, type) return(anaInfo[[paste0("path_", type)]])
 
-getMSFilesFromAnaInfo <- function(anaInfo, type, formats, mustExist = TRUE)
+getMSFilesFromAnaInfo <- function(anaInfo, types, formats, mustExist = TRUE)
 {
-    missing <- list()
-    
-    # go through allowed formats one by one: otherwise the resulting file types could be mixed, which might be unwanted(?)
-    for (form in formats)
+    if (!is.list(formats))
     {
-        aip <- getPathsFromAnaInfo(anaInfo, type)
-        if (is.null(aip))
-            next
-        msFilePaths <- listMSFiles(aip, form)
-        msFilesNoExt <- tools::file_path_sans_ext(basename(msFilePaths))
-        found <- anaInfo$analysis %in% msFilesNoExt
-        if (all(found)) # success!
-            return(msFilePaths[match(anaInfo$analysis, msFilesNoExt)])
-        missing[[form]] <- which(!found)
+        # formats can be a vector if only one type was specified (common scenario)
+        stopifnot(length(types) == 1)
+        formats <- list(formats)
+    }
+    
+    missing <- list()
+    for (i in seq_along(types))
+    {
+        # go through allowed formats one by one: otherwise the resulting file types could be mixed, which might be unwanted(?)
+        for (form in formats[[i]])
+        {
+            aip <- getPathsFromAnaInfo(anaInfo, types[i])
+            if (is.null(aip))
+            {
+                missing[[types[i]]][[form]] <- seq_along(anaInfo$analysis)
+                next
+            }
+            msFilePaths <- listMSFiles(aip, form)
+            msFilesNoExt <- tools::file_path_sans_ext(basename(msFilePaths))
+            found <- anaInfo$analysis %in% msFilesNoExt
+            if (all(found)) # success!
+                return(msFilePaths[match(anaInfo$analysis, msFilesNoExt)])
+            missing[[types[i]]][[form]] <- which(!found)
+        }
     }
 
     if (!mustExist)
         return(NULL)
-    
-    missingAll <- Reduce(intersect, missing)
-    stop(sprintf("The following analyses with type %s are not found with a correct data format (valid: %s): %s",
-                 type, paste0(formats, collapse = ", "), paste0(anaInfo$analysis[missingAll], collapse = ", ")),
+
+    missingAll <- Reduce(intersect, lapply(missing, Reduce, f = intersect))
+    stop(sprintf("The following analyses are not found with any valid type (%s) and/or data format (%s): %s",
+                 paste0(types, collapse = ", "), paste0(unique(unlist(formats)), collapse = ", "),
+                 paste0(anaInfo$analysis[missingAll], collapse = ", ")),
          call. = FALSE)
 }
 

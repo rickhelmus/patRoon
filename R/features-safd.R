@@ -128,7 +128,6 @@ findFeaturesSAFD <- function(analysisInfo, fileType = NULL, mzRange = c(0, 400),
     
     params <- list(takeCent, mzRange, maxNumbIter, maxTPeakW, resolution, minMSW, RThreshold, minInt,
                    sigIncThreshold, S2N, minPeakWS)
-    baseHash <- makeHash(params)
     
     if (verbose)
         printf("Finding features with SAFD for %d analyses ...\n", anaCount)

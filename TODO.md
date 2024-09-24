@@ -235,6 +235,16 @@
 - optionally link to MSTK depening on if it's available
 - SC: finish loading IMS metadata
 - MSTK: load polarities
+- FIX: loadIntensities() with 0 features seems to crash?
+- collapseIMSFiles(): see if this makes sense as an alternative to convertMSFiles()
+    - pros: doesn't need pwiz, slightly faster per file conversion (eg 23 vs 30 secs) and produces smaller files (eg ~180 vs 350 mb)
+    - cons: can't parallelize over multiple files, so probably not really faster, files are potentially with incomplete metadata
+    - could also use MSTK and/or SC for writing
+        - both need to write a bit more metadata (instrumentConfiguration and dataProcessing), as OpenMS fails otherwise
+        - best would be to do write spectra while reading, so we can do MP
+            - or skip MP and do complete batch in C++
+        - no support for mzXML
+    - initial tests of pwiz, mzR and MSTK show quite different numbers of OpenMS features...
 
 
 - test

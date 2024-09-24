@@ -232,23 +232,30 @@
     - see when we update/add similar raw data functions
 - clean old tims files
 - embed TIMS-SDK?
-- optionally link to MSTK depening on if it's available
+- optionally link to MSTK depending on if it's available
+- only enable OTIMS on Win/Lin x64
 - SC: finish loading IMS metadata
-- MSTK: load polarities
 - FIX: loadIntensities() with 0 features seems to crash?
 - collapseIMSFiles(): see if this makes sense as an alternative to convertMSFiles()
     - pros: doesn't need pwiz, slightly faster per file conversion (eg 23 vs 30 secs) and produces smaller files (eg ~180 vs 350 mb)
     - cons: can't parallelize over multiple files, so probably not really faster, files are potentially with incomplete metadata
     - could also use MSTK and/or SC for writing
         - both need to write a bit more metadata (instrumentConfiguration and dataProcessing), as OpenMS fails otherwise
+        - MSTK: load polarities
         - best would be to do write spectra while reading, so we can do MP
             - or skip MP and do complete batch in C++
         - no support for mzXML
     - initial tests of pwiz, mzR and MSTK show quite different numbers of OpenMS features...
-
+    - if we stick with convertMSFiles(), somehow recommend skipping MS2+gzip?
+- update generalteAnalysisInfo() and newProject()
+    - see if getAllMSFilesFromAnaInfo() can be used, otherwise remove it
+- convertMSFilesXXX()
+    - change function names?
+    - add option for zlib compression, and enable by default? Esp useful for IMS/profile data
+    
 
 - test
-    - new verifyFileForFormat() usage is convertMSFiles()
+    - new verifyFileForFormat() usage in convertMSFiles()
     - new spec averaging params
 
 - NEWS
@@ -259,11 +266,13 @@
     - (optimized getEICFGroupInfo() substantially)
     - loading OpenMS peak intensities is much faster, removed now unneeded intSearchRTWindow arg
     - getPICSet() isn't limited by centroided data anymore
+    - updated convertMSFilesXXX() functions, including changed args
 
 - docs
     - getMSFileFormats()
     - patRoon.MSBackends and patRoon.path.BrukerTIMS options
     - update PListParams
+    - updated convertMSFilesXXX() functions, including changed args
 
 ## IMS
 

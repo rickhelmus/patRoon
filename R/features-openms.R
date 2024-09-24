@@ -91,7 +91,7 @@ findFeaturesOpenMS <- function(analysisInfo, noiseThrInt = 1000, chromSNR = 3, c
                                extraOpts = NULL, useFFMIntensities = FALSE, verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
-    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, fileType = "centroid", allowedFormats = "mzML", add = ac)
+    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, fileTypes = "centroid", allowedFormats = "mzML", add = ac)
     aapply(checkmate::assertNumber, . ~ noiseThrInt + chromSNR + chromFWHM + mzPPM + minSampleRate +
                minTraceLength + minFWHM + maxFWHM + localRTRange + localMZRange,
            lower = 0, finite = TRUE, fixed = list(add = ac))

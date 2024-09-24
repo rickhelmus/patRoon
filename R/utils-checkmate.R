@@ -77,7 +77,7 @@ assertMSFileType <- function(x, null.ok = FALSE, .var.name = checkmate::vname(x)
     checkmate::assertChoice(x, getMSFileTypes(), null.ok = null.ok, .var.name = .var.name, add = add)
 }
 
-assertAnalysisInfo <- function(x, fileType = NULL, allowedFormats = NULL, null.ok = FALSE,
+assertAnalysisInfo <- function(x, fileTypes = NULL, allowedFormats = NULL, null.ok = FALSE,
                                .var.name = checkmate::vname(x), add = NULL)
 {
     if (is.null(x) && null.ok)
@@ -114,15 +114,13 @@ assertAnalysisInfo <- function(x, fileType = NULL, allowedFormats = NULL, null.o
     # NOTE: this is only applicable if add != NULL, otherwise previous assertions will throw errors
     if (is.null(add) || length(add$getMessages()) == mc)
     {
-        if (!is.null(fileType))
+        if (!is.null(fileTypes))
         {
-            checkmate::assertDirectoryExists(getPathsFromAnaInfo(x, fileType), .var.name = .var.name, add = add)
-            
             if (is.null(allowedFormats))
-                allowedFormats <- getMSFileFormats(fileType)
+                allowedFormats <- lapply(fileTypes, getMSFileFormats)
             
             # stops if files are missing
-            getMSFilesFromAnaInfo(x, fileType, allowedFormats, mustExist = TRUE)
+            getMSFilesFromAnaInfo(x, fileTypes, allowedFormats, mustExist = TRUE)
         }
 
         checkmate::assertVector(x$analysis, unique = TRUE, .var.name = paste0(.var.name, "$analysis"), add = add)

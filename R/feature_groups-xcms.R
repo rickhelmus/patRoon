@@ -196,7 +196,7 @@ importFeatureGroupsXCMS <- function(xs, analysisInfo)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(xs, "xcmsSet", add = ac)
-    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, fileType = "centroid", add = ac)
+    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, fileTypes = "centroid", add = ac)
     checkmate::reportAssertions(ac)
 
     if (length(xcms::groups(xs)) == 0)

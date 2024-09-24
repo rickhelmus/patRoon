@@ -41,7 +41,7 @@ findFeaturesEnviPick <- function(analysisInfo, ..., parallel = TRUE, verbose = T
     checkPackage("enviPick", "blosloos/enviPick")
     
     ac <- checkmate::makeAssertCollection()
-    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, fileType = "centroid", allowedFormats = "mzXML")
+    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, fileTypes = "centroid", allowedFormats = "mzXML")
     aapply(checkmate::assertFlag, . ~ parallel + verbose, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
@@ -113,7 +113,7 @@ findFeaturesEnviPick <- function(analysisInfo, ..., parallel = TRUE, verbose = T
 importFeaturesEnviMass <- function(analysisInfo, enviProjPath)
 {
     ac <- checkmate::makeAssertCollection()
-    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, fileType = "centroid", allowedFormats = "mzXML", add = ac)
+    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, fileTypes = "centroid", allowedFormats = "mzXML", add = ac)
     checkmate::assertDirectoryExists(enviProjPath, "r", add = ac)
     checkmate::assertDirectoryExists(file.path(enviProjPath, "peaklist"), "r", .var.name = "enviProjPath", add = ac)
     checkmate::reportAssertions(ac)

@@ -191,7 +191,7 @@ importFeatureGroupsKPIC2 <- function(picsSetGrouped, analysisInfo)
     ac <- checkmate::makeAssertCollection()
     checkmate::assertList(picsSetGrouped, add = ac)
     checkmate::assertNames(names(picsSetGrouped), must.include = c("group.info", "peakmat", "picset"), add = ac)
-    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, fileType = "centroid", add = ac)
+    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, fileTypes = "centroid", add = ac)
     checkmate::reportAssertions(ac)
     
     feat <- importFeaturesKPIC2(picsSetGrouped$picset, analysisInfo)

@@ -47,7 +47,7 @@ exportDAFiles <- function(anaInfo, format = "mzML", exportLine = TRUE, outPath =
     .Deprecated("convertMSFiles")
 
     ac <- checkmate::makeAssertCollection()
-    anaInfo <- assertAndPrepareAnaInfo(anaInfo, fileType = "raw", allowedFormats = "bruker", add = ac)
+    anaInfo <- assertAndPrepareAnaInfo(anaInfo, fileTypes = "raw", allowedFormats = "bruker", add = ac)
     checkmate::assertChoice(format, c("mzML", "mzXML", "mzData"), add = ac)
     checkmate::assertFlag(exportLine, add = ac)
     checkmate::assertCharacter(outPath, min.chars = 1, min.len = 1, add = ac)

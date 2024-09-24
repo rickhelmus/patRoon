@@ -6,6 +6,8 @@
 #include "msdata-mstk.h"
 #include "spectrum-raw.h"
 
+#include "MzMLWriter.h"
+
 namespace {
 
 MSToolkit::MSReader getMSTKReader(void)
@@ -172,4 +174,34 @@ void MSReadBackendMSTK::generateSpecMetadata(void)
     }
 
     setSpecMetadata(std::move(meta));
+}
+
+void writeMS1SpectraMSTK(std::string path, const std::vector<SpectrumRaw> &spectra, const SpectrumRawMetadataMS &meta)
+{
+    MSToolkit::MzMLWriter writer;
+    
+    if (!writer.createMzML(const_cast<char *>(path.data())))
+        Rcpp::stop("Failed to create mzML file '%s'!", path.c_str());
+    
+    if (!writer.createList(true))
+        Rcpp::stop("Failed to create spectrum list for '%s'", path.c_str());
+    
+    for (size_t i=0; i<spectra.size(); ++i)
+    {
+        MSToolkit::Spectrum MSTKSpec;
+        
+        MSTKSpec.setRTime(meta.times[i] / 60.0); // NOTE: MSTK writes minutes
+        MSTKSpec.setMsLevel(1);
+        MSTKSpec.setScanWindow(0.0, 1000.0); // UNDONE: is this important? otherwise we need to add it to the metadata
+        
+        for (size_t j=0; j<spectra[i].size(); ++j)
+            MSTKSpec.add(spectra[i].getMZs()[j], spectra[i].getIntensities()[j]);
+        
+        if (!writer.writeSpectra(MSTKSpec))
+            Rcpp::stop("Failed to write spectrum for file '%s'!", path.c_str());
+    }
+    
+    writer.writeIndex();
+    writer.closeList();
+    writer.closeMzML();
 }

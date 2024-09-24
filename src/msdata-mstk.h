@@ -31,4 +31,6 @@ public:
 
 RCPP_EXPOSED_CLASS(MSReadBackendMSTK)
 
+void writeMS1SpectraMSTK(std::string path, const std::vector<SpectrumRaw> &spectra, const SpectrumRawMetadataMS &meta);
+    
 #endif

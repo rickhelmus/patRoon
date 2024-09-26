@@ -159,6 +159,24 @@ RCPP_MODULE(MSReadBackend)
     ;
 }
 
+MSReadBackendUnavailable::MSReadBackendUnavailable(const char *n)
+{
+    Rcpp::stop("Backend '%s' is not available!", n);
+}
+
+// [[Rcpp::export]]
+bool backendAvailable(const std::string &b)
+{
+    if (b == "mstoolkit")
+    {
+#ifndef WITH_MSTK
+        return false;
+#endif
+    }
+    
+    return true; // UNDONE: also need to check OTIMS
+}
+
 // [[Rcpp::export]]
 int walkSpectra(const MSReadBackend &backend)
 {
@@ -849,6 +867,7 @@ Rcpp::List collapseIMSFrames(const MSReadBackend &backend, SpectrumRawTypes::Mas
     return ret;
 }
 
+
 // [[Rcpp::export]]
 void testMS1Writer(const MSReadBackend &backend, const std::string &out, SpectrumRawTypes::Mass mzStart,
                    SpectrumRawTypes::Mass mzEnd, SpectrumRawTypes::Mobility mobilityStart,
@@ -856,6 +875,7 @@ void testMS1Writer(const MSReadBackend &backend, const std::string &out, Spectru
                    SpectrumRawTypes::PeakAbundance minAbundance, unsigned topMost,
                    SpectrumRawTypes::Intensity minIntensityIMS, SpectrumRawTypes::Intensity minIntensityPre)
 {
+#ifdef WITH_MSTK
     const auto clMethod = clustMethodFromStr(method);
     const auto filterP = SpectrumRawFilter()
         .setMinIntensity(minIntensityIMS)
@@ -881,5 +901,5 @@ void testMS1Writer(const MSReadBackend &backend, const std::string &out, Spectru
     const auto spectra = applyMSData<SpectrumRaw>(backend, SpectrumRawTypes::MSLevel::MS1, scanSels, sfunc)[0];
     
     writeMS1SpectraMSTK(out, spectra, specMeta);
+#endif
 }
-

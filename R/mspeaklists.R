@@ -872,6 +872,8 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRtWindo
     gNames <- names(fGroups)
     cacheDB <- openCacheDBScope()
     
+    printf("Loading all MS peak lists for %d feature groups and %d analyses...\n", length(fGroups),
+           length(analyses(fGroups)))
     featurePLs <- applyMSData(analysisInfo(fGroups), function(ana, path, backend)
     {
         baseHash <- makeHash(getMSDataFileHash(path), maxMSRtWindow, topMost, avgFeatParams)

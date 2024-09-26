@@ -113,13 +113,13 @@ template <typename NumType> std::vector<int> clusterNums(const std::vector<NumTy
             NumType binSum = 0;
             for (auto i : sortedNumInds)
             {
-                if (curBinSize == 0 || (nums[i] - (binSum / static_cast<NumType>(curBinSize))) > window)
+                if (curBinSize > 0 && (nums[i] - (binSum / static_cast<NumType>(curBinSize))) > window)
                 {
-                    if (curBinSize > 0)
-                        ++curCluster;
-                    curBinSize = 1;
-                    binSum = nums[i];
+                    ++curCluster;
+                    curBinSize = 0;
+                    binSum = 0;
                 }
+                
                 ret[i] = curCluster;
                 binSum += nums[i];
                 ++curBinSize;

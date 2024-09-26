@@ -816,9 +816,8 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRtWindo
     assertAvgPListParams(avgFGroupParams, add = ac)
     checkmate::reportAssertions(ac)
 
-    # UNDONE: how to set algorithm slot?
     if (length(fGroups) == 0)
-        return(MSPeakLists(algorithm = "internal"))
+        return(MSPeakLists(algorithm = "patroon"))
     
     # UNDONE!!
     if (avgFeatParams$method == "distance")
@@ -920,7 +919,7 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRtWindo
     })
     
     return(MSPeakLists(peakLists = featurePLs, metadata = list(), avgPeakListArgs = avgFGroupParams,
-                       origFGNames = gNames, algorithm = "internal"))
+                       origFGNames = gNames, algorithm = "patroon"))
 })
 
 #' @rdname generateMSPeakLists

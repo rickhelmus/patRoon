@@ -1903,7 +1903,7 @@ void sc::mzml::MZML::write_spectra(
 
     if (new_file_path == file_path) return;
     
-    if (std::filesystem::exists(new_file_path)) std::filesystem::remove(new_file_path);
+    //if (std::filesystem::exists(new_file_path)) std::filesystem::remove(new_file_path);
 
     doc.save_file(new_file_path.c_str());
   }

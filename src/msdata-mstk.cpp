@@ -6,7 +6,7 @@
 #include "msdata-mstk.h"
 #include "spectrum-raw.h"
 
-#include "MzMLWriter.h"
+#include "mzMLWriter.h"
 
 namespace {
 

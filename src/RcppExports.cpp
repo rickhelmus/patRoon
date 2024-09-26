@@ -59,6 +59,17 @@ RcppExport SEXP _patRoon_initBrukerLibrary(SEXP pathSEXP, SEXP forceSEXP) {
     UNPROTECT(1);
     return rcpp_result_gen;
 }
+// backendAvailable
+bool backendAvailable(const std::string& b);
+RcppExport SEXP _patRoon_backendAvailable(SEXP bSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::string& >::type b(bSEXP);
+    rcpp_result_gen = Rcpp::wrap(backendAvailable(b));
+    return rcpp_result_gen;
+END_RCPP
+}
 // walkSpectra
 int walkSpectra(const MSReadBackend& backend);
 RcppExport SEXP _patRoon_walkSpectra(SEXP backendSEXP) {
@@ -666,6 +677,7 @@ RcppExport SEXP _rcpp_module_boot_MSReadBackend();
 static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_writeChromsToMzML", (DL_FUNC) &_patRoon_writeChromsToMzML, 2},
     {"_patRoon_initBrukerLibrary", (DL_FUNC) &_patRoon_initBrukerLibrary, 2},
+    {"_patRoon_backendAvailable", (DL_FUNC) &_patRoon_backendAvailable, 1},
     {"_patRoon_walkSpectra", (DL_FUNC) &_patRoon_walkSpectra, 1},
     {"_patRoon_getMSSpectrum", (DL_FUNC) &_patRoon_getMSSpectrum, 4},
     {"_patRoon_getScans", (DL_FUNC) &_patRoon_getScans, 5},

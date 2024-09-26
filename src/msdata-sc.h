@@ -3,10 +3,6 @@
 
 #include <Rcpp.h>
 
-#define PUGIXML_PATH "../pugixml/pugixml.hpp"
-#include "StreamCraft/StreamCraft_mzml.hpp"
-#undef PUGIXML_PATH
-
 #include "msdata.h"
 
 class MSReadBackendSC: public MSReadBackend

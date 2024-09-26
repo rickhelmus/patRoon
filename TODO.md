@@ -214,7 +214,6 @@
     - remove now unused avgParams (eg averaging func)
     - more extensively test filters/summing/averaging
     - support withPrecursor in old DA/mzR algos?
-    - make methods for generateMSPeakLists(), including for sets
     - settle on "diff" vs "distance" for averaging method
     - check defaults for new averaging params
     - get fully rid of precursorMzWindow and update NEWS/docs
@@ -266,12 +265,15 @@
     - loading OpenMS peak intensities is much faster, removed now unneeded intSearchRTWindow arg
     - getPICSet() isn't limited by centroided data anymore
     - updated convertMSFilesXXX() functions, including changed args
+    - generateMSPeakLists()
+        - now uses backends, old methods still available but deprecated
 
 - docs
     - getMSFileFormats()
     - patRoon.MSBackends and patRoon.path.BrukerTIMS options
     - update PListParams
     - updated convertMSFilesXXX() functions, including changed args
+    - update generateMSPeakLists()
 
 ## IMS
 

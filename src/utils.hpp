@@ -87,7 +87,7 @@ template <typename NumType> std::vector<int> clusterNums(const std::vector<NumTy
     if (nums.size() < 2)
         return ret; // no need to assign any clusters (for size==1 a one sized vector with value 0 will be returned)
     
-    if (method == clusterMethod::BIN || method == clusterMethod::DIFF)
+    if (method == clusterMethod::BIN || method == clusterMethod::DISTANCE)
     {
         const auto sortedNumInds = getSortedInds(nums);
         
@@ -107,7 +107,7 @@ template <typename NumType> std::vector<int> clusterNums(const std::vector<NumTy
                 ret[i] = curCluster;
             }
         }
-        else // clusterMethod::DIFF
+        else // clusterMethod::DISTANCE
         {
             int curBinSize = 0;
             NumType binSum = 0;

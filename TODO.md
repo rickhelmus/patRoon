@@ -214,7 +214,6 @@
     - remove now unused avgParams (eg averaging func)
     - more extensively test filters/summing/averaging
     - support withPrecursor in old DA/mzR algos?
-    - settle on "diff" vs "distance" for averaging method
     - check defaults for new averaging params
     - get fully rid of precursorMzWindow and update NEWS/docs
     - withPrecursor: now only applied prior to other filtering systems, change?

@@ -206,23 +206,22 @@
     - meatadata: scans, RTs, mobilities
     - spectra: m/z, mobilities (see if this can be used to speedup eg MSTK)
 - don't make open() required for memory backend (eg check flag instead of non-empty file in close())
-- SC: also load mzXML
 - further verify if applyMSData() picks up the right backend/file format when types/formats are set
 - make backend functions to test if mobility is sorted and which direction, so eg EICs and readSpectrum methods can optimize
 - MSPL
     - add mobility column?
     - remove now unused avgParams (eg averaging func)
     - more extensively test filters/summing/averaging
-    - support withPrecursor in old DA/mzR algos?
     - check defaults for new averaging params
-    - get fully rid of precursorMzWindow and update NEWS/docs
+    - get fully rid of precursorMzWindow (eg newProject()) and update NEWS/docs
     - withPrecursor: now only applied prior to other filtering systems, change?
         - if yes: adjust R and C++ code
         - doc in any case
     - further test bbCID data
         - also mixed bbCID/PASEF file (ie with different segments)
+    - move old MSPL generators to deprecate.R and add notifications
 - anaInfo / file path retrieval
-    - update convertMSFiles() and newProject()
+    - update newProject()
 - the default backends now put mzR as last to ensure mobility data can be used, change this somehow?
 - getEICs()
     - switch to anaInfo param (or optional?), otherwise add file type arg

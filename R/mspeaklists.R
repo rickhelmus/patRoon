@@ -808,22 +808,9 @@ setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupNa
 #' @templateVar what generateMSPeakLists
 #' @template main-rd-method
 #' @export
-setMethod("generateMSPeakLists", "featureGroups", function(fGroups, algorithm, ...)
-{
-    checkmate::assertChoice(algorithm, c("bruker", "brukerfmf", "mzr"))
-    
-    f <- switch(algorithm,
-                bruker = generateMSPeakListsDA,
-                brukerfmf = generateMSPeakListsDAFMF,
-                mzr = generateMSPeakListsMzR)
-
-    f(fGroups, ...)
-})
-
-# UNDONE: this will replace generateMSPeakLists()
-# UNDONE: how to set algorithm slot?
-generateMSPeakListsNew <- function(fGroups, maxMSRtWindow = 5, topMost = NULL, avgFeatParams = getDefAvgPListParams(),
-                                   avgFGroupParams = getDefAvgPListParams())
+setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRtWindow = 5, topMost = NULL,
+                                                           avgFeatParams = getDefAvgPListParams(),
+                                                           avgFGroupParams = getDefAvgPListParams())
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertNumber(maxMSRtWindow, lower = 1, finite = TRUE, null.ok = TRUE, add = ac)
@@ -832,6 +819,7 @@ generateMSPeakListsNew <- function(fGroups, maxMSRtWindow = 5, topMost = NULL, a
     assertAvgPListParams(avgFGroupParams, add = ac)
     checkmate::reportAssertions(ac)
 
+    # UNDONE: how to set algorithm slot?
     if (length(fGroups) == 0)
         return(MSPeakLists(algorithm = "internal"))
     
@@ -934,4 +922,11 @@ generateMSPeakListsNew <- function(fGroups, maxMSRtWindow = 5, topMost = NULL, a
     
     return(MSPeakLists(peakLists = featurePLs, metadata = list(), avgPeakListArgs = avgFGroupParams,
                        origFGNames = gNames, algorithm = "internal"))
-}
+})
+
+#' @rdname generateMSPeakLists
+#' @export
+setMethod("generateMSPeakLists", "featureGroupsSet", function(fGroups, ...)
+{
+    generateMSPeakListsSet(fGroups, generateMSPeakLists, ...)
+})

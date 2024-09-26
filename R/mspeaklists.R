@@ -137,7 +137,7 @@ setMethod("averageMSPeakLists", "MSPeakLists", function(obj)
             return(setNames(averageSpectraList(allPL, ...), gNames))
         }
         
-        allMSPLMSAvg <- doAvg("mode", obj@avgPeakListArgs$clusterMzWindow, obj@avgPeakListArgs$topMost,
+        allMSPLMSAvg <- doAvg("MS", obj@avgPeakListArgs$clusterMzWindow, obj@avgPeakListArgs$topMost,
                               obj@avgPeakListArgs$minIntensityPre, obj@avgPeakListArgs$minIntensityPost,
                               obj@avgPeakListArgs$minAbundance, obj@avgPeakListArgs$method, TRUE,
                               obj@avgPeakListArgs$withPrecursorMS, obj@avgPeakListArgs$pruneMissingPrecursorMS, TRUE)
@@ -146,7 +146,7 @@ setMethod("averageMSPeakLists", "MSPeakLists", function(obj)
                                 obj@avgPeakListArgs$minIntensityPre, obj@avgPeakListArgs$minIntensityPost,
                                 obj@avgPeakListArgs$minAbundance, obj@avgPeakListArgs$method, TRUE, FALSE, FALSE,
                                 obj@avgPeakListArgs$retainPrecursorMSMS)
-        
+
         avgPLists <- sapply(gNames, function(grp)
         {
             if (!any(allMSPLMSAvg[[grp]]$precursor) && nrow(allMSPLMSAvg[[grp]]) > 0)
@@ -825,7 +825,7 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRtWindo
     avgFeatParamsMS <- avgFeatParamsMSMS <-
         avgFeatParams[setdiff(names(avgFeatParams), c("withPrecursorMS", "pruneMissingPrecursorMS", "retainPrecursorMSMS"))]
     avgFeatParamsMS$withPrecursor <- avgFeatParams$withPrecursorMS
-    avgFeatParamsMS$retainPrecursor <- TRUE;
+    avgFeatParamsMS$retainPrecursor <- TRUE
     avgFeatParamsMS$pruneMissingPrecursor <- avgFeatParams$pruneMissingPrecursorMS
     avgFeatParamsMSMS$withPrecursor <- FALSE
     avgFeatParamsMSMS$pruneMissingPrecursor <- FALSE

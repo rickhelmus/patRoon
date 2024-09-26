@@ -228,7 +228,7 @@
     - allow multiple files?
     - see when we update/add similar raw data functions
 - clean old tims files
-- embed TIMS-SDK?
+- embed TIMS-SDK? --> in patRoonExt
 - optionally link to MSTK depending on if it's available
 - only enable OTIMS on Win/Lin x64
 - collapseIMSFiles(): see if this makes sense as an alternative to convertMSFiles()
@@ -242,7 +242,7 @@
         - no support for mzXML
     - initial tests of pwiz, mzR and MSTK show quite different numbers of OpenMS features...
     - if we stick with convertMSFiles(), somehow recommend skipping MS2+gzip?
-- update generalteAnalysisInfo() and newProject()
+- update generateAnalysisInfo() and newProject()
     - see if getAllMSFilesFromAnaInfo() can be used, otherwise remove it
 - convertMSFilesXXX()
     - change function names?

@@ -1,6 +1,8 @@
 #ifndef PATROON_MSTK_H
 #define PATROON_MSTK_H
 
+#ifdef WITH_MSTK
+
 #include <Rcpp.h>
 
 #include "MSToolkitTypes.h"
@@ -29,8 +31,24 @@ public:
     int getBackends(void) const { return backends; }
 };
 
+void writeMS1SpectraMSTK(std::string path, const std::vector<SpectrumRaw> &spectra, const SpectrumRawMetadataMS &meta);
+
+#else
+
+#include "msdata.h"
+
+class MSReadBackendMSTK: public MSReadBackendUnavailable
+{
+public:
+    MSReadBackendMSTK(void) : MSReadBackendUnavailable("mstoolkit") { }
+    ~MSReadBackendMSTK(void) { }
+    void generateSpecMetadata(void) { };
+    int getBackends(void) const { return 0; }
+};
+
+#endif // WITH_MSTK
+
 RCPP_EXPOSED_CLASS(MSReadBackendMSTK)
 
-void writeMS1SpectraMSTK(std::string path, const std::vector<SpectrumRaw> &spectra, const SpectrumRawMetadataMS &meta);
-    
+
 #endif

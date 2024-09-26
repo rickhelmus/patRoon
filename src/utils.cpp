@@ -80,8 +80,8 @@ clusterMethod clustMethodFromStr(const std::string &str)
 {
     if (str == "bin")
         return clusterMethod::BIN;
-    else if (str == "diff")
-        return clusterMethod::DIFF;
+    else if (str == "distance")
+        return clusterMethod::DISTANCE;
     else if (str == "hclust")
         return clusterMethod::HCLUST;
     

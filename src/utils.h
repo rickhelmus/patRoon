@@ -27,7 +27,7 @@ bool numberLTE(double x, double y, double tol = 1E-8);
 bool numberGTE(double x, double y, double tol = 1E-8);
 void normalizeNums(std::vector<double> &v);
 
-enum class clusterMethod { BIN, DIFF, HCLUST };
+enum class clusterMethod { BIN, DISTANCE, HCLUST };
 clusterMethod clustMethodFromStr(const std::string &str);
 
 #include "utils.hpp"

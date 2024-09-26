@@ -822,10 +822,6 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRtWindo
     if (length(fGroups) == 0)
         return(MSPeakLists(algorithm = "patroon"))
     
-    # UNDONE!!
-    if (avgFeatParams$method == "distance")
-        avgFeatParams$method = "diff"
-    
     avgFeatParamsMS <- avgFeatParamsMSMS <-
         avgFeatParams[setdiff(names(avgFeatParams), c("withPrecursorMS", "pruneMissingPrecursorMS", "retainPrecursorMSMS"))]
     avgFeatParamsMS$withPrecursor <- avgFeatParams$withPrecursorMS

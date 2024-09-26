@@ -235,7 +235,6 @@
 - optionally link to MSTK depending on if it's available
 - only enable OTIMS on Win/Lin x64
 - SC: finish loading IMS metadata
-- FIX: loadIntensities() with 0 features seems to crash?
 - collapseIMSFiles(): see if this makes sense as an alternative to convertMSFiles()
     - pros: doesn't need pwiz, slightly faster per file conversion (eg 23 vs 30 secs) and produces smaller files (eg ~180 vs 350 mb)
     - cons: can't parallelize over multiple files, so probably not really faster, files are potentially with incomplete metadata

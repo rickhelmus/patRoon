@@ -225,23 +225,21 @@ loadIntensities <- function(anaInfo, fList, verbose)
 {
     applyMSData(anaInfo, fList, types = "centroid", formats = "mzML", func = function(ana, path, backend, fTab)
     {
-        if (nrow(fTab) == 0)
-        {
-            fTab[, intensity := numeric()]
-            return(fTab)
-        }
-        
         fTab <- copy(fTab)
-        
-        hash <- makeHash(fTab)
-        cd <- loadCacheData("loadIntensities", hash)
-        if (!is.null(cd))
-            fTab[, intensity := cd]
+        if (nrow(fTab) == 0)
+            fTab[, intensity := numeric()]
         else
         {
-            openMSReadBackend(backend, path)
-            fTab[, intensity := getPeakIntensities(backend, fTab$mzmin, fTab$mzmax, fTab$ret)]
-            saveCacheData("loadIntensities", fTab$intensity, hash)
+            hash <- makeHash(fTab)
+            cd <- loadCacheData("loadIntensities", hash)
+            if (!is.null(cd))
+                fTab[, intensity := cd]
+            else
+            {
+                openMSReadBackend(backend, path)
+                fTab[, intensity := getPeakIntensities(backend, fTab$mzmin, fTab$mzmax, fTab$ret)]
+                saveCacheData("loadIntensities", fTab$intensity, hash)
+            }
         }
         
         if (verbose)

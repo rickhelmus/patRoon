@@ -161,7 +161,7 @@ saveCacheDataList <- function(category, dataList, hashes, dbArg = NULL)
         
         for (i in seq_along(dataList))
         {
-            data <- data.frame(d = I(list(fst::compress_fst(serialize(dataList[i], NULL, xdr = FALSE)))))
+            data <- data.frame(d = I(list(fst::compress_fst(serialize(dataList[[i]], NULL, xdr = FALSE)))))
             
             # From https://stackoverflow.com/a/7353236: update if already exists, otherwise insert
             DBI::dbExecute(db, sprintf("INSERT OR IGNORE INTO %s VALUES ('%s', :d)", category, hashes[i]), params = data)

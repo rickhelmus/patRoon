@@ -1,3 +1,5 @@
+#ifdef WITH_MSTK
+
 #include <Rcpp.h>
 #include <iostream>
 #include <iomanip>
@@ -205,3 +207,5 @@ void writeMS1SpectraMSTK(std::string path, const std::vector<SpectrumRaw> &spect
     writer.closeList();
     writer.closeMzML();
 }
+
+#endif // WITH_MSTK

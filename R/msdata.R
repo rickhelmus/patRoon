@@ -220,6 +220,9 @@ applyMSData <- function(anaInfo, func,  ..., types = getMSFileTypes(), formats =
     
     for (bn in backends)
     {
+        if (!backendAvailable(bn))
+            next
+        
         filePaths <- switch(bn,
                             opentims = maybeGetMSFilesForOTIMS(anaInfo, types, formats),
                             mzr = maybeGetMSFilesForMzR(anaInfo, types, formats),

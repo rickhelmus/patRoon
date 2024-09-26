@@ -42,4 +42,17 @@ public:
 
 RCPP_EXPOSED_CLASS(MSReadBackend)
 
+class MSReadBackendUnavailable: MSReadBackend
+{
+    void doOpen(const std::string &) override { }
+    void doClose(void) override { }
+    ThreadDataType doGetThreadData(void) const override { return nullptr; };
+    SpectrumRaw doReadSpectrum(const ThreadDataType &, SpectrumRawTypes::MSLevel, const SpectrumRawSelection &,
+                               const SpectrumRawTypes::MobilityRange &) const override { return SpectrumRaw(); };
+    
+public:
+    MSReadBackendUnavailable(const char *n);
+    ~MSReadBackendUnavailable(void) { }
+};
+
 #endif

@@ -26,3 +26,4 @@
 !LICENSE
 !README.md
 !_pkgdown.yaml
+!tools/build_flags.R

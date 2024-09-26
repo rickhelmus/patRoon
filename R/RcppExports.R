@@ -9,6 +9,10 @@ initBrukerLibrary <- function(path, force = FALSE) {
     .Call(`_patRoon_initBrukerLibrary`, path, force)
 }
 
+backendAvailable <- function(b) {
+    .Call(`_patRoon_backendAvailable`, b)
+}
+
 walkSpectra <- function(backend) {
     .Call(`_patRoon_walkSpectra`, backend)
 }

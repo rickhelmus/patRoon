@@ -230,6 +230,7 @@
 - clean old tims files
 - embed TIMS-SDK? --> in patRoonExt
 - optionally link to MSTK depending on if it's available
+    - somehow clearly state if unavailable during installation
 - only enable OTIMS on Win/Lin x64
 - collapseIMSFiles(): see if this makes sense as an alternative to convertMSFiles()
     - pros: doesn't need pwiz, slightly faster per file conversion (eg 23 vs 30 secs) and produces smaller files (eg ~180 vs 350 mb)

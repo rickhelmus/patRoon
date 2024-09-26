@@ -78,6 +78,8 @@ void MSReadBackendSC::generateSpecMetadata(void)
     sc::MS_ANALYSIS analysis(getCurrentFile());
     const auto hd = analysis.get_spectra_headers();
     
+    const bool hasMob = analysis.has_ion_mobility();
+    
     SpectrumRawMetadata meta;
     for (size_t i=0; i<hd.index.size(); ++i)
     {
@@ -93,8 +95,33 @@ void MSReadBackendSC::generateSpecMetadata(void)
         
         if (!isMS1)
         {
-            const SpectrumRawTypes::Mass l = hd.precursor_mz[i] - hd.window_mzlow[i], h = hd.precursor_mz[i] + hd.window_mzhigh[i];
-            meta.second.isolationRanges.emplace_back(l, h);
+            if (!hasMob)
+            {
+                const SpectrumRawTypes::Mass l = hd.precursor_mz[i] - hd.window_mzlow[i], h = hd.precursor_mz[i] + hd.window_mzhigh[i];
+                meta.second.isolationRanges.emplace_back(l, h);
+            }
+            else
+            {
+                // For IMS-MS/MS data, the different spectra inside a frame are stored in separate spectra
+                // --> move these spectra to MSMSFrames structs, so our main table only contains separate frames
+                frameMSMSInfo fi;
+                const auto curTime = hd.rt[i];
+                bool finished = false;
+                while (!finished)
+                {
+                    const SpectrumRawTypes::Mass l = hd.precursor_mz[i] - hd.window_mzlow[i], h = hd.precursor_mz[i] + hd.window_mzhigh[i];
+                    fi.isolationRanges.emplace_back(l, h);
+                    fi.subScans.push_back(hd.index[i]);
+                    ++i;
+                    if (i >= hd.index.size())
+                        break;
+                    if (!compareTol(curTime, hd.rt[i]))
+                        finished = true; // reached next frame
+                }
+                meta.second.MSMSFrames.push_back(std::move(fi));
+                if (finished)
+                    --i; // we reached one spec to far to find out we're finished
+            }
         }
     }
     

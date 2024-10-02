@@ -311,6 +311,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// parseFeatureMRMXMLFile
+Rcpp::DataFrame parseFeatureMRMXMLFile(Rcpp::CharacterVector file);
+RcppExport SEXP _patRoon_parseFeatureMRMXMLFile(SEXP fileSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type file(fileSEXP);
+    rcpp_result_gen = Rcpp::wrap(parseFeatureMRMXMLFile(file));
+    return rcpp_result_gen;
+END_RCPP
+}
 // parseFeatConsXMLFile
 Rcpp::List parseFeatConsXMLFile(Rcpp::CharacterVector file, Rcpp::IntegerVector anaCount);
 RcppExport SEXP _patRoon_parseFeatConsXMLFile(SEXP fileSEXP, SEXP anaCountSEXP) {
@@ -694,6 +705,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_readMoNAJSON", (DL_FUNC) &_patRoon_readMoNAJSON, 1},
     {"_patRoon_parseAdductConsXMLFile", (DL_FUNC) &_patRoon_parseAdductConsXMLFile, 1},
     {"_patRoon_parseFeatureXMLFile", (DL_FUNC) &_patRoon_parseFeatureXMLFile, 1},
+    {"_patRoon_parseFeatureMRMXMLFile", (DL_FUNC) &_patRoon_parseFeatureMRMXMLFile, 1},
     {"_patRoon_parseFeatConsXMLFile", (DL_FUNC) &_patRoon_parseFeatConsXMLFile, 2},
     {"_patRoon_writeFeatureXML", (DL_FUNC) &_patRoon_writeFeatureXML, 4},
     {"_patRoon_specDistMatrix", (DL_FUNC) &_patRoon_specDistMatrix, 7},

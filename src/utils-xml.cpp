@@ -19,24 +19,27 @@ void parseXMLFile(const char *file, const std::string &startTag,
 {
     std::ifstream ifs(file);
     std::string line, block;
-    bool inBlock = false;
+    unsigned tagCounter = 0; // use a counter to supported nested blocks
     
     while (std::getline(ifs, line))
     {
         trim(line);
         if (strStartsWith(line, startTag))
-            inBlock = true;
+            ++tagCounter;
         
-        if (inBlock)
+        if (tagCounter != 0)
             block += '\n' + line;
         
         if (line == endTag)
         {
-            pugi::xml_document doc;
-            doc.load_string(block.c_str());
-            func(doc);
-            inBlock = false;
-            block.clear();
+            --tagCounter;
+            if (tagCounter == 0)
+            {
+                pugi::xml_document doc;
+                doc.load_string(block.c_str());
+                func(doc);
+                block.clear();
+            }
         }
     }
 }

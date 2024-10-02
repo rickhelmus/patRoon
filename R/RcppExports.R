@@ -77,6 +77,10 @@ parseFeatureXMLFile <- function(file) {
     .Call(`_patRoon_parseFeatureXMLFile`, file)
 }
 
+parseFeatureMRMXMLFile <- function(file) {
+    .Call(`_patRoon_parseFeatureMRMXMLFile`, file)
+}
+
 parseFeatConsXMLFile <- function(file, anaCount) {
     .Call(`_patRoon_parseFeatConsXMLFile`, file, anaCount)
 }

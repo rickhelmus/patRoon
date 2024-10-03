@@ -7,8 +7,9 @@ getFlags <- function(what)
     {
         if (what == "PKG_CXXFLAGS")
             cat("-DWITH_MSTK ")
-        cat(Rmstoolkitlib::pkgconfig(what), sep = " ")
+        cat(Rmstoolkitlib::pkgconfig(what))
     }
-    else
-        cat("") # nothing special
+    # NOTE: the use of an underscore or dash for the CPU arch seems a bit random so just check for both
+    if (Sys.info()["machine"] %in% c("x86-64", "x86_64") && Sys.info()["sysname"] %in% c("Windows", "Linux"))
+        cat(" -DWITH_OTIMS")
 }

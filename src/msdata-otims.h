@@ -1,6 +1,8 @@
 #ifndef PATROON_OTIMS_H
 #define PATROON_OTIMS_H
 
+#ifdef WITH_OTIMS
+
 #include <Rcpp.h>
 
 #include "msdata.h"
@@ -19,6 +21,19 @@ class MSReadBackendOTIMS: public MSReadBackend
                                const SpectrumRawSelection &scanSel,
                                const SpectrumRawTypes::MobilityRange &mobRange) const override;
 };
+
+#else
+
+#include "msdata.h"
+
+class MSReadBackendOTIMS: public MSReadBackendUnavailable
+{
+public:
+    MSReadBackendOTIMS(void) : MSReadBackendUnavailable("opentims") { }
+    ~MSReadBackendOTIMS(void) { }
+};
+
+#endif // WITH_OTIMS
 
 RCPP_EXPOSED_CLASS(MSReadBackendOTIMS)
 

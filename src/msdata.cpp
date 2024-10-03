@@ -173,8 +173,14 @@ bool backendAvailable(const std::string &b)
         return false;
 #endif
     }
+    else if (b == "opentims")
+    {
+#ifndef WITH_OTIMS
+        return false;
+#endif
+    }
     
-    return true; // UNDONE: also need to check OTIMS
+    return true;
 }
 
 // [[Rcpp::export]]

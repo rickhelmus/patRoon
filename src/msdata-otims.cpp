@@ -1,7 +1,10 @@
+
 #include <Rcpp.h>
 
 #include "msdata-otims.h"
 #include "spectrum-raw.h"
+
+#ifdef WITH_OTIMS
 
 #include "opentims++/opentims_all.h"
 
@@ -152,9 +155,12 @@ SpectrumRaw MSReadBackendOTIMS::doReadSpectrum(const ThreadDataType &tdata, Spec
     return ret;
 }
 
+#endif // WITH_OTIMS
+
 // [[Rcpp::export]]
 bool initBrukerLibrary(const std::string &path, bool force = false)
 {
+#ifdef WITH_OTIMS
     static std::string lastPath;
     static bool succeeded = false;
     
@@ -179,4 +185,7 @@ bool initBrukerLibrary(const std::string &path, bool force = false)
     lastPath = path;
     
     return succeeded;
+#else
+    return false;
+#endif
 }

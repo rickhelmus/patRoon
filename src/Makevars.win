@@ -13,7 +13,7 @@ PKG_LIBS = $(SHLIB_OPENMP_CXXFLAGS)
 PKG_CXXFLAGS = $(SHLIB_OPENMP_CXXFLAGS)
 
 PKG_CXXFLAGS += $(shell echo 'source("../tools/build_flags.R"); getFlags("PKG_CXXFLAGS")' | "${R_HOME}/bin/R" --vanilla --slave)
-PKG_LIBS += $(shell echo 'source("../tools/build_flags.R"); getFlags' | "${R_HOME}/bin/R" --vanilla --slave)
+PKG_LIBS += $(shell echo 'source("../tools/build_flags.R"); getFlags("PKG_LIBS")' | "${R_HOME}/bin/R" --vanilla --slave)
 
 .PHONY: all clean inst
 

@@ -1,3 +1,5 @@
+#ifdef WITH_OTIMS
+
 #include <cstdint>
 #include <vector>
 
@@ -693,3 +695,5 @@ Rcpp::List collapseTIMSSpectra(const std::string &file, const std::vector<unsign
     }
     return ret;
 }
+
+#endif

@@ -143,7 +143,6 @@ Suggests:
 LinkingTo:
     Rcpp,
     rapidjsonr,
-    Rmstoolkitlib
 Config/Needs/pdeps:
     RDCOMClient,
     enviPick,

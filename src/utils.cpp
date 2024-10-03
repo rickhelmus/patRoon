@@ -13,6 +13,10 @@
 
 #include "utils.h"
 
+// HACK
+#include "hclust-cpp/fastcluster.cpp"
+
+
 // ---
 // Following three functions were taken from https://stackoverflow.com/a/217605
 

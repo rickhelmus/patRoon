@@ -153,7 +153,7 @@ getCentroidedMSFilesFromAnaInfo <- function(anaInfo, formats = c("mzML", "mzXML"
     getMSFilesFromAnaInfo(anaInfo, "centroid", formats, mustExist)
 }
 
-doGetEICs <- function(anaInfo, EICInfoList, cacheDB = NULL)
+doGetEICs <- function(anaInfo, EICInfoList, compress = TRUE, cacheDB = NULL)
 {
     # UNDONE: handle mobilities
     
@@ -165,7 +165,7 @@ doGetEICs <- function(anaInfo, EICInfoList, cacheDB = NULL)
         anaHash <- makeHash(getMSDataFileHash(path))
         
         # NOTE: subset columns here, so any additional columns from e.g. feature tables are not considered
-        hashes <- EICInfo[, makeHash(anaHash, .SD), by = seq_len(nrow(EICInfo)),
+        hashes <- EICInfo[, makeHash(anaHash, compress, .SD), by = seq_len(nrow(EICInfo)),
                           .SDcols = c("retmin", "retmax", "mzmin", "mzmax")][[2]]
         
         cachedData <- loadCacheData(category = "EICs", hashes, dbArg = cacheDB, simplify = FALSE)
@@ -184,7 +184,7 @@ doGetEICs <- function(anaInfo, EICInfoList, cacheDB = NULL)
         ToDo <- EICInfo[isCached == FALSE]
         openMSReadBackend(backend, path)
         EICs[!isCached] <- getEICList(backend, ToDo$mzmin, ToDo$mzmax, ToDo$retmin, ToDo$retmax, rep(0, nrow(ToDo)),
-                                      rep(0, nrow(ToDo)), TRUE)
+                                      rep(0, nrow(ToDo)), compress)
 
         saveCacheDataList("EICs", EICs[!isCached], hashes[!isCached], cacheDB)
         

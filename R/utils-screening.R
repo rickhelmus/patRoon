@@ -308,8 +308,8 @@ doGroupSuspects <- function(feat, groupFunc, ..., verbose = TRUE)
     sInfo[, d_rt := gInfo[group, "rts"] - rt]
     sInfo[, d_mz := gInfo[group, "mzs"] - mz]
     
-    return(featureGroupsScreening(screenInfo = sInfo, groups = gTable, groupInfo = gInfo, analysisInfo = anaInfo,
-                                  features = feat, ftindex = ftind))
+    return(featureGroupsScreening(screenInfo = sInfo, groups = gTable, groupInfo = gInfo, features = feat,
+                                  ftindex = ftind))
 }
 
 doSuspectFilter <- function(obj, onlyHits, selectHitsBy, selectBestFGroups, maxLevel, maxFormRank, maxCompRank,

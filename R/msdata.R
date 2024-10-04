@@ -210,6 +210,9 @@ setMethod("initMSReadBackend", "Rcpp_MSReadBackendMSTK", function(backend)
 
 openMSReadBackend <- function(backend, path)
 {
+    # UNDONE: set here? maybe elsewhere if we do OMP also for other C++ functionality
+    setOMPNumThreads(getOption("patRoon.threads", 1))
+    
     backend$open(path)
     backend <- initMSReadBackend(backend)
     return(backend)

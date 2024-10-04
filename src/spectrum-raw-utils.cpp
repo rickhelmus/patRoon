@@ -443,8 +443,7 @@ Rcpp::List doAverageSpectraList(Rcpp::List specsList, const std::string &method,
     }
     
     std::vector<SpectrumRawAveraged> averagedSpecList(entries);
-    // UNDONE: num threads
-    #pragma omp parallel for num_threads(12)
+    #pragma omp parallel for
     for (size_t i=0; i<entries; ++i)
         averagedSpecList[i] = averageSpectraRaw(allSpectra[i], clMethod, window, true, minIntensity, minAbundance);
 

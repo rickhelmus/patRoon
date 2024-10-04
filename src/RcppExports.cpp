@@ -678,6 +678,26 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// getOMPMaxNumThreads
+int getOMPMaxNumThreads();
+RcppExport SEXP _patRoon_getOMPMaxNumThreads() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(getOMPMaxNumThreads());
+    return rcpp_result_gen;
+END_RCPP
+}
+// setOMPNumThreads
+void setOMPNumThreads(int n);
+RcppExport SEXP _patRoon_setOMPNumThreads(SEXP nSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    setOMPNumThreads(n);
+    return R_NilValue;
+END_RCPP
+}
 
 // validate (ensure exported C++ functions exist before calling them)
 static int _patRoon_RcppExport_validate(const char* sig) { 
@@ -740,6 +760,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_calcSpecSimilarity", (DL_FUNC) &_patRoon_calcSpecSimilarity, 8},
     {"_patRoon_calcAnnSims", (DL_FUNC) &_patRoon_calcAnnSims, 6},
     {"_patRoon_addFilesToOpenMSIni", (DL_FUNC) &_patRoon_addFilesToOpenMSIni, 3},
+    {"_patRoon_getOMPMaxNumThreads", (DL_FUNC) &_patRoon_getOMPMaxNumThreads, 0},
+    {"_patRoon_setOMPNumThreads", (DL_FUNC) &_patRoon_setOMPNumThreads, 1},
     {"_rcpp_module_boot_MSReadBackend", (DL_FUNC) &_rcpp_module_boot_MSReadBackend, 0},
     {"_patRoon_RcppExport_registerCCallable", (DL_FUNC) &_patRoon_RcppExport_registerCCallable, 0},
     {NULL, NULL, 0}

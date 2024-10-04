@@ -1,3 +1,9 @@
+#include <Rcpp.h>
+
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
 #include <string>
 #include <algorithm>
 #include <cctype>
@@ -85,4 +91,31 @@ clusterMethod clustMethodFromStr(const std::string &str)
     
     Rcpp::stop("Unknown cluster method.");
     return clusterMethod::BIN; // avoid warning
+}
+
+int getOMPNumThreads()
+{
+#ifdef _OPENMP
+    return omp_get_num_threads();
+#else
+    return 1;
+#endif
+}
+
+// [[Rcpp::export]]
+int getOMPMaxNumThreads()
+{
+#ifdef _OPENMP
+    return omp_get_max_threads();
+#else
+    return 1;
+#endif
+}
+
+// [[Rcpp::export]]
+void setOMPNumThreads(int n)
+{
+#ifdef _OPENMP
+    omp_set_num_threads(n);
+#endif
 }

@@ -63,8 +63,7 @@ std::vector<std::vector<OutType>> applyMSData(const MSReadBackend &backend, Spec
     
     ThreadExceptionHandler exHandler;
 
-    // UNDONE: make num_threads configurable
-    #pragma omp parallel num_threads(12)
+    #pragma omp parallel
     {
         auto tdata = backend.getThreadData();
         #pragma omp for
@@ -200,7 +199,7 @@ int walkSpectra(const MSReadBackend &backend)
     
 #if 0
     size_t ret = 0;
-    #pragma omp parallel num_threads(12)
+    #pragma omp parallel
     {
         auto tdata = backend.getThreadData();
         #pragma omp for
@@ -625,7 +624,7 @@ Rcpp::List getMSPeakLists(const MSReadBackend &backend, const std::vector<Spectr
     const auto allSpectra = applyMSData<SpectrumRaw>(backend, MSLev, scanSels, sfunc);
     
     std::vector<SpectrumRawAveraged> averagedSpectra(entries);
-    #pragma omp parallel for num_threads(12)
+    #pragma omp parallel for
     for (size_t i=0; i<entries; ++i)
         averagedSpectra[i] = averageSpectraRaw(allSpectra[i], clMethod, mzWindow, true, minIntensityPost, minAbundance);
 
@@ -712,7 +711,7 @@ Rcpp::List getMobilograms(const MSReadBackend &backend, const std::vector<Spectr
 
     std::vector<EIM> averageEIMs(entries);
 
-    #pragma omp parallel for num_threads(12)
+    #pragma omp parallel for
     for (size_t i=0; i<entries; ++i)
     {
         EIM flatEIM;

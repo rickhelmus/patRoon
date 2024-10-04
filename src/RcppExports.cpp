@@ -13,14 +13,26 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// writeTraML
+void writeTraML(const std::vector<std::string>& IDs, const std::string& out);
+RcppExport SEXP _patRoon_writeTraML(SEXP IDsSEXP, SEXP outSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::vector<std::string>& >::type IDs(IDsSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type out(outSEXP);
+    writeTraML(IDs, out);
+    return R_NilValue;
+END_RCPP
+}
 // writeChromsToMzML
-void writeChromsToMzML(Rcpp::List EICs, const std::string& out);
-RcppExport SEXP _patRoon_writeChromsToMzML(SEXP EICsSEXP, SEXP outSEXP) {
+void writeChromsToMzML(Rcpp::List EICs, const std::vector<std::string>& IDs, const std::string& out);
+RcppExport SEXP _patRoon_writeChromsToMzML(SEXP EICsSEXP, SEXP IDsSEXP, SEXP outSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::List >::type EICs(EICsSEXP);
+    Rcpp::traits::input_parameter< const std::vector<std::string>& >::type IDs(IDsSEXP);
     Rcpp::traits::input_parameter< const std::string& >::type out(outSEXP);
-    writeChromsToMzML(EICs, out);
+    writeChromsToMzML(EICs, IDs, out);
     return R_NilValue;
 END_RCPP
 }
@@ -686,7 +698,8 @@ RcppExport SEXP _patRoon_RcppExport_registerCCallable() {
 RcppExport SEXP _rcpp_module_boot_MSReadBackend();
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_patRoon_writeChromsToMzML", (DL_FUNC) &_patRoon_writeChromsToMzML, 2},
+    {"_patRoon_writeTraML", (DL_FUNC) &_patRoon_writeTraML, 2},
+    {"_patRoon_writeChromsToMzML", (DL_FUNC) &_patRoon_writeChromsToMzML, 3},
     {"_patRoon_initBrukerLibrary", (DL_FUNC) &_patRoon_initBrukerLibrary, 2},
     {"_patRoon_backendAvailable", (DL_FUNC) &_patRoon_backendAvailable, 1},
     {"_patRoon_walkSpectra", (DL_FUNC) &_patRoon_walkSpectra, 1},

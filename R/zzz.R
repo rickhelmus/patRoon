@@ -7,7 +7,7 @@ defaultPkgOpts <- function(pkgname)
     ret <- list(cache.mode = "both",
                 checkCentroided = TRUE,
                 cache.fileName = "cache.sqlite",
-                MSBackends = c("opentims", "streamcraft", "mstoolkit", "mzr"),
+                MSBackends = getMSReadBackends(),
                 MP.method = "classic",
                 # backwards compat
                 MP.maxProcs = getOption("patRoon.maxProcAmount", parallel::detectCores(logical = FALSE)),

@@ -10,12 +10,6 @@
 #include <string>
 #include <vector>
 
-#ifdef _OPENMP
-#include <omp.h>
-inline int getOMPNumThreads(void) { return omp_get_num_threads(); }
-#else
-inline int getOMPNumThreads(void) { return 1; }
-#endif
 
 void ltrim(std::string &s);
 void rtrim(std::string &s);
@@ -29,6 +23,9 @@ void normalizeNums(std::vector<double> &v);
 
 enum class clusterMethod { BIN, DISTANCE, HCLUST };
 clusterMethod clustMethodFromStr(const std::string &str);
+
+int getOMPNumThreads(void);
+int getOMPMaxNumThreads(void);
 
 #include "utils.hpp"
 

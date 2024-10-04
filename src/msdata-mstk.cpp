@@ -97,8 +97,7 @@ void MSReadBackendMSTK::generateSpecMetadata(void)
     
     ThreadExceptionHandler exHandler;
     
-    // UNDONE: make num_threads configurable
-    #pragma omp parallel num_threads(12)
+    #pragma omp parallel
     {
         auto rd = getMSTKReader();
         MSToolkit::Spectrum spec;

@@ -201,7 +201,6 @@
 ## msdata
 
 - MT
-    - Function to set thread count used by patRoon and opentims
     - test ThreadExceptionHandler a bit more, eg if subsequent run calls cancels well if an exception is caught
 - cleanup
     - remove verifyDataCentroided()
@@ -229,8 +228,6 @@
         - doc in any case
     - further test bbCID data
         - also mixed bbCID/PASEF file (ie with different segments)
-- anaInfo / file path retrieval
-    - update newProject()
 - the default backends now put mzR as last to ensure mobility data can be used, change this somehow?
 - getEICs()
     - switch to anaInfo param (or optional?), otherwise add file type arg

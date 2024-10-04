@@ -169,6 +169,14 @@ addFilesToOpenMSIni <- function(file, inFiles, outFiles) {
     invisible(.Call(`_patRoon_addFilesToOpenMSIni`, file, inFiles, outFiles))
 }
 
+getOMPMaxNumThreads <- function() {
+    .Call(`_patRoon_getOMPMaxNumThreads`)
+}
+
+setOMPNumThreads <- function(n) {
+    invisible(.Call(`_patRoon_setOMPNumThreads`, n))
+}
+
 # Register entry points for exported C++ functions
 methods::setLoadAction(function(ns) {
     .Call(`_patRoon_RcppExport_registerCCallable`)

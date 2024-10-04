@@ -12,7 +12,7 @@ findPeaks <- function(EICs, algorithm, ..., verbose = TRUE)
     f(EICs, ..., verbose = verbose)
 }
 
-findPeaksOpenMS <- function(EICs, minRTDistance = 10, minNumPeaks = 5, minSNRatio = 2, resampleTraces = FALSE,
+findPeaksOpenMSOld <- function(EICs, minRTDistance = 10, minNumPeaks = 5, minSNRatio = 2, resampleTraces = FALSE,
                             extraOpts = NULL, smoothWidth = NULL, intSearchRTWindow = 3, scaleTimeFactor = NULL,
                             verbose = TRUE)
 {
@@ -97,6 +97,63 @@ findPeaksOpenMS <- function(EICs, minRTDistance = 10, minNumPeaks = 5, minSNRati
         return(p)
     })
     maybePrintf("Done!\n")
+    
+    return(peaksList)
+}
+
+findPeaksOpenMS <- function(EICs, extraOpts = NULL, scaleTimeFactor = NULL, verbose = TRUE)
+{
+    # UNDONE: more parameters, check what are sensible defaults
+    
+    # EICs should be a named list of data.tables
+    
+    # HACK HACK HACK: OpenMS errors if the time range is very small. For instance, this is a problem if IMS data is used
+    # with findMobilities() --> just increase the scale by scaleTimeFactor for now.
+    # UNDONE: do we still need this?
+    if (!is.null(scaleTimeFactor))
+    {
+        EICs <- lapply(EICs, function(eic) copy(eic)[, time := time * scaleTimeFactor])
+    }
+    
+    TraMLFile <- tempfile(fileext = ".TraML")
+    chromFile <- tempfile(fileext = ".mzML")
+    featsFile <- tempfile(fileext = ".featureXML")
+    
+    maybePrintf <- if (verbose) printf else function(...) NULL
+    
+    maybePrintf("Exporting EICs... ")
+    writeTraML(names(EICs), TraMLFile)
+    writeChromsToMzML(EICs, names(EICs), chromFile)
+    maybePrintf("Done!\n")
+    
+    maybePrintf("Finding peaks with OpenMS...\n-----------\n")
+    settings <- c("-in" = chromFile,
+                  "-tr" = TraMLFile,
+                  "-out" = featsFile)
+    if (!is.null(extraOpts))
+        settings <- modifyList(settings, extraOpts)
+    executeCommand(getExtDepPath("openms", "MRMTransitionGroupPicker", "OpenMS"), OpenMSArgListToOpts(settings),
+                   stdout = if (verbose) "" else FALSE)
+    maybePrintf("\n-----------\n")
+    
+    maybePrintf("Importing peaks... ")
+    peaks <- setDT(parseFeatureMRMXMLFile(featsFile))
+    maybePrintf("Done!\n")
+
+
+    peaks[, ID := NULL]
+    setnames(peaks, "chromID", "name")
+    setcolorder(peaks, c("name", "ret", "retmin", "retmax", "area", "intensity"))
+
+    if (!is.null(scaleTimeFactor))
+    {
+        peaks[, c("ret", "retmin", "retmax") := .(ret / scaleTimeFactor,
+                                                  retmin / scaleTimeFactor,
+                                                  retmax / scaleTimeFactor)]
+    }
+    
+    peaksList <- split(peaks, by = "name", keep.by = FALSE)
+    peaksList <- pruneList(peaksList, checkZeroRows = TRUE)
     
     return(peaksList)
 }

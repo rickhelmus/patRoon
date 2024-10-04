@@ -309,6 +309,8 @@
 - combine find/splitMobilities()?
 - Suspect features
     - XCMS/XCMS3/KPIC2: doc and/or default min fractions to zero as these probably don't make a lot of sense otherwise
+    - Handle mobilities
+        - Does the mobmin/mobmax range make sense how it is computed now?
 - Docs
     - mobilities slot in features
 

@@ -31,12 +31,9 @@ maybeGetMSFilesForMzR <- function(anaInfo, types, formats)
 
 maybeGetMSFilesForSC <- function(anaInfo, types, formats)
 {
-    if (!any(c("centroid", "ims") %in% types))
-        return(NULL)
-    
     # UNDONE: mechanism to prefer IM/centroided data
-    ret <- getMSFilesFromAnaInfo(anaInfo, "ims", "mzML", FALSE)
-    if (is.null(ret))
+    ret <- if ("ims" %in% types) getMSFilesFromAnaInfo(anaInfo, "ims", "mzML", FALSE)
+    if (is.null(ret) && "centroid" %in% types)
         ret <- getCentroidedMSFilesFromAnaInfo(anaInfo, formats = intersect(formats, c("mzML", "mzXML")),
                                                mustExist = FALSE)
     return(ret)
@@ -44,13 +41,9 @@ maybeGetMSFilesForSC <- function(anaInfo, types, formats)
 
 maybeGetMSFilesForMSTK <- function(anaInfo, types, formats)
 {
-    if (!any(c("centroid", "ims") %in% types))
-        return(NULL)
-    
     # UNDONE: mechanism to prefer IM/centroided data
-    # UNDONE: check if MSTK was compiled in
-    ret <- getMSFilesFromAnaInfo(anaInfo, "ims", "mzML", FALSE)
-    if (is.null(ret))
+    ret <- if ("ims" %in% types) getMSFilesFromAnaInfo(anaInfo, "ims", "mzML", FALSE)
+    if (is.null(ret) && "centroid" %in% types)
         ret <- getCentroidedMSFilesFromAnaInfo(anaInfo, formats = intersect(formats, c("mzML", "mzXML")),
                                                mustExist = FALSE)
     return(ret)

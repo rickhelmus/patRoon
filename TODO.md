@@ -200,27 +200,35 @@
 
 ## msdata
 
+- MT
+    - Function to set thread count used by patRoon and opentims
+    - test ThreadExceptionHandler a bit more, eg if subsequent run calls cancels well if an exception is caught
+- cleanup
+    - remove verifyDataCentroided()
+    - remove now unused avgParams (eg averaging func)
+    - get fully rid of precursorMzWindow (eg newProject()) and update NEWS/docs
+    - move old MSPL generators to deprecate.R and add notifications
+    - clean old tims files
+- OpenTIMS doesn't seem to want to initialize the Bruker libs sometimes when repeatedly calling devtools::load_all()
+    - forcing setup_bruker just before obtaining a handle seems to be a workaround
+    - for now just throw an error if it's not loaded, could try above aowrkaround if it seems to occur more frequently
 - replace makeFileHash() with getMSDataFileHash() on more places?
     - for now leave, but can be done when things appear slow
-- centroid checks
-    - perform in backends?
-    - remove verifyDataCentroided
+- perform centroid checks in backends?
 - Further test multithreading stability with OTIMS
 - check assumptions about data being sorted
     - meatadata: scans, RTs, mobilities
     - spectra: m/z, mobilities (see if this can be used to speedup eg MSTK)
 - MSPL
     - add mobility column?
-    - remove now unused avgParams (eg averaging func)
+    - store metadata?
     - more extensively test filters/summing/averaging
     - check defaults for new averaging params
-    - get fully rid of precursorMzWindow (eg newProject()) and update NEWS/docs
     - withPrecursor: now only applied prior to other filtering systems, change?
         - if yes: adjust R and C++ code
         - doc in any case
     - further test bbCID data
         - also mixed bbCID/PASEF file (ie with different segments)
-    - move old MSPL generators to deprecate.R and add notifications
 - anaInfo / file path retrieval
     - update newProject()
 - the default backends now put mzR as last to ensure mobility data can be used, change this somehow?
@@ -228,7 +236,6 @@
     - switch to anaInfo param (or optional?), otherwise add file type arg
     - allow multiple files?
     - see when we update/add similar raw data functions
-- clean old tims files
 - embed TIMS-SDK? --> in patRoonExt
 - optionally link to MSTK depending on if it's available
     - somehow clearly state if unavailable during installation
@@ -271,7 +278,7 @@
 
 - docs
     - getMSFileFormats()
-    - patRoon.MSBackends and patRoon.path.BrukerTIMS options
+    - patRoon.threads, patRoon.MSBackends and patRoon.path.BrukerTIMS options
     - update PListParams
     - updated convertMSFilesXXX() functions, including changed args
     - update generateMSPeakLists()
@@ -279,16 +286,6 @@
 
 ## IMS
 
-- MT
-    - Disable opentims threading when using OpenMP?
-    - Function to set thread count used by patRoon and opentims
-    - test ThreadExceptionHandler a bit more, eg if subsequent run calls cancels well if an exception is caught
-- get tims dll from options()
-- Streamline getBrukerAnalysisPath() with mz(X)ML versions (also for DA algos)
-- MSPL
-    - tweak getDefAvgPListParamsTIMS(), possibly merge with getDefAvgPListParams() and make/use arg assertion
-    - Does the PASEF isolation window needs to be halved to find ranges?
-    - store metadata?
 - findPeaks()
     - export? If yes, add checkmate's, documentation etc
     - add smoothing for XCMS3/enviPick? e.g. with signal::sgolayfilt()

@@ -27,6 +27,10 @@ using TIMSDecompBufferPair = decltype(getTIMSDecompBuffers(std::declval<size_t>(
 void MSReadBackendOTIMS::doOpen(const std::string &file)
 {
     handle = std::make_unique<TimsDataHandle>(file);
+    
+    if (handle->tof2mz_converter->description() != "BrukerTof2MzConverter" ||
+        handle->scan2inv_ion_mobility_converter->description() != "BrukerScan2InvIonMobilityConverter")
+        Rcpp::stop("Could not properly initialize OpenTIMS conversion functions. You may need to reload patRoon or restart R.");
 }
 
 void MSReadBackendOTIMS::doClose(void)
@@ -175,7 +179,7 @@ bool initBrukerLibrary(const std::string &path, bool force = false)
         ThreadingManager::get_instance().set_opentims_threading();
         succeeded = true;
     }
-    catch(const std::runtime_error &e)
+    catch(const std::exception &e)
     {
         if (lastPath != path) // only warn the first time
             Rcpp::warning("Failed to load Bruker TIMS library ('%s'): %s", path.c_str(), e.what());

@@ -77,30 +77,32 @@ std::vector<std::vector<OutType>> applyMSData(const MSReadBackend &backend, Spec
              * SpectrumRawSelection objects still differ (see above). We therefore keep track of the selection of the
              * previous set and if it differs perform a new spectrum read.
              * 
-             * UNDONE: this could be optmized further by also storing and re-using spectra before the previous selection set
+             * UNDONE: this could be optimized further by also storing and re-using spectra before the previous selection set
             */ 
             
-            SpectrumRaw curSpec;
-            SpectrumRawSelection curSel;
-            bool initSel = true;
-            
-            for (size_t j=0; j<entries; ++j)
-            {
-                const auto it = std::lower_bound(scanSels[j].begin(), scanSels[j].end(), selInd, selCompInd);
-                if (it == scanSels[j].end() || it->index != selInd)
-                    continue; // not found
+            exHandler.run([&] {
+                SpectrumRaw curSpec;
+                SpectrumRawSelection curSel;
+                bool initSel = true;
                 
-                if (initSel || curSel != *it)
+                for (size_t j=0; j<entries; ++j)
                 {
-                    initSel = false;
-                    curSel = *it;
-                    curSpec = backend.readSpectrum(tdata, MSLevel, curSel, SpectrumRawTypes::MobilityRange());
+                    const auto it = std::lower_bound(scanSels[j].begin(), scanSels[j].end(), selInd, selCompInd);
+                    if (it == scanSels[j].end() || it->index != selInd)
+                        continue; // not found
+                    
+                    if (initSel || curSel != *it)
+                    {
+                        initSel = false;
+                        curSel = *it;
+                        curSpec = backend.readSpectrum(tdata, MSLevel, curSel, SpectrumRawTypes::MobilityRange());
+                    }
+                    
+                    // UNDONE: optimization could be further pushed by not using a 2d vector here?
+                    const auto ind = std::distance(scanSels[j].begin(), it);
+                    ret[j][ind] = func(curSpec, curSel, j, args...);
                 }
-                
-                // UNDONE: optimization could be further pushed by not using a 2d vector here?
-                const auto ind = std::distance(scanSels[j].begin(), it);
-                exHandler.run([&] { ret[j][ind] = func(curSpec, curSel, j, args...); });
-            }
+            });
         }
     }
     

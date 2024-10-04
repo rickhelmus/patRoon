@@ -56,6 +56,15 @@ maybeGetMSFilesForMSTK <- function(anaInfo, types, formats)
     return(ret)
 }
 
+maybeGetMSFiles <- function(bn, ...)
+{
+    return(switch(bn,
+                  opentims = maybeGetMSFilesForOTIMS(...),
+                  mzr = maybeGetMSFilesForMzR(...),
+                  streamcraft = maybeGetMSFilesForSC(...),
+                  mstoolkit = maybeGetMSFilesForMSTK(...),
+                  NULL))
+}
 createMSBackend <- function(backendName)
 {
     return(switch(backendName,
@@ -223,12 +232,7 @@ applyMSData <- function(anaInfo, func,  ..., types = getMSFileTypes(), formats =
         if (!backendAvailable(bn))
             next
         
-        filePaths <- switch(bn,
-                            opentims = maybeGetMSFilesForOTIMS(anaInfo, types, formats),
-                            mzr = maybeGetMSFilesForMzR(anaInfo, types, formats),
-                            streamcraft = maybeGetMSFilesForSC(anaInfo, types, formats),
-                            mstoolkit = maybeGetMSFilesForMSTK(anaInfo, types, formats),
-                            NULL)
+        filePaths <- maybeGetMSFiles(bn, anaInfo, types, formats)
         if (!is.null(filePaths))
         {
             backend <- createMSBackend(bn)

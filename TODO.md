@@ -201,13 +201,14 @@
 ## msdata
 
 - replace makeFileHash() with getMSDataFileHash() on more places?
+    - for now leave, but can be done when things appear slow
+- centroid checks
+    - perform in backends?
+    - remove verifyDataCentroided
 - Further test multithreading stability with OTIMS
 - check assumptions about data being sorted
     - meatadata: scans, RTs, mobilities
     - spectra: m/z, mobilities (see if this can be used to speedup eg MSTK)
-- don't make open() required for memory backend (eg check flag instead of non-empty file in close())
-- further verify if applyMSData() picks up the right backend/file format when types/formats are set
-- make backend functions to test if mobility is sorted and which direction, so eg EICs and readSpectrum methods can optimize
 - MSPL
     - add mobility column?
     - remove now unused avgParams (eg averaging func)
@@ -274,6 +275,7 @@
     - update PListParams
     - updated convertMSFilesXXX() functions, including changed args
     - update generateMSPeakLists()
+    - availableBackends()
 
 ## IMS
 

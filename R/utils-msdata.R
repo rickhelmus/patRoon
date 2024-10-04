@@ -16,6 +16,8 @@ MSFileExtensions <- function()
 
 getMSFileTypes <- function() c("centroid", "profile", "raw", "ims")
 
+getMSReadBackends <- function() c("opentims", "streamcraft", "mstoolkit", "mzr")
+
 getMSDataFileHash <- function(path)
 {
     # NOTE: for hashing limit length as this function may be called frequently. The path is also included to make it

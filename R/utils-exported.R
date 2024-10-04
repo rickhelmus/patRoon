@@ -334,6 +334,38 @@ getFCParams <- function(rGroups, ...)
     return(modifyList(def, list(...)))
 }
 
+#' @export
+availableBackends <- function(anaInfo = NULL)
+{
+    anaInfo <- assertAndPrepareAnaInfo(anaInfo, null.ok = TRUE)
+    
+    allBackends <- getMSReadBackends()
+    
+    unselected <- setdiff(allBackends, getOption("patRoon.MSBackends", character()))
+    notCompiled <- allBackends[!sapply(allBackends, backendAvailable)]
+    noAnas <- if (is.null(anaInfo))
+        character()
+    else
+        allBackends[sapply(allBackends, function(b) is.null(maybeGetMSFiles(b, anaInfo, getMSFileTypes(), names(MSFileExtensions()))))]
+
+    checkAvail <- function(b)
+    {
+        stat <- character()
+        if (b %in% unselected)
+            stat <- c(stat, "not in patRoon.MSBackends")
+        if (b %in% notCompiled)
+            stat <- c(stat, "not compiled during installation or unavailable on your system")
+        if (b %in% noAnas)
+            stat <- c(stat, "no suitable analyses found")
+        if (length(stat) == 0)
+            return("yes")
+        return(sprintf("no (%s)", paste0(stat, collapse = ", ")))
+    }
+    
+    for (b in allBackends)
+        printf("Backend '%s': %s\n", b, checkAvail(b))
+}
+
 #' Obtains extracted ion chromatograms (EICs)
 #'
 #' This function generates one or more EIC(s) for given retention time and \emph{m/z} ranges.

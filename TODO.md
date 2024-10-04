@@ -291,6 +291,9 @@
     - export? If yes, add checkmate's, documentation etc
     - add smoothing for XCMS3/enviPick? e.g. with signal::sgolayfilt()
         - might also be nice for plotting chroms?
+    - OpenMS
+        - add more parameters and check what are good defaults
+        - remove old function
 - findMobilities()
     - fGroups method --> finished?
     - somehow nicely translate findPeaks() params to IMS scale (time --> mobility)

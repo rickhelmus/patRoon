@@ -9,6 +9,7 @@ defaultPkgOpts <- function(pkgname)
                 cache.fileName = "cache.sqlite",
                 cache.maxEntries = 100000,
                 MSBackends = getMSReadBackends(),
+                threads = parallel::detectCores(logical = FALSE),
                 MP.method = "classic",
                 # backwards compat
                 MP.maxProcs = getOption("patRoon.maxProcAmount", parallel::detectCores(logical = FALSE)),

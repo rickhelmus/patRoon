@@ -132,7 +132,7 @@ getAllMSFilesFromAnaInfo <- function(anaInfo, types, formats)
     
     ret <- Map(types, formats, f = function(type, forms)
     {
-        typePaths <- lapply(forms, function(f)
+        lapply(forms, function(f)
         {
             aip <- getPathsFromAnaInfo(anaInfo, type)
             if (is.null(aip))

@@ -216,7 +216,6 @@ setMethod("getXCMSnExp", "features", function(obj, verbose, loadRawData)
     rawData <- NULL
     if (loadRawData)
     {
-        verifyDataCentroided(analysisInfo(obj))
         rawData <- readMSDataForXCMS3(analysisInfo(obj))
     }
     else

@@ -291,6 +291,7 @@
         - add more parameters and check what are good defaults
         - remove old function
 - findMobilities()
+    - SC seems to hang?
     - fGroups method --> finished?
     - somehow nicely translate findPeaks() params to IMS scale (time --> mobility)
     - suppress XCMS warnings (or at least if no peaks are found)

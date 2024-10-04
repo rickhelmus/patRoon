@@ -463,13 +463,13 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
 
 #' @export
 setMethod("findMobilities", "features", function(obj, peaksAlgorithm, mzRange = 0.005, clusterIMSWindow = 0.01,
-                                                 clusterMethod = "diff", minIntensity = 0, maxMSRtWindow = 2, ...)
+                                                 clusterMethod = "distance", minIntensity = 0, maxMSRtWindow = 2, ...)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertNumber, . ~ mzRange + clusterIMSWindow + minIntensity, finite = TRUE,
            fixed = list(add = ac))
     checkmate::assertNumber(maxMSRtWindow, lower = 1, finite = TRUE, null.ok = TRUE, add = ac)
-    checkmate::assertChoice(clusterMethod, c("bin", "diff", "hclust"), add = ac)
+    checkmate::assertChoice(clusterMethod, c("bin", "distance", "hclust"), add = ac)
     checkmate::reportAssertions(ac)
     
     if (length(obj) == 0)
@@ -484,12 +484,9 @@ setMethod("findMobilities", "features", function(obj, peaksAlgorithm, mzRange = 
     
     printf("Finding mobilities for all features...\n")
     
-    obj@mobilities <- withProg(nrow(anaInfo), FALSE,
-                               Map(obj@features, getBrukerAnalysisPath(anaInfo$analysis, anaInfo$path), f = function(fTable, fp)
+    obj@mobilities <- applyMSData(anaInfo, obj@features, types = c("raw", "ims"), formats = c("bruker_ims", "mzML"), func = function(ana, path, backend, fTable)
     {
-        TIMSDB <- openTIMSMetaDBScope(f = fp)
-        frames <- getTIMSMetaTable(TIMSDB, "Frames", c("Id", "Time", "MsMsType"))
-        frames <- frames[MsMsType == 0]
+        openMSReadBackend(backend, path)
         
         fTable <- copy(fTable)
         if (!is.null(maxMSRtWindow))
@@ -498,11 +495,9 @@ setMethod("findMobilities", "features", function(obj, peaksAlgorithm, mzRange = 
             fTable[, retmax := min(retmax, ret + maxMSRtWindow), by = seq_len(nrow(fTable))]
         }
         
-        fTable[, frameIDs := list(list(frames[Time %between% c(retmin, retmax)]$Id)), by = seq_len(nrow(fTable))]
-        
         # NOTE: mzmin/mzmax may be too narrow here, hence use a user specified mz range
-        EIMs <- getTIMSMobilograms(fp, fTable$frameIDs, fTable$mz - mzRange, fTable$mz + mzRange, clusterMethod,
-                                   clusterIMSWindow, minIntensity, FALSE)
+        EIMs <- getMobilograms(backend, fTable$mz - mzRange, fTable$mz + mzRange, fTable$retmin, fTable$retmax,
+                               clusterMethod, clusterIMSWindow, minIntensity, FALSE)
         names(EIMs) <- fTable$ID
         EIMs <- lapply(EIMs, setDT)
         
@@ -517,7 +512,7 @@ setMethod("findMobilities", "features", function(obj, peaksAlgorithm, mzRange = 
         doProgress()
         
         return(peaksTable)
-    }))
+    })
     
     assignedN <- sum(mapply(obj@mobilities, obj@features, FUN = function(m, f) sum(f$ID %in% m$ID)))
     printf("Assigned %d mobilities to %d features (%.2f%% assigned).\n", sum(sapply(obj@mobilities, nrow)), assignedN,

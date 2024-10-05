@@ -983,3 +983,5 @@ estimateIdentificationLevel <- function(candidateName, candidateFGroup, candidat
     
     return(NA_character_)
 }
+
+setOMPThreads <- function() setOMPNumThreads(max(1, getOption("patRoon.threads", 1)))

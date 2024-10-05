@@ -278,7 +278,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                       const std::vector<SpectrumRawTypes::Time> &startTimes,
                       const std::vector<SpectrumRawTypes::Time> &endTimes,
                       const std::vector<SpectrumRawTypes::Mobility> &startMobs,
-                      const std::vector<SpectrumRawTypes::Mobility> &endMobs, bool compress)
+                      const std::vector<SpectrumRawTypes::Mobility> &endMobs, bool compress, bool withBP = false)
 {
     struct EICPoint
     {
@@ -286,6 +286,8 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         SpectrumRawTypes::Mass mz = 0.0;
         SpectrumRawTypes::Intensity intensity = 0;
         SpectrumRawTypes::Mobility mobility = 0.0;
+        SpectrumRawTypes::Mass mzBP = 0.0;
+        SpectrumRawTypes::Intensity intensityBP = 0.0;
     };
     
     const auto EICCount = startMZs.size();
@@ -334,6 +336,11 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
             ret.mz += mz * inten;
             if (hasMob)
                 ret.mobility += mob * inten;
+            if (withBP && inten > ret.intensityBP)
+            {
+                ret.intensityBP = inten;
+                ret.mzBP = mz;
+            }
         }
 
         if (ret.intensity > 0)
@@ -386,6 +393,8 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         std::vector<SpectrumRawTypes::Mass> mzs(points.size());
         std::vector<SpectrumRawTypes::Intensity> intensities(points.size());
         std::vector<SpectrumRawTypes::Mobility> mobilities((anySpecHasMob) ? points.size() : 0);
+        std::vector<SpectrumRawTypes::Intensity> intensitiesBP((withBP) ? points.size() : 0);
+        std::vector<SpectrumRawTypes::Mass> mzsBP((withBP) ? points.size() : 0);
         for (size_t j=0; j<points.size(); ++j)
         {
             times[j] = points[j].time;
@@ -393,15 +402,28 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
             intensities[j] = points[j].intensity;
             if (anySpecHasMob)
                 mobilities[j] = points[j].mobility;
+            if (withBP)
+            {
+                intensitiesBP[j] = points[j].intensityBP;
+                mzsBP[j] = points[j].mzBP;
+            }
         }
         
         auto df = Rcpp::DataFrame::create(Rcpp::Named("time") = times,
                                           Rcpp::Named("intensity") = intensities,
                                           Rcpp::Named("mz") = mzs);
         if (anySpecHasMob)
-        {
             df["mobility"] = mobilities;
-            // HACK: above assignment converts df to a list: https://stackoverflow.com/a/59369233
+        
+        if (withBP)
+        {
+            df["intensityBP"] = intensitiesBP;
+            df["mzBP"] = mzsBP;
+        }
+
+        if (anySpecHasMob || withBP)
+        {
+            // HACK: column assignment above converts df to a list: https://stackoverflow.com/a/59369233
             df = Rcpp::DataFrame(df);
         }
         

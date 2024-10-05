@@ -278,6 +278,7 @@
 
 - findPeaks()
     - export? If yes, add checkmate's, documentation etc
+        - if not, still need to doc args somehow
     - add smoothing for XCMS3/enviPick? e.g. with signal::sgolayfilt()
         - might also be nice for plotting chroms?
     - OpenMS
@@ -307,6 +308,9 @@
         - Does the mobmin/mobmax range make sense how it is computed now?
 - Docs
     - mobilities slot in features
+    - Dietrich features
+- NEWS
+    - Dietrich features
 
 
 ## Features

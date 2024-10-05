@@ -8,7 +8,8 @@ findPeaks <- function(EICs, algorithm, ..., verbose = TRUE)
     f <- switch(algorithm,
                 openms = findPeaksOpenMS,
                 xcms3 = findPeaksXCMS3,
-                envipick = findPeaksEnviPick)
+                envipick = findPeaksEnviPick,
+                dietrich = findPeaksDietrich)
     f(EICs, ..., verbose = verbose)
 }
 
@@ -212,4 +213,12 @@ findPeaksEnviPick <- function(EICs, ..., verbose = TRUE)
     ret <- pruneList(ret, checkZeroRows = TRUE)
     
     return(ret)
+}
+
+findPeaksDietrich <- function(EICs, ...)
+{
+    setOMPThreads()
+    peaks <- setNames(doFindPeaksDietrich(EICs, ...), names(EICs))
+    peaks <- lapply(peaks, setDT)
+    return(peaks)
 }

@@ -359,6 +359,25 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// doFindPeaksDietrich
+Rcpp::List doFindPeaksDietrich(Rcpp::List EICs, double minIntensity, int sn, int peakWidthMin, int peakWidthMax, double RTMin, double RTMax, int maxPeaksPerSignal, bool verbose);
+RcppExport SEXP _patRoon_doFindPeaksDietrich(SEXP EICsSEXP, SEXP minIntensitySEXP, SEXP snSEXP, SEXP peakWidthMinSEXP, SEXP peakWidthMaxSEXP, SEXP RTMinSEXP, SEXP RTMaxSEXP, SEXP maxPeaksPerSignalSEXP, SEXP verboseSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type EICs(EICsSEXP);
+    Rcpp::traits::input_parameter< double >::type minIntensity(minIntensitySEXP);
+    Rcpp::traits::input_parameter< int >::type sn(snSEXP);
+    Rcpp::traits::input_parameter< int >::type peakWidthMin(peakWidthMinSEXP);
+    Rcpp::traits::input_parameter< int >::type peakWidthMax(peakWidthMaxSEXP);
+    Rcpp::traits::input_parameter< double >::type RTMin(RTMinSEXP);
+    Rcpp::traits::input_parameter< double >::type RTMax(RTMaxSEXP);
+    Rcpp::traits::input_parameter< int >::type maxPeaksPerSignal(maxPeaksPerSignalSEXP);
+    Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
+    rcpp_result_gen = Rcpp::wrap(doFindPeaksDietrich(EICs, minIntensity, sn, peakWidthMin, peakWidthMax, RTMin, RTMax, maxPeaksPerSignal, verbose));
+    return rcpp_result_gen;
+END_RCPP
+}
 // specDistMatrix
 Rcpp::NumericMatrix specDistMatrix(Rcpp::List specList, Rcpp::CharacterVector method, Rcpp::CharacterVector shift, Rcpp::NumericVector precMZs, Rcpp::NumericVector mzWeight, Rcpp::NumericVector intWeight, Rcpp::NumericVector mzWindow);
 RcppExport SEXP _patRoon_specDistMatrix(SEXP specListSEXP, SEXP methodSEXP, SEXP shiftSEXP, SEXP precMZsSEXP, SEXP mzWeightSEXP, SEXP intWeightSEXP, SEXP mzWindowSEXP) {
@@ -741,6 +760,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_parseFeatureMRMXMLFile", (DL_FUNC) &_patRoon_parseFeatureMRMXMLFile, 1},
     {"_patRoon_parseFeatConsXMLFile", (DL_FUNC) &_patRoon_parseFeatConsXMLFile, 2},
     {"_patRoon_writeFeatureXML", (DL_FUNC) &_patRoon_writeFeatureXML, 4},
+    {"_patRoon_doFindPeaksDietrich", (DL_FUNC) &_patRoon_doFindPeaksDietrich, 9},
     {"_patRoon_specDistMatrix", (DL_FUNC) &_patRoon_specDistMatrix, 7},
     {"_patRoon_specDistRect", (DL_FUNC) &_patRoon_specDistRect, 9},
     {"_patRoon_testSpecFilter", (DL_FUNC) &_patRoon_testSpecFilter, 7},

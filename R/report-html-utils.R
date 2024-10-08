@@ -35,7 +35,8 @@ makeReactCellSmallChrom <- function(hasLargeChrom, plots)
 
 makeReactCellLargeChrom <- function(plots)
 {
-    return(function(value, index) htmltools::img(src = plots$chromsLarge[[value]]))
+    #return(function(value, index) htmltools::img(src = plots$chromsLarge[[value]]))
+    return(htmlwidgets::JS("function(cellInfo) { return '<img src=\"' + reportPlots.chromsLarge[[cellInfo.value]] + '\"></img>'; }"))
 }
 
 makeReactCellISTD <- function()
@@ -361,6 +362,7 @@ makeMainResultsReactable <- function(tab, tabName, retMin, plots, colGroupOrder 
                                annotations = getReactFilterMethodAnnotations())
         
         return(reactable::colDef(name = cdrow$displayName, show = !cdrow$hidden, format = format, cell = cell,
+                                 html = cdrow$formatting == "chromLarge", # HACK
                                  minWidth = if (!is.na(cdrow$minWidth)) cdrow$minWidth else 100,
                                  align = if (nzchar(cdrow$align)) cdrow$align, style = if (col %in% grpStartCols) colSepStyle,
                                  filterInput = filterInput, filterMethod = filterMethod))

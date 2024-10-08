@@ -107,7 +107,7 @@ setMethod("generateComponentsRAMClustR", "featureGroups", function(fGroups, ioni
     # RAMClustR needs csv for input
     fGRoupsCSVTable <- as.data.frame(gTable)
     rownames(fGRoupsCSVTable) <- anaInfo$analysis
-    colnames(fGRoupsCSVTable) <- paste(gInfo$mzs, gInfo$rts, sep = "_")
+    colnames(fGRoupsCSVTable) <- paste(gInfo$mz, gInfo$ret, sep = "_")
     csvFile <- tempfile("fGroups", fileext = ".csv")
     write.table(fGRoupsCSVTable, csvFile, row.names = TRUE, col.names = NA, sep = ",")
 
@@ -160,7 +160,7 @@ setMethod("generateComponentsRAMClustR", "featureGroups", function(fGroups, ioni
         # link feature groups: original order is in RC$xcmsOrd
         comps[[cmi]][, "group" := gNames[RC$xcmsOrd[RC$featclus == cmi][psorder[[cmi]]]]]
 
-        comps[[cmi]][, rt := gInfo[group, "rts"]]
+        comps[[cmi]][, rt := gInfo[match(comps[[cmi]]$group, group)]$ret]
         comps[[cmi]][, intensity := RC$msint[RC$featclus == cmi][psorder[[cmi]]]]
         setnames(comps[[cmi]],
                  c("rt", "int", "isogr", "iso", "adduct"),

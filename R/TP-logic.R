@@ -31,7 +31,7 @@ doGenerateTPsLogic <- function(fGroups, minMass, neutralMasses, transformations)
                     products = list()))
     
     gInfo <- groupInfo(fGroups)
-    parents <- data.table(name = names(fGroups), rt = gInfo$rts, neutralMass = neutralMasses)
+    parents <- data.table(name = names(fGroups), rt = gInfo$ret, neutralMass = neutralMasses)
     
     transformations <- getTPLogicTransformations(transformations)
     
@@ -113,7 +113,7 @@ setMethod("generateTPsLogic", "featureGroups", function(fGroups, minMass = 40, a
     
     adduct <- checkAndToAdduct(adduct, fGroups)
     fgAdd <- getFGroupAdducts(names(fGroups), annotations(fGroups), adduct, "generic")
-    neutralMasses <- if (length(fGroups) == 0) numeric() else calculateMasses(groupInfo(fGroups)[, "mzs"],
+    neutralMasses <- if (length(fGroups) == 0) numeric() else calculateMasses(groupInfo(fGroups)$mz,
                                                                               fgAdd$grpAdducts, type = "neutral")
     res <- doGenerateTPsLogic(fGroups, minMass, neutralMasses, transformations)
     
@@ -129,7 +129,7 @@ setMethod("generateTPsLogic", "featureGroupsSet", function(fGroups, minMass = 40
     assertLogicTransformations(transformations, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
-    res <- doGenerateTPsLogic(fGroups, minMass, groupInfo(fGroups)[, "mzs"], transformations)
+    res <- doGenerateTPsLogic(fGroups, minMass, groupInfo(fGroups)$mz, transformations)
     
     return(transformationProductsLogic(parents = res$parents, products = res$products))
 })

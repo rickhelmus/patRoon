@@ -210,7 +210,7 @@ generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, fGroupsComps =
                     if (nrow(scr) != 1)
                         if (hasRT) hasRT else NA_real_ # unclear which feature group to consider
                     else
-                        gi[scr$group, "rts"]
+                        gi[group == scr$group]$ret
                 }, by = seq_len(nrow(parentsTab))]
             }
             

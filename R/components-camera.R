@@ -168,7 +168,7 @@ setMethod("generateComponentsCAMERA", "featureGroups", function(fGroups, ionizat
             names(comps) <- paste0("CMP", seq_along(comps))
     }
     
-    rets <- lapply(comps, function(cm) gInfo[cm$group, "rts"])
+    rets <- lapply(comps, function(cm) gInfo[match(cm$group, group)]$ret)
     if (!is.null(adTable))
     {
         Ms <- sapply(comps, function(cm)

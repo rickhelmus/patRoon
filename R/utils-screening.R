@@ -165,7 +165,7 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, skipInvalid)
             
             # only consider nearby eluting fGroups if RTs are available
             if (hasRT)
-                gi <- gInfo[numLTE(abs(gInfo$rts - suspects$rt[ti]), rtWindow), ]
+                gi <- gInfo[numLTE(abs(ret - suspects$rt[ti]), rtWindow)]
             
             # match by mz, this is either done by...
             #   - fGroup ionized mass and 'mz' column from suspect data if the latter is available
@@ -176,23 +176,23 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, skipInvalid)
             
             if (is.na(suspects$mz[ti])) # no ionized suspect available, must use annotation data to compare neutral masses
             {
-                at <- annTbl[group %in% rownames(gi) & numLTE(abs(neutralMass - suspects[ti]$neutralMass), mzWindow)]
-                gi <- gi[at$group, ]
+                at <- annTbl[group %chin% gi$group & numLTE(abs(neutralMass - suspects[ti]$neutralMass), mzWindow)]
+                gi <- gi[group %chin% at$group]
             }
             else
-                gi <- gi[numLTE(abs(gi$mzs - suspects$mz[ti]), mzWindow), ]
+                gi <- gi[numLTE(abs(gi$mz - suspects$mz[ti]), mzWindow)]
             
             if (nrow(gi) == 0)
                 hits <- emptyResult() # no hits
             else
             {
-                hits <- rbindlist(lapply(rownames(gi), function(g)
+                hits <- rbindlist(Map(gi$group, gi$ret, gi$mz, f = function(g, gret, gmz)
                 {
                     ret <- data.table()
                     setMetaData(ret, suspects[ti])
-                    ret[, c("group", "d_rt", "d_mz") := .(g, d_rt = if (hasRT) gi[g, "rts"] - rt else NA_real_,
+                    ret[, c("group", "d_rt", "d_mz") := .(g, d_rt = if (hasRT) gret - rt else NA_real_,
                                                           ifelse(is.na(mz), annTbl[group == g]$neutralMass - neutralMass,
-                                                                 gi[g, "mzs"] - mz))]
+                                                                 gmz - mz))]
                     return(ret)
                 }), fill = TRUE)
             }
@@ -261,12 +261,7 @@ doGroupSuspects <- function(feat, groupFunc, ..., verbose = TRUE)
         return(groupFunc(featSub, ..., verbose = FALSE))
     }, simplify = FALSE)
     
-    fgInfoAll <- rbindlist(lapply(fgSusps, function(fg)
-    {
-        gi <- as.data.table(groupInfo(fg))
-        gi[, group := names(fg)]
-        return(gi)
-    }), idcol = "suspect")
+    fgInfoAll <- rbindlist(lapply(fgSusps, function(fg) copy(groupInfo(fg))), idcol = "suspect")
     fgInfoAll[, group_susp := {
         if (.N > 1)
             paste0(suspect, "-", seq_len(.N))
@@ -293,8 +288,7 @@ doGroupSuspects <- function(feat, groupFunc, ..., verbose = TRUE)
         return(inds)
     })]
     
-    gInfo <- as.data.frame(fgInfoAll[, c("rts", "mzs"), with = FALSE])
-    rownames(gInfo) <- fgInfoAll$group_susp
+    gInfo <- fgInfoAll[, .(group = group_susp, ret, mz)]
     
     # set screenInfo
     sInfo <- fgInfoAll[, c("suspect", "group_susp"), with = FALSE]
@@ -305,8 +299,8 @@ doGroupSuspects <- function(feat, groupFunc, ..., verbose = TRUE)
     if (is.null(susp[["rt"]]))
         susp[, rt := NA_real_]
     sInfo <- merge(sInfo, susp[, metaDataCols, with = FALSE], by = "name")
-    sInfo[, d_rt := gInfo[group, "rts"] - rt]
-    sInfo[, d_mz := gInfo[group, "mzs"] - mz]
+    sInfo[, d_rt := gInfo[match(sInfo$group, group)]$ret - rt]
+    sInfo[, d_mz := gInfo[match(sInfo$group, group)]$mz - mz]
     
     return(featureGroupsScreening(screenInfo = sInfo, groups = gTable, groupInfo = gInfo, features = feat,
                                   ftindex = ftind))

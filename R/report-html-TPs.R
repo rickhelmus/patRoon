@@ -127,7 +127,7 @@ reportHTMLUtils$methods(
         cInfo <- subsetDTColumnsIfPresent(cInfo, c("name", "parent_name", "parent_group", "parent_formula"))
         setnames(cInfo, "name", "cmpName")
         setnames(cInfo, sub("^parent_", "", names(cInfo)))
-        gInfo <- groupInfo(objects$fGroups)[cInfo$group, c("rts", "mzs")]
+        gInfo <- groupInfo(objects$fGroups)[match(cInfo$group, group), c("ret", "mz"), with = FALSE]
         
         cInfo[, c("retention", "mz") := gInfo]
         if (settings$features$retMin)

@@ -162,7 +162,7 @@ setMethod("plot", c(x = "featureGroups", y = "missing"), function(x, groupBy = N
             par(omd = c(0, 1 - lw, 0, 1), new = TRUE)
         }
         
-        plot(if (retMin) x@groupInfo$rts / 60 else x@groupInfo$rts, x@groupInfo$mzs,
+        plot(if (retMin) x@groupInfo$ret / 60 else x@groupInfo$ret, x@groupInfo$mz,
              xlab = if (retMin) "Retention time (min)" else "Retention time (sec.)",
              ylab = "m/z", col = col, pch = pch, ...)
         
@@ -496,11 +496,11 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
         retMz <- rbindlist(sapply(unique(cdf$rn), function(sn)
         {
             ftgrps <- groupTab[get(getADTIntCols(sn)) > 0]$group
-            return(gInfo[ftgrps, ])
+            return(gInfo[match(ftgrps, group), c("ret", "mz"), with = FALSE])
         }, simplify = FALSE), idcol = "sname")
         retMz$rts <- retMz$rts / max(retMz$rts) # normalize
         
-        circlize::circos.track(fa = retMz$sname, x = retMz$rts, y = retMz$mzs, ylim = c(0, max(retMz$mzs)), track.index = length(tracks),
+        circlize::circos.track(fa = retMz$sname, x = retMz$ret, y = retMz$mz, ylim = c(0, max(retMz$mz)), track.index = length(tracks),
                                panel.fun = function(x, y)
                                {
                                    x <- x / (max(x) / circlize::get.cell.meta.data("xrange"))
@@ -659,8 +659,8 @@ setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj),
         # NOTE: plotChroms() for sets override default
         if (gCount == 1)
             title <- sprintf("Group '%s'\nrt: %.1f - m/z: %.4f", groupName[1],
-                             if (retMin) gInfo[groupName[1], "rts"] / 60 else gInfo[groupName[1], "rts"],
-                             gInfo[groupName[1], "mzs"])
+                             if (retMin) gInfo[group == groupName[1]]$ret / 60 else gInfo[group == groupName[1]]$ret,
+                             gInfo[group == groupName[1]]$mz)
         else
             title <- sprintf("%d feature groups", gCount)
     }
@@ -746,7 +746,7 @@ setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj),
                 if ("ret" %in% annotate)
                     antxt <- sprintf("%.1f", rt)
                 if ("mz" %in% annotate)
-                    antxt <- paste(antxt, sprintf("%.4f", gInfo[grp, "mzs"]), sep = "\n")
+                    antxt <- paste(antxt, sprintf("%.4f", gInfo[grp == group]$mz), sep = "\n")
                 
                 if (nzchar(antxt))
                     text(rt, maxInt + ylim[2] * 0.02, antxt)
@@ -787,7 +787,7 @@ setMethod("plotChromsHash", "featureGroups", function(obj, analysis = analyses(o
                            topMostByRGroup = FALSE, onlyPresent = FALSE)
     }
     anas <- analysis
-    makeHash(args[setdiff(names(args), c("obj", "EICs"))], EICs, featureTable(obj)[analysis], groupInfo(obj)[groupName, ],
+    makeHash(args[setdiff(names(args), c("obj", "EICs"))], EICs, featureTable(obj)[analysis], groupInfo(obj)[group %chin% groupName],
              analysisInfo(obj)[analysis %chin% anas])
 })
 
@@ -1065,8 +1065,8 @@ setMethod("plotGraph", "featureGroups", function(obj, onlyPresent = TRUE, width 
                 getStrListWithMax(ISTDs[group == grp]$name, 6, "/")
             else
                 getStrListWithMax(ISTDs[group %chin% ISTDAssign[[grp]]]$name, 3, "/")
-            ret <- sprintf("<b>%s</b><br>RT: %.2f<br>m/z: %.4f<br>ISTD: %s", grp, gInfo[grp, "rts"], gInfo[grp, "mzs"],
-                           istds)
+            ret <- sprintf("<b>%s</b><br>RT: %.2f<br>m/z: %.4f<br>ISTD: %s", grp, gInfo[grp == group]$ret,
+                           gInfo[grp == group]$mz, istds)
             if (!is.null(sInfo) && grp %chin% sInfo$group)
                 ret <- paste0(ret, "<br>", "Suspect(s): ", getStrListWithMax(sInfo[group == grp]$name, 3, "/"))
             return(ret)
@@ -1084,7 +1084,7 @@ setMethod("plotGraph", "featureGroups", function(obj, onlyPresent = TRUE, width 
     
     if (nrow(edges) > 0)
     {
-        edges[, value := abs(gInfo[from, "rts"] - gInfo[to, "rts"])]
+        edges[, value := abs(gInfo[match(from, group)]$ret - gInfo[match(to, group)]$ret)]
         edges[, value := max(0.1, 1 - (value / max(value)))]
     }
     else

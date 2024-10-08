@@ -69,14 +69,14 @@ importFeatureGroupsEnviMass <- function(path, feat, positive)
 
     profPeaks <- as.data.table(loadRData(profPeaksPath))
     setorder(profPeaks, profileID)
-    gInfo <- data.frame(mzs = profPeaks$`mean_m/z`, rts = profPeaks$mean_RT)
-    rownames(gInfo) <- makeFGroupName(seq_len(nrow(gInfo)), gInfo$rts, gInfo$mzs)
+    gInfo <- data.table(group = makeFGroupName(seq_len(nrow(profPeaks)), profPeaks$mean_RT, profPeaks$`mean_m/z`),
+                        mz = profPeaks$`mean_m/z`, ret = profPeaks$mean_RT)
 
     profList <- loadRData(profListPath)
     peaks <- as.data.table(profList$peaks)
 
     groups <- as.data.table(matrix(0, nrow(anaInfo), nrow(gInfo)))
-    setnames(groups, rownames(gInfo))
+    setnames(groups, gInfo$group)
     ftind <- copy(groups)
 
     gcount <- ncol(groups)

@@ -609,7 +609,7 @@ reportHTMLUtils$methods(
                 set <- NULL
             
             return(buildMFLandingURL(set, objects$MSPeakLists[[grp]][["MSMS"]],
-                                     groupInfo(objects$fGroups)[grp, "mzs"]))
+                                     groupInfo(objects$fGroups)[group == grp]$mz))
         })
         
         CSVCols <- setdiff(names(tab), c("structure", "spectrum", "scorings"))

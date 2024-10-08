@@ -46,8 +46,7 @@ if (rmdVars$includeMFWebLinks != "none")
         else
             set <- NULL
         
-        return(buildMFLandingURL(set, rmdVars$MSPeakLists[[grp]][["MSMS"]],
-                                 rmdVars$gInfo[grp, "mzs"]))
+        return(buildMFLandingURL(set, rmdVars$MSPeakLists[[grp]][["MSMS"]], rmdVars$gInfo[match(grp, group)]$mz))
     })
 }
 if (!is.null(formulas) && "formulas" %in% rmdVars$reportPlots)

@@ -72,7 +72,7 @@ setMethod("generateComponentsSpecClust", "featureGroups", function(fGroups, MSPe
     checkmate::reportAssertions(ac)
     
     if (length(fGroups) == 0)
-        return(componentsSpecClust(distm = NULL, method = method, gInfo = groupInfo(fGroups),
+        return(componentsSpecClust(distm = NULL, method = method, gInfo = copy(groupInfo(fGroups)),
                                    properties = list(), maxTreeHeight = maxTreeHeight, deepSplit = deepSplit,
                                    minModuleSize = minModuleSize, algorithm = "specclust"))
 
@@ -90,7 +90,7 @@ setMethod("generateComponentsSpecClust", "featureGroups", function(fGroups, MSPe
     distm <- 1 - as.dist(sims)
     cat("Done!\n")
     
-    gInfo <- groupInfo(fGroups)[grpsResults, ]
+    gInfo <- copy(groupInfo(fGroups)[group %chin% grpsResults])
 
     return(componentsSpecClust(distm = distm, method = method, gInfo = gInfo,
                                properties = list(specSimParams = specSimParams),

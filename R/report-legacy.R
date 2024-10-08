@@ -315,7 +315,6 @@ reportCompoundTable <- function(fGroups, path, compounds, normalizeScores, exclu
 {
     printf("Exporting identification results tables...")
 
-    gInfo <- groupInfo(fGroups)
     gNames <- names(fGroups)
     compTable <- annotations(compounds)
     mcn <- mergedConsensusNames(compounds)
@@ -351,7 +350,6 @@ reportCompoundSpectra <- function(fGroups, path, MSPeakLists, compounds, compsCl
     printf("Exporting compound identification MS/MS spectra...\n")
 
     gNames <- names(fGroups)
-    gInfo <- groupInfo(fGroups)
     pLists <- peakLists(MSPeakLists)
 
     if (length(compounds) == 0)
@@ -485,7 +483,6 @@ reportComponentPlots <- function(fGroups, path, components, EICParams, retMin, E
         return(invisible(NULL))
     }
 
-    gInfo <- groupInfo(fGroups)
     cInfo <- componentInfo(components)
     cTable <- componentTable(components)
 

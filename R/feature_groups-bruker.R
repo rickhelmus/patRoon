@@ -63,9 +63,10 @@ importFeatureGroupsBrukerPA <- function(path, feat, rtWindow = 12, mzWindow = 0.
     gInfo <- extractPAGroupInfo(featgroups)
 
     # rename columns: do this after getting group info as that needs the original column names
-    gNames <- makeFGroupName(seq_len(nrow(gInfo)), gInfo$rts, gInfo$mzs)
+    gNames <- makeFGroupName(seq_len(nrow(gInfo)), gInfo$ret, gInfo$mz)
     setnames(featgroups, gNames)
-    rownames(gInfo) <- gNames
+    gInfo[, group := gNames]
+    setcolorder(gInfo, "group")
 
     ret <- featureGroupsBruker(groups = featgroups, groupInfo = gInfo, features = feat)
     ret@ftindex <- getFeatIndicesFromPA(ret, rtWindow, mzWindow, intWindow, warn)
@@ -86,7 +87,7 @@ extractPAGroupInfo <- function(groups)
     rts <- spltbuckets[c(T, F)]
     mzs <- spltbuckets[c(F, T)]
 
-    return(data.frame(rts = rts, mzs = mzs))
+    return(data.table(ret = rts, mz = mzs))
 }
 
 # PA doesn't export original feature IDs used for bucketing, try to find them back
@@ -113,10 +114,10 @@ getFeatIndicesFromPA <- function(fGroups, rtWindow, mzWindow, intWindow, warn)
             if (gTable[[dfind, grp]] > 0) # check if this file should have this feature
             {
                 # Filter retention time
-                subf <- fts[numLTE(abs(ret - gInfo$rts[grp]), rtWindow)]
+                subf <- fts[numLTE(abs(ret - gInfo$ret[grp]), rtWindow)]
 
                 # Filter m/z
-                subf <- subf[numLTE(abs(mz - gInfo$mzs[grp]), mzWindow)]
+                subf <- subf[numLTE(abs(mz - gInfo$mz[grp]), mzWindow)]
 
                 # Filter intensity
                 subf <- subf[numLTE(abs(intensity - gTable[[dfind, grp]]), intWindow)]

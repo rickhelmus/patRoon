@@ -372,7 +372,6 @@ setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLi
     
     adduct <- checkAndToAdduct(adduct, fGroups)
     
-    gInfo <- groupInfo(fGroups)
     anaInfo <- analysisInfo(fGroups)
     featIndex <- groupFeatIndex(fGroups)
     fTable <- featureTable(fGroups)

@@ -114,7 +114,6 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
     adduct <- checkAndToAdduct(adduct, fGroups)
     
     gCount <- length(fGroups)
-    gInfo <- groupInfo(fGroups)
     annTbl <- annotations(fGroups)
     libRecs <- records(MSLibrary)
     libSpecs <- spectra(MSLibrary)

@@ -442,7 +442,7 @@ setMethod("makeSet", "featureGroups", function(obj, ..., groupAlgo, groupArgs = 
     if (!is.null(grpInts[["dummy"]]))
         grpInts[, dummy := NULL]
     setnafill(grpInts, fill = 0)
-    setcolorder(grpInts, rownames(groupInfo(setGroups)))
+    setcolorder(grpInts, groupInfo(setGroups)$group)
     
     grpFeatInds <- rbindlist(lapply(featureTable(featSet), function(ft)
     {
@@ -453,7 +453,7 @@ setMethod("makeSet", "featureGroups", function(obj, ..., groupAlgo, groupArgs = 
     if (!is.null(grpFeatInds[["dummy"]]))
         grpFeatInds[, dummy := NULL]
     setnafill(grpFeatInds, fill = 0)
-    setcolorder(grpFeatInds, rownames(groupInfo(setGroups)))
+    setcolorder(grpFeatInds, groupInfo(setGroups)$group)
     
     ret <- featureGroupsSet(groupAlgo = groupAlgo, groupArgs = groupArgs, groupVerbose = verbose,
                             groups = grpInts, groupInfo = groupInfo(setGroups), features = featSet,
@@ -484,11 +484,11 @@ setMethod("unset", "featureGroupsSet", function(obj, set)
     assertSets(obj, set, FALSE)
     obj <- obj[, sets = set]
     
-    gInfo <- groupInfo(obj)
+    gInfo <- copy(groupInfo(obj))
     ann <- copy(annotations(obj))
     if (nrow(gInfo) > 0)
     {
-        gInfo$mzs <- ann[match(rownames(gInfo), group)]$ion_mz
+        gInfo[, mz := ann[match(gInfo$group, group)]$ion_mz]
         ann <- ann[, -c("set", "ion_mz")]
     }
     ISTDs <- copy(internalStandards(obj))

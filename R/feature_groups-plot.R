@@ -793,8 +793,9 @@ setMethod("plotChromsHash", "featureGroups", function(obj, analysis = analyses(o
 
 #' @export
 setMethod("plotMobilogram", "featureGroups", function(obj, markMob = TRUE, IMSWindow = 0.2, maxMSRtWindow = 2,
-                                                      mzWindow = 0.005, clusterIMSWindow = 0.01, clusterMethod = "diff",
-                                                      minIntensity = 0, xlim = NULL, ylim = NULL, ...)
+                                                      mzWindow = 0.005, clusterIMSWindow = 0.01,
+                                                      clusterMethod = "distance", minIntensity = 0, xlim = NULL,
+                                                      ylim = NULL, ...)
 {
     # UNDONE: more feature parity with plotChroms()
     # UNDONE: assert util for common parameters with findMobilities()
@@ -804,7 +805,7 @@ setMethod("plotMobilogram", "featureGroups", function(obj, markMob = TRUE, IMSWi
     aapply(checkmate::assertNumber, . ~ IMSWindow + mzWindow + clusterIMSWindow + minIntensity,
            lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertNumber(maxMSRtWindow, lower = 1, finite = TRUE, null.ok = TRUE, add = ac)
-    checkmate::assertChoice(clusterMethod, c("bin", "diff", "hclust"), add = ac)
+    checkmate::assertChoice(clusterMethod, c("bin", "distance", "hclust"), add = ac)
     assertXYLim(xlim, ylim, add = ac)
     checkmate::reportAssertions(ac)
     
@@ -818,29 +819,23 @@ setMethod("plotMobilogram", "featureGroups", function(obj, markMob = TRUE, IMSWi
     anaInfo <- analysisInfo(obj)
     mobs <- mobilities(getFeatures(obj))
 
-    EIMs <- Map(fTable, getBrukerAnalysisPath(anaInfo$analysis, anaInfo$path), f = function(fTable, fp)
+    EIMs <- applyMSData(anaInfo, fTable, types = c("raw", "ims"), formats = c("bruker_ims", "mzML"), func = function(ana, path, backend, ft)
     {
-        # UNDONE: c/p from findMobilities() --> make util function
-        TIMSDB <- openTIMSMetaDBScope(f = fp)
-        frames <- getTIMSMetaTable(TIMSDB, "Frames", c("Id", "Time", "MsMsType"))
-        frames <- frames[MsMsType == 0]
-        
-        fTable <- copy(fTable)
+        openMSReadBackend(backend, path)
+        ft <- copy(ft)
         if (!is.null(maxMSRtWindow))
         {
-            fTable[, retmin := max(retmin, ret - maxMSRtWindow), by = seq_len(nrow(fTable))]
-            fTable[, retmax := min(retmax, ret + maxMSRtWindow), by = seq_len(nrow(fTable))]
+            ft[, retmin := max(retmin, ret - maxMSRtWindow), by = seq_len(nrow(ft))]
+            ft[, retmax := min(retmax, ret + maxMSRtWindow), by = seq_len(nrow(ft))]
         }
         
-        fTable[, frameIDs := list(list(frames[Time %between% c(retmin, retmax)]$Id)), by = seq_len(nrow(fTable))]
-        
         # NOTE: mzmin/mzmax may be too narrow here, hence use a user specified mz range
-        m <- getTIMSMobilograms(fp, fTable$frameIDs, fTable$mz - mzWindow, fTable$mz + mzWindow, clusterMethod,
-                                clusterIMSWindow, minIntensity, FALSE)
-        names(m) <- fTable$ID
+        m <- getMobilograms(backend, ft$mz - mzWindow, ft$mz + mzWindow, ft$retmin, ft$retmax, clusterMethod,
+                            clusterIMSWindow, minIntensity, TRUE)
+        names(m) <- ft$ID
         return(lapply(m, setDT))
     })
-    
+
     if (is.null(xlim))
     {
         # UNDONE: use mobmin/mobmax values of mobilities slot instead?

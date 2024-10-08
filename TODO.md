@@ -308,6 +308,10 @@
         - sets methods? or simply not possible?
             - if not implement method that throws error
             - could be possible with featuresSuspects
+- plotMobilities()
+    - Finalize function: consistent arg names, checkmates, more functionality from plotChroms() --> see UNDONEs
+    - by default only allow 1 fg to be plotted?
+    - tests, docs
 - combine find/splitMobilities()?
 - Suspect features
     - XCMS/XCMS3/KPIC2: doc and/or default min fractions to zero as these probably don't make a lot of sense otherwise

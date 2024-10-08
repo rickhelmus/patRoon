@@ -73,8 +73,8 @@ Rcpp::List parseFeatConsXMLFile(Rcpp::CharacterVector file, Rcpp::IntegerVector 
             ftindex(el.fileID, gi) = el.featID;
     }
     
-    Rcpp::DataFrame gInfo = Rcpp::DataFrame::create(Rcpp::Named("rts") = rets,
-                                                    Rcpp::Named("mzs") = mzs);
+    Rcpp::DataFrame gInfo = Rcpp::DataFrame::create(Rcpp::Named("ret") = rets,
+                                                    Rcpp::Named("mz") = mzs);
     
     return Rcpp::List::create(Rcpp::Named("gInfo") = gInfo,
                               Rcpp::Named("ftindex") = ftindex);

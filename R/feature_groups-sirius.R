@@ -45,7 +45,7 @@ processSIRIUSFGroups <- function(outPath, anaInfo)
         ngrp <- max(resTbl$group)
         gTab <- data.table(matrix(0, nrow = nrow(anaInfo), ncol = ngrp))
         ftind <- copy(gTab)
-        gInfo <- data.frame(rts = numeric(ngrp), mzs = numeric(ngrp))
+        gInfo <- data.table(ret = numeric(ngrp), mz = numeric(ngrp))
         
         for (grpi in seq_len(ngrp))
         {
@@ -55,23 +55,24 @@ processSIRIUSFGroups <- function(outPath, anaInfo)
             set(ftind, ainds, j = grpi, value = grpRes$ID)
             
             # UNDONE: does SIRIUS report group rets/mzs?
-            gInfo[grpi, c("rts", "mzs")] <- list(mean(grpRes$ret), mean(grpRes$mz))
+            gInfo[grpi, c("ret", "mz") := .(mean(grpRes$ret), mean(grpRes$mz))]
         }
 
         # group order is not consistent between runs --> sort
-        ord <- order(gInfo$mzs)
-        gInfo <- gInfo[ord, ]
+        ord <- order(gInfo$mz)
+        gInfo <- gInfo[ord]
         gTab <- gTab[, ord, with = FALSE]; ftind <- ftind[, ord, with = FALSE]
 
-        gNames <- mapply(seq_len(ngrp), gInfo$rts, gInfo$mzs, FUN = makeFGroupName)
-        rownames(gInfo) <- gNames
+        gNames <- mapply(seq_len(ngrp), gInfo$ret, gInfo$mz, FUN = makeFGroupName)
+        gInfo[, group := gNames]
+        setcolorder(gInfo, "group")
         setnames(gTab, gNames)
         setnames(ftind, gNames)
 
         return(featureGroupsSIRIUS(groups = gTab, groupInfo = gInfo, features = features, ftindex = ftind))
     }
 
-    return(featureGroupsSIRIUS(groups = data.table(), groupInfo = data.frame(),
+    return(featureGroupsSIRIUS(groups = data.table(), groupInfo = data.table(),
                                features = featuresSIRIUS(analysisInfo = anaInfo, features = list()),
                                ftindex = data.table()))
 }

@@ -406,7 +406,7 @@ addAllDAEICs <- function(fGroups, mzWindow = 0.005, ctype = "EIC", bgsubtr = FAL
             {
                 eics <- sapply(grpsInAna, function(grpi)
                 {
-                    makeDAEIC(gInfo[grpi, "mzs"], mzWindow, ctype, bgsubtr = bgsubtr)
+                    makeDAEIC(gInfo$mz[grpi], mzWindow, ctype, bgsubtr = bgsubtr)
                 }, USE.NAMES = FALSE)
                 
                 chroms <- DA[["Analyses"]][[ind]][["Chromatograms"]]

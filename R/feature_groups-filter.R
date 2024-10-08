@@ -275,9 +275,9 @@ retentionMzFilter <- function(fGroups, range, negate, what)
             pred <- Negate(pred)
 
         checkVals <- switch(what,
-                            retention = fGroups@groupInfo$rts,
-                            mz = fGroups@groupInfo$mzs,
-                            mzDefect = fGroups@groupInfo$mzs - floor(fGroups@groupInfo$mzs))
+                            retention = fGroups@groupInfo$ret,
+                            mz = fGroups@groupInfo$mz,
+                            mzDefect = fGroups@groupInfo$mz - floor(fGroups@groupInfo$mz))
 
         return(list(subset = list(j = pred(checkVals))))
     }))

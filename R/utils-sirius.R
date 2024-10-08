@@ -455,7 +455,7 @@ getMS2QTFPs <- function(featAnnSIR)
 
 predictRespFactorsSIRFPs <- function(featAnnSIR, gInfo, calibrants, eluent, organicModifier, pHAq, concUnit)
 {
-    featAnnSIR <- featAnnSIR[rownames(gInfo)]
+    featAnnSIR <- featAnnSIR[gInfo$group]
     
     allFPs <- getMS2QTFPs(featAnnSIR)
     
@@ -470,7 +470,7 @@ predictRespFactorsSIRFPs <- function(featAnnSIR, gInfo, calibrants, eluent, orga
         return(list(RFs = data.table(), MD = list()))
     
     # NOTE: we set the area to one to easily get the response factor below
-    unknowns <- data.table(identifier = allFPs$id, retention_time = gInfo[allFPs$group, "rts"],
+    unknowns <- data.table(identifier = allFPs$id, retention_time = gInfo[match(allFPs$group, group)]$ret,
                            SMILES = NA_character_, conc_M = NA_real_, area = 1)
     
     baseHash <- makeHash(calibrants, eluent, organicModifier, pHAq)

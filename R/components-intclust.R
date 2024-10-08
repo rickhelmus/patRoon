@@ -85,7 +85,7 @@ setMethod("plotInt", "componentsIntClust", function(obj, index, pch = 20, type =
     if (is.character(index))
         index <- which(index == names(obj))
     
-    plotm <- obj@clusterm[rownames(obj@clusterm) %in% rownames(obj@gInfo)[obj@cutClusters == index], , drop = FALSE]
+    plotm <- obj@clusterm[rownames(obj@clusterm) %in% obj@gInfo$group[obj@cutClusters == index], , drop = FALSE]
     nsamp <- ncol(plotm)
 
     do.call(plot, c(list(x = c(0, nsamp), y = c(0, max(plotm)), type = "n", xlab = "", ylab = "normalized intensity",
@@ -106,7 +106,7 @@ setMethod("plotIntHash", "componentsIntClust", function(obj, index, ...)
 {
     if (is.character(index))
         index <- which(index == names(obj))
-    plotm <- obj@clusterm[rownames(obj@clusterm) %in% rownames(obj@gInfo)[obj@cutClusters == index], , drop = FALSE]
+    plotm <- obj@clusterm[rownames(obj@clusterm) %in% obj@gInfo$group[obj@cutClusters == index], , drop = FALSE]
     return(makeHash(plotm, ...))
 })
 
@@ -165,7 +165,7 @@ setMethod("generateComponentsIntClust", "featureGroups", function(fGroups, metho
     gInfo <- groupInfo(fGroups)
     
     if (length(fGroups) == 0)
-        return(componentsIntClust(clusterm = matrix(), distm = NULL, method = method, gInfo = gInfo,
+        return(componentsIntClust(clusterm = matrix(), distm = NULL, method = method, gInfo = copy(gInfo),
                                   properties = properties, maxTreeHeight = maxTreeHeight, deepSplit = deepSplit,
                                   minModuleSize = minModuleSize, algorithm = "intclust"))
     
@@ -184,7 +184,7 @@ setMethod("generateComponentsIntClust", "featureGroups", function(fGroups, metho
     distm <- daisy(clusterm, metric)
     cat("Done!\n")
 
-    return(componentsIntClust(clusterm = clusterm, distm = distm, method = method, gInfo = gInfo,
+    return(componentsIntClust(clusterm = clusterm, distm = distm, method = method, gInfo = copy(gInfo),
                               properties = properties, maxTreeHeight = maxTreeHeight,
                               deepSplit = deepSplit, minModuleSize = minModuleSize, algorithm = "intclust"))
 })

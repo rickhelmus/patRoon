@@ -202,6 +202,7 @@
 
 ## msdata
 
+- see if it makes sense to return lists instead of dataframes for other functions besides getEICList()
 - MT
     - test ThreadExceptionHandler a bit more, eg if subsequent run calls cancels well if an exception is caught
 - cleanup
@@ -212,7 +213,7 @@
     - clean old tims files
 - OpenTIMS doesn't seem to want to initialize the Bruker libs sometimes when repeatedly calling devtools::load_all()
     - forcing setup_bruker just before obtaining a handle seems to be a workaround
-    - for now just throw an error if it's not loaded, could try above aowrkaround if it seems to occur more frequently
+    - for now just throw an error if it's not loaded, could try above workaround if it seems to occur more frequently
 - replace makeFileHash() with getMSDataFileHash() on more places?
     - for now leave, but can be done when things appear slow
 - perform centroid checks in backends?
@@ -288,6 +289,7 @@
 - findPeaks()
     - export? If yes, add checkmate's, documentation etc
         - if not, still need to doc args somehow
+        - clashes with xcms::findPeaks()...
     - add smoothing for XCMS3/enviPick? e.g. with signal::sgolayfilt()
         - might also be nice for plotting chroms?
     - OpenMS
@@ -319,6 +321,8 @@
     - XCMS/XCMS3/KPIC2: doc and/or default min fractions to zero as these probably don't make a lot of sense otherwise
     - Handle mobilities
         - Does the mobmin/mobmax range make sense how it is computed now?
+- Suspect/Binning features
+    - cache results (or check if caching of EICs can be speed up)
 - reporting
     - convert reactable cell img functions to JS versions, so img paths are set dynamically which can save quite some space for selfContained reports
         --> see WIP changes made for chromsLarge

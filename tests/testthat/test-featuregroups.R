@@ -88,7 +88,7 @@ test_that("adducts setting", {
     {
         ann <- annotations(fgOpenMSAnn2)[i]
         return(isTRUE(all.equal(patRoon:::calculateMasses(ann$neutralMass, as.adduct(ann$adduct), "mz"),
-                                groupInfo(fgOpenMSAnn2)[ann$group, "mzs"])))
+                                groupInfo(fgOpenMSAnn2)[match(ann$group, group)]$mz)))
     })))
 })
 
@@ -293,12 +293,12 @@ test_that("delete and filter", {
     expect_true(all(sapply(groupTable(filter(fgOpenMS, relMinMaxIntensity = 0.5)),
                            function(x) max(x) >= (0.5 * max(groupTable(fgOpenMS))))))
 
-    expect_range(groupInfo(filter(fgOpenMS, retentionRange = c(120, 200)))$rts, c(120, 200))
+    expect_range(groupInfo(filter(fgOpenMS, retentionRange = c(120, 200)))$ret, c(120, 200))
     # expect_equivalent(filter(fgOpenMS, retentionRange = c(0, Inf)), fgOpenMS)
     expect_equivalent(filter(fgXCMS3, retentionRange = c(0, Inf)), fgXCMS3) # NOTE: cannot use OpenMS as it may  yield negative RTs...
-    expect_range(groupInfo(filter(fgOpenMS, mzRange = c(200, 300)))$mzs, c(200, 300))
+    expect_range(groupInfo(filter(fgOpenMS, mzRange = c(200, 300)))$mz, c(200, 300))
     expect_equivalent(filter(fgOpenMS, mzRange = c(0, Inf)), fgOpenMS)
-    expect_range(groupInfo(filter(fgOpenMS, mzDefectRange = c(0.1, 0.2)))$mzs %% 1, c(0.1, 0.2))
+    expect_range(groupInfo(filter(fgOpenMS, mzDefectRange = c(0.1, 0.2)))$mz %% 1, c(0.1, 0.2))
     expect_equivalent(filter(fgOpenMS, mzDefectRange = c(0, 1)), fgOpenMS)
     expect_lt(length(filter(fgOpenMS, chromWidthRange = c(0, 30))), length(fgOpenMS))
     expect_equivalent(filter(fgOpenMS, chromWidthRange = c(0, Inf)), fgOpenMS)
@@ -365,9 +365,9 @@ checkISTDNormWindows <- function(fg, minISTD, RTWin, MZWin)
     ia <- getISTDAssignments(fg)
     ia <- ia[lengths(ia) > minISTD]
     gInfo <- groupInfo(fg)
-    calcDev <- function(grp, istdGrps, what) abs(gInfo[grp, what] - gInfo[istdGrps, what])
-    maxRTDev <- max(unlist(Map(names(ia), ia, f = calcDev, MoreArgs = list(what = "rts"))))
-    maxMZDev <- max(unlist(Map(names(ia), ia, f = calcDev, MoreArgs = list(what = "mzs"))))
+    calcDev <- function(grp, istdGrps, what) abs(gInfo[group == grp][[what]] - gInfo[match(istdGrps, group)][[what]])
+    maxRTDev <- max(unlist(Map(names(ia), ia, f = calcDev, MoreArgs = list(what = "ret"))))
+    maxMZDev <- max(unlist(Map(names(ia), ia, f = calcDev, MoreArgs = list(what = "mz"))))
     expect_lte(maxRTDev, RTWin)
     expect_lte(maxMZDev, MZWin)
 }
@@ -581,8 +581,8 @@ test_that("sets functionality", {
     skip_if_not(testWithSets())
     
     # proper (de)neutralization
-    expect_equal(patRoon:::calculateMasses(groupInfo(unset(fgOpenMS, "positive"))$mzs, as.adduct("[M+H]+"), "neutral"),
-                 groupInfo(fgOpenMS[, sets = "positive"])$mzs)
+    expect_equal(patRoon:::calculateMasses(groupInfo(unset(fgOpenMS, "positive"))$mz, as.adduct("[M+H]+"), "neutral"),
+                 groupInfo(fgOpenMS[, sets = "positive"])$mz)
     expect_equal(analysisInfo(unset(fgOpenMS, "positive"), TRUE), getTestAnaInfoPos())
     expect_equal(analysisInfo(fgOpenMS[, sets = "positive"], TRUE)[, 1:4], getTestAnaInfoPos())
     expect_setequal(annotations(fgOpenMS)$adduct, c("[M+H]+", "[M-H]-"))
@@ -618,7 +618,7 @@ test_that("sets functionality", {
     {
         ann <- annotations(fgOpenMSDiffAdductRG)[i]
         # neutral mass equals neutralized group mass
-        return(isTRUE(all.equal(ann$neutralMass, groupInfo(fgOpenMSDiffAdductRG)[ann$group, "mzs"])))
+        return(isTRUE(all.equal(ann$neutralMass, groupInfo(fgOpenMSDiffAdductRG)[match(ann$group, group)]$mz)))
     })))
     
     expect_length(filter(fgOpenMSEmpty, relMinSets = 1), 0)

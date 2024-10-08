@@ -154,7 +154,7 @@ setMethod("initialize", "componentsFeatures", function(.Object, fGroups, minSize
     cols <- intersect(c("parentGroup", "group", "neutralMass", "isonr", "charge", "adduct_ion", "adduct_abundance"),
                       names(linkedFGs))
     linkedFGs <- linkedFGs[, cols, with = FALSE]
-    linkedFGs[, c("ret", "mz") := gInfo[group, c("rts", "mzs")]]
+    linkedFGs[, c("ret", "mz") := gInfo[match(linkedFGs$group, group), c("ret", "mz"), with = FALSE]]
     setcolorder(linkedFGs, c("group", "ret", "mz"))
     
     comps <- split(linkedFGs, by = "parentGroup", keep.by = FALSE)

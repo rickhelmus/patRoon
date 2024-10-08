@@ -330,7 +330,7 @@ setMethod("as.data.table", "MSPeakLists", function(x, fGroups = NULL, averaged =
 
     if (!is.null(fGroups))
     {
-        ret[, c("ret", "group_mz") := groupInfo(fGroups)[group, c("rts", "mzs")]][]
+        ret[, c("ret", "group_mz") := groupInfo(fGroups)[match(ret$group, group), c("ret", "mz"), with = FALSE][]
         setcolorder(ret, c("group", "ret", "group_mz"))
         if (!averaged)
             setcolorder(ret, "analysis")

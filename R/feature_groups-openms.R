@@ -177,6 +177,8 @@ importConsensusXML <- function(feat, cfile, verbose)
     gCount <- nrow(consXML$gInfo)
     if (gCount > 0)
     {
+        gInfo <- as.data.table(consXML$gInfo)
+        
         # generate group intensity table
         gtab <- data.table(matrix(0, nrow = anaCount, ncol = gCount))
         ftindex <- as.data.table(consXML$ftindex)
@@ -191,16 +193,16 @@ importConsensusXML <- function(feat, cfile, verbose)
             }
         }
 
-        gNames <- sapply(seq_len(gCount), function(grpi) makeFGroupName(grpi, consXML$gInfo$rts[grpi],
-                                                                        consXML$gInfo$mzs[grpi]))
-        rownames(consXML$gInfo) <- gNames
+        gNames <- sapply(seq_len(gCount), function(grpi) makeFGroupName(grpi, gInfo$ret[grpi], gInfo$mz[grpi]))
+        gInfo[, group := gNames]
+        setcolorder(gInfo, "group")
         setnames(gtab, gNames)
         setnames(ftindex, gNames)
 
-        ret <- list(groups = gtab, gInfo = consXML$gInfo, ftindex = ftindex)
+        ret <- list(groups = gtab, gInfo = gInfo, ftindex = ftindex)
     }
     else
-        ret <- list(groups = data.table(), gInfo = data.frame(), ftindex = data.table())
+        ret <- list(groups = data.table(), gInfo = data.table(), ftindex = data.table())
 
     if (verbose)
         cat("Done!\n")

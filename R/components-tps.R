@@ -221,9 +221,9 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, 
         # dummy intensity value so e.g. plotSpectrum works            
         cmp[, intensity := 1]
         
-        cmp[, c("ret", "mz") := gInfoTPs[group, c("rts", "mzs")]]
-        cmp[, retDiff := ret - gInfoParents[parentFG, "rts"]]
-        cmp[, mzDiff := mz - gInfoParents[parentFG, "mzs"]]
+        cmp[, c("ret", "mz") := gInfoTPs[match(cmp$group, group), c("ret", "mz"), with = FALSE]]
+        cmp[, retDiff := ret - gInfoParents[group == parentFG]$ret]
+        cmp[, mzDiff := mz - gInfoParents[group == parentFG]$mz]
         
         cmp[, retDir := fcase((retDiff + minRTDiff) < 0, -1,
                              (retDiff - minRTDiff) > 0, 1,
@@ -270,7 +270,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, 
         cols <- cols[sapply(cols, function(cl) any(!is.na(pars[[cl]])))]
         targetCols <- paste0("parent_", cols)
         compInfo[, (targetCols) := pars[match(parent_name, pars$name), cols, with = FALSE]]
-        compInfo[, c("parent_rt", "parent_mz") := gInfoParents[parent_group, c("rts", "mzs")]]
+        compInfo[, c("parent_rt", "parent_mz") := gInfoParents[match(parent_group, group), c("ret", "mz"), with = FALSE]]
         setcolorder(compInfo, c("parent_name", "parent_group", "parent_rt", "parent_mz"))
         TPFGMapping <- linkTPsToFGroups(TPs, fGroupsTPs)
     }

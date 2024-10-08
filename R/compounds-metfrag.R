@@ -304,7 +304,7 @@ generateMetFragRunData <- function(fGroups, MSPeakLists, mfSettings, extDB, topM
 
         mfSettings$IonizedPrecursorMass <- MSPeakLists[[grp]]$MS[precursor == TRUE]$mz
         mfSettings$PrecursorIonType <- addChr
-        mfSettings$ExperimentalRetentionTimeValue <- gInfo[grp, "rts"] / 60
+        mfSettings$ExperimentalRetentionTimeValue <- gInfo[group == grp]$ret / 60
 
         if (!is.null(identifiers))
             mfSettings$PrecursorCompoundIDs <- identifiers[[grp]]
@@ -611,7 +611,6 @@ setMethod("generateCompoundsMetFrag", "featureGroups", function(fGroups, MSPeakL
     gTable <- groupTable(fGroups)
     gNames <- names(fGroups)
     gCount <- length(fGroups)
-    gInfo <- groupInfo(fGroups)
     pLists <- peakLists(MSPeakLists)
 
     if (!is.logical(extendedPubChem) && database == "pubchem")

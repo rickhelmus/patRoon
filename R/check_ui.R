@@ -89,7 +89,7 @@ saveCheckSession <- function(session, path, fGroups, type)
     
     gInfo <- groupInfo(fGroups)
     session$featureGroups <- sapply(names(fGroups),
-                                    function(grp) list(ret = gInfo[grp, "rts"], mz = gInfo[grp, "mzs"]),
+                                    function(grp) list(ret = gInfo[group == grp]$ret, mz = gInfo[group == grp]$mz),
                                     simplify = FALSE)
     
     writeYAML(session, path)
@@ -99,16 +99,13 @@ importCheckUISessionGroups <- function(oldSession, fGroups, rtWindow, mzWindow)
 {
     
     gInfo <- groupInfo(fGroups)
-    gInfoDT <- as.data.table(gInfo[, c("rts", "mzs")])
-    setnames(gInfoDT, c("ret", "mz")) # equalize column names between old/new tables
-    gInfoDT[, group := rownames(gInfo)]
-    
+
     oldGroupTab <- rbindlist(oldSession$featureGroups, idcol = "group")
     
     warnTol <- FALSE
     newGroups <- setNames(lapply(split(oldGroupTab, seq_len(nrow(oldGroupTab))), function(ogtr)
     {
-        gi <- gInfoDT[numLTE(abs(ret - ogtr$ret), rtWindow) & numLTE(abs(mz - ogtr$mz), mzWindow)]
+        gi <- gInfo[numLTE(abs(ret - ogtr$ret), rtWindow) & numLTE(abs(mz - ogtr$mz), mzWindow)]
         if (nrow(gi) == 0)
         {
             printf("Could not find any matching feature groups for old group %s\n", ogtr$group)

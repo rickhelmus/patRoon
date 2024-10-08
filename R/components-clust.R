@@ -11,9 +11,10 @@ genClustComponents <- function(cutClusters, gInfo)
     clinds <- seq_along(unique(cutClusters))
     comps <- lapply(clinds, function(ci)
     {
-        gNames <- rownames(gInfo)[cutClusters == ci]
-        return(data.table(group = gNames, ret = gInfo[gNames, "rts"], mz = gInfo[gNames, "mzs"],
-                          intensity = 1))
+        gNames <- gInfo$group[cutClusters == ci]
+        ret <- copy(gInfo[cutClusters == ci][, c("group", "ret", "mz"), with = FALSE])
+        ret[, intensity := 1]
+        return(ret)
     })
     names(comps) <- paste0("CMP", seq_along(clinds))
     return(comps)
@@ -62,7 +63,7 @@ verifyCompNotAltered <- function(obj)
 #' @export
 componentsClust <- setClass("componentsClust",
                             slots = c(distm = "dist", clust = "hclust",
-                                      cutClusters = "numeric", gInfo = "data.frame", properties = "list",
+                                      cutClusters = "numeric", gInfo = "data.table", properties = "list",
                                       altered = "logical"),
                             contains = c("components", "VIRTUAL"))
 

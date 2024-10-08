@@ -107,7 +107,7 @@ doFGAADTGroups <- function(fGroups, intColNames, average, averageBy, areas, addQ
         ret[isSignificant & numLTE(abs(FC_log), FCParams$thresholdFC), classification := "significant"]
     }
     
-    ret[, c("group", "ret", "mz") := .(gNames, gInfo$rts, gInfo$mzs)]
+    ret[, c("group", "ret", "mz") := .(gNames, gInfo$ret, gInfo$mz)]
     setcolorder(ret, c("group", "ret", "mz"))
     
     if (addQualities)

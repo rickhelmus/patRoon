@@ -435,7 +435,7 @@ setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWi
     return(featureGroupsScreeningSet(screenInfo = scr, setObjects = setObjects,
                                      groupAlgo = fGroups@groupAlgo, groupArgs = fGroups@groupArgs,
                                      groupVerbose = fGroups@groupVerbose, groups = copy(groupTable(fGroups)),
-                                     groupInfo = groupInfo(fGroups), features = getFeatures(fGroups),
+                                     groupInfo = copy(groupInfo(fGroups)), features = getFeatures(fGroups),
                                      ftindex = copy(groupFeatIndex(fGroups)),
                                      groupQualities = copy(groupQualities(fGroups)),
                                      groupScores = copy(groupScores(fGroups)), ISTDs = copy(internalStandards(fGroups)),

@@ -135,15 +135,16 @@ importFeatureGroupsKPIC2FromFeat <- function(picsSetGrouped, analysisInfo, feat)
     if (is.null(picsSetGrouped$peakmat)) # no results (eg filtered out due to frac argument)
     {
         groups <- ftindex <- data.table()
-        gInfo <- data.frame(rts = numeric(), mzs = numeric())
+        gInfo <- data.table(group = character(), ret = numeric(), mz = numeric())
     }
     else
     {
         peakMat <- copy(picsSetGrouped$peakmat)
         
-        gInfo <- peakMat[, .(rts = mean(rt), mzs = mean(mz)), by = "group"]
-        setorderv(gInfo, "mzs")
-        gNames <- makeFGroupName(seq_len(nrow(gInfo)), gInfo$rts, gInfo$mzs)
+        gInfo <- peakMat[, .(ret = mean(rt), mz = mean(mz)), by = "group"]
+        gNames <- makeFGroupName(seq_len(nrow(gInfo)), gInfo$ret, gInfo$mz)
+        gInfo[, group := gNames]
+        setorderv(gInfo, c("group", "ret", "mz"))
         
         # NOTE: KPIC2 group ID may not be continuous
         peakMat[, groupName := gNames[match(group, gInfo$group)]]
@@ -163,9 +164,6 @@ importFeatureGroupsKPIC2FromFeat <- function(picsSetGrouped, analysisInfo, feat)
             inds[grpTab$sample] <- grpTab$index
             return(inds)
         })]
-        
-        gInfo <- as.data.frame(gInfo[, -"group"])
-        rownames(gInfo) <- gNames
     }
     
     return(featureGroupsKPIC2(picsSetGrouped = picsSetGrouped, groups = groups, groupInfo = gInfo, features = feat,

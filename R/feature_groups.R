@@ -68,7 +68,7 @@ NULL
 #' @slot groups Matrix (\code{\link{data.table}}) with intensities for each feature group (columns) per analysis (rows).
 #'   Access with \code{groups} method.
 #' @slot features \code{\link{features}} class associated with this object. Access with\code{featureTable} methods.
-#' @slot groupInfo \code{data.frame} with retention time (\code{rts} column, in seconds) and \emph{m/z} (\code{mzs}
+#' @slot groupInfo \code{data.table} with retention time (\code{ret} column, in seconds) and \emph{m/z} (\code{mz}
 #'   column) for each feature group. Access with \code{groupInfo} method.
 #' @slot ftindex Matrix (\code{\link{data.table}}) with feature indices for each feature group (columns) per analysis
 #'   (rows). Each index corresponds to the row within the feature table of the analysis (see
@@ -96,7 +96,7 @@ NULL
 #'
 #' @export
 featureGroups <- setClass("featureGroups",
-                          slots = c(groups = "data.table", groupInfo = "data.frame", features = "features",
+                          slots = c(groups = "data.table", groupInfo = "data.table", features = "features",
                                     ftindex = "data.table", groupQualities = "data.table",
                                     groupScores = "data.table", annotations = "data.table",
                                     ISTDs = "data.table", ISTDAssignments = "list", concentrations = "data.table",
@@ -534,7 +534,7 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
             obj@groups <- obj@groups[, -ginds, with = FALSE]
             obj@ftindex <- obj@ftindex[, -ginds, with = FALSE]
         }
-        obj@groupInfo <- obj@groupInfo[-ginds, ]
+        obj@groupInfo <- obj@groupInfo[-ginds]
         if (hasFGroupScores(obj))
         {
             obj@groupQualities <- obj@groupQualities[group %in% names(obj@groups)]
@@ -661,18 +661,18 @@ setMethod("export", "featureGroups", function(obj, type, out)
         colnames(df) <- hdr
 
         df["name"] <- colnames(obj@groups)
-        df["m/z"] <- obj@groupInfo$mzs
-        df["rt"] <- obj@groupInfo$rts / 60
+        df["m/z"] <- obj@groupInfo$mz
+        df["rt"] <- obj@groupInfo$ret / 60
 
         write.csv(df, out, row.names = FALSE, na = "")
     }
     else if (type == "mzmine")
     {
-        df <- obj@groupInfo
-        df$name <- rownames(df)
-        df <- df[, c("mzs", "rts", "name")]
-        df$rts <- df$rts / 60
-        write.table(df, out, row.names = FALSE, col.names = FALSE, sep = ",", quote = FALSE)
+        df <- copy(obj@groupInfo)
+        setnames(df, "group", "name")
+        setcolorder(df, c("mz", "ret", "name"))
+        df[, rt := df$rt / 60]
+        fwrite(df, out, row.names = FALSE, col.names = FALSE, sep = ",", quote = FALSE)
     }
 })
 
@@ -1003,7 +1003,7 @@ setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduc
         else
             fGroups@annotations[, adduct := prefAdduct]
 
-        fGroups@annotations[, neutralMass := calculateMasses(groupInfo(fGroups)[group, "mzs"],
+        fGroups@annotations[, neutralMass := calculateMasses(groupInfo(fGroups)[match(fGroups@annotations$group, group)]$mz,
                                                              lapply(adduct, as.adduct),
                                                              type = "neutral")]
                 
@@ -1158,19 +1158,19 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
         printf("Removed %d non-ubiquitous internal standards\n", origN - uniqueN(fGroups@ISTDs$name))
         
         gInfo <- groupInfo(fGroups)
-        gInfoISTDs <- gInfo[unique(fGroups@ISTDs$group), ]
-        fGroups@ISTDAssignments <- setNames(Map(gInfo$rts, gInfo$mzs, f = function(rt, mz)
+        gInfoISTDs <- gInfo[group %chin% fGroups@ISTDs$group]
+        fGroups@ISTDAssignments <- setNames(Map(gInfo$ret, gInfo$mz, f = function(rt, mz)
         {
             # UNDONE: with configurable N, handle duplicate IS assignments differently? (ie select on suspect RT instead of group RT)
             
             # sort by closest eluting ISTDs with closest m/z
-            gi <- gInfoISTDs[order(abs(gInfoISTDs$rts - rt), abs(gInfoISTDs$mzs - mz)), ]
-            giInRange <- gi[numLTE(abs(gi$rts - rt), ISTDRTWindow) & numLTE(abs(gi$mzs - mz), ISTDMZWindow), ]
+            gi <- gInfoISTDs[order(abs(ret - rt), abs(gInfoISTDs$mz - mz))]
+            giInRange <- gi[numLTE(abs(ret - rt), ISTDRTWindow) & numLTE(abs(mz - mz), ISTDMZWindow)]
             if (nrow(giInRange) >= minISTDs)
-                return(rownames(giInRange)) # only take those in range
+                return(giInRange$group) # only take those in range
             if (nrow(gi) > minISTDs)
-                gi <- gi[seq_len(minISTDs), ] # just take minimum of ISTDs, even if some are out of range
-            return(rownames(gi))
+                gi <- gi[seq_len(minISTDs)] # just take minimum of ISTDs, even if some are out of range
+            return(gi$group)
         }), names(fGroups))
         fGroups@ISTDAssignments <- fGroups@ISTDAssignments[lengths(fGroups@ISTDAssignments) > 0]
         fGroups@ISTDAssignments <- fGroups@ISTDAssignments[!names(fGroups@ISTDAssignments) %in% fGroups@ISTDs$group]
@@ -1423,17 +1423,16 @@ setMethod("splitMobilities", "featureGroups", function(obj, IMSWindow = 0.01, ..
     featureTable(obj) <- split(fTableAll[, -"gClust"], by = "analysis", keep.by = FALSE)
     
     # update gInfo
-    gInfoDT <- as.data.table(groupInfo(obj)) # UNDONE: someday the groupInfo slot should be a DT...
-    gInfoDT[, group_orig := names(obj)]
-    gInfoDT <- merge(gInfoDT, gMobInfo, by = "group_orig")
-    obj@groupInfo <- as.data.frame(gInfoDT[, -(c("group_orig", "gClust", "group"))])
-    rownames(obj@groupInfo) <- gInfoDT$group
+    gInfo <- copy(groupInfo(obj))
+    gInfo[, group_orig := group]
+    gInfo <- merge(gInfo, gMobInfo, by = "group_orig")
+    obj@groupInfo <- gInfo[, -(c("group_orig", "gClust"))]
     
     # update group table
     fTablePerGroup <- split(fTableAll, by = "group")
     anaInfo <- analysisInfo(obj)
     gTable <- data.table()
-    gTable[, (gInfoDT$group) := lapply(fTablePerGroup, function(ft)
+    gTable[, (gInfo$group) := lapply(fTablePerGroup, function(ft)
     {
         ints <- numeric(nrow(anaInfo))
         ints[match(ft$analysis, anaInfo$analysis)] <- ft$intensity

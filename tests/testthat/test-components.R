@@ -251,7 +251,7 @@ test_that("selectIons works", {
     {
         ann <- annotations(fGroupsSI)[i]
         return(isTRUE(all.equal(patRoon:::calculateMasses(ann$neutralMass, as.adduct(ann$adduct), "mz"),
-                                groupInfo(fGroupsSI)[ann$group, "mzs"])))
+                                groupInfo(fGroupsSI)[match(ann$group, group)]$mz)))
     })))
     
     skip_if(testWithSets())
@@ -301,6 +301,6 @@ test_that("sets functionality", {
     {
         ann <- annotations(fGroupsSI)[i]
         # neutral mass equals neutralized group mass
-        return(isTRUE(all.equal(ann$neutralMass, groupInfo(fGroupsSI)[ann$group, "mzs"])))
+        return(isTRUE(all.equal(ann$neutralMass, groupInfo(fGroupsSI)[match(ann$group, group)]$mz)))
     })))
 })

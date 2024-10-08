@@ -209,7 +209,7 @@ setMethod("generateComponentsNontarget", "featureGroups", function(fGroups, ioni
         homTab[, groups := list(sapply(`peak IDs`, function(pids)
         {
             ginds <- as.integer(unlist(strsplit(pids, ",")))
-            ginds <- ginds[order(gInfo[gNames[ginds], "mzs"])] # ensure they are from low to high m/z
+            ginds <- ginds[order(gInfo[match(gNames[ginds], group)]$mz)] # ensure they are from low to high m/z
             return(list(gNames[ginds]))
         }, simplify = FALSE))]
         
@@ -250,8 +250,8 @@ setMethod("generateComponentsNontarget", "featureGroups", function(fGroups, ioni
 
             mzSame <- function(mz1, mz2) numLTE(abs(mz1 - mz2), absMzDevLink)
             
-            if (any(sapply(missingG, function(mg) any(mzSame(gInfo[mg, "mzs"], gInfo[otherSeries, "mzs"])))) ||
-                any(sapply(missingOtherG, function(mg) any(mzSame(gInfo[mg, "mzs"], gInfo[series, "mzs"])))))
+            if (any(sapply(missingG, function(mg) any(mzSame(gInfo[group == mg]$mz, gInfo[match(otherSeries, group)]$mz)))) ||
+                any(sapply(missingOtherG, function(mg) any(mzSame(gInfo[group == mg]$mz, gInfo[match(series, group)]$mz)))))
                 next
             
             links <- c(links, ro)
@@ -282,7 +282,7 @@ setMethod("generateComponentsNontarget", "featureGroups", function(fGroups, ioni
             {
                 # merge groups
                 mGroups <- union(compTab[["groups"]][[r]][[1]], compTab[["groups"]][[other]][[1]])
-                mGroups <- mGroups[order(gInfo[mGroups, "mzs"])] # make sure order stays correct
+                mGroups <- mGroups[order(gInfo[match(mGroups, group)]$mz)] # make sure order stays correct
                 set(compTab, r, "groups", list(list(list(mGroups))))
                 
                 # mark presence
@@ -337,7 +337,7 @@ setMethod("generateComponentsNontarget", "featureGroups", function(fGroups, ioni
         {
             grp <- compTab[[rg]][[cmpi]][[1]]
             if (!is.null(grp))
-                return(data.table(rt = gInfo[grp, "rts"], mz = gInfo[grp, "mzs"], group = grp,
+                return(data.table(rt = gInfo[group == grp]$rt, mz = gInfo[group == grp]$mz, group = grp,
                                   hsnr = match(grp, allGroups), rGroup = rg,
                                   intensity = groupTablesRG[[rg]][group %in% grp, get(getADTIntCols(rg))]))
             return(NULL)

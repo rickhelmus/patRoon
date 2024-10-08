@@ -40,6 +40,7 @@
         - do by default in newProject()?
 
 - TP components
+    - getTPParents(): remove unused calcLogP arg?
     - update patRoonInst for new deps?
     - hashing for all algos seem to take unnecessary variables (eg parent names, things for prepareChemTable() etc)
     - further limit candidate columns? Can get quite excessive
@@ -59,6 +60,7 @@
             - finish up
                 - make title/href configurable?
         - TP structures with fmcsR/depict (maybe later?)
+        - delta sign sometimes shown as N ?
 
 - tests
     - IDL filter
@@ -255,7 +257,7 @@
 - convertMSFilesXXX()
     - change function names?
     - add option for zlib compression, and enable by default? Esp useful for IMS/profile data
-    
+- more clearly state which backend is used, e.g. for general logging and citing
 
 - test
     - new verifyFileForFormat() usage in convertMSFiles()
@@ -325,6 +327,7 @@
     - Dietrich features
 - NEWS
     - Dietrich features
+- groupInfo is now a DT
 
 
 ## Features

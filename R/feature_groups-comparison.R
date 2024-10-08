@@ -136,8 +136,7 @@ convertFGroupsToPseudoFeatures <- function(fGroupsList)
         gi <- groupInfo(fGroupsList[[fgi]])
 
         # use group info as basis
-        ft <- as.data.table(gi)
-        setnames(ft, c("rts", "mzs"), c("ret", "mz"))
+        ft <- gi[, c("ret", "mz"), with = FALSE]
         ft[, ID := colnames(gt)]
 
         if (nrow(ft) == 0)
@@ -383,7 +382,7 @@ setMethod("consensus", "featureGroupsComparison", function(obj, absMinAbundance 
                                      algorithm = allAlgos)
 
     if (nrow(compFeatInds) == 0) # all input were empty feature groups
-        return(featureGroupsConsensus(groups = data.table(), groupInfo = data.frame(), features = retFeatures,
+        return(featureGroupsConsensus(groups = data.table(), groupInfo = data.table(), features = retFeatures,
                                       ftindex = data.table(), algorithm = allAlgos))
 
     # initialize new feature group tables
@@ -411,7 +410,7 @@ setMethod("consensus", "featureGroupsComparison", function(obj, absMinAbundance 
     setTxtProgressBar(prog, nrow(anaInfo))
     close(prog)
 
-    return(featureGroupsConsensus(groups = consGroups, groupInfo = groupInfo(comparedFGroups), features = retFeatures,
+    return(featureGroupsConsensus(groups = consGroups, groupInfo = copy(groupInfo(comparedFGroups)), features = retFeatures,
                                   ftindex = consFeatInds, algorithm = allAlgos))
 })
 

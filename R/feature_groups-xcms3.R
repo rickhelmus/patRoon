@@ -174,12 +174,12 @@ importFeatureGroupsXCMS3FromFeat <- function(xdata, analysisInfo, feat)
     {
         # no results (e.g. due to minFraction>0)
         groups <- ftindex <- data.table()
-        gInfo <- data.frame(rts = numeric(), mzs = numeric())
+        gInfo <- data.table(group = character(), ret = numeric(), mzs = numeric())
     }
     else
     {
         gNames <- makeFGroupName(seq_len(nrow(xcginfo)), xcginfo[, "rtmed"], xcginfo[, "mzmed"])
-        gInfo <- data.frame(rts = xcginfo[, "rtmed"], mzs = xcginfo[, "mzmed"], row.names = gNames, stringsAsFactors = FALSE)
+        gInfo <- data.table(group = gNames, ret = xcginfo[, "rtmed"], mz = xcginfo[, "mzmed"])
         
         groups <- data.table(t(xcms::featureValues(xdata, value = "maxo")))
         setnames(groups, gNames)

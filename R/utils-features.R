@@ -191,7 +191,7 @@ updateAnnAdducts <- function(annTable, gInfo, adducts)
     
     adducts <- sapply(adducts, checkAndToAdduct, .var.name = "value", simplify = FALSE)
     adductsChr <- sapply(adducts, as.character) # re-make characters: standardize format
-    nm <- calculateMasses(gInfo[names(adducts), "mzs"], adducts, type = "neutral")
+    nm <- calculateMasses(gInfo[match(names(adducts), group)]$mz, adducts, type = "neutral")
     
     if (nrow(annTable) > 0)
     {
@@ -234,7 +234,7 @@ getAnnotationsFromSetFeatures <- function(fGroups)
             
             return(data.table(group = grps, adduct = firstFeats$adduct))
         }, simplify = FALSE), idcol = "set", fill = TRUE) # set fill for empty objects
-        ret[, neutralMass := groupInfo(fGroups)[ret$group, "mzs"]]
+        ret[, neutralMass := groupInfo(fGroups)[match(ret$group, group)]$mz]
         adducts <- sapply(unique(ret$adduct), as.adduct)
         ret[, ion_mz := calculateMasses(neutralMass, adducts[adduct], type = "mz")]
     }

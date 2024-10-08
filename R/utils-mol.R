@@ -380,7 +380,7 @@ predictRespFactorsSMILES <- function(fgSMILESTab, gInfo, calibrants, eluent, org
     
     fgSMILESTab <- copy(fgSMILESTab)
     fgSMILESTab[, identifier := group]
-    fgSMILESTab[, retention_time := gInfo[group, "rts"]]
+    fgSMILESTab[, retention_time := gInfo[match(fgSMILESTab$group, group)]$ret]
     fgSMILESTab[, conc_M := NA_real_]
     fgSMILESTab[, area := 1] # NOTE: we set the area to one to easily get the response factor
     fgSMILESTab[, hash := makeHash(baseHash, retention_time, SMILES), by = seq_len(nrow(fgSMILESTab))] 

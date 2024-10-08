@@ -15,7 +15,7 @@ namespace {
  * Return struct instead of Rcpp objects
  * Convert vector args to const refs
  * Removed unnecessary RcppArmadillo dependencies
- * Converted RT min/max args from scans to times
+ * Converted RT min/max args from scans to times and disable check if its zero
  * 
  * UNDONE: convert int args to doubles?
  */ 
@@ -241,7 +241,7 @@ PeakPickingResults peakPicking_cpp(const std::vector<double> &intensity, const s
     /* delete maxima that are outside predefined RT range and those below S/N treshold */
     j = 0;
     for(int i = 0; i < (anzahlmaxima); ++i) { 
-        if ((scantime[maxima[i]] >= rt_min) && (scantime[maxima[i]] <= rt_max) && ((intensity[maxima[i]]-noiselevel[i])*2 >= noisedeviation[i]*sn))  {	
+        if ((scantime[maxima[i]] >= rt_min) && (rt_max == 0.0 || scantime[maxima[i]] <= rt_max) && ((intensity[maxima[i]]-noiselevel[i])*2 >= noisedeviation[i]*sn))  {	
             maxima[j] = maxima[i];
             left_end[j] = left_end[i];
             right_end[j] = right_end[i];
@@ -396,19 +396,19 @@ Rcpp::List doFindPeaksDietrich(Rcpp::List EICs, double minIntensity, int sn, int
     Rcpp::List ret(entries);
     for (size_t i=0; i<entries; ++i)
     {
-        ret[i] = Rcpp::DataFrame::create(Rcpp::Named("ret") = ppresults[i].times,
-                                         Rcpp::Named("retmin") = ppresults[i].timesLeft,
-                                         Rcpp::Named("retmax") = ppresults[i].timesRight,
-                                         Rcpp::Named("area") = ppresults[i].areas,
-                                         Rcpp::Named("intensity") = ppresults[i].XICIntensities,
-                                         Rcpp::Named("noiseDeviation") = ppresults[i].noiseDeviations,
-                                         Rcpp::Named("FWHMLeft") = ppresults[i].FWHMsLeft,
-                                         Rcpp::Named("FWHMRight") = ppresults[i].FWHMsRight,
-                                         Rcpp::Named("baseline") = ppresults[i].baselines,
-                                         Rcpp::Named("scan") = ppresults[i].scans,
-                                         Rcpp::Named("scanLeft") = ppresults[i].scansLeft,
-                                         Rcpp::Named("scanRight") = ppresults[i].scansRight,
-                                         Rcpp::Named("noiseScans") = ppresults[i].noiseScans);
+        ret[i] = Rcpp::List::create(Rcpp::Named("ret") = ppresults[i].times,
+                                    Rcpp::Named("retmin") = ppresults[i].timesLeft,
+                                    Rcpp::Named("retmax") = ppresults[i].timesRight,
+                                    Rcpp::Named("area") = ppresults[i].areas,
+                                    Rcpp::Named("intensity") = ppresults[i].XICIntensities,
+                                    Rcpp::Named("noiseDeviation") = ppresults[i].noiseDeviations,
+                                    Rcpp::Named("FWHMLeft") = ppresults[i].FWHMsLeft,
+                                    Rcpp::Named("FWHMRight") = ppresults[i].FWHMsRight,
+                                    Rcpp::Named("baseline") = ppresults[i].baselines,
+                                    Rcpp::Named("scan") = ppresults[i].scans,
+                                    Rcpp::Named("scanLeft") = ppresults[i].scansLeft,
+                                    Rcpp::Named("scanRight") = ppresults[i].scansRight,
+                                    Rcpp::Named("noiseScans") = ppresults[i].noiseScans);
     }
     
     return ret;

@@ -409,9 +409,10 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
             }
         }
         
-        auto df = Rcpp::DataFrame::create(Rcpp::Named("time") = times,
-                                          Rcpp::Named("intensity") = intensities,
-                                          Rcpp::Named("mz") = mzs);
+        auto df = Rcpp::List::create(Rcpp::Named("time") = times,
+                                     Rcpp::Named("intensity") = intensities,
+                                     Rcpp::Named("mz") = mzs);
+        
         if (anySpecHasMob)
             df["mobility"] = mobilities;
         
@@ -421,12 +422,6 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
             df["mzBP"] = mzsBP;
         }
 
-        if (anySpecHasMob || withBP)
-        {
-            // HACK: column assignment above converts df to a list: https://stackoverflow.com/a/59369233
-            df = Rcpp::DataFrame(df);
-        }
-        
         ret[i] = df;
     }
     

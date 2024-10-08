@@ -462,20 +462,21 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
 })
 
 #' @export
-setMethod("findMobilities", "features", function(obj, peaksAlgorithm, mzRange = 0.005, clusterIMSWindow = 0.01,
+setMethod("findMobilities", "features", function(obj, findPeaksAlgo, mzRange = 0.005, clusterIMSWindow = 0.01,
                                                  clusterMethod = "distance", minIntensity = 0, maxMSRtWindow = 2, ...)
 {
     ac <- checkmate::makeAssertCollection()
+    assertFindPeaksAlgo(findPeaksAlgo, add = ac)
     aapply(checkmate::assertNumber, . ~ mzRange + clusterIMSWindow + minIntensity, finite = TRUE,
            fixed = list(add = ac))
-    checkmate::assertNumber(maxMSRtWindow, lower = 1, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertChoice(clusterMethod, c("bin", "distance", "hclust"), add = ac)
+    checkmate::assertNumber(maxMSRtWindow, lower = 1, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
     if (length(obj) == 0)
         return(obj) # nothing to do...
     
-    hash <- makeHash(obj, peaksAlgorithm, mzRange, clusterIMSWindow, clusterMethod, minIntensity, maxMSRtWindow, ...)
+    hash <- makeHash(obj, findPeaksAlgo, mzRange, clusterIMSWindow, clusterMethod, minIntensity, maxMSRtWindow, ...)
     cd <- loadCacheData("findMobilities", hash)
     if (!is.null(cd))
         return(cd)
@@ -504,7 +505,7 @@ setMethod("findMobilities", "features", function(obj, peaksAlgorithm, mzRange = 
         # pretend we have EICs so we can find peaks
         EICs <- lapply(EIMs, copy)
         EICs <- lapply(EICs, setnames, old = "mobility", new = "time")
-        peaksList <- findPeaks(EICs, peaksAlgorithm, ..., verbose = FALSE)
+        peaksList <- findPeaks(EICs, findPeaksAlgo, ..., verbose = FALSE)
         
         peaksTable <- rbindlist(peaksList, idcol = "ID")
         setnames(peaksTable, c("ret", "retmin", "retmax"), c("mobility", "mobstart", "mobend"), skip_absent = TRUE)

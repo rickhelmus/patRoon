@@ -106,14 +106,14 @@ findPeaksOpenMS <- function(EICs, extraOpts = NULL, scaleTimeFactor = NULL, verb
 {
     # UNDONE: more parameters, check what are sensible defaults
     
-    # EICs should be a named list of data.tables
+    # EICs should be a named list
     
     # HACK HACK HACK: OpenMS errors if the time range is very small. For instance, this is a problem if IMS data is used
     # with findMobilities() --> just increase the scale by scaleTimeFactor for now.
     # UNDONE: do we still need this?
     if (!is.null(scaleTimeFactor))
     {
-        EICs <- lapply(EICs, function(eic) copy(eic)[, time := time * scaleTimeFactor])
+        EICs <- lapply(EICs, function(eic) { eic$time <- eic$time * scaleTimeFactor; return(eic) })
     }
     
     TraMLFile <- tempfile(fileext = ".TraML")
@@ -140,7 +140,6 @@ findPeaksOpenMS <- function(EICs, extraOpts = NULL, scaleTimeFactor = NULL, verb
     maybePrintf("Importing peaks... ")
     peaks <- setDT(parseFeatureMRMXMLFile(featsFile))
     maybePrintf("Done!\n")
-
 
     peaks[, ID := NULL]
     setnames(peaks, "chromID", "name")
@@ -191,7 +190,7 @@ findPeaksEnviPick <- function(EICs, ..., verbose = TRUE)
     ret <- sapply(EICs, function(eic)
     {
         dummyPL$Scans[[1]] <- eic$time
-        sc <- copy(eic)
+        sc <- as.data.table(eic)
         setnames(sc, "time", "RT")
         sc[, "m/z" := 100] # dummy, no need for this
         sc[, measureID := seq_len(.N)]
@@ -220,5 +219,6 @@ findPeaksDietrich <- function(EICs, ...)
     setOMPThreads()
     peaks <- setNames(doFindPeaksDietrich(EICs, ...), names(EICs))
     peaks <- lapply(peaks, setDT)
+    peaks <- pruneList(peaks, checkZeroRows = TRUE)
     return(peaks)
 }

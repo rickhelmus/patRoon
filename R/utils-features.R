@@ -723,3 +723,61 @@ aggregateTox <- function(tox, aggrParams, splitSuspects = FALSE)
     
     return(tox[])
 }
+
+findPeaksInEICs <- function(allEICs, findPeaksAlgo, withBP, ..., parallel, cacheDB = NULL)
+{
+    baseHash <- makeHash(findPeaksAlgo, list(...))
+    
+    doApply("sapply", parallel, allEICs, function(EICs)
+    {
+        # NOTE: EICs must be named
+        
+        hash <- makeHash(baseHash, EICs)
+        cd <- loadCacheData("peaksEIC", hash, cacheDB)
+        if (!is.null(cd))
+        {
+            doProgress()
+            return(cd)
+        }
+
+        # convert EICs to data.tables: this is necessary for findPeaks()
+        # NOTE: we don't store (or hash) the EICs as DTs, as this makes things slower
+        
+        peaks <- findPeaks(EICs, findPeaksAlgo, ..., verbose = FALSE)
+        peaks <- rbindlist(peaks, idcol = "EIC_ID")
+        
+        if (nrow(peaks) == 0)
+            peaks[, c("mzmin", "mzmax", "mz", "mobmin", "mobmax", "mobility") := numeric()]
+        else
+        {
+            peaks[, c("mzmin", "mzmax", "mz", "mobmin", "mobmax", "mobility") := {
+                eic <- EICs[[EIC_ID]][EICs[[EIC_ID]]$intensity != 0 & EICs[[EIC_ID]]$time %between% c(retmin, retmax), ]
+                if (nrow(eic) == 0)
+                    numeric()
+                else
+                {
+                    if (is.null(eic[["mobility"]]))
+                        eic$mobility <- NA_real_
+                    if (withBP) # UNDONE: also use mobility BP data?
+                        list(min(eic$mzBP), max(eic$mzBP), eic$mzBP, min(eic$mobility), max(eic$mobility),
+                             weighted.mean(eic$mobility, eic$intensity))
+                    list(min(eic$mz), max(eic$mz), weighted.mean(eic$mz, eic$intensity),
+                         min(eic$mobility), max(eic$mobility), weighted.mean(eic$mobility, eic$intensity))
+                }
+            }, by = seq_len(nrow(peaks))]
+        }
+        
+        # NOTE: we could also set mobilities after checking if data is available, but then we need to repeat the EIC subsetting above
+        if (is.null(EICs$mobility))
+            peaks[, c("mobmin", "mobmax", "mobility") := NULL]
+        
+        # make unique IDs
+        peaks[, ID := make.unique(EIC_ID)]
+        
+        saveCacheData("peaksEIC", peaks, hash, cacheDB)
+        
+        doProgress()
+        
+        return(peaks)
+    }, simplify = FALSE)
+}

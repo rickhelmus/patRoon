@@ -850,6 +850,9 @@ assertConvertMSFilesArgs <- function(formatFrom, formatTo, overWrite, algorithm,
     checkmate::assertChoice(formatFrom, validFormatsFrom, add = add)
 }
 
+checkFindPeaksAlgo <- function(x) checkmate::checkChoice(x, c("xcms3", "envipick", "openms", "dietrich"))
+assertFindPeaksAlgo <- checkmate::makeAssertionFunction(checkFindPeaksAlgo)
+
 # from https://github.com/mllg/checkmate/issues/115
 aapply = function(fun, formula, ..., fixed = list())
 {

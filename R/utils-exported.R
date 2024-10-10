@@ -608,7 +608,7 @@ getQuantCalibFromScreening <- function(fGroups, concs, areas = FALSE, average = 
     
     ret <- data.table(name = concs$name, SMILES = tab[match(concs$name, susp_name)]$susp_SMILES,
                       group = tab[match(concs$name, susp_name)]$group)
-    ret[, rt := groupInfo(fGroups)[match(ret$group, group)]$ret]
+    ret[, rt := groupInfo(fGroups)$ret[match(ret$group, groupInfo(fGroups)$group)]]
     
     if (anyNA(ret$SMILES))
     {

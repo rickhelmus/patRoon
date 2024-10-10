@@ -157,7 +157,7 @@ setGeneric("averagedPeakLists", function(obj, ...) standardGeneric("averagedPeak
 setGeneric("spectrumSimilarity", function(obj, ...) standardGeneric("spectrumSimilarity"))
 
 #' @rdname generateMSPeakLists
-setGeneric("generateMSPeakLists", function(fGroups, algorithm, ...) standardGeneric("generateMSPeakLists"))
+setGeneric("generateMSPeakLists", function(fGroups, ...) standardGeneric("generateMSPeakLists"))
 
 #' @rdname generateMSPeakListsMzR
 setGeneric("generateMSPeakListsMzR", function(fGroups, ...) standardGeneric("generateMSPeakListsMzR"))

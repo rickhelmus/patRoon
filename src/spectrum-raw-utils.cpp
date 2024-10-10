@@ -453,16 +453,16 @@ Rcpp::List doAverageSpectraList(Rcpp::List specsList, const std::string &method,
     {
         if (alreadyAveraged)
         {
-            ret[i] = Rcpp::DataFrame::create(Rcpp::Named("mz") = averagedSpecList[i].getMZs(),
-                                             Rcpp::Named("intensity") = averagedSpecList[i].getIntensities(),
-                                             Rcpp::Named("abundance") = averagedSpecList[i].getAbundances(),
-                                             Rcpp::Named("abundance_prev") = averagedSpecList[i].getAvgPrevAbundances());
+            ret[i] = Rcpp::List::create(Rcpp::Named("mz") = averagedSpecList[i].getMZs(),
+                                        Rcpp::Named("intensity") = averagedSpecList[i].getIntensities(),
+                                        Rcpp::Named("abundance") = averagedSpecList[i].getAbundances(),
+                                        Rcpp::Named("abundance_prev") = averagedSpecList[i].getAvgPrevAbundances());
         }
         else
         {
-            ret[i] = Rcpp::DataFrame::create(Rcpp::Named("mz") = averagedSpecList[i].getMZs(),
-                                             Rcpp::Named("intensity") = averagedSpecList[i].getIntensities(),
-                                             Rcpp::Named("abundance") = averagedSpecList[i].getAbundances());
+            ret[i] = Rcpp::List::create(Rcpp::Named("mz") = averagedSpecList[i].getMZs(),
+                                        Rcpp::Named("intensity") = averagedSpecList[i].getIntensities(),
+                                        Rcpp::Named("abundance") = averagedSpecList[i].getAbundances());
         }
     }
     

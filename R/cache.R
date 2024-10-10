@@ -158,23 +158,17 @@ saveCacheDataList <- function(category, dataList, hashes, dbArg = NULL)
     
     dbWithWriteTransaction(db, {
         DBI::dbExecute(db, sprintf("CREATE TABLE IF NOT EXISTS %s (hash TEXT UNIQUE, data BLOB)", category))
-        
+
         for (i in seq_along(dataList))
         {
             data <- data.frame(d = I(list(fst::compress_fst(serialize(dataList[[i]], NULL, xdr = FALSE)))))
-            
-            # From https://stackoverflow.com/a/7353236: update if already exists, otherwise insert
-            DBI::dbExecute(db, sprintf("INSERT OR IGNORE INTO %s VALUES ('%s', :d)", category, hashes[i]), params = data)
-            DBI::dbExecute(db, sprintf("UPDATE %s SET data=(:d) WHERE changes()=0 AND hash='%s'", category, hashes[i]),
-                           params = data)
+
+            # do UPSERT
+            DBI::dbExecute(db, sprintf("INSERT INTO %s VALUES ('%s', :d) ON CONFLICT (hash) DO UPDATE SET data = excluded.data",
+                                       category, hashes[i]), params = data)
         }
         
-        # remove first row (from https://www.experts-exchange.com/questions/24926777/Delete-first-row-of-table.html) if
-        # too many rows
-        # if (DBI::dbGetQuery(db, sprintf("SELECT Count(*) FROM %s", category))[[1]] > getMaxCacheEntries())
-        #     DBI::dbExecute(db, sprintf("DELETE FROM %s WHERE ROWID in (SELECT min(ROWID) FROM %s)", category, category))
-        
-        # updated for multiple rows
+        # manage amount of multiple rows
         tabN <- DBI::dbGetQuery(db, sprintf("SELECT Count(*) FROM %s", category))[[1]]
         if (tabN > getMaxCacheEntries())
         {

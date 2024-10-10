@@ -850,9 +850,10 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRtWindo
                               minIntensityPost = params$minIntensityPost, minBPIntensity = 0)
         
         names(ret) <- ft$group
-        ret <- pruneList(ret, checkZeroRows = TRUE)
         ret <- Map(ret, ft$mz[match(names(ret), ft$group)], f = function(pl, pmz)
         {
+            if (length(pl$mz) == 0)
+                return(NULL)
             setDT(pl)
             pl <- assignPrecursorToMSPeakList(pl, pmz)
             if (params$pruneMissingPrecursor && !any(pl$precursor))
@@ -860,6 +861,7 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRtWindo
             setnames(pl, "abundance", "feat_abundance")
             return(pl)
         })
+        ret <- pruneList(ret)
         return(ret)
     }
     

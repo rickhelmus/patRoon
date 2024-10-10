@@ -648,9 +648,9 @@ Rcpp::List getMSPeakLists(const MSReadBackend &backend, const std::vector<Spectr
     Rcpp::List ret(entries);
     for (size_t i=0; i<entries; ++i)
     {
-        ret[i] = Rcpp::DataFrame::create(Rcpp::Named("mz") = averagedSpectra[i].getMZs(),
-                                         Rcpp::Named("intensity") = averagedSpectra[i].getIntensities(),
-                                         Rcpp::Named("abundance") = averagedSpectra[i].getAbundances());
+        ret[i] = Rcpp::List::create(Rcpp::Named("mz") = averagedSpectra[i].getMZs(),
+                                    Rcpp::Named("intensity") = averagedSpectra[i].getIntensities(),
+                                    Rcpp::Named("abundance") = averagedSpectra[i].getAbundances());
     }
 
     return ret;
@@ -789,8 +789,8 @@ Rcpp::List getMobilograms(const MSReadBackend &backend, const std::vector<Spectr
     Rcpp::List ret(entries);
     for (size_t i=0; i<entries; ++i)
     {
-        ret[i] = Rcpp::DataFrame::create(Rcpp::Named("mobility") = averageEIMs[i].mobilities,
-                                         Rcpp::Named("intensity") = averageEIMs[i].intensities);
+        ret[i] = Rcpp::List::create(Rcpp::Named("mobility") = averageEIMs[i].mobilities,
+                                    Rcpp::Named("intensity") = averageEIMs[i].intensities);
     }
     
     return ret;

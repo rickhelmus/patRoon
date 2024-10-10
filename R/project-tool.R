@@ -535,12 +535,7 @@ getScriptCode <- function(input, analyses)
             addComment("Calculate compound structure candidates")
             
             if (input$compIdent == "SIRIUS")
-            {
-                addComment("If you are using SIRIUS 5 you need to be logged in to use CSI:FingerID to obtain structure candidates.")
-                addAssignment("tokenFID", "NULL")
-                addComment("Uncomment the following line to get the refresh token to log in (only need to obtain it once).")
-                addCall("# tokenFID", "getSIRIUSToken", list(value = "my@mail.com", quote = TRUE))
-            }
+                addComment("Please see the handbook for SIRIUS login options. If you want to disable automatic login set login=FALSE")
             
             addCall("compounds", "generateCompounds", list(
                 list(value = "fGroups"),
@@ -558,7 +553,8 @@ getScriptCode <- function(input, analyses)
                 list(name = "fingerIDDatabase", value = "pubchem", quote = TRUE, condition = input$compIdent == "SIRIUS"),
                 list(name = "elements", value = "CHNOP", quote = TRUE, condition = input$compIdent == "SIRIUS"),
                 list(name = "profile", value = "qtof", quote = TRUE, condition = input$compIdent == "SIRIUS"),
-                list(name = "token", value = "tokenFID", condition = input$compIdent == "SIRIUS"),
+                list(name = "login", value = "interactive", quote = TRUE, condition = input$compIdent == "SIRIUS"),
+                list(name = "alwaysLogin", value = FALSE, condition = input$compIdent == "SIRIUS"),
                 list(name = "MSLibrary", value = "mslibrary", condition = input$compIdent == "Library"),
                 list(name = "minSim", value = 0.75, condition = input$compIdent == "Library"),
                 list(name = "absMzDev", value = 0.002, condition = input$compIdent == "Library"),

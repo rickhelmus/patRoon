@@ -258,7 +258,7 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
                                                               adduct = NULL, projectPath = NULL, elements = "CHNOP",
                                                               profile = "qtof", database = NULL, noise = NULL,
                                                               cores = NULL, getFingerprints = FALSE, topMost = 100,
-                                                              token = NULL, extraOptsGeneral = NULL,
+                                                              login = FALSE, alwaysLogin = FALSE, extraOptsGeneral = NULL,
                                                               extraOptsFormula = NULL, calculateFeatures = TRUE,
                                                               featThreshold = 0, featThresholdAnn = 0.75,
                                                               absAlignMzDev = 0.002, verbose = TRUE,
@@ -273,7 +273,8 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
     checkmate::assertNumber(noise, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertCount(cores, positive = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertCount(topMost, positive = TRUE, add = ac)
-    checkmate::assertString(token, null.ok = TRUE, add = ac)
+    assertSIRIUSLogin(login, add = ac)
+    checkmate::assertFlag(alwaysLogin, add = ac)
     aapply(checkmate::assertCharacter, . ~ extraOptsGeneral + extraOptsFormula, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertFlag(getFingerprints, add = ac)
     checkmate::assertFlag(calculateFeatures, add = ac)
@@ -300,7 +301,7 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
     printf("Processing %d feature groups with SIRIUS...\n---\n", gCount)
     formTable <- doSIRIUS(fGroups, MSPeakLists, calculateFeatures, profile, adduct, relMzDev, elements,
                           database, noise, cores, if (getFingerprints) "fingerprint" else "none", NULL, topMost,
-                          projectPath, token, extraOptsGeneral, extraOptsFormula, verbose, "formulasSIRIUS",
+                          projectPath, login, alwaysLogin, extraOptsGeneral, extraOptsFormula, verbose, "formulasSIRIUS",
                           patRoon:::processSIRIUSFormulas, NULL, splitBatches, dryRun)
     
     groupFormulas <- fingerprints <- list()

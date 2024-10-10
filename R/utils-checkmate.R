@@ -598,6 +598,18 @@ assertDynamicTreeCutArgs <- function(maxTreeHeight, deepSplit, minModuleSize, ad
     checkmate::assertCount(minModuleSize, positive = TRUE, add = add)
 }
 
+assertSIRIUSLogin <- function(x, .var.name = checkmate::vname(x), add = NULL)
+{
+    checkmate::assert(
+        checkmate::checkFALSE(x),
+        checkmate::checkChoice(x, c("check", "interactive")),
+        checkmate::checkCharacter(x, any.missing = FALSE, min.chars = 1, len = 2),
+        .var.name = .var.name, add = add
+    )
+    if (is.character(x) && length(x) == 2)
+        assertHasNames(x, c("username", "password"), .var.name = x, add = add)
+}
+
 assertAndPrepareReportSettings <- function(settings, setAggr = TRUE)
 {
     emptyListToVec <- function(val, evec)

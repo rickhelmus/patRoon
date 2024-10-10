@@ -112,6 +112,58 @@ unifySirNames <- function(sir)
     return(sir[, unNames, with = FALSE]) # filter out any other columns
 }
 
+hasSIRIUSLogin <- function()
+{
+    out <- system2(getExtDepPath("sirius"), c("login", "--show"), stdout = TRUE, stderr = FALSE)
+    notLoggedIn <- any(out == "Not logged in.")
+    isLoggedIn <- any(grepl("^Logged in as:", out))
+    if (notLoggedIn == isLoggedIn)
+    {
+        warning("Could not determine if SIRIUS is currently logged in", call. = FALSE)
+        return(FALSE)
+    }
+    return(isLoggedIn)
+}
+
+doSIRIUSLogin <- function(login, force)
+{
+    if (isFALSE(login))
+        return(invisible(NULL)) # no need to do anything
+    
+    if (force || !hasSIRIUSLogin())
+    {
+        if (length(login) == 1 && login == "check")
+            stop("There is no active SIRIUS login. Pease consult the SIRIUS documentation and patRoon handbook for details.")
+        
+        if (length(login) == 1 && login == "interactive")
+        {
+            if (!interactive())
+                stop("Cannot perform interactive login in non-interactive R sessions!", call. = FALSE)
+            
+            # NOTE: if "username" is part of the prompt then the RStudio backend of getPass won't hide the text input
+            login <- c(username = getPass::getPass("Please enter your SIRIUS username", noblank = TRUE),
+                       password = getPass::getPass("Please enter your SIRIUS password", noblank = TRUE))
+        }
+        
+        if (!"username" %in% names(login) || !nzchar(login["username"]))
+            stop("Please provide the username of your SIRIUS account", call. = FALSE)
+        if (!"password" %in% names(login) || !nzchar(login["password"]))
+            stop("Please provide the password of your SIRIUS account", call. = FALSE)
+
+        # NOTE: processx::run() is used as it allows correctly setting the environment, which doesn't seem to work very well
+        # with base::system2()
+        runv <- processx::run(getExtDepPath("sirius"), c("login", "--user-env=SIRUSER", "--password-env=SIRPW"),
+                              env = c("current", SIRUSER = login[["username"]], SIRPW = login[["password"]]))
+
+        if ((!is.na(runv$status) && runv$status != 0) || !grepl("Login successful!", runv$stdout))
+        {
+            cat(runv$stderr)
+            stop("Failed to perform a SIRIUS login! See error output above for details.", call. = FALSE)
+        }
+    }
+    invisible(NULL)
+}
+
 SIRMPFinishHandler <- function(cmd)
 {
     if (tools::file_ext(cmd$outPath) == "sirius")
@@ -135,10 +187,8 @@ SIRMPPrepareHandler <- function(cmd)
     command <- patRoon:::getExtDepPath("sirius")
     
     # UNDONE: it seems we would only need to log in once per worker, is this adding a lot of overhead?
-    if (!is.null(cmd[["token"]]))
-        executeCommand(command, c("login", paste0("--token=", cmd$token)), stdout = if (cmd$verbose) "" else FALSE,
-                       stderr = if (cmd$verbose) "" else FALSE)
-    
+    doSIRIUSLogin(cmd$login, cmd$alwaysLogin)
+
     inPath <- tempfile("sirius_in")
     outPath <- if (is.null(cmd[["projectPath"]])) tempfile("sirius_out") else cmd$projectPath
     # unlink(outPath, TRUE) # start with fresh output directory (otherwise previous results are combined)
@@ -161,7 +211,7 @@ SIRMPPrepareHandler <- function(cmd)
 }
 
 runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, resNames, profile, adducts, adductsChr, ppmMax, elements,
-                      database, noise, cores, withFingerID, fingerIDDatabase, topMost, projectPath, token,
+                      database, noise, cores, withFingerID, fingerIDDatabase, topMost, projectPath, login, alwaysLogin,
                       extraOptsGeneral, extraOptsFormula, verbose, processFunc, processArgs, splitBatches, dryRun)
 {
     mainArgs <- character()
@@ -228,9 +278,9 @@ runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, resNames, profile, add
             if (isV5)
                 allArgs <- c(allArgs, "write-summaries")
             return(list(args = allArgs, precMZs = precursorMZs[batch], MSPL = MSPLists[batch],
-                        MSMSPL = MSMSPLists[batch], adduct = add, projectPath = projectPath, token = token,
-                        verbose = verbose, resNames = resNames[batch], processFunc = processFunc,
-                        processArgs = processArgs, dryRun = dryRun,
+                        MSMSPL = MSMSPLists[batch], adduct = add, projectPath = projectPath, login = login,
+                        alwaysLogin = alwaysLogin, verbose = verbose, resNames = resNames[batch],
+                        processFunc = processFunc, processArgs = processArgs, dryRun = dryRun,
                         logFile = paste0("sirius-batch_", bi, "-", addChr, ".txt")))
         })
         
@@ -249,7 +299,7 @@ runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, resNames, profile, add
 }
 
 doSIRIUS <- function(fGroups, MSPeakLists, doFeatures, profile, adduct, relMzDev, elements,
-                     database, noise, cores, withFingerID, fingerIDDatabase, topMost, projectPath, token,
+                     database, noise, cores, withFingerID, fingerIDDatabase, topMost, projectPath, login, alwaysLogin,
                      extraOptsGeneral, extraOptsFormula, verbose, cacheName, processFunc, processArgs,
                      splitBatches, dryRun)
 {
@@ -329,7 +379,7 @@ doSIRIUS <- function(fGroups, MSPeakLists, doFeatures, profile, adduct, relMzDev
             msmspls <- lapply(doPLists, "[[", "MSMS")
             allResults <- runSIRIUS(plmzs, mspls, msmspls, flPLMeta$name[doWhich], profile, flPLMeta$adduct[doWhich],
                                     flPLMeta$adductChr[doWhich], relMzDev, elements, database, noise, cores,
-                                    withFingerID, fingerIDDatabase, topMost, projectPath, token,
+                                    withFingerID, fingerIDDatabase, topMost, projectPath, login, alwaysLogin,
                                     extraOptsGeneral, extraOptsFormula, verbose, processFunc, processArgs, splitBatches,
                                     dryRun)
         }

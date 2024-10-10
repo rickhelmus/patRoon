@@ -7,11 +7,22 @@
 #'   commandline option.
 #' @param cores The number of cores \command{SIRIUS} will use. If \code{NULL} then the default of all cores will be
 #'   used.
-#' @param token A \code{character} string with the refresh token to be used for logging in with \command{SIRIUS} (from
-#'   version \samp{5} only). The token can be obtained with the \code{\link{getSIRIUSToken}} function, or by running
-#'   \command{SIRIUS} directly (\emph{e.g.} with the \command{login} command). See the
-#'   \href{https://boecker-lab.github.io/docs.sirius.github.io/account-and-license/}{SIRIUS website} for more
-#'   information. If \code{NULL} then the log in is skipped.
+#' @param login,alwaysLogin Specifies if and how account logging of SIRIUS should be handled:
+#' 
+#'   \code{login=FALSE}: no automatic login is performed and the active login status is not checked.
+#'
+#'   \code{login=check}: aborts if no active login is present.
+#'
+#'   \code{login=interactive}: interactively ask for login (using \CRANpkg{getPass}).
+#'
+#'   \code{login=c(username="...", password="...")}: perform the login with the given details. For security reasons,
+#'   please do not enter the details directly, but use e.g. environment variables or store/retrieve them with the
+#'   \CRANpkg{keyring} package.
+#'   
+#'   if \code{alwaysLogin=TRUE} then a login is always performed, otherwise only if SIRIUS reports no active login.
+#' 
+#'   See the \href{https://boecker-lab.github.io/docs.sirius.github.io/account-and-license/}{SIRIUS website} for more
+#'   information.
 #' @param extraOptsGeneral,extraOptsFormula a \code{character} vector with any extra commandline parameters for
 #'   \command{SIRIUS}. For \command{SIRIUS} versions \code{<4.4} there is no distinction between general and formula
 #'   options. Otherwise commandline options specified in \code{extraOptsGeneral} are added prior to the \code{formula}

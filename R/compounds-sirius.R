@@ -272,7 +272,8 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
                                                                profile = "qtof", formulaDatabase = NULL,
                                                                fingerIDDatabase = "pubchem", noise = NULL,
                                                                cores = NULL, topMost = 100, topMostFormulas = 5,
-                                                               token = NULL, extraOptsGeneral = NULL,
+                                                               login = "check", alwaysLogin = FALSE,
+                                                               extraOptsGeneral = NULL,
                                                                extraOptsFormula = NULL, verbose = TRUE,
                                                                splitBatches = FALSE, dryRun = FALSE)
 {
@@ -286,7 +287,8 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
     checkmate::assertNumber(noise, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertCount(cores, positive = TRUE, null.ok = TRUE, add = ac)
     aapply(checkmate::assertCount, . ~ topMost + topMostFormulas, positive = TRUE, fixed = list(add = ac))
-    checkmate::assertString(token, null.ok = TRUE, add = ac)
+    assertSIRIUSLogin(login, add = ac)
+    checkmate::assertFlag(alwaysLogin, add = ac)
     aapply(checkmate::assertCharacter, . ~ extraOptsGeneral + extraOptsFormula, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertFlag(verbose, add = ac)
     checkmate::assertFlag(splitBatches, add = ac)
@@ -308,7 +310,7 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
     
     results <- doSIRIUS(fGroups, MSPeakLists, FALSE, profile, adduct, relMzDev, elements,
                         formulaDatabase, noise, cores, "structure", fingerIDDatabase, topMostFormulas, projectPath,
-                        token, extraOptsGeneral, extraOptsFormula, verbose, "compoundsSIRIUS",
+                        login, alwaysLogin, extraOptsGeneral, extraOptsFormula, verbose, "compoundsSIRIUS",
                         patRoon:::processSIRIUSCompounds, list(database = fingerIDDatabase, topMost = topMost),
                         splitBatches, dryRun)
     

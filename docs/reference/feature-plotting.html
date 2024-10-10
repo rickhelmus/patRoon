@@ -254,7 +254,7 @@ if <code>pch=NULL</code> then values are automatically assigned.</p></dd>
 
 
 <dt id="arg-sets">sets<a class="anchor" aria-label="anchor" href="#arg-sets"></a></dt>
-<dd><p>(<strong>sets workflow</strong>) For <code>plotInt</code>: if <code>TRUE</code> then feature intensities are plot per set (order follows the
+<dd><p>For <code>plotInt</code>: if <code>TRUE</code> then feature intensities are plot per set (order follows the
   <a href="analysis-information.html">analysis information</a>).</p>
 <p>For <code>plotVenn</code>: If <code>TRUE</code> then the <code>which</code> argument changes its meaning and is used to specify the
   names of the sets to be compared.</p></dd>
@@ -367,7 +367,7 @@ input object (which may be otherwise be removed by <em>e.g.</em> subsetting or
 
 
 <dt id="arg-set">set<a class="anchor" aria-label="anchor" href="#arg-set"></a></dt>
-<dd><p>(<strong>sets workflow</strong>) The set for which data must be plotted.</p></dd>
+<dd><p>The set for which data must be plotted.</p></dd>
 
 </dl></div>
     <div id="value">
@@ -404,22 +404,12 @@ from the used plotting function (see <em>e.g.</em> <code>draw.pairwise.venn</cod
     </div>
     <div id="sets-workflows">
     <h2>Sets workflows</h2>
-    <p>The following methods are changed or with new functionality:</p><ul><li><p><code>plotVenn</code> and <code>plotInt</code> allow to handle data per set. See the <code>sets</code> argument description.</p></li>
-<li><p><code>plotGraph</code> only plots data per set, and requires the <code>set</code> argument to be set.</p></li>
-</ul></div>
+    <p><code>plotVenn</code> and <code>plotInt</code> allow to handle data per set. See the <code>sets</code> argument description.   <code>plotGraph</code> only plots data per set, and requires the <code>set</code> argument to be set.</p>
+    </div>
     <div id="references">
     <h2>References</h2>
-    <p>Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.</p>
-<p>Conway JR, Lex A, Gehlenborg N (2017).
-“UpSetR: an R package for the visualization of intersecting sets and their properties.”
-<em>Bioinformatics</em>, <b>33</b>(18), 2938-2940.
-<a href="https://doi.org/10.1093/bioinformatics/btx364" class="external-link">doi:10.1093/bioinformatics/btx364</a>
-, <a href="http://dx.doi.org/10.1093/bioinformatics/btx364" class="external-link">http://dx.doi.org/10.1093/bioinformatics/btx364</a>.
- <br><br> Lex A, Gehlenborg N, Strobelt H, Vuillemot R, Pfister H (2014).
-“UpSet: Visualization of Intersecting Sets.”
-<em>IEEE Transactions on Visualization and Computer Graphics</em>, <b>20</b>(12), 1983–1992.
-<a href="https://doi.org/10.1109/tvcg.2014.2346248" class="external-link">doi:10.1109/tvcg.2014.2346248</a>
-.</p>
+    <p>circlize1</p>
+<p>Conway2017patRoon <br><br> Lex2014patRoon</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -443,7 +433,7 @@ from the used plotting function (see <em>e.g.</em> <code>draw.pairwise.venn</cod
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
       </footer></div>

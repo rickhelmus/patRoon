@@ -321,7 +321,6 @@
     - XCMS/XCMS3/KPIC2: doc and/or default min fractions to zero as these probably don't make a lot of sense otherwise
     - Handle mobilities
         - Does the mobmin/mobmax range make sense how it is computed now?
-    - cache results
 - reporting
     - convert reactable cell img functions to JS versions, so img paths are set dynamically which can save quite some space for selfContained reports
         --> see WIP changes made for chromsLarge

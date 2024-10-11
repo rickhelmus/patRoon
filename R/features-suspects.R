@@ -12,7 +12,7 @@ findFeaturesSuspects <- function(analysisInfo, suspects, findPeaksAlgo, rtWindow
 {
     # UNDONE: doc that feature RT is used for checking, instead of group RT for screenSuspects()
     # UNDONE: test with large suspect lists
-    # UNDONE: use adduct to set annotations?
+    # UNDONE: use adduct to set annotations? (then need to support that for sets)
 
     checkmate::assertFlag(skipInvalid) # not in assert collection, should fail before assertSuspectList
     
@@ -25,9 +25,6 @@ findFeaturesSuspects <- function(analysisInfo, suspects, findPeaksAlgo, rtWindow
            fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
-    cacheDB <- openCacheDBScope()
-    anaCount <- nrow(analysisInfo)
-    
     if (!is.null(adduct))
         adduct <- checkAndToAdduct(adduct)
     
@@ -35,37 +32,67 @@ findFeaturesSuspects <- function(analysisInfo, suspects, findPeaksAlgo, rtWindow
     suspects <- prepareSuspectList(suspects, adduct, skipInvalid, checkDesc = TRUE,
                                    prefCalcChemProps = prefCalcChemProps, neutralChemProps = neutralChemProps)
     
-    if (verbose)
-        printf("Finding features from suspects for %d analyses ...\n", anaCount)
-
-    # UNDONE: fill in IMS ranges (if available)
-    EICInfoList <- rep(list(data.table(mzmin = suspects$mz - mzWindow, mzmax = suspects$mz + mzWindow,
-                                       retmin = 0, retmax = 0)), nrow(analysisInfo))
-    printf("Loading EICs...\n")
-    allEICs <- doGetEICs(analysisInfo, EICInfoList, compress = FALSE, cacheDB = cacheDB)
-    allEICs <- lapply(allEICs, setNames, suspects$name)
-    
-    # UNDONE: somehow limit RT range if suspect rt is given?
-    
-    fList <- findPeaksInEICs(allEICs, findPeaksAlgo, ..., parallel = parallel, cacheDB = cacheDB)
-    fList <- lapply(fList, function(peaks)
+    cacheDB <- openCacheDBScope()
+    baseHash <- makeHash(suspects, findPeaksAlgo, rtWindow, mzWindow, adduct, skipInvalid, prefCalcChemProps,
+                         neutralChemProps, list(...))
+    filePaths <- getMSFilesFromAvailBackend(analysisInfo)
+    anaHashes <- setNames(lapply(filePaths, function(fp) makeHash(baseHash, getMSDataFileHash(fp))),
+                          analysisInfo$analysis)
+    cachedData <- loadCacheData("featuresSuspects", anaHashes, simplify = FALSE, dbArg = cacheDB)
+    if (!is.null(cachedData))
     {
-        peaks <- copy(peaks)
-        setnames(peaks, "EIC_ID", "suspect")
+        cachedData <- pruneList(setNames(cachedData, names(anaHashes)[match(names(cachedData), anaHashes)]))
+        anaInfoTBD <- analysisInfo[!analysis %in% names(cachedData)]
+    }
+    else
+        anaInfoTBD <- analysisInfo
+    
+    fList <- list()
+    if (nrow(anaInfoTBD) > 0)
+    {
+        if (verbose)
+            printf("Finding features of %d suspects in %d analyses ...\n", nrow(suspects), nrow(anaInfoTBD))
         
-        if (!is.null(suspects[["rt"]]))
+        # UNDONE: fill in IMS ranges (if available)
+        EICInfoList <- rep(list(data.table(mzmin = suspects$mz - mzWindow, mzmax = suspects$mz + mzWindow,
+                                           retmin = 0, retmax = 0)), nrow(anaInfoTBD))
+        printf("Loading EICs...\n")
+        allEICs <- doGetEICs(anaInfoTBD, EICInfoList, compress = FALSE, cacheDB = cacheDB)
+        allEICs <- lapply(allEICs, setNames, suspects$name)
+        
+        # UNDONE: somehow limit RT range if suspect rt is given?
+        # UNDONE: make withBP configurable?
+        
+        fList <- findPeaksInEICs(allEICs, findPeaksAlgo, ..., withBP = FALSE, parallel = parallel, cacheDB = cacheDB)
+        fList <- lapply(fList, function(peaks)
         {
-            peaks[, susp_rt := suspects[match(suspect, name)]$rt]
-            peaks <- peaks[is.na(susp_rt) | numLTE(abs(ret - susp_rt), rtWindow)][, susp_rt := NULL]
-        }
+            peaks <- copy(peaks)
+            setnames(peaks, "EIC_ID", "suspect")
+            
+            if (!is.null(suspects[["rt"]]))
+            {
+                peaks[, susp_rt := suspects[match(suspect, name)]$rt]
+                peaks <- peaks[is.na(susp_rt) | numLTE(abs(ret - susp_rt), rtWindow)][, susp_rt := NULL]
+            }
+            
+            return(peaks)
+        })
         
-        return(peaks)
-    })
+        for (a in anaInfoTBD$analysis)
+            saveCacheData("featuresSuspects", fList[[a]], anaHashes[[a]])
+    }
+    
+    if (!is.null(cachedData))
+    {
+        fList <- c(fList, cachedData)
+        fList <- fList[analysisInfo$analysis] # put original order
+    }
     
     if (verbose)
     {
         printf("Done!\n")
         printFeatStats(fList)
+        printf("Found %d out of %d suspects\n", uniqueN(unlist(lapply(fList, "[[", "suspect"))), nrow(suspects))
     }
     
     return(featuresSuspects(analysisInfo = analysisInfo, features = fList, suspects = suspects,

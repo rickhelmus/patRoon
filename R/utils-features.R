@@ -747,7 +747,10 @@ findPeaksInEICs <- function(allEICs, findPeaksAlgo, withBP, ..., parallel, cache
         peaks <- rbindlist(peaks, idcol = "EIC_ID")
         
         if (nrow(peaks) == 0)
+        {
+            peaks[, EIC_ID := character()]
             peaks[, c("mzmin", "mzmax", "mz", "mobmin", "mobmax", "mobility") := numeric()]
+        }
         else
         {
             peaks[, c("mzmin", "mzmax", "mz", "mobmin", "mobmax", "mobility") := {

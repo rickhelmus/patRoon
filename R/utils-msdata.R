@@ -147,6 +147,23 @@ getAllMSFilesFromAnaInfo <- function(anaInfo, types, formats)
     return(unique(unlist(ret)))
 }
 
+getMSFilesFromAvailBackend <- function(anaInfo, types = getMSFileTypes(), formats = names(MSFileExtensions()))
+{
+    backends <- getOption("patRoon.MSBackends", character())
+    
+    for (bn in backends)
+    {
+        if (!backendAvailable(bn))
+            next
+        filePaths <- maybeGetMSFiles(bn, anaInfo, types, formats)
+        if (!is.null(filePaths))
+            return(filePaths)
+    }
+    
+    stop("Failed to load a correct MS read backend. Please ensure patRoon.MSBackends is configured properly. See ?patRoon",
+         call. = FALSE)
+}
+
 # shortcut for common case
 getCentroidedMSFilesFromAnaInfo <- function(anaInfo, formats = c("mzML", "mzXML"), mustExist = TRUE)
 {

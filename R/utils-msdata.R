@@ -147,7 +147,7 @@ getAllMSFilesFromAnaInfo <- function(anaInfo, types, formats)
     return(unique(unlist(ret)))
 }
 
-getMSFilesFromAvailBackend <- function(anaInfo, types = getMSFileTypes(), formats = names(MSFileExtensions()))
+getMSFileHashesFromAvailBackend <- function(anaInfo, types = getMSFileTypes(), formats = names(MSFileExtensions()))
 {
     backends <- getOption("patRoon.MSBackends", character())
     
@@ -157,7 +157,11 @@ getMSFilesFromAvailBackend <- function(anaInfo, types = getMSFileTypes(), format
             next
         filePaths <- maybeGetMSFiles(bn, anaInfo, types, formats)
         if (!is.null(filePaths))
-            return(filePaths)
+        {
+            if (bn == "opentims")
+                filePaths <- file.path(filePaths, "analysis.tdf_bin")
+            return(setNames(sapply(filePaths, getMSDataFileHash), anaInfo$analysis))
+        }
     }
     
     stop("Failed to load a correct MS read backend. Please ensure patRoon.MSBackends is configured properly. See ?patRoon",

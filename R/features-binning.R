@@ -24,9 +24,8 @@ findFeaturesBinning <- function(analysisInfo, mzRange = c(50, 400), mzStep = 0.0
     
     cacheDB <- openCacheDBScope()
     baseHash <- makeHash(mzRange, mzStep, findPeaksAlgo, list(...))
-    filePaths <- getMSFilesFromAvailBackend(analysisInfo)
-    anaHashes <- setNames(lapply(filePaths, function(fp) makeHash(baseHash, getMSDataFileHash(fp))),
-                          analysisInfo$analysis)
+    anaHashes <- getMSFileHashesFromAvailBackend(analysisInfo)
+    anaHashes <- sapply(anaHashes, makeHash, baseHash)
     cachedData <- loadCacheData("featuresBinning", anaHashes, simplify = FALSE, dbArg = cacheDB)
     if (!is.null(cachedData))
     {

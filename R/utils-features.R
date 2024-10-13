@@ -732,7 +732,7 @@ findPeaksInEICs <- function(allEICs, findPeaksAlgo, withBP, ..., parallel, cache
         if (nrow(peaks) == 0)
         {
             peaks[, EIC_ID := character()]
-            peaks[, c("mzmin", "mzmax", "mz", "mobmin", "mobmax", "mobility") := numeric()]
+            peaks[, c("retmin", "retmax", "ret", "area", "intensity", "mzmin", "mzmax", "mz", "mobmin", "mobmax", "mobility") := numeric()]
         }
         else
         {

@@ -181,9 +181,14 @@ doGetEICs <- function(anaInfo, EICInfoList, compress = TRUE, withBP = FALSE, cac
     # HACK: for now we _don't_ cache EICs if compres==FALSE: the resulting data is very large and takes a long time to
     # be stored. Hence, the caller should cache the final results.
     doCache <- compress
-    
-    if (doCache && is.null(cacheDB))
-        cacheDB <- openCacheDBScope()
+
+    anaHashes <- NULL
+    if (doCache)
+    {
+        if (is.null(cacheDB))
+            cacheDB <- openCacheDBScope()
+        anaHashes <- getMSFileHashesFromAvailBackend(anaInfo)
+    }
     
     EICs <- applyMSData(anaInfo, EICInfoList, func = function(ana, path, backend, EICInfo)
     {
@@ -191,10 +196,8 @@ doGetEICs <- function(anaInfo, EICInfoList, compress = TRUE, withBP = FALSE, cac
         
         if (doCache)
         {
-            anaHash <- makeHash(getMSDataFileHash(path))
-            
             # NOTE: subset columns here, so any additional columns from e.g. feature tables are not considered
-            hashes <- EICInfo[, makeHash(anaHash, compress, .SD), by = seq_len(nrow(EICInfo)),
+            hashes <- EICInfo[, makeHash(anaHashes[[ana]], compress, .SD), by = seq_len(nrow(EICInfo)),
                               .SDcols = c("retmin", "retmax", "mzmin", "mzmax")][[2]]
             
             cachedData <- loadCacheData(category = "EICs", hashes, dbArg = cacheDB, simplify = FALSE)

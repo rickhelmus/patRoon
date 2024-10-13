@@ -35,9 +35,8 @@ findFeaturesSuspects <- function(analysisInfo, suspects, findPeaksAlgo, rtWindow
     cacheDB <- openCacheDBScope()
     baseHash <- makeHash(suspects, findPeaksAlgo, rtWindow, mzWindow, adduct, skipInvalid, prefCalcChemProps,
                          neutralChemProps, list(...))
-    filePaths <- getMSFilesFromAvailBackend(analysisInfo)
-    anaHashes <- setNames(lapply(filePaths, function(fp) makeHash(baseHash, getMSDataFileHash(fp))),
-                          analysisInfo$analysis)
+    anaHashes <- getMSFileHashesFromAvailBackend(analysisInfo)
+    anaHashes <- sapply(anaHashes, makeHash, baseHash)
     cachedData <- loadCacheData("featuresSuspects", anaHashes, simplify = FALSE, dbArg = cacheDB)
     if (!is.null(cachedData))
     {

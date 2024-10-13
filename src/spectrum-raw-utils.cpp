@@ -40,7 +40,8 @@ std::vector<SpectrumRawSelection> getSpecRawSelections(const SpectrumRawMetadata
     const bool isMSMS = MSLevel == SpectrumRawTypes::MSLevel::MS2;
     const bool isIMSMSMS = isMSMS && specMeta.second.isolationRanges.empty();
     
-    const auto startIt = std::lower_bound(metaMS.times.begin(), metaMS.times.end(), timeRange.start);
+    const auto startIt = (timeRange.start == 0.0) ? metaMS.times.begin() :
+        std::lower_bound(metaMS.times.begin(), metaMS.times.end(), timeRange.start);
     if (startIt != metaMS.times.end())
     {
         for (size_t i=std::distance(metaMS.times.begin(), startIt);

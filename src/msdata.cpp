@@ -325,7 +325,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
             {
                 if (mz < startMZs[entry] || mz > endMZs[entry])
                     continue;
-                if (mob < startMobs[entry] || mob > endMobs[entry])
+                if (mob < startMobs[entry] || (endMobs[entry] != 0.0 && mob > endMobs[entry]))
                     continue; // UNDONE: optimize eg for TIMS data where mobilities are sorted?
             }
             else if (mz > endMZs[entry])

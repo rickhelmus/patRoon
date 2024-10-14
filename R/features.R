@@ -463,11 +463,11 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
 
 #' @export
 setMethod("findMobilities", "features", function(obj, findPeaksAlgo, mzRange = 0.005, clusterIMSWindow = 0.01,
-                                                 clusterMethod = "distance", minIntensity = 0, maxMSRtWindow = 2, ...)
+                                                 clusterMethod = "distance", minIMSIntensity = 0, maxMSRtWindow = 2, ...)
 {
     ac <- checkmate::makeAssertCollection()
     assertFindPeaksAlgo(findPeaksAlgo, add = ac)
-    aapply(checkmate::assertNumber, . ~ mzRange + clusterIMSWindow + minIntensity, finite = TRUE,
+    aapply(checkmate::assertNumber, . ~ mzRange + clusterIMSWindow + minIMSIntensity, finite = TRUE,
            fixed = list(add = ac))
     checkmate::assertChoice(clusterMethod, c("bin", "distance", "hclust"), add = ac)
     checkmate::assertNumber(maxMSRtWindow, lower = 1, finite = TRUE, null.ok = TRUE, add = ac)
@@ -476,7 +476,7 @@ setMethod("findMobilities", "features", function(obj, findPeaksAlgo, mzRange = 0
     if (length(obj) == 0)
         return(obj) # nothing to do...
     
-    hash <- makeHash(obj, findPeaksAlgo, mzRange, clusterIMSWindow, clusterMethod, minIntensity, maxMSRtWindow, ...)
+    hash <- makeHash(obj, findPeaksAlgo, mzRange, clusterIMSWindow, clusterMethod, minIMSIntensity, maxMSRtWindow, ...)
     cd <- loadCacheData("findMobilities", hash)
     if (!is.null(cd))
         return(cd)
@@ -485,7 +485,7 @@ setMethod("findMobilities", "features", function(obj, findPeaksAlgo, mzRange = 0
     
     printf("Finding mobilities for all features...\n")
     
-    obj@mobilities <- applyMSData(anaInfo, obj@features, types = c("raw", "ims"), formats = c("bruker_ims", "mzML"), func = function(ana, path, backend, fTable)
+    obj@features <- applyMSData(anaInfo, obj@features, types = c("raw", "ims"), formats = c("bruker_ims", "mzML"), func = function(ana, path, backend, fTable)
     {
         openMSReadBackend(backend, path)
         
@@ -498,7 +498,7 @@ setMethod("findMobilities", "features", function(obj, findPeaksAlgo, mzRange = 0
         
         # NOTE: mzmin/mzmax may be too narrow here, hence use a user specified mz range
         EIMs <- getMobilograms(backend, fTable$mz - mzRange, fTable$mz + mzRange, fTable$retmin, fTable$retmax,
-                               clusterMethod, clusterIMSWindow, minIntensity, FALSE)
+                               clusterMethod, clusterIMSWindow, minIMSIntensity, FALSE)
         names(EIMs) <- fTable$ID
         EIMs <- lapply(EIMs, setDT)
         
@@ -506,18 +506,34 @@ setMethod("findMobilities", "features", function(obj, findPeaksAlgo, mzRange = 0
         EICs <- lapply(EIMs, copy)
         EICs <- lapply(EICs, setnames, old = "mobility", new = "time")
         peaksList <- findPeaks(EICs, findPeaksAlgo, ..., verbose = FALSE)
+
+        fTable[, ord := seq_len(.N)]
+        peaksList <- lapply(peaksList, function(p) p[, mobOrd := seq_len(.N)])
         
-        peaksTable <- rbindlist(peaksList, idcol = "ID")
-        setnames(peaksTable, c("ret", "retmin", "retmax"), c("mobility", "mobstart", "mobend"), skip_absent = TRUE)
+        peaksTable <- rbindlist(peaksList, idcol = "mob_parent_ID")
+        setnames(peaksTable,
+                 c("ret", "retmin", "retmax", "area", "intensity"),
+                 c("mobility", "mobstart", "mobend", "mob_area", "mob_intensity"), skip_absent = TRUE)
+        
+        peaksTable[, ID := appendMobToName(mob_parent_ID, mobility)]
+        
+        # add feature data
+        peaksTable <- merge(peaksTable, fTable, by.x = "mob_parent_ID", by.y = "ID", sort = FALSE)
+        setcolorder(peaksTable, names(fTable))
+        
+        # merge mobility features
+        fTable <- rbind(fTable, peaksTable, fill = TRUE)
+        
+        setorderv(fTable, c("ord", "mobOrd"), na.last = FALSE)
+        fTable[, c("ord", "mobOrd") := NULL]
         
         doProgress()
         
-        return(peaksTable)
+        return(fTable)
     })
     
-    assignedN <- sum(mapply(obj@mobilities, obj@features, FUN = function(m, f) sum(f$ID %in% m$ID)))
-    printf("Assigned %d mobilities to %d features (%.2f%% assigned).\n", sum(sapply(obj@mobilities, nrow)), assignedN,
-           assignedN * 100 / length(obj))
+    mobFeatsN <- sum(sapply(obj@features, function(ft) sum(!is.na(ft$mobility))))
+    printf("Assigned %d mobility features.\n", mobFeatsN)
     
     saveCacheData("findMobilities", obj, hash)
     

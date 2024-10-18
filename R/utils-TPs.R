@@ -192,9 +192,9 @@ doPlotTPGraph <- function(TPTab, parents, cmpTab, structuresMax, prune, onlyComp
         visNetwork::visHierarchicalLayout(enabled = TRUE, sortMethod = "directed")
 }
 
-getProductsFromLib <- function(TPLibrary, generations, matchGenerationsBy, matchIDBy)
+getProductsFromLib <- function(TPLibrary, TPLibrarySel, generations, matchGenerationsBy, matchIDBy)
 {
-    results <- split(TPLibrary, by = "parent_name")
+    results <- split(TPLibrarySel, by = "parent_name")
     
     curTPIDs <- setNames(vector("integer", length = length(results)), names(results))
     prepTPs <- function(r, pn, pid, gen, prvLogPDiff)
@@ -205,7 +205,6 @@ getProductsFromLib <- function(TPLibrary, generations, matchGenerationsBy, match
         # remove TP_ prefix
         cols <- grep("^TP_", names(r), value = TRUE)
         setnames(r, cols, sub("^TP_", "", cols))
-        setnames(r, "name", "name_lib")
         
         r[, retDir := 0] # may be changed below
         r[, generation := gen]
@@ -242,21 +241,25 @@ getProductsFromLib <- function(TPLibrary, generations, matchGenerationsBy, match
     # fill in chem IDs and names now that we sorted out all TPs
     results <- Map(results, names(results), f = function(r, pn)
     {
+        # prune TPs that equal the main parent
+        # UNDONE: this does not work if matchGenerationsBy=="name" (default for formulas) 
+        r <- r[get(matchGenerationsBy) != TPLibrary[parent_name == pn][[paste0("parent_", matchGenerationsBy)]][1]]
         set(r, j = "chem_ID", value = match(r[[matchIDBy]], unique(r[[matchIDBy]])))
+        setnames(r, "name", "name_lib")
         set(r, j = "name", value = paste0(pn, "-TP", r$chem_ID))
     })
-    
-    if (!is.null(TPLibrary[["retDir"]]))
+
+    if (!is.null(TPLibrarySel[["retDir"]]))
     {
-        results <- Map(results, TPLibrary[match(names(results), parent_name)]$retDir,
+        results <- Map(results, TPLibrarySel[match(names(results), parent_name)]$retDir,
                        f = data.table::set, MoreArgs = list(i = NULL, j = "retDir"))
     }
-    else if (!is.null(TPLibrary[["parent_LogP"]]) && !is.null(TPLibrary[["TP_LogP"]]))
+    else if (!is.null(TPLibrarySel[["parent_LogP"]]) && !is.null(TPLibrarySel[["TP_LogP"]]))
     {
-        results <- Map(results, TPLibrary[match(names(results), parent_name)]$parent_LogP,
+        results <- Map(results, TPLibrarySel[match(names(results), parent_name)]$parent_LogP,
                        f = function(r, pLogP) set(r, j = "retDir", value = fifelse(r$LogP < pLogP, -1, 1)))
     }
-    else if (!is.null(TPLibrary[["LogPDiff"]]))
+    else if (!is.null(TPLibrarySel[["LogPDiff"]]))
     {
         results <- lapply(results, function(x) set(x, j = "retDir", value = fcase(x$LogPDiff < 0, -1,
                                                                                   x$LogPDiff > 0, 1,
@@ -310,6 +313,7 @@ prepareDataForTPLibrary <- function(parents, TPLibrary, generations, matchParent
         }
     }
     
+    TPLibrarySel <- TPLibrary
     if (!is.null(parents))
     {
         # match with library
@@ -326,7 +330,7 @@ prepareDataForTPLibrary <- function(parents, TPLibrary, generations, matchParent
         
         # only take data in both
         dataInBoth <- intersect(dataLib, dataSusp)
-        TPLibrary <- TPLibrary[dataLib %chin% dataInBoth]
+        TPLibrarySel <- TPLibrary[dataLib %chin% dataInBoth]
         parents <- parents[dataSusp %chin% dataInBoth]
     }
     else
@@ -335,7 +339,7 @@ prepareDataForTPLibrary <- function(parents, TPLibrary, generations, matchParent
         setnames(parents, sub("^parent_", "", names(parents)))
     }
     
-    products <- getProductsFromLib(TPLibrary, generations, matchGenerationsBy, matchIDBy)
+    products <- getProductsFromLib(TPLibrary, TPLibrarySel, generations, matchGenerationsBy, matchIDBy)
     parents <- parents[name %in% names(products)]
     products <- products[match(parents$name, names(products))] # sync order
     

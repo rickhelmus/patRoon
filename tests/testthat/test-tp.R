@@ -216,9 +216,10 @@ test_that("basic usage", {
     testMFDB(TPsCTSComp)
 })
 
-TPFormLib <- genFormulaTPLibrary(patRoonData::suspectsPos)
-TPFormLibG2 <- genFormulaTPLibrary(patRoonData::suspectsPos, generations = 2)
-genTPsFormLibG2 <- generateTPs("library_formula", parents = patRoonData::suspectsPos[1:4, ], TPLibrary = TPFormLibG2)
+TPFormLib <- genFormulaTPLibrary(patRoonData::suspectsPos[1:4, ])
+TPFormLibG2 <- genFormulaTPLibrary(patRoonData::suspectsPos[1:4, ], generations = 2)
+genTPsFormLibG2 <- generateTPs("library_formula", parents = patRoonData::suspectsPos[1:4, ], TPLibrary = TPFormLibG2,
+                               generations = 2)
 test_that("genFormulaTPLibrary works", {
     checkmate::expect_data_table(TPFormLib, any.missing = FALSE)
     checkmate::expect_names(names(TPFormLib), must.include = c("parent_name", "parent_formula", "parent_neutralMass",

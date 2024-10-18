@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>5.3 Subsetting | patRoon handbook</title>
   <meta name="description" content="5.3 Subsetting | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.40 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.41 and GitBook 2.6.7" />
 
   <meta property="og:title" content="5.3 Subsetting | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2024-09-16" />
+<meta name="date" content="2024-10-18" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -374,7 +374,7 @@ div.csl-indent {
 <col width="52%" />
 </colgroup>
 <thead>
-<tr>
+<tr class="header">
 <th>Class</th>
 <th>Argument <code>i</code></th>
 <th>Argument <code>j</code></th>
@@ -382,37 +382,37 @@ div.csl-indent {
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td><code>features</code></td>
 <td>analyses</td>
 <td></td>
 <td></td>
 </tr>
-<tr>
+<tr class="even">
 <td><code>featureGroups</code></td>
 <td>analyses</td>
 <td>feature groups</td>
 <td></td>
 </tr>
-<tr>
+<tr class="odd">
 <td><code>MSPeakLists</code></td>
 <td>analyses</td>
 <td>feature groups</td>
 <td>peak lists for feature groups will be re-averaged when subset on analyses (by default)</td>
 </tr>
-<tr>
+<tr class="even">
 <td><code>formulas</code></td>
 <td>feature groups</td>
 <td></td>
 <td></td>
 </tr>
-<tr>
+<tr class="odd">
 <td><code>compounds</code></td>
 <td>feature groups</td>
 <td></td>
 <td></td>
 </tr>
-<tr>
+<tr class="even">
 <td><code>components</code></td>
 <td>components</td>
 <td>feature groups</td>
@@ -475,8 +475,8 @@ div.csl-indent {
 <div id="prioritization-workflow" class="section level3 hasAnchor" number="5.3.1">
 <h3><span class="header-section-number">5.3.1</span> Prioritization workflow<a href="subset.html#prioritization-workflow" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>An important use case of subsetting is prioritization of data. For instance, after statistical analysis only certain feature groups are deemed relevant for the rest of the workflow. A common prioritization workflow is illustrated below:</p>
-<div id="htmlwidget-c31513820bff54ef6566" style="width:500px;height:120px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-c31513820bff54ef6566">{"x":{"diagram":"\ndigraph Prioritization {\n  graph [ rankdir = LR ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.3,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Object conversion\" -> \"Prioritization\" -> Subsetting\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-fbefd7fddeef99f55f89" style="width:500px;height:120px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-fbefd7fddeef99f55f89">{"x":{"diagram":"\ndigraph Prioritization {\n  graph [ rankdir = LR ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.3,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Object conversion\" -> \"Prioritization\" -> Subsetting\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p>During the first step the workflow object is converted to a suitable format, most often using the <code>as.data.frame()</code> function. The converted data is then used as input for the prioritization strategy. Finally, these results are then used to select the data of interest in the original object.</p>
 <p>A very simplified example of such a process is shown below.</p>
 <div class="sourceCode" id="cb90"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb90-1"><a href="subset.html#cb90-1" tabindex="-1"></a>featTab <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(fGroups, <span class="at">average =</span> <span class="cn">TRUE</span>)</span>

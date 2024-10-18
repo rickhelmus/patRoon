@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>8.10 Predicting toxicities and concentrations (MS2Tox and MS2Quant integration) | patRoon handbook</title>
   <meta name="description" content="8.10 Predicting toxicities and concentrations (MS2Tox and MS2Quant integration) | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.40 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.41 and GitBook 2.6.7" />
 
   <meta property="og:title" content="8.10 Predicting toxicities and concentrations (MS2Tox and MS2Quant integration) | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2024-09-16" />
+<meta name="date" content="2024-10-18" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -408,8 +408,8 @@ div.csl-indent {
 <h3><span class="header-section-number">8.10.2</span> Predicting concentrations<a href="pred.html#predicting-concentrations" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The workflow to predict concentrations is quite similar to predicting toxicities. However, before we can start we first have to specify the <em>calibrants</em> and the LC gradient elution program.</p>
 <p>The calibrant data is used by <code>MS2Quant</code> to convert predicted ionization efficiencies to actual response factors, which are specific to the used LC instrument and methodology. For this purpose, several mixtures with known concentrations (i.e. standards) should be measured alongside your samples. The calibrants should be specified as a <code>data.frame</code>, for instance:</p>
-<pre><code>#&gt; Calculating/Validating chemical data... Done!
-#&gt; ================================================================================
+<pre><code>#&gt; Calculating/Validating chemical data... Done!</code></pre>
+<pre><code>#&gt; ================================================================================
 #&gt; Found 24/30 suspects (80.00%)</code></pre>
 <div style="border: 1px solid #ddd; padding: 5px; overflow-y: auto; height: 350px;">
 <table class="table" style="font-size: 11px; margin-left: auto; margin-right: auto;">
@@ -846,22 +846,22 @@ CN(C)CC(C1=CC=C(C=C1)OC)C2(CCCCC2)O
 </div>
 <p>The intensity column should contain either the peak intensity (height) or area. Note that some feature detection algorithms can sometimes produce inaccurate peak areas, and the area determination methodology is often different among algorithms. For this reason, using peak intensities may be more reliable, however, it is worth testing this with your data.</p>
 <p>It is also possible to use the <code>getQuantCalibFromScreening()</code> function to automatically create the calibrant table from feature group data:</p>
-<div class="sourceCode" id="cb279"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb279-1"><a href="pred.html#cb279-1" tabindex="-1"></a>calibList <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(...) <span class="co"># this should be a suspect list with your calibrants</span></span>
-<span id="cb279-2"><a href="pred.html#cb279-2" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroups, calibList) <span class="co"># screen for the calibrants</span></span>
-<span id="cb279-3"><a href="pred.html#cb279-3" tabindex="-1"></a>concs <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(...) <span class="co"># concentration data for each calibrant compound, see below</span></span>
-<span id="cb279-4"><a href="pred.html#cb279-4" tabindex="-1"></a>calibrants <span class="ot">&lt;-</span> <span class="fu">getQuantCalibFromScreening</span>(fGroups, concs)</span>
-<span id="cb279-5"><a href="pred.html#cb279-5" tabindex="-1"></a>calibrants <span class="ot">&lt;-</span> <span class="fu">getQuantCalibFromScreening</span>(fGroups, concs, <span class="at">areas =</span> <span class="cn">TRUE</span>) <span class="co"># obtain feature areas instead of intensities</span></span></code></pre></div>
+<div class="sourceCode" id="cb280"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb280-1"><a href="pred.html#cb280-1" tabindex="-1"></a>calibList <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(...) <span class="co"># this should be a suspect list with your calibrants</span></span>
+<span id="cb280-2"><a href="pred.html#cb280-2" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroups, calibList) <span class="co"># screen for the calibrants</span></span>
+<span id="cb280-3"><a href="pred.html#cb280-3" tabindex="-1"></a>concs <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(...) <span class="co"># concentration data for each calibrant compound, see below</span></span>
+<span id="cb280-4"><a href="pred.html#cb280-4" tabindex="-1"></a>calibrants <span class="ot">&lt;-</span> <span class="fu">getQuantCalibFromScreening</span>(fGroups, concs)</span>
+<span id="cb280-5"><a href="pred.html#cb280-5" tabindex="-1"></a>calibrants <span class="ot">&lt;-</span> <span class="fu">getQuantCalibFromScreening</span>(fGroups, concs, <span class="at">areas =</span> <span class="cn">TRUE</span>) <span class="co"># obtain feature areas instead of intensities</span></span></code></pre></div>
 <p>The first step is to perform a <a href="features.html#suspscr">screening</a> for the calibrant compounds. Please ensure that this list should contains SMILES data, and to ensure correct feature assignment it is highly recommended to include retention times. The second requirement for <code>getQuantCalibFromScreening()</code> is a table with concentrations for each calibrant compound, e.g.:</p>
-<div class="sourceCode" id="cb280"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb280-1"><a href="pred.html#cb280-1" tabindex="-1"></a>concs <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb280-2"><a href="pred.html#cb280-2" tabindex="-1"></a>    <span class="at">name =</span> <span class="fu">c</span>(<span class="st">&quot;DEET&quot;</span>, <span class="st">&quot;1h-benzotriazole&quot;</span>, <span class="st">&quot;Caffeine&quot;</span>, <span class="st">&quot;Atrazine&quot;</span>, <span class="st">&quot;Carbamazepine&quot;</span>, <span class="st">&quot;Venlafaxine&quot;</span>),</span>
-<span id="cb280-3"><a href="pred.html#cb280-3" tabindex="-1"></a>    <span class="at">standard_1 =</span> <span class="fu">c</span>(<span class="fl">1.00</span>, <span class="fl">1.05</span>, <span class="fl">1.10</span>, <span class="fl">0.99</span>, <span class="fl">1.01</span>, <span class="fl">1.12</span>),</span>
-<span id="cb280-4"><a href="pred.html#cb280-4" tabindex="-1"></a>    <span class="at">standard_2 =</span> <span class="fu">c</span>(<span class="fl">2.00</span>, <span class="fl">2.15</span>, <span class="fl">2.20</span>, <span class="fl">1.98</span>, <span class="fl">2.02</span>, <span class="fl">1.82</span>),</span>
-<span id="cb280-5"><a href="pred.html#cb280-5" tabindex="-1"></a>    <span class="at">standard_5 =</span> <span class="fu">c</span>(<span class="fl">5.01</span>, <span class="fl">5.05</span>, <span class="fl">5.22</span>, <span class="fl">5.00</span>, <span class="fl">4.88</span>, <span class="fl">4.65</span>),</span>
-<span id="cb280-6"><a href="pred.html#cb280-6" tabindex="-1"></a>    <span class="at">standard_10 =</span> <span class="fu">c</span>(<span class="fl">10.2</span>, <span class="fl">10.11</span>, <span class="fl">10.23</span>, <span class="fl">11.77</span>, <span class="fl">11.75</span>, <span class="fl">12.13</span>),</span>
-<span id="cb280-7"><a href="pred.html#cb280-7" tabindex="-1"></a>    <span class="at">standard_25 =</span> <span class="fu">c</span>(<span class="fl">25.3</span>, <span class="fl">25.12</span>, <span class="fl">25.34</span>, <span class="fl">24.89</span>, <span class="fl">24.78</span>, <span class="fl">24.68</span>),</span>
-<span id="cb280-8"><a href="pred.html#cb280-8" tabindex="-1"></a>    <span class="at">standard_50 =</span> <span class="fu">c</span>(<span class="fl">50.34</span>, <span class="fl">50.05</span>, <span class="fl">50.10</span>, <span class="fl">49.97</span>, <span class="fl">49.71</span>, <span class="fl">50.52</span>)</span>
-<span id="cb280-9"><a href="pred.html#cb280-9" tabindex="-1"></a>)</span>
-<span id="cb280-10"><a href="pred.html#cb280-10" tabindex="-1"></a>concs</span></code></pre></div>
+<div class="sourceCode" id="cb281"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb281-1"><a href="pred.html#cb281-1" tabindex="-1"></a>concs <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb281-2"><a href="pred.html#cb281-2" tabindex="-1"></a>    <span class="at">name =</span> <span class="fu">c</span>(<span class="st">&quot;DEET&quot;</span>, <span class="st">&quot;1h-benzotriazole&quot;</span>, <span class="st">&quot;Caffeine&quot;</span>, <span class="st">&quot;Atrazine&quot;</span>, <span class="st">&quot;Carbamazepine&quot;</span>, <span class="st">&quot;Venlafaxine&quot;</span>),</span>
+<span id="cb281-3"><a href="pred.html#cb281-3" tabindex="-1"></a>    <span class="at">standard_1 =</span> <span class="fu">c</span>(<span class="fl">1.00</span>, <span class="fl">1.05</span>, <span class="fl">1.10</span>, <span class="fl">0.99</span>, <span class="fl">1.01</span>, <span class="fl">1.12</span>),</span>
+<span id="cb281-4"><a href="pred.html#cb281-4" tabindex="-1"></a>    <span class="at">standard_2 =</span> <span class="fu">c</span>(<span class="fl">2.00</span>, <span class="fl">2.15</span>, <span class="fl">2.20</span>, <span class="fl">1.98</span>, <span class="fl">2.02</span>, <span class="fl">1.82</span>),</span>
+<span id="cb281-5"><a href="pred.html#cb281-5" tabindex="-1"></a>    <span class="at">standard_5 =</span> <span class="fu">c</span>(<span class="fl">5.01</span>, <span class="fl">5.05</span>, <span class="fl">5.22</span>, <span class="fl">5.00</span>, <span class="fl">4.88</span>, <span class="fl">4.65</span>),</span>
+<span id="cb281-6"><a href="pred.html#cb281-6" tabindex="-1"></a>    <span class="at">standard_10 =</span> <span class="fu">c</span>(<span class="fl">10.2</span>, <span class="fl">10.11</span>, <span class="fl">10.23</span>, <span class="fl">11.77</span>, <span class="fl">11.75</span>, <span class="fl">12.13</span>),</span>
+<span id="cb281-7"><a href="pred.html#cb281-7" tabindex="-1"></a>    <span class="at">standard_25 =</span> <span class="fu">c</span>(<span class="fl">25.3</span>, <span class="fl">25.12</span>, <span class="fl">25.34</span>, <span class="fl">24.89</span>, <span class="fl">24.78</span>, <span class="fl">24.68</span>),</span>
+<span id="cb281-8"><a href="pred.html#cb281-8" tabindex="-1"></a>    <span class="at">standard_50 =</span> <span class="fu">c</span>(<span class="fl">50.34</span>, <span class="fl">50.05</span>, <span class="fl">50.10</span>, <span class="fl">49.97</span>, <span class="fl">49.71</span>, <span class="fl">50.52</span>)</span>
+<span id="cb281-9"><a href="pred.html#cb281-9" tabindex="-1"></a>)</span>
+<span id="cb281-10"><a href="pred.html#cb281-10" tabindex="-1"></a>concs</span></code></pre></div>
 <pre><code>#&gt;               name standard_1 standard_2 standard_5 standard_10 standard_25 standard_50
 #&gt; 1             DEET       1.00       2.00       5.01       10.20       25.30       50.34
 #&gt; 2 1h-benzotriazole       1.05       2.15       5.05       10.11       25.12       50.05
@@ -871,13 +871,13 @@ CN(C)CC(C1=CC=C(C=C1)OC)C2(CCCCC2)O
 #&gt; 6      Venlafaxine       1.12       1.82       4.65       12.13       24.68       50.52</code></pre>
 <p>The concentrations are specified separately for each calibrant compound. The column names should follow the names of the <a href="preparations.html#anaInfo">replicate groups assigned to the standards</a>. The concentration unit is µg/l by default. The next section describes how this can be changed.</p>
 <p>The gradient elution program is also specified by a <code>data.frame</code>, which for every time point (in seconds!) describes the percentage of ‘B’. In this case, ‘B’ represents the total amount of organic modifier.</p>
-<div class="sourceCode" id="cb282"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb282-1"><a href="pred.html#cb282-1" tabindex="-1"></a>eluent <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb282-2"><a href="pred.html#cb282-2" tabindex="-1"></a>    <span class="at">time =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">180</span>, <span class="dv">600</span>, <span class="dv">900</span>, <span class="dv">960</span>),</span>
-<span id="cb282-3"><a href="pred.html#cb282-3" tabindex="-1"></a>    <span class="at">B =</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">30</span>, <span class="dv">100</span>, <span class="dv">100</span>, <span class="dv">10</span>)</span>
-<span id="cb282-4"><a href="pred.html#cb282-4" tabindex="-1"></a>)</span>
-<span id="cb282-5"><a href="pred.html#cb282-5" tabindex="-1"></a><span class="fu">plot</span>(eluent, <span class="at">type =</span> <span class="st">&quot;l&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb283"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb283-1"><a href="pred.html#cb283-1" tabindex="-1"></a>eluent <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb283-2"><a href="pred.html#cb283-2" tabindex="-1"></a>    <span class="at">time =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">180</span>, <span class="dv">600</span>, <span class="dv">900</span>, <span class="dv">960</span>),</span>
+<span id="cb283-3"><a href="pred.html#cb283-3" tabindex="-1"></a>    <span class="at">B =</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">30</span>, <span class="dv">100</span>, <span class="dv">100</span>, <span class="dv">10</span>)</span>
+<span id="cb283-4"><a href="pred.html#cb283-4" tabindex="-1"></a>)</span>
+<span id="cb283-5"><a href="pred.html#cb283-5" tabindex="-1"></a><span class="fu">plot</span>(eluent, <span class="at">type =</span> <span class="st">&quot;l&quot;</span>)</span></code></pre></div>
 <p><img src="handbook_files/figure-html/unnamed-chunk-54-1.png" width="50%" /></p>
-<div class="sourceCode" id="cb283"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb283-1"><a href="pred.html#cb283-1" tabindex="-1"></a>eluent</span></code></pre></div>
+<div class="sourceCode" id="cb284"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb284-1"><a href="pred.html#cb284-1" tabindex="-1"></a>eluent</span></code></pre></div>
 <pre><code>#&gt;   time   B
 #&gt; 1    0  10
 #&gt; 2  180  30
@@ -885,39 +885,39 @@ CN(C)CC(C1=CC=C(C=C1)OC)C2(CCCCC2)O
 #&gt; 4  900 100
 #&gt; 5  960  10</code></pre>
 <p>Then, the workflow to predict concentrations is very similar then predicting toxicities (previous section):</p>
-<div class="sourceCode" id="cb285"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb285-1"><a href="pred.html#cb285-1" tabindex="-1"></a><span class="co"># Calculate concentrations for suspect hits.</span></span>
-<span id="cb285-2"><a href="pred.html#cb285-2" tabindex="-1"></a>fGroupsSuspConc <span class="ot">&lt;-</span> <span class="fu">predictRespFactors</span>(</span>
-<span id="cb285-3"><a href="pred.html#cb285-3" tabindex="-1"></a>    fGroupsSusp,</span>
-<span id="cb285-4"><a href="pred.html#cb285-4" tabindex="-1"></a>    <span class="at">calibrants =</span> calibrants, <span class="at">eluent =</span> eluent,</span>
-<span id="cb285-5"><a href="pred.html#cb285-5" tabindex="-1"></a>    <span class="at">organicModifier =</span> <span class="st">&quot;MeCN&quot;</span>, <span class="co"># organic modifier: MeOH or MeCN</span></span>
-<span id="cb285-6"><a href="pred.html#cb285-6" tabindex="-1"></a>    <span class="at">pHAq =</span> <span class="dv">4</span> <span class="co"># pH of the aqueous part of the mobile phase</span></span>
-<span id="cb285-7"><a href="pred.html#cb285-7" tabindex="-1"></a>)</span>
-<span id="cb285-8"><a href="pred.html#cb285-8" tabindex="-1"></a><span class="co"># set areas to TRUE if the calibrant table contains areas</span></span>
-<span id="cb285-9"><a href="pred.html#cb285-9" tabindex="-1"></a>fGroupsSuspConc <span class="ot">&lt;-</span> <span class="fu">calculateConcs</span>(fGroupsSuspConc, <span class="at">areas =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb286"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb286-1"><a href="pred.html#cb286-1" tabindex="-1"></a><span class="co"># Calculate concentrations for suspect hits.</span></span>
+<span id="cb286-2"><a href="pred.html#cb286-2" tabindex="-1"></a>fGroupsSuspConc <span class="ot">&lt;-</span> <span class="fu">predictRespFactors</span>(</span>
+<span id="cb286-3"><a href="pred.html#cb286-3" tabindex="-1"></a>    fGroupsSusp,</span>
+<span id="cb286-4"><a href="pred.html#cb286-4" tabindex="-1"></a>    <span class="at">calibrants =</span> calibrants, <span class="at">eluent =</span> eluent,</span>
+<span id="cb286-5"><a href="pred.html#cb286-5" tabindex="-1"></a>    <span class="at">organicModifier =</span> <span class="st">&quot;MeCN&quot;</span>, <span class="co"># organic modifier: MeOH or MeCN</span></span>
+<span id="cb286-6"><a href="pred.html#cb286-6" tabindex="-1"></a>    <span class="at">pHAq =</span> <span class="dv">4</span> <span class="co"># pH of the aqueous part of the mobile phase</span></span>
+<span id="cb286-7"><a href="pred.html#cb286-7" tabindex="-1"></a>)</span>
+<span id="cb286-8"><a href="pred.html#cb286-8" tabindex="-1"></a><span class="co"># set areas to TRUE if the calibrant table contains areas</span></span>
+<span id="cb286-9"><a href="pred.html#cb286-9" tabindex="-1"></a>fGroupsSuspConc <span class="ot">&lt;-</span> <span class="fu">calculateConcs</span>(fGroupsSuspConc, <span class="at">areas =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 <p>As was shown for toxicities it is possible to use different data sources (e.g. compound annotations, suspects) for predictions.</p>
 <p>More details are in the reference manual: <code>?`pred-quant`</code>.</p>
 </div>
 <div id="toxicity-and-concentration-units" class="section level3 hasAnchor" number="8.10.3">
 <h3><span class="header-section-number">8.10.3</span> Toxicity and concentration units<a href="pred.html#toxicity-and-concentration-units" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The default unit for toxicity and concentration data is µg/l. However, this can be configured when calling the <code>predictTox()</code>/<code>predictRespFactors()</code> functions:</p>
-<div class="sourceCode" id="cb286"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb286-1"><a href="pred.html#cb286-1" tabindex="-1"></a>fGroupsSuspTox <span class="ot">&lt;-</span> <span class="fu">predictTox</span>(fGroupsSusp) <span class="co"># default unit: ug/l</span></span>
-<span id="cb286-2"><a href="pred.html#cb286-2" tabindex="-1"></a>fGroupsSuspTox <span class="ot">&lt;-</span> <span class="fu">predictTox</span>(fGroupsSusp, <span class="at">concUnit =</span> <span class="st">&quot;ug/l&quot;</span>) <span class="co"># same as above</span></span>
-<span id="cb286-3"><a href="pred.html#cb286-3" tabindex="-1"></a>fGroupsSuspTox <span class="ot">&lt;-</span> <span class="fu">predictTox</span>(fGroupsSusp, <span class="at">concUnit =</span> <span class="st">&quot;mM&quot;</span>) <span class="co"># millimolar</span></span>
-<span id="cb286-4"><a href="pred.html#cb286-4" tabindex="-1"></a>fGroupsSuspTox <span class="ot">&lt;-</span> <span class="fu">predictTox</span>(fGroupsSusp, <span class="at">concUnit =</span> <span class="st">&quot;log mM&quot;</span>) <span class="co"># unit used by MS2Tox</span></span>
-<span id="cb286-5"><a href="pred.html#cb286-5" tabindex="-1"></a></span>
-<span id="cb286-6"><a href="pred.html#cb286-6" tabindex="-1"></a><span class="co"># calculated concentrations are ng/l, calibrants are specified in ug/l</span></span>
-<span id="cb286-7"><a href="pred.html#cb286-7" tabindex="-1"></a><span class="co"># (by default calibConcUnit=concUnit)</span></span>
-<span id="cb286-8"><a href="pred.html#cb286-8" tabindex="-1"></a>fGroupsSuspConc <span class="ot">&lt;-</span> <span class="fu">predictRespFactors</span>(</span>
-<span id="cb286-9"><a href="pred.html#cb286-9" tabindex="-1"></a>    fGroupsSusp, <span class="at">calibrants =</span> calibrants, <span class="at">eluent =</span> eluent,</span>
-<span id="cb286-10"><a href="pred.html#cb286-10" tabindex="-1"></a>    <span class="at">organicModifier =</span> <span class="st">&quot;MeCN&quot;</span>, <span class="at">pHAq =</span> <span class="dv">4</span>,</span>
-<span id="cb286-11"><a href="pred.html#cb286-11" tabindex="-1"></a>    <span class="at">concUnit =</span> <span class="st">&quot;ng/l&quot;</span>, <span class="at">calibConcUnit =</span> <span class="st">&quot;ug/l&quot;</span></span>
-<span id="cb286-12"><a href="pred.html#cb286-12" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb287"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb287-1"><a href="pred.html#cb287-1" tabindex="-1"></a>fGroupsSuspTox <span class="ot">&lt;-</span> <span class="fu">predictTox</span>(fGroupsSusp) <span class="co"># default unit: ug/l</span></span>
+<span id="cb287-2"><a href="pred.html#cb287-2" tabindex="-1"></a>fGroupsSuspTox <span class="ot">&lt;-</span> <span class="fu">predictTox</span>(fGroupsSusp, <span class="at">concUnit =</span> <span class="st">&quot;ug/l&quot;</span>) <span class="co"># same as above</span></span>
+<span id="cb287-3"><a href="pred.html#cb287-3" tabindex="-1"></a>fGroupsSuspTox <span class="ot">&lt;-</span> <span class="fu">predictTox</span>(fGroupsSusp, <span class="at">concUnit =</span> <span class="st">&quot;mM&quot;</span>) <span class="co"># millimolar</span></span>
+<span id="cb287-4"><a href="pred.html#cb287-4" tabindex="-1"></a>fGroupsSuspTox <span class="ot">&lt;-</span> <span class="fu">predictTox</span>(fGroupsSusp, <span class="at">concUnit =</span> <span class="st">&quot;log mM&quot;</span>) <span class="co"># unit used by MS2Tox</span></span>
+<span id="cb287-5"><a href="pred.html#cb287-5" tabindex="-1"></a></span>
+<span id="cb287-6"><a href="pred.html#cb287-6" tabindex="-1"></a><span class="co"># calculated concentrations are ng/l, calibrants are specified in ug/l</span></span>
+<span id="cb287-7"><a href="pred.html#cb287-7" tabindex="-1"></a><span class="co"># (by default calibConcUnit=concUnit)</span></span>
+<span id="cb287-8"><a href="pred.html#cb287-8" tabindex="-1"></a>fGroupsSuspConc <span class="ot">&lt;-</span> <span class="fu">predictRespFactors</span>(</span>
+<span id="cb287-9"><a href="pred.html#cb287-9" tabindex="-1"></a>    fGroupsSusp, <span class="at">calibrants =</span> calibrants, <span class="at">eluent =</span> eluent,</span>
+<span id="cb287-10"><a href="pred.html#cb287-10" tabindex="-1"></a>    <span class="at">organicModifier =</span> <span class="st">&quot;MeCN&quot;</span>, <span class="at">pHAq =</span> <span class="dv">4</span>,</span>
+<span id="cb287-11"><a href="pred.html#cb287-11" tabindex="-1"></a>    <span class="at">concUnit =</span> <span class="st">&quot;ng/l&quot;</span>, <span class="at">calibConcUnit =</span> <span class="st">&quot;ug/l&quot;</span></span>
+<span id="cb287-12"><a href="pred.html#cb287-12" tabindex="-1"></a>)</span></code></pre></div>
 <p>See the reference manuals (<code>?`pred-tox`</code>/<code>?`pred-quant`</code>) For more details on which units can be specified</p>
 </div>
 <div id="inspecting-predicted-values" class="section level3 hasAnchor" number="8.10.4">
 <h3><span class="header-section-number">8.10.4</span> Inspecting predicted values<a href="pred.html#inspecting-predicted-values" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The raw toxicity and concentration data assigned to feature groups can be retrieved with the <code>toxicities()</code> and <code>concentrations()</code> method functions, respectively.</p>
-<div class="sourceCode" id="cb287"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb287-1"><a href="pred.html#cb287-1" tabindex="-1"></a><span class="fu">toxicities</span>(fGroupsSuspTox)</span></code></pre></div>
+<div class="sourceCode" id="cb288"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb288-1"><a href="pred.html#cb288-1" tabindex="-1"></a><span class="fu">toxicities</span>(fGroupsSuspTox)</span></code></pre></div>
 <pre><code>#&gt;           group    type        candidate     candidate_name      LC50
 #&gt;          &lt;char&gt;  &lt;char&gt;           &lt;char&gt;             &lt;char&gt;     &lt;num&gt;
 #&gt; 1: M120_R268_30 suspect [nH]1nnc2ccccc12   1H-benzotriazole  59755.77
@@ -925,7 +925,7 @@ CN(C)CC(C1=CC=C(C=C1)OC)C2(CCCCC2)O
 #&gt; 3: M146_R225_70 suspect  Oc1ccc2ccccc2n1 2-Hydroxyquinoline  48833.62
 #&gt; 4: M146_R248_69 suspect  Oc1ccc2ccccc2n1 2-Hydroxyquinoline  48833.62
 #&gt; 5: M146_R309_68 suspect  Oc1ccc2ccccc2n1 2-Hydroxyquinoline  48833.62</code></pre>
-<div class="sourceCode" id="cb289"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb289-1"><a href="pred.html#cb289-1" tabindex="-1"></a><span class="fu">concentrations</span>(fGroupsSuspConc)</span></code></pre></div>
+<div class="sourceCode" id="cb290"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb290-1"><a href="pred.html#cb290-1" tabindex="-1"></a><span class="fu">concentrations</span>(fGroupsSuspConc)</span></code></pre></div>
 <pre><code>#&gt;           group    type        candidate     candidate_name standard-pos-1 standard-pos-2 standard-pos-3
 #&gt;          &lt;char&gt;  &lt;char&gt;           &lt;char&gt;             &lt;char&gt;          &lt;num&gt;          &lt;num&gt;          &lt;num&gt;
 #&gt; 1: M120_R268_30 suspect [nH]1nnc2ccccc12   1H-benzotriazole      43.070773      39.905306       35.21956
@@ -934,7 +934,7 @@ CN(C)CC(C1=CC=C(C=C1)OC)C2(CCCCC2)O
 #&gt; 4: M146_R248_69 suspect  Oc1ccc2ccccc2n1 2-Hydroxyquinoline      19.030263      20.207821       19.54181
 #&gt; 5: M146_R309_68 suspect  Oc1ccc2ccccc2n1 2-Hydroxyquinoline       7.978394       8.646156        8.67157</code></pre>
 <p>If there were multiple candidates for a single feature group then these are split over the table rows:</p>
-<div class="sourceCode" id="cb291"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb291-1"><a href="pred.html#cb291-1" tabindex="-1"></a><span class="fu">toxicities</span>(fGroupsTox)</span></code></pre></div>
+<div class="sourceCode" id="cb292"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb292-1"><a href="pred.html#cb292-1" tabindex="-1"></a><span class="fu">toxicities</span>(fGroupsTox)</span></code></pre></div>
 <pre><code>#&gt;             group     type                  candidate                     candidate_name      LC50
 #&gt;            &lt;char&gt;   &lt;char&gt;                     &lt;char&gt;                             &lt;char&gt;     &lt;num&gt;
 #&gt;  1:  M120_R268_30 compound          C1=CC(=NC=C1N)C#N     5-aminopyridine-2-carbonitrile 132007.55
@@ -949,16 +949,16 @@ CN(C)CC(C1=CC=C(C=C1)OC)C2(CCCCC2)O
 #&gt; 19: M192_R355_191 compound   CCN(CC)C(=O)CC1=CC=CC=C1      N,N-diethyl-2-phenylacetamide  88445.02
 #&gt; 20: M192_R355_191 compound CCN(CC)C1=CC=C(C=C1)C(=O)C 1-[4-(diethylamino)phenyl]ethanone  96005.28</code></pre>
 <p>The <code>as.data.table()</code> method function, which <a href="processing.html#processing">was discussed previously</a>, can be used to summarize toxicity and concentration values.</p>
-<div class="sourceCode" id="cb293"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb293-1"><a href="pred.html#cb293-1" tabindex="-1"></a><span class="co"># </span><span class="al">NOTE</span><span class="co">: NA values are filtered and columns are subset for readability</span></span>
-<span id="cb293-2"><a href="pred.html#cb293-2" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroupsTox)[<span class="sc">!</span><span class="fu">is.na</span>(LC50), <span class="fu">c</span>(<span class="st">&quot;group&quot;</span>, <span class="st">&quot;LC50&quot;</span>, <span class="st">&quot;LC50_types&quot;</span>)]</span></code></pre></div>
+<div class="sourceCode" id="cb294"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb294-1"><a href="pred.html#cb294-1" tabindex="-1"></a><span class="co"># </span><span class="al">NOTE</span><span class="co">: NA values are filtered and columns are subset for readability</span></span>
+<span id="cb294-2"><a href="pred.html#cb294-2" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroupsTox)[<span class="sc">!</span><span class="fu">is.na</span>(LC50), <span class="fu">c</span>(<span class="st">&quot;group&quot;</span>, <span class="st">&quot;LC50&quot;</span>, <span class="st">&quot;LC50_types&quot;</span>)]</span></code></pre></div>
 <pre><code>#&gt;            group      LC50 LC50_types
 #&gt;           &lt;char&gt;     &lt;num&gt;     &lt;char&gt;
 #&gt; 1:  M120_R268_30  98911.56   compound
 #&gt; 2:  M137_R249_53 149557.04   compound
 #&gt; 3:  M146_R309_68  41178.78   compound
 #&gt; 4: M192_R355_191  93258.44   compound</code></pre>
-<div class="sourceCode" id="cb295"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb295-1"><a href="pred.html#cb295-1" tabindex="-1"></a>concCols <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;group&quot;</span>, <span class="fu">paste0</span>(<span class="fu">analyses</span>(fGroupsSuspConc), <span class="st">&quot;_conc&quot;</span>), <span class="st">&quot;conc_types&quot;</span>)</span>
-<span id="cb295-2"><a href="pred.html#cb295-2" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroupsSuspConc)[<span class="sc">!</span><span class="fu">is.na</span>(conc_types), concCols, with <span class="ot">=</span> <span class="cn">FALSE</span>]</span></code></pre></div>
+<div class="sourceCode" id="cb296"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb296-1"><a href="pred.html#cb296-1" tabindex="-1"></a>concCols <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;group&quot;</span>, <span class="fu">paste0</span>(<span class="fu">analyses</span>(fGroupsSuspConc), <span class="st">&quot;_conc&quot;</span>), <span class="st">&quot;conc_types&quot;</span>)</span>
+<span id="cb296-2"><a href="pred.html#cb296-2" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroupsSuspConc)[<span class="sc">!</span><span class="fu">is.na</span>(conc_types), concCols, with <span class="ot">=</span> <span class="cn">FALSE</span>]</span></code></pre></div>
 <pre><code>#&gt;           group standard-pos-1_conc standard-pos-2_conc standard-pos-3_conc conc_types
 #&gt;          &lt;char&gt;               &lt;num&gt;               &lt;num&gt;               &lt;num&gt;     &lt;char&gt;
 #&gt; 1: M120_R268_30           43.070773           39.905306            35.21956    suspect
@@ -967,8 +967,8 @@ CN(C)CC(C1=CC=C(C=C1)OC)C2(CCCCC2)O
 #&gt; 4: M146_R248_69           19.030263           20.207821            19.54181    suspect
 #&gt; 5: M146_R225_70           15.700200           17.662215            18.49330    suspect</code></pre>
 <p>The <code>as.data.table()</code> method function <em>aggregates</em> the data for a feature group in case multiple candidates were assigned to it. By default the values are mean averaged, but this be changed with the <code>toxAggrParams</code>/<code>concAggrParams</code> arguments, for instance:</p>
-<div class="sourceCode" id="cb297"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb297-1"><a href="pred.html#cb297-1" tabindex="-1"></a><span class="co"># as above, but aggregate by taking maximum values</span></span>
-<span id="cb297-2"><a href="pred.html#cb297-2" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroupsTox, <span class="at">toxAggrParams =</span> <span class="fu">getDefPredAggrParams</span>(max))[<span class="sc">!</span><span class="fu">is.na</span>(LC50), <span class="fu">c</span>(<span class="st">&quot;group&quot;</span>, <span class="st">&quot;LC50&quot;</span>, <span class="st">&quot;LC50_types&quot;</span>)]</span></code></pre></div>
+<div class="sourceCode" id="cb298"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb298-1"><a href="pred.html#cb298-1" tabindex="-1"></a><span class="co"># as above, but aggregate by taking maximum values</span></span>
+<span id="cb298-2"><a href="pred.html#cb298-2" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroupsTox, <span class="at">toxAggrParams =</span> <span class="fu">getDefPredAggrParams</span>(max))[<span class="sc">!</span><span class="fu">is.na</span>(LC50), <span class="fu">c</span>(<span class="st">&quot;group&quot;</span>, <span class="st">&quot;LC50&quot;</span>, <span class="st">&quot;LC50_types&quot;</span>)]</span></code></pre></div>
 <pre><code>#&gt;            group      LC50 LC50_types
 #&gt;           &lt;char&gt;     &lt;num&gt;     &lt;char&gt;
 #&gt; 1:  M120_R268_30 132007.55   compound
@@ -976,34 +976,34 @@ CN(C)CC(C1=CC=C(C=C1)OC)C2(CCCCC2)O
 #&gt; 3:  M146_R309_68  49051.68   compound
 #&gt; 4: M192_R355_191 114064.57   compound</code></pre>
 <p>If the <code>as.data.table()</code> method is used on suspect screening results, and predictions were performed directly for suspect hits, then predicted values can be reported for individual suspect match instead of aggregating them per feature group:</p>
-<div class="sourceCode" id="cb299"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb299-1"><a href="pred.html#cb299-1" tabindex="-1"></a><span class="co"># Reports predicted values for each suspect separately. If multiple suspects are assigned to a feature group,</span></span>
-<span id="cb299-2"><a href="pred.html#cb299-2" tabindex="-1"></a><span class="co"># then each suspect match is split into a different row. </span></span>
-<span id="cb299-3"><a href="pred.html#cb299-3" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroupsSuspTox, <span class="at">collapseSuspects =</span> <span class="cn">NULL</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb300"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb300-1"><a href="pred.html#cb300-1" tabindex="-1"></a><span class="co"># Reports predicted values for each suspect separately. If multiple suspects are assigned to a feature group,</span></span>
+<span id="cb300-2"><a href="pred.html#cb300-2" tabindex="-1"></a><span class="co"># then each suspect match is split into a different row. </span></span>
+<span id="cb300-3"><a href="pred.html#cb300-3" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroupsSuspTox, <span class="at">collapseSuspects =</span> <span class="cn">NULL</span>)</span></code></pre></div>
 <p>Finally, the <a href="report.html#report">reporting functionality</a> can be used to overview all predicted values, both aggregated and raw.</p>
 </div>
 <div id="using-predicted-values-to-prioritize-data" class="section level3 hasAnchor" number="8.10.5">
 <h3><span class="header-section-number">8.10.5</span> Using predicted values to prioritize data<a href="pred.html#using-predicted-values-to-prioritize-data" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The <code>filter()</code> method function that was <a href="filtering.html#filtering">introduced before</a> can also be used to filter data based on predicted toxicities, response factors and concentrations. For instance, this allows you to remove annotation candidates which are unlikely to be toxic or sensitive enough to be detected or any features with very low concentrations. Some examples are shown below.</p>
-<div class="sourceCode" id="cb300"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb300-1"><a href="pred.html#cb300-1" tabindex="-1"></a><span class="co"># compoundsSuspSIRTox is an object with predicted toxicities (LC50 values) for each candidate</span></span>
-<span id="cb300-2"><a href="pred.html#cb300-2" tabindex="-1"></a><span class="co"># we can use the common scoreLimits filter to select a range of allowed values (min/max)</span></span>
-<span id="cb300-3"><a href="pred.html#cb300-3" tabindex="-1"></a>compoundsSuspSIRToxF <span class="ot">&lt;-</span> <span class="fu">filter</span>(compoundsSuspSIRTox, <span class="at">scoreLimits =</span> <span class="fu">list</span>(<span class="at">LC50_SMILES =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">1E4</span>)))</span>
-<span id="cb300-4"><a href="pred.html#cb300-4" tabindex="-1"></a></span>
-<span id="cb300-5"><a href="pred.html#cb300-5" tabindex="-1"></a><span class="co"># for suspects with predicted toxicities/response factors there are dedicated filters</span></span>
-<span id="cb300-6"><a href="pred.html#cb300-6" tabindex="-1"></a>fGroupsSuspConcF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsSuspConc, <span class="at">minRF =</span> <span class="fl">5E4</span>) <span class="co"># remove suspect hits with response factor &lt;5E4</span></span>
-<span id="cb300-7"><a href="pred.html#cb300-7" tabindex="-1"></a>fGroupsSuspToxF <span class="ot">&lt;-</span> <span class="fu">filter</span>(ffGroupsSuspTox, <span class="at">maxLC50 =</span> <span class="dv">100</span>) <span class="co"># remove suspect hits with LC50 values &gt; 100</span></span>
-<span id="cb300-8"><a href="pred.html#cb300-8" tabindex="-1"></a></span>
-<span id="cb300-9"><a href="pred.html#cb300-9" tabindex="-1"></a><span class="co"># similarly, for feature data there are dedicated filters.</span></span>
-<span id="cb300-10"><a href="pred.html#cb300-10" tabindex="-1"></a><span class="co"># note that these aggregate data prior to filtering (see previous section)</span></span>
-<span id="cb300-11"><a href="pred.html#cb300-11" tabindex="-1"></a>fGroupsConcF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsConc, <span class="at">absMinConc =</span> <span class="fl">0.02</span>)</span>
-<span id="cb300-12"><a href="pred.html#cb300-12" tabindex="-1"></a><span class="co"># only keep features with concentrations that are at least 1% of their toxicity</span></span>
-<span id="cb300-13"><a href="pred.html#cb300-13" tabindex="-1"></a><span class="co"># note that both concentrations/toxicity values should have been calculated with calculateConcs()/calculateTox()</span></span>
-<span id="cb300-14"><a href="pred.html#cb300-14" tabindex="-1"></a>fGroupsConcToxF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsConcTox, <span class="at">absMinConcTox =</span> <span class="fl">0.01</span>)</span>
-<span id="cb300-15"><a href="pred.html#cb300-15" tabindex="-1"></a></span>
-<span id="cb300-16"><a href="pred.html#cb300-16" tabindex="-1"></a><span class="co"># also get rid of features without concentrations (these are ignored by default)</span></span>
-<span id="cb300-17"><a href="pred.html#cb300-17" tabindex="-1"></a>fGroupsConcF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsConc, <span class="at">absMinConc =</span> <span class="fl">0.02</span>, <span class="at">removeNA =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb300-18"><a href="pred.html#cb300-18" tabindex="-1"></a><span class="co"># like as.data.table we can configure how values are aggregated</span></span>
-<span id="cb300-19"><a href="pred.html#cb300-19" tabindex="-1"></a><span class="co"># here the minimum is used instead of the default mean</span></span>
-<span id="cb300-20"><a href="pred.html#cb300-20" tabindex="-1"></a>fGroupsToxF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsTox, <span class="at">absMaxTox =</span> <span class="fl">5E3</span>, <span class="at">predAggrParams =</span> <span class="fu">getDefPredAggrParams</span>(min))</span></code></pre></div>
+<div class="sourceCode" id="cb301"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb301-1"><a href="pred.html#cb301-1" tabindex="-1"></a><span class="co"># compoundsSuspSIRTox is an object with predicted toxicities (LC50 values) for each candidate</span></span>
+<span id="cb301-2"><a href="pred.html#cb301-2" tabindex="-1"></a><span class="co"># we can use the common scoreLimits filter to select a range of allowed values (min/max)</span></span>
+<span id="cb301-3"><a href="pred.html#cb301-3" tabindex="-1"></a>compoundsSuspSIRToxF <span class="ot">&lt;-</span> <span class="fu">filter</span>(compoundsSuspSIRTox, <span class="at">scoreLimits =</span> <span class="fu">list</span>(<span class="at">LC50_SMILES =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">1E4</span>)))</span>
+<span id="cb301-4"><a href="pred.html#cb301-4" tabindex="-1"></a></span>
+<span id="cb301-5"><a href="pred.html#cb301-5" tabindex="-1"></a><span class="co"># for suspects with predicted toxicities/response factors there are dedicated filters</span></span>
+<span id="cb301-6"><a href="pred.html#cb301-6" tabindex="-1"></a>fGroupsSuspConcF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsSuspConc, <span class="at">minRF =</span> <span class="fl">5E4</span>) <span class="co"># remove suspect hits with response factor &lt;5E4</span></span>
+<span id="cb301-7"><a href="pred.html#cb301-7" tabindex="-1"></a>fGroupsSuspToxF <span class="ot">&lt;-</span> <span class="fu">filter</span>(ffGroupsSuspTox, <span class="at">maxLC50 =</span> <span class="dv">100</span>) <span class="co"># remove suspect hits with LC50 values &gt; 100</span></span>
+<span id="cb301-8"><a href="pred.html#cb301-8" tabindex="-1"></a></span>
+<span id="cb301-9"><a href="pred.html#cb301-9" tabindex="-1"></a><span class="co"># similarly, for feature data there are dedicated filters.</span></span>
+<span id="cb301-10"><a href="pred.html#cb301-10" tabindex="-1"></a><span class="co"># note that these aggregate data prior to filtering (see previous section)</span></span>
+<span id="cb301-11"><a href="pred.html#cb301-11" tabindex="-1"></a>fGroupsConcF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsConc, <span class="at">absMinConc =</span> <span class="fl">0.02</span>)</span>
+<span id="cb301-12"><a href="pred.html#cb301-12" tabindex="-1"></a><span class="co"># only keep features with concentrations that are at least 1% of their toxicity</span></span>
+<span id="cb301-13"><a href="pred.html#cb301-13" tabindex="-1"></a><span class="co"># note that both concentrations/toxicity values should have been calculated with calculateConcs()/calculateTox()</span></span>
+<span id="cb301-14"><a href="pred.html#cb301-14" tabindex="-1"></a>fGroupsConcToxF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsConcTox, <span class="at">absMinConcTox =</span> <span class="fl">0.01</span>)</span>
+<span id="cb301-15"><a href="pred.html#cb301-15" tabindex="-1"></a></span>
+<span id="cb301-16"><a href="pred.html#cb301-16" tabindex="-1"></a><span class="co"># also get rid of features without concentrations (these are ignored by default)</span></span>
+<span id="cb301-17"><a href="pred.html#cb301-17" tabindex="-1"></a>fGroupsConcF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsConc, <span class="at">absMinConc =</span> <span class="fl">0.02</span>, <span class="at">removeNA =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb301-18"><a href="pred.html#cb301-18" tabindex="-1"></a><span class="co"># like as.data.table we can configure how values are aggregated</span></span>
+<span id="cb301-19"><a href="pred.html#cb301-19" tabindex="-1"></a><span class="co"># here the minimum is used instead of the default mean</span></span>
+<span id="cb301-20"><a href="pred.html#cb301-20" tabindex="-1"></a>fGroupsToxF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsTox, <span class="at">absMaxTox =</span> <span class="fl">5E3</span>, <span class="at">predAggrParams =</span> <span class="fu">getDefPredAggrParams</span>(min))</span></code></pre></div>
 <p>More details are found in the reference manual (<code>?`feature-filtering`</code>).</p>
 </div>
 </div>

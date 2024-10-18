@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>4.4 Componentization | patRoon handbook</title>
   <meta name="description" content="4.4 Componentization | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.40 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.41 and GitBook 2.6.7" />
 
   <meta property="og:title" content="4.4 Componentization | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2024-09-16" />
+<meta name="date" content="2024-10-18" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -381,49 +381,49 @@ div.csl-indent {
 <col width="37%" />
 </colgroup>
 <thead>
-<tr>
+<tr class="header">
 <th>Algorithm</th>
 <th>Usage</th>
 <th>Remarks</th>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td><a href="http://msbi.ipb-halle.de/msbi/CAMERA/">CAMERA</a></td>
 <td><code>generateComponents(algorithm = "camera", ...)</code></td>
 <td>Clusters feature groups with similar chromatographic elution profiles and annotate by known chemical rules (adducts, isotopologues, in-source fragments).</td>
 </tr>
-<tr>
+<tr class="even">
 <td><a href="https://github.com/sneumann/RAMClustR">RAMClustR</a></td>
 <td><code>generateComponents(algorithm = "ramclustr", ...)</code></td>
 <td>As above.</td>
 </tr>
-<tr>
+<tr class="odd">
 <td><a href="https://github.com/osenan/cliqueMS">cliqueMS</a></td>
 <td><code>generateComponents(algorithm = "cliquems", ...)</code></td>
 <td>As above, but using <em>feature components</em>.</td>
 </tr>
-<tr>
+<tr class="even">
 <td><a href="http://openms.de/">OpenMS</a></td>
 <td><code>generateComponents(algorithm = "openms", ...)</code></td>
 <td>As above. Uses <a href="https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/UTILS_MetaboliteAdductDecharger.html">MetaboliteAdductDecharger</a>.</td>
 </tr>
-<tr>
+<tr class="odd">
 <td><a href="https://cran.r-project.org/web/packages/nontarget/index.html">nontarget</a></td>
 <td><code>generateComponents(algorithm = "nontarget", ...)</code></td>
 <td>Uses the <a href="https://cran.r-project.org/web/packages/nontarget/index.html">nontarget</a> R package to perform unsupervised homologous series detection.</td>
 </tr>
-<tr>
+<tr class="even">
 <td>Intensity clustering</td>
 <td><code>generateComponents(algorithm = "intclust", ...)</code></td>
 <td>Groups features with similar intensity profiles across analyses by hierarchical clustering.</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>MS/MS clustering</td>
 <td><code>generateComponents(algorithm = "specclust", ...)</code></td>
 <td>Clusters feature groups with similar MS/MS spectra.</td>
 </tr>
-<tr>
+<tr class="even">
 <td>Transformation products</td>
 <td><code>generateComponents(algorithm = "tp", ...)</code></td>
 <td>Discussed in <a href="TPs.html#TPs">its own chapter</a>.</td>
@@ -436,7 +436,7 @@ div.csl-indent {
 <p>Note that some algorithms were primarily designed for datasets where features are generally present in the majority of the analyses (as is relatively common in metabolomics). For environmental analyses, however, this is often not the case. For instance, consider the following situation with three feature groups that chromatographically overlap and therefore could be considered a component:</p>
 <table>
 <thead>
-<tr>
+<tr class="header">
 <th>Feature group</th>
 <th><em>m/z</em></th>
 <th>analysis 1</th>
@@ -445,21 +445,21 @@ div.csl-indent {
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td>#1</td>
 <td>100.08827</td>
 <td>Present</td>
 <td>Present</td>
 <td>Absent</td>
 </tr>
-<tr>
+<tr class="even">
 <td>#2</td>
 <td>122.07021</td>
 <td>Present</td>
 <td>Present</td>
 <td>Absent</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>#3</td>
 <td>138.04415</td>
 <td>Absent</td>
@@ -497,8 +497,8 @@ div.csl-indent {
 <h3><span class="header-section-number">4.4.2</span> Homologues series<a href="componentization.html#homologues-series" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Homologues series can be automatically detected by interfacing with the <a href="https://cran.r-project.org/web/packages/nontarget/index.html">nontarget</a> R package. Components are made from feature groups that show increasing <em>m/z</em> and retention time values. Series are first detected within each replicate group. Afterwards, series from all replicates are linked in case (partial) overlap occurs and this overlap consists of the <em>same</em> feature groups (see figure below). Linked series are then finally merged if this will not cause any conflicts with other series: such a conflict typically occurs when two series are not only linked to each other.</p>
 <div class="figure"><span style="display:block;" id="fig:HS"></span>
-<div id="htmlwidget-a70b77e066086b164a1d" style="width:600px;height:250px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-a70b77e066086b164a1d">{"x":{"diagram":"\ndigraph Homologs {\n  graph [ rankdir = LR, compound = true, style = invis ]\n  node [ shape = oval,\n         fixedsize = true,\n         width = 2.3,\n         height = 0.8,\n         fontsize = 25,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n  subgraph cluster3 {\n    I [fillcolor=skyblue]; J [fillcolor=skyblue]; K [fillcolor=skyblue]\n    G -> H -> I -> J -> K [style=invis]\n  }\n\n  subgraph cluster4 {\n    _I [label=I, fillcolor=skyblue]; X [fillcolor=indianred1]; _K [label=K, fillcolor=skyblue]\n    _I -> X -> _K -> L [style=invis]\n  }\n\n  H -> _I [ltail=cluster3, lhead=cluster4, style=invis]\n  \n  I -> _I [constraint=false, style=dashed, arrowhead=none]\n  K -> _K [constraint=false, style=dashed, arrowhead=none]\n  \n  subgraph cluster1 {\n    C [fillcolor=skyblue]; D [fillcolor=skyblue]\n    A -> B -> C -> D [style=invis]\n  }\n\n  subgraph cluster2 {\n    _C [label=C, fillcolor=skyblue]; _D [label=D, fillcolor=skyblue]\n    _C -> _D -> E -> F [style=invis]\n  }\n  \n  B -> _C [ltail=cluster1, lhead=cluster2, style=invis]\n\n  C -> _C [constraint=false, style=dashed, arrowhead=none]\n  D -> _D [constraint=false, style=dashed, arrowhead=none]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-86ff076311ceec809d18" style="width:600px;height:250px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-86ff076311ceec809d18">{"x":{"diagram":"\ndigraph Homologs {\n  graph [ rankdir = LR, compound = true, style = invis ]\n  node [ shape = oval,\n         fixedsize = true,\n         width = 2.3,\n         height = 0.8,\n         fontsize = 25,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n  subgraph cluster3 {\n    I [fillcolor=skyblue]; J [fillcolor=skyblue]; K [fillcolor=skyblue]\n    G -> H -> I -> J -> K [style=invis]\n  }\n\n  subgraph cluster4 {\n    _I [label=I, fillcolor=skyblue]; X [fillcolor=indianred1]; _K [label=K, fillcolor=skyblue]\n    _I -> X -> _K -> L [style=invis]\n  }\n\n  H -> _I [ltail=cluster3, lhead=cluster4, style=invis]\n  \n  I -> _I [constraint=false, style=dashed, arrowhead=none]\n  K -> _K [constraint=false, style=dashed, arrowhead=none]\n  \n  subgraph cluster1 {\n    C [fillcolor=skyblue]; D [fillcolor=skyblue]\n    A -> B -> C -> D [style=invis]\n  }\n\n  subgraph cluster2 {\n    _C [label=C, fillcolor=skyblue]; _D [label=D, fillcolor=skyblue]\n    _C -> _D -> E -> F [style=invis]\n  }\n  \n  B -> _C [ltail=cluster1, lhead=cluster2, style=invis]\n\n  C -> _C [constraint=false, style=dashed, arrowhead=none]\n  D -> _D [constraint=false, style=dashed, arrowhead=none]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p class="caption">
 Figure 4.2: <strong>Linking of homologues series</strong> top: partial overlap and will be linked; bottom: no linkage due to different feature in overlapping series.
 </p>
@@ -511,29 +511,29 @@ Figure 4.2: <strong>Linking of homologues series</strong> top: partial overlap a
 <col width="78%" />
 </colgroup>
 <thead>
-<tr>
+<tr class="header">
 <th>Argument</th>
 <th>Remarks</th>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td><code>ionization</code></td>
 <td>Ionization mode: <code>"positive"</code> or <code>"negative"</code>. Not needed if <a href="incorpAdductIso.html#incorpAdductIso">adduct annotations</a> are available.</td>
 </tr>
-<tr>
+<tr class="even">
 <td><code>rtRange</code>, <code>mzRange</code></td>
 <td>Retention and <em>m/z</em> increment range. Retention times can be negative to allow series with increasing <em>m/z</em> values and decreasing retention times.</td>
 </tr>
-<tr>
+<tr class="odd">
 <td><code>elements</code></td>
 <td>Vector with elements to consider.</td>
 </tr>
-<tr>
+<tr class="even">
 <td><code>rtDev</code>, <code>absMzDev</code></td>
 <td>Maximum retention time and <em>m/z</em> deviation.</td>
 </tr>
-<tr>
+<tr class="odd">
 <td><code>...</code></td>
 <td>Further arguments passed to the <code>homol.search()</code> function.</td>
 </tr>
@@ -559,7 +559,7 @@ Figure 4.2: <strong>Linking of homologues series</strong> top: partial overlap a
 <col width="38%" />
 </colgroup>
 <thead>
-<tr>
+<tr class="header">
 <th>Argument</th>
 <th>Algorithm</th>
 <th>Default</th>
@@ -567,13 +567,13 @@ Figure 4.2: <strong>Linking of homologues series</strong> top: partial overlap a
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td><code>method</code></td>
 <td>All</td>
 <td><code>"complete"</code></td>
 <td>Clustering method. See <code>?hclust</code></td>
 </tr>
-<tr>
+<tr class="even">
 <td><code>metric</code></td>
 <td><code>intclust</code></td>
 <td><code>"euclidean"</code></td>

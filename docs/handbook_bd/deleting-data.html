@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>5.4 Deleting data | patRoon handbook</title>
   <meta name="description" content="5.4 Deleting data | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.40 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.41 and GitBook 2.6.7" />
 
   <meta property="og:title" content="5.4 Deleting data | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2024-09-16" />
+<meta name="date" content="2024-10-18" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -369,29 +369,29 @@ div.csl-indent {
 <p>Like the subset operator this function accepts a <code>i</code> and <code>j</code> parameter to specify which data should be operated on:</p>
 <table>
 <thead>
-<tr>
+<tr class="header">
 <th>Class</th>
 <th>Argument <code>i</code></th>
 <th>Argument <code>j</code></th>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td><code>features</code></td>
 <td>analysis</td>
 <td>feature index</td>
 </tr>
-<tr>
+<tr class="even">
 <td><code>featureGroups</code></td>
 <td>analysis</td>
 <td>feature group</td>
 </tr>
-<tr>
+<tr class="odd">
 <td><code>formulas</code>, <code>compounds</code></td>
 <td>feature group</td>
 <td>candidate index</td>
 </tr>
-<tr>
+<tr class="even">
 <td><code>components</code></td>
 <td>component</td>
 <td>feature group</td>
@@ -433,7 +433,7 @@ div.csl-indent {
 <col width="32%" />
 </colgroup>
 <thead>
-<tr>
+<tr class="header">
 <th>Class</th>
 <th>Called on every</th>
 <th>First argument</th>
@@ -442,28 +442,28 @@ div.csl-indent {
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td><code>features</code></td>
 <td>analysis</td>
 <td><code>data.table</code> with features</td>
 <td>analysis name</td>
 <td>Features indices (as <code>integer</code> or <code>logical</code>)</td>
 </tr>
-<tr>
+<tr class="even">
 <td><code>featureGroups</code></td>
 <td>feature group</td>
 <td>vector with group intensities</td>
 <td>feature group name</td>
 <td>The analyses of the features to remove (as <code>character</code>, <code>integer</code>, <code>logical</code>)</td>
 </tr>
-<tr>
+<tr class="odd">
 <td><code>formulas</code>, <code>compounds</code></td>
 <td>feature group</td>
 <td><code>data.table</code> with annotations</td>
 <td>feature group name</td>
 <td>Candidate indices (rows)</td>
 </tr>
-<tr>
+<tr class="even">
 <td><code>components</code></td>
 <td>component</td>
 <td><code>data.table</code> with the component</td>

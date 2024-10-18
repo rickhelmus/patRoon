@@ -362,7 +362,7 @@
 <dd><p>For the <code>"["</code> operator: ignored.</p>
 <p>For <code>delete</code>: passed to the function specified as <code>j</code>.</p>
 <p>For <code>normInts</code>: passed to <code><a href="suspect-screening.html">screenSuspects</a></code> if <code>featNorm="istd"</code>.</p>
-<p>For <a href="sets-workflow.html">sets workflow</a> methods: further arguments passed to the base <code>featureGroups</code> method.</p></dd>
+<p>1featureGroups</p></dd>
 
 
 <dt id="arg-fgroups-obj-x-object">fGroups, obj, x, object<a class="anchor" aria-label="anchor" href="#arg-fgroups-obj-x-object"></a></dt>
@@ -414,7 +414,7 @@ section for details.</p></dd>
 <dd><p>A <code>data.table</code> (or <code>data.frame</code>) with all internal standards. Should follow the format of
   a <a href="suspect-screening.html">suspect list</a>. Only used if <code>featNorm="istd"</code>. See the <code>Feature intensity
   normalization</code> section for details.</p>
-<p>(<strong>sets workflow</strong>) Can also be a <code>list</code> with internal standard lists.</p>
+<p>Can also be a <code>list</code> with internal standard lists.</p>
 <p>See the <code>suspects</code> argument to <code><a href="suspect-screening.html">screenSuspects</a></code> for more details.</p></dd>
 
 
@@ -587,16 +587,16 @@ length of two containing the min/max values. Set to NULL to ignore.</p></dd>
 
 
 <dt id="arg-set">set<a class="anchor" aria-label="anchor" href="#arg-set"></a></dt>
-<dd><p>(<strong>sets workflow</strong>) The name of the set.</p></dd>
+<dd><p>The name of the set.</p></dd>
 
 
 <dt id="arg-regroup">reGroup<a class="anchor" aria-label="anchor" href="#arg-regroup"></a></dt>
-<dd><p>(<strong>sets workflow</strong>) Set to <code>TRUE</code> to re-group the features after the adduct annotations are changed. See the
+<dd><p>Set to <code>TRUE</code> to re-group the features after the adduct annotations are changed. See the
 <code>Sets workflow</code> section for more details.</p></dd>
 
 
 <dt id="arg-sets">sets<a class="anchor" aria-label="anchor" href="#arg-sets"></a></dt>
-<dd><p>(<strong>sets workflow</strong>) For <code>[</code>: a <code>character</code> with name(s) of the sets to keep.</p>
+<dd><p>For <code>[</code>: a <code>character</code> with name(s) of the sets to keep.</p>
 <p>For <code>overlap</code> and <code>unique</code>: If <code>TRUE</code> then the <code>which</code> argument changes its meaning and is used
   to specify the names of the sets to be compared.</p></dd>
 
@@ -761,12 +761,12 @@ Assigned by the <code><a href="pred-quant.html">calculateConcs</a></code>/<code>
 
 
 <dt><code>groupAlgo,groupArgs,groupVerbose</code></dt>
-<dd><p>(<strong>sets workflow</strong>) Grouping parameters that were used when this object was created. Used
+<dd><p>Grouping parameters that were used when this object was created. Used
 by <code>adducts&lt;-</code> and <code>selectIons</code> when these methods perform a re-grouping of features.</p></dd>
 
 
 <dt><code>annotations,ISTDAssignments</code></dt>
-<dd><p>(<strong>sets workflow</strong>) As the <code>featureGroups</code> slots, but contains the data per set.</p></dd>
+<dd><p>As the <code>featureGroups</code> slots, but contains the data per set.</p></dd>
 
 
 <dt><code>annotationsChanged</code></dt>
@@ -839,34 +839,23 @@ by <code>adducts&lt;-</code> and <code>selectIons</code> when these methods perf
     </div>
     <div id="sets-workflows">
     <h2>Sets workflows</h2>
-    <p>The <code>featureGroupsSet</code> class is applicable for <a href="sets-workflow.html">sets workflows</a>. This class is derived from <code>featureGroups</code> and therefore largely follows the same user interface.</p>
-<p>The following methods are specifically defined for sets workflows:</p><ul><li><p><code>sets</code> Returns the set names for this object.</p></li>
-<li><p><code>unset</code> Converts the object data for a specified set into a 'non-set' object (<code>featureGroupsUnset</code>), which allows it to be used in 'regular' workflows. The adduct annotations for the selected set are used to convert all
-  feature (group) masses to ionic <em>m/z</em> values. The annotations persist in the converted object.</p></li>
-</ul><p>The following methods are changed or with new functionality:</p><ul><li><p><code>adducts</code>, <code>adducts&lt;-</code> require the <code>set</code> argument. The order of the data that is
+    <p>featureGroupsSetfeatureGroups</p>
+<p>featureGroupsUnsetThe adduct annotations for the selected set are used to convert all
+  feature (group) masses to ionic <em>m/z</em> values. The annotations persist in the converted object.</p>
+<p><code>adducts</code>, <code>adducts&lt;-</code> require the <code>set</code> argument. The order of the data that is
   returned/changed follows that of the <code>annotations</code> slot. Furthermore, <code>adducts&lt;-</code> will perform a
   re-grouping of features when its <code>reGroup</code> parameter is set to <code>TRUE</code>. The implications for this are
-  discussed below. Note that no adducts are changed <em>until</em> <code>reGroup=TRUE</code>.</p></li>
-<li><p>the subset operator (<code>[</code>) has specific arguments to choose (feature presence in) sets. See the argument
-  descriptions.</p></li>
-<li><p><code>as.data.table</code>: normalization of intensities is performed per set.</p></li>
-<li><p><code>export</code> Only allows to export data from one set. The <code>unset</code> method is used prior to exporting the
-  data.</p></li>
-<li><p><code>overlap</code> and <code>unique</code> allow to handle data per set. See the <code>sets</code> argument description.</p></li>
-<li><p><code>selectIons</code> Will perform a re-grouping of features. The implications of this are discussed below.</p></li>
-<li><p><code>normInts</code> Performs normalization for each set <em>independently</em>.</p></li>
-</ul><p>A re-grouping of features occurs if <code>selectIons</code> is called or <code>adducts&lt;-</code> is used with
+  discussed below. Note that no adducts are changed <em>until</em> <code>reGroup=TRUE</code>.   the subset operator (<code>[</code>) has specific arguments to choose (feature presence in) sets. See the argument
+  descriptions.   <code>as.data.table</code>: normalization of intensities is performed per set.   <code>export</code> Only allows to export data from one set. The <code>unset</code> method is used prior to exporting the
+  data.   <code>overlap</code> and <code>unique</code> allow to handle data per set. See the <code>sets</code> argument description.   <code>selectIons</code> Will perform a re-grouping of features. The implications of this are discussed below.   <code>normInts</code> Performs normalization for each set <em>independently</em>.</p>
+<p>A re-grouping of features occurs if <code>selectIons</code> is called or <code>adducts&lt;-</code> is used with
   <code>reGroup=TRUE</code>. Afterwards, it is very likely that feature group names are changed. Since data generated later
   in the workflow (<em>e.g.</em> annotation steps) rely on feature group names, these objects are <strong>not valid</strong>
   anymore, and <strong>must</strong> be re-generated.</p>
     </div>
     <div id="references">
     <h2>References</h2>
-    <p>Chetnik K, Petrick L, Pandey G (2020).
-“MetaClean: a machine learning-based classifier for reduced false positive peak detection in untargeted LC-MS metabolomics data.”
-<em>Metabolomics</em>, <b>16</b>(11).
-<a href="https://doi.org/10.1007/s11306-020-01738-3" class="external-link">doi:10.1007/s11306-020-01738-3</a>
-.</p>
+    <p>Chetnik2020patRoon</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -891,7 +880,7 @@ by <code>adducts&lt;-</code> and <code>selectIons</code> when these methods perf
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
       </footer></div>

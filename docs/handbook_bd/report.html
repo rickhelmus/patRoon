@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>5.9 Reporting | patRoon handbook</title>
   <meta name="description" content="5.9 Reporting | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.40 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.41 and GitBook 2.6.7" />
 
   <meta property="og:title" content="5.9 Reporting | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2024-09-16" />
+<meta name="date" content="2024-10-18" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -374,33 +374,33 @@ div.csl-indent {
 <col width="75%" />
 </colgroup>
 <thead>
-<tr>
+<tr class="header">
 <th>Argument</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td><code>fGroups</code></td>
 <td>The <code>featureGroups</code> object that should be reported (mandatory).</td>
 </tr>
-<tr>
+<tr class="even">
 <td><code>MSPeakLists</code></td>
 <td>The MS peak lists object used for annotations (mandatory if <code>formulas</code>/<code>compounds</code> are specified).</td>
 </tr>
-<tr>
+<tr class="odd">
 <td><code>formulas</code>, <code>compounds</code></td>
 <td>The <code>formulas</code> and <code>compounds</code> objects that should be used to report feature annotations.</td>
 </tr>
-<tr>
+<tr class="even">
 <td><code>compsCluster</code></td>
 <td>The result object from <a href="compclust.html#compclust">compound clustering</a>.</td>
 </tr>
-<tr>
+<tr class="odd">
 <td><code>components</code></td>
 <td>Any componentization results, <em>e.g.</em> with <a href="componentization.html#componentsChrom">adduct annotations</a> and from <a href="TPs.html#TPs">transformation product screening</a>.</td>
 </tr>
-<tr>
+<tr class="even">
 <td><code>TPs</code></td>
 <td>Output from object from <a href="genTPs.html#genTPs">generated transformation products</a>.</td>
 </tr>
@@ -460,25 +460,25 @@ div.csl-indent {
 <col width="59%" />
 </colgroup>
 <thead>
-<tr>
+<tr class="header">
 <th>Parameter</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td><code>general --&gt; format</code></td>
 <td>The output format. Currently only <code>"html"</code>.</td>
 </tr>
-<tr>
+<tr class="even">
 <td><code>general --&gt; selfContained</code></td>
 <td>If set (<code>true</code>) then the output will be a self contained <code>.html</code> file. Handy to share reports, but not recommended for large amounts of data.</td>
 </tr>
-<tr>
+<tr class="odd">
 <td><code>features --&gt; chromatograms --&gt; features</code></td>
 <td>If enabled (<code>true</code>) then the report includes chromatograms of individual features. If set to <code>all</code> then also chromatograms are generated for analyses in which a feature was not detected. This is especially useful to inspect if features were ‘missed’ during feature detection or accidentally removed after a filter step.</td>
 </tr>
-<tr>
+<tr class="even">
 <td><code>formulas/compounds --&gt; topMost</code></td>
 <td>Specifies the maximum number of top-ranked candidates to plot. Often it will take a considerable amount of time to report all candidates, hence, by default this is limited.</td>
 </tr>
@@ -502,34 +502,34 @@ div.csl-indent {
 <col width="46%" />
 </colgroup>
 <thead>
-<tr>
+<tr class="header">
 <th>Argument</th>
 <th>Functions</th>
 <th>Remarks</th>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td><code>fGroups</code>, <code>formulas</code>, <code>compounds</code>, <code>formulas</code>, <code>components</code>, <code>compsCluster</code>, <code>TPs</code></td>
 <td>All</td>
 <td>Objects to plot. Only <code>fGroups</code> is mandatory.</td>
 </tr>
-<tr>
+<tr class="even">
 <td><code>MSPeakLists</code></td>
 <td><code>reportPDF()</code>, <code>reportHTML()</code></td>
 <td>The <code>MSPeakLists</code> object that was used to generate annotation data. Only needs to be specified if <code>formulas</code> or <code>compounds</code> are reported.</td>
 </tr>
-<tr>
+<tr class="odd">
 <td><code>path</code></td>
 <td>All</td>
 <td>Directory path where report files will be stored (<code>"report"</code> by default).</td>
 </tr>
-<tr>
+<tr class="even">
 <td><code>formulasTopMost</code>, <code>compoundsTopMost</code></td>
 <td><code>reportPDF()</code>, <code>reportHTML()</code></td>
 <td>Report no more than this amount of highest ranked candidates.</td>
 </tr>
-<tr>
+<tr class="odd">
 <td><code>selfContained</code></td>
 <td><code>reportHTML()</code></td>
 <td>Outputs to a single and self contained <code>.html</code> file. Handy to share reports, but not recommended for large amounts of data.</td>

@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>8.11 Fold changes | patRoon handbook</title>
   <meta name="description" content="8.11 Fold changes | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.40 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.41 and GitBook 2.6.7" />
 
   <meta property="og:title" content="8.11 Fold changes | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2024-09-16" />
+<meta name="date" content="2024-10-18" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -367,7 +367,7 @@ div.csl-indent {
 <h2><span class="header-section-number">8.11</span> Fold changes<a href="FCCalc.html#FCCalc" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>A specific statistical way to prioritize feature data is by Fold changes (FC). This is a relative simple method to quickly identify (significant) changes between two sample groups. A typical use case is to compare the feature intensities before and after an experiment.</p>
 <p>To perform FC calculations we first need to specify its parameters. This is best achieved with the <code>getFCParams()</code> function:</p>
-<div class="sourceCode" id="cb301"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb301-1"><a href="FCCalc.html#cb301-1" tabindex="-1"></a><span class="fu">getFCParams</span>(<span class="fu">c</span>(<span class="st">&quot;before&quot;</span>, <span class="st">&quot;after&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb302"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb302-1"><a href="FCCalc.html#cb302-1" tabindex="-1"></a><span class="fu">getFCParams</span>(<span class="fu">c</span>(<span class="st">&quot;before&quot;</span>, <span class="st">&quot;after&quot;</span>))</span></code></pre></div>
 <pre><code>#&gt; $rGroups
 #&gt; [1] &quot;before&quot; &quot;after&quot; 
 #&gt; 
@@ -386,18 +386,18 @@ div.csl-indent {
 #&gt; $PVTestFunc
 #&gt; function (x, y) 
 #&gt; t.test(x, y, paired = TRUE)$p.value
-#&gt; &lt;bytecode: 0x56194a0adbd0&gt;
-#&gt; &lt;environment: 0x56194a0ae298&gt;
+#&gt; &lt;bytecode: 0x55d2a377fb60&gt;
+#&gt; &lt;environment: 0x55d2a3780228&gt;
 #&gt; 
 #&gt; $PVAdjFunc
 #&gt; function (pv) 
 #&gt; p.adjust(pv, &quot;BH&quot;)
-#&gt; &lt;bytecode: 0x56194a0adee0&gt;
-#&gt; &lt;environment: 0x56194a0ae298&gt;</code></pre>
+#&gt; &lt;bytecode: 0x55d2a377fe70&gt;
+#&gt; &lt;environment: 0x55d2a3780228&gt;</code></pre>
 <p>In this example we generate a <code>list</code> with parameters in order to make a comparison between two replicate groups: <code>before</code> and <code>after</code>. Several advanced parameters are available to tweak the calculation process. These are explained in the reference manual (<code>?featureGroups</code>).</p>
 <p>The <code>as.data.table</code> function for feature groups is used to perform the FC calculations.</p>
-<div class="sourceCode" id="cb303"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb303-1"><a href="FCCalc.html#cb303-1" tabindex="-1"></a>myFCParams <span class="ot">&lt;-</span> <span class="fu">getFCParams</span>(<span class="fu">c</span>(<span class="st">&quot;solvent-pos&quot;</span>, <span class="st">&quot;standard-pos&quot;</span>)) <span class="co"># compare solvent/standard</span></span>
-<span id="cb303-2"><a href="FCCalc.html#cb303-2" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroups, <span class="at">FCParams =</span> myFCParams)[, <span class="fu">c</span>(<span class="st">&quot;group&quot;</span>, <span class="st">&quot;FC&quot;</span>, <span class="st">&quot;FC_log&quot;</span>, <span class="st">&quot;PV&quot;</span>, <span class="st">&quot;PV_log&quot;</span>, <span class="st">&quot;classification&quot;</span>)]</span></code></pre></div>
+<div class="sourceCode" id="cb304"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb304-1"><a href="FCCalc.html#cb304-1" tabindex="-1"></a>myFCParams <span class="ot">&lt;-</span> <span class="fu">getFCParams</span>(<span class="fu">c</span>(<span class="st">&quot;solvent-pos&quot;</span>, <span class="st">&quot;standard-pos&quot;</span>)) <span class="co"># compare solvent/standard</span></span>
+<span id="cb304-2"><a href="FCCalc.html#cb304-2" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroups, <span class="at">FCParams =</span> myFCParams)[, <span class="fu">c</span>(<span class="st">&quot;group&quot;</span>, <span class="st">&quot;FC&quot;</span>, <span class="st">&quot;FC_log&quot;</span>, <span class="st">&quot;PV&quot;</span>, <span class="st">&quot;PV_log&quot;</span>, <span class="st">&quot;classification&quot;</span>)]</span></code></pre></div>
 <pre><code>#&gt;              group           FC      FC_log          PV     PV_log classification
 #&gt;             &lt;char&gt;        &lt;num&gt;       &lt;num&gt;       &lt;num&gt;      &lt;num&gt;         &lt;char&gt;
 #&gt;   1:     M99_R14_1 8.837494e-01 -0.17829070 0.223506802 0.65070926  insignificant
@@ -412,11 +412,11 @@ div.csl-indent {
 #&gt; 679: M432_R383_679 9.816400e+06 23.22676261 0.347009089 0.45965915             FC
 #&gt; 680:  M433_R10_680 1.132909e+00  0.18003240 0.293217996 0.53280938  insignificant</code></pre>
 <p>The <code>classification</code> column allows you to easily identify if and how a feature changes between the two sample groups. This can also be used to prioritize feature groups:</p>
-<div class="sourceCode" id="cb305"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb305-1"><a href="FCCalc.html#cb305-1" tabindex="-1"></a>tab <span class="ot">&lt;-</span> <span class="fu">as.data.table</span>(fGroups, <span class="at">FCParams =</span> myFCParams)</span>
-<span id="cb305-2"><a href="FCCalc.html#cb305-2" tabindex="-1"></a><span class="co"># only keep feature groups that significantly increase or decrease</span></span>
-<span id="cb305-3"><a href="FCCalc.html#cb305-3" tabindex="-1"></a>fGroupsChanged <span class="ot">&lt;-</span> fGroups[, tab[classification <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;increase&quot;</span>, <span class="st">&quot;decrease&quot;</span>)]<span class="sc">$</span>group]</span></code></pre></div>
+<div class="sourceCode" id="cb306"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb306-1"><a href="FCCalc.html#cb306-1" tabindex="-1"></a>tab <span class="ot">&lt;-</span> <span class="fu">as.data.table</span>(fGroups, <span class="at">FCParams =</span> myFCParams)</span>
+<span id="cb306-2"><a href="FCCalc.html#cb306-2" tabindex="-1"></a><span class="co"># only keep feature groups that significantly increase or decrease</span></span>
+<span id="cb306-3"><a href="FCCalc.html#cb306-3" tabindex="-1"></a>fGroupsChanged <span class="ot">&lt;-</span> fGroups[, tab[classification <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;increase&quot;</span>, <span class="st">&quot;decrease&quot;</span>)]<span class="sc">$</span>group]</span></code></pre></div>
 <p>The <code>plotVolcano</code> function can be used to visually the FC data:</p>
-<div class="sourceCode" id="cb306"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb306-1"><a href="FCCalc.html#cb306-1" tabindex="-1"></a><span class="fu">plotVolcano</span>(fGroups, myFCParams)</span></code></pre></div>
+<div class="sourceCode" id="cb307"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb307-1"><a href="FCCalc.html#cb307-1" tabindex="-1"></a><span class="fu">plotVolcano</span>(fGroups, myFCParams)</span></code></pre></div>
 <p><img src="handbook_files/figure-html/plotVolcano-1.png" width="50%" /></p>
 </div>
             </section>

@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>2.3 Regular R installation | patRoon handbook</title>
   <meta name="description" content="2.3 Regular R installation | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.40 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.41 and GitBook 2.6.7" />
 
   <meta property="og:title" content="2.3 Regular R installation | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2024-09-16" />
+<meta name="date" content="2024-10-18" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -416,61 +416,61 @@ div.csl-indent {
 <col width="60%" />
 </colgroup>
 <thead>
-<tr>
+<tr class="header">
 <th>Dependency</th>
 <th>Remarks</th>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td><a href="https://www.oracle.com/technetwork/java/javase/downloads/index.html">Java JDK</a></td>
 <td><strong>Mandatory</strong> for e.g. plotting structures and using MetFrag.</td>
 </tr>
-<tr>
+<tr class="even">
 <td><a href="https://github.com/openbabel/openbabel">OpenBabel</a></td>
 <td><strong>Highly recommend</strong> Used by e.g. suspect screening to automatically validate and calculate chemical properties such as InChIs and formulae. While optional, highly recommended.</td>
 </tr>
-<tr>
+<tr class="odd">
 <td><a href="https://cran.r-project.org/bin/windows/Rtools/">Rtools</a></td>
 <td>May be necessary on Window when installing <code>patRoon</code> and its <code>R</code> dependencies (discussed later).</td>
 </tr>
-<tr>
+<tr class="even">
 <td><a href="http://proteowizard.sourceforge.net/">ProteoWizard</a></td>
 <td>Needed for automatic data-pretreatment (e.g. data file conversion and centroiding, Bruker users may use DataAnalysis integration instead).</td>
 </tr>
-<tr>
+<tr class="odd">
 <td><a href="http://openms.de/">OpenMS</a></td>
 <td>Recommended. Used for e.g. finding and grouping features.</td>
 </tr>
-<tr>
+<tr class="even">
 <td><a href="http://ipb-halle.github.io/MetFrag/projects/metfragcl/">MetFrag CL</a></td>
 <td>Recommended. Used for annotation with MetFrag.</td>
 </tr>
-<tr>
+<tr class="odd">
 <td><a href="ftp://newftp.epa.gov/COMPTOX/Sustainable_Chemistry_Data/Chemistry_Dashboard/MetFrag_metadata_files">MetFrag CompTox DB</a></td>
 <td>Database files necessary for usage of the <a href="https://comptox.epa.gov/dashboard">CompTox</a> database with MetFrag. Note that a recent version of MetFrag (&gt;=2.4.5) is required. Note that the lists with additions for <a href="https://zenodo.org/record/3364464#.XnjM-XLvKUk">smoking metadata</a> and <a href="https://zenodo.org/record/3472781#.XnjMAHLvKUk">wastewater metadata</a> are also supported.</td>
 </tr>
-<tr>
+<tr class="even">
 <td><a href="https://zenodo.org/record/6503754">MetFrag PubChemLite DB</a></td>
 <td>Database file needed to use <a href="https://doi.org/10.1186/s13321-021-00489-0">PubChemLite</a> with MetFrag.</td>
 </tr>
-<tr>
+<tr class="odd">
 <td><a href="https://zenodo.org/record/6385954">MetFrag PubChem OECD PFAS DB</a></td>
 <td>Database file to use the OECD PFAS database with MetFrag.</td>
 </tr>
-<tr>
+<tr class="even">
 <td><a href="https://bio.informatik.uni-jena.de/software/sirius/">SIRIUS</a></td>
 <td>For obtaining feature data and formula and/or compound annotation.</td>
 </tr>
-<tr>
+<tr class="odd">
 <td><a href="https://bitbucket.org/djoumbou/biotransformer/src/master/">BioTransformer</a></td>
 <td>For prediction of transformation products. See the <a href="https://bitbucket.org/djoumbou/biotransformer/src/master/">BioTransformer</a> page for installation details. If you have trouble compiling the jar file you can download it from <a href="https://github.com/rickhelmus/patRoonExt/raw/master/tools/biotransformer-3.0.0.jar">here</a>.</td>
 </tr>
-<tr>
+<tr class="even">
 <td><a href="https://bitbucket.org/SSamanipour/safd.jl/src/master/">SAFD</a></td>
 <td>For finding features with <a href="https://bitbucket.org/SSamanipour/safd.jl/src/master/">SAFD</a>. Please follow all the installation on the <a href="https://bitbucket.org/SSamanipour/safd.jl/src/master/">SAFD webpage</a>.</td>
 </tr>
-<tr>
+<tr class="odd">
 <td><a href="https://pngquant.org/">pngquant</a></td>
 <td>Used to reduce size of HTML reports (only legacy interface), definitely optional.</td>
 </tr>

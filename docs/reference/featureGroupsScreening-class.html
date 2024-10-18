@@ -341,11 +341,11 @@ specified in the <code>fragments_*</code> columns of the suspect list. Set to <c
 
 
 <dt id="arg-sets">sets<a class="anchor" aria-label="anchor" href="#arg-sets"></a></dt>
-<dd><p>(<strong>sets workflow</strong>) A <code>character</code> with name(s) of the sets to keep (or remove if <code>negate=TRUE</code>).</p></dd>
+<dd><p>A <code>character</code> with name(s) of the sets to keep (or remove if <code>negate=TRUE</code>).</p></dd>
 
 
 <dt id="arg-set">set<a class="anchor" aria-label="anchor" href="#arg-set"></a></dt>
-<dd><p>(<strong>sets workflow</strong>) The name of the set.</p></dd>
+<dd><p>The name of the set.</p></dd>
 
 </dl></div>
     <div id="value">
@@ -418,8 +418,7 @@ annotation data when <code>annotateSuspects</code> is run.</p></dd>
   relative to the value for <code>maxFrags</code>. The calculation of this column is influenced by the
   <code>checkFragments</code> argument to <code>annotateSuspects</code>.</p></li>
 <li><p><code>estIDLevel</code> Provides an <em>estimation</em> of the identification level, roughly following that of
-  (Schymanski et al. 2014)
-. However, please note that this value is only an estimation, and manual
+  Schymanski2014patRoon. However, please note that this value is only an estimation, and manual
   interpretation is still necessary to assign final identification levels. The estimation is done through a set of
   rules, see the <code>Identification level rules</code> section below.</p></li>
 </ul><p>Note that only columns are present if sufficient data is available for their calculation.</p>
@@ -514,34 +513,24 @@ annotation data when <code>annotateSuspects</code> is run.</p></dd>
     </div>
     <div id="sets-workflows">
     <h2>Sets workflows</h2>
-    <p>The <code>featureGroupsScreeningSet</code> class is applicable for <a href="sets-workflow.html">sets workflows</a>. This class is derived from <code>featureGroupsScreening</code> and therefore largely follows the same user interface.</p>
-<p>The following methods are specifically defined for sets workflows:</p><ul><li><p><code>unset</code> Converts the object data for a specified set into a 'non-set' object (<code>featureGroupsScreeningUnset</code>), which allows it to be used in 'regular' workflows. Only the screening results present in the specified set are kept.</p></li>
-</ul><p>The following methods are changed or with new functionality:</p><ul><li><p><code>annotateSuspects</code> Suspect annotation is performed per set. Thus, formula/compound ranks, estimated
+    <p>featureGroupsScreeningSetfeatureGroupsScreening</p>
+<p>featureGroupsScreeningUnsetOnly the screening results present in the specified set are kept.</p>
+<p><code>annotateSuspects</code> Suspect annotation is performed per set. Thus, formula/compound ranks, estimated
   identification levels etc are calculated for each set. Subsequently, these results are merged in the final
   <code>screenInfo</code>. In addition, an overall <code>formRank</code> and <code>compRank</code> column is created based on the
   rankings of the suspect candidate in the set consensus data. Furthermore, an overall <code>estIDLevel</code> is generated
   that is based on the 'best' estimated identification level among the sets data (<em>i.e.</em> the lowest). In case
   there is a tie between sub-levels (<em>e.g.</em> <samp>3a</samp> and <samp>3b</samp>), then the sub-level is stripped
-  (<em>e.g.</em> <samp>3</samp>).</p></li>
-<li><p><code>filter</code> All filters related to estimated identification levels and formula/compound rankings  are
+  (<em>e.g.</em> <samp>3</samp>).   <code>filter</code> All filters related to estimated identification levels and formula/compound rankings  are
   applied to the overall set data (see above). All others are applied to set specific data: in this case candidates
-  are only removed if none of the set data confirms to the filter.</p></li>
-</ul><p>This class derives also from <code><a href="featureGroups-class.html">featureGroupsSet</a></code>. Please see its documentation for more relevant details
+  are only removed if none of the set data confirms to the filter.</p>
+<p>This class derives also from <code><a href="featureGroups-class.html">featureGroupsSet</a></code>. Please see its documentation for more relevant details
   with sets workflows.</p>
 <p>Note that the <code>formRank</code> and <code>compRank</code> columns are <em>not</em> updated when the data is subset.</p>
     </div>
     <div id="references">
     <h2>References</h2>
-    <p>Schymanski EL, Jeon J, Gulde R, Fenner K, Ruff M, Singer HP, Hollender J (2014).
-“Identifying Small Molecules via High Resolution Mass Spectrometry: Communicating Confidence.”
-<em>Environmental Science and Technology</em>, <b>48</b>(4), 2097–2098.
-<a href="https://doi.org/10.1021/es5002105" class="external-link">doi:10.1021/es5002105</a>
-.
- <br><br> Stein SE, Scott DR (1994).
-“Optimization and testing of mass spectral library search algorithms for compound identification.”
-<em>Journal of the American Society for Mass Spectrometry</em>, <b>5</b>(9), 859–866.
-<a href="https://doi.org/10.1016/1044-0305%2894%2987009-8" class="external-link">doi:10.1016/1044-0305(94)87009-8</a>
-.</p>
+    <p><br><br> Stein1994patRoon</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -565,7 +554,7 @@ annotation data when <code>annotateSuspects</code> is run.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
       </footer></div>

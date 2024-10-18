@@ -118,7 +118,7 @@
                         <h4 data-toc-skip class="author">Rick
 Helmus</h4>
             
-            <h4 data-toc-skip class="date">2024-09-16</h4>
+            <h4 data-toc-skip class="date">2024-10-18</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/vignettes/tutorial.Rmd" class="external-link"><code>vignettes/tutorial.Rmd</code></a></small>
       <div class="hidden name"><code>tutorial.Rmd</code></div>
@@ -641,14 +641,18 @@ package to do so:</p>
 <span><span class="co">#&gt; Loading all MS peak lists for 25 feature groups in analysis 'standard-pos-3'...</span></span>
 <span><span class="co">#&gt; ================================================================================</span></span>
 <span><span class="co">#&gt; Generating averaged peak lists for all feature groups...</span></span>
-<span><span class="co">#&gt; ================================================================================</span></span></code></pre>
+<span><span class="co">#&gt; ======================================</span></span></code></pre>
+<pre><code><span><span class="co">#&gt; ====================</span></span></code></pre>
+<pre><code><span><span class="co">#&gt; =========</span></span></code></pre>
+<pre><code><span><span class="co">#&gt; ==========</span></span></code></pre>
+<pre><code><span><span class="co">#&gt; ===</span></span></code></pre>
 <p>Note that we lowered the <code>clusterMzWindow</code> value to
 <em>0.002</em>. This window is used during averaging to cluster similar
 <em>m/z</em> values together. In general the better the resolution of
 your MS instrument, the lower the value can be set.</p>
 <p>Similar to feature groups the <code><a href="../reference/generics.html">filter()</a></code> generic function
 can be used to clean up the peak lists afterwards:</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mslists</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generics.html">filter</a></span><span class="op">(</span><span class="va">mslists</span>, relMSMSIntThr <span class="op">=</span> <span class="fl">0.02</span>, topMSMSPeaks <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; Done! Filtered 1298 (15.50%) MS peaks. Remaining: 7078</span></span></code></pre>
 <p>Here, all MS/MS mass peaks with intensities below 2% are removed and
@@ -665,7 +669,7 @@ presence of MS/MS fragments. In this tutorial we will use this data as
 an extra hint to score candidate chemical structures generated during
 the next step. The command below will use <a href="https://sourceforge.net/projects/genform/" class="external-link">GenForm</a> to perform
 this step. Again running this code may take some time.</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">formulas</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generateFormulas.html">generateFormulas</a></span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">mslists</span>, <span class="st">"genform"</span>, relMzDev <span class="op">=</span> <span class="fl">5</span>, adduct <span class="op">=</span> <span class="st">"[M+H]+"</span>, elements <span class="op">=</span> <span class="st">"CHNOPSCl"</span>,</span>
 <span>                             oc <span class="op">=</span> <span class="cn">FALSE</span>, calculateFeatures <span class="op">=</span> <span class="cn">TRUE</span>, featThresholdAnn <span class="op">=</span> <span class="fl">0.75</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; Loading all formulas for analysis 'standard-pos-1'...</span></span>
@@ -716,7 +720,7 @@ can be found by <code>patRoon</code>. Please see the <a href="https://rickhelmus
 for installation instructions.</p>
 <p>Then <code><a href="../reference/generateCompounds.html">generateCompounds()</a></code> is used to execute MetFrag and
 generate the <code>compounds</code>.</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">compounds</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generateCompounds.html">generateCompounds</a></span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">mslists</span>, <span class="st">"metfrag"</span>, method <span class="op">=</span> <span class="st">"CL"</span>,</span>
 <span>                               dbRelMzDev <span class="op">=</span> <span class="fl">5</span>, fragRelMzDev <span class="op">=</span> <span class="fl">5</span>, fragAbsMzDev <span class="op">=</span> <span class="fl">0.002</span>,</span>
 <span>                               adduct <span class="op">=</span> <span class="st">"[M+H]+"</span>, database <span class="op">=</span> <span class="st">"pubchemlite"</span>, maxCandidatesToStop <span class="op">=</span> <span class="fl">2500</span><span class="op">)</span></span></code></pre></div>
@@ -737,16 +741,16 @@ take care to prioritize your data before running this function!</p>
 <p>Finally we use the <code><a href="../reference/compounds-class.html">addFormulaScoring()</a></code> function to
 improve ranking of candidates by incorporating the formula calculation
 data from the previous step.</p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">compounds</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/compounds-class.html">addFormulaScoring</a></span><span class="op">(</span><span class="va">compounds</span>, <span class="va">formulas</span>, updateScore <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt; Adding formula scoring...</span></span>
-<span><span class="co">#&gt; ================================================================================</span></span></code></pre>
+<pre><code><span><span class="co">#&gt; Adding formula scoring...</span></span></code></pre>
+<pre><code><span><span class="co">#&gt; ================================================================================</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="inspecting-results-1">Inspecting results<a class="anchor" aria-label="anchor" href="#inspecting-results-1"></a>
 </h3>
 <p>Similar as feature groups we can quickly peek at some results:</p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mslists</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; A MSPeakLists object</span></span>
 <span><span class="co">#&gt; Hierarchy:</span></span>
@@ -761,7 +765,7 @@ data from the previous step.</p>
 <span><span class="co">#&gt; Average peak count/analysis: 2359 (MS: 2211 - MS/MS: 148)</span></span>
 <span><span class="co">#&gt; Total peak lists: 127 (MS: 75 - MS/MS: 52)</span></span>
 <span><span class="co">#&gt; Average peak lists/analysis: 42 (MS: 25 - MS/MS: 17)</span></span></code></pre>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">formulas</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; A formulas object</span></span>
 <span><span class="co">#&gt; Hierarchy:</span></span>
@@ -782,7 +786,7 @@ data from the previous step.</p>
 <span><span class="co">#&gt; Formulas assigned to feature groups:</span></span>
 <span><span class="co">#&gt;   - Total formula count: 29</span></span>
 <span><span class="co">#&gt;   - Average formulas per feature group: 1.3</span></span></code></pre>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">compounds</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; A compoundsMF object</span></span>
 <span><span class="co">#&gt; Hierarchy:</span></span>
@@ -793,7 +797,7 @@ data from the previous step.</p>
 <span><span class="co">#&gt; Algorithm: metfrag</span></span>
 <span><span class="co">#&gt; Number of feature groups with compounds in this object: 18</span></span>
 <span><span class="co">#&gt; Number of compounds: 740 (total), 41.1 (mean), 5 - 100 (min - max)</span></span></code></pre>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/generics.html">as.data.table</a></span><span class="op">(</span><span class="va">mslists</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;                group   type    ID        mz intensity precursor</span></span>
 <span><span class="co">#&gt;               &lt;char&gt; &lt;char&gt; &lt;int&gt;     &lt;num&gt;     &lt;num&gt;    &lt;lgcl&gt;</span></span>
@@ -808,7 +812,7 @@ data from the previous step.</p>
 <span><span class="co">#&gt; 1516: M186_R293_1568   MSMS    39 144.17459 100887.24     FALSE</span></span>
 <span><span class="co">#&gt; 1517: M186_R293_1568   MSMS    47 186.22174 277026.44      TRUE</span></span>
 <span><span class="co">#&gt; 1518: M186_R293_1568   MSMS    48 187.22492  42499.82     FALSE</span></span></code></pre>
-<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/generics.html">as.data.table</a></span><span class="op">(</span><span class="va">formulas</span><span class="op">)</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">7</span><span class="op">]</span> <span class="co"># only show first columns for clarity</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;              group neutral_formula ion_formula neutralMass ion_formula_mz       error   dbe</span></span>
 <span><span class="co">#&gt;             &lt;char&gt;          &lt;char&gt;      &lt;char&gt;       &lt;num&gt;          &lt;num&gt;       &lt;num&gt; &lt;num&gt;</span></span>
@@ -823,7 +827,7 @@ data from the previous step.</p>
 <span><span class="co">#&gt; 27: M183_R313_1489        C6H15O4P    C6H16O4P    182.0708       183.0781  2.93333333     0</span></span>
 <span><span class="co">#&gt; 28: M183_R313_1489        CH10N8OS    CH11N8OS    182.0698       183.0771 -2.40000000     1</span></span>
 <span><span class="co">#&gt; 29: M186_R293_1568         C12H27N     C12H28N    185.2143       186.2216  1.26666667     0</span></span></code></pre>
-<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/generics.html">as.data.table</a></span><span class="op">(</span><span class="va">compounds</span><span class="op">)</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span> <span class="co"># only show first columns for clarity</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;               group explainedPeaks    score neutralMass                  SMILES</span></span>
 <span><span class="co">#&gt;              &lt;char&gt;          &lt;int&gt;    &lt;num&gt;       &lt;num&gt;                  &lt;char&gt;</span></span>
@@ -838,13 +842,13 @@ data from the previous step.</p>
 <span><span class="co">#&gt; 738: M186_R293_1568              3 2.843497    185.2143       CCCC(CCC)(CCC)NCC</span></span>
 <span><span class="co">#&gt; 739: M186_R293_1568              3 2.839884    185.2143 CCN(CC)C(C)(C)CC(C)(C)C</span></span>
 <span><span class="co">#&gt; 740: M186_R293_1568              3 2.825351    185.2143   CC(C)CC(C)NC(C)CC(C)C</span></span></code></pre>
-<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/generics.html">plotSpectrum</a></span><span class="op">(</span><span class="va">mslists</span>, <span class="st">"M186_R293_1568"</span>, MSLevel <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <p><img src="tutorial_files/figure-html/plotSpectrum-1.png" width="576"></p>
-<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/generics.html">plotSpectrum</a></span><span class="op">(</span><span class="va">formulas</span>, <span class="fl">1</span>, <span class="st">"M109_R192_157"</span>, MSPeakLists <span class="op">=</span> <span class="va">mslists</span><span class="op">)</span></span></code></pre></div>
 <p><img src="tutorial_files/figure-html/plotSpectrum-2.png" width="576"></p>
-<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/generics.html">plotSpectrum</a></span><span class="op">(</span><span class="va">compounds</span>, <span class="fl">1</span>, <span class="st">"M120_R268_288"</span>, <span class="va">mslists</span>, plotStruct <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="tutorial_files/figure-html/plotSpectrum-3.png" width="576"></p>
 </div>
@@ -855,7 +859,7 @@ data from the previous step.</p>
 <p>The last step of the workflow is typically to report all the data.
 The <code><a href="../reference/reporting.html">report()</a></code> function combines all workflow data in an easy
 to use interactive <code>HTML</code> document.</p>
-<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/reporting.html">report</a></span><span class="op">(</span><span class="va">fGroups</span>, MSPeakLists <span class="op">=</span> <span class="va">mslists</span>, formulas <span class="op">=</span> <span class="va">formulas</span>, compounds <span class="op">=</span> <span class="va">compounds</span>,</span>
 <span>       components <span class="op">=</span> <span class="cn">NULL</span>, settingsFile <span class="op">=</span> <span class="st">"report.yml"</span>, openReport <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <blockquote>
@@ -863,7 +867,7 @@ to use interactive <code>HTML</code> document.</p>
 <code><a href="../reference/newProject.html">newProject()</a></code> and created the project manually then you
 <em>first</em> need to generate a new report settings file:</p>
 </blockquote>
-<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/reporting.html">genReportSettingsFile</a></span><span class="op">(</span><span class="op">)</span> <span class="co"># only run this if the project was created manually without  newProject() </span></span></code></pre></div>
 <p>The output of <code><a href="../reference/reporting.html">report()</a></code> can be viewed <a href="../examples/report.html">here</a>.</p>
 <p>Note that these functions can be called at any time during the
@@ -871,7 +875,7 @@ workflow. This may be especially useful if you want evaluate results
 during optimization or exploring the various algorithms and their
 parameters. In this case you can simply cherry pick the data that you
 want to report, for instance:</p>
-<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># only report feature groups (i.e. the bare minimum)</span></span>
 <span><span class="fu"><a href="../reference/reporting.html">report</a></span><span class="op">(</span><span class="va">fGroups</span><span class="op">)</span></span>
 <span></span>
@@ -884,7 +888,7 @@ want to report, for instance:</p>
 <p>In the previous sections the different parts of the processing script
 were discussed and where necessary modified. As a reference, the final
 script look similar ot this:</p>
-<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Script automatically generated on Mon Jul 26 14:32:58 2021</span></span>
 <span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rickhelmus/patRoon" class="external-link">patRoon</a></span><span class="op">)</span></span>
@@ -965,7 +969,7 @@ script look similar ot this:</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
       </footer>

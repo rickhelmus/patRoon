@@ -4,7 +4,7 @@
 * Fixed: if `updateScores=TRUE` for the methods `addFormulaScoring()`, `predictRespFactors()` and `predictTox()` then `NaN` scores could be introduced if the `formulaScore` is zero.
 * Fixed: if `updateScores=TRUE` for the method `addFormulaScoring()` then the `score` would be updated twice.
 * Fixed: `generateTPsLibrary()`/`generateTPsLibraryFormula()` specifying >1 generation did not yield in additional TP searches if `parents!=NULL`
-* `generateTPsLibrary()`/`generateTPsLibraryFormula()` any TPs that are equal to the parent (i.e. common with `generations>1`) are now removed
+* `generateTPsLibrary()`/`generateTPsLibraryFormula()` any TPs that are equal to the parent and are from a generation>1 are now removed
 
 
 # patRoon 2.3.2

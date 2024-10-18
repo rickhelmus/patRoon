@@ -243,7 +243,7 @@ getProductsFromLib <- function(TPLibrary, TPLibrarySel, generations, matchGenera
     {
         # prune TPs that equal the main parent
         # UNDONE: this does not work if matchGenerationsBy=="name" (default for formulas) 
-        r <- r[get(matchGenerationsBy) != TPLibrary[parent_name == pn][[paste0("parent_", matchGenerationsBy)]][1]]
+        r <- r[generation == 1 | get(matchGenerationsBy) != TPLibrary[parent_name == pn][[paste0("parent_", matchGenerationsBy)]][1]]
         set(r, j = "chem_ID", value = match(r[[matchIDBy]], unique(r[[matchIDBy]])))
         setnames(r, "name", "name_lib")
         set(r, j = "name", value = paste0(pn, "-TP", r$chem_ID))

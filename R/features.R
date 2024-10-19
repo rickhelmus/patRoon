@@ -463,11 +463,11 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
 
 #' @export
 setMethod("findMobilities", "features", function(obj, findPeaksAlgo, mzRange = 0.005, clusterIMSWindow = 0.01,
-                                                 clusterMethod = "distance", minIMSIntensity = 0, maxMSRtWindow = 2, ...)
+                                                 clusterMethod = "distance", minIntensityIMS = 0, maxMSRtWindow = 2, ...)
 {
     ac <- checkmate::makeAssertCollection()
     assertFindPeaksAlgo(findPeaksAlgo, add = ac)
-    aapply(checkmate::assertNumber, . ~ mzRange + clusterIMSWindow + minIMSIntensity, finite = TRUE,
+    aapply(checkmate::assertNumber, . ~ mzRange + clusterIMSWindow + minIntensityIMS, finite = TRUE,
            fixed = list(add = ac))
     checkmate::assertChoice(clusterMethod, c("bin", "distance", "hclust"), add = ac)
     checkmate::assertNumber(maxMSRtWindow, lower = 1, finite = TRUE, null.ok = TRUE, add = ac)
@@ -476,7 +476,7 @@ setMethod("findMobilities", "features", function(obj, findPeaksAlgo, mzRange = 0
     if (length(obj) == 0)
         return(obj) # nothing to do...
     
-    hash <- makeHash(obj, findPeaksAlgo, mzRange, clusterIMSWindow, clusterMethod, minIMSIntensity, maxMSRtWindow, ...)
+    hash <- makeHash(obj, findPeaksAlgo, mzRange, clusterIMSWindow, clusterMethod, minIntensityIMS, maxMSRtWindow, ...)
     cd <- loadCacheData("findMobilities", hash)
     if (!is.null(cd))
         return(cd)
@@ -498,7 +498,7 @@ setMethod("findMobilities", "features", function(obj, findPeaksAlgo, mzRange = 0
         
         # NOTE: mzmin/mzmax may be too narrow here, hence use a user specified mz range
         EIMs <- getMobilograms(backend, fTable$mz - mzRange, fTable$mz + mzRange, fTable$retmin, fTable$retmax,
-                               clusterMethod, clusterIMSWindow, minIMSIntensity, FALSE)
+                               clusterMethod, clusterIMSWindow, minIntensityIMS, FALSE)
         names(EIMs) <- fTable$ID
         EIMs <- lapply(EIMs, setDT)
         

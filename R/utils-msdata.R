@@ -197,7 +197,7 @@ doGetEICs <- function(anaInfo, EICInfoList, compress = TRUE, withBP = FALSE, cac
         if (doCache)
         {
             # NOTE: subset columns here, so any additional columns from e.g. feature tables are not considered
-            hashes <- EICInfo[, makeHash(anaHashes[[ana]], compress, .SD), by = seq_len(nrow(EICInfo)),
+            hashes <- EICInfo[, makeHash(anaHashes[[ana]], compress, withBP, .SD), by = seq_len(nrow(EICInfo)),
                               .SDcols = c("retmin", "retmax", "mzmin", "mzmax")][[2]]
             
             cachedData <- loadCacheData(category = "EICs", hashes, dbArg = cacheDB, simplify = FALSE)

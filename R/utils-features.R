@@ -756,15 +756,13 @@ findPeaksInEICs <- function(allEICs, findPeaksAlgo, withBP, ..., parallel, cache
             peaks[, c("mzmin", "mzmax", "mz", "mobmin", "mobmax", "mobility") := {
                 eic <- EICs[[EIC_ID]][EICs[[EIC_ID]]$intensity != 0 & EICs[[EIC_ID]]$time %between% c(retmin, retmax), ]
                 if (nrow(eic) == 0)
-                    numeric()
+                    numeric(1)
                 else
                 {
                     if (is.null(eic[["mobility"]]))
                         eic$mobility <- NA_real_
-                    if (withBP) # UNDONE: also use mobility BP data?
-                        list(min(eic$mzBP), max(eic$mzBP), eic$mzBP, min(eic$mobility), max(eic$mobility),
-                             weighted.mean(eic$mobility, eic$intensity))
-                    list(min(eic$mz), max(eic$mz), weighted.mean(eic$mz, eic$intensity),
+                    # UNDONE: also use mobility BP data?
+                    list(min(eic$mzmin), max(eic$mzmax), weighted.mean(if (withBP) eic$mzBP else eic$mz, eic$intensity),
                          min(eic$mobility), max(eic$mobility), weighted.mean(eic$mobility, eic$intensity))
                 }
             }, by = seq_len(nrow(peaks))]

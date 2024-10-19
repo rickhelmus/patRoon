@@ -283,7 +283,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     struct EICPoint
     {
         SpectrumRawTypes::Time time = 0.0;
-        SpectrumRawTypes::Mass mz = 0.0;
+        SpectrumRawTypes::Mass mz = 0.0, mzMin = 0.0, mzMax = 0.0;
         SpectrumRawTypes::Intensity intensity = 0;
         SpectrumRawTypes::Mobility mobility = 0.0;
         SpectrumRawTypes::Mass mzBP = 0.0;
@@ -332,14 +332,22 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                 break; 
             
             const auto inten = spec.getIntensities()[j];
-            ret.intensity += inten;
-            ret.mz += mz * inten;
-            if (hasMob)
-                ret.mobility += mob * inten;
-            if (withBP && inten > ret.intensityBP)
+            if (inten > 0)
             {
-                ret.intensityBP = inten;
-                ret.mzBP = mz;
+                ret.intensity += inten;
+                ret.mz += mz * inten;
+                if (ret.mzMin == 0.0 || mz < ret.mzMin)
+                    ret.mzMin = mz;
+                if (mz > ret.mzMax)
+                    ret.mzMax = mz;
+                if (hasMob)
+                    ret.mobility += mob * inten;
+                if (withBP && inten > ret.intensityBP)
+                {
+                    ret.intensityBP = inten;
+                    ret.mzBP = mz;
+                }
+                //Rcpp::Rcout << "EIC: " << ret.time << "/" << j << "\t" << std::fixed << mz << "\t" << inten << "\t" << ret.mzMin << "/" << ret.mzMax << "\t" << mob << "\n";
             }
         }
 
@@ -390,7 +398,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         }
 
         std::vector<SpectrumRawTypes::Time> times(points.size());
-        std::vector<SpectrumRawTypes::Mass> mzs(points.size());
+        std::vector<SpectrumRawTypes::Mass> mzs(points.size()), mzMins(points.size()), mzMaxs(points.size());
         std::vector<SpectrumRawTypes::Intensity> intensities(points.size());
         std::vector<SpectrumRawTypes::Mobility> mobilities((anySpecHasMob) ? points.size() : 0);
         std::vector<SpectrumRawTypes::Intensity> intensitiesBP((withBP) ? points.size() : 0);
@@ -398,7 +406,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         for (size_t j=0; j<points.size(); ++j)
         {
             times[j] = points[j].time;
-            mzs[j] = points[j].mz;
+            mzs[j] = points[j].mz; mzMins[j] = points[j].mzMin; mzMaxs[j] = points[j].mzMax;
             intensities[j] = points[j].intensity;
             if (anySpecHasMob)
                 mobilities[j] = points[j].mobility;
@@ -411,7 +419,9 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         
         auto df = Rcpp::List::create(Rcpp::Named("time") = times,
                                      Rcpp::Named("intensity") = intensities,
-                                     Rcpp::Named("mz") = mzs);
+                                     Rcpp::Named("mz") = mzs,
+                                     Rcpp::Named("mzmin") = mzMins,
+                                     Rcpp::Named("mzmax") = mzMaxs);
         
         if (anySpecHasMob)
             df["mobility"] = mobilities;

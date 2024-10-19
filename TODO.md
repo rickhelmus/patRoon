@@ -286,6 +286,7 @@
 
 ## IMS
 
+- general ratio of mass/CCS to filter results --> eg derived from CCS DB
 - findPeaks()
     - export? If yes, add checkmate's, documentation etc
         - if not, still need to doc args somehow

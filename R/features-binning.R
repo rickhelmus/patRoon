@@ -9,10 +9,11 @@ setMethod("initialize", "featuresBinning",
           function(.Object, ...) callNextMethod(.Object, algorithm = "binning", ...))
 
 #' @export
-findFeaturesBinning <- function(analysisInfo, mzRange = c(50, 400), mzStep = 0.02, findPeaksAlgo, ..., parallel = TRUE,
-                                verbose = TRUE)
+findFeaturesBinning <- function(analysisInfo, mzRange = c(50, 400), mzStep = 0.02, minIntensityIMS = 25,
+                                findPeaksAlgo, ..., parallel = TRUE, verbose = TRUE)
 {
     # UNDONE: add refs to docs, and highlight changes
+    # UNDONE: default OK for minIntensityIMS?
     
     ac <- checkmate::makeAssertCollection()
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, add = ac)
@@ -47,7 +48,8 @@ findFeaturesBinning <- function(analysisInfo, mzRange = c(50, 400), mzStep = 0.0
         
         printf("Loading EICs...\n")
         EICInfoList <- rep(list(data.table(mzmin = bins, mzmax = bins + mzStep, retmin = 0, retmax = 0)), nrow(anaInfoTBD))
-        allEICs <- doGetEICs(anaInfoTBD, EICInfoList, compress = FALSE, withBP = TRUE, cacheDB = cacheDB)
+        allEICs <- doGetEICs(anaInfoTBD, EICInfoList, minIntensityIMS = minIntensityIMS, compress = FALSE,
+                             withBP = TRUE, cacheDB = cacheDB)
         allEICs <- lapply(allEICs, setNames, names(bins))
         
         fList <- findPeaksInEICs(allEICs, findPeaksAlgo, withBP = TRUE, ..., parallel = parallel, cacheDB = cacheDB)

@@ -203,6 +203,12 @@
 ## msdata
 
 - see if it makes sense to return lists instead of dataframes for other functions besides getEICList()
+- minIntensityIMS
+    - use it for all other functions that get EICs
+    - default=25 is OK?
+    - store it in an option? or otherwise in EICParams for fGroups?
+    - remove default in doGetEICs() when finished
+    - also use it for MSPL and EIMs?
 - MT
     - test ThreadExceptionHandler a bit more, eg if subsequent run calls cancels well if an exception is caught
 - cleanup

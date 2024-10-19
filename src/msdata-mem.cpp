@@ -7,9 +7,10 @@
 
 SpectrumRaw MSReadBackendMem::doReadSpectrum(const ThreadDataType &tdata, SpectrumRawTypes::MSLevel MSLevel,
                                              const SpectrumRawSelection &scanSel,
-                                             const SpectrumRawTypes::MobilityRange &mobRange) const
+                                             const SpectrumRawTypes::MobilityRange &mobRange,
+                                             SpectrumRawTypes::Intensity minIntensityIMS) const
 {
-    // UNDONE: handle mobRange
+    // UNDONE: handle mobRange/minIntensityIMS
     
     if (MSLevel == SpectrumRawTypes::MSLevel::MS1)
         return spectraMS[scanSel.index];

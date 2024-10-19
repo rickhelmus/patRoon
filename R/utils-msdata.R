@@ -174,7 +174,7 @@ getCentroidedMSFilesFromAnaInfo <- function(anaInfo, formats = c("mzML", "mzXML"
     getMSFilesFromAnaInfo(anaInfo, "centroid", formats, mustExist)
 }
 
-doGetEICs <- function(anaInfo, EICInfoList, compress = TRUE, withBP = FALSE, cacheDB = NULL)
+doGetEICs <- function(anaInfo, EICInfoList, minIntensityIMS = 0, compress = TRUE, withBP = FALSE, cacheDB = NULL)
 {
     # UNDONE: handle mobilities
     
@@ -221,7 +221,7 @@ doGetEICs <- function(anaInfo, EICInfoList, compress = TRUE, withBP = FALSE, cac
         # NOTE: getEICList() return lists, which are converted to data.frames and is a lot faster than returning
         # data.frames directly.
         newEICs <- getEICList(backend, ToDo$mzmin, ToDo$mzmax, ToDo$retmin, ToDo$retmax, rep(0, nrow(ToDo)),
-                              rep(0, nrow(ToDo)), compress, withBP)
+                              rep(0, nrow(ToDo)), minIntensityIMS, compress, withBP)
         newEICs <- lapply(newEICs, setDF)
         EICs[!isCached] <- newEICs
 

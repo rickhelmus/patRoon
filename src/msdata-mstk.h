@@ -21,7 +21,8 @@ class MSReadBackendMSTK: public MSReadBackend
     ThreadDataType doGetThreadData(void) const override;
     SpectrumRaw doReadSpectrum(const ThreadDataType &tdata, SpectrumRawTypes::MSLevel MSLevel,
                                const SpectrumRawSelection &scanSel,
-                               const SpectrumRawTypes::MobilityRange &mobRange) const override;
+                               const SpectrumRawTypes::MobilityRange &mobRange,
+                               SpectrumRawTypes::Intensity minIntensityIMS) const override;
     
 public:
     MSReadBackendMSTK(void) { ++backends; Rcpp::Rcout << "constr: backends:" << backends << "\n"; }

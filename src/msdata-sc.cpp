@@ -10,7 +10,8 @@
 
 namespace {
 
-SpectrumRaw getSCSpectrum(sc::MS_ANALYSIS *analysis, SpectrumRawTypes::Scan scan, const SpectrumRawTypes::MobilityRange &mobRange)
+SpectrumRaw getSCSpectrum(sc::MS_ANALYSIS *analysis, SpectrumRawTypes::Scan scan,
+                          const SpectrumRawTypes::MobilityRange &mobRange, SpectrumRawTypes::Intensity minIntensityIMS)
 {
     const auto s = analysis->get_spectrum(scan);
     
@@ -27,7 +28,7 @@ SpectrumRaw getSCSpectrum(sc::MS_ANALYSIS *analysis, SpectrumRawTypes::Scan scan
         for (int i=0; i<s.array_length; ++i)
         {
             const auto mob = s.binary_data[mobArrayInd][i];
-            if (!mobRange.isSet() || mobRange.within(mob))
+            if ((!mobRange.isSet() || mobRange.within(mob)) && s.binary_data[1][1] >= minIntensityIMS)
                 ret.setPeak(i, s.binary_data[0][i], s.binary_data[1][i], mob);
         }
     }
@@ -51,21 +52,23 @@ MSReadBackend::ThreadDataType MSReadBackendSC::doGetThreadData(void) const
 
 SpectrumRaw MSReadBackendSC::doReadSpectrum(const ThreadDataType &tdata, SpectrumRawTypes::MSLevel MSLevel,
                                             const SpectrumRawSelection &scanSel,
-                                            const SpectrumRawTypes::MobilityRange &mobRange) const
+                                            const SpectrumRawTypes::MobilityRange &mobRange,
+                                            SpectrumRawTypes::Intensity minIntensityIMS) const
 {
     auto *analysis = reinterpret_cast<sc::MS_ANALYSIS *>(tdata.get());
     const auto &meta = getSpecMetadata();
     
     if (MSLevel == SpectrumRawTypes::MSLevel::MS1)
-        return getSCSpectrum(analysis, meta.first.scans[scanSel.index], mobRange);
+        return getSCSpectrum(analysis, meta.first.scans[scanSel.index], mobRange, minIntensityIMS);
     if (scanSel.MSMSFrameIndices.empty())
-        return getSCSpectrum(analysis, meta.second.scans[scanSel.index], mobRange);
+        return getSCSpectrum(analysis, meta.second.scans[scanSel.index], mobRange, minIntensityIMS);
     
     // if we are here we need to get MS2 data from an IMS frame...
     
     SpectrumRaw ret;
     for (const auto i : scanSel.MSMSFrameIndices)
-        ret.append(getSCSpectrum(analysis, meta.second.MSMSFrames[scanSel.index].subScans[i], mobRange));
+        ret.append(getSCSpectrum(analysis, meta.second.MSMSFrames[scanSel.index].subScans[i], mobRange,
+                                 minIntensityIMS));
     
     return ret;
 }

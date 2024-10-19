@@ -18,7 +18,7 @@ namespace {
 template<typename OutType, typename FuncType, typename... Args>
 std::vector<std::vector<OutType>> applyMSData(const MSReadBackend &backend, SpectrumRawTypes::MSLevel MSLevel,
                                               const std::vector<std::vector<SpectrumRawSelection>> &scanSels,
-                                              FuncType func, Args... args)
+                                              FuncType func, SpectrumRawTypes::Intensity minIntensityIMS, Args... args)
 {
     /* This function will apply a callback on selected spectra. Multiple sets of spectra selections are supported, and
      * the function is optimized to avoid reading the same spectra more than once in case of overlap between sets.
@@ -94,7 +94,8 @@ std::vector<std::vector<OutType>> applyMSData(const MSReadBackend &backend, Spec
                     {
                         initSel = false;
                         curSel = *it;
-                        curSpec = backend.readSpectrum(tdata, MSLevel, curSel, SpectrumRawTypes::MobilityRange());
+                        curSpec = backend.readSpectrum(tdata, MSLevel, curSel, SpectrumRawTypes::MobilityRange(),
+                                                       minIntensityIMS);
                     }
                     
                     // UNDONE: optimization could be further pushed by not using a 2d vector here?
@@ -194,7 +195,7 @@ int walkSpectra(const MSReadBackend &backend)
     for (size_t i=0; i<meta.first.scans.size(); ++i)
         sels[0].emplace_back(i);
     
-    const auto ret = applyMSData<size_t>(backend, SpectrumRawTypes::MSLevel::MS1, sels, sfunc);
+    const auto ret = applyMSData<size_t>(backend, SpectrumRawTypes::MSLevel::MS1, sels, sfunc, 0);
     return std::accumulate(ret[0].begin(), ret[0].end(), 0);
     
 #if 0
@@ -231,7 +232,7 @@ Rcpp::DataFrame getMSSpectrum(const MSReadBackend &backend, int index, int MSLev
     };
     
     const auto MSLev = (MSLevel == 1) ? SpectrumRawTypes::MSLevel::MS1 : SpectrumRawTypes::MSLevel::MS2;
-    const auto spectra = applyMSData<SpectrumRaw>(backend, MSLev, sels, sfunc);
+    const auto spectra = applyMSData<SpectrumRaw>(backend, MSLev, sels, sfunc, 0);
     const auto &spec = spectra[0][0];
     
     if (!spec.getMobilities().empty())
@@ -278,7 +279,8 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                       const std::vector<SpectrumRawTypes::Time> &startTimes,
                       const std::vector<SpectrumRawTypes::Time> &endTimes,
                       const std::vector<SpectrumRawTypes::Mobility> &startMobs,
-                      const std::vector<SpectrumRawTypes::Mobility> &endMobs, bool compress, bool withBP = false)
+                      const std::vector<SpectrumRawTypes::Mobility> &endMobs,
+                      SpectrumRawTypes::Intensity minIntensityIMS, bool compress, bool withBP = false)
 {
     struct EICPoint
     {
@@ -369,7 +371,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                                                 SpectrumRawTypes::MSLevel::MS1, 0));
     }
     
-    auto allEICPoints = applyMSData<EICPoint>(backend, SpectrumRawTypes::MSLevel::MS1, scanSels, sfunc);
+    auto allEICPoints = applyMSData<EICPoint>(backend, SpectrumRawTypes::MSLevel::MS1, scanSels, sfunc, minIntensityIMS);
 
     if (allEICPoints.empty())
         return Rcpp::List();
@@ -609,6 +611,7 @@ Rcpp::List getMSPeakLists(const MSReadBackend &backend, const std::vector<Spectr
                           SpectrumRawTypes::Intensity minIntensityPost, SpectrumRawTypes::Intensity minBPIntensity)
 {
     // UNDONE: add mobility column to output?
+    // UNDONE: use minIntensityIMS of applyMSData()? Might be faster, but doesn't preserve precursor
     
     const auto entries = startTimes.size();
     const auto clMethod = clustMethodFromStr(method);
@@ -648,7 +651,7 @@ Rcpp::List getMSPeakLists(const MSReadBackend &backend, const std::vector<Spectr
         Rcpp::Rcout << "\n";*/
     }
     
-    const auto allSpectra = applyMSData<SpectrumRaw>(backend, MSLev, scanSels, sfunc);
+    const auto allSpectra = applyMSData<SpectrumRaw>(backend, MSLev, scanSels, sfunc, 0);
     
     std::vector<SpectrumRawAveraged> averagedSpectra(entries);
     #pragma omp parallel for
@@ -674,6 +677,8 @@ Rcpp::List getMobilograms(const MSReadBackend &backend, const std::vector<Spectr
                           const std::string &method, SpectrumRawTypes::Mobility mobWindow,
                           SpectrumRawTypes::Intensity minIntensity, bool compress)
 {
+    // UNDONE: use applyMSData min intensity?
+    
     const auto entries = startTimes.size();
     const auto clMethod = clustMethodFromStr(method);
     const auto specMeta = backend.getSpecMetadata();
@@ -734,7 +739,7 @@ Rcpp::List getMobilograms(const MSReadBackend &backend, const std::vector<Spectr
                                                 SpectrumRawTypes::MSLevel::MS1, 0));
     }
     
-    const auto allEIMs = applyMSData<EIM>(backend, SpectrumRawTypes::MSLevel::MS1, scanSels, sfunc);
+    const auto allEIMs = applyMSData<EIM>(backend, SpectrumRawTypes::MSLevel::MS1, scanSels, sfunc, 0);
 
     std::vector<EIM> averageEIMs(entries);
 
@@ -847,7 +852,8 @@ Rcpp::NumericVector getPeakIntensities(const MSReadBackend &backend,
         scanSels[i].emplace_back(ind);
     }
     
-    const auto ints = applyMSData<SpectrumRawTypes::Intensity>(backend, SpectrumRawTypes::MSLevel::MS1, scanSels, sfunc);
+    const auto ints = applyMSData<SpectrumRawTypes::Intensity>(backend, SpectrumRawTypes::MSLevel::MS1, scanSels,
+                                                               sfunc, 0);
     
     auto ret = Rcpp::NumericVector(entries);
     for (size_t i=0; i<entries; ++i)
@@ -865,7 +871,6 @@ Rcpp::List collapseIMSFrames(const MSReadBackend &backend, SpectrumRawTypes::Mas
 {
     const auto clMethod = clustMethodFromStr(method);
     const auto filterP = SpectrumRawFilter()
-        .setMinIntensity(minIntensityIMS)
         .setMZRange(mzStart, mzEnd)
         .setTopMost(topMost);
     const auto mobRange = makeNumRange(mobilityStart, mobilityEnd);
@@ -885,7 +890,8 @@ Rcpp::List collapseIMSFrames(const MSReadBackend &backend, SpectrumRawTypes::Mas
     for (size_t i=0; i<specMeta.scans.size(); ++i)
         scanSels[0].emplace_back(i);
     
-    const auto spectra = applyMSData<SpectrumRawAveraged>(backend, SpectrumRawTypes::MSLevel::MS1, scanSels, sfunc)[0];
+    const auto spectra = applyMSData<SpectrumRawAveraged>(backend, SpectrumRawTypes::MSLevel::MS1, scanSels, sfunc,
+                                                          minIntensityIMS)[0];
     
     // NOTE: we return matrices so these can be directly consumed by mzR
     Rcpp::List ret(spectra.size());
@@ -932,7 +938,7 @@ void testMS1Writer(const MSReadBackend &backend, const std::string &out, Spectru
     for (size_t i=0; i<specMeta.scans.size(); ++i)
         scanSels[0].emplace_back(i);
     
-    const auto spectra = applyMSData<SpectrumRaw>(backend, SpectrumRawTypes::MSLevel::MS1, scanSels, sfunc)[0];
+    const auto spectra = applyMSData<SpectrumRaw>(backend, SpectrumRawTypes::MSLevel::MS1, scanSels, sfunc, 0)[0];
     
     writeMS1SpectraMSTK(out, spectra, specMeta);
 #endif

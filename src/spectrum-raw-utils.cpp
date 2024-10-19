@@ -191,6 +191,7 @@ SpectrumRaw filterIMSFrame(const SpectrumRaw &frame, const SpectrumRawFilter &fi
             curMob = frame.getMobilities()[i];
         }
         
+        // UNDONE: optimize eg for TIMS data where mobilities are sorted?
         if (mobRange.isSet() && !mobRange.within(curMob))
             continue;
         

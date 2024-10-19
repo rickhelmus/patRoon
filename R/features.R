@@ -542,44 +542,38 @@ setMethod("findMobilities", "features", function(obj, findPeaksAlgo, mzRange = 0
 
 #' @export
 setMethod("splitMobilities", "features", function(obj, mzWindow = 0.005, IMSWindow = 0.01, intSearchRTWindow = 3,
-                                                  calcArea = "integrate", findPeaksAlgo = "none", ...)
+                                                  calcArea = "integrate", findPeaksAlgo = "none", ..., parallel = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertNumber, . ~ mzWindow + IMSWindow, finite = TRUE, fixed = list(add = ac))
     checkmate::assertNumber(intSearchRTWindow, lower = 0, finite = TRUE, add = ac)
     checkmate::assertChoice(calcArea, c("integrate", "sum"), add = ac)
     checkmate::assertString(findPeaksAlgo, min.chars = 1, add = ac) # UNDONE check algo choice if findPeaks() will not be exported
+    checkmate::assertFlag(parallel, add = ac)
     checkmate::reportAssertions(ac)
     
     if (length(obj) == 0)
         return(obj) # nothing to do...
     
-    if (length(obj@mobilities) == 0)
-        stop("No mobilities are assigned. Did you run findMobilities()?", call. = FALSE)
-    
-    hash <- makeHash(obj, mzWindow, IMSWindow, intSearchRTWindow, calcArea, findPeaksAlgo, ...)
-    cd <- loadCacheData("splitMobilities", hash)
+    cacheDB <- openCacheDBScope()
+    hash <- makeHash(obj, mzWindow, IMSWindow, intSearchRTWindow, calcArea, findPeaksAlgo, list(...))
+    cd <- loadCacheData("splitMobilities", hash, dbArg = cacheDB)
     if (!is.null(cd))
         return(cd)
     
     anaInfo <- analysisInfo(obj)
-    filePaths <- getBrukerAnalysisPath(anaInfo$analysis, anaInfo$path)
+    
+    printf("Loading EICs...\n")
+    # UNDONE exclude non-mobility features (optionally)
+    allEICs <- doGetEICs(anaInfo, featureTable(obj), compress = FALSE, cacheDB = cacheDB)
+    browser()
+    allEICs <- Map(allEICs, featureTable(obj), f = function(eics, ft) setNames(eics, ft$ID))
 
-    # for printing below
-    oldN <- length(obj)
-    unassignedN <- sum(mapply(obj@mobilities, obj@features, FUN = function(m, f) sum(!f$ID %in% m$ID)))
-
-    # first generate new IDs so that split features are unique
-    obj@mobilities <- lapply(mobilities(obj), function(mobs)
+    if (findPeaksAlgo != "none")
     {
-        mobs <- copy(mobs)
-        setnames(mobs, "ID", "ID_orig")
-        mobs[, ID := appendMobToName(ID_orig, mobility)]
-        return(mobs)
-    })
-    
-    printf("Splitting features with multiple mobilities...\n")
-    
+        # UNDONE: make withBP configurable?
+        peaksList <- findPeaksInEICs(allEICs, findPeaksAlgo, ..., withBP = FALSE, parallel = parallel, cacheDB = cacheDB)
+    }
     obj@features <- withProg(nrow(anaInfo), FALSE,
                              Map(featureTable(obj), mobilities(obj), filePaths, f = function(fTable, mobs, fp)
     {

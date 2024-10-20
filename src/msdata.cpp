@@ -18,7 +18,8 @@ namespace {
 template<typename OutType, typename FuncType, typename... Args>
 std::vector<std::vector<OutType>> applyMSData(const MSReadBackend &backend, SpectrumRawTypes::MSLevel MSLevel,
                                               const std::vector<std::vector<SpectrumRawSelection>> &scanSels,
-                                              FuncType func, SpectrumRawTypes::Intensity minIntensityIMS, Args... args)
+                                              FuncType func, SpectrumRawTypes::Intensity minIntensityIMS,
+                                              std::function<SpectrumRaw(const SpectrumRaw &)> prepFunc = {}, Args... args)
 {
     /* This function will apply a callback on selected spectra. Multiple sets of spectra selections are supported, and
      * the function is optimized to avoid reading the same spectra more than once in case of overlap between sets.
@@ -96,6 +97,8 @@ std::vector<std::vector<OutType>> applyMSData(const MSReadBackend &backend, Spec
                         curSel = *it;
                         curSpec = backend.readSpectrum(tdata, MSLevel, curSel, SpectrumRawTypes::MobilityRange(),
                                                        minIntensityIMS);
+                        if (prepFunc)
+                            curSpec = prepFunc(curSpec);
                     }
                     
                     // UNDONE: optimization could be further pushed by not using a 2d vector here?
@@ -296,42 +299,51 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     const auto &specMeta = backend.getSpecMetadata();
     bool anySpecHasMob = false;
     
+    const auto specPrepFunc = [&](const SpectrumRaw &spec)
+    {
+        if (spec.hasMobilities())
+        {
+            const auto sInds = getSortedInds(spec.getMZs());
+            SpectrumRaw sortedSpec(spec.size(), true);
+            for (size_t k=0; k<spec.size(); ++k)
+            {
+                sortedSpec.setPeak(k, spec.getMZs()[sInds[k]], spec.getIntensities()[sInds[k]],
+                                   spec.getMobilities()[sInds[k]]);
+            }
+            return sortedSpec;
+        }
+        return spec;
+    };
+    
     const auto sfunc = [&](const SpectrumRaw &spec, const SpectrumRawSelection &ssel, size_t entry)
     {
         const bool hasMob = spec.hasMobilities();
         EICPoint ret;
         
         ret.time = specMeta.first.times[ssel.index];
+
+        // NOTE: assume spec is mz sorted
+        // use lower bound to speedup search for first mass
+        const auto mzIt = std::lower_bound(spec.getMZs().begin(), spec.getMZs().end(), startMZs[entry]);
+        if (mzIt == spec.getMZs().end())
+            return ret;
+        const auto startInd = std::distance(spec.getMZs().begin(), mzIt);
         
-        size_t startInd = 0;
-        
-        // NOTE: for non-IMS data assume spec is mz sorted
-        
-        if (!hasMob)
-        {
-            // use lower bound to speedup search for first mass
-            const auto mzIt = std::lower_bound(spec.getMZs().begin(), spec.getMZs().end(), startMZs[entry]);
-            if (mzIt == spec.getMZs().end())
-                return ret;
-            startInd = std::distance(spec.getMZs().begin(), mzIt);
-        }
-        else
+        if (hasMob)
             anySpecHasMob = true;
         
         for (size_t j=startInd; j<spec.size(); ++j)
         {
             const auto mz = spec.getMZs()[j];
-            const auto mob = (hasMob) ? spec.getMobilities()[j] : 0;
+            if (mz > endMZs[entry])
+                break; 
             
+            const auto mob = (hasMob) ? spec.getMobilities()[j] : 0;
             if (hasMob)
             {
-                if (mz < startMZs[entry] || mz > endMZs[entry])
-                    continue;
                 if (mob < startMobs[entry] || (endMobs[entry] != 0.0 && mob > endMobs[entry]))
                     continue; // UNDONE: optimize eg for TIMS data where mobilities are sorted?
             }
-            else if (mz > endMZs[entry])
-                break; 
             
             const auto inten = spec.getIntensities()[j];
             if (inten > 0)
@@ -371,7 +383,8 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                                                 SpectrumRawTypes::MSLevel::MS1, 0));
     }
     
-    auto allEICPoints = applyMSData<EICPoint>(backend, SpectrumRawTypes::MSLevel::MS1, scanSels, sfunc, minIntensityIMS);
+    auto allEICPoints = applyMSData<EICPoint>(backend, SpectrumRawTypes::MSLevel::MS1, scanSels, sfunc, minIntensityIMS,
+                                              specPrepFunc);
 
     if (allEICPoints.empty())
         return Rcpp::List();
@@ -795,7 +808,7 @@ Rcpp::List getMobilograms(const MSReadBackend &backend, const std::vector<Spectr
                 if (prevInt == 0 && nextInt == 0)
                     continue; // skip points with zero intensities that are neighbored by others.
             }
-            sortedEIM.append(avgEIM.mobilities[i], avgEIM.intensities[i]);
+            sortedEIM.append(avgEIM.mobilities[sInds[i]], avgEIM.intensities[sInds[i]]);
         }
         
         averageEIMs[i] = std::move(sortedEIM);

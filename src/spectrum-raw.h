@@ -134,6 +134,7 @@ struct SpectrumRawFilter
     
     SpectrumRawFilter &setMinIntensity(unsigned i) { minIntensity = i; return *this; }
     SpectrumRawFilter &setMZRange(SpectrumRawTypes::Mass s, SpectrumRawTypes::Mass e) { mzRange.set(s, e); return *this; }
+    SpectrumRawFilter &setMZRange(const NumRange<SpectrumRawTypes::Mass> &r) { mzRange = r; return *this; }
     SpectrumRawFilter &setTopMost(unsigned t) { topMost = t; return *this; }
     SpectrumRawFilter &setWithPrecursor(bool p) { withPrecursor = p; return *this; }
     SpectrumRawFilter &setRetainPrecursor(bool p) { retainPrecursor = p; return *this; }

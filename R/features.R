@@ -542,8 +542,9 @@ setMethod("findMobilities", "features", function(obj, findPeaksAlgo, mzRange = 0
 })
 
 #' @export
-setMethod("splitMobilities", "features", function(obj, mzWindow = 0.005, IMSWindow = 0.01, intSearchRTWindow = 3,
-                                                  calcArea = "integrate", findPeaksAlgo = "none", ..., parallel = TRUE)
+setMethod("splitMobilities", "features", function(obj, RTWindow = 20, mzWindow = 0.005, IMSWindow = 0.01,
+                                                  intSearchRTWindow = 3, calcArea = "integrate", findPeaksAlgo = "none",
+                                                  ..., parallel = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertNumber, . ~ mzWindow + IMSWindow, finite = TRUE, fixed = list(add = ac))
@@ -565,9 +566,14 @@ setMethod("splitMobilities", "features", function(obj, mzWindow = 0.005, IMSWind
     anaInfo <- analysisInfo(obj)
     
     printf("Loading EICs...\n")
+    EICInfoList <- lapply(featureTable(obj), function(ft)
+    {
+        ft <- copy(ft)
+        ft[, c("retmin", "retmax") := .(retmin - RTWindow, retmax + RTWindow)]
+        return(ft)
+    })
     # UNDONE exclude non-mobility features (optionally)
-    allEICs <- doGetEICs(anaInfo, featureTable(obj), compress = FALSE, cacheDB = cacheDB)
-    browser()
+    allEICs <- doGetEICs(anaInfo, EICInfoList, compress = FALSE, cacheDB = cacheDB)
     allEICs <- Map(allEICs, featureTable(obj), f = function(eics, ft) setNames(eics, ft$ID))
 
     if (findPeaksAlgo != "none")
@@ -575,6 +581,20 @@ setMethod("splitMobilities", "features", function(obj, mzWindow = 0.005, IMSWind
         # UNDONE: make withBP configurable?
         peaksList <- findPeaksInEICs(allEICs, findPeaksAlgo, ..., withBP = FALSE, parallel = parallel, cacheDB = cacheDB)
     }
+    
+    peaksList <- Map(peaksList, featureTable(obj), f = function(anaPLs, ft)
+    {
+        # filter out peaks outside original retmin/retmax
+        anaPLs <- anaPLs[numGTE(ret, ft[match(EIC_ID, ID)]$retmin) & numLTE(ret, ft[match(EIC_ID, ID)]$retmax)]
+        # filter out all peaks for EICs with >1 result
+        anaPLs[, N := .N, by = "EIC_ID"]
+        anaPLs <- anaPLs[N == 1][, N := NULL]
+    })
+    
+    # restore ID from EIC_ID, as make.unique() for ID may have changed it
+    
+    
+    browser()
     obj@features <- withProg(nrow(anaInfo), FALSE,
                              Map(featureTable(obj), mobilities(obj), filePaths, f = function(fTable, mobs, fp)
     {

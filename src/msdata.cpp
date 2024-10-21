@@ -342,7 +342,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
             if (hasMob)
             {
                 if (mob < startMobs[entry] || (endMobs[entry] != 0.0 && mob > endMobs[entry]))
-                    continue; // UNDONE: optimize eg for TIMS data where mobilities are sorted?
+                    continue;
             }
             
             const auto inten = spec.getIntensities()[j];

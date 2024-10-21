@@ -490,14 +490,15 @@ setMethod("findMobilities", "features", function(obj, findPeaksAlgo, mzRange = 0
         openMSReadBackend(backend, path)
         
         fTable <- copy(fTable)
+        retmin <- fTable$retmin; retmax <- fTable$retmax;
         if (!is.null(maxMSRtWindow))
         {
-            fTable[, retmin := max(retmin, ret - maxMSRtWindow), by = seq_len(nrow(fTable))]
-            fTable[, retmax := min(retmax, ret + maxMSRtWindow), by = seq_len(nrow(fTable))]
+            retmin <- pmax(retmin, fTable$ret - maxMSRtWindow)
+            retmax <- pmin(retmax, fTable$ret + maxMSRtWindow)
         }
         
         # NOTE: mzmin/mzmax may be too narrow here, hence use a user specified mz range
-        EIMs <- getMobilograms(backend, fTable$mz - mzRange, fTable$mz + mzRange, fTable$retmin, fTable$retmax,
+        EIMs <- getMobilograms(backend, fTable$mz - mzRange, fTable$mz + mzRange, retmin, retmax,
                                clusterMethod, clusterIMSWindow, minIntensityIMS, FALSE)
         names(EIMs) <- fTable$ID
         EIMs <- lapply(EIMs, setDT)

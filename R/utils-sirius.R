@@ -133,7 +133,7 @@ doSIRIUSLogin <- function(login, force)
     if (force || !hasSIRIUSLogin())
     {
         if (length(login) == 1 && login == "check")
-            stop("There is no active SIRIUS login. Pease consult the SIRIUS documentation and patRoon handbook for details.")
+            stop("There is no active SIRIUS login. Please consult the SIRIUS documentation and patRoon handbook for details.")
         
         if (length(login) == 1 && login == "interactive")
         {

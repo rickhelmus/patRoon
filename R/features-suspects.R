@@ -6,8 +6,8 @@ NULL
 featuresSuspects <- setClass("featuresSuspects", slots = c(suspects = "data.table"), contains = "features")
 
 #' @export
-findFeaturesSuspects <- function(analysisInfo, suspects, findPeaksAlgo, rtWindow = 12, mzWindow = 0.005, adduct = NULL,
-                                 skipInvalid = TRUE, prefCalcChemProps = TRUE, neutralChemProps = FALSE, ...,
+findFeaturesSuspects <- function(analysisInfo, suspects, peaksParam, rtWindow = 12, mzWindow = 0.005, adduct = NULL,
+                                 skipInvalid = TRUE, prefCalcChemProps = TRUE, neutralChemProps = FALSE,
                                  parallel = TRUE, verbose = TRUE)
 {
     # UNDONE: doc that feature RT is used for checking, instead of group RT for screenSuspects()
@@ -19,7 +19,7 @@ findFeaturesSuspects <- function(analysisInfo, suspects, findPeaksAlgo, rtWindow
     ac <- checkmate::makeAssertCollection()
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, add = ac)
     assertSuspectList(suspects, needsAdduct = is.null(adduct), skipInvalid = skipInvalid, add = ac)
-    assertFindPeaksAlgo(findPeaksAlgo, add = ac)
+    assertFindPeaksParam(peaksParam, add = ac)
     aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + neutralChemProps + parallel + verbose,
            fixed = list(add = ac))
@@ -33,8 +33,8 @@ findFeaturesSuspects <- function(analysisInfo, suspects, findPeaksAlgo, rtWindow
                                    prefCalcChemProps = prefCalcChemProps, neutralChemProps = neutralChemProps)
     
     cacheDB <- openCacheDBScope()
-    baseHash <- makeHash(suspects, findPeaksAlgo, rtWindow, mzWindow, adduct, skipInvalid, prefCalcChemProps,
-                         neutralChemProps, list(...))
+    baseHash <- makeHash(suspects, peaksParam, rtWindow, mzWindow, adduct, skipInvalid, prefCalcChemProps,
+                         neutralChemProps)
     anaHashes <- getMSFileHashesFromAvailBackend(analysisInfo)
     anaHashes <- sapply(anaHashes, makeHash, baseHash)
     cachedData <- loadCacheData("featuresSuspects", anaHashes, simplify = FALSE, dbArg = cacheDB)
@@ -62,7 +62,7 @@ findFeaturesSuspects <- function(analysisInfo, suspects, findPeaksAlgo, rtWindow
         # UNDONE: somehow limit RT range if suspect rt is given?
         # UNDONE: make withBP configurable?
         
-        fList <- findPeaksInEICs(allEICs, findPeaksAlgo, ..., withBP = FALSE, parallel = parallel, cacheDB = cacheDB)
+        fList <- findPeaksInEICs(allEICs, peaksParam, withBP = FALSE, parallel = parallel, cacheDB = cacheDB)
         fList <- lapply(fList, function(peaks)
         {
             peaks <- copy(peaks)
@@ -95,5 +95,5 @@ findFeaturesSuspects <- function(analysisInfo, suspects, findPeaksAlgo, rtWindow
     }
     
     return(featuresSuspects(analysisInfo = analysisInfo, features = fList, suspects = suspects,
-                            algorithm = paste0("suspects-", findPeaksAlgo)))
+                            algorithm = paste0("suspects-", peaksParam$algorithm)))
 }

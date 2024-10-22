@@ -118,16 +118,18 @@ findFeaturesQAlgorithms <- function(analysisInfo, ppm = 5, verbose = FALSE)
                         pks$mzmin <- pks$mz - pks$mzUncertainty
                         pks$mzmax <- pks$mz + pks$mzUncertainty
                         pks$ret <- pks$retentionTime
-                        # Not sure yet if uncertainty is in seconds or minutes
-                        # pks$retentionTimeUncertainty <- pks$retentionTimeUncertainty * 60
-                        pks$retmin <- pks$ret - pks$retentionTimeUncertainty
-                        pks$retmax <- pks$ret + pks$retentionTimeUncertainty
+                        pks$retentionTime <- NULL
+                        pks$retmin <- pks$lowestRetentionTime
+                        pks$lowestRetentionTime <- NULL
+                        pks$retmax <- pks$highestRetentionTime
+                        pks$highestRetentionTime <- NULL
                         pks$retUncertainty <- pks$retentionTimeUncertainty
                         pks$retentionTimeUncertainty <- NULL
-                        pks$retentionTime <- NULL
                         pks$binID <- NULL
                         pks$intensity <- pks$height
                         pks$height <- NULL
+                        pks$intensityUncertainty <- pks$heightUncertainty
+                        pks$heightUncertainty <- NULL
                         
                         data.table::setcolorder(pks, c("ID", "mz", "ret", "mzmin", "mzmax", "retmin", "retmax", 
                                                        "intensity", "area", "mzUncertainty", "retUncertainty", 

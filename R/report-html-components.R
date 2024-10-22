@@ -102,7 +102,11 @@ reportHTMLUtils$methods(
         tab <- removeDTColumnsIfPresent(tab, c("links", "size"))
         
         for (col in intersect(c("neutral_mass", "mz_increment"), names(tab)))
-            set(tab, j = col, value = round(tab[[col]], 5))
+        {
+            # NOTE: neutral_mass may be a character, eg for CAMERA where multiple masses are collapsed
+            if (is.numeric(tab[[col]]))
+                set(tab, j = col, value = round(tab[[col]], 5))
+        }
         for (col in intersect(c("cmp_ret", "cmp_retsd", "cmp_ppm", "ret_increment", "ret_min", "ret_max", "ret_range"),
                               names(tab)))
         {

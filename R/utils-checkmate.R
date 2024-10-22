@@ -850,8 +850,45 @@ assertConvertMSFilesArgs <- function(formatFrom, formatTo, overWrite, algorithm,
     checkmate::assertChoice(formatFrom, validFormatsFrom, add = add)
 }
 
-checkFindPeaksAlgo <- function(x) checkmate::checkChoice(x, c("xcms3", "envipick", "openms", "dietrich"))
-assertFindPeaksAlgo <- checkmate::makeAssertionFunction(checkFindPeaksAlgo)
+assertFindPeaksParam <- function(x, .var.name = checkmate::vname(x), add = NULL)
+{
+    assertListVal(x, "algorithm", checkmate::assertChoice, choices = c("xcms3", "envipick", "openms", "dietrich"),
+                  .var.name = .var.name) # NOTE: don't add, must fail for next line
+    if (x$algorithm == "openms")
+    {
+        assertListVal(x, "minPeakWidth", checkmate::assertNumber, finite = TRUE, .var.name = .var.name, add = add)
+        assertListVal(x, "backgroundSubtraction", checkmate::assertChoice, choices = c("none", "original", "exact"),
+                      .var.name = .var.name, add = add)
+        assertListVal(x, "SGolayFrameLength", checkmate::assertCount, positive = TRUE, .var.name = .var.name, add = add)
+        assertListVal(x, "SGolayPolyOrder", checkmate::assertCount, positive = TRUE, .var.name = .var.name, add = add)
+        assertListVal(x, "useGauss", checkmate::assertFlag, .var.name = .var.name, add = add)
+        assertListVal(x, "SN", checkmate::assertNumber, finite = TRUE, .var.name = .var.name, add = add)
+        assertListVal(x, "SNWinLen", checkmate::assertNumber, finite = TRUE, .var.name = .var.name, add = add)
+        assertListVal(x, "SNBinCount", checkmate::assertCount, positive = TRUE, .var.name = .var.name, add = add)
+        assertListVal(x, "method", checkmate::assertChoice, choices = c("legacy", "corrected", "crawdad"),
+                      .var.name = .var.name, add = add)
+        assertListVal(x, "integrationType", checkmate::assertChoice,
+                      choices = c("intensity_sum", "simpson", "trapezoid"), .var.name = .var.name, add = add)
+        assertListVal(x, "baselineType", checkmate::assertChoice,
+                      choices = c("base_to_base", "vertical_division", "vertical_division_min", "vertical_division_max"),
+                      .var.name = .var.name, add = add)
+        assertListVal(x, "fitEMG", checkmate::assertFlag, .var.name = .var.name, add = add)
+        assertListVal(x, "extraOpts", checkmate::assertList, .var.name = .var.name, add = add)
+    }
+    else if (x$algorithm == "dietrich")
+    {
+        assertListVal(x, "minIntensity", checkmate::assertNumber, finite = TRUE, .var.name = .var.name, add = add)
+        assertListVal(x, "SN", checkmate::assertCount, .var.name = .var.name, add = add)
+        assertListVal(x, "peakWidth", checkmate::assertNumeric, finite = TRUE, len = 2, any.missing = FALSE,
+                      .var.name = .var.name, add = add)
+        assertListVal(x, "RTRange", checkmate::assertNumeric, len = 2, any.missing = FALSE, .var.name = .var.name,
+                      add = add)
+        assertListVal(x, "maxPeaksPerSignal", checkmate::assertCount, .var.name = .var.name, add = add)
+    }
+    
+    # NOTE: for XCMS/enviPick we just let the package functions throw an error...
+    invisible(NULL)
+}
 
 # from https://github.com/mllg/checkmate/issues/115
 aapply = function(fun, formula, ..., fixed = list())

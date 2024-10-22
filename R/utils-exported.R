@@ -513,6 +513,70 @@ getDefEICParams <- function(...)
     return(modifyList(def, list(...), keep.null = TRUE))
 }
 
+#' @export
+getDefPeakParams <- function(type, algorithm, ...)
+{
+    checkmate::assertChoice(type, c("chrom", "ims"))
+    checkmate::assertChoice(algorithm, c("openms", "xcms3", "envipick", "dietrich"))
+    
+    # UNDONE: put all this in eg an internal YAML?
+    def <- if (type == "chrom")
+    {
+        switch(algorithm,
+               openms = list(
+                   minPeakWidth = -1,
+                   backgroundSubtraction = "none",
+                   SGolayFrameLength = 15,
+                   SGolayPolyOrder = 3,
+                   useGauss = TRUE,
+                   SN = 1.0,
+                   SNWinLen = 1000,
+                   SNBinCount = 30,
+                   method = "corrected",
+                   integrationType = "intensity_sum",
+                   baselineType = "base_to_base",
+                   fitEMG = FALSE,
+                   extraOpts = list()
+               ),
+               xcms3 = list(
+                   peakwidth = c(20, 50),
+                   snthresh = 10,
+                   prefilter = c(3, 100),
+                   integrate = 1,
+                   fitgauss = FALSE,
+                   noise = 0
+               ),
+               envipick = list(
+                   minpeak = 4,
+                   drtsmall = 20,
+                   drtfill = 10,
+                   drttotal = 200,
+                   recurs = 4,
+                   weight = 2,
+                   SB = 3,
+                   SN = 2,
+                   minint = 1E4,
+                   maxint = 1E7,
+                   ended = 2
+               ),
+               dietrich = list(
+                   minIntensity = 1,
+                   SN = 3,
+                   peakWidth = c(5, 60),
+                   RTRange = c(0, Inf),
+                   maxPeaksPerSignal = 10
+               )
+        )
+    }
+    else # IMS
+    {
+        # UNDONE!!
+        getDefPeakParams(algorithm, type = "chrom", ...)
+    }
+    
+    return(modifyList(def, c(list(...), algorithm = algorithm)))
+}
+
 #' Parameters to aggregate concentrations/toxicity values assigned to feature groups
 #'
 #' Parameters that are used by method functions such \code{\link[=as.data.table,featureGroups-method]{as.data.table}} to

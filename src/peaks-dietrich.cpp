@@ -363,7 +363,7 @@ PeakPickingResults peakPicking_cpp(const std::vector<double> &intensity, const s
 }
 
 // [[Rcpp::export]]
-Rcpp::List doFindPeaksDietrich(Rcpp::List EICs, double minIntensity, int sn, int peakWidthMin, int peakWidthMax,
+Rcpp::List doFindPeaksDietrich(Rcpp::List EICs, double minIntensity, int SN, int peakWidthMin, int peakWidthMax,
                                double RTMin, double RTMax, int maxPeaksPerSignal, bool verbose = true)
 {
     // UNDONE: set default args
@@ -386,7 +386,7 @@ Rcpp::List doFindPeaksDietrich(Rcpp::List EICs, double minIntensity, int sn, int
     #pragma omp parallel for
     for (size_t i=0; i<entries; ++i)
     {
-        ppresults[i] = peakPicking_cpp(allIntensities[i], allTimes[i], minIntensity, sn, peakWidthMin, peakWidthMax,
+        ppresults[i] = peakPicking_cpp(allIntensities[i], allTimes[i], minIntensity, SN, peakWidthMin, peakWidthMax,
                                        RTMin, RTMax, maxPeaksPerSignal);
     }
 

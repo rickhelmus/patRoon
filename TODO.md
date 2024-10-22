@@ -13,6 +13,7 @@
     - add NEWS
 - update sysdata.rda
 - start using saveCacheDataList() on more places?
+- basic and default error handling for executeCommand()?
 
 ## TC
 
@@ -300,8 +301,12 @@
     - add smoothing for XCMS3/enviPick? e.g. with signal::sgolayfilt()
         - might also be nice for plotting chroms?
     - OpenMS
-        - add more parameters and check what are good defaults
         - remove old function
+        - do we need scaleTimeFactor? then add to params
+        - check if we can get compute_peak_shape_metrics to work (maybe check OMS version?)
+    - Params
+        - see if current chrom defaults are fine
+        - add sensible IMS defaults
 - findMobilities()
     - SC seems to hang?
     - fGroups method --> finished?
@@ -334,6 +339,7 @@
 - Docs
     - mobilities slot in features
     - Dietrich features
+    - getDefPeakParams()
 - NEWS
     - Dietrich features
 - groupInfo is now a DT

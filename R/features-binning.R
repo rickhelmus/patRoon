@@ -10,7 +10,7 @@ setMethod("initialize", "featuresBinning",
 
 #' @export
 findFeaturesBinning <- function(analysisInfo, mzRange = c(50, 400), mzStep = 0.02, minIntensityIMS = 25,
-                                findPeaksAlgo, ..., parallel = TRUE, verbose = TRUE)
+                                peaksParam, ..., parallel = TRUE, verbose = TRUE)
 {
     # UNDONE: add refs to docs, and highlight changes
     # UNDONE: default OK for minIntensityIMS?
@@ -19,12 +19,12 @@ findFeaturesBinning <- function(analysisInfo, mzRange = c(50, 400), mzStep = 0.0
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, add = ac)
     assertRange(mzRange, add = ac)
     checkmate::assertNumber(mzStep, lower = 0.000001, finite = TRUE, add = ac)
-    assertFindPeaksAlgo(findPeaksAlgo, add = ac)
+    assertFindPeaksParam(peaksParam, add = ac)
     aapply(checkmate::assertFlag, . ~ parallel + verbose, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
     cacheDB <- openCacheDBScope()
-    baseHash <- makeHash(mzRange, mzStep, findPeaksAlgo, list(...))
+    baseHash <- makeHash(mzRange, mzStep, peaksParam)
     anaHashes <- getMSFileHashesFromAvailBackend(analysisInfo)
     anaHashes <- sapply(anaHashes, makeHash, baseHash)
     cachedData <- loadCacheData("featuresBinning", anaHashes, simplify = FALSE, dbArg = cacheDB)
@@ -52,7 +52,7 @@ findFeaturesBinning <- function(analysisInfo, mzRange = c(50, 400), mzStep = 0.0
                              withBP = TRUE, cacheDB = cacheDB)
         allEICs <- lapply(allEICs, setNames, names(bins))
         
-        fList <- findPeaksInEICs(allEICs, findPeaksAlgo, withBP = TRUE, ..., parallel = parallel, cacheDB = cacheDB)
+        fList <- findPeaksInEICs(allEICs, peaksParam, withBP = TRUE, parallel = parallel, cacheDB = cacheDB)
         
         fList <- lapply(fList, function(fTab)
         {

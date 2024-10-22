@@ -724,9 +724,9 @@ aggregateTox <- function(tox, aggrParams, splitSuspects = FALSE)
     return(tox[])
 }
 
-findPeaksInEICs <- function(allEICs, findPeaksAlgo, withBP, ..., parallel, cacheDB = NULL)
+findPeaksInEICs <- function(allEICs, peaksParam, withBP, parallel, cacheDB = NULL)
 {
-    baseHash <- makeHash(findPeaksAlgo, list(...))
+    baseHash <- makeHash(peaksParam)
     
     doApply("sapply", parallel, allEICs, function(EICs)
     {
@@ -743,7 +743,7 @@ findPeaksInEICs <- function(allEICs, findPeaksAlgo, withBP, ..., parallel, cache
         # convert EICs to data.tables: this is necessary for findPeaks()
         # NOTE: we don't store (or hash) the EICs as DTs, as this makes things slower
         
-        peaks <- findPeaks(EICs, findPeaksAlgo, ..., verbose = FALSE)
+        peaks <- findPeaks(EICs, peaksParam, verbose = FALSE)
         peaks <- rbindlist(peaks, idcol = "EIC_ID")
         
         if (nrow(peaks) == 0)

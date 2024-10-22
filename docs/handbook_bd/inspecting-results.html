@@ -231,6 +231,7 @@ div.csl-indent {
 <li class="chapter" data-level="4.6.2" data-path="annotation.html"><a href="annotation.html#formulae"><i class="fa fa-check"></i><b>4.6.2</b> Formulae</a></li>
 <li class="chapter" data-level="4.6.3" data-path="annotation.html"><a href="annotation.html#compounds"><i class="fa fa-check"></i><b>4.6.3</b> Compounds</a></li>
 <li class="chapter" data-level="4.6.4" data-path="annotation.html"><a href="annotation.html#suspAnn"><i class="fa fa-check"></i><b>4.6.4</b> Suspect annotation</a></li>
+<li class="chapter" data-level="4.6.5" data-path="annotation.html"><a href="annotation.html#SIRLogin"><i class="fa fa-check"></i><b>4.6.5</b> Account login for SIRIUS</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="processing.html"><a href="processing.html"><i class="fa fa-check"></i><b>5</b> Processing workflow data</a>
@@ -443,16 +444,16 @@ div.csl-indent {
 </tbody>
 </table>
 <p>The common <code>R</code> extraction operators <code>"[["</code>, <code>"$"</code> can be used to obtain data for a particular feature groups, analysis etc:</p>
-<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="inspecting-results.html#cb46-1" tabindex="-1"></a><span class="co"># Feature table (only first columns for readability)</span></span>
-<span id="cb46-2"><a href="inspecting-results.html#cb46-2" tabindex="-1"></a>fList[[<span class="st">&quot;standard-1&quot;</span>]][, <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]</span></code></pre></div>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="inspecting-results.html#cb49-1" tabindex="-1"></a><span class="co"># Feature table (only first columns for readability)</span></span>
+<span id="cb49-2"><a href="inspecting-results.html#cb49-2" tabindex="-1"></a>fList[[<span class="st">&quot;standard-1&quot;</span>]][, <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]</span></code></pre></div>
 <pre><code>#&gt; NULL</code></pre>
-<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="inspecting-results.html#cb48-1" tabindex="-1"></a><span class="co"># Feature group intensities</span></span>
-<span id="cb48-2"><a href="inspecting-results.html#cb48-2" tabindex="-1"></a>fGroups<span class="sc">$</span>M120_R268_30</span></code></pre></div>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="inspecting-results.html#cb51-1" tabindex="-1"></a><span class="co"># Feature group intensities</span></span>
+<span id="cb51-2"><a href="inspecting-results.html#cb51-2" tabindex="-1"></a>fGroups<span class="sc">$</span>M120_R268_30</span></code></pre></div>
 <pre><code>#&gt; [1] 264836 245372 216560</code></pre>
-<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="inspecting-results.html#cb50-1" tabindex="-1"></a>fGroups[[<span class="dv">1</span>, <span class="st">&quot;M120_R268_30&quot;</span>]] <span class="co"># only first analysis</span></span></code></pre></div>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="inspecting-results.html#cb53-1" tabindex="-1"></a>fGroups[[<span class="dv">1</span>, <span class="st">&quot;M120_R268_30&quot;</span>]] <span class="co"># only first analysis</span></span></code></pre></div>
 <pre><code>#&gt; [1] 264836</code></pre>
-<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="inspecting-results.html#cb52-1" tabindex="-1"></a><span class="co"># obtains MS/MS peak list  (feature group averaged data)</span></span>
-<span id="cb52-2"><a href="inspecting-results.html#cb52-2" tabindex="-1"></a>mslists[[<span class="st">&quot;M120_R268_30&quot;</span>]]<span class="sc">$</span>MSMS</span></code></pre></div>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="inspecting-results.html#cb55-1" tabindex="-1"></a><span class="co"># obtains MS/MS peak list  (feature group averaged data)</span></span>
+<span id="cb55-2"><a href="inspecting-results.html#cb55-2" tabindex="-1"></a>mslists[[<span class="st">&quot;M120_R268_30&quot;</span>]]<span class="sc">$</span>MSMS</span></code></pre></div>
 <pre><code>#&gt;        ID       mz  intensity precursor
 #&gt;     &lt;int&gt;    &lt;num&gt;      &lt;num&gt;    &lt;lgcl&gt;
 #&gt;  1:     5 105.0698   6183.111     FALSE
@@ -465,13 +466,13 @@ div.csl-indent {
 #&gt;  8:    20 123.0803  36631.111     FALSE
 #&gt;  9:    21 123.0996  15482.444     FALSE
 #&gt; 10:    22 124.0805  35580.667     FALSE</code></pre>
-<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="inspecting-results.html#cb54-1" tabindex="-1"></a><span class="co"># get all formula candidates for a feature group</span></span>
-<span id="cb54-2"><a href="inspecting-results.html#cb54-2" tabindex="-1"></a>formulas[[<span class="st">&quot;M120_R268_30&quot;</span>]][, <span class="dv">1</span><span class="sc">:</span><span class="dv">7</span>]</span></code></pre></div>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="inspecting-results.html#cb57-1" tabindex="-1"></a><span class="co"># get all formula candidates for a feature group</span></span>
+<span id="cb57-2"><a href="inspecting-results.html#cb57-2" tabindex="-1"></a>formulas[[<span class="st">&quot;M120_R268_30&quot;</span>]][, <span class="dv">1</span><span class="sc">:</span><span class="dv">7</span>]</span></code></pre></div>
 <pre><code>#&gt;    neutral_formula ion_formula neutralMass ion_formula_mz error   dbe isoScore
 #&gt;             &lt;char&gt;      &lt;char&gt;       &lt;num&gt;          &lt;num&gt; &lt;num&gt; &lt;num&gt;    &lt;num&gt;
 #&gt; 1:          C6H5N3      C6H6N3    119.0483       120.0556   1.8     6  0.92461</code></pre>
-<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="inspecting-results.html#cb56-1" tabindex="-1"></a><span class="co"># get all compound candidates for a feature group</span></span>
-<span id="cb56-2"><a href="inspecting-results.html#cb56-2" tabindex="-1"></a>compounds[[<span class="st">&quot;M120_R268_30&quot;</span>]][, <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>]</span></code></pre></div>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="inspecting-results.html#cb59-1" tabindex="-1"></a><span class="co"># get all compound candidates for a feature group</span></span>
+<span id="cb59-2"><a href="inspecting-results.html#cb59-2" tabindex="-1"></a>compounds[[<span class="st">&quot;M120_R268_30&quot;</span>]][, <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>]</span></code></pre></div>
 <pre><code>#&gt;     explainedPeaks     score neutralMass                   SMILES
 #&gt;              &lt;int&gt;     &lt;num&gt;       &lt;num&gt;                   &lt;char&gt;
 #&gt;  1:              0 2.7688810    119.0483        C1=CC2=NNN=C2C=C1
@@ -485,8 +486,8 @@ div.csl-indent {
 #&gt; 35:              0 0.7353883    119.0483        C1=CNC2=C1C=CN=N2
 #&gt; 36:              0 0.5346503    119.0483 C1=CC(=[N+]=[N-])C=CC1=N
 #&gt; 37:              0 0.3951816    119.0483         C(C#N)C(CC#N)C#N</code></pre>
-<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="inspecting-results.html#cb58-1" tabindex="-1"></a><span class="co"># get a table with information of a component</span></span>
-<span id="cb58-2"><a href="inspecting-results.html#cb58-2" tabindex="-1"></a>components[[<span class="st">&quot;CMP7&quot;</span>]][, <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]</span></code></pre></div>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="inspecting-results.html#cb61-1" tabindex="-1"></a><span class="co"># get a table with information of a component</span></span>
+<span id="cb61-2"><a href="inspecting-results.html#cb61-2" tabindex="-1"></a>components[[<span class="st">&quot;CMP7&quot;</span>]][, <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]</span></code></pre></div>
 <pre><code>#&gt;            group     ret       mz isogroup isonr charge
 #&gt;           &lt;char&gt;   &lt;num&gt;    &lt;num&gt;    &lt;num&gt; &lt;num&gt;  &lt;num&gt;
 #&gt; 1:  M143_R206_64 205.787 143.0700       NA    NA     NA
@@ -501,23 +502,23 @@ div.csl-indent {
 <p><strong><em>NOTE</em></strong> The <code>as.data.frame()</code> methods defined in <code>patRoon</code> simply convert the results from <code>as.data.table()</code>, hence, both functions are equal in their usage and are defined for the same object classes.</p>
 </blockquote>
 <p>Some typical examples are shown below.</p>
-<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="inspecting-results.html#cb60-1" tabindex="-1"></a><span class="co"># obtain table with all features (only first columns for readability)</span></span>
-<span id="cb60-2"><a href="inspecting-results.html#cb60-2" tabindex="-1"></a><span class="fu">as.data.table</span>(fList)[, <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]</span></code></pre></div>
+<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="inspecting-results.html#cb63-1" tabindex="-1"></a><span class="co"># obtain table with all features (only first columns for readability)</span></span>
+<span id="cb63-2"><a href="inspecting-results.html#cb63-2" tabindex="-1"></a><span class="fu">as.data.table</span>(fList)[, <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]</span></code></pre></div>
 <pre><code>#&gt;             analysis                     ID     ret        mz      area intensity
 #&gt;               &lt;char&gt;                 &lt;char&gt;   &lt;num&gt;     &lt;num&gt;     &lt;num&gt;     &lt;num&gt;
-#&gt;    1:  solvent-pos-1 f_12993661383729955448  13.176  98.97537 4345232.0    391476
-#&gt;    2:  solvent-pos-1 f_13696161788066801682   7.181 100.11197  797112.1    426956
-#&gt;    3:  solvent-pos-1  f_9673287907388898396 192.178 100.11211 9609998.0    750532
-#&gt;    4:  solvent-pos-1 f_12691897927277329896  19.171 100.11217 5784411.0    370376
-#&gt;    5:  solvent-pos-1 f_13002904346589703519   4.786 100.11220  551723.6    567312
+#&gt;    1:  solvent-pos-1  f_3712549838513084918  13.176  98.97537 4345232.0    391476
+#&gt;    2:  solvent-pos-1  f_5098063745388178889   7.181 100.11197  797112.1    426956
+#&gt;    3:  solvent-pos-1 f_14731490662324610183 192.178 100.11211 9609998.0    750532
+#&gt;    4:  solvent-pos-1  f_7442532548286746862  19.171 100.11217 5784411.0    370376
+#&gt;    5:  solvent-pos-1  f_6223661357051792381   4.786 100.11220  551723.6    567312
 #&gt;   ---                                                                            
-#&gt; 2922: standard-pos-3  f_3452666689620296598 318.892 425.18866  666531.5    232636
-#&gt; 2923: standard-pos-3  f_3580390970667225830   9.114 427.03242  362024.1    114744
-#&gt; 2924: standard-pos-3 f_11632672148383003551 318.892 427.18678  200193.5     77768
-#&gt; 2925: standard-pos-3 f_10474592504442502570 382.682 432.23984  217612.9     97648
-#&gt; 2926: standard-pos-3  f_9565771155879955649   9.114 433.00457 3086864.0    912920</code></pre>
-<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="inspecting-results.html#cb62-1" tabindex="-1"></a><span class="co"># Returns group info and intensity values for each feature group</span></span>
-<span id="cb62-2"><a href="inspecting-results.html#cb62-2" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroups, <span class="at">average =</span> <span class="cn">TRUE</span>) <span class="co"># average intensities for replicates</span></span></code></pre></div>
+#&gt; 2922: standard-pos-3 f_12059826925859653600 318.892 425.18866  666531.5    232636
+#&gt; 2923: standard-pos-3 f_12923821022313682561   9.114 427.03242  362024.1    114744
+#&gt; 2924: standard-pos-3 f_17912583984245226743 318.892 427.18678  200193.5     77768
+#&gt; 2925: standard-pos-3  f_8833803857797731219 382.682 432.23984  217612.9     97648
+#&gt; 2926: standard-pos-3  f_8149226498017244232   9.114 433.00457 3086864.0    912920</code></pre>
+<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="inspecting-results.html#cb65-1" tabindex="-1"></a><span class="co"># Returns group info and intensity values for each feature group</span></span>
+<span id="cb65-2"><a href="inspecting-results.html#cb65-2" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroups, <span class="at">average =</span> <span class="cn">TRUE</span>) <span class="co"># average intensities for replicates</span></span></code></pre></div>
 <pre><code>#&gt;              group      ret       mz standard-pos
 #&gt;             &lt;char&gt;    &lt;num&gt;    &lt;num&gt;        &lt;num&gt;
 #&gt;   1:  M109_R192_20 191.8717 109.0759    183482.67
@@ -531,10 +532,10 @@ div.csl-indent {
 #&gt; 139: M352_R335_664 334.9403 352.2019     74986.67
 #&gt; 140: M407_R239_672 239.3567 407.2227    186568.00
 #&gt; 141: M425_R319_676 319.4944 425.1885    214990.67</code></pre>
-<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="inspecting-results.html#cb64-1" tabindex="-1"></a><span class="co"># As above, but with suspect matches on separate rows and additional screening information</span></span>
-<span id="cb64-2"><a href="inspecting-results.html#cb64-2" tabindex="-1"></a><span class="co"># (select some columns to simplify the output below)</span></span>
-<span id="cb64-3"><a href="inspecting-results.html#cb64-3" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroupsSusp, <span class="at">average =</span> <span class="cn">TRUE</span>, <span class="at">collapseSuspects =</span> <span class="cn">NULL</span>,</span>
-<span id="cb64-4"><a href="inspecting-results.html#cb64-4" tabindex="-1"></a>              <span class="at">onlyHits =</span> <span class="cn">TRUE</span>)[, <span class="fu">c</span>(<span class="st">&quot;group&quot;</span>, <span class="st">&quot;susp_name&quot;</span>, <span class="st">&quot;susp_compRank&quot;</span>, <span class="st">&quot;susp_annSimBoth&quot;</span>, <span class="st">&quot;susp_estIDLevel&quot;</span>)]</span></code></pre></div>
+<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb67-1"><a href="inspecting-results.html#cb67-1" tabindex="-1"></a><span class="co"># As above, but with suspect matches on separate rows and additional screening information</span></span>
+<span id="cb67-2"><a href="inspecting-results.html#cb67-2" tabindex="-1"></a><span class="co"># (select some columns to simplify the output below)</span></span>
+<span id="cb67-3"><a href="inspecting-results.html#cb67-3" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroupsSusp, <span class="at">average =</span> <span class="cn">TRUE</span>, <span class="at">collapseSuspects =</span> <span class="cn">NULL</span>,</span>
+<span id="cb67-4"><a href="inspecting-results.html#cb67-4" tabindex="-1"></a>              <span class="at">onlyHits =</span> <span class="cn">TRUE</span>)[, <span class="fu">c</span>(<span class="st">&quot;group&quot;</span>, <span class="st">&quot;susp_name&quot;</span>, <span class="st">&quot;susp_compRank&quot;</span>, <span class="st">&quot;susp_annSimBoth&quot;</span>, <span class="st">&quot;susp_estIDLevel&quot;</span>)]</span></code></pre></div>
 <pre><code>#&gt;           group          susp_name susp_compRank susp_annSimBoth susp_estIDLevel
 #&gt;          &lt;char&gt;             &lt;char&gt;         &lt;int&gt;           &lt;num&gt;          &lt;char&gt;
 #&gt; 1: M120_R268_30   1H-benzotriazole             1       0.0000000              4b
@@ -542,8 +543,8 @@ div.csl-indent {
 #&gt; 3: M146_R309_68 2-Hydroxyquinoline             2       0.9896892              3c
 #&gt; 4: M146_R248_69 2-Hydroxyquinoline            NA              NA               5
 #&gt; 5: M146_R225_70 2-Hydroxyquinoline            NA              NA               5</code></pre>
-<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb66-1"><a href="inspecting-results.html#cb66-1" tabindex="-1"></a><span class="co"># Returns all peak lists for each feature group</span></span>
-<span id="cb66-2"><a href="inspecting-results.html#cb66-2" tabindex="-1"></a><span class="fu">as.data.table</span>(mslists)</span></code></pre></div>
+<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="inspecting-results.html#cb69-1" tabindex="-1"></a><span class="co"># Returns all peak lists for each feature group</span></span>
+<span id="cb69-2"><a href="inspecting-results.html#cb69-2" tabindex="-1"></a><span class="fu">as.data.table</span>(mslists)</span></code></pre></div>
 <pre><code>#&gt;              group   type    ID       mz  intensity precursor
 #&gt;             &lt;char&gt; &lt;char&gt; &lt;int&gt;    &lt;num&gt;      &lt;num&gt;    &lt;lgcl&gt;
 #&gt;   1:  M120_R268_30     MS     1 100.1120 178952.381     FALSE
@@ -557,17 +558,17 @@ div.csl-indent {
 #&gt; 237: M192_R355_191   MSMS    14 119.0496 588372.444     FALSE
 #&gt; 238: M192_R355_191   MSMS    18 120.0524  70273.333     FALSE
 #&gt; 239: M192_R355_191   MSMS    31 192.1384  71978.667      TRUE</code></pre>
-<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb68-1"><a href="inspecting-results.html#cb68-1" tabindex="-1"></a><span class="co"># Returns all formula candidates for each feature group with scoring</span></span>
-<span id="cb68-2"><a href="inspecting-results.html#cb68-2" tabindex="-1"></a><span class="co"># information, neutral loss etc</span></span>
-<span id="cb68-3"><a href="inspecting-results.html#cb68-3" tabindex="-1"></a><span class="fu">as.data.table</span>(formulas)[, <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]</span></code></pre></div>
+<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb71-1"><a href="inspecting-results.html#cb71-1" tabindex="-1"></a><span class="co"># Returns all formula candidates for each feature group with scoring</span></span>
+<span id="cb71-2"><a href="inspecting-results.html#cb71-2" tabindex="-1"></a><span class="co"># information, neutral loss etc</span></span>
+<span id="cb71-3"><a href="inspecting-results.html#cb71-3" tabindex="-1"></a><span class="fu">as.data.table</span>(formulas)[, <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]</span></code></pre></div>
 <pre><code>#&gt;            group neutral_formula ion_formula neutralMass ion_formula_mz      error
 #&gt;           &lt;char&gt;          &lt;char&gt;      &lt;char&gt;       &lt;num&gt;          &lt;num&gt;      &lt;num&gt;
 #&gt; 1:  M120_R268_30          C6H5N3      C6H6N3    119.0483       120.0556 1.80000000
 #&gt; 2:  M137_R249_53         C7H8N2O     C7H9N2O    136.0637       137.0709 2.90000000
 #&gt; 3:  M146_R309_68          C9H7NO      C9H8NO    145.0528       146.0600 1.66666667
 #&gt; 4: M192_R355_191        C12H17NO    C12H18NO    191.1310       192.1383 0.03333333</code></pre>
-<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb70-1"><a href="inspecting-results.html#cb70-1" tabindex="-1"></a><span class="co"># Returns all compound candidates for each feature group with scoring and other metadata</span></span>
-<span id="cb70-2"><a href="inspecting-results.html#cb70-2" tabindex="-1"></a><span class="fu">as.data.table</span>(compounds)[, <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>]</span></code></pre></div>
+<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb73-1"><a href="inspecting-results.html#cb73-1" tabindex="-1"></a><span class="co"># Returns all compound candidates for each feature group with scoring and other metadata</span></span>
+<span id="cb73-2"><a href="inspecting-results.html#cb73-2" tabindex="-1"></a><span class="fu">as.data.table</span>(compounds)[, <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>]</span></code></pre></div>
 <pre><code>#&gt;              group explainedPeaks     score neutralMass
 #&gt;             &lt;char&gt;          &lt;int&gt;     &lt;num&gt;       &lt;num&gt;
 #&gt;   1:  M120_R268_30              0 2.7688810    119.0483
@@ -581,8 +582,8 @@ div.csl-indent {
 #&gt; 277: M192_R355_191              1 0.8814458    191.1310
 #&gt; 278: M192_R355_191              0 0.8584452    191.1310
 #&gt; 279: M192_R355_191              1 0.7970401    191.1310</code></pre>
-<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb72-1"><a href="inspecting-results.html#cb72-1" tabindex="-1"></a><span class="co"># Returns table with all components (including feature group info, annotations etc)</span></span>
-<span id="cb72-2"><a href="inspecting-results.html#cb72-2" tabindex="-1"></a><span class="fu">as.data.table</span>(components)[, <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]</span></code></pre></div>
+<div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb75-1"><a href="inspecting-results.html#cb75-1" tabindex="-1"></a><span class="co"># Returns table with all components (including feature group info, annotations etc)</span></span>
+<span id="cb75-2"><a href="inspecting-results.html#cb75-2" tabindex="-1"></a><span class="fu">as.data.table</span>(components)[, <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]</span></code></pre></div>
 <pre><code>#&gt;       name  cmp_ret cmp_retsd       neutral_mass       analysis  size
 #&gt;     &lt;char&gt;    &lt;num&gt;     &lt;num&gt;             &lt;char&gt;         &lt;char&gt; &lt;int&gt;
 #&gt;  1:   CMP1 347.2914 0.0000000               &lt;NA&gt; standard-pos-2     2
@@ -597,9 +598,9 @@ div.csl-indent {
 #&gt; 91:  CMP30 268.3430 0.3840764           81.08705 standard-pos-1     3
 #&gt; 92:  CMP30 268.3430 0.3840764           81.08705 standard-pos-1     3</code></pre>
 <p>Finally, the <code>annotatedPeakList()</code> function is useful to inspect annotation results for a formula or compound candidate:</p>
-<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb74-1"><a href="inspecting-results.html#cb74-1" tabindex="-1"></a><span class="co"># formula annotations for the first formula candidate of feature group M137_R249_53</span></span>
-<span id="cb74-2"><a href="inspecting-results.html#cb74-2" tabindex="-1"></a><span class="fu">annotatedPeakList</span>(formulas, <span class="at">index =</span> <span class="dv">1</span>, <span class="at">groupName =</span> <span class="st">&quot;M137_R249_53&quot;</span>,</span>
-<span id="cb74-3"><a href="inspecting-results.html#cb74-3" tabindex="-1"></a>                  <span class="at">MSPeakLists =</span> mslists)</span></code></pre></div>
+<div class="sourceCode" id="cb77"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb77-1"><a href="inspecting-results.html#cb77-1" tabindex="-1"></a><span class="co"># formula annotations for the first formula candidate of feature group M137_R249_53</span></span>
+<span id="cb77-2"><a href="inspecting-results.html#cb77-2" tabindex="-1"></a><span class="fu">annotatedPeakList</span>(formulas, <span class="at">index =</span> <span class="dv">1</span>, <span class="at">groupName =</span> <span class="st">&quot;M137_R249_53&quot;</span>,</span>
+<span id="cb77-3"><a href="inspecting-results.html#cb77-3" tabindex="-1"></a>                  <span class="at">MSPeakLists =</span> mslists)</span></code></pre></div>
 <pre><code>#&gt;        ID        mz intensity precursor ion_formula   dbe ion_formula_mz error neutral_loss annotated
 #&gt;     &lt;int&gt;     &lt;num&gt;     &lt;num&gt;    &lt;lgcl&gt;      &lt;char&gt; &lt;num&gt;          &lt;num&gt; &lt;num&gt;       &lt;char&gt;    &lt;lgcl&gt;
 #&gt;  1:     2  94.06500  9406.111     FALSE       C6H8N   3.5       94.06513  1.30         CHNO      TRUE
@@ -612,9 +613,9 @@ div.csl-indent {
 #&gt;  8:    24 137.09572  2026.889     FALSE        &lt;NA&gt;    NA             NA    NA         &lt;NA&gt;     FALSE
 #&gt;  9:    26 138.09116 12356.667     FALSE        &lt;NA&gt;    NA             NA    NA         &lt;NA&gt;     FALSE
 #&gt; 10:    27 139.07503  5020.667     FALSE        &lt;NA&gt;    NA             NA    NA         &lt;NA&gt;     FALSE</code></pre>
-<div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb76-1"><a href="inspecting-results.html#cb76-1" tabindex="-1"></a><span class="co"># compound annotation for first candidate of feature group M137_R249_53</span></span>
-<span id="cb76-2"><a href="inspecting-results.html#cb76-2" tabindex="-1"></a><span class="fu">annotatedPeakList</span>(compounds, <span class="at">index =</span> <span class="dv">1</span>, <span class="at">groupName =</span> <span class="st">&quot;M137_R249_53&quot;</span>,</span>
-<span id="cb76-3"><a href="inspecting-results.html#cb76-3" tabindex="-1"></a>                  <span class="at">MSPeakLists =</span> mslists)</span></code></pre></div>
+<div class="sourceCode" id="cb79"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb79-1"><a href="inspecting-results.html#cb79-1" tabindex="-1"></a><span class="co"># compound annotation for first candidate of feature group M137_R249_53</span></span>
+<span id="cb79-2"><a href="inspecting-results.html#cb79-2" tabindex="-1"></a><span class="fu">annotatedPeakList</span>(compounds, <span class="at">index =</span> <span class="dv">1</span>, <span class="at">groupName =</span> <span class="st">&quot;M137_R249_53&quot;</span>,</span>
+<span id="cb79-3"><a href="inspecting-results.html#cb79-3" tabindex="-1"></a>                  <span class="at">MSPeakLists =</span> mslists)</span></code></pre></div>
 <pre><code>#&gt;        ID        mz intensity precursor ion_formula ion_formula_MF neutral_loss score annotated
 #&gt;     &lt;int&gt;     &lt;num&gt;     &lt;num&gt;    &lt;lgcl&gt;      &lt;char&gt;         &lt;char&gt;       &lt;char&gt; &lt;num&gt;    &lt;lgcl&gt;
 #&gt;  1:     2  94.06500  9406.111     FALSE       C6H8N   [C6H6N+H]+H+         CHNO   405      TRUE
@@ -628,30 +629,30 @@ div.csl-indent {
 #&gt;  9:    26 138.09116 12356.667     FALSE        &lt;NA&gt;           &lt;NA&gt;         &lt;NA&gt;    NA     FALSE
 #&gt; 10:    27 139.07503  5020.667     FALSE        &lt;NA&gt;           &lt;NA&gt;         &lt;NA&gt;    NA     FALSE</code></pre>
 <p>More advanced examples for these functions are shown below.</p>
-<div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb78-1"><a href="inspecting-results.html#cb78-1" tabindex="-1"></a><span class="co"># Feature table, can also be accessed by numeric index</span></span>
-<span id="cb78-2"><a href="inspecting-results.html#cb78-2" tabindex="-1"></a>fList[[<span class="dv">1</span>]]</span>
-<span id="cb78-3"><a href="inspecting-results.html#cb78-3" tabindex="-1"></a>mslists[[<span class="st">&quot;standard-1&quot;</span>, <span class="st">&quot;M120_R268_30&quot;</span>]] <span class="co"># feature data (instead of feature group averaged)</span></span>
-<span id="cb78-4"><a href="inspecting-results.html#cb78-4" tabindex="-1"></a>formulas[[<span class="dv">1</span>, <span class="st">&quot;M120_R268_30&quot;</span>]] <span class="co"># feature data (if available, i.e. calculateFeatures=TRUE)</span></span>
-<span id="cb78-5"><a href="inspecting-results.html#cb78-5" tabindex="-1"></a>components[[<span class="st">&quot;CMP1&quot;</span>, <span class="dv">1</span>]] <span class="co"># only for first feature group in component</span></span>
-<span id="cb78-6"><a href="inspecting-results.html#cb78-6" tabindex="-1"></a></span>
-<span id="cb78-7"><a href="inspecting-results.html#cb78-7" tabindex="-1"></a><span class="fu">as.data.frame</span>(fList) <span class="co"># classic data.frame format, works for all objects</span></span>
-<span id="cb78-8"><a href="inspecting-results.html#cb78-8" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroups) <span class="co"># return non-averaged intensities (default)</span></span>
-<span id="cb78-9"><a href="inspecting-results.html#cb78-9" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroups, <span class="at">features =</span> <span class="cn">TRUE</span>) <span class="co"># include feature information</span></span>
-<span id="cb78-10"><a href="inspecting-results.html#cb78-10" tabindex="-1"></a><span class="fu">as.data.table</span>(mslists, <span class="at">averaged =</span> <span class="cn">FALSE</span>) <span class="co"># peak lists for each feature</span></span>
-<span id="cb78-11"><a href="inspecting-results.html#cb78-11" tabindex="-1"></a><span class="fu">as.data.table</span>(mslists, <span class="at">fGroups =</span> fGroups) <span class="co"># add feature group information</span></span>
-<span id="cb78-12"><a href="inspecting-results.html#cb78-12" tabindex="-1"></a></span>
-<span id="cb78-13"><a href="inspecting-results.html#cb78-13" tabindex="-1"></a><span class="fu">as.data.table</span>(formulas, <span class="at">countElements =</span> <span class="fu">c</span>(<span class="st">&quot;C&quot;</span>, <span class="st">&quot;H&quot;</span>)) <span class="co"># include C/H counts (e.g. for van Krevelen plots)</span></span>
-<span id="cb78-14"><a href="inspecting-results.html#cb78-14" tabindex="-1"></a><span class="co"># add various information for organic matter characterization (common elemental</span></span>
-<span id="cb78-15"><a href="inspecting-results.html#cb78-15" tabindex="-1"></a><span class="co"># counts/ratios, classifications etc)</span></span>
-<span id="cb78-16"><a href="inspecting-results.html#cb78-16" tabindex="-1"></a><span class="fu">as.data.table</span>(formulas, <span class="at">OM =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb78-17"><a href="inspecting-results.html#cb78-17" tabindex="-1"></a></span>
-<span id="cb78-18"><a href="inspecting-results.html#cb78-18" tabindex="-1"></a><span class="fu">as.data.table</span>(compounds, <span class="at">fGroups =</span> fGroups) <span class="co"># add feature group information</span></span>
-<span id="cb78-19"><a href="inspecting-results.html#cb78-19" tabindex="-1"></a><span class="fu">as.data.table</span>(compounds, <span class="at">fragments =</span> <span class="cn">TRUE</span>) <span class="co"># include information of all annotated fragments</span></span>
-<span id="cb78-20"><a href="inspecting-results.html#cb78-20" tabindex="-1"></a></span>
-<span id="cb78-21"><a href="inspecting-results.html#cb78-21" tabindex="-1"></a><span class="fu">annotatedPeakList</span>(formulas, <span class="at">index =</span> <span class="dv">1</span>, <span class="at">groupName =</span> <span class="st">&quot;M120_R268_30&quot;</span>,</span>
-<span id="cb78-22"><a href="inspecting-results.html#cb78-22" tabindex="-1"></a>                  <span class="at">MSPeakLists =</span> mslists, <span class="at">onlyAnnotated =</span> <span class="cn">TRUE</span>) <span class="co"># only include annotated peaks</span></span>
-<span id="cb78-23"><a href="inspecting-results.html#cb78-23" tabindex="-1"></a><span class="fu">annotatedPeakList</span>(compounds, <span class="at">index =</span> <span class="dv">1</span>, <span class="at">groupName =</span> <span class="st">&quot;M120_R268_30&quot;</span>,</span>
-<span id="cb78-24"><a href="inspecting-results.html#cb78-24" tabindex="-1"></a>                  <span class="at">MSPeakLists =</span> mslists, <span class="at">formulas =</span> formulas) <span class="co"># include formula annotations</span></span></code></pre></div>
+<div class="sourceCode" id="cb81"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb81-1"><a href="inspecting-results.html#cb81-1" tabindex="-1"></a><span class="co"># Feature table, can also be accessed by numeric index</span></span>
+<span id="cb81-2"><a href="inspecting-results.html#cb81-2" tabindex="-1"></a>fList[[<span class="dv">1</span>]]</span>
+<span id="cb81-3"><a href="inspecting-results.html#cb81-3" tabindex="-1"></a>mslists[[<span class="st">&quot;standard-1&quot;</span>, <span class="st">&quot;M120_R268_30&quot;</span>]] <span class="co"># feature data (instead of feature group averaged)</span></span>
+<span id="cb81-4"><a href="inspecting-results.html#cb81-4" tabindex="-1"></a>formulas[[<span class="dv">1</span>, <span class="st">&quot;M120_R268_30&quot;</span>]] <span class="co"># feature data (if available, i.e. calculateFeatures=TRUE)</span></span>
+<span id="cb81-5"><a href="inspecting-results.html#cb81-5" tabindex="-1"></a>components[[<span class="st">&quot;CMP1&quot;</span>, <span class="dv">1</span>]] <span class="co"># only for first feature group in component</span></span>
+<span id="cb81-6"><a href="inspecting-results.html#cb81-6" tabindex="-1"></a></span>
+<span id="cb81-7"><a href="inspecting-results.html#cb81-7" tabindex="-1"></a><span class="fu">as.data.frame</span>(fList) <span class="co"># classic data.frame format, works for all objects</span></span>
+<span id="cb81-8"><a href="inspecting-results.html#cb81-8" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroups) <span class="co"># return non-averaged intensities (default)</span></span>
+<span id="cb81-9"><a href="inspecting-results.html#cb81-9" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroups, <span class="at">features =</span> <span class="cn">TRUE</span>) <span class="co"># include feature information</span></span>
+<span id="cb81-10"><a href="inspecting-results.html#cb81-10" tabindex="-1"></a><span class="fu">as.data.table</span>(mslists, <span class="at">averaged =</span> <span class="cn">FALSE</span>) <span class="co"># peak lists for each feature</span></span>
+<span id="cb81-11"><a href="inspecting-results.html#cb81-11" tabindex="-1"></a><span class="fu">as.data.table</span>(mslists, <span class="at">fGroups =</span> fGroups) <span class="co"># add feature group information</span></span>
+<span id="cb81-12"><a href="inspecting-results.html#cb81-12" tabindex="-1"></a></span>
+<span id="cb81-13"><a href="inspecting-results.html#cb81-13" tabindex="-1"></a><span class="fu">as.data.table</span>(formulas, <span class="at">countElements =</span> <span class="fu">c</span>(<span class="st">&quot;C&quot;</span>, <span class="st">&quot;H&quot;</span>)) <span class="co"># include C/H counts (e.g. for van Krevelen plots)</span></span>
+<span id="cb81-14"><a href="inspecting-results.html#cb81-14" tabindex="-1"></a><span class="co"># add various information for organic matter characterization (common elemental</span></span>
+<span id="cb81-15"><a href="inspecting-results.html#cb81-15" tabindex="-1"></a><span class="co"># counts/ratios, classifications etc)</span></span>
+<span id="cb81-16"><a href="inspecting-results.html#cb81-16" tabindex="-1"></a><span class="fu">as.data.table</span>(formulas, <span class="at">OM =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb81-17"><a href="inspecting-results.html#cb81-17" tabindex="-1"></a></span>
+<span id="cb81-18"><a href="inspecting-results.html#cb81-18" tabindex="-1"></a><span class="fu">as.data.table</span>(compounds, <span class="at">fGroups =</span> fGroups) <span class="co"># add feature group information</span></span>
+<span id="cb81-19"><a href="inspecting-results.html#cb81-19" tabindex="-1"></a><span class="fu">as.data.table</span>(compounds, <span class="at">fragments =</span> <span class="cn">TRUE</span>) <span class="co"># include information of all annotated fragments</span></span>
+<span id="cb81-20"><a href="inspecting-results.html#cb81-20" tabindex="-1"></a></span>
+<span id="cb81-21"><a href="inspecting-results.html#cb81-21" tabindex="-1"></a><span class="fu">annotatedPeakList</span>(formulas, <span class="at">index =</span> <span class="dv">1</span>, <span class="at">groupName =</span> <span class="st">&quot;M120_R268_30&quot;</span>,</span>
+<span id="cb81-22"><a href="inspecting-results.html#cb81-22" tabindex="-1"></a>                  <span class="at">MSPeakLists =</span> mslists, <span class="at">onlyAnnotated =</span> <span class="cn">TRUE</span>) <span class="co"># only include annotated peaks</span></span>
+<span id="cb81-23"><a href="inspecting-results.html#cb81-23" tabindex="-1"></a><span class="fu">annotatedPeakList</span>(compounds, <span class="at">index =</span> <span class="dv">1</span>, <span class="at">groupName =</span> <span class="st">&quot;M120_R268_30&quot;</span>,</span>
+<span id="cb81-24"><a href="inspecting-results.html#cb81-24" tabindex="-1"></a>                  <span class="at">MSPeakLists =</span> mslists, <span class="at">formulas =</span> formulas) <span class="co"># include formula annotations</span></span></code></pre></div>
 </div>
             </section>
 

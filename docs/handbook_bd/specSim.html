@@ -231,6 +231,7 @@ div.csl-indent {
 <li class="chapter" data-level="4.6.2" data-path="annotation.html"><a href="annotation.html#formulae"><i class="fa fa-check"></i><b>4.6.2</b> Formulae</a></li>
 <li class="chapter" data-level="4.6.3" data-path="annotation.html"><a href="annotation.html#compounds"><i class="fa fa-check"></i><b>4.6.3</b> Compounds</a></li>
 <li class="chapter" data-level="4.6.4" data-path="annotation.html"><a href="annotation.html#suspAnn"><i class="fa fa-check"></i><b>4.6.4</b> Suspect annotation</a></li>
+<li class="chapter" data-level="4.6.5" data-path="annotation.html"><a href="annotation.html#SIRLogin"><i class="fa fa-check"></i><b>4.6.5</b> Account login for SIRIUS</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="processing.html"><a href="processing.html"><i class="fa fa-check"></i><b>5</b> Processing workflow data</a>
@@ -405,7 +406,7 @@ div.csl-indent {
 </tbody>
 </table>
 <p>The <code>specSimParams</code> argument defines the parameters for similarity calculations. It is a <code>list</code>, and the default values are obtained with the <code>getDefSpecSimParams()</code> function:</p>
-<div class="sourceCode" id="cb94"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb94-1"><a href="specSim.html#cb94-1" tabindex="-1"></a><span class="fu">getDefSpecSimParams</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb97"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb97-1"><a href="specSim.html#cb97-1" tabindex="-1"></a><span class="fu">getDefSpecSimParams</span>()</span></code></pre></div>
 <pre><code>#&gt; $method
 #&gt; [1] &quot;cosine&quot;
 #&gt; 
@@ -440,36 +441,36 @@ div.csl-indent {
 <li><code>"both</code>” This combines both shifting methods: first peaks are aligned that have the same mass, then the <code>precursor</code> strategy is applied for the remaining mass peaks. This shifting method yields higher similarities if either fragment masses or neutral losses are similar.</li>
 </ul>
 <p>To override a default setting, simply pass it as an argument to <code>getDefSpecSimParams</code>:</p>
-<div class="sourceCode" id="cb96"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb96-1"><a href="specSim.html#cb96-1" tabindex="-1"></a><span class="fu">getDefSpecSimParams</span>(<span class="at">shift =</span> <span class="st">&quot;both&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb99"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb99-1"><a href="specSim.html#cb99-1" tabindex="-1"></a><span class="fu">getDefSpecSimParams</span>(<span class="at">shift =</span> <span class="st">&quot;both&quot;</span>)</span></code></pre></div>
 <p>For more details on the various similarity calculation parameters see the reference manual (<code>?getDefSpecSimParams</code>).</p>
 <p>Some examples are shown below:</p>
-<div class="sourceCode" id="cb97"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb97-1"><a href="specSim.html#cb97-1" tabindex="-1"></a><span class="co"># similarity between MS spectra with default parameters</span></span>
-<span id="cb97-2"><a href="specSim.html#cb97-2" tabindex="-1"></a><span class="fu">spectrumSimilarity</span>(mslists, <span class="at">groupName1 =</span> <span class="st">&quot;M120_R268_30&quot;</span>, <span class="at">groupName2 =</span> <span class="st">&quot;M137_R249_53&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb100"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb100-1"><a href="specSim.html#cb100-1" tabindex="-1"></a><span class="co"># similarity between MS spectra with default parameters</span></span>
+<span id="cb100-2"><a href="specSim.html#cb100-2" tabindex="-1"></a><span class="fu">spectrumSimilarity</span>(mslists, <span class="at">groupName1 =</span> <span class="st">&quot;M120_R268_30&quot;</span>, <span class="at">groupName2 =</span> <span class="st">&quot;M137_R249_53&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [1] 0.4088499</code></pre>
-<div class="sourceCode" id="cb99"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb99-1"><a href="specSim.html#cb99-1" tabindex="-1"></a><span class="co"># similarity between MS/MS spectra with default parameters</span></span>
-<span id="cb99-2"><a href="specSim.html#cb99-2" tabindex="-1"></a><span class="fu">spectrumSimilarity</span>(mslists, <span class="at">groupName1 =</span> <span class="st">&quot;M120_R268_30&quot;</span>, <span class="at">groupName2 =</span> <span class="st">&quot;M192_R355_191&quot;</span>,</span>
-<span id="cb99-3"><a href="specSim.html#cb99-3" tabindex="-1"></a>                   <span class="at">MSLevel =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb102"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb102-1"><a href="specSim.html#cb102-1" tabindex="-1"></a><span class="co"># similarity between MS/MS spectra with default parameters</span></span>
+<span id="cb102-2"><a href="specSim.html#cb102-2" tabindex="-1"></a><span class="fu">spectrumSimilarity</span>(mslists, <span class="at">groupName1 =</span> <span class="st">&quot;M120_R268_30&quot;</span>, <span class="at">groupName2 =</span> <span class="st">&quot;M192_R355_191&quot;</span>,</span>
+<span id="cb102-3"><a href="specSim.html#cb102-3" tabindex="-1"></a>                   <span class="at">MSLevel =</span> <span class="dv">2</span>)</span></code></pre></div>
 <pre><code>#&gt; [1] 0.08589848</code></pre>
-<div class="sourceCode" id="cb101"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb101-1"><a href="specSim.html#cb101-1" tabindex="-1"></a><span class="co"># As above, with jaccard calculation</span></span>
-<span id="cb101-2"><a href="specSim.html#cb101-2" tabindex="-1"></a><span class="fu">spectrumSimilarity</span>(mslists, <span class="at">groupName1 =</span> <span class="st">&quot;M120_R268_30&quot;</span>, <span class="at">groupName2 =</span> <span class="st">&quot;M192_R355_191&quot;</span>,</span>
-<span id="cb101-3"><a href="specSim.html#cb101-3" tabindex="-1"></a>                   <span class="at">MSLevel =</span> <span class="dv">2</span>, <span class="at">specSimParams =</span> <span class="fu">getDefSpecSimParams</span>(<span class="at">method =</span> <span class="st">&quot;jaccard&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb104"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb104-1"><a href="specSim.html#cb104-1" tabindex="-1"></a><span class="co"># As above, with jaccard calculation</span></span>
+<span id="cb104-2"><a href="specSim.html#cb104-2" tabindex="-1"></a><span class="fu">spectrumSimilarity</span>(mslists, <span class="at">groupName1 =</span> <span class="st">&quot;M120_R268_30&quot;</span>, <span class="at">groupName2 =</span> <span class="st">&quot;M192_R355_191&quot;</span>,</span>
+<span id="cb104-3"><a href="specSim.html#cb104-3" tabindex="-1"></a>                   <span class="at">MSLevel =</span> <span class="dv">2</span>, <span class="at">specSimParams =</span> <span class="fu">getDefSpecSimParams</span>(<span class="at">method =</span> <span class="st">&quot;jaccard&quot;</span>))</span></code></pre></div>
 <pre><code>#&gt; [1] 0.1111111</code></pre>
-<div class="sourceCode" id="cb103"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb103-1"><a href="specSim.html#cb103-1" tabindex="-1"></a><span class="co"># With shifting</span></span>
-<span id="cb103-2"><a href="specSim.html#cb103-2" tabindex="-1"></a><span class="fu">spectrumSimilarity</span>(mslists, <span class="at">groupName1 =</span> <span class="st">&quot;M120_R268_30&quot;</span>, <span class="at">groupName2 =</span> <span class="st">&quot;M192_R355_191&quot;</span>,</span>
-<span id="cb103-3"><a href="specSim.html#cb103-3" tabindex="-1"></a>                   <span class="at">MSLevel =</span> <span class="dv">2</span>, <span class="at">specSimParams =</span> <span class="fu">getDefSpecSimParams</span>(<span class="at">shift =</span> <span class="st">&quot;both&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb106"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb106-1"><a href="specSim.html#cb106-1" tabindex="-1"></a><span class="co"># With shifting</span></span>
+<span id="cb106-2"><a href="specSim.html#cb106-2" tabindex="-1"></a><span class="fu">spectrumSimilarity</span>(mslists, <span class="at">groupName1 =</span> <span class="st">&quot;M120_R268_30&quot;</span>, <span class="at">groupName2 =</span> <span class="st">&quot;M192_R355_191&quot;</span>,</span>
+<span id="cb106-3"><a href="specSim.html#cb106-3" tabindex="-1"></a>                   <span class="at">MSLevel =</span> <span class="dv">2</span>, <span class="at">specSimParams =</span> <span class="fu">getDefSpecSimParams</span>(<span class="at">shift =</span> <span class="st">&quot;both&quot;</span>))</span></code></pre></div>
 <pre><code>#&gt; [1] 0.08589848</code></pre>
 <p>The <code>spectrumSimilarity</code> function can also be used to calculate <em>multiple</em> similarities. Simply specify multiple feature group names for the <code>groupNameX</code> parameters. Alternatively, if you want to compare the same set of feature groups with each other pass their names only as the <code>groupName1</code> parameter:</p>
-<div class="sourceCode" id="cb105"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb105-1"><a href="specSim.html#cb105-1" tabindex="-1"></a><span class="co"># compare two pairs</span></span>
-<span id="cb105-2"><a href="specSim.html#cb105-2" tabindex="-1"></a><span class="fu">spectrumSimilarity</span>(mslists,</span>
-<span id="cb105-3"><a href="specSim.html#cb105-3" tabindex="-1"></a>                   <span class="at">groupName1 =</span> <span class="fu">c</span>(<span class="st">&quot;M120_R268_30&quot;</span>, <span class="st">&quot;M137_R249_53&quot;</span>),</span>
-<span id="cb105-4"><a href="specSim.html#cb105-4" tabindex="-1"></a>                   <span class="at">groupName2 =</span> <span class="fu">c</span>(<span class="st">&quot;M146_R309_68&quot;</span>, <span class="st">&quot;M192_R355_191&quot;</span>),</span>
-<span id="cb105-5"><a href="specSim.html#cb105-5" tabindex="-1"></a>                   <span class="at">MSLevel =</span> <span class="dv">2</span>, <span class="at">specSimParams =</span> <span class="fu">getDefSpecSimParams</span>(<span class="at">shift =</span> <span class="st">&quot;both&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb108"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb108-1"><a href="specSim.html#cb108-1" tabindex="-1"></a><span class="co"># compare two pairs</span></span>
+<span id="cb108-2"><a href="specSim.html#cb108-2" tabindex="-1"></a><span class="fu">spectrumSimilarity</span>(mslists,</span>
+<span id="cb108-3"><a href="specSim.html#cb108-3" tabindex="-1"></a>                   <span class="at">groupName1 =</span> <span class="fu">c</span>(<span class="st">&quot;M120_R268_30&quot;</span>, <span class="st">&quot;M137_R249_53&quot;</span>),</span>
+<span id="cb108-4"><a href="specSim.html#cb108-4" tabindex="-1"></a>                   <span class="at">groupName2 =</span> <span class="fu">c</span>(<span class="st">&quot;M146_R309_68&quot;</span>, <span class="st">&quot;M192_R355_191&quot;</span>),</span>
+<span id="cb108-5"><a href="specSim.html#cb108-5" tabindex="-1"></a>                   <span class="at">MSLevel =</span> <span class="dv">2</span>, <span class="at">specSimParams =</span> <span class="fu">getDefSpecSimParams</span>(<span class="at">shift =</span> <span class="st">&quot;both&quot;</span>))</span></code></pre></div>
 <pre><code>#&gt;              M146_R309_68 M192_R355_191
 #&gt; M120_R268_30     0.520052    0.08589848
 #&gt; M137_R249_53     0.197720    0.03372542</code></pre>
-<div class="sourceCode" id="cb107"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb107-1"><a href="specSim.html#cb107-1" tabindex="-1"></a><span class="co"># compare all</span></span>
-<span id="cb107-2"><a href="specSim.html#cb107-2" tabindex="-1"></a><span class="fu">spectrumSimilarity</span>(mslists, <span class="at">groupName1 =</span> <span class="fu">groupNames</span>(mslists),</span>
-<span id="cb107-3"><a href="specSim.html#cb107-3" tabindex="-1"></a>                   <span class="at">MSLevel =</span> <span class="dv">2</span>, <span class="at">specSimParams =</span> <span class="fu">getDefSpecSimParams</span>(<span class="at">shift =</span> <span class="st">&quot;both&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb110"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb110-1"><a href="specSim.html#cb110-1" tabindex="-1"></a><span class="co"># compare all</span></span>
+<span id="cb110-2"><a href="specSim.html#cb110-2" tabindex="-1"></a><span class="fu">spectrumSimilarity</span>(mslists, <span class="at">groupName1 =</span> <span class="fu">groupNames</span>(mslists),</span>
+<span id="cb110-3"><a href="specSim.html#cb110-3" tabindex="-1"></a>                   <span class="at">MSLevel =</span> <span class="dv">2</span>, <span class="at">specSimParams =</span> <span class="fu">getDefSpecSimParams</span>(<span class="at">shift =</span> <span class="st">&quot;both&quot;</span>))</span></code></pre></div>
 <pre><code>#&gt;               M120_R268_30 M137_R249_53 M146_R309_68 M192_R355_191
 #&gt; M120_R268_30    1.00000000   0.20406381   0.52005204    0.08589848
 #&gt; M137_R249_53    0.20406381   1.00000000   0.19772004    0.03372542

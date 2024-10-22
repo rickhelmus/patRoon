@@ -231,6 +231,7 @@ div.csl-indent {
 <li class="chapter" data-level="4.6.2" data-path="annotation.html"><a href="annotation.html#formulae"><i class="fa fa-check"></i><b>4.6.2</b> Formulae</a></li>
 <li class="chapter" data-level="4.6.3" data-path="annotation.html"><a href="annotation.html#compounds"><i class="fa fa-check"></i><b>4.6.3</b> Compounds</a></li>
 <li class="chapter" data-level="4.6.4" data-path="annotation.html"><a href="annotation.html#suspAnn"><i class="fa fa-check"></i><b>4.6.4</b> Suspect annotation</a></li>
+<li class="chapter" data-level="4.6.5" data-path="annotation.html"><a href="annotation.html#SIRLogin"><i class="fa fa-check"></i><b>4.6.5</b> Account login for SIRIUS</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="processing.html"><a href="processing.html"><i class="fa fa-check"></i><b>5</b> Processing workflow data</a>
@@ -366,8 +367,8 @@ div.csl-indent {
 <div id="annotation" class="section level2 hasAnchor" number="4.6">
 <h2><span class="header-section-number">4.6</span> Annotation<a href="annotation.html#annotation" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The annotation consists of collecting MS peak lists and then formula and/or compound annotation:</p>
-<div id="htmlwidget-f6794a489b0d35dfb892" style="width:500px;height:120px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-f6794a489b0d35dfb892">{"x":{"diagram":"\ndigraph Annotation {\n  graph [ rankdir = LR ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.3,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"MS peak lists\" -> \"Formula annotation\"\n    \"MS peak lists\" -> \"Compound annotation\"\n    \"Formula annotation\":n -> \"Suspect annotation\":n [style = dotted]\n    \"Compound annotation\":s -> \"Suspect annotation\":s [style = dotted]\n    \"Formula annotation\":e -> \"Compound annotation\":e [style = dotted, constraint = false]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-5797f35fa0b0c4f8a24a" style="width:500px;height:120px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-5797f35fa0b0c4f8a24a">{"x":{"diagram":"\ndigraph Annotation {\n  graph [ rankdir = LR ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.3,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"MS peak lists\" -> \"Formula annotation\"\n    \"MS peak lists\" -> \"Compound annotation\"\n    \"Formula annotation\":n -> \"Suspect annotation\":n [style = dotted]\n    \"Compound annotation\":s -> \"Suspect annotation\":s [style = dotted]\n    \"Formula annotation\":e -> \"Compound annotation\":e [style = dotted, constraint = false]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p>Note that compound annotation is normally not dependent upon formula annotation. However, formula data can be used to improve ranking of candidates afterwards by the <code>addFormulaScoring()</code> function, which will be discussed later in this section. Furthermore, suspect annotation is not mandatory, and may use data from peak lists, formulae and/or comounds.</p>
 <div id="ms-peak-lists" class="section level3 hasAnchor" number="4.6.1">
 <h3><span class="header-section-number">4.6.1</span> MS peak lists<a href="annotation.html#ms-peak-lists" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -1753,6 +1754,40 @@ TRUE
 <blockquote>
 <p><strong><em>NOTE</em></strong>: The current identification level rules are <em>only</em> optimized for GenForm and MetFrag annotation algorithms.</p>
 </blockquote>
+</div>
+<div id="SIRLogin" class="section level3 hasAnchor" number="4.6.5">
+<h3><span class="header-section-number">4.6.5</span> Account login for SIRIUS<a href="annotation.html#SIRLogin" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Recent version of <a href="https://bio.informatik.uni-jena.de/software/sirius/">SIRIUS</a> require an active account login to make queries to <a href="https://www.csi-fingerid.uni-jena.de/">CSI:FingerID</a>. This is primarily relevant when performing a compound annotation workflow with <code>SIRIUS</code> or a formula annotation workflow with <code>getFingerprints=TRUE</code>, e.g. <a href="pred.html#pred">when predicting toxicities or concentrations</a>.</p>
+<p>As a first step, please create an account as described in the SIRIUS documentation: <a href="https://v6.docs.sirius-ms.io/account-and-license/" class="uri">https://v6.docs.sirius-ms.io/account-and-license/</a>.</p>
+<p>Then, to login there are two options:</p>
+<ol style="list-style-type: decimal">
+<li>Manually login: either by using the SIRIUS GUI or the CLI. For the latter, see e.g. <code>sirius.exe login --help</code> for more details.</li>
+<li>Let <code>patRoon</code> automatically handle logins.</li>
+</ol>
+<p>The <code>login</code> parameter for <code>generateCompounds()</code> and <code>generateFormulas()</code> determines how logins are dealt with by <code>patRoon</code>. There are four options:</p>
+<ol style="list-style-type: decimal">
+<li><code>login=FALSE</code>: <em>no</em> logins are performed and <em>no</em> checks are performed to verify if there is an existing login.</li>
+<li><code>login="check"</code>: <em>no</em> logins are performed, but an active login is required to proceed.</li>
+<li><code>login="interactive"</code>: if no active login is present, then the username and password will be asked interactively and used to automatically login.</li>
+<li><code>login=c(username="...", password="...")</code>: if no active login is present, then the provided username and password will be used to automatically login.</li>
+</ol>
+<blockquote>
+<p><strong><em>NOTE</em></strong>: For the fourth option, please don’t provide the login details directly as plain-text for security reasons. See below for proper alternatives.</p>
+</blockquote>
+<p>The first two options are primarily meant for manual login. The function parameter <code>alwaysLogin=TRUE</code> can be set to force a login for the third and fourth options.</p>
+<p>The fourth option is primarily useful for e.g. heavy users of SIRIUS or unattended automatic workflows. To securely provide the login details, it is best to store them elsewhere. <a href="https://solutions.posit.co/connections/db/best-practices/managing-credentials/">This webpage</a> provides a detailed overview of how credentials can be safely stored. For instance, you can save the credentials in your <code>.Renviron</code> file and retreieve them when calling <code>generateCompounds()</code>:</p>
+<p>In your <code>.Renviron</code> file add:</p>
+<div class="sourceCode" id="cb46"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb46-1"><a href="annotation.html#cb46-1" tabindex="-1"></a><span class="va">SIRIUS_USERNAME</span><span class="op">=</span>MY_USERNAME</span>
+<span id="cb46-2"><a href="annotation.html#cb46-2" tabindex="-1"></a><span class="va">SIRIUS_PASSWORD</span><span class="op">=</span>MY_PASSWORD</span></code></pre></div>
+<p>and then in your <code>R</code> script:</p>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="annotation.html#cb47-1" tabindex="-1"></a>compounds <span class="ot">&lt;-</span> <span class="fu">generateCompounds</span>(..., <span class="at">login =</span> <span class="fu">c</span>(<span class="at">username =</span> <span class="fu">Sys.getenv</span>(<span class="st">&quot;SIRIUS_USERNAME&quot;</span>),</span>
+<span id="cb47-2"><a href="annotation.html#cb47-2" tabindex="-1"></a>                                              <span class="at">password =</span> <span class="fu">Sys.getenv</span>(<span class="st">&quot;SIRIUS_PASSWORD&quot;</span>)))</span></code></pre></div>
+<p>Alternatively, you could use the <a href="https://keyring.r-lib.org/">keyring</a> package, e.g.</p>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="annotation.html#cb48-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;keyring&quot;</span>) <span class="co"># execute in case you don&#39;t have keyring installed yet</span></span>
+<span id="cb48-2"><a href="annotation.html#cb48-2" tabindex="-1"></a>keyring<span class="sc">::</span><span class="fu">key_set</span>(<span class="st">&quot;SIRIUS&quot;</span>, <span class="at">username =</span> <span class="st">&quot;myaccount@email.com&quot;</span>) <span class="co"># execute this once to store the password</span></span>
+<span id="cb48-3"><a href="annotation.html#cb48-3" tabindex="-1"></a></span>
+<span id="cb48-4"><a href="annotation.html#cb48-4" tabindex="-1"></a>compounds <span class="ot">&lt;-</span> <span class="fu">generateCompounds</span>(..., <span class="at">login =</span> <span class="fu">c</span>(<span class="at">username =</span> <span class="st">&quot;myaccount@email.com&quot;</span>,</span>
+<span id="cb48-5"><a href="annotation.html#cb48-5" tabindex="-1"></a>                                              <span class="at">password =</span> keyring<span class="sc">::</span><span class="fu">key_get</span>(<span class="st">&quot;SIRIUS&quot;</span>, <span class="st">&quot;myaccount@email.com&quot;</span>)))<span class="er">)</span></span></code></pre></div>
 
 </div>
 </div>

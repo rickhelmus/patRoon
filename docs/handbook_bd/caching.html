@@ -231,6 +231,7 @@ div.csl-indent {
 <li class="chapter" data-level="4.6.2" data-path="annotation.html"><a href="annotation.html#formulae"><i class="fa fa-check"></i><b>4.6.2</b> Formulae</a></li>
 <li class="chapter" data-level="4.6.3" data-path="annotation.html"><a href="annotation.html#compounds"><i class="fa fa-check"></i><b>4.6.3</b> Compounds</a></li>
 <li class="chapter" data-level="4.6.4" data-path="annotation.html"><a href="annotation.html#suspAnn"><i class="fa fa-check"></i><b>4.6.4</b> Suspect annotation</a></li>
+<li class="chapter" data-level="4.6.5" data-path="annotation.html"><a href="annotation.html#SIRLogin"><i class="fa fa-check"></i><b>4.6.5</b> Account login for SIRIUS</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="processing.html"><a href="processing.html"><i class="fa fa-check"></i><b>5</b> Processing workflow data</a>
@@ -367,11 +368,11 @@ div.csl-indent {
 <h2><span class="header-section-number">8.12</span> Caching<a href="caching.html#caching" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>In <code>patRoon</code> lengthy processing operations such as finding features and generating annotation data is <em>cached</em>. This means that when you run such a calculation again (without changing any parameters), the data is simply loaded from the cache data instead of re-generating it. This in turn is very useful, for instance, if you have closed your R session and want to continue with data processing at a later stage.</p>
 <p>The cache data is stored in a <a href="https://www.sqlite.org/index.html">sqlite</a> database file. This file is stored by default under the name <code>cache.sqlite</code> in the current working directory (for this reason it is very important to always restore your working directory!). However, the name and location can be changed by setting a global package option:</p>
-<div class="sourceCode" id="cb308"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb308-1"><a href="caching.html#cb308-1" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.cache.fileName =</span> <span class="st">&quot;~/myCacheFile.sqlite&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb311"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb311-1"><a href="caching.html#cb311-1" tabindex="-1"></a><span class="fu">options</span>(<span class="at">patRoon.cache.fileName =</span> <span class="st">&quot;~/myCacheFile.sqlite&quot;</span>)</span></code></pre></div>
 <p>For instance, this might be useful if you want to use a shared cache file between projects.</p>
 <p>After a while you may see that your cache file can get quite large. This is especially true when testing different parameters to optimize your workflow. Furthermore, you may want to clear the cache after you have updated <code>patRoon</code> and want to make sure that the latest code is used to generate the data. At any point you can simply remove the cache file. A more fine tuned approach which doesn’t wipe all your cached data is by using the <code>clearCache()</code> function. With this function you can selectively remove parts of the cache file. The function has two arguments: <code>what</code>, which specifies what should be removed, and <code>file</code> which specifies the path to the cache file. The latter only needs to be specified if you want to manage a different cache file.</p>
 <p>In order to figure what is in the cache you can run <code>clearCache()</code> without any arguments:</p>
-<div class="sourceCode" id="cb309"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb309-1"><a href="caching.html#cb309-1" tabindex="-1"></a><span class="fu">clearCache</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb312"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb312-1"><a href="caching.html#cb312-1" tabindex="-1"></a><span class="fu">clearCache</span>()</span></code></pre></div>
 <pre><code>#&gt; Please specify which cache you want to remove. Available are:
 #&gt; - EICData (3 rows)
 #&gt; - LC50_SMILES (23 rows)
@@ -414,10 +415,10 @@ div.csl-indent {
 #&gt; - specData (12 rows)
 #&gt; - all (removes complete cache database)</code></pre>
 <p>Using this output you can re-run the function again, for instance:</p>
-<div class="sourceCode" id="cb311"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb311-1"><a href="caching.html#cb311-1" tabindex="-1"></a><span class="fu">clearCache</span>(<span class="st">&quot;featuresOpenMS&quot;</span>)</span>
-<span id="cb311-2"><a href="caching.html#cb311-2" tabindex="-1"></a><span class="fu">clearCache</span>(<span class="fu">c</span>(<span class="st">&quot;featureGroupsOpenMS&quot;</span>, <span class="st">&quot;formulasGenForm&quot;</span>)) <span class="co"># clear multiple</span></span>
-<span id="cb311-3"><a href="caching.html#cb311-3" tabindex="-1"></a><span class="fu">clearCache</span>(<span class="st">&quot;OpenMS&quot;</span>) <span class="co"># clear all with OpenMS in name (ie partial matched)</span></span>
-<span id="cb311-4"><a href="caching.html#cb311-4" tabindex="-1"></a><span class="fu">clearCache</span>(<span class="st">&quot;all&quot;</span>) <span class="co"># same as simply removing the file</span></span></code></pre></div>
+<div class="sourceCode" id="cb314"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb314-1"><a href="caching.html#cb314-1" tabindex="-1"></a><span class="fu">clearCache</span>(<span class="st">&quot;featuresOpenMS&quot;</span>)</span>
+<span id="cb314-2"><a href="caching.html#cb314-2" tabindex="-1"></a><span class="fu">clearCache</span>(<span class="fu">c</span>(<span class="st">&quot;featureGroupsOpenMS&quot;</span>, <span class="st">&quot;formulasGenForm&quot;</span>)) <span class="co"># clear multiple</span></span>
+<span id="cb314-3"><a href="caching.html#cb314-3" tabindex="-1"></a><span class="fu">clearCache</span>(<span class="st">&quot;OpenMS&quot;</span>) <span class="co"># clear all with OpenMS in name (ie partial matched)</span></span>
+<span id="cb314-4"><a href="caching.html#cb314-4" tabindex="-1"></a><span class="fu">clearCache</span>(<span class="st">&quot;all&quot;</span>) <span class="co"># same as simply removing the file</span></span></code></pre></div>
 </div>
             </section>
 

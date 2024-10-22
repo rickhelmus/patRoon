@@ -114,7 +114,8 @@ CSI:FingerID for compound annotation."><!-- mathjax --><script src="https://cdnj
 <span>  cores <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  topMost <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>  topMostFormulas <span class="op">=</span> <span class="fl">5</span>,</span>
-<span>  token <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  login <span class="op">=</span> <span class="st">"check"</span>,</span>
+<span>  alwaysLogin <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  extraOptsGeneral <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  extraOptsFormula <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -220,12 +221,17 @@ large numbers of candidates.</p></dd>
 formulae will be searched. Sets the <span class="option">--candidates</span> commandline option.</p></dd>
 
 
-<dt id="arg-token">token<a class="anchor" aria-label="anchor" href="#arg-token"></a></dt>
-<dd><p>A <code>character</code> string with the refresh token to be used for logging in with <code class="command">SIRIUS</code> (from
-version <samp>5</samp> only). The token can be obtained with the <code><a href="getSIRIUSToken.html">getSIRIUSToken</a></code> function, or by running
-<code class="command">SIRIUS</code> directly (<em>e.g.</em> with the <code class="command">login</code> command). See the
-<a href="https://boecker-lab.github.io/docs.sirius.github.io/account-and-license/" class="external-link">SIRIUS website</a> for more
-information. If <code>NULL</code> then the log in is skipped.</p></dd>
+<dt id="arg-login-alwayslogin">login, alwaysLogin<a class="anchor" aria-label="anchor" href="#arg-login-alwayslogin"></a></dt>
+<dd><p>Specifies if and how account logging of SIRIUS should be handled:</p>
+<p><code>login=FALSE</code>: no automatic login is performed and the active login status is not checked.</p>
+<p><code>login="check"</code>: aborts if no active login is present.</p>
+<p><code>login="interactive"</code>: interactively ask for login (using <a href="https://CRAN.R-project.org/package=getPass" class="external-link"><span class="pkg">getPass</span></a>).</p>
+<p><code>login=c(username="...", password="...")</code>: perform the login with the given details. For security reasons,
+  please do not enter the details directly, but use e.g. environment variables or store/retrieve them with the
+  <a href="https://CRAN.R-project.org/package=keyring" class="external-link"><span class="pkg">keyring</span></a> package.</p>
+<p>if <code>alwaysLogin=TRUE</code> then a login is always performed, otherwise only if SIRIUS reports no active login.</p>
+<p>See the <a href="https://boecker-lab.github.io/docs.sirius.github.io/account-and-license/" class="external-link">SIRIUS website</a> and
+  <span class="pkg">patRoon</span> handbook for more information.</p></dd>
 
 
 <dt id="arg-extraoptsgeneral-extraoptsformula">extraOptsGeneral, extraOptsFormula<a class="anchor" aria-label="anchor" href="#arg-extraoptsgeneral-extraoptsformula"></a></dt>

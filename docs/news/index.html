@@ -191,7 +191,7 @@
 <li>Fixed: <code><a href="../reference/generics.html">annotatedPeakList()</a></code>/<code><a href="../reference/generics.html">plotSpectrum()</a></code> methods for <code>compounds</code> didn’t label mass peaks with compounds algorithm if <code>formulas</code> were provided but no formula candidate was present.</li>
 <li>Fixed: in some specific conditions the plot() would throw an error (“cannot coerce type ‘S4’ to vector of type ‘double’”)</li>
 <li>Fixed: <code><a href="../reference/generateFormulas.html">generateFormulas()</a></code> generic definition had wrong argument order</li>
-<li>Fixed: <code><a href="../reference/getSIRIUSToken.html">getSIRIUSToken()</a></code> resulted in errors if the password input was cancelled.</li>
+<li>Fixed: <code>getSIRIUSToken()</code> resulted in errors if the password input was cancelled.</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -218,7 +218,7 @@
 </div>
 <div class="section level4">
 <h4 id="usage-of-sirius-version-2-2">Usage of SIRIUS version 5<a class="anchor" aria-label="anchor" href="#usage-of-sirius-version-2-2"></a></h4>
-<p>Active logins are now necessary to use webservices such as CSI:FingerID, see e.g. <a href="https://boecker-lab.github.io/docs.sirius.github.io/account-and-license/" class="external-link uri">https://boecker-lab.github.io/docs.sirius.github.io/account-and-license/</a> This release of <code>patRoon</code> adds support to make logging in more easy and adds several compatibility fixes for the latest <code>SIRIUS</code> version. The new utility function <code><a href="../reference/getSIRIUSToken.html">getSIRIUSToken()</a></code> can be used to obtain a necessary login token. The new <code>token</code> argument for <code><a href="../reference/generateCompoundsSIRIUS.html">generateCompoundsSIRIUS()</a></code> can be used to automatically log in. The <code>newPorject()</code> function was extended to use this new functionality.</p>
+<p>Active logins are now necessary to use webservices such as CSI:FingerID, see e.g. <a href="https://boecker-lab.github.io/docs.sirius.github.io/account-and-license/" class="external-link uri">https://boecker-lab.github.io/docs.sirius.github.io/account-and-license/</a> This release of <code>patRoon</code> adds support to make logging in more easy and adds several compatibility fixes for the latest <code>SIRIUS</code> version. The new utility function <code>getSIRIUSToken()</code> can be used to obtain a necessary login token. The new <code>token</code> argument for <code><a href="../reference/generateCompoundsSIRIUS.html">generateCompoundsSIRIUS()</a></code> can be used to automatically log in. The <code>newPorject()</code> function was extended to use this new functionality.</p>
 </div>
 <div class="section level4">
 <h4 id="docker-images-moved-2-2">Docker images moved<a class="anchor" aria-label="anchor" href="#docker-images-moved-2-2"></a></h4>

@@ -231,6 +231,7 @@ div.csl-indent {
 <li class="chapter" data-level="4.6.2" data-path="annotation.html"><a href="annotation.html#formulae"><i class="fa fa-check"></i><b>4.6.2</b> Formulae</a></li>
 <li class="chapter" data-level="4.6.3" data-path="annotation.html"><a href="annotation.html#compounds"><i class="fa fa-check"></i><b>4.6.3</b> Compounds</a></li>
 <li class="chapter" data-level="4.6.4" data-path="annotation.html"><a href="annotation.html#suspAnn"><i class="fa fa-check"></i><b>4.6.4</b> Suspect annotation</a></li>
+<li class="chapter" data-level="4.6.5" data-path="annotation.html"><a href="annotation.html#SIRLogin"><i class="fa fa-check"></i><b>4.6.5</b> Account login for SIRIUS</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="processing.html"><a href="processing.html"><i class="fa fa-check"></i><b>5</b> Processing workflow data</a>
@@ -367,8 +368,8 @@ div.csl-indent {
 <h2><span class="header-section-number">8.8</span> Compound clustering<a href="compclust.html#compclust" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>When large databases such as <a href="https://pubchem.ncbi.nlm.nih.gov/">PubChem</a> or <a href="http://www.chemspider.com/">ChemSpider</a> are used for compound annotation, it is common to find <em>many</em> candidate structures for even a single feature. While choosing the right scoring settings can significantly improve their ranking, it is still very much possible that many candidates of potential interest remain. In this situation it might help to perform <em>compound clustering</em>. During this process, all candidates for a feature are clustered hierarchically on basis of similar chemical structure. From the resulting cluster the <em>maximum common substructure</em> (MCS) can be derived, which represents the largest possible substructure that ‘fit’ in all candidates. By visual inspection of the MCS it may be possible to identify likely common structural properties of a feature.</p>
 <p>In order to perform compound clustering the <code>makeHCluster()</code> generic function should be used. This function heavily relies on chemical fingerprinting functionality provided by <a href="https://github.com/CDK-R/cdkr">rcdk</a>.</p>
-<div class="sourceCode" id="cb270"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb270-1"><a href="compclust.html#cb270-1" tabindex="-1"></a>compounds <span class="ot">&lt;-</span> <span class="fu">generateCompounds</span>(...) <span class="co"># get our compounds</span></span>
-<span id="cb270-2"><a href="compclust.html#cb270-2" tabindex="-1"></a>compsClust <span class="ot">&lt;-</span> <span class="fu">makeHCluster</span>(compounds)</span></code></pre></div>
+<div class="sourceCode" id="cb273"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb273-1"><a href="compclust.html#cb273-1" tabindex="-1"></a>compounds <span class="ot">&lt;-</span> <span class="fu">generateCompounds</span>(...) <span class="co"># get our compounds</span></span>
+<span id="cb273-2"><a href="compclust.html#cb273-2" tabindex="-1"></a>compsClust <span class="ot">&lt;-</span> <span class="fu">makeHCluster</span>(compounds)</span></code></pre></div>
 <p>This function accepts several arguments to fine tune the clustering process:</p>
 <ul>
 <li><code>method</code>: the clustering method (e.g. <code>"complete"</code> (default), <code>"ward.D2"</code>), see <code>?hclust</code> for options</li>
@@ -377,16 +378,16 @@ div.csl-indent {
 </ul>
 <p>For all arguments see the reference manual (<code>?makeHClust</code>).</p>
 <p>The resulting object is of type <code>compoundsCluster</code>. Several methods are defined to modify and inspect these results:</p>
-<div class="sourceCode" id="cb271"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb271-1"><a href="compclust.html#cb271-1" tabindex="-1"></a><span class="co"># plot MCS of first cluster from candidates of M192_R355_191</span></span>
-<span id="cb271-2"><a href="compclust.html#cb271-2" tabindex="-1"></a><span class="fu">plotStructure</span>(compsClust, <span class="at">groupName =</span> <span class="st">&quot;M192_R355_191&quot;</span>, <span class="dv">1</span>)</span>
-<span id="cb271-3"><a href="compclust.html#cb271-3" tabindex="-1"></a></span>
-<span id="cb271-4"><a href="compclust.html#cb271-4" tabindex="-1"></a><span class="co"># plot dendrogram</span></span>
-<span id="cb271-5"><a href="compclust.html#cb271-5" tabindex="-1"></a><span class="fu">plot</span>(compsClust, <span class="at">groupName =</span> <span class="st">&quot;M192_R355_191&quot;</span>)</span>
-<span id="cb271-6"><a href="compclust.html#cb271-6" tabindex="-1"></a></span>
-<span id="cb271-7"><a href="compclust.html#cb271-7" tabindex="-1"></a><span class="co"># re-assign clusters for a feature group</span></span>
-<span id="cb271-8"><a href="compclust.html#cb271-8" tabindex="-1"></a>compsClust <span class="ot">&lt;-</span> <span class="fu">treeCut</span>(compsClust, <span class="at">k =</span> <span class="dv">5</span>, <span class="at">groupName =</span> <span class="st">&quot;M192_R355_191&quot;</span>)</span>
-<span id="cb271-9"><a href="compclust.html#cb271-9" tabindex="-1"></a><span class="co"># ditto, but automatic cluster determination</span></span>
-<span id="cb271-10"><a href="compclust.html#cb271-10" tabindex="-1"></a>compsClust <span class="ot">&lt;-</span> <span class="fu">treeCutDynamic</span>(compsClust, <span class="at">minModuleSize =</span> <span class="dv">3</span>, <span class="at">groupName =</span> <span class="st">&quot;M192_R355_191&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb274"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb274-1"><a href="compclust.html#cb274-1" tabindex="-1"></a><span class="co"># plot MCS of first cluster from candidates of M192_R355_191</span></span>
+<span id="cb274-2"><a href="compclust.html#cb274-2" tabindex="-1"></a><span class="fu">plotStructure</span>(compsClust, <span class="at">groupName =</span> <span class="st">&quot;M192_R355_191&quot;</span>, <span class="dv">1</span>)</span>
+<span id="cb274-3"><a href="compclust.html#cb274-3" tabindex="-1"></a></span>
+<span id="cb274-4"><a href="compclust.html#cb274-4" tabindex="-1"></a><span class="co"># plot dendrogram</span></span>
+<span id="cb274-5"><a href="compclust.html#cb274-5" tabindex="-1"></a><span class="fu">plot</span>(compsClust, <span class="at">groupName =</span> <span class="st">&quot;M192_R355_191&quot;</span>)</span>
+<span id="cb274-6"><a href="compclust.html#cb274-6" tabindex="-1"></a></span>
+<span id="cb274-7"><a href="compclust.html#cb274-7" tabindex="-1"></a><span class="co"># re-assign clusters for a feature group</span></span>
+<span id="cb274-8"><a href="compclust.html#cb274-8" tabindex="-1"></a>compsClust <span class="ot">&lt;-</span> <span class="fu">treeCut</span>(compsClust, <span class="at">k =</span> <span class="dv">5</span>, <span class="at">groupName =</span> <span class="st">&quot;M192_R355_191&quot;</span>)</span>
+<span id="cb274-9"><a href="compclust.html#cb274-9" tabindex="-1"></a><span class="co"># ditto, but automatic cluster determination</span></span>
+<span id="cb274-10"><a href="compclust.html#cb274-10" tabindex="-1"></a>compsClust <span class="ot">&lt;-</span> <span class="fu">treeCutDynamic</span>(compsClust, <span class="at">minModuleSize =</span> <span class="dv">3</span>, <span class="at">groupName =</span> <span class="st">&quot;M192_R355_191&quot;</span>)</span></code></pre></div>
 <p>For a complete overview see the reference manual (<code>?compoundsCluster</code>).</p>
 </div>
             </section>

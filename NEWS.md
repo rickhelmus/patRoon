@@ -1,5 +1,6 @@
 # DEVEL
 
+* **IMPORTANT** The SIRIUS login workflow was changed as it was using an incorrect procedure. Please see the updated Handbook section: https://rickhelmus.github.io/patRoon/handbook_bd/annotation.html#SIRLogin. Note that SIRIUS 6 is _not_ yet supported.
 * Fixed: The `removeTPIsomers` filter for `transformationProductsStructure` didn't actually apply the `removeDuplicates` filter.
 * Fixed: if `updateScores=TRUE` for the methods `addFormulaScoring()`, `predictRespFactors()` and `predictTox()` then `NaN` scores could be introduced if the `formulaScore` is zero.
 * Fixed: if `updateScores=TRUE` for the method `addFormulaScoring()` then the `score` would be updated twice.

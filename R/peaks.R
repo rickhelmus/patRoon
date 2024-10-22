@@ -1,16 +1,16 @@
 #' @include main.R
 NULL
 
-findPeaks <- function(EICs, algorithm, ..., verbose = TRUE)
+findPeaks <- function(EICs, params, verbose = TRUE)
 {
     # UNDONE: export? If yes, add checkmate's
     
-    f <- switch(algorithm,
+    f <- switch(params$algorithm,
                 openms = findPeaksOpenMS,
                 xcms3 = findPeaksXCMS3,
                 envipick = findPeaksEnviPick,
                 dietrich = findPeaksDietrich)
-    f(EICs, ..., verbose = verbose)
+    f(EICs, params[setdiff(names(params), "algorithm")], verbose = verbose)
 }
 
 findPeaksOpenMSOld <- function(EICs, minRTDistance = 10, minNumPeaks = 5, minSNRatio = 2, resampleTraces = FALSE,
@@ -102,7 +102,7 @@ findPeaksOpenMSOld <- function(EICs, minRTDistance = 10, minNumPeaks = 5, minSNR
     return(peaksList)
 }
 
-findPeaksOpenMS <- function(EICs, extraOpts = NULL, scaleTimeFactor = NULL, verbose = TRUE)
+findPeaksOpenMS <- function(EICs, params, scaleTimeFactor = NULL, verbose = TRUE)
 {
     # UNDONE: more parameters, check what are sensible defaults
     
@@ -110,7 +110,7 @@ findPeaksOpenMS <- function(EICs, extraOpts = NULL, scaleTimeFactor = NULL, verb
     
     # HACK HACK HACK: OpenMS errors if the time range is very small. For instance, this is a problem if IMS data is used
     # with findMobilities() --> just increase the scale by scaleTimeFactor for now.
-    # UNDONE: do we still need this?
+    # UNDONE: do we still need this? If so, move to params
     if (!is.null(scaleTimeFactor))
     {
         EICs <- lapply(EICs, function(eic) { eic$time <- eic$time * scaleTimeFactor; return(eic) })
@@ -121,6 +121,7 @@ findPeaksOpenMS <- function(EICs, extraOpts = NULL, scaleTimeFactor = NULL, verb
     featsFile <- tempfile(fileext = ".featureXML")
     
     maybePrintf <- if (verbose) printf else function(...) NULL
+    boolToChr <- function(b) if (b) "true" else "false"
     
     maybePrintf("Exporting EICs... ")
     writeTraML(names(EICs), TraMLFile)
@@ -130,9 +131,23 @@ findPeaksOpenMS <- function(EICs, extraOpts = NULL, scaleTimeFactor = NULL, verb
     maybePrintf("Finding peaks with OpenMS...\n-----------\n")
     settings <- c("-in" = chromFile,
                   "-tr" = TraMLFile,
-                  "-out" = featsFile)
-    if (!is.null(extraOpts))
-        settings <- modifyList(settings, extraOpts)
+                  "-out" = featsFile,
+                  "-algorithm:min_peak_width" = params$minPeakWidth,
+                  "-algorithm:background_subtraction" = params$backgroundSubtraction,
+                  #"-algorithm:compute_peak_shape_metrics" = boolToChr(TRUE), UNDONE: this gives an error with OpenMS 2.7 --> maybe fixed with newer versions?
+                  "-algorithm:PeakPickerMRM:sgolay_frame_length" = params$SGolayFrameLength,
+                  "-algorithm:PeakPickerMRM:sgolay_polynomial_order" = params$SGolayPolyOrder,
+                  "-algorithm:PeakPickerMRM:use_gauss" = boolToChr(params$useGauss),
+                  "-algorithm:PeakPickerMRM:signal_to_noise" = params$SN,
+                  "-algorithm:PeakPickerMRM:sn_win_len" = params$SNWinLen,
+                  "-algorithm:PeakPickerMRM:sn_bin_count" = params$SNBinCount,
+                  "-algorithm:PeakPickerMRM:method" = params$method,
+                  "-algorithm:PeakIntegrator:integration_type" = params$integrationType,
+                  "-algorithm:PeakIntegrator:baseline_type" = params$baselineType,
+                  "-algorithm:PeakIntegrator:fit_EMG" = boolToChr(params$fitEMG))
+
+    if (!is.null(params[["extraOpts"]]) && length(params$extraOpst) > 0)
+        settings <- modifyList(settings, params$extraOpts)
     executeCommand(getExtDepPath("openms", "MRMTransitionGroupPicker", "OpenMS"), OpenMSArgListToOpts(settings),
                    stdout = if (verbose) "" else FALSE)
     maybePrintf("\n-----------\n")
@@ -158,11 +173,11 @@ findPeaksOpenMS <- function(EICs, extraOpts = NULL, scaleTimeFactor = NULL, verb
     return(peaksList)
 }
 
-findPeaksXCMS3 <- function(EICs, ..., verbose = TRUE)
+findPeaksXCMS3 <- function(EICs, params, verbose = TRUE)
 {
     ret <- sapply(EICs, function(eic)
     {
-        p <- as.data.table(xcms::peaksWithCentWave(eic$intensity, eic$time, ...))
+        p <- as.data.table(do.call(xcms::peaksWithCentWave, c(list(eic$intensity, eic$time), params)))
         cols <- c("ret", "retmin", "retmax", "area", "intensity")
         setnames(p, c("rt", "rtmin", "rtmax", "into", "maxo"), cols)
         setcolorder(p, cols)
@@ -171,7 +186,7 @@ findPeaksXCMS3 <- function(EICs, ..., verbose = TRUE)
     ret <- pruneList(ret, checkZeroRows = TRUE)
 }
 
-findPeaksEnviPick <- function(EICs, ..., verbose = TRUE)
+findPeaksEnviPick <- function(EICs, params, verbose = TRUE)
 {
     checkPackage("enviPick", "blosloos/enviPick")
     
@@ -201,7 +216,7 @@ findPeaksEnviPick <- function(EICs, ..., verbose = TRUE)
         dummyPL$Scans[[2]] <- as.matrix(sc)
         dummyPL$EIC_index <- as.matrix(data.table(start_ID = 1, end_ID = nrow(eic), number_peaks = nrow(eic)))
         
-        p <- enviPick::mzpick(dummyPL, ...)$Peaklist
+        p <- do.call(enviPick::mzpick, c(list(dummyPL), params))$Peaklist
         if (isTRUE(all.equal(p, 0))) # no results
             return(data.table(ret = numeric(), retmin = numeric(), retmax = numeric(), area = numeric(),
                               intensity = numeric()))
@@ -214,10 +229,15 @@ findPeaksEnviPick <- function(EICs, ..., verbose = TRUE)
     return(ret)
 }
 
-findPeaksDietrich <- function(EICs, ...)
+findPeaksDietrich <- function(EICs, params, verbose = TRUE)
 {
     setOMPThreads()
-    peaks <- setNames(doFindPeaksDietrich(EICs, ...), names(EICs))
+    peaks <- doFindPeaksDietrich(EICs, minIntensity = params$minIntensity, SN = params$SN,
+                                 peakWidthMin = params$peakWidth[1], peakWidthMax = params$peakWidth[2],
+                                 RTMin = params$RTRange[1],
+                                 RTMax = if (!is.finite(params$RTRange[2])) 0 else params$RTRange[2],
+                                 maxPeaksPerSignal = params$maxPeaksPerSignal, verbose = verbose)
+    names(peaks) <- names(EICs)
     peaks <- lapply(peaks, setDT)
     peaks <- pruneList(peaks, checkZeroRows = TRUE)
     return(peaks)

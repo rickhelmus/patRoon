@@ -550,7 +550,7 @@ d. Compound annotations obtained with other algorithms, e.g. `MetFrag`.
 
 For _a_ and _d_ SMILES is used to perform the calculations, for _b_ MS/MS fingerprints are used and for _c_ either can be used.
 
-> **_NOTE_** For option _b_, make sure that `getFingerprints=TRUE` when running `generateFormulas()` in order to obtain fingerprints.
+> **_NOTE_** For option _b_, make sure that `getFingerprints=TRUE` and [SIRIUS logins are handled](#SIRLogin) when running `generateFormulas()` in order to obtain fingerprints.
 
 ### Predicting toxicities
 

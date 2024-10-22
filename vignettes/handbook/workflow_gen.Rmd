@@ -906,3 +906,51 @@ In general, the more data provided by the suspect list and to `annotateSuspects(
 The `annotateSuspects()` function will log decisions for identification level assignments to the `log/` sub-directory in the current working directory. This is useful to inspect level assignments and especially useful when you customized any rules.
 
 > **_NOTE_**: The current identification level rules are _only_ optimized for GenForm and MetFrag annotation algorithms.
+
+### Account login for SIRIUS {#SIRLogin}
+
+Recent version of [SIRIUS] require an active account login to make queries to [CSI:FingerID]. This is primarily relevant when performing a compound annotation workflow with `SIRIUS` or a formula annotation workflow with `getFingerprints=TRUE`, e.g. [when predicting toxicities or concentrations](#pred).
+
+As a first step, please create an account as described in the SIRIUS documentation: https://v6.docs.sirius-ms.io/account-and-license/.
+
+Then, to login there are two options:
+
+1. Manually login: either by using the SIRIUS GUI or the CLI. For the latter, see e.g. `sirius.exe login --help` for more details.
+2. Let `patRoon` automatically handle logins.
+
+The `login` parameter for `generateCompounds()` and `generateFormulas()` determines how logins are dealt with by `patRoon`. There are four options:
+
+1. `login=FALSE`: _no_ logins are performed and _no_ checks are performed to verify if there is an existing login.
+2. `login="check"`: _no_ logins are performed, but an active login is required to proceed.
+3. `login="interactive"`: if no active login is present, then the username and password will be asked interactively and used to automatically login.
+4. `login=c(username="...", password="...")`: if no active login is present, then the provided username and password will be used to automatically login.
+
+> **_NOTE_**: For the fourth option, please don't provide the login details directly as plain-text for security reasons. See below for proper  alternatives.
+
+The first two options are primarily meant for manual login. The function parameter `alwaysLogin=TRUE` can be set to force a login for the third and fourth options.
+
+The fourth option is primarily useful for e.g. heavy users of SIRIUS or unattended automatic workflows. To securely provide the login details, it is best to store them elsewhere. [This webpage](https://solutions.posit.co/connections/db/best-practices/managing-credentials/) provides a detailed overview of how credentials can be safely stored. For instance, you can save the credentials in your `.Renviron` file and retreieve them when calling `generateCompounds()`:
+
+In your `.Renviron` file add:
+
+```{sh,eval=FALSE}
+SIRIUS_USERNAME=MY_USERNAME
+SIRIUS_PASSWORD=MY_PASSWORD
+```
+
+and then in your `R` script:
+
+```{R, eval=FALSE}
+compounds <- generateCompounds(..., login = c(username = Sys.getenv("SIRIUS_USERNAME"),
+                                              password = Sys.getenv("SIRIUS_PASSWORD")))
+```
+
+Alternatively, you could use the [keyring](https://keyring.r-lib.org/) package, e.g.
+
+```{R,eval=FALSE}
+install.packages("keyring") # execute in case you don't have keyring installed yet
+keyring::key_set("SIRIUS", username = "myaccount@email.com") # execute this once to store the password
+
+compounds <- generateCompounds(..., login = c(username = "myaccount@email.com",
+                                              password = keyring::key_get("SIRIUS", "myaccount@email.com"))))
+```

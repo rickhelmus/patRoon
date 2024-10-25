@@ -16,6 +16,7 @@ namespace {
  * Convert vector args to const refs
  * Removed unnecessary RcppArmadillo dependencies
  * Converted RT min/max args from scans to times and disable check if its zero
+ * Disabled noise removal for reported intensities/areas
  * 
  * UNDONE: convert int args to doubles?
  */ 
@@ -302,7 +303,9 @@ PeakPickingResults peakPicking_cpp(const std::vector<double> &intensity, const s
             FWHM_right[j] = FWHM_right[i];
             amountofpeaks[j] = amountofpeaks[i];
             for (int ii = left_end[i]; ii < right_end[i]; ++ii) {
-                if ((intensity[ii] >= noiselevel[i]) && (intensity[ii+1] >= noiselevel[i])) area[j] += ((intensity[ii]-noiselevel[i])+(intensity[ii+1]-noiselevel[i]))*(scantime[ii+1]-scantime[ii])/2;
+                // CHANGED: don't subtract noise
+                //if ((intensity[ii] >= noiselevel[i]) && (intensity[ii+1] >= noiselevel[i])) area[j] += ((intensity[ii]-noiselevel[i])+(intensity[ii+1]-noiselevel[i]))*(scantime[ii+1]-scantime[ii])/2;
+                area[j] += (intensity[ii]+intensity[ii+1])*(scantime[ii+1]-scantime[ii])/2;
             }
             j++;
         }
@@ -314,7 +317,7 @@ PeakPickingResults peakPicking_cpp(const std::vector<double> &intensity, const s
     for(int i = 0; i < (anzahlmaxima); ++i)
     {
         ret.times[i] = scantime[maxima[i]];
-        ret.XICIntensities[i] = intensity[maxima[i]]-noiselevel[i];
+        ret.XICIntensities[i] = intensity[maxima[i]]; // -noiselevel[i]; --> CHANGED: report raw intensities
         ret.scans[i] = maxima[i]+1;
         ret.timesLeft[i] = scantime[left_end[i]];
         ret.timesRight[i] = scantime[right_end[i]];

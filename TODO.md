@@ -304,6 +304,11 @@
         - remove old function
         - do we need scaleTimeFactor? then add to params
         - check if we can get compute_peak_shape_metrics to work (maybe check OMS version?)
+    - Dietrich
+        - Disabled noise removal for reported intensities/areas
+            - keep doing this?
+            - report both?
+            - document
     - Params
         - see if current chrom defaults are fine
         - add sensible IMS defaults

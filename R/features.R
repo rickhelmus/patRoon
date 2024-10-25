@@ -462,21 +462,24 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
 })
 
 #' @export
-setMethod("findMobilities", "features", function(obj, findPeaksAlgo, mzRange = 0.005, clusterIMSWindow = 0.01,
-                                                 clusterMethod = "distance", minIntensityIMS = 0, maxMSRtWindow = 2, ...)
+setMethod("findMobilities", "features", function(obj, mobPeaksParam, mzRange = 0.005, clusterIMSWindow = 0.01,
+                                                 clusterMethod = "distance", minIntensityIMS = 0, maxMSRTWindow = 2,
+                                                 chromPeaksParam = NULL, ...)
 {
     ac <- checkmate::makeAssertCollection()
-    assertFindPeaksAlgo(findPeaksAlgo, add = ac)
+    assertFindPeaksParam(mobPeaksParam, add = ac)
     aapply(checkmate::assertNumber, . ~ mzRange + clusterIMSWindow + minIntensityIMS, finite = TRUE,
            fixed = list(add = ac))
     checkmate::assertChoice(clusterMethod, c("bin", "distance", "hclust"), add = ac)
-    checkmate::assertNumber(maxMSRtWindow, lower = 1, finite = TRUE, null.ok = TRUE, add = ac)
+    checkmate::assertNumber(maxMSRTWindow, lower = 1, finite = TRUE, null.ok = TRUE, add = ac)
+    assertFindPeaksParam(chromPeaksParam, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
     if (length(obj) == 0)
         return(obj) # nothing to do...
     
-    hash <- makeHash(obj, findPeaksAlgo, mzRange, clusterIMSWindow, clusterMethod, minIntensityIMS, maxMSRtWindow, ...)
+    hash <- makeHash(obj, mobPeaksParam, mzRange, clusterIMSWindow, clusterMethod, minIntensityIMS, maxMSRTWindow,
+                     chromPeaksParam)
     cd <- loadCacheData("findMobilities", hash)
     if (!is.null(cd))
         return(cd)
@@ -491,10 +494,10 @@ setMethod("findMobilities", "features", function(obj, findPeaksAlgo, mzRange = 0
         
         fTable <- copy(fTable)
         retmin <- fTable$retmin; retmax <- fTable$retmax;
-        if (!is.null(maxMSRtWindow))
+        if (!is.null(maxMSRTWindow))
         {
-            retmin <- pmax(retmin, fTable$ret - maxMSRtWindow)
-            retmax <- pmin(retmax, fTable$ret + maxMSRtWindow)
+            retmin <- pmax(retmin, fTable$ret - maxMSRTWindow)
+            retmax <- pmin(retmax, fTable$ret + maxMSRTWindow)
         }
         
         # NOTE: mzmin/mzmax may be too narrow here, hence use a user specified mz range
@@ -506,7 +509,7 @@ setMethod("findMobilities", "features", function(obj, findPeaksAlgo, mzRange = 0
         # pretend we have EICs so we can find peaks
         EICs <- lapply(EIMs, copy)
         EICs <- lapply(EICs, setnames, old = "mobility", new = "time")
-        peaksList <- findPeaks(EICs, findPeaksAlgo, ..., verbose = FALSE)
+        peaksList <- findPeaks(EICs, mobPeaksParam, verbose = FALSE)
 
         fTable[, ord := seq_len(.N)]
         peaksList <- lapply(peaksList, function(p) p[, mobOrd := seq_len(.N)])

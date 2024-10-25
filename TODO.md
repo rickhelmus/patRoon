@@ -318,8 +318,6 @@
     - somehow nicely translate findPeaks() params to IMS scale (time --> mobility)
     - suppress XCMS warnings (or at least if no peaks are found)
     - update mobilities slot from delete()
-- splitMobilities()
-    - always remove unassigned features? Currently yes.
     - ID re-assignment works with e.g. XCMS IDs that may be numeric?
     - fGroups method
         - support updating groupQualities/groupScores/ISTDs/ISTDAssignments/annotations?
@@ -329,6 +327,9 @@
         - sets methods? or simply not possible?
             - if not implement method that throws error
             - could be possible with featuresSuspects
+- splitMobilities()
+    - keep? then update
+    - remove unassigned features?
 - plotMobilities()
     - Finalize function: consistent arg names, checkmates, more functionality from plotChroms() --> see UNDONEs
     - by default only allow 1 fg to be plotted?

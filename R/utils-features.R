@@ -782,3 +782,130 @@ findPeaksInEICs <- function(allEICs, peaksParam, withBP, parallel, cacheDB = NUL
         return(peaks)
     }, simplify = FALSE)
 }
+
+assignFeatureMobilities <- function(features, peaksParam, mzWindow, clusterIMSWindow, clusterMethod, minIntensityIMS,
+                                    maxMSRTWindow)
+{
+    printf("Finding mobilities for all features...\n")
+    
+    anaInfo <- analysisInfo(features)
+    
+    features@features <- applyMSData(anaInfo, features@features, types = c("raw", "ims"), formats = c("bruker_ims", "mzML"),
+                                     func = function(ana, path, backend, fTable)
+    {
+        openMSReadBackend(backend, path)
+        
+        fTable <- copy(fTable)
+        retmin <- fTable$retmin; retmax <- fTable$retmax;
+        if (!is.null(maxMSRTWindow))
+        {
+            retmin <- pmax(retmin, fTable$ret - maxMSRTWindow)
+            retmax <- pmin(retmax, fTable$ret + maxMSRTWindow)
+        }
+        
+        # NOTE: mzmin/mzmax may be too narrow here, hence use a user specified mz range
+        EIMs <- getMobilograms(backend, fTable$mz - mzWindow, fTable$mz + mzWindow, retmin, retmax,
+                               clusterMethod, clusterIMSWindow, minIntensityIMS, FALSE)
+        names(EIMs) <- fTable$ID
+        EIMs <- lapply(EIMs, setDT)
+        
+        # pretend we have EICs so we can find peaks
+        EICs <- lapply(EIMs, copy)
+        EICs <- lapply(EICs, setnames, old = "mobility", new = "time")
+        peaksList <- findPeaks(EICs, peaksParam, verbose = FALSE)
+        
+        fTable[, ord := seq_len(.N)]
+        peaksList <- lapply(peaksList, function(p) p[, mobOrd := seq_len(.N)])
+        
+        peaksTable <- rbindlist(peaksList, idcol = "mob_parent_ID")
+        setnames(peaksTable,
+                 c("ret", "retmin", "retmax", "area", "intensity"),
+                 c("mobility", "mobstart", "mobend", "mob_area", "mob_intensity"), skip_absent = TRUE)
+        
+        peaksTable[, ID := appendMobToName(mob_parent_ID, mobility)]
+        
+        # add feature data
+        peaksTable <- merge(peaksTable, fTable, by.x = "mob_parent_ID", by.y = "ID", sort = FALSE)
+        setcolorder(peaksTable, names(fTable))
+        
+        # merge mobility features
+        fTable <- rbind(fTable, peaksTable, fill = TRUE)
+        
+        setorderv(fTable, c("ord", "mobOrd"), na.last = FALSE)
+        fTable[, c("ord", "mobOrd") := NULL]
+        
+        doProgress()
+        
+        return(fTable)
+    })
+    
+    mobFeatsN <- sum(sapply(features@features, function(ft) sum(!is.na(ft$mobility))))
+    printf("Assigned %d mobility features.\n", mobFeatsN)
+    
+    return(features)
+}
+
+# UNDONE: make this an exported method?
+reintegrateFeatures <- function(features, RTWindow, calcArea, peaksParam, parallel)
+{
+    anaInfo <- analysisInfo(features)
+    cacheDB <- openCacheDBScope()
+    
+    printf("Loading EICs...\n")
+    EICInfoList <- lapply(featureTable(features), function(ft)
+    {
+        ft <- copy(ft)
+        ft[, c("retmin", "retmax") := .(retmin - RTWindow, retmax + RTWindow)]
+        return(ft)
+    })
+    # UNDONE exclude non-mobility features (optionally)
+    allEICs <- doGetEICs(anaInfo, EICInfoList, compress = FALSE, cacheDB = cacheDB)
+    allEICs <- Map(allEICs, featureTable(features), f = function(eics, ft) setNames(eics, ft$ID))
+    
+    if (!is.null(peaksParam))
+    {
+        # UNDONE: make withBP configurable?
+        peaksList <- findPeaksInEICs(allEICs, peaksParam, withBP = FALSE, parallel = parallel, cacheDB = cacheDB)
+        peaksList <- Map(peaksList, featureTable(features), f = function(anaPLs, ft)
+        {
+            # filter out peaks outside original retmin/retmax
+            anaPLs <- anaPLs[numGTE(ret, ft[match(EIC_ID, ID)]$retmin) & numLTE(ret, ft[match(EIC_ID, ID)]$retmax)]
+            # filter out all peaks for EICs with >1 result
+            anaPLs[, N := .N, by = "EIC_ID"]
+            return(anaPLs[N == 1][, N := NULL])
+        })
+    }
+    else
+        peaksList <- vector("list", nrow(anaInfo))
+    
+    features@features <- Map(featureTable(features), peaksList, allEICs, f = function(ft, pt, eics)
+    {
+        ft <- copy(ft)
+        if (!is.null(pt))
+        {
+            cols <- c("ret", "retmin", "retmax", "area", "intensity")
+            ft[pt, (cols) := mget(paste0("i.", cols)), on = c(ID = "EIC_ID")]
+            doEICUpdate <- !ft$ID %in% pt$EIC_ID
+        }
+        else
+            doEICUpdate <- rep(TRUE, nrow(ft))
+        
+        ft[doEICUpdate, intensity := mapply(ret, eics[doEICUpdate], FUN = function(r, eic)
+        {
+            eic[which.min(abs(eic$time - r)), "intensity"]
+        })]
+        ft[doEICUpdate, area := mapply(retmin, retmax, eics[doEICUpdate], FUN = function(rmin, rmax, eic)
+        {
+            wh <- eic$time %between% c(rmin, rmax)
+            a <- sum(eic$intensity[wh])
+            if (calcArea == "integrate")
+                a <- a * ((rmax - rmin) / sum(wh))
+            return(a)
+        })]
+    })
+    
+    printf("Re-integrated %d features (%d from newly found peaks)\n", length(features),
+           if (!is.null(peaksParam)) unlist(lapply(peaksList, nrow)) else 0)
+    
+    return(features)
+}

@@ -546,14 +546,12 @@ setMethod("findMobilities", "features", function(obj, mobPeaksParam, mzRange = 0
 
 #' @export
 setMethod("splitMobilities", "features", function(obj, RTWindow = 20, mzWindow = 0.005, IMSWindow = 0.01,
-                                                  intSearchRTWindow = 3, calcArea = "integrate", findPeaksAlgo = "none",
-                                                  ..., parallel = TRUE)
+                                                  calcArea = "integrate", peaksParam = NULL, parallel = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertNumber, . ~ mzWindow + IMSWindow, finite = TRUE, fixed = list(add = ac))
-    checkmate::assertNumber(intSearchRTWindow, lower = 0, finite = TRUE, add = ac)
     checkmate::assertChoice(calcArea, c("integrate", "sum"), add = ac)
-    checkmate::assertString(findPeaksAlgo, min.chars = 1, add = ac) # UNDONE check algo choice if findPeaks() will not be exported
+    assertFindPeaksParam(peaksParam, null.ok = TRUE, add = ac)
     checkmate::assertFlag(parallel, add = ac)
     checkmate::reportAssertions(ac)
     
@@ -561,7 +559,7 @@ setMethod("splitMobilities", "features", function(obj, RTWindow = 20, mzWindow =
         return(obj) # nothing to do...
     
     cacheDB <- openCacheDBScope()
-    hash <- makeHash(obj, mzWindow, IMSWindow, intSearchRTWindow, calcArea, findPeaksAlgo, list(...))
+    hash <- makeHash(obj, mzWindow, IMSWindow, calcArea, peaksParam)
     cd <- loadCacheData("splitMobilities", hash, dbArg = cacheDB)
     if (!is.null(cd))
         return(cd)
@@ -579,69 +577,39 @@ setMethod("splitMobilities", "features", function(obj, RTWindow = 20, mzWindow =
     allEICs <- doGetEICs(anaInfo, EICInfoList, compress = FALSE, cacheDB = cacheDB)
     allEICs <- Map(allEICs, featureTable(obj), f = function(eics, ft) setNames(eics, ft$ID))
 
-    if (findPeaksAlgo != "none")
+    if (!is.null(peaksParam))
     {
         # UNDONE: make withBP configurable?
-        peaksList <- findPeaksInEICs(allEICs, findPeaksAlgo, ..., withBP = FALSE, parallel = parallel, cacheDB = cacheDB)
+        peaksList <- findPeaksInEICs(allEICs, peaksParam, withBP = FALSE, parallel = parallel, cacheDB = cacheDB)
+        peaksList <- Map(peaksList, featureTable(obj), f = function(anaPLs, ft)
+        {
+            # filter out peaks outside original retmin/retmax
+            anaPLs <- anaPLs[numGTE(ret, ft[match(EIC_ID, ID)]$retmin) & numLTE(ret, ft[match(EIC_ID, ID)]$retmax)]
+            # filter out all peaks for EICs with >1 result
+            anaPLs[, N := .N, by = "EIC_ID"]
+            return(anaPLs[N == 1][, N := NULL])
+        })
     }
+    else
+        peaksList <- vector("list", nrow(anaInfo))
     
-    peaksList <- Map(peaksList, featureTable(obj), f = function(anaPLs, ft)
+    obj@features <- Map(featureTable(obj), peaksList, allEICs, f = function(ft, pt, eics)
     {
-        # filter out peaks outside original retmin/retmax
-        anaPLs <- anaPLs[numGTE(ret, ft[match(EIC_ID, ID)]$retmin) & numLTE(ret, ft[match(EIC_ID, ID)]$retmax)]
-        # filter out all peaks for EICs with >1 result
-        anaPLs[, N := .N, by = "EIC_ID"]
-        anaPLs <- anaPLs[N == 1][, N := NULL]
-    })
-    
-    # restore ID from EIC_ID, as make.unique() for ID may have changed it
-    
-    
-    browser()
-    obj@features <- withProg(nrow(anaInfo), FALSE,
-                             Map(featureTable(obj), mobilities(obj), filePaths, f = function(fTable, mobs, fp)
-    {
-        TIMSDB <- openTIMSMetaDBScope(f = fp)
-        frames <- getTIMSMetaTable(TIMSDB, "Frames", c("Id", "Time", "MsMsType"))
-        frames <- frames[MsMsType == 0]
-        
-        fTable <- copy(fTable)
-        
-        fTable <- fTable[ID %chin% mobs$ID_orig]
-        
-        # Split features by their mobility
-        setnames(fTable, "ID", "ID_orig")
-        fTable <- merge(fTable, mobs[, c("ID", "mobility", "ID_orig"), with = FALSE], by = "ID_orig", sort = FALSE)
-        setcolorder(fTable, "ID")
-        fTable[, ID_orig := NULL]
-
-        # Update quantities from EICs
-        EICs <- getTIMSEICs(fp, frames$Id, fTable$mz - mzWindow, fTable$mz + mzWindow, fTable$mobility - IMSWindow,
-                            fTable$mobility + IMSWindow, FALSE)
-        
-        whUpdateQuant <- rep(TRUE, nrow(fTable))
-        if (findPeaksAlgo != "none")
+        ft <- copy(ft)
+        if (!is.null(pt))
         {
-            # prepare EICs for findPeaks()
-            EICsPeaks <- setNames(Map(EICs, fTable$retmin, fTable$retmax, f = function(eic, rmin, rmax)
-            {
-                eic <- setDT(eic)
-                eic <- eic[time %between% c(rmin, rmax)]
-                return(eic)
-            }), fTable$ID)
-            peaks <- findPeaks(EICsPeaks, findPeaksAlgo, ..., verbose = FALSE)
-            peaks <- peaks[sapply(peaks, nrow) == 1] # only consider results where exactly one peak is found
-            peaksAll <- rbindlist(peaks, idcol = "ID")
-            copyCols <- c("ret", "retmin", "retmax", "area", "intensity")
-            fTable[peaksAll, (copyCols) := mget(paste0("i.", copyCols)), on = "ID"]
-            whUpdateQuant <- !fTable$ID %chin% names(peaks) # fall-back to simple quantity update for others
+            cols <- c("ret", "retmin", "retmax", "area", "intensity")
+            ft[pt, (cols) := mget(paste0("i.", cols)), on = c(ID = "EIC_ID")]
+            doEICUpdate <- !ft$ID %in% pt$EIC_ID
         }
+        else
+            doEICUpdate <- rep(TRUE, nrow(ft))
         
-        fTable[whUpdateQuant, intensity := mapply(ret, EICs[whUpdateQuant], FUN = function(r, eic)
+        ft[doEICUpdate, intensity := mapply(ret, eics[doEICUpdate], FUN = function(r, eic)
         {
-            max(eic[eic$time %between% c(r - intSearchRTWindow, r + intSearchRTWindow), "intensity"])
+            eic[which.min(abs(eic$time - r)), "intensity"]
         })]
-        fTable[whUpdateQuant, area := mapply(retmin, retmax, EICs[whUpdateQuant], FUN = function(rmin, rmax, eic)
+        ft[doEICUpdate, area := mapply(retmin, retmax, eics[doEICUpdate], FUN = function(rmin, rmax, eic)
         {
             wh <- eic$time %between% c(rmin, rmax)
             a <- sum(eic$intensity[wh])
@@ -649,12 +617,10 @@ setMethod("splitMobilities", "features", function(obj, RTWindow = 20, mzWindow =
                 a <- a * ((rmax - rmin) / sum(wh))
             return(a)
         })]
-        
-        doProgress()
-        
-        return(fTable)
-    }))
+    })
     
+    browser()
+
     splitMobs <- lapply(obj@mobilities, function(mobs) mobs[duplicated(mobs, by = "ID_orig")])
     splitN <- sum(sapply(splitMobs, function(m) uniqueN(m, by = "ID_orig")))
     printf("Split %d features with multiple mobilities (%.2f%%) into %d features.\nRemoved %d features without assignment (%.2f%%).\n",

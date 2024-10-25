@@ -850,8 +850,11 @@ assertConvertMSFilesArgs <- function(formatFrom, formatTo, overWrite, algorithm,
     checkmate::assertChoice(formatFrom, validFormatsFrom, add = add)
 }
 
-assertFindPeaksParam <- function(x, .var.name = checkmate::vname(x), add = NULL)
+assertFindPeaksParam <- function(x, null.ok = FALSE, .var.name = checkmate::vname(x), add = NULL)
 {
+    if (null.ok && is.null(x))
+        return(invisible(NULL))
+    
     assertListVal(x, "algorithm", checkmate::assertChoice, choices = c("xcms3", "envipick", "openms", "dietrich"),
                   .var.name = .var.name) # NOTE: don't add, must fail for next line
     if (x$algorithm == "openms")

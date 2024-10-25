@@ -490,7 +490,7 @@ setMethod("findMobilities", "features", function(obj, mobPeaksParam, mzWindow = 
     obj <- assignFeatureMobilities(obj, mobPeaksParam, mzWindow, clusterIMSWindow, clusterMethod, minIntensityIMS,
                                    maxMSRTWindow)
 
-    obj <- reintegrateFeatures(obj, RTWindow, calcArea, chromPeaksParam, parallel)
+    obj <- reintegrateFeatures(obj, RTWindow, calcArea, chromPeaksParam, TRUE, parallel)
 
     saveCacheData("findMobilities", obj, hash)
     

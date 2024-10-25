@@ -846,7 +846,7 @@ assignFeatureMobilities <- function(features, peaksParam, mzWindow, clusterIMSWi
 }
 
 # UNDONE: make this an exported method?
-reintegrateFeatures <- function(features, RTWindow, calcArea, peaksParam, parallel)
+reintegrateFeatures <- function(features, RTWindow, calcArea, peaksParam, onlyMob, parallel)
 {
     anaInfo <- analysisInfo(features)
     cacheDB <- openCacheDBScope()
@@ -856,11 +856,17 @@ reintegrateFeatures <- function(features, RTWindow, calcArea, peaksParam, parall
     {
         ft <- copy(ft)
         ft[, c("retmin", "retmax") := .(retmin - RTWindow, retmax + RTWindow)]
+        if (onlyMob)
+            ft <- ft[!is.null(ft[["mobility"]]) & !is.na(mobility)]
         return(ft)
     })
-    # UNDONE exclude non-mobility features (optionally)
     allEICs <- doGetEICs(anaInfo, EICInfoList, compress = FALSE, cacheDB = cacheDB)
-    allEICs <- Map(allEICs, featureTable(features), f = function(eics, ft) setNames(eics, ft$ID))
+    allEICs <- Map(allEICs, featureTable(features), f = function(eics, ft)
+    {
+        wh <- !onlyMob | (!is.null(ft[["mobility"]]) & !is.na(ft$mobility))
+        names(eics) <- ft[wh]$ID
+        return(eics)
+    })
     
     if (!is.null(peaksParam))
     {
@@ -878,6 +884,7 @@ reintegrateFeatures <- function(features, RTWindow, calcArea, peaksParam, parall
     else
         peaksList <- vector("list", nrow(anaInfo))
     
+    updatedFeatsFromEICs <- updatedFeatsFromPeaks <- 0
     features@features <- Map(featureTable(features), peaksList, allEICs, f = function(ft, pt, eics)
     {
         ft <- copy(ft)
@@ -885,16 +892,19 @@ reintegrateFeatures <- function(features, RTWindow, calcArea, peaksParam, parall
         {
             cols <- c("ret", "retmin", "retmax", "area", "intensity")
             ft[pt, (cols) := mget(paste0("i.", cols)), on = c(ID = "EIC_ID")]
-            doEICUpdate <- !ft$ID %in% pt$EIC_ID
+            peakIDs <- pt$EIC_ID
+            updatedFeatsFromPeaks <<- updatedFeatsFromPeaks + sum(ft$ID %in% pt$EIC_ID)
         }
         else
-            doEICUpdate <- rep(TRUE, nrow(ft))
+            peakIDs <- character()
         
-        ft[doEICUpdate, intensity := mapply(ret, eics[doEICUpdate], FUN = function(r, eic)
+        doIDs <- ft$ID[(!onlyMob | (!is.null(ft[["mobility"]]) & !is.na(ft$mobility))) & !ft$ID %chin% peakIDs]
+        
+        ft[ID %chin% doIDs, intensity := mapply(ret, eics[doIDs], FUN = function(r, eic)
         {
             eic[which.min(abs(eic$time - r)), "intensity"]
         })]
-        ft[doEICUpdate, area := mapply(retmin, retmax, eics[doEICUpdate], FUN = function(rmin, rmax, eic)
+        ft[ID %chin% doIDs, area := mapply(retmin, retmax, eics[doIDs], FUN = function(rmin, rmax, eic)
         {
             wh <- eic$time %between% c(rmin, rmax)
             a <- sum(eic$intensity[wh])
@@ -902,10 +912,14 @@ reintegrateFeatures <- function(features, RTWindow, calcArea, peaksParam, parall
                 a <- a * ((rmax - rmin) / sum(wh))
             return(a)
         })]
+        
+        updatedFeatsFromEICs <<- updatedFeatsFromEICs + length(doIDs)
+        
+        return(ft)
     })
     
-    printf("Re-integrated %d features (%d from newly found peaks)\n", length(features),
-           if (!is.null(peaksParam)) unlist(lapply(peaksList, nrow)) else 0)
+    printf("Re-integrated %d features (%d from newly found peaks and %d from EICs)\n",
+           updatedFeatsFromEICs + updatedFeatsFromPeaks, updatedFeatsFromPeaks, updatedFeatsFromEICs)
     
     return(features)
 }

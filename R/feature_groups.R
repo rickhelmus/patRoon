@@ -1418,9 +1418,6 @@ setMethod("calculateTox", "featureGroups", function(fGroups, featureAnn)
 #' @export
 setMethod("findMobilities", "featureGroups", function(obj, clusterIMSWindow = 0.01, ...)
 {
-    # UNDONE: handle cases when there are already IMS assignments (or just throw an error?)
-    # UNDONE: handle screening results (eg from featuresSuspects)
-    
     checkmate::assertNumber(clusterIMSWindow, finite = TRUE)
     
     fTable <- featureTable(obj)

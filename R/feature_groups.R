@@ -1378,47 +1378,39 @@ setMethod("calculateTox", "featureGroups", function(fGroups, featureAnn)
 })
 
 #' @export
-setMethod("findMobilities", "featureGroups", function(obj, ...)
+setMethod("findMobilities", "featureGroups", function(obj, clusterIMSWindow = 0.01, ...)
 {
-    obj@features <- findMobilities(getFeatures(obj), ...)
-    return(obj)
-})
-
-#' @export
-setMethod("splitMobilities", "featureGroups", function(obj, IMSWindow = 0.01, ...)
-{
-    checkmate::assertNumber(IMSWindow, finite = TRUE)
-    
-    obj@features <- splitMobilities(getFeatures(obj), IMSWindow = IMSWindow, ...)
+    checkmate::assertNumber(clusterIMSWindow, finite = TRUE)
     
     fTable <- featureTable(obj)
-    hash <- makeHash(obj, IMSWindow, ...)
-    cd <- loadCacheData("splitMobilities", hash)
+    hash <- makeHash(obj, clusterIMSWindow, ...)
+    cd <- loadCacheData("findMobilities", hash)
     if (!is.null(cd))
         return(cd)
     
-    obj@features <- splitMobilities(getFeatures(obj), IMSWindow = IMSWindow, ...)
+    obj@features <- splitMobilities(getFeatures(obj), clusterIMSWindow = clusterIMSWindow, ...)
     
     fTable <- featureTable(obj)
-
+    
     printf("Clustering mobilities... ")
     
     # cluster features within original fGroups with similar mobilities together    
     fTableAll <- rbindlist(fTable, idcol = "analysis")
-    fTableAll[, gClust := {
+    fTableAll[!is.na(mobility), gClust := {
         hc <- fastcluster::hclust(dist(mobility))
-        cutree(hc, h = IMSWindow)
+        cutree(hc, h = clusterIMSWindow)
     }, by = "group"]
     printf("Done!\n")
-
+    
     printf("Updating feature group data... ")
     
     # prepare group info
-    gMobInfo <- fTableAll[, .(mobility = mean(mobility)), by = c("group", "gClust")]
+    gMobInfo <- fTableAll[, .(mobility = mean(mobility, na.rm = TRUE)), by = c("group", "gClust")]
     setnames(gMobInfo, "group", "group_orig")
     gMobInfo[, group := appendMobToName(group_orig, mobility)]
     
     # update features
+    setnames(fTableAll, "group", "group_orig") # UNDONE: better colname
     fTableAll[gMobInfo, group := i.group, on = c(group = "group_orig", "gClust")]
     featureTable(obj) <- split(fTableAll[, -"gClust"], by = "analysis", keep.by = FALSE)
     
@@ -1455,9 +1447,19 @@ setMethod("splitMobilities", "featureGroups", function(obj, IMSWindow = 0.01, ..
     
     printf("Done!\n")
     
-    saveCacheData("splitMobilities", obj, hash)
-
+    saveCacheData("findMobilities", obj, hash)
+    
     return(obj)
+})
+
+#' @export
+setMethod("splitMobilities", "featureGroups", function(obj, IMSWindow = 0.01, ...)
+{
+    checkmate::assertNumber(IMSWindow, finite = TRUE)
+
+    # UNDONE    
+    obj@features <- splitMobilities(getFeatures(obj), IMSWindow = IMSWindow, ...)
+    
 })
 
 #' @describeIn featureGroups Obtain the total ion chromatogram/s (TICs) of the analyses.

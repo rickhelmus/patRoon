@@ -294,6 +294,7 @@
 ## IMS
 
 - general ratio of mass/CCS to filter results --> eg derived from CCS DB
+- be consistent in mobility vs IMS
 - findPeaks()
     - export? If yes, add checkmate's, documentation etc
         - if not, still need to doc args somehow
@@ -313,20 +314,18 @@
         - see if current chrom defaults are fine
         - add sensible IMS defaults
 - findMobilities()
+    - better names for ims_parent_ID/ims_parent_group?
+    - handle cases when there are already IMS assignments (or just throw an error?)
+    - limit mobmin/mobmax --> both min and max, ie to prevent excessively wrong peak range assignments
     - SC seems to hang?
-    - fGroups method --> finished?
-    - somehow nicely translate findPeaks() params to IMS scale (time --> mobility)
     - suppress XCMS warnings (or at least if no peaks are found)
-    - update mobilities slot from delete()
+    - remove mobilities slot
     - ID re-assignment works with e.g. XCMS IDs that may be numeric?
     - fGroups method
-        - support updating groupQualities/groupScores/ISTDs/ISTDAssignments/annotations?
+        - support updating groupQualities/groupScores/ISTDs/ISTDAssignments/annotations/concentrations/toxicities/screenInfo?
             - currently cleared with a warning
-        - support updating screenInfo?
-            - if not implement method that throws error
-        - sets methods? or simply not possible?
-            - if not implement method that throws error
-            - could be possible with featuresSuspects
+            - duplicate values where possible
+        - sets methods
 - splitMobilities()
     - keep? then update
     - remove unassigned features?
@@ -334,7 +333,6 @@
     - Finalize function: consistent arg names, checkmates, more functionality from plotChroms() --> see UNDONEs
     - by default only allow 1 fg to be plotted?
     - tests, docs
-- combine find/splitMobilities()?
 - Suspect features
     - XCMS/XCMS3/KPIC2: doc and/or default min fractions to zero as these probably don't make a lot of sense otherwise
     - Handle mobilities
@@ -343,12 +341,11 @@
     - convert reactable cell img functions to JS versions, so img paths are set dynamically which can save quite some space for selfContained reports
         --> see WIP changes made for chromsLarge
 - Docs
-    - mobilities slot in features
     - Dietrich features
     - getDefPeakParams()
 - NEWS
     - Dietrich features
-- groupInfo is now a DT
+    - groupInfo is now a DT
 
 
 ## Features

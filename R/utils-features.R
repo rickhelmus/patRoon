@@ -816,11 +816,11 @@ assignFeatureMobilities <- function(features, peaksParam, mzWindow, clusterIMSWi
         
         peaksList <- lapply(peaksList, function(p) p[, mobOrd := seq_len(.N)])
         
-        peaksTable <- rbindlist(peaksList, idcol = "mob_parent_ID")
+        peaksTable <- rbindlist(peaksList, idcol = "ims_parent_ID")
         mobNumCols <- c("mobility", "mobstart", "mobend", "mob_area", "mob_intensity")
         if (nrow(peaksTable) == 0)
         {
-            fTable[, mob_parent_ID := NA_character_]
+            fTable[, ims_parent_ID := NA_character_]
             fTable[, (mobNumCols) := NA_real_]
         }
         else
@@ -830,12 +830,12 @@ assignFeatureMobilities <- function(features, peaksParam, mzWindow, clusterIMSWi
             setnames(peaksTable, c("ret", "retmin", "retmax", "area", "intensity"), mobNumCols, skip_absent = TRUE)
             # NOTE: we subset columns here to remove any algo specific columns that may also be present in the feature
             # table (UNDONE?)
-            peaksTable <- subsetDTColumnsIfPresent(peaksTable, c(mobNumCols, "mobOrd", "mob_parent_ID"))
+            peaksTable <- subsetDTColumnsIfPresent(peaksTable, c(mobNumCols, "mobOrd", "ims_parent_ID"))
             
-            peaksTable[, ID := appendMobToName(mob_parent_ID, mobility)]
+            peaksTable[, ID := appendMobToName(ims_parent_ID, mobility)]
             
             # add feature data
-            peaksTable <- merge(peaksTable, fTable, by.x = "mob_parent_ID", by.y = "ID", sort = FALSE)
+            peaksTable <- merge(peaksTable, fTable, by.x = "ims_parent_ID", by.y = "ID", sort = FALSE)
             setcolorder(peaksTable, names(fTable))
             
             # merge mobility features

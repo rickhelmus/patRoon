@@ -814,25 +814,36 @@ assignFeatureMobilities <- function(features, peaksParam, mzWindow, clusterIMSWi
         EICs <- lapply(EICs, setnames, old = "mobility", new = "time")
         peaksList <- findPeaks(EICs, peaksParam, verbose = FALSE)
         
-        fTable[, ord := seq_len(.N)]
         peaksList <- lapply(peaksList, function(p) p[, mobOrd := seq_len(.N)])
         
         peaksTable <- rbindlist(peaksList, idcol = "mob_parent_ID")
-        setnames(peaksTable,
-                 c("ret", "retmin", "retmax", "area", "intensity"),
-                 c("mobility", "mobstart", "mobend", "mob_area", "mob_intensity"), skip_absent = TRUE)
-        
-        peaksTable[, ID := appendMobToName(mob_parent_ID, mobility)]
-        
-        # add feature data
-        peaksTable <- merge(peaksTable, fTable, by.x = "mob_parent_ID", by.y = "ID", sort = FALSE)
-        setcolorder(peaksTable, names(fTable))
-        
-        # merge mobility features
-        fTable <- rbind(fTable, peaksTable, fill = TRUE)
-        
-        setorderv(fTable, c("ord", "mobOrd"), na.last = FALSE)
-        fTable[, c("ord", "mobOrd") := NULL]
+        mobNumCols <- c("mobility", "mobstart", "mobend", "mob_area", "mob_intensity")
+        if (nrow(peaksTable) == 0)
+        {
+            fTable[, mob_parent_ID := NA_character_]
+            fTable[, (mobNumCols) := NA_real_]
+        }
+        else
+        {
+            fTable[, ord := seq_len(.N)]
+            
+            setnames(peaksTable, c("ret", "retmin", "retmax", "area", "intensity"), mobNumCols, skip_absent = TRUE)
+            # NOTE: we subset columns here to remove any algo specific columns that may also be present in the feature
+            # table (UNDONE?)
+            peaksTable <- subsetDTColumnsIfPresent(peaksTable, c(mobNumCols, "mobOrd", "mob_parent_ID"))
+            
+            peaksTable[, ID := appendMobToName(mob_parent_ID, mobility)]
+            
+            # add feature data
+            peaksTable <- merge(peaksTable, fTable, by.x = "mob_parent_ID", by.y = "ID", sort = FALSE)
+            setcolorder(peaksTable, names(fTable))
+            
+            # merge mobility features
+            fTable <- rbind(fTable, peaksTable, fill = TRUE)
+            
+            setorderv(fTable, c("ord", "mobOrd"), na.last = FALSE)
+            fTable[, c("ord", "mobOrd") := NULL]
+        }
         
         doProgress()
         

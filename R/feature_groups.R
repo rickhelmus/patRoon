@@ -1380,6 +1380,9 @@ setMethod("calculateTox", "featureGroups", function(fGroups, featureAnn)
 #' @export
 setMethod("findMobilities", "featureGroups", function(obj, clusterIMSWindow = 0.01, ...)
 {
+    # UNDONE: handle cases when there are already IMS assignments (or just throw an error?)
+    # UNDONE: handle screening results (eg from featuresSuspects)
+    
     checkmate::assertNumber(clusterIMSWindow, finite = TRUE)
     
     fTable <- featureTable(obj)
@@ -1388,7 +1391,7 @@ setMethod("findMobilities", "featureGroups", function(obj, clusterIMSWindow = 0.
     if (!is.null(cd))
         return(cd)
     
-    obj@features <- splitMobilities(getFeatures(obj), clusterIMSWindow = clusterIMSWindow, ...)
+    obj@features <- findMobilities(getFeatures(obj), clusterIMSWindow = clusterIMSWindow, ...)
     
     fTable <- featureTable(obj)
     
@@ -1397,31 +1400,40 @@ setMethod("findMobilities", "featureGroups", function(obj, clusterIMSWindow = 0.
     # cluster features within original fGroups with similar mobilities together    
     fTableAll <- rbindlist(fTable, idcol = "analysis")
     fTableAll[!is.na(mobility), gClust := {
-        hc <- fastcluster::hclust(dist(mobility))
-        cutree(hc, h = clusterIMSWindow)
+        if (.N == 0)
+            numeric()
+        else if (.N == 1)
+            1
+        else
+        {
+            hc <- fastcluster::hclust(dist(mobility))
+            cutree(hc, h = clusterIMSWindow)
+        }
     }, by = "group"]
     printf("Done!\n")
     
     printf("Updating feature group data... ")
-    
+
     # prepare group info
-    gMobInfo <- fTableAll[, .(mobility = mean(mobility, na.rm = TRUE)), by = c("group", "gClust")]
+    gMobInfo <- fTableAll[, .(mobility = mean(mobility)), by = c("group", "gClust")]
     setnames(gMobInfo, "group", "group_orig")
-    gMobInfo[, group := appendMobToName(group_orig, mobility)]
+    gMobInfo[, group := fifelse(!is.na(mobility), appendMobToName(group_orig, mobility), group_orig)]
     
     # update features
     setnames(fTableAll, "group", "group_orig") # UNDONE: better colname
-    fTableAll[gMobInfo, group := i.group, on = c(group = "group_orig", "gClust")]
+    fTableAll[gMobInfo, group := i.group, on = c("group_orig", "gClust")]
     featureTable(obj) <- split(fTableAll[, -"gClust"], by = "analysis", keep.by = FALSE)
     
     # update gInfo
     gInfo <- copy(groupInfo(obj))
-    gInfo[, group_orig := group]
-    gInfo <- merge(gInfo, gMobInfo, by = "group_orig")
-    obj@groupInfo <- gInfo[, -(c("group_orig", "gClust"))]
+    setnames(gInfo, "group", "group_orig")
+    gInfo <- merge(gInfo, gMobInfo, by = "group_orig", sort = FALSE)
+    setcolorder(gInfo, c("group", "ret", "mz", "mobility", "group_orig"))
+    obj@groupInfo <- gInfo[, -"gClust"]
     
-    # update group table
+    # re-fill group table
     fTablePerGroup <- split(fTableAll, by = "group")
+    fTablePerGroup <- fTablePerGroup[gInfo$group]
     anaInfo <- analysisInfo(obj)
     gTable <- data.table()
     gTable[, (gInfo$group) := lapply(fTablePerGroup, function(ft)
@@ -1435,7 +1447,8 @@ setMethod("findMobilities", "featureGroups", function(obj, clusterIMSWindow = 0.
     # update ftindex
     obj <- reGenerateFTIndex(obj)
     
-    for (sl in c("groupQualities", "groupScores", "ISTDs", "ISTDAssignments", "annotations"))
+    for (sl in c("groupQualities", "groupScores", "ISTDs", "ISTDAssignments", "annotations", "concentrations",
+                 "toxicities"))
     {
         d <- slot(obj, sl)
         if (length(d) > 0)

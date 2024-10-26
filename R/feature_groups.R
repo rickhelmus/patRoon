@@ -1416,19 +1416,19 @@ setMethod("findMobilities", "featureGroups", function(obj, clusterIMSWindow = 0.
 
     # prepare group info
     gMobInfo <- fTableAll[, .(mobility = mean(mobility)), by = c("group", "gClust")]
-    setnames(gMobInfo, "group", "group_orig")
-    gMobInfo[, group := fifelse(!is.na(mobility), appendMobToName(group_orig, mobility), group_orig)]
+    setnames(gMobInfo, "group", "ims_parent_group")
+    gMobInfo[, group := fifelse(!is.na(mobility), appendMobToName(ims_parent_group, mobility), ims_parent_group)]
     
     # update features
-    setnames(fTableAll, "group", "group_orig") # UNDONE: better colname
-    fTableAll[gMobInfo, group := i.group, on = c("group_orig", "gClust")]
+    setnames(fTableAll, "group", "ims_parent_group") # UNDONE: better colname
+    fTableAll[gMobInfo, group := i.group, on = c("ims_parent_group", "gClust")]
     featureTable(obj) <- split(fTableAll[, -"gClust"], by = "analysis", keep.by = FALSE)
     
     # update gInfo
     gInfo <- copy(groupInfo(obj))
-    setnames(gInfo, "group", "group_orig")
-    gInfo <- merge(gInfo, gMobInfo, by = "group_orig", sort = FALSE)
-    setcolorder(gInfo, c("group", "ret", "mz", "mobility", "group_orig"))
+    setnames(gInfo, "group", "ims_parent_group")
+    gInfo <- merge(gInfo, gMobInfo, by = "ims_parent_group", sort = FALSE)
+    setcolorder(gInfo, c("group", "ret", "mz", "mobility", "ims_parent_group"))
     obj@groupInfo <- gInfo[, -"gClust"]
     
     # re-fill group table

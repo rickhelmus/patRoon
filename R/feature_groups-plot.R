@@ -792,8 +792,8 @@ setMethod("plotChromsHash", "featureGroups", function(obj, analysis = analyses(o
 })
 
 #' @export
-setMethod("plotMobilogram", "featureGroups", function(obj, markMob = TRUE, IMSWindow = 0.2, maxMSRtWindow = 2,
-                                                      mzWindow = 0.005, clusterIMSWindow = 0.01,
+setMethod("plotMobilogram", "featureGroups", function(obj, groupName = names(obj), markMob = TRUE, IMSWindow = 0.2,
+                                                      maxMSRtWindow = 2, mzWindow = 0.005, clusterIMSWindow = 0.01,
                                                       clusterMethod = "distance", minIntensity = 0, xlim = NULL,
                                                       ylim = NULL, ...)
 {
@@ -801,6 +801,7 @@ setMethod("plotMobilogram", "featureGroups", function(obj, markMob = TRUE, IMSWi
     # UNDONE: assert util for common parameters with findMobilities()
 
     ac <- checkmate::makeAssertCollection()
+    checkmate::assertSubset(groupName, names(obj), empty.ok = TRUE, add = ac)
     checkmate::assertFlag(markMob, add = ac)
     aapply(checkmate::assertNumber, . ~ IMSWindow + mzWindow + clusterIMSWindow + minIntensity,
            lower = 0, finite = TRUE, fixed = list(add = ac))
@@ -809,7 +810,7 @@ setMethod("plotMobilogram", "featureGroups", function(obj, markMob = TRUE, IMSWi
     assertXYLim(xlim, ylim, add = ac)
     checkmate::reportAssertions(ac)
     
-    if (length(obj) == 0)
+    if (length(obj) == 0 || length(groupName) == 0)
     {
         noDataPlot()
         return(invisible(NULL))
@@ -817,12 +818,11 @@ setMethod("plotMobilogram", "featureGroups", function(obj, markMob = TRUE, IMSWi
     
     fTable <- featureTable(obj)
     anaInfo <- analysisInfo(obj)
-    mobs <- mobilities(getFeatures(obj))
 
     EIMs <- applyMSData(anaInfo, fTable, types = c("raw", "ims"), formats = c("bruker_ims", "mzML"), func = function(ana, path, backend, ft)
     {
         openMSReadBackend(backend, path)
-        ft <- copy(ft)
+        ft <- copy(ft[group %chin% groupName])
         if (!is.null(maxMSRtWindow))
         {
             ft[, retmin := max(retmin, ret - maxMSRtWindow), by = seq_len(nrow(ft))]
@@ -838,7 +838,6 @@ setMethod("plotMobilogram", "featureGroups", function(obj, markMob = TRUE, IMSWi
 
     if (is.null(xlim))
     {
-        # UNDONE: use mobmin/mobmax values of mobilities slot instead?
         minMob <- min(sapply(EIMs, sapply, function(eim) min(eim$mobility, na.rm = TRUE)), na.rm = TRUE)
         maxMob <- max(sapply(EIMs, sapply, function(eim) max(eim$mobility, na.rm = TRUE)), na.rm = TRUE)
         xlim <- c(minMob, maxMob) + c(-IMSWindow, IMSWindow)
@@ -858,9 +857,9 @@ setMethod("plotMobilogram", "featureGroups", function(obj, markMob = TRUE, IMSWi
         {
             points(EIMs[[ana]][[fID]]$mobility, EIMs[[ana]][[fID]]$intensity, type = "l")
             
-            if (markMob && length(mobs) > 0)
+            if (markMob)
             {
-                m <- mobs[[ana]][ID == fID]
+                m <- fTable[[ana]][ims_parent_ID == fID]
                 for (i in seq_len(nrow(m)))
                     segments(m$mobility[i], 0, m$mobility[i], m$intensity[i], col = "red", lty = "dotted")
             }

@@ -324,9 +324,9 @@ setMethod("getEICFGroupInfo", "featureGroups", function(fGroups, analysis, group
     else
         NULL
     
-    # subset relevant things in advance    
-    featTab <- featTab[group %chin% groupName, c("group", "analysis", "intensity", "retmin", "retmax", "mzmin", "mzmax"),
-                       with = FALSE]
+    # subset relevant things in advance
+    featTab <- subsetDTColumnsIfPresent(featTab, c("group", "analysis", "intensity", "retmin", "retmax", "mzmin",
+                                                   "mzmax", "mobmin", "mobmax"))
     
     # NOTE: we subset and split here in advance, as doing it in the loop below gets quite slow with many fGroups
     featTabAnaSub <- featTab[analysis %chin% takeAnalysis]

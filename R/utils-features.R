@@ -837,7 +837,7 @@ assignFeatureMobilities <- function(features, peaksParam, mzWindow, clusterIMSWi
         peaksList <- lapply(peaksList, function(p) p[, mobOrd := seq_len(.N)])
         
         peaksTable <- rbindlist(peaksList, idcol = "ims_parent_ID")
-        mobNumCols <- c("mobility", "mobstart", "mobend", "mob_area", "mob_intensity")
+        mobNumCols <- c("mobility", "mobmin", "mobmax", "mob_area", "mob_intensity")
         if (nrow(peaksTable) == 0)
         {
             fTable[, ims_parent_ID := NA_character_]
@@ -919,7 +919,8 @@ reintegrateFeatures <- function(features, RTWindow, calcArea, peaksParam, onlyMo
         
         ft[ID %chin% doIDs, intensity := mapply(ret, eics[doIDs], FUN = function(r, eic)
         {
-            eic[which.min(abs(eic$time - r)), "intensity"]
+            eic <- eic[eic$intensity > 0, ]
+            if (nrow(eic) > 0) eic[which.min(abs(eic$time - r)), "intensity"] else 0
         })]
         ft[ID %chin% doIDs, area := mapply(retmin, retmax, eics[doIDs], FUN = function(rmin, rmax, eic)
         {

@@ -451,18 +451,38 @@ setMethod("getEICsForFGroups", "featureGroups", function(fGroups, analysis, grou
     return(pruneList(EICs))
 })
 
-setMethod("getEICsForFeatures", "features", function(features)
+setMethod("getEICsForFeatures", "features", function(features, RTWindow = NULL, onlyMob = FALSE, ...)
 {
     if (length(features) == 0)
         return(list())
     
-    fTable <- featureTable(features)
-    anaInfo <- analysisInfo(features)
+    EICInfoList <- featureTable(features)
+    if (!is.null(RTWindow) || onlyMob)
+    {
+        EICInfoList <- lapply(featureTable(features), function(ft)
+        {
+            if (!is.null(RTWindow))
+            {
+                ft <- copy(ft)
+                ft[, c("retmin", "retmax") := .(retmin - RTWindow, retmax + RTWindow)]
+            }
+            if (onlyMob)
+                ft <- ft[!is.null(ft[["mobility"]]) & !is.na(mobility)]
+            return(ft)
+        })
+    }
     
-    return(pruneList(doGetEICs(anaInfo, fTable)))
+    ret <- doGetEICs(analysisInfo(features), EICInfoList, ...)
+    ret <- Map(ret, featureTable(features), f = function(eics, ft)
+    {
+        wh <- !onlyMob | (!is.null(ft[["mobility"]]) & !is.na(ft$mobility))
+        names(eics) <- ft[wh]$ID
+        return(eics)
+    })
+    return(pruneList(ret))
 })
 
-setMethod("getEICsForFeatures", "featuresSet", function(features)
+setMethod("getEICsForFeatures", "featuresSet", function(features, ...)
 {
     unsetFeatList <- sapply(sets(features), unset, obj = features, simplify = FALSE)
     EICList <- sapply(unsetFeatList, getEICsForFeatures, simplify = FALSE)
@@ -863,21 +883,7 @@ reintegrateFeatures <- function(features, RTWindow, calcArea, peaksParam, onlyMo
     cacheDB <- openCacheDBScope()
     
     printf("Loading EICs...\n")
-    EICInfoList <- lapply(featureTable(features), function(ft)
-    {
-        ft <- copy(ft)
-        ft[, c("retmin", "retmax") := .(retmin - RTWindow, retmax + RTWindow)]
-        if (onlyMob)
-            ft <- ft[!is.null(ft[["mobility"]]) & !is.na(mobility)]
-        return(ft)
-    })
-    allEICs <- doGetEICs(anaInfo, EICInfoList, compress = FALSE, cacheDB = cacheDB)
-    allEICs <- Map(allEICs, featureTable(features), f = function(eics, ft)
-    {
-        wh <- !onlyMob | (!is.null(ft[["mobility"]]) & !is.na(ft$mobility))
-        names(eics) <- ft[wh]$ID
-        return(eics)
-    })
+    allEICs <- getEICsForFeatures(features, RTWindow, onlyMob, compress = FALSE, cacheDB = cacheDB)
     
     if (!is.null(peaksParam))
     {

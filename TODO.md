@@ -7,6 +7,7 @@
 - update sysdata.rda
 - start using saveCacheDataList() on more places?
 - basic and default error handling for executeCommand()?
+- maxMSRtWindow --> maxMSRTWindow
 
 ## TC
 

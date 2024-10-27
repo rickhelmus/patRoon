@@ -176,8 +176,6 @@ getCentroidedMSFilesFromAnaInfo <- function(anaInfo, formats = c("mzML", "mzXML"
 
 doGetEICs <- function(anaInfo, EICInfoList, minIntensityIMS = 0, compress = TRUE, withBP = FALSE, cacheDB = NULL)
 {
-    # UNDONE: handle mobilities
-    
     # HACK: for now we _don't_ cache EICs if compres==FALSE: the resulting data is very large and takes a long time to
     # be stored. Hence, the caller should cache the final results.
     doCache <- compress
@@ -190,15 +188,24 @@ doGetEICs <- function(anaInfo, EICInfoList, minIntensityIMS = 0, compress = TRUE
         anaHashes <- getMSFileHashesFromAvailBackend(anaInfo)
     }
     
-    EICs <- applyMSData(anaInfo, EICInfoList, func = function(ana, path, backend, EICInfo)
+    allEICs <- applyMSData(anaInfo, EICInfoList, func = function(ana, path, backend, EICInfo)
     {
+        EICInfo <- copy(EICInfo)
+        for (col in c("mobmin", "mobmax"))
+        {
+            if (is.null(EICInfo[[col]]))
+                set(EICInfo, j = col, value = 0)
+            else
+                setnafill(EICInfo, fill = 0, cols = col)
+        }
+        
         EICs <- vector("list", nrow(EICInfo))
         
         if (doCache)
         {
             # NOTE: subset columns here, so any additional columns from e.g. feature tables are not considered
             hashes <- EICInfo[, makeHash(anaHashes[[ana]], compress, withBP, .SD), by = seq_len(nrow(EICInfo)),
-                              .SDcols = c("retmin", "retmax", "mzmin", "mzmax")][[2]]
+                              .SDcols = c("retmin", "retmax", "mzmin", "mzmax", "mobmin", "mobmax")][[2]]
             
             cachedData <- loadCacheData(category = "EICs", hashes, dbArg = cacheDB, simplify = FALSE)
             if (!is.null(cachedData) && length(cachedData) == nrow(EICInfo))
@@ -220,8 +227,8 @@ doGetEICs <- function(anaInfo, EICInfoList, minIntensityIMS = 0, compress = TRUE
         
         # NOTE: getEICList() return lists, which are converted to data.frames and is a lot faster than returning
         # data.frames directly.
-        newEICs <- getEICList(backend, ToDo$mzmin, ToDo$mzmax, ToDo$retmin, ToDo$retmax, rep(0, nrow(ToDo)),
-                              rep(0, nrow(ToDo)), minIntensityIMS, compress, withBP)
+        newEICs <- getEICList(backend, ToDo$mzmin, ToDo$mzmax, ToDo$retmin, ToDo$retmax, ToDo$mobmin, ToDo$mobmax,
+                              minIntensityIMS, compress, withBP)
         newEICs <- lapply(newEICs, setDF)
         EICs[!isCached] <- newEICs
 
@@ -232,5 +239,5 @@ doGetEICs <- function(anaInfo, EICInfoList, minIntensityIMS = 0, compress = TRUE
         return(EICs)
     })
     
-    return(EICs)
+    return(allEICs)
 }

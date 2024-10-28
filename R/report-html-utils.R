@@ -39,6 +39,11 @@ makeReactCellLargeChrom <- function(plots)
     return(htmlwidgets::JS("function(cellInfo) { return '<img src=\"' + reportPlots.chromsLarge[[cellInfo.value]] + '\"></img>'; }"))
 }
 
+makeReactCellMobilogram <- function()
+{
+    return(htmlwidgets::JS("function(cellInfo) { return '<img src=\"' + reportPlots.mobilograms[[cellInfo.value]] + '\"></img>'; }"))
+}
+
 makeReactCellISTD <- function()
 {
     function(value)
@@ -346,6 +351,7 @@ makeMainResultsReactable <- function(tab, tabName, retMin, plots, colGroupOrder 
                        round_merged = makeReactCellRoundMerged(cdrow$rounding),
                        chromSmall = makeReactCellSmallChrom("chromLarge" %chin% colDefDB$formatting, plots),
                        chromLarge = makeReactCellLargeChrom(plots),
+                       mobilogram = makeReactCellMobilogram(),
                        ISTD = makeReactCellISTD(),
                        annotations = makeReactCellAnnotations(),
                        structure = makeReactImgCell(),
@@ -362,7 +368,7 @@ makeMainResultsReactable <- function(tab, tabName, retMin, plots, colGroupOrder 
                                annotations = getReactFilterMethodAnnotations())
         
         return(reactable::colDef(name = cdrow$displayName, show = !cdrow$hidden, format = format, cell = cell,
-                                 html = cdrow$formatting == "chromLarge", # HACK
+                                 html = cdrow$formatting %in% c("chromLarge", "mobilogram"), # HACK
                                  minWidth = if (!is.na(cdrow$minWidth)) cdrow$minWidth else 100,
                                  align = if (nzchar(cdrow$align)) cdrow$align, style = if (col %in% grpStartCols) colSepStyle,
                                  filterInput = filterInput, filterMethod = filterMethod))

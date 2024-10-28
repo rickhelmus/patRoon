@@ -29,6 +29,7 @@ setGeneric("plotSpectrumHash", function(obj, ...) standardGeneric("plotSpectrumH
 setGeneric("plotScoresHash", function(obj, ...) standardGeneric("plotScoresHash"))
 setGeneric("plotStructureHash", function(obj, ...) standardGeneric("plotStructureHash"))
 setGeneric("plotChromsHash", function(obj, ...) standardGeneric("plotChromsHash"))
+setGeneric("plotMobilogramHash", function(obj, ...) standardGeneric("plotMobilogramHash"))
 setGeneric("plotIntHash", function(obj, ...) standardGeneric("plotIntHash"))
 setGeneric("plotChordHash", function(obj, ...) standardGeneric("plotChordHash"))
 setGeneric("plotVennHash", function(obj, ...) standardGeneric("plotVennHash"))

@@ -55,6 +55,8 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
     ret$chromsSmall <- genHTMLReportPlotsChromsSmall(fGroups, settings, outPath, EICs, EICParams, parallel)
     ret$chromsFeatures <- genHTMLReportPlotsChromsFeatures(fGroups, settings, outPath, EICs, EICParams, parallel)
     
+    ret$mobilograms <- genHTMLReportPlotsMobilograms(fGroups, settings, outPath, parallel)
+    
     ret$intPlots <- genHTMLReportPlotsIntPlots(fGroups, settings, outPath, parallel)
     
     gNames <- names(fGroups)

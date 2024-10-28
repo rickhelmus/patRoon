@@ -871,6 +871,16 @@ setMethod("plotMobilogram", "featureGroups", function(obj, groupName = names(obj
     }
 })
 
+setMethod("plotMobilogramHash", "featureGroups", function(obj, groupName = names(obj), markMob = TRUE, IMSWindow = 0.2,
+                                                          maxMSRtWindow = 2, mzWindow = 0.005, clusterIMSWindow = 0.01,
+                                                          clusterMethod = "distance", minIntensity = 0, xlim = NULL,
+                                                          ylim = NULL, ...)
+{
+    args <- allArgs(FALSE)
+    makeHash(args[setdiff(names(args), c("obj"))], featureTable(obj), groupInfo(obj)[group %chin% groupName],
+             analysisInfo(obj))
+})
+
 #' @details \code{plotVenn} plots a Venn diagram (using \pkg{\link{VennDiagram}}) outlining unique and shared feature
 #'   groups between up to five replicate groups.
 #' @template plotvenn-ret

@@ -330,9 +330,10 @@
 - splitMobilities()
     - keep? then update
     - remove unassigned features?
-- plotMobilities()
-    - Finalize function: consistent arg names, checkmates, more functionality from plotChroms() --> see UNDONEs
+- plotMobilogram()
+    - Finalize function: consistent arg names, checkmates, more functionality from plotChroms(), areas? --> see UNDONEs
     - by default only allow 1 fg to be plotted?
+    - finish plotMobilogramHash()
     - tests, docs
 - Suspect features
     - XCMS/XCMS3/KPIC2: doc and/or default min fractions to zero as these probably don't make a lot of sense otherwise
@@ -341,6 +342,9 @@
 - reporting
     - convert reactable cell img functions to JS versions, so img paths are set dynamically which can save quite some space for selfContained reports
         --> see WIP changes made for chromsLarge
+    - mobilograms
+        - make setting (and use it instead of large chroms)
+        - have small/big mobilograms? or put them in a separate tab instead of the table?
 - Docs
     - Dietrich features
     - getDefPeakParams()

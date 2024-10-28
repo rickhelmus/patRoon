@@ -840,14 +840,13 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRtWindo
     
     getMSPL <- function(backend, ft, params, MSLevel)
     {
-        # UNDONE: set mobilities
         ret <- getMSPeakLists(backend, ft$retmin, ft$retmax, ft$mz,
                               withPrecursor = params$withPrecursor, retainPrecursor = params$retainPrecursor,
                               MSLevel = MSLevel, method = params$method, mzWindow = params$clusterMzWindow,
-                              startMobs = rep(0, nrow(ft)), endMobs = rep(0, nrow(ft)),
-                              minAbundance = params$minAbundance, topMost = params$topMost,
-                              minIntensityIMS = params$minIntensityIMS, minIntensityPre = params$minIntensityPre,
-                              minIntensityPost = params$minIntensityPost, minBPIntensity = 0)
+                              startMobs = ft$mobmin, endMobs = ft$mobmax, minAbundance = params$minAbundance,
+                              topMost = params$topMost, minIntensityIMS = params$minIntensityIMS,
+                              minIntensityPre = params$minIntensityPre, minIntensityPost = params$minIntensityPost,
+                              minBPIntensity = 0)
         
         names(ret) <- ft$group
         ret <- Map(ret, ft$mz[match(names(ret), ft$group)], f = function(pl, pmz)
@@ -868,14 +867,16 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRtWindo
     fTable <- featureTable(fGroups)
     gNames <- names(fGroups)
     cacheDB <- openCacheDBScope()
+    anaHashes <- getMSFileHashesFromAvailBackend(analysisInfo(fGroups))
     
     printf("Loading all MS peak lists for %d feature groups and %d analyses...\n", length(fGroups),
            length(analyses(fGroups)))
-    featurePLs <- applyMSData(analysisInfo(fGroups), function(ana, path, backend)
+    featurePLs <- applyMSData(analysisInfo(fGroups), fTable, func = function(ana, path, backend, ft)
     {
-        baseHash <- makeHash(getMSDataFileHash(path), maxMSRtWindow, topMost, avgFeatParams)
+        baseHash <- makeHash(anaHashes[[ana]], maxMSRtWindow, topMost, avgFeatParams)
         
-        ft <- copy(fTable[[ana]][, c("mz", "ret", "retmin", "retmax", "group"), with = FALSE])
+        ft <- copy(ft)
+        ft <- subsetDTColumnsIfPresent(ft, c("mz", "ret", "retmin", "retmax", "mobmin", "mobmax", "group"))
         
         if (!is.null(topMost))
             ft <- ft[sapply(group, function(g) ana %in% topAna[[g]]) == TRUE]
@@ -895,6 +896,13 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRtWindo
         {
             ft[, retmin := pmax(retmin, ret - maxMSRtWindow)]
             ft[, retmax := pmin(retmax, ret + maxMSRtWindow)]
+        }
+        for (col in c("mobmin", "mobmax"))
+        {
+            if (is.null(ft[[col]]))
+                set(ft, j = col, value = 0)
+            else
+                setnafill(ft, fill = 0, cols = col)
         }
         
         openMSReadBackend(backend, path)

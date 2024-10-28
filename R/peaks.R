@@ -10,7 +10,21 @@ findPeaks <- function(EICs, params, verbose = TRUE)
                 xcms3 = findPeaksXCMS3,
                 envipick = findPeaksEnviPick,
                 dietrich = findPeaksDietrich)
-    f(EICs, params[setdiff(names(params), "algorithm")], verbose = verbose)
+    ret <- f(EICs, params[setdiff(names(params), c("algorithm", "forcePeakRange"))], verbose = verbose)
+    
+    if (any(params$forcePeakRange != 0))
+    {
+        ret <- lapply(ret, function(pl)
+        {
+            pl <- copy(pl)
+            if (params$forcePeakRange[1] > 0)
+                pl[, retmin := pmax(ret - params$forcePeakRange[1], retmin)]
+            if (params$forcePeakRange[2] > 0)
+                pl[, retmax := pmin(ret + params$forcePeakRange[2], retmax)]
+        })
+    }
+    
+    return(ret)
 }
 
 findPeaksOpenMSOld <- function(EICs, minRTDistance = 10, minNumPeaks = 5, minSNRatio = 2, resampleTraces = FALSE,

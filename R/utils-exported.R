@@ -568,15 +568,16 @@ getDefPeakParams <- function(type, algorithm, ...)
                    maxPeaksPerSignal = 10
                )
         )
-        def$forcePeakRange = c(0, 0)
+        def$forcePeakRange <- c(0, 0)
+        def$relMinIntensity <- 0
     }
     else # IMS
     {
         # UNDONE!!
         def <- getDefPeakParams(algorithm, type = "chrom", ...)
         def$forcePeakRange = c(0.01, 0.1)
+        def$relMinIntensity <- 0.25
     }
-    
     
     return(modifyList(def, c(list(...), algorithm = algorithm)))
 }

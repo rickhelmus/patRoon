@@ -334,6 +334,7 @@
     - Finalize function: consistent arg names, checkmates, more functionality from plotChroms(), areas? --> see UNDONEs
     - by default only allow 1 fg to be plotted?
     - finish plotMobilogramHash()
+    - peak marking doesn't work for mobility fGroups
     - tests, docs
 - Suspect features
     - XCMS/XCMS3/KPIC2: doc and/or default min fractions to zero as these probably don't make a lot of sense otherwise

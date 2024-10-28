@@ -823,6 +823,9 @@ setMethod("plotMobilogram", "featureGroups", function(obj, groupName = names(obj
     {
         openMSReadBackend(backend, path)
         ft <- copy(ft[group %chin% groupName])
+        if (nrow(ft) == 0)
+            return(list())
+        
         if (!is.null(maxMSRtWindow))
         {
             ft[, retmin := max(retmin, ret - maxMSRtWindow), by = seq_len(nrow(ft))]
@@ -835,6 +838,7 @@ setMethod("plotMobilogram", "featureGroups", function(obj, groupName = names(obj
         names(m) <- ft$ID
         return(lapply(m, setDT))
     })
+    EIMs <- pruneList(EIMs, checkEmptyElements = TRUE)
 
     if (is.null(xlim))
     {

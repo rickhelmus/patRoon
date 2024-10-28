@@ -519,10 +519,11 @@ getDefPeakParams <- function(type, algorithm, ...)
     checkmate::assertChoice(type, c("chrom", "ims"))
     checkmate::assertChoice(algorithm, c("openms", "xcms3", "envipick", "dietrich"))
     
+    def <- NULL
     # UNDONE: put all this in eg an internal YAML?
-    def <- if (type == "chrom")
+    if (type == "chrom")
     {
-        switch(algorithm,
+        def <- switch(algorithm,
                openms = list(
                    minPeakWidth = -1,
                    backgroundSubtraction = "none",
@@ -567,12 +568,15 @@ getDefPeakParams <- function(type, algorithm, ...)
                    maxPeaksPerSignal = 10
                )
         )
+        def$forcePeakRange = c(0, 0)
     }
     else # IMS
     {
         # UNDONE!!
-        getDefPeakParams(algorithm, type = "chrom", ...)
+        def <- getDefPeakParams(algorithm, type = "chrom", ...)
+        def$forcePeakRange = c(0.01, 0.1)
     }
+    
     
     return(modifyList(def, c(list(...), algorithm = algorithm)))
 }

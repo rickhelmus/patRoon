@@ -888,8 +888,10 @@ assertFindPeaksParam <- function(x, null.ok = FALSE, .var.name = checkmate::vnam
                       add = add)
         assertListVal(x, "maxPeaksPerSignal", checkmate::assertCount, .var.name = .var.name, add = add)
     }
-    
     # NOTE: for XCMS/enviPick we just let the package functions throw an error...
+    
+    assertListVal(x, "forcePeakRange", assertRange, .var.name = .var.name, add = add)
+    
     invisible(NULL)
 }
 

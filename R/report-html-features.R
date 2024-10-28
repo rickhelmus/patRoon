@@ -15,6 +15,8 @@ getFGReactTab <- function(objects, settings, ...)
         tab[, chrom_small := group]
     if (settings$features$chromatograms$large)
         tab[, chrom_large := group]
+    if (settings$features$chromatograms$large) # UNDONE!
+        tab[, mobilogram := group]
     
     if (!is.null(objects$MSPeakLists) || !is.null(objects$formulas) || !is.null(objects$compounds))
     {
@@ -114,6 +116,27 @@ genHTMLReportPlotsChromsFeatures <- function(fGroups, settings, outPath, EICs, E
                                parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)), width = 6, height = 4, bg = "transparent",
                                pointsize = 20, scaling = 1)
         })
+    }, simplify = FALSE)
+}
+
+genHTMLReportPlotsMobilograms <- function(fGroups, settings, outPath, parallel)
+{
+    # UNDONE: also big/small versions?
+    
+    gInfo <- groupInfo(fGroups)
+    
+    # UNDONE!
+    if (!settings$features$chromatograms$large || is.null(gInfo[["mobility"]]))
+        return(list())
+    
+    cat("Generate mobilograms...\n")
+    doApply("sapply", parallel, gInfo[is.na(mobility)]$group, function(grp)
+    {
+        doProgress()
+        makeHTMLReportPlot("mobilogram-", outPath, "plotMobilogram",
+                           list(fGroups, groupName = grp, bty = "l"),
+                           parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)),
+                           width = 6, height = 4, bg = "transparent", pointsize = 16)
     }, simplify = FALSE)
 }
 

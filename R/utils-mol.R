@@ -78,28 +78,7 @@ babelConvert <- function(input, inFormat, outFormat, appendFormula = FALSE, must
     # only do non-NA and unique input
     indsToDo <- which(!is.na(input) & !duplicated(input))
     
-    mpm <- getOption("patRoon.MP.method", "classic")
-    batchn <- if (mpm == "classic") getOption("patRoon.MP.maxProcs") else future::nbrOfWorkers()
-    minBatchSize <- 1000 # put a minimum as overhead of creating processes is significant
-    batchn <- max(1, min(batchn, round(length(indsToDo) / minBatchSize)))
-    
-    batches <- splitInNBatches(indsToDo, batchn)
-    
-    # NOTE: both the input and output is tagged with indices, which makes it much easier to see which conversions failed
-    # see https://github.com/openbabel/openbabel/issues/2231
-    
-    mainArgs <- c(paste0("-o", if (outFormat %in% c("formula", "logP", "MW")) "txt" else outFormat), "-e")
-    if (inFormat == "inchi")
-        mainArgs <- c(mainArgs, "-an")
-    if (outFormat == "inchi" || outFormat == "inchikey")
-        mainArgs <- c(mainArgs, "-xw", "-xt")
-    cmdQueue <- lapply(seq_along(batches), function(bi)
-    {
-        b <- batches[[bi]]
-        return(list(args = mainArgs, input = data.frame(input[b], b), logFile = paste0("obabel-batch_", bi, ".txt")))
-    })
-    
-    resultsList <- executeMultiProcess(cmdQueue, finishHandler = function(cmd)
+    finishHandler <- function(cmd)
     {
         if (file.size(cmd$outFile) == 0)
             return(NULL)
@@ -137,7 +116,8 @@ babelConvert <- function(input, inFormat, outFormat, appendFormula = FALSE, must
             setnames(ret, ncol(ret), outFormat)
         
         return(ret)
-    }, prepareHandler = function(cmd)
+    }
+    prepareHandler <- function(cmd)
     {
         inFile <- tempfile("obabel_in")
         fwrite(cmd$input, inFile, col.names = FALSE, sep = " ")
@@ -150,10 +130,54 @@ babelConvert <- function(input, inFormat, outFormat, appendFormula = FALSE, must
         if (!is.null(extraOpts))
             args <- c(args, extraOpts)
         return(modifyList(cmd, list(command = getExtDepPath("openbabel"), args = args, outFile = outFile)))
-    }, showProgress = FALSE, logSubDir = "obabel")
+    }
+    errorHandler <- function(cmd, ...)
+    {
+        # UNDONE: actually check the exit code to see if the error was a segfault?
+        indsToDo <<- c(indsToDo, cmd$input[[2]])
+        FALSE
+    }
     
+    # NOTE: both the input and output is tagged with indices, which makes it much easier to see which conversions failed
+    # see https://github.com/openbabel/openbabel/issues/2231
+    
+    mainArgs <- c(paste0("-o", if (outFormat %in% c("formula", "logP", "MW")) "txt" else outFormat), "-e")
+    if (inFormat == "inchi")
+        mainArgs <- c(mainArgs, "-an")
+    if (outFormat == "inchi" || outFormat == "inchikey")
+        mainArgs <- c(mainArgs, "-xw", "-xt")
+
+    # NOTE: In rare cases obabel actually crashes on wrong input, instead of skipping it. Since we run in batches, we
+    # cannot know which inputs are to blame. Thus, in the error handler we store all IDs of the batches that failed, and
+    # keep try again with smaller batches until everything was processed or failed in a one by one run.
+    
+    mpm <- getOption("patRoon.MP.method", "classic")
+    workersn <- if (mpm == "classic") getOption("patRoon.MP.maxProcs") else future::nbrOfWorkers()
+    minBatchSize <- 1000 # put a minimum as overhead of creating processes is significant
+    batchn <- max(1, min(workersn, round(length(indsToDo) / minBatchSize)))
+    resultsList <- list()
+    iterations <- 1
+    repeat
+    {
+        batches <- splitInNBatches(indsToDo, batchn)
+        indsToDo <- integer()
+        cmdQueue <- lapply(seq_along(batches), function(bi)
+        {
+            b <- batches[[bi]]
+            return(list(args = mainArgs, input = data.frame(input[b], b), logFile = sprintf("obabel-batch_%d-iter_%d.txt", bi, iterations)))
+        })
+        resultsList <- c(resultsList,  executeMultiProcess(cmdQueue, finishHandler = finishHandler,
+                                                           prepareHandler = prepareHandler, errorHandler = errorHandler,
+                                                           showProgress = FALSE, logSubDir = "obabel"))
+
+        if (length(indsToDo) == 0 || all(lengths(batches) == 1))
+            break # finished or tried all inputs one by one
+                
+        batchn <- batchn + 1 # try with more batches next iteration
+        iterations <- iterations + 1
+    }
     ret <- rbindlist(resultsList)
-    
+
     if (nrow(ret) == 0)
     {
         r <- rep(NA_character_, length(input))

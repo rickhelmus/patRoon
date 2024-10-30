@@ -241,7 +241,8 @@ setMethod("predictTox", "compoundsSIRIUS", function(obj, type = "FP", LC50Mode =
 #' @template algo_generator
 #'
 #' @details Similar to \code{\link{generateFormulasSIRIUS}}, candidate formulae are generated with SIRIUS. These results
-#'   are then feed to CSI:FingerID to acquire candidate structures. This method requires the availability of MS/MS data,
+#'   are then fed to CSI:FingerID to acquire candidate structures. Candidate formulae without any assigned structure
+#'   will be removed (unlike \code{\link{generateFormulasSIRIUS}}). This method requires the availability of MS/MS data,
 #'   and feature groups without it will be ignored.
 #'
 #' @param fingerIDDatabase Database specifically used for \command{CSI:FingerID}. If \code{NULL}, the value of the

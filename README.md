@@ -13,6 +13,8 @@ specTROmetry nOn-target aNalysis_.
 
 ## Project news
 
+**October 2024** `patRoon 2.3.3` is now released. This is a small maintenance release which correct the SIRIUS login procedure and comes with several other bug fixes. Please see the [Project NEWS][NEWS] for more details.
+
 **July 2024** `patRoon 2.3.2` is now released. This is a small maintenance release with several important bug fixes and new functions to inspect raw MS data (thanks to Ricardo Cunha). Please see the [Project NEWS][NEWS] for more details.
 
 **December 2023** `patRoon 2.3.1` is now released. This is a small maintenance release with several bug fixes. The most important fix is a correction for the prediction of concentrations from SIRIUS fingerprints. Please see the [Project NEWS][NEWS] for more details and important notes on updating `patRoon`.

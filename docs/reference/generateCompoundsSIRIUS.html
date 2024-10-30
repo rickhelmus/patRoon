@@ -18,7 +18,7 @@ CSI:FingerID for compound annotation."><!-- mathjax --><script src="https://cdnj
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.3</span>
       </span>
     </div>
 
@@ -277,7 +277,8 @@ averaged.</p></dd>
     <p>This function uses SIRIUS to generate compound candidates. This function is called when calling <code>generateCompounds</code> with
   <code>algorithm="sirius"</code>.</p>
 <p>Similar to <code><a href="generateFormulasSIRIUS.html">generateFormulasSIRIUS</a></code>, candidate formulae are generated with SIRIUS. These results
-  are then feed to CSI:FingerID to acquire candidate structures. This method requires the availability of MS/MS data,
+  are then fed to CSI:FingerID to acquire candidate structures. Candidate formulae without any assigned structure
+  will be removed (unlike <code><a href="generateFormulasSIRIUS.html">generateFormulasSIRIUS</a></code>). This method requires the availability of MS/MS data,
   and feature groups without it will be ignored.</p>
     </div>
     <div id="note">

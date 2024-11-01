@@ -1385,11 +1385,12 @@ setMethod("findMobilities", "featureGroups", function(fGroups, mobPeaksParam, mz
                                                       maxMSRTWindow = 2, chromPeaksParam = NULL, RTWindow = 20,
                                                       calcArea = "integrate", fallbackEIC = TRUE, parallel = TRUE)
 {
+    # NOTE: keep args in sync with other methods
     return(doFindMobilities(fGroups, mobPeaksParam = mobPeaksParam, mzWindow = mzWindow,
                             clusterIMSWindow = clusterIMSWindow, clusterMethod = clusterMethod,
                             minIntensityIMS = minIntensityIMS, maxMSRTWindow = maxMSRTWindow,
                             chromPeaksParam = chromPeaksParam, RTWindow = RTWindow, calcArea = calcArea,
-                            fallbackEIC = fallbackEIC, parallel = parallel))
+                            fallbackEIC = fallbackEIC, assignedMobilities = NULL, parallel = parallel))
 })
 
 #' @export

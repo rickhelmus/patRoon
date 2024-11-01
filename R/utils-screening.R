@@ -9,7 +9,7 @@ NULL
 isScreening <- function(fGroups) inherits(fGroups, c("featureGroupsScreening", "featureGroupsScreeningSet"))
 isSuspAnnotated <- function(fGroups) isScreening(fGroups) && !is.null(screenInfo(fGroups)[["estIDLevel"]])
 
-suspMetaDataCols <- function() c("name", "rt", "name_orig", "mz", "SMILES", "InChI", "InChIKey", "formula",
+suspMetaDataCols <- function() c("name", "rt", "name_orig", "mz", "mobility", "SMILES", "InChI", "InChIKey", "formula",
                                  "neutralMass", "molNeutralized", "adduct", "fragments_mz", "fragments_formula")
 suspAnnCols <- function() c("formRank", "compRank", "annSimForm", "annSimComp", "annSimBoth", "maxFrags",
                             "maxFragMatches", "maxFragMatchesRel", "estIDLevel")
@@ -309,7 +309,8 @@ doGroupSuspects <- function(feat, groupFunc, ..., verbose = TRUE)
     sInfo <- merge(sInfo, susp[, metaDataCols, with = FALSE], by = "name")
     sInfo[, d_rt := gInfo[match(sInfo$group, group)]$ret - rt]
     sInfo[, d_mz := gInfo[match(sInfo$group, group)]$mz - mz]
-    
+    if (hasMob)
+        sInfo[, d_mob := gInfo[match(sInfo$group, group)]$mobility - mobility]
     return(featureGroupsScreening(screenInfo = sInfo, groups = gTable, groupInfo = gInfo, features = feat,
                                   ftindex = ftind))
 }

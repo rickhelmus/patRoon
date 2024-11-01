@@ -180,7 +180,7 @@ doGetEICs <- function(anaInfo, EICInfoList, minIntensityIMS = 0, compress = TRUE
     if (length(EICInfoList) == 0)
         return(list())
     
-    # HACK: for now we _don't_ cache EICs if compres==FALSE: the resulting data is very large and takes a long time to
+    # HACK: for now we _don't_ cache EICs if compress==FALSE: the resulting data is very large and takes a long time to
     # be stored. Hence, the caller should cache the final results.
     doCache <- compress
 

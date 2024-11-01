@@ -130,7 +130,8 @@ genHTMLReportPlotsMobilograms <- function(fGroups, settings, outPath, parallel)
         return(list())
     
     cat("Generate mobilograms...\n")
-    doApply("sapply", parallel, gInfo[is.na(mobility)]$group, function(grp)
+    # UNDONE: only do IMS parent (if present)?
+    doApply("sapply", parallel, gInfo$group, function(grp)
     {
         doProgress()
         makeHTMLReportPlot("mobilogram-", outPath, "plotMobilogram",

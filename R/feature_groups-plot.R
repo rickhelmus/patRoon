@@ -863,7 +863,9 @@ setMethod("plotMobilogram", "featureGroups", function(obj, groupName = names(obj
             
             if (markMob)
             {
-                m <- fTable[[ana]][ims_parent_ID == fID]
+                # get all features with mobilities: for IMS parents we collect all mob features from ims_parent_ID,
+                # otherwise just the mob feature itself
+                m <- fTable[[ana]][(ID == fID | ims_parent_ID == fID) & !is.na(mobility)]
                 for (i in seq_len(nrow(m)))
                     segments(m$mobility[i], 0, m$mobility[i], m$intensity[i], col = "red", lty = "dotted")
             }

@@ -804,7 +804,7 @@ findPeaksInEICs <- function(allEICs, peaksParam, withBP, parallel, cacheDB = NUL
 }
 
 assignFeatureMobilities <- function(features, peaksParam, mzWindow, clusterIMSWindow, clusterMethod, minIntensityIMS,
-                                    maxMSRTWindow)
+                                    maxMSRTWindow, assignedMobilities)
 {
     printf("Finding mobilities for all features...\n")
     
@@ -815,17 +815,22 @@ assignFeatureMobilities <- function(features, peaksParam, mzWindow, clusterIMSWi
         openMSReadBackend(backend, path)
         
         fTable <- copy(fTable)
-        retmin <- fTable$retmin; retmax <- fTable$retmax;
+        
+        fTableForPeaks <- if (!is.null(assignedMobilities))
+            copy(fTable[!group %chin% assignedMobilities$group])
+        else
+            copy(fTable)
         if (!is.null(maxMSRTWindow))
         {
-            retmin <- pmax(retmin, fTable$ret - maxMSRTWindow)
-            retmax <- pmin(retmax, fTable$ret + maxMSRTWindow)
+            fTableForPeaks[, retmin := pmax(retmin, ret - maxMSRTWindow)]
+            fTableForPeaks[, retmax := pmin(retmax, ret + maxMSRTWindow)]
         }
         
         # NOTE: mzmin/mzmax may be too narrow here, hence use a user specified mz range
-        EIMs <- getMobilograms(backend, fTable$mz - mzWindow, fTable$mz + mzWindow, retmin, retmax,
-                               clusterMethod, clusterIMSWindow, minIntensityIMS, FALSE)
-        names(EIMs) <- fTable$ID
+        EIMs <- getMobilograms(backend, fTableForPeaks$mz - mzWindow, fTableForPeaks$mz + mzWindow,
+                               fTableForPeaks$retmin, fTableForPeaks$retmax, clusterMethod, clusterIMSWindow,
+                               minIntensityIMS, FALSE)
+        names(EIMs) <- fTableForPeaks$ID
         EIMs <- lapply(EIMs, setDT)
         
         # pretend we have EICs so we can find peaks
@@ -833,9 +838,18 @@ assignFeatureMobilities <- function(features, peaksParam, mzWindow, clusterIMSWi
         EICs <- lapply(EICs, setnames, old = "mobility", new = "time")
         peaksList <- findPeaks(EICs, peaksParam, verbose = FALSE)
         
-        peaksList <- lapply(peaksList, function(p) p[, mobOrd := seq_len(.N)])
-        
         peaksTable <- rbindlist(peaksList, idcol = "ims_parent_ID")
+        
+        if (!is.null(assignedMobilities))
+        {
+            am <- copy(assignedMobilities)
+            am <- am[group %chin% fTable$group]
+            am[, ims_parent_ID := fTable[match(am$group, group, nomatch = 0)]$ID][,group := NULL]
+            peaksTable <- rbind(peaksTable, am, fill = TRUE)
+        }
+        
+        peaksTable[, mobOrd := seq_len(.N), by = "ims_parent_ID"]
+        
         mobNumCols <- c("mobility", "mobmin", "mobmax", "mob_area", "mob_intensity")
         if (nrow(peaksTable) == 0)
         {
@@ -956,7 +970,8 @@ reintegrateFeatures <- function(features, RTWindow, calcArea, peaksParam, fallba
 }
 
 doFindMobilities <- function(fGroups, mobPeaksParam, mzWindow, clusterIMSWindow, clusterMethod, minIntensityIMS,
-                             maxMSRTWindow, chromPeaksParam, RTWindow, calcArea, fallbackEIC, parallel)
+                             maxMSRTWindow, chromPeaksParam, RTWindow, calcArea, fallbackEIC, assignedMobilities,
+                             parallel)
 {
     ac <- checkmate::makeAssertCollection()
     assertFindPeaksParam(mobPeaksParam, add = ac)
@@ -980,7 +995,7 @@ doFindMobilities <- function(fGroups, mobPeaksParam, mzWindow, clusterIMSWindow,
         return(cd)
     
     fGroups@features <- assignFeatureMobilities(fGroups@features, mobPeaksParam, mzWindow, clusterIMSWindow, clusterMethod,
-                                                minIntensityIMS, maxMSRTWindow)
+                                                minIntensityIMS, maxMSRTWindow, assignedMobilities)
     fGroups@features <- reintegrateFeatures(fGroups@features, RTWindow, calcArea, chromPeaksParam, fallbackEIC, TRUE,
                                             parallel)
     

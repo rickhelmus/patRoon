@@ -819,7 +819,7 @@ setMethod("plotMobilogram", "featureGroups", function(obj, groupName = names(obj
     fTable <- featureTable(obj)
     anaInfo <- analysisInfo(obj)
 
-    EIMs <- applyMSData(anaInfo, fTable, types = c("raw", "ims"), formats = c("bruker_ims", "mzML"), func = function(ana, path, backend, ft)
+    EIMs <- applyMSData(anaInfo, fTable, needIMS = TRUE, func = function(ana, path, backend, ft)
     {
         openMSReadBackend(backend, path)
         ft <- copy(ft[group %chin% groupName])

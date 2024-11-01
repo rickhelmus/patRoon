@@ -3,7 +3,7 @@ NULL
 
 Rcpp::loadModule("MSReadBackend", TRUE)
 
-maybeGetMSFilesForOTIMS <- function(anaInfo, types, formats)
+maybeGetMSFilesForOTIMS <- function(anaInfo, types, formats, needIMS)
 {
     if (!"raw" %in% types || !"bruker_ims" %in% formats)
         return(NULL)
@@ -19,9 +19,9 @@ maybeGetMSFilesForOTIMS <- function(anaInfo, types, formats)
     return(ret)
 }
 
-maybeGetMSFilesForMzR <- function(anaInfo, types, formats)
+maybeGetMSFilesForMzR <- function(anaInfo, types, formats, needIMS)
 {
-    if (!"centroid" %in% types)
+    if (!"centroid" %in% types || needIMS)
         return(NULL)
     if (!requireNamespace("mzR", quietly = TRUE))
         return(NULL) # UNDONE: this will only be relevant when we actually make mzR a soft dependency
@@ -29,21 +29,21 @@ maybeGetMSFilesForMzR <- function(anaInfo, types, formats)
                                            mustExist = FALSE))
 }
 
-maybeGetMSFilesForSC <- function(anaInfo, types, formats)
+maybeGetMSFilesForSC <- function(anaInfo, types, formats, needIMS)
 {
     # UNDONE: mechanism to prefer IM/centroided data
     ret <- if ("ims" %in% types) getMSFilesFromAnaInfo(anaInfo, "ims", "mzML", FALSE)
-    if (is.null(ret) && "centroid" %in% types)
+    if (is.null(ret) && "centroid" %in% types && !needIMS)
         ret <- getCentroidedMSFilesFromAnaInfo(anaInfo, formats = intersect(formats, c("mzML", "mzXML")),
                                                mustExist = FALSE)
     return(ret)
 }
 
-maybeGetMSFilesForMSTK <- function(anaInfo, types, formats)
+maybeGetMSFilesForMSTK <- function(anaInfo, types, formats, needIMS)
 {
     # UNDONE: mechanism to prefer IM/centroided data
     ret <- if ("ims" %in% types) getMSFilesFromAnaInfo(anaInfo, "ims", "mzML", FALSE)
-    if (is.null(ret) && "centroid" %in% types)
+    if (is.null(ret) && "centroid" %in% types && !needIMS)
         ret <- getCentroidedMSFilesFromAnaInfo(anaInfo, formats = intersect(formats, c("mzML", "mzXML")),
                                                mustExist = FALSE)
     return(ret)
@@ -217,7 +217,7 @@ openMSReadBackend <- function(backend, path)
 }
 
 applyMSData <- function(anaInfo, func,  ..., types = getMSFileTypes(), formats = names(MSFileExtensions()),
-                        showProgress = TRUE)
+                        needIMS = FALSE, showProgress = TRUE)
 {
     backends <- getOption("patRoon.MSBackends", character())
     
@@ -226,7 +226,7 @@ applyMSData <- function(anaInfo, func,  ..., types = getMSFileTypes(), formats =
         if (!backendAvailable(bn))
             next
         
-        filePaths <- maybeGetMSFiles(bn, anaInfo, types, formats)
+        filePaths <- maybeGetMSFiles(bn, anaInfo, types, formats, needIMS)
         if (!is.null(filePaths))
         {
             backend <- createMSBackend(bn)
@@ -236,7 +236,14 @@ applyMSData <- function(anaInfo, func,  ..., types = getMSFileTypes(), formats =
                            MoreArgs = list(backend = backend)))
         }
     }
-    
-    stop("Failed to load a correct MS read backend. Please ensure patRoon.MSBackends is configured properly. See ?patRoon",
+
+    msg <- "Could not load MS data."
+    if (!setequal(types, getMSFileTypes()))
+        msg <- paste(msg, sprintf("Allowed types: %s.", paste0("\"", types, "\"", collapse = ", ")))
+    if (!setequal(formats, names(MSFileExtensions())))
+        msg <- paste(msg, sprintf("Allowed formats: %s.", paste0("\"", formats, "\"", collapse = ", ")))
+    if (needIMS)
+        msg <- paste(msg, "IMS data is required.")
+    stop(msg, " Please ensure all data is present and the \"patRoon.MSBackends\" option is configured properly: see ?patRoon",
          call. = FALSE)
 }

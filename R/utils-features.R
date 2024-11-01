@@ -803,7 +803,7 @@ findPeaksInEICs <- function(allEICs, peaksParam, withBP, parallel, cacheDB = NUL
     }, simplify = FALSE)
 }
 
-assignFeatureMobilities <- function(features, peaksParam, mzWindow, clusterIMSWindow, clusterMethod, minIntensityIMS,
+assignFeatureMobilities <- function(features, peaksParam, mzWindow, IMSWindow, clusterMethod, minIntensityIMS,
                                     maxMSRTWindow, assignedMobilities)
 {
     printf("Finding mobilities for all features...\n")
@@ -828,7 +828,7 @@ assignFeatureMobilities <- function(features, peaksParam, mzWindow, clusterIMSWi
         
         # NOTE: mzmin/mzmax may be too narrow here, hence use a user specified mz range
         EIMs <- getMobilograms(backend, fTableForPeaks$mz - mzWindow, fTableForPeaks$mz + mzWindow,
-                               fTableForPeaks$retmin, fTableForPeaks$retmax, clusterMethod, clusterIMSWindow,
+                               fTableForPeaks$retmin, fTableForPeaks$retmax, clusterMethod, IMSWindow,
                                minIntensityIMS, FALSE)
         names(EIMs) <- fTableForPeaks$ID
         EIMs <- lapply(EIMs, setDT)
@@ -969,13 +969,13 @@ reintegrateFeatures <- function(features, RTWindow, calcArea, peaksParam, fallba
     return(features)
 }
 
-doFindMobilities <- function(fGroups, mobPeaksParam, mzWindow, clusterIMSWindow, clusterMethod, minIntensityIMS,
+doFindMobilities <- function(fGroups, mobPeaksParam, mzWindow, IMSWindow, clusterMethod, minIntensityIMS,
                              maxMSRTWindow, chromPeaksParam, RTWindow, calcArea, fallbackEIC, assignedMobilities,
                              parallel)
 {
     ac <- checkmate::makeAssertCollection()
     assertFindPeaksParam(mobPeaksParam, add = ac)
-    aapply(checkmate::assertNumber, . ~ mzWindow + clusterIMSWindow + minIntensityIMS + RTWindow, finite = TRUE,
+    aapply(checkmate::assertNumber, . ~ mzWindow + IMSWindow + minIntensityIMS + RTWindow, finite = TRUE,
            fixed = list(add = ac))
     checkmate::assertChoice(clusterMethod, c("bin", "distance", "hclust"), add = ac)
     checkmate::assertNumber(maxMSRTWindow, lower = 1, finite = TRUE, null.ok = TRUE, add = ac)
@@ -988,13 +988,13 @@ doFindMobilities <- function(fGroups, mobPeaksParam, mzWindow, clusterIMSWindow,
         return(fGroups) # nothing to do...
     
     fTable <- featureTable(fGroups)
-    hash <- makeHash(fGroups, mobPeaksParam, mzWindow, clusterIMSWindow, clusterMethod, minIntensityIMS, maxMSRTWindow,
+    hash <- makeHash(fGroups, mobPeaksParam, mzWindow, IMSWindow, clusterMethod, minIntensityIMS, maxMSRTWindow,
                      chromPeaksParam, RTWindow, calcArea, fallbackEIC)
     cd <- loadCacheData("findMobilities", hash)
     if (!is.null(cd))
         return(cd)
     
-    fGroups@features <- assignFeatureMobilities(fGroups@features, mobPeaksParam, mzWindow, clusterIMSWindow, clusterMethod,
+    fGroups@features <- assignFeatureMobilities(fGroups@features, mobPeaksParam, mzWindow, IMSWindow, clusterMethod,
                                                 minIntensityIMS, maxMSRTWindow, assignedMobilities)
     fGroups@features <- reintegrateFeatures(fGroups@features, RTWindow, calcArea, chromPeaksParam, fallbackEIC, TRUE,
                                             parallel)
@@ -1013,7 +1013,7 @@ doFindMobilities <- function(fGroups, mobPeaksParam, mzWindow, clusterIMSWindow,
         else
         {
             hc <- fastcluster::hclust(dist(mobility))
-            cutree(hc, h = clusterIMSWindow)
+            cutree(hc, h = IMSWindow)
         }
     }, by = "group"]
     printf("Done!\n")

@@ -1380,14 +1380,14 @@ setMethod("calculateTox", "featureGroups", function(fGroups, featureAnn)
 })
 
 #' @export
-setMethod("findMobilities", "featureGroups", function(fGroups, mobPeaksParam, mzWindow = 0.005, clusterIMSWindow = 0.01,
+setMethod("findMobilities", "featureGroups", function(fGroups, mobPeaksParam, mzWindow = 0.005, IMSWindow = 0.01,
                                                       clusterMethod = "distance", minIntensityIMS = 0,
                                                       maxMSRTWindow = 2, chromPeaksParam = NULL, RTWindow = 20,
                                                       calcArea = "integrate", fallbackEIC = TRUE, parallel = TRUE)
 {
     # NOTE: keep args in sync with other methods
     return(doFindMobilities(fGroups, mobPeaksParam = mobPeaksParam, mzWindow = mzWindow,
-                            clusterIMSWindow = clusterIMSWindow, clusterMethod = clusterMethod,
+                            IMSWindow = IMSWindow, clusterMethod = clusterMethod,
                             minIntensityIMS = minIntensityIMS, maxMSRTWindow = maxMSRTWindow,
                             chromPeaksParam = chromPeaksParam, RTWindow = RTWindow, calcArea = calcArea,
                             fallbackEIC = fallbackEIC, assignedMobilities = NULL, parallel = parallel))

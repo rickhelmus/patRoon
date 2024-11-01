@@ -17,6 +17,7 @@ namespace {
  * Removed unnecessary RcppArmadillo dependencies
  * Converted RT min/max args from scans to times and disable check if its zero
  * Disabled noise removal for reported intensities/areas
+ * Converted peakwidth_min and max from ints to doubles
  * 
  * UNDONE: convert int args to doubles?
  */ 
@@ -33,7 +34,7 @@ struct PeakPickingResults
 };
 
 PeakPickingResults peakPicking_cpp(const std::vector<double> &intensity, const std::vector<double> &scantime,
-                                   double min_intensity, int sn, int peakwidth_min, int peakwidth_max, double rt_min,
+                                   double min_intensity, int sn, double peakwidth_min, double peakwidth_max, double rt_min,
                                    double rt_max, int maxPeaksPerSignal)
 {
     
@@ -366,7 +367,7 @@ PeakPickingResults peakPicking_cpp(const std::vector<double> &intensity, const s
 }
 
 // [[Rcpp::export]]
-Rcpp::List doFindPeaksDietrich(Rcpp::List EICs, double minIntensity, int SN, int peakWidthMin, int peakWidthMax,
+Rcpp::List doFindPeaksDietrich(Rcpp::List EICs, double minIntensity, int SN, double peakWidthMin, double peakWidthMax,
                                double RTMin, double RTMax, int maxPeaksPerSignal, bool verbose = true)
 {
     // UNDONE: set default args

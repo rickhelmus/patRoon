@@ -940,3 +940,103 @@ reintegrateFeatures <- function(features, RTWindow, calcArea, peaksParam, onlyMo
     
     return(features)
 }
+
+doFindMobilities <- function(fGroups, mobPeaksParam, mzWindow, clusterIMSWindow, clusterMethod, minIntensityIMS,
+                             maxMSRTWindow, chromPeaksParam, RTWindow, calcArea, parallel)
+{
+    ac <- checkmate::makeAssertCollection()
+    assertFindPeaksParam(mobPeaksParam, add = ac)
+    aapply(checkmate::assertNumber, . ~ mzWindow + clusterIMSWindow + minIntensityIMS + RTWindow, finite = TRUE,
+           fixed = list(add = ac))
+    checkmate::assertChoice(clusterMethod, c("bin", "distance", "hclust"), add = ac)
+    checkmate::assertNumber(maxMSRTWindow, lower = 1, finite = TRUE, null.ok = TRUE, add = ac)
+    assertFindPeaksParam(chromPeaksParam, null.ok = TRUE, add = ac)
+    checkmate::assertChoice(calcArea, c("integrate", "sum"), add = ac)
+    checkmate::assertFlag(parallel, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (length(fGroups) == 0)
+        return(fGroups) # nothing to do...
+    
+    fTable <- featureTable(fGroups)
+    hash <- makeHash(fGroups, mobPeaksParam, mzWindow, clusterIMSWindow, clusterMethod, minIntensityIMS, maxMSRTWindow,
+                     chromPeaksParam, RTWindow, calcArea)
+    cd <- loadCacheData("findMobilities", hash)
+    if (!is.null(cd))
+        return(cd)
+    
+    fGroups@features <- assignFeatureMobilities(fGroups@features, mobPeaksParam, mzWindow, clusterIMSWindow, clusterMethod,
+                                                minIntensityIMS, maxMSRTWindow)
+    fGroups@features <- reintegrateFeatures(fGroups@features, RTWindow, calcArea, chromPeaksParam, TRUE, parallel)
+    
+    fTable <- featureTable(fGroups)
+    
+    printf("Clustering mobilities... ")
+    
+    # cluster features within original fGroups with similar mobilities together    
+    fTableAll <- rbindlist(fTable, idcol = "analysis")
+    fTableAll[!is.na(mobility), gClust := {
+        if (.N == 0)
+            numeric()
+        else if (.N == 1)
+            1
+        else
+        {
+            hc <- fastcluster::hclust(dist(mobility))
+            cutree(hc, h = clusterIMSWindow)
+        }
+    }, by = "group"]
+    printf("Done!\n")
+    
+    printf("Updating feature group data... ")
+    
+    # prepare group info
+    gMobInfo <- fTableAll[, .(mobility = mean(mobility)), by = c("group", "gClust")]
+    setnames(gMobInfo, "group", "ims_parent_group")
+    gMobInfo[, group := fifelse(!is.na(mobility), appendMobToName(ims_parent_group, mobility), ims_parent_group)]
+    
+    # update features
+    setnames(fTableAll, "group", "ims_parent_group") # UNDONE: better colname
+    fTableAll[gMobInfo, group := i.group, on = c("ims_parent_group", "gClust")]
+    featureTable(fGroups) <- split(fTableAll[, -"gClust"], by = "analysis", keep.by = FALSE)
+    
+    # update gInfo
+    gInfo <- copy(groupInfo(fGroups))
+    setnames(gInfo, "group", "ims_parent_group")
+    gInfo <- merge(gInfo, gMobInfo, by = "ims_parent_group", sort = FALSE)
+    setcolorder(gInfo, c("group", "ret", "mz", "mobility", "ims_parent_group"))
+    fGroups@groupInfo <- gInfo[, -"gClust"]
+    
+    # re-fill group table
+    fTablePerGroup <- split(fTableAll, by = "group")
+    fTablePerGroup <- fTablePerGroup[gInfo$group]
+    anaInfo <- analysisInfo(fGroups)
+    gTable <- data.table()
+    gTable[, (gInfo$group) := lapply(fTablePerGroup, function(ft)
+    {
+        ints <- numeric(nrow(anaInfo))
+        ints[match(ft$analysis, anaInfo$analysis)] <- ft$intensity
+        return(ints)
+    })]
+    fGroups@groups <- gTable
+    
+    # update ftindex
+    fGroups <- reGenerateFTIndex(fGroups)
+    
+    for (sl in c("groupQualities", "groupScores", "ISTDs", "ISTDAssignments", "annotations", "concentrations",
+                 "toxicities"))
+    {
+        d <- slot(fGroups, sl)
+        if (length(d) > 0)
+        {
+            warning("Clearing all data from ", sl, call. = FALSE)
+            slot(fGroups, sl) <- if (is.data.table(d)) data.table() else list()
+        }
+    }
+    
+    printf("Done!\n")
+    
+    saveCacheData("findMobilities", fGroups, hash)
+    
+    return(fGroups)
+}

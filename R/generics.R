@@ -497,7 +497,7 @@ setGeneric("filter", function(obj, ...) standardGeneric("filter"))
 #' @templateVar func findMobilities
 #' @templateVar desc finds ion mobilities for all features.
 #' @template generics
-setGeneric("findMobilities", function(obj, ...) standardGeneric("findMobilities"))
+setGeneric("findMobilities", function(fGroups, ...) standardGeneric("findMobilities"))
 
 #' @templateVar func getBPCs
 #' @templateVar desc gets base peak chromatogram(s).

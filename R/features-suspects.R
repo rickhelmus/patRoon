@@ -100,6 +100,8 @@ findFeaturesSuspects <- function(analysisInfo, suspects, peaksParam, rtWindow = 
             
             if (needIMS)
                 peaks[, ims_parent_ID := NA_character_]
+            else
+                peaks <- removeDTColumnsIfPresent(peaks, c("mobmin", "mobmax", "mobility"))
             
             return(peaks[])
         })

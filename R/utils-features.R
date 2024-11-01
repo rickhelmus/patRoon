@@ -789,7 +789,7 @@ findPeaksInEICs <- function(allEICs, peaksParam, withBP, parallel, cacheDB = NUL
         }
         
         # NOTE: we could also set mobilities after checking if data is available, but then we need to repeat the EIC subsetting above
-        if (is.null(EICs$mobility))
+        if (length(EICs) == 0 || is.null(EICs[[1]][["mobility"]]))
             peaks[, c("mobmin", "mobmax", "mobility") := NULL]
         
         # make unique IDs

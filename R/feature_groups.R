@@ -1383,13 +1383,13 @@ setMethod("calculateTox", "featureGroups", function(fGroups, featureAnn)
 setMethod("findMobilities", "featureGroups", function(fGroups, mobPeaksParam, mzWindow = 0.005, clusterIMSWindow = 0.01,
                                                       clusterMethod = "distance", minIntensityIMS = 0,
                                                       maxMSRTWindow = 2, chromPeaksParam = NULL, RTWindow = 20,
-                                                      calcArea = "integrate", parallel = TRUE)
+                                                      calcArea = "integrate", fallbackEIC = TRUE, parallel = TRUE)
 {
     return(doFindMobilities(fGroups, mobPeaksParam = mobPeaksParam, mzWindow = mzWindow,
                             clusterIMSWindow = clusterIMSWindow, clusterMethod = clusterMethod,
                             minIntensityIMS = minIntensityIMS, maxMSRTWindow = maxMSRTWindow,
                             chromPeaksParam = chromPeaksParam, RTWindow = RTWindow, calcArea = calcArea,
-                            parallel = parallel))
+                            fallbackEIC = fallbackEIC, parallel = parallel))
 })
 
 #' @export

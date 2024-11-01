@@ -464,42 +464,6 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
 })
 
 #' @export
-setMethod("findMobilities", "features", function(obj, mobPeaksParam, mzWindow = 0.005, clusterIMSWindow = 0.01,
-                                                 clusterMethod = "distance", minIntensityIMS = 0, maxMSRTWindow = 2,
-                                                 chromPeaksParam = NULL, RTWindow = 20, calcArea = "integrate",
-                                                 parallel = TRUE)
-{
-    ac <- checkmate::makeAssertCollection()
-    assertFindPeaksParam(mobPeaksParam, add = ac)
-    aapply(checkmate::assertNumber, . ~ mzWindow + clusterIMSWindow + minIntensityIMS + RTWindow, finite = TRUE,
-           fixed = list(add = ac))
-    checkmate::assertChoice(clusterMethod, c("bin", "distance", "hclust"), add = ac)
-    checkmate::assertNumber(maxMSRTWindow, lower = 1, finite = TRUE, null.ok = TRUE, add = ac)
-    assertFindPeaksParam(chromPeaksParam, null.ok = TRUE, add = ac)
-    checkmate::assertChoice(calcArea, c("integrate", "sum"), add = ac)
-    checkmate::assertFlag(parallel, add = ac)
-    checkmate::reportAssertions(ac)
-    
-    if (length(obj) == 0)
-        return(obj) # nothing to do...
-    
-    hash <- makeHash(obj, mobPeaksParam, mzWindow, clusterIMSWindow, clusterMethod, minIntensityIMS, maxMSRTWindow,
-                     chromPeaksParam)
-    cd <- loadCacheData("findMobilities", hash)
-    if (!is.null(cd))
-        return(cd)
-    
-    obj <- assignFeatureMobilities(obj, mobPeaksParam, mzWindow, clusterIMSWindow, clusterMethod, minIntensityIMS,
-                                   maxMSRTWindow)
-
-    obj <- reintegrateFeatures(obj, RTWindow, calcArea, chromPeaksParam, TRUE, parallel)
-
-    saveCacheData("findMobilities", obj, hash)
-    
-    return(obj)
-})
-
-#' @export
 setMethod("splitMobilities", "features", function(obj, RTWindow = 20, mzWindow = 0.005, IMSWindow = 0.01,
                                                   calcArea = "integrate", peaksParam = NULL, parallel = TRUE)
 {

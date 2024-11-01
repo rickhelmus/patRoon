@@ -18,6 +18,7 @@
 
 ## TC
 
+- delete(fgScreening, k = func) gives a warning for is.na (what was NA supposed to do?)
 - annSims
     - let lib compounds use the same specsimParams default? Then annSim == libMatch by default.
     - remove support for annSimBoth in annotateSuspects? Or optionally calc for feat annotations and copy that?
@@ -211,6 +212,7 @@
     - store it in an option? or otherwise in EICParams for fGroups?
     - remove default in doGetEICs() when finished
     - also use it for MSPL and EIMs?
+- getEICList(): do mob assignment from base peak instead of average
 - MT
     - test ThreadExceptionHandler a bit more, eg if subsequent run calls cancels well if an exception is caught
 - cleanup
@@ -327,6 +329,8 @@
             - currently cleared with a warning
             - duplicate values where possible
         - sets methods
+    - somehow handle eg XCMS objects which cannot do mobilities (eg clearout?)
+    - test for fGroups from screenInfo(), eg for fGroups with >1 suspect assigned
 - splitMobilities()
     - keep? then update
     - remove unassigned features?
@@ -334,12 +338,17 @@
     - Finalize function: consistent arg names, checkmates, more functionality from plotChroms(), areas? --> see UNDONEs
     - by default only allow 1 fg to be plotted?
     - finish plotMobilogramHash()
-    - peak marking doesn't work for mobility fGroups
     - tests, docs
 - Suspect features
     - XCMS/XCMS3/KPIC2: doc and/or default min fractions to zero as these probably don't make a lot of sense otherwise
     - Handle mobilities
         - Does the mobmin/mobmax range make sense how it is computed now?
+- Suspect screening
+    - support multiple mobilities/CCS? And adducts?
+        - could automatically 'expand' suspect list in prepareSuspectList()
+        - then also need to take care that mobility+adduct do combinatorial expansion
+        - rename suspects accordingly --> make a simplified adduct text format?
+        - we need this if we want to link >1 mobility feature to the same parent
 - reporting
     - convert reactable cell img functions to JS versions, so img paths are set dynamically which can save quite some space for selfContained reports
         --> see WIP changes made for chromsLarge

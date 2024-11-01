@@ -566,6 +566,65 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = NULL
     return(obj)
 })
 
+#' @export
+setMethod("findMobilities", "featureGroupsScreening", function(fGroups, mobPeaksParam, mzWindow = 0.005,
+                                                               IMSWindow = 0.01, clusterMethod = "distance",
+                                                               minIntensityIMS = 0, maxMSRTWindow = 2,
+                                                               chromPeaksParam = NULL, RTWindow = 20,
+                                                               calcArea = "integrate", fallbackEIC = TRUE,
+                                                               parallel = TRUE, fromSuspects = FALSE,
+                                                               filterSuspects = TRUE, suspsNeedMobility = FALSE)
+{
+    # UNDONE: clearly doc what IMSWindow is used for
+    
+    aapply(checkmate::assertFlag, . ~ fromSuspects + filterSuspects + suspsNeedMobility)
+    
+    scrHasMob <- !is.null(screenInfo(fGroups)[["mobility"]])
+    
+    if (!scrHasMob && filterSuspects)
+        stop("Cannot filter suspects: no mobility data for suspects", call. = FALSE)
+    
+    am <- NULL
+    if (fromSuspects)
+    {
+        am <- screenInfo(fGroups)[, .(group, mobmin = mobility - IMSWindow, mobmax = mobility + IMSWindow, mobility)]
+        am[, ngroup := .N, by = "group"]
+        am <- am[ngroup == 1][, -"ngroup"]
+        # UNDONE: message which were omitted
+    }
+    
+    ret <- doFindMobilities(fGroups, mobPeaksParam = mobPeaksParam, mzWindow = mzWindow,
+                            IMSWindow = IMSWindow, clusterMethod = clusterMethod,
+                            minIntensityIMS = minIntensityIMS, maxMSRTWindow = maxMSRTWindow,
+                            chromPeaksParam = chromPeaksParam, RTWindow = RTWindow, calcArea = calcArea,
+                            fallbackEIC = fallbackEIC, assignedMobilities = am, parallel = parallel)
+
+    scr <- copy(screenInfo(ret))
+    gInfo <- groupInfo(ret)[group %chin% scr$group | ims_parent_group %chin% scr$group]
+    scr <- scr[match(gInfo$ims_parent_group, group)] # expand
+    scr[, group := gInfo$group]
+    scr[, d_rt := gInfo$ret[match(group, gInfo$group)] - rt]
+    scr[, d_mob := gInfo$mobility[match(group, gInfo$group)] - mobility]
+    ret@screenInfo <- scr
+    
+    # UNDONE: move to filter()?
+    if (filterSuspects || suspsNeedMobility)
+    {
+        ret <- delete(ret, k = function(scr)
+        {
+            scr <- copy(scr)
+            scr[, keep := TRUE]
+            if (filterSuspects)
+                scr[, keep := is.na(mobility) | is.na(d_mob) | abs(d_mob) <= IMSWindow]
+            if (suspsNeedMobility)
+                scr[keep == TRUE, keep := is.na(mobility) | !is.na(d_mob)]
+            return(!scr$keep)
+        })
+    }
+    
+    return(ret)
+})
+
 
 #' @details \code{screenSuspects} is used to perform suspect screening. The input \code{\link{featureGroups}} object
 #'   will be screened for suspects by \emph{m/z} values and optionally retention times. Afterwards, any feature groups

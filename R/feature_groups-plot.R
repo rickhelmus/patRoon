@@ -799,6 +799,7 @@ setMethod("plotMobilogram", "featureGroups", function(obj, groupName = names(obj
 {
     # UNDONE: more feature parity with plotChroms()
     # UNDONE: assert util for common parameters with findMobilities()
+    # UNDONE: cache EIMs --> util that can also be used by findMobilities()?
 
     ac <- checkmate::makeAssertCollection()
     checkmate::assertSubset(groupName, names(obj), empty.ok = TRUE, add = ac)

@@ -876,7 +876,7 @@ assignFeatureMobilities <- function(features, peaksParam, mzWindow, clusterIMSWi
 }
 
 # UNDONE: make this an exported method?
-reintegrateFeatures <- function(features, RTWindow, calcArea, peaksParam, onlyMob, parallel)
+reintegrateFeatures <- function(features, RTWindow, calcArea, peaksParam, fallbackEIC, onlyMob, parallel)
 {
     anaInfo <- analysisInfo(features)
     cacheDB <- openCacheDBScope()
@@ -900,7 +900,7 @@ reintegrateFeatures <- function(features, RTWindow, calcArea, peaksParam, onlyMo
     else
         peaksList <- vector("list", nrow(anaInfo))
     
-    updatedFeatsFromEICs <- updatedFeatsFromPeaks <- 0
+    updatedFeatsFromEICs <- updatedFeatsFromPeaks <- notAssigned <- 0
     features@features <- Map(featureTable(features), peaksList, allEICs, f = function(ft, pt, eics)
     {
         ft <- copy(ft)
@@ -914,35 +914,49 @@ reintegrateFeatures <- function(features, RTWindow, calcArea, peaksParam, onlyMo
         else
             peakIDs <- character()
         
-        doIDs <- ft$ID[(!onlyMob | (!is.null(ft[["mobility"]]) & !is.na(ft$mobility))) & !ft$ID %chin% peakIDs]
-        
-        ft[ID %chin% doIDs, intensity := mapply(ret, eics[doIDs], FUN = function(r, eic)
+        if (fallbackEIC)
         {
-            eic <- eic[eic$intensity > 0, ]
-            if (nrow(eic) > 0) eic[which.min(abs(eic$time - r)), "intensity"] else 0
-        })]
-        ft[ID %chin% doIDs, area := mapply(retmin, retmax, eics[doIDs], FUN = function(rmin, rmax, eic)
+            # update those not assigned by a peak from EICs
+            doIDs <- ft$ID[(!onlyMob | (!is.null(ft[["mobility"]]) & !is.na(ft$mobility))) & !ft$ID %chin% peakIDs]
+        
+            ft[ID %chin% doIDs, intensity := mapply(ret, eics[doIDs], FUN = function(r, eic)
+            {
+                eic <- eic[eic$intensity > 0, ]
+                if (nrow(eic) > 0) eic[which.min(abs(eic$time - r)), "intensity"] else 0
+            })]
+            ft[ID %chin% doIDs, area := mapply(retmin, retmax, eics[doIDs], FUN = function(rmin, rmax, eic)
+            {
+                wh <- eic$time %between% c(rmin, rmax)
+                a <- sum(eic$intensity[wh])
+                if (calcArea == "integrate")
+                    a <- a * ((rmax - rmin) / sum(wh))
+                return(a)
+            })]
+            
+            updatedFeatsFromEICs <<- updatedFeatsFromEICs + length(doIDs)
+        }
+        else
         {
-            wh <- eic$time %between% c(rmin, rmax)
-            a <- sum(eic$intensity[wh])
-            if (calcArea == "integrate")
-                a <- a * ((rmax - rmin) / sum(wh))
-            return(a)
-        })]
-        
-        updatedFeatsFromEICs <<- updatedFeatsFromEICs + length(doIDs)
-        
+            # only keep those updated from a new peak or ignored in case onlyMob==T
+            wh <- (onlyMob & (is.null(ft[["mobility"]]) | is.na(ft$mobility))) | ft$ID %chin% peakIDs
+            notAssigned <<- notAssigned + sum(!wh)
+            # UNDONE: use delete()? would give issues for eg XCMS objects
+            ft <- ft[wh == TRUE]
+        }
         return(ft)
     })
     
-    printf("Re-integrated %d features (%d from newly found peaks and %d from EICs)\n",
-           updatedFeatsFromEICs + updatedFeatsFromPeaks, updatedFeatsFromPeaks, updatedFeatsFromEICs)
+    if (fallbackEIC)
+        printf("Re-integrated %d features (%d from newly found peaks and %d from EICs)\n",
+               updatedFeatsFromEICs + updatedFeatsFromPeaks, updatedFeatsFromPeaks, updatedFeatsFromEICs)
+    else
+        printf("Re-integrated %d features and removed %d unassigned\n", updatedFeatsFromPeaks, notAssigned)
     
     return(features)
 }
 
 doFindMobilities <- function(fGroups, mobPeaksParam, mzWindow, clusterIMSWindow, clusterMethod, minIntensityIMS,
-                             maxMSRTWindow, chromPeaksParam, RTWindow, calcArea, parallel)
+                             maxMSRTWindow, chromPeaksParam, RTWindow, calcArea, fallbackEIC, parallel)
 {
     ac <- checkmate::makeAssertCollection()
     assertFindPeaksParam(mobPeaksParam, add = ac)
@@ -952,7 +966,7 @@ doFindMobilities <- function(fGroups, mobPeaksParam, mzWindow, clusterIMSWindow,
     checkmate::assertNumber(maxMSRTWindow, lower = 1, finite = TRUE, null.ok = TRUE, add = ac)
     assertFindPeaksParam(chromPeaksParam, null.ok = TRUE, add = ac)
     checkmate::assertChoice(calcArea, c("integrate", "sum"), add = ac)
-    checkmate::assertFlag(parallel, add = ac)
+    aapply(checkmate::assertFlag, . ~ fallbackEIC + parallel, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
     if (length(fGroups) == 0)
@@ -960,14 +974,15 @@ doFindMobilities <- function(fGroups, mobPeaksParam, mzWindow, clusterIMSWindow,
     
     fTable <- featureTable(fGroups)
     hash <- makeHash(fGroups, mobPeaksParam, mzWindow, clusterIMSWindow, clusterMethod, minIntensityIMS, maxMSRTWindow,
-                     chromPeaksParam, RTWindow, calcArea)
+                     chromPeaksParam, RTWindow, calcArea, fallbackEIC)
     cd <- loadCacheData("findMobilities", hash)
     if (!is.null(cd))
         return(cd)
     
     fGroups@features <- assignFeatureMobilities(fGroups@features, mobPeaksParam, mzWindow, clusterIMSWindow, clusterMethod,
                                                 minIntensityIMS, maxMSRTWindow)
-    fGroups@features <- reintegrateFeatures(fGroups@features, RTWindow, calcArea, chromPeaksParam, TRUE, parallel)
+    fGroups@features <- reintegrateFeatures(fGroups@features, RTWindow, calcArea, chromPeaksParam, fallbackEIC, TRUE,
+                                            parallel)
     
     fTable <- featureTable(fGroups)
     

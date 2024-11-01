@@ -149,6 +149,8 @@ setMethod("initialize", "featureGroups", function(.Object, ...)
     return(.Object)
 })
 
+setMethod("hasMobilities", "features", function(obj) hasMobilities(getFeatures(obj)))
+
 #' @describeIn featureGroups Obtain feature group names.
 #' @export
 setMethod("names", "featureGroups", function(x) names(x@groups))

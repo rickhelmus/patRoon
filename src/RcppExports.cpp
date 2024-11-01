@@ -362,7 +362,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // doFindPeaksDietrich
-Rcpp::List doFindPeaksDietrich(Rcpp::List EICs, double minIntensity, int SN, int peakWidthMin, int peakWidthMax, double RTMin, double RTMax, int maxPeaksPerSignal, bool verbose);
+Rcpp::List doFindPeaksDietrich(Rcpp::List EICs, double minIntensity, int SN, double peakWidthMin, double peakWidthMax, double RTMin, double RTMax, int maxPeaksPerSignal, bool verbose);
 RcppExport SEXP _patRoon_doFindPeaksDietrich(SEXP EICsSEXP, SEXP minIntensitySEXP, SEXP SNSEXP, SEXP peakWidthMinSEXP, SEXP peakWidthMaxSEXP, SEXP RTMinSEXP, SEXP RTMaxSEXP, SEXP maxPeaksPerSignalSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -370,8 +370,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::List >::type EICs(EICsSEXP);
     Rcpp::traits::input_parameter< double >::type minIntensity(minIntensitySEXP);
     Rcpp::traits::input_parameter< int >::type SN(SNSEXP);
-    Rcpp::traits::input_parameter< int >::type peakWidthMin(peakWidthMinSEXP);
-    Rcpp::traits::input_parameter< int >::type peakWidthMax(peakWidthMaxSEXP);
+    Rcpp::traits::input_parameter< double >::type peakWidthMin(peakWidthMinSEXP);
+    Rcpp::traits::input_parameter< double >::type peakWidthMax(peakWidthMaxSEXP);
     Rcpp::traits::input_parameter< double >::type RTMin(RTMinSEXP);
     Rcpp::traits::input_parameter< double >::type RTMax(RTMaxSEXP);
     Rcpp::traits::input_parameter< int >::type maxPeaksPerSignal(maxPeaksPerSignalSEXP);

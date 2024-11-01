@@ -1380,88 +1380,16 @@ setMethod("calculateTox", "featureGroups", function(fGroups, featureAnn)
 })
 
 #' @export
-setMethod("findMobilities", "featureGroups", function(obj, clusterIMSWindow = 0.01, ...)
+setMethod("findMobilities", "featureGroups", function(fGroups, mobPeaksParam, mzWindow = 0.005, clusterIMSWindow = 0.01,
+                                                      clusterMethod = "distance", minIntensityIMS = 0,
+                                                      maxMSRTWindow = 2, chromPeaksParam = NULL, RTWindow = 20,
+                                                      calcArea = "integrate", parallel = TRUE)
 {
-    checkmate::assertNumber(clusterIMSWindow, finite = TRUE)
-    
-    fTable <- featureTable(obj)
-    hash <- makeHash(obj, clusterIMSWindow, ...)
-    cd <- loadCacheData("findMobilities", hash)
-    if (!is.null(cd))
-        return(cd)
-    
-    obj@features <- findMobilities(getFeatures(obj), clusterIMSWindow = clusterIMSWindow, ...)
-    
-    fTable <- featureTable(obj)
-    
-    printf("Clustering mobilities... ")
-    
-    # cluster features within original fGroups with similar mobilities together    
-    fTableAll <- rbindlist(fTable, idcol = "analysis")
-    fTableAll[!is.na(mobility), gClust := {
-        if (.N == 0)
-            numeric()
-        else if (.N == 1)
-            1
-        else
-        {
-            hc <- fastcluster::hclust(dist(mobility))
-            cutree(hc, h = clusterIMSWindow)
-        }
-    }, by = "group"]
-    printf("Done!\n")
-    
-    printf("Updating feature group data... ")
-
-    # prepare group info
-    gMobInfo <- fTableAll[, .(mobility = mean(mobility)), by = c("group", "gClust")]
-    setnames(gMobInfo, "group", "ims_parent_group")
-    gMobInfo[, group := fifelse(!is.na(mobility), appendMobToName(ims_parent_group, mobility), ims_parent_group)]
-    
-    # update features
-    setnames(fTableAll, "group", "ims_parent_group") # UNDONE: better colname
-    fTableAll[gMobInfo, group := i.group, on = c("ims_parent_group", "gClust")]
-    featureTable(obj) <- split(fTableAll[, -"gClust"], by = "analysis", keep.by = FALSE)
-    
-    # update gInfo
-    gInfo <- copy(groupInfo(obj))
-    setnames(gInfo, "group", "ims_parent_group")
-    gInfo <- merge(gInfo, gMobInfo, by = "ims_parent_group", sort = FALSE)
-    setcolorder(gInfo, c("group", "ret", "mz", "mobility", "ims_parent_group"))
-    obj@groupInfo <- gInfo[, -"gClust"]
-    
-    # re-fill group table
-    fTablePerGroup <- split(fTableAll, by = "group")
-    fTablePerGroup <- fTablePerGroup[gInfo$group]
-    anaInfo <- analysisInfo(obj)
-    gTable <- data.table()
-    gTable[, (gInfo$group) := lapply(fTablePerGroup, function(ft)
-    {
-        ints <- numeric(nrow(anaInfo))
-        ints[match(ft$analysis, anaInfo$analysis)] <- ft$intensity
-        return(ints)
-    })]
-    obj@groups <- gTable
-    
-    # update ftindex
-    obj <- reGenerateFTIndex(obj)
-    
-    for (sl in c("groupQualities", "groupScores", "ISTDs", "ISTDAssignments", "annotations", "concentrations",
-                 "toxicities"))
-    {
-        d <- slot(obj, sl)
-        if (length(d) > 0)
-        {
-            warning("Clearing all data from ", sl, call. = FALSE)
-            slot(obj, sl) <- if (is.data.table(d)) data.table() else list()
-        }
-    }
-    
-    printf("Done!\n")
-    
-    saveCacheData("findMobilities", obj, hash)
-    
-    return(obj)
+    return(doFindMobilities(fGroups, mobPeaksParam = mobPeaksParam, mzWindow = mzWindow,
+                            clusterIMSWindow = clusterIMSWindow, clusterMethod = clusterMethod,
+                            minIntensityIMS = minIntensityIMS, maxMSRTWindow = maxMSRTWindow,
+                            chromPeaksParam = chromPeaksParam, RTWindow = RTWindow, calcArea = calcArea,
+                            parallel = parallel))
 })
 
 #' @export

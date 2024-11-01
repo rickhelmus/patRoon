@@ -810,8 +810,7 @@ assignFeatureMobilities <- function(features, peaksParam, mzWindow, clusterIMSWi
     
     anaInfo <- analysisInfo(features)
     
-    features@features <- applyMSData(anaInfo, features@features, types = c("raw", "ims"), formats = c("bruker_ims", "mzML"),
-                                     func = function(ana, path, backend, fTable)
+    features@features <- applyMSData(anaInfo, features@features, needIMS = TRUE, func = function(ana, path, backend, fTable)
     {
         openMSReadBackend(backend, path)
         

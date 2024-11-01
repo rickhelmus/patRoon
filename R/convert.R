@@ -158,8 +158,7 @@ collapseIMSFiles <- function(anaInfo, mzRange = NULL, mobilityRange = NULL, clMe
     # UNDONE: checkmate
     # UNDONE: which default clust method?
     
-    fileTypes = c("raw", "ims"); formats <- list("bruker_ims", "mzml")
-    anaInfo <- assertAndPrepareAnaInfo(anaInfo, fileTypes = fileTypes, allowedFormats = formats)
+    anaInfo <- assertAndPrepareAnaInfo(anaInfo)
     
     outDirs <- getPathsFromAnaInfo(anaInfo, "centroid")
     if (is.null(outDirs) || anyNA(outDirs) || any(!nzchar(outDirs)))
@@ -167,7 +166,7 @@ collapseIMSFiles <- function(anaInfo, mzRange = NULL, mobilityRange = NULL, clMe
     mkdirp(outDirs)
     
     printf("Collapsing all %d analyses ...\n", nrow(anaInfo))
-    applyMSData(anaInfo, outDirs, types = fileTypes, formats = formats, showProgress = FALSE, func = function(ana, path, backend, outd)
+    applyMSData(anaInfo, outDirs, needIMS = TRUE, showProgress = FALSE, func = function(ana, path, backend, outd)
     {
         outp <- file.path(outd, paste0(ana, ".mzML"))
         

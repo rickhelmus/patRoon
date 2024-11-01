@@ -147,7 +147,8 @@ getAllMSFilesFromAnaInfo <- function(anaInfo, types, formats)
     return(unique(unlist(ret)))
 }
 
-getMSFileHashesFromAvailBackend <- function(anaInfo, types = getMSFileTypes(), formats = names(MSFileExtensions()))
+getMSFileHashesFromAvailBackend <- function(anaInfo, types = getMSFileTypes(), formats = names(MSFileExtensions()),
+                                            needIMS = FALSE)
 {
     backends <- getOption("patRoon.MSBackends", character())
     
@@ -155,7 +156,7 @@ getMSFileHashesFromAvailBackend <- function(anaInfo, types = getMSFileTypes(), f
     {
         if (!backendAvailable(bn))
             next
-        filePaths <- maybeGetMSFiles(bn, anaInfo, types, formats)
+        filePaths <- maybeGetMSFiles(bn, anaInfo, types, formats, needIMS)
         if (!is.null(filePaths))
         {
             if (bn == "opentims")
@@ -176,19 +177,24 @@ getCentroidedMSFilesFromAnaInfo <- function(anaInfo, formats = c("mzML", "mzXML"
 
 doGetEICs <- function(anaInfo, EICInfoList, minIntensityIMS = 0, compress = TRUE, withBP = FALSE, cacheDB = NULL)
 {
+    if (length(EICInfoList) == 0)
+        return(list())
+    
     # HACK: for now we _don't_ cache EICs if compres==FALSE: the resulting data is very large and takes a long time to
     # be stored. Hence, the caller should cache the final results.
     doCache <- compress
 
+    needIMS <- !is.null(EICInfoList[[1]][["mobmin"]])
+    
     anaHashes <- NULL
     if (doCache)
     {
         if (is.null(cacheDB))
             cacheDB <- openCacheDBScope()
-        anaHashes <- getMSFileHashesFromAvailBackend(anaInfo)
+        anaHashes <- getMSFileHashesFromAvailBackend(anaInfo, needIMS = needIMS)
     }
     
-    allEICs <- applyMSData(anaInfo, EICInfoList, func = function(ana, path, backend, EICInfo)
+    allEICs <- applyMSData(anaInfo, EICInfoList, needIMS = needIMS, func = function(ana, path, backend, EICInfo)
     {
         EICInfo <- copy(EICInfo)
         for (col in c("mobmin", "mobmax"))

@@ -72,6 +72,8 @@ setMethod("initialize", "features", function(.Object, ...)
     return(.Object)
 })
 
+setMethod("hasMobilities", "features", function(obj) length(obj) > 0 && !is.null(obj[[1]][["mobility"]]))
+
 #' @describeIn features Obtain total number of features.
 #' @export
 setMethod("length", "features", function(x)

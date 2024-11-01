@@ -254,11 +254,18 @@ doGroupSuspects <- function(feat, groupFunc, ..., verbose = TRUE)
     anaInfo <- analysisInfo(feat)
     fTable <- featureTable(feat)
     detectedSusps <- unique(unlist(lapply(fTable, "[[", "suspect")))
-    
+    hasMob <- hasMobilities(feat)
     fgSusps <- sapply(detectedSusps, function(susp)
     {
         featSub <- delete(feat, j = function(ft, ...) ft$suspect != susp)
-        return(groupFunc(featSub, ..., verbose = FALSE))
+        ret <- groupFunc(featSub, ..., verbose = FALSE)
+        if (hasMob)
+        {
+            ft <- as.data.table(getFeatures(ret))
+            ret@groupInfo[, mobility := mean(ft$mobility[ft$group == group]), by = "group"]
+            ret@groupInfo[, ims_parent_group := NA_character_]
+        }
+        return(ret)
     }, simplify = FALSE)
     
     fgInfoAll <- rbindlist(lapply(fgSusps, function(fg) copy(groupInfo(fg))), idcol = "suspect")
@@ -268,7 +275,7 @@ doGroupSuspects <- function(feat, groupFunc, ..., verbose = TRUE)
         else
             suspect
     }, by = "suspect"]
-    
+
     gTable <- data.table()
     gTable[, (fgInfoAll$group_susp) := Map(fgInfoAll$suspect, fgInfoAll$group, f = function(s, g)
     {
@@ -288,8 +295,9 @@ doGroupSuspects <- function(feat, groupFunc, ..., verbose = TRUE)
         return(inds)
     })]
     
-    gInfo <- fgInfoAll[, .(group = group_susp, ret, mz)]
-    
+    gInfo <- subsetDTColumnsIfPresent(copy(fgInfoAll), c("group_susp", "ret", "mz", "mobility", "ims_parent_group"))
+    setnames(gInfo, "group_susp", "group")
+
     # set screenInfo
     sInfo <- fgInfoAll[, c("suspect", "group_susp"), with = FALSE]
     setnames(sInfo, c("suspect", "group_susp"),  c("name", "group"))

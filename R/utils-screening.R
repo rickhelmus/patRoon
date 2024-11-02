@@ -120,6 +120,17 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid, checkDesc, prefCal
     return(suspects)
 }
 
+expandSuspMobilities <- function(suspects)
+{
+    if (is.null(suspects[["mobility"]]) || !is.character(suspects$mobility) || all(is.na(suspects$mobility)))
+        return(suspects)
+    
+    return(rbindlist(lapply(split(suspects, seq_len(nrow(suspects))), function(row)
+    {
+        data.table(row[, -"mobility"], mobility = as.numeric(unlist(strsplit(row$mobility, ";"))))
+    })))
+}
+
 doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, skipInvalid)
 {
     gInfo <- groupInfo(fGroups)

@@ -583,14 +583,16 @@ setMethod("findMobilities", "featureGroupsScreening", function(fGroups, mobPeaks
     
     if (!scrHasMob && filterSuspects)
         stop("Cannot filter suspects: no mobility data for suspects", call. = FALSE)
-    
+
     am <- NULL
     if (fromSuspects)
     {
-        am <- screenInfo(fGroups)[, .(group, mobmin = mobility - IMSWindow, mobmax = mobility + IMSWindow, mobility)]
+        am <- screenInfo(fGroups)
         am[, ngroup := .N, by = "group"]
         am <- am[ngroup == 1][, -"ngroup"]
         # UNDONE: message which were omitted
+        am <- expandSuspMobilities(am)
+        am <- am[, .(group, mobmin = mobility - IMSWindow, mobmax = mobility + IMSWindow, mobility)]
     }
     
     ret <- doFindMobilities(fGroups, mobPeaksParam = mobPeaksParam, mzWindow = mzWindow,
@@ -604,7 +606,23 @@ setMethod("findMobilities", "featureGroupsScreening", function(fGroups, mobPeaks
     scr <- scr[match(gInfo$ims_parent_group, group)] # expand
     scr[, group := gInfo$group]
     scr[, d_rt := gInfo$ret[match(group, gInfo$group)] - rt]
-    scr[, d_mob := gInfo$mobility[match(group, gInfo$group)] - mobility]
+    if (scrHasMob)
+    {
+        # pick mobility that is closest to that of a feature group
+        scr[, mob_group := gInfo$mobility[match(group, gInfo$group)]]
+        scr[, ims_parent_group := gInfo$ims_parent_group]
+        scrOrigExp <- expandSuspMobilities(screenInfo(ret))
+        scr[, mobility := NULL] # remove: may now be a character vector
+        scr[!is.na(mob_group), mobility := mapply(name, ims_parent_group, mob_group, FUN = function(n, g, gm)
+        {
+            mobs <- scrOrigExp[group == g & name == n]$mobility
+            return(mobs[which.min(abs(mobs - gm))])
+        })]
+        scr[, d_mob := mob_group - mobility][, -"mob_group"]
+    }
+    else
+        scr[, d_mob := NA_real_]
+    # UNDONE: restore scr order
     ret@screenInfo <- scr
     
     # UNDONE: move to filter()?

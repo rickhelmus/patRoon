@@ -298,6 +298,7 @@
 
 - general ratio of mass/CCS to filter results --> eg derived from CCS DB
 - be consistent in mobility vs IMS
+    - mobWindow and IMSWindow now randomly used
 - findPeaks()
     - export? If yes, add checkmate's, documentation etc
         - if not, still need to doc args somehow
@@ -343,6 +344,8 @@
     - XCMS/XCMS3/KPIC2: doc and/or default min fractions to zero as these probably don't make a lot of sense otherwise
     - Handle mobilities
         - Does the mobmin/mobmax range make sense how it is computed now?
+    - remove mobility assignment?
+        - if not, support >1 mobilities in suspect list
 - Suspect screening
     - support multiple mobilities/CCS? And adducts?
         - could automatically 'expand' suspect list in prepareSuspectList()

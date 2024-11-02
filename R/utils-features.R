@@ -844,7 +844,7 @@ assignFeatureMobilities <- function(features, peaksParam, mzWindow, IMSWindow, c
         {
             am <- copy(assignedMobilities)
             am <- am[group %chin% fTable$group]
-            am[, ims_parent_ID := fTable[match(am$group, group, nomatch = 0)]$ID][,group := NULL]
+            am[, ims_parent_ID := fTable[match(am$group, group, nomatch = 0)]$ID][, group := NULL]
             peaksTable <- rbind(peaksTable, am, fill = TRUE)
         }
         

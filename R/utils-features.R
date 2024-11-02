@@ -928,43 +928,48 @@ reintegrateFeatures <- function(features, RTWindow, calcArea, peaksParam, fallba
         else
             peakIDs <- character()
         
+        ft[, keep := TRUE]
+        
         if (fallbackEIC)
         {
             # update those not assigned by a peak from EICs
-            doIDs <- ft$ID[(!onlyMob | (!is.null(ft[["mobility"]]) & !is.na(ft$mobility))) & !ft$ID %chin% peakIDs]
-        
-            ft[ID %chin% doIDs, intensity := mapply(ret, eics[doIDs], FUN = function(r, eic)
-            {
-                eic <- eic[eic$intensity > 0, ]
-                if (nrow(eic) > 0) eic[which.min(abs(eic$time - r)), "intensity"] else 0
-            })]
-            ft[ID %chin% doIDs, area := mapply(retmin, retmax, eics[doIDs], FUN = function(rmin, rmax, eic)
-            {
-                wh <- eic$time %between% c(rmin, rmax)
-                a <- sum(eic$intensity[wh])
-                if (calcArea == "integrate")
-                    a <- a * ((rmax - rmin) / sum(wh))
-                return(a)
-            })]
-            
-            updatedFeatsFromEICs <<- updatedFeatsFromEICs + length(doIDs)
+            doRows <- ft[(!onlyMob | (!is.null(ft[["mobility"]]) & !is.na(mobility))) & !ID %chin% peakIDs, which = TRUE]
+
+            ft[doRows, c("intensity", "area") := {
+                eic <- eics[[ID]][eics[[ID]]$time %between% c(retmin, retmax), ]
+                
+                eicnz <- eic[eic$intensity > 0, ]
+                i <- if (nrow(eicnz) > 0) eicnz[which.min(abs(eicnz$time - ret)), "intensity"] else 0
+                
+                a <- 0
+                if (nrow(eic) > 0)
+                {
+                    a <- sum(eic$intensity)
+                    if (calcArea == "integrate")
+                        a <- a * ((retmax - retmin) / nrow(eic))
+                }
+                
+                list(i, a)
+            }, by = seq_along(doRows)]
+
+            ft[doRows, keep := intensity > 0]
+            updatedFeatsFromEICs <<- updatedFeatsFromEICs + ft[doRows][keep == TRUE, .N]
         }
         else
         {
             # only keep those updated from a new peak or ignored in case onlyMob==T
-            wh <- (onlyMob & (is.null(ft[["mobility"]]) | is.na(ft$mobility))) | ft$ID %chin% peakIDs
-            notAssigned <<- notAssigned + sum(!wh)
-            # UNDONE: use delete()? would give issues for eg XCMS objects
-            ft <- ft[wh == TRUE]
+            ft[, keep := (onlyMob & (is.null(ft[["mobility"]]) | is.na(mobility))) | ID %chin% peakIDs]
         }
+
+        notAssigned <<- notAssigned + sum(!ft$keep)
+        # UNDONE: use delete()? would give issues for eg XCMS objects
+        ft <- ft[keep == TRUE, -"keep"]
+        
         return(ft)
     })
     
-    if (fallbackEIC)
-        printf("Re-integrated %d features (%d from newly found peaks and %d from EICs)\n",
-               updatedFeatsFromEICs + updatedFeatsFromPeaks, updatedFeatsFromPeaks, updatedFeatsFromEICs)
-    else
-        printf("Re-integrated %d features and removed %d unassigned\n", updatedFeatsFromPeaks, notAssigned)
+    printf("Re-integrated %d features (%d from newly found peaks, %d from EICs and removed %d unassigned)\n",
+           updatedFeatsFromEICs + updatedFeatsFromPeaks, updatedFeatsFromPeaks, updatedFeatsFromEICs, notAssigned)
     
     return(features)
 }

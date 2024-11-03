@@ -352,7 +352,7 @@
     - Handle mobilities
         - Does the mobmin/mobmax range make sense how it is computed now?
     - remove mobility assignment?
-        - if not, support >1 mobilities in suspect list
+        - if not, support >1 mobilities in suspect list and do mobility assignment directly from suspect list like findMobilities()
 - Suspect screening
     - support multiple mobilities/CCS? And adducts?
         - could automatically 'expand' suspect list in prepareSuspectList()

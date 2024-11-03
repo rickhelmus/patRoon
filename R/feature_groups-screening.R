@@ -585,7 +585,7 @@ setMethod("findMobilities", "featureGroupsScreening", function(fGroups, mobPeaks
     am <- NULL
     if (fromSuspects)
     {
-        am <- screenInfo(fGroups)
+        am <- copy(screenInfo(fGroups))
         am[, ngroup := .N, by = "group"]
         am <- am[ngroup == 1][, -"ngroup"]
         # UNDONE: message which were omitted
@@ -601,6 +601,7 @@ setMethod("findMobilities", "featureGroupsScreening", function(fGroups, mobPeaks
 
     scr <- copy(screenInfo(ret))
     gInfo <- groupInfo(ret)[group %chin% scr$group | ims_parent_group %chin% scr$group]
+    scr[, orderOrig := seq_len(.N)]
     scr <- scr[match(gInfo$ims_parent_group, group)] # expand
     scr[, group := gInfo$group]
     scr[, d_rt := gInfo$ret[match(group, gInfo$group)] - rt]
@@ -610,18 +611,24 @@ setMethod("findMobilities", "featureGroupsScreening", function(fGroups, mobPeaks
         scr[, mob_group := gInfo$mobility[match(group, gInfo$group)]]
         scr[, ims_parent_group := gInfo$ims_parent_group]
         scrOrigExp <- expandSuspMobilities(screenInfo(ret))
-        scr[, mobility := NULL] # remove: may now be a character vector
+        
+        # split mobilities from suspect list, NA those from IMS parents, and make sure column is numeric
+        scr[, mobility := NA]
+        scr[, mobility := as.numeric(mobility)] # NOTE: column type conversion needs to be done separately
         scr[!is.na(mob_group), mobility := mapply(name, ims_parent_group, mob_group, FUN = function(n, g, gm)
         {
             mobs <- scrOrigExp[group == g & name == n]$mobility
             return(mobs[which.min(abs(mobs - gm))])
         })]
-        scr[, d_mob := mob_group - mobility][, -"mob_group"]
+        
+        scr[, d_mob := mob_group - mobility]
+        scr[, c("mob_group", "ims_parent_group") := NULL]
     }
     else
         scr[, d_mob := NA_real_]
-    # UNDONE: restore scr order
-    ret@screenInfo <- scr
+    
+    setorderv(scr, "orderOrig")
+    ret@screenInfo <- scr[, -"orderOrig"]
     
     # UNDONE: move to filter()?
     if (filterSuspects || suspsNeedMobility)

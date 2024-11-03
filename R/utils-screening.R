@@ -247,7 +247,7 @@ delScreening <- function(fGroups, j, k)
     
     scr[, keep := TRUE]
     
-    if (is.na(k))
+    if (is.atomic(k) && is.na(k))
         scr[group %chin% j, keep := FALSE]
     else if (is.function(k))
         scr[group %chin% j, keep := !k(.SD)]

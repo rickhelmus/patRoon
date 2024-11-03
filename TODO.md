@@ -18,7 +18,6 @@
 
 ## TC
 
-- delete(fgScreening, k = func) gives a warning for is.na (what was NA supposed to do?)
 - annSims
     - let lib compounds use the same specsimParams default? Then annSim == libMatch by default.
     - remove support for annSimBoth in annotateSuspects? Or optionally calc for feat annotations and copy that?

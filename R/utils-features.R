@@ -812,7 +812,6 @@ assignFeatureMobilities <- function(features, peaksParam, mzWindow, IMSWindow, c
     
     features@features <- applyMSData(anaInfo, features@features, needIMS = TRUE, func = function(ana, path, backend, fTable)
     {
-        openMSReadBackend(backend, path)
         
         fTable <- copy(fTable)
         
@@ -820,25 +819,32 @@ assignFeatureMobilities <- function(features, peaksParam, mzWindow, IMSWindow, c
             copy(fTable[!group %chin% assignedMobilities$group])
         else
             copy(fTable)
-        if (!is.null(maxMSRTWindow))
+        
+        if (nrow(fTableForPeaks) > 0)
         {
-            fTableForPeaks[, retmin := pmax(retmin, ret - maxMSRTWindow)]
-            fTableForPeaks[, retmax := pmin(retmax, ret + maxMSRTWindow)]
+            if (!is.null(maxMSRTWindow))
+            {
+                fTableForPeaks[, retmin := pmax(retmin, ret - maxMSRTWindow)]
+                fTableForPeaks[, retmax := pmin(retmax, ret + maxMSRTWindow)]
+            }
+            
+            openMSReadBackend(backend, path)
+            # NOTE: mzmin/mzmax may be too narrow here, hence use a user specified mz range
+            EIMs <- getMobilograms(backend, fTableForPeaks$mz - mzWindow, fTableForPeaks$mz + mzWindow,
+                                   fTableForPeaks$retmin, fTableForPeaks$retmax, clusterMethod, IMSWindow,
+                                   minIntensityIMS, FALSE)
+            names(EIMs) <- fTableForPeaks$ID
+            EIMs <- lapply(EIMs, setDT)
+            
+            # pretend we have EICs so we can find peaks
+            EICs <- lapply(EIMs, copy)
+            EICs <- lapply(EICs, setnames, old = "mobility", new = "time")
+            peaksList <- findPeaks(EICs, peaksParam, verbose = FALSE)
+            
+            peaksTable <- rbindlist(peaksList, idcol = "ims_parent_ID")
         }
-        
-        # NOTE: mzmin/mzmax may be too narrow here, hence use a user specified mz range
-        EIMs <- getMobilograms(backend, fTableForPeaks$mz - mzWindow, fTableForPeaks$mz + mzWindow,
-                               fTableForPeaks$retmin, fTableForPeaks$retmax, clusterMethod, IMSWindow,
-                               minIntensityIMS, FALSE)
-        names(EIMs) <- fTableForPeaks$ID
-        EIMs <- lapply(EIMs, setDT)
-        
-        # pretend we have EICs so we can find peaks
-        EICs <- lapply(EIMs, copy)
-        EICs <- lapply(EICs, setnames, old = "mobility", new = "time")
-        peaksList <- findPeaks(EICs, peaksParam, verbose = FALSE)
-        
-        peaksTable <- rbindlist(peaksList, idcol = "ims_parent_ID")
+        else
+            peaksTable <- data.table()
         
         if (!is.null(assignedMobilities))
         {

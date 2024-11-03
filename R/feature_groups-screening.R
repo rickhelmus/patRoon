@@ -575,8 +575,6 @@ setMethod("findMobilities", "featureGroupsScreening", function(fGroups, mobPeaks
                                                                parallel = TRUE, fromSuspects = FALSE,
                                                                filterSuspects = TRUE, suspsNeedMobility = FALSE)
 {
-    # UNDONE: clearly doc what IMSWindow is used for
-    
     aapply(checkmate::assertFlag, . ~ fromSuspects + filterSuspects + suspsNeedMobility)
     
     scrHasMob <- !is.null(screenInfo(fGroups)[["mobility"]])

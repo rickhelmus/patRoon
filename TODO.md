@@ -329,6 +329,7 @@
             - currently cleared with a warning
             - duplicate values where possible
         - sets methods
+    - filterSuspects/suspsNeedMobility: move to filter()?
     - somehow handle eg XCMS objects which cannot do mobilities (eg clearout?)
     - test for fGroups from screenInfo(), eg for fGroups with >1 suspect assigned
     - clearly doc what IMSWindow is used for
@@ -354,11 +355,6 @@
     - remove mobility assignment?
         - if not, support >1 mobilities in suspect list and do mobility assignment directly from suspect list like findMobilities()
 - Suspect screening
-    - support multiple mobilities/CCS? And adducts?
-        - could automatically 'expand' suspect list in prepareSuspectList()
-        - then also need to take care that mobility+adduct do combinatorial expansion
-        - rename suspects accordingly --> make a simplified adduct text format?
-        - we need this if we want to link >1 mobility feature to the same parent
 - reporting
     - convert reactable cell img functions to JS versions, so img paths are set dynamically which can save quite some space for selfContained reports
         --> see WIP changes made for chromsLarge

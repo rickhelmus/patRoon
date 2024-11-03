@@ -42,20 +42,6 @@ findFeaturesSuspects <- function(analysisInfo, suspects, peaksParam, rtWindow = 
         needIMS <- FALSE
     }
     
-    # UNDONE: do something like this in findMobilities()
-    # if (needIMS)
-    # {
-    #     suspects[, order := seq_len(.N)]
-    #     suspects[!is.na(mobility), ims_parent_ID := name]
-    #     # expand suspect list so we can also include 'non-IMS' features
-    #     suspsNoMob <- copy(suspects[!is.na(mobility)])
-    #     suspsNoMob[, mobility := NA_real_]
-    #     suspects[!is.na(mobility), name := appendMobToName(name, mobility)]
-    #     suspects <- rbind(suspects, suspsNoMob)
-    #     setorderv(suspects, c("order", "mobility"), na.last = FALSE)
-    #     suspects[, order := NULL]
-    # }
-    
     cacheDB <- openCacheDBScope()
     baseHash <- makeHash(suspects, peaksParam, rtWindow, mzWindow, mobWindow, adduct, skipInvalid, prefCalcChemProps,
                          neutralChemProps)

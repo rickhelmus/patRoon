@@ -332,6 +332,14 @@
         - sets methods
     - somehow handle eg XCMS objects which cannot do mobilities (eg clearout?)
     - test for fGroups from screenInfo(), eg for fGroups with >1 suspect assigned
+    - clearly doc what IMSWindow is used for
+    - doc the use for fromSuspects, eg
+        - doesn't rely on mobility peak detection, so might be less prone to false negatives with eg low intensities
+        - scenario 1: we know the mobility very well, eg from a database --> use a narrow IMSWindow
+        - scenario 2: we only have the mobility from eg a prediction and don't care so much about identification by CCS match --> use wide IMSWindow
+        - somehow only do this as fallback when mobility peak detection fails?
+            - doesn't seem very useful for approach 1&2 though (we already know the mobility or are not interested in an accurate one)
+            - adds extra complexity when grouping mobility features, eg if different methods were used across the features
 - splitMobilities()
     - keep? then update
     - remove unassigned features?

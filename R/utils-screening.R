@@ -96,6 +96,10 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid, checkDesc, prefCal
             suspects[, mz := NA_real_]
         }
         
+        # mobility column may be character vector if >1 mobility is given for a suspect
+        if (!is.null(suspects[["mobility"]]) && is.character(suspects$mobility))
+            suspects[!nzchar(mobility), mobility := NA_character_]
+        
         saveCacheData("screenSuspectsPrepList", suspects, hash)
     }        
     

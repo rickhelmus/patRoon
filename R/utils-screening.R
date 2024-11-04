@@ -255,6 +255,9 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, skipInvalid)
         ret <- rbindlist(retlist, fill = TRUE)
         setcolorder(ret, "name")
         
+        if (hasMobilities(fGroups))
+            ret <- finalizeScreenInfoForIMS(ret, gInfo, minMobilityMatches, IMSWindow)
+        
         setTxtProgressBar(prog, nrow(suspects))
         close(prog)
     }

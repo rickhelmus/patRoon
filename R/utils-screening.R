@@ -172,7 +172,7 @@ finalizeScreenInfoForIMS <- function(scr, gInfo, minMobilityMatches, IMSWindow)
     return(removeDTColumnsIfPresent(scr, c("mob_group", "ims_parent_group")))
 }
 
-doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, skipInvalid)
+doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, IMSWindow, minMobilityMatches, skipInvalid)
 {
     gInfo <- groupInfo(fGroups)
     annTbl <- annotations(fGroups)

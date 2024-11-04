@@ -605,45 +605,10 @@ setMethod("findMobilities", "featureGroupsScreening", function(fGroups, mobPeaks
     scr <- scr[match(gInfo$ims_parent_group, group)] # expand
     scr[, group := gInfo$group]
     scr[, d_rt := gInfo$ret[match(group, gInfo$group)] - rt]
-    if (scrHasMob)
-    {
-        # pick mobility that is closest to that of a feature group
-        scr[, mob_group := gInfo$mobility[match(group, gInfo$group)]]
-        scr[, ims_parent_group := gInfo$ims_parent_group]
-        scrOrigExp <- expandSuspMobilities(screenInfo(ret))
-        
-        # split mobilities from suspect list, NA those from IMS parents, and make sure column is numeric
-        scr[, mobility := NA]
-        scr[, mobility := as.numeric(mobility)] # NOTE: column type conversion needs to be done separately
-        scr[!is.na(mob_group), mobility := mapply(name, ims_parent_group, mob_group, FUN = function(n, g, gm)
-        {
-            mobs <- scrOrigExp[group == g & name == n]$mobility
-            return(mobs[which.min(abs(mobs - gm))])
-        })]
-        
-        scr[, d_mob := mob_group - mobility]
-        scr[, c("mob_group", "ims_parent_group") := NULL]
-    }
-    else
-        scr[, d_mob := NA_real_]
-    
     setorderv(scr, "orderOrig")
-    ret@screenInfo <- scr[, -"orderOrig"]
-    
-    # UNDONE: move to filter()?
-    if (filterSuspects || suspsNeedMobility)
-    {
-        ret <- delete(ret, k = function(scr)
-        {
-            scr <- copy(scr)
-            scr[, keep := TRUE]
-            if (filterSuspects)
-                scr[, keep := is.na(mobility) | is.na(d_mob) | abs(d_mob) <= IMSWindow]
-            if (suspsNeedMobility)
-                scr[keep == TRUE, keep := is.na(mobility) | !is.na(d_mob)]
-            return(!scr$keep)
-        })
-    }
+    scr[, orderOrig := NULL]
+    scr <- finalizeScreenInfoForIMS(scr, gInfo, minMobilityMatches, IMSWindow)
+    ret@screenInfo <- scr
     
     return(ret)
 })

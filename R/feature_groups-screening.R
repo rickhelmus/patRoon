@@ -573,15 +573,11 @@ setMethod("findMobilities", "featureGroupsScreening", function(fGroups, mobPeaks
                                                                chromPeaksParam = NULL, RTWindow = 20,
                                                                calcArea = "integrate", fallbackEIC = TRUE,
                                                                parallel = TRUE, fromSuspects = FALSE,
-                                                               filterSuspects = TRUE, suspsNeedMobility = FALSE)
+                                                               minMobilityMatches = 0)
 {
-    aapply(checkmate::assertFlag, . ~ fromSuspects + filterSuspects + suspsNeedMobility)
+    checkmate::assertFlag(fromSuspects)
+    checkmate::assertCount(minMobilityMatches)
     
-    scrHasMob <- !is.null(screenInfo(fGroups)[["mobility"]])
-    
-    if (!scrHasMob && filterSuspects)
-        stop("Cannot filter suspects: no mobility data for suspects", call. = FALSE)
-
     am <- NULL
     if (fromSuspects)
     {
@@ -689,8 +685,9 @@ setMethod("findMobilities", "featureGroupsScreening", function(fGroups, mobPeaks
 #' @rdname suspect-screening
 #' @aliases screenSuspects
 #' @export
-setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindow, mzWindow, adduct, skipInvalid,
-                                                      prefCalcChemProps, neutralChemProps, onlyHits)
+setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindow, mzWindow, IMSWindow, adduct,
+                                                      skipInvalid, prefCalcChemProps, neutralChemProps,
+                                                      minMobilityMatches, onlyHits)
 {
     checkmate::assertFlag(skipInvalid) # not in assert collection, should fail before assertSuspectList
 
@@ -699,9 +696,10 @@ setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindo
     
     ac <- checkmate::makeAssertCollection()
     assertSuspectList(suspects, needsAdduct = needsAdduct, skipInvalid, add = ac)
-    aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow + IMSWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + neutralChemProps + onlyHits,
            fixed = list(add = ac))
+    checkmate::assertCount(minMobilityMatches, add = ac)
     checkmate::reportAssertions(ac)
 
     if (!is.null(adduct))
@@ -711,13 +709,13 @@ setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindo
     suspects <- prepareSuspectList(suspects, adduct, skipInvalid, checkDesc = TRUE,
                                    prefCalcChemProps = prefCalcChemProps, neutralChemProps = neutralChemProps)
     
-    hash <- makeHash(fGroups, suspects, rtWindow, mzWindow, adduct, skipInvalid, prefCalcChemProps, neutralChemProps,
-                     onlyHits)
+    hash <- makeHash(fGroups, suspects, rtWindow, mzWindow, IMSWindow, adduct, skipInvalid, prefCalcChemProps,
+                     neutralChemProps, minMobilityMatches, onlyHits)
     cd <- loadCacheData("screenSuspects", hash)
     if (!is.null(cd))
         return(cd)
 
-    scr <- doScreenSuspects(fGroups, suspects, rtWindow, mzWindow, skipInvalid)
+    scr <- doScreenSuspects(fGroups, suspects, rtWindow, mzWindow, IMSWindow, minMobilityMatches, skipInvalid)
 
     if (onlyHits)
         fGroups <- fGroups[, scr$group]
@@ -740,12 +738,14 @@ setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindo
 #' @param amend If \code{TRUE} then screening results will be \emph{amended} to the original object.
 #' @rdname suspect-screening
 #' @export
-setMethod("screenSuspects", "featureGroupsScreening", function(fGroups, suspects, rtWindow, mzWindow,
-                                                               adduct, skipInvalid, onlyHits, amend = FALSE)
+setMethod("screenSuspects", "featureGroupsScreening", function(fGroups, suspects, rtWindow, mzWindow, IMSWindow,
+                                                               adduct, skipInvalid, prefCalcChemProps, neutralChemProps,
+                                                               minMobilityMatches, onlyHits, amend = FALSE)
 {
     aapply(checkmate::assertFlag, . ~ onlyHits + amend)
-    
-    fGroupsScreened <- callNextMethod(fGroups, suspects, rtWindow, mzWindow, adduct, skipInvalid, onlyHits)
+
+    fGroupsScreened <- callNextMethod(fGroups, suspects, rtWindow, mzWindow, IMSWindow, adduct, skipInvalid,
+                                      prefCalcChemProps, neutralChemProps, minMobilityMatches, onlyHits)
     if (!amend)
         return(fGroupsScreened)
     

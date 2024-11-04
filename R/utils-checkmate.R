@@ -214,6 +214,23 @@ assertSuspectList <- function(x, needsAdduct, skipInvalid, .var.name = checkmate
         assertListVal(x, col, checkmate::assertNumeric, any.missing = TRUE, mustExist = FALSE,
                       lower = if (col != "rt") 0 else -Inf, finite = TRUE, .var.name = .var.name, add = add)
 
+    if (!is.null(x[["mobility"]]))
+    {
+        if (is.numeric(x$mobility))
+            assertListVal(x, "mobility", checkmate::assertNumeric, any.missing = TRUE, lower = 0, finite = TRUE,
+                          .var.name = .var.name, add = add)
+        else if (is.character(x$mobility))
+        {
+            # don't add, let it fail before next check
+            assertListVal(x, "mobility", checkmate::assertCharacter, any.missing = TRUE,  .var.name = .var.name)
+            mobExp <- expandSuspMobilities(x)
+            assertListVal(mobExp, "mobility", checkmate::assertNumeric, any.missing = TRUE, lower = 0, finite = TRUE,
+                          .var.name = .var.name, add = add)
+        }
+        else
+            stop(sprintf("mobility column must be numeric or character (now %s)", class(x$mobility)), call. = FALSE)
+    }
+    
     if (!skipInvalid)
     {
         cx <- if (is.data.table(x)) copy(x) else as.data.table(x)

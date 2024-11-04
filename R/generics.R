@@ -294,8 +294,9 @@ setGeneric("annotateSuspects", function(fGroups, MSPeakLists = NULL, formulas = 
 
 #' @param \dots Further arguments specified to the methods.
 #' @rdname suspect-screening
-setGeneric("screenSuspects", function(fGroups, suspects, rtWindow = 12, mzWindow = 0.005, adduct = NULL,
-                                      skipInvalid = TRUE, prefCalcChemProps = TRUE, neutralChemProps = FALSE,
+setGeneric("screenSuspects", function(fGroups, suspects, rtWindow = 12, mzWindow = 0.005, IMSWindow = 0.01,
+                                      adduct = NULL, skipInvalid = TRUE, prefCalcChemProps = TRUE,
+                                      neutralChemProps = FALSE, minMobilityMatches = 0,
                                       onlyHits = FALSE, ...) standardGeneric("screenSuspects"))
 
 ### Optimization

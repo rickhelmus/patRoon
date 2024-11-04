@@ -182,19 +182,9 @@ assertAndPrepareAnaInfoBy <- function(x, anaInfo, withFGroups, .var.name = check
 assertSuspectList <- function(x, needsAdduct, skipInvalid, .var.name = checkmate::vname(x), add = NULL)
 {
     mzCols <- c("mz", "neutralMass", "SMILES", "InChI", "formula")
-    allCols <- c("name", "adduct", "rt", mzCols)
     
     # this seems necessary for proper naming in subsequent assertions (why??)
     .var.name <- force(.var.name)
-    
-    # subset with relevant columns: avoid checking others in subsequent assertDataFrame call
-    if (checkmate::testDataFrame(x))
-    {
-        if (is.data.table(x))
-            x <- x[, intersect(names(x), allCols), with = FALSE]
-        else
-            x <- x[, intersect(names(x), allCols), drop = FALSE]
-    }
     
     checkmate::assertDataFrame(x, any.missing = TRUE, min.rows = 1, .var.name = .var.name, add = add)
     assertHasNames(x, "name", .var.name = .var.name, add = add)

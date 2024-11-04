@@ -409,9 +409,9 @@ setMethod("calculateTox", "featureGroupsScreeningSet", function(fGroups, feature
 
 #' @rdname suspect-screening
 #' @export
-setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWindow, mzWindow,
+setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWindow, mzWindow, IMSWindow,
                                                          adduct, skipInvalid, prefCalcChemProps, neutralChemProps,
-                                                         onlyHits)
+                                                         minMobilityMatches, onlyHits)
 {
     verifyNoAdductIonizationArg(adduct)
     
@@ -420,9 +420,10 @@ setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWi
     unsetFGroupsList <- sapply(sets(fGroups), unset, obj = fGroups, simplify = FALSE)
     setObjects <- Map(unsetFGroupsList, suspects,
                       f = function(fg, s) screenSuspects(fg, s, rtWindow = rtWindow, mzWindow = mzWindow,
-                                                         adduct = NULL, skipInvalid = skipInvalid,
+                                                         IMSWindow = IMSWindow, adduct = NULL, skipInvalid = skipInvalid,
                                                          prefCalcChemProps = prefCalcChemProps,
-                                                         neutralChemProps = neutralChemProps, onlyHits = onlyHits))
+                                                         neutralChemProps = neutralChemProps,
+                                                         minMobilityMatches = minMobilityMatches, onlyHits = onlyHits))
     
     scr <- mergeScreeningSetInfos(setObjects)
     if (onlyHits)
@@ -443,14 +444,15 @@ setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWi
 
 #' @rdname suspect-screening
 #' @export
-setMethod("screenSuspects", "featureGroupsScreeningSet", function(fGroups, suspects, rtWindow, mzWindow,
+setMethod("screenSuspects", "featureGroupsScreeningSet", function(fGroups, suspects, rtWindow, mzWindow, IMSWindow,
                                                                   adduct, skipInvalid, prefCalcChemProps,
-                                                                  neutralChemProps, onlyHits, amend = FALSE)
+                                                                  neutralChemProps, minMobilityMatches, onlyHits,
+                                                                  amend = FALSE)
 {
     aapply(checkmate::assertFlag, . ~ onlyHits + amend)
     
-    fGroupsScreened <- callNextMethod(fGroups, suspects, rtWindow, mzWindow, adduct, skipInvalid, prefCalcChemProps,
-                                      neutralChemProps, onlyHits)
+    fGroupsScreened <- callNextMethod(fGroups, suspects, rtWindow, mzWindow, IMSWindow, adduct, skipInvalid,
+                                      prefCalcChemProps, neutralChemProps, minMobilityMatches, onlyHits)
     if (!amend)
         return(fGroupsScreened)
     

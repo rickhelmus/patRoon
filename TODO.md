@@ -367,6 +367,7 @@
 - NEWS
     - Dietrich features
     - groupInfo is now a DT
+    - FIXED: suspect list assertion only checked part of the columns
 
 
 ## Features

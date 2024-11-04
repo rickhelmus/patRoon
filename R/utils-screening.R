@@ -135,6 +135,43 @@ expandSuspMobilities <- function(suspects)
     })))
 }
 
+finalizeScreenInfoForIMS <- function(scr, gInfo, minMobilityMatches, IMSWindow)
+{
+    # shared code for findMobilities() and screenSuspects()
+
+    if (is.null(scr[["mobility"]]))
+        return(scr)
+    
+    scrOrigExp <- expandSuspMobilities(scr)
+    
+    # pick mobility that is closest to that of a feature group
+    scr[, mob_group := gInfo$mobility[match(group, gInfo$group)]]
+    scr[, ims_parent_group := gInfo$ims_parent_group[match(group, gInfo$group)]]
+    
+    # split mobilities from suspect list, NA those from IMS parents, and make sure column is numeric
+    scr[, mobility := NA]
+    scr[, mobility := as.numeric(mobility)] # NOTE: column type conversion needs to be done separately
+    scr[!is.na(mob_group), mobility := mapply(name, ims_parent_group, mob_group, FUN = function(n, g, gm)
+    {
+        mobs <- scrOrigExp[group == g & name == n]$mobility
+        mobs <- mobs[!is.na(mobs)]
+        return(if(length(mobs) == 0) NA_real_ else mobs[which.min(abs(mobs - gm))])
+    })]
+    
+    scr[, d_mob := mob_group - mobility]
+    
+    scr <- scr[is.na(mobility) | is.na(d_mob) | abs(d_mob) <= IMSWindow]
+    
+    if (minMobilityMatches)
+    {
+        scr[, keep := (.N - 1) >= min(minMobilityMatches, scrOrigExp[ims_parent_group == group, .N]),
+            by = c("ims_parent_group", "name")]
+        scr <- scr[keep == TRUE, -"keep"]
+    }
+    
+    return(removeDTColumnsIfPresent(scr, c("mob_group", "ims_parent_group")))
+}
+
 doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, skipInvalid)
 {
     gInfo <- groupInfo(fGroups)

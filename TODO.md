@@ -329,7 +329,8 @@
             - currently cleared with a warning
             - duplicate values where possible
         - sets methods
-    - filterSuspects/suspsNeedMobility: move to filter()?
+    - minMobilityMatches: move to filter()?
+        - then needs to store nr of mobilities in suspect list (eg like MS2 peaks)
     - somehow handle eg XCMS objects which cannot do mobilities (eg clearout?)
     - test for fGroups from screenInfo(), eg for fGroups with >1 suspect assigned
     - clearly doc what IMSWindow is used for

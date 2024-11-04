@@ -72,7 +72,8 @@ findFeaturesSuspects <- function(analysisInfo, suspects, peaksParam, rtWindow = 
         allEICs <- doGetEICs(anaInfoTBD, rep(list(EICInfo), nrow(anaInfoTBD)), compress = FALSE, cacheDB = cacheDB)
         allEICs <- lapply(allEICs, setNames, suspects$name)
         
-        fList <- findPeaksInEICs(allEICs, peaksParam, withBP = FALSE, parallel = parallel, cacheDB = cacheDB)
+        fList <- findPeaksInEICs(allEICs, peaksParam, withBP = FALSE, withMobility = needIMS, parallel = parallel,
+                                 cacheDB = cacheDB)
         fList <- lapply(fList, function(peaks)
         {
             peaks <- copy(peaks)
@@ -86,8 +87,6 @@ findFeaturesSuspects <- function(analysisInfo, suspects, peaksParam, rtWindow = 
             
             if (needIMS)
                 peaks[, ims_parent_ID := NA_character_]
-            else
-                peaks <- removeDTColumnsIfPresent(peaks, c("mobmin", "mobmax", "mobility"))
             
             return(peaks[])
         })

@@ -52,7 +52,8 @@ findFeaturesBinning <- function(analysisInfo, mzRange = c(50, 400), mzStep = 0.0
                              withBP = TRUE, cacheDB = cacheDB)
         allEICs <- lapply(allEICs, setNames, names(bins))
         
-        fList <- findPeaksInEICs(allEICs, peaksParam, withBP = TRUE, parallel = parallel, cacheDB = cacheDB)
+        fList <- findPeaksInEICs(allEICs, peaksParam, withBP = TRUE, withMobility = FALSE, parallel = parallel,
+                                 cacheDB = cacheDB)
         
         fList <- lapply(fList, function(fTab)
         {

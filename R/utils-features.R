@@ -744,7 +744,7 @@ aggregateTox <- function(tox, aggrParams, splitSuspects = FALSE)
     return(tox[])
 }
 
-findPeaksInEICs <- function(allEICs, peaksParam, withBP, parallel, cacheDB = NULL)
+findPeaksInEICs <- function(allEICs, peaksParam, withBP, withMobility, parallel, cacheDB = NULL)
 {
     baseHash <- makeHash(peaksParam)
     
@@ -789,7 +789,7 @@ findPeaksInEICs <- function(allEICs, peaksParam, withBP, parallel, cacheDB = NUL
         }
         
         # NOTE: we could also set mobilities after checking if data is available, but then we need to repeat the EIC subsetting above
-        if (length(EICs) == 0 || is.null(EICs[[1]][["mobility"]]))
+        if (!withMobility || length(EICs) == 0 || is.null(EICs[[1]][["mobility"]]))
             peaks[, c("mobmin", "mobmax", "mobility") := NULL]
         
         # make unique IDs
@@ -907,7 +907,8 @@ reintegrateFeatures <- function(features, RTWindow, calcArea, peaksParam, fallba
     if (!is.null(peaksParam))
     {
         # UNDONE: make withBP configurable?
-        peaksList <- findPeaksInEICs(allEICs, peaksParam, withBP = FALSE, parallel = parallel, cacheDB = cacheDB)
+        peaksList <- findPeaksInEICs(allEICs, peaksParam, withBP = FALSE, withMobility = FALSE, parallel = parallel,
+                                     cacheDB = cacheDB)
         peaksList <- Map(peaksList, featureTable(features), f = function(anaPLs, ft)
         {
             # filter out peaks outside original retmin/retmax

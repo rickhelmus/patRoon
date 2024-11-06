@@ -655,7 +655,10 @@ getDuplicatedStrings <- function(x) names(which(table(x) > 1))
 doApply <- function(applyf, doPar, data, ...)
 {
     if (doPar)
+    {
         applyf <- get(paste0("future_", applyf), envir = asNamespace("future.apply"))
+        return(withProg(length(data), doPar, do.call(applyf, list(data, ..., future.seed = TRUE))))
+    }
     withProg(length(data), doPar, do.call(applyf, list(data, ...)))
 }
 

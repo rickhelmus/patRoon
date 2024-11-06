@@ -53,7 +53,8 @@ executeMultiProcessFuture <- function(commandQueue, finishHandler, timeoutHandle
                                                     finishHandler = finishHandler, timeoutHandler = timeoutHandler,
                                                     errorHandler = errorHandler, prepareHandler = prepareHandler,
                                                     procTimeout = procTimeout, logSubDir = logSubDir,
-                                                    future.scheduling = getOption("patRoon.MP.futureSched",  1.0)))
+                                                    future.scheduling = getOption("patRoon.MP.futureSched",  1.0),
+                                                    future.seed = TRUE))
                         
     logPath <- getOption("patRoon.MP.logPath", FALSE)
     if (!is.null(logSubDir) && !isFALSE(logPath))

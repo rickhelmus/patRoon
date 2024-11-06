@@ -185,11 +185,8 @@ generateTPsCTS <- function(parents, transLibrary, generations = 1, errorRetries 
         newResults <- list()
         if (length(parsTBD) > 0)
         {
-            lapfunc <- if (parallel) future.apply::future_sapply else sapply
-            newResults <- withProg(length(parsTBD), parallel,
-                                   do.call(lapfunc, list(parsSplit[parsTBD], patRoon:::runCTS,
-                                                         transLibrary, generations, errorRetries,
-                                                         neutralizeTPs, calcLogP, simplify = FALSE)))
+            newResults <- doApply("sapply", parallel, parsSplit[parsTBD], patRoon:::runCTS, transLibrary, generations,
+                                  errorRetries, neutralizeTPs, calcLogP, simplify = FALSE)
 
             for (pn in names(newResults))
             {

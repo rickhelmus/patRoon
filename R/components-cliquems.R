@@ -134,11 +134,8 @@ setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ioniz
                       simplify = FALSE)
         cat("Done!\n")
         
-        if (parallel)
-            allCliques <- withProg(length(xds), TRUE, future.apply::future_sapply(xds, getCliques, simplify = FALSE))
-        else
-            allCliques <- withProg(length(xds), FALSE, sapply(xds, getCliques, simplify = FALSE))
-        
+        allCliques <- doApply("sapply", parallel, xds, getCliques, simplify = FALSE)
+
         for (a in anasTBD)
             saveCacheData("componentsCliqueMS", allCliques[[a]], hashes[[a]], db)
         

@@ -65,10 +65,7 @@ findFeaturesEnviPick <- function(analysisInfo, ..., parallel = TRUE, verbose = T
     anasTBD <- setdiff(anas, names(cachedData))
     if (length(anasTBD) > 0)
     {
-        if (parallel)
-            feats <- withProg(length(anasTBD), TRUE, future.apply::future_lapply(filePaths[anasTBD], doFP))
-        else
-            feats <- withProg(length(anasTBD), FALSE, lapply(filePaths[anasTBD], doFP))
+        feats <- doApply("lapply", parallel, filePaths[anasTBD], doFP)
         names(feats) <- anasTBD
         for (a in anasTBD)
             saveCacheData("featuresEnviPick", feats[[a]], hashes[[a]])

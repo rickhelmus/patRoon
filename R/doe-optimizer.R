@@ -93,10 +93,7 @@ DoEOptimizer$methods(
             return(result)
         }
         
-        if (parallel)
-            response <- withProg(length(tasks), TRUE, rbindlist(future.apply::future_lapply(tasks, doExp)))
-        else
-            response <- withProg(length(tasks), FALSE, rbindlist(lapply(tasks, doExp)))
+        response <- doApply("lapply", parallel, tasks, doExp)
 
         ret <- list()
         ret$params <- typParams

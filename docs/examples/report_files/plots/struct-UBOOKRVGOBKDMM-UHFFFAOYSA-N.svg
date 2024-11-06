@@ -31,7 +31,7 @@
       <path id='mol1atm7' class='atom' d='M86.04 16.18h-1.26v8.55l-5.46 -8.55h-1.45v10.46h1.26v-8.48l5.41 8.48h1.5v-10.46z' stroke='none'/>
       <g id='mol1atm9' class='atom'>
         <path d='M86.04 62.61h-1.26v8.55l-5.46 -8.55h-1.45v10.46h1.26v-8.48l5.41 8.48h1.5v-10.46z' stroke='none'/>
-        <path d='M84.68 79.98v4.76h1.34v-10.46h-1.34v4.53h-5.38v-4.53h-1.33v10.46h1.34v-4.76h5.36z' stroke='none'/>
+        <path d='M84.68 79.98v4.76h1.34v-10.46h-1.34v4.53h-5.38v-4.53h-1.33v10.46h1.33v-4.76h5.38z' stroke='none'/>
       </g>
     </g>
   </g>

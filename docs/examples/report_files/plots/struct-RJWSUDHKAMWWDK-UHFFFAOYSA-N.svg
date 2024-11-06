@@ -19,7 +19,7 @@
       <line id='mol1bnd12' class='bond' x1='19.27' y1='57.44' x2='7.13' y2='42.97'/>
       <g id='mol1atm11' class='atom'>
         <path d='M40.54 50.73h-.83v5.61l-3.58 -5.61h-.95v6.86h.83v-5.56l3.55 5.56h.98v-6.86z' stroke='none'/>
-        <path d='M39.65 46.81v3.12h.88v-6.86h-.88v2.97h-3.53v-2.97h-.87v6.86h.88v-3.12h3.52z' stroke='none'/>
+        <path d='M39.65 46.81v3.12h.88v-6.86h-.88v2.97h-3.53v-2.97h-.87v6.86h.87v-3.12h3.53z' stroke='none'/>
       </g>
     </g>
   </g>

@@ -29,14 +29,14 @@
 <rect x='329.93' y='113.41' width='46.10' height='0.00' style='stroke-width: 0.75; stroke: #E31A1C; fill: #E31A1C;' />
 <rect x='385.25' y='71.84' width='46.10' height='41.57' style='stroke-width: 0.75; stroke: #FDBF6F; fill: #FDBF6F;' />
 <rect x='440.57' y='71.84' width='46.10' height='41.57' style='stroke-width: 0.75; stroke: #FF7F00; fill: #FF7F00;' />
-<text transform='translate(82.21,133.67) rotate(-90)' text-anchor='end' style='font-size: 16.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='39.12px' lengthAdjust='spacingAndGlyphs'>score</text>
-<text transform='translate(137.53,133.67) rotate(-90)' text-anchor='end' style='font-size: 16.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='69.37px' lengthAdjust='spacingAndGlyphs'>fragScore</text>
-<text transform='translate(192.85,133.67) rotate(-90)' text-anchor='end' style='font-size: 16.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='116.50px' lengthAdjust='spacingAndGlyphs'>metFusionScore</text>
-<text transform='translate(248.17,133.67) rotate(-90)' text-anchor='end' style='font-size: 16.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='152.94px' lengthAdjust='spacingAndGlyphs'>individualMoNAScore</text>
-<text transform='translate(303.49,133.67) rotate(-90)' text-anchor='end' style='font-size: 16.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='108.52px' lengthAdjust='spacingAndGlyphs'>numberPatents</text>
-<text transform='translate(358.81,133.67) rotate(-90)' text-anchor='end' style='font-size: 16.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='139.64px' lengthAdjust='spacingAndGlyphs'>pubMedReferences</text>
-<text transform='translate(414.13,133.67) rotate(-90)' text-anchor='end' style='font-size: 16.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='113.87px' lengthAdjust='spacingAndGlyphs'>annoTypeCount</text>
-<text transform='translate(469.45,133.67) rotate(-90)' text-anchor='end' style='font-size: 16.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='95.15px' lengthAdjust='spacingAndGlyphs'>formulaScore</text>
+<text transform='translate(82.21,133.67) rotate(-90)' text-anchor='end' style='font-size: 16.00px; font-family: "Nimbus Sans";' textLength='39.12px' lengthAdjust='spacingAndGlyphs'>score</text>
+<text transform='translate(137.53,133.67) rotate(-90)' text-anchor='end' style='font-size: 16.00px; font-family: "Nimbus Sans";' textLength='69.37px' lengthAdjust='spacingAndGlyphs'>fragScore</text>
+<text transform='translate(192.85,133.67) rotate(-90)' text-anchor='end' style='font-size: 16.00px; font-family: "Nimbus Sans";' textLength='116.50px' lengthAdjust='spacingAndGlyphs'>metFusionScore</text>
+<text transform='translate(248.17,133.67) rotate(-90)' text-anchor='end' style='font-size: 16.00px; font-family: "Nimbus Sans";' textLength='152.94px' lengthAdjust='spacingAndGlyphs'>individualMoNAScore</text>
+<text transform='translate(303.49,133.67) rotate(-90)' text-anchor='end' style='font-size: 16.00px; font-family: "Nimbus Sans";' textLength='108.52px' lengthAdjust='spacingAndGlyphs'>numberPatents</text>
+<text transform='translate(358.81,133.67) rotate(-90)' text-anchor='end' style='font-size: 16.00px; font-family: "Nimbus Sans";' textLength='139.64px' lengthAdjust='spacingAndGlyphs'>pubMedReferences</text>
+<text transform='translate(414.13,133.67) rotate(-90)' text-anchor='end' style='font-size: 16.00px; font-family: "Nimbus Sans";' textLength='113.87px' lengthAdjust='spacingAndGlyphs'>annoTypeCount</text>
+<text transform='translate(469.45,133.67) rotate(-90)' text-anchor='end' style='font-size: 16.00px; font-family: "Nimbus Sans";' textLength='95.15px' lengthAdjust='spacingAndGlyphs'>formulaScore</text>
 <line x1='36.00' y1='113.41' x2='36.00' y2='9.49' style='stroke-width: 0.75;' />
 <line x1='36.00' y1='113.41' x2='26.40' y2='113.41' style='stroke-width: 0.75;' />
 <line x1='36.00' y1='92.62' x2='26.40' y2='92.62' style='stroke-width: 0.75;' />
@@ -44,20 +44,20 @@
 <line x1='36.00' y1='51.06' x2='26.40' y2='51.06' style='stroke-width: 0.75;' />
 <line x1='36.00' y1='30.27' x2='26.40' y2='30.27' style='stroke-width: 0.75;' />
 <line x1='36.00' y1='9.49' x2='26.40' y2='9.49' style='stroke-width: 0.75;' />
-<text x='16.80' y='118.65' text-anchor='end' style='font-size: 14.40px; font-weight: 0; font-family: "Nimbus Sans";' textLength='20.00px' lengthAdjust='spacingAndGlyphs'>0.0</text>
-<text x='16.80' y='97.87' text-anchor='end' style='font-size: 14.40px; font-weight: 0; font-family: "Nimbus Sans";' textLength='20.00px' lengthAdjust='spacingAndGlyphs'>0.5</text>
-<text x='16.80' y='77.09' text-anchor='end' style='font-size: 14.40px; font-weight: 0; font-family: "Nimbus Sans";' textLength='20.00px' lengthAdjust='spacingAndGlyphs'>1.0</text>
-<text x='16.80' y='56.30' text-anchor='end' style='font-size: 14.40px; font-weight: 0; font-family: "Nimbus Sans";' textLength='20.00px' lengthAdjust='spacingAndGlyphs'>1.5</text>
-<text x='16.80' y='35.52' text-anchor='end' style='font-size: 14.40px; font-weight: 0; font-family: "Nimbus Sans";' textLength='20.00px' lengthAdjust='spacingAndGlyphs'>2.0</text>
-<text x='16.80' y='14.73' text-anchor='end' style='font-size: 14.40px; font-weight: 0; font-family: "Nimbus Sans";' textLength='20.00px' lengthAdjust='spacingAndGlyphs'>2.5</text>
-<text x='76.38' y='-1.92' text-anchor='middle' style='font-size: 12.80px; font-weight: 0; font-family: "Nimbus Sans";' textLength='24.90px' lengthAdjust='spacingAndGlyphs'>2.54</text>
-<text x='131.70' y='80.46' text-anchor='middle' style='font-size: 12.80px; font-weight: 0; font-family: "Nimbus Sans";' textLength='24.90px' lengthAdjust='spacingAndGlyphs'>0.56</text>
-<text x='187.02' y='63.04' text-anchor='middle' style='font-size: 12.80px; font-weight: 0; font-family: "Nimbus Sans";' textLength='24.90px' lengthAdjust='spacingAndGlyphs'>0.98</text>
-<text x='242.34' y='103.81' text-anchor='middle' style='font-size: 12.80px; font-weight: 0; font-family: "Nimbus Sans";' textLength='7.11px' lengthAdjust='spacingAndGlyphs'>0</text>
-<text x='297.66' y='103.77' text-anchor='middle' style='font-size: 12.80px; font-weight: 0; font-family: "Nimbus Sans";' textLength='7.11px' lengthAdjust='spacingAndGlyphs'>0</text>
-<text x='352.98' y='103.81' text-anchor='middle' style='font-size: 12.80px; font-weight: 0; font-family: "Nimbus Sans";' textLength='7.11px' lengthAdjust='spacingAndGlyphs'>0</text>
-<text x='408.30' y='62.24' text-anchor='middle' style='font-size: 12.80px; font-weight: 0; font-family: "Nimbus Sans";' textLength='7.11px' lengthAdjust='spacingAndGlyphs'>1</text>
-<text x='463.62' y='62.24' text-anchor='middle' style='font-size: 12.80px; font-weight: 0; font-family: "Nimbus Sans";' textLength='7.11px' lengthAdjust='spacingAndGlyphs'>1</text>
+<text x='16.80' y='118.65' text-anchor='end' style='font-size: 14.40px; font-family: "Nimbus Sans";' textLength='20.00px' lengthAdjust='spacingAndGlyphs'>0.0</text>
+<text x='16.80' y='97.87' text-anchor='end' style='font-size: 14.40px; font-family: "Nimbus Sans";' textLength='20.00px' lengthAdjust='spacingAndGlyphs'>0.5</text>
+<text x='16.80' y='77.09' text-anchor='end' style='font-size: 14.40px; font-family: "Nimbus Sans";' textLength='20.00px' lengthAdjust='spacingAndGlyphs'>1.0</text>
+<text x='16.80' y='56.30' text-anchor='end' style='font-size: 14.40px; font-family: "Nimbus Sans";' textLength='20.00px' lengthAdjust='spacingAndGlyphs'>1.5</text>
+<text x='16.80' y='35.52' text-anchor='end' style='font-size: 14.40px; font-family: "Nimbus Sans";' textLength='20.00px' lengthAdjust='spacingAndGlyphs'>2.0</text>
+<text x='16.80' y='14.73' text-anchor='end' style='font-size: 14.40px; font-family: "Nimbus Sans";' textLength='20.00px' lengthAdjust='spacingAndGlyphs'>2.5</text>
+<text x='76.38' y='-1.92' text-anchor='middle' style='font-size: 12.80px; font-family: "Nimbus Sans";' textLength='24.90px' lengthAdjust='spacingAndGlyphs'>2.54</text>
+<text x='131.70' y='80.46' text-anchor='middle' style='font-size: 12.80px; font-family: "Nimbus Sans";' textLength='24.90px' lengthAdjust='spacingAndGlyphs'>0.56</text>
+<text x='187.02' y='63.04' text-anchor='middle' style='font-size: 12.80px; font-family: "Nimbus Sans";' textLength='24.90px' lengthAdjust='spacingAndGlyphs'>0.98</text>
+<text x='242.34' y='103.81' text-anchor='middle' style='font-size: 12.80px; font-family: "Nimbus Sans";' textLength='7.11px' lengthAdjust='spacingAndGlyphs'>0</text>
+<text x='297.66' y='103.77' text-anchor='middle' style='font-size: 12.80px; font-family: "Nimbus Sans";' textLength='7.11px' lengthAdjust='spacingAndGlyphs'>0</text>
+<text x='352.98' y='103.81' text-anchor='middle' style='font-size: 12.80px; font-family: "Nimbus Sans";' textLength='7.11px' lengthAdjust='spacingAndGlyphs'>0</text>
+<text x='408.30' y='62.24' text-anchor='middle' style='font-size: 12.80px; font-family: "Nimbus Sans";' textLength='7.11px' lengthAdjust='spacingAndGlyphs'>1</text>
+<text x='463.62' y='62.24' text-anchor='middle' style='font-size: 12.80px; font-family: "Nimbus Sans";' textLength='7.11px' lengthAdjust='spacingAndGlyphs'>1</text>
 </g>
 <defs>
   <clipPath id='cpNzguNzJ8NTAwLjE2fDcuNjh8MjA5LjI4'>

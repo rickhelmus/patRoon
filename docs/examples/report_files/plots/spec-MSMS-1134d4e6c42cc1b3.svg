@@ -30,14 +30,14 @@
 <line x1='306.63' y1='228.96' x2='306.63' y2='236.16' style='stroke-width: 0.75;' />
 <line x1='354.39' y1='228.96' x2='354.39' y2='236.16' style='stroke-width: 0.75;' />
 <line x1='402.14' y1='228.96' x2='402.14' y2='236.16' style='stroke-width: 0.75;' />
-<text x='67.86' y='254.88' text-anchor='middle' style='font-size: 12.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='13.35px' lengthAdjust='spacingAndGlyphs'>90</text>
-<text x='115.62' y='254.88' text-anchor='middle' style='font-size: 12.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>100</text>
-<text x='163.37' y='254.88' text-anchor='middle' style='font-size: 12.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>110</text>
-<text x='211.13' y='254.88' text-anchor='middle' style='font-size: 12.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>120</text>
-<text x='258.88' y='254.88' text-anchor='middle' style='font-size: 12.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>130</text>
-<text x='306.63' y='254.88' text-anchor='middle' style='font-size: 12.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>140</text>
-<text x='354.39' y='254.88' text-anchor='middle' style='font-size: 12.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>150</text>
-<text x='402.14' y='254.88' text-anchor='middle' style='font-size: 12.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>160</text>
+<text x='67.86' y='254.88' text-anchor='middle' style='font-size: 12.00px; font-family: "Nimbus Sans";' textLength='13.35px' lengthAdjust='spacingAndGlyphs'>90</text>
+<text x='115.62' y='254.88' text-anchor='middle' style='font-size: 12.00px; font-family: "Nimbus Sans";' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>100</text>
+<text x='163.37' y='254.88' text-anchor='middle' style='font-size: 12.00px; font-family: "Nimbus Sans";' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>110</text>
+<text x='211.13' y='254.88' text-anchor='middle' style='font-size: 12.00px; font-family: "Nimbus Sans";' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>120</text>
+<text x='258.88' y='254.88' text-anchor='middle' style='font-size: 12.00px; font-family: "Nimbus Sans";' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>130</text>
+<text x='306.63' y='254.88' text-anchor='middle' style='font-size: 12.00px; font-family: "Nimbus Sans";' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>140</text>
+<text x='354.39' y='254.88' text-anchor='middle' style='font-size: 12.00px; font-family: "Nimbus Sans";' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>150</text>
+<text x='402.14' y='254.88' text-anchor='middle' style='font-size: 12.00px; font-family: "Nimbus Sans";' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>160</text>
 <polyline points='59.04,2.88 59.04,228.96 418.64,228.96 ' style='stroke-width: 0.75;' />
 </g>
 <defs>
@@ -46,8 +46,8 @@
   </clipPath>
 </defs>
 <g clip-path='url(#cpMC4wMHw0MjEuNTJ8MC4wMHwyODguMDA=)'>
-<text x='238.84' y='283.68' text-anchor='middle' style='font-size: 12.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='19.32px' lengthAdjust='spacingAndGlyphs'>m/z</text>
-<text transform='translate(12.96,115.92) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='44.68px' lengthAdjust='spacingAndGlyphs'>Intensity</text>
+<text x='238.84' y='283.68' text-anchor='middle' style='font-size: 12.00px; font-family: "Nimbus Sans";' textLength='19.32px' lengthAdjust='spacingAndGlyphs'>m/z</text>
+<text transform='translate(12.96,115.92) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Nimbus Sans";' textLength='44.68px' lengthAdjust='spacingAndGlyphs'>Intensity</text>
 </g>
 <defs>
   <clipPath id='cpNTkuMDR8NDE4LjY0fDIuODh8MjI4Ljk2'>
@@ -72,13 +72,13 @@
 <line x1='59.04' y1='164.53' x2='51.84' y2='164.53' style='stroke-width: 0.75;' />
 <line x1='59.04' y1='103.28' x2='51.84' y2='103.28' style='stroke-width: 0.75;' />
 <line x1='59.04' y1='42.02' x2='51.84' y2='42.02' style='stroke-width: 0.75;' />
-<text transform='translate(41.76,225.79) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>0</text>
-<text transform='translate(41.76,164.53) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='33.37px' lengthAdjust='spacingAndGlyphs'>20000</text>
-<text transform='translate(41.76,103.28) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='33.37px' lengthAdjust='spacingAndGlyphs'>40000</text>
-<text transform='translate(41.76,42.02) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='33.37px' lengthAdjust='spacingAndGlyphs'>60000</text>
+<text transform='translate(41.76,225.79) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Nimbus Sans";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>0</text>
+<text transform='translate(41.76,164.53) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Nimbus Sans";' textLength='33.37px' lengthAdjust='spacingAndGlyphs'>20000</text>
+<text transform='translate(41.76,103.28) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Nimbus Sans";' textLength='33.37px' lengthAdjust='spacingAndGlyphs'>40000</text>
+<text transform='translate(41.76,42.02) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Nimbus Sans";' textLength='33.37px' lengthAdjust='spacingAndGlyphs'>60000</text>
 <line x1='426.74' y1='13.68' x2='442.94' y2='13.68' style='stroke-width: 0.75; stroke: #BEBEBE;' />
 <line x1='426.74' y1='24.48' x2='442.94' y2='24.48' style='stroke-width: 0.75; stroke: #FF0000;' />
-<text x='451.04' y='16.96' style='font-size: 9.00px; font-weight: 0;fill: #BEBEBE; font-family: "Nimbus Sans";' textLength='46.03px' lengthAdjust='spacingAndGlyphs'>unassigned</text>
-<text x='451.04' y='27.76' style='font-size: 9.00px; font-weight: 0;fill: #FF0000; font-family: "Nimbus Sans";' textLength='38.00px' lengthAdjust='spacingAndGlyphs'>precursor</text>
+<text x='451.04' y='16.96' style='font-size: 9.00px;fill: #BEBEBE; font-family: "Nimbus Sans";' textLength='46.03px' lengthAdjust='spacingAndGlyphs'>unassigned</text>
+<text x='451.04' y='27.76' style='font-size: 9.00px;fill: #FF0000; font-family: "Nimbus Sans";' textLength='38.00px' lengthAdjust='spacingAndGlyphs'>precursor</text>
 </g>
 </svg>

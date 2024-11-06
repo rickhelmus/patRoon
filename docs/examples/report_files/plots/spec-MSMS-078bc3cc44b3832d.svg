@@ -28,12 +28,12 @@
 <line x1='276.85' y1='228.96' x2='276.85' y2='236.16' style='stroke-width: 0.75;' />
 <line x1='335.86' y1='228.96' x2='335.86' y2='236.16' style='stroke-width: 0.75;' />
 <line x1='394.88' y1='228.96' x2='394.88' y2='236.16' style='stroke-width: 0.75;' />
-<text x='99.79' y='254.88' text-anchor='middle' style='font-size: 12.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>110</text>
-<text x='158.81' y='254.88' text-anchor='middle' style='font-size: 12.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>120</text>
-<text x='217.83' y='254.88' text-anchor='middle' style='font-size: 12.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>130</text>
-<text x='276.85' y='254.88' text-anchor='middle' style='font-size: 12.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>140</text>
-<text x='335.86' y='254.88' text-anchor='middle' style='font-size: 12.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>150</text>
-<text x='394.88' y='254.88' text-anchor='middle' style='font-size: 12.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>160</text>
+<text x='99.79' y='254.88' text-anchor='middle' style='font-size: 12.00px; font-family: "Nimbus Sans";' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>110</text>
+<text x='158.81' y='254.88' text-anchor='middle' style='font-size: 12.00px; font-family: "Nimbus Sans";' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>120</text>
+<text x='217.83' y='254.88' text-anchor='middle' style='font-size: 12.00px; font-family: "Nimbus Sans";' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>130</text>
+<text x='276.85' y='254.88' text-anchor='middle' style='font-size: 12.00px; font-family: "Nimbus Sans";' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>140</text>
+<text x='335.86' y='254.88' text-anchor='middle' style='font-size: 12.00px; font-family: "Nimbus Sans";' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>150</text>
+<text x='394.88' y='254.88' text-anchor='middle' style='font-size: 12.00px; font-family: "Nimbus Sans";' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>160</text>
 <polyline points='59.04,2.88 59.04,228.96 418.64,228.96 ' style='stroke-width: 0.75;' />
 </g>
 <defs>
@@ -42,8 +42,8 @@
   </clipPath>
 </defs>
 <g clip-path='url(#cpMC4wMHw0MjEuNTJ8MC4wMHwyODguMDA=)'>
-<text x='238.84' y='283.68' text-anchor='middle' style='font-size: 12.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='19.32px' lengthAdjust='spacingAndGlyphs'>m/z</text>
-<text transform='translate(12.96,115.92) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='44.68px' lengthAdjust='spacingAndGlyphs'>Intensity</text>
+<text x='238.84' y='283.68' text-anchor='middle' style='font-size: 12.00px; font-family: "Nimbus Sans";' textLength='19.32px' lengthAdjust='spacingAndGlyphs'>m/z</text>
+<text transform='translate(12.96,115.92) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Nimbus Sans";' textLength='44.68px' lengthAdjust='spacingAndGlyphs'>Intensity</text>
 </g>
 <defs>
   <clipPath id='cpNTkuMDR8NDE4LjY0fDIuODh8MjI4Ljk2'>
@@ -62,13 +62,13 @@
 <line x1='59.04' y1='119.97' x2='51.84' y2='119.97' style='stroke-width: 0.75;' />
 <line x1='59.04' y1='64.62' x2='51.84' y2='64.62' style='stroke-width: 0.75;' />
 <line x1='59.04' y1='9.27' x2='51.84' y2='9.27' style='stroke-width: 0.75;' />
-<text transform='translate(41.76,175.31) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='33.70px' lengthAdjust='spacingAndGlyphs'>1e+05</text>
-<text transform='translate(41.76,119.97) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='33.70px' lengthAdjust='spacingAndGlyphs'>2e+05</text>
-<text transform='translate(41.76,64.62) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='33.70px' lengthAdjust='spacingAndGlyphs'>3e+05</text>
-<text transform='translate(41.76,9.27) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='33.70px' lengthAdjust='spacingAndGlyphs'>4e+05</text>
+<text transform='translate(41.76,175.31) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Nimbus Sans";' textLength='33.70px' lengthAdjust='spacingAndGlyphs'>1e+05</text>
+<text transform='translate(41.76,119.97) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Nimbus Sans";' textLength='33.70px' lengthAdjust='spacingAndGlyphs'>2e+05</text>
+<text transform='translate(41.76,64.62) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Nimbus Sans";' textLength='33.70px' lengthAdjust='spacingAndGlyphs'>3e+05</text>
+<text transform='translate(41.76,9.27) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Nimbus Sans";' textLength='33.70px' lengthAdjust='spacingAndGlyphs'>4e+05</text>
 <line x1='426.74' y1='13.68' x2='442.94' y2='13.68' style='stroke-width: 0.75; stroke: #BEBEBE;' />
 <line x1='426.74' y1='24.48' x2='442.94' y2='24.48' style='stroke-width: 0.75; stroke: #FF0000;' />
-<text x='451.04' y='16.96' style='font-size: 9.00px; font-weight: 0;fill: #BEBEBE; font-family: "Nimbus Sans";' textLength='46.03px' lengthAdjust='spacingAndGlyphs'>unassigned</text>
-<text x='451.04' y='27.76' style='font-size: 9.00px; font-weight: 0;fill: #FF0000; font-family: "Nimbus Sans";' textLength='38.00px' lengthAdjust='spacingAndGlyphs'>precursor</text>
+<text x='451.04' y='16.96' style='font-size: 9.00px;fill: #BEBEBE; font-family: "Nimbus Sans";' textLength='46.03px' lengthAdjust='spacingAndGlyphs'>unassigned</text>
+<text x='451.04' y='27.76' style='font-size: 9.00px;fill: #FF0000; font-family: "Nimbus Sans";' textLength='38.00px' lengthAdjust='spacingAndGlyphs'>precursor</text>
 </g>
 </svg>

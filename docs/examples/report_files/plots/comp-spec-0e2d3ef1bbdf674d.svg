@@ -28,12 +28,12 @@
 <line x1='250.65' y1='209.28' x2='250.65' y2='218.88' style='stroke-width: 0.75;' />
 <line x1='297.38' y1='209.28' x2='297.38' y2='218.88' style='stroke-width: 0.75;' />
 <line x1='344.10' y1='209.28' x2='344.10' y2='218.88' style='stroke-width: 0.75;' />
-<text x='110.49' y='243.84' text-anchor='middle' style='font-size: 16.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='26.70px' lengthAdjust='spacingAndGlyphs'>100</text>
-<text x='157.21' y='243.84' text-anchor='middle' style='font-size: 16.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='26.70px' lengthAdjust='spacingAndGlyphs'>110</text>
-<text x='203.93' y='243.84' text-anchor='middle' style='font-size: 16.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='26.70px' lengthAdjust='spacingAndGlyphs'>120</text>
-<text x='250.65' y='243.84' text-anchor='middle' style='font-size: 16.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='26.70px' lengthAdjust='spacingAndGlyphs'>130</text>
-<text x='297.38' y='243.84' text-anchor='middle' style='font-size: 16.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='26.70px' lengthAdjust='spacingAndGlyphs'>140</text>
-<text x='344.10' y='243.84' text-anchor='middle' style='font-size: 16.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='26.70px' lengthAdjust='spacingAndGlyphs'>150</text>
+<text x='110.49' y='243.84' text-anchor='middle' style='font-size: 16.00px; font-family: "Nimbus Sans";' textLength='26.70px' lengthAdjust='spacingAndGlyphs'>100</text>
+<text x='157.21' y='243.84' text-anchor='middle' style='font-size: 16.00px; font-family: "Nimbus Sans";' textLength='26.70px' lengthAdjust='spacingAndGlyphs'>110</text>
+<text x='203.93' y='243.84' text-anchor='middle' style='font-size: 16.00px; font-family: "Nimbus Sans";' textLength='26.70px' lengthAdjust='spacingAndGlyphs'>120</text>
+<text x='250.65' y='243.84' text-anchor='middle' style='font-size: 16.00px; font-family: "Nimbus Sans";' textLength='26.70px' lengthAdjust='spacingAndGlyphs'>130</text>
+<text x='297.38' y='243.84' text-anchor='middle' style='font-size: 16.00px; font-family: "Nimbus Sans";' textLength='26.70px' lengthAdjust='spacingAndGlyphs'>140</text>
+<text x='344.10' y='243.84' text-anchor='middle' style='font-size: 16.00px; font-family: "Nimbus Sans";' textLength='26.70px' lengthAdjust='spacingAndGlyphs'>150</text>
 <polyline points='78.72,3.84 78.72,209.28 363.53,209.28 ' style='stroke-width: 0.75;' />
 </g>
 <defs>
@@ -42,8 +42,8 @@
   </clipPath>
 </defs>
 <g clip-path='url(#cpMC4wMHwzNjcuMzd8MC4wMHwyODguMDA=)'>
-<text x='221.12' y='282.24' text-anchor='middle' style='font-size: 16.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='25.78px' lengthAdjust='spacingAndGlyphs'>m/z</text>
-<text transform='translate(17.28,106.56) rotate(-90)' text-anchor='middle' style='font-size: 16.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='59.59px' lengthAdjust='spacingAndGlyphs'>Intensity</text>
+<text x='221.12' y='282.24' text-anchor='middle' style='font-size: 16.00px; font-family: "Nimbus Sans";' textLength='25.78px' lengthAdjust='spacingAndGlyphs'>m/z</text>
+<text transform='translate(17.28,106.56) rotate(-90)' text-anchor='middle' style='font-size: 16.00px; font-family: "Nimbus Sans";' textLength='59.59px' lengthAdjust='spacingAndGlyphs'>Intensity</text>
 </g>
 <defs>
   <clipPath id='cpNzguNzJ8MzYzLjUzfDMuODR8MjA5LjI4'>
@@ -64,29 +64,29 @@
 <line x1='78.72' y1='147.40' x2='69.12' y2='147.40' style='stroke-width: 0.75;' />
 <line x1='78.72' y1='90.51' x2='69.12' y2='90.51' style='stroke-width: 0.75;' />
 <line x1='78.72' y1='33.62' x2='69.12' y2='33.62' style='stroke-width: 0.75;' />
-<text transform='translate(55.68,204.29) rotate(-90)' text-anchor='middle' style='font-size: 16.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='8.90px' lengthAdjust='spacingAndGlyphs'>0</text>
-<text transform='translate(55.68,147.40) rotate(-90)' text-anchor='middle' style='font-size: 16.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='44.94px' lengthAdjust='spacingAndGlyphs'>1e+05</text>
-<text transform='translate(55.68,33.62) rotate(-90)' text-anchor='middle' style='font-size: 16.00px; font-weight: 0; font-family: "Nimbus Sans";' textLength='44.94px' lengthAdjust='spacingAndGlyphs'>3e+05</text>
+<text transform='translate(55.68,204.29) rotate(-90)' text-anchor='middle' style='font-size: 16.00px; font-family: "Nimbus Sans";' textLength='8.90px' lengthAdjust='spacingAndGlyphs'>0</text>
+<text transform='translate(55.68,147.40) rotate(-90)' text-anchor='middle' style='font-size: 16.00px; font-family: "Nimbus Sans";' textLength='44.94px' lengthAdjust='spacingAndGlyphs'>1e+05</text>
+<text transform='translate(55.68,33.62) rotate(-90)' text-anchor='middle' style='font-size: 16.00px; font-family: "Nimbus Sans";' textLength='44.94px' lengthAdjust='spacingAndGlyphs'>3e+05</text>
 </g>
 <g clip-path='url(#cpNzguNzJ8MzYzLjUzfDMuODR8MjA5LjI4)'>
-<text transform='translate(142.72,182.50) rotate(-90)' style='font-size: 14.40px; font-weight: 0; font-family: "Nimbus Sans";' textLength='10.39px' lengthAdjust='spacingAndGlyphs'>C</text>
-<text transform='translate(145.36,172.11) rotate(-90)' style='font-size: 10.08px; font-weight: 0; font-family: "Nimbus Sans";' textLength='5.60px' lengthAdjust='spacingAndGlyphs'>7</text>
-<text transform='translate(142.72,166.51) rotate(-90)' style='font-size: 14.40px; font-weight: 0; font-family: "Nimbus Sans";' textLength='10.39px' lengthAdjust='spacingAndGlyphs'>H</text>
-<text transform='translate(145.36,156.12) rotate(-90)' style='font-size: 10.08px; font-weight: 0; font-family: "Nimbus Sans";' textLength='5.60px' lengthAdjust='spacingAndGlyphs'>8</text>
-<text transform='translate(142.72,150.52) rotate(-90)' style='font-size: 14.40px; font-weight: 0; font-family: "Nimbus Sans";' textLength='10.39px' lengthAdjust='spacingAndGlyphs'>N</text>
-<text transform='translate(273.57,71.87) rotate(-90)' style='font-size: 14.40px; font-weight: 0; font-family: "Nimbus Sans";' textLength='10.39px' lengthAdjust='spacingAndGlyphs'>C</text>
-<text transform='translate(276.21,61.48) rotate(-90)' style='font-size: 10.08px; font-weight: 0; font-family: "Nimbus Sans";' textLength='5.60px' lengthAdjust='spacingAndGlyphs'>7</text>
-<text transform='translate(273.57,55.88) rotate(-90)' style='font-size: 14.40px; font-weight: 0; font-family: "Nimbus Sans";' textLength='10.39px' lengthAdjust='spacingAndGlyphs'>H</text>
-<text transform='translate(276.21,45.49) rotate(-90)' style='font-size: 10.08px; font-weight: 0; font-family: "Nimbus Sans";' textLength='5.60px' lengthAdjust='spacingAndGlyphs'>8</text>
-<text transform='translate(273.57,39.89) rotate(-90)' style='font-size: 14.40px; font-weight: 0; font-family: "Nimbus Sans";' textLength='10.39px' lengthAdjust='spacingAndGlyphs'>N</text>
-<text transform='translate(276.21,29.50) rotate(-90)' style='font-size: 10.08px; font-weight: 0; font-family: "Nimbus Sans";' textLength='5.60px' lengthAdjust='spacingAndGlyphs'>3</text>
+<text transform='translate(142.72,182.50) rotate(-90)' style='font-size: 14.40px; font-family: "Nimbus Sans";' textLength='10.39px' lengthAdjust='spacingAndGlyphs'>C</text>
+<text transform='translate(145.36,172.11) rotate(-90)' style='font-size: 10.08px; font-family: "Nimbus Sans";' textLength='5.60px' lengthAdjust='spacingAndGlyphs'>7</text>
+<text transform='translate(142.72,166.51) rotate(-90)' style='font-size: 14.40px; font-family: "Nimbus Sans";' textLength='10.39px' lengthAdjust='spacingAndGlyphs'>H</text>
+<text transform='translate(145.36,156.12) rotate(-90)' style='font-size: 10.08px; font-family: "Nimbus Sans";' textLength='5.60px' lengthAdjust='spacingAndGlyphs'>8</text>
+<text transform='translate(142.72,150.52) rotate(-90)' style='font-size: 14.40px; font-family: "Nimbus Sans";' textLength='10.39px' lengthAdjust='spacingAndGlyphs'>N</text>
+<text transform='translate(273.57,71.87) rotate(-90)' style='font-size: 14.40px; font-family: "Nimbus Sans";' textLength='10.39px' lengthAdjust='spacingAndGlyphs'>C</text>
+<text transform='translate(276.21,61.48) rotate(-90)' style='font-size: 10.08px; font-family: "Nimbus Sans";' textLength='5.60px' lengthAdjust='spacingAndGlyphs'>7</text>
+<text transform='translate(273.57,55.88) rotate(-90)' style='font-size: 14.40px; font-family: "Nimbus Sans";' textLength='10.39px' lengthAdjust='spacingAndGlyphs'>H</text>
+<text transform='translate(276.21,45.49) rotate(-90)' style='font-size: 10.08px; font-family: "Nimbus Sans";' textLength='5.60px' lengthAdjust='spacingAndGlyphs'>8</text>
+<text transform='translate(273.57,39.89) rotate(-90)' style='font-size: 14.40px; font-family: "Nimbus Sans";' textLength='10.39px' lengthAdjust='spacingAndGlyphs'>N</text>
+<text transform='translate(276.21,29.50) rotate(-90)' style='font-size: 10.08px; font-family: "Nimbus Sans";' textLength='5.60px' lengthAdjust='spacingAndGlyphs'>3</text>
 </g>
 <g clip-path='url(#cpMC4wMHw1MDQuMDB8MC4wMHwyODguMDA=)'>
 <line x1='374.33' y1='18.24' x2='395.93' y2='18.24' style='stroke-width: 0.75; stroke: #A6CEE3;' />
 <line x1='374.33' y1='32.64' x2='395.93' y2='32.64' style='stroke-width: 0.75; stroke: #FF0000;' />
 <line x1='374.33' y1='47.04' x2='395.93' y2='47.04' style='stroke-width: 0.75; stroke: #B2DF8A;' />
-<text x='406.73' y='22.61' style='font-size: 12.00px; font-weight: 0;fill: #A6CEE3; font-family: "Nimbus Sans";' textLength='61.38px' lengthAdjust='spacingAndGlyphs'>unassigned</text>
-<text x='406.73' y='37.01' style='font-size: 12.00px; font-weight: 0;fill: #FF0000; font-family: "Nimbus Sans";' textLength='50.68px' lengthAdjust='spacingAndGlyphs'>precursor</text>
-<text x='406.73' y='51.41' style='font-size: 12.00px; font-weight: 0;fill: #B2DF8A; font-family: "Nimbus Sans";' textLength='88.03px' lengthAdjust='spacingAndGlyphs'>metfrag,genform</text>
+<text x='406.73' y='22.61' style='font-size: 12.00px;fill: #A6CEE3; font-family: "Nimbus Sans";' textLength='61.38px' lengthAdjust='spacingAndGlyphs'>unassigned</text>
+<text x='406.73' y='37.01' style='font-size: 12.00px;fill: #FF0000; font-family: "Nimbus Sans";' textLength='50.68px' lengthAdjust='spacingAndGlyphs'>precursor</text>
+<text x='406.73' y='51.41' style='font-size: 12.00px;fill: #B2DF8A; font-family: "Nimbus Sans";' textLength='88.03px' lengthAdjust='spacingAndGlyphs'>metfrag,genform</text>
 </g>
 </svg>

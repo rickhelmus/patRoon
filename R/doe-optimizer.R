@@ -93,7 +93,7 @@ DoEOptimizer$methods(
             return(result)
         }
         
-        response <- doApply("lapply", parallel, tasks, doExp)
+        response <- rbindlist(doApply("lapply", parallel, tasks, doExp))
 
         ret <- list()
         ret$params <- typParams

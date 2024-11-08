@@ -194,8 +194,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // getEIMList
-Rcpp::List getEIMList(const MSReadBackend& backend, const std::vector<SpectrumRawTypes::Mass>& startMZs, const std::vector<SpectrumRawTypes::Mass>& endMZs, const std::vector<SpectrumRawTypes::Time>& startTimes, const std::vector<SpectrumRawTypes::Time>& endTimes, const std::string& method, SpectrumRawTypes::Mobility mobWindow, SpectrumRawTypes::Intensity minIntensity, bool compress);
-RcppExport SEXP _patRoon_getEIMList(SEXP backendSEXP, SEXP startMZsSEXP, SEXP endMZsSEXP, SEXP startTimesSEXP, SEXP endTimesSEXP, SEXP methodSEXP, SEXP mobWindowSEXP, SEXP minIntensitySEXP, SEXP compressSEXP) {
+Rcpp::List getEIMList(const MSReadBackend& backend, const std::vector<SpectrumRawTypes::Mass>& startMZs, const std::vector<SpectrumRawTypes::Mass>& endMZs, const std::vector<SpectrumRawTypes::Time>& startTimes, const std::vector<SpectrumRawTypes::Time>& endTimes, const std::vector<SpectrumRawTypes::Mobility>& startMobs, const std::vector<SpectrumRawTypes::Mobility>& endMobs, const std::string& method, SpectrumRawTypes::Mobility mobWindow, SpectrumRawTypes::Intensity minIntensity, bool compress);
+RcppExport SEXP _patRoon_getEIMList(SEXP backendSEXP, SEXP startMZsSEXP, SEXP endMZsSEXP, SEXP startTimesSEXP, SEXP endTimesSEXP, SEXP startMobsSEXP, SEXP endMobsSEXP, SEXP methodSEXP, SEXP mobWindowSEXP, SEXP minIntensitySEXP, SEXP compressSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -204,11 +204,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Mass>& >::type endMZs(endMZsSEXP);
     Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Time>& >::type startTimes(startTimesSEXP);
     Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Time>& >::type endTimes(endTimesSEXP);
+    Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Mobility>& >::type startMobs(startMobsSEXP);
+    Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Mobility>& >::type endMobs(endMobsSEXP);
     Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::Mobility >::type mobWindow(mobWindowSEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minIntensity(minIntensitySEXP);
     Rcpp::traits::input_parameter< bool >::type compress(compressSEXP);
-    rcpp_result_gen = Rcpp::wrap(getEIMList(backend, startMZs, endMZs, startTimes, endTimes, method, mobWindow, minIntensity, compress));
+    rcpp_result_gen = Rcpp::wrap(getEIMList(backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, method, mobWindow, minIntensity, compress));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -750,7 +752,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_getMSMetadata", (DL_FUNC) &_patRoon_getMSMetadata, 2},
     {"_patRoon_setSpecMetadata", (DL_FUNC) &_patRoon_setSpecMetadata, 3},
     {"_patRoon_getMSPeakLists", (DL_FUNC) &_patRoon_getMSPeakLists, 17},
-    {"_patRoon_getEIMList", (DL_FUNC) &_patRoon_getEIMList, 9},
+    {"_patRoon_getEIMList", (DL_FUNC) &_patRoon_getEIMList, 11},
     {"_patRoon_getPeakIntensities", (DL_FUNC) &_patRoon_getPeakIntensities, 4},
     {"_patRoon_collapseIMSFrames", (DL_FUNC) &_patRoon_collapseIMSFrames, 11},
     {"_patRoon_testMS1Writer", (DL_FUNC) &_patRoon_testMS1Writer, 12},

@@ -152,7 +152,7 @@ reportFGroupPlots <- function(fGroups, path, plotGrid, EICParams, retMin, EICs)
     withr::local_pdf(pdfFile, paper = "a4", pointsize = 10, width = 8, height = 11)
 
     # all feature groups
-    plotChroms(fGroups, EICParams = getDefEICParams(rtWindow = EICParams$rtWindow, mzExpWindow = EICParams$mzExpWindow,
+    plotChroms(fGroups, EICParams = getDefEICParams(window = EICParams$window, mzExpWindow = EICParams$mzExpWindow,
                                                     topMost = 1), retMin = retMin, EICs = EICs, showPeakArea = TRUE,
                showFGroupRect = FALSE)
 
@@ -512,7 +512,7 @@ reportComponentPlots <- function(fGroups, path, components, EICParams, retMin, E
 
         screen(scr[1])
         plotChroms(components, cmpi, fGroups, title = sprintf("Component %d", cmpi),
-                   EICParams = getDefEICParams(rtWindow = EICParams$rtWindow, mzExpWindow = EICParams$mzExpWindow),
+                   EICParams = getDefEICParams(window = EICParams$window, mzExpWindow = EICParams$mzExpWindow),
                    retMin = retMin, EICs = EICs)
 
         screen(scr[2])

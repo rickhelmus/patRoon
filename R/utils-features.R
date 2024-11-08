@@ -219,6 +219,19 @@ getAnnotationsFromSetFeatures <- function(fGroups)
         ret <- data.table()
 }
 
+getDefEIXParams <- function()
+{
+    list(
+        topMost = NULL,
+        topMostByRGroup = FALSE,
+        onlyPresent = TRUE,
+        mzExpWindow = 0.001,
+        mobExpWindow = 0.005,
+        setsAdductPos = "[M+H]+",
+        setsAdductNeg = "[M-H]-"
+    )
+}
+
 filterEICs <- function(EICs, fGroups, analysis = NULL, groupName = NULL, topMost = NULL, topMostByRGroup = FALSE,
                        onlyPresent = FALSE)
 {
@@ -284,7 +297,7 @@ setMethod("getFeatureEIXInputTab", "features", function(obj, analysis, EIXParams
                                                "mzmax", "mobmin", "mobmax"))
         
         if (!is.null(EIXParams))
-            tab[, c("retmin", "retmax") := .(retmin - EIXParams$rtWindow, retmax + EIXParams$rtWindow)]
+            tab[, c("retmin", "retmax") := .(retmin - EIXParams$window, retmax + EIXParams$window)]
         
         if (onlyMob)
             tab <- tab[!is.null(ft[["mobility"]]) & !is.na(mobility)]
@@ -298,8 +311,6 @@ setMethod("getFeatureEIXInputTab", "features", function(obj, analysis, EIXParams
 setMethod("getFeatureEIXInputTab", "featureGroups", function(obj, analysis, groupName, EIXParams)
 {
     # UNDONE: generalize EICs/EIMs
-    # - rename EIC* to EIM*
-    # - extend params with RT window for IMS, mobExpWindow (missing features) and mobWindow (plotting), mobClusterWindow (clustering)
     # - extra arg to choose between chrom/moilogram: applies mobWindow or retWindow
     
     takeAnalysis <- analysis # copy name to workaround DT access below

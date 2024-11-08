@@ -732,7 +732,7 @@ Rcpp::List getMobilograms(const MSReadBackend &backend, const std::vector<Spectr
             }
             
             const auto mz = spec.getMZs()[i];
-            if (numberLTE(mz, startMZs[e]) || numberGTE(mz, endMZs[e]))
+            if (mz < startMZs[e] || mz > endMZs[e])
                 continue;
             
             const auto inten = spec.getIntensities()[i];

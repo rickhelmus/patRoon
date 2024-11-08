@@ -296,8 +296,9 @@
 ## IMS
 
 - general ratio of mass/CCS to filter results --> eg derived from CCS DB
-- be consistent in mobility vs IMS
+- be consistent in mobility vs IMS and mobilograms and EIMs
     - mobWindow and IMSWindow now randomly used
+    - getMobilograms --> getEIMList()
 - findPeaks()
     - export? If yes, add checkmate's, documentation etc
         - if not, still need to doc args somehow
@@ -334,6 +335,7 @@
     - somehow handle eg XCMS objects which cannot do mobilities (eg clearout?)
     - test for fGroups from screenInfo(), eg for fGroups with >1 suspect assigned
     - clearly doc what IMSWindow is used for
+    - see if mzWindow for assignFeatureMobilities() is now not needed anymore since getMobilograms() is fixed
     - doc the use for fromSuspects, eg
         - doesn't rely on mobility peak detection, so might be less prone to false negatives with eg low intensities
         - scenario 1: we know the mobility very well, eg from a database --> use a narrow IMSWindow

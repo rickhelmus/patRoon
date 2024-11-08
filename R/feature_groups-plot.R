@@ -623,7 +623,7 @@ setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj),
     
     if (is.null(xlim))
     {
-        xlim <- c(min(featTab$retmin) - EICParams$rtWindow, max(featTab$retmax) + EICParams$rtWindow)
+        xlim <- c(min(featTab$retmin) - EICParams$window, max(featTab$retmax) + EICParams$window)
         if (retMin)
             xlim <- xlim / 60
     }

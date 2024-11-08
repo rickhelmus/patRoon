@@ -247,3 +247,51 @@ doGetEICs <- function(anaInfo, EICInfoList, minIntensityIMS = 0, compress = TRUE
     
     return(allEICs)
 }
+
+doGetEIMs <- function(anaInfo, EIMInfoList, IMSWindow, clusterMethod, minIntensity, compress = TRUE, cacheDB = NULL)
+{
+    if (length(EIMInfoList) == 0)
+        return(list())
+    
+    anaHashes <- NULL
+    if (is.null(cacheDB))
+        cacheDB <- openCacheDBScope()
+    anaHashes <- getMSFileHashesFromAvailBackend(anaInfo, needIMS = TRUE)
+    
+    allEIMs <- applyMSData(anaInfo, EIMInfoList, needIMS = TRUE, func = function(ana, path, backend, EIMInfo)
+    {
+        EIMs <- vector("list", nrow(EIMInfo))
+        # NOTE: subset columns here, so any additional columns from e.g. feature tables are not considered
+        hashes <- EIMInfo[, makeHash(anaHashes[[ana]], IMSWindow, clusterMethod, minIntensity, compress, .SD),
+                          by = seq_len(nrow(EIMInfo)), .SDcols = c("retmin", "retmax", "mzmin", "mzmax")][[2]]
+        
+        cachedData <- loadCacheData(category = "EIMs", hashes, dbArg = cacheDB, simplify = FALSE)
+        if (!is.null(cachedData) && length(cachedData) == nrow(EIMInfo))
+        {
+            doProgress()
+            return(unname(cachedData)) # everything is in the cache
+        }
+        
+        cachedInds <- if (!is.null(cachedData)) match(names(cachedData), hashes) else integer()
+        isCached <- if (!is.null(cachedData)) hashes %chin% names(cachedData) else rep(FALSE, nrow(EIMInfo))
+        # NOTE: cachedData is 'subset' below to make sure any duplicate hashes are properly assigned
+        EIMs[isCached] <- cachedData[match(hashes, names(cachedData), nomatch = 0)]
+        
+        ToDo <- EIMInfo[isCached == FALSE]
+        openMSReadBackend(backend, path)
+        
+        # NOTE: getMobilograms() return lists, which are converted to data.frames and is a lot faster than returning
+        # data.frames directly.
+        newEIMs <- getMobilograms(backend, ToDo$mzmin, ToDo$mzmax, ToDo$retmin, ToDo$retmax, clusterMethod, IMSWindow,
+                                  minIntensity, compress)
+        newEIMs <- lapply(newEIMs, setDF)
+        EIMs[!isCached] <- newEIMs
+        
+        saveCacheDataList("EIMs", EIMs[!isCached], hashes[!isCached], cacheDB)
+        
+        doProgress()
+        return(EIMs)
+    })
+    
+    return(allEIMs)
+}

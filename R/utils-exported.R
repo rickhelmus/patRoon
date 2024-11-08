@@ -519,9 +519,13 @@ getDefEICParams <- function(...)
 getDefEIMParams <- function(...)
 {
     def <- getDefEIXParams()
-    def$window <- 0.2
-    def$maxRTWindow <- 2
-    def$IMSWindow <- 0.01
+    def <- modifyList(def, list(
+        window = 0.2,
+        maxRTWindow = 2,
+        IMSWindow = 0.01,
+        clusterMethod = "distance",
+        minIntensity = 0
+    ))
     return(modifyList(def, list(...), keep.null = TRUE))
 }
 

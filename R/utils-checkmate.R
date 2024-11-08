@@ -489,6 +489,11 @@ assertNormalizationMethod <- function(x, withNone = TRUE, .var.name = checkmate:
     checkmate::assertChoice(x, ch, .var.name = .var.name, add = add)
 }
 
+assertClusterMethod <- function(x, .var.name = checkmate::vname(x), add = NULL)
+{
+    checkmate::assertChoice(clusterMethod, c("bin", "distance", "hclust"), .var.name = .var.name, add = add)
+}
+
 assertEIXParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
 {
     checkmate::assertList(x, names = "unique", .var.name = .var.name) # no add: should fail
@@ -573,8 +578,7 @@ assertAvgPListParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
     assertListVal(x, "minIntensityIMS", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name,
                   add = add)
     assertListVal(x, "avgFun", checkmate::assertFunction, .var.name = .var.name, add = add)
-    assertListVal(x, "method", checkmate::assertChoice, choices = c("distance", "hclust"), .var.name = .var.name,
-                  add = add)
+    assertListVal(x, "method", assertClusterMethod, .var.name = .var.name, add = add)
     assertListVal(x, "withPrecursorMS", checkmate::assertFlag, .var.name = .var.name, add = add)
     assertListVal(x, "pruneMissingPrecursorMS", checkmate::assertFlag, .var.name = .var.name, add = add)
     assertListVal(x, "retainPrecursorMSMS", checkmate::assertFlag, .var.name = .var.name, add = add)

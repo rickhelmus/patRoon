@@ -828,7 +828,7 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flat
     anas <- analyses(obj)
     gNames <- names(obj)
     gCount <- length(obj)
-    EICs <- getFeatureEIXs(obj, type = "EIC", EICParams = getDefEICParams(rtWindow = 0))
+    EICs <- getFeatureEIXs(obj, type = "EIC", EICParams = getDefEICParams(window = 0))
     fgQualities <- featureGroupQualities()
     
     printf("Calculating group peak qualities and scores...\n")

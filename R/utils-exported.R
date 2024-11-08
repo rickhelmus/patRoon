@@ -500,16 +500,28 @@ getBGMSMSPeaks <- function(anaInfo, rGroups = NULL, MSLevel = 2, retentionRange 
 #' @export
 getDefEICParams <- function(...)
 {
-    def <- list(
-        rtWindow = 30,
-        topMost = NULL,
-        topMostByRGroup = FALSE,
-        onlyPresent = TRUE,
-        mzExpWindow = 0.001,
-        setsAdductPos = "[M+H]+",
-        setsAdductNeg = "[M-H]-"
-    )
+    def <- getDefEIXParams()
+    def$window <- 30
     
+    mod <- list(...)
+    if (!is.null(mod[["rtWindow"]]))
+    {
+        warning("The \"rtWindow\" parameter is deprecated and was renamed to \"window\"", call. = FALSE)
+        mod$window <- mod$rtWindow
+        mod$rtWindow <- NULL
+    }
+    
+    return(modifyList(def, mod, keep.null = TRUE))
+}
+
+#' @name EICParams
+#' @export
+getDefEIMParams <- function(...)
+{
+    def <- getDefEIXParams()
+    def$window <- 0.2
+    def$maxRTWindow <- 2
+    def$IMSWindow <- 0.01
     return(modifyList(def, list(...), keep.null = TRUE))
 }
 

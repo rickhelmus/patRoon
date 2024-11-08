@@ -366,10 +366,15 @@
 - Docs
     - Dietrich features
     - getDefPeakParams()
+    - getDefEICParams() / getDefEIMParams()
+        - update for retWindow --> window
+        - add docs for getDefEIMParams()
+        - update handbook
 - NEWS
     - Dietrich features
     - groupInfo is now a DT
     - FIXED: suspect list assertion only checked part of the columns
+    - getDefEICParams(): retWindow --> window
 
 
 ## Features

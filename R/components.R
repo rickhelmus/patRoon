@@ -501,7 +501,7 @@ setMethod("plotSpectrumHash", "components", function(obj, index, markFGroup = NU
 #' @note For \code{plotChroms}: The \code{topMost} and \code{topMostByRGroup} EIC parameters are ignored unless the
 #'   components are from homologous series.
 #' @export
-setMethod("plotChroms", "components", function(obj, index, fGroups, EICParams = getDefEICParams(rtWindow = 5), ...)
+setMethod("plotChroms", "components", function(obj, index, fGroups, EICParams = getDefEICParams(window = 5), ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assert(
@@ -538,7 +538,7 @@ setMethod("plotChroms", "components", function(obj, index, fGroups, EICParams = 
                    showFGroupRect = showFGroupRect, ...)
 })
 
-setMethod("plotChromsHash", "components", function(obj, index, fGroups, EICParams = getDefEICParams(rtWindow = 5), ...)
+setMethod("plotChromsHash", "components", function(obj, index, fGroups, EICParams = getDefEICParams(window = 5), ...)
 {
     comp <- componentTable(obj)[[index]]
     anas <- analyses(fGroups)

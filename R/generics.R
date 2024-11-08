@@ -340,7 +340,7 @@ setGeneric("reportPDF", function(fGroups, path = "report", reportFGroups = TRUE,
                                                              "annotHitCount", "libMatch"),
                                  compoundsOnlyUsedScorings = TRUE, compoundsTopMost = 5,
                                  compsCluster = NULL, components = NULL, MSPeakLists = NULL, retMin = TRUE,
-                                 EICGrid = c(2, 1), EICParams = getDefEICParams(rRtWindow = 20, topMost = 1,
+                                 EICGrid = c(2, 1), EICParams = getDefEICParams(window = 20, topMost = 1,
                                                                                 topMostByRGroup = TRUE),
                                  clearPath = FALSE) standardGeneric("reportPDF"))
 #' @rdname reporting-legacy
@@ -353,7 +353,7 @@ setGeneric("reportHTML", function(fGroups, path = "report", reportPlots = c("cho
                                   compoundsOnlyUsedScorings = TRUE, compoundsTopMost = 5, compsCluster = NULL,
                                   includeMFWebLinks = "compounds", components = NULL, interactiveHeat = FALSE,
                                   MSPeakLists = NULL, specSimParams = getDefSpecSimParams(), TPs = NULL,
-                                  retMin = TRUE, EICParams = getDefEICParams(rtWindow = 20, topMost = 1,
+                                  retMin = TRUE, EICParams = getDefEICParams(window = 20, topMost = 1,
                                                                              topMostByRGroup = TRUE),
                                   TPGraphStructuresMax = 25, selfContained = TRUE, optimizePng = FALSE,
                                   clearPath = FALSE, openReport = TRUE, noDate = FALSE) standardGeneric("reportHTML"))

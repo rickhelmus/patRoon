@@ -741,7 +741,7 @@ The `EICParams` argument to `plotChroms()` is used to specify more advanced para
 
 Parameter         | Description
 ----------------- | -------------------------------------------------
-`rtWindow`        | Expands the EIC retention time range +/- the feature peak width (in seconds). This is e.g. useful to zoom out.
+`window`          | Expands the EIC retention time range +/- the feature peak width (in seconds). This is e.g. useful to zoom out.
 `topMost`         | Only consider this amount of highest intensity features in a group.
 `topMostByRGroup` | If `TRUE` then the `topMost` parameter concerns the top most intense features in a replicate group (e.g. `topMost=1` would draw the most intense feature for each replicate group).
 `onlyPresent`     | Only create EICs for analyses where a feature was detected? Setting to `FALSE` is useful to inspect if a feature was 'missed'.

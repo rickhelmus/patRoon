@@ -325,7 +325,15 @@ filterEICs <- function(EICs, fGroups, analysis = NULL, groupName = NULL, topMost
     return(pruneList(EICs, checkEmptyElements = TRUE))
 }
 
-setMethod("getFeatureEIXInputTab", "features", function(obj, analysis, EIXParams, onlyMob)
+getEICsOREIMs <- function(obj, type, inputTab, EIXParams, ...)
+{
+    if (type == "EIC")
+        doGetEICs(analysisInfo(obj), inputTab, ...)
+    else # EIM
+        doGetEIMs(analysisInfo(obj), inputTab, EIXParams$IMSWindow, EIXParams$clusterMethod, EIXParams$minIntensity, ...)
+}
+
+setMethod("getFeatureEIXInputTab", "features", function(obj, type, analysis, EIXParams, onlyMob)
 {
     ret <- featureTable(obj)[analyses(obj) %chin% analysis]
     
@@ -337,7 +345,12 @@ setMethod("getFeatureEIXInputTab", "features", function(obj, analysis, EIXParams
                                                "mzmax", "mobmin", "mobmax"))
         
         if (!is.null(EIXParams))
-            tab[, c("retmin", "retmax") := .(retmin - EIXParams$window, retmax + EIXParams$window)]
+        {
+            if (type == "EIC")
+                tab[, c("retmin", "retmax") := .(retmin - EIXParams$window, retmax + EIXParams$window)]
+            else
+                tab[, c("mobmin", "mobmax") := .(mobmin - EIXParams$window, mobmax + EIXParams$window)]
+        }
         
         if (onlyMob)
             tab <- tab[!is.null(ft[["mobility"]]) & !is.na(mobility)]
@@ -348,11 +361,8 @@ setMethod("getFeatureEIXInputTab", "features", function(obj, analysis, EIXParams
     return(ret)
 })
 
-setMethod("getFeatureEIXInputTab", "featureGroups", function(obj, analysis, groupName, EIXParams)
+setMethod("getFeatureEIXInputTab", "featureGroups", function(obj, type, analysis, groupName, EIXParams)
 {
-    # UNDONE: generalize EICs/EIMs
-    # - extra arg to choose between chrom/moilogram: applies mobWindow or retWindow
-    
     takeAnalysis <- analysis # copy name to workaround DT access below
     
     anaInfo <- analysisInfo(obj)[analysis %chin% takeAnalysis]
@@ -386,11 +396,14 @@ setMethod("getFeatureEIXInputTab", "featureGroups", function(obj, analysis, grou
             if (any(!analysis %chin% ret$analysis))
             {
                 ftAllAna <- featTabSplitGrp[[fg]]
-                # UNDONE: handle mobilities
-                ret <- rbind(ret, data.table(analysis = setdiff(analysis, ret$analysis), intensity = 0,
-                                             retmin = min(ftAllAna$retmin), retmax = max(ftAllAna$retmax),
-                                             mzmin = min(ftAllAna$mzmin) - EIXParams$mzExpWindow,
-                                             mzmax = max(ftAllAna$mzmax) + EIXParams$mzExpWindow))
+                dummy <- data.table(analysis = setdiff(analysis, ret$analysis), intensity = 0,
+                                    retmin = min(ftAllAna$retmin), retmax = max(ftAllAna$retmax),
+                                    mzmin = min(ftAllAna$mzmin) - EIXParams$mzExpWindow,
+                                    mzmax = max(ftAllAna$mzmax) + EIXParams$mzExpWindow)
+                if (!is.null(ftAllAna[["mobmin"]]))
+                    dummy[, c("mobmin", "mobmax") := .(min(ftAllAna$mobmin) - EIXParams$mobExpWindow,
+                                                       max(ftAllAna$mobmax) + EIXParams$mobExpWindow)]
+                ret <- rbind(ret, dummy)
             }
         }
         
@@ -409,7 +422,11 @@ setMethod("getFeatureEIXInputTab", "featureGroups", function(obj, analysis, grou
             }
         }
         
-        ret[, c("retmin", "retmax") := .(retmin - EIXParams$rtWindow, retmax + EIXParams$rtWindow)]
+        if (type == "EIC")
+            ret[, c("retmin", "retmax") := .(retmin - EIXParams$window, retmax + EIXParams$window)]
+        else
+            ret[, c("mobmin", "mobmax") := .(mobmin - EIXParams$window, mobmax + EIXParams$window)]
+        
         return(ret)
     }, simplify = FALSE))
 })
@@ -480,7 +497,7 @@ setMethod("getFeatureEIXs", "features", function(obj, type, analysis = analyses(
         return(list())
     
     inputTab <- getFeatureEIXInputTab(obj, type, analysis, EIXParams, onlyMob)
-    EIXs <- do.call(if (type == "EIC") doGetEICs else doGetEIMs, c(list(analysisInfo(obj), inputTab), list(...)))
+    EIXs <- getEICsOREIMs(obj, type, inputTab, EIXParams, ...)
     EIXs <- Map(EIXs, featureTable(obj), f = function(eics, ft)
     {
         wh <- !onlyMob | (!is.null(ft[["mobility"]]) & !is.na(ft$mobility))
@@ -509,12 +526,12 @@ setMethod("getFeatureEIXs", "featureGroups", function(obj, type, analysis = anal
     takeAnalysis <- analysis # for DT subset below
     anaInfo <- analysisInfo(obj)[analysis %chin% takeAnalysis]
     
-    inputTab <- getFeatureEIXInputTab(obj, analysis, groupName, EIXParams)
+    inputTab <- getFeatureEIXInputTab(obj, type, analysis, groupName, EIXParams)
     inputTab <- split(rbindlist(inputTab, idcol = "group"), by = "analysis")
     inputTab <- inputTab[intersect(anaInfo$analysis, names(inputTab))] # sync order
     anaInfoEIXs <- anaInfo[analysis %in% names(inputTab)]
     
-    EIXs <- do.call(if (type == "EIC") doGetEICs else doGetEIMs, c(list(analysisInfo(obj), inputTab), list(...)))
+    EIXs <- getEICsOREIMs(obj, type, inputTab, EIXParams, ...)
     EIXs <- Map(EIXs, lapply(inputTab, "[[", "group"), f = setNames)
     
     return(pruneList(EIXs))

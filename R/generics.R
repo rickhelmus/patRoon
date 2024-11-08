@@ -36,10 +36,8 @@ setGeneric("plotChordHash", function(obj, ...) standardGeneric("plotChordHash"))
 setGeneric("plotVennHash", function(obj, ...) standardGeneric("plotVennHash"))
 setGeneric("plotUpSetHash", function(obj, ...) standardGeneric("plotUpSetHash"))
 
-setGeneric("getEICFGroupInfo", function(fGroups, ...) standardGeneric("getEICFGroupInfo"))
-setGeneric("getEICsForFGroups", function(fGroups, analysis = analyses(fGroups), groupName = names(fGroups),
-                                         ...) standardGeneric("getEICsForFGroups"))
-setGeneric("getEICsForFeatures", function(features, ...) standardGeneric("getEICsForFeatures"))
+setGeneric("getFeatureEIXInputTab", function(obj, ...) standardGeneric("getFeatureEIXInputTab"))
+setGeneric("getFeatureEIXs", function(obj, type, ...) standardGeneric("getFeatureEIXs"))
 
 setGeneric("initMSReadBackend", function(backend) standardGeneric("initMSReadBackend"))
 

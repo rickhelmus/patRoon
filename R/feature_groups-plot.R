@@ -583,7 +583,7 @@ setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj),
         groupBy <- "group" # compat
     
     if (is.null(EICs))
-        EICs <- getEICsForFGroups(obj, analysis, groupName, EICParams)
+        EICs <- getFeatureEIXs(obj, type = "EIC", analysis, groupName, EICParams)
     else
     {
         # sync as much as possible with given EICParams

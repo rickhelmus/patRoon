@@ -260,10 +260,20 @@ doGetEIMs <- function(anaInfo, EIMInfoList, IMSWindow, clusterMethod, minIntensi
     
     allEIMs <- applyMSData(anaInfo, EIMInfoList, needIMS = TRUE, func = function(ana, path, backend, EIMInfo)
     {
+        EIMInfo <- copy(EIMInfo)
+        for (col in c("mobmin", "mobmax"))
+        {
+            if (is.null(EIMInfo[[col]]))
+                set(EIMInfo, j = col, value = 0)
+            else
+                setnafill(EIMInfo, fill = 0, cols = col)
+        }
+        
         EIMs <- vector("list", nrow(EIMInfo))
         # NOTE: subset columns here, so any additional columns from e.g. feature tables are not considered
         hashes <- EIMInfo[, makeHash(anaHashes[[ana]], IMSWindow, clusterMethod, minIntensity, compress, .SD),
-                          by = seq_len(nrow(EIMInfo)), .SDcols = c("retmin", "retmax", "mzmin", "mzmax")][[2]]
+                          by = seq_len(nrow(EIMInfo)), .SDcols = c("retmin", "retmax", "mzmin", "mzmax", "mobmin",
+                                                                   "mobmax")][[2]]
         
         cachedData <- loadCacheData(category = "EIMs", hashes, dbArg = cacheDB, simplify = FALSE)
         if (!is.null(cachedData) && length(cachedData) == nrow(EIMInfo))
@@ -278,12 +288,13 @@ doGetEIMs <- function(anaInfo, EIMInfoList, IMSWindow, clusterMethod, minIntensi
         EIMs[isCached] <- cachedData[match(hashes, names(cachedData), nomatch = 0)]
         
         ToDo <- EIMInfo[isCached == FALSE]
+        
         openMSReadBackend(backend, path)
         
         # NOTE: getEIMList() return lists, which are converted to data.frames and is a lot faster than returning
         # data.frames directly.
-        newEIMs <- getEIMList(backend, ToDo$mzmin, ToDo$mzmax, ToDo$retmin, ToDo$retmax, clusterMethod, IMSWindow,
-                              minIntensity, compress)
+        newEIMs <- getEIMList(backend, ToDo$mzmin, ToDo$mzmax, ToDo$retmin, ToDo$retmax, ToDo$mobmin, ToDo$mobmax,
+                              clusterMethod, IMSWindow, minIntensity, compress)
         newEIMs <- lapply(newEIMs, setDF)
         EIMs[!isCached] <- newEIMs
         

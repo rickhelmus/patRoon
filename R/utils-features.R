@@ -830,9 +830,9 @@ assignFeatureMobilities <- function(features, peaksParam, mzWindow, IMSWindow, c
             
             openMSReadBackend(backend, path)
             # NOTE: mzmin/mzmax may be too narrow here, hence use a user specified mz range
-            EIMs <- getMobilograms(backend, fTableForPeaks$mz - mzWindow, fTableForPeaks$mz + mzWindow,
-                                   fTableForPeaks$retmin, fTableForPeaks$retmax, clusterMethod, IMSWindow,
-                                   minIntensityIMS, FALSE)
+            EIMs <- getEIMList(backend, fTableForPeaks$mz - mzWindow, fTableForPeaks$mz + mzWindow,
+                               fTableForPeaks$retmin, fTableForPeaks$retmax, clusterMethod, IMSWindow,
+                               minIntensityIMS, FALSE)
             names(EIMs) <- fTableForPeaks$ID
             EIMs <- lapply(EIMs, setDT)
             

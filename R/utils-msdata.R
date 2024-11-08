@@ -280,10 +280,10 @@ doGetEIMs <- function(anaInfo, EIMInfoList, IMSWindow, clusterMethod, minIntensi
         ToDo <- EIMInfo[isCached == FALSE]
         openMSReadBackend(backend, path)
         
-        # NOTE: getMobilograms() return lists, which are converted to data.frames and is a lot faster than returning
+        # NOTE: getEIMList() return lists, which are converted to data.frames and is a lot faster than returning
         # data.frames directly.
-        newEIMs <- getMobilograms(backend, ToDo$mzmin, ToDo$mzmax, ToDo$retmin, ToDo$retmax, clusterMethod, IMSWindow,
-                                  minIntensity, compress)
+        newEIMs <- getEIMList(backend, ToDo$mzmin, ToDo$mzmax, ToDo$retmin, ToDo$retmax, clusterMethod, IMSWindow,
+                              minIntensity, compress)
         newEIMs <- lapply(newEIMs, setDF)
         EIMs[!isCached] <- newEIMs
         

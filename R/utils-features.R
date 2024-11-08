@@ -312,22 +312,51 @@ filterEICs <- function(EICs, fGroups, analysis = NULL, groupName = NULL, topMost
     return(pruneList(EICs, checkEmptyElements = TRUE))
 }
 
-setMethod("getEICFGroupInfo", "featureGroups", function(fGroups, analysis, groupName, EICParams)
+setMethod("getFeatureEIXInputTab", "features", function(obj, analysis, EIXParams, onlyMob)
 {
+    ret <- featureTable(obj)[analyses(obj) %chin% analysis]
+    
+    ret <- lapply(ret, function(tab)
+    {
+        tab <- copy(tab)
+        # HACK: we keep group column for featureGroups method
+        tab <- subsetDTColumnsIfPresent(tab, c("group", "analysis", "intensity", "retmin", "retmax", "mzmin",
+                                               "mzmax", "mobmin", "mobmax"))
+        
+        if (!is.null(EIXParams))
+            tab[, c("retmin", "retmax") := .(retmin - EIXParams$rtWindow, retmax + EIXParams$rtWindow)]
+        
+        if (onlyMob)
+            tab <- tab[!is.null(ft[["mobility"]]) & !is.na(mobility)]
+        
+        return(tab)
+    })
+    
+    return(ret)
+})
+
+setMethod("getFeatureEIXInputTab", "featureGroups", function(obj, analysis, groupName, EIXParams)
+{
+    # UNDONE: generalize EICs/EIMs
+    # - rename EIC* to EIM*
+    # - extend params with RT window for IMS, mobExpWindow (missing features) and mobWindow (plotting), mobClusterWindow (clustering)
+    # - extra arg to choose between chrom/moilogram: applies mobWindow or retWindow
+    
     takeAnalysis <- analysis # copy name to workaround DT access below
     
-    anaInfo <- analysisInfo(fGroups)[analysis %chin% takeAnalysis]
-    featTab <- as.data.table(getFeatures(fGroups))
+    anaInfo <- analysisInfo(obj)[analysis %chin% takeAnalysis]
     
-    topMost <- if (!is.null(EICParams$topMost))
-        min(EICParams$topMost, nrow(anaInfo))
+    topMost <- if (!is.null(EIXParams$topMost))
+        min(EIXParams$topMost, nrow(anaInfo))
     else
         NULL
+    
+    featTab <- as.data.table(getFeatures(obj))
     
     # subset relevant things in advance
     featTab <- subsetDTColumnsIfPresent(featTab, c("group", "analysis", "intensity", "retmin", "retmax", "mzmin",
                                                    "mzmax", "mobmin", "mobmax"))
-    
+
     # NOTE: we subset and split here in advance, as doing it in the loop below gets quite slow with many fGroups
     featTabAnaSub <- featTab[analysis %chin% takeAnalysis]
     featTabSplitGrp <- split(featTab, by = "group", keep.by = FALSE)
@@ -341,21 +370,22 @@ setMethod("getEICFGroupInfo", "featureGroups", function(fGroups, analysis, group
         ret <- copy(ret)
         
         # add missing analyses if needed
-        if (!EICParams$onlyPresent)
+        if (!EIXParams$onlyPresent)
         {
             if (any(!analysis %chin% ret$analysis))
             {
                 ftAllAna <- featTabSplitGrp[[fg]]
+                # UNDONE: handle mobilities
                 ret <- rbind(ret, data.table(analysis = setdiff(analysis, ret$analysis), intensity = 0,
                                              retmin = min(ftAllAna$retmin), retmax = max(ftAllAna$retmax),
-                                             mzmin = min(ftAllAna$mzmin) - EICParams$mzExpWindow,
-                                             mzmax = max(ftAllAna$mzmax) + EICParams$mzExpWindow))
+                                             mzmin = min(ftAllAna$mzmin) - EIXParams$mzExpWindow,
+                                             mzmax = max(ftAllAna$mzmax) + EIXParams$mzExpWindow))
             }
         }
         
         if (!is.null(topMost))
         {
-            if (EICParams$topMostByRGroup)
+            if (EIXParams$topMostByRGroup)
             {
                 ret[, rGroup := anaInfo$group[match(analysis, anaInfo$analysis)]]
                 ret[, rank := frank(-intensity, ties.method = "first"), by = "rGroup"]
@@ -368,21 +398,21 @@ setMethod("getEICFGroupInfo", "featureGroups", function(fGroups, analysis, group
             }
         }
         
-        ret[, c("retmin", "retmax") := .(retmin - EICParams$rtWindow, retmax + EICParams$rtWindow)]
+        ret[, c("retmin", "retmax") := .(retmin - EIXParams$rtWindow, retmax + EIXParams$rtWindow)]
         return(ret)
     }, simplify = FALSE))
 })
 
-setMethod("getEICFGroupInfo", "featureGroupsSet", function(fGroups, analysis, groupName, EICParams)
+setMethod("getFeatureEIXInputTab", "featureGroupsSet", function(obj, analysis, groupName, EIXParams)
 {
     ret <- callNextMethod()
     
-    anaInfo <- analysisInfo(fGroups)
-    featTab <- as.data.table(getFeatures(fGroups))
+    anaInfo <- analysisInfo(obj)
+    featTab <- as.data.table(getFeatures(obj))
     
     # HACK: since feature tables store the character form, it's easier to keep it all the same
-    EICParams$setsAdductPos <- as.character(EICParams$setsAdductPos)
-    EICParams$setsAdductNeg <- as.character(EICParams$setsAdductNeg)
+    EIXParams$setsAdductPos <- as.character(EIXParams$setsAdductPos)
+    EIXParams$setsAdductNeg <- as.character(EIXParams$setsAdductNeg)
     
     # 'ionize' m/zs
     return(Map(names(ret), ret, f = function(grp, ranges)
@@ -390,7 +420,7 @@ setMethod("getEICFGroupInfo", "featureGroupsSet", function(fGroups, analysis, gr
         featTabGrp <- featTab[group == grp]
         ranges[, adduct := featTabGrp[match(ranges$analysis, analysis)]$adduct]
         
-        if (!EICParams$onlyPresent && any(is.na(ranges$adduct))) # adduct will be NA for 'missing' features
+        if (!EIXParams$onlyPresent && any(is.na(ranges$adduct))) # adduct will be NA for 'missing' features
         {
             # First try to get adduct from other features in the same set: assume that adduct per set for a single
             # feature group is always the same
@@ -408,9 +438,9 @@ setMethod("getEICFGroupInfo", "featureGroupsSet", function(fGroups, analysis, gr
                 if (nrow(t) == 0)
                     NA # all features were removed
                 else if (as.adduct(t$adduct[1])@charge > 0)
-                    EICParams$setsAdductPos
+                    EIXParams$setsAdductPos
                 else
-                    EICParams$setsAdductNeg
+                    EIXParams$setsAdductNeg
             })]
             
             if (any(is.na(ranges$adduct)))
@@ -432,64 +462,51 @@ setMethod("getEICFGroupInfo", "featureGroupsSet", function(fGroups, analysis, gr
     }))
 })
 
-setMethod("getEICsForFGroups", "featureGroups", function(fGroups, analysis, groupName, EICParams)
+setMethod("getFeatureEIXs", "features", function(obj, type, analysis = analyses(obj), EIXParams = NULL,
+                                                 onlyMob = FALSE, ...)
 {
-    if (length(fGroups) == 0 || length(analysis) == 0 || length(groupName) == 0)
+    if (length(obj) == 0)
         return(list())
     
-    takeAnalysis <- analysis # for DT subset below
-    anaInfo <- analysisInfo(fGroups)[analysis %chin% takeAnalysis]
-    
-    EICInfoTab <- getEICFGroupInfo(fGroups, analysis, groupName, EICParams)
-    EICInfo <- split(rbindlist(EICInfoTab, idcol = "group"), by = "analysis")
-    EICInfo <- EICInfo[intersect(anaInfo$analysis, names(EICInfo))] # sync order
-    anaInfoEICs <- anaInfo[analysis %in% names(EICInfo)]
-    
-    EICs <- doGetEICs(anaInfoEICs, EICInfo)
-    EICs <- Map(EICs, lapply(EICInfo, "[[", "group"), f = setNames)
-    
-    return(pruneList(EICs))
-})
-
-setMethod("getEICsForFeatures", "features", function(features, RTWindow = NULL, onlyMob = FALSE, ...)
-{
-    if (length(features) == 0)
-        return(list())
-    
-    EICInfoList <- featureTable(features)
-    if (!is.null(RTWindow) || onlyMob)
-    {
-        EICInfoList <- lapply(featureTable(features), function(ft)
-        {
-            if (!is.null(RTWindow))
-            {
-                ft <- copy(ft)
-                ft[, c("retmin", "retmax") := .(retmin - RTWindow, retmax + RTWindow)]
-            }
-            if (onlyMob)
-                ft <- ft[!is.null(ft[["mobility"]]) & !is.na(mobility)]
-            return(ft)
-        })
-    }
-    
-    ret <- doGetEICs(analysisInfo(features), EICInfoList, ...)
-    ret <- Map(ret, featureTable(features), f = function(eics, ft)
+    inputTab <- getFeatureEIXInputTab(obj, type, analysis, EIXParams, onlyMob)
+    EIXs <- do.call(if (type == "EIC") doGetEICs else doGetEIMs, c(list(analysisInfo(obj), inputTab), list(...)))
+    EIXs <- Map(EIXs, featureTable(obj), f = function(eics, ft)
     {
         wh <- !onlyMob | (!is.null(ft[["mobility"]]) & !is.na(ft$mobility))
         names(eics) <- ft[wh]$ID
         return(eics)
     })
-    return(pruneList(ret))
+    return(pruneList(EIXs))
 })
 
-setMethod("getEICsForFeatures", "featuresSet", function(features, ...)
+setMethod("getFeatureEIXs", "featuresSet", function(obj, ...)
 {
-    unsetFeatList <- sapply(sets(features), unset, obj = features, simplify = FALSE)
-    EICList <- sapply(unsetFeatList, getEICsForFeatures, simplify = FALSE)
-    EICs <- unlist(EICList, recursive = FALSE, use.names = FALSE) # use.names gives combined set/ana name, we just want ana
-    names(EICs) <- unlist(lapply(EICList, names))
-    EICs <- EICs[intersect(analyses(features), names(EICs))] # sync order
-    return(EICs)
+    unsetFeatList <- sapply(sets(obj), unset, obj = obj, simplify = FALSE)
+    EIXList <- sapply(unsetFeatList, getFeatureEIXs, ..., simplify = FALSE)
+    EIXs <- unlist(EIXList, recursive = FALSE, use.names = FALSE) # use.names gives combined set/ana name, we just want ana
+    names(EIXs) <- unlist(lapply(EIXList, names))
+    EIXs <- EIXs[intersect(analyses(obj), names(EIXs))] # sync order
+    return(EIXs)
+})
+
+setMethod("getFeatureEIXs", "featureGroups", function(obj, type, analysis = analyses(obj), groupName = names(obj),
+                                                      EIXParams, ...)
+{
+    if (length(obj) == 0 || length(analysis) == 0 || length(groupName) == 0)
+        return(list())
+    
+    takeAnalysis <- analysis # for DT subset below
+    anaInfo <- analysisInfo(obj)[analysis %chin% takeAnalysis]
+    
+    inputTab <- getFeatureEIXInputTab(obj, analysis, groupName, EIXParams)
+    inputTab <- split(rbindlist(inputTab, idcol = "group"), by = "analysis")
+    inputTab <- inputTab[intersect(anaInfo$analysis, names(inputTab))] # sync order
+    anaInfoEIXs <- anaInfo[analysis %in% names(inputTab)]
+    
+    EIXs <- do.call(if (type == "EIC") doGetEICs else doGetEIMs, c(list(analysisInfo(obj), inputTab), list(...)))
+    EIXs <- Map(EIXs, lapply(inputTab, "[[", "group"), f = setNames)
+    
+    return(pruneList(EIXs))
 })
 
 convertConc <- function(conc, unitFrom, unitTo, MW)
@@ -902,7 +919,7 @@ reintegrateFeatures <- function(features, RTWindow, calcArea, peaksParam, fallba
     cacheDB <- openCacheDBScope()
     
     printf("Loading EICs...\n")
-    allEICs <- getEICsForFeatures(features, RTWindow, onlyMob, compress = FALSE, cacheDB = cacheDB)
+    allEICs <- getFeatureEIXs(features, RTWindow, onlyMob, compress = FALSE, cacheDB = cacheDB)
     
     if (!is.null(peaksParam))
     {

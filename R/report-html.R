@@ -238,7 +238,7 @@ doReportHTML <- function(fGroups, MSPeakLists, formulas, compounds, compsCluster
     else
         EICParams["topMost"] <- list(NULL)
     
-    EICs <- getEICsForFGroups(fGroups, EICParams = EICParams)
+    EICs <- getFeatureEIXs(fGroups, type = "EIC", EICParams = EICParams)
     cat("Done!\n")
     
     allPlots <- generateHTMLReportPlots(fGroups, MSPeakLists, formulas, compounds, compsCluster, components, TPs,

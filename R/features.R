@@ -395,7 +395,7 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
     if (!is.null(cd))
         return(cd)
     
-    EICs <- getEICsForFeatures(obj)
+    EICs <- getFeatureEIXs(obj, "EIC")
     
     # HACK HACK HACK: MetaClean::calculateGaussianSimilarity needs to have
     # xcms::SSgauss attached

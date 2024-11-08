@@ -460,7 +460,7 @@
 	    - default selectIons() to only consider 'common' adducts? or change default adducts for componentization algos?
 	    - check better for what is supported by SIRIUS?
 - import XCMS features: verify anaInfo (or remove necessity, eg with importAnaInfo func)
-- getEICsForFeatures method for kpic2?
+- getFeatureEIXs method for kpic2?
 - load OpenMS intensities in parallel
     - either with futures or with MP and cache intensities afterwards
 - XCMS: multiple features grouped in same analysis?

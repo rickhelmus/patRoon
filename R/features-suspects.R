@@ -14,7 +14,6 @@ findFeaturesSuspects <- function(analysisInfo, suspects, peaksParam, rtWindow = 
     # UNDONE: test with large suspect lists
     # UNDONE: use adduct to set annotations? (then need to support that for sets)
     # UNDONE: force mob window option, like findMobilities()
-    # UNDONE: check mobilities in prepareSuspectList()
 
     checkmate::assertFlag(skipInvalid) # not in assert collection, should fail before assertSuspectList
     

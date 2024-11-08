@@ -233,12 +233,12 @@ checkFeaturesInterface$methods(
             {
                 not <- showNotification("Loading EICs...", duration = NULL, closeButton = FALSE, type = "message")
                 if (input$fGroupPlotMode == "topMostByRGroup")
-                    EICsTopMostRG <<- getEICsForFGroups(fGroups,
-                                                        EICParams = modifyList(EICParams, list(topMost = 1,
-                                                                                               topMostByRGroup = TRUE)))
+                    EICsTopMostRG <<- getFeatureEIXs(fGroups, type = "EIC",
+                                                     EICParams = modifyList(EICParams, list(topMost = 1,
+                                                                                            topMostByRGroup = TRUE)))
                 else
-                    EICsAll <<- getEICsForFGroups(fGroups, EICParams = modifyList(EICParams, list(topMost = NULL),
-                                                                                  keep.null = TRUE))
+                    EICsAll <<- getFeatureEIXs(fGroups, type = "EIC",
+                                               EICParams = modifyList(EICParams, list(topMost = NULL), keep.null = TRUE))
                 removeNotification(not)
             }
             rValues$fGroupPlotMode <- input$fGroupPlotMode
@@ -369,8 +369,8 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, EICParams
     fTable <- featureTable(fGroups)
     ftind <- groupFeatIndex(fGroups)
     
-    EICsTopMost <- getEICsForFGroups(fGroups, EICParams = modifyList(EICParams, list(topMost = 1,
-                                                                                     topMostByRGroup = FALSE)))
+    EICsTopMost <- getFeatureEIXs(fGroups, type = "EIC", EICParams = modifyList(EICParams, list(topMost = 1,
+                                                                                                topMostByRGroup = FALSE)))
     EICsTopMostRG <- EICsAll <- list()
     
     # format is in [[ana]][[fGroup]], since we only took top most intensive we can throw away the ana dimension

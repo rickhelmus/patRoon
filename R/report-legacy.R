@@ -649,7 +649,7 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
     if (reportFGroups || !is.null(formulas) || !is.null(compounds) || !is.null(components))
     {
         cat("Loading all EICs... ")
-        EICs <- getEICsForFGroups(fGroups, EICParams = EICParams)
+        EICs <- getFeatureEIXs(fGroups, type = "EIC", EICParams = EICParams)
         cat("Done!\n")
     }
 
@@ -800,7 +800,7 @@ setMethod("reportHTML", "featureGroups", function(fGroups, path, reportPlots, fo
     #     !is.null(compounds) || !is.null(components))
     {
         cat("Loading all EICs... ")
-        EICs <- getEICsForFGroups(fGroups, EICParams = EICParams)
+        EICs <- getFeatureEIXs(fGroups, type = "EIC", EICParams = EICParams)
         cat("Done!\n")
     }
 

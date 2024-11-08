@@ -298,6 +298,7 @@
 - general ratio of mass/CCS to filter results --> eg derived from CCS DB
 - be consistent in mobility vs IMS and mobilograms and EIMs
     - mobWindow and IMSWindow now randomly used
+- make sure mobility ranges are set when getting EIMs
 - findPeaks()
     - export? If yes, add checkmate's, documentation etc
         - if not, still need to doc args somehow

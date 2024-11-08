@@ -1017,7 +1017,7 @@ doFindMobilities <- function(fGroups, mobPeaksParam, mzWindow, IMSWindow, cluste
     assertFindPeaksParam(mobPeaksParam, add = ac)
     aapply(checkmate::assertNumber, . ~ mzWindow + IMSWindow + minIntensityIMS + RTWindow, finite = TRUE,
            fixed = list(add = ac))
-    checkmate::assertChoice(clusterMethod, c("bin", "distance", "hclust"), add = ac)
+    assertClusterMethod(clusterMethod, add = ac)
     checkmate::assertNumber(maxMSRTWindow, lower = 1, finite = TRUE, null.ok = TRUE, add = ac)
     assertFindPeaksParam(chromPeaksParam, null.ok = TRUE, add = ac)
     checkmate::assertChoice(calcArea, c("integrate", "sum"), add = ac)

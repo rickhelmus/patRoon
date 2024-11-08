@@ -807,7 +807,7 @@ setMethod("plotMobilogram", "featureGroups", function(obj, groupName = names(obj
     aapply(checkmate::assertNumber, . ~ IMSWindow + mzWindow + clusterIMSWindow + minIntensity,
            lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertNumber(maxMSRtWindow, lower = 1, finite = TRUE, null.ok = TRUE, add = ac)
-    checkmate::assertChoice(clusterMethod, c("bin", "distance", "hclust"), add = ac)
+    assertClusterMethod(clusterMethod, add = ac)
     assertXYLim(xlim, ylim, add = ac)
     checkmate::reportAssertions(ac)
     

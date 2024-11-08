@@ -317,6 +317,7 @@
         - see if current chrom defaults are fine
         - add sensible IMS defaults
 - findMobilities()
+    - assert that instrument data has actually IMS data
     - better names for ims_parent_ID/ims_parent_group?
     - handle cases when there are already IMS assignments (or just throw an error?)
     - limit mobmin/mobmax --> both min and max, ie to prevent excessively wrong peak range assignments

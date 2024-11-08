@@ -687,6 +687,8 @@ Rcpp::List getEIMList(const MSReadBackend &backend, const std::vector<SpectrumRa
                       const std::vector<SpectrumRawTypes::Mass> &endMZs,
                       const std::vector<SpectrumRawTypes::Time> &startTimes,
                       const std::vector<SpectrumRawTypes::Time> &endTimes,
+                      const std::vector<SpectrumRawTypes::Mobility> &startMobs,
+                      const std::vector<SpectrumRawTypes::Mobility> &endMobs,
                       const std::string &method, SpectrumRawTypes::Mobility mobWindow,
                       SpectrumRawTypes::Intensity minIntensity, bool compress)
 {
@@ -706,19 +708,23 @@ Rcpp::List getEIMList(const MSReadBackend &backend, const std::vector<SpectrumRa
         void append(SpectrumRawTypes::Mobility m, SpectrumRawTypes::Intensity i) { mobilities.push_back(m); intensities.push_back(i); }
     };
     
-    const auto &sfunc = [compress, minIntensity, &startMZs, &endMZs](const SpectrumRaw &spec, const SpectrumRawSelection &ssel, size_t e)
+    const auto &sfunc = [compress, minIntensity, &startMZs, &endMZs, &startMobs, &endMobs](const SpectrumRaw &spec, const SpectrumRawSelection &ssel, size_t e)
     {
         if (!spec.hasMobilities())
             Rcpp::stop("Cannot load mobilogram: no mobility data found!");
         
         EIM ret;
-        SpectrumRawTypes::Mobility curMob;
+        SpectrumRawTypes::Mobility curMob = -1.0;
         SpectrumRawTypes::Intensity curIntensity;
         for (size_t i=0; ; ++i)
         {
-            if (i == 0 || i >= spec.size() || curMob != spec.getMobilities()[i])
+            const auto mob = (i < spec.size()) ? spec.getMobilities()[i] : -1.0;
+            if (mob != -1.0 && (mob < startMobs[e] || (endMobs[e] != 0.0 && mob > endMobs[e])))
+                continue;
+            
+            if (i >= spec.size() || curMob == -1.0 || curMob != mob)
             {
-                if (i > 0)
+                if (curMob != -1.0)
                 {
                     ret.mobilities.push_back(curMob);
                     ret.intensities.push_back(curIntensity);
@@ -727,7 +733,7 @@ Rcpp::List getEIMList(const MSReadBackend &backend, const std::vector<SpectrumRa
                 if (i >= spec.size())
                     break;
                 
-                curMob = spec.getMobilities()[i];
+                curMob = mob;
                 curIntensity = 0;
             }
             

@@ -683,12 +683,12 @@ Rcpp::List getMSPeakLists(const MSReadBackend &backend, const std::vector<Spectr
 }
 
 // [[Rcpp::export]]
-Rcpp::List getMobilograms(const MSReadBackend &backend, const std::vector<SpectrumRawTypes::Mass> &startMZs,
-                          const std::vector<SpectrumRawTypes::Mass> &endMZs,
-                          const std::vector<SpectrumRawTypes::Time> &startTimes,
-                          const std::vector<SpectrumRawTypes::Time> &endTimes,
-                          const std::string &method, SpectrumRawTypes::Mobility mobWindow,
-                          SpectrumRawTypes::Intensity minIntensity, bool compress)
+Rcpp::List getEIMList(const MSReadBackend &backend, const std::vector<SpectrumRawTypes::Mass> &startMZs,
+                      const std::vector<SpectrumRawTypes::Mass> &endMZs,
+                      const std::vector<SpectrumRawTypes::Time> &startTimes,
+                      const std::vector<SpectrumRawTypes::Time> &endTimes,
+                      const std::string &method, SpectrumRawTypes::Mobility mobWindow,
+                      SpectrumRawTypes::Intensity minIntensity, bool compress)
 {
     // UNDONE: use applyMSData min intensity?
     

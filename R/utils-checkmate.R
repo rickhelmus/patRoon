@@ -489,12 +489,13 @@ assertNormalizationMethod <- function(x, withNone = TRUE, .var.name = checkmate:
     checkmate::assertChoice(x, ch, .var.name = .var.name, add = add)
 }
 
-assertEICParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
+assertEIXParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
 {
     checkmate::assertList(x, names = "unique", .var.name = .var.name) # no add: should fail
     
-    assertListVal(x, "rtWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
+    assertListVal(x, "window", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
     assertListVal(x, "mzExpWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
+    assertListVal(x, "mobExpWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
     assertListVal(x, "topMost", checkmate::assertCount, positive = TRUE, null.ok = TRUE, .var.name = .var.name,
                   add = add)
     assertListVal(x, "topMostByRGroup", checkmate::assertFlag, .var.name = .var.name, add = add)
@@ -504,6 +505,22 @@ assertEICParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
     
     if (!is.null(x[["topMost"]]) && !isTRUE(x$onlyPresent))
         stop("onlyPresent must be TRUE if topMost is set", call. = FALSE)
+    
+    invisible(NULL)
+}
+
+assertEICParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
+{
+    assertEIXParams(x, .var.name = .var.name, add = add)
+    invisible(NULL)
+}
+
+assertEIMParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
+{
+    assertEIXParams(x, .var.name = .var.name, add = add)
+    
+    assertListVal(x, "maxRTWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
+    assertListVal(x, "IMSWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
     
     invisible(NULL)
 }

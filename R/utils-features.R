@@ -325,6 +325,16 @@ filterEICs <- function(EICs, fGroups, analysis = NULL, groupName = NULL, topMost
     return(pruneList(EICs, checkEmptyElements = TRUE))
 }
 
+extendEIXInputTab <- function(tab, type, EIXParams)
+{
+    tab <- copy(tab)
+    if (type == "EIC")
+        tab[, c("retmin", "retmax") := .(retmin - EIXParams$window, retmax + EIXParams$window)]
+    else # "EIM"
+        tab[, c("mobmin", "mobmax") := .(mobmin - EIXParams$window, mobmax + EIXParams$window)]
+    return(tab)
+}
+
 getEICsOREIMs <- function(obj, type, inputTab, EIXParams, ...)
 {
     if (type == "EIC")
@@ -333,32 +343,25 @@ getEICsOREIMs <- function(obj, type, inputTab, EIXParams, ...)
         doGetEIMs(analysisInfo(obj), inputTab, EIXParams$IMSWindow, EIXParams$clusterMethod, EIXParams$minIntensity, ...)
 }
 
-setMethod("getFeatureEIXInputTab", "features", function(obj, type, analysis, EIXParams, onlyMob)
+setMethod("getFeatureEIXInputTab", "features", function(obj, type, EIXParams, selectFunc)
 {
-    ret <- featureTable(obj)[analyses(obj) %chin% analysis]
-    
-    ret <- lapply(ret, function(tab)
+    return(lapply(featureTable(obj), function(tab)
     {
+        if (!is.null(selectFunc))
+            tab <- selectFunc(tab)
+        
         tab <- copy(tab)
         # HACK: we keep group column for featureGroups method
         tab <- subsetDTColumnsIfPresent(tab, c("group", "analysis", "intensity", "retmin", "retmax", "mzmin",
                                                "mzmax", "mobmin", "mobmax"))
-        
+
+        if (type == "EIM" && is.null(tab[["mobmin"]]))
+            tab[, c("mobmin", "mobmax") := NA_real_]
         if (!is.null(EIXParams))
-        {
-            if (type == "EIC")
-                tab[, c("retmin", "retmax") := .(retmin - EIXParams$window, retmax + EIXParams$window)]
-            else
-                tab[, c("mobmin", "mobmax") := .(mobmin - EIXParams$window, mobmax + EIXParams$window)]
-        }
-        
-        if (onlyMob)
-            tab <- tab[!is.null(ft[["mobility"]]) & !is.na(mobility)]
-        
+            tab <- extendEIXInputTab(tab, type, EIXParams)
+
         return(tab)
-    })
-    
-    return(ret)
+    }))
 })
 
 setMethod("getFeatureEIXInputTab", "featureGroups", function(obj, type, analysis, groupName, EIXParams)
@@ -422,10 +425,9 @@ setMethod("getFeatureEIXInputTab", "featureGroups", function(obj, type, analysis
             }
         }
         
-        if (type == "EIC")
-            ret[, c("retmin", "retmax") := .(retmin - EIXParams$window, retmax + EIXParams$window)]
-        else
-            ret[, c("mobmin", "mobmax") := .(mobmin - EIXParams$window, mobmax + EIXParams$window)]
+        if (type == "EIM" && is.null(ret[["mobmin"]]))
+            ret[, c("mobmin", "mobmax") := NA_real_]
+        ret <- extendEIXInputTab(ret, type, EIXParams)
         
         return(ret)
     }, simplify = FALSE))
@@ -491,17 +493,16 @@ setMethod("getFeatureEIXInputTab", "featureGroupsSet", function(obj, analysis, g
 })
 
 setMethod("getFeatureEIXs", "features", function(obj, type, analysis = analyses(obj), EIXParams = NULL,
-                                                 onlyMob = FALSE, ...)
+                                                 selectFunc = NULL, ...)
 {
     if (length(obj) == 0)
         return(list())
     
-    inputTab <- getFeatureEIXInputTab(obj, type, analysis, EIXParams, onlyMob)
+    inputTab <- getFeatureEIXInputTab(obj, type, EIXParams, selectFunc)
     EIXs <- getEICsOREIMs(obj, type, inputTab, EIXParams, ...)
     EIXs <- Map(EIXs, featureTable(obj), f = function(eics, ft)
     {
-        wh <- !onlyMob | (!is.null(ft[["mobility"]]) & !is.na(ft$mobility))
-        names(eics) <- ft[wh]$ID
+        names(eics) <- if (!is.null(selectFunc)) selectFunc(ft)$ID else ft$ID
         return(eics)
     })
     return(pruneList(EIXs))
@@ -853,40 +854,24 @@ assignFeatureMobilities <- function(features, peaksParam, mzWindow, IMSWindow, c
 {
     printf("Finding mobilities for all features...\n")
     
-    anaInfo <- analysisInfo(features)
+    EIMParams <- getDefEIMParams(window = NULLToZero(maxMSRTWindow), clusterMethod = clusterMethod,
+                                 IMSWindow = IMSWindow, minIntensity = minIntensityIMS)
+    EIMSelFunc <- if (!is.null(assignedMobilities)) \(tab) tab[!group %chin% assignedMobilities$group]
+    allEIMs <- getFeatureEIXs(features, "EIM", EIXParams = EIMParams, selectFunc = EIMSelFunc, compress = FALSE)
     
-    features@features <- applyMSData(anaInfo, features@features, needIMS = TRUE, func = function(ana, path, backend, fTable)
+    features@features <- Map(features@features, allEIMs, f = function(fTable, EIMs)
     {
-        
+        mobNumCols <- c("mobility", "mobmin", "mobmax", "mob_area", "mob_intensity")
+
         fTable <- copy(fTable)
         
-        fTableForPeaks <- if (!is.null(assignedMobilities))
-            copy(fTable[!group %chin% assignedMobilities$group])
-        else
-            copy(fTable)
-        
-        if (nrow(fTableForPeaks) > 0)
+        if (length(EIMs) > 0)
         {
-            if (!is.null(maxMSRTWindow))
-            {
-                fTableForPeaks[, retmin := pmax(retmin, ret - maxMSRTWindow)]
-                fTableForPeaks[, retmax := pmin(retmax, ret + maxMSRTWindow)]
-            }
-            
-            openMSReadBackend(backend, path)
-            # NOTE: mzmin/mzmax may be too narrow here, hence use a user specified mz range
-            EIMs <- getEIMList(backend, fTableForPeaks$mz - mzWindow, fTableForPeaks$mz + mzWindow,
-                               fTableForPeaks$retmin, fTableForPeaks$retmax, rep(0, nrow(fTableForPeaks)),
-                               rep(0, nrow(fTableForPeaks)), clusterMethod, IMSWindow, minIntensityIMS, FALSE)
-            names(EIMs) <- fTableForPeaks$ID
-            EIMs <- lapply(EIMs, setDT)
-            
             # pretend we have EICs so we can find peaks
-            EICs <- lapply(EIMs, copy)
-            EICs <- lapply(EICs, setnames, old = "mobility", new = "time")
-            peaksList <- findPeaks(EICs, peaksParam, verbose = FALSE)
-            
+            EIMs <- lapply(EIMs, setnames, old = "mobility", new = "time")
+            peaksList <- findPeaks(EIMs, peaksParam, verbose = FALSE)
             peaksTable <- rbindlist(peaksList, idcol = "ims_parent_ID")
+            setnames(peaksTable, c("ret", "retmin", "retmax", "area", "intensity"), mobNumCols, skip_absent = TRUE)
         }
         else
             peaksTable <- data.table()
@@ -901,7 +886,6 @@ assignFeatureMobilities <- function(features, peaksParam, mzWindow, IMSWindow, c
         
         peaksTable[, mobOrd := seq_len(.N), by = "ims_parent_ID"]
         
-        mobNumCols <- c("mobility", "mobmin", "mobmax", "mob_area", "mob_intensity")
         if (nrow(peaksTable) == 0)
         {
             fTable[, ims_parent_ID := NA_character_]
@@ -911,7 +895,6 @@ assignFeatureMobilities <- function(features, peaksParam, mzWindow, IMSWindow, c
         {
             fTable[, ord := seq_len(.N)]
             
-            setnames(peaksTable, c("ret", "retmin", "retmax", "area", "intensity"), mobNumCols, skip_absent = TRUE)
             # NOTE: we subset columns here to remove any algo specific columns that may also be present in the feature
             # table (UNDONE?)
             peaksTable <- subsetDTColumnsIfPresent(peaksTable, c(mobNumCols, "mobOrd", "ims_parent_ID"))
@@ -929,11 +912,9 @@ assignFeatureMobilities <- function(features, peaksParam, mzWindow, IMSWindow, c
             fTable[, c("ord", "mobOrd") := NULL]
         }
         
-        doProgress()
-        
         return(fTable)
     })
-    
+
     mobFeatsN <- sum(sapply(features@features, function(ft) sum(!is.na(ft$mobility))))
     printf("Assigned %d mobility features.\n", mobFeatsN)
     
@@ -947,7 +928,9 @@ reintegrateFeatures <- function(features, RTWindow, calcArea, peaksParam, fallba
     cacheDB <- openCacheDBScope()
     
     printf("Loading EICs...\n")
-    allEICs <- getFeatureEIXs(features, RTWindow, onlyMob, compress = FALSE, cacheDB = cacheDB)
+    EICSelFunc <- if (onlyMob) \(tab) tab[!is.null(tab[["mobility"]]) & !is.na(mobility)]
+    allEICs <- getFeatureEIXs(features, type = "EIC", EIXParams = getDefEIMParams(window = RTWindow),
+                              selectFunc = EICSelFunc, compress = FALSE, cacheDB = cacheDB)
     
     if (!is.null(peaksParam))
     {
@@ -985,7 +968,7 @@ reintegrateFeatures <- function(features, RTWindow, calcArea, peaksParam, fallba
         if (fallbackEIC)
         {
             # update those not assigned by a peak from EICs
-            doRows <- ft[(!onlyMob | (!is.null(ft[["mobility"]]) & !is.na(mobility))) & !ID %chin% peakIDs, which = TRUE]
+            doRows <- which(ft$ID %chin% names(eics))
 
             ft[doRows, c("intensity", "area") := {
                 eic <- eics[[ID]][eics[[ID]]$time %between% c(retmin, retmax), ]

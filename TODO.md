@@ -337,6 +337,7 @@
     - test for fGroups from screenInfo(), eg for fGroups with >1 suspect assigned
     - clearly doc what IMSWindow is used for
     - see if mzWindow for assignFeatureMobilities() is now not needed anymore since getMobilograms() is fixed
+    - store mobility assignment type in feature table? (eg mobilogram, suspect, PASEF)
     - doc the use for fromSuspects, eg
         - doesn't rely on mobility peak detection, so might be less prone to false negatives with eg low intensities
         - scenario 1: we know the mobility very well, eg from a database --> use a narrow IMSWindow

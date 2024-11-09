@@ -586,6 +586,7 @@ setMethod("findMobilities", "featureGroupsScreening", function(fGroups, mobPeaks
         am <- am[ngroup == 1][, -"ngroup"]
         # UNDONE: message which were omitted
         am <- expandSuspMobilities(am)
+        am <- am[!is.na(mobility)]
         am <- am[, .(group, mobmin = mobility - IMSWindow, mobmax = mobility + IMSWindow, mobility)]
     }
     

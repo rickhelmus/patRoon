@@ -508,10 +508,10 @@ setMethod("getFeatureEIXs", "features", function(obj, type, analysis = analyses(
     return(pruneList(EIXs))
 })
 
-setMethod("getFeatureEIXs", "featuresSet", function(obj, ...)
+setMethod("getFeatureEIXs", "featuresSet", function(obj, type, ...)
 {
     unsetFeatList <- sapply(sets(obj), unset, obj = obj, simplify = FALSE)
-    EIXList <- sapply(unsetFeatList, getFeatureEIXs, ..., simplify = FALSE)
+    EIXList <- sapply(unsetFeatList, getFeatureEIXs, type = type, ..., simplify = FALSE)
     EIXs <- unlist(EIXList, recursive = FALSE, use.names = FALSE) # use.names gives combined set/ana name, we just want ana
     names(EIXs) <- unlist(lapply(EIXList, names))
     EIXs <- EIXs[intersect(analyses(obj), names(EIXs))] # sync order

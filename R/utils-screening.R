@@ -135,6 +135,24 @@ expandSuspMobilities <- function(suspects)
     })))
 }
 
+assignFeatureMobilitiesSuspects <- function(features, assignedMobilities)
+{
+    printf("Finding mobilities for all features from suspects...\n")
+    oldCount <- countMobilityFeatures(features)
+    
+    features@features <- lapply(features@features, function(fTable)
+    {
+        mobTable <- copy(assignedMobilities)
+        mobTable <- mobTable[group %chin% fTable$group]
+        mobTable[, ims_parent_ID := fTable[match(mobTable$group, group, nomatch = 0)]$ID][, group := NULL]
+        return(doAssignFeatureMobilities(fTable, mobTable))
+    })
+    
+    printf("Assigned %d mobility features.\n", countMobilityFeatures(features) - oldCount)
+    
+    return(features)
+}
+
 finalizeScreenInfoForIMS <- function(scr, gInfo, minMobilityMatches, IMSWindow)
 {
     # shared code for findMobilities() and screenSuspects()

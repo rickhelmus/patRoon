@@ -338,6 +338,10 @@
     - clearly doc what IMSWindow is used for
     - see if mzWindow for assignFeatureMobilities() is now not needed anymore since getMobilograms() is fixed
     - store mobility assignment type in feature table? (eg mobilogram, suspect, PASEF)
+    - method for fGroupsScreeningSet
+    - clusterFGroupMobilities(): don't clear out annotation table (sets!)
+        - copy data from IMS parents
+        - maybe also for other slots? (with a warning/message?)
     - doc the use for fromSuspects, eg
         - doesn't rely on mobility peak detection, so might be less prone to false negatives with eg low intensities
         - scenario 1: we know the mobility very well, eg from a database --> use a narrow IMSWindow

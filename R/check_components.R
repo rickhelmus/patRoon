@@ -197,7 +197,7 @@ setMethod("checkComponents", "components", function(components, fGroups, session
     
     cmpNames <- names(components)
     
-    EICs <- getFeatureEIXs(fGroups, type = "EIC", EICParams = modifyList(EICParams,
+    EICs <- getFeatureEIXs(fGroups, type = "EIC", EIXParams = modifyList(EICParams,
                                                                          list(topMost = 1, topMostByRGroup = FALSE)))
     
     curSession <- NULL

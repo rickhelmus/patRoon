@@ -926,6 +926,20 @@ assertFindPeaksParam <- function(x, null.ok = FALSE, .var.name = checkmate::vnam
     invisible(NULL)
 }
 
+assertFindMobilitiesArgs <- function(mobPeaksParam, mzWindow, IMSWindow, clusterMethod, minIntensityIMS,
+                                     maxMSRTWindow, chromPeaksParam, RTWindow, calcArea, fallbackEIC, parallel, add)
+{
+    assertFindPeaksParam(mobPeaksParam, add = add)
+    aapply(checkmate::assertNumber, . ~ mzWindow + IMSWindow + minIntensityIMS + RTWindow, finite = TRUE,
+           fixed = list(add = add))
+    assertClusterMethod(clusterMethod, add = add)
+    checkmate::assertNumber(maxMSRTWindow, lower = 1, finite = TRUE, null.ok = TRUE, add = add)
+    assertFindPeaksParam(chromPeaksParam, null.ok = TRUE, add = add)
+    checkmate::assertChoice(calcArea, c("integrate", "sum"), add = add)
+    aapply(checkmate::assertFlag, . ~ fallbackEIC + parallel, fixed = list(add = add))
+    invisible(NULL)
+}
+
 # from https://github.com/mllg/checkmate/issues/115
 aapply = function(fun, formula, ..., fixed = list())
 {

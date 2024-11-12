@@ -849,22 +849,61 @@ findPeaksInEICs <- function(allEICs, peaksParam, withBP, withMobility, parallel,
     }, simplify = FALSE)
 }
 
-assignFeatureMobilities <- function(features, peaksParam, mzWindow, IMSWindow, clusterMethod, minIntensityIMS,
-                                    maxMSRTWindow, assignedMobilities)
+getMobilityCols <- function() c("mobility", "mobmin", "mobmax", "mob_area", "mob_intensity")
+countMobilityFeatures <- function(feat) sum(sapply(featureTable(feat), function(ft) sum(!is.null(ft[["mobility"]]) & !is.na(ft$mobility))))
+
+doAssignFeatureMobilities <- function(fTable, mobTable)
 {
-    printf("Finding mobilities for all features...\n")
+    fTable <- copy(fTable)
+    fTable[, ord := seq_len(.N)]
+    
+    mobTable <- copy(mobTable)
+    mobTable[, mobOrd := seq_len(.N), by = "ims_parent_ID"]
+    mobTable[, ID := appendMobToName(ims_parent_ID, mobility)]
+    
+    if (nrow(mobTable) == 0)
+    {
+        mobNumCols <- intersect(getMobilityCols(), names(mobTab))
+        fTable[, ims_parent_ID := NA_character_]
+        fTable[, (mobNumCols) := NA_real_]
+    }
+    else
+    {
+        # add feature data: merge fTable, while making sure that no columns overlap
+        mobTable <- merge(mobTable, fTable[, c("ID", setdiff(names(fTable), names(mobTable))), with = FALSE],
+                          by.x = "ims_parent_ID", by.y = "ID", sort = FALSE)
+        setcolorder(mobTable, names(fTable))
+        
+        # merge mobility features
+        fTable <- rbind(fTable, mobTable, fill = TRUE)
+        
+        setorderv(fTable, c("ord", "mobOrd"), na.last = FALSE)
+        fTable[, c("ord", "mobOrd") := NULL]
+    }
+    
+    return(fTable)
+}
+
+assignFeatureMobilitiesPeaks <- function(features, peaksParam, mzWindow, IMSWindow, clusterMethod, minIntensityIMS,
+                                         maxMSRTWindow, selectFunc)
+{
+    hash <- makeHash(features, peaksParam, mzWindow, IMSWindow, clusterMethod, minIntensityIMS, maxMSRTWindow,
+                     selectFunc)
+    cd <- loadCacheData("assignFeatureMobilitiesPeaks", hash)
+    if (!is.null(cd))
+        return(cd)
+    
+    printf("Finding mobilities for all features from mobilogram peaks...\n")
+    oldCount <- countMobilityFeatures(features)
     
     EIMParams <- getDefEIMParams(window = NULLToZero(maxMSRTWindow), clusterMethod = clusterMethod,
                                  IMSWindow = IMSWindow, minIntensity = minIntensityIMS)
-    EIMSelFunc <- if (!is.null(assignedMobilities)) \(tab) tab[!group %chin% assignedMobilities$group]
-    allEIMs <- getFeatureEIXs(features, "EIM", EIXParams = EIMParams, selectFunc = EIMSelFunc, compress = FALSE)
+    allEIMs <- getFeatureEIXs(features, "EIM", EIXParams = EIMParams, selectFunc = selectFunc, compress = FALSE)
+    
+    mobNumCols <- getMobilityCols()
     
     features@features <- Map(features@features, allEIMs, f = function(fTable, EIMs)
     {
-        mobNumCols <- c("mobility", "mobmin", "mobmax", "mob_area", "mob_intensity")
-
-        fTable <- copy(fTable)
-        
         if (length(EIMs) > 0)
         {
             # pretend we have EICs so we can find peaks
@@ -872,63 +911,36 @@ assignFeatureMobilities <- function(features, peaksParam, mzWindow, IMSWindow, c
             peaksList <- findPeaks(EIMs, peaksParam, verbose = FALSE)
             peaksTable <- rbindlist(peaksList, idcol = "ims_parent_ID")
             setnames(peaksTable, c("ret", "retmin", "retmax", "area", "intensity"), mobNumCols, skip_absent = TRUE)
-        }
-        else
-            peaksTable <- data.table()
-        
-        if (!is.null(assignedMobilities))
-        {
-            am <- copy(assignedMobilities)
-            am <- am[group %chin% fTable$group]
-            am[, ims_parent_ID := fTable[match(am$group, group, nomatch = 0)]$ID][, group := NULL]
-            peaksTable <- rbind(peaksTable, am, fill = TRUE)
-        }
-        
-        peaksTable[, mobOrd := seq_len(.N), by = "ims_parent_ID"]
-        
-        if (nrow(peaksTable) == 0)
-        {
-            fTable[, ims_parent_ID := NA_character_]
-            fTable[, (mobNumCols) := NA_real_]
-        }
-        else
-        {
-            fTable[, ord := seq_len(.N)]
-            
             # NOTE: we subset columns here to remove any algo specific columns that may also be present in the feature
             # table (UNDONE?)
-            peaksTable <- subsetDTColumnsIfPresent(peaksTable, c(mobNumCols, "mobOrd", "ims_parent_ID"))
-            
-            peaksTable[, ID := appendMobToName(ims_parent_ID, mobility)]
-            
-            # add feature data
-            peaksTable <- merge(peaksTable, fTable, by.x = "ims_parent_ID", by.y = "ID", sort = FALSE)
-            setcolorder(peaksTable, names(fTable))
-            
-            # merge mobility features
-            fTable <- rbind(fTable, peaksTable, fill = TRUE)
-            
-            setorderv(fTable, c("ord", "mobOrd"), na.last = FALSE)
-            fTable[, c("ord", "mobOrd") := NULL]
+            peaksTable <- subsetDTColumnsIfPresent(peaksTable, c(mobNumCols, "ims_parent_ID"))
         }
-        
-        return(fTable)
+        else
+            peaksTable <- data.table()[, (mobNumCols) := numeric()]
+
+        return(doAssignFeatureMobilities(fTable, peaksTable))
     })
 
-    mobFeatsN <- sum(sapply(features@features, function(ft) sum(!is.na(ft$mobility))))
-    printf("Assigned %d mobility features.\n", mobFeatsN)
+    printf("Assigned %d mobility features.\n", countMobilityFeatures(features) - oldCount)
+    
+    saveCacheData("assignFeatureMobilitiesPeaks", features, hash)
     
     return(features)
 }
 
 # UNDONE: make this an exported method?
-reintegrateFeatures <- function(features, RTWindow, calcArea, peaksParam, fallbackEIC, onlyMob, parallel)
+reintegrateMobilityFeatures <- function(features, RTWindow, calcArea, peaksParam, fallbackEIC, parallel)
 {
-    anaInfo <- analysisInfo(features)
     cacheDB <- openCacheDBScope()
+    hash <- makeHash(features, RTWindow, calcArea, peaksParam, fallbackEIC)
+    cd <- loadCacheData("reintegrateMobilityFeatures", hash, cacheDB)
+    if (!is.null(cd))
+        return(cd)
+    
+    anaInfo <- analysisInfo(features)
     
     printf("Loading EICs...\n")
-    EICSelFunc <- if (onlyMob) \(tab) tab[!is.null(tab[["mobility"]]) & !is.na(mobility)]
+    EICSelFunc <- \(tab) tab[!is.null(tab[["mobility"]]) & !is.na(mobility)]
     allEICs <- getFeatureEIXs(features, type = "EIC", EIXParams = getDefEIMParams(window = RTWindow),
                               selectFunc = EICSelFunc, compress = FALSE, cacheDB = cacheDB)
     
@@ -992,8 +1004,8 @@ reintegrateFeatures <- function(features, RTWindow, calcArea, peaksParam, fallba
         }
         else
         {
-            # only keep those updated from a new peak or ignored in case onlyMob==T
-            ft[, keep := (onlyMob & (is.null(ft[["mobility"]]) | is.na(mobility))) | ID %chin% peakIDs]
+            # only keep those updated from a new peak
+            ft[, keep := ((is.null(ft[["mobility"]]) | is.na(mobility))) | ID %chin% peakIDs]
         }
 
         notAssigned <<- notAssigned + sum(!ft$keep)
@@ -1006,48 +1018,30 @@ reintegrateFeatures <- function(features, RTWindow, calcArea, peaksParam, fallba
     printf("Re-integrated %d features (%d from newly found peaks, %d from EICs and removed %d unassigned)\n",
            updatedFeatsFromEICs + updatedFeatsFromPeaks, updatedFeatsFromPeaks, updatedFeatsFromEICs, notAssigned)
     
+    saveCacheData("reintegrateMobilityFeatures", features, hash)
+    
     return(features)
 }
 
-doFindMobilities <- function(fGroups, mobPeaksParam, mzWindow, IMSWindow, clusterMethod, minIntensityIMS,
-                             maxMSRTWindow, chromPeaksParam, RTWindow, calcArea, fallbackEIC, assignedMobilities,
-                             parallel)
+clusterFGroupMobilities <- function(fGroups, IMSWindow, sets)
 {
-    ac <- checkmate::makeAssertCollection()
-    assertFindPeaksParam(mobPeaksParam, add = ac)
-    aapply(checkmate::assertNumber, . ~ mzWindow + IMSWindow + minIntensityIMS + RTWindow, finite = TRUE,
-           fixed = list(add = ac))
-    assertClusterMethod(clusterMethod, add = ac)
-    checkmate::assertNumber(maxMSRTWindow, lower = 1, finite = TRUE, null.ok = TRUE, add = ac)
-    assertFindPeaksParam(chromPeaksParam, null.ok = TRUE, add = ac)
-    checkmate::assertChoice(calcArea, c("integrate", "sum"), add = ac)
-    aapply(checkmate::assertFlag, . ~ fallbackEIC + parallel, fixed = list(add = ac))
-    checkmate::reportAssertions(ac)
+    # UNDONE: do something more polymorphic than hackish sets arg?
     
-    if (length(fGroups) == 0)
-        return(fGroups) # nothing to do...
-    
-    fTable <- featureTable(fGroups)
-    hash <- makeHash(fGroups, mobPeaksParam, mzWindow, IMSWindow, clusterMethod, minIntensityIMS, maxMSRTWindow,
-                     chromPeaksParam, RTWindow, calcArea, fallbackEIC)
-    cd <- loadCacheData("findMobilities", hash)
+    hash <- makeHash(fGroups, IMSWindow)
+    cd <- loadCacheData("clusterFGroupMobilities", hash)
     if (!is.null(cd))
         return(cd)
     
-    fGroups@features <- assignFeatureMobilities(fGroups@features, mobPeaksParam, mzWindow, IMSWindow, clusterMethod,
-                                                minIntensityIMS, maxMSRTWindow, assignedMobilities)
-    fGroups@features <- reintegrateFeatures(fGroups@features, RTWindow, calcArea, chromPeaksParam, fallbackEIC, TRUE,
-                                            parallel)
-    
-    fTable <- featureTable(fGroups)
+    fTableAll <- rbindlist(featureTable(fGroups), idcol = "analysis")
+    if (sets)
+        fTableAll[, set := analysisInfo(fGroups)$set[match(analysis, analyses(fGroups))]]
     
     printf("Clustering mobilities... ")
-    
     # cluster features within original fGroups with similar mobilities together    
-    fTableAll <- rbindlist(fTable, idcol = "analysis")
-    fTableAll[!is.na(mobility), gClust := {
-        if (.N == 0)
-            numeric()
+    byCols <- if (sets) c("group", "set") else "group"
+    fTableAll[!is.na(mobility), IMSClust := {
+        cl <- if (.N == 0)
+            integer()
         else if (.N == 1)
             1
         else
@@ -1055,27 +1049,29 @@ doFindMobilities <- function(fGroups, mobPeaksParam, mzWindow, IMSWindow, cluste
             hc <- fastcluster::hclust(dist(mobility))
             cutree(hc, h = IMSWindow)
         }
-    }, by = "group"]
+        paste0(paste0(unlist(.BY), collapse = "_"), "-", cl)
+    }, by = byCols]
     printf("Done!\n")
-    
+
     printf("Updating feature group data... ")
     
     # prepare group info
-    gMobInfo <- fTableAll[, .(mobility = mean(mobility)), by = c("group", "gClust")]
+    gMobInfo <- fTableAll[, .(mobility = mean(mobility)), by = c("group", "IMSClust")]
     setnames(gMobInfo, "group", "ims_parent_group")
     gMobInfo[, group := fifelse(!is.na(mobility), appendMobToName(ims_parent_group, mobility), ims_parent_group)]
     
     # update features
     setnames(fTableAll, "group", "ims_parent_group") # UNDONE: better colname
-    fTableAll[gMobInfo, group := i.group, on = c("ims_parent_group", "gClust")]
-    featureTable(fGroups) <- split(fTableAll[, -"gClust"], by = "analysis", keep.by = FALSE)
+    fTableAll[gMobInfo, group := i.group, on = c("ims_parent_group", "IMSClust")]
+    fTableAll <- removeDTColumnsIfPresent(fTableAll, c("IMSClust", "set"))
+    featureTable(fGroups) <- split(fTableAll, by = "analysis", keep.by = FALSE)
     
     # update gInfo
     gInfo <- copy(groupInfo(fGroups))
     setnames(gInfo, "group", "ims_parent_group")
     gInfo <- merge(gInfo, gMobInfo, by = "ims_parent_group", sort = FALSE)
     setcolorder(gInfo, c("group", "ret", "mz", "mobility", "ims_parent_group"))
-    fGroups@groupInfo <- gInfo[, -"gClust"]
+    fGroups@groupInfo <- gInfo[, -"IMSClust"]
     
     # re-fill group table
     fTablePerGroup <- split(fTableAll, by = "group")
@@ -1093,6 +1089,7 @@ doFindMobilities <- function(fGroups, mobPeaksParam, mzWindow, IMSWindow, cluste
     # update ftindex
     fGroups <- reGenerateFTIndex(fGroups)
     
+    # UNDONE: don't clear annotations (sets!)
     for (sl in c("groupQualities", "groupScores", "ISTDs", "ISTDAssignments", "annotations", "concentrations",
                  "toxicities"))
     {
@@ -1104,9 +1101,9 @@ doFindMobilities <- function(fGroups, mobPeaksParam, mzWindow, IMSWindow, cluste
         }
     }
     
-    printf("Done!\n")
+    saveCacheData("clusterFGroupMobilities", fGroups, hash)
     
-    saveCacheData("findMobilities", fGroups, hash)
+    printf("Done!\n")
     
     return(fGroups)
 }

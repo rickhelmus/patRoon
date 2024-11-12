@@ -369,7 +369,7 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, EICParams
     fTable <- featureTable(fGroups)
     ftind <- groupFeatIndex(fGroups)
     
-    EICsTopMost <- getFeatureEIXs(fGroups, type = "EIC", EICParams = modifyList(EICParams, list(topMost = 1,
+    EICsTopMost <- getFeatureEIXs(fGroups, type = "EIC", EIXParams = modifyList(EICParams, list(topMost = 1,
                                                                                                 topMostByRGroup = FALSE)))
     EICsTopMostRG <- EICsAll <- list()
     

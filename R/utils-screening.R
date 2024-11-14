@@ -144,7 +144,11 @@ assignFeatureMobilitiesSuspects <- function(features, assignedMobilities)
     {
         mobTable <- copy(assignedMobilities)
         mobTable <- mobTable[group %chin% fTable$group]
-        mobTable[, ims_parent_ID := fTable[match(mobTable$group, group, nomatch = 0)]$ID][, group := NULL]
+        if (nrow(mobTable) == 0)
+            mobTable[, ims_parent_ID := character()]
+        else
+            mobTable[, ims_parent_ID := fTable[match(mobTable$group, group, nomatch = 0)]$ID][, group := NULL]
+        mobTable[, c("mob_area", "mob_intensity", "mob_assign_method") := .(NA_real_, NA_real_, "suspect")]
         return(doAssignFeatureMobilities(fTable, mobTable))
     })
     

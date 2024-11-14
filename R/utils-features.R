@@ -890,10 +890,9 @@ doAssignFeatureMobilities <- function(fTable, mobTable)
 }
 
 assignFeatureMobilitiesPeaks <- function(features, peaksParam, mzWindow, IMSWindow, clusterMethod, minIntensityIMS,
-                                         maxMSRTWindow, selectFunc)
+                                         maxMSRTWindow)
 {
-    hash <- makeHash(features, peaksParam, mzWindow, IMSWindow, clusterMethod, minIntensityIMS, maxMSRTWindow,
-                     selectFunc)
+    hash <- makeHash(features, peaksParam, mzWindow, IMSWindow, clusterMethod, minIntensityIMS, maxMSRTWindow)
     cd <- loadCacheData("assignFeatureMobilitiesPeaks", hash)
     if (!is.null(cd))
         return(cd)
@@ -903,7 +902,9 @@ assignFeatureMobilitiesPeaks <- function(features, peaksParam, mzWindow, IMSWind
     
     EIMParams <- getDefEIMParams(window = NULLToZero(maxMSRTWindow), clusterMethod = clusterMethod,
                                  IMSWindow = IMSWindow, minIntensity = minIntensityIMS)
-    allEIMs <- getFeatureEIXs(features, "EIM", EIXParams = EIMParams, selectFunc = selectFunc, compress = FALSE)
+    # skip any mobility features and IMS parents
+    EIMSelFunc <- \(tab) if (is.null(tab[["mobility"]])) tab else tab[is.na(mobility) & !ID %chin% ims_parent_ID]
+    allEIMs <- getFeatureEIXs(features, "EIM", EIXParams = EIMParams, selectFunc = EIMSelFunc, compress = FALSE)
     
     mobNumCols <- getMobilityCols()
     

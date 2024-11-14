@@ -599,7 +599,7 @@ setMethod("findMobilities", "featureGroupsScreening", function(fGroups, mobPeaks
     }
     
     fGroups@features <- assignFeatureMobilitiesPeaks(fGroups@features, mobPeaksParam, mzWindow, IMSWindow, clusterMethod,
-                                                    minIntensityIMS, maxMSRTWindow, \(ft) ft[!ft$group %chin% am$group])
+                                                     minIntensityIMS, maxMSRTWindow)
     fGroups@features <- reintegrateMobilityFeatures(fGroups@features, EICRTWindow, peakRTWindow, calcArea,
                                                     chromPeaksParam, fallbackEIC, parallel)
     fGroups <- clusterFGroupMobilities(fGroups, IMSWindow, FALSE)

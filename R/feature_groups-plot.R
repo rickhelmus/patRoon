@@ -834,8 +834,8 @@ setMethod("plotMobilogram", "featureGroups", function(obj, groupName = names(obj
         }
         
         # NOTE: mzmin/mzmax may be too narrow here, hence use a user specified mz range
-        m <- getEIMList(backend, ft$mz - mzWindow, ft$mz + mzWindow, ft$retmin, ft$retmax, clusterMethod,
-                        clusterIMSWindow, minIntensity, TRUE)
+        m <- getEIMList(backend, ft$mz - mzWindow, ft$mz + mzWindow, ft$retmin, ft$retmax, rep(0, nrow(ft)),
+                        rep(0, nrow(ft)), clusterMethod, clusterIMSWindow, minIntensity, TRUE)
         names(m) <- ft$ID
         return(lapply(m, setDT))
     })

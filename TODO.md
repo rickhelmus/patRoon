@@ -363,7 +363,11 @@
         - Does the mobmin/mobmax range make sense how it is computed now?
     - remove mobility assignment?
         - if not, support >1 mobilities in suspect list and do mobility assignment directly from suspect list like findMobilities()
-- Suspect screening
+- ISTDs
+    - update slots in findMobilities()? Doc otherwise that normalization should be done after mob assignment
+    - how do we assign ISTDs after mobilities are assigned?
+        - need to make sure that minimum number of ISTDs is satisfied by number of unique IMS parents
+        - for ISTDs with no suspect mobility and >1 mobility features, simply assign all+parent?
 - reporting
     - convert reactable cell img functions to JS versions, so img paths are set dynamically which can save quite some space for selfContained reports
         --> see WIP changes made for chromsLarge
@@ -377,6 +381,8 @@
         - update for retWindow --> window
         - add docs for getDefEIMParams()
         - update handbook
+    - findMobilities()
+        - mention that feature properties (except intensity, rt, area) are simply copied from parent
 - NEWS
     - Dietrich features
     - groupInfo is now a DT

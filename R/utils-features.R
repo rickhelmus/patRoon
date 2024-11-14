@@ -922,8 +922,9 @@ assignFeatureMobilitiesPeaks <- function(features, peaksParam, mzWindow, IMSWind
             peaksTable <- subsetDTColumnsIfPresent(peaksTable, c(mobNumCols, "ims_parent_ID"))
         }
         else
-            peaksTable <- data.table()[, (mobNumCols) := numeric()]
+            peaksTable <- data.table()[, (mobNumCols) := numeric()][, ims_parent_ID := character()]
 
+        peaksTable[, mob_assign_method := "peak"]
         return(doAssignFeatureMobilities(fTable, peaksTable))
     })
 
@@ -975,7 +976,7 @@ reintegrateMobilityFeatures <- function(features, EICRTWindow, peakRTWindow, cal
         if (!is.null(pt))
         {
             cols <- c("ret", "retmin", "retmax", "area", "intensity")
-            ft[pt, (cols) := mget(paste0("i.", cols)), on = c(ID = "EIC_ID")]
+            ft[pt, (c(cols, "mob_reintegr_method")) := c(mget(paste0("i.", cols)), list("peak")), on = c(ID = "EIC_ID")]
             peakIDs <- pt$EIC_ID
             updatedFeatsFromPeaks <<- updatedFeatsFromPeaks + sum(ft$ID %in% pt$EIC_ID)
         }
@@ -987,7 +988,7 @@ reintegrateMobilityFeatures <- function(features, EICRTWindow, peakRTWindow, cal
         if (fallbackEIC)
         {
             # update those not assigned by a peak from EICs
-            doRows <- which(ft$ID %chin% names(eics))
+            doRows <- which(ft$ID %chin% names(eics) & !ft$ID %chin% peakIDs)
 
             ft[doRows, c("intensity", "area") := {
                 eic <- eics[[ID]][eics[[ID]]$time %between% c(retmin, retmax), ]
@@ -1005,6 +1006,7 @@ reintegrateMobilityFeatures <- function(features, EICRTWindow, peakRTWindow, cal
                 
                 list(i, a)
             }, by = seq_along(doRows)]
+            ft[doRows, mob_reintegr_method := "EIC"]
 
             ft[doRows, keep := intensity > 0]
             updatedFeatsFromEICs <<- updatedFeatsFromEICs + ft[doRows][keep == TRUE, .N]

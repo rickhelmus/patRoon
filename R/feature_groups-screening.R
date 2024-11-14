@@ -585,33 +585,16 @@ setMethod("findMobilities", "featureGroupsScreening", function(fGroups, mobPeaks
     if (length(fGroups) == 0)
         return(fGroups) # nothing to do...
     
-    am <- NULL
     if (fromSuspects)
-    {
-        am <- copy(screenInfo(fGroups))
-        am[, ngroup := .N, by = "group"]
-        am <- am[ngroup == 1][, -"ngroup"]
-        # UNDONE: message which were omitted
-        am <- expandSuspMobilities(am)
-        am <- am[!is.na(mobility)]
-        am <- am[, .(group, mobmin = mobility - IMSWindow, mobmax = mobility + IMSWindow, mobility)]
-        fGroups@features <- assignFeatureMobilitiesSuspects(fGroups@features, am)
-    }
-    
+        fGroups@features <- assignFeatureMobilitiesSuspects(fGroups@features, IMSWindow, screenInfo(fGroups))
     fGroups@features <- assignFeatureMobilitiesPeaks(fGroups@features, mobPeaksParam, mzWindow, IMSWindow, clusterMethod,
                                                      minIntensityIMS, maxMSRTWindow)
     fGroups@features <- reintegrateMobilityFeatures(fGroups@features, EICRTWindow, peakRTWindow, calcArea,
                                                     chromPeaksParam, fallbackEIC, parallel)
     fGroups <- clusterFGroupMobilities(fGroups, IMSWindow, FALSE)
-    
-    scr <- copy(screenInfo(fGroups))
-    gInfo <- groupInfo(fGroups)[group %chin% scr$group | ims_parent_group %chin% scr$group]
-    scr[, orderOrig := seq_len(.N)]
-    scr <- scr[match(gInfo$ims_parent_group, group)] # expand
-    scr[, group := gInfo$group]
-    scr[, d_rt := gInfo$ret[match(group, gInfo$group)] - rt]
-    setorderv(scr, "orderOrig")
-    scr[, orderOrig := NULL]
+
+    gInfo <- groupInfo(fGroups)
+    scr <- expandAndUpdateScreenInfoForIMS(screenInfo(fGroups), gInfo)
     scr <- finalizeScreenInfoForIMS(scr, gInfo, minMobilityMatches, IMSWindow)
     fGroups@screenInfo <- scr
     

@@ -411,6 +411,54 @@ setMethod("calculateTox", "featureGroupsScreeningSet", function(fGroups, feature
     callNextMethod(fGroups, featureAnn)
 })
 
+setMethod("findMobilities", "featureGroupsScreeningSet", function(fGroups, mobPeaksParam, mzWindow = 0.005,
+                                                                  IMSWindow = 0.01, clusterMethod = "distance",
+                                                                  minIntensityIMS = 0, maxMSRTWindow = 2,
+                                                                  chromPeaksParam = NULL, EICRTWindow = 20,
+                                                                  peakRTWindow = 5, calcArea = "integrate",
+                                                                  fallbackEIC = TRUE, parallel = TRUE,
+                                                                  fromSuspects = FALSE, minMobilityMatches = 0)
+{
+    ac <- checkmate::makeAssertCollection()
+    assertFindMobilitiesArgs(mobPeaksParam, mzWindow, IMSWindow, clusterMethod, minIntensityIMS, maxMSRTWindow,
+                             chromPeaksParam, EICRTWindow, peakRTWindow, calcArea, fallbackEIC, parallel, ac)
+    checkmate::assertFlag(fromSuspects, add = ac)
+    checkmate::assertCount(minMobilityMatches, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (length(fGroups) == 0)
+        return(fGroups) # nothing to do...
+
+    anaInfo <- analysisInfo(fGroups)
+    for (s in sets(fGroups))
+    {
+        anasSet <- anaInfo[set == s]$analysis
+        if (fromSuspects)
+        {
+            fGroups@features <- assignFeatureMobilitiesSuspects(fGroups@features, screenInfo(setObjects(fGroups)[[s]]),
+                                                                IMSWindow,
+                                                                \(ft, a) if (!a %chin% anasSet) ft[0] else ft)
+        }
+    }
+    fGroups@features <- assignFeatureMobilitiesPeaks(fGroups@features, mobPeaksParam, mzWindow, IMSWindow, clusterMethod,
+                                                     minIntensityIMS, maxMSRTWindow)
+    fGroups@features <- reintegrateMobilityFeatures(fGroups@features, EICRTWindow, peakRTWindow, calcArea,
+                                                    chromPeaksParam, fallbackEIC, parallel)
+    fGroups <- clusterFGroupMobilities(fGroups, IMSWindow, TRUE)
+    
+    gInfo <- groupInfo(fGroups)
+    scr <- expandAndUpdateScreenInfoForIMS(screenInfo(fGroups), gInfo)
+    scr <- finalizeScreenInfoForIMS(scr, gInfo, minMobilityMatches, IMSWindow)
+    fGroups@screenInfo <- scr
+    
+    # update setObjects: there are quite a few things to be updated for a full sync, ie addition of new features and
+    # feature groups, groupInfo, screenInfo, ... We take a shortcut here by simply overwriting the setObjects by unset
+    # versions.
+    fGroups@setObjects <- lapply(sets(fGroups), unset, obj = fGroups)
+    
+    return(fGroups)
+})
+
 #' @rdname suspect-screening
 #' @export
 setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWindow, mzWindow, IMSWindow,

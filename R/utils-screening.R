@@ -135,15 +135,31 @@ expandSuspMobilities <- function(suspects)
     })))
 }
 
-assignFeatureMobilitiesSuspects <- function(features, assignedMobilities)
+assignFeatureMobilitiesSuspects <- function(features, scr, IMSWindow, selectFunc = NULL)
 {
     printf("Finding mobilities for all features from suspects...\n")
     oldCount <- countMobilityFeatures(features)
     
-    features@features <- lapply(features@features, function(fTable)
+    if (is.null(scr[["mobility"]]))
+    {
+        warning("Cannot load mobilities from suspects: No suspect mobility data", call. = FALSE)
+        return(features)
+    }
+    
+    assignedMobilities <- copy(scr)
+    assignedMobilities[, ngroup := .N, by = "group"]
+    assignedMobilities <- assignedMobilities[ngroup == 1][, -"ngroup"]
+    # UNDONE: message which were omitted
+    assignedMobilities <- expandSuspMobilities(assignedMobilities)
+    assignedMobilities <- assignedMobilities[!is.na(mobility)]
+    assignedMobilities <- assignedMobilities[, .(group, mobility, mobmin = mobility - IMSWindow, mobmax = mobility + IMSWindow)]
+    
+    features@features <- Map(features@features, names(features@features), f = function(fTable, ana)
     {
         mobTable <- copy(assignedMobilities)
         mobTable <- mobTable[group %chin% fTable$group]
+        if (!is.null(selectFunc))
+            mobTable <- selectFunc(mobTable, ana)
         if (nrow(mobTable) == 0)
             mobTable[, ims_parent_ID := character()]
         else
@@ -155,6 +171,19 @@ assignFeatureMobilitiesSuspects <- function(features, assignedMobilities)
     printf("Assigned %d mobility features.\n", countMobilityFeatures(features) - oldCount)
     
     return(features)
+}
+
+expandAndUpdateScreenInfoForIMS <- function(scr, gInfo)
+{
+    gInfo <- gInfo[group %chin% scr$group | ims_parent_group %chin% scr$group]
+    scr <- copy(scr)
+    scr[, orderOrig := seq_len(.N)]
+    scr <- scr[match(gInfo$ims_parent_group, group)] # expand
+    scr[, group := gInfo$group]
+    scr[, d_rt := gInfo$ret[match(group, gInfo$group)] - rt]
+    setorderv(scr, "orderOrig")
+    scr[, orderOrig := NULL]
+    return(scr[])
 }
 
 finalizeScreenInfoForIMS <- function(scr, gInfo, minMobilityMatches, IMSWindow)

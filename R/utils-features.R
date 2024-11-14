@@ -433,7 +433,7 @@ setMethod("getFeatureEIXInputTab", "featureGroups", function(obj, type, analysis
     }, simplify = FALSE))
 })
 
-setMethod("getFeatureEIXInputTab", "featureGroupsSet", function(obj, analysis, groupName, EIXParams)
+setMethod("getFeatureEIXInputTab", "featureGroupsSet", function(obj, type, analysis, groupName, EIXParams)
 {
     ret <- callNextMethod()
     
@@ -863,9 +863,13 @@ doAssignFeatureMobilities <- function(fTable, mobTable)
     
     if (nrow(mobTable) == 0)
     {
-        mobNumCols <- intersect(getMobilityCols(), names(mobTab))
-        fTable[, ims_parent_ID := NA_character_]
-        fTable[, (mobNumCols) := NA_real_]
+        if (is.null(fTable[["mobility"]]))
+        {
+            # at least initialize columns
+            mobNumCols <- intersect(getMobilityCols(), names(mobTable))
+            fTable[, ims_parent_ID := NA_character_]
+            fTable[, (mobNumCols) := NA_real_]
+        }
     }
     else
     {
@@ -878,8 +882,9 @@ doAssignFeatureMobilities <- function(fTable, mobTable)
         fTable <- rbind(fTable, mobTable, fill = TRUE)
         
         setorderv(fTable, c("ord", "mobOrd"), na.last = FALSE)
-        fTable[, c("ord", "mobOrd") := NULL]
     }
+    
+    fTable <- removeDTColumnsIfPresent(fTable, c("ord", "mobOrd"))
     
     return(fTable)
 }

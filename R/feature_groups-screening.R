@@ -570,14 +570,14 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = NULL
 setMethod("findMobilities", "featureGroupsScreening", function(fGroups, mobPeaksParam, mzWindow = 0.005,
                                                                IMSWindow = 0.01, clusterMethod = "distance",
                                                                minIntensityIMS = 0, maxMSRTWindow = 2,
-                                                               chromPeaksParam = NULL, RTWindow = 20,
-                                                               calcArea = "integrate", fallbackEIC = TRUE,
-                                                               parallel = TRUE, fromSuspects = FALSE,
-                                                               minMobilityMatches = 0)
+                                                               chromPeaksParam = NULL, EICRTWindow = 20,
+                                                               peakRTWindow = 5, calcArea = "integrate",
+                                                               fallbackEIC = TRUE, parallel = TRUE,
+                                                               fromSuspects = FALSE, minMobilityMatches = 0)
 {
     ac <- checkmate::makeAssertCollection()
     assertFindMobilitiesArgs(mobPeaksParam, mzWindow, IMSWindow, clusterMethod, minIntensityIMS, maxMSRTWindow,
-                             chromPeaksParam, RTWindow, calcArea, fallbackEIC, parallel, ac)
+                             chromPeaksParam, EICRTWindow, peakRTWindow, calcArea, fallbackEIC, parallel, ac)
     checkmate::assertFlag(fromSuspects, add = ac)
     checkmate::assertCount(minMobilityMatches, add = ac)
     checkmate::reportAssertions(ac)
@@ -600,8 +600,8 @@ setMethod("findMobilities", "featureGroupsScreening", function(fGroups, mobPeaks
     
     fGroups@features <- assignFeatureMobilitiesPeaks(fGroups@features, mobPeaksParam, mzWindow, IMSWindow, clusterMethod,
                                                     minIntensityIMS, maxMSRTWindow, \(ft) ft[!ft$group %chin% am$group])
-    fGroups@features <- reintegrateMobilityFeatures(fGroups@features, RTWindow, calcArea, chromPeaksParam, fallbackEIC,
-                                                    parallel)
+    fGroups@features <- reintegrateMobilityFeatures(fGroups@features, EICRTWindow, peakRTWindow, calcArea,
+                                                    chromPeaksParam, fallbackEIC, parallel)
     fGroups <- clusterFGroupMobilities(fGroups, IMSWindow, FALSE)
     
     scr <- copy(screenInfo(fGroups))

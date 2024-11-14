@@ -1098,15 +1098,22 @@ clusterFGroupMobilities <- function(fGroups, IMSWindow, sets)
     # update ftindex
     fGroups <- reGenerateFTIndex(fGroups)
     
-    # UNDONE: don't clear annotations (sets!)
-    for (sl in c("groupQualities", "groupScores", "ISTDs", "ISTDAssignments", "annotations", "concentrations",
-                 "toxicities"))
+    # UNDONE: what to do with ISTDs/ISTDAssignments?
+    for (sl in c("groupQualities", "groupScores", "annotations", "concentrations", "toxicities"))
     {
         d <- slot(fGroups, sl)
         if (length(d) > 0)
         {
-            warning("Clearing all data from ", sl, call. = FALSE)
-            slot(fGroups, sl) <- if (is.data.table(d)) data.table() else list()
+            printf("NOTE: copying parent data from %s\n", sl)
+            
+            # slots are all data.tables with group column
+            d <- rbindlist(lapply(split(d, seq_len(nrow(d))), function(r)
+            {
+                og <- gInfo[!is.na(mobility) & ims_parent_group == r$group]$group
+                rbind(r, data.table(group = og, r[, -"group"]))
+            }))
+            
+            slot(fGroups, sl) <- d
         }
     }
     

@@ -934,10 +934,10 @@ assignFeatureMobilitiesPeaks <- function(features, peaksParam, mzWindow, IMSWind
 }
 
 # UNDONE: make this an exported method?
-reintegrateMobilityFeatures <- function(features, RTWindow, calcArea, peaksParam, fallbackEIC, parallel)
+reintegrateMobilityFeatures <- function(features, EICRTWindow, peakRTWindow, calcArea, peaksParam, fallbackEIC, parallel)
 {
     cacheDB <- openCacheDBScope()
-    hash <- makeHash(features, RTWindow, calcArea, peaksParam, fallbackEIC)
+    hash <- makeHash(features, EICRTWindow, peakRTWindow, calcArea, peaksParam, fallbackEIC)
     cd <- loadCacheData("reintegrateMobilityFeatures", hash, cacheDB)
     if (!is.null(cd))
         return(cd)
@@ -946,7 +946,7 @@ reintegrateMobilityFeatures <- function(features, RTWindow, calcArea, peaksParam
     
     printf("Loading EICs...\n")
     EICSelFunc <- \(tab) tab[!is.null(tab[["mobility"]]) & !is.na(mobility)]
-    allEICs <- getFeatureEIXs(features, type = "EIC", EIXParams = getDefEIMParams(window = RTWindow),
+    allEICs <- getFeatureEIXs(features, type = "EIC", EIXParams = getDefEIMParams(window = EICRTWindow),
                               selectFunc = EICSelFunc, compress = FALSE, cacheDB = cacheDB)
     
     if (!is.null(peaksParam))
@@ -956,8 +956,9 @@ reintegrateMobilityFeatures <- function(features, RTWindow, calcArea, peaksParam
                                      cacheDB = cacheDB)
         peaksList <- Map(peaksList, featureTable(features), f = function(anaPLs, ft)
         {
-            # filter out peaks outside original retmin/retmax
-            anaPLs <- anaPLs[numGTE(ret, ft[match(EIC_ID, ID)]$retmin) & numLTE(ret, ft[match(EIC_ID, ID)]$retmax)]
+            # filter out peaks outside original retmin/retmax and with high RT deviation
+            parFT <- ft[match(anaPLs$EIC_ID, ID)]
+            anaPLs <- anaPLs[numGTE(ret, parFT$retmin) & numLTE(ret, parFT$retmax) & numLTE(abs(ret - parFT$ret), peakRTWindow)]
             # filter out all peaks for EICs with >1 result
             anaPLs[, N := .N, by = "EIC_ID"]
             return(anaPLs[N == 1][, N := NULL])

@@ -927,11 +927,12 @@ assertFindPeaksParam <- function(x, null.ok = FALSE, .var.name = checkmate::vnam
 }
 
 assertFindMobilitiesArgs <- function(mobPeaksParam, mzWindow, IMSWindow, clusterMethod, minIntensityIMS,
-                                     maxMSRTWindow, chromPeaksParam, RTWindow, calcArea, fallbackEIC, parallel, add)
+                                     maxMSRTWindow, chromPeaksParam, EICRTWindow, peakRTWindow, calcArea,
+                                     fallbackEIC, parallel, add)
 {
     assertFindPeaksParam(mobPeaksParam, add = add)
-    aapply(checkmate::assertNumber, . ~ mzWindow + IMSWindow + minIntensityIMS + RTWindow, finite = TRUE,
-           fixed = list(add = add))
+    aapply(checkmate::assertNumber, . ~ mzWindow + IMSWindow + minIntensityIMS + EICRTWindow + peakRTWindow,
+           finite = TRUE, fixed = list(add = add))
     assertClusterMethod(clusterMethod, add = add)
     checkmate::assertNumber(maxMSRTWindow, lower = 1, finite = TRUE, null.ok = TRUE, add = add)
     assertFindPeaksParam(chromPeaksParam, null.ok = TRUE, add = add)

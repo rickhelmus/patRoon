@@ -1393,7 +1393,7 @@ setMethod("findMobilities", "featureGroups", function(fGroups, mobPeaksParam, mz
         return(fGroups) # nothing to do...
     
     fGroups@features <- assignFeatureMobilitiesPeaks(fGroups@features, mobPeaksParam, mzWindow, IMSWindow, clusterMethod,
-                                                    minIntensityIMS, maxMSRTWindow, NULL)
+                                                    minIntensityIMS, maxMSEICRTWindow)
     fGroups@features <- reintegrateMobilityFeatures(fGroups@features, EICRTWindow, peakRTWindow, calcArea,
                                                     chromPeaksParam, fallbackEIC, parallel)
     fGroups <- clusterFGroupMobilities(fGroups, IMSWindow, FALSE)

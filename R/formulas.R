@@ -207,7 +207,7 @@ setMethod("as.data.table", "formulas", function(x, fGroups = NULL, fragments = F
     {
         ret[, formula_avg_count := .N, by = "group"]
         
-        avgCols <- getAllMergedConsCols(c("ion_formula", "neutral_formula"), names(ret), mergedConsensusNames(x))
+        avgCols <- getMergedConsCols(c("ion_formula", "neutral_formula"), names(ret), mergedConsensusNames(x))
         ret[, (avgCols) := lapply(.SD, function(f)
         {
             f <- f[!is.na(f)]
@@ -386,7 +386,7 @@ setMethod("plotScores", "formulas", function(obj, index, groupName, analysis = N
         annTable <- normalizeAnnScores(annTable, annScoreNames(obj, TRUE), obj@scoreRanges[[groupName]], mcnAll,
                                        normalizeScores == "minmax", excludeNormScores)
     
-    scoreCols <- getAllMergedConsCols(annScoreNames(obj, FALSE), names(annTable), mcnAll)
+    scoreCols <- getMergedConsCols(annScoreNames(obj, FALSE), names(annTable), mcnAll)
 
     makeScoresPlot(annTable[index, scoreCols, with = FALSE], mcn)
 })

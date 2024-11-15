@@ -158,19 +158,7 @@ setMethod("[", c("featureGroupsScreening", "ANY", "ANY", "missing"), function(x,
 
 #' @rdname featureGroupsScreening-class
 #' @export
-setMethod("delete", "featureGroupsScreening", function(obj, i = NULL, j = NULL, k = NULL, ...)
-{
-    if (!is.null(k))
-    {
-        if (!is.null(i))
-            stop("Cannot specify i and k arguments simultaneously.", call. = FALSE)
-        return(delScreening(obj, j, k))
-    }
-    
-    obj <- callNextMethod()
-    obj@screenInfo <- obj@screenInfo[group %in% names(obj)]
-    return(obj)
-})
+setMethod("delete", "featureGroupsScreening", doSFGroupsScreeningDelete)
 
 #' @rdname pred-quant
 #' @export
@@ -218,37 +206,7 @@ setMethod("predictRespFactors", "featureGroupsScreening", function(obj, calibran
 
 #' @rdname pred-tox
 #' @export
-setMethod("predictTox", "featureGroupsScreening", function(obj, LC50Mode = "static", concUnit = "ugL")
-{
-    checkPackage("MS2Tox", "kruvelab/MS2Tox")
-    
-    checkmate::assertChoice(LC50Mode, c("static", "flow"))
-    assertConcUnit(concUnit)
-    
-    if (length(obj) == 0)
-        return(obj)
-    
-    scr <- screenInfo(obj)
-    if (is.null(scr[["SMILES"]]) || all(is.na(scr$SMILES)))
-        stop("Suspects lack necessary SMILES information to perform calculations, aborting...", call. = FALSE)
-    if (any(is.na(scr$SMILES)))
-        warning("Some suspect SMILES are NA and will be ignored", call. = FALSE)
-    
-    # avoid duplicate calculations if there happen to be suspects with the same SMILES
-    inpSMILES <- unique(screenInfo(obj)$SMILES)
-    inpSMILES <- inpSMILES[!is.na(inpSMILES)]
-    
-    printf("Predicting LC50 values from SMILES with MS2Tox for %d suspects...\n", length(inpSMILES))
-    pr <- predictLC50SMILES(inpSMILES, LC50Mode, concUnit)
-    
-    if (!is.null(scr[["LC50_SMILES"]]))
-        scr[, LC50_SMILES := NULL] # clearout for merge below
-    scr <- merge(scr, pr, by = "SMILES", sort = FALSE, all.x = TRUE)
-    
-    obj@screenInfo <- scr
-    
-    return(obj)
-})
+setMethod("predictTox", "featureGroupsScreening", doPredictToxSuspects)
 
 #' @rdname pred-quant
 #' @export
@@ -730,27 +688,7 @@ setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindo
 #' @param amend If \code{TRUE} then screening results will be \emph{amended} to the original object.
 #' @rdname suspect-screening
 #' @export
-setMethod("screenSuspects", "featureGroupsScreening", function(fGroups, suspects, rtWindow, mzWindow, IMSWindow,
-                                                               adduct, skipInvalid, prefCalcChemProps, neutralChemProps,
-                                                               minMobilityMatches, onlyHits, amend = FALSE)
-{
-    aapply(checkmate::assertFlag, . ~ onlyHits + amend)
-
-    fGroupsScreened <- callNextMethod(fGroups, suspects, rtWindow, mzWindow, IMSWindow, adduct, skipInvalid,
-                                      prefCalcChemProps, neutralChemProps, minMobilityMatches, onlyHits)
-    if (!amend)
-        return(fGroupsScreened)
-    
-    # amend screening results
-    
-    fGroups@screenInfo <- rbind(fGroups@screenInfo, fGroupsScreened@screenInfo, fill = TRUE)
-    fGroups@screenInfo <- unique(fGroups@screenInfo, by = c("name", "group"))
-    
-    if (onlyHits)
-        fGroups <- fGroups[, fGroups@screenInfo$group]
-    
-    return(fGroups)
-})
+setMethod("screenSuspects", "featureGroupsScreening", doScreenSuspectsAmend)
 
 #' @details \code{numericIDLevel} Extracts the numeric part of a given
 #'   identification level (\emph{e.g.} \code{"3a"} becomes \samp{3}).

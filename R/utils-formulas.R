@@ -328,7 +328,7 @@ rankFormulaTable <- function(formTable)
 
 calculateFormScoreRanges <- function(formTable, mConsNames)
 {
-    scoreCols <- getAllMergedConsCols(formScoreNames(FALSE), names(formTable), mConsNames)
+    scoreCols <- getMergedConsCols(formScoreNames(FALSE), names(formTable), mConsNames)
     return(setNames(lapply(scoreCols,
                            function(sc) if (any(!is.na(formTable[[sc]]))) range(formTable[[sc]], na.rm = TRUE) else c(NA, NA)),
                     scoreCols))
@@ -433,13 +433,13 @@ getFormInfoList <- function(formTable, index, mConsNames, useHTML)
     if (useHTML)
     {
         resultRow[, neutral_formula := subscriptFormulaHTML(neutral_formula)]
-        ionFormCols <- getAllMergedConsCols("ion_formula", names(resultRow), mConsNames)
+        ionFormCols <- getMergedConsCols("ion_formula", names(resultRow), mConsNames)
         resultRow[, (ionFormCols) := lapply(mget(ionFormCols), subscriptFormulaHTML)]
     }
     
     addValText <- function(curText, fmt, col)
     {
-        cols <- getAllMergedConsCols(col, names(resultRow), mConsNames)
+        cols <- getMergedConsCols(col, names(resultRow), mConsNames)
 
         ret <- character()
         for (cl in cols)

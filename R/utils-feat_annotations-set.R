@@ -47,12 +47,12 @@ makeFeatAnnSetConsensus <- function(setObjects, origFGNames, setThreshold, setTh
             ct[, c("set", "setsCount", "setsMergedCount", rname) := .(s, 1, 1, seq_len(.N))]
             
             # rename cols that are specific to a set or algo consensus or should otherwise not be combined
-            cols <- getAllMergedConsCols(c(
-                "fragInfo", "rank", "mergedBy", "coverage", "explainedPeaks", "ion_formula", "ion_formula_mz",
-                "precursorType", "libPeaksCompared", "libPeaksTotal", "annSim", "estIDLevel"
+            cols <- getMergedConsCols(c(
+                "fragInfo", "rank", "mergedBy", "coverage", "explainedPeaks", "ion_formula", "ion_formula_mz", "precursorType",
+                "libPeaksCompared", "libPeaksTotal", "annSim", "estIDLevel"
             ), names(ct), mConsNames)
             if (!setAvgSpecificScores)
-                cols <- c(cols, getAllMergedConsCols(featAnnSetSpecificScoreCols(), names(ct), mConsNames))
+                cols <- c(cols, getMergedConsCols(featAnnSetSpecificScoreCols(), names(ct), mConsNames))
             if (length(cols) > 0)
                 setnames(ct, cols, paste0(cols, "-", s))
             
@@ -70,8 +70,8 @@ makeFeatAnnSetConsensus <- function(setObjects, origFGNames, setThreshold, setTh
             
             # UNDONE: below cols are specific to compounds --> make method?
             combineCols <- c("compoundName", "compoundName2", "identifier", "relatedCIDs")
-            combineColsBoth <- intersect(getAllMergedConsCols(combineCols, names(left), mConsNames),
-                                         getAllMergedConsCols(combineCols, names(right), mConsNames))
+            combineColsBoth <- intersect(getMergedConsCols(combineCols, names(left), mConsNames),
+                                         getMergedConsCols(combineCols, names(right), mConsNames))
             otherColsBoth <- setdiff(intersect(names(left), names(right)),
                                      c(scoreColsBoth, combineColsBoth, "set"))
             colsOnlyRight <- setdiff(names(right), names(left))
@@ -120,7 +120,7 @@ makeFeatAnnSetConsensus <- function(setObjects, origFGNames, setThreshold, setTh
             ct[, (scCols) := lapply(.SD, function(x) x / setsMergedCount), .SDcols = scCols]
         
         # re-sort by avg rank scores
-        rnames <- getAllMergedConsCols("rank", names(ct), names(setObjects))
+        rnames <- getMergedConsCols("rank", names(ct), names(setObjects))
         ncand <- nrow(ct)
         ct[, rankScore := {
             invRanks <- (ncand - (unlist(.SD) - 1)) / ncand
@@ -135,7 +135,7 @@ makeFeatAnnSetConsensus <- function(setObjects, origFGNames, setThreshold, setTh
         ct[, c("setsCount", "setsMergedCount") := NULL]
         
         # assign non-set specific annSims
-        asnames <- getAllMergedConsCols("annSim", names(ct), names(setObjects))
+        asnames <- getMergedConsCols("annSim", names(ct), names(setObjects))
         ct[, annSim := do.call(pmax, c(.SD, list(na.rm = TRUE))), .SDcols = asnames]
         
         return(ct)
@@ -270,7 +270,7 @@ doFeatAnnConsensusSets <- function(allAnnObjs, MSPeakLists, specSimParams, label
     cons <- lapply(cons, function(at)
     {
         at <- copy(at)
-        cols <- getAllMergedConsCols("mergedBy", names(at), names(setObjects))
+        cols <- getMergedConsCols("mergedBy", names(at), names(setObjects))
         at[, mergedBy := {
             # collapse all cols with comma, split by comma, take unique, re-collapse with comma
             allMB <- unlist(mget(cols))
@@ -338,7 +338,7 @@ doFeatAnnDeleteSets <- function(obj, i, j, ...)
     # update ranks
     obj@groupAnnotations <- Map(obj@groupAnnotations, groupNames(obj), f = function(at, grp)
     {
-        rankCols <- getAllMergedConsCols("rank", names(at), mergedConsensusNames(obj))
+        rankCols <- getMergedConsCols("rank", names(at), mergedConsensusNames(obj))
         at[, (rankCols) := lapply(rankCols, function(rc)
         {
             s <- sub("^rank\\-", "", rc)

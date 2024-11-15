@@ -377,13 +377,13 @@ reportHTMLUtils$methods(
         {
             ft <- formulas[[tab$group[index]]][tab$candidate[index]]
             ft <- ft[, setdiff(names(ft), names(tab)), with = FALSE]
-            takeCols <- getAllMergedConsCols(c("neutral_formula", "ion_formula", "neutralMass", "ion_formula_mz",
+            takeCols <- getMergedConsCols(c("neutral_formula", "ion_formula", "neutralMass", "ion_formula_mz",
                                                "error", "error_frag_median", "error_frag_median_abs",
                                                "explainedPeaks", "explainedIntensity"), names(ft), mcn)
             ft <- ft[, takeCols, with = FALSE]
-            for (col in getAllMergedConsCols(c("neutral_formula", "ion_formula"), names(ft), mcn))
+            for (col in getMergedConsCols(c("neutral_formula", "ion_formula"), names(ft), mcn))
                 set(ft, j = col, value = subscriptFormulaHTML(ft[[col]]))
-            massCols <- getAllMergedConsCols(c("neutralMass", "ion_formula_mz"), names(ft), mcn)
+            massCols <- getMergedConsCols(c("neutralMass", "ion_formula_mz"), names(ft), mcn)
             numCols <- names(ft)[sapply(ft, is.numeric)]
             for (col in numCols)
                 set(ft, j = col, value = round(ft[[col]], if (col %chin% massCols) 5 else 2))
@@ -401,7 +401,7 @@ reportHTMLUtils$methods(
         getScoreDetails <- function(index)
         {
             fRow <- formulas[[tab$group[index]]][tab$candidate[index]]
-            cols <- getAllMergedConsCols(annScoreNames(formulas, FALSE), names(fRow), mcn)
+            cols <- getMergedConsCols(annScoreNames(formulas, FALSE), names(fRow), mcn)
             return(makeAnnScoreReact(fRow[, cols, with = FALSE],
                                      if (isFGSet(objects$fGroups)) sets(objects$fGroups) else NULL))
         }
@@ -541,7 +541,7 @@ reportHTMLUtils$methods(
                 # TP DB
                 "parent", "transformation", "enzyme", "evidencedoi"
             )
-            ct <- ct[, getAllMergedConsCols(takeCols, names(ct), mcn), with = FALSE]
+            ct <- ct[, getMergedConsCols(takeCols, names(ct), mcn), with = FALSE]
             
             if (!is.null(tab[["compoundName"]]) && !is.null(tab[["compoundName2"]]))
                 set(ct, j = "compoundName2", value = NULL) # already in main table compoundName column
@@ -552,7 +552,7 @@ reportHTMLUtils$methods(
             for (col in numCols)
                 set(ct, j = col, value = round(ct[[col]], 2))
             
-            for (col in getAllMergedConsCols(c("identifier", "relatedCIDs"), names(ct), mcn))
+            for (col in getMergedConsCols(c("identifier", "relatedCIDs"), names(ct), mcn))
             {
                 # get db: handle consensus results
                 cn <- sub("identifier|relatedCIDs", "", col)
@@ -575,7 +575,7 @@ reportHTMLUtils$methods(
         getScoreDetails <- function(index)
         {
             cRow <- compounds[[tab$group[index]]][tab$candidate[index]]
-            cols <- getAllMergedConsCols(annScoreNames(compounds, FALSE), names(cRow), mcn)
+            cols <- getMergedConsCols(annScoreNames(compounds, FALSE), names(cRow), mcn)
             return(makeAnnScoreReact(cRow[, cols, with = FALSE],
                                      if (isFGSet(objects$fGroups)) sets(objects$fGroups) else NULL))
         }

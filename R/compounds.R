@@ -84,7 +84,7 @@ setMethod("annScoreNames", "compounds", function(obj, onlyNums)
         # exclude suspect presence 'scores'
         suspScores <- compoundScorings("metfrag")
         suspScores <- suspScores[suspScores$suspect_list == TRUE, ]
-        suspCols <- getAllMergedConsCols(suspScores, ret, mergedConsensusNames(obj))
+        suspCols <- getMergedConsCols(suspScores, ret, mergedConsensusNames(obj))
         ret <- setdiff(ret, suspCols)
     }
     return(ret)
@@ -344,7 +344,7 @@ setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeSc
         annTable <- normalizeAnnScores(annTable, annScoreNames(obj, TRUE), obj@scoreRanges[[groupName]], mcnAll,
                                        normalizeScores == "minmax", excludeNormScores)
     
-    scoreCols <- getAllMergedConsCols(annScoreNames(obj, FALSE), names(annTable), mcnAll)
+    scoreCols <- getMergedConsCols(annScoreNames(obj, FALSE), names(annTable), mcnAll)
     if (onlyUsed)
         scoreCols <- intersect(scoreCols, obj@scoreTypes)
     

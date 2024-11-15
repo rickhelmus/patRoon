@@ -341,7 +341,7 @@ setMethod("filter", "featureAnnotations", function(obj, minExplainedPeaks = NULL
         {
             for (sc in names(scoreLimits))
             {
-                cols <- getAllMergedConsCols(sc, names(annTable), mConsNames)
+                cols <- getMergedConsCols(sc, names(annTable), mConsNames)
                 if (length(cols) == 0)
                     next
                 
@@ -391,7 +391,7 @@ setMethod("filter", "featureAnnotations", function(obj, minExplainedPeaks = NULL
         
         if (!is.null(maxLevel))
         {
-            cols <- getAllMergedConsCols("estIDLevel", names(annTable), mConsNames)
+            cols <- getMergedConsCols("estIDLevel", names(annTable), mConsNames)
             if (length(cols) == 0)
                 stop("No estimated identification levels found. Please run estimateIDLevels() first.", call. = FALSE)
             

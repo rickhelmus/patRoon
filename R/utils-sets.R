@@ -56,7 +56,7 @@ verifyNoAdductIonizationArg <- function(adduct)
 assignSetsIDLs <- function(tab, mcn)
 {
     tab <- copy(tab)
-    cols <- getAllMergedConsCols("estIDLevel", names(tab), mcn)
+    cols <- getMergedConsCols("estIDLevel", names(tab), mcn)
     
     if (length(cols) == 0)
         return(tab)

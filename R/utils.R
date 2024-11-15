@@ -661,7 +661,7 @@ readYAML <- function(f) yaml::read_yaml(f, eval.expr = FALSE)
 writeYAML <- function(...) yaml::write_yaml(..., indent = 4)
 
 # get a vector of all (merged) columns
-getAllMergedConsCols <- function(targetCols, allCols, mConsNames)
+getMergedConsCols <- function(targetCols, allCols, mConsNames)
 {
     if (length(mConsNames) > 0)
         targetCols <- c(targetCols, sapply(targetCols, function(cl) paste0(cl, "-", mConsNames), USE.NAMES = FALSE))
@@ -929,10 +929,10 @@ estimateIdentificationLevel <- function(candidateName, candidateFGroup, candidat
                 
                 if (isForm)
                     levelOK <- checkAnnotationScore(val, type, formRank, fRow, formTable, fRowNorm, formTableNorm,
-                                                    getAllMergedConsCols(type, names(formTable), mFormNames))
+                                                    getMergedConsCols(type, names(formTable), mFormNames))
                 else
                     levelOK <- checkAnnotationScore(val, type, compRank, cRow, compTable, cRowNorm, compTableNorm,
-                                                    getAllMergedConsCols(type, names(compTable), mCompNames))
+                                                    getMergedConsCols(type, names(compTable), mCompNames))
                 
                 if (!isTRUE(levelOK))
                 {

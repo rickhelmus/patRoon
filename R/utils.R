@@ -668,6 +668,9 @@ getMergedConsCols <- function(targetCols, allCols, mConsNames)
     return(intersect(targetCols, allCols))
 }
 
+# get all columns that were merged
+getAllMergedConsCols <- function(allCols, mConsNames) grep(sprintf("\\-(%s)$", paste0(mConsNames, collapse = "|")), allCols, value = TRUE)
+
 getDuplicatedStrings <- function(x) names(which(table(x) > 1))
 
 doApply <- function(applyf, doPar, data, ..., prog = TRUE)

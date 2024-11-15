@@ -322,6 +322,29 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, IMSWindow, m
     return(ret[])
 }
 
+# method definition for screening methods of screenSuspects()
+doScreenSuspectsAmend <- function(fGroups, suspects, rtWindow, mzWindow, IMSWindow,
+                                  adduct, skipInvalid, prefCalcChemProps, neutralChemProps,
+                                  minMobilityMatches, onlyHits, amend = FALSE)
+{
+    aapply(checkmate::assertFlag, . ~ onlyHits + amend)
+    
+    fGroupsScreened <- callNextMethod(fGroups, suspects, rtWindow, mzWindow, IMSWindow, adduct, skipInvalid,
+                                      prefCalcChemProps, neutralChemProps, minMobilityMatches, onlyHits)
+    if (!amend)
+        return(fGroupsScreened)
+    
+    # amend screening results
+    
+    fGroups@screenInfo <- rbind(fGroups@screenInfo, fGroupsScreened@screenInfo, fill = TRUE)
+    fGroups@screenInfo <- unique(fGroups@screenInfo, by = c("name", "group"))
+    
+    if (onlyHits)
+        fGroups <- fGroups[, fGroups@screenInfo$group]
+    
+    return(fGroups)
+}
+
 delScreening <- function(fGroups, j, k)
 {
     scr <- copy(screenInfo(fGroups))
@@ -352,6 +375,21 @@ delScreening <- function(fGroups, j, k)
     scr <- scr[keep == TRUE][, keep := NULL][]
     fGroups@screenInfo <- scr
     return(fGroups)
+}
+
+doSFGroupsScreeningDelete <- function(obj, i = NULL, j = NULL, k = NULL, ...)
+{
+    if (!is.null(k))
+    {
+        if (!is.null(i))
+            stop("Cannot specify i and k arguments simultaneously.", call. = FALSE)
+        return(delScreening(obj, j, k))
+    }
+    
+    # NOTE: this function is a method definition, so we can call callNextMethod()
+    obj <- callNextMethod()
+    obj@screenInfo <- obj@screenInfo[group %chin% names(obj)]
+    return(obj)
 }
 
 # used by groupFeatures methods for featuresSuspects
@@ -546,4 +584,37 @@ annotatedMSMSSimilarity <- function(annPL, specSimParams)
     
     return(drop(specDistRect(list(annPLAnn), list(annPL), specSimParams$method, "none", 0, 0,
                              specSimParams$mzWeight, specSimParams$intWeight, specSimParams$absMzDev)))
+}
+
+# used as predictTox method definitions
+doPredictToxSuspects <-  function(obj, LC50Mode = "static", concUnit = "ugL")
+{
+    checkPackage("MS2Tox", "kruvelab/MS2Tox")
+    
+    checkmate::assertChoice(LC50Mode, c("static", "flow"))
+    assertConcUnit(concUnit)
+    
+    if (length(obj) == 0)
+        return(obj)
+    
+    scr <- screenInfo(obj)
+    if (is.null(scr[["SMILES"]]) || all(is.na(scr$SMILES)))
+        stop("Suspects lack necessary SMILES information to perform calculations, aborting...", call. = FALSE)
+    if (any(is.na(scr$SMILES)))
+        warning("Some suspect SMILES are NA and will be ignored", call. = FALSE)
+    
+    # avoid duplicate calculations if there happen to be suspects with the same SMILES
+    inpSMILES <- unique(screenInfo(obj)$SMILES)
+    inpSMILES <- inpSMILES[!is.na(inpSMILES)]
+    
+    printf("Predicting LC50 values from SMILES with MS2Tox for %d suspects...\n", length(inpSMILES))
+    pr <- predictLC50SMILES(inpSMILES, LC50Mode, concUnit)
+    
+    if (!is.null(scr[["LC50_SMILES"]]))
+        scr[, LC50_SMILES := NULL] # clearout for merge below
+    scr <- merge(scr, pr, by = "SMILES", sort = FALSE, all.x = TRUE)
+    
+    obj@screenInfo <- scr
+    
+    return(obj)
 }

@@ -111,12 +111,9 @@ mergeScreeningSetInfos <- function(setObjects, sInfos = lapply(setObjects, scree
     return(scrInfo[])
 }
 
-syncScreeningSetObjects <- function(obj)
+syncScreeningSetObjects <- function(obj, unsetFGroups)
 {
-    # BUG? can't call "[" directly here to subset??
-    # obj@setObjects <- lapply(obj@setObjects, "[", i = analyses(obj), j = groupNames(obj))
-    obj@setObjects <- lapply(obj@setObjects, function(x) x[analyses(obj), groupNames(obj)])
-    newsi <- mergeScreeningSetInfos(obj@setObjects)
+    newsi <- mergeScreeningSetInfos(unsetFGroups)
 
     # retain sets form/comp ranks and estIDLevel    
     oldsi <- screenInfo(obj)
@@ -127,21 +124,6 @@ syncScreeningSetObjects <- function(obj)
     }
 
     obj@screenInfo <- newsi[]
-    return(obj)
-}
-
-updateSOScreeningInfo <- function(obj)
-{
-    newsi <- screenInfo(obj)
-    
-    obj@setObjects <- lapply(obj@setObjects, function(so)
-    {
-        sosi <- copy(screenInfo(so))
-        sosi[, keep := FALSE]
-        sosi[newsi, keep := TRUE, on = c("group", "name")] # mark overlap
-        so@screenInfo <- sosi[keep == TRUE, -"keep"]
-        return(so)
-    })
     return(obj)
 }
 
@@ -177,7 +159,7 @@ updateSOScreeningInfo <- function(obj)
 #' @export
 featureGroupsScreeningSet <- setClass("featureGroupsScreeningSet",
                                       slots = c(screenInfo = "data.table"),
-                                      contains = c("featureGroupsSet", "workflowStepSet"))
+                                      contains = "featureGroupsSet")
 
 setMethod("initialize", "featureGroupsScreeningSet",
           function(.Object, ...) callNextMethod(.Object, algorithm = "screening-set", ...))
@@ -205,19 +187,28 @@ setMethod("[", c("featureGroupsScreeningSet", "ANY", "ANY", "missing"), function
     checkmate::assertCharacter(suspects, null.ok = TRUE)
     assertSets(x, sets, TRUE)
     
+    curSets <- get("sets", pos = 2)(x)
+    
     x <- callNextMethod(x, i, j, ..., ni = ni, rGroups = rGroups, sets = sets, reorder = reorder, drop = drop)
     
     if (!is.null(suspects))
-    {
-        x@setObjects <- lapply(x@setObjects, "[", suspects = suspects)
-        # --> groups may have been removed
-        x <- x[, unique(unlist(lapply(x@setObjects, groupNames)))]
-    }    
+        x <- x[, x@screenInfo[name %in% suspects]$group]
 
     if (!is.null(sets))
     {
-        x@setObjects <- x@setObjects[sets]
-        x <- syncScreeningSetObjects(x)
+        # get rid of set specific columns for removed sets
+        rmSets <- setdiff(curSets, sets)
+        rmCols <- getAllMergedConsCols(names(x@screenInfo), rmSets)
+        if (length(rmCols) > 0)
+            x@screenInfo[, (rmCols) := NULL]
+        
+        # update sets assignments and get rid of set specific rows
+        newSets <- sets
+        x@screenInfo[, sets := {
+            sv <- unlist(strsplit(sets, ",", fixed = TRUE))
+            paste0(intersect(newSets, sv), collapse = ",")
+        }, by = seq_len(nrow(x@screenInfo))][]
+        x@screenInfo <- x@screenInfo[nzchar(sets) == TRUE]
     }
     
     return(x)
@@ -225,22 +216,7 @@ setMethod("[", c("featureGroupsScreeningSet", "ANY", "ANY", "missing"), function
 
 #' @rdname featureGroupsScreening-class
 #' @export
-setMethod("delete", "featureGroupsScreeningSet", function(obj, i = NULL, j = NULL, k = NULL, ...)
-{
-    if (!is.null(k))
-    {
-        if (!is.null(i))
-            stop("Cannot specify i and k arguments simultaneously.", call. = FALSE)
-        obj <- delScreening(obj, j, k)
-        return(updateSOScreeningInfo(obj))
-    }
-    
-    oldn <- length(obj)
-    obj <- callNextMethod()
-    if (length(obj) != oldn)
-        obj <- syncScreeningSetObjects(obj)
-    return(obj)
-})
+setMethod("delete", "featureGroupsScreeningSet", doSFGroupsScreeningDelete)
 
 #' @rdname featureGroupsScreening-class
 #' @export
@@ -259,29 +235,24 @@ setMethod("annotateSuspects", "featureGroupsScreeningSet", function(fGroups, MSP
            c("MSPeakListsSet", "formulasSet", "compoundsSet"), null.ok = TRUE, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
+    unsetFGroups <- sapply(sets(fGroups), unset, obj = fGroups, simplify = FALSE)
     unsetMSPeakLists <- checkAndUnSetOther(sets(fGroups), MSPeakLists, "MSPeakLists", TRUE)
     unsetFormulas <- checkAndUnSetOther(sets(fGroups), formulas, "formulas", TRUE)
     unsetCompounds <- checkAndUnSetOther(sets(fGroups), compounds, "compounds", TRUE)
     
     logPath <- if (is.null(logPath)) rep(list(NULL), length(sets(fGroups))) else file.path(logPath, sets(fGroups))
     
-    fGroups@setObjects <- Map(setObjects(fGroups), unsetMSPeakLists, unsetFormulas, unsetCompounds, logPath = logPath,
-                              f = annotateSuspects, MoreArgs = list(absMzDev = absMzDev,
-                                                                    specSimParams = specSimParams,
-                                                                    checkFragments = checkFragments,
-                                                                    formulasNormalizeScores = formulasNormalizeScores,
-                                                                    compoundsNormalizeScores = compoundsNormalizeScores,
-                                                                    IDFile = IDFile))
+    unsetFGroups <- Map(unsetFGroups, unsetMSPeakLists, unsetFormulas, unsetCompounds, logPath = logPath,
+                        f = annotateSuspects, MoreArgs = list(absMzDev = absMzDev,
+                                                              specSimParams = specSimParams,
+                                                              checkFragments = checkFragments,
+                                                              formulasNormalizeScores = formulasNormalizeScores,
+                                                              compoundsNormalizeScores = compoundsNormalizeScores,
+                                                              IDFile = IDFile))
     
-    # clear old set cols if present
-    cols <- c("formRank", "compRank", "estIDLevel")
-    if (any(cols %in% names(screenInfo(fGroups))))
-    {
-        fGroups@screenInfo <- copy(fGroups@screenInfo)
-        fGroups@screenInfo[, intersect(cols, names(screenInfo(fGroups))) := NULL]
-    }
-    
-    fGroups <- syncScreeningSetObjects(fGroups)
+    # re-generate so that annotation specific columns are added
+    # NOTE: this will also clearout any previously added annotation columns
+    fGroups@screenInfo <- mergeScreeningSetInfos(unsetFGroups)
     
     # add non set specific columns
 
@@ -342,30 +313,14 @@ setMethod("filter", "featureGroupsScreeningSet", function(obj, ..., onlyHits = N
            fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
-    oldsi <- screenInfo(obj)
-    # NOTE: we do onlyHits later, as otherwise doSuspectFilter() might cause set synchronization (via delete()) whereas
-    # the setObjects are not updated yet
-    obj <- doSuspectFilter(obj, onlyHits = NULL, selectHitsBy, selectBestFGroups, maxLevel, maxFormRank, maxCompRank,
+    obj <- doSuspectFilter(obj, onlyHits = onlyHits, selectHitsBy, selectBestFGroups, maxLevel, maxFormRank, maxCompRank,
                            minAnnSimForm, minAnnSimComp, minAnnSimBoth, absMinFragMatches, relMinFragMatches, minRF,
                            maxLC50, negate)
-    suspFiltered <- !isTRUE(all.equal(oldsi, screenInfo(obj)))
-    
-    if (suspFiltered)
-        obj <- updateSOScreeningInfo(obj)
-    
-    if (!is.null(onlyHits))
-        obj <- doSuspectFilter(obj, onlyHits = onlyHits, selectHitsBy = NULL, selectBestFGroups = FALSE, maxLevel = NULL,
-                               maxFormRank = NULL, maxCompRank = NULL, minAnnSimForm = NULL, minAnnSimComp = NULL,
-                               minAnnSimBoth = NULL, absMinFragMatches = NULL, relMinFragMatches = NULL, minRF = NULL,
-                               maxLC50 = NULL, negate = negate)
     
     # filter functionality from fGroupsSet
     if (...length() > 0)
         obj <- callNextMethod(obj, ..., negate = negate)
     
-    if (...length() > 0 || suspFiltered || !is.null(onlyHits))
-        obj <- syncScreeningSetObjects(obj)
-
     return(obj)
 })
 
@@ -378,8 +333,9 @@ setMethod("predictRespFactors", "featureGroupsScreeningSet", function(obj, calib
     
     checkmate::assertList(calibrants, types = "data.frame", any.missing = FALSE, len = length(sets(obj)))
     
-    obj@setObjects <- Map(setObjects(obj), calibrants, f = predictRespFactors, MoreArgs = list(...))
-    obj <- syncScreeningSetObjects(obj)
+    unsetFGroups <- sapply(sets(fGroups), unset, obj = fGroups, simplify = FALSE)
+    unsetFGroups <- Map(unsetFGroups, calibrants, f = predictRespFactors, MoreArgs = list(...))
+    obj <- syncScreeningSetObjects(obj, unsetFGroups)
     
     return(obj)
     
@@ -387,13 +343,7 @@ setMethod("predictRespFactors", "featureGroupsScreeningSet", function(obj, calib
 
 #' @rdname pred-tox
 #' @export
-setMethod("predictTox", "featureGroupsScreeningSet", function(obj, ...)
-{
-    obj@setObjects <- lapply(setObjects(obj), predictTox, ...)
-    obj <- syncScreeningSetObjects(obj)
-    return(obj)
-    
-})
+setMethod("predictTox", "featureGroupsScreeningSet", doPredictToxSuspects)
 
 #' @rdname pred-quant
 #' @export
@@ -448,13 +398,29 @@ setMethod("findMobilities", "featureGroupsScreeningSet", function(fGroups, mobPe
     
     gInfo <- groupInfo(fGroups)
     scr <- expandAndUpdateScreenInfoForIMS(screenInfo(fGroups), gInfo)
+    
+    mySets <- sets(fGroups)
+    fgSetNames <- sapply(mySets, function(s) names(fGroups[, sets = s]), simplify = FALSE)
+
+    # Prune hits that are not actually in set: the data for mobility feature groups is copied from their parents, while
+    # the actual mobility feature group may not be in the same sets.
+    for (i in seq_len(nrow(scr)))
+    {
+        curSets <- unlist(strsplit(scr$sets[i], ",", fixed = TRUE))
+        groupSets <- mySets[sapply(fgSetNames, function(n) scr$group[i] %chin% n)] # actual set presence of fGroup
+        
+        # update set assignment
+        newSets <- intersect(curSets, groupSets)
+        set(scr, i = i, j = "sets", paste0(newSets, collapse = ","))
+        
+        # set copied values from to NA from cleared out sets
+        rmSets <- setdiff(curSets, newSets)
+        NACols <- getAllMergedConsCols(names(scr), rmSets)
+        set(scr, i = i, j = NACols, NA)
+    }
+
     scr <- finalizeScreenInfoForIMS(scr, gInfo, minMobilityMatches, IMSWindow)
     fGroups@screenInfo <- scr
-    
-    # update setObjects: there are quite a few things to be updated for a full sync, ie addition of new features and
-    # feature groups, groupInfo, screenInfo, ... We take a shortcut here by simply overwriting the setObjects by unset
-    # versions.
-    fGroups@setObjects <- lapply(sets(fGroups), unset, obj = fGroups)
     
     return(fGroups)
 })
@@ -481,8 +447,7 @@ setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWi
     if (onlyHits)
         fGroups <- fGroups[, scr$group]
     
-    return(featureGroupsScreeningSet(screenInfo = scr, setObjects = setObjects,
-                                     groupAlgo = fGroups@groupAlgo, groupArgs = fGroups@groupArgs,
+    return(featureGroupsScreeningSet(screenInfo = scr, groupAlgo = fGroups@groupAlgo, groupArgs = fGroups@groupArgs,
                                      groupVerbose = fGroups@groupVerbose, groups = copy(groupTable(fGroups)),
                                      groupInfo = copy(groupInfo(fGroups)), features = getFeatures(fGroups),
                                      ftindex = copy(groupFeatIndex(fGroups)),
@@ -496,33 +461,7 @@ setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWi
 
 #' @rdname suspect-screening
 #' @export
-setMethod("screenSuspects", "featureGroupsScreeningSet", function(fGroups, suspects, rtWindow, mzWindow, IMSWindow,
-                                                                  adduct, skipInvalid, prefCalcChemProps,
-                                                                  neutralChemProps, minMobilityMatches, onlyHits,
-                                                                  amend = FALSE)
-{
-    aapply(checkmate::assertFlag, . ~ onlyHits + amend)
-    
-    fGroupsScreened <- callNextMethod(fGroups, suspects, rtWindow, mzWindow, IMSWindow, adduct, skipInvalid,
-                                      prefCalcChemProps, neutralChemProps, minMobilityMatches, onlyHits)
-    if (!amend)
-        return(fGroupsScreened)
-    
-    # amend screening results
-    
-    fGroups@setObjects <- Map(fGroups@setObjects, fGroupsScreened@setObjects, f = function(so, sos)
-    {
-        so@screenInfo <- rbind(so@screenInfo, sos@screenInfo, fill = TRUE)
-        so@screenInfo <- unique(so@screenInfo, by = c("name", "group"))
-        return(so)
-    })
-    fGroups <- syncScreeningSetObjects(fGroups)
-    
-    if (onlyHits)
-        fGroups <- fGroups[, fGroups@screenInfo$group]
-    
-    return(fGroups)
-})
+setMethod("screenSuspects", "featureGroupsScreeningSet", doScreenSuspectsAmend)
 
 
 #' @rdname featureGroupsScreening-class
@@ -539,10 +478,10 @@ setMethod("unset", "featureGroupsScreeningSet", function(obj, set)
     uobj <- callNextMethod()
     
     obj <- obj[, sets = set]
-    sInfo <- mergeScreeningSetInfos(setObjects(obj), rmSetCols = FALSE)
+    sInfo <- copy(screenInfo(obj))
     if (length(sInfo) > 0)
     {
-        sInfo[, sets := NULL]
+        sInfo <- removeDTColumnsIfPresent(sInfo, c("formRank", "compRank", "estIDLevel", "sets"))
         # restore set specific columns
         setnames(sInfo, sub(paste0("\\-", set, "$"), "", names(sInfo)))
     }

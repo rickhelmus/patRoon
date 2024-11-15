@@ -6,7 +6,7 @@ normalizeAnnScores <- function(res, scoreCols, scoreRanges, mConsNames, minMaxNo
     scoreCols <- intersect(scoreCols, names(res))
     
     if (!is.null(exclude))
-        scoreCols <- scoreCols[!scoreCols %in% getAllMergedConsCols(exclude, columns, mConsNames)]
+        scoreCols <- scoreCols[!scoreCols %in% getMergedConsCols(exclude, columns, mConsNames)]
     
     if (length(scoreCols) > 0)
     {
@@ -235,7 +235,7 @@ doFeatAnnConsensus <- function(obj, ..., rankWeights, annNames, uniqueCols)
         
         if (nrow(mAnnList[[grpi]]) > 0)
         {
-            rnames <- getAllMergedConsCols("rank", names(mAnnList[[grpi]]), annNames)
+            rnames <- getMergedConsCols("rank", names(mAnnList[[grpi]]), annNames)
             anpresent <- sub("^rank\\-", "", rnames)
             # get relevant weights with correct order
             rWeights <- rankWeights[match(anpresent, annNames)]
@@ -283,7 +283,7 @@ filterFeatAnnConsensus <- function(obj, absMinAbundance, relMinAbundance, unique
         {
             cols <- "coverage"
             if (filterAlgoCols)
-                cols <- setdiff(getAllMergedConsCols(cols, names(annTable), mcnAll), cols)
+                cols <- setdiff(getMergedConsCols(cols, names(annTable), mcnAll), cols)
             if (length(cols) == 0)
                 return(FALSE)
             at <- annTable[, cols, with = FALSE]
@@ -294,7 +294,7 @@ filterFeatAnnConsensus <- function(obj, absMinAbundance, relMinAbundance, unique
 
         cols <- "mergedBy"
         if (filterAlgoCols)
-            cols <- setdiff(getAllMergedConsCols(cols, names(annTable), mcnAll), cols)
+            cols <- setdiff(getMergedConsCols(cols, names(annTable), mcnAll), cols)
         
         if (length(cols) == 0)
             return(FALSE)

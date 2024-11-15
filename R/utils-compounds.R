@@ -171,7 +171,7 @@ getCompInfoList <- function(compResults, compIndex, mConsNames, addHTMLURL)
 
     addValText <- function(curText, fmt, cols)
     {
-        cols <- getAllMergedConsCols(cols, columns, mConsNames)
+        cols <- getMergedConsCols(cols, columns, mConsNames)
         ret <- character()
         for (cl in cols)
         {
@@ -192,13 +192,13 @@ getCompInfoList <- function(compResults, compIndex, mConsNames, addHTMLURL)
     {
         addIdURL <- function(param, ident, db) return(sprintf("%s: %s", param, makeDBIdentLink(db, ident)))
 
-        dbcols <- getAllMergedConsCols("database", columns, mConsNames)
+        dbcols <- getMergedConsCols("database", columns, mConsNames)
         
         if (!is.null(resultRow[["identifier"]])) # compounds were not merged, can use 'regular' column
             ctext <- c(ctext, addIdURL("identifier", resultRow$identifier, resultRow$database))
         else
         {
-            idcols <- getAllMergedConsCols("identifier", columns, mConsNames)
+            idcols <- getMergedConsCols("identifier", columns, mConsNames)
 
             if (allSame(resultRow[, idcols, with = FALSE])) # no need to show double ids
                 ctext <- c(ctext, addIdURL("identifier", resultRow[[idcols[1]]], resultRow[[dbcols[1]]]))
@@ -209,7 +209,7 @@ getCompInfoList <- function(compResults, compIndex, mConsNames, addHTMLURL)
             }
         }
         
-        relatedIDCols <- getAllMergedConsCols("relatedCIDs", columns, mConsNames)
+        relatedIDCols <- getMergedConsCols("relatedCIDs", columns, mConsNames)
         for (i in seq_along(relatedIDCols))
             ctext <- c(ctext, addIdURL(relatedIDCols[i], resultRow[[relatedIDCols[i]]], resultRow[[dbcols[i]]]))
     }
@@ -221,7 +221,7 @@ getCompInfoList <- function(compResults, compIndex, mConsNames, addHTMLURL)
 
     ctext <- addValText(ctext, "%s", c("compoundName", "neutral_formula", "SMILES"))
 
-    if (length(getAllMergedConsCols("InChIKey", columns, mConsNames)) > 0)
+    if (length(getMergedConsCols("InChIKey", columns, mConsNames)) > 0)
         ctext <- addValText(ctext, "%s", "InChIKey")
     else # only add InChIKey1/2 if full isn't available
         ctext <- addValText(ctext, "%s", c("InChIKey1", "InChIKey2"))

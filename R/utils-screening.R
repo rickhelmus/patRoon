@@ -15,7 +15,7 @@ suspAnnCols <- function() c("formRank", "compRank", "annSimForm", "annSimComp", 
                             "maxFragMatches", "maxFragMatchesRel", "estIDLevel")
 
 # UNDONE: remove this function? If not and it changes, then update assignSetsIDLs()
-getAllSuspCols <- function(targetCols, allCols, mConsNames) getAllMergedConsCols(targetCols, allCols, mConsNames)
+getAllSuspCols <- function(targetCols, allCols, mConsNames) getMergedConsCols(targetCols, allCols, mConsNames)
 
 doScreeningShow <- function(obj)
 {

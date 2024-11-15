@@ -23,7 +23,7 @@ getCompInfoText <- function(compResults, compIndex, addHTMLURL, normalizeScores,
     
     addValText <- function(curText, fmt, cols)
     {
-        cols <- getAllMergedConsCols(cols, columns, mConsNames)
+        cols <- getMergedConsCols(cols, columns, mConsNames)
         ret <- ""
         for (cl in cols)
         {
@@ -66,8 +66,8 @@ getCompInfoText <- function(compResults, compIndex, addHTMLURL, normalizeScores,
             ctext <- paste0(ctext, addIdURL("identifier", resultRow$identifier, resultRow$database))
         else
         {
-            idcols <- getAllMergedConsCols("identifier", columns, mConsNames)
-            dbcols <- getAllMergedConsCols("database", columns, mConsNames)
+            idcols <- getMergedConsCols("identifier", columns, mConsNames)
+            dbcols <- getMergedConsCols("database", columns, mConsNames)
             
             if (allSame(resultRow[, idcols, with = FALSE])) # no need to show double ids
                 ctext <- paste0(ctext, addIdURL("identifier", resultRow[[idcols[1]]], resultRow[[dbcols[1]]]))
@@ -83,7 +83,7 @@ getCompInfoText <- function(compResults, compIndex, addHTMLURL, normalizeScores,
     
     ctext <- addValText(ctext, "%s", c("compoundName", "formula", "SMILES"))
     
-    if (length(getAllMergedConsCols("InChIKey", columns, mConsNames)) > 0)
+    if (length(getMergedConsCols("InChIKey", columns, mConsNames)) > 0)
         ctext <- addValText(ctext, "%s", "InChIKey")
     else # only add InChIKey1/2 if full isn't available
         ctext <- addValText(ctext, "%s", c("InChIKey1", "InChIKey2"))
@@ -292,7 +292,7 @@ setMethod("compoundViewer", c("featureGroups", "MSPeakLists", "compounds"), func
             allCols <- names(ret)
             getCols <- function(col)
             {
-                ret <- getAllMergedConsCols(col, allCols, mergedConsensusNames(compounds))
+                ret <- getMergedConsCols(col, allCols, mergedConsensusNames(compounds))
                 return(ret[sapply(ret, function(cl) !all(is.na(cl)))])
             }
             

@@ -226,7 +226,7 @@ reportFormulaTable <- function(fGroups, path, formulas, normalizeScores, exclude
         {
             out <- file.path(path, sprintf("%s-%s.csv", class(fGroups), grp))
 
-            ft <- formulas[[grp]][, -getAllMergedConsCols("fragInfo", names(formulas[[grp]]),
+            ft <- formulas[[grp]][, -getMergedConsCols("fragInfo", names(formulas[[grp]]),
                                                           mergedConsensusNames(formulas)), with = FALSE]
             if (normalizeScores != "none")
                 ft <- normalizeAnnScores(ft, annScoreNames(formulas, TRUE), formulas@scoreRanges[[grp]],
@@ -333,7 +333,7 @@ reportCompoundTable <- function(fGroups, path, compounds, normalizeScores, exclu
         if (grp %in% gNames && nrow(compTable[[grp]]) > 0)
         {
             out <- file.path(path, sprintf("%s-%s.csv", class(fGroups), grp))
-            tab <- compTable[[grp]][, -getAllMergedConsCols("fragInfo", names(compTable[[grp]]),
+            tab <- compTable[[grp]][, -getMergedConsCols("fragInfo", names(compTable[[grp]]),
                                                       mergedConsensusNames(compounds)), with = FALSE]
             if (!is.null(compsCluster) && !is.null(cutcl[[grp]]))
                 tab[, cluster := cutcl[[grp]]]

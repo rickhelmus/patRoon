@@ -15,6 +15,8 @@
 - start using saveCacheDataList() on more places?
 - basic and default error handling for executeCommand()?
 - maxMSRtWindow --> maxMSRTWindow
+- BUG: unescaped set names are now used regular expressions (problem if eg dot is present when make.unique was used)
+
 
 ## TC
 
@@ -374,6 +376,10 @@
     - mobilograms
         - make setting (and use it instead of large chroms)
         - have small/big mobilograms? or put them in a separate tab instead of the table?
+
+- Tests
+    - more verification that fGroupsScreeningSets still works fine after removal of setObjects
+    
 - Docs
     - Dietrich features
     - getDefPeakParams()
@@ -388,6 +394,8 @@
     - groupInfo is now a DT
     - FIXED: suspect list assertion only checked part of the columns
     - getDefEICParams(): retWindow --> window
+    - fGroupsScreeningSet doesn't have setObjects anymore
+        - makes common operations faster
 
 
 ## Features

@@ -1142,22 +1142,26 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
     fGroups@ISTDs <- data.table()
     fGroups@ISTDAssignments <- list()
     
+    updatedFeatures <- featureTable(fGroups)
+
     if (featNorm == "istd")
     {
         # HACK: what we should do here for screening is exactly the same as screenSuspects(). So simply call that and use
         # its output...
         fGroupsScr <- screenSuspects(fGroups, suspects = standards, ...)
         fGroups@ISTDs <- screenInfo(fGroupsScr)
-        origN <- uniqueN(fGroups@ISTDs$name)
         
         # only keep hits that are present in the analyses with non-NA conc
         fGroupsWithISTD <- fGroups[, fGroups@ISTDs$group]
         fGroupsWithISTD <- fGroupsWithISTD[!is.na(normConcs) & normConcs != 0]
         fGroupsWithISTD <- minAnalysesFilter(fGroupsWithISTD, relThreshold = 1, verbose = FALSE)
+        printf("Removed %d non-ubiquitous internal standards\n", sum(!fGroups@ISTDs$group %in% names(fGroupsWithISTD)))
         
+        # don't include mobility features
+        if (hasMobilities(fGroups))
+            fGroupsWithISTD <- delete(fGroupsWithISTD, j = groupInfo(fGroupsWithISTD)[!is.na(mobility)]$group)
+
         fGroups@ISTDs <- fGroups@ISTDs[group %in% names(fGroupsWithISTD)]
-        
-        printf("Removed %d non-ubiquitous internal standards\n", origN - uniqueN(fGroups@ISTDs$name))
         
         gInfo <- groupInfo(fGroups)
         gInfoISTDs <- gInfo[group %chin% fGroups@ISTDs$group]
@@ -1177,7 +1181,7 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
         fGroups@ISTDAssignments <- fGroups@ISTDAssignments[lengths(fGroups@ISTDAssignments) > 0]
         fGroups@ISTDAssignments <- fGroups@ISTDAssignments[!names(fGroups@ISTDAssignments) %in% fGroups@ISTDs$group]
         
-        fGroups@features@features <- Map(featureTable(fGroups), normConcs, f = function(ft, nconc)
+        updatedFeatures <- Map(updatedFeatures, normConcs, f = function(ft, nconc)
         {
             ft <- copy(ft)
             
@@ -1203,11 +1207,12 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
     }
     else if (featNorm == "tic")
     {
-        fGroups@features@features <- Map(featureTable(fGroups), normConcs, f = function(ft, nconc)
+        updatedFeatures <- Map(updatedFeatures, normConcs, f = function(ft, nconc)
         {
             ft <- copy(ft)
-            nint <- normFunc(ft$intensity) * nconc
-            narea <- normFunc(ft$area) * nconc
+            ftSub <- if (hasMobilities(fGroups)) ft[is.na(mobility)] else ft # exclude mobility features
+            nint <- normFunc(ftSub$intensity) * nconc
+            narea <- normFunc(ftSub$area) * nconc
             if (is.na(nconc) || nconc == 0 || nint == 0)
                 ft[, c("intensity_rel", "area_rel") := 0]
             else
@@ -1217,7 +1222,7 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
     }
     else if (featNorm == "conc")
     {
-        fGroups@features@features <- Map(featureTable(fGroups), normConcs, f = function(ft, nconc)
+        updatedFeatures <- Map(updatedFeatures, normConcs, f = function(ft, nconc)
         {
             ft <- copy(ft)
             if (is.na(nconc) || nconc == 0)
@@ -1229,7 +1234,7 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
     }
     else # "none"
     {
-        fGroups@features@features <- lapply(featureTable(fGroups), function(ft)
+        updatedFeatures <- lapply(updatedFeatures, function(ft)
         {
             ft <- copy(ft)
             ft[, c("intensity_rel", "area_rel") := .(intensity, area)]
@@ -1245,7 +1250,7 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
         nInts <- sapply(lapply(featsPerGroup, "[[", "intensity_rel"), normFunc)
         nAreas <- sapply(lapply(featsPerGroup, "[[", "area_rel"), normFunc)
         
-        fGroups@features@features <- lapply(featureTable(fGroups), function(ft)
+        updatedFeatures <- lapply(featureTable(fGroups), function(ft)
         {
             ft <- copy(ft)
             ft[, c("intensity_rel", "area_rel") := .(intensity_rel / nInts[group],
@@ -1253,6 +1258,21 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
             return(ft)
         })
     }
+    
+    # HACK: for mobility features we keep normalization equal to their parents
+    if (hasMobilities(fGroups))
+    {
+        updatedFeatures <- lapply(updatedFeatures, function(ft)
+        {
+            ft <- copy(ft)
+            ft[!is.na(mobility), c("intensity_rel", "area_rel") := {
+                pid <- ims_parent_ID
+                ft[match(pid, ID), c("intensity_rel", "area_rel")]
+            }]
+        })
+    }
+    
+    featureTable(fGroups) <- updatedFeatures
     
     return(fGroups)
 })

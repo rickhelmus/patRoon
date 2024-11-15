@@ -1098,7 +1098,6 @@ clusterFGroupMobilities <- function(fGroups, IMSWindow, sets)
     # update ftindex
     fGroups <- reGenerateFTIndex(fGroups)
     
-    # UNDONE: what to do with ISTDs/ISTDAssignments?
     for (sl in c("groupQualities", "groupScores", "annotations", "concentrations", "toxicities"))
     {
         d <- slot(fGroups, sl)
@@ -1115,6 +1114,26 @@ clusterFGroupMobilities <- function(fGroups, IMSWindow, sets)
             
             slot(fGroups, sl) <- d
         }
+    }
+    
+    if (length(internalStandardAssignments(fGroups)) > 0)
+    {
+        # copy parent IS assignments
+        
+        addMobISTDAssigns <- function(ISA)
+        {
+            gi <- gInfo[group %chin% names(ISA) | ims_parent_group %chin% names(ISA)]
+            mobFGs <- gi[!is.na(mobility)]$group
+            mobFGParents <- gi[!is.na(mobility)]$ims_parent_group
+            browser()
+            setNames(ISA[mobFGParents], mobFGs)
+        }
+
+        if (sets)
+            fGroups@ISTDAssignments <- lapply(internalStandardAssignments(fGroups),
+                                              function(ISA) c(ISA, addMobISTDAssigns(ISA)))
+        else
+            fGroups@ISTDAssignments <- c(fGroups@ISTDAssignments, addMobISTDAssigns(internalStandardAssignments(fGroups)))
     }
     
     saveCacheData("clusterFGroupMobilities", fGroups, hash)

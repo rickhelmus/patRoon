@@ -396,6 +396,7 @@
     - getDefEICParams(): retWindow --> window
     - fGroupsScreeningSet doesn't have setObjects anymore
         - makes common operations faster
+    - FIXED: fGroupsScreeningSet now correctly stores RF_SMILES per set
 
 
 ## Features

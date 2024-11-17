@@ -554,227 +554,64 @@ setMethod("plotChordHash", "featureGroups", function(obj, ...)
 setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj), groupName = names(obj),
                                                   retMin = FALSE, showPeakArea = FALSE, showFGroupRect = TRUE,
                                                   title = NULL, groupBy = NULL, showLegend = TRUE,
-                                                  annotate = c("none", "ret", "mz"), intMax = "eic",
+                                                  annotate = c("none", "ret", "mz", "mob"), intMax = "eic",
                                                   EICParams = getDefEICParams(), showProgress = FALSE, xlim = NULL,
                                                   ylim = NULL, EICs = NULL, ...)
 {
-    anaInfo <- analysisInfo(obj)
-    
     ac <- checkmate::makeAssertCollection()
-    aapply(checkmate::assertSubset, . ~ analysis + groupName, list(analyses(obj), names(obj)), empty.ok = TRUE,
-           fixed = list(add = ac))
-    aapply(checkmate::assertFlag, . ~ retMin + showPeakArea + showFGroupRect + showLegend + showProgress,
-           fixed = list(add = ac))
-    checkmate::assertString(title, null.ok = TRUE, add = ac)
-    checkmate::assertChoice(groupBy, c("rGroups", "fGroups", names(anaInfo)), null.ok = TRUE, add = ac)
-    annotate <- checkmate::matchArg(annotate, c("none", "ret", "mz"), several.ok = TRUE, add = ac)
+    assertPlotEIXArgs(obj, analysis, groupName, showPeakArea, showFGroupRect, title, groupBy, showLegend, annotate,
+                      showProgress, xlim, ylim, ac)
+    checkmate::assertFlag(retMin, add = ac)
     checkmate::assertChoice(intMax, c("eic", "feature"), add = ac)
     assertEICParams(EICParams, add = ac)
-    assertXYLim(xlim, ylim, add = ac)
     checkmate::reportAssertions(ac)
-
+    
     if (intMax == "feature" && !EICParams$onlyPresent)
         stop("intMax must be 'eic' when EICParams$onlyPresent == FALSE", call. = FALSE)
     
-    if (showLegend && is.null(groupBy))
-        showLegend <- FALSE
-    
-    if (!is.null(groupBy) && groupBy == "rGroups")
-        groupBy <- "group" # compat
+    if (intMax == "eic")
+        intMax <- "eix" # for makeEIXPlot()
     
     if (is.null(EICs))
         EICs <- getFeatureEIXs(obj, type = "EIC", analysis, groupName, EICParams)
     else
     {
         # sync as much as possible with given EICParams
-        EICs <- filterEICs(EICs, obj, analysis = analysis, groupName = groupName, topMost = EICParams$topMost,
+        EICs <- filterEIXs(EICs, obj, analysis = analysis, groupName = groupName, topMost = EICParams$topMost,
                            topMostByRGroup = EICParams$topMostByRGroup, onlyPresent = EICParams$onlyPresent)
     }
-    
-    if (length(obj) == 0 || length(EICs) == 0)
-    {
-        noDataPlot()
-        return(invisible(NULL))
-    }
-    
+
+    takeAnalysis <- analysis
+    anaInfo <- analysisInfo(obj)
+    anaInfo <- anaInfo[analysis %chin% takeAnalysis & analysis %chin% names(EICs)]
     gInfo <- groupInfo(obj)
     gCount <- length(groupName)
-    takeAnalysis <- analysis
-    anaInfo <- anaInfo[analysis %chin% takeAnalysis & analysis %chin% names(EICs)]
     featTab <- as.data.table(getFeatures(obj))[group %chin% groupName]
-    rGroups <- unique(anaInfo$group)
     
-    if (is.null(groupBy))
-        EICColors <- "blue"
-    else if (groupBy == "fGroups")
+    setnames(featTab, c("ret", "retmin", "retmax"), c("x", "xmin", "xmax"))
+    
+    if (retMin)
     {
-        EICColors <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(gCount)
-        names(EICColors) <- groupName
-    }
-    else
-    {
-        colgrps <- unique(anaInfo[[groupBy]])
-        EICColors <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(length(colgrps))
-        names(EICColors) <- colgrps
+        EICParams$window <- EICParams$window / 60
+        featTab[, c("x", "xmin", "xmax") := .(x/60, xmin/60, xmax/60)]
+        EICs <- lapply(EICs, function(ea) lapply(ea, function(eg) { eg$time <- eg$time/60; return(eg) }))
+        gInfo <- copy(gInfo)
+        gInfo[, ret := ret / 60]
     }
     
-    fillColors <- adjustcolor(EICColors, alpha.f = 0.35)
-    names(fillColors) <- names(EICColors)
-    
-    if (is.null(xlim))
-    {
-        xlim <- c(min(featTab$retmin) - EICParams$window, max(featTab$retmax) + EICParams$window)
-        if (retMin)
-            xlim <- xlim / 60
-    }
-    if (is.null(ylim))
-    {
-        if (intMax == "eic")
-        {
-            RTRangeGrp <- split(featTab[, .(retmin = min(retmin), retmax = max(retmax)), by = "group"], by = "group", keep.by = FALSE)
-            plotIntMax <- max(unlist(lapply(EICs, function(aeic) Map(names(aeic), aeic, f = function(grp, eic)
-            {
-                rtr <- unlist(RTRangeGrp[[grp]])
-                if (!is.null(rtr))
-                {
-                    if (!is.null(xlim))
-                    {
-                        xl <- if (retMin) xlim * 60 else xlim
-                        rtr <- c(max(rtr[1], xl[1]), min(rtr[2], xl[2]))
-                    }
-                    eici <- eic[eic$time %between% rtr, "intensity"]
-                    if (length(eici) > 0)
-                        return(max(eici))
-                }
-                return(0)
-            }))))
-        }
-        else # "feature"
-            plotIntMax <- max(featTab$intensity)
-        ylim <- c(0, plotIntMax * 1.1)
-    }
-
-    if (is.null(title))
-    {
-        # NOTE: plotChroms() for sets override default
-        if (gCount == 1)
-            title <- sprintf("Group '%s'\nrt: %.1f - m/z: %.4f", groupName[1],
-                             if (retMin) gInfo[group == groupName[1]]$ret / 60 else gInfo[group == groupName[1]]$ret,
-                             gInfo[group == groupName[1]]$mz)
-        else
-            title <- sprintf("%d feature groups", gCount)
-    }
-    
-    if (showLegend)
-    {
-        makeLegend <- function(x, y, ...)
-        {
-            return(legend(x, y, names(EICColors), col = EICColors, text.col = EICColors, lty = 1, xpd = NA, ncol = 1,
-                          cex = 0.75, bty = "n", ...))
-        }
-        
-        plot.new()
-        leg <- makeLegend(0, 0, plot = FALSE)
-        lw <- (grconvertX(leg$rect$w, to = "ndc") - grconvertX(0, to = "ndc"))
-        lw <- min(lw, 0.5) # don't make it too wide
-        withr::local_par(list(omd = c(0, 1 - lw, 0, 1), new = TRUE))
-    }
-    
-    plot(0, type = "n", main = title, xlab = sprintf("Retention time (%s)", if (retMin) "min." else "sec."),
-         ylab = "Intensity", xlim = xlim, ylim = ylim, ...)
-    
-    effectiveXlim <- par("usr")[c(1, 2)]
-    effectiveYlim <- par("usr")[c(3, 4)]
-    
-    if (showProgress)
-        prog <- openProgBar(0, gCount)
-    
-    for (grp in groupName)
-    {
-        featTabGrp <- featTab[group == grp]
-        
-        for (ana in analysis)
-        {
-            EIC <- EICs[[ana]][[grp]]
-            if (is.null(EIC))
-                next
-            
-            featRow <- featTabGrp[analysis == ana]
-            if (EICParams$onlyPresent && nrow(featRow) == 0)
-                next
-            
-            colInd <- if (is.null(groupBy))
-                1
-            else if (groupBy == "fGroups")
-                grp
-            else
-                anaInfo[match(ana, analysis)][[groupBy]]
-
-            points(if (retMin) EIC$time / 60 else EIC$time, EIC$intensity, type = "l", col = EICColors[colInd])
-            
-            if (showPeakArea && nrow(featRow) != 0)
-            {
-                EICFill <- setDT(EIC[numGTE(EIC$time, featRow$retmin) & numLTE(EIC$time, featRow$retmax), ])
-                if (retMin)
-                    EICFill[, time := time / 60]
-                EICFill <- EICFill[time %inrange% effectiveXlim]
-                # filling doesn't work if outside y plot range
-                EICFill[intensity < effectiveYlim[1], intensity := effectiveYlim[1]]
-                EICFill[intensity > effectiveYlim[2], intensity := effectiveYlim[2]]
-                polygon(c(EICFill$time, rev(EICFill$time)), c(EICFill$intensity, rep(0, length(EICFill$intensity))),
-                        col = fillColors[colInd], border = NA)
-            }
-        }
-        
-        if (showFGroupRect || !"none" %in% annotate)
-        {
-            rtRange <- c(min(featTabGrp$retmin), max(featTabGrp$retmax))
-            if (retMin)
-                rtRange <- rtRange / 60
-            maxInt <- max(featTabGrp$intensity)
-            
-            if (showFGroupRect)
-                rect(rtRange[1], 0, rtRange[2], maxInt, border = "red", lty = "dotted")
-            
-            if (!"none" %in% annotate)
-            {
-                antxt <- character()
-                rt <- mean(featTabGrp$ret)
-                if (retMin)
-                    rt <- rt / 60
-                
-                if ("ret" %in% annotate)
-                    antxt <- sprintf("%.1f", rt)
-                if ("mz" %in% annotate)
-                    antxt <- paste(antxt, sprintf("%.4f", gInfo[grp == group]$mz), sep = "\n")
-                
-                if (nzchar(antxt))
-                    text(rt, maxInt + ylim[2] * 0.02, antxt)
-            }
-        }
-        
-        if (showProgress)
-            setTxtProgressBar(prog, match(grp, groupName))
-    }
-    
-    if (showLegend)
-        makeLegend(par("usr")[2], par("usr")[4])
-    
-    if (showProgress)
-    {
-        setTxtProgressBar(prog, gCount)
-        close(prog)
-    }
+    makeEIXPlot(featTab, anaInfo, gInfo, showPeakArea, showFGroupRect, title, groupBy, showLegend, intMax,
+                showProgress, annotate, xlim, ylim, EICs, EICParams$window, EICParams$onlyPresent,
+                sprintf("Retention time (%s)", if (retMin) "min." else "sec."), ...)
 })
 
 setMethod("plotChromsHash", "featureGroups", function(obj, analysis = analyses(obj), groupName = names(obj),
                                                       retMin = FALSE, showPeakArea = FALSE, showFGroupRect = TRUE,
                                                       title = NULL, groupBy = NULL, showLegend = TRUE,
-                                                      annotate = c("none", "ret", "mz"),
+                                                      annotate = c("none", "ret", "mz", "mob"),
                                                       intMax = "eic", EICParams = getDefEICParams(),
                                                       showProgress = FALSE, xlim = NULL, ylim = NULL, EICs = NULL, ...)
 {
-    annotate <- checkmate::matchArg(annotate, c("none", "ret", "mz"), several.ok = TRUE)
+    annotate <- checkmate::matchArg(annotate, c("none", "ret", "mz", "mob"), several.ok = TRUE)
     if ("none" %in% annotate)
         annotate <- "none"
     args <- allArgs(FALSE)
@@ -783,7 +620,7 @@ setMethod("plotChromsHash", "featureGroups", function(obj, analysis = analyses(o
         # omit data we don't need: speeds up hashing quite a bit
         # NOTE: only apply analysis/group filters, as the rest will slow down things considerably. Hence, this could
         # result in cache misses.
-        EICs <- filterEICs(EICs, obj, analysis = analysis, groupName = groupName, topMost = NULL,
+        EICs <- filterEIXs(EICs, obj, analysis = analysis, groupName = groupName, topMost = NULL,
                            topMostByRGroup = FALSE, onlyPresent = FALSE)
     }
     anas <- analysis
@@ -792,96 +629,72 @@ setMethod("plotChromsHash", "featureGroups", function(obj, analysis = analyses(o
 })
 
 #' @export
-setMethod("plotMobilogram", "featureGroups", function(obj, groupName = names(obj), markMob = TRUE, IMSWindow = 0.2,
-                                                      maxMSRtWindow = 2, mzWindow = 0.005, clusterIMSWindow = 0.01,
-                                                      clusterMethod = "distance", minIntensity = 0, xlim = NULL,
-                                                      ylim = NULL, ...)
+setMethod("plotMobilogram", "featureGroups", function(obj, analysis = analyses(obj), groupName = names(obj),
+                                                      showPeakArea = FALSE, showFGroupRect = TRUE, title = NULL,
+                                                      groupBy = NULL, showLegend = TRUE,
+                                                      annotate = c("none", "ret", "mz", "mob"),
+                                                      EIMParams = getDefEIMParams(), showProgress = FALSE, xlim = NULL,
+                                                      ylim = NULL, EIMs = NULL, ...)
 {
-    # UNDONE: more feature parity with plotChroms()
-    # UNDONE: assert util for common parameters with findMobilities()
-    # UNDONE: cache EIMs --> util that can also be used by findMobilities()?
-
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertSubset(groupName, names(obj), empty.ok = TRUE, add = ac)
-    checkmate::assertFlag(markMob, add = ac)
-    aapply(checkmate::assertNumber, . ~ IMSWindow + mzWindow + clusterIMSWindow + minIntensity,
-           lower = 0, finite = TRUE, fixed = list(add = ac))
-    checkmate::assertNumber(maxMSRtWindow, lower = 1, finite = TRUE, null.ok = TRUE, add = ac)
-    assertClusterMethod(clusterMethod, add = ac)
-    assertXYLim(xlim, ylim, add = ac)
+    assertPlotEIXArgs(obj, analysis, groupName, showPeakArea, showFGroupRect, title, groupBy, showLegend, annotate,
+                      showProgress, xlim, ylim, ac)
+    assertEIMParams(EIMParams, add = ac)
     checkmate::reportAssertions(ac)
     
-    if (length(obj) == 0 || length(groupName) == 0)
+    if (!hasMobilities(obj))
+        stop("There are no mobilities assigned to features.", call. = FALSE)
+    
+    if (intMax == "feature" && !EIMParams$onlyPresent)
+        stop("intMax must be 'eim' when EIMParams$onlyPresent == FALSE", call. = FALSE)
+    
+    if (intMax == "eim")
+        intMax <- "eix" # for makeEIXPlot()
+    
+    if (is.null(EIMs))
+        EIMs <- getFeatureEIXs(obj, type = "EIM", analysis, groupName, EIMParams)
+    else
     {
-        noDataPlot()
-        return(invisible(NULL))
+        # sync as much as possible with given EICParams
+        EIMs <- filterEIXs(EIMs, obj, analysis = analysis, groupName = groupName, topMost = EIMParams$topMost,
+                           topMostByRGroup = EIMParams$topMostByRGroup, onlyPresent = EIMParams$onlyPresent)
     }
     
-    fTable <- featureTable(obj)
+    takeAnalysis <- analysis
     anaInfo <- analysisInfo(obj)
-
-    EIMs <- applyMSData(anaInfo, fTable, needIMS = TRUE, func = function(ana, path, backend, ft)
-    {
-        openMSReadBackend(backend, path)
-        ft <- copy(ft[group %chin% groupName])
-        if (nrow(ft) == 0)
-            return(list())
-        
-        if (!is.null(maxMSRtWindow))
-        {
-            ft[, retmin := max(retmin, ret - maxMSRtWindow), by = seq_len(nrow(ft))]
-            ft[, retmax := min(retmax, ret + maxMSRtWindow), by = seq_len(nrow(ft))]
-        }
-        
-        # NOTE: mzmin/mzmax may be too narrow here, hence use a user specified mz range
-        m <- getEIMList(backend, ft$mz - mzWindow, ft$mz + mzWindow, ft$retmin, ft$retmax, rep(0, nrow(ft)),
-                        rep(0, nrow(ft)), clusterMethod, clusterIMSWindow, minIntensity, TRUE)
-        names(m) <- ft$ID
-        return(lapply(m, setDT))
-    })
-    EIMs <- pruneList(EIMs, checkEmptyElements = TRUE)
-
-    if (is.null(xlim))
-    {
-        minMob <- min(sapply(EIMs, sapply, function(eim) min(eim$mobility, na.rm = TRUE)), na.rm = TRUE)
-        maxMob <- max(sapply(EIMs, sapply, function(eim) max(eim$mobility, na.rm = TRUE)), na.rm = TRUE)
-        xlim <- c(minMob, maxMob) + c(-IMSWindow, IMSWindow)
-    }
-    if (is.null(ylim))
-    {
-        maxInt <- max(sapply(EIMs, sapply, function(eim) max(eim$intensity)))
-        ylim <- c(0, maxInt) # UNDONE: extra spacing like plotChroms?
-    }
+    anaInfo <- anaInfo[analysis %chin% takeAnalysis & analysis %chin% names(EIMs)]
+    gInfo <- groupInfo(obj)
+    gCount <- length(groupName)
+    featTab <- as.data.table(getFeatures(obj))[group %chin% groupName]
     
-    # UNDONE: unit for IMS?
-    plot(0, type = "n", xlab = "Mobility", ylab = "Intensity", xlim = xlim, ylim = ylim, ...)
-    
-    for (ana in names(EIMs))
-    {
-        for (fID in names(EIMs[[ana]]))
-        {
-            points(EIMs[[ana]][[fID]]$mobility, EIMs[[ana]][[fID]]$intensity, type = "l")
-            
-            if (markMob)
-            {
-                # get all features with mobilities: for IMS parents we collect all mob features from ims_parent_ID,
-                # otherwise just the mob feature itself
-                m <- fTable[[ana]][(ID == fID | ims_parent_ID == fID) & !is.na(mobility)]
-                for (i in seq_len(nrow(m)))
-                    segments(m$mobility[i], 0, m$mobility[i], m$intensity[i], col = "red", lty = "dotted")
-            }
-        }
-    }
+    setnames(featTab, c("mobility", "mobmin", "mobmax"), c("x", "xmin", "xmax"))
+
+    makeEIXPlot(featTab, anaInfo, gInfo, showPeakArea, showFGroupRect, title, groupBy, showLegend, "eix",
+                showProgress, annotate, xlim, ylim, EIMs, EIMParams$window, EIMParams$onlyPresent, "Mobility", ...)
 })
 
-setMethod("plotMobilogramHash", "featureGroups", function(obj, groupName = names(obj), markMob = TRUE, IMSWindow = 0.2,
-                                                          maxMSRtWindow = 2, mzWindow = 0.005, clusterIMSWindow = 0.01,
-                                                          clusterMethod = "distance", minIntensity = 0, xlim = NULL,
-                                                          ylim = NULL, ...)
+setMethod("plotMobilogramHash", "featureGroups", function(obj, analysis = analyses(obj), groupName = names(obj),
+                                                          showPeakArea = FALSE, showFGroupRect = TRUE, title = NULL,
+                                                          groupBy = NULL, showLegend = TRUE,
+                                                          annotate = c("none", "ret", "mz", "mob"),
+                                                          EIMParams = getDefEIMParams(), showProgress = FALSE, xlim = NULL,
+                                                          ylim = NULL, EIMs = NULL, ...)
 {
+    annotate <- checkmate::matchArg(annotate, c("none", "ret", "mz", "mob"), several.ok = TRUE)
+    if ("none" %in% annotate)
+        annotate <- "none"
     args <- allArgs(FALSE)
-    makeHash(args[setdiff(names(args), c("obj"))], featureTable(obj), groupInfo(obj)[group %chin% groupName],
-             analysisInfo(obj))
+    if (!is.null(EIMs))
+    {
+        # omit data we don't need: speeds up hashing quite a bit
+        # NOTE: only apply analysis/group filters, as the rest will slow down things considerably. Hence, this could
+        # result in cache misses.
+        EIMs <- filterEIXs(EIMs, obj, analysis = analysis, groupName = groupName, topMost = NULL,
+                           topMostByRGroup = FALSE, onlyPresent = FALSE)
+    }
+    anas <- analysis
+    makeHash(args[setdiff(names(args), c("obj", "EIMs"))], EIMs, featureTable(obj)[analysis], groupInfo(obj)[group %chin% groupName],
+             analysisInfo(obj)[analysis %chin% anas])
 })
 
 #' @details \code{plotVenn} plots a Venn diagram (using \pkg{\link{VennDiagram}}) outlining unique and shared feature

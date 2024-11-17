@@ -880,6 +880,19 @@ assertConvertMSFilesArgs <- function(formatFrom, formatTo, overWrite, algorithm,
     checkmate::assertChoice(formatFrom, validFormatsFrom, add = add)
 }
 
+assertPlotEIXArgs <- function(obj, analysis, groupName, showPeakArea, showFGroupRect, title, groupBy, showLegend,
+                              annotate, showProgress, xlim, ylim, add)
+{
+    aapply(checkmate::assertSubset, . ~ analysis + groupName, list(analyses(obj), names(obj)), empty.ok = TRUE,
+           fixed = list(add = add))
+    aapply(checkmate::assertFlag, . ~ showPeakArea + showFGroupRect + showLegend + showProgress,
+           fixed = list(add = add))
+    checkmate::assertString(title, null.ok = TRUE, add = add)
+    checkmate::assertChoice(groupBy, c("rGroups", "fGroups", names(analysisInfo(obj))), null.ok = TRUE, add = add)
+    annotate <- checkmate::matchArg(annotate, c("none", "ret", "mz", "mob"), several.ok = TRUE, add = add)
+    assertXYLim(xlim, ylim, add = add)
+}
+
 assertFindPeaksParam <- function(x, null.ok = FALSE, .var.name = checkmate::vname(x), add = NULL)
 {
     if (null.ok && is.null(x))

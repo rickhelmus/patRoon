@@ -272,20 +272,20 @@ getDefEIXParams <- function()
     )
 }
 
-filterEICs <- function(EICs, fGroups, analysis = NULL, groupName = NULL, topMost = NULL, topMostByRGroup = FALSE,
+filterEIXs <- function(EIXs, fGroups, analysis = NULL, groupName = NULL, topMost = NULL, topMostByRGroup = FALSE,
                        onlyPresent = FALSE)
 {
     if (!is.null(analysis))
-        EICs <- EICs[names(EICs) %chin% analysis]
+        EIXs <- EIXs[names(EIXs) %chin% analysis]
     else
         analysis <- analyses(fGroups)
     if (!is.null(groupName))
-        EICs <- lapply(EICs, function(e) e[names(e) %chin% groupName])
+        EIXs <- lapply(EIXs, function(e) e[names(e) %chin% groupName])
 
     if (onlyPresent)
     {
         gTable <- groupTable(fGroups)
-        EICs <- Map(names(EICs), EICs, f = function(ana, aeic)
+        EIXs <- Map(names(EIXs), EIXs, f = function(ana, aeic)
         {
             anaInd <- match(ana, analyses(fGroups))
             absentFGs <- names(gTable)[gTable[anaInd] == 0]
@@ -299,7 +299,7 @@ filterEICs <- function(EICs, fGroups, analysis = NULL, groupName = NULL, topMost
         gTable[, c("analysis", "rGroup") := analysisInfo(fGroups)[, c("analysis", "group"), with = FALSE]]
         for (fg in names(fGroups))
         {
-            anasWithFG <- Map(names(EICs), EICs, f = function(ana, aeic) if (fg %chin% names(aeic)) ana else character())
+            anasWithFG <- Map(names(EIXs), EIXs, f = function(ana, aeic) if (fg %chin% names(aeic)) ana else character())
             anasWithFG <- pruneList(anasWithFG, checkEmptyElements = TRUE)
             anasWithFG <- unlist(anasWithFG)
             tab <- gTable[analysis %chin% anasWithFG, c(fg, "analysis", "rGroup"), with = FALSE]
@@ -317,12 +317,12 @@ filterEICs <- function(EICs, fGroups, analysis = NULL, groupName = NULL, topMost
                 }
                 else
                     character()
-                EICs[rmAnas] <- lapply(EICs[rmAnas], "[[<-", fg, NULL)
+                EIXs[rmAnas] <- lapply(EIXs[rmAnas], "[[<-", fg, NULL)
             }
         }
     }
 
-    return(pruneList(EICs, checkEmptyElements = TRUE))
+    return(pruneList(EIXs, checkEmptyElements = TRUE))
 }
 
 extendEIXInputTab <- function(tab, type, EIXParams)

@@ -354,11 +354,6 @@
 - splitMobilities()
     - keep? then update
     - remove unassigned features?
-- plotMobilogram()
-    - Finalize function: consistent arg names, checkmates, more functionality from plotChroms(), areas? --> see UNDONEs
-    - by default only allow 1 fg to be plotted?
-    - finish plotMobilogramHash()
-    - tests, docs
 - Suspect features
     - XCMS/XCMS3/KPIC2: doc and/or default min fractions to zero as these probably don't make a lot of sense otherwise
     - Handle mobilities
@@ -387,6 +382,9 @@
         - mention that feature properties (except intensity, rt, area) are simply copied from parent
     - ISTDs
         - doc that mobility features are completely ignored for normalization, and relative intensities/areas are copied from parents
+    - plotChroms()/plotMobilograms():
+        - annotate has mob option
+        - intMax can only work for EICs (mob inten may not be stored)
 
 - NEWS
     - Dietrich features
@@ -396,7 +394,7 @@
     - fGroupsScreeningSet doesn't have setObjects anymore
         - makes common operations faster
     - FIXED: fGroupsScreeningSet now correctly stores RF_SMILES per set
-
+    - plotChroms(): annotate now has mob option
 
 ## Features
 

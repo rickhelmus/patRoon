@@ -122,6 +122,200 @@ makeVennPlot <- function(plotObjects, categories, areas, intersectFunc,
     invisible(list(gList = gRet, areas = areas, intersectionCounts = icounts))
 }
 
+makeEIXPlot <- function(featPlotTab, anaInfo, gInfo, showPeakArea, showFGroupRect, title, groupBy, showLegend, intMax,
+                        showProgress, annotate, xlim, ylim, EIXs, window, onlyPresent, xlab, ...)
+{
+    # NOTE: when called by plotChroms(), all RTs in featPlotTab, gInfo and EIXs may have been converted to minutes
+    
+    if (showLegend && is.null(groupBy))
+        showLegend <- FALSE
+    
+    if (!is.null(groupBy) && groupBy == "rGroups")
+        groupBy <- "group" # compat
+    
+    if (nrow(featPlotTab) == 0 || length(EIXs) == 0)
+    {
+        noDataPlot()
+        return(invisible(NULL))
+    }
+    
+    gNames <- unique(featPlotTab$group)
+    gCount <- length(gNames)
+
+    if (is.null(groupBy))
+        EIXColors <- "blue"
+    else if (groupBy == "fGroups")
+    {
+        EIXColors <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(gCount)
+        names(EIXColors) <- gNames
+    }
+    else
+    {
+        colgrps <- unique(anaInfo[[groupBy]])
+        EIXColors <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(length(colgrps))
+        names(EIXColors) <- colgrps
+    }
+    
+    fillColors <- adjustcolor(EIXColors, alpha.f = 0.35)
+    names(fillColors) <- names(EIXColors)
+    
+    if (is.null(title))
+    {
+        if (gCount == 1)
+        {
+            title <- sprintf("Group '%s'\nrt: %.1f - m/z: %.4f", gNames[1], gInfo[group == gNames]$ret,
+                             gInfo[group == gNames]$mz)
+            if (!is.null(gInfo[["mobility"]]))
+                title <- sprintf("%s - mob: %.2f", title, gInfo[group == gNames]$mobility)
+        }
+        else
+            title <- sprintf("%d feature groups", gCount)
+    }
+    
+    if (!"none" %in% annotate)
+    {
+        featPlotTab[, annotation := {
+            antxt <- character()
+            if ("ret" %in% annotate)
+                antxt <- sprintf("%.1f", gInfo$ret[match(group[1], gInfo$group)])
+            if ("mz" %in% annotate)
+                antxt <- paste(antxt, sprintf("%.4f", gInfo$mz[match(group[1], gInfo$group)]), sep = "\n")
+            if ("mob" %in% annotate && !is.null(gInfo[["mobility"]]))
+                antxt <- paste(antxt, sprintf("%.2f", gInfo$mobility[match(group[1], gInfo$group)]), sep = "\n")
+            antxt
+        }, by = "group"]
+    }
+    
+    if (is.null(xlim))
+    {
+        xlim <- if (anyNA(featPlotTab$xmin))
+            range(unlist(lapply(EIXs, function(ea) lapply(ea, "[[", 1))))
+        else
+            c(min(featPlotTab$xmin) - window, max(featPlotTab$xmax) + window)
+    }
+    
+    if (is.null(ylim))
+    {
+        if (intMax == "eix")
+        {
+            xRangeGrp <- split(featPlotTab[, .(xmin = min(xmin), xmax = max(xmax)), by = "group"], by = "group", keep.by = FALSE)
+            plotIntMax <- max(unlist(lapply(EIXs, function(aeix) Map(names(aeix), aeix, f = function(grp, eix)
+            {
+                xr <- unlist(xRangeGrp[[grp]])
+                if (!is.null(xr))
+                {
+                    eixi <- if (is.na(xr[1]))
+                        eix$intensity
+                    else
+                    {
+                        xr <- c(max(xr[1], xlim[1]), min(xr[2], xlim[2]))
+                        eixi <- eix[eix[[1]] %between% xr, "intensity"]
+                    }
+                    if (length(eixi) > 0)
+                        return(max(eixi))
+                }
+                return(0)
+            }))))
+        }
+        else # "feature"
+            plotIntMax <- max(featPlotTab$intensity)
+        ylim <- c(0, plotIntMax * 1.1)
+    }
+    
+    if (showLegend)
+    {
+        makeLegend <- function(x, y, ...)
+        {
+            return(legend(x, y, names(EIXColors), col = EIXColors, text.col = EIXColors, lty = 1, xpd = NA, ncol = 1,
+                          cex = 0.75, bty = "n", ...))
+        }
+        
+        plot.new()
+        leg <- makeLegend(0, 0, plot = FALSE)
+        lw <- (grconvertX(leg$rect$w, to = "ndc") - grconvertX(0, to = "ndc"))
+        lw <- min(lw, 0.5) # don't make it too wide
+        withr::local_par(list(omd = c(0, 1 - lw, 0, 1), new = TRUE))
+    }
+    
+    plot(0, type = "n", main = title, xlab = xlab, ylab = "Intensity", xlim = xlim, ylim = ylim, ...)
+    
+    effectiveXlim <- par("usr")[c(1, 2)]
+    effectiveYlim <- par("usr")[c(3, 4)]
+    
+    if (showProgress)
+        prog <- openProgBar(0, gCount)
+    
+    for (grp in gNames)
+    {
+        featTabGrp <- featPlotTab[group == grp]
+        
+        for (ana in names(EIXs))
+        {
+            EIX <- EIXs[[ana]][[grp]]
+            if (is.null(EIX))
+                next
+            
+            featRow <- featTabGrp[analysis == ana]
+            if (onlyPresent && nrow(featRow) == 0)
+                next
+            
+            colInd <- if (is.null(groupBy))
+                1
+            else if (groupBy == "fGroups")
+                grp
+            else
+                anaInfo[match(ana, analysis)][[groupBy]]
+            
+            points(EIX[[1]], EIX$intensity, type = "l", col = EIXColors[colInd])
+            
+            if (showPeakArea && nrow(featRow) != 0 && !is.na(featRow$xmin))
+            {
+                EIXFill <- setDT(EIX[numGTE(EIX[[1]], featRow$xmin) & numLTE(EIX[[1]], featRow$xmax), ])
+                EIXFill <- EIXFill[EIXFill[[1]] %inrange% effectiveXlim]
+                # filling doesn't work if outside y plot range
+                EIXFill[intensity < effectiveYlim[1], intensity := effectiveYlim[1]]
+                EIXFill[intensity > effectiveYlim[2], intensity := effectiveYlim[2]]
+                polygon(c(EIXFill[[1]], rev(EIXFill[[1]])), c(EIXFill$intensity, rep(0, length(EIXFill$intensity))),
+                        col = fillColors[colInd], border = NA)
+            }
+        }
+
+        if ((showFGroupRect || !is.null(featTabGrp[["annotation"]])) && !anyNA(featTabGrp$xmin))
+        {
+            xRange <- c(min(featTabGrp$xmin), max(featTabGrp$xmax))
+            maxInt <- if (intMax == "eix")
+            {
+                max(sapply(EIXs[[ana]], function(eixa)
+                {
+                    ints <- eixa[eixa[[1]] %between% xRange, "intensity"]
+                    return(if (length(ints) > 0) max(ints) else 0)
+                }))
+            }
+            else
+                max(featTabGrp$intensity)
+            
+            if (showFGroupRect)
+                rect(xRange[1], 0, xRange[2], maxInt, border = "red", lty = "dotted")
+            
+            if (!is.null(featTabGrp[["annotation"]]) && nzchar(featTabGrp$annotation))
+                text(mean(featTabGrp$x), maxInt + ylim[2] * 0.02, featTabGrp$annotation)
+        }
+        
+        if (showProgress)
+            setTxtProgressBar(prog, match(grp, gNames))
+    }
+    
+    if (showLegend)
+        makeLegend(par("usr")[2], par("usr")[4])
+    
+    if (showProgress)
+    {
+        setTxtProgressBar(prog, gCount)
+        close(prog)
+    }
+    invisible(NULL)
+}
+
 getMSPlotData <- function(spec, marklwd, markWhich = NULL)
 {
     hasFragInfo <- !is.null(spec[["ion_formula"]])

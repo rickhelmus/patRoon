@@ -384,7 +384,7 @@ setMethod("findMobilities", "featureGroupsScreeningSet", function(fGroups, mobPe
         anasSet <- anaInfo[set == s]$analysis
         if (fromSuspects)
         {
-            fGroups@features <- assignFeatureMobilitiesSuspects(fGroups@features, screenInfo(setObjects(fGroups)[[s]]),
+            fGroups@features <- assignFeatureMobilitiesSuspects(fGroups@features, screenInfo(unset(fGroups, s)),
                                                                 IMSWindow,
                                                                 \(ft, a) if (!a %chin% anasSet) ft[0] else ft)
         }

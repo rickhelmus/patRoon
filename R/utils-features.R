@@ -1072,7 +1072,7 @@ clusterFGroupMobilities <- function(fGroups, IMSWindow, sets)
     # update features
     setnames(fTableAll, "group", "ims_parent_group") # UNDONE: better colname
     fTableAll[gMobInfo, group := i.group, on = c("ims_parent_group", "IMSClust")]
-    fTableAll <- removeDTColumnsIfPresent(fTableAll, c("IMSClust", "set"))
+    fTableAll <- removeDTColumnsIfPresent(fTableAll, c("IMSClust", "set", "ims_parent_group"))
     featureTable(fGroups) <- split(fTableAll, by = "analysis", keep.by = FALSE)
     
     # update gInfo

@@ -108,7 +108,9 @@ doFGAADTGroups <- function(fGroups, intColNames, average, averageBy, areas, addQ
     }
     
     ret[, c("group", "ret", "mz") := .(gNames, gInfo$ret, gInfo$mz)]
-    setcolorder(ret, c("group", "ret", "mz"))
+    if (hasMobilities(fGroups))
+        ret[, c("mobility", "ims_parent_group") := .(gInfo$mobility, gInfo$ims_parent_group)]
+    setcolorder(ret, intersect(c("group", "ims_parent_group", "ret", "mz", "mobility"), names(ret)))
     
     if (addQualities)
         ret <- cbind(ret, groupQualities(fGroups)[match(ret$group, group), -"group"])
@@ -297,7 +299,7 @@ doFGAADTFeatures <- function(fGroups, fgTab, intColNames, average, averageBy, ad
         fgTab[, average_group := stripADTIntSuffix(average_group)]
     }
     fgTab <- removeDTColumnsIfPresent(fgTab, "intensity")
-    setnames(fgTab, c("ret", "mz"), c("group_ret", "group_mz"))
+    setnames(fgTab, c("ret", "mz", "mobility"), c("group_ret", "group_mz", "group_mobility"), skip_absent = TRUE)
     annCols <- grep("^(neutralMass|ion_mz|adduct)", names(fgTab), value = TRUE)
     if (length(annCols) > 0)
         setnames(fgTab, annCols, paste0("group_", annCols))
@@ -328,8 +330,9 @@ doFGAADTFeatures <- function(fGroups, fgTab, intColNames, average, averageBy, ad
     
     # set nice column order
     qualCols <- c(featureQualityNames(), featureQualityNames(scores = TRUE))
-    colord <- c("group", "set", "analysis", "average_group", "replicate_group", "group_ret", "group_mz",
-                "ID", "ret", "mz", "ion_mz", "intensity", "area", "intensity_rel", "area_rel")
+    colord <- c("group", "ims_parent_group", "set", "analysis", "average_group", "replicate_group", "group_ret",
+                "group_mz", "group_mobility", "ID", "ims_parent_ID", "ret", "mz", "ion_mz", "intensity", "area",
+                "intensity_rel", "area_rel")
     colord <- c(colord, setdiff(names(featTab), c(colord, qualCols)))
     colord <- c(colord, grep("group_(ion_mz|adduct)", names(fgTab), value = TRUE), "neutralMass", "x_reg",
                 getADTRegCols(), "regression_group", featureQualityNames(),

@@ -180,6 +180,8 @@ doGetEICs <- function(anaInfo, EICInfoList, minIntensityIMS = 0, compress = TRUE
     if (length(EICInfoList) == 0)
         return(list())
     
+    anaInfo <- anaInfo[analysis %in% names(EICInfoList)]
+    
     # HACK: for now we _don't_ cache EICs if compress==FALSE: the resulting data is very large and takes a long time to
     # be stored. Hence, the caller should cache the final results.
     doCache <- compress
@@ -252,6 +254,8 @@ doGetEIMs <- function(anaInfo, EIMInfoList, IMSWindow, clusterMethod, minIntensi
 {
     if (length(EIMInfoList) == 0)
         return(list())
+    
+    anaInfo <- anaInfo[analysis %in% names(EIMInfoList)]
     
     anaHashes <- NULL
     if (is.null(cacheDB))

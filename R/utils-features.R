@@ -1125,7 +1125,6 @@ clusterFGroupMobilities <- function(fGroups, IMSWindow, sets)
             gi <- gInfo[group %chin% names(ISA) | ims_parent_group %chin% names(ISA)]
             mobFGs <- gi[!is.na(mobility)]$group
             mobFGParents <- gi[!is.na(mobility)]$ims_parent_group
-            browser()
             setNames(ISA[mobFGParents], mobFGs)
         }
 

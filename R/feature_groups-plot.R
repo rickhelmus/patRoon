@@ -645,12 +645,6 @@ setMethod("plotMobilogram", "featureGroups", function(obj, analysis = analyses(o
     if (!hasMobilities(obj))
         stop("There are no mobilities assigned to features.", call. = FALSE)
     
-    if (intMax == "feature" && !EIMParams$onlyPresent)
-        stop("intMax must be 'eim' when EIMParams$onlyPresent == FALSE", call. = FALSE)
-    
-    if (intMax == "eim")
-        intMax <- "eix" # for makeEIXPlot()
-    
     if (is.null(EIMs))
         EIMs <- getFeatureEIXs(obj, type = "EIM", analysis, groupName, EIMParams)
     else

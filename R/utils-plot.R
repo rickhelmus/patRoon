@@ -209,7 +209,7 @@ makeEIXPlot <- function(featPlotTab, anaInfo, gInfo, showPeakArea, showFGroupRec
                     else
                     {
                         xr <- c(max(xr[1], xlim[1]), min(xr[2], xlim[2]))
-                        eixi <- eix[eix[[1]] %between% xr, "intensity"]
+                        eix[eix[[1]] %between% xr, "intensity"]
                     }
                     if (length(eixi) > 0)
                         return(max(eixi))

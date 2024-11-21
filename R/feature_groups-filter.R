@@ -26,7 +26,7 @@ NULL
 #' @seealso \code{\link{featureGroups-class}} and \code{\link{groupFeatures}}
 NULL
 
-intensityFilter <- function(fGroups, absThreshold, relThreshold, negate = FALSE)
+intensityFilter <- function(fGroups, absThreshold, relThreshold, negate = FALSE, applyIMS = "both")
 {
     if (length(fGroups) == 0)
         return(fGroups)
@@ -42,10 +42,10 @@ intensityFilter <- function(fGroups, absThreshold, relThreshold, negate = FALSE)
                               names(fGroups))
         delGroups[, (names(delGroups)) := lapply(fGroups@groups, compF), by = rep(1, nrow(delGroups))]
         return(list(delete = list(j = delGroups)))
-    }))
+    }, applyIMS = applyIMS))
 }
 
-minMaxIntensityFilter <- function(fGroups, absThreshold, relThreshold, negate = FALSE)
+minMaxIntensityFilter <- function(fGroups, absThreshold, relThreshold, negate = FALSE, applyIMS = "both")
 {
     if (length(fGroups) == 0)
         return(fGroups)
@@ -58,10 +58,10 @@ minMaxIntensityFilter <- function(fGroups, absThreshold, relThreshold, negate = 
     {
         compF <- if (negate) function(x, ...) max(x) >= threshold else function(x, ...) max(x) < threshold
         delete(fGroups, j = compF)
-    }, "minMaxIntensity"))
+    }, "minMaxIntensity", applyIMS))
 }
 
-blankFilter <- function(fGroups, threshold, negate = FALSE)
+blankFilter <- function(fGroups, threshold, negate = FALSE, applyIMS = "both")
 {
     anaInfo <- analysisInfo(fGroups)
     rGroups <- replicateGroups(fGroups)
@@ -109,10 +109,11 @@ blankFilter <- function(fGroups, threshold, negate = FALSE)
         for (j in seq_along(delGroups))
             set(delGroups, j = j, value = fifelse(pred(fGroups@groups[[j]], anaThrs[[j]]), 1, 0))
         return(list(delete = list(j = delGroups)))
-    }))
+    }, applyIMS = applyIMS))
 }
 
-minAnalysesFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, negate = FALSE, verbose = TRUE)
+minAnalysesFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, negate = FALSE, applyIMS = "both",
+                              verbose = TRUE)
 {
     threshold <- getHighestAbsValue(absThreshold, relThreshold, length(analyses(fGroups)))
     if (threshold == 0)
@@ -123,10 +124,11 @@ minAnalysesFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, negat
         if (negate)
             pred <- Negate(pred)
         return(list(subset = list(j = sapply(groupTable(fGroups), pred, USE.NAMES = FALSE))))
-    }, "minAnalyses"))
+    }, "minAnalyses", applyIMS = applyIMS))
 }
 
-minReplicatesFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, negate = FALSE, verbose = TRUE)
+minReplicatesFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, negate = FALSE, applyIMS = "both",
+                                verbose = TRUE)
 {
     threshold <- getHighestAbsValue(absThreshold, relThreshold, length(replicateGroups(fGroups)))
     if (threshold == 0)
@@ -141,10 +143,11 @@ minReplicatesFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, neg
             pred <- Negate(pred)
 
         return(list(subset = list(j = sapply(groupTable(fGroups), pred, USE.NAMES = FALSE))))
-    }, "minReplicates", verbose))
+    }, "minReplicates", applyIMS, verbose))
 }
 
-minFeaturesFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, negate = FALSE, verbose = TRUE)
+minFeaturesFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, negate = FALSE, applyIMS = "both",
+                              verbose = TRUE)
 {
     threshold <- getHighestAbsValue(absThreshold, relThreshold, length(fGroups))
     if (threshold == 0)
@@ -157,10 +160,11 @@ minFeaturesFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, negat
             pred <- Negate(pred)
 
         return(list(subset = list(i = sapply(transpose(groupTable(fGroups)), pred, USE.NAMES = FALSE), j = TRUE)))
-    }, "minReplicates", verbose))
+    }, "minReplicates", applyIMS, verbose))
 }
 
-minConcFilter <- function(fGroups, absThreshold, relThreshold, aggrParams, removeNA, normToTox = FALSE, negate = FALSE)
+minConcFilter <- function(fGroups, absThreshold, relThreshold, aggrParams, removeNA, normToTox = FALSE, negate = FALSE,
+                          applyIMS = "both")
 {
     concs <- concentrations(fGroups)
     if (length(fGroups) == 0 || nrow(concs) == 0 ||
@@ -197,10 +201,10 @@ minConcFilter <- function(fGroups, absThreshold, relThreshold, aggrParams, remov
                               names(fGroups))
         delGroups[, (names(aggrConcsT)) := lapply(aggrConcsT, compF), by = rep(1, nrow(delGroups))]
         return(list(delete = list(j = delGroups)))
-    }))
+    }, applyIMS = applyIMS))
 }
 
-maxToxFilter <- function(fGroups, absThreshold, relThreshold, aggrParams, removeNA, negate = FALSE)
+maxToxFilter <- function(fGroups, absThreshold, relThreshold, aggrParams, removeNA, negate = FALSE, applyIMS = "both")
 {
     tox <- toxicities(fGroups)
     if (length(fGroups) == 0 || nrow(tox) == 0)
@@ -220,10 +224,10 @@ maxToxFilter <- function(fGroups, absThreshold, relThreshold, aggrParams, remove
             function(x) (removeNA & is.na(x)) | (!is.na(x) & x > threshold)
         
         return(list(delete = list(j = aggrTox[compF(LC50) == TRUE]$group)))
-    }))
+    }, applyIMS = applyIMS))
 }
 
-replicateAbundanceFilter <- function(fGroups, absThreshold, relThreshold, maxIntRSD, negate = FALSE)
+replicateAbundanceFilter <- function(fGroups, absThreshold, relThreshold, maxIntRSD, negate = FALSE, applyIMS = "both")
 {
     if (NULLToZero(absThreshold) == 0 && NULLToZero(relThreshold) == 0 && NULLToZero(maxIntRSD) == 0)
         return(fGroups) # all thresholds NULL/0
@@ -262,10 +266,10 @@ replicateAbundanceFilter <- function(fGroups, absThreshold, relThreshold, maxInt
         set(delGroups, j = "group", value = rGroupsAna)
         delGroups[, (gNames) := lapply(.SD, function(x) if (pred(x, .N, group)) 1 else 0), by = group, .SDcols = gNames]
         return(list(delete = list(j = delGroups[, -"group"])))
-    }, "replicateAbundance"))
+    }, "replicateAbundance", applyIMS = applyIMS))
 }
 
-retentionMzFilter <- function(fGroups, range, negate, what)
+retentionMzFilter <- function(fGroups, range, negate, applyIMS, what)
 {
     return(doFGroupsFilter(fGroups, what, c(range, negate), function(fGroups)
     {
@@ -280,10 +284,10 @@ retentionMzFilter <- function(fGroups, range, negate, what)
                             mzDefect = fGroups@groupInfo$mz - floor(fGroups@groupInfo$mz))
 
         return(list(subset = list(j = pred(checkVals))))
-    }))
+    }, applyIMS = applyIMS))
 }
 
-chromWidthFilter <- function(fGroups, range, negate)
+chromWidthFilter <- function(fGroups, range, negate, applyIMS)
 {
     ftindex <- groupFeatIndex(fGroups)
     fTable <- featureTable(fGroups)
@@ -310,10 +314,10 @@ chromWidthFilter <- function(fGroups, range, negate)
                               names(fGroups))
         delGroups[, (names(delGroups)) := lapply(ftindex, pred), by = rep(1, nrow(delGroups))]
         return(list(delete = list(j = delGroups)))
-    }))
+    }, applyIMS = applyIMS))
 }
 
-replicateGroupFilter <- function(fGroups, rGroups, negate = FALSE, verbose = TRUE)
+replicateGroupFilter <- function(fGroups, rGroups, negate = FALSE, applyIMS = "both", verbose = TRUE)
 {
     return(doFGroupsFilter(fGroups, "replicate group", c(rGroups, negate), function(fGroups)
     {
@@ -321,10 +325,10 @@ replicateGroupFilter <- function(fGroups, rGroups, negate = FALSE, verbose = TRU
         if (negate)
             pred <- Negate(pred)
         return(list(delete = list(i = pred(analysisInfo(fGroups)$group), j = NULL)))
-    }, "replicate_group", verbose))
+    }, "replicate_group", applyIMS, verbose))
 }
 
-selectIMSFilter <- function(fGroups, IMS, negate)
+selectIMSFilter <- function(fGroups, IMS, negate, applyIMS)
 {
     if (!hasMobilities(fGroups))
     {
@@ -341,10 +345,10 @@ selectIMSFilter <- function(fGroups, IMS, negate)
         gInfoDel <- if (IMS) gInfoDel[is.na(mobility)] else gInfoDel[!is.na(mobility)]
         
         return(delete(fGroups, j = gInfoDel$group))
-    }, "IMS_selection"))
+    }, "IMS_selection", applyIMS = applyIMS))
 }
 
-resultsFilter <- function(fGroups, results, negate = FALSE, verbose = TRUE)
+resultsFilter <- function(fGroups, results, negate = FALSE, applyIMS = "both", verbose = TRUE)
 {
     return(doFGroupsFilter(fGroups, "results", c(results, negate), function(fGroups)
     {
@@ -352,10 +356,10 @@ resultsFilter <- function(fGroups, results, negate = FALSE, verbose = TRUE)
         if (negate)
             fgRes <- setdiff(names(fGroups), fgRes)
         return(list(subset = list(j = fgRes)))
-    }, verbose = verbose))
+    }, applyIMS = applyIMS, verbose = verbose))
 }
 
-featQualityFilter <- function(fGroups, qualityRanges, negate)
+featQualityFilter <- function(fGroups, qualityRanges, negate, applyIMS)
 {
     ftindex <- groupFeatIndex(fGroups)
     fTable <- featureTable(fGroups)
@@ -381,10 +385,10 @@ featQualityFilter <- function(fGroups, qualityRanges, negate)
                               names(fGroups))
         delGroups[, (names(delGroups)) := lapply(ftindex, pred), by = rep(1, nrow(delGroups))]
         return(list(delete = list(j = delGroups)))
-    }, "feat_quality"))
+    }, "feat_quality", applyIMS = applyIMS))
 }
 
-groupQualityFilter <- function(fGroups, qualityRanges, negate)
+groupQualityFilter <- function(fGroups, qualityRanges, negate, applyIMS)
 {
     qRanges <- qualityRanges[names(qualityRanges) %in% featureQualityNames()]
     qRangesScore <- qualityRanges[names(qualityRanges) %in% featureQualityNames(scores = TRUE)]
@@ -409,10 +413,10 @@ groupQualityFilter <- function(fGroups, qualityRanges, negate)
         if (length(qRangesScore) > 0)
             ret <- intersect(ret, doF(fGroups, qRangesScore, groupScores(fGroups)))
         return(list(subset = list(j = ret)))
-    }, "group_quality"))
+    }, "group_quality", applyIMS = applyIMS))
 }
 
-checkFeaturesFilter <- function(fGroups, checkFeaturesSession, negate)
+checkFeaturesFilter <- function(fGroups, checkFeaturesSession, negate, applyIMS)
 {
     return(doFGroupsFilter(fGroups, "checked features session", c(makeFileHash(checkFeaturesSession), negate), function(fGroups)
     {
@@ -434,10 +438,24 @@ checkFeaturesFilter <- function(fGroups, checkFeaturesSession, negate)
         }
         
         return(list(delete = list(j = j)))
-    }, "checkedFeatures"))
+    }, "checkedFeatures", applyIMS = applyIMS))
 }
 
-minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, negate = FALSE, verbose = TRUE)
+removeISFilter <- function(fGroups, negate, applyIMS)
+{
+    if (nrow(internalStandards(fGroups)) == 0)
+        stop("Cannot remove internal standards: there are no internal standards assigned. ",
+             "Did you run normInts()?")
+    
+    return(doFGroupsFilter(fGroups, "remove internal standards", c(makeFileHash(checkFeaturesSession), negate), function(fGroups)
+    {
+        igrps <- internalStandards(fGroups)$group
+        return(list(delete = list(j = if (negate) setdiff(names(fGroups), igrps) else igrps)))
+    }, "removeIS", applyIMS = applyIMS))
+}
+
+minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, negate = FALSE, applyIMS = "both",
+                                 verbose = TRUE)
 {
     threshold <- getHighestAbsValue(absThreshold, relThreshold, length(sets(fGroups)))
     if (threshold == 0)
@@ -451,7 +469,7 @@ minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, ne
             pred <- Negate(pred)
         
         return(list(subset = list(j = sapply(groupTable(fGroups), pred, USE.NAMES = FALSE))))
-    }, "minSets", verbose))
+    }, "minSets", applyIMS, verbose))
 }
 
 
@@ -569,9 +587,10 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
                                               maxReplicateIntRSD = NULL, blankThreshold = NULL,
                                               retentionRange = NULL, mzRange = NULL, mzDefectRange = NULL,
                                               chromWidthRange = NULL, featQualityRange = NULL, groupQualityRange = NULL,
-                                              rGroups = NULL, IMS = NULL, results = NULL,
-                                              removeBlanks = FALSE, removeISTDs = FALSE, checkFeaturesSession = NULL,
-                                              predAggrParams = getDefPredAggrParams(), removeNA = FALSE, negate = FALSE)
+                                              rGroups = NULL, IMS = NULL, results = NULL, removeBlanks = FALSE,
+                                              removeISTDs = FALSE, checkFeaturesSession = NULL,
+                                              predAggrParams = getDefPredAggrParams(), removeNA = FALSE, negate = FALSE,
+                                              applyIMS = "both")
 {
     if (isTRUE(checkFeaturesSession))
         checkFeaturesSession <- "checked-features.yml"
@@ -600,8 +619,12 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
     if (!is.logical(checkFeaturesSession))
         assertCheckSession(checkFeaturesSession, mustExist = TRUE,  null.ok = TRUE, add = ac)
     assertPredAggrParams(predAggrParams, add = ac)
+    assertApplyIMSArg(applyIMS, add = ac)
     checkmate::reportAssertions(ac)
 
+    if (isTRUE(applyIMS) && !hasMobilities(obj))
+        stop("applyIMS == TRUE while no mobilities are assigned", call. = FALSE)
+    
     if (length(obj) == 0)
         return(obj)
 
@@ -609,7 +632,7 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
     {
         args <- c(list(arg1), ...)
         if (any(!sapply(args, is.null)))
-            return(do.call(func, c(list(obj, arg1, ..., negate = negate), otherArgs)))
+            return(do.call(func, c(list(obj, arg1, ..., negate = negate, applyIMS = applyIMS), otherArgs)))
         return(obj)
     }
 
@@ -653,16 +676,9 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
     obj <- maybeDoFilter(resultsFilter, results)
     if (removeBlanks)
         obj <- replicateGroupFilter(obj, unique(unlist(strsplit(analysisInfo(obj)$blank, ","))), negate = !negate)
-
     if (removeISTDs)
-    {
-        if (nrow(internalStandards(obj)) == 0)
-            stop("Cannot remove internal standards: there are no internal standards assigned. ",
-                 "Did you run normInts()?")
-        igrps <- internalStandards(obj)$group
-        obj <- delete(obj, j = if (negate) setdiff(names(obj), igrps) else igrps)
-    }
-    
+        obj <- removeISFilter(obj, negate, applyIMS)
+
     return(obj)
 })
 
@@ -672,14 +688,15 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
 #'   or relative) amount of sets. Set to \code{NULL} to ignore.
 #' @rdname feature-filtering
 #' @export
-setMethod("filter", "featureGroupsSet", function(obj, ..., negate = FALSE, sets = NULL, absMinSets = NULL,
-                                                 relMinSets = NULL)
+setMethod("filter", "featureGroupsSet", function(obj, ..., negate = FALSE, applyIMS = "both", sets = NULL,
+                                                 absMinSets = NULL, relMinSets = NULL)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(negate, add = ac)
     assertSets(obj, sets, TRUE, add = ac)
     aapply(checkmate::assertNumber, . ~ absMinSets + relMinSets, lower = 0, finite = TRUE, null.ok = TRUE,
            fixed = list(add = ac))
+    assertApplyIMSArg(applyIMS, add = ac)
     checkmate::reportAssertions(ac)
     
     if (!is.null(sets) && length(sets) > 0)
@@ -693,7 +710,7 @@ setMethod("filter", "featureGroupsSet", function(obj, ..., negate = FALSE, sets 
         obj <- callNextMethod(obj, ..., negate = negate)
     
     if (!is.null(absMinSets) || !is.null(relMinSets))
-        obj <- minSetsFGroupsFilter(obj, absMinSets, relMinSets, negate = negate)
+        obj <- minSetsFGroupsFilter(obj, absMinSets, relMinSets, negate = negate, applyIMS = applyIMS)
     
     return(obj)
 })

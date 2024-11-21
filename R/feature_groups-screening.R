@@ -501,7 +501,7 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = NULL
                                                        maxLevel = NULL, maxFormRank = NULL, maxCompRank = NULL,
                                                        minAnnSimForm = NULL, minAnnSimComp = NULL, minAnnSimBoth = NULL,
                                                        absMinFragMatches = NULL, relMinFragMatches = NULL,
-                                                       minRF = NULL, maxLC50 = NULL, negate = FALSE)
+                                                       minRF = NULL, maxLC50 = NULL, negate = FALSE, applyIMS = "both")
 {
     # NOTE: keep args and method in sync with featureGroupsScreeningSet method
     
@@ -512,14 +512,15 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = NULL
            null.ok = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertNumber, . ~ minAnnSimForm + minAnnSimComp + minAnnSimBoth + minRF + maxLC50, null.ok = TRUE,
            fixed = list(add = ac))
+    assertApplyIMSArg(applyIMS, add = ac)
     checkmate::reportAssertions(ac)
     
     obj <- doSuspectFilter(obj, onlyHits, selectHitsBy, selectBestFGroups, maxLevel, maxFormRank, maxCompRank,
                            minAnnSimForm, minAnnSimComp, minAnnSimBoth, absMinFragMatches, relMinFragMatches, minRF,
-                           maxLC50, negate)
+                           maxLC50, negate, applyIMS)
 
     if (...length() > 0)
-        obj <- callNextMethod(obj, ..., negate = negate)
+        obj <- callNextMethod(obj, ..., negate = negate, applyIMS = applyIMS)
     
     return(obj)
 })

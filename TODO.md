@@ -374,6 +374,7 @@
     - more verification that fGroupsScreeningSets still works fine after removal of setObjects
     - more verification that normInts() works before/after findMobilities()
     - IMS arg for [ and filter()
+    - applyMS for filter()
     
 - Docs
     - Dietrich features
@@ -390,6 +391,8 @@
         - annotate has mob option
         - intMax can only work for EICs (mob inten may not be stored)
     - IMS arg for [ and filter()
+    - applyIMS arg for all fGroups filter methods
+        - ignores negate!
 
 - NEWS
     - Dietrich features
@@ -401,6 +404,8 @@
     - FIXED: fGroupsScreeningSet now correctly stores RF_SMILES per set
     - plotChroms(): annotate now has mob option
     - IMS arg for [ and filter()
+    - applyIMS arg for all fGroups filter methods
+    - filter: removeISTDs and onlyHits now use doFGroupFilter() --> caches and prints message
 
 ## Features
 

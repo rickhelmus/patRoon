@@ -301,7 +301,7 @@ setMethod("filter", "featureGroupsScreeningSet", function(obj, ..., onlyHits = N
                                                           maxLevel = NULL, maxFormRank = NULL, maxCompRank = NULL,
                                                           minAnnSimForm = NULL, minAnnSimComp = NULL, minAnnSimBoth = NULL,
                                                           absMinFragMatches = NULL, relMinFragMatches = NULL,
-                                                          minRF = NULL, maxLC50 = NULL, negate = FALSE)
+                                                          minRF = NULL, maxLC50 = NULL, negate = FALSE, applyIMS = "both")
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertFlag, . ~ onlyHits + selectBestFGroups + negate, null.ok = c(TRUE, FALSE, FALSE), fixed = list(add = ac))
@@ -310,15 +310,16 @@ setMethod("filter", "featureGroupsScreeningSet", function(obj, ..., onlyHits = N
            null.ok = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertNumber, . ~ minAnnSimForm + minAnnSimComp + minAnnSimBoth + minRF + maxLC50, null.ok = TRUE,
            fixed = list(add = ac))
+    assertApplyIMSArg(applyIMS, add = ac)
     checkmate::reportAssertions(ac)
     
     obj <- doSuspectFilter(obj, onlyHits = onlyHits, selectHitsBy, selectBestFGroups, maxLevel, maxFormRank, maxCompRank,
                            minAnnSimForm, minAnnSimComp, minAnnSimBoth, absMinFragMatches, relMinFragMatches, minRF,
-                           maxLC50, negate)
+                           maxLC50, negate, applyIMS)
     
     # filter functionality from fGroupsSet
     if (...length() > 0)
-        obj <- callNextMethod(obj, ..., negate = negate)
+        obj <- callNextMethod(obj, ..., negate = negate, applyIMS = applyIMS)
     
     return(obj)
 })

@@ -124,7 +124,7 @@ scoreFeatQuality <- function(quality, values)
 
 hasFGroupScores <- function(fGroups) nrow(groupScores(fGroups)) > 0
 
-doFGroupsFilter <- function(fGroups, what, hashParam, func, cacheCateg = what, verbose = TRUE)
+doFGroupsFilter <- function(fGroups, what, hashParam, func, cacheCateg = what, applyIMS = "both", verbose = TRUE)
 {
     if (verbose)
     {
@@ -139,6 +139,26 @@ doFGroupsFilter <- function(fGroups, what, hashParam, func, cacheCateg = what, v
     {
         ret <- if (length(fGroups) > 0) func(fGroups) else fGroups
         saveCacheData(cacheName, ret, hash)
+    }
+    
+    if (applyIMS != "both" && hasMobilities(fGroups))
+    {
+        # only remove mobility features/feature groups or their parents
+        
+        gInfoKeep <- groupInfo(fGroups)
+        gInfoKeep <- if (applyIMS) gInfoKeep[is.na(mobility)] else gInfoKeep[!is.na(mobility)]
+        
+        fGroupsFiltered <- ret
+
+        ret <- delete(fGroups, i = !analyses(fGroups) %in% analyses(fGroupsFiltered))
+        ret <- delete(fGroups, j = setdiff(names(fGroups), union(names(fGroupsFiltered), gInfoKeep$group)))
+        
+        ret@features <- delete(getFeatures(ret), j = function(ft, ana)
+        {
+            keep <- if (applyIMS) is.na(ft$mobility) else !is.na(ft$mobility)
+            keep <- keep | ft$ID %in% featureTable(fGroupsFiltered)[[ana]]$ID
+            return(!keep)
+        })
     }
     
     if (verbose)

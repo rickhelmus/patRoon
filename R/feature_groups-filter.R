@@ -324,6 +324,26 @@ replicateGroupFilter <- function(fGroups, rGroups, negate = FALSE, verbose = TRU
     }, "replicate_group", verbose))
 }
 
+selectIMSFilter <- function(fGroups, IMS, negate)
+{
+    if (!hasMobilities(fGroups))
+    {
+        warning("Cannot apply ims filter: no mobilities assigned", call. = FALSE)
+        return(fGroups)
+    }
+    
+    if (negate)
+        IMS <- !IMS
+    
+    return(doFGroupsFilter(fGroups, "IMS selection", IMS, function(fGroups)
+    {
+        gInfoDel <- groupInfo(fGroups)
+        gInfoDel <- if (IMS) gInfoDel[is.na(mobility)] else gInfoDel[!is.na(mobility)]
+        
+        return(delete(fGroups, j = gInfoDel$group))
+    }, "IMS_selection"))
+}
+
 resultsFilter <- function(fGroups, results, negate = FALSE, verbose = TRUE)
 {
     return(doFGroupsFilter(fGroups, "results", c(results, negate), function(fGroups)
@@ -549,9 +569,9 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
                                               maxReplicateIntRSD = NULL, blankThreshold = NULL,
                                               retentionRange = NULL, mzRange = NULL, mzDefectRange = NULL,
                                               chromWidthRange = NULL, featQualityRange = NULL, groupQualityRange = NULL,
-                                              rGroups = NULL, results = NULL, removeBlanks = FALSE, removeISTDs = FALSE,
-                                              checkFeaturesSession = NULL, predAggrParams = getDefPredAggrParams(),
-                                              removeNA = FALSE, negate = FALSE)
+                                              rGroups = NULL, IMS = NULL, results = NULL,
+                                              removeBlanks = FALSE, removeISTDs = FALSE, checkFeaturesSession = NULL,
+                                              predAggrParams = getDefPredAggrParams(), removeNA = FALSE, negate = FALSE)
 {
     if (isTRUE(checkFeaturesSession))
         checkFeaturesSession <- "checked-features.yml"
@@ -569,6 +589,7 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
            list(c(featureQualityNames(group = FALSE), featureQualityNames(group = FALSE, scores = TRUE)),
                 c(featureQualityNames(), featureQualityNames(scores = TRUE))), fixed = list(add = ac))
     checkmate::assertCharacter(rGroups, min.chars = 1, min.len = 1, any.missing = FALSE, null.ok = TRUE, add = ac)
+    checkmate::assertFlag(IMS, null.ok = TRUE, add = ac)
     checkmate::assert(checkmate::checkNull(results),
                       checkmate::checkClass(results, "featureAnnotations"),
                       checkmate::checkClass(results, "components"),
@@ -628,6 +649,7 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
                                                                                        normToTox = TRUE))
     
     obj <- maybeDoFilter(replicateGroupFilter, rGroups)
+    obj <- maybeDoFilter(selectIMSFilter, IMS)
     obj <- maybeDoFilter(resultsFilter, results)
     if (removeBlanks)
         obj <- replicateGroupFilter(obj, unique(unlist(strsplit(analysisInfo(obj)$blank, ","))), negate = !negate)

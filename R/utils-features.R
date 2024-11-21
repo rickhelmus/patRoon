@@ -144,7 +144,7 @@ getFilteredFGroups <- function(fGroups, retFilter)
     return(fGroups)
 }
 
-doFGroupsFilter <- function(fGroups, what, hashParam, func, cacheCateg = what, verbose = TRUE)
+doFGroupsFilter <- function(fGroups, what, hashParam, func, cacheCateg = what, applyIMS = "both", verbose = TRUE)
 {
     if (verbose)
     {
@@ -162,19 +162,38 @@ doFGroupsFilter <- function(fGroups, what, hashParam, func, cacheCateg = what, v
             saveCacheData(cacheName, ret, hash)
     }
 
-    fGroups <- getFilteredFGroups(fGroups, ret)
+    fGroupsFiltered <- getFilteredFGroups(fGroups, ret)
+    
+    if (applyIMS != "both" && hasMobilities(fGroups))
+    {
+        # only remove mobility features/feature groups or their parents
+        
+        gInfoKeep <- groupInfo(fGroups)
+        gInfoKeep <- if (applyIMS) gInfoKeep[is.na(mobility)] else gInfoKeep[!is.na(mobility)]
+        
+        fgf <- delete(fGroups, i = !analyses(fGroups) %in% analyses(fGroupsFiltered))
+        fgf <- delete(fgf, j = setdiff(names(fgf), union(names(fGroupsFiltered), gInfoKeep$group)))
+        
+        fgf@features <- delete(getFeatures(fgf), j = function(ft, ana)
+        {
+            keep <- if (applyIMS) is.na(ft$mobility) else !is.na(ft$mobility)
+            keep <- keep | ft$ID %in% featureTable(fGroupsFiltered)[[ana]]$ID
+            return(!keep)
+        })
+        
+        fGroupsFiltered <- fgf
+    }
     
     if (verbose)
     {
-        newFCount <- length(getFeatures(fGroups)); newGCount <- length(fGroups)
-        newn <- length(ret)
+        newFCount <- length(getFeatures(fGroupsFiltered)); newGCount <- length(fGroupsFiltered)
         printf("Done! Filtered %d (%.2f%%) features and %d (%.2f%%) feature groups. Remaining: %d features in %d groups.\n",
                oldFCount - newFCount, if (oldFCount > 0) (1 - (newFCount / oldFCount)) * 100,
                oldGCount - newGCount, if (oldGCount > 0) (1 - (newGCount / oldGCount)) * 100,
                newFCount, newGCount)
     }
     
-    return(fGroups)
+    return(fGroupsFiltered)
 }
 
 # used by adducts()<- methods

@@ -1,3 +1,14 @@
+prepIMSFGroupsForPlot <- function(fGroups, IMS)
+{
+    if (is.null(IMS) || length(fGroups) == 0 || !hasMobilities(fGroups))
+        return(fGroups)
+    
+    ret <- selectIMSFilter(fGroups, IMS = IMS, verbose = FALSE)
+    if (length(ret) == 0) # this could only happened due to the IMS subsetting
+        warning("No feature groups available to plot, perhaps you want to change the IMS argument?", call. = FALSE)
+    return(ret)
+}
+
 # based on http://www.cureffi.org/2013/09/23/a-quick-intro-to-chemical-informatics-in-r/
 getRCDKStructurePlot <- function(molecule, width = 500, height = 500, trim = TRUE, transparent = TRUE)
 {

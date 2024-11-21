@@ -587,8 +587,8 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
                                               maxReplicateIntRSD = NULL, blankThreshold = NULL,
                                               retentionRange = NULL, mzRange = NULL, mzDefectRange = NULL,
                                               chromWidthRange = NULL, featQualityRange = NULL, groupQualityRange = NULL,
-                                              rGroups = NULL, IMS = NULL, results = NULL, removeBlanks = FALSE,
-                                              removeISTDs = FALSE, checkFeaturesSession = NULL,
+                                              rGroups = NULL, IMS = NULL, withIMSParent = FALSE, results = NULL,
+                                              removeBlanks = FALSE, removeISTDs = FALSE, checkFeaturesSession = NULL,
                                               predAggrParams = getDefPredAggrParams(), removeNA = FALSE, negate = FALSE,
                                               applyIMS = "both")
 {
@@ -615,15 +615,20 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
                       checkmate::checkList(results, c("featureAnnotations", "components"), any.missing = FALSE,
                                            min.len = 1),
                       .var.name = "results")
-    aapply(checkmate::assertFlag, . ~ removeBlanks + removeISTDs + removeNA + negate, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ withIMSParent + removeBlanks + removeISTDs + removeNA + negate, fixed = list(add = ac))
     if (!is.logical(checkFeaturesSession))
         assertCheckSession(checkFeaturesSession, mustExist = TRUE,  null.ok = TRUE, add = ac)
     assertPredAggrParams(predAggrParams, add = ac)
     assertApplyIMSArg(applyIMS, add = ac)
     checkmate::reportAssertions(ac)
 
-    if (isTRUE(applyIMS) && !hasMobilities(obj))
-        stop("applyIMS == TRUE while no mobilities are assigned", call. = FALSE)
+    if (!hasMobilities(obj))
+    {
+        if (isTRUE(applyIMS))
+            stop("applyIMS == TRUE while no mobilities are assigned", call. = FALSE)
+        if (withIMSParent)
+            stop("withIMSParent == TRUE while no mobilities are assigned", call. = FALSE)
+    }
     
     if (length(obj) == 0)
         return(obj)
@@ -674,6 +679,12 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
     obj <- maybeDoFilter(replicateGroupFilter, rGroups)
     obj <- maybeDoFilter(selectIMSFilter, IMS)
     obj <- maybeDoFilter(resultsFilter, results)
+    # NOTE: for the next two don't have to use doFGroupFilter() as applyIMS is not relevant
+    if (withIMSParent)
+    {
+        gInfoIMS <- groupInfo(obj)[!is.na(mobility)]
+        obj <- delete(obj, j = gInfoIMS[!ims_parent_group %chin% names(obj)]$group)
+    }
     if (removeBlanks)
         obj <- replicateGroupFilter(obj, unique(unlist(strsplit(analysisInfo(obj)$blank, ","))), negate = !negate)
     if (removeISTDs)

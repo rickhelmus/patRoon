@@ -447,6 +447,15 @@ assertDeleteArgAndToChr <- function(x, choices, .var.name = checkmate::vname(x),
     return(x)
 }
 
+assertApplyIMSArg <- function(x, .var.name = checkmate::vname(x), add = NULL)
+{
+    checkmate::assert(
+        checkmate::checkFlag(x),
+        checkmate::checkChoice(x, "both"),
+        .var.name = .var.name, add = add
+    )
+}
+
 assertFGAsDataTableArgs <- function(fGroups, areas, features, qualities, regression, regressionBy, averageFunc,
                                     normalized, FCParams, concAggrParams, toxAggrParams, normConcToTox, anaInfoCols,
                                     collapseSuspects, onlyHits)

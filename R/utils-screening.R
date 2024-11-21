@@ -462,11 +462,14 @@ doGroupSuspects <- function(feat, groupFunc, ..., verbose = TRUE)
 
 doSuspectFilter <- function(obj, onlyHits, selectHitsBy, selectBestFGroups, maxLevel, maxFormRank, maxCompRank,
                             minAnnSimForm, minAnnSimComp, minAnnSimBoth, absMinFragMatches, relMinFragMatches, minRF,
-                            maxLC50, negate)
+                            maxLC50, negate, applyIMS)
 {
     if (nrow(screenInfo(obj)) > 0)
     {
-        colFilter <- function(pred, what, col, dataWhich, funcToRun, ac = TRUE)
+        filteredSI <- copy(screenInfo(obj))
+        filteredSI[, rowID := seq_len(nrow(filteredSI))] # so we can see what was removed (for applyIMS)
+        
+        colFilter <- function(si, pred, what, col, dataWhich, funcToRun, ac = TRUE)
         {
             val <- get(what)
             if (!is.null(val))
@@ -487,27 +490,27 @@ doSuspectFilter <- function(obj, onlyHits, selectHitsBy, selectBestFGroups, maxL
                         doPred <- function(x, v) !is.na(x) & nzchar(x) & pred(x, v)
                     
                     # ensure at least one column follows predicate
-                    obj@screenInfo <- screenInfo(obj)[rowSums(sapply(mget(allCols), doPred, val)) >= 1]
+                    si <- si[rowSums(sapply(mget(allCols), doPred, val)) >= 1]
                 }
             }
-            return(obj)
+            return(si)
         }
         colFilterAnn <- function(...) colFilter(dataWhich = "annotation", funcToRun = "annotateSuspects", ...)
         minPred <- function(x, v) x >= v
         maxPred <- function(x, v) x <= v
         levPred <- function(x, v) maxPred(numericIDLevel(x), v)
         
-        obj <- colFilterAnn(levPred, "maxLevel", "estIDLevel", ac = FALSE)
-        obj <- colFilterAnn(maxPred, "maxFormRank", "formRank", ac = FALSE)
-        obj <- colFilterAnn(maxPred, "maxCompRank", "compRank", ac = FALSE)
-        obj <- colFilterAnn(minPred, "minAnnSimForm", "annSimForm")
-        obj <- colFilterAnn(minPred, "minAnnSimComp", "annSimComp")
-        obj <- colFilterAnn(minPred, "minAnnSimBoth", "annSimBoth")
-        obj <- colFilterAnn(minPred, "absMinFragMatches", "maxFragMatches")
-        obj <- colFilterAnn(minPred, "relMinFragMatches", "maxFragMatchesRel")
+        filteredSI <- colFilterAnn(filteredSI, levPred, "maxLevel", "estIDLevel", ac = FALSE)
+        filteredSI <- colFilterAnn(filteredSI, maxPred, "maxFormRank", "formRank", ac = FALSE)
+        filteredSI <- colFilterAnn(filteredSI, maxPred, "maxCompRank", "compRank", ac = FALSE)
+        filteredSI <- colFilterAnn(filteredSI, minPred, "minAnnSimForm", "annSimForm")
+        filteredSI <- colFilterAnn(filteredSI, minPred, "minAnnSimComp", "annSimComp")
+        filteredSI <- colFilterAnn(filteredSI, minPred, "minAnnSimBoth", "annSimBoth")
+        filteredSI <- colFilterAnn(filteredSI, minPred, "absMinFragMatches", "maxFragMatches")
+        filteredSI <- colFilterAnn(filteredSI, minPred, "relMinFragMatches", "maxFragMatchesRel")
         
-        obj <- colFilter(minPred, "minRF", "RF_SMILES", dataWhich = "response factor", funcToRun = "predictRespFactors")
-        obj <- colFilter(maxPred, "maxLC50", "LC50_SMILES", dataWhich = "LC50", funcToRun = "predictTox")
+        filteredSI <- colFilter(filteredSI, minPred, "minRF", "RF_SMILES", dataWhich = "response factor", funcToRun = "predictRespFactors")
+        filteredSI <- colFilter(filteredSI, maxPred, "maxLC50", "LC50_SMILES", dataWhich = "LC50", funcToRun = "predictTox")
         
         # do here so that only duplicates not yet filtered out in previous steps are considered
         # NOTE for sets: for ID levels only the regular (non-set) estIDLevel column is used
@@ -544,27 +547,43 @@ doSuspectFilter <- function(obj, onlyHits, selectHitsBy, selectBestFGroups, maxL
                         si <- copy(si)
                         si[gTab, keep := i.keep, on = c("group", "name")]
                         setorderv(si, "name")
-                        obj@screenInfo <- si[keep == TRUE, -"keep"]
+                        si <- si[keep == TRUE, -"keep"]
                     }
                 }
-                return(obj@screenInfo)
+                return(si)
             }
             
             if (!is.null(selectHitsBy))
-                obj@screenInfo <- doSelectFilter(obj@screenInfo, selectHitsBy, "name")
+                filteredSI <- doSelectFilter(filteredSI, selectHitsBy, "name")
             if (selectBestFGroups)
-                obj@screenInfo <- doSelectFilter(obj@screenInfo, "level", "group")
+                filteredSI <- doSelectFilter(filteredSI, "level", "group")
         }
+        
+        if (applyIMS != "both" && hasMobilities(obj))
+        {
+            origSI <- screenInfo(obj)
+            rowsRM <- setdiff(seq_len(nrow(origSI)), filteredSI$rowID)
+            groupsKeep <- if (applyIMS) groupInfo(obj)[is.na(mobility)]$group else groupInfo(obj)[!is.na(mobility)]$group
+            rowsRM <- rowsRM[!origSI[rowsRM]$group %in% groupsKeep]
+            if (length(rowsRM) > 0)
+                obj@screenInfo <- obj@screenInfo[-rowsRM]
+        }
+        else
+            obj@screenInfo <- filteredSI[, -"rowID"]
     }
     
     # NOTE: do last in case previous steps removed hits 
     if (!is.null(onlyHits))
     {
-        sGroups <- unique(screenInfo(obj)$group)
-        if (negate && onlyHits)
-            obj <- obj[, setdiff(names(obj), sGroups)]
-        else
-            obj <- obj[, sGroups]
+        obj <- doFGroupsFilter(obj, "suspects", list(), function(fGroups)
+        {
+            sGroups <- unique(screenInfo(fGroups)$group)
+            if (negate && onlyHits)
+                fGroups <- fGroups[, setdiff(names(fGroups), sGroups)]
+            else
+                fGroups <- fGroups[, sGroups]
+            return(fGroups)
+        }, applyIMS = applyIMS)
     }
     
     return(obj)

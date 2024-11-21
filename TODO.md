@@ -344,6 +344,9 @@
     - clusterFGroupMobilities(): don't clear out annotation table (sets!)
         - copy data from IMS parents
         - maybe also for other slots? (with a warning/message?)
+    - parent-less IMS features
+        - test: reporting, minMobilityMatches and other post-suspect screening, ...
+        - handle normalization: perform like non-IMS workflow with a warning?
     - doc the use for fromSuspects, eg
         - doesn't rely on mobility peak detection, so might be less prone to false negatives with eg low intensities
         - scenario 1: we know the mobility very well, eg from a database --> use a narrow IMSWindow
@@ -370,6 +373,7 @@
 - Tests
     - more verification that fGroupsScreeningSets still works fine after removal of setObjects
     - more verification that normInts() works before/after findMobilities()
+    - IMS arg for [ and filter()
     
 - Docs
     - Dietrich features
@@ -382,9 +386,10 @@
         - mention that feature properties (except intensity, rt, area) are simply copied from parent
     - ISTDs
         - doc that mobility features are completely ignored for normalization, and relative intensities/areas are copied from parents
-    - plotChroms()/plotMobilograms():
+    - plotChroms()/plotMobilograms()
         - annotate has mob option
         - intMax can only work for EICs (mob inten may not be stored)
+    - IMS arg for [ and filter()
 
 - NEWS
     - Dietrich features
@@ -395,6 +400,7 @@
         - makes common operations faster
     - FIXED: fGroupsScreeningSet now correctly stores RF_SMILES per set
     - plotChroms(): annotate now has mob option
+    - IMS arg for [ and filter()
 
 ## Features
 

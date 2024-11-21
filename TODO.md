@@ -373,7 +373,7 @@
 - Tests
     - more verification that fGroupsScreeningSets still works fine after removal of setObjects
     - more verification that normInts() works before/after findMobilities()
-    - IMS arg for [ and filter()
+    - IMS arg for [, filter() and plotting functions
     - applyMS for filter()
     
 - Docs
@@ -390,7 +390,8 @@
     - plotChroms()/plotMobilograms()
         - annotate has mob option
         - intMax can only work for EICs (mob inten may not be stored)
-    - IMS arg for [ and filter()
+        - plotChroms(): IMS arg overrides analysis/groupNames args for availability after IMS selection
+    - IMS arg for [, filter() and plotting functions
     - applyIMS arg for all fGroups filter methods
         - ignores negate!
     - withIMSParent arg for filter()

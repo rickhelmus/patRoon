@@ -57,9 +57,12 @@ NULL
 #' @rdname feature-plotting
 #' @export
 setMethod("plot", c(x = "featureGroups", y = "missing"), function(x, groupBy = NULL, onlyUnique = FALSE,
-                                                                  retMin = FALSE, showLegend = TRUE, col = NULL,
-                                                                  pch = NULL, ...)
+                                                                  retMin = FALSE, showLegend = TRUE, IMS = "maybe",
+                                                                  col = NULL, pch = NULL, ...)
 {
+    assertIMSArg(IMS)
+    x <- prepIMSFGroupsForPlot(x, IMS)
+    
     anaInfo <- analysisInfo(x)
 
     ac <- checkmate::makeAssertCollection()
@@ -187,10 +190,13 @@ setMethod("plotHash", "featureGroups", function(x, ...)
 #' @export
 setMethod("plotInt", "featureGroups", function(obj, average = FALSE, averageFunc = mean, areas = FALSE,
                                                normalized = FALSE, xBy = NULL, xNames = TRUE, groupBy = "fGroups",
-                                               regression = FALSE, showLegend = FALSE, pch = 20,
+                                               regression = FALSE, showLegend = FALSE, IMS = "maybe", pch = 20,
                                                type = if (regression) "p" else "b", lty = 3,
                                                col = NULL, plotArgs = NULL, linesArgs = NULL)
 {
+    assertIMSArg(IMS)
+    obj <- prepIMSFGroupsForPlot(obj, IMS)
+    
     anaInfo <- analysisInfo(obj)
     
     ac <- checkmate::makeAssertCollection()
@@ -384,8 +390,11 @@ setMethod("plotIntHash", "featureGroups", function(obj, ...) makeHash(groupTable
 #' @rdname feature-plotting
 #' @export
 setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addRetMzPlots = TRUE, aggregate = FALSE,
-                                                 groupBy = NULL, addIntraOuterGroupLinks = FALSE, ...)
+                                                 groupBy = NULL, addIntraOuterGroupLinks = FALSE, IMS = "maybe",  ...)
 {
+    assertIMSArg(IMS)
+    obj <- prepIMSFGroupsForPlot(obj, IMS)
+    
     anaInfo <- analysisInfo(obj)
     
     ac <- checkmate::makeAssertCollection()
@@ -555,8 +564,8 @@ setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj),
                                                   retMin = FALSE, showPeakArea = FALSE, showFGroupRect = TRUE,
                                                   title = NULL, groupBy = NULL, showLegend = TRUE,
                                                   annotate = c("none", "ret", "mz", "mob"), intMax = "eic",
-                                                  EICParams = getDefEICParams(), showProgress = FALSE, xlim = NULL,
-                                                  ylim = NULL, EICs = NULL, ...)
+                                                  EICParams = getDefEICParams(), showProgress = FALSE, IMS = "maybe",
+                                                  xlim = NULL, ylim = NULL, EICs = NULL, ...)
 {
     ac <- checkmate::makeAssertCollection()
     assertPlotEIXArgs(obj, analysis, groupName, showPeakArea, showFGroupRect, title, groupBy, showLegend, annotate,
@@ -564,6 +573,7 @@ setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj),
     checkmate::assertFlag(retMin, add = ac)
     checkmate::assertChoice(intMax, c("eic", "feature"), add = ac)
     assertEICParams(EICParams, add = ac)
+    assertIMSArg(IMS, add = ac)
     checkmate::reportAssertions(ac)
     
     if (intMax == "feature" && !EICParams$onlyPresent)
@@ -571,6 +581,13 @@ setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj),
     
     if (intMax == "eic")
         intMax <- "eix" # for makeEIXPlot()
+    
+    obj <- prepIMSFGroupsForPlot(obj, IMS)
+    if (IMS != "both")
+    {
+        analysis <- intersect(analysis, analyses(obj))
+        groupName <- intersect(groupName, names(obj))
+    }
     
     if (is.null(EICs))
         EICs <- getFeatureEIXs(obj, type = "EIC", analysis, groupName, EICParams)
@@ -609,7 +626,8 @@ setMethod("plotChromsHash", "featureGroups", function(obj, analysis = analyses(o
                                                       title = NULL, groupBy = NULL, showLegend = TRUE,
                                                       annotate = c("none", "ret", "mz", "mob"),
                                                       intMax = "eic", EICParams = getDefEICParams(),
-                                                      showProgress = FALSE, xlim = NULL, ylim = NULL, EICs = NULL, ...)
+                                                      showProgress = FALSE, IMS = "maybe", xlim = NULL, ylim = NULL,
+                                                      EICs = NULL, ...)
 {
     annotate <- checkmate::matchArg(annotate, c("none", "ret", "mz", "mob"), several.ok = TRUE)
     if ("none" %in% annotate)
@@ -620,6 +638,7 @@ setMethod("plotChromsHash", "featureGroups", function(obj, analysis = analyses(o
         # omit data we don't need: speeds up hashing quite a bit
         # NOTE: only apply analysis/group filters, as the rest will slow down things considerably. Hence, this could
         # result in cache misses.
+        # NOTE: we also ignore changes in analysis and groupName by selection from IMS arg
         EICs <- filterEIXs(EICs, obj, analysis = analysis, groupName = groupName, topMost = NULL,
                            topMostByRGroup = FALSE, onlyPresent = FALSE)
     }
@@ -697,8 +716,11 @@ setMethod("plotMobilogramHash", "featureGroups", function(obj, analysis = analys
 #' 
 #' @rdname feature-plotting
 #' @export
-setMethod("plotVenn", "featureGroups", function(obj, which = NULL, aggregate = TRUE, ...)
+setMethod("plotVenn", "featureGroups", function(obj, which = NULL, aggregate = TRUE, IMS = "maybe", ...)
 {
+    assertIMSArg(IMS)
+    obj <- prepIMSFGroupsForPlot(obj, IMS)
+    
     anaInfo <- analysisInfo(obj)
     aggregate <- assertAndPrepareAnaInfoBy(aggregate, anaInfo, FALSE)
     groups <- unique(anaInfo[[aggregate]])
@@ -748,9 +770,12 @@ setMethod("plotVennHash", "featureGroups", function(obj, ...)
 #'
 #' @rdname feature-plotting
 #' @export
-setMethod("plotUpSet", "featureGroups", function(obj, which = NULL, aggregate = TRUE, nsets = NULL,
+setMethod("plotUpSet", "featureGroups", function(obj, which = NULL, aggregate = TRUE, IMS = "maybe", nsets = NULL,
                                                  nintersects = NA, ...)
 {
+    assertIMSArg(IMS)
+    obj <- prepIMSFGroupsForPlot(obj, IMS)
+    
     anaInfo <- analysisInfo(obj)
     aggregate <- assertAndPrepareAnaInfoBy(aggregate, anaInfo, FALSE)
     groups <- unique(anaInfo[[aggregate]])
@@ -798,17 +823,17 @@ setMethod("plotUpSetHash", "featureGroups", function(obj, ...)
 #' @rdname feature-plotting
 #' @export
 setMethod("plotVolcano", "featureGroups", function(obj, FCParams, showLegend = TRUE, averageFunc = mean,
-                                                   normalized = FALSE, col = NULL, pch = 19, ...)
+                                                   normalized = FALSE, IMS = "maybe", col = NULL, pch = 19, ...)
 {
     ac <- checkmate::makeAssertCollection()
     assertFCParams(FCParams, obj, null.ok = FALSE, add = ac)
     checkmate::assertFlag(showLegend, add = ac)
     checkmate::assertFunction(averageFunc, add = ac)
     checkmate::assertFlag(normalized, add = ac)
+    assertIMSArg(IMS, add = ac)
     checkmate::reportAssertions(ac)
-    
-    ac <- checkmate::makeAssertCollection()
-    checkmate::reportAssertions(ac)
+
+    obj <- prepIMSFGroupsForPlot(obj, IMS)
     
     if (length(obj) == 0)
         stop("Can't plot empty feature groups object")

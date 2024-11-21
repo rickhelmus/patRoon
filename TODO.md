@@ -386,6 +386,7 @@
     - IMS arg for [ and filter()
     - applyIMS arg for all fGroups filter methods
         - ignores negate!
+    - withIMSParent arg for filter()
 
 - NEWS
     - Dietrich features
@@ -399,6 +400,7 @@
     - IMS arg for [ and filter()
     - applyIMS arg for all fGroups filter methods
     - filter: removeISTDs and onlyHits now use doFGroupFilter() --> caches and prints message
+    - withIMSParent arg for filter()
 
 ## Features
 

@@ -1,3 +1,7 @@
+# Devel
+
+* Fixed: `reAverage = TRUE` was not handled correctly for the `delete()` method for `MSPeakListsSet`
+
 # patRoon 2.3.3
 
 ## Import changes

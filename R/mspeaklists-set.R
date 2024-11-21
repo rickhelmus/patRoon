@@ -161,9 +161,9 @@ setMethod("as.data.table", "MSPeakListsSet", function(x, fGroups = NULL, average
 
 #' @rdname MSPeakLists-class
 #' @export
-setMethod("delete", "MSPeakListsSet", function(obj, ...)
+setMethod("delete", "MSPeakListsSet", function(obj, i = NULL, j = NULL, k = NULL, reAverage = FALSE, ...)
 {
-    obj <- callNextMethod()
+    obj <- callNextMethod(obj, i, j, k, reAverage = FALSE, ...) # NOTE: re-averaging is done below
     
     # sync set objects
     obj@setObjects <- Map(sets(obj), obj@setObjects, f = function(sn, so)
@@ -174,8 +174,8 @@ setMethod("delete", "MSPeakListsSet", function(obj, ...)
         # remove removed groups
         so <- delete(so, i = !groupNames(so) %chin% groupNames(obj))
         
-        # remove removed peaks
-        delete(so, j = function(PL, grp, ana, t)
+        # remove removed peaks and re-average if needed
+        delete(so, reAverage = reAverage, j = function(PL, grp, ana, t)
         {
             setPL <- if (is.null(ana)) obj[[grp]][[t]] else obj[[ana, grp]][[t]]
             if (is.null(setPL))
@@ -185,6 +185,9 @@ setMethod("delete", "MSPeakListsSet", function(obj, ...)
             return(!PL$ID %in% setPL$ID)
         })
     })
+    
+    if (reAverage)
+        obj <-  syncMSPeakListsSetObjects(obj)
     
     return(obj)
 })

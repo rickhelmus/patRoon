@@ -1,6 +1,7 @@
 context("MS peak lists")
 
 fGroups <- getTestFGroups(getTestAnaInfoAnn())[, 1:100]
+ovFGroup <- if (testWithSets()) names(overlap(fGroups, c("positive", "negative"), sets = TRUE))[1] else names(fGroups)[1]
 plists <- generateMSPeakLists(fGroups, "mzr")
 plistsMSMS <- filter(plists, withMSMS = TRUE)
 
@@ -129,6 +130,8 @@ test_that("delete and filter", {
     expect_equal(delete(plists, i = character()), plists)
     expect_equal(delete(plists, j = integer()), plists)
     expect_equal(delete(plists, k = character()), plists)
+    expect_equal(delete(plists, k = 1, reAverage = FALSE)[[ovFGroup]], plists[[ovFGroup]])
+    expect_false(isTRUE(all.equal(delete(plists, k = 1, reAverage = TRUE)[[ovFGroup]], plists[[ovFGroup]])))
     expect_length(delete(plists), 0)
     
     expect_gte(checkIntLimit(filter(plists, absMSIntThr = 2500), FALSE, TRUE, FALSE), 2500)
@@ -187,6 +190,8 @@ test_that("basic functionality", {
     expect_equivalent(groupNames(plists[, 1:2]), groupNames(plists)[1:2])
     expect_equivalent(groupNames(plists[, groupNames(plists)[2:3]]), groupNames(plists)[2:3])
     expect_equivalent(groupNames(plists[, c(FALSE, TRUE)]), groupNames(plists)[c(FALSE, TRUE)])
+    expect_equivalent(plists[1:2, reAverage = FALSE][[ovFGroup]], plists[[ovFGroup]])
+    expect_false(isTRUE(all.equal(plists[1:2, reAverage = TRUE][[ovFGroup]], plists[[ovFGroup]])))
     expect_equal(length(plists[FALSE, reAverage = TRUE]), 0)
     expect_length(plistsEmpty[1:5], 0)
 

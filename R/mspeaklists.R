@@ -435,7 +435,7 @@ setMethod("delete", "MSPeakLists", function(obj, i = NULL, j = NULL, k = NULL, r
     if (reAverage)
     {
         obj@averagedPeakLists <- averageMSPeakLists(obj)
-        obj <- assignMSPLIDs(obj) # re-generater as IDs are cleared by re-averaging
+        obj <- assignMSPLIDs(obj) # re-generate as IDs are cleared by re-averaging
     }
     
     return(obj)

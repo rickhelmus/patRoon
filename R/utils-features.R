@@ -880,6 +880,7 @@ doAssignFeatureMobilities <- function(fTable, mobTable)
         
         # merge mobility features
         fTable <- rbind(fTable, mobTable, fill = TRUE)
+        fTable[is.na(mobility), ims_parent_ID := NA_character_]
         
         setorderv(fTable, c("ord", "mobOrd"), na.last = FALSE)
     }
@@ -1080,6 +1081,7 @@ clusterFGroupMobilities <- function(fGroups, IMSWindow, sets)
     setnames(gInfo, "group", "ims_parent_group")
     gInfo <- merge(gInfo, gMobInfo, by = "ims_parent_group", sort = FALSE)
     setcolorder(gInfo, c("group", "ret", "mz", "mobility", "ims_parent_group"))
+    gInfo[is.na(mobility), ims_parent_group := NA_character_]
     fGroups@groupInfo <- gInfo[, -"IMSClust"]
     
     # re-fill group table

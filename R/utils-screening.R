@@ -178,7 +178,8 @@ expandAndUpdateScreenInfoForIMS <- function(scr, gInfo)
     gInfo <- gInfo[group %chin% scr$group | ims_parent_group %chin% scr$group]
     scr <- copy(scr)
     scr[, orderOrig := seq_len(.N)]
-    scr <- scr[match(gInfo$ims_parent_group, group)] # expand
+    imspars <- fifelse(is.na(gInfo$ims_parent_group), gInfo$group, gInfo$ims_parent_group)
+    scr <- scr[match(imspars, group)] # expand & copy
     scr[, group := gInfo$group]
     scr[, d_rt := gInfo$ret[match(group, gInfo$group)] - rt]
     setorderv(scr, "orderOrig")

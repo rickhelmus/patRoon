@@ -447,6 +447,18 @@ assertDeleteArgAndToChr <- function(x, choices, .var.name = checkmate::vname(x),
     return(x)
 }
 
+assertIMSArg <- function(x, null.ok = FALSE, .var.name = checkmate::vname(x), add = NULL)
+{
+    if (is.null(x) && null.ok)
+        return(invisible(NULL))
+
+    checkmate::assert(
+        checkmate::checkFlag(x),
+        checkmate::checkChoice(x, c("both", "maybe")),
+        .var.name = .var.name, add = add
+    )
+}
+
 assertApplyIMSArg <- function(x, .var.name = checkmate::vname(x), add = NULL)
 {
     checkmate::assert(

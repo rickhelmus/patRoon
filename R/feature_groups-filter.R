@@ -328,7 +328,7 @@ replicateGroupFilter <- function(fGroups, rGroups, negate = FALSE, applyIMS = "b
     }, "replicate_group", applyIMS, verbose))
 }
 
-selectIMSFilter <- function(fGroups, IMS, negate, applyIMS)
+selectIMSFilter <- function(fGroups, IMS, negate = FALSE, applyIMS = "both", verbose = TRUE)
 {
     if (!hasMobilities(fGroups))
     {
@@ -341,11 +341,19 @@ selectIMSFilter <- function(fGroups, IMS, negate, applyIMS)
     
     return(doFGroupsFilter(fGroups, "IMS selection", IMS, function(fGroups)
     {
+        if (IMS == "both")
+            return(fGroups)
+        
         gInfoDel <- groupInfo(fGroups)
-        gInfoDel <- if (IMS) gInfoDel[is.na(mobility)] else gInfoDel[!is.na(mobility)]
+        gInfoDel <- if (isTRUE(IMS))
+            gInfoDel[is.na(mobility)]
+        else if (isFALSE(IMS))
+            gInfoDel[!is.na(mobility)]
+        else # "maybe"
+            gInfoDel[!is.na(mobility) & ims_parent_group %chin% names(fGroups)]
         
         return(delete(fGroups, j = gInfoDel$group))
-    }, "IMS_selection", applyIMS = applyIMS))
+    }, "IMS_selection", applyIMS = "both", verbose = verbose))
 }
 
 resultsFilter <- function(fGroups, results, negate = FALSE, applyIMS = "both", verbose = TRUE)
@@ -608,7 +616,7 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
            list(c(featureQualityNames(group = FALSE), featureQualityNames(group = FALSE, scores = TRUE)),
                 c(featureQualityNames(), featureQualityNames(scores = TRUE))), fixed = list(add = ac))
     checkmate::assertCharacter(rGroups, min.chars = 1, min.len = 1, any.missing = FALSE, null.ok = TRUE, add = ac)
-    checkmate::assertFlag(IMS, null.ok = TRUE, add = ac)
+    assertIMSArg(IMS, null.ok = TRUE, add = ac)
     checkmate::assert(checkmate::checkNull(results),
                       checkmate::checkClass(results, "featureAnnotations"),
                       checkmate::checkClass(results, "components"),

@@ -228,9 +228,14 @@ importFeaturesKPIC2 <- function(picsList, analysisInfo)
 #' @rdname kpic2-conv
 #' @aliases getPICSet
 #' @export
-setMethod("getPICSet", "features", function(obj, loadRawData = TRUE)
+setMethod("getPICSet", "features", function(obj, loadRawData = TRUE, IMS = FALSE)
 {
     checkmate::assertFlag(loadRawData)
+    assertIMSArg(IMS)
+    
+    if (IMS != "both" && hasMobilities(obj))
+        obj <- selectIMSFilterFeatures(obj, IMS)
+    
     
     anaInfo <- analysisInfo(obj)
     fTable <- featureTable(obj)

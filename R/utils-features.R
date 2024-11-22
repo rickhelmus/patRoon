@@ -1108,7 +1108,12 @@ clusterFGroupMobilities <- function(fGroups, IMSWindow, sets)
     setnames(fTableAll, "group", "ims_parent_group") # UNDONE: better colname
     fTableAll[gMobInfo, group := i.group, on = c("ims_parent_group", "IMSClust")]
     fTableAll <- removeDTColumnsIfPresent(fTableAll, c("IMSClust", "set", "ims_parent_group"))
-    featureTable(fGroups) <- split(fTableAll, by = "analysis", keep.by = FALSE)
+    fTable <- split(fTableAll, by = "analysis", keep.by = FALSE)
+    # NOTE: the above will not restore any empty feature tables
+    missingAna <- setdiff(analyses(fGroups), names(fTable))
+    fTable[missingAna] <- rep(list(fTableAll[0]), length(missingAna)) # get empty table with all cols
+    fTable <- fTable[analyses(fGroups)] # restore order
+    featureTable(fGroups) <- fTable
     
     # update gInfo
     gInfo <- copy(groupInfo(fGroups))

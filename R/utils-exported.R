@@ -652,7 +652,7 @@ getDefPredAggrParams <- function(all = mean, ...)
 
 #' @rdname pred-quant
 #' @export
-getQuantCalibFromScreening <- function(fGroups, concs, areas = FALSE, average = FALSE)
+getQuantCalibFromScreening <- function(fGroups, concs, areas = FALSE, average = FALSE, IMS = "maybe")
 {
     # UNDONE: mention that duplicate suspects (name.x) are ignored
     
@@ -671,8 +671,12 @@ getQuantCalibFromScreening <- function(fGroups, concs, areas = FALSE, average = 
     for (col in concRGs)
         checkmate::assertNumeric(concs[[col]], finite = TRUE, .var.name = paste0("concs[['", col, "']]"), add = ac)
     aapply(checkmate::assertFlag, . ~ areas + average, fixed = list(add = ac))
+    assertIMSArg(IMS, add = ac)
     checkmate::reportAssertions(ac)
 
+    if (IMS != "both" && hasMobilities(fGroups))
+        fGroups <- selectIMSFilter(fGroups, IMS, verbose = FALSE)
+    
     anaInfo <- analysisInfo(fGroups)
     
     if (!is.data.table(concs))

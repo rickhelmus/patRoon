@@ -398,6 +398,7 @@
     - calculateConcs()
         - clearly doc that mobility parent intensities are used to calculate concentrations (if available).
         - Also note that the mobility fGroup's RF is still used (only relevant for SIRIUS or RT changes), and is different then when findMobilities() copies results
+        - IMS arg for getQuantCalibFromScreening() --> clearly doc that default is best
     - ADT
         - IMS option and mobility_collapsed column, which contains rounded numbers
 
@@ -410,7 +411,7 @@
         - makes common operations faster
     - FIXED: fGroupsScreeningSet now correctly stores RF_SMILES per set
     - plotChroms(): annotate now has mob option
-    - IMS arg for [ and filter()
+    - IMS arg for [, filter(), plotting functions, ADT, getQuantCalibFromScreening()
     - applyIMS arg for all fGroups filter methods
     - filter: removeISTDs and onlyHits now use doFGroupFilter() --> caches and prints message
     - withIMSParent arg for filter()

@@ -19,11 +19,15 @@ setMethod("delete", "featuresXCMS3", function(obj, i = NULL, j = NULL, ...)
     old <- obj
     obj <- callNextMethod()
     
-    # simple ana subset
-    if (is.null(j) && !setequal(analyses(old), analyses(obj)))
-        obj@xdata <- xcms::filterFile(obj@xdata, which(analyses(old) %in% analyses(obj)))
-    else if (!is.null(j)) # sync features
-        obj@xdata <- xcms::filterChromPeaks(obj@xdata, getKeptXCMSPeakInds(old, obj))
+    if (!hasMobilities(obj))
+    {
+        # simple ana subset
+        if (is.null(j) && !setequal(analyses(old), analyses(obj)))
+            obj@xdata <- xcms::filterFile(obj@xdata, which(analyses(old) %in% analyses(obj)))
+        else if (!is.null(j)) # sync features
+            obj@xdata <- xcms::filterChromPeaks(obj@xdata, getKeptXCMSPeakInds(old, obj))
+    }
+    
     return(obj)
 })
 

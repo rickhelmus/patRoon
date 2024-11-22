@@ -632,13 +632,21 @@ setMethod("averageGroups", "featureGroups", function(fGroups, areas, normalized,
 #'   \code{"mzmine"} (MZmine).
 #' @param out The destination file for the exported data.
 #' @export
-setMethod("export", "featureGroups", function(obj, type, out)
+setMethod("export", "featureGroups", function(obj, type, out, IMS = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertChoice(type, c("brukerpa", "brukertasq", "mzmine"), add = ac)
     checkmate::assertPathForOutput(out, overwrite = TRUE, add = ac) # NOTE: assert doesn't work on Windows...
+    assertIMSArg(IMS, add = ac)
     checkmate::reportAssertions(ac)
 
+    if (IMS != "both" && hasMobilities(obj))
+    {
+        if (!isFALSE(IMS))
+            warning("Exporting mobility features is not supported; mobility data will not be exported.", call. = FALSE)
+        obj <- selectIMSFilter(obj, IMS, verbose = FALSE)
+    }
+    
     if (length(obj) == 0)
         stop("Cannot export empty feature groups object")
 

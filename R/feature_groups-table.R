@@ -24,8 +24,15 @@ mergeScreenInfoWithDT <- function(tab, scrInfo, collapseSuspects, onlyHits)
 
 doFGAADTGroups <- function(fGroups, intColNames, average, averageBy, areas, addQualities, addScores, regression,
                            regressionBy, averageFunc, normalized, FCParams, concAggrParams, toxAggrParams,
-                           normConcToTox, collapseSuspects, onlyHits)
+                           normConcToTox, IMS, collapseSuspects, onlyHits)
 {
+    fGroupsOrig <- NULL
+    if (IMS != "both")
+    {
+        fGroupsOrig <- fGroups
+        fGroups <- selectIMSFilter(fGroups, IMS = IMS, verbose = FALSE)
+    }
+    
     anaInfo <- analysisInfo(fGroups)
     gNames <- names(fGroups)
     gInfo <- groupInfo(fGroups)
@@ -109,8 +116,20 @@ doFGAADTGroups <- function(fGroups, intColNames, average, averageBy, areas, addQ
     
     ret[, c("group", "ret", "mz") := .(gNames, gInfo$ret, gInfo$mz)]
     if (hasMobilities(fGroups))
+    {
         ret[, c("mobility", "ims_parent_group") := .(gInfo$mobility, gInfo$ims_parent_group)]
-    setcolorder(ret, intersect(c("group", "ims_parent_group", "ret", "mz", "mobility"), names(ret)))
+        if (IMS != "both")
+        {
+            gInfoOrig <- groupInfo(fGroupsOrig)
+            digits <- 3 # UNDONE: is this a good number?
+            ret[!is.na(mobility), mobility_collapsed := as.character(round(mobility, digits))]
+            ret[is.na(mobility), mobility_collapsed := sapply(group, function(g)
+            {
+                paste0(round(gInfoOrig[ims_parent_group == g]$mobility, digits), collapse = ",")
+            })]
+        }
+    }
+    setcolorder(ret, intersect(c("group", "ims_parent_group", "ret", "mz", "mobility", "mobility_collapsed"), names(ret)))
     
     if (addQualities)
         ret <- cbind(ret, groupQualities(fGroups)[match(ret$group, group), -"group"])
@@ -229,8 +248,15 @@ doFGAADTGroups <- function(fGroups, intColNames, average, averageBy, areas, addQ
 }
 
 doFGAADTFeatures <- function(fGroups, fgTab, intColNames, average, averageBy, addQualities, addScores, regression,
-                             regressionBy, averageFunc, anaInfoCols)
+                             regressionBy, averageFunc, anaInfoCols, IMS)
 {
+    fGroupsOrig <- NULL
+    if (IMS != "both")
+    {
+        fGroupsOrig <- fGroups
+        fGroups <- selectIMSFilter(fGroups, IMS = IMS, verbose = FALSE)
+    }
+    
     anaInfo <- analysisInfo(fGroups)
     
     # prepare feature properties to merge
@@ -281,6 +307,17 @@ doFGAADTFeatures <- function(fGroups, fgTab, intColNames, average, averageBy, ad
         featTab <- unique(featTab, by = by)
     }
     
+    if (IMS != "both" && hasMobilities(fGroups))
+    {
+        fTabOrig <- featureTable(fGroupsOrig)
+        digits <- 3 # UNDONE: is this a good number?
+        featTab[!is.na(mobility), mobility_collapsed := as.character(round(mobility, digits))]
+        featTab[is.na(mobility), mobility_collapsed := mapply(ID, analysis, FUN = function(i, a)
+        {
+            paste0(round(fTabOrig[[a]][ims_parent_ID == i]$mobility, digits), collapse = ",")
+        })]
+    }
+    
     # prepare main table for merge
     
     if (averageBy != "fGroups")
@@ -306,7 +343,8 @@ doFGAADTFeatures <- function(fGroups, fgTab, intColNames, average, averageBy, ad
         fgTab[, average_group := stripADTIntSuffix(average_group)]
     }
     fgTab <- removeDTColumnsIfPresent(fgTab, "intensity")
-    setnames(fgTab, c("ret", "mz", "mobility"), c("group_ret", "group_mz", "group_mobility"), skip_absent = TRUE)
+    setnames(fgTab, c("ret", "mz", "mobility", "mobility_collapsed"),
+             c("group_ret", "group_mz", "group_mobility", "group_mobility_collapsed"), skip_absent = TRUE)
     annCols <- grep("^(neutralMass|ion_mz|adduct)", names(fgTab), value = TRUE)
     if (length(annCols) > 0)
         setnames(fgTab, annCols, paste0("group_", annCols))
@@ -338,8 +376,8 @@ doFGAADTFeatures <- function(fGroups, fgTab, intColNames, average, averageBy, ad
     # set nice column order
     qualCols <- c(featureQualityNames(), featureQualityNames(scores = TRUE))
     colord <- c("group", "ims_parent_group", "set", "analysis", "average_group", "replicate_group", "group_ret",
-                "group_mz", "group_mobility", "ID", "ims_parent_ID", "ret", "mz", "ion_mz", "intensity", "area",
-                "intensity_rel", "area_rel")
+                "group_mz", "group_mobility", "group_mobility_collapsed", "ID", "ims_parent_ID", "ret", "mz", "ion_mz",
+                "mobility", "mobility_collapsed", "intensity", "area", "intensity_rel", "area_rel")
     colord <- c(colord, setdiff(names(featTab), c(colord, qualCols)))
     colord <- c(colord, grep("group_(ion_mz|adduct)", names(fgTab), value = TRUE), "neutralMass", "x_reg",
                 getADTRegCols(), "regression_group", featureQualityNames(),
@@ -380,14 +418,14 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
                             regression = FALSE, regressionBy = NULL, averageFunc = mean, normalized = FALSE,
                             FCParams = NULL, concAggrParams = getDefPredAggrParams(),
                             toxAggrParams = getDefPredAggrParams(), normConcToTox = FALSE, anaInfoCols = NULL,
-                            collapseSuspects = ",", onlyHits = FALSE)
+                            IMS = "both", collapseSuspects = ",", onlyHits = FALSE)
 {
     anaInfo <- analysisInfo(fGroups)
     if (isTRUE(regression))
         regression <- "conc" # legacy
     
     assertFGAsDataTableArgs(fGroups, areas, features, qualities, regression, regressionBy, averageFunc, normalized,
-                            FCParams, concAggrParams, toxAggrParams, normConcToTox, anaInfoCols, collapseSuspects,
+                            FCParams, concAggrParams, toxAggrParams, normConcToTox, anaInfoCols, IMS, collapseSuspects,
                             onlyHits)
     averageBy <- assertAndPrepareAnaInfoBy(average, anaInfo, TRUE)
     
@@ -425,12 +463,12 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
 
     ret <- doFGAADTGroups(fGroups, intColNames, average, averageBy, areas, addQualities, addScores, regression,
                           regressionBy, averageFunc, normalized, FCParams, concAggrParams, toxAggrParams,
-                          normConcToTox, collapseSuspects, onlyHits)    
+                          normConcToTox, IMS, collapseSuspects, onlyHits)    
 
     if (features)
     {
         ret <- doFGAADTFeatures(fGroups, ret, intColNames, average, averageBy, addQualities, addScores, regression,
-                                regressionBy, averageFunc, anaInfoCols)
+                                regressionBy, averageFunc, anaInfoCols, IMS)
     }
     
     return(ret[])

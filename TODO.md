@@ -369,6 +369,8 @@
     - mobilograms
         - make setting (and use it instead of large chroms)
         - have small/big mobilograms? or put them in a separate tab instead of the table?
+- if all mobility features are deleted, remove mobility columns etc so that hasMobilities() returns FALSE?
+    - or should hasMobilities() actually check if there is still a feature with assigned mobility left?
 
 - Tests
     - more verification that fGroupsScreeningSets still works fine after removal of setObjects
@@ -391,7 +393,8 @@
         - annotate has mob option
         - intMax can only work for EICs (mob inten may not be stored)
         - plotChroms(): IMS arg overrides analysis/groupNames args for availability after IMS selection
-    - IMS arg for [, filter() and plotting functions
+    - IMS arg for [, filter() and plotting functions, export(), getXCMS...()
+    - doc that IMS arg should most likely be FALSE for export/getXCMS...()
     - applyIMS arg for all fGroups filter methods
         - ignores negate!
     - withIMSParent arg for filter()
@@ -411,7 +414,7 @@
         - makes common operations faster
     - FIXED: fGroupsScreeningSet now correctly stores RF_SMILES per set
     - plotChroms(): annotate now has mob option
-    - IMS arg for [, filter(), plotting functions, ADT, getQuantCalibFromScreening()
+    - IMS arg for [, filter(), plotting functions, ADT, getQuantCalibFromScreening(), export(), getXCMS...()
     - applyIMS arg for all fGroups filter methods
     - filter: removeISTDs and onlyHits now use doFGroupFilter() --> caches and prints message
     - withIMSParent arg for filter()

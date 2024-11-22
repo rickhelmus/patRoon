@@ -66,7 +66,7 @@ findFeaturesXCMS3 <- function(analysisInfo, param = xcms::CentWaveParam(), ..., 
 
     files <- getCentroidedMSFilesFromAnaInfo(analysisInfo)
 
-    hash <- makeHash(analysisInfo[, c("analysis", "path", "group"), with = FALSE], do.call(makeFileHash, as.list(files)),
+    hash <- makeHash(analysisInfo[, c("analysis", "path_centroid", "group"), with = FALSE], do.call(makeFileHash, as.list(files)),
                      param)
     cachef <- loadCacheData("featuresXCMS3", hash)
     if (!is.null(cachef))

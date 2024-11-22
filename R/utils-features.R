@@ -603,7 +603,21 @@ calcFeatureConcs <- function(fGroups, resp, areas)
 {
     # get concentration data from response factors
     
-    gt <- transpose(groupTable(fGroups, areas = areas)[, resp$group, with = FALSE])
+    gt <- groupTable(fGroups, areas = areas)[, resp$group, with = FALSE]
+    if (hasMobilities(fGroups))
+    {
+        # for mobility features, we take parent intensities (if available) as mobility filtering may lead to reduced
+        # intensities that currently are not taken into account when calculating response factors
+        # UNDONE: make this configurable?
+        gInfoChange <- groupInfo(fGroups)[!is.na(mobility) & group %chin% resp$group & ims_parent_group %chin% group]
+        if (nrow(gInfoChange) > 0)
+        {
+            for (grpi in seq_along(gInfoChange))
+                set(gt, j = gInfoChange$group[grpi], value = fGroups[[gInfoChange$ims_parent_group[grpi]]])
+        }
+    }
+    
+    gt <- transpose(gt)
     setnames(gt, analyses(fGroups))
     
     concs <- copy(resp)

@@ -384,8 +384,10 @@ predictRespFactorsSMILES <- function(fgSMILESTab, gInfo, calibrants, eluent, org
     fgSMILESTab[, conc_M := NA_real_]
     fgSMILESTab[, area := 1] # NOTE: we set the area to one to easily get the response factor
     fgSMILESTab[, hash := makeHash(baseHash, retention_time, SMILES), by = seq_len(nrow(fgSMILESTab))] 
-    
-    cachedData <- loadCacheData("RF_SMILES", fgSMILESTab$hash, simplify = FALSE)
+
+    # NOTE: for mobility feature groups, hashes can be the same as there could be duplicated RTs
+    # --> pass unique hashes to loadCacheData() below
+    cachedData <- loadCacheData("RF_SMILES", unique(fgSMILESTab$hash), simplify = FALSE)
     fgSMILESTabTODO <- if (!is.null(cachedData)) fgSMILESTab[!hash %in% names(cachedData)] else fgSMILESTab
     
     MS2QRes <- NULL 
@@ -400,9 +402,8 @@ predictRespFactorsSMILES <- function(fgSMILESTab, gInfo, calibrants, eluent, org
     
     if (!is.null(cachedData))
     {
-        cachedRFs <- rbindlist(lapply(cachedData, function(cd) data.table(RF_SMILES = cd)), idcol = "hash")
-        cachedRFs[, SMILES := fgSMILESTab$SMILES[match(hash, fgSMILESTab$hash)]]
-        cachedRFs[, group := fgSMILESTab$group[match(hash, fgSMILESTab$hash)]]
+        cachedRFs <- copy(fgSMILESTab[hash %chin% names(cachedData), c("group", "SMILES", "hash")])
+        cachedRFs[, RF_SMILES := unlist(cachedData[hash])] # subsetting by hash will correctly handle duplicates (see NOTE above)
         cachedRFs[, hash := NULL]
         
         if (is.null(MS2QRes))

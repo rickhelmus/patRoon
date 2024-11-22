@@ -105,12 +105,16 @@ makeXCMSGroups <- function(fGroups, verbose = TRUE)
 
 #' @rdname xcms-conv
 #' @export
-setMethod("getXCMSSet", "features", function(obj, verbose, loadRawData)
+setMethod("getXCMSSet", "features", function(obj, verbose, loadRawData, IMS = FALSE)
 {
     # generate dummy XCMS set, based on https://groups.google.com/forum/m/#!topic/xcms/CGC0SKMVhAQ
 
     checkmate::assertFlag(loadRawData)
     checkmate::assertFlag(verbose)
+    assertIMSArg(IMS)
+    
+    if (IMS != "both" && hasMobilities(obj))
+        obj <- selectIMSFilterFeatures(obj, IMS)
 
     xs <- new(getClassDef("xcmsSet", package = "xcms"))
     anaInfo <- analysisInfo(obj)
@@ -160,16 +164,22 @@ setMethod("getXCMSSet", "features", function(obj, verbose, loadRawData)
 #' @export
 setMethod("getXCMSSet", "featuresXCMS", function(obj, ...)
 {
+    if (hasMobilities(obj))
+        return(callNextMethod())
     return(obj@xs)
 })
 
 #' @rdname xcms-conv
 #' @export
-setMethod("getXCMSSet", "featureGroups", function(obj, verbose, loadRawData)
+setMethod("getXCMSSet", "featureGroups", function(obj, verbose, loadRawData, IMS = FALSE)
 {
     checkmate::assertFlag(loadRawData)
     checkmate::assertFlag(verbose)
+    assertIMSArg(IMS)
 
+    if (IMS != "both")
+        obj <- selectIMSFilter(obj, IMS = IMS, verbose = FALSE)
+    
     if (verbose)
         cat("Getting ungrouped xcmsSet...\n")
     xs <- getXCMSSet(getFeatures(obj), verbose = verbose, loadRawData = loadRawData)
@@ -183,17 +193,20 @@ setMethod("getXCMSSet", "featureGroups", function(obj, verbose, loadRawData)
 
 #' @rdname xcms-conv
 #' @export
-setMethod("getXCMSSet", "featureGroupsXCMS", function(obj, verbose, loadRawData)
+setMethod("getXCMSSet", "featureGroupsXCMS", function(obj, verbose, loadRawData, ...)
 {
     # first see if we can just return the xcmsSet used during grouping
 
+    if (hasMobilities(obj))
+        return(callNextMethod())
+    
     anaInfo <- analysisInfo(obj)
 
     if (length(xcms::filepaths(obj@xs)) != length(anaInfo$analysis) ||
         !all(simplifyAnalysisNames(xcms::filepaths(obj@xs)) == anaInfo$analysis))
     {
         # files changed, need to update group statistics which is rather complex so just fallback
-        return(callNextMethod(obj, verbose = verbose, loadRawData = loadRawData))
+        return(callNextMethod())
     }
 
     return(obj@xs)
@@ -209,9 +222,13 @@ setMethod("getXCMSSet", "featureGroupsSet", function(obj, ..., set) getXCMSSet(u
 
 #' @rdname xcms-conv
 #' @export
-setMethod("getXCMSnExp", "features", function(obj, verbose, loadRawData)
+setMethod("getXCMSnExp", "features", function(obj, verbose, loadRawData, IMS = FALSE)
 {
     checkmate::assertFlag(loadRawData)
+    assertIMSArg(IMS)
+    
+    if (IMS != "both" && hasMobilities(obj))
+        obj <- selectIMSFilterFeatures(obj, IMS)
     
     rawData <- NULL
     if (loadRawData)
@@ -291,7 +308,8 @@ setMethod("getXCMSnExp", "features", function(obj, verbose, loadRawData)
 setMethod("getXCMSnExp", "featuresXCMS3", function(obj, ...)
 {
     # first verify if we can just return the embedded xcms object
-    if (!all(simplifyAnalysisNames(Biobase::pData(obj@xdata)$sample_name) == analysisInfo(obj)$analysis))
+    if (hasMobilities(obj) ||
+        !all(simplifyAnalysisNames(Biobase::pData(obj@xdata)$sample_name) == analysisInfo(obj)$analysis))
         return(callNextMethod())
     
     return(obj@xdata)
@@ -299,9 +317,13 @@ setMethod("getXCMSnExp", "featuresXCMS3", function(obj, ...)
 
 #' @rdname xcms-conv
 #' @export
-setMethod("getXCMSnExp", "featureGroups", function(obj, verbose, loadRawData)
+setMethod("getXCMSnExp", "featureGroups", function(obj, verbose, loadRawData, IMS = FALSE)
 {
     checkmate::assertFlag(verbose)
+    assertIMSArg(IMS)
+    
+    if (IMS != "both")
+        obj <- selectIMSFilter(obj, IMS = IMS, verbose = FALSE)
     
     if (verbose)
         cat("Getting ungrouped XCMSnExp...\n")
@@ -333,16 +355,15 @@ setMethod("getXCMSnExp", "featureGroups", function(obj, verbose, loadRawData)
 
 #' @rdname xcms-conv
 #' @export
-setMethod("getXCMSnExp", "featureGroupsXCMS3", function(obj, verbose, loadRawData)
+setMethod("getXCMSnExp", "featureGroupsXCMS3", function(obj, verbose, loadRawData, ...)
 {
     # first see if we can just return the embedded xcms object
-    # NOTE: we can't do this if analyses have been subset
 
     anaInfo <- analysisInfo(obj)
 
-    if (nrow(Biobase::pData(obj@xdata)) != length(anaInfo$analysis) ||
+    if (hasMobilities(obj) || nrow(Biobase::pData(obj@xdata)) != length(anaInfo$analysis) ||
         !all(simplifyAnalysisNames(Biobase::pData(obj@xdata)$sample_name) == anaInfo$analysis))
-        return(callNextMethod(obj, verbose = verbose, loadRawData = loadRawData))
+        return(callNextMethod())
 
     return(obj@xdata)
 })

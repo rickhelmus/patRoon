@@ -1182,3 +1182,20 @@ clusterFGroupMobilities <- function(fGroups, IMSWindow, sets)
     
     return(fGroups)
 }
+
+# similar to selectIMSFilter(), but for features
+selectIMSFilterFeatures <- function(features, IMS)
+{
+    if (IMS == "both" || !hasMobilities(features))
+        return(features)
+    
+    delete(features, j = function(fl, ...)
+    {
+        if (isTRUE(IMS))
+            is.na(fl$mobility)
+        else if (isFALSE(IMS))
+            !is.na(fl$mobility)
+        else # "maybe"
+            !is.na(fl$mobility) & fl$ims_parent_ID %chin% fl$ID
+    })
+}

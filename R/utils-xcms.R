@@ -256,8 +256,7 @@ setMethod("getXCMSnExp", "features", function(obj, verbose, loadRawData, IMS = F
                                             instrumentModel = rep("MS", anaN),
                                             ionSource = rep("ESI", anaN),
                                             analyser = rep("analyzer", anaN),
-                                            detectorType = rep("detector", anaN)),
-        )
+                                            detectorType = rep("detector", anaN)))
         xcms::phenoData(rawData) <- new("NAnnotatedDataFrame",
                                         data.frame(sample_name = anaInfo$analysis,
                                                    sample_group = anaInfo$group,

@@ -208,7 +208,7 @@ importFeaturesKPIC2 <- function(picsList, analysisInfo)
         ret <- as.data.table(pics$peakinfo)
         setnames(ret, c("rt", "rtmin", "rtmax", "maxo", "snr"),
                  c("ret", "retmin", "retmax", "intensity", "sn"))
-        ret[, ID := seq_len(.N)][]
+        ret[, ID := as.character(seq_len(.N))][]
         return(ret)
     }), analysisInfo$analysis)
     

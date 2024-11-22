@@ -395,6 +395,9 @@
     - applyIMS arg for all fGroups filter methods
         - ignores negate!
     - withIMSParent arg for filter()
+    - calculateConcs()
+        - clearly doc that mobility parent intensities are used to calculate concentrations (if available).
+        - Also note that the mobility fGroup's RF is still used (only relevant for SIRIUS or RT changes), and is different then when findMobilities() copies results
     - ADT
         - IMS option and mobility_collapsed column, which contains rounded numbers
 

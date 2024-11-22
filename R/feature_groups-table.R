@@ -268,9 +268,16 @@ doFGAADTFeatures <- function(fGroups, fgTab, intColNames, average, averageBy, ad
         if (averageBy != "fGroups")
             featTab[, average_group := anaInfo[[averageBy]][match(analysis, anaInfo$analysis)]]
         
-        featTab <- removeDTColumnsIfPresent(featTab, c("isocount", "analysis", "ID", "set"))
+        # average all numeric columns
         numCols <- setdiff(names(which(sapply(featTab, is.numeric))), "average_group")
+        # avoid DT warning when averaging int values that lead to decimal values
+        # UNDONE: or collapse int values instead: for Dietrich peaks they are scan numbers, OpenMS iscounts, so could make sense
+        featTab[, (numCols) := lapply(.SD, as.numeric), .SDcols = numCols]
         featTab[, (numCols) := lapply(.SD, averageFunc), .SDcols = numCols, by = by]
+        
+        # collapse all character columns
+        chCols <- names(which(sapply(featTab, is.character)))
+        featTab[, (chCols) := lapply(.SD, function(x) paste0(unique(x), collapse = ",")), .SDcols = chCols, by = by]
         featTab <- unique(featTab, by = by)
     }
     

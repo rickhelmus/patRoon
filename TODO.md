@@ -409,6 +409,8 @@
     - applyIMS arg for all fGroups filter methods
     - filter: removeISTDs and onlyHits now use doFGroupFilter() --> caches and prints message
     - withIMSParent arg for filter()
+    - ADT
+        - character columns are now collapsed instead of removed with features=T and averaging
 
 ## Features
 

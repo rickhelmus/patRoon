@@ -470,7 +470,7 @@ assertApplyIMSArg <- function(x, .var.name = checkmate::vname(x), add = NULL)
 
 assertFGAsDataTableArgs <- function(fGroups, areas, features, qualities, regression, regressionBy, averageFunc,
                                     normalized, FCParams, concAggrParams, toxAggrParams, normConcToTox, anaInfoCols,
-                                    collapseSuspects, onlyHits)
+                                    IMS, collapseSuspects, onlyHits)
 {
     anaInfo <- analysisInfo(fGroups)
     
@@ -497,6 +497,7 @@ assertFGAsDataTableArgs <- function(fGroups, areas, features, qualities, regress
     assertFCParams(FCParams, fGroups, null.ok = TRUE, add = ac)
     aapply(assertPredAggrParams, . ~ concAggrParams + toxAggrParams, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertSubset(anaInfoCols, names(anaInfo), empty.ok = TRUE, add = ac)
+    assertIMSArg(IMS, add = ac)
     checkmate::assertString(collapseSuspects, null.ok = TRUE, add = ac)
     checkmate::assertFlag(onlyHits, add = ac)
     checkmate::reportAssertions(ac)

@@ -395,6 +395,8 @@
     - applyIMS arg for all fGroups filter methods
         - ignores negate!
     - withIMSParent arg for filter()
+    - ADT
+        - IMS option and mobility_collapsed column, which contains rounded numbers
 
 - NEWS
     - Dietrich features

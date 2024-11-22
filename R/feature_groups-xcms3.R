@@ -245,13 +245,16 @@ setMethod("delete", "featureGroupsXCMS3", function(obj, ...)
     old <- obj
     obj <- callNextMethod()
 
-    if (length(old) > length(obj))
-        obj@xdata <- xcms::filterFeatureDefinitions(obj@xdata, names(old) %chin% names(obj))
-    # simple ana subset
-    if (!setequal(analyses(old), analyses(obj)))
-        obj@xdata <- xcms::filterFile(obj@xdata, which(analyses(old) %in% analyses(obj)), keepFeatures = TRUE)
-    if (nrow(xcms::chromPeaks(obj@xdata)) != length(obj@features)) # sync features
-        obj@xdata <- xcms::filterChromPeaks(obj@xdata, getKeptXCMSPeakInds(old@features, obj@features, obj@xdata))
-
+    if (!hasMobilities(obj))
+    {
+        if (length(old) > length(obj))
+            obj@xdata <- xcms::filterFeatureDefinitions(obj@xdata, names(old) %chin% names(obj))
+        # simple ana subset
+        if (!setequal(analyses(old), analyses(obj)))
+            obj@xdata <- xcms::filterFile(obj@xdata, which(analyses(old) %in% analyses(obj)), keepFeatures = TRUE)
+        if (nrow(xcms::chromPeaks(obj@xdata)) != length(obj@features)) # sync features
+            obj@xdata <- xcms::filterChromPeaks(obj@xdata, getKeptXCMSPeakInds(old@features, obj@features, obj@xdata))
+    }
+    
     return(obj)
 })

@@ -76,12 +76,15 @@ setMethod("delete", "featuresKPIC2", function(obj, i = NULL, j = NULL, ...)
     
     old <- obj
     obj <- callNextMethod()
-    
-    # simple ana subset
-    if (is.null(j) && !setequal(analyses(old), analyses(obj)))
-        obj@picsList <- obj@picsList[analyses(obj)]
-    else if (!is.null(j)) # sync features
-        obj <- updatePICSet(old, obj, i)
+
+    if (!hasMobilities(obj))
+    {
+        # simple ana subset
+        if (is.null(j) && !setequal(analyses(old), analyses(obj)))
+            obj@picsList <- obj@picsList[analyses(obj)]
+        else if (!is.null(j)) # sync features
+            obj <- updatePICSet(old, obj, i)
+    }
     
     return(obj)
 })
@@ -292,5 +295,7 @@ setMethod("getPICSet", "features", function(obj, loadRawData = TRUE)
 #' @export
 setMethod("getPICSet", "featuresKPIC2", function(obj, ...)
 {
+    if (hasMobilities(obj))
+        return(callNextMethod())
     return(unname(obj@picsList))
 })

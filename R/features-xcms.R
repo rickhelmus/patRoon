@@ -35,17 +35,20 @@ setMethod("delete", "featuresXCMS", function(obj, i = NULL, j = NULL, ...)
     old <- obj
     obj <- callNextMethod()
     
-    # simple ana subset
-    if (is.null(j) && !setequal(analyses(old), analyses(obj)))
-        obj@xs <- obj@xs[, analyses(old) %in% analyses(obj)]
-    else if (!is.null(j)) # sync features
+    if (!hasMobilities(obj))
     {
-        # NOTE: we can only do this currently when the XCMS feature are sorted by analysis, which is not the case eg
-        # when fillPeaks() has been used. If unsorted, then there is no easy way to relate back patRoon features with
-        # XCMSSet features. For now we just don't update the object, and create a new object in getXCMSSet() if it's out
-        # of sync.
-        if (!is.unsorted(xcms::peaks(old@xs)[, "sample"]))
-            xcms::peaks(obj@xs) <- xcms::peaks(obj@xs)[getKeptXCMSPeakInds(old, obj, obj@xs), , drop = FALSE]
+        # simple ana subset
+        if (is.null(j) && !setequal(analyses(old), analyses(obj)))
+            obj@xs <- obj@xs[, analyses(old) %in% analyses(obj)]
+        else if (!is.null(j)) # sync features
+        {
+            # NOTE: we can only do this currently when the XCMS feature are sorted by analysis, which is not the case eg
+            # when fillPeaks() has been used. If unsorted, then there is no easy way to relate back patRoon features with
+            # XCMSSet features. For now we just don't update the object, and create a new object in getXCMSSet() if it's out
+            # of sync.
+            if (!is.unsorted(xcms::peaks(old@xs)[, "sample"]))
+                xcms::peaks(obj@xs) <- xcms::peaks(obj@xs)[getKeptXCMSPeakInds(old, obj, obj@xs), , drop = FALSE]
+        }            
     }
     
     return(obj)

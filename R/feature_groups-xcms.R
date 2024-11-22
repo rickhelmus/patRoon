@@ -224,7 +224,7 @@ setMethod("delete", "featureGroupsXCMS", function(obj, ...)
     old <- obj
     obj <- callNextMethod()
     
-    if (length(old) > length(obj))
+    if (!hasMobilities(obj) && length(old) > length(obj))
     {
         keep <- names(old) %chin% names(obj)
         xcms::groups(obj@xs) <- xcms::groups(obj@xs)[keep, , drop = FALSE]

@@ -120,7 +120,7 @@ groupFeaturesSIRIUS <- function(analysisInfo, verbose = TRUE)
     
     inputFiles <- getCentroidedMSFilesFromAnaInfo(analysisInfo, "mzML")
     
-    hash <- makeHash(analysisInfo[, c("analysis", "path"), with = FALSE], lapply(inputFiles, makeFileHash))
+    hash <- makeHash(analysisInfo[, c("analysis", "path_centroid"), with = FALSE], lapply(inputFiles, makeFileHash))
     
     cachefg <- loadCacheData("featureGroupsSIRIUS", hash)
     if (!is.null(cachefg))

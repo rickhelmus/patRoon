@@ -902,6 +902,7 @@ doAssignFeatureMobilities <- function(fTable, mobTable)
             mobNumCols <- intersect(getMobilityCols(), names(mobTable))
             fTable[, ims_parent_ID := NA_character_]
             fTable[, (mobNumCols) := NA_real_]
+            fTable[, mob_assign_method := NA_character_]
         }
     }
     else

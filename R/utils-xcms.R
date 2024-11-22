@@ -376,7 +376,7 @@ importXCMSPeaks <- function(peaks, analysisInfo)
     feat <- lapply(seq_len(nrow(analysisInfo)), function(sind)
     {
         ret <- plist[sample == sind]
-        ret[, ID := seq_len(nrow(ret))]
+        ret[, ID := as.character(seq_len(nrow(ret)))]
         setnames(ret, c("rt", "rtmin", "rtmax", "maxo", "into"), c("ret", "retmin", "retmax", "intensity", "area"))
         return(ret[, intersect(XCMSFeatCols(), names(ret)), with = FALSE])
     })

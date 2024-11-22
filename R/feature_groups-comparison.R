@@ -362,7 +362,7 @@ setMethod("consensus", "featureGroupsComparison", function(obj, absMinAbundance 
 
             # make new IDs
             ret[, c("ID.x", "ID.y") := NULL]
-            ret[, ID := seq_len(nrow(ret))]
+            ret[, ID := as.character(seq_len(nrow(ret)))]
 
             colsToAvg <- c("ret", "mz", "area", "retmin", "retmax", "mzmin", "mzmax", "intensity")
 

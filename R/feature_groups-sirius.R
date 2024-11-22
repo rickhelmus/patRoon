@@ -35,7 +35,7 @@ processSIRIUSFGroups <- function(outPath, anaInfo)
 
     if (nrow(resTbl) > 0)
     {
-        resTbl[, ID := seq_len(.N), by = "analysis"]
+        resTbl[, ID := as.character(seq_len(.N)), by = "analysis"]
         fList <- split(resTbl, by = "analysis", keep.by = FALSE)
         fList <- fList[intersect(anaInfo$analysis, names(fList))] # re-order
         # no need anymore, and clashes with group assignments in fGroups constructor

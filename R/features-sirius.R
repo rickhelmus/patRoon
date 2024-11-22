@@ -43,7 +43,7 @@ SIRFeatMPFinishHandler <- function(cmd)
     
     setorderv(ret, "mz") # order is inconsistent between runs --> fix order by sorting
     
-    ret[, ID := seq_len(nrow(..ret))]
+    ret[, ID := as.character(seq_len(nrow(..ret)))]
     setcolorder(ret, "ID")
     return(ret[])
 }

@@ -1,5 +1,5 @@
 general:
-    version: 2
+    version: 3
     format: html
     path: report
     keepUnusedPlots: 7
@@ -13,6 +13,9 @@ features:
         small: true
         features: false
         intMax: eic
+    mobilograms:
+        large: true
+        small: true
     intensityPlots: false
     aggregateConcs: mean
     aggregateTox: mean

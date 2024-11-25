@@ -7,7 +7,7 @@ NULL
 
 
 generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, compsCluster, components, TPs, settings,
-                                    outPath, EICs, EICParams, specSimParams, parallel)
+                                    outPath, EICs, EICParams, EIMs, EIMParams, specSimParams, parallel)
 {
     ret <- list()
     
@@ -55,7 +55,8 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
     ret$chromsSmall <- genHTMLReportPlotsChromsSmall(fGroups, settings, outPath, EICs, EICParams, parallel)
     ret$chromsFeatures <- genHTMLReportPlotsChromsFeatures(fGroups, settings, outPath, EICs, EICParams, parallel)
     
-    ret$mobilograms <- genHTMLReportPlotsMobilograms(fGroups, settings, outPath, parallel)
+    ret$mobilogramsLarge <- genHTMLReportPlotsMobilogramsLarge(fGroups, settings, outPath, EIMs, EIMParams, parallel)
+    ret$mobilogramsSmall <- genHTMLReportPlotsMobilogramsSmall(fGroups, settings, outPath, EIMs, EIMParams, parallel)
     
     ret$intPlots <- genHTMLReportPlotsIntPlots(fGroups, settings, outPath, parallel)
     
@@ -213,7 +214,7 @@ reportHTMLUtils$methods(
 
 
 doReportHTML <- function(fGroups, MSPeakLists, formulas, compounds, compsCluster, components, TPs, settings, path,
-                         EICParams, specSimParams, openReport, parallel)
+                         EICParams, EIMParams, specSimParams, openReport, parallel)
 {
     workPath <- file.path(tempdir(TRUE), "report")
     unlink(workPath, TRUE)
@@ -240,9 +241,28 @@ doReportHTML <- function(fGroups, MSPeakLists, formulas, compounds, compsCluster
     
     EICs <- getFeatureEIXs(fGroups, type = "EIC", EIXParams = EICParams)
     cat("Done!\n")
+
+    EIMs <- NULL
+    if (hasMobilities(fGroups))
+    {
+        cat("Loading all EIMs... ")
+        EIMParams$onlyPresent <- TRUE
+        if (!settings$features$mobilograms$large && settings$features$mobilograms$small)
+        {
+            # plot only small mobilogram (and summary overview), get minimum set of EIMs
+            EIMParams$topMost <- 1
+            EIMParams$topMostByRGroup <- FALSE
+        }
+        else
+            EIMParams["topMost"] <- list(NULL)
+        
+        EIMs <- getFeatureEIXs(fGroups, type = "EIM", EIXParams = EIMParams)
+        cat("Done!\n")
+        
+    }
     
     allPlots <- generateHTMLReportPlots(fGroups, MSPeakLists, formulas, compounds, compsCluster, components, TPs,
-                                        settings, path, EICs, EICParams, specSimParams, parallel)
+                                        settings, path, EICs, EICParams, EIMs, EIMParams, specSimParams, parallel)
     
     reportEnv <- new.env()
     

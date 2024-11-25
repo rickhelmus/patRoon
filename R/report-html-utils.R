@@ -20,28 +20,23 @@ makeReactCellRoundMerged <- function(rounding)
     })
 }
 
-makeReactCellSmallChrom <- function(hasLargeChrom, plots)
+makeReactCellLargeChromMob <- function(plots, type)
+{
+    #return(function(value, index) htmltools::img(src = plots$chromsLarge[[value]]))
+    return(htmlwidgets::JS(sprintf("function(cellInfo) { return '<img src=\"' + reportPlots.%sLarge[[cellInfo.value]] + '\"></img>'; }", type)))
+}
+
+makeReactCellSmallChromMob <- function(hasLarge, plots, type)
 {
     return(function(value, index)
     {
-        tag <- htmltools::img(src = plots$chromsSmall[[value]], style = list("max-height" = "20px"))
-        if (hasLargeChrom)
-            tag <- htmltools::tagAppendAttributes(tag, "data-srcZoom" = plots$chromsLarge[[value]])
+        tag <- htmltools::img(src = plots[[paste0(type, "Small")]][[value]], style = list("max-height" = "20px"))
+        if (hasLarge)
+            tag <- htmltools::tagAppendAttributes(tag, "data-srcZoom" = plots[[paste0(type, "Large")]][[value]])
         else
             tag <- htmltools::tagAppendAttributes(tag, class = "noZoomImg")
         return(tag)
     })
-}
-
-makeReactCellLargeChrom <- function(plots)
-{
-    #return(function(value, index) htmltools::img(src = plots$chromsLarge[[value]]))
-    return(htmlwidgets::JS("function(cellInfo) { return '<img src=\"' + reportPlots.chromsLarge[[cellInfo.value]] + '\"></img>'; }"))
-}
-
-makeReactCellMobilogram <- function()
-{
-    return(htmlwidgets::JS("function(cellInfo) { return '<img src=\"' + reportPlots.mobilograms[[cellInfo.value]] + '\"></img>'; }"))
 }
 
 makeReactCellISTD <- function()
@@ -349,9 +344,10 @@ makeMainResultsReactable <- function(tab, tabName, retMin, plots, colGroupOrder 
         
         cell <- switch(cdrow$formatting,
                        round_merged = makeReactCellRoundMerged(cdrow$rounding),
-                       chromSmall = makeReactCellSmallChrom("chromLarge" %chin% colDefDB$formatting, plots),
-                       chromLarge = makeReactCellLargeChrom(plots),
-                       mobilogram = makeReactCellMobilogram(),
+                       chromLarge = makeReactCellLargeChromMob(plots, "chroms"),
+                       chromSmall = makeReactCellSmallChromMob("chromLarge" %chin% colDefDB$formatting, plots, "chroms"),
+                       mobLarge = makeReactCellLargeChromMob(plots, "mobilograms"),
+                       mobSmall = makeReactCellSmallChromMob("mobLarge" %chin% colDefDB$formatting, plots, "mobilograms"),
                        ISTD = makeReactCellISTD(),
                        annotations = makeReactCellAnnotations(),
                        structure = makeReactImgCell(),
@@ -368,7 +364,7 @@ makeMainResultsReactable <- function(tab, tabName, retMin, plots, colGroupOrder 
                                annotations = getReactFilterMethodAnnotations())
         
         return(reactable::colDef(name = cdrow$displayName, show = !cdrow$hidden, format = format, cell = cell,
-                                 html = cdrow$formatting %in% c("chromLarge", "mobilogram"), # HACK
+                                 html = cdrow$formatting %in% c("chromLarge", "mobLarge"), # HACK
                                  minWidth = if (!is.na(cdrow$minWidth)) cdrow$minWidth else 100,
                                  align = if (nzchar(cdrow$align)) cdrow$align, style = if (col %in% grpStartCols) colSepStyle,
                                  filterInput = filterInput, filterMethod = filterMethod))

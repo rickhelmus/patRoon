@@ -151,8 +151,8 @@ adjustReportSettings <- function(settings, adjSettings) return(modifyList(settin
 #' @rdname reporting
 #' @export
 setMethod("report", "featureGroups", function(fGroups, MSPeakLists, formulas, compounds, compsCluster, components,
-                                              TPs, settingsFile, path, EICParams, specSimParams, clearPath, openReport,
-                                              parallel, overrideSettings)
+                                              TPs, settingsFile, path, EICParams, EIMParams, specSimParams, clearPath,
+                                              openReport, parallel, overrideSettings)
 {
     ac <- checkmate::makeAssertCollection()
     if (!is.null(path))
@@ -162,6 +162,8 @@ setMethod("report", "featureGroups", function(fGroups, MSPeakLists, formulas, co
            c("MSPeakLists", "formulas", "compounds", "compoundsCluster", "components", "transformationProducts"),
            null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertFileExists(settingsFile, "r", add = ac)
+    assertEICParams(EICParams, add = ac)
+    assertEIMParams(EIMParams, add = ac)
     assertSpecSimParams(specSimParams, add = ac)
     checkmate::assertList(overrideSettings, any.missing = FALSE, names = "unique", add = ac)
     checkmate::reportAssertions(ac)
@@ -187,7 +189,7 @@ setMethod("report", "featureGroups", function(fGroups, MSPeakLists, formulas, co
     # UNDONE: check format setting here, when others are supported
     
     doReportHTML(fGroups, MSPeakLists, formulas, compounds, compsCluster, components, TPs, settings, path,
-                 EICParams, specSimParams, openReport, parallel)
+                 EICParams, EIMParams, specSimParams, openReport, parallel)
     
     invisible(NULL)
 })

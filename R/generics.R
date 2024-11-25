@@ -358,6 +358,7 @@ setGeneric("report", function(fGroups, MSPeakLists = NULL, formulas = NULL, comp
                               components = NULL, TPs = NULL,
                               settingsFile = system.file("report", "settings.yml", package = "patRoon"),
                               path = NULL, EICParams = getDefEICParams(topMost = 1, topMostByRGroup = TRUE),
+                              EIMParams = getDefEIMParams(topMost = 1, topMostByRGroup = TRUE),
                               specSimParams = getDefSpecSimParams(), clearPath = FALSE, openReport = TRUE,
                               parallel = TRUE, overrideSettings = list()) standardGeneric("report"))
 

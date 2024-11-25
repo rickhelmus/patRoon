@@ -15,8 +15,10 @@ getFGReactTab <- function(objects, settings, ...)
         tab[, chrom_small := group]
     if (settings$features$chromatograms$large)
         tab[, chrom_large := group]
-    if (settings$features$chromatograms$large) # UNDONE!
-        tab[, mobilogram := group]
+    if (settings$features$mobilograms$small)
+        tab[, mob_small := group]
+    if (settings$features$mobilograms$large)
+        tab[, mob_large := group]
     
     if (!is.null(objects$MSPeakLists) || !is.null(objects$formulas) || !is.null(objects$compounds))
     {
@@ -119,25 +121,46 @@ genHTMLReportPlotsChromsFeatures <- function(fGroups, settings, outPath, EICs, E
     }, simplify = FALSE)
 }
 
-genHTMLReportPlotsMobilograms <- function(fGroups, settings, outPath, parallel)
+genHTMLReportPlotsMobilogramsLarge <- function(fGroups, settings, outPath, EIMs, EIMParams, parallel)
 {
-    # UNDONE: also big/small versions?
-    
     gInfo <- groupInfo(fGroups)
     
-    # UNDONE!
-    if (!settings$features$chromatograms$large || is.null(gInfo[["mobility"]]))
+    if (!settings$features$mobilograms$large || is.null(gInfo[["mobility"]]))
         return(list())
     
-    cat("Generate mobilograms...\n")
+    cat("Generate large mobilograms...\n")
     # UNDONE: only do IMS parent (if present)?
     doApply("sapply", parallel, gInfo$group, function(grp)
     {
         doProgress()
-        makeHTMLReportPlot("mobilogram-", outPath, "plotMobilogram",
-                           list(fGroups, groupName = grp, bty = "l"),
+        makeHTMLReportPlot("mobilogram_large-", outPath, "plotMobilogram",
+                           list(fGroups, groupName = grp, EIMs = EIMs,
+                                EIMParams = EIMParams, groupBy = "rGroups", title = "", bty = "l"),
                            parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)),
                            width = 6, height = 4, bg = "transparent", pointsize = 16)
+    }, simplify = FALSE)
+}
+
+genHTMLReportPlotsMobilogramsSmall <- function(fGroups, settings, outPath, EIMs, EIMParams, parallel)
+{
+    gInfo <- groupInfo(fGroups)
+    
+    if (!settings$features$mobilograms$small || is.null(gInfo[["mobility"]]))
+        return(list())
+    
+    cat("Generate small mobilograms...\n")
+    # UNDONE: only do IMS parent (if present)?
+    doApply("sapply", parallel, gInfo$group, function(grp)
+    {
+        doProgress()
+        makeHTMLReportPlot("mobilogram_small-", outPath, "plotMobilogram",
+                           list(fGroups, groupName = grp, EIMs = EIMs,
+                                EIMParams = modifyList(EIMParams, list(topMost = 1, topMostByRGroup = FALSE,
+                                                                       onlyPresent = TRUE)),
+                                showFGroupRect = FALSE, showPeakArea = TRUE, title = "", bty = "n"),
+                           parParams = list(mai = c(0, 0, 0, 0), lwd = 10), width = 12, height = 4, bg = "transparent",
+                           pointsize = 16)
+        
     }, simplify = FALSE)
 }
 
@@ -445,7 +468,9 @@ reportHTMLUtils$methods(
                                        checked = TRUE)),
             maybeInclUI(hasFQualities(), list(value = "qualities", name = "Quality scores")),
             maybeInclUI(settings$features$chromatograms$large,
-                      list(value = "chrom_large", name = "Large chromatograms"))
+                      list(value = "chrom_large", name = "Large chromatograms")),
+            maybeInclUI(settings$features$mobilograms$large,
+                        list(value = "mob_large", name = "Large mobilograms"))
         ))
     },
     

@@ -14,6 +14,10 @@ setMethod("initialize", "componentsRC",
           function(.Object, ...) callNextMethod(.Object, ..., algorithm = "ramclustr"))
 
 
+#' @rdname components-class
+#' @export
+setMethod("expandMobilities", "componentsRC", function(obj, ...) cannotExpandComponMobilities(obj))
+
 #' Componentization of adducts, isotopes etc. with RAMClustR
 #'
 #' Uses \href{https://github.com/cbroeckl/RAMClustR}{RAMClustR} to generate components from feature groups which follow

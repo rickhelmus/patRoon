@@ -1294,11 +1294,11 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
     {
         gNames <- names(fGroups)
         
-        featsPerGroup <- split(rbindlist(featureTable(fGroups)), by = "group")
+        featsPerGroup <- split(rbindlist(updatedFeatures), by = "group")
         nInts <- sapply(lapply(featsPerGroup, "[[", "intensity_rel"), normFunc)
         nAreas <- sapply(lapply(featsPerGroup, "[[", "area_rel"), normFunc)
         
-        updatedFeatures <- lapply(featureTable(fGroups), function(ft)
+        updatedFeatures <- lapply(updatedFeatures, function(ft)
         {
             ft <- copy(ft)
             ft[nInts[group] > 0, intensity_rel := intensity_rel / nInts[group]]

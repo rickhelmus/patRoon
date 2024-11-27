@@ -129,3 +129,13 @@ getIonizationFromAnnTable <- function(annTable)
     
     return("positive")
 }
+
+omitMobFGroupsForComponentization <- function(fGroups)
+{
+    if (hasMobilities(fGroups))
+    {
+        printf("NOTE: mobility feature groups will be omitted from componentization\n")
+        fGroups <- selectIMSFilter(fGroups, IMS = "maybe", verbose = FALSE)
+    }
+    return(fGroups)
+}

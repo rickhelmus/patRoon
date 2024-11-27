@@ -65,6 +65,8 @@ setMethod("generateComponentsCAMERA", "featureGroups", function(fGroups, ionizat
     checkmate::assertList(extraOpts, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
+    fGroups <- omitMobFGroupsForComponentization(fGroups)
+
     if (length(fGroups) == 0)
         return(componentsCamera(componentInfo = data.table(), components = list(),
                                 xsa = new("xsAnnotate")))

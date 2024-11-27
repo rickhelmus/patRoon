@@ -111,6 +111,8 @@ setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionizat
     
     if (!numEQ(sum(potentialAdducts), 1))
         stop("The sum of all adduct probabilities should be one.")
+
+    fGroups <- omitMobFGroupsForComponentization(fGroups)
     
     anaInfo <- analysisInfo(fGroups)
     featTable <- featureTable(fGroups)

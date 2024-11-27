@@ -174,8 +174,17 @@ mergeTPComponCandidatesTab <- function(compTab)
 }
 
 doGenComponentsTPs <- function(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, compounds, ignoreParents, minRTDiff,
-                               specSimParams, parallel)
+                               specSimParams, parallel, IMS)
 {
+    doIMSSel <- IMS != "both" && hasMobilities(fGroups)
+    fGroupsTPsOrig <- NULL
+    if (doIMSSel)
+    {
+        fGroupsTPsOrig <- fGroupsTPs
+        fGroups <- selectIMSFilter(fGroups, IMS, verbose = FALSE)
+        fGroupsTPs <- selectIMSFilter(fGroupsTPs, IMS, verbose = FALSE)
+    }
+    
     fromTPs <- !is.null(TPs)
     parFromScr <- fromTPs && parentsFromScreening(TPs)
     TPsFromScr <- fromTPs && TPsFromScreening(TPs)
@@ -368,6 +377,10 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, 
     
     ret <- componentsTPs(componentInfo = compInfo[], components = compList, fromTPs = fromTPs,
                          parentsFromScreening = parFromScr, TPsFromScreening = TPsFromScr)
+    
+    if (doIMSSel)
+        ret <- expandMobilities(ret, fGroupsTPsOrig)
+    
     saveCacheData("componentsTPs", ret, hash)
     
     return(ret)
@@ -701,7 +714,8 @@ setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked = TRUE, width =
 setMethod("generateComponentsTPs", "featureGroups", function(fGroups, fGroupsTPs = fGroups, TPs = NULL,
                                                              MSPeakLists = NULL, formulas = NULL, compounds = NULL,
                                                              ignoreParents = FALSE, minRTDiff = 20,
-                                                             specSimParams = getDefSpecSimParams(), parallel = TRUE)
+                                                             specSimParams = getDefSpecSimParams(), parallel = TRUE,
+                                                             IMS = "maybe")
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertClass, . ~ fGroupsTPs + TPs + MSPeakLists + formulas + compounds,
@@ -711,6 +725,7 @@ setMethod("generateComponentsTPs", "featureGroups", function(fGroups, fGroupsTPs
     checkmate::assertNumber(minRTDiff, lower = 0, finite = TRUE, add = add)
     assertSpecSimParams(specSimParams, add = ac)
     checkmate::assertFlag(parallel, add = ac)
+    assertIMSArg(IMS, add = ac)
     checkmate::reportAssertions(ac)
     
     if (!is.null(TPs) && (parentsFromScreening(TPs) || TPsFromScreening(TPs)) &&
@@ -718,7 +733,7 @@ setMethod("generateComponentsTPs", "featureGroups", function(fGroups, fGroupsTPs
         stop("Input feature groups need to be screened for parents/TPs!")
 
     return(doGenComponentsTPs(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, compounds, ignoreParents, minRTDiff,
-                              specSimParams, parallel))
+                              specSimParams, parallel, IMS))
 })
 
 #' @rdname generateComponentsTPs
@@ -726,7 +741,8 @@ setMethod("generateComponentsTPs", "featureGroups", function(fGroups, fGroupsTPs
 setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroupsTPs = fGroups, TPs = NULL,
                                                                 MSPeakLists = NULL, formulas = NULL, compounds = NULL,
                                                                 ignoreParents = FALSE, minRTDiff = 20,
-                                                                specSimParams = getDefSpecSimParams(), parallel = TRUE)
+                                                                specSimParams = getDefSpecSimParams(), parallel = TRUE,
+                                                                IMS = "maybe")
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertClass, . ~ fGroupsTPs + TPs + MSPeakLists + formulas + compounds,
@@ -736,6 +752,7 @@ setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroups
     checkmate::assertNumber(minRTDiff, lower = 0, finite = TRUE, add = add)
     assertSpecSimParams(specSimParams, add = ac)
     checkmate::assertFlag(parallel, add = ac)
+    assertIMSArg(IMS, add = ac)
     checkmate::reportAssertions(ac)
 
     if (!is.null(TPs) && (parentsFromScreening(TPs) || TPsFromScreening(TPs)) &&
@@ -743,7 +760,7 @@ setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroups
         stop("Input feature groups need to be screened for parents/TPs!")
     
     ret <- doGenComponentsTPs(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, compounds, ignoreParents, minRTDiff,
-                              specSimParams, parallel)
+                              specSimParams, parallel, IMS)
     
     # UNDONE: more efficient method to get set specific fGroups?
     gNamesTPsSets <- sapply(sets(fGroupsTPs), function(s) names(fGroupsTPs[, sets = s]), simplify = FALSE)

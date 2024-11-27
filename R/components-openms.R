@@ -9,6 +9,11 @@ componentsOpenMS <- setClass("componentsOpenMS", contains = "componentsFeatures"
 setMethod("initialize", "componentsOpenMS",
           function(.Object, ...) callNextMethod(.Object, algorithm = "openms", ...))
 
+#' @rdname components-class
+#' @export
+setMethod("expandMobilities", "componentsOpenMS", function(obj, ...) cannotExpandComponMobilities(obj))
+
+
 #' Componentization of adducts, isotopes etc. with OpenMS
 #'
 #' Uses the

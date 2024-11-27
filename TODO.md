@@ -40,6 +40,7 @@
     - bg MS/MS subtraction
         - default abundance filtering while averaging? or apply filter in newProject()
     - don't try to do MetFrag/PubChem with MP (by default) or warn, also add docs why
+        - maybe force/default disable MP if database is not local?
     - MSPL filter to remove mass peaks with X Da higher m/z than precursor
         - do by default in newProject()?
 
@@ -264,6 +265,7 @@
         - no support for mzXML
     - initial tests of pwiz, mzR and MSTK show quite different numbers of OpenMS features...
     - if we stick with convertMSFiles(), somehow recommend skipping MS2+gzip?
+- interface with timsConvert?
 - update generateAnalysisInfo() and newProject()
     - see if getAllMSFilesFromAnaInfo() can be used, otherwise remove it
 - convertMSFilesXXX()
@@ -327,23 +329,11 @@
     - SC seems to hang?
     - suppress XCMS warnings (or at least if no peaks are found)
     - remove mobilities slot
-    - ID re-assignment works with e.g. XCMS IDs that may be numeric?
-    - fGroups method
-        - support updating groupQualities/groupScores/ISTDs/ISTDAssignments/annotations/concentrations/toxicities/screenInfo?
-            - currently cleared with a warning
-            - duplicate values where possible
-        - sets methods
     - minMobilityMatches: move to filter()?
         - then needs to store nr of mobilities in suspect list (eg like MS2 peaks)
-    - somehow handle eg XCMS objects which cannot do mobilities (eg clearout?)
     - test for fGroups from screenInfo(), eg for fGroups with >1 suspect assigned
     - clearly doc what IMSWindow is used for
-    - see if mzWindow for assignFeatureMobilities() is now not needed anymore since getMobilograms() is fixed
-    - store mobility assignment type in feature table? (eg mobilogram, suspect, PASEF)
-    - method for fGroupsScreeningSet
-    - clusterFGroupMobilities(): don't clear out annotation table (sets!)
-        - copy data from IMS parents
-        - maybe also for other slots? (with a warning/message?)
+    - add PASEF as mobility assignment type?
     - parent-less IMS features
         - test: reporting, minMobilityMatches and other post-suspect screening, ...
         - handle normalization: perform like non-IMS workflow with a warning?
@@ -358,17 +348,18 @@
     - keep? then update
     - remove unassigned features?
 - Suspect features
-    - XCMS/XCMS3/KPIC2: doc and/or default min fractions to zero as these probably don't make a lot of sense otherwise
-    - Handle mobilities
-        - Does the mobmin/mobmax range make sense how it is computed now?
-    - remove mobility assignment?
-        - if not, support >1 mobilities in suspect list and do mobility assignment directly from suspect list like findMobilities()
+    - Remove featureSuspects and replace by findFeaturesBinning?
+        - Add arg to give suspect list, vector of m/zs etc instead of binning
+        - Maybe rename binning to eg EICs?
+    - otherwise, if we keep it...
+        - XCMS/XCMS3/KPIC2: doc and/or default min fractions to zero as these probably don't make a lot of sense otherwise
+        - Handle mobilities
+            - Does the mobmin/mobmax range make sense how it is computed now?
+        - remove mobility assignment?
+            - if not, support >1 mobilities in suspect list and do mobility assignment directly from suspect list like findMobilities()
 - reporting
     - convert reactable cell img functions to JS versions, so img paths are set dynamically which can save quite some space for selfContained reports
         --> see WIP changes made for chromsLarge
-    - mobilograms
-        - make setting (and use it instead of large chroms)
-        - have small/big mobilograms? or put them in a separate tab instead of the table?
 - if all mobility features are deleted, remove mobility columns etc so that hasMobilities() returns FALSE?
     - or should hasMobilities() actually check if there is still a feature with assigned mobility left?
 

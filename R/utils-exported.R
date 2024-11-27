@@ -674,8 +674,7 @@ getQuantCalibFromScreening <- function(fGroups, concs, areas = FALSE, average = 
     assertIMSArg(IMS, add = ac)
     checkmate::reportAssertions(ac)
 
-    if (IMS != "both" && hasMobilities(fGroups))
-        fGroups <- selectIMSFilter(fGroups, IMS, verbose = FALSE)
+    fGroups <- selectIMSFilter(fGroups, IMS, verbose = FALSE, warn = FALSE)
     
     anaInfo <- analysisInfo(fGroups)
     

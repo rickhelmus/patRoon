@@ -141,6 +141,8 @@ setMethod("generateComponentsNontarget", "featureGroups", function(fGroups, ioni
     checkmate::assertFlag(traceHack, add = ac)
     checkmate::reportAssertions(ac)
 
+    fGroups <- omitMobFGroupsForComponentization(fGroups)
+    
     if (length(fGroups) == 0)
         return(componentsNT(homol = list(), componentInfo = data.table(), components = list(),
                             algorithm = "nontarget"))

@@ -414,6 +414,7 @@
     - ADT
         - character columns are now collapsed instead of removed with features=T and averaging
     - feature ID column is now always of character type
+    - significantly optimized doScreenSuspects (emptyResults)
 
 ## Features
 

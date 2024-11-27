@@ -225,17 +225,13 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, IMSWindow, m
     # NOTE: rt is always included
     metaDataCols <- union("rt", intersect(suspMetaDataCols(), names(suspects)))
     
-    emptyResult <- function()
+    emptyResult <- data.table()
+    for (col in c(metaDataCols, "group", "d_rt", "d_mz"))
     {
-        ret <- data.table()
-        for (col in c(metaDataCols, "group", "d_rt", "d_mz"))
-        {
-            if (col %in% c("rt", "mz", "neutralMass", "d_rt", "d_mz"))
-                ret[, (col) := numeric()]
-            else
-                ret[, (col) := character()]
-        }
-        return(ret)
+        if (col %in% c("rt", "mz", "neutralMass", "d_rt", "d_mz"))
+            emptyResult[, (col) := numeric()]
+        else
+            emptyResult[, (col) := character()]
     }
     
     setMetaData <- function(t, suspRow)
@@ -280,7 +276,7 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, IMSWindow, m
                 gi <- gi[numLTE(abs(gi$mz - suspects$mz[ti]), mzWindow)]
             
             if (nrow(gi) == 0)
-                hits <- emptyResult() # no hits
+                hits <- copy(emptyResult) # no hits
             else
             {
                 hits <- rbindlist(Map(gi$group, gi$ret, gi$mz, f = function(g, gret, gmz)
@@ -307,7 +303,7 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, IMSWindow, m
         close(prog)
     }
     else
-        ret <- emptyResult()
+        ret <- copy(emptyResult)
     
     suspectsn <- nrow(suspects)
     foundn <- uniqueN(ret$name)

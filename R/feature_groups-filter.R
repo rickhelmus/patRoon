@@ -328,30 +328,38 @@ replicateGroupFilter <- function(fGroups, rGroups, negate = FALSE, applyIMS = "b
     }, "replicate_group", applyIMS, verbose))
 }
 
-selectIMSFilter <- function(fGroups, IMS, negate = FALSE, applyIMS = "both", verbose = TRUE)
+selectIMSFilter <- function(fGroups, IMS, negate = FALSE, applyIMS = "both", verbose = TRUE, warn = TRUE)
 {
     if (!hasMobilities(fGroups))
     {
-        warning("Cannot apply ims filter: no mobilities assigned", call. = FALSE)
+        if (warn)
+            warning("Cannot apply ims filter: no mobilities assigned", call. = FALSE)
         return(fGroups)
     }
     
-    if (negate)
-        IMS <- !IMS
-    
-    return(doFGroupsFilter(fGroups, "IMS selection", IMS, function(fGroups)
+    if (IMS == "both" && !negate)
     {
-        if (IMS == "both")
-            return(fGroups)
+        # do here: no need for caching
+        return(fGroups)
+    }
+    
+    return(doFGroupsFilter(fGroups, "IMS selection", c(IMS, negate), function(fGroups)
+    {
+        if (IMS == "both") # implies negate, see above
+            return(delete(fGroups))
         
         gInfoDel <- groupInfo(fGroups)
-        gInfoDel <- if (isTRUE(IMS))
+        gInfoDel <- if (isTRUE(IMS) || (isFALSE(IMS) && negate))
             gInfoDel[is.na(mobility)]
-        else if (isFALSE(IMS))
+        else if (isFALSE(IMS) || (isTRUE(IMS) && negate))
             gInfoDel[!is.na(mobility)]
-        else # "maybe"
-            gInfoDel[!is.na(mobility) & ims_parent_group %chin% names(fGroups)]
-        
+        else if (IMS == "maybe")
+        {
+            if (negate)
+                gInfoDel[is.na(mobility) | !ims_parent_group %chin% names(fGroups)]
+            else
+                gInfoDel[!is.na(mobility) & ims_parent_group %chin% names(fGroups)]
+        }
         return(delete(fGroups, j = gInfoDel$group))
     }, "IMS_selection", applyIMS = "both", verbose = verbose))
 }

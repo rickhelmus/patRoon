@@ -243,6 +243,7 @@
         - doc in any case
     - further test bbCID data
         - also mixed bbCID/PASEF file (ie with different segments)
+    - hclust seems unusable due to high mem usage with IMS data? --> force disable?
 - the default backends now put mzR as last to ensure mobility data can be used, change this somehow?
 - getEICs()
     - switch to anaInfo param (or optional?), otherwise add file type arg
@@ -328,7 +329,6 @@
     - limit mobmin/mobmax --> both min and max, ie to prevent excessively wrong peak range assignments
     - SC seems to hang?
     - suppress XCMS warnings (or at least if no peaks are found)
-    - remove mobilities slot
     - minMobilityMatches: move to filter()?
         - then needs to store nr of mobilities in suspect list (eg like MS2 peaks)
     - test for fGroups from screenInfo(), eg for fGroups with >1 suspect assigned
@@ -357,17 +357,21 @@
             - Does the mobmin/mobmax range make sense how it is computed now?
         - remove mobility assignment?
             - if not, support >1 mobilities in suspect list and do mobility assignment directly from suspect list like findMobilities()
+- components
+    - better name for expandMobilities()?
+        - add docs (incl generic)
+    - TPs: should expandMobilities() also copy components for mobility parents?
+        - if not, clearly doc the difference if components are generated after findMobilities()
 - reporting
     - convert reactable cell img functions to JS versions, so img paths are set dynamically which can save quite some space for selfContained reports
         --> see WIP changes made for chromsLarge
-- if all mobility features are deleted, remove mobility columns etc so that hasMobilities() returns FALSE?
-    - or should hasMobilities() actually check if there is still a feature with assigned mobility left?
 
 - Tests
     - more verification that fGroupsScreeningSets still works fine after removal of setObjects
     - more verification that normInts() works before/after findMobilities()
     - IMS arg for [, filter() and plotting functions
     - applyMS for filter()
+    - expandMobilities()
     
 - Docs
     - hasMobilities slot for features
@@ -396,6 +400,10 @@
         - IMS arg for getQuantCalibFromScreening() --> clearly doc that default is best
     - ADT
         - IMS option and mobility_collapsed column, which contains rounded numbers
+    - components
+        - doc that expandMobilities() may needs to be called after tree splitting
+            - improve printed NOTE with link to manual?
+        - clearly doc that expandMobilities() just simple copying only; and this may lead to eg TP candidates that were not actually found by screening and therefore have NAs in the report
 
 - NEWS
     - hasMobilities slot for features

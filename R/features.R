@@ -64,7 +64,7 @@ printFeatStats <- function(fList)
 #'
 #' @export
 features <- setClass("features",
-                     slots = c(features = "list", analysisInfo = "data.table", featureQualityNames = "character", mobilities = "list"),
+                     slots = c(features = "list", analysisInfo = "data.table", featureQualityNames = "character", hasMobilities = "logical"),
                      contains = c("VIRTUAL", "workflowStep"))
 
 setMethod("initialize", "features", function(.Object, ...)
@@ -72,10 +72,11 @@ setMethod("initialize", "features", function(.Object, ...)
     args <- list(...)
     .Object <- callNextMethod(.Object, ...)
     .Object@features <- makeEmptyListNamed(.Object@features)
+    .Object@hasMobilities <- FALSE
     return(.Object)
 })
 
-setMethod("hasMobilities", "features", function(obj) length(obj) > 0 && !is.null(obj[[1]][["mobility"]]))
+setMethod("hasMobilities", "features", function(obj) obj@hasMobilities)
 
 #' @describeIn features Obtain total number of features.
 #' @export
@@ -191,10 +192,6 @@ setMethod("analyses", "features", function(obj) analysisInfo(obj)$analysis)
 #' @template strmethod
 #' @export
 setMethod("replicateGroups", "features", function(obj) unique(analysisInfo(obj)$group))
-
-#' @export
-setMethod("mobilities", "features", function(obj) obj@mobilities)
-
 
 #' @describeIn features Returns all feature data in a table.
 #' @export

@@ -943,6 +943,8 @@ assignFeatureMobilitiesPeaks <- function(features, peaksParam, IMSWindow, cluste
 
     printf("Assigned %d mobility features.\n", countMobilityFeatures(features) - oldCount)
     
+    features@hasMobilities <- TRUE
+    
     saveCacheData("assignFeatureMobilitiesPeaks", features, hash)
     
     return(features)

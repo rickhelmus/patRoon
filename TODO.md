@@ -370,6 +370,7 @@
     - applyMS for filter()
     
 - Docs
+    - hasMobilities slot for features
     - Dietrich features
     - getDefPeakParams()
     - getDefEICParams() / getDefEIMParams()
@@ -397,6 +398,7 @@
         - IMS option and mobility_collapsed column, which contains rounded numbers
 
 - NEWS
+    - hasMobilities slot for features
     - Dietrich features
     - groupInfo is now a DT
     - FIXED: suspect list assertion only checked part of the columns

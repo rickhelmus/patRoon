@@ -207,5 +207,6 @@ setMethod("unset", "featuresSet", function(obj, set)
     
     anaInfo <- copy(analysisInfo(obj))
     anaInfo[, set := NULL]
-    return(featuresUnset(features = ionizedFTable, analysisInfo = anaInfo, algorithm = paste0(algorithm(obj), "_unset")))
+    return(featuresUnset(features = ionizedFTable, analysisInfo = anaInfo, algorithm = paste0(algorithm(obj), "_unset"),
+                         hasMobilities = hasMobilities(obj)))
 })

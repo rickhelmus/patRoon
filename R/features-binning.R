@@ -48,6 +48,7 @@ findFeaturesBinning <- function(analysisInfo, mzRange = c(50, 400), mzStep = 0.0
         
         printf("Loading EICs...\n")
         EICInfoList <- rep(list(data.table(mzmin = bins, mzmax = bins + mzStep, retmin = 0, retmax = 0)), nrow(anaInfoTBD))
+        names(EICInfoList) <- anaInfoTBD$analysis
         allEICs <- doGetEICs(anaInfoTBD, EICInfoList, minIntensityIMS = minIntensityIMS, compress = FALSE,
                              withBP = TRUE, cacheDB = cacheDB)
         allEICs <- lapply(allEICs, setNames, names(bins))

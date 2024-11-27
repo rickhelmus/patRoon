@@ -14,6 +14,10 @@ componentsCamera <- setClass("componentsCamera", slots = c(xsa = "ANY"),
 setMethod("initialize", "componentsCamera",
           function(.Object, ...) callNextMethod(.Object, algorithm = "camera", ...))
 
+#' @rdname components-class
+#' @export
+setMethod("expandMobilities", "componentsCamera", function(obj, ...) cannotExpandComponMobilities(obj))
+
 #' Componentization of adducts, isotopes etc. with CAMERA
 #'
 #' Interfaces with \href{https://bioconductor.org/packages/release/bioc/html/CAMERA.html}{CAMERA} to generate components

@@ -14,6 +14,10 @@ componentsCliqueMS <- setClass("componentsCliqueMS", slots = c(cliques = "list")
 setMethod("initialize", "componentsCliqueMS",
           function(.Object, ...) callNextMethod(.Object, algorithm = "cliquems", ...))
 
+#' @rdname components-class
+#' @export
+setMethod("expandMobilities", "componentsCliqueMS", function(obj, ...) cannotExpandComponMobilities(obj))
+
 #' Componentization of adducts, isotopes etc. with cliqueMS
 #'
 #' Uses \href{https://github.com/osenan/cliqueMS}{cliqueMS} to generate components using the

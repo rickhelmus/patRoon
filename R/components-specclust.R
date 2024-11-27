@@ -63,13 +63,22 @@ componentsSpecClust <- setClass("componentsSpecClust", contains = "componentsClu
 setMethod("generateComponentsSpecClust", "featureGroups", function(fGroups, MSPeakLists, method = "complete",
                                                                    specSimParams = getDefSpecSimParams(),
                                                                    maxTreeHeight = 1, deepSplit = TRUE,
-                                                                   minModuleSize = 1)
+                                                                   minModuleSize = 1, IMS = "maybe")
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     assertSpecSimParams(specSimParams, add = ac)
     assertDynamicTreeCutArgs(maxTreeHeight, deepSplit, minModuleSize, ac)
+    assertIMSArg(IMS, add = ac)
     checkmate::reportAssertions(ac)
+    
+    doIMSSel <- IMS != "both" && hasMobilities(fGroups)
+    fGroupsOrig <- NULL
+    if (doIMSSel)
+    {
+        fGroupsOrig <- fGroups
+        fGroups <- selectIMSFilter(fGroups, IMS, verbose = FALSE)
+    }
     
     if (length(fGroups) == 0)
         return(componentsSpecClust(distm = NULL, method = method, gInfo = copy(groupInfo(fGroups)),
@@ -92,8 +101,13 @@ setMethod("generateComponentsSpecClust", "featureGroups", function(fGroups, MSPe
     
     gInfo <- copy(groupInfo(fGroups)[group %chin% grpsResults])
 
-    return(componentsSpecClust(distm = distm, method = method, gInfo = gInfo,
+    ret <- componentsSpecClust(distm = distm, method = method, gInfo = gInfo,
                                properties = list(specSimParams = specSimParams),
                                maxTreeHeight = maxTreeHeight, deepSplit = deepSplit,
-                               minModuleSize = minModuleSize, algorithm = "specclust"))
+                               minModuleSize = minModuleSize, algorithm = "specclust")
+    
+    if (doIMSSel)
+        ret <- expandMobilities(ret, fGroupsOrig)
+    
+    return(ret)
 })

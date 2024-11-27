@@ -150,7 +150,7 @@ setMethod("plotIntHash", "componentsIntClust", function(obj, index, ...)
 setMethod("generateComponentsIntClust", "featureGroups", function(fGroups, method = "complete", metric = "euclidean",
                                                                   normalized = TRUE, average = TRUE,
                                                                   maxTreeHeight = 1, deepSplit = TRUE,
-                                                                  minModuleSize = 1)
+                                                                  minModuleSize = 1, IMS = "maybe")
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
@@ -159,9 +159,19 @@ setMethod("generateComponentsIntClust", "featureGroups", function(fGroups, metho
     checkmate::assertFlag(normalized, add = ac)
     checkmate::assertFlag(average, add = ac)
     assertDynamicTreeCutArgs(maxTreeHeight, deepSplit, minModuleSize, ac)
+    assertIMSArg(IMS, add = ac)
     checkmate::reportAssertions(ac)
 
     properties <- list(metric = metric, average = average)
+    
+    doIMSSel <- IMS != "both" && hasMobilities(fGroups)
+    fGroupsOrig <- NULL
+    if (doIMSSel)
+    {
+        fGroupsOrig <- fGroups
+        fGroups <- selectIMSFilter(fGroups, IMS, verbose = FALSE)
+    }
+    
     gInfo <- groupInfo(fGroups)
     
     if (length(fGroups) == 0)
@@ -184,7 +194,12 @@ setMethod("generateComponentsIntClust", "featureGroups", function(fGroups, metho
     distm <- daisy(clusterm, metric)
     cat("Done!\n")
 
-    return(componentsIntClust(clusterm = clusterm, distm = distm, method = method, gInfo = copy(gInfo),
+    ret <- componentsIntClust(clusterm = clusterm, distm = distm, method = method, gInfo = copy(gInfo),
                               properties = properties, maxTreeHeight = maxTreeHeight,
-                              deepSplit = deepSplit, minModuleSize = minModuleSize, algorithm = "intclust"))
+                              deepSplit = deepSplit, minModuleSize = minModuleSize, algorithm = "intclust")
+
+    if (doIMSSel)
+        ret <- expandMobilities(ret, fGroupsOrig)
+    
+    return(ret)
 })

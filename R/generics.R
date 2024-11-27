@@ -468,6 +468,11 @@ setGeneric("cutClusters", function(obj) standardGeneric("cutClusters"))
 #' @template generics
 setGeneric("defaultExclNormScores", function(obj) standardGeneric("defaultExclNormScores"))
 
+#' @templateVar func expandMobilities
+#' @templateVar desc expands data for ion mobilities assigned to features.
+#' @template generics
+setGeneric("expandMobilities", function(obj, ...) standardGeneric("expandMobilities"))
+
 #' @templateVar func estimateIDLevels
 #' @templateVar desc estimates identification confidence levels.
 #' @template generics

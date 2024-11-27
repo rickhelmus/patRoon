@@ -235,6 +235,24 @@ setMethod("as.data.table", "components", function(x)
     return(ret)
 })
 
+#' @export
+setMethod("expandMobilities", "components", function(obj, fGroups)
+{
+    # UNDONE: better function name?
+    
+    checkmate::assertClass(fGroups, "featureGroups")
+    
+    if (!hasMobilities(fGroups))
+        stop("No mobilities are assigned!", call. = FALSE)
+    
+    gInfo <- groupInfo(fGroups)
+    
+    obj@components <- lapply(componentTable(obj), expandTableForIMSFGroups, gInfo) # copy results for mobility fGroups
+    obj@componentInfo[, size := sapply(componentTable(obj), nrow)][] # update sizes
+    
+    return(obj)
+})
+
 #' @describeIn components Provides rule based filtering for components.
 #'
 #' @param size Should be a two sized vector with the minimum/maximum size of a component. Set to \code{NULL} to ignore.

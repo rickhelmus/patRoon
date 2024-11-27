@@ -175,15 +175,8 @@ assignFeatureMobilitiesSuspects <- function(features, scr, IMSWindow, selectFunc
 
 expandAndUpdateScreenInfoForIMS <- function(scr, gInfo)
 {
-    gInfo <- gInfo[group %chin% scr$group | ims_parent_group %chin% scr$group]
-    scr <- copy(scr)
-    scr[, orderOrig := seq_len(.N)]
-    imspars <- fifelse(is.na(gInfo$ims_parent_group), gInfo$group, gInfo$ims_parent_group)
-    scr <- scr[match(imspars, group)] # expand & copy
-    scr[, group := gInfo$group]
-    scr[, d_rt := gInfo$ret[match(group, gInfo$group)] - rt]
-    setorderv(scr, "orderOrig")
-    scr[, orderOrig := NULL]
+    scr <- expandTableForIMSFGroups(scr, gInfo)
+    scr[, d_rt := gInfo$ret[match(group, gInfo$group)] - rt] # update
     return(scr[])
 }
 

@@ -1201,3 +1201,17 @@ selectIMSFilterFeatures <- function(features, IMS)
             !is.na(fl$mobility) & fl$ims_parent_ID %chin% fl$ID
     })
 }
+
+expandTableForIMSFGroups <- function(tab, gInfo)
+{
+    # map all fGroups to copy: these are all mobility fGroups that are not orphans
+    gInfo <- gInfo[group %chin% tab$group | ims_parent_group %chin% tab$group]
+    tab <- copy(tab)
+    tab[, orderOrig := seq_len(.N)]
+    imspars <- fifelse(is.na(gInfo$ims_parent_group), gInfo$group, gInfo$ims_parent_group)
+    tab <- tab[match(imspars, group)] # expand & copy
+    tab[, group := gInfo$group]
+    setorderv(tab, "orderOrig")
+    tab[, orderOrig := NULL]
+    return(tab[])
+}

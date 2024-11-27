@@ -42,6 +42,10 @@ setMethod("plotGraph", "componentsNTSet", function(obj, onlyLinked = TRUE, set, 
 
 #' @rdname componentsNT-class
 #' @export
+setMethod("expandMobilities", "componentsNTSet", function(obj, ...) cannotExpandComponMobilities(obj))
+
+#' @rdname componentsNT-class
+#' @export
 componentsNTUnset <- setClass("componentsNTUnset", contains = "componentsNT")
 
 

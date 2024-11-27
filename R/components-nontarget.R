@@ -72,6 +72,10 @@ setMethod("plotGraph", "componentsNT", function(obj, onlyLinked = TRUE, width = 
     makeGraph(obj, onlyLinked, titles, width, height)
 })
 
+#' @rdname componentsNT-class
+#' @export
+setMethod("expandMobilities", "componentsNT", function(obj, ...) cannotExpandComponMobilities(obj))
+
 #' Componentization of homologous series with nontarget
 #'
 #' Uses \href{https://cran.r-project.org/web/packages/nontarget/index.html}{the nontarget R package} to generate

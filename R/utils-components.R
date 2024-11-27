@@ -139,3 +139,8 @@ omitMobFGroupsForComponentization <- function(fGroups)
     }
     return(fGroups)
 }
+
+cannotExpandComponMobilities <- function(obj)
+{
+    stop(sprintf("expandMobilities() is not supported for this class of components (%s)", class(obj)), call. = FALSE)
+}

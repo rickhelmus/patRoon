@@ -1410,7 +1410,7 @@ setMethod("calculateTox", "featureGroups", function(fGroups, featureAnn)
 })
 
 #' @export
-setMethod("findMobilities", "featureGroups", function(fGroups, mobPeaksParam, mzWindow = 0.005, IMSWindow = 0.01,
+setMethod("findMobilities", "featureGroups", function(fGroups, mobPeaksParam, IMSWindow = 0.01,
                                                       clusterMethod = "distance", minIntensityIMS = 0,
                                                       maxMSRTWindow = 2, chromPeaksParam = NULL, EICRTWindow = 20,
                                                       peakRTWindow = 5, calcArea = "integrate", fallbackEIC = TRUE,
@@ -1419,14 +1419,14 @@ setMethod("findMobilities", "featureGroups", function(fGroups, mobPeaksParam, mz
     # NOTE: keep args in sync with other methods
     
     ac <- checkmate::makeAssertCollection()
-    assertFindMobilitiesArgs(mobPeaksParam, mzWindow, IMSWindow, clusterMethod, minIntensityIMS, maxMSRTWindow,
+    assertFindMobilitiesArgs(mobPeaksParam, IMSWindow, clusterMethod, minIntensityIMS, maxMSRTWindow,
                              chromPeaksParam, EICRTWindow, peakRTWindow, calcArea, fallbackEIC, parallel, ac)
     checkmate::reportAssertions(ac)
     
     if (length(fGroups) == 0)
         return(fGroups) # nothing to do...
     
-    fGroups@features <- assignFeatureMobilitiesPeaks(fGroups@features, mobPeaksParam, mzWindow, IMSWindow, clusterMethod,
+    fGroups@features <- assignFeatureMobilitiesPeaks(fGroups@features, mobPeaksParam, IMSWindow, clusterMethod,
                                                      minIntensityIMS, maxMSRTWindow)
     fGroups@features <- reintegrateMobilityFeatures(fGroups@features, EICRTWindow, peakRTWindow, calcArea,
                                                     chromPeaksParam, fallbackEIC, parallel)

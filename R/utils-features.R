@@ -924,10 +924,10 @@ doAssignFeatureMobilities <- function(fTable, mobTable)
     return(fTable)
 }
 
-assignFeatureMobilitiesPeaks <- function(features, peaksParam, mzWindow, IMSWindow, clusterMethod, minIntensityIMS,
+assignFeatureMobilitiesPeaks <- function(features, peaksParam, IMSWindow, clusterMethod, minIntensityIMS,
                                          maxMSRTWindow)
 {
-    hash <- makeHash(features, peaksParam, mzWindow, IMSWindow, clusterMethod, minIntensityIMS, maxMSRTWindow)
+    hash <- makeHash(features, peaksParam, IMSWindow, clusterMethod, minIntensityIMS, maxMSRTWindow)
     cd <- loadCacheData("assignFeatureMobilitiesPeaks", hash)
     if (!is.null(cd))
         return(cd)

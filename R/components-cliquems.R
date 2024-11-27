@@ -86,6 +86,8 @@ setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ioniz
     checkmate::assertFlag(parallel, add = ac)
     checkmate::reportAssertions(ac)
 
+    fGroups <- omitMobFGroupsForComponentization(fGroups)
+    
     if (length(fGroups) == 0)
         return(componentsCliqueMS(fGroups = fGroups, absMzDev = absMzDev, minSize = minSize,
                                   relMinAdductAbundance = relMinAdductAbundance))

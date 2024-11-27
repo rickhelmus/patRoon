@@ -80,6 +80,8 @@ setMethod("generateComponentsRAMClustR", "featureGroups", function(fGroups, ioni
     checkmate::assertList(extraOptsFM, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
+    fGroups <- omitMobFGroupsForComponentization(fGroups)
+    
     if (length(fGroups) == 0)
         return(componentsRC(componentInfo = data.table(), components = list(),
                             RC = structure(list(), class = "hclust")))

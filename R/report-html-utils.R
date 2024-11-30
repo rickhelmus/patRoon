@@ -7,6 +7,17 @@ makeReactImgCell <- function()
     function(value) htmltools::img(src = value, style = list("max-height" = "300px"))
 }
 
+makeReactCellIMSParentGroup <- function()
+{
+    # only print IMS parent when (1) the cell is the actual parent or (2) we are at the top of the table page
+    return(htmlwidgets::JS("function(cellInfo, state)
+    {
+        if (cellInfo.row.group === cellInfo.value || cellInfo.viewIndex === 0)
+            return(cellInfo.value);
+        return '';
+    }"))
+}
+
 makeReactCellRoundMerged <- function(rounding)
 {
     return(function(value)
@@ -330,6 +341,7 @@ makeMainResultsReactable <- function(tab, tabName, retMin, plots, colGroupOrder 
     })
     
     grpStartCols <- getReactColGrpStartCols(groupDefs)
+    hasMob <- !is.null(tab[["ims_parent_group"]])
     
     # build reactable column defs: set display names, cell formatting, filters, visibility
     colDefs <- sapply(names(tab), function(col)
@@ -339,6 +351,7 @@ makeMainResultsReactable <- function(tab, tabName, retMin, plots, colGroupOrder 
             reactable::colFormat(digits = cdrow$rounding)
         
         cell <- switch(cdrow$formatting,
+                       ims_parent_group = makeReactCellIMSParentGroup(),
                        round_merged = makeReactCellRoundMerged(cdrow$rounding),
                        chromLarge = makeReactCellLargeChromMob(plots, "chroms"),
                        chromSmall = makeReactCellSmallChromMob("chromLarge" %chin% colDefDB$formatting, plots, "chroms"),
@@ -351,6 +364,24 @@ makeMainResultsReactable <- function(tab, tabName, retMin, plots, colGroupOrder 
                        formula = makeReactCellFormula(),
                        NULL)
         
+        style <- NULL
+        isStartCol <- col %in% grpStartCols
+        if (hasMob || isStartCol)
+        {
+            style <- if (!hasMob)
+                colSepStyle
+            else
+            {
+                function(v, i)
+                {
+                    s <- if (isStartCol) colSepStyle
+                    if (!is.na(tab$ims_parent_group[i]) && !is.na(tab$mobility[i]))
+                        s <- c(s, list(background = "lightcyan"))
+                    return(s)
+                }
+            }
+        }
+        
         filterInput <- switch(cdrow$filter,
                               select = makeReactFilterInputSelect(id),
                               annotations = makeReactFilterInputAnnotations(id),
@@ -359,10 +390,11 @@ makeMainResultsReactable <- function(tab, tabName, retMin, plots, colGroupOrder 
                                exact = getReactFilterMethodExact(),
                                annotations = getReactFilterMethodAnnotations())
         
+        
         return(reactable::colDef(name = cdrow$displayName, show = !cdrow$hidden, format = format, cell = cell,
                                  html = cdrow$formatting %in% c("chromLarge", "mobLarge"), # HACK
                                  minWidth = if (!is.na(cdrow$minWidth)) cdrow$minWidth else 100,
-                                 align = if (nzchar(cdrow$align)) cdrow$align, style = if (col %in% grpStartCols) colSepStyle,
+                                 align = if (nzchar(cdrow$align)) cdrow$align, style = style,
                                  filterInput = filterInput, filterMethod = filterMethod))
     }, simplify = FALSE)
     colDefs <- setReactNumRangeFilters(id, tab, colDefs)

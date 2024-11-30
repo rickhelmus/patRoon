@@ -11,6 +11,12 @@ getFGReactTab <- function(objects, settings, ...)
     tab <- as.data.table(objects$fGroups, qualities = "score", average = TRUE,
                          concAggrParams = settings$features$aggregateConcs, toxAggrParams = settings$features$aggregateTox, ...)
     
+    if (!is.null(tab[["ims_parent_group"]]))
+    {
+        # link IMS parents to themselves for grouping
+        tab[is.na(mobility) & group %chin% ims_parent_group, ims_parent_group := group]
+    }
+    
     if (settings$features$chromatograms$small)
         tab[, chrom_small := group]
     if (settings$features$chromatograms$large)

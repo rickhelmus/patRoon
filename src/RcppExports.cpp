@@ -71,6 +71,78 @@ RcppExport SEXP _patRoon_initBrukerLibrary(SEXP pathSEXP, SEXP forceSEXP) {
     UNPROTECT(1);
     return rcpp_result_gen;
 }
+// getBrukerCCS
+Rcpp::NumericVector getBrukerCCS(Rcpp::NumericVector mobs, Rcpp::IntegerVector charges, Rcpp::NumericVector mzs);
+static SEXP _patRoon_getBrukerCCS_try(SEXP mobsSEXP, SEXP chargesSEXP, SEXP mzsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type mobs(mobsSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type charges(chargesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type mzs(mzsSEXP);
+    rcpp_result_gen = Rcpp::wrap(getBrukerCCS(mobs, charges, mzs));
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _patRoon_getBrukerCCS(SEXP mobsSEXP, SEXP chargesSEXP, SEXP mzsSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_patRoon_getBrukerCCS_try(mobsSEXP, chargesSEXP, mzsSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error("%s", CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
+// getBrukerMob
+Rcpp::NumericVector getBrukerMob(Rcpp::NumericVector ccss, Rcpp::IntegerVector charges, Rcpp::NumericVector mzs);
+static SEXP _patRoon_getBrukerMob_try(SEXP ccssSEXP, SEXP chargesSEXP, SEXP mzsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type ccss(ccssSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type charges(chargesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type mzs(mzsSEXP);
+    rcpp_result_gen = Rcpp::wrap(getBrukerMob(ccss, charges, mzs));
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _patRoon_getBrukerMob(SEXP ccssSEXP, SEXP chargesSEXP, SEXP mzsSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_patRoon_getBrukerMob_try(ccssSEXP, chargesSEXP, mzsSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error("%s", CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
 // backendAvailable
 bool backendAvailable(const std::string& b);
 RcppExport SEXP _patRoon_backendAvailable(SEXP bSEXP) {
@@ -727,6 +799,8 @@ static int _patRoon_RcppExport_validate(const char* sig) {
     static std::set<std::string> signatures;
     if (signatures.empty()) {
         signatures.insert("bool(*initBrukerLibrary)(const std::string&,bool)");
+        signatures.insert("Rcpp::NumericVector(*getBrukerCCS)(Rcpp::NumericVector,Rcpp::IntegerVector,Rcpp::NumericVector)");
+        signatures.insert("Rcpp::NumericVector(*getBrukerMob)(Rcpp::NumericVector,Rcpp::IntegerVector,Rcpp::NumericVector)");
     }
     return signatures.find(sig) != signatures.end();
 }
@@ -734,6 +808,8 @@ static int _patRoon_RcppExport_validate(const char* sig) {
 // registerCCallable (register entry points for exported C++ functions)
 RcppExport SEXP _patRoon_RcppExport_registerCCallable() { 
     R_RegisterCCallable("patRoon", "_patRoon_initBrukerLibrary", (DL_FUNC)_patRoon_initBrukerLibrary_try);
+    R_RegisterCCallable("patRoon", "_patRoon_getBrukerCCS", (DL_FUNC)_patRoon_getBrukerCCS_try);
+    R_RegisterCCallable("patRoon", "_patRoon_getBrukerMob", (DL_FUNC)_patRoon_getBrukerMob_try);
     R_RegisterCCallable("patRoon", "_patRoon_RcppExport_validate", (DL_FUNC)_patRoon_RcppExport_validate);
     return R_NilValue;
 }
@@ -744,6 +820,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_writeTraML", (DL_FUNC) &_patRoon_writeTraML, 2},
     {"_patRoon_writeChromsToMzML", (DL_FUNC) &_patRoon_writeChromsToMzML, 3},
     {"_patRoon_initBrukerLibrary", (DL_FUNC) &_patRoon_initBrukerLibrary, 2},
+    {"_patRoon_getBrukerCCS", (DL_FUNC) &_patRoon_getBrukerCCS, 3},
+    {"_patRoon_getBrukerMob", (DL_FUNC) &_patRoon_getBrukerMob, 3},
     {"_patRoon_backendAvailable", (DL_FUNC) &_patRoon_backendAvailable, 1},
     {"_patRoon_walkSpectra", (DL_FUNC) &_patRoon_walkSpectra, 1},
     {"_patRoon_getMSSpectrum", (DL_FUNC) &_patRoon_getMSSpectrum, 4},

@@ -650,6 +650,20 @@ getDefPredAggrParams <- function(all = mean, ...)
     return(modifyList(def, list(...)))
 }
 
+#' @export
+getCCSParams <- function(method, ..., calibrant = NULL)
+{
+    ret <- list(
+        method = method,
+        temperature = 305,
+        massGas = 28.0134,
+        MasonSchampConstant = 18500,
+        calibrant = calibrant
+    )
+    
+    return(modifyList(ret, list(...)))
+}
+
 #' @rdname pred-quant
 #' @export
 getQuantCalibFromScreening <- function(fGroups, concs, areas = FALSE, average = FALSE, IMS = "maybe")
@@ -744,4 +758,77 @@ getQuantCalibFromScreening <- function(fGroups, concs, areas = FALSE, average = 
 TPLogicTransformations <- function()
 {
     return(patRoon:::TPsLogicTransformations) # stored inside R/sysdata.rda
+}
+
+#' @export
+convertMobilityToCCS <- function(mobility, charge, mz, CCSParams)
+{
+    ac <- checkmate::makeAssertCollection()
+    assertMobilityConversionArgs(mobility, charge, mz, CCSParams, add = ac)
+    checkmate::reportAssertions(ac)
+
+    charge <- abs(charge)
+    
+    u = ((mz * CCSParams$massGas) / (mz + CCSParams$massGas))
+    
+    if (CCSParams$method == "bruker")
+    {
+        if (!doInitBrukerLib())
+            stop("Cannot convert mobility data with Bruker TIMS library: failed to initialize library", call. = FALSE)
+        return(getBrukerCCS(mobility, charge, mz))
+    }
+    else if (CCSParams$method %in% c("mason-schamp_k", "mason-schamp_1/k"))
+    {
+        if (CCSParams$method == "mason-schamp_k")
+            mobility <- 1 / mobility
+        return(CCSParams$MasonSchampConst * (charge / (sqrt(u * CCSParams$temperature))) * mobility)
+    }
+    else if (CCSParams$method == "agilent")
+    {
+        calibrant <- prepareAgilentIMSCalib(CCSParams$calibrant, CCSParams$massGas)
+        return((mobility - calibrant$TFix) * charge / calibrant$beta / sqrt(mz / (mz + calibrant$massGas)))
+    }
+    # UNDONE: support waters later, procedure seems unclear how it affects different instruments and need test data
+    # else # waters
+    # {
+    #     coeff <- t0 <- exponent <- EDCDelay <- NA_real_ # UNDONE
+    #     mobCorr <- mobility - (0.001 * EDCDelay * sqrt(mz))
+    #     omagec <- coeff * (mobCorr + t0)^exponent
+    #     return((omagec * charges) / sqrt(u))
+    # }
+}
+
+#' @export
+convertCCSToMobility <- function(ccs, charge, mz, CCSParams)
+{
+    ac <- checkmate::makeAssertCollection()
+    assertMobilityConversionArgs(ccs, charge, mz, CCSParams, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    charge <- abs(charge)
+    
+    u = ((mz * CCSParams$massGas) / (mz + CCSParams$massGas))
+    
+    if (CCSParams$method == "bruker")
+    {
+        if (!doInitBrukerLib())
+            stop("Cannot convert mobility data with Bruker TIMS library: failed to initialize library", call. = FALSE)
+        return(getBrukerMob(ccs, charge, mz))
+    }
+    else if (CCSParams$method %in% c("mason-schamp_k", "mason-schamp_1/k"))
+    {
+        mob <- ccs / CCSParams$MasonSchampConst / (charge / (sqrt(u * CCSParams$temperature)))
+        if (CCSParams$method == "mason-schamp_k")
+            mob <- 1 / mob
+        return(mob)
+    }
+    else if (CCSParams$method == "agilent")
+    {
+        calibrant <- prepareAgilentIMSCalib(CCSParams$calibrant, CCSParams$massGas)
+        return((ccs * sqrt(mz / (mz + calibrant$massGas)) * calibrant$beta / charge) + calibrant$TFix)
+    }
+    # UNDONE: support waters later, procedure seems unclear how it affects different instruments and need test data
+    # else # waters
+    # {
+    # }
 }

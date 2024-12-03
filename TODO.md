@@ -322,6 +322,7 @@
     - Params
         - see if current chrom defaults are fine
         - add sensible IMS defaults
+        - naming: change param to params for consistency (also assertions)
 - findMobilities()
     - assert that instrument data has actually IMS data
     - better names for ims_parent_ID/ims_parent_group?
@@ -365,6 +366,10 @@
 - reporting
     - convert reactable cell img functions to JS versions, so img paths are set dynamically which can save quite some space for selfContained reports
         --> see WIP changes made for chromsLarge
+- CCS
+    - convertMobilityToCCS() / convertCCSToMobility()
+        - handle Waters data?
+        - verify Agilent data
 
 - Tests
     - more verification that fGroupsScreeningSets still works fine after removal of setObjects
@@ -372,6 +377,7 @@
     - IMS arg for [, filter() and plotting functions
     - applyMS for filter()
     - expandMobilities()
+    - convertMobilityToCCS() / convertCCSToMobility()
     
 - Docs
     - hasMobilities slot for features
@@ -404,7 +410,10 @@
         - doc that expandMobilities() may needs to be called after tree splitting
             - improve printed NOTE with link to manual?
         - clearly doc that expandMobilities() just simple copying only; and this may lead to eg TP candidates that were not actually found by screening and therefore have NAs in the report
-
+    - convertMobilityToCCS() / convertCCSToMobility()
+        - clearly refer to papers and implementations
+    - getCCSParams()
+        - doc where Mason-Schamp const comes from
 - NEWS
     - hasMobilities slot for features
     - Dietrich features

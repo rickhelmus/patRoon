@@ -12,8 +12,7 @@ maybeGetMSFilesForOTIMS <- function(anaInfo, types, formats, needIMS)
     if (!is.null(ret))
     {
         # try to load the Bruker TIMS library
-        libp <- getOption("patRoon.path.BrukerTIMS", "")
-        if (!nzchar(libp) || !initBrukerLibrary(libp))
+        if (!doInitBrukerLib())
             ret <- NULL
     }
     return(ret)

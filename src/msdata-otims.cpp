@@ -19,7 +19,64 @@ auto getTIMSDecompBuffers(size_t size)
 
 // From http://mochan.info/c++/2019/06/12/returntype-deduction.html
 using TIMSDecompBufferPair = decltype(getTIMSDecompBuffers(std::declval<size_t>()));
+
+// utility class to load and use the TIMS SDK
+class BrukerLibrary
+{
+    std::string path;
+    bool loaded = false;
+    // NOTE: we conveniently use LoadedLibraryHandle to handle loading the SDK library
+    std::unique_ptr<LoadedLibraryHandle> libHandle = nullptr;
+
+    // CCS <--> mobility conversion from TIMS-SDK
+    typedef double tims_oneoverk0_to_ccs_for_mz_fun_t(const double ook0, const int charge, const double mz);
+    tims_oneoverk0_to_ccs_for_mz_fun_t *tims_oneoverk0_to_ccs_for_mz = nullptr;
+    typedef double tims_ccs_to_oneoverk0_for_mz_fun_t(const double ccs, const int charge, const double mz);
+    tims_ccs_to_oneoverk0_for_mz_fun_t *tims_ccs_to_oneoverk0_for_mz = nullptr;
     
+    void verifyIfLoaded(void) const
+    {
+        if (!loaded)
+            throw(std::runtime_error("Cannot convert mobility/CCS data: Bruker SDK library not loaded!"));
+    }
+    
+public:
+    void load(const std::string &p)
+    {
+        loaded = false;
+        
+        setup_bruker(p);
+        
+        // NOTE: this disables threading from TIMS-SDK, which otherwise seems to cause issues with the threading applied
+        // in patRoon
+        ThreadingManager::get_instance().set_opentims_threading();
+        
+        libHandle = std::make_unique<LoadedLibraryHandle>(p);
+        
+        tims_oneoverk0_to_ccs_for_mz = libHandle->symbol_lookup<tims_oneoverk0_to_ccs_for_mz_fun_t>("tims_oneoverk0_to_ccs_for_mz");
+        tims_ccs_to_oneoverk0_for_mz = libHandle->symbol_lookup<tims_ccs_to_oneoverk0_for_mz_fun_t>("tims_ccs_to_oneoverk0_for_mz");
+        
+        loaded = true; // No exception thrown if we are here, so should be fine
+        path = p;
+    }
+    
+    bool isLoaded(void) const { return loaded; }
+    const std::string &currentPath(void) { return path; }
+    
+    double getCCS(double mob, int charge, double mz) const
+    {
+        verifyIfLoaded();
+        return tims_oneoverk0_to_ccs_for_mz(mob, charge, mz);
+    }
+    double getMob(double ccs, int charge, double mz) const
+    {
+        verifyIfLoaded();
+        return tims_ccs_to_oneoverk0_for_mz(ccs, charge, mz);
+    }
+    
+};
+BrukerLibrary brukerLibrary;
+
 }
 
 // [[Rcpp::interfaces(r, cpp)]]
@@ -168,31 +225,55 @@ SpectrumRaw MSReadBackendOTIMS::doReadSpectrum(const ThreadDataType &tdata, Spec
 bool initBrukerLibrary(const std::string &path, bool force = false)
 {
 #ifdef WITH_OTIMS
-    static std::string lastPath;
-    static bool succeeded = false;
+    const std::string lastPath = brukerLibrary.currentPath();
     
-    if (!force && !lastPath.empty() && succeeded && path == lastPath)
+    if (!force && brukerLibrary.isLoaded() && path == brukerLibrary.currentPath())
         return true; // already loaded
     
     try
     {
-        setup_bruker(path);
-        // NOTE: this disables threading from TIMS-SDK, which otherwise seems to cause issues with the threading applied
-        // in patRoon
-        ThreadingManager::get_instance().set_opentims_threading();
-        succeeded = true;
+        brukerLibrary.load(path);
     }
     catch(const std::exception &e)
     {
         if (lastPath != path) // only warn the first time
             Rcpp::warning("Failed to load Bruker TIMS library ('%s'): %s", path.c_str(), e.what());
-        succeeded = false;
     }
     
-    lastPath = path;
-    
-    return succeeded;
+    return brukerLibrary.isLoaded();
 #else
     return false;
 #endif
+}
+
+// [[Rcpp::export]]
+Rcpp::NumericVector getBrukerCCS(Rcpp::NumericVector mobs, Rcpp::IntegerVector charges, Rcpp::NumericVector mzs)
+{
+    Rcpp::NumericVector ret(mobs.size());
+    
+    for (int i=0; i<ret.size(); ++i)
+    {
+        if (mobs[i] == NA_REAL || charges[i] == NA_INTEGER || mzs[i] == NA_REAL)
+            ret[i] = NA_REAL;
+        else
+            ret[i] = brukerLibrary.getCCS(mobs[i], charges[i], mzs[i]);
+    }
+    
+    return ret;
+}
+
+// [[Rcpp::export]]
+Rcpp::NumericVector getBrukerMob(Rcpp::NumericVector ccss, Rcpp::IntegerVector charges, Rcpp::NumericVector mzs)
+{
+    Rcpp::NumericVector ret(ccss.size());
+    
+    for (int i=0; i<ret.size(); ++i)
+    {
+        if (ccss[i] == NA_REAL || charges[i] == NA_INTEGER || mzs[i] == NA_REAL)
+            ret[i] = NA_REAL;
+        else
+            ret[i] = brukerLibrary.getMob(ccss[i], charges[i], mzs[i]);
+    }
+    
+    return ret;
 }

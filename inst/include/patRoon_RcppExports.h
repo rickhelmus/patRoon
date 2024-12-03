@@ -45,6 +45,48 @@ namespace patRoon {
         return Rcpp::as<bool >(rcpp_result_gen);
     }
 
+    inline double getBrukerCCS(double mob, int charge, double mz) {
+        typedef SEXP(*Ptr_getBrukerCCS)(SEXP,SEXP,SEXP);
+        static Ptr_getBrukerCCS p_getBrukerCCS = NULL;
+        if (p_getBrukerCCS == NULL) {
+            validateSignature("double(*getBrukerCCS)(double,int,double)");
+            p_getBrukerCCS = (Ptr_getBrukerCCS)R_GetCCallable("patRoon", "_patRoon_getBrukerCCS");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p_getBrukerCCS(Shield<SEXP>(Rcpp::wrap(mob)), Shield<SEXP>(Rcpp::wrap(charge)), Shield<SEXP>(Rcpp::wrap(mz)));
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (Rcpp::internal::isLongjumpSentinel(rcpp_result_gen))
+            throw Rcpp::LongjumpException(rcpp_result_gen);
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
+        return Rcpp::as<double >(rcpp_result_gen);
+    }
+
+    inline double getBrukerMob(double ccs, int charge, double mz) {
+        typedef SEXP(*Ptr_getBrukerMob)(SEXP,SEXP,SEXP);
+        static Ptr_getBrukerMob p_getBrukerMob = NULL;
+        if (p_getBrukerMob == NULL) {
+            validateSignature("double(*getBrukerMob)(double,int,double)");
+            p_getBrukerMob = (Ptr_getBrukerMob)R_GetCCallable("patRoon", "_patRoon_getBrukerMob");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p_getBrukerMob(Shield<SEXP>(Rcpp::wrap(ccs)), Shield<SEXP>(Rcpp::wrap(charge)), Shield<SEXP>(Rcpp::wrap(mz)));
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (Rcpp::internal::isLongjumpSentinel(rcpp_result_gen))
+            throw Rcpp::LongjumpException(rcpp_result_gen);
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
+        return Rcpp::as<double >(rcpp_result_gen);
+    }
+
 }
 
 #endif // RCPP_patRoon_RCPPEXPORTS_H_GEN_

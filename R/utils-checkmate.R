@@ -963,7 +963,7 @@ assertFindPeaksParam <- function(x, null.ok = FALSE, .var.name = checkmate::vnam
 
 assertFindMobilitiesArgs <- function(mobPeaksParam, IMSWindow, clusterMethod, minIntensityIMS,
                                      maxMSRTWindow, chromPeaksParam, EICRTWindow, peakRTWindow, calcArea,
-                                     fallbackEIC, parallel, add)
+                                     fallbackEIC, CCSParams, parallel, add)
 {
     assertFindPeaksParam(mobPeaksParam, add = add)
     aapply(checkmate::assertNumber, . ~ IMSWindow + minIntensityIMS + EICRTWindow + peakRTWindow, finite = TRUE,
@@ -973,6 +973,7 @@ assertFindMobilitiesArgs <- function(mobPeaksParam, IMSWindow, clusterMethod, mi
     assertFindPeaksParam(chromPeaksParam, null.ok = TRUE, add = add)
     checkmate::assertChoice(calcArea, c("integrate", "sum"), add = add)
     aapply(checkmate::assertFlag, . ~ fallbackEIC + parallel, fixed = list(add = add))
+    assertCCSParams(CCSParams, add = add)
     invisible(NULL)
 }
 
@@ -1008,13 +1009,13 @@ assertCCSParams <- function(x, null.ok = FALSE, .var.name = checkmate::vname(x),
     }
 }
 
-assertMobilityConversionArgs <- function(mobility, charge, mz, CCSParams, add = NULL)
+assertMobilityConversionArgs <- function(mobility, mz, CCSParams, charge, add = NULL)
 {
     aapply(checkmate::assertNumeric, . ~ mobility + mz, finite = TRUE, lower = 0, fixed = list(add = add))
-    checkmate::assertIntegerish(charge, add = add)
+    checkmate::assertIntegerish(charge, null.ok = TRUE, add = add)
     assertCCSParams(CCSParams, add = add)
     
-    if (length(mobility) != length(charge) || length(mobility) != length(mz))
+    if (length(mobility) != length(mz) || (!is.null(charge) && length(mobility) != length(charge)))
         stop("The length of mobility, charge and mz should be equal", call. = FALSE)
 }
 

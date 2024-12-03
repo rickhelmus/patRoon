@@ -45,17 +45,17 @@ namespace patRoon {
         return Rcpp::as<bool >(rcpp_result_gen);
     }
 
-    inline double getBrukerCCS(double mob, int charge, double mz) {
+    inline Rcpp::NumericVector getBrukerCCS(Rcpp::NumericVector mobs, Rcpp::IntegerVector charges, Rcpp::NumericVector mzs) {
         typedef SEXP(*Ptr_getBrukerCCS)(SEXP,SEXP,SEXP);
         static Ptr_getBrukerCCS p_getBrukerCCS = NULL;
         if (p_getBrukerCCS == NULL) {
-            validateSignature("double(*getBrukerCCS)(double,int,double)");
+            validateSignature("Rcpp::NumericVector(*getBrukerCCS)(Rcpp::NumericVector,Rcpp::IntegerVector,Rcpp::NumericVector)");
             p_getBrukerCCS = (Ptr_getBrukerCCS)R_GetCCallable("patRoon", "_patRoon_getBrukerCCS");
         }
         RObject rcpp_result_gen;
         {
             RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p_getBrukerCCS(Shield<SEXP>(Rcpp::wrap(mob)), Shield<SEXP>(Rcpp::wrap(charge)), Shield<SEXP>(Rcpp::wrap(mz)));
+            rcpp_result_gen = p_getBrukerCCS(Shield<SEXP>(Rcpp::wrap(mobs)), Shield<SEXP>(Rcpp::wrap(charges)), Shield<SEXP>(Rcpp::wrap(mzs)));
         }
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();
@@ -63,20 +63,20 @@ namespace patRoon {
             throw Rcpp::LongjumpException(rcpp_result_gen);
         if (rcpp_result_gen.inherits("try-error"))
             throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
-        return Rcpp::as<double >(rcpp_result_gen);
+        return Rcpp::as<Rcpp::NumericVector >(rcpp_result_gen);
     }
 
-    inline double getBrukerMob(double ccs, int charge, double mz) {
+    inline Rcpp::NumericVector getBrukerMob(Rcpp::NumericVector ccss, Rcpp::IntegerVector charges, Rcpp::NumericVector mzs) {
         typedef SEXP(*Ptr_getBrukerMob)(SEXP,SEXP,SEXP);
         static Ptr_getBrukerMob p_getBrukerMob = NULL;
         if (p_getBrukerMob == NULL) {
-            validateSignature("double(*getBrukerMob)(double,int,double)");
+            validateSignature("Rcpp::NumericVector(*getBrukerMob)(Rcpp::NumericVector,Rcpp::IntegerVector,Rcpp::NumericVector)");
             p_getBrukerMob = (Ptr_getBrukerMob)R_GetCCallable("patRoon", "_patRoon_getBrukerMob");
         }
         RObject rcpp_result_gen;
         {
             RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p_getBrukerMob(Shield<SEXP>(Rcpp::wrap(ccs)), Shield<SEXP>(Rcpp::wrap(charge)), Shield<SEXP>(Rcpp::wrap(mz)));
+            rcpp_result_gen = p_getBrukerMob(Shield<SEXP>(Rcpp::wrap(ccss)), Shield<SEXP>(Rcpp::wrap(charges)), Shield<SEXP>(Rcpp::wrap(mzs)));
         }
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();
@@ -84,7 +84,7 @@ namespace patRoon {
             throw Rcpp::LongjumpException(rcpp_result_gen);
         if (rcpp_result_gen.inherits("try-error"))
             throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
-        return Rcpp::as<double >(rcpp_result_gen);
+        return Rcpp::as<Rcpp::NumericVector >(rcpp_result_gen);
     }
 
 }

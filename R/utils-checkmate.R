@@ -976,6 +976,46 @@ assertFindMobilitiesArgs <- function(mobPeaksParam, IMSWindow, clusterMethod, mi
     invisible(NULL)
 }
 
+assertCCSParams <- function(x, null.ok = FALSE, .var.name = checkmate::vname(x), add = NULL)
+{
+    assertListVal(x, "method", checkmate::assertChoice,
+                  choices = c("bruker", "mason-schamp_k", "mason-schamp_1/k", "agilent"),# "waters"),
+                  .var.name = .var.name, add = add)
+    
+    if (x$method == "agilent" && is.null(x[["calibrant"]]))
+        stop("Please set the calibrant CCS parameter", call. = FALSE)
+    
+    assertListVal(x, "calibrant", function(..., .var.name)
+    {
+        checkmate::assert(
+                  checkmate::checkNull(...),
+                  checkmate::checkDirectoryExists(...),
+                  checkmate::checkFileExists(..., "r"),
+                  checkmate::checkList(..., any.missing = FALSE),
+                  .var.name = .var.name
+        )
+    }, .var.name = .var.name)
+    
+    if (is.list(x$calibrant))
+    {
+        vn <- paste0(.var.name, "$calibrant")
+        assertListVal(x$calibrant, "massGas", checkmate::assertNumber, finite = TRUE, mustExist = FALSE,
+                      .var.name = vn, add = add)
+        assertListVal(x$calibrant, "TFix", checkmate::assertNumber, finite = TRUE, .var.name = vn, add = add)
+        assertListVal(x$calibrant, "beta", checkmate::assertNumber, finite = TRUE, .var.name = vn, add = add)
+    }
+}
+
+assertMobilityConversionArgs <- function(mobility, charge, mz, CCSParams, add = NULL)
+{
+    aapply(checkmate::assertNumeric, . ~ mobility + mz, finite = TRUE, lower = 0, fixed = list(add = add))
+    checkmate::assertIntegerish(charge, add = add)
+    assertCCSParams(CCSParams, add = add)
+    
+    if (length(mobility) != length(charge) || length(mobility) != length(mz))
+        stop("The length of mobility, charge and mz should be equal", call. = FALSE)
+}
+
 # from https://github.com/mllg/checkmate/issues/115
 aapply = function(fun, formula, ..., fixed = list())
 {

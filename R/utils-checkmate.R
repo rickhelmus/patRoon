@@ -985,6 +985,8 @@ assertCCSParams <- function(x, null.ok = FALSE, .var.name = checkmate::vname(x),
     if (x$method == "agilent" && is.null(x[["calibrant"]]))
         stop("Please set the calibrant CCS parameter", call. = FALSE)
     
+    assertListVal(x, "defaultCharge", checkmate::assertInt, .var.name = .var.name, add = add)
+    
     assertListVal(x, "calibrant", function(..., .var.name)
     {
         checkmate::assert(

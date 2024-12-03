@@ -651,6 +651,7 @@ getCCSParams <- function(method, ..., calibrant = NULL)
 {
     ret <- list(
         method = method,
+        defaultCharge = 1,
         temperature = 305,
         massGas = 28.0134,
         MasonSchampConstant = 18500,
@@ -813,12 +814,14 @@ TPLogicTransformations <- function()
 }
 
 #' @export
-convertMobilityToCCS <- function(mobility, charge, mz, CCSParams)
+convertMobilityToCCS <- function(mobility, mz, CCSParams, charge = NULL)
 {
     ac <- checkmate::makeAssertCollection()
-    assertMobilityConversionArgs(mobility, charge, mz, CCSParams, add = ac)
+    assertMobilityConversionArgs(mobility, mz, CCSParams, charge, add = ac)
     checkmate::reportAssertions(ac)
 
+    if (is.null(charge))
+        charge <- rep(CCSParams$defaultCharge, length(mobility))
     charge <- abs(charge)
     
     u = ((mz * CCSParams$massGas) / (mz + CCSParams$massGas))
@@ -851,12 +854,14 @@ convertMobilityToCCS <- function(mobility, charge, mz, CCSParams)
 }
 
 #' @export
-convertCCSToMobility <- function(ccs, charge, mz, CCSParams)
+convertCCSToMobility <- function(ccs, mz, CCSParams, charge = NULL)
 {
     ac <- checkmate::makeAssertCollection()
-    assertMobilityConversionArgs(ccs, charge, mz, CCSParams, add = ac)
+    assertMobilityConversionArgs(ccs, mz, CCSParams, charge, add = ac)
     checkmate::reportAssertions(ac)
     
+    if (is.null(charge))
+        charge <- rep(CCSParams$defaultCharge, length(mobility))
     charge <- abs(charge)
     
     u = ((mz * CCSParams$massGas) / (mz + CCSParams$massGas))

@@ -181,6 +181,10 @@ addFilesToOpenMSIni <- function(file, inFiles, outFiles) {
     invisible(.Call(`_patRoon_addFilesToOpenMSIni`, file, inFiles, outFiles))
 }
 
+loadAgilentIMSCalibration <- function(file) {
+    .Call(`_patRoon_loadAgilentIMSCalibration`, file)
+}
+
 getOMPMaxNumThreads <- function() {
     .Call(`_patRoon_getOMPMaxNumThreads`)
 }

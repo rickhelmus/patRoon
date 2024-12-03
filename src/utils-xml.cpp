@@ -73,3 +73,30 @@ void addFilesToOpenMSIni(const std::string &file, const std::vector<std::string>
     
     doc.save_file(file.c_str());
 }
+
+// [[Rcpp::export]]
+Rcpp::List loadAgilentIMSCalibration(const std::string &file)
+{
+    pugi::xml_document doc;
+    const auto result = doc.load_file(file.c_str());
+    
+    if (!result)
+        Rcpp::stop("Failed to parse XML file ('%s'): %s", file, result.description());
+    
+    const auto nodeEl = doc.child("OverrideImsCalibration");
+    const auto calibNode = nodeEl.child("SingleFieldCcsCalibration");
+    if (!nodeEl || !calibNode)
+        Rcpp::stop("Failed to parse calibrant file: unknown format.");
+    
+    const auto fileVersion = nodeEl.child("FileVersion").text().as_int();
+    if (fileVersion != 1)
+        Rcpp::warning("Agilent calibration version is %d, while only version 1 was tested.", fileVersion);
+    
+    const auto massGas = getNumericFromXML(calibNode.child("DriftGas").attribute("mass"));
+    const auto TFix = getNumericFromXML(calibNode.child("TFix").text());
+    const auto beta = getNumericFromXML(calibNode.child("Beta").text());
+    
+    return Rcpp::List::create(Rcpp::Named("massGas") = massGas,
+                              Rcpp::Named("TFix") = TFix,
+                              Rcpp::Named("beta") = beta);
+}

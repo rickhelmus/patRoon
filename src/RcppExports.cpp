@@ -773,6 +773,17 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// loadAgilentIMSCalibration
+Rcpp::List loadAgilentIMSCalibration(const std::string& file);
+RcppExport SEXP _patRoon_loadAgilentIMSCalibration(SEXP fileSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::string& >::type file(fileSEXP);
+    rcpp_result_gen = Rcpp::wrap(loadAgilentIMSCalibration(file));
+    return rcpp_result_gen;
+END_RCPP
+}
 // getOMPMaxNumThreads
 int getOMPMaxNumThreads();
 RcppExport SEXP _patRoon_getOMPMaxNumThreads() {
@@ -862,6 +873,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_calcSpecSimilarity", (DL_FUNC) &_patRoon_calcSpecSimilarity, 8},
     {"_patRoon_calcAnnSims", (DL_FUNC) &_patRoon_calcAnnSims, 6},
     {"_patRoon_addFilesToOpenMSIni", (DL_FUNC) &_patRoon_addFilesToOpenMSIni, 3},
+    {"_patRoon_loadAgilentIMSCalibration", (DL_FUNC) &_patRoon_loadAgilentIMSCalibration, 1},
     {"_patRoon_getOMPMaxNumThreads", (DL_FUNC) &_patRoon_getOMPMaxNumThreads, 0},
     {"_patRoon_setOMPNumThreads", (DL_FUNC) &_patRoon_setOMPNumThreads, 1},
     {"_rcpp_module_boot_MSReadBackend", (DL_FUNC) &_rcpp_module_boot_MSReadBackend, 0},

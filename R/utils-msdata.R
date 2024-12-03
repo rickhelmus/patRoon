@@ -1,6 +1,12 @@
 #' @include main.R
 NULL
 
+doInitBrukerLib <- function()
+{
+    libp <- getOption("patRoon.path.BrukerTIMS", "")
+    return(nzchar(libp) && initBrukerLibrary(libp))
+}
+
 MSFileExtensions <- function()
 {
     list(thermo = "raw",
@@ -309,4 +315,24 @@ doGetEIMs <- function(anaInfo, EIMInfoList, IMSWindow, clusterMethod, minIntensi
     })
     
     return(allEIMs)
+}
+
+prepareAgilentIMSCalib <- function(calibrant, massGas)
+{
+    if (is.list(calibrant))
+    {
+        if (is.null(calibrant[["massGas"]]))
+            calibrant$massGas <- massGas # UNDONE
+    }
+    else
+    {
+        if (checkmate::testDirectory(calibrant))
+        {
+            calibrant <- file.path(calibrant, "AcqData", "OverrideImsCal.xml")
+            if (!file.exists(calibrant))
+                stop(sprintf("Cannot load '%s': file does not exists", calibrant), call. = FALSE)
+        }
+        calibrant <- loadAgilentIMSCalibration(calibrant)
+    }
+    return(calibrant)
 }

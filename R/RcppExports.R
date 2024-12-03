@@ -13,6 +13,14 @@ initBrukerLibrary <- function(path, force = FALSE) {
     .Call(`_patRoon_initBrukerLibrary`, path, force)
 }
 
+getBrukerCCS <- function(mobs, charges, mzs) {
+    .Call(`_patRoon_getBrukerCCS`, mobs, charges, mzs)
+}
+
+getBrukerMob <- function(ccss, charges, mzs) {
+    .Call(`_patRoon_getBrukerMob`, ccss, charges, mzs)
+}
+
 backendAvailable <- function(b) {
     .Call(`_patRoon_backendAvailable`, b)
 }

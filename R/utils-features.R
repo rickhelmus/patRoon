@@ -1185,6 +1185,30 @@ clusterFGroupMobilities <- function(fGroups, IMSWindow, sets)
     return(fGroups)
 }
 
+assignFGroupsCCS <- function(fGroups, CCSParams)
+{
+    if (!hasMobilities(fGroups))
+        stop("Cannot calculate CCS values: feature groups are without mobility assignments", call. = FALSE)
+    
+    charges <- if (nrow(annotations(fGroups)) > 0)
+        sapply(annotations(fGroups)$adduct, function(a) as.adduct(a)@charge)
+    else
+        rep(CCSParams$defaultCharge, length(fGroups))
+    names(charges) <- names(fGroups)
+    
+    fGroups@features@features <- lapply(featureTable(fGroups), function(ft)
+    {
+        ft <- copy(ft)
+        ft[!is.na(mobility), CCS := convertMobilityToCCS(mobility, mz, CCSParams, charges[group])]
+        return(ft[])
+    })
+    
+    fGroups@groupInfo <- copy(groupInfo(fGroups))
+    fGroups@groupInfo[!is.na(mobility), CCS := convertMobilityToCCS(mobility, mz, CCSParams, charges[group])]
+    
+    return(fGroups)
+}
+
 # similar to selectIMSFilter(), but for features
 selectIMSFilterFeatures <- function(features, IMS)
 {

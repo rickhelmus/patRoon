@@ -289,10 +289,11 @@ doFeatAnnConsensusSets <- function(allAnnObjs, labels, setThreshold, setThreshol
 
 doFeatAnnUnset <- function(obj, set)
 {
-    hash <- makeHash(obj, set)
-    cd <- loadCacheData("featAnnUnset", hash)
-    if (!is.null(cd))
-        return(cd)
+    # UNDONE: caching actually seems to slow down things for large objects, as makeHash() is wasting a lot of time --> disable for now
+    # hash <- makeHash(obj, set)
+    # cd <- loadCacheData("featAnnUnset", hash)
+    # if (!is.null(cd))
+    #     return(cd)
     
     obj <- obj[, sets = set]
     
@@ -327,7 +328,7 @@ doFeatAnnUnset <- function(obj, set)
     scRanges <- lapply(obj@scoreRanges, function(sc) setNames(sc, gsub(pat, "", names(sc))))
         
     ret <- list(annotations = ann, scoreTypes = scTypes, scoreRanges = scRanges)
-    saveCacheData("featAnnUnset", ret, hash)
+    # saveCacheData("featAnnUnset", ret, hash)
     
     return(ret)
 }

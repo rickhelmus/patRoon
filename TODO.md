@@ -3,7 +3,7 @@
 ## general
 
 - newProject: don't break lines of text strings, e.g. long paths with spaces in them passed to generateAnalysisInfo()
-- doFeatAnnUnset(): disabled caching for now as it's quite slow for large objects, find a way to speed it up?
+- lossElements: handbook suggests it takes a whole formula --> maybe make fragFormula/lossFormula filters?
 
 ## Ext
 

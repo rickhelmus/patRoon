@@ -38,6 +38,13 @@ setMethod("updateSetConsensus", "formulasSet", function(obj)
     return(obj)
 })
 
+setMethod("getFragInfo", "formulasSet", function(obj, groupName, index, analysis = NULL)
+{
+    if (!is.null(analysis))
+        return(callNextMethod())
+    return(doFeatAnnGetFragInfoSets(obj, groupName, index))
+})
+
 setMethod("mergedConsensusNames", "formulasSet", doFeatAnnMCNSets)
 setMethod("mergedConsensusNames", "formulasConsensusSet", doFeatAnnMCNSetsCons)
 
@@ -258,7 +265,6 @@ generateFormulasSet <- function(fGroupsSet, MSPeakListsSet, adduct, generator, .
     
     setObjects <- Map(unsetFGroupsList, msplArgs, setArgs,
                       f = function(fg, mspl, sa) do.call(generator, c(list(fGroups = fg, MSPeakLists = mspl[[1]], adduct = NULL, ...), sa)))
-    setObjects <- initSetFragInfos(setObjects, MSPeakListsSet)
     
     combFormulas <- Reduce(modifyList, lapply(setObjects, annotations, features = TRUE))
     

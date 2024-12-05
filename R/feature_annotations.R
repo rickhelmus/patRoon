@@ -74,6 +74,14 @@ setMethod("initialize", "featureAnnotations", function(.Object, ...)
 
 setMethod("groupNamesResults", "featureAnnotations", function(obj) groupNames(obj))
 
+setMethod("getFragInfo", "featureAnnotations", function(obj, groupName, index)
+{
+    annTable <- annotations(obj)[[groupName]]
+    if (!is.null(annTable) && nrow(annTable) >= index)
+        return(annTable$fragInfo[[index]])
+    return(NULL)
+})
+
 #' @describeIn featureAnnotations Accessor for the \code{groupAnnotations} slot.
 #' @export
 setMethod("annotations", "featureAnnotations", function(obj) obj@groupAnnotations)
@@ -163,12 +171,12 @@ setMethod("as.data.table", "featureAnnotations", function(x, fGroups = NULL, fra
     
     if (fragments)
     {
-        ret <- rbindlist(lapply(annTable, function(ct)
+        ret <- rbindlist(Map(annTable, names(annTable), f = function(ct, grp)
         {
             ct <- copy(ct)
             ct[, row := seq_len(nrow(ct))]
             
-            fragTab <- rbindlist(ct$fragInfo, idcol = "row", fill = TRUE)
+            fragTab <- rbindlist(lapply(seq_len(nrow(ct)), getFragInfo, obj = x, groupName = grp), idcol = "row", fill = TRUE)
             fragTab[, PLID := NULL]
             cnames <- setdiff(names(fragTab), "row")
             setnames(fragTab, cnames, paste0("frag_", cnames))
@@ -187,8 +195,8 @@ setMethod("as.data.table", "featureAnnotations", function(x, fGroups = NULL, fra
     
     ret <- addElementInfoToAnnTable(ret, countElements, countFragElements, OM, TRUE)
     
-    if (!is.null(ret[["fragInfo"]]))
-        return(ret[, -"fragInfo"]) # not there if empty results
+    # NOTE: fragInfo is absent if empty results
+    ret <- removeDTColumnsIfPresent(ret, getAllMergedConsCols("fragInfo", names(ret), mergedConsensusNames(x)))
     
     return(ret)
 })
@@ -293,7 +301,7 @@ setMethod("filter", "featureAnnotations", function(obj, minExplainedPeaks = NULL
     mark <- if (negate) function(x) !x else function(x) x
     
     oldn <- length(obj)
-    obj <- delete(obj, j = function(annTable, ...)
+    obj <- delete(obj, j = function(annTable, grp, ...)
     {
         annTable <- copy(annTable)
         annTable[, keep := TRUE]
@@ -318,8 +326,9 @@ setMethod("filter", "featureAnnotations", function(obj, minExplainedPeaks = NULL
         
         if (!is.null(fragElements) || !is.null(lossElements))
         {
-            annTable[keep == TRUE, keep := sapply(fragInfo, function(fi)
+            annTable[keep == TRUE, keep := sapply(seq_len(nrow(annTable)), function(i)
             {
+                fi <- getFragInfo(obj, grp, i)
                 if (nrow(fi) == 0)
                     return(FALSE)
                 if (!is.null(fragElements) && !any(sapply(fi$ion_formula, checkFormula, fragElements, negate)))

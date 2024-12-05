@@ -230,7 +230,8 @@ verifyMSPLAnFilter <- function(mspl, obj1, obj2 = NULL, negate = FALSE)
             {
                 if (is.null(o[[fg]]))
                     return(integer())
-                return(lapply(o[[fg]]$fragInfo, "[[", "PLID"))
+                allFIs <- lapply(seq_len(nrow(o[[fg]])), function(i) getFragInfo(o, fg, i))
+                return(lapply(allFIs, "[[", "PLID"))
             }))
             
             if (negate)
@@ -342,7 +343,7 @@ test_that("annotation works", {
     expect_lt(nrow(anPLOnly), nrow(anPL))
     expect_true(any(is.na(anPL$ion_formula)))
     expect_false(any(is.na(anPLOnly$ion_formula)))
-    expect_true(all(compsCons[[1]]$fragInfo[[1]]$ion_formula %in% anPLOnly$ion_formula))
+    expect_true(all(getFragInfo(compsCons, groupNames(compsCons)[1], 1)$ion_formula %in% anPLOnly$ion_formula))
     expect_true(any(grepl("metfrag", anPLOnly$mergedBy)))
     expect_true(any(grepl("sirius", anPLOnly$mergedBy)))
     expect_true(any(grepl("genform", anPLOnly$mergedBy)))

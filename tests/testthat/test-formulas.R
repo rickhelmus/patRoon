@@ -235,7 +235,7 @@ test_that("annotation works", {
     expect_lt(nrow(anPLOnly), nrow(anPL))
     expect_true(any(is.na(anPL$ion_formula)))
     expect_false(any(is.na(anPLOnly$ion_formula)))
-    expect_true(all(formsGF[[anPLGroup]]$fragInfo[[1]]$ion_formula %in% anPLOnly$ion_formula))
+    expect_true(all(getFragInfo(formsGF, anPLGroup, 1)$ion_formula %in% anPLOnly$ion_formula))
     
     skip_if(!doSIRIUS)
     expect_true(any(grepl("genform", anPLCons$mergedBy)))

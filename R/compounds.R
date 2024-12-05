@@ -383,11 +383,11 @@ setMethod("annotatedPeakList", "compounds", function(obj, index, groupName, MSPe
     checkmate::reportAssertions(ac)
 
     if (is.null(formulas) || is.null(formulas[[groupName]]))
-        return(doAnnotatePeakList(MSPeakLists[[groupName]][["MSMS"]], annotations(obj)[[groupName]], index,
+        return(doAnnotatePeakList(MSPeakLists[[groupName]][["MSMS"]], getFragInfo(obj, groupName, index),
                                   onlyAnnotated))
     
     # NOTE: onlyAnnotated is set FALSE so we have the complete peaklist for merging
-    ret <- doAnnotatePeakList(MSPeakLists[[groupName]][["MSMS"]], annotations(obj)[[groupName]], index,
+    ret <- doAnnotatePeakList(MSPeakLists[[groupName]][["MSMS"]], getFragInfo(obj, groupName, index),
                               onlyAnnotated = FALSE)
     if (is.null(ret))
         return(ret)

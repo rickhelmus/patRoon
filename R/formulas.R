@@ -67,6 +67,18 @@ setMethod("initialize", "formulas", function(.Object, ...)
     return(.Object)
 })
 
+setMethod("getFragInfo", "formulas", function(obj, groupName, index, analysis = NULL)
+{
+    if (!is.null(analysis))
+    {
+        annTable <- annotations(obj, TRUE)[[analysis, groupName]]
+        if (!is.null(annTable) && nrow(annTable) >= index)
+            return(annTable$fragInfo[[index]])
+        return(NULL)
+    }
+    return(callNextMethod(obj, groupName, index))
+})
+
 #' @rdname formulas-class
 formulasConsensus <- setClass("formulasConsensus",
                               slots = c(mergedConsensusNames = "character"),
@@ -233,11 +245,11 @@ setMethod("annotatedPeakList", "formulas", function(obj, index, groupName, analy
     checkmate::reportAssertions(ac)
     
     if (!is.null(analysis))
-        return(doAnnotatePeakList(MSPeakLists[[analysis, groupName]][["MSMS"]],
-                                  annotations(obj, TRUE)[[analysis, groupName]], index, onlyAnnotated))
+        return(doAnnotatePeakList(MSPeakLists[[analysis, groupName]][["MSMS"]], getFragInfo(obj, groupName, index,
+                                                                                            analysis = analysis),
+                                  onlyAnnotated))
     
-    return(doAnnotatePeakList(MSPeakLists[[groupName]][["MSMS"]], annotations(obj)[[groupName]], index,
-                              onlyAnnotated))
+    return(doAnnotatePeakList(MSPeakLists[[groupName]][["MSMS"]], getFragInfo(obj, groupName, index), onlyAnnotated))
 })
 
 #' @describeIn formulas Plots an annotated spectrum for a given candidate formula of a feature or feature group. Two

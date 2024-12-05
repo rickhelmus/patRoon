@@ -7,6 +7,7 @@ setGeneric("averageGroups", function(fGroups, areas = FALSE, normalized = FALSE,
 setGeneric("averageMSPeakLists", function(obj) standardGeneric("averageMSPeakLists"))
 setGeneric("collapseComponents", function(obj) standardGeneric("collapseComponents"))
 setGeneric("annScoreNames", function(obj, onlyNums) standardGeneric("annScoreNames"))
+setGeneric("getFragInfo", function(obj, groupName, index, ...) standardGeneric("getFragInfo"))
 setGeneric("prepareConsensusLabels", function(obj, ..., labels) standardGeneric("prepareConsensusLabels"))
 setGeneric("mergedConsensusNames", function(obj, sets = TRUE) standardGeneric("mergedConsensusNames"))
 setGeneric("identifiers", function(compounds) standardGeneric("identifiers"))

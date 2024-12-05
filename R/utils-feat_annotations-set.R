@@ -44,7 +44,7 @@ makeFeatAnnSetConsensus <- function(setObjects, origFGNames, setThreshold, setTh
             
             # rename cols that are specific to a set or algo consensus or should otherwise not be combined
             cols <- getAllMergedConsCols(c(
-                "rank", "mergedBy", "coverage", "explainedPeaks", "ion_formula", "ion_formula_mz", "precursorType",
+                "fragInfo", "rank", "mergedBy", "coverage", "explainedPeaks", "ion_formula", "ion_formula_mz", "precursorType",
                 "libPeaksCompared", "libPeaksTotal"
             ), names(ct), mConsNames)
             if (!setAvgSpecificScores)
@@ -69,10 +69,10 @@ makeFeatAnnSetConsensus <- function(setObjects, origFGNames, setThreshold, setTh
             combineColsBoth <- intersect(getAllMergedConsCols(combineCols, names(left), mConsNames),
                                          getAllMergedConsCols(combineCols, names(right), mConsNames))
             otherColsBoth <- setdiff(intersect(names(left), names(right)),
-                                     c(scoreColsBoth, combineColsBoth, "set", "fragInfo"))
+                                     c(scoreColsBoth, combineColsBoth, "set"))
             colsOnlyRight <- setdiff(names(right), names(left))
             
-            left[right, (c(scoreColsBoth, combineColsBoth, otherColsBoth, colsOnlyRight, "set", "fragInfo")) :=
+            left[right, (c(scoreColsBoth, combineColsBoth, otherColsBoth, colsOnlyRight, "set")) :=
                      # sum scores (they are averaged later below)
                      c(lapply(scoreColsBoth, function(col) sumMergedScoreRows(mget(c(col, otherCols(col)),
                                                                                    inherits = TRUE), .N)),
@@ -94,9 +94,7 @@ makeFeatAnnSetConsensus <- function(setObjects, origFGNames, setThreshold, setTh
                        # add missing columns from right (if any)
                        mget(otherCols(colsOnlyRight)),
                        # mark set presence
-                       .(paste0(set, ",", i.set)),
-                       # combine fragInfos
-                       .(Map(fragInfo, i.fragInfo, f = rbind, MoreArgs = list(fill = TRUE)))),
+                       .(paste0(set, ",", i.set))),
                  on = "UID"]
             
             left[UID %chin% right$UID, setsMergedCount := setsMergedCount + 1]
@@ -206,6 +204,15 @@ makeAnnSetScorings <- function(setObjects, setAvgSpecificScores, origFGNames)
     return(list(scTypes = scTypes, scRanges = scRanges))
 }
 
+doFeatAnnGetFragInfoSets <- function(obj, groupName, index)
+{
+    annTable <- annotations(obj)[[groupName]]
+    if (is.null(annTable) || nrow(annTable) < index)
+        return(NULL)
+    allFI <- sapply(sets(obj), function(s) annTable[[paste0("fragInfo-", s)]][[index]], simplify = FALSE)
+    return(rbindlist(allFI, idcol = "set", fill = TRUE))
+}
+
 doUpdateSetConsensus <- function(obj)
 {
     if (length(setObjects(obj)) >= 1)
@@ -221,25 +228,6 @@ doUpdateSetConsensus <- function(obj)
     obj@scoreRanges <- obj@scoreRanges[groupNames(obj)]
     
     return(obj)
-}
-
-initSetFragInfos <- function(setObjects, MSPeakListsSet)
-{
-    # update fragInfos
-    for (s in names(setObjects))
-    {
-        for (fg in groupNames(setObjects[[s]]))
-        {
-            setObjects[[s]]@groupAnnotations[[fg]][, fragInfo := lapply(fragInfo, function(fi)
-            {
-                fi <- copy(fi) # BUG: avoid warning that somehow was incorrectly copied (invalid .internal.selfref)
-                fi[, set := s]
-                return(fi)
-            })]
-        }
-    }
-    
-    return(setObjects)
 }
 
 doFeatAnnConsensusSets <- function(allAnnObjs, labels, setThreshold, setThresholdAnn, setAvgSpecificScores, rankWeights)
@@ -289,28 +277,12 @@ doFeatAnnConsensusSets <- function(allAnnObjs, labels, setThreshold, setThreshol
 
 doFeatAnnUnset <- function(obj, set)
 {
-    # UNDONE: caching actually seems to slow down things for large objects, as makeHash() is wasting a lot of time --> disable for now
-    # hash <- makeHash(obj, set)
-    # cd <- loadCacheData("featAnnUnset", hash)
-    # if (!is.null(cd))
-    #     return(cd)
-    
     obj <- obj[, sets = set]
     
     ann <- lapply(annotations(obj), copy)
     
     # get rid of sets specific columns
     ann <- lapply(ann, data.table::set, j = c("set", "setCoverage", "setCoverageAnn"), value = NULL)
-    
-    # ... and in fragInfos
-    ann <- lapply(ann, function(tbl)
-    {
-        tbl[, fragInfo := lapply(fragInfo, function(fi)
-        {
-            fi <- copy(fi)
-            set(fi, j = "set", value = NULL)
-        })]
-    })
     
     pat <- paste0("\\-", set, "$")
     
@@ -328,7 +300,6 @@ doFeatAnnUnset <- function(obj, set)
     scRanges <- lapply(obj@scoreRanges, function(sc) setNames(sc, gsub(pat, "", names(sc))))
         
     ret <- list(annotations = ann, scoreTypes = scTypes, scoreRanges = scRanges)
-    # saveCacheData("featAnnUnset", ret, hash)
     
     return(ret)
 }
@@ -403,9 +374,6 @@ doFeatAnnSubsetSets <- function(x, i, j, ..., sets = NULL, updateConsensus = FAL
                         s <- unlist(strsplit(set, ","))
                         paste0(setdiff(s, rmSets), collapse = ",")
                     }, by = seq_len(nrow(ct))]
-                    
-                    # update fragInfos
-                    ct[, fragInfo := lapply(fragInfo, function(fi) fi[!set %chin% rmSets])]
                     
                     return(ct[])       
                 })

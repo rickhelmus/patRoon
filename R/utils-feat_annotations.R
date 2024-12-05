@@ -60,31 +60,26 @@ addElementInfoToAnnTable <- function(annTable, elements, fragElements, OM, class
     return(annTable)
 }
 
-doAnnotatePeakList <- function(spec, annTable, index, onlyAnnotated)
+doAnnotatePeakList <- function(spec, fragInfo, onlyAnnotated)
 {
     if (is.null(spec))
         return(NULL)
     
     spec <- copy(spec)
 
-    if (!is.null(annTable) && nrow(annTable) >= index)
+    if (!is.null(fragInfo))
     {
-        fragInfo <- annTable[index]$fragInfo[[1]]
+        fi <- fragInfo[, -"mz"]
+        set(fi, j = "annotated", value = TRUE)
         
-        if (!is.null(fragInfo))
+        byx <- "ID"; byy <- "PLID"
+        # HACK: check for sets here. Not the prettiest way, but simplifies things a lot.
+        if (!is.null(spec[["set"]]))
         {
-            fi <- fragInfo[, -"mz"]
-            set(fi, j = "annotated", value = TRUE)
-            
-            byx <- "ID"; byy <- "PLID"
-            # HACK: check for sets here. Not the prettiest way, but simplifies things a lot.
-            if (!is.null(spec[["set"]]))
-            {
-                byx <- c(byx, "set"); byy <- c(byy, "set")
-            }
-            spec <- merge(spec, fi, all.x = TRUE, by.x = byx, by.y = byy, sort = FALSE)
-            set(spec, i = which(is.na(spec$annotated)), j = "annotated", value = FALSE)
+            byx <- c(byx, "set"); byy <- c(byy, "set")
         }
+        spec <- tryCatch(merge(spec, fi, all.x = TRUE, by.x = byx, by.y = byy, sort = FALSE), error = function(...) FALSE)
+        set(spec, i = which(is.na(spec$annotated)), j = "annotated", value = FALSE)
     }
     
     if (is.null(spec[["annotated"]]))

@@ -214,22 +214,34 @@ assertSuspectList <- function(x, needsAdduct, skipInvalid, .var.name = checkmate
         assertListVal(x, col, checkmate::assertNumeric, any.missing = TRUE, mustExist = FALSE,
                       lower = if (col != "rt") 0 else -Inf, finite = TRUE, .var.name = .var.name, add = add)
 
-    if (!is.null(x[["mobility"]]))
+    assertMobCCS <- function(col)
     {
-        if (is.numeric(x$mobility))
-            assertListVal(x, "mobility", checkmate::assertNumeric, any.missing = TRUE, lower = 0, finite = TRUE,
+        if (is.numeric(x[[col]]))
+            assertListVal(x, col, checkmate::assertNumeric, any.missing = TRUE, lower = 0, finite = TRUE,
                           .var.name = .var.name, add = add)
-        else if (is.character(x$mobility))
+        else if (is.character(x[[col]]))
         {
             # don't add, let it fail before next check
-            assertListVal(x, "mobility", checkmate::assertCharacter, any.missing = TRUE,  .var.name = .var.name)
-            mobExp <- expandSuspMobilities(x)
-            assertListVal(mobExp, "mobility", checkmate::assertNumeric, any.missing = TRUE, lower = 0, finite = TRUE,
+            assertListVal(x, col, checkmate::assertCharacter, any.missing = TRUE,  .var.name = .var.name)
+            mobExp <- expandSuspMobilities(x) # NOTE: this will also check if mobilities/CCS are consistently given
+            assertListVal(mobExp, col, checkmate::assertNumeric, any.missing = TRUE, lower = 0, finite = TRUE,
                           .var.name = .var.name, add = add)
         }
         else
-            stop(sprintf("mobility column must be numeric or character (now %s)", class(x$mobility)), call. = FALSE)
+            stop(sprintf("%s column must be numeric or character (now %s)", col, class(x[[col]])), call. = FALSE)
     }
+
+    hasMob <- !is.null(x[["mobility"]])
+    hasCCS <- !is.null(x[["CCS"]])
+    
+    if (hasMob && hasCCS && class(x$mobility) != class(x$CCS))
+        stop(sprintf("The value class of the mobility column ('%s') differs from the CCS column ('%s')",
+                     class(x$mobility), class(x$CCS)), call. = FALSE)
+    
+    if (hasMob)
+        assertMobCCS("mobility")
+    if (hasCCS)
+        assertMobCCS("CCS")
     
     if (!skipInvalid)
     {

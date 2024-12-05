@@ -46,7 +46,7 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid, checkDesc, prefCal
         }
         
         # convert to numerics, may be logical if all are NA...
-        for (col in c("mz", "rt"))
+        for (col in c("mz", "rt", "mobility", "CCS"))
         {
             if (!is.null(suspects[[col]]))
                 suspects[, (col) := as.numeric(get(col))]
@@ -95,11 +95,16 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid, checkDesc, prefCal
             # NOTE: if mz column is already available it either contains user values or already NAs
             suspects[, mz := NA_real_]
         }
+
+        # NOTE: mobility and CCS columns may be character vectors when >1 value is given (should be separated by ;)
         
-        # mobility column may be character vector if >1 mobility is given for a suspect
         if (!is.null(suspects[["mobility"]]) && is.character(suspects$mobility))
             suspects[!nzchar(mobility), mobility := NA_character_]
-        
+        if (!is.null(suspects[["CCS"]]) && is.character(suspects$CCS))
+            suspects[!nzchar(CCS), CCS := NA_character_]
+        if (!is.null(suspects[["mobility"]]) && is.null(suspects[["CCS"]]))
+            suspects[, CCS := NA_real_]
+            
         saveCacheData("screenSuspectsPrepList", suspects, hash)
     }        
     
@@ -126,12 +131,36 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid, checkDesc, prefCal
 
 expandSuspMobilities <- function(suspects)
 {
-    if (is.null(suspects[["mobility"]]) || !is.character(suspects$mobility) || all(is.na(suspects$mobility)))
-        return(suspects)
+    # NOTE: assertSuspectList() already checked that column classes are equal
     
-    return(rbindlist(lapply(split(suspects, seq_len(nrow(suspects))), function(row)
+    if (is.null(suspects[["mobility"]]) || !is.character(suspects$mobility))
+        return(copy(suspects))
+    if (all(is.na(suspects$mobility)))
     {
-        data.table(row[, -"mobility"], mobility = as.numeric(unlist(strsplit(row$mobility, ";"))))
+        suspects <- copy(suspects)
+        suspects[, mobility := as.numeric(mobility)]
+        if (!is.null(suspects[["CCS"]]))
+            suspects[, CCS := as.numeric(CCS)]
+        return(suspects[])
+    }
+    
+    doSplit <- function(x) { if (is.na(x)) NA_real_ else as.numeric(unlist(strsplit(x, ";"))) }
+    
+    suspNoMobs <- removeDTColumnsIfPresent(suspects, c("mobility", "CCS")) # for expanding below
+    
+    return(rbindlist(lapply(seq_len(nrow(suspects)), function(i)
+    {
+        mobs <- doSplit(suspects$mobility[i])
+        if (!is.null(suspects[["CCS"]]))
+        {
+            CCSs <- doSplit(suspects$CCS[i])
+            if (!is.na(suspects$CCS[i]) && length(mobs) != length(CCSs))
+                stop(sprintf("The length of mobility and CCS values for suspect '%s' (row %d) differs: %d/%d",
+                             suspects$name[i], i, length(mobs), length(CCSs)), call. = FALSE)
+        }
+        else
+            CCSs <- NA_real_
+        data.table(suspNoMobs[i], mobility = mobs, CCS = CCSs)
     })))
 }
 
@@ -194,16 +223,23 @@ finalizeScreenInfoForIMS <- function(scr, gInfo, minMobilityMatches, IMSWindow)
     scr[, ims_parent_group := gInfo$ims_parent_group[match(group, gInfo$group)]]
     
     # split mobilities from suspect list, NA those from IMS parents, and make sure column is numeric
-    scr[, mobility := NA]
-    scr[, mobility := as.numeric(mobility)] # NOTE: column type conversion needs to be done separately
-    scr[!is.na(mob_group), mobility := mapply(name, ims_parent_group, mob_group, FUN = function(n, g, gm)
-    {
-        mobs <- scrOrigExp[group == g & name == n]$mobility
-        mobs <- mobs[!is.na(mobs)]
-        return(if(length(mobs) == 0) NA_real_ else mobs[which.min(abs(mobs - gm))])
-    })]
-    
+    scr[, c("mobility", "CCS") := NA]
+    scr[, c("mobility", "CCS") := .(as.numeric(mobility), as.numeric(CCS))] # NOTE: column type conversion needs to be done separately
+    scr[!is.na(mob_group), c("mobility", "CCS") := {
+        g <- group; n <- name
+        soe <- scrOrigExp[group == g & name == n]
+        wh <- which.min(abs(soe$mobility - mob_group))
+        if (length(wh) == 0)
+            list(NA_real_, NA_real_)
+        else
+            list(soe$mobility[wh], soe$CCS[wh])
+    }, by = seq_len(nrow(scr[!is.na(mob_group)]))]
+
     scr[, d_mob := mob_group - mobility]
+    if (is.null(gInfo[["CCS"]]))
+        scr[, d_CCS := NA_real_]
+    else
+        scr[, d_CCS := gInfo$CCS[match(group, gInfo$group)] - CCS]
     
     scr <- scr[is.na(mobility) | is.na(d_mob) | abs(d_mob) <= IMSWindow]
     

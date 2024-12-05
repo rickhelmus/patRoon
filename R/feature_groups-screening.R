@@ -526,17 +526,17 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = NULL
 })
 
 #' @export
-setMethod("findMobilities", "featureGroupsScreening", function(fGroups, mobPeaksParam, IMSWindow = 0.01,
+setMethod("findMobilities", "featureGroupsScreening", function(fGroups, mobPeaksParam = NULL, IMSWindow = 0.01,
                                                                clusterMethod = "distance", minIntensityIMS = 0,
                                                                maxMSRTWindow = 2, chromPeaksParam = NULL,
                                                                EICRTWindow = 20, peakRTWindow = 5,
                                                                calcArea = "integrate", fallbackEIC = TRUE,
-                                                               parallel = TRUE, fromSuspects = FALSE,
+                                                               CCSParams = NULL, parallel = TRUE, fromSuspects = FALSE,
                                                                minMobilityMatches = 0)
 {
     ac <- checkmate::makeAssertCollection()
     assertFindMobilitiesArgs(mobPeaksParam, IMSWindow, clusterMethod, minIntensityIMS, maxMSRTWindow,
-                             chromPeaksParam, EICRTWindow, peakRTWindow, calcArea, fallbackEIC, parallel, ac)
+                             chromPeaksParam, EICRTWindow, peakRTWindow, calcArea, fallbackEIC, CCSParams, parallel, ac)
     checkmate::assertFlag(fromSuspects, add = ac)
     checkmate::assertCount(minMobilityMatches, add = ac)
     checkmate::reportAssertions(ac)
@@ -552,6 +552,9 @@ setMethod("findMobilities", "featureGroupsScreening", function(fGroups, mobPeaks
                                                     chromPeaksParam, fallbackEIC, parallel)
     fGroups <- clusterFGroupMobilities(fGroups, IMSWindow, FALSE)
 
+    if (!is.null(CCSParams))
+        fGroups <- assignFGroupsCCS(fGroups, CCSParams)
+    
     gInfo <- groupInfo(fGroups)
     scr <- expandAndUpdateScreenInfoForIMS(screenInfo(fGroups), gInfo)
     scr <- finalizeScreenInfoForIMS(scr, gInfo, minMobilityMatches, IMSWindow)

@@ -25,23 +25,27 @@ genHTMLReportPlotsTPs <- function(fGroups, components, MSPeakLists, formulas, co
             {
                 scrParRow <- scr[name == cmpInfoRow$parent_name & group == cmpInfoRow$parent_group]
                 scrTPRow <- scr[name == ctRow$TP_name & group == ctRow$group]
-                if (!is.null(compounds) && !is.null(scr[["compRank"]]) &&
-                    all(c(cmpInfoRow$parent_group, ctRow$group) %chin% groupNames(compounds)) &&
-                    nrow(scrTPRow) == 1 && !is.na(scrParRow$compRank) && !is.na(scrTPRow$compRank))
+                
+                if (nrow(scrParRow) > 0 && nrow(scrTPRow) > 0) # check if hit wasn't filtered away
                 {
-                    plSpecArgs <- list(obj = compounds, formulas = formulas,
-                                       index = c(scrParRow$compRank, scrTPRow$compRank), MSPeakLists = MSPeakLists,
-                                       plotStruct = FALSE)
-                }
-                else if (!is.null(formulas) && !is.null(scr[["formRank"]]) &&
-                         all(c(cmpInfoRow$parent_group, ctRow$group) %chin% groupNames(formulas)) &&
-                         nrow(scrTPRow) == 1 && !is.na(scrParRow$formRank) && !is.na(scrTPRow$formRank) &&
-                         !is.null(MSPeakLists[[cmpInfoRow$parent_group]][["MSMS"]]) &&
-                         !is.null(MSPeakLists[[ctRow$group]][["MSMS"]]))
-                {
-                    plSpecArgs <- list(obj = formulas,
-                                       index = c(scrParRow$formRank, scrTPRow$formRank),
-                                       MSPeakLists = MSPeakLists)
+                    if (!is.null(compounds) && !is.null(scr[["compRank"]]) &&
+                        all(c(cmpInfoRow$parent_group, ctRow$group) %chin% groupNames(compounds)) &&
+                        nrow(scrTPRow) == 1 && !is.na(scrParRow$compRank) && !is.na(scrTPRow$compRank))
+                    {
+                        plSpecArgs <- list(obj = compounds, formulas = formulas,
+                                           index = c(scrParRow$compRank, scrTPRow$compRank), MSPeakLists = MSPeakLists,
+                                           plotStruct = FALSE)
+                    }
+                    else if (!is.null(formulas) && !is.null(scr[["formRank"]]) &&
+                             all(c(cmpInfoRow$parent_group, ctRow$group) %chin% groupNames(formulas)) &&
+                             nrow(scrTPRow) == 1 && !is.na(scrParRow$formRank) && !is.na(scrTPRow$formRank) &&
+                             !is.null(MSPeakLists[[cmpInfoRow$parent_group]][["MSMS"]]) &&
+                             !is.null(MSPeakLists[[ctRow$group]][["MSMS"]]))
+                    {
+                        plSpecArgs <- list(obj = formulas,
+                                           index = c(scrParRow$formRank, scrTPRow$formRank),
+                                           MSPeakLists = MSPeakLists)
+                    }
                 }
             }
             

@@ -2,6 +2,7 @@
 
 * Fixed: `reAverage = TRUE` was not handled correctly for the `delete()` method for `MSPeakListsSet`
 * Speed up 'unsetting' of large formulas/compounds objects, which affects eg plotting TP similarities, annotatedPeakList() etc (reported by Alessia Ore)
+* `report()`: correctly handle removed suspect hits while reporting TP similarities (reported by Alessia Ore)
 
 # patRoon 2.3.3
 

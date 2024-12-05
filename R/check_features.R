@@ -260,7 +260,17 @@ checkFeaturesInterface$methods(
         
         ep <- getDefEICParams(topMost = if (rValues$fGroupPlotMode == "all") NULL else 1,
                               topMostByRGroup = rValues$fGroupPlotMode == "topMostByRGroup")
-        withr::with_par(list(mar = c(4, 4, 0.1, 1), cex = 1.5), {
+        tbl <- rhandsontable::hot_to_r(input$primaryHot)
+        tblRow <- match(rValues$currentPrimSel, tbl[[1]])
+
+        if (!is.na(tblRow))
+            keep <- tbl[tblRow, ]$keep
+        else
+            keep <- 2
+
+        bg = c(RColorBrewer::brewer.pal(3, "Reds")[[1]], RColorBrewer::brewer.pal(3, "Greens")[[1]], "white")[[keep+1]]
+
+        withr::with_par(list(mar = c(4, 4, 0.1, 1), cex = 1.5, bg = bg), {
             plotChroms(fg, EICs = EICs, colourBy = "rGroups", showPeakArea = TRUE, EICParams = ep,
                        showFGroupRect = FALSE, title = "", retMin = rValues$settings$retUnit == "min")
         })
@@ -473,5 +483,5 @@ predictCheckFeaturesSession <- function(fGroups, session, model = NULL, overWrit
     rmf <- gNames[preds[preds$Pred_Class %in% c("BAD", "Fail"), "EIC"]]
     saveCheckSession(list(removeFully = rmf, removePartially = list()), session, fGroups[, rmf], "featureGroups")
     
-    invisible(NULL)
+    invisible(preds)
 }

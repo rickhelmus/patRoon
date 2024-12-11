@@ -945,18 +945,19 @@ assignFeatureMobilitiesPeaks <- function(features, peaksParam, IMSWindow, cluste
     
     features@features <- Map(features@features, allEIMs, f = function(fTable, EIMs)
     {
+        peaksTable <-  data.table()
         if (length(EIMs) > 0)
         {
             # pretend we have EICs so we can find peaks
             EIMs <- lapply(EIMs, setnames, old = "mobility", new = "time")
             peaksList <- findPeaks(EIMs, peaksParam, verbose = FALSE)
-            peaksTable <- rbindlist(peaksList, idcol = "ims_parent_ID")
+            peaksTable <- rbindlist(peaksList, idcol = "ims_parent_ID")                
             setnames(peaksTable, c("ret", "retmin", "retmax", "area", "intensity"), mobNumCols, skip_absent = TRUE)
             # NOTE: we subset columns here to remove any algo specific columns that may also be present in the feature
             # table (UNDONE?)
             peaksTable <- subsetDTColumnsIfPresent(peaksTable, c(mobNumCols, "ims_parent_ID"))
         }
-        else
+        if (length(peaksTable) == 0)
             peaksTable <- data.table()[, (mobNumCols) := numeric()][, ims_parent_ID := character()]
 
         peaksTable[, mob_assign_method := "peak"]

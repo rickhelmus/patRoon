@@ -133,26 +133,6 @@ doAverageSpectraList <- function(specsList, method, window, minIntensity, minAbu
     .Call(`_patRoon_doAverageSpectraList`, specsList, method, window, minIntensity, minAbundance)
 }
 
-collapseTIMSFrame <- function(file, frameID, method, mzWindow, mzStart = 0.0, mzEnd = 0.0, mobilityStart = 0.0, mobilityEnd = 0.0, minAbundance = 1L, topMost = 0L, minIntensity = 0L, minIntensityPost = 0L, scanStartsN = NULL, scanEndsN = NULL, precursorMZ = 0.0, onlyWithPrecursor = FALSE, flatten = FALSE) {
-    .Call(`_patRoon_collapseTIMSFrame`, file, frameID, method, mzWindow, mzStart, mzEnd, mobilityStart, mobilityEnd, minAbundance, topMost, minIntensity, minIntensityPost, scanStartsN, scanEndsN, precursorMZ, onlyWithPrecursor, flatten)
-}
-
-getTIMSPeakLists <- function(file, frameIDsList, precursorMZs, onlyWithPrecursor, method, mzWindow, minAbundance = 1L, topMost = 0L, minIntensityPre = 0L, minIntensityPost = 0L, minIntensityFinal = 0L, mobilityStartsN = NULL, mobilityEndsN = NULL, scanStartsListN = NULL, scanEndsListN = NULL) {
-    .Call(`_patRoon_getTIMSPeakLists`, file, frameIDsList, precursorMZs, onlyWithPrecursor, method, mzWindow, minAbundance, topMost, minIntensityPre, minIntensityPost, minIntensityFinal, mobilityStartsN, mobilityEndsN, scanStartsListN, scanEndsListN)
-}
-
-getTIMSEICs <- function(file, frameIDs, mzStarts, mzEnds, mobilityStarts, mobilityEnds, compress) {
-    .Call(`_patRoon_getTIMSEICs`, file, frameIDs, mzStarts, mzEnds, mobilityStarts, mobilityEnds, compress)
-}
-
-getTIMSMobilograms <- function(file, frameIDsList, mzStarts, mzEnds, method, IMSWindow, minIntensity = 0L, compress = TRUE) {
-    .Call(`_patRoon_getTIMSMobilograms`, file, frameIDsList, mzStarts, mzEnds, method, IMSWindow, minIntensity, compress)
-}
-
-collapseTIMSSpectra <- function(file, frameIDs, mzStart, mzEnd, mobilityStart, mobilityEnd, method, mzWindow, minAbundance, topMost, minIntensityPre, minIntensityPost) {
-    .Call(`_patRoon_collapseTIMSSpectra`, file, frameIDs, mzStart, mzEnd, mobilityStart, mobilityEnd, method, mzWindow, minAbundance, topMost, minIntensityPre, minIntensityPost)
-}
-
 loadEICIntensities <- function(spectra, featList, rtWindow) {
     .Call(`_patRoon_loadEICIntensities`, spectra, featList, rtWindow)
 }

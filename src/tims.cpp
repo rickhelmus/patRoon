@@ -384,7 +384,6 @@ EIX sortCompressEIX(const EIX &eix, bool compress, std::vector<size_t> *indOrder
 
 }
 
-// [[Rcpp::export]]
 Rcpp::DataFrame collapseTIMSFrame(const std::string &file, size_t frameID, const std::string &method, double mzWindow,
                                   double mzStart = 0.0, double mzEnd = 0.0, double mobilityStart = 0.0,
                                   double mobilityEnd = 0.0, unsigned minAbundance = 1, unsigned topMost = 0,
@@ -415,7 +414,6 @@ Rcpp::DataFrame collapseTIMSFrame(const std::string &file, size_t frameID, const
                                    Rcpp::Named("intensity") = spec.intensities);
 }
 
-// [[Rcpp::export]]
 Rcpp::List getTIMSPeakLists(const std::string &file, Rcpp::List frameIDsList,
                             const std::vector<double> precursorMZs, bool onlyWithPrecursor,
                             const std::string &method, double mzWindow, unsigned minAbundance = 1, unsigned topMost = 0,
@@ -486,7 +484,6 @@ Rcpp::List getTIMSPeakLists(const std::string &file, Rcpp::List frameIDsList,
     return ret;
 }
 
-// [[Rcpp::export]]
 Rcpp::List getTIMSEICs(const std::string &file, const std::vector<unsigned> &frameIDs,
                        const std::vector<double> &mzStarts, const std::vector<double> &mzEnds,
                        const std::vector<double> &mobilityStarts, const std::vector<double> &mobilityEnds,
@@ -590,7 +587,6 @@ Rcpp::List getTIMSEICs(const std::string &file, const std::vector<unsigned> &fra
     return ret;
 }
 
-// [[Rcpp::export]]
 Rcpp::List getTIMSMobilograms(const std::string &file, Rcpp::List frameIDsList, const std::vector<double> &mzStarts,
                               const std::vector<double> &mzEnds, const std::string &method, double IMSWindow,
                               unsigned minIntensity = 0, bool compress = true)
@@ -648,7 +644,6 @@ Rcpp::List getTIMSMobilograms(const std::string &file, Rcpp::List frameIDsList, 
     return ret;
 }
 
-// [[Rcpp::export]]
 Rcpp::List collapseTIMSSpectra(const std::string &file, const std::vector<unsigned> &frameIDs, double mzStart,
                                double mzEnd, double mobilityStart, double mobilityEnd, const std::string &method,
                                double mzWindow, unsigned minAbundance, unsigned topMost, unsigned minIntensityPre,

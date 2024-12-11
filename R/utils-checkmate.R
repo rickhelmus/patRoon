@@ -987,12 +987,15 @@ assertFindMobilitiesArgs <- function(mobPeaksParam, IMSWindow, clusterMethod, mi
     assertFindPeaksParam(chromPeaksParam, null.ok = TRUE, add = add)
     checkmate::assertChoice(calcArea, c("integrate", "sum"), add = add)
     aapply(checkmate::assertFlag, . ~ fallbackEIC + parallel, fixed = list(add = add))
-    assertCCSParams(CCSParams, add = add)
+    assertCCSParams(CCSParams, null.ok = TRUE, add = add)
     invisible(NULL)
 }
 
 assertCCSParams <- function(x, null.ok = FALSE, .var.name = checkmate::vname(x), add = NULL)
 {
+    if (null.ok && is.null(x))
+        return(invisible(NULL))
+    
     assertListVal(x, "method", checkmate::assertChoice,
                   choices = c("bruker", "mason-schamp_k", "mason-schamp_1/k", "agilent"),# "waters"),
                   .var.name = .var.name, add = add)

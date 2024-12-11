@@ -249,6 +249,7 @@ bool initBrukerLibrary(const std::string &path, bool force = false)
 // [[Rcpp::export]]
 Rcpp::NumericVector getBrukerCCS(Rcpp::NumericVector mobs, Rcpp::IntegerVector charges, Rcpp::NumericVector mzs)
 {
+#ifdef WITH_OTIMS
     Rcpp::NumericVector ret(mobs.size());
     
     for (int i=0; i<ret.size(); ++i)
@@ -260,11 +261,16 @@ Rcpp::NumericVector getBrukerCCS(Rcpp::NumericVector mobs, Rcpp::IntegerVector c
     }
     
     return ret;
+#else
+    Rcpp::stop("Cannot calculate CCS values with Bruker library: backend unavailable!");
+    return Rcpp::NumericVector();
+#endif
 }
 
 // [[Rcpp::export]]
 Rcpp::NumericVector getBrukerMob(Rcpp::NumericVector ccss, Rcpp::IntegerVector charges, Rcpp::NumericVector mzs)
 {
+#ifdef WITH_OTIMS
     Rcpp::NumericVector ret(ccss.size());
     
     for (int i=0; i<ret.size(); ++i)
@@ -276,4 +282,8 @@ Rcpp::NumericVector getBrukerMob(Rcpp::NumericVector ccss, Rcpp::IntegerVector c
     }
     
     return ret;
+#else
+    Rcpp::stop("Cannot calculate mobility values with Bruker library: backend unavailable!");
+    return Rcpp::NumericVector();
+#endif
 }

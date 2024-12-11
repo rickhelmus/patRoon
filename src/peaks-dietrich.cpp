@@ -377,7 +377,7 @@ Rcpp::List doFindPeaksDietrich(Rcpp::List EICs, double minIntensity, int SN, dou
     std::vector<std::vector<double>> allIntensities, allTimes;
     for (size_t i=0; i<entries; ++i)
     {
-        Rcpp::DataFrame df = EICs[i];
+        Rcpp::DataFrame df = Rcpp::as<Rcpp::DataFrame>(EICs[i]);
         allIntensities.emplace_back(Rcpp::as<std::vector<double>>(df["intensity"]));
         allTimes.emplace_back(Rcpp::as<std::vector<double>>(df["time"]));
     }

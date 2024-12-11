@@ -1000,6 +1000,9 @@ assertCCSParams <- function(x, null.ok = FALSE, .var.name = checkmate::vname(x),
                   choices = c("bruker", "mason-schamp_k", "mason-schamp_1/k", "agilent"),# "waters"),
                   .var.name = .var.name, add = add)
     
+    if (x$method == "bruker" && !backendAvailable("opentims"))
+        stop("Cannot calculate mobility data with Bruker library: not supported on this platform/OS", call. = FALSE)
+    
     if (x$method == "agilent" && is.null(x[["calibrant"]]))
         stop("Please set the calibrant CCS parameter", call. = FALSE)
     

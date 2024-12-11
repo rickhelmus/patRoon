@@ -74,7 +74,7 @@ genHTMLReportPlotsChromsLarge <- function(fGroups, settings, outPath, EICs, EICP
         makeHTMLReportPlot("chrom_large-", outPath, "plotChroms",
                            list(fGroups, groupName = grp, retMin = settings$features$retMin,
                                 intMax = settings$features$chromatograms$intMax, EICs = EICs,
-                                EICParams = EICParams, groupBy = "rGroups", title = "", bty = "l"),
+                                EICParams = EICParams, groupBy = "rGroups", IMS = "both", title = "", bty = "l"),
                            parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)),
                            width = 6, height = 4, bg = "transparent", pointsize = 16)
     }, simplify = FALSE)
@@ -93,7 +93,7 @@ genHTMLReportPlotsChromsSmall <- function(fGroups, settings, outPath, EICs, EICP
                            list(fGroups, groupName = grp, retMin = settings$features$retMin, EICs = EICs,
                                 EICParams = modifyList(EICParams, list(topMost = 1, topMostByRGroup = FALSE,
                                                                        onlyPresent = TRUE)),
-                                showFGroupRect = FALSE, showPeakArea = TRUE, title = "",
+                                showFGroupRect = FALSE, showPeakArea = TRUE, IMS = "both", title = "",
                                 intMax = settings$features$chromatograms$intMax, bty = "n"),
                            parParams = list(mai = c(0, 0, 0, 0), lwd = 10), width = 12, height = 4, bg = "transparent",
                            pointsize = 16)

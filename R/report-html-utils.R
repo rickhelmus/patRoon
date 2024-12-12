@@ -11,17 +11,6 @@ makeReactImgCell <- function()
     function(value) htmltools::img(src = value, style = list("max-height" = "300px"))
 }
 
-makeReactCellIMSParentGroup <- function()
-{
-    # only print IMS parent when (1) the cell is the actual parent or (2) we are at the top of the table page
-    return(htmlwidgets::JS("function(cellInfo, state)
-    {
-        if (cellInfo.row.group === cellInfo.value || cellInfo.viewIndex === 0)
-            return(cellInfo.value);
-        return '';
-    }"))
-}
-
 makeReactCellRoundMerged <- function(rounding)
 {
     return(function(value)
@@ -355,7 +344,6 @@ makeMainResultsReactable <- function(tab, tabName, retMin, plots, colGroupOrder 
             reactable::colFormat(digits = cdrow$rounding)
         
         cell <- switch(cdrow$formatting,
-                       ims_parent_group = makeReactCellIMSParentGroup(),
                        round_merged = makeReactCellRoundMerged(cdrow$rounding),
                        chromLarge = makeReactCellLargeChromMob(plots, "chroms"),
                        chromSmall = makeReactCellSmallChromMob("chromLarge" %chin% colDefDB$formatting, plots, "chroms"),
@@ -368,23 +356,7 @@ makeMainResultsReactable <- function(tab, tabName, retMin, plots, colGroupOrder 
                        formula = makeReactCellFormula(),
                        NULL)
         
-        style <- NULL
-        isStartCol <- col %in% grpStartCols
-        if (hasMob || isStartCol)
-        {
-            style <- if (!hasMob)
-                colSepStyle
-            else
-            {
-                function(v, i)
-                {
-                    s <- if (isStartCol) colSepStyle
-                    if (!is.na(tab$ims_parent_group[i]) && !is.na(tab$mobility[i]))
-                        s <- c(s, list(background = "lightcyan"))
-                    return(s)
-                }
-            }
-        }
+        style <- if (col %in% grpStartCols) colSepStyle
         
         filterInput <- switch(cdrow$filter,
                               select = makeReactFilterInputSelect(id),
@@ -393,7 +365,6 @@ makeMainResultsReactable <- function(tab, tabName, retMin, plots, colGroupOrder 
         filterMethod <- switch(cdrow$filter,
                                exact = getReactFilterMethodExact(),
                                annotations = getReactFilterMethodAnnotations())
-        
         
         return(reactable::colDef(name = cdrow$displayName, show = !cdrow$hidden, format = format, cell = cell,
                                  html = cdrow$formatting %in% c("chromLarge", "mobLarge"), # HACK
@@ -547,7 +518,7 @@ reportHTMLUtils$methods(
         )
     },
 
-    makeToolbar = function(tableID, groupBy = NULL, columnToggles = NULL, toggleExpand = FALSE,
+    makeToolbar = function(tableID, groupBy = NULL, groupByDef = NULL, columnToggles = NULL, toggleExpand = FALSE,
                            toggleExpandDisableIfNoGrouping = TRUE, tagsPreButtons = NULL, tagsPostButtons = NULL)
     {
         makeID <- function(id) paste0(tableID, "-", id)
@@ -567,7 +538,8 @@ reportHTMLUtils$methods(
                     label("for" = makeID("groupBy"), "Group by"),
                     select(id = makeID("groupBy"), onChange = onChange,
                            style = list("margin-right" = "10px", "margin-top" = "3px"),
-                           lapply(pruneList(groupBy), function(o) option(value = o$value, o$name))
+                           lapply(pruneList(groupBy),
+                           function(o) option(value = o$value, o$name, selected = !is.null(groupByDef) && o$value == groupByDef))
                     )
                 )
             }
@@ -605,12 +577,11 @@ reportHTMLUtils$methods(
             
             if (toggleExpand)
             {
+                show <- !toggleExpandDisableIfNoGrouping || (!is.null(groupByDef) && groupByDef != "none")
                 ret <- htmltools::tagAppendChildren(
                     ret,
-                    # NOTE: button is hidden if toggleExpandDisableIfNoGrouping since the initial selection is assumed
-                    # to be no grouping.
                     htmltools::tags$button(type = "button", class = "btn btn-secondary btn-sm", id = toggleExpandID,
-                                           style = paste("display:", if (!toggleExpandDisableIfNoGrouping) "" else "none"),
+                                           style = paste("display:", if (show) "" else "none"),
                                            onClick = sprintf("Reactable.toggleAllRowsExpanded('%s')", tableID),
                                            bsicons::bs_icon("caret-right-fill", size = "1.5em", title = "Expand/Collapse"))
                 )

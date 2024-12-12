@@ -192,17 +192,23 @@ genHTMLReportPlotsIntPlots <- function(fGroups, settings, outPath, parallel)
 
 
 reportHTMLUtils$methods(
+    makeMainResultsFGReactable = function(...)
+    {
+        hasMob <- hasMobilities(objects$fGroups)
+        makeMainResultsReactable(..., retMin = settings$features$retMin, plots = plots,
+                                 groupBy = if (hasMob) "ims_parent_group", defaultExpanded = hasMob)
+    },
+
     genMainTablePlain = function()
     {
         mdprintf("Feature groups... ")
-        makeMainResultsReactable(getFGReactTab(objects, settings), "Plain", settings$features$retMin, plots,
-                                 initView = "Plain")
+        makeMainResultsFGReactable(getFGReactTab(objects, settings), "Plain", initView = "Plain")
     },
     
     genMainTableSusByGroup = function()
     {
-        makeMainResultsReactable(getFGReactTab(objects, settings, onlyHits = TRUE), "SusByGroup",
-                                 settings$features$retMin, plots, initView = "SuspectsByGroup")
+        makeMainResultsFGReactable(getFGReactTab(objects, settings, onlyHits = TRUE), "SusByGroup",
+                                   initView = "SuspectsByGroup")
     },
     genMainTableSusCandSuspect = function()
     {
@@ -221,7 +227,7 @@ reportHTMLUtils$methods(
         tab <- getFGReactTab(objects, settings, collapseSuspects = NULL, onlyHits = TRUE)
         # HACK: use a different name (and col definition) so that we get a hidden column used for filtering
         setnames(tab, "susp_name", "susp_ID")
-        makeMainResultsReactable(tab, "SusCandGroup", settings$features$retMin, plots)
+        makeMainResultsFGReactable(tab, "SusCandGroup")
     },
 
     # HACK: the ISTD table is essentially the same as what screenInfo() returns for suspects. So the following functions
@@ -231,7 +237,7 @@ reportHTMLUtils$methods(
     {
         tab <- getFGReactTab(objects, settings)
         tab <- tab[group %chin% internalStandards(objects$fGroups)$group]
-        makeMainResultsReactable(tab, "ISTDsByGroup", settings$features$retMin, plots, initView = "ISTDsByGroup")
+        makeMainResultsFGReactable(tab, "ISTDsByGroup", initView = "ISTDsByGroup")
     },
     genMainTableISTDsCandISTD = function()
     {
@@ -257,7 +263,7 @@ reportHTMLUtils$methods(
                 
         ftab <- merge(tab, ftab, by = "group")
 
-        makeMainResultsReactable(ftab, "ISTDsCandGroup", settings$features$retMin, plots)
+        makeMainResultsFGReactable(ftab, "ISTDsCandGroup")
     },
 
     genSuspInfoTable = function(id)
@@ -467,7 +473,14 @@ reportHTMLUtils$methods(
     
     makeFGToolbar = function(tableID)
     {
-        makeToolbar(tableID, columnToggles = list(
+        gb <- if (hasMobilities(objects$fGroups))
+        {
+            list(
+                list(value = "", name = "None"),
+                list(value = "ims_parent_group", name = "IMS parent group")
+            )
+        }
+        makeToolbar(tableID, groupBy = gb, groupByDef = "ims_parent_group", columnToggles = list(
             list(value = "group", name = "Group info", checked = TRUE),
             list(value = "intensities", name = "Intensities", checked = TRUE),
             maybeInclUI(hasConcs(), list(value = "concentrations", name = "Concentrations",
@@ -477,7 +490,7 @@ reportHTMLUtils$methods(
                       list(value = "chrom_large", name = "Large chromatograms")),
             maybeInclUI(settings$features$mobilograms$large,
                         list(value = "mob_large", name = "Large mobilograms"))
-        ))
+        ), toggleExpand = TRUE)
     },
     
     mainTabToClass = function(main) if (main) "detailsMainTable" else "detailsCandTable",

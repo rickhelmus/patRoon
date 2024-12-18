@@ -332,10 +332,12 @@ function showTabCols(id, columnGroup, show)
         Reactable.toggleHideColumn(id, cols, !show);
     
     // UNDONE: don't do this here
-    if (columnGroup === "chrom_large")
+    if (columnGroup === "chrom_mob_large")
+    {
         Reactable.toggleHideColumn(id, "chrom_small", show);
-    if (columnGroup === "mob_large")
-        Reactable.toggleHideColumn(id, "mob_small", show);
+        if (cols.includes("mob_large"))
+            Reactable.toggleHideColumn(id, "mob_small", show);
+    }
 }
 
 function updateCompon(cmpName, activateFG = true)

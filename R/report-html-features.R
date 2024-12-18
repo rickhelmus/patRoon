@@ -57,7 +57,7 @@ getFGScreeningReactTab <- function(tab, plots)
     scols <- setdiff(names(tab), "group")
     setnames(tab, scols, paste0("susp_", scols))
     if (!is.null(tab[["susp_InChIKey"]]) && !all(is.na(tab$susp_InChIKey)))
-        tab[, susp_structure := plots$structs[getIKBlock1(susp_InChIKey)]]
+        tab[, susp_structure := getIKBlock1(susp_InChIKey)]
     return(tab)
 }
 
@@ -188,6 +188,11 @@ genHTMLReportPlotsIntPlots <- function(fGroups, settings, outPath, parallel)
                            parParams = list(mar = c(4.1, 4.1, 1, 0.1)), width = 8, height = 4, bg = "transparent",
                            pointsize = 16)
     }, simplify = FALSE)
+}
+
+makeReactCellFeatChrom <- function()
+{
+    return(getReactCellImgJS("'src=\"' + reportPlots.chromsFeatures[ci.row.group][ci.row.analysis] + '\"'"))
 }
 
 
@@ -359,10 +364,7 @@ reportHTMLUtils$methods(
             # add EICs
             tab[, chromatogram := ""] # dummy value, not needed
             
-            colDefs$chromatogram <- reactable::colDef(minWidth = 175, cell = function(value, index)
-            {
-                htmltools::img(src = plots$chromsFeatures[[tab$group[index]]][[tab$analysis[index]]])
-            })
+            colDefs$chromatogram <- reactable::colDef(minWidth = 175, cell = makeReactCellFeatChrom(), html = TRUE)
         }
         if (!is.null(tab[["set"]]))
             colDefs$set <- reactable::colDef(filterInput = makeReactFilterInputSelect("featuresTab"))

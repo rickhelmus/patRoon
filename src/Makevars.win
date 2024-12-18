@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2016-2024 Rick Helmus <r.helmus@uva.nl>
+#
+# SPDX-License-Identifier: GPL-3.0-only
+
 PKG_CPPFLAGS=-DSTRICT_R_HEADERS
 
 SRC=$(wildcard GenForm-svn/*.cpp)

@@ -1,7 +1,12 @@
-# This file contains IPO utility functions used for optimizing feature finding.
-# The functions are copied unchanged from utils.R and
-# optimizeXcmsSetParameters.R. All functions are placed inside a separate
-# environment to keep the package namespace clean.
+# SPDX-FileCopyrightText: 2016-2024 Rick Helmus <r.helmus@uva.nl>
+#
+# SPDX-License-Identifier: GPL-3.0-only
+
+# This file contains IPO utility functions used for optimizing feature finding. The functions are copied unchanged from
+# utils.R and optimizeXcmsSetParameters.R. The original code is licensed under GPLv2 or higher, see https://github.com/rietho/IPO
+
+# All functions are placed inside a separate environment to keep the package
+# namespace clean.
 
 # no coverage: no intention to test IPO code
 # nocov start

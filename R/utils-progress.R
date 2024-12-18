@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2016-2024 Rick Helmus <r.helmus@uva.nl>
+#
+# SPDX-License-Identifier: GPL-3.0-only
+
 # This function is heavily inspired by the excellent progressr package by Henrik Bengtsson:
 # https://github.com/HenrikBengtsson/progressr
 # Some day we might switch (back) to this package, but since it requires an opt-in by the user, we stick with this

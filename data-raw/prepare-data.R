@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2016-2024 Rick Helmus <r.helmus@uva.nl>
+#
+# SPDX-License-Identifier: GPL-3.0-only
+
 compScorings <- read.csv(system.file("data-raw", "compounds-scorings.csv", package = "patRoon"), stringsAsFactors = FALSE)
 
 # adapted from GenForm/msaddion.cpp

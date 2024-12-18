@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2016-2024 Rick Helmus <r.helmus@uva.nl>
+#
+# SPDX-License-Identifier: GPL-3.0-only
+
 #' Utilities for caching of workflow data.
 #'
 #' Several utility functions for caching workflow data. The most important function is \code{clearCache}; other

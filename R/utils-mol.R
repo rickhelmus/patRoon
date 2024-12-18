@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2016-2024 Rick Helmus <r.helmus@uva.nl>
+#
+# SPDX-License-Identifier: GPL-3.0-only
+
 isValidMol <- function(mol) !is.null(mol) # && !is.na(mol)
 emptyMol <- function() rcdk::parse.smiles("")[[1]]
 isEmptyMol <- function(mol) rcdk::get.atom.count(mol) == 0

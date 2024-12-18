@@ -31,3 +31,6 @@
 ^CITATION.cff$
 ^\.github$
 ^logo.png$
+^LICENSES$
+^REUSE.toml$
+^tools$

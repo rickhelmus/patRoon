@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2016-2024 Rick Helmus <r.helmus@uva.nl>
+#
+# SPDX-License-Identifier: GPL-3.0-only
+
 reactSelFilterButton <- function(id, name, target, ocFunc, title)
 {
     htmltools::tags$button(class = "btn btn-secondary btn-sm", "data-bs-toggle" = "modal",

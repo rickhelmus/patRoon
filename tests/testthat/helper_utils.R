@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2016-2024 Rick Helmus <r.helmus@uva.nl>
+#
+# SPDX-License-Identifier: GPL-3.0-only
+
 testWithSets <- function() T # UNDONE: check environment variable or something
 
 getTestDataPathGeneric <- function() "test_data"

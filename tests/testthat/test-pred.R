@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2016-2024 Rick Helmus <r.helmus@uva.nl>
+#
+# SPDX-License-Identifier: GPL-3.0-only
+
 context("prediction")
 
 # NOTE: fGroups, peak lists, annotations should all be in sync with test-formulas/test-compounds

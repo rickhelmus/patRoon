@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2016-2024 Rick Helmus <r.helmus@uva.nl>
+#
+# SPDX-License-Identifier: GPL-3.0-only
+
 defMultiProcErrorHandler <- function(cmd, exitStatus, ...)
 {
     return(sprintf("Failed to run command '%s' with args: '%s'. Exit code: %d",

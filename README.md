@@ -6,6 +6,7 @@
 [![patRoon r-universe](https://rickhelmus.r-universe.dev/badges/patRoon)](https://rickhelmus.r-universe.dev/patRoon)
 [![DOI:10.1186/s13321-020-00477-w](https://zenodo.org/badge/DOI/10.1186/s13321-020-00477-w.svg)](https://doi.org/10.1186/s13321-020-00477-w)
 [![DOI](https://joss.theoj.org/papers/10.21105/joss.04029/status.svg)](https://doi.org/10.21105/joss.04029)
+[![REUSE status](https://api.reuse.software/badge/github.com/rickhelmus/patRoon)](https://api.reuse.software/info/github.com/rickhelmus/patRoon)
 
 `patRoon` aims to provide comprehensive mass spectrometry based non-target analysis (NTA) workflows for environmental
 analysis. The name is derived from a Dutch word that means _pattern_ and may also be an acronym for _hyPhenated mAss

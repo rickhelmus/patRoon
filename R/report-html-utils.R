@@ -6,9 +6,12 @@ getMainReactColSepStyle <- function() list(borderLeft = "1px solid DarkGrey")
 
 getReactColGrpStartCols <- function(groupDefs) sapply(groupDefs[-1], function(col) col$columns[1])
 
-makeReactImgCell <- function()
+getReactCellImgJS <- function(imgTags, maxHeight = NULL)
 {
-    function(value) htmltools::img(src = value, style = list("max-height" = "300px"))
+    if (!is.null(maxHeight))
+        imgTags <- paste(imgTags, sprintf(" + ' style=\"max-height: %dpx\"'", maxHeight))
+    
+        return(htmlwidgets::JS(sprintf("ci => '<img ' + %s + '></img>';", imgTags)))
 }
 
 makeReactCellRoundMerged <- function(rounding)
@@ -20,23 +23,20 @@ makeReactCellRoundMerged <- function(rounding)
     })
 }
 
-makeReactCellLargeChromMob <- function(plots, type)
+makeReactCellLargeChromMob <- function(type)
 {
-    #return(function(value, index) htmltools::img(src = plots$chromsLarge[[value]]))
-    return(htmlwidgets::JS(sprintf("function(cellInfo) { return '<img src=\"' + reportPlots.%sLarge[[cellInfo.value]] + '\"></img>'; }", type)))
+    imgTags <- sprintf("'src=\"' + reportPlots.%sLarge[ci.value] + '\"'", type)
+    return(getReactCellImgJS(imgTags))
 }
 
-makeReactCellSmallChromMob <- function(hasLarge, plots, type)
+makeReactCellSmallChromMob <- function(hasLarge, type)
 {
-    return(function(value, index)
-    {
-        tag <- htmltools::img(src = plots[[paste0(type, "Small")]][[value]], style = list("max-height" = "20px"))
-        if (hasLarge)
-            tag <- htmltools::tagAppendAttributes(tag, "data-srcZoom" = plots[[paste0(type, "Large")]][[value]])
-        else
-            tag <- htmltools::tagAppendAttributes(tag, class = "noZoomImg")
-        return(tag)
-    })
+    imgTags <- sprintf("'src=\"' + reportPlots.%sSmall[ci.value] + '\"'", type)
+    imgTags <- if (hasLarge)
+        paste(imgTags, sprintf("+ ' data-srcZoom=\"' + reportPlots.%sLarge[ci.value] + '\"'", type))
+    else
+        paste(imgTags, "+ ' class=\"noZoomImg\"'")
+    return(getReactCellImgJS(imgTags, 20))
 }
 
 makeReactCellISTD <- function()
@@ -65,6 +65,12 @@ makeReactCellAnnotations <- function()
             tags <- c(tags, list(annTag("grey", "white", "Comp")))
         return(do.call(htmltools::tagList, tags))
     }
+}
+
+makeReactCellStructure <- function()
+{
+    return(getReactCellImgJS(sprintf("'src=\"' + reportPlots.structs[ci.value] + '\"'"),
+           maxHeight = 300))
 }
 
 makeReactCellIDL <- function()
@@ -345,13 +351,13 @@ makeMainResultsReactable <- function(tab, tabName, retMin, plots, colGroupOrder 
         
         cell <- switch(cdrow$formatting,
                        round_merged = makeReactCellRoundMerged(cdrow$rounding),
-                       chromLarge = makeReactCellLargeChromMob(plots, "chroms"),
-                       chromSmall = makeReactCellSmallChromMob("chromLarge" %chin% colDefDB$formatting, plots, "chroms"),
-                       mobLarge = makeReactCellLargeChromMob(plots, "mobilograms"),
-                       mobSmall = makeReactCellSmallChromMob("mobLarge" %chin% colDefDB$formatting, plots, "mobilograms"),
+                       chromLarge = makeReactCellLargeChromMob("chroms"),
+                       chromSmall = makeReactCellSmallChromMob("chromLarge" %chin% colDefDB$formatting, "chroms"),
+                       mobLarge = makeReactCellLargeChromMob("mobilograms"),
+                       mobSmall = makeReactCellSmallChromMob("mobLarge" %chin% colDefDB$formatting, "mobilograms"),
                        ISTD = makeReactCellISTD(),
                        annotations = makeReactCellAnnotations(),
-                       structure = makeReactImgCell(),
+                       structure = makeReactCellStructure(),
                        IDL = makeReactCellIDL(),
                        formula = makeReactCellFormula(),
                        NULL)
@@ -366,9 +372,9 @@ makeMainResultsReactable <- function(tab, tabName, retMin, plots, colGroupOrder 
                                exact = getReactFilterMethodExact(),
                                annotations = getReactFilterMethodAnnotations())
         
+        isHTML <- cdrow$formatting %in% c("chromLarge", "chromSmall", "mobLarge", "mobSmall", "structure")
         return(reactable::colDef(name = cdrow$displayName, show = !cdrow$hidden, format = format, cell = cell,
-                                 html = cdrow$formatting %in% c("chromLarge", "mobLarge"), # HACK
-                                 minWidth = if (!is.na(cdrow$minWidth)) cdrow$minWidth else 100,
+                                 html = isHTML, minWidth = if (!is.na(cdrow$minWidth)) cdrow$minWidth else 100,
                                  align = if (nzchar(cdrow$align)) cdrow$align, style = style,
                                  filterInput = filterInput, filterMethod = filterMethod))
     }, simplify = FALSE)

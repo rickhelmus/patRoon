@@ -97,6 +97,12 @@ makeAnnReactable <- function(tab, id, detailsTabFunc = NULL, annPLTabFunc = NULL
                          language = reactable::reactableLang(noData = "No annotations available"), ...))
 }
 
+makeReactCellAnn <- function(ann, what)
+{
+    return(getReactCellImgJS(sprintf("'src=\"' + reportPlots.%s[ci.value].%s[ci.row.candidate-1] + '\"'", ann, what),
+                             maxHeight = 300))
+}
+
 genHTMLReportPlotsStructs <- function(fGroups, compounds, components, settings, outPath, parallel)
 {
     scrStructInfo <- if (isScreening(fGroups)) screenInfo(fGroups)[, .(SMILES, IK1 = getIKBlock1(InChIKey))] else NULL
@@ -351,8 +357,8 @@ reportHTMLUtils$methods(
                 tab[, (col) := round(get(col), if (col == "neutralMass") 5 else 2)]
         }
         
-        tab[, spectrum := plots$formulas[[group]]$spectra, by = "group"]
-        tab[, scorings := plots$formulas[[group]]$scores, by = "group"]
+        tab[, spectrum := group]
+        tab[, scorings := group]
         
         if (hasSuspects())
         {
@@ -415,8 +421,8 @@ reportHTMLUtils$methods(
             neutral_formula = reactable::colDef("formula",
                                                 cell = function(value) htmltools::span(dangerouslySetInnerHTML = list("__html" = subscriptFormulaHTML(value)))),
             neutralMass = reactable::colDef("neutral mass"),
-            spectrum = reactable::colDef(cell = makeReactImgCell(), minWidth = 200),
-            scorings = reactable::colDef(cell = makeReactImgCell(), minWidth = 200)
+            spectrum = reactable::colDef(cell = makeReactCellAnn("formulas", "spectra"), minWidth = 200, html = TRUE),
+            scorings = reactable::colDef(cell = makeReactCellAnn("formulas", "scores"), minWidth = 200, html = TRUE)
         ))
         
         colDefs <- setReactNumRangeFilters("formulasTab", tab, colDefs)
@@ -475,9 +481,9 @@ reportHTMLUtils$methods(
         if (!is.null(tab[["score"]]))
             tab[, score := round(score, 2)]
         
-        tab[, structure := plots$structs[UID]]
-        tab[, spectrum := plots$compounds[[group]]$spectra, by = "group"]
-        tab[, scorings := plots$compounds[[group]]$scores, by = "group"]
+        tab[, structure := UID]
+        tab[, spectrum := group]
+        tab[, scorings := group]
         
         if (hasSuspects())
         {
@@ -591,9 +597,9 @@ reportHTMLUtils$methods(
             neutral_formula = reactable::colDef("formula",
                                                 cell = function(value) htmltools::span(dangerouslySetInnerHTML = list("__html" = subscriptFormulaHTML(value)))),
             neutralMass = if (!is.null(tab[["neutralMass"]])) reactable::colDef("neutral mass") else NULL,
-            structure = reactable::colDef(cell = makeReactImgCell(), minWidth = 125),
-            spectrum = reactable::colDef(cell = makeReactImgCell(), minWidth = 200),
-            scorings = reactable::colDef(cell = makeReactImgCell(), minWidth = 200)
+            structure = reactable::colDef(cell = makeReactCellStructure(), minWidth = 125, html = TRUE),
+            spectrum = reactable::colDef(cell = makeReactCellAnn("compounds", "spectra"), minWidth = 200, html = TRUE),
+            scorings = reactable::colDef(cell = makeReactCellAnn("compounds", "scores"), minWidth = 200, html = TRUE)
         ))
         
         colDefs <- setReactNumRangeFilters("compoundsTab", tab, colDefs)

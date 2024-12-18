@@ -473,23 +473,27 @@ reportHTMLUtils$methods(
     
     makeFGToolbar = function(tableID)
     {
-        gb <- if (hasMobilities(objects$fGroups))
+        hasMob <- hasMobilities(objects$fGroups)
+        gb <- if (hasMob)
         {
             list(
                 list(value = "", name = "None"),
                 list(value = "ims_parent_group", name = "IMS parent group")
             )
         }
+        chromMobTitle <- if (hasMob && settings$features$chromatograms$large && settings$features$mobilograms$large)
+            "Large chromatograms/mobilograms"
+        else if (hasMob && settings$features$mobilograms$large)
+            "Large mobilograms"
+        else if (settings$features$chromatograms$large)
+            "Large chromatograms"
         makeToolbar(tableID, groupBy = gb, groupByDef = "ims_parent_group", columnToggles = list(
             list(value = "group", name = "Group info", checked = TRUE),
             list(value = "intensities", name = "Intensities", checked = TRUE),
             maybeInclUI(hasConcs(), list(value = "concentrations", name = "Concentrations",
                                        checked = TRUE)),
             maybeInclUI(hasFQualities(), list(value = "qualities", name = "Quality scores")),
-            maybeInclUI(settings$features$chromatograms$large,
-                      list(value = "chrom_large", name = "Large chromatograms")),
-            maybeInclUI(settings$features$mobilograms$large,
-                        list(value = "mob_large", name = "Large mobilograms"))
+            maybeInclUI(!is.null(chromMobTitle), list(value = "chrom_mob_large", name = chromMobTitle))
         ), toggleExpand = TRUE)
     },
     

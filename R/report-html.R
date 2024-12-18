@@ -179,7 +179,8 @@ reportHTMLUtils$methods(
     
     genMainUI = function()
     {
-        plotsVar <- htmltools::HTML(sprintf("const reportPlots = JSON.parse('%s');", jsonlite::toJSON(plots)))
+        plotsVar <- htmltools::HTML(sprintf("const reportPlots = JSON.parse(LZString.decompressFromBase64('%s'));",
+                                    lzstring::compressToBase64(jsonlite::toJSON(plots))))
         
         ui <- bslib::page_navbar(
             theme = bslib::bs_theme(version = 5, preset = "cerulean", "card-spacer-x" = "0.5em",
@@ -205,6 +206,8 @@ reportHTMLUtils$methods(
         return(htmltools::tagList(
             htmltools::includeScript(system.file("js", "utils-report.js", package = "patRoon")),
             htmltools::includeCSS(system.file("report", "report.css", package = "patRoon")),
+            htmltools::htmlDependency("lz-string", "1.5.0", src = system.file("report", package = "patRoon"),
+                                      script = "lz-string.min.js"),
             htmltools::tags$script(plotsVar),
             ui
         ))

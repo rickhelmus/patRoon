@@ -366,8 +366,8 @@
 - reporting
     - have only one option for large/small mobilograms
         - or make bools for chroms/mobs and separate var that specifies small and/or large
-    - convert reactable cell img functions to JS versions, so img paths are set dynamically which can save quite some space for selfContained reports
-        --> see WIP changes made for chromsLarge
+    - have feature specific mobilograms? if yes, add setting too
+    - comps-clust: don't have imgs double in reportPlots
 - CCS
     - convertMobilityToCCS() / convertCCSToMobility()
         - handle Waters data?

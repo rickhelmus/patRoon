@@ -364,6 +364,8 @@
     - TPs: should expandMobilities() also copy components for mobility parents?
         - if not, clearly doc the difference if components are generated after findMobilities()
 - reporting
+    - have only one option for large/small mobilograms
+        - or make bools for chroms/mobs and separate var that specifies small and/or large
     - convert reactable cell img functions to JS versions, so img paths are set dynamically which can save quite some space for selfContained reports
         --> see WIP changes made for chromsLarge
 - CCS

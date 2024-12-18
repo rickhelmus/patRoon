@@ -110,7 +110,8 @@ Imports:
     keys,
     backports,
     httr,
-    getPass
+    getPass,
+    lzstring
 Suggests: 
     RDCOMClient,
     metfRag,

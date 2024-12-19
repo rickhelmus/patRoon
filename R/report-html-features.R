@@ -119,8 +119,8 @@ genHTMLReportPlotsChromsFeatures <- function(fGroups, settings, outPath, EICs, E
                                     EICs = EICs, EICParams = modifyList(EICParams, list(topMost = NULL,
                                                                                         onlyPresent = settings$features$chromatograms$features != "all"),
                                                                         keep.null = TRUE), showFGroupRect = FALSE,
-                                    showPeakArea = TRUE, title = "", intMax = settings$features$chromatograms$intMax,
-                                    bty = "l"),
+                                    showPeakArea = TRUE, IMS = "both", title = "",
+                                    intMax = settings$features$chromatograms$intMax, bty = "l"),
                                parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)), width = 6, height = 4, bg = "transparent",
                                pointsize = 20, scaling = 1)
         })

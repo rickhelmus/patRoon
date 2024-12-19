@@ -384,8 +384,8 @@ reportHTMLUtils$methods(
             ft <- formulas[[tab$group[index]]][tab$candidate[index]]
             ft <- ft[, setdiff(names(ft), names(tab)), with = FALSE]
             takeCols <- getMergedConsCols(c("neutral_formula", "ion_formula", "neutralMass", "ion_formula_mz",
-                                               "error", "error_frag_median", "error_frag_median_abs",
-                                               "explainedPeaks", "explainedIntensity"), names(ft), mcn)
+                                            "error", "error_frag_median", "error_frag_median_abs",
+                                            "explainedPeaks", "explainedIntensity"), names(ft), mcn)
             ft <- ft[, takeCols, with = FALSE]
             for (col in getMergedConsCols(c("neutral_formula", "ion_formula"), names(ft), mcn))
                 set(ft, j = col, value = subscriptFormulaHTML(ft[[col]]))

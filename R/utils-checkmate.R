@@ -181,6 +181,9 @@ assertAndPrepareAnaInfoBy <- function(x, anaInfo, withFGroups, .var.name = check
 
 assertSuspectList <- function(x, needsAdduct, skipInvalid, .var.name = checkmate::vname(x), add = NULL)
 {
+    # NOTE: we don't check mobility/CCS columns here, since we don't know yet which adduct specific column to take,
+    # things would become complex. Instead, all checks will be done in expandSuspMobilities()
+    
     mzCols <- c("mz", "neutralMass", "SMILES", "InChI", "formula")
     
     # this seems necessary for proper naming in subsequent assertions (why??)
@@ -214,35 +217,6 @@ assertSuspectList <- function(x, needsAdduct, skipInvalid, .var.name = checkmate
         assertListVal(x, col, checkmate::assertNumeric, any.missing = TRUE, mustExist = FALSE,
                       lower = if (col != "rt") 0 else -Inf, finite = TRUE, .var.name = .var.name, add = add)
 
-    assertMobCCS <- function(col)
-    {
-        if (is.numeric(x[[col]]))
-            assertListVal(x, col, checkmate::assertNumeric, any.missing = TRUE, lower = 0, finite = TRUE,
-                          .var.name = .var.name, add = add)
-        else if (is.character(x[[col]]))
-        {
-            # don't add, let it fail before next check
-            assertListVal(x, col, checkmate::assertCharacter, any.missing = TRUE,  .var.name = .var.name)
-            mobExp <- expandSuspMobilities(x) # NOTE: this will also check if mobilities/CCS are consistently given
-            assertListVal(mobExp, col, checkmate::assertNumeric, any.missing = TRUE, lower = 0, finite = TRUE,
-                          .var.name = .var.name, add = add)
-        }
-        else
-            stop(sprintf("%s column must be numeric or character (now %s)", col, class(x[[col]])), call. = FALSE)
-    }
-
-    hasMob <- !is.null(x[["mobility"]])
-    hasCCS <- !is.null(x[["CCS"]])
-    
-    if (hasMob && hasCCS && class(x$mobility) != class(x$CCS))
-        stop(sprintf("The value class of the mobility column ('%s') differs from the CCS column ('%s')",
-                     class(x$mobility), class(x$CCS)), call. = FALSE)
-    
-    if (hasMob)
-        assertMobCCS("mobility")
-    if (hasCCS)
-        assertMobCCS("CCS")
-    
     if (!skipInvalid)
     {
         cx <- if (is.data.table(x)) copy(x) else as.data.table(x)

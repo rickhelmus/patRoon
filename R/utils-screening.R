@@ -96,18 +96,6 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid, checkDesc, prefCal
             suspects[, mz := NA_real_]
         }
 
-        # NOTE: mobility and CCS columns may be character vectors when >1 value is given (should be separated by ';')
-        # UNDONE: handle adduct specific columns
-        
-        hasMob <- !is.null(suspects[["mobility"]]); hasCCS <- !is.null(suspects[["CCS"]])
-        if (hasMob && is.character(suspects$mobility))
-            suspects[!nzchar(mobility), mobility := NA_character_]
-        if (hasCCS && is.character(suspects$CCS))
-            suspects[!nzchar(CCS), CCS := NA_character_]
-        if (hasMob && !hasCCS)
-            suspects[, CCS := NA_real_]
-        if (!hasMob && hasCCS)
-            suspects[, mobility := NA_real_]
         saveCacheData("screenSuspectsPrepList", suspects, hash)
     }        
     
@@ -157,7 +145,7 @@ expandSuspMobilities <- function(suspects)
         if (is.na(x))
             return(NA_real_)
         if (is.character(x))
-            return(as.numeric(unlist(strsplit(x, ";"))))
+            return(if (nzchar(x)) as.numeric(unlist(strsplit(x, ";"))) else NA_real_)
         return(x)
     }
     

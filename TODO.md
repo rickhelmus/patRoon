@@ -373,6 +373,8 @@
     - applyMS for filter()
     - expandMobilities()
     - convertMobilityToCCS() / convertCCSToMobility()
+    - suspects
+        - test order of data selection for mobility and CCS columns, missing data etc
     
 - Docs
     - hasMobilities slot for features
@@ -409,6 +411,9 @@
         - clearly refer to papers and implementations
     - getCCSParams()
         - doc where Mason-Schamp const comes from
+    - suspects
+        - doc order of data selection for mobility and CCS columns
+
 - NEWS
     - hasMobilities slot for features
     - Dietrich features

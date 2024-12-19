@@ -532,13 +532,13 @@ setMethod("findMobilities", "featureGroupsScreening", function(fGroups, mobPeaks
                                                                EICRTWindow = 20, peakRTWindow = 5,
                                                                calcArea = "integrate", fallbackEIC = TRUE,
                                                                CCSParams = NULL, parallel = TRUE, fromSuspects = FALSE,
-                                                               minMobilityMatches = 0)
+                                                               IMSMatchParams = NULL)
 {
     ac <- checkmate::makeAssertCollection()
     assertFindMobilitiesArgs(mobPeaksParam, IMSWindow, clusterMethod, minIntensityIMS, maxMSRTWindow,
                              chromPeaksParam, EICRTWindow, peakRTWindow, calcArea, fallbackEIC, CCSParams, parallel, ac)
     checkmate::assertFlag(fromSuspects, add = ac)
-    checkmate::assertCount(minMobilityMatches, add = ac)
+    assertIMSMatchParams(IMSMatchParams, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
     if (length(fGroups) == 0)
@@ -557,7 +557,7 @@ setMethod("findMobilities", "featureGroupsScreening", function(fGroups, mobPeaks
     
     gInfo <- groupInfo(fGroups)
     scr <- expandAndUpdateScreenInfoForIMS(screenInfo(fGroups), gInfo)
-    scr <- finalizeScreenInfoForIMS(scr, gInfo, minMobilityMatches, IMSWindow)
+    scr <- finalizeScreenInfoForIMS(scr, gInfo, IMSMatchParams)
     fGroups@screenInfo <- scr
     
     return(fGroups)
@@ -639,9 +639,9 @@ setMethod("findMobilities", "featureGroupsScreening", function(fGroups, mobPeaks
 #' @rdname suspect-screening
 #' @aliases screenSuspects
 #' @export
-setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindow, mzWindow, IMSWindow, adduct,
-                                                      skipInvalid, prefCalcChemProps, neutralChemProps,
-                                                      minMobilityMatches, onlyHits)
+setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindow, mzWindow, IMSMatchParams,
+                                                      adduct, skipInvalid, prefCalcChemProps, neutralChemProps,
+                                                      onlyHits)
 {
     checkmate::assertFlag(skipInvalid) # not in assert collection, should fail before assertSuspectList
 
@@ -650,10 +650,11 @@ setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindo
     
     ac <- checkmate::makeAssertCollection()
     assertSuspectList(suspects, needsAdduct = needsAdduct, skipInvalid, add = ac)
-    aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow + IMSWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow, lower = 0, finite = TRUE,
+           fixed = list(add = ac))
+    assertIMSMatchParams(IMSMatchParams, null.ok = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + neutralChemProps + onlyHits,
            fixed = list(add = ac))
-    checkmate::assertCount(minMobilityMatches, add = ac)
     checkmate::reportAssertions(ac)
 
     if (!is.null(adduct))
@@ -663,13 +664,13 @@ setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindo
     suspects <- prepareSuspectList(suspects, adduct, skipInvalid, checkDesc = TRUE,
                                    prefCalcChemProps = prefCalcChemProps, neutralChemProps = neutralChemProps)
     
-    hash <- makeHash(fGroups, suspects, rtWindow, mzWindow, IMSWindow, adduct, skipInvalid, prefCalcChemProps,
-                     neutralChemProps, minMobilityMatches, onlyHits)
+    hash <- makeHash(fGroups, suspects, rtWindow, mzWindow, IMSMatchParams, adduct, skipInvalid, prefCalcChemProps,
+                     neutralChemProps, onlyHits)
     cd <- loadCacheData("screenSuspects", hash)
     if (!is.null(cd))
         return(cd)
 
-    scr <- doScreenSuspects(fGroups, suspects, rtWindow, mzWindow, IMSWindow, adduct, minMobilityMatches, skipInvalid)
+    scr <- doScreenSuspects(fGroups, suspects, rtWindow, mzWindow, IMSMatchParams, adduct, skipInvalid)
 
     if (onlyHits)
         fGroups <- fGroups[, scr$group]

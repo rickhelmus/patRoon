@@ -16,6 +16,7 @@ features:
     mobilograms:
         large: true
         small: true
+        features: false
     intensityPlots: false
     aggregateConcs: mean
     aggregateTox: mean

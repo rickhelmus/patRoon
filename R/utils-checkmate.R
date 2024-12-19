@@ -771,6 +771,12 @@ assertAndPrepareReportSettings <- function(settings, setAggr = TRUE)
     checkmate::assertChoice(settings$features$chromatograms$intMax, c("eic", "feature"), add = ac)
     checkmate::assertFlag(settings$features$mobilograms$large, add = ac)
     checkmate::assertFlag(settings$features$mobilograms$small, add = ac)
+    checkmate::assert(
+        checkmate::checkFlag(settings$features$mobilograms$features),
+        checkmate::checkChoice(settings$features$mobilograms$features, "all"),
+        .var.name = "settings$features$mobilograms$features",
+        add = ac
+    )
     checkmate::assertFlag(settings$features$intensityPlots, add = ac)
     if (setAggr)
     {

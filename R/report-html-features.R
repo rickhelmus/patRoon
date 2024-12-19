@@ -170,6 +170,32 @@ genHTMLReportPlotsMobilogramsSmall <- function(fGroups, settings, outPath, EIMs,
     }, simplify = FALSE)
 }
 
+genHTMLReportPlotsMobilogramsFeatures <- function(fGroups, settings, outPath, EIMs, EIMParams, parallel)
+{
+    if (isFALSE(settings$features$mobilograms$features))
+        return(list())
+    
+    anas <- analyses(fGroups)
+    cat("Generate individual feature mobilograms...\n")
+    doApply("sapply", parallel, names(fGroups), function(grp)
+    {
+        doProgress()
+        Map(anas, seq_along(anas), f = function(ana, anai)
+        {
+            if (settings$features$mobilograms$features != "all" && fGroups[[grp]][anai] == 0)
+                return("")
+            makeHTMLReportPlot("mobilogram_feat", outPath, "plotMobilogram",
+                               list(fGroups, analysis = ana, groupName = grp, EIMs = EIMs,
+                                    EIMParams = modifyList(EIMParams, list(topMost = NULL,
+                                                                           onlyPresent = settings$features$mobilograms$features != "all"),
+                                                           keep.null = TRUE), showFGroupRect = FALSE,
+                                    showPeakArea = TRUE, title = "", bty = "l"),
+                               parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)), width = 6, height = 4, bg = "transparent",
+                               pointsize = 20, scaling = 1)
+        })
+    }, simplify = FALSE)
+}
+
 genHTMLReportPlotsIntPlots <- function(fGroups, settings, outPath, parallel)
 {
     if (!settings$features$intensityPlots)
@@ -190,9 +216,9 @@ genHTMLReportPlotsIntPlots <- function(fGroups, settings, outPath, parallel)
     }, simplify = FALSE)
 }
 
-makeReactCellFeatChrom <- function()
+makeReactCellFeatChromMob <- function(type)
 {
-    return(getReactCellImgJS("'src=\"' + reportPlots.chromsFeatures[ci.row.group][ci.row.analysis] + '\"'"))
+    return(getReactCellImgJS(sprintf("'src=\"' + reportPlots.%sFeatures[ci.row.group][ci.row.analysis] + '\"'", type)))
 }
 
 
@@ -364,8 +390,17 @@ reportHTMLUtils$methods(
             # add EICs
             tab[, chromatogram := ""] # dummy value, not needed
             
-            colDefs$chromatogram <- reactable::colDef(minWidth = 175, cell = makeReactCellFeatChrom(), html = TRUE)
+            colDefs$chromatogram <- reactable::colDef(minWidth = 175, cell = makeReactCellFeatChromMob("chroms"),
+                                                      html = TRUE)
         }
+        if (!isFALSE(settings$features$mobilograms$features) && hasMobilities(objects$fGroups))
+        {
+            # add EIMs
+            tab[, mobilogram := ""] # dummy value, not needed
+            colDefs$mobilogram <- reactable::colDef(minWidth = 175, cell = makeReactCellFeatChromMob("mobilograms"),
+                                                    html = TRUE)
+        }
+        
         if (!is.null(tab[["set"]]))
             colDefs$set <- reactable::colDef(filterInput = makeReactFilterInputSelect("featuresTab"))
         
@@ -381,13 +416,13 @@ reportHTMLUtils$methods(
         colDefs$analysis <- setReactSelRangeFilter("featuresTab", reactable::colDef())
         colDefs$rGroup <- setReactSelRangeFilter("featuresTab", colDefs$rGroup)
         
-        setcolorder(tab, intersect(c("analysis", "rGroup", "ID", "chromatogram"), names(tab)))
+        setcolorder(tab, intersect(c("analysis", "rGroup", "ID", "chromatogram", "mobilogram"), names(tab)))
         
-        CSVCols <- setdiff(names(tab), "chromatogram")
+        CSVCols <- setdiff(names(tab), c("chromatogram", "mobilogram"))
         
         makeReactable(tab, "featuresTab", compact = TRUE, defaultExpanded = TRUE, columns = colDefs, filterable = FALSE,
                       meta = list(colToggles = list(qualities = fqn), CSVCols = CSVCols, internFilterable = "group",
-                                  neverFilterable = "chromatogram"), pagination = TRUE)
+                                  neverFilterable = c("chromatogram", "mobilogram")), pagination = TRUE)
     },
     
     genConcsTable = function()

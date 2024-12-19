@@ -57,6 +57,7 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
     
     ret$mobilogramsLarge <- genHTMLReportPlotsMobilogramsLarge(fGroups, settings, outPath, EIMs, EIMParams, parallel)
     ret$mobilogramsSmall <- genHTMLReportPlotsMobilogramsSmall(fGroups, settings, outPath, EIMs, EIMParams, parallel)
+    ret$mobilogramsFeatures <- genHTMLReportPlotsMobilogramsFeatures(fGroups, settings, outPath, EIMs, EIMParams, parallel)
     
     ret$intPlots <- genHTMLReportPlotsIntPlots(fGroups, settings, outPath, parallel)
     
@@ -249,7 +250,7 @@ doReportHTML <- function(fGroups, MSPeakLists, formulas, compounds, compsCluster
     if (hasMobilities(fGroups))
     {
         cat("Loading all EIMs... ")
-        EIMParams$onlyPresent <- TRUE
+        EIMParams$onlyPresent <- settings$features$mobilograms$features != "all"
         if (!settings$features$mobilograms$large && settings$features$mobilograms$small)
         {
             # plot only small mobilogram (and summary overview), get minimum set of EIMs

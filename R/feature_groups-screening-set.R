@@ -366,12 +366,12 @@ setMethod("findMobilities", "featureGroupsScreeningSet", function(fGroups, mobPe
                                                                   maxMSRTWindow = 2, chromPeaksParam = NULL,
                                                                   EICRTWindow = 20, peakRTWindow = 5,
                                                                   calcArea = "integrate", fallbackEIC = TRUE,
-                                                                  parallel = TRUE, fromSuspects = FALSE,
-                                                                  minMobilityMatches = 0)
+                                                                  CCSParams = NULL, parallel = TRUE,
+                                                                  fromSuspects = FALSE, minMobilityMatches = 0)
 {
     ac <- checkmate::makeAssertCollection()
     assertFindMobilitiesArgs(mobPeaksParam, IMSWindow, clusterMethod, minIntensityIMS, maxMSRTWindow,
-                             chromPeaksParam, EICRTWindow, peakRTWindow, calcArea, fallbackEIC, parallel, ac)
+                             chromPeaksParam, EICRTWindow, peakRTWindow, calcArea, fallbackEIC, CCSParams, parallel, ac)
     checkmate::assertFlag(fromSuspects, add = ac)
     checkmate::assertCount(minMobilityMatches, add = ac)
     checkmate::reportAssertions(ac)
@@ -395,6 +395,8 @@ setMethod("findMobilities", "featureGroupsScreeningSet", function(fGroups, mobPe
     fGroups@features <- reintegrateMobilityFeatures(fGroups@features, EICRTWindow, peakRTWindow, calcArea,
                                                     chromPeaksParam, fallbackEIC, parallel)
     fGroups <- clusterFGroupMobilities(fGroups, IMSWindow, TRUE)
+    if (!is.null(CCSParams))
+        fGroups <- assignFGroupsCCS(fGroups, CCSParams)
     
     gInfo <- groupInfo(fGroups)
     scr <- expandAndUpdateScreenInfoForIMS(screenInfo(fGroups), gInfo)

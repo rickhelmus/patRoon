@@ -9,8 +9,9 @@ NULL
 isScreening <- function(fGroups) inherits(fGroups, c("featureGroupsScreening", "featureGroupsScreeningSet"))
 isSuspAnnotated <- function(fGroups) isScreening(fGroups) && !is.null(screenInfo(fGroups)[["estIDLevel"]])
 
-suspMetaDataCols <- function() c("name", "rt", "name_orig", "mz", "mobility", "SMILES", "InChI", "InChIKey", "formula",
-                                 "neutralMass", "molNeutralized", "adduct", "fragments_mz", "fragments_formula")
+suspMetaDataCols <- function() c("name", "rt", "name_orig", "mz", "mobility", "CCS", "SMILES", "InChI", "InChIKey",
+                                 "formula", "neutralMass", "molNeutralized", "adduct", "fragments_mz",
+                                 "fragments_formula")
 suspAnnCols <- function() c("formRank", "compRank", "annSimForm", "annSimComp", "annSimBoth", "maxFrags",
                             "maxFragMatches", "maxFragMatchesRel", "estIDLevel")
 
@@ -248,7 +249,7 @@ finalizeScreenInfoForIMS <- function(scr, gInfo, minMobilityMatches, IMSWindow)
     return(removeDTColumnsIfPresent(scr, c("mob_group", "ims_parent_group")))
 }
 
-doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, IMSWindow, minMobilityMatches, skipInvalid)
+doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, IMSWindow, adduct, minMobilityMatches, skipInvalid)
 {
     gInfo <- groupInfo(fGroups)
     annTbl <- annotations(fGroups)
@@ -279,6 +280,8 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, IMSWindow, m
     
     if (length(fGroups) > 0)
     {
+        adductTxt <- if (!is.null(adduct)) as.character(adduct)
+            
         prog <- openProgBar(0, nrow(suspects))
         
         retlist <- lapply(seq_len(nrow(suspects)), function(ti)
@@ -314,9 +317,44 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, IMSWindow, m
                 {
                     ret <- data.table()
                     setMetaData(ret, suspects[ti])
+                    
+                    # copy the right mobility and CCS columns from the suspect list
+                    # preference order: existing col > col from (adduct arg > adduct column > feat annotations)
+                    
+                    getMobCCS <- function(type)
+                    {
+                        isUsable <- function(v) !is.na(v) && (!is.character(v) || nzchar(v))
+                        
+                        if (!is.null(suspects[[type]]) && isUsable(suspects[[type]][ti]))
+                            return(suspects[[type]][ti])
+                        
+                        tryAddCol <- function(add)
+                        {
+                            addCol <- paste0(type, "_", add)
+                            if (!is.null(suspects[[addCol]]) && isUsable(suspects[[addCol]][ti]))
+                                return(suspects[[addCol]][ti])
+                            return(NA_real_)
+                        }
+                        
+                        v <- NA_real_
+                        
+                        if (!is.null(adductTxt))
+                            v <- tryAddCol(adductTxt)
+                        if (is.na(v) && !is.null(suspects[["adduct"]]) && !is.na(suspects$adduct[ti]) &&
+                            nzchar(suspects$adduct[ti]))
+                            v <- tryAddCol(suspects$adduct[ti])
+                        if (is.na(v) && nrow(annotations(fGroups)) > 0)
+                            v <- tryAddCol(annotations(fGroups)[group == g]$adduct)
+                        
+                        return(v)
+                    }
+                    
+                    ret[, c("mobility", "CCS") := .(getMobCCS("mobility"), getMobCCS("CCS"))]
+                    
                     ret[, c("group", "d_rt", "d_mz") := .(g, d_rt = if (hasRT) gret - rt else NA_real_,
                                                           ifelse(is.na(mz), annTbl[group == g]$neutralMass - neutralMass,
                                                                  gmz - mz))]
+                    
                     return(ret)
                 }), fill = TRUE)
             }

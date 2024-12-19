@@ -91,10 +91,7 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid, checkDesc, prefCal
             }
         }
         else if (is.null(suspects[["mz"]]))
-        {
-            # NOTE: if mz column is already available it either contains user values or already NAs
             suspects[, mz := NA_real_]
-        }
 
         saveCacheData("screenSuspectsPrepList", suspects, hash)
     }        
@@ -109,11 +106,11 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid, checkDesc, prefCal
             if (skipInvalid)
             {
                 warning(paste("Ignored following suspects for which no mass could be calculated:",
-                              wrong))
+                              wrong), call. = FALSE)
                 suspects <- suspects[!isNA]
             }
             else
-                stop(paste("Could not calculate ion masses for the following suspects: "), wrong)
+                stop(paste("Could not calculate ion masses for the following suspects: ", wrong), call. = FALSE)
         }
     }
     

@@ -669,7 +669,7 @@ setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindo
     if (!is.null(cd))
         return(cd)
 
-    scr <- doScreenSuspects(fGroups, suspects, rtWindow, mzWindow, IMSWindow, minMobilityMatches, skipInvalid)
+    scr <- doScreenSuspects(fGroups, suspects, rtWindow, mzWindow, IMSWindow, adduct, minMobilityMatches, skipInvalid)
 
     if (onlyHits)
         fGroups <- fGroups[, scr$group]

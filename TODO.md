@@ -369,9 +369,6 @@
     - TPs: should expandMobilities() also copy components for mobility parents?
         - if not, clearly doc the difference if components are generated after findMobilities()
 - reporting
-    - have only one option for large/small mobilograms
-        - or make bools for chroms/mobs and separate var that specifies small and/or large
-    - have feature specific mobilograms? if yes, add setting too
     - comps-clust: don't have imgs double in reportPlots
 - CCS
     - convertMobilityToCCS() / convertCCSToMobility()

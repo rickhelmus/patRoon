@@ -259,6 +259,7 @@ getAnnotationsFromSetFeatures <- function(fGroups)
     }
     else
         ret <- data.table()
+    return(ret)
 }
 
 finishFGroupsForSets <- function(fGroups, ..., verbose)
@@ -1105,16 +1106,17 @@ clusterFGroupMobilities <- function(fGroups, IMSWindow, sets)
     # prepare group info
     gMobInfo <- fTableAll[, .(mobility = mean(mobility)), by = c("group", "IMSClust")]
     setnames(gMobInfo, "group", "ims_parent_group")
-    gMobInfo[, group := fifelse(!is.na(mobility), appendMobToName(ims_parent_group, mobility), ims_parent_group)]
+    gMobInfo[is.na(mobility), group := ims_parent_group]
+    gMobInfo[!is.na(mobility), group := appendMobToName(ims_parent_group, mobility)]
     
     # update features
     setnames(fTableAll, "group", "ims_parent_group") # UNDONE: better colname
     fTableAll[gMobInfo, group := i.group, on = c("ims_parent_group", "IMSClust")]
-    fTableAll <- removeDTColumnsIfPresent(fTableAll, c("IMSClust", "set", "ims_parent_group"))
-    fTable <- split(fTableAll, by = "analysis", keep.by = FALSE)
+    fTableAllClean <- removeDTColumnsIfPresent(fTableAll, c("IMSClust", "set", "ims_parent_group"))
+    fTable <- split(fTableAllClean, by = "analysis", keep.by = FALSE)
     # NOTE: the above will not restore any empty feature tables
     missingAna <- setdiff(analyses(fGroups), names(fTable))
-    fTable[missingAna] <- rep(list(fTableAll[0]), length(missingAna)) # get empty table with all cols
+    fTable[missingAna] <- rep(list(fTableAllClean[0]), length(missingAna)) # get empty table with all cols
     fTable <- fTable[analyses(fGroups)] # restore order
     featureTable(fGroups) <- fTable
     
@@ -1155,6 +1157,14 @@ clusterFGroupMobilities <- function(fGroups, IMSWindow, sets)
                 og <- gInfo[!is.na(mobility) & ims_parent_group == r$group]$group
                 rbind(r, data.table(group = og, r[, -"group"]))
             }))
+            
+            # HACK: for sets workflows, ensure that we only have keep the relevant mobility fGroup annotation
+            if (sets && sl == "annotations")
+            {
+                fGroupsPerSet <- fTableAll[, .(group = unique(group)), by = "set"]
+                keep <- mapply(d$group, d$set, FUN = function(g, s) g %chin% fGroupsPerSet[set == s]$group)
+                d <- d[keep == TRUE]
+            }
             
             slot(fGroups, sl) <- d
         }

@@ -1192,10 +1192,15 @@ assignFGroupsCCS <- function(fGroups, CCSParams)
         stop("Cannot calculate CCS values: feature groups are without mobility assignments", call. = FALSE)
     
     charges <- if (nrow(annotations(fGroups)) > 0)
-        sapply(annotations(fGroups)$adduct, function(a) as.adduct(a)@charge)
+    {
+        # NOTE: there is at most 1 mobility fGroup per set, so we don't have to worry about multiple annotations in sets workflows
+        ann <- annotations(fGroups)[group %chin% groupInfo(fGroups)[!is.na(mobility)]$group]
+        unAdd <- unique(ann$adduct)
+        addCharges <- sapply(unAdd, function(a) as.adduct(a)@charge)
+        setNames(addCharges[ann$adduct], ann$group)
+    }
     else
-        rep(CCSParams$defaultCharge, length(fGroups))
-    names(charges) <- names(fGroups)
+        setNames(rep(CCSParams$defaultCharge, length(fGroups)), names(fGroups))
     
     fGroups@features@features <- lapply(featureTable(fGroups), function(ft)
     {

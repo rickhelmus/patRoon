@@ -331,13 +331,13 @@ setMethod("findMobilities", "featureGroupsSet", function(fGroups, mobPeaksParam,
                                                          clusterMethod = "distance", minIntensityIMS = 0,
                                                          maxMSRTWindow = 2, chromPeaksParam = NULL, EICRTWindow = 20,
                                                          peakRTWindow = 5, calcArea = "integrate", fallbackEIC = TRUE,
-                                                         parallel = TRUE)
+                                                         CCSParams = NULL, parallel = TRUE)
 {
     # NOTE: keep args in sync with other methods
     
     ac <- checkmate::makeAssertCollection()
     assertFindMobilitiesArgs(mobPeaksParam, IMSWindow, clusterMethod, minIntensityIMS, maxMSRTWindow,
-                             chromPeaksParam, EICRTWindow, peakRTWindow, calcArea, fallbackEIC, parallel, ac)
+                             chromPeaksParam, EICRTWindow, peakRTWindow, calcArea, fallbackEIC, CCSParams, parallel, ac)
     checkmate::reportAssertions(ac)
     
     if (length(fGroups) == 0)
@@ -348,6 +348,9 @@ setMethod("findMobilities", "featureGroupsSet", function(fGroups, mobPeaksParam,
     fGroups@features <- reintegrateMobilityFeatures(fGroups@features, EICRTWindow, peakRTWindow, calcArea,
                                                     chromPeaksParam, fallbackEIC, parallel)
     fGroups <- clusterFGroupMobilities(fGroups, IMSWindow, TRUE)
+    
+    if (!is.null(CCSParams))
+        fGroups <- assignFGroupsCCS(fGroups, CCSParams)
     
     return(fGroups)
 })

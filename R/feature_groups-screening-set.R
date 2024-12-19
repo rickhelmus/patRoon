@@ -11,7 +11,8 @@ NULL
 mergeScreeningSetInfos <- function(setObjects, sInfos = lapply(setObjects, screenInfo), rmSetCols = TRUE)
 {
     rmCols <- c("mz", "fragments_mz")
-    unCols <- c("rt", "formula", "SMILES", "InChI", "InChIKey", "neutralMass", "d_rt", "d_mz", "LC50_SMILES")
+    unCols <- c("rt", "mobility", "CCS", "formula", "SMILES", "InChI", "InChIKey", "neutralMass", "d_rt", "d_mz",
+                "d_mob", "d_mob_rel", "d_CCS", "d_CCS_rel", "LC50_SMILES")
     
     renameDupCols <- function(si, suf, all)
     {
@@ -367,13 +368,13 @@ setMethod("findMobilities", "featureGroupsScreeningSet", function(fGroups, mobPe
                                                                   EICRTWindow = 20, peakRTWindow = 5,
                                                                   calcArea = "integrate", fallbackEIC = TRUE,
                                                                   CCSParams = NULL, parallel = TRUE,
-                                                                  fromSuspects = FALSE, minMobilityMatches = 0)
+                                                                  fromSuspects = FALSE, IMSMatchParams = NULL)
 {
     ac <- checkmate::makeAssertCollection()
     assertFindMobilitiesArgs(mobPeaksParam, IMSWindow, clusterMethod, minIntensityIMS, maxMSRTWindow,
                              chromPeaksParam, EICRTWindow, peakRTWindow, calcArea, fallbackEIC, CCSParams, parallel, ac)
     checkmate::assertFlag(fromSuspects, add = ac)
-    checkmate::assertCount(minMobilityMatches, add = ac)
+    assertIMSMatchParams(IMSMatchParams, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
     if (length(fGroups) == 0)
@@ -421,7 +422,7 @@ setMethod("findMobilities", "featureGroupsScreeningSet", function(fGroups, mobPe
         set(scr, i = i, j = NACols, NA)
     }
 
-    scr <- finalizeScreenInfoForIMS(scr, gInfo, minMobilityMatches, IMSWindow)
+    scr <- finalizeScreenInfoForIMS(scr, gInfo, IMSMatchParams)
     fGroups@screenInfo <- scr
     
     return(fGroups)
@@ -429,9 +430,9 @@ setMethod("findMobilities", "featureGroupsScreeningSet", function(fGroups, mobPe
 
 #' @rdname suspect-screening
 #' @export
-setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWindow, mzWindow, IMSWindow,
+setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWindow, mzWindow, IMSMatchParams,
                                                          adduct, skipInvalid, prefCalcChemProps, neutralChemProps,
-                                                         minMobilityMatches, onlyHits)
+                                                         onlyHits)
 {
     verifyNoAdductIonizationArg(adduct)
     
@@ -440,10 +441,10 @@ setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWi
     unsetFGroupsList <- sapply(sets(fGroups), unset, obj = fGroups, simplify = FALSE)
     setObjects <- Map(unsetFGroupsList, suspects,
                       f = function(fg, s) screenSuspects(fg, s, rtWindow = rtWindow, mzWindow = mzWindow,
-                                                         IMSWindow = IMSWindow, adduct = NULL, skipInvalid = skipInvalid,
+                                                         IMSMatchParams = IMSMatchParams, adduct = NULL,
+                                                         skipInvalid = skipInvalid,
                                                          prefCalcChemProps = prefCalcChemProps,
-                                                         neutralChemProps = neutralChemProps,
-                                                         minMobilityMatches = minMobilityMatches, onlyHits = onlyHits))
+                                                         neutralChemProps = neutralChemProps, onlyHits = onlyHits))
     
     scr <- mergeScreeningSetInfos(setObjects)
     if (onlyHits)

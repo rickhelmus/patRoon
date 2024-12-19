@@ -205,13 +205,10 @@ expandAndUpdateScreenInfoForIMS <- function(scr, gInfo)
     return(scr[])
 }
 
-finalizeScreenInfoForIMS <- function(scr, gInfo, minMobilityMatches, IMSWindow)
+finalizeScreenInfoForIMS <- function(scr, gInfo, IMSMatchParams)
 {
     # shared code for findMobilities() and screenSuspects()
 
-    if (is.null(scr[["mobility"]]))
-        return(scr)
-    
     scrOrigExp <- expandSuspMobilities(scr)
     
     # pick mobility that is closest to that of a feature group
@@ -232,24 +229,33 @@ finalizeScreenInfoForIMS <- function(scr, gInfo, minMobilityMatches, IMSWindow)
     }, by = seq_len(nrow(scr[!is.na(mob_group)]))]
 
     scr[, d_mob := mob_group - mobility]
+    scr[, d_mob_rel := d_mob / mobility]
     if (is.null(gInfo[["CCS"]]))
         scr[, d_CCS := NA_real_]
     else
         scr[, d_CCS := gInfo$CCS[match(group, gInfo$group)] - CCS]
-    
-    scr <- scr[is.na(mobility) | is.na(d_mob) | abs(d_mob) <= IMSWindow]
-    
-    if (minMobilityMatches)
+    scr[, d_CCS_rel := d_CCS / CCS]
+
+    if (!is.null(IMSMatchParams))
     {
-        scr[, keep := (.N - 1) >= min(minMobilityMatches, scrOrigExp[ims_parent_group == group, .N]),
-            by = c("ims_parent_group", "name")]
-        scr <- scr[keep == TRUE, -"keep"]
+        checkCol <- if (IMSMatchParams$param == "mobility") "d_mob" else "d_CCS"
+        if (IMSMatchParams$relative)
+            checkCol <- paste0(checkCol, "_rel")
+        
+        scr <- scr[is.na(get(checkCol)) | abs(get(checkCol)) <= IMSMatchParams$window]
+        
+        if (IMSMatchParams$minMatches > 0)
+        {
+            scr[, keep := (.N - 1) >= min(IMSMatchParams$minMatches, scrOrigExp[ims_parent_group == group, .N]),
+                by = c("ims_parent_group", "name")]
+            scr <- scr[keep == TRUE, -"keep"]
+        }
     }
     
     return(removeDTColumnsIfPresent(scr, c("mob_group", "ims_parent_group")))
 }
 
-doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, IMSWindow, adduct, minMobilityMatches, skipInvalid)
+doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, IMSMatchParams, adduct, skipInvalid)
 {
     gInfo <- groupInfo(fGroups)
     annTbl <- annotations(fGroups)
@@ -366,7 +372,7 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, IMSWindow, a
         setcolorder(ret, "name")
         
         if (hasMobilities(fGroups))
-            ret <- finalizeScreenInfoForIMS(ret, gInfo, minMobilityMatches, IMSWindow)
+            ret <- finalizeScreenInfoForIMS(ret, gInfo, IMSMatchParams)
         
         setTxtProgressBar(prog, nrow(suspects))
         close(prog)
@@ -382,14 +388,13 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, IMSWindow, a
 }
 
 # method definition for screening methods of screenSuspects()
-doScreenSuspectsAmend <- function(fGroups, suspects, rtWindow, mzWindow, IMSWindow,
-                                  adduct, skipInvalid, prefCalcChemProps, neutralChemProps,
-                                  minMobilityMatches, onlyHits, amend = FALSE)
+doScreenSuspectsAmend <- function(fGroups, suspects, rtWindow, mzWindow, IMSMatchParams, adduct, skipInvalid,
+                                  prefCalcChemProps, neutralChemProps, onlyHits, amend = FALSE)
 {
     aapply(checkmate::assertFlag, . ~ onlyHits + amend)
     
-    fGroupsScreened <- callNextMethod(fGroups, suspects, rtWindow, mzWindow, IMSWindow, adduct, skipInvalid,
-                                      prefCalcChemProps, neutralChemProps, minMobilityMatches, onlyHits)
+    fGroupsScreened <- callNextMethod(fGroups, suspects, rtWindow, mzWindow, IMSMatchParams, adduct, skipInvalid,
+                                      prefCalcChemProps, neutralChemProps, onlyHits)
     if (!amend)
         return(fGroupsScreened)
     

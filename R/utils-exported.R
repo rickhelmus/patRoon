@@ -665,6 +665,31 @@ getCCSParams <- function(method, ..., calibrant = NULL)
     return(modifyList(ret, list(...)))
 }
 
+#' @export
+getIMSMatchParams <- function(param, ...)
+{
+    ret <- list(
+        param = param,
+        relative = TRUE,
+        minMatches = 0
+    )
+    
+    ret <- modifyList(ret, list(...))
+    
+    if (is.null(ret[["window"]]))
+    {
+        # UNDONE: tweak
+        ret$window <- if (ret$relative)
+            0.05
+        else if (ret$param == "mobility")
+            0.03
+        else # CCS
+            10
+    }
+    
+    return(ret)
+}
+
 #' @rdname pred-quant
 #' @export
 getQuantCalibFromScreening <- function(fGroups, concs, areas = FALSE, average = FALSE, IMS = "maybe")

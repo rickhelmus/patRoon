@@ -1013,6 +1013,17 @@ assertMobilityConversionArgs <- function(mobility, mz, CCSParams, charge, add = 
         stop("The length of mobility, charge and mz should be equal", call. = FALSE)
 }
 
+assertIMSMatchParams <- function(x, null.ok = FALSE, .var.name = checkmate::vname(x), add = NULL)
+{
+    if (null.ok && is.null(x))
+        return(invisible(NULL))
+    
+    assertListVal(x, "param", checkmate::assertChoice, choices = c("mobility", "CCS"), .var.name = .var.name, add = add)
+    assertListVal(x, "relative", checkmate::assertFlag, .var.name = .var.name, add = add)
+    assertListVal(x, "window", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
+    assertListVal(x, "minMatches", checkmate::assertCount, positive = FALSE, .var.name = .var.name, add = add)
+}
+
 # from https://github.com/mllg/checkmate/issues/115
 aapply = function(fun, formula, ..., fixed = list())
 {

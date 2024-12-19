@@ -335,9 +335,12 @@
     - test for fGroups from screenInfo(), eg for fGroups with >1 suspect assigned
     - clearly doc what IMSWindow is used for
     - add PASEF as mobility assignment type?
-    - parent-less IMS features
+    - parent-less/orphaned IMS features
         - test: reporting, minMobilityMatches and other post-suspect screening, ...
         - handle normalization: perform like non-IMS workflow with a warning?
+        - suspects: minMobilityMatches is now not handled properly
+            - don't do N-1 for orphaned
+            - removes all parent-less or IMS parent fGroups? fine? if so, doc
     - doc the use for fromSuspects, eg
         - doesn't rely on mobility peak detection, so might be less prone to false negatives with eg low intensities
         - scenario 1: we know the mobility very well, eg from a database --> use a narrow IMSWindow
@@ -358,6 +361,8 @@
             - Does the mobmin/mobmax range make sense how it is computed now?
         - remove mobility assignment?
             - if not, support >1 mobilities in suspect list and do mobility assignment directly from suspect list like findMobilities()
+- getIMSMatchParams()
+    - tweak defaults
 - components
     - better name for expandMobilities()?
         - add docs (incl generic)

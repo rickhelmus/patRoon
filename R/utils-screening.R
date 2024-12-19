@@ -46,7 +46,7 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid, checkDesc, prefCal
         }
         
         # convert to numerics, may be logical if all are NA...
-        for (col in c("mz", "rt", "mobility", "CCS"))
+        for (col in c("mz", "rt"))
         {
             if (!is.null(suspects[[col]]))
                 suspects[, (col) := as.numeric(get(col))]
@@ -96,15 +96,18 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid, checkDesc, prefCal
             suspects[, mz := NA_real_]
         }
 
-        # NOTE: mobility and CCS columns may be character vectors when >1 value is given (should be separated by ;)
+        # NOTE: mobility and CCS columns may be character vectors when >1 value is given (should be separated by ';')
+        # UNDONE: handle adduct specific columns
         
-        if (!is.null(suspects[["mobility"]]) && is.character(suspects$mobility))
+        hasMob <- !is.null(suspects[["mobility"]]); hasCCS <- !is.null(suspects[["CCS"]])
+        if (hasMob && is.character(suspects$mobility))
             suspects[!nzchar(mobility), mobility := NA_character_]
-        if (!is.null(suspects[["CCS"]]) && is.character(suspects$CCS))
+        if (hasCCS && is.character(suspects$CCS))
             suspects[!nzchar(CCS), CCS := NA_character_]
-        if (!is.null(suspects[["mobility"]]) && is.null(suspects[["CCS"]]))
+        if (hasMob && !hasCCS)
             suspects[, CCS := NA_real_]
-            
+        if (!hasMob && hasCCS)
+            suspects[, mobility := NA_real_]
         saveCacheData("screenSuspectsPrepList", suspects, hash)
     }        
     
@@ -131,35 +134,42 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid, checkDesc, prefCal
 
 expandSuspMobilities <- function(suspects)
 {
-    # NOTE: assertSuspectList() already checked that column classes are equal
+    # UNDONE: support adduct specific columns
     
-    if (is.null(suspects[["mobility"]]) || !is.character(suspects$mobility))
+    hasMob <- !is.null(suspects[["mobility"]]); hasCCS <- !is.null(suspects[["CCS"]])
+    if (!hasMob && !hasCCS)
         return(copy(suspects))
-    if (all(is.na(suspects$mobility)))
+
+    verifyCol <- function(col)
     {
-        suspects <- copy(suspects)
-        suspects[, mobility := as.numeric(mobility)]
-        if (!is.null(suspects[["CCS"]]))
-            suspects[, CCS := as.numeric(CCS)]
-        return(suspects[])
+        # NOTE: also allow all NA columns, which are mostly logical by default
+        if (!is.numeric(suspects[[col]]) && !is.character(suspects[[col]]) && !all(is.na(suspects[[col]])))
+            stop(sprintf("%s column must be numeric or character (now %s)", col, class(suspects[[col]])), call. = FALSE)
     }
     
-    doSplit <- function(x) { if (is.na(x)) NA_real_ else as.numeric(unlist(strsplit(x, ";"))) }
+    if (hasMob)
+        verifyCol("mobility")
+    if (hasCCS)
+        verifyCol("CCS")
+    
+    doSplit <- function(x)
+    {
+        if (is.na(x))
+            return(NA_real_)
+        if (is.character(x))
+            return(as.numeric(unlist(strsplit(x, ";"))))
+        return(x)
+    }
     
     suspNoMobs <- removeDTColumnsIfPresent(suspects, c("mobility", "CCS")) # for expanding below
     
     return(rbindlist(lapply(seq_len(nrow(suspects)), function(i)
     {
-        mobs <- doSplit(suspects$mobility[i])
-        if (!is.null(suspects[["CCS"]]))
-        {
-            CCSs <- doSplit(suspects$CCS[i])
-            if (!is.na(suspects$CCS[i]) && length(mobs) != length(CCSs))
-                stop(sprintf("The length of mobility and CCS values for suspect '%s' (row %d) differs: %d/%d",
-                             suspects$name[i], i, length(mobs), length(CCSs)), call. = FALSE)
-        }
-        else
-            CCSs <- NA_real_
+        mobs <- if (hasMob) doSplit(suspects$mobility[i]) else NA_real_
+        CCSs <- if (hasCCS) doSplit(suspects$CCS[i]) else NA_real_
+        if (length(mobs) != length(CCSs) && !checkmate::testScalarNA(mobs) && !checkmate::testScalarNA(CCSs))
+            stop(sprintf("The length of mobility and CCS values for suspect '%s' (row %d) differs: %d/%d",
+                         suspects$name[i], i, length(mobs), length(CCSs)), call. = FALSE)
         data.table(suspNoMobs[i], mobility = mobs, CCS = CCSs)
     })))
 }

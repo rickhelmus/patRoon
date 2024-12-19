@@ -40,7 +40,7 @@ jobs:
                     docker run --name patroon -t "${IMAGE_NAME}:${git_sha}-${CIRCLE_BRANCH}" /bin/bash -c "cd patRoon; Rscript docker/run_tests.R"
             - run:
                 name: Copy test results
-                when: true
+                when: always
                 command: |
                     CONTAINER_ID=`docker ps -aqf "name=patroon"`
                     mkdir /tmp/tests

@@ -526,13 +526,13 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = NULL
 })
 
 #' @export
-setMethod("findMobilities", "featureGroupsScreening", function(fGroups, mobPeaksParam = NULL, IMSWindow = 0.01,
-                                                               clusterMethod = "distance", minIntensityIMS = 0,
-                                                               maxMSRTWindow = 2, chromPeaksParam = NULL,
-                                                               EICRTWindow = 20, peakRTWindow = 5,
-                                                               calcArea = "integrate", fallbackEIC = TRUE,
-                                                               CCSParams = NULL, parallel = TRUE, fromSuspects = FALSE,
-                                                               IMSMatchParams = NULL)
+setMethod("assignMobilities", "featureGroupsScreening", function(obj, mobPeaksParam = NULL, IMSWindow = 0.01,
+                                                                 clusterMethod = "distance", minIntensityIMS = 0,
+                                                                 maxMSRTWindow = 2, chromPeaksParam = NULL,
+                                                                 EICRTWindow = 20, peakRTWindow = 5,
+                                                                 calcArea = "integrate", fallbackEIC = TRUE,
+                                                                 CCSParams = NULL, parallel = TRUE, fromSuspects = FALSE,
+                                                                 IMSMatchParams = NULL)
 {
     ac <- checkmate::makeAssertCollection()
     assertFindMobilitiesArgs(mobPeaksParam, IMSWindow, clusterMethod, minIntensityIMS, maxMSRTWindow,
@@ -541,26 +541,26 @@ setMethod("findMobilities", "featureGroupsScreening", function(fGroups, mobPeaks
     assertIMSMatchParams(IMSMatchParams, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
-    if (length(fGroups) == 0)
-        return(fGroups) # nothing to do...
+    if (length(obj) == 0)
+        return(obj) # nothing to do...
     
     if (fromSuspects)
-        fGroups@features <- assignFeatureMobilitiesSuspects(fGroups@features, IMSWindow, screenInfo(fGroups))
-    fGroups@features <- assignFeatureMobilitiesPeaks(fGroups@features, mobPeaksParam, IMSWindow, clusterMethod,
-                                                     minIntensityIMS, maxMSRTWindow)
-    fGroups@features <- reintegrateMobilityFeatures(fGroups@features, EICRTWindow, peakRTWindow, calcArea,
-                                                    chromPeaksParam, fallbackEIC, parallel)
-    fGroups <- clusterFGroupMobilities(fGroups, IMSWindow, FALSE)
+        obj@features <- assignFeatureMobilitiesSuspects(obj@features, IMSWindow, screenInfo(obj))
+    obj@features <- assignFeatureMobilitiesPeaks(obj@features, mobPeaksParam, IMSWindow, clusterMethod,
+                                                 minIntensityIMS, maxMSRTWindow)
+    obj@features <- reintegrateMobilityFeatures(obj@features, EICRTWindow, peakRTWindow, calcArea,
+                                                chromPeaksParam, fallbackEIC, parallel)
+    obj <- clusterFGroupMobilities(obj, IMSWindow, FALSE)
 
     if (!is.null(CCSParams))
-        fGroups <- assignFGroupsCCS(fGroups, CCSParams)
+        obj <- assignFGroupsCCS(obj, CCSParams)
     
-    gInfo <- groupInfo(fGroups)
-    scr <- expandAndUpdateScreenInfoForIMS(screenInfo(fGroups), gInfo)
+    gInfo <- groupInfo(obj)
+    scr <- expandAndUpdateScreenInfoForIMS(screenInfo(obj), gInfo)
     scr <- finalizeScreenInfoForIMS(scr, gInfo, IMSMatchParams)
-    fGroups@screenInfo <- scr
+    obj@screenInfo <- scr
     
-    return(fGroups)
+    return(obj)
 })
 
 

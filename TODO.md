@@ -323,7 +323,7 @@
         - see if current chrom defaults are fine
         - add sensible IMS defaults
         - naming: change param to params for consistency (also assertions)
-- findMobilities()
+- assignMobilities()
     - assert that instrument data has actually IMS data
     - better names for ims_parent_ID/ims_parent_group?
     - handle cases when there are already IMS assignments (or just throw an error?)
@@ -360,14 +360,14 @@
         - Handle mobilities
             - Does the mobmin/mobmax range make sense how it is computed now?
         - remove mobility assignment?
-            - if not, support >1 mobilities in suspect list and do mobility assignment directly from suspect list like findMobilities()
+            - if not, support >1 mobilities in suspect list and do mobility assignment directly from suspect list like assignMobilities()
 - getIMSMatchParams()
     - tweak defaults
 - components
     - better name for expandMobilities()?
         - add docs (incl generic)
     - TPs: should expandMobilities() also copy components for mobility parents?
-        - if not, clearly doc the difference if components are generated after findMobilities()
+        - if not, clearly doc the difference if components are generated after assignMobilities()
 - reporting
     - comps-clust: don't have imgs double in reportPlots
 - CCS
@@ -377,7 +377,7 @@
 
 - Tests
     - more verification that fGroupsScreeningSets still works fine after removal of setObjects
-    - more verification that normInts() works before/after findMobilities()
+    - more verification that normInts() works before/after assignMobilities()
     - IMS arg for [, filter() and plotting functions
     - applyMS for filter()
     - expandMobilities()
@@ -393,7 +393,7 @@
         - update for retWindow --> window
         - add docs for getDefEIMParams()
         - update handbook
-    - findMobilities()
+    - assignMobilities()
         - mention that feature properties (except intensity, rt, area) are simply copied from parent
     - ISTDs
         - doc that mobility features are completely ignored for normalization, and relative intensities/areas are copied from parents
@@ -408,7 +408,7 @@
     - withIMSParent arg for filter()
     - calculateConcs()
         - clearly doc that mobility parent intensities are used to calculate concentrations (if available).
-        - Also note that the mobility fGroup's RF is still used (only relevant for SIRIUS or RT changes), and is different then when findMobilities() copies results
+        - Also note that the mobility fGroup's RF is still used (only relevant for SIRIUS or RT changes), and is different then when assignMobilities() copies results
         - IMS arg for getQuantCalibFromScreening() --> clearly doc that default is best
     - ADT
         - IMS option and mobility_collapsed column, which contains rounded numbers

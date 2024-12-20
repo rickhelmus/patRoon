@@ -207,7 +207,7 @@ expandAndUpdateScreenInfoForIMS <- function(scr, gInfo)
 
 finalizeScreenInfoForIMS <- function(scr, gInfo, IMSMatchParams)
 {
-    # shared code for findMobilities() and screenSuspects()
+    # shared code for assignMobilities() and screenSuspects()
 
     scrOrigExp <- expandSuspMobilities(scr)
     

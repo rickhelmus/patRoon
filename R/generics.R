@@ -427,6 +427,11 @@ setGeneric("annotatedPeakList", function(obj, ...) standardGeneric("annotatedPea
 #' @template generics
 setGeneric("annotations", function(obj, ...) standardGeneric("annotations"))
 
+#' @templateVar func assignMobilities
+#' @templateVar desc finds ion mobilities for all features.
+#' @template generics
+setGeneric("assignMobilities", function(obj, ...) standardGeneric("assignMobilities"))
+
 #' @templateVar func calculatePeakQualities
 #' @templateVar desc calculates chromatographic peak qualities and scores.
 #' @template generics
@@ -494,11 +499,6 @@ setGeneric("featureTable", function(obj, ...) standardGeneric("featureTable"))
 #' @templateVar desc provides various functionality to do post-filtering of data.
 #' @template generics
 setGeneric("filter", function(obj, ...) standardGeneric("filter"))
-
-#' @templateVar func findMobilities
-#' @templateVar desc finds ion mobilities for all features.
-#' @template generics
-setGeneric("findMobilities", function(fGroups, ...) standardGeneric("findMobilities"))
 
 #' @templateVar func getBPCs
 #' @templateVar desc gets base peak chromatogram(s).

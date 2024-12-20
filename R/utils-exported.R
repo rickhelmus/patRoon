@@ -862,3 +862,94 @@ convertCCSToMobility <- function(ccs, mz, CCSParams, charge = NULL)
     # {
     # }
 }
+
+#' @export
+setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFromBy = "InChIKey",
+                                                     overwrite = FALSE, adducts = c("[M+H]+", "[M-H]-", "none"),
+                                                     prefCalcChemProps = TRUE, neutralChemProps = FALSE)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assert(
+        checkmate::checkChoice(from, c("pubchemlite", "c3sdb")),
+        checkmate::checkDataFrame(from, min.rows = 1),
+        checkmate::checkNull(from),
+        .var.name = "from", add = ac
+    )
+    checkmate::assertChoice(matchFromBy, c("InChIKey", "InChI", "SMILES", "name"), add = ac)
+    checkmate::assertFlag(overwrite, add = ac)
+    checkmate::assertCharacter(adducts, min.chars = 1, any.missing = FALSE, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    obj <- copy(obj)
+    
+    adductsNoNone <- setdiff(adducts, "none")
+    addMobCols <- paste0("mob_", adductsNoNone)
+    addCCSCols <- paste0("CCS_", adductsNoNone)
+    if ("none" %in% adducts)
+    {
+        addMobCols <- c(addMobCols, "mob")
+        addCCSCols <- c(addCCSCols, "CCS")
+    }
+    
+    if (!is.null(from))
+    {
+        if (is.null(obj[[matchFromBy]]))
+            stop(sprintf("Column '%s' not found to match input data.", matchFromBy), call. = FALSE)
+        
+        if (is.data.frame(from))
+        {
+            from <- makeDT(from)
+            from <- prepareChemTable(from, prefCalcChemProps, neutralChemProps)
+        }
+        else if (from == "pubchemlite")
+        {
+            printf("Loading PubChemLite... ")
+            path <- getExtDepPath("metfragpcl")
+            from <- fread(path)
+            printf("Done!\n")
+            setnames(from, "CompoundName", "name") # UNDONE: doc that this column is used for name matching, support Synonym col as well?
+            pat <- "^pred_CCS_A2_"
+            predCols <- grep(pat, names(from), value = TRUE)
+            if (length(predCols) == 0)
+                stop(sprintf("No CCS prediction columns found in the configured PubChemLite data (%s). Please ensure a version with CCS values.",
+                             path), call. = FALSE)
+            setnames(from, predCols, gsub(pat, "CCS_", predCols))
+        }
+        else # c3sdb
+        {
+            # UNDONE: support c3sdb
+        }
+        
+        predCols <- grep("^CCS_", names(from), value = TRUE)
+        predCols <- intersect(predCols, addCCSCols)
+        if (length(predCols) == 0)
+            stop("No (adduct relevant) CCS columns found in the provided data.", call. = FALSE)
+        if (is.null(matchFromBy))
+            stop(sprintf("Column '%s' not found to match data from.", matchFromBy), call. = FALSE)
+        
+        for (col in predCols)
+        {
+            if (is.null(obj[[col]]))
+            {
+                m <- match(obj[[matchFromBy]], from[[matchFromBy]])
+                set(obj, j = col, value = from[[col]][m])
+            }
+            else
+            {
+                takeVal <- function(x) overwrite | is.na(x) | (is.character(x) & !nzchar(x))
+                obj[from, (col) := fifelse(takeVal(get(col)), get(paste0("i.", col)), get(col)),
+                    on = matchFromBy][]
+            }
+        }
+    }
+    
+    # UNDONE: calculate mobilities from CCS values and vice versa
+    
+    return(obj)
+})
+
+#' @export
+setMethod("assignMobilities", "data.frame", function(obj, ...)
+{
+    return(as.data.frame(assignMobilities(as.data.table(obj), ...)))
+})

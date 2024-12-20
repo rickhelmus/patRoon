@@ -866,7 +866,8 @@ convertCCSToMobility <- function(ccs, mz, CCSParams, charge = NULL)
 #' @export
 setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFromBy = "InChIKey",
                                                      overwrite = FALSE, adducts = c("[M+H]+", "[M-H]-", "none"),
-                                                     prefCalcChemProps = TRUE, neutralChemProps = FALSE)
+                                                     prefCalcChemProps = TRUE, neutralChemProps = FALSE,
+                                                     virtualenv = "patRoon-c3sdb")
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assert(
@@ -878,7 +879,23 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
     checkmate::assertChoice(matchFromBy, c("InChIKey", "InChI", "SMILES", "name"), add = ac)
     checkmate::assertFlag(overwrite, add = ac)
     checkmate::assertCharacter(adducts, min.chars = 1, any.missing = FALSE, add = ac)
+    checkmate::assertString(virtualenv, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
+    
+    if (!is.null(from) && from == "c3sdb")
+    {
+        checkPackage("reticulate")
+        if (is.null(obj[["SMILES"]]))
+            stop("No SMILES data found in the input data.", call. = FALSE)
+        validAdducts <- c("[M+H]+", "[M+Na]+", "[M-H]-", "[M+NH4]+", "[M+K]+", "[M+H-H2O]+", "[M+HCOO]-", "[M+CH3COO]-",
+                          "[M+Na-2H]-")
+        wrongAdducts <- setdiff(adducts, validAdducts)
+        if (length(wrongAdducts) > 0)
+        {
+            warning("Ignoring invalid adducts: ", paste0(wrongAdducts, collapse = ", "), call. = FALSE)
+            adducts <- setdiff(adducts, wrongAdducts)
+        }
+    }
     
     obj <- copy(obj)
     
@@ -917,7 +934,33 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
         }
         else # c3sdb
         {
-            # UNDONE: support c3sdb
+            if (!is.null(virtualenv))
+                reticulate::use_virtualenv("patRoon-c3sdb")
+            py_pickle <- reticulate::import("pickle")
+            py_c3sdb <- reticulate::import("c3sdb.ml.data")
+            py_bi <- reticulate::import_builtins()
+            
+            # UNDONE: do this differently? Makes it easy to get neutral masses
+            objPrep <- prepareChemTable(obj, prefCalcChemProps, neutralChemProps)
+            
+            kmcm_svr <- with(py_bi$open(py_c3sdb$pretrained_data("c3sdb_kmcm_svr.pkl"), "rb"), as = "pf",
+                             py_pickle$load(pf))
+            
+            preds <- sapply(adducts, function(add)
+            {
+                dfi <- py_c3sdb$data_for_inference(calculateMasses(objPrep$neutralMass, as.adduct(add), "mz"),
+                                                   rep(add, nrow(obj)), objPrep$SMILES,
+                                                   py_c3sdb$pretrained_data("c3sdb_OHEncoder.pkl"),
+                                                   py_c3sdb$pretrained_data("c3sdb_SScaler.pkl"))
+                ret <- rep(NA_real_, nrow(obj))
+                ret[dfi[[2]]] <- kmcm_svr$predict(dfi[[1]])
+                return(ret)
+            }, simplify = FALSE)
+            
+            from <- data.table(obj[[matchFromBy]])
+            setnames(from, matchFromBy)
+            for (add in names(preds))
+                set(from, j = paste0("CCS_", add), value = preds[[add]])
         }
         
         predCols <- grep("^CCS_", names(from), value = TRUE)
@@ -953,3 +996,19 @@ setMethod("assignMobilities", "data.frame", function(obj, ...)
 {
     return(as.data.frame(assignMobilities(as.data.table(obj), ...)))
 })
+
+#' @export
+installc3sdb <- function(envname = "patRoon-c3sdb", clearEnv = FALSE, ...)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertString(envname, min.chars = 1, null.ok = TRUE)
+    checkmate::assertFlag(clearEnv, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    checkPackage("reticulate")
+    
+    if (clearEnv && !is.null(envname))
+        reticulate::virtualenv_remove(envname)
+    
+    reticulate::py_install("git+https://github.com/dylanhross/c3sdb", envname = envname, ...)
+}

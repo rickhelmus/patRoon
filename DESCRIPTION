@@ -140,7 +140,8 @@ Suggests:
     MS2Quant,
     MS2Tox,
     ChemmineR,
-    fmcsR
+    fmcsR,
+    reticulate
 LinkingTo:
     Rcpp,
     rapidjsonr,

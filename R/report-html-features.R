@@ -61,6 +61,28 @@ getFGScreeningReactTab <- function(tab)
     return(tab)
 }
 
+prepFGPredUID <- function(tab, objects)
+{
+    tab <- data.table::copy(tab)
+    tab[type == "SIRIUS_FP", candidate := subscriptFormulaHTML(candidate)]
+    tab[, candidate_UID := ""]
+    
+    if (isScreening(objects$fGroups))
+    {
+        si <- screenInfo(objects$fGroups)
+        tab[type == "suspect" & candidate %chin% si$SMILES,
+              candidate_UID := getIKBlock1(si[match(candidate, SMILES)]$InChIKey)]
+    }
+    if (!is.null(objects[["compounds"]]))
+    {
+        cTab <- as.data.table(objects$compounds)
+        tab[type == "compound" & candidate %chin% cTab$SMILES,
+              candidate_UID := cTab[match(candidate, SMILES)]$UID]
+    }
+    
+    return(tab)
+}
+
 
 genHTMLReportPlotsChromsLarge <- function(fGroups, settings, outPath, EICs, EICParams, parallel)
 {
@@ -427,22 +449,12 @@ reportHTMLUtils$methods(
     
     genConcsTable = function()
     {
-        concs <- data.table::copy(concentrations(objects$fGroups))
-        
-        imgTag <- function(IK1, cand) sprintf("<img src='%s' alt='%s' style='max-height: 300px;')></img>", plots$structs[IK1], cand)
-        
-        concs[type == "SIRIUS_FP", candidate := subscriptFormulaHTML(candidate)]
-        concs[type == "suspect", candidate := imgTag(getIKBlock1(screenInfo(objects$fGroups)[match(candidate, SMILES)]$InChIKey),
-                                                     candidate)]
-        if (!is.null(objects[["compounds"]]))
-        {
-            cTab <- as.data.table(objects$compounds)
-            concs[type == "compound", candidate := imgTag(cTab[match(candidate, SMILES)]$UID, candidate)]
-        }
-        
+        concs <- prepFGPredUID(concentrations(objects$fGroups), objects)
+
         colDefs <- list(
             group = reactable::colDef(show = FALSE),
-            candidate = reactable::colDef(html = TRUE)
+            candidate = reactable::colDef(html = TRUE, cell = htmlwidgets::JS("reactCellPredCand")),
+            candidate_UID = reactable::colDef(show = FALSE)
         )
         if (!is.null(concs[["candidate_name"]]))
             colDefs$candidate_name <- reactable::colDef("candidate name")
@@ -456,22 +468,12 @@ reportHTMLUtils$methods(
 
     genToxTable = function()
     {
-        tox <- data.table::copy(toxicities(objects$fGroups))
-        
-        imgTag <- function(IK1, cand) sprintf("<img src='%s' alt='%s' style='max-height: 300px;')></img>", plots$structs[IK1], cand)
-        
-        tox[type == "SIRIUS_FP", candidate := subscriptFormulaHTML(candidate)]
-        tox[type == "suspect", candidate := imgTag(getIKBlock1(screenInfo(objects$fGroups)[match(candidate, SMILES)]$InChIKey),
-                                                     candidate)]
-        if (!is.null(objects[["compounds"]]))
-        {
-            cTab <- as.data.table(objects$compounds)
-            tox[type == "compound", candidate := imgTag(cTab[match(candidate, SMILES)]$UID, candidate)]
-        }
+        tox <- prepFGPredUID(toxicities(objects$fGroups), objects)
         
         colDefs <- list(
             group = reactable::colDef(show = FALSE),
-            candidate = reactable::colDef(html = TRUE),
+            candidate = reactable::colDef(html = TRUE, cell = htmlwidgets::JS("reactCellPredCand")),
+            candidate_UID = reactable::colDef(show = FALSE),
             LC50 = reactable::colDef(format = reactable::colFormat(digits = 2))
         )
         if (!is.null(tox[["candidate_name"]]))

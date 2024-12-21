@@ -441,6 +441,9 @@
         - character columns are now collapsed instead of removed with features=T and averaging
     - feature ID column is now always of character type
     - significantly optimized doScreenSuspects (emptyResults)
+    - reporting
+        - size optimizations, mainly for self contained (lzstring, no duplicate images)
+        - candidate column in CSV of pred tables now doesn't contain images
 
 ## Features
 

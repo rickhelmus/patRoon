@@ -11,7 +11,7 @@ getReactCellImgJS <- function(imgTags, maxHeight = NULL)
     if (!is.null(maxHeight))
         imgTags <- paste(imgTags, sprintf(" + ' style=\"max-height: %dpx\"'", maxHeight))
     
-        return(htmlwidgets::JS(sprintf("ci => '<img ' + %s + '></img>';", imgTags)))
+    return(htmlwidgets::JS(sprintf("ci => '<img ' + %s + '></img>';", imgTags)))
 }
 
 makeReactCellRoundMerged <- function(rounding)
@@ -310,8 +310,7 @@ getReactColDefDB <- function(tab, tabName)
     return(colDefDB)
 }
 
-makeMainResultsReactable <- function(tab, tabName, retMin, plots, colGroupOrder = NULL,
-                                     initTabFunc = "initMainTabDefault", ...)
+makeMainResultsReactable <- function(tab, tabName, retMin, colGroupOrder = NULL, initTabFunc = "initMainTabDefault", ...)
 {
     tab <- copy(tab)
     

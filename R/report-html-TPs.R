@@ -74,7 +74,7 @@ genHTMLReportPlotsTPs <- function(fGroups, components, MSPeakLists, formulas, co
     }))
 }
 
-getTPCandReactTab <- function(obj, plots)
+getTPCandReactTab <- function(obj)
 {
     ret <- rbindlist(lapply(componentTable(obj), function(cmp)
     {
@@ -84,9 +84,9 @@ getTPCandReactTab <- function(obj, plots)
     }), fill = TRUE, idcol = "cmpName")
     setnames(ret, "name", "candidate_name")
     if (!is.null(ret[["InChIKey"]]))
-        ret[, TP_structure := plots$structs[getIKBlock1(InChIKey)]]
+        ret[, TP_structure := getIKBlock1(InChIKey)]
     if (!is.null(ret[["simSuspInChIKey"]]))
-        ret[, simSuspStructure := plots$structs[getIKBlock1(simSuspInChIKey)]]
+        ret[, simSuspStructure := getIKBlock1(simSuspInChIKey)]
     return(ret)
 }
 
@@ -165,7 +165,7 @@ reportHTMLUtils$methods(
         tab[, cmpName := component]
         
         if (!is.null(tab[["parent_InChIKey"]]))
-            tab[, parent_structure := plots$structs[getIKBlock1(parent_InChIKey)]]
+            tab[, parent_structure := getIKBlock1(parent_InChIKey)]
             
         makeMainResultsFGReactable(tab, "TPsParents", initView = "TPsParents",
                                    colGroupOrder = "component", initTabFunc = "initTabTPsParents")
@@ -183,32 +183,32 @@ reportHTMLUtils$methods(
     },
     genMainTableTPsCandSuspect = function()
     {
-        candTab <- getTPCandReactTab(getTPComponObj(), plots)
+        candTab <- getTPCandReactTab(getTPComponObj())
         
         if (TPsFromScreening(objects$components))
         {
-            scr <- getFGScreeningReactTab(screenInfo(objects$fGroups), plots)
+            scr <- getFGScreeningReactTab(screenInfo(objects$fGroups))
             candTab <- merge(candTab, scr, by.x = c("group", "candidate_name"), by.y = c("group", "susp_name"),
                              sort = FALSE)
         }
         
-        makeMainResultsReactable(candTab, "TPsCandSuspect", settings$features$retMin, plots, colGroupOrder = "TP")
+        makeMainResultsReactable(candTab, "TPsCandSuspect", settings$features$retMin, colGroupOrder = "TP")
     },
 
     genMainTableTPsBySuspect = function()
     {
-        candTab <- getTPCandReactTab(getTPComponObj(), plots)
+        candTab <- getTPCandReactTab(getTPComponObj())
         
         if (TPsFromScreening(objects$components))
         {
-            scr <- getFGScreeningReactTab(screenInfo(objects$fGroups), plots)
+            scr <- getFGScreeningReactTab(screenInfo(objects$fGroups))
             candTab <- merge(candTab, scr, by.x = c("group", "candidate_name"), by.y = c("group", "susp_name"),
                              sort = FALSE)
         }
         
         candTab[, candidate_groups := paste0(group, collapse = ", "), by = "candidate_name"][, group := NULL]
         candTab <- unique(candTab, by = "candidate_name")
-        makeMainResultsReactable(candTab, "TPsBySuspect", settings$features$retMin, plots, initView = "TPsBySuspect",
+        makeMainResultsReactable(candTab, "TPsBySuspect", settings$features$retMin, initView = "TPsBySuspect",
                                  initTabFunc = "initTabTPs")
     },
     genMainTableTPsCandGroup = function()

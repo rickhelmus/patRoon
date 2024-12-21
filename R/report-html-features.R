@@ -51,7 +51,7 @@ getFGReactTab <- function(objects, settings, ...)
     return(tab)
 }
 
-getFGScreeningReactTab <- function(tab, plots)
+getFGScreeningReactTab <- function(tab)
 {
     tab <- copy(tab)
     scols <- setdiff(names(tab), "group")
@@ -226,7 +226,7 @@ reportHTMLUtils$methods(
     makeMainResultsFGReactable = function(...)
     {
         hasMob <- hasMobilities(objects$fGroups)
-        makeMainResultsReactable(..., retMin = settings$features$retMin, plots = plots,
+        makeMainResultsReactable(..., retMin = settings$features$retMin,
                                  groupBy = if (hasMob) "ims_parent_group", defaultExpanded = hasMob)
     },
 
@@ -243,15 +243,15 @@ reportHTMLUtils$methods(
     },
     genMainTableSusCandSuspect = function()
     {
-        makeMainResultsReactable(getFGScreeningReactTab(screenInfo(objects$fGroups), plots), "SusCandSuspect",
-                                 settings$features$retMin, plots)
+        makeMainResultsReactable(getFGScreeningReactTab(screenInfo(objects$fGroups)), "SusCandSuspect",
+                                 settings$features$retMin)
     },
     genMainTableSusBySuspect = function()
     {
-        tab <- getFGScreeningReactTab(screenInfo(objects$fGroups), plots)
+        tab <- getFGScreeningReactTab(screenInfo(objects$fGroups))
         tab[, susp_groups := paste0(group, collapse = ", "), by = "susp_name"][, group := NULL]
         tab <- unique(tab, by = "susp_name")
-        makeMainResultsReactable(tab, "SusBySuspect", settings$features$retMin, plots, initView = "SuspectsBySuspect")
+        makeMainResultsReactable(tab, "SusBySuspect", settings$features$retMin, initView = "SuspectsBySuspect")
     },
     genMainTableSusCandGroup = function()
     {
@@ -272,20 +272,20 @@ reportHTMLUtils$methods(
     },
     genMainTableISTDsCandISTD = function()
     {
-        makeMainResultsReactable(getFGScreeningReactTab(internalStandards(objects$fGroups), plots), "ISTDsCandISTD",
-                                 settings$features$retMin, plots)
+        makeMainResultsReactable(getFGScreeningReactTab(internalStandards(objects$fGroups)), "ISTDsCandISTD",
+                                 settings$features$retMin)
     },
     genMainTableISTDsByISTD = function()
     {
-        tab <- getFGScreeningReactTab(internalStandards(objects$fGroups), plots)
+        tab <- getFGScreeningReactTab(internalStandards(objects$fGroups))
         # UNDONE: give other name
         tab[, susp_groups := paste0(group, collapse = ", "), by = "susp_name"][, group := NULL]
         tab <- unique(tab, by = "susp_name")
-        makeMainResultsReactable(tab, "ISTDsByISTD", settings$features$retMin, plots, initView = "ISTDsByISTD")
+        makeMainResultsReactable(tab, "ISTDsByISTD", settings$features$retMin, initView = "ISTDsByISTD")
     },
     genMainTableISTDsCandGroup = function()
     {
-        tab <- getFGScreeningReactTab(internalStandards(objects$fGroups), plots)
+        tab <- getFGScreeningReactTab(internalStandards(objects$fGroups))
         # HACK: use a different name (and col definition) so that we get a hidden column used for filtering
         setnames(tab, "susp_name", "susp_ID")
 

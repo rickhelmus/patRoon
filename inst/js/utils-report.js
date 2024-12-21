@@ -428,6 +428,17 @@ function showTPGraph(cmp)
     }
 }
 
+function reactCellPredCand(cellInfo)
+{
+    const UID = cellInfo.row.candidate_UID;
+    
+    // if UID (=InChIKey1) is set, then try to plot the candidate's structure
+    if (UID && reportPlots.structs[UID])
+        return '<img src="' + reportPlots.structs[UID] + '" style="max-height: 300px"></img>';
+        
+    return cellInfo.value; // formula or SMILES for which no structure plot is available
+}
+
 function filtRangeModalInit(tab, col)
 {
     const mname = "filter_" + col;

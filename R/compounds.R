@@ -709,6 +709,53 @@ setMethod("estimateIDLevels", "compounds", function(obj, absMzDev = 0.005, formu
     return(obj)
 })
 
+#' @export
+setMethod("assignMobilities", "compounds", function(obj, fGroups, IMS = TRUE, from = NULL, matchFromBy = "InChIKey",
+                                                    overwrite = FALSE, adductNone = NULL, CCSParams = NULL,
+                                                    prefCalcChemProps = TRUE, neutralChemProps = FALSE,
+                                                    virtualenv = "patRoon-c3sdb")
+{
+    # UNDONE: matchFromBy == "InChIKey" is not supported by SIRIUS, support IK1? throw error (otherwise implicitly done by DT method)?
+    # UNDONE: handle adduct column in DT method, remove need for adductNone arg, don't consider adduct specific cols?
+    # UNDONE: doc how adducts are dealt with
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(fGroups, "featureGroups", add = ac)
+    assertIMSArg(IMS, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (length(obj) == 0)
+        return(obj)
+    
+    if (IMS != "both" && hasMobilities(fGroups))
+        fGroups <- selectIMSFilter(fGroups, IMS, verbose = FALSE)
+    
+    allTab <- as.data.table(obj)[group %chin% names(fGroups)]
+    
+    annFG <- annotations(fGroups)
+    if (nrow(annFG) > 0)
+        allTab[, adduct := annFG$adduct[match(group, annFG$group)]]
+
+    # UNDONE: how to set adducts when there are no fGroup annotations? Use adductNone or separate arg?
+    allTab <- assignMobilities(allTab, from = from, matchFromBy = matchFromBy, overwrite = overwrite, adducts = adducts,
+                               adductNone = adductNone, CCSParams = CCSParams, prepareChemProps = FALSE,
+                               prefCalcChemProps = prefCalcChemProps, neutralChemProps = neutralChemProps,
+                               virtualenv = virtualenv)
+    
+    if (is.null(allTab[["mobility"]]))
+        allTab[, mobility := NA_real_]
+    if (is.null(allTab[["CCS"]]))
+        allTab[, CCS := NA_real_]
+    
+    if (hasMobilities(fGroups))
+        allTab <- assignTabIMSDeviations(allTab, groupInfo(fGroups))
+
+    ga <- split(allTab, by = allTab$group)
+    obj@groupAnnotations[names(ga)] <- ga
+    
+    return(obj)
+})
+
 setMethod("prepareConsensusLabels", "compounds", function(obj, ..., labels)
 {
     if (is.null(labels))

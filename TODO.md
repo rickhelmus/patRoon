@@ -341,6 +341,14 @@
         - suspects: minMobilityMatches is now not handled properly
             - don't do N-1 for orphaned
             - removes all parent-less or IMS parent fGroups? fine? if so, doc
+    - compounds method
+        - first get CCS/mobility data, mostly like suspects method --> skip warning for adducts and prepChemTable()
+            - pass as.data.table() output, so we only have to do calculations, lib loading etc once
+            - need to make sure column names are proper
+        - then assign final mobilities/CCSs for the fGroup's adduct
+            - store the adduct now in the results or get it from fGroups/arg?
+            - use the same getMobCCS() function from suspects for assignments
+        - calculate d_mob/d_ccs --> needs fGroups data
     - doc the use for fromSuspects, eg
         - doesn't rely on mobility peak detection, so might be less prone to false negatives with eg low intensities
         - scenario 1: we know the mobility very well, eg from a database --> use a narrow IMSWindow
@@ -384,6 +392,8 @@
     - convertMobilityToCCS() / convertCCSToMobility()
     - suspects
         - test order of data selection for mobility and CCS columns, missing data etc
+    - assignMobilities()
+        - DT method: robustness with missing data in input/from
     
 - Docs
     - hasMobilities slot for features
@@ -395,6 +405,9 @@
         - update handbook
     - assignMobilities()
         - mention that feature properties (except intensity, rt, area) are simply copied from parent
+        - suspect/compounds method
+            - mention when mobility <--> CCS conversions occur
+            - doc that default charge in CCSParams is not used, but taken from adductNone or adduct column
     - ISTDs
         - doc that mobility features are completely ignored for normalization, and relative intensities/areas are copied from parents
     - plotChroms()/plotMobilograms()
@@ -418,6 +431,7 @@
         - clearly doc that expandMobilities() just simple copying only; and this may lead to eg TP candidates that were not actually found by screening and therefore have NAs in the report
     - convertMobilityToCCS() / convertCCSToMobility()
         - clearly refer to papers and implementations
+        - mention that length of charge param is expanded
     - getCCSParams()
         - doc where Mason-Schamp const comes from
     - suspects

@@ -1015,8 +1015,8 @@ assertMobilityConversionArgs <- function(mobility, mz, CCSParams, charge, add = 
     checkmate::assertIntegerish(charge, null.ok = TRUE, add = add)
     assertCCSParams(CCSParams, add = add)
     
-    if (length(mobility) != length(mz) || (!is.null(charge) && length(mobility) != length(charge)))
-        stop("The length of mobility, charge and mz should be equal", call. = FALSE)
+    if (length(mobility) != length(mz))
+        stop("The length of the input mobility and mz data should be equal", call. = FALSE)
 }
 
 assertIMSMatchParams <- function(x, null.ok = FALSE, .var.name = checkmate::vname(x), add = NULL)

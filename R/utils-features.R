@@ -1255,3 +1255,19 @@ expandTableForIMSFGroups <- function(tab, gInfo)
     tab[, orderOrig := NULL]
     return(tab[])
 }
+
+assignTabIMSDeviations <- function(tab, gInfo)
+{
+    # used by screening / compounds
+    
+    tab <- copy(tab)
+    tab[, d_mob := gInfo$mobility[match(group, gInfo$group)] - mobility]
+    tab[, d_mob_rel := d_mob / mobility]
+    if (is.null(gInfo[["CCS"]]))
+        tab[, d_CCS := NA_real_]
+    else
+        tab[, d_CCS := gInfo$CCS[match(group, gInfo$group)] - CCS]
+    tab[, d_CCS_rel := d_CCS / CCS]
+    
+    return(tab[])
+}

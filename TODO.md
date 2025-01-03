@@ -303,6 +303,7 @@
 - general ratio of mass/CCS to filter results --> eg derived from CCS DB
 - be consistent in mobility vs IMS and mobilograms and EIMs
     - mobWindow and IMSWindow now randomly used
+    - IMS arg but affects mobility features
 - make sure mobility ranges are set when getting EIMs
 - findPeaks()
     - export? If yes, add checkmate's, documentation etc
@@ -349,6 +350,7 @@
             - store the adduct now in the results or get it from fGroups/arg?
             - use the same getMobCCS() function from suspects for assignments
         - calculate d_mob/d_ccs --> needs fGroups data
+        - only do all this for fGroups with IMS data by default
     - doc the use for fromSuspects, eg
         - doesn't rely on mobility peak detection, so might be less prone to false negatives with eg low intensities
         - scenario 1: we know the mobility very well, eg from a database --> use a narrow IMSWindow
@@ -434,7 +436,7 @@
         - mention that length of charge param is expanded
     - getCCSParams()
         - doc where Mason-Schamp const comes from
-    - suspects
+    - suspects/compounds
         - doc order of data selection for mobility and CCS columns
 
 - NEWS

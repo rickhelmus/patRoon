@@ -870,6 +870,8 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
                                                      prefCalcChemProps = TRUE, neutralChemProps = FALSE,
                                                      virtualenv = "patRoon-c3sdb")
 {
+    # NOTE: keep args in sync with other methods
+    
     ac <- checkmate::makeAssertCollection()
     checkmate::assert(
         checkmate::checkChoice(from, c("pubchemlite", "c3sdb")),
@@ -1031,18 +1033,17 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
     # fill in missing mobility/CCS values by conversions
     if (!is.null(CCSParams))
     {
-        doConvert <- function(start, values, masses, adduct)
+        doConvert <- function(start, values, masses, charges)
         {
-            ch <- adduct@charge
             doIt <- if (start == "mobility") convertMobilityToCCS else convertCCSToMobility
 
             if (!is.character(values))
-                return(doIt(values, masses, CCSParams, ch))
+                return(doIt(values, masses, CCSParams, charges))
             
             # handle semi-colon separated values from suspect lists
             tab <- rbindlist(lapply(seq_along(values), function(i)
             {
-                list(x = as.numeric(strsplit(values[i], ";", fixed = TRUE)[[1]]), m = masses[i])
+                list(x = as.numeric(strsplit(values[i], ";", fixed = TRUE)[[1]]), m = masses[i], ch = charges[i])
             }), idcol = TRUE)
             tab[, convx := as.character(doIt(x, m, CCSParams, ch))]
             tab[, convx := paste0(convx, collapse = ";"), by = .id]
@@ -1062,29 +1063,35 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
             
             if (addChr == "none")
             {
-                if (is.null(adductNone))
+                if (is.null(adductNone) && is.null(obj[["adduct"]]))
                 {
-                    stop("Please provide a value for 'adductNone' so that values can be calculated for mobility/CCS columns.",
+                    stop("Please provide a value for the 'adductNone' argument or an adduct column for conversions from mobility/CCS columns.",
                          call. = FALSE)
                 }
-                add <- adductNone
+                add <- if (!is.null(obj[["adduct"]]))
+                    fifelse(!is.na(obj$adduct) & nzchar(obj$adduct), as.adduct(obj$adduct), adductNone)
+                else
+                    adductNone
             }
             else
                 add <- as.adduct(addChr)
             
             masses <- calculateMasses(obj$neutralMass, add, "mz")
+            charges <- if (is.list(add)) sapply(add, slot, "charge") else rep(add@charge, nrow(obj))
             
             if (is.null(obj[[mCol]]))
-                obj[, (mCol) := doConvert("CCS", get(cCol), masses, add)]
+                obj[, (mCol) := doConvert("CCS", get(cCol), masses, charges)]
             else if (is.null(obj[[cCol]]))
-                obj[, (cCol) := doConvert("mobility", get(mCol), masses, add)]
+                obj[, (cCol) := doConvert("mobility", get(mCol), masses, charges)]
             else # both present: only consider NAs
             {
                 hasVal <- function(x) !is.na(x) & (!is.character(x) | nzchar(x))
-                obj[, .masses := masses] # UNDONE: handle the (unlikely) case that this column was already present?
-                obj[!hasVal(get(mCol)) & hasVal(get(cCol)), (mCol) := doConvert("CCS", get(cCol), .masses, add)]
-                obj[hasVal(get(mCol)) & !hasVal(get(cCol)), (cCol) := doConvert("mobility", get(mCol), .masses, add)]
-                ob[, .masses := NULL]
+                # temporarily add masses/charges to handle subset assignments below
+                # UNDONE: handle the (unlikely) case that these columns are already present?
+                obj[, c(".masses", ".charges") := .(masses, charges)]
+                obj[!hasVal(get(mCol)) & hasVal(get(cCol)), (mCol) := doConvert("CCS", get(cCol), .masses, .charges)]
+                obj[hasVal(get(mCol)) & !hasVal(get(cCol)), (cCol) := doConvert("mobility", get(mCol), .masses, .charges)]
+                obj[, c(".masses", ".charges") := NULL]
             }
         }
     }

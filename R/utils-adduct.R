@@ -57,7 +57,7 @@ checkAndGetIonization <- function(ionization, fGroups, .var.name = "ionization",
     
     checkmate::assertChoice(ionization, c("positive", "negative"), .var.name = .var.name, add = add)
 
-    return(ionization)    
+    return(ionization)
 }
 
 calculateMasses <- function(masses, adducts, type, err = TRUE)

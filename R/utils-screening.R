@@ -228,13 +228,7 @@ finalizeScreenInfoForIMS <- function(scr, gInfo, IMSMatchParams)
             list(soe$mobility[wh], soe$CCS[wh])
     }, by = seq_len(nrow(scr[!is.na(mob_group)]))]
 
-    scr[, d_mob := mob_group - mobility]
-    scr[, d_mob_rel := d_mob / mobility]
-    if (is.null(gInfo[["CCS"]]))
-        scr[, d_CCS := NA_real_]
-    else
-        scr[, d_CCS := gInfo$CCS[match(group, gInfo$group)] - CCS]
-    scr[, d_CCS_rel := d_CCS / CCS]
+    scr <- assignTabIMSDeviations(scr, gInfo)
 
     if (!is.null(IMSMatchParams))
     {

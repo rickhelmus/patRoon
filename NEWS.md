@@ -14,6 +14,7 @@
 
 * `generateTPsLibrary()`/`generateTPsLibraryFormula()` any TPs that are equal to the parent and are from a generation>1 are now removed
 * Added clarification in `generateCompoundsSIRIUS()` documentation that formula candidates without structure assignment are omitted (suggested by Nienke Meekel)
+* Added visual clue to `checkFeatures()` to see whether a feature is marked to be kept (pull request #117 as suggested by Leon Saal)
 
 ## Fixes
 

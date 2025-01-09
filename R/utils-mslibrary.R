@@ -90,7 +90,7 @@ sanitizeMSLibrary <- function(lib, prefCalcChemProps, neutralChemProps, potAdduc
                                     neutralChemProps = neutralChemProps)
     
     # normalize polarity: ensure uppercase, sometimes shortened as P/N
-    lib$records[, Ion_mode := toupper("POSITIVE")]
+    lib$records[, Ion_mode := toupper(Ion_mode)]
     lib$records[Ion_mode == "P", Ion_mode := "POSITIVE"]
     lib$records[Ion_mode == "N", Ion_mode := "NEGATIVE"]
     

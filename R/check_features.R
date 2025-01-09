@@ -270,9 +270,9 @@ checkFeaturesInterface$methods(
         if (!is.na(tblRow))
             keep <- tbl[tblRow, ]$keep
         else
-            keep <- 2
+            keep <- 1
 
-        bg = c(RColorBrewer::brewer.pal(3, "Reds")[[1]], RColorBrewer::brewer.pal(3, "Greens")[[1]], "white")[[keep+1]]
+        bg = c(RColorBrewer::brewer.pal(9, "Reds")[[1]], "white")[[keep+1]]
 
         withr::with_par(list(mar = c(4, 4, 0.1, 1), cex = 1.5, bg = bg), {
             plotChroms(fg, EICs = EICs, colourBy = "rGroups", showPeakArea = TRUE, EICParams = ep,
@@ -452,6 +452,8 @@ getMCTrainData <- function(fGroups, session)
 #'   remove unwanted feature groups by \code{\link[=filter,featureGroups-method]{filter}}.
 #' @param model The model that was created with \pkg{MetaClean} and that should be used to predict pass/fail data. If
 #'   \code{NULL}, the example model of the \pkg{MetaCleanData} package is used.
+#' @return A dataframe with the class predictions as well as the associated probabilities for each EIC as returned by the \code{MetaClean::getPredicitons} function. 
+#'   The dataframe has the four columns: EIC, Pred_Class, Pred_Prob_Pass, Pred_Prob_Fail.
 #' @rdname check-GUI
 #' @export
 predictCheckFeaturesSession <- function(fGroups, session, model = NULL, overWrite = FALSE)

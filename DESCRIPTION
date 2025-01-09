@@ -27,6 +27,10 @@ Authors@R: c(
     person("Bas", "van de Velde",
            role = "ctb",
            comment = c(ORCID = "0000-0003-1292-3251"),
+    ),
+    person("Leon", "Saal",
+           role = "ctb",
+           comment = c(ORCID = "0000-0002-3522-7729"),
     ))
 Description: Provides an easy-to-use interface to a mass spectrometry based
     non-target analysis workflow. Various (open-source) tools are combined

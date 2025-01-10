@@ -343,14 +343,7 @@
             - don't do N-1 for orphaned
             - removes all parent-less or IMS parent fGroups? fine? if so, doc
     - compounds method
-        - first get CCS/mobility data, mostly like suspects method --> skip warning for adducts and prepChemTable()
-            - pass as.data.table() output, so we only have to do calculations, lib loading etc once
-            - need to make sure column names are proper
-        - then assign final mobilities/CCSs for the fGroup's adduct
-            - store the adduct now in the results or get it from fGroups/arg?
-            - use the same getMobCCS() function from suspects for assignments
-        - calculate d_mob/d_ccs --> needs fGroups data
-        - only do all this for fGroups with IMS data by default
+        - handle sets
     - doc the use for fromSuspects, eg
         - doesn't rely on mobility peak detection, so might be less prone to false negatives with eg low intensities
         - scenario 1: we know the mobility very well, eg from a database --> use a narrow IMSWindow

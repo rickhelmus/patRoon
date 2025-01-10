@@ -711,18 +711,20 @@ setMethod("estimateIDLevels", "compounds", function(obj, absMzDev = 0.005, formu
 
 #' @export
 setMethod("assignMobilities", "compounds", function(obj, fGroups, IMS = TRUE, from = NULL, matchFromBy = "InChIKey",
-                                                    overwrite = FALSE, adductNone = NULL, CCSParams = NULL,
-                                                    prefCalcChemProps = TRUE, neutralChemProps = FALSE,
-                                                    virtualenv = "patRoon-c3sdb")
+                                                    overwrite = FALSE, adducts = c("[M+H]+", "[M-H]-", "none"),
+                                                    adductDef = NULL, CCSParams = NULL, prefCalcChemProps = TRUE,
+                                                    neutralChemProps = FALSE, virtualenv = "patRoon-c3sdb")
 {
     # UNDONE: matchFromBy == "InChIKey" is not supported by SIRIUS, support IK1? throw error (otherwise implicitly done by DT method)?
-    # UNDONE: handle adduct column in DT method, remove need for adductNone arg, don't consider adduct specific cols?
     # UNDONE: doc how adducts are dealt with
+    #   - uses fGroup annotations, not what was used for annotation
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     assertIMSArg(IMS, add = ac)
     checkmate::reportAssertions(ac)
+    
+    adductDef <- checkAndToAdduct(adductDef, fGroups)
     
     if (length(obj) == 0)
         return(obj)
@@ -730,27 +732,43 @@ setMethod("assignMobilities", "compounds", function(obj, fGroups, IMS = TRUE, fr
     if (IMS != "both" && hasMobilities(fGroups))
         fGroups <- selectIMSFilter(fGroups, IMS, verbose = FALSE)
     
+    gInfo <- groupInfo(fGroups)
+    
+    # HACK: mimic a 'suspect list' from all annotation results (allTab) so we can use the DT method
     allTab <- as.data.table(obj)[group %chin% names(fGroups)]
     
+    # temporarily add some columns for so that the DT method can do its calculations
+    allTab[, mz := gInfo$mz[match(group, gInfo$group)]]
     annFG <- annotations(fGroups)
     if (nrow(annFG) > 0)
         allTab[, adduct := annFG$adduct[match(group, annFG$group)]]
 
-    # UNDONE: how to set adducts when there are no fGroup annotations? Use adductNone or separate arg?
     allTab <- assignMobilities(allTab, from = from, matchFromBy = matchFromBy, overwrite = overwrite, adducts = adducts,
-                               adductNone = adductNone, CCSParams = CCSParams, prepareChemProps = FALSE,
+                               adductDef = adductDef, CCSParams = CCSParams, prepareChemProps = FALSE,
                                prefCalcChemProps = prefCalcChemProps, neutralChemProps = neutralChemProps,
                                virtualenv = virtualenv)
+    
+    allTab <- removeDTColumnsIfPresent(allTab, c("mz", "adduct"))
     
     if (is.null(allTab[["mobility"]]))
         allTab[, mobility := NA_real_]
     if (is.null(allTab[["CCS"]]))
         allTab[, CCS := NA_real_]
     
+    # copy the right mobility and CCS columns and discard others
+    adductDefChr <- if (!is.null(adductDef)) as.character(adductDef)
+    allTab[, mobility := selectFromSuspAdductCol(allTab, "mobility", annotations(fGroups), adductDefChr)]
+    allTab[, CCS := selectFromSuspAdductCol(allTab, "CCS", annotations(fGroups), adductDefChr)]
+    
+    # omit adduct specific cols in final results
+    rmCols <- grep("^(mobility|CCS)_", names(allTab), value = TRUE)
+    if (length(rmCols) > 0)
+        set(allTab, j = rmCols, value = NULL)
+    
     if (hasMobilities(fGroups))
-        allTab <- assignTabIMSDeviations(allTab, groupInfo(fGroups))
+        allTab <- assignTabIMSDeviations(allTab, gInfo)
 
-    ga <- split(allTab, by = allTab$group)
+    ga <- split(allTab, by = "group")
     obj@groupAnnotations[names(ga)] <- ga
     
     return(obj)

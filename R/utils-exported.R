@@ -866,7 +866,7 @@ convertCCSToMobility <- function(ccs, mz, CCSParams, charge = NULL)
 #' @export
 setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFromBy = "InChIKey",
                                                      overwrite = FALSE, adducts = c("[M+H]+", "[M-H]-", "none"),
-                                                     adductNone = NULL, CCSParams = NULL, prepareChemProps = TRUE,
+                                                     adductDef = NULL, CCSParams = NULL, prepareChemProps = TRUE,
                                                      prefCalcChemProps = TRUE, neutralChemProps = FALSE,
                                                      virtualenv = "patRoon-c3sdb")
 {
@@ -887,8 +887,8 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
     checkmate::assertString(virtualenv, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
-    if (!is.null(adductNone))
-        adductNone <- checkAndToAdduct(adductNone)
+    if (!is.null(adductDef))
+        adductDef <- checkAndToAdduct(adductDef)
 
     adducts_c3sdb <- setdiff(adducts, "none") # none doesn't make sense for c3sdb, just omit it to avoid warnings/errors
     if (identical(from, "c3sdb"))
@@ -910,18 +910,23 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
     obj <- copy(obj)
     
     if (prepareChemProps)
+    {
+        if (is.null(adductDef) && (is.null(obj[["adduct"]]) || anyNA(obj$adduct) || any(!nzchar(obj$adduct))))
+            stop("Please set the 'adductDef' argument so that m/z values can be calculated.", call. = FALSE)
         obj <- prepareChemTable(obj, prefCalcChemProps, neutralChemProps)
+        obj <- calcSuspMZs(obj, adductDef)
+    }
     
     if (identical(from, "c3sdb") || !is.null(CCSParams))
     {
         msg <- paste("Mass data is necessary for c3sdb pedictions and mobility <--> CCS conversions.",
                      "This data can be automatically calculated by setting prepareChemProps=TRUE and ensuring a SMILES,",
                      "InChI or formula column is present.")
-        if (is.null(obj[["neutralMass"]]))
-            stop(paste("No neutral mass data found in the input data (neutralMass column).", msg), call. = FALSE)
-        if (anyNA(obj$neutralMass))
-            warning(paste(sprintf("The following rows do not contain neutralMass data and will be ignored: %s.",
-                                  paste0(obj[is.na(neutralMass), which = TRUE], collapse = ", ")), msg), call. = FALSE)
+        if (is.null(obj[["mz"]]))
+            stop(paste("No m/z data found in the input data (mz column).", msg), call. = FALSE)
+        if (anyNA(obj$mz))
+            warning(paste(sprintf("The following rows do not contain m/z data and will be ignored: %s.",
+                                  paste0(obj[is.na(mz), which = TRUE], collapse = ", ")), msg), call. = FALSE)
     }
     
     if (identical(from, "c3sdb"))
@@ -974,12 +979,11 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
                              py_pickle$load(pf))
             
             # only do predictions for suspects with SMILES and mass data
-            objDo <- obj[!is.na(SMILES) & nzchar(SMILES) & !is.na(neutralMass)]
+            objDo <- obj[!is.na(SMILES) & nzchar(SMILES) & !is.na(mz)]
             
             preds <- sapply(adducts_c3sdb, function(add)
             {
-                dfi <- py_c3sdb$data_for_inference(calculateMasses(objDo$neutralMass, as.adduct(add), "mz"),
-                                                   rep(add, nrow(objDo)), objDo$SMILES,
+                dfi <- py_c3sdb$data_for_inference(objDo$mz, rep(add, nrow(objDo)), objDo$SMILES,
                                                    py_c3sdb$pretrained_data("c3sdb_OHEncoder.pkl"),
                                                    py_c3sdb$pretrained_data("c3sdb_SScaler.pkl"))
                 ret <- rep(NA_real_, nrow(objDo))
@@ -1061,37 +1065,29 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
             if (is.null(obj[[mCol]]) && is.null(obj[[cCol]]))
                 next
             
-            if (addChr == "none")
+            charges <- if (addChr == "none")
             {
-                if (is.null(adductNone) && is.null(obj[["adduct"]]))
-                {
-                    stop("Please provide a value for the 'adductNone' argument or an adduct column for conversions from mobility/CCS columns.",
-                         call. = FALSE)
-                }
-                add <- if (!is.null(obj[["adduct"]]))
-                    fifelse(!is.na(obj$adduct) & nzchar(obj$adduct), as.adduct(obj$adduct), adductNone)
+                if (!is.null(obj[["adduct"]]))
+                    fifelse(!is.na(obj$adduct) & nzchar(obj$adduct), as.adduct(obj$adduct)@charge, CCSParams$defaultCharge)
                 else
-                    adductNone
+                    CCSParams$defaultCharge
             }
             else
-                add <- as.adduct(addChr)
-            
-            masses <- calculateMasses(obj$neutralMass, add, "mz")
-            charges <- if (is.list(add)) sapply(add, slot, "charge") else rep(add@charge, nrow(obj))
+                as.adduct(addChr)@charge
             
             if (is.null(obj[[mCol]]))
-                obj[, (mCol) := doConvert("CCS", get(cCol), masses, charges)]
+                obj[, (mCol) := doConvert("CCS", get(cCol), obj$mz, charges)]
             else if (is.null(obj[[cCol]]))
-                obj[, (cCol) := doConvert("mobility", get(mCol), masses, charges)]
+                obj[, (cCol) := doConvert("mobility", get(mCol), obj$mz, charges)]
             else # both present: only consider NAs
             {
                 hasVal <- function(x) !is.na(x) & (!is.character(x) | nzchar(x))
-                # temporarily add masses/charges to handle subset assignments below
-                # UNDONE: handle the (unlikely) case that these columns are already present?
-                obj[, c(".masses", ".charges") := .(masses, charges)]
-                obj[!hasVal(get(mCol)) & hasVal(get(cCol)), (mCol) := doConvert("CCS", get(cCol), .masses, .charges)]
-                obj[hasVal(get(mCol)) & !hasVal(get(cCol)), (cCol) := doConvert("mobility", get(mCol), .masses, .charges)]
-                obj[, c(".masses", ".charges") := NULL]
+                # temporarily add charges to handle subset assignments below
+                # UNDONE: handle the (unlikely) case that the column is already present?
+                obj[, .charge := charges]
+                obj[!hasVal(get(mCol)) & hasVal(get(cCol)), (mCol) := doConvert("CCS", get(cCol), obj$mz, .charge)]
+                obj[hasVal(get(mCol)) & !hasVal(get(cCol)), (cCol) := doConvert("mobility", get(mCol), obj$mz, .charge)]
+                obj[, .charges := NULL]
             }
         }
     }

@@ -25,6 +25,24 @@ doScreeningShow <- function(obj)
     printf("Suspects annotated: %s\n", if (isSuspAnnotated(obj)) "yes" else "no")
 }
 
+calcSuspMZs <- function(suspects, adduct)
+{
+    suspects <- copy(suspects)
+    
+    if (is.null(suspects[["mz"]]))
+        suspects[, mz := NA_real_] # make it present to simplify code below
+    
+    if (!is.null(adduct))
+        suspects[is.na(mz), mz := calculateMasses(neutralMass, ..adduct, type = "mz")]
+    else if (!is.null(suspects[["adduct"]]))
+    {
+        unAdducts <- sapply(unique(suspects[is.na(mz) & !is.na(adduct) & nzchar(adduct)]$adduct), as.adduct)
+        suspects[is.na(mz) & !is.na(adduct) & nzchar(adduct), mz := calculateMasses(neutralMass, unAdducts[adduct], type = "mz")]
+    }
+    
+    return(suspects[])
+}
+
 prepareSuspectList <- function(suspects, adduct, skipInvalid, checkDesc, prefCalcChemProps, neutralChemProps,
                                calcMZs = TRUE)
 {
@@ -79,18 +97,7 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid, checkDesc, prefCal
         # calculate ionic masses if possible (not possible if no adducts are given and fGroups are annotated)
         if (calcMZs && (is.null(suspects[["mz"]]) || any(is.na(suspects[["mz"]]))) &&
             (!is.null(adduct) || !is.null(suspects[["adduct"]])))
-        {
-            if (is.null(suspects[["mz"]]))
-                suspects[, mz := NA_real_] # make it present to simplify code below
-            
-            if (!is.null(adduct))
-                suspects[is.na(mz), mz := calculateMasses(neutralMass, ..adduct, type = "mz")]
-            else
-            {
-                unAdducts <- sapply(unique(suspects[is.na(mz)]$adduct), as.adduct)
-                suspects[is.na(mz) & !is.na(adduct), mz := calculateMasses(neutralMass, unAdducts[adduct], type = "mz")]
-            }
-        }
+            suspects <- calcSuspMZs(suspects, adduct)
         else if (is.null(suspects[["mz"]]))
             suspects[, mz := NA_real_]
 
@@ -249,6 +256,40 @@ finalizeScreenInfoForIMS <- function(scr, gInfo, IMSMatchParams)
     return(removeDTColumnsIfPresent(scr, c("mob_group", "ims_parent_group")))
 }
 
+selectFromSuspAdductCol <- function(tab, col, fgAnn, adductChrDef)
+{
+    isUsable <- function(v) !is.na(v) & (!is.character(v) | nzchar(v))
+    
+    # preference order: regular non-adduct col > col from (adduct arg > adduct column > feat annotations)
+    
+    # special case: we can use all data from regular non-adduct column
+    if (!is.null(tab[[col]]) && all(isUsable(tab[[col]])))
+        return(tab[[col]])
+    
+    tryAddCol <- function(add, row)
+    {
+        cl <- if (!is.null(add)) paste0(col, "_", add) else col
+        if (!is.null(tab[[cl]]) && isUsable(tab[[cl]][row]))
+            return(tab[[cl]][row])
+        return(NA_real_)
+    }
+    
+    # UNDONE: would be nice to vectorize this somehow...
+    return(sapply(seq_len(nrow(tab)), function(i)
+    {
+        v <- NA_real_
+        
+        if (!is.null(adductChrDef))
+            v <- tryAddCol(adductChrDef, i)
+        if (is.na(v) && !is.null(tab[["adduct"]]) && !is.na(tab$adduct[i]) && nzchar(tab$adduct[i]))
+            v <- tryAddCol(tab$adduct[i], i)
+        if (is.na(v) && nrow(fgAnn) > 0)
+            v <- tryAddCol(fgAnn[group == tab$group[i]]$adduct, i)
+        
+        return(v)
+    }))
+}
+
 doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, IMSMatchParams, adduct, skipInvalid)
 {
     gInfo <- groupInfo(fGroups)
@@ -319,37 +360,8 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, IMSMatchPara
                     setMetaData(ret, suspects[ti])
                     
                     # copy the right mobility and CCS columns from the suspect list
-                    # preference order: existing col > col from (adduct arg > adduct column > feat annotations)
-                    
-                    getMobCCS <- function(type)
-                    {
-                        isUsable <- function(v) !is.na(v) && (!is.character(v) || nzchar(v))
-                        
-                        if (!is.null(suspects[[type]]) && isUsable(suspects[[type]][ti]))
-                            return(suspects[[type]][ti])
-                        
-                        tryAddCol <- function(add)
-                        {
-                            addCol <- paste0(type, "_", add)
-                            if (!is.null(suspects[[addCol]]) && isUsable(suspects[[addCol]][ti]))
-                                return(suspects[[addCol]][ti])
-                            return(NA_real_)
-                        }
-                        
-                        v <- NA_real_
-                        
-                        if (!is.null(adductTxt))
-                            v <- tryAddCol(adductTxt)
-                        if (is.na(v) && !is.null(suspects[["adduct"]]) && !is.na(suspects$adduct[ti]) &&
-                            nzchar(suspects$adduct[ti]))
-                            v <- tryAddCol(suspects$adduct[ti])
-                        if (is.na(v) && nrow(annotations(fGroups)) > 0)
-                            v <- tryAddCol(annotations(fGroups)[group == g]$adduct)
-                        
-                        return(v)
-                    }
-                    
-                    ret[, c("mobility", "CCS") := .(getMobCCS("mobility"), getMobCCS("CCS"))]
+                    ret[, mobility := selectFromSuspAdductCol(suspects[ti], "mobility", annotations(fGroups), adductTxt)]
+                    ret[, CCS := selectFromSuspAdductCol(suspects[ti], "CCS", annotations(fGroups), adductTxt)]
                     
                     ret[, c("group", "d_rt", "d_mz") := .(g, d_rt = if (hasRT) gret - rt else NA_real_,
                                                           ifelse(is.na(mz), annTbl[group == g]$neutralMass - neutralMass,

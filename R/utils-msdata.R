@@ -86,6 +86,7 @@ listMSFiles <- function(dirs, from)
 }
 
 getPathsFromAnaInfo <- function(anaInfo, type) return(anaInfo[[paste0("path_", type)]])
+getAnaInfoPathCols <- function(anaInfo) intersect(paste0("path_", getMSFileTypes()), names(anaInfo))
 
 getMSFilesFromAnaInfo <- function(anaInfo, types, formats, mustExist = TRUE)
 {

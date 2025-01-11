@@ -1292,6 +1292,31 @@ saveNewProjectParams <- function(file, input)
     writeYAML(values, file)
 }
 
+anaFilesToAnaInfo <- function(anaFiles)
+{
+    # UNDONE: full path conversion
+    
+    ret <- dcast(anaFiles, analysis ~ type, value.var = "path")
+    setnames(ret, getMSFileTypes(), paste0("path_", getMSFileTypes()), skip_absent = TRUE)
+    for (ft in getMSFileTypes())
+    {
+        col <- paste0("path_", ft)
+        if (is.null(ret[[col]]))
+            set(ret, j = col, value = character(0))
+    }
+    return(ret)
+}
+
+anaInfoToAnaFiles <- function(anaInfo)
+{
+    # UNDONE: full path conversion
+    
+    ret <- melt(anaInfo, id.vars = "analysis", measure.vars = getAnaInfoPathCols(anaInfo), variable.name = "type",
+                value.name = "path", na.rm = TRUE)
+    ret[, type := gsub("^path_", "", type)]
+    return(ret)
+}
+
 #' Easily create new \pkg{patRoon} projects
 #' 
 #' The \code{newProject} function is used to quickly generate a processing R script. This tool allows the user to
@@ -1322,9 +1347,13 @@ newProject <- function(destPath = NULL)
                     selectionMode = "range", outsideClickDeselects = FALSE,
                     contextMenu = FALSE, manualColumnResize = TRUE)
 
-    emptyAnaTable <- function() data.table(exclude = logical(0), analysis = character(0), format = character(0),
-                                           group = character(0), blank = character(0), conc = numeric(0), 
-                                           norm_conc = numeric(0), path = character(0))
+    emptyAnaTable <- function()
+    {
+        ai <- data.table(exclude = logical(0), analysis = character(0), type = character(0), group = character(0),
+                         blank = character(0), conc = numeric(0), norm_conc = numeric(0))
+        ai[, paste0("path_", getMSFileTypes()) := character(0)]
+        return(ai)
+    }
     
     server <- function(input, output, session)
     {
@@ -1335,9 +1364,15 @@ newProject <- function(destPath = NULL)
 
         makeAnalysesHot <- function(rvName)
         {
+            dt <- copy(rValues[[rvName]])
+            pcols <- getAnaInfoPathCols(dt)
+            dt[, type := {
+                p <- unlist(mget(pcols))
+                paste0(sub("^path_", "", names(p)[!is.na(p)]), collapse = ", ")
+            }, by = .I]
+            dt[, (pcols) := NULL]
             hot <- do.call(rhandsontable::rhandsontable,
-                           c(list(rValues[[rvName]], height = 250, maxRows = nrow(rValues[[rvName]]),
-                                  columnSorting = FALSE),
+                           c(list(dt, height = 250, maxRows = nrow(dt), columnSorting = FALSE),
                              hotOpts)) %>%
                 rhandsontable::hot_col(c("group", "blank"), readOnly = FALSE, type = "text") %>%
                 rhandsontable::hot_col(c("conc", "norm_conc"), readOnly = FALSE, type = "numeric") %>%
@@ -1511,34 +1546,11 @@ newProject <- function(destPath = NULL)
         observeEvent(input$analysesHotNeg, doObserveAnaHot("analysesHotNeg", "analysesNeg"))
         
         observeEvent(input$addAnalysesDir, {
-            
-            if (FALSE) {
-            anaDir <- rstudioapi::selectDirectory(path = "~/")
-            if (!is.null(anaDir))
-            {
-                files <- listMSFiles(anaDir, getMSFileFormats())
-
-                if (length(files) > 0)
-                {
-                    dt <- data.table(exclude = FALSE, path = dirname(files), analysis = simplifyAnalysisNames(files),
-                                     group = "", blank = "", conc = NA_real_, norm_conc = NA_real_)
-
-                    msExts <- MSFileExtensions()
-                    dt[, format := sapply(tolower(tools::file_ext(files)), function(ext)
-                    {
-                        paste0(names(msExts)[sapply(msExts, function(e) ext %in% tolower(e))], collapse = "/")
-                    })]
-
-                    dt[, format := paste0(.SD$format, collapse = ", "), by = .(path, analysis)]
-                    dt <- unique(dt, by = c("analysis", "path"))
-         
-                    setcolorder(dt, c("exclude", "analysis", "format", "group", "blank", "conc", "norm_conc", "path"))
-
-                    rvName <- getCurAnaRVName()
-                    rValues[[rvName]] <- rbind(rValues[[rvName]], dt)
-                }
-            }
-            }
+            rvName <- getCurAnaRVName()
+            rValues$analysisFiles <- if (nrow(rValues[[rvName]]) == 0)
+                rValues$analysisFiles[0, ]
+            else
+                anaInfoToAnaFiles(rValues[[rvName]])
             
             showModal(modalDialog(
                 title = "Select analyses",
@@ -1614,9 +1626,10 @@ newProject <- function(destPath = NULL)
             if (!is.null(anaDir))
             {
                 files <- listMSFiles(anaDir, getMSFileFormats(input$analysisFilesAddType))
-                rValues$analysisFiles <- data.frame(analysis = tools::file_path_sans_ext(basename(files)),
-                                                    type = if (length(files) > 0) input$analysisFilesAddType else character(),
-                                                    path = files)
+                af <- data.table(analysis = tools::file_path_sans_ext(basename(files)),
+                                 type = if (length(files) > 0) input$analysisFilesAddType else character(),
+                                 path = files)
+                rValues$analysisFiles <- rbind(rValues$analysisFiles, af)
             }
         })
         
@@ -1627,12 +1640,30 @@ newProject <- function(destPath = NULL)
         
         observeEvent(input$analysisFilesRemove, {
             sel <- input$analysisFilesHot_select$select$rAll
-            rValues$analysisFiles <- rValues$analysisFiles[-sel, ]
+            rValues$analysisFiles <- rValues$analysisFiles[-sel]
         })
         
         observeEvent(input$analysisFilesOK, {
             removeModal()
-            print(rhandsontable::hot_to_r(input$analysisFilesHot))
+            rvName <- getCurAnaRVName()
+            if (nrow(rValues$analysisFiles) > 0)
+            {
+                ai <- anaFilesToAnaInfo(rValues$analysisFiles)
+                aiOv <- ai[analysis %in% rValues[[rvName]]$analysis]
+                aiNew <- ai[!analysis %in% rValues[[rvName]]$analysis]
+                
+                if (nrow(aiOv) > 0)
+                {
+                    pcols <- getAnaInfoPathCols(rValues[[rvName]])
+                    temp <- copy(rValues[[rvName]]) # HACK: take a copy so that Shiny registers change due to DT merge
+                    temp[aiOv, (pcols) := mget(paste0("i.", pcols)), on = "analysis"]
+                    rValues[[rvName]] <- temp
+                }
+                if (nrow(aiNew) > 0)
+                    rValues[[rvName]] <- rbind(rValues[[rvName]], aiNew, fill = TRUE)
+            }
+            else
+                rValues[[rvName]] <- rValues[[rvName]][0]
         })
         
         observeEvent(input$addAnalysesCSV, {

@@ -773,6 +773,12 @@ getNewProjectUI <- function(destPath)
     miniUI::miniPage(
         shinyjs::useShinyjs(),
         
+        # based on https://stackoverflow.com/a/63882648
+        tags$style(
+            type = 'text/css',
+            '.modal-dialog { width: fit-content !important; height: fit-content !important; }'
+        ),
+        
         miniUI::gadgetTitleBar("Create project tool", right = miniUI::miniTitleBarButton("create", "Create", TRUE)),
 
         miniUI::miniTabstripPanel(
@@ -1311,7 +1317,7 @@ newProject <- function(destPath = NULL)
     # NOTE: set selectionMode to range as only row series can currently be queried
     # (https://github.com/jrowen/rhandsontable/issues/313)
     hotOpts <- list(rowHeaderWidth = 40, readOnly = TRUE,
-                    columnSorting = FALSE, sortIndicator = TRUE, selectCallback = TRUE,
+                    sortIndicator = TRUE, selectCallback = TRUE,
                     currentRowClassName = "currentRow", stretchH = "all",
                     selectionMode = "range", outsideClickDeselects = FALSE,
                     contextMenu = FALSE, manualColumnResize = TRUE)
@@ -1323,18 +1329,28 @@ newProject <- function(destPath = NULL)
     server <- function(input, output, session)
     {
         rValues <- reactiveValues(analyses = emptyAnaTable(),
+                                  analysisFiles = data.table(analysis = character(), type = character(), path = character()),
                                   analysesPos = emptyAnaTable(),
                                   analysesNeg = emptyAnaTable())
 
         makeAnalysesHot <- function(rvName)
         {
             hot <- do.call(rhandsontable::rhandsontable,
-                           c(list(rValues[[rvName]], height = 250, maxRows = nrow(rValues[[rvName]])),
+                           c(list(rValues[[rvName]], height = 250, maxRows = nrow(rValues[[rvName]]),
+                                  columnSorting = FALSE),
                              hotOpts)) %>%
                 rhandsontable::hot_col(c("group", "blank"), readOnly = FALSE, type = "text") %>%
                 rhandsontable::hot_col(c("conc", "norm_conc"), readOnly = FALSE, type = "numeric") %>%
                 rhandsontable::hot_col("exclude", readOnly = FALSE, type = "checkbox")
             
+            return(hot)
+        }
+        makeAnalysisFilesHot <- function(rvName)
+        {
+            hot <- do.call(rhandsontable::rhandsontable,
+                           c(list(rValues[[rvName]], height = 300, maxRows = nrow(rValues[[rvName]]),
+                                  rowHeaders = NULL),
+                             hotOpts))
             return(hot)
         }
         getCurAnaHotName <- function()
@@ -1495,6 +1511,8 @@ newProject <- function(destPath = NULL)
         observeEvent(input$analysesHotNeg, doObserveAnaHot("analysesHotNeg", "analysesNeg"))
         
         observeEvent(input$addAnalysesDir, {
+            
+            if (FALSE) {
             anaDir <- rstudioapi::selectDirectory(path = "~/")
             if (!is.null(anaDir))
             {
@@ -1520,8 +1538,103 @@ newProject <- function(destPath = NULL)
                     rValues[[rvName]] <- rbind(rValues[[rvName]], dt)
                 }
             }
+            }
+            
+            showModal(modalDialog(
+                title = "Select analyses",
+                rhandsontable::rHandsontableOutput("analysisFilesHot", height = 300, width = 700),
+                easyClose = TRUE,
+                fade = FALSE, # TRUE messes up HOT
+                footer = tagList(
+                    # use column() to (1) make sure selectInput only occupies a single row and (2) a button can
+                    # be placed right next to it and (3) left alignment
+                    column(
+                        width = 2,
+                        style = "padding-right: 0px;",
+                        htmltools::tagAppendAttributes(
+                            selectInput("analysisFilesAddType", NULL, c("raw", "centroid", "profile", "ims"),
+                                        selectize = FALSE, width = "100%"),
+                            style = "margin-bottom: 0px;")
+                    ),
+                    column(
+                        width = 1,
+                        style = "padding-left: 0px;",
+                        actionButton("analysisFilesAdd", label = NULL, icon = icon("plus"))
+                    ),
+                    column(
+                        width = 2,
+                        style = "padding-right: 0px;",
+                        htmltools::tagAppendAttributes(
+                            selectInput("analysisFilesChangeType", NULL, c("centroid", "profile", "ims"),
+                                        selectize = FALSE, width = "100%"),
+                            style = "margin-bottom: 0px;")
+                    ),
+                    column(
+                        width = 1,
+                        style = "padding-left: 0px;",
+                        shinyjs::disabled(actionButton("analysisFilesChange", label = NULL, icon = icon("pen-to-square")))
+                    ),
+                    column(
+                        width = 1,
+                        shinyjs::disabled(actionButton("analysisFilesRemove", label = NULL, icon = icon("trash")))
+                    ),
+                    modalButton("Cancel"),
+                    actionButton("analysisFilesOK", "OK")
+                )
+            ))
         })
-
+        
+        observeEvent(input$analysisFilesHot_select$select$r, {
+            if (nrow(rValues$analysisFiles) > 0 && length(input$analysisFilesHot_select$select$rAll) > 0)
+            {
+                sel <- input$analysisFilesHot_select$select$rAll
+                rawSelected <- "raw" %in% rValues$analysisFiles[sel, "type"]
+                shinyjs::toggleState("analysisFilesChangeType", condition = !rawSelected)
+                shinyjs::toggleState("analysisFilesChange", condition = !rawSelected)
+                
+                # Disallow IMS selection for mzXML files (not supported by format)
+                mzXMLSelected <- "mzxml" %in% tolower(tools::file_ext(rValues$analysisFiles[sel ,"path"]))
+                ch <- c("centroid", "profile", if (!mzXMLSelected) "ims")
+                s <- rValues$analysisFiles[sel ,"type"]
+                if (uniqueN(s) > 1)
+                    s <- ch[1] # just default to first choice if selection isn't homogenous
+                updateSelectInput(session, "analysisFilesChangeType", selected = s, choices = ch)
+                
+                shinyjs::toggleState("analysisFilesRemove", condition = TRUE)
+            }
+            else
+            {
+                shinyjs::toggleState("analysisFilesChange", condition = FALSE)
+                shinyjs::toggleState("analysisFilesRemove", condition = FALSE)
+            }
+        })
+        
+        observeEvent(input$analysisFilesAdd, {
+            anaDir <- rstudioapi::selectDirectory(path = "~/")
+            if (!is.null(anaDir))
+            {
+                files <- listMSFiles(anaDir, getMSFileFormats(input$analysisFilesAddType))
+                rValues$analysisFiles <- data.frame(analysis = tools::file_path_sans_ext(basename(files)),
+                                                    type = if (length(files) > 0) input$analysisFilesAddType else character(),
+                                                    path = files)
+            }
+        })
+        
+        observeEvent(input$analysisFilesChange, {
+            sel <- input$analysisFilesHot_select$select$rAll
+            rValues$analysisFiles$type[sel] <- input$analysisFilesChangeType
+        })
+        
+        observeEvent(input$analysisFilesRemove, {
+            sel <- input$analysisFilesHot_select$select$rAll
+            rValues$analysisFiles <- rValues$analysisFiles[-sel, ]
+        })
+        
+        observeEvent(input$analysisFilesOK, {
+            removeModal()
+            print(rhandsontable::hot_to_r(input$analysisFilesHot))
+        })
+        
         observeEvent(input$addAnalysesCSV, {
             csvFile <- rstudioapi::selectFile(path = "~/", filter = "csv files (*.csv)")
             if (!is.null(csvFile))
@@ -1589,6 +1702,7 @@ newProject <- function(destPath = NULL)
         observeEvent(input$ISTDListButtonNeg, selectSuspList("ISTDListNeg"))
         
         output$analysesHot <- rhandsontable::renderRHandsontable(makeAnalysesHot("analyses"))
+        output$analysisFilesHot <- rhandsontable::renderRHandsontable(makeAnalysisFilesHot("analysisFiles"))
         output$analysesHotPos <- rhandsontable::renderRHandsontable(makeAnalysesHot("analysesPos"))
         output$analysesHotNeg <- rhandsontable::renderRHandsontable(makeAnalysesHot("analysesNeg"))
         

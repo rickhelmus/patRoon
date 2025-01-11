@@ -1571,6 +1571,7 @@ newProject <- function(destPath = NULL)
                     column(
                         width = 1,
                         style = "padding-left: 0px;",
+                        title = "Add all analysis files with the selected type within a directory",
                         actionButton("analysisFilesAdd", label = NULL, icon = icon("plus"))
                     ),
                     column(
@@ -1584,6 +1585,7 @@ newProject <- function(destPath = NULL)
                     column(
                         width = 1,
                         style = "padding-left: 0px;",
+                        title = "Change type of selected analysis files",
                         shinyjs::disabled(actionButton("analysisFilesChange", label = NULL, icon = icon("pen-to-square")))
                     ),
                     column(

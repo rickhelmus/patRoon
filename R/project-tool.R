@@ -243,11 +243,11 @@ getScriptCode <- function(input, analyses)
     addNL()
     
     if (input$ionization != "both")
-        addAnaInfo("anaInfo", analyses, input$analysisTableFile, TRUE, input$ionization)
+        addAnaInfo("anaInfo", analyses[[input$ionization]], input$analysisTableFile, TRUE, input$ionization)
     else
     {
-        addAnaInfo("anaInfoPos", analyses$pos, input$analysisTableFilePos, TRUE, "positive")
-        addAnaInfo("anaInfoNeg", analyses$neg, input$analysisTableFileNeg, FALSE, "negative")
+        addAnaInfo("anaInfoPos", analyses$positive, input$analysisTableFilePos, TRUE, "positive")
+        addAnaInfo("anaInfoNeg", analyses$negative, input$analysisTableFileNeg, FALSE, "negative")
     }
     
     if (nzchar(input$convAlgo) || nzchar(input$DAMethod) || input$doDACalib)
@@ -866,18 +866,7 @@ getNewProjectUI <- function(destPath)
                         conditionalPanel(
                             condition = "input.generateAnaInfo == \"table\" || input.generateAnaInfo == \"script\"",
                             flex = NA,
-                            conditionalPanel(
-                                condition = "input.ionization != \"both\"",
-                                rhandsontable::rHandsontableOutput("analysesHot")
-                            ),
-                            conditionalPanel(
-                                condition = "input.ionization == \"both\" && input.currentSet == \"positive\"",
-                                rhandsontable::rHandsontableOutput("analysesHotPos")
-                            ),
-                            conditionalPanel(
-                                condition = "input.ionization == \"both\" && input.currentSet == \"negative\"",
-                                rhandsontable::rHandsontableOutput("analysesHotNeg")
-                            )
+                            rhandsontable::rHandsontableOutput("analysesHot")
                         )
                     )
                 ),
@@ -1355,16 +1344,18 @@ newProject <- function(destPath = NULL)
         return(ai)
     }
     
+    anaInfoTabs <- list(positive = emptyAnaTable(), negative = emptyAnaTable())
+    
     server <- function(input, output, session)
     {
-        rValues <- reactiveValues(analyses = emptyAnaTable(),
-                                  analysisFiles = data.table(analysis = character(), type = character(), path = character()),
-                                  analysesPos = emptyAnaTable(),
-                                  analysesNeg = emptyAnaTable())
+        rValues <- reactiveValues(triggerAnaInfoHotUpdate = 0,
+                                  analysisFiles = data.table(analysis = character(), type = character(), path = character()))
 
-        makeAnalysesHot <- function(rvName)
+        makeAnalysesHot <- function()
         {
-            dt <- copy(rValues[[rvName]])
+            rValues$triggerAnaInfoHotUpdate
+            
+            dt <- copy(anaInfoTabs[[getCurPolarity()]])
             pcols <- getAnaInfoPathCols(dt)
             dt[, type := {
                 p <- unlist(mget(pcols))
@@ -1372,7 +1363,7 @@ newProject <- function(destPath = NULL)
             }, by = .I]
             dt[, (pcols) := NULL]
             hot <- do.call(rhandsontable::rhandsontable,
-                           c(list(dt, height = 250, maxRows = nrow(dt), columnSorting = FALSE),
+                           c(list(dt, height = 250, maxRows = nrow(dt), columnSorting = FALSE, manualRowMove = TRUE),
                              hotOpts)) %>%
                 rhandsontable::hot_col(c("group", "blank"), readOnly = FALSE, type = "text") %>%
                 rhandsontable::hot_col(c("conc", "norm_conc"), readOnly = FALSE, type = "numeric") %>%
@@ -1380,47 +1371,34 @@ newProject <- function(destPath = NULL)
             
             return(hot)
         }
-        makeAnalysisFilesHot <- function(rvName)
+        triggerAnaInfoHotUpdate <- function() rValues$triggerAnaInfoHotUpdate <- rValues$triggerAnaInfoHotUpdate + 1
+        makeAnalysisFilesHot <- function()
         {
             hot <- do.call(rhandsontable::rhandsontable,
-                           c(list(rValues[[rvName]], height = 300, maxRows = nrow(rValues[[rvName]]),
+                           c(list(rValues$analysisFiles, height = 300, maxRows = nrow(rValues$analysisFiles),
                                   rowHeaders = NULL),
                              hotOpts))
             return(hot)
         }
-        getCurAnaHotName <- function()
+        getCurPolarity <- function()
         {
-            if (input$ionization != "both")
-                return("analysesHot")
-            else if (input$currentSet == "positive")
-                return("analysesHotPos")
-            return("analysesHotNeg")
-        }
-        getCurAnaRVName <- function()
-        {
-            if (input$ionization != "both")
-                return("analyses")
-            else if (input$currentSet == "positive")
-                return("analysesPos")
-            return("analysesNeg")
+            if (input$ionization == "positive" || (input$ionization == "both" && input$currentSet == "positive"))
+                return("positive")
+            return("negative")
         }
         verifyAnalysesOK <- function()
         {
-            noAnas <- input$ionization != "both" && nrow(rValues$analyses) == 0
-            noAnasPos <- input$ionization == "both" && nrow(rValues$analysesPos) == 0
-            noAnasNeg <- input$ionization == "both" && nrow(rValues$analysesNeg) == 0
-            
-            if (noAnas || noAnasPos || noAnasNeg)
+            verifyAny <- function(pol)
             {
-                msg <- "Please select some analyses"
-                if (noAnasPos && !noAnasNeg)
-                    msg <- paste(msg, "for positive mode")
-                else if (!noAnasPos && noAnasNeg)
-                    msg <- paste(msg, "for negative mode")
-                rstudioapi::showDialog("No analyses selected", paste0(msg, "!"), "")
-                return(FALSE)
+                if (nrow(anaInfoTabs[[pol]]) == 0 && input$ionization %in% c(pol, "both"))
+                {
+                    rstudioapi::showDialog("No analyses", paste0("Please select some analyses for ", pol, " mode!"), "")
+                    return(FALSE)
+                }
             }
             
+            verifyAny("positive"); verifyAny("negative")
+
             if (input$generateAnaInfo == "table")
             {
                 checkAnas <- if (input$ionization != "both")
@@ -1507,9 +1485,7 @@ newProject <- function(destPath = NULL)
                 rstudioapi::showDialog("No legacy format", "Please select at least one legacy reporting format!", "")
             else
             {
-                anas <- if (input$ionization != "both") rValues$analyses else list(pos = rValues$analysesPos,
-                                                                                   neg = rValues$analysesNeg)
-                doCreateProject(input, anas)
+                doCreateProject(input, anaInfoTabs)
                 stopApp(TRUE)
             }
         })
@@ -1532,25 +1508,32 @@ newProject <- function(destPath = NULL)
                 saveNewProjectParams(sl, input)
         })
         
-        doObserveAnaHot <- function(name, rvName)
-        {
+        observeEvent(input$analysesHot, {
             # HACK: maxRows: make sure we don't have empty table as hot_to_r errors otherwise
-            if (!is.null(input[[name]]) && input[[name]]$params$maxRows > 0)
+            if (!is.null(input$analysesHot) && input$analysesHot$params$maxRows > 0)
             {
-                df <- rhandsontable::hot_to_r(input[[name]])
-                rValues[[rvName]][, c("exclude", "group", "blank", "conc", "norm_conc") := .(df$exclude, df$group, df$blank, df$conc, df$norm_conc)]
+                # sync from table edits, which is currently limited to moving rows and setting metadata (groups, blanks etc)
+                dt <- rhandsontable::hot_to_r(input$analysesHot)
+
+                pol <- getCurPolarity()
+                ai <- anaInfoTabs[[pol]]
+                
+                ai <- ai[match(dt$analysis, analysis)] # sync order
+                
+                # update metadata
+                mcols <- c("group", "blank", "conc", "norm_conc")
+                ai[, (mcols) := dt[, mcols, with = FALSE]]
+                
+                anaInfoTabs[[pol]] <<- ai
             }
-        }
-        observeEvent(input$analysesHot, doObserveAnaHot("analysesHot", "analyses"))
-        observeEvent(input$analysesHotPos, doObserveAnaHot("analysesHotPos", "analysesPos"))
-        observeEvent(input$analysesHotNeg, doObserveAnaHot("analysesHotNeg", "analysesNeg"))
+        })
         
         observeEvent(input$addAnalysesDir, {
-            rvName <- getCurAnaRVName()
-            rValues$analysisFiles <- if (nrow(rValues[[rvName]]) == 0)
+            pol <- getCurPolarity()
+            rValues$analysisFiles <- if (nrow(anaInfoTabs[[pol]]) == 0)
                 rValues$analysisFiles[0, ]
             else
-                anaInfoToAnaFiles(rValues[[rvName]])
+                anaInfoToAnaFiles(anaInfoTabs[[pol]])
             
             showModal(modalDialog(
                 title = "Select analyses",
@@ -1647,25 +1630,25 @@ newProject <- function(destPath = NULL)
         
         observeEvent(input$analysisFilesOK, {
             removeModal()
-            rvName <- getCurAnaRVName()
+            pol <- getCurPolarity()
             if (nrow(rValues$analysisFiles) > 0)
             {
                 ai <- anaFilesToAnaInfo(rValues$analysisFiles)
-                aiOv <- ai[analysis %in% rValues[[rvName]]$analysis]
-                aiNew <- ai[!analysis %in% rValues[[rvName]]$analysis]
+                aiOv <- ai[analysis %in% anaInfoTabs[[pol]]$analysis]
+                aiNew <- ai[!analysis %in% anaInfoTabs[[pol]]$analysis]
                 
                 if (nrow(aiOv) > 0)
                 {
-                    pcols <- getAnaInfoPathCols(rValues[[rvName]])
-                    temp <- copy(rValues[[rvName]]) # HACK: take a copy so that Shiny registers change due to DT merge
-                    temp[aiOv, (pcols) := mget(paste0("i.", pcols)), on = "analysis"]
-                    rValues[[rvName]] <- temp
+                    pcols <- getAnaInfoPathCols(anaInfoTabs[[pol]])
+                    anaInfoTabs[[pol]][aiOv, (pcols) := mget(paste0("i.", pcols)), on = "analysis"]
                 }
                 if (nrow(aiNew) > 0)
-                    rValues[[rvName]] <- rbind(rValues[[rvName]], aiNew, fill = TRUE)
+                    anaInfoTabs[[pol]] <<- rbind(anaInfoTabs[[pol]], aiNew, fill = TRUE)
             }
             else
-                rValues[[rvName]] <- rValues[[rvName]][0]
+                anaInfoTabs[[pol]] <<- anaInfoTabs[[pol]][0]
+            
+            triggerAnaInfoHotUpdate()
         })
         
         observeEvent(input$addAnalysesCSV, {
@@ -1697,8 +1680,10 @@ newProject <- function(destPath = NULL)
                     csvTab[, format := formats]
                     csvTab <- csvTab[nzchar(format)] # prune unknown files (might have been removed?)
                     
-                    rvName <- getCurAnaRVName()
-                    rValues[[rvName]] <- rbind(rValues[[rvName]], csvTab, fill = TRUE)
+                    pol <- getCurPolarity()
+                    # UNDONE: merge/overwrite duplicates
+                    anaInfoTabs[[pol]] <<- rbind(anaInfoTabs[[pol]], csvTab, fill = TRUE)
+                    triggerAnaInfoHotUpdate()
                 }
             }
         })
@@ -1734,10 +1719,8 @@ newProject <- function(destPath = NULL)
         observeEvent(input$ISTDListButtonPos, selectSuspList("ISTDListPos"))
         observeEvent(input$ISTDListButtonNeg, selectSuspList("ISTDListNeg"))
         
-        output$analysesHot <- rhandsontable::renderRHandsontable(makeAnalysesHot("analyses"))
-        output$analysisFilesHot <- rhandsontable::renderRHandsontable(makeAnalysisFilesHot("analysisFiles"))
-        output$analysesHotPos <- rhandsontable::renderRHandsontable(makeAnalysesHot("analysesPos"))
-        output$analysesHotNeg <- rhandsontable::renderRHandsontable(makeAnalysesHot("analysesNeg"))
+        output$analysesHot <- rhandsontable::renderRHandsontable(makeAnalysesHot())
+        output$analysisFilesHot <- rhandsontable::renderRHandsontable(makeAnalysisFilesHot())
         
         observeEvent(input$featGrouper, {
             if (input$ionization == "both" && input$featGrouper == "SIRIUS")

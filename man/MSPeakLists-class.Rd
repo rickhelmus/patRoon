@@ -117,7 +117,7 @@ spectrumSimilarity(obj, ...)
 
 \S4method{as.data.table}{MSPeakListsSet}(x, fGroups = NULL, averaged = TRUE)
 
-\S4method{delete}{MSPeakListsSet}(obj, ...)
+\S4method{delete}{MSPeakListsSet}(obj, i = NULL, j = NULL, k = NULL, reAverage = FALSE, ...)
 
 \S4method{filter}{MSPeakListsSet}(
   obj,

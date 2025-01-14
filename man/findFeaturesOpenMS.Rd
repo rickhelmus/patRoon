@@ -46,7 +46,7 @@ findFeaturesOpenMS(
 stage. Sets \code{algorithm:mtd:reestimate_mt_sd}.}
 
 \item{traceTermCriterion, traceTermOutliers, minSampleRate}{Termination criterion for the extension of mass traces. See
-\href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureFinderMetabo.html}{FeatureFinderMetabo}.
+\href{https://abibuilder.cs.uni-tuebingen.de/archive/openms/Documentation/nightly/html/TOPP_FeatureFinderMetabo.html}{FeatureFinderMetabo}.
  Sets the \code{algorithm:mtd:trace_termination_criterion}, \code{algorithm:mtd:trace_termination_outliers} and
 \code{algorithm:mtd:min_sample_rate} options, respectively.}
 
@@ -55,7 +55,7 @@ to disable maximum. Sets \code{algorithm:mtd:min_trace_length} and \code{algorit
 respectively.}
 
 \item{widthFiltering, minFWHM, maxFWHM}{Enable filtering of unlikely peak widths. See
-\href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureFinderMetabo.html}{FeatureFinderMetabo}.
+\href{https://abibuilder.cs.uni-tuebingen.de/archive/openms/Documentation/nightly/html/TOPP_FeatureFinderMetabo.html}{FeatureFinderMetabo}.
  Sets \code{algorithm:epd:width_filtering}, \code{algorithm:epd:min_fwhm} and \code{algorithm:epd:max_fwhm},
 respectively.}
 
@@ -66,11 +66,11 @@ respectively.}
 \code{algorithm:ffm:local_rt_range} and \code{algorithm:ffm:local_mz_range} options, respectively.}
 
 \item{isotopeFilteringModel}{Remove/score candidate assemblies based on isotope intensities. See
-\href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureFinderMetabo.html}{FeatureFinderMetabo}.
+\href{https://abibuilder.cs.uni-tuebingen.de/archive/openms/Documentation/nightly/html/TOPP_FeatureFinderMetabo.html}{FeatureFinderMetabo}.
  Sets the \code{algorithm:ffm:isotope_filtering_model} option.}
 
 \item{MZScoring13C}{Use the 13C isotope as the expected shift for isotope mass traces. See
-\href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureFinderMetabo.html}{FeatureFinderMetabo}.
+\href{https://abibuilder.cs.uni-tuebingen.de/archive/openms/Documentation/nightly/html/TOPP_FeatureFinderMetabo.html}{FeatureFinderMetabo}.
  Sets \code{algorithm:ffm:mz_scoring_13C}.}
 
 \item{useSmoothedInts}{If \code{TRUE} then use LOWESS intensities instead of raw intensities. Sets the
@@ -97,7 +97,7 @@ An object of a class which is derived from \code{\link{features}}.
 }
 \description{
 uses the
-\href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureFinderMetabo.html}{FeatureFinderMetabo}
+\href{https://abibuilder.cs.uni-tuebingen.de/archive/openms/Documentation/nightly/html/TOPP_FeatureFinderMetabo.html}{FeatureFinderMetabo}
 TOPP tool (see \url{http://www.openms.de}) to find features.
 }
 \details{

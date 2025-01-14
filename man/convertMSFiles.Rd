@@ -64,7 +64,7 @@ directly passed to the \code{--filter} option (see
 \item{extraOpts}{A \code{character} vector specifying any extra commandline
 parameters passed to \command{msConvert} or \command{FileConverter}. Set to
 \code{NULL} to ignore. For options: see
-\href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FileConverter.html}{FileConverter}
+\href{https://abibuilder.cs.uni-tuebingen.de/archive/openms/Documentation/nightly/html/TOPP_FileConverter.html}{FileConverter}
  and
 \href{http://proteowizard.sourceforge.net/tools/msconvert.html}{msConvert}.}
 

@@ -16,7 +16,7 @@ setMethod("initialize", "componentsOpenMS",
 #' Componentization of adducts, isotopes etc. with OpenMS
 #'
 #' Uses the
-#' \href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/UTILS_MetaboliteAdductDecharger.html}{MetaboliteAdductDecharger}
+#' \href{https://abibuilder.cs.uni-tuebingen.de/archive/openms/Documentation/nightly/html/TOPP_MetaboliteAdductDecharger.html}{MetaboliteAdductDecharger}
 #' utility (see \url{http://www.openms.de}) to generate components.
 #'
 #' @templateVar algo OpenMS
@@ -42,7 +42,7 @@ setMethod("initialize", "componentsOpenMS",
 #'   \code{chargeMin}/\code{chargeMax} arguments (and \emph{not} with \code{potentialAdducts}), \emph{e.g.} if
 #'   \code{chargeMax=2} then both \code{[M+H]+} and \code{[2M+H]2+} may be considered. Please see the
 #'   \command{algorithm:MetaboliteFeatureDeconvolution:potential_adducts} option of
-#'   \href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/UTILS_MetaboliteAdductDecharger.html}{MetaboliteAdductDecharger}
+#'   \href{https://abibuilder.cs.uni-tuebingen.de/archive/openms/Documentation/nightly/html/TOPP_MetaboliteAdductDecharger.html}{MetaboliteAdductDecharger}
 #'    for more details. If \code{NULL} then the a default is chosen with \code{\link{defaultOpenMSAdducts}} (which is
 #'   \emph{not} the same as \command{OpenMS}).
 #'

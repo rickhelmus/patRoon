@@ -60,11 +60,11 @@ This function uses OpenMS to group features. This function is called when callin
   \code{algorithm="openms"}.
 
 Retention times may be aligned by the
-  \href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_MapAlignerPoseClustering.html}{MapAlignerPoseClustering}
+  \href{https://abibuilder.cs.uni-tuebingen.de/archive/openms/Documentation/nightly/html/TOPP_MapAlignerPoseClustering.html}{MapAlignerPoseClustering}
    TOPP tool. Grouping is achieved by either the
-  \href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureLinkerUnlabeled.html}{FeatureLinkerUnlabeled}
+  \href{https://abibuilder.cs.uni-tuebingen.de/archive/openms/Documentation/nightly/html/TOPP_FeatureLinkerUnlabeled.html}{FeatureLinkerUnlabeled}
    or
-  \href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureLinkerUnlabeledQT.html}{FeatureLinkerUnlabeledQT}
+  \href{https://abibuilder.cs.uni-tuebingen.de/archive/openms/Documentation/nightly/html/TOPP_FeatureLinkerUnlabeledQT.html}{FeatureLinkerUnlabeledQT}
    TOPP tools.
 }
 \references{

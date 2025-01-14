@@ -38,9 +38,9 @@
 [data.table]: https://github.com/Rdatatable/data.table/wiki
 [sqlite]: https://www.sqlite.org/index.html
 [msconvert]: http://proteowizard.sourceforge.net/tools/msconvert.html
-[FeatureFinderMetabo]: https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureFinderMetabo.html
-[FeatureLinkerUnlabeled]: https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureLinkerUnlabeled.html
-[MapAlignerPoseClustering]: https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_MapAlignerPoseClustering.html
+[FeatureFinderMetabo]: https://abibuilder.cs.uni-tuebingen.de/archive/openms/Documentation/nightly/html/TOPP_FeatureFinderMetabo.html
+[FeatureLinkerUnlabeled]: https://abibuilder.cs.uni-tuebingen.de/archive/openms/Documentation/nightly/html/TOPP_FeatureLinkerUnlabeled.html
+[MapAlignerPoseClustering]: https://abibuilder.cs.uni-tuebingen.de/archive/openms/Documentation/nightly/html/TOPP_MapAlignerPoseClustering.html
 [UpSet]: https://caleydo.org/tools/upset/
 [tutorial]: https://rickhelmus.github.io/patRoon/articles/tutorial.html
 [reference]: https://rickhelmus.github.io/patRoon/reference/index.html
@@ -60,7 +60,7 @@
 [processx]: https://github.com/r-lib/processx
 [progressr]: https://github.com/HenrikBengtsson/progressr
 [cliqueMS]: https://github.com/osenan/cliqueMS
-[MetaboliteAdductDecharger]: https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/UTILS_MetaboliteAdductDecharger.html
+[MetaboliteAdductDecharger]: https://abibuilder.cs.uni-tuebingen.de/archive/openms/Documentation/nightly/html/TOPP_MetaboliteAdductDecharger.html
 [BioTransformer]: https://bitbucket.org/djoumbou/biotransformer/src/master/
 [CTS]: https://qed.epa.gov/cts/
 [KPIC2]: https://github.com/hcji/KPIC2

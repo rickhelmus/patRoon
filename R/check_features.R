@@ -264,16 +264,8 @@ checkFeaturesInterface$methods(
         
         ep <- getDefEICParams(topMost = if (rValues$fGroupPlotMode == "all") NULL else 1,
                               topMostByRGroup = rValues$fGroupPlotMode == "topMostByRGroup")
-        tbl <- rhandsontable::hot_to_r(input$primaryHot)
-        tblRow <- match(rValues$currentPrimSel, tbl[[1]])
-
-        if (!is.na(tblRow))
-            keep <- tbl[tblRow, ]$keep
-        else
-            keep <- 1
-
-        bg = c(RColorBrewer::brewer.pal(9, "Reds")[[1]], "white")[[keep+1]]
-
+        
+        bg <- if (rValues$currentPrimSel %in% rValues$removeFully) RColorBrewer::brewer.pal(9, "Reds")[[1]] else "white"
         withr::with_par(list(mar = c(4, 4, 0.1, 1), cex = 1.5, bg = bg), {
             plotChroms(fg, EICs = EICs, colourBy = "rGroups", showPeakArea = TRUE, EICParams = ep,
                        showFGroupRect = FALSE, title = "", retMin = rValues$settings$retUnit == "min")

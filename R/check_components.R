@@ -118,7 +118,8 @@ checkComponentsInterface$methods(
         rp <- rValues$removePartially[[rValues$currentPrimSel]]
         cmp <- if (!is.null(rp)) delete(components, j = rp) else components
         
-        withr::with_par(list(mar = c(4, 4, 0.1, 1), cex = 1.5), {
+        bg <- if (rValues$currentPrimSel %in% rValues$removeFully) RColorBrewer::brewer.pal(9, "Reds")[[1]] else "white"
+        withr::with_par(list(mar = c(4, 4, 0.1, 1), cex = 1.5, bg = bg), {
             if (!rValues$currentPrimSel %in% names(cmp))
             {
                 # may happen if all fGroups are disabled

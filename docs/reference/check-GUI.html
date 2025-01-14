@@ -194,6 +194,11 @@ function will stop with an error message.</p></dd>
 <code>NULL</code>, the example model of the <span class="pkg">MetaCleanData</span> package is used.</p></dd>
 
 </dl></div>
+    <div id="value">
+    <h2>Value</h2>
+    <p>A dataframe with the class predictions as well as the associated probabilities for each EIC as returned by the <code><a href="https://rdrr.io/pkg/MetaClean/man/getPredicitons.html" class="external-link">MetaClean::getPredicitons</a></code> function.
+  The dataframe has the four columns: EIC, Pred_Class, Pred_Prob_Pass, Pred_Prob_Fail.</p>
+    </div>
     <div id="details">
     <h2>Details</h2>
     <p>The data selected for removal is stored in <em>sessions</em>. These are <code class="file">YAML</code> files to allow easy external

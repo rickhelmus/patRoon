@@ -82,6 +82,10 @@ function will stop with an error message.}
 \item{model}{The model that was created with \pkg{MetaClean} and that should be used to predict pass/fail data. If
 \code{NULL}, the example model of the \pkg{MetaCleanData} package is used.}
 }
+\value{
+A dataframe with the class predictions as well as the associated probabilities for each EIC as returned by the \code{MetaClean::getPredicitons} function. 
+  The dataframe has the four columns: EIC, Pred_Class, Pred_Prob_Pass, Pred_Prob_Fail.
+}
 \description{
 These functions provide interactive utilities to explore and review workflow data using a \pkg{\link{shiny}}
 graphical user interface (GUI). In addition, unsatisfactory data (\emph{e.g.} noise identified as a feature and

@@ -152,6 +152,13 @@ sanitizeMSLibrary <- function(lib, prefCalcChemProps, neutralChemProps, potAdduc
                     }))]
     }
     
+    printf("Guessing missing ionization modes... ")
+    lib$records[(is.na(Ion_mode) | !nzchar(Ion_mode)) & !is.na(Precursor_type), Ion_mode := {
+        add <- tryCatch(as.adduct(Precursor_type[1]), error = function(...) NULL)
+        if (is.null(add)) NA_character_ else if (add@charge > 0) "POSITIVE" else "NEGATIVE"
+    }, by = "Precursor_type"]
+    printf("Done!\n")
+    
     printf("Calculating missing precursor m/z values...\n")
     lib$records[is.na(PrecursorMZ) & !is.na(neutralMass) & !is.na(Precursor_type),
                 PrecursorMZ := withProg(.N, FALSE, mapply(neutralMass, Precursor_type, FUN = function(em, pt)

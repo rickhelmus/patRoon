@@ -240,6 +240,7 @@ Collate:
     'features-optimize-openms.R'
     'features-optimize-xcms.R'
     'features-optimize-xcms3.R'
+    'features-qalgorithms.R'
     'features-safd.R'
     'features-sirius.R'
     'features-tasq.R'

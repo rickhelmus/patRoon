@@ -132,6 +132,11 @@ getExtDepPath <- function(what, subTool = NULL, verify = TRUE)
         biotransformer = list(
             name = "BioTransformer",
             opt = "BioTransformer"
+        ),
+        qalgorithms = list(
+            name = "qAlgorithms", # add to expDepPkg also?
+            bin = "qAlgorithms",
+            opt = "qAlgorithms"
         )
     )
     

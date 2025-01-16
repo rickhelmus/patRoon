@@ -270,6 +270,29 @@ setMethod("estimateIDLevels", "compoundsSet", function(obj, absMzDev = 0.005, fo
     return(obj)
 })
 
+#' @export
+setMethod("assignMobilities", "compoundsSet", function(obj, fGroups, IMS = TRUE, from = NULL, ...)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(fGroups, "featureGroupsSet", add = ac)
+    assertIMSArg(IMS, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (!checkmate::testList(from))
+        from <- rep(list(from), length(sets(obj)))
+    else if (length(from) != sets(obj))
+    {
+        stop("If 'from' is a list its length should be equal to the number of sets in the compounds object.",
+             call. = FALSE)
+    }
+    
+    obj@setObjects <- Map(setObjects(obj), from = from, f = assignMobilities,
+                          MoreArgs = list(fGroups = fGroups, IMS = IMS, ...))
+    obj <- updateSetConsensus(obj)
+    return(obj)
+})
+
+
 #' @rdname compounds-class
 #' @export
 setMethod("consensus", "compoundsSet", function(obj, ..., MSPeakLists,

@@ -343,7 +343,7 @@
             - don't do N-1 for orphaned
             - removes all parent-less or IMS parent fGroups? fine? if so, doc
     - compounds method
-        - handle sets
+        - handle IMS data already present in DB
     - doc the use for fromSuspects, eg
         - doesn't rely on mobility peak detection, so might be less prone to false negatives with eg low intensities
         - scenario 1: we know the mobility very well, eg from a database --> use a narrow IMSWindow

@@ -512,7 +512,6 @@ setMethod("unset", "featureGroupsSet", function(obj, set)
     if (nrow(tox) > 0)
         tox <- tox[, -"sets"]
     
-    
     return(featureGroupsUnset(groups = copy(groupTable(obj)), groupInfo = gInfo,
                               features = unset(getFeatures(obj), set), ftindex = copy(groupFeatIndex(obj)),
                               groupQualities = copy(groupQualities(obj)), groupScores = copy(groupScores(obj)),

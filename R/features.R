@@ -72,7 +72,8 @@ setMethod("initialize", "features", function(.Object, ...)
     args <- list(...)
     .Object <- callNextMethod(.Object, ...)
     .Object@features <- makeEmptyListNamed(.Object@features)
-    .Object@hasMobilities <- FALSE
+    if (length(.Object@hasMobilities) == 0)
+        .Object@hasMobilities <- FALSE # initialize
     return(.Object)
 })
 

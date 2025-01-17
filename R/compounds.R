@@ -733,11 +733,12 @@ setMethod("assignMobilities", "compounds", function(obj, fGroups, IMS = TRUE, fr
         fGroups <- selectIMSFilter(fGroups, IMS, verbose = FALSE)
     
     gInfo <- groupInfo(fGroups)
-    
+
     # HACK: mimic a 'suspect list' from all annotation results (allTab) so we can use the DT method
     allTab <- as.data.table(obj)[group %chin% names(fGroups)]
+    allTab <- subsetDTColumnsIfPresent(allTab, c("group", "SMILES", "InChI", "InChIKey", "InChIKey1", "UID"))
     
-    # temporarily add some columns for so that the DT method can do its calculations
+    # add some columns for so that the DT method can do its calculations
     allTab[, mz := gInfo$mz[match(group, gInfo$group)]]
     annFG <- annotations(fGroups)
     if (nrow(annFG) > 0)
@@ -748,28 +749,28 @@ setMethod("assignMobilities", "compounds", function(obj, fGroups, IMS = TRUE, fr
                                prefCalcChemProps = prefCalcChemProps, neutralChemProps = neutralChemProps,
                                virtualenv = virtualenv)
     
-    allTab <- removeDTColumnsIfPresent(allTab, c("mz", "adduct"))
-    
     if (is.null(allTab[["mobility"]]))
         allTab[, mobility := NA_real_]
     if (is.null(allTab[["CCS"]]))
         allTab[, CCS := NA_real_]
     
-    # copy the right mobility and CCS columns and discard others
+    # copy the right mobility and CCS columns
     adductDefChr <- if (!is.null(adductDef)) as.character(adductDef)
     allTab[, mobility := selectFromSuspAdductCol(allTab, "mobility", annotations(fGroups), adductDefChr)]
     allTab[, CCS := selectFromSuspAdductCol(allTab, "CCS", annotations(fGroups), adductDefChr)]
     
-    # omit adduct specific cols in final results
-    rmCols <- grep("^(mobility|CCS)_", names(allTab), value = TRUE)
-    if (length(rmCols) > 0)
-        set(allTab, j = rmCols, value = NULL)
-    
     if (hasMobilities(fGroups))
         allTab <- assignTabIMSDeviations(allTab, gInfo)
 
-    ga <- split(allTab, by = "group")
-    obj@groupAnnotations[names(ga)] <- ga
+    allTabList <- split(allTab, by = "group")
+    obj@groupAnnotations[names(allTabList)] <- Map(obj@groupAnnotations[names(allTabList)], allTabList, f = function(cTab, IMTab)
+    {
+        IMTab <- IMTab[match(cTab$UID, UID)]
+        IMTab <- subsetDTColumnsIfPresent(IMTab, c("mobility", "CCS", "d_mob", "d_mob_rel", "d_CCS", "d_CCS_rel"))
+        cTab <- copy(cTab)
+        cTab[, (names(IMTab)) := IMTab]
+        return(cTab)
+    })
     
     return(obj)
 })

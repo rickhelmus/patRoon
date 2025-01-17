@@ -47,9 +47,12 @@ makeFeatAnnSetConsensus <- function(setObjects, origFGNames, setThreshold, setTh
             ct[, c("set", "setsCount", "setsMergedCount", rname) := .(s, 1, 1, seq_len(.N))]
             
             # rename cols that are specific to a set or algo consensus or should otherwise not be combined
+            # NOTE: the IMS columns don't have to be included here for IMS fGroups (these do not occur 1 >1 set), but
+            # should be for non-IMS fGroups are only included
             cols <- getMergedConsCols(c(
                 "fragInfo", "rank", "mergedBy", "coverage", "explainedPeaks", "ion_formula", "ion_formula_mz", "precursorType",
-                "libPeaksCompared", "libPeaksTotal", "annSim", "estIDLevel"
+                "libPeaksCompared", "libPeaksTotal", "annSim", "estIDLevel", "mobility", "CCS", "d_mob", "d_mob_rel",
+                "d_CCS", "d_CCS_rel"
             ), names(ct), mConsNames)
             if (!setAvgSpecificScores)
                 cols <- c(cols, getMergedConsCols(featAnnSetSpecificScoreCols(), names(ct), mConsNames))

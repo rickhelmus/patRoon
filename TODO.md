@@ -374,6 +374,7 @@
 - reporting
     - comps-clust: don't have imgs double in reportPlots
     - handle mobility columns for suspects and compounds
+- skip IMS fGroups annotation with high MS/MS similarity
 - CCS
     - convertMobilityToCCS() / convertCCSToMobility()
         - handle Waters data?
@@ -406,6 +407,8 @@
             - doc how charge is taken and adducts are used
             - compounds: mobility etc assumed to be specific per set (due to different adducts and m/z values), but equal for consensus() (structure should be the same)
             - DT: adducts arg can be character() if adduct column is present
+            - matchFromBy == "InChIKey1" will automatically calculate IK1 if missing, and DT method keeps it in output
+            - matchFromBy == "InChIKey" is not supported by SIRIUS
     - ISTDs
         - doc that mobility features are completely ignored for normalization, and relative intensities/areas are copied from parents
     - plotChroms()/plotMobilograms()

@@ -881,7 +881,7 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
         checkmate::checkNull(from),
         .var.name = "from", add = ac
     )
-    checkmate::assertChoice(matchFromBy, c("InChIKey", "InChI", "SMILES", "name"), add = ac)
+    checkmate::assertChoice(matchFromBy, c("InChIKey", "InChIKey1", "InChI", "SMILES", "name"), add = ac)
     aapply(checkmate::assertFlag, . ~ overwrite + predictAdductOnly + prepareChemProps + prefCalcChemProps +
                neutralChemProps, fixed = list(add = ac))
     checkmate::assertCharacter(adducts, min.chars = 1, any.missing = FALSE, add = ac)
@@ -936,6 +936,9 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
     
     if (!is.null(from))
     {
+        if (matchFromBy == "InChIKey1" && is.null(obj[["InChIKey1"]]) && !is.null(obj[["InChIKey"]]))
+            obj[, InChIKey1 := getInChIKey1(InChIKey)]
+        
         if (is.null(obj[[matchFromBy]]))
             stop(sprintf("Column '%s' not found to match input data.", matchFromBy), call. = FALSE)
         if (anyNA(obj[[matchFromBy]]))
@@ -1032,6 +1035,10 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
         predCols <- intersect(predCols, c(addMobCols, addCCSCols))
         if (length(predCols) == 0)
             stop("No (adduct relevant) mobility/CCS columns found in the provided data.", call. = FALSE)
+        
+        if (matchFromBy == "InChIKey1" && is.null(from[["InChIKey1"]]) && !is.null(from[["InChIKey"]]))
+            from[, InChIKey1 := getInChIKey1(InChIKey)]
+        
         if (is.null(from[[matchFromBy]]))
             stop(sprintf("Column '%s' not found to match data from.", matchFromBy), call. = FALSE)
 

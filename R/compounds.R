@@ -710,12 +710,11 @@ setMethod("estimateIDLevels", "compounds", function(obj, absMzDev = 0.005, formu
 })
 
 #' @export
-setMethod("assignMobilities", "compounds", function(obj, fGroups, IMS = TRUE, from = NULL, matchFromBy = "InChIKey",
+setMethod("assignMobilities", "compounds", function(obj, fGroups, IMS = TRUE, from = NULL, matchFromBy = "InChIKey1",
                                                     overwrite = FALSE, adductDef = NULL, CCSParams = NULL,
                                                     prefCalcChemProps = TRUE, neutralChemProps = FALSE,
                                                     virtualenv = "patRoon-c3sdb")
 {
-    # UNDONE: matchFromBy == "InChIKey" is not supported by SIRIUS, support IK1? throw error (otherwise implicitly done by DT method)?
     # UNDONE: doc how adducts are dealt with
     #   - uses fGroup annotations, not what was used for annotation
     
@@ -745,7 +744,7 @@ setMethod("assignMobilities", "compounds", function(obj, fGroups, IMS = TRUE, fr
         allTab[, adduct := annFG$adduct[match(group, annFG$group)]]
 
     allTab <- assignMobilities(allTab, from = from, matchFromBy = matchFromBy, overwrite = overwrite,
-                               adducts = character(), adductDef = adductDef, predictAdductOnly = predictAdductOnly,
+                               adducts = character(), adductDef = adductDef, predictAdductOnly = TRUE,
                                CCSParams = CCSParams, prepareChemProps = FALSE, prefCalcChemProps = prefCalcChemProps,
                                neutralChemProps = neutralChemProps, virtualenv = virtualenv)
     

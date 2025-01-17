@@ -829,7 +829,8 @@ setMethod("consensus", "compounds", function(obj, ..., MSPeakLists,
     assertConsCommonArgs(absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, labels)
 
     uniqueCols <- c("neutral_formula", "SMILES", "InChI", "InChIKey1", "InChIKey2", "InChIKey", "neutralMass",
-                    "RF_SMILES", "RF_SIRFP", "LC50_SMILES", "LC50_SIRFP")
+                    "RF_SMILES", "RF_SIRFP", "LC50_SMILES", "LC50_SIRFP", "mobility", "CCS", "d_mob", "d_mob_rel",
+                    "d_CCS", "d_CCS_rel")
     cons <- doFeatAnnConsensus(obj, ..., rankWeights = rankWeights, annNames = labels,
                                uniqueCols = uniqueCols)
     

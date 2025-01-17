@@ -373,6 +373,7 @@
         - if not, clearly doc the difference if components are generated after assignMobilities()
 - reporting
     - comps-clust: don't have imgs double in reportPlots
+    - handle mobility columns for suspects and compounds
 - CCS
     - convertMobilityToCCS() / convertCCSToMobility()
         - handle Waters data?
@@ -402,7 +403,8 @@
         - mention that feature properties (except intensity, rt, area) are simply copied from parent
         - suspect/compounds method
             - mention when mobility <--> CCS conversions occur
-            - doc that default charge in CCSParams is not used, but taken from adductNone or adduct column
+            - doc how charge is taken and adducts are used
+            - compounds: mobility etc assumed to be specific per set (due to different adducts and m/z values), but equal for consensus() (structure should be the same)
     - ISTDs
         - doc that mobility features are completely ignored for normalization, and relative intensities/areas are copied from parents
     - plotChroms()/plotMobilograms()

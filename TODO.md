@@ -4,7 +4,9 @@
 
 - newProject: don't break lines of text strings, e.g. long paths with spaces in them passed to generateAnalysisInfo()
 - lossElements: handbook suggests it takes a whole formula --> maybe make fragFormula/lossFormula filters?
-- BUG: annotatedBy filter: removing analysis PLs shouldn't be done as IDs mismatch with those from annotation objects
+- BUG: annotatedBy filter incorrectly filters feature level peak lists
+    - record group IDs in feature tabs and use them to remove
+    - or work with tolerances, so that reAveraged data can work (but may be less accurate)
 
 
 ## Ext

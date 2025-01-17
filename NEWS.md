@@ -6,7 +6,7 @@
 * Added visual clue to `checkFeatures()` and `checkComponents()` to see whether a feature or component is marked to be removed (pull request #117 as suggested by Leon Saal)
 * `loadMSLibrary()`: don't always set `Ion_mode` of records to positive and guess missing `Ion_mode` data (issue #119)
 * Fixed: `generateFormulasGenForm()` `topMost` was not considered for cached results
-
+* Small doc updates for `MSPeakLists`
 
 # patRoon 2.3.3
 

@@ -192,7 +192,7 @@ used.}
 
 \item{k}{A vector with analyses (\code{character} with names or \code{integer} with indices) for which the data
 should be deleted. If \code{k!=NULL} then deletions will \emph{not} occur on group averaged peak lists. Otherwise,
-if \code{k=NULL} then deltion occurs on \emph{both} group averaged and analysis specific peak lists.}
+if \code{k=NULL} then deletion occurs on \emph{both} group averaged and analysis specific peak lists.}
 
 \item{absMSIntThr, absMSMSIntThr, relMSIntThr, relMSMSIntThr}{Absolute/relative intensity threshold for MS or MS/MS peak
 lists. \code{NULL} for none.}
@@ -317,9 +317,8 @@ returned.
 
 \item \code{filter(MSPeakLists)}: provides post filtering of generated MS peak lists, which may further enhance quality of
 subsequent workflow steps (\emph{e.g.} formulae calculation and compounds identification) and/or speed up these
-processes. The filters are applied to all peak lists for each analysis. These peak lists are subsequently averaged
-to update group averaged peak lists. However, since version \samp{1.1}, the resulting feature group lists are
-\emph{not} filtered afterwards.
+processes. The filters are applied to peak lists for each feature and feature group. The feature group peak lists
+are \emph{not} re-averaged by default (see the \code{reAverage} argument). \emph{not} filtered afterwards.
 
 \item \code{plotSpectrum(MSPeakLists)}: Plots a spectrum using MS or MS/MS peak lists for a given feature group. Two spectra can be
 compared when two feature groups are specified.

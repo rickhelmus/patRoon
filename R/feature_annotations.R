@@ -318,10 +318,9 @@ setMethod("filter", "featureAnnotations", function(obj, minExplainedPeaks = NULL
                 if (length(cols) == 0)
                     next
                 
-                annTable[keep == TRUE, keep :=
-                             mark(do.call(pmax, c(.SD, list(na.rm = TRUE))) >= scoreLimits[[sc]][1] &
-                                      do.call(pmin, c(.SD, list(na.rm = TRUE))) <= scoreLimits[[sc]][2]),
-                         .SDcols = cols]
+                annTable[keep == TRUE, keep := {
+                    mark(any(between(na.omit(unlist(.SD)), scoreLimits[[sc]][1], scoreLimits[[sc]][2])))
+                }, by = .I, .SDcols = cols]
             }
         }
         

@@ -7,6 +7,7 @@
 * `loadMSLibrary()`: don't always set `Ion_mode` of records to positive and guess missing `Ion_mode` data (issue #119)
 * Fixed: `generateFormulasGenForm()` `topMost` was not considered for cached results
 * Small doc updates for `MSPeakLists`
+* Fixed: the score filters for the `filter()` method of formulas/compounds could in rare cases not be applied correctly for consensus and/or sets results
 
 # patRoon 2.3.3
 

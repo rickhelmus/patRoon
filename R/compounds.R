@@ -134,23 +134,42 @@ setMethod("identifiers", "compounds", function(compounds)
 #'
 #' @export
 setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScore = NULL, minFragScore = NULL,
-                                          minFormulaScore = NULL, scoreLimits = NULL, ...)
+                                          minFormulaScore = NULL, scoreLimits = NULL, IMSRange = NULL, maxIMSDev = NULL,
+                                          ..., negate = FALSE)
 {
+    # UNDONE: assertions for IMSRange and maxIMSDev
+    
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertNumber, . ~ minScore + minFragScore + minFormulaScore, finite = TRUE,
            null.ok = TRUE, fixed = list(add = ac)) # note: negative scores allowed for SIRIUS
     checkmate::assertList(scoreLimits, null.ok = TRUE, types = "numeric", add = ac)
+    checkmate::assertFlag(negate, add = ac)
     checkmate::reportAssertions(ac)
 
+    if (is.null(scoreLimits) &&
+        (!is.null(minScore) || !is.null(minFragScore) || !is.null(minFormulaScore) || !is.null(IMSRange) ||
+         !is.null(maxIMSDev)))
+    {
+        scoreLimits <- list()
+    }
+        
     if (!is.null(minScore) || !is.null(minFragScore) || !is.null(minFormulaScore))
     {
-        if (is.null(scoreLimits))
-            scoreLimits <- list()
-        
         minVals <- c(score = minScore, fragScore = minFragScore, formulaScore = minFormulaScore)
         minVals <- minVals[!sapply(minVals, is.null)]
         for (sc in names(minVals))
             scoreLimits[[sc]] <- c(minVals[[sc]], Inf)
+    }
+    
+    # HACK: not really a score, but the filtering principle is the same
+    if (!is.null(IMSRange))
+        scoreLimits[[IMSRange$type]] <- c(IMSRange$min, IMSRange$max)
+    if (!is.null(maxIMSDev))
+    {
+        col <- if (maxIMSDev$type == "mobility") "d_mob" else "d_CCS"
+        if (maxIMSDev$relative)
+            col <- paste0(col, "_rel")
+        scoreLimits[[col]] <- c(-maxIMSDev$tolerance, maxIMSDev$tolerance)
     }
     
     return(callNextMethod(obj, minExplainedPeaks, scoreLimits, ...))

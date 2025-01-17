@@ -285,9 +285,10 @@ setMethod("assignMobilities", "compoundsSet", function(obj, fGroups, IMS = TRUE,
         stop("If 'from' is a list its length should be equal to the number of sets in the compounds object.",
              call. = FALSE)
     }
-    
-    obj@setObjects <- Map(setObjects(obj), from = from, f = assignMobilities,
-                          MoreArgs = list(fGroups = fGroups, IMS = IMS, ...))
+
+    unsetFGs <- checkAndUnSetOther(sets(obj), fGroups, "fGroups")
+    obj@setObjects <- Map(setObjects(obj), fGroups = unsetFGs, from = from, f = assignMobilities,
+                          MoreArgs = list(IMS = IMS, ...))
     obj <- updateSetConsensus(obj)
     return(obj)
 })

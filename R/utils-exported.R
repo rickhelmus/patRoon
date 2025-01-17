@@ -970,7 +970,7 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
         else # c3sdb
         {
             if (!is.null(virtualenv))
-                reticulate::use_virtualenv("patRoon-c3sdb")
+                reticulate::use_virtualenv(virtualenv)
             py_pickle <- reticulate::import("pickle")
             py_c3sdb <- reticulate::import("c3sdb.ml.data")
             py_bi <- reticulate::import_builtins()

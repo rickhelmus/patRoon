@@ -866,11 +866,13 @@ convertCCSToMobility <- function(ccs, mz, CCSParams, charge = NULL)
 #' @export
 setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFromBy = "InChIKey",
                                                      overwrite = FALSE, adducts = c("[M+H]+", "[M-H]-", "none"),
-                                                     adductDef = NULL, CCSParams = NULL, prepareChemProps = TRUE,
-                                                     prefCalcChemProps = TRUE, neutralChemProps = FALSE,
-                                                     virtualenv = "patRoon-c3sdb")
+                                                     adductDef = NULL, predictAdductOnly = TRUE, CCSParams = NULL,
+                                                     prepareChemProps = TRUE, prefCalcChemProps = TRUE,
+                                                     neutralChemProps = FALSE, virtualenv = "patRoon-c3sdb")
 {
     # NOTE: keep args in sync with other methods
+    
+    # UNDONE: cache
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assert(
@@ -880,31 +882,24 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
         .var.name = "from", add = ac
     )
     checkmate::assertChoice(matchFromBy, c("InChIKey", "InChI", "SMILES", "name"), add = ac)
-    aapply(checkmate::assertFlag, . ~ overwrite + prepareChemProps + prefCalcChemProps + neutralChemProps,
-           fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ overwrite + predictAdductOnly + prepareChemProps + prefCalcChemProps +
+               neutralChemProps, fixed = list(add = ac))
     checkmate::assertCharacter(adducts, min.chars = 1, any.missing = FALSE, add = ac)
     assertCCSParams(CCSParams, null.ok = TRUE, add = ac)
     checkmate::assertString(virtualenv, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
+    if (!is.null(obj[["adduct"]]))
+        adducts <- union(adducts, obj[!is.na(adduct) & nzchar(adduct)]$adduct) # expand with adducts from suspect list
     if (!is.null(adductDef))
         adductDef <- checkAndToAdduct(adductDef)
 
-    adducts_c3sdb <- setdiff(adducts, "none") # none doesn't make sense for c3sdb, just omit it to avoid warnings/errors
-    if (identical(from, "c3sdb"))
+    do_c3sdb <- identical(from, "c3sdb")
+    if (do_c3sdb)
     {
         checkPackage("reticulate")
         if (is.null(obj[["SMILES"]]))
-            stop("No SMILES data found in the input data.", call. = FALSE)
-        validAdducts <- c("[M+H]+", "[M+Na]+", "[M-H]-", "[M+NH4]+", "[M+K]+", "[M+H-H2O]+", "[M+HCOO]-", "[M+CH3COO]-",
-                          "[M+Na-2H]-")
-        wrongAdducts <- setdiff(adducts_c3sdb, validAdducts)
-        if (length(wrongAdducts) > 0)
-        {
-            warning("Ignoring adducts that are unsupported by c3sdb: ", paste0(wrongAdducts, collapse = ", "),
-                    call. = FALSE)
-            adducts_c3sdb <- setdiff(adducts_c3sdb, wrongAdducts)
-        }
+            stop("No SMILES data found in the input data, this is necessary for c3sdb predictions.", call. = FALSE)
     }
     
     obj <- copy(obj)
@@ -917,7 +912,7 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
         obj <- calcSuspMZs(obj, adductDef)
     }
     
-    if (identical(from, "c3sdb") || !is.null(CCSParams))
+    if (do_c3sdb || !is.null(CCSParams))
     {
         msg <- paste("Mass data is necessary for c3sdb pedictions and mobility <--> CCS conversions.",
                      "This data can be automatically calculated by setting prepareChemProps=TRUE and ensuring a SMILES,",
@@ -929,7 +924,7 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
                                   paste0(obj[is.na(mz), which = TRUE], collapse = ", ")), msg), call. = FALSE)
     }
     
-    if (identical(from, "c3sdb"))
+    if (do_c3sdb)
     {
         if (is.null(obj[["SMILES"]]))
             stop("No SMILES data found in the input data (SMILES column). This is necessary for c3sdb predictions",
@@ -947,6 +942,8 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
             warning(sprintf("The following rows in the input data are NA in the match column ('%s') and are therefore not matched: %s.",
                             matchFromBy, paste0(obj[is.na(get(matchFromBy)), which = TRUE], collapse = ", ")),
                     call. = FALSE)
+        
+        adductsNoNone <- setdiff(adducts, "none")
         
         if (is.data.frame(from))
         {
@@ -981,28 +978,49 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
             # only do predictions for suspects with SMILES and mass data
             objDo <- obj[!is.na(SMILES) & nzchar(SMILES) & !is.na(mz)]
             
-            preds <- sapply(adducts_c3sdb, function(add)
+            doPred <- function(mzs, SMILES, add)
             {
-                dfi <- py_c3sdb$data_for_inference(objDo$mz, rep(add, nrow(objDo)), objDo$SMILES,
+                if (length(mzs) == 0)
+                    return(numeric())
+                
+                if (!add %in% c3sdbAdducts())
+                {
+                    warning(sprintf("Skipping predictions for unsupported adduct '%s'.", add), call. = FALSE)
+                    return(rep(NA_real_, length(mzs))) 
+                }
+
+                # use as.list() to handle scalars: https://github.com/rstudio/reticulate/issues/258
+                dfi <- py_c3sdb$data_for_inference(as.list(mzs), as.list(rep(add, length(mzs))), as.list(SMILES),
                                                    py_c3sdb$pretrained_data("c3sdb_OHEncoder.pkl"),
                                                    py_c3sdb$pretrained_data("c3sdb_SScaler.pkl"))
-                ret <- rep(NA_real_, nrow(objDo))
+                ret <- rep(NA_real_, length(mzs))
                 ret[dfi[[2]]] <- kmcm_svr$predict(dfi[[1]])
                 if (any(!dfi[[2]]))
                     warning(sprintf("Predictions failed for adduct '%s' for the following SMILES: %s.", add,
-                                    paste0(objDo[dfi[[2]] == FALSE]$SMILES, collapse = ", ")), call. = FALSE)
+                                    paste0(SMILES[dfi[[2]] == FALSE], collapse = ", ")), call. = FALSE)
                 return(ret)
-            }, simplify = FALSE)
+            }
             
-            from <- data.table(objDo[[matchFromBy]])
-            setnames(from, matchFromBy)
-            for (add in names(preds))
-                set(from, j = paste0("CCS_", add), value = preds[[add]])
+            from <- data.table(objDo[[matchFromBy]], mz = objDo$mz, SMILES = objDo$SMILES)
+            setnames(from, 1, matchFromBy)
+            
+            hasAddCol <- !is.null(objDo[["adduct"]])
+            
+            for (add in adductsNoNone)
+            {
+                wh <- !hasAddCol | !predictAdductOnly | is.na(objDo$adduct) | !nzchar(objDo$adduct) | objDo$adduct == add
+                wh <- rep(wh, length.out = nrow(objDo))
+                if (any(wh))
+                {
+                    printf("Predicting %d CCS values for adduct '%s'... ", sum(wh), add)
+                    from[wh, paste0("CCS_", add) := doPred(mz, SMILES, add)]
+                    printf(" Done!\n")
+                }
+            }
         }
         
         # merge in data in input obj
         
-        adductsNoNone <- setdiff(adducts, "none")
         addMobCols <- paste0("mobility_", adductsNoNone)
         addCCSCols <- paste0("CCS_", adductsNoNone)
         if ("none" %in% adducts)
@@ -1010,8 +1028,7 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
             addMobCols <- c(addMobCols, "mobility")
             addCCSCols <- c(addCCSCols, "CCS")
         }
-        predCols <- c(grep("^mobility_", names(from), value = TRUE),
-                      grep("^CCS_", names(from), value = TRUE))
+        predCols <- c(grep("^mobility", names(from), value = TRUE), grep("^CCS", names(from), value = TRUE))
         predCols <- intersect(predCols, c(addMobCols, addCCSCols))
         if (length(predCols) == 0)
             stop("No (adduct relevant) mobility/CCS columns found in the provided data.", call. = FALSE)
@@ -1054,6 +1071,7 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
             return(unique(tab, by = ".id")$convx)
         }
         
+        printf("Calculating missing mobility/CCS values... ")
         for (addChr in adducts)
         {
             mCol <- "mobility"; cCol <- "CCS"
@@ -1068,7 +1086,12 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
             charges <- if (addChr == "none")
             {
                 if (!is.null(obj[["adduct"]]))
-                    fifelse(!is.na(obj$adduct) & nzchar(obj$adduct), as.adduct(obj$adduct)@charge, CCSParams$defaultCharge)
+                {
+                    wh <- !is.na(obj$adduct) & nzchar(obj$adduct)
+                    unAddChr <- unique(obj$adduct[wh])
+                    unAddCharge <- sapply(unAddChr, function(uac) as.adduct(uac)@charge)
+                    fifelse(wh, unAddCharge[obj$adduct], CCSParams$defaultCharge)
+                }
                 else
                     CCSParams$defaultCharge
             }
@@ -1090,6 +1113,7 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
                 obj[, .charges := NULL]
             }
         }
+        printf("Done!\n")
     }
     
     return(obj[])

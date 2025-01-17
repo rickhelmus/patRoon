@@ -988,3 +988,8 @@ estimateIdentificationLevel <- function(candidateName, candidateFGroup, candidat
 }
 
 setOMPThreads <- function() setOMPNumThreads(max(1, getOption("patRoon.threads", 1)))
+
+c3sdbAdducts <- function()
+{
+    c("[M+H]+", "[M+Na]+", "[M-H]-", "[M+NH4]+", "[M+K]+", "[M+H-H2O]+", "[M+HCOO]-", "[M+CH3COO]-", "[M+Na-2H]-")
+}

@@ -711,9 +711,9 @@ setMethod("estimateIDLevels", "compounds", function(obj, absMzDev = 0.005, formu
 
 #' @export
 setMethod("assignMobilities", "compounds", function(obj, fGroups, IMS = TRUE, from = NULL, matchFromBy = "InChIKey",
-                                                    overwrite = FALSE, adducts = c("[M+H]+", "[M-H]-", "none"),
-                                                    adductDef = NULL, CCSParams = NULL, prefCalcChemProps = TRUE,
-                                                    neutralChemProps = FALSE, virtualenv = "patRoon-c3sdb")
+                                                    overwrite = FALSE, adductDef = NULL, CCSParams = NULL,
+                                                    prefCalcChemProps = TRUE, neutralChemProps = FALSE,
+                                                    virtualenv = "patRoon-c3sdb")
 {
     # UNDONE: matchFromBy == "InChIKey" is not supported by SIRIUS, support IK1? throw error (otherwise implicitly done by DT method)?
     # UNDONE: doc how adducts are dealt with
@@ -744,10 +744,10 @@ setMethod("assignMobilities", "compounds", function(obj, fGroups, IMS = TRUE, fr
     if (nrow(annFG) > 0)
         allTab[, adduct := annFG$adduct[match(group, annFG$group)]]
 
-    allTab <- assignMobilities(allTab, from = from, matchFromBy = matchFromBy, overwrite = overwrite, adducts = adducts,
-                               adductDef = adductDef, CCSParams = CCSParams, prepareChemProps = FALSE,
-                               prefCalcChemProps = prefCalcChemProps, neutralChemProps = neutralChemProps,
-                               virtualenv = virtualenv)
+    allTab <- assignMobilities(allTab, from = from, matchFromBy = matchFromBy, overwrite = overwrite,
+                               adducts = character(), adductDef = adductDef, predictAdductOnly = predictAdductOnly,
+                               CCSParams = CCSParams, prepareChemProps = FALSE, prefCalcChemProps = prefCalcChemProps,
+                               neutralChemProps = neutralChemProps, virtualenv = virtualenv)
     
     if (is.null(allTab[["mobility"]]))
         allTab[, mobility := NA_real_]

@@ -404,7 +404,7 @@ setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLi
         mainArgs <- c(mainArgs, "oc")
     
     formTable <- list()
-    baseHash <- makeHash(mainArgs, MSMode, isolatePrec)
+    baseHash <- makeHash(mainArgs, MSMode, isolatePrec, topMost)
     setHash <- makeHash(fGroups, MSPeakLists, baseHash)
     
     # ana is optional and not used when only calculating group average formulas

@@ -5,7 +5,6 @@
 - newProject: don't break lines of text strings, e.g. long paths with spaces in them passed to generateAnalysisInfo()
 - lossElements: handbook suggests it takes a whole formula --> maybe make fragFormula/lossFormula filters?
 - BUG: annotatedBy filter: removing analysis PLs shouldn't be done as IDs mismatch with those from annotation objects
-- BUG: genform topMost is not hashed
 
 
 ## Ext

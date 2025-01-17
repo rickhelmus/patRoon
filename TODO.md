@@ -405,6 +405,7 @@
             - mention when mobility <--> CCS conversions occur
             - doc how charge is taken and adducts are used
             - compounds: mobility etc assumed to be specific per set (due to different adducts and m/z values), but equal for consensus() (structure should be the same)
+            - DT: adducts arg can be character() if adduct column is present
     - ISTDs
         - doc that mobility features are completely ignored for normalization, and relative intensities/areas are copied from parents
     - plotChroms()/plotMobilograms()

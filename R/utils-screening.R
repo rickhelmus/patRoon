@@ -283,7 +283,7 @@ selectFromSuspAdductCol <- function(tab, col, fgAnn, adductChrDef)
             v <- tryAddCol(adductChrDef, i)
         if (is.na(v) && !is.null(tab[["adduct"]]) && !is.na(tab$adduct[i]) && nzchar(tab$adduct[i]))
             v <- tryAddCol(tab$adduct[i], i)
-        if (is.na(v) && nrow(fgAnn) > 0)
+        if (is.na(v) && !is.null(tab[["group"]]) && nrow(fgAnn) > 0)
             v <- tryAddCol(fgAnn[group == tab$group[i]]$adduct, i)
         
         return(v)
@@ -358,10 +358,10 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, IMSMatchPara
                 {
                     ret <- data.table()
                     setMetaData(ret, suspects[ti])
-                    
+
                     # copy the right mobility and CCS columns from the suspect list
-                    ret[, mobility := selectFromSuspAdductCol(suspects[ti], "mobility", annotations(fGroups), adductTxt)]
-                    ret[, CCS := selectFromSuspAdductCol(suspects[ti], "CCS", annotations(fGroups), adductTxt)]
+                    ret[, mobility := selectFromSuspAdductCol(suspects[ti], "mobility", annTbl, adductTxt)]
+                    ret[, CCS := selectFromSuspAdductCol(suspects[ti], "CCS", annTbl, adductTxt)]
                     
                     ret[, c("group", "d_rt", "d_mz") := .(g, d_rt = if (hasRT) gret - rt else NA_real_,
                                                           ifelse(is.na(mz), annTbl[group == g]$neutralMass - neutralMass,

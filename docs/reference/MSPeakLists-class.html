@@ -292,7 +292,7 @@ used.</p></dd>
 <dt id="arg-k">k<a class="anchor" aria-label="anchor" href="#arg-k"></a></dt>
 <dd><p>A vector with analyses (<code>character</code> with names or <code>integer</code> with indices) for which the data
 should be deleted. If <code>k!=NULL</code> then deletions will <em>not</em> occur on group averaged peak lists. Otherwise,
-if <code>k=NULL</code> then deltion occurs on <em>both</em> group averaged and analysis specific peak lists.</p></dd>
+if <code>k=NULL</code> then deletion occurs on <em>both</em> group averaged and analysis specific peak lists.</p></dd>
 
 
 <dt id="arg-absmsintthr-absmsmsintthr-relmsintthr-relmsmsintthr">absMSIntThr, absMSMSIntThr, relMSIntThr, relMSMSIntThr<a class="anchor" aria-label="anchor" href="#arg-absmsintthr-absmsmsintthr-relmsintthr-relmsmsintthr"></a></dt>
@@ -446,9 +446,8 @@ returned.</p></li>
 <li><p><code>delete(MSPeakLists)</code>: Completely deletes specified peaks from MS peak lists.</p></li>
 <li><p><code>filter(MSPeakLists)</code>: provides post filtering of generated MS peak lists, which may further enhance quality of
 subsequent workflow steps (<em>e.g.</em> formulae calculation and compounds identification) and/or speed up these
-processes. The filters are applied to all peak lists for each analysis. These peak lists are subsequently averaged
-to update group averaged peak lists. However, since version <samp>1.1</samp>, the resulting feature group lists are
-<em>not</em> filtered afterwards.</p></li>
+processes. The filters are applied to peak lists for each feature and feature group. The feature group peak lists
+are <em>not</em> re-averaged by default (see the <code>reAverage</code> argument). <em>not</em> filtered afterwards.</p></li>
 <li><p><code>plotSpectrum(MSPeakLists)</code>: Plots a spectrum using MS or MS/MS peak lists for a given feature group. Two spectra can be
 compared when two feature groups are specified.</p></li>
 <li><p><code>spectrumSimilarity(MSPeakLists)</code>: Calculates the spectral similarity between two or more spectra.</p></li>

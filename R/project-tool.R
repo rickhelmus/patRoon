@@ -779,6 +779,16 @@ getNewProjectUI <- function(destPath)
             '.modal-dialog { width: fit-content !important; height: fit-content !important; }'
         ),
         
+        tags$script(htmlwidgets::JS('
+                Shiny.addCustomMessageHandler("selectAnaTabRows", function(range)
+                {
+                    // get rhot instance: https://github.com/jrowen/rhandsontable/issues/97
+                    var ht = HTMLWidgets.getInstance(analysesHot).hot;
+                    ht.selectRows(range[0] - 1, range[1] - 1);
+                });
+            ')
+        ),
+        
         miniUI::gadgetTitleBar("Create project tool", right = miniUI::miniTitleBarButton("create", "Create", TRUE)),
 
         miniUI::miniTabstripPanel(
@@ -874,8 +884,16 @@ getNewProjectUI <- function(destPath)
                 conditionalPanel(
                     condition = "input.generateAnaInfo == \"table\" || input.generateAnaInfo == \"script\"",
                     miniUI::miniButtonBlock(
-                        actionButton("addAnalysesDir", "Add analyses from directory ..."),
-                        actionButton("addAnalysesCSV", "Add analyses from csv file ...")
+                        actionButton("setAnaInfoFiles", label = "Files", icon = icon("file-import"),
+                                     title = "Set analysis files"),
+                        shinyjs::disabled(actionButton("removeAnaInfoRows", label = "Remove", icon = icon("trash"),
+                                                       title = "Remove selected row(s)")),
+                        shinyjs::disabled(actionButton("anaInfoRowsUp", label = "Move up", icon = icon("arrow-up"),
+                                                       title = "Move selected row(s) up")),
+                        shinyjs::disabled(actionButton("anaInfoRowsDown", label = "Move down", icon = icon("arrow-down"),
+                                                       title = "Move selected row(s) down")),
+                        actionButton("importAnaInfoCSV", label = "Import CSV", icon = icon("file-csv"),
+                                     title = "Import previously generated analyses information from a csv file")
                     )
                 )
             ),
@@ -1283,8 +1301,6 @@ saveNewProjectParams <- function(file, input)
 
 anaFilesToAnaInfo <- function(anaFiles)
 {
-    # UNDONE: full path conversion
-    
     ret <- dcast(anaFiles, analysis ~ type, value.var = "path")
     setnames(ret, getMSFileTypes(), paste0("path_", getMSFileTypes()), skip_absent = TRUE)
     for (ft in getMSFileTypes())
@@ -1298,12 +1314,10 @@ anaFilesToAnaInfo <- function(anaFiles)
 
 anaInfoToAnaFiles <- function(anaInfo)
 {
-    # UNDONE: full path conversion
-    
     ret <- melt(anaInfo, id.vars = "analysis", measure.vars = getAnaInfoPathCols(anaInfo), variable.name = "type",
                 value.name = "path", na.rm = TRUE)
     ret[, type := gsub("^path_", "", type)]
-    return(ret)
+    return(ret[])
 }
 
 #' Easily create new \pkg{patRoon} projects
@@ -1363,7 +1377,7 @@ newProject <- function(destPath = NULL)
             }, by = .I]
             dt[, (pcols) := NULL]
             hot <- do.call(rhandsontable::rhandsontable,
-                           c(list(dt, height = 250, maxRows = nrow(dt), columnSorting = FALSE, manualRowMove = TRUE),
+                           c(list(dt, height = 250, maxRows = nrow(dt), columnSorting = FALSE),
                              hotOpts)) %>%
                 rhandsontable::hot_col(c("group", "blank"), readOnly = FALSE, type = "text") %>%
                 rhandsontable::hot_col(c("conc", "norm_conc"), readOnly = FALSE, type = "numeric") %>%
@@ -1385,6 +1399,25 @@ newProject <- function(destPath = NULL)
             if (input$ionization == "positive" || (input$ionization == "both" && input$currentSet == "positive"))
                 return("positive")
             return("negative")
+        }
+        moveSelectedAnalyses <- function(dir)
+        {
+            sel <- input$analysesHot_select$select$rAll
+            # NOTE: assume selection is a block range
+            mv <- if (dir == "up")
+                seq(min(sel) - 1, max(sel))
+            else
+                seq(min(sel), max(sel) + 1)
+            
+            pol <- getCurPolarity()
+            tab <- anaInfoTabs[[pol]]
+            tab[, index := .I]
+            tab[mv, index := shift(index, n = if (dir == "up") - 1L else 1L, type = "cyclic")]
+            
+            anaInfoTabs[[pol]] <<- tab[(index), -"index"]
+            triggerAnaInfoHotUpdate()
+            newRange <- c(min(sel), max(sel)) + if (dir == "up") -1 else 1
+            session$sendCustomMessage("selectAnaTabRows", newRange)
         }
         verifyAnalysesOK <- function()
         {
@@ -1512,23 +1545,32 @@ newProject <- function(destPath = NULL)
             # HACK: maxRows: make sure we don't have empty table as hot_to_r errors otherwise
             if (!is.null(input$analysesHot) && input$analysesHot$params$maxRows > 0)
             {
-                # sync from table edits, which is currently limited to moving rows and setting metadata (groups, blanks etc)
+                # sync from table edits
                 dt <- rhandsontable::hot_to_r(input$analysesHot)
-
                 pol <- getCurPolarity()
                 ai <- anaInfoTabs[[pol]]
-                
-                ai <- ai[match(dt$analysis, analysis)] # sync order
-                
-                # update metadata
                 mcols <- c("group", "blank", "conc", "norm_conc")
                 ai[, (mcols) := dt[, mcols, with = FALSE]]
-                
                 anaInfoTabs[[pol]] <<- ai
+            }
+            else
+            {
+                shinyjs::disable("removeAnaInfoRows")
+                shinyjs::disable("anaInfoRowsUp")
+                shinyjs::disable("anaInfoRowsDown")
             }
         })
         
-        observeEvent(input$addAnalysesDir, {
+        observeEvent(input$analysesHot_select$select$r, {
+            pol <- getCurPolarity()
+            sel <- input$analysesHot_select$select$rAll
+            e <- nrow(anaInfoTabs[[pol]]) > 0 && length(sel) > 0
+            shinyjs::toggleState("removeAnaInfoRows", condition = e)
+            shinyjs::toggleState("anaInfoRowsUp", condition = e && min(sel) > 1)
+            shinyjs::toggleState("anaInfoRowsDown", condition = e && max(sel) < nrow(anaInfoTabs[[pol]]))
+        })
+        
+        observeEvent(input$setAnaInfoFiles, {
             pol <- getCurPolarity()
             rValues$analysisFiles <- if (nrow(anaInfoTabs[[pol]]) == 0)
                 rValues$analysisFiles[0, ]
@@ -1581,6 +1623,25 @@ newProject <- function(destPath = NULL)
             ))
         })
         
+        observeEvent(input$removeAnaInfoRows, {
+            sel <- input$analysesHot_select$select$rAll
+            pol <- getCurPolarity()
+            anaInfoTabs[[pol]] <<- anaInfoTabs[[pol]][-sel]
+            triggerAnaInfoHotUpdate()
+        })
+
+        observeEvent(input$anaInfoRowsUp, { moveSelectedAnalyses("up") })
+        observeEvent(input$anaInfoRowsDown, { moveSelectedAnalyses("down") })
+        
+        observeEvent(input$analysisFilesHot, {
+            # HACK: maxRows: make sure we don't have empty table as hot_to_r errors otherwise
+            if (is.null(input$analysesHot) || input$analysisFilesHot$params$maxRows == 0)
+            {
+                shinyjs::disable("analysisFilesChangeType")
+                shinyjs::disable("analysisFilesChange")
+                shinyjs::disable("analysisFilesRemove")
+            }
+        })
         observeEvent(input$analysisFilesHot_select$select$r, {
             if (nrow(rValues$analysisFiles) > 0 && length(input$analysisFilesHot_select$select$rAll) > 0)
             {
@@ -1597,12 +1658,12 @@ newProject <- function(destPath = NULL)
                     s <- ch[1] # just default to first choice if selection isn't homogenous
                 updateSelectInput(session, "analysisFilesChangeType", selected = s, choices = ch)
                 
-                shinyjs::toggleState("analysisFilesRemove", condition = TRUE)
+                shinyjs::enable("analysisFilesRemove")
             }
             else
             {
-                shinyjs::toggleState("analysisFilesChange", condition = FALSE)
-                shinyjs::toggleState("analysisFilesRemove", condition = FALSE)
+                shinyjs::disable("analysisFilesChange")
+                shinyjs::disable("analysisFilesRemove")
             }
         })
         
@@ -1631,17 +1692,24 @@ newProject <- function(destPath = NULL)
         observeEvent(input$analysisFilesOK, {
             removeModal()
             pol <- getCurPolarity()
+            
             if (nrow(rValues$analysisFiles) > 0)
             {
                 ai <- anaFilesToAnaInfo(rValues$analysisFiles)
-                aiOv <- ai[analysis %in% anaInfoTabs[[pol]]$analysis]
-                aiNew <- ai[!analysis %in% anaInfoTabs[[pol]]$analysis]
                 
+                # remove the analyses for which all file paths were removed
+                anaInfoTabs[[pol]] <<- anaInfoTabs[[pol]][analysis %in% rValues$analysisFiles$analysis]
+    
+                # overlap: update paths            
+                aiOv <- ai[analysis %in% anaInfoTabs[[pol]]$analysis]
                 if (nrow(aiOv) > 0)
                 {
                     pcols <- getAnaInfoPathCols(anaInfoTabs[[pol]])
                     anaInfoTabs[[pol]][aiOv, (pcols) := mget(paste0("i.", pcols)), on = "analysis"]
                 }
+
+                # add analyses for new files                
+                aiNew <- ai[!analysis %in% anaInfoTabs[[pol]]$analysis]
                 if (nrow(aiNew) > 0)
                     anaInfoTabs[[pol]] <<- rbind(anaInfoTabs[[pol]], aiNew, fill = TRUE)
             }
@@ -1651,7 +1719,7 @@ newProject <- function(destPath = NULL)
             triggerAnaInfoHotUpdate()
         })
         
-        observeEvent(input$addAnalysesCSV, {
+        observeEvent(input$importAnaInfoCSV, {
             csvFile <- rstudioapi::selectFile(path = "~/", filter = "csv files (*.csv)")
             if (!is.null(csvFile))
             {

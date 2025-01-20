@@ -751,6 +751,27 @@ getTPGenInputs <- function(isLib)
     return(ret)
 }
 
+getAnaTableFileUI <- function(pol)
+{
+    # NOTE: pol may be NULL
+    basef <- "analyses"
+    if (!is.null(pol))
+        basef <- paste0(basef, if (pol == "positive") "-pos" else "-neg")
+    pf <- if (is.null(pol)) "" else if (pol == "positive") "Pos" else "Neg"
+    
+    fillRow(
+        flex = NA,
+        conditionalPanel(
+            condition = "input.analysisTableFileType == \"CSV\"",
+            textInput(paste0("analysisTableFileCSV", pf), "File name", paste0(basef, ".csv"), width = "100%")
+        ),
+        conditionalPanel(
+            condition = "input.analysisTableFileType == \"R\"",
+            textInput(paste0("analysisTableFileR", pf), "File name", paste0(basef, ".R"), width = "100%")
+        )
+    )
+}
+
 getNewProjectUI <- function(destPath)
 {
     textNote <- function(txt) div(style = "margin: 8px 0 12px; font-size: small", txt)
@@ -769,7 +790,23 @@ getNewProjectUI <- function(destPath)
             numericInput(paste0(id, "-max"), paste("Max.", label), value = maxVal, ..., width = "100%")
         )
     }
-
+    
+    anaTableCondition <- function(pol)
+    {
+        ret <- "input.generateAnaInfo == \"table\""
+        if (!missing(pol))
+        {
+            if (is.null(pol))
+                ret <- paste(ret, "&& input.ionization != \"both\"")
+            else
+            {
+                ret <- paste(ret, "&& input.ionization == \"both\"")
+                if (pol != "both")
+                    ret <- paste0(ret, " && input.currentSet == \"", pol, "\"")
+            }
+        }
+        return(ret)
+    }
     miniUI::miniPage(
         shinyjs::useShinyjs(),
         
@@ -827,62 +864,81 @@ getNewProjectUI <- function(destPath)
                 "Analyses", icon = icon("folder-open"),
                 miniUI::miniContentPanel(
                     fillCol(
-                        flex = c(NA, NA, 1, NA),
+                        flex = NA,
                         fillRow(
-                            height = 120,
-                            radioButtons("generateAnaInfo", "Generate analysis information",
-                                         c("None" = "none", "From new csv file" = "table",
-                                           "Load in script" = "script", "Example data" = "example")),
-                            conditionalPanel(
-                                condition = "input.generateAnaInfo == \"table\" || input.generateAnaInfo == \"script\"",
-                                fillCol(
-                                    flex = NA,
-                                    conditionalPanel(
-                                        condition = "input.ionization == \"both\"",
-                                        radioButtons("currentSet", "Selected set", c("positive", "negative"),
-                                                     inline = TRUE)
-                                    ),
-                                    conditionalPanel(
-                                        condition = "input.ionization != \"both\" && input.generateAnaInfo == \"table\"",
-                                        textInput("analysisTableFile", "Analysis table output file", "analyses.csv")
-                                    ),
-                                    conditionalPanel(
-                                        condition = "input.ionization == \"both\" && input.generateAnaInfo == \"table\" && input.currentSet == \"positive\"",
-                                        textInput("analysisTableFilePos",
-                                                  "Analysis table output file", "analyses-pos.csv")
-                                    ),
-                                    conditionalPanel(
-                                        condition = "input.ionization == \"both\" && input.generateAnaInfo == \"table\" && input.currentSet == \"negative\"",
-                                        textInput("analysisTableFileNeg",
-                                                  "Analysis table output file", "analyses-neg.csv")
+                            height = 180,
+                            fillCol(
+                                flex = NA,
+                                radioButtons("generateAnaInfo", "Generate analysis information",
+                                             c("None" = "none", "Analyses table" = "table",
+                                               "Dynamically in script" = "dynamic", "Example data" = "example")),
+                                conditionalPanel(
+                                    condition = anaTableCondition(),
+                                    radioButtons("analysisTableFileType", "Save analyses table",
+                                                 c("as CSV file" = "CSV", "as R file" = "R", "embedded in script" = "embedded"),
+                                                 inline = TRUE)
+                                ),
+                                conditionalPanel(
+                                    condition = "input.generateAnaInfo == \"example\"",
+                                    fillRow(
+                                        height = 30,
+                                        textNote("Make sure that the patRoonData package is installed.")
                                     )
+                                )
+                            ),
+                            fillCol(
+                                flex = NA,
+                                conditionalPanel(
+                                    condition = anaTableCondition("both"),
+                                    radioButtons("currentSet", "Define table for set", c("positive", "negative"),
+                                                 inline = TRUE)
+                                ),
+                                conditionalPanel(
+                                    condition = anaTableCondition(NULL),
+                                    getAnaTableFileUI(NULL)
+                                ),
+                                conditionalPanel(
+                                    condition = anaTableCondition("positive"),
+                                    getAnaTableFileUI("positive")
+                                ),
+                                conditionalPanel(
+                                    condition = anaTableCondition("negative"),
+                                    getAnaTableFileUI("negative")
                                 )
                             )
                         ),
                         conditionalPanel(
-                            condition = "input.generateAnaInfo == \"table\" || input.generateAnaInfo == \"script\"",
-                            fillRow(
-                                height = 30,
-                                textNote("Make sure to consider data conversion if data files are not yet in mzXML/mzML format.")
+                            condition = "input.generateAnaInfo == \"dynamic\"",
+                            fillCol(
+                                flex = NA,
+                                strong(em("Generate analysis information from the following directories")),
+                                br(),
+                                fileSelect("genAnaInfoDynRaw", "genAnaInfoDynRawButton",
+                                           "raw analyses", "", placeholder = "Leave empty for none"),
+                                fileSelect("genAnaInfoDynCentroid", "genAnaInfoDynCentroidButton",
+                                           "centroided analyses", "", placeholder = "Leave empty for none"),
+                                fileSelect("genAnaInfoDynIMS", "genAnaInfoDynIMSButton",
+                                           "IMS analyses", "", placeholder = "Leave empty for none"),
+                                fileSelect("genAnaInfoDynProfile", "genAnaInfoDynProfileButton",
+                                           "profile analyses", "", placeholder = "Leave empty for none")
                             )
                         ),
                         conditionalPanel(
-                            condition = "input.generateAnaInfo == \"example\"",
-                            fillRow(
-                                height = 30,
-                                textNote("Make sure that the patRoonData package is installed.")
-                            )
+                            height = 30,
+                            condition = paste(anaTableCondition(), "|| input.generateAnaInfo == \"dynamic\""),
+                            textNote(paste("Raw analyses are instrument files (.raw, .d etc);",
+                                           "others are mzXML/mzML files.",
+                                           "Exporting data is configured in Data pre-treatment."))
                         ),
                         conditionalPanel(
-                            condition = "input.generateAnaInfo == \"table\" || input.generateAnaInfo == \"script\"",
-                            flex = NA,
+                            condition = anaTableCondition(),
                             rhandsontable::rHandsontableOutput("analysesHot")
                         )
                     )
                 ),
                 
                 conditionalPanel(
-                    condition = "input.generateAnaInfo == \"table\" || input.generateAnaInfo == \"script\"",
+                    condition = anaTableCondition(),
                     miniUI::miniButtonBlock(
                         actionButton("setAnaInfoFiles", label = "Files", icon = icon("file-import"),
                                      title = "Set analysis files"),

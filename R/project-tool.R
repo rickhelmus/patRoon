@@ -1475,6 +1475,14 @@ newProject <- function(destPath = NULL)
             newRange <- c(min(sel), max(sel)) + if (dir == "up") -1 else 1
             session$sendCustomMessage("selectAnaTabRows", newRange)
         }
+        doObserveGenAnaInfoDynSelDir <- function(textID, buttonID)
+        {
+            observeEvent(input[[buttonID]], {
+                d <- rstudioapi::selectDirectory("Select directory", path = input[[textID]])
+                if (!is.null(d))
+                    updateTextInput(session, textID, value = d)
+            })
+        }
         verifyAnalysesOK <- function()
         {
             verifyAny <- function(pol)
@@ -1811,6 +1819,12 @@ newProject <- function(destPath = NULL)
                 }
             }
         })
+        
+        doObserveGenAnaInfoDynSelDir("genAnaInfoDynRaw", "genAnaInfoDynRawButton")
+        doObserveGenAnaInfoDynSelDir("genAnaInfoDynCentroid", "genAnaInfoDynCentroidButton")
+        doObserveGenAnaInfoDynSelDir("genAnaInfoDynIMS", "genAnaInfoDynIMSButton")
+        doObserveGenAnaInfoDynSelDir("genAnaInfoDynProfile", "genAnaInfoDynProfileButton")
+        
         
         observeEvent(input$convAlgo, {
             from <- switch(input$convAlgo,

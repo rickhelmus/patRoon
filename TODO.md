@@ -354,7 +354,6 @@
 - splitMobilities()
     - keep? then update
     - remove unassigned features?
-- fGroups IMSRange filter
 - Suspect features
     - Remove featureSuspects and replace by findFeaturesBinning?
         - Add arg to give suspect list, vector of m/zs etc instead of binning

@@ -44,7 +44,7 @@ setMethod("initialize", "compoundsMF",
 setMethod("settings", "compoundsMF", function(compoundsMF) compoundsMF@settings)
 
 
-unifyMFNames <- function(mfr, scoreTypesMF)
+unifyMFNames <- function(mfr, scoreTypesMF, adduct)
 {
     unNames <- c(NoExplPeaks = "explainedPeaks",
                  Score = "score",
@@ -162,6 +162,8 @@ unifyMFNames <- function(mfr, scoreTypesMF)
                  evidencedoi = "evidencedoi"
 
                  )
+    # CCSbase predictions
+    unNames[[paste0("pred_CCS_A2_", as.character(adduct))]] <- "CCS"
 
     unNames <- unNames[names(unNames) %in% names(mfr)] # filter out missing
     setnames(mfr, names(unNames), unNames)
@@ -364,7 +366,7 @@ processMFResults <- function(comptab, runData, lfile = "")
             cat(sprintf("\n%s - Done!\n", date()), file = lfile, append = TRUE)
 
         # unify column names & filter unnecessary columns
-        comptab <- unifyMFNames(comptab, runData$mfSettings$MetFragScoreTypes)
+        comptab <- unifyMFNames(comptab, runData$mfSettings$MetFragScoreTypes, runData$adduct)
 
         if (!is.null(comptab[["CASRN"]]))
             comptab[, CASRN := sub("CASRN:", "", CASRN, fixed = TRUE)] # remove "CASRN" prefix

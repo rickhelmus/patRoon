@@ -10,6 +10,7 @@ setGeneric("removeEmptyAnalyses", function(fGroups) standardGeneric("removeEmpty
 setGeneric("averageGroups", function(fGroups, areas = FALSE, normalized = FALSE, by = "group",
                                      func = mean) standardGeneric("averageGroups"))
 setGeneric("hasMobilities", function(obj) standardGeneric("hasMobilities"))
+setGeneric("clearMobilities", function(obj) standardGeneric("clearMobilities"))
 setGeneric("averageMSPeakLists", function(obj) standardGeneric("averageMSPeakLists"))
 setGeneric("collapseComponents", function(obj) standardGeneric("collapseComponents"))
 setGeneric("annScoreNames", function(obj, onlyNums) standardGeneric("annScoreNames"))

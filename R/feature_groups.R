@@ -151,6 +151,16 @@ setMethod("initialize", "featureGroups", function(.Object, ...)
 
 setMethod("hasMobilities", "featureGroups", function(obj) hasMobilities(getFeatures(obj)))
 
+setMethod("clearMobilities", "featureGroups", function(obj)
+{
+    if (!hasMobilities(obj))
+        return(obj)
+    
+    obj@groupInfo <- removeDTColumnsIfPresent(groupInfo(obj), c("mobility", "CCS", "ims_parent_group"))
+    obj@features <- clearMobilities(getFeatures(obj))
+    return(obj)
+})
+
 #' @describeIn featureGroups Obtain feature group names.
 #' @export
 setMethod("names", "featureGroups", function(x) names(x@groups))

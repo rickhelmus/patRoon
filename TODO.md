@@ -350,9 +350,6 @@
         - somehow only do this as fallback when mobility peak detection fails?
             - doesn't seem very useful for approach 1&2 though (we already know the mobility or are not interested in an accurate one)
             - adds extra complexity when grouping mobility features, eg if different methods were used across the features
-- splitMobilities()
-    - keep? then update
-    - remove unassigned features?
 - Suspect features
     - Remove featureSuspects and replace by findFeaturesBinning?
         - Add arg to give suspect list, vector of m/zs etc instead of binning

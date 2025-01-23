@@ -341,8 +341,7 @@
         - suspects: minMobilityMatches is now not handled properly
             - don't do N-1 for orphaned
             - removes all parent-less or IMS parent fGroups? fine? if so, doc
-    - compounds method
-        - handle IMS data already present in DB
+    - switch to PCL w/ CCSbase in patRoonExt
     - doc the use for fromSuspects, eg
         - doesn't rely on mobility peak detection, so might be less prone to false negatives with eg low intensities
         - scenario 1: we know the mobility very well, eg from a database --> use a narrow IMSWindow
@@ -434,6 +433,9 @@
     - suspects/compounds
         - doc order of data selection for mobility and CCS columns
     - getIMSRangeParams() and getIMSMatchParams()
+    - get CCS values from MetFrag
+        - use PCL w/ CCSbase
+        - still need to call assignMobilities() with from = NULL to get CCS deviations, mobility conversions etc
 
 
 - NEWS

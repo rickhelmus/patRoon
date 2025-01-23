@@ -134,21 +134,21 @@ setMethod("identifiers", "compounds", function(compounds)
 #'
 #' @export
 setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScore = NULL, minFragScore = NULL,
-                                          minFormulaScore = NULL, scoreLimits = NULL, IMSRange = NULL, maxIMSDev = NULL,
-                                          ..., negate = FALSE)
+                                          minFormulaScore = NULL, scoreLimits = NULL, IMSRangeParams = NULL,
+                                          IMSMatchParams = NULL, ..., negate = FALSE)
 {
-    # UNDONE: assertions for IMSRange and maxIMSDev
-    
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertNumber, . ~ minScore + minFragScore + minFormulaScore, finite = TRUE,
            null.ok = TRUE, fixed = list(add = ac)) # note: negative scores allowed for SIRIUS
     checkmate::assertList(scoreLimits, null.ok = TRUE, types = "numeric", add = ac)
+    assertIMSRangeParams(IMSRangeParams, null.ok = TRUE, add = ac)
+    assertIMSMatchParams(IMSMatchParams, null.ok = TRUE, add = ac)
     checkmate::assertFlag(negate, add = ac)
     checkmate::reportAssertions(ac)
 
     if (is.null(scoreLimits) &&
-        (!is.null(minScore) || !is.null(minFragScore) || !is.null(minFormulaScore) || !is.null(IMSRange) ||
-         !is.null(maxIMSDev)))
+        (!is.null(minScore) || !is.null(minFragScore) || !is.null(minFormulaScore) || !is.null(IMSRangeParams) ||
+         !is.null(IMSMatchParams)))
     {
         scoreLimits <- list()
     }
@@ -162,14 +162,14 @@ setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScor
     }
     
     # HACK: not really a score, but the filtering principle is the same
-    if (!is.null(IMSRange))
-        scoreLimits[[IMSRange$type]] <- c(IMSRange$min, IMSRange$max)
-    if (!is.null(maxIMSDev))
+    if (!is.null(IMSRangeParams))
+        scoreLimits[[IMSRangeParams$param]] <- c(IMSRangeParams$lower, IMSRangeParams$upper)
+    if (!is.null(IMSMatchParams))
     {
-        col <- if (maxIMSDev$type == "mobility") "d_mob" else "d_CCS"
-        if (maxIMSDev$relative)
+        col <- if (IMSMatchParams$param == "mobility") "d_mob" else "d_CCS"
+        if (IMSMatchParams$relative)
             col <- paste0(col, "_rel")
-        scoreLimits[[col]] <- c(-maxIMSDev$tolerance, maxIMSDev$tolerance)
+        scoreLimits[[col]] <- c(-IMSMatchParams$window, IMSMatchParams$window)
     }
     
     return(callNextMethod(obj, minExplainedPeaks, scoreLimits, ...))

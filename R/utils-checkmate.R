@@ -1019,6 +1019,17 @@ assertMobilityConversionArgs <- function(mobility, mz, CCSParams, charge, add = 
         stop("The length of the input mobility and mz data should be equal", call. = FALSE)
 }
 
+assertIMSRangeParams <- function(x, null.ok = FALSE, .var.name = checkmate::vname(x), add = NULL)
+{
+    if (null.ok && is.null(x))
+        return(invisible(NULL))
+    
+    assertListVal(x, "param", checkmate::assertChoice, choices = c("mobility", "CCS"), .var.name = .var.name, add = add)
+    assertListVal(x, "lower", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
+    assertListVal(x, "upper", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
+    
+}
+
 assertIMSMatchParams <- function(x, null.ok = FALSE, .var.name = checkmate::vname(x), add = NULL)
 {
     if (null.ok && is.null(x))

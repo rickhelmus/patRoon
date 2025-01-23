@@ -711,9 +711,9 @@ getCCSParams <- function(method, ..., calibrant = NULL)
 }
 
 #' @export
-getIMSRangeParams <- function(param, lower, upper)
+getIMSRangeParams <- function(param, lower, upper, mzRelative = FALSE)
 {
-    return(list(param = param, lower = lower, upper = upper))
+    return(list(param = param, lower = lower, upper = upper, mzRelative = mzRelative))
 }
 
 #' @export

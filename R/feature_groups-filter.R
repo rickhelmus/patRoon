@@ -375,11 +375,15 @@ IMSRangeFilter <- function(fGroups, IMSRangeParams, negate, applyIMS = TRUE)
     
     return(doFGroupsFilter(fGroups, "IMS range", c(IMSRangeParams, negate), function(fGroups)
     {
-        gInfo <- if (negate)
-            gInfo[!numGTE(get(IMSRangeParams$param), IMSRangeParams$lower) | !numLTE(get(IMSRangeParams$param), IMSRangeParams$upper)]
+        vals <- gInfo[[IMSRangeParams$param]]
+        if (IMSRangeParams$mzRelative)
+            vals <- vals / gInfo$mz
+        
+        keep <- if (negate)
+            !numGTE(vals, IMSRangeParams$lower) | !numLTE(vals, IMSRangeParams$upper)
         else
-            gInfo[numGTE(get(IMSRangeParams$param), IMSRangeParams$lower) & numLTE(get(IMSRangeParams$param), IMSRangeParams$upper)]
-        return(fGroups[, gInfo$group])
+            numGTE(vals, IMSRangeParams$lower) & numLTE(vals, IMSRangeParams$upper)
+        return(fGroups[, keep])
     }, "IMS_range", applyIMS = TRUE))
 }
 

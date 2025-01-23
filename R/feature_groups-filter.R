@@ -360,7 +360,12 @@ selectIMSFilter <- function(fGroups, IMS, negate = FALSE, applyIMS = "both", ver
             else
                 gInfoDel[!is.na(mobility) & ims_parent_group %chin% names(fGroups)]
         }
-        return(delete(fGroups, j = gInfoDel$group))
+        fGroups <- delete(fGroups, j = gInfoDel$group)
+        
+        if (isFALSE(IMS))
+            fGroups <- clearMobilities(fGroups)
+        
+        return(fGroups)
     }, "IMS_selection", applyIMS = "both", verbose = verbose))
 }
 

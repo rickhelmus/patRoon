@@ -1209,7 +1209,7 @@ selectIMSFilterFeatures <- function(features, IMS)
     if (IMS == "both" || !hasMobilities(features))
         return(features)
     
-    delete(features, j = function(fl, ...)
+    features <- delete(features, j = function(fl, ...)
     {
         if (isTRUE(IMS))
             is.na(fl$mobility)
@@ -1218,6 +1218,8 @@ selectIMSFilterFeatures <- function(features, IMS)
         else # "maybe"
             !is.na(fl$mobility) & fl$ims_parent_ID %chin% fl$ID
     })
+    
+    return(clearMobilities(features))
 }
 
 expandTableForIMSFGroups <- function(tab, gInfo)

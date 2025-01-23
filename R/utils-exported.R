@@ -662,6 +662,12 @@ getCCSParams <- function(method, ..., calibrant = NULL)
 }
 
 #' @export
+getIMSRangeParams <- function(param, lower, upper)
+{
+    return(list(param = param, lower = lower, upper = upper))
+}
+
+#' @export
 getIMSMatchParams <- function(param, ...)
 {
     ret <- list(

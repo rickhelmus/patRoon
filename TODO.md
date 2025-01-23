@@ -431,6 +431,8 @@
         - doc where Mason-Schamp const comes from
     - suspects/compounds
         - doc order of data selection for mobility and CCS columns
+    - getIMSRangeParams() and getIMSMatchParams()
+
 
 - NEWS
     - hasMobilities slot for features

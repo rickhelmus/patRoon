@@ -332,6 +332,7 @@
     - suppress XCMS warnings (or at least if no peaks are found)
     - minMobilityMatches: move to filter()?
         - then needs to store nr of mobilities in suspect list (eg like MS2 peaks)
+            - this is now done, so we can do this
     - test for fGroups from screenInfo(), eg for fGroups with >1 suspect assigned
     - clearly doc what IMSWindow is used for
     - add PASEF as mobility assignment type?

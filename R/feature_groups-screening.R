@@ -117,6 +117,8 @@ featureGroupsScreening <- setClass("featureGroupsScreening",
 setMethod("initialize", "featureGroupsScreening",
           function(.Object, ...) callNextMethod(.Object, algorithm = "screening", ...))
 
+setMethod("clearMobilities", "featureGroupsScreening", doFGroupScreeningClearMobilities)
+
 #' @describeIn featureGroupsScreening Returns a table with screening information
 #'   (see \code{screenInfo} slot).
 #' @aliases screenInfo

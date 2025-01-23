@@ -76,6 +76,25 @@ setMethod("initialize", "features", function(.Object, ...)
 
 setMethod("hasMobilities", "features", function(obj) obj@hasMobilities)
 
+setMethod("clearMobilities", "features", function(obj)
+{
+    if (!hasMobilities(obj))
+        return(obj)
+    
+    featureTable(obj) <- lapply(featureTable(obj), function(ft)
+    {
+        ft <- copy(ft)
+        ft <- ft[, c("mobility", "CCS", "ims_parent_ID", "mobmin", "mobmax") := NULL]
+        mob_cols <- grep("^mob_", names(ft), value = TRUE)
+        if (length(mob_cols) > 0)
+            ft <- ft[, (mob_cols) := NULL]
+        return(ft)
+    })
+    
+    obj@hasMobilities <- FALSE
+    return(obj)
+})
+
 #' @describeIn features Obtain total number of features.
 #' @export
 setMethod("length", "features", function(x)

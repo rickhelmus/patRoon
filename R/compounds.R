@@ -135,7 +135,7 @@ setMethod("identifiers", "compounds", function(compounds)
 #' @export
 setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScore = NULL, minFragScore = NULL,
                                           minFormulaScore = NULL, scoreLimits = NULL, IMSRangeParams = NULL,
-                                          IMSMatchParams = NULL, ..., negate = FALSE)
+                                          IMSMatchParams = NULL, ...)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertNumber, . ~ minScore + minFragScore + minFormulaScore, finite = TRUE,
@@ -143,7 +143,6 @@ setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScor
     checkmate::assertList(scoreLimits, null.ok = TRUE, types = "numeric", add = ac)
     assertIMSRangeParams(IMSRangeParams, null.ok = TRUE, add = ac)
     assertIMSMatchParams(IMSMatchParams, null.ok = TRUE, add = ac)
-    checkmate::assertFlag(negate, add = ac)
     checkmate::reportAssertions(ac)
 
     if (is.null(scoreLimits) &&

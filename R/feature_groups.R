@@ -1441,16 +1441,6 @@ setMethod("assignMobilities", "featureGroups", function(obj, mobPeaksParam = NUL
     return(obj)
 })
 
-#' @export
-setMethod("splitMobilities", "featureGroups", function(obj, IMSWindow = 0.01, ...)
-{
-    checkmate::assertNumber(IMSWindow, finite = TRUE)
-
-    # UNDONE    
-    obj@features <- splitMobilities(getFeatures(obj), IMSWindow = IMSWindow, ...)
-    
-})
-
 #' @describeIn featureGroups Obtain the total ion chromatogram/s (TICs) of the analyses.
 #' @export
 setMethod("getTICs", "featureGroups", function(obj, retentionRange = NULL, MSLevel = c(1, 2))

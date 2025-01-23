@@ -11,8 +11,8 @@ NULL
 mergeScreeningSetInfos <- function(setObjects, sInfos = lapply(setObjects, screenInfo), rmSetCols = TRUE)
 {
     rmCols <- c("mz", "fragments_mz")
-    unCols <- c("rt", "mobility", "CCS", "formula", "SMILES", "InChI", "InChIKey", "neutralMass", "d_rt", "d_mz",
-                "d_mob", "d_mob_rel", "d_CCS", "d_CCS_rel", "LC50_SMILES")
+    unCols <- c("rt", "mobility", "CCS", "mobility_susp", "CCS_susp", "formula", "SMILES", "InChI", "InChIKey",
+                "neutralMass", "d_rt", "d_mz", "d_mob", "d_mob_rel", "d_CCS", "d_CCS_rel", "LC50_SMILES")
     
     renameDupCols <- function(si, suf, all)
     {
@@ -163,6 +163,8 @@ featureGroupsScreeningSet <- setClass("featureGroupsScreeningSet",
 
 setMethod("initialize", "featureGroupsScreeningSet",
           function(.Object, ...) callNextMethod(.Object, algorithm = "screening-set", ...))
+
+setMethod("clearMobilities", "featureGroupsScreeningSet", doFGroupScreeningClearMobilities)
 
 #' @rdname featureGroupsScreening-class
 #' @export

@@ -18,6 +18,20 @@ suspAnnCols <- function() c("formRank", "compRank", "annSimForm", "annSimComp", 
 # UNDONE: remove this function? If not and it changes, then update assignSetsIDLs()
 getAllSuspCols <- function(targetCols, allCols, mConsNames) getMergedConsCols(targetCols, allCols, mConsNames)
 
+doFGroupScreeningClearMobilities <- function(obj)
+{
+    obj <- callNextMethod()
+    cols <- getMergedConsCols(c("mobility", "CCS", "d_mob", "d_mob_rel", "d_CCS", "d_CCS_rel"), names(obj@screenInfo),
+                              mergedConsensusNames(obj))
+    if (length(cols) > 0)
+    {
+        scr <- copy(screenInfo(obj))
+        scr[, (cols) := NULL]
+        obj@screenInfo <- scr[]
+    }
+    return(obj)
+}
+
 doScreeningShow <- function(obj)
 {
     printf("Suspects: %s (%d hits total)\n", getStrListWithMax(unique(screenInfo(obj)$name), 6, ", "),
@@ -127,9 +141,7 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid, checkDesc, prefCal
 
 expandSuspMobilities <- function(suspects)
 {
-    # UNDONE: support adduct specific columns
-    
-    hasMob <- !is.null(suspects[["mobility"]]); hasCCS <- !is.null(suspects[["CCS"]])
+    hasMob <- !is.null(suspects[["mobility_susp"]]); hasCCS <- !is.null(suspects[["CCS_susp"]])
     if (!hasMob && !hasCCS)
         return(copy(suspects))
 
@@ -141,9 +153,9 @@ expandSuspMobilities <- function(suspects)
     }
     
     if (hasMob)
-        verifyCol("mobility")
+        verifyCol("mobility_susp")
     if (hasCCS)
-        verifyCol("CCS")
+        verifyCol("CCS_susp")
     
     doSplit <- function(x)
     {
@@ -158,8 +170,8 @@ expandSuspMobilities <- function(suspects)
     
     return(rbindlist(lapply(seq_len(nrow(suspects)), function(i)
     {
-        mobs <- if (hasMob) doSplit(suspects$mobility[i]) else NA_real_
-        CCSs <- if (hasCCS) doSplit(suspects$CCS[i]) else NA_real_
+        mobs <- if (hasMob) doSplit(suspects$mobility_susp[i]) else NA_real_
+        CCSs <- if (hasCCS) doSplit(suspects$CCS_susp[i]) else NA_real_
         if (length(mobs) != length(CCSs) && !checkmate::testScalarNA(mobs) && !checkmate::testScalarNA(CCSs))
             stop(sprintf("The length of mobility and CCS values for suspect '%s' (row %d) differs: %d/%d",
                          suspects$name[i], i, length(mobs), length(CCSs)), call. = FALSE)
@@ -223,8 +235,8 @@ finalizeScreenInfoForIMS <- function(scr, gInfo, IMSMatchParams)
     scr[, ims_parent_group := gInfo$ims_parent_group[match(group, gInfo$group)]]
     
     # split mobilities from suspect list, NA those from IMS parents, and make sure column is numeric
-    scr[, c("mobility", "CCS") := NA]
-    scr[, c("mobility", "CCS") := .(as.numeric(mobility), as.numeric(CCS))] # NOTE: column type conversion needs to be done separately
+    setnames(scr, c("mobility", "CCS"), c("mobility_susp", "CCS_susp"), skip_absent = TRUE)
+    scr[, c("mobility", "CCS") := NA_real_]
     scr[!is.na(mob_group), c("mobility", "CCS") := {
         g <- group; n <- name
         soe <- scrOrigExp[group == g & name == n]
@@ -360,8 +372,8 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, IMSMatchPara
                     setMetaData(ret, suspects[ti])
 
                     # copy the right mobility and CCS columns from the suspect list
-                    ret[, mobility := selectFromSuspAdductCol(suspects[ti], "mobility", annTbl, adductTxt)]
-                    ret[, CCS := selectFromSuspAdductCol(suspects[ti], "CCS", annTbl, adductTxt)]
+                    ret[, mobility_susp := selectFromSuspAdductCol(suspects[ti], "mobility", annTbl, adductTxt)]
+                    ret[, CCS_susp := selectFromSuspAdductCol(suspects[ti], "CCS", annTbl, adductTxt)]
                     
                     ret[, c("group", "d_rt", "d_mz") := .(g, d_rt = if (hasRT) gret - rt else NA_real_,
                                                           ifelse(is.na(mz), annTbl[group == g]$neutralMass - neutralMass,

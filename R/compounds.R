@@ -162,7 +162,12 @@ setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScor
     
     # HACK: not really a score, but the filtering principle is the same
     if (!is.null(IMSRangeParams))
-        scoreLimits[[IMSRangeParams$param]] <- c(IMSRangeParams$lower, IMSRangeParams$upper)
+    {
+        col <- IMSRangeParams$param
+        if (IMSRangeParams$mzRelative)
+            col <- paste0(col, "_mz")
+        scoreLimits[[col]] <- c(IMSRangeParams$lower, IMSRangeParams$upper)
+    }
     if (!is.null(IMSMatchParams))
     {
         col <- if (IMSMatchParams$param == "mobility") "d_mob" else "d_CCS"
@@ -170,7 +175,7 @@ setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScor
             col <- paste0(col, "_rel")
         scoreLimits[[col]] <- c(-IMSMatchParams$window, IMSMatchParams$window)
     }
-    
+
     return(callNextMethod(obj, minExplainedPeaks, scoreLimits, ...))
 })
 
@@ -775,6 +780,7 @@ setMethod("assignMobilities", "compounds", function(obj, fGroups, IMS = TRUE, fr
     adductDefChr <- if (!is.null(adductDef)) as.character(adductDef)
     allTab[, mobility := selectFromSuspAdductCol(allTab, "mobility", annotations(fGroups), adductDefChr)]
     allTab[, CCS := selectFromSuspAdductCol(allTab, "CCS", annotations(fGroups), adductDefChr)]
+    allTab[, c("mobility_mz", "CCS_mz") := .(mobility / mz, CCS / mz)]
     
     if (hasMobilities(fGroups))
         allTab <- assignTabIMSDeviations(allTab, gInfo)
@@ -783,7 +789,8 @@ setMethod("assignMobilities", "compounds", function(obj, fGroups, IMS = TRUE, fr
     obj@groupAnnotations[names(allTabList)] <- Map(obj@groupAnnotations[names(allTabList)], allTabList, f = function(cTab, IMTab)
     {
         IMTab <- IMTab[match(cTab$UID, UID)]
-        IMTab <- subsetDTColumnsIfPresent(IMTab, c("mobility", "CCS", "d_mob", "d_mob_rel", "d_CCS", "d_CCS_rel"))
+        IMTab <- subsetDTColumnsIfPresent(IMTab, c("mobility", "mobility_mz", "CCS", "CCS_mz", "d_mob", "d_mob_rel",
+                                                   "d_CCS", "d_CCS_rel"))
         cTab <- copy(cTab)
         cTab[, (names(IMTab)) := IMTab]
         return(cTab)
@@ -846,8 +853,8 @@ setMethod("consensus", "compounds", function(obj, ..., MSPeakLists,
     assertConsCommonArgs(absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, labels)
 
     uniqueCols <- c("neutral_formula", "SMILES", "InChI", "InChIKey1", "InChIKey2", "InChIKey", "neutralMass",
-                    "RF_SMILES", "RF_SIRFP", "LC50_SMILES", "LC50_SIRFP", "mobility", "CCS", "d_mob", "d_mob_rel",
-                    "d_CCS", "d_CCS_rel")
+                    "RF_SMILES", "RF_SIRFP", "LC50_SMILES", "LC50_SIRFP", "mobility", "mobility_mz", "CCS", "CCS_mz",
+                    "d_mob", "d_mob_rel", "d_CCS", "d_CCS_rel")
     cons <- doFeatAnnConsensus(obj, ..., rankWeights = rankWeights, annNames = labels,
                                uniqueCols = uniqueCols)
     

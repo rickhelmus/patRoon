@@ -878,8 +878,6 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
 {
     # NOTE: keep args in sync with other methods
     
-    # UNDONE: cache
-    
     ac <- checkmate::makeAssertCollection()
     checkmate::assert(
         checkmate::checkChoice(from, c("pubchemlite", "c3sdb")),
@@ -900,6 +898,12 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
     if (!is.null(adductDef))
         adductDef <- checkAndToAdduct(adductDef)
 
+    hash <- makeHash(obj, from, matchFromBy, overwrite, adducts, adductDef, predictAdductOnly, CCSParams,
+                     prepareChemProps, prefCalcChemProps, neutralChemProps)
+    cd <- loadCacheData("assignMobilitiesDT", hash)
+    if (!is.null(cd))
+        return(cd)
+    
     do_c3sdb <- identical(from, "c3sdb")
     if (do_c3sdb)
     {
@@ -1128,6 +1132,8 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
         }
         printf("Done!\n")
     }
+    
+    saveCacheData("assignMobilitiesDT", obj, hash)
     
     return(obj[])
 })

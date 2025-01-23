@@ -364,6 +364,25 @@ selectIMSFilter <- function(fGroups, IMS, negate = FALSE, applyIMS = "both", ver
     }, "IMS_selection", applyIMS = "both", verbose = verbose))
 }
 
+IMSRangeFilter <- function(fGroups, IMSRangeParams, negate, applyIMS = TRUE)
+{
+    if (!hasMobilities(fGroups))
+        stop("Cannot apply IMS Range filter: no mobilities assigned", call. = FALSE)
+
+    gInfo <- groupInfo(fGroups)
+    if (is.null(gInfo[["CCS"]]) && IMSRangeParams$param == "CCS")
+        stop("Cannot apply IMS Range filter: no CCS values assigned", call. = FALSE)
+    
+    return(doFGroupsFilter(fGroups, "IMS range", c(IMSRangeParams, negate), function(fGroups)
+    {
+        gInfo <- if (negate)
+            gInfo[!numGTE(get(IMSRangeParams$param), IMSRangeParams$lower) | !numLTE(get(IMSRangeParams$param), IMSRangeParams$upper)]
+        else
+            gInfo[numGTE(get(IMSRangeParams$param), IMSRangeParams$lower) & numLTE(get(IMSRangeParams$param), IMSRangeParams$upper)]
+        return(fGroups[, gInfo$group])
+    }, "IMS_range", applyIMS = TRUE))
+}
+
 resultsFilter <- function(fGroups, results, negate = FALSE, applyIMS = "both", verbose = TRUE)
 {
     return(doFGroupsFilter(fGroups, "results", c(results, negate), function(fGroups)
@@ -603,10 +622,10 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
                                               maxReplicateIntRSD = NULL, blankThreshold = NULL,
                                               retentionRange = NULL, mzRange = NULL, mzDefectRange = NULL,
                                               chromWidthRange = NULL, featQualityRange = NULL, groupQualityRange = NULL,
-                                              rGroups = NULL, IMS = NULL, withIMSParent = FALSE, results = NULL,
-                                              removeBlanks = FALSE, removeISTDs = FALSE, checkFeaturesSession = NULL,
-                                              predAggrParams = getDefPredAggrParams(), removeNA = FALSE, negate = FALSE,
-                                              applyIMS = "both")
+                                              rGroups = NULL, IMS = NULL, withIMSParent = FALSE, IMSRangeParams = NULL,
+                                              results = NULL, removeBlanks = FALSE, removeISTDs = FALSE,
+                                              checkFeaturesSession = NULL, predAggrParams = getDefPredAggrParams(),
+                                              removeNA = FALSE, negate = FALSE, applyIMS = "both")
 {
     if (isTRUE(checkFeaturesSession))
         checkFeaturesSession <- "checked-features.yml"
@@ -625,6 +644,7 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
                 c(featureQualityNames(), featureQualityNames(scores = TRUE))), fixed = list(add = ac))
     checkmate::assertCharacter(rGroups, min.chars = 1, min.len = 1, any.missing = FALSE, null.ok = TRUE, add = ac)
     assertIMSArg(IMS, null.ok = TRUE, add = ac)
+    assertIMSRangeParams(IMSRangeParams, null.ok = TRUE, add = ac)
     checkmate::assert(checkmate::checkNull(results),
                       checkmate::checkClass(results, "featureAnnotations"),
                       checkmate::checkClass(results, "components"),
@@ -694,7 +714,9 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
     
     obj <- maybeDoFilter(replicateGroupFilter, rGroups)
     obj <- maybeDoFilter(selectIMSFilter, IMS)
+    obj <- maybeDoFilter(IMSRangeFilter, IMSRangeParams)
     obj <- maybeDoFilter(resultsFilter, results)
+    
     # NOTE: for the next two don't have to use doFGroupFilter() as applyIMS is not relevant
     if (withIMSParent)
     {

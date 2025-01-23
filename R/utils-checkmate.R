@@ -1027,6 +1027,7 @@ assertIMSRangeParams <- function(x, null.ok = FALSE, .var.name = checkmate::vnam
     assertListVal(x, "param", checkmate::assertChoice, choices = c("mobility", "CCS"), .var.name = .var.name, add = add)
     assertListVal(x, "lower", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
     assertListVal(x, "upper", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
+    assertListVal(x, "mzRelative", checkmate::assertFlag, .var.name = .var.name, add = add)
     
 }
 

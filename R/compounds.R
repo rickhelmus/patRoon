@@ -758,7 +758,7 @@ setMethod("assignMobilities", "compounds", function(obj, fGroups, IMS = TRUE, fr
 
     # HACK: mimic a 'suspect list' from all annotation results (allTab) so we can use the DT method
     allTab <- as.data.table(obj)[group %chin% names(fGroups)]
-    allTab <- subsetDTColumnsIfPresent(allTab, c("group", "SMILES", "InChI", "InChIKey", "InChIKey1", "UID"))
+    allTab <- subsetDTColumnsIfPresent(allTab, c("group", "SMILES", "InChI", "InChIKey", "InChIKey1", "UID", "CCS"))
     
     # add some columns for so that the DT method can do its calculations
     allTab[, mz := gInfo$mz[match(group, gInfo$group)]]
@@ -767,7 +767,7 @@ setMethod("assignMobilities", "compounds", function(obj, fGroups, IMS = TRUE, fr
         allTab[, adduct := annFG$adduct[match(group, annFG$group)]]
 
     allTab <- assignMobilities(allTab, from = from, matchFromBy = matchFromBy, overwrite = overwrite,
-                               adducts = character(), adductDef = adductDef, predictAdductOnly = TRUE,
+                               adducts = "none", adductDef = adductDef, predictAdductOnly = TRUE,
                                CCSParams = CCSParams, prepareChemProps = FALSE, prefCalcChemProps = prefCalcChemProps,
                                neutralChemProps = neutralChemProps, virtualenv = virtualenv)
     
@@ -775,7 +775,7 @@ setMethod("assignMobilities", "compounds", function(obj, fGroups, IMS = TRUE, fr
         allTab[, mobility := NA_real_]
     if (is.null(allTab[["CCS"]]))
         allTab[, CCS := NA_real_]
-    
+
     # copy the right mobility and CCS columns
     adductDefChr <- if (!is.null(adductDef)) as.character(adductDef)
     allTab[, mobility := selectFromSuspAdductCol(allTab, "mobility", annotations(fGroups), adductDefChr)]

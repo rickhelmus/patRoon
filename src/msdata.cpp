@@ -896,7 +896,7 @@ Rcpp::List collapseIMSFrames(const MSReadBackend &backend, SpectrumRawTypes::Mas
     
     const auto &sfunc = [&](const SpectrumRaw &spec, const SpectrumRawSelection &, size_t)
     {
-        if (!spec.hasMobilities())
+        if (!spec.hasMobilities() && !spec.empty()) // NOTE: we cannot distinguish between non-IMS and empty spectra at the moment
             Rcpp::stop("Tried to collapse non-IMS data!");
         
         const auto specf = filterIMSFrame(spec, filterP, 0.0, mobRange);

@@ -1438,6 +1438,7 @@ setMethod("assignMobilities", "featureGroups", function(obj, mobPeaksParam = NUL
     
     if (!is.null(mobPeaksParam))
     {
+        obj <- warnAndClearAssignedMobilities(obj)
         obj@features <- assignFeatureMobilitiesPeaks(obj@features, mobPeaksParam, IMSWindow, clusterMethod,
                                                      minIntensityIMS, maxMSRTWindow)
         obj@features <- reintegrateMobilityFeatures(obj@features, EICRTWindow, peakRTWindow, calcArea,

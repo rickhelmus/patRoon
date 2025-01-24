@@ -214,29 +214,27 @@ doGetEICs <- function(anaInfo, EICInfoList, minIntensityIMS = 0, compress = TRUE
                 setnafill(EICInfo, fill = 0, cols = col)
         }
         
-        EICs <- vector("list", nrow(EICInfo))
-        
+        EICs <- isCached <- hashes <- NULL
         if (doCache)
         {
             # NOTE: subset columns here, so any additional columns from e.g. feature tables are not considered
             hashes <- EICInfo[, makeHash(anaHashes[[ana]], compress, withBP, .SD), by = seq_len(nrow(EICInfo)),
                               .SDcols = c("retmin", "retmax", "mzmin", "mzmax", "mobmin", "mobmax")][[2]]
             
-            cachedData <- loadCacheData(category = "EICs", hashes, dbArg = cacheDB, simplify = FALSE)
-            if (!is.null(cachedData) && length(cachedData) == nrow(EICInfo))
+            EICs <- loadCacheData(category = "EICs", hashes, dbArg = cacheDB, simplify = FALSE)
+            isCached <- !sapply(EICs, is.null)
+            if (all(isCached))
             {
                 doProgress()
-                return(unname(cachedData)) # everything is in the cache
+                return(unname(EICs)) # everything is in the cache
             }
-            
-            cachedInds <- if (!is.null(cachedData)) match(names(cachedData), hashes) else integer()
-            isCached <- if (!is.null(cachedData)) hashes %chin% names(cachedData) else rep(FALSE, nrow(EICInfo))
-            # NOTE: cachedData is 'subset' below to make sure any duplicate hashes are properly assigned
-            EICs[isCached] <- cachedData[match(hashes, names(cachedData), nomatch = 0)]
         }
         else
-            isCached <- rep(FALSE, length(EICs))
-        
+        {
+            EICs <- vector("list", nrow(EICInfo))
+            isCached <- rep(FALSE, nrow(EICInfo))
+        }
+
         ToDo <- EICInfo[isCached == FALSE]
         openMSReadBackend(backend, path)
         
@@ -246,7 +244,7 @@ doGetEICs <- function(anaInfo, EICInfoList, minIntensityIMS = 0, compress = TRUE
                               minIntensityIMS, compress, withBP)
         newEICs <- lapply(newEICs, setDF)
         EICs[!isCached] <- newEICs
-
+        
         if (doCache)
             saveCacheDataList("EICs", EICs[!isCached], hashes[!isCached], cacheDB)
         
@@ -280,24 +278,20 @@ doGetEIMs <- function(anaInfo, EIMInfoList, IMSWindow, clusterMethod, minIntensi
                 setnafill(EIMInfo, fill = 0, cols = col)
         }
         
-        EIMs <- vector("list", nrow(EIMInfo))
         # NOTE: subset columns here, so any additional columns from e.g. feature tables are not considered
         hashes <- EIMInfo[, makeHash(anaHashes[[ana]], IMSWindow, clusterMethod, minIntensity, compress, .SD),
                           by = seq_len(nrow(EIMInfo)), .SDcols = c("retmin", "retmax", "mzmin", "mzmax", "mobmin",
                                                                    "mobmax")][[2]]
         
-        cachedData <- loadCacheData(category = "EIMs", hashes, dbArg = cacheDB, simplify = FALSE)
-        if (!is.null(cachedData) && length(cachedData) == nrow(EIMInfo))
+        EIMs <- loadCacheData(category = "EIMs", hashes, dbArg = cacheDB, simplify = FALSE)
+        isCached <- !sapply(EIMs, is.null)
+        if (all(isCached))
         {
+            # everything is in the cache
             doProgress()
-            return(unname(cachedData)) # everything is in the cache
+            return(unname(EIMs))
         }
-        
-        cachedInds <- if (!is.null(cachedData)) match(names(cachedData), hashes) else integer()
-        isCached <- if (!is.null(cachedData)) hashes %chin% names(cachedData) else rep(FALSE, nrow(EIMInfo))
-        # NOTE: cachedData is 'subset' below to make sure any duplicate hashes are properly assigned
-        EIMs[isCached] <- cachedData[match(hashes, names(cachedData), nomatch = 0)]
-        
+
         ToDo <- EIMInfo[isCached == FALSE]
         
         openMSReadBackend(backend, path)

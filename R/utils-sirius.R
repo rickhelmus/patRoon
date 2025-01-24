@@ -477,8 +477,8 @@ predictRespFactorsSIRFPs <- function(featAnnSIR, gInfo, calibrants, eluent, orga
     splFPs <- split(allFPs[, -c("id", "group")], seq_len(nrow(allFPs)))
     hashes <- sapply(seq_len(nrow(allFPs)), function(i) makeHash(baseHash, splFPs[[i]], unknowns$retention_time[i]))
     
-    cachedData <- loadCacheData("RF_SIRFP", hashes, simplify = FALSE)
-    indsTODO <- if (!is.null(cachedData)) which(!hashes %in% names(cachedData)) else seq_along(hashes)
+    cachedData <- pruneList(loadCacheData("RF_SIRFP", hashes, simplify = FALSE))
+    indsTODO <- which(!hashes %in% names(cachedData))
     hashesTODO <- hashes[indsTODO]
     
     MS2QRes <- NULL
@@ -495,7 +495,7 @@ predictRespFactorsSIRFPs <- function(featAnnSIR, gInfo, calibrants, eluent, orga
                              by.y = "identifier", sort = FALSE)
     }
     
-    if (!is.null(cachedData))
+    if (length(cachedData) > 0)
     {
         cachedRFs <- rbindlist(lapply(cachedData, function(cd) data.table(RF_SIRFP = cd)), idcol = "hash")
         cachedRFs[, neutral_formula := allFPs$neutral_formula[match(hash, hashes)]]
@@ -544,8 +544,8 @@ predictLC50SIRFPs <- function(featAnnSIR, LC50Mode, concUnit)
     baseHash <- makeHash(LC50Mode)
     hashes <- sapply(split(allFPs[, -c("id", "group")], seq_len(nrow(allFPs))), function(s) makeHash(baseHash, s))
     
-    cachedData <- loadCacheData("LC50_SIRFP", hashes, simplify = FALSE)
-    indsTODO <- if (!is.null(cachedData)) which(!hashes %in% names(cachedData)) else seq_along(hashes)
+    cachedData <- pruneList(loadCacheData("LC50_SIRFP", hashes, simplify = FALSE))
+    indsTODO <- which(!hashes %in% names(cachedData))
     hashesTODO <- hashes[indsTODO]
     
     LC50s <- NULL
@@ -564,7 +564,7 @@ predictLC50SIRFPs <- function(featAnnSIR, LC50Mode, concUnit)
             saveCacheData("LC50_SIRFP", LC50s$LC50_SIRFP[i], hashesTODO[i])
     }
     
-    if (!is.null(cachedData))
+    if (length(cachedData) > 0)
     {
         cachedLC50s <- rbindlist(lapply(cachedData, function(cd) data.table(LC50_SIRFP = cd)), idcol = "hash")
         cachedLC50s[, neutral_formula := allFPs$neutral_formula[match(hash, hashes)]]

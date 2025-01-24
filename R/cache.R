@@ -69,7 +69,7 @@ openCacheDBScope <- withr::local_(function(x, file = getCacheFile()) openCacheDB
 #' @export
 loadCacheData <- function(category, hashes, dbArg = NULL, simplify = TRUE, fixDTs = TRUE)
 {
-    if (getCacheMode() == "save" || getCacheMode() == "none")
+    if (getCacheMode() == "save" || getCacheMode() == "none" || length(hashes) == 0)
         return(NULL)
 
     if (is.null(dbArg))
@@ -79,16 +79,15 @@ loadCacheData <- function(category, hashes, dbArg = NULL, simplify = TRUE, fixDT
 
     RSQLite::sqliteSetBusyHandler(db, 300 * 1000) # UNDONE: make configurable?
 
-    ret <- NULL
+    ret <- setNames(rep(list(NULL), length(hashes)), hashes)
 
     if (nrow(DBI::dbGetQuery(db, sprintf("SELECT 1 FROM sqlite_master WHERE type='table' AND name='%s'", category))) > 0)
     {
         if (length(hashes) == 1) # select only one?
         {
             df <- DBI::dbGetQuery(db, sprintf("SELECT data FROM %s WHERE hash='%s'", category, hashes))
-
             if (nrow(df) > 0)
-                ret <- lapply(df$data, function(x) unserialize(fst::decompress_fst(x)))
+                ret[[1]] <- unserialize(fst::decompress_fst(df$data[[1]]))
         }
         else
         {
@@ -97,26 +96,26 @@ loadCacheData <- function(category, hashes, dbArg = NULL, simplify = TRUE, fixDT
 
             if (nrow(df) > 0)
             {
-                ret <- lapply(df$data, function(x) unserialize(fst::decompress_fst(x)))
-                if (length(ret) > 0)
+                d <- setNames(lapply(df$data, function(x) unserialize(fst::decompress_fst(x))), df$hash)
+                # NOTE: use [] to keep names so that hashes that are not present are properly named and assigned to NULL
+                ret[] <- d[hashes]
+                if (fixDTs)
                 {
-                    names(ret) <- df$hash
-                    ret <- ret[match(hashes, names(ret), nomatch = 0)] # sync order
+                    # make sure duplicate hashes do not get the same DT object, as this will result in unexpected
+                    # behavior when doing in-place operations
+                    # NOTE: copy() automatically handles nested DTs
+                    dupl <- duplicated(names(ret))
+                    ret[dupl] <- lapply(ret[dupl], data.table::copy)
                 }
             }
-        }
-        
-        if (!is.null(ret) && length(ret) == 1)
-        {
-            if (simplify)
-                ret <- ret[[1]]
-            else if (length(hashes) == 1)
-                names(ret) <- hashes
         }
     }
 
     if (fixDTs)
         ret <- recursiveApplyDT(ret, setalloccol, sapply, simplify = FALSE)
+
+    if (simplify && length(hashes) == 1)
+        ret <- ret[[1]]
     
     return(ret)
 }

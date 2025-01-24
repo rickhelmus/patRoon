@@ -904,26 +904,87 @@ Rcpp::List collapseIMSFrames(const MSReadBackend &backend, SpectrumRawTypes::Mas
                                  minAbundance);
     };
     
-    const auto &specMeta = backend.getSpecMetadata().first;
-    std::vector<std::vector<SpectrumRawSelection>> scanSels(1);
-    for (size_t i=0; i<specMeta.scans.size(); ++i)
-        scanSels[0].emplace_back(i);
+    const auto &specMetaMS = backend.getSpecMetadata().first;
+    std::vector<std::vector<SpectrumRawSelection>> scanSelsMS(1);
+    for (size_t i=0; i<specMetaMS.scans.size(); ++i)
+        scanSelsMS[0].emplace_back(i);
     
-    const auto spectra = applyMSData<SpectrumRawAveraged>(backend, SpectrumRawTypes::MSLevel::MS1, scanSels, sfunc,
-                                                          minIntensityIMS)[0];
+    const auto spectraMS = applyMSData<SpectrumRawAveraged>(backend, SpectrumRawTypes::MSLevel::MS1, scanSelsMS, sfunc,
+                                                            minIntensityIMS)[0];
     
-    // NOTE: we return matrices so these can be directly consumed by mzR
-    Rcpp::List ret(spectra.size());
-    const auto coln = Rcpp::CharacterVector::create("mz", "intensity");
-    for (size_t i=0; i<spectra.size(); ++i)
+    const auto &specMetaMS2 = backend.getSpecMetadata().second;
+    std::vector<std::vector<SpectrumRawSelection>> scanSelsMS2(1);
+    std::vector<SpectrumRawTypes::Time> scanTimesMS2;
+    std::vector<SpectrumRawTypes::Mass> scanPrecursorMZs;
+    for (size_t i=0; i<specMetaMS2.scans.size(); ++i)
     {
-        Rcpp::NumericMatrix m(spectra[i].size(), 2);
-        Rcpp::NumericVector mzs = Rcpp::wrap(spectra[i].getMZs()), ints = Rcpp::wrap(spectra[i].getIntensities());
-        m(Rcpp::_, 0) = mzs; m(Rcpp::_, 1) = ints;
-        Rcpp::colnames(m) = coln;
-        ret[i] = m;
+        // special case, eg DIA
+        // UNDONE: handle unlikely case that PASEF frame has only one precursor
+        if (specMetaMS2.MSMSFrames[i].isolationRanges.size() < 2)
+        {
+            scanSelsMS2[0].emplace_back(i);
+            if (specMetaMS2.MSMSFrames[i].isolationRanges.empty())
+                scanPrecursorMZs.push_back(0.0);
+            else
+            {
+                scanPrecursorMZs.push_back(
+                    (specMetaMS2.MSMSFrames[i].isolationRanges[0].start +
+                        specMetaMS2.MSMSFrames[i].isolationRanges[0].end) / 2.0
+                );
+            }
+            continue;
+        }
+        
+        // for PASEF data we combine spectra with close precursor m/z
+        std::vector<SpectrumRawTypes::Mass> precMZs;
+        std::transform(specMetaMS2.MSMSFrames[i].isolationRanges.cbegin(),
+                       specMetaMS2.MSMSFrames[i].isolationRanges.cend(),
+                       std::back_inserter(precMZs),
+                       [](const auto &ir) { return (ir.start + ir.end) / 2.0; });
+        const auto precMZClusts = clusterNums(precMZs, clMethod, mzWindow);
+        const int maxClust = *(std::max_element(precMZClusts.begin(), precMZClusts.end()));
+        
+        for (int cl=0; cl<=maxClust; ++cl)
+        {
+            SpectrumRawSelection ssel(i);
+            SpectrumRawTypes::Mass prec = 0.0;
+            for (size_t j=0; j<precMZs.size(); ++j)
+            {
+                if (cl == precMZClusts[j])
+                {
+                    ssel.MSMSFrameIndices.push_back(j);
+                    prec += precMZs[j];
+                }
+            }
+            scanSelsMS2[0].push_back(ssel);
+            scanTimesMS2.push_back(specMetaMS2.times[i]);
+            scanPrecursorMZs.push_back(prec / static_cast<SpectrumRawTypes::Mass>(ssel.MSMSFrameIndices.size()));
+        }
     }
-    return ret;
+    
+    const auto spectraMS2 = applyMSData<SpectrumRawAveraged>(backend, SpectrumRawTypes::MSLevel::MS2, scanSelsMS2, sfunc,
+                                                             minIntensityIMS)[0];
+    
+    const auto &getSpecRList = [](const auto &spectra)
+    {
+        // NOTE: we return matrices so these can be directly consumed by mzR
+        Rcpp::List ret(spectra.size());
+        const auto coln = Rcpp::CharacterVector::create("mz", "intensity");
+        for (size_t i=0; i<spectra.size(); ++i)
+        {
+            Rcpp::NumericMatrix m(spectra[i].size(), 2);
+            Rcpp::NumericVector mzs = Rcpp::wrap(spectra[i].getMZs()), ints = Rcpp::wrap(spectra[i].getIntensities());
+            m(Rcpp::_, 0) = mzs; m(Rcpp::_, 1) = ints;
+            Rcpp::colnames(m) = coln;
+            ret[i] = m;
+        }
+        return ret;
+    };
+    
+    return Rcpp::List::create(Rcpp::Named("MS1") = getSpecRList(spectraMS),
+                              Rcpp::Named("MS2") = getSpecRList(spectraMS2),
+                              Rcpp::Named("timesMS2") = scanTimesMS2,
+                              Rcpp::Named("precursorMZs") = scanPrecursorMZs);
 }
 
 

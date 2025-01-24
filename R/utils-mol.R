@@ -386,9 +386,8 @@ predictRespFactorsSMILES <- function(fgSMILESTab, gInfo, calibrants, eluent, org
     fgSMILESTab[, hash := makeHash(baseHash, retention_time, SMILES), by = seq_len(nrow(fgSMILESTab))] 
 
     # NOTE: for mobility feature groups, hashes can be the same as there could be duplicated RTs
-    # --> pass unique hashes to loadCacheData() below
-    cachedData <- loadCacheData("RF_SMILES", unique(fgSMILESTab$hash), simplify = FALSE)
-    fgSMILESTabTODO <- if (!is.null(cachedData)) fgSMILESTab[!hash %in% names(cachedData)] else fgSMILESTab
+    cachedData <- pruneList(loadCacheData("RF_SMILES", fgSMILESTab$hash, simplify = FALSE))
+    fgSMILESTabTODO <- fgSMILESTab[!hash %in% names(cachedData)]
     
     MS2QRes <- NULL 
     if (nrow(fgSMILESTabTODO) > 0)
@@ -400,12 +399,11 @@ predictRespFactorsSMILES <- function(fgSMILESTab, gInfo, calibrants, eluent, org
             saveCacheData("RF_SMILES", MS2QRes$RFs$RF_SMILES[i], fgSMILESTabTODO$hash[i])
     }
     
-    if (!is.null(cachedData))
+    if (length(cachedData) > 0)
     {
-        cachedRFs <- copy(fgSMILESTab[hash %chin% names(cachedData), c("group", "SMILES", "hash")])
-        cachedRFs[, RF_SMILES := unlist(cachedData[hash])] # subsetting by hash will correctly handle duplicates (see NOTE above)
-        cachedRFs[, hash := NULL]
-        
+        cachedRFs <- copy(fgSMILESTab[hash %chin% names(cachedData), c("group", "SMILES")])
+        cachedRFs[, RF_SMILES := unlist(cachedData)]
+
         if (is.null(MS2QRes))
         {
             MD <- loadCacheData("MS2QMD", baseHash)
@@ -452,8 +450,8 @@ predictLC50SMILES <- function(SMILES, LC50Mode, concUnit)
         return(data.table(SMILES = character(), LC50_SMILES = character()))
     
     hashes <- sapply(inp$SMILES, makeHash, LC50Mode)
-    cachedData <- loadCacheData("LC50_SMILES", hashes, simplify = FALSE)
-    indsTODO <- if (!is.null(cachedData)) which(!hashes %in% names(cachedData)) else seq_along(hashes)
+    cachedData <- pruneList(loadCacheData("LC50_SMILES", hashes, simplify = FALSE))
+    indsTODO <- which(!hashes %in% names(cachedData))
     hashesTODO <- hashes[indsTODO]
     
     LC50s <- NULL
@@ -466,7 +464,7 @@ predictLC50SMILES <- function(SMILES, LC50Mode, concUnit)
             saveCacheData("LC50_SMILES", LC50s$LC50_SMILES[i], hashesTODO[i])
     }
 
-    if (!is.null(cachedData))
+    if (length(cachedData) > 0)
     {
         cachedLC50s <- rbindlist(lapply(cachedData, function(cd) data.table(LC50_SMILES = cd)), idcol = "hash")
         cachedLC50s[, SMILES := inp$SMILES[match(hash, hashes)]]

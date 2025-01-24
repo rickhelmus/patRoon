@@ -27,10 +27,10 @@ findFeaturesBinning <- function(analysisInfo, mzRange = c(50, 400), mzStep = 0.0
     baseHash <- makeHash(mzRange, mzStep, peaksParam)
     anaHashes <- getMSFileHashesFromAvailBackend(analysisInfo)
     anaHashes <- sapply(anaHashes, makeHash, baseHash)
-    cachedData <- loadCacheData("featuresBinning", anaHashes, simplify = FALSE, dbArg = cacheDB)
-    if (!is.null(cachedData))
+    cachedData <- pruneList(loadCacheData("featuresBinning", anaHashes, simplify = FALSE, dbArg = cacheDB))
+    if (length(cachedData) > 0)
     {
-        cachedData <- pruneList(setNames(cachedData, names(anaHashes)[match(names(cachedData), anaHashes)]))
+        names(cachedData) <- names(anaHashes)[match(names(cachedData), anaHashes)]
         anaInfoTBD <- analysisInfo[!analysis %in% names(cachedData)]
     }
     else
@@ -68,7 +68,7 @@ findFeaturesBinning <- function(analysisInfo, mzRange = c(50, 400), mzStep = 0.0
             saveCacheData("featuresBinning", fList[[a]], anaHashes[[a]])
     }
     
-    if (!is.null(cachedData))
+    if (length(cachedData) > 0)
     {
         fList <- c(fList, cachedData)
         fList <- fList[analysisInfo$analysis] # put original order

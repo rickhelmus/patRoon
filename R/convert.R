@@ -165,6 +165,44 @@ collapseIMSFiles <- function(anaInfo, mzRange = NULL, mobilityRange = NULL, clMe
         stop("Please set a valid centroid path for all analyses in the analysis information.", call. = FALSE)
     mkdirp(outDirs)
     
+    
+    makeHeader <- function(spectra, pol, MSLevel, times, precursorMZs)
+    {
+        # NOTE: there may be empty spectra due to filtering or measurement errors
+        nonEmptySpectra <- sapply(spectra, nrow) > 0
+        specMZRange <- range(unlist(lapply(spectra[nonEmptySpectra], function(sp) range(sp[, "mz"]))))
+        
+        # NOTE: scan nums are filled in later
+        data.frame(msLevel = MSLevel,
+                   polarity = pol,
+                   peaksCount = sapply(spectra, nrow), # UNDONE: correct?
+                   totIonCurrent = sapply(spectra, function(sp) if (nrow(sp) == 0) 0 else sum(sp[, "intensity"])),
+                   retentionTime = times,
+                   basePeakMZ = sapply(spectra, function(sp) if (nrow(sp) == 0) 0 else sp[which.max(sp[, "intensity"]), "mz"]),
+                   basePeakIntensity = sapply(spectra, function(sp) if (nrow(sp) == 0) 0 else max(sp[, "intensity"])),
+                   collisionEnergy = NA_real_,
+                   ionisationEnergy = 0,
+                   lowMZ = 0,
+                   highMZ = 0,
+                   precursorScanNum = NA_integer_,
+                   precursorMZ = precursorMZs,
+                   precursorCharge = NA_integer_,
+                   precursorIntensity = NA_real_,
+                   mergedScan = NA_integer_,
+                   mergedResultScanNum = NA_integer_,
+                   mergedResultStartScanNum = NA_integer_,
+                   mergedResultEndScanNum = NA_integer_,
+                   injectionTime = 0,
+                   filterString = NA_character_,
+                   centroided = TRUE,
+                   ionMobilityDriftTime = NA_real_,
+                   isolationWindowLowerOffset = NA_real_,
+                   isolationWindowUpperOffset = NA_real_,
+                   # UNDONE: below are technically not scan limits, but might be good enough?
+                   scanWindowLowerLimit = specMZRange[1],
+                   scanWindowUpperLimit = specMZRange[2])
+    }
+    
     printf("Collapsing all %d analyses ...\n", nrow(anaInfo))
     applyMSData(anaInfo, outDirs, needIMS = TRUE, showProgress = FALSE, func = function(ana, path, backend, outd)
     {
@@ -179,47 +217,29 @@ collapseIMSFiles <- function(anaInfo, mzRange = NULL, mobilityRange = NULL, clMe
         }
         
         openMSReadBackend(backend, path)
+        collapsedSpectra <- collapseIMSFrames(backend, NULLToZero(mzRange[1]), NULLToZero(mzRange[2]),
+                                              NULLToZero(mobilityRange[1]), NULLToZero(mobilityRange[2]), clMethod,
+                                              mzWindow, minAbundance, NULLToZero(topMost), NULLToZero(minIntensityIMS),
+                                              NULLToZero(minIntensityPre))
         
         meta <- getMSMetadata(backend, 1)
-        spectra <- collapseIMSFrames(backend, NULLToZero(mzRange[1]), NULLToZero(mzRange[2]), NULLToZero(mobilityRange[1]),
-                                     NULLToZero(mobilityRange[2]), clMethod, mzWindow, minAbundance, NULLToZero(topMost),
-                                     NULLToZero(minIntensityIMS), NULLToZero(minIntensityPre))
+        
+        # UNDONE: assume there is no polarity switching (currently not possible with IMS instruments anyway)
+        pol <- if (meta$polarity[1] == 1) 1 else 0
+        
+        headerMS1 <- makeHeader(collapsedSpectra$MS1, pol, 1, meta$time, NA_real_)
+        headerMS2 <- makeHeader(collapsedSpectra$MS2, pol, 2, collapsedSpectra$timesMS2, collapsedSpectra$precursorMZs)
+        
+        header <- rbind(headerMS1, headerMS2)
+        ord <- order(header$retentionTime, header$msLevel)
+        header <- header[ord, ]
+        header$seqNum <- header$acquisitionNum <- seq_len(nrow(header))
+        header$spectrumId <- paste0("scan=", header$seqNum)
+        
+        allSpectra <- c(collapsedSpectra$MS1, collapsedSpectra$MS2)
+        allSpectra <- allSpectra[ord]
 
-        specMZRange <- range(unlist(lapply(spectra, function(sp) range(sp[, "mz"]))))
-        
-        header <- data.frame(seqNum = seq_along(spectra),
-                             acquisitionNum = meta$scan,
-                             msLevel = 1,
-                             polarity = fifelse(meta$scan == 1, 1, 0),
-                             peaksCount = sapply(spectra, nrow), # UNDONE: correct?
-                             totIonCurrent = sapply(spectra, function(sp) sum(sp[, "intensity"])),
-                             retentionTime = meta$time,
-                             basePeakMZ = sapply(spectra, function(sp) sp[which.max(sp[, "intensity"]), "mz"]),
-                             basePeakIntensity = sapply(spectra, function(sp) max(sp[, "intensity"])),
-                             collisionEnergy = NA_real_,
-                             ionisationEnergy = 0,
-                             lowMZ = 0,
-                             highMZ = 0,
-                             precursorScanNum = NA_integer_,
-                             precursorMZ = NA_real_,
-                             precursorCharge = NA_integer_,
-                             precursorIntensity = NA_real_,
-                             mergedScan = NA_integer_,
-                             mergedResultScanNum = NA_integer_,
-                             mergedResultStartScanNum = NA_integer_,
-                             mergedResultEndScanNum = NA_integer_,
-                             injectionTime = 0,
-                             filterString = NA_character_,
-                             centroided = TRUE,
-                             ionMobilityDriftTime = NA_real_,
-                             isolationWindowLowerOffset = NA_real_,
-                             isolationWindowUpperOffset = NA_real_,
-                             # UNDONE: below are technically not scan limits, but might be good enough?
-                             scanWindowLowerLimit = specMZRange[1],
-                             scanWindowUpperLimit = specMZRange[2])
-        header$spectrumId <- paste0("scan=", meta$scan)
-        
-        mzR::writeMSData(spectra, outp, header)
+        mzR::writeMSData(allSpectra, outp, header)
 
         printf("done!\n")
     })

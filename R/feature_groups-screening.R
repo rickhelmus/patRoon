@@ -543,17 +543,21 @@ setMethod("assignMobilities", "featureGroupsScreening", function(obj, mobPeaksPa
     assertIMSMatchParams(IMSMatchParams, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
-    if (length(obj) == 0)
+    if (length(obj) == 0 || (is.null(mobPeaksParam) && !fromSuspects && is.null(CCSParams)))
         return(obj) # nothing to do...
-    
-    obj <- warnAndClearAssignedMobilities(obj)
-    if (fromSuspects)
-        obj@features <- assignFeatureMobilitiesSuspects(obj@features, IMSWindow, screenInfo(obj))
-    obj@features <- assignFeatureMobilitiesPeaks(obj@features, mobPeaksParam, IMSWindow, clusterMethod,
-                                                 minIntensityIMS, maxMSRTWindow)
-    obj@features <- reintegrateMobilityFeatures(obj@features, EICRTWindow, peakRTWindow, calcArea,
-                                                chromPeaksParam, fallbackEIC, parallel)
-    obj <- clusterFGroupMobilities(obj, IMSWindow, FALSE)
+
+    if (!is.null(mobPeaksParam) || fromSuspects)
+    {
+        obj <- warnAndClearAssignedMobilities(obj)
+        if (fromSuspects)
+            obj@features <- assignFeatureMobilitiesSuspects(obj@features, IMSWindow, screenInfo(obj))
+        if (!is.null(mobPeaksParam))
+            obj@features <- assignFeatureMobilitiesPeaks(obj@features, mobPeaksParam, IMSWindow, clusterMethod,
+                                                         minIntensityIMS, maxMSRTWindow)
+        obj@features <- reintegrateMobilityFeatures(obj@features, EICRTWindow, peakRTWindow, calcArea,
+                                                    chromPeaksParam, fallbackEIC, parallel)
+        obj <- clusterFGroupMobilities(obj, IMSWindow, FALSE)
+    }
 
     if (!is.null(CCSParams))
         obj <- assignFGroupsCCS(obj, CCSParams)

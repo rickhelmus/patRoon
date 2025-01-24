@@ -336,7 +336,7 @@ setMethod("predictRespFactors", "featureGroupsScreeningSet", function(obj, calib
     
     checkmate::assertList(calibrants, types = "data.frame", any.missing = FALSE, len = length(sets(obj)))
     
-    unsetFGroups <- sapply(sets(fGroups), unset, obj = fGroups, simplify = FALSE)
+    unsetFGroups <- sapply(sets(obj), unset, obj = obj, simplify = FALSE)
     unsetFGroups <- Map(unsetFGroups, calibrants, f = predictRespFactors, MoreArgs = list(...))
     obj <- syncScreeningSetObjects(obj, unsetFGroups)
     

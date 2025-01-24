@@ -324,9 +324,9 @@
         - add sensible IMS defaults
         - naming: change param to params for consistency (also assertions)
 - assignMobilities()
+    - finish updating methods for mobPeaksParam==NULL
     - assert that instrument data has actually IMS data
     - better names for ims_parent_ID/ims_parent_group?
-    - handle cases when there are already IMS assignments (or just throw an error?)
     - limit mobmin/mobmax --> both min and max, ie to prevent excessively wrong peak range assignments
     - SC seems to hang?
     - suppress XCMS warnings (or at least if no peaks are found)
@@ -354,12 +354,14 @@
     - Remove featureSuspects and replace by findFeaturesBinning?
         - Add arg to give suspect list, vector of m/zs etc instead of binning
         - Maybe rename binning to eg EICs?
+        - remove doGroupSuspects()
     - otherwise, if we keep it...
         - XCMS/XCMS3/KPIC2: doc and/or default min fractions to zero as these probably don't make a lot of sense otherwise
         - Handle mobilities
             - Does the mobmin/mobmax range make sense how it is computed now?
         - remove mobility assignment?
             - if not, support >1 mobilities in suspect list and do mobility assignment directly from suspect list like assignMobilities()
+        - update use of loadCacheData() (see bin features)
 - getIMSMatchParams()
     - tweak defaults
 - components
@@ -387,6 +389,7 @@
         - test order of data selection for mobility and CCS columns, missing data etc
     - assignMobilities()
         - DT method: robustness with missing data in input/from
+    - selectIMS filter: ensure that objects is fully reverted with IMS=FALSE
     
 - Docs
     - hasMobilities slot for features

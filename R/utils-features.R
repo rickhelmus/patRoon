@@ -886,6 +886,16 @@ findPeaksInEICs <- function(allEICs, peaksParam, withBP, withMobility, parallel,
 getMobilityCols <- function() c("mobility", "mobmin", "mobmax", "mob_area", "mob_intensity")
 countMobilityFeatures <- function(feat) sum(sapply(featureTable(feat), function(ft) sum(!is.null(ft[["mobility"]]) & !is.na(ft$mobility))))
 
+warnAndClearAssignedMobilities <- function(fGroups)
+{
+    if (hasMobilities(fGroups))
+    {
+        warning("Mobility features already have been assigned, these will be cleared now!", call. = FALSE)
+        fGroups <- selectIMSFilter(fGroups, IMS = FALSE, verbose = FALSE)
+    }
+    return(fGroups)
+}
+
 doAssignFeatureMobilities <- function(fTable, mobTable)
 {
     fTable <- copy(fTable)

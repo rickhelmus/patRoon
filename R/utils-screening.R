@@ -310,6 +310,9 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, IMSMatchPara
     # NOTE: rt is always included
     metaDataCols <- union("rt", intersect(suspMetaDataCols(), names(suspects)))
     
+    # HACK: the mobility columns are handled differently
+    metaDataCols <- setdiff(metaDataCols, c("mobility", "mobility_susp", "CCS", "CCS_mobility"))
+    
     emptyResult <- data.table()
     for (col in c(metaDataCols, "group", "d_rt", "d_mz"))
     {

@@ -959,7 +959,7 @@ assertFindMobilitiesArgs <- function(mobPeaksParam, IMSWindow, clusterMethod, mi
                                      maxMSRTWindow, chromPeaksParam, EICRTWindow, peakRTWindow, calcArea,
                                      fallbackEIC, CCSParams, parallel, add)
 {
-    assertFindPeaksParam(mobPeaksParam, add = add)
+    assertFindPeaksParam(mobPeaksParam, null.ok = TRUE, add = add)
     aapply(checkmate::assertNumber, . ~ IMSWindow + minIntensityIMS + EICRTWindow + peakRTWindow, finite = TRUE,
            fixed = list(add = add))
     assertClusterMethod(clusterMethod, add = add)

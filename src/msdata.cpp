@@ -26,7 +26,6 @@ std::vector<std::vector<OutType>> applyMSData(const MSReadBackend &backend, Spec
      * 
      * The code makes the following assumptions:
      * - each set of SpectrumRawSelection objects is unique and sorted by index from low to high
-     * - the index of each SpectrumRawSelection in a set is unique
      * - SpectrumRawSelection objects with the same index but different MSMSFrameIndices may occur across sets. Thus,
      *   across sets the full object instead of merely the index should be compared.
      * 
@@ -87,23 +86,24 @@ std::vector<std::vector<OutType>> applyMSData(const MSReadBackend &backend, Spec
                 
                 for (size_t j=0; j<entries; ++j)
                 {
-                    const auto it = std::lower_bound(scanSels[j].begin(), scanSels[j].end(), selInd, selCompInd);
-                    if (it == scanSels[j].end() || it->index != selInd)
-                        continue; // not found
-                    
-                    if (initSel || curSel != *it)
+                    auto it = std::lower_bound(scanSels[j].begin(), scanSels[j].end(), selInd, selCompInd);
+                    while (it != scanSels[j].end() && it->index == selInd)
                     {
-                        initSel = false;
-                        curSel = *it;
-                        curSpec = backend.readSpectrum(tdata, MSLevel, curSel, SpectrumRawTypes::MobilityRange(),
-                                                       minIntensityIMS);
-                        if (prepFunc)
-                            curSpec = prepFunc(curSpec);
+                       if (initSel || curSel != *it)
+                        {
+                            initSel = false;
+                            curSel = *it;
+                            curSpec = backend.readSpectrum(tdata, MSLevel, curSel, SpectrumRawTypes::MobilityRange(),
+                                                           minIntensityIMS);
+                            if (prepFunc)
+                                curSpec = prepFunc(curSpec);
+                        }
+                        
+                        // UNDONE: optimization could be further pushed by not using a 2d vector here?
+                        const auto ind = std::distance(scanSels[j].begin(), it);
+                        ret[j][ind] = func(curSpec, curSel, j, args...);
+                        ++it;
                     }
-                    
-                    // UNDONE: optimization could be further pushed by not using a 2d vector here?
-                    const auto ind = std::distance(scanSels[j].begin(), it);
-                    ret[j][ind] = func(curSpec, curSel, j, args...);
                 }
             });
         }

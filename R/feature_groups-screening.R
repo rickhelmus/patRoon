@@ -546,6 +546,7 @@ setMethod("assignMobilities", "featureGroupsScreening", function(obj, mobPeaksPa
     if (length(obj) == 0)
         return(obj) # nothing to do...
     
+    obj <- warnAndClearAssignedMobilities(obj)
     if (fromSuspects)
         obj@features <- assignFeatureMobilitiesSuspects(obj@features, IMSWindow, screenInfo(obj))
     obj@features <- assignFeatureMobilitiesPeaks(obj@features, mobPeaksParam, IMSWindow, clusterMethod,

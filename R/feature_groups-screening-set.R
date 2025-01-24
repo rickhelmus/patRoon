@@ -382,6 +382,7 @@ setMethod("assignMobilities", "featureGroupsScreeningSet", function(obj, mobPeak
     if (length(obj) == 0)
         return(obj) # nothing to do...
 
+    obj <- warnAndClearAssignedMobilities(obj)
     anaInfo <- analysisInfo(obj)
     for (s in sets(obj))
     {

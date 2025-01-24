@@ -329,12 +329,6 @@
     - limit mobmin/mobmax --> both min and max, ie to prevent excessively wrong peak range assignments
     - SC seems to hang?
     - suppress XCMS warnings (or at least if no peaks are found)
-    - minMobilityMatches: move to filter()?
-        - then needs to store nr of mobilities in suspect list (eg like MS2 peaks)
-            - this is now done, so we can do this
-    - test for fGroups from screenInfo(), eg for fGroups with >1 suspect assigned
-    - clearly doc what IMSWindow is used for
-    - add PASEF as mobility assignment type?
     - parent-less/orphaned IMS features
         - test: reporting, minMobilityMatches and other post-suspect screening, ...
         - handle normalization: perform like non-IMS workflow with a warning?
@@ -342,13 +336,6 @@
             - don't do N-1 for orphaned
             - removes all parent-less or IMS parent fGroups? fine? if so, doc
     - switch to PCL w/ CCSbase in patRoonExt
-    - doc the use for fromSuspects, eg
-        - doesn't rely on mobility peak detection, so might be less prone to false negatives with eg low intensities
-        - scenario 1: we know the mobility very well, eg from a database --> use a narrow IMSWindow
-        - scenario 2: we only have the mobility from eg a prediction and don't care so much about identification by CCS match --> use wide IMSWindow
-        - somehow only do this as fallback when mobility peak detection fails?
-            - doesn't seem very useful for approach 1&2 though (we already know the mobility or are not interested in an accurate one)
-            - adds extra complexity when grouping mobility features, eg if different methods were used across the features
 - Suspect features
     - Remove featureSuspects and replace by findFeaturesBinning?
         - Add arg to give suspect list, vector of m/zs etc instead of binning
@@ -377,6 +364,10 @@
         - handle Waters data?
         - verify Agilent data
 
+- Low priority
+    - add IMSMatch filter for suspects?
+    - add PASEF as mobility assignment type?
+
 - Tests
     - more verification that fGroupsScreeningSets still works fine after removal of setObjects
     - more verification that normInts() works before/after assignMobilities()
@@ -388,6 +379,7 @@
         - test order of data selection for mobility and CCS columns, missing data etc
     - assignMobilities()
         - DT method: robustness with missing data in input/from
+        - test for fGroups from screenInfo(), eg for fGroups with >1 suspect assigned
     - selectIMS filter: ensure that objects is fully reverted with IMS=FALSE
     
 - Docs
@@ -407,6 +399,11 @@
             - DT: adducts arg can be character() if adduct column is present
             - matchFromBy == "InChIKey1" will automatically calculate IK1 if missing, and DT method keeps it in output
             - matchFromBy == "InChIKey" is not supported by SIRIUS
+        - doc the use for fromSuspects, eg
+            - doesn't rely on mobility peak detection, so might be less prone to false negatives with eg low intensities
+            - scenario 1: we know the mobility very well, eg from a database --> use a narrow IMSWindow
+            - scenario 2: we only have the mobility from eg a prediction and don't care so much about identification by CCS match --> use wide IMSWindow
+        - clearly doc what IMSWindow is used for
     - ISTDs
         - doc that mobility features are completely ignored for normalization, and relative intensities/areas are copied from parents
     - plotChroms()/plotMobilograms()

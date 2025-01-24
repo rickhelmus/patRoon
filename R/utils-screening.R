@@ -234,8 +234,7 @@ finalizeScreenInfoForIMS <- function(scr, gInfo, IMSMatchParams)
     scr[, mob_group := gInfo$mobility[match(group, gInfo$group)]]
     scr[, ims_parent_group := gInfo$ims_parent_group[match(group, gInfo$group)]]
     
-    # split mobilities from suspect list, NA those from IMS parents, and make sure column is numeric
-    setnames(scr, c("mobility", "CCS"), c("mobility_susp", "CCS_susp"), skip_absent = TRUE)
+    # assign closest mobility/CCS from suspect list
     scr[, c("mobility", "CCS") := NA_real_]
     scr[!is.na(mob_group), c("mobility", "CCS") := {
         g <- group; n <- name

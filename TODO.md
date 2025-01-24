@@ -324,7 +324,6 @@
         - add sensible IMS defaults
         - naming: change param to params for consistency (also assertions)
 - assignMobilities()
-    - finish updating methods for mobPeaksParam==NULL
     - assert that instrument data has actually IMS data
     - better names for ims_parent_ID/ims_parent_group?
     - limit mobmin/mobmax --> both min and max, ie to prevent excessively wrong peak range assignments

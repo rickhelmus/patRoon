@@ -1444,9 +1444,19 @@ newProject <- function(destPath = NULL)
         triggerAnaInfoHotUpdate <- function() rValues$triggerAnaInfoHotUpdate <- rValues$triggerAnaInfoHotUpdate + 1
         makeAnalysisFilesHot <- function()
         {
+            tab <- copy(rValues$analysisFiles)
+            tab[, format := mapply(analysis, path, type, FUN = function(a, p, t) {
+                exts <- MSFileExtensions()[getMSFileFormats(t)]
+                paths <- file.path(p, paste0(a, ".", exts))
+                exts <- exts[file.exists(paths)]
+                if (length(exts) == 0)
+                    "not found!"
+                else
+                    paste0(exts, collapse = ", ")
+            })]
+            setcolorder(tab, c("analysis", "type", "format", "path"))
             hot <- do.call(rhandsontable::rhandsontable,
-                           c(list(rValues$analysisFiles, height = 300, maxRows = nrow(rValues$analysisFiles),
-                                  rowHeaders = NULL),
+                           c(list(tab, height = 300, maxRows = nrow(rValues$analysisFiles), rowHeaders = NULL),
                              hotOpts))
             return(hot)
         }
@@ -1738,7 +1748,8 @@ newProject <- function(destPath = NULL)
                 files <- listMSFiles(anaDir, getMSFileFormats(input$analysisFilesAddType))
                 af <- data.table(analysis = tools::file_path_sans_ext(basename(files)),
                                  type = if (length(files) > 0) input$analysisFilesAddType else character(),
-                                 path = files)
+                                 path = dirname(files))
+                af <- unique(af) # in case of multiple files with the same analysis name and path (eg mzXML+mzML)
                 rValues$analysisFiles <- rbind(rValues$analysisFiles, af)
             }
         })

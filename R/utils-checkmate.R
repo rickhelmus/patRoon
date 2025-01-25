@@ -153,6 +153,9 @@ assertAndPrepareAnaInfo <- function(x, ..., null.ok = FALSE, .var.name = checkma
 
     if ((is.null(add) || length(add$getMessages()) == mc) && !is.null(x))
     {
+        chrCols <- c("analysis", "group", "blank", getAnaInfoPathCols(x))
+        for (col in chrCols)
+            x[, (col) := as.character(get(col))]
         if (!is.null(x[["norm_conc"]]))
             x[, norm_conc := as.numeric(norm_conc)]
         x[is.na(blank), blank := ""]

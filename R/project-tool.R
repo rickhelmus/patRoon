@@ -1408,8 +1408,8 @@ newProject <- function(destPath = NULL)
 
     emptyAnaTable <- function()
     {
-        ai <- data.table(exclude = logical(0), analysis = character(0), type = character(0), group = character(0),
-                         blank = character(0), conc = numeric(0), norm_conc = numeric(0))
+        ai <- data.table(analysis = character(0), type = character(0), group = character(0), blank = character(0),
+                         conc = numeric(0), norm_conc = numeric(0))
         ai[, paste0("path_", getMSFileTypes()) := character(0)]
         return(ai)
     }
@@ -1436,8 +1436,7 @@ newProject <- function(destPath = NULL)
                            c(list(dt, height = 250, maxRows = nrow(dt), columnSorting = FALSE),
                              hotOpts)) %>%
                 rhandsontable::hot_col(c("group", "blank"), readOnly = FALSE, type = "text") %>%
-                rhandsontable::hot_col(c("conc", "norm_conc"), readOnly = FALSE, type = "numeric") %>%
-                rhandsontable::hot_col("exclude", readOnly = FALSE, type = "checkbox")
+                rhandsontable::hot_col(c("conc", "norm_conc"), readOnly = FALSE, type = "numeric")
             
             return(hot)
         }

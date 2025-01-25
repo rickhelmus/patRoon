@@ -1775,7 +1775,7 @@ newProject <- function(destPath = NULL)
                 # remove the analyses for which all file paths were removed
                 anaInfoTabs[[pol]] <<- anaInfoTabs[[pol]][analysis %in% rValues$analysisFiles$analysis]
     
-                # overlap: update paths            
+                # overlap: update paths
                 aiOv <- ai[analysis %in% anaInfoTabs[[pol]]$analysis]
                 if (nrow(aiOv) > 0)
                 {
@@ -1798,34 +1798,30 @@ newProject <- function(destPath = NULL)
             csvFile <- rstudioapi::selectFile(path = "~/", filter = "csv files (*.csv)")
             if (!is.null(csvFile))
             {
-                csvTab <- tryCatch(fread(csvFile, select = c("path", "analysis", "group", "blank"),
-                                         colClasses = "character"),
-                                   error = function(e) FALSE, warning = function(w) FALSE)
-                if (is.logical(csvTab))
-                    rstudioapi::showDialog("Error", "Failed to open/parse selected csv file!", "")
-                else if (nrow(csvTab) > 0)
+                ai <- tryCatch(assertAndPrepareAnaInfo(fread(csvFile)), error = function(e)
                 {
-                    msExts <- MSFileExtensions()
-                    msFiles <- normalizePath(listMSFiles(csvTab$path, getMSFileFormats()), winslash = "/")
-                    msFilesNoExt <- tools::file_path_sans_ext(msFiles)
-                    formats <- mapply(csvTab$analysis, csvTab$path, FUN = function(ana, path)
-                    {
-                        fps <- msFiles[msFilesNoExt == file.path(path, ana)]
-                        if (length(fps) == 0)
-                            return("")
-                        ret <- sapply(tolower(tools::file_ext(fps)), function(ext)
-                        {
-                            paste0(names(msExts)[sapply(msExts, function(e) ext %in% tolower(e))], collapse = "/")
-                        })
-                        return(paste0(ret, collapse = ", "))
-                    })
-                    
-                    csvTab[, format := formats]
-                    csvTab <- csvTab[nzchar(format)] # prune unknown files (might have been removed?)
-                    
+                    rstudioapi::showDialog("Invalid CSV file",
+                                           sprintf("The selected CSV file is not a valid analysis information file: '%s'", e))
+                    return(FALSE)
+                })
+                
+                if (!isFALSE(ai) && nrow(ai) > 0)
+                {
                     pol <- getCurPolarity()
-                    # UNDONE: merge/overwrite duplicates
-                    anaInfoTabs[[pol]] <<- rbind(anaInfoTabs[[pol]], csvTab, fill = TRUE)
+                    
+                    # check for overlap
+                    if (any(ai$analysis %in% anaInfoTabs[[pol]]$analysis))
+                    {
+                        overwrite <- rstudioapi::showQuestion("Overwrite analysis information",
+                                                              "One or more analyses are already defined. Do you want to overwrite or keep the current information for these analyses?",
+                                                              "Overwrite", "Keep", timeout = NULL)
+                        if (overwrite) # UNDONE: try to keep original order?
+                            anaInfoTabs[[pol]] <<- anaInfoTabs[[pol]][!analysis %in% ai$analysis]
+                        else
+                            ai <- ai[!analysis %in% anaInfoTabs[[pol]]$analysis]
+                    }
+                    
+                    anaInfoTabs[[pol]] <<- rbind(anaInfoTabs[[pol]], ai, fill = TRUE)
                     triggerAnaInfoHotUpdate()
                 }
             }

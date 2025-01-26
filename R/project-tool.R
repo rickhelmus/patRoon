@@ -1445,7 +1445,7 @@ newProject <- function(destPath = NULL)
         {
             tab <- copy(rValues$analysisFiles)
             tab[, format := mapply(analysis, path, type, FUN = function(a, p, t) {
-                exts <- MSFileExtensions()[getMSFileFormats(t)]
+                exts <- unique(MSFileExtensions()[getMSFileFormats(t)])
                 paths <- file.path(p, paste0(a, ".", exts))
                 exts <- exts[file.exists(paths)]
                 if (length(exts) == 0)

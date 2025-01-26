@@ -111,7 +111,8 @@ Imports:
     backports,
     httr,
     getPass,
-    lzstring
+    lzstring,
+    constructive
 Suggests: 
     RDCOMClient,
     metfRag,

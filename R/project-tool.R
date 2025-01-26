@@ -5,7 +5,22 @@
 #' @include main.R
 NULL
 
-getScriptCode <- function(input, analyses)
+makeAnaInfoR <- function(anaInfo, varName = NULL)
+{
+    # NOTE: for constructive we convert to a data.frame to avoid need for data.table and allow read.table() to
+    # construct the table
+    anaInfo <- as.data.frame(anaInfo)
+    
+    # UNDONE: read.table() looks nicer, but need to see for larger tables. Make it optional?
+    
+    if (is.null(varName))
+        return(constructive::construct(anaInfo, constructive::opts_data.frame("read.table"))$code)
+    
+    return(constructive::construct_multi(setNames(list(anaInfo), varName),
+                                         constructive::opts_data.frame("read.table"))$code)
+}
+
+getScriptCode <- function(input, anaInfo)
 {
     txtCon <- withr::local_connection(textConnection(NULL, "w"))
     
@@ -83,12 +98,23 @@ getScriptCode <- function(input, analyses)
         cl <- paste0(callPrefix, argText, ")")
         addText(cl)
     }
-    addAnaInfo <- function(anaInfoVarName, anaTable, anaTableFile, comment, ionization)
+    addAnaInfo <- function(anaInfoVarName, anaTable, anaTableFile, comment)
     {
         if (input$generateAnaInfo == "table")
         {
-            addComment("Load analysis table", condition = comment)
-            addCall(anaInfoVarName, "read.csv", list(value = anaTableFile, quote = TRUE))
+            if (input$analysisTableFileType == "embedded")
+            {
+                addComment("Create analysis table", condition = comment)
+                addText(makeAnaInfoR(anaTable, anaInfoVarName))
+            }
+            else
+            {
+                addComment("Load analysis table", condition = comment)
+                if (input$analysisTableFileType == "CSV")
+                    addCall(anaInfoVarName, "read.csv", list(value = anaTableFile, quote = TRUE))
+                else # R
+                    addCall(anaInfoVarName, "source", list(value = anaTableFile, quote = TRUE))
+            }
         }
         else if (input$generateAnaInfo == "script")
         {
@@ -243,11 +269,11 @@ getScriptCode <- function(input, analyses)
     addNL()
     
     if (input$ionization != "both")
-        addAnaInfo("anaInfo", analyses[[input$ionization]], input$analysisTableFile, TRUE, input$ionization)
+        addAnaInfo("anaInfo", anaInfo$tab, anaInfo$file, TRUE)
     else
     {
-        addAnaInfo("anaInfoPos", analyses$positive, input$analysisTableFilePos, TRUE, "positive")
-        addAnaInfo("anaInfoNeg", analyses$negative, input$analysisTableFileNeg, FALSE, "negative")
+        addAnaInfo("anaInfoPos", anaInfo$positive$tab, anaInfo$positive$file, TRUE)
+        addAnaInfo("anaInfoNeg", anaInfo$negative$tab, anaInfo$negative$file, FALSE)
     }
     
     if (nzchar(input$convAlgo) || nzchar(input$DAMethod) || input$doDACalib)
@@ -691,27 +717,39 @@ getScriptCode <- function(input, analyses)
     return(paste0(textConnectionValue(txtCon), collapse = "\n"))
 }
 
-doCreateProject <- function(input, analyses)
+doCreateProject <- function(input, anaInfoTabs)
 {
     mkdirp(input$destinationPath)
 
-    prepareAnas <- function(anas, tableFile)
+    prepareAnaInfo <- function(pol)
     {
-        anas <- copy(anas)
-        anas[, group := ifelse(!nzchar(group), analysis, group)]
+        aTab <- copy(anaInfoTabs[[pol]])
+        aTab[is.na(group) | !nzchar(group), group := analysis]
+        aTab <- aTab[, -"type"]
+        
+        fp <- NULL
         
         # Make analysis table
-        if (input$generateAnaInfo == "table")
-            write.csv(anas[!anas$exclude, c("path", "analysis", "group", "blank", "conc", "norm_conc")],
-                      file.path(input$destinationPath, tableFile), row.names = FALSE)
+        if (input$generateAnaInfo == "table" && input$analysisTableFileType != "embedded")
+        {
+            n <- paste0("analysisTableFile", input$analysisTableFileType)
+            if (input$ionization == "both")
+                n <- paste0(n, if (input$ionization == "positive") "Pos" else "Neg")
+            fp <- file.path(input$destinationPath, input[[n]])
+            
+            if (input$analysisTableFileType == "CSV")
+                write.csv(aTab, fp, row.names = FALSE)
+            else # "R"
+                cat(makeAnaInfoR(aTab), file = fp, sep = "\n")
+        }
         
-        return(anas)
+        return(list(file = fp, tab = aTab))
     }
 
     if (input$ionization != "both")
-        analyses <- prepareAnas(analyses, input$analysisTableFile)
+        anaInfo <- prepareAnaInfo(input$ionization)
     else
-        analyses <- Map(prepareAnas, analyses, list(input$analysisTableFilePos, input$analysisTableFileNeg))
+        anaInfo <- list(positive = prepareAnaInfo("positive"), negative = prepareAnaInfo("negative"))
     
     doSusps <- input$exSuspList || (input$ionization != "both" && nzchar(input$suspectList)) ||
         (input$ionization == "both" && nzchar(input$suspectListPos))
@@ -721,7 +759,7 @@ doCreateProject <- function(input, analyses)
     if ("HTML" %in% input$reportGen)
         genReportSettingsFile(file.path(input$destinationPath, "report.yml"))
     
-    code <- getScriptCode(input, analyses)
+    code <- getScriptCode(input, anaInfo)
     if (input$outputScriptTo == "curFile")
     {
         # insert at end of current document
@@ -1502,15 +1540,15 @@ newProject <- function(destPath = NULL)
                     return(FALSE)
                 }
             }
-            
             verifyAny("positive"); verifyAny("negative")
 
             if (input$generateAnaInfo == "table")
             {
+                n <- paste0("analysisTableFile", input$analysisTableFileType)
                 checkAnas <- if (input$ionization != "both")
-                    input$analysisTableFile
+                    input[[n]]
                 else
-                    c(input$analysisTableFilePos, input$analysisTableFileNeg)
+                    input[paste0(n, c("Pos", "Neg"))]
                 for (f in checkAnas)
                 {
                     p <- file.path(input$destinationPath, f)
@@ -1574,7 +1612,7 @@ newProject <- function(destPath = NULL)
                 rstudioapi::showDialog("Invalid destination", "Please select a destination path!", "")
             else if (input$outputScriptTo != "curFile" && !nzchar(input$scriptFile))
                 rstudioapi::showDialog("No script file", "Please select a destination script file!", "")
-            else if (input$generateAnaInfo %in% c("table", "script") && !verifyAnalysesOK())
+            else if (input$generateAnaInfo == "table" && !verifyAnalysesOK())
             {}
             else if (input$outputScriptTo != "curFile" && file.exists(file.path(input$destinationPath, input$scriptFile)) &&
                      !rstudioapi::showQuestion("Script file already exists",

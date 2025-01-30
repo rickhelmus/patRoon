@@ -248,6 +248,29 @@ Rcpp::DataFrame getMSSpectrum(const MSReadBackend &backend, int index, int MSLev
 }
 
 // [[Rcpp::export]]
+Rcpp::DataFrame getCentroidedFrame(const MSReadBackend &backend, int index, SpectrumRawTypes::Mass mzWindow,
+                                   SpectrumRawTypes::Mobility mobWindow, SpectrumRawTypes::Intensity minIntensity,
+                                   const std::string &method)
+{
+    const auto clMethod = clustMethodFromStr(method);
+    
+    SpectrumRawSelection sel(index);
+    std::vector<std::vector<SpectrumRawSelection>> sels(1, std::vector<SpectrumRawSelection>{sel});
+    
+    const auto sfunc = [](const SpectrumRaw &spec, const SpectrumRawSelection &, size_t)
+    {
+        return spec;
+    };
+    
+    const auto spectra = applyMSData<SpectrumRaw>(backend, SpectrumRawTypes::MSLevel::MS1, sels, sfunc, 0);
+    const auto &spec = centroidIMSFrame(spectra[0][0], clMethod, mzWindow, mobWindow, minIntensity);
+    
+    return Rcpp::DataFrame::create(Rcpp::Named("mz") = spec.getMZs(),
+                                   Rcpp::Named("intensity") = spec.getIntensities(),
+                                   Rcpp::Named("mobility") = spec.getMobilities());
+}
+
+// [[Rcpp::export]]
 Rcpp::DataFrame getScans(const MSReadBackend &backend, SpectrumRawTypes::Mass timeStart, SpectrumRawTypes::Mass timeEnd,
                          int MSLevel, SpectrumRawTypes::Mass prec)
 {

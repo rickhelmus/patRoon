@@ -511,6 +511,7 @@ assertEIXParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
     
     assertListVal(x, "window", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
     assertListVal(x, "mzExpWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
+    assertListVal(x, "mzExpIMSWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
     assertListVal(x, "mobExpWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
     assertListVal(x, "topMost", checkmate::assertCount, positive = TRUE, null.ok = TRUE, .var.name = .var.name,
                   add = add)

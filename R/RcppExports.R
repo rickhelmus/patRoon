@@ -41,8 +41,8 @@ getScans <- function(backend, timeStart, timeEnd, MSLevel, prec) {
     .Call(`_patRoon_getScans`, backend, timeStart, timeEnd, MSLevel, prec)
 }
 
-getEICList <- function(backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, minIntensityIMS, compress, withBP = FALSE) {
-    .Call(`_patRoon_getEICList`, backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, minIntensityIMS, compress, withBP)
+getEICList <- function(backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, mzExpIMSWindow, minIntensityIMS, compress, withBP = FALSE) {
+    .Call(`_patRoon_getEICList`, backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, mzExpIMSWindow, minIntensityIMS, compress, withBP)
 }
 
 getMSMetadata <- function(backend, msLevel) {
@@ -57,8 +57,8 @@ getMSPeakLists <- function(backend, startTimes, endTimes, precursorMZs, withPrec
     .Call(`_patRoon_getMSPeakLists`, backend, startTimes, endTimes, precursorMZs, withPrecursor, retainPrecursor, MSLevel, method, mzWindow, startMobs, endMobs, minAbundance, topMost, minIntensityIMS, minIntensityPre, minIntensityPost, minBPIntensity)
 }
 
-getEIMList <- function(backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, method, mobWindow, minIntensity, compress) {
-    .Call(`_patRoon_getEIMList`, backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, method, mobWindow, minIntensity, compress)
+getEIMList <- function(backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, method, mobWindow, minIntensity, mzExpIMSWindow, compress) {
+    .Call(`_patRoon_getEIMList`, backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, method, mobWindow, minIntensity, mzExpIMSWindow, compress)
 }
 
 getPeakIntensities <- function(backend, startMZs, endMZs, times) {

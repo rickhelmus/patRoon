@@ -306,7 +306,8 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                       const std::vector<SpectrumRawTypes::Time> &endTimes,
                       const std::vector<SpectrumRawTypes::Mobility> &startMobs,
                       const std::vector<SpectrumRawTypes::Mobility> &endMobs,
-                      SpectrumRawTypes::Intensity minIntensityIMS, bool compress, bool withBP = false)
+                      SpectrumRawTypes::Mass mzExpIMSWindow, SpectrumRawTypes::Intensity minIntensityIMS, bool compress,
+                      bool withBP = false)
 {
     struct EICPoint
     {
@@ -347,7 +348,9 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
 
         // NOTE: assume spec is mz sorted
         // use lower bound to speedup search for first mass
-        const auto mzIt = std::lower_bound(spec.getMZs().begin(), spec.getMZs().end(), startMZs[entry]);
+        const auto mzStart = startMZs[entry] - ((hasMob) ? mzExpIMSWindow : 0.0);
+        const auto mzEnd = endMZs[entry] + ((hasMob) ? mzExpIMSWindow : 0.0);
+        const auto mzIt = std::lower_bound(spec.getMZs().begin(), spec.getMZs().end(), mzStart);
         if (mzIt == spec.getMZs().end())
             return ret;
         const auto startInd = std::distance(spec.getMZs().begin(), mzIt);
@@ -358,7 +361,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         for (size_t j=startInd; j<spec.size(); ++j)
         {
             const auto mz = spec.getMZs()[j];
-            if (mz > endMZs[entry])
+            if (mz > mzEnd)
                 break; 
             
             const auto mob = (hasMob) ? spec.getMobilities()[j] : 0;
@@ -713,7 +716,7 @@ Rcpp::List getEIMList(const MSReadBackend &backend, const std::vector<SpectrumRa
                       const std::vector<SpectrumRawTypes::Mobility> &startMobs,
                       const std::vector<SpectrumRawTypes::Mobility> &endMobs,
                       const std::string &method, SpectrumRawTypes::Mobility mobWindow,
-                      SpectrumRawTypes::Intensity minIntensity, bool compress)
+                      SpectrumRawTypes::Intensity minIntensity, SpectrumRawTypes::Mass mzExpIMSWindow, bool compress)
 {
     // UNDONE: use applyMSData min intensity?
     
@@ -731,7 +734,7 @@ Rcpp::List getEIMList(const MSReadBackend &backend, const std::vector<SpectrumRa
         void append(SpectrumRawTypes::Mobility m, SpectrumRawTypes::Intensity i) { mobilities.push_back(m); intensities.push_back(i); }
     };
     
-    const auto &sfunc = [compress, minIntensity, &startMZs, &endMZs, &startMobs, &endMobs](const SpectrumRaw &spec, const SpectrumRawSelection &ssel, size_t e)
+    const auto &sfunc = [compress, minIntensity, mzExpIMSWindow, &startMZs, &endMZs, &startMobs, &endMobs](const SpectrumRaw &spec, const SpectrumRawSelection &ssel, size_t e)
     {
         if (!spec.hasMobilities())
             Rcpp::stop("Cannot load mobilogram: no mobility data found!");
@@ -761,7 +764,7 @@ Rcpp::List getEIMList(const MSReadBackend &backend, const std::vector<SpectrumRa
             }
             
             const auto mz = spec.getMZs()[i];
-            if (mz < startMZs[e] || mz > endMZs[e])
+            if (mz < (startMZs[e] - mzExpIMSWindow) || mz > (endMZs[e] + mzExpIMSWindow))
                 continue;
             
             const auto inten = spec.getIntensities()[i];

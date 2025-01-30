@@ -70,7 +70,7 @@ openCacheDBScope <- withr::local_(function(x, file = getCacheFile()) openCacheDB
 loadCacheData <- function(category, hashes, dbArg = NULL, simplify = TRUE, fixDTs = TRUE)
 {
     if (getCacheMode() == "save" || getCacheMode() == "none" || length(hashes) == 0)
-        return(NULL)
+        return(if (simplify && length(hashes) == 1) NULL else setNames(rep(list(NULL), length(hashes)), hashes))
 
     if (is.null(dbArg))
         db <- openCacheDBScope()

@@ -267,9 +267,7 @@
     - initial tests of pwiz, mzR and MSTK show quite different numbers of OpenMS features...
     - if we stick with convertMSFiles(), somehow recommend skipping MS2+gzip?
     - finalize
-        - make export of MS2 spectra optional
         - integrate with convertMSFiles()?
-        - test DIA data
 - interface with timsConvert?
 - update generateAnalysisInfo() and newProject()
     - see if getAllMSFilesFromAnaInfo() can be used, otherwise remove it

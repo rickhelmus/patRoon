@@ -914,23 +914,24 @@ Rcpp::List collapseIMSFrames(const MSReadBackend &backend, SpectrumRawTypes::Mas
     
     const auto &specMetaMS2 = backend.getSpecMetadata().second;
     std::vector<std::vector<SpectrumRawSelection>> scanSelsMS2(1);
-    std::vector<SpectrumRawTypes::Time> scanTimesMS2;
-    std::vector<SpectrumRawTypes::Mass> scanPrecursorMZs;
+    std::vector<SpectrumRawTypes::Scan> framesMS2;
+    std::vector<SpectrumRawTypes::Mass> scanPrecursorMZs, isolationStarts, isolationEnds;
     for (size_t i=0; i<specMetaMS2.scans.size(); ++i)
     {
         // special case, eg DIA
-        // UNDONE: handle unlikely case that PASEF frame has only one precursor
         if (specMetaMS2.MSMSFrames[i].isolationRanges.size() < 2)
         {
             scanSelsMS2[0].emplace_back(i);
+            framesMS2.push_back(specMetaMS2.scans[i]);
             if (specMetaMS2.MSMSFrames[i].isolationRanges.empty())
-                scanPrecursorMZs.push_back(0.0);
+            {
+                scanPrecursorMZs.push_back(0.0); isolationStarts.push_back(0.0); isolationEnds.push_back(0.0);
+            }
             else
             {
-                scanPrecursorMZs.push_back(
-                    (specMetaMS2.MSMSFrames[i].isolationRanges[0].start +
-                        specMetaMS2.MSMSFrames[i].isolationRanges[0].end) / 2.0
-                );
+                const auto ir = specMetaMS2.MSMSFrames[i].isolationRanges[0];
+                scanPrecursorMZs.push_back((ir.start + ir.end) / 2.0);
+                isolationStarts.push_back(ir.start); isolationEnds.push_back(ir.end);
             }
             continue;
         }
@@ -948,17 +949,22 @@ Rcpp::List collapseIMSFrames(const MSReadBackend &backend, SpectrumRawTypes::Mas
         {
             SpectrumRawSelection ssel(i);
             SpectrumRawTypes::Mass prec = 0.0;
+            SpectrumRawTypes::IsolationRange ir(0.0, 0.0);
             for (size_t j=0; j<precMZs.size(); ++j)
             {
                 if (cl == precMZClusts[j])
                 {
                     ssel.MSMSFrameIndices.push_back(j);
                     prec += precMZs[j];
+                    ir.start += specMetaMS2.MSMSFrames[i].isolationRanges[j].start;
+                    ir.end += specMetaMS2.MSMSFrames[i].isolationRanges[j].end;
                 }
             }
             scanSelsMS2[0].push_back(ssel);
-            scanTimesMS2.push_back(specMetaMS2.times[i]);
-            scanPrecursorMZs.push_back(prec / static_cast<SpectrumRawTypes::Mass>(ssel.MSMSFrameIndices.size()));
+            framesMS2.push_back(specMetaMS2.scans[i]);
+            const auto size = static_cast<SpectrumRawTypes::Mass>(ssel.MSMSFrameIndices.size());
+            scanPrecursorMZs.push_back(prec / size);
+            isolationStarts.push_back(ir.start / size); isolationEnds.push_back(ir.end / size);
         }
     }
     
@@ -983,8 +989,10 @@ Rcpp::List collapseIMSFrames(const MSReadBackend &backend, SpectrumRawTypes::Mas
     
     return Rcpp::List::create(Rcpp::Named("MS1") = getSpecRList(spectraMS),
                               Rcpp::Named("MS2") = getSpecRList(spectraMS2),
-                              Rcpp::Named("timesMS2") = scanTimesMS2,
-                              Rcpp::Named("precursorMZs") = scanPrecursorMZs);
+                              Rcpp::Named("framesMS2") = framesMS2,
+                              Rcpp::Named("precursorMZs") = scanPrecursorMZs,
+                              Rcpp::Named("isolationStarts") = isolationStarts,
+                              Rcpp::Named("isolationEnds") = isolationEnds);
 }
 
 

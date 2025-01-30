@@ -157,6 +157,7 @@ collapseIMSFiles <- function(anaInfo, mzRange = NULL, mobilityRange = NULL, clMe
 {
     # UNDONE: checkmate
     # UNDONE: which default clust method?
+    # UNDONE: support mzXML
     
     anaInfo <- assertAndPrepareAnaInfo(anaInfo)
     
@@ -166,41 +167,50 @@ collapseIMSFiles <- function(anaInfo, mzRange = NULL, mobilityRange = NULL, clMe
     mkdirp(outDirs)
     
     
-    makeHeader <- function(spectra, pol, MSLevel, times, precursorMZs)
+    makeHeader <- function(collapsedSpectra, MSLevel, meta)
     {
+        # UNDONE: assume there is no polarity switching (currently not possible with IMS instruments anyway)
+        # UNDONE: support polarities for MSTK
+        pol <- if (meta$polarity[1] == 1) 1 else 0
+        times <- if (MSLevel == 1) meta$time else meta$time[match(collapsedSpectra$framesMS2, meta$scan)]
+        spectra <- if (MSLevel == 1) collapsedSpectra$MS1 else collapsedSpectra$MS2
+        
         # NOTE: there may be empty spectra due to filtering or measurement errors
         nonEmptySpectra <- sapply(spectra, nrow) > 0
         specMZRange <- range(unlist(lapply(spectra[nonEmptySpectra], function(sp) range(sp[, "mz"]))))
         
         # NOTE: scan nums are filled in later
-        data.frame(msLevel = MSLevel,
-                   polarity = pol,
-                   peaksCount = sapply(spectra, nrow), # UNDONE: correct?
-                   totIonCurrent = sapply(spectra, function(sp) if (nrow(sp) == 0) 0 else sum(sp[, "intensity"])),
-                   retentionTime = times,
-                   basePeakMZ = sapply(spectra, function(sp) if (nrow(sp) == 0) 0 else sp[which.max(sp[, "intensity"]), "mz"]),
-                   basePeakIntensity = sapply(spectra, function(sp) if (nrow(sp) == 0) 0 else max(sp[, "intensity"])),
-                   collisionEnergy = NA_real_,
-                   ionisationEnergy = 0,
-                   lowMZ = 0,
-                   highMZ = 0,
-                   precursorScanNum = NA_integer_,
-                   precursorMZ = precursorMZs,
-                   precursorCharge = NA_integer_,
-                   precursorIntensity = NA_real_,
-                   mergedScan = NA_integer_,
-                   mergedResultScanNum = NA_integer_,
-                   mergedResultStartScanNum = NA_integer_,
-                   mergedResultEndScanNum = NA_integer_,
-                   injectionTime = 0,
-                   filterString = NA_character_,
-                   centroided = TRUE,
-                   ionMobilityDriftTime = NA_real_,
-                   isolationWindowLowerOffset = NA_real_,
-                   isolationWindowUpperOffset = NA_real_,
-                   # UNDONE: below are technically not scan limits, but might be good enough?
-                   scanWindowLowerLimit = specMZRange[1],
-                   scanWindowUpperLimit = specMZRange[2])
+        data.frame(
+            msLevel = MSLevel,
+            polarity = pol,
+            peaksCount = sapply(spectra, nrow), # UNDONE: correct?
+            totIonCurrent = sapply(spectra, function(sp) if (nrow(sp) == 0) 0 else sum(sp[, "intensity"])),
+            retentionTime = times,
+            basePeakMZ = sapply(spectra, function(sp) if (nrow(sp) == 0) 0 else sp[which.max(sp[, "intensity"]), "mz"]),
+            basePeakIntensity = sapply(spectra, function(sp) if (nrow(sp) == 0) 0 else max(sp[, "intensity"])),
+            collisionEnergy = NA_real_,
+            ionisationEnergy = 0,
+            lowMZ = 0,
+            highMZ = 0,
+            precursorScanNum = NA_integer_,
+            precursorMZ = if (MSLevel == 1) NA_real_ else collapsedSpectra$precursorMZs,
+            precursorCharge = NA_integer_,
+            precursorIntensity = NA_real_,
+            mergedScan = NA_integer_,
+            mergedResultScanNum = NA_integer_,
+            mergedResultStartScanNum = NA_integer_,
+            mergedResultEndScanNum = NA_integer_,
+            injectionTime = 0,
+            filterString = NA_character_,
+            centroided = TRUE,
+            ionMobilityDriftTime = NA_real_,
+            isolationWindowLowerOffset = if (MSLevel == 1) NA_real_ else collapsedSpectra$precursorMZs - collapsedSpectra$isolationStarts,
+            isolationWindowUpperOffset = if (MSLevel == 1) NA_real_ else collapsedSpectra$isolationEnds - collapsedSpectra$precursorMZs,
+            # UNDONE: below are technically not scan limits, but might be good enough?
+            scanWindowLowerLimit = specMZRange[1],
+            scanWindowUpperLimit = specMZRange[2],
+            frame = if (MSLevel == 1) meta$scan else collapsedSpectra$framesMS2 # temporary, will be used and removed later
+        )
     }
     
     printf("Collapsing all %d analyses ...\n", nrow(anaInfo))
@@ -222,20 +232,18 @@ collapseIMSFiles <- function(anaInfo, mzRange = NULL, mobilityRange = NULL, clMe
                                               mzWindow, minAbundance, NULLToZero(topMost), NULLToZero(minIntensityIMS),
                                               NULLToZero(minIntensityPre))
         
-        meta <- getMSMetadata(backend, 1)
         
-        # UNDONE: assume there is no polarity switching (currently not possible with IMS instruments anyway)
-        pol <- if (meta$polarity[1] == 1) 1 else 0
         
-        headerMS1 <- makeHeader(collapsedSpectra$MS1, pol, 1, meta$time, NA_real_)
-        headerMS2 <- makeHeader(collapsedSpectra$MS2, pol, 2, collapsedSpectra$timesMS2, collapsedSpectra$precursorMZs)
+        headerMS1 <- makeHeader(collapsedSpectra, 1, getMSMetadata(backend, 1))
+        headerMS2 <- makeHeader(collapsedSpectra, 2, getMSMetadata(backend, 2))
         
         header <- rbind(headerMS1, headerMS2)
-        ord <- order(header$retentionTime, header$msLevel)
+        ord <- order(header$frame, header$precursorMZ)
         header <- header[ord, ]
         header$seqNum <- header$acquisitionNum <- seq_len(nrow(header))
-        header$spectrumId <- paste0("scan=", header$seqNum)
-        
+        header$spectrumId <- sprintf("merged=%d frame=%d", header$seqNum, header$frame)
+        header <- header[, names(header) != "frame"]
+
         allSpectra <- c(collapsedSpectra$MS1, collapsedSpectra$MS2)
         allSpectra <- allSpectra[ord]
 

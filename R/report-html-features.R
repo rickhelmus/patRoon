@@ -21,10 +21,13 @@ getFGReactTab <- function(objects, settings, ...)
         tab[, chrom_small := group]
     if (settings$features$chromatograms$large)
         tab[, chrom_large := group]
-    if (settings$features$mobilograms$small)
-        tab[, mob_small := group]
-    if (settings$features$mobilograms$large)
-        tab[, mob_large := group]
+    if (hasMobilities(objects$fGroups))
+    {
+        if (settings$features$mobilograms$small)
+            tab[, mob_small := group]
+        if (settings$features$mobilograms$large)
+            tab[, mob_large := group]
+    }
     
     if (!is.null(objects$MSPeakLists) || !is.null(objects$formulas) || !is.null(objects$compounds))
     {
@@ -153,7 +156,7 @@ genHTMLReportPlotsMobilogramsLarge <- function(fGroups, settings, outPath, EIMs,
 {
     gInfo <- groupInfo(fGroups)
     
-    if (!settings$features$mobilograms$large || is.null(gInfo[["mobility"]]))
+    if (!settings$features$mobilograms$large || !hasMobilities(fGroups))
         return(list())
     
     cat("Generate large mobilograms...\n")
@@ -173,7 +176,7 @@ genHTMLReportPlotsMobilogramsSmall <- function(fGroups, settings, outPath, EIMs,
 {
     gInfo <- groupInfo(fGroups)
     
-    if (!settings$features$mobilograms$small || is.null(gInfo[["mobility"]]))
+    if (!settings$features$mobilograms$small || !hasMobilities(fGroups))
         return(list())
     
     cat("Generate small mobilograms...\n")
@@ -194,7 +197,7 @@ genHTMLReportPlotsMobilogramsSmall <- function(fGroups, settings, outPath, EIMs,
 
 genHTMLReportPlotsMobilogramsFeatures <- function(fGroups, settings, outPath, EIMs, EIMParams, parallel)
 {
-    if (isFALSE(settings$features$mobilograms$features))
+    if (isFALSE(settings$features$mobilograms$features) || !hasMobilities(fGroups))
         return(list())
     
     anas <- analyses(fGroups)

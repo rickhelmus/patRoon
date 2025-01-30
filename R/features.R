@@ -409,7 +409,7 @@ setMethod("delete", "features", function(obj, i = NULL, j = NULL, ...)
 #'   Similarity} metric, in which case it will be set to \samp{0}.
 #' @export
 setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessFactor, featureQualities = NULL,
-                                                         parallel = TRUE)
+                                                         EICParams = getDefEICParams(window = 0), parallel = TRUE)
 {
     checkPackage("MetaClean")
     
@@ -421,6 +421,7 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
     checkmate::assertNumeric(weights, finite = TRUE, any.missing = FALSE, min.len = 1, names = "unique",
                              null.ok = TRUE, add = ac)
     checkmate::assertNumber(flatnessFactor, add = ac)
+    assertEICParams(EICParams, add = ac)
     checkmate::assertFlag(parallel, add = ac)
     checkmate::reportAssertions(ac)
     
@@ -436,7 +437,7 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
     if (!is.null(cd))
         return(cd)
     
-    EICs <- getFeatureEIXs(obj, "EIC")
+    EICs <- getFeatureEIXs(obj, "EIC", EICParams)
     
     # HACK HACK HACK: MetaClean::calculateGaussianSimilarity needs to have
     # xcms::SSgauss attached

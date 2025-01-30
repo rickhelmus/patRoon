@@ -835,7 +835,7 @@ setMethod("overlap", "featureGroups", function(fGroups, which, aggregate, exclus
 #' @export
 setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flatnessFactor, featureQualities = NULL,
                                                               featureGroupQualities = NULL, avgFunc = mean,
-                                                              parallel = TRUE)
+                                                              EICParams = getDefEICParams(window = 0), parallel = TRUE)
 {
     checkPackage("MetaClean")
     
@@ -844,6 +844,7 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flat
     assertFeatureQualities(featureGroupQualities, null.ok = TRUE, add = ac)
     checkmate::assertNumber(flatnessFactor, add = ac)
     checkmate::assertFunction(avgFunc, add = ac)
+    assertEICParams(EICParams, add = ac)
     checkmate::assertFlag(parallel, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -876,7 +877,8 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flat
     fs <- featScoreNames
     w <- if (!is.null(weights) && any(names(weights) %in% fs)) weights[names(weights) %in% fs] else NULL
     obj@features <- calculatePeakQualities(getFeatures(obj), weights = w, flatnessFactor = flatnessFactor,
-                                           featureQualities = featureQualities, parallel = parallel)
+                                           featureQualities = featureQualities, EICParams = EICParams,
+                                           parallel = parallel)
     
     ftind <- groupFeatIndex(obj)
     anas <- analyses(obj)

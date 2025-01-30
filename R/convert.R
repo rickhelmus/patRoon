@@ -151,9 +151,9 @@ convertMSFilesBruker <- function(inFiles, outFiles, to, centroid)
     invisible(NULL)
 }
 
-collapseIMSFiles <- function(anaInfo, mzRange = NULL, mobilityRange = NULL, clMethod = "bin", mzWindow = 0.005,
-                             minAbundance = 0, topMost = NULL, minIntensityIMS = NULL, minIntensityPre = NULL,
-                             overWrite = FALSE)
+collapseIMSFiles <- function(anaInfo, mzRange = NULL, mobilityRange = NULL, clMethod = "distance", mzWindow = 0.005,
+                             minAbundance = 0, topMost = NULL, minIntensityIMS = NULL,
+                             minIntensityPre = NULL, includeMSMS = FALSE, overWrite = FALSE)
 {
     # UNDONE: checkmate
     # UNDONE: which default clust method?
@@ -230,14 +230,20 @@ collapseIMSFiles <- function(anaInfo, mzRange = NULL, mobilityRange = NULL, clMe
         collapsedSpectra <- collapseIMSFrames(backend, NULLToZero(mzRange[1]), NULLToZero(mzRange[2]),
                                               NULLToZero(mobilityRange[1]), NULLToZero(mobilityRange[2]), clMethod,
                                               mzWindow, minAbundance, NULLToZero(topMost), NULLToZero(minIntensityIMS),
-                                              NULLToZero(minIntensityPre))
+                                              NULLToZero(minIntensityPre), includeMSMS)
         
         
         
         headerMS1 <- makeHeader(collapsedSpectra, 1, getMSMetadata(backend, 1))
-        headerMS2 <- makeHeader(collapsedSpectra, 2, getMSMetadata(backend, 2))
         
-        header <- rbind(headerMS1, headerMS2)
+        if (!includeMSMS)
+            header <- headerMS1
+        else
+        {
+            headerMS2 <- makeHeader(collapsedSpectra, 2, getMSMetadata(backend, 2))
+            header <- rbind(headerMS1, headerMS2)
+        }
+        
         ord <- order(header$frame, header$precursorMZ)
         header <- header[ord, ]
         header$seqNum <- header$acquisitionNum <- seq_len(nrow(header))

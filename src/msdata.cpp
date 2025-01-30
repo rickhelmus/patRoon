@@ -912,7 +912,8 @@ Rcpp::List collapseIMSFrames(const MSReadBackend &backend, SpectrumRawTypes::Mas
                              SpectrumRawTypes::Mobility mobilityStart, SpectrumRawTypes::Mobility mobilityEnd,
                              const std::string &method, SpectrumRawTypes::Mass mzWindow,
                              SpectrumRawTypes::PeakAbundance minAbundance, unsigned topMost,
-                             SpectrumRawTypes::Intensity minIntensityIMS, SpectrumRawTypes::Intensity minIntensityPre)
+                             SpectrumRawTypes::Intensity minIntensityIMS, SpectrumRawTypes::Intensity minIntensityPre,
+                             bool includeMSMS)
 {
     const auto clMethod = clustMethodFromStr(method);
     const auto filterP = SpectrumRawFilter()
@@ -938,6 +939,26 @@ Rcpp::List collapseIMSFrames(const MSReadBackend &backend, SpectrumRawTypes::Mas
     const auto spectraMS = applyMSData<SpectrumRawAveraged>(backend, SpectrumRawTypes::MSLevel::MS1, scanSelsMS, sfunc,
                                                             minIntensityIMS)[0];
     
+    const auto &getSpecRList = [](const auto &spectra)
+    {
+        // NOTE: we return matrices so these can be directly consumed by mzR
+        Rcpp::List ret(spectra.size());
+        const auto coln = Rcpp::CharacterVector::create("mz", "intensity");
+        for (size_t i=0; i<spectra.size(); ++i)
+        {
+            Rcpp::NumericMatrix m(spectra[i].size(), 2);
+            Rcpp::NumericVector mzs = Rcpp::wrap(spectra[i].getMZs()), ints = Rcpp::wrap(spectra[i].getIntensities());
+            m(Rcpp::_, 0) = mzs; m(Rcpp::_, 1) = ints;
+            Rcpp::colnames(m) = coln;
+            ret[i] = m;
+        }
+        return ret;
+    };
+    
+    if (!includeMSMS)
+        return Rcpp::List::create(Rcpp::Named("MS1") = getSpecRList(spectraMS));
+
+        
     const auto &specMetaMS2 = backend.getSpecMetadata().second;
     std::vector<std::vector<SpectrumRawSelection>> scanSelsMS2(1);
     std::vector<SpectrumRawTypes::Scan> framesMS2;
@@ -996,22 +1017,6 @@ Rcpp::List collapseIMSFrames(const MSReadBackend &backend, SpectrumRawTypes::Mas
     
     const auto spectraMS2 = applyMSData<SpectrumRawAveraged>(backend, SpectrumRawTypes::MSLevel::MS2, scanSelsMS2, sfunc,
                                                              minIntensityIMS)[0];
-    
-    const auto &getSpecRList = [](const auto &spectra)
-    {
-        // NOTE: we return matrices so these can be directly consumed by mzR
-        Rcpp::List ret(spectra.size());
-        const auto coln = Rcpp::CharacterVector::create("mz", "intensity");
-        for (size_t i=0; i<spectra.size(); ++i)
-        {
-            Rcpp::NumericMatrix m(spectra[i].size(), 2);
-            Rcpp::NumericVector mzs = Rcpp::wrap(spectra[i].getMZs()), ints = Rcpp::wrap(spectra[i].getIntensities());
-            m(Rcpp::_, 0) = mzs; m(Rcpp::_, 1) = ints;
-            Rcpp::colnames(m) = coln;
-            ret[i] = m;
-        }
-        return ret;
-    };
     
     return Rcpp::List::create(Rcpp::Named("MS1") = getSpecRList(spectraMS),
                               Rcpp::Named("MS2") = getSpecRList(spectraMS2),

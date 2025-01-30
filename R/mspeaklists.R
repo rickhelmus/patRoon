@@ -884,8 +884,8 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRtWindo
 
         ft[, hash := makeHash(baseHash, .SD), by = seq_len(nrow(ft)), .SDcols = setdiff(names(ft), "group")]
         
-        cachedData <- loadCacheData("MSPeakLists", ft$hash, cacheDB, simplify = FALSE)
-        if (!is.null(cachedData))
+        cachedData <- pruneList(loadCacheData("MSPeakLists", ft$hash, cacheDB, simplify = FALSE))
+        if (length(cachedData) > 0)
             names(cachedData) <- ft$group[match(names(cachedData), ft$hash)]
         
         ft <- ft[!group %chin% names(cachedData)]

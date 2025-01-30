@@ -178,5 +178,7 @@ SpectrumRawAveraged averageSpectraRaw(const std::vector<SpectrumRawAveraged> &sp
                                       SpectrumRawTypes::Intensity minIntensity,
                                       SpectrumRawTypes::PeakAbundance minAbundance);
 std::vector<size_t> frameSubSpecIDs(const SpectrumRaw &frame);
+SpectrumRaw centroidIMSFrame(const SpectrumRaw &frame, const clusterMethod method, SpectrumRawTypes::Mass mzWindow,
+                             SpectrumRawTypes::Mobility mobWindow, SpectrumRawTypes::Intensity minIntensity);
 
 #endif

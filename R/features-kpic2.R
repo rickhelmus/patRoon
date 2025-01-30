@@ -228,18 +228,19 @@ importFeaturesKPIC2 <- function(picsList, analysisInfo)
 #' @rdname kpic2-conv
 #' @aliases getPICSet
 #' @export
-setMethod("getPICSet", "features", function(obj, loadRawData = TRUE, IMS = FALSE)
+setMethod("getPICSet", "features", function(obj, loadRawData = TRUE, IMS = FALSE,
+                                            EICParams = getDefEICParams(window = 0))
 {
     checkmate::assertFlag(loadRawData)
     assertIMSArg(IMS)
+    assertEICParams(EICParams)
     
     if (IMS != "both" && hasMobilities(obj))
         obj <- selectIMSFilterFeatures(obj, IMS)
     
-    
     anaInfo <- analysisInfo(obj)
     fTable <- featureTable(obj)
-    EICs <- if (loadRawData) getFeatureEIXs(obj, "EIC") else NULL
+    EICs <- if (loadRawData) getFeatureEIXs(obj, "EIC", EICParams = EICParams) else NULL
     MSMeta <- if (loadRawData)
     {
         applyMSData(anaInfo, showProgress = FALSE, func = function(ana, path, backend)

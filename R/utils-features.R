@@ -287,6 +287,7 @@ getDefEIXParams <- function()
         onlyPresent = TRUE,
         mzExpWindow = 0.001,
         mobExpWindow = 0.005,
+        mzExpIMSWindow = 0.002,
         setsAdductPos = "[M+H]+",
         setsAdductNeg = "[M-H]-"
     )
@@ -358,12 +359,13 @@ extendEIXInputTab <- function(tab, type, EIXParams)
 getEICsOREIMs <- function(obj, type, inputTab, EIXParams, ...)
 {
     if (type == "EIC")
-        doGetEICs(analysisInfo(obj), inputTab, ...)
+        doGetEICs(analysisInfo(obj), inputTab, EIXParams$mzExpIMSWindow, ...)
     else # EIM
-        doGetEIMs(analysisInfo(obj), inputTab, EIXParams$IMSWindow, EIXParams$clusterMethod, EIXParams$minIntensity, ...)
+        doGetEIMs(analysisInfo(obj), inputTab, EIXParams$IMSWindow, EIXParams$clusterMethod, EIXParams$minIntensity,
+                  EIXParams$mzExpIMSWindow, ...)
 }
 
-setMethod("getFeatureEIXInputTab", "features", function(obj, type, EIXParams, selectFunc)
+setMethod("getFeatureEIXInputTab", "features", function(obj, type, selectFunc)
 {
     return(lapply(featureTable(obj), function(tab)
     {
@@ -377,8 +379,8 @@ setMethod("getFeatureEIXInputTab", "features", function(obj, type, EIXParams, se
 
         if (type == "EIM" && is.null(tab[["mobmin"]]))
             tab[, c("mobmin", "mobmax") := NA_real_]
-        if (!is.null(EIXParams))
-            tab <- extendEIXInputTab(tab, type, EIXParams)
+
+        tab <- extendEIXInputTab(tab, type, EIXParams)
 
         return(tab)
     }))
@@ -512,8 +514,7 @@ setMethod("getFeatureEIXInputTab", "featureGroupsSet", function(obj, type, analy
     }))
 })
 
-setMethod("getFeatureEIXs", "features", function(obj, type, analysis = analyses(obj), EIXParams = NULL,
-                                                 selectFunc = NULL, ...)
+setMethod("getFeatureEIXs", "features", function(obj, type, analysis = analyses(obj), EIXParams, selectFunc = NULL, ...)
 {
     if (length(obj) == 0)
         return(list())

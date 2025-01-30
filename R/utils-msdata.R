@@ -182,7 +182,8 @@ getCentroidedMSFilesFromAnaInfo <- function(anaInfo, formats = c("mzML", "mzXML"
     getMSFilesFromAnaInfo(anaInfo, "centroid", formats, mustExist)
 }
 
-doGetEICs <- function(anaInfo, EICInfoList, minIntensityIMS = 0, compress = TRUE, withBP = FALSE, cacheDB = NULL)
+doGetEICs <- function(anaInfo, EICInfoList, mzExpIMSWindow = 0, minIntensityIMS = 0, compress = TRUE, withBP = FALSE,
+                      cacheDB = NULL)
 {
     if (length(EICInfoList) == 0)
         return(list())
@@ -241,7 +242,7 @@ doGetEICs <- function(anaInfo, EICInfoList, minIntensityIMS = 0, compress = TRUE
         # NOTE: getEICList() return lists, which are converted to data.frames and is a lot faster than returning
         # data.frames directly.
         newEICs <- getEICList(backend, ToDo$mzmin, ToDo$mzmax, ToDo$retmin, ToDo$retmax, ToDo$mobmin, ToDo$mobmax,
-                              minIntensityIMS, compress, withBP)
+                              mzExpIMSWindow, minIntensityIMS, compress, withBP)
         newEICs <- lapply(newEICs, setDF)
         EICs[!isCached] <- newEICs
         
@@ -255,7 +256,8 @@ doGetEICs <- function(anaInfo, EICInfoList, minIntensityIMS = 0, compress = TRUE
     return(allEICs)
 }
 
-doGetEIMs <- function(anaInfo, EIMInfoList, IMSWindow, clusterMethod, minIntensity, compress = TRUE, cacheDB = NULL)
+doGetEIMs <- function(anaInfo, EIMInfoList, IMSWindow, clusterMethod, minIntensity, mzExpIMSWindow = 0,
+                      compress = TRUE, cacheDB = NULL)
 {
     if (length(EIMInfoList) == 0)
         return(list())
@@ -299,7 +301,7 @@ doGetEIMs <- function(anaInfo, EIMInfoList, IMSWindow, clusterMethod, minIntensi
         # NOTE: getEIMList() return lists, which are converted to data.frames and is a lot faster than returning
         # data.frames directly.
         newEIMs <- getEIMList(backend, ToDo$mzmin, ToDo$mzmax, ToDo$retmin, ToDo$retmax, ToDo$mobmin, ToDo$mobmax,
-                              clusterMethod, IMSWindow, minIntensity, compress)
+                              clusterMethod, IMSWindow, minIntensity, mzExpIMSWindow, compress)
         newEIMs <- lapply(newEIMs, setDF)
         EIMs[!isCached] <- newEIMs
         

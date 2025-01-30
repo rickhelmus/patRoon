@@ -286,6 +286,8 @@
     - updated convertMSFilesXXX() functions, including changed args
     - generateMSPeakLists()
         - now uses backends, old methods still available but deprecated
+    - EICParams for getPICSet() and calculatePeakQualities() (needed for m/z IMS expansion)
+    - mzExpIMSWindow EIXParam
 
 - docs
     - getMSFileFormats()
@@ -294,6 +296,8 @@
     - updated convertMSFilesXXX() functions, including changed args
     - update generateMSPeakLists()
     - availableBackends()
+    - EICParams for getPICSet() and calculatePeakQualities()
+    - mzExpIMSWindow EIXParam
 
 ## IMS
 

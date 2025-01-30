@@ -179,6 +179,22 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// getCentroidedFrame
+Rcpp::DataFrame getCentroidedFrame(const MSReadBackend& backend, int index, SpectrumRawTypes::Mass mzWindow, SpectrumRawTypes::Mobility mobWindow, SpectrumRawTypes::Intensity minIntensity, const std::string& method);
+RcppExport SEXP _patRoon_getCentroidedFrame(SEXP backendSEXP, SEXP indexSEXP, SEXP mzWindowSEXP, SEXP mobWindowSEXP, SEXP minIntensitySEXP, SEXP methodSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const MSReadBackend& >::type backend(backendSEXP);
+    Rcpp::traits::input_parameter< int >::type index(indexSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type mzWindow(mzWindowSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Mobility >::type mobWindow(mobWindowSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minIntensity(minIntensitySEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
+    rcpp_result_gen = Rcpp::wrap(getCentroidedFrame(backend, index, mzWindow, mobWindow, minIntensity, method));
+    return rcpp_result_gen;
+END_RCPP
+}
 // getScans
 Rcpp::DataFrame getScans(const MSReadBackend& backend, SpectrumRawTypes::Mass timeStart, SpectrumRawTypes::Mass timeEnd, int MSLevel, SpectrumRawTypes::Mass prec);
 RcppExport SEXP _patRoon_getScans(SEXP backendSEXP, SEXP timeStartSEXP, SEXP timeEndSEXP, SEXP MSLevelSEXP, SEXP precSEXP) {
@@ -727,6 +743,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_backendAvailable", (DL_FUNC) &_patRoon_backendAvailable, 1},
     {"_patRoon_walkSpectra", (DL_FUNC) &_patRoon_walkSpectra, 1},
     {"_patRoon_getMSSpectrum", (DL_FUNC) &_patRoon_getMSSpectrum, 4},
+    {"_patRoon_getCentroidedFrame", (DL_FUNC) &_patRoon_getCentroidedFrame, 6},
     {"_patRoon_getScans", (DL_FUNC) &_patRoon_getScans, 5},
     {"_patRoon_getEICList", (DL_FUNC) &_patRoon_getEICList, 10},
     {"_patRoon_getMSMetadata", (DL_FUNC) &_patRoon_getMSMetadata, 2},

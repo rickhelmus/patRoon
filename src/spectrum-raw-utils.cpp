@@ -492,3 +492,87 @@ std::vector<size_t> frameSubSpecIDs(const SpectrumRaw &frame)
     }
     return ret;
 }
+
+SpectrumRaw centroidIMSFrame(const SpectrumRaw &frame, const clusterMethod method, SpectrumRawTypes::Mass mzWindow,
+                             SpectrumRawTypes::Mobility mobWindow, SpectrumRawTypes::Intensity minIntensity)
+{
+    // UNDONE: this function is a bit too naive and probably needs to pick IMS peaks for better centroiding, leaving it
+    // here in case we ever want to do that...
+    
+    if (frame.empty())
+        return SpectrumRaw();
+    
+    const std::vector<int> mzClusts = clusterNums(frame.getMZs(), method, mzWindow);
+    const int maxMZClust = *(std::max_element(mzClusts.begin(), mzClusts.end()));
+    SpectrumRaw binnedSpectrum;
+    
+    for (int mzcl=0; mzcl<=maxMZClust; ++mzcl)
+    {
+        SpectrumRaw mzBinSpec;
+        auto it = std::find(mzClusts.cbegin(), mzClusts.cend(), mzcl);
+        while (it != mzClusts.cend())
+        {
+            const auto ind = std::distance(mzClusts.cbegin(), it);
+            
+            mzBinSpec.append(frame.getMZs()[ind], frame.getIntensities()[ind], frame.getMobilities()[ind]);
+            it = std::find(std::next(it), mzClusts.cend(), mzcl);
+        }
+        
+        if (mzBinSpec.empty())
+            continue;
+        else if (mzBinSpec.size() == 1)
+        {
+            binnedSpectrum.append(mzBinSpec);
+            continue;
+        }
+        
+        const std::vector<int> mobClusts = clusterNums(mzBinSpec.getMobilities(), method, mobWindow);
+        const int maxMobClust = *(std::max_element(mobClusts.begin(), mobClusts.end()));
+        SpectrumRaw mobBinSpec(maxMobClust + 1, true);
+        
+        // sum data for each cluster
+        for (size_t i=0; i<mobClusts.size(); ++i)
+        {
+            const size_t mobcl = mobClusts[i];
+            const SpectrumRawTypes::Intensity intenfl = mzBinSpec.getIntensities()[i];
+            const SpectrumRawTypes::Mass mz = mobBinSpec.getMZs()[mobcl] + (mzBinSpec.getMZs()[i] *
+                                                                    static_cast<SpectrumRawTypes::Mass>(intenfl));
+            const SpectrumRawTypes::Mass mob = mobBinSpec.getMobilities()[mobcl] + (mzBinSpec.getMobilities()[i] *
+                                                                static_cast<SpectrumRawTypes::Mobility>(intenfl));
+            const SpectrumRawTypes::Intensity inten = mobBinSpec.getIntensities()[mobcl] + intenfl;
+            mobBinSpec.setPeak(mobcl, mz, inten, mob);
+        }
+        
+        // average data
+        for (size_t i=0; i<mobBinSpec.size(); ++i)
+        {
+            const auto inten = mobBinSpec.getIntensities()[i];
+            const SpectrumRawTypes::Mass mz = mobBinSpec.getMZs()[i] / static_cast<SpectrumRawTypes::Mass>(inten);
+            const SpectrumRawTypes::Mobility mob = mobBinSpec.getMobilities()[i] / static_cast<SpectrumRawTypes::Mobility>(inten);
+            mobBinSpec.setPeak(i, mz, inten, mob);
+        }
+        
+        binnedSpectrum.append(mobBinSpec);
+    }
+    
+    // sort spectrum && pre-treat
+    const auto sortedInds = getSortedInds(binnedSpectrum.getMZs());
+    SpectrumRaw sortedSpectrum;
+    for (size_t i=0; i<sortedInds.size(); ++i)
+    {
+        const auto j = sortedInds[i];
+        if (minIntensity > 0 && binnedSpectrum.getIntensities()[j] < minIntensity)
+            continue;
+        
+        // UNDONE: support this?
+/*        const auto abundance = static_cast<SpectrumRawTypes::PeakAbundance>(binIDs[j].size()) /
+            static_cast<SpectrumRawTypes::PeakAbundance>(numSpecs);
+        if (abundance < minAbundance)
+            continue;*/
+        
+        sortedSpectrum.append(binnedSpectrum.getMZs()[j], binnedSpectrum.getIntensities()[j],
+                              binnedSpectrum.getMobilities()[j]);
+    }
+    
+    return sortedSpectrum;
+}

@@ -33,6 +33,10 @@ getMSSpectrum <- function(backend, index, MSLevel, frameIndex = -1L) {
     .Call(`_patRoon_getMSSpectrum`, backend, index, MSLevel, frameIndex)
 }
 
+getCentroidedFrame <- function(backend, index, mzWindow, mobWindow, minIntensity, method) {
+    .Call(`_patRoon_getCentroidedFrame`, backend, index, mzWindow, mobWindow, minIntensity, method)
+}
+
 getScans <- function(backend, timeStart, timeEnd, MSLevel, prec) {
     .Call(`_patRoon_getScans`, backend, timeStart, timeEnd, MSLevel, prec)
 }

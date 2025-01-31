@@ -1034,6 +1034,8 @@ void testMS1Writer(const MSReadBackend &backend, const std::string &out, Spectru
                    SpectrumRawTypes::PeakAbundance minAbundance, unsigned topMost,
                    SpectrumRawTypes::Intensity minIntensityIMS, SpectrumRawTypes::Intensity minIntensityPre)
 {
+#if 0 // MSTK writer was removed
+    
 #ifdef WITH_MSTK
     const auto clMethod = clustMethodFromStr(method);
     const auto filterP = SpectrumRawFilter()
@@ -1060,5 +1062,7 @@ void testMS1Writer(const MSReadBackend &backend, const std::string &out, Spectru
     const auto spectra = applyMSData<SpectrumRaw>(backend, SpectrumRawTypes::MSLevel::MS1, scanSels, sfunc, 0)[0];
     
     writeMS1SpectraMSTK(out, spectra, specMeta);
+#endif
+    
 #endif
 }

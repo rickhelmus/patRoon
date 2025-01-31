@@ -32,7 +32,7 @@ public:
     int getBackends(void) const { return backends; }
 };
 
-void writeMS1SpectraMSTK(std::string path, const std::vector<SpectrumRaw> &spectra, const SpectrumRawMetadataMS &meta);
+//void writeMS1SpectraMSTK(std::string path, const std::vector<SpectrumRaw> &spectra, const SpectrumRawMetadataMS &meta);
 
 #else
 

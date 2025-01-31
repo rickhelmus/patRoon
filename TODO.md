@@ -266,11 +266,10 @@
         - no support for mzXML
     - initial tests of pwiz, mzR and MSTK show quite different numbers of OpenMS features...
     - if we stick with convertMSFiles(), somehow recommend skipping MS2+gzip?
-    - finalize
-        - integrate with convertMSFiles()?
 - interface with timsConvert?
 - update generateAnalysisInfo() and newProject()
     - see if getAllMSFilesFromAnaInfo() can be used, otherwise remove it
+    - use of getMSFileConversionFormats()
 - convertMSFilesXXX()
     - change function names?
     - add option for zlib compression, and enable by default? Esp useful for IMS/profile data
@@ -289,6 +288,7 @@
     - loading OpenMS peak intensities is much faster, removed now unneeded intSearchRTWindow arg
     - getPICSet() isn't limited by centroided data anymore
     - updated convertMSFilesXXX() functions, including changed args
+        - algo specific functions are now exported
     - generateMSPeakLists()
         - now uses backends, old methods still available but deprecated
     - EICParams for getPICSet() and calculatePeakQualities() (needed for m/z IMS expansion)
@@ -299,6 +299,7 @@
     - patRoon.threads, patRoon.MSBackends and patRoon.path.BrukerTIMS options
     - update PListParams
     - updated convertMSFilesXXX() functions, including changed args
+        - add docs for algo specific functions that are now exported
     - update generateMSPeakLists()
     - availableBackends()
     - EICParams for getPICSet() and calculatePeakQualities()

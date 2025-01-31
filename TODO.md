@@ -260,7 +260,6 @@
     - cons: can't parallelize over multiple files, so probably not really faster, files are potentially with incomplete metadata
     - could also use MSTK and/or SC for writing
         - both need to write a bit more metadata (instrumentConfiguration and dataProcessing), as OpenMS fails otherwise
-        - MSTK: load polarities
         - best would be to do write spectra while reading, so we can do MP
             - or skip MP and do complete batch in C++
         - no support for mzXML

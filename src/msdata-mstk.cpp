@@ -116,8 +116,7 @@ void MSReadBackendMSTK::generateSpecMetadata(void)
                 curMS1MD->times.push_back(spec.getRTime() * 60); // NOTE: MSTK takes minutes
                 curMS1MD->TICs.push_back(spec.getTIC());
                 curMS1MD->BPCs.push_back(spec.getBPI());
-                curMS1MD->polarities.push_back(SpectrumRawTypes::MSPolarity::UNKNOWN); // UNDONE: MSTK doesn't load polarities yet
-                
+                curMS1MD->polarities.push_back(spec.getPositiveScan() ? SpectrumRawTypes::MSPolarity::POSITIVE : SpectrumRawTypes::MSPolarity::NEGATIVE);
                 if (!isMS1)
                     threadMeta.second.isolationRanges.emplace_back(spec.getSelWindowLower(), spec.getSelWindowUpper());
             });

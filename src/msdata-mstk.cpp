@@ -8,8 +8,6 @@
 #include "msdata-mstk.h"
 #include "spectrum-raw.h"
 
-#include "mzMLWriter.h"
-
 namespace {
 
 MSToolkit::MSReader getMSTKReader(void)
@@ -179,6 +177,11 @@ void MSReadBackendMSTK::generateSpecMetadata(void)
     setSpecMetadata(std::move(meta));
 }
 
+#if 0
+
+// the writer was removed from MSTK...
+#include "mzMLWriter.h"
+
 void writeMS1SpectraMSTK(std::string path, const std::vector<SpectrumRaw> &spectra, const SpectrumRawMetadataMS &meta)
 {
     MSToolkit::MzMLWriter writer;
@@ -208,5 +211,6 @@ void writeMS1SpectraMSTK(std::string path, const std::vector<SpectrumRaw> &spect
     writer.closeList();
     writer.closeMzML();
 }
+#endif
 
 #endif // WITH_MSTK

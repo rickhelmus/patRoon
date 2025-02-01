@@ -99,6 +99,9 @@ setGeneric("getPICSet", function(obj, ...) standardGeneric("getPICSet"))
 #' @rdname groupFeatures
 setGeneric("groupFeatures", function(obj, algorithm, ...) standardGeneric("groupFeatures"))
 
+#' @rdname groupFeaturesIMS
+setGeneric("groupFeaturesIMS", function(feat, ...) standardGeneric("groupFeaturesIMS"))
+
 #' @rdname groupFeaturesOpenMS
 setGeneric("groupFeaturesOpenMS", function(feat, ...) standardGeneric("groupFeaturesOpenMS"))
 

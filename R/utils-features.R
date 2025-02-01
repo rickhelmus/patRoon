@@ -864,7 +864,8 @@ findPeaksInEICs <- function(allEICs, peaksParam, withBP, withMobility, parallel,
                         eic$mobility <- NA_real_
                     # UNDONE: also use mobility BP data?
                     list(min(eic$mzmin), max(eic$mzmax), weighted.mean(if (withBP) eic$mzBP else eic$mz, eic$intensity),
-                         min(eic$mobility), max(eic$mobility), weighted.mean(eic$mobility, eic$intensity))
+                         min(eic$mobmin), max(eic$mobmax),
+                         weighted.mean(if (withBP) eic$mobilityBP else eic$mobility, eic$intensity))
                 }
             }, by = seq_len(nrow(peaks))]
         }

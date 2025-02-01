@@ -664,7 +664,7 @@ setMethod("plotMobilogram", "featureGroups", function(obj, analysis = analyses(o
         EIMs <- getFeatureEIXs(obj, type = "EIM", analysis, groupName, EIMParams)
     else
     {
-        # sync as much as possible with given EICParams
+        # sync as much as possible with given EIMParams
         EIMs <- filterEIXs(EIMs, obj, analysis = analysis, groupName = groupName, topMost = EIMParams$topMost,
                            topMostByRGroup = EIMParams$topMostByRGroup, onlyPresent = EIMParams$onlyPresent)
     }

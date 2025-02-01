@@ -146,6 +146,7 @@ Suggests:
 LinkingTo:
     Rcpp,
     rapidjsonr,
+    RcppProgress
 Config/Needs/pdeps:
     RDCOMClient,
     enviPick,

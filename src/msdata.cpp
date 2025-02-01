@@ -1,4 +1,9 @@
+// [[Rcpp::depends(RcppProgress)]]
+
 #include <Rcpp.h>
+#include <progress.hpp>
+#include <progress_bar.hpp>
+
 #include <algorithm>
 #include <vector>
 
@@ -19,7 +24,9 @@ template<typename OutType, typename FuncType, typename... Args>
 std::vector<std::vector<OutType>> applyMSData(const MSReadBackend &backend, SpectrumRawTypes::MSLevel MSLevel,
                                               const std::vector<std::vector<SpectrumRawSelection>> &scanSels,
                                               FuncType func, SpectrumRawTypes::Intensity minIntensityIMS,
-                                              std::function<SpectrumRaw(const SpectrumRaw &)> prepFunc = {}, Args... args)
+                                              bool showProgress = false,
+                                              std::function<SpectrumRaw(const SpectrumRaw &)> prepFunc = {},
+                                              Args... args)
 {
     /* This function will apply a callback on selected spectra. Multiple sets of spectra selections are supported, and
      * the function is optimized to avoid reading the same spectra more than once in case of overlap between sets.
@@ -62,6 +69,7 @@ std::vector<std::vector<OutType>> applyMSData(const MSReadBackend &backend, Spec
         ret.emplace_back(scanSels[i].size());
     
     ThreadExceptionHandler exHandler;
+    Progress progb(allScanSelInds.size(), showProgress);
 
     #pragma omp parallel
     {
@@ -106,6 +114,7 @@ std::vector<std::vector<OutType>> applyMSData(const MSReadBackend &backend, Spec
                     }
                 }
             });
+            progb.increment();
         }
     }
     
@@ -307,7 +316,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                       const std::vector<SpectrumRawTypes::Mobility> &startMobs,
                       const std::vector<SpectrumRawTypes::Mobility> &endMobs,
                       SpectrumRawTypes::Mass mzExpIMSWindow, SpectrumRawTypes::Intensity minIntensityIMS, bool compress,
-                      bool withBP = false)
+                      bool showProgress = false, bool withBP = false)
 {
     struct EICPoint
     {
@@ -410,7 +419,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     }
     
     auto allEICPoints = applyMSData<EICPoint>(backend, SpectrumRawTypes::MSLevel::MS1, scanSels, sfunc, minIntensityIMS,
-                                              specPrepFunc);
+                                              showProgress, specPrepFunc);
 
     if (allEICPoints.empty())
         return Rcpp::List();

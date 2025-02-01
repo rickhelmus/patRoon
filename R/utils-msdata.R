@@ -183,7 +183,8 @@ getCentroidedMSFilesFromAnaInfo <- function(anaInfo, formats = c("mzML", "mzXML"
 }
 
 doGetEICs <- function(anaInfo, EICInfoList, mzExpIMSWindow = 0, minIntensityIMS = 0, compress = TRUE,
-                      showProgress = FALSE, withBP = FALSE, cacheDB = NULL)
+                      showProgress = "batch", withBP = FALSE, minEICIntensity = 0, minAdjacentTime = 0,
+                      minAdjacentPointIntensity = 0, cacheDB = NULL)
 {
     if (length(EICInfoList) == 0)
         return(list())
@@ -196,15 +197,18 @@ doGetEICs <- function(anaInfo, EICInfoList, mzExpIMSWindow = 0, minIntensityIMS 
 
     needIMS <- !is.null(EICInfoList[[1]][["mobmin"]])
     
-    anaHashes <- NULL
+    anaHashes <- baseHash <- NULL
     if (doCache)
     {
         if (is.null(cacheDB))
             cacheDB <- openCacheDBScope()
         anaHashes <- getMSFileHashesFromAvailBackend(anaInfo, needIMS = needIMS)
+        baseHash <- makeHash(mzExpIMSWindow, minIntensityIMS, compress, withBP = FALSE, minEICIntensity,
+                             minAdjacentTime, minAdjacentPointIntensity)
     }
     
-    allEICs <- applyMSData(anaInfo, EICInfoList, needIMS = needIMS, func = function(ana, path, backend, EICInfo)
+    allEICs <- applyMSData(anaInfo, EICInfoList, showProgress = showProgress == "batch", needIMS = needIMS,
+                           func = function(ana, path, backend, EICInfo)
     {
         EICInfo <- copy(EICInfo)
         for (col in c("mobmin", "mobmax"))
@@ -219,7 +223,7 @@ doGetEICs <- function(anaInfo, EICInfoList, mzExpIMSWindow = 0, minIntensityIMS 
         if (doCache)
         {
             # NOTE: subset columns here, so any additional columns from e.g. feature tables are not considered
-            hashes <- EICInfo[, makeHash(anaHashes[[ana]], compress, withBP, .SD), by = seq_len(nrow(EICInfo)),
+            hashes <- EICInfo[, makeHash(anaHashes[[ana]], baseHash, .SD), by = seq_len(nrow(EICInfo)),
                               .SDcols = c("retmin", "retmax", "mzmin", "mzmax", "mobmin", "mobmax")][[2]]
             
             EICs <- loadCacheData(category = "EICs", hashes, dbArg = cacheDB, simplify = FALSE)
@@ -242,8 +246,10 @@ doGetEICs <- function(anaInfo, EICInfoList, mzExpIMSWindow = 0, minIntensityIMS 
         # NOTE: getEICList() return lists, which are converted to data.frames and is a lot faster than returning
         # data.frames directly.
         newEICs <- getEICList(backend, ToDo$mzmin, ToDo$mzmax, ToDo$retmin, ToDo$retmax, ToDo$mobmin, ToDo$mobmax,
-                              mzExpIMSWindow, minIntensityIMS, compress, showProgress, withBP)
-        newEICs <- lapply(newEICs, setDF)
+                              mzExpIMSWindow, minIntensityIMS, compress, showProgress = showProgress == "ana", withBP,
+                              minEICIntensity, minAdjacentTime, minAdjacentPointIntensity)
+        wh <- lengths(newEICs) > 0 # zero length if post-filtered
+        newEICs[wh] <- lapply(newEICs[wh], setDF)
         EICs[!isCached] <- newEICs
         
         if (doCache)

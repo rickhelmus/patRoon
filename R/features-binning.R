@@ -45,8 +45,8 @@ findFeaturesBinning <- function(analysisInfo, retRange = NULL, mzRange = c(50, 4
     getEICInfoList <- function(withIMS, wide)
     {
         # UNDONE: make factor configurable
-        mzst <- if (wide) mzStep * 2 else mzStep
-        mobst <- if (wide) mobStep * 2 else mobStep
+        mzst <- if (wide) mzStep * 1 else mzStep
+        mobst <- if (wide) mobStep * 1 else mobStep
         
         # UNDONE: also support other binning approaches?
         binsMZ <- seq(mzRange[1], mzRange[2], by = mzst * 0.5)
@@ -73,47 +73,21 @@ findFeaturesBinning <- function(analysisInfo, retRange = NULL, mzRange = c(50, 4
         return(setNames(rep(list(EICInfoAna), nrow(anaInfoTBD)), anaInfoTBD$analysis))
     }
     
-    getAllEICs <- function(EICInfoList)
+    getAllEICs <- function(EICInfoList, ...)
     {
         allEICs <- doGetEICs(anaInfoTBD, EICInfoList, minIntensityIMS = minIntensityIMS, compress = FALSE,
-                             showProgress = verbose, withBP = TRUE, cacheDB = cacheDB)
+                             showProgress = if (verbose) "ana" else FALSE, withBP = TRUE, cacheDB = cacheDB, ...)
         allEICs <- lapply(allEICs, setNames, EICInfoList[[1]]$EIC_ID)
         return(allEICs)
-    }
-    
-    validEICs <- function(EICs)
-    {
-        # UNDONE: make faster and add args to configure thresholds
-        lapply(EICs, function(anaEICs)
-        {
-            sapply(anaEICs, function(eic)
-            {
-                startTime <- 0
-                if (max(eic$intensity) < 1000)
-                    return(FALSE)
-                for (r in seq_len(nrow(eic)))
-                {
-                    if (eic$intensity[r] >= 250)
-                    {
-                        if (startTime == 0)
-                            startTime <- eic$time[r]
-                        else if (numGTE(eic$time[r] - startTime, 30))
-                            return(TRUE)
-                    }
-                    else
-                        startTime <- 0
-                }
-                return(FALSE)
-            })
-        })
     }
     
     fList <- list()
     if (nrow(anaInfoTBD) > 0)
     {
         wideEICInfoList <- getEICInfoList(withIMS = FALSE, wide = TRUE)
-        wideEICs <- getAllEICs(wideEICInfoList)
-        validWideEICs <- validEICs(wideEICs)
+        wideEICs <- getAllEICs(wideEICInfoList, minEICIntensity = 1000, minAdjacentTime = 30,
+                               minAdjacentPointIntensity = 250)
+        validWideEICs <- lapply(wideEICs, function(wea) lengths(wea) > 0)
         
         EICInfoList <- getEICInfoList(withIMS = !is.null(mobRange), wide = FALSE)
         EICInfoList <- Map(EICInfoList, wideEICInfoList, validWideEICs, f = function(EICInfoAna, EICInfoAnaWide, validWideEICs)
@@ -124,13 +98,14 @@ findFeaturesBinning <- function(analysisInfo, retRange = NULL, mzRange = c(50, 4
             return(EICInfoAna[ov$xid])
         })
         
-        browser()
-        allEICs <- getAllEICs(EICInfoList)
-        
+        allEICs <- getAllEICs(EICInfoList, minEICIntensity = 1000, minAdjacentTime = 30,
+                              minAdjacentPointIntensity = 250)
+        allEICs <- lapply(allEICs, pruneList, checkEmptyElements = TRUE)
 
+        withIMS <- !is.null(mobRange)
         fList <- findPeaksInEICs(allEICs, peaksParam, withBP = TRUE, withMobility = withIMS, parallel = parallel,
                                  cacheDB = cacheDB)
-        fList <- lapply(fList, function(fTab)
+        fList <- Map(fList, EICInfoList, f = function(fTab, EICInfoAna)
         {
             # only keep those peaks with m/z in the "center" of the analyzed m/z range
             fTab[, EIC_ID_MZ := EICInfoAna[match(fTab$EIC_ID, EIC_ID)]$EIC_ID_MZ]

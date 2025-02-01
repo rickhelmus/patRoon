@@ -316,7 +316,9 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                       const std::vector<SpectrumRawTypes::Mobility> &startMobs,
                       const std::vector<SpectrumRawTypes::Mobility> &endMobs,
                       SpectrumRawTypes::Mass mzExpIMSWindow, SpectrumRawTypes::Intensity minIntensityIMS, bool compress,
-                      bool showProgress = false, bool withBP = false)
+                      bool showProgress = false, bool withBP = false, SpectrumRawTypes::Intensity minEICIntensity = 0,
+                      SpectrumRawTypes::Time minAdjacentTime = 0,
+                      SpectrumRawTypes::Intensity minAdjacentPointIntensity = 0)
 {
     struct EICPoint
     {
@@ -449,6 +451,44 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         // NOTE: assume all MS spectra have or have not IMS data (UNDONE?)
         
         auto &points = allEICPoints[i];
+        
+        // start with some pre-filtering
+        bool valid = true;
+        
+        if (minEICIntensity > 0)
+        {
+            const auto maxIt = std::max_element(points.begin(), points.end(), [](const auto &a, const auto &b)
+            {
+                return a.intensity < b.intensity;
+            });
+            valid = numberGTE(maxIt->intensity, minEICIntensity);
+        }
+        if (valid && minAdjacentTime > 0 && minAdjacentPointIntensity > 0)
+        {
+            SpectrumRawTypes::Time startTime = 0;
+            valid = false; // until provent otherwise
+            for (size_t j=0; j<points.size(); ++j)
+            {
+                if (numberGTE(points[j].intensity, minAdjacentPointIntensity))
+                {
+                    if (startTime == 0)
+                        startTime = points[j].time;
+                    else if (numberGTE(points[j].time - startTime, minAdjacentTime))
+                    {
+                        valid = true;
+                        break;
+                    }
+                }
+                else
+                    startTime = 0;
+            }
+        }
+        
+        if (!valid)
+        {
+            ret[i] = Rcpp::List();
+            continue;
+        }
         
         if (compress && points.size() >= 3)
         {

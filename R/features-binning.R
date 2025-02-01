@@ -9,23 +9,29 @@ setMethod("initialize", "featuresBinning",
           function(.Object, ...) callNextMethod(.Object, algorithm = "binning", ...))
 
 #' @export
-findFeaturesBinning <- function(analysisInfo, mzRange = c(50, 400), mzStep = 0.02, minIntensityIMS = 25,
+findFeaturesBinning <- function(analysisInfo, retRange = NULL, mzRange = c(50, 400), mzStep = 0.02, mobRange = NULL,
+                                mobStep = 0.04, minIntensityIMS = 25,
                                 peaksParam, ..., parallel = TRUE, verbose = TRUE)
 {
     # UNDONE: add refs to docs, and highlight changes
+    # UNDONE: mobRange/mobStep defaults
     # UNDONE: default OK for minIntensityIMS?
+    # UNDONE: print messages, stats etc, taking verbose into account
     
     ac <- checkmate::makeAssertCollection()
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, add = ac)
-    assertRange(mzRange, add = ac)
-    checkmate::assertNumber(mzStep, lower = 0.000001, finite = TRUE, add = ac)
+    aapply(assertRange, . ~ retRange + mzRange + mobRange, null.ok = c(TRUE, FALSE, TRUE), fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ mzStep + mobStep, lower = 0.000001, finite = TRUE, fixed = list(add = ac))
     assertFindPeaksParam(peaksParam, add = ac)
     aapply(checkmate::assertFlag, . ~ parallel + verbose, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
+    if (is.null(retRange))
+        retRange <- c(0, 0)
+    
     cacheDB <- openCacheDBScope()
-    baseHash <- makeHash(mzRange, mzStep, peaksParam)
-    anaHashes <- getMSFileHashesFromAvailBackend(analysisInfo)
+    baseHash <- makeHash(mzRange, mzStep, mobRange, mobStep, minIntensityIMS, peaksParam)
+    anaHashes <- getMSFileHashesFromAvailBackend(analysisInfo, needIMS = withIMS)
     anaHashes <- sapply(anaHashes, makeHash, baseHash)
     cachedData <- pruneList(loadCacheData("featuresBinning", anaHashes, simplify = FALSE, dbArg = cacheDB))
     if (length(cachedData) > 0)
@@ -36,30 +42,129 @@ findFeaturesBinning <- function(analysisInfo, mzRange = c(50, 400), mzStep = 0.0
     else
         anaInfoTBD <- analysisInfo
     
+    getEICInfoList <- function(withIMS, wide)
+    {
+        # UNDONE: make factor configurable
+        mzst <- if (wide) mzStep * 2 else mzStep
+        mobst <- if (wide) mobStep * 2 else mobStep
+        
+        # UNDONE: also support other binning approaches?
+        binsMZ <- seq(mzRange[1], mzRange[2], by = mzst * 0.5)
+        names(binsMZ) <- paste0("bin_M", binsMZ)
+        
+        binsMob <- NULL
+        if (withIMS)
+        {
+            binsMob <- seq(mobRange[1], mobRange[2], by = mobst * 0.5)
+            names(binsMob) <- paste0("bin_M", binsMob)
+        }
+        
+        EICInfoAna <- data.table(mzmin = binsMZ, mzmax = binsMZ + mzst, retmin = retRange[1], retmax = retRange[2],
+                                 EIC_ID_MZ = names(binsMZ))
+        if (withIMS)
+        {
+            tab <- CJ(EIC_ID_MZ = names(binsMZ), EIC_ID_mob = names(binsMob), sorted = FALSE)
+            tab[, c("mobmin", "mobmax") := .(binsMob[EIC_ID_mob], binsMob[EIC_ID_mob] + mobst)]
+            EICInfoAna <- merge(EICInfoAna, tab, by = "EIC_ID_MZ", sort = FALSE)
+        }
+        
+        EICInfoAna[, EIC_ID := paste0("EIC_", .I)] # UNDONE
+        
+        return(setNames(rep(list(EICInfoAna), nrow(anaInfoTBD)), anaInfoTBD$analysis))
+    }
+    
+    getAllEICs <- function(EICInfoList)
+    {
+        allEICs <- doGetEICs(anaInfoTBD, EICInfoList, minIntensityIMS = minIntensityIMS, compress = FALSE,
+                             showProgress = verbose, withBP = TRUE, cacheDB = cacheDB)
+        allEICs <- lapply(allEICs, setNames, EICInfoList[[1]]$EIC_ID)
+        return(allEICs)
+    }
+    
+    validEICs <- function(EICs)
+    {
+        # UNDONE: make faster and add args to configure thresholds
+        lapply(EICs, function(anaEICs)
+        {
+            sapply(anaEICs, function(eic)
+            {
+                startTime <- 0
+                if (max(eic$intensity) < 1000)
+                    return(FALSE)
+                for (r in seq_len(nrow(eic)))
+                {
+                    if (eic$intensity[r] >= 250)
+                    {
+                        if (startTime == 0)
+                            startTime <- eic$time[r]
+                        else if (numGTE(eic$time[r] - startTime, 30))
+                            return(TRUE)
+                    }
+                    else
+                        startTime <- 0
+                }
+                return(FALSE)
+            })
+        })
+    }
+    
     fList <- list()
     if (nrow(anaInfoTBD) > 0)
     {
-        # UNDONE: also support other binning approaches?
-        bins <- seq(mzRange[1], mzRange[2], by = mzStep * 0.5)
-        names(bins) <- paste0("bin_M", bins)
+        wideEICInfoList <- getEICInfoList(withIMS = FALSE, wide = TRUE)
+        wideEICs <- getAllEICs(wideEICInfoList)
+        validWideEICs <- validEICs(wideEICs)
+        
+        EICInfoList <- getEICInfoList(withIMS = !is.null(mobRange), wide = FALSE)
+        EICInfoList <- Map(EICInfoList, wideEICInfoList, validWideEICs, f = function(EICInfoAna, EICInfoAnaWide, validWideEICs)
+        {
+            wide <- EICInfoAnaWide[validWideEICs == TRUE, c("EIC_ID", "mzmin", "mzmax"), with = FALSE]
+            setkeyv(wide, c("mzmin", "mzmax"))
+            ov <- foverlaps(EICInfoAna, wide, type = "within", nomatch = NULL, which = TRUE)
+            return(EICInfoAna[ov$xid])
+        })
+        
+        browser()
+        allEICs <- getAllEICs(EICInfoList)
+        
 
-        if (verbose)
-            printf("Finding features in %d bins for %d analyses ...\n", length(bins), nrow(anaInfoTBD))
-        
-        printf("Loading EICs...\n")
-        EICInfoList <- rep(list(data.table(mzmin = bins, mzmax = bins + mzStep, retmin = 0, retmax = 0)), nrow(anaInfoTBD))
-        names(EICInfoList) <- anaInfoTBD$analysis
-        allEICs <- doGetEICs(anaInfoTBD, EICInfoList, minIntensityIMS = minIntensityIMS, compress = FALSE,
-                             withBP = TRUE, cacheDB = cacheDB)
-        allEICs <- lapply(allEICs, setNames, names(bins))
-        
-        fList <- findPeaksInEICs(allEICs, peaksParam, withBP = TRUE, withMobility = FALSE, parallel = parallel,
+        fList <- findPeaksInEICs(allEICs, peaksParam, withBP = TRUE, withMobility = withIMS, parallel = parallel,
                                  cacheDB = cacheDB)
-        
         fList <- lapply(fList, function(fTab)
         {
             # only keep those peaks with m/z in the "center" of the analyzed m/z range
-            fTab[between(mz, bins[EIC_ID] + mzStep/4, bins[EIC_ID] + mzStep/4*3) == TRUE][, EIC_ID := NULL]
+            fTab[, EIC_ID_MZ := EICInfoAna[match(fTab$EIC_ID, EIC_ID)]$EIC_ID_MZ]
+            fTab <- fTab[between(mz, binsMZ[EIC_ID_MZ] + mzStep/4, binsMZ[EIC_ID_MZ] + mzStep/4*3) == TRUE]
+            if (withIMS)
+            {
+                fTab[, EIC_ID_mob := EICInfoAna[match(fTab$EIC_ID, EIC_ID)]$EIC_ID_mob]
+                fTab[, mob_bin := binsMob[EIC_ID_mob]] # UNDONE
+                fTab <- fTab[between(mobility, binsMob[EIC_ID_mob] + mobStep/4, binsMob[EIC_ID_mob] + mobStep/4*3) == TRUE]
+                
+                if (nrow(fTab) > 1)
+                {
+                    # remove duplicates and keep the one with the highest intensity
+                    fTab[, keep := TRUE]
+                    for (r in seq_len(nrow(fTab)-1))
+                    {
+                        if (!fTab$keep[r])
+                            next
+                        rTab <- fTab[r]
+                        nextTab <- fTab[seq(r + 1, nrow(fTab))]
+                        # UNDONE: make thresholds configurable
+                        nextTab <- nextTab[keep == TRUE & numLTE(abs(ret - rTab$ret), 3) & numLTE(abs(mz - rTab$mz), 0.001) &
+                                               numLTE(abs(mobility - rTab$mobility), 0.02)]
+                        if (nrow(nextTab) > 0)
+                        {
+                            maxInt <- max(rTab$intensity, nextTab$intensity)
+                            fTab[ID %chin% c(rTab$ID, nextTab$ID), keep := numEQ(intensity, maxInt)]
+                        }
+                    }
+                    fTab <- fTab[keep == TRUE][, keep := NULL]
+                }
+            }
+            fTab <- removeDTColumnsIfPresent(fTab, c("EIC_ID_MZ", "EIC_ID_mob", "EIC_ID"))
+            return(fTab)
         })
         
         # UNDONE: use BP intensity?
@@ -80,5 +185,5 @@ findFeaturesBinning <- function(analysisInfo, mzRange = c(50, 400), mzStep = 0.0
         printFeatStats(fList)
     }
     
-    return(featuresBinning(analysisInfo = analysisInfo, features = fList))
+    return(featuresBinning(analysisInfo = analysisInfo, features = fList, hasMobilities = withIMS))
 }

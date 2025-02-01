@@ -281,7 +281,8 @@ doGetEIMs <- function(anaInfo, EIMInfoList, IMSWindow, clusterMethod, minIntensi
         }
         
         # NOTE: subset columns here, so any additional columns from e.g. feature tables are not considered
-        hashes <- EIMInfo[, makeHash(anaHashes[[ana]], IMSWindow, clusterMethod, minIntensity, compress, .SD),
+        hashes <- EIMInfo[, makeHash(anaHashes[[ana]], IMSWindow, clusterMethod, minIntensity, mzExpIMSWindow,
+                                     compress, .SD),
                           by = seq_len(nrow(EIMInfo)), .SDcols = c("retmin", "retmax", "mzmin", "mzmax", "mobmin",
                                                                    "mobmax")][[2]]
         

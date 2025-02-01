@@ -333,16 +333,27 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     const auto &specMeta = backend.getSpecMetadata();
     bool anySpecHasMob = false;
     
+    const auto minMZ = *(std::min_element(startMZs.begin(), startMZs.end()));
+    const auto maxMZ = *(std::max_element(endMZs.begin(), endMZs.end()));
+    const auto minMob = (startMobs.empty()) ? 0 : *(std::min_element(startMobs.begin(), startMobs.end()));
+    const auto maxMob = (endMobs.empty()) ? 0 : *(std::max_element(endMobs.begin(), endMobs.end()));
+    
     const auto specPrepFunc = [&](const SpectrumRaw &spec)
     {
         if (spec.hasMobilities())
         {
             const auto sInds = getSortedInds(spec.getMZs());
-            SpectrumRaw sortedSpec(spec.size(), true);
+            SpectrumRaw sortedSpec;
             for (size_t k=0; k<spec.size(); ++k)
             {
-                sortedSpec.setPeak(k, spec.getMZs()[sInds[k]], spec.getIntensities()[sInds[k]],
-                                   spec.getMobilities()[sInds[k]]);
+                if (spec.getMZs()[sInds[k]] < minMZ || spec.getMZs()[sInds[k]] > maxMZ)
+                    continue;
+                if (spec.getMobilities()[sInds[k]] < minMob ||
+                    (maxMob != 0.0 && spec.getMobilities()[sInds[k]] > maxMob))
+                    continue;
+                    
+                sortedSpec.append(spec.getMZs()[sInds[k]], spec.getIntensities()[sInds[k]],
+                                  spec.getMobilities()[sInds[k]]);
             }
             return sortedSpec;
         }

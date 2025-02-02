@@ -308,7 +308,10 @@ Rcpp::DataFrame getScans(const MSReadBackend &backend, SpectrumRawTypes::Mass ti
     return ret;
 }
 
-// [[Rcpp::export]]
+#if 0
+// older version that loads EICs directly in applyMSData(); pros: doesn't need to load full spectra, cons: may more use
+// more memory for many EICs
+
 Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRawTypes::Mass> &startMZs,
                       const std::vector<SpectrumRawTypes::Mass> &endMZs,
                       const std::vector<SpectrumRawTypes::Time> &startTimes,
@@ -557,6 +560,285 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         }
 
         ret[i] = df;
+    }
+    
+    return ret;
+}
+#endif
+
+// [[Rcpp::export]]
+Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRawTypes::Mass> &startMZs,
+                      const std::vector<SpectrumRawTypes::Mass> &endMZs,
+                      const std::vector<SpectrumRawTypes::Time> &startTimes,
+                      const std::vector<SpectrumRawTypes::Time> &endTimes,
+                      const std::vector<SpectrumRawTypes::Mobility> &startMobs,
+                      const std::vector<SpectrumRawTypes::Mobility> &endMobs,
+                      SpectrumRawTypes::Mass mzExpIMSWindow, SpectrumRawTypes::Intensity minIntensityIMS, bool compress,
+                      bool showProgress = false, bool withBP = false, SpectrumRawTypes::Intensity minEICIntensity = 0,
+                      SpectrumRawTypes::Time minAdjacentTime = 0,
+                      SpectrumRawTypes::Intensity minAdjacentPointIntensity = 0)
+{
+    struct EICPoint
+    {
+        SpectrumRawTypes::Time time = 0.0;
+        SpectrumRawTypes::Mass mz = 0.0, mzMin = 0.0, mzMax = 0.0;
+        SpectrumRawTypes::Intensity intensity = 0;
+        SpectrumRawTypes::Mobility mobility = 0.0, mobMin = 0.0, mobMax = 0.0;
+        SpectrumRawTypes::Mass mzBP = 0.0;
+        SpectrumRawTypes::Mobility mobilityBP = 0.0;
+        SpectrumRawTypes::Intensity intensityBP = 0.0;
+    };
+    
+    struct EIC
+    {
+        std::vector<SpectrumRawTypes::Time> times;
+        std::vector<SpectrumRawTypes::Mass> mzs, mzMins, mzMaxs;
+        std::vector<SpectrumRawTypes::Intensity> intensities;
+        std::vector<SpectrumRawTypes::Mobility> mobilities, mobMins, mobMaxs;
+        std::vector<SpectrumRawTypes::Mass> mzBPs;
+        std::vector<SpectrumRawTypes::Mobility> mobilityBPs;
+        std::vector<SpectrumRawTypes::Intensity> intensityiesBP;
+        void addPoint(const EICPoint &p)
+        {
+            times.push_back(p.time);
+            mzs.push_back(p.mz);
+            mzMins.push_back(p.mzMin);
+            mzMaxs.push_back(p.mzMax);
+            intensities.push_back(p.intensity);
+            mobilities.push_back(p.mobility);
+            mobMins.push_back(p.mobMin);
+            mobMaxs.push_back(p.mobMax);
+            mzBPs.push_back(p.mzBP);
+            mobilityBPs.push_back(p.mobilityBP);
+            intensityiesBP.push_back(p.intensityBP);
+        }
+        void erasePoint(size_t ind)
+        {
+            times.erase(times.begin() + ind);
+            mzs.erase(mzs.begin() + ind);
+            mzMins.erase(mzMins.begin() + ind);
+            mzMaxs.erase(mzMaxs.begin() + ind);
+            intensities.erase(intensities.begin() + ind);
+            mobilities.erase(mobilities.begin() + ind);
+            mobMins.erase(mobMins.begin() + ind);
+            mobMaxs.erase(mobMaxs.begin() + ind);
+            mzBPs.erase(mzBPs.begin() + ind);
+            mobilityBPs.erase(mobilityBPs.begin() + ind);
+            intensityiesBP.erase(intensityiesBP.begin() + ind);
+        }
+        size_t size(void) const { return times.size(); }
+        bool empty(void) const { return times.empty(); }
+    };
+    
+    const auto EICCount = startMZs.size();
+    const auto &specMeta = backend.getSpecMetadata();
+    bool anySpecHasMob = false;
+    
+    const auto minMZ = *(std::min_element(startMZs.begin(), startMZs.end()));
+    const auto maxMZ = *(std::max_element(endMZs.begin(), endMZs.end()));
+    const auto minMob = (startMobs.empty()) ? 0 : *(std::min_element(startMobs.begin(), startMobs.end()));
+    const auto maxMob = (endMobs.empty()) ? 0 : *(std::max_element(endMobs.begin(), endMobs.end()));
+    
+    using TimeAndSpec = std::pair<SpectrumRawTypes::Time, SpectrumRaw>;
+    const auto sfunc = [&](const SpectrumRaw &spec, const SpectrumRawSelection &ssel, size_t)
+    {
+        const auto time = specMeta.first.times[ssel.index];
+        if (spec.hasMobilities())
+        {
+            anySpecHasMob = true;
+            const auto sInds = getSortedInds(spec.getMZs());
+            SpectrumRaw sortedSpec;
+            for (size_t k=0; k<spec.size(); ++k)
+            {
+                if (spec.getMZs()[sInds[k]] < minMZ || spec.getMZs()[sInds[k]] > maxMZ)
+                    continue;
+                if (spec.getMobilities()[sInds[k]] < minMob ||
+                    (maxMob != 0.0 && spec.getMobilities()[sInds[k]] > maxMob))
+                    continue;
+                
+                sortedSpec.append(spec.getMZs()[sInds[k]], spec.getIntensities()[sInds[k]],
+                                  spec.getMobilities()[sInds[k]]);
+            }
+            return TimeAndSpec(time, sortedSpec);
+        }
+        return TimeAndSpec(time, spec);
+    };
+    
+    std::set<SpectrumRawTypes::Scan> allScans;
+    for (size_t i=0; i<EICCount; ++i)
+    {
+        const auto sels = getSpecRawSelections(specMeta, makeNumRange(startTimes[i], endTimes[i]),
+                                               SpectrumRawTypes::MSLevel::MS1, 0);
+        for (const auto &sel : sels)
+            allScans.insert(sel.index);
+    }
+    std::vector<std::vector<SpectrumRawSelection>> scanSels(1);
+    for (const auto &scan : allScans)
+        scanSels[0].emplace_back(scan);
+
+    auto allSpectra = applyMSData<TimeAndSpec>(backend, SpectrumRawTypes::MSLevel::MS1, scanSels, sfunc,
+                                               minIntensityIMS, showProgress);
+    
+    if (allSpectra.empty())
+        return Rcpp::List();
+    
+    std::vector<EIC> allEICs(EICCount);
+    #pragma omp parallel for
+    for (size_t i=0; i<EICCount; ++i)
+    {
+        EIC eic;
+        SpectrumRawTypes::Intensity maxInten = 0;
+        SpectrumRawTypes::Time startTimeAboveThr = 0;
+        bool enoughAboveThr = false;
+        
+        auto it = std::lower_bound(allSpectra[0].cbegin(), allSpectra[0].cend(), startTimes[i],
+                                   [](const auto &a, const auto &b) { return a.first < b; });
+        for (; it != allSpectra[0].cend() && (endTimes[i] == 0.0 || numberLTE(it->first, endTimes[i])); ++it)
+        {
+            const auto &spec = it->second;
+            const bool hasMob = spec.hasMobilities();
+            EICPoint point;
+            point.time = it->first;
+            
+            // NOTE: assume spec is mz sorted
+            // use lower bound to speedup search for first mass
+            const auto mzStart = startMZs[i] - ((hasMob) ? mzExpIMSWindow : 0.0);
+            const auto mzEnd = endMZs[i] + ((hasMob) ? mzExpIMSWindow : 0.0);
+            const auto mzIt = std::lower_bound(spec.getMZs().begin(), spec.getMZs().end(), mzStart);
+            
+            if (mzIt == spec.getMZs().end())
+            {
+                eic.addPoint(point);
+                continue;
+            }
+            
+            const auto startInd = std::distance(spec.getMZs().begin(), mzIt);
+            
+            for (size_t j=startInd; j<spec.size(); ++j)
+            {
+                const auto mz = spec.getMZs()[j];
+                if (mz > mzEnd)
+                    break; 
+                
+                const auto mob = (hasMob) ? spec.getMobilities()[j] : 0;
+                if (hasMob)
+                {
+                    if (mob < startMobs[i] || (endMobs[i] != 0.0 && mob > endMobs[i]))
+                        continue;
+                }
+                
+                const auto inten = spec.getIntensities()[j];
+                if (inten > 0)
+                {
+                    point.intensity += inten;
+                    point.mz += mz * inten;
+                    if (point.mzMin == 0.0 || mz < point.mzMin)
+                        point.mzMin = mz;
+                    if (mz > point.mzMax)
+                        point.mzMax = mz;
+                    if (hasMob)
+                    {
+                        point.mobility += mob * inten;
+                        if (point.mobMin == 0.0 || mob < point.mobMin)
+                            point.mobMin = mob;
+                        if (mob > point.mobMax)
+                            point.mobMax = mob;
+                    }
+                    if (withBP && inten > point.intensityBP)
+                    {
+                        point.intensityBP = inten;
+                        point.mzBP = mz;
+                        point.mobilityBP = mob;
+                    }
+                    //Rcpp::Rcout << "EIC: " << point.time << "/" << j << "\t" << std::fixed << mz << "\t" << inten << "\t" << point.mzMin << "/" << point.mzMax << "\t" << mob << "\n";
+                }
+            }
+            
+            if (point.intensity > 0)
+            {
+                // weighted mean
+                point.mz /= point.intensity;
+                if (hasMob)
+                    point.mobility /= point.intensity;
+                if (point.intensity > maxInten)
+                    maxInten = point.intensity;
+            }
+            
+            if (!enoughAboveThr && minAdjacentTime != 0.0)
+            {
+                if (numberGTE(point.intensity, minAdjacentPointIntensity))
+                {
+                    if (startTimeAboveThr == 0.0)
+                        startTimeAboveThr = point.time;
+                    else if (numberGTE(point.time - startTimeAboveThr, minAdjacentTime))
+                        enoughAboveThr = true;
+                }
+                else
+                    startTimeAboveThr = 0.0;
+            }
+            
+            eic.addPoint(point);
+        }
+        
+        if (minEICIntensity != 0.0 && maxInten < minEICIntensity)
+            continue;
+        if (minAdjacentTime != 0.0 && !enoughAboveThr)
+            continue;
+        
+        if (compress && eic.size() >= 3)
+        {
+            for (auto it=std::next(eic.intensities.begin()); it!=std::prev(eic.intensities.end()); )
+            {
+                if (*it == 0)
+                {
+                    if (*std::prev(it) == 0 && *std::next(it) == 0)
+                    {
+                        const auto ind = std::distance(eic.intensities.begin(), it);
+                        eic.erasePoint(ind);
+                        it = eic.intensities.begin() + ind; // refresh
+                        continue;
+                    }
+                }
+                ++it;
+            }
+        }
+        allEICs[i] = eic;
+    }
+
+    Rcpp::List ret(EICCount);
+    for (size_t i=0; i<EICCount; ++i)
+    {
+        // NOTE: assume all MS spectra have or have not IMS data (UNDONE?)
+        
+        auto &eic = allEICs[i];
+        if (eic.empty())
+        {
+            ret[i] = Rcpp::List();
+            continue;
+        }
+        
+        auto li = Rcpp::List::create(Rcpp::Named("time") = eic.times,
+                                     Rcpp::Named("intensity") = eic.intensities,
+                                     Rcpp::Named("mz") = eic.mzs,
+                                     Rcpp::Named("mzmin") = eic.mzMins,
+                                     Rcpp::Named("mzmax") = eic.mzMaxs);
+        
+        if (anySpecHasMob)
+        {
+            li["mobility"] = eic.mobilities;
+            li["mobmin"] = eic.mobMins;
+            li["mobmax"] = eic.mobMaxs;
+        }
+        
+        if (withBP)
+        {
+            li["intensityBP"] = eic.intensityiesBP;
+            li["mzBP"] = eic.mzBPs;
+            if (anySpecHasMob)
+                li["mobilityBP"] = eic.mobilityBPs;
+        }
+        
+        ret[i] = li;
     }
     
     return ret;

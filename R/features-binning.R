@@ -42,85 +42,91 @@ findFeaturesBinning <- function(analysisInfo, retRange = NULL, mzRange = c(50, 4
     else
         anaInfoTBD <- analysisInfo
     
-    getEICInfoList <- function(withIMS, wide)
+    getEICInfoList <- function(withIMS)
     {
-        # UNDONE: make factor configurable
-        mzst <- if (wide) mzStep * 1 else mzStep
-        mobst <- if (wide) mobStep * 1 else mobStep
-        
         # UNDONE: also support other binning approaches?
-        binsMZ <- seq(mzRange[1], mzRange[2], by = mzst * 0.5)
+        binsMZ <- seq(mzRange[1], mzRange[2], by = mzStep * 0.5)
         names(binsMZ) <- paste0("bin_M", binsMZ)
         
-        binsMob <- NULL
+        binsIMS <- NULL
         if (withIMS)
         {
-            binsMob <- seq(mobRange[1], mobRange[2], by = mobst * 0.5)
-            names(binsMob) <- paste0("bin_M", binsMob)
+            binsIMS <- seq(mobRange[1], mobRange[2], by = mobStep * 0.5)
+            names(binsIMS) <- paste0("bin_I", binsIMS)
         }
         
-        EICInfoAna <- data.table(mzmin = binsMZ, mzmax = binsMZ + mzst, retmin = retRange[1], retmax = retRange[2],
+        EICInfoAna <- data.table(mzmin = binsMZ, mzmax = binsMZ + mzStep, retmin = retRange[1], retmax = retRange[2],
                                  EIC_ID_MZ = names(binsMZ))
         if (withIMS)
         {
-            tab <- CJ(EIC_ID_MZ = names(binsMZ), EIC_ID_mob = names(binsMob), sorted = FALSE)
-            tab[, c("mobmin", "mobmax") := .(binsMob[EIC_ID_mob], binsMob[EIC_ID_mob] + mobst)]
+            tab <- CJ(EIC_ID_MZ = names(binsMZ), EIC_ID_IMS = names(binsIMS), sorted = FALSE)
+            tab[, c("mobmin", "mobmax") := .(binsIMS[EIC_ID_IMS], binsIMS[EIC_ID_IMS] + mobStep)]
             EICInfoAna <- merge(EICInfoAna, tab, by = "EIC_ID_MZ", sort = FALSE)
         }
         
-        EICInfoAna[, EIC_ID := paste0("EIC_", .I)] # UNDONE
+        EICInfoAna[, EIC_ID := paste0("EIC_", .I)]
         
         return(setNames(rep(list(EICInfoAna), nrow(anaInfoTBD)), anaInfoTBD$analysis))
     }
     
     getAllEICs <- function(EICInfoList, ...)
     {
-        allEICs <- doGetEICs(anaInfoTBD, EICInfoList, minIntensityIMS = minIntensityIMS, compress = FALSE,
-                             showProgress = if (verbose) "ana" else FALSE, withBP = TRUE, cacheDB = cacheDB, ...)
-        allEICs <- lapply(allEICs, setNames, EICInfoList[[1]]$EIC_ID)
-        return(allEICs)
+        ret <- doGetEICs(anaInfoTBD, EICInfoList, minIntensityIMS = minIntensityIMS, compress = FALSE,
+                         showProgress = if (verbose) "ana" else FALSE, withBP = TRUE, cacheDB = cacheDB, ...)
+        ret <- lapply(ret, setNames, EICInfoList[[1]]$EIC_ID)
+        return(ret)
     }
     
     fList <- list()
     if (nrow(anaInfoTBD) > 0)
     {
-        wideEICInfoList <- getEICInfoList(withIMS = FALSE, wide = TRUE)
-        wideEICs <- getAllEICs(wideEICInfoList, minEICIntensity = 1000, minAdjacentTime = 30,
-                               minAdjacentPointIntensity = 250)
-        validWideEICs <- lapply(wideEICs, function(wea) lengths(wea) > 0)
-        
-        EICInfoList <- getEICInfoList(withIMS = !is.null(mobRange), wide = FALSE)
-        EICInfoList <- Map(EICInfoList, wideEICInfoList, validWideEICs, f = function(EICInfoAna, EICInfoAnaWide, validWideEICs)
-        {
-            wide <- EICInfoAnaWide[validWideEICs == TRUE, c("EIC_ID", "mzmin", "mzmax"), with = FALSE]
-            setkeyv(wide, c("mzmin", "mzmax"))
-            ov <- foverlaps(EICInfoAna, wide, type = "within", nomatch = NULL, which = TRUE)
-            return(EICInfoAna[ov$xid])
-        })
-        
+        EICInfoList <- getEICInfoList(withIMS = FALSE)
         allEICs <- getAllEICs(EICInfoList, minEICIntensity = 1000, minAdjacentTime = 30,
                               minAdjacentPointIntensity = 250)
         allEICs <- lapply(allEICs, pruneList, checkEmptyElements = TRUE)
+        # omit missing
+        EICInfoList <- Map(EICInfoList, allEICs, f = function(info, eics) info[EIC_ID %chin% names(eics)])
 
         withIMS <- !is.null(mobRange)
+        if (withIMS)
+        {
+            # With IMS worksflows the mz EICs are only used as a pre-filter. As the EIC object is potentially large we
+            # remove it here.
+            rm(allEICs) 
+            gc()
+            
+            mzEICInfoList <- EICInfoList
+            EICInfoList <- getEICInfoList(withIMS = TRUE)
+            EICInfoList <- Map(EICInfoList, mzEICInfoList, f = function(infoMob, infoMZ)
+            {
+                # remove complete m/z bins that were filtered out before
+                infoMZ <- infoMZ[, c("mzmin", "mzmax"), with = FALSE]
+                setkeyv(infoMZ, c("mzmin", "mzmax"))
+                ov <- foverlaps(infoMob, infoMZ, type = "within", nomatch = NULL, which = TRUE)
+                return(infoMob[ov$xid])
+            })
+            
+            allEICs <- getAllEICs(EICInfoList, minEICIntensity = 1000, minAdjacentTime = 30,
+                                  minAdjacentPointIntensity = 250)
+            allEICs <- lapply(allEICs, pruneList, checkEmptyElements = TRUE)
+        }
         fList <- findPeaksInEICs(allEICs, peaksParam, withBP = TRUE, withMobility = withIMS, parallel = parallel,
                                  cacheDB = cacheDB)
         fList <- Map(fList, EICInfoList, f = function(fTab, EICInfoAna)
         {
             # only keep those peaks with m/z in the "center" of the analyzed m/z range
-            fTab[, EIC_ID_MZ := EICInfoAna[match(fTab$EIC_ID, EIC_ID)]$EIC_ID_MZ]
-            fTab <- fTab[between(mz, binsMZ[EIC_ID_MZ] + mzStep/4, binsMZ[EIC_ID_MZ] + mzStep/4*3) == TRUE]
+            fTab[, binMZStart := EICInfoAna[match(fTab$EIC_ID, EIC_ID)]$mzmin]
+            fTab <- fTab[between(mz, binMZStart + mzStep/4, binMZStart + mzStep/4*3) == TRUE]
             if (withIMS)
             {
-                fTab[, EIC_ID_mob := EICInfoAna[match(fTab$EIC_ID, EIC_ID)]$EIC_ID_mob]
-                fTab[, mob_bin := binsMob[EIC_ID_mob]] # UNDONE
-                fTab <- fTab[between(mobility, binsMob[EIC_ID_mob] + mobStep/4, binsMob[EIC_ID_mob] + mobStep/4*3) == TRUE]
+                fTab[, binMobStart := EICInfoAna[match(fTab$EIC_ID, EIC_ID)]$mobmin]
+                fTab <- fTab[between(mobility, binMobStart + mobStep/4, binMobStart + mobStep/4*3) == TRUE]
                 
                 if (nrow(fTab) > 1)
                 {
                     # remove duplicates and keep the one with the highest intensity
                     fTab[, keep := TRUE]
-                    for (r in seq_len(nrow(fTab)-1))
+                    for (r in seq_len(nrow(fTab) - 1))
                     {
                         if (!fTab$keep[r])
                             next
@@ -138,7 +144,7 @@ findFeaturesBinning <- function(analysisInfo, retRange = NULL, mzRange = c(50, 4
                     fTab <- fTab[keep == TRUE][, keep := NULL]
                 }
             }
-            fTab <- removeDTColumnsIfPresent(fTab, c("EIC_ID_MZ", "EIC_ID_mob", "EIC_ID"))
+            fTab <- removeDTColumnsIfPresent(fTab, c("binMZStart", "binMobStart"))
             return(fTab)
         })
         

@@ -365,7 +365,7 @@ getEICsOREIMs <- function(obj, type, inputTab, EIXParams, ...)
                   EIXParams$mzExpIMSWindow, ...)
 }
 
-setMethod("getFeatureEIXInputTab", "features", function(obj, type, selectFunc)
+setMethod("getFeatureEIXInputTab", "features", function(obj, type, EIXParams, selectFunc)
 {
     return(lapply(featureTable(obj), function(tab)
     {
@@ -518,7 +518,6 @@ setMethod("getFeatureEIXs", "features", function(obj, type, analysis = analyses(
 {
     if (length(obj) == 0)
         return(list())
-    
     inputTab <- getFeatureEIXInputTab(obj, type, EIXParams, selectFunc)
     EIXs <- getEICsOREIMs(obj, type, inputTab, EIXParams, ...)
     EIXs <- Map(EIXs, featureTable(obj), f = function(eics, ft)
@@ -999,7 +998,7 @@ reintegrateMobilityFeatures <- function(features, EICRTWindow, peakRTWindow, cal
     
     printf("Loading EICs...\n")
     EICSelFunc <- \(tab) tab[!is.null(tab[["mobility"]]) & !is.na(mobility)]
-    allEICs <- getFeatureEIXs(features, type = "EIC", EIXParams = getDefEIMParams(window = EICRTWindow),
+    allEICs <- getFeatureEIXs(features, type = "EIC", EIXParams = getDefEICParams(window = EICRTWindow),
                               selectFunc = EICSelFunc, compress = FALSE, cacheDB = cacheDB)
     
     if (!is.null(peaksParam))

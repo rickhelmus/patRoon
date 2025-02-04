@@ -203,7 +203,7 @@ For some parameters it is recommended or even necessary to set hard limits on th
 ```{r fOptPRanges,eval=FALSE}
 # set minimum intensity threshold (but no max)
 ftOpt <- optimizeFeatureFinding(anaInfo, "openms",
-                                list(noiseThrInt = c(1000, 5000), # initial testing range
+                                list(noiseThrInt = c(1000, 5000)), # initial testing range
                                 paramRanges = list(noiseThrInt = c(500, Inf))) # never test below 500
 ```
 

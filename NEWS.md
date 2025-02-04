@@ -9,6 +9,7 @@
 * Small doc updates for `MSPeakLists`
 * Fixed: the score filters for the `filter()` method of formulas/compounds could in rare cases not be applied correctly for consensus and/or sets results
 * MSP MS libraries: don't be case sensitive when checking the "Num Peaks" field (Bas van de Velde)
+* Small fixes in example code from the Handbook (reported by Boris Droz and Jan Specker)
 
 
 # patRoon 2.3.3

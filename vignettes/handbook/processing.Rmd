@@ -191,7 +191,8 @@ fGroups <- filter(fGroups,
                   removeBlanks = TRUE) # remove blank analyses from object afterwards
 
 # filter by feature properties
-fGroups <- filter(mzDefectRange = c(0.8, 0.9),
+fGroups <- filter(fGroups,
+                  mzDefectRange = c(0.8, 0.9),
                   chromWidthRange = c(6, 120))
 
 # remove features not present in at least 3 analyses
@@ -350,7 +351,7 @@ All filters support _negation_: if enabled all specified filters will be execute
 fGroups <- filter(fGroups, rGroups = c("repl1", "repl2"), negate = TRUE)
 
 # only retain features with a mass defect outside 0.8-0.9
-fGroups <- filter(mzDefectRange = c(0.8, 0.9), negate = TRUE)
+fGroups <- filter(fGroups, mzDefectRange = c(0.8, 0.9), negate = TRUE)
 
 # remove duplicate suspect hits and only keep the _worst_ hit
 fGroupsSusp <- filter(fGroupsSusp, selectHitsBy = "level", negate = TRUE)

@@ -824,64 +824,56 @@ aggregateTox <- function(tox, aggrParams, splitSuspects = FALSE)
     return(tox[])
 }
 
-findPeaksInEICs <- function(allEICs, peaksParam, withBP, withMobility, parallel, cacheDB = NULL)
+findPeaksInEICs <- function(EICs, peaksParam, withBP, withMobility, cacheDB = NULL)
 {
     baseHash <- makeHash(peaksParam)
     
-    doApply("sapply", parallel, allEICs, function(EICs)
+    # NOTE: EICs must be named
+    
+    hash <- makeHash(baseHash, EICs)
+    cd <- loadCacheData("peaksEIC", hash, cacheDB)
+    if (!is.null(cd))
+        return(cd)
+    
+    # convert EICs to data.tables: this is necessary for findPeaks()
+    # NOTE: we don't store (or hash) the EICs as DTs, as this makes things slower
+    
+    peaks <- findPeaks(EICs, peaksParam, verbose = FALSE)
+    peaks <- rbindlist(peaks, idcol = "EIC_ID")
+    
+    if (nrow(peaks) == 0)
     {
-        # NOTE: EICs must be named
+        peaks[, EIC_ID := character()]
+        peaks[, c("retmin", "retmax", "ret", "area", "intensity", "mzmin", "mzmax", "mz", "mobmin", "mobmax", "mobility") := numeric()]
+    }
+    else
+    {
+        peaks[, c("mzmin", "mzmax", "mz", "mobmin", "mobmax", "mobility") := {
+            eic <- EICs[[EIC_ID]][EICs[[EIC_ID]]$intensity != 0 & EICs[[EIC_ID]]$time %between% c(retmin, retmax), ]
+            if (nrow(eic) == 0)
+                numeric(1)
+            else
+            {
+                if (is.null(eic[["mobility"]]))
+                    eic$mobility <- NA_real_
+                # UNDONE: also use mobility BP data?
+                list(min(eic$mzmin), max(eic$mzmax), weighted.mean(if (withBP) eic$mzBP else eic$mz, eic$intensity),
+                     min(eic$mobmin), max(eic$mobmax),
+                     weighted.mean(if (withBP) eic$mobilityBP else eic$mobility, eic$intensity))
+            }
+        }, by = seq_len(nrow(peaks))]
+    }
+    
+    # NOTE: we could also set mobilities after checking if data is available, but then we need to repeat the EIC subsetting above
+    if (!withMobility || length(EICs) == 0 || is.null(EICs[[1]][["mobility"]]))
+        peaks[, c("mobmin", "mobmax", "mobility") := NULL]
+    
+    # make unique IDs
+    peaks[, ID := make.unique(EIC_ID)]
+    
+    saveCacheData("peaksEIC", peaks, hash, cacheDB)
         
-        hash <- makeHash(baseHash, EICs)
-        cd <- loadCacheData("peaksEIC", hash, cacheDB)
-        if (!is.null(cd))
-        {
-            doProgress()
-            return(cd)
-        }
-
-        # convert EICs to data.tables: this is necessary for findPeaks()
-        # NOTE: we don't store (or hash) the EICs as DTs, as this makes things slower
-        
-        peaks <- findPeaks(EICs, peaksParam, verbose = FALSE)
-        peaks <- rbindlist(peaks, idcol = "EIC_ID")
-        
-        if (nrow(peaks) == 0)
-        {
-            peaks[, EIC_ID := character()]
-            peaks[, c("retmin", "retmax", "ret", "area", "intensity", "mzmin", "mzmax", "mz", "mobmin", "mobmax", "mobility") := numeric()]
-        }
-        else
-        {
-            peaks[, c("mzmin", "mzmax", "mz", "mobmin", "mobmax", "mobility") := {
-                eic <- EICs[[EIC_ID]][EICs[[EIC_ID]]$intensity != 0 & EICs[[EIC_ID]]$time %between% c(retmin, retmax), ]
-                if (nrow(eic) == 0)
-                    numeric(1)
-                else
-                {
-                    if (is.null(eic[["mobility"]]))
-                        eic$mobility <- NA_real_
-                    # UNDONE: also use mobility BP data?
-                    list(min(eic$mzmin), max(eic$mzmax), weighted.mean(if (withBP) eic$mzBP else eic$mz, eic$intensity),
-                         min(eic$mobmin), max(eic$mobmax),
-                         weighted.mean(if (withBP) eic$mobilityBP else eic$mobility, eic$intensity))
-                }
-            }, by = seq_len(nrow(peaks))]
-        }
-        
-        # NOTE: we could also set mobilities after checking if data is available, but then we need to repeat the EIC subsetting above
-        if (!withMobility || length(EICs) == 0 || is.null(EICs[[1]][["mobility"]]))
-            peaks[, c("mobmin", "mobmax", "mobility") := NULL]
-        
-        # make unique IDs
-        peaks[, ID := make.unique(EIC_ID)]
-        
-        saveCacheData("peaksEIC", peaks, hash, cacheDB)
-        
-        doProgress()
-        
-        return(peaks)
-    }, simplify = FALSE)
+    return(peaks)
 }
 
 getMobilityCols <- function() c("mobility", "mobmin", "mobmax", "mob_area", "mob_intensity")
@@ -1004,16 +996,18 @@ reintegrateMobilityFeatures <- function(features, EICRTWindow, peakRTWindow, cal
     if (!is.null(peaksParam))
     {
         # UNDONE: make withBP configurable?
-        peaksList <- findPeaksInEICs(allEICs, peaksParam, withBP = FALSE, withMobility = FALSE, parallel = parallel,
-                                     cacheDB = cacheDB)
-        peaksList <- Map(peaksList, featureTable(features), f = function(anaPLs, ft)
+        peaksList <- doApply("Map", parallel, allEICs, featureTable(features), f = function(EICs, ft)
         {
+            peaks <- findPeaksInEICs(EICs, peaksParam, withBP = FALSE, withMobility = FALSE, cacheDB = cacheDB)
             # filter out peaks outside original retmin/retmax and with high RT deviation
-            parFT <- ft[match(anaPLs$EIC_ID, ID)]
-            anaPLs <- anaPLs[numGTE(ret, parFT$retmin) & numLTE(ret, parFT$retmax) & numLTE(abs(ret - parFT$ret), peakRTWindow)]
+            parFT <- ft[match(peaks$EIC_ID, ID)]
+            peaks <- peaks[numGTE(ret, parFT$retmin) & numLTE(ret, parFT$retmax) & numLTE(abs(ret - parFT$ret), peakRTWindow)]
             # filter out all peaks for EICs with >1 result
-            anaPLs[, N := .N, by = "EIC_ID"]
-            return(anaPLs[N == 1][, N := NULL])
+            peaks[, N := .N, by = "EIC_ID"]
+            
+            doProgress()
+            
+            return(peaks[N == 1][, N := NULL])
         })
     }
     else

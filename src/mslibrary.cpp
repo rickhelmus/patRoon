@@ -6,6 +6,7 @@
 
 // [[Rcpp::depends(rapidjsonr)]]
 
+#include <cctype>
 #include <fstream>
 #include <iomanip>
 #include <set>
@@ -141,7 +142,10 @@ Rcpp::List readMSP(Rcpp::CharacterVector file, Rcpp::LogicalVector pc)
                 std::string val = line.substr(cPos + 1);
                 trim(key); trim(val);
                 
-                if (key == "Num Peaks")
+                auto keyLower = key;
+                std::transform(keyLower.begin(), keyLower.end(), keyLower.begin(), ::tolower);
+                
+                if (keyLower == "num peaks")
                 {
                     bool getMZ = true;
                     const char *separators = " \t,;:()[]{}"; // separators from NIST manual

@@ -182,6 +182,16 @@ getCentroidedMSFilesFromAnaInfo <- function(anaInfo, formats = c("mzML", "mzXML"
     getMSFilesFromAnaInfo(anaInfo, "centroid", formats, mustExist)
 }
 
+doGetEICsForAna <- function(...)
+{
+    # NOTE: getEICList() return lists, which are converted to data.frames and is a lot faster than returning
+    # data.frames directly.
+    EICs <- getEICList(...)
+    wh <- lengths(EICs) > 0 # zero length if post-filtered --> don't try to make DFs for these
+    EICs[wh] <- lapply(EICs[wh], setDF)
+    return(EICs)
+}
+
 doGetEICs <- function(anaInfo, EICInfoList, mzExpIMSWindow = 0, minIntensityIMS = 0, compress = TRUE,
                       showProgress = "batch", withBP = FALSE, minEICIntensity = 0, minAdjacentTime = 0,
                       minAdjacentPointIntensity = 0, cacheDB = NULL)
@@ -243,13 +253,9 @@ doGetEICs <- function(anaInfo, EICInfoList, mzExpIMSWindow = 0, minIntensityIMS 
         ToDo <- EICInfo[isCached == FALSE]
         openMSReadBackend(backend, path)
         
-        # NOTE: getEICList() return lists, which are converted to data.frames and is a lot faster than returning
-        # data.frames directly.
-        newEICs <- getEICList(backend, ToDo$mzmin, ToDo$mzmax, ToDo$retmin, ToDo$retmax, ToDo$mobmin, ToDo$mobmax,
-                              mzExpIMSWindow, minIntensityIMS, compress, showProgress = showProgress == "ana", withBP,
-                              minEICIntensity, minAdjacentTime, minAdjacentPointIntensity)
-        wh <- lengths(newEICs) > 0 # zero length if post-filtered
-        newEICs[wh] <- lapply(newEICs[wh], setDF)
+        newEICs <- doGetEICsForAna(backend, ToDo$mzmin, ToDo$mzmax, ToDo$retmin, ToDo$retmax, ToDo$mobmin, ToDo$mobmax,
+                                   mzExpIMSWindow, minIntensityIMS, compress, showProgress = showProgress == "ana", withBP,
+                                   minEICIntensity, minAdjacentTime, minAdjacentPointIntensity)
         EICs[!isCached] <- newEICs
         
         if (doCache)

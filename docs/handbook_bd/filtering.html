@@ -475,23 +475,24 @@ div.csl-indent {
 <span id="cb84-10"><a href="filtering.html#cb84-10" tabindex="-1"></a>                  <span class="at">removeBlanks =</span> <span class="cn">TRUE</span>) <span class="co"># remove blank analyses from object afterwards</span></span>
 <span id="cb84-11"><a href="filtering.html#cb84-11" tabindex="-1"></a></span>
 <span id="cb84-12"><a href="filtering.html#cb84-12" tabindex="-1"></a><span class="co"># filter by feature properties</span></span>
-<span id="cb84-13"><a href="filtering.html#cb84-13" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(<span class="at">mzDefectRange =</span> <span class="fu">c</span>(<span class="fl">0.8</span>, <span class="fl">0.9</span>),</span>
-<span id="cb84-14"><a href="filtering.html#cb84-14" tabindex="-1"></a>                  <span class="at">chromWidthRange =</span> <span class="fu">c</span>(<span class="dv">6</span>, <span class="dv">120</span>))</span>
-<span id="cb84-15"><a href="filtering.html#cb84-15" tabindex="-1"></a></span>
-<span id="cb84-16"><a href="filtering.html#cb84-16" tabindex="-1"></a><span class="co"># remove features not present in at least 3 analyses</span></span>
-<span id="cb84-17"><a href="filtering.html#cb84-17" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">absMinAnalyses =</span> <span class="dv">3</span>)</span>
-<span id="cb84-18"><a href="filtering.html#cb84-18" tabindex="-1"></a></span>
-<span id="cb84-19"><a href="filtering.html#cb84-19" tabindex="-1"></a><span class="co"># remove features not present in at least 20% of all replicate groups</span></span>
-<span id="cb84-20"><a href="filtering.html#cb84-20" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">relMinReplicates =</span> <span class="fl">0.2</span>)</span>
-<span id="cb84-21"><a href="filtering.html#cb84-21" tabindex="-1"></a></span>
-<span id="cb84-22"><a href="filtering.html#cb84-22" tabindex="-1"></a><span class="co"># only keep data present in replicate groups &quot;repl1&quot; and &quot;repl2&quot;</span></span>
-<span id="cb84-23"><a href="filtering.html#cb84-23" tabindex="-1"></a><span class="co"># all other features and analyses will be removed</span></span>
-<span id="cb84-24"><a href="filtering.html#cb84-24" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">rGroups =</span> <span class="fu">c</span>(<span class="st">&quot;repl1&quot;</span>, <span class="st">&quot;repl2&quot;</span>))</span>
-<span id="cb84-25"><a href="filtering.html#cb84-25" tabindex="-1"></a></span>
-<span id="cb84-26"><a href="filtering.html#cb84-26" tabindex="-1"></a><span class="co"># only keep feature groups with compound annotations</span></span>
-<span id="cb84-27"><a href="filtering.html#cb84-27" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">results =</span> compounds)</span>
-<span id="cb84-28"><a href="filtering.html#cb84-28" tabindex="-1"></a><span class="co"># only keep feature groups with formula or compound annotations</span></span>
-<span id="cb84-29"><a href="filtering.html#cb84-29" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">results =</span> <span class="fu">list</span>(formulas, compounds))</span></code></pre></div>
+<span id="cb84-13"><a href="filtering.html#cb84-13" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups,</span>
+<span id="cb84-14"><a href="filtering.html#cb84-14" tabindex="-1"></a>                  <span class="at">mzDefectRange =</span> <span class="fu">c</span>(<span class="fl">0.8</span>, <span class="fl">0.9</span>),</span>
+<span id="cb84-15"><a href="filtering.html#cb84-15" tabindex="-1"></a>                  <span class="at">chromWidthRange =</span> <span class="fu">c</span>(<span class="dv">6</span>, <span class="dv">120</span>))</span>
+<span id="cb84-16"><a href="filtering.html#cb84-16" tabindex="-1"></a></span>
+<span id="cb84-17"><a href="filtering.html#cb84-17" tabindex="-1"></a><span class="co"># remove features not present in at least 3 analyses</span></span>
+<span id="cb84-18"><a href="filtering.html#cb84-18" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">absMinAnalyses =</span> <span class="dv">3</span>)</span>
+<span id="cb84-19"><a href="filtering.html#cb84-19" tabindex="-1"></a></span>
+<span id="cb84-20"><a href="filtering.html#cb84-20" tabindex="-1"></a><span class="co"># remove features not present in at least 20% of all replicate groups</span></span>
+<span id="cb84-21"><a href="filtering.html#cb84-21" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">relMinReplicates =</span> <span class="fl">0.2</span>)</span>
+<span id="cb84-22"><a href="filtering.html#cb84-22" tabindex="-1"></a></span>
+<span id="cb84-23"><a href="filtering.html#cb84-23" tabindex="-1"></a><span class="co"># only keep data present in replicate groups &quot;repl1&quot; and &quot;repl2&quot;</span></span>
+<span id="cb84-24"><a href="filtering.html#cb84-24" tabindex="-1"></a><span class="co"># all other features and analyses will be removed</span></span>
+<span id="cb84-25"><a href="filtering.html#cb84-25" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">rGroups =</span> <span class="fu">c</span>(<span class="st">&quot;repl1&quot;</span>, <span class="st">&quot;repl2&quot;</span>))</span>
+<span id="cb84-26"><a href="filtering.html#cb84-26" tabindex="-1"></a></span>
+<span id="cb84-27"><a href="filtering.html#cb84-27" tabindex="-1"></a><span class="co"># only keep feature groups with compound annotations</span></span>
+<span id="cb84-28"><a href="filtering.html#cb84-28" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">results =</span> compounds)</span>
+<span id="cb84-29"><a href="filtering.html#cb84-29" tabindex="-1"></a><span class="co"># only keep feature groups with formula or compound annotations</span></span>
+<span id="cb84-30"><a href="filtering.html#cb84-30" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">results =</span> <span class="fu">list</span>(formulas, compounds))</span></code></pre></div>
 </div>
 <div id="suspect-screening" class="section level3 hasAnchor" number="5.2.2">
 <h3><span class="header-section-number">5.2.2</span> Suspect screening<a href="filtering.html#suspect-screening" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -730,7 +731,7 @@ div.csl-indent {
 <span id="cb88-2"><a href="filtering.html#cb88-2" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">rGroups =</span> <span class="fu">c</span>(<span class="st">&quot;repl1&quot;</span>, <span class="st">&quot;repl2&quot;</span>), <span class="at">negate =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb88-3"><a href="filtering.html#cb88-3" tabindex="-1"></a></span>
 <span id="cb88-4"><a href="filtering.html#cb88-4" tabindex="-1"></a><span class="co"># only retain features with a mass defect outside 0.8-0.9</span></span>
-<span id="cb88-5"><a href="filtering.html#cb88-5" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(<span class="at">mzDefectRange =</span> <span class="fu">c</span>(<span class="fl">0.8</span>, <span class="fl">0.9</span>), <span class="at">negate =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb88-5"><a href="filtering.html#cb88-5" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">mzDefectRange =</span> <span class="fu">c</span>(<span class="fl">0.8</span>, <span class="fl">0.9</span>), <span class="at">negate =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb88-6"><a href="filtering.html#cb88-6" tabindex="-1"></a></span>
 <span id="cb88-7"><a href="filtering.html#cb88-7" tabindex="-1"></a><span class="co"># remove duplicate suspect hits and only keep the _worst_ hit</span></span>
 <span id="cb88-8"><a href="filtering.html#cb88-8" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsSusp, <span class="at">selectHitsBy =</span> <span class="st">&quot;level&quot;</span>, <span class="at">negate =</span> <span class="cn">TRUE</span>)</span>

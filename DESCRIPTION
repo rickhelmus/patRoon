@@ -59,7 +59,7 @@ Imports:
     grid,
     graphics,
     RColorBrewer,
-    data.table,
+    data.table (>= 1.15.0),
     withr,
     digest,
     DBI,

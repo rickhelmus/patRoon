@@ -424,7 +424,6 @@ setMethod("estimateIDLevels", "formulas", function(obj, absMzDev = 0.005, normal
     
     mFormNames <- mergedConsensusNames(obj)
     
-    # UNDONE: annSimBoth?
     mainIDLArgs <- list(candidateRTDev = NULL, candidateAnnSimBoth = NA, maxSuspFrags = NA, maxFragMatches = 0,
                         mFormNames = mFormNames, mCompNames = NULL, absMzDev = absMzDev, IDLevelRules = IDLevelRules,
                         logPath = logPath)

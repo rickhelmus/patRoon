@@ -13,7 +13,7 @@
 
 ## TC
 
-- add annSims, IDLs etc to report
+- add estimateIDLevels() in newProject()
 - anaInfo
     - fGroups/feat subset
         - deprecate rGroups subset/filter param?

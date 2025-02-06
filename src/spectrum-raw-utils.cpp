@@ -27,7 +27,7 @@ template<typename Spec> std::vector<size_t> flattenedSpecIDs(const std::vector<S
     return ret;
 }
 
-bool precWithinIsoWindow(SpectrumRawTypes::Mass &prec, const NumRange<SpectrumRawTypes::Mass> &range)
+bool precWithinIsoWindow(SpectrumRawTypes::Mass prec, const NumRange<SpectrumRawTypes::Mass> &range)
 {
     // NOTE: in case of MS/MS, we match all spectra if the precursor was unset (0.0) or the raw data does not
     // contain isolation windows (i.e. start==end, e.g. exported Bruker TIMS bbCID data)
@@ -69,8 +69,9 @@ std::vector<SpectrumRawSelection> getSpecRawSelections(const SpectrumRawMetadata
                 if (sel.MSMSFrameIndices.empty())
                     continue; // no MS/MS data for this one
             }
-            else if (isMSMS && precWithinIsoWindow(precursor, specMeta.second.isolationRanges[i]))
+            else if (isMSMS && !precWithinIsoWindow(precursor, specMeta.second.isolationRanges[i]))
                 continue;
+            
             ret.push_back(std::move(sel));
         }
     }

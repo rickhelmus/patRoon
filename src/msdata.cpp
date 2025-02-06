@@ -1049,7 +1049,7 @@ Rcpp::List getMSPeakLists(const MSReadBackend &backend, const std::vector<Spectr
     {
         scanSels.push_back(getSpecRawSelections(specMeta, makeNumRange(startTimes[i], endTimes[i]), MSLev,
                                                 precursorMZs[i], minBPIntensity));
-        /*Rcpp::Rcout << "ss: ";
+        /*Rcpp::Rcout << "ss " << i << "/" << precursorMZs[i] << ": ";
         for (const auto &ss : scanSels.back())
             Rcpp::Rcout << ss.index << "/" << specMeta.second.scans[ss.index] << " ";
         Rcpp::Rcout << "\n";*/

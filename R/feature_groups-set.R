@@ -187,14 +187,14 @@ setMethod("featureTable", "featureGroupsSet", function(obj) featureTable(obj@fea
 
 #' @rdname featureGroups-class
 #' @export
-setMethod("[", c("featureGroupsSet", "ANY", "ANY", "missing"), function(x, i, j, ..., ni, rGroups, IMS, sets = NULL,
-                                                                        reorder = FALSE, drop = TRUE)
+setMethod("[", c("featureGroupsSet", "ANY", "ANY", "missing"), function(x, i, j, ..., sets = NULL, reorder = FALSE,
+                                                                        drop = TRUE)
 {
     assertSets(x, sets, TRUE)
     if (!is.null(sets))
         i <- mergeAnaSubsetArgWithSets(i, sets, analysisInfo(x), reorder)
     
-    return(callNextMethod(x, i, j, ..., ni = ni, reorder = reorder, rGroups = rGroups, IMS = IMS))
+    return(callNextMethod(x, i, j, ..., reorder = reorder))
 })
 
 # UNDONE: mention that object will be unset

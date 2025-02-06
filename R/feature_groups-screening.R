@@ -141,13 +141,12 @@ setMethod("show", "featureGroupsScreening", function(object)
 #' @param drop Ignored.
 #'
 #' @export
-setMethod("[", c("featureGroupsScreening", "ANY", "ANY", "missing"), function(x, i, j, ..., ni, rGroups,
-                                                                              suspects = NULL, reorder = FALSE,
-                                                                              drop = TRUE)
+setMethod("[", c("featureGroupsScreening", "ANY", "ANY", "missing"), function(x, i, j, ..., suspects = NULL,
+                                                                              reorder = FALSE, drop = TRUE)
 {
     checkmate::assertCharacter(suspects, null.ok = TRUE)
     
-    x <- callNextMethod(x, i, j, ..., ni = ni, rGroups = rGroups, reorder = reorder, drop = drop)
+    x <- callNextMethod(x, i, j, ..., reorder = reorder, drop = drop)
     
     if (!is.null(suspects))
         x <- x[, x@screenInfo[name %in% suspects]$group]

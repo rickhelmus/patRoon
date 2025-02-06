@@ -182,16 +182,16 @@ setMethod("show", "featureGroupsScreeningSet", function(object)
 
 #' @rdname featureGroupsScreening-class
 #' @export
-setMethod("[", c("featureGroupsScreeningSet", "ANY", "ANY", "missing"), function(x, i, j, ..., ni, rGroups,
-                                                                                 suspects = NULL, sets = NULL,
-                                                                                 reorder = FALSE, drop = TRUE)
+setMethod("[", c("featureGroupsScreeningSet", "ANY", "ANY", "missing"), function(x, i, j, ..., suspects = NULL,
+                                                                                 sets = NULL, reorder = FALSE,
+                                                                                 drop = TRUE)
 {
     checkmate::assertCharacter(suspects, null.ok = TRUE)
     assertSets(x, sets, TRUE)
     
     curSets <- get("sets", pos = 2)(x)
     
-    x <- callNextMethod(x, i, j, ..., ni = ni, rGroups = rGroups, sets = sets, reorder = reorder, drop = drop)
+    x <- callNextMethod(x, i, j, ..., sets = sets, reorder = reorder, drop = drop)
     
     if (!is.null(suspects))
         x <- x[, x@screenInfo[name %in% suspects]$group]

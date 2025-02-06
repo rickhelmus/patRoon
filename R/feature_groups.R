@@ -413,7 +413,10 @@ setMethod("[", c("featureGroups", "ANY", "ANY", "missing"), function(x, i, j, ..
     if (!missing(results))
         x <- filter(x, results = results)
     
-    x <- doSubsetFeaturesByAna(x, i, ni, reorder)
+    # NOTE: we need to capture the parent frame here and pass it along for correct ni evaluation below
+    # NOTE: all derived methods of "[" should NOT specify ni in their argument list, otherwise NSE will fail!
+    env <- parent.frame()
+    x <- doSubsetFeaturesByAna(x, i, ni, reorder = reorder, env = env)
     
     if (!missing(j))
     {

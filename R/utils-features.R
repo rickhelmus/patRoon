@@ -28,16 +28,16 @@ checkAnaInfoAggrGrouping <- function(anaInfo, what, aggrBy, groupBy)
     }
 }
 
-doSubsetFeaturesByAna <- function(obj, i, ni, reorder)
+doSubsetFeaturesByAna <- function(obj, i, ..., reorder, env)
 {
-    if (!missing(ni))
+    # NOTE: ni is passed as dots here, as otherwise NSE will _not_ work!
+    if (...length() > 0)
     {
         if (!missing(i))
             stop("Cannot simulatenously specify i and ni arguments.", call. = FALSE)
         anaInfo <- analysisInfo(obj)
         # From https://stackoverflow.com/a/62043225
-        # NOTE: set env=parent.frame() here, as ni is passed from another function (`[`) 
-        anaInfo <- eval(substitute(anaInfo[.i], list(.i = substitute(ni, env = parent.frame()))))
+        anaInfo <- eval(substitute(anaInfo[.i], list(.i = substitute(..., env = env))))
         i <- anaInfo$analysis
     }
     

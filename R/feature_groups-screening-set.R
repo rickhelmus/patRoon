@@ -224,7 +224,6 @@ setMethod("delete", "featureGroupsScreeningSet", doSFGroupsScreeningDelete)
 #' @export
 setMethod("annotateSuspects", "featureGroupsScreeningSet", function(fGroups, MSPeakLists, formulas, compounds,
                                                                     absMzDev = 0.005,
-                                                                    specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
                                                                     checkFragments = c("mz", "formula", "compound"),
                                                                     formulasNormalizeScores = "max",
                                                                     compoundsNormalizeScores = "max",
@@ -246,7 +245,6 @@ setMethod("annotateSuspects", "featureGroupsScreeningSet", function(fGroups, MSP
     
     unsetFGroups <- Map(unsetFGroups, unsetMSPeakLists, unsetFormulas, unsetCompounds, logPath = logPath,
                         f = annotateSuspects, MoreArgs = list(absMzDev = absMzDev,
-                                                              specSimParams = specSimParams,
                                                               checkFragments = checkFragments,
                                                               formulasNormalizeScores = formulasNormalizeScores,
                                                               compoundsNormalizeScores = compoundsNormalizeScores,

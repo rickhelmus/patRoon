@@ -289,10 +289,11 @@ setMethod("filter", "features", function(obj, absMinIntensity = NULL, relMinInte
 #' @describeIn features Subset on analyses.
 #' @param drop Ignored.
 #' @export
-setMethod("[", c("features", "ANY", "missing", "missing"), function(x, i, ..., ni, reorder = FALSE, drop = TRUE)
+setMethod("[", c("features", "ANY", "missing", "missing"), function(x, i, j, ..., ni, reorder = FALSE, drop = TRUE)
 {
     checkmate::assertFlag(reorder)
-    x <- doSubsetFeaturesByAna(x, i, ni, reorder)
+    env <- parent.frame()
+    x <- doSubsetFeaturesByAna(x, i, ni, reorder = reorder, env = env)
     return(x)
 })
 

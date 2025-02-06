@@ -182,10 +182,13 @@ assertAndPrepareAnaInfoBy <- function(x, anaInfo, withFGroups, .var.name = check
     return(x)
 }
 
-assertSuspectList <- function(x, needsAdduct, skipInvalid, .var.name = checkmate::vname(x), add = NULL)
+assertSuspectList <- function(x, needsAdduct, skipInvalid, null.ok = FALSE, .var.name = checkmate::vname(x), add = NULL)
 {
     # NOTE: we don't check mobility/CCS columns here, since we don't know yet which adduct specific column to take,
     # things would become complex. Instead, all checks will be done in expandSuspMobilities()
+    
+    if (is.null(x) && null.ok)
+        return(invisible(NULL))
     
     mzCols <- c("mz", "neutralMass", "SMILES", "InChI", "formula")
     

@@ -343,9 +343,9 @@ reportHTMLUtils$methods(
         
         tab <- as.data.table(formulas)
         
-        # NOTE: for consensus results, duplicate algo columns (eg explainedPeaks) are only shown in details
+        # NOTE: for consensus results, duplicate algo columns (eg explainedPeaks, but except estIDLevel) are only shown in details
         tab <- subsetDTColumnsIfPresent(tab, c("group", "neutral_formula", "neutralMass", "explainedPeaks",
-                                               "explainedIntensity", "error"))
+                                               "explainedIntensity", "error", "estIDLevel"))
         
         tab[, candidate := seq_len(.N), by = "group"]
         
@@ -382,10 +382,13 @@ reportHTMLUtils$methods(
         getFormDetails <- function(index)
         {
             ft <- formulas[[tab$group[index]]][tab$candidate[index]]
-            ft <- ft[, setdiff(names(ft), names(tab)), with = FALSE]
+            # don't consider columns that are already in main table
+            # HACK: except ID level in sets workflows, as only the non-set specific ID level is in the main table
+            ft <- ft[, setdiff(names(ft), setdiff(names(tab), "estIDLevel")), with = FALSE]
             takeCols <- getMergedConsCols(c("neutral_formula", "ion_formula", "neutralMass", "ion_formula_mz",
                                             "error", "error_frag_median", "error_frag_median_abs",
-                                            "explainedPeaks", "explainedIntensity"), names(ft), mcn)
+                                            "explainedPeaks", "explainedIntensity", "annSim", "estIDLevel"),
+                                          names(ft), mcn)
             ft <- ft[, takeCols, with = FALSE]
             for (col in getMergedConsCols(c("neutral_formula", "ion_formula"), names(ft), mcn))
                 set(ft, j = col, value = subscriptFormulaHTML(ft[[col]]))
@@ -407,12 +410,14 @@ reportHTMLUtils$methods(
         getScoreDetails <- function(index)
         {
             fRow <- formulas[[tab$group[index]]][tab$candidate[index]]
-            cols <- getMergedConsCols(annScoreNames(formulas, FALSE), names(fRow), mcn)
+            cols <- getMergedConsCols(c(annScoreNames(formulas, FALSE), "annSim"), names(fRow), mcn)
             return(makeAnnScoreReact(fRow[, cols, with = FALSE],
                                      if (isFGSet(objects$fGroups)) sets(objects$fGroups) else NULL))
         }
         
         setcolorder(tab, intersect(c("candidate", "suspect"), names(tab)))
+        if (!is.null(tab[["estIDLevel"]]))
+            setcolorder(tab, "estIDLevel", after = "scorings")
         
         colDefs <- pruneList(list(
             group = reactable::colDef(show = FALSE, filterMethod = getReactFilterMethodExact()),
@@ -422,7 +427,8 @@ reportHTMLUtils$methods(
                                                 cell = function(value) htmltools::span(dangerouslySetInnerHTML = list("__html" = subscriptFormulaHTML(value)))),
             neutralMass = reactable::colDef("neutral mass"),
             spectrum = reactable::colDef(cell = makeReactCellAnn("formulas", "spectra"), minWidth = 200, html = TRUE),
-            scorings = reactable::colDef(cell = makeReactCellAnn("formulas", "scores"), minWidth = 200, html = TRUE)
+            scorings = reactable::colDef(cell = makeReactCellAnn("formulas", "scores"), minWidth = 200, html = TRUE),
+            estIDLevel = if (!is.null(tab[["estIDLevel"]])) reactable::colDef(cell = makeReactCellIDL(), align = "right") else NULL
         ))
         
         colDefs <- setReactNumRangeFilters("formulasTab", tab, colDefs)
@@ -465,8 +471,8 @@ reportHTMLUtils$methods(
         
         # NOTE: for consensus results, duplicate algo columns (eg identifier) are only shown in details
         tab <- subsetDTColumnsIfPresent(tab, c("group", "compoundName", "compoundName2", "identifier",
-                                               "neutral_formula", "neutralMass", "explainedPeaks", "score", "InChIKey",
-                                               "UID"))
+                                               "neutral_formula", "neutralMass", "explainedPeaks", "score",
+                                               "estIDLevel", "InChIKey", "UID"))
         
         tab[, candidate := seq_len(.N), by = "group"]
         
@@ -522,13 +528,16 @@ reportHTMLUtils$methods(
         getCompDetails <- function(index)
         {
             ct <- data.table::copy(compounds[[tab$group[index]]][tab$candidate[index]])
-            ct <- ct[, setdiff(names(ct), names(tab)), with = FALSE]
+            # don't consider columns that are already in main table
+            # HACK: except ID level in sets workflows, as only the non-set specific ID level is in the main table
+            ct <- ct[, setdiff(names(ct), setdiff(names(tab), "estIDLevel")), with = FALSE]
             takeCols <- c(
                 "compoundName",
                 "identifier",
                 "relatedCIDs",
                 "database",
                 "explainedPeaks",
+                "annSim", "annSimForm", "annSimBoth", "estIDLevel",
                 "neutral_formula",
                 "SMILES",
                 "InChI",
@@ -548,8 +557,7 @@ reportHTMLUtils$methods(
                 "parent", "transformation", "enzyme", "evidencedoi"
             )
             ct <- ct[, getMergedConsCols(takeCols, names(ct), mcn), with = FALSE]
-            
-            if (!is.null(tab[["compoundName"]]) && !is.null(tab[["compoundName2"]]))
+            if (!is.null(tab[["compoundName"]]) && !is.null(ct[["compoundName2"]]))
                 set(ct, j = "compoundName2", value = NULL) # already in main table compoundName column
             
             set(ct, j = "neutral_formula", value = subscriptFormulaHTML(ct$neutral_formula))
@@ -587,19 +595,22 @@ reportHTMLUtils$methods(
         }
         
         setcolorder(tab, intersect(c("candidate", "compoundName", "suspect", "structure"), names(tab)))
+        if (!is.null(tab[["estIDLevel"]]))
+            setcolorder(tab, "estIDLevel", after = "scorings")
         
         colDefs <- pruneList(list(
             group = reactable::colDef(show = FALSE, filterMethod = getReactFilterMethodExact()),
             candidate = reactable::colDef("#", minWidth = 15),
             compoundName = if (!is.null(tab[["compoundName"]])) reactable::colDef("compound", cell = getCompCell) else NULL,
             suspect = if (!is.null(tab[["suspect"]])) reactable::colDef("suspect(s)", filterMethod = getReactFilterMethodSuspect()) else NULL,
+            structure = reactable::colDef(cell = makeReactCellStructure(), minWidth = 125, html = TRUE),
             identifier = if (!is.null(tab[["identifier"]])) reactable::colDef(cell = function(value, index) htmltools::span(dangerouslySetInnerHTML = list("__html" = makeDBIdentLink(databases[index], value)))) else NULL,
             neutral_formula = reactable::colDef("formula",
                                                 cell = function(value) htmltools::span(dangerouslySetInnerHTML = list("__html" = subscriptFormulaHTML(value)))),
             neutralMass = if (!is.null(tab[["neutralMass"]])) reactable::colDef("neutral mass") else NULL,
-            structure = reactable::colDef(cell = makeReactCellStructure(), minWidth = 125, html = TRUE),
             spectrum = reactable::colDef(cell = makeReactCellAnn("compounds", "spectra"), minWidth = 200, html = TRUE),
-            scorings = reactable::colDef(cell = makeReactCellAnn("compounds", "scores"), minWidth = 200, html = TRUE)
+            scorings = reactable::colDef(cell = makeReactCellAnn("compounds", "scores"), minWidth = 200, html = TRUE),
+            estIDLevel = if (!is.null(tab[["estIDLevel"]])) reactable::colDef(cell = makeReactCellIDL(), align = "right") else NULL
         ))
         
         colDefs <- setReactNumRangeFilters("compoundsTab", tab, colDefs)

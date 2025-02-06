@@ -248,18 +248,20 @@ setMethod("predictRespFactors", "compoundsSet", doFeatAnnPredictRFSets)
 setMethod("predictTox", "compoundsSet", doFeatAnnPredictToxSets)
 
 #' @export
-setMethod("estimateIDLevels", "compoundsSet", function(obj, absMzDev = 0.005, formulas = NULL, 
+setMethod("estimateIDLevels", "compoundsSet", function(obj, absMzDev = 0.005, MSPeakLists = NULL, formulas = NULL, 
                                                        formulasNormalizeScores = "max", compoundsNormalizeScores = "max",
                                                        IDFile = system.file("misc", "IDLevelRules.yml", package = "patRoon"),
                                                        logPath = NULL, parallel = TRUE)
 {
+    checkmate::assertClass(MSPeakLists, "MSPeakListsSet", null.ok = TRUE)
     checkmate::assertClass(formulas, "formulasSet", null.ok = TRUE)
 
+    unsetMSPL <- checkAndUnSetOther(sets(obj), MSPeakLists, "MSPeakLists", TRUE)
     unsetFormulas <- checkAndUnSetOther(sets(obj), formulas, "formulas", TRUE)
     
     logPath <- if (is.null(logPath)) rep(list(NULL), length(sets(fGroups))) else file.path(logPath, sets(fGroups))
     
-    obj@setObjects <- Map(setObjects(obj), formulas = unsetFormulas, logPath = logPath,
+    obj@setObjects <- Map(setObjects(obj), MSPeakLists = unsetMSPL, formulas = unsetFormulas, logPath = logPath,
                           f = estimateIDLevels, MoreArgs = list(absMzDev = absMzDev,
                                                                 formulasNormalizeScores = formulasNormalizeScores,
                                                                 compoundsNormalizeScores = compoundsNormalizeScores,

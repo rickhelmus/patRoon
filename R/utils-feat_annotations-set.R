@@ -51,8 +51,8 @@ makeFeatAnnSetConsensus <- function(setObjects, origFGNames, setThreshold, setTh
             # should be for non-IMS fGroups
             cols <- getMergedConsCols(c(
                 "fragInfo", "rank", "mergedBy", "coverage", "explainedPeaks", "ion_formula", "ion_formula_mz", "precursorType",
-                "libPeaksCompared", "libPeaksTotal", "annSim", "estIDLevel", "mobility", "mobility_mz", "CCS", "CCS_mz",
-                "d_mob", "d_mob_rel", "d_CCS", "d_CCS_rel"
+                "libPeaksCompared", "libPeaksTotal", "annSim", "annSimForm", "annSimBoth", "estIDLevel", "mobility",
+                "mobility_mz", "CCS", "CCS_mz", "d_mob", "d_mob_rel", "d_CCS", "d_CCS_rel"
             ), names(ct), mConsNames)
             if (!setAvgSpecificScores)
                 cols <- c(cols, getMergedConsCols(featAnnSetSpecificScoreCols(), names(ct), mConsNames))
@@ -138,8 +138,12 @@ makeFeatAnnSetConsensus <- function(setObjects, origFGNames, setThreshold, setTh
         ct[, c("setsCount", "setsMergedCount") := NULL]
         
         # assign non-set specific annSims
-        asnames <- getMergedConsCols("annSim", names(ct), names(setObjects))
-        ct[, annSim := do.call(pmax, c(.SD, list(na.rm = TRUE))), .SDcols = asnames]
+        for (col in c("annSim", "annSimForm", "annSimBoth"))
+        {
+            asnames <- getMergedConsCols(col, names(ct), names(setObjects))
+            if (length(asnames) > 0)
+                ct[, (col) := do.call(pmax, c(.SD, list(na.rm = TRUE))), .SDcols = asnames]
+        }
         
         return(ct)
     })

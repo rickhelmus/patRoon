@@ -20,10 +20,7 @@
 
 ## TC
 
-- annSims
-    - remove support for annSimBoth in annotateSuspects? Or optionally calc for feat annotations and copy that?
-        - either of these is preferred, as annSimBoth now needs separate specSimParams to annotateSuspects
-    - add annSims, IDLs etc to report
+- add annSims, IDLs etc to report
 - anaInfo
     - fGroups/feat subset
         - deprecate rGroups subset/filter param?
@@ -79,10 +76,10 @@
         - filter for candidate specific frag/NL matches
     
 - docs
-    - specSimParams --> specSimParamsMatch
     - ES contributions for IDLs
     - explicitly mention annSim can be filtered with scoreLimits?
     - annSim for sets is calculated as max
+    - annSimForm / annSimBoth are added by compounds method of estimateIDLevels() if formulas/MSPL are set, may be used for ID levels (not by default)
     - analysisInfo slot/accessor is now data.table()
     - reorderAnalyses(): doc that XCMS/XCMS3/KPIC2 fGroups internal slot is not updated, maybe also improve general docs for what is updated and for XCMS what it means for exporting data
     - analysisInfo<-()
@@ -145,6 +142,7 @@
 
 - NEWS
     - specSimParamsMatch --> specSimParams
+    - annotateSuspects() now copies annSims from feat annotations instead of calculating --> change in func args
     - annSuspects should be faster now (no need to calc annSims, and estIDLevel is faster)
     - analysisInfo slot/accessor is now data.table()
     - no analysisInfo slot in fGroups anymore

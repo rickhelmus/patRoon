@@ -920,7 +920,7 @@ estimateIdentificationLevel <- function(candidateName, candidateFGroup, candidat
                 minSim <- getVal(val, type, "min")
                 levelOK <- !is.na(candidateAnnSimBoth) && numGTE(candidateAnnSimBoth, minSim)
                 if (!levelOK)
-                    levelFailed <- if (is.na(candidateAnnSimBoth)) "no calculated similarity" else
+                    levelFailed <- if (is.na(candidateAnnSimBoth)) "no calculated similarity for both formulas+compounds" else
                         sprintf("similarity too low: %f/%f", candidateAnnSimBoth, minSim)
             }
             else if (type %in% allScores)

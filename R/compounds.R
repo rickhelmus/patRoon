@@ -666,14 +666,17 @@ setMethod("predictTox", "compounds", function(obj, LC50Mode = "static", concUnit
 })
 
 #' @export
-setMethod("estimateIDLevels", "compounds", function(obj, absMzDev = 0.005, formulas = NULL, 
-                                                   formulasNormalizeScores = "max", compoundsNormalizeScores = "max",
-                                                   IDFile = system.file("misc", "IDLevelRules.yml", package = "patRoon"),
-                                                   logPath = NULL, parallel = TRUE)
+setMethod("estimateIDLevels", "compounds", function(obj, absMzDev = 0.005, MSPeakLists = NULL, formulas = NULL,
+                                                    specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
+                                                    formulasNormalizeScores = "max", compoundsNormalizeScores = "max",
+                                                    IDFile = system.file("misc", "IDLevelRules.yml", package = "patRoon"),
+                                                    logPath = NULL, parallel = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertNumber(absMzDev, lower = 0, finite = TRUE, add = ac)
+    checkmate::assertClass(MSPeakLists, "MSPeakLists", null.ok = TRUE, add = ac)
     checkmate::assertClass(formulas, "formulas", null.ok = TRUE, add = ac)
+    assertSpecSimParams(specSimParams, add = ac)
     aapply(assertNormalizationMethod, . ~ formulasNormalizeScores + compoundsNormalizeScores, withNone = FALSE,
            fixed = list(add = ac))
     checkmate::assertFileExists(IDFile, "r", add = ac)
@@ -687,44 +690,65 @@ setMethod("estimateIDLevels", "compounds", function(obj, absMzDev = 0.005, formu
     mFormNames <- if (!is.null(formulas)) mergedConsensusNames(formulas) else NULL
     mCompNames <- mergedConsensusNames(obj)
     
-    # UNDONE: annSimBoth?
-    mainIDLArgs <- list(candidateRTDev = NULL, candidateAnnSimBoth = NA, maxSuspFrags = NA, maxFragMatches = 0,
-                        mFormNames = mFormNames, mCompNames = mCompNames, absMzDev = absMzDev,
-                        IDLevelRules = IDLevelRules, logPath = logPath)
+    mainIDLArgs <- list(candidateRTDev = NULL, maxSuspFrags = NA, maxFragMatches = 0, mFormNames = mFormNames,
+                        mCompNames = mCompNames, absMzDev = absMzDev, IDLevelRules = IDLevelRules, logPath = logPath)
     
     printf("Estimating identification levels for %d feature groups with a total of %d candidates...\n",
            length(groupNames(obj)), length(obj))
     
     obj@groupAnnotations <- doApply("Map", parallel, groupNames(obj), annotations(obj), f = function(grp, ann)
     {
-        fTable <- if (!is.null(formulas)) formulas[[grp]] else NULL
-        fTableNorm <- if (!is.null(fTable))
-        {
-            normalizeAnnScores(formulas[[grp]], formScoreNames(TRUE), formulas@scoreRanges[[grp]], mFormNames,
-                               formulasNormalizeScores == "minmax")
-        }
-        else
-            NULL
         annNorm <- normalizeAnnScores(ann, compScoreNames(TRUE), obj@scoreRanges[[grp]], mCompNames,
                                       compoundsNormalizeScores == "minmax")
         
         ann <- copy(ann)
+
+        ann[, c("annSimForm", "annSimBoth") := .(0, annSim)] # initialize
+        
+        fTable <- if (!is.null(formulas)) formulas[[grp]] else NULL
+        fTableNorm <- NULL
+        fRanks <- rep(NA_integer_, nrow(ann))
+        if (!is.null(fTable))
+        {
+            fTableNorm <- normalizeAnnScores(formulas[[grp]], formScoreNames(TRUE), formulas@scoreRanges[[grp]],
+                                             mFormNames, formulasNormalizeScores == "minmax")
+            fRanks <- match(ann$neutral_formula, fTable$neutral_formula, nomatch = NA_integer_)
+            
+            ann[, annSimForm := fifelse(is.na(fRanks), 0, fTable$annSim[fRanks])]
+            
+            if (!is.null(MSPeakLists) && !is.null(MSPeakLists[[grp]][["MSMS"]]) && !is.null(fTable))
+            {
+                pl <- MSPeakLists[[grp]][["MSMS"]]
+                pl <- prepSpecSimilarityPL(pl, specSimParams$removePrecursor, specSimParams$relMinIntensity,
+                                           specSimParams$minPeaks)
+                annInds <- lapply(ann$fragInfo, "[[", "PLID")
+                annIndsForms <- Map(ann$neutral_formula, fRanks, f = function(f, fr)
+                {
+                    if (is.na(fr) == 0)
+                        return(integer())
+                    return(fTable$fragInfo[[fr]]$PLID)
+                })
+                annIndsBoth <- Map(annInds, annIndsForms, f = union)
+                ann[, annSimBoth := calcAnnSims(pl, annIndsBoth, specSimParams$method, specSimParams$mzWeight,
+                                                specSimParams$intWeight, specSimParams$absMzDev)]
+            }
+        }
+        
         ann[, estIDLevel := {
-            cf <- neutral_formula
-            fRank <- if (!is.null(fTable)) fTable[neutral_formula == cf, which = TRUE] else NA_integer_
-            if (length(fRank) == 0)
-                fRank <- NA_integer_
-            annSimForm <- if (!is.na(fRank)) fTable$annSim[fRank] else NA_real_
             do.call(estimateIdentificationLevel, c(mainIDLArgs, list(candidateName = compoundName,
                                                                      candidateFGroup = grp,
                                                                      candidateInChIKey1 = InChIKey1,
-                                                                     candidateFormula = if (!is.na(fRank)) neutral_formula else NULL,
+                                                                     candidateFormula = if (!is.na(fRanks[.I])) neutral_formula else NULL,
                                                                      candidateAnnSimForm = annSimForm,
                                                                      candidateAnnSimComp = annSim,
+                                                                     candidateAnnSimBoth = annSimBoth,
                                                                      formTable = fTable, formTableNorm = fTableNorm,
-                                                                     formRank = fRank, compTable = ann,
+                                                                     formRank = fRanks[.I], compTable = ann,
                                                                      compTableNorm = annNorm, compRank = .I)))
         }, by = seq_len(nrow(ann))]
+        
+        setcolorder(ann, intersect(c("annSimForm", "annSimBoth", "estIDLevel"), names(ann)), after = "annSim")
+        
         doProgress()
         return(ann)
     })

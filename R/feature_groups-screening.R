@@ -296,7 +296,6 @@ setMethod("calculateTox", "featureGroupsScreening", function(fGroups, featureAnn
 #' @export
 setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeakLists, formulas, compounds,
                                                                  absMzDev = 0.005,
-                                                                 specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
                                                                  checkFragments = c("mz", "formula", "compound"),
                                                                  formulasNormalizeScores = "max",
                                                                  compoundsNormalizeScores = "max",
@@ -311,7 +310,6 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
            c("MSPeakLists", "formulas", "compounds"), null.ok = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertNumber, . ~ absMzDev, lower = 0,
            finite = TRUE, fixed = list(add = ac))
-    assertSpecSimParams(specSimParams, add = ac)
     checkmate::assertSubset(checkFragments, c("mz", "formula", "compound"), add = ac)
     aapply(assertNormalizationMethod, . ~ formulasNormalizeScores + compoundsNormalizeScores, withNone = FALSE,
            fixed = list(add = ac))
@@ -320,8 +318,8 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
         assertCanCreateDir(logPath, add = ac)
     checkmate::reportAssertions(ac)
 
-    hash <- makeHash(fGroups, MSPeakLists, formulas, compounds, absMzDev, specSimParams, checkFragments,
-                     formulasNormalizeScores, compoundsNormalizeScores, makeFileHash(IDFile))
+    hash <- makeHash(fGroups, MSPeakLists, formulas, compounds, absMzDev, checkFragments, formulasNormalizeScores,
+                     compoundsNormalizeScores, makeFileHash(IDFile))
     cd <- loadCacheData("annotateSuspects", hash)
     if (!is.null(cd))
         return(cd)
@@ -371,13 +369,10 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
             
             if (!is.na(compRank) && !is.null(cTable[["fragInfo"]][[compRank]]))
             {
-                annSimComp <-  compounds[[gName]]$annSim[compRank]
+                annSimComp <- compounds[[gName]]$annSim[compRank]
 
-                if (!is.na(formRank)) # UNDONE: remove?
-                    annSimBoth <- annotatedMSMSSimilarity(annotatedPeakList(compounds, index = compRank,
-                                                                            groupName = gName, MSPeakLists = MSPeakLists,
-                                                                            formulas = formulas),
-                                                          specSimParams)
+                if (!is.null(compounds[[gName]][["annSimBoth"]]))
+                    annSimBoth <- compounds[[gName]]$annSimBoth[compRank]
                 else
                     annSimBoth <- annSimComp
             }

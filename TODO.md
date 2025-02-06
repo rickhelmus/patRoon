@@ -21,7 +21,6 @@
 ## TC
 
 - annSims
-    - let lib compounds use the same specsimParams default? Then annSim == libMatch by default.
     - remove support for annSimBoth in annotateSuspects? Or optionally calc for feat annotations and copy that?
         - either of these is preferred, as annSimBoth now needs separate specSimParams to annotateSuspects
     - add annSims, IDLs etc to report
@@ -65,7 +64,8 @@
             - finish up
                 - make title/href configurable?
         - TP structures with fmcsR/depict (maybe later?)
-        - delta sign sometimes shown as N ?
+        - delta symbol sometimes shown as N ?
+            - put a replacement in CSV and convert that to HTML symbol?
 
 - tests
     - IDL filter
@@ -140,6 +140,7 @@
         - TPStructParams: all parameters, explain when logPs are calculated (ie if both parent/TP is absent)
         - TPsComp/TPsForm: filter()
         - parallel=T is only useful with many candidates
+    - compoundsLibrary: mention that libMatch == annSim
 
 
 - NEWS
@@ -204,6 +205,7 @@
         - log P tolerance for retDir calculation
     - report()
         - fixed: TP graphs were generated for components with absent (parent) fGroups
+    - compoundsLibrary: specSimParamsLib now defaults to specSimParams, and the latter now defaults to removing the precursor
 
 ## msdata
 

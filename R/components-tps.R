@@ -470,6 +470,7 @@ setMethod("as.data.table", "componentsTPs", function(x, candidates = FALSE)
 #' @export
 setMethod("filter", "componentsTPs", function(obj, ..., retDirMatch = FALSE,
                                               minSpecSim = NULL, minSpecSimPrec = NULL, minSpecSimBoth = NULL,
+                                              minTotFragMatches = NULL, minTotNLMatches = NULL,
                                               minFragMatches = NULL, minNLMatches = NULL, formulas = NULL,
                                               verbose = TRUE, negate = FALSE)
 {
@@ -478,8 +479,9 @@ setMethod("filter", "componentsTPs", function(obj, ..., retDirMatch = FALSE,
     # UNDONE: also filter set separate similarities?
     
     ac <- checkmate::makeAssertCollection()
-    aapply(checkmate::assertNumber, . ~ minSpecSim + minSpecSimPrec + minSpecSimBoth + minFragMatches + minNLMatches,
-           lower = 0, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ minSpecSim + minSpecSimPrec + minSpecSimBoth + minTotFragMatches +
+               minTotNLMatches + minFragMatches + minNLMatches, lower = 0, finite = TRUE, null.ok = TRUE,
+           fixed = list(add = ac))
     checkmate::assertClass(formulas, "formulas", null.ok = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ retDirMatch + verbose + negate, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
@@ -487,7 +489,9 @@ setMethod("filter", "componentsTPs", function(obj, ..., retDirMatch = FALSE,
     if (length(obj) == 0)
         return(obj)
     
-    if (!is.null(formulas) && (is.null(obj[[1]][["candidates"]]) || is.null(obj[[1]]$candidates[[1]][["trans_add"]])))
+    hasCandidates <- !is.null(obj[[1]][["candidates"]])
+    
+    if (!is.null(formulas) && (!hasCandidates || is.null(obj[[1]]$candidates[[1]][["trans_add"]])))
         stop("formula filter is only available for logic TP products")
     
     old <- obj
@@ -509,7 +513,8 @@ setMethod("filter", "componentsTPs", function(obj, ..., retDirMatch = FALSE,
     }
     
     anyTPFilters <- retDirMatch || !is.null(minSpecSim) || !is.null(minSpecSimPrec) || !is.null(minSpecSimBoth) ||
-        !is.null(minFragMatches) || !is.null(minNLMatches) || !is.null(formulas)
+        !is.null(minTotFragMatches) || !is.null(minTotNLMatches) || !is.null(minFragMatches) || !is.null(minNLMatches) ||
+        !is.null(formulas)
     
     if (anyTPFilters)
     {
@@ -529,13 +534,13 @@ setMethod("filter", "componentsTPs", function(obj, ..., retDirMatch = FALSE,
             ct <- minColFilter(ct, "specSimilarity", minSpecSim)
             ct <- minColFilter(ct, "specSimilarityPrec", minSpecSimPrec)
             ct <- minColFilter(ct, "specSimilarityBoth", minSpecSimBoth)
-            ct <- minColFilter(ct, "totalFragmentMatches", minFragMatches)
-            ct <- minColFilter(ct, "totalNeutralLossMatches", minNLMatches)
+            ct <- minColFilter(ct, "totalFragmentMatches", minTotFragMatches)
+            ct <- minColFilter(ct, "totalNeutralLossMatches", minTotNLMatches)
             
             return(!ct$keep)
         })
         
-        if (!is.null(formulas))
+        if (!is.null(minFragMatches) || !is.null(minNLMatches) || !is.null(formulas))
         {
             # check if subtracting is possible, ie by checking if subtraction doesn't lead to negative element
             # counts
@@ -559,23 +564,30 @@ setMethod("filter", "componentsTPs", function(obj, ..., retDirMatch = FALSE,
             {
                 cmpTab <- copy(cmpTab)
                 parentFG <- componentInfo(obj)[name == cmpName]$parent_group
-                
+                    
                 cmpTab[, candidates := Map(group, candidates, f = function(grp, ct)
                 {
                     ct <- copy(ct)
                     ct[, keep := TRUE]
 
-                    if (!is.null(formulas[[parentFG]]))
-                    {
-                        # filter results where subtraction of any of the parent formulas is impossible
-                        ct[keep == TRUE & nzchar(trans_sub), keep := sapply(trans_sub, canSub, formulas[[parentFG]])]
-                    }
+                    ct <- minColFilter(ct, "fragmentMatches", minFragMatches)
+                    ct <- minColFilter(ct, "neutralLossMatches", minNLMatches)
                     
-                    # filter results where addition is not part of TP candidate formulas
-                    ct[keep == TRUE & nzchar(trans_add), keep := sapply(trans_add, canSub, annotations(formulas)[[grp]])]
+                    if (!is.null(formulas))
+                    {
+                        if (!is.null(formulas[[parentFG]]))
+                        {
+                            # filter results where subtraction of any of the parent formulas is impossible
+                            ct[keep == TRUE & nzchar(trans_sub), keep := sapply(trans_sub, canSub, formulas[[parentFG]])]
+                        }
+                        
+                        # filter results where addition is not part of TP candidate formulas
+                        ct[keep == TRUE & nzchar(trans_add), keep := sapply(trans_add, canSub, annotations(formulas)[[grp]])]
+                    }
                     
                     return(ct[keep == TRUE][, keep := NULL])
                 })]
+                
                 return(cmpTab)
             })
             
@@ -586,9 +598,16 @@ setMethod("filter", "componentsTPs", function(obj, ..., retDirMatch = FALSE,
             })
         }
         
-        
         if (verbose)
+        {
             printComponentsFiltered(old, obj)
+            
+            if (hasCandidates)
+            {
+                oldcn <- nrow(as.data.table(old, candidates = TRUE)); newcn <- nrow(as.data.table(obj, candidates = TRUE))
+                printf("Removed %d (%.2f%%) TP candidates.\n", oldcn - newcn, if (oldcn == 0) 0 else (oldcn - newcn) * 100 / oldcn)
+            }
+        }
     }
     
     if (...length() > 0)

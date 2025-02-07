@@ -18,7 +18,7 @@
 - BUG: unescaped set names are now used regular expressions (problem if eg dot is present when make.unique was used)
 
 
-# Maybe
+## Maybe
 
 - see if MSPL sets anaInfo can be replaced by non-exported slot with named vector with sets for each ana
     - could be taken from analyses of sets objects
@@ -26,15 +26,16 @@
 - groupBy: fGroups --> fGroup for consistency with anaInfo cols? (set/analysis/replicate)
 
 
+## newProject()
+
+- update MSPL filters and set maxMZOverPrec (and other new?) by default
+- add estimateIDLevels()
+
 ## TC
 
-- add estimateIDLevels() in newProject()
-- Misc
-    - MSPL filter to remove mass peaks with X Da higher m/z than precursor
-        - do by default in newProject()?
+- rename estimateIDLevels() and have the same name as annotateSuspects()?
 
 - TP components
-    - getTPParents(): remove unused calcLogP arg?
     - update patRoonInst for new deps?
     - hashing for all algos seem to take unnecessary variables (eg parent names, things for prepareChemTable() etc)
     - further limit candidate columns? Can get quite excessive

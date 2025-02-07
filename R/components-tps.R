@@ -422,20 +422,6 @@ setMethod("groupNamesResults", "componentsTPs", function(obj)
     return(union(componentInfo(obj)$parent_group, groupNames(obj)))
 })
 
-setMethod("collapseComponents", "componentsTPs", function(obj)
-{
-    obj@components <- lapply(obj@components, function(cmp)
-    {
-        keep <- intersect(c("TP_name", "group", "set"), names(cmp))
-        cmp <- cmp[, keep, with = FALSE]
-        cmp[, TP_name := paste0(unique(TP_name), collapse = ","), by = "group"]
-        if (!is.null(cmp[["set"]]))
-            cmp[, set := paste0(unique(unlist(strsplit(set, ","))), collapse = ","), by = "group"]
-        return(unique(cmp, by = "group"))
-    })
-    return(obj)
-})
-
 setMethod("parentsFromScreening", "componentsTPs", function(obj) obj@parentsFromScreening)
 setMethod("TPsFromScreening", "componentsTPs", function(obj) obj@TPsFromScreening)
 

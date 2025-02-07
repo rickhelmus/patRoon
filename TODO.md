@@ -25,7 +25,16 @@
     - could be taken from analyses of sets objects
 - FC: select multiple groups and/or anaInfo cols?
 - groupBy: fGroups --> fGroup for consistency with anaInfo cols? (set/analysis/replicate)
-
+- report
+    - TP structures with fmcsR/depict
+    - refactor/redesign
+        - prefix cmp, tp etc columns
+        - move main_columns to sysdata
+        - move all JS callbacks etc to js file(s)?
+        - improve code distribution over files
+        - finish up
+            - make title/href configurable?
+            
 
 ## newProject()
 
@@ -37,22 +46,14 @@
 - rename estimateIDLevels() and have the same name as annotateSuspects()?
 
 - TP components
-    - further limit candidate columns? Can get quite excessive
     - update filter for candidate specific frag/NL matches
     - add set specific frag/NL matches for candidates
         - report them?
-    - collapseComponents(): not needed anymore? otherwise update
     - report()
         - BUG: JS errors when fGroups are subset/do not contain TPs anymore?
-        - refactor/redesign
-            - prefix cmp, tp etc columns
-            - move main_columns to sysdata
-            - move all JS callbacks etc to js file(s)?
-            - improve code distribution over files
-            - move flexdashboard to Suggests (and remove completely if legacy reportHTML is removed)
-            - finish up
-                - make title/href configurable?
-        - TP structures with fmcsR/depict (maybe later?)
+        - remove reportHTML()?
+            - if yes, remove flexdashboard dep
+            - otherwise update, and move flexdashboard to suggests
         - delta symbol sometimes shown as N ?
             - put a replacement in CSV and convert that to HTML symbol?
 

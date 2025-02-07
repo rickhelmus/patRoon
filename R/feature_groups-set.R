@@ -8,10 +8,7 @@
 NULL
 
 #' @param set \setsWF The name of the set.
-#' @param sets \setsWF For \code{[}: a \code{character} with name(s) of the sets to keep.
-#'
-#'   For \code{overlap} and \code{unique}: If \code{TRUE} then the \code{which} argument changes its meaning and is used
-#'   to specify the names of the sets to be compared.
+#' @param sets \setsWF A \code{character} with name(s) of the sets to keep.
 #'
 #' @slot groupAlgo,groupArgs,groupVerbose \setsWF Grouping parameters that were used when this object was created. Used
 #'   by \code{adducts<-} and \code{selectIons} when these methods perform a re-grouping of features.
@@ -201,26 +198,6 @@ setMethod("[", c("featureGroupsSet", "ANY", "ANY", "missing"), function(x, i, j,
 #' @rdname featureGroups-class
 #' @export
 setMethod("export", "featureGroupsSet", function(obj, type, out, set) export(unset(obj, set), type, out))
-
-#' @rdname featureGroups-class
-#' @export
-setMethod("unique", "featureGroupsSet", function(x, which, aggregate = TRUE, ..., sets = FALSE)
-{
-    checkmate::assertFlag(sets)
-    if (sets)
-        aggregate <- "set"
-    callNextMethod(x, which = which, aggregate = aggregate, ...)
-})
-
-#' @rdname featureGroups-class
-#' @export
-setMethod("overlap", "featureGroupsSet", function(fGroups, which, aggregate, exclusive, sets = FALSE)
-{
-    checkmate::assertFlag(sets)
-    if (sets)
-        aggregate <- "set"
-    return(callNextMethod(fGroups, which = which, aggregate = aggregate, exclusive = exclusive))
-})
 
 #' @rdname featureGroups-class
 #' @export

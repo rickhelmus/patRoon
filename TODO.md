@@ -30,7 +30,6 @@
             - colourBy, which
     - see if MSPL sets anaInfo can be replaced by non-exported slot with named vector with sets for each ana
         - could be taken from analyses of sets objects
-    - plotVenn/unique sets methods: deprecate/remove sets arg?
     - plotVenn()/overlap/plotUpSet(): deprecate/remove list arg for which?
     - FC: select multiple groups and/or anaInfo cols?
     - plotChord/report(): report sets as outer groups? make it optional?
@@ -142,6 +141,7 @@
         - TPsComp/TPsForm: filter()
         - parallel=T is only useful with many candidates
     - compoundsLibrary: mention that libMatch == annSim
+    - plotVenn()/overlap()/unique(): update for removal of sets arg, give examples with aggregate
 
 
 - NEWS
@@ -212,6 +212,7 @@
         - topMostByRGroup, replicateGroups(), replicateGroupSubtract()
         - NT rGroup column
         - rGroups arg for filters
+    - plotVenn()/overlap()/unique(): removal of sets arg
         
 
 ## msdata

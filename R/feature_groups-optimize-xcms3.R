@@ -99,7 +99,7 @@ featureGroupsOptimizerXCMS3$methods(
         
         # convert flattened group/ret align lists back to XCMS usable param objects
         ret$groupParam <- convertXCMS3GroupListToParam(params[groupParamNames], params$groupMethod,
-                                                       analysisInfo(features)$group)
+                                                       analysisInfo(features)$replicate)
         ret$retAlignParam <- convertXCMS3RetAlignListToParam(params[retAlignParamNames],
                                                              params$retAlignMethod)
         

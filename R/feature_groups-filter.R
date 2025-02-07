@@ -10,8 +10,8 @@ NULL
 #' Basic rule based filtering of feature groups.
 #'
 #' @param fGroups,obj \code{\link{featureGroups}} object to which the filter is applied.
-#' @param rGroups A character vector of replicate groups that should be kept (\code{filter}) or subtracted from
-#'   (\code{replicateGroupSubtract}).
+#' @param replicates A character vector of replicates that should be kept (\code{filter}) or subtracted from
+#'   (\code{replicateSubtract}).
 #'
 #' @return A filtered \code{\link{featureGroups}} object. Feature groups that are filtered away have their intensity set
 #'   to zero. In case a feature group is not present in any of the analyses anymore it will be removed completely.
@@ -64,12 +64,12 @@ minMaxIntensityFilter <- function(fGroups, absThreshold, relThreshold, negate = 
 blankFilter <- function(fGroups, threshold, negate = FALSE, applyIMS = "both")
 {
     anaInfo <- analysisInfo(fGroups)
-    rGroups <- replicateGroups(fGroups)
+    reps <- replicates(fGroups)
 
     # multiple groups may be specified separated by comma
     blankGroups <- sapply(anaInfo$blank, function(rg) strsplit(rg, ","), USE.NAMES = FALSE)
     allBlanks <- unique(unlist(blankGroups))
-    allBlanks <- allBlanks[allBlanks %in% rGroups]
+    allBlanks <- allBlanks[allBlanks %in% reps]
     
     if (length(allBlanks) == 0)
     {
@@ -85,7 +85,7 @@ blankFilter <- function(fGroups, threshold, negate = FALSE, applyIMS = "both")
         
         avgBls <- lapply(allBlanks, function(bl)
         {
-            avg <- vapply(fGroups@groups[anaInfo$group == bl], function(x) mean(x[x > 0]), FUN.VALUE = numeric(1),
+            avg <- vapply(fGroups@groups[anaInfo$replicate == bl], function(x) mean(x[x > 0]), FUN.VALUE = numeric(1),
                           USE.NAMES = FALSE)
             avg[is.na(avg)] <- 0
             return(avg)
@@ -130,15 +130,15 @@ minAnalysesFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, negat
 minReplicatesFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, negate = FALSE, applyIMS = "both",
                                 verbose = TRUE)
 {
-    threshold <- getHighestAbsValue(absThreshold, relThreshold, length(replicateGroups(fGroups)))
+    threshold <- getHighestAbsValue(absThreshold, relThreshold, length(replicates(fGroups)))
     if (threshold == 0)
         return(fGroups)
 
-    rGroupsAna <- analysisInfo(fGroups)$group
+    repsAna <- analysisInfo(fGroups)$replicate
 
     return(doFGroupsFilter(fGroups, "minimum replicates", c(threshold, negate), function(fGroups)
     {
-        pred <- function(x) length(unique(rGroupsAna[x > 0])) >= threshold
+        pred <- function(x) length(unique(repsAna[x > 0])) >= threshold
         if (negate)
             pred <- Negate(pred)
 
@@ -233,19 +233,18 @@ replicateAbundanceFilter <- function(fGroups, absThreshold, relThreshold, maxInt
         return(fGroups) # all thresholds NULL/0
 
     gNames <- names(fGroups)
-    rGroupsAna <- analysisInfo(fGroups)$group
-    rGroups <- replicateGroups(fGroups)
-    rGroupLens <- table(rGroupsAna)
-    rGroupInds <- sapply(rGroups, function(rg) which(rGroupsAna == rg), simplify = FALSE)
+    replicatesAna <- analysisInfo(fGroups)$replicate
+    replicateLens <- table(replicatesAna)
+    replicateInds <- sapply(replicates(fGroups), function(rg) which(replicatesAna == rg), simplify = FALSE)
 
     doThr <- !is.null(absThreshold) || !is.null(relThreshold)
     if (doThr)
     {
         if (!is.null(relThreshold))
-            thresholds <- sapply(replicateGroups(fGroups),
-                                 function(rg) getHighestAbsValue(absThreshold, relThreshold, sum(rGroupsAna == rg)))
+            thresholds <- sapply(replicates(fGroups),
+                                 function(rg) getHighestAbsValue(absThreshold, relThreshold, sum(replicatesAna == rg)))
         else
-            thresholds <- setNames(rep(absThreshold, length(replicateGroups(fGroups))), replicateGroups(fGroups))
+            thresholds <- setNames(rep(absThreshold, length(replicates(fGroups))), replicates(fGroups))
     }
     
     maxIntRSD <- NULLToZero(maxIntRSD)
@@ -263,8 +262,8 @@ replicateAbundanceFilter <- function(fGroups, absThreshold, relThreshold, maxInt
             pred <- Negate(pred)
 
         delGroups <- copy(fGroups@groups)
-        set(delGroups, j = "group", value = rGroupsAna)
-        delGroups[, (gNames) := lapply(.SD, function(x) if (pred(x, .N, group)) 1 else 0), by = group, .SDcols = gNames]
+        set(delGroups, j = "replicate", value = replicatesAna)
+        delGroups[, (gNames) := lapply(.SD, function(x) if (pred(x, .N, replicate)) 1 else 0), by = replicate, .SDcols = gNames]
         return(list(delete = list(j = delGroups[, -"group"])))
     }, "replicateAbundance", applyIMS = applyIMS))
 }
@@ -317,14 +316,14 @@ chromWidthFilter <- function(fGroups, range, negate, applyIMS)
     }, applyIMS = applyIMS))
 }
 
-replicateGroupFilter <- function(fGroups, rGroups, negate = FALSE, applyIMS = "both", verbose = TRUE)
+replicateFilter <- function(fGroups, replicates, negate = FALSE, applyIMS = "both", verbose = TRUE)
 {
-    return(doFGroupsFilter(fGroups, "replicate group", c(rGroups, negate), function(fGroups)
+    return(doFGroupsFilter(fGroups, "replicate", c(replicates, negate), function(fGroups)
     {
-        pred <- function(g) !g %chin% rGroups
+        pred <- function(g) !g %chin% replicates
         if (negate)
             pred <- Negate(pred)
-        return(list(delete = list(i = pred(analysisInfo(fGroups)$group), j = NULL)))
+        return(list(delete = list(i = pred(analysisInfo(fGroups)$replicate), j = NULL)))
     }, "replicate_group", applyIMS, verbose))
 }
 
@@ -533,10 +532,10 @@ minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, ne
 #' @param absMinFeatures,relMinFeatures Analyses are only kept when they contain at least this (absolute or relative)
 #'   amount of features. Set to \code{NULL} to ignore.
 #' @param absMinReplicateAbundance,relMinReplicateAbundance Minimum absolute/relative abundance that a grouped feature
-#'   should be present within a replicate group. If this minimum is not met all features within the replicate group are
+#'   should be present within a replicate. If this minimum is not met all features within the replicate are
 #'   removed. Set to \code{NULL} to skip this step.
 #' @param maxReplicateIntRSD Maximum relative standard deviation (RSD) of intensity values for features within a
-#'   replicate group. If the RSD is above this value all features within the replicate group are removed. Set to
+#'   replicate. If the RSD is above this value all features within the replicate are removed. Set to
 #'   \code{NULL} to ignore.
 #' @param absMinConc,relMinConc The minimum absolute/relative predicted concentration (calculated by
 #'   \code{\link{calculateConcs}}) assigned to a feature. The toxicities are first aggregated prior to filtering, as
@@ -556,7 +555,7 @@ minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, ne
 #'   threshold. For instance, a value of \samp{5} means that only features with an intensity five times higher than that
 #'   of the blank are kept. The relative intensity values between blanks and non-blanks are determined from the mean of
 #'   all non-zero blank intensities. Set to \code{NULL} to skip this step.
-#' @param removeBlanks Set to \code{TRUE} to remove all analyses that belong to replicate groups that are specified as a
+#' @param removeBlanks Set to \code{TRUE} to remove all analyses that belong to replicates that are specified as a
 #'   blank in the \link{analysis-information}. This is useful to simplify the analyses in the specified
 #'   \code{\link{featureGroups}} object after blank subtraction. When both \code{blankThreshold} and this argument are
 #'   set, blank subtraction is performed prior to removing any analyses.
@@ -582,7 +581,7 @@ minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, ne
 #'   effective data filtering. For instance, when an intensity filter removes features from blank analyses, a subsequent
 #'   blank filter may not adequately perform blank subtraction. Similarly, when intensity and blank filters are executed
 #'   after the replicate abundance filter it may be necessary to ensure minimum replicate abundance again as the
-#'   intensity and blank filters may have removed some features within a replicate group.
+#'   intensity and blank filters may have removed some features within a replicate.
 #'
 #'   With this in mind, filters (if specified) occur in the following order:
 #'
@@ -608,7 +607,7 @@ minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, ne
 #'   \code{relMinReplicates}, \code{absMinFeatures}, \code{relMinFeatures}), \code{absMinConc}, \code{relMinConc},
 #'   \code{absMaxTox} and \code{relMaxTox}.
 #'
-#'   \item Replicate group filter (\emph{i.e.} \code{rGroups}), results filter (\emph{i.e.} \code{results}) and blank
+#'   \item Replicate filter (\emph{i.e.} \code{replicates}), results filter (\emph{i.e.} \code{results}) and blank
 #'   analyses / internal standard removal (\emph{i.e.} \code{removeBlanks=TRUE} / \code{removeISTDs=TRUE}).
 #'
 #'   }
@@ -631,7 +630,7 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
                                               maxReplicateIntRSD = NULL, blankThreshold = NULL,
                                               retentionRange = NULL, mzRange = NULL, mzDefectRange = NULL,
                                               chromWidthRange = NULL, featQualityRange = NULL, groupQualityRange = NULL,
-                                              rGroups = NULL, IMS = NULL, withIMSParent = FALSE, IMSRangeParams = NULL,
+                                              replicates = NULL, IMS = NULL, withIMSParent = FALSE, IMSRangeParams = NULL,
                                               results = NULL, removeBlanks = FALSE, removeISTDs = FALSE,
                                               checkFeaturesSession = NULL, predAggrParams = getDefPredAggrParams(),
                                               removeNA = FALSE, negate = FALSE, applyIMS = "both")
@@ -651,7 +650,7 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
     aapply(assertScoreRange, . ~ featQualityRange + groupQualityRange,
            list(c(featureQualityNames(group = FALSE), featureQualityNames(group = FALSE, scores = TRUE)),
                 c(featureQualityNames(), featureQualityNames(scores = TRUE))), fixed = list(add = ac))
-    checkmate::assertCharacter(rGroups, min.chars = 1, min.len = 1, any.missing = FALSE, null.ok = TRUE, add = ac)
+    checkmate::assertCharacter(replicates, min.chars = 1, min.len = 1, any.missing = FALSE, null.ok = TRUE, add = ac)
     assertIMSArg(IMS, null.ok = TRUE, add = ac)
     assertIMSRangeParams(IMSRangeParams, null.ok = TRUE, add = ac)
     checkmate::assert(checkmate::checkNull(results),
@@ -721,7 +720,7 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
                                                                                        removeNA = removeNA,
                                                                                        normToTox = TRUE))
     
-    obj <- maybeDoFilter(replicateGroupFilter, rGroups)
+    obj <- maybeDoFilter(replicateFilter, replicates)
     obj <- maybeDoFilter(selectIMSFilter, IMS)
     obj <- maybeDoFilter(IMSRangeFilter, IMSRangeParams)
     obj <- maybeDoFilter(resultsFilter, results)
@@ -733,7 +732,7 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
         obj <- delete(obj, j = gInfoIMS[!ims_parent_group %chin% names(obj)]$group)
     }
     if (removeBlanks)
-        obj <- replicateGroupFilter(obj, unique(unlist(strsplit(analysisInfo(obj)$blank, ","))), negate = !negate)
+        obj <- replicateFilter(obj, unique(unlist(strsplit(analysisInfo(obj)$blank, ","))), negate = !negate)
     if (removeISTDs)
         obj <- removeISFilter(obj, negate, applyIMS)
 
@@ -774,22 +773,22 @@ setMethod("filter", "featureGroupsSet", function(obj, ..., negate = FALSE, apply
 })
 
 
-#' @details \code{replicateGroupSubtract} removes feature groups present in a
-#'   given set of replicate groups (unless intensities are above a given
-#'   threshold). The replicate groups that are subtracted will be removed.
+#' @details \code{replicateSubtract} removes feature groups present in a
+#'   given set of replicates (unless intensities are above a given
+#'   threshold). The replicates that are subtracted will be removed.
 #'
 #' @param threshold Minimum relative threshold (compared to mean intensity of
-#'   replicate group being subtracted) for a feature group to be \emph{not}
+#'   replicate being subtracted) for a feature group to be \emph{not}
 #'   removed. When \samp{0} a feature group is always removed when present in
-#'   the given replicate groups.
+#'   the given replicates.
 #'
 #' @rdname feature-filtering
-#' @aliases replicateGroupSubtract
+#' @aliases replicateSubtract
 #' @export
-setMethod("replicateGroupSubtract", "featureGroups", function(fGroups, rGroups, threshold)
+setMethod("replicateSubtract", "featureGroups", function(fGroups, replicates, threshold)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertCharacter(rGroups, min.chars = 1, add = ac)
+    checkmate::assertCharacter(replicates, min.chars = 1, add = ac)
     checkmate::assertNumber(threshold, lower = 0, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -799,7 +798,7 @@ setMethod("replicateGroupSubtract", "featureGroups", function(fGroups, rGroups, 
     checkIntensities <- threshold > 0
     gNames <- names(fGroups)
 
-    filteredGroups <- replicateGroupFilter(fGroups, rGroups, verbose = FALSE)
+    filteredGroups <- replicateFilter(fGroups, replicates, verbose = FALSE)
     sharedGroups <- intersect(gNames, names(filteredGroups))
 
     if (length(sharedGroups) == 0)
@@ -824,5 +823,5 @@ setMethod("replicateGroupSubtract", "featureGroups", function(fGroups, rGroups, 
         fGroups <- delete(fGroups, j = delGroups)
     }
     
-    return(replicateGroupFilter(fGroups, rGroups, negate = TRUE, verbose = FALSE))
+    return(replicateFilter(fGroups, replicates, negate = TRUE, verbose = FALSE))
 })

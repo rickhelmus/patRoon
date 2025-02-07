@@ -93,15 +93,15 @@ doFGAADTGroups <- function(fGroups, intColNames, average, averageBy, areas, addQ
         }
         
         gTableNonAvg <- groupTable(fGroups, areas, normalized)
-        gTableAvg <- averageGroups(fGroups, areas, normalized, by = "group", func = averageFunc) # UNDONE: support averageBy
+        gTableAvg <- averageGroups(fGroups, areas, normalized, by = "replicate", func = averageFunc) # UNDONE: support averageBy
         
-        repInds <- match(FCParams$rGroups, replicateGroups(fGroups))
+        repInds <- match(FCParams$replicates, replicates(fGroups))
         for (i in seq_along(gTableAvg))
             set(ret, i, "FC", do.call(calcFC, as.list(gTableAvg[[i]][repInds])))
         ret[, FC_log := log2(FC)]
         
-        anaInds1 <- which(anaInfo$group %in% FCParams$rGroups[1])
-        anaInds2 <- which(anaInfo$group %in% FCParams$rGroups[2])
+        anaInds1 <- which(anaInfo$replicate %in% FCParams$replicates[1])
+        anaInds2 <- which(anaInfo$replicate %in% FCParams$replicates[2])
         ret[, PV := mapply(gTableNonAvg[anaInds1, ], gTableNonAvg[anaInds2, ], FUN = FCParams$PVTestFunc)]
         ret[, PV := FCParams$PVAdjFunc(PV)]
         ret[, PV_log := -log10(PV)]
@@ -286,7 +286,7 @@ doFGAADTFeatures <- function(fGroups, fgTab, intColNames, average, averageBy, ad
     
     if (isFALSE(average))
     {
-        featTab[, replicate_group := anaInfo$group[match(analysis, anaInfo$analysis)]]
+        featTab[, replicate := anaInfo$replicate[match(analysis, anaInfo$analysis)]]
         featTab[, average_group := analysis]
     }
     else
@@ -375,7 +375,7 @@ doFGAADTFeatures <- function(fGroups, fgTab, intColNames, average, averageBy, ad
     
     # set nice column order
     qualCols <- c(featureQualityNames(), featureQualityNames(scores = TRUE))
-    colord <- c("group", "ims_parent_group", "set", "analysis", "average_group", "replicate_group", "group_ret",
+    colord <- c("group", "ims_parent_group", "set", "analysis", "average_group", "replicate", "group_ret",
                 "group_mz", "group_mobility", "group_mobility_collapsed", "ID", "ims_parent_ID", "ret", "mz", "ion_mz",
                 "mobility", "mobility_collapsed", "intensity", "area", "intensity_rel", "area_rel")
     colord <- c(colord, setdiff(names(featTab), c(colord, qualCols)))

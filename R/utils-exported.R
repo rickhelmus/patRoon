@@ -51,7 +51,7 @@ getMSFileFormats <- function(fileType = NULL)
 #'   handles analyses which are available in multiple formats.
 #'
 #' @param paths A character vector containing one or more file paths that should be used for finding the analyses.
-#' @param groups,blanks An (optional) character vector containing replicate groups and blanks, respectively (will be
+#' @param groups,blanks An (optional) character vector containing replicates and blanks, respectively (will be
 #'   recycled). If \code{groups} is an empty character string (\code{""}) the analysis name will be set as replicate
 #'   group.
 #' @param concs An optional numeric vector containing concentration values for each analysis. Can be \code{NA} if
@@ -67,12 +67,12 @@ getMSFileFormats <- function(fileType = NULL)
 #'
 #' @rdname analysis-information
 #' @export
-generateAnalysisInfo <- function(paths, groups = "", blanks = "", concs = NULL, norm_concs = NULL,
+generateAnalysisInfo <- function(paths, replicates = "", blanks = "", concs = NULL, norm_concs = NULL,
                                  formats = getMSFileFormats())
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertDirectoryExists(paths, access = "r", add = ac)
-    checkmate::assertCharacter(groups, min.len = 1, add = ac)
+    checkmate::assertCharacter(replicates, min.len = 1, add = ac)
     checkmate::assertCharacter(blanks, min.len = 1, add = ac)
     aapply(checkmate::assertNumeric, . ~ concs + norm_concs, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertSubset(formats, getMSFileFormats(), empty.ok = FALSE, add = ac)
@@ -90,8 +90,8 @@ generateAnalysisInfo <- function(paths, groups = "", blanks = "", concs = NULL, 
     ret <- ret[!duplicated(ret[, c("path", "analysis")]), ]
     
     # set after duplicate removal
-    groups <- rep(groups, length.out = nrow(ret))
-    ret$group <- ifelse(!nzchar(groups), ret$analysis, groups)
+    replicates <- rep(replicates, length.out = nrow(ret))
+    ret$replicate <- ifelse(!nzchar(replicates), ret$analysis, replicates)
     ret$blank <- blanks
     
     getConcs <- function(x)
@@ -144,14 +144,14 @@ generateAnalysisInfoFromEnviMass <- function(path)
                 return("")
         })]
         
-        enviSInfo[Type == "blank", group := blank]
+        enviSInfo[Type == "blank", replicate := blank]
     }
     else
         enviSInfo[, blank := ""]
     
-    enviSInfo[group == "FALSE", group := ""]
+    enviSInfo[replicate == "FALSE", replicate := ""]
     
-    ret <- data.frame(path = file.path(path, "files"), analysis = enviSInfo$ID, group = enviSInfo$group,
+    ret <- data.frame(path = file.path(path, "files"), analysis = enviSInfo$ID, replicate = enviSInfo$replicate,
                       blank = enviSInfo$blank, stringsAsFactors = FALSE)
     
     return(ret)
@@ -291,11 +291,11 @@ featureQualityNames <- function(feat = TRUE, group = TRUE, scores = FALSE, totSc
 
 #' Fold change calculation
 #'
-#' @details Fold change calculation can be used to easily identify significant changes between replicate groups. The
+#' @details Fold change calculation can be used to easily identify significant changes between replicates. The
 #'   calculation process is configured through a paramater list, which can be constructed with the \code{getFCParams}
 #'   function. The parameter list has the following entries: \itemize{
 #'
-#'   \item \code{rGroups} the name of the two replicate groups to compare (taken from the \code{rGroups} argument to
+#'   \item \code{replicates} the name of the two replicates to compare (taken from the \code{replicates} argument to
 #'   \code{getFCParams}).
 #'
 #'   \item \code{thresholdFC}: the threshold log FC for a feature group to be classified as increasing/decreasing.
@@ -312,7 +312,7 @@ featureQualityNames <- function(feat = TRUE, group = TRUE, scores = FALSE, totSc
 #'
 #'   }
 #'   
-#' @param rGroups A \code{character} vector with the names of the two replicate groups to be compared.
+#' @param replicates A \code{character} vector with the names of the two replicates to be compared.
 #' @param \dots Optional named arguments that override defaults.
 #' 
 #' @author The code to calculate and plot Fold change data was created by Bas van de Velde.
@@ -320,11 +320,11 @@ featureQualityNames <- function(feat = TRUE, group = TRUE, scores = FALSE, totSc
 #' @seealso \code{\link{featureGroups-class}} and \link{feature-plotting}
 #'
 #' @export
-getFCParams <- function(rGroups, ...)
+getFCParams <- function(replicates, ...)
 {
-    checkmate::assertCharacter(rGroups, min.chars = 1, len = 2, any.missing = FALSE)
+    checkmate::assertCharacter(replicates, min.chars = 1, len = 2, any.missing = FALSE)
     
-    def <- list(rGroups = rGroups,
+    def <- list(replicates = replicates,
                 thresholdFC = 0.25,
                 thresholdPV = 0.05,
                 zeroMethod = "add",
@@ -391,14 +391,14 @@ getEICs <- function(file, ranges)
 }
 
 #' @export
-getBGMSMSPeaks <- function(anaInfo, rGroups = NULL, MSLevel = 2, retentionRange = NULL, mobilityRange = NULL,
+getBGMSMSPeaks <- function(anaInfo, replicates = NULL, MSLevel = 2, retentionRange = NULL, mobilityRange = NULL,
                            minBPIntensity = 5000,
                            avgSpectraParams = getDefAvgPListParams(minAbundance = 0.1, topMost = 25),
                            avgAnalysesParams = getDefAvgPListParams(minAbundance = 0.8, topMost = 25))
 {
     ac <- checkmate::makeAssertCollection()
     anaInfo <- assertAndPrepareAnaInfo(anaInfo, add = ac)
-    checkmate::assertChoice(rGroups, unique(anaInfo$group), null.ok = TRUE, add = ac)
+    checkmate::assertChoice(replicates, unique(anaInfo$replicate), null.ok = TRUE, add = ac)
     checkmate::assertChoice(MSLevel, 1:2, add = ac)
     assertRange(retentionRange, null.ok = TRUE, add = ac)
     checkmate::assertNumber(minBPIntensity, na.ok = FALSE, add = ac)
@@ -408,8 +408,8 @@ getBGMSMSPeaks <- function(anaInfo, rGroups = NULL, MSLevel = 2, retentionRange 
     cacheDB <- openCacheDBScope()
     baseHash <- makeHash(MSLevel, retentionRange, minBPIntensity, avgSpectraParams, avgAnalysesParams)
     
-    if (!is.null(rGroups))
-        anaInfo <- anaInfo[group %in% rGroups]
+    if (!is.null(replicates))
+        anaInfo <- anaInfo[replicate %in% replicates]
     if (is.null(retentionRange))
         retentionRange <- c(0, 0)
     if (is.null(mobilityRange))
@@ -468,9 +468,9 @@ getBGMSMSPeaks <- function(anaInfo, rGroups = NULL, MSLevel = 2, retentionRange 
 #' \item \code{topMost} Only create EICs for this number of top most intense features. If \code{NULL} then EICs are
 #' created for all features.
 #' 
-#' \item \code{topMostByRGroup} If set to \code{TRUE} and \code{topMost} is set: only create EICs for the top most
-#' features in each replicate group. For instance, when \code{topMost=1} and \code{topMostByRGroup=TRUE}, then EICs will
-#' be plotted for the most intense feature of each replicate group.
+#' \item \code{topMostByReplicate} If set to \code{TRUE} and \code{topMost} is set: only create EICs for the top most
+#' features in each replicate. For instance, when \code{topMost=1} and \code{topMostByReplicate=TRUE}, then EICs will
+#' be plotted for the most intense feature of each replicate.
 #' 
 #' \item \code{onlyPresent} If \code{TRUE} then EICs are created only for analyses in which a feature was detected. If
 #' \code{onlyPresent=FALSE} then EICs are generated for \strong{all} analyses. The latter is handy to evaluate if a peak
@@ -710,11 +710,11 @@ getQuantCalibFromScreening <- function(fGroups, concs, areas = FALSE, average = 
     checkmate::assertDataFrame(concs, min.cols = 2, min.rows = 1, add = ac)
     checkmate::assertNames(names(concs), must.include = "name", add = ac)
     checkmate::assertCharacter(concs$name, any.missing = FALSE, min.chars = 1, unique = TRUE, add = ac)
-    concRGs <- setdiff(names(concs), "name")
-    concRGs <- intersect(concRGs, replicateGroups(fGroups))
-    if (length(concRGs) == 0)
-        stop("No concentration columns for (relevant) replicate groups found.", call. = FALSE)
-    for (col in concRGs)
+    concReps <- setdiff(names(concs), "name")
+    concReps <- intersect(concReps, replicates(fGroups))
+    if (length(concReps) == 0)
+        stop("No concentration columns for (relevant) replicates found.", call. = FALSE)
+    for (col in concReps)
         checkmate::assertNumeric(concs[[col]], finite = TRUE, .var.name = paste0("concs[['", col, "']]"), add = ac)
     aapply(checkmate::assertFlag, . ~ areas + average, fixed = list(add = ac))
     assertIMSArg(IMS, add = ac)
@@ -753,24 +753,24 @@ getQuantCalibFromScreening <- function(fGroups, concs, areas = FALSE, average = 
     }
     
     intCols <- if (average)
-        concRGs
+        concReps
     else
-        unlist(lapply(concRGs, function(rg) anaInfo[group == rg]$analysis))
+        unlist(lapply(concReps, function(rg) anaInfo[group == rg]$analysis))
     intCols <- getADTIntCols(intCols)
     ret <- merge(ret, tab[, c("susp_name", intCols), with = FALSE], by.x = "name", by.y = "susp_name")
     
-    vname <- if (average) "rGroup" else "analysis"
+    vname <- if (average) "replicate" else "analysis"
     ret <- melt(ret, measure.vars = intCols, variable.name = vname, value.name = "intensity")
     ret[, (vname) := stripADTIntSuffix(get(vname))]
     
     if (!average)
-        ret[, rGroup := anaInfo$group[match(analysis, anaInfo$analysis)]]
+        ret[, replicate := anaInfo$replicate[match(analysis, anaInfo$analysis)]]
     
-    mconcs <- melt(concs, measure.vars = concRGs, variable.name = "rGroup", value.name = "conc") 
+    mconcs <- melt(concs, measure.vars = concReps, variable.name = "replicate", value.name = "conc") 
     
-    ret <- merge(ret, mconcs[, c("name", "rGroup", "conc"), with = FALSE], by = c("name", "rGroup"))
+    ret <- merge(ret, mconcs[, c("name", "replicate", "conc"), with = FALSE], by = c("name", "replicate"))
     
-    ret <- removeDTColumnsIfPresent(ret, c("analysis", "rGroup", "group"))
+    ret <- removeDTColumnsIfPresent(ret, c("analysis", "replicate", "group"))
     setcolorder(ret, c("name", "SMILES", "rt", "conc", "intensity"))
     
     return(ret[])

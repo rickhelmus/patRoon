@@ -179,9 +179,9 @@ setMethod("generateComponentsIntClust", "featureGroups", function(fGroups, metho
                                   properties = properties, maxTreeHeight = maxTreeHeight, deepSplit = deepSplit,
                                   minModuleSize = minModuleSize, algorithm = "intclust"))
     
-    anas <- if (average) replicateGroups(fGroups) else analyses(fGroups)
+    anas <- if (average) replicates(fGroups) else analyses(fGroups)
     if (length(anas) < 2)
-        stop(paste("Need at least >= 2", if (average) "replicate groups" else "analyses"))
+        stop(paste("Need at least >= 2", if (average) "replicates" else "analyses"))
 
     cat("Obtaining feature quantities... ")
     gTable <- as.data.table(fGroups, average = average, normalized = normalized)

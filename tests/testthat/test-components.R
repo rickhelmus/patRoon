@@ -4,7 +4,7 @@
 
 context("components")
 
-# take a blank and standard to have two different replicate groups
+# take a blank and standard to have two different replicates
 # set localMZRange=0 to keep isotopes
 fGroups <- getTestFGroups(getTestAnaInfoComponents(), localMZRange = 0)
 # reduced set for CAMERA/RAMClustR/intensity; for the others we keep all to have sufficient data for good results

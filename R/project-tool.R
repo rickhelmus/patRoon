@@ -120,7 +120,7 @@ getScriptCode <- function(input, anaInfo)
         {
             addCall(anaInfoVarName, "generateAnalysisInfo", list(
                 list(name = "paths", value = unique(anaTable$path), quote = TRUE),
-                list(name = "groups", value = anaTable$group, quote = TRUE),
+                list(name = "replicates", value = anaTable$replicate, quote = TRUE),
                 list(name = "blanks", value = anaTable$blank, quote = TRUE),
                 list(name = "concs", value = anaTable$conc),
                 list(name = "norm_concs", value = anaTable$norm_conc)
@@ -323,7 +323,7 @@ getScriptCode <- function(input, anaInfo)
         list(value = "anaInfo", condition = input$featGrouper == "SIRIUS"),
         list(value = if (input$featGrouper == "XCMS") "xcms3" else tolower(input$featGrouper), quote = TRUE),
         list(name = "rtalign", value = TRUE, condition = input$featGrouper != "SIRIUS"),
-        list(name = "groupParam", value = "xcms::PeakDensityParam(sampleGroups = analysisInfo(fList)$group)",
+        list(name = "groupParam", value = "xcms::PeakDensityParam(sampleGroups = analysisInfo(fList)$replicate)",
              condition = input$featGrouper == "XCMS"),
         list(name = "retAlignParam", value = "xcms::ObiwarpParam()", condition = input$featGrouper == "XCMS")
     ))
@@ -1446,7 +1446,7 @@ newProject <- function(destPath = NULL)
 
     emptyAnaTable <- function()
     {
-        ai <- data.table(analysis = character(0), type = character(0), group = character(0), blank = character(0),
+        ai <- data.table(analysis = character(0), type = character(0), replicate = character(0), blank = character(0),
                          conc = numeric(0), norm_conc = numeric(0))
         ai[, paste0("path_", getMSFileTypes()) := character(0)]
         return(ai)
@@ -1473,7 +1473,7 @@ newProject <- function(destPath = NULL)
             hot <- do.call(rhandsontable::rhandsontable,
                            c(list(dt, height = 250, maxRows = nrow(dt), columnSorting = FALSE),
                              hotOpts)) %>%
-                rhandsontable::hot_col(c("group", "blank"), readOnly = FALSE, type = "text") %>%
+                rhandsontable::hot_col(c("replicate", "blank"), readOnly = FALSE, type = "text") %>%
                 rhandsontable::hot_col(c("conc", "norm_conc"), readOnly = FALSE, type = "numeric")
             
             return(hot)
@@ -1660,7 +1660,7 @@ newProject <- function(destPath = NULL)
                 dt <- rhandsontable::hot_to_r(input$analysesHot)
                 pol <- getCurPolarity()
                 ai <- anaInfoTabs[[pol]]
-                mcols <- c("group", "blank", "conc", "norm_conc")
+                mcols <- c("replicate", "blank", "conc", "norm_conc")
                 ai[, (mcols) := dt[, mcols, with = FALSE]]
                 anaInfoTabs[[pol]] <<- ai
             }

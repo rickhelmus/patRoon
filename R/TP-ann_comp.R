@@ -50,8 +50,9 @@ setMethod("filter", "transformationProductsAnnComp", function(obj, ..., minFitFo
             {
                 if (nrow(tab) <= topMost)
                     return(FALSE)
-                ord <- order(tab$TPScore, decreasing = !negate)
-                return(ord[-seq_len(topMost)])
+                tab <- copy(tab)
+                tab[, ord := data.table::frank(-TPScore, ties.method = "first"), by = "group"]
+                return(if (negate) tab[ord <= topMost, which = TRUE] else tab[ord > topMost, which = TRUE])
             })
         }
 

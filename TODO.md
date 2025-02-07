@@ -39,7 +39,6 @@
 - rename estimateIDLevels() and have the same name as annotateSuspects()?
 
 - TP components
-    - update filter for candidate specific frag/NL matches
     - add set specific frag/NL matches for candidates
         - report them?
     - report()
@@ -115,7 +114,7 @@
     - generateComponentsTPs()
         - new args
         - as.data.table candidates arg
-        - candidate specific frag/NL matches
+        - candidate specific frag/NL matches, also filter
         - new slots
     - generateTPs()
         - ann_comp/ann_form algos
@@ -181,7 +180,7 @@
     - generateComponentsTPs()
         - new args
         - as.data.table candidates arg
-        - candidate specific frag/NL matches
+        - candidate specific frag/NL matches, also filter
         - new slots
     - generateTPs()
         - consistent "logP" naming, also for compounds

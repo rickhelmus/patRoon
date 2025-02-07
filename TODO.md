@@ -30,10 +30,6 @@
 
 - add estimateIDLevels() in newProject()
 - Misc
-    - bg MS/MS subtraction
-        - default abundance filtering while averaging? or apply filter in newProject()
-    - don't try to do MetFrag/PubChem with MP (by default) or warn, also add docs why
-        - maybe force/default disable MP if database is not local?
     - MSPL filter to remove mass peaks with X Da higher m/z than precursor
         - do by default in newProject()?
 
@@ -137,7 +133,7 @@
     - compoundsLibrary: mention that libMatch == annSim
     - plotVenn()/overlap()/unique(): update for removal of sets arg, give examples with aggregate
     - plotVenn()/overlap/plotUpSet(): update for removal of list arg possibility for which
-
+    - MetFrag: don't do MP for non-local databases to avoid connection errors
 
 - NEWS
     - specSimParamsMatch --> specSimParams
@@ -210,7 +206,7 @@
     - plotVenn()/overlap()/unique(): removal of sets arg
     - plotVenn()/overlap/plotUpSet(): removed list arg possibility for which
     - FIXED: plotVenn() now warns when there are too many groups, instead of erroring
-
+    - MetFrag: don't do MP for non-local databases to avoid connection errors
 
 
 ## msdata
@@ -246,6 +242,7 @@
     - store metadata?
     - more extensively test filters/summing/averaging
     - check defaults for new averaging params
+        - set abundance threshold?
     - withPrecursor: now only applied prior to other filtering systems, change?
         - if yes: adjust R and C++ code
         - doc in any case

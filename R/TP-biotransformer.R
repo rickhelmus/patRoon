@@ -204,8 +204,7 @@ generateTPsBioTransformer <- function(parents, type = "env", generations = 2, ma
 
     parents <- getTPParents(parents, skipInvalid, prefCalcChemProps, neutralChemProps)
 
-    baseHash <- makeHash(type, generations, maxExpGenerations, extraOpts, prefCalcChemProps, neutralChemProps,
-                         neutralizeTPs, skipInvalid, TPStructParams)
+    baseHash <- makeHash(type, generations, maxExpGenerations, extraOpts, neutralizeTPs, TPStructParams)
     setHash <- makeHash(parents, baseHash)
     
     cmdQueue <- Map(parents$name, parents$SMILES, f = getBaseBTCmd,

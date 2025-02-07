@@ -132,7 +132,7 @@ generateTPsAnnForm <- function(parents, formulas, minFitFormula = 0, skipInvalid
         parsSplit <- split(parents, seq_len(nrow(parents)))
         names(parsSplit) <- parents$name
         
-        baseHash <- makeHash(formulas, skipInvalid, prefCalcChemProps, neutralChemProps)
+        baseHash <- makeHash(formulas)
         setHash <- makeHash(parents, baseHash)
         cachedSet <- loadCacheSet("TPsAnnForm", setHash, cacheDB)
         hashes <- sapply(parsSplit, function(par) makeHash(baseHash, par[, c("name", "SMILES", "formula")],

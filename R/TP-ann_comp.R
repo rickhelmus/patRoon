@@ -231,8 +231,7 @@ generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, fGroupsComps =
         names(parsSplit) <- parentsTab$name
         
         baseHash <- makeHash(compounds, TPsRef, fGroupsComps, minRTDiff, minFitFormula, minFitCompound, minSimSusp,
-                             minFitCompOrSimSusp, extraOptsFMCSR, skipInvalid, prefCalcChemProps, neutralizeTPs,
-                             TPStructParams)
+                             minFitCompOrSimSusp, extraOptsFMCSR, neutralizeTPs, TPStructParams)
         setHash <- makeHash(parentsTab, baseHash)
         cachedSet <- loadCacheSet("TPsAnnComp", setHash, cacheDB)
         hashes <- sapply(parsSplit, function(par) makeHash(baseHash, par[, c("name", "SMILES", "formula")],

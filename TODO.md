@@ -16,6 +16,7 @@
 - basic and default error handling for executeCommand()?
 - maxMSRtWindow --> maxMSRTWindow
 - BUG: unescaped set names are now used regular expressions (problem if eg dot is present when make.unique was used)
+- update patRoonInst for new deps?
 
 
 ## Maybe
@@ -36,8 +37,6 @@
 - rename estimateIDLevels() and have the same name as annotateSuspects()?
 
 - TP components
-    - update patRoonInst for new deps?
-    - hashing for all algos seem to take unnecessary variables (eg parent names, things for prepareChemTable() etc)
     - further limit candidate columns? Can get quite excessive
     - update filter for candidate specific frag/NL matches
     - add set specific frag/NL matches for candidates

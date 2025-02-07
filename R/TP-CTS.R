@@ -146,8 +146,7 @@ generateTPsCTS <- function(parents, transLibrary, generations = 1, errorRetries 
         parsSplit <- split(parents, seq_len(nrow(parents)))
         names(parsSplit) <- parents$name
         
-        baseHash <- makeHash(transLibrary, generations, errorRetries, skipInvalid, prefCalcChemProps,
-                             neutralChemProps, neutralizeTPs, TPStructParams)
+        baseHash <- makeHash(transLibrary, generations, errorRetries, neutralizeTPs, TPStructParams)
         setHash <- makeHash(parents, baseHash)
         cachedSet <- loadCacheSet("TPsCTS", setHash, cacheDB)
         hashes <- sapply(parsSplit, function(par) makeHash(baseHash, par[, c("name", "SMILES")], with = FALSE))

@@ -31,7 +31,7 @@ setMethod("collapseComponents", "componentsNT", function(obj)
 {
     obj@components <- lapply(obj@components, function(cmp)
     {
-        keep <- c("rt", "mz", "group", "replicate")
+        keep <- c("ret", "mz", "group", "replicate")
         cmp <- cmp[, keep, with = FALSE]
         cmp[, replicate := paste0(unique(replicate), collapse = ","), by = "group"]
         return(unique(cmp, by = "group"))
@@ -343,7 +343,7 @@ setMethod("generateComponentsNontarget", "featureGroups", function(fGroups, ioni
         {
             grp <- compTab[[pr]][[cmpi]][[1]]
             if (!is.null(grp))
-                return(data.table(rt = gInfo[group %in% grp]$rt, mz = gInfo[group %in% grp]$mz, group = grp,
+                return(data.table(ret = gInfo[group %in% grp]$ret, mz = gInfo[group %in% grp]$mz, group = grp,
                                   hsnr = match(grp, allGroups), replicate = pr,
                                   intensity = groupTablesRep[[pr]][group %in% grp, get(getADTIntCols(pr))]))
             return(NULL)

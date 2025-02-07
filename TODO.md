@@ -206,6 +206,7 @@
     - plotVenn()/overlap/plotUpSet(): removed list arg possibility for which
     - FIXED: plotVenn() now warns when there are too many groups, instead of erroring
     - MetFrag: don't do MP for non-local databases to avoid connection errors
+    - componentsNT: renamed "rt" to "ret" for consistency
 
 
 ## msdata

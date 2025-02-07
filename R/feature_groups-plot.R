@@ -710,26 +710,15 @@ setMethod("plotVenn", "featureGroups", function(obj, which = NULL, aggregate = T
     groups <- unique(anaInfo[[aggregate]])
     
     checkmate::assert(checkmate::checkSubset(which, groups, empty.ok = FALSE),
-                      checkmate::checkList(which, "character", any.missing = FALSE),
                       checkmate::checkNull(which),
                       .var.name = "which")
 
     if (is.null(which))
         which <- groups
 
-    fGroupsList <- lapply(which, function(w) obj[anaInfo[get(aggregate) %in% w]$analysis])
+    fGroupsList <- lapply(which, function(w) obj[anaInfo[get(aggregate) == w]$analysis])
     
-    if (is.list(which))
-    {
-        if (!checkmate::testNamed(which))
-            names(which) <- sapply(which, paste0, collapse = "+", USE.NAMES = FALSE)
-    }
-    else
-        names(which) <- which
-    
-    makeVennPlot(lapply(fGroupsList, names), names(which), lengths(fGroupsList),
-                 function(obj1, obj2) intersect(obj1, obj2),
-                 length, ...)
+    makeVennPlot(lapply(fGroupsList, names), which, lengths(fGroupsList), intersect, length, ...)
 })
 
 setMethod("plotVennHash", "featureGroups", function(obj, ...)
@@ -756,7 +745,6 @@ setMethod("plotUpSet", "featureGroups", function(obj, which = NULL, aggregate = 
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assert(checkmate::checkSubset(which, groups, empty.ok = FALSE),
-                      checkmate::checkList(which, "character", any.missing = FALSE),
                       checkmate::checkNull(which),
                       .var.name = "which", add = ac)
     checkmate::assertCount(nsets, positive = TRUE, null.ok = TRUE, add = ac)

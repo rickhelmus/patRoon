@@ -28,7 +28,7 @@ buttonFunc <- function(cols)
                  "}"))
 }
 
-bts <- list(list(text = "Intensities", action = buttonFunc(replicateGroups(rmdVars$fGroups))))
+bts <- list(list(text = "Intensities", action = buttonFunc(replicates(rmdVars$fGroups))))
 
 hiddenCols <- integer()
 if (hasFGroupScores(rmdVars$fGroups))

@@ -17,8 +17,8 @@ fgSIRIUS <- groupFeatures(analysisInfo(fList)[1,], "sirius") # only do first ana
 
 # fList with dummy concs
 anaInfoConc <- cbind(getTestAnaInfo(), list(conc = c(NA, NA, NA, 1, 2, 3)))
-# modify replicate groups so we can test averaging
-anaInfoConc$group[grepl("standard", anaInfoConc$group)] <- c("standard-1", "standard-2", "standard-2")
+# modify replicates so we can test averaging
+anaInfoConc$replicate[grepl("standard", anaInfoConc$replicate)] <- c("standard-1", "standard-2", "standard-2")
 fListConc <- getTestFeatures(anaInfoConc)
 fgOpenMSConc <- groupFeatures(fListConc, "openms")
 
@@ -93,7 +93,7 @@ test_that("adducts setting", {
 })
 
 # to compare original anaInfo: ignore extra columns that may have been added afterwards
-getAnaInfo <- function(fg) analysisInfo(fg, TRUE)[, c("path", "analysis", "group", "blank")]
+getAnaInfo <- function(fg) analysisInfo(fg, TRUE)[, c("path", "analysis", "replicate", "blank")]
 
 test_that("basic subsetting", {
     expect_length(fgOpenMS[, 1:50], 50)
@@ -191,7 +191,7 @@ test_that("as.data.table works", {
     expect_equal(nrow(as.data.table(fgOpenMS)), length(fgOpenMS))
 
     checkmate::expect_names(names(as.data.table(fgOpenMS, average = TRUE)),
-                            must.include = getADTIntCols(replicateGroups(fgOpenMS)))
+                            must.include = getADTIntCols(replicates(fgOpenMS)))
     
     # UNDONE: intensities are sometimes higher than areas?
     # expect_gt_or_zero(as.data.table(fgOpenMS, areas = TRUE), as.data.table(fgOpenMS, areas = FALSE))
@@ -233,19 +233,19 @@ test_that("unique works", {
 
     expect_equivalent(unique(fgOpenMS, which = "standard-pos"),
                       unique(fgOpenMS, which = "standard-pos",
-                             relativeTo = setdiff(replicateGroups(fgOpenMS), "standard-pos")))
+                             relativeTo = setdiff(replicates(fgOpenMS), "standard-pos")))
     expect_equivalent(unique(fgOpenMS, which = "standard-pos"), unique(fgOpenMS, which = "standard-pos", outer = TRUE))
     expect_lt(length(unique(fgOpenMS, which = "standard-pos")), length(fgOpenMS))
-    expect_equal(length(unique(fgOpenMS, which = replicateGroups(fgOpenMS))), length(fgOpenMS))
-    expect_lt(length(unique(fgOpenMS, which = replicateGroups(fgOpenMS), outer = TRUE)), length(fgOpenMS))
-    expect_length(unique(fgOpenMSEmpty, which = replicateGroups(fgOpenMS)), 0)
+    expect_equal(length(unique(fgOpenMS, which = replicates(fgOpenMS))), length(fgOpenMS))
+    expect_lt(length(unique(fgOpenMS, which = replicates(fgOpenMS), outer = TRUE)), length(fgOpenMS))
+    expect_length(unique(fgOpenMSEmpty, which = replicates(fgOpenMS)), 0)
 })
 
 test_that("overlap works", {
     # note: only have two rep groups
 
-    expect_lt(length(overlap(fgOpenMS, which = replicateGroups(fgOpenMS))), length(fgOpenMS))
-    expect_length(overlap(fgOpenMSEmpty, which = replicateGroups(fgOpenMS)), 0)
+    expect_lt(length(overlap(fgOpenMS, which = replicates(fgOpenMS))), length(fgOpenMS))
+    expect_length(overlap(fgOpenMSEmpty, which = replicates(fgOpenMS)), 0)
 })
 
 minInt <- function(fg, rel)
@@ -262,7 +262,7 @@ featCounts <- function(fg, rel)
     return(if (rel) counts / length(fg) else counts)
 }
 
-stdRGs <- if (testWithSets()) c("standard-pos", "standard-neg") else "standard-pos"
+stdReps <- if (testWithSets()) c("standard-pos", "standard-neg") else "standard-pos"
 
 qr <- list(ZigZag = c(0.2, 0.6), TPASRScore = c(0.5, 0.9))
 fgOpenMSQFF <- filter(fgOpenMSQ, featQualityRange = qr)
@@ -303,10 +303,10 @@ test_that("delete and filter", {
     expect_lt(length(filter(fgOpenMS, chromWidthRange = c(0, 30))), length(fgOpenMS))
     expect_equivalent(filter(fgOpenMS, chromWidthRange = c(0, Inf)), fgOpenMS)
 
-    expect_identical(replicateGroups(filter(fgOpenMS, rGroups = "standard-pos")), "standard-pos")
-    expect_identical(replicateGroups(fgOpenMS[, rGroups = "standard-pos"]), "standard-pos")
-    expect_identical(replicateGroups(filter(fgOpenMS, removeBlanks = TRUE)), stdRGs)
-    expect_identical(replicateGroups(removeEmptyAnalyses(filter(fgOpenMS, blankThreshold = 1E6))), stdRGs)
+    expect_identical(replicates(filter(fgOpenMS, replicates = "standard-pos")), "standard-pos")
+    expect_identical(replicates(fgOpenMS[, replicates = "standard-pos"]), "standard-pos")
+    expect_identical(replicates(filter(fgOpenMS, removeBlanks = TRUE)), stdReps)
+    expect_identical(replicates(removeEmptyAnalyses(filter(fgOpenMS, blankThreshold = 1E6))), stdReps)
     
     expect_gte(min(featCounts(filter(fgOpenMS, relMinFeatures = 0.3), TRUE)), 0.3)
     expect_gte(min(featCounts(filter(fgOpenMS, absMinFeatures = length(fgOpenMS) * 0.3), FALSE)),
@@ -344,10 +344,10 @@ test_that("delete and filter", {
                          retentionRange = c(120, Inf), relMinReplicateAbundance = 1), 0)
 })
 
-test_that("replicate group subtraction", {
-    expect_setequal(names(replicateGroupSubtract(fgOpenMS, "solvent-pos")),
-                    names(unique(fgOpenMS, which = setdiff(replicateGroups(fgOpenMS), "solvent-pos"))))
-    expect_length(replicateGroupSubtract(fgOpenMSEmpty, "solvent-pos"), 0)
+test_that("replicate subtraction", {
+    expect_setequal(names(replicateSubtract(fgOpenMS, "solvent-pos")),
+                    names(unique(fgOpenMS, which = setdiff(replicates(fgOpenMS), "solvent-pos"))))
+    expect_length(replicateSubtract(fgOpenMSEmpty, "solvent-pos"), 0)
 })
 
 fgISTD <- fgOpenMS
@@ -480,7 +480,7 @@ if (testWithSets())
 test_that("plotting works", {
     expect_doppel("retmz", function() plot(fgOpenMS, groupBy = "fGroups", showLegend = FALSE))
     expect_doppel("retmz-singlec", function() plot(fgOpenMS, groupBy = NULL, col = "blue"))
-    expect_doppel("retmz-rgroups", function() plot(fgOpenMS, groupBy = "rGroups"))
+    expect_doppel("retmz-rgroups", function() plot(fgOpenMS, groupBy = "replicate"))
     expect_doppel("retmz-comp", function() plot(fGCompOpenMS, groupBy = "fGroups", showLegend = FALSE))
 
     expect_doppel("intensity-def", function() plotInt(fgOpenMS))
@@ -489,20 +489,20 @@ test_that("plotting works", {
     expect_doppel("chord-def", function() plotChord(fgOpenMS))
     expect_doppel("chord-selflinks", function() plotChord(fgOpenMS, addSelfLinks = TRUE))
     expect_doppel("chord-nortmz", function() plotChord(fgOpenMS, addRetMzPlots = FALSE))
-    expect_doppel("chord-outer", function() plotChord(fgOpenMS, groupBy = "group"))
+    expect_doppel("chord-outer", function() plotChord(fgOpenMS, groupBy = "replicate"))
     expect_doppel("chord-comp", function() plotChord(fGCompOpenMS))
-    expect_error(plotChord(unique(fgOpenMS, which = replicateGroups(fgOpenMS), outer = TRUE),
+    expect_error(plotChord(unique(fgOpenMS, which = replicates(fgOpenMS), outer = TRUE),
                            aggregate = TRUE)) # stops with nothing to plot: no overlap
-    expect_plot(plotChord(unique(fgOpenMS, which = replicateGroups(fgOpenMS), outer = TRUE),
+    expect_plot(plotChord(unique(fgOpenMS, which = replicates(fgOpenMS), outer = TRUE),
                           aggregate = TRUE, addSelfLinks = TRUE)) # unless there are self links
 
     expect_doppel("eic-def", function() plotChroms(subFGroups))
     expect_doppel("eic-rtmin", function() plotChroms(subFGroups, retMin = TRUE))
     expect_doppel("eic-tm1", function() plotChroms(subFGroups, EICParams = getDefEICParams(topMost = 1)))
     expect_doppel("eic-tm1rg", function() plotChroms(subFGroups,
-                                                     EICParams = getDefEICParams(topMost = 1, topMostByRGroup = TRUE)))
+                                                     EICParams = getDefEICParams(topMost = 1, topMostByReplicate = TRUE)))
     expect_doppel("eic-area", function() plotChroms(subFGroups, showPeakArea = TRUE))
-    expect_doppel("eic-cbr", function() plotChroms(subFGroups, groupBy = "rGroups"))
+    expect_doppel("eic-cbr", function() plotChroms(subFGroups, groupBy = "replicate"))
     expect_doppel("eic-cbf", function() plotChroms(subFGroups, groupBy = "fGroups"))
     expect_doppel("eic-ann", function() plotChroms(subFGroups, annotate = "mz"))
     # below two should be mostly the same, but xlim and group rect will be slightly different since subsetting removes
@@ -513,12 +513,12 @@ test_that("plotting works", {
                                                     groupName = names(subFGroups)[1]))
 
     expect_doppel("venn", function() plotVenn(fgOpenMS))
-    # use conc fGroups as it has >2 rGroups
+    # use conc fGroups as it has >2 replicates
     expect_doppel("venn-multiple", function() plotVenn(fgOpenMS, which = list(standards = "standard-pos",
                                                                               solvents = "solvent-pos")))
     expect_doppel("venn-comp", function() plotVenn(fGCompOpenMS))
     expect_equal(expect_plot(plotVenn(fgOpenMS, which = c("solvent-pos", "standard-pos")))$areas[2],
-                 length(filter(fgOpenMS, rGroups = "standard-pos")))
+                 length(filter(fgOpenMS, replicates = "standard-pos")))
     expect_equal(expect_plot(plotVenn(fGCompOpenMS))$areas[2], length(fgXCMS))
 
     # vdiffr doesn't work with UpSet
@@ -537,7 +537,7 @@ test_that("plotting works", {
 
 test_that("plotting empty objects works", {
     expect_doppel("retmz-empty", function() plot(fgOpenMSEmpty))
-    expect_doppel("retmz-empty", function() plot(fgOpenMSEmpty, groupBy = "rGroups"))
+    expect_doppel("retmz-empty", function() plot(fgOpenMSEmpty, groupBy = "replicate"))
     expect_doppel("retmz-comp-empty", function() plot(fgCompBothEmpty))
 
     expect_doppel("intensity-def-empty", function() plotInt(fgOpenMSEmpty))

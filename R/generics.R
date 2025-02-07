@@ -67,7 +67,7 @@ setGeneric("comparison", function(..., groupAlgo,
                                   groupArgs = list(rtalign = FALSE)) standardGeneric("comparison"), signature = "...")
 
 #' @rdname feature-filtering
-setGeneric("replicateGroupSubtract", function(fGroups, rGroups, threshold = 0) standardGeneric("replicateGroupSubtract"))
+setGeneric("replicateSubtract", function(fGroups, replicates, threshold = 0) standardGeneric("replicateSubtract"))
 
 #' @rdname featureGroups-class
 setGeneric("groupQualities", function(fGroups) standardGeneric("groupQualities"))
@@ -341,7 +341,7 @@ setGeneric("reportPDF", function(fGroups, path = "report", reportFGroups = TRUE,
                                  compoundsOnlyUsedScorings = TRUE, compoundsTopMost = 5,
                                  compsCluster = NULL, components = NULL, MSPeakLists = NULL, retMin = TRUE,
                                  EICGrid = c(2, 1), EICParams = getDefEICParams(window = 20, topMost = 1,
-                                                                                topMostByRGroup = TRUE),
+                                                                                topMostByReplicate = TRUE),
                                  clearPath = FALSE) standardGeneric("reportPDF"))
 #' @rdname reporting-legacy
 setGeneric("reportHTML", function(fGroups, path = "report", reportPlots = c("chord", "venn", "upset", "eics", "formulas"),
@@ -354,15 +354,15 @@ setGeneric("reportHTML", function(fGroups, path = "report", reportPlots = c("cho
                                   includeMFWebLinks = "compounds", components = NULL, interactiveHeat = FALSE,
                                   MSPeakLists = NULL, specSimParams = getDefSpecSimParams(), TPs = NULL,
                                   retMin = TRUE, EICParams = getDefEICParams(window = 20, topMost = 1,
-                                                                             topMostByRGroup = TRUE),
+                                                                             topMostByReplicate = TRUE),
                                   TPGraphStructuresMax = 25, selfContained = TRUE, optimizePng = FALSE,
                                   clearPath = FALSE, openReport = TRUE, noDate = FALSE) standardGeneric("reportHTML"))
 #' @rdname reporting
 setGeneric("report", function(fGroups, MSPeakLists = NULL, formulas = NULL, compounds = NULL, compsCluster = NULL,
                               components = NULL, TPs = NULL,
                               settingsFile = system.file("report", "settings.yml", package = "patRoon"),
-                              path = NULL, EICParams = getDefEICParams(topMost = 1, topMostByRGroup = TRUE),
-                              EIMParams = getDefEIMParams(topMost = 1, topMostByRGroup = TRUE),
+                              path = NULL, EICParams = getDefEICParams(topMost = 1, topMostByReplicate = TRUE),
+                              EIMParams = getDefEIMParams(topMost = 1, topMostByReplicate = TRUE),
                               specSimParams = getDefSpecSimParams(), clearPath = FALSE, openReport = TRUE,
                               parallel = TRUE, overrideSettings = list()) standardGeneric("report"))
 
@@ -614,10 +614,10 @@ setGeneric("delete", function(obj, ...) standardGeneric("delete"))
 #' @template generics
 setGeneric("plotVolcano", function(obj, ...) standardGeneric("plotVolcano"))
 
-#' @templateVar func replicateGroups
-#' @templateVar desc returns a \code{character} vector with the analyses for which data is present in this object.
+#' @templateVar func replicates
+#' @templateVar desc returns a \code{character} vector with the replicates for which data is present in this object.
 #' @template generics
-setGeneric("replicateGroups", function(obj) standardGeneric("replicateGroups"))
+setGeneric("replicates", function(obj) standardGeneric("replicates"))
 
 #' @templateVar func setObjects
 #' @templateVar desc returns the \emph{set objects} of this object. See the documentation of \code{\link{workflowStepSet}}.

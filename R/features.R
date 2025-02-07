@@ -45,7 +45,7 @@ printFeatStats <- function(fList)
 #' @param retMin Plot retention time in minutes (instead of seconds).
 #' @param title Character string used for title of the plot. If \code{NULL} a title will be automatically generated.
 #' @param colourBy Sets the automatic colour selection: "none" for a single colour or "analyses"/"rGroups" for a
-#'   distinct colour per analysis or analysis replicate group.
+#'   distinct colour per analysis or analysis replicate.
 #' @param showLegend Plot a legend if TRUE.
 #' @template plot-lim
 #' @param \dots For \code{delete}: passed to the function specified as \code{j}.
@@ -148,7 +148,7 @@ setMethod("reorderAnalyses", "features", function(obj, anas)
 #' @param df If \code{TRUE} then the returned value is a \code{data.frame}, otherwise a \code{data.table}.
 #' @return \code{analysisInfo}: A \code{data.table} containing a column with
 #'   analysis name (\code{analysis}), its path (\code{path}), and other columns
-#'   such as replicate group name (\code{group}) and blank reference
+#'   such as replicate name (\code{replicate}) and blank reference
 #'   (\code{blank}).
 #' @export
 setMethod("analysisInfo", "features", function(obj, df = FALSE)
@@ -188,10 +188,10 @@ setReplaceMethod("analysisInfo", "features", function(obj, value)
 setMethod("analyses", "features", function(obj) analysisInfo(obj)$analysis)
 
 #' @templateVar class features
-#' @templateVar what replicate groups
+#' @templateVar what replicates
 #' @template strmethod
 #' @export
-setMethod("replicateGroups", "features", function(obj) unique(analysisInfo(obj)$group))
+setMethod("replicates", "features", function(obj) unique(analysisInfo(obj)$replicate))
 
 #' @describeIn features Returns all feature data in a table.
 #' @export

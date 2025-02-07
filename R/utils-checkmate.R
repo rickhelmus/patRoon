@@ -87,10 +87,10 @@ assertAnalysisInfo <- function(x, fileTypes = NULL, allowedFormats = NULL, null.
         mc <- length(add$getMessages())
 
     checkmate::assertDataFrame(x, min.rows = 1, .var.name = .var.name, add = add)
-    assertHasNames(x, c("analysis", "group", "blank"), .var.name = .var.name, add = add)
+    assertHasNames(x, c("analysis", "replicate", "blank"), .var.name = .var.name, add = add)
     
     assertListVal(x, "analysis", checkmate::assertCharacter, any.missing = FALSE, .var.name = .var.name, add = add)
-    assertListVal(x, "group", checkmate::assertCharacter, any.missing = FALSE, .var.name = .var.name, add = add)
+    assertListVal(x, "replicate", checkmate::assertCharacter, any.missing = FALSE, .var.name = .var.name, add = add)
     assertListVal(x, "blank", checkmate::assertCharacter, any.missing = TRUE, .var.name = .var.name, add = add)
     
     pathCols <- paste0("path_", getMSFileTypes())
@@ -148,12 +148,18 @@ assertAndPrepareAnaInfo <- function(x, ..., null.ok = FALSE, .var.name = checkma
                 "The column will be renamed to 'path_centroid', but this may not be what you want...", call. = FALSE)
         setnames(x, "path", "path_centroid")
     }
+    if (is.null(x[["replicate"]]) && !is.null(x[["group"]]))
+    {
+        warning("The usage of the 'group' column in the analysis information is deprecated. Please rename this column to 'replicate'.",
+                call. = FALSE)
+        setnames(x, "group", "replicate")
+    }
     
     assertAnalysisInfo(x, ..., .var.name = .var.name, add = add)
 
     if ((is.null(add) || length(add$getMessages()) == mc) && !is.null(x))
     {
-        chrCols <- c("analysis", "group", "blank", getAnaInfoPathCols(x))
+        chrCols <- c("analysis", "replicate", "blank", getAnaInfoPathCols(x))
         for (col in chrCols)
             x[, (col) := as.character(get(col))]
         if (!is.null(x[["norm_conc"]]))
@@ -175,8 +181,8 @@ assertAndPrepareAnaInfoBy <- function(x, anaInfo, withFGroups, .var.name = check
         checkmate::checkChoice(x, ch),
         .var.name = .var.name, add = add
     )
-    if (isTRUE(x) || x == "rGroups")
-        x <- "group"
+    if (isTRUE(x))
+        x <- "replicate"
     else if (isFALSE(x))
         x <- "analysis"
     return(x)
@@ -518,7 +524,7 @@ assertEIXParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
     assertListVal(x, "mobExpWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
     assertListVal(x, "topMost", checkmate::assertCount, positive = TRUE, null.ok = TRUE, .var.name = .var.name,
                   add = add)
-    assertListVal(x, "topMostByRGroup", checkmate::assertFlag, .var.name = .var.name, add = add)
+    assertListVal(x, "topMostByReplicate", checkmate::assertFlag, .var.name = .var.name, add = add)
     assertListVal(x, "onlyPresent", checkmate::assertFlag, .var.name = .var.name, add = add)
     assertListVal(x, "setsAdductPos", checkAndToAdduct, .var.name = .var.name)
     assertListVal(x, "setsAdductNeg", checkAndToAdduct, .var.name = .var.name)
@@ -554,9 +560,9 @@ assertFCParams <- function(x, fGroups, null.ok = FALSE, .var.name = checkmate::v
     
     checkmate::assertList(x, names = "unique", .var.name = .var.name) # no add: should fail
     
-    assertListVal(x, "rGroups", checkmate::assertCharacter, any.missing = FALSE, len = 2, .var.name = .var.name,
+    assertListVal(x, "replicate", checkmate::assertCharacter, any.missing = FALSE, len = 2, .var.name = .var.name,
                   add = add)
-    assertListVal(x, "rGroups", checkmate::assertSubset, choices = replicateGroups(fGroups), .var.name = .var.name,
+    assertListVal(x, "replicate", checkmate::assertSubset, choices = replicates(fGroups), .var.name = .var.name,
                   add = add)
     assertListVal(x, "thresholdFC", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
     assertListVal(x, "thresholdPV", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
@@ -910,7 +916,7 @@ assertPlotEIXArgs <- function(obj, analysis, groupName, showPeakArea, showFGroup
     aapply(checkmate::assertFlag, . ~ showPeakArea + showFGroupRect + showLegend + showProgress,
            fixed = list(add = add))
     checkmate::assertString(title, null.ok = TRUE, add = add)
-    checkmate::assertChoice(groupBy, c("rGroups", "fGroups", names(analysisInfo(obj))), null.ok = TRUE, add = add)
+    checkmate::assertChoice(groupBy, c("fGroups", names(analysisInfo(obj))), null.ok = TRUE, add = add)
     annotate <- checkmate::matchArg(annotate, c("none", "ret", "mz", "mob"), several.ok = TRUE, add = add)
     assertXYLim(xlim, ylim, add = add)
 }

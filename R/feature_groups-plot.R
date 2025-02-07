@@ -67,8 +67,7 @@ setMethod("plot", c(x = "featureGroups", y = "missing"), function(x, groupBy = N
 
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertFlag, . ~ onlyUnique + retMin + showLegend, fixed = list(add = ac))
-    # UNDONE: do this in assertAndPrepareAnaInfoBy()
-    checkmate::assertChoice(groupBy, c("fGroups", names(anaInfo)), null.ok = TRUE, add = ac)
+    assertAnaInfoBy(groupBy, anaInfo, TRUE, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
     if (length(x) == 0)
@@ -125,7 +124,7 @@ setMethod("plot", c(x = "featureGroups", y = "missing"), function(x, groupBy = N
                 labPch <- rep(pch, length.out = length(labels))
             names(labPch) <- labels
             
-            # get averaged intensities for each rGroup and omit initial name/rt/mz columns
+            # get averaged intensities and omit initial name/rt/mz columns
             gTable <- as.data.table(x, average = groupBy)[, getADTIntCols(allGroups), with = FALSE]
             
             for (r in seq_len(nrow(gTable)))
@@ -200,8 +199,8 @@ setMethod("plotInt", "featureGroups", function(obj, average = FALSE, averageFunc
     aapply(checkmate::assertFlag, . ~ average + areas + normalized + xNames + regression + showLegend,
            fixed = list(add = ac))
     checkmate::assertFunction(averageFunc, add = ac)
-    checkmate::assertChoice(xBy, names(anaInfo), null.ok = TRUE, add = ac)
-    checkmate::assertChoice(groupBy, c("fGroups", names(anaInfo)), null.ok = TRUE, add = ac)
+    assertAnaInfoBy(xBy, anaInfo, FALSE, null.ok = TRUE, add = ac)
+    assertAnaInfoBy(groupBy, anaInfo, TRUE, null.ok = TRUE, add = ac)
     aapply(checkmate::assertList, . ~ plotArgs + linesArgs, null.ok = TRUE, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
@@ -390,7 +389,7 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
     aapply(checkmate::assertFlag, . ~ addSelfLinks + addRetMzPlots + addIntraOuterGroupLinks,
            fixed = list(add = ac))
     aggregateBy <- assertAndPrepareAnaInfoBy(aggregate, anaInfo, FALSE, add = ac)
-    checkmate::assertChoice(groupBy, names(anaInfo), null.ok = TRUE, add = ac)
+    assertAnaInfoBy(groupBy, anaInfo, FALSE, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
     if (length(obj) == 0)

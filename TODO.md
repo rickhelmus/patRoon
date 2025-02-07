@@ -29,7 +29,7 @@
         - docs
             - colourBy, which
     - see if MSPL sets anaInfo can be replaced by non-exported slot with named vector with sets for each ana
-    - properly handle NA values for custom cols?
+        - could be taken from analyses of sets objects
     - plotVenn/unique sets methods: deprecate/remove sets arg?
     - plotVenn()/overlap/plotUpSet(): deprecate/remove list arg for which?
     - FC: select multiple groups and/or anaInfo cols?

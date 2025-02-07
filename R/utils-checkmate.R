@@ -170,21 +170,35 @@ assertAndPrepareAnaInfo <- function(x, ..., null.ok = FALSE, .var.name = checkma
     return(x)
 }
 
-assertAndPrepareAnaInfoBy <- function(x, anaInfo, withFGroups, .var.name = checkmate::vname(x), add = NULL)
+assertAnaInfoBy <- function(x, anaInfo, withFGroups, null.ok = FALSE, any.missing = FALSE,
+                            .var.name = checkmate::vname(x), add = NULL)
 {
+    if (is.null(x) && null.ok)
+        return(NULL)
+    
     ch <- names(anaInfo)
     if (withFGroups)
         ch <- c(ch, "fGroups")
+    checkmate::assertChoice(x, ch, .var.name = .var.name) # no add: let it fail
+    if ((!withFGroups || x != "fGroups") && !any.missing)
+        checkmate::assertAtomicVector(anaInfo[[x]], .var.name = sprintf("anaInfo[[\"%s\"]]", x),
+                                      any.missing = any.missing, add = add)
     
-    checkmate::assert(
-        checkmate::checkFlag(x),
-        checkmate::checkChoice(x, ch),
-        .var.name = .var.name, add = add
-    )
+}
+
+assertAndPrepareAnaInfoBy <- function(x, anaInfo, withFGroups, null.ok = FALSE, any.missing = FALSE,
+                                      .var.name = checkmate::vname(x), add = NULL)
+{
+    if (is.null(x) && null.ok)
+        return(NULL)
+
     if (isTRUE(x))
         x <- "replicate"
     else if (isFALSE(x))
         x <- "analysis"
+    
+    assertAnaInfoBy(x, anaInfo, withFGroups, null.ok, any.missing, .var.name = .var.name, add = add)
+    
     return(x)
 }
 
@@ -480,13 +494,9 @@ assertFGAsDataTableArgs <- function(fGroups, areas, features, qualities, regress
         checkmate::checkChoice(qualities, c("quality", "score", "both")),
         .var.name = "qualities", add = ac
     )
-    checkmate::assert(
-        checkmate::checkFALSE(regression),
-        checkmate::checkChoice(regression, names(anaInfo)),
-        .var.name = "regression", add = ac
-    )
-    if (is.character(regression))
+    if (!isFALSE(regression))
     {
+        assertAnaInfoBy(regression, anaInfo, FALSE, any.missing = TRUE, add = ac)
         checkmate::assertNumeric(anaInfo[[regression]],
                                  .var.name = sprintf("analysisInfo(fGroups)[[\"%s\"]]", regression), add = ac)
     }

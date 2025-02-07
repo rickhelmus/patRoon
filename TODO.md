@@ -41,7 +41,6 @@
     - update filter for candidate specific frag/NL matches
     - add set specific frag/NL matches for candidates
         - report them?
-    - sync topMost filter for ann TPs
     - collapseComponents(): not needed anymore? otherwise update
     - report()
         - BUG: JS errors when fGroups are subset/do not contain TPs anymore?

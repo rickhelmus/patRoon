@@ -42,8 +42,9 @@ setMethod("filter", "transformationProductsAnnForm", function(obj, ..., minFitFo
             {
                 if (nrow(tab) <= topMost)
                     return(FALSE)
-                ord <- order(tab$TPScore, decreasing = !negate)
-                return(ord[-seq_len(topMost)])
+                tab <- copy(tab)
+                tab[, ord := data.table::frank(-TPScore, ties.method = "first"), by = "group"]
+                return(if (negate) tab[ord <= topMost, which = TRUE] else tab[ord > topMost, which = TRUE])
             })
         }
         
@@ -80,7 +81,6 @@ getTPsFormulas <- function(annTable, parName, parFormula, minFitFormula)
     
     tab[, c("name", "ID", "parent_ID", "chem_ID", "generation") := .(paste0(parName, "-TP", .I), .I, NA_integer_, .I, 1)]
     
-    # UNDONE: apply thresholds
     # UNDONE: unset annotation objects?
     
     tab[, fitFormula := sapply(formula, calcFormulaFit, parFormula)]

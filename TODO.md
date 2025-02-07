@@ -29,14 +29,6 @@
 ## TC
 
 - add estimateIDLevels() in newProject()
-- anaInfo
-    - rename group col to replicate and warn for deprecation (like blank/ref column)
-        - update BPC/TIC functions, sync with plotChroms()
-        - Handbook
-            - colourBy
-        - docs
-            - colourBy, which
-
 - Misc
     - bg MS/MS subtraction
         - default abundance filtering while averaging? or apply filter in newProject()

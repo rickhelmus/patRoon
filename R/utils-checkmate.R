@@ -570,9 +570,9 @@ assertFCParams <- function(x, fGroups, null.ok = FALSE, .var.name = checkmate::v
     
     checkmate::assertList(x, names = "unique", .var.name = .var.name) # no add: should fail
     
-    assertListVal(x, "replicate", checkmate::assertCharacter, any.missing = FALSE, len = 2, .var.name = .var.name,
+    assertListVal(x, "replicates", checkmate::assertCharacter, any.missing = FALSE, len = 2, .var.name = .var.name,
                   add = add)
-    assertListVal(x, "replicate", checkmate::assertSubset, choices = replicates(fGroups), .var.name = .var.name,
+    assertListVal(x, "replicates", checkmate::assertSubset, choices = replicates(fGroups), .var.name = .var.name,
                   add = add)
     assertListVal(x, "thresholdFC", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
     assertListVal(x, "thresholdPV", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)

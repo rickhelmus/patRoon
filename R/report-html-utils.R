@@ -544,7 +544,13 @@ reportHTMLUtils$methods(
                     select(id = makeID("groupBy"), onChange = onChange,
                            style = list("margin-right" = "10px", "margin-top" = "3px"),
                            lapply(pruneList(groupBy),
-                           function(o) option(value = o$value, o$name, selected = !is.null(groupByDef) && o$value == groupByDef))
+                           function(o)
+                           {
+                               opt <- option(value = o$value, o$name)
+                               if (!is.null(groupByDef) && o$value == groupByDef)
+                                   opt <- htmltools::tagAppendAttributes(opt, selected = "selected")
+                               return(opt)
+                           })
                     )
                 )
             }
@@ -582,7 +588,7 @@ reportHTMLUtils$methods(
             
             if (toggleExpand)
             {
-                show <- !toggleExpandDisableIfNoGrouping || (!is.null(groupByDef) && groupByDef != "none")
+                show <- !toggleExpandDisableIfNoGrouping || (!is.null(groupByDef) && groupByDef != "none" && nzchar(groupByDef))
                 ret <- htmltools::tagAppendChildren(
                     ret,
                     htmltools::tags$button(type = "button", class = "btn btn-secondary btn-sm", id = toggleExpandID,

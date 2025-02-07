@@ -496,7 +496,7 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
             ftgrps <- groupTab[get(getADTIntCols(sn)) > 0]$group
             return(gInfo[match(ftgrps, group), c("ret", "mz"), with = FALSE])
         }, simplify = FALSE), idcol = "sname")
-        retMz$rts <- retMz$rts / max(retMz$rts) # normalize
+        retMz[, ret := ret / max(ret)] # normalize
         
         circlize::circos.track(fa = retMz$sname, x = retMz$ret, y = retMz$mz, ylim = c(0, max(retMz$mz)), track.index = length(tracks),
                                panel.fun = function(x, y)

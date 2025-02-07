@@ -129,6 +129,11 @@ makeVennPlot <- function(plotObjects, categories, areas, intersectFunc,
                                            c(1, 2, 3, 4, 5)))
         gRet <- do.call(VennDiagram::draw.quintuple.venn, c(areas, icounts, vennArgs))
     }
+    else
+    {
+        warning("Venn plot only supports up to 5 categories", call. = FALSE)
+        return(invisible(NULL))
+    }
     
     invisible(list(gList = gRet, areas = areas, intersectionCounts = icounts))
 }

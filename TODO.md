@@ -214,8 +214,9 @@
         - rGroups arg for filters
     - plotVenn()/overlap()/unique(): removal of sets arg
     - plotVenn()/overlap/plotUpSet(): removed list arg possibility for which
+    - FIXED: plotVenn() now warns when there are too many groups, instead of erroring
 
-        
+
 
 ## msdata
 

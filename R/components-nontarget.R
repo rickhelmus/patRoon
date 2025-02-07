@@ -343,9 +343,9 @@ setMethod("generateComponentsNontarget", "featureGroups", function(fGroups, ioni
         {
             grp <- compTab[[rg]][[cmpi]][[1]]
             if (!is.null(grp))
-                return(data.table(rt = gInfo[group == grp]$rt, mz = gInfo[group == grp]$mz, group = grp,
                                   hsnr = match(grp, allGroups), rGroup = rg,
                                   intensity = groupTablesRG[[rg]][group %in% grp, get(getADTIntCols(rg))]))
+                return(data.table(rt = gInfo[group %in% grp]$rt, mz = gInfo[group %in% grp]$mz, group = grp,
             return(NULL)
         }), fill = TRUE)
         setorderv(ret, c("hsnr"))

@@ -27,15 +27,11 @@ NULL
 #' @param \dots passed to \code{\link[base]{plot}} (\code{plot}, \code{plotChroms}, \code{plotTICs} and
 #'   \code{plotBPCs}), \pkg{\link{VennDiagram}} plotting functions (\code{plotVenn}), \code{\link{chordDiagram}}
 #'   (\code{plotChord}) or \code{\link[UpSetR]{upset}} (\code{plotUpSet}).
-#' @param sets \setsWF If \code{TRUE} then the \code{which} argument changes its meaning and is used to specify the
-#'   names of the sets to be compared.
 #'
 #' @inheritParams featureGroups-class
 #'
 #' @section Sets workflows: \setsWFChangedMethods{
 #'
-#'   \item \code{plotVenn} and \code{plotInt} allow to handle data per set. See the \code{sets} argument description.
-#'   
 #'   \item \code{plotGraph} only plots data per set, and requires the \code{set} argument to be set.
 #'
 #'   }
@@ -734,16 +730,6 @@ setMethod("plotVenn", "featureGroups", function(obj, which = NULL, aggregate = T
     makeVennPlot(lapply(fGroupsList, names), names(which), lengths(fGroupsList),
                  function(obj1, obj2) intersect(obj1, obj2),
                  length, ...)
-})
-
-#' @rdname feature-plotting
-#' @export
-setMethod("plotVenn", "featureGroupsSet", function(obj, which = NULL, aggregate = TRUE, ..., sets = FALSE)
-{
-    checkmate::assertFlag(sets)
-    if (sets)
-        aggregate <- "set"
-    callNextMethod(obj, which = which, aggregate = aggregate, ...)
 })
 
 setMethod("plotVennHash", "featureGroups", function(obj, ...)

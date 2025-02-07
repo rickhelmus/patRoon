@@ -18,6 +18,14 @@
 - BUG: unescaped set names are now used regular expressions (problem if eg dot is present when make.unique was used)
 
 
+# Maybe
+
+- see if MSPL sets anaInfo can be replaced by non-exported slot with named vector with sets for each ana
+    - could be taken from analyses of sets objects
+- FC: select multiple groups and/or anaInfo cols?
+- groupBy: fGroups --> fGroup for consistency with anaInfo cols? (set/analysis/replicate)
+
+
 ## TC
 
 - add estimateIDLevels() in newProject()
@@ -28,11 +36,6 @@
             - colourBy
         - docs
             - colourBy, which
-    - see if MSPL sets anaInfo can be replaced by non-exported slot with named vector with sets for each ana
-        - could be taken from analyses of sets objects
-    - FC: select multiple groups and/or anaInfo cols?
-    - plotChord/report(): report sets as outer groups? make it optional?
-    - groupBy: fGroups --> fGroup for consistency with anaInfo cols? (set/analysis/replicate)
 
 - Misc
     - bg MS/MS subtraction

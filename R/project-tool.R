@@ -1008,7 +1008,7 @@ getNewProjectUI <- function(destPath)
                             "input.convAlgo != \"\"",
                             fillRow(
                                 height = 90,
-                                selectInput("convFrom", "Input format", getMSFileConversionFormats(), multiple = FALSE,
+                                selectInput("convFrom", "Input format", getMSFileConversionFormats("pwiz", "raw"), multiple = FALSE,
                                             width = "95%"),
                                 fillCol(
                                     flex = c(1, NA),
@@ -1872,14 +1872,14 @@ newProject <- function(destPath = NULL)
         
         observeEvent(input$convAlgo, {
             from <- switch(input$convAlgo,
-                           pwiz = getMSFileConversionFormats("pwiz"),
+                           pwiz = getMSFileConversionFormats("pwiz", "raw"),
                            bruker = "bruker",
-                           openms = getMSFileConversionFormats("openms"),
+                           openms = getMSFileConversionFormats("openms", "centroid"),
                            ""
                    )
             sel <- ""
             if (nzchar(input$convAlgo))
-                sel <- getMSFileConversionFormats(input$convAlgo, input$convAlgo != "openms")[1]
+                sel <- getMSFileConversionFormats(input$convAlgo, if (input$convAlgo == "openms") "centroid" else "raw" )[1]
 
             updateSelectInput(session, "convFrom", choices = from, selected = sel)
         })

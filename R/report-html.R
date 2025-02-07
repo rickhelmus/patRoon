@@ -28,26 +28,31 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
                                              parParams = list(mai = c(0.9, 0.8, 0.1, 0.1)), width = 10, height = 4)
     
     replicateLenNonEmpty <- length(replicates(removeEmptyAnalyses(fGroups)))
-    replicateLen <- length(replicates(fGroups))
-    anyOverlap <- replicateLen > 1 &&
-        length(unique(fGroups, which = replicates(fGroups), outer = TRUE)) < length(fGroups)
+    aggr <- replicateLenNonEmpty >= 2
+    aggrWh <- if (aggr) replicates(fGroups) else analyses(fGroups)
+    aggrLen <- length(aggrWh)
+    anyOverlap <- aggrLen >= 2 &&
+        length(unique(fGroups, which = aggrWh, aggregate = aggr, outer = TRUE)) < length(fGroups)
     
     ret$overview$chord <- ret$overview$venn  <- ret$overview$UpSet <- NULL
-    if (anyOverlap && replicateLenNonEmpty > 1)
+    if (anyOverlap && aggrLen >= 2)
     {
-        if ("chord" %in% settings$summary && replicateLenNonEmpty > 2)
+        if ("chord" %in% settings$summary)
         {
-            ret$overview$chord <- makeHTMLReportPlot("chord", outPath, "plotChord", list(fGroups, aggregate = TRUE),
+            ret$overview$chord <- makeHTMLReportPlot("chord", outPath, "plotChord",
+                                                     list(fGroups, aggregate = aggr,
+                                                          groupBy = if (isFGSet(fGroups)) "set"),
                                                      width = 7, height = 7)
         }
-        if ("venn" %in% settings$summary && replicateLen < 6)
+        if ("venn" %in% settings$summary && aggrLen < 6)
         {
-            ret$overview$venn <- makeHTMLReportPlot("venn", outPath, "plotVenn", list(fGroups), width = 7, height = 7)
+            ret$overview$venn <- makeHTMLReportPlot("venn", outPath, "plotVenn", list(fGroups, aggregate = aggr),
+                                                    width = 7, height = 7)
         }
         
         if ("upset" %in% settings$summary)
-            ret$overview$UpSet <- makeHTMLReportPlot("upset", outPath, "plotUpSet", list(fGroups), doPrint = TRUE,
-                                                     width = 7, height = 7)
+            ret$overview$UpSet <- makeHTMLReportPlot("upset", outPath, "plotUpSet", list(fGroups, aggregate = aggr),
+                                                     doPrint = TRUE, width = 7, height = 7)
     }
     cat(" Done!\n")
     

@@ -536,7 +536,7 @@ reportHTMLUtils$methods(
                                        checked = TRUE)),
             maybeInclUI(hasFQualities(), list(value = "qualities", name = "Quality scores")),
             maybeInclUI(!is.null(chromMobTitle), list(value = "chrom_mob_large", name = chromMobTitle))
-        ), toggleExpand = TRUE)
+        ), toggleExpand = !is.null(gb))
     },
     
     mainTabToClass = function(main) if (main) "detailsMainTable" else "detailsCandTable",

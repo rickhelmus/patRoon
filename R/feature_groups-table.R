@@ -433,7 +433,7 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
         return(data.table(mz = numeric(), ret = numeric(), group = character()))
 
     intColNames <- if (averageBy == "fGroups") "intensity" else getADTIntCols(unique(anaInfo[[averageBy]]))    
-    if (!isFALSE(regression) && (sum(!is.na(anaInfo[[regression]]) < 2) || averageBy == "fGroups"))
+    if (!isFALSE(regression) && (sum(!is.na(anaInfo[[regression]])) < 2 || averageBy == "fGroups"))
         regression <- FALSE
     addQualities <- !isFALSE(qualities) && qualities %in% c("both", "quality") && hasFGroupScores(fGroups)
     addScores <- !isFALSE(qualities) && qualities %in% c("both", "score") && hasFGroupScores(fGroups)

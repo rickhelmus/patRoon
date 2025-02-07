@@ -705,7 +705,7 @@ reportHTMLUtils$methods(
                                 maybeInclUI(hasSets(), list(value = "set", name = "Set"))
                             ), columnToggles = maybeInclUI(hasFQualities(), list(
                                 list(value = "qualities", name = "Quality scores")
-                            )), toggleExpand = TRUE)
+                            )), groupByDef = "", toggleExpand = TRUE)
                         ),
                         bslib::card_body(genFeaturesTable())
                     ),

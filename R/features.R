@@ -504,20 +504,18 @@ setMethod("getBPCs", "features", function(obj, retentionRange = NULL, MSLevel = 
 #' @describeIn features Plots the TICs of the analyses.
 #' @export
 setMethod("plotTICs", "features", function(obj, retentionRange = NULL, MSLevel = 1, retMin = FALSE, title = NULL, 
-                                           colourBy = c("none", "analyses", "rGroups"), showLegend = TRUE, xlim = NULL, 
-                                           ylim = NULL, ...)
+                                           groupBy = NULL, showLegend = TRUE, xlim = NULL,  ylim = NULL, ...)
 {
-    plotTICs(analysisInfo(obj), retentionRange, MSLevel, retMin, title, colourBy, showLegend, xlim, ylim, ...)
+    plotTICs(analysisInfo(obj), retentionRange, MSLevel, retMin, title, groupBy, showLegend, xlim, ylim, ...)
 })
 
 
 #' @describeIn features Plots the BPCs of the analyses.
 #' @export
 setMethod("plotBPCs", "features", function(obj, retentionRange = NULL, MSLevel = 1, retMin = FALSE, title = NULL,
-                                           colourBy = c("none", "analyses", "rGroups"), showLegend = TRUE, xlim = NULL, 
-                                           ylim = NULL, ...)
+                                           groupBy = NULL, showLegend = TRUE, xlim = NULL,  ylim = NULL, ...)
 {
-    plotBPCs(analysisInfo(obj), retentionRange, MSLevel, retMin, title, colourBy, showLegend, xlim, ylim, ...)
+    plotBPCs(analysisInfo(obj), retentionRange, MSLevel, retMin, title, groupBy, showLegend, xlim, ylim, ...)
 })
 
 

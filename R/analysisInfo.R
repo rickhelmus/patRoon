@@ -84,24 +84,42 @@ setMethod("getBPCs", "data.frame", function(obj, retentionRange = NULL, MSLevel 
 #' @describeIn analysisinfo-dataframe Plots the TICs of the analyses.
 #' @param retMin Plot retention time in minutes (instead of seconds).
 #' @param title Character string used for title of the plot. If \code{NULL} a title will be automatically generated.
-#' @param colourBy Sets the automatic colour selection: "none" for a single colour or "analyses"/"rGroups" for a
+#' @param groupBy Sets the automatic colour selection: "none" for a single colour or "analyses"/"rGroups" for a
 #'   distinct colour per analysis or analysis replicate.
 #' @param showLegend Plot a legend if TRUE.
 #' @template plot-lim
+
 #' @export
 setMethod("plotTICs", "data.frame", function(obj, retentionRange = NULL, MSLevel = 1, retMin = FALSE, title = NULL, 
-                                             colourBy = c("none", "analyses", "rGroups"), showLegend = TRUE, xlim = NULL, 
-                                             ylim = NULL, ...)
+                                             groupBy = NULL, showLegend = TRUE, xlim = NULL,  ylim = NULL, ...)
 {
-    doPlotHeaders(obj, what = "tic", retentionRange, MSLevel, retMin, title, colourBy, showLegend, xlim, ylim, ...)
+    doPlotHeaders(as.data.table(obj), what = "tic", retentionRange, MSLevel, retMin, title, groupBy, showLegend, xlim,
+                  ylim, ...)
 })
 
 
 #' @describeIn analysisinfo-dataframe Plots the BPCs of the analyses.
 #' @export
 setMethod("plotBPCs", "data.frame", function(obj, retentionRange = NULL, MSLevel = 1, retMin = FALSE, title = NULL,
-                                             colourBy = c("none", "analyses", "rGroups"), showLegend = TRUE, xlim = NULL, 
-                                             ylim = NULL, ...)
+                                             groupBy = NULL, showLegend = TRUE, xlim = NULL,  ylim = NULL, ...)
 {
-    doPlotHeaders(obj, what = "bpc", retentionRange, MSLevel, retMin, title, colourBy, showLegend, xlim, ylim, ...)
+    doPlotHeaders(as.data.table(obj), what = "bpc", retentionRange, MSLevel, retMin, title, groupBy, showLegend, xlim,
+                  ylim, ...)
+})
+
+#' @rdname analysisinfo-dataframe
+#' @export
+setMethod("plotTICs", "data.table", function(obj, retentionRange = NULL, MSLevel = 1, retMin = FALSE, title = NULL, 
+                                             groupBy = NULL, showLegend = TRUE, xlim = NULL,  ylim = NULL, ...)
+{
+    doPlotHeaders(obj, what = "tic", retentionRange, MSLevel, retMin, title, groupBy, showLegend, xlim, ylim, ...)
+})
+
+#' @rdname analysisinfo-dataframe
+#' @describeIn analysisinfo-dataframe Plots the BPCs of the analyses.
+#' @export
+setMethod("plotBPCs", "data.table", function(obj, retentionRange = NULL, MSLevel = 1, retMin = FALSE, title = NULL,
+                                             groupBy = NULL, showLegend = TRUE, xlim = NULL,  ylim = NULL, ...)
+{
+    doPlotHeaders(obj, what = "bpc", retentionRange, MSLevel, retMin, title, groupBy, showLegend, xlim, ylim, ...)
 })

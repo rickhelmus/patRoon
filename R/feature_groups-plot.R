@@ -926,17 +926,15 @@ setMethod("plotGraph", "featureGroupsSet", function(obj, onlyPresent = TRUE, set
 #' @describeIn featureGroups Plots the total ion chromatogram/s (TICs) of the analyses.
 #' @export
 setMethod("plotTICs", "featureGroups", function(obj, retentionRange = NULL, MSLevel = 1, retMin = FALSE, title = NULL,
-                                                colourBy = c("none", "analyses", "rGroups"), showLegend = TRUE,
-                                                xlim = NULL, ylim = NULL, ...)
+                                                groupBy = NULL, showLegend = TRUE, xlim = NULL, ylim = NULL, ...)
 {
-    plotTICs(obj@features, retentionRange, MSLevel, retMin, title, colourBy, showLegend, xlim, ylim, ...)
+    plotTICs(obj@features, retentionRange, MSLevel, retMin, title, groupBy, showLegend, xlim, ylim, ...)
 })
 
 #' @describeIn featureGroups Plots the base peak chromatogram/s (BPCs) of the analyses.
 #' @export
 setMethod("plotBPCs", "featureGroups", function(obj, retentionRange = NULL, MSLevel = 1, retMin = FALSE, title = NULL,
-                                                colourBy = c("none", "analyses", "rGroups"), showLegend = TRUE,
-                                                xlim = NULL, ylim = NULL, ...)
+                                                groupBy = NULL, showLegend = TRUE, xlim = NULL, ylim = NULL, ...)
 {
-    plotBPCs(obj@features, retentionRange, MSLevel, retMin, title, colourBy, showLegend, xlim, ylim, ...)
+    plotBPCs(obj@features, retentionRange, MSLevel, retMin, title, groupBy, showLegend, xlim, ylim, ...)
 })

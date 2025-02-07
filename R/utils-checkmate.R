@@ -926,7 +926,7 @@ assertPlotEIXArgs <- function(obj, analysis, groupName, showPeakArea, showFGroup
     aapply(checkmate::assertFlag, . ~ showPeakArea + showFGroupRect + showLegend + showProgress,
            fixed = list(add = add))
     checkmate::assertString(title, null.ok = TRUE, add = add)
-    checkmate::assertChoice(groupBy, c("fGroups", names(analysisInfo(obj))), null.ok = TRUE, add = add)
+    assertAnaInfoBy(groupBy, analysisInfo(obj), TRUE, null.ok = TRUE, add = add)
     annotate <- checkmate::matchArg(annotate, c("none", "ret", "mz", "mob"), several.ok = TRUE, add = add)
     assertXYLim(xlim, ylim, add = add)
 }

@@ -680,15 +680,15 @@ noDataPlot <- function() textPlot("no data to plot")
 withSVGLite <- withr::with_(function(file, ...) svglite::svglite(file, ...), function(old) dev.off())
 
 doPlotHeaders <- function(obj, what = "tic", retentionRange, MSLevel, retMin = FALSE, title = NULL, 
-                          colourBy = c("none", "analyses", "rGroups"), showLegend = TRUE, xlim = NULL, ylim = NULL, ...)
+                          groupBy = NULL, showLegend = TRUE, xlim = NULL, ylim = NULL, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertString(title, null.ok = TRUE, add = ac)
-    colourBy <- checkmate::matchArg(colourBy, c("none", "analyses", "rGroups"), add = ac)
+    assertAnaInfoBy(groupBy, obj, FALSE, null.ok = TRUE, add = ac)
     assertXYLim(xlim, ylim, add = ac)
     checkmate::reportAssertions(ac)
     
-    if (showLegend && colourBy == "none")
+    if (showLegend && is.null(groupBy))
         showLegend <- FALSE
     
     if ("tic" %in% what)
@@ -707,23 +707,19 @@ doPlotHeaders <- function(obj, what = "tic", retentionRange, MSLevel, retMin = F
     obj <- obj[obj$analysis %chin% unique(data$analysis), ]
     anas <- obj$analysis
     anaCount <- length(anas)
-    replicates <- unique(obj$group)
+    reps <- unique(obj$replicate)
     
-    if (colourBy == "rGroups")
-    {
-        PlotColors <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(length(replicates))
-        names(PlotColors) <- replicates
-    }
-    else if (colourBy == "analyses")
-    {
-        PlotColors <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(anaCount)
-        names(PlotColors) <- anas
-    }
+    if (is.null(groupBy))
+        plotColors <- "blue"
     else
-        PlotColors <- "blue"
+    {
+        colgrps <- unique(obj[[groupBy]])
+        plotColors <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(length(colgrps))
+        names(plotColors) <- colgrps
+    }
     
-    fillColors <- adjustcolor(PlotColors, alpha.f = 0.35)
-    names(fillColors) <- names(PlotColors)
+    fillColors <- adjustcolor(plotColors, alpha.f = 0.35)
+    names(fillColors) <- names(plotColors)
     
     if (is.null(xlim))
     {
@@ -747,10 +743,8 @@ doPlotHeaders <- function(obj, what = "tic", retentionRange, MSLevel, retMin = F
     {
         makeLegend <- function(x, y, ...)
         {
-            texts <- if (colourBy == "rGroups") replicates else anas
-            return(legend(x, y, texts, col = PlotColors[texts],
-                          text.col = PlotColors[texts], lty = 1,
-                          xpd = NA, ncol = 1, cex = 0.75, bty = "n", ...))
+            return(legend(x, y, names(plotColors), col = plotColors, text.col = plotColors, lty = 1, xpd = NA, ncol = 1,
+                          cex = 0.75, bty = "n", ...))
         }
         
         plot.new()
@@ -772,15 +766,13 @@ doPlotHeaders <- function(obj, what = "tic", retentionRange, MSLevel, retMin = F
         
         if (nrow(anadt) == 0)
             next
-        
-        if (colourBy == "rGroups")
-            colInd <- obj$group[match(ana, obj$analysis)]
-        else if (colourBy == "analyses")
-            colInd <- ana
-        else
+
+        if (is.null(groupBy))
             colInd <- 1
+        else
+            colInd <- obj[match(ana, analysis)][[groupBy]]
         
-        points(if (retMin) anadt$ret / 60 else anadt$ret, anadt$intensity, type = "l", col = PlotColors[colInd])
+        points(if (retMin) anadt$ret / 60 else anadt$ret, anadt$intensity, type = "l", col = plotColors[colInd])
     }
     
     if (showLegend)

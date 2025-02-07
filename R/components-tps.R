@@ -829,7 +829,7 @@ setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroups
                     
                     if (!is.null(unsetFormulas[[s]]) || !is.null(unsetCompounds[[s]]))
                     {
-                        # calculate per set spectrum similarities
+                        # calculate per set ann similarities
                         # UNDONE: also for each candidate?
                         sims <- genTPAnnSimilarities(parentFG, cmp$group, unsetMSPeakLists[[s]], unsetFormulas[[s]],
                                                      unsetCompounds[[s]])

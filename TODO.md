@@ -34,6 +34,9 @@
         - improve code distribution over files
         - finish up
             - make title/href configurable?
+- TPs
+    - add set specific frag/NL matches for candidates
+        - report them?
             
 
 ## newProject()
@@ -46,8 +49,6 @@
 - rename estimateIDLevels() and have the same name as annotateSuspects()?
 
 - TP components
-    - add set specific frag/NL matches for candidates
-        - report them?
     - report()
         - BUG: JS errors when fGroups are subset/do not contain TPs anymore?
         - remove reportHTML()?
@@ -218,11 +219,9 @@
     - store it in an option? or otherwise in EICParams for fGroups?
     - remove default in doGetEICs() when finished
     - also use it for MSPL and EIMs?
-- getEICList(): do mob assignment from base peak instead of average
 - MT
     - test ThreadExceptionHandler a bit more, eg if subsequent run calls cancels well if an exception is caught
 - cleanup
-    - remove verifyDataCentroided()
     - remove now unused avgParams (eg averaging func)
     - get fully rid of precursorMzWindow (eg newProject()) and update NEWS/docs
     - move old MSPL generators to deprecate.R and add notifications

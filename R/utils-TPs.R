@@ -1,4 +1,4 @@
-getTPParents <- function(parents, skipInvalid, prefCalcChemProps, neutralChemProps, calcLogP, checkWhat = "SMILES")
+getTPParents <- function(parents, skipInvalid, prefCalcChemProps, neutralChemProps, checkWhat = "SMILES")
 {
     if ((is.data.frame(parents) && nrow(parents) == 0) || length(parents) == 0)
         return(data.table(name = character(), SMILES = character(), InChI = character(), InChIKey = character(),

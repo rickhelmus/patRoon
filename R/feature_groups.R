@@ -794,7 +794,6 @@ setMethod("overlap", "featureGroups", function(fGroups, which, aggregate, exclus
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assert(checkmate::checkSubset(which, groups, empty.ok = FALSE),
-                      checkmate::checkList(which, "character", any.missing = FALSE),
                       checkmate::checkNull(which),
                       .var.name = "which", add = ac)
     checkmate::assertFlag(exclusive, add = ac)
@@ -806,12 +805,12 @@ setMethod("overlap", "featureGroups", function(fGroups, which, aggregate, exclus
     if (length(which) < 2 || length(fGroups) == 0)
         return(fGroups) # nothing to do...
 
-    fGroupsList <- lapply(which, function(w) fGroups[anaInfo[get(aggregate) %in% w]$analysis])
+    fGroupsList <- lapply(which, function(w) fGroups[anaInfo[get(aggregate) == w]$analysis])
     ov <- Reduce(intersect, lapply(fGroupsList, names))
     ret <- fGroups[, ov]
 
     if (exclusive)
-        ret <- unique(ret, which = unlist(which), aggregate = aggregate)
+        ret <- unique(ret, which = which, aggregate = aggregate)
     
     return(ret)
 })

@@ -687,6 +687,8 @@ setMethod("generateCompoundsMetFrag", "featureGroups", function(fGroups, MSPeakL
 
     if (method == "CL")
     {
+        if (!isLocalDB)
+            withr::local_options(list(patRoon.MP.maxProcs = 1))
         results <- executeMultiProcess(runData, finishHandler = patRoon:::MFMPFinishHandler,
                                        timeoutHandler = patRoon:::MFMPTimeoutHandler,
                                        errorHandler = patRoon:::MFMPErrorHandler,

@@ -240,7 +240,7 @@ setMethod("getPICSet", "features", function(obj, loadRawData = TRUE, IMS = FALSE
     
     anaInfo <- analysisInfo(obj)
     fTable <- featureTable(obj)
-    EICs <- if (loadRawData) getFeatureEIXs(obj, "EIC", EICParams = EICParams) else NULL
+    EICs <- if (loadRawData) getFeatureEIXs(obj, "EIC", EIXParams = EICParams) else NULL
     MSMeta <- if (loadRawData)
     {
         applyMSData(anaInfo, showProgress = FALSE, func = function(ana, path, backend)

@@ -234,11 +234,11 @@ checkFeaturesInterface$methods(
                 not <- showNotification("Loading EICs...", duration = NULL, closeButton = FALSE, type = "message")
                 if (input$fGroupPlotMode == "topMostByRGroup")
                     EICsTopMostRG <<- getFeatureEIXs(fGroups, type = "EIC",
-                                                     EICParams = modifyList(EICParams, list(topMost = 1,
                                                                                             topMostByRGroup = TRUE)))
+                                                     EIXParams = modifyList(EICParams, list(topMost = 1,
                 else
                     EICsAll <<- getFeatureEIXs(fGroups, type = "EIC",
-                                               EICParams = modifyList(EICParams, list(topMost = NULL), keep.null = TRUE))
+                                               EIXParams = modifyList(EICParams, list(topMost = NULL), keep.null = TRUE))
                 removeNotification(not)
             }
             rValues$fGroupPlotMode <- input$fGroupPlotMode

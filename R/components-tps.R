@@ -105,7 +105,6 @@ getTPComponCandidatesScr <- function(prods, TPGroups, MSPeakLists, formulas, com
         return(NULL)
     
     # limit columns a bit to not bloat components too much
-    # UNDONE: column selection OK?
     tab <- copy(prods)
     tab <- subsetDTColumnsIfPresent(tab, c("name", "compoundName", "SMILES", "InChI", "InChIKey", "formula",
                                            "molNeutralized", "CID", "mass", "retDir", "trans_add",
@@ -488,7 +487,7 @@ setMethod("filter", "componentsTPs", function(obj, ..., retDirMatch = FALSE,
     if (length(obj) == 0)
         return(obj)
     
-    if (!is.null(formulas) && is.null(obj[[1]][["trans_add"]]))
+    if (!is.null(formulas) && (is.null(obj[[1]][["candidates"]]) || is.null(obj[[1]]$candidates[[1]][["trans_add"]])))
         stop("formula filter is only available for logic TP products")
     
     old <- obj
@@ -533,40 +532,60 @@ setMethod("filter", "componentsTPs", function(obj, ..., retDirMatch = FALSE,
             ct <- minColFilter(ct, "totalFragmentMatches", minFragMatches)
             ct <- minColFilter(ct, "totalNeutralLossMatches", minNLMatches)
             
-            if (!is.null(formulas))
-            {
-                # check if subtracting is possible, ie by checking if subtraction doesn't lead to negative element
-                # counts
-                canSub <- function(f, ft)
-                {
-                    if (is.null(ft) || length(f) == 0 || !nzchar(f))
-                        return(TRUE) # UNDONE?
-                    candidateForms <- unique(ft$neutral_formula)
-                    for (cf in candidateForms)
-                    {
-                        fl <- splitFormulaToList(subtractFormula(cf, f))
-                        if (all(fl >= 0))
-                            return(TRUE)
-                    }
-                    return(FALSE)
-                }
-                if (negate)
-                    canSub <- Negate(canSub)
-                
-                parentFG <- componentInfo(obj)[name == cmp]$parent_group
-                if (!is.null(formulas[[parentFG]]))
-                {
-                    # filter results where subtraction of any of the parent formulas is impossible
-                    ct[keep == TRUE & nzchar(trans_sub), keep := sapply(trans_sub, canSub, formulas[[parentFG]])]
-                }
-                
-                # filter results where addition is not part of TP candidate formulas
-                ct[keep == TRUE & nzchar(trans_add), keep := mapply(trans_add, annotations(formulas)[group],
-                                                                    FUN = canSub)]
-            }
-            
             return(!ct$keep)
         })
+        
+        if (!is.null(formulas))
+        {
+            # check if subtracting is possible, ie by checking if subtraction doesn't lead to negative element
+            # counts
+            canSub <- function(f, ft)
+            {
+                if (is.null(ft) || length(f) == 0 || !nzchar(f))
+                    return(TRUE) # UNDONE?
+                candidateForms <- unique(ft$neutral_formula)
+                for (cf in candidateForms)
+                {
+                    fl <- splitFormulaToList(subtractFormula(cf, f))
+                    if (all(fl >= 0))
+                        return(TRUE)
+                }
+                return(FALSE)
+            }
+            if (negate)
+                canSub <- Negate(canSub)
+            
+            obj@components <- Map(names(obj), componentTable(obj), f = function(cmpName, cmpTab)
+            {
+                cmpTab <- copy(cmpTab)
+                parentFG <- componentInfo(obj)[name == cmpName]$parent_group
+                
+                cmpTab[, candidates := Map(group, candidates, f = function(grp, ct)
+                {
+                    ct <- copy(ct)
+                    ct[, keep := TRUE]
+
+                    if (!is.null(formulas[[parentFG]]))
+                    {
+                        # filter results where subtraction of any of the parent formulas is impossible
+                        ct[keep == TRUE & nzchar(trans_sub), keep := sapply(trans_sub, canSub, formulas[[parentFG]])]
+                    }
+                    
+                    # filter results where addition is not part of TP candidate formulas
+                    ct[keep == TRUE & nzchar(trans_add), keep := sapply(trans_add, canSub, annotations(formulas)[[grp]])]
+                    
+                    return(ct[keep == TRUE][, keep := NULL])
+                })]
+                return(cmpTab)
+            })
+            
+            # prune component rows w/out candidates
+            obj <- delete(obj, j = function(ct, ...)
+            {
+                return(sapply(ct$candidates, function(cand) nrow(cand) == 0))
+            })
+        }
+        
         
         if (verbose)
             printComponentsFiltered(old, obj)
@@ -792,6 +811,7 @@ setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroups
                     if (!is.null(unsetFormulas[[s]]) || !is.null(unsetCompounds[[s]]))
                     {
                         # calculate per set spectrum similarities
+                        # UNDONE: also for each candidate?
                         sims <- genTPAnnSimilarities(parentFG, cmp$group, unsetMSPeakLists[[s]], unsetFormulas[[s]],
                                                      unsetCompounds[[s]])
                         annColNames <- paste0(c("totalFragmentMatches", "totalNeutralLossMatches"), "-", s)

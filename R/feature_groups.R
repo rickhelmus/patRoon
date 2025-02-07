@@ -18,8 +18,8 @@ NULL
 #' features across analyses.
 #'
 #' @param fGroups,obj,x,object \code{featureGroups} object to be accessed.
-#' @param rGroups For \code{[}: An optional \code{character} vector: if specified only keep results for the given
-#'   replicate groups (equivalent to the \code{rGroups} argument to \code{\link[=filter,featureGroups-method]{filter}}).
+#' @param replicates For \code{[}: An optional \code{character} vector: if specified only keep results for the given
+#'   replicates (equivalent to the \code{replicates} argument to \code{\link[=filter,featureGroups-method]{filter}}).
 #' @param \dots For the \code{"["} operator: ignored.
 #'
 #'   For \code{delete}: passed to the function specified as \code{j}.
@@ -27,7 +27,7 @@ NULL
 #'   For \code{normInts}: passed to \code{\link{screenSuspects}} if \code{featNorm="istd"}.
 #'
 #'   \setsPassedArgs1{featureGroups}
-#' @param average If \code{TRUE} then data within replicate groups are averaged.
+#' @param average If \code{TRUE} then data within replicates are averaged.
 #'
 #'   For \code{as.data.table}: if \code{features=TRUE} other feature properties are also averaged.
 #' @param averageFunc Function used for averaging. Only used when \code{average=TRUE} or \code{FCParams != NULL}.
@@ -39,9 +39,9 @@ NULL
 #'
 #'   For \code{as.data.table}: if no normalization data is available (\emph{e.g.} because \code{normInts} was not used)
 #'   then an automatic group normalization is performed.
-#' @param which A character vector with replicate groups used for comparison.
+#' @param which A character vector with replicates used for comparison.
 #'
-#'   For \code{overlap}: can also be a \code{list} of \code{character} vectors with replicate groups to compare. For
+#'   For \code{overlap}: can also be a \code{list} of \code{character} vectors with replicates to compare. For
 #'   instance, \code{which=list(c("samp1", "samp2"), c("samp3", "samp4"))} returns the overlap between
 #'   \code{"samp1"}+\code{"samp2"} and \code{"samp3"}+\code{"samp4"}.
 #' @param FCParams A parameter list to calculate Fold change data. See \code{getFCParams} for more details. Set to
@@ -172,10 +172,10 @@ setMethod("names", "featureGroups", function(x) names(x@groups))
 setMethod("analyses", "featureGroups", function(obj) analysisInfo(obj)$analysis)
 
 #' @templateVar class featureGroups
-#' @templateVar what replicate groups
+#' @templateVar what replicates
 #' @template strmethod
 #' @export
-setMethod("replicateGroups", "featureGroups", function(obj) unique(analysisInfo(obj)$group))
+setMethod("replicates", "featureGroups", function(obj) unique(analysisInfo(obj)$replicate))
 
 #' @describeIn featureGroups Same as \code{names}. Provided for consistency to other classes.
 #' @export
@@ -401,13 +401,13 @@ setMethod("toxicities", "featureGroups", function(fGroups) fGroups@toxicities)
 #'   can be specified in a \code{list}: in this case a feature group is kept if it has a result in \emph{any} of the
 #'   objects (equivalent to the \code{results} argument to \code{\link[=filter,featureGroups-method]{filter}}).
 #' @export
-setMethod("[", c("featureGroups", "ANY", "ANY", "missing"), function(x, i, j, ..., ni, rGroups, IMS, results,
+setMethod("[", c("featureGroups", "ANY", "ANY", "missing"), function(x, i, j, ..., ni, replicates, IMS, results,
                                                                      reorder = FALSE, drop = TRUE)
 {
     checkmate::assertFlag(reorder)
     
-    if (!missing(rGroups))
-        x <- filter(x, rGroups = rGroups)
+    if (!missing(replicates))
+        x <- filter(x, replicates = replicates)
     if (!missing(IMS))
         x <- filter(x, IMS = IMS)
     if (!missing(results))
@@ -702,13 +702,13 @@ setMethod("export", "featureGroups", function(obj, type, out, IMS = FALSE)
 })
 
 #' @describeIn featureGroups Obtain a subset with unique feature groups
-#'   present in one or more specified replicate group(s).
-#' @param relativeTo A character vector with replicate groups that should be
-#'   used for unique comparison. If \code{NULL} then all replicate groups are
-#'   used for comparison. Replicate groups specified in \code{which} are
+#'   present in one or more specified replicate(s).
+#' @param relativeTo A character vector with replicates that should be
+#'   used for unique comparison. If \code{NULL} then all replicates are
+#'   used for comparison. replicates specified in \code{which} are
 #'   ignored.
 #' @param outer If \code{TRUE} then only feature groups are kept which do not
-#'   overlap between the specified replicate groups for the \code{which}
+#'   overlap between the specified replicates for the \code{which}
 #'   parameter.
 #' @export
 setMethod("unique", "featureGroups", function(x, which, aggregate = TRUE, relativeTo = NULL, outer = FALSE)
@@ -756,9 +756,9 @@ setMethod("unique", "featureGroups", function(x, which, aggregate = TRUE, relati
 })
 
 #' @describeIn featureGroups Obtain a subset with feature groups that overlap
-#'   between a set of specified replicate group(s).
+#'   between a set of specified replicate(s).
 #' @param exclusive If \code{TRUE} then all feature groups are removed that are
-#'   not unique to the given replicate groups.
+#'   not unique to the given replicates.
 #' @aliases overlap
 #' @export
 setMethod("overlap", "featureGroups", function(fGroups, which, aggregate, exclusive)

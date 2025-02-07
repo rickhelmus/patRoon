@@ -148,12 +148,12 @@ NULL
 #' \item \code{analysis} the file name \strong{without} extension. Must be \strong{unique}, even if the \code{path} is
 #' different.
 #'
-#' \item \code{group} name of \emph{replicate group}. A replicate group is used to group analyses together that are
-#' replicates of each other. Thus, the \code{group} column for all  analyses considered to be belonging to the same
-#' replicate group should have an equal (but unique) value. Used for \emph{e.g.} averaging and
+#' \item \code{replicate} name of the \emph{replicate}. Used to group analyses together that are
+#' replicates of each other. Thus, the \code{replicate} column for all analyses considered to be belonging to the same
+#' replicate should have an equal (but unique) value. Used for \emph{e.g.} averaging and
 #' \code{\link[=filter,featureGroups-method]{filter}}.
 #'
-#' \item \code{blank} all analyses within this replicate group are used by the \code{featureGroups} method of
+#' \item \code{blank} all analyses within this replicate are used by the \code{featureGroups} method of
 #' \code{\link[=filter,featureGroups-method]{filter}} for blank subtraction. Multiple entries can be entered by
 #' separation with a comma.
 #'
@@ -472,7 +472,7 @@ NULL
 #'
 #' @template EICParams-arg
 #' 
-#' @note The \code{topMost} and \code{topMostByRGroup} EIC parameters (\code{\link{EICParams}}) are ignored.
+#' @note The \code{topMost} and \code{topMostByReplicate} EIC parameters (\code{\link{EICParams}}) are ignored.
 #'
 #' @references \insertRef{Chetnik2020}{patRoon}
 #'
@@ -510,7 +510,7 @@ NULL
 #' @param calibConcUnit The concentration unit used in the calibrants table. For possible values see the \code{concUnit}
 #'   argument.
 #' @param concs A \code{data.frame} with concentration data. See the \verb{Calibration} section below.
-#' @param average Set to \code{TRUE} to average intensity values within replicate groups.
+#' @param average Set to \code{TRUE} to average intensity values within replicates.
 #'
 #' @templateVar scoreName response factor
 #' @templateVar scoreWeightName scoreWeight
@@ -553,10 +553,10 @@ NULL
 #'   \code{getQuantCalibFromScreening} function still requires you to specify concentration data, which is achieved via
 #'   the \code{concs} argument. This should be a \code{data.frame} with a column \code{name} corresponding to the
 #'   calibrant name (\emph{i.e.} same as used by \code{screenSuspects} above) and columns with concentration data. The
-#'   latter columns specify the concentrations of a calibrant in different replicate groups (as defined in the
+#'   latter columns specify the concentrations of a calibrant in different replicates (as defined in the
 #'   \link[=analysis-information]{analysis information}). The concentration columns should be named after the
-#'   corresponding replicate group. Only those replicate groups that should be used for calibration need to be included.
-#'   Furthermore, \code{NA} values can be used if a replicate group should be ignored for a specific calibrant.
+#'   corresponding replicate. Only those replicates that should be used for calibration need to be included.
+#'   Furthermore, \code{NA} values can be used if a replicate should be ignored for a specific calibrant.
 #'
 #' @templateVar whatPred response factors
 #' @templateVar predFunc predictRespFactors

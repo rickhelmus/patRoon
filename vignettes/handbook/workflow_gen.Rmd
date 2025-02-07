@@ -181,8 +181,8 @@ The final bits of preparation is constructing the information for the analyses t
 
 * **path**: the directory path of the file containing the analysis data
 * **analysis**: the name of the analysis. This should be the file name _without_ file extension.
-* **group**: to which _replicate group_ the analysis belongs. All analysis which are replicates of each other get the same name.
-* **blank**: which replicate group should be used for blank subtraction.
+* **replicate**: to which _replicate_ the analysis belongs. All analysis which are replicates of each other get the same name.
+* **blank**: which replicate should be used for blank subtraction.
 * **conc** (optional, advanced) A numeric value describing the concentration or any other value for which the intensity in this sample may correlate, for instance, dilution factor, sampling time etc. This column is only required when you want to obtain quantitative information (e.g. concentrations) using the `as.data.table()` method function (see `?featureGroups` for more information).
 
 The `generateAnalysisInfo()` function can be used to (semi-)automatically generate a suitable `data.frame` that contains all the required information for a set of analysis. For, instance:
@@ -309,7 +309,7 @@ fGroupsOMS2 <- groupFeatures(fListOMS2, "openms", rtalign = FALSE) # OpenMS grou
 fGroupsOMS3 <- groupFeatures(fListXCMS, "openms", maxGroupRT = 6) # group XCMS features with OpenMS, adjusted grouping parameter
 # group enviPick features with XCMS3, disable minFraction
 fGroupsXCMS <- groupFeatures(fListEP, "xcms3",
-                             xcms::PeakDensityParam(sampleGroups = analInfo$group,
+                             xcms::PeakDensityParam(sampleGroups = analInfo$replicate,
                                                     minFraction = 0))
 # group with KPIC2 and set some custom grouping/aligning parameters
 fGroupsKPIC2 <- groupFeatures(fListKPIC2, "kpic2", groupArgs = list(tolerance = c(0.002, 18)),
@@ -438,7 +438,7 @@ Feature group | _m/z_      | analysis 1 | analysis 2 | analysis 3
 
 Based on the mass differences from this example a cluster of `[M+H]+`, `[M+Na]+` and `[M+K]+` could be assumed. However, no features of the first two feature groups were detected in the third sample analysis, whereas the third feature group wasn't detected in the first two sample analysis. Based on this it seems unlikely that feature group _#3_ should be part of the component.
 
-For the algorithms that operate on a 'feature group level' ([CAMERA] and [RAMClustR]), the `relMinReplicates` argument can be used to remove feature groups from a component that are not abundant. For instance, when this value is _0.5_ (the default), and all the features of a component were detected in four different replicate groups in total, then only those feature groups are kept for which its features were detected in at least two different replicate groups (_i.e._ half of four).
+For the algorithms that operate on a 'feature group level' ([CAMERA] and [RAMClustR]), the `relMinReplicates` argument can be used to remove feature groups from a component that are not abundant. For instance, when this value is _0.5_ (the default), and all the features of a component were detected in four different replicates in total, then only those feature groups are kept for which its features were detected in at least two different replicates (_i.e._ half of four).
 
 Another approach to reduce unlikely adduct annotations is to use algorithms that operate on a 'feature level' ([cliqueMS] and [OpenMS]). These algorithms generate components for each sample analysis individually. The 'feature components' are then merged by a consensus approach where unlikely annotations are removed (the algorithm is described further in the reference manual, `?generateComponents`).
 
@@ -472,7 +472,7 @@ componCliqueMS <- generateComponents(fGroups, "cliquems", ionization = "negative
 
 ### Homologues series
 
-Homologues series can be automatically detected by interfacing with the [nontarget] R package. Components are made from feature groups that show increasing _m/z_ and retention time values. Series are first detected within each replicate group. Afterwards, series from all replicates are linked in case (partial) overlap occurs and this overlap consists of the _same_ feature groups (see figure below). Linked series are then finally merged if this will not cause any conflicts with other series: such a conflict typically occurs when two series are not only linked to each other.
+Homologues series can be automatically detected by interfacing with the [nontarget] R package. Components are made from feature groups that show increasing _m/z_ and retention time values. Series are first detected within each replicate. Afterwards, series from all replicates are linked in case (partial) overlap occurs and this overlap consists of the _same_ feature groups (see figure below). Linked series are then finally merged if this will not cause any conflicts with other series: such a conflict typically occurs when two series are not only linked to each other.
 
 ```{r HS,echo=FALSE,fig.cap="**Linking of homologues series** top: partial overlap and will be linked; bottom: no linkage due to different feature in overlapping series.",out.width="100%"}
 plotGV("

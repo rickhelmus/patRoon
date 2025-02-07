@@ -47,10 +47,10 @@ makeInfoBox <- function(txt)
     sprintf("<div style='max-width: 300px; max-height: 432px; border: 1px solid black; border-style: dotted; margin: 1px; padding: 1px; overflow: auto; white-space: nowrap; text-align: left;'>%s</div>", txt)
 }
 
-rGroupLenNonEmpty <- length(unique(analysisInfo(removeEmptyAnalyses(rmdVars$fGroups))$group))
-rGroupLen <- length(replicateGroups(rmdVars$fGroups))
+rGroupLenNonEmpty <- length(unique(analysisInfo(removeEmptyAnalyses(rmdVars$fGroups))$replicate))
+rGroupLen <- length(replicates(rmdVars$fGroups))
 anyOverlap <- rGroupLen > 1 &&
-    length(unique(rmdVars$fGroups, which = replicateGroups(rmdVars$fGroups), outer = TRUE)) < length(rmdVars$fGroups)
+    length(unique(rmdVars$fGroups, which = replicates(rmdVars$fGroups), outer = TRUE)) < length(rmdVars$fGroups)
 if (length(rmdVars$fGroups) > 0 && anyOverlap && rGroupLenNonEmpty > 1)
 {
     doPlotChord <- "chord" %in% rmdVars$reportPlots && rGroupLenNonEmpty > 2
@@ -86,7 +86,7 @@ allPlots <- sapply(seq_len(length(rmdVars$fGroups)), function(grpi)
     path <- file.path(plotPathFull, sprintf("chrom_%d.png", grpi))
     makeCachedPlot(path, "plotChroms",
                    list(rmdVars$fGroups, groupName = names(rmdVars$fGroups)[grpi], EICParams = rmdVars$EICParams,
-                        retMin = rmdVars$retMin, EICs = rmdVars$EICs, groupBy = "rGroup"),
+                        retMin = rmdVars$retMin, EICs = rmdVars$EICs, groupBy = "replicate"),
                    7, 4.5, bg = NA, cacheDB = rmdVars$cacheDB)
     setTxtProgressBar(prog, grpi)
     return(path)

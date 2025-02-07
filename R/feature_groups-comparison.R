@@ -310,7 +310,7 @@ setMethod("consensus", "featureGroupsComparison", function(obj, absMinAbundance 
             uniqueFrom <- names(obj)[uniqueFrom]
         comparedFGroups <- unique(comparedFGroups, which = uniqueFrom,
                                   outer = uniqueOuter)
-        fGroupsList <- fGroupsList[replicateGroups(comparedFGroups)]
+        fGroupsList <- fGroupsList[replicates(comparedFGroups)]
     }
 
     compFeats <- featureTable(comparedFGroups)

@@ -8,11 +8,11 @@ appendMobToName <- function(n, mob) make.unique(sprintf("%s_I%.2f", n, mob)) # U
 
 showAnaInfo <- function(anaInfo)
 {
-    rGroups <- unique(anaInfo$group)
+    replicates <- unique(anaInfo$replicate)
     blGroups <- unique(anaInfo$blank)
     printf("Analyses: %s (%d total)\n", getStrListWithMax(anaInfo$analysis, 6, ", "), nrow(anaInfo))
-    printf("Replicate groups: %s (%d total)\n", getStrListWithMax(rGroups, 8, ", "), length(rGroups))
-    printf("Replicate groups used as blank: %s (%d total)\n", getStrListWithMax(blGroups, 8, ", "), length(blGroups))
+    printf("Replicates: %s (%d total)\n", getStrListWithMax(replicates, 8, ", "), length(replicates))
+    printf("Replicates used as blank: %s (%d total)\n", getStrListWithMax(blGroups, 8, ", "), length(blGroups))
 }
 
 checkAnaInfoAggrGrouping <- function(anaInfo, what, aggrBy, groupBy)
@@ -283,7 +283,7 @@ getDefEIXParams <- function()
 {
     list(
         topMost = NULL,
-        topMostByRGroup = FALSE,
+        topMostByReplicate = FALSE,
         onlyPresent = TRUE,
         mzExpWindow = 0.001,
         mobExpWindow = 0.005,
@@ -293,7 +293,7 @@ getDefEIXParams <- function()
     )
 }
 
-filterEIXs <- function(EIXs, fGroups, analysis = NULL, groupName = NULL, topMost = NULL, topMostByRGroup = FALSE,
+filterEIXs <- function(EIXs, fGroups, analysis = NULL, groupName = NULL, topMost = NULL, topMostByReplicate = FALSE,
                        onlyPresent = FALSE)
 {
     if (!is.null(analysis))
@@ -317,18 +317,18 @@ filterEIXs <- function(EIXs, fGroups, analysis = NULL, groupName = NULL, topMost
     if (!is.null(topMost))
     {
         gTable <- copy(groupTable(fGroups))
-        gTable[, c("analysis", "rGroup") := analysisInfo(fGroups)[, c("analysis", "group"), with = FALSE]]
+        gTable[, c("analysis", "replicate") := analysisInfo(fGroups)[, c("analysis", "replicate"), with = FALSE]]
         for (fg in names(fGroups))
         {
             anasWithFG <- Map(names(EIXs), EIXs, f = function(ana, aeic) if (fg %chin% names(aeic)) ana else character())
             anasWithFG <- pruneList(anasWithFG, checkEmptyElements = TRUE)
             anasWithFG <- unlist(anasWithFG)
-            tab <- gTable[analysis %chin% anasWithFG, c(fg, "analysis", "rGroup"), with = FALSE]
+            tab <- gTable[analysis %chin% anasWithFG, c(fg, "analysis", "replicate"), with = FALSE]
             if (nrow(tab) > 0)
             {
-                rmAnas <- if (topMostByRGroup)
+                rmAnas <- if (topMostByReplicate)
                 {
-                    tab[, rank := frank(-get(fg), ties.method = "first"), by = "rGroup"]
+                    tab[, rank := frank(-get(fg), ties.method = "first"), by = "replicate"]
                     tab[rank > topMost]$analysis
                 }
                 else if (nrow(tab) > topMost)
@@ -434,10 +434,10 @@ setMethod("getFeatureEIXInputTab", "featureGroups", function(obj, type, analysis
         
         if (!is.null(topMost))
         {
-            if (EIXParams$topMostByRGroup)
+            if (EIXParams$topMostByReplicate)
             {
-                ret[, rGroup := anaInfo$group[match(analysis, anaInfo$analysis)]]
-                ret[, rank := frank(-intensity, ties.method = "first"), by = "rGroup"]
+                ret[, replicate := anaInfo$replicate[match(analysis, anaInfo$analysis)]]
+                ret[, rank := frank(-intensity, ties.method = "first"), by = "replicate"]
                 ret <- ret[rank <= topMost]
             }
             else

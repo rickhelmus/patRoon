@@ -15,7 +15,7 @@ Generic                                             | Classes                   
 `show()`                                            | All                           | Prints general information.
 `"[["` / `"$"` operators                            | All                           | Extract general information, see below.
 `as.data.table()` / `as.data.frame()`               | All                           | Convert data to a `data.table` or `data.frame`, see below.
-`analysisInfo()`, `analyses()`, `replicateGroups()` | `features`, `featureGroups`   | Returns the [analysis information](#anaInfo), analyses or replicate groups for which this object contains data.
+`analysisInfo()`, `analyses()`, `replicates()` | `features`, `featureGroups`   | Returns the [analysis information](#anaInfo), analyses or replicates for which this object contains data.
 `groupInfo()`                                       | `featureGroups`               | Returns feature group information (_m/z_ and retention time values).
 `screenInfo()`                                      | `featureGroupsScreening`      | Returns information on hits from [suspect screening](#suspscr).
 `componentInfo()`                                   | `components`                  | Returns information for all components.
@@ -155,10 +155,10 @@ Filter                                     | Classes                     | Remar
 `absMinAnalyses`, `relMinAnalyses`         | `featureGroups`             | Minimum feature abundance in all analyses
 `absMinReplicates`, `relMinReplicates`     | `featureGroups`             | Minimum feature abundance in different replicates
 `absMinFeatures`, `relMinFeatures`         | `featureGroups`             | Only keep analyses with at least this amount of features 
-`absMinReplicateAbundance`, `relMinReplicateAbundance` | `featureGroups` | Minimum feature abundance in a replicate group
-`maxReplicateIntRSD`                       | `featureGroups`             | Maximum relative standard deviation of feature intensities in a replicate group.
+`absMinReplicateAbundance`, `relMinReplicateAbundance` | `featureGroups` | Minimum feature abundance in a replicate
+`maxReplicateIntRSD`                       | `featureGroups`             | Maximum relative standard deviation of feature intensities in a replicate.
 `blankThreshold`                           | `featureGroups`             | Minimum intensity factor above blank intensity
-`rGroups`                                  | `featureGroups`             | Only keep (features of) these replicate groups
+`replicate                                 | `featureGroups`             | Only keep (features of) these replicates
 `results`                                  | `featureGroups`             | Only keep feature groups with formula/compound annotations or componentization results
 
 Application of filters to feature data is important for (environmental) non-target analysis. Especially blank and replicate filters (i.e. `blankThreshold` and `absMinReplicateAbundance`/`relMinReplicateAbundance`) are important filters and are highly recommended to always apply for cleaning up your dataset.
@@ -168,11 +168,11 @@ All filters are available for feature group data, whereas only a subset is avail
 From the table above you can notice that many filters concern both _absolute_ and _relative_ data (i.e. as prefixed with `abs` and `rel`). When a relative filter is used the value is scaled between _0_ and _1_. For instance:
 
 ```{r filtFeatRel,eval=FALSE}
-# remove features not present in at least half of the analyses within a replicate group
+# remove features not present in at least half of the analyses within a replicate
 fGroups <- filter(fGroups, relMinReplicateAbundance = 0.5)
 ```
 
-An advantage of relative filters is that you will not have to worry about the data size involved. For instance, in the above example the filter always takes half of the number of analyses within a replicate group, even when replicate groups have different number of analyses.
+An advantage of relative filters is that you will not have to worry about the data size involved. For instance, in the above example the filter always takes half of the number of analyses within a replicate, even when replicates have different number of analyses.
 
 Note that multiple filters can be specified at once. Especially for feature group data the order of filtering may impact the final results, this is explained further in the reference manual (i.e. ``?`feature-filtering` ``).
 
@@ -185,7 +185,7 @@ fList <- filter(fList, retentionRange = c(120, Inf))
 # common filters for feature groups
 fGroups <- filter(fGroups,
                   absMinIntensity = 500, # remove features <500 intensity
-                  relMinReplicateAbundance = 1, # features should be in all analysis of replicate groups
+                  relMinReplicateAbundance = 1, # features should be in all analysis of replicates
                   maxReplicateIntRSD = 0.75, # remove features with intensity RSD in replicates >75%
                   blankThreshold = 5, # remove features <5x intensity of (average) blank intensity
                   removeBlanks = TRUE) # remove blank analyses from object afterwards
@@ -198,12 +198,12 @@ fGroups <- filter(fGroups,
 # remove features not present in at least 3 analyses
 fGroups <- filter(fGroups, absMinAnalyses = 3)
 
-# remove features not present in at least 20% of all replicate groups
+# remove features not present in at least 20% of all replicates
 fGroups <- filter(fGroups, relMinReplicates = 0.2)
 
-# only keep data present in replicate groups "repl1" and "repl2"
+# only keep data present in replicates "repl1" and "repl2"
 # all other features and analyses will be removed
-fGroups <- filter(fGroups, rGroups = c("repl1", "repl2"))
+fGroups <- filter(fGroups, replicates = c("repl1", "repl2"))
 
 # only keep feature groups with compound annotations
 fGroups <- filter(fGroups, results = compounds)
@@ -347,8 +347,8 @@ componNT <- filter(componNT, rtIncrement = c(10, 30),
 All filters support _negation_: if enabled all specified filters will be executed in an opposite manner. Negation may not be so commonly used, but allows greater flexibility which is sometimes needed for advanced filtering steps. Furthermore, it is also useful to specifically isolate the data that otherwise would have been removed. Some examples are shown below.
 
 ```{r filtNeg,eval=FALSE}
-# keep all features/analyses _not_ present from replicate groups "repl1" and "repl2"
-fGroups <- filter(fGroups, rGroups = c("repl1", "repl2"), negate = TRUE)
+# keep all features/analyses _not_ present from replicates "repl1" and "repl2"
+fGroups <- filter(fGroups, replicates = c("repl1", "repl2"), negate = TRUE)
 
 # only retain features with a mass defect outside 0.8-0.9
 fGroups <- filter(fGroups, mzDefectRange = c(0.8, 0.9), negate = TRUE)
@@ -434,11 +434,11 @@ components[c("CMP1", "CMP5")]
 components[, groupNames(compounds)]
 ```
 
-In addition, feature groups can also be subset by given replicate groups or annotation/componentization results (similar to `filter()`). Similarly, suspect screening results can also be subset by given suspect names.
+In addition, feature groups can also be subset by given replicates or annotation/componentization results (similar to `filter()`). Similarly, suspect screening results can also be subset by given suspect names.
 
-```{r subsetRGSusp,eval=FALSE}
-# equal as filter(fGroups, rGroups = ...)
-fGroups[rGroups = c("repl1", "repl2")]
+```{r subsetRepSusp,eval=FALSE}
+# equal as filter(fGroups, replicates = ...)
+fGroups[replicates = c("repl1", "repl2")]
 # equal as filter(fGroups, results = ...)
 fGroups[results = compounds]
 # only keep feature groups assigned to given suspects
@@ -475,7 +475,7 @@ A very simplified example of such a process is shown below.
 ```{r prioriEx,eval=FALSE}
 featTab <- as.data.frame(fGroups, average = TRUE)
 
-# prioritization: sort by (averaged) intensity of the "sample" replicate group
+# prioritization: sort by (averaged) intensity of the "sample" replicate
 # (from high to low) and then obtain the feature group identifiers of the top 5.
 featTab <- featTab[order(featTab$standard, decreasing = TRUE), ]
 groupsOfInterest <- featTab$group[1:5]
@@ -484,7 +484,7 @@ groupsOfInterest <- featTab$group[1:5]
 fGroups <- fGroups[, groupsOfInterest]
 
 # fGroups now only contains the feature groups for which intensity values in the
-# "sample" replicate group were in the top 5
+# "sample" replicate were in the top 5
 ```
 
 ## Deleting data
@@ -555,19 +555,19 @@ formulas <- delete(formulas, j = function(ft, ...) ft$error > 5)
 
 Often an analysis batch is composed of different sample groups, such as different treatments, influent/effluent etc. In such scenarios it may be highly interesting to evaluate uniqueness or overlap between these samples. Furthermore, extracting overlapping or unique features is a simple but effective prioritization strategy.
 
-The `overlap()` and `unique()` functions can be used to extract overlapping and unique features between replicate groups, respectively. Both functions return a subset of the given `featureGroups` object. An overview of their arguments is given below.
+The `overlap()` and `unique()` functions can be used to extract overlapping and unique features between replicates, respectively. Both functions return a subset of the given `featureGroups` object. An overview of their arguments is given below.
 
 Argument     | Function(s)             | Remarks
 ------------ | ----------------------- | ----------------------------------------------------------------
-`which`      | `unique()`, `overlap()` | The replicate groups to compare.
-`relativeTo` | `unique()`              | Only return unique features compared to these replicate groups (`NULL` for all). Replicate groups in `which` are ignored.
+`which`      | `unique()`, `overlap()` | The replicates to compare.
+`relativeTo` | `unique()`              | Only return unique features compared to these replicates (`NULL` for all). Replicates in `which` are ignored.
 `outer`      | `unique()`              | If `TRUE` then only return features which are _also_ unique among the compared replicates groups.
-`exclusive`  | `overlap`               | Only keep features that _only_ overlap between the compared replicate groups.
+`exclusive`  | `overlap`               | Only keep features that _only_ overlap between the compared replicates.
 
 Some examples:
 
 ```{r compUn,eval=FALSE}
-# only keep features uniquely present in replicate group "repl1"
+# only keep features uniquely present in replicate "repl1"
 fGroupsUn1 <- unique(fGroups, which = "repl1")
 # only keep features in repl1/repl2 which are not in repl3
 fGroupsUn2 <- unique(fGroups, which = c("repl1", "repl2"),
@@ -579,7 +579,7 @@ fGroupsUn3 <- unique(fGroups, which = c("repl1", "repl2"),
 # only keep features overlapping in repl1/repl2
 fGroupsOv1 <- overlap(fGroups, which = c("repl1", "repl2"))
 # only keep features overlapping in repl1/repl2 AND are not present in any other
-# replicate group
+# replicate
 fGroupsOv2 <- overlap(fGroups, which = c("repl1", "repl2"),
                       exclusive = TRUE)
 ```
@@ -679,7 +679,7 @@ Argument                                      | Generic                         
 `EICParams`                                   | `plotChroms()`                   | Advanced parameters to control the creation of extracted ion chromatograms (described below)
 `showPeakArea`, `showFGroupRect`              | `plotChroms()`                   | Fill peak areas / draw rectangles around feature groups?
 `title`                                       | `plotChroms()`, `plotSpectrum()` | Override plot title
-`colourBy`                                    | `plotChroms()`                   | Colour individual feature groups (`"fGroups"`) or replicate groups (`"rGroups"`). By default nothing is coloured (`"none"`)
+`colourBy`                                    | `plotChroms()`                   | Colour individual feature groups (`"fGroups"`) or replicates (`"rGroups"`). By default nothing is coloured (`"none"`)
 `showLegend`                                  | `plotChroms()`                   | Display a legend? (only if `colourBy!="none"`)
 `xlim`, `ylim`                                | `plotChroms()`, `plotSpectrum()` | Override x/y axis ranges, i.e. to manually set plotting range.
 `groupName`, `analysis`, `precursor`, `index` | `plotSpectrum()`                 | What to plot. See examples below.
@@ -713,7 +713,7 @@ plot(fGroups) # simple scatter plot of retention and m/z values
 
 plotChroms(fGroups) # plot EICs for all features
 plotChroms(fGroups[, 1], # only plot all features of first group
-           colourBy = "rGroups") # and mark them individually per replicate group
+           colourBy = "replicate") # and mark them individually per replicate
 plotChroms(components, index = 7, fGroups = fGroups) # EICs from a component
 
 plotSpectrum(mslists, "M120_R268_30") # non-annotated MS spectrum
@@ -739,12 +739,12 @@ plotGraph(componNT)
 
 The `EICParams` argument to `plotChroms()` is used to specify more advanced parameters for the creation of extracted ion chromatograms (EICs). Some parameters of interest:
 
-Parameter         | Description
------------------ | -------------------------------------------------
-`window`          | Expands the EIC retention time range +/- the feature peak width (in seconds). This is e.g. useful to zoom out.
-`topMost`         | Only consider this amount of highest intensity features in a group.
-`topMostByRGroup` | If `TRUE` then the `topMost` parameter concerns the top most intense features in a replicate group (e.g. `topMost=1` would draw the most intense feature for each replicate group).
-`onlyPresent`     | Only create EICs for analyses where a feature was detected? Setting to `FALSE` is useful to inspect if a feature was 'missed'.
+Parameter            | Description
+-------------------- | -------------------------------------------------
+`window`             | Expands the EIC retention time range +/- the feature peak width (in seconds). This is e.g. useful to zoom out.
+`topMost`            | Only consider this amount of highest intensity features in a group.
+`topMostByReplicate` | If `TRUE` then the `topMost` parameter concerns the top most intense features in a replicate (e.g. `topMost=1` would draw the most intense feature for each replicate).
+`onlyPresent`        | Only create EICs for analyses where a feature was detected? Setting to `FALSE` is useful to inspect if a feature was 'missed'.
 
 The parameters are configured by giving a named `list` to the `EICParams` argument. To obtain such a `list` with default settings, the `getDefEICParams()` function can be used:
 
@@ -781,19 +781,19 @@ Generic     | Classes
 
 The most simple comparison plot is a Venn diagram (i.e. `plotVenn()`). This function is especially useful for two or three-way comparisons. More complex comparisons are better visualized with [UpSet] diagrams (i.e. `plotUpSet()`). Finally, chord diagrams (i.e. `plotChord()`) provide visually pleasing diagrams to assess overlap between data.
 
-These functions can either be used to compare feature data or different objects of the same type. The former is typically used to compare overlap or uniqueness between features in different replicate groups, whereas comparison between objects is useful to visualize differences in algorithmic output. Besides visualization, note that both operations can also be performed to modify or combine objects (see [unique and overlapping features](#unOv) and [algorithm consensus](#consensus)).
+These functions can either be used to compare feature data or different objects of the same type. The former is typically used to compare overlap or uniqueness between features in different replicates, whereas comparison between objects is useful to visualize differences in algorithmic output. Besides visualization, note that both operations can also be performed to modify or combine objects (see [unique and overlapping features](#unOv) and [algorithm consensus](#consensus)).
 
 As usual, some examples are shown below.
 
 ```{r prePlotComp,include=FALSE,eval=runData}
 fGroupsO <- fGroups
-fGroups <- fGroupsRG
+fGroups <- fGroupsRep
 ```
 
 ```{r plotComp,eval=runData}
-plotUpSet(fGroups) # compare replicate groups
-plotVenn(fGroups, which = c("repl1", "repl2")) # compare some replicate groups
-plotChord(fGroups, aggregate = TRUE) # overlap between replicate groups
+plotUpSet(fGroups) # compare replicates
+plotVenn(fGroups, which = c("repl1", "repl2")) # compare some replicates
+plotChord(fGroups, aggregate = TRUE) # overlap between replicates
 # compare with custom made groups
 plotChord(fGroups, aggregate = TRUE,
           outer = c(repl1 = "grp1", repl2 = "grp1", repl3 = "grp2", repl4 = "grp3"))

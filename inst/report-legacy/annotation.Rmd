@@ -158,7 +158,7 @@ if (!is.null(rmdVars$components))
     annCols <- c("isogroup", "isonr", "charge", "ppm", # RAMClustR
                  "isotopes", "adnr", "adduct_rule", "adduct_charge", "adduct_nmol", "M_adduct", # CAMERA
                  "adduct_ion", # RC/CAMERA
-                 "hsnr", "rGroup", # nontarget
+                 "hsnr", "replicate", # nontarget
                  "TP_name") # TPs
     
     fGroupsSpecDT[, components := sapply(group, function(grp)
@@ -172,8 +172,8 @@ if (!is.null(rmdVars$components))
             cline <- cTable[[cmpi]][group == grp]
             if (nrow(cline) > 1) # some components like NT/TP may have >1 row per fGroup
             {
-                if (!is.null(cline[["rGroup"]])) # NT
-                    cline[, rGroup := paste0(rGroup, collapse = "/")]
+                if (!is.null(cline[["replicate"]])) # NT
+                    cline[, replicate := paste0(replicate, collapse = "/")]
                 cline <- cline[1]
             }
             cline <- cline[, sapply(cline, function(x) !is.na(x) && nzchar(x),

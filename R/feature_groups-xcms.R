@@ -211,7 +211,7 @@ importFeatureGroupsXCMS <- function(xs, analysisInfo)
 setReplaceMethod("analysisInfo", "featureGroupsXCMS", function(obj, value)
 {
     obj <- callNextMethod()
-    xcms::sampclass(obj@xs) <- analysisInfo(obj)$group # sync
+    xcms::sampclass(obj@xs) <- analysisInfo(obj)$replicate # sync
     return(obj)
 })
 

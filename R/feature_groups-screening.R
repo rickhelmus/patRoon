@@ -133,8 +133,7 @@ setMethod("show", "featureGroupsScreening", function(object)
 #' @describeIn featureGroupsScreening Subset on analyses, feature groups and/or
 #'   suspects.
 #'   
-#' @param i,j,rGroups Used for subsetting data analyses, feature groups and
-#'   replicate groups, see \code{\link{featureGroups}}.
+#' @param i,j,\dots Used for subsetting analyses, feature groups and others, see \code{\link{featureGroups}}.
 #' @param suspects An optional \code{character} vector with suspect names. If
 #'   specified, only \code{featureGroups} will be kept that are assigned to
 #'   these suspects.

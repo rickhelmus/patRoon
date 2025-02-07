@@ -39,7 +39,7 @@ readMSDataForXCMS3 <- function(anaInfo)
     anaFiles <- getCentroidedMSFilesFromAnaInfo(anaInfo)
     return(MSnbase::readMSData(files = anaFiles,
                                pdata = Biobase::AnnotatedDataFrame(data.frame(sample_name = anaInfo$analysis,
-                                                                              sample_group = anaInfo$group,
+                                                                              sample_group = anaInfo$replicate,
                                                                               stringsAsFactors = FALSE)),
                                mode = "onDisk"))
 }
@@ -76,7 +76,7 @@ makeXCMSGroups <- function(fGroups, verbose = TRUE)
     if (verbose)
         cat("Making groups...\n")
 
-    repGroups <- replicateGroups(fGroups)
+    repGroups <- replicates(fGroups)
     grps <- rbindlist(lapply(seq_along(ftind), function(g)
     {
         fprops <- rbindlist(lapply(seq_len(nrow(anaInfo)), function(s)
@@ -94,7 +94,7 @@ makeXCMSGroups <- function(fGroups, verbose = TRUE)
                           npeaks = sum(ftind[[g]] != 0))
 
         # add counts per sample group
-        ret[, (repGroups) := lapply(repGroups, function(rg) sum(ftind[[g]][rg == anaInfo$group] != 0))]
+        ret[, (repGroups) := lapply(repGroups, function(rg) sum(ftind[[g]][rg == anaInfo$replicate] != 0))]
 
         return(ret)
     }))
@@ -119,7 +119,7 @@ setMethod("getXCMSSet", "features", function(obj, verbose, loadRawData, IMS = FA
     xs <- new(getClassDef("xcmsSet", package = "xcms"))
     anaInfo <- analysisInfo(obj)
     
-    xcms::phenoData(xs) <- data.frame(class = anaInfo$group, row.names = anaInfo$analysis)
+    xcms::phenoData(xs) <- data.frame(class = anaInfo$replicate, row.names = anaInfo$analysis)
 
     if (loadRawData)
         xcms::filepaths(xs) <- getCentroidedMSFilesFromAnaInfo(anaInfo)
@@ -257,7 +257,7 @@ setMethod("getXCMSnExp", "features", function(obj, verbose, loadRawData, IMS = F
                                             analyser = rep("analyzer", anaN),
                                             detectorType = rep("detector", anaN)))
         xcms::phenoData(rawData) <- Biobase::AnnotatedDataFrame(data.frame(sample_name = anaInfo$analysis,
-                                                                           sample_group = anaInfo$group,
+                                                                           sample_group = anaInfo$replicate,
                                                                            stringsAsFactors = FALSE))
     }
 

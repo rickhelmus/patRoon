@@ -15,11 +15,11 @@ if (runData)
 {
     # try to sync with tutorial so cache can be re-used
     anaInfo <- patRoonData::exampleAnalysisInfo()
-    anaInfoRG <- anaInfo
-    anaInfoRG$group <- c(rep("repl1", 2),
-                         rep("repl2", 2),
-                         rep("repl3", 1),
-                         rep("repl4", 1))
+    anaInfoRep <- anaInfo
+    anaInfoRep$replicate <- c(rep("repl1", 2),
+                              rep("repl2", 2),
+                              rep("repl3", 1),
+                              rep("repl4", 1))
 
     # set max proc to 1 to limit FFM memory usage a bit on CI
     getFeats <- function(ai) withr::with_options(list(patRoon.multiproc.max = 1), findFeatures(ai, "openms", noiseThrInt = 2E4))
@@ -31,9 +31,9 @@ if (runData)
                       blankThreshold = 5, removeBlanks = TRUE,
                       retentionRange = c(120, Inf), mzRange = NULL)
 
-    fListRG <- getFeats(anaInfoRG)
-    fGroupsRG <- groupFeatures(fListRG, "openms")
-    fGroupsRG <- filter(fGroupsRG, preAbsMinIntensity = 100, absMinIntensity = 10000)
+    fListRep <- getFeats(anaInfoRep)
+    fGroupsRep <- groupFeatures(fListRep, "openms")
+    fGroupsRep <- filter(fGroupsRep, preAbsMinIntensity = 100, absMinIntensity = 10000)
     
     anaInfoNorm <- generateAnalysisInfo(paths = patRoonData::exampleDataPath(),
                                         groups = c(rep("solvent", 3), rep("standard", 3)),
@@ -79,7 +79,7 @@ if (runData)
                           adduct = "[M+H]+", database = "pubchemlite", maxCandidatesToStop = 5000)
     
     componCAM <- components <- generateComponents(fGroups, "camera", ionization = "positive")
-    componInt <- generateComponents(fGroupsRG, "intclust")
+    componInt <- generateComponents(fGroupsRep, "intclust")
     componNT <- generateComponents(fGroupsUF[, 1:200], "nontarget", minlength = 3, ionization = "positive")
     
     compsClust <- makeHCluster(compsMF)
@@ -110,8 +110,8 @@ if (runData)
                                                          "MoNA-export-CASMI_2012.msp"), "msp")
     mslibraryJSON <- loadMSLibrary(file.path(vignDir, "..", "tests", "testthat", "test_data", "MoNA-export-CASMI_2016.json"), "json")
     
-    saveRDS(list(fList = fList, fGroups = fGroups, fGroupsUF = fGroupsUF, fListRG = fListRG,
-                 fGroupsRG = fGroupsRG, fGroupsNorm = fGroupsNorm, mslists = mslists, formulas = formulas, compsMF = compsMF,
+    saveRDS(list(fList = fList, fGroups = fGroups, fGroupsUF = fGroupsUF, fListRep = fListRep,
+                 fGroupsRep = fGroupsRep, fGroupsNorm = fGroupsNorm, mslists = mslists, formulas = formulas, compsMF = compsMF,
                  componCAM = componCAM, componInt = componInt, componNT = componNT,
                  compsClust = compsClust,
                  ftOpt = if (doOpt) ftOpt else NULL, fGroupsSets = fGroupsSets, fGroupsSetsAnn = fGroupsSetsAnn,

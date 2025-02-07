@@ -17,11 +17,11 @@ NULL
 #' @param colourBy Sets the automatic colour selection: \code{"none"} for a single colour or
 #'   \code{"rGroups"}/\code{"fGroups"} for a distinct colour per replicate/feature group.
 #' @param showLegend Plot a legend if \code{TRUE}.
-#' @param which A character vector with replicate groups used for comparison. Set to \code{NULL} to ignore.
+#' @param which A character vector with replicates used for comparison. Set to \code{NULL} to ignore.
 #'
 #'   For \code{plotVenn}: alternatively a named \code{list} containing elements of \code{character} vectors with
-#'   replicate groups to compare. For instance, \code{which=list(infl = c("influent-A", "influent-B"), effl =
-#'   c("effluent-A", "effluent-B"))}, will compare the features in replicate groups \samp{"influent-A/B"} against those
+#'   replicates to compare. For instance, \code{which=list(infl = c("influent-A", "influent-B"), effl =
+#'   c("effluent-A", "effluent-B"))}, will compare the features in replicates \samp{"influent-A/B"} against those
 #'   in \samp{"effluent-A/B"}. The names of the list are used for labelling in the plot, and will be made automatically
 #'   if not specified.
 #' @param \dots passed to \code{\link[base]{plot}} (\code{plot}, \code{plotChroms}, \code{plotTICs} and
@@ -50,9 +50,9 @@ NULL
 
 #' @details \code{plot} Generates an \emph{m/z} \emph{vs} retention time
 #'   plot for all featue groups. Optionally highlights unique/overlapping
-#'   presence amongst replicate groups.
+#'   presence amongst replicates.
 #' @param onlyUnique If \code{TRUE} and \code{colourBy="rGroups"} then only
-#'   feature groups that are unique to a replicate group are plotted.
+#'   feature groups that are unique to a replicate are plotted.
 #' 
 #' @rdname feature-plotting
 #' @export
@@ -68,7 +68,7 @@ setMethod("plot", c(x = "featureGroups", y = "missing"), function(x, groupBy = N
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertFlag, . ~ onlyUnique + retMin + showLegend, fixed = list(add = ac))
     # UNDONE: do this in assertAndPrepareAnaInfoBy()
-    checkmate::assertChoice(groupBy, c("rGroups", "fGroups", names(anaInfo)), null.ok = TRUE, add = ac)
+    checkmate::assertChoice(groupBy, c("fGroups", names(anaInfo)), null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
     if (length(x) == 0)
@@ -100,9 +100,6 @@ setMethod("plot", c(x = "featureGroups", y = "missing"), function(x, groupBy = N
         }
         else
         {
-            if (groupBy == "rGroups")
-                groupBy <- "group" # compat
-            
             allGroups <- unique(anaInfo[[groupBy]])
             
             labels <- c(allGroups, "overlap")
@@ -182,7 +179,7 @@ setMethod("plotHash", "featureGroups", function(x, ...)
 })
 
 #' @details \code{plotInt} Generates a line plot for the (averaged) intensity of feature groups within all analyses
-#' @param xnames Plot analysis (or replicate group if \code{average=TRUE}) names on the x axis.
+#' @param xnames Plot analysis (or replicate if \code{average=TRUE}) names on the x axis.
 #' @param plotArgs,linesArgs A \code{list} with further arguments passed to \code{\link[base]{plot}} and
 #'    \code{\link[graphics]{lines}}, respectively.
 #'
@@ -203,8 +200,8 @@ setMethod("plotInt", "featureGroups", function(obj, average = FALSE, averageFunc
     aapply(checkmate::assertFlag, . ~ average + areas + normalized + xNames + regression + showLegend,
            fixed = list(add = ac))
     checkmate::assertFunction(averageFunc, add = ac)
-    checkmate::assertChoice(xBy, c("rGroups", names(anaInfo)), null.ok = TRUE, add = ac)
-    checkmate::assertChoice(groupBy, c("fGroups", "rGroups", names(anaInfo)), null.ok = TRUE, add = ac)
+    checkmate::assertChoice(xBy, names(anaInfo), null.ok = TRUE, add = ac)
+    checkmate::assertChoice(groupBy, c("fGroups", names(anaInfo)), null.ok = TRUE, add = ac)
     aapply(checkmate::assertList, . ~ plotArgs + linesArgs, null.ok = TRUE, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
@@ -213,11 +210,7 @@ setMethod("plotInt", "featureGroups", function(obj, average = FALSE, averageFunc
     if (is.null(xBy))
         xBy <- averageBy
     else
-    {
-        if (xBy == "rGroups")
-            xBy <- "group"
         checkAnaInfoAggrGrouping(anaInfo, "averaged", averageBy, xBy)
-    }
     
     if (is.null(groupBy))
     {
@@ -225,11 +218,7 @@ setMethod("plotInt", "featureGroups", function(obj, average = FALSE, averageFunc
             showLegend <- FALSE
     }
     else
-    {
-        if (groupBy == "rGroups")
-            groupBy <- "group"
         checkAnaInfoAggrGrouping(anaInfo, "averaged", averageBy, groupBy)
-    }
     
     if (length(obj) == 0)
     {
@@ -376,7 +365,7 @@ setMethod("plotIntHash", "featureGroups", function(obj, ...) makeHash(groupTable
 #'
 #' @param outerGroups Character vector of names to be used as outer groups. The
 #'   values in the specified vector should be named by analysis names
-#'   (\code{average} set to \code{FALSE}) or replicate group names
+#'   (\code{average} set to \code{FALSE}) or replicate names
 #'   (\code{average} set to \code{TRUE}), for instance: \code{c(analysis1 =
 #'   "group1", analysis2 = "group1", analysis3 = "group2")}. Set to \code{NULL}
 #'   to disable outer groups.
@@ -595,7 +584,7 @@ setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj),
     {
         # sync as much as possible with given EICParams
         EICs <- filterEIXs(EICs, obj, analysis = analysis, groupName = groupName, topMost = EICParams$topMost,
-                           topMostByRGroup = EICParams$topMostByRGroup, onlyPresent = EICParams$onlyPresent)
+                           topMostByReplicate = EICParams$topMostByReplicate, onlyPresent = EICParams$onlyPresent)
     }
 
     takeAnalysis <- analysis
@@ -640,7 +629,7 @@ setMethod("plotChromsHash", "featureGroups", function(obj, analysis = analyses(o
         # result in cache misses.
         # NOTE: we also ignore changes in analysis and groupName by selection from IMS arg
         EICs <- filterEIXs(EICs, obj, analysis = analysis, groupName = groupName, topMost = NULL,
-                           topMostByRGroup = FALSE, onlyPresent = FALSE)
+                           topMostByReplicate = FALSE, onlyPresent = FALSE)
     }
     anas <- analysis
     makeHash(args[setdiff(names(args), c("obj", "EICs"))], EICs, featureTable(obj)[analysis], groupInfo(obj)[group %chin% groupName],
@@ -670,7 +659,7 @@ setMethod("plotMobilogram", "featureGroups", function(obj, analysis = analyses(o
     {
         # sync as much as possible with given EIMParams
         EIMs <- filterEIXs(EIMs, obj, analysis = analysis, groupName = groupName, topMost = EIMParams$topMost,
-                           topMostByRGroup = EIMParams$topMostByRGroup, onlyPresent = EIMParams$onlyPresent)
+                           topMostByReplicate = EIMParams$topMostByReplicate, onlyPresent = EIMParams$onlyPresent)
     }
     
     takeAnalysis <- analysis
@@ -703,7 +692,7 @@ setMethod("plotMobilogramHash", "featureGroups", function(obj, analysis = analys
         # NOTE: only apply analysis/group filters, as the rest will slow down things considerably. Hence, this could
         # result in cache misses.
         EIMs <- filterEIXs(EIMs, obj, analysis = analysis, groupName = groupName, topMost = NULL,
-                           topMostByRGroup = FALSE, onlyPresent = FALSE)
+                           topMostByReplicate = FALSE, onlyPresent = FALSE)
     }
     anas <- analysis
     makeHash(args[setdiff(names(args), c("obj", "EIMs"))], EIMs, featureTable(obj)[analysis], groupInfo(obj)[group %chin% groupName],
@@ -711,7 +700,7 @@ setMethod("plotMobilogramHash", "featureGroups", function(obj, analysis = analys
 })
 
 #' @details \code{plotVenn} plots a Venn diagram (using \pkg{\link{VennDiagram}}) outlining unique and shared feature
-#'   groups between up to five replicate groups.
+#'   groups between up to five replicates.
 #' @template plotvenn-ret
 #' 
 #' @rdname feature-plotting
@@ -764,7 +753,7 @@ setMethod("plotVennHash", "featureGroups", function(obj, ...)
 })
 
 #' @details \code{plotUpSet} plots an UpSet diagram (using the \code{\link[UpSetR]{upset}} function) outlining unique
-#'   and shared feature groups between given replicate groups.
+#'   and shared feature groups between given replicates.
 #'   
 #' @template plotUpSet
 #'

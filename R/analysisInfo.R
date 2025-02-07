@@ -41,10 +41,10 @@ setMethod("getTICs", "data.frame", function(obj, retentionRange = NULL, MSLevel 
     
     if (nrow(res) > 0)
     {
-        group <- obj$group
-        names(group) <- obj$analysis
-        res$group <- group[res$analysis]
-        setcolorder(res, c("analysis", "group"))
+        replicate <- obj$replicate
+        names(replicate) <- obj$analysis
+        res$replicate <- replicate[res$analysis]
+        setcolorder(res, c("analysis", "replicate"))
     }
     
     return(res)
@@ -72,10 +72,10 @@ setMethod("getBPCs", "data.frame", function(obj, retentionRange = NULL, MSLevel 
     
     if (nrow(res) > 0)
     {
-        group <- obj$group
-        names(group) <- obj$analysis
-        res$group <- group[res$analysis]
-        setcolorder(res, c("analysis", "group"))
+        replicate <- obj$replicate
+        names(replicate) <- obj$analysis
+        res$replicate <- replicate[res$analysis]
+        setcolorder(res, c("analysis", "replicate"))
     }
     
     return(res)
@@ -84,8 +84,8 @@ setMethod("getBPCs", "data.frame", function(obj, retentionRange = NULL, MSLevel 
 #' @describeIn analysisinfo-dataframe Plots the TICs of the analyses.
 #' @param retMin Plot retention time in minutes (instead of seconds).
 #' @param title Character string used for title of the plot. If \code{NULL} a title will be automatically generated.
-#' @param colourBy Sets the automatic colour selection: "none" for a single 
-#' colour or "analyses"/"rGroups" for a distinct colour per analysis or analysis replicate group.
+#' @param colourBy Sets the automatic colour selection: "none" for a single colour or "analyses"/"rGroups" for a
+#'   distinct colour per analysis or analysis replicate.
 #' @param showLegend Plot a legend if TRUE.
 #' @template plot-lim
 #' @export

@@ -701,7 +701,7 @@ reportHTMLUtils$methods(
                         bsCardBodyNoFill(
                             makeToolbar("featuresTab", groupBy = list(
                                 list(value = "", name = "None"),
-                                list(value = "rGroup", name = "Replicate group"),
+                                list(value = "replicate", name = "Replicate"),
                                 maybeInclUI(hasSets(), list(value = "set", name = "Set"))
                             ), columnToggles = maybeInclUI(hasFQualities(), list(
                                 list(value = "qualities", name = "Quality scores")

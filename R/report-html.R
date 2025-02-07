@@ -16,7 +16,7 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
     ret$overview$chroms <- makeHTMLReportPlot("chroms", outPath, "plotChroms",
                                               list(fGroups, retMin = settings$features$retMin, EICs = EICs,
                                                    EICParams = modifyList(EICParams, list(topMost = 1,
-                                                                                          topMostByRGroup = FALSE,
+                                                                                          topMostByReplicate = FALSE,
                                                                                           onlyPresent = TRUE)),
                                                    showPeakArea = TRUE, showFGroupRect = FALSE, groupBy = "fGroups",
                                                    showLegend = FALSE, intMax = settings$features$chromatograms$intMax),
@@ -27,20 +27,20 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
                                                   retMin = settings$features$retMin),
                                              parParams = list(mai = c(0.9, 0.8, 0.1, 0.1)), width = 10, height = 4)
     
-    rGroupLenNonEmpty <- length(replicateGroups(removeEmptyAnalyses(fGroups)))
-    rGroupLen <- length(replicateGroups(fGroups))
-    anyOverlap <- rGroupLen > 1 &&
-        length(unique(fGroups, which = replicateGroups(fGroups), outer = TRUE)) < length(fGroups)
+    replicateLenNonEmpty <- length(replicates(removeEmptyAnalyses(fGroups)))
+    replicateLen <- length(replicates(fGroups))
+    anyOverlap <- replicateLen > 1 &&
+        length(unique(fGroups, which = replicates(fGroups), outer = TRUE)) < length(fGroups)
     
     ret$overview$chord <- ret$overview$venn  <- ret$overview$UpSet <- NULL
-    if (anyOverlap && rGroupLenNonEmpty > 1)
+    if (anyOverlap && replicateLenNonEmpty > 1)
     {
-        if ("chord" %in% settings$summary && rGroupLenNonEmpty > 2)
+        if ("chord" %in% settings$summary && replicateLenNonEmpty > 2)
         {
             ret$overview$chord <- makeHTMLReportPlot("chord", outPath, "plotChord", list(fGroups, aggregate = TRUE),
                                                      width = 7, height = 7)
         }
-        if ("venn" %in% settings$summary && rGroupLen < 6)
+        if ("venn" %in% settings$summary && replicateLen < 6)
         {
             ret$overview$venn <- makeHTMLReportPlot("venn", outPath, "plotVenn", list(fGroups), width = 7, height = 7)
         }
@@ -238,7 +238,7 @@ doReportHTML <- function(fGroups, MSPeakLists, formulas, compounds, compsCluster
     {
         # plot only small chromatograms (and summary overview), get minimum set of EICs
         EICParams$topMost <- 1
-        EICParams$topMostByRGroup <- FALSE
+        EICParams$topMostByReplicate <- FALSE
     }
     else
         EICParams["topMost"] <- list(NULL)
@@ -255,7 +255,7 @@ doReportHTML <- function(fGroups, MSPeakLists, formulas, compounds, compsCluster
         {
             # plot only small mobilogram (and summary overview), get minimum set of EIMs
             EIMParams$topMost <- 1
-            EIMParams$topMostByRGroup <- FALSE
+            EIMParams$topMostByReplicate <- FALSE
         }
         else
             EIMParams["topMost"] <- list(NULL)

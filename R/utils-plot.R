@@ -141,9 +141,6 @@ makeEIXPlot <- function(featPlotTab, anaInfo, gInfo, showPeakArea, showFGroupRec
     if (showLegend && is.null(groupBy))
         showLegend <- FALSE
     
-    if (!is.null(groupBy) && groupBy == "rGroups")
-        groupBy <- "group" # compat
-    
     if (nrow(featPlotTab) == 0 || length(EIXs) == 0)
     {
         noDataPlot()

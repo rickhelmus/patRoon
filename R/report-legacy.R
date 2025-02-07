@@ -48,7 +48,7 @@ NULL
 #' @note Any formulae and compounds for feature groups which are not present within \code{fGroups} (\emph{i.e.} because
 #'   it has been subset afterwards) will not be reported.
 #'
-#'   The \code{topMost}, \code{topMostByRGroup} and \code{onlyPresent} \link[=EICParams]{EIC parameters} may be ignored,
+#'   The \code{topMost}, \code{topMostByReplicate} and \code{onlyPresent} \link[=EICParams]{EIC parameters} may be ignored,
 #'   \emph{e.g.}, when generating overview plots.
 #'
 #' @seealso reporting

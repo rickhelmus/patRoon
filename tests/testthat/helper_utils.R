@@ -145,7 +145,7 @@ if (testWithSets())
     getDAAnaInfo <- function(...)
     {
         ret <- getDAAnaInfoAll(pat)
-        return(ret[grepl("-pos", ret$group, fixed = TRUE), ])
+        return(ret[grepl("-pos", ret$replicate, fixed = TRUE), ])
     }
     getTestFeatures <- function(anaInfo = getTestAnaInfo(), noiseThrInt = 3E4, ...)
     {

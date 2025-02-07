@@ -149,12 +149,12 @@ As you can see the generated `data.frame` consists of four columns:
 
 * *path*: the directory path of the file containing the analysis data
 * *analysis*: the name of the analysis. This should be the file name _without_ file extension.
-* *group*: to which _replicate group_ the analysis belongs. All analysis which are replicates of each other get the same name.
-* *blank*: which replicate group should be used for blank subtraction.
+* *replicate*: to which _replicate_ the analysis belongs. All analysis which are replicates of each other get the same name.
+* *blank*: which replicate should be used for blank subtraction.
 
-The latter two columns are especially important for [data cleanup](#data-cleanup), which will be discussed later. For now keep in mind that the analyses for the solvents and standards each belong to a different replicate group (`"solvent"` and `"standard"`) and that the solvents should be used for blank subtraction.
+The latter two columns are especially important for [data cleanup](#data-cleanup), which will be discussed later. For now keep in mind that the analyses for the solvents and standards each belong to a different replicate (`"solvent"` and `"standard"`) and that the solvents should be used for blank subtraction.
 
-In this tutorial the analysis information was just copied directly from [patRoonData]. The `generateAnalysisInfo()` function can be used to generate such a table for your own sample analyses. This function scans a given directory for MS data files and automatically fills in the `path` and `analysis` columns from this information. In addition, you can pass replicate group and blank information to this function. Example:
+In this tutorial the analysis information was just copied directly from [patRoonData]. The `generateAnalysisInfo()` function can be used to generate such a table for your own sample analyses. This function scans a given directory for MS data files and automatically fills in the `path` and `analysis` columns from this information. In addition, you can pass replicate and blank information to this function. Example:
 
 ```{r genAnaInfo}
 generateAnalysisInfo(patRoonData::exampleDataPath(), groups = c(rep("solvent-pos", 3), rep("standard-pos", 3)),
@@ -201,8 +201,8 @@ fGroups <- filter(fGroups, preAbsMinIntensity = 100, absMinIntensity = 1E5,
 The following filtering steps will be performed:
 
 * Features are removed if their intensity is below a defined intensity threshold (set by `absMinIntensity`). This filter is an effective way to  not only remove 'noisy' data, but, for instance, can also be used to remove any low intensity features which likely miss MS/MS data.
-* If a feature is not ubiquitously present in (part of) replicate analyses it will be filtered out from that replicate group. This is controlled by setting `relMinReplicateAbundance`. The value is relative, for instance, a value of `0.5` would mean that a feature needs to be present in half of the replicates. In this tutorial we use a value of `1` which means that a feature should be present in all replicate samples. This is a _very_ effective filter in removing any outliers, for instance, caused by features which don't actually represent a well defined chromatographic peak.
-* Similarly, features with within a replicate group are removed if the relative standard deviation (RSD) of their intensities exceeds that of the value set by the `maxReplicateIntRSD` argument.
+* If a feature is not ubiquitously present in (part of) replicate analyses it will be filtered out from that replicate. This is controlled by setting `relMinReplicateAbundance`. The value is relative, for instance, a value of `0.5` would mean that a feature needs to be present in half of the replicates. In this tutorial we use a value of `1` which means that a feature should be present in all replicate samples. This is a _very_ effective filter in removing any outliers, for instance, caused by features which don't actually represent a well defined chromatographic peak.
+* Similarly, features with within a replicate are removed if the relative standard deviation (RSD) of their intensities exceeds that of the value set by the `maxReplicateIntRSD` argument.
 * Features are filtered out that do not have a significantly higher intensity than the blank intensity. This is controlled by `blankThreshold`: the given value of `5` means that the intensity of a feature needs to be at least five times higher compared to the (average) blank signal.
 
 The `removeBlanks` argument tells will remove all blank analyses after filtering. The `retentionRange` and `mzRange` arguments are not used here, but could be used to filter out any features outside a give retention or _m/z_ range. There are many more filters: see `?filter()` for more information.

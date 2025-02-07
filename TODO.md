@@ -22,15 +22,19 @@
 
 - add estimateIDLevels() in newProject()
 - anaInfo
-    - fGroups/feat subset
-        - deprecate rGroups subset/filter param?
     - rename group col to replicate and warn for deprecation (like blank/ref column)
+        - update BPC/TIC functions, sync with plotChroms()
+        - Handbook
+            - colourBy
+        - docs
+            - colourBy, which
     - see if MSPL sets anaInfo can be replaced by non-exported slot with named vector with sets for each ana
     - properly handle NA values for custom cols?
     - plotVenn/unique sets methods: deprecate/remove sets arg?
     - plotVenn()/overlap/plotUpSet(): deprecate/remove list arg for which?
     - FC: select multiple groups and/or anaInfo cols?
     - plotChord/report(): report sets as outer groups? make it optional?
+    - groupBy: fGroups --> fGroup for consistency with anaInfo cols? (set/analysis/replicate)
 
 - Misc
     - bg MS/MS subtraction
@@ -204,6 +208,11 @@
     - report()
         - fixed: TP graphs were generated for components with absent (parent) fGroups
     - compoundsLibrary: specSimParamsLib now defaults to specSimParams, and the latter now defaults to removing the precursor
+    - replicate groups --> replicates
+        - topMostByRGroup, replicateGroups(), replicateGroupSubtract()
+        - NT rGroup column
+        - rGroups arg for filters
+        
 
 ## msdata
 
@@ -683,13 +692,6 @@
 - utility functions to make custom DBs for MetFrag and SIRIUS and support to use them with the latter
 - DBE calculation for SIRIUS?
 - OM reporting
-- as.data.table: option to average per replicate group?
-- ID levels for non-suspects
-    - function to calculate ID levels from suspect list (to take RTs/MSMS if available), formulas, compounds
-    - store in compounds?
-    - does it make sense for formula candidates?
-    - add into reporting
-        - also mark if in suspect list
 
 ## Suspects
 

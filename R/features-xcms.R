@@ -20,7 +20,7 @@ setMethod("reorderAnalyses", "featuresXCMS", function(obj, anas)
 setReplaceMethod("analysisInfo", "featuresXCMS", function(obj, value)
 {
     obj <- callNextMethod()
-    xcms::sampclass(obj@xs) <- analysisInfo(obj)$group # sync
+    xcms::sampclass(obj@xs) <- analysisInfo(obj)$replicate # sync
     return(obj)
 })
 
@@ -82,7 +82,7 @@ findFeaturesXCMS <- function(analysisInfo, method = "centWave", ..., verbose = T
 
     files <- getCentroidedMSFilesFromAnaInfo(analysisInfo)
     
-    hash <- makeHash(analysisInfo[, c("analysis", "path_centroid", "group"), with = FALSE], do.call(makeFileHash, as.list(files)),
+    hash <- makeHash(analysisInfo[, c("analysis", "path_centroid", "replicate"), with = FALSE], do.call(makeFileHash, as.list(files)),
                      method, list(...))
     cachef <- loadCacheData("featuresXCMS", hash)
     if (!is.null(cachef))
@@ -92,9 +92,9 @@ findFeaturesXCMS <- function(analysisInfo, method = "centWave", ..., verbose = T
         printf("Finding features with XCMS for %d analyses ...\n", nrow(analysisInfo))
 
     if (verbose)
-        xs <- xcms::xcmsSet(files, analysisInfo$analysis, analysisInfo$group, method = method, ...)
+        xs <- xcms::xcmsSet(files, analysisInfo$analysis, analysisInfo$replicate, method = method, ...)
     else
-        suppressMessages(xs <- xcms::xcmsSet(files, analysisInfo$analysis, analysisInfo$group, method = method, ...))
+        suppressMessages(xs <- xcms::xcmsSet(files, analysisInfo$analysis, analysisInfo$replicate, method = method, ...))
 
     ret <- importFeaturesXCMS(xs, analysisInfo)
 

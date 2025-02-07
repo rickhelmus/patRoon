@@ -95,7 +95,7 @@ genHTMLReportPlotsChromsLarge <- function(fGroups, settings, outPath, EICs, EICP
         makeHTMLReportPlot("chrom_large-", outPath, "plotChroms",
                            list(fGroups, groupName = grp, retMin = settings$features$retMin,
                                 intMax = settings$features$chromatograms$intMax, EICs = EICs,
-                                EICParams = EICParams, groupBy = "rGroups", IMS = "both", title = "", bty = "l"),
+                                EICParams = EICParams, groupBy = "replicate", IMS = "both", title = "", bty = "l"),
                            parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)),
                            width = 6, height = 4, bg = "transparent", pointsize = 16)
     }, simplify = FALSE)
@@ -112,7 +112,7 @@ genHTMLReportPlotsChromsSmall <- function(fGroups, settings, outPath, EICs, EICP
         doProgress()
         makeHTMLReportPlot("chrom_small", outPath, "plotChroms",
                            list(fGroups, groupName = grp, retMin = settings$features$retMin, EICs = EICs,
-                                EICParams = modifyList(EICParams, list(topMost = 1, topMostByRGroup = FALSE,
+                                EICParams = modifyList(EICParams, list(topMost = 1, topMostByReplicate = FALSE,
                                                                        onlyPresent = TRUE)),
                                 showFGroupRect = FALSE, showPeakArea = TRUE, IMS = "both", title = "",
                                 intMax = settings$features$chromatograms$intMax, bty = "n"),
@@ -162,7 +162,7 @@ genHTMLReportPlotsMobilogramsLarge <- function(fGroups, settings, outPath, EIMs,
         doProgress()
         makeHTMLReportPlot("mobilogram_large-", outPath, "plotMobilogram",
                            list(fGroups, groupName = grp, EIMs = EIMs,
-                                EIMParams = EIMParams, groupBy = "rGroups", title = "", bty = "l"),
+                                EIMParams = EIMParams, groupBy = "replicate", title = "", bty = "l"),
                            parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)),
                            width = 6, height = 4, bg = "transparent", pointsize = 16)
     }, simplify = FALSE)
@@ -182,7 +182,7 @@ genHTMLReportPlotsMobilogramsSmall <- function(fGroups, settings, outPath, EIMs,
         doProgress()
         makeHTMLReportPlot("mobilogram_small-", outPath, "plotMobilogram",
                            list(fGroups, groupName = grp, EIMs = EIMs,
-                                EIMParams = modifyList(EIMParams, list(topMost = 1, topMostByRGroup = FALSE,
+                                EIMParams = modifyList(EIMParams, list(topMost = 1, topMostByReplicate = FALSE,
                                                                        onlyPresent = TRUE)),
                                 showFGroupRect = FALSE, showPeakArea = TRUE, title = "", bty = "n"),
                            parParams = list(mai = c(0, 0, 0, 0), lwd = 10), width = 12, height = 4, bg = "transparent",
@@ -367,7 +367,7 @@ reportHTMLUtils$methods(
     genFeaturesTable = function()
     {
         mdprintf("Features... ")
-        
+
         tab <- as.data.table(getFeatures(objects$fGroups))
         tab <- removeDTColumnsIfPresent(tab, "adduct") # can already be seen in group table
         tab <- removeDTColumnsIfPresent(tab, featureQualityNames(group = FALSE, scores = FALSE)) # only show scores
@@ -400,11 +400,10 @@ reportHTMLUtils$methods(
             }
         }
         
-        tab[, rGroup := anaInfo[match(tab$analysis, analysis)]$group]
+        tab[, replicate := anaInfo[match(tab$analysis, analysis)]$replicate]
 
         colDefs <- list(
-            group = reactable::colDef(show = FALSE, filterMethod = getReactFilterMethodExact()),
-            rGroup = reactable::colDef("replicate group")
+            group = reactable::colDef(show = FALSE, filterMethod = getReactFilterMethodExact())
         )
         if (!isFALSE(settings$features$chromatograms$features))
         {
@@ -435,9 +434,9 @@ reportHTMLUtils$methods(
         colDefs <- setReactNumRangeFilters("featuresTab", tab, colDefs)
         
         colDefs$analysis <- setReactSelRangeFilter("featuresTab", reactable::colDef())
-        colDefs$rGroup <- setReactSelRangeFilter("featuresTab", colDefs$rGroup)
+        colDefs$replicate <- setReactSelRangeFilter("featuresTab", reactable::colDef())
         
-        setcolorder(tab, intersect(c("analysis", "rGroup", "ID", "chromatogram", "mobilogram"), names(tab)))
+        setcolorder(tab, intersect(c("analysis", "replicate", "ID", "chromatogram", "mobilogram"), names(tab)))
         
         CSVCols <- setdiff(names(tab), c("chromatogram", "mobilogram"))
         

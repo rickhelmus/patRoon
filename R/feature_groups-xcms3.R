@@ -49,7 +49,7 @@ setMethod("initialize", "featureGroupsXCMS3",
 #' @template main-rd-method
 #' @export
 setMethod("groupFeaturesXCMS3", "features", function(feat, rtalign = TRUE, loadRawData = TRUE,
-                                                     groupParam = xcms::PeakDensityParam(sampleGroups = analysisInfo(feat)$group),
+                                                     groupParam = xcms::PeakDensityParam(sampleGroups = analysisInfo(feat)$replicate),
                                                      preGroupParam = groupParam,
                                                      retAlignParam = xcms::ObiwarpParam(), verbose = TRUE)
 {
@@ -68,7 +68,7 @@ setMethod("groupFeaturesXCMS3", "features", function(feat, rtalign = TRUE, loadR
 #' @rdname groupFeaturesXCMS3
 #' @export
 setMethod("groupFeaturesXCMS3", "featuresSuspects", function(feat,
-                                                             groupParam = xcms::PeakDensityParam(sampleGroups = analysisInfo(feat)$group),
+                                                             groupParam = xcms::PeakDensityParam(sampleGroups = analysisInfo(feat)$replicate),
                                                              verbose = TRUE)
 {
     return(doGroupSuspects(feat, selectMethod("groupFeaturesXCMS3", "features"), rtalign = FALSE,
@@ -78,7 +78,7 @@ setMethod("groupFeaturesXCMS3", "featuresSuspects", function(feat,
 #' @rdname groupFeaturesXCMS3
 #' @export
 setMethod("groupFeaturesXCMS3", "featuresSet", function(feat,
-                                                        groupParam = xcms::PeakDensityParam(sampleGroups = analysisInfo(feat)$group),
+                                                        groupParam = xcms::PeakDensityParam(sampleGroups = analysisInfo(feat)$replicate),
                                                         verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()

@@ -5,7 +5,7 @@
 
 checkFeaturesInterface <- setRefClass("checkFeaturesInterface", contains = "checkUIInterface",
                                       fields = c(fGroups = "featureGroups", EICParams = "list",
-                                                 EICsTopMost = "list", EICsTopMostRG = "list", EICsAll = "list",
+                                                 EICsTopMost = "list", EICsTopMostRep = "list", EICsAll = "list",
                                                  EICPreviews = "list"))
 
 checkFeaturesInterface$methods(
@@ -23,7 +23,7 @@ checkFeaturesInterface$methods(
             ),
             selectInput("fGroupPlotMode", NULL,
                         c("Top most group" = "topMost",
-                          "Top most replicates" = "topMostByRGroup",
+                          "Top most replicates" = "topMostByReplicate",
                           "All" = "all"), "topMost")
         )
     },
@@ -55,7 +55,7 @@ checkFeaturesInterface$methods(
             fillRow(
                 checkboxGroupInput("featureColumns", "Feature table columns",
                                    c("Retention time & m/z" = "retMZ",
-                                     "Replicate group" = "rGroup",
+                                     "Replicate" = "replicate",
                                      "Blank" = "blank",
                                      "Quantity" = "quantity",
                                      "RT and m/z range" = "rtMZRange",
@@ -188,8 +188,8 @@ checkFeaturesInterface$methods(
         fData <- data.table(analysis = ai$analysis)
         if ("retMZ" %in% rValues$settings$featureColumns)
             fData[, c("ret", "mz") := .(feat$ret / divret, feat$mz)]
-        if ("rGroup" %in% rValues$settings$featureColumns)
-            fData[, replicate_group := ai$group]
+        if ("replicate" %in% rValues$settings$featureColumns)
+            fData[, replicate := ai$replicate]
         if ("blank" %in% rValues$settings$featureColumns)
             fData[, blank := ai$blank]
         if ("quantity" %in% rValues$settings$featureColumns)
@@ -224,14 +224,14 @@ checkFeaturesInterface$methods(
         })
         
         observeEvent(input$fGroupPlotMode, {
-            if ((input$fGroupPlotMode == "topMostByRGroup" && length(EICsTopMostRG) == 0) ||
+            if ((input$fGroupPlotMode == "topMostByReplicate" && length(EICsTopMostRep) == 0) ||
                 (input$fGroupPlotMode == "all" && length(EICsAll) == 0))
             {
                 not <- showNotification("Loading EICs...", duration = NULL, closeButton = FALSE, type = "message")
-                if (input$fGroupPlotMode == "topMostByRGroup")
-                    EICsTopMostRG <<- getFeatureEIXs(fGroups, type = "EIC",
-                                                                                            topMostByRGroup = TRUE)))
+                if (input$fGroupPlotMode == "topMostByReplicate")
+                    EICsTopMostRep <<- getFeatureEIXs(fGroups, type = "EIC",
                                                      EIXParams = modifyList(EICParams, list(topMost = 1,
+                                                                                            topMostByReplicate = TRUE)))
                 else
                     EICsAll <<- getFeatureEIXs(fGroups, type = "EIC",
                                                EIXParams = modifyList(EICParams, list(topMost = NULL), keep.null = TRUE))
@@ -245,14 +245,14 @@ checkFeaturesInterface$methods(
     {
         EICs <- switch(rValues$fGroupPlotMode,
                        topMost = EICsTopMost,
-                       topMostByRGroup = EICsTopMostRG,
+                       topMostByReplicate = EICsTopMostRep,
                        all = EICsAll
         )
         if (length(EICs) == 0)
             EICs <- NULL # not (yet) loaded, in this case plotChroms() will make its own but EICs must be NULL
         
         fg <- fGroups[, rValues$currentPrimSel]
-        if (rValues$fGroupPlotMode == "all") # UNDONE: also for rGroups top most somehow?
+        if (rValues$fGroupPlotMode == "all") # UNDONE: also for replicates top most somehow?
         {
             rp <- rValues$removePartially[[rValues$currentPrimSel]]
             if (!is.null(rp))
@@ -260,9 +260,9 @@ checkFeaturesInterface$methods(
         }
         
         ep <- getDefEICParams(topMost = if (rValues$fGroupPlotMode == "all") NULL else 1,
-                              topMostByRGroup = rValues$fGroupPlotMode == "topMostByRGroup")
+                              topMostByReplicate = rValues$fGroupPlotMode == "topMostByReplicate")
         withr::with_par(list(mar = c(4, 4, 0.1, 1), cex = 1.5), {
-            plotChroms(fg, EICs = EICs, groupBy = "rGroups", showPeakArea = TRUE, EICParams = ep,
+            plotChroms(fg, EICs = EICs, groupBy = "replicate", showPeakArea = TRUE, EICParams = ep,
                        showFGroupRect = FALSE, title = "", retMin = rValues$settings$retUnit == "min")
         })
     },
@@ -364,8 +364,8 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, EICParams
     ftind <- groupFeatIndex(fGroups)
     
     EICsTopMost <- getFeatureEIXs(fGroups, type = "EIC", EIXParams = modifyList(EICParams, list(topMost = 1,
-                                                                                                topMostByRGroup = FALSE)))
-    EICsTopMostRG <- EICsAll <- list()
+                                                                                                topMostByReplicate = FALSE)))
+    EICsTopMostRep <- EICsAll <- list()
     
     # format is in [[ana]][[fGroup]], since we only took top most intensive we can throw away the ana dimension
     EICPreviews <- Reduce(modifyList, EICsTopMost)
@@ -383,7 +383,7 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, EICParams
         curSession <- list(removeFully = character(), removePartially = list())
     
     int <- checkFeaturesInterface$new(fGroups = fGroups, EICParams = EICParams, EICsTopMost = EICsTopMost,
-                                      EICsTopMostRG = EICsTopMostRG, EICsAll = EICsAll,
+                                      EICsTopMostRep = EICsTopMostRep, EICsAll = EICsAll,
                                       EICPreviews = EICPreviews, primarySelections = gNames,
                                       curSession = curSession, session = session)
     return(runCheckUI(int))

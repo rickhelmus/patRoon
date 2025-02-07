@@ -424,10 +424,9 @@ setMethod("plotSpectrum", "components", function(obj, index, markFGroup = NULL, 
     if (haveHom)
     {
         # merge merged homologue entries
-        plotData[!is.na(hsnr), c("rGroup", "intensity") :=
-                     .(paste0(rGroup, collapse = "/"),
-                       max(intensity)), by = "hsnr"]
-        plotData <- plotData[!duplicated(plotData, by = c("hsnr", "rGroup"))]
+        plotData[!is.na(hsnr), c("replicate", "intensity") := .(paste0(replicate, collapse = "/"), max(intensity)),
+                 by = "hsnr"]
+        plotData <- plotData[!duplicated(plotData, by = c("hsnr", "replicate"))]
     }
 
     plotData[, label := sapply(seq_len(nrow(plotData)), function(r)
@@ -447,7 +446,7 @@ setMethod("plotSpectrum", "components", function(obj, index, markFGroup = NULL, 
     plotData[, lwd := ifelse(nzchar(label), 1, 0.5)]
 
     if (haveHom)
-        plotData[, categ := rGroup]
+        plotData[, categ := replicate]
     else
         plotData[, categ := ifelse(nzchar(label), "assigned", "unassigned")]
 
@@ -512,7 +511,7 @@ setMethod("plotSpectrumHash", "components", function(obj, index, markFGroup = NU
 #' @describeIn components Plot an extracted ion chromatogram (EIC) for all feature groups within a single component.
 #' @param fGroups The \code{\link{featureGroups}} object that was used to generate the components.
 #' @template EICParams-arg
-#' @note For \code{plotChroms}: The \code{topMost} and \code{topMostByRGroup} EIC parameters are ignored unless the
+#' @note For \code{plotChroms}: The \code{topMost} and \code{topMostByReplicate} EIC parameters are ignored unless the
 #'   components are from homologous series.
 #' @export
 setMethod("plotChroms", "components", function(obj, index, fGroups, EICParams = getDefEICParams(window = 5), ...)
@@ -532,17 +531,14 @@ setMethod("plotChroms", "components", function(obj, index, fGroups, EICParams = 
 
     showPeakArea <- isHom
     showFGroupRect <- !isHom
-    groupBy = if (!isHom) "fGroups" else "rGroups"
+    groupBy = if (!isHom) "fGroups" else "replicate"
 
     if (isHom)
-    {
-        rGroups <- unique(comp$rGroup)
-        fGroups <- replicateGroupFilter(fGroups, rGroups, verbose = FALSE)
-    }
+        fGroups <- replicateFilter(fGroups, unique(comp$replicate), verbose = FALSE)
     else
     {
         EICParams$topMost <- 1
-        EICParams$topMostByRGroup <- FALSE
+        EICParams$topMostByReplicate <- FALSE
     }
 
     fGroups <- fGroups[, unique(comp$group)]
@@ -557,7 +553,7 @@ setMethod("plotChromsHash", "components", function(obj, index, fGroups, EICParam
     comp <- componentTable(obj)[[index]]
     anas <- analyses(fGroups)
     if (!is.null(comp[["hsnr"]])) # homologues?
-        anas <- analysisInfo(fGroups)[group %chin% comp$rGroup]$analysis
+        anas <- analysisInfo(fGroups)[replicate %chin% comp$replicate]$analysis
     makeHash(comp, plotChromsHash(fGroups, EICParams = EICParams, analyses = anas, groupName = comp$group, ...))
 })
 

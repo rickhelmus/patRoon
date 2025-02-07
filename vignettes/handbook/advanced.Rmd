@@ -631,7 +631,7 @@ concs <- data.frame(
 concs
 ```
 
-The concentrations are specified separately for each calibrant compound. The column names should follow the names of the [replicate groups assigned to the standards](#anaInfo). The concentration unit is &#x00B5;g/l by default. The next section describes how this can be changed. 
+The concentrations are specified separately for each calibrant compound. The column names should follow the names of the [replicate assigned to the standards](#anaInfo). The concentration unit is &#x00B5;g/l by default. The next section describes how this can be changed. 
 
 The gradient elution program is also specified by a `data.frame`, which for every time point (in seconds!) describes the percentage of 'B'. In this case, 'B' represents the total amount of organic modifier.
 
@@ -764,7 +764,7 @@ To perform FC calculations we first need to specify its parameters. This is best
 getFCParams(c("before", "after"))
 ```
 
-In this example we generate a `list` with parameters in order to make a comparison between two replicate groups: `before` and `after`. Several advanced parameters are available to tweak the calculation process. These are explained in the reference manual (`?featureGroups`).
+In this example we generate a `list` with parameters in order to make a comparison between two replicates: `before` and `after`. Several advanced parameters are available to tweak the calculation process. These are explained in the reference manual (`?featureGroups`).
 
 The `as.data.table` function for feature groups is used to perform the FC calculations.
 

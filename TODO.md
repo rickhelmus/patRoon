@@ -17,6 +17,7 @@
 - maxMSRtWindow --> maxMSRTWindow
 - BUG: unescaped set names are now used regular expressions (problem if eg dot is present when make.unique was used)
 - update patRoonInst for new deps?
+- peaksParam --> peaksParams
 
 
 ## Maybe

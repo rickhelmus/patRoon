@@ -47,6 +47,104 @@ removeDuplicateFeatsSusps <- function(tab, checkRet, selectTopIntens)
     return(tab[duplicate == FALSE][, duplicate := NULL])
 }
 
+getFeatEICsInfo <- function(params, withIMS)
+{
+    EICInfoAna <- NULL
+    if (params$methodMZ == "bins")
+    {
+        # UNDONE: also support other binning approaches?
+        binsMZ <- seq(params$mzRange[1], params$mzRange[2], by = params$mzStep * 0.5)
+        names(binsMZ) <- paste0("bin_M", binsMZ)
+        
+        binsIMS <- NULL
+        if (!is.null(params[["methodIMS"]]))
+        {
+            binsIMS <- seq(params$mobRange[1], params$mobRange[2], by = params$mobStep * 0.5)
+            names(binsIMS) <- paste0("bin_I", binsIMS)
+        }
+        
+        EICInfoAna <- data.table(mzmin = binsMZ, mzmax = binsMZ + params$mzStep, retmin = params$retRange[1],
+                                 retmax = params$retRange[2], EIC_ID_MZ = names(binsMZ))
+        if (withIMS)
+        {
+            tab <- CJ(EIC_ID_MZ = names(binsMZ), EIC_ID_IMS = names(binsIMS), sorted = FALSE)
+            tab[, c("mobmin", "mobmax") := .(binsIMS[EIC_ID_IMS], binsIMS[EIC_ID_IMS] + params$mobStep)]
+            EICInfoAna <- merge(EICInfoAna, tab, by = "EIC_ID_MZ", sort = FALSE)
+        }
+        else
+            EICInfoAna[, c("mobmin", "mobmax") := 0]
+        
+        EICInfoAna[, EIC_ID := paste0("EIC_", .I)]
+    }
+    else
+    {
+        EICInfoAna <- data.table(mzmin = params$suspects$mz - params$mzWindow,
+                                 mzmax = params$suspects$mz + params$mzWindow,
+                                 EIC_ID = paste0("EIC_", seq_len(nrow(params$suspects))))
+        
+        # UNDONE: also put in retmin/retmax? This will affect peak finding (eg noise estimation)...
+        EICInfoAna[, c("retmin", "retmax") := .(0, 0)]
+        
+        if (withIMS && !is.null(params$suspects[["mobility"]]))
+            EICInfoAna[, c("mobmin", "mobmax") := .(params$suspects$mobility - params$IMSWindow,
+                                                    params$suspects$mobility + params$IMSWindow)]
+        else
+            EICInfoAna[, c("mobmin", "mobmax") := .(0, 0)]
+    }
+    
+    return(EICInfoAna)
+}
+
+#' @export
+getFeaturesEICsParams <- function(methodMZ, methodIMS = NULL, ...)
+{
+    checkmate::assertChoice(methodMZ, c("bins", "suspects"))
+    checkmate::assertChoice(methodIMS, c("bins", "suspects"), null.ok = TRUE)
+    
+    if (methodMZ != "suspects" && identical(methodIMS, "suspects"))
+        stop("methodIMS can only be 'suspects' if methodMZ is also set to 'suspects'", call. = FALSE)
+    
+    ret <- list(methodMZ = methodMZ, methodIMS = methodIMS, retRange = NULL)
+    
+    if (methodMZ == "bins")
+    {
+        ret <- modifyList(ret, list(
+            mzRange = c(80, 600),
+            mzStep = 0.02
+        ))
+    }
+    else if (methodMZ == "suspects")
+    {
+        ret <- modifyList(ret, list(
+            rtWindow = 30,
+            mzWindow = 0.005,
+            # UNDONE these to separate param and also use elsewhere?
+            skipInvalid = TRUE,
+            prefCalcChemProps = TRUE,
+            neutralChemProps = FALSE
+        ))
+    }
+    
+    if (!is.null(methodIMS))
+    {
+        if (methodIMS == "bins")
+        {
+            ret <- modifyList(ret, list(
+                mobRange = c(0.5, 1.3),
+                mobStep = 0.04
+            ))
+        }
+        else if (methodIMS == "suspects")
+        {
+            ret <- modifyList(ret, list(
+                IMSWindow = 0.02
+            ))
+        }
+    }
+    
+    return(modifyList(ret, list(...), keep.null = TRUE))
+}
+
 #' @rdname features-class
 #' @export
 featuresBinning <- setClass("featuresBinning", contains = "features")
@@ -55,10 +153,7 @@ setMethod("initialize", "featuresBinning",
           function(.Object, ...) callNextMethod(.Object, algorithm = "binning", ...))
 
 #' @export
-findFeaturesBinning <- function(analysisInfo, peaksParam, retRange = NULL, mzRange = c(50, 400), mzStep = 0.02,
-                                mobRange = NULL, mobStep = 0.04, suspects = NULL, suspRTWindow = 30,
-                                suspMZWindow = 0.005, suspIMSWindow = 0.02, skipInvalid = TRUE, adduct = NULL,
-                                prefCalcChemProps = TRUE, neutralChemProps = FALSE, minIntensityIMS = 25, verbose = TRUE)
+findFeaturesBinning <- function(analysisInfo, featParams, peaksParam, minIntensityIMS = 25, verbose = TRUE)
 {
     # UNDONE: add refs to docs, and highlight changes
     # UNDONE: mobRange/mobStep defaults
@@ -70,37 +165,35 @@ findFeaturesBinning <- function(analysisInfo, peaksParam, retRange = NULL, mzRan
     # UNDONE: support IM bins with suspects
     # UNDONE: split function for bins / suspects
     
-    checkmate::assertFlag(skipInvalid) # not in assert collection, should fail before assertSuspectList
-    
     ac <- checkmate::makeAssertCollection()
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, add = ac)
+    assertFeaturesEICsParams(featParams, add = ac)
     assertFindPeaksParam(peaksParam, add = ac)
-    aapply(assertRange, . ~ retRange + mzRange + mobRange, null.ok = c(TRUE, FALSE, TRUE), fixed = list(add = ac))
-    aapply(checkmate::assertNumber, . ~ mzStep + mobStep, lower = 0.000001, finite = TRUE, fixed = list(add = ac))
-    aapply(checkmate::assertNumber, . ~ suspRTWindow + suspMZWindow + suspIMSWindow + minIntensityIMS, lower = 0,
-           finite = TRUE, fixed = list(add = ac))
-    assertSuspectList(suspects, needsAdduct = is.null(adduct), skipInvalid = skipInvalid, null.ok = TRUE, add = ac)
-    aapply(checkmate::assertFlag, . ~ prefCalcChemProps + neutralChemProps + verbose, fixed = list(add = ac))
+    checkmate::assertNumber(minIntensityIMS, lower = 0, finite = TRUE, add = ac)
+    checkmate::assertFlag(verbose, add = ac)
     checkmate::reportAssertions(ac)
     
-    if (!is.null(adduct))
-        adduct <- checkAndToAdduct(adduct)
+    if (!is.null(featParams[["adduct"]]))
+        featParams$adduct <- checkAndToAdduct(featParams$adduct)
     
-    if (!is.null(suspects))
+    if (!is.null(featParams$suspects))
     {
-        suspects <- prepareSuspectList(suspects, adduct = adduct, skipInvalid = skipInvalid, checkDesc = TRUE,
-                                       prefCalcChemProps = prefCalcChemProps, neutralChemProps = neutralChemProps)
-        suspects <- removeDuplicateFeatsSusps(suspects, FALSE, FALSE)
-        suspects <- suspects[order(mz)]
+        featParams$suspects <- prepareSuspectList(featParams$suspects, adduct = adduct,
+                                                  skipInvalid = featParams$skipInvalid, checkDesc = TRUE,
+                                                  prefCalcChemProps = featParams$prefCalcChemProps,
+                                                  neutralChemProps = featParams$neutralChemProps)
+        featParams$suspects <- removeDuplicateFeatsSusps(featParams$suspects, FALSE, FALSE)
+        featParams$suspects <- featParams$suspects[order(mz)]
+        # UNDONE: print removed suspects
     }
     
-    doBinning <- is.null(suspects) # UNDONE
+    if (is.null(featParams[["retRange"]]))
+        featParams$retRange <- c(0, 0)
     
-    if (is.null(retRange))
-        retRange <- c(0, 0)
+    withIMS <- !is.null(featParams[["methodIMS"]])
     
     cacheDB <- openCacheDBScope()
-    baseHash <- makeHash(retRange, mzRange, mzStep, mobRange, mobStep, minIntensityIMS, peaksParam)
+    baseHash <- makeHash(featParams, peaksParam, minIntensityIMS)
     anaHashes <- getMSFileHashesFromAvailBackend(analysisInfo, needIMS = withIMS)
     anaHashes <- sapply(anaHashes, makeHash, baseHash)
     cachedData <- pruneList(loadCacheData("featuresBinning", anaHashes, simplify = FALSE, dbArg = cacheDB))
@@ -112,50 +205,6 @@ findFeaturesBinning <- function(analysisInfo, peaksParam, retRange = NULL, mzRan
     else
         anaInfoTBD <- analysisInfo
     
-    getEICInfoList <- function(withIMS)
-    {
-        if (doBinning)
-        {
-            # UNDONE: also support other binning approaches?
-            binsMZ <- seq(mzRange[1], mzRange[2], by = mzStep * 0.5)
-            names(binsMZ) <- paste0("bin_M", binsMZ)
-            
-            binsIMS <- NULL
-            if (withIMS)
-            {
-                binsIMS <- seq(mobRange[1], mobRange[2], by = mobStep * 0.5)
-                names(binsIMS) <- paste0("bin_I", binsIMS)
-            }
-            
-            EICInfoAna <- data.table(mzmin = binsMZ, mzmax = binsMZ + mzStep, retmin = retRange[1], retmax = retRange[2],
-                                     EIC_ID_MZ = names(binsMZ))
-            if (withIMS)
-            {
-                tab <- CJ(EIC_ID_MZ = names(binsMZ), EIC_ID_IMS = names(binsIMS), sorted = FALSE)
-                tab[, c("mobmin", "mobmax") := .(binsIMS[EIC_ID_IMS], binsIMS[EIC_ID_IMS] + mobStep)]
-                EICInfoAna <- merge(EICInfoAna, tab, by = "EIC_ID_MZ", sort = FALSE)
-            }
-            else
-                EICInfoAna[, c("mobmin", "mobmax") := 0]
-            
-            EICInfoAna[, EIC_ID := paste0("EIC_", .I)]
-        }
-        else
-        {
-            EICInfoAna <- data.table(mzmin = suspects$mz - suspMZWindow, mzmax = suspects$mz + suspMZWindow,
-                                     EIC_ID = paste0("EIC_", seq_len(nrow(suspects))))
-
-            # UNDONE: also put in retmin/retmax? This will affect peak finding (eg noise estimation)...
-            EICInfoAna[, c("retmin", "retmax") := .(0, 0)]
-            
-            if (withIMS && !is.null(suspects[["mobility"]]))
-                EICInfoAna[, c("mobmin", "mobmax") := .(suspects$mobility - suspIMSWindow, suspects$mobility + suspIMSWindow)]
-            else
-                EICInfoAna[, c("mobmin", "mobmax") := .(0, 0)]
-        }
-        
-        return(setNames(rep(list(EICInfoAna), nrow(anaInfoTBD)), anaInfoTBD$analysis))
-    }
     
     getEICsAna <- function(backend, EICInfo)
     {
@@ -172,15 +221,11 @@ findFeaturesBinning <- function(analysisInfo, peaksParam, retRange = NULL, mzRan
     fList <- list()
     if (nrow(anaInfoTBD) > 0)
     {
-        withIMS <- !is.null(mobRange)
-        EICInfoListMZ <- getEICInfoList(withIMS = FALSE)
-        EICInfoListMob <- if (withIMS) getEICInfoList(withIMS = TRUE) else rep(list(NULL), nrow(anaInfoTBD))
-        
-        fList <- applyMSData(anaInfoTBD, EICInfoListMZ, EICInfoListMob, needIMS = withIMS,
-                             func = function(ana, path, backend, EICInfoMZ, EICInfoMob)
+        fList <- applyMSData(anaInfoTBD, needIMS = withIMS, func = function(ana, path, backend)
         {
             openMSReadBackend(backend, path)
-            
+         
+            EICInfoMZ <- getFeatEICsInfo(featParams, withIMS = FALSE)
             EICs <- getEICsAna(backend, EICInfoMZ)
             # omit missing
             EICInfoMZ <- EICInfoMZ[EIC_ID %chin% names(EICs)]
@@ -195,6 +240,7 @@ findFeaturesBinning <- function(analysisInfo, peaksParam, retRange = NULL, mzRan
                 # remove complete m/z bins that were filtered out before
                 temp <- EICInfoMZ[, c("mzmin", "mzmax"), with = FALSE]
                 setkeyv(temp, c("mzmin", "mzmax"))
+                EICInfoMob <- getFeatEICsInfo(featParams, withIMS = TRUE)
                 ov <- foverlaps(EICInfoMob, temp, type = "within", nomatch = NULL, which = TRUE)
                 EICInfo <- EICInfoMob[ov$xid]
                 
@@ -205,15 +251,15 @@ findFeaturesBinning <- function(analysisInfo, peaksParam, retRange = NULL, mzRan
             
             peaks <- findPeaksInEICs(EICs, peaksParam, withBP = TRUE, withMobility = withIMS, cacheDB = cacheDB)
 
-            if (doBinning)
+            if (featParams$methodMZ == "bins")
             {
                 # only keep those peaks with m/z in the "center" of the analyzed m/z and mobility range
                 peaks[, binMZStart := EICInfo[match(peaks$EIC_ID, EIC_ID)]$mzmin]
-                peaks <- peaks[between(mz, binMZStart + mzStep/4, binMZStart + mzStep/4*3) == TRUE]
-                if (withIMS)
+                peaks <- peaks[between(mz, binMZStart + featParams$mzStep/4, binMZStart + featParams$mzStep/4*3) == TRUE]
+                if (identical(featParams[["methodIMS"]], "bins"))
                 {
                     peaks[, binMobStart := EICInfo[match(peaks$EIC_ID, EIC_ID)]$mobmin]
-                    peaks <- peaks[between(mobility, binMobStart + mobStep/4, binMobStart + mobStep/4*3) == TRUE]
+                    peaks <- peaks[between(mobility, binMobStart + featParams$mobStep/4, binMobStart + featParams$mobStep/4*3) == TRUE]
                 }
             }
 

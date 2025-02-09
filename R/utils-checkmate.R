@@ -1071,6 +1071,53 @@ assertIMSMatchParams <- function(x, null.ok = FALSE, .var.name = checkmate::vnam
     assertListVal(x, "minMatches", checkmate::assertCount, positive = FALSE, .var.name = .var.name, add = add)
 }
 
+assertFeaturesEICsParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
+{
+    checkmate::assertList(x, .var.name = .var.name)
+    assertListVal(x, "methodMZ", checkmate::assertChoice, choices = c("bins", "suspects"), .var.name = .var.name)
+    assertListVal(x, "methodMZ", checkmate::assertChoice, choices = c("bins", "suspects"), null.ok = TRUE,
+                  .var.name = .var.name)
+    assertListVal(x, "retRange", assertRange, null.ok = TRUE, .var.name = .var.name, add = add)
+    
+    if (x$methodMZ == "bins")
+    {
+        assertListVal(x, "mzRange", assertRange, .var.name = .var.name, add = add)
+        assertListVal(x, "mzStep", checkmate::assertNumber, lower = 0.000001, finite = TRUE,
+                      .var.name = .var.name, add = add)
+    }
+    else if (x$methodMZ == "suspects")
+    {
+        assertListVal(x, "rtWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
+        assertListVal(x, "mzWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
+        
+        # UNDONE these to separate param and also use elsewhere?
+        assertListVal(x, "skipInvalid", checkmate::assertFlag, .var.name = .var.name, add = add)
+        assertListVal(x, "prefCalcChemProps", checkmate::assertFlag, .var.name = .var.name, add = add)
+        assertListVal(x, "neutralChemProps", checkmate::assertFlag, .var.name = .var.name, add = add)
+        
+        assertListVal(x, "suspects", assertSuspectList, needsAdduct = is.null(x[["adduct"]]), skipInvalid = x$skipInvalid,
+                      .var.name = .var.name, add = add)
+    }
+
+    if (!is.null(x[["methodIMS"]]))
+    {
+        if (x$methodIMS != "bins" && x$methodMZ == "bins")
+            stop("'methodIMS' should be set to 'bins' if methodMZ is set to 'bins'.", call. = FALSE)
+        
+        if (x$methodIMS == "bins")
+        {
+            assertListVal(x, "mobRange", assertRange, .var.name = .var.name, add = add)
+            assertListVal(x, "mobStep", checkmate::assertNumber, lower = 0.000001, finite = TRUE,
+                          .var.name = .var.name, add = add)
+        }
+        else if (x$methodIMS == "suspects")
+        {
+            assertListVal(x, "suspIMSWindow", checkmate::assertNumber, lower = 0, finite = TRUE,
+                          .var.name = .var.name, add = add)
+        }
+    }
+}
+
 # from https://github.com/mllg/checkmate/issues/115
 aapply = function(fun, formula, ..., fixed = list())
 {

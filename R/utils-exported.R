@@ -340,7 +340,7 @@ availableBackends <- function(anaInfo = NULL)
     
     allBackends <- getMSReadBackends()
     
-    unselected <- setdiff(allBackends, getOption("patRoon.MSBackends", character()))
+    unselected <- setdiff(allBackends, getOption("patRoon.MS.backends", character()))
     notCompiled <- allBackends[!sapply(allBackends, backendAvailable)]
     noAnas <- if (is.null(anaInfo))
         character()
@@ -351,7 +351,7 @@ availableBackends <- function(anaInfo = NULL)
     {
         stat <- character()
         if (b %in% unselected)
-            stat <- c(stat, "not in patRoon.MSBackends")
+            stat <- c(stat, "not in patRoon.MS.backends")
         if (b %in% notCompiled)
             stat <- c(stat, "not compiled during installation or unavailable on your system")
         if (b %in% noAnas)

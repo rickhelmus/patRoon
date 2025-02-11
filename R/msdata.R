@@ -30,20 +30,23 @@ maybeGetMSFilesForMzR <- function(anaInfo, types, formats, needIMS)
 
 maybeGetMSFilesForSC <- function(anaInfo, types, formats, needIMS)
 {
-    ret <- if ("ims" %in% types) getMSFilesFromAnaInfo(anaInfo, "ims", "mzML", FALSE)
-    if (is.null(ret) && "centroid" %in% types && !needIMS)
-        ret <- getCentroidedMSFilesFromAnaInfo(anaInfo, formats = intersect(formats, c("mzML", "mzXML")),
-                                               mustExist = FALSE)
-    return(ret)
+    prefIMS <- getOption("patRoon.MS.preferIMS", FALSE)
+    
+    filesIMS <- if ("ims" %in% types || needIMS) getMSFilesFromAnaInfo(anaInfo, "ims", "mzML", FALSE)
+    filesCentroid <- if ("centroid" %in% types && !needIMS && (is.null(filesIMS) || !prefIMS))
+        getCentroidedMSFilesFromAnaInfo(anaInfo, formats = intersect(formats, c("mzML", "mzXML")), mustExist = FALSE)
+    
+    if (!is.null(filesIMS) && !is.null(filesCentroid))
+        return(if (prefIMS) filesIMS else filesCentroid)
+    if (!is.null(filesIMS))
+        return(filesIMS)
+    return(filesCentroid)
 }
 
 maybeGetMSFilesForMSTK <- function(anaInfo, types, formats, needIMS)
 {
-    ret <- if ("ims" %in% types) getMSFilesFromAnaInfo(anaInfo, "ims", "mzML", FALSE)
-    if (is.null(ret) && "centroid" %in% types && !needIMS)
-        ret <- getCentroidedMSFilesFromAnaInfo(anaInfo, formats = intersect(formats, c("mzML", "mzXML")),
-                                               mustExist = FALSE)
-    return(ret)
+    # so far the same constraints as
+    return(maybeGetMSFilesForSC(anaInfo, types, formats, needIMS))
 }
 
 maybeGetMSFiles <- function(bn, ...)
@@ -216,7 +219,7 @@ openMSReadBackend <- function(backend, path)
 applyMSData <- function(anaInfo, func,  ..., types = getMSFileTypes(), formats = names(MSFileExtensions()),
                         needIMS = FALSE, showProgress = TRUE)
 {
-    backends <- getOption("patRoon.MSBackends", character())
+    backends <- getOption("patRoon.MS.backends", character())
     
     for (bn in backends)
     {
@@ -241,6 +244,6 @@ applyMSData <- function(anaInfo, func,  ..., types = getMSFileTypes(), formats =
         msg <- paste(msg, sprintf("Allowed formats: %s.", paste0("\"", formats, "\"", collapse = ", ")))
     if (needIMS)
         msg <- paste(msg, "IMS data is required.")
-    stop(msg, " Please ensure all data is present and the \"patRoon.MSBackends\" option is configured properly: see ?patRoon",
+    stop(msg, " Please ensure all data is present and the \"patRoon.MS.backends\" option is configured properly: see ?patRoon",
          call. = FALSE)
 }

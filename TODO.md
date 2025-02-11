@@ -220,10 +220,6 @@
 
 - see what is the best default for backends
     - set mzR in front for safety?
-- cleanup
-    - remove now unused avgParams (eg averaging func)
-    - get fully rid of precursorMzWindow (eg newProject()) and update NEWS/docs
-    - move old MSPL generators to deprecate.R and add notifications
 - perform centroid checks in backends?
 - MSPL
     - store metadata?
@@ -273,6 +269,7 @@
         - algo specific functions are now exported
     - generateMSPeakLists()
         - now uses backends, old methods still available but deprecated
+        - no more precursorMzWindow, and avg params were changed
     - EICParams for getPICSet() and calculatePeakQualities() (needed for m/z IMS expansion)
     - mzExpIMSWindow EIXParam
 
@@ -284,6 +281,9 @@
         - add docs for algo specific functions that are now exported
     - update generateMSPeakLists()
         - also in Handbook
+        - no more precursorMzWindow
+        - update avg params
+        - don't refer to deprecated MSPL generators
     - availableBackends()
     - EICParams for getPICSet() and calculatePeakQualities()
     - mzExpIMSWindow and minIntensityIMS EIXParam

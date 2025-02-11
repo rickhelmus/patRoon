@@ -223,8 +223,6 @@
 - perform centroid checks in backends?
 - MSPL
     - store metadata?
-    - check defaults for new averaging params
-        - set abundance threshold?
     - hclust seems unusable due to high mem usage with IMS data? --> force disable?
 - embed TIMS-SDK? --> in patRoonExt
 - optionally link to MSTK depending on if it's available
@@ -253,7 +251,7 @@
         - new spec averaging params
         - more extensively test filters/summing/averaging
         - further test bbCID data: also mixed bbCID/PASEF file (ie with different segments)
-
+        - see if current default abundance threshold is fine
 
 
 - NEWS

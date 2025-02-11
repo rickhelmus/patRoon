@@ -275,6 +275,8 @@ reportHTMLUtils$methods(
     {
         tab <- getFGScreeningReactTab(screenInfo(objects$fGroups))
         tab[, susp_groups := paste0(group, collapse = ", "), by = "susp_name"][, group := NULL]
+        if (!is.null(tab[["susp_estIDLevel"]]))
+            tab[, susp_bestEstIDLevel := getBestIDLevel(susp_estIDLevel), by = "susp_name"]
         tab <- unique(tab, by = "susp_name")
         makeMainResultsReactable(tab, "SusBySuspect", settings$features$retMin, initView = "SuspectsBySuspect")
     },
@@ -305,6 +307,8 @@ reportHTMLUtils$methods(
         tab <- getFGScreeningReactTab(internalStandards(objects$fGroups))
         # UNDONE: give other name
         tab[, susp_groups := paste0(group, collapse = ", "), by = "susp_name"][, group := NULL]
+        if (!is.null(tab[["susp_estIDLevel"]]))
+            tab[, susp_bestEstIDLevel := getBestIDLevel(susp_estIDLevel), by = "susp_name"]
         tab <- unique(tab, by = "susp_name")
         makeMainResultsReactable(tab, "ISTDsByISTD", settings$features$retMin, initView = "ISTDsByISTD")
     },

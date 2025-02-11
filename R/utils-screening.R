@@ -721,3 +721,17 @@ doPredictToxSuspects <-  function(obj, LC50Mode = "static", concUnit = "ugL")
     
     return(obj)
 }
+
+getBestIDLevel <- function(IDLs)
+{
+    IDLs <- IDLs[!is.na(IDLs)]
+    if (length(IDLs) == 0)
+        return(NA_character_)
+    
+    numIDs <- numericIDLevel(IDLs)
+    whMin <- which(numIDs == min(numIDs))
+    if (!allSame(IDLs[whMin]))
+        return(as.character(numIDs[whMin[1]])) # strip sublevel if not all the same
+    
+    return(IDLs[whMin[1]])
+}

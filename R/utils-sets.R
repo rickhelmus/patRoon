@@ -61,21 +61,7 @@ assignSetsIDLs <- function(tab, mcn)
     if (length(cols) == 0)
         return(tab)
     
-    tab[, estIDLevel := {
-        allIDs <- unlist(mget(cols))
-        allIDs <- allIDs[!is.na(allIDs)]
-        if (length(allIDs) == 0)
-            NA_character_
-        else
-        {
-            numIDs <- numericIDLevel(allIDs)
-            whMin <- which(numIDs == min(numIDs))
-            if (!allSame(allIDs[whMin]))
-                as.character(numIDs[whMin[1]]) # strip sublevel if not all the same
-            else
-                allIDs[whMin[1]]
-        }
-    }, by = seq_len(nrow(tab))][]
+    tab[, estIDLevel := getBestIDLevel(unlist(mget(cols))), by = seq_len(nrow(tab))][]
     
     return(tab)
 }

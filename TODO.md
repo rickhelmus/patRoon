@@ -50,7 +50,6 @@
 
 - TP components
     - report()
-        - BUG: JS errors when fGroups are subset/do not contain TPs anymore?
         - remove reportHTML()?
             - if yes, remove flexdashboard dep
             - otherwise update, and move flexdashboard to suggests
@@ -167,6 +166,7 @@
         - intensity cols are suffixed
             - clarify that same columns are used for areas?
         - adduct column: now split per set and renamed to group_adduct
+        - added susp_bestEstIDLevel column
     - plotInt()
         - xnames --> xNames
         - new args: areas, xBy, groupBy, averageFunc, regression

@@ -202,6 +202,8 @@ reportHTMLUtils$methods(
         if (TPsFromScreening(objects$components))
         {
             scr <- getFGScreeningReactTab(screenInfo(objects$fGroups))
+            if (!is.null(scr[["susp_estIDLevel"]]))
+                scr[, susp_bestEstIDLevel := getBestIDLevel(susp_estIDLevel), by = "susp_name"]
             candTab <- merge(candTab, scr, by.x = c("group", "candidate_name"), by.y = c("group", "susp_name"),
                              sort = FALSE)
         }
@@ -209,7 +211,7 @@ reportHTMLUtils$methods(
         candTab[, candidate_groups := paste0(group, collapse = ", "), by = "candidate_name"][, group := NULL]
         candTab <- unique(candTab, by = "candidate_name")
         makeMainResultsReactable(candTab, "TPsBySuspect", settings$features$retMin, initView = "TPsBySuspect",
-                                 initTabFunc = "initTabTPs")
+                                 colGroupOrder = "TP", initTabFunc = "initTabTPs")
     },
     genMainTableTPsCandGroup = function()
     {

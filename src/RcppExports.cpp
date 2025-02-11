@@ -556,21 +556,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// doAverageSpectra
-Rcpp::DataFrame doAverageSpectra(Rcpp::List specs, const std::string& method, SpectrumRawTypes::Mass window, SpectrumRawTypes::Intensity minIntensity, SpectrumRawTypes::PeakAbundance minAbundance);
-RcppExport SEXP _patRoon_doAverageSpectra(SEXP specsSEXP, SEXP methodSEXP, SEXP windowSEXP, SEXP minIntensitySEXP, SEXP minAbundanceSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::List >::type specs(specsSEXP);
-    Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
-    Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type window(windowSEXP);
-    Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minIntensity(minIntensitySEXP);
-    Rcpp::traits::input_parameter< SpectrumRawTypes::PeakAbundance >::type minAbundance(minAbundanceSEXP);
-    rcpp_result_gen = Rcpp::wrap(doAverageSpectra(specs, method, window, minIntensity, minAbundance));
-    return rcpp_result_gen;
-END_RCPP
-}
 // doAverageSpectraList
 Rcpp::List doAverageSpectraList(Rcpp::List specsList, const std::string& method, SpectrumRawTypes::Mass window, SpectrumRawTypes::Intensity minIntensity, SpectrumRawTypes::PeakAbundance minAbundance);
 RcppExport SEXP _patRoon_doAverageSpectraList(SEXP specsListSEXP, SEXP methodSEXP, SEXP windowSEXP, SEXP minIntensitySEXP, SEXP minAbundanceSEXP) {
@@ -774,7 +759,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_testSpecFilter", (DL_FUNC) &_patRoon_testSpecFilter, 7},
     {"_patRoon_testClusterNums", (DL_FUNC) &_patRoon_testClusterNums, 3},
     {"_patRoon_testClusterNums2", (DL_FUNC) &_patRoon_testClusterNums2, 3},
-    {"_patRoon_doAverageSpectra", (DL_FUNC) &_patRoon_doAverageSpectra, 5},
     {"_patRoon_doAverageSpectraList", (DL_FUNC) &_patRoon_doAverageSpectraList, 5},
     {"_patRoon_loadEICIntensities", (DL_FUNC) &_patRoon_loadEICIntensities, 3},
     {"_patRoon_loadEICs", (DL_FUNC) &_patRoon_loadEICs, 5},

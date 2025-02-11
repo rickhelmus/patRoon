@@ -223,9 +223,8 @@
 
 - see what is the best default for backends
     - set mzR in front for safety?
-- perform centroid checks in backends?
-- MSPL
-    - hclust seems unusable due to high mem usage with IMS data? --> force disable?
+- perform centroid and IMS checks in backends?
+- MSPL: hclust seems unusable due to high mem usage with IMS data? --> just default to distance and doc change/IMS need?
 - embed TIMS-SDK? --> in patRoonExt
 - optionally link to MSTK depending on if it's available
     - somehow clearly state if unavailable during installation
@@ -274,7 +273,8 @@
 
 - docs
     - getMSFileFormats()
-    - patRoon.threads, patRoon.MSBackends and patRoon.path.BrukerTIMS options
+    - patRoon.threads, patRoon.MS.backends, patRoon.MS.preferIMS and patRoon.path.BrukerTIMS options
+        - patRoon.MS.preferIMS: only works for MSTK/SC, ie putting OTIMS in front doesn't work
     - update PListParams
     - updated convertMSFilesXXX() functions, including changed args
         - add docs for algo specific functions that are now exported

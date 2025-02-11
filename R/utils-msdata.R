@@ -157,7 +157,7 @@ getAllMSFilesFromAnaInfo <- function(anaInfo, types, formats)
 getMSFileHashesFromAvailBackend <- function(anaInfo, types = getMSFileTypes(), formats = names(MSFileExtensions()),
                                             needIMS = FALSE)
 {
-    backends <- getOption("patRoon.MSBackends", character())
+    backends <- getOption("patRoon.MS.backends", character())
     
     for (bn in backends)
     {
@@ -172,7 +172,7 @@ getMSFileHashesFromAvailBackend <- function(anaInfo, types = getMSFileTypes(), f
         }
     }
     
-    stop("Failed to load a correct MS read backend. Please ensure patRoon.MSBackends is configured properly. See ?patRoon",
+    stop("Failed to load a correct MS read backend. Please ensure patRoon.MS.backends is configured properly. See ?patRoon",
          call. = FALSE)
 }
 

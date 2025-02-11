@@ -3,7 +3,8 @@ defaultPkgOpts <- function(pkgname)
     ret <- list(cache.mode = "both",
                 checkCentroided = TRUE,
                 cache.fileName = "cache.sqlite",
-                MSBackends = getMSReadBackends(),
+                MS.backends = getMSReadBackends(),
+                MS.preferIMS = FALSE,
                 threads = parallel::detectCores(logical = FALSE),
                 MP.method = "classic",
                 # backwards compat

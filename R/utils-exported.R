@@ -410,8 +410,8 @@ getEICs <- function(analysisInfo, ranges, compress = FALSE, minIntensityIMS = 25
 #' @export
 getBGMSMSPeaks <- function(anaInfo, replicates = NULL, MSLevel = 2, retentionRange = NULL, mobilityRange = NULL,
                            minBPIntensity = 5000,
-                           avgSpectraParams = getDefAvgPListParams(minAbundance = 0.1, topMost = 25),
-                           avgAnalysesParams = getDefAvgPListParams(minAbundance = 0.8, topMost = 25))
+                           avgSpectraParams = getDefAvgPListParams(minAbundanceRel = 0.1, topMost = 25),
+                           avgAnalysesParams = getDefAvgPListParams(minAbundanceAbs = 0.8, topMost = 25))
 {
     ac <- checkmate::makeAssertCollection()
     anaInfo <- assertAndPrepareAnaInfo(anaInfo, add = ac)
@@ -447,7 +447,8 @@ getBGMSMSPeaks <- function(anaInfo, replicates = NULL, MSLevel = 2, retentionRan
                                 MSLevel = MSLevel, method = avgSpectraParams$method,
                                 mzWindow = avgSpectraParams$clusterMzWindow,
                                 startMobs = mobilityRange[1], endMobs = mobilityRange[2],
-                                minAbundance = avgSpectraParams$minAbundance,
+                                minAbundanceRel = avgSpectraParams$minAbundanceRel,
+                                minAbundanceAbs = avgSpectraParams$minAbundanceAbs,
                                 topMost = avgSpectraParams$topMost,
                                 minIntensityIMS = avgSpectraParams$minIntensityIMS,
                                 minIntensityPre = avgSpectraParams$minIntensityPre,
@@ -463,7 +464,8 @@ getBGMSMSPeaks <- function(anaInfo, replicates = NULL, MSLevel = 2, retentionRan
     printf("Averaging analyses averaged spectra... ")
     ret <- averageSpectraList(list(blSpecs), avgAnalysesParams$clusterMzWindow, avgAnalysesParams$topMost,
                               avgAnalysesParams$minIntensityPre, avgAnalysesParams$minIntensityPost,
-                              avgAnalysesParams$minAbundance, avgAnalysesParams$method, FALSE, FALSE, FALSE, FALSE)[[1]]
+                              avgAnalysesParams$minAbundanceRel, avgAnalysesParams$minAbundanceAbs,
+                              avgAnalysesParams$method, FALSE, FALSE, FALSE, FALSE)[[1]]
     ret[, precursor := NULL]
     printf("Done!\n")
     

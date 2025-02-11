@@ -49,6 +49,9 @@
 - msdata
     - mechanism to prefer IM/centroided data? loading centroiding data could be faster if no IMS is needed
         - could be achieved by putting mzR as first backend?
+    - store MSPL metadata?
+        - better have a util that gets metadata from MS data
+        --> remove metadata slot once we have that
 
             
 
@@ -222,7 +225,6 @@
     - set mzR in front for safety?
 - perform centroid checks in backends?
 - MSPL
-    - store metadata?
     - hclust seems unusable due to high mem usage with IMS data? --> force disable?
 - embed TIMS-SDK? --> in patRoonExt
 - optionally link to MSTK depending on if it's available
@@ -285,6 +287,7 @@
     - EICParams for getPICSet() and calculatePeakQualities()
     - mzExpIMSWindow and minIntensityIMS EIXParam
     - update all for getEICs()
+    - doc that minAbundanceAbs will be maxed to actual spec count
 
 ## IMS
 

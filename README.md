@@ -79,7 +79,7 @@ workflow steps are optional, fully configurable and algorithms can easily be mix
     * Code for loading MS and EIC data, MS similarity calculations and others were implemented in `C++` to reduce computational times.
 * The [RDCOMClient] `R` package is used to interface with Bruker DataAnalysis algorithms.
 * The [Shiny] `R` package was used to implement several GUI tools.
-* The reporting functionality relies on the excellent [R markdown][Rmd] and related packages such as [flexdashboard], [bslib] and [reactable].
+* The reporting functionality relies on the excellent [R markdown][Rmd] and related packages such as [bslib] and [reactable].
 
 
 ## Installation
@@ -161,7 +161,6 @@ For bug reports, code contributions (pull requests), questions, suggestions and 
 [DockerImg]: https://uva-hva.gitlab.host/R.Helmus/patroon/container_registry/2
 [CTS]: https://qed.epa.gov/cts/
 [Rmd]: https://rmarkdown.rstudio.com/
-[flexdashboard]: https://pkgs.rstudio.com/flexdashboard/
 [bslib]: https://rstudio.github.io/bslib/
 [reactable]: https://glin.github.io/reactable/
 [MS2Tox]: https://github.com/kruvelab/MS2Tox

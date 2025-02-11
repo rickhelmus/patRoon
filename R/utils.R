@@ -111,11 +111,6 @@ getExtDepPath <- function(what, subTool = NULL, verify = TRUE)
             bin = "sirius",
             opt = "SIRIUS"
         ),
-        pngquant = list(
-            name = "pngquant",
-            bin = "pngquant",
-            opt = "pngquant"
-        ),
         openbabel = list(
             name = "OpenBabel",
             bin = "obabel",

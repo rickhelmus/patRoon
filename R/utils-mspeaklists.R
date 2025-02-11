@@ -79,7 +79,7 @@ getDefAvgPListParams <- function(...)
                 minIntensityPre = 500,
                 minIntensityPost = 500,
                 minIntensityIMS = 25,
-                minAbundance = 0,
+                minAbundance = 0.1,
                 method = "hclust",
                 withPrecursorMS = TRUE,
                 pruneMissingPrecursorMS = TRUE,

@@ -250,12 +250,13 @@ std::vector<double> testClusterNums2(const std::vector<double> &nums, const std:
 SpectrumRawAveraged averageSpectraRaw(const SpectrumRawAveraged &flattenedSpecs, const std::vector<size_t> &specIDs,
                                       clusterMethod method, SpectrumRawTypes::Mass window, bool averageIntensities,
                                       SpectrumRawTypes::Intensity minIntensity,
-                                      SpectrumRawTypes::PeakAbundance minAbundance)
+                                      SpectrumRawTypes::PeakAbundance minAbundanceRel,
+                                      SpectrumRawTypes::PeakAbundance minAbundanceAbs)
 {
     if (flattenedSpecs.empty()) // all spectra are empty
         return SpectrumRawAveraged();
     
-    const bool alreadyAveraged = !flattenedSpecs.getAbundances().empty();
+    const bool alreadyAveraged = !flattenedSpecs.getAbundancesRel().empty();
     const std::vector<int> clusts = clusterNums(flattenedSpecs.getMZs(), method, window);
     const int maxClust = *(std::max_element(clusts.begin(), clusts.end()));
     SpectrumRawAveraged binnedSpectrum(maxClust + 1, false, alreadyAveraged);
@@ -277,8 +278,9 @@ SpectrumRawAveraged averageSpectraRaw(const SpectrumRawAveraged &flattenedSpecs,
         
         if (alreadyAveraged)
         {
-            const SpectrumRawTypes::PeakAbundance ab = binnedSpectrum.getAvgPrevAbundances()[cl] + flattenedSpecs.getAbundances()[i];
-            binnedSpectrum.setAvgPrevAbundance(cl, ab);
+            const SpectrumRawTypes::PeakAbundance abr = binnedSpectrum.getAvgPrevAbundancesRel()[cl] + flattenedSpecs.getAbundancesRel()[i];
+            const SpectrumRawTypes::PeakAbundance aba = binnedSpectrum.getAvgPrevAbundancesAbs()[cl] + flattenedSpecs.getAbundancesAbs()[i];
+            binnedSpectrum.setAvgPrevAbundance(cl, abr, aba);
         }
         
         binIDs[cl].insert(specIDs[i]);
@@ -298,8 +300,9 @@ SpectrumRawAveraged averageSpectraRaw(const SpectrumRawAveraged &flattenedSpecs,
         
         if (alreadyAveraged)
         {
-            binnedSpectrum.setAvgPrevAbundance(i, binnedSpectrum.getAvgPrevAbundances()[i] /
-                static_cast<SpectrumRawTypes::PeakAbundance>(numSpecs));
+            const auto ns = static_cast<SpectrumRawTypes::PeakAbundance>(numSpecs);
+            binnedSpectrum.setAvgPrevAbundance(i, binnedSpectrum.getAvgPrevAbundancesRel()[i] / ns,
+                                               binnedSpectrum.getAvgPrevAbundancesAbs()[i] / ns);
         }
     }
     
@@ -308,22 +311,25 @@ SpectrumRawAveraged averageSpectraRaw(const SpectrumRawAveraged &flattenedSpecs,
     // sort spectrum && pre-treat
     const auto sortedInds = getSortedInds(binnedSpectrum.getMZs());
     SpectrumRawAveraged sortedSpectrum;
+    minAbundanceAbs = std::min(minAbundanceAbs, static_cast<SpectrumRawTypes::PeakAbundance>(numSpecs));
     for (size_t i=0; i<sortedInds.size(); ++i)
     {
         const auto j = sortedInds[i];
         if (minIntensity > 0 && binnedSpectrum.getIntensities()[j] < minIntensity)
             continue;
         
-        const auto abundance = static_cast<SpectrumRawTypes::PeakAbundance>(binIDs[j].size()) /
-            static_cast<SpectrumRawTypes::PeakAbundance>(numSpecs);
-        if (abundance < minAbundance)
+        const auto abundanceAbs = static_cast<SpectrumRawTypes::PeakAbundance>(binIDs[j].size());
+        const auto abundanceRel = abundanceAbs / static_cast<SpectrumRawTypes::PeakAbundance>(numSpecs);
+        if (abundanceRel < minAbundanceRel || abundanceAbs < minAbundanceAbs)
             continue;
         
         if (alreadyAveraged)
-            sortedSpectrum.append(binnedSpectrum.getMZs()[j], binnedSpectrum.getIntensities()[j], abundance,
-                                  binnedSpectrum.getAvgPrevAbundances()[j]);
+            sortedSpectrum.append(binnedSpectrum.getMZs()[j], binnedSpectrum.getIntensities()[j], abundanceRel,
+                                  abundanceAbs, binnedSpectrum.getAvgPrevAbundancesRel()[j],
+                                  binnedSpectrum.getAvgPrevAbundancesAbs()[j]);
         else
-            sortedSpectrum.append(binnedSpectrum.getMZs()[j], binnedSpectrum.getIntensities()[j], abundance);
+            sortedSpectrum.append(binnedSpectrum.getMZs()[j], binnedSpectrum.getIntensities()[j], abundanceRel,
+                                  abundanceAbs);
     }
     
     // Rcpp::Rcout << "sortedSpectrum: " << sortedSpectrum.size() << "\n";
@@ -334,34 +340,38 @@ SpectrumRawAveraged averageSpectraRaw(const SpectrumRawAveraged &flattenedSpecs,
 SpectrumRawAveraged averageSpectraRaw(const SpectrumRaw &flattenedSpecs, const std::vector<size_t> &specIDs,
                                       clusterMethod method, SpectrumRawTypes::Mass window, bool averageIntensities,
                                       SpectrumRawTypes::Intensity minIntensity,
-                                      SpectrumRawTypes::PeakAbundance minAbundance)
+                                      SpectrumRawTypes::PeakAbundance minAbundanceRel,
+                                      SpectrumRawTypes::PeakAbundance minAbundanceAbs)
 {
     return averageSpectraRaw(SpectrumRawAveraged(flattenedSpecs.getMZs(), flattenedSpecs.getIntensities()), specIDs,
-                             method, window, averageIntensities, minIntensity, minAbundance);
+                             method, window, averageIntensities, minIntensity, minAbundanceRel, minAbundanceAbs);
 }
 
 SpectrumRawAveraged averageSpectraRaw(const std::vector<SpectrumRaw> &spectra, clusterMethod method,
                                       SpectrumRawTypes::Mass window, bool averageIntensities,
                                       SpectrumRawTypes::Intensity minIntensity,
-                                      SpectrumRawTypes::PeakAbundance minAbundance)
+                                      SpectrumRawTypes::PeakAbundance minAbundanceRel,
+                                      SpectrumRawTypes::PeakAbundance minAbundanceAbs)
 {
     return averageSpectraRaw(flattenSpectra(spectra), flattenedSpecIDs(spectra), method, window, averageIntensities,
-                             minIntensity, minAbundance);
+                             minIntensity, minAbundanceRel, minAbundanceAbs);
 }
 
 SpectrumRawAveraged averageSpectraRaw(const std::vector<SpectrumRawAveraged> &spectra, clusterMethod method,
                                       SpectrumRawTypes::Mass window, bool averageIntensities,
                                       SpectrumRawTypes::Intensity minIntensity,
-                                      SpectrumRawTypes::PeakAbundance minAbundance)
+                                      SpectrumRawTypes::PeakAbundance minAbundanceRel,
+                                      SpectrumRawTypes::PeakAbundance minAbundanceAbs)
 {
     return averageSpectraRaw(flattenSpectra(spectra), flattenedSpecIDs(spectra), method, window, averageIntensities,
-                             minIntensity, minAbundance);
+                             minIntensity, minAbundanceRel, minAbundanceAbs);
 }
 
 // [[Rcpp::export]]
 Rcpp::List doAverageSpectraList(Rcpp::List specsList, const std::string &method,
                                 SpectrumRawTypes::Mass window, SpectrumRawTypes::Intensity minIntensity,
-                                SpectrumRawTypes::PeakAbundance minAbundance)
+                                SpectrumRawTypes::PeakAbundance minAbundanceRel,
+                                SpectrumRawTypes::PeakAbundance minAbundanceAbs)
 {
     const size_t entries = specsList.size();
     const auto clMethod = clustMethodFromStr(method);
@@ -384,16 +394,17 @@ Rcpp::List doAverageSpectraList(Rcpp::List specsList, const std::string &method,
             if (!checkedAveraged)
             {
                 const std::vector<std::string> cn = s.names();
-                alreadyAveraged = std::find(cn.cbegin(), cn.cend(), "abundance") != cn.cend();
+                alreadyAveraged = std::find(cn.cbegin(), cn.cend(), "abundance_rel") != cn.cend();
                 checkedAveraged = true;
             }
             
-            const std::vector<double> abundances = (alreadyAveraged) ? s["abundance"] : std::vector<double>();
+            const std::vector<double> abundancesRel = (alreadyAveraged) ? s["abundance_rel"] : std::vector<double>();
+            const std::vector<double> abundancesAbs = (alreadyAveraged) ? s["abundance_abs"] : std::vector<double>();
             
             for (size_t k=0; k<mzs.size(); ++k)
             {
                 if (alreadyAveraged)
-                    spectra[j].append(mzs[k], intensities[k], abundances[k]);
+                    spectra[j].append(mzs[k], intensities[k], abundancesRel[k], abundancesAbs[k]);
                 else
                     spectra[j].append(mzs[k], intensities[k]);
             }
@@ -403,7 +414,8 @@ Rcpp::List doAverageSpectraList(Rcpp::List specsList, const std::string &method,
     std::vector<SpectrumRawAveraged> averagedSpecList(entries);
     #pragma omp parallel for
     for (size_t i=0; i<entries; ++i)
-        averagedSpecList[i] = averageSpectraRaw(allSpectra[i], clMethod, window, true, minIntensity, minAbundance);
+        averagedSpecList[i] = averageSpectraRaw(allSpectra[i], clMethod, window, true, minIntensity, minAbundanceRel,
+                                                minAbundanceAbs);
 
     Rcpp::List ret(entries);
     
@@ -413,14 +425,17 @@ Rcpp::List doAverageSpectraList(Rcpp::List specsList, const std::string &method,
         {
             ret[i] = Rcpp::List::create(Rcpp::Named("mz") = averagedSpecList[i].getMZs(),
                                         Rcpp::Named("intensity") = averagedSpecList[i].getIntensities(),
-                                        Rcpp::Named("abundance") = averagedSpecList[i].getAbundances(),
-                                        Rcpp::Named("abundance_prev") = averagedSpecList[i].getAvgPrevAbundances());
+                                        Rcpp::Named("abundance_rel") = averagedSpecList[i].getAbundancesRel(),
+                                        Rcpp::Named("abundance_abs") = averagedSpecList[i].getAbundancesAbs(),
+                                        Rcpp::Named("abundance_prev_rel") = averagedSpecList[i].getAvgPrevAbundancesRel(),
+                                        Rcpp::Named("abundance_prev_abs") = averagedSpecList[i].getAvgPrevAbundancesAbs());
         }
         else
         {
             ret[i] = Rcpp::List::create(Rcpp::Named("mz") = averagedSpecList[i].getMZs(),
                                         Rcpp::Named("intensity") = averagedSpecList[i].getIntensities(),
-                                        Rcpp::Named("abundance") = averagedSpecList[i].getAbundances());
+                                        Rcpp::Named("abundance_rel") = averagedSpecList[i].getAbundancesRel(),
+                                        Rcpp::Named("abundance_abs") = averagedSpecList[i].getAbundancesAbs());
         }
     }
     

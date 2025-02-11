@@ -186,8 +186,8 @@ convertMSFilesBruker <- function(inFiles, outFiles, formatTo = "mzML", centroid 
 
 #' @export
 convertMSFilesIMSCollapse <- function(inFiles, outFiles, typeFrom, formatTo = "mzML", mzRange = NULL, mobilityRange = NULL,
-                                      clMethod = "distance", mzWindow = 0.005, minAbundance = 0, topMost = NULL,
-                                      minIntensityIMS = NULL, minIntensityPre = NULL, includeMSMS = FALSE, ...)
+                                      clMethod = "distance", mzWindow = 0.005, minAbundanceRel = 0, minAbundanceAbs = 0,
+                                      topMost = NULL, minIntensityIMS = NULL, minIntensityPre = NULL, includeMSMS = FALSE, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCharacter(inFiles, min.chars = 1, min.len = 1, add = ac)
@@ -196,7 +196,7 @@ convertMSFilesIMSCollapse <- function(inFiles, outFiles, typeFrom, formatTo = "m
     checkmate::assertChoice(formatTo, c("mzML", "mzXML"), add = ac)
     aapply(assertRange, . ~ mzRange + mobilityRange, null.ok = TRUE, fixed = list(add = ac))
     assertClusterMethod(clMethod, add = ac)
-    aapply(checkmate::assertNumber, . ~ mzWindow + minAbundance + minIntensityIMS + minIntensityPre,
+    aapply(checkmate::assertNumber, . ~ mzWindow + minAbundanceRel + minAbundanceAbs + minIntensityIMS + minIntensityPre,
            lower = 0, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertCount(topMost, positive = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertFlag(includeMSMS, add = ac)
@@ -267,8 +267,8 @@ convertMSFilesIMSCollapse <- function(inFiles, outFiles, typeFrom, formatTo = "m
         openMSReadBackend(backend, path)
         collapsedSpectra <- collapseIMSFrames(backend, NULLToZero(mzRange[1]), NULLToZero(mzRange[2]),
                                               NULLToZero(mobilityRange[1]), NULLToZero(mobilityRange[2]), clMethod,
-                                              mzWindow, minAbundance, NULLToZero(topMost), NULLToZero(minIntensityIMS),
-                                              NULLToZero(minIntensityPre), includeMSMS)
+                                              mzWindow, minAbundanceRel, minAbundanceAbs, NULLToZero(topMost),
+                                              NULLToZero(minIntensityIMS), NULLToZero(minIntensityPre), includeMSMS)
         
         
         

@@ -603,6 +603,14 @@ assertAvgPListParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
 
     assertListVal(x, "clusterMzWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name,
                   add = add)
+    assertListVal(x, "minAbundanceRel", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name,
+                  add = add)
+    assertListVal(x, "minAbundanceAbs", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name,
+                  add = add)
+    assertListVal(x, "minAbundanceIMSRel", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name,
+                  add = add)
+    assertListVal(x, "minAbundanceIMSAbs", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name,
+                  add = add)
     assertListVal(x, "topMost", checkmate::assertCount, positive = TRUE, .var.name = .var.name, add = add)
     assertListVal(x, "minIntensityPre", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name,
                   add = add)

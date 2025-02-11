@@ -33,6 +33,10 @@ getMSSpectrum <- function(backend, index, MSLevel, frameIndex = -1L) {
     .Call(`_patRoon_getMSSpectrum`, backend, index, MSLevel, frameIndex)
 }
 
+getCollapsedFrame <- function(backend, index, mzWindow, minIntensityIMS, minIntensityPre, minAbundanceRel, minAbundanceAbs, method) {
+    .Call(`_patRoon_getCollapsedFrame`, backend, index, mzWindow, minIntensityIMS, minIntensityPre, minAbundanceRel, minAbundanceAbs, method)
+}
+
 getCentroidedFrame <- function(backend, index, mzWindow, mobWindow, minIntensity, method) {
     .Call(`_patRoon_getCentroidedFrame`, backend, index, mzWindow, mobWindow, minIntensity, method)
 }
@@ -53,8 +57,8 @@ setSpecMetadata <- function(backend, mdMS, mdMSMS) {
     invisible(.Call(`_patRoon_setSpecMetadata`, backend, mdMS, mdMSMS))
 }
 
-getMSPeakLists <- function(backend, startTimes, endTimes, precursorMZs, withPrecursor, retainPrecursor, MSLevel, method, mzWindow, startMobs, endMobs, minAbundance, topMost, minIntensityIMS, minIntensityPre, minIntensityPost, minBPIntensity) {
-    .Call(`_patRoon_getMSPeakLists`, backend, startTimes, endTimes, precursorMZs, withPrecursor, retainPrecursor, MSLevel, method, mzWindow, startMobs, endMobs, minAbundance, topMost, minIntensityIMS, minIntensityPre, minIntensityPost, minBPIntensity)
+getMSPeakLists <- function(backend, startTimes, endTimes, precursorMZs, withPrecursor, retainPrecursor, MSLevel, method, mzWindow, startMobs, endMobs, minAbundanceRel, minAbundanceAbs, minAbundanceIMSRel, minAbundanceIMSAbs, topMost, minIntensityIMS, minIntensityPre, minIntensityPost, minBPIntensity) {
+    .Call(`_patRoon_getMSPeakLists`, backend, startTimes, endTimes, precursorMZs, withPrecursor, retainPrecursor, MSLevel, method, mzWindow, startMobs, endMobs, minAbundanceRel, minAbundanceAbs, minAbundanceIMSRel, minAbundanceIMSAbs, topMost, minIntensityIMS, minIntensityPre, minIntensityPost, minBPIntensity)
 }
 
 getEIMList <- function(backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, method, mobWindow, minIntensity, mzExpIMSWindow, compress) {
@@ -65,8 +69,8 @@ getPeakIntensities <- function(backend, startMZs, endMZs, times) {
     .Call(`_patRoon_getPeakIntensities`, backend, startMZs, endMZs, times)
 }
 
-collapseIMSFrames <- function(backend, mzStart, mzEnd, mobilityStart, mobilityEnd, method, mzWindow, minAbundance, topMost, minIntensityIMS, minIntensityPre, includeMSMS) {
-    .Call(`_patRoon_collapseIMSFrames`, backend, mzStart, mzEnd, mobilityStart, mobilityEnd, method, mzWindow, minAbundance, topMost, minIntensityIMS, minIntensityPre, includeMSMS)
+collapseIMSFrames <- function(backend, mzStart, mzEnd, mobilityStart, mobilityEnd, method, mzWindow, minAbundanceRel, minAbundanceAbs, topMost, minIntensityIMS, minIntensityPre, includeMSMS) {
+    .Call(`_patRoon_collapseIMSFrames`, backend, mzStart, mzEnd, mobilityStart, mobilityEnd, method, mzWindow, minAbundanceRel, minAbundanceAbs, topMost, minIntensityIMS, minIntensityPre, includeMSMS)
 }
 
 testMS1Writer <- function(backend, out, mzStart, mzEnd, mobilityStart, mobilityEnd, method, mzWindow, minAbundance, topMost, minIntensityIMS, minIntensityPre) {
@@ -129,8 +133,8 @@ testClusterNums2 <- function(nums, method, window) {
     .Call(`_patRoon_testClusterNums2`, nums, method, window)
 }
 
-doAverageSpectraList <- function(specsList, method, window, minIntensity, minAbundance) {
-    .Call(`_patRoon_doAverageSpectraList`, specsList, method, window, minIntensity, minAbundance)
+doAverageSpectraList <- function(specsList, method, window, minIntensity, minAbundanceRel, minAbundanceAbs) {
+    .Call(`_patRoon_doAverageSpectraList`, specsList, method, window, minIntensity, minAbundanceRel, minAbundanceAbs)
 }
 
 loadEICIntensities <- function(spectra, featList, rtWindow) {

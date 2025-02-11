@@ -47,7 +47,6 @@
 [miniCRAN]: https://github.com/andrie/miniCRAN
 [Rtools]: https://cran.r-project.org/bin/windows/Rtools/
 [JavaJDK]: https://www.oracle.com/technetwork/java/javase/downloads/index.html
-[pngquant]: https://pngquant.org/
 [OpenBabel]: https://github.com/openbabel/openbabel
 [Docker]: https://www.docker.com/
 [RStudio]: https://rstudio.com/

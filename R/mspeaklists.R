@@ -138,19 +138,22 @@ setMethod("averageMSPeakLists", "MSPeakLists", function(obj)
             return(lapply(avgPL, function(pl)
             {
                 pl <- copy(pl)
-                setnames(pl, c("abundance", "abundance_prev"), c("fgroup_abundance", "feat_abundance"))
+                setnames(pl, c("abundance_rel", "abundance_abs", "abundance_prev_rel", "abundance_prev_abs"),
+                         c("fgroup_abundance_rel", "fgroup_abundance_abs", "feat_abundance_rel", "feat_abundance_abs"))
                 return(pl)
             }))
         }
         
         allMSPLMSAvg <- doAvg("MS", obj@avgPeakListArgs$clusterMzWindow, obj@avgPeakListArgs$topMost,
                               obj@avgPeakListArgs$minIntensityPre, obj@avgPeakListArgs$minIntensityPost,
-                              obj@avgPeakListArgs$minAbundance, obj@avgPeakListArgs$method, TRUE,
-                              obj@avgPeakListArgs$withPrecursorMS, obj@avgPeakListArgs$pruneMissingPrecursorMS, TRUE)
+                              obj@avgPeakListArgs$minAbundanceRel, obj@avgPeakListArgs$minAbundanceAbs,
+                              obj@avgPeakListArgs$method, TRUE, obj@avgPeakListArgs$withPrecursorMS,
+                              obj@avgPeakListArgs$pruneMissingPrecursorMS, TRUE)
         
         allMSPLMSMSAvg <- doAvg("MSMS", obj@avgPeakListArgs$clusterMzWindow, obj@avgPeakListArgs$topMost,
                                 obj@avgPeakListArgs$minIntensityPre, obj@avgPeakListArgs$minIntensityPost,
-                                obj@avgPeakListArgs$minAbundance, obj@avgPeakListArgs$method, TRUE, FALSE, FALSE,
+                                obj@avgPeakListArgs$minAbundanceRel, obj@avgPeakListArgs$minAbundanceAbs,
+                                obj@avgPeakListArgs$method, TRUE, FALSE, FALSE,
                                 obj@avgPeakListArgs$retainPrecursorMSMS)
 
         avgPLists <- sapply(gNames, function(grp)
@@ -471,9 +474,11 @@ setMethod("delete", "MSPeakLists", function(obj, i = NULL, j = NULL, k = NULL, r
 #' @export
 setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity = NULL, relMinIntensity = NULL,
                                             topMostPeaks = NULL, minPeaks = NULL, maxMZOverPrec = NULL,
-                                            minAbundanceFeat = NULL, minAbundanceFGroup = NULL, isolatePrec = NULL,
-                                            deIsotope = FALSE, removeMZs = NULL, withMSMS = FALSE, annotatedBy = NULL,
-                                            retainPrecursor = TRUE, mzWindow = 0.005, reAverage = FALSE, negate = FALSE)
+                                            minAbundanceFeatRel = NULL, minAbundanceFeatAbs = NULL,
+                                            minAbundanceFGroupRel = NULL, minAbundanceFGroupAbs = NULL,
+                                            isolatePrec = NULL, deIsotope = FALSE, removeMZs = NULL, withMSMS = FALSE,
+                                            annotatedBy = NULL, retainPrecursor = TRUE, mzWindow = 0.005,
+                                            reAverage = FALSE, negate = FALSE)
 {
     if (is.logical(isolatePrec) && isolatePrec == TRUE)
         isolatePrec <- getDefIsolatePrecParams()
@@ -481,7 +486,8 @@ setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity 
     ac <- checkmate::makeAssertCollection()
     checkmate::assertSubset(MSLevel, 1:2, add = ac)
     aapply(checkmate::assertNumber, . ~ absMinIntensity + relMinIntensity + maxMZOverPrec +
-               minAbundanceFeat + minAbundanceFGroup, lower = 0, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
+               minAbundanceFeatRel + minAbundanceFeatAbs +  minAbundanceFGroupRel + minAbundanceFGroupAbs,
+           lower = 0, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertCount, . ~ topMostPeaks + minPeaks, positive = TRUE, null.ok = TRUE, fixed = list(add = ac))
     assertPListIsolatePrecParams(isolatePrec, add = ac)
     aapply(checkmate::assertFlag, . ~ deIsotope + withMSMS + retainPrecursor + reAverage + negate,
@@ -517,8 +523,9 @@ setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity 
         return(obj)
 
     hash <- makeHash(obj, MSLevel, absMinIntensity, relMinIntensity, topMostPeaks, minPeaks, maxMZOverPrec,
-                     minAbundanceFeat, minAbundanceFGroup, isolatePrec, deIsotope, removeMZs, withMSMS, annotatedBy,
-                     retainPrecursor, mzWindow, reAverage, negate)
+                     minAbundanceFeatRel, minAbundanceFeatAbs, minAbundanceFGroupRel, minAbundanceFGroupAbs,
+                     isolatePrec, deIsotope, removeMZs, withMSMS, annotatedBy, retainPrecursor, mzWindow, reAverage,
+                     negate)
     cache <- loadCacheData("filterMSPeakLists", hash)
     if (!is.null(cache))
         return(cache)
@@ -540,7 +547,9 @@ setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity 
                 return(FALSE)
             
             plF <- doMSPeakListFilter(plF, absMinIntensity, relMinIntensity, topMostPeaks, NULL, maxMZOverPrec,
-                                      minAbundanceFeat, if (is.null(ana)) minAbundanceFGroup else NULL,
+                                      minAbundanceFeatRel, minAbundanceFeatAbs,
+                                      if (is.null(ana)) minAbundanceFGroupRel else NULL,
+                                      if (is.null(ana)) minAbundanceFGroupAbs else NULL,
                                       deIsotope, removeMZs, TRUE, plF[precursor == TRUE]$mz, mzWindow, negate)
             if (!is.null(isolatePrec))
                 plF <- isolatePrecInMSPeakList(plF, isolatePrec, negate)
@@ -849,10 +858,11 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRtWindo
         ret <- getMSPeakLists(backend, ft$retmin, ft$retmax, ft$mz,
                               withPrecursor = params$withPrecursor, retainPrecursor = params$retainPrecursor,
                               MSLevel = MSLevel, method = params$method, mzWindow = params$clusterMzWindow,
-                              startMobs = ft$mobmin, endMobs = ft$mobmax, minAbundance = params$minAbundance,
-                              topMost = params$topMost, minIntensityIMS = params$minIntensityIMS,
-                              minIntensityPre = params$minIntensityPre, minIntensityPost = params$minIntensityPost,
-                              minBPIntensity = 0)
+                              startMobs = ft$mobmin, endMobs = ft$mobmax, minAbundanceRel = params$minAbundanceRel,
+                              minAbundanceAbs = params$minAbundanceAbs, minAbundanceIMSRel = params$minAbundanceIMSRel,
+                              minAbundanceIMSAbs = params$minAbundanceIMSAbs, topMost = params$topMost,
+                              minIntensityIMS = params$minIntensityIMS, minIntensityPre = params$minIntensityPre,
+                              minIntensityPost = params$minIntensityPost, minBPIntensity = 0)
         
         names(ret) <- ft$group
         ret <- Map(ret, ft$mz[match(names(ret), ft$group)], f = function(pl, pmz)

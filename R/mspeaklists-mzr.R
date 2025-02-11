@@ -140,12 +140,15 @@ averageSpectra <- function(spectra, clusterMzWindow, topMost, minIntensityPre, m
 #'
 #' @templateVar what generateMSPeakListsMzR
 #' @template main-rd-method
+#' @keywords internal
 #' @export
 setMethod("generateMSPeakListsMzR", "featureGroups", function(fGroups, maxMSRtWindow = 5,
                                                               precursorMzWindow = 4, topMost = NULL,
                                                               avgFeatParams = getDefAvgPListParams(),
                                                               avgFGroupParams = getDefAvgPListParams())
 {
+    .Deprecated(old = "generateMSPeakListsMzR", new = "generateMSPeakLists")
+    
     ac <- checkmate::makeAssertCollection()
     checkmate::assertNumber(maxMSRtWindow, lower = 1, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertNumber(precursorMzWindow, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
@@ -172,8 +175,10 @@ setMethod("generateMSPeakListsMzR", "featureGroups", function(fGroups, maxMSRtWi
     resultHashes <- vector("character", anaCount * gCount)
     resultHashCount <- 0
 
-    # UNDONE
+    warning("The withPrecursorMS and minIntensityIMS parameters are not supported with mzR, they will be ignored. ",
+            "Furthermore, the avgFun parameter was removed, and now default to 'mean'.", call. = FALSE)
     avgFeatParams <- avgFeatParams[setdiff(names(avgFeatParams), c("withPrecursorMS", "minIntensityIMS"))]
+    avgFeatParams$avgFun <- mean
     
     avgFeatParamsMS <- avgFeatParamsMSMS <-
         avgFeatParams[setdiff(names(avgFeatParams), c("pruneMissingPrecursorMS", "retainPrecursorMSMS"))]

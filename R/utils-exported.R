@@ -243,7 +243,6 @@ verifyDependencies <- function()
     
     check("ProteoWizard", findPWizPath(), "patRoon.path.pwiz", isDir = TRUE)
     check("OpenMS", getExtDepPath("openms", "FeatureFinderMetabo", verify = FALSE), "patRoon.path.OpenMS")
-    check("pngquant", getExtDepPath("pngquant", verify = FALSE), "patRoon.path.pngquant")
     check("SIRIUS", getExtDepPath("sirius", verify = FALSE), "patRoon.path.SIRIUS")
     check("MetFrag CL", getExtDepPath("metfragcl", verify = FALSE), "patRoon.path.MetFragCL")
     check("MetFrag CompTox Database", getExtDepPath("metfragct", verify = FALSE), "patRoon.path.MetFragCompTox")

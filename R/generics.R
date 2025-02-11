@@ -343,20 +343,6 @@ setGeneric("reportPDF", function(fGroups, path = "report", reportFGroups = TRUE,
                                  EICGrid = c(2, 1), EICParams = getDefEICParams(window = 20, topMost = 1,
                                                                                 topMostByReplicate = TRUE),
                                  clearPath = FALSE) standardGeneric("reportPDF"))
-#' @rdname reporting-legacy
-setGeneric("reportHTML", function(fGroups, path = "report", reportPlots = c("chord", "venn", "upset", "eics", "formulas"),
-                                  formulas = NULL, formulasTopMost = 5,
-                                  formulasNormalizeScores = "max", formulasExclNormScores = NULL,
-                                  compounds = NULL, compoundsNormalizeScores = "max",
-                                  compoundsExclNormScores = c("score", "individualMoNAScore", "annoTypeCount",
-                                                              "annotHitCount", "libMatch"),
-                                  compoundsOnlyUsedScorings = TRUE, compoundsTopMost = 5, compsCluster = NULL,
-                                  includeMFWebLinks = "compounds", components = NULL, interactiveHeat = FALSE,
-                                  MSPeakLists = NULL, specSimParams = getDefSpecSimParams(), TPs = NULL,
-                                  retMin = TRUE, EICParams = getDefEICParams(window = 20, topMost = 1,
-                                                                             topMostByReplicate = TRUE),
-                                  TPGraphStructuresMax = 25, selfContained = TRUE, optimizePng = FALSE,
-                                  clearPath = FALSE, openReport = TRUE, noDate = FALSE) standardGeneric("reportHTML"))
 #' @rdname reporting
 setGeneric("report", function(fGroups, MSPeakLists = NULL, formulas = NULL, compounds = NULL, compsCluster = NULL,
                               components = NULL, TPs = NULL,

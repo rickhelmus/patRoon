@@ -15,15 +15,15 @@
 #' @keywords internal
 NULL
 
-#' @details \code{reportMD} performs HTML reporting, please use
-#'   \code{\link{reportHTML}} instead.
+#' @details \code{reportHTML} performs HTML reporting, please use
+#'   \code{\link{report}} instead.
 #' @rdname patRoon-deprecated
 #' @export
 #' @keywords internal
-reportMD <- function(...)
+reportHTML <- function(...)
 {
-    .Deprecated("reportHTML")
-    reportHTML(...)
+    .Deprecated("report")
+    report(...)
 }
 
 #' @details \code{exportDAFiles} will export a set of analyses either in

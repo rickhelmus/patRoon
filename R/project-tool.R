@@ -697,18 +697,6 @@ getScriptCode <- function(input, anaInfo)
                 list(name = "MSPeakLists", value = "mslists", condition = doMSPL),
                 list(name = "components", value = componVal)
             ))
-            addCall(NULL, "reportHTML", condition = "HTML" %in% input$reportLegacy, list(
-                list(value = "fGroups"),
-                list(name = "path", value = "report", quote = TRUE),
-                list(name = "formulas", value = "formulas", isNULL = !nzchar(input$formulaGen)),
-                list(name = "compounds", value = "compounds", isNULL = !nzchar(input$compIdent)),
-                list(name = "MSPeakLists", value = "mslists", condition = doMSPL),
-                list(name = "components", value = componVal),
-                list(name = "TPs", value = "TPs", condition = input$doTPs),
-                list(name = "reportPlots", value = c("chord", "venn", "upset", "eics", "formulas"), quote = TRUE),
-                list(name = "selfContained", value = FALSE),
-                list(name = "openReport", value = TRUE)
-            ))
         }
     }
     
@@ -1294,7 +1282,7 @@ getNewProjectUI <- function(destPath)
                                            "HTML", width = "100%"),
                         conditionalPanel(
                             condition = "input.reportGen.includes('legacy')",
-                            checkboxGroupInput("reportLegacy", "Legacy report formats", c("CSV", "PDF", "HTML"),
+                            checkboxGroupInput("reportLegacy", "Legacy report formats", c("CSV", "PDF"),
                                                "CSV", width = "100%")
                         )
                     )

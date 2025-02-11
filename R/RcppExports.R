@@ -129,10 +129,6 @@ testClusterNums2 <- function(nums, method, window) {
     .Call(`_patRoon_testClusterNums2`, nums, method, window)
 }
 
-doAverageSpectra <- function(specs, method, window, minIntensity, minAbundance) {
-    .Call(`_patRoon_doAverageSpectra`, specs, method, window, minIntensity, minAbundance)
-}
-
 doAverageSpectraList <- function(specsList, method, window, minIntensity, minAbundance) {
     .Call(`_patRoon_doAverageSpectraList`, specsList, method, window, minIntensity, minAbundance)
 }

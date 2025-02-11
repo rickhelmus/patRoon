@@ -366,6 +366,36 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// getIsolationMZs
+Rcpp::NumericVector getIsolationMZs(const MSReadBackend& backend, const std::string& method, SpectrumRawTypes::Mass mzWindow, SpectrumRawTypes::Intensity minTIC);
+RcppExport SEXP _patRoon_getIsolationMZs(SEXP backendSEXP, SEXP methodSEXP, SEXP mzWindowSEXP, SEXP minTICSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const MSReadBackend& >::type backend(backendSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type mzWindow(mzWindowSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minTIC(minTICSEXP);
+    rcpp_result_gen = Rcpp::wrap(getIsolationMZs(backend, method, mzWindow, minTIC));
+    return rcpp_result_gen;
+END_RCPP
+}
+// getIsolationMZsAndMobs
+Rcpp::List getIsolationMZsAndMobs(const MSReadBackend& backend, const std::string& method, SpectrumRawTypes::Mass mzWindow, SpectrumRawTypes::Mobility mobWindow, SpectrumRawTypes::Intensity minTIC, SpectrumRawTypes::PeakAbundance minAbundance);
+RcppExport SEXP _patRoon_getIsolationMZsAndMobs(SEXP backendSEXP, SEXP methodSEXP, SEXP mzWindowSEXP, SEXP mobWindowSEXP, SEXP minTICSEXP, SEXP minAbundanceSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const MSReadBackend& >::type backend(backendSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type mzWindow(mzWindowSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Mobility >::type mobWindow(mobWindowSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minTIC(minTICSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::PeakAbundance >::type minAbundance(minAbundanceSEXP);
+    rcpp_result_gen = Rcpp::wrap(getIsolationMZsAndMobs(backend, method, mzWindow, mobWindow, minTIC, minAbundance));
+    return rcpp_result_gen;
+END_RCPP
+}
 // testMS1Writer
 void testMS1Writer(const MSReadBackend& backend, const std::string& out, SpectrumRawTypes::Mass mzStart, SpectrumRawTypes::Mass mzEnd, SpectrumRawTypes::Mobility mobilityStart, SpectrumRawTypes::Mobility mobilityEnd, const std::string& method, SpectrumRawTypes::Mass mzWindow, SpectrumRawTypes::PeakAbundance minAbundance, unsigned topMost, SpectrumRawTypes::Intensity minIntensityIMS, SpectrumRawTypes::Intensity minIntensityPre);
 RcppExport SEXP _patRoon_testMS1Writer(SEXP backendSEXP, SEXP outSEXP, SEXP mzStartSEXP, SEXP mzEndSEXP, SEXP mobilityStartSEXP, SEXP mobilityEndSEXP, SEXP methodSEXP, SEXP mzWindowSEXP, SEXP minAbundanceSEXP, SEXP topMostSEXP, SEXP minIntensityIMSSEXP, SEXP minIntensityPreSEXP) {
@@ -768,6 +798,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_getEIMList", (DL_FUNC) &_patRoon_getEIMList, 12},
     {"_patRoon_getPeakIntensities", (DL_FUNC) &_patRoon_getPeakIntensities, 4},
     {"_patRoon_collapseIMSFrames", (DL_FUNC) &_patRoon_collapseIMSFrames, 13},
+    {"_patRoon_getIsolationMZs", (DL_FUNC) &_patRoon_getIsolationMZs, 4},
+    {"_patRoon_getIsolationMZsAndMobs", (DL_FUNC) &_patRoon_getIsolationMZsAndMobs, 6},
     {"_patRoon_testMS1Writer", (DL_FUNC) &_patRoon_testMS1Writer, 12},
     {"_patRoon_readMSP", (DL_FUNC) &_patRoon_readMSP, 2},
     {"_patRoon_writeMSPLibrary", (DL_FUNC) &_patRoon_writeMSPLibrary, 3},

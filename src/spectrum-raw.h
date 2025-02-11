@@ -114,8 +114,8 @@ public:
     SpectrumRawAveraged(size_t size, bool ab = false, bool aab = false) : SpectrumRaw(size),
                                                                           abundancesRel((ab) ? size : 0),
                                                                           abundancesAbs((ab) ? size : 0),
-                                                                          averagedPrevAbundancesAbs((aab) ? size : 0),
-                                                                          averagedPrevAbundancesRel((aab) ? size : 0) { }
+                                                                          averagedPrevAbundancesRel((aab) ? size : 0),
+                                                                          averagedPrevAbundancesAbs((aab) ? size : 0) { }
     
     const auto &getAbundancesAbs(void) const { return abundancesAbs; }
     const auto &getAbundancesRel(void) const { return abundancesRel; }

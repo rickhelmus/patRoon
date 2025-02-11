@@ -39,8 +39,6 @@ emptyMSPeakList <- function(abundanceColumn, avgCols)
 #' 
 #' \item \code{minAbundance} Minimum relative abundance of an MS peak across the spectra that are averaged (\samp{0-1}).
 #'
-#' \item \code{avgFun} Function that is used to calculate average \emph{m/z} values.
-#'
 #' \item \code{method} Method used for producing averaged MS spectra. Valid values are \code{"hclust"}, used for
 #' hierarchical clustering (using the \pkg{\link{fastcluster}} package), and \code{"distance"}, to use the between peak
 #' distance. The latter method may reduces processing time and memory requirements, at the potential cost of reduced
@@ -82,7 +80,6 @@ getDefAvgPListParams <- function(...)
                 minIntensityPost = 500,
                 minIntensityIMS = 25,
                 minAbundance = 0,
-                avgFun = mean,
                 method = "hclust",
                 withPrecursorMS = TRUE,
                 pruneMissingPrecursorMS = TRUE,
@@ -96,7 +93,6 @@ getDefAvgPListParamsRD <- function()
 {
     def <- getDefAvgPListParams()
     def <- sapply(def, function(v) if (is.character(v)) paste0("\"", v, "\"") else v)
-    def$avgFun <- "mean" # UNDONE?
     return(paste0("\\code{", names(def), "=", def, "}", collapse = "; "))
 }
 # nocov end

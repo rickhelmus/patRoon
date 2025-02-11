@@ -13,41 +13,30 @@
 #'   step.
 #' @param \dots Further arguments passed to \code{\link[graphics]{plot}}.
 #'
-#' @author Ricardo Cunha, \email{cunha@@iuta.de}
+#' @author Ricardo Cunha (\email{cunha@@iuta.de}) and Rick Helmus (\email{r.helmus@@uva.nl})
 #'
 #' @name analysisinfo-dataframe
 NULL
 
 #' @describeIn analysisinfo-dataframe Obtain the total ion chromatogram/s (TICs) of the analyses.
-#' @author Ricardo Cunha, \email{cunha@@iuta.de}
 #' @export
 setMethod("getTICs", "data.frame", function(obj, retentionRange = NULL, MSLevel = 1)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertIntegerish(MSLevel, min.len = 1, lower = 1, add = ac)
     obj <- assertAndPrepareAnaInfo(obj, add = ac)
+    assertRange(retentionRange, null.ok = TRUE, add = ac)
+    checkmate::assertChoice(MSLevel, 1:2, add = ac)
     checkmate::reportAssertions(ac)
     
-    filePaths <- getCentroidedMSFilesFromAnaInfo(obj)
-    
-    res <- lapply(filePaths, function(fpath)
+    return(rbindlist(applyMSData(obj, showProgress = FALSE, func = function(ana, path, backend)
     {
-        hd <- getHeaders(fpath, retentionRange, MSLevel)
-        data.table("ret" = hd$retentionTime, "MSLevel" = hd$msLevel, "intensity" = hd$totIonCurrent)
-    })
-    
-    names(res) <- obj$analysis
-    res <- rbindlist(res, idcol = "analysis")
-    
-    if (nrow(res) > 0)
-    {
-        replicate <- obj$replicate
-        names(replicate) <- obj$analysis
-        res$replicate <- replicate[res$analysis]
-        setcolorder(res, c("analysis", "replicate"))
-    }
-    
-    return(res)
+        openMSReadBackend(backend, path)
+        md <- getMSMetadata(backend, MSLevel)
+        if (!is.null(retentionRange))
+            md <- md[numGTE(md$time, retentionRange[1]) & numLTE(md$time, retentionRange[2]), ]
+        return(data.table(analysis = ana, replicate = obj$replicate[match(ana, obj$analysis)], ret = md$time,
+                          MSLevel = MSLevel, intensity = md$TIC))
+    })))
 })
 
 #' @describeIn analysisinfo-dataframe Obtain the base peak chromatogram/s (BPCs) of the analyses.
@@ -55,30 +44,20 @@ setMethod("getTICs", "data.frame", function(obj, retentionRange = NULL, MSLevel 
 setMethod("getBPCs", "data.frame", function(obj, retentionRange = NULL, MSLevel = 1)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertIntegerish(MSLevel, min.len = 1, lower = 1, add = ac)
     obj <- assertAndPrepareAnaInfo(obj, add = ac)
+    assertRange(retentionRange, null.ok = TRUE, add = ac)
+    checkmate::assertChoice(MSLevel, 1:2, add = ac)
     checkmate::reportAssertions(ac)
     
-    filePaths <- getCentroidedMSFilesFromAnaInfo(obj)
-    
-    res <- lapply(filePaths, function(fpath)
+    return(rbindlist(applyMSData(obj, showProgress = FALSE, func = function(ana, path, backend)
     {
-        hd <- getHeaders(fpath, retentionRange, MSLevel)
-        data.table("ret" = hd$retentionTime, "MSLevel" = hd$msLevel, "mz" = hd$basePeakMZ, "intensity" = hd$basePeakIntensity)
-    })
-    
-    names(res) <- obj$analysis
-    res <- rbindlist(res, idcol = "analysis")
-    
-    if (nrow(res) > 0)
-    {
-        replicate <- obj$replicate
-        names(replicate) <- obj$analysis
-        res$replicate <- replicate[res$analysis]
-        setcolorder(res, c("analysis", "replicate"))
-    }
-    
-    return(res)
+        openMSReadBackend(backend, path)
+        md <- getMSMetadata(backend, MSLevel)
+        if (!is.null(retentionRange))
+            md <- md[numGTE(md$time, retentionRange[1]) & numLTE(md$time, retentionRange[2]), ]
+        return(data.table(analysis = ana, replicate = obj$replicate[match(ana, obj$analysis)], ret = md$time,
+                          MSLevel = MSLevel, intensity = md$BPC))
+    })))
 })
 
 #' @describeIn analysisinfo-dataframe Plots the TICs of the analyses.

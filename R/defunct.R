@@ -206,7 +206,7 @@ getCompViewerUI <- function(pageChoices)
 #' @export
 setMethod("compoundViewer", c("featureGroups", "MSPeakLists", "compounds"), function(fGroups, MSPeakLists, compounds)
 {
-    .Defunct("reportHTML")
+    .Defunct("report")
     return(NULL)
     
     compTable <- compoundTable(compounds)

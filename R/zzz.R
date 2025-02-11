@@ -22,7 +22,6 @@ defaultPkgOpts <- function(pkgname)
                 path.MetFragPubChemLite = "",
                 path.SIRIUS = "",
                 path.OpenMS = "",
-                path.pngquant = "",
                 path.obabel = "",
                 path.BioTransformer = "")
     return(setNames(ret, paste0(pkgname, ".", names(ret))))

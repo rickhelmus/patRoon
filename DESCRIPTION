@@ -94,8 +94,6 @@ Imports:
     enviPat,
     knitr,
     rmarkdown,
-    flexdashboard,
-    DT,
     bslib (>= 0.5.0),
     bsicons,
     reactable (>= 0.4.1),

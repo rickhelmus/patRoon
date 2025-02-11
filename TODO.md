@@ -34,6 +34,12 @@
         - improve code distribution over files
         - finish up
             - make title/href configurable?
+    - delta symbol sometimes shown as N ?
+        - put a replacement in CSV and convert that to HTML symbol?
+        - can't reproduce it... maybe not needed?
+    - overview tab of all EICs?
+        - needs JS to set imgs from plot table and way to attach titles to imgs
+
 - TPs
     - add set specific frag/NL matches for candidates
         - report them?
@@ -47,14 +53,6 @@
 ## TC
 
 - rename estimateIDLevels() and have the same name as annotateSuspects()?
-
-- TP components
-    - report()
-        - remove reportHTML()?
-            - if yes, remove flexdashboard dep
-            - otherwise update, and move flexdashboard to suggests
-        - delta symbol sometimes shown as N ?
-            - put a replacement in CSV and convert that to HTML symbol?
 
 - tests
     - IDL filter
@@ -496,11 +494,6 @@
 - SIRIUS5: doc that tool should be present even if host is not a worker. Or another approach?
 - No need for R.utils dep if normalizePath() is used everywhere instead of getAbsolutePath()?
 - get rid of magrittr dependency?
-
-## Reporting
-
-- get rid of pngquant
-    - fully remove remainder when old reportHTML is fully removed (installation script, Dockerfile, options, ...)
 
 
 ## Features

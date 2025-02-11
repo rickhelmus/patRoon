@@ -49,6 +49,7 @@
 
 - update MSPL filters and set maxMZOverPrec (and other new?) by default
 - add estimateIDLevels()
+- remove precursorMzWindow
 
 ## TC
 
@@ -275,6 +276,7 @@
     - updated convertMSFilesXXX() functions, including changed args
         - add docs for algo specific functions that are now exported
     - update generateMSPeakLists()
+        - also in Handbook
     - availableBackends()
     - EICParams for getPICSet() and calculatePeakQualities()
     - mzExpIMSWindow and minIntensityIMS EIXParam

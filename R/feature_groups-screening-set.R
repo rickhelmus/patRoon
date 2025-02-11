@@ -363,7 +363,7 @@ setMethod("calculateTox", "featureGroupsScreeningSet", function(fGroups, feature
 })
 
 setMethod("assignMobilities", "featureGroupsScreeningSet", function(obj, mobPeaksParam = NULL, IMSWindow = 0.01,
-                                                                    clusterMethod = "distance", minIntensityIMS = 0,
+                                                                    clusterMethod = "distance", minIntensityIMS = 25,
                                                                     maxMSRTWindow = 2, chromPeaksParam = NULL,
                                                                     EICRTWindow = 20, peakRTWindow = 5,
                                                                     calcArea = "integrate", fallbackEIC = TRUE,
@@ -397,7 +397,7 @@ setMethod("assignMobilities", "featureGroupsScreeningSet", function(obj, mobPeak
         if (!is.null(mobPeaksParam))
             obj@features <- assignFeatureMobilitiesPeaks(obj@features, mobPeaksParam, IMSWindow, clusterMethod,
                                                          minIntensityIMS, maxMSRTWindow)
-        obj@features <- reintegrateMobilityFeatures(obj@features, EICRTWindow, peakRTWindow, calcArea,
+        obj@features <- reintegrateMobilityFeatures(obj@features, EICRTWindow, peakRTWindow, calcArea, minIntensityIMS,
                                                     chromPeaksParam, fallbackEIC, parallel)
         obj <- clusterFGroupMobilities(obj, IMSWindow, TRUE)
     }

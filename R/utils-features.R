@@ -288,6 +288,7 @@ getDefEIXParams <- function()
         mzExpWindow = 0.001,
         mobExpWindow = 0.005,
         mzExpIMSWindow = 0.002,
+        minIntensityIMS = 25,
         setsAdductPos = "[M+H]+",
         setsAdductNeg = "[M-H]-"
     )
@@ -359,9 +360,9 @@ extendEIXInputTab <- function(tab, type, EIXParams)
 getEICsOREIMs <- function(obj, type, inputTab, EIXParams, ...)
 {
     if (type == "EIC")
-        doGetEICs(analysisInfo(obj), inputTab, EIXParams$mzExpIMSWindow, ...)
+        doGetEICs(analysisInfo(obj), inputTab, EIXParams$mzExpIMSWindow, EIXParams$minIntensityIMS, ...)
     else # EIM
-        doGetEIMs(analysisInfo(obj), inputTab, EIXParams$IMSWindow, EIXParams$clusterMethod, EIXParams$minIntensity,
+        doGetEIMs(analysisInfo(obj), inputTab, EIXParams$IMSWindow, EIXParams$clusterMethod, EIXParams$minIntensityIMS,
                   EIXParams$mzExpIMSWindow, ...)
 }
 
@@ -940,7 +941,7 @@ assignFeatureMobilitiesPeaks <- function(features, peaksParam, IMSWindow, cluste
     oldCount <- countMobilityFeatures(features)
     
     EIMParams <- getDefEIMParams(window = NULLToZero(maxMSRTWindow), clusterMethod = clusterMethod,
-                                 IMSWindow = IMSWindow, minIntensity = minIntensityIMS)
+                                 IMSWindow = IMSWindow, minIntensityIMS = minIntensityIMS)
     # skip any mobility features and IMS parents
     EIMSelFunc <- \(tab) if (is.null(tab[["mobility"]])) tab else tab[is.na(mobility) & !ID %chin% ims_parent_ID]
     allEIMs <- getFeatureEIXs(features, "EIM", EIXParams = EIMParams, selectFunc = EIMSelFunc, compress = FALSE)
@@ -978,10 +979,11 @@ assignFeatureMobilitiesPeaks <- function(features, peaksParam, IMSWindow, cluste
 }
 
 # UNDONE: make this an exported method?
-reintegrateMobilityFeatures <- function(features, EICRTWindow, peakRTWindow, calcArea, peaksParam, fallbackEIC, parallel)
+reintegrateMobilityFeatures <- function(features, EICRTWindow, peakRTWindow, calcArea, minIntensityIMS, peaksParam,
+                                        fallbackEIC, parallel)
 {
     cacheDB <- openCacheDBScope()
-    hash <- makeHash(features, EICRTWindow, peakRTWindow, calcArea, peaksParam, fallbackEIC)
+    hash <- makeHash(features, EICRTWindow, peakRTWindow, calcArea, minIntensityIMS, peaksParam, fallbackEIC)
     cd <- loadCacheData("reintegrateMobilityFeatures", hash, cacheDB)
     if (!is.null(cd))
         return(cd)
@@ -990,7 +992,8 @@ reintegrateMobilityFeatures <- function(features, EICRTWindow, peakRTWindow, cal
     
     printf("Loading EICs...\n")
     EICSelFunc <- \(tab) tab[!is.null(tab[["mobility"]]) & !is.na(mobility)]
-    allEICs <- getFeatureEIXs(features, type = "EIC", EIXParams = getDefEICParams(window = EICRTWindow),
+    allEICs <- getFeatureEIXs(features, type = "EIC", EIXParams = getDefEICParams(window = EICRTWindow,
+                                                                                  minIntensityIMS = minIntensityIMS),
                               selectFunc = EICSelFunc, compress = FALSE, cacheDB = cacheDB)
     
     if (!is.null(peaksParam))

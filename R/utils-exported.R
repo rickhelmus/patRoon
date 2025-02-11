@@ -371,22 +371,24 @@ availableBackends <- function(anaInfo = NULL)
 #'
 #' @param file The file path to the sample analysis data file (\file{.mzXML} or \file{.mzML}).
 #' @param ranges A \code{data.frame} with \code{numeric} columns \code{"retmin"}, \code{"retmin"}, \code{"mzmin"},
-#'   \code{"mzmax"} with the lower/upper ranges of the retention time and \emph{m/z}.
+#'   \code{"mzmax"} with the lower/upper ranges of the retention time and \emph{m/z}. Furthermore, columns
+#'   \code{"mobmin"} and \code{"mobmax"} can be added for IMS data.
 #'
-#' @return A \code{list} with EIC data for each of the rows in \code{ranges}. 
+#' @return A \code{list} with EIC data for each of the rows in \code{ranges}.
 #'
 #' @export
-getEICs <- function(file, ranges)
+getEICs <- function(file, ranges, minIntensityIMS = 25)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFileExists(file, "r", add = ac)
     checkmate::assertDataFrame(ranges, types = "numeric", any.missing = FALSE, add = ac)
     assertHasNames(ranges, c("mzmin", "mzmax", "retmin", "retmax"))
+    checkmate::assertNumber(minIntensityIMS, lower = 0, finite = TRUE, na.ok = FALSE, add = ac)
     checkmate::reportAssertions(ac)
     
     # UNDONE: set file type
     dummyAI <- data.table(analysis = basename(tools::file_path_sans_ext(file)), path_centroid = dirname(file))
-    return(doGetEICs(dummyAI, list(as.data.table(ranges)))[[1]])
+    return(doGetEICs(dummyAI, list(as.data.table(ranges)), minIntensityIMS = minIntensityIMS)[[1]])
 }
 
 #' @export
@@ -522,8 +524,7 @@ getDefEIMParams <- function(...)
         window = 0.2,
         maxRTWindow = 2,
         IMSWindow = 0.01,
-        clusterMethod = "distance",
-        minIntensity = 0
+        clusterMethod = "distance"
     ))
     return(modifyList(def, list(...), keep.null = TRUE))
 }

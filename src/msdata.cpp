@@ -1014,9 +1014,6 @@ Rcpp::List getMSPeakLists(const MSReadBackend &backend, const std::vector<Spectr
                           SpectrumRawTypes::Intensity minIntensityIMS, SpectrumRawTypes::Intensity minIntensityPre,
                           SpectrumRawTypes::Intensity minIntensityPost, SpectrumRawTypes::Intensity minBPIntensity)
 {
-    // UNDONE: add mobility column to output?
-    // UNDONE: use minIntensityIMS of applyMSData()? Might be faster, but doesn't preserve precursor
-    
     const auto entries = startTimes.size();
     const auto clMethod = clustMethodFromStr(method);
     const auto MSLev = (MSLevel == 1) ? SpectrumRawTypes::MSLevel::MS1 : SpectrumRawTypes::MSLevel::MS2;
@@ -1026,7 +1023,7 @@ Rcpp::List getMSPeakLists(const MSReadBackend &backend, const std::vector<Spectr
         .setWithPrecursor(withPrecursor)
         .setRetainPrecursor(retainPrecursor);
     const auto specFilter = SpectrumRawFilter(baseSpecFilter).setMinIntensity(minIntensityPre);
-    const auto specFilterIMS = SpectrumRawFilter(baseSpecFilter).setMinIntensity(minIntensityIMS);
+    const auto specFilterIMS = SpectrumRawFilter(baseSpecFilter);
     
     // NOTE: for IMS data, averageSpectraRaw() is called which returns a SpectrumRawAveraged. Since we don't care about
     // the additional metadata from this class, we purposely slice it by explicitly specifying the lambda's return type.
@@ -1055,7 +1052,7 @@ Rcpp::List getMSPeakLists(const MSReadBackend &backend, const std::vector<Spectr
         Rcpp::Rcout << "\n";*/
     }
     
-    const auto allSpectra = applyMSData<SpectrumRaw>(backend, MSLev, scanSels, sfunc, 0);
+    const auto allSpectra = applyMSData<SpectrumRaw>(backend, MSLev, scanSels, sfunc, minIntensityIMS);
     
     std::vector<SpectrumRawAveraged> averagedSpectra(entries);
     #pragma omp parallel for
@@ -1083,8 +1080,6 @@ Rcpp::List getEIMList(const MSReadBackend &backend, const std::vector<SpectrumRa
                       const std::string &method, SpectrumRawTypes::Mobility mobWindow,
                       SpectrumRawTypes::Intensity minIntensity, SpectrumRawTypes::Mass mzExpIMSWindow, bool compress)
 {
-    // UNDONE: use applyMSData min intensity?
-    
     const auto entries = startTimes.size();
     const auto clMethod = clustMethodFromStr(method);
     const auto specMeta = backend.getSpecMetadata();
@@ -1132,11 +1127,7 @@ Rcpp::List getEIMList(const MSReadBackend &backend, const std::vector<SpectrumRa
             if (mz < (startMZs[e] - mzExpIMSWindow) || mz > (endMZs[e] + mzExpIMSWindow))
                 continue;
             
-            const auto inten = spec.getIntensities()[i];
-            if (inten < minIntensity)
-                continue;
-            
-            curIntensity += inten;
+            curIntensity += spec.getIntensities()[i];
         }
         
         return ret;
@@ -1149,7 +1140,7 @@ Rcpp::List getEIMList(const MSReadBackend &backend, const std::vector<SpectrumRa
                                                 SpectrumRawTypes::MSLevel::MS1, 0));
     }
     
-    const auto allEIMs = applyMSData<EIM>(backend, SpectrumRawTypes::MSLevel::MS1, scanSels, sfunc, 0);
+    const auto allEIMs = applyMSData<EIM>(backend, SpectrumRawTypes::MSLevel::MS1, scanSels, sfunc, minIntensity);
 
     std::vector<EIM> averageEIMs(entries);
 

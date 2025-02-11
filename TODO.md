@@ -217,6 +217,8 @@
 
 ## msdata
 
+- see what is the best default for backends
+    - set mzR in front for safety?
 - cleanup
     - remove now unused avgParams (eg averaging func)
     - get fully rid of precursorMzWindow (eg newProject()) and update NEWS/docs
@@ -233,10 +235,6 @@
     - further test bbCID data
         - also mixed bbCID/PASEF file (ie with different segments)
     - hclust seems unusable due to high mem usage with IMS data? --> force disable?
-- getEICs()
-    - switch to anaInfo param (or optional?), otherwise add file type arg
-    - allow multiple files?
-    - see when we update/add similar raw data functions
 - embed TIMS-SDK? --> in patRoonExt
 - optionally link to MSTK depending on if it's available
     - somehow clearly state if unavailable during installation
@@ -286,7 +284,8 @@
     - update generateMSPeakLists()
     - availableBackends()
     - EICParams for getPICSet() and calculatePeakQualities()
-    - mzExpIMSWindow EIXParam
+    - mzExpIMSWindow and minIntensityIMS EIXParam
+    - update all for getEICs()
 
 ## IMS
 

@@ -134,7 +134,13 @@ setMethod("averageMSPeakLists", "MSPeakLists", function(obj)
             {
                 pruneList(lapply(pLists, function(pl) pl[[grp]][[mode]]), checkZeroRows = TRUE)
             }, simplify = FALSE)
-            return(setNames(averageSpectraList(allPL, ...), gNames))
+            avgPL <- setNames(averageSpectraList(allPL, ...), gNames)
+            return(lapply(avgPL, function(pl)
+            {
+                pl <- copy(pl)
+                setnames(pl, c("abundance", "abundance_prev"), c("fgroup_abundance", "feat_abundance"))
+                return(pl)
+            }))
         }
         
         allMSPLMSAvg <- doAvg("MS", obj@avgPeakListArgs$clusterMzWindow, obj@avgPeakListArgs$topMost,
@@ -857,7 +863,6 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRtWindo
             pl <- assignPrecursorToMSPeakList(pl, pmz)
             if (params$pruneMissingPrecursor && !any(pl$precursor))
                 pl <- pl[0]
-            setnames(pl, "abundance", "feat_abundance")
             return(pl)
         })
         ret <- pruneList(ret)

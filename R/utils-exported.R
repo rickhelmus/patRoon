@@ -367,28 +367,44 @@ availableBackends <- function(anaInfo = NULL)
 
 #' Obtains extracted ion chromatograms (EICs)
 #'
-#' This function generates one or more EIC(s) for given retention time and \emph{m/z} ranges.
+#' This function generates one or more EIC(s) for given retention time, \emph{m/z} and optionally mobility ranges.
 #'
-#' @param file The file path to the sample analysis data file (\file{.mzXML} or \file{.mzML}).
-#' @param ranges A \code{data.frame} with \code{numeric} columns \code{"retmin"}, \code{"retmin"}, \code{"mzmin"},
-#'   \code{"mzmax"} with the lower/upper ranges of the retention time and \emph{m/z}. Furthermore, columns
-#'   \code{"mobmin"} and \code{"mobmax"} can be added for IMS data.
+#' @template analysisInfo-arg
 #'
-#' @return A \code{list} with EIC data for each of the rows in \code{ranges}.
+#' @param ranges A \code{list} with for each analysis a \code{data.frame} with \code{numeric} columns \code{"retmin"},
+#'   \code{"retmax"}, \code{"mzmin"}, \code{"mzmax"} with the lower/upper ranges of the retention time and \emph{m/z}.
+#'   Furthermore, columns \code{"mobmin"} and \code{"mobmax"} can be added for IMS data.
+#'
+#' @return A \code{list} with for each analysis a \code{list} with EIC data for each of the rows in \code{ranges}.
 #'
 #' @export
-getEICs <- function(file, ranges, minIntensityIMS = 25)
+getEICs <- function(analysisInfo, ranges, compress = FALSE, minIntensityIMS = 25)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertFileExists(file, "r", add = ac)
-    checkmate::assertDataFrame(ranges, types = "numeric", any.missing = FALSE, add = ac)
-    assertHasNames(ranges, c("mzmin", "mzmax", "retmin", "retmax"))
+    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, add = ac)
+    checkmate::assert(
+        checkmate::checkList(ranges, len = nrow(analysisInfo)),
+        checkmate::checkDataFrame(ranges, types = "numeric", any.missing = FALSE),
+        .var.name = "ranges", add = ac
+    )
+    checkmate::assertFlag(compress, add = ac)
     checkmate::assertNumber(minIntensityIMS, lower = 0, finite = TRUE, na.ok = FALSE, add = ac)
     checkmate::reportAssertions(ac)
+
+    if (checkmate::testDataFrame(ranges))
+        ranges <- rep(list(as.data.table(ranges)), nrow(analysisInfo))
     
-    # UNDONE: set file type
-    dummyAI <- data.table(analysis = basename(tools::file_path_sans_ext(file)), path_centroid = dirname(file))
-    return(doGetEICs(dummyAI, list(as.data.table(ranges)), minIntensityIMS = minIntensityIMS)[[1]])
+    if (!checkmate::testNamed(ranges))
+        names(ranges) <- analysisInfo$analysis
+    else
+        checkmate::assertSetEqual(names(ranges), analysisInfo$analysis)
+    
+    for (r in ranges)
+    {
+        checkmate::assertDataFrame(r, types = "numeric", any.missing = FALSE)
+        assertHasNames(r, c("mzmin", "mzmax", "retmin", "retmax"))
+    }
+    return(doGetEICs(analysisInfo, ranges, compress = compress, withBP = TRUE, minIntensityIMS = minIntensityIMS))
 }
 
 #' @export

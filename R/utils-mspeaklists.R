@@ -352,8 +352,13 @@ doMSPeakListFilter <- function(pList, absIntThr, relIntThr, topMost, minPeaks, m
     }
     
     if (!is.null(minAbundanceFeat))
-        ret <- ret[intPred(feat_abundance, minAbundanceFeat)]
-    if (!is.null(minAbundanceFGroup))
+    {
+        if (!is.null(ret[["feat_abundance"]]))
+            ret <- ret[intPred(feat_abundance, minAbundanceFeat)] # averaged PL
+        else
+            ret <- ret[intPred(abundance, minAbundanceFeat)] # feat PL
+    }
+    if (!is.null(minAbundanceFGroup) && !is.null(ret[["fgroup_abundance"]]))
         ret <- ret[intPred(fgroup_abundance, minAbundanceFGroup)]
     
     if (deIsotope)
@@ -616,7 +621,7 @@ getBinnedPLPair <- function(MSPeakLists, groupNames, analyses, MSLevel, specSimP
                 sp <- PLP$specs[[1]]
                 sp[, mergedBy := uniqueName]
                 sp[, intensity := intensity / max(intensity)]
-                sp <- removeDTColumnsIfPresent(sp, c("fgroup_abundance", "feat_abundance"))
+                sp <- removeDTColumnsIfPresent(sp, c("abundance", "feat_abundance"))
                 return(sp)
             }
             return(list(spec1 = dummySpec(PLP1), spec2 = dummySpec(PLP2)))

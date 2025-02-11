@@ -223,14 +223,8 @@
 - perform centroid checks in backends?
 - MSPL
     - store metadata?
-    - more extensively test filters/summing/averaging
     - check defaults for new averaging params
         - set abundance threshold?
-    - withPrecursor: now only applied prior to other filtering systems, change?
-        - if yes: adjust R and C++ code
-        - doc in any case
-    - further test bbCID data
-        - also mixed bbCID/PASEF file (ie with different segments)
     - hclust seems unusable due to high mem usage with IMS data? --> force disable?
 - embed TIMS-SDK? --> in patRoonExt
 - optionally link to MSTK depending on if it's available
@@ -255,7 +249,12 @@
 
 - test
     - new verifyFileForFormat() usage in convertMSFiles()
-    - new spec averaging params
+    - MSPL
+        - new spec averaging params
+        - more extensively test filters/summing/averaging
+        - further test bbCID data: also mixed bbCID/PASEF file (ie with different segments)
+
+
 
 - NEWS
     - MSFileFormats() --> getMSFileConversionFormats() / getMSFileFormats()

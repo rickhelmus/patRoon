@@ -359,53 +359,6 @@ SpectrumRawAveraged averageSpectraRaw(const std::vector<SpectrumRawAveraged> &sp
 }
 
 // [[Rcpp::export]]
-Rcpp::DataFrame doAverageSpectra(Rcpp::List specs, const std::string &method, SpectrumRawTypes::Mass window,
-                                 SpectrumRawTypes::Intensity minIntensity, SpectrumRawTypes::PeakAbundance minAbundance)
-{
-    const auto clMethod = clustMethodFromStr(method);
-    
-    std::vector<SpectrumRawAveraged> spectra(specs.size());
-    bool alreadyAveraged = false, checkAveraged = false;
-    for (size_t i=0; i<spectra.size(); ++i)
-    {
-        const Rcpp::DataFrame s = Rcpp::as<Rcpp::DataFrame>(specs[i]);
-        const std::vector<double> mzs = s["mz"];
-        const std::vector<double> intensities = s["intensity"];
-        
-        if (!checkAveraged)
-        {
-            const std::vector<std::string> cn = s.names();
-            alreadyAveraged = std::find(cn.cbegin(), cn.cend(), "abundance") != cn.cend();
-            checkAveraged = true;
-        }
-
-        const std::vector<double> abundances = (alreadyAveraged) ? s["abundance"] : std::vector<double>();
-
-        for (size_t j=0; j<mzs.size(); ++j)
-        {
-            if (alreadyAveraged)
-                spectra[i].append(mzs[j], intensities[j], abundances[j]);
-            else
-                spectra[i].append(mzs[j], intensities[j]);
-        }
-    }
-    
-    const auto avgsp = averageSpectraRaw(spectra, clMethod, window, true, minIntensity, minAbundance);
-    
-    if (alreadyAveraged)
-    {
-        return Rcpp::DataFrame::create(Rcpp::Named("mz") = avgsp.getMZs(),
-                                       Rcpp::Named("intensity") = avgsp.getIntensities(),
-                                       Rcpp::Named("abundance") = avgsp.getAbundances(),
-                                       Rcpp::Named("abundance_prev") = avgsp.getAvgPrevAbundances());
-    }
-    
-    return Rcpp::DataFrame::create(Rcpp::Named("mz") = avgsp.getMZs(),
-                                   Rcpp::Named("intensity") = avgsp.getIntensities(),
-                                   Rcpp::Named("abundance") = avgsp.getAbundances());
-}
-
-// [[Rcpp::export]]
 Rcpp::List doAverageSpectraList(Rcpp::List specsList, const std::string &method,
                                 SpectrumRawTypes::Mass window, SpectrumRawTypes::Intensity minIntensity,
                                 SpectrumRawTypes::PeakAbundance minAbundance)

@@ -43,6 +43,9 @@
 - TPs
     - add set specific frag/NL matches for candidates
         - report them?
+- Rcpp: see if it makes sense to return lists instead of dataframes
+    - if we want to further optimize eg MS library loading
+
             
 
 ## newProject()
@@ -210,7 +213,6 @@
 
 ## msdata
 
-- see if it makes sense to return lists instead of dataframes for other functions besides getEICList()
 - minIntensityIMS
     - use it for all other functions that get EICs
     - default=25 is OK?
@@ -221,7 +223,6 @@
     - remove now unused avgParams (eg averaging func)
     - get fully rid of precursorMzWindow (eg newProject()) and update NEWS/docs
     - move old MSPL generators to deprecate.R and add notifications
-    - clean old tims files
 - replace makeFileHash() with getMSDataFileHash() on more places?
     - for now leave, but can be done when things appear slow
 - perform centroid checks in backends?

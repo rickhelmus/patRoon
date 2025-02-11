@@ -44,11 +44,14 @@ NULL
 #'
 #' @templateVar what generateMSPeakListsDA
 #' @template main-rd-method
+#' @keywords internal
 #' @export
 setMethod("generateMSPeakListsDA", "featureGroups", function(fGroups, bgsubtr = TRUE, maxMSRtWindow = 5, minMSIntensity = 500,
                                                              minMSMSIntensity = 500,  clear = TRUE, close = TRUE, save = close,
                                                              MSMSType = "MSMS", avgFGroupParams = getDefAvgPListParams())
 {
+    .Deprecated(old = "generateMSPeakListsDA", new = "generateMSPeakLists")
+    
     # UNDONE: implement topMost
     # UNDONE: better hashing
 
@@ -194,11 +197,14 @@ setMethod("generateMSPeakListsDA", "featureGroupsSet", function(fGroups, ...)
 #' 
 #' @templateVar what generateMSPeakListsDAFMF
 #' @template main-rd-method
+#' @keywords internal
 #' @export
 setMethod("generateMSPeakListsDAFMF", "featureGroups", function(fGroups, minMSIntensity = 500, minMSMSIntensity = 500,
                                                                 close = TRUE, save = close,
                                                                 avgFGroupParams = getDefAvgPListParams())
 {
+    .Deprecated(old = "generateMSPeakListsDA", new = "generateMSPeakLists")
+    
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     aapply(checkmate::assertNumber, . ~ minMSIntensity + minMSMSIntensity,

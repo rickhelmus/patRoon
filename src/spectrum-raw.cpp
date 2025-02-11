@@ -34,21 +34,29 @@ void SpectrumRaw::insert(size_t i, SpectrumRawTypes::Mass mz, SpectrumRawTypes::
 }
 
 void SpectrumRawAveraged::append(SpectrumRawTypes::Mass mz, SpectrumRawTypes::Intensity inten,
-                                 SpectrumRawTypes::PeakAbundance ab)
+                                 SpectrumRawTypes::PeakAbundance abr, SpectrumRawTypes::PeakAbundance aba)
 {
     SpectrumRaw::append(mz, inten);
-    abundances.push_back(ab);
+    abundancesRel.push_back(abr); abundancesAbs.push_back(aba);
 }
 
 void SpectrumRawAveraged::append(SpectrumRawTypes::Mass mz, SpectrumRawTypes::Intensity inten,
-                                 SpectrumRawTypes::PeakAbundance ab, SpectrumRawTypes::PeakAbundance avgPrvAb)
+                                 SpectrumRawTypes::PeakAbundance abr, SpectrumRawTypes::PeakAbundance aba,
+                                 SpectrumRawTypes::PeakAbundance avgPrvAbR, SpectrumRawTypes::PeakAbundance avgPrvAbA)
 {
-    append(mz, inten, ab);
-    averagedPreviousAbundance.push_back(avgPrvAb);
+    append(mz, inten, abr, aba);
+    averagedPrevAbundancesRel.push_back(avgPrvAbR); averagedPrevAbundancesAbs.push_back(avgPrvAbA);
 }
 
 void SpectrumRawAveraged::append(const SpectrumRawAveraged &sp)
 {
     SpectrumRaw::append(sp);
-    abundances.insert(abundances.end(), sp.getAbundances().begin(), sp.getAbundances().end());
+    abundancesRel.insert(abundancesRel.end(), sp.getAbundancesRel().begin(), sp.getAbundancesRel().end());
+    abundancesAbs.insert(abundancesAbs.end(), sp.getAbundancesAbs().begin(), sp.getAbundancesAbs().end());
+}
+
+void SpectrumRawAveraged::setAvgPrevAbundance(size_t i, SpectrumRawTypes::PeakAbundance abr,
+                                              SpectrumRawTypes::PeakAbundance aba)
+{
+    averagedPrevAbundancesRel[i] = abr; averagedPrevAbundancesAbs[i] = aba;
 }

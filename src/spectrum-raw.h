@@ -104,26 +104,33 @@ public:
 
 class SpectrumRawAveraged: public SpectrumRaw
 {
-    std::vector<SpectrumRawTypes::PeakAbundance> abundances, averagedPreviousAbundance;
+    std::vector<SpectrumRawTypes::PeakAbundance> abundancesRel, abundancesAbs;
+    std::vector<SpectrumRawTypes::PeakAbundance> averagedPrevAbundancesRel, averagedPrevAbundancesAbs;
     
 public:
     SpectrumRawAveraged(void) = default;
     SpectrumRawAveraged(const std::vector<SpectrumRawTypes::Mass> &m,
                         const std::vector<SpectrumRawTypes::Intensity> &i) : SpectrumRaw(m, i) { }
     SpectrumRawAveraged(size_t size, bool ab = false, bool aab = false) : SpectrumRaw(size),
-                                                                          abundances((ab) ? size : 0),
-                                                                          averagedPreviousAbundance((aab) ? size : 0) { }
+                                                                          abundancesRel((ab) ? size : 0),
+                                                                          abundancesAbs((ab) ? size : 0),
+                                                                          averagedPrevAbundancesAbs((aab) ? size : 0),
+                                                                          averagedPrevAbundancesRel((aab) ? size : 0) { }
     
-    const auto &getAbundances(void) const { return abundances; }
-    const auto &getAvgPrevAbundances(void) const { return averagedPreviousAbundance; }
+    const auto &getAbundancesAbs(void) const { return abundancesAbs; }
+    const auto &getAbundancesRel(void) const { return abundancesRel; }
+    const auto &getAvgPrevAbundancesRel(void) const { return averagedPrevAbundancesRel; }
+    const auto &getAvgPrevAbundancesAbs(void) const { return averagedPrevAbundancesAbs; }
     
     using SpectrumRaw::append;
-    void append(SpectrumRawTypes::Mass mz, SpectrumRawTypes::Intensity inten, SpectrumRawTypes::PeakAbundance ab);
+    void append(SpectrumRawTypes::Mass mz, SpectrumRawTypes::Intensity inten, SpectrumRawTypes::PeakAbundance abr,
+                SpectrumRawTypes::PeakAbundance aba);
     void append(SpectrumRawTypes::Mass mz, SpectrumRawTypes::Intensity inten, SpectrumRawTypes::PeakAbundance ab,
-                SpectrumRawTypes::PeakAbundance avgPrvAb);
+                SpectrumRawTypes::PeakAbundance aba, SpectrumRawTypes::PeakAbundance avgPrvAbR,
+                SpectrumRawTypes::PeakAbundance avgPrvAbA);
     void append(const SpectrumRawAveraged &sp);
     
-    void setAvgPrevAbundance(size_t i, SpectrumRawTypes::PeakAbundance ab) { averagedPreviousAbundance[i] = ab; }
+    void setAvgPrevAbundance(size_t i, SpectrumRawTypes::PeakAbundance abr, SpectrumRawTypes::PeakAbundance aba);
 };
 
 struct SpectrumRawFilter
@@ -164,19 +171,23 @@ SpectrumRaw filterIMSFrame(const SpectrumRaw &spectrum, const SpectrumRawFilter 
 SpectrumRawAveraged averageSpectraRaw(const SpectrumRawAveraged &flattenedSpecs, const std::vector<size_t> &specIDs,
                                       clusterMethod method, SpectrumRawTypes::Mass window, bool averageIntensities,
                                       SpectrumRawTypes::Intensity minIntensity,
-                                      SpectrumRawTypes::PeakAbundance minAbundance);
+                                      SpectrumRawTypes::PeakAbundance minAbundanceRel,
+                                      SpectrumRawTypes::PeakAbundance minAbundanceAbs);
 SpectrumRawAveraged averageSpectraRaw(const SpectrumRaw &flattenedSpecs, const std::vector<size_t> &specIDs,
                                       clusterMethod method, SpectrumRawTypes::Mass window, bool averageIntensities,
                                       SpectrumRawTypes::Intensity minIntensity,
-                                      SpectrumRawTypes::PeakAbundance minAbundance);
+                                      SpectrumRawTypes::PeakAbundance minAbundanceRel,
+                                      SpectrumRawTypes::PeakAbundance minAbundanceAbs);
 SpectrumRawAveraged averageSpectraRaw(const std::vector<SpectrumRaw> &spectra, clusterMethod method,
                                       SpectrumRawTypes::Mass window, bool averageIntensities,
                                       SpectrumRawTypes::Intensity minIntensity,
-                                      SpectrumRawTypes::PeakAbundance minAbundance);
+                                      SpectrumRawTypes::PeakAbundance minAbundanceRel,
+                                      SpectrumRawTypes::PeakAbundance minAbundanceAbs);
 SpectrumRawAveraged averageSpectraRaw(const std::vector<SpectrumRawAveraged> &spectra, clusterMethod method,
                                       SpectrumRawTypes::Mass window, bool averageIntensities,
                                       SpectrumRawTypes::Intensity minIntensity,
-                                      SpectrumRawTypes::PeakAbundance minAbundance);
+                                      SpectrumRawTypes::PeakAbundance minAbundanceRel,
+                                      SpectrumRawTypes::PeakAbundance minAbundanceAbs);
 std::vector<size_t> frameSubSpecIDs(const SpectrumRaw &frame);
 SpectrumRaw centroidIMSFrame(const SpectrumRaw &frame, const clusterMethod method, SpectrumRawTypes::Mass mzWindow,
                              SpectrumRawTypes::Mobility mobWindow, SpectrumRawTypes::Intensity minIntensity);

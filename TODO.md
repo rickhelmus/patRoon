@@ -43,8 +43,12 @@
 - TPs
     - add set specific frag/NL matches for candidates
         - report them?
-- Rcpp: see if it makes sense to return lists instead of dataframes
-    - if we want to further optimize eg MS library loading
+- Possible optimizations
+    - Rcpp: see if it makes sense to return lists instead of dataframes, eg to further optimize MS library loading
+    - replace makeFileHash() with getMSDataFileHash() on more places?
+- msdata
+    - mechanism to prefer IM/centroided data? loading centroiding data could be faster if no IMS is needed
+        - could be achieved by putting mzR as first backend?
 
             
 
@@ -213,25 +217,12 @@
 
 ## msdata
 
-- minIntensityIMS
-    - use it for all other functions that get EICs
-    - default=25 is OK?
-    - store it in an option? or otherwise in EICParams for fGroups?
-    - remove default in doGetEICs() when finished
-    - also use it for MSPL and EIMs?
 - cleanup
     - remove now unused avgParams (eg averaging func)
     - get fully rid of precursorMzWindow (eg newProject()) and update NEWS/docs
     - move old MSPL generators to deprecate.R and add notifications
-- replace makeFileHash() with getMSDataFileHash() on more places?
-    - for now leave, but can be done when things appear slow
 - perform centroid checks in backends?
-- Further test multithreading stability with OTIMS
-- check assumptions about data being sorted
-    - meatadata: scans, RTs, mobilities
-    - spectra: m/z, mobilities (see if this can be used to speedup eg MSTK)
 - MSPL
-    - add mobility column?
     - store metadata?
     - more extensively test filters/summing/averaging
     - check defaults for new averaging params
@@ -242,7 +233,6 @@
     - further test bbCID data
         - also mixed bbCID/PASEF file (ie with different segments)
     - hclust seems unusable due to high mem usage with IMS data? --> force disable?
-- the default backends now put mzR as last to ensure mobility data can be used, change this somehow?
 - getEICs()
     - switch to anaInfo param (or optional?), otherwise add file type arg
     - allow multiple files?
@@ -252,17 +242,12 @@
     - somehow clearly state if unavailable during installation
 - only enable OTIMS on Win/Lin x64
     - somehow clearly state if unavailable during installation?
-    - should work after tims.cpp is removed --> test when done
 - collapseIMSFiles(): see if this makes sense as an alternative to convertMSFiles()
-    - pros: doesn't need pwiz, slightly faster per file conversion (eg 23 vs 30 secs) and produces smaller files (eg ~180 vs 350 mb)
-    - cons: can't parallelize over multiple files, so probably not really faster, files are potentially with incomplete metadata
-    - could also use MSTK and/or SC for writing
+    - could use MSTK and/or SC for writing
         - both need to write a bit more metadata (instrumentConfiguration and dataProcessing), as OpenMS fails otherwise
         - best would be to do write spectra while reading, so we can do MP
             - or skip MP and do complete batch in C++
         - no support for mzXML
-    - initial tests of pwiz, mzR and MSTK show quite different numbers of OpenMS features...
-    - if we stick with convertMSFiles(), somehow recommend skipping MS2+gzip?
 - interface with timsConvert?
 - update generateAnalysisInfo() and newProject()
     - see if getAllMSFilesFromAnaInfo() can be used, otherwise remove it
@@ -270,6 +255,7 @@
 - convertMSFilesXXX()
     - change function names?
     - add option for zlib compression, and enable by default? Esp useful for IMS/profile data
+    - option to omit MS2 data?
 - more clearly state which backend is used, e.g. for general logging and citing
 
 - test

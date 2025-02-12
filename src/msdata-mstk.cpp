@@ -93,6 +93,12 @@ void MSReadBackendMSTK::generateSpecMetadata(void)
     const size_t lastScan = MSTKReader.getLastScan();
     const bool haveIMS = firstSpec.hasIonMobilityArray();
     
+    if (firstSpec.getCentroidStatus() != 1)
+        Rcpp::stop("Please make sure that file '%s' is centroided!", getCurrentFile().c_str());
+    
+    if (getNeedIMS() && !haveIMS)
+        Rcpp::stop("File '%s' does not contain ion mobility data!", getCurrentFile().c_str());
+    
     SpectrumRawMetadata meta;
     
     ThreadExceptionHandler exHandler;

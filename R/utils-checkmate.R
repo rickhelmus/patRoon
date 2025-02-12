@@ -940,7 +940,7 @@ assertPlotEIXArgs <- function(obj, analysis, groupName, showPeakArea, showFGroup
     assertXYLim(xlim, ylim, add = add)
 }
 
-assertFindPeaksParam <- function(x, null.ok = FALSE, .var.name = checkmate::vname(x), add = NULL)
+assertFindPeakParams <- function(x, null.ok = FALSE, .var.name = checkmate::vname(x), add = NULL)
 {
     if (null.ok && is.null(x))
         return(invisible(NULL))
@@ -991,12 +991,12 @@ assertFindMobilitiesArgs <- function(mobPeaksParam, IMSWindow, clusterMethod, mi
                                      maxMSRTWindow, chromPeaksParam, EICRTWindow, peakRTWindow, calcArea,
                                      fallbackEIC, CCSParams, parallel, add)
 {
-    assertFindPeaksParam(mobPeaksParam, null.ok = TRUE, add = add)
+    assertFindPeakParams(mobPeaksParam, null.ok = TRUE, add = add)
     aapply(checkmate::assertNumber, . ~ IMSWindow + minIntensityIMS + EICRTWindow + peakRTWindow, finite = TRUE,
            fixed = list(add = add))
     assertClusterMethod(clusterMethod, add = add)
     checkmate::assertNumber(maxMSRTWindow, lower = 1, finite = TRUE, null.ok = TRUE, add = add)
-    assertFindPeaksParam(chromPeaksParam, null.ok = TRUE, add = add)
+    assertFindPeakParams(chromPeaksParam, null.ok = TRUE, add = add)
     checkmate::assertChoice(calcArea, c("integrate", "sum"), add = add)
     aapply(checkmate::assertFlag, . ~ fallbackEIC + parallel, fixed = list(add = add))
     assertCCSParams(CCSParams, null.ok = TRUE, add = add)

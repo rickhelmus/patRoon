@@ -370,7 +370,7 @@ availableBackends <- function(anaInfo = NULL, verbose = TRUE)
             printf("Backend '%s': %s\n", b, check[[b]])
     }
     
-    return(invisible(names(sapply(check, identical, "yes"))))
+    return(invisible(names(check[sapply(check, identical, "yes")])))
 }
 
 #' Obtains extracted ion chromatograms (EICs)

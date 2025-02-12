@@ -147,6 +147,7 @@ void MSReadBackend::close(void)
 RCPP_MODULE(MSReadBackend)
 {
     Rcpp::class_<MSReadBackend>("MSReadBackend")
+        .method("setNeedIMS", &MSReadBackend::setNeedIMS)
         .method("open", &MSReadBackend::open)
         .method("close", &MSReadBackend::close)
         .method("getCurrentFile", &MSReadBackend::getCurrentFile)

@@ -14,6 +14,7 @@ protected:
 private:
     std::string currentFile;
     SpectrumRawMetadata specMetadata;
+    bool needIMS = false;
     
     virtual void doOpen(const std::string &file) = 0;
     virtual void doClose(void) = 0;
@@ -28,6 +29,8 @@ public:
     MSReadBackend(const MSReadBackend &) = delete;
     virtual ~MSReadBackend(void) { }
     
+    void setNeedIMS(bool n) { needIMS = n; }
+    bool getNeedIMS(void) const { return needIMS; }
     void open(const std::string &file);
     void close(void);
     const std::string &getCurrentFile(void) const { return currentFile; }

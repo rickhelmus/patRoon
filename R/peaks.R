@@ -32,9 +32,11 @@ findPeaks <- function(EICs, params, logPath)
             }
             
             if (params$forcePeakRange[1] > 0)
-                pl[, retmin := pmax(ret - params$forcePeakRange[1], retmin)]
+                pl[, c("retmin", "retmax") := .(pmin(ret - params$forcePeakRange[1], retmin),
+                                                pmax(ret + params$forcePeakRange[1], retmax))]
             if (params$forcePeakRange[2] > 0)
-                pl[, retmax := pmin(ret + params$forcePeakRange[2], retmax)]
+                pl[, c("retmin", "retmax") := .(pmax(ret - params$forcePeakRange[2], retmin),
+                                                pmin(ret + params$forcePeakRange[2], retmax))]
         })
     }
     

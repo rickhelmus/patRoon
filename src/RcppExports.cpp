@@ -367,7 +367,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // getIsolationMZs
-Rcpp::NumericVector getIsolationMZs(const MSReadBackend& backend, const std::string& method, SpectrumRawTypes::Mass mzWindow, SpectrumRawTypes::Intensity minTIC);
+Rcpp::List getIsolationMZs(const MSReadBackend& backend, const std::string& method, SpectrumRawTypes::Mass mzWindow, SpectrumRawTypes::Intensity minTIC);
 RcppExport SEXP _patRoon_getIsolationMZs(SEXP backendSEXP, SEXP methodSEXP, SEXP mzWindowSEXP, SEXP minTICSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;

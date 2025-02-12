@@ -1187,3 +1187,19 @@ installc3sdb <- function(envname = "patRoon-c3sdb", clearEnv = FALSE, ...)
     
     reticulate::py_install("git+https://github.com/dylanhross/c3sdb", envname = envname, ...)
 }
+
+#' @export
+installTIMSCONVERT <- function(envname = "patRoon-TIMSCONVERT", clearEnv = FALSE, ...)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertString(envname, min.chars = 1, null.ok = TRUE)
+    checkmate::assertFlag(clearEnv, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    checkPackage("reticulate")
+    
+    if (clearEnv && !is.null(envname))
+        reticulate::virtualenv_remove(envname)
+    
+    reticulate::py_install("git+https://github.com/gtluu/timsconvert", envname = envname, ...)
+}

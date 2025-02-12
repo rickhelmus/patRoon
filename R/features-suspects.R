@@ -20,7 +20,7 @@ findFeaturesSuspects <- function(analysisInfo, suspects, peaksParam, rtWindow = 
     ac <- checkmate::makeAssertCollection()
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, add = ac)
     assertSuspectList(suspects, needsAdduct = is.null(adduct), skipInvalid = skipInvalid, add = ac)
-    assertFindPeaksParam(peaksParam, add = ac)
+    assertFindPeakParams(peaksParam, add = ac)
     aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertNumber(mobWindow, lower = 0, finite = TRUE, null.ok = TRUE)
     aapply(checkmate::assertFlag, . ~ skipInvalid + prefCalcChemProps + neutralChemProps + parallel + verbose,

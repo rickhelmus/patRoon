@@ -17,7 +17,6 @@
 - maxMSRtWindow --> maxMSRTWindow
 - BUG: unescaped set names are now used regular expressions (problem if eg dot is present when make.unique was used)
 - update patRoonInst for new deps?
-- peaksParam --> peaksParams
 
 
 ## Maybe
@@ -289,8 +288,6 @@
     - add smoothing for XCMS3/enviPick? e.g. with signal::sgolayfilt()
         - might also be nice for plotting chroms?
     - OpenMS
-        - remove old function
-        - check if we can get compute_peak_shape_metrics to work (maybe check OMS version?)
         - add MRMTransitionGroupPicker to patRoonExt
     - Dietrich
         - Disabled noise removal for reported intensities/areas
@@ -301,7 +298,6 @@
         - see if current chrom defaults are fine
         - add sensible IMS defaults
             - reduce gaussWidth for OpenMS
-        - naming: change param to params for consistency (also assertions)
 - assignMobilities()
     - assert that instrument data has actually IMS data
     - better names for ims_parent_ID/ims_parent_group?

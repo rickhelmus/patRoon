@@ -825,9 +825,9 @@ aggregateTox <- function(tox, aggrParams, splitSuspects = FALSE)
     return(tox[])
 }
 
-findPeaksInEICs <- function(EICs, peaksParam, withBP, withMobility, cacheDB = NULL)
+findPeaksInEICs <- function(EICs, peakParams, withBP, withMobility, cacheDB = NULL)
 {
-    baseHash <- makeHash(peaksParam)
+    baseHash <- makeHash(peakParams)
     
     # NOTE: EICs must be named
     
@@ -839,7 +839,7 @@ findPeaksInEICs <- function(EICs, peaksParam, withBP, withMobility, cacheDB = NU
     # convert EICs to data.tables: this is necessary for findPeaks()
     # NOTE: we don't store (or hash) the EICs as DTs, as this makes things slower
     
-    peaks <- findPeaks(EICs, peaksParam, verbose = FALSE)
+    peaks <- findPeaks(EICs, peakParams, verbose = FALSE)
     peaks <- rbindlist(peaks, idcol = "EIC_ID")
     
     if (nrow(peaks) == 0)
@@ -929,10 +929,10 @@ doAssignFeatureMobilities <- function(fTable, mobTable)
     return(fTable)
 }
 
-assignFeatureMobilitiesPeaks <- function(features, peaksParam, IMSWindow, clusterMethod, minIntensityIMS,
+assignFeatureMobilitiesPeaks <- function(features, peakParams, IMSWindow, clusterMethod, minIntensityIMS,
                                          maxMSRTWindow)
 {
-    hash <- makeHash(features, peaksParam, IMSWindow, clusterMethod, minIntensityIMS, maxMSRTWindow)
+    hash <- makeHash(features, peakParams, IMSWindow, clusterMethod, minIntensityIMS, maxMSRTWindow)
     cd <- loadCacheData("assignFeatureMobilitiesPeaks", hash)
     if (!is.null(cd))
         return(cd)
@@ -955,7 +955,7 @@ assignFeatureMobilitiesPeaks <- function(features, peaksParam, IMSWindow, cluste
         {
             # pretend we have EICs so we can find peaks
             EIMs <- lapply(EIMs, setnames, old = "mobility", new = "time")
-            peaksList <- findPeaks(EIMs, peaksParam, verbose = TRUE)
+            peaksList <- findPeaks(EIMs, peakParams, verbose = TRUE)
             peaksTable <- rbindlist(peaksList, idcol = "ims_parent_ID")                
             setnames(peaksTable, c("ret", "retmin", "retmax", "area", "intensity"), mobNumCols, skip_absent = TRUE)
             # NOTE: we subset columns here to remove any algo specific columns that may also be present in the feature
@@ -979,11 +979,11 @@ assignFeatureMobilitiesPeaks <- function(features, peaksParam, IMSWindow, cluste
 }
 
 # UNDONE: make this an exported method?
-reintegrateMobilityFeatures <- function(features, EICRTWindow, peakRTWindow, calcArea, minIntensityIMS, peaksParam,
+reintegrateMobilityFeatures <- function(features, EICRTWindow, peakRTWindow, calcArea, minIntensityIMS, peakParams,
                                         fallbackEIC, parallel)
 {
     cacheDB <- openCacheDBScope()
-    hash <- makeHash(features, EICRTWindow, peakRTWindow, calcArea, minIntensityIMS, peaksParam, fallbackEIC)
+    hash <- makeHash(features, EICRTWindow, peakRTWindow, calcArea, minIntensityIMS, peakParams, fallbackEIC)
     cd <- loadCacheData("reintegrateMobilityFeatures", hash, cacheDB)
     if (!is.null(cd))
         return(cd)
@@ -996,12 +996,12 @@ reintegrateMobilityFeatures <- function(features, EICRTWindow, peakRTWindow, cal
                                                                                   minIntensityIMS = minIntensityIMS),
                               selectFunc = EICSelFunc, compress = FALSE, cacheDB = cacheDB)
     
-    if (!is.null(peaksParam))
+    if (!is.null(peakParams))
     {
         # UNDONE: make withBP configurable?
         peaksList <- doApply("Map", parallel, allEICs, featureTable(features), f = function(EICs, ft)
         {
-            peaks <- findPeaksInEICs(EICs, peaksParam, withBP = FALSE, withMobility = FALSE, cacheDB = cacheDB)
+            peaks <- findPeaksInEICs(EICs, peakParams, withBP = FALSE, withMobility = FALSE, cacheDB = cacheDB)
             # filter out peaks outside original retmin/retmax and with high RT deviation
             parFT <- ft[match(peaks$EIC_ID, ID)]
             peaks <- peaks[numGTE(ret, parFT$retmin) & numLTE(ret, parFT$retmax) & numLTE(abs(ret - parFT$ret), peakRTWindow)]

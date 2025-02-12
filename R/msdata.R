@@ -160,6 +160,9 @@ setMethod("initMSReadBackend", "Rcpp_MSReadBackendMem", function(backend)
         hd <- as.data.table(mzR::header(msf))
         mzR::close(msf)
         
+        if (!is.null(hd[["centroided"]]) && !all(hd$centroided))
+            stop(sprintf("Please make sure that file '%s' is centroided!", path), call. = FALSE)
+        
         setnames(hd, c("acquisitionNum", "retentionTime", "totIonCurrent", "basePeakIntensity"),
                  c("scan", "time", "TIC", "BPC"))
         hd[polarity == 0, polarity := -1] # 0 is negative mode for mzR
@@ -230,6 +233,7 @@ applyMSData <- function(anaInfo, func,  ..., types = getMSFileTypes(), formats =
         if (!is.null(filePaths))
         {
             backend <- createMSBackend(bn)
+            backend$setNeedIMS(needIMS)
             printf("Using '%s' backend for reading MS data.\n", bn) # UNDONE: make printing optional (arg/option?)
             # NOTE: disable future parallelization as the backends are already OpenMP parallelized
             # NOTE: the callback can return cached data so opening the file should happen there.

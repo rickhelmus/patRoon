@@ -227,7 +227,6 @@
 
 - see what is the best default for backends
     - set mzR in front for safety?
-- perform centroid and IMS checks in backends?
 - MSPL: hclust seems unusable due to high mem usage with IMS data? --> just default to distance and doc change/IMS need?
 - embed TIMS-SDK? --> in patRoonExt
 - collapseIMSFiles(): see if this makes sense as an alternative to convertMSFiles()

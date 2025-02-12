@@ -37,108 +37,9 @@ findPeaks <- function(EICs, params, verbose = TRUE)
     return(ret)
 }
 
-findPeaksOpenMSOld <- function(EICs, minRTDistance = 10, minNumPeaks = 5, minSNRatio = 2, resampleTraces = FALSE,
-                            extraOpts = NULL, smoothWidth = NULL, intSearchRTWindow = 3, scaleTimeFactor = NULL,
-                            verbose = TRUE)
+findPeaksOpenMS <- function(EICs, params, verbose = TRUE)
 {
-    # EICs should be a named list of data.tables
-    
-    # HACK HACK HACK: OpenMS errors if the time range is very small. For instance, this is a problem if IMS data is used
-    # with findMobilities() --> just multiply everything 'time' related with 100 for now.
-    if (!is.null(scaleTimeFactor))
-    {
-        EICs <- lapply(EICs, function(eic) copy(eic)[, time := time * scaleTimeFactor])
-        minRTDistance <- minRTDistance * scaleTimeFactor
-        intSearchRTWindow <- intSearchRTWindow * scaleTimeFactor
-    }
-    
-    chromFile <- tempfile(fileext = ".mzML")
-    featsFile <- tempfile(fileext = ".featureXML")
-    
-    maybePrintf <- if (verbose) printf else function(...) NULL
-    
-    maybePrintf("Exporting EICs... ")
-    writeChromsToMzML(EICs, chromFile)
-    maybePrintf("Done!\n")
-    
-    if (!is.null(smoothWidth))
-    {
-        maybePrintf("Smoothing traces with OpenMS...\n-----------\n")
-        executeCommand(getCommandWithOptPath("NoiseFilterGaussian", "OpenMS"),
-                       OpenMSArgListToOpts(c("-in" = chromFile,
-                                             "-out" = chromFile,
-                                             "-algorithm:gaussian_width" = smoothWidth)),
-                       stdout = if (verbose) "" else FALSE)
-        maybePrintf("\n-----------\n")
-    }
-    
-    maybePrintf("Finding peaks with OpenMS...\n-----------\n")
-    settings <- c("-in" = chromFile,
-                  "-out" = featsFile,
-                  "-algorithm:min_rt_distance" = minRTDistance,
-                  "-algorithm:min_num_peaks_per_feature" = minNumPeaks,
-                  "-algorithm:min_signal_to_noise_ratio" = minSNRatio)
-    if (resampleTraces)
-        settings <- c(settings, "-algorithm:resample_traces")
-    if (!is.null(extraOpts))
-        settings <- modifyList(settings, extraOpts)
-    executeCommand(getCommandWithOptPath("FeatureFinderMRM", "OpenMS"), OpenMSArgListToOpts(settings),
-                   stdout = if (verbose) "" else FALSE)
-    maybePrintf("\n-----------\n")
-    
-    maybePrintf("Importing peaks... ")
-    peaks <- setDT(parseFeatureXMLFile(featsFile))
-    maybePrintf("Done!\n")
-    
-    # NOTE: the mz parameter is (ab)used to set the EIC index
-    peaks[, name := names(EICs)[mz]][, mz := NULL]
-
-    # BUG: sometimes RT reported is wrong (https://github.com/OpenMS/OpenMS/issues/6239). For now simply omit the
-    # results...
-    peaks <- peaks[ret %between% list(retmin, retmax)]
-    
-    peaksList <- split(peaks, by = "name", keep.by = FALSE)
-    peaksList <- pruneList(peaksList, checkZeroRows = TRUE)
-    
-    maybePrintf("Post-processing... ")
-    
-    # subset columns, convert to data.tables & fill in intensities (not reported by OpenMS)
-    peaksList <- Map(peaksList, EICs[names(peaksList)], f = function(p, eic)
-    {
-        p <- setDT(p[, c("ret", "retmin", "retmax", "area")])
-        p[, intensity := sapply(ret, function(r)
-        {
-            e <- eic[time %between% c(r - intSearchRTWindow, r + intSearchRTWindow)]
-            return(max(e$intensity))
-        })]
-        
-        if (!is.null(scaleTimeFactor))
-        {
-            p[, c("ret", "retmin", "retmax") := .(ret / scaleTimeFactor,
-                                                  retmin / scaleTimeFactor,
-                                                  retmax / scaleTimeFactor)]
-        }
-        
-        return(p)
-    })
-    maybePrintf("Done!\n")
-    
-    return(peaksList)
-}
-
-findPeaksOpenMS <- function(EICs, params, scaleTimeFactor = NULL, verbose = TRUE)
-{
-    # UNDONE: more parameters, check what are sensible defaults
-    
     # EICs should be a named list
-    
-    # HACK HACK HACK: OpenMS errors if the time range is very small. For instance, this is a problem if IMS data is used
-    # with findMobilities() --> just increase the scale by scaleTimeFactor for now.
-    # UNDONE: do we still need this? If so, move to params
-    if (!is.null(scaleTimeFactor))
-    {
-        EICs <- lapply(EICs, function(eic) { eic$time <- eic$time * scaleTimeFactor; return(eic) })
-    }
     
     TraMLFile <- tempfile(fileext = ".TraML")
     chromFile <- tempfile(fileext = ".mzML")
@@ -185,13 +86,6 @@ findPeaksOpenMS <- function(EICs, params, scaleTimeFactor = NULL, verbose = TRUE
     setnames(peaks, "chromID", "name")
     setcolorder(peaks, c("name", "ret", "retmin", "retmax", "area", "intensity"))
 
-    if (!is.null(scaleTimeFactor))
-    {
-        peaks[, c("ret", "retmin", "retmax") := .(ret / scaleTimeFactor,
-                                                  retmin / scaleTimeFactor,
-                                                  retmax / scaleTimeFactor)]
-    }
-    
     peaksList <- split(peaks, by = "name", keep.by = FALSE)
     peaksList <- pruneList(peaksList, checkZeroRows = TRUE)
     

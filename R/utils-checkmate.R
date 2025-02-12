@@ -911,7 +911,8 @@ assertQuantEluent <- checkmate::makeAssertionFunction(checkQuantEluent)
 
 assertConvertMSFilesArgs <- function(formatFrom, formatTo, overWrite, algorithm, add)
 {
-    checkmate::assertChoice(algorithm, c("pwiz", "openms", "bruker", "im_collapse")) # no adding: should fail first
+    # no adding: should fail first
+    checkmate::assertChoice(algorithm, c("pwiz", "openms", "bruker", "im_collapse", "timsconvert"))
     
     checkmate::assertChoice(formatTo, c("mzXML", "mzML"), add = add) # UNDONE: enough for now?
     checkmate::assertFlag(overWrite, add = add)
@@ -921,7 +922,8 @@ assertConvertMSFilesArgs <- function(formatFrom, formatTo, overWrite, algorithm,
                                openms = getMSFileFormats("centroid"),
                                bruker = "bruker",
                                # NOTE: for im_collapse more specific format checks are done later
-                               im_collapse = c(getMSFileFormats("raw"), getMSFileFormats("ims")))
+                               im_collapse = c(getMSFileFormats("raw"), getMSFileFormats("ims")),
+                               timsconvert = "bruker_ims")
     checkmate::assertChoice(formatFrom, validFormatsFrom, add = add)
 }
 

@@ -574,6 +574,7 @@ getDefPeakParams <- function(type, algorithm, ...)
                    SGolayFrameLength = 15,
                    SGolayPolyOrder = 3,
                    useGauss = TRUE,
+                   gaussWidth = 50,
                    SN = 1.0,
                    SNWinLen = 1000,
                    SNBinCount = 30,

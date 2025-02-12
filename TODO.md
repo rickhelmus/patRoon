@@ -245,7 +245,6 @@
     - change function names?
     - add option for zlib compression, and enable by default? Esp useful for IMS/profile data
     - option to omit MS2 data?
-- more clearly state which backend is used, e.g. for general logging and citing
 
 - test
     - new verifyFileForFormat() usage in convertMSFiles()

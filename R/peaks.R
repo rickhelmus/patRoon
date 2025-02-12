@@ -1,7 +1,7 @@
 #' @include main.R
 NULL
 
-findPeaks <- function(EICs, params, verbose = TRUE)
+findPeaks <- function(EICs, params, logPath)
 {
     # UNDONE: export? If yes, add checkmate's
     
@@ -10,7 +10,11 @@ findPeaks <- function(EICs, params, verbose = TRUE)
                 xcms3 = findPeaksXCMS3,
                 envipick = findPeaksEnviPick,
                 dietrich = findPeaksDietrich)
-    ret <- f(EICs, params[setdiff(names(params), c("algorithm", "forcePeakRange", "relMinIntensity"))], verbose = verbose)
+    
+    if (params$algorithm == "openms") # UNDONE: change in case we get additional algos with logging
+        mkdirp(dirname(logPath))
+    
+    ret <- f(EICs, params[setdiff(names(params), c("algorithm", "forcePeakRange", "relMinIntensity"))], logPath = logPath)
     
     if (any(params$forcePeakRange != 0) || params$relMinIntensity > 0)
     {
@@ -37,23 +41,25 @@ findPeaks <- function(EICs, params, verbose = TRUE)
     return(ret)
 }
 
-findPeaksOpenMS <- function(EICs, params, verbose = TRUE)
+findPeaksOpenMS <- function(EICs, params, logPath)
 {
     # EICs should be a named list
     
     TraMLFile <- tempfile(fileext = ".TraML")
     chromFile <- tempfile(fileext = ".mzML")
     featsFile <- tempfile(fileext = ".featureXML")
-    
-    maybePrintf <- if (verbose) printf else function(...) NULL
+
+    unlink(logPath, force = TRUE)
+    logPrintf <- function(...) cat(sprintf(...), file = logPath, append = TRUE, sep = "\n")
+        
     boolToChr <- function(b) if (b) "true" else "false"
     
-    maybePrintf("Exporting EICs... ")
+    logPrintf("Exporting EICs... ")
     writeTraML(names(EICs), TraMLFile)
     writeChromsToMzML(EICs, names(EICs), chromFile)
-    maybePrintf("Done!\n")
+    logPrintf("Done!\n")
     
-    maybePrintf("Finding peaks with OpenMS...\n-----------\n")
+    logPrintf("Finding peaks with OpenMS...\n-----------\n")
     settings <- c("-in" = chromFile,
                   "-tr" = TraMLFile,
                   "-out" = featsFile,
@@ -69,19 +75,20 @@ findPeaksOpenMS <- function(EICs, params, verbose = TRUE)
                   "-algorithm:PeakPickerMRM:method" = params$method,
                   "-algorithm:PeakIntegrator:integration_type" = params$integrationType,
                   "-algorithm:PeakIntegrator:baseline_type" = params$baselineType,
-                  "-algorithm:PeakIntegrator:fit_EMG" = boolToChr(params$fitEMG))
+                  "-algorithm:PeakIntegrator:fit_EMG" = boolToChr(params$fitEMG),
+                  "-debug" = 10)
 
     if (!is.null(params[["extraOpts"]]) && length(params$extraOpst) > 0)
         settings <- modifyList(settings, params$extraOpts)
     osettings <- OpenMSArgListToOpts(settings)
     osettings <- c(osettings, "-algorithm:compute_peak_shape_metrics") # not a value, just a flag
-    executeCommand(getExtDepPath("openms", "MRMTransitionGroupPicker", "OpenMS"), osettings,
-                   stdout = if (verbose) "" else FALSE)
-    maybePrintf("\n-----------\n")
+    logPrintf(executeCommand(getExtDepPath("openms", "MRMTransitionGroupPicker", "OpenMS"), osettings, stdout = TRUE,
+                             stderr = TRUE))
+    logPrintf("\n-----------\n")
     
-    maybePrintf("Importing peaks... ")
+    logPrintf("Importing peaks... ")
     peaks <- setDT(parseFeatureMRMXMLFile(featsFile))
-    maybePrintf("Done!\n")
+    logPrintf("Done!\n")
 
     peaks[, ID := NULL]
     setnames(peaks, "chromID", "name")
@@ -93,7 +100,7 @@ findPeaksOpenMS <- function(EICs, params, verbose = TRUE)
     return(peaksList)
 }
 
-findPeaksXCMS3 <- function(EICs, params, verbose = TRUE)
+findPeaksXCMS3 <- function(EICs, params, logPath)
 {
     ret <- sapply(EICs, function(eic)
     {
@@ -106,7 +113,7 @@ findPeaksXCMS3 <- function(EICs, params, verbose = TRUE)
     ret <- pruneList(ret, checkZeroRows = TRUE)
 }
 
-findPeaksEnviPick <- function(EICs, params, verbose = TRUE)
+findPeaksEnviPick <- function(EICs, params, logPath)
 {
     checkPackage("enviPick", "blosloos/enviPick")
     
@@ -149,7 +156,7 @@ findPeaksEnviPick <- function(EICs, params, verbose = TRUE)
     return(ret)
 }
 
-findPeaksDietrich <- function(EICs, params, verbose = TRUE)
+findPeaksDietrich <- function(EICs, params, logPath)
 {
     setOMPThreads()
     peaks <- doFindPeaksDietrich(EICs, minIntensity = params$minIntensity, SN = params$SN,

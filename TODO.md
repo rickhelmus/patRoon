@@ -299,7 +299,6 @@
         - add sensible IMS defaults
             - reduce gaussWidth for OpenMS
 - assignMobilities()
-    - assert that instrument data has actually IMS data
     - better names for ims_parent_ID/ims_parent_group?
     - limit mobmin/mobmax --> both min and max, ie to prevent excessively wrong peak range assignments
     - SC seems to hang?

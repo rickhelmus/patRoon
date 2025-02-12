@@ -249,7 +249,8 @@ findFeaturesBinning <- function(analysisInfo, featParams, peakParams, minIntensi
             else
                 EICInfo <- EICInfoMZ
             
-            peaks <- findPeaksInEICs(EICs, peakParams, withBP = TRUE, withMobility = withIMS, cacheDB = cacheDB)
+            peaks <- findPeaksInEICs(EICs, peakParams, withBP = TRUE, withMobility = withIMS,
+                                     logPath = file.path("log", "featEICs", paste0(ana, ".txt")), cacheDB = cacheDB)
 
             if (featParams$methodMZ == "bins")
             {

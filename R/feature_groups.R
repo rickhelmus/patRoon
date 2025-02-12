@@ -1423,29 +1423,29 @@ setMethod("calculateTox", "featureGroups", function(fGroups, featureAnn)
 })
 
 #' @export
-setMethod("assignMobilities", "featureGroups", function(obj, mobPeaksParam = NULL, IMSWindow = 0.01,
+setMethod("assignMobilities", "featureGroups", function(obj, mobPeakParams = NULL, IMSWindow = 0.01,
                                                         clusterMethod = "distance", minIntensityIMS = 0,
-                                                        maxMSRTWindow = 2, chromPeaksParam = NULL, EICRTWindow = 20,
+                                                        maxMSRTWindow = 2, chromPeakParams = NULL, EICRTWindow = 20,
                                                         peakRTWindow = 5, calcArea = "integrate", fallbackEIC = TRUE,
                                                         CCSParams = NULL, parallel = TRUE)
 {
     # NOTE: keep args in sync with other methods
     
     ac <- checkmate::makeAssertCollection()
-    assertFindMobilitiesArgs(mobPeaksParam, IMSWindow, clusterMethod, minIntensityIMS, maxMSRTWindow,
-                             chromPeaksParam, EICRTWindow, peakRTWindow, calcArea, fallbackEIC, CCSParams, parallel, ac)
+    assertFindMobilitiesArgs(mobPeakParams, IMSWindow, clusterMethod, minIntensityIMS, maxMSRTWindow,
+                             chromPeakParams, EICRTWindow, peakRTWindow, calcArea, fallbackEIC, CCSParams, parallel, ac)
     checkmate::reportAssertions(ac)
     
     if (length(obj) == 0)
         return(obj) # nothing to do...
     
-    if (!is.null(mobPeaksParam))
+    if (!is.null(mobPeakParams))
     {
         obj <- warnAndClearAssignedMobilities(obj)
-        obj@features <- assignFeatureMobilitiesPeaks(obj@features, mobPeaksParam, IMSWindow, clusterMethod,
+        obj@features <- assignFeatureMobilitiesPeaks(obj@features, mobPeakParams, IMSWindow, clusterMethod,
                                                      minIntensityIMS, maxMSRTWindow)
         obj@features <- reintegrateMobilityFeatures(obj@features, EICRTWindow, peakRTWindow, calcArea, minIntensityIMS,
-                                                    chromPeaksParam, fallbackEIC, parallel)
+                                                    chromPeakParams, fallbackEIC, parallel)
         obj <- clusterFGroupMobilities(obj, IMSWindow, FALSE)
     }
     

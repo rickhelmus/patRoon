@@ -955,6 +955,7 @@ assertFindPeaksParam <- function(x, null.ok = FALSE, .var.name = checkmate::vnam
         assertListVal(x, "SGolayFrameLength", checkmate::assertCount, positive = TRUE, .var.name = .var.name, add = add)
         assertListVal(x, "SGolayPolyOrder", checkmate::assertCount, positive = TRUE, .var.name = .var.name, add = add)
         assertListVal(x, "useGauss", checkmate::assertFlag, .var.name = .var.name, add = add)
+        assertListVal(x, "gaussWidth", checkmate::assertNumber, finite = TRUE, .var.name = .var.name, add = add)
         assertListVal(x, "SN", checkmate::assertNumber, finite = TRUE, .var.name = .var.name, add = add)
         assertListVal(x, "SNWinLen", checkmate::assertNumber, finite = TRUE, .var.name = .var.name, add = add)
         assertListVal(x, "SNBinCount", checkmate::assertCount, positive = TRUE, .var.name = .var.name, add = add)

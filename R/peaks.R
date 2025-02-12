@@ -162,6 +162,7 @@ findPeaksOpenMS <- function(EICs, params, scaleTimeFactor = NULL, verbose = TRUE
                   "-algorithm:PeakPickerMRM:sgolay_frame_length" = params$SGolayFrameLength,
                   "-algorithm:PeakPickerMRM:sgolay_polynomial_order" = params$SGolayPolyOrder,
                   "-algorithm:PeakPickerMRM:use_gauss" = boolToChr(params$useGauss),
+                  "-algorithm:PeakPickerMRM:gauss_width" = params$gaussWidth,
                   "-algorithm:PeakPickerMRM:signal_to_noise" = params$SN,
                   "-algorithm:PeakPickerMRM:sn_win_len" = params$SNWinLen,
                   "-algorithm:PeakPickerMRM:sn_bin_count" = params$SNBinCount,

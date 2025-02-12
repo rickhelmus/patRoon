@@ -64,6 +64,7 @@
 - conversion/anaInfo
     - see if getAllMSFilesFromAnaInfo() can be used, otherwise remove it
     - use of getMSFileConversionFormats()
+    - add im_collapse and timsconvert
 
 ## TC
 
@@ -235,10 +236,8 @@
         - best would be to do write spectra while reading, so we can do MP
             - or skip MP and do complete batch in C++
         - no support for mzXML
-- interface with timsConvert?
 - convertMSFilesXXX()
     - change function names?
-    - add option for zlib compression, and enable by default? Esp useful for IMS/profile data
     - option to omit MS2 data?
 
 - test
@@ -284,6 +283,7 @@
     - mzExpIMSWindow and minIntensityIMS EIXParam
     - update all for getEICs()
     - doc that minAbundanceAbs will be maxed to actual spec count
+    - timsconvert; add refs, installation
 
 ## IMS
 

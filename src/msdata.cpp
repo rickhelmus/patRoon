@@ -1130,7 +1130,7 @@ Rcpp::List getEIMList(const MSReadBackend &backend, const std::vector<SpectrumRa
         void append(SpectrumRawTypes::Mobility m, SpectrumRawTypes::Intensity i) { mobilities.push_back(m); intensities.push_back(i); }
     };
     
-    const auto &sfunc = [minIntensity, mzExpIMSWindow, &startMZs, &endMZs, &startMobs, &endMobs](const SpectrumRaw &spec, const SpectrumRawSelection &ssel, size_t e)
+    const auto &sfunc = [mzExpIMSWindow, &startMZs, &endMZs, &startMobs, &endMobs](const SpectrumRaw &spec, const SpectrumRawSelection &ssel, size_t e)
     {
         if (!spec.empty() && !spec.hasMobilities())
             Rcpp::stop("Cannot load mobilogram: no mobility data found!");
@@ -1420,13 +1420,14 @@ Rcpp::List collapseIMSFrames(const MSReadBackend &backend, SpectrumRawTypes::Mas
 }
 
 // [[Rcpp::export]]
-Rcpp::NumericVector getIsolationMZs(const MSReadBackend &backend, const std::string &method,
-                                    SpectrumRawTypes::Mass mzWindow, SpectrumRawTypes::Intensity minTIC)
+Rcpp::List getIsolationMZs(const MSReadBackend &backend, const std::string &method,
+                           SpectrumRawTypes::Mass mzWindow, SpectrumRawTypes::Intensity minTIC)
 {
     const auto &specMeta = backend.getSpecMetadata().second;
     
     // not really spectra, but useful to average data later 
     std::vector<SpectrumRaw> isolationSpectra;
+    std::vector<SpectrumRawTypes::Time> times;
     
     if (!specMeta.isolationRanges.empty()) // non-IMS
     {
@@ -1436,29 +1437,52 @@ Rcpp::NumericVector getIsolationMZs(const MSReadBackend &backend, const std::str
             sp.setPeak(0, (specMeta.isolationRanges[i].start + specMeta.isolationRanges[i].end) / 2.0,
                        specMeta.TICs[i]);
             isolationSpectra.push_back(std::move(sp));
+            times.push_back(specMeta.times[i]);
         }
     }
     else
     {
+        const auto &sfunc = [&](const SpectrumRaw &spec, const SpectrumRawSelection &, size_t)
+        {
+            return std::accumulate(spec.getIntensities().cbegin(), spec.getIntensities().cend(), 0.0);
+        };
+        
+        std::vector<std::vector<SpectrumRawSelection>> scanSels(1);
+        std::vector<SpectrumRawTypes::Mass> mzs;
         for (size_t i=0; i<specMeta.scans.size(); ++i)
         {
-            const auto &fi = specMeta.MSMSFrames[i];
-            SpectrumRaw sp(fi.isolationRanges.size());
-            for (size_t j=0; j<fi.isolationRanges.size(); ++j)
+            for (size_t j=0; j<specMeta.MSMSFrames[i].isolationRanges.size(); ++j)
             {
-                sp.setPeak(j, (fi.isolationRanges[j].start + fi.isolationRanges[j].end) / 2.0, specMeta.TICs[i]);
+                SpectrumRawSelection ssel(i);
+                ssel.MSMSFrameIndices.push_back(j);
+                scanSels[0].push_back(std::move(ssel));
+                times.push_back(specMeta.times[i]);
+                mzs.push_back((specMeta.MSMSFrames[i].isolationRanges[j].start +
+                    specMeta.MSMSFrames[i].isolationRanges[j].end) / 2.0);
             }
+        }
+        
+        const auto TICs = applyMSData<SpectrumRawTypes::Intensity>(backend, SpectrumRawTypes::MSLevel::MS2,
+                                                                   scanSels, sfunc, 0)[0];
+        
+        for (size_t i=0; i<times.size(); ++i)
+        {
+            if (TICs[i] < minTIC)
+                continue;
+            SpectrumRaw sp(1);
+            sp.setPeak(0, mzs[i], TICs[i]);
             isolationSpectra.push_back(std::move(sp));
         }
     }
     
     if (isolationSpectra.empty())
-        return Rcpp::NumericVector();
+        return Rcpp::List();
 
     const auto isoSpecAvg = averageSpectraRaw(isolationSpectra, clustMethodFromStr(method), mzWindow,
-                                              true, minTIC, 0.0, 0.0);
+                                              false, minTIC, 0.0, 0.0);
 
-    return Rcpp::wrap(isoSpecAvg.getMZs());
+    return Rcpp::List::create(Rcpp::Named("time") = times,
+                              Rcpp::Named("mz") = isoSpecAvg.getMZs());
 }
 
 // [[Rcpp::export]]
@@ -1502,6 +1526,7 @@ Rcpp::List getIsolationMZsAndMobs(const MSReadBackend &backend, const std::strin
 
     std::vector<std::vector<SpectrumRawSelection>> scanSels(1);
     std::vector<SpectrumRawTypes::Mass> mzs;
+    std::vector<SpectrumRawTypes::Time> times;
     for (size_t i=0; i<specMeta.scans.size(); ++i)
     {
         for (size_t j=0; j<specMeta.MSMSFrames[i].isolationRanges.size(); ++j)
@@ -1509,6 +1534,7 @@ Rcpp::List getIsolationMZsAndMobs(const MSReadBackend &backend, const std::strin
             SpectrumRawSelection ssel(i);
             ssel.MSMSFrameIndices.push_back(j);
             scanSels[0].push_back(std::move(ssel));
+            times.push_back(specMeta.times[i]);
             mzs.push_back((specMeta.MSMSFrames[i].isolationRanges[j].start +
                            specMeta.MSMSFrames[i].isolationRanges[j].end) / 2.0);
         }
@@ -1522,6 +1548,7 @@ Rcpp::List getIsolationMZsAndMobs(const MSReadBackend &backend, const std::strin
     const auto clMethod = clustMethodFromStr(method);
     const auto mzClusts = clusterNums(mzs, clMethod, mzWindow);
     const auto maxMZClust = *(std::max_element(mzClusts.begin(), mzClusts.end()));
+    std::vector<std::vector<SpectrumRawTypes::Time>> finalTimes;
     std::vector<SpectrumRawTypes::Mass> finalMZs;
     std::vector<SpectrumRawTypes::Mobility> finalMobs;
     std::vector<SpectrumRawTypes::Intensity> finalInts;
@@ -1547,9 +1574,10 @@ Rcpp::List getIsolationMZsAndMobs(const MSReadBackend &backend, const std::strin
             continue;
         else if (mobsOfMZClust.size() == 1)
         {
-            finalMZs.push_back(mzs[indsOfMZClust[0]]);
-            finalMobs.push_back(mobsOfMZClust[0]);
             finalInts.push_back(mats[indsOfMZClust[0]].second);
+            finalMZs.push_back(mzs[indsOfMZClust[0]]);
+            finalTimes.push_back({times[indsOfMZClust[0]]});
+            finalMobs.push_back(mobsOfMZClust[0]);
             continue;
         }
         
@@ -1557,6 +1585,7 @@ Rcpp::List getIsolationMZsAndMobs(const MSReadBackend &backend, const std::strin
         const int maxMobClust = *(std::max_element(mobClusts.cbegin(), mobClusts.cend()));
         for (int mobcl=0; mobcl<=maxMobClust; ++mobcl)
         {
+            std::vector<SpectrumRawTypes::Time> timesOfMobClust;
             SpectrumRawTypes::Mass totMz = 0.0;
             SpectrumRawTypes::Mobility totMob = 0.0;
             SpectrumRawTypes::Intensity totInt = 0.0;
@@ -1565,18 +1594,25 @@ Rcpp::List getIsolationMZsAndMobs(const MSReadBackend &backend, const std::strin
             {
                 const auto ind = std::distance(mobClusts.cbegin(), itmob);
                 const auto clint = mats[indsOfMZClust[ind]].second;
+                timesOfMobClust.push_back(times[indsOfMZClust[ind]]);
                 totMz += (mzs[indsOfMZClust[ind]] * static_cast<SpectrumRawTypes::Mass>(clint));
                 totMob += (mobsOfMZClust[ind] * static_cast<SpectrumRawTypes::Mobility>(clint));
                 totInt += clint;
                 itmob = std::find(std::next(itmob), mobClusts.cend(), mobcl);
             }
+            finalTimes.push_back(std::move(timesOfMobClust));
             finalMZs.push_back(totMz / static_cast<SpectrumRawTypes::Mass>(totInt));
             finalMobs.push_back(totMob / static_cast<SpectrumRawTypes::Mobility>(totInt));
             finalInts.push_back(totInt);
         }
     }
     
-    return Rcpp::List::create(Rcpp::Named("mz") = finalMZs,
+    Rcpp::List Rtimes(finalTimes.size());
+    for (size_t i=0; i<finalTimes.size(); ++i)
+        Rtimes[i] = Rcpp::wrap(finalTimes[i]);
+    
+    return Rcpp::List::create(Rcpp::Named("times") = Rtimes,
+                              Rcpp::Named("mz") = finalMZs,
                               Rcpp::Named("mobility") = finalMobs,
                               Rcpp::Named("intensity") = finalInts);
 }

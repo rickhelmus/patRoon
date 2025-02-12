@@ -659,6 +659,9 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     };
     
     const auto EICCount = startMZs.size();
+    if (EICCount == 0)
+        return Rcpp::List();
+    
     const auto &specMeta = backend.getSpecMetadata();
     bool anySpecHasMob = false;
     
@@ -1129,7 +1132,7 @@ Rcpp::List getEIMList(const MSReadBackend &backend, const std::vector<SpectrumRa
     
     const auto &sfunc = [minIntensity, mzExpIMSWindow, &startMZs, &endMZs, &startMobs, &endMobs](const SpectrumRaw &spec, const SpectrumRawSelection &ssel, size_t e)
     {
-        if (!spec.hasMobilities())
+        if (!spec.empty() && !spec.hasMobilities())
             Rcpp::stop("Cannot load mobilogram: no mobility data found!");
         
         EIM ret;

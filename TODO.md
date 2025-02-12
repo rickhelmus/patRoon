@@ -61,6 +61,9 @@
 - update MSPL filters and set maxMZOverPrec (and other new?) by default
 - add estimateIDLevels()
 - remove precursorMzWindow
+- conversion/anaInfo
+    - see if getAllMSFilesFromAnaInfo() can be used, otherwise remove it
+    - use of getMSFileConversionFormats()
 
 ## TC
 
@@ -238,9 +241,6 @@
             - or skip MP and do complete batch in C++
         - no support for mzXML
 - interface with timsConvert?
-- update generateAnalysisInfo() and newProject()
-    - see if getAllMSFilesFromAnaInfo() can be used, otherwise remove it
-    - use of getMSFileConversionFormats()
 - convertMSFilesXXX()
     - change function names?
     - add option for zlib compression, and enable by default? Esp useful for IMS/profile data
@@ -285,6 +285,7 @@
         - update avg params
         - don't refer to deprecated MSPL generators
     - availableBackends()
+        - also invisible return value
     - EICParams for getPICSet() and calculatePeakQualities()
     - mzExpIMSWindow and minIntensityIMS EIXParam
     - update all for getEICs()

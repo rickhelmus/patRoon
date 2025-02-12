@@ -31,7 +31,12 @@ defaultPkgOpts <- function(pkgname)
 dumpPkgOpts <- function(printFunc)
 {
     for (opt in names(defaultPkgOpts(utils::packageName())))
-        printFunc(sprintf("- %s: %s", opt, paste0('"', getOption(opt), '"', collapse = ", ")))
+    {
+        msg <- sprintf("- %s: %s", opt, paste0('"', getOption(opt), '"', collapse = ", "))
+        if (opt == "patRoon.MS.backends")
+            msg <- paste(msg, sprintf("(available: %s)", paste0('"', availableBackends(verbose = FALSE), '"', collapse = ", ")))
+        printFunc(msg)
+    }
 }
 
 .onLoad <- function(libname, pkgname)

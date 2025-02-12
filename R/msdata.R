@@ -230,6 +230,7 @@ applyMSData <- function(anaInfo, func,  ..., types = getMSFileTypes(), formats =
         if (!is.null(filePaths))
         {
             backend <- createMSBackend(bn)
+            printf("Using '%s' backend for reading MS data.\n", bn) # UNDONE: make printing optional (arg/option?)
             # NOTE: disable future parallelization as the backends are already OpenMP parallelized
             # NOTE: the callback can return cached data so opening the file should happen there.
             return(doApply("Map", doPar = FALSE, prog = showProgress, data = anaInfo$analysis, filePaths, ..., f = func,

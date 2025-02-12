@@ -362,25 +362,25 @@ setMethod("calculateTox", "featureGroupsScreeningSet", function(fGroups, feature
     callNextMethod(fGroups, featureAnn)
 })
 
-setMethod("assignMobilities", "featureGroupsScreeningSet", function(obj, mobPeaksParam = NULL, IMSWindow = 0.01,
+setMethod("assignMobilities", "featureGroupsScreeningSet", function(obj, mobPeakParams = NULL, IMSWindow = 0.01,
                                                                     clusterMethod = "distance", minIntensityIMS = 25,
-                                                                    maxMSRTWindow = 2, chromPeaksParam = NULL,
+                                                                    maxMSRTWindow = 2, chromPeakParams = NULL,
                                                                     EICRTWindow = 20, peakRTWindow = 5,
                                                                     calcArea = "integrate", fallbackEIC = TRUE,
                                                                     CCSParams = NULL, parallel = TRUE,
                                                                     fromSuspects = FALSE, IMSMatchParams = NULL)
 {
     ac <- checkmate::makeAssertCollection()
-    assertFindMobilitiesArgs(mobPeaksParam, IMSWindow, clusterMethod, minIntensityIMS, maxMSRTWindow,
-                             chromPeaksParam, EICRTWindow, peakRTWindow, calcArea, fallbackEIC, CCSParams, parallel, ac)
+    assertFindMobilitiesArgs(mobPeakParams, IMSWindow, clusterMethod, minIntensityIMS, maxMSRTWindow,
+                             chromPeakParams, EICRTWindow, peakRTWindow, calcArea, fallbackEIC, CCSParams, parallel, ac)
     checkmate::assertFlag(fromSuspects, add = ac)
     assertIMSMatchParams(IMSMatchParams, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
-    if (length(obj) == 0 || (is.null(mobPeaksParam) && !fromSuspects && is.null(CCSParams)))
+    if (length(obj) == 0 || (is.null(mobPeakParams) && !fromSuspects && is.null(CCSParams)))
         return(obj) # nothing to do...
 
-    if (!is.null(mobPeaksParam) || fromSuspects)
+    if (!is.null(mobPeakParams) || fromSuspects)
     {
         obj <- warnAndClearAssignedMobilities(obj)
         anaInfo <- analysisInfo(obj)
@@ -394,11 +394,11 @@ setMethod("assignMobilities", "featureGroupsScreeningSet", function(obj, mobPeak
                                                                 \(ft, a) if (!a %chin% anasSet) ft[0] else ft)
             }
         }
-        if (!is.null(mobPeaksParam))
-            obj@features <- assignFeatureMobilitiesPeaks(obj@features, mobPeaksParam, IMSWindow, clusterMethod,
+        if (!is.null(mobPeakParams))
+            obj@features <- assignFeatureMobilitiesPeaks(obj@features, mobPeakParams, IMSWindow, clusterMethod,
                                                          minIntensityIMS, maxMSRTWindow)
         obj@features <- reintegrateMobilityFeatures(obj@features, EICRTWindow, peakRTWindow, calcArea, minIntensityIMS,
-                                                    chromPeaksParam, fallbackEIC, parallel)
+                                                    chromPeakParams, fallbackEIC, parallel)
         obj <- clusterFGroupMobilities(obj, IMSWindow, TRUE)
     }
     

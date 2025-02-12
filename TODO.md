@@ -48,12 +48,14 @@
     - Rcpp: see if it makes sense to return lists instead of dataframes, eg to further optimize MS library loading
     - replace makeFileHash() with getMSDataFileHash() on more places?
 - msdata
-    - mechanism to prefer IM/centroided data? loading centroiding data could be faster if no IMS is needed
-        - could be achieved by putting mzR as first backend?
     - store MSPL metadata?
         - better have a util that gets metadata from MS data
         --> remove metadata slot once we have that
-
+    - collapseIMSFiles(): could use MSTK and/or SC for writing
+        - both need to write a bit more metadata (instrumentConfiguration and dataProcessing), as OpenMS fails otherwise
+        - best would be to do write spectra while reading, so we can do MP
+            - or skip MP and do complete batch in C++
+        - no support for mzXML
             
 
 ## newProject()
@@ -230,15 +232,7 @@
     - set mzR in front for safety?
 - MSPL: hclust seems unusable due to high mem usage with IMS data? --> just default to distance and doc change/IMS need?
 - embed TIMS-SDK? --> in patRoonExt
-- collapseIMSFiles(): see if this makes sense as an alternative to convertMSFiles()
-    - could use MSTK and/or SC for writing
-        - both need to write a bit more metadata (instrumentConfiguration and dataProcessing), as OpenMS fails otherwise
-        - best would be to do write spectra while reading, so we can do MP
-            - or skip MP and do complete batch in C++
-        - no support for mzXML
-- convertMSFilesXXX()
-    - change function names?
-    - option to omit MS2 data?
+
 
 - test
     - new verifyFileForFormat() usage in convertMSFiles()

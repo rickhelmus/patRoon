@@ -104,7 +104,7 @@ findPeaksXCMS3 <- function(EICs, params, logPath)
 {
     ret <- sapply(EICs, function(eic)
     {
-        p <- as.data.table(do.call(xcms::peaksWithCentWave, c(list(eic$intensity, eic$time), params)))
+        p <- as.data.table(suppressWarnings(do.call(xcms::peaksWithCentWave, c(list(eic$intensity, eic$time), params))))
         cols <- c("ret", "retmin", "retmax", "area", "intensity")
         setnames(p, c("rt", "rtmin", "rtmax", "into", "maxo"), cols)
         setcolorder(p, cols)

@@ -299,6 +299,52 @@ convertMSFilesIMSCollapse <- function(inFiles, outFiles, typeFrom, formatTo = "m
     invisible(NULL)
 }
 
+convertMSFilesTIMSCONVERT <- function(inFiles, outFiles, formatTo = "mzML", centroid = TRUE, centroidRaw = FALSE,
+                                      IMS = FALSE, extraOpts = NULL, virtualenv = "patRoon-TIMSCONVERT")
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertCharacter(inFiles, min.chars = 1, min.len = 1, add = ac)
+    checkmate::assertCharacter(outFiles, min.chars = 1, len = length(inFiles), add = ac)
+    aapply(checkmate::assertFlag, . ~ centroid + centroidRaw + IMS, fixed = list(add = ac))
+    checkmate::assertCharacter(extraOpts, min.chars = 1, null.ok = TRUE, add = ac)
+    checkmate::assertCharacter(virtualenv, min.chars = 1, null.ok = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
+
+    # NOTE: activate virtualenv will setup the right PATH
+    if (!is.null(virtualenv))
+        reticulate::use_virtualenv(virtualenv)
+    
+    mainArgs <- character()
+    if (IMS)
+        mainArgs <- c(mainArgs, "--mode", "raw")
+    else if (centroid && centroidRaw)
+        mainArgs <- c(mainArgs, "--mode", "raw")
+    else if (centroid)
+        mainArgs <- c(mainArgs, "--mode", "centroid")
+    else
+        mainArgs <- c(mainArgs, "--mode", "profile")
+    
+    if (!IMS)
+        mainArgs <- c(mainArgs, "--exclude_mobility")
+    
+    if (!is.null(extraOpts))
+        mainArgs <- c(mainArgs, extraOpts)
+    
+    inFiles <- normalizePath(inFiles); outFiles <- normalizePath(outFiles, mustWork = FALSE)
+    cmdQueue <- Map(inFiles, outFiles, f = function(inF, outF)
+    {
+        if (basename(tools::file_path_sans_ext(inF)) != basename(tools::file_path_sans_ext(outF)))
+            stop(sprintf("Input and output files must have the same base name: in '%s' - out '%s'", inF, outF),
+                 call. = FALSE)
+        logf <- paste0("timsconvert-", basename(tools::file_path_sans_ext(inF)), ".txt")
+        return(list(logFile = logf, command = "timsconvert", args = c("--input", inF, "--outdir", dirname(outF), mainArgs)))
+    })
+    
+    executeMultiProcess(cmdQueue, function(cmd) {}, logSubDir = "convert")
+    
+    invisible(NULL)
+}
+
 #' @details \code{convertMSFiles} converts the data format of an analysis to
 #'   another. It uses tools from
 #'   \href{http://proteowizard.sourceforge.net/}{ProteoWizard}
@@ -429,8 +475,7 @@ convertMSFilePaths <- function(files, formatFrom, formatTo = "mzML", outPath = N
     files <- normalizePath(files, mustWork = FALSE) # no mustWork, file existence will be checked later
     
     basef <- basename(tools::file_path_sans_ext(files))
-    output <- normalizePath(file.path(outPath, paste0(basef, ".", formatTo)),
-                            mustWork = FALSE)
+    output <- normalizePath(file.path(outPath, paste0(basef, ".", formatTo)), mustWork = FALSE)
     
     keepFiles <- sapply(seq_along(files), function(fi)
     {
@@ -454,8 +499,10 @@ convertMSFilePaths <- function(files, formatFrom, formatTo = "mzML", outPath = N
             convertMSFilesOpenMS(files, output, formatTo, ...)
         else if (algorithm == "bruker")
             convertMSFilesBruker(files, output, formatTo, ...)
-        else # if (algorithm == "im_collapse")
+        else if (algorithm == "im_collapse")
             convertMSFilesIMSCollapse(files, output, formatTo = formatTo, ...)
+        else # algorithm == "timsconvert"
+            convertMSFilesTIMSCONVERT(files, output, formatTo = formatTo, ...)
     }
 }
 
@@ -467,12 +514,14 @@ convertMSFilesAnaInfo <- function(anaInfo, typeFrom = "raw", typeTo = "centroid"
                              pwiz = getMSFileTypes(),
                              openms = c("centroid", "profile"),
                              bruker = "raw",
-                             im_collapse = c("raw", "ims"))
+                             im_collapse = c("raw", "ims"),
+                             timsconvert = "raw")
     validToTypes <- switch(algorithm,
                            pwiz = c("ims", "profile", "centroid"),
                            openms = c("centroid", "profile"),
                            bruker = c("centroid", "profile"),
-                           im_collapse = "centroid")
+                           im_collapse = "centroid",
+                           timsconvert = c("centroid", "profile", "ims"))
     
     ac <- checkmate::makeAssertCollection()
     assertConvertMSFilesArgs(formatFrom, formatTo, overWrite, algorithm, add = ac)
@@ -514,6 +563,8 @@ convertMSFilesAnaInfo <- function(anaInfo, typeFrom = "raw", typeTo = "centroid"
     }
     else if (algorithm == "im_collapse")
         args <- c(args, list(typeFrom = typeFrom))
+    else if (algorithm == "timsconvert")
+        args <- c(args, list(centroid = typeTo == "centroid", IMS = typeTo == "ims"))
     
     do.call(convertMSFilePaths, args)
 }

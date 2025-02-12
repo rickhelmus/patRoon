@@ -457,6 +457,8 @@ getBGMSMSPeaks <- function(anaInfo, replicates = NULL, MSLevel = 2, retentionRan
                                 startMobs = mobilityRange[1], endMobs = mobilityRange[2],
                                 minAbundanceRel = avgSpectraParams$minAbundanceRel,
                                 minAbundanceAbs = avgSpectraParams$minAbundanceAbs,
+                                minAbundanceIMSRel = avgSpectraParams$minAbundanceIMSRel,
+                                minAbundanceIMSAbs = avgSpectraParams$minAbundanceIMSAbs,
                                 topMost = avgSpectraParams$topMost,
                                 minIntensityIMS = avgSpectraParams$minIntensityIMS,
                                 minIntensityPre = avgSpectraParams$minIntensityPre,

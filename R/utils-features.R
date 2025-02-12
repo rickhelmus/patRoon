@@ -856,7 +856,7 @@ findPeaksInEICs <- function(EICs, peaksParam, withBP, withMobility, cacheDB = NU
             else
             {
                 if (is.null(eic[["mobility"]]))
-                    eic$mobility <- NA_real_
+                    eic$mobility <- eic$mobilityBP <- eic$mobmin <- eic$mobmax <- NA_real_
                 # UNDONE: also use mobility BP data?
                 list(min(eic$mzmin), max(eic$mzmax), weighted.mean(if (withBP) eic$mzBP else eic$mz, eic$intensity),
                      min(eic$mobmin), max(eic$mobmax),
@@ -955,7 +955,7 @@ assignFeatureMobilitiesPeaks <- function(features, peaksParam, IMSWindow, cluste
         {
             # pretend we have EICs so we can find peaks
             EIMs <- lapply(EIMs, setnames, old = "mobility", new = "time")
-            peaksList <- findPeaks(EIMs, peaksParam, verbose = FALSE)
+            peaksList <- findPeaks(EIMs, peaksParam, verbose = TRUE)
             peaksTable <- rbindlist(peaksList, idcol = "ims_parent_ID")                
             setnames(peaksTable, c("ret", "retmin", "retmax", "area", "intensity"), mobNumCols, skip_absent = TRUE)
             # NOTE: we subset columns here to remove any algo specific columns that may also be present in the feature

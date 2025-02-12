@@ -59,7 +59,6 @@ findPeaksOpenMS <- function(EICs, params, verbose = TRUE)
                   "-out" = featsFile,
                   "-algorithm:min_peak_width" = params$minPeakWidth,
                   "-algorithm:background_subtraction" = params$backgroundSubtraction,
-                  #"-algorithm:compute_peak_shape_metrics" = boolToChr(TRUE), UNDONE: this gives an error with OpenMS 2.7 --> maybe fixed with newer versions?
                   "-algorithm:PeakPickerMRM:sgolay_frame_length" = params$SGolayFrameLength,
                   "-algorithm:PeakPickerMRM:sgolay_polynomial_order" = params$SGolayPolyOrder,
                   "-algorithm:PeakPickerMRM:use_gauss" = boolToChr(params$useGauss),
@@ -74,7 +73,9 @@ findPeaksOpenMS <- function(EICs, params, verbose = TRUE)
 
     if (!is.null(params[["extraOpts"]]) && length(params$extraOpst) > 0)
         settings <- modifyList(settings, params$extraOpts)
-    executeCommand(getExtDepPath("openms", "MRMTransitionGroupPicker", "OpenMS"), OpenMSArgListToOpts(settings),
+    osettings <- OpenMSArgListToOpts(settings)
+    osettings <- c(osettings, "-algorithm:compute_peak_shape_metrics") # not a value, just a flag
+    executeCommand(getExtDepPath("openms", "MRMTransitionGroupPicker", "OpenMS"), osettings,
                    stdout = if (verbose) "" else FALSE)
     maybePrintf("\n-----------\n")
     

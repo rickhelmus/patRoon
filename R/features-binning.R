@@ -153,7 +153,7 @@ setMethod("initialize", "featuresBinning",
           function(.Object, ...) callNextMethod(.Object, algorithm = "binning", ...))
 
 #' @export
-findFeaturesBinning <- function(analysisInfo, featParams, peaksParam, minIntensityIMS = 25, verbose = TRUE)
+findFeaturesBinning <- function(analysisInfo, featParams, peakParams, minIntensityIMS = 25, verbose = TRUE)
 {
     # UNDONE: add refs to docs, and highlight changes
     # UNDONE: mobRange/mobStep defaults
@@ -168,7 +168,7 @@ findFeaturesBinning <- function(analysisInfo, featParams, peaksParam, minIntensi
     ac <- checkmate::makeAssertCollection()
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, add = ac)
     assertFeaturesEICsParams(featParams, add = ac)
-    assertFindPeaksParam(peaksParam, add = ac)
+    assertFindPeakParams(peakParams, add = ac)
     checkmate::assertNumber(minIntensityIMS, lower = 0, finite = TRUE, add = ac)
     checkmate::assertFlag(verbose, add = ac)
     checkmate::reportAssertions(ac)
@@ -193,7 +193,7 @@ findFeaturesBinning <- function(analysisInfo, featParams, peaksParam, minIntensi
     withIMS <- !is.null(featParams[["methodIMS"]])
     
     cacheDB <- openCacheDBScope()
-    baseHash <- makeHash(featParams, peaksParam, minIntensityIMS)
+    baseHash <- makeHash(featParams, peakParams, minIntensityIMS)
     anaHashes <- getMSFileHashesFromAvailBackend(analysisInfo, needIMS = withIMS)
     anaHashes <- sapply(anaHashes, makeHash, baseHash)
     cachedData <- pruneList(loadCacheData("featuresBinning", anaHashes, simplify = FALSE, dbArg = cacheDB))
@@ -249,7 +249,7 @@ findFeaturesBinning <- function(analysisInfo, featParams, peaksParam, minIntensi
             else
                 EICInfo <- EICInfoMZ
             
-            peaks <- findPeaksInEICs(EICs, peaksParam, withBP = TRUE, withMobility = withIMS, cacheDB = cacheDB)
+            peaks <- findPeaksInEICs(EICs, peakParams, withBP = TRUE, withMobility = withIMS, cacheDB = cacheDB)
 
             if (featParams$methodMZ == "bins")
             {

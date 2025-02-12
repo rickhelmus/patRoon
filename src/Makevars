@@ -16,14 +16,12 @@ PKG_CFLAGS += $(shell echo 'source("../tools/build_flags.R"); getFlags("PKG_CFLA
 PKG_CXXFLAGS += $(shell echo 'source("../tools/build_flags.R"); getFlags("PKG_CXXFLAGS")' | "${R_HOME}/bin/R" --vanilla --slave)
 PKG_LIBS += $(shell echo 'source("../tools/build_flags.R"); getFlags("PKG_LIBS")' | "${R_HOME}/bin/R" --vanilla --slave)
 
-PATROON_CFG = $(shell echo 'source("../tools/build_flags.R"); printConfig()' | "${R_HOME}/bin/R" --vanilla --slave)
-
 .PHONY: all clean inst
 
 all: GenForm $(SHLIB)
 
 all:
-	@echo "$(value PATROON_CFG)"
+	@echo 'source("../tools/build_flags.R"); printConfig()' | "${R_HOME}/bin/R" --vanilla --slave
 
 GenForm: $(OBJECTS_GF)
 	$(CXX) -o $(DEST_GF) $(OBJECTS_GF)

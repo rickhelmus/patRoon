@@ -298,7 +298,7 @@
         - see if current chrom defaults are fine
         - add sensible IMS defaults
             - reduce gaussWidth for OpenMS
-            - XCMS: peakwidth = c(0.01, 0.2))
+            - XCMS: peakwidth = c(0.01, 0.2)), prefilter = c(3, 10), firstBaselineCheck = F
 - assignMobilities()
     - better names for ims_parent_ID/ims_parent_group?
     - limit mobmin/mobmax --> both min and max, ie to prevent excessively wrong peak range assignments

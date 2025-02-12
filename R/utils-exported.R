@@ -379,9 +379,10 @@ getFCParams <- function(replicates, ...)
 }
 
 #' @export
-availableBackends <- function(anaInfo = NULL)
+availableBackends <- function(anaInfo = NULL, verbose = TRUE)
 {
     anaInfo <- assertAndPrepareAnaInfo(anaInfo, null.ok = TRUE)
+    checkmate::assertFlag(verbose)
     
     allBackends <- getMSReadBackends()
     
@@ -405,9 +406,16 @@ availableBackends <- function(anaInfo = NULL)
             return("yes")
         return(sprintf("no (%s)", paste0(stat, collapse = ", ")))
     }
+
+    check <- sapply(allBackends, checkAvail)
+        
+    if (verbose)
+    {
+        for (b in allBackends)
+            printf("Backend '%s': %s\n", b, check[[b]])
+    }
     
-    for (b in allBackends)
-        printf("Backend '%s': %s\n", b, checkAvail(b))
+    return(invisible(names(sapply(check, identical, "yes"))))
 }
 
 #' Obtains extracted ion chromatograms (EICs)

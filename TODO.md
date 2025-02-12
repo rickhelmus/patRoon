@@ -286,15 +286,12 @@
     - IMS arg but affects mobility features
 - make sure mobility ranges are set when getting EIMs
 - findPeaks()
-    - export? If yes, add checkmate's, documentation etc
-        - if not, still need to doc args somehow
-        - clashes with xcms::findPeaks()...
     - add smoothing for XCMS3/enviPick? e.g. with signal::sgolayfilt()
         - might also be nice for plotting chroms?
     - OpenMS
         - remove old function
-        - do we need scaleTimeFactor? then add to params
         - check if we can get compute_peak_shape_metrics to work (maybe check OMS version?)
+        - add MRMTransitionGroupPicker to patRoonExt
     - Dietrich
         - Disabled noise removal for reported intensities/areas
             - keep doing this?
@@ -303,6 +300,7 @@
     - Params
         - see if current chrom defaults are fine
         - add sensible IMS defaults
+            - reduce gaussWidth for OpenMS
         - naming: change param to params for consistency (also assertions)
 - assignMobilities()
     - assert that instrument data has actually IMS data

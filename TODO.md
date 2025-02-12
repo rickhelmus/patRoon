@@ -298,11 +298,11 @@
         - see if current chrom defaults are fine
         - add sensible IMS defaults
             - reduce gaussWidth for OpenMS
+            - XCMS: peakwidth = c(0.01, 0.2))
 - assignMobilities()
     - better names for ims_parent_ID/ims_parent_group?
     - limit mobmin/mobmax --> both min and max, ie to prevent excessively wrong peak range assignments
     - SC seems to hang?
-    - suppress XCMS warnings (or at least if no peaks are found)
     - parent-less/orphaned IMS features
         - test: reporting, minMobilityMatches and other post-suspect screening, ...
         - handle normalization: perform like non-IMS workflow with a warning?

@@ -1511,8 +1511,7 @@ Rcpp::List getIsolationMZs(const MSReadBackend &backend, const std::string &meth
 // [[Rcpp::export]]
 Rcpp::List getIsolationMZsAndMobs(const MSReadBackend &backend, const std::string &method,
                                   SpectrumRawTypes::Mass mzWindow, SpectrumRawTypes::Mobility mobWindow,
-                                  SpectrumRawTypes::Intensity minTIC,
-                                  SpectrumRawTypes::PeakAbundance minAbundance)
+                                  SpectrumRawTypes::Intensity minTIC)
 {
     const auto &specMeta = backend.getSpecMetadata().second;
     

@@ -381,8 +381,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // getIsolationMZsAndMobs
-Rcpp::List getIsolationMZsAndMobs(const MSReadBackend& backend, const std::string& method, SpectrumRawTypes::Mass mzWindow, SpectrumRawTypes::Mobility mobWindow, SpectrumRawTypes::Intensity minTIC, SpectrumRawTypes::PeakAbundance minAbundance);
-RcppExport SEXP _patRoon_getIsolationMZsAndMobs(SEXP backendSEXP, SEXP methodSEXP, SEXP mzWindowSEXP, SEXP mobWindowSEXP, SEXP minTICSEXP, SEXP minAbundanceSEXP) {
+Rcpp::List getIsolationMZsAndMobs(const MSReadBackend& backend, const std::string& method, SpectrumRawTypes::Mass mzWindow, SpectrumRawTypes::Mobility mobWindow, SpectrumRawTypes::Intensity minTIC);
+RcppExport SEXP _patRoon_getIsolationMZsAndMobs(SEXP backendSEXP, SEXP methodSEXP, SEXP mzWindowSEXP, SEXP mobWindowSEXP, SEXP minTICSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -391,8 +391,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type mzWindow(mzWindowSEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::Mobility >::type mobWindow(mobWindowSEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minTIC(minTICSEXP);
-    Rcpp::traits::input_parameter< SpectrumRawTypes::PeakAbundance >::type minAbundance(minAbundanceSEXP);
-    rcpp_result_gen = Rcpp::wrap(getIsolationMZsAndMobs(backend, method, mzWindow, mobWindow, minTIC, minAbundance));
+    rcpp_result_gen = Rcpp::wrap(getIsolationMZsAndMobs(backend, method, mzWindow, mobWindow, minTIC));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -799,7 +798,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_getPeakIntensities", (DL_FUNC) &_patRoon_getPeakIntensities, 4},
     {"_patRoon_collapseIMSFrames", (DL_FUNC) &_patRoon_collapseIMSFrames, 13},
     {"_patRoon_getIsolationMZs", (DL_FUNC) &_patRoon_getIsolationMZs, 4},
-    {"_patRoon_getIsolationMZsAndMobs", (DL_FUNC) &_patRoon_getIsolationMZsAndMobs, 6},
+    {"_patRoon_getIsolationMZsAndMobs", (DL_FUNC) &_patRoon_getIsolationMZsAndMobs, 5},
     {"_patRoon_testMS1Writer", (DL_FUNC) &_patRoon_testMS1Writer, 12},
     {"_patRoon_readMSP", (DL_FUNC) &_patRoon_readMSP, 2},
     {"_patRoon_writeMSPLibrary", (DL_FUNC) &_patRoon_writeMSPLibrary, 3},

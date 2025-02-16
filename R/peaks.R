@@ -161,11 +161,12 @@ findPeaksEnviPick <- function(EICs, params, logPath)
 findPeaksDietrich <- function(EICs, params, logPath)
 {
     setOMPThreads()
+    # UNDONE: log output?
     peaks <- doFindPeaksDietrich(EICs, minIntensity = params$minIntensity, SN = params$SN,
                                  peakWidthMin = params$peakWidth[1], peakWidthMax = params$peakWidth[2],
                                  RTMin = params$RTRange[1],
                                  RTMax = if (!is.finite(params$RTRange[2])) 0 else params$RTRange[2],
-                                 maxPeaksPerSignal = params$maxPeaksPerSignal, verbose = verbose)
+                                 maxPeaksPerSignal = params$maxPeaksPerSignal, verbose = FALSE)
     names(peaks) <- names(EICs)
     peaks <- lapply(peaks, setDT)
     peaks <- pruneList(peaks, checkZeroRows = TRUE)

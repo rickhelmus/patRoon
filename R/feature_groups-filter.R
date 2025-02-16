@@ -393,7 +393,7 @@ checkFeaturesFilter <- function(fGroups, checkFeaturesSession, negate)
             delGroups <- setnames(as.data.table(matrix(FALSE, length(analyses(fGroups)), length(fGroups))),
                             names(fGroups))
                         
-            delGroups[, (names(delGroups)) := lapply(names(fGroups), compF), by = rep(1, nrow(delGroups))]
+            delGroups[, (names(delGroups)) := lapply(names(delGroups), compF), by = rep(1, nrow(delGroups))]
             j <- if (negate) !delGroups else delGroups
         }
         

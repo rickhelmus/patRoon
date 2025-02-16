@@ -64,6 +64,16 @@ scoreFeatQuality <- function(quality, values)
 
 hasFGroupScores <- function(fGroups) nrow(groupScores(fGroups)) > 0
 
+getFilteredFGroups <- function(fGroups, retFilter) {
+    if (!is.null(retFilter$subset)){
+        fGroups <- fGroups[retFilter$subset$i, retFilter$subset$j]
+    }
+    if (!is.null(retFilter$delete)){
+        fGroups <- delete(fGroups, i = retFilter$delete$i, j = retFilter$delete$j)
+    }
+    return(fGroups)
+}
+
 doFGroupsFilter <- function(fGroups, what, hashParam, func, cacheCateg = what, verbose = TRUE)
 {
     if (verbose)
@@ -77,13 +87,15 @@ doFGroupsFilter <- function(fGroups, what, hashParam, func, cacheCateg = what, v
     ret <- loadCacheData(cacheName, hash)
     if (is.null(ret))
     {
-        ret <- if (length(fGroups) > 0) func(fGroups) else fGroups
-        saveCacheData(cacheName, ret, hash)
+        ret <- if (length(fGroups) > 0) func(fGroups) else NULL
+        if (!is.null(ret)) saveCacheData(cacheName, ret, hash)
     }
+
+    fGroups <- getFilteredFGroups(fGroups, ret)
     
     if (verbose)
     {
-        newFCount <- length(getFeatures(ret)); newGCount <- length(ret)
+        newFCount <- length(getFeatures(fGroups)); newGCount <- length(fGroups)
         newn <- length(ret)
         printf("Done! Filtered %d (%.2f%%) features and %d (%.2f%%) feature groups. Remaining: %d features in %d groups.\n",
                oldFCount - newFCount, if (oldFCount > 0) (1 - (newFCount / oldFCount)) * 100,
@@ -91,7 +103,7 @@ doFGroupsFilter <- function(fGroups, what, hashParam, func, cacheCateg = what, v
                newFCount, newGCount)
     }
     
-    return(ret)
+    return(fGroups)
 }
 
 # this combines all functionality from all fGroup as.data.table methods, a not so pretty but pragmatic solution...

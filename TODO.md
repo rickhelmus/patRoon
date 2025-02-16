@@ -283,6 +283,7 @@
 - be consistent in mobility vs IMS and mobilograms and EIMs
     - mobWindow and IMSWindow now randomly used
     - IMS arg but affects mobility features
+    - withMobility vs withIMS
 - make sure mobility ranges are set when getting EIMs
 - findPeaks()
     - add smoothing for XCMS3/enviPick? e.g. with signal::sgolayfilt()

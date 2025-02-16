@@ -47,59 +47,60 @@ removeDuplicateFeatsSusps <- function(tab, checkRet, selectTopIntens)
     return(tab[duplicate == FALSE][, duplicate := NULL])
 }
 
-getFeatEICsInfo <- function(params, withIMS)
+getFeatEICsInfo <- function(params, withIMS, MS2Info)
 {
-    EICInfoAna <- NULL
+    EICInfo <- NULL
     if (params$methodMZ == "bins")
     {
         # UNDONE: also support other binning approaches?
         binsMZ <- seq(params$mzRange[1], params$mzRange[2], by = params$mzStep * 0.5)
         names(binsMZ) <- paste0("bin_M", binsMZ)
         
-        binsIMS <- NULL
-        if (!is.null(params[["methodIMS"]]))
+        EICInfo <- data.table(mzmin = binsMZ, mzmax = binsMZ + params$mzStep, EIC_ID_MZ = names(binsMZ))
+    }
+    else if (params$methodMZ == "suspects")
+        EICInfo <- data.table(mzmin = params$suspects$mz - params$mzWindow, mzmax = params$suspects$mz + params$mzWindow)
+    else if (params$methodMZ == "ms2")
+        EICInfo <- data.table(mzmin = MS2Info$mz - params$mzWindow, mzmax = MS2Info$mz + params$mzWindow)
+    
+    if (withIMS)
+    {
+        if (params$methodIMS == "bins")
         {
-            binsIMS <- seq(params$mobRange[1], params$mobRange[2], by = params$mobStep * 0.5)
-            names(binsIMS) <- paste0("bin_I", binsIMS)
-        }
-        
-        EICInfoAna <- data.table(mzmin = binsMZ, mzmax = binsMZ + params$mzStep, retmin = params$retRange[1],
-                                 retmax = params$retRange[2], EIC_ID_MZ = names(binsMZ))
-        if (withIMS)
-        {
+            binsIMS <- NULL
+            {
+                binsIMS <- seq(params$mobRange[1], params$mobRange[2], by = params$mobStep * 0.5)
+                names(binsIMS) <- paste0("bin_I", binsIMS)
+            }
             tab <- CJ(EIC_ID_MZ = names(binsMZ), EIC_ID_IMS = names(binsIMS), sorted = FALSE)
             tab[, c("mobmin", "mobmax") := .(binsIMS[EIC_ID_IMS], binsIMS[EIC_ID_IMS] + params$mobStep)]
-            EICInfoAna <- merge(EICInfoAna, tab, by = "EIC_ID_MZ", sort = FALSE)
+            EICInfo <- merge(EICInfo, tab, by = "EIC_ID_MZ", sort = FALSE)
         }
-        else
-            EICInfoAna[, c("mobmin", "mobmax") := 0]
-        
-        EICInfoAna[, EIC_ID := paste0("EIC_", .I)]
+        else if (params$methodIMS == "suspects")
+        {
+            EICInfo <- EICInfo[, c("mobmin", "mobmax") := .(params$suspects$mobility - params$IMSWindow,
+                                                            params$suspects$mobility + params$IMSWindow)]
+        }
+        else if (params$methodIMS == "ms2")
+        {
+            EICInfo <- EICInfo[, c("mobmin", "mobmax") := .(MS2Info$mobility - params$IMSWindow,
+                                                            MS2Info$mobility + params$IMSWindow)]
+        }
     }
     else
-    {
-        EICInfoAna <- data.table(mzmin = params$suspects$mz - params$mzWindow,
-                                 mzmax = params$suspects$mz + params$mzWindow,
-                                 EIC_ID = paste0("EIC_", seq_len(nrow(params$suspects))))
-        
-        # UNDONE: also put in retmin/retmax? This will affect peak finding (eg noise estimation)...
-        EICInfoAna[, c("retmin", "retmax") := .(0, 0)]
-        
-        if (withIMS && !is.null(params$suspects[["mobility"]]))
-            EICInfoAna[, c("mobmin", "mobmax") := .(params$suspects$mobility - params$IMSWindow,
-                                                    params$suspects$mobility + params$IMSWindow)]
-        else
-            EICInfoAna[, c("mobmin", "mobmax") := .(0, 0)]
-    }
+        EICInfo[, c("mobmin", "mobmax") := 0]
     
-    return(EICInfoAna)
+    EICInfo[, c("retmin", "retmax") := .(params$retRange[1], params$retRange[2])]
+    EICInfo[, EIC_ID := paste0("EIC_", .I)]
+    
+    return(EICInfo)
 }
 
 #' @export
 getFeaturesEICsParams <- function(methodMZ, methodIMS = NULL, ...)
 {
-    checkmate::assertChoice(methodMZ, c("bins", "suspects"))
-    checkmate::assertChoice(methodIMS, c("bins", "suspects"), null.ok = TRUE)
+    checkmate::assertChoice(methodMZ, c("bins", "suspects", "ms2"))
+    checkmate::assertChoice(methodIMS, c("bins", "suspects", "ms2"), null.ok = TRUE)
     
     if (methodMZ != "suspects" && identical(methodIMS, "suspects"))
         stop("methodIMS can only be 'suspects' if methodMZ is also set to 'suspects'", call. = FALSE)
@@ -124,6 +125,15 @@ getFeaturesEICsParams <- function(methodMZ, methodIMS = NULL, ...)
             neutralChemProps = FALSE
         ))
     }
+    else if (methodMZ == "ms2")
+    {
+        ret <- modifyList(ret, list(
+            rtWindow = 3,
+            mzWindow = 0.005,
+            minTIC = 10000,
+            clusterMethod = "distance"
+        ))
+    }
     
     if (!is.null(methodIMS))
     {
@@ -135,6 +145,12 @@ getFeaturesEICsParams <- function(methodMZ, methodIMS = NULL, ...)
             ))
         }
         else if (methodIMS == "suspects")
+        {
+            ret <- modifyList(ret, list(
+                IMSWindow = 0.02
+            ))
+        }
+        else if (methodIMS == "ms2")
         {
             ret <- modifyList(ret, list(
                 IMSWindow = 0.02
@@ -176,15 +192,16 @@ findFeaturesBinning <- function(analysisInfo, featParams, peakParams, minIntensi
     if (!is.null(featParams[["adduct"]]))
         featParams$adduct <- checkAndToAdduct(featParams$adduct)
     
-    if (!is.null(featParams$suspects))
+    if (featParams$methodMZ == "suspects")
     {
         featParams$suspects <- prepareSuspectList(featParams$suspects, adduct = adduct,
                                                   skipInvalid = featParams$skipInvalid, checkDesc = TRUE,
                                                   prefCalcChemProps = featParams$prefCalcChemProps,
                                                   neutralChemProps = featParams$neutralChemProps)
+        featParams$suspectsOrig <- featParams$suspects
         featParams$suspects <- removeDuplicateFeatsSusps(featParams$suspects, FALSE, FALSE)
         featParams$suspects <- featParams$suspects[order(mz)]
-        # UNDONE: print removed suspects
+        # UNDONE: print removed suspects?
     }
     
     if (is.null(featParams[["retRange"]]))
@@ -205,14 +222,13 @@ findFeaturesBinning <- function(analysisInfo, featParams, peakParams, minIntensi
     else
         anaInfoTBD <- analysisInfo
     
-    
     getEICsAna <- function(backend, EICInfo)
     {
         # UNDONE: make post filters configurable
         ret <- doGetEICsForAna(backend, EICInfo$mzmin, EICInfo$mzmax, EICInfo$retmin, EICInfo$retmax,
                                EICInfo$mobmin, EICInfo$mobmax, mzExpIMSWindow = 0, minIntensityIMS = minIntensityIMS,
-                               compress = FALSE, showProgress = FALSE, withBP = TRUE, minEICIntensity = 1000,
-                               minAdjacentTime = 30, minAdjacentPointIntensity = 250)
+                               compress = FALSE, showProgress = FALSE, withBP = TRUE, minEICIntensity = 5000,
+                               minAdjacentTime = 5, minAdjacentPointIntensity = 250)
         names(ret) <- EICInfo$EIC_ID
         ret <- pruneList(ret, checkEmptyElements = TRUE)
         return(ret)
@@ -225,11 +241,23 @@ findFeaturesBinning <- function(analysisInfo, featParams, peakParams, minIntensi
         {
             openMSReadBackend(backend, path)
          
-            EICInfoMZ <- getFeatEICsInfo(featParams, withIMS = FALSE)
+            MS2Info <- NULL
+            if (featParams$methodMZ == "ms2")
+            {
+                MS2Info <- if (identical(featParams$methodIMS, "ms2"))
+                    getIsolationMZsAndMobs(backend, featParams$clusterMethod, featParams$mzWindow, featParams$IMSWindow,
+                                           featParams$minTIC)
+                else
+                    getIsolationMZs(backend, featParams$clusterMethod, featParams$mzWindow, featParams$minTIC)
+                setDT(MS2Info)
+            }
+            
+            EICInfoMZ <- getFeatEICsInfo(featParams, withIMS = FALSE, MS2Info = MS2Info)
             EICs <- getEICsAna(backend, EICInfoMZ)
             # omit missing
             EICInfoMZ <- EICInfoMZ[EIC_ID %chin% names(EICs)]
             
+            EICInfo <- NULL
             if (withIMS)
             {
                 # With IMS worksflows the mz EICs are only used as a pre-filter. As the EIC object is potentially large we
@@ -240,7 +268,7 @@ findFeaturesBinning <- function(analysisInfo, featParams, peakParams, minIntensi
                 # remove complete m/z bins that were filtered out before
                 temp <- EICInfoMZ[, c("mzmin", "mzmax"), with = FALSE]
                 setkeyv(temp, c("mzmin", "mzmax"))
-                EICInfoMob <- getFeatEICsInfo(featParams, withIMS = TRUE)
+                EICInfoMob <- getFeatEICsInfo(featParams, withIMS = TRUE, MS2Info = MS2Info)
                 ov <- foverlaps(EICInfoMob, temp, type = "within", nomatch = NULL, which = TRUE)
                 EICInfo <- EICInfoMob[ov$xid]
                 
@@ -252,20 +280,45 @@ findFeaturesBinning <- function(analysisInfo, featParams, peakParams, minIntensi
             peaks <- findPeaksInEICs(EICs, peakParams, withBP = TRUE, withMobility = withIMS,
                                      logPath = file.path("log", "featEICs", paste0(ana, ".txt")), cacheDB = cacheDB)
 
+            # only keep those peaks with m/z in the "center" of the analyzed m/z and mobility range
             if (featParams$methodMZ == "bins")
             {
-                # only keep those peaks with m/z in the "center" of the analyzed m/z and mobility range
                 peaks[, binMZStart := EICInfo[match(peaks$EIC_ID, EIC_ID)]$mzmin]
                 peaks <- peaks[between(mz, binMZStart + featParams$mzStep/4, binMZStart + featParams$mzStep/4*3) == TRUE]
-                if (identical(featParams[["methodIMS"]], "bins"))
-                {
-                    peaks[, binMobStart := EICInfo[match(peaks$EIC_ID, EIC_ID)]$mobmin]
-                    peaks <- peaks[between(mobility, binMobStart + featParams$mobStep/4, binMobStart + featParams$mobStep/4*3) == TRUE]
-                }
             }
-
+            if (identical(featParams[["methodIMS"]], "bins"))
+            {
+                peaks[, binMobStart := EICInfo[match(peaks$EIC_ID, EIC_ID)]$mobmin]
+                peaks <- peaks[between(mobility, binMobStart + featParams$mobStep/4, binMobStart + featParams$mobStep/4*3) == TRUE]
+            }
+            if (featParams$methodMZ == "suspects" && is.finite(featParams$rtWindow) && !is.null(featParams$suspects[["rt"]]))
+            {
+                # only keep peaks with at least one closely eluting suspect
+                peaks[, keep := {
+                    susp <- featParams$suspectsOrig[numLTE(abs(mz - omz), featParams$mzWindow) &
+                                                        numLTE(abs(rt - ort), featParams$rtWindow),
+                                                    env = list(omz = mz, ort = ret)]
+                    if (identical(featParams[["methodIMS"]], "ms2") && !is.null(featParams$suspects[["mobility"]]))
+                        susp <- susp[numLTE(abs(mobility - omob), featParams$IMSWindow), env = list(omob = mobility)]
+                    nrow(susp) > 0
+                }, by = .I]
+                peaks <- peaks[keep == TRUE]
+            }
+            else if (featParams$methodMZ %in% "ms2" && is.finite(featParams$rtWindow))
+            {
+                # only keep peaks that elute closely to at least one MS2 spectrum
+                peaks[, keep := {
+                    MS2Peaks <- MS2Info[numLTE(abs(mz - omz), featParams$mzWindow), env = list(omz = mz)]
+                    if (identical(featParams[["methodIMS"]], "ms2"))
+                        MS2Peaks <- MS2Peaks[numLTE(abs(mobility - omob), featParams$IMSWindow), env = list(omob = mobility)]
+                    allRet <- unlist(MS2Peaks$times)
+                    any(numLTE(abs(ret - allRet), featParams$rtWindow))
+                }, by = .I]
+                peaks <- peaks[keep == TRUE]
+            }
+            
             peaks <- removeDuplicateFeatsSusps(peaks, TRUE, TRUE)
-            peaks <- removeDTColumnsIfPresent(peaks, c("binMZStart", "binMobStart"))
+            peaks <- removeDTColumnsIfPresent(peaks, c("binMZStart", "binMobStart", "keep"))
             
             doProgress()
             

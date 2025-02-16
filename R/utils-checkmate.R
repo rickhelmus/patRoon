@@ -1077,8 +1077,8 @@ assertIMSMatchParams <- function(x, null.ok = FALSE, .var.name = checkmate::vnam
 assertFeaturesEICsParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
 {
     checkmate::assertList(x, .var.name = .var.name)
-    assertListVal(x, "methodMZ", checkmate::assertChoice, choices = c("bins", "suspects"), .var.name = .var.name)
-    assertListVal(x, "methodMZ", checkmate::assertChoice, choices = c("bins", "suspects"), null.ok = TRUE,
+    assertListVal(x, "methodMZ", checkmate::assertChoice, choices = c("bins", "suspects", "ms2"), .var.name = .var.name)
+    assertListVal(x, "methodIMS", checkmate::assertChoice, choices = c("bins", "suspects", "ms2"), null.ok = TRUE,
                   .var.name = .var.name)
     assertListVal(x, "retRange", assertRange, null.ok = TRUE, .var.name = .var.name, add = add)
     
@@ -1101,11 +1101,18 @@ assertFeaturesEICsParams <- function(x, .var.name = checkmate::vname(x), add = N
         assertListVal(x, "suspects", assertSuspectList, needsAdduct = is.null(x[["adduct"]]), skipInvalid = x$skipInvalid,
                       .var.name = .var.name, add = add)
     }
+    else if (x$methodMZ == "ms2")
+    {
+        assertListVal(x, "rtWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
+        assertListVal(x, "mzWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
+        assertListVal(x, "minTIC", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
+        assertListVal(x, "clusterMethod", assertClusterMethod, .var.name = .var.name, add = add)
+    }
 
     if (!is.null(x[["methodIMS"]]))
     {
-        if (x$methodIMS != "bins" && x$methodMZ == "bins")
-            stop("'methodIMS' should be set to 'bins' if methodMZ is set to 'bins'.", call. = FALSE)
+        if (x$methodIMS != "bins" && x$methodIMS != x$methodMZ)
+            stop("'methodIMS' should be set to 'bins' or match 'methodMZ'.", call. = FALSE)
         
         if (x$methodIMS == "bins")
         {
@@ -1115,8 +1122,13 @@ assertFeaturesEICsParams <- function(x, .var.name = checkmate::vname(x), add = N
         }
         else if (x$methodIMS == "suspects")
         {
-            assertListVal(x, "suspIMSWindow", checkmate::assertNumber, lower = 0, finite = TRUE,
-                          .var.name = .var.name, add = add)
+            assertListVal(x, "IMSWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name,
+                          add = add)
+        }
+        else if (x$methodIMS == "ms2")
+        {
+            assertListVal(x, "IMSWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name,
+                          add = add)
         }
     }
 }

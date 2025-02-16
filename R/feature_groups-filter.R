@@ -41,7 +41,7 @@ intensityFilter <- function(fGroups, absThreshold, relThreshold, negate = FALSE)
         delGroups <- setnames(as.data.table(matrix(FALSE, length(analyses(fGroups)), length(fGroups))),
                               names(fGroups))
         delGroups[, (names(delGroups)) := lapply(fGroups@groups, compF), by = rep(1, nrow(delGroups))]
-        return(delete(fGroups, j = delGroups))
+        return(list(delete = list(i = NULL, j = delGroups)))
     }))
 }
 
@@ -92,7 +92,7 @@ blankFilter <- function(fGroups, threshold, negate = FALSE)
         
         for (j in seq_along(delGroups))
             set(delGroups, j = j, value = fifelse(pred(fGroups@groups[[j]], anaThrs[[j]]), 1, 0))
-        return(delete(fGroups, j = delGroups))
+        return(list(delete = list(i = NULL, j = delGroups)))
     }))
 }
 
@@ -106,7 +106,7 @@ minAnalysesFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, negat
         pred <- function(x) sum(x > 0) >= threshold
         if (negate)
             pred <- Negate(pred)
-        return(fGroups[, sapply(groupTable(fGroups), pred, USE.NAMES = FALSE)])
+        return(list(subset = list(i = TRUE, j = sapply(groupTable(fGroups), pred, USE.NAMES = FALSE))))
     }, "minAnalyses"))
 }
 
@@ -124,7 +124,7 @@ minReplicatesFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, neg
         if (negate)
             pred <- Negate(pred)
 
-        return(fGroups[, sapply(groupTable(fGroups), pred, USE.NAMES = FALSE)])
+        return(list(subset = list(i = TRUE, j = sapply(groupTable(fGroups), pred, USE.NAMES = FALSE))))
     }, "minReplicates", verbose))
 }
 
@@ -140,7 +140,7 @@ minFeaturesFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, negat
         if (negate)
             pred <- Negate(pred)
 
-        return(fGroups[sapply(transpose(groupTable(fGroups)), pred, USE.NAMES = FALSE)])
+        return(list(subset = list(i = sapply(transpose(groupTable(fGroups)), pred, USE.NAMES = FALSE), j = TRUE)))
     }, "minReplicates", verbose))
 }
 
@@ -180,7 +180,7 @@ minConcFilter <- function(fGroups, absThreshold, relThreshold, aggrParams, remov
         delGroups <- setnames(as.data.table(matrix(FALSE, length(analyses(fGroups)), length(fGroups))),
                               names(fGroups))
         delGroups[, (names(aggrConcsT)) := lapply(aggrConcsT, compF), by = rep(1, nrow(delGroups))]
-        return(delete(fGroups, j = delGroups))
+        return(list(delete = list(i = NULL, j = delGroups)))
     }))
 }
 
@@ -204,6 +204,7 @@ maxToxFilter <- function(fGroups, absThreshold, relThreshold, aggrParams, remove
             function(x) (removeNA & is.na(x)) | (!is.na(x) & x > threshold)
         
         return(delete(fGroups, j = aggrTox[compF(LC50) == TRUE]$group))
+        return(list(delete = list(i = NULL, j = aggrTox[compF(LC50) == TRUE]$group)))
     }))
 }
 
@@ -245,7 +246,7 @@ replicateAbundanceFilter <- function(fGroups, absThreshold, relThreshold, maxInt
         delGroups <- copy(fGroups@groups)
         set(delGroups, j = "group", value = rGroupsAna)
         delGroups[, (gNames) := lapply(.SD, function(x) if (pred(x, .N, group)) 1 else 0), by = group, .SDcols = gNames]
-        return(delete(fGroups, j = delGroups[, -"group"]))
+        return(list(delete = list(i = NULL, j = delGroups[, -"group"])))
     }, "replicateAbundance"))
 }
 
@@ -263,7 +264,7 @@ retentionMzFilter <- function(fGroups, range, negate, what)
                             mz = fGroups@groupInfo$mzs,
                             mzDefect = fGroups@groupInfo$mzs - floor(fGroups@groupInfo$mzs))
 
-        return(fGroups[, pred(checkVals)])
+        return(list(subset = list(i = TRUE, j = pred(checkVals))))
     }))
 }
 
@@ -293,7 +294,7 @@ chromWidthFilter <- function(fGroups, range, negate)
         delGroups <- setnames(as.data.table(matrix(FALSE, length(analyses(fGroups)), length(fGroups))),
                               names(fGroups))
         delGroups[, (names(delGroups)) := lapply(ftindex, pred), by = rep(1, nrow(delGroups))]
-        return(delete(fGroups, j = delGroups))
+        return(list(delete = list(i = NULL, j = delGroups)))
     }))
 }
 
@@ -304,7 +305,7 @@ replicateGroupFilter <- function(fGroups, rGroups, negate = FALSE, verbose = TRU
         pred <- function(g) !g %chin% rGroups
         if (negate)
             pred <- Negate(pred)
-        return(delete(fGroups, pred(analysisInfo(fGroups)$group)))
+        return(delete = list(i = pred(analysisInfo(fGroups)$group, j = NULL)))
     }, "replicate_group", verbose))
 }
 
@@ -315,7 +316,7 @@ resultsFilter <- function(fGroups, results, negate = FALSE, verbose = TRUE)
         fgRes <- if (is.list(results)) unique(unlist(lapply(results, groupNamesResults))) else groupNamesResults(results)
         if (negate)
             fgRes <- setdiff(names(fGroups), fgRes)
-        return(fGroups[, fgRes])
+        return(list(subset = list(i = TRUE, j = fgRes)))
     }, verbose = verbose))
 }
 
@@ -344,7 +345,7 @@ featQualityFilter <- function(fGroups, qualityRanges, negate)
         delGroups <- setnames(as.data.table(matrix(FALSE, length(analyses(fGroups)), length(fGroups))),
                               names(fGroups))
         delGroups[, (names(delGroups)) := lapply(ftindex, pred), by = rep(1, nrow(delGroups))]
-        return(delete(fGroups, j = delGroups))
+        return(list(delete = list(i = NULL, j = delGroups)))
     }, "feat_quality"))
 }
 
@@ -364,14 +365,14 @@ groupQualityFilter <- function(fGroups, qualityRanges, negate)
         {
             tab <- copy(tab)
             tab[, keep := checkHow(mapply(.SD, qr, FUN = pred)), by = seq_len(nrow(tab)), .SDcols = names(qr)]
-            return(fg[, tab[keep == TRUE]$group])
+            return(list(subset = list(i = TRUE, j = tab[keep == TRUE]$group)))
         }
         
         if (length(qRanges) > 0)
-            fGroups <- doF(fGroups, qRanges, groupQualities(fGroups))
+            ret <- doF(fGroups, qRanges, groupQualities(fGroups))
         if (length(qRangesScore) > 0)
-            fGroups <- doF(fGroups, qRangesScore, groupScores(fGroups))
-        return(fGroups)
+            ret <- doF(fGroups, qRangesScore, groupScores(fGroups))
+        return(ret)
     }, "group_quality"))
 }
 
@@ -381,23 +382,22 @@ checkFeaturesFilter <- function(fGroups, checkFeaturesSession, negate)
     {
         session <- readCheckSession(checkFeaturesSession, "featureGroups")
         if (negate)
-            fGroups <- fGroups[, union(session$removeFully, names(session$removePartially))]
+            j <- union(session$removeFully, names(session$removePartially))
         else
-            fGroups <- delete(fGroups, j = session$removeFully)
+            j <- session$removeFully
         
         if (length(session$removePartially) > 0)
         {
             anas <- analyses(fGroups)
-            fGroups <- delete(fGroups, j = function(x, grp)
-            {
-                if (is.null(session$removePartially[[grp]]))
-                    return(FALSE)
-                anaRm <- anas %chin% session$removePartially[[grp]]
-                return(if (negate) !anaRm else anaRm)
-            })
+            compF <- function(grp) anas %chin% session$removePartially[[grp]] | grp %chin% session$removeFully
+            delGroups <- setnames(as.data.table(matrix(FALSE, length(analyses(fGroups)), length(fGroups))),
+                            names(fGroups))
+                        
+            delGroups[, (names(delGroups)) := lapply(names(fGroups), compF), by = rep(1, nrow(delGroups))]
+            j <- if (negate) !delGroups else delGroups
         }
         
-        return(fGroups)
+        return(list(delete = list(i = NULL, j = j)))
     }, "checkedFeatures"))
 }
 
@@ -414,7 +414,7 @@ minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, ne
         if (negate)
             pred <- Negate(pred)
         
-        return(fGroups[, sapply(groupTable(fGroups), pred, USE.NAMES = FALSE)])
+        return(list(subset = list(i = TRUE, j = sapply(groupTable(fGroups), pred, USE.NAMES = FALSE))))
     }, "minSets", verbose))
 }
 

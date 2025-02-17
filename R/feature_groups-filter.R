@@ -203,7 +203,6 @@ maxToxFilter <- function(fGroups, absThreshold, relThreshold, aggrParams, remove
         else
             function(x) (removeNA & is.na(x)) | (!is.na(x) & x > threshold)
         
-        return(delete(fGroups, j = aggrTox[compF(LC50) == TRUE]$group))
         return(list(delete = list(i = NULL, j = aggrTox[compF(LC50) == TRUE]$group)))
     }))
 }
@@ -305,7 +304,7 @@ replicateGroupFilter <- function(fGroups, rGroups, negate = FALSE, verbose = TRU
         pred <- function(g) !g %chin% rGroups
         if (negate)
             pred <- Negate(pred)
-        return(delete = list(i = pred(analysisInfo(fGroups)$group, j = NULL)))
+        return(list(delete = list(i = pred(analysisInfo(fGroups)$group, j = NULL))))
     }, "replicate_group", verbose))
 }
 

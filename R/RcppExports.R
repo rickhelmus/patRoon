@@ -45,8 +45,8 @@ getScans <- function(backend, timeStart, timeEnd, MSLevel, prec) {
     .Call(`_patRoon_getScans`, backend, timeStart, timeEnd, MSLevel, prec)
 }
 
-getEICList <- function(backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, mzExpIMSWindow, minIntensityIMS, compress, showProgress = FALSE, withBP = FALSE, minEICIntensity = 0L, minAdjacentTime = 0L, minAdjacentPointIntensity = 0L) {
-    .Call(`_patRoon_getEICList`, backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, mzExpIMSWindow, minIntensityIMS, compress, showProgress, withBP, minEICIntensity, minAdjacentTime, minAdjacentPointIntensity)
+getEICList <- function(backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, mzExpIMSWindow, minIntensityIMS, compress, showProgress = FALSE, withBP = FALSE, minEICIntensity = 0L, minEICAdjTime = 0L, minEICAdjPoints = 0L, minEICAdjIntensity = 0L) {
+    .Call(`_patRoon_getEICList`, backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, mzExpIMSWindow, minIntensityIMS, compress, showProgress, withBP, minEICIntensity, minEICAdjTime, minEICAdjPoints, minEICAdjIntensity)
 }
 
 getMSMetadata <- function(backend, msLevel) {

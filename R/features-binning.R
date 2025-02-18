@@ -105,7 +105,8 @@ getFeaturesEICsParams <- function(methodMZ, methodIMS = NULL, ...)
     if (methodMZ != "suspects" && identical(methodIMS, "suspects"))
         stop("methodIMS can only be 'suspects' if methodMZ is also set to 'suspects'", call. = FALSE)
     
-    ret <- list(methodMZ = methodMZ, methodIMS = methodIMS, retRange = NULL)
+    ret <- list(methodMZ = methodMZ, methodIMS = methodIMS, retRange = NULL, minEICIntensity = 5000,
+                minEICAdjTime = 5, minEICAdjPoints = 5, minEICAdjIntensity = 250)
     
     if (methodMZ == "bins")
     {
@@ -224,11 +225,12 @@ findFeaturesBinning <- function(analysisInfo, featParams, peakParams, minIntensi
     
     getEICsAna <- function(backend, EICInfo)
     {
-        # UNDONE: make post filters configurable
         ret <- doGetEICsForAna(backend, EICInfo$mzmin, EICInfo$mzmax, EICInfo$retmin, EICInfo$retmax,
                                EICInfo$mobmin, EICInfo$mobmax, mzExpIMSWindow = 0, minIntensityIMS = minIntensityIMS,
-                               compress = FALSE, showProgress = FALSE, withBP = TRUE, minEICIntensity = 5000,
-                               minAdjacentTime = 5, minAdjacentPointIntensity = 250)
+                               compress = FALSE, showProgress = FALSE, withBP = TRUE,
+                               minEICIntensity = featParams$minEICIntensity, minEICAdjTime = featParams$minEICAdjTime,
+                               minEICAdjPoints = featParams$minEICAdjPoints,
+                               minEICAdjIntensity = featParams$minEICAdjIntensity)
         names(ret) <- EICInfo$EIC_ID
         ret <- pruneList(ret, checkEmptyElements = TRUE)
         return(ret)

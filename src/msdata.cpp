@@ -348,8 +348,8 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                       const std::vector<SpectrumRawTypes::Mobility> &endMobs,
                       SpectrumRawTypes::Mass mzExpIMSWindow, SpectrumRawTypes::Intensity minIntensityIMS, bool compress,
                       bool showProgress = false, bool withBP = false, SpectrumRawTypes::Intensity minEICIntensity = 0,
-                      SpectrumRawTypes::Time minAdjacentTime = 0,
-                      SpectrumRawTypes::Intensity minAdjacentPointIntensity = 0)
+                      SpectrumRawTypes::Time minEICAdjTime = 0,
+                      SpectrumRawTypes::Intensity minEICAdjIntensity = 0)
 {
     struct EICPoint
     {
@@ -494,17 +494,17 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
             });
             valid = numberGTE(maxIt->intensity, minEICIntensity);
         }
-        if (valid && minAdjacentTime > 0 && minAdjacentPointIntensity > 0)
+        if (valid && minEICAdjTime > 0 && minEICAdjIntensity > 0)
         {
             SpectrumRawTypes::Time startTime = 0;
-            valid = false; // until provent otherwise
+            valid = false; // until proven otherwise
             for (size_t j=0; j<points.size(); ++j)
             {
-                if (numberGTE(points[j].intensity, minAdjacentPointIntensity))
+                if (numberGTE(points[j].intensity, minEICAdjIntensity))
                 {
                     if (startTime == 0)
                         startTime = points[j].time;
-                    else if (numberGTE(points[j].time - startTime, minAdjacentTime))
+                    else if (numberGTE(points[j].time - startTime, minEICAdjTime))
                     {
                         valid = true;
                         break;
@@ -603,8 +603,8 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                       const std::vector<SpectrumRawTypes::Mobility> &endMobs,
                       SpectrumRawTypes::Mass mzExpIMSWindow, SpectrumRawTypes::Intensity minIntensityIMS, bool compress,
                       bool showProgress = false, bool withBP = false, SpectrumRawTypes::Intensity minEICIntensity = 0,
-                      SpectrumRawTypes::Time minAdjacentTime = 0,
-                      SpectrumRawTypes::Intensity minAdjacentPointIntensity = 0)
+                      SpectrumRawTypes::Time minEICAdjTime = 0, unsigned minEICAdjPoints = 0,
+                      SpectrumRawTypes::Intensity minEICAdjIntensity = 0)
 {
     struct EICPoint
     {
@@ -720,6 +720,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         EIC eic;
         SpectrumRawTypes::Intensity maxInten = 0;
         SpectrumRawTypes::Time startTimeAboveThr = 0;
+        unsigned adjPointsAboveThr = 0;
         bool enoughAboveThr = false;
         
         auto it = std::lower_bound(allSpectra[0].cbegin(), allSpectra[0].cend(), startTimes[i],
@@ -795,17 +796,29 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                     maxInten = point.intensity;
             }
             
-            if (!enoughAboveThr && minAdjacentTime != 0.0)
+            if (!enoughAboveThr && (minEICAdjTime != 0.0 || minEICAdjPoints > 0))
             {
-                if (numberGTE(point.intensity, minAdjacentPointIntensity))
+                if (numberGTE(point.intensity, minEICAdjIntensity))
                 {
-                    if (startTimeAboveThr == 0.0)
-                        startTimeAboveThr = point.time;
-                    else if (numberGTE(point.time - startTimeAboveThr, minAdjacentTime))
-                        enoughAboveThr = true;
+                    if (minEICAdjTime != 0.0)
+                    {
+                        if (startTimeAboveThr == 0.0)
+                            startTimeAboveThr = point.time;
+                        else if (numberGTE(point.time - startTimeAboveThr, minEICAdjTime))
+                            enoughAboveThr = true;
+                    }
+                    if (minEICAdjPoints > 0)
+                    {
+                        ++adjPointsAboveThr;
+                        if (adjPointsAboveThr >= minEICAdjPoints)
+                            enoughAboveThr = true;
+                    }
                 }
                 else
+                {
                     startTimeAboveThr = 0.0;
+                    adjPointsAboveThr = 0;   
+                }
             }
             
             eic.addPoint(point);
@@ -813,7 +826,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         
         if (minEICIntensity != 0.0 && maxInten < minEICIntensity)
             continue;
-        if (minAdjacentTime != 0.0 && !enoughAboveThr)
+        if ((minEICAdjTime != 0.0 || minEICAdjPoints > 0) && !enoughAboveThr)
             continue;
         
         if (compress && eic.size() >= 3)

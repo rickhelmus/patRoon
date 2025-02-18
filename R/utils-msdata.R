@@ -193,8 +193,8 @@ doGetEICsForAna <- function(...)
 }
 
 doGetEICs <- function(anaInfo, EICInfoList, mzExpIMSWindow = 0, minIntensityIMS = 0, compress = TRUE,
-                      showProgress = "batch", withBP = FALSE, minEICIntensity = 0, minAdjacentTime = 0,
-                      minAdjacentPointIntensity = 0, cacheDB = NULL)
+                      showProgress = "batch", withBP = FALSE, minEICIntensity = 0, minEICAdjTime = 0,
+                      minEICAdjPoints = 0, minEICAdjIntensity = 0, cacheDB = NULL)
 {
     if (length(EICInfoList) == 0)
         return(list())
@@ -214,7 +214,7 @@ doGetEICs <- function(anaInfo, EICInfoList, mzExpIMSWindow = 0, minIntensityIMS 
             cacheDB <- openCacheDBScope()
         anaHashes <- getMSFileHashesFromAvailBackend(anaInfo, needIMS = needIMS)
         baseHash <- makeHash(mzExpIMSWindow, minIntensityIMS, compress, withBP = FALSE, minEICIntensity,
-                             minAdjacentTime, minAdjacentPointIntensity)
+                             minEICAdjTime, minEICAdjPoints, minEICAdjIntensity)
     }
     
     allEICs <- applyMSData(anaInfo, EICInfoList, showProgress = showProgress == "batch", needIMS = needIMS,
@@ -255,7 +255,7 @@ doGetEICs <- function(anaInfo, EICInfoList, mzExpIMSWindow = 0, minIntensityIMS 
         
         newEICs <- doGetEICsForAna(backend, ToDo$mzmin, ToDo$mzmax, ToDo$retmin, ToDo$retmax, ToDo$mobmin, ToDo$mobmax,
                                    mzExpIMSWindow, minIntensityIMS, compress, showProgress = showProgress == "ana", withBP,
-                                   minEICIntensity, minAdjacentTime, minAdjacentPointIntensity)
+                                   minEICIntensity, minEICAdjTime, minEICAdjPoints, minEICAdjIntensity)
         EICs[!isCached] <- newEICs
         
         if (doCache)

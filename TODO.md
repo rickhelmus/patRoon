@@ -284,7 +284,6 @@
     - mobWindow and IMSWindow now randomly used
     - IMS arg but affects mobility features
     - withMobility vs withIMS
-- make sure mobility ranges are set when getting EIMs
 - findPeaks()
     - add smoothing for XCMS3/enviPick? e.g. with signal::sgolayfilt()
         - might also be nice for plotting chroms?
@@ -302,14 +301,10 @@
             - XCMS: peakwidth = c(0.01, 0.2)), prefilter = c(3, 10), firstBaselineCheck = F
 - assignMobilities()
     - better names for ims_parent_ID/ims_parent_group?
-    - limit mobmin/mobmax --> both min and max, ie to prevent excessively wrong peak range assignments
     - SC seems to hang?
     - parent-less/orphaned IMS features
-        - test: reporting, minMobilityMatches and other post-suspect screening, ...
+        - test: reporting, other post-suspect screening, ...
         - handle normalization: perform like non-IMS workflow with a warning?
-        - suspects: minMobilityMatches is now not handled properly
-            - don't do N-1 for orphaned
-            - removes all parent-less or IMS parent fGroups? fine? if so, doc
     - switch to PCL w/ CCSbase in patRoonExt
 - Suspect features
     - Remove featureSuspects and replace by findFeaturesBinning?

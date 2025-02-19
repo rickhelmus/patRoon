@@ -758,7 +758,7 @@ setMethod("estimateIDLevels", "compounds", function(obj, absMzDev = 0.005, MSPea
 
 #' @export
 setMethod("assignMobilities", "compounds", function(obj, fGroups, IMS = TRUE, from = NULL, matchFromBy = "InChIKey1",
-                                                    overwrite = FALSE, adductDef = NULL, CCSParams = NULL,
+                                                    overwrite = FALSE, adduct = NULL, CCSParams = NULL,
                                                     prefCalcChemProps = TRUE, neutralChemProps = FALSE,
                                                     virtualenv = "patRoon-c3sdb")
 {
@@ -770,7 +770,7 @@ setMethod("assignMobilities", "compounds", function(obj, fGroups, IMS = TRUE, fr
     assertIMSArg(IMS, add = ac)
     checkmate::reportAssertions(ac)
     
-    adductDef <- checkAndToAdduct(adductDef, fGroups)
+    adduct <- checkAndToAdduct(adduct, fGroups)
     
     if (length(obj) == 0)
         return(obj)
@@ -787,12 +787,15 @@ setMethod("assignMobilities", "compounds", function(obj, fGroups, IMS = TRUE, fr
     # add some columns for so that the DT method can do its calculations
     allTab[, mz := gInfo$mz[match(group, gInfo$group)]]
     annFG <- annotations(fGroups)
+    adductChr <- if (!is.null(adduct)) as.character(adduct)
     if (nrow(annFG) > 0)
         allTab[, adduct := annFG$adduct[match(group, annFG$group)]]
+    else
+        allTab[, adduct := adductChr]
 
     allTab <- assignMobilities(allTab, from = from, matchFromBy = matchFromBy, overwrite = overwrite,
-                               adducts = "none", adductDef = adductDef, predictAdductOnly = TRUE,
-                               CCSParams = CCSParams, prepareChemProps = FALSE, prefCalcChemProps = prefCalcChemProps,
+                               adducts = "none", predictAdductOnly = TRUE, CCSParams = CCSParams,
+                               prepareChemProps = FALSE, prefCalcChemProps = prefCalcChemProps,
                                neutralChemProps = neutralChemProps, virtualenv = virtualenv)
     
     if (is.null(allTab[["mobility"]]))
@@ -801,9 +804,8 @@ setMethod("assignMobilities", "compounds", function(obj, fGroups, IMS = TRUE, fr
         allTab[, CCS := NA_real_]
 
     # copy the right mobility and CCS columns
-    adductDefChr <- if (!is.null(adductDef)) as.character(adductDef)
-    allTab[, mobility := selectFromSuspAdductCol(allTab, "mobility", annotations(fGroups), adductDefChr)]
-    allTab[, CCS := selectFromSuspAdductCol(allTab, "CCS", annotations(fGroups), adductDefChr)]
+    allTab[, mobility := selectFromSuspAdductCol(allTab, "mobility", annotations(fGroups), adductChr)]
+    allTab[, CCS := selectFromSuspAdductCol(allTab, "CCS", annotations(fGroups), adductChr)]
     allTab[, c("mobility_mz", "CCS_mz") := .(mobility / mz, CCS / mz)]
     
     if (hasMobilities(fGroups))

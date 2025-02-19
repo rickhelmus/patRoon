@@ -9,8 +9,8 @@ NULL
 isScreening <- function(fGroups) inherits(fGroups, c("featureGroupsScreening", "featureGroupsScreeningSet"))
 isSuspAnnotated <- function(fGroups) isScreening(fGroups) && !is.null(screenInfo(fGroups)[["estIDLevel"]])
 
-suspMetaDataCols <- function() c("name", "rt", "name_orig", "mz", "mobility", "CCS", "SMILES", "InChI", "InChIKey",
-                                 "formula", "neutralMass", "molNeutralized", "adduct", "fragments_mz",
+suspMetaDataCols <- function() c("name", "rt", "name_orig", "mz", "mobility_susp", "CCS_susp", "SMILES", "InChI",
+                                 "InChIKey", "formula", "neutralMass", "molNeutralized", "adduct", "fragments_mz",
                                  "fragments_formula")
 suspAnnCols <- function() c("formRank", "compRank", "annSimForm", "annSimComp", "annSimBoth", "maxFrags",
                             "maxFragMatches", "maxFragMatchesRel", "estIDLevel")
@@ -312,7 +312,7 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, IMSMatchPara
     metaDataCols <- union("rt", intersect(suspMetaDataCols(), names(suspects)))
     
     # HACK: the mobility columns are handled differently
-    metaDataCols <- setdiff(metaDataCols, c("mobility", "mobility_susp", "CCS", "CCS_mobility"))
+    metaDataCols <- setdiff(metaDataCols, c("mobility", "mobility_susp", "CCS", "CCS_susp"))
     
     emptyResult <- data.table()
     for (col in c(metaDataCols, "group", "d_rt", "d_mz"))

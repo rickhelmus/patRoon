@@ -254,11 +254,13 @@ finalizeScreenInfoForIMS <- function(scr, gInfo, IMSMatchParams)
         if (IMSMatchParams$relative)
             checkCol <- paste0(checkCol, "_rel")
         
-        scr <- scr[is.na(get(checkCol)) | abs(get(checkCol)) <= IMSMatchParams$window]
+        scr <- scr[is.na(get(checkCol)) | numLTE(abs(get(checkCol)), IMSMatchParams$window)]
         
         if (IMSMatchParams$minMatches > 0)
         {
-            scr[, keep := (.N - 1) >= min(IMSMatchParams$minMatches, scrOrigExp[ims_parent_group == group, .N]),
+            # NOTE: if parent groups have been filtered or not assigned at all, then nothing is filtered as the min(...)
+            # call below evalues to zero.
+            scr[, keep := .N >= min(IMSMatchParams$minMatches, scrOrigExp[ims_parent_group == group, .N]),
                 by = c("ims_parent_group", "name")]
             scr <- scr[keep == TRUE, -"keep"]
         }

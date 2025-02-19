@@ -303,7 +303,7 @@
     - better names for ims_parent_ID/ims_parent_group?
     - SC seems to hang?
     - parent-less/orphaned IMS features
-        - test: reporting, other post-suspect screening, ...
+        - test: other post-suspect screening, ...
         - handle normalization: perform like non-IMS workflow with a warning?
             - should be done, test updates
             - doc!

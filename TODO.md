@@ -305,6 +305,8 @@
     - parent-less/orphaned IMS features
         - test: reporting, other post-suspect screening, ...
         - handle normalization: perform like non-IMS workflow with a warning?
+            - should be done, test updates
+            - doc!
     - switch to PCL w/ CCSbase in patRoonExt
 - Suspect features
     - Remove featureSuspects and replace by findFeaturesBinning?

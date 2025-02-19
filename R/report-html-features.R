@@ -13,8 +13,8 @@ getFGReactTab <- function(objects, settings, ...)
     
     if (!is.null(tab[["ims_parent_group"]]))
     {
-        # link IMS parents to themselves for grouping
-        tab[is.na(mobility) & group %chin% ims_parent_group, ims_parent_group := group]
+        # link IMS parents and orphans to themselves for grouping
+        tab[is.na(ims_parent_group), ims_parent_group := group]
     }
     
     if (settings$features$chromatograms$small)
@@ -250,9 +250,9 @@ makeReactCellFeatChromMob <- function(type)
 reportHTMLUtils$methods(
     makeMainResultsFGReactable = function(...)
     {
-        hasMob <- hasMobilities(objects$fGroups)
+        hasMobParents <- hasMobilities(objects$fGroups) && any(!is.na(groupInfo(objects$fGroups)$ims_parent_group))
         makeMainResultsReactable(..., retMin = settings$features$retMin,
-                                 groupBy = if (hasMob) "ims_parent_group", defaultExpanded = hasMob)
+                                 groupBy = if (hasMobParents) "ims_parent_group", defaultExpanded = hasMobParents)
     },
 
     genMainTablePlain = function()
@@ -519,7 +519,7 @@ reportHTMLUtils$methods(
     makeFGToolbar = function(tableID)
     {
         hasMob <- hasMobilities(objects$fGroups)
-        gb <- if (hasMob)
+        gb <- if (hasMob && any(!is.na(groupInfo(objects$fGroups)$ims_parent_group)))
         {
             list(
                 list(value = "", name = "None"),

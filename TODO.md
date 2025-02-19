@@ -297,8 +297,11 @@
     - Params
         - see if current chrom defaults are fine
         - add sensible IMS defaults
-            - reduce gaussWidth for OpenMS
+            - reduce gaussWidth for OpenMS --> gaussWidth = 0.02
             - XCMS: peakwidth = c(0.01, 0.2)), prefilter = c(3, 10), firstBaselineCheck = F
+            - enviPick: drtsmall = 0.2, drtfill = 0.02, drttotal = 1, minint = 1E1
+            - dietrich: peakWidth = c(0.02, 0.5)
+        - doc common parameters that may need to be changed for IMS
 - assignMobilities()
     - better names for ims_parent_ID/ims_parent_group?
     - SC seems to hang?

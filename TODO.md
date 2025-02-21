@@ -293,14 +293,6 @@
             - keep doing this?
             - report both?
             - document
-    - Params
-        - see if current chrom defaults are fine
-        - add sensible IMS defaults
-            - reduce gaussWidth for OpenMS --> gaussWidth = 0.02
-            - XCMS: peakwidth = c(0.01, 0.2)), prefilter = c(3, 10), firstBaselineCheck = F
-            - enviPick: drtsmall = 0.2, drtfill = 0.02, drttotal = 1, minint = 1E1
-            - dietrich: peakWidth = c(0.02, 0.5)
-        - doc common parameters that may need to be changed for IMS
 - assignMobilities()
     - better names for ims_parent_ID/ims_parent_group?
     - SC seems to hang?
@@ -409,6 +401,9 @@
     - get CCS values from MetFrag
         - use PCL w/ CCSbase
         - still need to call assignMobilities() with from = NULL to get CCS deviations, mobility conversions etc
+    - peakParams
+        - doc common parameters that may need to be changed for IMS
+        - doc that they could probably be optimized further
 
 
 - NEWS

@@ -560,7 +560,7 @@ getDefEIMParams <- function(...)
 #' @export
 getDefPeakParams <- function(type, algorithm, ...)
 {
-    checkmate::assertChoice(type, c("chrom", "ims"))
+    checkmate::assertChoice(type, c("chrom", "bruker_ims", "agilent_ims"))
     checkmate::assertChoice(algorithm, c("openms", "xcms3", "envipick", "dietrich"))
     
     def <- NULL
@@ -574,7 +574,7 @@ getDefPeakParams <- function(type, algorithm, ...)
                    SGolayFrameLength = 15,
                    SGolayPolyOrder = 3,
                    useGauss = TRUE,
-                   gaussWidth = 50,
+                   gaussWidth = 30,
                    SN = 1.0,
                    SNWinLen = 1000,
                    SNBinCount = 30,
@@ -585,7 +585,7 @@ getDefPeakParams <- function(type, algorithm, ...)
                    extraOpts = list()
                ),
                xcms3 = list(
-                   peakwidth = c(20, 50),
+                   peakwidth = c(10, 30),
                    snthresh = 10,
                    prefilter = c(3, 100),
                    integrate = 1,
@@ -616,11 +616,30 @@ getDefPeakParams <- function(type, algorithm, ...)
         def$forcePeakRange <- c(0, 0)
         def$relMinIntensity <- 0
     }
-    else # IMS
+    else if (type == "bruker_ims")
     {
-        # UNDONE!!
         def <- getDefPeakParams(algorithm, type = "chrom", ...)
+        def <- modifyList(def, switch(
+            algorithm,
+            openms = list(gaussWidth = 0.02),
+            xcms3 = list(peakwidth = c(0.01, 0.5), prefilter = c(3, 10), firstBaselineCheck = FALSE),
+            envipick = list(drtsmall = 0.2, drtfill = 0.02, drttotal = 1, minint = 10),
+            dietrich = list(peakWidth = c(0.02, 0.5))
+        ))
         def$forcePeakRange = c(0.01, 0.1)
+        def$relMinIntensity <- 0.25
+    }
+    else if (type == "agilent_ims")
+    {
+        def <- getDefPeakParams(algorithm, type = "chrom", ...)
+        def <- modifyList(def, switch(
+            algorithm,
+            openms = list(gaussWidth = 0.05),
+            xcms3 = list(peakwidth = c(0.1, 5), prefilter = c(3, 10), firstBaselineCheck = FALSE),
+            envipick = list(drtsmall = 2, drtfill = 0.4, drttotal = 1, minint = 10),
+            dietrich = list(peakWidth = c(0.2, 5))
+        ))
+        def$forcePeakRange = c(0.2, 1)
         def$relMinIntensity <- 0.25
     }
     

@@ -246,6 +246,24 @@ makeReactCellFeatChromMob <- function(type)
     return(getReactCellImgJS(sprintf("'src=\"' + reportPlots.%sFeatures[ci.row.group][ci.row.analysis] + '\"'", type)))
 }
 
+makeSuspInfoPropTab <- function(tab, id, retMin)
+{
+    tab <- copy(tab)
+    for (col in intersect(c("neutralMass", "mz"), names(tab)))
+        set(tab, j = col, value = round(tab[[col]], 5))
+    if (!is.null(tab[["rt"]]))
+    {
+        if (retMin)
+            set(tab, j = "rt", value = tab$rt / 60)
+        set(tab, j = "rt", value = round(tab$rt, 2))
+    }
+    if (!is.null(tab[["formula"]]))
+        set(tab, j = "formula", value = subscriptFormulaHTML(tab$formula))
+    setnames(tab, c("mobility_susp", "CCS_susp"), c("mobility suspect", "CCS suspect"), skip_absent = TRUE)
+    
+    ptab <- makePropTab(tab, NULL, "name")
+    return(makePropReactable(ptab, id, "name", minPropWidth = 120, minValWidth = 150))
+}
 
 reportHTMLUtils$methods(
     makeMainResultsFGReactable = function(...)
@@ -329,48 +347,20 @@ reportHTMLUtils$methods(
     genSuspInfoTable = function(id)
     {
         tab <- as.data.table(objects$fGroups, collapseSuspects = NULL)
-        tab <- tab[, getAllSuspCols(paste0("susp_", suspMetaDataCols()), names(tab),
-                                    mergedConsensusNames(objects$fGroups)), with = FALSE]
-        
+        tab <- subsetDTColumnsIfPresent(tab, getAllSuspCols(paste0("susp_", suspMetaDataCols()), names(tab),
+                                                            mergedConsensusNames(objects$fGroups)))
         setnames(tab, sub("^susp_", "", names(tab)))
-        
         tab <- unique(tab, by = "name")
-        
-        for (col in intersect(c("neutralMass", "mz"), names(tab)))
-            set(tab, j = col, value = round(tab[[col]], 5))
-        if (!is.null(tab[["rt"]]))
-        {
-            if (settings$features$retMin)
-                set(tab, j = "rt", value = tab$rt / 60)
-            set(tab, j = "rt", value = round(tab$rt, 2))
-        }
-        if (!is.null(tab[["formula"]]))
-            set(tab, j = "formula", value = subscriptFormulaHTML(tab$formula))
-        setnames(tab, c("mobility_susp", "CCS_susp"), c("mobility suspect", "CCS suspect"), skip_absent = TRUE)
-        
-        ptab <- makePropTab(tab, NULL, "name")
-        makePropReactable(ptab, id, "name", minPropWidth = 120, minValWidth = 150)
+        return(makeSuspInfoPropTab(tab, id, settings$features$retMin))
     },
     
     genISTDInfoTable = function()
     {
         tab <- data.table::copy(internalStandards(objects$fGroups))
-        tab <- subsetDTColumnsIfPresent(tab, suspMetaDataCols())
+        tab <- subsetDTColumnsIfPresent(tab, getAllSuspCols(suspMetaDataCols(), names(tab),
+                                                            mergedConsensusNames(objects$fGroups)))
         tab <- unique(tab, by = "name")
-        
-        for (col in intersect(c("neutralMass", "mz"), names(tab)))
-            set(tab, j = col, value = round(tab[[col]], 5))
-        if (!is.null(tab[["rt"]]))
-        {
-            if (settings$features$retMin)
-                set(tab, j = "rt", value = tab$rt / 60)
-            set(tab, j = "rt", value = round(tab$rt, 2))
-        }
-        if (!is.null(tab[["formula"]]))
-            set(tab, j = "formula", value = subscriptFormulaHTML(tab$formula))
-        
-        ptab <- makePropTab(tab, NULL, "name")
-        makePropReactable(ptab, "ISTDInfoTab", "name", minPropWidth = 120, minValWidth = 150)
+        return(makeSuspInfoPropTab(tab, "ISTDInfoTab", settings$features$retMin))
     },
     
     genFeaturesTable = function()

@@ -259,7 +259,7 @@ setMethod("estimateIDLevels", "compoundsSet", function(obj, absMzDev = 0.005, MS
     unsetMSPL <- checkAndUnSetOther(sets(obj), MSPeakLists, "MSPeakLists", TRUE)
     unsetFormulas <- checkAndUnSetOther(sets(obj), formulas, "formulas", TRUE)
     
-    logPath <- if (is.null(logPath)) rep(list(NULL), length(sets(fGroups))) else file.path(logPath, sets(fGroups))
+    logPath <- if (is.null(logPath)) rep(list(NULL), length(sets(obj))) else file.path(logPath, sets(obj))
     
     obj@setObjects <- Map(setObjects(obj), MSPeakLists = unsetMSPL, formulas = unsetFormulas, logPath = logPath,
                           f = estimateIDLevels, MoreArgs = list(absMzDev = absMzDev,

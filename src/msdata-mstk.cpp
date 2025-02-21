@@ -93,7 +93,7 @@ void MSReadBackendMSTK::generateSpecMetadata(void)
     const size_t lastScan = MSTKReader.getLastScan();
     const bool haveIMS = firstSpec.hasIonMobilityArray();
     
-    if (firstSpec.getCentroidStatus() != 1)
+    if (!haveIMS && firstSpec.getCentroidStatus() != 1)
         Rcpp::stop("Please make sure that file '%s' is centroided!", getCurrentFile().c_str());
     
     if (getNeedIMS() && !haveIMS)

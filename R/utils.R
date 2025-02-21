@@ -301,7 +301,7 @@ prepareDTForComparison <- function(dt)
 }
 
 removeDTColumnsIfPresent <- function(dt, cols) dt[, setdiff(names(dt), cols), with = FALSE]
-subsetDTColumnsIfPresent <- function(dt, cols) dt[, intersect(names(dt), cols), with = FALSE]
+subsetDTColumnsIfPresent <- function(dt, cols) dt[, intersect(cols, names(dt)), with = FALSE]
 
 readAllFile <- function(f) readChar(f, file.size(f))
 

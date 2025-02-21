@@ -280,7 +280,7 @@ makePropReactable <- function(tab, id, idcol = FALSE, minPropWidth = 150, minVal
 
 getReactColDefDB <- function(tab, tabName)
 {
-    colDefDB <- fread(system.file("report", "main_columns.csv", package = "patRoon"))
+    colDefDB <- fread(system.file("report", "main_columns.csv", package = "patRoon"), encoding = "UTF-8")
     colDefDB[, isRegEx := grepl("^\\^|\\$$", name)]
     colDefDB[isRegEx == TRUE, regex := name]
     

@@ -64,12 +64,21 @@ scoreFeatQuality <- function(quality, values)
 
 hasFGroupScores <- function(fGroups) nrow(groupScores(fGroups)) > 0
 
-getFilteredFGroups <- function(fGroups, retFilter) {
-    if (!is.null(retFilter$subset)){
-        fGroups <- fGroups[retFilter$subset$i, retFilter$subset$j]
+getFilteredFGroups <- function(fGroups, retFilter) 
+{
+    if (!is.null(retFilter$subset))
+    {
+        if (is.null(retFilter$subset$i) & !is.null(retFilter$subset$j))
+            fGroups <- fGroups[, retFilter$subset$j] 
+        if (!is.null(retFilter$subset$i) & is.null(retFilter$subset$j))
+            fGroups <- fGroups[retFilter$subset$i]
+        else   
+            fGroups <- fGroups[retFilter$subset$i, retFilter$subset$j]  
     }
-    if (!is.null(retFilter$delete)){
-        fGroups <- delete(fGroups, i = retFilter$delete$i, j = retFilter$delete$j)
+    if (!is.null(retFilter$delete))
+    {   
+        if(!is.null(retFilter$delete$j))
+            fGroups <- delete(fGroups, i = retFilter$delete$i, j = retFilter$delete$j)
     }
     return(fGroups)
 }

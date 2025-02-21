@@ -52,6 +52,8 @@
         - best would be to do write spectra while reading, so we can do MP
             - or skip MP and do complete batch in C++
         - no support for mzXML
+- add smoothing for XCMS3/enviPick peaks? e.g. with signal::sgolayfilt()
+    - might also be nice for plotting chroms?
             
 
 ## newProject()
@@ -59,7 +61,9 @@
 - update MSPL filters and set maxMZOverPrec (and other new?) by default
 - add estimateIDLevels()
 - remove precursorMzWindow
-- source(...) doesn't return anaInfo but a list, either subset that result or set anaInfo in the R file?
+- anaInfo.R
+    - source(...) doesn't return anaInfo but a list, either subset that result or set anaInfo in the R file?
+    - conc/norm conc are set to "NA_real_"
 - conversion/anaInfo
     - see if getAllMSFilesFromAnaInfo() can be used, otherwise remove it
     - use of getMSFileConversionFormats()
@@ -283,9 +287,12 @@
     - mobWindow and IMSWindow now randomly used
     - IMS arg but affects mobility features
     - withMobility vs withIMS
+- Agilent
+    - Somehow neatly adjust defaults for tolerances etc the larger mobility scale
+        - IMSWindow/mobWindow, IMSMatchParams, EIXParams
+    - See if we can get smaller mzML files?
+    - SC doesn't recognize IM
 - findPeaks()
-    - add smoothing for XCMS3/enviPick? e.g. with signal::sgolayfilt()
-        - might also be nice for plotting chroms?
     - OpenMS
         - add MRMTransitionGroupPicker to patRoonExt
     - Dietrich
@@ -297,10 +304,7 @@
     - better names for ims_parent_ID/ims_parent_group?
     - SC seems to hang?
     - parent-less/orphaned IMS features
-        - test: other post-suspect screening, ...
-        - handle normalization: perform like non-IMS workflow with a warning?
-            - should be done, test updates
-            - doc!
+        - done?
     - switch to PCL w/ CCSbase in patRoonExt
 - Suspect features
     - Remove featureSuspects and replace by findFeaturesBinning?
@@ -316,6 +320,7 @@
         - update use of loadCacheData() (see bin features)
 - getIMSMatchParams()
     - tweak defaults
+    - also distinction for Agilent/Bruker
 - components
     - better name for expandMobilities()?
         - add docs (incl generic)
@@ -369,8 +374,10 @@
             - scenario 1: we know the mobility very well, eg from a database --> use a narrow IMSWindow
             - scenario 2: we only have the mobility from eg a prediction and don't care so much about identification by CCS match --> use wide IMSWindow
         - clearly doc what IMSWindow is used for
-    - ISTDs
-        - doc that mobility features are completely ignored for normalization, and relative intensities/areas are copied from parents
+    - normInts()
+        - istd hits of mobility features are not used (IMS="maybe")
+        - mobility features are ignored (IMS="maybe") for tic
+        - relative intensities/areas are copied from parents
     - plotChroms()/plotMobilograms()
         - annotate has mob option
         - intMax can only work for EICs (mob inten may not be stored)

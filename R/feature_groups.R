@@ -1291,7 +1291,7 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
         updatedFeatures <- lapply(updatedFeatures, function(ft)
         {
             ft <- copy(ft)
-            ft[!is.na(mobility) & !is.na(ims_parent_ID), c("intensity_rel", "area_rel") := {
+            ft[!is.na(mobility) & !is.na(ims_parent_ID) & ims_parent_ID %chin% ID, c("intensity_rel", "area_rel") := {
                 pid <- ims_parent_ID
                 ft[match(pid, ID, nomatch = 0), c("intensity_rel", "area_rel")]
             }]

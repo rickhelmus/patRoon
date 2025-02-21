@@ -518,7 +518,7 @@ reportHTMLUtils$methods(
             )
         }
         chromMobTitle <- if (hasMob && settings$features$chromatograms$large && settings$features$mobilograms$large)
-            "Large chromatograms/mobilograms"
+            "Large chroms/mobs"
         else if (hasMob && settings$features$mobilograms$large)
             "Large mobilograms"
         else if (settings$features$chromatograms$large)

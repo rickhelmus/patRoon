@@ -257,6 +257,7 @@
         - no more precursorMzWindow, and avg params were changed
     - EICParams for getPICSet() and calculatePeakQualities() (needed for m/z IMS expansion)
     - mzExpIMSWindow EIXParam
+    - (subsetDTColumnsIfPresent: use order of requested cols instead of original) --> may change column order in some places
 
 - docs
     - getMSFileFormats()
@@ -333,6 +334,7 @@
 - reporting
     - comps-clust: don't have imgs double in reportPlots
     - handle mobility columns for suspects and compounds
+    - shorten "Large chromatograms/mobilograms" as it breaks toolbar line in eg suspect view
 - skip IMS fGroups annotation with high MS/MS similarity
 - CCS
     - convertMobilityToCCS() / convertCCSToMobility()

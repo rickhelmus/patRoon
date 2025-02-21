@@ -24,7 +24,7 @@ makeAnnKable <- function(tab, mark = NULL, ...)
     if (!is.null(mark))
         kab <- kableExtra::row_spec(kab, mark, italic = TRUE)
     kab <- kableExtra::scroll_box(kab, box_css = "border: 1px solid #ddd;",
-                                  extra_css = "overflow-x: hidden; overflow-y: auto; height: 200px;")
+                                  extra_css = "overflow-x: auto; overflow-y: auto; height: 200px; max-width: 400px;")
     return(htmltools::span(dangerouslySetInnerHTML = list("__html" = kab)))
 }
 
@@ -78,18 +78,18 @@ makeAnnScoreReact <- function(annRow, sets)
     return(makeAnnTitleTab("Scorings", makeAnnKable(ptab)))
 }
 
-makeAnnReactable <- function(tab, id, detailsTabFunc = NULL, annPLTabFunc = NULL, scoreTabFunc = NULL, ...)
+makeAnnReactable <- function(tab, id, detailsFuncs = NULL, ...)
 {
-    details <- if (is.null(detailsTabFunc))
+    details <- if (is.null(detailsFuncs))
         NULL
     else
     {
         function(index)
         {
-            htmltools::div(style = list(margin = "12px 45px", display = "flex", "flex-wrap" = "no-wrap",
-                                        background = "#FCFCFC", border = "dashed 1px",
-                                        "justify-content" = "space-between", "overflow-x" = "auto"),
-                           detailsTabFunc(index), annPLTabFunc(index), scoreTabFunc(index))
+            df <- pruneList(lapply(detailsFuncs, function(f) f(index)))
+            st <- list(margin = "12px 45px", display = "flex", "flex-wrap" = "no-wrap", background = "#FCFCFC",
+                       border = "dashed 1px", "justify-content" = "space-between", "overflow-x" = "auto")
+            do.call(htmltools::div, c(df, list(style = st)))
         }
     }
     
@@ -385,9 +385,7 @@ reportHTMLUtils$methods(
             # don't consider columns that are already in main table
             # HACK: except ID level in sets workflows, as only the non-set specific ID level is in the main table
             ft <- ft[, setdiff(names(ft), setdiff(names(tab), "estIDLevel")), with = FALSE]
-            takeCols <- getMergedConsCols(c("neutral_formula", "ion_formula", "neutralMass", "ion_formula_mz",
-                                            "error", "error_frag_median", "error_frag_median_abs",
-                                            "explainedPeaks", "explainedIntensity", "annSim", "estIDLevel"),
+            takeCols <- getMergedConsCols(c("neutral_formula", "ion_formula", "neutralMass", "ion_formula_mz"),
                                           names(ft), mcn)
             ft <- ft[, takeCols, with = FALSE]
             for (col in getMergedConsCols(c("neutral_formula", "ion_formula"), names(ft), mcn))
@@ -407,10 +405,37 @@ reportHTMLUtils$methods(
             return(makeAnnPLReact(apl))
         }
         
+        getIdentDetails <- function(index)
+        {
+            ct <- data.table::copy(formulas[[tab$group[index]]][tab$candidate[index]])
+            takeCols <- c(
+                "explainedPeaks",
+                "explainedIntensity",
+                "error", "error_frag_median", "error_frag_median_abs",
+                "annSim",
+                "estIDLevel"
+            )
+            ct <- ct[, getMergedConsCols(takeCols, names(ct), mcn), with = FALSE]
+            
+            if (ncol(ct) == 0)
+                return(NULL)
+            
+            roundCols <- function(cols, digits)
+            {
+                for (col in getMergedConsCols(cols, names(ct), mcn))
+                    set(ct, j = col, value = round(ct[[col]], digits))
+            }
+            roundCols(c("annSim", "annSimForm", "annSimBoth", "CCS", "d_CCS"), 2)
+            roundCols(c("mobility", "d_mob", "d_mob_rel", "d_CCS_rel"), 3)
+            
+            return(makeAnnDetailsReact("Identification properties", ct,
+                                       if (isFGSet(objects$fGroups)) sets(objects$fGroups) else NULL))
+        }
+        
         getScoreDetails <- function(index)
         {
             fRow <- formulas[[tab$group[index]]][tab$candidate[index]]
-            cols <- getMergedConsCols(c(annScoreNames(formulas, FALSE), "annSim"), names(fRow), mcn)
+            cols <- getMergedConsCols(annScoreNames(formulas, FALSE), names(fRow), mcn)
             return(makeAnnScoreReact(fRow[, cols, with = FALSE],
                                      if (isFGSet(objects$fGroups)) sets(objects$fGroups) else NULL))
         }
@@ -436,10 +461,11 @@ reportHTMLUtils$methods(
         CSVCols <- setdiff(names(tab), c("spectrum", "scorings"))
         internFilterable <- "group"
         neverFilterable <- c(".details", "candidate", "spectrum", "scorings")
-        ret <- makeAnnReactable(tab, "formulasTab", columns = colDefs, getFormDetails, getAnnPLDetails,
-                                getScoreDetails, meta = list(CSVCols = CSVCols, internFilterable = internFilterable,
-                                                             neverFilterable = neverFilterable),
-                                initView = "all", initTabFunc = "initTabAnn")
+        ret <- makeAnnReactable(tab, "formulasTab", columns = colDefs,
+                                detailsFuncs = list(getFormDetails, getAnnPLDetails, getIdentDetails, getScoreDetails),
+                                meta = list(CSVCols = CSVCols, internFilterable = internFilterable,
+                                            neverFilterable = neverFilterable), initView = "all",
+                                initTabFunc = "initTabAnn")
         saveCacheData("reportHTMLFormulas", ret, hash)
         return(ret)
     },
@@ -529,15 +555,12 @@ reportHTMLUtils$methods(
         {
             ct <- data.table::copy(compounds[[tab$group[index]]][tab$candidate[index]])
             # don't consider columns that are already in main table
-            # HACK: except ID level in sets workflows, as only the non-set specific ID level is in the main table
-            ct <- ct[, setdiff(names(ct), setdiff(names(tab), "estIDLevel")), with = FALSE]
+            ct <- ct[, setdiff(names(ct), names(tab)), with = FALSE]
             takeCols <- c(
                 "compoundName",
                 "identifier",
                 "relatedCIDs",
                 "database",
-                "explainedPeaks",
-                "annSim", "annSimForm", "annSimBoth", "estIDLevel",
                 "neutral_formula",
                 "SMILES",
                 "InChI",
@@ -575,6 +598,35 @@ reportHTMLUtils$methods(
             }
             
             return(makeAnnDetailsReact("Compound properties", ct,
+                                       if (isFGSet(objects$fGroups)) sets(objects$fGroups) else NULL))
+        }
+        
+        getIdentDetails <- function(index)
+        {
+            ct <- data.table::copy(compounds[[tab$group[index]]][tab$candidate[index]])
+            takeCols <- c(
+                "explainedPeaks",
+                "annSim",
+                "annSimForm",
+                "annSimBoth",
+                "estIDLevel",
+                "mobility", "d_mob", "d_mob_rel",
+                "CCS", "d_CCS", "d_CCS_rel"
+            )
+            ct <- ct[, getMergedConsCols(takeCols, names(ct), mcn), with = FALSE]
+            
+            if (ncol(ct) == 0)
+                return(NULL)
+            
+            roundCols <- function(cols, digits)
+            {
+                for (col in getMergedConsCols(cols, names(ct), mcn))
+                    set(ct, j = col, value = round(ct[[col]], digits))
+            }
+            roundCols(c("annSim", "annSimForm", "annSimBoth", "CCS", "d_CCS"), 2)
+            roundCols(c("mobility", "d_mob", "d_mob_rel", "d_CCS_rel"), 3)
+            
+            return(makeAnnDetailsReact("Identification properties", ct,
                                        if (isFGSet(objects$fGroups)) sets(objects$fGroups) else NULL))
         }
         
@@ -632,10 +684,11 @@ reportHTMLUtils$methods(
         CSVCols <- setdiff(names(tab), c("structure", "spectrum", "scorings"))
         internFilterable <- "group"
         neverFilterable <- c(".details", "candidate", "structure", "spectrum", "scorings")
-        ret <- makeAnnReactable(tab, "compoundsTab", columns = colDefs, getCompDetails, getAnnPLDetails,
-                                getScoreDetails, meta = list(mfWebLinks = mfWebLinks, CSVCols = CSVCols,
-                                                             internFilterable = internFilterable,
-                                                             neverFilterable = neverFilterable),
+        ret <- makeAnnReactable(tab, "compoundsTab", columns = colDefs,
+                                detailsFuncs = list(getCompDetails, getAnnPLDetails, getIdentDetails, getScoreDetails),
+                                meta = list(mfWebLinks = mfWebLinks, CSVCols = CSVCols,
+                                            internFilterable = internFilterable,
+                                            neverFilterable = neverFilterable),
                                 initView = "all", initTabFunc = "initTabAnn")
         saveCacheData("reportHTMLCompounds", ret, hash)
         return(ret)

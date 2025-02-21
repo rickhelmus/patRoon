@@ -557,6 +557,8 @@ convertMSFilesAnaInfo <- function(anaInfo, typeFrom = "raw", typeTo = "centroid"
                 stop("Converting IMS data to profile data is not supported.", call. = FALSE)
             if (typeTo == "centroid")
                 IMS <- NA
+            else if (typeTo == "ims")
+                centroid <- FALSE # centroiding is ignored for Bruker data and messes up Agilent data
         }
         
         args <- c(args, list(centroid = centroid, IMS = IMS))

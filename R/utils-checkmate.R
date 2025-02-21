@@ -100,7 +100,7 @@ assertAnalysisInfo <- function(x, fileTypes = NULL, allowedFormats = NULL, null.
     for (col in pathCols)
     {
         if (!is.null(x[[col]]))
-            assertListVal(x, col, checkmate::assertCharacter, any.missing = FALSE, .var.name = .var.name, add = add)
+            assertListVal(x, col, checkmate::assertCharacter, any.missing = TRUE, .var.name = .var.name, add = add)
     }
 
     checkmate::assert(

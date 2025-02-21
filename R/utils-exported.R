@@ -1107,6 +1107,8 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
             if (!is.character(values))
                 return(doIt(values, masses, CCSParams, charges))
             
+            charges <- rep(charges, length.out = length(values))
+            
             # handle semi-colon separated values from suspect lists
             tab <- rbindlist(lapply(seq_along(values), function(i)
             {

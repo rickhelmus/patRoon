@@ -62,6 +62,7 @@
 - update MSPL filters and set maxMZOverPrec (and other new?) by default
 - add estimateIDLevels()
 - remove precursorMzWindow
+- source(...) doesn't return anaInfo but a list, either subset that result or set anaInfo in the R file?
 - conversion/anaInfo
     - see if getAllMSFilesFromAnaInfo() can be used, otherwise remove it
     - use of getMSFileConversionFormats()

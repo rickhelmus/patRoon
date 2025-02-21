@@ -712,7 +712,7 @@ doCreateProject <- function(input, anaInfoTabs)
     prepareAnaInfo <- function(pol)
     {
         aTab <- copy(anaInfoTabs[[pol]])
-        aTab[is.na(group) | !nzchar(group), group := analysis]
+        aTab[is.na(replicate) | !nzchar(replicate), replicate := analysis]
         aTab <- aTab[, -"type"]
         
         fp <- NULL

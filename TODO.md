@@ -331,7 +331,6 @@
         - if not, clearly doc the difference if components are generated after assignMobilities()
 - reporting
     - comps-clust: don't have imgs double in reportPlots
-    - shorten "Large chromatograms/mobilograms" as it breaks toolbar line in eg suspect view
 - skip IMS fGroups annotation with high MS/MS similarity
 - CCS
     - convertMobilityToCCS() / convertCCSToMobility()

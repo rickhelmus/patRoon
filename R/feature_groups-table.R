@@ -29,12 +29,9 @@ doFGAADTGroups <- function(fGroups, intColNames, average, averageBy, areas, addQ
                            regressionBy, averageFunc, normalized, FCParams, concAggrParams, toxAggrParams,
                            normConcToTox, IMS, collapseSuspects, onlyHits)
 {
-    fGroupsOrig <- NULL
+    fGroupsOrig <- fGroups
     if (IMS != "both")
-    {
-        fGroupsOrig <- fGroups
         fGroups <- selectIMSFilter(fGroups, IMS = IMS, verbose = FALSE)
-    }
     
     anaInfo <- analysisInfo(fGroups)
     gNames <- names(fGroups)
@@ -120,19 +117,26 @@ doFGAADTGroups <- function(fGroups, intColNames, average, averageBy, areas, addQ
     ret[, c("group", "ret", "mz") := .(gNames, gInfo$ret, gInfo$mz)]
     if (hasMobilities(fGroups))
     {
-        ret[, c("mobility", "ims_parent_group") := .(gInfo$mobility, gInfo$ims_parent_group)]
-        if (IMS != "both")
+        cols <- intersect(c("mobility", "CCS", "ims_parent_group"), names(gInfo))
+        ret[, (cols) := gInfo[, cols, with = FALSE]]
+        if (!isTRUE(IMS))
         {
             gInfoOrig <- groupInfo(fGroupsOrig)
-            digits <- 3 # UNDONE: is this a good number?
-            ret[!is.na(mobility), mobility_collapsed := as.character(round(mobility, digits))]
-            ret[is.na(mobility), mobility_collapsed := sapply(group, function(g)
+            doCollapse <- function(coln, digits)
             {
-                paste0(round(gInfoOrig[ims_parent_group == g]$mobility, digits), collapse = ",")
-            })]
+                ret[!is.na(get(coln)), (paste0(coln, "_collapsed")) := as.character(round(get(coln), digits))]
+                ret[is.na(get(coln)), (paste0(coln, "_collapsed")) := sapply(group, function(g)
+                {
+                    paste0(round(gInfoOrig[ims_parent_group == g][[coln]], digits), collapse = ",")
+                })]
+            }
+            # UNDONE: is the rounding with a good number?
+            doCollapse("mobility", 3)
+            doCollapse("CCS", 3)
         }
     }
-    setcolorder(ret, intersect(c("group", "ims_parent_group", "ret", "mz", "mobility", "mobility_collapsed"), names(ret)))
+    setcolorder(ret, intersect(c("group", "ims_parent_group", "ret", "mz", "mobility", "mobility_collapsed", "CCS",
+                                 "CCS_collapsed"), names(ret)))
     
     if (addQualities)
         ret <- cbind(ret, groupQualities(fGroups)[match(ret$group, group), -"group"])

@@ -34,9 +34,6 @@
         - improve code distribution over files
         - finish up
             - make title/href configurable?
-    - delta symbol sometimes shown as N ?
-        - put a replacement in CSV and convert that to HTML symbol?
-        - can't reproduce it... maybe not needed?
     - overview tab of all EICs?
         - needs JS to set imgs from plot table and way to attach titles to imgs
 

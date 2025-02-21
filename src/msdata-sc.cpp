@@ -80,12 +80,12 @@ void MSReadBackendSC::generateSpecMetadata(void)
 
     sc::MS_ANALYSIS analysis(getCurrentFile());
     
-    if (analysis.get_spectra_mode({0})[0] != 2)
-        Rcpp::stop("Please make sure that file '%s' is centroided!", getCurrentFile().c_str());
-    
     const auto hd = analysis.get_spectra_headers();
     
     const bool hasMob = analysis.has_ion_mobility();
+
+    if (!hasMob && analysis.get_spectra_mode({0})[0] != 2)
+        Rcpp::stop("Please make sure that file '%s' is centroided!", getCurrentFile().c_str());
     
     if (getNeedIMS() && !hasMob)
         Rcpp::stop("File '%s' does not contain ion mobility data!", getCurrentFile().c_str());

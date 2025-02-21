@@ -222,7 +222,7 @@ setMethod("estimateIDLevels", "formulasSet", function(obj, absMzDev = 0.005, nor
                                                       IDFile = system.file("misc", "IDLevelRules.yml", package = "patRoon"),
                                                       logPath = NULL, parallel = TRUE)
 {
-    logPath <- if (is.null(logPath)) rep(list(NULL), length(sets(fGroups))) else file.path(logPath, sets(fGroups))
+    logPath <- if (is.null(logPath)) rep(list(NULL), length(sets(obj))) else file.path(logPath, sets(obj))
     
     obj@setObjects <- Map(setObjects(obj), logPath = logPath,
                           f = estimateIDLevels, MoreArgs = list(absMzDev = absMzDev, normalizeScores = normalizeScores,

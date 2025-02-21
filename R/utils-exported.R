@@ -1158,7 +1158,7 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
                 obj[, .charge := charges]
                 obj[!hasVal(get(mCol)) & hasVal(get(cCol)), (mCol) := doConvert("CCS", get(cCol), obj$mz, .charge)]
                 obj[hasVal(get(mCol)) & !hasVal(get(cCol)), (cCol) := doConvert("mobility", get(mCol), obj$mz, .charge)]
-                obj[, .charges := NULL]
+                obj[, .charge := NULL]
             }
         }
         printf("Done!\n")

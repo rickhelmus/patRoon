@@ -195,7 +195,7 @@ findFeaturesBinning <- function(analysisInfo, featParams, peakParams, minIntensi
     
     if (featParams$methodMZ == "suspects")
     {
-        featParams$suspects <- prepareSuspectList(featParams$suspects, adduct = adduct,
+        featParams$suspects <- prepareSuspectList(featParams$suspects, adduct = featParams$adduct,
                                                   skipInvalid = featParams$skipInvalid, checkDesc = TRUE,
                                                   prefCalcChemProps = featParams$prefCalcChemProps,
                                                   neutralChemProps = featParams$neutralChemProps)

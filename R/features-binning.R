@@ -227,12 +227,12 @@ findFeaturesBinning <- function(analysisInfo, featParams, peakParams, minIntensi
     {
         ret <- doGetEICsForAna(backend, EICInfo$mzmin, EICInfo$mzmax, EICInfo$retmin, EICInfo$retmax,
                                EICInfo$mobmin, EICInfo$mobmax, mzExpIMSWindow = 0, minIntensityIMS = minIntensityIMS,
-                               compress = FALSE, showProgress = FALSE, withBP = TRUE,
-                               minEICIntensity = featParams$minEICIntensity, minEICAdjTime = featParams$minEICAdjTime,
+                               showProgress = FALSE, withBP = TRUE, minEICIntensity = featParams$minEICIntensity,
+                               minEICAdjTime = featParams$minEICAdjTime,
                                minEICAdjPoints = featParams$minEICAdjPoints,
                                minEICAdjIntensity = featParams$minEICAdjIntensity)
         names(ret) <- EICInfo$EIC_ID
-        ret <- pruneList(ret, checkEmptyElements = TRUE)
+        ret <- pruneList(ret, checkEmptyElements = TRUE, keepAttr = TRUE)
         return(ret)
     }
     

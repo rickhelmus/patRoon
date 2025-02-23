@@ -61,4 +61,22 @@ public:
     ~MSReadBackendUnavailable(void) { }
 };
 
+template <typename T, typename I> std::vector<I> fillEIXIntensities(const std::vector<T> &allXValues,
+                                                                    const std::vector<T> &xvalues,
+                                                                    const std::vector<I> &intensities)
+{
+    std::vector<I> intens(allXValues.size());
+    auto it = xvalues.begin();
+    auto allIt = std::lower_bound(allXValues.begin(), allXValues.end(), *it);
+    while (it != xvalues.end() && allIt != allXValues.end())
+    {
+        const auto ind = std::distance(allXValues.begin(), allIt);
+        intens[ind] = intensities[std::distance(xvalues.begin(), it)];
+        ++it;
+        allIt = std::lower_bound(allIt, allXValues.end(), *it);
+    }
+    
+    return intens;
+}
+
 #endif

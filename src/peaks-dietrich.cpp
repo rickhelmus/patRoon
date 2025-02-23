@@ -1,5 +1,8 @@
 #include <Rcpp.h>
 
+#include "spectrum-raw.h"
+#include "msdata.h"
+
 namespace {
 
 /*Supporting Information*/
@@ -18,6 +21,7 @@ namespace {
  * Converted RT min/max args from scans to times and disable check if its zero
  * Disabled noise removal for reported intensities/areas
  * Converted peakwidth_min and max from ints to doubles
+ * Use SpectrumRawTypes for intensity and time vectors
  * 
  * UNDONE: convert int args to doubles?
  */ 
@@ -33,7 +37,7 @@ struct PeakPickingResults
                                    scansRight(s), noiseScans(s) { }
 };
 
-PeakPickingResults peakPicking_cpp(const std::vector<double> &intensity, const std::vector<double> &scantime,
+PeakPickingResults peakPicking_cpp(const std::vector<SpectrumRawTypes::Intensity> &intensity, const std::vector<SpectrumRawTypes::Time> &scantime,
                                    double min_intensity, int sn, double peakwidth_min, double peakwidth_max, double rt_min,
                                    double rt_max, int maxPeaksPerSignal)
 {
@@ -367,19 +371,22 @@ PeakPickingResults peakPicking_cpp(const std::vector<double> &intensity, const s
 }
 
 // [[Rcpp::export]]
-Rcpp::List doFindPeaksDietrich(Rcpp::List EICs, double minIntensity, int SN, double peakWidthMin, double peakWidthMax,
-                               double RTMin, double RTMax, int maxPeaksPerSignal, bool verbose = true)
+Rcpp::List doFindPeaksDietrich(Rcpp::List EICs, bool fillEICs, double minIntensity, int SN, double peakWidthMin,
+                               double peakWidthMax, double RTMin, double RTMax, int maxPeaksPerSignal,
+                               bool verbose = true)
 {
     // UNDONE: set default args
     
     const size_t entries = EICs.size();
     
-    std::vector<std::vector<double>> allIntensities, allTimes;
+    const std::vector<SpectrumRawTypes::Time> fullEICTimes = (fillEICs) ? EICs.attr("allXValues") : std::vector<SpectrumRawTypes::Time>();
+    std::vector<std::vector<SpectrumRawTypes::Time>> allTimes;
+    std::vector<std::vector<SpectrumRawTypes::Intensity>> allIntensities;
     for (size_t i=0; i<entries; ++i)
     {
         Rcpp::DataFrame df = Rcpp::as<Rcpp::DataFrame>(EICs[i]);
-        allIntensities.emplace_back(Rcpp::as<std::vector<double>>(df["intensity"]));
-        allTimes.emplace_back(Rcpp::as<std::vector<double>>(df["time"]));
+        allTimes.emplace_back(Rcpp::as<std::vector<SpectrumRawTypes::Time>>(df["time"]));
+        allIntensities.emplace_back(Rcpp::as<std::vector<SpectrumRawTypes::Intensity>>(df["intensity"]));
     }
     
     std::vector<PeakPickingResults> ppresults(entries);
@@ -387,11 +394,26 @@ Rcpp::List doFindPeaksDietrich(Rcpp::List EICs, double minIntensity, int SN, dou
     if (verbose) // UNDONE: progress bar?
         Rcpp::Rcout << "Finding peaks for " << entries << " traces...";
     
-    #pragma omp parallel for
-    for (size_t i=0; i<entries; ++i)
+    if (fillEICs)
     {
-        ppresults[i] = peakPicking_cpp(allIntensities[i], allTimes[i], minIntensity, SN, peakWidthMin, peakWidthMax,
-                                       RTMin, RTMax, maxPeaksPerSignal);
+        #pragma omp parallel for
+        for (size_t i=0; i<entries; ++i)
+        {
+            const auto intens = fillEIXIntensities(fullEICTimes, allTimes[i], allIntensities[i]);
+            ppresults[i] = peakPicking_cpp(intens, fullEICTimes, minIntensity, SN, peakWidthMin, peakWidthMax,
+                                           RTMin, RTMax, maxPeaksPerSignal);
+        }
+        
+    }
+    else
+    {
+        #pragma omp parallel for
+        for (size_t i=0; i<entries; ++i)
+        {
+            ppresults[i] = peakPicking_cpp(allIntensities[i], allTimes[i], minIntensity, SN, peakWidthMin, peakWidthMax,
+                                           RTMin, RTMax, maxPeaksPerSignal);
+        }
+        
     }
 
     if (verbose)

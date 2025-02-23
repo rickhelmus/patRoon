@@ -262,12 +262,12 @@ setMethod("getPICSet", "features", function(obj, loadRawData = TRUE, IMS = FALSE
             ret$path = attr(MSMeta[[ana]], "path")
             ret$scantime <- MSMeta[[ana]]$time
             
-            if (!is.null(EICs[[ana]]))
+            if (!is.null(EICs[[ana]]) && !is.null(attr(EICs[[ana]], "allXValues")))
             {
+                at <- attr(EICs[[ana]], "allXValues")
                 ret$pics <- Map(EICs[[ana]], fTable[[ana]]$mz, f = function(eic, mz)
                 {
-                    setDT(eic)
-                    setnames(eic, "intensity", "int")
+                    eic <- data.table(time = at, int = doFillEIXIntensities(at, eic$time, eic$intensity))
                     eic[, mz := mz] # UNDONE? Could add actual m/z for each scan...
                     eic[, scan := sapply(time, function(t) MSMeta[[ana]][which.min(abs(t - MSMeta[[ana]]$time)), "scan"])]
                     return(as.matrix(eic[, c("scan", "int", "mz"), with = FALSE]))

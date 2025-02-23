@@ -261,13 +261,13 @@ makeEIXPlot <- function(featPlotTab, anaInfo, gInfo, showPeakArea, showFGroupRec
     for (grp in gNames)
     {
         featTabGrp <- featPlotTab[group == grp]
-        
         for (ana in names(EIXs))
         {
-            EIX <- EIXs[[ana]][[grp]]
-            if (is.null(EIX))
+            if (is.null(EIXs[[ana]]) || is.null(EIXs[[ana]][[grp]]) || is.null(attr(EIXs[[ana]], "allXValues")))
                 next
-            
+            EIX <- EIXs[[ana]][[grp]]
+            allx <- attr(EIXs[[ana]], "allXValues")
+            EIX <- padEIX(allx, EIX[[1]], EIX$intensity)
             featRow <- featTabGrp[analysis == ana]
             if (onlyPresent && nrow(featRow) == 0)
                 next

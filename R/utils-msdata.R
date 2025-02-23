@@ -192,19 +192,15 @@ doGetEICsForAna <- function(...)
     return(EICs)
 }
 
-doGetEICs <- function(anaInfo, EICInfoList, mzExpIMSWindow = 0, minIntensityIMS = 0, compress = TRUE,
-                      showProgress = "batch", withBP = FALSE, minEICIntensity = 0, minEICAdjTime = 0,
-                      minEICAdjPoints = 0, minEICAdjIntensity = 0, cacheDB = NULL)
+doGetEICs <- function(anaInfo, EICInfoList, mzExpIMSWindow = 0, minIntensityIMS = 0, showProgress = "batch",
+                      withBP = FALSE, minEICIntensity = 0, minEICAdjTime = 0, minEICAdjPoints = 0,
+                      minEICAdjIntensity = 0, doCache = TRUE, cacheDB = NULL)
 {
     if (length(EICInfoList) == 0)
         return(list())
     
     anaInfo <- anaInfo[analysis %in% names(EICInfoList)]
     
-    # HACK: for now we _don't_ cache EICs if compress==FALSE: the resulting data is very large and takes a long time to
-    # be stored. Hence, the caller should cache the final results.
-    doCache <- compress
-
     needIMS <- !is.null(EICInfoList[[1]][["mobmin"]])
     
     anaHashes <- baseHash <- NULL
@@ -213,8 +209,8 @@ doGetEICs <- function(anaInfo, EICInfoList, mzExpIMSWindow = 0, minIntensityIMS 
         if (is.null(cacheDB))
             cacheDB <- openCacheDBScope()
         anaHashes <- getMSFileHashesFromAvailBackend(anaInfo, needIMS = needIMS)
-        baseHash <- makeHash(mzExpIMSWindow, minIntensityIMS, compress, withBP = FALSE, minEICIntensity,
-                             minEICAdjTime, minEICAdjPoints, minEICAdjIntensity)
+        baseHash <- makeHash(mzExpIMSWindow, minIntensityIMS, withBP = FALSE, minEICIntensity, minEICAdjTime,
+                             minEICAdjPoints, minEICAdjIntensity)
     }
     
     allEICs <- applyMSData(anaInfo, EICInfoList, showProgress = showProgress == "batch", needIMS = needIMS,
@@ -229,15 +225,19 @@ doGetEICs <- function(anaInfo, EICInfoList, mzExpIMSWindow = 0, minIntensityIMS 
                 setnafill(EICInfo, fill = 0, cols = col)
         }
         
-        EICs <- isCached <- hashes <- NULL
+        EICs <- isCached <- anaHash <- anaEICHash <- NULL
         if (doCache)
         {
+            anaEICHash <- makeHash(anaHashes[[ana]], baseHash)
             # NOTE: subset columns here, so any additional columns from e.g. feature tables are not considered
-            hashes <- EICInfo[, makeHash(anaHashes[[ana]], baseHash, .SD), by = seq_len(nrow(EICInfo)),
+            hashes <- EICInfo[, makeHash(anaEICHash, .SD), by = seq_len(nrow(EICInfo)),
                               .SDcols = c("retmin", "retmax", "mzmin", "mzmax", "mobmin", "mobmax")][[2]]
             
-            isCached <- !sapply(EICs, is.null)
             EICs <- unname(loadCacheData(category = "EICs", hashes, dbArg = cacheDB, simplify = FALSE, fixDTs = FALSE))
+            ax <- loadCacheData(category = "EICAllTimes", anaEICHash, dbArg = cacheDB)
+            isCached <- !is.null(ax) & !sapply(EICs, is.null)
+            if (!is.null(ax))
+                attr(EICs, "allXValues") <- ax
             if (all(isCached))
             {
                 doProgress()
@@ -254,12 +254,16 @@ doGetEICs <- function(anaInfo, EICInfoList, mzExpIMSWindow = 0, minIntensityIMS 
         openMSReadBackend(backend, path)
         
         newEICs <- doGetEICsForAna(backend, ToDo$mzmin, ToDo$mzmax, ToDo$retmin, ToDo$retmax, ToDo$mobmin, ToDo$mobmax,
-                                   mzExpIMSWindow, minIntensityIMS, compress, showProgress = showProgress == "ana", withBP,
+                                   mzExpIMSWindow, minIntensityIMS, showProgress = showProgress == "ana", withBP,
                                    minEICIntensity, minEICAdjTime, minEICAdjPoints, minEICAdjIntensity)
         EICs[!isCached] <- newEICs
+        attr(EICs, "allXValues") <- attr(newEICs, "allXValues")
         
         if (doCache)
+        {
             saveCacheDataList("EICs", EICs[!isCached], hashes[!isCached], cacheDB)
+            saveCacheData("EICAllTimes", attr(EICs, "allXValues"), anaEICHash, cacheDB)
+        }
         
         doProgress()
         return(EICs)

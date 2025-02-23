@@ -4,6 +4,8 @@
 
 #include <Rcpp.h>
 
+#include "msdata.h"
+
 #include "cpp-base64/base64.cpp"
 
 namespace {
@@ -52,7 +54,7 @@ void writeTraML(const std::vector<std::string> &IDs, const std::string &out)
 }
 
 // [[Rcpp::export]]
-void writeChromsToMzML(Rcpp::List EICs, const std::vector<std::string> &IDs, const std::string &out)
+void writeChromsToMzML(Rcpp::List EICs, bool fillEICs, const std::vector<std::string> &IDs, const std::string &out)
 {
     // generate a minimal acceptable mzML file for MRMTransitionGroupPicker
     
@@ -64,17 +66,33 @@ void writeChromsToMzML(Rcpp::List EICs, const std::vector<std::string> &IDs, con
           << indentStr(1) << "<run id=\"runID\" defaultInstrumentConfigurationRef=\"IC1\">\n"
           << indentStr(2) << "<chromatogramList count = \"" << EICs.size() << "\" defaultDataProcessingRef=\"patRoon\">\n";
 
+    // BUG: seems files with only double arrays are supported by OpenMS...
+    
+    const auto dataSizeTime = sizeof(double) * 8;
+    const auto dataSizeIntens = sizeof(double) * 8;
+    const auto allTimes = (fillEICs) ? Rcpp::as<std::vector<double>>(EICs.attr("allXValues")) : std::vector<double>();
+    
     for (int i = 0; i < EICs.size(); ++i)
     {
         const Rcpp::List item = EICs[i];
         const auto times = Rcpp::as<std::vector<double>>(item["time"]);
         const auto ints = Rcpp::as<std::vector<double>>(item["intensity"]);
-        const auto timesEnc = base64_encode(reinterpret_cast<unsigned const char*>(times.data()), times.size() * sizeof(double));
-        const auto intsEnc = base64_encode(reinterpret_cast<unsigned const char*>(ints.data()), ints.size() * sizeof(double));
-        const auto dataSize = sizeof(double) * 8;
+        std::string timesEnc, intsEnc;
+        if (fillEICs)
+        {
+            const auto allInts = fillEIXIntensities(allTimes, times, ints);
+            timesEnc = base64_encode(reinterpret_cast<unsigned const char*>(allTimes.data()), allTimes.size() * sizeof(double));
+            intsEnc = base64_encode(reinterpret_cast<unsigned const char*>(allInts.data()), allInts.size() * sizeof(double));
+        }
+        else
+        {
+            timesEnc = base64_encode(reinterpret_cast<unsigned const char*>(times.data()), times.size() * sizeof(double));
+            intsEnc = base64_encode(reinterpret_cast<unsigned const char*>(ints.data()), ints.size() * sizeof(double));
+        }
+        const auto arrayLen = (fillEICs) ? allTimes.size() : times.size();
 
         ofile << indentStr(3) << "<chromatogram index=\"" << i << "\" id=\"" << IDs[i] << "\" defaultArrayLength=\""
-              << times.size() << "\">\n";
+              << arrayLen << "\">\n";
 
         ofile << indentStr(4) << R"(<cvParam cvRef="MS" accession="MS:1001473" name="selected reaction monitoring chromatogram" value=""/>)" << "\n";
         ofile << indentStr(4) << R"(<cvParam cvRef="MS" accession="MS:1000130" name="positive scan" value=""/>)" << "\n";
@@ -87,13 +105,13 @@ void writeChromsToMzML(Rcpp::List EICs, const std::vector<std::string> &IDs, con
 
         ofile << indentStr(4) << R"(<binaryDataArrayList count="2">)" << "\n"
               << indentStr(5) << R"(<binaryDataArray encodedLength="1400">)" << "\n"
-              << indentStr(6) << R"(<cvParam cvRef="MS" accession="MS:1000523" name=")" << dataSize << R"(-bit float" value=""/>)" << "\n"
+              << indentStr(6) << R"(<cvParam cvRef="MS" accession="MS:1000523" name=")" << dataSizeTime << R"(-bit float" value=""/>)" << "\n"
               << indentStr(6) << R"(<cvParam cvRef="MS" accession="MS:1000576" name="no compression" value=""/>)" << "\n"
               << indentStr(6) << R"(<cvParam cvRef="MS" accession="MS:1000595" name="time array" value="" unitCvRef="UO" unitAccession="UO:0000010" unitName="seconds"/>)" << "\n"
               << indentStr(6) << "<binary>" << timesEnc << "</binary>\n"
               << indentStr(5) << "</binaryDataArray>\n"
               << indentStr(5) << R"(<binaryDataArray encodedLength="1400">)" << "\n"
-              << indentStr(6) << R"(<cvParam cvRef="MS" accession="MS:1000523" name=")" << dataSize << R"(-bit float" value=""/>)" << "\n"
+              << indentStr(6) << R"(<cvParam cvRef="MS" accession="MS:1000523" name=")" << dataSizeIntens << R"(-bit float" value=""/>)" << "\n"
               << indentStr(6) << R"(<cvParam cvRef="MS" accession="MS:1000576" name="no compression" value=""/>)" << "\n"
               << indentStr(6) << R"(<cvParam cvRef="MS" accession="MS:1000515" name="intensity array" value="" unitCvRef="MS" unitAccession="MS:1000131" unitName="number of detector counts"/>)" << "\n"
               << indentStr(6) << "<binary>" << intsEnc << "</binary>\n"

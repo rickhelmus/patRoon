@@ -873,8 +873,13 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flat
         
         pdata <- lapply(seq_len(nrow(fList)), function(fti) list(rtmin = fList$retmin[fti],
                                                                  rtmax = fList$retmax[fti]))
-        # NOTE: MetaClean expects EIC matrices
-        eic <- lapply(doAna, function(a) as.matrix(EICs[[a]][[grp]]))
+        eic <- lapply(doAna, function(a)
+        {
+            at <- attr(EICs[[a]], "allXValues")
+            ints <- doFillEIXIntensities(at, EICs[[a]][[grp]]$time, EICs[[a]][[grp]]$intensity)
+            # NOTE: MetaClean expects EIC matrices
+            as.matrix(data.frame(time = at, intensity = ints))
+        })
         gq <- sapply(lapply(fgQualities, "[[", "func"), do.call, list(pdata, eic), simplify = FALSE)
         
         setTxtProgressBar(prog, match(grp, gNames))

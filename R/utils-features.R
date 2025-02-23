@@ -836,10 +836,7 @@ findPeaksInEICs <- function(EICs, peakParams, withBP, withMobility, logPath, cac
     if (!is.null(cd))
         return(cd)
     
-    # convert EICs to data.tables: this is necessary for findPeaks()
-    # NOTE: we don't store (or hash) the EICs as DTs, as this makes things slower
-    
-    peaks <- findPeaks(EICs, peakParams, logPath)
+    peaks <- findPeaks(EICs, TRUE, peakParams, logPath)
     peaks <- rbindlist(peaks, idcol = "EIC_ID")
     
     if (nrow(peaks) == 0)
@@ -850,7 +847,7 @@ findPeaksInEICs <- function(EICs, peakParams, withBP, withMobility, logPath, cac
     else
     {
         peaks[, c("mzmin", "mzmax", "mz", "mobmin", "mobmax", "mobility") := {
-            eic <- EICs[[EIC_ID]][EICs[[EIC_ID]]$intensity != 0 & EICs[[EIC_ID]]$time %between% c(retmin, retmax), ]
+            eic <- EICs[[EIC_ID]][EICs[[EIC_ID]]$time %between% c(retmin, retmax), ]
             if (nrow(eic) == 0)
                 numeric(1)
             else
@@ -955,7 +952,7 @@ assignFeatureMobilitiesPeaks <- function(features, peakParams, IMSWindow, cluste
         {
             # pretend we have EICs so we can find peaks
             EIMs <- lapply(EIMs, setnames, old = "mobility", new = "time")
-            peaksList <- findPeaks(EIMs, peakParams, file.path("log", "assignMobilities", paste0("mobilogram_peaks-", ana, ".txt")))
+            peaksList <- findPeaks(EIMs, FALSE, peakParams, file.path("log", "assignMobilities", paste0("mobilogram_peaks-", ana, ".txt")))
             peaksTable <- rbindlist(peaksList, idcol = "ims_parent_ID")                
             setnames(peaksTable, c("ret", "retmin", "retmax", "area", "intensity"), mobNumCols, skip_absent = TRUE)
             # NOTE: we subset columns here to remove any algo specific columns that may also be present in the feature
@@ -994,7 +991,7 @@ reintegrateMobilityFeatures <- function(features, EICRTWindow, peakRTWindow, cal
     EICSelFunc <- \(tab) tab[!is.null(tab[["mobility"]]) & !is.na(mobility)]
     allEICs <- getFeatureEIXs(features, type = "EIC", EIXParams = getDefEICParams(window = EICRTWindow,
                                                                                   minIntensityIMS = minIntensityIMS),
-                              selectFunc = EICSelFunc, compress = FALSE, cacheDB = cacheDB)
+                              selectFunc = EICSelFunc, cacheDB = cacheDB)
     
     if (!is.null(peakParams))
     {

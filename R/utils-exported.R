@@ -386,7 +386,7 @@ availableBackends <- function(anaInfo = NULL, verbose = TRUE)
 #' @return A \code{list} with for each analysis a \code{list} with EIC data for each of the rows in \code{ranges}.
 #'
 #' @export
-getEICs <- function(analysisInfo, ranges, compress = FALSE, minIntensityIMS = 25)
+getEICs <- function(analysisInfo, ranges, output = "fill", minIntensityIMS = 25)
 {
     ac <- checkmate::makeAssertCollection()
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, add = ac)
@@ -395,7 +395,7 @@ getEICs <- function(analysisInfo, ranges, compress = FALSE, minIntensityIMS = 25
         checkmate::checkDataFrame(ranges, types = "numeric", any.missing = FALSE),
         .var.name = "ranges", add = ac
     )
-    checkmate::assertFlag(compress, add = ac)
+    checkmate::assertChoice(output, c("fill", "pad", "raw"), add = ac)
     checkmate::assertNumber(minIntensityIMS, lower = 0, finite = TRUE, na.ok = FALSE, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -412,7 +412,28 @@ getEICs <- function(analysisInfo, ranges, compress = FALSE, minIntensityIMS = 25
         checkmate::assertDataFrame(r, types = "numeric", any.missing = FALSE)
         assertHasNames(r, c("mzmin", "mzmax", "retmin", "retmax"))
     }
-    return(doGetEICs(analysisInfo, ranges, compress = compress, withBP = TRUE, minIntensityIMS = minIntensityIMS))
+    ret <- doGetEICs(analysisInfo, ranges, withBP = TRUE, minIntensityIMS = minIntensityIMS)
+    if (output != "raw")
+    {
+        ret <- lapply(ret, function(anaEICs)
+        {
+            at <- attr(anaEICs, "allXValues")
+            if (is.null(at))
+                return(anaEICs) # no EICs
+        
+            if (output == "fill")
+                return(lapply(anaEICs, function(eic) data.frame(time = at,
+                                                                intensity = doFillEIXIntensities(at, eic$time, eic$intensity))))
+            
+            # output == "pad"
+            return(lapply(anaEICs, function(eic)
+            {
+                eic <- setDF(padEIX(at, eic$time, eic$intensity))
+                setnames(eic, "xvalue", "time")
+            }))
+        })
+    }
+    return(ret)
 }
 
 #' @export

@@ -1,10 +1,10 @@
 #' @include main.R
 NULL
 
-findPeaks <- function(EICs, params, logPath)
+findPeaks <- function(EICs, fillEICs, params, logPath)
 {
     # UNDONE: export? If yes, add checkmate's
-    
+ 
     f <- switch(params$algorithm,
                 openms = findPeaksOpenMS,
                 xcms3 = findPeaksXCMS3,
@@ -14,7 +14,8 @@ findPeaks <- function(EICs, params, logPath)
     if (params$algorithm == "openms") # UNDONE: change in case we get additional algos with logging
         mkdirp(dirname(logPath))
     
-    ret <- f(EICs, params[setdiff(names(params), c("algorithm", "forcePeakRange", "relMinIntensity"))], logPath = logPath)
+    ret <- f(EICs, fillEICs, params[setdiff(names(params), c("algorithm", "forcePeakRange", "relMinIntensity"))],
+             logPath = logPath)
     
     if (any(params$forcePeakRange != 0) || params$relMinIntensity > 0)
     {
@@ -43,7 +44,7 @@ findPeaks <- function(EICs, params, logPath)
     return(ret)
 }
 
-findPeaksOpenMS <- function(EICs, params, logPath)
+findPeaksOpenMS <- function(EICs, fillEICs, params, logPath)
 {
     # EICs should be a named list
     
@@ -58,7 +59,7 @@ findPeaksOpenMS <- function(EICs, params, logPath)
     
     logPrintf("Exporting EICs... ")
     writeTraML(names(EICs), TraMLFile)
-    writeChromsToMzML(EICs, names(EICs), chromFile)
+    writeChromsToMzML(EICs, fillEICs, names(EICs), chromFile)
     logPrintf("Done!\n")
     
     logPrintf("Finding peaks with OpenMS...\n-----------\n")
@@ -102,11 +103,13 @@ findPeaksOpenMS <- function(EICs, params, logPath)
     return(peaksList)
 }
 
-findPeaksXCMS3 <- function(EICs, params, logPath)
+findPeaksXCMS3 <- function(EICs, fillEICs, params, logPath)
 {
+    allTime <- attr(EICs, "allXValues")
     ret <- sapply(EICs, function(eic)
     {
-        p <- as.data.table(suppressWarnings(do.call(xcms::peaksWithCentWave, c(list(eic$intensity, eic$time), params))))
+        inten <- if (fillEICs) doFillEIXIntensities(allTime, eic$time, eic$intensity) else eic$intensity
+        p <- as.data.table(suppressWarnings(do.call(xcms::peaksWithCentWave, c(list(inten, allTime), params))))
         cols <- c("ret", "retmin", "retmax", "area", "intensity")
         setnames(p, c("rt", "rtmin", "rtmax", "into", "maxo"), cols)
         setcolorder(p, cols)
@@ -115,7 +118,7 @@ findPeaksXCMS3 <- function(EICs, params, logPath)
     ret <- pruneList(ret, checkZeroRows = TRUE)
 }
 
-findPeaksEnviPick <- function(EICs, params, logPath)
+findPeaksEnviPick <- function(EICs, fillEICs, params, logPath)
 {
     checkPackage("enviPick", "blosloos/enviPick")
     
@@ -130,12 +133,21 @@ findPeaksEnviPick <- function(EICs, params, logPath)
                     Peak_index = 0,
                     Peaklist = 0)
     
+    allTime <- if (fillEICs) attr(EICs, "allXValues")
+    
     # UNDONE: this could probably be faster if called with all EICs at once?
     ret <- sapply(EICs, function(eic)
     {
-        dummyPL$Scans[[1]] <- eic$time
-        sc <- as.data.table(eic)
-        setnames(sc, "time", "RT")
+        if (fillEICs)
+        {
+            dummyPL$Scans[[1]] <- allTime
+            sc <- data.table(RT = allTime, intensity = doFillEIXIntensities(allTime, eic$time, eic$intensity))
+        }
+        else
+        {
+            dummyPL$Scans[[1]] <- eic$time
+            sc <- data.table(RT = eic$time, intensity = eic$intensity)
+        }
         sc[, "m/z" := 100] # dummy, no need for this
         sc[, measureID := seq_len(.N)]
         sc[, c("partID", "clustID") := 1] # fake that this trace was partitioned & clustered
@@ -143,7 +155,8 @@ findPeaksEnviPick <- function(EICs, params, logPath)
         setcolorder(sc, c("m/z", "intensity", "RT"))
         # setorderv(sc, "m/z") # needs to be ordered by mz (but we are using a single dummy value, so no need)
         dummyPL$Scans[[2]] <- as.matrix(sc)
-        dummyPL$EIC_index <- as.matrix(data.table(start_ID = 1, end_ID = nrow(eic), number_peaks = nrow(eic)))
+        dummyPL$EIC_index <- as.matrix(data.table(start_ID = 1, end_ID = length(allTime),
+                                                  number_peaks = length(allTime)))
         
         p <- do.call(enviPick::mzpick, c(list(dummyPL), params))$Peaklist
         if (isTRUE(all.equal(p, 0))) # no results
@@ -158,11 +171,11 @@ findPeaksEnviPick <- function(EICs, params, logPath)
     return(ret)
 }
 
-findPeaksDietrich <- function(EICs, params, logPath)
+findPeaksDietrich <- function(EICs, fillEICs, params, logPath)
 {
     setOMPThreads()
     # UNDONE: log output?
-    peaks <- doFindPeaksDietrich(EICs, minIntensity = params$minIntensity, SN = params$SN,
+    peaks <- doFindPeaksDietrich(EICs, fillEICs = fillEICs, minIntensity = params$minIntensity, SN = params$SN,
                                  peakWidthMin = params$peakWidth[1], peakWidthMax = params$peakWidth[2],
                                  RTMin = params$RTRange[1],
                                  RTMax = if (!is.finite(params$RTRange[2])) 0 else params$RTRange[2],

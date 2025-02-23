@@ -5,8 +5,8 @@ writeTraML <- function(IDs, out) {
     invisible(.Call(`_patRoon_writeTraML`, IDs, out))
 }
 
-writeChromsToMzML <- function(EICs, IDs, out) {
-    invisible(.Call(`_patRoon_writeChromsToMzML`, EICs, IDs, out))
+writeChromsToMzML <- function(EICs, fillEICs, IDs, out) {
+    invisible(.Call(`_patRoon_writeChromsToMzML`, EICs, fillEICs, IDs, out))
 }
 
 initBrukerLibrary <- function(path, force = FALSE) {
@@ -45,8 +45,16 @@ getScans <- function(backend, timeStart, timeEnd, MSLevel, prec) {
     .Call(`_patRoon_getScans`, backend, timeStart, timeEnd, MSLevel, prec)
 }
 
-getEICList <- function(backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, mzExpIMSWindow, minIntensityIMS, compress, showProgress = FALSE, withBP = FALSE, minEICIntensity = 0L, minEICAdjTime = 0L, minEICAdjPoints = 0L, minEICAdjIntensity = 0L) {
-    .Call(`_patRoon_getEICList`, backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, mzExpIMSWindow, minIntensityIMS, compress, showProgress, withBP, minEICIntensity, minEICAdjTime, minEICAdjPoints, minEICAdjIntensity)
+getEICList <- function(backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, mzExpIMSWindow, minIntensityIMS, showProgress = FALSE, withBP = FALSE, minEICIntensity = 0L, minEICAdjTime = 0L, minEICAdjPoints = 0L, minEICAdjIntensity = 0L) {
+    .Call(`_patRoon_getEICList`, backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, mzExpIMSWindow, minIntensityIMS, showProgress, withBP, minEICIntensity, minEICAdjTime, minEICAdjPoints, minEICAdjIntensity)
+}
+
+doFillEIXIntensities <- function(allXValues, xvalues, intensities) {
+    .Call(`_patRoon_doFillEIXIntensities`, allXValues, xvalues, intensities)
+}
+
+padEIX <- function(allXValues, xvalues, intensities) {
+    .Call(`_patRoon_padEIX`, allXValues, xvalues, intensities)
 }
 
 getMSMetadata <- function(backend, msLevel) {
@@ -117,8 +125,8 @@ writeFeatureXML <- function(featList, fPath, out, hulls) {
     invisible(.Call(`_patRoon_writeFeatureXML`, featList, fPath, out, hulls))
 }
 
-doFindPeaksDietrich <- function(EICs, minIntensity, SN, peakWidthMin, peakWidthMax, RTMin, RTMax, maxPeaksPerSignal, verbose = TRUE) {
-    .Call(`_patRoon_doFindPeaksDietrich`, EICs, minIntensity, SN, peakWidthMin, peakWidthMax, RTMin, RTMax, maxPeaksPerSignal, verbose)
+doFindPeaksDietrich <- function(EICs, fillEICs, minIntensity, SN, peakWidthMin, peakWidthMax, RTMin, RTMax, maxPeaksPerSignal, verbose = TRUE) {
+    .Call(`_patRoon_doFindPeaksDietrich`, EICs, fillEICs, minIntensity, SN, peakWidthMin, peakWidthMax, RTMin, RTMax, maxPeaksPerSignal, verbose)
 }
 
 specDistMatrix <- function(specList, method, shift, precMZs, mzWeight, intWeight, mzWindow) {

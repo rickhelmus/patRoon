@@ -192,8 +192,8 @@ doGetEICsForAna <- function(...)
     return(EICs)
 }
 
-doGetEICs <- function(anaInfo, EICInfoList, mzExpIMSWindow = 0, minIntensityIMS = 0, showProgress = "batch",
-                      withBP = FALSE, minEICIntensity = 0, minEICAdjTime = 0, minEICAdjPoints = 0,
+doGetEICs <- function(anaInfo, EICInfoList, mzExpIMSWindow = 0, minIntensityIMS = 0, mode = "simple",
+                      showProgress = "batch", minEICIntensity = 0, minEICAdjTime = 0, minEICAdjPoints = 0,
                       minEICAdjIntensity = 0, doCache = TRUE, cacheDB = NULL)
 {
     if (length(EICInfoList) == 0)
@@ -209,8 +209,8 @@ doGetEICs <- function(anaInfo, EICInfoList, mzExpIMSWindow = 0, minIntensityIMS 
         if (is.null(cacheDB))
             cacheDB <- openCacheDBScope()
         anaHashes <- getMSFileHashesFromAvailBackend(anaInfo, needIMS = needIMS)
-        baseHash <- makeHash(mzExpIMSWindow, minIntensityIMS, withBP = FALSE, minEICIntensity, minEICAdjTime,
-                             minEICAdjPoints, minEICAdjIntensity)
+        baseHash <- makeHash(mzExpIMSWindow, minIntensityIMS, mode, minEICIntensity, minEICAdjTime, minEICAdjPoints,
+                             minEICAdjIntensity)
     }
     
     allEICs <- applyMSData(anaInfo, EICInfoList, showProgress = showProgress == "batch", needIMS = needIMS,
@@ -254,7 +254,7 @@ doGetEICs <- function(anaInfo, EICInfoList, mzExpIMSWindow = 0, minIntensityIMS 
         openMSReadBackend(backend, path)
         
         newEICs <- doGetEICsForAna(backend, ToDo$mzmin, ToDo$mzmax, ToDo$retmin, ToDo$retmax, ToDo$mobmin, ToDo$mobmax,
-                                   mzExpIMSWindow, minIntensityIMS, showProgress = showProgress == "ana", withBP,
+                                   mzExpIMSWindow, minIntensityIMS, mode = mode, showProgress = showProgress == "ana",
                                    minEICIntensity, minEICAdjTime, minEICAdjPoints, minEICAdjIntensity)
         EICs[!isCached] <- newEICs
         attr(EICs, "allXValues") <- attr(newEICs, "allXValues")

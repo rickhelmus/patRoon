@@ -412,7 +412,7 @@ getEICs <- function(analysisInfo, ranges, output = "fill", minIntensityIMS = 25)
         checkmate::assertDataFrame(r, types = "numeric", any.missing = FALSE)
         assertHasNames(r, c("mzmin", "mzmax", "retmin", "retmax"))
     }
-    ret <- doGetEICs(analysisInfo, ranges, withBP = TRUE, minIntensityIMS = minIntensityIMS)
+    ret <- doGetEICs(analysisInfo, ranges, mode = "full", minIntensityIMS = minIntensityIMS)
     if (output != "raw")
     {
         ret <- lapply(ret, function(anaEICs)

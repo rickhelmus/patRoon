@@ -408,14 +408,25 @@ numLTE <- function(x, y, tol = sqrt(.Machine$double.eps)) numEQ(x, y, tol) | x <
 
 wrapStr <- function(s, width, sep = "\n") paste0(strwrap(s, width), collapse = sep)
 
-pruneList <- function(l, checkEmptyElements = FALSE, checkZeroRows = FALSE)
+pruneList <- function(l, checkEmptyElements = FALSE, checkZeroRows = FALSE, keepAttr = FALSE)
 {
-    ret <- l[!sapply(l, is.null)]
+    a <- NULL
+    if (keepAttr)
+    {
+        a <- attributes(l)
+        a <- a[!names(a) %in% c("dim", "names", "dimnames")] # other attributes are dropped according to ?`[`
+    }
+    
+    l <- l[!sapply(l, is.null)]
     if (checkEmptyElements)
-        ret <- ret[lengths(ret) > 0]
+        l <- l[lengths(l) > 0]
     if (checkZeroRows)
-        ret <- ret[sapply(ret, nrow) > 0]
-    return(ret)
+        l <- l[sapply(l, nrow) > 0]
+    
+    if (keepAttr)
+        attributes(l)[names(a)] <- a
+    
+    return(l)
 }
 
 makeEmptyListNamed <- function(li)

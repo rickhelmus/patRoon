@@ -1226,7 +1226,7 @@ Rcpp::List getEIMList(const MSReadBackend &backend, const std::vector<SpectrumRa
         // average data
         for (size_t j=0; j<EIMSize; ++j)
         {
-            avgEIM.mobilities[j] /= static_cast<double>(clSizes[j]); // mean of all values
+            avgEIM.mobilities[j] /= static_cast<SpectrumRawTypes::Mobility>(clSizes[j]); // mean of all values
             avgEIM.intensities[j] /= allEIMs[i].size(); // mean of values (including frames without this cluster)
         }
         

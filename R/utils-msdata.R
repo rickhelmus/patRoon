@@ -236,12 +236,12 @@ doGetEICs <- function(anaInfo, EICInfoList, mzExpIMSWindow = 0, minIntensityIMS 
             hashes <- EICInfo[, makeHash(anaHashes[[ana]], baseHash, .SD), by = seq_len(nrow(EICInfo)),
                               .SDcols = c("retmin", "retmax", "mzmin", "mzmax", "mobmin", "mobmax")][[2]]
             
-            EICs <- loadCacheData(category = "EICs", hashes, dbArg = cacheDB, simplify = FALSE)
             isCached <- !sapply(EICs, is.null)
+            EICs <- unname(loadCacheData(category = "EICs", hashes, dbArg = cacheDB, simplify = FALSE, fixDTs = FALSE))
             if (all(isCached))
             {
                 doProgress()
-                return(unname(EICs)) # everything is in the cache
+                return(EICs) # everything is in the cache
             }
         }
         else

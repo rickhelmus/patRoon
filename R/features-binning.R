@@ -223,16 +223,18 @@ findFeaturesBinning <- function(analysisInfo, featParams, peakParams, minIntensi
     else
         anaInfoTBD <- analysisInfo
     
-    getEICsAna <- function(backend, EICInfo)
+    getEICsAna <- function(backend, EICInfo, test)
     {
-        ret <- doGetEICsForAna(backend, EICInfo$mzmin, EICInfo$mzmax, EICInfo$retmin, EICInfo$retmax,
-                               EICInfo$mobmin, EICInfo$mobmax, mzExpIMSWindow = 0, minIntensityIMS = minIntensityIMS,
-                               showProgress = FALSE, withBP = TRUE, minEICIntensity = featParams$minEICIntensity,
-                               minEICAdjTime = featParams$minEICAdjTime,
-                               minEICAdjPoints = featParams$minEICAdjPoints,
-                               minEICAdjIntensity = featParams$minEICAdjIntensity)
+        args <- list(backend, EICInfo$mzmin, EICInfo$mzmax, EICInfo$retmin, EICInfo$retmax,
+                     EICInfo$mobmin, EICInfo$mobmax, mzExpIMSWindow = 0, minIntensityIMS = minIntensityIMS,
+                     mode = if (test) "test" else "full", showProgress = FALSE,
+                     minEICIntensity = featParams$minEICIntensity, minEICAdjTime = featParams$minEICAdjTime,
+                     minEICAdjPoints = featParams$minEICAdjPoints,
+                     minEICAdjIntensity = featParams$minEICAdjIntensity)
+        ret <- do.call(if (test) getEICList else doGetEICsForAna, args)
         names(ret) <- EICInfo$EIC_ID
-        ret <- pruneList(ret, checkEmptyElements = TRUE, keepAttr = TRUE)
+        if (!test)
+            ret <- pruneList(ret, checkEmptyElements = TRUE, keepAttr = TRUE)
         return(ret)
     }
     
@@ -254,18 +256,13 @@ findFeaturesBinning <- function(analysisInfo, featParams, peakParams, minIntensi
                 setDT(MS2Info)
             }
             
+            EICs <- EICInfo <- NULL
             EICInfoMZ <- getFeatEICsInfo(featParams, withIMS = FALSE, MS2Info = MS2Info)
-            EICs <- getEICsAna(backend, EICInfoMZ)
-            # omit missing
-            EICInfoMZ <- EICInfoMZ[EIC_ID %chin% names(EICs)]
-            
-            EICInfo <- NULL
             if (withIMS)
             {
-                # With IMS worksflows the mz EICs are only used as a pre-filter. As the EIC object is potentially large we
-                # remove it here.
-                rm(EICs) 
-                gc()
+                testEICs <- getEICsAna(backend, EICInfoMZ, TRUE)
+                testEICs <- unlist(testEICs)
+                EICInfoMZ <- EICInfoMZ[EIC_ID %chin% names(testEICs)[testEICs]]
                 
                 # remove complete m/z bins that were filtered out before
                 temp <- EICInfoMZ[, c("mzmin", "mzmax"), with = FALSE]
@@ -274,12 +271,15 @@ findFeaturesBinning <- function(analysisInfo, featParams, peakParams, minIntensi
                 ov <- foverlaps(EICInfoMob, temp, type = "within", nomatch = NULL, which = TRUE)
                 EICInfo <- EICInfoMob[ov$xid]
                 
-                EICs <- getEICsAna(backend, EICInfo)
+                EICs <- getEICsAna(backend, EICInfo, FALSE)
             }
             else
-                EICInfo <- EICInfoMZ
+            {
+                EICs <- getEICsAna(backend, EICInfoMZ, FALSE)
+                EICInfo <- EICInfoMZ[EIC_ID %chin% names(EICs)] # omit missing
+            }
             
-            peaks <- findPeaksInEICs(EICs, peakParams, withBP = TRUE, withMobility = withIMS,
+            peaks <- findPeaksInEICs(EICs, peakParams, withMobility = withIMS,
                                      logPath = file.path("log", "featEICs", paste0(ana, ".txt")), cacheDB = cacheDB)
 
             # only keep those peaks with m/z in the "center" of the analyzed m/z and mobility range

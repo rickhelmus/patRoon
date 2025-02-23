@@ -825,7 +825,7 @@ aggregateTox <- function(tox, aggrParams, splitSuspects = FALSE)
     return(tox[])
 }
 
-findPeaksInEICs <- function(EICs, peakParams, withBP, withMobility, logPath, cacheDB = NULL)
+findPeaksInEICs <- function(EICs, peakParams, withMobility, logPath, cacheDB = NULL)
 {
     baseHash <- makeHash(peakParams)
     
@@ -839,32 +839,35 @@ findPeaksInEICs <- function(EICs, peakParams, withBP, withMobility, logPath, cac
     peaks <- findPeaks(EICs, TRUE, peakParams, logPath)
     peaks <- rbindlist(peaks, idcol = "EIC_ID")
     
-    if (nrow(peaks) == 0)
+    if (!is.null(EICs[[1]][["mz"]])) # EICs made with mode == "full"?
     {
-        peaks[, EIC_ID := character()]
-        peaks[, c("retmin", "retmax", "ret", "area", "intensity", "mzmin", "mzmax", "mz", "mobmin", "mobmax", "mobility") := numeric()]
+        if (nrow(peaks) == 0)
+        {
+            peaks[, EIC_ID := character()]
+            peaks[, c("retmin", "retmax", "ret", "area", "intensity", "mzmin", "mzmax", "mz", "mobmin", "mobmax", "mobility") := numeric()]
+        }
+        else
+        {
+            peaks[, c("mzmin", "mzmax", "mz", "mobmin", "mobmax", "mobility") := {
+                eic <- EICs[[EIC_ID]][EICs[[EIC_ID]]$time %between% c(retmin, retmax), ]
+                if (nrow(eic) == 0)
+                    numeric(1)
+                else
+                {
+                    if (is.null(eic[["mobility"]]))
+                        eic$mobility <- eic$mobilityBP <- eic$mobmin <- eic$mobmax <- NA_real_
+                    # UNDONE: also use mobility BP data?
+                    list(min(eic$mzmin), max(eic$mzmax), weighted.mean(eic$mzBP, eic$intensity),
+                         min(eic$mobmin), max(eic$mobmax),
+                         weighted.mean(eic$mobilityBP, eic$intensity))
+                }
+            }, by = seq_len(nrow(peaks))]
+        }
+        
+        # NOTE: we could also set mobilities after checking if data is available, but then we need to repeat the EIC subsetting above
+        if (!withMobility || length(EICs) == 0 || is.null(EICs[[1]][["mobility"]]))
+            peaks[, c("mobmin", "mobmax", "mobility") := NULL]
     }
-    else
-    {
-        peaks[, c("mzmin", "mzmax", "mz", "mobmin", "mobmax", "mobility") := {
-            eic <- EICs[[EIC_ID]][EICs[[EIC_ID]]$time %between% c(retmin, retmax), ]
-            if (nrow(eic) == 0)
-                numeric(1)
-            else
-            {
-                if (is.null(eic[["mobility"]]))
-                    eic$mobility <- eic$mobilityBP <- eic$mobmin <- eic$mobmax <- NA_real_
-                # UNDONE: also use mobility BP data?
-                list(min(eic$mzmin), max(eic$mzmax), weighted.mean(if (withBP) eic$mzBP else eic$mz, eic$intensity),
-                     min(eic$mobmin), max(eic$mobmax),
-                     weighted.mean(if (withBP) eic$mobilityBP else eic$mobility, eic$intensity))
-            }
-        }, by = seq_len(nrow(peaks))]
-    }
-    
-    # NOTE: we could also set mobilities after checking if data is available, but then we need to repeat the EIC subsetting above
-    if (!withMobility || length(EICs) == 0 || is.null(EICs[[1]][["mobility"]]))
-        peaks[, c("mobmin", "mobmax", "mobility") := NULL]
     
     # make unique IDs
     peaks[, ID := make.unique(EIC_ID)]
@@ -995,10 +998,9 @@ reintegrateMobilityFeatures <- function(features, EICRTWindow, peakRTWindow, cal
     
     if (!is.null(peakParams))
     {
-        # UNDONE: make withBP configurable?
         peaksList <- doApply("Map", parallel, allEICs, featureTable(features), analyses(features), f = function(EICs, ft, ana)
         {
-            peaks <- findPeaksInEICs(EICs, peakParams, withBP = FALSE, withMobility = FALSE,
+            peaks <- findPeaksInEICs(EICs, peakParams, withMobility = FALSE,
                                      logPath = file.path("log", "assignMobilities", paste0("reintegrate-", ana, ".txt")),
                                      cacheDB = cacheDB)
             # filter out peaks outside original retmin/retmax and with high RT deviation

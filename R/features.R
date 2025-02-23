@@ -438,7 +438,7 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
     if (!is.null(cd))
         return(cd)
     
-    EICs <- getFeatureEIXs(obj, "EIC", EICParams)
+    EICs <- getFeatureEIXs(obj, "EIC", EIXParams = EICParams)
     
     # HACK HACK HACK: MetaClean::calculateGaussianSimilarity needs to have
     # xcms::SSgauss attached
@@ -447,10 +447,11 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
     eg$SSgauss <- xcms::SSgauss
     withr::local_environment(eg)
     
-    calcFeatQualities <- function(ret, retmin, retmax, intensity, EIC)
+    calcFeatQualities <- function(ret, retmin, retmax, intensity, EIC, EICAT)
     {
         # NOTE: MetaClean expects matrices
-        args <- list(c(rt = ret, rtmin = retmin, rtmax = retmax, maxo = intensity), as.matrix(EIC))
+        EIC <- as.matrix(data.frame(time = EICAT, intensity = doFillEIXIntensities(EICAT, EIC$time, EIC$intensity)))
+        args <- list(c(rt = ret, rtmin = retmin, rtmax = retmax, maxo = intensity), EIC)
         return(sapply(featQualityNames, function(q)
         {
             a <- args
@@ -471,7 +472,8 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
             ft[, c(featQualityNames, featScoreNames) := numeric()]
         else
         {
-            ft[, (featQualityNames) := rbindlist(Map(calcFeatQualities, ret, retmin, retmax, intensity, eic))]
+            eicat <- attr(eic, "allXValues")
+            ft[, (featQualityNames) := rbindlist(Map(calcFeatQualities, ret, retmin, retmax, intensity, eic, MoreArgs = list(eicat)))]
             ft[, (featScoreNames) := Map(patRoon:::scoreFeatQuality, featQualities, .SD), .SDcols = featQualityNames]
         }
         patRoon:::doProgress()

@@ -382,7 +382,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, 
                          parentsFromScreening = parFromScr, TPsFromScreening = TPsFromScr)
     
     if (doIMSSel)
-        ret <- expandMobilities(ret, fGroupsTPsOrig)
+        ret <- expandForIMS(ret, fGroupsTPsOrig)
     
     saveCacheData("componentsTPs", ret, hash)
     

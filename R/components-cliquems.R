@@ -16,7 +16,7 @@ setMethod("initialize", "componentsCliqueMS",
 
 #' @rdname components-class
 #' @export
-setMethod("expandMobilities", "componentsCliqueMS", function(obj, ...) cannotExpandComponMobilities(obj))
+setMethod("expandForIMS", "componentsCliqueMS", function(obj, ...) cannotExpandComponIMS(obj))
 
 #' Componentization of adducts, isotopes etc. with cliqueMS
 #'

@@ -107,7 +107,7 @@ setMethod("generateComponentsSpecClust", "featureGroups", function(fGroups, MSPe
                                minModuleSize = minModuleSize, algorithm = "specclust")
     
     if (doIMSSel)
-        ret <- expandMobilities(ret, fGroupsOrig)
+        ret <- expandForIMS(ret, fGroupsOrig)
     
     return(ret)
 })

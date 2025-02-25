@@ -16,7 +16,7 @@ setMethod("initialize", "componentsCamera",
 
 #' @rdname components-class
 #' @export
-setMethod("expandMobilities", "componentsCamera", function(obj, ...) cannotExpandComponMobilities(obj))
+setMethod("expandForIMS", "componentsCamera", function(obj, ...) cannotExpandComponIMS(obj))
 
 #' Componentization of adducts, isotopes etc. with CAMERA
 #'

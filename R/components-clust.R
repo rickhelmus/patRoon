@@ -19,7 +19,7 @@ genClustComponents <- function(cutClusters, gInfo)
     names(comps) <- paste0("CMP", seq_along(clinds))
     
     if (!is.null(gInfo[["mobility"]]))
-        printf("NOTE: you may need to call expandMobilities() to restore mobility feature groups in the new components.\n")
+        printf("NOTE: you may need to call expandForIMS() to restore mobility feature groups in the new components.\n")
     
     return(comps)
 }

@@ -137,13 +137,13 @@ setMethod("consensus", "componentsSet", function(obj, ...)
 
 #' @rdname components-class
 #' @export
-setMethod("expandMobilities", "componentsSet", function(obj, fGroups)
+setMethod("expandForIMS", "componentsSet", function(obj, fGroups)
 {
     checkmate::assertClass(fGroups, "featureGroupsSet")
     
     obj@setObjects <- sapply(sets(obj), function(s)
     {
-        expandMobilities(setObjects(obj)[[s]], unset(fGroups, set = s))
+        expandForIMS(setObjects(obj)[[s]], unset(fGroups, set = s))
     }, simplify = FALSE)
     
     return(syncComponentsSetObjects(obj))

@@ -56,8 +56,8 @@ setMethod("expandForIMS", "componentsOpenMS", function(obj, ...) cannotExpandCom
 #'   \code{potentialAdducts=list(positive=c("[M+H]+" = 0.8, "[M+Na]+" = 0.2), negative=c("[M-H]-" = 0.8, "[M-H2O-H]-" =
 #'   0.2))}
 #' @param minRTOverlap,retWindow Sets feature retention tolerances when grouping features. Sets the
-#'   \command{"algorithm:MetaboliteFeatureDeconvolution:retention_max_diff"} and
-#'   \command{algorithm:MetaboliteFeatureDeconvolution:min_rt_overlap} options.
+#'   \command{algorithm:MetaboliteFeatureDeconvolution:min_rt_overlap} and
+#'   \command{"algorithm:MetaboliteFeatureDeconvolution:retention_max_diff"} options.
 #' @param extraOpts Named character vector with extra command line parameters directly passed to
 #'   \command{MetaboliteAdductDecharger}. Set to \code{NULL} to ignore.
 #'

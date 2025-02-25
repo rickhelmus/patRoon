@@ -266,11 +266,11 @@ makeSuspInfoPropTab <- function(tab, id, retMin)
 }
 
 reportHTMLUtils$methods(
-    makeMainResultsFGReactable = function(...)
+    makeMainResultsFGReactable = function(..., groupMob = TRUE)
     {
-        hasMobParents <- hasMobilities(objects$fGroups) && any(!is.na(groupInfo(objects$fGroups)$ims_parent_group))
+        groupMob <- groupMob && hasMobilities(objects$fGroups) && any(!is.na(groupInfo(objects$fGroups)$ims_parent_group))
         makeMainResultsReactable(..., retMin = settings$features$retMin,
-                                 groupBy = if (hasMobParents) "ims_parent_group", defaultExpanded = hasMobParents)
+                                 groupBy = if (groupMob) "ims_parent_group", defaultExpanded = groupMob)
     },
 
     genMainTablePlain = function()
@@ -507,10 +507,10 @@ reportHTMLUtils$methods(
         do.call(plotGraph, args)
     },
     
-    makeFGToolbar = function(tableID)
+    makeFGToolbar = function(tableID, groupMob)
     {
         hasMob <- hasMobilities(objects$fGroups)
-        gb <- if (hasMob && any(!is.na(groupInfo(objects$fGroups)$ims_parent_group)))
+        gb <- if (hasMob && groupMob && any(!is.na(groupInfo(objects$fGroups)$ims_parent_group)))
         {
             list(
                 list(value = "", name = "None"),
@@ -535,10 +535,10 @@ reportHTMLUtils$methods(
     
     mainTabToClass = function(main) if (main) "detailsMainTable" else "detailsCandTable",
     
-    makeFGTableCard = function(tab, main, ...)
+    makeFGTableCard = function(tab, main, ..., groupMob = TRUE)
     {
         makeMainTableCard(tab, ..., cl = mainTabToClass(main), hd = "Feature groups",
-                          toolbar = makeFGToolbar(tab$elementId))
+                          toolbar = makeFGToolbar(tab$elementId, groupMob = groupMob))
     },
     makeCandTableCard = function(tab, main, ..., groupBy = NULL)
     {

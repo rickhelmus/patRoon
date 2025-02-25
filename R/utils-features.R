@@ -287,7 +287,7 @@ getDefEIXParams <- function()
         onlyPresent = TRUE,
         mzExpWindow = 0.001,
         mobExpWindow = 0.005,
-        mzExpIMSWindow = 0.002,
+        mzExpIMSWindow = 0.005,
         minIntensityIMS = 25,
         setsAdductPos = "[M+H]+",
         setsAdductNeg = "[M-H]-"

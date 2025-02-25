@@ -124,11 +124,6 @@
         - remove mobility assignment?
             - if not, support >1 mobilities in suspect list and do mobility assignment directly from suspect list like assignMobilities()
         - update use of loadCacheData() (see bin features)
-- components
-    - better name for expandMobilities()?
-        - add docs (incl generic)
-    - TPs: should expandMobilities() also copy components for mobility parents?
-        - if not, clearly doc the difference if components are generated after assignMobilities()
 - reporting
     - comps-clust: don't have imgs double in reportPlots
 - skip IMS fGroups annotation with high MS/MS similarity
@@ -161,7 +156,7 @@
     - more verification that normInts() works before/after assignMobilities()
     - IMS arg for [, filter() and plotting functions
     - applyMS for filter()
-    - expandMobilities()
+    - expandForIMS()
     - convertMobilityToCCS() / convertCCSToMobility()
     - suspects
         - test order of data selection for mobility and CCS columns, missing data etc
@@ -300,9 +295,12 @@
     - ADT
         - IMS option and mobility_collapsed column, which contains rounded numbers
     - components
-        - doc that expandMobilities() may needs to be called after tree splitting
+        - doc that expandForIMS() may needs to be called after tree splitting
             - improve printed NOTE with link to manual?
-        - clearly doc that expandMobilities() just simple copying only; and this may lead to eg TP candidates that were not actually found by screening and therefore have NAs in the report
+        - clearly doc that expandForIMS() just simple copying only; and this may lead to eg TP candidates that were not actually found by screening and therefore have NAs in the report
+            - unless screening occurred before mobility assignment, which needs to be in a expand workflow?
+        - doc expandForIMS() generic and methods
+        - clearly doc the difference if TP components are generated after assignMobilities(); there will be no IMS TP parents with expanding
     - convertMobilityToCCS() / convertCCSToMobility()
         - clearly refer to papers and implementations
         - mention that length of charge param is expanded

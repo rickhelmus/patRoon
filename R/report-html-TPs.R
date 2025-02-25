@@ -166,8 +166,8 @@ reportHTMLUtils$methods(
         if (!is.null(tab[["parent_InChIKey"]]))
             tab[, parent_structure := getIKBlock1(parent_InChIKey)]
             
-        makeMainResultsFGReactable(tab, "TPsParents", initView = "TPsParents",
-                                   colGroupOrder = "component", initTabFunc = "initTabTPsParents")
+        makeMainResultsFGReactable(tab, "TPsParents", initView = "TPsParents", colGroupOrder = "component",
+                                   initTabFunc = "initTabTPsParents", groupMob = FALSE)
     },
     
     genMainTableTPsByGroup = function()
@@ -366,7 +366,7 @@ reportHTMLUtils$methods(
         
         ret <- list(
             genTPsSidebar(),
-            makeFGTableCard(genMainTableTPsParents(), TRUE, "TPsParents"),
+            makeFGTableCard(genMainTableTPsParents(), TRUE, "TPsParents", groupMob = FALSE),
             makeFGTableCard(genMainTableTPsByGroup(), TRUE, "TPsByGroup")
         )
         

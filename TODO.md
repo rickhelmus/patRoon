@@ -14,7 +14,6 @@
 - update sysdata.rda
 - start using saveCacheDataList() on more places?
 - basic and default error handling for executeCommand()?
-- maxMSRtWindow --> maxMSRTWindow
 - BUG: unescaped set names are now used regular expressions (problem if eg dot is present when make.unique was used)
 - update patRoonInst for new deps?
 
@@ -54,7 +53,7 @@
         - no support for mzXML
 - add smoothing for XCMS3/enviPick peaks? e.g. with signal::sgolayfilt()
     - might also be nice for plotting chroms?
-            
+- add IMSMatch filter for suspects?
 
 ## newProject()
 
@@ -69,11 +68,78 @@
     - use of getMSFileConversionFormats()
     - add im_collapse and timsconvert
 
+## Param defaults
+
+- Think of an approach to centralize defaults for tolerances (m/z, RT, mob)
+- Have different defaults for Agilent/Bruker IMS
+- Harmonize/consistent names
+    - maxMSRtWindow --> maxMSRTWindow
+    - be consistent in mobility vs IMS and mobilograms and EIMs
+        - mobWindow and IMSWindow now randomly used
+        - IMS arg but affects mobility features
+        - withMobility vs withIMS
+- getIMSMatchParams()
+    - tweak defaults
+    - also distinction for Agilent/Bruker
+
 ## TC
 
 - rename estimateIDLevels() and have the same name as annotateSuspects()?
 
-- tests
+## msdata
+
+- see what is the best default for backends
+    - set mzR in front for safety?
+- MSPL: hclust seems unusable due to high mem usage with IMS data? --> just default to distance and doc change/IMS need?
+- embed TIMS-SDK? --> in patRoonExt
+- Agilent
+    - See if we can get smaller mzML files?
+    - SC doesn't recognize IM
+
+## IMS
+
+- findPeaks()
+    - OpenMS
+        - add MRMTransitionGroupPicker to patRoonExt
+    - Dietrich
+        - Disabled noise removal for reported intensities/areas
+            - keep doing this?
+            - report both?
+            - document
+- assignMobilities()
+    - better names for ims_parent_ID/ims_parent_group?
+    - SC seems to hang?
+    - parent-less/orphaned IMS features
+        - done?
+    - switch to PCL w/ CCSbase in patRoonExt
+- Suspect features
+    - Remove featureSuspects and replace by findFeaturesBinning?
+        - Add arg to give suspect list, vector of m/zs etc instead of binning
+        - Maybe rename binning to eg EICs?
+        - remove doGroupSuspects()
+    - otherwise, if we keep it...
+        - XCMS/XCMS3/KPIC2: doc and/or default min fractions to zero as these probably don't make a lot of sense otherwise
+        - Handle mobilities
+            - Does the mobmin/mobmax range make sense how it is computed now?
+        - remove mobility assignment?
+            - if not, support >1 mobilities in suspect list and do mobility assignment directly from suspect list like assignMobilities()
+        - update use of loadCacheData() (see bin features)
+- components
+    - better name for expandMobilities()?
+        - add docs (incl generic)
+    - TPs: should expandMobilities() also copy components for mobility parents?
+        - if not, clearly doc the difference if components are generated after assignMobilities()
+- reporting
+    - comps-clust: don't have imgs double in reportPlots
+- skip IMS fGroups annotation with high MS/MS similarity
+- CCS
+    - convertMobilityToCCS() / convertCCSToMobility()
+        - handle Waters data?
+
+
+## Tests
+
+- TC
     - IDL filter
     - annSim: jaccard (as was done for suspects)
     - as.data.table()
@@ -83,8 +149,30 @@
         - test if k=NA works
     - TP components
         - filter for candidate specific frag/NL matches
-    
-- docs
+- msdata
+    - new verifyFileForFormat() usage in convertMSFiles()
+    - MSPL
+        - new spec averaging params
+        - more extensively test filters/summing/averaging
+        - further test bbCID data: also mixed bbCID/PASEF file (ie with different segments)
+        - see if current default abundance threshold is fine
+- IMS
+    - more verification that fGroupsScreeningSets still works fine after removal of setObjects
+    - more verification that normInts() works before/after assignMobilities()
+    - IMS arg for [, filter() and plotting functions
+    - applyMS for filter()
+    - expandMobilities()
+    - convertMobilityToCCS() / convertCCSToMobility()
+    - suspects
+        - test order of data selection for mobility and CCS columns, missing data etc
+    - assignMobilities()
+        - DT method: robustness with missing data in input/from
+        - test for fGroups from screenInfo(), eg for fGroups with >1 suspect assigned
+    - selectIMS filter: ensure that objects is fully reverted with IMS=FALSE
+
+## Docs
+
+- TC
     - ES contributions for IDLs
     - explicitly mention annSim can be filtered with scoreLimits?
     - annSim for sets is calculated as max
@@ -150,8 +238,90 @@
     - plotVenn()/overlap()/unique(): update for removal of sets arg, give examples with aggregate
     - plotVenn()/overlap/plotUpSet(): update for removal of list arg possibility for which
     - MetFrag: don't do MP for non-local databases to avoid connection errors
+- msdata
+    - getMSFileFormats()
+    - patRoon.threads, patRoon.MS.backends, patRoon.MS.preferIMS and patRoon.path.BrukerTIMS options
+        - patRoon.MS.preferIMS: only works for MSTK/SC, ie putting OTIMS in front doesn't work
+    - update PListParams
+    - updated convertMSFilesXXX() functions, including changed args
+        - add docs for algo specific functions that are now exported
+    - update generateMSPeakLists()
+        - also in Handbook
+        - no more precursorMzWindow
+        - update avg params
+        - don't refer to deprecated MSPL generators
+    - availableBackends()
+        - also invisible return value
+    - EICParams for getPICSet() and calculatePeakQualities()
+    - mzExpIMSWindow and minIntensityIMS EIXParam
+    - update all for getEICs()
+        - note that additional columns are only available for output=="raw"
+    - doc that minAbundanceAbs will be maxed to actual spec count
+    - timsconvert; add refs, installation
+- IMS
+    - hasMobilities slot for features
+    - Dietrich features
+    - getDefPeakParams()
+    - getDefEICParams() / getDefEIMParams()
+        - update for retWindow --> window
+        - add docs for getDefEIMParams()
+        - update handbook
+    - assignMobilities()
+        - mention that feature properties (except intensity, rt, area) are simply copied from parent
+        - suspect/compounds method
+            - mention when mobility <--> CCS conversions occur
+            - doc how charge is taken and adducts are used
+            - compounds: mobility etc assumed to be specific per set (due to different adducts and m/z values), but equal for consensus() (structure should be the same)
+            - DT: adducts arg can be character() if adduct column is present
+            - matchFromBy == "InChIKey1" will automatically calculate IK1 if missing, and DT method keeps it in output
+            - matchFromBy == "InChIKey" is not supported by SIRIUS
+        - doc the use for fromSuspects, eg
+            - doesn't rely on mobility peak detection, so might be less prone to false negatives with eg low intensities
+            - scenario 1: we know the mobility very well, eg from a database --> use a narrow IMSWindow
+            - scenario 2: we only have the mobility from eg a prediction and don't care so much about identification by CCS match --> use wide IMSWindow
+        - clearly doc what IMSWindow is used for
+    - normInts()
+        - istd hits of mobility features are not used (IMS="maybe")
+        - mobility features are ignored (IMS="maybe") for tic
+        - relative intensities/areas are copied from parents
+    - plotChroms()/plotMobilograms()
+        - annotate has mob option
+        - intMax can only work for EICs (mob inten may not be stored)
+        - plotChroms(): IMS arg overrides analysis/groupNames args for availability after IMS selection
+    - IMS arg for [, filter() and plotting functions, export(), getXCMS...()
+    - doc that IMS arg should most likely be FALSE for export/getXCMS...()
+    - applyIMS arg for all fGroups filter methods
+        - ignores negate!
+    - withIMSParent arg for filter()
+    - calculateConcs()
+        - clearly doc that mobility parent intensities are used to calculate concentrations (if available).
+        - Also note that the mobility fGroup's RF is still used (only relevant for SIRIUS or RT changes), and is different then when assignMobilities() copies results
+        - IMS arg for getQuantCalibFromScreening() --> clearly doc that default is best
+    - ADT
+        - IMS option and mobility_collapsed column, which contains rounded numbers
+    - components
+        - doc that expandMobilities() may needs to be called after tree splitting
+            - improve printed NOTE with link to manual?
+        - clearly doc that expandMobilities() just simple copying only; and this may lead to eg TP candidates that were not actually found by screening and therefore have NAs in the report
+    - convertMobilityToCCS() / convertCCSToMobility()
+        - clearly refer to papers and implementations
+        - mention that length of charge param is expanded
+    - getCCSParams()
+        - doc where Mason-Schamp const comes from
+    - suspects/compounds
+        - doc order of data selection for mobility and CCS columns
+    - getIMSRangeParams() and getIMSMatchParams()
+    - get CCS values from MetFrag
+        - use PCL w/ CCSbase
+        - still need to call assignMobilities() with from = NULL to get CCS deviations, mobility conversions etc
+    - peakParams
+        - doc common parameters that may need to be changed for IMS
+        - doc that they could probably be optimized further
 
-- NEWS
+
+## NEWS
+
+- TC
     - specSimParamsMatch --> specSimParams
     - annotateSuspects() now copies annSims from feat annotations instead of calculating --> change in func args
     - annSuspects should be faster now (no need to calc annSims, and estIDLevel is faster)
@@ -225,26 +395,7 @@
     - FIXED: plotVenn() now warns when there are too many groups, instead of erroring
     - MetFrag: don't do MP for non-local databases to avoid connection errors
     - componentsNT: renamed "rt" to "ret" for consistency
-
-
-## msdata
-
-- see what is the best default for backends
-    - set mzR in front for safety?
-- MSPL: hclust seems unusable due to high mem usage with IMS data? --> just default to distance and doc change/IMS need?
-- embed TIMS-SDK? --> in patRoonExt
-
-
-- test
-    - new verifyFileForFormat() usage in convertMSFiles()
-    - MSPL
-        - new spec averaging params
-        - more extensively test filters/summing/averaging
-        - further test bbCID data: also mixed bbCID/PASEF file (ie with different segments)
-        - see if current default abundance threshold is fine
-
-
-- NEWS
+- msdata
     - MSFileFormats() --> getMSFileConversionFormats() / getMSFileFormats()
     - new behavior of getMSFilesFromAnaInfo(): file types are checked one by one to avoid mixes and always checked to be present (mustExist was set a bit randomly...)
     - better checking of analysis file directory checking (verifyFileForFormat())
@@ -260,161 +411,7 @@
     - EICParams for getPICSet() and calculatePeakQualities() (needed for m/z IMS expansion)
     - mzExpIMSWindow EIXParam
     - (subsetDTColumnsIfPresent: use order of requested cols instead of original) --> may change column order in some places
-
-- docs
-    - getMSFileFormats()
-    - patRoon.threads, patRoon.MS.backends, patRoon.MS.preferIMS and patRoon.path.BrukerTIMS options
-        - patRoon.MS.preferIMS: only works for MSTK/SC, ie putting OTIMS in front doesn't work
-    - update PListParams
-    - updated convertMSFilesXXX() functions, including changed args
-        - add docs for algo specific functions that are now exported
-    - update generateMSPeakLists()
-        - also in Handbook
-        - no more precursorMzWindow
-        - update avg params
-        - don't refer to deprecated MSPL generators
-    - availableBackends()
-        - also invisible return value
-    - EICParams for getPICSet() and calculatePeakQualities()
-    - mzExpIMSWindow and minIntensityIMS EIXParam
-    - update all for getEICs()
-        - note that additional columns are only available for output=="raw"
-    - doc that minAbundanceAbs will be maxed to actual spec count
-    - timsconvert; add refs, installation
-
-## IMS
-
-- be consistent in mobility vs IMS and mobilograms and EIMs
-    - mobWindow and IMSWindow now randomly used
-    - IMS arg but affects mobility features
-    - withMobility vs withIMS
-- Agilent
-    - Somehow neatly adjust defaults for tolerances etc the larger mobility scale
-        - IMSWindow/mobWindow, IMSMatchParams, EIXParams
-    - See if we can get smaller mzML files?
-    - SC doesn't recognize IM
-- findPeaks()
-    - OpenMS
-        - add MRMTransitionGroupPicker to patRoonExt
-    - Dietrich
-        - Disabled noise removal for reported intensities/areas
-            - keep doing this?
-            - report both?
-            - document
-- assignMobilities()
-    - better names for ims_parent_ID/ims_parent_group?
-    - SC seems to hang?
-    - parent-less/orphaned IMS features
-        - done?
-    - switch to PCL w/ CCSbase in patRoonExt
-- Suspect features
-    - Remove featureSuspects and replace by findFeaturesBinning?
-        - Add arg to give suspect list, vector of m/zs etc instead of binning
-        - Maybe rename binning to eg EICs?
-        - remove doGroupSuspects()
-    - otherwise, if we keep it...
-        - XCMS/XCMS3/KPIC2: doc and/or default min fractions to zero as these probably don't make a lot of sense otherwise
-        - Handle mobilities
-            - Does the mobmin/mobmax range make sense how it is computed now?
-        - remove mobility assignment?
-            - if not, support >1 mobilities in suspect list and do mobility assignment directly from suspect list like assignMobilities()
-        - update use of loadCacheData() (see bin features)
-- getIMSMatchParams()
-    - tweak defaults
-    - also distinction for Agilent/Bruker
-- components
-    - better name for expandMobilities()?
-        - add docs (incl generic)
-    - TPs: should expandMobilities() also copy components for mobility parents?
-        - if not, clearly doc the difference if components are generated after assignMobilities()
-- reporting
-    - comps-clust: don't have imgs double in reportPlots
-- skip IMS fGroups annotation with high MS/MS similarity
-- CCS
-    - convertMobilityToCCS() / convertCCSToMobility()
-        - handle Waters data?
-        - verify Agilent data
-
-- Low priority
-    - add IMSMatch filter for suspects?
-    - add PASEF as mobility assignment type?
-
-- Tests
-    - more verification that fGroupsScreeningSets still works fine after removal of setObjects
-    - more verification that normInts() works before/after assignMobilities()
-    - IMS arg for [, filter() and plotting functions
-    - applyMS for filter()
-    - expandMobilities()
-    - convertMobilityToCCS() / convertCCSToMobility()
-    - suspects
-        - test order of data selection for mobility and CCS columns, missing data etc
-    - assignMobilities()
-        - DT method: robustness with missing data in input/from
-        - test for fGroups from screenInfo(), eg for fGroups with >1 suspect assigned
-    - selectIMS filter: ensure that objects is fully reverted with IMS=FALSE
-    
-- Docs
-    - hasMobilities slot for features
-    - Dietrich features
-    - getDefPeakParams()
-    - getDefEICParams() / getDefEIMParams()
-        - update for retWindow --> window
-        - add docs for getDefEIMParams()
-        - update handbook
-    - assignMobilities()
-        - mention that feature properties (except intensity, rt, area) are simply copied from parent
-        - suspect/compounds method
-            - mention when mobility <--> CCS conversions occur
-            - doc how charge is taken and adducts are used
-            - compounds: mobility etc assumed to be specific per set (due to different adducts and m/z values), but equal for consensus() (structure should be the same)
-            - DT: adducts arg can be character() if adduct column is present
-            - matchFromBy == "InChIKey1" will automatically calculate IK1 if missing, and DT method keeps it in output
-            - matchFromBy == "InChIKey" is not supported by SIRIUS
-        - doc the use for fromSuspects, eg
-            - doesn't rely on mobility peak detection, so might be less prone to false negatives with eg low intensities
-            - scenario 1: we know the mobility very well, eg from a database --> use a narrow IMSWindow
-            - scenario 2: we only have the mobility from eg a prediction and don't care so much about identification by CCS match --> use wide IMSWindow
-        - clearly doc what IMSWindow is used for
-    - normInts()
-        - istd hits of mobility features are not used (IMS="maybe")
-        - mobility features are ignored (IMS="maybe") for tic
-        - relative intensities/areas are copied from parents
-    - plotChroms()/plotMobilograms()
-        - annotate has mob option
-        - intMax can only work for EICs (mob inten may not be stored)
-        - plotChroms(): IMS arg overrides analysis/groupNames args for availability after IMS selection
-    - IMS arg for [, filter() and plotting functions, export(), getXCMS...()
-    - doc that IMS arg should most likely be FALSE for export/getXCMS...()
-    - applyIMS arg for all fGroups filter methods
-        - ignores negate!
-    - withIMSParent arg for filter()
-    - calculateConcs()
-        - clearly doc that mobility parent intensities are used to calculate concentrations (if available).
-        - Also note that the mobility fGroup's RF is still used (only relevant for SIRIUS or RT changes), and is different then when assignMobilities() copies results
-        - IMS arg for getQuantCalibFromScreening() --> clearly doc that default is best
-    - ADT
-        - IMS option and mobility_collapsed column, which contains rounded numbers
-    - components
-        - doc that expandMobilities() may needs to be called after tree splitting
-            - improve printed NOTE with link to manual?
-        - clearly doc that expandMobilities() just simple copying only; and this may lead to eg TP candidates that were not actually found by screening and therefore have NAs in the report
-    - convertMobilityToCCS() / convertCCSToMobility()
-        - clearly refer to papers and implementations
-        - mention that length of charge param is expanded
-    - getCCSParams()
-        - doc where Mason-Schamp const comes from
-    - suspects/compounds
-        - doc order of data selection for mobility and CCS columns
-    - getIMSRangeParams() and getIMSMatchParams()
-    - get CCS values from MetFrag
-        - use PCL w/ CCSbase
-        - still need to call assignMobilities() with from = NULL to get CCS deviations, mobility conversions etc
-    - peakParams
-        - doc common parameters that may need to be changed for IMS
-        - doc that they could probably be optimized further
-
-
-- NEWS
+- IMS
     - hasMobilities slot for features
     - Dietrich features
     - groupInfo is now a DT

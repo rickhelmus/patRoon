@@ -112,11 +112,10 @@ reportHTMLUtils$methods(
 
     getTPParentInfoJSON = function()
     {
-        cInfo <- componentInfo(getTPComponObj())
-        cInfo <- subsetDTColumnsIfPresent(cInfo, c("name", "parent_name", "parent_group", "parent_InChIKey"))
-        setnames(cInfo, c("name", "parent_name", "parent_group", "parent_InChIKey"),
-                 c("cmpName", "name", "group", "InChIKey"),
-                 skip_absent = TRUE)
+        cInfo <- data.table::copy(componentInfo(getTPComponObj()))
+        cInfo[, InChIKey1 := getIKBlock1(parent_InChIKey)]
+        cInfo <- subsetDTColumnsIfPresent(cInfo, c("name", "parent_name", "parent_group", "InChIKey1"))
+        setnames(cInfo, c("name", "parent_name", "parent_group"), c("cmpName", "name", "group"), skip_absent = TRUE)
         splt <- lapply(split(cInfo, by = "cmpName", keep.by = FALSE), as.list)
         return(jsonlite::toJSON(splt, auto_unbox = TRUE))
     },

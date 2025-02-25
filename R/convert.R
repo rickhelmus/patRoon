@@ -43,8 +43,8 @@ getMSFileConversionFormats <- function(algorithm = "pwiz", type)
 }
 
 #' @export
-convertMSFilesPWiz <- function(inFiles, outFiles, formatTo = "mzML", centroid = TRUE, IMS = FALSE, filters = NULL,
-                               extraOpts = NULL, PWizBatchSize = 1)
+convertMSFilesPWiz <- function(inFiles, outFiles, formatTo = "mzML", centroid = TRUE, IMS = FALSE, minIntensity = 5,
+                               filters = NULL, extraOpts = NULL, PWizBatchSize = 1)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCharacter(inFiles, min.chars = 1, min.len = 1, add = ac)
@@ -54,20 +54,20 @@ convertMSFilesPWiz <- function(inFiles, outFiles, formatTo = "mzML", centroid = 
                       checkmate::checkChoice(centroid, c("vendor", "cwt")),
                       .var.name = "centroid", add = ac)
     checkmate::assertFlag(IMS, na.ok = TRUE, add = ac)
+    checkmate::assertNumber(minIntensity, lower = 0, finite = TRUE, add = ac)
     checkmate::assertCharacter(filters, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::assertCharacter(extraOpts, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::assertCount(PWizBatchSize, positive = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
     if (centroid != FALSE)
-    {
-        if (is.null(filters))
-            filters <- character()
         filters <- c(paste("peakPicking", if (is.character(centroid)) centroid else ""), filters)
-    }
     
     if (is.na(IMS))
         filters <- c(filters, "scanSumming sumMs1=1")
+    
+    if (minIntensity > 0)
+        filters <- c(filters, sprintf("threshold absolute %f most-intense", minIntensity))
 
     mainArgs <- paste0("--", formatTo)
     if (!isFALSE(IMS))

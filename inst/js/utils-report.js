@@ -374,7 +374,7 @@ function updateTPCompon(cmpName, activateFG = true)
     if (intEl)
         intEl.src = reportPlots.intPlots[TPComponParentInfo[cmpName].group];
     if (structEl)
-        structEl.src = reportPlots.structs[TPComponParentInfo[cmpName].InChIKey] || "";
+        structEl.src = reportPlots.structs[TPComponParentInfo[cmpName].InChIKey1] || "";
     
     if (document.getElementById('parentSuspInfoTab'))
         Reactable.setFilter('parentSuspInfoTab', 'name', TPComponParentInfo[cmpName].name);

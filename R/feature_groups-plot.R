@@ -582,6 +582,21 @@ setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj),
                            topMostByReplicate = EICParams$topMostByReplicate, onlyPresent = EICParams$onlyPresent)
     }
 
+    # prepare EICs for plotting
+    
+    EICs <- lapply(EICs, function(ea)
+    {
+        ax <- attr(ea, "allXValues")
+        lapply(ea, function(eg)
+        {
+            eg <- setDF(padEIX(ax, eg$time, eg$intensity))
+            setnames(eg, "xvalue", "time")
+            if (retMin)
+                eg$time <- eg$time/60
+            return(eg)
+        })
+    })
+
     takeAnalysis <- analysis
     anaInfo <- analysisInfo(obj)
     anaInfo <- anaInfo[analysis %chin% takeAnalysis & analysis %chin% names(EICs)]
@@ -595,11 +610,10 @@ setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj),
     {
         EICParams$window <- EICParams$window / 60
         featTab[, c("x", "xmin", "xmax") := .(x/60, xmin/60, xmax/60)]
-        EICs <- lapply(EICs, function(ea) lapply(ea, function(eg) { eg$time <- eg$time/60; return(eg) }))
         gInfo <- copy(gInfo)
         gInfo[, ret := ret / 60]
     }
-    
+
     makeEIXPlot(featTab, anaInfo, gInfo, showPeakArea, showFGroupRect, title, groupBy, showLegend, intMax,
                 showProgress, annotate, xlim, ylim, EICs, EICParams$window, EICParams$onlyPresent,
                 sprintf("Retention time (%s)", if (retMin) "min." else "sec."), ...)

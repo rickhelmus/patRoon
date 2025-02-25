@@ -302,16 +302,16 @@ filterEIXs <- function(EIXs, fGroups, analysis = NULL, groupName = NULL, topMost
     else
         analysis <- analyses(fGroups)
     if (!is.null(groupName))
-        EIXs <- lapply(EIXs, function(e) e[names(e) %chin% groupName])
+        EIXs <- lapply(EIXs, function(e) subListAttr(e, names(e) %chin% groupName))
 
     if (onlyPresent)
     {
         gTable <- groupTable(fGroups)
-        EIXs <- Map(names(EIXs), EIXs, f = function(ana, aeic)
+        EIXs <- Map(names(EIXs), EIXs, f = function(ana, aeix)
         {
             anaInd <- match(ana, analyses(fGroups))
             absentFGs <- names(gTable)[gTable[anaInd] == 0]
-            return(aeic[!names(aeic) %chin% absentFGs])
+            return(subListAttr(aeix, !names(aeix) %chin% absentFGs))
         })
     }
     
@@ -344,7 +344,7 @@ filterEIXs <- function(EIXs, fGroups, analysis = NULL, groupName = NULL, topMost
         }
     }
 
-    return(pruneList(EIXs, checkEmptyElements = TRUE))
+    return(pruneList(EIXs, checkEmptyElements = TRUE, keepAttr = TRUE))
 }
 
 extendEIXInputTab <- function(tab, type, EIXParams)

@@ -596,8 +596,10 @@ setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity 
                     obj[[grp]]$MS[precursor == TRUE]$mz
             }
             plF <- doMSPeakListFilter(plF, absMinIntensity, relMinIntensity, topMostPeaks, minPeaks, maxMZOverPrec,
-                                      minAbundanceFeat, if (is.null(ana)) minAbundanceFGroup else NULL, deIsotope,
-                                      removeMZs, retainPrecursor, precMZ, mzWindow, negate)
+                                      minAbundanceFeatRel, minAbundanceFeatAbs,
+                                      if (is.null(ana)) minAbundanceFGroupRel else NULL,
+                                      if (is.null(ana)) minAbundanceFGroupAbs else NULL,
+                                      deIsotope, removeMZs, retainPrecursor, precMZ, mzWindow, negate)
         }
         
         return(!pl$ID %in% plF$ID)

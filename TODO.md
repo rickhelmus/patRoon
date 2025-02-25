@@ -54,6 +54,7 @@
 - add smoothing for XCMS3/enviPick peaks? e.g. with signal::sgolayfilt()
     - might also be nice for plotting chroms?
 - add IMSMatch filter for suspects?
+- convertMobilityToCCS() / convertCCSToMobility(): handle Waters data?
 
 ## newProject()
 
@@ -88,12 +89,12 @@
 
 ## msdata
 
+- FIX: handle empty EICs when filling, padding etc
 - see what is the best default for backends
     - set mzR in front for safety?
 - MSPL: hclust seems unusable due to high mem usage with IMS data? --> just default to distance and doc change/IMS need?
 - embed TIMS-SDK? --> in patRoonExt
 - Agilent
-    - See if we can get smaller mzML files?
     - SC doesn't recognize IM
 
 ## IMS
@@ -127,9 +128,6 @@
 - reporting
     - comps-clust: don't have imgs double in reportPlots
 - skip IMS fGroups annotation with high MS/MS similarity
-- CCS
-    - convertMobilityToCCS() / convertCCSToMobility()
-        - handle Waters data?
 
 
 ## Tests
@@ -253,6 +251,7 @@
         - note that additional columns are only available for output=="raw"
     - doc that minAbundanceAbs will be maxed to actual spec count
     - timsconvert; add refs, installation
+    - minIntensity arg for pwiz conversion, set by default for eg Agilent data
 - IMS
     - hasMobilities slot for features
     - Dietrich features
@@ -409,6 +408,7 @@
     - EICParams for getPICSet() and calculatePeakQualities() (needed for m/z IMS expansion)
     - mzExpIMSWindow EIXParam
     - (subsetDTColumnsIfPresent: use order of requested cols instead of original) --> may change column order in some places
+    - minIntensity arg for pwiz conversion, set by default
 - IMS
     - hasMobilities slot for features
     - Dietrich features

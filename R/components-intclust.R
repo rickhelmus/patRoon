@@ -199,7 +199,7 @@ setMethod("generateComponentsIntClust", "featureGroups", function(fGroups, metho
                               deepSplit = deepSplit, minModuleSize = minModuleSize, algorithm = "intclust")
 
     if (doIMSSel)
-        ret <- expandMobilities(ret, fGroupsOrig)
+        ret <- expandForIMS(ret, fGroupsOrig)
     
     return(ret)
 })

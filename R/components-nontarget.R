@@ -74,7 +74,7 @@ setMethod("plotGraph", "componentsNT", function(obj, onlyLinked = TRUE, width = 
 
 #' @rdname componentsNT-class
 #' @export
-setMethod("expandMobilities", "componentsNT", function(obj, ...) cannotExpandComponMobilities(obj))
+setMethod("expandForIMS", "componentsNT", function(obj, ...) cannotExpandComponIMS(obj))
 
 #' Componentization of homologous series with nontarget
 #'

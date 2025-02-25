@@ -15,7 +15,7 @@ setMethod("initialize", "componentsOpenMS",
 
 #' @rdname components-class
 #' @export
-setMethod("expandMobilities", "componentsOpenMS", function(obj, ...) cannotExpandComponMobilities(obj))
+setMethod("expandForIMS", "componentsOpenMS", function(obj, ...) cannotExpandComponIMS(obj))
 
 
 #' Componentization of adducts, isotopes etc. with OpenMS

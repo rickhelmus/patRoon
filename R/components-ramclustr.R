@@ -16,7 +16,7 @@ setMethod("initialize", "componentsRC",
 
 #' @rdname components-class
 #' @export
-setMethod("expandMobilities", "componentsRC", function(obj, ...) cannotExpandComponMobilities(obj))
+setMethod("expandForIMS", "componentsRC", function(obj, ...) cannotExpandComponIMS(obj))
 
 #' Componentization of adducts, isotopes etc. with RAMClustR
 #'

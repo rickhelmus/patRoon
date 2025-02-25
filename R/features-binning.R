@@ -118,7 +118,7 @@ getFeaturesEICsParams <- function(methodMZ, methodIMS = NULL, ...)
     else if (methodMZ == "suspects")
     {
         ret <- modifyList(ret, list(
-            rtWindow = 30,
+            rtWindow = 12,
             mzWindow = 0.005,
             # UNDONE these to separate param and also use elsewhere?
             skipInvalid = TRUE,

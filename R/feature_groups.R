@@ -1432,7 +1432,7 @@ setMethod("calculateTox", "featureGroups", function(fGroups, featureAnn)
 
 #' @export
 setMethod("assignMobilities", "featureGroups", function(obj, mobPeakParams = NULL, IMSWindow = 0.01,
-                                                        clusterMethod = "distance", minIntensityIMS = 0,
+                                                        clusterMethod = "distance", minIntensityIMS = 25,
                                                         maxMSRTWindow = 2, chromPeakParams = NULL, EICRTWindow = 20,
                                                         peakRTWindow = 5, calcArea = "integrate", fallbackEIC = TRUE,
                                                         CCSParams = NULL, parallel = TRUE)

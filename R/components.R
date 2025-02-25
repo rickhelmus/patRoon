@@ -232,7 +232,7 @@ setMethod("as.data.table", "components", function(x)
 })
 
 #' @export
-setMethod("expandMobilities", "components", function(obj, fGroups)
+setMethod("expandForIMS", "components", function(obj, fGroups)
 {
     # UNDONE: better function name?
     

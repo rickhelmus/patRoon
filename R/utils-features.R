@@ -68,9 +68,9 @@ getFilteredFGroups <- function(fGroups, retFilter)
 {
     if (!is.null(retFilter$subset))
     {
-        if (is.null(retFilter$subset$i) & !is.null(retFilter$subset$j))
+        if (is.null(retFilter$subset$i) && !is.null(retFilter$subset$j))
             fGroups <- fGroups[, retFilter$subset$j] 
-        if (!is.null(retFilter$subset$i) & is.null(retFilter$subset$j))
+        if (!is.null(retFilter$subset$i) && is.null(retFilter$subset$j))
             fGroups <- fGroups[retFilter$subset$i]
         else   
             fGroups <- fGroups[retFilter$subset$i, retFilter$subset$j]  
@@ -97,7 +97,8 @@ doFGroupsFilter <- function(fGroups, what, hashParam, func, cacheCateg = what, v
     if (is.null(ret))
     {
         ret <- if (length(fGroups) > 0) func(fGroups) else NULL
-        if (!is.null(ret)) saveCacheData(cacheName, ret, hash)
+        if (!is.null(ret))
+            saveCacheData(cacheName, ret, hash)
     }
 
     fGroups <- getFilteredFGroups(fGroups, ret)

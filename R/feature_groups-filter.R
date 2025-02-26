@@ -304,7 +304,7 @@ replicateGroupFilter <- function(fGroups, rGroups, negate = FALSE, verbose = TRU
         pred <- function(g) !g %chin% rGroups
         if (negate)
             pred <- Negate(pred)
-        return(list(delete = list(i = pred(analysisInfo(fGroups)$group, j = NULL))))
+        return(list(delete = list(i = pred(analysisInfo(fGroups)$group), j = NULL)))
     }, "replicate_group", verbose))
 }
 
@@ -364,14 +364,15 @@ groupQualityFilter <- function(fGroups, qualityRanges, negate)
         {
             tab <- copy(tab)
             tab[, keep := checkHow(mapply(.SD, qr, FUN = pred)), by = seq_len(nrow(tab)), .SDcols = names(qr)]
-            return(list(subset = list(j = tab[keep == TRUE]$group)))
+            return(tab[keep == TRUE]$group)
         }
         
+        ret <- character()
         if (length(qRanges) > 0)
             ret <- doF(fGroups, qRanges, groupQualities(fGroups))
         if (length(qRangesScore) > 0)
-            ret <- doF(fGroups, qRangesScore, groupScores(fGroups))
-        return(ret)
+            ret <- intersect(ret, doF(fGroups, qRangesScore, groupScores(fGroups)))
+        return(list(subset = list(j = ret)))
     }, "group_quality"))
 }
 

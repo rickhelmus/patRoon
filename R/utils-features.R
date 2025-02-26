@@ -69,17 +69,14 @@ getFilteredFGroups <- function(fGroups, retFilter)
     if (!is.null(retFilter$subset))
     {
         if (is.null(retFilter$subset$i) && !is.null(retFilter$subset$j))
-            fGroups <- fGroups[, retFilter$subset$j] 
-        if (!is.null(retFilter$subset$i) && is.null(retFilter$subset$j))
+            fGroups <- fGroups[, retFilter$subset$j]
+        else if (!is.null(retFilter$subset$i) && is.null(retFilter$subset$j))
             fGroups <- fGroups[retFilter$subset$i]
-        else   
+        else
             fGroups <- fGroups[retFilter$subset$i, retFilter$subset$j]  
     }
     if (!is.null(retFilter$delete))
-    {   
-        if(!is.null(retFilter$delete$j))
-            fGroups <- delete(fGroups, i = retFilter$delete$i, j = retFilter$delete$j)
-    }
+        fGroups <- delete(fGroups, i = retFilter$delete$i, j = retFilter$delete$j)
     return(fGroups)
 }
 

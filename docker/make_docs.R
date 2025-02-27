@@ -14,9 +14,11 @@ file.rename(origRmds, disabledRmds)
 # remotes::install_github("r-lib/pkgdown@v1.6.1")
 install.packages("pkgdown")
 
-install.packages(c("bookdown", "DiagrammeR", "rsvg", "webshot", "tinytex", "devtools"))
+install.packages(c("bookdown", "DiagrammeR", "rsvg", "webshot", "devtools"))
 remotes::install_github("rich-iannone/DiagrammeRsvg")
 
+# get latest version of tinytex to fix issues with the tutorial PDF: https://github.com/rstudio/rmarkdown/issues/2556#issuecomment-2678609024
+install.packages("tinytex", repos = c("https://rstudio.r-universe.dev", "https://cloud.r-project.org"))
 tinytex::install_tinytex()
 tinytex::tlmgr_install("pdfcrop")
 webshot::install_phantomjs()

@@ -90,7 +90,6 @@ getFeatEICsInfo <- function(params, withIMS, MS2Info)
     else
         EICInfo[, c("mobmin", "mobmax") := 0]
     
-    EICInfo[, c("retmin", "retmax") := .(params$retRange[1], params$retRange[2])]
     EICInfo[, EIC_ID := paste0("EIC_", .I)]
     
     return(EICInfo)
@@ -225,7 +224,7 @@ findFeaturesBinning <- function(analysisInfo, featParams, peakParams, minIntensi
     
     getEICsAna <- function(backend, EICInfo, test)
     {
-        args <- list(backend, EICInfo$mzmin, EICInfo$mzmax, EICInfo$retmin, EICInfo$retmax,
+        args <- list(backend, EICInfo$mzmin, EICInfo$mzmax, featParams$retRange[1], featParams$retRange[2],
                      EICInfo$mobmin, EICInfo$mobmax, mzExpIMSWindow = 0, minIntensityIMS = minIntensityIMS,
                      mode = if (test) "test" else "full", showProgress = FALSE,
                      minEICIntensity = featParams$minEICIntensity, minEICAdjTime = featParams$minEICAdjTime,

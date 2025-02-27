@@ -1,4 +1,4 @@
-/*! bslib 0.8.0 | (c) 2012-2024 RStudio, PBC. | License: MIT + file LICENSE */
+/*! bslib 0.9.0 | (c) 2012-2025 RStudio, PBC. | License: MIT + file LICENSE */
 "use strict";
 (() => {
   var __getOwnPropNames = Object.getOwnPropertyNames;

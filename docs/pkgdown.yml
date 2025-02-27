@@ -1,9 +1,9 @@
-pandoc: 3.6.2
+pandoc: 3.6.3
 pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   tutorial: tutorial.html
-last_built: 2025-02-04T11:38Z
+last_built: 2025-02-27T07:33Z
 urls:
   reference: https://rickhelmus.github.io/patRoon/reference
   article: https://rickhelmus.github.io/patRoon/articles

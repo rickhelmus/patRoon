@@ -24,6 +24,16 @@ template <typename C> std::vector<size_t> getSortedInds(const C &cont)
     return ret;
 }
 
+template <typename IT> std::vector<size_t> getSortedInds(const IT &start, const IT &end)
+{
+    // get sorted indices
+    // inspired from https://stackoverflow.com/a/40183830
+    std::vector<size_t> ret(std::distance(start, end));
+    std::iota(ret.begin(), ret.end(), 0);
+    std::sort(ret.begin(), ret.end(), [&](size_t i, size_t j) { return *(start + i) < *(start + j); });
+    return ret;
+}
+
 // inspired from eg https://stackoverflow.com/questions/11828539/elegant-exceptionhandling-in-openmp
 class ThreadExceptionHandler
 {

@@ -445,6 +445,8 @@
 - limits
     - lowered clusterMzWindow
 - sets names are now checked to not contain any special characters (besides underscores). Automatic labels are now separated by underscores instead of dots.
+- FIXED: SIRIUS with calculateFeatures=T may sometimes fail due to file name truncation
+
 
 ## Features
 

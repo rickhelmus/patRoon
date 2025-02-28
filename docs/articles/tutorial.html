@@ -118,7 +118,7 @@
                         <h4 data-toc-skip class="author">Rick
 Helmus</h4>
             
-            <h4 data-toc-skip class="date">2025-02-27</h4>
+            <h4 data-toc-skip class="date">2025-02-28</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/vignettes/tutorial.Rmd" class="external-link"><code>vignettes/tutorial.Rmd</code></a></small>
       <div class="hidden name"><code>tutorial.Rmd</code></div>
@@ -727,7 +727,7 @@ generate the <code>compounds</code>.</p>
 <pre><code><span><span class="co">#&gt; Identifying 25 feature groups with MetFrag...</span></span>
 <span><span class="co">#&gt; Converting to algorithm specific adducts... Done!</span></span>
 <span><span class="co">#&gt; ================================================================================</span></span>
-<span><span class="co">#&gt; Loaded 740 compounds from 18 features (72.00%).</span></span></code></pre>
+<span><span class="co">#&gt; Loaded 865 compounds from 18 features (72.00%).</span></span></code></pre>
 <p>While <code><a href="../reference/generateCompounds.html">generateCompounds()</a></code> is running a list of candidate
 compound structures will be downloaded for every feature group and
 ranked according to various scoring parameters.</p>
@@ -793,10 +793,10 @@ data from the previous step.</p>
 <span><span class="co">#&gt; compounds</span></span>
 <span><span class="co">#&gt;     |-- compoundsMF</span></span>
 <span><span class="co">#&gt; ---</span></span>
-<span><span class="co">#&gt; Object size (indication): 2.9 MB</span></span>
+<span><span class="co">#&gt; Object size (indication): 3.3 MB</span></span>
 <span><span class="co">#&gt; Algorithm: metfrag</span></span>
 <span><span class="co">#&gt; Number of feature groups with compounds in this object: 18</span></span>
-<span><span class="co">#&gt; Number of compounds: 740 (total), 41.1 (mean), 5 - 100 (min - max)</span></span></code></pre>
+<span><span class="co">#&gt; Number of compounds: 865 (total), 48.1 (mean), 7 - 100 (min - max)</span></span></code></pre>
 <div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/generics.html">as.data.table</a></span><span class="op">(</span><span class="va">mslists</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;                group   type    ID        mz intensity precursor</span></span>
@@ -829,19 +829,19 @@ data from the previous step.</p>
 <span><span class="co">#&gt; 29: M186_R293_1568         C12H27N     C12H28N    185.2143       186.2216  1.26666667     0</span></span></code></pre>
 <div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/generics.html">as.data.table</a></span><span class="op">(</span><span class="va">compounds</span><span class="op">)</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span> <span class="co"># only show first columns for clarity</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt;               group explainedPeaks    score neutralMass                  SMILES</span></span>
-<span><span class="co">#&gt;              &lt;char&gt;          &lt;int&gt;    &lt;num&gt;       &lt;num&gt;                  &lt;char&gt;</span></span>
-<span><span class="co">#&gt;   1:  M109_R192_157              1 4.080113    108.0687         C1=CC(=CC=C1N)N</span></span>
-<span><span class="co">#&gt;   2:  M109_R192_157              1 4.016746    108.0687       C1=CC=C(C(=C1)N)N</span></span>
-<span><span class="co">#&gt;   3:  M109_R192_157              1 3.773151    108.0687         C1=CC=C(C=C1)NN</span></span>
-<span><span class="co">#&gt;   4:  M109_R192_157              1 3.449049    108.0687       C1=CC(=CC(=C1)N)N</span></span>
-<span><span class="co">#&gt;   5:  M109_R192_157              1 2.979250    108.0687           CNC1=CC=CC=N1</span></span>
-<span><span class="co">#&gt;  ---                                                                           </span></span>
-<span><span class="co">#&gt; 736: M186_R293_1568              3 2.864543    185.2143     CCCC(CCC)(CCC)N(C)C</span></span>
-<span><span class="co">#&gt; 737: M186_R293_1568              3 2.854816    185.2143     CCCC(CCC)(CC(C)C)NC</span></span>
-<span><span class="co">#&gt; 738: M186_R293_1568              3 2.843497    185.2143       CCCC(CCC)(CCC)NCC</span></span>
-<span><span class="co">#&gt; 739: M186_R293_1568              3 2.839884    185.2143 CCN(CC)C(C)(C)CC(C)(C)C</span></span>
-<span><span class="co">#&gt; 740: M186_R293_1568              3 2.825351    185.2143   CC(C)CC(C)NC(C)CC(C)C</span></span></code></pre>
+<pre><code><span><span class="co">#&gt;               group explainedPeaks    score neutralMass                SMILES</span></span>
+<span><span class="co">#&gt;              &lt;char&gt;          &lt;int&gt;    &lt;num&gt;       &lt;num&gt;                &lt;char&gt;</span></span>
+<span><span class="co">#&gt;   1:  M109_R192_157              1 4.158972    108.0687       C1=CC(=CC=C1N)N</span></span>
+<span><span class="co">#&gt;   2:  M109_R192_157              1 4.028166    108.0687     C1=CC=C(C(=C1)N)N</span></span>
+<span><span class="co">#&gt;   3:  M109_R192_157              1 3.686926    108.0687       C1=CC=C(C=C1)NN</span></span>
+<span><span class="co">#&gt;   4:  M109_R192_157              1 3.012428    108.0687       CC1=CC(=NC=C1)N</span></span>
+<span><span class="co">#&gt;   5:  M109_R192_157              1 2.986042    108.0687     C1=CC(=CC(=C1)N)N</span></span>
+<span><span class="co">#&gt;  ---                                                                         </span></span>
+<span><span class="co">#&gt; 861: M186_R293_1568              3 2.930620    185.2143       CCCCCCC(CCCC)CN</span></span>
+<span><span class="co">#&gt; 862: M186_R293_1568              3 2.864485    185.2143   CCCC(CCC)(CCC)N(C)C</span></span>
+<span><span class="co">#&gt; 863: M186_R293_1568              3 2.854763    185.2143   CCCC(CCC)(CC(C)C)NC</span></span>
+<span><span class="co">#&gt; 864: M186_R293_1568              3 2.843468    185.2143     CCCC(CCC)(CCC)NCC</span></span>
+<span><span class="co">#&gt; 865: M186_R293_1568              3 2.824611    185.2143 CC(C)CC(C)NC(C)CC(C)C</span></span></code></pre>
 <div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/generics.html">plotSpectrum</a></span><span class="op">(</span><span class="va">mslists</span>, <span class="st">"M186_R293_1568"</span>, MSLevel <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <p><img src="tutorial_files/figure-html/plotSpectrum-1.png" width="576"></p>

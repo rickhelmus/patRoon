@@ -690,11 +690,9 @@ assertCheckSession <- function(x, mustExist, null.ok = FALSE, .var.name = checkm
 checkSetLabels <- function(x, len)
 {
     ret <- checkmate::checkCharacter(x, min.chars = 1, any.missing = FALSE, len = len, unique = TRUE)
-    if (isTRUE(ret) && any(grepl(",", x, fixed = TRUE)))
-        ret <- "Set labels cannot contain commas"
-    if (isTRUE(ret) && any(grepl("-", x, fixed = TRUE)))
-        ret <- "Set labels cannot contain minus signs (-)"
-    if (isTRUE(ret) && any(grepl("genform|sirius|bruker|metfrag", x)))
+    if (isTRUE(ret) && any(grepl("\\W", x)))
+        ret <- "Set labels should only contain alphanumeric characters and underscores"
+    if (isTRUE(ret) && any(grepl("genform|sirius|bruker|metfrag|library", x)))
         ret <- "Set labels cannot contain annotation algorithm names"
     return(ret)
 }

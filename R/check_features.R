@@ -297,8 +297,8 @@ checkFeaturesInterface$methods(
 #' 
 #' @rdname check-GUI
 #' @export
-importCheckFeaturesSession <- function(sessionIn, sessionOut, fGroups, rtWindow = 6, mzWindow = 0.002,
-                                       overWrite = FALSE)
+importCheckFeaturesSession <- function(sessionIn, sessionOut, fGroups, rtWindow = defaultLim("retention", "narrow"),
+                                       mzWindow = defaultLim("mz", "narrow"), overWrite = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     assertCheckSession(sessionIn, mustExist = TRUE, add = ac)

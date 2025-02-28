@@ -95,7 +95,8 @@ unifyLibNames <- function(cTab)
 setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakLists,
                                                                 specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
                                                                 MSLibrary, minSim = 0.75,
-                                                                minAnnSim = minSim, absMzDev = 0.002, adduct = NULL,
+                                                                minAnnSim = minSim,
+                                                                absMzDev = defaultLim("mz", "narrow"), adduct = NULL,
                                                                 checkIons = "adduct", spectrumType = "MS2",
                                                                 specSimParamsLib = specSimParams)
 {
@@ -333,7 +334,8 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
 setMethod("generateCompoundsLibrary", "featureGroupsSet", function(fGroups, MSPeakLists,
                                                                    specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
                                                                    MSLibrary, minSim = 0.75,
-                                                                   minAnnSim = minSim, absMzDev = 0.002, adduct = NULL,
+                                                                   minAnnSim = minSim,
+                                                                   absMzDev = defaultLim("mz", "narrow"), adduct = NULL,
                                                                    ..., setThreshold = 0, setThresholdAnn = 0,
                                                                    setAvgSpecificScores = FALSE)
 {

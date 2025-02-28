@@ -407,7 +407,7 @@ setMethod("plotScoresHash", "formulas", function(obj, index, groupName, analysis
 })
 
 #' @export
-setMethod("estimateIDLevels", "formulas", function(obj, absMzDev = 0.005, normalizeScores = "max",
+setMethod("estimateIDLevels", "formulas", function(obj, absMzDev = defaultLim("mz", "medium"), normalizeScores = "max",
                                                    IDFile = system.file("misc", "IDLevelRules.yml", package = "patRoon"),
                                                    logPath = NULL, parallel = TRUE)
 {

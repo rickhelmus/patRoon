@@ -9,7 +9,8 @@ featureGroupsIMS <- setClass("featureGroupsIMS", contains = "featureGroups")
 setMethod("initialize", "featureGroupsIMS",
           function(.Object, groupAlgo, ...) callNextMethod(.Object, algorithm = paste0("ims-", groupAlgo), ...))
 
-setMethod("groupFeaturesIMS", "features", function(feat, groupAlgo, IMSWindow = 0.02, ..., verbose = FALSE)
+setMethod("groupFeaturesIMS", "features", function(feat, groupAlgo, IMSWindow = defaultLim("mobility", "medium"), ...,
+                                                   verbose = FALSE)
 {
     # UNDONE: doc verbose bahavior
     # UNDONE: check that all features are orphans?

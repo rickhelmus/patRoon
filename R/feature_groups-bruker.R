@@ -38,7 +38,8 @@ setMethod("initialize", "featureGroupsBruker",
 #' @inherit importFeatureGroups return
 #'
 #' @export
-importFeatureGroupsBrukerPA <- function(path, feat, rtWindow = 12, mzWindow = 0.005, intWindow = 5, warn = TRUE)
+importFeatureGroupsBrukerPA <- function(path, feat, rtWindow = defaultLim("retention", "medium"),
+                                        mzWindow = defaultLim("mz", "medium"), intWindow = 5, warn = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFileExists(path, "r", add = ac)

@@ -12,9 +12,7 @@
     - add to handbook
     - add NEWS
 - update sysdata.rda
-- start using saveCacheDataList() on more places?
 - basic and default error handling for executeCommand()?
-- BUG: unescaped set names are now used regular expressions (problem if eg dot is present when make.unique was used)
 - update patRoonInst for new deps?
 - formulas: calcFeatures by default FALSE?
 
@@ -56,6 +54,8 @@
     - might also be nice for plotting chroms?
 - add IMSMatch filter for suspects?
 - convertMobilityToCCS() / convertCCSToMobility(): handle Waters data?
+- start using saveCacheDataList() on more places?
+
 
 ## newProject()
 
@@ -83,6 +83,7 @@
         - withMobility vs withIMS
 - don't use defaults for eg feature finding (and grouping)?
 - somehow cache defaultLim()?
+- tweak agilent defaults --> after application?
 
 ## TC
 
@@ -438,6 +439,7 @@
         - candidate column in CSV of pred tables now doesn't contain images
 - limits
     - lowered clusterMzWindow
+- sets names are now checked to not contain any special characters (besides underscores). Automatic labels are now separated by underscores instead of dots.
 
 ## Features
 

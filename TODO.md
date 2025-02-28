@@ -5,7 +5,6 @@
     - add to handbook
     - add NEWS
 - update sysdata.rda
-- basic and default error handling for executeCommand()?
 - update patRoonInst for new deps?
 - formulas: calcFeatures by default FALSE?
 
@@ -48,6 +47,7 @@
 - add IMSMatch filter for suspects?
 - convertMobilityToCCS() / convertCCSToMobility(): handle Waters data?
 - start using saveCacheDataList() on more places?
+- basic and default error handling for executeCommand()?
 
 
 ## newProject()
@@ -122,7 +122,6 @@
         - update use of loadCacheData() (see bin features)
 - reporting
     - comps-clust: don't have imgs double in reportPlots
-- skip IMS fGroups annotation with high MS/MS similarity
 
 
 ## Tests
@@ -157,6 +156,7 @@
         - DT method: robustness with missing data in input/from
         - test for fGroups from screenInfo(), eg for fGroups with >1 suspect assigned
     - selectIMS filter: ensure that objects is fully reverted with IMS=FALSE
+    - minMobSpecSim
 - genLimitsFile()
 
 ## Docs
@@ -310,6 +310,11 @@
     - peakParams
         - doc common parameters that may need to be changed for IMS
         - doc that they could probably be optimized further
+    - spectrumSimilarityMobility() method/generic
+    - minMobSpecSim: clearly doc how things work
+        - results are simply copied from parent (including annSims)
+        - only fragInfos are updated
+        - ignored for MS only formulas
 - limits
     - defaults also used for params (EIXs etc) --> doc somehow
     - doc new functions

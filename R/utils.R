@@ -419,12 +419,12 @@ subListAttr <- function(l, el)
 
 pruneList <- function(l, checkEmptyElements = FALSE, checkZeroRows = FALSE, keepAttr = FALSE)
 {
-    wh <- !sapply(l, is.null)
+    inds <- which(!sapply(l, is.null))
     if (checkEmptyElements)
-        wh <- wh & lengths(l) > 0
+        inds <- inds[lengths(l[inds]) > 0]
     if (checkZeroRows)
-        wh <- wh & sapply(l, nrow) > 0
-    return(if (keepAttr) subListAttr(l, wh) else l[wh])    
+        inds <- inds[sapply(l[inds], nrow) > 0]
+    return(if (keepAttr) subListAttr(l, inds) else l[inds])    
 }
 
 makeEmptyListNamed <- function(li)

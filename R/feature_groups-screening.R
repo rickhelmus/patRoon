@@ -297,7 +297,7 @@ setMethod("calculateTox", "featureGroupsScreening", function(fGroups, featureAnn
 #' @aliases annotateSuspects
 #' @export
 setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeakLists, formulas, compounds,
-                                                                 absMzDev = 0.005,
+                                                                 absMzDev = defaultLim("mz", "medium"),
                                                                  checkFragments = c("mz", "formula", "compound"),
                                                                  formulasNormalizeScores = "max",
                                                                  compoundsNormalizeScores = "max",
@@ -518,10 +518,13 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = NULL
 })
 
 #' @export
-setMethod("assignMobilities", "featureGroupsScreening", function(obj, mobPeakParams = NULL, IMSWindow = 0.01,
+setMethod("assignMobilities", "featureGroupsScreening", function(obj, mobPeakParams = NULL,
+                                                                 IMSWindow = defaultLim("mobility", "medium"),
                                                                  clusterMethod = "distance", minIntensityIMS = 25,
-                                                                 maxMSRTWindow = 2, chromPeakParams = NULL,
-                                                                 EICRTWindow = 20, peakRTWindow = 5,
+                                                                 maxMSRTWindow = defaultLim("retention", "very_narrow"),
+                                                                 chromPeakParams = NULL,
+                                                                 EICRTWindow = defaultLim("retention", "wide"),
+                                                                 peakRTWindow = defaultLim("retention", "narrow"),
                                                                  calcArea = "integrate", fallbackEIC = TRUE,
                                                                  CCSParams = NULL, parallel = TRUE, fromSuspects = FALSE,
                                                                  IMSMatchParams = NULL)

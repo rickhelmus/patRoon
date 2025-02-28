@@ -304,10 +304,14 @@ setMethod("calculateTox", "featureGroupsSet", function(fGroups, featureAnn)
 })
 
 #' @export
-setMethod("assignMobilities", "featureGroupsSet", function(obj, mobPeakParams = NULL, IMSWindow = 0.01,
+setMethod("assignMobilities", "featureGroupsSet", function(obj, mobPeakParams = NULL,
+                                                           IMSWindow = defaultLim("mobility", "medium"),
                                                            clusterMethod = "distance", minIntensityIMS = 25,
-                                                           maxMSRTWindow = 2, chromPeakParams = NULL, EICRTWindow = 20,
-                                                           peakRTWindow = 5, calcArea = "integrate", fallbackEIC = TRUE,
+                                                           maxMSRTWindow = defaultLim("retention", "very_narrow"),
+                                                           chromPeakParams = NULL,
+                                                           EICRTWindow = defaultLim("retention", "wide"),
+                                                           peakRTWindow = defaultLim("retention", "narrow"),
+                                                           calcArea = "integrate", fallbackEIC = TRUE,
                                                            CCSParams = NULL, parallel = TRUE)
 {
     # NOTE: keep args in sync with other methods

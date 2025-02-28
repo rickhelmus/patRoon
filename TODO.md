@@ -16,6 +16,7 @@
 - basic and default error handling for executeCommand()?
 - BUG: unescaped set names are now used regular expressions (problem if eg dot is present when make.unique was used)
 - update patRoonInst for new deps?
+- formulas: calcFeatures by default FALSE?
 
 
 ## Maybe
@@ -68,20 +69,20 @@
     - see if getAllMSFilesFromAnaInfo() can be used, otherwise remove it
     - use of getMSFileConversionFormats()
     - add im_collapse and timsconvert
+- remove default limits that are in limits.yml
+- copy limits file and UI to specify IMS default
+
 
 ## Param defaults
 
-- Think of an approach to centralize defaults for tolerances (m/z, RT, mob)
-- Have different defaults for Agilent/Bruker IMS
 - Harmonize/consistent names
     - maxMSRtWindow --> maxMSRTWindow
     - be consistent in mobility vs IMS and mobilograms and EIMs
         - mobWindow and IMSWindow now randomly used
         - IMS arg but affects mobility features
         - withMobility vs withIMS
-- getIMSMatchParams()
-    - tweak defaults
-    - also distinction for Agilent/Bruker
+- don't use defaults for eg feature finding (and grouping)?
+- somehow cache defaultLim()?
 
 ## TC
 
@@ -162,6 +163,7 @@
         - DT method: robustness with missing data in input/from
         - test for fGroups from screenInfo(), eg for fGroups with >1 suspect assigned
     - selectIMS filter: ensure that objects is fully reverted with IMS=FALSE
+- genLimitsFile()
 
 ## Docs
 
@@ -233,7 +235,7 @@
     - MetFrag: don't do MP for non-local databases to avoid connection errors
 - msdata
     - getMSFileFormats()
-    - patRoon.threads, patRoon.MS.backends, patRoon.MS.preferIMS and patRoon.path.BrukerTIMS options
+    - patRoon.threads, patRoon.MS.backends, patRoon.MS.preferIMS, patRoon.path.BrukerTIMS and patRoon.path.limits options
         - patRoon.MS.preferIMS: only works for MSTK/SC, ie putting OTIMS in front doesn't work
     - update PListParams
     - updated convertMSFilesXXX() functions, including changed args
@@ -314,6 +316,10 @@
     - peakParams
         - doc common parameters that may need to be changed for IMS
         - doc that they could probably be optimized further
+- limits
+    - defaults also used for params (EIXs etc) --> doc somehow
+    - doc new functions
+    - appendix in Handbook
 
 
 ## NEWS
@@ -430,6 +436,8 @@
     - reporting
         - size optimizations, mainly for self contained (lzstring, no duplicate images)
         - candidate column in CSV of pred tables now doesn't contain images
+- limits
+    - lowered clusterMzWindow
 
 ## Features
 

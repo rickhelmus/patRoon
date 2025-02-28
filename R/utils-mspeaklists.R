@@ -75,7 +75,7 @@ emptyMSPeakList <- function(abundanceColumn, avgCols)
 #' @export
 getDefAvgPListParams <- function(...)
 {
-    def <- list(clusterMzWindow = 0.005,
+    def <- list(clusterMzWindow = defaultLim("mz", "narrow"),
                 topMost = 50,
                 minIntensityPre = 500,
                 minIntensityPost = 500,
@@ -175,7 +175,7 @@ getDefSpecSimParams <- function(...)
                 removePrecursor = FALSE,
                 mzWeight = 0,
                 intWeight = 1,
-                absMzDev = 0.005,
+                absMzDev = defaultLim("mz", "medium"),
                 relMinIntensity = 0.05,
                 minPeaks = 1,
                 shift = "none",
@@ -512,7 +512,7 @@ binPeakLists <- function(pl1, pl2, shift, absMzDev)
 
 # NOTE: This function is mainly for debugging the C++ version
 specSimilarityR <- function(pl1, pl2, method, shift = "none", removePrecursor = FALSE, mzWeight = 0, intWeight = 1,
-                           absMzDev = 0.005, relMinIntensity = 0.1)
+                           absMzDev = defaultLim("mz", "medium"), relMinIntensity = 0.1)
 {
     # UNDONE: refs
     

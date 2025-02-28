@@ -285,9 +285,9 @@ getDefEIXParams <- function()
         topMost = NULL,
         topMostByReplicate = FALSE,
         onlyPresent = TRUE,
-        mzExpWindow = 0.001,
-        mobExpWindow = 0.005,
-        mzExpIMSWindow = 0.005,
+        mzExpWindow = defaultLim("mz", "very_narrow"),
+        mobExpWindow = defaultLim("mobility", "very_narrow"),
+        mzExpIMSWindow = defaultLim("mz", "medium"),
         minIntensityIMS = 25,
         setsAdductPos = "[M+H]+",
         setsAdductNeg = "[M-H]-"

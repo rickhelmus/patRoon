@@ -842,6 +842,49 @@ assertAndPrepareReportSettings <- function(settings, setAggr = TRUE)
     return(settings)
 }
 
+assertAndPrepareLimits <- function(limits)
+{
+    checkmate::assertList(limits, any.missing = FALSE)
+    assertHasNames(limits, c("general", "retention", "mz", "mobility_bruker", "mobility_agilent", "CCS"))
+    
+    assertListVal(limits, "general", checkmate::assertList, any.missing = FALSE)
+    assertListVal(limits$general, "version", checkmate::assertCount, positive = TRUE)
+    
+    # check version first: if file is older we silently update it so subsequent checks won't fail
+    # NOTE: this for the future
+    
+    ac <- checkmate::makeAssertCollection()
+    assertListVal(limits$general, "IMS", checkmate::assertChoice, choices = c("bruker", "agilent"), add = ac)
+
+    
+    levels <- c("very_narrow", "narrow", "medium", "wide")
+    levels <- c(levels, paste0(levels, "_rel"))
+    for (categ in setdiff(names(limits), "general"))
+    {
+        assertListVal(limits, categ, checkmate::assertList, any.missing = FALSE, add = ac)
+        assertListVal(limits, categ, assertHasNames, n = levels, subset = TRUE, add = ac)
+        for (limit in names(limits[[categ]]))
+            assertListVal(limits[[categ]], limit, checkmate::assertNumber, lower = 0, finite = TRUE,
+                          .var.name = paste0("limits$", categ), add = ac)
+        
+    }
+    
+    checkmate::reportAssertions(ac)
+    
+    if (limits$general$IMS == "bruker")
+    {
+        limits$mobility_agilent <- NULL
+        names(limits)[which(names(limits) == "mobility_bruker")] <- "mobility"
+    }
+    else
+    {
+        limits$mobility_bruker <- NULL
+        names(limits)[which(names(limits) == "mobility_agilent")] <- "mobility"
+    }
+    
+    return(limits)
+}
+
 checkConcUnit <- function(x)
 {
     bases <- c("n", "u", "m", "")

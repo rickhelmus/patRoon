@@ -66,7 +66,7 @@ setMethod("expandForIMS", "componentsCliqueMS", function(obj, ...) cannotExpandC
 setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ionization = NULL, maxCharge = 1,
                                                                   maxGrade = 2, ppm = 10,
                                                                   adductInfo = NULL,
-                                                                  absMzDev = 0.005, minSize = 2,
+                                                                  absMzDev = defaultLim("mz", "medium"), minSize = 2,
                                                                   relMinAdductAbundance = 0.75,
                                                                   adductConflictsUsePref = TRUE,
                                                                   NMConflicts = c("preferential", "mostAbundant", "mostIntense"),

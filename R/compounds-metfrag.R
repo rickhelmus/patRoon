@@ -562,8 +562,10 @@ MFMPErrorHandler <- function(cmd, exitStatus, retries)
 setMethod("generateCompoundsMetFrag", "featureGroups", function(fGroups, MSPeakLists,
                                                                 specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
                                                                 method = "CL", timeout = 300, timeoutRetries = 2,
-                                                                errorRetries = 2, topMost = 100, dbRelMzDev = 5,
-                                                                fragRelMzDev = 5, fragAbsMzDev = 0.002, adduct = NULL,
+                                                                errorRetries = 2, topMost = 100,
+                                                                dbRelMzDev = defaultLim("mz", "narrow_rel"),
+                                                                fragRelMzDev = defaultLim("mz", "narrow_rel"),
+                                                                fragAbsMzDev = defaultLim("mz", "narrow"), adduct = NULL,
                                                                 database = "pubchem", extendedPubChem = "auto", chemSpiderToken = "",
                                                                 scoreTypes = compoundScorings("metfrag", database, onlyDefault = TRUE)$name,
                                                                 scoreWeights = 1.0,
@@ -798,7 +800,9 @@ setMethod("generateCompoundsMetFrag", "featureGroupsSet", function(fGroups, MSPe
                                                                    specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
                                                                    method = "CL", timeout = 300,
                                                                    timeoutRetries = 2, errorRetries = 2, topMost = 100,
-                                                                   dbRelMzDev = 5, fragRelMzDev = 5, fragAbsMzDev = 0.002,
+                                                                   dbRelMzDev = defaultLim("mz", "narrow_rel"),
+                                                                   fragRelMzDev = defaultLim("mz", "narrow_rel"),
+                                                                   fragAbsMzDev = defaultLim("mz", "narrow"),
                                                                    adduct = NULL, ..., setThreshold = 0,
                                                                    setThresholdAnn = 0, setAvgSpecificScores = FALSE)
 {

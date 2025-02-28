@@ -218,7 +218,8 @@ setMethod("predictRespFactors", "formulasSet", doFeatAnnPredictRFSets)
 setMethod("predictTox", "formulasSet", doFeatAnnPredictToxSets)
 
 #' @export
-setMethod("estimateIDLevels", "formulasSet", function(obj, absMzDev = 0.005, normalizeScores = "max",
+setMethod("estimateIDLevels", "formulasSet", function(obj, absMzDev = defaultLim("mz", "medium"),
+                                                      normalizeScores = "max",
                                                       IDFile = system.file("misc", "IDLevelRules.yml", package = "patRoon"),
                                                       logPath = NULL, parallel = TRUE)
 {

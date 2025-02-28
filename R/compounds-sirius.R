@@ -274,7 +274,7 @@ setMethod("predictTox", "compoundsSIRIUS", function(obj, type = "FP", LC50Mode =
 #' @export
 setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLists,
                                                                specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
-                                                               relMzDev = 5, adduct = NULL,
+                                                               relMzDev = defaultLim("mz", "narrow_rel"), adduct = NULL,
                                                                projectPath = NULL, elements = "CHNOP",
                                                                profile = "qtof", formulaDatabase = NULL,
                                                                fingerIDDatabase = "pubchem", noise = NULL,
@@ -345,7 +345,7 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
 #' @export
 setMethod("generateCompoundsSIRIUS", "featureGroupsSet", function(fGroups, MSPeakLists,
                                                                   specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
-                                                                  relMzDev = 5, adduct = NULL,
+                                                                  relMzDev = defaultLim("mz", "narrow_rel"), adduct = NULL,
                                                                   projectPath = NULL, ..., setThreshold = 0,
                                                                   setThresholdAnn = 0, setAvgSpecificScores = FALSE)
 {

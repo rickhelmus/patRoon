@@ -551,7 +551,7 @@ getBGMSMSPeaks <- function(anaInfo, replicates = NULL, MSLevel = 2, retentionRan
 getDefEICParams <- function(...)
 {
     def <- getDefEIXParams()
-    def$window <- 30
+    def$window <- defaultLim("retention", "wide")
     
     mod <- list(...)
     if (!is.null(mod[["rtWindow"]]))
@@ -570,9 +570,9 @@ getDefEIMParams <- function(...)
 {
     def <- getDefEIXParams()
     def <- modifyList(def, list(
-        window = 0.2,
-        maxRTWindow = 2,
-        IMSWindow = 0.01,
+        window = defaultLim("mobility", "wide"),
+        maxRTWindow = defaultLim("retention", "very_narrow"),
+        IMSWindow = defaultLim("mobility", "medium"),
         clusterMethod = "distance"
     ))
     return(modifyList(def, list(...), keep.null = TRUE))
@@ -753,13 +753,10 @@ getIMSMatchParams <- function(param, ...)
     
     if (is.null(ret[["window"]]))
     {
-        # UNDONE: tweak
-        ret$window <- if (ret$relative)
-            0.05
-        else if (ret$param == "mobility")
-            0.03
+        if (ret$param == "mobility")
+            ret$window <- if (ret$relative) defaultLim("mobility", "medium_rel") else defaultLim("mobility", "medium")
         else # CCS
-            10
+            ret$window <- if (ret$relative) defaultLim("CCS", "medium_rel") else defaultLim("CCS", "medium")
     }
     
     return(ret)

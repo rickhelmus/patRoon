@@ -477,8 +477,8 @@ setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity 
                                             minAbundanceFeatRel = NULL, minAbundanceFeatAbs = NULL,
                                             minAbundanceFGroupRel = NULL, minAbundanceFGroupAbs = NULL,
                                             isolatePrec = NULL, deIsotope = FALSE, removeMZs = NULL, withMSMS = FALSE,
-                                            annotatedBy = NULL, retainPrecursor = TRUE, mzWindow = 0.005,
-                                            reAverage = FALSE, negate = FALSE)
+                                            annotatedBy = NULL, retainPrecursor = TRUE,
+                                            mzWindow = defaultLim("mz", "medium"), reAverage = FALSE, negate = FALSE)
 {
     if (is.logical(isolatePrec) && isolatePrec == TRUE)
         isolatePrec <- getDefIsolatePrecParams()
@@ -825,7 +825,8 @@ setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupNa
 #' @templateVar what generateMSPeakLists
 #' @template main-rd-method
 #' @export
-setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRtWindow = 5, topMost = NULL,
+setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRtWindow = defaultLim("retention", "narrow"),
+                                                           topMost = NULL,
                                                            avgFeatParams = getDefAvgPListParams(),
                                                            avgFGroupParams = getDefAvgPListParams())
 {

@@ -128,8 +128,9 @@ setMethod("expandForIMS", "componentsNT", function(obj, ...) cannotExpandComponI
 #' @export
 setMethod("generateComponentsNontarget", "featureGroups", function(fGroups, ionization = NULL, rtRange = c(-120, 120),
                                                                    mzRange = c(5, 120), elements = c("C", "H", "O"),
-                                                                   rtDev = 30, absMzDev = 0.002,
-                                                                   absMzDevLink = absMzDev * 2, 
+                                                                   rtDev = defaultLim("retention", "wide"),
+                                                                   absMzDev = defaultLim("mz", "narrow"),
+                                                                   absMzDevLink = defaultLim("mz", "medium"), 
                                                                    traceHack = all(R.Version()[c("major", "minor")] >= c(3, 4)),
                                                                    ...)
 {

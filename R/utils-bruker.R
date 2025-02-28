@@ -309,8 +309,9 @@ makeDAEIC <- function(mz, mzWindow, ctype = "EIC", mtype = "MS", polarity = "bot
 
 #' @rdname bruker-utils
 #' @export
-addDAEIC <- function(analysis, path, mz, mzWindow = 0.005, ctype = "EIC", mtype = "MS", polarity = "both", bgsubtr = FALSE, fragpath = "",
-                     name = NULL, hideDA = TRUE, close = FALSE, save = close)
+addDAEIC <- function(analysis, path, mz, mzWindow = defaultLim("mz", "medium"), ctype = "EIC", mtype = "MS",
+                     polarity = "both", bgsubtr = FALSE, fragpath = "", name = NULL, hideDA = TRUE, close = FALSE,
+                     save = close)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertString(analysis, min.chars = 1, add = ac)
@@ -363,7 +364,7 @@ addDAEIC <- function(analysis, path, mz, mzWindow = 0.005, ctype = "EIC", mtype 
 #'
 #' @rdname bruker-utils
 #' @export
-addAllDAEICs <- function(fGroups, mzWindow = 0.005, ctype = "EIC", bgsubtr = FALSE, name = TRUE,
+addAllDAEICs <- function(fGroups, mzWindow = defaultLim("mz", "medium"), ctype = "EIC", bgsubtr = FALSE, name = TRUE,
                          onlyPresent = TRUE, hideDA = TRUE, close = FALSE, save = close)
 {
     ac <- checkmate::makeAssertCollection()

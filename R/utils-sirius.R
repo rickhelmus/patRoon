@@ -326,6 +326,8 @@ doSIRIUS <- function(fGroups, MSPeakLists, doFeatures, profile, adduct, relMzDev
     {
         pLists <- peakLists(MSPeakLists)
         flattenedPLists <- unlist(pLists, recursive = FALSE)
+        # assign a short name as SIRIUS seems to truncate long IDs
+        names(flattenedPLists) <- paste0("flat", seq_along(flattenedPLists))
         
         # important: assign before flattenedPLists subset steps below
         flPLMeta <- data.table(name = names(flattenedPLists),

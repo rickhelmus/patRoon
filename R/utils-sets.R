@@ -37,7 +37,7 @@ prepareMakeSetAdducts <- function(objects, adducts, labels)
         names(adducts) <- labels
     }
     else
-        names(adducts) <- make.unique(ifelse(sapply(adducts, "slot", "charge") < 0, "negative", "positive"))
+        names(adducts) <- make.unique(ifelse(sapply(adducts, "slot", "charge") < 0, "negative", "positive"), sep = "_")
     
     return(adducts)
 }

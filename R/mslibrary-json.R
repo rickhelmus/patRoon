@@ -30,7 +30,7 @@ NULL
 #'
 #' @export
 loadMSLibraryMoNAJSON <- function(file, prefCalcChemProps = TRUE, neutralChemProps = FALSE, potAdducts = TRUE,
-                                  potAdductsLib = TRUE, absMzDev = 0.002, calcSPLASH = TRUE)
+                                  potAdductsLib = TRUE, absMzDev = defaultLim("mz", "narrow"), calcSPLASH = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFileExists(file, "r", add = ac)

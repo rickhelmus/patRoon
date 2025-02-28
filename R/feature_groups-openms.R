@@ -60,9 +60,11 @@ setMethod("initialize", "featureGroupsOpenMS",
 #' @templateVar cl features
 #' @template main-rd-method
 #' @export
-setMethod("groupFeaturesOpenMS", "features", function(feat, rtalign = TRUE, QT = FALSE, maxAlignRT = 30,
-                                                      maxAlignMZ = 0.005, maxGroupRT = 12,
-                                                      maxGroupMZ = 0.005, extraOptsRT = NULL,
+setMethod("groupFeaturesOpenMS", "features", function(feat, rtalign = TRUE, QT = FALSE,
+                                                      maxAlignRT = defaultLim("retention", "wide"),
+                                                      maxAlignMZ = defaultLim("mz", "medium"),
+                                                      maxGroupRT = defaultLim("retention", "medium"),
+                                                      maxGroupMZ = defaultLim("mz", "medium"), extraOptsRT = NULL,
                                                       extraOptsGroup = NULL, verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()

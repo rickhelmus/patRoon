@@ -364,7 +364,7 @@ getScriptCode <- function(input, anaInfo)
             list(name = "rtRange", value = c(-120, 120), condition = input$components == "nontarget"),
             list(name = "mzRange", value = c(5, 120), condition = input$components == "nontarget"),
             list(name = "elements", value = c("C", "H", "O"), quote = TRUE, condition = input$components == "nontarget"),
-            list(name = "rtDev", value = 30, condition = input$components == "nontarget"),
+            list(name = "rtDev", value = defaultLim("retention", "wide"), condition = input$components == "nontarget"),
             list(name = "absMzDev", value = 0.002, condition = input$components == "nontarget")
         ))
         
@@ -529,7 +529,8 @@ getScriptCode <- function(input, anaInfo)
                 list(value = "mslists"),
                 list(value = tolower(input$formulaGen), quote = TRUE),
                 list(name = "relMzDev", value = 5, condition = input$formulaGen != "Bruker"),
-                list(name = "precursorMzSearchWindow", value = 0.002, condition = input$formulaGen == "Bruker"),
+                list(name = "precursorMzSearchWindow", value = defaultLim("mz", "narrow"),
+                     condition = input$formulaGen == "Bruker"),
                 getAdductArg(),
                 list(name = "elements", value = "CHNOP", quote = TRUE, condition = input$formulaGen != "Bruker"),
                 list(name = "oc", value = FALSE, condition = input$formulaGen == "GenForm"),

@@ -202,8 +202,8 @@ setMethod("delete", "MSPeakListsSet", function(obj, i = NULL, j = NULL, k = NULL
 #' @rdname MSPeakLists-class
 #' @export
 setMethod("filter", "MSPeakListsSet", function(obj, ..., removeMZs = NULL, withMSMS = FALSE, annotatedBy = NULL,
-                                               retainPrecursor = TRUE, mzWindow = 0.005, reAverage = FALSE,
-                                               negate = FALSE, sets = NULL)
+                                               retainPrecursor = TRUE, mzWindow = defaultLim("mz", "medium"),
+                                               reAverage = FALSE, negate = FALSE, sets = NULL)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(negate, add = ac)

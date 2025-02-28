@@ -338,12 +338,13 @@ processGenFormResultFile <- function(file, isMSMS, adduct, topMost)
 #' @export
 setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLists,
                                                                specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
-                                                               relMzDev = 5, adduct = NULL,
+                                                               relMzDev = defaultLim("mz", "narrow_rel"), adduct = NULL,
                                                                elements = "CHNOP", hetero = TRUE, oc = FALSE,
                                                                thrMS = NULL, thrMSMS = NULL, thrComb = NULL,
                                                                maxCandidates = Inf, extraOpts = NULL,
                                                                calculateFeatures = TRUE, featThreshold = 0,
-                                                               featThresholdAnn = 0.75, absAlignMzDev = 0.002,
+                                                               featThresholdAnn = 0.75,
+                                                               absAlignMzDev = defaultLim("mz", "narrow"),
                                                                MSMode = "both", isolatePrec = TRUE, timeout = 120,
                                                                topMost = 50, batchSize = 8)
 {
@@ -472,9 +473,9 @@ setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLi
 #' @export
 setMethod("generateFormulasGenForm", "featureGroupsSet", function(fGroups, MSPeakLists,
                                                                   specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
-                                                                  relMzDev = 5, adduct = NULL,
-                                                                  ..., setThreshold = 0, setThresholdAnn = 0,
-                                                                  setAvgSpecificScores = FALSE)
+                                                                  relMzDev = defaultLim("mz", "narrow_rel"),
+                                                                  adduct = NULL, ..., setThreshold = 0,
+                                                                  setThresholdAnn = 0, setAvgSpecificScores = FALSE)
 {
     generateFormulasSet(fGroups, MSPeakLists, specSimParams, adduct, generateFormulasGenForm, relMzDev = relMzDev, ...,
                         setThreshold = setThreshold, setThresholdAnn = setThresholdAnn,

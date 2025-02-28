@@ -66,7 +66,8 @@ setMethod("expandForIMS", "componentsRC", function(obj, ...) cannotExpandComponI
 #' @export
 setMethod("generateComponentsRAMClustR", "featureGroups", function(fGroups, ionization = NULL, st = NULL, sr = NULL,
                                                                    maxt = 12, hmax = 0.3, normalize = "TIC",
-                                                                   absMzDev = 0.002, relMzDev = 5,
+                                                                   absMzDev = defaultLim("mz", "narrow"),
+                                                                   relMzDev = defaultLim("mz", "narrow_rel"),
                                                                    minSize = 2, relMinReplicates = 0.5,
                                                                    RCExperimentVals = list(design = list(platform = "LC-MS"),
                                                                                            instrument = list(ionization = ionization, MSlevs = 1)),

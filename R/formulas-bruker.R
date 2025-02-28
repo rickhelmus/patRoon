@@ -68,9 +68,11 @@ getEmptyDAFragInfo <- function() data.table(mz = numeric(), ion_formula = charac
 #' @export
 setMethod("generateFormulasDA", "featureGroups", function(fGroups, MSPeakLists,
                                                           specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
-                                                          precursorMzSearchWindow = 0.002, MSMode = "both",
-                                                          adduct = NULL, featThreshold = 0, featThresholdAnn = 0.75,
-                                                          absAlignMzDev = 0.002, save = TRUE, close = save)
+                                                          precursorMzSearchWindow = defaultLim("mz", "narrow"),
+                                                          MSMode = "both", adduct = NULL, featThreshold = 0,
+                                                          featThresholdAnn = 0.75,
+                                                          absAlignMzDev = defaultLim("mz", "narrow"), save = TRUE,
+                                                          close = save)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
@@ -315,9 +317,9 @@ setMethod("generateFormulasDA", "featureGroups", function(fGroups, MSPeakLists,
 #' @export
 setMethod("generateFormulasDA", "featureGroupsSet", function(fGroups, MSPeakLists,
                                                              specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
-                                                             precursorMzSearchWindow = 0.002, MSMode = "both",
-                                                             adduct = NULL, ..., setThreshold = 0, setThresholdAnn = 0,
-                                                             setAvgSpecificScores = FALSE)
+                                                             precursorMzSearchWindow = defaultLim("mz", "narrow"),
+                                                             MSMode = "both", adduct = NULL, ..., setThreshold = 0,
+                                                             setThresholdAnn = 0, setAvgSpecificScores = FALSE)
 {
     generateFormulasSet(fGroups, MSPeakLists, specSimParams, adduct, generateFormulasDA,
                         precursorMzSearchWindow = precursorMzSearchWindow, MSMode = MSMode, ...,

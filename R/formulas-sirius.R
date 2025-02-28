@@ -260,13 +260,15 @@ setMethod("predictTox", "formulasSIRIUS", function(obj, LC50Mode = "static", con
 #' @export
 setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLists,
                                                               specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
-                                                              relMzDev = 5, adduct = NULL, projectPath = NULL,
+                                                              relMzDev = defaultLim("mz", "narrow_rel"),
+                                                              adduct = NULL, projectPath = NULL,
                                                               elements = "CHNOP", profile = "qtof", database = NULL,
                                                               noise = NULL, cores = NULL, getFingerprints = FALSE,
                                                               topMost = 100, login = FALSE, alwaysLogin = FALSE,
                                                               extraOptsGeneral = NULL, extraOptsFormula = NULL,
                                                               calculateFeatures = TRUE, featThreshold = 0,
-                                                              featThresholdAnn = 0.75, absAlignMzDev = 0.002,
+                                                              featThresholdAnn = 0.75,
+                                                              absAlignMzDev = defaultLim("mz", "narrow"),
                                                               verbose = TRUE, splitBatches = FALSE, dryRun = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
@@ -364,7 +366,8 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
 #' @export
 setMethod("generateFormulasSIRIUS", "featureGroupsSet", function(fGroups, MSPeakLists,
                                                                  specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
-                                                                 relMzDev = 5, adduct = NULL, projectPath = NULL, ...,
+                                                                 relMzDev = defaultLim("mz", "narrow_rel"),
+                                                                 adduct = NULL, projectPath = NULL, ...,
                                                                  setThreshold = 0, setThresholdAnn = 0,
                                                                  setAvgSpecificScores = FALSE)
 {

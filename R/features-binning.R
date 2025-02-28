@@ -118,8 +118,8 @@ getFeaturesEICsParams <- function(methodMZ, methodIMS = NULL, ...)
     else if (methodMZ == "suspects")
     {
         ret <- modifyList(ret, list(
-            rtWindow = 12,
-            mzWindow = 0.005,
+            rtWindow = defaultLim("retention", "medium"),
+            mzWindow = defaultLim("mz", "medium"),
             # UNDONE these to separate param and also use elsewhere?
             skipInvalid = TRUE,
             prefCalcChemProps = TRUE,
@@ -129,8 +129,8 @@ getFeaturesEICsParams <- function(methodMZ, methodIMS = NULL, ...)
     else if (methodMZ == "ms2")
     {
         ret <- modifyList(ret, list(
-            rtWindow = 3,
-            mzWindow = 0.005,
+            rtWindow = defaultLim("retention", "very_narrow"),
+            mzWindow = defaultLim("mz", "narrow"),
             minTIC = 10000,
             clusterMethod = "distance"
         ))
@@ -148,13 +148,13 @@ getFeaturesEICsParams <- function(methodMZ, methodIMS = NULL, ...)
         else if (methodIMS == "suspects")
         {
             ret <- modifyList(ret, list(
-                IMSWindow = 0.02
+                IMSWindow = defaultLim("mobility", "medium")
             ))
         }
         else if (methodIMS == "ms2")
         {
             ret <- modifyList(ret, list(
-                IMSWindow = 0.02
+                IMSWindow = defaultLim("mobility", "medium") # UNDONE: or narrow?
             ))
         }
     }

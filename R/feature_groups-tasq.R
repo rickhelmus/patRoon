@@ -42,7 +42,7 @@ setMethod("initialize", "featureGroupsBrukerTASQ",
 #' @references \addCitations{fastcluster}{1}
 #'
 #' @export
-importFeatureGroupsBrukerTASQ <- function(path, analysisInfo, clusterRTWindow = 12)
+importFeatureGroupsBrukerTASQ <- function(path, analysisInfo, clusterRTWindow = defaultLim("retention", "medium"))
 {
     ac <- checkmate::makeAssertCollection()
     assertCSVFile(path, TASQImportCols(), add = ac)

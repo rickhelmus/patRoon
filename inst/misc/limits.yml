@@ -1,0 +1,28 @@
+general:
+    version: 1
+    IMS: bruker
+retention:
+    very_narrow: 2
+    narrow: 6
+    medium: 12
+    wide: 30
+mz:
+    very_narrow: 0.001
+    narrow: 0.002
+    medium: 0.005
+    narrow_rel: 5
+    medium_rel: 10
+mobility_bruker:
+    very_narrow: 0.005
+    narrow: 0.01
+    medium: 0.02
+    wide: 0.2
+    medium_rel: 0.05
+mobility_agilent:
+    narrow: 0.1
+    medium: 0.2
+    wide: 2
+    medium_rel: 0.05
+CCS:
+    medium: 10
+    medium_rel: 0.05

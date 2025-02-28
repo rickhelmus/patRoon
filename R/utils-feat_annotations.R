@@ -311,3 +311,51 @@ filterFeatAnnConsensus <- function(obj, absMinAbundance, relMinAbundance, unique
     
     return(obj)
 }
+
+getMobFeatAnnSpecSims <- function(MSPeakLists, fGroups, minMobSpecSim, specSimParams, doFGroups = TRUE)
+{
+    if (length(MSPeakLists) == 0 || !hasMobilities(fGroups) || minMobSpecSim == 0)
+        return(NULL)
+
+    mobSpecSims <- spectrumSimilarityMobility(MSPeakLists, fGroups, MSLevel = 2, warn = FALSE,
+                                              specSimParams = specSimParams, doFGroups = doFGroups)
+    return(mobSpecSims[!is.na(similarity) & numGTE(similarity, minMobSpecSim)])
+}
+
+updateFragInfosForCopiedMobResults <- function(annList, MSPL)
+{
+    if (length(annList) == 0)
+        return(annList)
+    
+    return(Map(annList, names(annList), f = function(ann, grp)
+    {
+        if (nrow(ann) == 0 || is.null(MSPL[[grp]]) || is.null(MSPL[[grp]][["MSMS"]]))
+            return(ann)
+        
+        ann <- copy(ann)
+        
+        for (r in seq_len(nrow(ann)))
+        {
+            fi <- ann$fragInfo[[r]]
+            if (!is.null(fi) && nrow(fi) > 0)
+            {
+                # update PLIDs or remove if non-existing
+                # HACK: for feature PLs there is no PLID column yet. For now, just only filter those...
+                
+                updatedPLIDs <- sapply(fi$mz, getMZIndexFromMSPeakList, MSPL[[grp]][["MSMS"]])
+                
+                if (is.null(fi[["PLID"]]))
+                    fi <- fi[!is.na(updatedPLIDs)]
+                else
+                {
+                    fi <- copy(fi)                    
+                    fi[, PLID := updatedPLIDs]
+                    fi <- fi[!is.na(PLID)]
+                }
+                set(ann, r, "fragInfo", list(fi))
+            }
+        }
+        
+        return(ann)
+    }))
+}

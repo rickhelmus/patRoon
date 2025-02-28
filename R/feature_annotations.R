@@ -69,7 +69,8 @@ featureAnnotations <- setClass("featureAnnotations",
                                slots = c(groupAnnotations = "list", scoreTypes = "character", scoreRanges = "list"),
                                contains = c("workflowStep", "VIRTUAL"))
 
-setMethod("initialize", "featureAnnotations", function(.Object, specSimParams, MSPeakLists, ...)
+setMethod("initialize", "featureAnnotations", function(.Object, specSimParams, MSPeakLists, ..., mobSpecSims = NULL,
+                                                       gNames = NULL)
 {
     .Object <- callNextMethod(.Object, ...)
     .Object@groupAnnotations <- makeEmptyListNamed(.Object@groupAnnotations)
@@ -97,6 +98,25 @@ setMethod("initialize", "featureAnnotations", function(.Object, specSimParams, M
         })
         
         printf(" Done!\n")
+    }
+    
+    if (!is.null(mobSpecSims))
+    {
+        mss <- mobSpecSims[ims_parent_group %chin% groupNames(.Object)]
+        if (nrow(mss) > 0)
+        {
+            .Object@groupAnnotations[mss$group] <- copy(.Object@groupAnnotations[mss$ims_parent_group])
+            .Object@groupAnnotations[mss$group] <- updateFragInfosForCopiedMobResults(.Object@groupAnnotations[mss$group],
+                                                                                      averagedPeakLists(MSPeakLists))
+            .Object@scoreRanges[mss$group] <- copy(.Object@scoreRanges[mss$ims_parent_group])
+            
+            # sync order
+            .Object@groupAnnotations <- .Object@groupAnnotations[intersect(gNames, groupNames(.Object))]
+            .Object@scoreRanges <- .Object@scoreRanges[intersect(gNames, groupNames(.Object))]
+
+            printf("Copied %d results to %d mobility feature groups with similar MS2 spectra.\n",
+                   sum(sapply(.Object@groupAnnotations[unique(mss$ims_parent_group)], nrow)), nrow(mss))
+        }
     }
     
     return(.Object)

@@ -784,6 +784,51 @@ setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupNa
     return(if (drop && length(sims) == 1) drop(sims) else sims)
 })
 
+#' @export
+setMethod("spectrumSimilarityMobility", "MSPeakLists", function(obj, fGroups, doFGroups = TRUE, warn = TRUE, ...,
+                                                                drop = FALSE)
+{
+    if (length(obj) == 0)
+        return(NULL)
+    
+    checkmate::assertClass(fGroups, "featureGroups")
+    aapply(checkmate::assertFlag, . ~ doFGroups + warn)
+    checkmate::assertFALSE(drop)
+    
+    if (!hasMobilities(fGroups))
+        stop("No mobility data available in feature groups.", call. = FALSE)
+    
+    gInfo <- groupInfo(fGroups)
+    gInfo <- gInfo[group %chin% groupNames(obj) & (group %chin% ims_parent_group | ims_parent_group %chin% group)]
+    anas <- analyses(obj)
+    
+    if (nrow(gInfo) == 0)
+    {
+        if (warn)
+            warning("No relevant feature group data found.", call. = FALSE)
+        return(NULL)
+    }
+    
+    return(rbindlist(lapply(gInfo[is.na(ims_parent_group)]$group, function(g)
+    {
+        mg <- gInfo[ims_parent_group == g]$group
+        
+        if (doFGroups)
+        {
+            s <- spectrumSimilarity(obj, groupName1 = mg, groupName2 = g, ..., drop = drop)
+            return(data.table(group = mg, ims_parent_group = g, similarity = s[, 1]))
+        }
+        
+        rbindlist(lapply(anas, function(a)
+        {
+            s <- spectrumSimilarity(obj, groupName1 = mg, groupName2 = g, analysis1 = rep(a, length(mg)),
+                                    analysis2 = a, ..., drop = drop)
+            return(data.table(group = mg, ims_parent_group = g, analysis = a, similarity = s[, 1]))
+        }))
+    })))
+})
+
+
 #' Generation of MS Peak Lists
 #'
 #' Functionality to convert MS and MS/MS data into MS peak lists.

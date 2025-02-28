@@ -98,13 +98,14 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
                                                                 minAnnSim = minSim,
                                                                 absMzDev = defaultLim("mz", "narrow"), adduct = NULL,
                                                                 checkIons = "adduct", spectrumType = "MS2",
-                                                                specSimParamsLib = specSimParams)
+                                                                specSimParamsLib = specSimParams, minMobSpecSim = 0)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     aapply(assertSpecSimParams, . ~ specSimParams + specSimParamsLib, fixed = list(add = ac))
     checkmate::assertClass(MSLibrary, "MSLibrary", add = ac)
-    aapply(checkmate::assertNumber, . ~ minSim + minAnnSim + absMzDev, lower = 0, finite = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ minSim + minAnnSim + absMzDev + minMobSpecSim, lower = 0, finite = TRUE,
+           fixed = list(add = ac))
     checkmate::assertChoice(checkIons, c("adduct", "polarity", "none"), add = ac)
     checkmate::assertCharacter(spectrumType, min.len = 1, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
@@ -152,10 +153,12 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
     
     cacheDB <- openCacheDBScope()
     baseHash <- makeHash(minSim, minAnnSim, absMzDev, adduct, checkIons, specSimParams, specSimParamsLib)
-    setHash <- makeHash(fGroups, MSPeakLists, MSLibrary, baseHash)
+    setHash <- makeHash(fGroups, MSPeakLists, MSLibrary, minMobSpecSim, baseHash)
     cachedSet <- loadCacheSet("compoundsLibrary", setHash, cacheDB)
     resultHashes <- vector("character", gCount)
     resultHashCount <- 0
+    
+    mobSpecSims <- getMobFeatAnnSpecSims(MSPeakLists, fGroups, minMobSpecSim, specSimParams)
     
     printf("Processing %d feature groups with a library of %d records...\n", gCount, nrow(libRecs))
     
@@ -168,6 +171,9 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
             return(NULL)
         spec <- MSPeakLists[[grp]][["MSMS"]]
         if (is.null(spec))
+            return(NULL)
+        
+        if (!is.null(mobSpecSims) && grp %chin% mobSpecSims$group)
             return(NULL)
         
         precMZ <- MSPeakLists[[grp]]$MS[precursor == TRUE]$mz
@@ -323,7 +329,8 @@ setMethod("generateCompoundsLibrary", "featureGroups", function(fGroups, MSPeakL
     ret <- compounds(groupAnnotations = compList, scoreTypes = c("score", "libMatch"),
                      scoreRanges = sapply(compList, function(ct) list(score = range(ct$score),
                                                                       libMatch = range(ct$libMatch)), simplify = FALSE),
-                     algorithm = "library", MSPeakLists = MSPeakLists, specSimParams = NULL)
+                     algorithm = "library", MSPeakLists = MSPeakLists, specSimParams = NULL,
+                     mobSpecSims = mobSpecSims, gNames = names(fGroups))
     return(ret)
 })
 

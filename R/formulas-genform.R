@@ -345,8 +345,8 @@ setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLi
                                                                calculateFeatures = TRUE, featThreshold = 0,
                                                                featThresholdAnn = 0.75,
                                                                absAlignMzDev = defaultLim("mz", "narrow"),
-                                                               MSMode = "both", isolatePrec = TRUE, timeout = 120,
-                                                               topMost = 50, batchSize = 8)
+                                                               MSMode = "both", isolatePrec = TRUE, minMobSpecSim = 0,
+                                                               timeout = 120, topMost = 50, batchSize = 8)
 {
     if (is.infinite(maxCandidates))
         maxCandidates <- 0
@@ -364,6 +364,7 @@ setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLi
            fixed = list(add = ac))
     checkmate::assertChoice(MSMode, c("ms", "msms", "both"), add = ac)
     checkmate::assertCharacter(extraOpts, null.ok = TRUE, add = ac)
+    checkmate::assertNumber(minMobSpecSim, lower = 0, add = ac)
     checkmate::assertCount(topMost, positive = TRUE, add = ac)
     checkmate::assertCount(batchSize, positive = TRUE, add = ac)
     
@@ -408,11 +409,19 @@ setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLi
     
     formTable <- list()
     baseHash <- makeHash(mainArgs, MSMode, isolatePrec, topMost)
-    setHash <- makeHash(fGroups, MSPeakLists, baseHash)
+    setHash <- makeHash(fGroups, MSPeakLists, baseHash, minMobSpecSim)
+    mobSpecSims <- getMobFeatAnnSpecSims(MSPeakLists, fGroups, minMobSpecSim, specSimParams)
+    mobSpecSimsAna <- if (calculateFeatures)
+        getMobFeatAnnSpecSims(MSPeakLists, fGroups, minMobSpecSim, specSimParams, doFGroups = FALSE)
     
     # ana is optional and not used when only calculating group average formulas
     doGenForm <- function(groupPeakLists, ana)
     {
+        if (is.null(ana) && !is.null(mobSpecSims))
+            groupPeakLists <- groupPeakLists[setdiff(names(groupPeakLists), mobSpecSims$group)]
+        else if (!is.null(ana) && !is.null(mobSpecSimsAna))
+            groupPeakLists <- groupPeakLists[setdiff(names(groupPeakLists), mobSpecSimsAna[analysis == ana]$group)]
+        
         if (!is.null(ana))
             printf("Loading all formulas for analysis '%s'...\n", ana)
         else
@@ -465,7 +474,8 @@ setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLi
     groupFormulas <- setFormulaPLID(groupFormulas, MSPeakLists, absAlignMzDev)
     
     return(formulas(groupAnnotations = groupFormulas, featureFormulas = formTable, algorithm = "genform",
-                    MSPeakLists = MSPeakLists, specSimParams = specSimParams))
+                    MSPeakLists = MSPeakLists, specSimParams = specSimParams, mobSpecSims = mobSpecSims,
+                    mobSpecSimsAna = mobSpecSimsAna, gNames = names(fGroups)))
 })
 
 #' @template featAnnSets-gen_args

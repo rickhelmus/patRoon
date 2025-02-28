@@ -281,8 +281,8 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
                                                                cores = NULL, topMost = 100, topMostFormulas = 5,
                                                                login = "check", alwaysLogin = FALSE,
                                                                extraOptsGeneral = NULL,
-                                                               extraOptsFormula = NULL, verbose = TRUE,
-                                                               splitBatches = FALSE, dryRun = FALSE)
+                                                               extraOptsFormula = NULL, minMobSpecSim = 0,
+                                                               verbose = TRUE, splitBatches = FALSE, dryRun = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
@@ -298,6 +298,7 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
     assertSIRIUSLogin(login, add = ac)
     checkmate::assertFlag(alwaysLogin, add = ac)
     aapply(checkmate::assertCharacter, . ~ extraOptsGeneral + extraOptsFormula, null.ok = TRUE, fixed = list(add = ac))
+    checkmate::assertNumber(minMobSpecSim, lower = 0, finite = TRUE, add = ac)
     checkmate::assertFlag(verbose, add = ac)
     checkmate::assertFlag(splitBatches, add = ac)
     checkmate::assertFlag(dryRun, add = ac)
@@ -313,13 +314,16 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
     if (is.null(fingerIDDatabase))
         fingerIDDatabase <- if (!is.null(formulaDatabase)) formulaDatabase else "pubchem"
 
+    mobSpecSims <- getMobFeatAnnSpecSims(MSPeakLists, fGroups, minMobSpecSim, specSimParams)
+    
     gCount <- length(fGroups)
     printf("Processing %d feature groups with SIRIUS+CSI:FingerID...\n", gCount)
     
     results <- doSIRIUS(fGroups, MSPeakLists, FALSE, profile, adduct, relMzDev, elements,
                         formulaDatabase, noise, cores, "structure", fingerIDDatabase, topMostFormulas, projectPath,
-                        login, alwaysLogin, extraOptsGeneral, extraOptsFormula, verbose, "compoundsSIRIUS",
-                        patRoon:::processSIRIUSCompounds, list(database = fingerIDDatabase, topMost = topMost),
+                        login, alwaysLogin, extraOptsGeneral, extraOptsFormula, mobSpecSims, NULL, verbose,
+                        "compoundsSIRIUS", patRoon:::processSIRIUSCompounds, list(database = fingerIDDatabase,
+                                                                                  topMost = topMost),
                         splitBatches, dryRun)
     
     # prune empty/NULL results
@@ -334,10 +338,20 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
                ngrp, if (gCount == 0) 0 else ngrp * 100 / gCount)
     }
 
-    return(compoundsSIRIUS(groupAnnotations = lapply(results, "[[", "comptab"), scoreTypes = "score",
+    ret <- compoundsSIRIUS(groupAnnotations = lapply(results, "[[", "comptab"), scoreTypes = "score",
                            scoreRanges = lapply(results, "[[", "scRanges"),
                            fingerprints = pruneList(lapply(results, "[[", "fingerprints"), checkZeroRows = TRUE),
-                           algorithm = "sirius", MSPeakLists = MSPeakLists, specSimParams = specSimParams))
+                           algorithm = "sirius", MSPeakLists = MSPeakLists, specSimParams = specSimParams,
+                           mobSpecSims = mobSpecSims, gNames = names(fGroups))
+    
+    if (!is.null(mobSpecSims))
+    {
+        mss <- mobSpecSims[ims_parent_group %chin% names(ret@fingerprints)]
+        if (nrow(mss) > 0)
+            ret@fingerprints[mss$group] <- copy(ret@fingerprints[mss$ims_parent_group])
+    }
+    
+    return(ret)
 })
 
 #' @template featAnnSets-gen_args

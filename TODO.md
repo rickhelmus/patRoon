@@ -129,6 +129,8 @@
         - update use of loadCacheData() (see bin features)
 - reporting
     - comps-clust: don't have imgs double in reportPlots
+    - hide ims_precursor_group if all are NA (e.g. all orphans)
+    - group orphans in eg "orphan" group?
 
 
 ## Tests

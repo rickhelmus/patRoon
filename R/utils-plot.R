@@ -296,11 +296,9 @@ makeEIXPlot <- function(featPlotTab, anaInfo, gInfo, showPeakArea, showFGroupRec
             xRange <- c(min(featTabGrp$xmin), max(featTabGrp$xmax))
             maxInt <- if (intMax == "eix")
             {
-                max(sapply(EIXs[[ana]], function(eixa)
-                {
-                    ints <- eixa[eixa[[1]] %between% xRange, "intensity"]
-                    return(if (length(ints) > 0) max(ints) else 0)
-                }))
+                eixag <- EIXs[[ana]][[grp]]
+                ints <- eixag[eixag[[1]] %between% xRange, "intensity"]
+                if (length(ints) > 0) max(ints) else 0
             }
             else
                 max(featTabGrp$intensity)

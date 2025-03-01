@@ -281,6 +281,8 @@ filterEIXs <- function(EIXs, fGroups, analysis = NULL, groupName = NULL, topMost
         analysis <- analyses(fGroups)
     if (!is.null(groupName))
         EIXs <- lapply(EIXs, function(e) subListAttr(e, names(e) %chin% groupName))
+    else
+        groupName <- names(fGroups)
 
     if (onlyPresent)
     {
@@ -297,7 +299,7 @@ filterEIXs <- function(EIXs, fGroups, analysis = NULL, groupName = NULL, topMost
     {
         gTable <- copy(groupTable(fGroups))
         gTable[, c("analysis", "replicate") := analysisInfo(fGroups)[, c("analysis", "replicate"), with = FALSE]]
-        for (fg in names(fGroups))
+        for (fg in groupName)
         {
             anasWithFG <- Map(names(EIXs), EIXs, f = function(ana, aeic) if (fg %chin% names(aeic)) ana else character())
             anasWithFG <- pruneList(anasWithFG, checkEmptyElements = TRUE)

@@ -124,11 +124,14 @@ doFGAADTGroups <- function(fGroups, intColNames, average, averageBy, areas, addQ
             gInfoOrig <- groupInfo(fGroupsOrig)
             doCollapse <- function(coln, digits)
             {
-                ret[!is.na(get(coln)), (paste0(coln, "_collapsed")) := as.character(round(get(coln), digits))]
-                ret[is.na(get(coln)), (paste0(coln, "_collapsed")) := sapply(group, function(g)
+                if (!is.null(ret[[coln]]))
                 {
-                    paste0(round(gInfoOrig[ims_parent_group == g][[coln]], digits), collapse = ",")
-                })]
+                    ret[!is.na(get(coln)), (paste0(coln, "_collapsed")) := as.character(round(get(coln), digits))]
+                    ret[is.na(get(coln)), (paste0(coln, "_collapsed")) := sapply(group, function(g)
+                    {
+                        paste0(round(gInfoOrig[ims_parent_group == g][[coln]], digits), collapse = ",")
+                    })]
+                }
             }
             # UNDONE: is the rounding with a good number?
             doCollapse("mobility", 3)

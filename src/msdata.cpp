@@ -921,6 +921,8 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         allEICs[i] = std::move(eic);
     }
     
+    allPeaksSorted.clear(); // no need for this anymore
+    
     Rcpp::List ret(EICCount);
     // NOTE: constructing the list directly with create() is much faster
     if (eicMode == EICMode::SIMPLE)

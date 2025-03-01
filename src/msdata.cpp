@@ -625,9 +625,9 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         std::vector<SpectrumRawTypes::Mass> mzs, mzMins, mzMaxs;
         std::vector<SpectrumRawTypes::Intensity> intensities;
         std::vector<SpectrumRawTypes::Mobility> mobilities, mobMins, mobMaxs;
-        std::vector<SpectrumRawTypes::Mass> mzBPs;
-        std::vector<SpectrumRawTypes::Mobility> mobilityBPs;
-        std::vector<SpectrumRawTypes::Intensity> intensityiesBP;
+        std::vector<SpectrumRawTypes::Mass> mzsBP;
+        std::vector<SpectrumRawTypes::Mobility> mobilitiesBP;
+        std::vector<SpectrumRawTypes::Intensity> intensitiesBP;
         void addPoint(const EICPoint &p)
         {
             times.push_back(p.time);
@@ -638,9 +638,9 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
             mobilities.push_back(p.mobility);
             mobMins.push_back(p.mobMin);
             mobMaxs.push_back(p.mobMax);
-            mzBPs.push_back(p.mzBP);
-            mobilityBPs.push_back(p.mobilityBP);
-            intensityiesBP.push_back(p.intensityBP);
+            mzsBP.push_back(p.mzBP);
+            mobilitiesBP.push_back(p.mobilityBP);
+            intensitiesBP.push_back(p.intensityBP);
         }
         void addPoint(SpectrumRawTypes::Time t, SpectrumRawTypes::Intensity i) { times.push_back(t); intensities.push_back(i); }
         void clear(void)
@@ -653,9 +653,9 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
             mobilities.clear();
             mobMins.clear();
             mobMaxs.clear();
-            mzBPs.clear();
-            mobilityBPs.clear();
-            intensityiesBP.clear();
+            mzsBP.clear();
+            mobilitiesBP.clear();
+            intensitiesBP.clear();
         }
         size_t size(void) const { return times.size(); }
         bool empty(void) const { return times.empty(); }
@@ -682,8 +682,8 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     if (EICCount == 0)
         return Rcpp::List();
     
-    enum class EICMode { SIMPLE, FULL, TEST };
-    const auto eicMode = (mode == "simple") ? EICMode::SIMPLE : (mode == "full") ? EICMode::FULL : EICMode::TEST;
+    enum class EICMode { SIMPLE, FULL, FULL_MZ, TEST };
+    const auto eicMode = (mode == "simple") ? EICMode::SIMPLE : (mode == "full") ? EICMode::FULL : (mode == "full_mz") ? EICMode::FULL_MZ : EICMode::TEST;
     
     const auto &specMeta = backend.getSpecMetadata();
     
@@ -745,7 +745,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     if (allSpectra.empty())
         return Rcpp::List();
     
-    bool anySpecHasMob = false;
+    bool anySpecHasMob = false; // NOTE: assume all MS spectra have or have not IMS data (UNDONE?)
     AllPeaks allPeaks;
     for (size_t i=0; i<allSpectra[0].size(); ++i)
     {
@@ -819,10 +819,10 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                 if (curPoint.intensity > 0)
                 {
                     curPoint.time = curTime;
-                    if (eicMode == EICMode::FULL)
+                    if (eicMode == EICMode::FULL || eicMode == EICMode::FULL_MZ)
                     {
                         curPoint.mz /= curPoint.intensity;
-                        if (anySpecHasMob)
+                        if (anySpecHasMob && eicMode != EICMode::FULL_MZ)
                             curPoint.mobility /= curPoint.intensity;
                         eic.addPoint(curPoint);
                     }
@@ -887,14 +887,14 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
             if (inten > 0)
             {
                 curPoint.intensity += inten;
-                if (eicMode == EICMode::FULL)
+                if (eicMode == EICMode::FULL || eicMode == EICMode::FULL_MZ)
                 {
                     curPoint.mz += mz * inten;
                     if (curPoint.mzMin == 0.0 || mz < curPoint.mzMin)
                         curPoint.mzMin = mz;
                     if (mz > curPoint.mzMax)
                         curPoint.mzMax = mz;
-                    if (anySpecHasMob)
+                    if (anySpecHasMob && eicMode != EICMode::FULL_MZ)
                     {
                         curPoint.mobility += mob * inten;
                         if (curPoint.mobMin == 0.0 || mob < curPoint.mobMin)
@@ -922,6 +922,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     }
     
     Rcpp::List ret(EICCount);
+    // NOTE: constructing the list directly with create() is much faster
     if (eicMode == EICMode::SIMPLE)
     {
         for (size_t i=0; i<EICCount; ++i)
@@ -932,32 +933,37 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
             eic.clear(); // free memory as EICs may consume a lot
         }
     }
-    else if (eicMode == EICMode::FULL)
+    else if (eicMode == EICMode::FULL && anySpecHasMob)
     {
         for (size_t i=0; i<EICCount; ++i)
         {
-            // NOTE: assume all MS spectra have or have not IMS data (UNDONE?)
-            
             auto &eic = allEICs[i];
-            auto li = Rcpp::List::create(Rcpp::Named("time") = eic.times,
-                                         Rcpp::Named("intensity") = eic.intensities,
-                                         Rcpp::Named("mz") = eic.mzs,
-                                         Rcpp::Named("mzmin") = eic.mzMins,
-                                         Rcpp::Named("mzmax") = eic.mzMaxs);
-            
-            if (anySpecHasMob)
-            {
-                li["mobility"] = eic.mobilities;
-                li["mobmin"] = eic.mobMins;
-                li["mobmax"] = eic.mobMaxs;
-            }
-            
-            li["intensityBP"] = eic.intensityiesBP;
-            li["mzBP"] = eic.mzBPs;
-            if (anySpecHasMob)
-                li["mobilityBP"] = eic.mobilityBPs;
-            
-            ret[i] = li;
+            ret[i] = Rcpp::List::create(Rcpp::Named("time") = eic.times,
+                                        Rcpp::Named("intensity") = eic.intensities,
+                                        Rcpp::Named("intensityBP") = eic.intensitiesBP,
+                                        Rcpp::Named("mz") = eic.mzs,
+                                        Rcpp::Named("mzBP") = eic.mzsBP,
+                                        Rcpp::Named("mzmin") = eic.mzMins,
+                                        Rcpp::Named("mzmax") = eic.mzMaxs,
+                                        Rcpp::Named("mobility") = eic.mobilities,
+                                        Rcpp::Named("mobmin") = eic.mobMins,
+                                        Rcpp::Named("mobmax") = eic.mobMaxs,
+                                        Rcpp::Named("mobilityBP") = eic.mobilitiesBP);
+            eic.clear(); // free memory as EICs may consume a lot
+        }
+    }
+    else if (eicMode == EICMode::FULL || eicMode == EICMode::FULL_MZ)
+    {
+        for (size_t i=0; i<EICCount; ++i)
+        {
+            auto &eic = allEICs[i];
+            ret[i] = Rcpp::List::create(Rcpp::Named("time") = eic.times,
+                                        Rcpp::Named("intensity") = eic.intensities,
+                                        Rcpp::Named("intensityBP") = eic.intensitiesBP,
+                                        Rcpp::Named("mz") = eic.mzs,
+                                        Rcpp::Named("mzBP") = eic.mzsBP,
+                                        Rcpp::Named("mzmin") = eic.mzMins,
+                                        Rcpp::Named("mzmax") = eic.mzMaxs);
             eic.clear(); // free memory as EICs may consume a lot
         }
     }

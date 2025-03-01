@@ -222,17 +222,17 @@ findFeaturesBinning <- function(analysisInfo, featParams, peakParams, minIntensi
     else
         anaInfoTBD <- analysisInfo
     
-    getEICsAna <- function(backend, EICInfo, test)
+    getEICsAna <- function(backend, EICInfo, mode)
     {
         args <- list(backend, EICInfo$mzmin, EICInfo$mzmax, featParams$retRange[1], featParams$retRange[2],
                      EICInfo$mobmin, EICInfo$mobmax, mzExpIMSWindow = 0, minIntensityIMS = minIntensityIMS,
-                     mode = if (test) "test" else "full", showProgress = FALSE,
-                     minEICIntensity = featParams$minEICIntensity, minEICAdjTime = featParams$minEICAdjTime,
+                     mode = mode, showProgress = FALSE, minEICIntensity = featParams$minEICIntensity,
+                     minEICAdjTime = featParams$minEICAdjTime,
                      minEICAdjPoints = featParams$minEICAdjPoints,
                      minEICAdjIntensity = featParams$minEICAdjIntensity)
-        ret <- do.call(if (test) getEICList else doGetEICsForAna, args)
+        ret <- do.call(if (mode == "test") getEICList else doGetEICsForAna, args)
         names(ret) <- EICInfo$EIC_ID
-        if (!test)
+        if (mode != "test")
             ret <- pruneList(ret, checkEmptyElements = TRUE, keepAttr = TRUE)
         return(ret)
     }
@@ -259,7 +259,7 @@ findFeaturesBinning <- function(analysisInfo, featParams, peakParams, minIntensi
             EICInfoMZ <- getFeatEICsInfo(featParams, withIMS = FALSE, MS2Info = MS2Info)
             if (withIMS)
             {
-                testEICs <- getEICsAna(backend, EICInfoMZ, TRUE)
+                testEICs <- getEICsAna(backend, EICInfoMZ, "test")
                 testEICs <- unlist(testEICs)
                 EICInfoMZ <- EICInfoMZ[EIC_ID %chin% names(testEICs)[testEICs]]
                 
@@ -270,11 +270,11 @@ findFeaturesBinning <- function(analysisInfo, featParams, peakParams, minIntensi
                 ov <- foverlaps(EICInfoMob, temp, type = "within", nomatch = NULL, which = TRUE)
                 EICInfo <- EICInfoMob[ov$xid]
                 
-                EICs <- getEICsAna(backend, EICInfo, FALSE)
+                EICs <- getEICsAna(backend, EICInfo, "full")
             }
             else
             {
-                EICs <- getEICsAna(backend, EICInfoMZ, FALSE)
+                EICs <- getEICsAna(backend, EICInfoMZ, "full_mz")
                 EICInfo <- EICInfoMZ[EIC_ID %chin% names(EICs)] # omit missing
             }
             

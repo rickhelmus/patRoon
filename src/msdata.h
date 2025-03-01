@@ -65,6 +65,9 @@ template <typename T, typename I> std::vector<I> fillEIXIntensities(const std::v
                                                                     const std::vector<T> &xvalues,
                                                                     const std::vector<I> &intensities)
 {
+    if (allXValues.empty() || xvalues.empty())
+        return std::vector<I>(allXValues.size(), 0);
+    
     std::vector<I> intens(allXValues.size());
     auto it = xvalues.begin();
     auto allIt = std::lower_bound(allXValues.begin(), allXValues.end(), *it);
@@ -73,7 +76,8 @@ template <typename T, typename I> std::vector<I> fillEIXIntensities(const std::v
         const auto ind = std::distance(allXValues.begin(), allIt);
         intens[ind] = intensities[std::distance(xvalues.begin(), it)];
         ++it;
-        allIt = std::lower_bound(allIt, allXValues.end(), *it);
+        if (it != xvalues.end())
+            allIt = std::lower_bound(allIt, allXValues.end(), *it);
     }
     
     return intens;

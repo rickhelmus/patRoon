@@ -989,6 +989,14 @@ Rcpp::List padEIX(const std::vector<SpectrumRawTypes::Time> &allXValues,
     std::vector<SpectrumRawTypes::Time> outXValues;
     std::vector<SpectrumRawTypes::Intensity> outIntensities;
     
+    if (xvalues.empty())
+    {
+        outXValues = { allXValues.front(), allXValues.back() };
+        outIntensities.resize(2, 0.0);
+        return Rcpp::List::create(Rcpp::Named("xvalue") = outXValues,
+                                  Rcpp::Named("intensity") = outIntensities);
+    }
+    
     auto it = xvalues.begin();
     auto allIt = allXValues.begin();
     

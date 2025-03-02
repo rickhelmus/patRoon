@@ -1,7 +1,7 @@
 #' @include features.R
 NULL
 
-removeDuplicateFeatsSusps <- function(tab, checkRet, selectTopIntens)
+removeDuplicateFeatsSusps <- function(tab, checkRet, selectTopIntens, nameCol)
 {
     # marks duplicates in feature or suspect table, and keeps the feature with the highest intensity
 
@@ -10,12 +10,11 @@ removeDuplicateFeatsSusps <- function(tab, checkRet, selectTopIntens)
 
     isSame <- function(x, y)
     {
-        # UNDONE: make thresholds configurable
-        yes <- numLTE(abs(x$mz - y$mz), 0.001)
+        yes <- numLTE(abs(x$mz - y$mz), defaultLim("mz", "very_narrow"))
         if (checkRet)
-            yes <- yes & ((is.na(x$ret) & is.na(y$ret)) | numLTE(abs(x$ret - y$ret), 3))
+            yes <- yes & ((is.na(x$ret) & is.na(y$ret)) | numLTE(abs(x$ret - y$ret), defaultLim("retention", "very_narrow")))
         if (!is.null(x[["mobility"]]))
-            yes <- yes & numLTE(abs(x$mobility - y$mobility), 0.02)
+            yes <- yes & numLTE(abs(x$mobility - y$mobility), defaultLim("mobility", "very_narrow"))
         return(yes)
     }
     
@@ -27,20 +26,18 @@ removeDuplicateFeatsSusps <- function(tab, checkRet, selectTopIntens)
             next
         rTab <- tab[r]
         nextTab <- tab[seq(r + 1, nrow(tab))]
-        # UNDONE: make thresholds configurable
         nextTab <- nextTab[duplicate == FALSE & isSame(rTab, nextTab)]
         if (nrow(nextTab) > 0)
         {
             if (selectTopIntens)
             {
                 maxInt <- max(rTab$intensity, nextTab$intensity)
-                tab[ID %chin% c(rTab$ID, nextTab$ID), duplicate := !numEQ(intensity, maxInt)]
+                tab[get(nameCol) %chin% c(rTab[[nameCol]], nextTab[[nameCol]]), duplicate := !numEQ(intensity, maxInt)]
             }
             else
             {
                 # otherwise just keep current and mark all from next rows
-                # UNDONE: name/ID
-                tab[name %chin% nextTab$name, duplicate := TRUE]
+                tab[get(nameCol) %chin% nextTab[[nameCol]], duplicate := TRUE]
             }
         }
     }
@@ -173,14 +170,8 @@ setMethod("initialize", "featuresBinning",
 findFeaturesBinning <- function(analysisInfo, featParams, peakParams, minIntensityIMS = 25, verbose = TRUE)
 {
     # UNDONE: add refs to docs, and highlight changes
-    # UNDONE: mobRange/mobStep defaults
-    # UNDONE: default OK for minIntensityIMS?
-    # UNDONE: print messages, stats etc, taking verbose into account
-    # UNDONE: support parallel? Can take a lot of memory and currently not supported by applyMSData()
     # UNDONE: use BP intensity?
-    # UNDONE: log/print status messages
-    # UNDONE: support IM bins with suspects
-    # UNDONE: split function for bins / suspects
+    # UNDONE: test empties, eg no EICs
     
     ac <- checkmate::makeAssertCollection()
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, add = ac)
@@ -189,6 +180,8 @@ findFeaturesBinning <- function(analysisInfo, featParams, peakParams, minIntensi
     checkmate::assertNumber(minIntensityIMS, lower = 0, finite = TRUE, add = ac)
     checkmate::assertFlag(verbose, add = ac)
     checkmate::reportAssertions(ac)
+    
+    maybePrintf <- \(...) if (verbose) printf(...)
     
     if (!is.null(featParams[["adduct"]]))
         featParams$adduct <- checkAndToAdduct(featParams$adduct)
@@ -200,9 +193,11 @@ findFeaturesBinning <- function(analysisInfo, featParams, peakParams, minIntensi
                                                   prefCalcChemProps = featParams$prefCalcChemProps,
                                                   neutralChemProps = featParams$neutralChemProps)
         featParams$suspectsOrig <- featParams$suspects
-        featParams$suspects <- removeDuplicateFeatsSusps(featParams$suspects, FALSE, FALSE)
+        featParams$suspects <- removeDuplicateFeatsSusps(featParams$suspects, FALSE, FALSE, "name")
         featParams$suspects <- featParams$suspects[order(mz)]
-        # UNDONE: print removed suspects?
+        suspsRM <- setdiff(featParams$suspectsOrig$name, featParams$suspects$name)
+        maybePrintf("The following %d non-unique suspects were removed %s.\n", length(suspsRM),
+                    getStrListWithMax(suspsRM, 10, ", "))
     }
     
     if (is.null(featParams[["retRange"]]))
@@ -241,8 +236,10 @@ findFeaturesBinning <- function(analysisInfo, featParams, peakParams, minIntensi
     fList <- list()
     if (nrow(anaInfoTBD) > 0)
     {
-        fList <- applyMSData(anaInfoTBD, needIMS = withIMS, func = function(ana, path, backend)
+        fList <- applyMSData(anaInfoTBD, needIMS = withIMS, showProgress = FALSE, func = function(ana, path, backend)
         {
+            maybePrintf("\n-------\nFinding features for '%s'...\n", ana)
+            
             openMSReadBackend(backend, path)
          
             MS2Info <- NULL
@@ -260,9 +257,12 @@ findFeaturesBinning <- function(analysisInfo, featParams, peakParams, minIntensi
             EICInfoMZ <- getFeatEICsInfo(featParams, withIMS = FALSE, MS2Info = MS2Info)
             if (withIMS)
             {
+                maybePrintf("Pre-checking %d m/z EICs... ", nrow(EICInfoMZ))
                 testEICs <- getEICsAna(backend, EICInfoMZ, "test", featParams$topMostEICPre)
                 testEICs <- unlist(testEICs)
                 EICInfoMZ <- EICInfoMZ[EIC_ID %chin% names(testEICs)[testEICs]]
+                maybePrintf("Done! Eliminated %d (%.2f%%) EICs\n", sum(!testEICs),
+                            (sum(!testEICs) / length(testEICs)) * 100)
                 
                 # remove complete m/z bins that were filtered out before
                 temp <- EICInfoMZ[, c("mzmin", "mzmax"), with = FALSE]
@@ -271,16 +271,22 @@ findFeaturesBinning <- function(analysisInfo, featParams, peakParams, minIntensi
                 ov <- foverlaps(EICInfoMob, temp, type = "within", nomatch = NULL, which = TRUE)
                 EICInfo <- EICInfoMob[ov$xid]
                 
+                maybePrintf("Loading %d m/z+mobility EICs... ", nrow(EICInfo))
                 EICs <- getEICsAna(backend, EICInfo, "full", featParams$topMostEIC)
+                maybePrintf("Done!\n")
             }
             else
             {
+                maybePrintf("Loading %d m/z EICs... ", nrow(EICInfoMZ))
                 EICs <- getEICsAna(backend, EICInfoMZ, "full_mz", featParams$topMostEIC)
                 EICInfo <- EICInfoMZ[EIC_ID %chin% names(EICs)] # omit missing
+                maybePrintf("Done!\n")
             }
             
+            maybePrintf("Finding peaks in %d remaining EICs... ", length(EICs))
             peaks <- findPeaksInEICs(EICs, peakParams, withMobility = withIMS,
                                      logPath = file.path("log", "featEICs", paste0(ana, ".txt")), cacheDB = cacheDB)
+            maybePrintf("Done! Found %d peaks.\n", nrow(peaks))
 
             # only keep those peaks with m/z in the "center" of the analyzed m/z and mobility range
             if (featParams$methodMZ == "bins")
@@ -319,10 +325,10 @@ findFeaturesBinning <- function(analysisInfo, featParams, peakParams, minIntensi
                 peaks <- peaks[keep == TRUE]
             }
             
-            peaks <- removeDuplicateFeatsSusps(peaks, TRUE, TRUE)
+            peaks <- removeDuplicateFeatsSusps(peaks, TRUE, TRUE, "ID")
             peaks <- removeDTColumnsIfPresent(peaks, c("binMZStart", "binMobStart", "keep"))
-            
-            doProgress()
+
+            maybePrintf("%d peaks remain after filtering.\n", nrow(peaks))            
             
             return(peaks)
         })
@@ -339,7 +345,7 @@ findFeaturesBinning <- function(analysisInfo, featParams, peakParams, minIntensi
     
     if (verbose)
     {
-        printf("Done!\n")
+        printf("\n-------\nDone!\n")
         printFeatStats(fList)
     }
     

@@ -105,7 +105,8 @@ getFeaturesEICsParams <- function(methodMZ, methodIMS = NULL, ...)
         stop("methodIMS can only be 'suspects' if methodMZ is also set to 'suspects'", call. = FALSE)
     
     ret <- list(methodMZ = methodMZ, methodIMS = methodIMS, retRange = NULL, minEICIntensity = 5000,
-                minEICAdjTime = 5, minEICAdjPoints = 5, minEICAdjIntensity = 250)
+                minEICAdjTime = 5, minEICAdjPoints = 5, minEICAdjIntensity = 250, topMostEIC = 10000,
+                topMostEICPre = 10000)
     
     if (methodMZ == "bins")
     {
@@ -222,14 +223,14 @@ findFeaturesBinning <- function(analysisInfo, featParams, peakParams, minIntensi
     else
         anaInfoTBD <- analysisInfo
     
-    getEICsAna <- function(backend, EICInfo, mode)
+    getEICsAna <- function(backend, EICInfo, mode, topMost)
     {
         args <- list(backend, EICInfo$mzmin, EICInfo$mzmax, featParams$retRange[1], featParams$retRange[2],
                      EICInfo$mobmin, EICInfo$mobmax, mzExpIMSWindow = 0, minIntensityIMS = minIntensityIMS,
                      mode = mode, showProgress = FALSE, minEICIntensity = featParams$minEICIntensity,
                      minEICAdjTime = featParams$minEICAdjTime,
                      minEICAdjPoints = featParams$minEICAdjPoints,
-                     minEICAdjIntensity = featParams$minEICAdjIntensity)
+                     minEICAdjIntensity = featParams$minEICAdjIntensity, topMost = topMost)
         ret <- do.call(if (mode == "test") getEICList else doGetEICsForAna, args)
         names(ret) <- EICInfo$EIC_ID
         if (mode != "test")
@@ -259,7 +260,7 @@ findFeaturesBinning <- function(analysisInfo, featParams, peakParams, minIntensi
             EICInfoMZ <- getFeatEICsInfo(featParams, withIMS = FALSE, MS2Info = MS2Info)
             if (withIMS)
             {
-                testEICs <- getEICsAna(backend, EICInfoMZ, "test")
+                testEICs <- getEICsAna(backend, EICInfoMZ, "test", featParams$topMostEICPre)
                 testEICs <- unlist(testEICs)
                 EICInfoMZ <- EICInfoMZ[EIC_ID %chin% names(testEICs)[testEICs]]
                 
@@ -270,11 +271,11 @@ findFeaturesBinning <- function(analysisInfo, featParams, peakParams, minIntensi
                 ov <- foverlaps(EICInfoMob, temp, type = "within", nomatch = NULL, which = TRUE)
                 EICInfo <- EICInfoMob[ov$xid]
                 
-                EICs <- getEICsAna(backend, EICInfo, "full")
+                EICs <- getEICsAna(backend, EICInfo, "full", featParams$topMostEIC)
             }
             else
             {
-                EICs <- getEICsAna(backend, EICInfoMZ, "full_mz")
+                EICs <- getEICsAna(backend, EICInfoMZ, "full_mz", featParams$topMostEIC)
                 EICInfo <- EICInfoMZ[EIC_ID %chin% names(EICs)] # omit missing
             }
             

@@ -187,8 +187,7 @@ doGetEICsForAna <- function(...)
     # NOTE: getEICList() return lists, which are converted to data.frames and is a lot faster than returning
     # data.frames directly.
     EICs <- getEICList(...)
-    wh <- lengths(EICs) > 0 # zero length if post-filtered --> don't try to make DFs for these
-    EICs[wh] <- lapply(EICs[wh], setDF)
+    EICs[] <- lapply(EICs, setDF)
     return(EICs)
 }
 

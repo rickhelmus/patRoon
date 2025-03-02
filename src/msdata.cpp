@@ -798,10 +798,12 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
             continue;
         const auto itEnd = std::prev(std::upper_bound(itStart, allPeaksSorted.mzs.cend(), mzEnd));
         const auto startInd = std::distance(allPeaksSorted.mzs.cbegin(), itStart);
-        const auto endInd = std::distance(allPeaksSorted.mzs.cbegin(), itEnd);
+        auto endInd = std::distance(allPeaksSorted.mzs.cbegin(), itEnd);
+        if (startInd > endInd)
+            endInd = startInd; // only one peak at the end
         const auto sortedInds = getSortedInds(allPeaksSorted.indices.cbegin() + startInd,
                                               allPeaksSorted.indices.cbegin() + endInd);
-        
+
         EICPoint curPoint;
         size_t curScanInd = allPeaksSorted.indices.size(), prvScanInd = allPeaksSorted.indices.size();
         bool init = true;

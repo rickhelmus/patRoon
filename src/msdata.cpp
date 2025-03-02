@@ -604,7 +604,8 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                       SpectrumRawTypes::Mass mzExpIMSWindow, SpectrumRawTypes::Intensity minIntensityIMS,
                       const std::string &mode = "simple", bool showProgress = false,
                       SpectrumRawTypes::Intensity minEICIntensity = 0, SpectrumRawTypes::Time minEICAdjTime = 0,
-                      unsigned minEICAdjPoints = 0, SpectrumRawTypes::Intensity minEICAdjIntensity = 0)
+                      unsigned minEICAdjPoints = 0, SpectrumRawTypes::Intensity minEICAdjIntensity = 0,
+                      unsigned topMost = 0)
 {
     // NOTE: startTimes/endTimes may be length one vectors, in which case they are used for all EICs
     
@@ -777,6 +778,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     allPeaks.clear();
 
     std::vector<EIC> allEICs(EICCount);
+    std::vector<SpectrumRawTypes::Intensity> allEICMaxIntensities(EICCount);
     #pragma omp parallel for
     for (size_t i=0; i<EICCount; ++i)
     {
@@ -784,7 +786,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         SpectrumRawTypes::Intensity maxInten = 0;
         SpectrumRawTypes::Time startTimeAboveThr = 0;
         unsigned adjPointsAboveThr = 0;
-        bool enoughAboveThr = false;
+        bool enoughTimeAboveThr = false, enoughPointsAboveThr = false;
      
         const auto mzStart = startMZs[i] - ((anySpecHasMob) ? mzExpIMSWindow : 0.0);
         const auto mzEnd = endMZs[i] + ((anySpecHasMob) ? mzExpIMSWindow : 0.0);
@@ -801,7 +803,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                                               allPeaksSorted.indices.cbegin() + endInd);
         
         EICPoint curPoint;
-        size_t curScanInd = 0;
+        size_t curScanInd = allPeaksSorted.indices.size(), prvScanInd = allPeaksSorted.indices.size();
         bool init = true;
         for (size_t j=0; ; ++j)
         {
@@ -832,22 +834,24 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                         maxInten = curPoint.intensity;
                 }
                 
-                if (!enoughAboveThr && (minEICAdjTime != 0.0 || minEICAdjPoints > 0))
+                if ((!enoughTimeAboveThr && minEICAdjTime > 0.0) || (!enoughPointsAboveThr && minEICAdjPoints > 0))
                 {
-                    if (numberGTE(curPoint.intensity, minEICAdjIntensity))
+                    if (prvScanInd != allPeaksSorted.indices.size() &&
+                        prvScanInd == (curScanInd - 1) &&
+                        numberGTE(curPoint.intensity, minEICAdjIntensity))
                     {
-                        if (minEICAdjTime != 0.0)
+                        if (minEICAdjTime > 0.0)
                         {
                             if (startTimeAboveThr == 0.0)
                                 startTimeAboveThr = curTime;
                             else if (numberGTE(curTime - startTimeAboveThr, minEICAdjTime))
-                                enoughAboveThr = true;
+                                enoughTimeAboveThr = true;
                         }
                         if (minEICAdjPoints > 0)
                         {
                             ++adjPointsAboveThr;
                             if (adjPointsAboveThr >= minEICAdjPoints)
-                                enoughAboveThr = true;
+                                enoughPointsAboveThr = true;
                         }
                     }
                     else
@@ -861,6 +865,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                     break;
                 
                 curPoint = EICPoint();
+                prvScanInd = curScanInd;
                 curScanInd = scanInd;
             }
 
@@ -915,31 +920,48 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         
         if (minEICIntensity != 0.0 && maxInten < minEICIntensity)
             continue;
-        if ((minEICAdjTime != 0.0 || minEICAdjPoints > 0) && !enoughAboveThr)
+        if (!enoughTimeAboveThr && minEICAdjTime > 0.0)
+            continue;
+        if (!enoughPointsAboveThr && minEICAdjPoints > 0)
             continue;
         
         allEICs[i] = std::move(eic);
+        allEICMaxIntensities[i] = maxInten;
     }
     
     allPeaksSorted.clear(); // no need for this anymore
     
-    Rcpp::List ret(EICCount);
-    // NOTE: constructing the list directly with create() is much faster
-    if (eicMode == EICMode::SIMPLE)
+    SpectrumRawTypes::Intensity minMaxIntens = 0.0;
+    if (topMost > 0 && allEICMaxIntensities.size() > topMost)
     {
-        for (size_t i=0; i<EICCount; ++i)
+        auto sortedAEMI = allEICMaxIntensities;
+        sortedAEMI.erase(std::remove(sortedAEMI.begin(), sortedAEMI.end(), 0.0), sortedAEMI.end());
+        std::nth_element(sortedAEMI.begin(), sortedAEMI.begin() + (topMost-1), sortedAEMI.end(),
+                         std::greater<SpectrumRawTypes::Intensity>());
+        minMaxIntens = sortedAEMI[topMost-1];
+    }
+    
+    Rcpp::List ret(EICCount);
+    for (size_t i=0; i<EICCount; ++i)
+    {
+        auto &eic = allEICs[i];
+        
+        if (allEICMaxIntensities[i] < minMaxIntens)
         {
-            auto &eic = allEICs[i];   
+            // just clear the EIC so an empty will be added below. Note that we would clear the EIC at the end anyway.
+            eic.clear();
+        }
+        
+        // NOTE: constructing the ouput list directly with create() is much faster than assigning items afterwards.
+        // Hence, we do quite some if statements here...
+    
+        if (eicMode == EICMode::SIMPLE)
+        {
             ret[i] = Rcpp::List::create(Rcpp::Named("time") = eic.times,
                                         Rcpp::Named("intensity") = eic.intensities);
-            eic.clear(); // free memory as EICs may consume a lot
         }
-    }
-    else if (eicMode == EICMode::FULL && anySpecHasMob)
-    {
-        for (size_t i=0; i<EICCount; ++i)
+        else if (eicMode == EICMode::FULL && anySpecHasMob)
         {
-            auto &eic = allEICs[i];
             ret[i] = Rcpp::List::create(Rcpp::Named("time") = eic.times,
                                         Rcpp::Named("intensity") = eic.intensities,
                                         Rcpp::Named("intensityBP") = eic.intensitiesBP,
@@ -951,14 +973,9 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                                         Rcpp::Named("mobmin") = eic.mobMins,
                                         Rcpp::Named("mobmax") = eic.mobMaxs,
                                         Rcpp::Named("mobilityBP") = eic.mobilitiesBP);
-            eic.clear(); // free memory as EICs may consume a lot
         }
-    }
-    else if (eicMode == EICMode::FULL || eicMode == EICMode::FULL_MZ)
-    {
-        for (size_t i=0; i<EICCount; ++i)
+        else if (eicMode == EICMode::FULL || eicMode == EICMode::FULL_MZ)
         {
-            auto &eic = allEICs[i];
             ret[i] = Rcpp::List::create(Rcpp::Named("time") = eic.times,
                                         Rcpp::Named("intensity") = eic.intensities,
                                         Rcpp::Named("intensityBP") = eic.intensitiesBP,
@@ -966,13 +983,13 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                                         Rcpp::Named("mzBP") = eic.mzsBP,
                                         Rcpp::Named("mzmin") = eic.mzMins,
                                         Rcpp::Named("mzmax") = eic.mzMaxs);
-            eic.clear(); // free memory as EICs may consume a lot
         }
-    }
-    else // if (eicMode == EICMode::TEST)
-    {
-        for (size_t i=0; i<EICCount; ++i)
-            ret[i] = !allEICs[i].empty();
+        else // if (eicMode == EICMode::TEST)
+        {
+            ret[i] = !eic.empty();
+        }
+        
+        eic.clear(); // free memory as EICs may consume a lot
     }
     
     if (eicMode != EICMode::TEST)

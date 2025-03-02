@@ -131,7 +131,11 @@
     - comps-clust: don't have imgs double in reportPlots
     - hide ims_precursor_group if all are NA (e.g. all orphans)
     - group orphans in eg "orphan" group?
-
+- feat EICs
+    - rename
+    - remove susp features
+    - verbose option with status messages
+    - tweak default EIC filtering params, more strict for binning?
 
 ## Tests
 

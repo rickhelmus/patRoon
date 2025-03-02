@@ -1126,6 +1126,8 @@ assertFeaturesEICsParams <- function(x, .var.name = checkmate::vname(x), add = N
     assertListVal(x, "minEICAdjTime", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
     assertListVal(x, "minEICAdjPoints", checkmate::assertCount, .var.name = .var.name, add = add)
     assertListVal(x, "minEICAdjIntensity", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
+    assertListVal(x, "topMostEIC", checkmate::assertCount, positive = FALSE, .var.name = .var.name, add = add)
+    assertListVal(x, "topMostEICPre", checkmate::assertCount, positive = FALSE, .var.name = .var.name, add = add)
     
     if (x$methodMZ == "bins")
     {

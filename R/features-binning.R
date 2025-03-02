@@ -234,7 +234,7 @@ findFeaturesBinning <- function(analysisInfo, featParams, peakParams, minIntensi
         ret <- do.call(if (mode == "test") getEICList else doGetEICsForAna, args)
         names(ret) <- EICInfo$EIC_ID
         if (mode != "test")
-            ret <- pruneList(ret, checkEmptyElements = TRUE, keepAttr = TRUE)
+            ret <- pruneList(ret, checkZeroRows = TRUE, keepAttr = TRUE)
         return(ret)
     }
     

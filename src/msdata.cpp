@@ -750,7 +750,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     AllPeaks allPeaks;
     for (size_t i=0; i<allSpectra[0].size(); ++i)
     {
-        allPeaks.indices.insert(allPeaks.indices.end(), allSpectra[0][i].size(), i);
+        allPeaks.indices.insert(allPeaks.indices.end(), allSpectra[0][i].size(), scanSels[0][i].index);
         allPeaks.mzs.insert(allPeaks.mzs.end(), allSpectra[0][i].getMZs().begin(), allSpectra[0][i].getMZs().end());
         allPeaks.intensities.insert(allPeaks.intensities.end(), allSpectra[0][i].getIntensities().begin(),
                                     allSpectra[0][i].getIntensities().end());

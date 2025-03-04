@@ -66,15 +66,6 @@ setMethod("groupFeaturesKPIC2", "features", function(feat, rtalign = TRUE, loadR
 
 #' @rdname groupFeaturesKPIC2
 #' @export
-setMethod("groupFeaturesKPIC2", "featuresSuspects", function(feat, groupArgs = list(tolerance = c(0.005, 12)),
-                                                             verbose = TRUE)
-{
-    return(doGroupSuspects(feat, selectMethod("groupFeaturesKPIC2", "features"), rtalign = FALSE, loadRawData = FALSE,
-                           groupArgs = groupArgs, alignArgs = list(), verbose = verbose))
-})
-
-#' @rdname groupFeaturesKPIC2
-#' @export
 setMethod("groupFeaturesKPIC2", "featuresSet", function(feat, groupArgs = list(tolerance = c(0.005, 12)),
                                                         verbose = TRUE)
 {

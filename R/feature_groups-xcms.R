@@ -67,14 +67,6 @@ setMethod("groupFeaturesXCMS", "features", function(feat, rtalign = TRUE, loadRa
 
 #' @rdname groupFeaturesXCMS
 #' @export
-setMethod("groupFeaturesXCMS", "featuresSuspects", function(feat, groupArgs = list(mzwid = 0.015), verbose = TRUE)
-{
-    return(doGroupSuspects(feat, selectMethod("groupFeaturesXCMS", "features"), rtalign = FALSE,
-                           loadRawData = FALSE, groupArgs = groupArgs, retcorArgs = list(), verbose = verbose))
-})
-
-#' @rdname groupFeaturesXCMS
-#' @export
 setMethod("groupFeaturesXCMS", "featuresSet", function(feat, groupArgs = list(mzwid = 0.015), verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()

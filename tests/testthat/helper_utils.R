@@ -242,11 +242,12 @@ makeMZXMLs <- function(anaInfo)
     # BUG/HACK: mzR cannot read mzXML files produced by OpenMS. The latter sets the .mzML source file as parentFile,
     # which is currently not supported by pwiz (pwiz keeps the original instrument raw data format). However, pwiz does
     # recognize mzXML as source format so simply convert the files twice...
-    convertMSFiles(anaInfo = anaInfo, from = "mzML", outPath = getWorkPath(), to = "mzXML",
-                   algorithm = "openms", overWrite = TRUE)
-    anaInfo$path <- getWorkPath()
-    convertMSFiles(anaInfo = anaInfo, from = "mzXML", outPath = getWorkPath(), to = "mzXML",
-                   algorithm = "openms", overWrite = TRUE)
+    outpath <- getWorkPath()
+    convertMSFilesOpenMS(file.path(anaInfo$path_centroid, paste0(anaInfo$analysis, ".mzML")),
+                         file.path(outpath, paste0(anaInfo$analysis, ".mzXML")), "mzXML")
+    anaInfo$path_centroid <- outpath
+    convertMSFilesAnaInfo(anaInfo = anaInfo, typeFrom = "centroid", formatFrom = "mzXML", formatTo = "mzXML",
+                          algorithm = "openms", overWrite = TRUE)
     return(anaInfo)
 }
 

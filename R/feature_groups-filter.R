@@ -57,7 +57,7 @@ minMaxIntensityFilter <- function(fGroups, absThreshold, relThreshold, negate = 
     return(doFGroupsFilter(fGroups, "min max intensity", c(threshold, negate), function(fGroups)
     {
         compF <- if (negate) function(x, ...) max(x) >= threshold else function(x, ...) max(x) < threshold
-        delete(fGroups, j = compF)
+        return(list(delete = list(j = compF)))
     }, "minMaxIntensity", applyIMS))
 }
 
@@ -342,10 +342,10 @@ selectIMSFilter <- function(fGroups, IMS, negate = FALSE, applyIMS = "both", ver
         return(fGroups)
     }
     
-    return(doFGroupsFilter(fGroups, "IMS selection", c(IMS, negate), function(fGroups)
+    ret <- doFGroupsFilter(fGroups, "IMS selection", c(IMS, negate), function(fGroups)
     {
         if (IMS == "both") # implies negate, see above
-            return(delete(fGroups))
+            return(list(delete = list(j = names(fGroups))))
         
         gInfoDel <- groupInfo(fGroups)
         gInfoDel <- if (isTRUE(IMS) || (isFALSE(IMS) && negate))
@@ -359,13 +359,13 @@ selectIMSFilter <- function(fGroups, IMS, negate = FALSE, applyIMS = "both", ver
             else
                 gInfoDel[!is.na(mobility) & ims_parent_group %chin% names(fGroups)]
         }
-        fGroups <- delete(fGroups, j = gInfoDel$group)
-        
-        if (isFALSE(IMS))
-            fGroups <- clearMobilities(fGroups)
-        
-        return(fGroups)
-    }, "IMS_selection", applyIMS = "both", verbose = verbose))
+        return(list(delete = list(j = gInfoDel$group)))
+    }, "IMS_selection", applyIMS = "both", verbose = verbose)
+    
+    if (isFALSE(IMS))
+        ret <- clearMobilities(ret) # UNDONE: cache?
+    
+    return(ret)
 }
 
 IMSRangeFilter <- function(fGroups, IMSRangeParams, negate, applyIMS = TRUE)
@@ -387,7 +387,7 @@ IMSRangeFilter <- function(fGroups, IMSRangeParams, negate, applyIMS = TRUE)
             !numGTE(vals, IMSRangeParams$lower) | !numLTE(vals, IMSRangeParams$upper)
         else
             numGTE(vals, IMSRangeParams$lower) & numLTE(vals, IMSRangeParams$upper)
-        return(fGroups[, keep])
+        return(list(subset = list(j = keep)))
     }, "IMS_range", applyIMS = TRUE))
 }
 

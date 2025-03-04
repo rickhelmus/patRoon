@@ -153,36 +153,45 @@ doFGroupsFilter <- function(fGroups, what, hashParam, func, cacheCateg = what, a
     }
     
     cacheName <- sprintf("filterFGroups_%s", cacheCateg)
-    hash <- makeHash(fGroups, what, hashParam)
+    hash <- makeHash(fGroups, what, hashParam, applyIMS)
     ret <- loadCacheData(cacheName, hash)
     if (is.null(ret))
     {
         ret <- if (length(fGroups) > 0) func(fGroups) else NULL
         if (!is.null(ret))
+        {
+            if (applyIMS != "both" && hasMobilities(fGroups))
+            {
+                # only remove mobility features/feature groups or their parents
+                gInfoKeep <- groupInfo(fGroups)
+                gInfoKeep <- if (applyIMS) gInfoKeep[is.na(mobility)] else gInfoKeep[!is.na(mobility)]
+                
+                if (!is.null(ret[["delete"]]) && !is.null(ret[["delete"]][["j"]]))
+                {
+                    if (is.character(ret$delete$j))
+                        ret$delete$j <- setdiff(ret$delete$j, gInfoKeep$group)
+                    else if (checkmate::testAtomicVector(ret$delete$j))
+                        ret$delete$j <- setdiff(names(fGroups)[ret$delete$j], gInfoKeep$group)
+                    else # DT
+                    {
+                        ret$delete$j <- copy(ret$delete$j)
+                        ret$delete$j[, (gInfoKeep$group) := FALSE]
+                    }
+                }
+                if (!is.null(ret[["subset"]]) && !is.null(ret[["subset"]][["j"]]))
+                {
+                    if (is.character(ret$subset$j))
+                        ret$subset$j <- intersect(ret$subset$j, gInfoKeep$group)
+                    else # logical/inds
+                        ret$subset$j <- intersect(names(fGroups)[ret$subset$j], gInfoKeep$group)
+                }
+            }
+            
             saveCacheData(cacheName, ret, hash)
+        }
     }
 
     fGroupsFiltered <- getFilteredFGroups(fGroups, ret)
-    
-    if (applyIMS != "both" && hasMobilities(fGroups))
-    {
-        # only remove mobility features/feature groups or their parents
-        
-        gInfoKeep <- groupInfo(fGroups)
-        gInfoKeep <- if (applyIMS) gInfoKeep[is.na(mobility)] else gInfoKeep[!is.na(mobility)]
-        
-        fgf <- delete(fGroups, i = !analyses(fGroups) %in% analyses(fGroupsFiltered))
-        fgf <- delete(fgf, j = setdiff(names(fgf), union(names(fGroupsFiltered), gInfoKeep$group)))
-        
-        fgf@features <- delete(getFeatures(fgf), j = function(ft, ana)
-        {
-            keep <- if (applyIMS) is.na(ft$mobility) else !is.na(ft$mobility)
-            keep <- keep | ft$ID %in% featureTable(fGroupsFiltered)[[ana]]$ID
-            return(!keep)
-        })
-        
-        fGroupsFiltered <- fgf
-    }
     
     if (verbose)
     {

@@ -71,16 +71,6 @@ setMethod("groupFeaturesXCMS3", "features", function(feat, rtalign = TRUE, loadR
 
 #' @rdname groupFeaturesXCMS3
 #' @export
-setMethod("groupFeaturesXCMS3", "featuresSuspects", function(feat,
-                                                             groupParam = xcms::PeakDensityParam(sampleGroups = analysisInfo(feat)$replicate),
-                                                             verbose = TRUE)
-{
-    return(doGroupSuspects(feat, selectMethod("groupFeaturesXCMS3", "features"), rtalign = FALSE,
-                           loadRawData = FALSE, groupParam = groupParam, verbose = verbose))
-})
-
-#' @rdname groupFeaturesXCMS3
-#' @export
 setMethod("groupFeaturesXCMS3", "featuresSet", function(feat,
                                                         groupParam = xcms::PeakDensityParam(sampleGroups = analysisInfo(feat)$replicate),
                                                         verbose = TRUE)

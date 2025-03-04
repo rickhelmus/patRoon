@@ -115,27 +115,14 @@
     - parent-less/orphaned IMS features
         - done?
     - switch to PCL w/ CCSbase in patRoonExt
-- Suspect features
-    - Remove featureSuspects and replace by findFeaturesBinning?
-        - Add arg to give suspect list, vector of m/zs etc instead of binning
-        - Maybe rename binning to eg EICs?
-        - remove doGroupSuspects()
-    - otherwise, if we keep it...
-        - XCMS/XCMS3/KPIC2: doc and/or default min fractions to zero as these probably don't make a lot of sense otherwise
-        - Handle mobilities
-            - Does the mobmin/mobmax range make sense how it is computed now?
-        - remove mobility assignment?
-            - if not, support >1 mobilities in suspect list and do mobility assignment directly from suspect list like assignMobilities()
-        - update use of loadCacheData() (see bin features)
 - reporting
     - comps-clust: don't have imgs double in reportPlots
     - hide ims_precursor_group if all are NA (e.g. all orphans)
     - group orphans in eg "orphan" group?
 - feat EICs
     - rename
-    - remove susp features
-    - verbose option with status messages
     - tweak default EIC filtering params, more strict for binning?
+    - group IMS: add to groupFeatures, (force) disable RT align and group fractions?
 
 ## Tests
 

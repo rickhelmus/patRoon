@@ -84,7 +84,7 @@ setMethod("initialize", "featuresOpenMS",
 #'
 #' @export
 findFeaturesOpenMS <- function(analysisInfo, noiseThrInt = 1000, chromSNR = 3, chromFWHM = 5,
-                               mzPPM = defaultTol("mz", "medium_rel"), reEstimateMTSD = TRUE,
+                               mzPPM = defaultLim("mz", "medium_rel"), reEstimateMTSD = TRUE,
                                traceTermCriterion = "sample_rate", traceTermOutliers = 5, minSampleRate = 0.5,
                                minTraceLength = 3, maxTraceLength = -1, widthFiltering = "fixed", minFWHM = 1,
                                maxFWHM = 30, traceSNRFiltering = FALSE, localRTRange = 10, localMZRange = 6.5,

@@ -860,7 +860,8 @@ findPeaksInEICs <- function(EICs, peakParams, withMobility, logPath, cacheDB = N
         else
         {
             peaks[, c("mzmin", "mzmax", "mz", "mobmin", "mobmax", "mobility") := {
-                eic <- EICs[[EIC_ID]][EICs[[EIC_ID]]$time %between% c(retmin, retmax), ]
+                eic <- EICs[[EIC_ID]]
+                eic <- eic[numGTETol(eic$time, retmin) & numLTETol(eic$time, retmax), ]
                 if (nrow(eic) == 0)
                     numeric(1)
                 else
@@ -1050,7 +1051,8 @@ reintegrateMobilityFeatures <- function(features, EICRTWindow, peakRTWindow, cal
             doRows <- which(ft$ID %chin% names(eics) & !ft$ID %chin% peakIDs)
 
             ft[doRows, c("intensity", "area") := {
-                eic <- eics[[ID]][eics[[ID]]$time %between% c(retmin, retmax), ]
+                eic <- eics[[ID]]
+                eic <- eic[numGTETol(eic$time, retmin) & numLTETol(eic$time, retmax), ]
                 
                 eicnz <- eic[eic$intensity > 0, ]
                 i <- if (nrow(eicnz) > 0) eicnz[which.min(abs(eicnz$time - ret)), "intensity"] else 0

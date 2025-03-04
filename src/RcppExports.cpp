@@ -215,14 +215,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // getScans
-Rcpp::DataFrame getScans(const MSReadBackend& backend, SpectrumRawTypes::Mass timeStart, SpectrumRawTypes::Mass timeEnd, int MSLevel, SpectrumRawTypes::Mass prec);
+Rcpp::DataFrame getScans(const MSReadBackend& backend, SpectrumRawTypes::Time timeStart, SpectrumRawTypes::Time timeEnd, int MSLevel, SpectrumRawTypes::Mass prec);
 RcppExport SEXP _patRoon_getScans(SEXP backendSEXP, SEXP timeStartSEXP, SEXP timeEndSEXP, SEXP MSLevelSEXP, SEXP precSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const MSReadBackend& >::type backend(backendSEXP);
-    Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type timeStart(timeStartSEXP);
-    Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type timeEnd(timeEndSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Time >::type timeStart(timeStartSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Time >::type timeEnd(timeEndSEXP);
     Rcpp::traits::input_parameter< int >::type MSLevel(MSLevelSEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type prec(precSEXP);
     rcpp_result_gen = Rcpp::wrap(getScans(backend, timeStart, timeEnd, MSLevel, prec));

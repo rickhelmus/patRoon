@@ -406,6 +406,11 @@ numEQ <- function(x, y, tol = sqrt(.Machine$double.eps)) abs(x - y) <= tol
 numGTE <- function(x, y, tol = sqrt(.Machine$double.eps)) numEQ(x, y, tol) | x > y
 numLTE <- function(x, y, tol = sqrt(.Machine$double.eps)) numEQ(x, y, tol) | x < y
 
+# more tolerance versions of above, e.g. when comparing floats from C++ with doubles from R
+numEQTol <- function(x, y, tol = 1E-4) numEQ(x, y, tol)
+numGTETol <- function(x, y, tol = 1E-4) numGTE(x, y, tol)
+numLTETol <- function(x, y, tol = 1E-4) numLTE(x, y, tol)
+
 wrapStr <- function(s, width, sep = "\n") paste0(strwrap(s, width), collapse = sep)
 
 subListAttr <- function(l, el)

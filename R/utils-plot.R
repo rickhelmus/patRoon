@@ -281,7 +281,7 @@ makeEIXPlot <- function(featPlotTab, anaInfo, gInfo, showPeakArea, showFGroupRec
             
             if (showPeakArea && nrow(featRow) != 0 && !is.na(featRow$xmin))
             {
-                EIXFill <- setDT(EIX[numGTE(EIX[[1]], featRow$xmin) & numLTE(EIX[[1]], featRow$xmax), ])
+                EIXFill <- setDT(EIX[numGTETol(EIX[[1]], featRow$xmin) & numLTETol(EIX[[1]], featRow$xmax), ])
                 EIXFill <- EIXFill[EIXFill[[1]] %inrange% effectiveXlim]
                 # filling doesn't work if outside y plot range
                 EIXFill[intensity < effectiveYlim[1], intensity := effectiveYlim[1]]

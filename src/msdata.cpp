@@ -308,7 +308,7 @@ Rcpp::DataFrame getCentroidedFrame(const MSReadBackend &backend, int index, Spec
 }
 
 // [[Rcpp::export]]
-Rcpp::DataFrame getScans(const MSReadBackend &backend, SpectrumRawTypes::Mass timeStart, SpectrumRawTypes::Mass timeEnd,
+Rcpp::DataFrame getScans(const MSReadBackend &backend, SpectrumRawTypes::Time timeStart, SpectrumRawTypes::Time timeEnd,
                          int MSLevel, SpectrumRawTypes::Mass prec)
 {
     const auto sels = getSpecRawSelections(backend.getSpecMetadata(), makeNumRange(timeStart, timeEnd),

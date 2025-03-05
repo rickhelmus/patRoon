@@ -385,7 +385,7 @@ setMethod("assignMobilities", "featureGroupsScreeningSet", function(obj, mobPeak
 
     if (!is.null(mobPeakParams) || fromSuspects)
     {
-        obj <- warnAndClearAssignedMobilities(obj)
+        obj <- checkAssignedMobilityFGroups(obj)
         anaInfo <- analysisInfo(obj)
         for (s in sets(obj))
         {

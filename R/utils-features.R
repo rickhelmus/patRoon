@@ -892,10 +892,13 @@ findPeaksInEICs <- function(EICs, peakParams, withMobility, logPath, cacheDB = N
 getMobilityCols <- function() c("mobility", "mobmin", "mobmax", "mob_area", "mob_intensity")
 countMobilityFeatures <- function(feat) sum(sapply(featureTable(feat), function(ft) sum(!is.null(ft[["mobility"]]) & !is.na(ft$mobility))))
 
-warnAndClearAssignedMobilities <- function(fGroups)
+checkAssignedMobilityFGroups <- function(fGroups)
 {
     if (hasMobilities(fGroups))
     {
+        if (all(!is.na(fGroups$mobility)))
+            stop("There are no feature groups without mobility assignments available for which mobility features can be assigned.", call. = FALSE)
+        
         warning("Mobility features already have been assigned, these will be cleared now!", call. = FALSE)
         fGroups <- selectIMSFilter(fGroups, IMS = FALSE, verbose = FALSE)
     }

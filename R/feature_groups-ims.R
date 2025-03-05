@@ -13,7 +13,6 @@ setMethod("groupFeaturesIMS", "features", function(feat, groupAlgo, IMSWindow = 
                                                    verbose = FALSE)
 {
     # UNDONE: doc verbose bahavior
-    # UNDONE: check that all features are orphans?
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assertString(groupAlgo, add = ac)
@@ -26,6 +25,9 @@ setMethod("groupFeaturesIMS", "features", function(feat, groupAlgo, IMSWindow = 
     anaInfo <- analysisInfo(feat)
     fTable <- featureTable(feat)
     fTableAll <- as.data.table(feat)
+    
+    if (any(is.na(fTableAll$mobility)))
+        stop("All features must have mobilities assigned.", call. = FALSE)
     
     # clusters features with similar mobilities
     if (nrow(fTableAll) == 0)

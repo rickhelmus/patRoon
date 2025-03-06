@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2025-02-28" />
+<meta name="date" content="2025-03-06" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -937,28 +937,28 @@ CN(C)CC(C1=CC=C(C=C1)OC)C2(CCCCC2)O
 #&gt; 5: M146_R309_68 suspect  Oc1ccc2ccccc2n1 2-Hydroxyquinoline       7.978394       8.646156        8.67157</code></pre>
 <p>If there were multiple candidates for a single feature group then these are split over the table rows:</p>
 <div class="sourceCode" id="cb295"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb295-1"><a href="pred.html#cb295-1" tabindex="-1"></a><span class="fu">toxicities</span>(fGroupsTox)</span></code></pre></div>
-<pre><code>#&gt;             group     type                  candidate                     candidate_name      LC50
-#&gt;            &lt;char&gt;   &lt;char&gt;                     &lt;char&gt;                             &lt;char&gt;     &lt;num&gt;
-#&gt;  1:  M120_R268_30 compound          C1=CC(=NC=C1N)C#N     5-aminopyridine-2-carbonitrile 132007.55
-#&gt;  2:  M120_R268_30 compound        C1=CC2=C(N=C1)N=CN2          1H-imidazo[4,5-b]pyridine 125872.29
-#&gt;  3:  M120_R268_30 compound          C1=CC2=NNN=C2C=C1                   2H-benzotriazole  65155.26
-#&gt;  4:  M120_R268_30 compound          C1=CN=CC(=C1N)C#N     4-aminopyridine-3-carbonitrile  83309.12
-#&gt;  5:  M120_R268_30 compound          C1=CNC2=CN=CN=C21        5H-pyrrolo[3,2-d]pyrimidine  88213.59
-#&gt; ---                                                                                               
-#&gt; 16: M192_R355_191 compound CCN(CC)C(=O)C1=CC=C(C=C1)C      N,N-diethyl-4-methylbenzamide  86651.19
-#&gt; 17: M192_R355_191 compound CCN(CC)C(=O)C1=CC=CC(=C1)C      N,N-diethyl-3-methylbenzamide 114064.57
-#&gt; 18: M192_R355_191 compound   CCN(CC)C(=O)C1=CC=CC=C1C      N,N-diethyl-2-methylbenzamide  81126.15
-#&gt; 19: M192_R355_191 compound   CCN(CC)C(=O)CC1=CC=CC=C1      N,N-diethyl-2-phenylacetamide  88445.02
-#&gt; 20: M192_R355_191 compound CCN(CC)C1=CC=C(C=C1)C(=O)C 1-[4-(diethylamino)phenyl]ethanone  96005.28</code></pre>
+<pre><code>#&gt;             group     type                        candidate                          candidate_name      LC50
+#&gt;            &lt;char&gt;   &lt;char&gt;                           &lt;char&gt;                                  &lt;char&gt;     &lt;num&gt;
+#&gt;  1:  M120_R268_30 compound              C1=CC2=C(C=NN2)N=C1              1H-pyrazolo[4,3-b]pyridine  96147.35
+#&gt;  2:  M120_R268_30 compound              C1=CC2=C(N=C1)N=CN2               1H-imidazo[4,5-b]pyridine 125872.29
+#&gt;  3:  M120_R268_30 compound                C1=CC2=NNN=C2C=C1                        2H-benzotriazole  65155.26
+#&gt;  4:  M120_R268_30 compound              C1=CN2C(=CC=N2)N=C1               pyrazolo[1,5-a]pyrimidine  81286.35
+#&gt;  5:  M120_R268_30 compound                C1=CNC2=CN=CN=C21             5H-pyrrolo[3,2-d]pyrimidine  88213.59
+#&gt; ---                                                                                                          
+#&gt; 16: M192_R355_191 compound       CCN(CC)C(=O)C1=CC=C(C=C1)C           N,N-diethyl-4-methylbenzamide  86651.19
+#&gt; 17: M192_R355_191 compound       CCN(CC)C(=O)C1=CC=CC(=C1)C           N,N-diethyl-3-methylbenzamide 114064.57
+#&gt; 18: M192_R355_191 compound         CCN(CC)C(=O)C1=CC=CC=C1C           N,N-diethyl-2-methylbenzamide  81126.15
+#&gt; 19: M192_R355_191 compound         CCN(CC)C(=O)CC1=CC=CC=C1           N,N-diethyl-2-phenylacetamide  88445.02
+#&gt; 20: M192_R355_191 compound C[C@H]1[C@@H](OCCN1C)C2=CC=CC=C2 (2S,3S)-3,4-dimethyl-2-phenylmorpholine 132385.09</code></pre>
 <p>The <code>as.data.table()</code> method function, which <a href="processing.html#processing">was discussed previously</a>, can be used to summarize toxicity and concentration values.</p>
 <div class="sourceCode" id="cb297"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb297-1"><a href="pred.html#cb297-1" tabindex="-1"></a><span class="co"># </span><span class="al">NOTE</span><span class="co">: NA values are filtered and columns are subset for readability</span></span>
 <span id="cb297-2"><a href="pred.html#cb297-2" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroupsTox)[<span class="sc">!</span><span class="fu">is.na</span>(LC50), <span class="fu">c</span>(<span class="st">&quot;group&quot;</span>, <span class="st">&quot;LC50&quot;</span>, <span class="st">&quot;LC50_types&quot;</span>)]</span></code></pre></div>
 <pre><code>#&gt;            group      LC50 LC50_types
 #&gt;           &lt;char&gt;     &lt;num&gt;     &lt;char&gt;
-#&gt; 1:  M120_R268_30  98911.56   compound
+#&gt; 1:  M120_R268_30  91334.97   compound
 #&gt; 2:  M137_R249_53 149557.04   compound
-#&gt; 3:  M146_R309_68  41178.78   compound
-#&gt; 4: M192_R355_191  93258.44   compound</code></pre>
+#&gt; 3:  M146_R309_68  39154.68   compound
+#&gt; 4: M192_R355_191 100534.41   compound</code></pre>
 <div class="sourceCode" id="cb299"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb299-1"><a href="pred.html#cb299-1" tabindex="-1"></a>concCols <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;group&quot;</span>, <span class="fu">paste0</span>(<span class="fu">analyses</span>(fGroupsSuspConc), <span class="st">&quot;_conc&quot;</span>), <span class="st">&quot;conc_types&quot;</span>)</span>
 <span id="cb299-2"><a href="pred.html#cb299-2" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroupsSuspConc)[<span class="sc">!</span><span class="fu">is.na</span>(conc_types), concCols, with <span class="ot">=</span> <span class="cn">FALSE</span>]</span></code></pre></div>
 <pre><code>#&gt;           group standard-pos-1_conc standard-pos-2_conc standard-pos-3_conc conc_types
@@ -973,10 +973,10 @@ CN(C)CC(C1=CC=C(C=C1)OC)C2(CCCCC2)O
 <span id="cb301-2"><a href="pred.html#cb301-2" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroupsTox, <span class="at">toxAggrParams =</span> <span class="fu">getDefPredAggrParams</span>(max))[<span class="sc">!</span><span class="fu">is.na</span>(LC50), <span class="fu">c</span>(<span class="st">&quot;group&quot;</span>, <span class="st">&quot;LC50&quot;</span>, <span class="st">&quot;LC50_types&quot;</span>)]</span></code></pre></div>
 <pre><code>#&gt;            group      LC50 LC50_types
 #&gt;           &lt;char&gt;     &lt;num&gt;     &lt;char&gt;
-#&gt; 1:  M120_R268_30 132007.55   compound
+#&gt; 1:  M120_R268_30 125872.29   compound
 #&gt; 2:  M137_R249_53 314718.38   compound
 #&gt; 3:  M146_R309_68  49051.68   compound
-#&gt; 4: M192_R355_191 114064.57   compound</code></pre>
+#&gt; 4: M192_R355_191 132385.09   compound</code></pre>
 <p>If the <code>as.data.table()</code> method is used on suspect screening results, and predictions were performed directly for suspect hits, then predicted values can be reported for individual suspect match instead of aggregating them per feature group:</p>
 <div class="sourceCode" id="cb303"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb303-1"><a href="pred.html#cb303-1" tabindex="-1"></a><span class="co"># Reports predicted values for each suspect separately. If multiple suspects are assigned to a feature group,</span></span>
 <span id="cb303-2"><a href="pred.html#cb303-2" tabindex="-1"></a><span class="co"># then each suspect match is split into a different row. </span></span>

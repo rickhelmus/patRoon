@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2025-02-28" />
+<meta name="date" content="2025-03-06" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -371,11 +371,11 @@ div.csl-indent {
 <div class="sourceCode" id="cb167"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb167-1"><a href="processing-data.html#cb167-1" tabindex="-1"></a><span class="fu">as.data.table</span>(compounds)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="fu">c</span>(<span class="st">&quot;group&quot;</span>, <span class="st">&quot;score-positive&quot;</span>, <span class="st">&quot;score-negative&quot;</span>, <span class="st">&quot;compoundName&quot;</span>, <span class="st">&quot;set&quot;</span>)]</span></code></pre></div>
 <pre><code>#&gt;            group score-positive score-negative                           compoundName               set
 #&gt;           &lt;char&gt;          &lt;num&gt;          &lt;num&gt;                                 &lt;char&gt;            &lt;char&gt;
-#&gt; 1: M198_R317_273       3.405141       4.563358    3-(4-chlorophenyl)-1,1-dimethylurea positive,negative
-#&gt; 2: M198_R317_273       1.782466       2.025473    3-(3-chlorophenyl)-1,1-dimethylurea positive,negative
-#&gt; 3: M198_R317_273       1.688621       1.859463 4-amino-2-chloro-N,N-dimethylbenzamide positive,negative
-#&gt; 4: M198_R317_273       1.775210       1.524256         1-(4-chlorophenyl)-3-ethylurea positive,negative
-#&gt; 5: M198_R317_273       1.684881       1.855723 3-amino-4-chloro-N,N-dimethylbenzamide positive,negative</code></pre>
+#&gt; 1: M198_R317_273       3.290700       4.569478    3-(4-chlorophenyl)-1,1-dimethylurea positive,negative
+#&gt; 2: M198_R317_273       1.668025       2.025473    3-(3-chlorophenyl)-1,1-dimethylurea positive,negative
+#&gt; 3: M198_R317_273       1.594943       1.869558 4-amino-2-chloro-N,N-dimethylbenzamide positive,negative
+#&gt; 4: M198_R317_273       1.673759       1.557270         1-(4-chlorophenyl)-3-ethylurea positive,negative
+#&gt; 5: M198_R317_273       1.591203       1.865819 3-amino-4-chloro-N,N-dimethylbenzamide positive,negative</code></pre>
 <p>In addition, some the data processing functionality contains additional functionality for a sets workflow:</p>
 <div class="sourceCode" id="cb169"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb169-1"><a href="processing-data.html#cb169-1" tabindex="-1"></a><span class="co"># only keep feature groups that have positive data</span></span>
 <span id="cb169-2"><a href="processing-data.html#cb169-2" tabindex="-1"></a>fGroupsPos <span class="ot">&lt;-</span> fGroups[, sets <span class="ot">=</span> <span class="st">&quot;positive&quot;</span>]</span>

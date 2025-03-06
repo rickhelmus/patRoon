@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2025-02-28" />
+<meta name="date" content="2025-03-06" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -476,17 +476,17 @@ div.csl-indent {
 <span id="cb59-2"><a href="inspecting-results.html#cb59-2" tabindex="-1"></a>compounds[[<span class="st">&quot;M120_R268_30&quot;</span>]][, <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>]</span></code></pre></div>
 <pre><code>#&gt;     explainedPeaks     score neutralMass                   SMILES
 #&gt;              &lt;int&gt;     &lt;num&gt;       &lt;num&gt;                   &lt;char&gt;
-#&gt;  1:              0 2.7688810    119.0483        C1=CC2=NNN=C2C=C1
-#&gt;  2:              0 1.0227002    119.0483        C1=CNC2=CN=CN=C21
-#&gt;  3:              0 1.0012557    119.0483        C1=CN=CC(=C1N)C#N
-#&gt;  4:              0 0.9894233    119.0483      C1=CC2=C(N=C1)N=CN2
-#&gt;  5:              0 0.9853520    119.0483        C1=CC(=NC=C1N)C#N
+#&gt;  1:              0 2.9919045    119.0483        C1=CC2=NNN=C2C=C1
+#&gt;  2:              0 1.2504308    119.0483        C1=CNC2=CN=CN=C21
+#&gt;  3:              0 1.2336169    119.0483      C1=CC2=C(N=C1)N=CN2
+#&gt;  4:              0 1.2079701    119.0483      C1=CC2=C(C=NN2)N=C1
+#&gt;  5:              0 1.1511570    119.0483      C1=CN2C(=CC=N2)N=C1
 #&gt; ---                                                              
-#&gt; 37:              0 0.7388040    119.0483        C1=CC2=NC=NN2C=C1
-#&gt; 38:              0 0.7368631    119.0483        C1=CN2C=NC=C2N=C1
-#&gt; 39:              0 0.7352825    119.0483        C1=CNC2=C1C=CN=N2
-#&gt; 40:              0 0.5346503    119.0483 C1=CC(=[N+]=[N-])C=CC1=N
-#&gt; 41:              0 0.3939508    119.0483         C(C#N)C(CC#N)C#N</code></pre>
+#&gt; 37:              0 0.9541662    119.0483        CC1=CN=C(N=C1)C#N
+#&gt; 38:              0 0.9535093    119.0483        CC1=NC(=NC=C1)C#N
+#&gt; 39:              0 0.9499092    119.0483        CC1=NN=C(C=C1)C#N
+#&gt; 40:              0 0.8128595    119.0483 C1=CC(=[N+]=[N-])C=CC1=N
+#&gt; 41:              0 0.7438038    119.0483         C(C#N)C(CC#N)C#N</code></pre>
 <div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="inspecting-results.html#cb61-1" tabindex="-1"></a><span class="co"># get a table with information of a component</span></span>
 <span id="cb61-2"><a href="inspecting-results.html#cb61-2" tabindex="-1"></a>components[[<span class="st">&quot;CMP7&quot;</span>]][, <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]</span></code></pre></div>
 <pre><code>#&gt;            group     ret       mz isogroup isonr charge
@@ -507,17 +507,17 @@ div.csl-indent {
 <span id="cb63-2"><a href="inspecting-results.html#cb63-2" tabindex="-1"></a><span class="fu">as.data.table</span>(fList)[, <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]</span></code></pre></div>
 <pre><code>#&gt;             analysis                     ID     ret        mz      area intensity
 #&gt;               &lt;char&gt;                 &lt;char&gt;   &lt;num&gt;     &lt;num&gt;     &lt;num&gt;     &lt;num&gt;
-#&gt;    1:  solvent-pos-1 f_10715549514927882394  13.176  98.97537 4345232.0    391476
-#&gt;    2:  solvent-pos-1  f_5897551936645294719   7.181 100.11197  797112.1    426956
-#&gt;    3:  solvent-pos-1 f_16597649526673570636 192.178 100.11211 9609998.0    750532
-#&gt;    4:  solvent-pos-1  f_9718338269308146803  19.171 100.11217 5784411.0    370376
-#&gt;    5:  solvent-pos-1 f_14078370335292415581   4.786 100.11220  551723.6    567312
+#&gt;    1:  solvent-pos-1 f_17590824442646173224  13.176  98.97537 4345232.0    391476
+#&gt;    2:  solvent-pos-1 f_13394242216147759252   7.181 100.11197  797112.1    426956
+#&gt;    3:  solvent-pos-1  f_7087061069348083640 192.178 100.11211 9609998.0    750532
+#&gt;    4:  solvent-pos-1  f_6901462986906308306  19.171 100.11217 5784411.0    370376
+#&gt;    5:  solvent-pos-1  f_4041152368453544641   4.786 100.11220  551723.6    567312
 #&gt;   ---                                                                            
-#&gt; 2922: standard-pos-3 f_12609174729000181935 318.892 425.18866  666531.5    232636
-#&gt; 2923: standard-pos-3  f_3466981035329378608   9.114 427.03242  362024.1    114744
-#&gt; 2924: standard-pos-3  f_9652807371626638962 318.892 427.18678  200193.5     77768
-#&gt; 2925: standard-pos-3  f_3519792058071878087 382.682 432.23984  217612.9     97648
-#&gt; 2926: standard-pos-3 f_13439699907642740291   9.114 433.00457 3086864.0    912920</code></pre>
+#&gt; 2922: standard-pos-3 f_15115743417353454712 318.892 425.18866  666531.5    232636
+#&gt; 2923: standard-pos-3  f_5918170388350093229   9.114 427.03242  362024.1    114744
+#&gt; 2924: standard-pos-3 f_11703209048661137267 318.892 427.18678  200193.5     77768
+#&gt; 2925: standard-pos-3  f_7391959453426985964 382.682 432.23984  217612.9     97648
+#&gt; 2926: standard-pos-3 f_15876751683807888264   9.114 433.00457 3086864.0    912920</code></pre>
 <div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="inspecting-results.html#cb65-1" tabindex="-1"></a><span class="co"># Returns group info and intensity values for each feature group</span></span>
 <span id="cb65-2"><a href="inspecting-results.html#cb65-2" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroups, <span class="at">average =</span> <span class="cn">TRUE</span>) <span class="co"># average intensities for replicates</span></span></code></pre></div>
 <pre><code>#&gt;              group      ret       mz standard-pos
@@ -540,8 +540,8 @@ div.csl-indent {
 <pre><code>#&gt;           group          susp_name susp_compRank susp_annSimBoth susp_estIDLevel
 #&gt;          &lt;char&gt;             &lt;char&gt;         &lt;int&gt;           &lt;num&gt;          &lt;char&gt;
 #&gt; 1: M120_R268_30   1H-benzotriazole             1       0.0000000              4b
-#&gt; 2: M137_R249_53      N-Phenyl urea             1       0.6443557               5
-#&gt; 3: M146_R309_68 2-Hydroxyquinoline             2       0.9896892              3c
+#&gt; 2: M137_R249_53      N-Phenyl urea             1       0.6443557              3a
+#&gt; 3: M146_R309_68 2-Hydroxyquinoline             2       0.9896892              3a
 #&gt; 4: M146_R248_69 2-Hydroxyquinoline            NA              NA               5
 #&gt; 5: M146_R225_70 2-Hydroxyquinoline            NA              NA               5</code></pre>
 <div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="inspecting-results.html#cb69-1" tabindex="-1"></a><span class="co"># Returns all peak lists for each feature group</span></span>
@@ -570,19 +570,19 @@ div.csl-indent {
 #&gt; 4: M192_R355_191        C12H17NO    C12H18NO    191.1310       192.1383 0.03333333</code></pre>
 <div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb73-1"><a href="inspecting-results.html#cb73-1" tabindex="-1"></a><span class="co"># Returns all compound candidates for each feature group with scoring and other metadata</span></span>
 <span id="cb73-2"><a href="inspecting-results.html#cb73-2" tabindex="-1"></a><span class="fu">as.data.table</span>(compounds)[, <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>]</span></code></pre></div>
-<pre><code>#&gt;              group explainedPeaks     score neutralMass
-#&gt;             &lt;char&gt;          &lt;int&gt;     &lt;num&gt;       &lt;num&gt;
-#&gt;   1:  M120_R268_30              0 2.7688810    119.0483
-#&gt;   2:  M120_R268_30              0 1.0227002    119.0483
-#&gt;   3:  M120_R268_30              0 1.0012557    119.0483
-#&gt;   4:  M120_R268_30              0 0.9894233    119.0483
-#&gt;   5:  M120_R268_30              0 0.9853520    119.0483
-#&gt;  ---                                                   
-#&gt; 288: M192_R355_191              1 0.9697766    191.1310
-#&gt; 289: M192_R355_191              1 0.9697633    191.1310
-#&gt; 290: M192_R355_191              1 0.9681211    191.1310
-#&gt; 291: M192_R355_191              1 0.9641146    191.1310
-#&gt; 292: M192_R355_191              1 0.9582355    191.1310</code></pre>
+<pre><code>#&gt;              group explainedPeaks    score neutralMass
+#&gt;             &lt;char&gt;          &lt;int&gt;    &lt;num&gt;       &lt;num&gt;
+#&gt;   1:  M120_R268_30              0 2.991905    119.0483
+#&gt;   2:  M120_R268_30              0 1.250431    119.0483
+#&gt;   3:  M120_R268_30              0 1.233617    119.0483
+#&gt;   4:  M120_R268_30              0 1.207970    119.0483
+#&gt;   5:  M120_R268_30              0 1.151157    119.0483
+#&gt;  ---                                                  
+#&gt; 288: M192_R355_191              1 1.367332    191.1310
+#&gt; 289: M192_R355_191              1 1.367220    191.1310
+#&gt; 290: M192_R355_191              1 1.366424    191.1310
+#&gt; 291: M192_R355_191              1 1.364403    191.1310
+#&gt; 292: M192_R355_191              1 1.363116    191.1310</code></pre>
 <div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb75-1"><a href="inspecting-results.html#cb75-1" tabindex="-1"></a><span class="co"># Returns table with all components (including feature group info, annotations etc)</span></span>
 <span id="cb75-2"><a href="inspecting-results.html#cb75-2" tabindex="-1"></a><span class="fu">as.data.table</span>(components)[, <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]</span></code></pre></div>
 <pre><code>#&gt;       name  cmp_ret cmp_retsd       neutral_mass       analysis  size

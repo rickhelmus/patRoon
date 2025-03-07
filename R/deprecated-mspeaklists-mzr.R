@@ -8,12 +8,14 @@ NULL
 
 # align & average spectra by clustering or between peak distances
 # code inspired from msProcess R package: https://github.com/zeehio/msProcess
-averageSpectra <- function(spectra, clusterMzWindow, topMost, minIntensityPre, minIntensityPost, minAbundance,
-                           abundanceColumn, avgFun, avgCols, method, assignPrecursor, pruneMissingPrecursor,
-                           retainPrecursor)
+averageSpectra <- function(spectra, clusterMzWindow, topMost, minIntensityPre, minIntensityPost, minAbundanceRel,
+                           minAbundanceAbs, abundanceColumn, avgFun, avgCols, method, assignPrecursor,
+                           pruneMissingPrecursor, retainPrecursor)
 {
     if (length(spectra) == 0) # no spectra, return empty spectrum
         return(emptyMSPeakList(abundanceColumn, avgCols))
+    
+    abundanceColumnRel <- paste0(abundanceColumn, "_rel"); abundanceColumnAbs <- paste0(abundanceColumn, "_abs")
     
     spectra <- lapply(spectra, function(s)
     {
@@ -36,7 +38,10 @@ averageSpectra <- function(spectra, clusterMzWindow, topMost, minIntensityPre, m
     if (nrow(spcomb) < 2 || length(spectra) < 2)
     {
         if (!is.null(abundanceColumn))
-            spcomb[, (abundanceColumn) := 1 / spcount]
+        {
+            spcomb[, (abundanceColumnRel) := 1 / spcount]
+            spcomb[, (abundanceColumnAbs) := 1]
+        }
         return(spcomb[, names(emptyMSPeakList(abundanceColumn, avgCols)), with = FALSE])
     }
     
@@ -72,13 +77,14 @@ averageSpectra <- function(spectra, clusterMzWindow, topMost, minIntensityPre, m
     # do abundance calculation _after_ removing duplicated mass peaks from same spectra
     if (!is.null(abundanceColumn))
     {
-        ret[, (abundanceColumn) := .N / spcount, by = "cluster"]
-        ret <- ret[get(abundanceColumn) >= minAbundance]
+        ret[, (abundanceColumnRel) := .N / spcount, by = "cluster"]
+        ret[, (abundanceColumnAbs) := .N, by = "cluster"]
+        ret <- ret[get(abundanceColumnRel) >= minAbundanceRel & get(abundanceColumnAbs) >= minAbundanceAbs]
     }
     
     ret <- doAvgPL(ret, "cluster", spcount)
     ret[, c("cluster", "spid") := NULL]
-    setcolorder(ret, c("mz", "intensity", abundanceColumn, avgCols))
+    setcolorder(ret, intersect(c("mz", "intensity", abundanceColumnRel, abundanceColumnAbs, avgCols), names(ret)))
     
     if (nrow(ret) == 0)
         return(ret)
@@ -143,19 +149,20 @@ getSpectraHeader <- function(spectra, rtRange, MSLevel, precursor, precursorMzWi
     return(hd)
 }
 
-averageSpectraMZR <- function(spectra, hd, clusterMzWindow, topMost, minIntensityPre, minIntensityPost, minAbundance,
-                              avgFun, method, precursor, pruneMissingPrecursor, retainPrecursor)
+averageSpectraMZR <- function(spectra, hd, clusterMzWindow, topMost, minIntensityPre, minIntensityPost, minAbundanceRel,
+                              minAbundanceAbs, avgFun, method, precursor, pruneMissingPrecursor, retainPrecursor)
 {
     if (nrow(hd) == 0) # no spectra, return empty spectrum
-        return(emptyMSPeakList("feat_abundance", NULL))
+        return(emptyMSPeakList("abundance", NULL))
     
     sp <- spectra$spectra[hd$seqNum]
     # convert to peaklist format
     sp <- lapply(sp, function(spec) setnames(as.data.table(spec), c("mz", "intensity")))
     sp <- lapply(sp, assignPrecursorToMSPeakList, precursor)
     
-    return(averageSpectra(sp, clusterMzWindow, topMost, minIntensityPre, minIntensityPost, minAbundance,
-                          "feat_abundance", avgFun, NULL, method, TRUE, pruneMissingPrecursor, retainPrecursor))
+    return(averageSpectra(sp, clusterMzWindow, topMost, minIntensityPre, minIntensityPost, minAbundanceRel,
+                          minAbundanceAbs, "abundance", avgFun, NULL, method, TRUE, pruneMissingPrecursor,
+                          retainPrecursor))
 }
 
 # use mzR to generate MS peaklists.
@@ -198,8 +205,9 @@ averageSpectraMZR <- function(spectra, hd, clusterMzWindow, topMost, minIntensit
 #' @export
 setMethod("generateMSPeakListsMzR", "featureGroups", function(fGroups, maxMSRtWindow = 5,
                                                               precursorMzWindow = 4, topMost = NULL,
-                                                              avgFeatParams = getDefAvgPListParams(),
-                                                              avgFGroupParams = getDefAvgPListParams())
+                                                              avgFeatParams = getDefAvgPListParams(clusterMzWindow = 0.005),
+                                                              avgFGroupParams = getDefAvgPListParams(clusterMzWindow = 0.005,
+                                                                                                     withPrecursorMS = FALSE))
 {
     .Deprecated(old = "generateMSPeakListsMzR", new = "generateMSPeakLists")
     
@@ -229,9 +237,12 @@ setMethod("generateMSPeakListsMzR", "featureGroups", function(fGroups, maxMSRtWi
     resultHashes <- vector("character", anaCount * gCount)
     resultHashCount <- 0
 
-    warning("The withPrecursorMS and minIntensityIMS parameters are not supported with mzR, they will be ignored. ",
+    warning("The withPrecursorMS, minIntensityIMS, minAbundanceIMSRel, and minAbundanceIMSAbs parameters are not ",
+            "supported with mzR, they will be ignored. ",
             "Furthermore, the avgFun parameter was removed, and now default to 'mean'.", call. = FALSE)
-    avgFeatParams <- avgFeatParams[setdiff(names(avgFeatParams), c("withPrecursorMS", "minIntensityIMS"))]
+    avgFeatParams <- avgFeatParams[setdiff(names(avgFeatParams),
+                                           c("withPrecursorMS", "minIntensityIMS", "minAbundanceIMSRel",
+                                             "minAbundanceIMSAbs"))]
     avgFeatParams$avgFun <- mean
     
     avgFeatParamsMS <- avgFeatParamsMSMS <-

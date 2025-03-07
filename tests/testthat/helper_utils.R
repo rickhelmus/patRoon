@@ -409,6 +409,8 @@ expect_reportHTML <- function(object)
         lines <- gsub("data-tabsetid=\"[[:digit:]]+\"", "", lines)
         lines <- gsub("bslib-card\\-[[:digit:]]+", "", lines)
         lines <- gsub("navbar-collapse-[[:digit:]]+", "", lines)
+        lines <- gsub("bslib-accordion-[[:digit:]]+", "", lines)
+        lines <- gsub("bslib-accordion-panel-[[:digit:]]+", "", lines)
         return(gsub("\"[#]?tab\\-[[:digit:]]+\\-[[:digit:]]+\"", "", lines))
     }
     
@@ -416,6 +418,8 @@ expect_reportHTML <- function(object)
     {
         rpLines <- uniqueLines(rpFile)
         act <- quasi_label(rlang::enquo(object))
+        if (!isTRUE(all.equal(rpLines, uniqueLines(rpFile))))
+            browser()
         expect(isTRUE(all.equal(rpLines, uniqueLines(rpFile))), "cached report differs")
     }
 

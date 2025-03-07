@@ -23,7 +23,7 @@
 <line x1='150.92' y1='502.56' x2='150.92' y2='509.76' style='stroke-width: 0.75;' />
 <line x1='223.67' y1='502.56' x2='223.67' y2='509.76' style='stroke-width: 0.75;' />
 <line x1='296.42' y1='502.56' x2='296.42' y2='509.76' style='stroke-width: 0.75;' />
-<line x1='369.16' y1='502.56' x2='369.16' y2='509.76' style='stroke-width: 0.75;' />
+<line x1='369.17' y1='502.56' x2='369.17' y2='509.76' style='stroke-width: 0.75;' />
 <line x1='441.91' y1='502.56' x2='441.91' y2='509.76' style='stroke-width: 0.75;' />
 <line x1='514.66' y1='502.56' x2='514.66' y2='509.76' style='stroke-width: 0.75;' />
 <line x1='587.41' y1='502.56' x2='587.41' y2='509.76' style='stroke-width: 0.75;' />
@@ -31,7 +31,7 @@
 <text x='150.92' y='528.48' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='13.35px' lengthAdjust='spacingAndGlyphs'>95</text>
 <text x='223.67' y='528.48' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>100</text>
 <text x='296.42' y='528.48' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>105</text>
-<text x='369.16' y='528.48' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>110</text>
+<text x='369.17' y='528.48' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>110</text>
 <text x='441.91' y='528.48' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>115</text>
 <text x='514.66' y='528.48' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>120</text>
 <text x='587.41' y='528.48' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>125</text>
@@ -55,15 +55,14 @@
   </clipPath>
 </defs>
 <g clip-path='url(#cpNTkuMDR8NjE1LjI5fDU5LjA0fDUwMi41Ng==)'>
-<line x1='384.88' y1='280.80' x2='384.88' y2='451.91' style='stroke-width: 0.75; stroke: #A6CEE3;' />
-<line x1='355.56' y1='280.80' x2='355.56' y2='376.90' style='stroke-width: 1.50; stroke: #FF0000;' />
-<line x1='341.24' y1='280.80' x2='341.24' y2='311.22' style='stroke-width: 0.75; stroke: #A6CEE3;' />
-<line x1='399.48' y1='280.80' x2='399.48' y2='298.91' style='stroke-width: 0.75; stroke: #A6CEE3;' />
-<line x1='356.08' y1='280.80' x2='356.08' y2='297.53' style='stroke-width: 0.75; stroke: #A6CEE3;' />
-<line x1='428.69' y1='280.80' x2='428.69' y2='294.23' style='stroke-width: 0.75; stroke: #A6CEE3;' />
-<line x1='326.23' y1='280.80' x2='326.23' y2='293.08' style='stroke-width: 0.75; stroke: #A6CEE3;' />
-<line x1='326.76' y1='280.80' x2='326.76' y2='290.91' style='stroke-width: 0.75; stroke: #A6CEE3;' />
-<line x1='384.36' y1='280.80' x2='384.36' y2='290.42' style='stroke-width: 0.75; stroke: #A6CEE3;' />
+<line x1='384.89' y1='280.80' x2='384.89' y2='451.91' style='stroke-width: 0.75; stroke: #A6CEE3;' />
+<line x1='355.56' y1='280.80' x2='355.56' y2='352.00' style='stroke-width: 1.50; stroke: #FF0000;' />
+<line x1='341.24' y1='280.80' x2='341.24' y2='302.32' style='stroke-width: 0.75; stroke: #A6CEE3;' />
+<line x1='399.48' y1='280.80' x2='399.48' y2='299.23' style='stroke-width: 0.75; stroke: #A6CEE3;' />
+<line x1='428.69' y1='280.80' x2='428.69' y2='295.77' style='stroke-width: 0.75; stroke: #A6CEE3;' />
+<line x1='356.08' y1='280.80' x2='356.08' y2='294.48' style='stroke-width: 0.75; stroke: #A6CEE3;' />
+<line x1='326.23' y1='280.80' x2='326.23' y2='290.15' style='stroke-width: 0.75; stroke: #A6CEE3;' />
+<line x1='384.36' y1='280.80' x2='384.36' y2='289.81' style='stroke-width: 0.75; stroke: #A6CEE3;' />
 <line x1='269.23' y1='280.80' x2='269.23' y2='266.31' style='stroke-width: 1.50; stroke: #FF0000;' />
 <line x1='239.90' y1='280.80' x2='239.90' y2='264.91' style='stroke-width: 0.75; stroke: #A6CEE3;' />
 <line x1='254.63' y1='280.80' x2='254.63' y2='126.52' style='stroke-width: 0.75; stroke: #A6CEE3;' />

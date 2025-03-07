@@ -347,6 +347,13 @@ assertCanCreateDirs <- function(x, .var.name = checkmate::vname(x), add = NULL)
         assertCanCreateDir(ana, .var.name, add)
 }
 
+assertDirExists <- function(x, access, null.ok = FALSE, .var.name = checkmate::vname(x), add = NULL)
+{
+    if (is.null(x) && null.ok)
+        return(invisible(NULL))
+    checkmate::assertDirectoryExists(x, access, .var.name = .var.name, add = add)
+}
+
 assertDACloseSaveArgs <- function(x, save, .var.name = checkmate::vname(x), add = NULL)
 {
     checkmate::assertFlag(x, .var.name = .var.name, add = add)

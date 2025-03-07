@@ -67,48 +67,58 @@ getMSFileFormats <- function(fileType = NULL)
 #'
 #' @rdname analysis-information
 #' @export
-generateAnalysisInfo <- function(paths, replicates = "", blanks = "", concs = NULL, norm_concs = NULL,
-                                 formats = getMSFileFormats())
+generateAnalysisInfo <- function(pathRaw = NULL, pathCentroid = NULL, pathIMS = NULL, pathProfile = NULL, ...)
 {
+    otherArgs <- list(...)
+
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertDirectoryExists(paths, access = "r", add = ac)
-    checkmate::assertCharacter(replicates, min.len = 1, add = ac)
-    checkmate::assertCharacter(blanks, min.len = 1, add = ac)
-    aapply(checkmate::assertNumeric, . ~ concs + norm_concs, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
-    checkmate::assertSubset(formats, getMSFileFormats(), empty.ok = FALSE, add = ac)
+    aapply(assertDirExists, . ~ pathRaw + pathCentroid + pathIMS + pathProfile, access = "r", null.ok = TRUE,
+           fixed = list(add = ac))
+    if (length(otherArgs) > 0)
+        checkmate::assertNames(names(otherArgs), "unique", .var.name = "...", add = ac)
+    checkmate::qassertr(otherArgs, "V", .var.name = "...")
     checkmate::reportAssertions(ac)
-    
-    files <- listMSFiles(paths, formats)
-    
-    if (length(files) == 0)
+
+    addPath <- function(path, type)
     {
-        warning(sprintf("No analyses found in %s!", paste(paths, collapse = ", ")))
-        return(NULL)
-    }
-    
-    ret <- data.frame(path = dirname(files), analysis = simplifyAnalysisNames(files), stringsAsFactors = FALSE)
-    ret <- ret[!duplicated(ret[, c("path", "analysis")]), ]
-    
-    # set after duplicate removal
-    replicates <- rep(replicates, length.out = nrow(ret))
-    ret$replicate <- ifelse(!nzchar(replicates), ret$analysis, replicates)
-    ret$blank <- blanks
-    
-    getConcs <- function(x)
-    {
-        if (length(x) >= nrow(ret))
-            return(x[seq_len(nrow(ret))])
-        ret <- rep(NA_real_, nrow(ret))
-        ret[seq_along(x)] <- x
+        if (is.null(path))
+            return(NULL)
+        files <- listMSFiles(path, getMSFileFormats(type))
+        if (length(files) == 0)
+        {
+            warning(sprintf("No analyses found in %s!", path), call. = FALSE)
+            return(NULL)
+        }
+        ret <- data.table(analysis = simplifyAnalysisNames(files))
+        ret[, (paste0("path_", type)) := dirname(files)]
         return(ret)
     }
     
-    if (!is.null(concs))
-        ret$conc <- getConcs(concs)
-    if (!is.null(norm_concs))
-        ret$norm_conc <- getConcs(norm_concs)
+    # UNDONE: use getMSFileTypes() somehow?
+    allPaths <- Map(list(pathRaw, pathCentroid, pathIMS, pathProfile), c("raw", "centroid", "ims", "profile"), f = addPath)
+    allPaths <- pruneList(allPaths)
+    anaInfo <- if (length(allPaths) > 0)
+        Reduce(allPaths, f = function(x, y) merge(x, y, by = "analysis", all = TRUE))
+    else
+        data.table(analysis = character())
     
-    return(ret)
+    for (ft in getMSFileTypes())
+    {
+        if (is.null(anaInfo[[paste0("path_", ft)]]))
+            anaInfo[, (paste0("path_", ft)) := ""]
+    }
+    
+    for (oa in names(otherArgs))
+        anaInfo[, (oa) := rep(otherArgs[[oa]], length.out = nrow(anaInfo))]
+    
+    if (is.null(anaInfo[["replicate"]]))
+        anaInfo[, replicate := analysis]
+    else
+        anaInfo[!nzchar(replicate), replicate := analysis]
+    if (is.null(anaInfo[["blank"]]))
+        anaInfo[, blank := ""]
+    
+    return(as.data.frame(anaInfo))
 }
 
 # nocov start

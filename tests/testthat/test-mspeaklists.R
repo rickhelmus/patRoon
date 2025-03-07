@@ -5,8 +5,8 @@
 context("MS peak lists")
 
 fGroups <- getTestFGroups(getTestAnaInfoAnn())[, 1:100]
-ovFGroup <- if (testWithSets()) names(overlap(fGroups, c("positive", "negative"), sets = TRUE))[1] else names(fGroups)[1]
-plists <- generateMSPeakLists(fGroups, "mzr")
+ovFGroup <- if (testWithSets()) names(overlap(fGroups, which = c("positive", "negative"), aggregate = "set"))[1] else names(fGroups)[1]
+plists <- generateMSPeakLists(fGroups)
 plistsMSMS <- filter(plists, withMSMS = TRUE)
 
 if (doDATests())
@@ -19,11 +19,11 @@ if (doDATests())
     # NOTE: set bgsubtr to FALSE: subtraction might remove pecursor peaks of
     # (often wrong) low intensity features and result in warnings during
     # averaging
-    plistsDA <- generateMSPeakLists(fgDA, "bruker", save = FALSE, bgsubtr = FALSE)
-    plistsDAEmpty <- generateMSPeakLists(fgDA[, "nope"], "bruker", save = FALSE, bgsubtr = FALSE)
+    plistsDA <- generateMSPeakListsDA(fgDA, save = FALSE, bgsubtr = FALSE)
+    plistsDAEmpty <- generateMSPeakListsDA(fgDA[, "nope"], save = FALSE, bgsubtr = FALSE)
 
     fgDA2 <- getTestFGroupsDA(getDAAnaInfo("std1"))[, 1:25]
-    plistsDAFMF <- generateMSPeakLists(fgDA2, "brukerfmf")
+    plistsDAFMF <- generateMSPeakListsDAFMF(fgDA2)
 }
 
 # remove some inconsistent metadata
@@ -38,7 +38,7 @@ if (testWithSets())
 }
 
 test_that("verify generation of MS peak lists", {
-    expect_known_value(plistsNoIM, testFile("plists-mzr"))
+    expect_known_value(plistsNoIM, testFile("plists"))
 
     skip_if_not(doDATests())
     expect_known_value(plistsDA, testFile("plists-DA"))
@@ -46,7 +46,7 @@ test_that("verify generation of MS peak lists", {
 })
 
 test_that("verify show output", {
-    expect_known_show(plists, testFile("plists-mzr", text = TRUE))
+    expect_known_show(plists, testFile("plists", text = TRUE))
 
     skip_if_not(doDATests())
     expect_known_show(plistsDA, testFile("plists-DA", text = TRUE))
@@ -182,7 +182,7 @@ test_that("empty object", {
     expect_length(plistsEmpty, 0)
     expect_length(delete(plistsEmpty), 0)
     expect_length(filter(plistsEmpty, relMinIntensity = 0.2, topMostPeaks = 10), 0)
-    expect_length(generateMSPeakLists(getEmptyTestFGroups(), "mzr"), 0)
+    expect_length(generateMSPeakLists(getEmptyTestFGroups()), 0)
     expect_lt(length(plistsEmptyMS), length(plists))
     expect_gt(length(plistsEmptyMS), 0)
 
@@ -351,7 +351,7 @@ test_that("plotting works", {
 if (testWithSets())
 {
     fgOneEmptySet <- makeOneEmptySetFGroups(fGroups)
-    plistsOneEmptySet <- generateMSPeakLists(fgOneEmptySet, "mzr")
+    plistsOneEmptySet <- generateMSPeakLists(fgOneEmptySet)
     plotSetSpecFG <- groupNames(setObjects(plistsMSMS)[[2]])[12]
 }
 

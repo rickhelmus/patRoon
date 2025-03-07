@@ -636,7 +636,7 @@ getBinnedPLPair <- function(MSPeakLists, groupNames, analyses, MSLevel, specSimP
                 sp <- PLP$specs[[1]]
                 sp[, mergedBy := uniqueName]
                 sp[, intensity := intensity / max(intensity)]
-                sp <- removeDTColumnsIfPresent(sp, c("group_abundance_rel", "group_abundance_abs", "feat_abundance_rel",
+                sp <- removeDTColumnsIfPresent(sp, c("fgroup_abundance_rel", "fgroup_abundance_abs", "feat_abundance_rel",
                                                      "feat_abundance_abs"))
                 return(sp)
             }

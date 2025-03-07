@@ -123,6 +123,8 @@
     - rename
     - tweak default EIC filtering params, more strict for binning?
     - group IMS: add to groupFeatures, (force) disable RT align and group fractions?
+- update fGroupsComparison/consensus()
+- update featAnn consensus?
 
 ## Tests
 

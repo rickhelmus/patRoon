@@ -133,12 +133,13 @@ importFeatureGroupsKPIC2FromFeat <- function(picsSetGrouped, analysisInfo, feat)
         peakMat <- copy(picsSetGrouped$peakmat)
         
         gInfo <- peakMat[, .(ret = mean(rt), mz = mean(mz)), by = "group"]
+        setorderv(gInfo, "mz")
         gNames <- makeFGroupName(seq_len(nrow(gInfo)), gInfo$ret, gInfo$mz)
+        setnames(gInfo, "group", "group_kp2")
         gInfo[, group := gNames]
-        setorderv(gInfo, c("group", "ret", "mz"))
         
         # NOTE: KPIC2 group ID may not be continuous
-        peakMat[, groupName := gNames[match(group, gInfo$group)]]
+        peakMat[, groupName := gNames[match(group, gInfo$group_kp2)]]
         peakMatSplit <- split(peakMat, by = "groupName")[gNames] # sync order after split
         groups <- data.table()
         groups[, (gNames) := lapply(peakMatSplit, function(grpTab)
@@ -155,6 +156,8 @@ importFeatureGroupsKPIC2FromFeat <- function(picsSetGrouped, analysisInfo, feat)
             inds[grpTab$sample] <- grpTab$index
             return(inds)
         })]
+        
+        gInfo[, group_kp2 := NULL]
     }
     
     return(featureGroupsKPIC2(picsSetGrouped = picsSetGrouped, groups = groups, groupInfo = gInfo, features = feat,

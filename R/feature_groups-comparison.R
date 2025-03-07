@@ -160,7 +160,7 @@ convertFGroupsToPseudoFeatures <- function(fGroupsList)
         flist[[fGNames[fgi]]] <- ft
     }
 
-    anaInfo <- data.table(analysis = fGNames, group = fGNames, blank = "", path = ".")
+    anaInfo <- data.table(analysis = fGNames, replicate = fGNames, blank = "", path = ".")
 
     return(featuresFromFeatGroups(features = flist, analysisInfo = anaInfo))
 }

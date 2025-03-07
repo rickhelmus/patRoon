@@ -408,6 +408,7 @@ expect_reportHTML <- function(object)
         lines <- readLines(path)
         lines <- gsub("data-tabsetid=\"[[:digit:]]+\"", "", lines)
         lines <- gsub("bslib-card\\-[[:digit:]]+", "", lines)
+        lines <- gsub("navbar-collapse-[[:digit:]]+", "", lines)
         return(gsub("\"[#]?tab\\-[[:digit:]]+\\-[[:digit:]]+\"", "", lines))
     }
     

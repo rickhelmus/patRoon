@@ -193,7 +193,7 @@ doGetEICsForAna <- function(...)
 
 doGetEICs <- function(anaInfo, EICInfoList, mzExpIMSWindow = 0, minIntensityIMS = 0, mode = "simple",
                       showProgress = "batch", minEICIntensity = 0, minEICAdjTime = 0, minEICAdjPoints = 0,
-                      minEICAdjIntensity = 0, doCache = TRUE, cacheDB = NULL)
+                      minEICAdjIntensity = 0, pad = FALSE, doCache = TRUE, cacheDB = NULL)
 {
     if (length(EICInfoList) == 0)
         return(list())
@@ -237,11 +237,6 @@ doGetEICs <- function(anaInfo, EICInfoList, mzExpIMSWindow = 0, minIntensityIMS 
             isCached <- !is.null(ax) & !sapply(EICs, is.null)
             if (!is.null(ax))
                 attr(EICs, "allXValues") <- ax
-            if (all(isCached))
-            {
-                doProgress()
-                return(EICs) # everything is in the cache
-            }
         }
         else
         {
@@ -249,19 +244,31 @@ doGetEICs <- function(anaInfo, EICInfoList, mzExpIMSWindow = 0, minIntensityIMS 
             isCached <- rep(FALSE, nrow(EICInfo))
         }
 
-        ToDo <- EICInfo[isCached == FALSE]
-        openMSReadBackend(backend, path)
-        
-        newEICs <- doGetEICsForAna(backend, ToDo$mzmin, ToDo$mzmax, ToDo$retmin, ToDo$retmax, ToDo$mobmin, ToDo$mobmax,
-                                   mzExpIMSWindow, minIntensityIMS, mode = mode, showProgress = showProgress == "ana",
-                                   minEICIntensity, minEICAdjTime, minEICAdjPoints, minEICAdjIntensity)
-        EICs[!isCached] <- newEICs
-        attr(EICs, "allXValues") <- attr(newEICs, "allXValues")
-        
-        if (doCache)
+        if (any(!isCached))
         {
-            saveCacheDataList("EICs", EICs[!isCached], hashes[!isCached], cacheDB)
-            saveCacheData("EICAllTimes", attr(EICs, "allXValues"), anaEICHash, cacheDB)
+
+            ToDo <- EICInfo[isCached == FALSE]
+            openMSReadBackend(backend, path)
+            
+            newEICs <- doGetEICsForAna(backend, ToDo$mzmin, ToDo$mzmax, ToDo$retmin, ToDo$retmax, ToDo$mobmin, ToDo$mobmax,
+                                       mzExpIMSWindow, minIntensityIMS, mode = mode, showProgress = showProgress == "ana",
+                                       minEICIntensity, minEICAdjTime, minEICAdjPoints, minEICAdjIntensity)
+            EICs[!isCached] <- newEICs
+            attr(EICs, "allXValues") <- attr(newEICs, "allXValues")
+            
+            if (doCache)
+            {
+                saveCacheDataList("EICs", EICs[!isCached], hashes[!isCached], cacheDB)
+                saveCacheData("EICAllTimes", attr(EICs, "allXValues"), anaEICHash, cacheDB)
+            }
+        }
+        if (pad)
+        {
+            EICs[] <- Map(EICs, EICInfo$retmin, EICInfo$retmax, f = function(eic, rmin, rmax)
+            {
+                px <- padEIX(attr(EICs, "allXValues"), rmin, rmax, eic$time, eic$intensity)
+                data.frame(time = px[[1]], intensity = px[[2]])
+            })
         }
         
         doProgress()

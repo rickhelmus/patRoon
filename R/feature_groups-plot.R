@@ -574,7 +574,7 @@ setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj),
     }
     
     if (is.null(EICs))
-        EICs <- getFeatureEIXs(obj, type = "EIC", analysis, groupName, EICParams)
+        EICs <- getFeatureEIXs(obj, type = "EIC", analysis, groupName, EICParams, pad = TRUE)
     else
     {
         # sync as much as possible with given EICParams
@@ -589,8 +589,6 @@ setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj),
         ax <- attr(ea, "allXValues")
         lapply(ea, function(eg)
         {
-            eg <- setDF(padEIX(ax, eg$time, eg$intensity))
-            setnames(eg, "xvalue", "time")
             if (retMin)
                 eg$time <- eg$time/60
             return(eg)

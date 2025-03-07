@@ -177,7 +177,7 @@ setMethod("getXCMSSet", "featureGroups", function(obj, verbose, loadRawData, IMS
     checkmate::assertFlag(verbose)
     assertIMSArg(IMS)
 
-    if (IMS != "both")
+    if (IMS != "both" && hasMobilities(obj))
         obj <- selectIMSFilter(obj, IMS = IMS, verbose = FALSE)
     
     if (verbose)
@@ -322,7 +322,7 @@ setMethod("getXCMSnExp", "featureGroups", function(obj, verbose, loadRawData, IM
     checkmate::assertFlag(verbose)
     assertIMSArg(IMS)
     
-    if (IMS != "both")
+    if (IMS != "both" && hasMobilities(obj))
         obj <- selectIMSFilter(obj, IMS = IMS, verbose = FALSE)
     
     if (verbose)

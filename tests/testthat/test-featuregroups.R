@@ -93,7 +93,7 @@ test_that("adducts setting", {
 })
 
 # to compare original anaInfo: ignore extra columns that may have been added afterwards
-getAnaInfo <- function(fg) analysisInfo(fg, TRUE)[, c("path", "analysis", "replicate", "blank")]
+getAnaInfo <- function(fg) analysisInfo(fg, TRUE)[, c("path_centroid", "analysis", "replicate", "blank")]
 
 test_that("basic subsetting", {
     expect_length(fgOpenMS[, 1:50], 50)
@@ -514,8 +514,8 @@ test_that("plotting works", {
 
     expect_doppel("venn", function() plotVenn(fgOpenMS))
     # use conc fGroups as it has >2 replicates
-    expect_doppel("venn-multiple", function() plotVenn(fgOpenMS, which = list(standards = "standard-pos",
-                                                                              solvents = "solvent-pos")))
+    expect_doppel("venn-multiple", function() plotVenn(fgOpenMS, which = c("standard-pos", "solvent-pos"),
+                                                       aggregate = TRUE))
     expect_doppel("venn-comp", function() plotVenn(fGCompOpenMS))
     expect_equal(expect_plot(plotVenn(fgOpenMS, which = c("solvent-pos", "standard-pos")))$areas[2],
                  length(filter(fgOpenMS, replicates = "standard-pos")))
@@ -574,7 +574,7 @@ if (testWithSets())
     fgOpenMSDiffAdductRG <- fgOpenMS
     adducts(fgOpenMSDiffAdductRG, reGroup = TRUE, set = "positive")[names(fgOpenMSDiffAdductRG[, sets = "positive"])] <- "[M+K]+"
     
-    fgUniqueSet2 <- unique(fgOpenMS, which = "negative", sets = TRUE)
+    fgUniqueSet2 <- unique(fgOpenMS, which = "negative", aggregate = "set")
 }
 
 test_that("sets functionality", {
@@ -624,13 +624,13 @@ test_that("sets functionality", {
     expect_length(filter(fgOpenMSEmpty, relMinSets = 1), 0)
     
     expect_lt(length(fgUniqueSet2), length(fgOpenMS))
-    expect_equal(length(unique(fgOpenMS, which = sets(fgOpenMS), sets = TRUE)), length(fgOpenMS))
-    expect_length(unique(fgOpenMSEmpty, which = sets(fgOpenMSEmpty), sets = TRUE), 0)
+    expect_equal(length(unique(fgOpenMS, which = sets(fgOpenMS), aggregate = "set")), length(fgOpenMS))
+    expect_length(unique(fgOpenMSEmpty, which = sets(fgOpenMSEmpty), aggregate = "set"), 0)
     
-    expect_lt(length(overlap(fgOpenMS, which = sets(fgOpenMS), sets = TRUE)), length(fgOpenMS))
-    expect_length(overlap(fgOpenMSEmpty, which = sets(fgOpenMS), sets = TRUE), 0)
+    expect_lt(length(overlap(fgOpenMS, which = sets(fgOpenMS), aggregate = "set")), length(fgOpenMS))
+    expect_length(overlap(fgOpenMSEmpty, which = sets(fgOpenMS), aggregate = "set"), 0)
     
-    expect_doppel("venn-sets", function() plotVenn(fgOpenMS, sets = TRUE))
+    expect_doppel("venn-sets", function() plotVenn(fgOpenMS, aggregate = "set"))
     
     expect_doppel("chord-outer-set", function() plotChord(fgOpenMS, aggregate = TRUE, groupBy = "set"))
     

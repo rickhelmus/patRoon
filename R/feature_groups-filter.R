@@ -264,7 +264,7 @@ replicateAbundanceFilter <- function(fGroups, absThreshold, relThreshold, maxInt
         delGroups <- copy(fGroups@groups)
         set(delGroups, j = "replicate", value = replicatesAna)
         delGroups[, (gNames) := lapply(.SD, function(x) if (pred(x, .N, replicate)) 1 else 0), by = replicate, .SDcols = gNames]
-        return(list(delete = list(j = delGroups[, -"group"])))
+        return(list(delete = list(j = delGroups[, -"replicate"])))
     }, "replicateAbundance", applyIMS = applyIMS))
 }
 

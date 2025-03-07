@@ -246,7 +246,7 @@ setMethod("as.data.table", "featureAnnotations", function(x, fGroups = NULL, fra
     ret <- addElementInfoToAnnTable(ret, countElements, countFragElements, OM, TRUE)
     
     # NOTE: fragInfo is absent if empty results
-    ret <- removeDTColumnsIfPresent(ret, getAllMergedConsCols("fragInfo", names(ret), mergedConsensusNames(x)))
+    ret <- removeDTColumnsIfPresent(ret, getMergedConsCols("fragInfo", names(ret), mergedConsensusNames(x)))
     
     return(ret)
 })

@@ -269,15 +269,17 @@ BEGIN_RCPP
 END_RCPP
 }
 // padEIX
-Rcpp::List padEIX(const std::vector<SpectrumRawTypes::Time>& allXValues, const std::vector<SpectrumRawTypes::Time>& xvalues, const std::vector<SpectrumRawTypes::Intensity>& intensities);
-RcppExport SEXP _patRoon_padEIX(SEXP allXValuesSEXP, SEXP xvaluesSEXP, SEXP intensitiesSEXP) {
+Rcpp::List padEIX(const std::vector<SpectrumRawTypes::Time>& allXValues, SpectrumRawTypes::Time startX, SpectrumRawTypes::Time endX, const std::vector<SpectrumRawTypes::Time>& xvalues, const std::vector<SpectrumRawTypes::Intensity>& intensities);
+RcppExport SEXP _patRoon_padEIX(SEXP allXValuesSEXP, SEXP startXSEXP, SEXP endXSEXP, SEXP xvaluesSEXP, SEXP intensitiesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Time>& >::type allXValues(allXValuesSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Time >::type startX(startXSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Time >::type endX(endXSEXP);
     Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Time>& >::type xvalues(xvaluesSEXP);
     Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Intensity>& >::type intensities(intensitiesSEXP);
-    rcpp_result_gen = Rcpp::wrap(padEIX(allXValues, xvalues, intensities));
+    rcpp_result_gen = Rcpp::wrap(padEIX(allXValues, startX, endX, xvalues, intensities));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -821,7 +823,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_getScans", (DL_FUNC) &_patRoon_getScans, 5},
     {"_patRoon_getEICList", (DL_FUNC) &_patRoon_getEICList, 16},
     {"_patRoon_doFillEIXIntensities", (DL_FUNC) &_patRoon_doFillEIXIntensities, 3},
-    {"_patRoon_padEIX", (DL_FUNC) &_patRoon_padEIX, 3},
+    {"_patRoon_padEIX", (DL_FUNC) &_patRoon_padEIX, 5},
     {"_patRoon_getMSMetadata", (DL_FUNC) &_patRoon_getMSMetadata, 2},
     {"_patRoon_setSpecMetadata", (DL_FUNC) &_patRoon_setSpecMetadata, 3},
     {"_patRoon_getMSPeakLists", (DL_FUNC) &_patRoon_getMSPeakLists, 20},

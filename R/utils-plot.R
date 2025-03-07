@@ -152,7 +152,8 @@ makeEIXPlot <- function(featPlotTab, anaInfo, gInfo, showPeakArea, showFGroupRec
         return(invisible(NULL))
     }
     
-    gNames <- unique(featPlotTab$group)
+    gInfo <- gInfo[group %chin% featPlotTab$group]
+    gNames <- gInfo$group
     gCount <- length(gNames)
 
     if (is.null(groupBy))
@@ -261,6 +262,9 @@ makeEIXPlot <- function(featPlotTab, anaInfo, gInfo, showPeakArea, showFGroupRec
     for (grp in gNames)
     {
         featTabGrp <- featPlotTab[group == grp]
+        xRange <- c(min(featTabGrp$xmin), max(featTabGrp$xmax))
+        doRectOrAnn <- (showFGroupRect || !is.null(featTabGrp[["annotation"]])) && !anyNA(featTabGrp$xmin)
+        maxEIXInt <- 0 # for showFGroupRect/annotate below
         for (ana in names(EIXs))
         {
             if (is.null(EIXs[[ana]]) || is.null(EIXs[[ana]][[grp]]))
@@ -289,25 +293,27 @@ makeEIXPlot <- function(featPlotTab, anaInfo, gInfo, showPeakArea, showFGroupRec
                 polygon(c(EIXFill[[1]], rev(EIXFill[[1]])), c(EIXFill$intensity, rep(0, length(EIXFill$intensity))),
                         col = fillColors[colInd], border = NA)
             }
+            
+            if (doRectOrAnn)
+            {
+                ints <- EIX[numGTETol(EIX[[1]], xRange[1]) & numLTETol(EIX[[1]], xRange[2]), "intensity"]
+                if (length(ints) > 0)
+                    maxEIXInt <- max(maxEIXInt, ints)
+            }
         }
 
-        if ((showFGroupRect || !is.null(featTabGrp[["annotation"]])) && !anyNA(featTabGrp$xmin))
+        if (doRectOrAnn)
         {
-            xRange <- c(min(featTabGrp$xmin), max(featTabGrp$xmax))
-            maxInt <- if (intMax == "eix")
-            {
-                eixag <- EIXs[[ana]][[grp]]
-                ints <- eixag[eixag[[1]] %between% xRange, "intensity"]
-                if (length(ints) > 0) max(ints) else 0
-            }
-            else
-                max(featTabGrp$intensity)
+            maxInt <- if (intMax == "eix") maxEIXInt else max(featTabGrp$intensity)
             
             if (showFGroupRect)
                 rect(xRange[1], 0, xRange[2], maxInt, border = "red", lty = "dotted")
             
-            if (!is.null(featTabGrp[["annotation"]]) && nzchar(featTabGrp$annotation))
+            if (!is.null(featTabGrp[["annotation"]]))
+            {
+                ftga <- featTabGrp[nzchar(annotation)]
                 text(mean(featTabGrp$x), maxInt + ylim[2] * 0.02, featTabGrp$annotation)
+            }
         }
         
         if (showProgress)

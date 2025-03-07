@@ -6,7 +6,7 @@ context("formulas")
 
 fGroups <- getFormFGroups()
 fGroupsEmpty <- getEmptyTestFGroups()
-plists <- generateMSPeakLists(fGroups, "mzr")
+plists <- generateMSPeakLists(fGroups)
 plistsEmpty <- plists[FALSE, reAverage = TRUE]
 plistsEmptyMS <- removeMSPlists(plists, "MS")
 plistsEmptyMSMS <- removeMSPlists(plists, "MSMS")

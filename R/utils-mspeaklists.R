@@ -6,7 +6,7 @@ emptyMSPeakList <- function(abundanceColumn, avgCols)
 {
     ret <- data.table(mz = numeric(), intensity = numeric())
     if (!is.null(abundanceColumn))
-        ret[, (abundanceColumn) := numeric()]
+        ret[, (paste0(abundanceColumn, c("_rel", "_abs"))) := numeric()]
     if (!is.null(avgCols))
         ret[, (avgCols) := numeric()]
     ret[, precursor := logical()]

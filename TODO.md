@@ -321,6 +321,7 @@
     - defaults also used for params (EIXs etc) --> doc somehow
     - doc new functions
     - appendix in Handbook
+- updates for generateAnalysisInfo()
 
 
 ## NEWS
@@ -441,7 +442,7 @@
     - lowered clusterMzWindow
 - sets names are now checked to not contain any special characters (besides underscores). Automatic labels are now separated by underscores instead of dots.
 - FIXED: SIRIUS with calculateFeatures=T may sometimes fail due to file name truncation
-
+- generateAnalysisInfo()
 
 ## Features
 

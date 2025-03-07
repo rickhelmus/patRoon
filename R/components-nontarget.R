@@ -306,7 +306,7 @@ setMethod("generateComponentsNontarget", "featureGroups", function(fGroups, ioni
                 set(compTab, row, "RT increment", mean(compTab[["RT increment"]][indBoth]))
                 set(compTab, row, "min. RT in series", min(compTab[["min. RT in series"]][indBoth]))
                 set(compTab, row, "max. RT in series", max(compTab[["max. RT in series"]][indBoth]))
-                set(compTab, row, "max.-min. RT", compTab[["max. RT in series"]][r] - compTab[["min. RT in series"]][r])
+                set(compTab, row, "max.-min. RT", compTab[["max. RT in series"]][row] - compTab[["min. RT in series"]][row])
                 
                 set(compTab, other, "keep", FALSE) # remove other
                 set(compTab, row, "links", list(list(setdiff(links, other)))) # unlink

@@ -20,7 +20,7 @@ suppressWarnings(compsCAMMR <- doGenComponents(fGroupsSimple, "camera", relMinRe
 suppressWarnings(compsCAMSize <- doGenComponents(fGroupsSimple, "camera", minSize = 3))
 compsNT <- doGenComponents(fGroups, "nontarget")
 compsInt <- doGenComponents(fGroupsSimple, "intclust", average = FALSE) # no averaging: only one rep group
-plists <- generateMSPeakLists(fGroupsSimple, "mzr")
+plists <- generateMSPeakLists(fGroupsSimple)
 compsSpec <- doGenComponents(fGroupsSimple, "specclust", plists)
 compsOpenMS <- doGenComponents(fGroups, "openms")
 compsOpenMSMS <- doGenComponents(fGroups, "openms", minSize = 3)

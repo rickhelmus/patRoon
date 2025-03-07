@@ -39,9 +39,13 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
     {
         if ("chord" %in% settings$summary)
         {
-            ret$overview$chord <- makeHTMLReportPlot("chord", outPath, "plotChord",
-                                                     list(fGroups, aggregate = aggr,
-                                                          groupBy = if (isFGSet(fGroups)) "set"),
+            groupBy <- if (isFGSet(fGroups))
+            {
+                AnySetOv <- length(unique(fGroups, which = sets(fGroups), aggregate = "set", outer = TRUE)) < length(fGroups)
+                if (AnySetOv) "set" else NULL
+            }
+            ret$overview$chord <- makeHTMLReportPlot("chord", outPath, "plotChord", list(fGroups, aggregate = aggr,
+                                                                                         groupBy = groupBy),
                                                      width = 7, height = 7)
         }
         if ("venn" %in% settings$summary && aggrLen < 6)

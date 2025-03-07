@@ -108,8 +108,8 @@ setMethod("initialize", "featureGroups", function(.Object, ...)
     args <- list(...)
 
     # data.table's don't seem to initialize well (gives error that slot is init as list)
-    for (s in c("groups", "ftindex", "groupQualities", "groupScores", "annotations", "ISTDs", "concentrations",
-                "toxicities"))
+    for (s in c("groups", "groupInfo", "ftindex", "groupQualities", "groupScores", "annotations", "ISTDs",
+                "concentrations", "toxicities"))
     {
         if (is.null(args[[s]]))
             args[[s]] <- data.table()

@@ -412,8 +412,8 @@ getEICs <- function(analysisInfo, ranges, output = "fill", minIntensityIMS = 25)
         checkmate::assertDataFrame(r, types = "numeric", any.missing = FALSE)
         assertHasNames(r, c("mzmin", "mzmax", "retmin", "retmax"))
     }
-    ret <- doGetEICs(analysisInfo, ranges, mode = "full", minIntensityIMS = minIntensityIMS)
-    if (output != "raw")
+    ret <- doGetEICs(analysisInfo, ranges, mode = "full", minIntensityIMS = minIntensityIMS, pad = output == "pad")
+    if (output == "fill")
     {
         ret <- lapply(ret, function(anaEICs)
         {
@@ -421,16 +421,8 @@ getEICs <- function(analysisInfo, ranges, output = "fill", minIntensityIMS = 25)
             if (is.null(at))
                 return(anaEICs) # no EICs
         
-            if (output == "fill")
-                return(lapply(anaEICs, function(eic) data.frame(time = at,
-                                                                intensity = doFillEIXIntensities(at, eic$time, eic$intensity))))
-            
-            # output == "pad"
-            return(lapply(anaEICs, function(eic)
-            {
-                eic <- setDF(padEIX(at, eic$time, eic$intensity))
-                setnames(eic, "xvalue", "time")
-            }))
+            return(lapply(anaEICs, function(eic) data.frame(time = at,
+                                                            intensity = doFillEIXIntensities(at, eic$time, eic$intensity))))
         })
     }
     return(ret)

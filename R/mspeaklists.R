@@ -339,7 +339,7 @@ setMethod("as.data.table", "MSPeakLists", function(x, fGroups = NULL, averaged =
 
     if (!is.null(fGroups))
     {
-        ret[, c("ret", "group_mz") := groupInfo(fGroups)[match(ret$group, group), c("ret", "mz"), with = FALSE]][]
+        ret[, c("ret", "group_mz") := groupInfo(fGroups)[match(..ret$group, group), c("ret", "mz"), with = FALSE]][]
         setcolorder(ret, c("group", "ret", "group_mz"))
         if (!averaged)
             setcolorder(ret, "analysis")
@@ -370,7 +370,7 @@ setMethod("delete", "MSPeakLists", function(obj, i = NULL, j = NULL, k = NULL, r
     checkmate::assertFlag(reAverage, add = ac)
     checkmate::reportAssertions(ac)
     
-    if ((length(i) == 0 && length(k) == 0) || (!is.null(j) && length(j) == 0))
+    if ((length(i) == 0 && (!doAnaOnly || length(k) == 0)) || (!is.null(j) && length(j) == 0))
         return(obj) # nothing to remove...
 
     # i/j = NULL; k = vector: remove analyses (subset) (averagedPeakLists ignored)
@@ -954,7 +954,11 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRtWindo
         ft <- ft[!group %chin% names(cachedData)]
         
         if (nrow(ft) == 0)
-            return(cachedData) # all cached
+        {
+            # all cached
+            cachedData <- cachedData[intersect(gNames, names(cachedData))] # sync fg order
+            return(cachedData)
+        }
         
         if (!is.null(maxMSRtWindow))
         {

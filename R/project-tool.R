@@ -20,7 +20,7 @@ makeAnaInfoR <- function(anaInfo, varName = NULL)
                                          constructive::opts_data.frame("read.table"))$code)
 }
 
-getScriptCode <- function(input, anaInfo)
+getScriptCode <- function(input, anaInfoData)
 {
     txtCon <- withr::local_connection(textConnection(NULL, "w"))
     
@@ -98,39 +98,32 @@ getScriptCode <- function(input, anaInfo)
         cl <- paste0(callPrefix, argText, ")")
         addText(cl)
     }
-    addAnaInfo <- function(anaInfoVarName, anaTable, anaTableFile, comment)
+    addAnaInfo <- function(anaInfoVarName, aid, comment)
     {
         if (input$generateAnaInfo == "table")
         {
             if (input$analysisTableFileType == "embedded")
             {
                 addComment("Create analysis table", condition = comment)
-                addText(makeAnaInfoR(anaTable, anaInfoVarName))
+                addText(makeAnaInfoR(aid$tab, anaInfoVarName))
             }
             else
             {
                 addComment("Load analysis table", condition = comment)
                 if (input$analysisTableFileType == "CSV")
-                    addCall(anaInfoVarName, "read.csv", list(value = anaTableFile, quote = TRUE))
+                    addCall(anaInfoVarName, "read.csv", list(value = aid$file, quote = TRUE))
                 else # R
-                    addCall(anaInfoVarName, "source", list(value = anaTableFile, quote = TRUE))
+                    addCall(anaInfoVarName, "source", list(value = aid$file, quote = TRUE))
             }
         }
-        else if (input$generateAnaInfo == "script")
+        else if (input$generateAnaInfo == "dynamic")
         {
             addCall(anaInfoVarName, "generateAnalysisInfo", list(
-                list(name = "paths", value = unique(anaTable$path), quote = TRUE),
-                list(name = "replicates", value = anaTable$replicate, quote = TRUE),
-                list(name = "blanks", value = anaTable$blank, quote = TRUE),
-                list(name = "concs", value = anaTable$conc),
-                list(name = "norm_concs", value = anaTable$norm_conc)
+                list(name = "pathRaw", value = aid$pathRaw, quote = TRUE),
+                list(name = "pathCentroid", value = aid$pathCentroid, quote = TRUE),
+                list(name = "pathIMS", value = aid$pathIMS, quote = TRUE),
+                list(name = "pathProfile", value = aid$pathProfile, quote = TRUE)
             ))
-            if (any(anaTable$exclude))
-            {
-                toExclude <- paste0('c(', paste0(which(anaTable$exclude), collapse = ', '), ')')
-                addAssignment(anaInfoVarName, paste0(anaInfoVarName, '[-', toExclude, ', ]'))
-                addNL()
-            }
         }
         else if (input$generateAnaInfo == "example")
         {
@@ -140,13 +133,13 @@ getScriptCode <- function(input, anaInfo)
         }
         else # none
         {
-            addComment("NOTE: please set anaInfo to a valid data.frame with analysis information. See ?`analysis-information` for more details.",
+            addComment("NOTE: please set to a valid data.frame with analysis information. See ?`analysis-information` for more details.",
                        condition = comment)
             addCall(anaInfoVarName, "data.frame", list(
-                list(name = "path", value = "character()"),
+                list(name = "path_centroid", value = "character()"),
                 list(name = "analysis", value = "character()"),
-                list(name = "groups", value = "character()"),
-                list(name = "blanks", value = "character()")
+                list(name = "replicate", value = "character()"),
+                list(name = "blank", value = "character()")
             ))
         }
     }
@@ -269,11 +262,11 @@ getScriptCode <- function(input, anaInfo)
     addNL()
     
     if (input$ionization != "both")
-        addAnaInfo("anaInfo", anaInfo$tab, anaInfo$file, TRUE)
+        addAnaInfo("anaInfo", anaInfoData, TRUE)
     else
     {
-        addAnaInfo("anaInfoPos", anaInfo$positive$tab, anaInfo$positive$file, TRUE)
-        addAnaInfo("anaInfoNeg", anaInfo$negative$tab, anaInfo$negative$file, FALSE)
+        addAnaInfo("anaInfoPos", anaInfoData$positive, TRUE)
+        addAnaInfo("anaInfoNeg", anaInfoData$negative, FALSE)
     }
     
     if (nzchar(input$convAlgo) || nzchar(input$DAMethod) || input$doDACalib)
@@ -710,35 +703,51 @@ doCreateProject <- function(input, anaInfoTabs)
 {
     mkdirp(input$destinationPath)
 
-    prepareAnaInfo <- function(pol)
+    prepareAnaInfoData <- function(pol)
     {
-        aTab <- copy(anaInfoTabs[[pol]])
-        aTab[is.na(replicate) | !nzchar(replicate), replicate := analysis]
-        aTab <- aTab[, -"type"]
-        
-        fp <- NULL
+        ret <- list()
         
         # Make analysis table
-        if (input$generateAnaInfo == "table" && input$analysisTableFileType != "embedded")
+        if (input$generateAnaInfo == "table")
         {
-            n <- paste0("analysisTableFile", input$analysisTableFileType)
-            if (input$ionization == "both")
-                n <- paste0(n, if (input$ionization == "positive") "Pos" else "Neg")
-            fp <- file.path(input$destinationPath, input[[n]])
+            aTab <- copy(anaInfoTabs[[pol]])
+            aTab[is.na(replicate) | !nzchar(replicate), replicate := analysis]
+            aTab <- aTab[, -"type"]
             
-            if (input$analysisTableFileType == "CSV")
-                write.csv(aTab, fp, row.names = FALSE)
-            else # "R"
-                cat(makeAnaInfoR(aTab), file = fp, sep = "\n")
+            if (input$analysisTableFileType != "embedded")
+            {
+                n <- paste0("analysisTableFile", input$analysisTableFileType)
+                if (input$ionization == "both")
+                    n <- paste0(n, if (input$ionization == "positive") "Pos" else "Neg")
+                fp <- file.path(input$destinationPath, input[[n]])
+                
+                if (input$analysisTableFileType == "CSV")
+                    write.csv(aTab, fp, row.names = FALSE)
+                else # "R"
+                    cat(makeAnaInfoR(aTab), file = fp, sep = "\n")
+                ret$file <- fp
+                
+            }
+            
+            ret$tab <- aTab
         }
-        
-        return(list(file = fp, tab = aTab))
+        else (input$generateAnaInfo == "dynamic")
+        {
+            pf <- if (is.null(pol)) "" else if (pol == "positive") "Pos" else "Neg"
+            ret <- list(
+                pathRaw = input[[paste0("genAnaInfoDynRaw", pol)]],
+                pathCentroid = input[[paste0("genAnaInfoDynCentroid", pol)]],
+                pathIMS = input[[paste0("genAnaInfoDynIMS", pol)]],
+                pathProfile = input[[paste0("genAnaInfoDynProfile", pol)]],
+            )
+        }
+        return(ret)
     }
 
     if (input$ionization != "both")
-        anaInfo <- prepareAnaInfo(input$ionization)
+        aid <- prepareAnaInfoData(input$ionization)
     else
-        anaInfo <- list(positive = prepareAnaInfo("positive"), negative = prepareAnaInfo("negative"))
+        aid <- list(positive = prepareAnaInfoData("positive"), negative = prepareAnaInfoData("negative"))
     
     doSusps <- input$exSuspList || (input$ionization != "both" && nzchar(input$suspectList)) ||
         (input$ionization == "both" && nzchar(input$suspectListPos))
@@ -748,7 +757,7 @@ doCreateProject <- function(input, anaInfoTabs)
     if ("HTML" %in% input$reportGen)
         genReportSettingsFile(file.path(input$destinationPath, "report.yml"))
     
-    code <- getScriptCode(input, anaInfo)
+    code <- getScriptCode(input, aid)
     if (input$outputScriptTo == "curFile")
     {
         # insert at end of current document
@@ -778,6 +787,15 @@ getTPGenInputs <- function(isLib)
     return(ret)
 }
 
+fileSelect <- function(idText, idButton, label, value = "", ...)
+{
+    fillRow(
+        flex = c(1, NA),
+        textInput(idText, label, value, width = "100%", ...),
+        actionButton(idButton, "", icon("folder-open"), style = "margin: 25px 0 0 15px")
+    )
+}
+
 getAnaTableFileUI <- function(pol)
 {
     # NOTE: pol may be NULL
@@ -799,17 +817,25 @@ getAnaTableFileUI <- function(pol)
     )
 }
 
+genAnaDynUI <- function(pol)
+{
+    pf <- if (is.null(pol)) "" else if (pol == "positive") "Pos" else "Neg"
+    
+    htmltools::tagList(
+        fileSelect(paste0("genAnaInfoDynRaw", pf), "genAnaInfoDynRawButton",
+                   "raw analyses", "", placeholder = "Leave empty for none"),
+        fileSelect(paste0("genAnaInfoDynCentroid", pf), "genAnaInfoDynCentroidButton",
+                   "centroided analyses", "", placeholder = "Leave empty for none"),
+        fileSelect(paste0("genAnaInfoDynIMS", pf), "genAnaInfoDynIMSButton",
+                   "IMS analyses", "", placeholder = "Leave empty for none"),
+        fileSelect(paste0("genAnaInfoDynProfile", pf), "genAnaInfoDynProfileButton",
+                   "profile analyses", "", placeholder = "Leave empty for none")
+    )
+}
+
 getNewProjectUI <- function(destPath)
 {
     textNote <- function(txt) div(style = "margin: 8px 0 12px; font-size: small", txt)
-    fileSelect <- function(idText, idButton, label, value = "", ...)
-    {
-        fillRow(
-            flex = c(1, NA),
-            textInput(idText, label, value, width = "100%", ...),
-            actionButton(idButton, "", icon("folder-open"), style = "margin: 25px 0 0 15px")
-        )
-    }
     rangeNumeric <- function(id, label, minVal = 0, maxVal = 0, ...)
     {
         fillRow(
@@ -818,7 +844,7 @@ getNewProjectUI <- function(destPath)
         )
     }
     
-    anaTableCondition <- function(pol)
+    anaTableCondition <- function(pol, wh)
     {
         ret <- "input.generateAnaInfo == \"table\""
         if (!missing(pol))
@@ -829,11 +855,26 @@ getNewProjectUI <- function(destPath)
             {
                 ret <- paste(ret, "&& input.ionization == \"both\"")
                 if (pol != "both")
-                    ret <- paste0(ret, " && input.currentSet == \"", pol, "\"")
+                    ret <- paste0(ret, " && input.currentSetStatic == \"", pol, "\"")
             }
         }
         return(ret)
     }
+    
+    anaDynCondition <- function(pol, wh)
+    {
+        ret <- "input.generateAnaInfo == \"dynamic\""
+        if (is.null(pol))
+            ret <- paste(ret, "&& input.ionization != \"both\"")
+        else
+        {
+            ret <- paste(ret, "&& input.ionization == \"both\"")
+            if (pol != "both")
+                ret <- paste0(ret, " && input.currentSetDynamic == \"", pol, "\"")
+        }
+        return(ret)
+    }
+    
     miniUI::miniPage(
         shinyjs::useShinyjs(),
         
@@ -917,7 +958,7 @@ getNewProjectUI <- function(destPath)
                                 flex = NA,
                                 conditionalPanel(
                                     condition = anaTableCondition("both"),
-                                    radioButtons("currentSet", "Define table for set", c("positive", "negative"),
+                                    radioButtons("currentSetStatic", "Define table for set", c("positive", "negative"),
                                                  inline = TRUE)
                                 ),
                                 conditionalPanel(
@@ -938,16 +979,25 @@ getNewProjectUI <- function(destPath)
                             condition = "input.generateAnaInfo == \"dynamic\"",
                             fillCol(
                                 flex = NA,
+                                conditionalPanel(
+                                    condition = anaDynCondition("both"),
+                                    radioButtons("currentSetDynamic", "Define table for set", c("positive", "negative"),
+                                                 inline = TRUE)
+                                ),
                                 strong(em("Generate analysis information from the following directories")),
                                 br(),
-                                fileSelect("genAnaInfoDynRaw", "genAnaInfoDynRawButton",
-                                           "raw analyses", "", placeholder = "Leave empty for none"),
-                                fileSelect("genAnaInfoDynCentroid", "genAnaInfoDynCentroidButton",
-                                           "centroided analyses", "", placeholder = "Leave empty for none"),
-                                fileSelect("genAnaInfoDynIMS", "genAnaInfoDynIMSButton",
-                                           "IMS analyses", "", placeholder = "Leave empty for none"),
-                                fileSelect("genAnaInfoDynProfile", "genAnaInfoDynProfileButton",
-                                           "profile analyses", "", placeholder = "Leave empty for none")
+                                conditionalPanel(
+                                    condition = anaDynCondition(NULL),
+                                    genAnaDynUI(NULL)
+                                ),
+                                conditionalPanel(
+                                    condition = anaDynCondition("positive"),
+                                    genAnaDynUI("positive")
+                                ),
+                                conditionalPanel(
+                                    condition = anaDynCondition("negative"),
+                                    genAnaDynUI("negative")
+                                )
                             )
                         ),
                         conditionalPanel(
@@ -1452,7 +1502,7 @@ newProject <- function(destPath = NULL)
         {
             rValues$triggerAnaInfoHotUpdate
             
-            dt <- copy(anaInfoTabs[[getCurPolarity()]])
+            dt <- copy(anaInfoTabs[[getCurPolarityAnaTab()]])
             pcols <- getAnaInfoPathCols(dt)
             dt[, type := {
                 p <- unlist(mget(pcols))
@@ -1486,9 +1536,9 @@ newProject <- function(destPath = NULL)
                              hotOpts))
             return(hot)
         }
-        getCurPolarity <- function()
+        getCurPolarityAnaTab <- function()
         {
-            if (input$ionization == "positive" || (input$ionization == "both" && input$currentSet == "positive"))
+            if (input$ionization == "positive" || (input$ionization == "both" && input$currentSetStatic == "positive"))
                 return("positive")
             return("negative")
         }
@@ -1501,7 +1551,7 @@ newProject <- function(destPath = NULL)
             else
                 seq(min(sel), max(sel) + 1)
             
-            pol <- getCurPolarity()
+            pol <- getCurPolarityAnaTab()
             tab <- anaInfoTabs[[pol]]
             tab[, index := .I]
             tab[mv, index := shift(index, n = if (dir == "up") - 1L else 1L, type = "cyclic")]
@@ -1514,6 +1564,8 @@ newProject <- function(destPath = NULL)
         doObserveGenAnaInfoDynSelDir <- function(textID, buttonID)
         {
             observeEvent(input[[buttonID]], {
+                pf <- if (input$ionization != "both") "" else if (input$currentSetDynamic == "positive") "Pos" else "Neg"
+                textID <- paste0(textID, pf)
                 d <- rstudioapi::selectDirectory("Select directory", path = input[[textID]])
                 if (!is.null(d))
                     updateTextInput(session, textID, value = d)
@@ -1647,7 +1699,7 @@ newProject <- function(destPath = NULL)
             {
                 # sync from table edits
                 dt <- rhandsontable::hot_to_r(input$analysesHot)
-                pol <- getCurPolarity()
+                pol <- getCurPolarityAnaTab()
                 ai <- anaInfoTabs[[pol]]
                 mcols <- c("replicate", "blank", "conc", "norm_conc")
                 ai[, (mcols) := dt[, mcols, with = FALSE]]
@@ -1662,7 +1714,7 @@ newProject <- function(destPath = NULL)
         })
         
         observeEvent(input$analysesHot_select$select$r, {
-            pol <- getCurPolarity()
+            pol <- getCurPolarityAnaTab()
             sel <- input$analysesHot_select$select$rAll
             e <- nrow(anaInfoTabs[[pol]]) > 0 && length(sel) > 0
             shinyjs::toggleState("removeAnaInfoRows", condition = e)
@@ -1671,7 +1723,7 @@ newProject <- function(destPath = NULL)
         })
         
         observeEvent(input$setAnaInfoFiles, {
-            pol <- getCurPolarity()
+            pol <- getCurPolarityAnaTab()
             rValues$analysisFiles <- if (nrow(anaInfoTabs[[pol]]) == 0)
                 rValues$analysisFiles[0, ]
             else
@@ -1725,7 +1777,7 @@ newProject <- function(destPath = NULL)
         
         observeEvent(input$removeAnaInfoRows, {
             sel <- input$analysesHot_select$select$rAll
-            pol <- getCurPolarity()
+            pol <- getCurPolarityAnaTab()
             anaInfoTabs[[pol]] <<- anaInfoTabs[[pol]][-sel]
             triggerAnaInfoHotUpdate()
         })
@@ -1792,7 +1844,7 @@ newProject <- function(destPath = NULL)
         
         observeEvent(input$analysisFilesOK, {
             removeModal()
-            pol <- getCurPolarity()
+            pol <- getCurPolarityAnaTab()
             
             if (nrow(rValues$analysisFiles) > 0)
             {
@@ -1833,7 +1885,7 @@ newProject <- function(destPath = NULL)
                 
                 if (!isFALSE(ai) && nrow(ai) > 0)
                 {
-                    pol <- getCurPolarity()
+                    pol <- getCurPolarityAnaTab()
                     
                     # check for overlap
                     if (any(ai$analysis %in% anaInfoTabs[[pol]]$analysis))

@@ -161,13 +161,13 @@ getFeaturesEICsParams <- function(methodMZ, methodIMS = NULL, ...)
 
 #' @rdname features-class
 #' @export
-featuresBinning <- setClass("featuresBinning", contains = "features")
+featuresEICs <- setClass("featuresEICs", contains = "features")
 
-setMethod("initialize", "featuresBinning",
-          function(.Object, ...) callNextMethod(.Object, algorithm = "binning", ...))
+setMethod("initialize", "featuresEICs",
+          function(.Object, ...) callNextMethod(.Object, algorithm = "eics", ...))
 
 #' @export
-findFeaturesBinning <- function(analysisInfo, featParams, peakParams, minIntensityIMS = 25, verbose = TRUE)
+findFeaturesEICs <- function(analysisInfo, featParams, peakParams, minIntensityIMS = 25, verbose = TRUE)
 {
     # UNDONE: add refs to docs, and highlight changes
     # UNDONE: use BP intensity?
@@ -209,7 +209,7 @@ findFeaturesBinning <- function(analysisInfo, featParams, peakParams, minIntensi
     baseHash <- makeHash(featParams, peakParams, minIntensityIMS)
     anaHashes <- getMSFileHashesFromAvailBackend(analysisInfo, needIMS = withIMS)
     anaHashes <- sapply(anaHashes, makeHash, baseHash)
-    cachedData <- pruneList(loadCacheData("featuresBinning", anaHashes, simplify = FALSE, dbArg = cacheDB))
+    cachedData <- pruneList(loadCacheData("featuresEICs", anaHashes, simplify = FALSE, dbArg = cacheDB))
     if (length(cachedData) > 0)
     {
         names(cachedData) <- names(anaHashes)[match(names(cachedData), anaHashes)]
@@ -334,7 +334,7 @@ findFeaturesBinning <- function(analysisInfo, featParams, peakParams, minIntensi
         })
         
         for (a in anaInfoTBD$analysis)
-            saveCacheData("featuresBinning", fList[[a]], anaHashes[[a]], dbArg = cacheDB)
+            saveCacheData("featuresEICs", fList[[a]], anaHashes[[a]], dbArg = cacheDB)
     }
     
     if (length(cachedData) > 0)
@@ -349,5 +349,5 @@ findFeaturesBinning <- function(analysisInfo, featParams, peakParams, minIntensi
         printFeatStats(fList)
     }
     
-    return(featuresBinning(analysisInfo = analysisInfo, features = fList, hasMobilities = withIMS))
+    return(featuresEICs(analysisInfo = analysisInfo, features = fList, hasMobilities = withIMS))
 }

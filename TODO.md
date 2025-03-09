@@ -120,11 +120,11 @@
     - hide ims_precursor_group if all are NA (e.g. all orphans)
     - group orphans in eg "orphan" group?
 - feat EICs
-    - rename
     - tweak default EIC filtering params, more strict for binning?
     - group IMS: add to groupFeatures, (force) disable RT align and group fractions?
 - update fGroupsComparison/consensus()
 - update featAnn consensus?
+- update checkFeatures()
 
 ## Tests
 

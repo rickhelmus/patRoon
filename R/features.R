@@ -567,8 +567,8 @@ setMethod("plotBPCs", "features", function(obj, retentionRange = NULL, MSLevel =
 #' @templateVar what find features
 #' @templateVar ex1 findFeaturesOpenMS
 #' @templateVar ex2 findFeaturesXCMS
-#' @templateVar algos bruker,openms,xcms,xcms3,envipick,sirius,kpic2,safd
-#' @templateVar algosSuffix Bruker,OpenMS,XCMS,XCMS3,EnviPick,SIRIUS,KPIC2,SAFD
+#' @templateVar algos bruker,openms,xcms,xcms3,envipick,sirius,kpic2,safd,eics
+#' @templateVar algosSuffix Bruker,OpenMS,XCMS,XCMS3,EnviPick,SIRIUS,KPIC2,SAFD,EICs
 #' @templateVar ret features
 #' @template generic-algo
 #'
@@ -581,8 +581,8 @@ findFeatures <- function(analysisInfo, algorithm, ..., verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, add = ac)
-    checkmate::assertChoice(algorithm, c("bruker", "openms", "xcms", "xcms3", "envipick", "sirius", "kpic2", "safd"),
-                            add = ac)
+    checkmate::assertChoice(algorithm, c("bruker", "openms", "xcms", "xcms3", "envipick", "sirius", "kpic2", "safd",
+                                         "eics"), add = ac)
     checkmate::assertFlag(verbose, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -594,7 +594,8 @@ findFeatures <- function(analysisInfo, algorithm, ..., verbose = TRUE)
                 envipick = findFeaturesEnviPick,
                 sirius = findFeaturesSIRIUS,
                 kpic2 = findFeaturesKPIC2,
-                safd = findFeaturesSAFD)
+                safd = findFeaturesSAFD,
+                eics = findFeaturesEICs)
 
     f(analysisInfo, ..., verbose = verbose)
 }

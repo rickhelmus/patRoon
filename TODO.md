@@ -329,7 +329,9 @@
 
 - TC
     - specSimParamsMatch --> specSimParams
-    - annotateSuspects() now copies annSims from feat annotations instead of calculating --> change in func args
+    - annotateSuspects() now copies annSims from feat annotations instead of calculating
+        - change in func args
+        - annSimBoth is copied, so needs to be present in compounds (ie from IDLs)
     - annSuspects should be faster now (no need to calc annSims, and estIDLevel is faster)
     - analysisInfo slot/accessor is now data.table()
     - no analysisInfo slot in fGroups anymore

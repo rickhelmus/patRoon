@@ -353,17 +353,17 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
         cTable <- if (!is.null(compounds)) compounds[[gName]] else NULL
         cScRanges <- if (!is.null(compounds)) compounds@scoreRanges[[gName]] else NULL
         
-        formRank <- NA_integer_; annSimForm <- annSimBoth <- NA_real_
+        formRank <- NA_integer_; annSimForm <- NA_real_
         if (!is.null(fTable) && !is.null(si[["formula"]]) && !is.na(si$formula[i]))
         {
             formRank <- which(si$formula[i] == fTable$neutral_formula)
             formRank <- if (length(formRank) > 0) formRank[1] else NA_integer_
             if (!is.na(formRank))
-                annSimForm <- annSimBoth <- formulas[[gName]]$annSim[formRank]
+                annSimForm <- formulas[[gName]]$annSim[formRank]
         }
         
         suspIK1 <- if (!is.null(si[["InChIKey"]]) && !is.na(si$InChIKey[i])) getIKBlock1(si$InChIKey[i]) else NULL
-        annSimComp <- NA_real_; compRank <- NA_integer_
+        annSimComp <- annSimBoth <- NA_real_; compRank <- NA_integer_
         if (!is.null(MSMSList) && !is.null(cTable) && !is.null(suspIK1))
         {
             compRank <- which(suspIK1 == cTable$InChIKey1)
@@ -375,8 +375,6 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
 
                 if (!is.null(compounds[[gName]][["annSimBoth"]]))
                     annSimBoth <- compounds[[gName]]$annSimBoth[compRank]
-                else
-                    annSimBoth <- annSimComp
             }
         }
         

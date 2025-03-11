@@ -11,7 +11,6 @@
     - check if ref docs are OK
     - add to handbook
     - add NEWS
-- update sysdata.rda
 - update patRoonInst for new deps?
 - formulas: calcFeatures by default FALSE?
 - BUG: annSim.1 column (in formulas?)?
@@ -391,7 +390,7 @@
         - consistent calculation and configuration of logP/retDir calculation for all TP structure algos
         - new ann_form/ann_comp args
         - TPStructParams
-        - log P tolerance for retDir calculation
+        - log P tolerance for retDir calculation --> default enabled and has a large effect vs prev results --> doc how to revert to old behavior?
     - report()
         - fixed: TP graphs were generated for components with absent (parent) fGroups
     - compoundsLibrary: specSimParamsLib now defaults to specSimParams, and the latter now defaults to removing the precursor

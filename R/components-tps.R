@@ -523,14 +523,6 @@ setMethod("filter", "componentsTPs", function(obj, ..., retDirMatch = FALSE,
             ct <- copy(ct)
             ct[, keep := TRUE]
             
-            if (retDirMatch)
-            {
-                if (negate)
-                    ct[TP_retDir != 0 & retDir != 0, keep := TP_retDir != retDir]
-                else
-                    ct[TP_retDir != 0 & retDir != 0, keep := TP_retDir == retDir]
-            }
-            
             ct <- minColFilter(ct, "specSimilarity", minSpecSim)
             ct <- minColFilter(ct, "specSimilarityPrec", minSpecSimPrec)
             ct <- minColFilter(ct, "specSimilarityBoth", minSpecSimBoth)
@@ -540,7 +532,7 @@ setMethod("filter", "componentsTPs", function(obj, ..., retDirMatch = FALSE,
             return(!ct$keep)
         })
         
-        if (!is.null(minFragMatches) || !is.null(minNLMatches) || !is.null(formulas))
+        if (retDirMatch || !is.null(minFragMatches) || !is.null(minNLMatches) || !is.null(formulas))
         {
             # check if subtracting is possible, ie by checking if subtraction doesn't lead to negative element
             # counts
@@ -565,11 +557,19 @@ setMethod("filter", "componentsTPs", function(obj, ..., retDirMatch = FALSE,
                 cmpTab <- copy(cmpTab)
                 parentFG <- componentInfo(obj)[name == cmpName]$parent_group
                     
-                cmpTab[, candidates := Map(group, candidates, f = function(grp, ct)
+                cmpTab[, candidates := Map(group, candidates, retDir, f = function(grp, ct, rd)
                 {
                     ct <- copy(ct)
                     ct[, keep := TRUE]
 
+                    if (retDirMatch && rd != 0)
+                    {
+                        if (negate)
+                            ct[TP_retDir != 0, keep := TP_retDir != rd]
+                        else
+                            ct[TP_retDir != 0, keep := TP_retDir == rd]
+                    }
+                    
                     ct <- minColFilter(ct, "fragmentMatches", minFragMatches)
                     ct <- minColFilter(ct, "neutralLossMatches", minNLMatches)
                     

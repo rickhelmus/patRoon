@@ -725,7 +725,7 @@ setMethod("estimateIDLevels", "compounds", function(obj, absMzDev = defaultLim("
                 annInds <- lapply(ann$fragInfo, "[[", "PLID")
                 annIndsForms <- Map(ann$neutral_formula, fRanks, f = function(f, fr)
                 {
-                    if (is.na(fr) == 0)
+                    if (is.na(fr))
                         return(integer())
                     return(fTable$fragInfo[[fr]]$PLID)
                 })

@@ -315,9 +315,9 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, IMSMatchPara
     metaDataCols <- setdiff(metaDataCols, c("mobility", "mobility_susp", "CCS", "CCS_susp"))
     
     emptyResult <- data.table()
-    for (col in c(metaDataCols, "group", "d_rt", "d_mz"))
+    for (col in c(metaDataCols, "mobility_susp", "CCS_susp", "group", "d_rt", "d_mz"))
     {
-        if (col %in% c("rt", "mz", "neutralMass", "d_rt", "d_mz"))
+        if (col %in% c("rt", "mz", "neutralMass", "mobility_susp", "CCS_susp", "d_rt", "d_mz"))
             emptyResult[, (col) := numeric()]
         else
             emptyResult[, (col) := character()]
@@ -591,16 +591,14 @@ doSuspectFilter <- function(obj, onlyHits, selectHitsBy, selectBestFGroups, maxL
     }
     
     # NOTE: do last in case previous steps removed hits 
-    if (!is.null(onlyHits))
+    if (!is.null(onlyHits) && (onlyHits || negate))
     {
-        obj <- doFGroupsFilter(obj, "suspects", list(), function(fGroups)
+        obj <- doFGroupsFilter(obj, "suspects", list(onlyHits, negate), function(fGroups)
         {
             sGroups <- unique(screenInfo(fGroups)$group)
             if (negate && onlyHits)
-                fGroups <- fGroups[, setdiff(names(fGroups), sGroups)]
-            else
-                fGroups <- fGroups[, sGroups]
-            return(fGroups)
+                sGroups <- setdiff(names(fGroups), sGroups)
+            return(list(subset = list(j = sGroups)))
         }, applyIMS = applyIMS)
     }
     

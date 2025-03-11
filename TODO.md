@@ -14,6 +14,7 @@
 - update sysdata.rda
 - update patRoonInst for new deps?
 - formulas: calcFeatures by default FALSE?
+- BUG: annSim.1 column (in formulas?)?
 
 
 ## Maybe

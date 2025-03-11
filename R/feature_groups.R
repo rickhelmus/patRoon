@@ -1469,14 +1469,14 @@ setMethod("assignMobilities", "featureGroups", function(obj, mobPeakParams = NUL
 
 #' @describeIn featureGroups Obtain the total ion chromatogram/s (TICs) of the analyses.
 #' @export
-setMethod("getTICs", "featureGroups", function(obj, retentionRange = NULL, MSLevel = c(1, 2))
+setMethod("getTICs", "featureGroups", function(obj, retentionRange = NULL, MSLevel = 1)
 {
     getTICs(obj@features, retentionRange, MSLevel)
 })
 
 #' @describeIn featureGroups Obtain the base peak chromatogram/s (BPCs) of the analyses.
 #' @export
-setMethod("getBPCs", "featureGroups", function(obj, retentionRange = NULL, MSLevel = c(1, 2))
+setMethod("getBPCs", "featureGroups", function(obj, retentionRange = NULL, MSLevel = 1)
 {
     getBPCs(obj@features, retentionRange, MSLevel)
 })

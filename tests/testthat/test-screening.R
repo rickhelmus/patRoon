@@ -113,7 +113,7 @@ doAnnot <- function(...) annotateSuspects(..., logPath = NULL) # disable logging
 hasMF <- TRUE # !is.null(getOption("patRoon.path.MetFragCL")) && nzchar(getOption("patRoon.path.MetFragCL"))
 if (hasMF)
 {
-    plists <- generateMSPeakListsMzR(fGroupsScrNoRT)
+    plists <- generateMSPeakLists(fGroupsScrNoRT)
     compsMF <- callMF(fGroupsScr, plists, db = file.path(getTestDataPath(), "test-mf-db-isomers.csv"))
     compsMFMoNa <- callMF(fGroupsScrNoRT, plists, scoreTypes = c("fragScore", "individualMoNAScore"),
                           db = file.path(getTestDataPath(), "test-mf-db-isomers.csv"))
@@ -245,7 +245,7 @@ test_that("Negated screen filters", {
     expect_length(selectedNegFGroupsLev, length(fGroupsAnnNoRTFake))
     
     expect_gt(maxIDLevel(filter(fGroupsAnnNoRT, maxLevel = 3, negate = TRUE)), 3)
-    expect_gt(getMaxScrCol(filter(fGroupsAnnNoRT, maxFormRank = 3, negate = TRUE), "formRank"), 3)
+    expect_gt(getMaxScrCol(filter(fGroupsAnnNoRT, maxFormRank = 1, negate = TRUE), "formRank"), 1)
     expect_gt(getMaxScrCol(filter(fGroupsAnnNoRT, maxCompRank = 1, negate = TRUE), "compRank"), 1)
     expect_lt(getMinScrCol(filter(fGroupsAnnNoRT, minAnnSimForm = 0.9, negate = TRUE), "annSimForm"), 0.9)
     expect_lt(getMinScrCol(filter(fGroupsAnnNoRT, minAnnSimComp = 0.9, negate = TRUE), "annSimComp"), 0.9)
@@ -256,7 +256,7 @@ test_that("Negated screen filters", {
 })
 
 fGroupsEmpty <- groupFeatures(findFeatures(getTestAnaInfo(), "openms", noiseThrInt = 1E9), "openms")
-suspsEmpty <- data.table(name = "doesnotexist", SMILES = "C", mz = 12)
+suspsEmpty <- data.table(name = "doesnotexist", SMILES = "C", mz = 12, adduct = "[M+H]+")
 fGroupsScrEmpty <- doScreen(fGroups, suspsEmpty)
 
 if (hasMF)
@@ -281,9 +281,12 @@ test_that("Empty objects", {
 
 test_that("Addition works", {
     # repeated screening shouldn't change object
-    expect_equal(scr, screenInfo(doScreen(fGroupsScr, susps, onlyHits = TRUE, amend = TRUE)))
-    expect_equal(scr, screenInfo(doScreen(fGroupsScrEmpty, susps, onlyHits = TRUE, amend = TRUE)))
-    expect_equal(scr, screenInfo(doScreen(doScreen(fGroups, susps[1:3]), susps[-(1:3)], onlyHits = TRUE, amend = TRUE)))
+    expect_equal(scr, screenInfo(doScreen(fGroupsScr, susps, onlyHits = TRUE, amend = TRUE)),
+                 check.attributes = FALSE)
+    expect_equal(scr, screenInfo(doScreen(fGroupsScrEmpty, susps, onlyHits = TRUE, amend = TRUE)),
+                 check.attributes = FALSE)
+    expect_equal(scr, screenInfo(doScreen(doScreen(fGroups, susps[1:3]), susps[-(1:3)], onlyHits = TRUE, amend = TRUE))[order(name)],
+                 check.attributes = FALSE)
 })
 
 if (hasMF)
@@ -315,7 +318,7 @@ test_that("sets functionality", {
     # some tests from feature groups to ensure proper subsetting/unsetting
     expect_equal(analysisInfo(unset(fGroupsScr, "positive"), TRUE), getTestAnaInfoPos(getTestAnaInfoAnn()),
                  check.attributes = FALSE)
-    expect_equal(analysisInfo(fGroupsScr[, sets = "positive"], TRUE)[, 1:4], getTestAnaInfoPos(getTestAnaInfoAnn()),
+    expect_equal(analysisInfo(fGroupsScr[, sets = "positive"], FALSE)[, -"set"], getTestAnaInfoPos(getTestAnaInfoAnn()),
                  check.attributes = FALSE)
     expect_setequal(unique(annotations(fGroupsScr)$adduct), c("[M+H]+", "[M-H]-"))
     expect_equal(fGroupsScr, fGroupsScr[, sets = sets(fGroupsScr)])

@@ -113,11 +113,14 @@ doAnnot <- function(...) annotateSuspects(..., logPath = NULL) # disable logging
 hasMF <- TRUE # !is.null(getOption("patRoon.path.MetFragCL")) && nzchar(getOption("patRoon.path.MetFragCL"))
 if (hasMF)
 {
-    plists <- generateMSPeakLists(fGroupsScrNoRT, "mzr")
+    plists <- generateMSPeakListsMzR(fGroupsScrNoRT)
     compsMF <- callMF(fGroupsScr, plists, db = file.path(getTestDataPath(), "test-mf-db-isomers.csv"))
     compsMFMoNa <- callMF(fGroupsScrNoRT, plists, scoreTypes = c("fragScore", "individualMoNAScore"),
                           db = file.path(getTestDataPath(), "test-mf-db-isomers.csv"))
     forms <- doGenForms(fGroupsScrNoRT, plists, "genform", calculateFeatures = FALSE)
+    
+    compsMF <- estimateIDLevels(compsMF, MSPeakLists = plists, formulas = forms)
+    compsMFMoNa <- estimateIDLevels(compsMFMoNa, MSPeakLists = plists, formulas = forms)
     
     fGroupsAnnNothing <- doAnnot(fGroupsScr)
     fGroupsAnnMF <- doAnnot(fGroupsScr, MSPeakLists = plists, formulas = forms, compounds = compsMF)
@@ -174,8 +177,6 @@ if (hasMF)
     selectedHitsLev <- filter(fGroupsAnnNoRT, selectHitsBy = "level", onlyHits = TRUE)
     
     fGroupsAnnNoRTFake <- makeFakeHit(fGroupsAnnNoRT)
-    if (testWithSets())
-        fGroupsAnnNoRTFake@setObjects[[1]] <- makeFakeHit(fGroupsAnnNoRTFake@setObjects[[1]])
     selectedFGroupsLev <- filter(fGroupsAnnNoRTFake, selectBestFGroups = TRUE)
 }
 

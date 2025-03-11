@@ -8,9 +8,8 @@
 NULL
 
 # merges screening info from screenInfo slots
-mergeScreeningSetInfos <- function(setObjects, sInfos = lapply(setObjects, screenInfo), rmSetCols = TRUE)
+mergeScreeningSetInfos <- function(setObjects, sInfos = lapply(setObjects, screenInfo))
 {
-    rmCols <- c("mz", "fragments_mz")
     unCols <- c("rt", "mobility", "CCS", "mobility_susp", "CCS_susp", "formula", "SMILES", "InChI", "InChIKey",
                 "neutralMass", "d_rt", "d_mz", "d_mob", "d_mob_rel", "d_CCS", "d_CCS_rel", "LC50_SMILES")
     
@@ -74,24 +73,11 @@ mergeScreeningSetInfos <- function(setObjects, sInfos = lapply(setObjects, scree
                 scrInfo[, (allCols) := NULL]
             }
         }
-        
-        if (rmSetCols)
-        {
-            rmc <- getAllCols(rmCols)
-            if (length(rmc) > 0)
-                scrInfo[, (rmc) := NULL]
-        }
     }
     else if (length(sInfos) == 1)
     {
         scrInfo <- copy(sInfos[[1]])
         scrInfo <- renameDupCols(scrInfo, paste0("-", names(setObjects)[1]), FALSE)
-        if (rmSetCols)
-        {
-            rmc <- intersect(rmCols, names(scrInfo))
-            if (length(rmc) > 0)
-                scrInfo[, (rmc) := NULL]
-        }
     }
     else
         scrInfo <- data.table()

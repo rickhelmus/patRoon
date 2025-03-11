@@ -6,7 +6,7 @@ context("compounds")
 
 fGroups <- getCompFGroups()
 
-plists <- generateMSPeakLists(fGroups, "mzr")
+plists <- generateMSPeakLists(fGroups)
 plistsEmpty <- plists[FALSE, reAverage = TRUE]
 plistsEmptyMS <- removeMSPlists(plists, "MS")
 fGroupsEmpty <- getEmptyTestFGroups()
@@ -67,7 +67,8 @@ test_that("verify Library compound generation", {
     lmCol <- if (testWithSets()) "libMatch-positive" else "libMatch"
     expect_gte(min(as.data.table(doGenComps(fGroups, plists, "library", MSLibrary = mslibrary, minSim = 0.25))[[lmCol]],
                    na.rm = TRUE), 0.25)
-    expect_true(all(!is.na(as.data.table(compsLib, fragments = TRUE)$frag_ion_formula))) # check presence annotations
+    # check presence annotations
+    expect_true(all(!is.na(as.data.table(filter(compsLib, minExplainedPeaks = 1), fragments = TRUE)$frag_ion_formula)))
 })
 
 test_that("verify fingerprints", {

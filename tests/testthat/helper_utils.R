@@ -526,3 +526,18 @@ compareRef <- function(ref)
     on <- getOldNewRefs(ref)
     waldo::compare(on$old, on$new, tolerance = 0.00001, max_diffs = Inf)
 }
+
+# to compare with old TP components format
+compareCompRef <- function(ref)
+{
+    on <- getOldNewRefs(ref)
+    tabOld <- as.data.table(on$old)
+    tabNew <- as.data.table(on$new, candidates = TRUE)
+    setnames(tabOld, c("TP_name", paste0("fragmentMatches", c("", "-positive", "-negative")),
+                       paste0("neutralLossMatches", c("", "-positive", "-negative"))),
+             c("candidate_name", paste0("totalFragmentMatches", c("", "-positive", "-negative")),
+               paste0("totalNeutralLossMatches", c("", "-positive", "-negative"))),
+             skip_absent = TRUE)
+    tabNew <- removeDTColumnsIfPresent(tabNew, c("fragmentMatches", "neutralLossMatches"))
+    waldo::compare(tabOld, tabNew, tolerance = 0.001, max_diffs = Inf)
+}

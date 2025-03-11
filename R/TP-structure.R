@@ -461,7 +461,7 @@ setMethod("consensus", "transformationProductsStructure", function(obj, ..., abs
     setcolorder(allParentsTab, parCols) # move mergedBy to end
     
     # HACK: dummy values for fpType/fpSimMethod, they are not really used as calcSims is always FALSE
-    return(transformationProductsStructureConsensus(calcSims = FALSE, fpType = "extended", fpSimMethod = "tanimoto",
+    return(transformationProductsStructureConsensus(getDefTPStructParams(calcSims = FALSE), doRetDirs = FALSE,
                                                     parents = allParentsTab, products = mergedTPs,
                                                     algorithm = paste0(unique(sapply(allTPs, algorithm)), collapse = ",")))
 })

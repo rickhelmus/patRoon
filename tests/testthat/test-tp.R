@@ -28,7 +28,8 @@ TPsLibFormScr <- generateTPs("library_formula", TPLibrary = TPCustFormLib, fGrou
 
 TPsBTSusp <- generateTPs("biotransformer", suspL)
 TPsBTScr <- generateTPs("biotransformer", fGroups)
-TPsBTSuspMore <- generateTPs("biotransformer", patRoonData::suspectsPos[1:25, ], calcSims = TRUE) # for filter tests
+# for filter tests
+TPsBTSuspMore <- generateTPs("biotransformer", patRoonData::suspectsPos[1:25, ], TPStructParams = getDefTPStructParams(calcSims = TRUE))
 
 doCTS <- FALSE
 if (doCTS)
@@ -50,7 +51,7 @@ doMetFrag <- TRUE # !is.null(getOption("patRoon.path.MetFragCL")) && nzchar(getO
 
 if (doMetFrag)
 {
-    plists <- generateMSPeakLists(fGroups, "mzr")
+    plists <- generateMSPeakLists(fGroups)
     plistsEmpty <- plists[FALSE, reAverage = TRUE]
     plistsEmptyMS <- removeMSPlists(plists, "MS")
     
@@ -303,7 +304,7 @@ if (doCTS)
 if (doMetFrag)
 {
     fGroupsAnn <- doScreen(fGroupsMore, convertToSuspects(TPsLibSusp, includeParents = TRUE), onlyHits = TRUE)
-    plistsAnn <- generateMSPeakLists(fGroupsAnn, "mzr")
+    plistsAnn <- generateMSPeakLists(fGroupsAnn)
     formsAnn <- doGenForms(fGroupsAnn, plistsAnn, "genform", elements = "CHNOPSClF", calculateFeatures = FALSE)
     TPDB <- tempfile(fileext = ".csv")
     convertToMFDB(TPsLibSusp, TPDB, includeParents = TRUE)
@@ -355,7 +356,12 @@ test_that("TP componentization", {
     checkmate::expect_names(names(as.data.table(componTPsAnn)), must.include = c("specSimilarity", "specSimilarityPrec",
                                                                                  "specSimilarityBoth",
                                                                                  "totalFragmentMatches",
-                                                                                 "neutralLossMatches"))
+                                                                                 "totalNeutralLossMatches"))
+    checkmate::expect_names(names(as.data.table(componTPsAnn, candidates = TRUE)),
+                            must.include = c("specSimilarity", "specSimilarityPrec", "specSimilarityBoth",
+                                             "totalFragmentMatches", "totalNeutralLossMatches",
+                                             "candidate_name", "fragmentMatches", "neutralLossMatches", "TP_retDir",
+                                             "formulaDiff"))
     checkmate::expect_names(names(as.data.table(componTPsAnnPL)), must.include = c("specSimilarity", "specSimilarityPrec",
                                                                                    "specSimilarityBoth"))
     
@@ -367,8 +373,8 @@ test_that("TP componentization", {
     expect_known_show(componTPsCTS, testFile("tp-compon-cts", text = TRUE))
 })
 
-getMinCompTblVal <- function(x, field) min(as.data.table(x)[[field]], na.rm = TRUE)
-getMaxCompTblVal <- function(x, field) max(as.data.table(x)[[field]], na.rm = TRUE)
+getMinCompTblVal <- function(x, field) min(as.data.table(x, candidates = TRUE)[[field]], na.rm = TRUE)
+getMaxCompTblVal <- function(x, field) max(as.data.table(x, candidates = TRUE)[[field]], na.rm = TRUE)
 
 componTPsRetF <- filter(componTPsLogic, retDirMatch = TRUE)
 componTPsRetFN <- filter(componTPsLogic, retDirMatch = TRUE, negate = TRUE)
@@ -378,9 +384,10 @@ if (doMetFrag)
     # HACK: add unlikely element so we can easily test formula filter below
     componTPsLogicMod <- componTPsLogic
     componTPsLogicMod@components[[1]] <- copy(componTPsLogicMod@components[[1]])
-    componTPsLogicMod@components[[1]][, trans_add := "Cl"]
+    componTPsLogicMod@components[[1]]$candidates[[1]] <- copy(componTPsLogicMod@components[[1]]$candidates[[1]])
+    componTPsLogicMod@components[[1]]$candidates[[1]][, trans_add := "Cl"]
     
-    plistsLogicAnn <- generateMSPeakLists(fGroupsTPsLogic, "mzr")
+    plistsLogicAnn <- generateMSPeakLists(fGroupsTPsLogic)
     formsLogicAnn <- doGenForms(fGroupsTPsLogic, plistsLogicAnn, "genform", calculateFeatures = FALSE)
 }
 
@@ -390,10 +397,10 @@ test_that("TP component usage", {
     expect_HTML(plotGraph(TPsLibFormSusp, which = componentInfo(componTPsLibForm)$parent_name[1],
                           components = componTPsLibForm))
     
-    expect_equal(as.data.table(componTPsLogic)[TP_retDir == retDir | TP_retDir == 0 | retDir == 0, -"size"],
-                 as.data.table(componTPsRetF)[, -"size"])
-    expect_equal(as.data.table(componTPsLogic)[TP_retDir != retDir | TP_retDir == 0 | retDir == 0, -"size"],
-                 as.data.table(componTPsRetFN)[, -"size"])
+    expect_equal(as.data.table(componTPsLogic, candidates = TRUE)[TP_retDir == retDir | TP_retDir == 0 | retDir == 0, -"size"],
+                 as.data.table(componTPsRetF, candidates = TRUE)[, -"size"])
+    expect_equal(as.data.table(componTPsLogic, candidates = TRUE)[TP_retDir != retDir | TP_retDir == 0 | retDir == 0, -"size"],
+                 as.data.table(componTPsRetFN, candidates = TRUE)[, -"size"])
     
     expect_reportHTML(makeReportHTML(fGroupsMoreScr, components = componTPsBT, TPs = TPsBTSusp))
     
@@ -411,6 +418,8 @@ test_that("TP component usage", {
     expect_lt(getMaxCompTblVal(filter(componTPsAnn, minSpecSim = 0.2, negate = TRUE), "specSimilarity"), 0.2)
     expect_lt(getMaxCompTblVal(filter(componTPsAnn, minSpecSimPrec = 0.2, negate = TRUE), "specSimilarityPrec"), 0.2)
     expect_lt(getMaxCompTblVal(filter(componTPsAnn, minSpecSimBoth = 0.3, negate = TRUE), "specSimilarityBoth"), 0.3)
-    expect_lt(getMaxCompTblVal(filter(componTPsAnn, minFragMatches = 2, negate = TRUE), "totalFragmentMatches"), 2)
-    expect_lt(getMaxCompTblVal(filter(componTPsAnn, minNLMatches = 4, negate = TRUE), "totalNeutralLossMatches"), 4)
+    expect_lt(getMaxCompTblVal(filter(componTPsAnn, minTotFragMatches = 2, negate = TRUE), "totalFragmentMatches"), 2)
+    expect_lt(getMaxCompTblVal(filter(componTPsAnn, minTotNLMatches = 4, negate = TRUE), "totalNeutralLossMatches"), 4)
+    expect_lt(getMaxCompTblVal(filter(componTPsAnn, minFragMatches = 2, negate = TRUE), "fragmentMatches"), 2)
+    expect_lt(getMaxCompTblVal(filter(componTPsAnn, minNLMatches = 4, negate = TRUE), "neutralLossMatches"), 4)
 })

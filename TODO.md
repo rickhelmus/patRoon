@@ -418,6 +418,7 @@
     - mzExpIMSWindow EIXParam
     - (subsetDTColumnsIfPresent: use order of requested cols instead of original) --> may change column order in some places
     - minIntensity arg for pwiz conversion, set by default
+    - getBPCs(): doen't return m/z anymore
 - IMS
     - hasMobilities slot for features
     - Dietrich features

@@ -9,7 +9,7 @@ hasMetfrag <- TRUE # !is.null(getOption("patRoon.path.MetFragCL")) && nzchar(get
 if (hasMetfrag)
 {
     fGroups <- getCompFGroups()
-    plists <- generateMSPeakLists(fGroups, "mzr")
+    plists <- generateMSPeakLists(fGroups)
     compounds <- callMF(fGroups, plists, db = file.path(getTestDataPath(), "test-mf-db-isomers.csv"))
     compsClust <- makeHCluster(compounds)
     firstGroup <- names(clusters(compsClust))[1]

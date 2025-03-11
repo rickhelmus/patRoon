@@ -24,7 +24,7 @@ test_that("TICs", {
 
 test_that("BPCs", {
     checkmate::expect_data_table(getBPCs(anaInfoOne))
-    expect_equal(colnames(getBPCs(anaInfoOne)), c("analysis", "replicate", "ret", "MSLevel", "mz", "intensity"))
+    expect_equal(colnames(getBPCs(anaInfoOne)), c("analysis", "replicate", "ret", "MSLevel", "intensity"))
     expect_equal(nrow(getBPCs(anaInfoOne)), 759)
     checkmate::expect_data_table(getBPCs(fList))
     checkmate::expect_data_table(getBPCs(fgOpenMS))
@@ -32,8 +32,8 @@ test_that("BPCs", {
 
 test_that("test plot TICs and BPCs", {
     expect_doppel("raw-tic", function() plotTICs(anaInfoOne))
-    expect_doppel("raw-tic-col", function() plotTICs(fList, colourBy = "replicate", MSLevel = 1))
-    expect_doppel("raw-ms2", function() plotTICs(fgOpenMS[2:4, ], colourBy = "replicate", MSLevel = 2))
+    expect_doppel("raw-tic-col", function() plotTICs(fList, groupBy = "replicate", MSLevel = 1))
+    expect_doppel("raw-ms2", function() plotTICs(fgOpenMS[2:4, ], groupBy = "replicate", MSLevel = 2))
     expect_doppel("raw-bpc", function() plotBPCs(anaInfo[2:3, ]))
     expect_doppel("raw-tic-feat", function() plotTICs(fList[1, ]))
     expect_doppel("raw-tic-fg", function() plotTICs(fgOpenMS[1, ]))

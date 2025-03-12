@@ -412,8 +412,10 @@ test_that("TP component usage", {
     expect_gte(getMinCompTblVal(filter(componTPsAnn, minSpecSim = 0.2), "specSimilarity"), 0.2)
     expect_gte(getMinCompTblVal(filter(componTPsAnn, minSpecSimPrec = 0.2), "specSimilarityPrec"), 0.2)
     expect_gte(getMinCompTblVal(filter(componTPsAnn, minSpecSimBoth = 0.2), "specSimilarityBoth"), 0.2)
-    expect_gte(getMinCompTblVal(filter(componTPsAnn, minFragMatches = 2), "totalFragmentMatches"), 2)
-    expect_gte(getMinCompTblVal(filter(componTPsAnn, minNLMatches = 2), "totalNeutralLossMatches"), 2)
+    expect_gte(getMinCompTblVal(filter(componTPsAnn, minTotFragMatches = 2), "totalFragmentMatches"), 2)
+    expect_gte(getMinCompTblVal(filter(componTPsAnn, minTotNLMatches = 2), "totalNeutralLossMatches"), 2)
+    expect_gte(getMinCompTblVal(filter(componTPsAnn, minFragMatches = 2), "fragmentMatches"), 2)
+    expect_gte(getMinCompTblVal(filter(componTPsAnn, minNLMatches = 2), "neutralLossMatches"), 2)
     
     expect_lt(getMaxCompTblVal(filter(componTPsAnn, minSpecSim = 0.2, negate = TRUE), "specSimilarity"), 0.2)
     expect_lt(getMaxCompTblVal(filter(componTPsAnn, minSpecSimPrec = 0.2, negate = TRUE), "specSimilarityPrec"), 0.2)

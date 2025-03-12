@@ -136,7 +136,7 @@
     - as.data.table()
         - changed/new average, regression, regressionBy args
     - groupBy/aggregate
-        - plot(), plotChord(), plotChroms(), plotVenn(), plotUpSet(), unique(), overlap()
+        - plotChord(), plotChroms(), plotVenn(), plotUpSet(), unique(), overlap()
     - plotInt(): areas, xBy, groupBy, regression
     - [
         - analysis re-ordering

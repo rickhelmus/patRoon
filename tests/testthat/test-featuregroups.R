@@ -205,6 +205,9 @@ test_that("as.data.table works", {
 test_that("unique works", {
     # note: only have two rep groups
 
+    expect_equal(unique(fgOpenMS, aggregate = FALSE,
+                        which = analysisInfo(fgOpenMS)[replicate == "standard-pos"]$analysis),
+                 unique(fgOpenMS, aggregate = TRUE, which = "standard-pos"))
     expect_equivalent(unique(fgOpenMS, which = "standard-pos"),
                       unique(fgOpenMS, which = "standard-pos",
                              relativeTo = setdiff(replicates(fgOpenMS), "standard-pos")))
@@ -218,6 +221,8 @@ test_that("unique works", {
 test_that("overlap works", {
     # note: only have two rep groups
 
+    expect_equal(overlap(fgOpenMS, aggregate = FALSE, which = analyses(fgOpenMS)),
+                 overlap(fgOpenMS, aggregate = TRUE, which = replicates(fgOpenMS)))
     expect_lt(length(overlap(fgOpenMS, which = replicates(fgOpenMS))), length(fgOpenMS))
     expect_length(overlap(fgOpenMSEmpty, which = replicates(fgOpenMS)), 0)
 })
@@ -461,7 +466,9 @@ test_that("plotting works", {
     expect_equal(expect_plot(plotVenn(fGCompOpenMS))$areas[2], length(fgXCMS))
 
     # vdiffr doesn't work with UpSet
-    expect_ggplot(plotUpSet(fgOpenMS))
+    expect_ggplot(plotUpSet(fgOpenMS, aggregate = FALSE))
+    expect_ggplot(plotUpSet(fgOpenMS, aggregate = TRUE))
+    expect_ggplot(plotUpSet(fgOpenMS, which = c("standard-pos", "solvent-pos"), aggregate = TRUE))
     expect_ggplot(plotUpSet(fGCompOpenMS))
     
     expect_doppel("volcano", function() plotVolcano(fgOpenMS, FCParams))
@@ -549,6 +556,8 @@ test_that("sets functionality", {
     expect_length(overlap(fgOpenMSEmpty, which = sets(fgOpenMS), aggregate = "set"), 0)
     
     expect_doppel("venn-sets", function() plotVenn(fgOpenMS, aggregate = "set"))
+    
+    expect_ggplot(plotUpSet(fgOpenMS, aggregate = "set"))
     
     expect_doppel("chord-outer-set", function() plotChord(fgOpenMS, aggregate = TRUE, groupBy = "set"))
     

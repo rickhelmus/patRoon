@@ -135,8 +135,7 @@
     - annSim: jaccard (as was done for suspects)
     - as.data.table()
         - changed/new average, regression, regressionBy args
-    - groupBy/aggregate
-        - plotChord() [aggregate], plotVenn(), plotUpSet(), unique(), overlap()
+    - plotChord() [aggregate]
     - plotInt(): areas, xBy, groupBy, regression
     - [
         - analysis re-ordering

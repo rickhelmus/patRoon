@@ -1,0 +1,1 @@
+A featuresXCMS3 objectHierarchy:features    |-- featuresXCMS3---Algorithm: xcms3Total feature count: 164Average feature count/analysis: 164Analyses: standard-pos-1 (1 total)Replicates: standard-pos (1 total)Replicates used as blank: solvent-pos (1 total)

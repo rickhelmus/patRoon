@@ -1,1 +1,0 @@
-A componentsSpecClust objectHierarchy:componentsClust    |-- componentsSpecClust---Algorithm: specclustComponents: CMP1, CMP2, CMP3 (3 total)Number of unique feature groups in this object: 21Size of components: 21 (total), 7.0 (mean), 6 - 8 (min - max)

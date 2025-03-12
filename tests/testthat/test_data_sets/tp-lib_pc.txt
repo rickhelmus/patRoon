@@ -1,1 +1,0 @@
-A transformationProductsLibrary objectHierarchy:transformationProductsStructure    |-- transformationProductsLibrary---Algorithm: libraryParents: (-)-(1R,2S,5R)-Menthol, (-)-(2S,5R)-Menthone, (-)-bisoprolol, (-)-Epigallocatechin, (-)-Epigallocatechin gallate, (-)-ethosuximide, ... (4144 total)Total TPs: 9894

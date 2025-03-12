@@ -396,19 +396,7 @@ expect_equal_scr <- function(object, expected, ...)
     invisible(act$val)
 }
 
-expect_doppel <- function(title, fig)
-{
-    # use different path for sets
-    # UNDONE: we don't separate anymore, rename all refs at some point so we don't need this hack
-    
-    # from vdiffr::expect_doppelganger(): get current context
-    # context <- get(".context", envir = testthat::get_reporter())
-    # return(vdiffr::expect_doppelganger(..., path = paste0(context, "_set")))
-    # UNDONE: for now modify title, hopefully we can separate nicely again with the new snapshot system some day...
-    title <- paste0("sets-", title)
-    
-    return(vdiffr::expect_doppelganger(title, fig))
-}
+expect_doppel <- function(...) vdiffr::expect_doppelganger(...)
 
 # HACK: workaround for non imported checkmate namespace
 makeExpectation <- checkmate::makeExpectation

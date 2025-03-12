@@ -107,6 +107,18 @@ test_that("suspect screening is OK", {
     
 })
 
+dupSusp <- "2-Hydroxyquinoline"; dupSuspGrps <- screenInfo(fGroupsScrNoRT)[name == dupSusp]$group
+test_that("Screen delete", {
+    expect_equal(nrow(screenInfo(delete(fGroupsScr, j = NULL, k = NA))), 0)
+    expect_equal(nrow(screenInfo(delete(fGroupsScr, j = NULL, k = function(...) TRUE))), 0)
+    expect_equal(nrow(screenInfo(delete(fGroupsScr, j = NULL, k = screenInfo(fGroupsScr)$name))), 0)
+    expect_equal(nrow(screenInfo(delete(fGroupsScr, j = screenInfo(fGroupsScr)$group, k = NA))), 0)
+    expect_equal(screenInfo(delete(fGroupsScr, j = NULL, k = screenInfo(fGroupsScr)$name[1])), screenInfo(fGroupsScr)[-1])
+    expect_in(dupSusp, screenInfo(delete(fGroupsScrNoRT, j = dupSuspGrps[1], k = dupSusp))$name) # dup, so should still be present
+    checkmate::expect_names(screenInfo(delete(fGroupsScrNoRTDup, j = dupSuspGrps, k = NA))$group,
+                            disjunct.from = dupSuspGrps)
+})
+
 doAnnot <- function(...) annotateSuspects(..., logPath = NULL) # disable logging as it slow downs testing
 
 # NOTE: try keep this in sync with MF tests for caching purposes
@@ -266,6 +278,9 @@ test_that("Empty objects", {
     expect_length(doScreen(fGroupsEmpty, suspsEmpty), 0)
     expect_length(fGroupsScrEmpty, length(fGroups))
     expect_equal(nrow(as.data.table(fGroupsScrEmpty, onlyHits = TRUE)), 0)
+    
+    expect_equal(nrow(screenInfo(delete(fGroupsScrEmpty, j = NULL, k = NA))), 0)
+    expect_equal(nrow(screenInfo(delete(fGroupsScrEmpty, j = NULL, k = function(...) TRUE))), 0)
     
     expect_length(filter(fGroupsScrEmpty, onlyHits = TRUE), 0)
     expect_length(filter(fGroupsScrEmpty, onlyHits = TRUE, negate = TRUE), length(fGroups))

@@ -440,7 +440,7 @@ delScreening <- function(fGroups, j, k)
         j <- assertDeleteArgAndToChr(j, names(fGroups), add = ac)
     checkmate::assert(
         checkmate::checkFunction(k),
-        checkmate::checkChoice(k, unique(scr$name)),
+        checkmate::checkSubset(k, scr$name, empty.ok = FALSE),
         checkmate::checkScalarNA(k),
         .var.name = "k", add = ac
     )
@@ -451,7 +451,7 @@ delScreening <- function(fGroups, j, k)
     
     scr[, keep := TRUE]
     
-    if (is.atomic(k) && is.na(k))
+    if (checkmate::testScalarNA(k))
         scr[group %chin% j, keep := FALSE]
     else if (is.function(k))
         scr[group %chin% j, keep := !k(.SD)]

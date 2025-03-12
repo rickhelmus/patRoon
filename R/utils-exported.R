@@ -823,7 +823,7 @@ getQuantCalibFromScreening <- function(fGroups, concs, areas = FALSE, average = 
     intCols <- if (average)
         concReps
     else
-        unlist(lapply(concReps, function(rg) anaInfo[group == rg]$analysis))
+        unlist(lapply(concReps, function(r) anaInfo[replicate == r]$analysis))
     intCols <- getADTIntCols(intCols)
     ret <- merge(ret, tab[, c("susp_name", intCols), with = FALSE], by.x = "name", by.y = "susp_name")
     

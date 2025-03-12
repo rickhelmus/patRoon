@@ -482,6 +482,7 @@ doFeatAnnPredictRFSets <- function(obj, fGroups, calibrants, ...)
     unsetFGs <- checkAndUnSetOther(sets(obj), fGroups, "fGroups")
     obj@setObjects <- Map(setObjects(obj), unsetFGs, calibrants, f = predictRespFactors, MoreArgs = list(...))
     obj <- updateSetConsensus(obj)
+    obj@MS2QuantMeta <- sapply(sets(obj), function(s) setObjects(obj)[[s]]@MS2QuantMeta, simplify = FALSE)
     
     return(obj)
 }

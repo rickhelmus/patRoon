@@ -23,7 +23,8 @@ NULL
 formulasSet <- setClass("formulasSet", slots = c(setThreshold = "numeric",
                                                  setThresholdAnn = "numeric",
                                                  setAvgSpecificScores = "logical",
-                                                 origFGNames = "character"),
+                                                 origFGNames = "character",
+                                                 MS2QuantMeta = "list"),
                         contains = c("formulas", "workflowStepSet"))
 
 #' @rdname formulas-class

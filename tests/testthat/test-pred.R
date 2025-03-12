@@ -41,8 +41,8 @@ if (doSIRIUS)
                                        calibConcUnit = "M")
     fGroupsForms <- predictTox(fGroupsForms)
     
-    plistsForms <- generateMSPeakLists(fGroupsForms, "mzr")
-    plistsComps <- generateMSPeakLists(fGroupsComps, "mzr")
+    plistsForms <- generateMSPeakLists(fGroupsForms)
+    plistsComps <- generateMSPeakLists(fGroupsComps)
     
     formsSIR <- doGenFormsSIRFPs(fGroupsForms, plistsForms)
     formsSIR <- predictRespFactors(formsSIR, fGroupsForms, calib, eluent, organicModifier = "MeOH", pHAq = 4,
@@ -61,14 +61,15 @@ if (doSIRIUS)
     compsEmpty <- delete(compsSIR)
 }
 
-getMS2QLM <- function(obj) if (testWithSets()) setObjects(obj)[[1]]@MS2QuantMeta$linModel else obj@MS2QuantMeta$linModel
+getMS2QLM <- function(obj) if (testWithSets()) obj@MS2QuantMeta[[1]]$linModel else obj@MS2QuantMeta$linModel
+RFCol <- getAllSuspCols("RF_SMILES", names(screenInfo(fGroupsComps)), mergedConsensusNames(fGroupsComps))[1]
 
 test_that("Basics for prediction", {
-    expect_known_value(screenInfo(fGroupsComps)[, c("RF_SMILES", "LC50_SMILES"), with = FALSE], testFile("pred-scr"))
-    checkmate::expect_names(names(screenInfo(fGroupsComps)), must.include = c("RF_SMILES", "LC50_SMILES"))
-    checkmate::expect_data_table(screenInfo(fGroupsComps)[, c("RF_SMILES", "LC50_SMILES"), with = FALSE],
+    expect_known_value(screenInfo(fGroupsComps)[, c(RFCol, "LC50_SMILES"), with = FALSE], testFile("pred-scr"))
+    checkmate::expect_names(names(screenInfo(fGroupsComps)), must.include = c(RFCol, "LC50_SMILES"))
+    checkmate::expect_data_table(screenInfo(fGroupsComps)[, c(RFCol, "LC50_SMILES"), with = FALSE],
                                  types = "numeric")
-    checkmate::expect_numeric(screenInfo(filter(fGroupsComps, minRF = 1E6))$RF_SMILES, lower = 1E6)
+    checkmate::expect_numeric(screenInfo(filter(fGroupsComps, minRF = 1E6))[[RFCol]], lower = 1E6)
     checkmate::expect_numeric(screenInfo(filter(fGroupsComps, maxLC50 = 1E5))$LC50_SMILES, upper = 1E5)
     expect_equal(nrow(screenInfo(fGroupsEmpty)), 0)
     

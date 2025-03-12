@@ -144,7 +144,7 @@ syncScreeningSetObjects <- function(obj, unsetFGroups)
 #' @rdname featureGroupsScreening-class
 #' @export
 featureGroupsScreeningSet <- setClass("featureGroupsScreeningSet",
-                                      slots = c(screenInfo = "data.table"),
+                                      slots = c(screenInfo = "data.table", MS2QuantMeta = "list"),
                                       contains = "featureGroupsSet")
 
 setMethod("initialize", "featureGroupsScreeningSet",
@@ -323,6 +323,7 @@ setMethod("predictRespFactors", "featureGroupsScreeningSet", function(obj, calib
     unsetFGroups <- sapply(sets(obj), unset, obj = obj, simplify = FALSE)
     unsetFGroups <- Map(unsetFGroups, calibrants, f = predictRespFactors, MoreArgs = list(...))
     obj <- syncScreeningSetObjects(obj, unsetFGroups)
+    obj@MS2QuantMeta <- sapply(sets(obj), function(s) unsetFGroups[[s]]@MS2QuantMeta, simplify = FALSE)
     
     return(obj)
     

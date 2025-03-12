@@ -1,0 +1,1 @@
+An adduct object ('adduct')Addition: HSubtraction: Molecule multiplier: 1Charge: +1Generic textual representation: [M+H]+

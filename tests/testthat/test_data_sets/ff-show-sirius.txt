@@ -1,1 +1,0 @@
-A featuresSIRIUS objectHierarchy:features    |-- featuresSIRIUS---Algorithm: siriusTotal feature count: 69Average feature count/analysis: 69Analyses: standard-pos-1 (1 total)Replicates: standard-pos (1 total)Replicates used as blank: solvent-pos (1 total)

@@ -1,0 +1,1 @@
+An optimization result object ('optimizationResult')Algorithm: xcmsParameter set 1/1 (BEST):    Experimental designs tested: 2    Starting params:    - mzdiff: c(0.002, 0.006)    - method: centWave    Optimized params:    - mzdiff: 0.006    - method: centWave    Best results: featureCount: 68; nonRP: 44; RP: 2; PPS: 0.0909090909090909Best parameter set: 1

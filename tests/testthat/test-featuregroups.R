@@ -419,7 +419,7 @@ test_that("reporting with empty object works", {
 test_that("plotting works", {
     expect_doppel("retmz", function() plot(fgOpenMS, groupBy = "fGroups", showLegend = FALSE))
     expect_doppel("retmz-singlec", function() plot(fgOpenMS, groupBy = NULL, col = "blue"))
-    expect_doppel("retmz-rgroups", function() plot(fgOpenMS, groupBy = "replicate"))
+    expect_doppel("retmz-rep", function() plot(fgOpenMS, groupBy = "replicate"))
     expect_doppel("retmz-comp", function() plot(fGCompOpenMS, groupBy = "fGroups", showLegend = FALSE))
 
     expect_doppel("intensity-def", function() plotInt(fgOpenMS))

@@ -2,14 +2,67 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-testWithSets <- function() T # UNDONE: check environment variable or something
-
 getTestDataPathGeneric <- function() "test_data"
 
 testFile <- function(f, ..., text = FALSE) file.path(getTestDataPath(), paste0(f, ..., if (!text) ".Rds" else ".txt", collapse = ""))
+getWorkPath <- function(file = "", ...) if (nzchar(file)) file.path("test_temp", file, ...) else "test_temp"
+getTestDataPath <- function() paste0(getTestDataPathGeneric(), "_sets")
+
+getTestAnaInfo <- function()
+{
+    return(rbind(patRoonData::exampleAnalysisInfo("positive"), patRoonData::exampleAnalysisInfo("negative")))
+}
+getTestAnaInfoNS <- function() patRoonData::exampleAnalysisInfo()
+getTestAnaInfoPos <- function(anaInfo = getTestAnaInfo()) anaInfo[!grepl("\\-neg", anaInfo$analysis), ]
+getDAAnaInfo <- function(pat = NULL)
+{
+    path <- getOption("patRoon.test.DAAnalyses")
+    if (is.null(path))
+        return(NULL)
+    ret <- generateAnalysisInfo(c(file.path(path, "neg"), file.path(path, "pos")),
+                                groups = c(rep("solvent-neg", 3), rep("standard-neg", 3),
+                                           rep("solvent-pos", 3), rep("standard-pos", 3)),
+                                blanks = "solvent", formats = "bruker")
+    if (!is.null(pat))
+        ret <- ret[grepl(pat, ret$analysis), ]
+    return(ret)
+}
+isAnaInfoNeg <- function(anaInfo) grepl("\\-neg", anaInfo$analysis)
+
+getTestFeatures <- function(anaInfo = getTestAnaInfo(), noiseThrInt = 3E4, ...)
+{
+    an <- isAnaInfoNeg(anaInfo)
+    if (any(an))
+        ret <- makeSet(findFeatures(anaInfo[!an, ], "openms", noiseThrInt = noiseThrInt, ...),
+                       findFeatures(anaInfo[an, ], "openms", noiseThrInt = noiseThrInt, ...),
+                       adducts = c("[M+H]+", "[M-H]-"))
+    else
+        ret <- makeSet(findFeatures(anaInfo, "openms", noiseThrInt = noiseThrInt, ...), adducts = "[M+H]+")
+    return(ret)
+}
+getTestFeaturesNS <- function(anaInfo = getTestAnaInfoNS(), noiseThrInt = 3E4, ...)
+{
+    ret <- findFeatures(anaInfo, "openms", noiseThrInt = noiseThrInt, ...)
+    return(ret)
+}
+
 getTestFGroups <- function(anaInfo = getTestAnaInfo(), ...) groupFeatures(getTestFeatures(anaInfo, ...), "openms")
+getTestFGroupsNS <- function(anaInfo = getTestAnaInfoNS(), ...) groupFeatures(getTestFeaturesNS(anaInfo, ...), "openms")
 getEmptyFeatures <- function(anaInfo = getTestAnaInfo(), ...) getTestFeatures(anaInfo, noiseThrInt = 1E9, ...)
+getEmptyFeaturesNS <- function(anaInfo = getTestAnaInfoNS(), ...) getTestFeaturesNS(anaInfo, noiseThrInt = 1E9, ...)
 getEmptyTestFGroups <- function(anaInfo = getTestAnaInfo()) getTestFGroups(anaInfo)[, "none"]
+
+getTestFGroupsDA <- function(anaInfo)
+{
+    an <- isAnaInfoNeg(anaInfo)
+    if (any(isAnaInfoNeg(anaInfo)))
+        feats <- makeSet(findFeatures(anaInfo[!an, ], "bruker"),
+                         findFeatures(anaInfo[an, ], "bruker"),
+                         adducts = c("[M+H]+", "[M-H]-"))
+    else
+        feats <- makeSet(findFeatures(anaInfo[!an, ], "bruker"), adducts = c("[M+H]+", "[M-H]-"))
+    return(groupFeatures(feats, "openms"))
+}
 
 getFormFGroups <- function()
 {
@@ -35,161 +88,58 @@ callMF <- function(fGroups, plists, scoreTypes = "fragScore", db = getMFTestDBPa
                extraOpts = list(LocalDatabasePath = db), ...)
 }
 
-getDAAnaInfoAll <- function(pat = NULL)
-{
-    path <- getOption("patRoon.test.DAAnalyses")
-    if (is.null(path))
-        return(NULL)
-    ret <- generateAnalysisInfo(c(file.path(path, "neg"), file.path(path, "pos")),
-                                groups = c(rep("solvent-neg", 3), rep("standard-neg", 3),
-                                           rep("solvent-pos", 3), rep("standard-pos", 3)),
-                                blanks = "solvent", formats = "bruker")
-    if (!is.null(pat))
-        ret <- ret[grepl(pat, ret$analysis), ]
-    return(ret)
-}
-
 getMSLibMSPPath <- function() file.path(getTestDataPathGeneric(), "MoNA-export-CASMI_2012.msp")
 getMSLibJSONPath <- function() file.path(getTestDataPathGeneric(), "MoNA-export-CASMI_2016.json")
 
-if (testWithSets())
+makeOneEmptySetFGroups <- function(fGroups) delete(fGroups, which(analysisInfo(fGroups)$set == "negative"), function(...) TRUE)
+
+doExportXCMS <- function(x, ...)
 {
-    isAnaInfoNeg <- function(anaInfo) grepl("\\-neg", anaInfo$analysis)
-    
-    getWorkPath <- function(file = "", ...) if (nzchar(file)) file.path("test_temp_sets", file, ...) else "test_temp_sets"
-    getTestDataPath <- function() paste0(getTestDataPathGeneric(), "_sets")
-    
-    getTestAnaInfo <- function()
-    {
-        return(rbind(patRoonData::exampleAnalysisInfo("positive"), patRoonData::exampleAnalysisInfo("negative")))
-    }
-    getTestAnaInfoPos <- function(anaInfo = getTestAnaInfo()) anaInfo[!grepl("\\-neg", anaInfo$analysis), ]
-    getDAAnaInfo <- function(...) getDAAnaInfoAll(...)
-    getTestFeatures <- function(anaInfo = getTestAnaInfo(), noiseThrInt = 3E4, ...)
-    {
-        an <- isAnaInfoNeg(anaInfo)
-        if (any(an))
-            ret <- makeSet(findFeatures(anaInfo[!an, ], "openms", noiseThrInt = noiseThrInt, ...),
-                           findFeatures(anaInfo[an, ], "openms", noiseThrInt = noiseThrInt, ...),
-                           adducts = c("[M+H]+", "[M-H]-"))
-        else
-            ret <- makeSet(findFeatures(anaInfo, "openms", noiseThrInt = noiseThrInt, ...), adducts = "[M+H]+")
-        return(ret)
-        
-    }
-    getTestFGroupsDA <- function(anaInfo)
-    {
-        an <- isAnaInfoNeg(anaInfo)
-        if (any(isAnaInfoNeg(anaInfo)))
-            feats <- makeSet(findFeatures(anaInfo[!an, ], "bruker"),
-                             findFeatures(anaInfo[an, ], "bruker"),
-                             adducts = c("[M+H]+", "[M-H]-"))
-        else
-            feats <- makeSet(findFeatures(anaInfo[!an, ], "bruker"), adducts = c("[M+H]+", "[M-H]-"))
-        return(groupFeatures(feats, "openms"))
-    }
-    makeOneEmptySetFGroups <- function(fGroups) delete(fGroups, which(analysisInfo(fGroups)$set == "negative"), function(...) TRUE)
-
-    doExportXCMS <- function(x, ...)
-    {
-        # HACK: if x is a SIRIUS fGroups object, it will not be a set object
-        if (is(x, "featureGroupsSIRIUS"))
-            getXCMSSet(x, ...)
-        else
-            getXCMSSet(x, loadRawData = FALSE, set = "positive")
-    }
-    doExportXCMS3 <- function(x, ...)
-    {
-        # HACK: if x is a SIRIUS fGroups object, it will not be a set object
-        if (is(x, "featureGroupsSIRIUS"))
-            getXCMSnExp(x, ...)
-        else
-            getXCMSnExp(x, loadRawData = FALSE, set = "positive")
-    }
-    getExpAnaInfo <- function() getTestAnaInfoPos()
-    getExpFeats <- function(x) x[, sets = "positive"]
-    getExpFG <- function(x) x[, sets = "positive"]
-    doExport <- function(x, ...) export(x, ..., set = "positive")
-    
-    getISTDAssignments <- function(fg) internalStandardAssignments(fg, "positive")
-
-    getTestAnaInfoAnn <- function() getTestAnaInfo()[grepl("standard\\-.+\\-[2-3]", getTestAnaInfo()$analysis), ]
-    getTestAnaInfoComponents <- function() getTestAnaInfo()[grepl("(solvent|standard)\\-.+\\-1", getTestAnaInfo()$analysis), ]
-
-    getSIRFormFPsProjPath <- function() file.path(getTestDataPath(), paste0("SIRProjFormFPs", c("-pos", "-neg")))
-    getSIRCompProjPath <- function() file.path(getTestDataPath(), paste0("SIRProjComp", c("-pos", "-neg")))
-    
-    doScreen <- function(fg, susp, ...)
-    {
-        cols <- !grepl("^mz$", names(susp))
-        susp <- if (is.data.table(susp)) susp[, cols, with = FALSE] else susp[, cols, drop = FALSE]
-        screenSuspects(fg, susp, ...)
-    }
-    
-    doNormInts <- function(fg, ...) normInts(fg, ..., standards = list(patRoonData::ISTDListPos,
-                                                                       patRoonData::ISTDListNeg))
-    
-    # zero threshold makes comparisons in testing much easier
-    doGenForms <- function(..., setThresholdAnn = 0) generateFormulas(..., setThresholdAnn = setThresholdAnn)
-    doFormCons <- function(..., setThresholdAnn = 0) consensus(..., setThresholdAnn = setThresholdAnn)
-    doGenComps <- function(..., setThresholdAnn = 0) generateCompounds(..., setThresholdAnn = setThresholdAnn)
-    doCompCons <- function(..., setThresholdAnn = 0) consensus(..., setThresholdAnn = setThresholdAnn)
-    doGenComponents <- function(...) generateComponents(...)
-    
-    doGenLogicTPs <- function(...) generateTPs("logic", ...)
-} else
+    # HACK: if x is a SIRIUS fGroups object, it will not be a set object
+    if (is(x, "featureGroupsSIRIUS"))
+        getXCMSSet(x, ...)
+    else
+        getXCMSSet(x, loadRawData = FALSE, set = "positive")
+}
+doExportXCMS3 <- function(x, ...)
 {
-    getWorkPath <- function(file = "", ...) if (nzchar(file)) file.path("test_temp", file, ...) else "test_temp"
-    getTestDataPath <- getTestDataPathGeneric
-    getTestAnaInfo <- function() patRoonData::exampleAnalysisInfo()
-    getDAAnaInfo <- function(...)
-    {
-        ret <- getDAAnaInfoAll(pat)
-        return(ret[grepl("-pos", ret$replicate, fixed = TRUE), ])
-    }
-    getTestFeatures <- function(anaInfo = getTestAnaInfo(), noiseThrInt = 3E4, ...)
-    {
-        ret <- findFeatures(anaInfo, "openms", noiseThrInt = noiseThrInt, ...)
-        return(ret)
-    }
-    
-    doExportXCMS <- function(x, ...) getXCMSSet(x, ...)
-    doExportXCMS3 <- function(x, ...) getXCMSnExp(x, ...)
-    getExpAnaInfo <- function() getTestAnaInfo()
-    getExpFeats <- function(x) x
-    getExpFG <- function(x) x
-    doExport <- function(x, ...) export(x, ...)
-    getISTDAssignments <- function(fg) internalStandardAssignments(fg)
+    # HACK: if x is a SIRIUS fGroups object, it will not be a set object
+    if (is(x, "featureGroupsSIRIUS"))
+        getXCMSnExp(x, ...)
+    else
+        getXCMSnExp(x, loadRawData = FALSE, set = "positive")
+}
+doExportXCMSNS <- function(x, ...) getXCMSSet(x, ...)
+doExportXCMS3NS <- function(x, ...) getXCMSnExp(x, ...)
+getExpAnaInfo <- function() getTestAnaInfoPos()
+getExpFeats <- function(x) x[, sets = "positive"]
+getExpFG <- function(x) x[, sets = "positive"]
+doExport <- function(x, ...) export(x, ..., set = "positive")
 
-    getTestAnaInfoComponents <- function() getTestAnaInfo()[3:4, ]
-    getTestAnaInfoAnn <- function() getTestAnaInfo()[4:5, ]
-    
-    getSIRFormFPsProjPath <- function() file.path(getTestDataPath(), "SIRProjFormFPs")
-    getSIRCompProjPath <- function() file.path(getTestDataPath(), "SIRProjComp")
-    
-    doScreen <- function(fg, susp, ...)
-    {
-        if ((is.null(susp[["mz"]]) || any(is.na(susp$mz))) && (is.null(susp[["adduct"]]) || any(is.na(susp$adduct))))
-            screenSuspects(fg, susp, ..., adduct = "[M+H]+")
-        else
-            screenSuspects(fg, susp, ...)
-    }
-    doNormInts <- function(fg, ...) normInts(fg, ..., standards = patRoonData::ISTDListPos)
-    doGenForms <- function(...) generateFormulas(..., adduct = "[M+H]+")
-    doFormCons <- function(...) consensus(...)
-    doGenComps <- function(...) generateCompounds(..., adduct = "[M+H]+")
-    doCompCons <- function(...) consensus(...)
-    doGenComponents <- function(fGroups, algorithm, ...)
-    {
-        args <- c(list(fGroups, algorithm), list(...))
-        if (!algorithm %in% c("intclust", "specclust"))
-            args <- c(args, list(ionization = "positive"))
-        do.call(generateComponents, args)
-    }
-    
-    doGenLogicTPs <- function(...) generateTPs("logic", ..., adduct = "[M+H]+")
+getISTDAssignments <- function(fg) internalStandardAssignments(fg, "positive")
+
+getTestAnaInfoAnn <- function() getTestAnaInfo()[grepl("standard\\-.+\\-[2-3]", getTestAnaInfo()$analysis), ]
+getTestAnaInfoAnnNS <- function() getTestAnaInfoNS()[4:5, ]
+getTestAnaInfoComponents <- function() getTestAnaInfo()[grepl("(solvent|standard)\\-.+\\-1", getTestAnaInfo()$analysis), ]
+
+getSIRFormFPsProjPath <- function() file.path(getTestDataPath(), paste0("SIRProjFormFPs", c("-pos", "-neg")))
+getSIRCompProjPath <- function() file.path(getTestDataPath(), paste0("SIRProjComp", c("-pos", "-neg")))
+
+doScreen <- function(fg, susp, ...)
+{
+    cols <- !grepl("^mz$", names(susp))
+    susp <- if (is.data.table(susp)) susp[, cols, with = FALSE] else susp[, cols, drop = FALSE]
+    screenSuspects(fg, susp, ...)
 }
 
+doNormInts <- function(fg, ...) normInts(fg, ..., standards = list(patRoonData::ISTDListPos,
+                                                                   patRoonData::ISTDListNeg))
+
+# zero threshold makes comparisons in testing much easier
+doGenForms <- function(..., setThresholdAnn = 0) generateFormulas(..., setThresholdAnn = setThresholdAnn)
+doFormCons <- function(..., setThresholdAnn = 0) consensus(..., setThresholdAnn = setThresholdAnn)
+doGenComps <- function(..., setThresholdAnn = 0) generateCompounds(..., setThresholdAnn = setThresholdAnn)
+doCompCons <- function(..., setThresholdAnn = 0) consensus(..., setThresholdAnn = setThresholdAnn)
 
 # to make testing a bit easier: precursors don't have to follow filter rules
 removePrecursors <- function(plists)
@@ -209,8 +159,7 @@ removePrecursors <- function(plists)
     
     plists <- doRmPrecs(plists)
     
-    if (testWithSets())
-        plists@setObjects <- lapply(plists@setObjects, doRmPrecs)
+    plists@setObjects <- lapply(plists@setObjects, doRmPrecs)
     
     return(plists)
 }
@@ -229,8 +178,7 @@ removeMSPlists <- function(plists, type)
     
     plists <- doRemove(plists)
     
-    if (testWithSets())
-        plists@setObjects <- lapply(plists@setObjects, doRemove)
+    plists@setObjects <- lapply(plists@setObjects, doRemove)
     
     return(plists)
 }
@@ -451,14 +399,14 @@ expect_equal_scr <- function(object, expected, ...)
 expect_doppel <- function(title, fig)
 {
     # use different path for sets
-    if (testWithSets())
-    {
-        # from vdiffr::expect_doppelganger(): get current context
-        # context <- get(".context", envir = testthat::get_reporter())
-        # return(vdiffr::expect_doppelganger(..., path = paste0(context, "_set")))
-        # UNDONE: for now modify title, hopefully we can separate nicely again with the new snapshot system some day...
-        title <- paste0("sets-", title)
-    }
+    # UNDONE: we don't separate anymore, rename all refs at some point so we don't need this hack
+    
+    # from vdiffr::expect_doppelganger(): get current context
+    # context <- get(".context", envir = testthat::get_reporter())
+    # return(vdiffr::expect_doppelganger(..., path = paste0(context, "_set")))
+    # UNDONE: for now modify title, hopefully we can separate nicely again with the new snapshot system some day...
+    title <- paste0("sets-", title)
+    
     return(vdiffr::expect_doppelganger(title, fig))
 }
 

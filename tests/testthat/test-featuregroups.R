@@ -10,7 +10,7 @@ fList <- getTestFeatures(noiseThrInt = 1E5)
 
 fgOpenMS <- groupFeatures(fList, "openms")
 # BUG: old XCMS obiwarp doesn' work with non sets test data
-fgXCMS <- if (!testWithSets()) groupFeatures(fList, "xcms", rtalign = FALSE) else groupFeatures(fList, "xcms")
+fgXCMS <- groupFeatures(fList, "xcms")
 fgXCMS3 <- groupFeatures(fList, "xcms3")
 fgKPIC2 <- groupFeatures(fList, "kpic2")
 fgSIRIUS <- groupFeatures(analysisInfo(fList)[1,], "sirius") # only do first analysis to avoid long run times
@@ -66,34 +66,8 @@ test_that("empty objects work", {
     expect_length(fgOpenMSEmptyQ, 0)
 })
 
-if (!testWithSets())
-{
-    fgOpenMSAnn <- fgOpenMS
-    adducts(fgOpenMSAnn) <- rep("[M+H]+", length(fgOpenMSAnn))
-    fgOpenMSAnn2 <- fgOpenMSAnn
-    adducts(fgOpenMSAnn2)[3] <- "[M+K]+"
-}
-
-test_that("adducts setting", {
-    skip_if(testWithSets()) # sets tests done below
-    
-    expect_length(adducts(fgOpenMS), 0)
-    expect_length(adducts(fgOpenMSAnn), length(fgOpenMSAnn))
-    expect_length(adducts(fgOpenMSAnn2), length(fgOpenMSAnn2))
-    expect_setequal(adducts(fgOpenMSAnn), "[M+H]+")
-    expect_equal(adducts(fgOpenMSAnn2)[3], "[M+K]+", check.attributes = FALSE)
-    
-    # verify neutral masses
-    expect_true(all(sapply(seq_len(nrow(annotations(fgOpenMSAnn2))), function(i)
-    {
-        ann <- annotations(fgOpenMSAnn2)[i]
-        return(isTRUE(all.equal(patRoon:::calculateMasses(ann$neutralMass, as.adduct(ann$adduct), "mz"),
-                                groupInfo(fgOpenMSAnn2)[match(ann$group, group)]$mz)))
-    })))
-})
-
 # to compare original anaInfo: ignore extra columns that may have been added afterwards
-getAnaInfo <- function(fg) analysisInfo(fg, TRUE)[, c("path_centroid", "analysis", "replicate", "blank")]
+getAnaInfo <- function(fg) analysisInfo(fg)[, -"set"]
 
 test_that("basic subsetting", {
     expect_length(fgOpenMS[, 1:50], 50)
@@ -262,7 +236,7 @@ featCounts <- function(fg, rel)
     return(if (rel) counts / length(fg) else counts)
 }
 
-stdReps <- if (testWithSets()) c("standard-pos", "standard-neg") else "standard-pos"
+stdReps <- c("standard-pos", "standard-neg")
 
 qr <- list(ZigZag = c(0.2, 0.6), TPASRScore = c(0.5, 0.9))
 fgOpenMSQFF <- filter(fgOpenMSQ, featQualityRange = qr)
@@ -401,13 +375,6 @@ fGCompKPIC2 <- comparison(openms = fgOpenMS, xcms = fgXCMS, groupAlgo = "kpic2")
 fgCompOneEmpty <- comparison(openms = fgOpenMS, xcms = fgXCMSEmpty, groupAlgo = "openms")
 fgCompBothEmpty <- comparison(openms = fgOpenMSEmpty, xcms = fgXCMSEmpty, groupAlgo = "openms")
 
-if (!testWithSets())
-{
-    fGCons <- consensus(fGCompOpenMS)
-    fGConsOneEmpty <- consensus(fgCompOneEmpty)
-    fGConsBothEmpty <- consensus(fgCompBothEmpty)
-}
-
 test_that("verify feature group comparison", {
     expect_known_value(groupTable(fGCompOpenMS@comparedFGroups), testFile("fg-comp-openms"))
     expect_known_value(groupTable(fGCompXCMS@comparedFGroups), testFile("fg-comp-xcms"))
@@ -428,25 +395,6 @@ test_that("verify feature group comparison", {
 
     expect_length(fgCompOneEmpty, 2)
     expect_length(fgCompBothEmpty, 2)
-    
-    skip_if(testWithSets())
-    
-    expect_known_value(groupTable(fGCons), testFile("fg-comp-cons"))
-
-    expect_lt(length(consensus(fGCompOpenMS, relMinAbundance = 1)), length(fGCons))
-    
-    expect_length(fGConsOneEmpty, length(fgOpenMS))
-    expect_length(fGConsBothEmpty, 0)
-
-    expect_equal(length(consensus(fGCompOpenMS, uniqueFrom = 1)) +
-                 length(consensus(fGCompOpenMS, uniqueFrom = 2)) +
-                 length(consensus(fGCompOpenMS, relMinAbundance = 1)), length(fGCons))
-    expect_equal(length(consensus(fGCompOpenMS, uniqueFrom = 1:2, uniqueOuter = TRUE)) +
-                 length(consensus(fGCompOpenMS, relMinAbundance = 1)), length(fGCons))
-    expect_length(consensus(fGCompOpenMS, uniqueFrom = 1:2), length(fGCons))
-    expect_lt(length(consensus(fGCompOpenMS, uniqueFrom = 1:2, uniqueOuter = TRUE)), length(fGCons))
-    expect_length(consensus(fgCompBothEmpty, uniqueFrom = 1), 0)
-    expect_length(consensus(fgCompBothEmpty, uniqueFrom = 1, uniqueOuter = TRUE), 0)
 })
 
 subFGroups <- fgOpenMS[, 1:25]
@@ -467,15 +415,6 @@ test_that("reporting with empty object works", {
     expect_error(reportPDF(fgOpenMSEmpty, getWorkPath()), NA)
     expect_error(makeReportHTML(fgOpenMSEmpty), NA)
 })
-
-chordGroups <- c("standard-pos-1" = "grp1",
-                 "standard-pos-2" = "grp2",
-                 "standard-pos-3" = "grp2",
-                 "solvent-pos-1" = "grp3",
-                 "solvent-pos-2" = "grp4",
-                 "solvent-pos-3" = "grp5")
-if (testWithSets())
-    chordGroups <- c(chordGroups, setNames(chordGroups, sub("pos", "neg", names(chordGroups))))
 
 test_that("plotting works", {
     expect_doppel("retmz", function() plot(fgOpenMS, groupBy = "fGroups", showLegend = FALSE))
@@ -526,13 +465,6 @@ test_that("plotting works", {
     expect_ggplot(plotUpSet(fGCompOpenMS))
     
     expect_doppel("volcano", function() plotVolcano(fgOpenMS, FCParams))
-    
-    skip_if(testWithSets())
-    
-    expect_equal(expect_plot(plotVenn(fGCompOpenMS))$intersectionCounts,
-                 length(consensus(fGCompOpenMS, relMinAbundance = 1)))
-    expect_HTML(plotGraph(fgNormISTDMin1, onlyPresent = FALSE))
-    expect_HTML(plotGraph(fgNormISTDMin1, onlyPresent = TRUE))
 })
 
 test_that("plotting empty objects works", {
@@ -553,38 +485,24 @@ test_that("plotting empty objects works", {
 
     expect_error(plotUpSet(fgOpenMSEmpty))
     expect_error(plotUpSet(fgCompBothEmpty))
-    
-    skip_if(testWithSets())
-    
-    expect_doppel("retmz", function() plot(fGConsOneEmpty, groupBy = "fGroups", showLegend = FALSE)) # should be same as fgOpenMS
-    expect_doppel("chord-def", function() plotChord(fGConsOneEmpty)) # should be same as fgOpenMS
-    expect_doppel("venn", function() plotVenn(fGConsOneEmpty)) # should be same as fgOpenMS
-    expect_ggplot(plotUpSet(fGConsOneEmpty))
-    
-    expect_HTML(plotGraph(fgNormISTDEmpty))
 })
 
-if (testWithSets())
-{
-    fgOpenMSOneEmptySet <- makeSet(unset(fgOpenMS, "positive"), unset(fgOpenMSEmpty, "negative"), groupAlgo = "openms",
-                                   adducts = NULL, labels = c("positive", "negative"))
-    
-    fgOpenMSDiffAdduct <- fgOpenMS
-    adducts(fgOpenMSDiffAdduct, reGroup = FALSE, set = "positive")[names(fgOpenMSDiffAdduct[, sets = "positive"])[3]] <- "[M+K]+"
-    fgOpenMSDiffAdductRG <- fgOpenMS
-    adducts(fgOpenMSDiffAdductRG, reGroup = TRUE, set = "positive")[names(fgOpenMSDiffAdductRG[, sets = "positive"])] <- "[M+K]+"
-    
-    fgUniqueSet2 <- unique(fgOpenMS, which = "negative", aggregate = "set")
-}
+fgOpenMSOneEmptySet <- makeSet(unset(fgOpenMS, "positive"), unset(fgOpenMSEmpty, "negative"), groupAlgo = "openms",
+                               adducts = NULL, labels = c("positive", "negative"))
+
+fgOpenMSDiffAdduct <- fgOpenMS
+adducts(fgOpenMSDiffAdduct, reGroup = FALSE, set = "positive")[names(fgOpenMSDiffAdduct[, sets = "positive"])[3]] <- "[M+K]+"
+fgOpenMSDiffAdductRG <- fgOpenMS
+adducts(fgOpenMSDiffAdductRG, reGroup = TRUE, set = "positive")[names(fgOpenMSDiffAdductRG[, sets = "positive"])] <- "[M+K]+"
+
+fgUniqueSet2 <- unique(fgOpenMS, which = "negative", aggregate = "set")
 
 test_that("sets functionality", {
-    skip_if_not(testWithSets())
-    
     # proper (de)neutralization
     expect_equal(patRoon:::calculateMasses(groupInfo(unset(fgOpenMS, "positive"))$mz, as.adduct("[M+H]+"), "neutral"),
                  groupInfo(fgOpenMS[, sets = "positive"])$mz)
     expect_equal(analysisInfo(unset(fgOpenMS, "positive"), TRUE), getTestAnaInfoPos())
-    expect_equal(analysisInfo(fgOpenMS[, sets = "positive"], TRUE)[, 1:4], getTestAnaInfoPos())
+    expect_equivalent(analysisInfo(fgOpenMS[, sets = "positive"], FALSE)[, -"set"], getTestAnaInfoPos())
     expect_setequal(annotations(fgOpenMS)$adduct, c("[M+H]+", "[M-H]-"))
     expect_equal(fgOpenMS, fgOpenMS[, sets = sets(fgOpenMS)])
     expect_length(fgOpenMS[, sets = character()], 0)
@@ -637,4 +555,55 @@ test_that("sets functionality", {
     expect_HTML(plotGraph(fgNormISTDMin1, onlyPresent = FALSE, set = "positive"))
     expect_HTML(plotGraph(fgNormISTDMin1, onlyPresent = TRUE, set = "positive"))
     expect_HTML(plotGraph(fgNormISTDEmpty, set = "positive"))
+})
+
+fListUS <- unset(fList, "positive")
+fgNS <- groupFeatures(fListUS, "openms")
+fgNSAnn <- fgNS
+adducts(fgNSAnn) <- rep("[M+H]+", length(fgNSAnn))
+fgNSAnn2 <- fgNSAnn
+adducts(fgNSAnn2)[3] <- "[M+K]+"
+
+fGCompNS <- comparison(openms = fgNS, xcms = groupFeatures(fListUS, "xcms", rtalign = FALSE), groupAlgo = "openms")
+fGConsNS <- consensus(fGCompNS)
+
+fgOpenMSNSEmpty <- groupFeatures(getEmptyFeaturesNS(), "openms")
+fgXCMSNSEmpty <- groupFeatures(getEmptyFeaturesNS(), "xcms")
+fgCompNSOneEmpty <- comparison(openms = fgNS, xcms = fgXCMSNSEmpty, groupAlgo = "openms")
+fGConsNSOneEmpty <- consensus(fgCompNSOneEmpty)
+fgCompNSBothEmpty <- comparison(openms = fgOpenMSNSEmpty, xcms = fgXCMSNSEmpty, groupAlgo = "openms")
+fGConsNSBothEmpty <- consensus(fgCompNSBothEmpty)
+
+test_that("set unsupported functionality", {
+    expect_length(adducts(fgNS), 0)
+    expect_length(adducts(fgNSAnn), length(fgNSAnn))
+    expect_length(adducts(fgNSAnn2), length(fgNSAnn2))
+    expect_setequal(adducts(fgNSAnn), "[M+H]+")
+    expect_equal(adducts(fgNSAnn2)[3], "[M+K]+", check.attributes = FALSE)
+    # verify neutral masses
+    expect_true(all(sapply(seq_len(nrow(annotations(fgNSAnn2))), function(i)
+    {
+        ann <- annotations(fgNSAnn2)[i]
+        return(isTRUE(all.equal(patRoon:::calculateMasses(ann$neutralMass, as.adduct(ann$adduct), "mz"),
+                                groupInfo(fgNSAnn2)[match(ann$group, group)]$mz)))
+    })))
+
+    expect_known_value(groupTable(fGConsNS), testFile("fg-comp-cons"))
+    
+    expect_lt(length(consensus(fGCompNS, relMinAbundance = 1)), length(fGConsNS))
+    
+    expect_length(fGConsNSOneEmpty, length(fgNS))
+    expect_length(fGConsNSBothEmpty, 0)
+    
+    expect_equal(length(consensus(fGCompNS, uniqueFrom = 1)) +
+                     length(consensus(fGCompNS, uniqueFrom = 2)) +
+                     length(consensus(fGCompNS, relMinAbundance = 1)), length(fGConsNS))
+    expect_equal(length(consensus(fGCompNS, uniqueFrom = 1:2, uniqueOuter = TRUE)) +
+                     length(consensus(fGCompNS, relMinAbundance = 1)), length(fGConsNS))
+    expect_length(consensus(fGCompNS, uniqueFrom = 1:2), length(fGConsNS))
+    expect_lt(length(consensus(fGCompNS, uniqueFrom = 1:2, uniqueOuter = TRUE)), length(fGConsNS))
+    expect_length(consensus(fgCompNSBothEmpty, uniqueFrom = 1), 0)
+    expect_length(consensus(fgCompNSBothEmpty, uniqueFrom = 1, uniqueOuter = TRUE), 0)
+    
+    expect_equal(expect_plot(plotVenn(fGCompNS))$intersectionCounts, length(consensus(fGCompNS, relMinAbundance = 1)))
 })

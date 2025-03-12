@@ -6,15 +6,12 @@ context("screening")
 
 susps <- as.data.table(patRoonData::suspectsPos)
 # take subset of suspects to speed things up a bit
-# 2-OH quinoline: isomers present, handy for tests below. Aldicarb: has different adduct.
-susps <- susps[name %in% fread(getMFTestDBPath())$Name | name %in% c("2-Hydroxyquinoline", "Aldicarb")]
-susps[, adduct := fifelse(name == "Aldicarb", "[M+Na]+", "[M+H]+")]
-if (testWithSets())
-{
-    sn <- as.data.table(patRoonData::suspectsNeg)[1:10]
-    sn[, adduct := "[M-H]-"]
-    susps <- rbind(susps, sn)
-}
+# 2-OH quinoline: isomers present, handy for tests below.
+susps <- susps[name %in% fread(getMFTestDBPath())$Name | name == "2-Hydroxyquinoline"]
+susps[, adduct := "[M+H]+"]
+sn <- as.data.table(patRoonData::suspectsNeg)[1:10]
+sn[, adduct := "[M-H]-"]
+susps <- rbind(susps, sn)
 susps[, InChI := babelConvert(SMILES, "smi", "inchi")]
 susps[, neutralMass := getNeutralMassFromSMILES(SMILES)]
 susps[, formula := babelConvert(SMILES, "smi", "formula")]
@@ -94,17 +91,6 @@ test_that("suspect screening is OK", {
                     c(fakedSusp, fakeReplSusp))
     expect_setequal(as.data.table(fGroupsScrNoRTDup, collapseSuspects = NULL, features = TRUE)[group == fakeDupGroup]$analysis,
                     analyses(fGroupsScrNoRTDup)[1:2])
-    
-    skip_if(testWithSets())
-
-    expect_equal_scr(scrSMI, getScrInfo(suspsMissing[, c("name", "rt", "mz", "neutralMass", "adduct")]),
-                     tolerance = 1E-3)
-    
-    # adduct argument
-    # UNDONE: do something with selectIons?
-    expect_equal_scr(getScrInfo(susps[name == "Aldicarb"]),
-                     getScrInfo(susps[name == "Aldicarb", -"adduct"], adduct = "[M+Na]+"))
-    
 })
 
 dupSusp <- "2-Hydroxyquinoline"; dupSuspGrps <- screenInfo(fGroupsScrNoRT)[name == dupSusp]$group
@@ -328,8 +314,6 @@ test_that("reporting works", {
 })
 
 test_that("sets functionality", {
-    skip_if_not(testWithSets())
-    
     # some tests from feature groups to ensure proper subsetting/unsetting
     expect_equal(analysisInfo(unset(fGroupsScr, "positive"), TRUE), getTestAnaInfoPos(getTestAnaInfoAnn()),
                  check.attributes = FALSE)
@@ -339,6 +323,19 @@ test_that("sets functionality", {
     expect_equal(fGroupsScr, fGroupsScr[, sets = sets(fGroupsScr)])
     expect_length(fGroupsScr[, sets = character()], 0)
     expect_equal(sets(filter(fGroupsScr, sets = "positive", negate = TRUE)), "negative")
+})
+
+fGroupsNS <- getTestFGroupsNS(getTestAnaInfoAnnNS(), noiseThrInt = 1E4)
+getScrInfoNS <- function(susps, ...) screenInfo(doScreen(fGroupsNS, susps, onlyHits = TRUE, ...))
+suspsPos <- as.data.table(patRoonData::suspectsPos)
+# Aldicarb: has different adduct.
+suspsPos <- suspsPos[name %in% fread(getMFTestDBPath())$Name | name == "Aldicarb"]
+suspsPos[, adduct := fifelse(name == "Aldicarb", "[M+Na]+", "[M+H]+")]
+test_that("set unsupported functionality", {
+    # adduct argument
+    # UNDONE: do something with selectIons?
+    expect_equal_scr(getScrInfoNS(suspsPos[name == "Aldicarb"]),
+                     getScrInfoNS(suspsPos[name == "Aldicarb", -"adduct"], adduct = "[M+Na]+"))
 })
 
 getTQAnalytes <- function(path)

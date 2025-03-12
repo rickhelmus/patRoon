@@ -1,1 +1,0 @@
-A componentsRC objectHierarchy:components    |-- componentsRC---Algorithm: ramclustrComponents: CMP1, CMP2, CMP3, CMP4, CMP5, CMP6, ... (7 total)Number of unique feature groups in this object: 48Size of components: 48 (total), 6.9 (mean), 3 - 15 (min - max)

@@ -74,12 +74,6 @@ test_that("verify DA formula generation", {
     expect_known_show(formsDA, testFile("formulas-DA", text = TRUE))
 })
 
-test_that("verify fingerprints", {
-    skip_if(!doSIRIUS || testWithSets())
-    expect_gt(length(formsSIRFPs), 0)
-    testSIRFPSubset(formsSIRFPs)
-})
-
 test_that("basic subsetting", {
     expect_length(formsGF["nope"], 0)
     expect_equivalent(groupNames(formsGF[1:2]), groupNames(formsGF)[1:2])
@@ -96,12 +90,6 @@ test_that("basic subsetting", {
     expect_equivalent(formsGF[[groupNames(formsGF)[5]]], annotations(formsGF)[[5]])
     expect_equivalent(callDollar(formsGF, groupNames(formsGF)[4]), formsGF[[4]])
 })
-
-if (!testWithSets())
-{
-    formsGFMST1 <- filter(formsGFMS, topMost = 1)
-    formsGFMST1N <- filter(formsGFMS, topMost = 1, negate = TRUE)
-}
 
 test_that("delete and filter", {
     checkmate::expect_names(groupNames(delete(formsGF, i = 1)), disjunct.from = groupNames(formsGF)[1])
@@ -180,19 +168,12 @@ test_that("delete and filter", {
     expect_lt(length(filter(formsGF, OM = TRUE, negate = TRUE)), length(formsGF))
     expect_length(formsGF, sum(length(filter(formsGF, OM = TRUE)),
                                length(filter(formsGF, OM = TRUE, negate = TRUE))))
-    
-    skip_if(testWithSets())
-    
-    # in case of ties between pos/neg the isoScore is sometimes not the highest --> skip test with sets for now
-    expect_true(all(sapply(annotations(formsGFMST1[groupNames(formsGFMST1N)]), function(a) max(a$isoScore)) >=
-                        sapply(annotations(formsGFMST1N), function(a) max(a$isoScore))))
 })
 
 test_that("as.data.table() works", {
     testFeatAnnADT(formsGF)
 
-    normScName <- if (testWithSets()) "isoScore-positive" else "isoScore"
-    expect_range(na.omit(as.data.table(formsGF, normalizeScores = "max")[[normScName]]), c(0, 1))
+    expect_range(na.omit(as.data.table(formsGF, normalizeScores = "max")[["isoScore-positive"]]), c(0, 1))
     expect_setequal(as.data.table(formsGF, average = TRUE)$group, groupNames(formsGF))
     expect_equal(uniqueN(as.data.table(formsGF, average = TRUE), by = "group"),
                  length(groupNames(formsGF)))
@@ -297,16 +278,11 @@ test_that("plotting works", {
                  length(doFormCons(formsGF, formsSIR, MSPeakLists = plists, relMinAbundance = 1)))
 })
 
-if (testWithSets())
-{
-    fgOneEmptySet <- makeOneEmptySetFGroups(fGroups)
-    formsGFOneEmptySet <- doGenForms(fgOneEmptySet, plists, "genform")
-    formsGFAvgSpecCols <- doGenForms(fGroups, plists, "genform", setAvgSpecificScores = TRUE)
-}
+fgOneEmptySet <- makeOneEmptySetFGroups(fGroups)
+formsGFOneEmptySet <- doGenForms(fgOneEmptySet, plists, "genform")
+formsGFAvgSpecCols <- doGenForms(fGroups, plists, "genform", setAvgSpecificScores = TRUE)
 
 test_that("sets functionality", {
-    skip_if_not(testWithSets())
-    
     expect_equal(formsGF, formsGF[, sets = sets(formsGF)])
     expect_length(formsGF[, sets = character()], 0)
     expect_equal(sets(filter(formsGF, sets = "positive", negate = TRUE)), "negative")
@@ -335,4 +311,13 @@ test_that("sets functionality", {
     expect_gt(length(setObjects(formsSIRFPs)[[1]]@fingerprints), 0)
     expect_gt(length(setObjects(formsSIRFPs)[[2]]@fingerprints), 0)
     testSIRFPSubset(setObjects(formsSIRFPs)[[1]])
+})
+
+formsGFMSUS <- unset(formsGFMS, "positive")
+formsGFUSMST1 <- filter(formsGFMSUS, topMost = 1)
+formsGFUSMST1N <- filter(formsGFMSUS, topMost = 1, negate = TRUE)
+test_that("set unsupported functionality", {
+    # in case of ties between pos/neg the isoScore is sometimes not the highest --> skip test with sets for now
+    expect_true(all(sapply(annotations(formsGFUSMST1[groupNames(formsGFUSMST1N)]), function(a) max(a$isoScore)) >=
+                        sapply(annotations(formsGFUSMST1N), function(a) max(a$isoScore))))
 })

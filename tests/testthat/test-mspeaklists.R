@@ -5,7 +5,7 @@
 context("MS peak lists")
 
 fGroups <- getTestFGroups(getTestAnaInfoAnn())[, 1:100]
-ovFGroup <- if (testWithSets()) names(overlap(fGroups, which = c("positive", "negative"), aggregate = "set"))[1] else names(fGroups)[1]
+ovFGroup <- names(overlap(fGroups, which = c("positive", "negative"), aggregate = "set"))[1]
 plists <- generateMSPeakLists(fGroups)
 plistsMSMS <- filter(plists, withMSMS = TRUE)
 
@@ -31,11 +31,8 @@ plistsNoIM <- plists
 rmCols <- c("electronBeamEnergy")
 clearMD <- function(md) lapply(md, function(mda) lapply(mda, function(mdf) lapply(mdf, function(mds) mds[, setdiff(names(mds), rmCols), with = FALSE])))
 plistsNoIM@metadata <- clearMD(plistsNoIM@metadata)
-if (testWithSets())
-{
-    plistsNoIM@setObjects <- lapply(setObjects(plistsNoIM), function(so) { so@metadata <- clearMD(so@metadata); so })
-    plistsNoIM@analysisInfo <- data.table() # remove as it is system dependent
-}
+plistsNoIM@setObjects <- lapply(setObjects(plistsNoIM), function(so) { so@metadata <- clearMD(so@metadata); so })
+plistsNoIM@analysisInfo <- data.table() # remove as it is system dependent
 
 test_that("verify generation of MS peak lists", {
     expect_known_value(plistsNoIM, testFile("plists"))
@@ -124,8 +121,6 @@ checkPeaksLimit <- function(plists, doMin, doMSMS)
     }), na.rm = TRUE)), na.rm = TRUE))
 }
 
-isoTestBy <- if (testWithSets()) c("group", "set") else "group"
-
 test_that("delete and filter", {
     checkmate::expect_names(groupNames(delete(plists, i = 1)), disjunct.from = groupNames(plists)[1])
     checkmate::expect_names(groupNames(delete(plists, i = groupNames(plists)[1])), disjunct.from = groupNames(plists)[1])
@@ -167,10 +162,10 @@ test_that("delete and filter", {
 
     # isotopes for MS peak lists should not exceed M+5 (default)
     expect_lte(max(as.data.table(filter(
-        plists, MSLevel = 1, isolatePrec = getDefIsolatePrecParams()))[type == "MS", diff(range(mz)), by = isoTestBy][["V1"]]), 5)
+        plists, MSLevel = 1, isolatePrec = getDefIsolatePrecParams()))[type == "MS", diff(range(mz)), by = c("group", "set")][["V1"]]), 5)
     # half with z=2
     expect_lte(max(as.data.table(filter(
-        plists, MSLevel = 1, isolatePrec = getDefIsolatePrecParams(z=2)))[type == "MS", diff(range(mz)), by = isoTestBy][["V1"]]), 2.5)
+        plists, MSLevel = 1, isolatePrec = getDefIsolatePrecParams(z=2)))[type == "MS", diff(range(mz)), by = c("group", "set")][["V1"]]), 2.5)
 
     # UNDONE: deisotope?
 })
@@ -257,14 +252,14 @@ test_that("spectral similarity", {
     
     testSpecSim(plists, groupNames(plists), groupNames(plists),
                 analysis1 = rep(analyses(plists)[1], length(groupNames(plists))),
-                analysis2 = rep(analyses(plists)[1], length(groupNames(plists))), MSLevel = 1, expectNA = testWithSets())
-    testSpecSim(plists, groupNames(plists), groupNames(plists), MSLevel = 1, expectNA = testWithSets())
+                analysis2 = rep(analyses(plists)[1], length(groupNames(plists))), MSLevel = 1, expectNA = TRUE)
+    testSpecSim(plists, groupNames(plists), groupNames(plists), MSLevel = 1, expectNA = TRUE)
     testSpecSim(plists, groupNames(plists), groupNames(plists), MSLevel = 2, expectNA = TRUE)
     testSpecSim(plists, groupNames(plists)[1:5], groupNames(plists)[6:10], MSLevel = 1)
     
     testSpecSim(plists, groupNames(plists), NULL, MSLevel = 1,
-                analysis1 = rep(analyses(plists)[1], length(groupNames(plists))), expectNA = testWithSets())
-    testSpecSim(plists, groupNames(plists), NULL, MSLevel = 1, expectNA = testWithSets())
+                analysis1 = rep(analyses(plists)[1], length(groupNames(plists))), expectNA = TRUE)
+    testSpecSim(plists, groupNames(plists), NULL, MSLevel = 1, expectNA = TRUE)
     testSpecSim(plists, groupNames(plists), NULL, MSLevel = 2, expectNA = TRUE)
     
     testSpecSim(plistsMSMS, groupNames(plistsMSMS)[1], groupNames(plistsMSMS)[2], MSLevel = 2)
@@ -348,17 +343,12 @@ test_that("plotting works", {
                                                                     MSLevel = 2))
 })
 
-if (testWithSets())
-{
-    fgOneEmptySet <- makeOneEmptySetFGroups(fGroups)
-    plistsOneEmptySet <- generateMSPeakLists(fgOneEmptySet)
-    plotSetSpecFG <- groupNames(setObjects(plistsMSMS)[[2]])[12]
-}
+fgOneEmptySet <- makeOneEmptySetFGroups(fGroups)
+plistsOneEmptySet <- generateMSPeakLists(fgOneEmptySet)
+plotSetSpecFG <- groupNames(setObjects(plistsMSMS)[[2]])[12]
 
 test_that("sets functionality", {
-    skip_if_not(testWithSets())
-    
-    expect_equal(analysisInfo(plists[, sets = "positive"], TRUE)[, 1:4], getTestAnaInfoPos(getTestAnaInfoAnn()),
+    expect_equal(analysisInfo(plists[, sets = "positive"])[, -"set"], getTestAnaInfoPos(getTestAnaInfoAnn()),
                  check.attributes = FALSE)
     expect_equal(plists, plists[, sets = sets(plists)])
     expect_length(plists[, sets = character()], 0)

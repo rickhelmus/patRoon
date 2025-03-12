@@ -11,8 +11,7 @@ context("prediction")
 calib <- fread(system.file("example_data", "quantification_example.csv", package = "MS2Quant"))
 calib[, retention_time := retention_time * 60]
 calib <- calib[!is.na(conc_M)]
-if (testWithSets())
-    calib <- list(calib, calib)
+calib <- list(calib, calib)
 eluent <- fread(system.file("example_data", "eluent.csv", package = "MS2Quant"))
 eluent[, time := time * 60]
 
@@ -61,7 +60,7 @@ if (doSIRIUS)
     compsEmpty <- delete(compsSIR)
 }
 
-getMS2QLM <- function(obj) if (testWithSets()) obj@MS2QuantMeta[[1]]$linModel else obj@MS2QuantMeta$linModel
+getMS2QLM <- function(obj) obj@MS2QuantMeta[[1]]$linModel
 RFCol <- getAllSuspCols("RF_SMILES", names(screenInfo(fGroupsComps)), mergedConsensusNames(fGroupsComps))[1]
 
 test_that("Basics for prediction", {
@@ -78,9 +77,9 @@ test_that("Basics for prediction", {
     expect_known_value(formsTab[, grep("^(RF|LC50)_", names(formsTab), value = TRUE), with = FALSE], testFile("pred-forms"))
     expect_known_value(compsTab[, grep("^(RF|LC50)_", names(compsTab), value = TRUE), with = FALSE], testFile("pred-comps"))
     
-    expect_length(grep("^(RF|LC50)_", names(formsTab)), if (testWithSets()) 4 else 2)
-    expect_length(grep("^(RF|LC50)_", names(compsTab)), if (testWithSets()) 6 else 3)
-    expect_length(grep("^(RF|LC50)_", compsSIR@scoreTypes), if (testWithSets()) 6 else 3)
+    expect_length(grep("^(RF|LC50)_", names(formsTab)), 4)
+    expect_length(grep("^(RF|LC50)_", names(compsTab)), 6)
+    expect_length(grep("^(RF|LC50)_", compsSIR@scoreTypes), 6)
     
     expect_error(predictRespFactors(formsEmpty, fGroupsComps, calib, eluent, organicModifier = "MeOH", pHAq = 4,
                                     calibConcUnit = "M"), NA)

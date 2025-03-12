@@ -26,7 +26,7 @@ updatePICSet <- function(old, new, analyses)
 {
     new@picsList[analyses] <- Map(new@picsList[analyses], featureTable(old)[analyses], featureTable(new)[analyses], f = function(pics, oft, nft)
     {
-        removed <- oft[!ID %in% nft$ID]$ID
+        removed <- as.integer(oft[!ID %in% nft$ID]$ID)
         if (length(removed) > 0)
         {
             pics$pics <- pics$pics[-removed]

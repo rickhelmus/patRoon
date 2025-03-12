@@ -1,1 +1,0 @@
-A compounds objectHierarchy:featureAnnotations    |-- compounds      |-- compoundsConsensus      |-- compoundsMF      |-- compoundsSet        |-- compoundsConsensusSet      |-- compoundsUnset---Algorithm: siriusNumber of feature groups with compounds in this object: 5Number of compounds: 309 (total), 61.8 (mean), 1 - 100 (min - max)

@@ -8,9 +8,9 @@ fGroups <- getCompFGroups()
 
 suspL <- patRoonData::suspectsPos[patRoonData::suspectsPos$name %in% screenInfo(fGroups)$name, ]
 
-TPsLogic <- doGenLogicTPs(fGroups)
-TPsLogicCustom <- doGenLogicTPs(fGroups, transformations = data.table(transformation = "test", add = "C",
-                                                                      sub = "", retDir = 1))
+TPsLogic <- generateTPs("logic", fGroups)
+TPsLogicCustom <- generateTPs("logic", fGroups, transformations = data.table(transformation = "test", add = "C",
+                                                                              sub = "", retDir = 1))
 TPsLibPC <- generateTPs("library")
 TPsLibPCGen2 <- generateTPs("library", generations = 2)
 TPsLibSusp <- generateTPs("library", suspL)
@@ -40,7 +40,7 @@ if (doCTS)
 
 fGroupsEmpty <- getEmptyTestFGroups()
 fGroupsScrEmpty <- doScreen(fGroupsEmpty, data.table(name = "doesnotexist", SMILES = "C", mz = 12))
-TPsLogicEmpty <- doGenLogicTPs(fGroupsEmpty)
+TPsLogicEmpty <- generateTPs("logic", fGroupsEmpty)
 TPsLibEmpty <- generateTPs("library", fGroupsScrEmpty)
 TPsLibFormEmpty <- generateTPs("library_formula", TPLibrary = TPCustFormLib, fGroupsScrEmpty)
 TPsBTEmpty <- generateTPs("biotransformer", fGroupsScrEmpty)
@@ -88,7 +88,7 @@ test_that("verify TP generation", {
     
     expect_setequal(parents(TPsLogic)$name, names(fGroups))
     checkmate::expect_names(names(parents(TPsLogic)), permutation.of = c("name", "rt", "neutralMass"))
-    expect_true(all(as.data.table(doGenLogicTPs(fGroups, minMass = 100))$neutralMass >= 100))
+    expect_true(all(as.data.table(generateTPs("logic", fGroups, minMass = 100))$neutralMass >= 100))
     expect_length(TPsLogicCustom, length(fGroups))
 
     expect_setequal(parents(TPsLibPC)$name, patRoon:::PubChemTransformations$parent_name)
@@ -291,7 +291,7 @@ componTPsLib <- generateComponents(doScreen(fGroupsMore, convertToSuspects(TPsLi
 componTPsLibForm <- generateComponents(doScreen(fGroupsMore, convertToSuspects(TPsLibFormSusp, includeParents = TRUE)),
                                        "tp", TPs = TPsLibFormSusp)
 
-TPsLogicMore <- doGenLogicTPs(fGroupsMore[, 1:50])
+TPsLogicMore <- generateTPs("logic", fGroupsMore[, 1:50])
 fGroupsTPsLogic <- doScreen(fGroupsMore, convertToSuspects(TPsLogicMore), onlyHits = TRUE)
 componTPsLogic <- generateComponents(fGroupsTPsLogic, "tp", TPs = TPsLogicMore)
 

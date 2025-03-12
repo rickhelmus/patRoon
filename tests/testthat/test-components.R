@@ -12,27 +12,27 @@ fGroupsSimple <- fGroups[, 1:50]
 
 
 # fix seed for reproducible clustering, suppress warnings about <5 samples
-withr::with_seed(20, suppressWarnings(compsRC <- doGenComponents(fGroupsSimple, "ramclustr")))
-withr::with_seed(20, suppressWarnings(compsRCMR <- doGenComponents(fGroupsSimple, "ramclustr", relMinReplicates = 1)))
+withr::with_seed(20, suppressWarnings(compsRC <- generateComponents(fGroupsSimple, "ramclustr")))
+withr::with_seed(20, suppressWarnings(compsRCMR <- generateComponents(fGroupsSimple, "ramclustr", relMinReplicates = 1)))
 # UNDONE: getting unknown NaN warnings here...
-suppressWarnings(compsCAM <- doGenComponents(fGroupsSimple, "camera"))
-suppressWarnings(compsCAMMR <- doGenComponents(fGroupsSimple, "camera", relMinReplicates = 1))
-suppressWarnings(compsCAMSize <- doGenComponents(fGroupsSimple, "camera", minSize = 3))
-compsNT <- doGenComponents(fGroups, "nontarget")
-compsInt <- doGenComponents(fGroupsSimple, "intclust", average = FALSE) # no averaging: only one rep group
+suppressWarnings(compsCAM <- generateComponents(fGroupsSimple, "camera"))
+suppressWarnings(compsCAMMR <- generateComponents(fGroupsSimple, "camera", relMinReplicates = 1))
+suppressWarnings(compsCAMSize <- generateComponents(fGroupsSimple, "camera", minSize = 3))
+compsNT <- generateComponents(fGroups, "nontarget")
+compsInt <- generateComponents(fGroupsSimple, "intclust", average = FALSE) # no averaging: only one rep group
 plists <- generateMSPeakLists(fGroupsSimple)
-compsSpec <- doGenComponents(fGroupsSimple, "specclust", plists)
-compsOpenMS <- doGenComponents(fGroups, "openms")
-compsOpenMSMS <- doGenComponents(fGroups, "openms", minSize = 3)
+compsSpec <- generateComponents(fGroupsSimple, "specclust", plists)
+compsOpenMS <- generateComponents(fGroups, "openms")
+compsOpenMSMS <- generateComponents(fGroups, "openms", minSize = 3)
 suppressWarnings({
-    withr::with_seed(20, compsClMS <- doGenComponents(fGroups, "cliquems", parallel = FALSE))
-    withr::with_seed(20, compsClMSNoAB <- doGenComponents(fGroups, "cliquems", relMinAdductAbundance = 0,
+    withr::with_seed(20, compsClMS <- generateComponents(fGroups, "cliquems", parallel = FALSE))
+    withr::with_seed(20, compsClMSNoAB <- generateComponents(fGroups, "cliquems", relMinAdductAbundance = 0,
                                                           adductConflictsUsePref = FALSE, parallel = FALSE))
 })
 
 fGroupsEmpty <- getEmptyTestFGroups()
-compsEmpty <- do.call(if (testWithSets()) componentsSet else components, list(algorithm = "none", componentInfo = data.table()))
-compsEmpty2 <- do.call(if (testWithSets()) componentsSet else components, list(algorithm = "none2", componentInfo = data.table()))
+compsEmpty <- componentsSet(algorithm = "none", componentInfo = data.table())
+compsEmpty2 <- componentsSet(algorithm = "none2", componentInfo = data.table())
 
 test_that("components generation works", {
     # For RC/CAM: don't store their internal objects as they contain irreproducible file names
@@ -46,12 +46,12 @@ test_that("components generation works", {
     expect_known_value(compsOpenMS, testFile("components-om"))
 
     expect_length(compsEmpty, 0)
-    expect_length(doGenComponents(fGroupsEmpty, "ramclustr"), 0)
-    expect_length(doGenComponents(fGroupsEmpty, "camera"), 0)
-    expect_length(doGenComponents(fGroupsEmpty, "intclust"), 0)
-    expect_length(doGenComponents(fGroupsEmpty, "nontarget"), 0)
-    expect_length(doGenComponents(fGroupsEmpty, "openms"), 0)
-    expect_length(doGenComponents(fGroupsEmpty, "cliquems"), 0)
+    expect_length(generateComponents(fGroupsEmpty, "ramclustr"), 0)
+    expect_length(generateComponents(fGroupsEmpty, "camera"), 0)
+    expect_length(generateComponents(fGroupsEmpty, "intclust"), 0)
+    expect_length(generateComponents(fGroupsEmpty, "nontarget"), 0)
+    expect_length(generateComponents(fGroupsEmpty, "openms"), 0)
+    expect_length(generateComponents(fGroupsEmpty, "cliquems"), 0)
 
     expect_lt(length(groupNames(compsRCMR)), length(groupNames(compsRC)))
     expect_lt(length(groupNames(compsCAMMR)), length(groupNames(compsCAM)))
@@ -174,9 +174,6 @@ test_that("basic usage works", {
 test_that("consensus works", {
     expect_length(consensus(compsRC, compsCAM), length(compsRC) + length(compsCAM))
     expect_error(consensus(compsEmpty, compsEmpty2), NA)
-    
-    skip_if(testWithSets())
-    expect_error(consensus(compsRC, compsEmpty), NA) # can't do with sets: all objects must have same sets
 })
 
 test_that("clustered components", {
@@ -215,16 +212,9 @@ test_that("plotting works", {
     expect_doppel("component-ic-int", function() plotInt(compsInt, index = 1))
     expect_doppel("component-ic-sil", function() plotSilhouettes(compsInt, 2:6))
     expect_doppel("component-ic-heat", function() plotHeatMap(compsInt, interactive = FALSE))
-
-    skip_if(testWithSets())
-    expect_HTML(plotGraph(compsNT, onlyLinked = FALSE))
 })
 
-fGroupsSI <- if (testWithSets())
-{
-    selectIons(fGroups, compsRC, prefAdduct = c("[M+H]+", "[M-H]-"), onlyMonoIso = TRUE)
-} else
-    selectIons(fGroups, compsRC, prefAdduct = "[M+H]+", onlyMonoIso = TRUE)
+fGroupsSI <- selectIons(fGroups, compsRC, prefAdduct = c("[M+H]+", "[M-H]-"), onlyMonoIso = TRUE)
 
 test_that("selectIons works", {
     expect_setequal(annotations(fGroupsSI)$group, names(fGroupsSI))
@@ -240,41 +230,19 @@ test_that("selectIons works", {
     expect_equal(selectIons(fGroups, compsEmpty, prefAdduct = "[M+H]+", onlyMonoIso = TRUE), fGroups)
     # ... and components without annotations in general
     expect_equal(selectIons(fGroups, compsNT, prefAdduct = "[M+H]+", onlyMonoIso = TRUE), fGroups)
-    
-    skip_if(testWithSets())
-    
-    checkmate::expect_subset(names(fGroupsSI), names(fGroups))
-    expect_equal(nrow(annotations(fGroupsSI)), length(fGroupsSI))
-    
-    # verify neutral masses
-    expect_true(all(sapply(seq_len(nrow(annotations(fGroupsSI))), function(i)
-    {
-        ann <- annotations(fGroupsSI)[i]
-        return(isTRUE(all.equal(patRoon:::calculateMasses(ann$neutralMass, as.adduct(ann$adduct), "mz"),
-                                groupInfo(fGroupsSI)[match(ann$group, group)]$mz)))
-    })))
-    
-    skip_if(testWithSets())
-    
-    expect_lt(length(fGroupsSI), length(fGroups))
 })
 
-if (testWithSets())
+fgOneEmptySet <- makeOneEmptySetFGroups(fGroupsSimple)
+compsRCOneEmptySet <- withr::with_seed(20, suppressWarnings(generateComponents(fgOneEmptySet, "ramclustr")))
+
+getSetCompNames <- function(cmp, set)
 {
-    fgOneEmptySet <- makeOneEmptySetFGroups(fGroupsSimple)
-    compsRCOneEmptySet <- withr::with_seed(20, suppressWarnings(doGenComponents(fgOneEmptySet, "ramclustr")))
-    
-    getSetCompNames <- function(cmp, set)
-    {
-        pat <- paste0("\\-", set, "$")
-        ret <- grep(pat, names(cmp), value = TRUE)
-        return(sub(pat, "", ret))
-    }
+    pat <- paste0("\\-", set, "$")
+    ret <- grep(pat, names(cmp), value = TRUE)
+    return(sub(pat, "", ret))
 }
 
 test_that("sets functionality", {
-    skip_if_not(testWithSets())
-    
     # components should be just a combination of the set specific components
     expect_setequal(getSetCompNames(compsRC, "positive"), names(unset(compsRC, "positive")))
     expect_setequal(getSetCompNames(compsRC, "negative"), names(unset(compsRC, "negative")))
@@ -303,4 +271,25 @@ test_that("sets functionality", {
         # neutral mass equals neutralized group mass
         return(isTRUE(all.equal(ann$neutralMass, groupInfo(fGroupsSI)[match(ann$group, group)]$mz)))
     })))
+})
+
+fGroupsUS <- unset(fGroups, "positive")
+fGroupsSIUS <- selectIons(fGroupsUS, unset(compsRC, "positive"), prefAdduct = "[M+H]+", onlyMonoIso = TRUE)
+
+test_that("set unsupported functionality", {
+    # can't do with sets: all objects must have same sets
+    expect_error(consensus(unset(compsRC, "positive"), components(algorithm = "none", componentInfo = data.table())), NA)
+    
+    checkmate::expect_subset(names(fGroupsSIUS), names(fGroupsUS))
+    expect_equal(nrow(annotations(fGroupsSIUS)), length(fGroupsSIUS))
+    
+    # verify neutral masses
+    expect_true(all(sapply(seq_len(nrow(annotations(fGroupsSIUS))), function(i)
+    {
+        ann <- annotations(fGroupsSIUS)[i]
+        return(isTRUE(all.equal(patRoon:::calculateMasses(ann$neutralMass, as.adduct(ann$adduct), "mz"),
+                                groupInfo(fGroupsSIUS)[match(ann$group, group)]$mz)))
+    })))
+    
+    expect_lt(length(fGroupsSIUS), length(fGroupsUS))
 })

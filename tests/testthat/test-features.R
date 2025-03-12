@@ -176,9 +176,6 @@ test_that("XCMS conversion", {
     expect_equal(featMZs(importFeatures(epAnaInfo, "xcms", XCMSImpEP)), featMZs(ffEP))
     expect_equal(featMZs(importFeatures(anaInfoOne, "xcms", XCMSImpKPIC2)), featMZs(ffKPIC2))
     expect_equal(featMZs(importFeatures(anaInfoOne, "xcms", XCMSImpSIRIUS)), featMZs(ffSIRIUS))
-    
-    skip_if(testWithSets())
-    expect_equal(featMZs(importFeatures(anaInfo, "xcms", XCMSImpOpenMS)), featMZs(ffOpenMS))    
 })
 
 # XCMS3ImpXCMS <- getXCMSnExp(ffXCMS, loadRawData = FALSE)
@@ -207,23 +204,29 @@ test_that("XCMS3 conversion", {
     expect_equal(featMZs(importFeatures(epAnaInfo, "xcms3", XCMS3ImpEP)), featMZs(ffEP))
     expect_equal(featMZs(importFeatures(anaInfoOne, "xcms3", XCMS3ImpKPIC2)), featMZs(ffKPIC2))
     expect_equal(featMZs(importFeatures(anaInfoOne, "xcms3", XCMS3ImpSIRIUS)), featMZs(ffSIRIUS))
-    
-    skip_if(testWithSets())
-    expect_equal(featMZs(importFeatures(anaInfo, "xcms3", XCMS3ImpOpenMS)), featMZs(ffOpenMS))
 })
 
 test_that("Sets functionality", {
-    skip_if_not(testWithSets())
-    
     # proper (de)neutralization
     expect_equal(patRoon:::calculateMasses(unset(ffOpenMS, "positive")[[1]]$mz, as.adduct("[M+H]+"), "neutral"),
                  ffOpenMS[[1]]$mz)
     expect_equal(patRoon:::calculateMasses(ffOpenMS[[1]]$mz, as.adduct("[M+H]+"), "mz"), ffOpenMS[[1]]$ion_mz)
     expect_equal(analysisInfo(unset(ffOpenMS, "positive"), TRUE), getTestAnaInfoPos())
-    expect_equal(analysisInfo(ffOpenMS[, sets = "positive"], TRUE)[, 1:4], getTestAnaInfoPos())
+    expect_equivalent(analysisInfo(ffOpenMS[, sets = "positive"])[, -"set"], getTestAnaInfoPos())
     expect_equal(unique(ffOpenMS[[1]]$adduct), "[M+H]+")
     expect_equal(sets(filter(ffOpenMS, sets = "positive", negate = TRUE)), "negative")
     expect_length(ffOpenMS[, sets = character()], 0)
     expect_length(makeSet(ffXCMS3, ffXCMS3[FALSE], adducts = "[M+H]+"), length(ffXCMS3))
     expect_length(makeSet(ffXCMS3[FALSE], ffXCMS3[FALSE], adducts = "[M+H]+"), 0)
+})
+
+anaInfoNS <- getTestAnaInfoNS()
+ffNS <- getTestFeaturesNS(anaInfoNS)
+XCMSImpOpenMSNS <- doExportXCMSNS(ffNS, loadRawData = FALSE)
+XCMS3ImpOpenMSNS <- doExportXCMS3NS(ffNS, loadRawData = FALSE)
+
+test_that("set unsupported functionality", {
+    expect_equal(featMZs(importFeatures(anaInfoNS, "xcms", XCMSImpOpenMSNS)), featMZs(ffNS))    
+    expect_equal(featMZs(importFeatures(anaInfoNS, "xcms3", XCMS3ImpOpenMSNS)), featMZs(ffNS))
+    
 })

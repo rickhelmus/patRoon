@@ -64,17 +64,10 @@ test_that("verify Library compound generation", {
     expect_length(compsLibEmptyPL, 0)
     expect_length(doGenComps(fGroups, plistsEmptyMS, "library", MSLibrary = mslibrary), 0)
     expect_length(doGenComps(fGroups, plists, "library", MSLibrary = mslibrary["none"]), 0)
-    lmCol <- if (testWithSets()) "libMatch-positive" else "libMatch"
-    expect_gte(min(as.data.table(doGenComps(fGroups, plists, "library", MSLibrary = mslibrary, minSim = 0.25))[[lmCol]],
+    expect_gte(min(as.data.table(doGenComps(fGroups, plists, "library", MSLibrary = mslibrary, minSim = 0.25))[["libMatch-positive"]],
                    na.rm = TRUE), 0.25)
     # check presence annotations
     expect_true(all(!is.na(as.data.table(filter(compsLib, minExplainedPeaks = 1), fragments = TRUE)$frag_ion_formula)))
-})
-
-test_that("verify fingerprints", {
-    skip_if(!doSIRIUS || testWithSets())
-    expect_gt(length(compsSIR), 0)
-    testSIRFPSubset(compsSIR)
 })
 
 hasCompounds <- doMetFrag || doSIRIUS
@@ -89,12 +82,6 @@ if (doMetFrag)
 comps <- if (doMetFrag) compsMFIso else if (doSIRIUS) compsSIR
 compsEmpty <- if (doMetFrag) compsMFEmptyPL else if (doSIRIUS) compsSIREmptyPL
 compsExplained <- filter(comps, minExplainedPeaks = 1)
-
-if (!testWithSets())
-{
-    compsT1 <- filter(comps, topMost = 1)
-    compsT1N <- filter(comps, topMost = 1, negate = TRUE)
-}
 
 test_that("delete and filter", {
     skip_if_not(hasCompounds)
@@ -173,12 +160,6 @@ test_that("delete and filter", {
     expect_lt(length(filter(compsSIR, scoreLimits = list(score = c(-200, Inf)))), length(compsSIR))
     expect_lt(length(filter(compsSIR, scoreLimits = list(score = c(-200, Inf)), negate = TRUE)),
               length(compsSIR))
-    
-    skip_if(testWithSets())
-    
-    # in case of ties between pos/neg the score is sometimes not the highest --> skip test with sets for now
-    expect_true(all(sapply(annotations(compsT1[groupNames(compsT1N)]), function(a) max(a$score)) >=
-                        sapply(annotations(compsT1N), function(a) max(a$score))))
 })
 
 test_that("basic subsetting", {
@@ -198,8 +179,7 @@ test_that("basic subsetting", {
 
 test_that("as.data.table() works", {
     testFeatAnnADT(comps)
-    normScName <- if (testWithSets()) "fragScore-positive" else "fragScore"
-    expect_range(as.data.table(comps, normalizeScores = "max")[[normScName]], c(0, 1))
+    expect_range(as.data.table(comps, normalizeScores = "max")[["fragScore-positive"]], c(0, 1))
 })
 
 if (doMetFrag)
@@ -246,13 +226,8 @@ verifyMSPLAnFilter <- function(mspl, obj1, obj2 = NULL, negate = FALSE)
         }
     }
     
-    if (testWithSets())
-    {
-        for (s in sets(msplF))
-            doVerify(msplF[, sets = s], lapply(allObj, function(o) o[, sets = s]))
-    }
-    else
-        doVerify(msplF, allObj)
+    for (s in sets(msplF))
+        doVerify(msplF[, sets = s], lapply(allObj, function(o) o[, sets = s]))
 }
 
 test_that("annotatedBy and results filters", {
@@ -414,15 +389,11 @@ test_that("plotting works", {
     expect_error(plotUpSet(compsMF, compsSIREmpty))
 })
 
-if (testWithSets())
-{
-    fgOneEmptySet <- makeOneEmptySetFGroups(fGroups)
-    compsOneEmptySet <- callMF(fgOneEmptySet, plists)
-    compsAvgSpecCols <- callMF(fGroups, plists, setAvgSpecificScores = TRUE)
-}
+fgOneEmptySet <- makeOneEmptySetFGroups(fGroups)
+compsOneEmptySet <- callMF(fgOneEmptySet, plists)
+compsAvgSpecCols <- callMF(fGroups, plists, setAvgSpecificScores = TRUE)
 
 test_that("sets functionality", {
-    skip_if_not(testWithSets())
     skip_if_not(doMetFrag)
     
     expect_equal(comps, comps[, sets = sets(comps)])
@@ -453,4 +424,14 @@ test_that("sets functionality", {
     expect_gt(length(setObjects(compsSIR)[[1]]@fingerprints), 0)
     expect_gt(length(setObjects(compsSIR)[[2]]@fingerprints), 0)
     testSIRFPSubset(setObjects(compsSIR)[[1]])
+})
+
+compsUS <- unset(comps, "positive")
+compsUST1 <- filter(compsUS, topMost = 1)
+compsUST1N <- filter(compsUS, topMost = 1, negate = TRUE)
+test_that("set unsupported functionality", {
+    # in case of ties between pos/neg the score is sometimes not the highest --> skip test with sets for now
+    expect_true(all(sapply(annotations(compsUST1[groupNames(compsUST1N)]), function(a) max(a$score)) >=
+                        sapply(annotations(compsUST1N), function(a) max(a$score))))
+    
 })

@@ -531,7 +531,7 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
 #'   then no collapsing occurs, and each suspect match is reported on a single row. See the \verb{Suspect collapsing}
 #'   section below for additional details.
 #'
-#' @section {Suspect collapsing}: The \code{as.data.table} method fir \code{featureGroupsScreening} supports an
+#' @section {Suspect collapsing}: The \code{as.data.table} method for \code{featureGroupsScreening} supports an
 #'   additional format where each suspect hit is reported on a separate row (enabled by setting
 #'   \code{collapseSuspects=NULL}). In this format the suspect
 #'   properties from the \code{screenInfo} method are merged with each suspect row. Alternatively, if \emph{suspect

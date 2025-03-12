@@ -177,7 +177,7 @@ mergeTPComponCandidatesTab <- function(compTab)
 }
 
 doGenComponentsTPs <- function(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, compounds, ignoreParents, minRTDiff,
-                               specSimParams, parallel, IMS)
+                               specSimParams, IMS)
 {
     doIMSSel <- IMS != "both" && hasMobilities(fGroups)
     fGroupsTPsOrig <- NULL
@@ -439,7 +439,7 @@ setMethod("as.data.table", "componentsTPs", function(x, candidates = FALSE)
     if (candidates)
         ret <- mergeTPComponCandidatesTab(ret)
     
-    ret <- removeDTColumnsIfPresent(ret, c("candidates", "candidatesForm", "candidatesComp"))
+    ret <- removeDTColumnsIfPresent(ret, "candidates")
     
     return(ret)
 })
@@ -742,8 +742,7 @@ setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked = TRUE, width =
 setMethod("generateComponentsTPs", "featureGroups", function(fGroups, fGroupsTPs = fGroups, TPs = NULL,
                                                              MSPeakLists = NULL, formulas = NULL, compounds = NULL,
                                                              ignoreParents = FALSE, minRTDiff = 20,
-                                                             specSimParams = getDefSpecSimParams(), parallel = TRUE,
-                                                             IMS = "maybe")
+                                                             specSimParams = getDefSpecSimParams(), IMS = "maybe")
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertClass, . ~ fGroupsTPs + TPs + MSPeakLists + formulas + compounds,
@@ -752,7 +751,6 @@ setMethod("generateComponentsTPs", "featureGroups", function(fGroups, fGroupsTPs
     checkmate::assertFlag(ignoreParents, add = add)
     checkmate::assertNumber(minRTDiff, lower = 0, finite = TRUE, add = add)
     assertSpecSimParams(specSimParams, add = ac)
-    checkmate::assertFlag(parallel, add = ac)
     assertIMSArg(IMS, add = ac)
     checkmate::reportAssertions(ac)
     
@@ -761,7 +759,7 @@ setMethod("generateComponentsTPs", "featureGroups", function(fGroups, fGroupsTPs
         stop("Input feature groups need to be screened for parents/TPs!")
 
     return(doGenComponentsTPs(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, compounds, ignoreParents, minRTDiff,
-                              specSimParams, parallel, IMS))
+                              specSimParams, IMS))
 })
 
 #' @rdname generateComponentsTPs
@@ -769,8 +767,7 @@ setMethod("generateComponentsTPs", "featureGroups", function(fGroups, fGroupsTPs
 setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroupsTPs = fGroups, TPs = NULL,
                                                                 MSPeakLists = NULL, formulas = NULL, compounds = NULL,
                                                                 ignoreParents = FALSE, minRTDiff = 20,
-                                                                specSimParams = getDefSpecSimParams(), parallel = TRUE,
-                                                                IMS = "maybe")
+                                                                specSimParams = getDefSpecSimParams(), IMS = "maybe")
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertClass, . ~ fGroupsTPs + TPs + MSPeakLists + formulas + compounds,
@@ -779,7 +776,6 @@ setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroups
     checkmate::assertFlag(ignoreParents, add = add)
     checkmate::assertNumber(minRTDiff, lower = 0, finite = TRUE, add = add)
     assertSpecSimParams(specSimParams, add = ac)
-    checkmate::assertFlag(parallel, add = ac)
     assertIMSArg(IMS, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -788,7 +784,7 @@ setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroups
         stop("Input feature groups need to be screened for parents/TPs!")
     
     ret <- doGenComponentsTPs(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, compounds, ignoreParents, minRTDiff,
-                              specSimParams, parallel, IMS)
+                              specSimParams, IMS)
     
     # UNDONE: more efficient method to get set specific fGroups?
     gNamesTPsSets <- sapply(sets(fGroupsTPs), function(s) names(fGroupsTPs[, sets = s]), simplify = FALSE)

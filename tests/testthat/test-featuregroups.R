@@ -441,8 +441,8 @@ test_that("plotting works", {
     expect_doppel("eic-tm1rg", function() plotChroms(subFGroups,
                                                      EICParams = getDefEICParams(topMost = 1, topMostByReplicate = TRUE)))
     expect_doppel("eic-area", function() plotChroms(subFGroups, showPeakArea = TRUE))
-    expect_doppel("eic-cbr", function() plotChroms(subFGroups, groupBy = "replicate"))
-    expect_doppel("eic-cbf", function() plotChroms(subFGroups, groupBy = "fGroups"))
+    expect_doppel("eic-gbr", function() plotChroms(subFGroups, groupBy = "replicate"))
+    expect_doppel("eic-gbf", function() plotChroms(subFGroups, groupBy = "fGroups"))
     expect_doppel("eic-ann", function() plotChroms(subFGroups, annotate = "mz"))
     # below two should be mostly the same, but xlim and group rect will be slightly different since subsetting removes
     # some of the feature data that is used to determine the limits for these. For now just compare the two figures
@@ -551,6 +551,8 @@ test_that("sets functionality", {
     expect_doppel("venn-sets", function() plotVenn(fgOpenMS, aggregate = "set"))
     
     expect_doppel("chord-outer-set", function() plotChord(fgOpenMS, aggregate = TRUE, groupBy = "set"))
+    
+    expect_doppel("eic-gby_set", function() plotChroms(subFGroups, groupBy = "set"))
     
     expect_HTML(plotGraph(fgNormISTDMin1, onlyPresent = FALSE, set = "positive"))
     expect_HTML(plotGraph(fgNormISTDMin1, onlyPresent = TRUE, set = "positive"))

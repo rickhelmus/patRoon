@@ -14,6 +14,7 @@
 - update patRoonInst for new deps?
 - formulas: calcFeatures by default FALSE?
 - BUG: annSim.1 column (in formulas?)?
+- install timsconvert and c3sdb in Docker and bundle
 
 
 ## Maybe
@@ -99,6 +100,7 @@
 - embed TIMS-SDK? --> in patRoonExt
 - Agilent
     - SC doesn't recognize IM
+- re-introduce isolation window for MSPL? eg if file doesn't contain ranges (is that a thing?) or for some reason a more narrow range is desired
 
 ## IMS
 
@@ -129,38 +131,89 @@
 
 ## Tests
 
-- TC
-    - IDL filter
+- Features
     - annSim: jaccard (as was done for suspects)
     - as.data.table()
         - changed/new average, regression, regressionBy args
-    - delete() for screening
-        - check if SOs are properly synced
-        - test if k=NA works
-    - TP components
-        - filter for candidate specific frag/NL matches
-- msdata
-    - new verifyFileForFormat() usage in convertMSFiles()
+    - groupBy/aggregate
+        - plot(), plotChord(), plotChroms(), plotVenn(), plotUpSet(), unique(), overlap()
+    - plotInt(): areas, xBy, groupBy, regression
+    - [
+        - analysis re-ordering
+        - ni
+    - analysisInfo()<-
+    - SAFD?
+- Feat Ann
+    - IDL filter and filtering annSim, annSimForm, annSimBoth
+    - annSim: jaccard (as was done for suspects)
+    - getBGMSMSPeaks()
     - MSPL
         - new spec averaging params
         - more extensively test filters/summing/averaging
-        - further test bbCID data: also mixed bbCID/PASEF file (ie with different segments)
+        - further test bbCID data
+            - also mixed bbCID/PASEF file (ie with different segments)
+            - are m/z ranges always present?
         - see if current default abundance threshold is fine
+        - new filters: removeMZs, MSLevel, maxMZOverPrec, abundances
+
+- TPs
+    - TP components
+        - candidates arg for ADT
+    - ann TPs
+        - also filter methods
+        - comp method: TPsRef, fGroupsComps, min... thresholds
+    - verify TP retDirs?
+    - run CTS tests
+- msdata
+    - new verifyFileForFormat() usage in convertMSFiles()
+    - file conversion?
+        - with anaInfo function to go from eg IMS to centroid
+        - testing with pwiz tricky for CI
+        - would need raw data for other conversions
+        --> check after we have IMS data
+    - backends
+        - availableBackends()
+        - use eg mzR, MSTK, SC to get eg EICs or PLs
 - IMS
-    - more verification that fGroupsScreeningSets still works fine after removal of setObjects
     - more verification that normInts() works before/after assignMobilities()
-    - IMS arg for [, filter() and plotting functions
+    - IMS arg for [, filter(), ADT, and plotting functions
     - applyMS for filter()
+    - IMSRangeFilter
     - expandForIMS()
+        - verify things are copied or error is thrown for unsupported algos
     - convertMobilityToCCS() / convertCCSToMobility()
     - suspects
         - test order of data selection for mobility and CCS columns, missing data etc
     - assignMobilities()
         - DT method: robustness with missing data in input/from
-        - test for fGroups from screenInfo(), eg for fGroups with >1 suspect assigned
+        - fGroups methods
+            - verify relevant slots are copied
+            - from screenInfo(), eg for fGroups with >1 suspect assigned
+            - mobPeakParams, fromSuspects, chromPeakParams, calcArea, fallBackEIC, CCSParams, IMSMatchParams
+        - compounds method: IMS, from overwrite, CCSParams args
     - selectIMS filter: ensure that objects is fully reverted with IMS=FALSE
     - minMobSpecSim
-- genLimitsFile()
+        - verify that everything is copied, including fingerprints and scoreRanges
+    - IMSRangeParams (incl mobility_mz/CCS_mz) and IMSMatchParams filters for suspects (screenSuspects() and assignMobilities()) and compounds
+    - EIC features
+        - from bins, mob bins, ms2 and susps (validate m/z range features?)
+        - with different peak finders
+        - verify removal duplicate suspects/features?
+    - groupFeaturesIMS()
+    - plotChroms(): mob annotation
+    - plotMobilogram()
+    - XCMS features/fGroups, eg with subsetting & exporting
+    - normInts(): verify results are copied
+    - CCS/Mob conversion utilities? Or rely on assignMobilities() tests?
+    - spectrumSimilarityMobility()
+    - susp lists with >1 mobility/CCS values. Test if mob/CCS counts differ.
+- misc
+    - genLimitsFile() and verify that it overrides
+    - checkFeatures()/checkComponents() verify if things still work
+    - DA features and formulas?
+    - manually check all HTML reporting functionality at the end
+    - generateAnalysisInfo()?
+
 
 ## Docs
 
@@ -323,7 +376,7 @@
     - doc new functions
     - appendix in Handbook
 - updates for generateAnalysisInfo()
-- MS2QuantMeta slots for fGroyupsScreeningSet, formulasSet and compoundsSet (latter already present but wasn;t filled in)
+- MS2QuantMeta slots for fGroyupsScreeningSet, formulasSet and compoundsSet (latter already present but wasn't filled in)
 
 
 ## NEWS

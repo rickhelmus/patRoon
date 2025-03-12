@@ -1,0 +1,1 @@
+A componentsNTSet objectHierarchy:componentsSet    |-- componentsNTSet---Algorithm: nontarget-setComponents: CMP1-set1, CMP2-set1, CMP3-set1 (3 total)Number of feature groups in components: 34 (total), 11.3 (mean), 10 - 14 (min - max)Sets: set1

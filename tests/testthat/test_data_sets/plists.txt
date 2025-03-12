@@ -1,1 +1,0 @@
-A MSPeakListsSet objectHierarchy:MSPeakLists,workflowStepSet    |-- MSPeakListsSet---Algorithm: patroon-setTotal peak count: 18387 (MS: 16239 - MS/MS: 2148)Average peak count/analysis: 4597 (MS: 4060 - MS/MS: 537)Total peak lists: 293 (MS: 195 - MS/MS: 98)Average peak lists/analysis: 73 (MS: 49 - MS/MS: 24)Sets: positive, negative

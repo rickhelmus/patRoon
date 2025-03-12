@@ -4,9 +4,9 @@
 
 getTestDataPathGeneric <- function() "test_data"
 
+getTestDataPath <- function() getTestDataPathGeneric()
 testFile <- function(f, ..., text = FALSE) file.path(getTestDataPath(), paste0(f, ..., if (!text) ".Rds" else ".txt", collapse = ""))
 getWorkPath <- function(file = "", ...) if (nzchar(file)) file.path("test_temp", file, ...) else "test_temp"
-getTestDataPath <- function() paste0(getTestDataPathGeneric(), "_sets")
 
 getTestAnaInfo <- function()
 {

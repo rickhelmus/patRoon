@@ -16,11 +16,11 @@ MSFileExtensions <- function()
          agilent_ims = "d",
          ab = "wiff",
          waters = "raw",
-         mzXML = "mzXML",
-         mzML = "mzML")
+         mzML = "mzML",
+         mzXML = "mzXML")
 }
 
-getMSFileTypes <- function() c("centroid", "profile", "raw", "ims")
+getMSFileTypes <- function() c("raw", "centroid", "profile", "ims")
 
 getMSReadBackends <- function() c("opentims", "streamcraft", "mstoolkit", "mzr")
 

@@ -833,9 +833,10 @@ genAnaDynUI <- function(pol)
     )
 }
 
+textNote <- function(txt) div(style = "margin: 8px 0 12px; font-size: small", txt)
+
 getNewProjectUI <- function(destPath)
 {
-    textNote <- function(txt) div(style = "margin: 8px 0 12px; font-size: small", txt)
     rangeNumeric <- function(id, label, minVal = 0, maxVal = 0, ...)
     {
         fillRow(
@@ -885,11 +886,11 @@ getNewProjectUI <- function(destPath)
         ),
         
         tags$script(htmlwidgets::JS('
-                Shiny.addCustomMessageHandler("selectAnaTabRows", function(range)
+                Shiny.addCustomMessageHandler("selectHotRows", function(data)
                 {
                     // get rhot instance: https://github.com/jrowen/rhandsontable/issues/97
-                    var ht = HTMLWidgets.getInstance(analysesHot).hot;
-                    ht.selectRows(range[0] - 1, range[1] - 1);
+                    var ht = HTMLWidgets.getInstance(window[data.tab]).hot;
+                    ht.selectRows(data.range[0] - 1, data.range[1] - 1);
                 });
             ')
         ),
@@ -1034,75 +1035,27 @@ getNewProjectUI <- function(destPath)
                 "Data pre-treatment", icon = icon("upload"),
                 miniUI::miniContentPanel(
                     fillCol(
-                        flex = NA,
-                        height = 220,
+                        flex = c(NA, 1),
                         fillRow(
-                            height = 75,
-                            selectInput("convAlgo", "Data Conversion Algorithm", c("None" = "", "ProteoWizard" = "pwiz",
-                                                                                   "Bruker DataAnalysis" = "bruker",
-                                                                                   "OpenMS" = "openms"),
-                                        width = "100%")
+                            height = 30,
+                            strong("MS data conversion steps")
                         ),
-                        conditionalPanel(
-                            "input.convAlgo != \"\"",
-                            fillRow(
-                                height = 90,
-                                selectInput("convFrom", "Input format", getMSFileConversionFormats("pwiz", "raw"), multiple = FALSE,
-                                            width = "95%"),
-                                fillCol(
-                                    flex = c(1, NA),
-                                    selectInput("convTo", "Output format", "mzML", multiple = FALSE,
-                                                selected = "mzML", width = "100%"),
-                                    textNote("enviPick/XCMS support mzXML, XCMS/OpenMS support mzML")
-                                )
-                            )
-                        ),
-                        conditionalPanel(
-                            "input.convAlgo == \"pwiz\" || input.convAlgo == \"bruker\"",
-                            fillRow(
-                                height = 60,
-                                checkboxInput("peakPicking", "Perform peak picking (line spectra)", value = TRUE),
-                                conditionalPanel(
-                                    condition = "input.convAlgo == \"pwiz\"",
-                                    checkboxInput("peakPickingVendor", "Use vendor algorithm for peak picking", value = TRUE)
-                                )
-                            )
+                        fillRow(
+                            rhandsontable::rHandsontableOutput("MSConversionHot")
                         )
-                    ),
-                    hr(),
-                    fillCol(
-                        flex = NA,
-                        height = 70,
-                        strong("Bruker DataAnalysis options"),
-                        textNote("Only supported with bruker data and if DataAnalysis is installed.")
-                    ),
-                    fillCol(
-                        flex = NA,
-                        height = 120,
-                        fillCol(
-                            flex = NA,
-                            height = 50,
-                            conditionalPanel(
-                                condition = "input.ionization != \"both\"",
-                                fileSelect("DAMethod", "DAMethodButton", "DataAnalysis method"),
-                            ),
-                            conditionalPanel(
-                                condition = "input.ionization == \"both\"",
-                                fillRow(
-                                    fillCol(
-                                        width = "95%",
-                                        fileSelect("DAMethodPos", "DAMethodButtonPos", "DataAnalysis method (positive)")
-                                    ),
-                                    fillCol(
-                                        width = "95%",
-                                        fileSelect("DAMethodNeg", "DAMethodButtonNeg", "DataAnalysis method (negative)")
-                                    )
-                                )
-                            )
-                        ),
-                        textNote("Leaving this blank will not set any method"),
-                        checkboxInput("doDACalib", "Perform m/z re-calibration")
                     )
+                ),
+                miniUI::miniButtonBlock(
+                    actionButton("addMSConversion", label = "Add", icon = icon("plus"),
+                                 title = "Add MS conversion step"),
+                    shinyjs::disabled(actionButton("removeMSConversionRows", label = "Remove", icon = icon("trash"),
+                                                   title = "Remove selected row(s)")),
+                    shinyjs::disabled(actionButton("MSConversionRowsUp", label = "Move up", icon = icon("arrow-up"),
+                                                   title = "Move selected row(s) up")),
+                    shinyjs::disabled(actionButton("MSConversionRowsDown", label = "Move down", icon = icon("arrow-down"),
+                                                   title = "Move selected row(s) down")),
+                    actionButton("configBrukerCalib", label = "Bruker DataAnalysis calibration", icon = icon("cog"),
+                                 title = "Configure Bruker DataAnalysis calibration")
                 )
             ),
             miniUI::miniTabPanel(
@@ -1453,6 +1406,25 @@ anaInfoToAnaFiles <- function(anaInfo)
     return(ret[])
 }
 
+
+groupConvTypesFormats <- function(algo, inOut)
+{
+    fTypes <- intersect(getMSFileTypes(), if (inOut == "input") validConvFromTypes(algo) else validConvToTypes(algo))
+    return(sapply(fTypes, function(ft)
+    {
+        formats <- if (inOut == "input") getMSInConversionFormats(algo, ft) else getMSOutConversionFormats(algo, ft)
+        return(setNames(paste0(ft, "_", formats), paste0(formats, " (", ft, ")")))
+    }, simplify = FALSE))
+}
+
+splitConvTypeFormat <- function(typeFormat) unlist(strsplit(typeFormat, "_"))
+
+convTypeFormatToLabel <- function(typeFormat)
+{
+    tf <- splitConvTypeFormat(typeFormat)
+    return(paste0(tf[1], " (", tf[2], ")"))
+}
+
 #' Easily create new \pkg{patRoon} projects
 #' 
 #' The \code{newProject} function is used to quickly generate a processing R script. This tool allows the user to
@@ -1492,11 +1464,13 @@ newProject <- function(destPath = NULL)
     }
     
     anaInfoTabs <- list(positive = emptyAnaTable(), negative = emptyAnaTable())
+    MSConversionSteps <- data.table(algorithm = character(0), from = character(0), to = character(0), path = character(0))
     
     server <- function(input, output, session)
     {
         rValues <- reactiveValues(triggerAnaInfoHotUpdate = 0,
-                                  analysisFiles = data.table(analysis = character(), type = character(), path = character()))
+                                  analysisFiles = data.table(analysis = character(), type = character(), path = character()),
+                                  triggerMSConvHotUpdate = 0)
 
         makeAnalysesHot <- function()
         {
@@ -1542,24 +1516,33 @@ newProject <- function(destPath = NULL)
                 return("positive")
             return("negative")
         }
-        moveSelectedAnalyses <- function(dir)
+        moveSelectedRows <- function(dir, sel, tab)
         {
-            sel <- input$analysesHot_select$select$rAll
             # NOTE: assume selection is a block range
             mv <- if (dir == "up")
                 seq(min(sel) - 1, max(sel))
             else
                 seq(min(sel), max(sel) + 1)
             
-            pol <- getCurPolarityAnaTab()
-            tab <- anaInfoTabs[[pol]]
+            tab <- copy(tab)
             tab[, index := .I]
             tab[mv, index := shift(index, n = if (dir == "up") - 1L else 1L, type = "cyclic")]
-            
-            anaInfoTabs[[pol]] <<- tab[(index), -"index"]
-            triggerAnaInfoHotUpdate()
+            tab <- tab[(index), -"index"]
+            return(tab)
+        }
+        moveTabSel <- function(dir, sel, id)
+        {
             newRange <- c(min(sel), max(sel)) + if (dir == "up") -1 else 1
-            session$sendCustomMessage("selectAnaTabRows", newRange)
+            session$sendCustomMessage("selectHotRows", list(tab = id, range = newRange))
+        }
+        moveSelectedAnalyses <- function(dir)
+        {
+            # NOTE: assume selection is a block range
+            sel <- input$analysesHot_select$select$rAll
+            pol <- getCurPolarityAnaTab()
+            anaInfoTabs[[pol]] <<- moveSelectedRows(dir, sel, anaInfoTabs[[pol]])
+            triggerAnaInfoHotUpdate()
+            moveTabSel(dir, sel, "analysesHot")
         }
         doObserveGenAnaInfoDynSelDir <- function(textID, buttonID)
         {
@@ -1606,6 +1589,23 @@ newProject <- function(destPath = NULL)
             
             return(TRUE)
         }
+        makeMSConversionHot <- function()
+        {
+            rValues$triggerMSConvHotUpdate
+            tab <- copy(MSConversionSteps)
+            tab[, from := sapply(from, convTypeFormatToLabel)]
+            tab[, to := sapply(to, convTypeFormatToLabel)]
+            do.call(rhandsontable::rhandsontable, c(list(tab, height = 250, maxRows = nrow(tab), columnSorting = FALSE),
+                                                    hotOpts))
+        }
+        moveSelectedConversions <- function(dir)
+        {
+            # NOTE: assume selection is a block range
+            sel <- input$MSConversionHot_select$select$rAll
+            MSConversionSteps <<- moveSelectedRows(dir, sel, MSConversionSteps)
+            triggerMSConvHotUpdate()
+            moveTabSel(dir, sel, "MSConversionHot")
+        }
         selectDAMethod <- function(inputName)
         {
             dm <- rstudioapi::selectDirectory("Select DataAnalysis method")
@@ -1620,6 +1620,21 @@ newProject <- function(destPath = NULL)
             
             if (!is.null(dm))
                 updateTextInput(session, inputName, value = dm)
+        }
+        triggerMSConvHotUpdate <- function() rValues$triggerMSConvHotUpdate <- rValues$triggerMSConvHotUpdate + 1
+        verifyMSConvOK <- function()
+        {
+            mcs <- copy(MSConversionSteps)
+            mcs[, type := sapply(MSConversionSteps$to, function(x) splitConvTypeFormat(x)[1])]
+            mcs <- unique(mcs, by = "type")
+            if (anyDuplicated(mcs$path) > 0)
+            {
+                rstudioapi::showDialog("Duplicate output paths",
+                                       "Please ensure that output paths are unique for each conversion output type.",
+                                       "")
+                return(FALSE)
+            }
+            return(TRUE)
         }
         selectSuspList <- function(inputName)
         {
@@ -1654,6 +1669,8 @@ newProject <- function(destPath = NULL)
             else if (input$outputScriptTo != "curFile" && !nzchar(input$scriptFile))
                 rstudioapi::showDialog("No script file", "Please select a destination script file!", "")
             else if (input$generateAnaInfo == "table" && !verifyAnalysesOK())
+            {}
+            else if (!verifyMSConvOK())
             {}
             else if (input$outputScriptTo != "curFile" && file.exists(file.path(input$destinationPath, input$scriptFile)) &&
                      !rstudioapi::showQuestion("Script file already exists",
@@ -1910,24 +1927,147 @@ newProject <- function(destPath = NULL)
         doObserveGenAnaInfoDynSelDir("genAnaInfoDynIMS", "genAnaInfoDynIMSButton")
         doObserveGenAnaInfoDynSelDir("genAnaInfoDynProfile", "genAnaInfoDynProfileButton")
         
+        observeEvent(input$addMSConversion, {
+            showModal(modalDialog(
+                title = "Add MS data conversion step",
+                fillCol(
+                    flex = NA,
+                    width = 600,
+                    fillCol(
+                        height = 75,
+                        selectInput("convAlgo", "Algorithm",
+                                    c("ProteoWizard" = "pwiz", "OpenMS" = "openms", "Bruker" = "bruker",
+                                      "IM collapse" = "im_collapse", "TIMSCONVERT" = "timsconvert"),
+                                    multiple = FALSE, width = "100%")
+                    ),
+                    fillCol(
+                        height = 140,
+                        fillRow(
+                            flex = c(1, NA, 1),
+                            selectInput("convFrom", "From", groupConvTypesFormats("pwiz", "input"), multiple = FALSE,
+                                        width = "100%"),
+                            fillCol(width = "20px"),
+                            selectInput("convTo", "To", groupConvTypesFormats("pwiz", "output"), multiple = FALSE,
+                                        width = "100%")
+                        ),
+                        fillCol(
+                            flex = NA,
+                            fillCol(
+                                height = 50,
+                                fileSelect("MSConversionPath", "MSConversionPathButton", "output path"),
+                            ),
+                            fillCol(
+                                height = 25,
+                                textNote("Leave blank for a default directory.")
+                            )
+                        )
+                    ),
+                ),
+                easyClose = TRUE,
+                fade = FALSE, # TRUE messes up HOT
+                footer = tagList(
+                    modalButton("Cancel"),
+                    actionButton("addMSConversionOK", "OK")
+                )
+            ))
+        })
+        observeEvent(input$MSConversionPathButton, {
+            d <- rstudioapi::selectDirectory("Select directory", path = input$MSConversionPath)
+            if (!is.null(d))
+                updateTextInput(session, "MSConversionPath", value = d)
+        })
+        observeEvent(input$configBrukerCalib, {
+            showModal(modalDialog(
+                title = "Configure Bruker DataAnalysis m/z re-calibration",
+                fillCol(
+                    flex = NA,
+                    fillCol(
+                        height = 50,
+                        checkboxInput("doDACalib", "Perform m/z re-calibration", value = FALSE)
+                    ),
+                    conditionalPanel(
+                        condition = "input.doDACalib",
+                        fillCol(
+                            flex = NA,
+                            height = 90,
+                            fillCol(
+                                flex = NA,
+                                height = 50,
+                                conditionalPanel(
+                                    condition = "input.ionization != \"both\"",
+                                    fileSelect("DAMethod", "DAMethodButton", "DataAnalysis method"),
+                                ),
+                                conditionalPanel(
+                                    condition = "input.ionization == \"both\"",
+                                    fillRow(
+                                        fillCol(
+                                            width = "95%",
+                                            fileSelect("DAMethodPos", "DAMethodButtonPos", "DataAnalysis method (positive)")
+                                        ),
+                                        fillCol(
+                                            width = "95%",
+                                            fileSelect("DAMethodNeg", "DAMethodButtonNeg", "DataAnalysis method (negative)")
+                                        )
+                                    )
+                                )
+                            ),
+                            textNote("Leaving this blank will not set any method.")
+                        )
+                    ),
+                    fillCol(
+                        height = 40,
+                        textNote(HTML("Only supported with bruker data and if DataAnalysis is installed.<br>This step is always executed before other conversion steps."))
+                    )
+                ),
+                easyClose = TRUE,
+                fade = FALSE, # TRUE messes up HOT
+                footer = tagList(
+                    modalButton("Close")
+                )
+            ))
+        })
         
         observeEvent(input$convAlgo, {
-            from <- switch(input$convAlgo,
-                           pwiz = getMSFileConversionFormats("pwiz", "raw"),
-                           bruker = "bruker",
-                           openms = getMSFileConversionFormats("openms", "centroid"),
-                           ""
-                   )
-            sel <- ""
-            if (nzchar(input$convAlgo))
-                sel <- getMSFileConversionFormats(input$convAlgo, if (input$convAlgo == "openms") "centroid" else "raw" )[1]
-
-            updateSelectInput(session, "convFrom", choices = from, selected = sel)
+            f <- groupConvTypesFormats(input$convAlgo, "input")
+            updateSelectInput(session, "convFrom", choices = f, selected = f[[1]][1])
+            f <- groupConvTypesFormats(input$convAlgo, "output")
+            updateSelectInput(session, "convTo", choices = f, selected = f[[1]][1])
         })
-
         observeEvent(input$DAMethodButton, selectDAMethod("DAMethod"))
         observeEvent(input$DAMethodButtonPos, selectDAMethod("DAMethodPos"))
         observeEvent(input$DAMethodButtonNeg, selectDAMethod("DAMethodNeg"))
+        observeEvent(input$addMSConversionOK, {
+            removeModal()
+            path <- input$MSConversionPath
+            if (!nzchar(path))
+                path <- file.path(input$destinationPath, "converted", splitConvTypeFormat(input$convTo)[1])
+            MSConversionSteps <<- rbind(MSConversionSteps, data.table(algorithm = input$convAlgo, from = input$convFrom,
+                                                                      to = input$convTo, path = path))
+            triggerMSConvHotUpdate()
+        })
+        observeEvent(input$MSConversionHot, {
+            # HACK: maxRows: make sure we don't have empty table as hot_to_r errors otherwise
+            if (is.null(input$MSConversionHot) || input$MSConversionHot$params$maxRows == 0)
+            {
+                shinyjs::disable("removeMSConversionRows")
+                shinyjs::disable("MSConversionRowsUp")
+                shinyjs::disable("MSConversionRowsDown")
+            }
+        })
+        observeEvent(input$MSConversionHot_select$select$r, {
+            sel <- input$MSConversionHot_select$select$rAll
+            e <- nrow(MSConversionSteps) > 0 && length(sel) > 0
+            shinyjs::toggleState("removeMSConversionRows", condition = e)
+            shinyjs::toggleState("MSConversionRowsUp", condition = e && min(sel) > 1)
+            shinyjs::toggleState("MSConversionRowsDown", condition = e && max(sel) < nrow(MSConversionSteps))
+        })
+        observeEvent(input$removeMSConversionRows, {
+            sel <- input$MSConversionHot_select$select$rAll
+            MSConversionSteps <<- MSConversionSteps[-sel]
+            triggerMSConvHotUpdate()
+        })
+        observeEvent(input$MSConversionRowsUp, { moveSelectedConversions("up") })
+        observeEvent(input$MSConversionRowsDown, { moveSelectedConversions("down") })
 
         observeEvent(input$suspectListButton, selectSuspList("suspectList"))
         observeEvent(input$suspectListButtonPos, selectSuspList("suspectListPos"))
@@ -1944,6 +2084,8 @@ newProject <- function(destPath = NULL)
         
         output$analysesHot <- rhandsontable::renderRHandsontable(makeAnalysesHot())
         output$analysisFilesHot <- rhandsontable::renderRHandsontable(makeAnalysisFilesHot())
+        
+        output$MSConversionHot <- rhandsontable::renderRHandsontable(makeMSConversionHot())
         
         observeEvent(input$featGrouper, {
             if (input$ionization == "both" && input$featGrouper == "SIRIUS")

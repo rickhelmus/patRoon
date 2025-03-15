@@ -376,6 +376,8 @@
     - appendix in Handbook
 - updates for generateAnalysisInfo()
 - MS2QuantMeta slots for fGroyupsScreeningSet, formulasSet and compoundsSet (latter already present but wasn't filled in)
+- add Handbook section on file conversion
+    - mention mzXML/mzML requirements as newProject() doesn't give note anymore
 
 
 ## NEWS

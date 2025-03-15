@@ -68,7 +68,7 @@
     - conc/norm conc are set to "NA_real_"
 - conversion/anaInfo
     - see if getAllMSFilesFromAnaInfo() can be used, otherwise remove it
-    - use of getMSFileConversionFormats()
+    - use of getMSInConversionFormats() / getMSOutConversionFormats()
     - add im_collapse and timsconvert
 - remove default limits that are in limits.yml
 - copy limits file and UI to specify IMS default
@@ -283,7 +283,7 @@
     - plotVenn()/overlap/plotUpSet(): update for removal of list arg possibility for which
     - MetFrag: don't do MP for non-local databases to avoid connection errors
 - msdata
-    - getMSFileFormats()
+    - getMSFileFormats(), getMSOutConversionFormats(), ...
     - patRoon.threads, patRoon.MS.backends, patRoon.MS.preferIMS, patRoon.path.BrukerTIMS and patRoon.path.limits options
         - patRoon.MS.preferIMS: only works for MSTK/SC, ie putting OTIMS in front doesn't work
     - update PListParams
@@ -457,7 +457,7 @@
     - MetFrag: don't do MP for non-local databases to avoid connection errors
     - componentsNT: renamed "rt" to "ret" for consistency
 - msdata
-    - MSFileFormats() --> getMSFileConversionFormats() / getMSFileFormats()
+    - MSFileFormats() --> getMSInConversionFormats() / getMSOutConversionFormats() / getMSFileFormats()
     - new behavior of getMSFilesFromAnaInfo(): file types are checked one by one to avoid mixes and always checked to be present (mustExist was set a bit randomly...)
     - better checking of analysis file directory checking (verifyFileForFormat())
     - new/changed PListParams

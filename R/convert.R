@@ -17,29 +17,56 @@
 #' @name convertMSFiles
 NULL
 
-#' @details \code{getMSFileConversionFormats} returns a \code{character} with all supported
+validConvFromTypes <- function(algo)
+{
+    switch(algo,
+           pwiz = getMSFileTypes(),
+           openms = c("centroid", "profile"),
+           bruker = "raw",
+           im_collapse = c("raw", "ims"),
+           timsconvert = "raw")
+}
+
+validConvToTypes <- function(algo)
+{
+    switch(algo,
+           pwiz = c("centroid", "profile", "ims"),
+           openms = c("centroid"),
+           bruker = c("centroid", "profile"),
+           im_collapse = "centroid",
+           timsconvert = c("centroid", "profile", "ims"))
+}
+
+#' @details \code{getMSInConversionFormats} returns a \code{character} with all supported
 #'   input formats (see below).
 #' @param vendor If \code{TRUE} only vendor formats are returned.
 #' @rdname convertMSFiles
 #' @export
-getMSFileConversionFormats <- function(algorithm = "pwiz", type)
+getMSInConversionFormats <- function(algorithm = "pwiz", type)
 {
-    checkmate::assertChoice(algorithm, c("pwiz", "openms", "bruker", "im_collapse"))
-    checkmate::assertChoice(type, getMSFileTypes())
+    checkmate::assertChoice(algorithm, c("pwiz", "openms", "bruker", "im_collapse", "timsconvert"))
+    checkmate::assertChoice(type, validConvFromTypes(algorithm))
 
-    if (algorithm == "pwiz")
-        ret <- names(MSFileExtensions())
-    else if (algorithm %in% c("openms", "im_collapse"))
-        ret <- c("mzXML", "mzML")
-    else # algorithm == "bruker"
+    ret <- getMSFileFormats(type)
+    
+    if (algorithm == "openms")
+         ret <- intersect(ret, c("mzML", "mzXML"))
+    else if (algorithm == "bruker")
         ret <- "bruker"
-
-    if (type == "raw")
-        ret <- setdiff(ret, c("mzXML", "mzML"))
-    else if (type == "ims")
-        ret <- setdiff(ret, "mzXML")
-
+    else if (algorithm == "im_collapse")
+        ret <- intersect(ret, c("bruker_ims", "mzML"))
+    else if (algorithm == "timsconvert")
+         ret <- "bruker_ims"
+    
     return(ret)
+}
+
+getMSOutConversionFormats <- function(algorithm = "pwiz", type)
+{
+    checkmate::assertChoice(algorithm, c("pwiz", "openms", "bruker", "im_collapse", "timsconvert"))
+    checkmate::assertChoice(type, validConvToTypes(algorithm))
+    
+    return(if (algorithm == "timsconvert") "mzML" else c("mzML", "mzXML"))
 }
 
 #' @export
@@ -306,6 +333,7 @@ convertMSFilesTIMSCONVERT <- function(inFiles, outFiles, formatTo = "mzML", cent
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCharacter(inFiles, min.chars = 1, min.len = 1, add = ac)
     checkmate::assertCharacter(outFiles, min.chars = 1, len = length(inFiles), add = ac)
+    checkmate::assertChoice(formatTo, "mzML", add = ac)
     aapply(checkmate::assertFlag, . ~ centroid + centroidRaw + IMS, fixed = list(add = ac))
     checkmate::assertCharacter(extraOpts, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::assertCharacter(virtualenv, min.chars = 1, null.ok = TRUE, add = ac)
@@ -511,23 +539,10 @@ convertMSFilePaths <- function(files, formatFrom, formatTo = "mzML", outPath = N
 convertMSFilesAnaInfo <- function(anaInfo, typeFrom = "raw", typeTo = "centroid", formatFrom, formatTo = "mzML",
                                   overWrite = FALSE, algorithm = "pwiz", centroidVendor = TRUE, ...)
 {
-    validFromTypes <- switch(algorithm,
-                             pwiz = getMSFileTypes(),
-                             openms = c("centroid", "profile"),
-                             bruker = "raw",
-                             im_collapse = c("raw", "ims"),
-                             timsconvert = "raw")
-    validToTypes <- switch(algorithm,
-                           pwiz = c("ims", "profile", "centroid"),
-                           openms = c("centroid", "profile"),
-                           bruker = c("centroid", "profile"),
-                           im_collapse = "centroid",
-                           timsconvert = c("centroid", "profile", "ims"))
-    
     ac <- checkmate::makeAssertCollection()
     assertConvertMSFilesArgs(formatFrom, formatTo, overWrite, algorithm, add = ac)
-    checkmate::assertChoice(typeFrom, validFromTypes, add = ac)
-    checkmate::assertChoice(typeTo, validToTypes, add = ac)
+    checkmate::assertChoice(typeFrom, validConvFromTypes(algorithm), add = ac)
+    checkmate::assertChoice(typeTo, validConvToTypes(algorithm), add = ac)
     checkmate::assertFlag(centroidVendor, add = ac)
     checkmate::reportAssertions(ac)
 

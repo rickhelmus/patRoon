@@ -40,7 +40,7 @@ getMSFileFormats <- function(fileType = NULL)
         else if (fileType == "ims")
             ret <- "mzML"
         else
-            ret <- c("mzXML", "mzML")
+            ret <- c("mzML", "mzXML")
     }
     return(ret)
 }

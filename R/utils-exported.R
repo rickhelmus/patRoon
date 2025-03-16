@@ -67,13 +67,16 @@ getMSFileFormats <- function(fileType = NULL)
 #'
 #' @rdname analysis-information
 #' @export
-generateAnalysisInfo <- function(pathRaw = NULL, pathCentroid = NULL, pathIMS = NULL, pathProfile = NULL, ...)
+generateAnalysisInfo <- function(fromRaw = NULL, fromCentroid = NULL, fromProfile = NULL, fromIMS = NULL,
+                                 convCentroid = NULL, convProfile = NULL, convIMS = NULL, ...)
 {
     otherArgs <- list(...)
 
     ac <- checkmate::makeAssertCollection()
-    aapply(assertDirExists, . ~ pathRaw + pathCentroid + pathIMS + pathProfile, access = "r", null.ok = TRUE,
+    aapply(assertDirExists, . ~ fromRaw + fromCentroid + fromProfile + fromIMS, access = "r", null.ok = TRUE,
            fixed = list(add = ac))
+    aapply(checkmate::assertCharacter, . ~ convCentroid + convProfile + convIMS, min.chars = 1,
+           any.missing = FALSE, min.len = 1, null.ok = TRUE, fixed = list(add = ac))
     if (length(otherArgs) > 0)
         checkmate::assertNames(names(otherArgs), "unique", .var.name = "...", add = ac)
     checkmate::qassertr(otherArgs, "V", .var.name = "...")
@@ -95,7 +98,7 @@ generateAnalysisInfo <- function(pathRaw = NULL, pathCentroid = NULL, pathIMS = 
     }
     
     # UNDONE: use getMSFileTypes() somehow?
-    allPaths <- Map(list(pathRaw, pathCentroid, pathIMS, pathProfile), c("raw", "centroid", "ims", "profile"), f = addPath)
+    allPaths <- Map(list(fromRaw, fromCentroid, fromIMS, fromProfile), c("raw", "centroid", "profile", "ims"), f = addPath)
     allPaths <- pruneList(allPaths)
     anaInfo <- if (length(allPaths) > 0)
         Reduce(allPaths, f = function(x, y) merge(x, y, by = "analysis", all = TRUE))
@@ -106,6 +109,16 @@ generateAnalysisInfo <- function(pathRaw = NULL, pathCentroid = NULL, pathIMS = 
     {
         if (is.null(anaInfo[[paste0("path_", ft)]]))
             anaInfo[, (paste0("path_", ft)) := ""]
+    }
+    
+    convPaths <- setNames(list(convCentroid, convProfile, convIMS), c("centroid", "profile", "ims"))
+    for (ft in getMSFileTypes())
+    {
+        if (!is.null(convPaths[[ft]]))
+        {
+            col <- paste0("path_", ft)
+            anaInfo[is.na(get(col)) | !nzchar(get(col)), (col) := rep(convPaths[[ft]], length.out = .N)]
+        }
     }
     
     for (oa in names(otherArgs))

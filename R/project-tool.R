@@ -20,7 +20,7 @@ makeAnaInfoR <- function(anaInfo, varName = NULL)
                                          constructive::opts_data.frame("read.table"))$code)
 }
 
-getScriptCode <- function(input, anaInfoData)
+getScriptCode <- function(input, anaInfoData, MSConvSettings)
 {
     txtCon <- withr::local_connection(textConnection(NULL, "w"))
     
@@ -119,10 +119,13 @@ getScriptCode <- function(input, anaInfoData)
         else if (input$generateAnaInfo == "dynamic")
         {
             addCall(anaInfoVarName, "generateAnalysisInfo", list(
-                list(name = "pathRaw", value = aid$pathRaw, quote = TRUE),
-                list(name = "pathCentroid", value = aid$pathCentroid, quote = TRUE),
-                list(name = "pathIMS", value = aid$pathIMS, quote = TRUE),
-                list(name = "pathProfile", value = aid$pathProfile, quote = TRUE)
+                list(name = "fromRaw", value = aid$fromRaw, quote = TRUE),
+                list(name = "fromCentroid", value = aid$fromCentroid, quote = TRUE),
+                list(name = "fromProfile", value = aid$fromProfile, quote = TRUE),
+                list(name = "fromIMS", value = aid$fromIMS, quote = TRUE),
+                list(name = "convCentroid", value = MSConvSettings$output$centroid, quote = TRUE),
+                list(name = "convProfile", value = MSConvSettings$output$profile, quote = TRUE),
+                list(name = "convIMS", value = MSConvSettings$output$ims, quote = TRUE)
             ))
         }
         else if (input$generateAnaInfo == "example")
@@ -147,26 +150,22 @@ getScriptCode <- function(input, anaInfoData)
     {
         addCall(NULL, "setDAMethod", list(
             list(value = anaInfoVarName),
-            list(value = input[[DAMethodVarName]], quote = TRUE)
-        ), condition = nzchar(input[[DAMethodVarName]]), indent = 4)
-        addCall(NULL, "recalibrarateDAFiles", list(value = anaInfoVarName), condition = input$doDACalib, indent = 4)
-        if (nzchar(input$convAlgo))
+            list(value = MSConvSettings$brukerCalib[[DAMethodVarName]], quote = TRUE)
+        ), condition = MSConvSettings$brukerCalib$enabled && nzchar(MSConvSettings$brukerCalib[[DAMethodVarName]]), indent = 4)
+        addCall(NULL, "recalibrarateDAFiles", list(value = anaInfoVarName),
+                condition = MSConvSettings$brukerCalib$enabled, indent = 4)
+        itf <- splitConvTypeFormat(MSConvSettings$steps$from); otf <- splitConvTypeFormat(MSConvSettings$steps$to)
+        for (i in seq_len(nrow(MSConvSettings$steps)))
         {
-            if (input$peakPicking)
-                centroid <- if (input$peakPickingVendor && input$convAlgo == "pwiz") "\"vendor\"" else TRUE
-            else
-                centroid <- FALSE
-            
-            for (of in input$convTo)
-            {
-                addCall(NULL, "convertMSFiles", list(
-                    list(name = "anaInfo", value = anaInfoVarName),
-                    list(name = "from", value = input$convFrom, quote = TRUE),
-                    list(name = "to", value = of, quote = TRUE),
-                    list(name = "algorithm", value = input$convAlgo, quote = TRUE),
-                    list(name = "centroid", value = centroid)),
-                    indent = 4)
-            }
+            addCall(NULL, "convertMSFilesAnaInfo", list(
+                list(value = anaInfoVarName),
+                list(name = "typeFrom", value = itf[[i]][1], quote = TRUE),
+                list(name = "formatFrom", value = itf[[i]][2], quote = TRUE),
+                list(name = "typeTo", value = otf[[i]][1], quote = TRUE),
+                list(name = "formatTo", value = otf[[i]][2], quote = TRUE),
+                list(name = "algorithm", value = MSConvSettings$steps$algorithm[i], quote = TRUE),
+                list(name = "overWrite", value = FALSE)
+            ), indent = 4)
         }
     }
     addFindFeatures <- function(varName, anaInfoVarName)
@@ -269,19 +268,19 @@ getScriptCode <- function(input, anaInfoData)
         addAnaInfo("anaInfoNeg", anaInfoData$negative, FALSE)
     }
     
-    if (nzchar(input$convAlgo) || nzchar(input$DAMethod) || input$doDACalib)
+    if (nrow(MSConvSettings$steps) > 0 || MSConvSettings$brukerCalib$enabled)
     {
         addNL()
         addComment("Set to FALSE to skip data pre-treatment")
         addAssignment("doDataPretreatment", TRUE)
         addText("if (doDataPretreatment)\n{")
         if (input$ionization != "both")
-            addPrepBlock("anaInfo", "DAMethod")
+            addPrepBlock("anaInfo", "method")
         else
         {
-            addPrepBlock("anaInfoPos", "DAMethodPos")
+            addPrepBlock("anaInfoPos", "methodPos")
             addNL()
-            addPrepBlock("anaInfoNeg", "DAMethodNeg")
+            addPrepBlock("anaInfoNeg", "methodNeg")
         }
         addText("}")
     }
@@ -699,7 +698,7 @@ getScriptCode <- function(input, anaInfoData)
     return(paste0(textConnectionValue(txtCon), collapse = "\n"))
 }
 
-doCreateProject <- function(input, anaInfoTabs)
+doCreateProject <- function(input, anaInfoTabs, MSConvSettings)
 {
     mkdirp(input$destinationPath)
 
@@ -714,6 +713,10 @@ doCreateProject <- function(input, anaInfoTabs)
             aTab[is.na(replicate) | !nzchar(replicate), replicate := analysis]
             aTab <- aTab[, -"type"]
             
+            aTab[is.na(path_centroid) | !nzchar(path_centroid), path_centroid := MSConvSettings$output$centroid]
+            aTab[is.na(path_profile) | !nzchar(path_profile), path_profile := MSConvSettings$output$profile]
+            aTab[is.na(path_ims) | !nzchar(path_ims), path_ims := MSConvSettings$output$ims]
+            
             if (input$analysisTableFileType != "embedded")
             {
                 n <- paste0("analysisTableFile", input$analysisTableFileType)
@@ -726,7 +729,6 @@ doCreateProject <- function(input, anaInfoTabs)
                 else # "R"
                     cat(makeAnaInfoR(aTab), file = fp, sep = "\n")
                 ret$file <- fp
-                
             }
             
             ret$tab <- aTab
@@ -735,10 +737,10 @@ doCreateProject <- function(input, anaInfoTabs)
         {
             pf <- if (is.null(pol)) "" else if (pol == "positive") "Pos" else "Neg"
             ret <- list(
-                pathRaw = input[[paste0("genAnaInfoDynRaw", pol)]],
-                pathCentroid = input[[paste0("genAnaInfoDynCentroid", pol)]],
-                pathIMS = input[[paste0("genAnaInfoDynIMS", pol)]],
-                pathProfile = input[[paste0("genAnaInfoDynProfile", pol)]],
+                fromRaw = input[[paste0("genAnaInfoDynRaw", pol)]],
+                fromCentroid = input[[paste0("genAnaInfoDynCentroid", pol)]],
+                fromIMS = input[[paste0("genAnaInfoDynIMS", pol)]],
+                fromProfile = input[[paste0("genAnaInfoDynProfile", pol)]]
             )
         }
         return(ret)
@@ -749,6 +751,12 @@ doCreateProject <- function(input, anaInfoTabs)
     else
         aid <- list(positive = prepareAnaInfoData("positive"), negative = prepareAnaInfoData("negative"))
     
+    for (t in getMSFileTypes())
+    {
+        if (!nzchar(MSConvSettings$output[[t]]))
+            MSConvSettings$output[[t]] <- "."
+    }
+    
     doSusps <- input$exSuspList || (input$ionization != "both" && nzchar(input$suspectList)) ||
         (input$ionization == "both" && nzchar(input$suspectListPos))
     if (doSusps && input$annotateSus && input$genIDLevelFile)
@@ -757,7 +765,7 @@ doCreateProject <- function(input, anaInfoTabs)
     if ("HTML" %in% input$reportGen)
         genReportSettingsFile(file.path(input$destinationPath, "report.yml"))
     
-    code <- getScriptCode(input, aid)
+    code <- getScriptCode(input, aid, MSConvSettings$steps)
     if (input$outputScriptTo == "curFile")
     {
         # insert at end of current document
@@ -1054,8 +1062,9 @@ getNewProjectUI <- function(destPath)
                                                    title = "Move selected row(s) up")),
                     shinyjs::disabled(actionButton("MSConversionRowsDown", label = "Move down", icon = icon("arrow-down"),
                                                    title = "Move selected row(s) down")),
-                    actionButton("configBrukerCalib", label = "Bruker DataAnalysis calibration", icon = icon("cog"),
-                                 title = "Configure Bruker DataAnalysis calibration")
+                    actionButton("configConvPaths", label = "Output paths", icon = icon("folder-open")),
+                    actionButton("configBrukerCalib", label = "Bruker m/z calibration", icon = icon("cog"),
+                                 title = "Configure Bruker DataAnalysis m/z calibration")
                 )
             ),
             miniUI::miniTabPanel(
@@ -1311,10 +1320,10 @@ getNewProjectWidgetTypes <- function()
         convTo = "select",
         peakPicking = "check",
         peakPickingVendor = "check",
-        DAMethod = "text",
-        DAMethodPos = "text",
-        DAMethodNeg = "text",
-        doDACalib = "check",
+        DAMethod = "text", # UNDONE: remove
+        DAMethodPos = "text", # UNDONE: remove
+        DAMethodNeg = "text", # UNDONE: remove
+        doBrukerCalib = "check", # UNDONE: remove
         featFinder = "select",
         featGrouper = "select",
         suspectList = "text",
@@ -1417,12 +1426,12 @@ groupConvTypesFormats <- function(algo, inOut)
     }, simplify = FALSE))
 }
 
-splitConvTypeFormat <- function(typeFormat) unlist(strsplit(typeFormat, "_"))
+splitConvTypeFormat <- function(typeFormat) strsplit(typeFormat, "_")
 
 convTypeFormatToLabel <- function(typeFormat)
 {
     tf <- splitConvTypeFormat(typeFormat)
-    return(paste0(tf[1], " (", tf[2], ")"))
+    return(paste0(tf[[1]][1], " (", tf[[1]][2], ")"))
 }
 
 #' Easily create new \pkg{patRoon} projects
@@ -1464,7 +1473,12 @@ newProject <- function(destPath = NULL)
     }
     
     anaInfoTabs <- list(positive = emptyAnaTable(), negative = emptyAnaTable())
-    MSConversionSteps <- data.table(algorithm = character(0), from = character(0), to = character(0), path = character(0))
+    MSConvSettings <- list(
+        steps = data.table(algorithm = character(0), from = character(0), to = character(0)),
+        output = list(centroid = file.path("converted", "centroid"), profile = file.path("converted", "profile"),
+                      ims = file.path("converted", "ims")),
+        brukerCalib <- list(enabled = FALSE, method = "", methodPos = "", methodNeg = "")
+    )
     
     server <- function(input, output, session)
     {
@@ -1472,6 +1486,14 @@ newProject <- function(destPath = NULL)
                                   analysisFiles = data.table(analysis = character(), type = character(), path = character()),
                                   triggerMSConvHotUpdate = 0)
 
+        doObserveSelDir <- function(textID, buttonID)
+        {
+            observeEvent(input[[buttonID]], {
+                d <- rstudioapi::selectDirectory("Select directory", path = input[[textID]])
+                if (!is.null(d))
+                    updateTextInput(session, textID, value = d)
+            })
+        }
         makeAnalysesHot <- function()
         {
             rValues$triggerAnaInfoHotUpdate
@@ -1592,7 +1614,7 @@ newProject <- function(destPath = NULL)
         makeMSConversionHot <- function()
         {
             rValues$triggerMSConvHotUpdate
-            tab <- copy(MSConversionSteps)
+            tab <- copy(MSConvSettings$steps)
             tab[, from := sapply(from, convTypeFormatToLabel)]
             tab[, to := sapply(to, convTypeFormatToLabel)]
             do.call(rhandsontable::rhandsontable, c(list(tab, height = 250, maxRows = nrow(tab), columnSorting = FALSE),
@@ -1602,7 +1624,7 @@ newProject <- function(destPath = NULL)
         {
             # NOTE: assume selection is a block range
             sel <- input$MSConversionHot_select$select$rAll
-            MSConversionSteps <<- moveSelectedRows(dir, sel, MSConversionSteps)
+            MSConvSettings$steps <<- moveSelectedRows(dir, sel, MSConvSettings$steps)
             triggerMSConvHotUpdate()
             moveTabSel(dir, sel, "MSConversionHot")
         }
@@ -1622,20 +1644,6 @@ newProject <- function(destPath = NULL)
                 updateTextInput(session, inputName, value = dm)
         }
         triggerMSConvHotUpdate <- function() rValues$triggerMSConvHotUpdate <- rValues$triggerMSConvHotUpdate + 1
-        verifyMSConvOK <- function()
-        {
-            mcs <- copy(MSConversionSteps)
-            mcs[, type := sapply(MSConversionSteps$to, function(x) splitConvTypeFormat(x)[1])]
-            mcs <- unique(mcs, by = "type")
-            if (anyDuplicated(mcs$path) > 0)
-            {
-                rstudioapi::showDialog("Duplicate output paths",
-                                       "Please ensure that output paths are unique for each conversion output type.",
-                                       "")
-                return(FALSE)
-            }
-            return(TRUE)
-        }
         selectSuspList <- function(inputName)
         {
             sl <- rstudioapi::selectFile("Select suspect list", filter = "csv files (*.csv)")
@@ -1670,8 +1678,6 @@ newProject <- function(destPath = NULL)
                 rstudioapi::showDialog("No script file", "Please select a destination script file!", "")
             else if (input$generateAnaInfo == "table" && !verifyAnalysesOK())
             {}
-            else if (!verifyMSConvOK())
-            {}
             else if (input$outputScriptTo != "curFile" && file.exists(file.path(input$destinationPath, input$scriptFile)) &&
                      !rstudioapi::showQuestion("Script file already exists",
                                                sprintf("Script file already exists: '%s'.\nOverwrite?",
@@ -1687,16 +1693,12 @@ newProject <- function(destPath = NULL)
                 rstudioapi::showDialog("No legacy format", "Please select at least one legacy reporting format!", "")
             else
             {
-                doCreateProject(input, anaInfoTabs)
+                doCreateProject(input, anaInfoTabs, MSConvSettings$steps)
                 stopApp(TRUE)
             }
         })
 
-        observeEvent(input$projectDestButton, {
-            dest <- rstudioapi::selectDirectory("Select destination directory", path = input$destinationPath)
-            if (!is.null(dest))
-                updateTextInput(session, "destinationPath", value = dest)
-        })
+        doObserveSelDir("destinationPath", "projectDestButton")
         
         observeEvent(input$loadParams, {
             sl <- rstudioapi::selectFile("Select parameter file", filter = "yml files (*.yml)")
@@ -1931,62 +1933,71 @@ newProject <- function(destPath = NULL)
             showModal(modalDialog(
                 title = "Add MS data conversion step",
                 fillCol(
-                    flex = NA,
+                    flex = 1,
+                    height = 150,
                     width = 600,
                     fillCol(
-                        height = 75,
                         selectInput("convAlgo", "Algorithm",
                                     c("ProteoWizard" = "pwiz", "OpenMS" = "openms", "Bruker" = "bruker",
                                       "IM collapse" = "im_collapse", "TIMSCONVERT" = "timsconvert"),
                                     multiple = FALSE, width = "100%")
                     ),
-                    fillCol(
-                        height = 140,
-                        fillRow(
-                            flex = c(1, NA, 1),
-                            selectInput("convFrom", "From", groupConvTypesFormats("pwiz", "input"), multiple = FALSE,
-                                        width = "100%"),
-                            fillCol(width = "20px"),
-                            selectInput("convTo", "To", groupConvTypesFormats("pwiz", "output"), multiple = FALSE,
-                                        width = "100%")
-                        ),
-                        fillCol(
-                            flex = NA,
-                            fillCol(
-                                height = 50,
-                                fileSelect("MSConversionPath", "MSConversionPathButton", "output path"),
-                            ),
-                            fillCol(
-                                height = 25,
-                                textNote("Leave blank for a default directory.")
-                            )
-                        )
-                    ),
+                    fillRow(
+                        flex = c(1, NA, 1),
+                        selectInput("convFrom", "From", groupConvTypesFormats("pwiz", "input"), multiple = FALSE,
+                                    width = "100%"),
+                        fillCol(width = "20px"),
+                        selectInput("convTo", "To", groupConvTypesFormats("pwiz", "output"), multiple = FALSE,
+                                    width = "100%")
+                    )
                 ),
                 easyClose = TRUE,
-                fade = FALSE, # TRUE messes up HOT
                 footer = tagList(
                     modalButton("Cancel"),
                     actionButton("addMSConversionOK", "OK")
                 )
             ))
         })
-        observeEvent(input$MSConversionPathButton, {
-            d <- rstudioapi::selectDirectory("Select directory", path = input$MSConversionPath)
-            if (!is.null(d))
-                updateTextInput(session, "MSConversionPath", value = d)
+        doObserveSelDir("MSConversionPath", "MSConversionPathButton")
+        observeEvent(input$configConvPaths, {
+            showModal(modalDialog(
+                title = "Set MS conversion output paths",
+                fillCol(
+                    flex = c(1, 1, 1, NA),
+                    height = 275,
+                    width = 400,
+                    fileSelect("MSConvOutputCentroid", "MSConvOutputCentroidButton", "Centroid", MSConvSettings$output$centroid),
+                    fileSelect("MSConvOutputProfile", "MSConvOutputProfileButton", "Profile", MSConvSettings$output$profile),
+                    fileSelect("MSConvOutputIMS", "MSConvOutputIMSButton", "IMS", MSConvSettings$output$ims),
+                    fillCol(
+                        height = 25,
+                        textNote("Relative paths are relative to the project directory.")
+                    )
+                ),
+                easyClose = TRUE,
+                footer = tagList(
+                    modalButton("Cancel"),
+                    actionButton("MSConvOutputOK", "OK")
+                )
+            ))
         })
+        doObserveSelDir("MSConvOutputRaw", "MSConvOutputRawButton")
+        doObserveSelDir("MSConvOutputCentroid", "MSConvOutputCentroidButton")
+        doObserveSelDir("MSConvOutputProfile", "MSConvOutputProfileButton")
+        doObserveSelDir("MSConvOutputIMS", "MSConvOutputIMSButton")
+        
         observeEvent(input$configBrukerCalib, {
             showModal(modalDialog(
                 title = "Configure Bruker DataAnalysis m/z re-calibration",
                 fillCol(
                     flex = NA,
+                    width = 600,
                     fillCol(
                         height = 50,
-                        checkboxInput("doDACalib", "Perform m/z re-calibration", value = FALSE)
+                        checkboxInput("doBrukerCalib", "Perform m/z re-calibration", value = MSConvSettings$brukerCalib$enabled)
                     ),
                     conditionalPanel(
-                        condition = "input.doDACalib",
+                        condition = "input.doBrukerCalib",
                         fillCol(
                             flex = NA,
                             height = 90,
@@ -1995,18 +2006,23 @@ newProject <- function(destPath = NULL)
                                 height = 50,
                                 conditionalPanel(
                                     condition = "input.ionization != \"both\"",
-                                    fileSelect("DAMethod", "DAMethodButton", "DataAnalysis method"),
+                                    fileSelect("DAMethod", "DAMethodButton", "DataAnalysis method",
+                                               MSConvSettings$brukerCalib$method),
                                 ),
                                 conditionalPanel(
                                     condition = "input.ionization == \"both\"",
                                     fillRow(
                                         fillCol(
                                             width = "95%",
-                                            fileSelect("DAMethodPos", "DAMethodButtonPos", "DataAnalysis method (positive)")
+                                            fileSelect("DAMethodPos", "DAMethodButtonPos",
+                                                       "DataAnalysis method (positive)",
+                                                       MSConvSettings$brukerCalib$methodPos)
                                         ),
                                         fillCol(
                                             width = "95%",
-                                            fileSelect("DAMethodNeg", "DAMethodButtonNeg", "DataAnalysis method (negative)")
+                                            fileSelect("DAMethodNeg", "DAMethodButtonNeg",
+                                                       "DataAnalysis method (negative)",
+                                                       MSConvSettings$brukerCalib$methodNeg)
                                         )
                                     )
                                 )
@@ -2020,9 +2036,9 @@ newProject <- function(destPath = NULL)
                     )
                 ),
                 easyClose = TRUE,
-                fade = FALSE, # TRUE messes up HOT
                 footer = tagList(
-                    modalButton("Close")
+                    modalButton("Cancel"),
+                    actionButton("brukerCalibOK", "OK")
                 )
             ))
         })
@@ -2038,11 +2054,8 @@ newProject <- function(destPath = NULL)
         observeEvent(input$DAMethodButtonNeg, selectDAMethod("DAMethodNeg"))
         observeEvent(input$addMSConversionOK, {
             removeModal()
-            path <- input$MSConversionPath
-            if (!nzchar(path))
-                path <- file.path(input$destinationPath, "converted", splitConvTypeFormat(input$convTo)[1])
-            MSConversionSteps <<- rbind(MSConversionSteps, data.table(algorithm = input$convAlgo, from = input$convFrom,
-                                                                      to = input$convTo, path = path))
+            MSConvSettings$steps <<- rbind(MSConvSettings$steps, data.table(algorithm = input$convAlgo, from = input$convFrom,
+                                                                            to = input$convTo))
             triggerMSConvHotUpdate()
         })
         observeEvent(input$MSConversionHot, {
@@ -2056,18 +2069,29 @@ newProject <- function(destPath = NULL)
         })
         observeEvent(input$MSConversionHot_select$select$r, {
             sel <- input$MSConversionHot_select$select$rAll
-            e <- nrow(MSConversionSteps) > 0 && length(sel) > 0
+            e <- nrow(MSConvSettings$steps) > 0 && length(sel) > 0
             shinyjs::toggleState("removeMSConversionRows", condition = e)
             shinyjs::toggleState("MSConversionRowsUp", condition = e && min(sel) > 1)
-            shinyjs::toggleState("MSConversionRowsDown", condition = e && max(sel) < nrow(MSConversionSteps))
+            shinyjs::toggleState("MSConversionRowsDown", condition = e && max(sel) < nrow(MSConvSettings$steps))
         })
         observeEvent(input$removeMSConversionRows, {
             sel <- input$MSConversionHot_select$select$rAll
-            MSConversionSteps <<- MSConversionSteps[-sel]
+            MSConvSettings$steps <<- MSConvSettings$steps[-sel]
             triggerMSConvHotUpdate()
         })
         observeEvent(input$MSConversionRowsUp, { moveSelectedConversions("up") })
         observeEvent(input$MSConversionRowsDown, { moveSelectedConversions("down") })
+        observeEvent(input$MSConvOutputOK, {
+            removeModal()
+            MSConvSettings$output$centroid <<- input$MSConvOutputCentroid
+            MSConvSettings$output$profile <<- input$MSConvOutputProfile
+            MSConvSettings$output$ims <<- input$MSConvOutputIMS
+        })
+        observeEvent(input$brukerCalibOK, {
+            removeModal()
+            MSConvSettings$brukerCalib <<- list(enabled = input$doBrukerCalib, method = input$DAMethod,
+                                                methodPos = input$DAMethodPos, methodNeg = input$DAMethodNeg)
+        })
 
         observeEvent(input$suspectListButton, selectSuspList("suspectList"))
         observeEvent(input$suspectListButtonPos, selectSuspList("suspectListPos"))

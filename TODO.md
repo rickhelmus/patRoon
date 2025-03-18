@@ -133,14 +133,12 @@
 
 - Features
     - annSim: jaccard (as was done for suspects)
-    - as.data.table()
-        - changed/new average, regression, regressionBy args
     - plotChord() [aggregate]
     - plotInt(): areas, xBy, groupBy, regression
-    - [
+    - [ (feats/fGroups)
         - analysis re-ordering
         - ni
-    - analysisInfo()<-
+    - analysisInfo()<- (feats/fGroups)
     - SAFD?
 - Feat Ann
     - IDL filter and filtering annSim, annSimForm, annSimBoth
@@ -248,6 +246,7 @@
             - mention that "set" can be used for sets workflows
             - regressionBy column with features=T
             - mention that regressionBy values for average groups should be equal
+            - mention that in sets workflow, regressionBy column can be set to set unique names (eg UV-pos)
         - fix: mention how pred results are merged with collapseSuspects=NULL (ie all non-suspect type values are removed if fGroup has suspect result)
         - updates for changed regression arg and conc_reg --> x_reg
         - anaInfoCols arg

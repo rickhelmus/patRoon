@@ -15,13 +15,6 @@ fgXCMS3 <- groupFeatures(fList, "xcms3")
 fgKPIC2 <- groupFeatures(fList, "kpic2")
 fgSIRIUS <- groupFeatures(analysisInfo(fList)[1,], "sirius") # only do first analysis to avoid long run times
 
-# fList with dummy concs
-anaInfoConc <- cbind(getTestAnaInfo(), list(conc = c(NA, NA, NA, 1, 2, 3)))
-# modify replicates so we can test averaging
-anaInfoConc$replicate[grepl("standard", anaInfoConc$replicate)] <- c("standard-1", "standard-2", "standard-2")
-fListConc <- getTestFeatures(anaInfoConc)
-fgOpenMSConc <- groupFeatures(fListConc, "openms")
-
 fgOpenMSQ <- calculatePeakQualities(fgOpenMS)
 
 fListEmpty <- getEmptyFeatures()
@@ -158,14 +151,27 @@ test_that("XCMS3 conversion", {
                  unname(groupTable(getExpFG(fgSIRIUS))))
 })
 
-regr <- as.data.table(fgOpenMSConc, features = TRUE, regression = TRUE)
+fGroupsRegr <- fgOpenMS
+analysisInfo(fGroupsRegr)$conc <- seq_along(analyses(fGroupsRegr))
+fGroupsRegrNA <- fGroupsRegr
+analysisInfo(fGroupsRegrNA)$conc[c(TRUE, FALSE)] <- NA
+regr <- as.data.table(fGroupsRegr, regression = TRUE)
+regrF <- as.data.table(fGroupsRegr, regression = TRUE, features = TRUE)
+regrFBA <- as.data.table(fGroupsRegr, regression = TRUE, features = TRUE, regressionBy = "set", average = TRUE)
+regrFNA <- as.data.table(fGroupsRegrNA, regression = TRUE, features = TRUE, anaInfoCols = "conc")
+
 FCParams <- getFCParams(c("solvent-pos", "standard-pos"))
 fctbl <- as.data.table(fgOpenMS, FCParams = FCParams)
+fctblF <- as.data.table(fgOpenMS, FCParams = FCParams, features = TRUE)
 test_that("as.data.table works", {
     expect_equal(nrow(as.data.table(fgOpenMS)), length(fgOpenMS))
 
     checkmate::expect_names(names(as.data.table(fgOpenMS, average = TRUE)),
                             must.include = getADTIntCols(replicates(fgOpenMS)))
+    checkmate::expect_names(names(as.data.table(fgOpenMS, average = "set")),
+                            must.include = getADTIntCols(sets(fgOpenMS)))
+    checkmate::expect_names(names(as.data.table(fgOpenMS, average = "fGroups")), must.include = "intensity")
+    
     
     # UNDONE: intensities are sometimes higher than areas?
     # expect_gt_or_zero(as.data.table(fgOpenMS, areas = TRUE), as.data.table(fgOpenMS, areas = FALSE))
@@ -173,20 +179,35 @@ test_that("as.data.table works", {
     expect_equal(as.data.table(fgOpenMS, areas = TRUE)[[getADTIntCols(analyses(fgOpenMS)[1])]][11],
                  featureTable(fgOpenMS)[[analyses(fgOpenMS)[1]]][["area"]][groupFeatIndex(fgOpenMS)[[c(11, 1)]]])
     
-    expect_range(nrow(as.data.table(fgOpenMS, features = TRUE)), length(fgOpenMS) * c(1, length(analyses(fgOpenMS))))
+    expect_equal(nrow(as.data.table(fgOpenMS, features = TRUE)), length(getFeatures(fgOpenMS)))
+    expect_equal(nrow(as.data.table(fgOpenMS, features = TRUE, average = "analysis")), length(getFeatures(fgOpenMS)))
+    expect_equal(nrow(as.data.table(fgOpenMS, features = TRUE, average = "fGroups")), length(fgOpenMS))
+    expect_setequal(as.data.table(fgOpenMS, features = TRUE, average = "set")$average_group, sets(fgOpenMS))
 
+    checkmate::expect_names(names(as.data.table(fGroupsRegr, features = TRUE, anaInfoCols = "conc")),
+                            must.include = "anaInfo_conc")
+    
     expect_error(as.data.table(fgOpenMS, regression = TRUE)) # no conc specified
-    checkmate::expect_names(names(regr), must.include = "RSQ")
-    checkmate::expect_names(names(as.data.table(fgOpenMSConc, features = FALSE, regression = TRUE)),
-                            must.include = "RSQ")
-    checkmate::expect_names(names(as.data.table(fgOpenMSConc, features = FALSE, average = TRUE,
-                                                regression = TRUE)), must.include = "RSQ")
-    expect_true(all(is.na(regr$x_reg) | is.na(regr$x_reg) | is.na(regr$RSQ) | regr$RSQ < 0.9 |
-                        abs(regr$x_reg - regr$x_reg) < 0.5)) # calculated x values should be somewhat close
+    expect_equal(regr, as.data.table(fGroupsRegr, regression = "conc"))
+    expect_equal(regrF, as.data.table(fGroupsRegr, features = TRUE, regression = "conc"))
+    testRegrTab(fGroupsRegr, FALSE, FALSE, FALSE)
+    testRegrTab(fGroupsRegr, FALSE, TRUE, FALSE)
+    testRegrTab(fGroupsRegr, FALSE, TRUE, TRUE)
+    testRegrTab(fGroupsRegr, TRUE, FALSE, FALSE)
+    testRegrTab(fGroupsRegr, TRUE, TRUE, FALSE)
+    testRegrTab(fGroupsRegr, TRUE, TRUE, TRUE)
+    expect_true(all(is.na(regrF$x_reg) | is.na(regrF$x_reg) | is.na(regrF$RSQ) | regrF$RSQ < 0.9 |
+                        abs(regrF$x_reg - regrF$anaInfo_conc) < 0.5)) # calculated x values should be somewhat close
+    expect_true(any(is.na(regrFNA$anaInfo_conc) & !is.na(regrFNA$x_reg))) # at least some x estimations should be there
+    # regression properties should be equal per fGroup+regression_group
+    expect_equal(uniqueN(regrFBA[, .(group, regression_group, slope, intercept, RSQ, p)]),
+                 uniqueN(regrFBA[, .(group, regression_group)]))
 
     checkmate::expect_names(names(fctbl), must.include = c("FC", "FC_log", "PV", "PV_log", "classification"))
     checkmate::expect_subset(fctbl$classification, c("insignificant", "FC", "increase", "decrease", "significant"))
-
+    checkmate::expect_names(names(fctblF), must.include = c("FC", "FC_log", "PV", "PV_log", "classification"))
+    checkmate::expect_subset(fctblF$classification, c("insignificant", "FC", "increase", "decrease", "significant"))
+    
     expect_identical(as.data.table(fgOpenMS), as.data.table(fgOpenMSQ, qualities = FALSE)) # nothing extra reported
     expect_identical(as.data.table(fgOpenMS), as.data.table(fgOpenMS, qualities = "both")) # nothing to report
     checkmate::expect_names(names(as.data.table(fgOpenMSQ, qualities = "quality")), must.include = featureQualityNames())

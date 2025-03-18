@@ -199,6 +199,26 @@ makeMZXMLs <- function(anaInfo)
     return(anaInfo)
 }
 
+testRegrTab <- function(fg, feat, rb, avg)
+{
+    tab <- as.data.table(fg, regression = TRUE, features = feat, regressionBy = if (rb) "set", average = avg)
+    
+    regrCols <- getADTRegCols()
+    if (feat)
+        regrCols <- c(regrCols, "x_reg")
+    else if (rb)
+        regrCols <- unlist(lapply(sets(fg), function(x) paste0(regrCols, "_", x)))
+    checkmate::expect_names(names(tab), must.include = regrCols)
+    if (feat && rb)
+        checkmate::expect_names(names(tab), must.include = c(regrCols, "regression_group"))
+    
+    # check if there are any non-NA/NaN values (except p values for regressionBy+average, as there are insufficient observations)    
+    if (rb && avg)
+        regrCols <- setdiff(regrCols, c("p", paste0("p_", sets(fg))))
+    for (col in regrCols)
+        expect_true(any(!is.na(tab[[col]]) & !is.nan(tab[[col]])), info = col)
+}
+
 updateSIRIUSAnnProj <- function(SIRPath, clearEmptyFI)
 {
     for (pp in normalizePath(SIRPath))

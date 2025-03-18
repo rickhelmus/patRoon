@@ -269,7 +269,7 @@ setMethod("analysisInfo", "featureGroups", function(obj, df) analysisInfo(getFea
 #' @export
 setReplaceMethod("analysisInfo", "featureGroups", function(obj, value)
 {
-    # to verify the new anaInfo it is easiest to rely on the checks to be done by the featurs method of
+    # to verify the new anaInfo it is easiest to rely on the checks to be done by the features method of
     # analysisInfo()<-. However, the re-ordering of fGroup data needs to be done before the features are changed, as
     # otherwise reorderAnalysis() doesn't know what has changed. So first do the anaInfo change on a copy of the
     # features, then reorder the fGroup data and finally update the object features.

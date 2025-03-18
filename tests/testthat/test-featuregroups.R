@@ -79,7 +79,20 @@ test_that("basic subsetting", {
     expect_equivalent(fgOpenMS[[analyses(fgOpenMS)[4], names(fgOpenMS)[50]]], groupTable(fgOpenMS)[[4, 50]])
     expect_equivalent(fgOpenMS[[4]], groupTable(fgOpenMS)[[4]])
     expect_equivalent(callDollar(fgOpenMS, names(fgOpenMS)[4]), fgOpenMS[[4]])
+    
+    expect_equal(replicates(fgOpenMS[, replicates = "standard-pos"]), "standard-pos")
+    expect_equal(replicates(fgOpenMS[, ni = replicate == "standard-pos"]), "standard-pos")
 })
+
+revSeq <- seq(length(analyses(fgOpenMS)), 1)
+fgOpenMSRev <- fgOpenMS[revSeq, reorder = TRUE]
+test_that("anaInfo modification", {
+    expect_equal(fgOpenMS[revSeq, reorder = FALSE], fgOpenMS)
+    expect_equal(fgOpenMSRev, { fg <- fgOpenMS; analysisInfo(fg) <- analysisInfo(fg)[revSeq, ]; fg })
+    expect_equal(groupTable(fgOpenMSRev), groupTable(fgOpenMS)[revSeq])
+    expect_equal(groupFeatIndex(fgOpenMSRev), groupFeatIndex(fgOpenMS)[revSeq])
+})
+
 
 expfile <- file.path(getWorkPath(), "export.csv") # NOTE: will be removed prior to each test automatically
 test_that("exporting works", {
@@ -449,11 +462,22 @@ test_that("plotting works", {
     expect_doppel("retmz-comp", function() plot(fGCompOpenMS, groupBy = "fGroups", showLegend = FALSE))
 
     expect_doppel("intensity-def", function() plotInt(fgOpenMS))
-    expect_doppel("intensity-avg", function() plotInt(fgOpenMS, TRUE))
-
+    expect_doppel("intensity-avg", function() plotInt(fgOpenMS, average = TRUE))
+    expect_doppel("intensity-area", function() plotInt(fgOpenMS, areas = TRUE))
+    expect_doppel("intensity-norm", function() plotInt(fgOpenMS, normalized = TRUE))
+    expect_doppel("intensity-group_rep", function() plotInt(fgOpenMS, groupBy = "replicate"))
+    expect_doppel("intensity-xBy", function() plotInt(fGroupsRegr, xBy = "conc"))
+    expect_doppel("intensity-regr", function() plotInt(fGroupsRegr, regression = TRUE, xBy = "conc"))
+    expect_doppel("intensity-regr-group", function() plotInt(fGroupsRegr, regression = TRUE, xBy = "conc", groupBy = "replicate"))
+    expect_doppel("intensity-regr-group-leg", function() plotInt(fGroupsRegr[, 1:25], regression = TRUE, xBy = "conc",
+                                                                 groupBy = "replicate", showLegend = TRUE))
+    expect_doppel("intensity-regr-group-leg1", function() plotInt(fGroupsRegr[, 1], regression = TRUE, xBy = "conc",
+                                                                 groupBy = "replicate", showLegend = TRUE))
+    
     expect_doppel("chord-def", function() plotChord(fgOpenMS))
     expect_doppel("chord-selflinks", function() plotChord(fgOpenMS, addSelfLinks = TRUE))
     expect_doppel("chord-nortmz", function() plotChord(fgOpenMS, addRetMzPlots = FALSE))
+    expect_doppel("chord-aggr", function() plotChord(fgOpenMS, aggregate = TRUE))
     expect_doppel("chord-outer", function() plotChord(fgOpenMS, groupBy = "replicate"))
     expect_doppel("chord-comp", function() plotChord(fGCompOpenMS))
     expect_error(plotChord(unique(fgOpenMS, which = replicates(fgOpenMS), outer = TRUE),
@@ -533,6 +557,8 @@ test_that("sets functionality", {
     expect_equivalent(analysisInfo(fgOpenMS[, sets = "positive"], FALSE)[, -"set"], getTestAnaInfoPos())
     expect_setequal(annotations(fgOpenMS)$adduct, c("[M+H]+", "[M-H]-"))
     expect_equal(fgOpenMS, fgOpenMS[, sets = sets(fgOpenMS)])
+    expect_equal(sets(fgOpenMS[, sets = "positive"]), "positive")
+    expect_equal(sets(fgOpenMS[, ni = set == "positive"]), "positive")
     expect_length(fgOpenMS[, sets = character()], 0)
     expect_length(fgOpenMS[, sets = "positive"], length(fgOpenMS) - length(fgUniqueSet2))
     expect_length(unset(fgOpenMS, set = "positive"), length(fgOpenMS) - length(fgUniqueSet2))
@@ -576,10 +602,16 @@ test_that("sets functionality", {
     expect_lt(length(overlap(fgOpenMS, which = sets(fgOpenMS), aggregate = "set")), length(fgOpenMS))
     expect_length(overlap(fgOpenMSEmpty, which = sets(fgOpenMS), aggregate = "set"), 0)
     
+    expect_doppel("intensity-avg_set", function() plotInt(fgOpenMS, average = "set"))
+    expect_doppel("intensity-group_set", function() plotInt(fgOpenMS, groupBy = "set"))
+    expect_doppel("intensity-regr-set", function() plotInt(fGroupsRegr[, 1:25], regression = TRUE, xBy = "conc",
+                                                           groupBy = "set", showLegend = TRUE))
+    
     expect_doppel("venn-sets", function() plotVenn(fgOpenMS, aggregate = "set"))
     
     expect_ggplot(plotUpSet(fgOpenMS, aggregate = "set"))
     
+    expect_doppel("chord-aggr-set", function() plotChord(fgOpenMS, aggregate = "set"))
     expect_doppel("chord-outer-set", function() plotChord(fgOpenMS, aggregate = TRUE, groupBy = "set"))
     
     expect_doppel("eic-gby_set", function() plotChroms(subFGroups, groupBy = "set"))

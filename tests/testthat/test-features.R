@@ -93,6 +93,8 @@ test_that("basic subsetting", {
     expect_equivalent(ffOpenMS[[2]], featureTable(ffOpenMS)[[2]])
     expect_equivalent(ffOpenMS[[analyses(ffOpenMS)[2]]], featureTable(ffOpenMS)[[2]])
     expect_equivalent(callDollar(ffOpenMS, analyses(ffOpenMS)[2]), ffOpenMS[[2]])
+    
+    expect_equal(replicates(ffOpenMS[, ni = replicate == "standard-pos"]), "standard-pos")
 })
 
 qr <- list(ZigZag = c(0.2, 0.6), TPASRScore = c(0.5, 0.9))
@@ -206,6 +208,55 @@ test_that("XCMS3 conversion", {
     expect_equal(featMZs(importFeatures(anaInfoOne, "xcms3", XCMS3ImpSIRIUS)), featMZs(ffSIRIUS))
 })
 
+KPIC2ImpKPIC2 <- getPICSet(ffKPIC2)
+KPIC2ImpOpenMS <- getPICSet(ffOpenMS, loadRawData = FALSE)
+test_that("KPIC2 conversion", {
+    expect_equal(KPIC2ImpKPIC2[[1]]$peakinfo[, "mz"], ffKPIC2[[1]]$mz)
+    expect_equal(KPIC2ImpOpenMS[[1]]$peakinfo[, "mz"], ffOpenMS[[1]]$mz)
+})
+
+getModifiedAI <- function(ai)
+{
+    ret <- ffOpenMS
+    analysisInfo(ret) <- ai
+    return(ret)
+}
+expectModAI <- function(cb)
+{
+    ret <- ffOpenMS
+    ai <- cb(copy(analysisInfo(ret)))
+    analysisInfo(ret) <- ai
+    expect_equal(analysisInfo(ret), ai)
+}
+
+test_that("anaInfo modification", {
+    expect_equal(getModifiedAI(analysisInfo(ffOpenMS)), ffOpenMS)
+    expectModAI(\(x) { x$har <- 1; x})
+    expectModAI(\(x) x[seq(nrow(x), 1)])
+    expect_error(expectModAI(\(x) { x$analysis[1] <- "nope"; x }), regexp = "Cannot modify analysis")
+    expect_error(expectModAI(\(x) x[, -"replicate"]), regexp = "missing")
+    expect_error(expectModAI(\(x) rbind(x, x)), regexp = "Cannot add analyses")
+    expect_error(expectModAI(\(x) x[-1]), regexp = "Cannot remove analyses")
+    
+    expect_equal(ffOpenMS[seq(length(analyses(ffOpenMS)), 1)], ffOpenMS)
+    checkmate::expect_names(analyses(ffOpenMS[seq(length(analyses(ffOpenMS)), 1), reorder = TRUE]),
+                                     identical.to = rev(analyses(ffOpenMS)))
+    checkmate::expect_names(names(featureTable(ffOpenMS[seq(length(analyses(ffOpenMS)), 1), reorder = TRUE])),
+                            identical.to = rev(analyses(ffOpenMS)))
+
+    expect_equal(xcms::peaks(getXCMSSet(ffXCMS3[seq(length(analyses(ffXCMS3)), 1), reorder = TRUE], loadRawData = FALSE)),
+                 xcms::peaks(XCMSImpXCMS3)[order(xcms::peaks(XCMSImpXCMS3)[, "sample"], decreasing = TRUE), ])
+    
+    expect_equal(xcms::chromPeaks(getXCMSnExp(ffXCMS3[seq(length(analyses(ffXCMS3)), 1), reorder = TRUE])),
+                 xcms::chromPeaks(XCMS3ImpXCMS3)[order(xcms::chromPeaks(XCMS3ImpXCMS3)[, "sample"], decreasing = TRUE), ])
+    expect_equal(xcms::chromPeaks(getXCMSnExp(ffEP[seq(length(analyses(ffEP)), 1), reorder = TRUE], loadRawData = FALSE)),
+                 xcms::chromPeaks(XCMS3ImpEP)[order(xcms::chromPeaks(XCMS3ImpEP)[, "sample"], decreasing = TRUE), ])
+    
+    expect_equal(getPICSet(ffKPIC2[seq(length(analyses(ffKPIC2)), 1), reorder = TRUE]), KPIC2ImpKPIC2[seq(length(KPIC2ImpKPIC2), 1)])
+    expect_equal(getPICSet(ffOpenMS[seq(length(analyses(ffOpenMS)), 1), reorder = TRUE], loadRawData = FALSE),
+                 KPIC2ImpOpenMS[seq(length(KPIC2ImpOpenMS), 1)])
+})
+
 test_that("Sets functionality", {
     # proper (de)neutralization
     expect_equal(patRoon:::calculateMasses(unset(ffOpenMS, "positive")[[1]]$mz, as.adduct("[M+H]+"), "neutral"),
@@ -216,6 +267,8 @@ test_that("Sets functionality", {
     expect_equal(unique(ffOpenMS[[1]]$adduct), "[M+H]+")
     expect_equal(sets(filter(ffOpenMS, sets = "positive", negate = TRUE)), "negative")
     expect_length(ffOpenMS[, sets = character()], 0)
+    expect_equal(sets(ffOpenMS[, sets = "positive"]), "positive")
+    expect_equal(sets(ffOpenMS[, ni = set == "positive"]), "positive")
     expect_length(makeSet(ffXCMS3, ffXCMS3[FALSE], adducts = "[M+H]+"), length(ffXCMS3))
     expect_length(makeSet(ffXCMS3[FALSE], ffXCMS3[FALSE], adducts = "[M+H]+"), 0)
 })

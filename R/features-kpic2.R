@@ -267,9 +267,9 @@ setMethod("getPICSet", "features", function(obj, loadRawData = TRUE, IMS = FALSE
                 at <- attr(EICs[[ana]], "allXValues")
                 ret$pics <- Map(EICs[[ana]], fTable[[ana]]$mz, f = function(eic, mz)
                 {
-                    eic <- data.table(time = at, int = doFillEIXIntensities(at, eic$time, eic$intensity))
-                    eic[, mz := mz] # UNDONE? Could add actual m/z for each scan...
-                    eic[, scan := sapply(time, function(t) MSMeta[[ana]][which.min(abs(t - MSMeta[[ana]]$time)), "scan"])]
+                    # UNDONE? Could add actual m/z for each scan...
+                    eic <- data.table(time = at, int = doFillEIXIntensities(at, eic$time, eic$intensity), mz = mz,
+                                      scan = MSMeta[[ana]]$scan)
                     return(as.matrix(eic[, c("scan", "int", "mz"), with = FALSE]))
                 })
                 ret$peaks <- Map(ret$pics, fTable[[ana]]$intensity, f = function(pic, int)

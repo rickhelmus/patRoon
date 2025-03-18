@@ -132,13 +132,6 @@
 ## Tests
 
 - Features
-    - annSim: jaccard (as was done for suspects)
-    - plotChord() [aggregate]
-    - plotInt(): areas, xBy, groupBy, regression
-    - [ (feats/fGroups)
-        - analysis re-ordering
-        - ni
-    - analysisInfo()<- (feats/fGroups)
     - SAFD?
 - Feat Ann
     - IDL filter and filtering annSim, annSimForm, annSimBoth
@@ -257,6 +250,7 @@
     - plotInt()
         - xnames --> xNames
         - new args: areas, xBy, groupBy, averageFunc, regression
+        - RSQs in legend only shown if length(fGroups==1) or groupBy = "fGroups"
     - filter() for screening: k arg, including NA to clearout results for fGroups specified by j (or all if j==NULL)
     - MS/MS bg subtraction
         - abundance filter args

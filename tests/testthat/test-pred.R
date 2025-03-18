@@ -124,7 +124,10 @@ if (doSIRIUS)
     fGroupsCompsNoSuspC <- fGroupsCompsC
     fGroupsCompsNoSuspC@toxicities <- toxicities(fGroupsCompsC)[group != rmSuspGrp | type != "suspect"]
     fGroupsCompsNoSuspC@concentrations <- concentrations(fGroupsCompsC)[group != rmSuspGrp | type != "suspect"]
-}    
+    
+    revSeq <- seq(length(analyses(fGroupsCompsC)), 1)
+    fGroupsCompsCRev <- fGroupsCompsC[revSeq, reorder = TRUE]
+}
 
 test_that("Basics for calculation", {
     skip_if_not(doSIRIUS)
@@ -168,6 +171,10 @@ test_that("Basics for calculation", {
     # UNDONE: can we actually get NA tox values?
     # expect_gt(length(getFeatures(filter(fGroupsOnlyCompsC, absMaxTox = 6E4))),
     #           length(getFeatures(filter(fGroupsOnlyCompsC, absMaxTox = 6E4, removeNA = TRUE))))
+    
+    # esnure analysis columns are re-ordered
+    checkmate::expect_names(intersect(names(concentrations(fGroupsCompsCRev)), analyses(fGroupsCompsC)),
+                            permutation.of = analyses(fGroupsCompsCRev))
 })
 
 if (doSIRIUS)

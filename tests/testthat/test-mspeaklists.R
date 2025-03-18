@@ -121,6 +121,25 @@ checkPeaksLimit <- function(plists, doMin, doMSMS)
     }), na.rm = TRUE)), na.rm = TRUE))
 }
 
+testMSPLAbundance <- function(obj, avg, rel, thr)
+{
+    # NOTE: exclude data with relative abundance==1: these may be averaged from less than available spectra
+    colRel <- if (!avg) "abundance_rel" else "fgroup_abundance_rel"
+    tab <- as.data.table(obj, averaged = avg)[get(colRel) != 1]
+    col <- sprintf("%sabundance_%s", if (!avg) "" else "fgroup_", if (rel) "rel" else "abs")
+    expect_gte(min(tab[[col]]), thr, label = col)
+}
+
+test_that("avg params", {
+    expect_gte(min(as.data.table(generateMSPeakLists(fGroups, avgFeatParams = getDefAvgPListParams(minIntensityPost = 2500)), averaged = FALSE)$intensity), 2500)
+    expect_gte(min(as.data.table(generateMSPeakLists(fGroups, avgFGroupParams = getDefAvgPListParams(minIntensityPost = 2500)))$intensity), 2500)
+    testMSPLAbundance(generateMSPeakLists(fGroups, avgFeatParams = getDefAvgPListParams(minAbundanceRel = 0.5)), FALSE, TRUE, 0.5)
+    testMSPLAbundance(generateMSPeakLists(fGroups, avgFeatParams = getDefAvgPListParams(minAbundanceAbs = 10)), FALSE, FALSE, 10)
+    # UNDONE: these tests are not so useful as there are only two analyses to average... so the abundance will also be between one (in case of feature being in only one analyses) or two
+    # testMSPLAbundance(generateMSPeakLists(fGroups, avgFGroupParams = getDefAvgPListParams(minAbundanceRel = 0.5)), TRUE, TRUE, 0.5)
+    # testMSPLAbundance(generateMSPeakLists(fGroups, avgFGroupParams = getDefAvgPListParams(minAbundanceAbs = 2)), TRUE, FALSE, 2)
+})
+
 test_that("delete and filter", {
     checkmate::expect_names(groupNames(delete(plists, i = 1)), disjunct.from = groupNames(plists)[1])
     checkmate::expect_names(groupNames(delete(plists, i = groupNames(plists)[1])), disjunct.from = groupNames(plists)[1])

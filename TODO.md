@@ -138,7 +138,7 @@
     - annSim: jaccard (as was done for suspects)
     - getBGMSMSPeaks()
     - MSPL
-        - new spec averaging params
+        - new spec averaging params: add IMS
         - more extensively test filters/summing/averaging
         - further test bbCID data
             - also mixed bbCID/PASEF file (ie with different segments)

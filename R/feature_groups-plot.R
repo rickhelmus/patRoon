@@ -192,7 +192,7 @@ setMethod("plotInt", "featureGroups", function(obj, average = FALSE, averageFunc
     anaInfo <- analysisInfo(obj)
     
     ac <- checkmate::makeAssertCollection()
-    aapply(checkmate::assertFlag, . ~ average + areas + normalized + xNames + regression + showLegend,
+    aapply(checkmate::assertFlag, . ~ areas + normalized + xNames + regression + showLegend,
            fixed = list(add = ac))
     checkmate::assertFunction(averageFunc, add = ac)
     assertAnaInfoBy(xBy, anaInfo, FALSE, null.ok = TRUE, add = ac)
@@ -221,7 +221,8 @@ setMethod("plotInt", "featureGroups", function(obj, average = FALSE, averageFunc
         return(invisible(NULL))
     }
 
-    obj <- maybeAutoNormalizeFGroups(obj)
+    if (normalized)
+        obj <- maybeAutoNormalizeFGroups(obj)
     
     intTab <- if (isFALSE(average))
         copy(groupTable(obj, areas, normalized))
@@ -282,7 +283,7 @@ setMethod("plotInt", "featureGroups", function(obj, average = FALSE, averageFunc
         makeLegend <- function(x, y, ...)
         {
             leg <- names(col)
-            if (regression)
+            if (regression && (groupBy == "fGroups" || length(regList) == 1))
             {
                 RSQs <- if (groupBy == "fGroups") sapply(regList, "[[", "RSQ") else sapply(regList[[1]], "[[", "RSQ")
                 RSQs <- sprintf("%.2f", RSQs)
@@ -318,11 +319,12 @@ setMethod("plotInt", "featureGroups", function(obj, average = FALSE, averageFunc
         irows <- if (is.null(xgrp)) seq_len(nrow(intTab)) else intTab[, .I[xgroup == xgrp]]
         x <- if (xNum) intTab$x[irows] else intTab$xnum[irows]
         do.call(lines, c(list(x = x, y = y, col = col), linesArgs))
-        
         if (regression)
         {
-            lm <- if (!is.null(xgrp)) regList[[grp]][[xgrp]][["lm"]] else regList[[grp]][["lm"]]
-            if (!is.null(lm))
+            rl <- if (!is.null(xgrp)) regList[[grp]][[xgrp]] else regList[[grp]]
+            lm <- if (!is.null(rl)) rl[["lm"]]
+            slope <- if (!is.null(rl)) rl$slope else NA
+            if (!is.null(lm) && !is.na(slope))
             {
                 # from https://stackoverflow.com/a/10046370
                 clip(min(x), max(x), min(y), max(y))

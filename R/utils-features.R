@@ -31,7 +31,7 @@ checkAnaInfoAggrGrouping <- function(anaInfo, what, aggrBy, groupBy)
 doSubsetFeaturesByAna <- function(obj, i, ..., reorder, env)
 {
     # NOTE: ni is passed as dots here, as otherwise NSE will _not_ work!
-    if (!missing(..1) > 0) # check ..1: https://stackoverflow.com/a/25396892
+    if (!missing(..1)) # check ..1: https://stackoverflow.com/a/25396892
     {
         if (!missing(i))
             stop("Cannot simulatenously specify i and ni arguments.", call. = FALSE)

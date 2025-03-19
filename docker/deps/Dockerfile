@@ -4,7 +4,7 @@ FROM rocker/rstudio:4.4
 
 ENV SETUPDIR=/usr/local/setup
 
-# NOTE: we remove system libs from OpenMS (libc etc) that shouldn't be installed --> they conflict with RStudio
+# NOTE: we remove system libs in /usr/lib from OpenMS (libc etc, all except libOpenMS*) that shouldn't be installed --> they conflict with RStudio
 
 RUN --mount=type=cache,id=cache_apt,target=/var/cache/apt --mount=type=cache,id=lib_apt,target=/var/lib/apt apt-get update -y && \
     apt-get install -y --no-install-recommends libssl-dev libssh2-1-dev wget libnode-dev openbabel \
@@ -14,7 +14,7 @@ RUN --mount=type=cache,id=cache_apt,target=/var/cache/apt --mount=type=cache,id=
     wget -P $SETUPDIR https://github.com/OpenMS/OpenMS/releases/download/Release3.0.0/OpenMS-3.0.0-Debian-Linux-x86_64.deb && \
     apt-get install -y --no-install-recommends $SETUPDIR/OpenMS-3.0.0-Debian-Linux-x86_64.deb && \
     rm -rf $SETUPDIR && \
-    rm /usr/lib/libc.so.6 /usr/lib/libm.so.6 /usr/lib/libpthread.so.0 /usr/lib/libstdc++.so.6 /usr/lib/libglib-2.0.so.0 && \
+    rm /usr/lib/lib[a-zA-NP-Z]* && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     echo 'PATH=/home/rstudio/bin:${PATH}' >> /usr/local/lib/R/etc/Renviron && R CMD javareconf
 

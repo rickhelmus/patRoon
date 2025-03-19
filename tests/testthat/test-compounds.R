@@ -285,6 +285,35 @@ test_that("MetFrag can timeout", {
     })
 })
 
+compsMFJ <- callMF(fGroups, plists, specSimParams = getDefSpecSimParams(method = "jaccard"))
+compsMFIDL <- estimateIDLevels(compsMF)
+compsMFIDLF <- estimateIDLevels(compsMF, MSPeakLists = plists, formulas = forms)
+annSimCols <- getMergedConsCols("annSim", names(as.data.table(compsMFJ)), mergedConsensusNames(compsMFJ))
+annSimColsF <- getMergedConsCols(c("annSim", "annSimForm", "annSimBoth"), names(as.data.table(compsMFIDLF)),
+                                 mergedConsensusNames(compsMFIDLF))
+test_that("annSims and IDLs", {
+    # only annSims should be affected
+    expect_equal(removeDTColumnsIfPresent(as.data.table(compsMF), annSimCols),
+                 removeDTColumnsIfPresent(as.data.table(compsMFJ), annSimCols))
+    # annSims should be different or zero
+    expect_true(all(as.data.table(compsMF)[annSim == as.data.table(compsMFJ)$annSim]$annSim == 0))
+    expect_true(all(as.data.table(compsMFIDL)$annSimForm == 0))
+    expect_true(all(as.data.table(compsMFIDL)$annSimBoth == as.data.table(compsMFIDL)$annSim))
+    expect_true(any(as.data.table(compsMFIDLF)$annSimForm > 0))
+    expect_true(any(as.data.table(compsMFIDLF)$annSimBoth > as.data.table(compsMFIDLF)$annSim))
+    
+    expect_min_gte(as.data.table(filter(compsMFJ, scoreLimits = list(annSim = c(0.5, 1))))$annSim, 0.5)
+    expect_min_gte(as.data.table(filter(compsMFIDLF, scoreLimits = list(annSimForm = c(0.5, 1))))$annSimForm, 0.5)
+    expect_min_gte(as.data.table(filter(compsMFIDLF, scoreLimits = list(annSimBoth = c(0.5, 1))))$annSimBoth, 0.5)
+    
+    checkmate::expect_names(names(as.data.table(compsMFIDL)), must.include = c("estIDLevel", "annSimForm", "annSimBoth"))
+    checkmate::expect_names(names(as.data.table(compsMFIDLF)), must.include = c("estIDLevel", "annSimForm", "annSimBoth"))
+    checkmate::expect_subset(numericIDLevel(as.data.table(compsMFIDL)$estIDLevel), c(2, 3, 5)) # no 4 w/out formulas
+    checkmate::expect_subset(numericIDLevel(as.data.table(compsMFIDLF)$estIDLevel), c(2, 3, 4, 5)) # also 4 w/ formulas
+    expect_max_lte(numericIDLevel(as.data.table(filter(compsMFIDLF, maxLevel = 3))$estIDLevel), 3)
+    expect_min_gte(numericIDLevel(as.data.table(filter(compsMFIDLF, maxLevel = 3, negate = TRUE))$estIDLevel), 4)
+})
+
 if (doMetFrag && doSIRIUS)
     compsCons <- doCompCons(compsMF, compsSIR, MSPeakLists = plists)
 

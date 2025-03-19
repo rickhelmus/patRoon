@@ -134,8 +134,6 @@
 - Features
     - SAFD?
 - Feat Ann
-    - IDL filter and filtering annSim, annSimForm, annSimBoth
-    - annSim: jaccard (as was done for suspects)
     - MSPL
         - new spec averaging params: add IMS
         - more extensively test filters/summing/averaging

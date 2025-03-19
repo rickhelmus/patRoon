@@ -181,6 +181,23 @@ test_that("as.data.table() works", {
                                                countFragElements = c("C", "H"))[, c("frag_C", "frag_H"), with = FALSE]))))
 })
 
+formsGFJ <- doGenForms(fGroups, plists, "genform", specSimParams = getDefSpecSimParams(method = "jaccard"))
+formsGFIDL <- estimateIDLevels(formsGF)
+annSimCols <- getMergedConsCols("annSim", names(as.data.table(formsGFJ)), mergedConsensusNames(formsGFJ))
+test_that("annSims and IDLs", {
+    # only annSims should be affected
+    expect_equal(removeDTColumnsIfPresent(as.data.table(formsGF), annSimCols),
+                 removeDTColumnsIfPresent(as.data.table(formsGFJ), annSimCols))
+    # annSims should be different or zero
+    expect_true(all(as.data.table(formsGF)[annSim == as.data.table(formsGFJ)$annSim]$annSim == 0))
+    expect_min_gte(as.data.table(filter(formsGFJ, scoreLimits = list(annSim = c(0.5, 1))))$annSim, 0.5)
+    
+    checkmate::expect_names(names(as.data.table(formsGFIDL)), must.include = "estIDLevel")
+    expect_setequal(as.data.table(formsGFIDL)$estIDLevel, c("5", "4a", "4b")) # better levels cannot be with formulas
+    expect_max_lte(numericIDLevel(as.data.table(filter(formsGFIDL, maxLevel = 4))$estIDLevel), 4)
+    expect_min_gte(numericIDLevel(as.data.table(filter(formsGFIDL, maxLevel = 4, negate = TRUE))$estIDLevel), 5)
+})
+
 if (doSIRIUS)
     fCons <- doFormCons(formsGF, formsSIR, MSPeakLists = plists)
 

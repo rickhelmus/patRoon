@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2016-2024 Rick Helmus <r.helmus@uva.nl>
+# SPDX-FileCopyrightText: 2016 - 2025 Rick Helmus <r.helmus@uva.nl>
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
@@ -10,8 +10,9 @@ local({
         if (!is.null(exclude))
             paths <- setdiff(paths, exclude)
         args <- c("annotate",
-                  "--year=2016-2024",
+                  "--year=2016-2025",
                   "--copyright=Rick Helmus <r.helmus@uva.nl>",
+                  "--merge-copyrights",
                   "--license=GPL-3.0-only")
         if (!is.null(style))
             args <- c(args, paste0("--style=", style))

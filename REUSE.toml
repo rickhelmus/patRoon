@@ -9,7 +9,7 @@ path = ["inst/**", "docs/**", "man/**", "man-roxygen/**", "tests/**", "vignettes
         "DESCRIPTION", "R/**", "src/*", "docker/**", "*", "data-raw/**", ".circleci/config.yml",
         ".github/**"]
 precedence = "closest"
-SPDX-FileCopyrightText = "2016-204 Rick Helmus <r.helmus@uva.nl>"
+SPDX-FileCopyrightText = "2016-2025 Rick Helmus <r.helmus@uva.nl>"
 SPDX-License-Identifier = "GPL-3.0-only"
 
 [[annotations]]

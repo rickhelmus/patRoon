@@ -130,6 +130,23 @@ testMSPLAbundance <- function(obj, avg, rel, thr)
     expect_gte(min(tab[[col]]), thr, label = col)
 }
 
+getMSPLProp <- function(obj, avg, col)
+{
+    tab <- as.data.table(obj, averaged = avg)
+    return(tab[precursor == FALSE][[col]]) # ignore precursors: these are usually not filtered away
+}
+
+testMaxMZOverPrec <- function(obj, thr, neg)
+{
+    tab <- as.data.table(obj)
+    tab[, precursor_mz := if (any(precursor)) mz[precursor == TRUE] else NA_real_, by = c("group", "set", "type")]
+    tab <- tab[!is.na(precursor_mz) & precursor == FALSE] # ignore precursors: these are usually not filtered away
+    if (!neg)
+        expect_true(all((tab$mz - tab$precursor_mz) <= thr))
+    else
+        expect_true(all((tab$mz - tab$precursor_mz) > thr))
+}
+
 test_that("avg params", {
     expect_gte(min(as.data.table(generateMSPeakLists(fGroups, avgFeatParams = getDefAvgPListParams(minIntensityPost = 2500)), averaged = FALSE)$intensity), 2500)
     expect_gte(min(as.data.table(generateMSPeakLists(fGroups, avgFGroupParams = getDefAvgPListParams(minIntensityPost = 2500)))$intensity), 2500)
@@ -156,7 +173,8 @@ test_that("delete and filter", {
     expect_equal(delete(plists, k = 1, reAverage = FALSE)[[ovFGroup]], plists[[ovFGroup]])
     expect_false(isTRUE(all.equal(delete(plists, k = 1, reAverage = TRUE)[[ovFGroup]], plists[[ovFGroup]])))
     expect_length(delete(plists), 0)
-    
+
+    # we only test MSLevel selection here: the mechanism is the same for all filters
     expect_gte(checkIntLimit(filter(plists, MSLevel = 1, absMinIntensity = 2500), FALSE, TRUE, FALSE), 2500)
     expect_gte(checkIntLimit(filter(plists, MSLevel = 2, absMinIntensity = 2500), FALSE, TRUE, TRUE), 2500)
     expect_lte(checkIntLimit(filter(plists, MSLevel = 1, absMinIntensity = 2500, negate = TRUE), FALSE, FALSE, FALSE), 2500)
@@ -166,7 +184,7 @@ test_that("delete and filter", {
     expect_gte(checkIntLimit(filter(plists, MSLevel = 2, relMinIntensity = 0.2), TRUE, TRUE, TRUE, plists), 0.2)
     expect_lte(checkIntLimit(filter(plists, MSLevel = 1, relMinIntensity = 0.2, negate = TRUE), TRUE, FALSE, FALSE, plists), 0.2)
     expect_lte(checkIntLimit(filter(plists, MSLevel = 2, relMinIntensity = 0.2, negate = TRUE), TRUE, FALSE, TRUE, plists), 0.2)
-
+    
     expect_lte(checkPeaksLimit(filter(plists, MSLevel = 1, topMostPeaks = 5), FALSE, FALSE), 5)
     expect_lte(checkPeaksLimit(filter(plists, MSLevel = 2, topMostPeaks = 5), FALSE, TRUE), 5)
     expect_lte(checkPeaksLimit(filter(plists, MSLevel = 1, topMostPeaks = 5, negate = TRUE), FALSE, FALSE), 5)
@@ -176,6 +194,28 @@ test_that("delete and filter", {
     expect_true(all(sapply(averagedPeakLists(filter(plists, withMSMS = TRUE, negate = TRUE)),
                            function(pl) is.null(pl[["MSMS"]]))))
 
+    expect_min_gte(getMSPLProp(filter(plists, minAbundanceFeatRel = 0.5), "abundance_rel", avg = FALSE), 0.5)
+    expect_min_gte(getMSPLProp(filter(plists, minAbundanceFeatAbs = 10), "abundance_abs", avg = FALSE), 10)
+    expect_max_lt(getMSPLProp(filter(plists, minAbundanceFeatRel = 0.5, negate = TRUE), "abundance_rel", avg = FALSE), 0.5)
+    expect_max_lt(getMSPLProp(filter(plists, minAbundanceFeatAbs = 10, negate = TRUE), "abundance_abs", avg = FALSE), 10)
+    
+    expect_min_gte(getMSPLProp(filter(plists, minAbundanceFeatRel = 0.5), "feat_abundance_rel", avg = TRUE), 0.5)
+    expect_min_gte(getMSPLProp(filter(plists, minAbundanceFeatAbs = 10), "feat_abundance_abs", avg = TRUE), 10)
+    expect_max_lt(getMSPLProp(filter(plists, minAbundanceFeatRel = 0.5, negate = TRUE), "feat_abundance_rel", avg = TRUE), 0.5)
+    expect_max_lt(getMSPLProp(filter(plists, minAbundanceFeatAbs = 10, negate = TRUE), "feat_abundance_abs", avg = TRUE), 10)
+    
+    expect_min_gte(getMSPLProp(filter(plists, minAbundanceFGroupRel = 0.5), "fgroup_abundance_rel", avg = TRUE), 0.5)
+    expect_min_gte(getMSPLProp(filter(plists, minAbundanceFGroupAbs = 2), "fgroup_abundance_abs", avg = TRUE), 2)
+    expect_max_lt(getMSPLProp(filter(plists, minAbundanceFGroupRel = 1, negate = TRUE), "fgroup_abundance_rel", avg = TRUE), 1)
+    expect_max_lt(getMSPLProp(filter(plists, minAbundanceFGroupAbs = 2, negate = TRUE), "fgroup_abundance_abs", avg = TRUE), 2)
+
+    testMaxMZOverPrec(filter(plists, maxMZOverPrec = 0.5), 0.5, FALSE)
+    testMaxMZOverPrec(filter(plists, maxMZOverPrec = 0.5, negate = TRUE), 0.5, TRUE)
+    
+    rmMZ <- plists[[1]][[1]]$mz[1]
+    expect_true(all(abs(getMSPLProp(filter(plists, removeMZs = list(rmMZ, rmMZ), mzWindow = 0.005), TRUE, "mz") - rmMZ) > 0.005))
+    expect_true(all(abs(getMSPLProp(filter(plists, removeMZs = list(rmMZ, rmMZ), mzWindow = 0.005, negate = TRUE), TRUE, "mz") - rmMZ) <= 0.005))
+    
     expect_lte(length(filter(plists, MSLevel = 2, topMostPeaks = 5, retainPrecursor = FALSE)),
                length(filter(plists, MSLevel = 2, topMostPeaks = 5)))
 
@@ -383,4 +423,22 @@ test_that("sets functionality", {
                                                                   MSLevel = 2, perSet = TRUE, mirror = FALSE))
     expect_doppel("mspl-spec-set-mirror", function() plotSpectrum(plistsMSMS, groupName = plotSetSpecFG,
                                                                   MSLevel = 2, perSet = TRUE, mirror = TRUE))
+})
+
+doGetBG <- function(ai = getTestAnaInfoNS()[getTestAnaInfoNS()$replicate == "solvent-pos", ], minBPIntensity = 1E5, ...)
+{
+    getBGMSMSPeaks(ai, minBPIntensity = minBPIntensity, ...)
+}
+bg <- doGetBG()
+test_that("BG MSMS", {
+    expect_known_value(bg, testFile("bg-msms"))
+    checkmate::expect_data_table(bg, any.missing = FALSE)
+    checkmate::expect_names(names(bg), must.include = c("mz", "intensity", "abundance_rel_ana", "abundance_abs_ana", 
+                                                        "abundance_rel_spec", "abundance_abs_spec"))
+    expect_equal(bg, doGetBG(ai = getTestAnaInfoNS(), replicates = "solvent-pos"))
+    expect_lt(sum(doGetBG(minBPIntensity = 3E5)$abundance_abs_spec), sum(bg$abundance_abs_spec))
+    expect_min_gte(doGetBG(avgSpectraParams = getDefAvgPListParams(minAbundanceRel = 0.5, topMost = 25))$abundance_rel_spec, 0.5)
+    expect_min_gte(doGetBG(avgSpectraParams = getDefAvgPListParams(minAbundanceAbs = 50, topMost = 25))$abundance_abs_spec, 50)
+    expect_min_gte(doGetBG(avgAnalysesParams = getDefAvgPListParams(minAbundanceRel = 0.5, topMost = 25))$abundance_rel_ana, 0.5)
+    expect_min_gte(doGetBG(avgAnalysesParams = getDefAvgPListParams(minAbundanceAbs = 2, topMost = 25))$abundance_abs_ana, 2)
 })

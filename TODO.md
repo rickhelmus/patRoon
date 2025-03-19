@@ -136,7 +136,6 @@
 - Feat Ann
     - IDL filter and filtering annSim, annSimForm, annSimBoth
     - annSim: jaccard (as was done for suspects)
-    - getBGMSMSPeaks()
     - MSPL
         - new spec averaging params: add IMS
         - more extensively test filters/summing/averaging
@@ -144,7 +143,6 @@
             - also mixed bbCID/PASEF file (ie with different segments)
             - are m/z ranges always present?
         - see if current default abundance threshold is fine
-        - new filters: removeMZs, MSLevel, maxMZOverPrec, abundances
 
 - TPs
     - TP components

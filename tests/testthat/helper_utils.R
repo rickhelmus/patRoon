@@ -289,6 +289,9 @@ expect_gt_or_zero <- function(object, expected)
     invisible(act$val)
 }
 
+expect_min_gte <- function(x, thr, na.rm = FALSE) expect_gte(min(x, na.rm = na.rm), thr)
+expect_max_lt <- function(x, thr, na.rm = FALSE) expect_lt(max(x, na.rm = na.rm), thr)
+
 expect_known_show <- function(object, file)
 {
     act <- quasi_label(rlang::enquo(object))

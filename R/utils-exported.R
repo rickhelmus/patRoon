@@ -455,7 +455,7 @@ getEICs <- function(analysisInfo, ranges, output = "fill", minIntensityIMS = 25)
 getBGMSMSPeaks <- function(anaInfo, replicates = NULL, MSLevel = 2, retentionRange = NULL, mobilityRange = NULL,
                            minBPIntensity = 5000,
                            avgSpectraParams = getDefAvgPListParams(minAbundanceRel = 0.1, topMost = 25),
-                           avgAnalysesParams = getDefAvgPListParams(minAbundanceAbs = 0.8, topMost = 25))
+                           avgAnalysesParams = getDefAvgPListParams(minAbundanceRel = 0.8, topMost = 25))
 {
     ac <- checkmate::makeAssertCollection()
     anaInfo <- assertAndPrepareAnaInfo(anaInfo, add = ac)
@@ -513,6 +513,8 @@ getBGMSMSPeaks <- function(anaInfo, replicates = NULL, MSLevel = 2, retentionRan
                               avgAnalysesParams$minAbundanceRel, avgAnalysesParams$minAbundanceAbs,
                               avgAnalysesParams$method, FALSE, FALSE, FALSE, FALSE)[[1]]
     ret[, precursor := NULL]
+    setnames(ret, c("abundance_rel", "abundance_abs", "abundance_prev_rel", "abundance_prev_abs"),
+             c("abundance_rel_ana", "abundance_abs_ana", "abundance_rel_spec", "abundance_abs_spec"))
     printf("Done!\n")
     
     return(ret[])

@@ -149,7 +149,6 @@
         - also filter methods
         - comp method: TPsRef, fGroupsComps, min... thresholds
     - verify TP retDirs?
-    - run CTS tests
 - msdata
     - new verifyFileForFormat() usage in convertMSFiles()
     - file conversion?

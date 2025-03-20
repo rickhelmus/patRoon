@@ -48,10 +48,10 @@ if (doCTS)
     TPsCTSEmpty <- generateTPs("cts", fGroupsScrEmpty, "photolysis_unranked")
 
 doMetFrag <- TRUE # !is.null(getOption("patRoon.path.MetFragCL")) && nzchar(getOption("patRoon.path.MetFragCL"))
+plists <- generateMSPeakLists(fGroups)
 
 if (doMetFrag)
 {
-    plists <- generateMSPeakLists(fGroups)
     plistsEmpty <- plists[FALSE, reAverage = TRUE]
     plistsEmptyMS <- removeMSPlists(plists, "MS")
     
@@ -67,6 +67,12 @@ if (doMetFrag)
     }
 }
 
+formsGF <- doGenForms(fGroups, plists, "genform")
+TPsAnnFormSusp <- generateTPs("ann_form", suspL, formsGF)
+TPsAnnFormScr <- generateTPs("ann_form", fGroups, formsGF)
+TPsAnnFormEmpty <- generateTPs("ann_form", fGroupsScrEmpty, formsGF)
+TPsAnnFormEmpty2 <- generateTPs("ann_form", fGroups, delete(formsGF))
+
 test_that("verify TP generation", {
     expect_known_value(TPsLogic, testFile("tp-logic"))
     expect_known_value(TPsLibPC, testFile("tp-lib_pc"))
@@ -78,6 +84,8 @@ test_that("verify TP generation", {
     expect_known_value(TPsLibFormScr, testFile("tp-lib_form_scr"))
     expect_known_value(TPsBTSusp, testFile("tp-bt_susp"))
     expect_known_value(TPsBTScr, testFile("tp-bt_scr"))
+    expect_known_value(TPsAnnFormSusp, testFile("tp-ann_form_susp"))
+    expect_known_value(TPsAnnFormScr, testFile("tp-ann_form_scr"))
     
     expect_known_show(TPsLogic, testFile("tp-logic", text = TRUE))
     expect_known_show(TPsLibPC, testFile("tp-lib_pc", text = TRUE))
@@ -85,6 +93,8 @@ test_that("verify TP generation", {
     expect_known_show(TPsLibScr, testFile("tp-lib_scr", text = TRUE))
     expect_known_show(TPsBTSusp, testFile("tp-bt_susp", text = TRUE))
     expect_known_show(TPsBTScr, testFile("tp-bt_scr", text = TRUE))
+    expect_known_show(TPsAnnFormSusp, testFile("tp-ann_form_susp", text = TRUE))
+    expect_known_show(TPsAnnFormScr, testFile("tp-ann_form_scr", text = TRUE))
     
     expect_setequal(parents(TPsLogic)$name, names(fGroups))
     checkmate::expect_names(names(parents(TPsLogic)), permutation.of = c("name", "rt", "neutralMass"))
@@ -106,11 +116,25 @@ test_that("verify TP generation", {
     checkmate::expect_names(parents(TPsBTScr)$name, subset.of = screenInfo(fGroups)$name)
     checkmate::expect_names(names(parents(TPsBTSusp)), must.include = c("name", "SMILES", "InChI", "InChIKey",
                                                                         "formula", "neutralMass"))
+
+    checkmate::expect_names(parents(TPsAnnFormSusp)$name, subset.of = suspL$name)
+    checkmate::expect_names(parents(TPsAnnFormScr)$name, subset.of = screenInfo(fGroups)$name)
+    checkmate::expect_names(names(parents(TPsAnnFormSusp)), must.include = c("name", "SMILES", "InChI", "InChIKey",
+                                                                             "formula", "neutralMass"))
+    checkmate::expect_names(names(as.data.table(TPsAnnFormSusp)),
+                            must.include = c("group", "name", "ID", "parent_ID", "chem_ID", "generation", "formula",
+                                             "annSim", "fitFormula", "TPScore"))
+    expect_range(as.data.table(TPsAnnFormSusp)$annSim, c(0, 1))
+    expect_range(as.data.table(TPsAnnFormSusp)$fitFormula, c(0, 1))
+    expect_range(as.data.table(TPsAnnFormSusp)$TPScore, c(0, 2))
+    expect_min_gte(as.data.table(generateTPs("ann_form", fGroups, formsGF, minFitFormula = 0.8))$fitFormula, 0.8)
     
     expect_length(TPsLogicEmpty, 0)
     expect_length(TPsLibEmpty, 0)
     expect_length(TPsLibFormEmpty, 0)
     expect_length(TPsBTEmpty, 0)
+    expect_length(TPsAnnFormEmpty, 0)
+    expect_length(TPsAnnFormEmpty2, 0)
     
     skip_if_not(doMetFrag)
 
@@ -206,6 +230,15 @@ test_that("basic usage", {
                               by = c("formula", "parent")), 0)
     expect_gte(min(as.data.table(filter(TPsBTSuspMore, minSimilarity = 0.5))$similarity), 0.5)
     expect_lt(max(as.data.table(filter(TPsBTSuspMore, minSimilarity = 0.5, negate = TRUE))$similarity), 0.5)
+    expect_min_gte(as.data.table(filter(TPsAnnFormSusp, minFitFormula = 0.8))$fitFormula, 0.8)
+    expect_max_lt(as.data.table(filter(TPsAnnFormSusp, minFitFormula = 0.8, negate = TRUE))$fitFormula, 0.8)
+    expect_min_gte(as.data.table(filter(TPsAnnFormSusp, minTPScore = 1.2))$TPScore, 1.2)
+    expect_max_lt(as.data.table(filter(TPsAnnFormSusp, minTPScore = 1.2, negate = TRUE))$TPScore, 1.2)
+    expect_max_lte(sapply(products(filter(TPsAnnFormSusp, topMost = 3)), \(x) x[, .N, by = "group"][[2]]), 3)
+    expect_max_gt(sapply(products(filter(TPsAnnFormSusp, topMost = 1, negate = TRUE)), \(x) x[, .N, by = "group"][[2]]), 2)
+    expect_setequal(TPsAnnFormSusp[[1]]$name,
+                    union(filter(TPsAnnFormSusp, topMost = 3)[[1]]$name,
+                          filter(TPsAnnFormSusp, topMost = 3, negate = TRUE)[[1]]$name))
     
     skip_if_not(doMetFrag)
     
@@ -298,6 +331,8 @@ componTPsLogic <- generateComponents(fGroupsTPsLogic, "tp", TPs = TPsLogicMore)
 fGroupsMoreScr <- doScreen(fGroupsMore, convertToSuspects(TPsBTSusp, includeParents = TRUE), onlyHits = TRUE)
 componTPsBT <- generateComponents(fGroupsMoreScr, "tp", TPs = TPsBTSusp)
 
+componTPsAnnForm <- generateComponents(fGroups, "tp", TPs = TPsAnnFormSusp)
+
 if (doCTS)
     componTPsCTS <- generateComponents(fGroupsMoreScr, "tp", TPs = TPsCTSSusp)
 
@@ -320,12 +355,14 @@ test_that("TP componentization", {
     expect_known_value(componTPsLib, testFile("tp-compon-lib"))
     expect_known_value(componTPsLibForm, testFile("tp-compon-lib_form"))
     expect_known_value(componTPsBT, testFile("tp-compon-bt"))
+    expect_known_value(componTPsAnnForm, testFile("tp-compon-ann_form"))
     
     expect_known_show(componTPsNone, testFile("tp-compon-none", text = TRUE))
     expect_known_show(componTPsLogic, testFile("tp-compon-logic", text = TRUE))
     expect_known_show(componTPsLib, testFile("tp-compon-lib", text = TRUE))
     expect_known_show(componTPsLibForm, testFile("tp-compon-lib_form", text = TRUE))
     expect_known_show(componTPsBT, testFile("tp-compon-bt", text = TRUE))
+    expect_known_show(componTPsAnnForm, testFile("tp-compon-ann_form", text = TRUE))
     
     expect_equal(nrow(as.data.table(componTPsNone)), length(groupNames(componTPsNone))^2)
     expect_length(intersect(componentInfo(componTPsNoneTPDiff)$parent_group, groupNames(componTPsNoneTPDiff)), 0)
@@ -344,6 +381,9 @@ test_that("TP componentization", {
     expect_length(generateComponents(fGroups, "tp", TPs = TPsLogicEmpty), 0)
     expect_length(generateComponents(fGroupsScrEmpty, "tp", TPs = TPsLogicEmpty), 0)
     expect_length(generateComponents(fGroupsEmpty, "tp", TPs = NULL), 0)
+
+    checkmate::expect_names(names(as.data.table(componTPsAnnForm, candidates = TRUE)),
+                            must.include = c("fitFormula", "annSim", "TPScore"))
     
     skip_if_not(doMetFrag)
     

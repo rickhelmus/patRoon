@@ -143,8 +143,6 @@
         - see if current default abundance threshold is fine
 
 - TPs
-    - TP components
-        - candidates arg for ADT
     - ann TPs
         - also filter methods
         - comp method: TPsRef, fGroupsComps, min... thresholds
@@ -264,7 +262,9 @@
         - ann_comp/ann_form algos
         - forceCalcRetDir: only relevant for library atm, clearly mention its use in genTPsLib docs
         - TPStructParams: all parameters, explain when logPs are calculated (ie if both parent/TP is absent)
-        - TPsComp/TPsForm: filter()
+        - TPsComp/TPsForm
+            - filter()
+            - mention that suspect list parents are not filtered out from candidate list
         - parallel=T is only useful with many candidates
     - compoundsLibrary: mention that libMatch == annSim
     - plotVenn()/overlap()/unique(): update for removal of sets arg, give examples with aggregate

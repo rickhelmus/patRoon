@@ -239,7 +239,9 @@ setMethod("as.data.table", "featureAnnotations", function(x, fGroups = NULL, fra
     
     if (!is.null(fGroups))
     {
-        ret[, c("ret", "group_mz") := groupInfo(fGroups)[match(ret$group, group), c("ret", "mz"), with = FALSE]]
+        gInfo <- groupInfo(fGroups)
+        mt <- match(ret$group, gInfo$group)
+        ret[, c("ret", "group_mz") := gInfo[mt, c("ret", "mz"), with = FALSE]]
         setcolorder(ret, c("group", "ret", "group_mz"))
     }
     

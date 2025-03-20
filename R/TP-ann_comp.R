@@ -85,6 +85,13 @@ setMethod("linkTPsToFGroups", "transformationProductsAnnComp", function(TPs, fGr
 getTPsCompounds <- function(annTable, parentRow, TPStructParams, extraOptsFMCSR, simSusps, minRTDiff,
                             minFitFormula, minFitCompound, minSimSusp, minFitCompOrSimSusp, neutralizeTPs, parallel)
 {
+    if (nrow(annTable) == 0)
+        return(data.table(group = character(), name = character(), ID = integer(), parent_ID = integer(),
+                          chem_ID = integer(), generation = integer(), compoundName = character(), SMILES = character(),
+                          InChI = character(), InChIKey = character(), formula = character(), annSim = numeric(),
+                          fitFormula = numeric(), fitCompound = numeric(), simSusp = numeric(),
+                          simSuspSMILES = numeric(), "simSuspInChI", simSuspInChIKey = numeric(), TPScore = numeric()))
+    
     tab <- copy(annTable)
     setnames(tab, "neutral_formula", "formula")
     

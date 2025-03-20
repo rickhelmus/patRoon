@@ -50,6 +50,12 @@ if (doCTS)
 doMetFrag <- TRUE # !is.null(getOption("patRoon.path.MetFragCL")) && nzchar(getOption("patRoon.path.MetFragCL"))
 plists <- generateMSPeakLists(fGroups)
 
+formsGF <- doGenForms(fGroups, plists, "genform")
+TPsAnnFormSusp <- generateTPs("ann_form", suspL, formsGF)
+TPsAnnFormScr <- generateTPs("ann_form", fGroups, formsGF)
+TPsAnnFormEmpty <- generateTPs("ann_form", fGroupsScrEmpty, formsGF)
+TPsAnnFormEmpty2 <- generateTPs("ann_form", fGroups, delete(formsGF))
+
 if (doMetFrag)
 {
     plistsEmpty <- plists[FALSE, reAverage = TRUE]
@@ -65,13 +71,12 @@ if (doMetFrag)
         TPsCTSComp <- generateTPs("cts", compsMF, "photolysis_unranked")
         TPsCTSCompEmpty <- generateTPs("cts", delete(compsMF), "photolysis_unranked")
     }
+    TPsAnnCompSusp <- generateTPs("ann_comp", suspL, compsMF)
+    TPsAnnCompScr <- generateTPs("ann_comp", fGroups, compsMF)
+    TPsAnnCompScrMFCOS <- generateTPs("ann_comp", fGroups, compsMF, TPsRef = TPsBTScr, minFitCompOrSimSusp = c(0.6, 0.8))
+    TPsAnnCompEmpty <- generateTPs("ann_comp", fGroupsScrEmpty, compsMF)
+    TPsAnnCompEmpty2 <- generateTPs("ann_comp", fGroups, delete(compsMF))
 }
-
-formsGF <- doGenForms(fGroups, plists, "genform")
-TPsAnnFormSusp <- generateTPs("ann_form", suspL, formsGF)
-TPsAnnFormScr <- generateTPs("ann_form", fGroups, formsGF)
-TPsAnnFormEmpty <- generateTPs("ann_form", fGroupsScrEmpty, formsGF)
-TPsAnnFormEmpty2 <- generateTPs("ann_form", fGroups, delete(formsGF))
 
 test_that("verify TP generation", {
     expect_known_value(TPsLogic, testFile("tp-logic"))
@@ -86,6 +91,8 @@ test_that("verify TP generation", {
     expect_known_value(TPsBTScr, testFile("tp-bt_scr"))
     expect_known_value(TPsAnnFormSusp, testFile("tp-ann_form_susp"))
     expect_known_value(TPsAnnFormScr, testFile("tp-ann_form_scr"))
+    expect_known_value(TPsAnnCompSusp, testFile("tp-ann_comp_susp"))
+    expect_known_value(TPsAnnCompScr, testFile("tp-ann_comp_scr"))
     
     expect_known_show(TPsLogic, testFile("tp-logic", text = TRUE))
     expect_known_show(TPsLibPC, testFile("tp-lib_pc", text = TRUE))
@@ -95,6 +102,8 @@ test_that("verify TP generation", {
     expect_known_show(TPsBTScr, testFile("tp-bt_scr", text = TRUE))
     expect_known_show(TPsAnnFormSusp, testFile("tp-ann_form_susp", text = TRUE))
     expect_known_show(TPsAnnFormScr, testFile("tp-ann_form_scr", text = TRUE))
+    expect_known_show(TPsAnnCompSusp, testFile("tp-ann_comp_susp", text = TRUE))
+    expect_known_show(TPsAnnCompScr, testFile("tp-ann_comp_scr", text = TRUE))
     
     expect_setequal(parents(TPsLogic)$name, names(fGroups))
     checkmate::expect_names(names(parents(TPsLogic)), permutation.of = c("name", "rt", "neutralMass"))
@@ -128,7 +137,7 @@ test_that("verify TP generation", {
     expect_range(as.data.table(TPsAnnFormSusp)$fitFormula, c(0, 1))
     expect_range(as.data.table(TPsAnnFormSusp)$TPScore, c(0, 2))
     expect_min_gte(as.data.table(generateTPs("ann_form", fGroups, formsGF, minFitFormula = 0.8))$fitFormula, 0.8)
-    
+
     expect_length(TPsLogicEmpty, 0)
     expect_length(TPsLibEmpty, 0)
     expect_length(TPsLibFormEmpty, 0)
@@ -147,6 +156,24 @@ test_that("verify TP generation", {
     checkmate::expect_names(parents(TPsBTComp)$name, subset.of = as.data.table(compsMF)$identifier)
     expect_length(TPsLibCompEmpty, 0)
     expect_length(TPsBTCompEmpty, 0)
+
+    checkmate::expect_names(parents(TPsAnnCompSusp)$name, subset.of = suspL$name)
+    checkmate::expect_names(parents(TPsAnnCompScr)$name, subset.of = screenInfo(fGroups)$name)
+    checkmate::expect_names(names(parents(TPsAnnCompSusp)), must.include = c("name", "SMILES", "InChI", "InChIKey",
+                                                                             "formula", "neutralMass"))
+    checkmate::expect_names(names(as.data.table(TPsAnnCompSusp)),
+                            must.include = c("group", "name", "ID", "parent_ID", "chem_ID", "generation", "formula",
+                                             "annSim", "fitFormula", "TPScore"))
+    expect_range(as.data.table(TPsAnnCompSusp)$annSim, c(0, 1))
+    expect_range(as.data.table(TPsAnnCompSusp)$fitFormula, c(0, 1))
+    expect_range(as.data.table(TPsAnnCompSusp)$TPScore, c(0, 2))
+    expect_min_gte(as.data.table(generateTPs("ann_comp", fGroups, compsMF, minFitFormula = 0.8))$fitFormula, 0.8)
+    expect_min_gte(as.data.table(generateTPs("ann_comp", fGroups, compsMF, minFitCompound = 0.8))$fitCompound, 0.8)
+    expect_min_gte(as.data.table(generateTPs("ann_comp", fGroups, compsMF, TPsRef = TPsBTScr, minSimSusp = 0.8))$simSusp, 0.8)
+    expect_true(all(as.data.table(TPsAnnCompScrMFCOS)$fitCompound >= 0.6 | as.data.table(TPsAnnCompScrMFCOS)$simSusp >= 0.8))
+    expect_lt(length(generateTPs("ann_comp", fGroups, compsMF, fGroupsComps = fGroups)), length(TPsAnnCompScr))
+    expect_length(TPsAnnCompEmpty, 0)
+    expect_length(TPsAnnCompEmpty2, 0)
     
     skip_if_not(doCTS)
     expect_known_value(TPsCTSSusp, testFile("tp-cts_susp"))
@@ -184,6 +211,8 @@ testMFDB <- function(TPs)
 TPsBTSuspFPI <- filter(TPsBTSuspMore, removeParentIsomers = TRUE)
 TPsBTSuspFPIN <- filter(TPsBTSuspMore, removeParentIsomers = TRUE, negate = TRUE)
 pnames <- parents(TPsLogic)$name
+TPsAnnCompFiltMFCOS <- if (doMetFrag) filter(TPsAnnCompSusp, minFitCompOrSimSusp = c(0.6, 0.8))
+
 test_that("basic usage", {
     expect_length(TPsLogic["nope"], 0)
     expect_equivalent(names(TPsLogic[1:2]), pnames[1:2])
@@ -230,6 +259,7 @@ test_that("basic usage", {
                               by = c("formula", "parent")), 0)
     expect_gte(min(as.data.table(filter(TPsBTSuspMore, minSimilarity = 0.5))$similarity), 0.5)
     expect_lt(max(as.data.table(filter(TPsBTSuspMore, minSimilarity = 0.5, negate = TRUE))$similarity), 0.5)
+    
     expect_min_gte(as.data.table(filter(TPsAnnFormSusp, minFitFormula = 0.8))$fitFormula, 0.8)
     expect_max_lt(as.data.table(filter(TPsAnnFormSusp, minFitFormula = 0.8, negate = TRUE))$fitFormula, 0.8)
     expect_min_gte(as.data.table(filter(TPsAnnFormSusp, minTPScore = 1.2))$TPScore, 1.2)
@@ -246,7 +276,23 @@ test_that("basic usage", {
     expect_error(assertSusp(convertToSuspects(TPsBTComp, includeParents = TRUE)), NA)
     testMFDB(TPsLibComp)
     testMFDB(TPsBTComp)
-    
+
+    expect_min_gte(as.data.table(filter(TPsAnnCompSusp, minFitFormula = 0.9))$fitFormula, 0.9)
+    expect_max_lt(as.data.table(filter(TPsAnnCompSusp, minFitFormula = 0.9, negate = TRUE))$fitFormula, 0.9)
+    expect_min_gte(as.data.table(filter(TPsAnnCompSusp, minFitCompound = 0.8))$fitCompound, 0.8)
+    expect_max_lt(as.data.table(filter(TPsAnnCompSusp, minFitCompound = 0.8, negate = TRUE))$fitCompound, 0.8)
+    expect_min_gte(as.data.table(filter(TPsAnnCompScrMFCOS, minSimSusp = 0.9))$simSusp, 0.9)
+    expect_max_lt(as.data.table(filter(TPsAnnCompScrMFCOS, minSimSusp = 0.8, negate = TRUE))$simSusp, 0.8)
+    expect_true(all(as.data.table(TPsAnnCompFiltMFCOS)[, fitCompound >= 0.6 | is.na(simSusp) | simSusp >= 0.8]))
+    expect_min_gte(as.data.table(filter(TPsAnnCompSusp, minTPScore = 1.2))$TPScore, 1.2)
+    expect_max_lt(as.data.table(filter(TPsAnnCompSusp, minTPScore = 1.2, negate = TRUE))$TPScore, 1.2)
+    # we cannot do the topMost tests as there are only 1 candidate/fGroup --> rely on formula tests which uses the same code
+    # expect_max_lte(sapply(products(filter(TPsAnnCompSusp, topMost = 3)), \(x) x[, .N, by = "group"][[2]]), 3)
+    # expect_max_gt(sapply(products(filter(TPsAnnCompSusp, topMost = 1, negate = TRUE)), \(x) x[, .N, by = "group"][[2]]), 2)
+    # expect_setequal(TPsAnnCompSusp[[1]]$name,
+    #                 union(filter(TPsAnnCompSusp, topMost = 3)[[1]]$name,
+    #                       filter(TPsAnnCompSusp, topMost = 3, negate = TRUE)[[1]]$name))
+        
     skip_if_not(doCTS)
     expect_error(assertSusp(convertToSuspects(TPsCTSSusp, includeParents = TRUE)), NA)
     testMFDB(TPsCTSSusp)
@@ -347,6 +393,8 @@ if (doMetFrag)
     componTPsAnn <- generateComponents(fGroupsAnn, "tp", TPs = TPsLibSusp, MSPeakLists = plistsAnn, formulas = formsAnn,
                                        compounds = compsAnn)
     componTPsAnnPL <- generateComponents(fGroupsAnn, "tp", TPs = TPsLibSusp, MSPeakLists = plistsAnn)
+    
+    componTPsAnnComp <- generateComponents(fGroups, "tp", TPs = TPsAnnCompScrMFCOS)
 }
 
 test_that("TP componentization", {
@@ -389,9 +437,11 @@ test_that("TP componentization", {
     
     expect_known_value(componTPsAnn, testFile("tp-compon-ann"))
     expect_known_value(componTPsAnnPL, testFile("tp-compon-ann_pl"))
+    expect_known_value(componTPsAnnComp, testFile("tp-compon-ann_comp"))
     
     expect_known_show(componTPsAnn, testFile("tp-compon-ann", text = TRUE))
     expect_known_show(componTPsAnnPL, testFile("tp-compon-ann_pl", text = TRUE))
+    expect_known_show(componTPsAnnComp, testFile("tp-compon-ann_comp", text = TRUE))
     
     checkmate::expect_names(names(as.data.table(componTPsAnn)), must.include = c("specSimilarity", "specSimilarityPrec",
                                                                                  "specSimilarityBoth",
@@ -407,7 +457,10 @@ test_that("TP componentization", {
     
     expect_error(generateComponents(fGroupsMore[, 1:50], "tp", TPs = NULL, MSPeakLists = plistsEmpty), NA)
     expect_error(generateComponents(fGroupsMore[, 1:50], "tp", TPs = NULL, MSPeakLists = plistsEmptyMS), NA)
-    
+
+    checkmate::expect_names(names(as.data.table(componTPsAnnComp, candidates = TRUE)),
+                            must.include = c("fitFormula", "fitCompound", "simSusp", "annSim", "TPScore"))
+        
     skip_if_not(doCTS)
     expect_known_value(componTPsCTS, testFile("tp-compon-cts"))
     expect_known_show(componTPsCTS, testFile("tp-compon-cts", text = TRUE))

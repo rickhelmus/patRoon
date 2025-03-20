@@ -291,6 +291,7 @@ expect_gt_or_zero <- function(object, expected)
 
 expect_min_gte <- function(x, thr, na.rm = FALSE) expect_gte(min(x, na.rm = na.rm), thr)
 expect_max_lte <- function(x, thr, na.rm = FALSE) expect_lte(max(x, na.rm = na.rm), thr)
+expect_max_gt <- function(x, thr, na.rm = FALSE) expect_gt(max(x, na.rm = na.rm), thr)
 expect_max_lt <- function(x, thr, na.rm = FALSE) expect_lt(max(x, na.rm = na.rm), thr)
 
 expect_known_show <- function(object, file)

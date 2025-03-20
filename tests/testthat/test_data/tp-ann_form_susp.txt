@@ -1,0 +1,1 @@
+A transformationProductsAnnForm objectHierarchy:transformationProductsFormula    |-- transformationProductsAnnForm---Algorithm: ann_formParents: DEET, 1H-benzotriazole, Chloridazon, Diuron, Fluometuron, Linuron, ... (9 total)Total TPs: 225

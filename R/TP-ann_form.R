@@ -74,8 +74,14 @@ setMethod("linkTPsToFGroups", "transformationProductsAnnForm", function(TPs, fGr
 
 
 # NOTE: this function is called by a withProg() block, so handles progression updates
+# NOTE: parGroup may be NULL, eg when parents are from a suspect list
 getTPsFormulas <- function(annTable, parName, parFormula, minFitFormula)
 {
+    if (nrow(annTable) == 0)
+        return(data.table(group = character(), name = character(), ID = integer(), parent_ID = integer(),
+                           chem_ID = integer(), generation = integer(), formula = character(), annSim = numeric(),
+                           fitFormula = numeric(), TPScore = numeric()))
+    
     tab <- copy(annTable)
     setnames(tab, "neutral_formula", "formula")
     
@@ -120,7 +126,7 @@ generateTPsAnnForm <- function(parents, formulas, minFitFormula = 0, skipInvalid
            fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
-    parents <- getTPParents(parents, skipInvalid, prefCalcChemProps, neutralChemProps)
+    parents <- getTPParents(parents, skipInvalid, prefCalcChemProps, neutralChemProps, "formula")
     
     if (nrow(parents) == 0)
         results <- list()
@@ -132,10 +138,10 @@ generateTPsAnnForm <- function(parents, formulas, minFitFormula = 0, skipInvalid
         parsSplit <- split(parents, seq_len(nrow(parents)))
         names(parsSplit) <- parents$name
         
-        baseHash <- makeHash(formulas)
+        baseHash <- makeHash(formulas, minFitFormula)
         setHash <- makeHash(parents, baseHash)
         cachedSet <- loadCacheSet("TPsAnnForm", setHash, cacheDB)
-        hashes <- sapply(parsSplit, function(par) makeHash(baseHash, par[, c("name", "SMILES", "formula")],
+        hashes <- sapply(parsSplit, function(par) makeHash(baseHash, par[, c("name", "formula")],
                                                            with = FALSE))
         cachedResults <- pruneList(sapply(hashes, function(h)
         {

@@ -11,6 +11,7 @@
 * MSP MS libraries: don't be case sensitive when checking the "Num Peaks" field (Bas van de Velde)
 * Small fixes in example code from the Handbook (reported by Boris Droz and Jan Specker)
 * Changed cache for filtering of feature groups to reduce cache size (#98)
+* Updated PubChem Transformations to 0.2.0
 
 
 # patRoon 2.3.3

@@ -11,7 +11,7 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
 {
     ret <- list()
     
-    cat("Genarate summary plots...")
+    cat("Generate summary plots...")
     
     ret$overview$chroms <- makeHTMLReportPlot("chroms", outPath, "plotChroms",
                                               list(fGroups, retMin = settings$features$retMin, EICs = EICs,

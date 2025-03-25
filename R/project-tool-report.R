@@ -22,8 +22,16 @@ newProjectReportServer <- function(id, settings)
     moduleServer(id, function(input, output, session)
     {
         list(
-            reportGen = reactive(input$reportGen),
-            reportLegacy = reactive(input$reportLegacy)
+            valid = reactive({
+                if ("legacy" %in% input$reportGen && length(input$reportLegacy) == 0)
+                    list(title = "Invalid report settings", msg = "Please select at least one report format!")
+                else
+                    TRUE
+            }),
+            settings = reactive(list(
+                reportGen = input$reportGen,
+                reportLegacy = input$reportLegacy
+            ))
         )
     })
 }

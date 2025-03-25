@@ -52,21 +52,20 @@ newProjectPreTreatServer <- function(id, ionization, settings)
         return(paste0(tf[[1]][1], " (", tf[[1]][2], ")"))
     }
     
-    MSConvSettings <- list(
-        steps = data.table(algorithm = character(0), from = character(0), to = character(0)),
-        output = list(centroid = file.path("converted", "centroid"), profile = file.path("converted", "profile"),
-                      ims = file.path("converted", "ims")),
-        brukerCalib <- list(enabled = FALSE, method = "", methodPos = "", methodNeg = "")
-    )
-    
     moduleServer(id, function(input, output, session)
     {
-        rValues <- reactiveValues(triggerMSConvHOTUpdate = 0)
+        rValues <- reactiveValues(
+            triggerMSConvHOTUpdate = 0,
+            steps = data.table(algorithm = character(0), from = character(0), to = character(0)),
+            output = list(centroid = file.path("converted", "centroid"), profile = file.path("converted", "profile"),
+                          ims = file.path("converted", "ims")),
+            brukerCalib = list(enabled = FALSE, method = "", methodPos = "", methodNeg = "")
+        )
         
         makeMSConversionHOT <- function()
         {
             rValues$triggerMSConvHOTUpdate
-            tab <- copy(MSConvSettings$steps)
+            tab <- isolate(copy(rValues$steps))
             tab[, from := sapply(from, convTypeFormatToLabel)]
             tab[, to := sapply(to, convTypeFormatToLabel)]
             makeNewProjectHOT(tab, height = 250, maxRows = nrow(tab), columnSorting = FALSE)
@@ -75,7 +74,7 @@ newProjectPreTreatServer <- function(id, ionization, settings)
         {
             # NOTE: assume selection is a block range
             sel <- input$MSConversionHOT_select$select$rAll
-            MSConvSettings$steps <<- moveSelectedTabRows(dir, sel, MSConvSettings$steps)
+            rValues$steps <- moveSelectedTabRows(dir, sel, rValues$steps)
             triggerMSConvHOTUpdate()
             moveHOTSel(session, dir, sel, ns("MSConversionHOT"))
         }
@@ -94,6 +93,7 @@ newProjectPreTreatServer <- function(id, ionization, settings)
             if (!is.null(dm))
                 updateTextInput(session, inputName, value = dm)
         }
+        
         triggerMSConvHOTUpdate <- function() rValues$triggerMSConvHOTUpdate <- rValues$triggerMSConvHOTUpdate + 1
         
         observeEvent(input$addMSConversion, {
@@ -134,10 +134,10 @@ newProjectPreTreatServer <- function(id, ionization, settings)
                     height = 275,
                     width = 400,
                     fileSelect(ns("MSConvOutputCentroid"), ns("MSConvOutputCentroidButton"), "Centroid",
-                               MSConvSettings$output$centroid),
+                               rValues$output$centroid),
                     fileSelect(ns("MSConvOutputProfile"), ns("MSConvOutputProfileButton"), "Profile",
-                               MSConvSettings$output$profile),
-                    fileSelect(ns("MSConvOutputIMS"), ns("MSConvOutputIMSButton"), "IMS", MSConvSettings$output$ims),
+                               rValues$output$profile),
+                    fileSelect(ns("MSConvOutputIMS"), ns("MSConvOutputIMSButton"), "IMS", rValues$output$ims),
                     fillCol(
                         height = 25,
                         textNote("Relative paths are relative to the project directory.")
@@ -164,7 +164,7 @@ newProjectPreTreatServer <- function(id, ionization, settings)
                     fillCol(
                         height = 50,
                         checkboxInput(ns("doBrukerCalib"), "Perform m/z re-calibration",
-                                      value = MSConvSettings$brukerCalib$enabled)
+                                      value = rValues$brukerCalib$enabled)
                     ),
                     conditionalPanel(
                         condition = "input.doBrukerCalib",
@@ -179,7 +179,7 @@ newProjectPreTreatServer <- function(id, ionization, settings)
                                     condition = "output.ionization != \"both\"",
                                     ns = ns,
                                     fileSelect(ns("DAMethod"), ns("DAMethodButton"), "DataAnalysis method",
-                                               MSConvSettings$brukerCalib$method),
+                                               rValues$brukerCalib$method),
                                 ),
                                 conditionalPanel(
                                     condition = "output.ionization == \"both\"",
@@ -189,13 +189,13 @@ newProjectPreTreatServer <- function(id, ionization, settings)
                                             width = "95%",
                                             fileSelect(ns("DAMethodPos"), ns("DAMethodButtonPos"),
                                                        "DataAnalysis method (positive)",
-                                                       MSConvSettings$brukerCalib$methodPos)
+                                                       rValues$brukerCalib$methodPos)
                                         ),
                                         fillCol(
                                             width = "95%",
                                             fileSelect(ns("DAMethodNeg"), ns("DAMethodButtonNeg"),
                                                        "DataAnalysis method (negative)",
-                                                       MSConvSettings$brukerCalib$methodNeg)
+                                                       rValues$brukerCalib$methodNeg)
                                         )
                                     )
                                 )
@@ -227,8 +227,8 @@ newProjectPreTreatServer <- function(id, ionization, settings)
         observeEvent(input$DAMethodButtonNeg, selectDAMethod("DAMethodNeg"))
         observeEvent(input$addMSConversionOK, {
             removeModal()
-            MSConvSettings$steps <<- rbind(MSConvSettings$steps, data.table(algorithm = input$convAlgo, from = input$convFrom,
-                                                                            to = input$convTo))
+            rValues$steps <- rbind(rValues$steps, data.table(algorithm = input$convAlgo, from = input$convFrom,
+                                                             to = input$convTo))
             triggerMSConvHOTUpdate()
         })
         observeEvent(input$MSConversionHOT, {
@@ -242,32 +242,41 @@ newProjectPreTreatServer <- function(id, ionization, settings)
         })
         observeEvent(input$MSConversionHOT_select$select$r, {
             sel <- input$MSConversionHOT_select$select$rAll
-            e <- nrow(MSConvSettings$steps) > 0 && length(sel) > 0
+            e <- nrow(rValues$steps) > 0 && length(sel) > 0
             shinyjs::toggleState("removeMSConversionRows", condition = e)
             shinyjs::toggleState("MSConversionRowsUp", condition = e && min(sel) > 1)
-            shinyjs::toggleState("MSConversionRowsDown", condition = e && max(sel) < nrow(MSConvSettings$steps))
+            shinyjs::toggleState("MSConversionRowsDown", condition = e && max(sel) < nrow(rValues$steps))
         })
         observeEvent(input$removeMSConversionRows, {
             sel <- input$MSConversionHOT_select$select$rAll
-            MSConvSettings$steps <<- MSConvSettings$steps[-sel]
+            rValues$steps <- rValues$steps[-sel]
             triggerMSConvHOTUpdate()
         })
         observeEvent(input$MSConversionRowsUp, { moveSelectedConversions("up") })
         observeEvent(input$MSConversionRowsDown, { moveSelectedConversions("down") })
         observeEvent(input$MSConvOutputOK, {
             removeModal()
-            MSConvSettings$output$centroid <<- input$MSConvOutputCentroid
-            MSConvSettings$output$profile <<- input$MSConvOutputProfile
-            MSConvSettings$output$ims <<- input$MSConvOutputIMS
+            rValues$output$centroid <- input$MSConvOutputCentroid
+            rValues$output$profile <- input$MSConvOutputProfile
+            rValues$output$ims <- input$MSConvOutputIMS
         })
         observeEvent(input$brukerCalibOK, {
             removeModal()
-            MSConvSettings$brukerCalib <<- list(enabled = input$doBrukerCalib, method = input$DAMethod,
-                                                methodPos = input$DAMethodPos, methodNeg = input$DAMethodNeg)
+            rValues$brukerCalib <- list(enabled = input$doBrukerCalib, method = input$DAMethod,
+                                        methodPos = input$DAMethodPos, methodNeg = input$DAMethodNeg)
         })
         
         output$MSConversionHOT <- rhandsontable::renderRHandsontable(makeMSConversionHOT())
         
         output <- exportShinyOutputVal(output, "ionization", ionization)
+        
+        list(
+            valid = \() TRUE,
+            settings = reactive(list(
+                steps = rValues$steps,
+                output = rValues$output,
+                brukerCalib = rValues$brukerCalib
+            ))
+        )
     })
 }

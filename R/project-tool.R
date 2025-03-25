@@ -168,92 +168,92 @@ newProject <- function(destPath = NULL)
 
     # UNDONE: warning/message about empty groups
     
+    checkExistingScript <- function(settings)
+    {
+        p <- file.path(settings$destination, settings$scriptFile)
+        return(settings$outputScriptTo == "curFile" || !file.exists(p) ||
+                   rstudioapi::showQuestion("Script file already exists",
+                                            sprintf("Script file already exists: '%s'.\nOverwrite?", p), "Yes", "No"))
+    }
+    
+    checkExistingAnaInfo <- function(settingsGen, settingsAna)
+    {
+        if (settingsAna$generateAnaInfo == "table")
+        {
+            n <- paste0("analysisTableFile", settingsAna$analysisTableFileType)
+            checkAnas <- if (settingsGen$ionization != "both")
+                input[[n]]
+            else
+                input[paste0(n, c("Pos", "Neg"))]
+            for (f in checkAnas)
+            {
+                p <- file.path(settingsGen$destination, f)
+                if (file.exists(p))
+                {
+                    ov <- rstudioapi::showQuestion("Analysis table file already exists",
+                                                   sprintf("Analysis table file already exists: '%s'.\nOverwrite?", p),
+                                                   "Yes", "No")
+                    if (!ov)
+                        return(FALSE)
+                }
+            }
+        }
+        return(TRUE)
+    }
+    
     server <- function(input, output, session)
     {
-        rValues <- reactiveValues(generalSettings = list())
-
-        general <- newProjectGeneralServer("general", reactive(rValues$generalSettings))
-        analyses <- newProjectAnalysesServer("analyses", general$ionization, reactive(rValues$analysesSettings))
-        MSConversion <- newProjectPreTreatServer("pretreat", general$ionization, reactive(rValues$preTreatSettings))
-        features <- newProjectFeaturesServer("features", general$ionization, reactive(rValues$featureSettings))
+        loadedSettings <- reactiveValues(general = list())
+        data <- list()
+        
+        data$general <- newProjectGeneralServer("general", reactive(loadedSettings$general))
+        ionization <- reactive(data$general$settings()$ionization)
+        data$analyses <- newProjectAnalysesServer("analyses", ionization, reactive(loadedSettings$analyses))
+        data$preTreatment <- newProjectPreTreatServer("pretreat", ionization, reactive(loadedSettings$preTreat))
+        data$features <- newProjectFeaturesServer("features", ionization, reactive(loadedSettings$feature))
         hasSusp <- reactive({
-            features$exSuspList() || (general$ionization() != "both" && nzchar(features$suspectList())) ||
-                (general$ionization() == "both" && nzchar(features$suspectListPos()))
+            data$features$settings()$exSuspList || (ionization() != "both" && nzchar(data$features$settings()$suspectList) ||
+                (ionization() == "both" && nzchar(data$features$settings()$suspectListPos)))
         })
-        annotations <- newProjectAnnotationServer("annotation", hasSusp, reactive(rValues$annotationSettings))
-        TPs <- newProjectTPServer("tp", hasSusp, reactive(rValues$TPSettings))
-        report <- newProjectReportServer("report", reactive(rValues$reportSettings))
-
-        verifyAnalysesOK <- function()
+        data$annotations <- newProjectAnnotationServer("annotation", hasSusp, reactive(loadedSettings$annotation))
+        data$TPs <- newProjectTPServer("tp", hasSusp, reactive(loadedSettings$TP))
+        data$report <- newProjectReportServer("report", reactive(loadedSettings$report))
+        
+        validate <- function()
         {
-            verifyAny <- function(pol)
+            for (d in data)
             {
-                if (nrow(anaInfoTabs[[pol]]) == 0 && input$ionization %in% c(pol, "both"))
+                v <- d$valid()
+                if (!isTRUE(v))
                 {
-                    rstudioapi::showDialog("No analyses", paste0("Please select some analyses for ", pol, " mode!"), "")
+                    rstudioapi::showDialog(v$title, v$msg, "")
                     return(FALSE)
                 }
             }
-            verifyAny("positive"); verifyAny("negative")
-
-            if (input$generateAnaInfo == "table")
-            {
-                n <- paste0("analysisTableFile", input$analysisTableFileType)
-                checkAnas <- if (input$ionization != "both")
-                    input[[n]]
-                else
-                    input[paste0(n, c("Pos", "Neg"))]
-                for (f in checkAnas)
-                {
-                    p <- file.path(input$destinationPath, f)
-                    if (file.exists(p))
-                    {
-                        ov <- rstudioapi::showQuestion("Analysis table file already exists",
-                                                       sprintf("Analysis table file already exists: '%s'.\nOverwrite?", p),
-                                                       "Yes", "No")
-                        if (!ov)
-                            return(FALSE)
-                    }
-                }
-            }
-            
             return(TRUE)
         }
         
         observeEvent(input$create, {
-            if (!nzchar(input$destinationPath))
-                rstudioapi::showDialog("Invalid destination", "Please select a destination path!", "")
-            else if (input$outputScriptTo != "curFile" && !nzchar(input$scriptFile))
-                rstudioapi::showDialog("No script file", "Please select a destination script file!", "")
-            else if (input$generateAnaInfo == "table" && !verifyAnalysesOK())
+            if (!validate())
             {}
-            else if (input$outputScriptTo != "curFile" && file.exists(file.path(input$destinationPath, input$scriptFile)) &&
-                     !rstudioapi::showQuestion("Script file already exists",
-                                               sprintf("Script file already exists: '%s'.\nOverwrite?",
-                                                       file.path(input$destinationPath, input$scriptFile)),
-                                               "Yes", "No"))
+            else if (!checkExistingScript(data$general$settings()))
             {}
-            else if (input$compIdent == "Library" && !nzchar(input$MSLibraryPath))
-                rstudioapi::showDialog("No MS library", "Please select an MS library!", "")
-            else if (input$doTPs && input$TPGen != "Logic" && input$TPGenInput == "suspects" &&
-                     !nzchar(input$TPSuspectList))
-                rstudioapi::showDialog("No parent suspect list", "Please select a parent suspect list!", "")
-            else if ("legacy" %in% input$reportGen && length(input$reportLegacy) == 0)
-                rstudioapi::showDialog("No legacy format", "Please select at least one legacy reporting format!", "")
+            else if (!checkExistingAnaInfo(data$general$settings(), data$analyses$settings()))
+            {}
             else
             {
-                doCreateProject(input, anaInfoTabs, MSConvSettings$steps)
+                doCreateProject(input, data$analyses$anaInfoTabs(), data$preTreatment$settings()$steps)
                 stopApp(TRUE)
             }
         })
 
-        observeEvent(general$loadParams(), {
+        observeEvent(data$general$loadParams(), {
             sl <- rstudioapi::selectFile("Select parameter file", filter = "yml files (*.yml)")
             if (!is.null(sl))
                 loadNewProjectParams(sl, input, session)
         })
         
-        observeEvent(input$saveParams, {
+        observeEvent(data$general$saveParams(), {
             sl <- rstudioapi::selectFile("Select parameter file", filter = "yml files (*.yml)", existing = FALSE)
             if (!is.null(sl))
                 saveNewProjectParams(sl, input)

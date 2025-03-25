@@ -97,5 +97,27 @@ newProjectAnnotationServer <- function(id, hasSuspects, settings)
         })
         
         output <- exportShinyOutputVal(output, "hasSuspects", hasSuspects)
+        
+        list(
+            valid = reactive({
+                if (input$compIdent == "Library" && !nzchar(input$MSLibraryPath))
+                    list(title = "No library path", msg = "Please select a library path!")
+                else
+                    TRUE
+            }),
+            settings = reactive(list(
+                components = input$components,
+                selectIons = input$selectIons,
+                formulaGen = input$formulaGen,
+                compIdent = input$compIdent,
+                peakListGen = input$peakListGen,
+                DIA = input$DIA,
+                precursorMzWindow = input$precursorMzWindow,
+                MSLibraryFormat = input$MSLibraryFormat,
+                MSLibraryPath = input$MSLibraryPath,
+                annotateSus = input$annotateSus,
+                genIDLevelFile = input$genIDLevelFile
+            ))
+        )
     })
 }

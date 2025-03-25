@@ -222,18 +222,17 @@ newProjectAnalysesServer <- function(id, ionization, settings)
         return(ai)
     }
     
-    anaInfoTabs <- list(positive = emptyAnaTable(), negative = emptyAnaTable())
-    
     moduleServer(id, function(input, output, session)
     {
         rValues <- reactiveValues(triggerAnaInfoHOTUpdate = 0,
+                                  anaInfoTabs = list(positive = emptyAnaTable(), negative = emptyAnaTable()),
                                   analysisFiles = data.table(analysis = character(), type = character(), path = character()))
         
         makeAnalysesHOT <- function()
         {
             rValues$triggerAnaInfoHOTUpdate
             
-            dt <- copy(anaInfoTabs[[getCurPolarity()]])
+            dt <- isolate(copy(rValues$anaInfoTabs[[getCurPolarity()]]))
             pcols <- getAnaInfoPathCols(dt)
             dt[, type := {
                 p <- unlist(mget(pcols))
@@ -277,7 +276,7 @@ newProjectAnalysesServer <- function(id, ionization, settings)
             # NOTE: assume selection is a block range
             sel <- input$analysesHOT_select$select$rAll
             pol <- getCurPolarity()
-            anaInfoTabs[[pol]] <<- moveSelectedTabRows(dir, sel, anaInfoTabs[[pol]])
+            rValues$anaInfoTabs[[pol]] <- moveSelectedTabRows(dir, sel, rValues$anaInfoTabs[[pol]])
             triggerAnaInfoHOTUpdate()
             moveHOTSel(session, dir, sel, ns("analysesHOT"))
         }
@@ -289,10 +288,10 @@ newProjectAnalysesServer <- function(id, ionization, settings)
                 # sync from table edits
                 dt <- rhandsontable::hot_to_r(input$analysesHOT)
                 pol <- getCurPolarity()
-                ai <- anaInfoTabs[[pol]]
+                ai <- rValues$anaInfoTabs[[pol]]
                 mcols <- c("replicate", "blank", "conc", "norm_conc")
                 ai[, (mcols) := dt[, mcols, with = FALSE]]
-                anaInfoTabs[[pol]] <<- ai
+                rValues$anaInfoTabs[[pol]] <- ai
             }
             else
             {
@@ -305,18 +304,18 @@ newProjectAnalysesServer <- function(id, ionization, settings)
         observeEvent(input$analysesHOT_select$select$r, {
             pol <- getCurPolarity()
             sel <- input$analysesHOT_select$select$rAll
-            e <- nrow(anaInfoTabs[[pol]]) > 0 && length(sel) > 0
+            e <- nrow(rValues$anaInfoTabs[[pol]]) > 0 && length(sel) > 0
             shinyjs::toggleState("removeAnaInfoRows", condition = e)
             shinyjs::toggleState("anaInfoRowsUp", condition = e && min(sel) > 1)
-            shinyjs::toggleState("anaInfoRowsDown", condition = e && max(sel) < nrow(anaInfoTabs[[pol]]))
+            shinyjs::toggleState("anaInfoRowsDown", condition = e && max(sel) < nrow(rValues$anaInfoTabs[[pol]]))
         })
         
         observeEvent(input$setAnaInfoFiles, {
             pol <- getCurPolarity()
-            rValues$analysisFiles <- if (nrow(anaInfoTabs[[pol]]) == 0)
+            rValues$analysisFiles <- if (nrow(rValues$anaInfoTabs[[pol]]) == 0)
                 rValues$analysisFiles[0, ]
             else
-                anaInfoToAnaFiles(anaInfoTabs[[pol]])
+                anaInfoToAnaFiles(rValues$anaInfoTabs[[pol]])
             
             showModal(modalDialog(
                 title = "Select analyses",
@@ -367,7 +366,7 @@ newProjectAnalysesServer <- function(id, ionization, settings)
         observeEvent(input$removeAnaInfoRows, {
             sel <- input$analysesHOT_select$select$rAll
             pol <- getCurPolarity()
-            anaInfoTabs[[pol]] <<- anaInfoTabs[[pol]][-sel]
+            rValues$anaInfoTabs[[pol]] <- rValues$anaInfoTabs[[pol]][-sel]
             triggerAnaInfoHOTUpdate()
         })
         
@@ -440,23 +439,23 @@ newProjectAnalysesServer <- function(id, ionization, settings)
                 ai <- anaFilesToAnaInfo(rValues$analysisFiles)
                 
                 # remove the analyses for which all file paths were removed
-                anaInfoTabs[[pol]] <<- anaInfoTabs[[pol]][analysis %in% rValues$analysisFiles$analysis]
+                rValues$anaInfoTabs[[pol]] <- rValues$anaInfoTabs[[pol]][analysis %in% rValues$analysisFiles$analysis]
                 
                 # overlap: update paths
-                aiOv <- ai[analysis %in% anaInfoTabs[[pol]]$analysis]
+                aiOv <- ai[analysis %in% rValues$anaInfoTabs[[pol]]$analysis]
                 if (nrow(aiOv) > 0)
                 {
-                    pcols <- getAnaInfoPathCols(anaInfoTabs[[pol]])
-                    anaInfoTabs[[pol]][aiOv, (pcols) := mget(paste0("i.", pcols)), on = "analysis"]
+                    pcols <- getAnaInfoPathCols(rValues$anaInfoTabs[[pol]])
+                    rValues$anaInfoTabs[[pol]][aiOv, (pcols) := mget(paste0("i.", pcols)), on = "analysis"]
                 }
                 
                 # add analyses for new files                
-                aiNew <- ai[!analysis %in% anaInfoTabs[[pol]]$analysis]
+                aiNew <- ai[!analysis %in% rValues$anaInfoTabs[[pol]]$analysis]
                 if (nrow(aiNew) > 0)
-                    anaInfoTabs[[pol]] <<- rbind(anaInfoTabs[[pol]], aiNew, fill = TRUE)
+                    rValues$anaInfoTabs[[pol]] <- rbind(rValues$anaInfoTabs[[pol]], aiNew, fill = TRUE)
             }
             else
-                anaInfoTabs[[pol]] <<- anaInfoTabs[[pol]][0]
+                rValues$anaInfoTabs[[pol]] <- rValues$anaInfoTabs[[pol]][0]
             
             triggerAnaInfoHOTUpdate()
         })
@@ -477,18 +476,18 @@ newProjectAnalysesServer <- function(id, ionization, settings)
                     pol <- getCurPolarity()
                     
                     # check for overlap
-                    if (any(ai$analysis %in% anaInfoTabs[[pol]]$analysis))
+                    if (any(ai$analysis %in% rValues$anaInfoTabs[[pol]]$analysis))
                     {
                         overwrite <- rstudioapi::showQuestion("Overwrite analysis information",
                                                               "One or more analyses are already defined. Do you want to overwrite or keep the current information for these analyses?",
                                                               "Overwrite", "Keep", timeout = NULL)
                         if (overwrite) # UNDONE: try to keep original order?
-                            anaInfoTabs[[pol]] <<- anaInfoTabs[[pol]][!analysis %in% ai$analysis]
+                            rValues$anaInfoTabs[[pol]] <- rValues$anaInfoTabs[[pol]][!analysis %in% ai$analysis]
                         else
-                            ai <- ai[!analysis %in% anaInfoTabs[[pol]]$analysis]
+                            ai <- ai[!analysis %in% rValues$anaInfoTabs[[pol]]$analysis]
                     }
                     
-                    anaInfoTabs[[pol]] <<- rbind(anaInfoTabs[[pol]], ai, fill = TRUE)
+                    rValues$anaInfoTabs[[pol]] <- rbind(rValues$anaInfoTabs[[pol]], ai, fill = TRUE)
                     triggerAnaInfoHOTUpdate()
                 }
             }
@@ -516,5 +515,46 @@ newProjectAnalysesServer <- function(id, ionization, settings)
         output$analysisFilesHOT <- rhandsontable::renderRHandsontable(makeAnalysisFilesHOT())
         
         output <- exportShinyOutputVal(output, "ionization", ionization)
+        
+        list(
+            valid = reactive({
+                ret <- TRUE
+                if (input$generateAnaInfo == "table")
+                {
+                    for (pol in c("positive", "negative"))
+                    {
+                        if (nrow(anaInfoTabs[[pol]]) == 0 && input$ionization %in% c(pol, "both"))
+                        {
+                            ret <- list(title = "No analyses", msg = paste0("Please select some analyses for ", pol, " mode!"))
+                            break
+                        }
+                    }
+                }
+                ret
+            }),
+            settings = reactive(list(
+                generateAnaInfo = input$generateAnaInfo,
+                analysisTableFileType = input$analysisTableFileType,
+                analysisTableFileCSV = input$analysisTableFileCSV,
+                analysisTableFileCSVPos = input$analysisTableFileCSVPos,
+                analysisTableFileCSVNeg = input$analysisTableFileCSVNeg,
+                analysisTableFileR = input$analysisTableFileR,
+                analysisTableFileRPos = input$analysisTableFileRPos,
+                analysisTableFileRNeg = input$analysisTableFileRNeg,
+                genAnaInfoDynRaw = input$genAnaInfoDynRaw,
+                genAnaInfoDynRawPos = input$genAnaInfoDynRawPos,
+                genAnaInfoDynRawNeg = input$genAnaInfoDynRawNeg,
+                genAnaInfoDynCentroid = input$genAnaInfoDynCentroid,
+                genAnaInfoDynCentroidPos = input$genAnaInfoDynCentroidPos,
+                genAnaInfoDynCentroidNeg = input$genAnaInfoDynCentroidNeg,
+                genAnaInfoDynIMS = input$genAnaInfoDynIMS,
+                genAnaInfoDynIMSPos = input$genAnaInfoDynIMSPos,
+                genAnaInfoDynIMSNeg = input$genAnaInfoDynIMSNeg,
+                genAnaInfoDynProfile = input$genAnaInfoDynProfile,
+                genAnaInfoDynProfilePos = input$genAnaInfoDynProfilePos,
+                genAnaInfoDynProfileNeg = input$genAnaInfoDynProfileNeg
+            )),
+            anaInfoTabs = reactive(rValues$anaInfoTabs)
+        )
     })
 }

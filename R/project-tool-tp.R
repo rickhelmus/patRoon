@@ -54,5 +54,21 @@ newProjectTPServer <- function(id, hasSuspects, settings)
         })
         
         observeEvent(input$TPSuspButton, selectSuspList(session, "TPSuspectList"))
+        
+        list(
+            valid = reactive({
+                if (input$doTPs && input$TPGenInput == "suspects" && !nzchar(input$TPSuspectList))
+                    list(title = "No suspect list", msg = "Please select a suspect list!")
+                else
+                    TRUE
+            }),
+            settings = reactive(list(
+                doTPs = input$doTPs,
+                TPGen = input$TPGen,
+                TPGenInput = input$TPGenInput,
+                TPSuspectList = input$TPSuspectList,
+                TPDoMFDB = input$TPDoMFDB
+            ))
+        )
     })
 }

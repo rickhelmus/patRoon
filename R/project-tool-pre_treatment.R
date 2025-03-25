@@ -1,3 +1,5 @@
+splitConvTypeFormat <- function(typeFormat) strsplit(typeFormat, "_")
+
 newProjectPreTreatUI <- function(id)
 {
     ns <- NS(id)
@@ -43,8 +45,6 @@ newProjectPreTreatServer <- function(id, ionization, settings)
             return(setNames(paste0(ft, "_", formats), paste0(formats, " (", ft, ")")))
         }, simplify = FALSE))
     }
-    
-    splitConvTypeFormat <- function(typeFormat) strsplit(typeFormat, "_")
     
     convTypeFormatToLabel <- function(typeFormat)
     {

@@ -161,11 +161,29 @@ newProjectFeaturesServer <- function(id, ionization, settings)
         
         output <- exportShinyOutputVal(output, "ionization", ionization)
         
-        # UNDONE
         list(
-            exSuspList = reactive(input$exSuspList),
-            suspectList = reactive(input$suspectList),
-            suspectListPos = reactive(input$suspectListPos)
+            valid = \() TRUE,
+            settings = reactive(list(
+                featFinder = input$featFinder,
+                featGrouper = input$featGrouper,
+                suspectList = input$suspectList,
+                suspectListPos = input$suspectListPos,
+                suspectListNeg = input$suspectListNeg,
+                exSuspList = input$exSuspList,
+                preIntThr = input$preIntThr,
+                intThr = input$intThr,
+                repAbundance = input$repAbundance,
+                maxRepRSD = input$maxRepRSD,
+                blankThr = input$blankThr,
+                removeBlanks = input$removeBlanks,
+                retention = c(input[["retention-min"]], input[["retention-max"]]),
+                mz = c(input[["mz-min"]], input[["mz-max"]]),
+                featNorm = input$featNorm,
+                groupNorm = input$groupNorm,
+                ISTDList = input$ISTDList,
+                ISTDListPos = input$ISTDListPos,
+                ISTDListNeg = input$ISTDListNeg
+            ))
         )
     })
 }

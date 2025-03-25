@@ -242,7 +242,7 @@ newProject <- function(destPath = NULL)
             {}
             else
             {
-                doCreateProject(input, data$analyses$anaInfoTabs(), data$preTreatment$settings()$steps)
+                doCreateProject(data$analyses$anaInfoTabs(), sapply(data, \(d) d$settings(), simplify = FALSE))
                 stopApp(TRUE)
             }
         })

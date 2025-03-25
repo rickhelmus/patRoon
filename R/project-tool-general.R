@@ -44,11 +44,21 @@ newProjectGeneralServer <- function(id, settings)
         })
         
         list(
-            destination = reactive(input$destinationPath),
-            outputScriptTo = reactive(input$outputScriptTo),
-            scriptFile = reactive(input$scriptFile),
-            createRStudioProj = reactive(input$createRStudioProj),
-            ionization = reactive(input$ionization),
+            valid = reactive({
+                if (!nzchar(input$destinationPath))
+                    list(title = "Invalid destination", msg = "Please select a destination path!")
+                else if (input$outputScriptTo != "curFile" && !nzchar(input$scriptFile))
+                    list(title = "No script file", msg = "Please select a destination script file!")
+                else
+                    TRUE
+            }),
+            settings = reactive(list(
+                destination = input$destinationPath,
+                outputScriptTo = input$outputScriptTo,
+                scriptFile = input$scriptFile,
+                createRStudioProj = input$createRStudioProj,
+                ionization = input$ionization
+            )),
             loadParams = reactive(input$loadParams),
             saveParams = reactive(input$saveParams)
         )

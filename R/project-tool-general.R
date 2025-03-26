@@ -5,7 +5,7 @@ newProjectGeneralUI <- function(id, destPath)
         miniUI::miniContentPanel(
             fillCol(
                 flex = NA,
-                fileSelect(ns("destinationPath"), ns("destinationPathButton"), "Project destination",
+                fileSelect(ns("destination"), ns("destinationButton"), "Project destination",
                            if (is.null(destPath)) "~/" else destPath),
                 br(),
                 fillRow(
@@ -37,7 +37,7 @@ newProjectGeneralServer <- function(id, settings)
 {
     moduleServer(id, function(input, output, session)
     {
-        doObserveSelDir(input, session, "destinationPath", "destinationPathButton")
+        doObserveSelDir(input, session, "destination", "destinationButton")
         
         observeEvent(settings(), {
             updateRadioButtons(session, "ionization", selected = settings()$ionization)
@@ -45,7 +45,7 @@ newProjectGeneralServer <- function(id, settings)
         
         list(
             valid = reactive({
-                if (!nzchar(input$destinationPath))
+                if (!nzchar(input$destination))
                     list(title = "Invalid destination", msg = "Please select a destination path!")
                 else if (input$outputScriptTo != "curFile" && !nzchar(input$scriptFile))
                     list(title = "No script file", msg = "Please select a destination script file!")
@@ -53,7 +53,7 @@ newProjectGeneralServer <- function(id, settings)
                     TRUE
             }),
             settings = reactive(list(
-                destination = input$destinationPath,
+                destination = input$destination,
                 outputScriptTo = input$outputScriptTo,
                 scriptFile = input$scriptFile,
                 createRStudioProj = input$createRStudioProj,

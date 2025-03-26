@@ -61,95 +61,6 @@ getNewProjectUI <- function(destPath)
     )
 }
 
-getNewProjectWidgetTypes <- function()
-{
-    list(
-        outputScriptTo = "radio",
-        scriptFile = "text",
-        createRStudioProj = "check",
-        ionization = "radio",
-        analysisTableFile = "text",
-        analysisTableFilePos = "text",
-        analysisTableFileNeg = "text",
-        convAlgo = "select",
-        convFrom = "select",
-        convTo = "select",
-        peakPicking = "check",
-        peakPickingVendor = "check",
-        DAMethod = "text", # UNDONE: remove
-        DAMethodPos = "text", # UNDONE: remove
-        DAMethodNeg = "text", # UNDONE: remove
-        doBrukerCalib = "check", # UNDONE: remove
-        featFinder = "select",
-        featGrouper = "select",
-        suspectList = "text",
-        suspectListPos = "text",
-        suspectListNeg = "text",
-        exSuspList = "check",
-        preIntThr = "numeric",
-        intThr = "numeric",
-        repAbundance = "numeric",
-        maxRepRSD = "numeric",
-        blankThr = "numeric",
-        "retention-min" = "numeric",
-        "retention-max" = "numeric",
-        "mz-min" = "numeric",
-        "mz-max" = "numeric",
-        removeBlanks = "check",
-        featNorm = "select",
-        groupNorm = "check",
-        ISTDList = "text",
-        ISTDListPos = "text",
-        ISTDListNeg = "text",
-        components = "select",
-        selectIons = "check",
-        formulaGen = "select",
-        compIdent = "select",
-        peakListGen = "select",
-        DIA = "check",
-        precursorMzWindow = "numeric",
-        MSLibraryFormat = "select",
-        MSLibraryPath = "text",
-        annotateSus = "check",
-        genIDLevelFile = "check",
-        doTPs = "check",
-        TPGen = "select",
-        TPGenInput = "select",
-        TPSuspectList = "text",
-        TPDoMFDB = "check",
-        reportGen = "checkGroup",
-        reportLegacy = "checkGroup"
-    )
-}
-
-loadNewProjectParams <- function(file, input, session)
-{
-    wtypes <- getNewProjectWidgetTypes()
-    values <- readYAML(file)
-    for (param in names(values))
-    {
-        if (wtypes[[param]] == "radio")
-            updateRadioButtons(session, param, selected = values[[param]])
-        else if (wtypes[[param]] == "text")
-            updateTextInput(session, param, value = values[[param]])
-        else if (wtypes[[param]] == "check")
-            updateCheckboxInput(session, param, value = values[[param]])
-        else if (wtypes[[param]] == "checkGroup")
-            updateCheckboxGroupInput(session, param, selected = values[[param]])
-        else if (wtypes[[param]] == "select")
-            updateSelectInput(session, param, selected = values[[param]])
-        else if (wtypes[[param]] == "numeric")
-            updateNumericInput(session, param, value = values[[param]])
-    }
-}
-
-saveNewProjectParams <- function(file, input)
-{
-    values <- getNewProjectWidgetTypes()
-    values <- isolate(reactiveValuesToList(input))[names(values)]
-    writeYAML(values, file)
-}
-
 #' Easily create new \pkg{patRoon} projects
 #' 
 #' The \code{newProject} function is used to quickly generate a processing R script. This tool allows the user to
@@ -203,13 +114,20 @@ newProject <- function(destPath = NULL)
     
     server <- function(input, output, session)
     {
-        loadedSettings <- reactiveValues(general = list())
+        # NOTE: initialize to NULL so observeEvent in modules are not triggered initially
+        loadedSettings <- reactiveValues(general = NULL,
+                                         analyses = NULL,
+                                         preTreatment = NULL,
+                                         feature = NULL,
+                                         annotation = NULL,
+                                         TP = NULL,
+                                         report = NULL)
         data <- list()
         
         data$general <- newProjectGeneralServer("general", reactive(loadedSettings$general))
         ionization <- reactive(data$general$settings()$ionization)
         data$analyses <- newProjectAnalysesServer("analyses", ionization, reactive(loadedSettings$analyses))
-        data$preTreatment <- newProjectPreTreatServer("pretreat", ionization, reactive(loadedSettings$preTreat))
+        data$preTreatment <- newProjectPreTreatServer("pretreat", ionization, reactive(loadedSettings$preTreatment))
         data$features <- newProjectFeaturesServer("features", ionization, reactive(loadedSettings$feature))
         hasSusp <- reactive({
             data$features$settings()$exSuspList || (ionization() != "both" && nzchar(data$features$settings()$suspectList) ||
@@ -219,6 +137,8 @@ newProject <- function(destPath = NULL)
         data$TPs <- newProjectTPServer("tp", hasSusp, reactive(loadedSettings$TP))
         data$report <- newProjectReportServer("report", reactive(loadedSettings$report))
         
+        getSettings <- function() sapply(data, \(d) d$settings(), simplify = FALSE)
+
         validate <- function()
         {
             for (d in data)
@@ -242,7 +162,7 @@ newProject <- function(destPath = NULL)
             {}
             else
             {
-                doCreateProject(data$analyses$anaInfoTabs(), sapply(data, \(d) d$settings(), simplify = FALSE))
+                doCreateProject(data$analyses$anaInfoTabs(), getSettings())
                 stopApp(TRUE)
             }
         })
@@ -250,13 +170,17 @@ newProject <- function(destPath = NULL)
         observeEvent(data$general$loadParams(), {
             sl <- rstudioapi::selectFile("Select parameter file", filter = "yml files (*.yml)")
             if (!is.null(sl))
-                loadNewProjectParams(sl, input, session)
+            {
+                ymlSettings <- readYAML(sl)
+                for (s in names(ymlSettings))
+                    loadedSettings[[s]] <- ymlSettings[[s]]
+            }
         })
         
         observeEvent(data$general$saveParams(), {
             sl <- rstudioapi::selectFile("Select parameter file", filter = "yml files (*.yml)", existing = FALSE)
             if (!is.null(sl))
-                saveNewProjectParams(sl, input)
+                writeYAML(getSettings(), sl)
         })
     }
 

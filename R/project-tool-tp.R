@@ -40,6 +40,14 @@ newProjectTPServer <- function(id, hasSuspects, settings)
 {
     moduleServer(id, function(input, output, session)
     {
+        observeEvent(settings(), {
+            updateCheckboxInput(session, "doTPs", value = settings()$doTPs)
+            updateSelectInput(session, "TPGen", selected = settings()$TPGen)
+            updateSelectInput(session, "TPGenInput", selected = settings()$TPGenInput)
+            updateTextInput(session, "TPSuspectList", value = settings()$TPSuspectList)
+            updateCheckboxInput(session, "TPDoMFDB", value = settings()$TPDoMFDB)
+        })
+        
         observeEvent(input$TPGen, {
             updateSelectInput(inputId = "TPGenInput", choices = getTPGenInputs(input$TPGen == "Library"))
         })

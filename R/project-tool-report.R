@@ -21,6 +21,11 @@ newProjectReportServer <- function(id, settings)
 {
     moduleServer(id, function(input, output, session)
     {
+        observeEvent(settings(), {
+            updateCheckboxGroupInput(session, "reportGen", selected = settings()$reportGen)
+            updateCheckboxGroupInput(session, "reportLegacy", selected = settings()$reportLegacy)
+        })
+        
         list(
             valid = reactive({
                 if ("legacy" %in% input$reportGen && length(input$reportLegacy) == 0)

@@ -62,6 +62,15 @@ newProjectPreTreatServer <- function(id, ionization, settings)
             brukerCalib = list(enabled = FALSE, method = "", methodPos = "", methodNeg = "")
         )
         
+        triggerMSConvHOTUpdate <- function() rValues$triggerMSConvHOTUpdate <- rValues$triggerMSConvHOTUpdate + 1
+        
+        observeEvent(settings(), {
+            rValues$steps <- as.data.table(settings()$steps)
+            rValues$output <- settings()$output
+            rValues$brukerCalib <- settings()$brukerCalib
+            triggerMSConvHOTUpdate()
+        })
+        
         makeMSConversionHOT <- function()
         {
             rValues$triggerMSConvHOTUpdate
@@ -93,8 +102,6 @@ newProjectPreTreatServer <- function(id, ionization, settings)
             if (!is.null(dm))
                 updateTextInput(session, inputName, value = dm)
         }
-        
-        triggerMSConvHOTUpdate <- function() rValues$triggerMSConvHOTUpdate <- rValues$triggerMSConvHOTUpdate + 1
         
         observeEvent(input$addMSConversion, {
             showModal(modalDialog(

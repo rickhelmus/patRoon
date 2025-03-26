@@ -228,6 +228,29 @@ newProjectAnalysesServer <- function(id, ionization, settings)
                                   anaInfoTabs = list(positive = emptyAnaTable(), negative = emptyAnaTable()),
                                   analysisFiles = data.table(analysis = character(), type = character(), path = character()))
         
+        observeEvent(settings(), {
+            updateRadioButtons(session, "generateAnaInfo", selected = settings()$generateAnaInfo)
+            updateRadioButtons(session, "analysisTableFileType", selected = settings()$analysisTableFileType)
+            updateTextInput(session, "analysisTableFileCSV", value = settings()$analysisTableFileCSV)
+            updateTextInput(session, "analysisTableFileCSVPos", value = settings()$analysisTableFileCSVPos)
+            updateTextInput(session, "analysisTableFileCSVNeg", value = settings()$analysisTableFileCSVNeg)
+            updateTextInput(session, "analysisTableFileR", value = settings()$analysisTableFileR)
+            updateTextInput(session, "analysisTableFileRPos", value = settings()$analysisTableFileRPos)
+            updateTextInput(session, "analysisTableFileRNeg", value = settings()$analysisTableFileRNeg)
+            updateTextInput(session, "genAnaInfoDynRaw", value = settings()$genAnaInfoDynRaw)
+            updateTextInput(session, "genAnaInfoDynRawPos", value = settings()$genAnaInfoDynRawPos)
+            updateTextInput(session, "genAnaInfoDynRawNeg", value = settings()$genAnaInfoDynRawNeg)
+            updateTextInput(session, "genAnaInfoDynCentroid", value = settings()$genAnaInfoDynCentroid)
+            updateTextInput(session, "genAnaInfoDynCentroidPos", value = settings()$genAnaInfoDynCentroidPos)
+            updateTextInput(session, "genAnaInfoDynCentroidNeg", value = settings()$genAnaInfoDynCentroidNeg)
+            updateTextInput(session, "genAnaInfoDynIMS", value = settings()$genAnaInfoDynIMS)
+            updateTextInput(session, "genAnaInfoDynIMSPos", value = settings()$genAnaInfoDynIMSPos)
+            updateTextInput(session, "genAnaInfoDynIMSNeg", value = settings()$genAnaInfoDynIMSNeg)
+            updateTextInput(session, "genAnaInfoDynProfile", value = settings()$genAnaInfoDynProfile)
+            updateTextInput(session, "genAnaInfoDynProfilePos", value = settings()$genAnaInfoDynProfilePos)
+            updateTextInput(session, "genAnaInfoDynProfileNeg", value = settings()$genAnaInfoDynProfileNeg)
+        })
+        
         makeAnalysesHOT <- function()
         {
             rValues$triggerAnaInfoHOTUpdate

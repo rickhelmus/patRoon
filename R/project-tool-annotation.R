@@ -90,6 +90,20 @@ newProjectAnnotationServer <- function(id, hasSuspects, settings)
 {
     moduleServer(id, function(input, output, session)
     {
+        observeEvent(settings(), {
+            updateSelectInput(session, "components", selected = settings()$components)
+            updateCheckboxInput(session, "selectIons", value = settings()$selectIons)
+            updateSelectInput(session, "formulaGen", selected = settings()$formulaGen)
+            updateSelectInput(session, "compIdent", selected = settings()$compIdent)
+            updateSelectInput(session, "peakListGen", selected = settings()$peakListGen)
+            updateCheckboxInput(session, "DIA", value = settings()$DIA)
+            updateNumericInput(session, "precursorMzWindow", value = settings()$precursorMzWindow)
+            updateSelectInput(session, "MSLibraryFormat", selected = settings()$MSLibraryFormat)
+            updateTextInput(session, "MSLibraryPath", value = settings()$MSLibraryPath)
+            updateCheckboxInput(session, "annotateSus", value = settings()$annotateSus)
+            updateCheckboxInput(session, "genIDLevelFile", value = settings()$genIDLevelFile)
+        })
+        
         observeEvent(input$MSLibraryPathButton, {
             MSFile <- rstudioapi::selectFile(path = "~/")
             if (!is.null(MSFile))

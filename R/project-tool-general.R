@@ -40,6 +40,10 @@ newProjectGeneralServer <- function(id, settings)
         doObserveSelDir(input, session, "destination", "destinationButton")
         
         observeEvent(settings(), {
+            # UNDONE: update destination?
+            updateRadioButtons(session, "outputScriptTo", selected = settings()$outputScriptTo)
+            updateTextInput(session, "scriptFile", value = settings()$scriptFile)
+            updateCheckboxInput(session, "createRStudioProj", value = settings()$createRStudioProj)
             updateRadioButtons(session, "ionization", selected = settings()$ionization)
         })
         

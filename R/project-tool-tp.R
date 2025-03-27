@@ -80,3 +80,16 @@ newProjectTPServer <- function(id, hasSuspects, settings)
         )
     })
 }
+
+defaultTPSettings <- function()
+{
+    return(list(doTPs = FALSE, TPGen = "BioTransformer", TPGenInput = "suspects",
+                TPSuspectList = "", TPDoMFDB = TRUE))
+}
+
+upgradeTPSettings <- function(settings)
+{
+    # NOTE: this updates from first file version
+    return(modifyList(defaultTPSettings(),
+                      settings[c("doTPs", "TPGen", "TPGenInput", "TPSuspectList", "TPDoMFDB")]))
+}

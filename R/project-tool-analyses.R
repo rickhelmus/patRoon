@@ -36,9 +36,6 @@ newProjectAnalysesUI <- function(id)
     getAnaTableFileUI <- function(pol)
     {
         # NOTE: pol may be NULL
-        basef <- "analyses"
-        if (!is.null(pol))
-            basef <- paste0(basef, if (pol == "positive") "-pos" else "-neg")
         pf <- if (is.null(pol)) "" else if (pol == "positive") "Pos" else "Neg"
         
         fillRow(
@@ -46,12 +43,12 @@ newProjectAnalysesUI <- function(id)
             conditionalPanel(
                 condition = "input.analysisTableFileType == \"CSV\"",
                 ns = ns,
-                textInput(ns(paste0("analysisTableFileCSV", pf)), "File name", paste0(basef, ".csv"), width = "100%")
+                textInput(ns(paste0("analysisTableFileCSV", pf)), "File name", width = "100%")
             ),
             conditionalPanel(
                 condition = "input.analysisTableFileType == \"R\"",
                 ns = ns,
-                textInput(ns(paste0("analysisTableFileR", pf)), "File name", paste0(basef, ".R"), width = "100%")
+                textInput(ns(paste0("analysisTableFileR", pf)), "File name", width = "100%")
             )
         )
     }
@@ -580,4 +577,40 @@ newProjectAnalysesServer <- function(id, ionization, settings)
             anaInfoTabs = reactive(rValues$anaInfoTabs)
         )
     })
+}
+
+defaultAnalysesSettings <- function()
+{
+    return(list(
+        generateAnaInfo = "none",
+        analysisTableFileType = "CSV",
+        analysisTableFileCSV = "analyses.csv",
+        analysisTableFileCSVPos = "analyses-pos.csv",
+        analysisTableFileCSVNeg = "analyses-neg.csv",
+        analysisTableFileR = "analyses.R",
+        analysisTableFileRPos = "analyses-pos.R",
+        analysisTableFileRNeg = "analyses-neg.R",
+        genAnaInfoDynRaw = "",
+        genAnaInfoDynRawPos = "",
+        genAnaInfoDynRawNeg = "",
+        genAnaInfoDynCentroid = "",
+        genAnaInfoDynCentroidPos = "",
+        genAnaInfoDynCentroidNeg = "",
+        genAnaInfoDynIMS = "",
+        genAnaInfoDynIMSPos = "",
+        genAnaInfoDynIMSNeg = "",
+        genAnaInfoDynProfile = "",
+        genAnaInfoDynProfilePos = "",
+        genAnaInfoDynProfileNeg = ""
+    ))
+}
+
+upgradeAnalysesSettings <- function(settings)
+{
+    # NOTE: this updates from first file version
+    return(modifyList(defaultAnalysesSettings(), list(
+        analysisTableFileCSV = settings$analysisTableFile,
+        analysisTableFileCSVPos = settings$analysisTableFilePos,
+        analysisTableFileCSVNeg = settings$analysisTableFileNeg
+    )))
 }

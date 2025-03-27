@@ -19,12 +19,12 @@ newProjectFeaturesUI <- function(id)
                 fillRow(
                     selectInput(ns("featFinder"), "Feature finder", c("OpenMS", "XCMS", "enviPick", "SIRIUS", "KPIC2",
                                                                   "Bruker DataAnalysis" = "Bruker"),
-                                "OpenMS", FALSE, width = "95%"),
+                                multiple = FALSE, width = "95%"),
                     fillCol(
                         flex = c(1, NA),
                         height = 90,
                         selectInput(ns("featGrouper"), "Feature grouper", c("OpenMS", "XCMS", "KPIC2", "SIRIUS"),
-                                    "OpenMS", FALSE, width = "100%"),
+                                    multiple = FALSE, width = "100%"),
                         conditionalPanel(
                             condition = "input.featGrouper == \"SIRIUS\"",
                             ns = ns,
@@ -74,16 +74,16 @@ newProjectFeaturesUI <- function(id)
             fillCol(
                 height = 325,
                 fillRow(
-                    numericInput(ns("preIntThr"), "Pre-Intensity threshold", 1E2, 0, step = 100, width = "95%"),
-                    numericInput(ns("intThr"), "Intensity threshold", 1E4, 0, step = 1000, width = "100%")
+                    numericInput(ns("preIntThr"), "Pre-Intensity threshold", 0, 0, step = 100, width = "95%"),
+                    numericInput(ns("intThr"), "Intensity threshold", 0, 0, step = 1000, width = "100%")
                 ),
                 fillRow(
-                    numericInput(ns("repAbundance"), "Min. replicate abundance (relative)", 1, 0, 1.0, 0.1, width = "95%"),
-                    numericInput(ns("maxRepRSD"), "Max. replicate intensity RSD", 0.75, 0, step = 0.1, width = "100%")
+                    numericInput(ns("repAbundance"), "Min. replicate abundance (relative)", 0, 0, 1.0, 0.1, width = "95%"),
+                    numericInput(ns("maxRepRSD"), "Max. replicate intensity RSD", 0, 0, step = 0.1, width = "100%")
                 ),
                 fillRow(
-                    numericInput(ns("blankThr"), "Min. blank threshold", 5, 0, step = 1, width = "95%"),
-                    checkboxInput(ns("removeBlanks"), "Discard blanks after filtering", TRUE)
+                    numericInput(ns("blankThr"), "Min. blank threshold", 0, 0, step = 1, width = "95%"),
+                    checkboxInput(ns("removeBlanks"), "Discard blanks after filtering")
                 ),
                 rangeNumeric(ns("retention"), "retention time (s)", step = 10),
                 rangeNumeric(ns("mz"), "m/z", step = 10)
@@ -210,4 +210,41 @@ newProjectFeaturesServer <- function(id, ionization, settings)
             ))
         )
     })
+}
+
+defaultFeaturesSettings <- function()
+{
+    return(list(
+        featFinder = "OpenMS",
+        featGrouper = "OpenMS",
+        suspectList = "",
+        suspectListPos = "",
+        suspectListNeg = "",
+        exSuspList = FALSE,
+        preIntThr = 1E2,
+        intThr = 1E4,
+        repAbundance = 1,
+        maxRepRSD = 0.75,
+        blankThr = 5,
+        removeBlanks = TRUE,
+        retention = c(0, 0),
+        mz = c(0, 0),
+        featNorm = "none",
+        groupNorm = FALSE,
+        ISTDList = "",
+        ISTDListPos = "",
+        ISTDListNeg = ""
+    ))
+}
+
+upgradeFeaturesSettings <- function(settings)
+{
+    # NOTE: this updates from first file version
+    ret <- modifyList(defaultFeaturesSettings(),
+                      settings[c("featFinder", "featGrouper", "suspectList", "suspectListPos", "suspectListNeg",
+                      "exSuspList", "preIntThr", "intThr", "repAbundance", "maxRepRSD", "blankThr", "removeBlanks",
+                      "retention", "mz", "featNorm", "groupNorm", "ISTDList", "ISTDListPos", "ISTDListNeg")])
+    ret$retention <- c(settings[["retention-min"]], settings[["retention-max"]])
+    ret$mz <- c(settings[["mz-min"]], settings[["mz-max"]])
+    return(ret)
 }

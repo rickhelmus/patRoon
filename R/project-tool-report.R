@@ -40,3 +40,14 @@ newProjectReportServer <- function(id, settings)
         )
     })
 }
+
+defaultReportSettings <- function()
+{
+    return(list(reportGen = "HTML", reportLegacy = "CSV"))
+}
+
+upgradeReportSettings <- function(settings)
+{
+    # NOTE: this updates from first file version
+    return(modifyList(defaultReportSettings(), settings[c("reportGen", "reportLegacy")]))
+}

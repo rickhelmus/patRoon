@@ -5,7 +5,7 @@
 #' @include main.R
 NULL
 
-getNewProjectUI <- function(destPath)
+getNewProjectUI <- function()
 {
     miniUI::miniPage(
         shinyjs::useShinyjs(),
@@ -31,7 +31,7 @@ getNewProjectUI <- function(destPath)
         miniUI::miniTabstripPanel(
             miniUI::miniTabPanel(
                 "General", icon = icon("save"),
-                newProjectGeneralUI("general", destPath)
+                newProjectGeneralUI("general")
             ),
             miniUI::miniTabPanel(
                 "Analyses", icon = icon("folder-open"),
@@ -114,21 +114,20 @@ newProject <- function(destPath = NULL)
     
     server <- function(input, output, session)
     {
-        # NOTE: initialize to NULL so observeEvent in modules are not triggered initially
-        loadedSettings <- reactiveValues(general = NULL,
-                                         analyses = NULL,
-                                         preTreatment = NULL,
-                                         feature = NULL,
-                                         annotation = NULL,
-                                         TP = NULL,
-                                         report = NULL)
+        loadedSettings <- reactiveValues(general = defaultGeneralSettings(destPath),
+                                         analyses = defaultAnalysesSettings(),
+                                         preTreatment = defaultPreTreatSettings(),
+                                         features = defaultFeaturesSettings(),
+                                         annotation = defaultAnnotationSettings(),
+                                         TP = defaultTPSettings(),
+                                         report = defaultReportSettings())
         data <- list()
         
         data$general <- newProjectGeneralServer("general", reactive(loadedSettings$general))
         ionization <- reactive(data$general$settings()$ionization)
         data$analyses <- newProjectAnalysesServer("analyses", ionization, reactive(loadedSettings$analyses))
         data$preTreatment <- newProjectPreTreatServer("pretreat", ionization, reactive(loadedSettings$preTreatment))
-        data$features <- newProjectFeaturesServer("features", ionization, reactive(loadedSettings$feature))
+        data$features <- newProjectFeaturesServer("features", ionization, reactive(loadedSettings$features))
         hasSusp <- reactive({
             data$features$settings()$exSuspList || (ionization() != "both" && nzchar(data$features$settings()$suspectList) ||
                 (ionization() == "both" && nzchar(data$features$settings()$suspectListPos)))
@@ -172,6 +171,18 @@ newProject <- function(destPath = NULL)
             if (!is.null(sl))
             {
                 ymlSettings <- readYAML(sl)
+                if (is.null(ymlSettings[["version"]]))
+                    ymlSettings$version <- 1L # first file version was unversioned
+                if (ymlSettings$version < 2L) 
+                {
+                    ymlSettings <- list(general = upgradeGeneralSettings(ymlSettings, destPath),
+                                        analyses = upgradeAnalysesSettings(ymlSettings),
+                                        preTreatment = upgradePreTreatSettings(ymlSettings),
+                                        feature = upgradeFeatureSettings(ymlSettings),
+                                        annotation = upgradeAnnotationSettings(ymlSettings),
+                                        TP = upgradeTPSettings(ymlSettings),
+                                        report = upgradeReportSettings(ymlSettings))
+                }
                 for (s in names(ymlSettings))
                     loadedSettings[[s]] <- ymlSettings[[s]]
             }
@@ -180,10 +191,14 @@ newProject <- function(destPath = NULL)
         observeEvent(data$general$saveParams(), {
             sl <- rstudioapi::selectFile("Select parameter file", filter = "yml files (*.yml)", existing = FALSE)
             if (!is.null(sl))
-                writeYAML(getSettings(), sl)
+            {
+                out <- getSettings()
+                out$version <- 2L
+                writeYAML(out, sl)
+            }
         })
     }
 
-    runGadget(getNewProjectUI(destPath), server, viewer = dialogViewer("Create new project", width = 800, height = 600))
+    runGadget(getNewProjectUI(), server, viewer = dialogViewer("Create new project", width = 800, height = 600))
     # runGadget(getNewProjectUI(), server, viewer = paneViewer())
 }

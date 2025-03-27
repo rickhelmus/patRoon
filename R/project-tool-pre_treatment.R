@@ -52,20 +52,21 @@ newProjectPreTreatServer <- function(id, ionization, settings)
         return(paste0(tf[[1]][1], " (", tf[[1]][2], ")"))
     }
     
+    defSettings <- defaultPreTreatSettings()
+    
     moduleServer(id, function(input, output, session)
     {
         rValues <- reactiveValues(
             triggerMSConvHOTUpdate = 0,
-            steps = data.table(algorithm = character(0), from = character(0), to = character(0)),
-            output = list(centroid = file.path("converted", "centroid"), profile = file.path("converted", "profile"),
-                          ims = file.path("converted", "ims")),
-            brukerCalib = list(enabled = FALSE, method = "", methodPos = "", methodNeg = "")
+            steps = defSettings$steps,
+            output = defSettings$output,
+            brukerCalib = defSettings$brukerCalib
         )
         
         triggerMSConvHOTUpdate <- function() rValues$triggerMSConvHOTUpdate <- rValues$triggerMSConvHOTUpdate + 1
         
         observeEvent(settings(), {
-            rValues$steps <- as.data.table(settings()$steps)
+            rValues$steps <- as.data.table(settings()$steps) # NOTE: steps are stored as list in yml files
             rValues$output <- settings()$output
             rValues$brukerCalib <- settings()$brukerCalib
             triggerMSConvHOTUpdate()
@@ -286,4 +287,38 @@ newProjectPreTreatServer <- function(id, ionization, settings)
             ))
         )
     })
+}
+
+defaultPreTreatSettings <- function()
+{
+    return(list(
+        steps = data.table(algorithm = character(0), from = character(0), to = character(0)),
+        output = list(centroid = file.path("converted", "centroid"), profile = file.path("converted", "profile"),
+                      ims = file.path("converted", "ims")),
+        brukerCalib = list(enabled = FALSE, method = "", methodPos = "", methodNeg = "")
+    ))
+}
+
+upgradePreTreatSettings <- function(settings)
+{
+    # NOTE: this updates from first file version
+    # NOTE: the old vendor peak picking setting is ignored
+    
+    ret <- defaultPreTreatSettings()
+    
+    if (nzchar(settings$convAlgo))
+    {
+        fromt <- if (settings$convAlgo %in% c("pwiz", "bruker")) "raw" else "centroid"
+        tot <- if ((settings$convAlgo %in% c("pwiz", "bruker") && settings$peakPicking) || settings$convAlgo == "openms")
+            "centroid"
+        else
+            "profile"
+        ret$steps <- data.table(algorithm = settings$convAlgo, from = paste0(fromt, "_", settings$convFrom),
+                                to = paste0(tot, "_", settings$convTo))
+    }
+    
+    ret$brukerCalib <- list(enabled = settings$doDACalib, method = settings$DAMethod,
+                            methodPos = settings$DAMethodPos, methodNeg = settings$DAMethodNeg)
+
+    return(ret)    
 }

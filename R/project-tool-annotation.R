@@ -14,7 +14,7 @@ newProjectAnnotationUI <- function(id)
                 conditionalPanel(
                     condition = "input.components != \"nontarget\" && input.components != \"\"",
                     ns = ns,
-                    checkboxInput(ns("selectIons"), "Select feature adduct ions", value = TRUE)
+                    checkboxInput(ns("selectIons"), "Select feature adduct ions")
                 )
             ),
             fillRow(
@@ -38,7 +38,7 @@ newProjectAnnotationUI <- function(id)
                     fillCol(
                         selectInput(ns("peakListGen"), "Peak list generator",
                                     c("mzR", "Bruker DataAnalysis" = "Bruker"),
-                                    "mzR", multiple = FALSE, width = "95%"),
+                                    multiple = FALSE, width = "95%"),
                         checkboxInput(ns("DIA"), "Data Independent Acquisition (DIA) MS/MS")
                     ),
                     conditionalPanel(
@@ -76,7 +76,7 @@ newProjectAnnotationUI <- function(id)
                             condition = "input.annotateSus",
                             ns = ns,
                             checkboxInput(ns("genIDLevelFile"), "Generate template file with configurable identification levels",
-                                          TRUE, width = "100%")
+                                          width = "100%")
                         ),
                         textNote("Suspect annotation is currently only optimized for GenForm/MetFrag")
                     )
@@ -134,4 +134,30 @@ newProjectAnnotationServer <- function(id, hasSuspects, settings)
             ))
         )
     })
+}
+
+defaultAnnotationSettings <- function()
+{
+    return(list(
+        components = "",
+        selectIons = TRUE,
+        formulaGen = "",
+        compIdent = "",
+        peakListGen = "mzR",
+        DIA = FALSE,
+        precursorMzWindow = 4,
+        MSLibraryFormat = "msp",
+        MSLibraryPath = "",
+        annotateSus = TRUE,
+        genIDLevelFile = TRUE
+    ))
+}
+
+upgradeAnnotationSettings <- function(settings)
+{
+    # NOTE: this updates from first file version
+    return(modifyList(defaultAnnotationSettings(),
+                      settings[c("components", "selectIons", "formulaGen", "compIdent", "peakListGen", "DIA",
+                                 "precursorMzWindow", "MSLibraryFormat", "MSLibraryPath", "annotateSus",
+                                 "genIDLevelFile")]))
 }

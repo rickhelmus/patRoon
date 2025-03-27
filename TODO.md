@@ -195,6 +195,8 @@
     - DA features and formulas?
     - manually check all HTML reporting functionality at the end
     - generateAnalysisInfo()?
+- newProject()
+    - importing old yml files, esp wrt file conversion
 
 
 ## Docs

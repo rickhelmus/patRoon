@@ -1,12 +1,11 @@
-newProjectGeneralUI <- function(id, destPath)
+newProjectGeneralUI <- function(id)
 {
     ns <- NS(id)
     tagList(
         miniUI::miniContentPanel(
             fillCol(
                 flex = NA,
-                fileSelect(ns("destination"), ns("destinationButton"), "Project destination",
-                           if (is.null(destPath)) "~/" else destPath),
+                fileSelect(ns("destination"), ns("destinationButton"), "Project destination"),
                 br(),
                 fillRow(
                     height = 100,
@@ -15,8 +14,8 @@ newProjectGeneralUI <- function(id, destPath)
                     conditionalPanel(
                         condition = "input.outputScriptTo == \"newFile\"",
                         ns = ns,
-                        textInput(ns("scriptFile"), "Script file", "process.R", width = "80%"),
-                        checkboxInput(ns("createRStudioProj"), "Create (and open) RStudio project", value = TRUE)
+                        textInput(ns("scriptFile"), "Script file", width = "80%"),
+                        checkboxInput(ns("createRStudioProj"), "Create (and open) RStudio project")
                     )
                 ),
                 br(),
@@ -40,7 +39,7 @@ newProjectGeneralServer <- function(id, settings)
         doObserveSelDir(input, session, "destination", "destinationButton")
         
         observeEvent(settings(), {
-            # UNDONE: update destination?
+            updateTextInput(session, "destination", value = settings()$destination)
             updateRadioButtons(session, "outputScriptTo", selected = settings()$outputScriptTo)
             updateTextInput(session, "scriptFile", value = settings()$scriptFile)
             updateCheckboxInput(session, "createRStudioProj", value = settings()$createRStudioProj)
@@ -67,4 +66,22 @@ newProjectGeneralServer <- function(id, settings)
             saveParams = reactive(input$saveParams)
         )
     })
+}
+
+defaultGeneralSettings <- function(destPath)
+{
+    return(list(
+        destination = if (is.null(destPath)) "~/" else destPath,
+        outputScriptTo = "newFile",
+        scriptFile = "process.R",
+        createRStudioProj = TRUE,
+        ionization = "positive"
+    ))
+}
+
+upgradeGeneralSettings <- function(settings, destPath)
+{
+    # NOTE: this updates from first file version
+    return(modifyList(defaultGeneralSettings(destPath),
+                      settings[c("outputScriptTo", "scriptFile", "createRStudioProj", "ionization")]))
 }

@@ -188,7 +188,7 @@ getScriptCode <- function(anaInfoData, settings)
             list(name = "stringsAsFactors", value = FALSE)
         ))
     }
-    addLoadSuspList <- function(name, doEx, varBase, exVarBase, inpVarBase)
+    addLoadSuspList <- function(name, ionization, doEx, featSettings, varBase, exVarBase, inpVarBase)
     {
         # Generalized for suspect screening and ISTD normalization
         
@@ -201,9 +201,9 @@ getScriptCode <- function(anaInfoData, settings)
             exVarBasePos <- paste0("patRoonData::", exVarBase, "Pos")
             exVarBaseNeg <- paste0("patRoonData::", exVarBase, "Neg")
             
-            if (settings$general$ionization == "positive")
+            if (ionization == "positive")
                 addAssignment(varBase, exVarBasePos)
-            else if (settings$general$ionization == "negative")
+            else if (ionization == "negative")
                 addAssignment(varBase, exVarBaseNeg)
             else
             {
@@ -215,17 +215,18 @@ getScriptCode <- function(anaInfoData, settings)
         {
             addComment(paste("Load", name))
             
-            if (settings$general$ionization != "both")
-                addLoadSuspCall(varBase, settings$features[[inpVarBase]])
+            if (ionization != "both")
+                addLoadSuspCall(varBase, featSettings[[inpVarBase]])
             else
             {
-                if (nzchar(settings$features$suspectListNeg))
+                inpVarBasePos <- paste0(inpVarBase, "Pos"); inpVarBaseNeg <- paste0(inpVarBase, "Neg")
+                if (nzchar(featSettings[[inpVarBaseNeg]]))
                 {
-                    addLoadSuspCall(varBasePos, settings$features[[paste0(inpVarBase, "Pos")]])
-                    addLoadSuspCall(varBaseNeg, settings$features[[paste0(inpVarBase, "Neg")]])
+                    addLoadSuspCall(varBasePos, featSettings[[inpVarBasePos]])
+                    addLoadSuspCall(varBaseNeg, featSettings[[inpVarBaseNeg]])
                 }
                 else
-                    addLoadSuspCall(varBase, settings$features[[paste0(inpVarBase, "Pos")]])
+                    addLoadSuspCall(varBase, featSettings[[inpVarBasePos]])
             }
         }
     }
@@ -313,12 +314,12 @@ getScriptCode <- function(anaInfoData, settings)
         list(name = "retAlignParam", value = "xcms::ObiwarpParam()", condition = settings$features$featGrouper == "XCMS")
     ))
     
-    retRange <- settings$features$retention
+    retRange <- settings$features$advanced$retention
     if (all(retRange == 0))
         retRange <- NULL
     else if (retRange[2] == 0)
         retRange[2] <- Inf
-    mzRange <- settings$features$mz
+    mzRange <- settings$features$advanced$mz
     if (all(mzRange == 0))
         mzRange <- NULL
     else if (mzRange[2] == 0)
@@ -327,12 +328,12 @@ getScriptCode <- function(anaInfoData, settings)
     addComment("Basic rule based filtering")
     addCall("fGroups", "filter", list(
         list(value = "fGroups"),
-        list(name = "preAbsMinIntensity", value = settings$features$preIntThr, zeroToNULL = TRUE),
-        list(name = "absMinIntensity", value = settings$features$intThr, zeroToNULL = TRUE),
-        list(name = "relMinReplicateAbundance", value = settings$features$repAbundance, zeroToNULL = TRUE),
-        list(name = "maxReplicateIntRSD", value = settings$features$maxRepRSD, zeroToNULL = TRUE),
-        list(name = "blankThreshold", value = settings$features$blankThr, zeroToNULL = TRUE),
-        list(name = "removeBlanks", value = settings$features$removeBlanks),
+        list(name = "preAbsMinIntensity", value = settings$features$advanced$preIntThr, zeroToNULL = TRUE),
+        list(name = "absMinIntensity", value = settings$features$advanced$intThr, zeroToNULL = TRUE),
+        list(name = "relMinReplicateAbundance", value = settings$features$advanced$repAbundance, zeroToNULL = TRUE),
+        list(name = "maxReplicateIntRSD", value = settings$features$advanced$maxRepRSD, zeroToNULL = TRUE),
+        list(name = "blankThreshold", value = settings$features$advanced$blankThr, zeroToNULL = TRUE),
+        list(name = "removeBlanks", value = settings$features$advanced$removeBlanks),
         list(name = "retentionRange", value = retRange),
         list(name = "mzRange", value = mzRange)
     ))
@@ -368,21 +369,22 @@ getScriptCode <- function(anaInfoData, settings)
         }
     }
     
-    if (settings$features$featNorm != "none" || settings$features$groupNorm)
+    if (settings$features$advanced$featNorm != "none" || settings$features$advanced$groupNorm)
     {
         addHeader("normalization")
         
-        if (settings$features$featNorm == "istd")
+        if (settings$features$advanced$featNorm == "istd")
         {
-            addLoadSuspList("ISTD list",
-                            (settings$general$ionization != "both" && !nzchar(settings$features$ISTDList)) ||
-                                (settings$general$ionization == "both" && !nzchar(settings$features$ISTDListPos)),
-                            "ISTDList", "ISTDList", "ISTDList")
+            addLoadSuspList("ISTD list", settings$general$ionization,
+                            (settings$general$ionization != "both" && !nzchar(settings$features$advanced$ISTDList)) ||
+                                (settings$general$ionization == "both" && !nzchar(settings$features$advanced$ISTDListPos)),
+                            settings$features$advanced, "ISTDList", "ISTDList", "ISTDList")
             addNL()
             if (settings$general$ionization != "both")
                 addComment("Set adduct to NULL if ISTD list contains an adduct column")
             
-            standards <- if (settings$general$ionization != "both" || (!settings$features$exSuspList && !nzchar(settings$features$suspectListNeg)))
+            standards <- if (settings$general$ionization != "both" ||
+                             (!settings$features$exSuspList && !nzchar(settings$features$advanced$ISTDListNeg)))
                 "ISTDList"
             else
                 c("ISTDListPos", "ISTDListNeg")
@@ -392,16 +394,16 @@ getScriptCode <- function(anaInfoData, settings)
         
         addCall("fGroups", "normInts", list(
             list(value = "fGroups"),
-            list(name = "featNorm", value = settings$features$featNorm, quote = TRUE),
-            list(name = "groupNorm", value = settings$features$groupNorm),
+            list(name = "featNorm", value = settings$features$advanced$featNorm, quote = TRUE),
+            list(name = "groupNorm", value = settings$features$advanced$groupNorm),
             list(name = "normFunc", value = "max"),
-            list(name = "standards", value = standards, condition = settings$features$featNorm == "istd"),
-            list(name = "ISTDRTWindow", value = 120, condition = settings$features$featNorm == "istd"),
-            list(name = "ISTDMZWindow", value = 300, condition = settings$features$featNorm == "istd"),
-            list(name = "minISTDs", value = 3, condition = settings$features$featNorm == "istd"),
-            list(name = "rtWindow", value = 12, condition = settings$features$featNorm == "istd"),
-            list(name = "mzWindow", value = 0.005, condition = settings$features$featNorm == "istd"),
-            getAdductArg(settings$features$featNorm == "istd")
+            list(name = "standards", value = standards, condition = settings$features$advanced$featNorm == "istd"),
+            list(name = "ISTDRTWindow", value = 120, condition = settings$features$advanced$featNorm == "istd"),
+            list(name = "ISTDMZWindow", value = 300, condition = settings$features$advanced$featNorm == "istd"),
+            list(name = "minISTDs", value = 3, condition = settings$features$advanced$featNorm == "istd"),
+            list(name = "rtWindow", value = 12, condition = settings$features$advanced$featNorm == "istd"),
+            list(name = "mzWindow", value = 0.005, condition = settings$features$advanced$featNorm == "istd"),
+            getAdductArg(settings$features$advanced$featNorm == "istd")
         ))
     }
     
@@ -412,7 +414,8 @@ getScriptCode <- function(anaInfoData, settings)
     {
         addHeader("suspect screening")
         
-        addLoadSuspList("suspect list", settings$features$exSuspList, "suspList", "suspects", "suspectList")
+        addLoadSuspList("suspect list", settings$ionization, settings$features$exSuspList, settings$features,
+                        "suspList", "suspects", "suspectList")
         
         useScrForTPScreening <- settings$TP$doTPs && settings$TP$TPGen != "Logic" && settings$TP$TPGenInput == "screening"
         

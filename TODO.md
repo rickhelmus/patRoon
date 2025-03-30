@@ -197,6 +197,7 @@
     - generateAnalysisInfo()?
 - newProject()
     - importing old yml files, esp wrt file conversion
+    - verify suspect/ISTD loading with all polarity options and examples
 
 
 ## Docs

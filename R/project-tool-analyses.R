@@ -58,13 +58,13 @@ newProjectAnalysesUI <- function(id)
         pf <- if (is.null(pol)) "" else if (pol == "positive") "Pos" else "Neg"
         
         htmltools::tagList(
-            fileSelect(ns(paste0("genAnaInfoDynRaw", pf)), ns("genAnaInfoDynRawButton"),
+            fileSelect(ns(paste0("genAnaInfoDynRaw", pf)), ns(paste0("genAnaInfoDynRawButton", pf)),
                        "raw analyses", "", placeholder = "Leave empty for none"),
-            fileSelect(ns(paste0("genAnaInfoDynCentroid", pf)), ns("genAnaInfoDynCentroidButton"),
+            fileSelect(ns(paste0("genAnaInfoDynCentroid", pf)), ns(paste0("genAnaInfoDynCentroidButton", pf)),
                        "centroided analyses", "", placeholder = "Leave empty for none"),
-            fileSelect(ns(paste0("genAnaInfoDynIMS", pf)), ns("genAnaInfoDynIMSButton"),
+            fileSelect(ns(paste0("genAnaInfoDynIMS", pf)), ns(paste0("genAnaInfoDynIMSButton", pf)),
                        "IMS analyses", "", placeholder = "Leave empty for none"),
-            fileSelect(ns(paste0("genAnaInfoDynProfile", pf)), ns("genAnaInfoDynProfileButton"),
+            fileSelect(ns(paste0("genAnaInfoDynProfile", pf)), ns(paste0("genAnaInfoDynProfileButton", pf)),
                        "profile analyses", "", placeholder = "Leave empty for none")
         )
     }
@@ -513,10 +513,11 @@ newProjectAnalysesServer <- function(id, ionization, settings)
             }
         })
         
-        doObserveGenAnaInfoDynSelDir <- function(textID, buttonID)
+        doObserveGenAnaInfoDynSelDir <- function(textID, buttonID, pol)
         {
+            pf <- if (is.null(pol)) "" else if (pol == "positive") "Pos" else "Neg"
+            buttonID <- paste0(buttonID, pf)
             observeEvent(input[[buttonID]], {
-                pf <- if (input$ionization != "both") "" else if (input$currentSetDynamic == "positive") "Pos" else "Neg"
                 textID <- paste0(textID, pf)
                 d <- rstudioapi::selectDirectory("Select directory", path = input[[textID]])
                 if (!is.null(d))
@@ -524,10 +525,13 @@ newProjectAnalysesServer <- function(id, ionization, settings)
             })
         }
         
-        doObserveGenAnaInfoDynSelDir("genAnaInfoDynRaw", "genAnaInfoDynRawButton")
-        doObserveGenAnaInfoDynSelDir("genAnaInfoDynCentroid", "genAnaInfoDynCentroidButton")
-        doObserveGenAnaInfoDynSelDir("genAnaInfoDynIMS", "genAnaInfoDynIMSButton")
-        doObserveGenAnaInfoDynSelDir("genAnaInfoDynProfile", "genAnaInfoDynProfileButton")
+        for (pol in list(NULL, "positive", "negative"))
+        {
+            doObserveGenAnaInfoDynSelDir("genAnaInfoDynRaw", "genAnaInfoDynRawButton", pol)
+            doObserveGenAnaInfoDynSelDir("genAnaInfoDynCentroid", "genAnaInfoDynCentroidButton", pol)
+            doObserveGenAnaInfoDynSelDir("genAnaInfoDynIMS", "genAnaInfoDynIMSButton", pol)
+            doObserveGenAnaInfoDynSelDir("genAnaInfoDynProfile", "genAnaInfoDynProfileButton", pol)
+        }
         
         doObserveSelDir(input, session, "destinationPath", "destinationPathButton")
         

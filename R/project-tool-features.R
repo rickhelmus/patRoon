@@ -10,16 +10,16 @@ newProjectFeaturesUI <- function(id)
                     height = 90,
                     flex = NA,
                     fillRow(
-                        selectInput(ns("featFinder"), "Feature finder", c("OpenMS", "XCMS", "enviPick", "SIRIUS", "KPIC2",
+                        selectInput(ns("featAlgo"), "Feature finder", c("OpenMS", "XCMS", "enviPick", "SIRIUS", "KPIC2",
                                                                           "Bruker DataAnalysis" = "Bruker"),
                                     multiple = FALSE, width = "95%"),
                         fillCol(
                             flex = c(1, NA),
                             height = 90,
-                            selectInput(ns("featGrouper"), "Feature grouper", c("OpenMS", "XCMS", "KPIC2", "SIRIUS"),
+                            selectInput(ns("fGroupsAlgo"), "Feature grouper", c("OpenMS", "XCMS", "KPIC2", "SIRIUS"),
                                         multiple = FALSE, width = "100%"),
                             conditionalPanel(
-                                condition = "input.featGrouper == \"SIRIUS\"",
+                                condition = "input.fGroupsAlgo == \"SIRIUS\"",
                                 ns = ns,
                                 textNote(HTML("This will always find <b>and</b> group features with SIRIUS."))
                             )
@@ -82,8 +82,8 @@ newProjectFeaturesServer <- function(id, ionization, settings)
         rValues <- reactiveValues(advanced = defaultFeaturesSettings()$advanced)
         
         observeEvent(settings(), {
-            updateSelectInput(session, "featFinder", selected = settings()$featFinder)
-            updateSelectInput(session, "featGrouper", selected = settings()$featGrouper)
+            updateSelectInput(session, "featAlgo", selected = settings()$featAlgo)
+            updateSelectInput(session, "fGroupsAlgo", selected = settings()$fGroupsAlgo)
             updateTextInput(session, "suspectList", value = settings()$suspectList)
             updateTextInput(session, "suspectListPos", value = settings()$suspectListPos)
             updateTextInput(session, "suspectListNeg", value = settings()$suspectListNeg)
@@ -104,14 +104,14 @@ newProjectFeaturesServer <- function(id, ionization, settings)
         observeEvent(input$ISTDListButtonPos, selectSuspList(session, "ISTDListPos"))
         observeEvent(input$ISTDListButtonNeg, selectSuspList(session, "ISTDListNeg"))
         
-        observeEvent(input$featGrouper, {
-            if (ionization() == "both" && input$featGrouper == "SIRIUS")
+        observeEvent(input$fGroupsAlgo, {
+            if (ionization() == "both" && input$fGroupsAlgo == "SIRIUS")
             {
                 rstudioapi::showDialog("Not supported", "Grouping features with SIRIUS is currently not supported with sets", "")
-                updateSelectInput(inputId = "featGrouper", selected = "OpenMS")
+                updateSelectInput(inputId = "fGroupsAlgo", selected = "OpenMS")
             }
             else
-                shinyjs::toggleState("featFinder", input$featGrouper != "SIRIUS")
+                shinyjs::toggleState("featAlgo", input$fGroupsAlgo != "SIRIUS")
         })
         
         observeEvent(input$advancedOpen, {
@@ -230,8 +230,8 @@ newProjectFeaturesServer <- function(id, ionization, settings)
         list(
             valid = \() TRUE,
             settings = reactive(list(
-                featFinder = input$featFinder,
-                featGrouper = input$featGrouper,
+                featAlgo = input$featAlgo,
+                fGroupsAlgo = input$fGroupsAlgo,
                 suspectList = input$suspectList,
                 suspectListPos = input$suspectListPos,
                 suspectListNeg = input$suspectListNeg,
@@ -245,8 +245,8 @@ newProjectFeaturesServer <- function(id, ionization, settings)
 defaultFeaturesSettings <- function()
 {
     return(list(
-        featFinder = "OpenMS",
-        featGrouper = "OpenMS",
+        featAlgo = "OpenMS",
+        fGroupsAlgo = "OpenMS",
         suspectList = "",
         suspectListPos = "",
         suspectListNeg = "",
@@ -273,8 +273,9 @@ upgradeFeaturesSettings <- function(settings)
 {
     # NOTE: this updates from first file version
     ret <- modifyList(defaultFeaturesSettings(),
-                      settings[c("featFinder", "featGrouper", "suspectList", "suspectListPos", "suspectListNeg",
-                                 "exSuspList")])
+                      settings[c("suspectList", "suspectListPos", "suspectListNeg", "exSuspList")])
+    ret$featAlgo <- settings$featFinder
+    ret$fGroupsAlgo <- settings$featGrouper
     ret$retention <- c(settings[["retention-min"]], settings[["retention-max"]])
     ret$mz <- c(settings[["mz-min"]], settings[["mz-max"]])
     ret$advanced <- settings[c("preIntThr", "intThr", "repAbundance", "maxRepRSD", "blankThr", "removeBlanks",

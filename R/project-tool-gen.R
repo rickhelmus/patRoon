@@ -165,21 +165,21 @@ getScriptCode <- function(anaInfoData, settings)
     {
         addCall(varName, "findFeatures", list(
             list(value = anaInfoVarName),
-            list(value = if (settings$features$featFinder == "XCMS") "xcms3" else tolower(settings$features$featFinder), quote = TRUE),
-            list(name = "noiseThrInt", value = 1000, condition = settings$features$featFinder == "OpenMS"),
-            list(name = "chromSNR", value = 3, condition = settings$features$featFinder == "OpenMS"),
-            list(name = "chromFWHM", value = 5, condition = settings$features$featFinder == "OpenMS"),
-            list(name = "minFWHM", value = 1, condition = settings$features$featFinder == "OpenMS"),
-            list(name = "maxFWHM", value = 30, condition = settings$features$featFinder == "OpenMS"),
-            list(name = "kmeans", value = TRUE, condition = settings$features$featFinder == "KPIC2"),
-            list(name = "level", value = 1000, condition = settings$features$featFinder == "KPIC2"),
-            list(name = "doFMF", value = TRUE, condition = settings$features$featFinder == "Bruker")
+            list(value = if (settings$features$featAlgo == "XCMS") "xcms3" else tolower(settings$features$featAlgo), quote = TRUE),
+            list(name = "noiseThrInt", value = 1000, condition = settings$features$featAlgo == "OpenMS"),
+            list(name = "chromSNR", value = 3, condition = settings$features$featAlgo == "OpenMS"),
+            list(name = "chromFWHM", value = 5, condition = settings$features$featAlgo == "OpenMS"),
+            list(name = "minFWHM", value = 1, condition = settings$features$featAlgo == "OpenMS"),
+            list(name = "maxFWHM", value = 30, condition = settings$features$featAlgo == "OpenMS"),
+            list(name = "kmeans", value = TRUE, condition = settings$features$featAlgo == "KPIC2"),
+            list(name = "level", value = 1000, condition = settings$features$featAlgo == "KPIC2"),
+            list(name = "doFMF", value = TRUE, condition = settings$features$featAlgo == "Bruker")
         ))
     }
     getAdductArg <- function(cond = TRUE) list(name = "adduct", value = if (settings$general$ionization == "positive") "[M+H]+" else "[M-H]-",
                                                quote = TRUE,
                                                condition = settings$general$ionization != "both" &&
-                                                   (!nzchar(settings$annotation$components) || settings$annotation$components == "nontarget" || !settings$annotation$selectIons) &&
+                                                   (!nzchar(settings$annotation$componAlgo) || settings$annotation$componAlgo == "nontarget" || !settings$annotation$selectIons) &&
                                                    cond)
     addLoadSuspCall <- function(var, file)
     {
@@ -281,12 +281,12 @@ getScriptCode <- function(anaInfoData, settings)
     
     addHeader("features")
     
-    if (settings$features$featGrouper != "SIRIUS") # NOTE: never the case with sets
+    if (settings$features$fGroupsAlgo != "SIRIUS") # NOTE: never the case with sets
     {
         addComment("Find all features")
         addComment(sprintf("NOTE: see the %s manual for many more options",
-                           if (settings$features$featFinder == "OpenMS") "reference" else settings$features$featFinder),
-                   condition = !settings$features$featFinder %in% c("Bruker", "SIRIUS"))
+                           if (settings$features$featAlgo == "OpenMS") "reference" else settings$features$featAlgo),
+                   condition = !settings$features$featAlgo %in% c("Bruker", "SIRIUS"))
         if (settings$general$ionization != "both")
             addFindFeatures("fList", "anaInfo")
         else
@@ -305,13 +305,13 @@ getScriptCode <- function(anaInfoData, settings)
     
     addComment("Group and align features between analyses")
     addCall("fGroups", "groupFeatures", list(
-        list(value = "fList", condition = settings$features$featGrouper != "SIRIUS"),
-        list(value = "anaInfo", condition = settings$features$featGrouper == "SIRIUS"),
-        list(value = if (settings$features$featGrouper == "XCMS") "xcms3" else tolower(settings$features$featGrouper), quote = TRUE),
-        list(name = "rtalign", value = TRUE, condition = settings$features$featGrouper != "SIRIUS"),
+        list(value = "fList", condition = settings$features$fGroupsAlgo != "SIRIUS"),
+        list(value = "anaInfo", condition = settings$features$fGroupsAlgo == "SIRIUS"),
+        list(value = if (settings$features$fGroupsAlgo == "XCMS") "xcms3" else tolower(settings$features$fGroupsAlgo), quote = TRUE),
+        list(name = "rtalign", value = TRUE, condition = settings$features$fGroupsAlgo != "SIRIUS"),
         list(name = "groupParam", value = "xcms::PeakDensityParam(sampleGroups = analysisInfo(fList)$replicate)",
-             condition = settings$features$featGrouper == "XCMS"),
-        list(name = "retAlignParam", value = "xcms::ObiwarpParam()", condition = settings$features$featGrouper == "XCMS")
+             condition = settings$features$fGroupsAlgo == "XCMS"),
+        list(name = "retAlignParam", value = "xcms::ObiwarpParam()", condition = settings$features$fGroupsAlgo == "XCMS")
     ))
     
     retRange <- settings$features$advanced$retention
@@ -338,23 +338,23 @@ getScriptCode <- function(anaInfoData, settings)
         list(name = "mzRange", value = mzRange)
     ))
     
-    if (nzchar(settings$annotation$components))
+    if (nzchar(settings$annotation$componAlgo))
     {
         addHeader("componentization")
         
         addComment("Perform automatic generation of components")
         addCall("components", "generateComponents", list(
             list(value = "fGroups"),
-            list(value = tolower(settings$annotation$components), quote = TRUE),
+            list(value = tolower(settings$annotation$componAlgo), quote = TRUE),
             list(name = "ionization", value = settings$general$ionization, quote = TRUE, condition = settings$general$ionization != "both"),
-            list(name = "rtRange", value = c(-120, 120), condition = settings$annotation$components == "nontarget"),
-            list(name = "mzRange", value = c(5, 120), condition = settings$annotation$components == "nontarget"),
-            list(name = "elements", value = c("C", "H", "O"), quote = TRUE, condition = settings$annotation$components == "nontarget"),
-            list(name = "rtDev", value = defaultLim("retention", "wide"), condition = settings$annotation$components == "nontarget"),
-            list(name = "absMzDev", value = 0.002, condition = settings$annotation$components == "nontarget")
+            list(name = "rtRange", value = c(-120, 120), condition = settings$annotation$componAlgo == "nontarget"),
+            list(name = "mzRange", value = c(5, 120), condition = settings$annotation$componAlgo == "nontarget"),
+            list(name = "elements", value = c("C", "H", "O"), quote = TRUE, condition = settings$annotation$componAlgo == "nontarget"),
+            list(name = "rtDev", value = defaultLim("retention", "wide"), condition = settings$annotation$componAlgo == "nontarget"),
+            list(name = "absMzDev", value = 0.002, condition = settings$annotation$componAlgo == "nontarget")
         ))
         
-        if (settings$annotation$selectIons && settings$annotation$components != "nontarget")
+        if (settings$annotation$selectIons && settings$annotation$componAlgo != "nontarget")
         {
             pa <- switch(settings$general$ionization,
                          positive = "[M+H]+",
@@ -475,13 +475,13 @@ getScriptCode <- function(anaInfoData, settings)
         addScreenCall("suspListTPs", am = if (useScrForTPScreening) TRUE else NULL)
     }
     
-    doMSPL <- nzchar(settings$annotation$formulaGen) || nzchar(settings$annotation$compIdent)
+    doMSPL <- nzchar(settings$annotation$formulasAlgo) || nzchar(settings$annotation$compoundsAlgo)
     
-    if (nzchar(settings$annotation$formulaGen) || nzchar(settings$annotation$compIdent))
+    if (nzchar(settings$annotation$formulasAlgo) || nzchar(settings$annotation$compoundsAlgo))
     {
         addHeader("annotation")
         
-        useFMF <- settings$features$featFinder == "Bruker" && settings$annotation$peakListGen == "Bruker"
+        useFMF <- settings$features$featAlgo == "Bruker" && settings$annotation$peakListGen == "Bruker"
         addComment("Retrieve MS peak lists")
         addCall("avgMSListParams", "getDefAvgPListParams", list(name = "clusterMzWindow", value = 0.005))
         addCall("mslists", "generateMSPeakLists", list(
@@ -508,32 +508,32 @@ getScriptCode <- function(anaInfoData, settings)
             list(name = "topMSMSPeaks", value = 25)
         ))
         
-        if (nzchar(settings$annotation$formulaGen))
+        if (nzchar(settings$annotation$formulasAlgo))
         {
             addNL()
             addComment("Calculate formula candidates")
             addCall("formulas", "generateFormulas", list(
                 list(value = "fGroups"),
                 list(value = "mslists"),
-                list(value = tolower(settings$annotation$formulaGen), quote = TRUE),
-                list(name = "relMzDev", value = 5, condition = settings$annotation$formulaGen != "Bruker"),
+                list(value = tolower(settings$annotation$formulasAlgo), quote = TRUE),
+                list(name = "relMzDev", value = 5, condition = settings$annotation$formulasAlgo != "Bruker"),
                 list(name = "precursorMzSearchWindow", value = defaultLim("mz", "narrow"),
-                     condition = settings$annotation$formulaGen == "Bruker"),
+                     condition = settings$annotation$formulasAlgo == "Bruker"),
                 getAdductArg(),
-                list(name = "elements", value = "CHNOP", quote = TRUE, condition = settings$annotation$formulaGen != "Bruker"),
-                list(name = "oc", value = FALSE, condition = settings$annotation$formulaGen == "GenForm"),
-                list(name = "profile", value = "qtof", quote = TRUE, condition = settings$annotation$formulaGen == "SIRIUS"),
-                list(name = "calculateFeatures", value = "TRUE", condition = settings$annotation$formulaGen != "Bruker"),
+                list(name = "elements", value = "CHNOP", quote = TRUE, condition = settings$annotation$formulasAlgo != "Bruker"),
+                list(name = "oc", value = FALSE, condition = settings$annotation$formulasAlgo == "GenForm"),
+                list(name = "profile", value = "qtof", quote = TRUE, condition = settings$annotation$formulasAlgo == "SIRIUS"),
+                list(name = "calculateFeatures", value = "TRUE", condition = settings$annotation$formulasAlgo != "Bruker"),
                 list(name = "featThresholdAnn", value = 0.75),
                 list(name = "setThresholdAnn", value = 0, condition = settings$general$ionization == "both")
             ))
         }
         
-        if (nzchar(settings$annotation$compIdent))
+        if (nzchar(settings$annotation$compoundsAlgo))
         {
             addNL()
             
-            if (settings$annotation$compIdent == "Library")
+            if (settings$annotation$compoundsAlgo == "Library")
             {
                 addComment("Load MS library. You may want to filter it, please see the manuals for more details.")
                 addCall("mslibrary", "loadMSLibrary", list(
@@ -543,7 +543,7 @@ getScriptCode <- function(anaInfoData, settings)
                 ))
             }
             
-            doTPDB <- settings$annotation$compIdent == "MetFrag" && settings$TP$doTPs && settings$TP$TPGen != "Logic" && settings$TP$TPDoMFDB
+            doTPDB <- settings$annotation$compoundsAlgo == "MetFrag" && settings$TP$doTPs && settings$TP$TPGen != "Logic" && settings$TP$TPDoMFDB
             if (doTPDB)
                 addCall(NULL, "convertToMFDB", list(
                     list(value = "TPs"),
@@ -553,34 +553,34 @@ getScriptCode <- function(anaInfoData, settings)
             
             addComment("Calculate compound structure candidates")
             
-            if (settings$annotation$compIdent == "SIRIUS")
+            if (settings$annotation$compoundsAlgo == "SIRIUS")
                 addComment("Please see the handbook for SIRIUS login options. If you want to disable automatic login set login=FALSE")
             
             addCall("compounds", "generateCompounds", list(
                 list(value = "fGroups"),
                 list(value = "mslists"),
-                list(value = tolower(settings$annotation$compIdent), quote = TRUE),
-                list(name = "dbRelMzDev", value = 5, condition = settings$annotation$compIdent == "MetFrag"),
-                list(name = "fragRelMzDev", value = 5, condition = settings$annotation$compIdent == "MetFrag"),
-                list(name = "fragAbsMzDev", value = 0.002, condition = settings$annotation$compIdent == "MetFrag"),
-                list(name = "relMzDev", value = 5, condition = settings$annotation$compIdent == "SIRIUS"),
+                list(value = tolower(settings$annotation$compoundsAlgo), quote = TRUE),
+                list(name = "dbRelMzDev", value = 5, condition = settings$annotation$compoundsAlgo == "MetFrag"),
+                list(name = "fragRelMzDev", value = 5, condition = settings$annotation$compoundsAlgo == "MetFrag"),
+                list(name = "fragAbsMzDev", value = 0.002, condition = settings$annotation$compoundsAlgo == "MetFrag"),
+                list(name = "relMzDev", value = 5, condition = settings$annotation$compoundsAlgo == "SIRIUS"),
                 getAdductArg(),
-                list(name = "database", value = "pubchem", quote = TRUE, condition = settings$annotation$compIdent == "MetFrag" && !doTPDB),
+                list(name = "database", value = "pubchem", quote = TRUE, condition = settings$annotation$compoundsAlgo == "MetFrag" && !doTPDB),
                 list(name = "database", value = "csv", quote = TRUE, condition = doTPDB),
                 list(name = "extraOpts", value = "list(LocalDatabasePath = \"TP-database.csv\")", condition = doTPDB),
-                list(name = "maxCandidatesToStop", value = 2500, condition = settings$annotation$compIdent == "MetFrag"),
-                list(name = "fingerIDDatabase", value = "pubchem", quote = TRUE, condition = settings$annotation$compIdent == "SIRIUS"),
-                list(name = "elements", value = "CHNOP", quote = TRUE, condition = settings$annotation$compIdent == "SIRIUS"),
-                list(name = "profile", value = "qtof", quote = TRUE, condition = settings$annotation$compIdent == "SIRIUS"),
-                list(name = "login", value = "interactive", quote = TRUE, condition = settings$annotation$compIdent == "SIRIUS"),
-                list(name = "alwaysLogin", value = FALSE, condition = settings$annotation$compIdent == "SIRIUS"),
-                list(name = "MSLibrary", value = "mslibrary", condition = settings$annotation$compIdent == "Library"),
-                list(name = "minSim", value = 0.75, condition = settings$annotation$compIdent == "Library"),
-                list(name = "absMzDev", value = 0.002, condition = settings$annotation$compIdent == "Library"),
-                list(name = "specSimParams", value = "getDefSpecSimParams()", condition = settings$annotation$compIdent == "Library"),
+                list(name = "maxCandidatesToStop", value = 2500, condition = settings$annotation$compoundsAlgo == "MetFrag"),
+                list(name = "fingerIDDatabase", value = "pubchem", quote = TRUE, condition = settings$annotation$compoundsAlgo == "SIRIUS"),
+                list(name = "elements", value = "CHNOP", quote = TRUE, condition = settings$annotation$compoundsAlgo == "SIRIUS"),
+                list(name = "profile", value = "qtof", quote = TRUE, condition = settings$annotation$compoundsAlgo == "SIRIUS"),
+                list(name = "login", value = "interactive", quote = TRUE, condition = settings$annotation$compoundsAlgo == "SIRIUS"),
+                list(name = "alwaysLogin", value = FALSE, condition = settings$annotation$compoundsAlgo == "SIRIUS"),
+                list(name = "MSLibrary", value = "mslibrary", condition = settings$annotation$compoundsAlgo == "Library"),
+                list(name = "minSim", value = 0.75, condition = settings$annotation$compoundsAlgo == "Library"),
+                list(name = "absMzDev", value = 0.002, condition = settings$annotation$compoundsAlgo == "Library"),
+                list(name = "specSimParams", value = "getDefSpecSimParams()", condition = settings$annotation$compoundsAlgo == "Library"),
                 list(name = "setThresholdAnn", value = 0, condition = settings$general$ionization == "both")
             ))
-            if (settings$annotation$compIdent == "MetFrag")
+            if (settings$annotation$compoundsAlgo == "MetFrag")
             {
                 addCall("compounds", "addFormulaScoring", list(
                     list(value = "compounds"),
@@ -590,14 +590,14 @@ getScriptCode <- function(anaInfoData, settings)
             }
         }
         
-        if (doSusps && settings$annotation$annotateSus && (nzchar(settings$annotation$formulaGen) || nzchar(settings$annotation$compIdent)))
+        if (doSusps && settings$annotation$annotateSus && (nzchar(settings$annotation$formulasAlgo) || nzchar(settings$annotation$compoundsAlgo)))
         {
             addNL()
             addComment("Annotate suspects")
             addCall("fGroups", "annotateSuspects", list(
                 list(value = "fGroups"),
-                list(name = "formulas", value = "formulas", isNULL = !nzchar(settings$annotation$formulaGen)),
-                list(name = "compounds", value = "compounds", isNULL = !nzchar(settings$annotation$compIdent)),
+                list(name = "formulas", value = "formulas", isNULL = !nzchar(settings$annotation$formulasAlgo)),
+                list(name = "compounds", value = "compounds", isNULL = !nzchar(settings$annotation$compoundsAlgo)),
                 list(name = "MSPeakLists", value = "mslists", condition = doMSPL),
                 list(name = "IDFile", value = "idlevelrules.yml", quote = TRUE, condition = settings$annotation$genIDLevelFile)
             ))
@@ -615,8 +615,8 @@ getScriptCode <- function(anaInfoData, settings)
             list(name = "fGroupsTPs", value = "fGroups"),
             list(name = "TPs", value = "TPs"),
             list(name = "MSPeakLists", value = "mslists", condition = doMSPL),
-            list(name = "formulas", value = "formulas", condition = nzchar(settings$annotation$formulaGen)),
-            list(name = "compounds", value = "compounds", condition = nzchar(settings$annotation$compIdent))
+            list(name = "formulas", value = "formulas", condition = nzchar(settings$annotation$formulasAlgo)),
+            list(name = "compounds", value = "compounds", condition = nzchar(settings$annotation$compoundsAlgo))
         ))
         
         addNL()
@@ -629,7 +629,7 @@ getScriptCode <- function(anaInfoData, settings)
             list(name = "minSpecSimBoth", value = "NULL"),
             list(name = "minFragMatches", value = "NULL"),
             list(name = "minNLMatches", value = "NULL"),
-            list(name = "formulas", value = "formulas", isNULL = !nzchar(settings$annotation$formulaGen),
+            list(name = "formulas", value = "formulas", isNULL = !nzchar(settings$annotation$formulasAlgo),
                  condition = settings$TP$TPGen == "Logic")
         ))
         
@@ -643,7 +643,7 @@ getScriptCode <- function(anaInfoData, settings)
         # UNDONE: for now TP components are always reported instead of others
         componVal <- if (settings$TP$doTPs)
             "componentsTP"
-        else if (nzchar(settings$annotation$components) && (!settings$annotation$selectIons || settings$annotation$components == "nontarget"))
+        else if (nzchar(settings$annotation$componAlgo) && (!settings$annotation$selectIons || settings$annotation$componAlgo == "nontarget"))
             "components"
         else
             "NULL"
@@ -656,8 +656,8 @@ getScriptCode <- function(anaInfoData, settings)
             addCall(NULL, "report", list(
                 list(value = "fGroups"),
                 list(name = "MSPeakLists", value = "mslists", isNULL = !doMSPL),
-                list(name = "formulas", value = "formulas", isNULL = !nzchar(settings$annotation$formulaGen)),
-                list(name = "compounds", value = "compounds", isNULL = !nzchar(settings$annotation$compIdent)),
+                list(name = "formulas", value = "formulas", isNULL = !nzchar(settings$annotation$formulasAlgo)),
+                list(name = "compounds", value = "compounds", isNULL = !nzchar(settings$annotation$compoundsAlgo)),
                 list(name = "components", value = componVal),
                 list(name = "TPs", value = "TPs", condition = settings$TP$doTPs),
                 list(name = "settingsFile", value = "report.yml", quote = TRUE),
@@ -674,15 +674,15 @@ getScriptCode <- function(anaInfoData, settings)
             addCall(NULL, "reportCSV", condition = "CSV" %in% settings$report$reportLegacy, list(
                 list(value = "fGroups"),
                 list(name = "path", value = "report", quote = TRUE),
-                list(name = "formulas", value = "formulas", isNULL = !nzchar(settings$annotation$formulaGen)),
-                list(name = "compounds", value = "compounds", isNULL = !nzchar(settings$annotation$compIdent)),
+                list(name = "formulas", value = "formulas", isNULL = !nzchar(settings$annotation$formulasAlgo)),
+                list(name = "compounds", value = "compounds", isNULL = !nzchar(settings$annotation$compoundsAlgo)),
                 list(name = "components", value = componVal)
             ))
             addCall(NULL, "reportPDF", condition = "PDF" %in% settings$report$reportLegacy, list(
                 list(value = "fGroups"),
                 list(name = "path", value = "report", quote = TRUE),
-                list(name = "formulas", value = "formulas", isNULL = !nzchar(settings$annotation$formulaGen)),
-                list(name = "compounds", value = "compounds", isNULL = !nzchar(settings$annotation$compIdent)),
+                list(name = "formulas", value = "formulas", isNULL = !nzchar(settings$annotation$formulasAlgo)),
+                list(name = "compounds", value = "compounds", isNULL = !nzchar(settings$annotation$compoundsAlgo)),
                 list(name = "MSPeakLists", value = "mslists", condition = doMSPL),
                 list(name = "components", value = componVal)
             ))

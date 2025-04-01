@@ -8,11 +8,11 @@ newProjectAnnotationUI <- function(id)
             
             fillCol(
                 height = 100,
-                selectInput(ns("components"), "Component generation",
+                selectInput(ns("componAlgo"), "Component generation",
                             c("None" = "", "RAMClustR", "CAMERA", "OpenMS", "CliqueMS", "nontarget"),
                             multiple = FALSE, width = "100%"),
                 conditionalPanel(
-                    condition = "input.components != \"nontarget\" && input.components != \"\"",
+                    condition = "input.componAlgo != \"nontarget\" && input.componAlgo != \"\"",
                     ns = ns,
                     checkboxInput(ns("selectIons"), "Select feature adduct ions")
                 )
@@ -21,17 +21,17 @@ newProjectAnnotationUI <- function(id)
                 height = 90,
                 fillCol(
                     flex = c(1, NA),
-                    selectInput(ns("formulaGen"), "Formula generation",
+                    selectInput(ns("formulasAlgo"), "Formula generation",
                                 c("None" = "", "GenForm", "SIRIUS", "Bruker DataAnalysis" = "Bruker"),
                                 multiple = FALSE, width = "95%"),
                     textNote("DataAnalysis only works with features from DataAnalysis")
                 ),
-                selectInput(ns("compIdent"), "Compound identification",
+                selectInput(ns("compoundsAlgo"), "Compound identification",
                             c("None" = "", "SIRIUS+CSI:FingerID" = "SIRIUS", "MetFrag", "Library"),
                             multiple = FALSE, width = "100%")
             ),
             conditionalPanel(
-                condition = "input.formulaGen != \"\" || input.compIdent != \"\"",
+                condition = "input.formulasAlgo != \"\" || input.compoundsAlgo != \"\"",
                 ns = ns,
                 fillRow(
                     height = 110,
@@ -49,7 +49,7 @@ newProjectAnnotationUI <- function(id)
                 )
             ),
             conditionalPanel(
-                condition = "input.compIdent == \"Library\"",
+                condition = "input.compoundsAlgo == \"Library\"",
                 ns = ns,
                 fillRow(
                     height = 90,
@@ -65,7 +65,7 @@ newProjectAnnotationUI <- function(id)
                 )
             ),
             conditionalPanel(
-                condition = "output.hasSuspects && (input.formulaGen != \"\" || input.compIdent != \"\")",
+                condition = "output.hasSuspects && (input.formulasAlgo != \"\" || input.compoundsAlgo != \"\")",
                 ns = ns,
                 fillRow(
                     height = 90,
@@ -91,10 +91,10 @@ newProjectAnnotationServer <- function(id, hasSuspects, settings)
     moduleServer(id, function(input, output, session)
     {
         observeEvent(settings(), {
-            updateSelectInput(session, "components", selected = settings()$components)
+            updateSelectInput(session, "componAlgo", selected = settings()$componAlgo)
             updateCheckboxInput(session, "selectIons", value = settings()$selectIons)
-            updateSelectInput(session, "formulaGen", selected = settings()$formulaGen)
-            updateSelectInput(session, "compIdent", selected = settings()$compIdent)
+            updateSelectInput(session, "formulasAlgo", selected = settings()$formulasAlgo)
+            updateSelectInput(session, "compoundsAlgo", selected = settings()$compoundsAlgo)
             updateSelectInput(session, "peakListGen", selected = settings()$peakListGen)
             updateCheckboxInput(session, "DIA", value = settings()$DIA)
             updateNumericInput(session, "precursorMzWindow", value = settings()$precursorMzWindow)
@@ -114,16 +114,16 @@ newProjectAnnotationServer <- function(id, hasSuspects, settings)
         
         list(
             valid = reactive({
-                if (input$compIdent == "Library" && !nzchar(input$MSLibraryPath))
+                if (input$compoundsAlgo == "Library" && !nzchar(input$MSLibraryPath))
                     list(title = "No library path", msg = "Please select a library path!")
                 else
                     TRUE
             }),
             settings = reactive(list(
-                components = input$components,
+                componAlgo = input$componAlgo,
                 selectIons = input$selectIons,
-                formulaGen = input$formulaGen,
-                compIdent = input$compIdent,
+                formulasAlgo = input$formulasAlgo,
+                compoundsAlgo = input$compoundsAlgo,
                 peakListGen = input$peakListGen,
                 DIA = input$DIA,
                 precursorMzWindow = input$precursorMzWindow,
@@ -139,10 +139,10 @@ newProjectAnnotationServer <- function(id, hasSuspects, settings)
 defaultAnnotationSettings <- function()
 {
     return(list(
-        components = "",
+        componAlgo = "",
         selectIons = TRUE,
-        formulaGen = "",
-        compIdent = "",
+        formulasAlgo = "",
+        compoundsAlgo = "",
         peakListGen = "mzR",
         DIA = FALSE,
         precursorMzWindow = 4,
@@ -156,8 +156,11 @@ defaultAnnotationSettings <- function()
 upgradeAnnotationSettings <- function(settings)
 {
     # NOTE: this updates from first file version
-    return(modifyList(defaultAnnotationSettings(),
-                      settings[c("components", "selectIons", "formulaGen", "compIdent", "peakListGen", "DIA",
-                                 "precursorMzWindow", "MSLibraryFormat", "MSLibraryPath", "annotateSus",
-                                 "genIDLevelFile")]))
+    ret <- modifyList(defaultAnnotationSettings(),
+                      settings[c("selectIons", "peakListGen", "DIA", "precursorMzWindow", "MSLibraryFormat",
+                                 "MSLibraryPath", "annotateSus", "genIDLevelFile")])
+    ret$componAlgo <- settings$components
+    ret$formulasAlgo <- ret$formulaGen
+    ret$compoundsAlgo <- ret$compIdent
+    return(ret)
 }

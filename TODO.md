@@ -90,6 +90,7 @@
 ## TC
 
 - rename estimateIDLevels() and have the same name as annotateSuspects()?
+    - estimateIDConfidence()?
 - minAbundanceFeatAbs/Rel: does it make sense to also filter fGroup peak lists? If not, remove and update docs.
 
 ## msdata

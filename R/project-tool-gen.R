@@ -314,12 +314,12 @@ getScriptCode <- function(anaInfoData, settings)
         list(name = "retAlignParam", value = "xcms::ObiwarpParam()", condition = settings$features$fGroupsAlgo == "XCMS")
     ))
     
-    retRange <- settings$features$advanced$retention
+    retRange <- settings$features$fGroupsAdv$retention
     if (all(retRange == 0))
         retRange <- NULL
     else if (retRange[2] == 0)
         retRange[2] <- Inf
-    mzRange <- settings$features$advanced$mz
+    mzRange <- settings$features$fGroupsAdv$mz
     if (all(mzRange == 0))
         mzRange <- NULL
     else if (mzRange[2] == 0)
@@ -328,12 +328,12 @@ getScriptCode <- function(anaInfoData, settings)
     addComment("Basic rule based filtering")
     addCall("fGroups", "filter", list(
         list(value = "fGroups"),
-        list(name = "preAbsMinIntensity", value = settings$features$advanced$preIntThr, zeroToNULL = TRUE),
-        list(name = "absMinIntensity", value = settings$features$advanced$intThr, zeroToNULL = TRUE),
-        list(name = "relMinReplicateAbundance", value = settings$features$advanced$repAbundance, zeroToNULL = TRUE),
-        list(name = "maxReplicateIntRSD", value = settings$features$advanced$maxRepRSD, zeroToNULL = TRUE),
-        list(name = "blankThreshold", value = settings$features$advanced$blankThr, zeroToNULL = TRUE),
-        list(name = "removeBlanks", value = settings$features$advanced$removeBlanks),
+        list(name = "preAbsMinIntensity", value = settings$features$fGroupsAdv$preIntThr, zeroToNULL = TRUE),
+        list(name = "absMinIntensity", value = settings$features$fGroupsAdv$intThr, zeroToNULL = TRUE),
+        list(name = "relMinReplicateAbundance", value = settings$features$fGroupsAdv$repAbundance, zeroToNULL = TRUE),
+        list(name = "maxReplicateIntRSD", value = settings$features$fGroupsAdv$maxRepRSD, zeroToNULL = TRUE),
+        list(name = "blankThreshold", value = settings$features$fGroupsAdv$blankThr, zeroToNULL = TRUE),
+        list(name = "removeBlanks", value = settings$features$fGroupsAdv$removeBlanks),
         list(name = "retentionRange", value = retRange),
         list(name = "mzRange", value = mzRange)
     ))
@@ -369,22 +369,22 @@ getScriptCode <- function(anaInfoData, settings)
         }
     }
     
-    if (settings$features$advanced$featNorm != "none" || settings$features$advanced$groupNorm)
+    if (settings$features$fGroupsAdv$featNorm != "none" || settings$features$fGroupsAdv$groupNorm)
     {
         addHeader("normalization")
         
-        if (settings$features$advanced$featNorm == "istd")
+        if (settings$features$fGroupsAdv$featNorm == "istd")
         {
             addLoadSuspList("ISTD list", settings$general$ionization,
-                            (settings$general$ionization != "both" && !nzchar(settings$features$advanced$ISTDList)) ||
-                                (settings$general$ionization == "both" && !nzchar(settings$features$advanced$ISTDListPos)),
-                            settings$features$advanced, "ISTDList", "ISTDList", "ISTDList")
+                            (settings$general$ionization != "both" && !nzchar(settings$features$fGroupsAdv$ISTDList)) ||
+                                (settings$general$ionization == "both" && !nzchar(settings$features$fGroupsAdv$ISTDListPos)),
+                            settings$features$fGroupsAdv, "ISTDList", "ISTDList", "ISTDList")
             addNL()
             if (settings$general$ionization != "both")
                 addComment("Set adduct to NULL if ISTD list contains an adduct column")
             
             standards <- if (settings$general$ionization != "both" ||
-                             (!settings$features$exSuspList && !nzchar(settings$features$advanced$ISTDListNeg)))
+                             (!settings$features$exSuspList && !nzchar(settings$features$fGroupsAdv$ISTDListNeg)))
                 "ISTDList"
             else
                 c("ISTDListPos", "ISTDListNeg")
@@ -394,16 +394,16 @@ getScriptCode <- function(anaInfoData, settings)
         
         addCall("fGroups", "normInts", list(
             list(value = "fGroups"),
-            list(name = "featNorm", value = settings$features$advanced$featNorm, quote = TRUE),
-            list(name = "groupNorm", value = settings$features$advanced$groupNorm),
+            list(name = "featNorm", value = settings$features$fGroupsAdv$featNorm, quote = TRUE),
+            list(name = "groupNorm", value = settings$features$fGroupsAdv$groupNorm),
             list(name = "normFunc", value = "max"),
-            list(name = "standards", value = standards, condition = settings$features$advanced$featNorm == "istd"),
-            list(name = "ISTDRTWindow", value = 120, condition = settings$features$advanced$featNorm == "istd"),
-            list(name = "ISTDMZWindow", value = 300, condition = settings$features$advanced$featNorm == "istd"),
-            list(name = "minISTDs", value = 3, condition = settings$features$advanced$featNorm == "istd"),
-            list(name = "rtWindow", value = 12, condition = settings$features$advanced$featNorm == "istd"),
-            list(name = "mzWindow", value = 0.005, condition = settings$features$advanced$featNorm == "istd"),
-            getAdductArg(settings$features$advanced$featNorm == "istd")
+            list(name = "standards", value = standards, condition = settings$features$fGroupsAdv$featNorm == "istd"),
+            list(name = "ISTDRTWindow", value = 120, condition = settings$features$fGroupsAdv$featNorm == "istd"),
+            list(name = "ISTDMZWindow", value = 300, condition = settings$features$fGroupsAdv$featNorm == "istd"),
+            list(name = "minISTDs", value = 3, condition = settings$features$fGroupsAdv$featNorm == "istd"),
+            list(name = "rtWindow", value = 12, condition = settings$features$fGroupsAdv$featNorm == "istd"),
+            list(name = "mzWindow", value = 0.005, condition = settings$features$fGroupsAdv$featNorm == "istd"),
+            getAdductArg(settings$features$fGroupsAdv$featNorm == "istd")
         ))
     }
     

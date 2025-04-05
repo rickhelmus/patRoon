@@ -2,65 +2,69 @@ newProjectFeaturesUI <- function(id)
 {
     ns <- NS(id)
     
-    htmltools::tagList(
-        miniUI::miniContentPanel(
-            fillCol(
-                flex = NA,
+    miniUI::miniContentPanel(
+        fillCol(
+            flex = NA,
+            fillRow(
+                height = 90,
+                selectInput(ns("featAlgo"), "Feature finding algorithm",
+                            c("OpenMS", "XCMS", "enviPick", "SIRIUS", "KPIC2", EICs = "EIC",
+                              "Bruker DataAnalysis" = "Bruker"), multiple = FALSE, width = "95%"),
+                conditionalPanel(
+                    condition = "input.featAlgo == \"EIC\"",
+                    ns = ns,
+                    style = "margin-top: 25px;", # align with select label: https://stackoverflow.com/a/70543848
+                    actionButton(ns("featEICParams"), "", icon = icon("cog"), title = "EIC parameters")
+                )
+            ),
+            fillRow(
+                height = 90,
                 fillCol(
-                    height = 90,
-                    flex = NA,
-                    fillRow(
-                        selectInput(ns("featAlgo"), "Feature finder", c("OpenMS", "XCMS", "enviPick", "SIRIUS", "KPIC2",
-                                                                          "Bruker DataAnalysis" = "Bruker"),
-                                    multiple = FALSE, width = "95%"),
-                        fillCol(
-                            flex = c(1, NA),
-                            height = 90,
-                            selectInput(ns("fGroupsAlgo"), "Feature grouper", c("OpenMS", "XCMS", "KPIC2", "SIRIUS"),
-                                        multiple = FALSE, width = "100%"),
-                            conditionalPanel(
-                                condition = "input.fGroupsAlgo == \"SIRIUS\"",
-                                ns = ns,
-                                textNote(HTML("This will always find <b>and</b> group features with SIRIUS."))
-                            )
-                        )
+                    flex = c(1, NA),
+                    selectInput(ns("fGroupsAlgo"), "Feature grouping algorithm", c("OpenMS", "XCMS", "KPIC2", "SIRIUS"),
+                                multiple = FALSE, width = "95%"),
+                    conditionalPanel(
+                        condition = "input.fGroupsAlgo == \"SIRIUS\"",
+                        ns = ns,
+                        textNote(HTML("This will always find <b>and</b> group features with SIRIUS."))
                     )
                 ),
                 fillCol(
-                    height = 125,
-                    flex = NA,
-                    conditionalPanel(
-                        condition = "output.ionization != \"both\"",
-                        ns = ns,
-                        fileSelect(ns("suspectList"), ns("suspectListButton"), "Suspect list",
-                                   placeholder = "Leave empty for no suspect screening")
-                    ),
-                    conditionalPanel(
-                        condition = "output.ionization == \"both\"",
-                        ns = ns,
-                        fillRow(
-                            height = 60,
-                            fillCol(
-                                width = "95%",
-                                fileSelect(ns("suspectListPos"), ns("suspectListButtonPos"), "Suspect list (positive)",
-                                           placeholder = "Leave empty for no suspect screening")
-                            ),
-                            fillCol(
-                                width = "95%",
-                                fileSelect(ns("suspectListNeg"), ns("suspectListButtonNeg"), "Suspect list (negative)",
-                                           placeholder = "Leave empty if same as positive")
-                            )
-                        )
-                    ),
+                    style = "margin-top: 25px;",
+                    actionButton(ns("fGroupsAdv"), "", icon = icon("cog"), title = "Advanced settings")
+                )
+            ),
+            fillCol(
+                height = 125,
+                flex = NA,
+                conditionalPanel(
+                    condition = "output.ionization != \"both\"",
+                    ns = ns,
+                    fileSelect(ns("suspectList"), ns("suspectListButton"), "Suspect list",
+                               placeholder = "Leave empty for no suspect screening")
+                ),
+                conditionalPanel(
+                    condition = "output.ionization == \"both\"",
+                    ns = ns,
                     fillRow(
-                        height = 50,
-                        checkboxInput(ns("exSuspList"), "Example suspect list(s)")
+                        height = 60,
+                        fillCol(
+                            width = "95%",
+                            fileSelect(ns("suspectListPos"), ns("suspectListButtonPos"), "Suspect list (positive)",
+                                       placeholder = "Leave empty for no suspect screening")
+                        ),
+                        fillCol(
+                            width = "95%",
+                            fileSelect(ns("suspectListNeg"), ns("suspectListButtonNeg"), "Suspect list (negative)",
+                                       placeholder = "Leave empty if same as positive")
+                        )
                     )
+                ),
+                fillRow(
+                    height = 50,
+                    checkboxInput(ns("exSuspList"), "Example suspect list(s)")
                 )
             )
-        ),
-        miniUI::miniButtonBlock(
-            actionButton(ns("advancedOpen"), "Advanced", icon = icon("cog"))
         )
     )
 }
@@ -77,18 +81,30 @@ newProjectFeaturesServer <- function(id, ionization, settings)
         )
     }
     
+    getEICIMSMethods <- function(methodMZ)
+    {
+        switch(methodMZ,
+               bins = "bins",
+               suspects = c("bins", "suspects"),
+               ms2 = c("bins", "ms2"))
+    }
+    
     moduleServer(id, function(input, output, session)
     {
-        rValues <- reactiveValues(advanced = defaultFeaturesSettings()$advanced)
+        rValues <- reactiveValues(
+            featEICParams = defaultFeaturesSettings()$featEICParams,
+            fGroupsAdv = defaultFeaturesSettings()$fGroupsAdv
+        )
         
         observeEvent(settings(), {
             updateSelectInput(session, "featAlgo", selected = settings()$featAlgo)
+            rValues$featEICParams <- settings()$featEICParams
             updateSelectInput(session, "fGroupsAlgo", selected = settings()$fGroupsAlgo)
+            rValues$fGroupsAdv <- settings()$fGroupsAdv
             updateTextInput(session, "suspectList", value = settings()$suspectList)
             updateTextInput(session, "suspectListPos", value = settings()$suspectListPos)
             updateTextInput(session, "suspectListNeg", value = settings()$suspectListNeg)
             updateCheckboxInput(session, "exSuspList", value = settings()$exSuspList)
-            rValues$advanced <- settings()$advanced
         })
 
         observeEvent(input$suspectListButton, selectSuspList(session, "suspectList"))
@@ -113,10 +129,96 @@ newProjectFeaturesServer <- function(id, ionization, settings)
             else
                 shinyjs::toggleState("featAlgo", input$fGroupsAlgo != "SIRIUS")
         })
-        
-        observeEvent(input$advancedOpen, {
+
+        observeEvent(input$featEICParams, {
+            # UNDONE: update methodIMS options based on methodMZ selection
             showModal(modalDialog(
-                title = "Advanced feature settings",
+                title = "EIC feature parameters",
+                fillCol(
+                    flex = NA,
+                    width = 500,
+                    fillRow(
+                        height = 75,
+                        selectInput(ns("methodMZ"), "EIC method (m/z)", c("bins", "suspects", "ms2"),
+                                    selected = rValues$featEICParams$methodMZ, width = "95%"),
+                        # UNDONE: only in post-IMS workflows
+                        selectInput(ns("methodIMS"), "EIC method (IMS)",
+                                    getEICIMSMethods(rValues$featEICParams$methodMZ),
+                                    selected = rValues$featEICParams$methodIMS, width = "95%"),
+                    ),
+                    conditionalPanel(
+                        condition = "input.methodMZ == \"suspects\" && output.ionization != \"both\"",
+                        ns = ns,
+                        fillRow(
+                            height = 50,
+                            fileSelect(ns("featEICSuspectList"), ns("featEICSuspectListButton"), "Suspect list",
+                                       rValues$featEICParams$suspects)
+                        )
+                    ),
+                    conditionalPanel(
+                        condition = "input.methodMZ == \"suspects\" && output.ionization == \"both\"",
+                        ns = ns,
+                        fillRow(
+                            height = 50,
+                            fillCol(
+                                width = "95%",
+                                fileSelect(ns("featEICSuspectListPos"), ns("featEICSuspectListButtonPos"),
+                                           "Suspect list (positive)", rValues$featEICParams$suspectsPos)
+                            ),
+                            fillCol(
+                                width = "95%",
+                                fileSelect(ns("featEICSuspectListNeg"), ns("featEICSuspectListButtonNeg"),
+                                           "Suspect list (negative)", rValues$featEICParams$suspectsNeg)
+                            )
+                        )
+                    ),
+                    conditionalPanel(
+                        condition = "input.methodMZ == \"suspects\"",
+                        ns = ns,
+                        fillRow(
+                            height = 40,
+                            textNote("Leave empty to use the suspect list(s) set in the Features tab.")
+                        )
+                    ),
+                    fillRow(
+                        height = 75,
+                        # NOTE: 97.5% is from the 2x 95% widths for the method selectInputs
+                        selectInput(ns("peaksAlgo"), "Peak detection algorithm",
+                                    c(Dietrich = "dietrich", "OpenMS" = " openms", "XCMS3" = "xcms3", "enviPick" = "envipick"),
+                                    selected = rValues$featEICParams$peaksAlgo, width = "97.5%")
+                    )
+                ),
+                easyClose = TRUE,
+                footer = tagList(
+                    modalButton("Cancel"),
+                    actionButton(ns("featEICParamsOK"), "OK")
+                )
+            ))
+        })
+        
+        observeEvent(input$methodMZ, {
+            ch <- getEICIMSMethods(input$methodMZ)
+            sel <- input$methodIMS
+            if (!sel %in% ch)
+                sel <- ch[1]
+            updateSelectInput(session, "methodIMS", choices = ch, selected = sel)
+        })
+        
+        observeEvent(input$featEICParamsOK, {
+            removeModal()
+            rValues$featEICParams <- list(
+                methodMZ = input$methodMZ,
+                methodIMS = input$methodIMS,
+                suspects = input$featEICSuspectList,
+                suspectsPos = input$featEICSuspectListPos,
+                suspectsNeg = input$featEICSuspectListNeg,
+                peaksAlgo = input$peaksAlgo
+            )
+        })
+        
+        observeEvent(input$fGroupsAdv, {
+            showModal(modalDialog(
+                title = "Advanced feature group settings",
                 fillCol(
                     flex = NA,
                     width = 500,
@@ -131,26 +233,26 @@ newProjectFeaturesServer <- function(id, ionization, settings)
                     fillCol(
                         height = 325,
                         fillRow(
-                            numericInput(ns("preIntThr"), "Pre-Intensity threshold", rValues$advanced$preIntThr, 0,
+                            numericInput(ns("preIntThr"), "Pre-Intensity threshold", rValues$fGroupsAdv$preIntThr, 0,
                                          step = 100, width = "95%"),
-                            numericInput(ns("intThr"), "Intensity threshold", rValues$advanced$intThr, 0, step = 1000,
+                            numericInput(ns("intThr"), "Intensity threshold", rValues$fGroupsAdv$intThr, 0, step = 1000,
                                          width = "100%")
                         ),
                         fillRow(
                             numericInput(ns("repAbundance"), "Min. replicate abundance (relative)",
-                                         rValues$advanced$repAbundance, 0, 1.0, 0.1, width = "95%"),
-                            numericInput(ns("maxRepRSD"), "Max. replicate intensity RSD", rValues$advanced$maxRepRSD, 0,
+                                         rValues$fGroupsAdv$repAbundance, 0, 1.0, 0.1, width = "95%"),
+                            numericInput(ns("maxRepRSD"), "Max. replicate intensity RSD", rValues$fGroupsAdv$maxRepRSD, 0,
                                          step = 0.1, width = "100%")
                         ),
                         fillRow(
-                            numericInput(ns("blankThr"), "Min. blank threshold", rValues$advanced$blankThr, 0, step = 1,
+                            numericInput(ns("blankThr"), "Min. blank threshold", rValues$fGroupsAdv$blankThr, 0, step = 1,
                                          width = "95%"),
                             checkboxInput(ns("removeBlanks"), "Discard blanks after filtering",
-                                          rValues$advanced$removeBlanks)
+                                          rValues$fGroupsAdv$removeBlanks)
                         ),
                         rangeNumeric(ns("retention"), "retention time (s)", step = 10,
-                                     value = rValues$advanced$retention),
-                        rangeNumeric(ns("mz"), "m/z", step = 10, value = rValues$advanced$mz)
+                                     value = rValues$fGroupsAdv$retention),
+                        rangeNumeric(ns("mz"), "m/z", step = 10, value = rValues$fGroupsAdv$mz)
                     ),
                     hr(),
                     fillCol(
@@ -161,14 +263,14 @@ newProjectFeaturesServer <- function(id, ionization, settings)
                                                                                "Internal standard" = "istd",
                                                                                "Internal standard concentration" = "conc",
                                                                                "TIC" = "tic"),
-                                    rValues$advanced$featNorm),
-                        checkboxInput(ns("groupNorm"), "Group normalization", rValues$advanced$groupNorm),
+                                    rValues$fGroupsAdv$featNorm),
+                        checkboxInput(ns("groupNorm"), "Group normalization", rValues$fGroupsAdv$groupNorm),
                         
                         conditionalPanel(
                             condition = "input.featNorm == \"istd\" && output.ionization != \"both\"",
                             ns = ns,
                             fileSelect(ns("ISTDList"), ns("ISTDListButton"), "Internal standard list",
-                                       rValues$advanced$ISTDList, placeholder = "Leave empty for example list")
+                                       rValues$fGroupsAdv$ISTDList, placeholder = "Leave empty for example list")
                         ),
                         conditionalPanel(
                             condition = "input.featNorm == \"istd\" && output.ionization == \"both\"",
@@ -179,14 +281,14 @@ newProjectFeaturesServer <- function(id, ionization, settings)
                                     width = "95%",
                                     fileSelect(ns("ISTDListPos"), ns("ISTDListButtonPos"),
                                                "Internal standard list (positive)",
-                                               rValues$advanced$ISTDListPos,
+                                               rValues$fGroupsAdv$ISTDListPos,
                                                placeholder = "Leave empty for example list")
                                 ),
                                 fillCol(
                                     width = "95%",
                                     fileSelect(ns("ISTDListNeg"), ns("ISTDListButtonNeg"),
                                                "Internal standard list (negative)",
-                                               rValues$advanced$ISTDListNeg,
+                                               rValues$fGroupsAdv$ISTDListNeg,
                                                placeholder = "Leave empty if same as positive")
                                 )
                             )
@@ -201,14 +303,14 @@ newProjectFeaturesServer <- function(id, ionization, settings)
                 easyClose = TRUE,
                 footer = tagList(
                     modalButton("Cancel"),
-                    actionButton(ns("advancedOK"), "OK")
+                    actionButton(ns("fGroupsAdvOK"), "OK")
                 )
             ))
         })
         
-        observeEvent(input$advancedOK, {
+        observeEvent(input$fGroupsAdvOK, {
             removeModal()
-            rValues$advanced <- list(
+            rValues$fGroupsAdv <- list(
                 preIntThr = input$preIntThr,
                 intThr = input$intThr,
                 repAbundance = input$repAbundance,
@@ -236,7 +338,7 @@ newProjectFeaturesServer <- function(id, ionization, settings)
                 suspectListPos = input$suspectListPos,
                 suspectListNeg = input$suspectListNeg,
                 exSuspList = input$exSuspList,
-                advanced = rValues$advanced
+                fGroupsAdv = rValues$fGroupsAdv
             ))
         )
     })
@@ -251,7 +353,15 @@ defaultFeaturesSettings <- function()
         suspectListPos = "",
         suspectListNeg = "",
         exSuspList = FALSE,
-        advanced = list(
+        featEICParams = list(
+            methodMZ = "bins",
+            methodIMS = "bins",
+            suspects = "",
+            suspectsPos = "",
+            suspectsNeg = "",
+            peaksAlgo = "dietrich"
+        ),
+        fGroupsAdv = list(
             preIntThr = 1E2,
             intThr = 1E4,
             repAbundance = 1,
@@ -278,7 +388,7 @@ upgradeFeaturesSettings <- function(settings)
     ret$fGroupsAlgo <- settings$featGrouper
     ret$retention <- c(settings[["retention-min"]], settings[["retention-max"]])
     ret$mz <- c(settings[["mz-min"]], settings[["mz-max"]])
-    ret$advanced <- settings[c("preIntThr", "intThr", "repAbundance", "maxRepRSD", "blankThr", "removeBlanks",
-                               "retention", "mz", "featNorm", "groupNorm", "ISTDList", "ISTDListPos", "ISTDListNeg")]
+    ret$fGroupsAdv <- settings[c("preIntThr", "intThr", "repAbundance", "maxRepRSD", "blankThr", "removeBlanks",
+                                 "retention", "mz", "featNorm", "groupNorm", "ISTDList", "ISTDListPos", "ISTDListNeg")]
     return(ret)
 }

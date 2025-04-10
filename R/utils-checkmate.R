@@ -77,6 +77,12 @@ assertMSFileType <- function(x, null.ok = FALSE, .var.name = checkmate::vname(x)
     checkmate::assertChoice(x, getMSFileTypes(), null.ok = null.ok, .var.name = .var.name, add = add)
 }
 
+assertMSConvAlgo <- function(x, .var.name = checkmate::vname(x), add = NULL)
+{
+    checkmate::assertChoice(x, c("pwiz", "openms", "bruker", "im_collapse", "timsconvert"), .var.name = .var.name,
+                            add = add)
+}
+
 assertAnalysisInfo <- function(x, fileTypes = NULL, allowedFormats = NULL, null.ok = FALSE,
                                .var.name = checkmate::vname(x), add = NULL)
 {
@@ -960,9 +966,9 @@ assertQuantEluent <- checkmate::makeAssertionFunction(checkQuantEluent)
 assertConvertMSFilesArgs <- function(formatFrom, formatTo, overWrite, algorithm, add)
 {
     # no adding: should fail first
-    checkmate::assertChoice(algorithm, c("pwiz", "openms", "bruker", "im_collapse", "timsconvert"))
+    assertMSConvAlgo(algorithm)
     
-    checkmate::assertChoice(formatTo, c("mzXML", "mzML"), add = add) # UNDONE: enough for now?
+    checkmate::assertChoice(formatTo, getMSConversionFormats(algorithm, "output"), add = add)
     checkmate::assertFlag(overWrite, add = add)
     
     validFormatsFrom <- switch(algorithm,

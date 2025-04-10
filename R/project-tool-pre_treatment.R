@@ -36,12 +36,12 @@ newProjectPreTreatServer <- function(id, ionization, settings)
 {
     ns <- NS(id)
     
-    groupConvTypesFormats <- function(algo, inOut)
+    groupConvTypesFormats <- function(algo, dir)
     {
-        fTypes <- intersect(getMSFileTypes(), if (inOut == "input") validConvFromTypes(algo) else validConvToTypes(algo))
+        fTypes <- getMSConversionTypes(algo, dir)
         return(sapply(fTypes, function(ft)
         {
-            formats <- if (inOut == "input") getMSInConversionFormats(algo, ft) else getMSOutConversionFormats(algo, ft)
+            formats <- getMSConversionFormats(algo, ft, dir)
             return(setNames(paste0(ft, "_", formats), paste0(formats, " (", ft, ")")))
         }, simplify = FALSE))
     }

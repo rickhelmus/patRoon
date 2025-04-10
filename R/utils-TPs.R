@@ -102,6 +102,17 @@ doPlotTPGraph <- function(TPTab, parents, cmpTab, structuresMax, prune, onlyComp
         stop("No TPs to plot", call. = FALSE)
     
     TPTab <- copy(TPTab)
+    
+    # remove any links from rows that may have been deleted by delete()
+    # NOTE: we need to do this repeatedly as each iteration may result in further orphans
+    while (TRUE)
+    {
+        wh <- TPTab[is.na(parent_ID) | parent_ID %in% ID, which = TRUE]
+        if (length(wh) == nrow(TPTab))
+            break
+        TPTab <- TPTab[wh]
+    }
+
     TPTab[, c("name_orig", "name") := .(name, make.unique(name))]
     TPTab[, parent_name := fifelse(is.na(parent_ID), parent, name[match(parent_ID, ID)]), by = "parent"]
     

@@ -47,7 +47,7 @@ BTMPFinishHandler <- function(cmd)
     
     # BT only specifies to which chemical structure a TP is, not if it the parent came from a specific route. For now
     # assume the TP could be from any of the parents.
-    curTPID <- 0
+    curTPID <- 0L
     processChilds <- function(parID, parChemID, generation)
     {
         if (generation > cmd$maxExpGenerations)
@@ -59,7 +59,7 @@ BTMPFinishHandler <- function(cmd)
                                              MoreArgs = list(generation = generation + 1)))))
     }
     
-    ret <- processChilds(0, 0, 1)
+    ret <- processChilds(0L, 0L, 1)
     ret[parent_ID == 0, parent_ID := NA_integer_]
 
     # No need for these...

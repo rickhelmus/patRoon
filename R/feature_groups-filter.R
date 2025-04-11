@@ -575,6 +575,9 @@ minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, ne
 #'
 #' @templateVar feat FALSE
 #' @template feat-filter-args
+#' 
+#' @templateVar append Set to \code{NULL} to ignore.
+#' @template IMS-arg
 #'
 #' @section Filter order: When multiple arguments are specified to \code{filter}, multiple filters are applied in
 #'   sequence. Since some of these filters may affect each other, choosing their order correctly may be important for

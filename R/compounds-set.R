@@ -273,6 +273,7 @@ setMethod("estimateIDLevels", "compoundsSet", function(obj, absMzDev = defaultLi
     return(obj)
 })
 
+#' @template IMS-arg
 #' @export
 setMethod("assignMobilities", "compoundsSet", function(obj, fGroups, IMS = TRUE, from = NULL, ...)
 {

@@ -28,6 +28,8 @@ NULL
 #'   \code{plotBPCs}), \pkg{\link{VennDiagram}} plotting functions (\code{plotVenn}), \code{\link{chordDiagram}}
 #'   (\code{plotChord}) or \code{\link[UpSetR]{upset}} (\code{plotUpSet}).
 #'
+#' @template IMS-arg
+#'
 #' @inheritParams featureGroups-class
 #'
 #' @section Sets workflows: \setsWFChangedMethods{

@@ -67,6 +67,9 @@ NULL
 #' @templateVar dollarOpName feature group
 #' @template sub_sel_del-args
 #'
+#' @templateVar append For \code{"["}: Leave unassigned to perform no IMS selection.
+#' @template IMS-arg
+#' 
 #' @slot groups Matrix (\code{\link{data.table}}) with intensities for each feature group (columns) per analysis (rows).
 #'   Access with \code{groups} method.
 #' @slot features \code{\link{features}} class associated with this object. Access with\code{featureTable} methods.

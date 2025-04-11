@@ -213,6 +213,8 @@
     - clMethod and mzWindow for IM collapse --> see how this can be combined with others
     - link to HRMS interface in convertMSFilesIMSCollapse()
     - update handbook and tutorial
+- features
+    - handbook: mention somewhere that IMS="maybe" for e.g. plotting
 - TC
     - ES contributions for IDLs
     - explicitly mention annSim can be filtered with scoreLimits?

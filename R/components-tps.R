@@ -671,6 +671,7 @@ setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked = TRUE, width =
 #'   elutes prior/after the parent (to calculate \code{retDir} values, see Details in \link{componentsTPs}))
 #'
 #' @template specSimParams-arg
+#' @template IMS-arg
 #'
 #' @note The \code{shift} parameter of \code{specSimParams} is ignored by \code{generateComponentsTPs}, since it always
 #'   calculates similarities with all supported options.

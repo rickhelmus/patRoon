@@ -63,8 +63,9 @@ setMethod("getBPCs", "data.frame", function(obj, retentionRange = NULL, MSLevel 
 #' @describeIn analysisinfo-dataframe Plots the TICs of the analyses.
 #' @param retMin Plot retention time in minutes (instead of seconds).
 #' @param title Character string used for title of the plot. If \code{NULL} a title will be automatically generated.
-#' @param groupBy Sets the automatic colour selection: "none" for a single colour or "analyses"/"rGroups" for a
-#'   distinct colour per analysis or analysis replicate.
+#' @param groupBy Specifies how results are grouped in the plot. Should be a name of a column in the
+#'   \link[=analysis-information]{analysis information} table which is used to make analysis groups (\emph{e.g.}
+#'   \code{"replicate"}), or \code{"fGroups"} to group by feature group. Set to \code{NULL} for no grouping.
 #' @param showLegend Plot a legend if TRUE.
 #' @template plot-lim
 

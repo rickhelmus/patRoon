@@ -45,25 +45,25 @@ getMSFileFormats <- function(fileType = NULL)
     return(ret)
 }
 
-#' @details \code{generateAnalysisInfo} is an utility function that automatically generates a \code{data.frame} with
-#'   analysis information. It scans the directories specified from the \code{paths} argument for analyses, and uses this
-#'   to automatically fill in the \code{analysis} and \code{path} columns. Furthermore, this function also correctly
-#'   handles analyses which are available in multiple formats.
+#' @details \code{generateAnalysisInfo} is an utility function that automatically generates analysis information. It
+#'   scans given directories for analysis files, and uses this to automatically fill in the \code{analysis} and
+#'   \code{path_*} columns. This function automatically groups together analyses that are stored with different file
+#'   types and formats (see further details below).
 #'
-#' @param paths A character vector containing one or more file paths that should be used for finding the analyses.
-#' @param groups,blanks An (optional) character vector containing replicates and blanks, respectively (will be
-#'   recycled). If \code{groups} is an empty character string (\code{""}) the analysis name will be set as replicate
-#'   group.
-#' @param concs An optional numeric vector containing concentration values for each analysis. Can be \code{NA} if
-#'   unknown. If the length of \code{concs} is less than the number of analyses the remainders will be set to \code{NA}.
-#'   Set to \code{NULL} to not include concentration data.
-#' @param norm_concs An optional numeric vector containing concentrations used for \emph{feature normalization} (see the
-#'   \verb{Feature intensity normalization} section in the \link[=featureGroups-class]{featureGroups documentation}).
-#'   \code{NA} values are allowed for analyses that should not be normalized (\emph{e.g.} because no IS is present). If
-#'   the length of \code{norm_concs} is less than the number of analyses the remainders will be set to \code{NA}. Set to
-#'   \code{NULL} to not include normalization concentration data.
-#' @param formats A character vector of analyses file types to consider. Analyses not present in these formats will be
-#'   ignored. For valid values see \code{\link{getMSFileFormats}}.
+#' @param fromRaw,fromCentroid,fromProfile,fromIMS One or more file paths that should be used for finding analyses that
+#'   are stored as raw, centroided, profile or IMS data, respectively (see details below). Set to \code{NULL} to skip
+#'   file detection for a particular file type.
+#' @param convCentroid,convProfile,convIMS These arguments specify the \link[=convertMSFiles]{MS file conversion}
+#'   destination paths for centroided, profile and IMS data, respectively. These paths are used for those analyses for
+#'   which no file with a particular file type could be found in the directories specified by the respective
+#'   \code{from*} arguments. Set to \code{NULL} to not set any destination directory. If multiple paths are specified
+#'   then these will be recycled to fill the table rows.
+#' @param \dots Any other columns that should be added to the analysis information table, such as \code{replicate} and
+#'   \code{blank}. The arguments specified by \dots should be named. Vectors are recycled to the number of rows of the
+#'   table.
+#'
+#' @return \code{generateAnalysisInformation} returns a \code{data.frame} with automatically generated analysis
+#'   information.
 #'
 #' @rdname analysis-information
 #' @export

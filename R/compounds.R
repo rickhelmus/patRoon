@@ -757,6 +757,7 @@ setMethod("estimateIDLevels", "compounds", function(obj, absMzDev = defaultLim("
     return(obj)
 })
 
+#' @template IMS-arg
 #' @export
 setMethod("assignMobilities", "compounds", function(obj, fGroups, IMS = TRUE, from = NULL, matchFromBy = "InChIKey1",
                                                     overwrite = FALSE, adduct = NULL, CCSParams = NULL,

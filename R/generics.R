@@ -134,6 +134,7 @@ setGeneric("checkFeatures", function(fGroups, session = "checked-features.yml", 
 #' @param set \setsWF The name of the set to be exported.
 #'
 #' @template loadrawdata-arg
+#' @template IMS-arg
 #'
 #' @section Sets workflows: In a \link[=sets-workflow]{sets workflow}, \code{\link{unset}} is used to convert the
 #'   feature (group) data before the object is exported.

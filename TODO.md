@@ -202,7 +202,12 @@
 
 ## Docs
 
+- move all plotBPC(), getEIC() etc methods into one doc file?
 - TC
+    - anaInfo
+        - link to IMS section where path_IMS is explained
+        - add link to backends for OpenTIMS
+        - maybe add more examples where eg raw data can be used
     - ES contributions for IDLs
     - explicitly mention annSim can be filtered with scoreLimits?
     - annSim for sets is calculated as max

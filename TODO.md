@@ -132,6 +132,7 @@
 
 - Features
     - SAFD?
+    - set reordering?
 - Feat Ann
     - MSPL
         - new spec averaging params: add IMS
@@ -217,12 +218,7 @@
     - explicitly mention annSim can be filtered with scoreLimits?
     - annSim for sets is calculated as max
     - annSimForm / annSimBoth are added by compounds method of estimateIDLevels() if formulas/MSPL are set, may be used for ID levels (not by default)
-    - analysisInfo slot/accessor is now data.table()
     - reorderAnalyses(): doc that XCMS/XCMS3/KPIC2 fGroups internal slot is not updated, maybe also improve general docs for what is updated and for XCMS what it means for exporting data
-    - analysisInfo<-()
-        - doc methods (eg add limitations)
-        - doc that anaInfo shouldn't be changed by reference?
-    - new subset args (ni, reorder, reorder sets)
     - plotVenn()/unique()/overlap(): aggregate arg
     - overlap(): which can be NULL
     - plotUpSet()

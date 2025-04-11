@@ -18,8 +18,6 @@ NULL
 #' features across analyses.
 #'
 #' @param fGroups,obj,x,object \code{featureGroups} object to be accessed.
-#' @param replicates For \code{[}: An optional \code{character} vector: if specified only keep results for the given
-#'   replicates (equivalent to the \code{replicates} argument to \code{\link[=filter,featureGroups-method]{filter}}).
 #' @param \dots For the \code{"["} operator: ignored.
 #'
 #'   For \code{delete}: passed to the function specified as \code{j}.
@@ -27,6 +25,10 @@ NULL
 #'   For \code{normInts}: passed to \code{\link{screenSuspects}} if \code{featNorm="istd"}.
 #'
 #'   \setsPassedArgs1{featureGroups}
+#' @param value For \code{analysisInfo<-}: A \code{data.frame} or \code{data.table} with updated analysis information.
+#'
+#'   For \code{adducts<-}: A \code{character} with adduct annotations assigned to each feature group. The length should
+#'   equal the number of feature groups. Can be named with feature group names to customize the assignment order.
 #' @param average If \code{TRUE} then data within replicates are averaged.
 #'
 #'   For \code{as.data.table}: if \code{features=TRUE} other feature properties are also averaged.
@@ -41,8 +43,8 @@ NULL
 #'   then an automatic group normalization is performed.
 #' @param which A character vector with replicates used for comparison.
 #'
-#'   For \code{overlap}: can also be a \code{list} of \code{character} vectors with replicates to compare. For
-#'   instance, \code{which=list(c("samp1", "samp2"), c("samp3", "samp4"))} returns the overlap between
+#'   For \code{overlap}: can also be a \code{list} of \code{character} vectors with replicates to compare. For instance,
+#'   \code{which=list(c("samp1", "samp2"), c("samp3", "samp4"))} returns the overlap between
 #'   \code{"samp1"}+\code{"samp2"} and \code{"samp3"}+\code{"samp4"}.
 #' @param FCParams A parameter list to calculate Fold change data. See \code{getFCParams} for more details. Set to
 #'   \code{NULL} to not perform FC calculations.
@@ -265,7 +267,8 @@ setMethod("groupTable", "featureGroups", function(object, areas = FALSE, normali
 #' @export
 setMethod("analysisInfo", "featureGroups", function(obj, df) analysisInfo(getFeatures(obj), df))
 
-#' @describeIn featureGroups Modifies analysis information
+#' @templateVar class featureGroups
+#' @template analysisInfo-set
 #' @export
 setReplaceMethod("analysisInfo", "featureGroups", function(obj, value)
 {
@@ -364,9 +367,6 @@ setMethod("adducts", "featureGroups", function(obj)
 })
 
 #' @describeIn featureGroups Sets adduct annotations for feature groups.
-#' @param value For \code{adducts<-}: A \code{character} with adduct annotations assigned to each feature group. The
-#'   length should equal the number of feature groups. Can be named with feature group names to customize the assignment
-#'   order.
 #' @export
 setReplaceMethod("adducts", "featureGroups", function(obj, value)
 {
@@ -396,10 +396,14 @@ setMethod("concentrations", "featureGroups", function(fGroups) fGroups@concentra
 setMethod("toxicities", "featureGroups", function(fGroups) fGroups@toxicities)
 
 #' @describeIn featureGroups Subset on analyses/feature groups.
+#' @param replicates An optional \code{character} vector: if specified only keep results for the given replicates
+#'   (equivalent to the \code{replicates} argument to \code{\link[=filter,featureGroups-method]{filter}}).
 #' @param results Optional argument. If specified only feature groups with results in the specified object are kept. The
 #'   class of \code{results} should be \code{\link{featureAnnotations}} or \code{\link{components}}. Multiple objects
 #'   can be specified in a \code{list}: in this case a feature group is kept if it has a result in \emph{any} of the
 #'   objects (equivalent to the \code{results} argument to \code{\link[=filter,featureGroups-method]{filter}}).
+#' @templateVar ex fGroups
+#' @template feat-subset
 #' @export
 setMethod("[", c("featureGroups", "ANY", "ANY", "missing"), function(x, i, j, ..., ni, replicates, IMS, results,
                                                                      reorder = FALSE, drop = TRUE)

@@ -94,7 +94,6 @@ setMethod("plotTICs", "data.table", function(obj, retentionRange = NULL, MSLevel
     doPlotHeaders(obj, what = "tic", retentionRange, MSLevel, retMin, title, groupBy, showLegend, xlim, ylim, ...)
 })
 
-#' @rdname analysisinfo-dataframe
 #' @describeIn analysisinfo-dataframe Plots the BPCs of the analyses.
 #' @export
 setMethod("plotBPCs", "data.table", function(obj, retentionRange = NULL, MSLevel = 1, retMin = FALSE, title = NULL,

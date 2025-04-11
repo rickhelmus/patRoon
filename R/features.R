@@ -28,7 +28,8 @@ printFeatStats <- function(fList)
 #' @seealso \code{\link{findFeatures}}
 #'
 #' @slot features List of features per analysis file. Use the \code{featureTable} method for access.
-#' @slot analysisInfo Analysis group information. Use the \code{analysisInfo} method for access.
+#' @slot analysisInfo A \code{data.table} with the \link[=analysis-information]{analysis information}. Use the
+#'   \code{analysisInfo} method for access.
 #' @slot featureQualityNames Character vector with the names of the chromatographic peak quality metrics that are
 #'   present.
 #'
@@ -149,10 +150,7 @@ setMethod("reorderAnalyses", "features", function(obj, anas)
 
 #' @describeIn features Get analysis information
 #' @param df If \code{TRUE} then the returned value is a \code{data.frame}, otherwise a \code{data.table}.
-#' @return \code{analysisInfo}: A \code{data.table} containing a column with
-#'   analysis name (\code{analysis}), its path (\code{path}), and other columns
-#'   such as replicate name (\code{replicate}) and blank reference
-#'   (\code{blank}).
+#' @return \code{analysisInfo}: The \link[=analysis-information]{analysis information} of this \code{features} object.
 #' @export
 setMethod("analysisInfo", "features", function(obj, df = FALSE)
 {
@@ -178,9 +176,14 @@ setMethod("getFeatureQualityNames", "features", function(obj, scores = FALSE, to
 })
 
 #' @describeIn features Modifies analysis information
+#' @templateVar class features
+#' @template analysisInfo-set
+#' @param value A \code{data.frame} or \code{data.table} with the new analysis information.
 #' @export
 setReplaceMethod("analysisInfo", "features", function(obj, value)
 {
+    checkmate::assertDataFrame(value)
+    
     oldAnaInfo <- analysisInfo(obj)
     
     if (nrow(oldAnaInfo) > nrow(value))
@@ -307,7 +310,8 @@ setMethod("filter", "features", function(obj, absMinIntensity = NULL, relMinInte
 })
 
 #' @describeIn features Subset on analyses.
-#' @param drop Ignored.
+#' @templateVar ex fList
+#' @template feat-subset
 #' @export
 setMethod("[", c("features", "ANY", "missing", "missing"), function(x, i, j, ..., ni, reorder = FALSE, drop = TRUE)
 {

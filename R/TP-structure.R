@@ -313,8 +313,7 @@ setMethod("plotVenn", "transformationProductsStructure", function(obj, ..., comm
 #' @template plotUpSet
 #' @export
 setMethod("plotUpSet", "transformationProductsStructure", function(obj, ..., commonParents = FALSE, labels = NULL,
-                                                                   nsets = length(list(...)) + 1, nintersects = NA,
-                                                                   upsetArgs = NULL)
+                                                                   nsets = NULL, nintersects = NA, upsetArgs = NULL)
 {
     # UNDONE: this method is mostly a copy of the featureAnnotations method, merge?
     
@@ -327,8 +326,8 @@ setMethod("plotUpSet", "transformationProductsStructure", function(obj, ..., com
     checkmate::assertFlag(commonParents, add = ac)
     checkmate::assertCharacter(labels, min.chars = 1, len = length(allTPs), null.ok = TRUE, add = ac)
     checkmate::assertList(upsetArgs, names = "unique", null.ok = TRUE, add = ac)
-    checkmate::assertCount(nsets, positive = TRUE)
-    checkmate::assertCount(nintersects, positive = TRUE, na.ok = TRUE)
+    checkmate::assertCount(nsets, positive = TRUE, null.ok = TRUE, add = ac)
+    checkmate::assertCount(nintersects, positive = TRUE, na.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
     if (is.null(labels))
@@ -359,6 +358,9 @@ setMethod("plotUpSet", "transformationProductsStructure", function(obj, ..., com
     
     if (sum(sapply(TPTab, function(x) any(x>0))) < 2)
         stop("Need at least two non-empty objects to plot")
+    
+    if (is.null(nsets))
+        nsets <- length(allTPs)
     
     do.call(UpSetR::upset, c(list(TPTab, nsets = nsets, nintersects = nintersects), upsetArgs))
 })

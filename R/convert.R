@@ -6,17 +6,65 @@
 #'
 #' Conversion of MS analysis files between several open and closed data formats.
 #'
-#' @param algorithm Either \code{"pwiz"} (implemented by \command{msConvert} of
-#'   ProteoWizard), \code{"openms"} (implemented by \command{FileConverter} of
-#'   OpenMS) or \code{"bruker"} (implemented by DataAnalysis).
+#' @param algorithm Either \code{"pwiz"} (ProteoWizard), \code{"openms"}, \code{"bruker"} (Bruker DataAnalysis) ,
+#'   \code{"im_collapse"} or \code{"timsconvert"}.
+#' @param direction A \code{character} specifying the direction of conversion. Either \code{"input"} or \code{"output"}.
+#' @param inFiles,outFiles A \code{character} vector with input and output files, respectively. Lengths and order should
+#'   be the same.
+#' @param type,typeFrom,typeTo The type of the input or output files. See \code{getMSConversionTypes} for the supported
+#'   types.
+#' @param formatFrom,formatTo The input or output format. See \code{getMSConversionFormats} for the supported formats.
+#' @param centroid Set to \code{TRUE} to perform centroiding.
 #'
-#' @templateVar what \code{convertMSFiles} (except if \code{algorithm="bruker"})
+#'   For \code{convertMSFilesPWiz}: the value may be \code{"vendor"} to perform centroiding with the vendor algorithm or
+#'   \code{"cwt"} to use ProteoWizard's wavelet algorithm.
+#' @param IMS How to handle IMS data.
+#'
+#'   For \code{convertMSFilesPWiz}: if \code{TRUE} then IMS data is exported and spectra for each IMS frame are combined
+#'   into a single spectrum (using the \command{--combineIonMobilitySpectra} option), which is the format supported by
+#'   \pkg{patRoon}. Set to \code{NA} to collapse the IMS data by scan summing, which mimics 'regular' HRMS data. Set to
+#'   \code{FALSE} for non-IMS data. \strong{NOTE}: do not set \code{IMS=FALSE} if the data has IMS data. This will
+#'   result in very large files where MS spectra are not combined by frame, which \strong{cannot} be properly read by
+#'   \pkg{patRoon}.
+#'
+#'   For \code{convertMSFilesTIMSCONVERT}: set to \code{TRUE} to keep IMS data or \code{FALSE} to exclude IMS data to
+#'   mimic 'regular' LC-MS data.
+#' @param extraOpts A \code{character} vector specifying any extra command line parameters passed to \command{msconvert}
+#'   or \command{FileConverter}. Set to \code{NULL} to ignore. For options: see
+#'   \href{https://abibuilder.cs.uni-tuebingen.de/archive/openms/Documentation/nightly/html/TOPP_FileConverter.html}{FileConverter}
+#'   and \href{http://proteowizard.sourceforge.net/tools/msconvert.html}{msconvert}.
+#' @param overWrite Should existing destination file be overwritten (\code{TRUE}) or not (\code{FALSE})?
+#' @param \dots For \code{convertMSFilesIMSCollapse}: further arguments passed to
+#'   \code{\link[mzR:writeMSData]{mzR::writeMSData}}.
+#'
+#'   For \code{convertMSFilePaths} and \code{convertMSFilesAnaInfo}: further arguments passed to algorithm specific
+#'   conversion functions.
+#'
+#' @templateVar what \code{convertMSFilesPWiz}, \code{convertMSFilesOpenMS} and \code{convertMSFilesTIMSCONVERT}
 #' @template uses-multiProc
 #'
+#' @references \insertRef{Rst2016}{patRoon} \cr\cr
 #'
-#' @name convertMSFiles
+#'   \insertRef{Chambers2012}{patRoon} \cr\cr
+#'
+#'   \insertRef{Luu2022}{patRoon} \cr\cr
+#'
+#'   \addCitations{mzR}{1} \cr\cr
+#'
+#'   \addCitations{mzR}{2} \cr\cr
+#'
+#'   \addCitations{mzR}{3} \cr\cr
+#'
+#'   \addCitations{mzR}{4} \cr\cr
+#'
+#'   \addCitations{mzR}{5}
+#'
+#' @name MSConversion
 NULL
 
+#' @details \code{getMSConversionTypes} returns a \code{character} with all supported input or output conversion types
+#'   for an algorithm.
+#' @rdname MSConversion
 #' @export
 getMSConversionTypes <- function(algorithm, direction)
 {
@@ -41,10 +89,9 @@ getMSConversionTypes <- function(algorithm, direction)
                   timsconvert = c("centroid", "profile", "ims")))
 }
 
-#' @details \code{getMSInConversionFormats} returns a \code{character} with all supported
-#'   input formats (see below).
-#' @param vendor If \code{TRUE} only vendor formats are returned.
-#' @rdname convertMSFiles
+#' @details \code{getMSConversionFormats} returns a \code{character} with all supported input or output conversion
+#'   formats for an algorithm, optionally filtered by the given \code{type}.
+#' @rdname MSConversion
 #' @export
 getMSConversionFormats <- function(algorithm, direction, type = NULL)
 {
@@ -77,6 +124,19 @@ getMSConversionFormats <- function(algorithm, direction, type = NULL)
     return(ret)
 }
 
+#' @details \code{convertMSFilesPWiz} converts and pre-treats HRMS data with the \command{msconvert} tool from
+#'   \href{http://proteowizard.sourceforge.net/}{ProteoWizard}.
+#'
+#' @param minIntensity The minimum intensity of the mass peaks to be kept. Applying an intensity threshold is especially
+#'   beneficial to reduce export file size when there are a lot of zero or very low intensity mass peaks (\emph{e.g.}
+#'   Agilent data).
+#' @param filters A \code{character} vector specifying one or more filters to \command{msconvert}. The elements of the
+#'   specified vector are directly passed to the \code{--filter} option (see
+#'   \href{http://proteowizard.sourceforge.net/tools/filters.html}{here})
+#' @param PWizBatchSize The number of analyses to process by a single call to \command{msconvert}. Usually a value of
+#'   one is most efficient. Set to zero to run all analyses all at once from a single call.
+#'
+#' @rdname MSConversion
 #' @export
 convertMSFilesPWiz <- function(inFiles, outFiles, formatTo = "mzML", centroid = TRUE, IMS = FALSE, minIntensity = 5,
                                filters = NULL, extraOpts = NULL, PWizBatchSize = 1)
@@ -155,6 +215,9 @@ convertMSFilesPWiz <- function(inFiles, outFiles, formatTo = "mzML", centroid = 
     invisible(NULL)
 }
 
+#' @details \code{convertMSFilesOpenMS} converts HRMS data with the \command{FileConvert} tool of
+#'   \href{http://www.openms.de/}{OpenMS}.
+#' @rdname MSConversion
 #' @export
 convertMSFilesOpenMS <- function(inFiles, outFiles, formatTo = "mzML", extraOpts = NULL)
 {
@@ -183,6 +246,9 @@ convertMSFilesOpenMS <- function(inFiles, outFiles, formatTo = "mzML", extraOpts
     invisible(NULL)
 }
 
+#' @details \code{convertMSFilesBruker} converts and pre-treats Bruker HRMS data with Bruker DataAnalysis. Note that
+#'   TIMS data currently is not supported.
+#' @rdname MSConversion
 #' @export
 convertMSFilesBruker <- function(inFiles, outFiles, formatTo = "mzML", centroid = TRUE)
 {
@@ -219,6 +285,26 @@ convertMSFilesBruker <- function(inFiles, outFiles, formatTo = "mzML", centroid 
     invisible(NULL)
 }
 
+#' @details \code{convertMSFilesIMSCollapse} is used to convert IMS data to data that mimics 'regular' HRMS data by
+#'   collapsing the IMS dimension. The raw data interface of \pkg{patRoon} first sums up all spectra within each IMS
+#'   frame and the resulting data is then exported with the \code{\link[mzR:writeMSData]{mzR::writeMSData}} function.
+#'   This function has several thresholds that may speed up the conversion process and reduce noise, but care should be
+#'   taken that no peaks of interest are lost.
+#'
+#' @param mzRange,mobilityRange A two sized vector specifying the m/z and mobility range to be exported, respectively.
+#'   Set to \code{NULL} to export the full range.
+#' @param minAbundanceRel,minAbundanceAbs The minimum relative and absolute abundance for a mass peak across the spectra
+#'   within a single IMS frame. Set to \samp{0} to include all mass peaks.
+#' @param topMost Only consider these top most intense peaks in each spectrum within a frame. Set to \code{NULL} to
+#'   include all peaks.
+#' @param minIntensityIMS,minIntensityPre The minimum intensity for MS peaks in raw and individual IMS spectra, and
+#'   combined and summed spectra, respectively.
+#' @param includeMSMS Set to \code{TRUE} to include MS/MS spectra in the output. For IMS workflows where IMS data is
+#'   only collapsed to produce compatible data files for feature detection, MS/MS data are not needed and can be
+#'   excluded to reduce computational times and file sizes. Setting \code{includeMSMS=TRUE} is primarily intended to
+#'   perform 'classical LC-MS workflows' with IMS data.
+#'
+#' @rdname MSConversion
 #' @export
 convertMSFilesIMSCollapse <- function(inFiles, outFiles, typeFrom, formatTo = "mzML", mzRange = NULL, mobilityRange = NULL,
                                       clMethod = "distance", mzWindow = defaultLim("mz", "medium"),
@@ -335,6 +421,19 @@ convertMSFilesIMSCollapse <- function(inFiles, outFiles, typeFrom, formatTo = "m
     invisible(NULL)
 }
 
+#' @details \code{convertMSFilesTIMSCONVERT} converts and pre-treats TIMS data with
+#'   \href{https://gtluu.github.io/timsconvert/}{TIMSCONVERT}. The \code{\link{installTIMSCONVERT}} function can be used
+#'   to automatically install \command{TIMSCONVERT}.
+#'
+#' @param centroidRaw Only applicable if \code{IMS=FALSE}. Sets the \code{mode} parameter of \command{TIMSCONVERT}:
+#'   \code{raw} if \code{centroidRaw=TRUE} or \code{centroid} if \code{centroidRaw=FALSE}. See
+#'   \url{https://gtluu.github.io/timsconvert/local.html#notes-on-mode-parameter} for more details.
+#' @param virtualenv The virtual Python environment in which \command{TIMSCONVERT} is installed. This is passed to
+#'   \code{\link[reticulate:use_virtualenv]{reticulate::use_virtualenv}}, which will ensure that the
+#'   \command{TIMSCONVERT} command line utility can be found by \pkg{patRoon}. Set to \code{NULL} to skip this step.
+#'
+#' @rdname MSConversion
+#' @export
 convertMSFilesTIMSCONVERT <- function(inFiles, outFiles, formatTo = "mzML", centroid = TRUE, centroidRaw = FALSE,
                                       IMS = FALSE, extraOpts = NULL, virtualenv = "patRoon-TIMSCONVERT")
 {
@@ -382,98 +481,15 @@ convertMSFilesTIMSCONVERT <- function(inFiles, outFiles, formatTo = "mzML", cent
     invisible(NULL)
 }
 
-#' @details \code{convertMSFiles} converts the data format of an analysis to
-#'   another. It uses tools from
-#'   \href{http://proteowizard.sourceforge.net/}{ProteoWizard}
-#'   (\command{msConvert} command), \href{http://www.openms.de/}{OpenMS}
-#'   (\command{FileConverter} command) or Bruker DataAnalysis to perform the
-#'   conversion. Supported input and output formats include \file{mzXML},
-#'   \file{.mzML} and several vendor formats, depending on which algorithm is
-#'   used.
+#' @details \code{convertMSFilePaths} is a wrapper function that simplifies the use of algorithm specific MS conversion
+#'   functions, such as \code{convertMSFilesPWiz}, and \code{convertMSFilesTIMSCONVERT}.
 #'
-#' @param files,dirs The \code{files} argument should be a \code{character}
-#'   vector with input files. If \code{files} contains directories and
-#'   \code{dirs=TRUE} then files from these directories are also considered. An
-#'   alternative method to specify input files is by the \code{anaInfo}
-#'   argument. If the latter is specified \code{files} may be \code{NULL}.
-#' @param outPath A character vector specifying directories that should be used
-#'   for the output. Will be re-cycled if necessary. If \code{NULL}, output
-#'   directories will be kept the same as the input directories.
-#' @param anaInfo An \link[=analysis-information]{analysis info table} used to
-#'   retrieve input files. Either this argument or \code{files} (or both) should
-#'   be set (\emph{i.e.} not \code{NULL}).
-#' @param from Input format (see below). These are used to find analyses when
-#'   \code{dirs=TRUE} or \code{anaInfo} is set.
-#' @param to Output format: \code{"mzXML"} or \code{"mzML"}.
-#' @param overWrite Should existing destination file be overwritten
-#'   (\code{TRUE}) or not (\code{FALSE})?
-#' @param centroid Set to \code{TRUE} to enable centroiding (not supported if
-#'   \code{algorithm="openms"}). In addition, when \code{algorithm="pwiz"} the
-#'   value may be \code{"vendor"} to perform centroiding with the vendor
-#'   algorithm or \code{"cwt"} to use ProteoWizard's wavelet algorithm.
-#' @param filters When \code{algorithm="pwiz"}: a \code{character} vector
-#'   specifying one or more filters. The elements of the specified vector are
-#'   directly passed to the \code{--filter} option (see
-#'   \href{http://proteowizard.sourceforge.net/tools/filters.html}{here})
-#' @param extraOpts A \code{character} vector specifying any extra commandline
-#'   parameters passed to \command{msConvert} or \command{FileConverter}. Set to
-#'   \code{NULL} to ignore. For options: see
-#'   \href{https://abibuilder.cs.uni-tuebingen.de/archive/openms/Documentation/nightly/html/TOPP_FileConverter.html}{FileConverter}
-#'    and
-#'   \href{http://proteowizard.sourceforge.net/tools/msconvert.html}{msConvert}.
-#' @param PWizBatchSize When \code{algorithm="pwiz"}: the number of analyses to
-#'   process by a single call to \command{msConvert}. Usually a value of one is
-#'   most efficient. Set to zero to run all analyses all at once from a single
-#'   call.
+#' @param files,dirs The \code{files} argument should be a \code{character} vector with input files. If \code{files}
+#'   contains directories and \code{dirs=TRUE} then files from these directories are also considered.
+#' @param outPath A character vector specifying directories that should be used for the output. Will be re-cycled if
+#'   necessary. If \code{NULL}, output directories will be kept the same as the input directories.
 #'
-#' @section Conversion formats: Possible output formats (\code{to} argument) are
-#'   \code{mzXML} and \code{mzML}.
-#'
-#'   Possible input formats (\code{from} argument) depend on the algorithm that
-#'   was chosen and may include:
-#'
-#'   \itemize{
-#'
-#'   \item \code{thermo}: Thermo \file{.RAW} files (only
-#'   \code{algorithm="pwiz"}).
-#'
-#'   \item \code{bruker}: Bruker \file{.d}, \file{.yep}, \file{.baf} and
-#'   \file{.fid} files (only \code{algorithm="pwiz"} or
-#'   \code{algorithm="bruker"}).
-#'
-#'   \item \code{agilent}: Agilent \file{.d} files (only
-#'   \code{algorithm="pwiz"}).
-#'
-#'   \item \code{ab}: AB Sciex \file{.wiff} files (only
-#'   \code{algorithm="pwiz"}).
-#'
-#'   \item \code{waters} Waters \file{.RAW} files (only
-#'   \code{algorithm="pwiz"}).
-#'
-#'   \item \code{mzXML}/\code{mzML}: Open format \file{.mzXML}/\file{.mzML}
-#'   files (only \code{algorithm="pwiz"} or \code{algorithm="openms"}).
-#'
-#'   }
-#'
-#'   Note that the actual supported file formats of ProteoWizard depend on how
-#'   it was installed (see
-#'   \href{http://proteowizard.sourceforge.net/formats/index.html}{here}).
-#'
-#' @examples \dontrun{
-#' # Use FileConverter of OpenMS to convert between open mzXML/mzML format
-#' convertMSFiles("standard-1.mzXML", to = "mzML", algorithm = "openms")
-#'
-#' # Convert all Thermo .RAW files in the analyses/raw directory to mzML and
-#' # store the files in analyses/mzml. During conversion files are centroided by
-#' # the peakPicking filter and only MS 1 data is kept.
-#' convertMSFiles("analyses/raw", "analyses/mzml", dirs = TRUE, from = "thermo",
-#'                centroid = "vendor", filters = "msLevel 1")
-#' }
-#'
-#' @references \insertRef{Rst2016}{patRoon} \cr\cr
-#'   \insertRef{Chambers2012}{patRoon}
-#'
-#' @rdname convertMSFiles
+#' @rdname MSConversion
 #' @export
 convertMSFilePaths <- function(files, formatFrom, formatTo = "mzML", outPath = NULL, dirs = TRUE, overWrite = FALSE,
                                algorithm = "pwiz", ...)
@@ -543,6 +559,16 @@ convertMSFilePaths <- function(files, formatFrom, formatTo = "mzML", outPath = N
     }
 }
 
+#' @details \code{convertMSFilesAnaInfo} is a wrapper function that simplifies the use of \code{convertMSFilePaths}.
+#'
+#' @param anaInfo An \link[=analysis-information]{analysis info table} that is used to retrieve the input files. The
+#'   paths set by \code{path_centroid}, \code{path_profile} and \code{path_ims} are used to determine the output
+#'   directories. This function automatically determines if and how centroiding and IMS conversions should be applied.
+#'
+#' @param centroidVendor Only for \code{algorithm="pwiz"}: whether centroiding should be performed with vendor
+#'   algorithms.
+#'
+#' @rdname MSConversion
 #' @export
 convertMSFilesAnaInfo <- function(anaInfo, typeFrom = "raw", typeTo = "centroid", formatFrom, formatTo = "mzML",
                                   overWrite = FALSE, algorithm = "pwiz", centroidVendor = TRUE, ...)

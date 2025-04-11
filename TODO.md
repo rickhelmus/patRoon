@@ -221,13 +221,10 @@
     - annSim for sets is calculated as max
     - annSimForm / annSimBoth are added by compounds method of estimateIDLevels() if formulas/MSPL are set, may be used for ID levels (not by default)
     - reorderAnalyses(): doc that XCMS/XCMS3/KPIC2 fGroups internal slot is not updated, maybe also improve general docs for what is updated and for XCMS what it means for exporting data
-    - plotVenn()/unique()/overlap(): aggregate arg
-    - overlap(): which can be NULL
     - plotUpSet()
-        - aggregate arg
         - nsets can be NULL
     - plotChord()
-        - aggregate arg (replaces average)
+        - aggregate arg --> replaces average, check handbook
         - outerGroups --> groupBy and now expects anaInfo column name
             - also update (incorrect) example in handbook
     - plot()/plotChroms()
@@ -277,8 +274,7 @@
             - mention that suspect list parents are not filtered out from candidate list
         - parallel=T is only useful with many candidates
     - compoundsLibrary: mention that libMatch == annSim
-    - plotVenn()/overlap()/unique(): update for removal of sets arg, give examples with aggregate
-    - plotVenn()/overlap/plotUpSet(): update for removal of list arg possibility for which
+    - plotVenn()/overlap()/unique(): update for removal of sets arg: give examples with aggregate in the handbook
     - MetFrag: don't do MP for non-local databases to avoid connection errors
 - msdata
     - getMSFileFormats(), getMSConversionFormats(), ...

@@ -476,8 +476,8 @@ setMethod("plotVenn", "featureAnnotations", function(obj, ..., labels = NULL, ve
 #' @templateVar withArgs TRUE
 #' @template plotUpSet
 #' @export
-setMethod("plotUpSet", "featureAnnotations", function(obj, ..., labels = NULL, nsets = length(list(...)) + 1,
-                                                      nintersects = NA, upsetArgs = NULL)
+setMethod("plotUpSet", "featureAnnotations", function(obj, ..., labels = NULL, nsets = NULL, nintersects = NA,
+                                                      upsetArgs = NULL)
 {
     allFeatAnnotations <- c(list(obj), list(...))
     
@@ -486,8 +486,8 @@ setMethod("plotUpSet", "featureAnnotations", function(obj, ..., labels = NULL, n
                           unique = TRUE, .var.name = "...", add = ac)
     checkmate::assertCharacter(labels, min.chars = 1, len = length(allFeatAnnotations), null.ok = TRUE, add = ac)
     checkmate::assertList(upsetArgs, names = "unique", null.ok = TRUE, add = ac)
-    checkmate::assertCount(nsets, positive = TRUE)
-    checkmate::assertCount(nintersects, positive = TRUE, na.ok = TRUE)
+    checkmate::assertCount(nsets, positive = TRUE, null.ok = TRUE, add = ac)
+    checkmate::assertCount(nintersects, positive = TRUE, na.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
     if (is.null(labels))
@@ -512,6 +512,9 @@ setMethod("plotUpSet", "featureAnnotations", function(obj, ..., labels = NULL, n
     
     if (sum(sapply(annTab, function(x) any(x>0))) < 2)
         stop("Need at least two non-empty objects to plot")
+    
+    if (is.null(nsets))
+        nsets <- length(allFeatAnnotations)
     
     do.call(UpSetR::upset, c(list(annTab, nsets = nsets, nintersects = nintersects), upsetArgs))
 })

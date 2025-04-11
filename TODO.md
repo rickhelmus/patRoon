@@ -221,8 +221,6 @@
     - annSim for sets is calculated as max
     - annSimForm / annSimBoth are added by compounds method of estimateIDLevels() if formulas/MSPL are set, may be used for ID levels (not by default)
     - reorderAnalyses(): doc that XCMS/XCMS3/KPIC2 fGroups internal slot is not updated, maybe also improve general docs for what is updated and for XCMS what it means for exporting data
-    - plotUpSet()
-        - nsets can be NULL
     - plotChord()
         - aggregate arg --> replaces average, check handbook
         - outerGroups --> groupBy and now expects anaInfo column name
@@ -394,7 +392,7 @@
     - overlap(): which can be NULL
     - plotUpSet():
         - aggregate arg
-        - nsets can be/defaults to NULL
+        - nsets can be/defaults to NULL (all methods)
     - plotChord()
         - aggregate arg (replaces average)
         - outerGroups --> groupBy and now expects anaInfo column name

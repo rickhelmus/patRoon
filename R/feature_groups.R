@@ -41,11 +41,13 @@ NULL
 #'
 #'   For \code{as.data.table}: if no normalization data is available (\emph{e.g.} because \code{normInts} was not used)
 #'   then an automatic group normalization is performed.
-#' @param which A character vector with replicates used for comparison.
+#' @param which A character vector with the selection to compare (\emph{e.g.} replicates, as set by the \code{aggregate}
+#'   argument).
 #'
-#'   For \code{overlap}: can also be a \code{list} of \code{character} vectors with replicates to compare. For instance,
-#'   \code{which=list(c("samp1", "samp2"), c("samp3", "samp4"))} returns the overlap between
-#'   \code{"samp1"}+\code{"samp2"} and \code{"samp3"}+\code{"samp4"}.
+#'   For \code{overlap}: can also be a \code{NULL} to compare all elements.
+#' @param aggregate Specifies how data should be aggregated prior to comparison. Set to \code{FALSE} to compare
+#'   analyses, \code{TRUE} to compare replicates or to the name of a column in the \link[=analysis-information]{analysis
+#'   information} to compare by a custom grouping of analyses.
 #' @param FCParams A parameter list to calculate Fold change data. See \code{getFCParams} for more details. Set to
 #'   \code{NULL} to not perform FC calculations.
 #' @param MSLevel Integer vector with the ms levels (i.e., 1 for MS1 and 2 for MS2) to obtain TIC traces.
@@ -69,7 +71,7 @@ NULL
 #'
 #' @templateVar append For \code{"["}: Leave unassigned to perform no IMS selection.
 #' @template IMS-arg
-#' 
+#'
 #' @slot groups Matrix (\code{\link{data.table}}) with intensities for each feature group (columns) per analysis (rows).
 #'   Access with \code{groups} method.
 #' @slot features \code{\link{features}} class associated with this object. Access with\code{featureTable} methods.
@@ -708,15 +710,11 @@ setMethod("export", "featureGroups", function(obj, type, out, IMS = FALSE)
     }
 })
 
-#' @describeIn featureGroups Obtain a subset with unique feature groups
-#'   present in one or more specified replicate(s).
-#' @param relativeTo A character vector with replicates that should be
-#'   used for unique comparison. If \code{NULL} then all replicates are
-#'   used for comparison. replicates specified in \code{which} are
-#'   ignored.
-#' @param outer If \code{TRUE} then only feature groups are kept which do not
-#'   overlap between the specified replicates for the \code{which}
-#'   parameter.
+#' @describeIn featureGroups Obtain a subset with unique feature groups present in one or more specified replicate(s).
+#' @param relativeTo A character vector with replicates that should be used for unique comparison. If \code{NULL} then
+#'   all replicates are used for comparison. replicates specified in \code{which} are ignored.
+#' @param outer If \code{TRUE} then only feature groups are kept which do not overlap between the specified replicates
+#'   for the \code{which} parameter.
 #' @export
 setMethod("unique", "featureGroups", function(x, which, aggregate = TRUE, relativeTo = NULL, outer = FALSE)
 {
@@ -762,10 +760,8 @@ setMethod("unique", "featureGroups", function(x, which, aggregate = TRUE, relati
     return(ret)
 })
 
-#' @describeIn featureGroups Obtain a subset with feature groups that overlap
-#'   between a set of specified replicate(s).
-#' @param exclusive If \code{TRUE} then all feature groups are removed that are
-#'   not unique to the given replicates.
+#' @describeIn featureGroups Obtain a subset with feature groups that overlap between a set of specified replicate(s).
+#' @param exclusive If \code{TRUE} then all feature groups are removed that are not unique to the given replicates.
 #' @aliases overlap
 #' @export
 setMethod("overlap", "featureGroups", function(fGroups, which, aggregate, exclusive)

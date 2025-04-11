@@ -17,13 +17,8 @@ NULL
 #' @param colourBy Sets the automatic colour selection: \code{"none"} for a single colour or
 #'   \code{"rGroups"}/\code{"fGroups"} for a distinct colour per replicate/feature group.
 #' @param showLegend Plot a legend if \code{TRUE}.
-#' @param which A character vector with replicates used for comparison. Set to \code{NULL} to ignore.
-#'
-#'   For \code{plotVenn}: alternatively a named \code{list} containing elements of \code{character} vectors with
-#'   replicates to compare. For instance, \code{which=list(infl = c("influent-A", "influent-B"), effl =
-#'   c("effluent-A", "effluent-B"))}, will compare the features in replicates \samp{"influent-A/B"} against those
-#'   in \samp{"effluent-A/B"}. The names of the list are used for labelling in the plot, and will be made automatically
-#'   if not specified.
+#' @param which A character vector with the selection to compare (\emph{e.g.} replicates, as set by the \code{aggregate}
+#'   argument). Set to \code{NULL} to select everything.
 #' @param \dots passed to \code{\link[base]{plot}} (\code{plot}, \code{plotChroms}, \code{plotTICs} and
 #'   \code{plotBPCs}), \pkg{\link{VennDiagram}} plotting functions (\code{plotVenn}), \code{\link{chordDiagram}}
 #'   (\code{plotChord}) or \code{\link[UpSetR]{upset}} (\code{plotUpSet}).

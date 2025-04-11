@@ -53,7 +53,7 @@ getMSFileFormats <- function(fileType = NULL)
 #' @param fromRaw,fromCentroid,fromProfile,fromIMS One or more file paths that should be used for finding analyses that
 #'   are stored as raw, centroided, profile or IMS data, respectively (see details below). Set to \code{NULL} to skip
 #'   file detection for a particular file type.
-#' @param convCentroid,convProfile,convIMS These arguments specify the \link[=convertMSFiles]{MS file conversion}
+#' @param convCentroid,convProfile,convIMS These arguments specify the \link[=MSConversion]{MS file conversion}
 #'   destination paths for centroided, profile and IMS data, respectively. These paths are used for those analyses for
 #'   which no file with a particular file type could be found in the directories specified by the respective
 #'   \code{from*} arguments. Set to \code{NULL} to not set any destination directory. If multiple paths are specified

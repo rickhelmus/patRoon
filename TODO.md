@@ -203,11 +203,16 @@
 ## Docs
 
 - move all plotBPC(), getEIC() etc methods into one doc file?
+- anaInfo
+    - link to IMS section where path_IMS is explained
+    - add link to backends for OpenTIMS
+    - maybe add more examples where eg raw data can be used
+- convert
+    - add patRoon 3.0 citation for im_collapse
+    - clMethod and mzWindow for IM collapse --> see how this can be combined with others
+    - link to HRMS interface in convertMSFilesIMSCollapse()
+    - update handbook and tutorial
 - TC
-    - anaInfo
-        - link to IMS section where path_IMS is explained
-        - add link to backends for OpenTIMS
-        - maybe add more examples where eg raw data can be used
     - ES contributions for IDLs
     - explicitly mention annSim can be filtered with scoreLimits?
     - annSim for sets is calculated as max

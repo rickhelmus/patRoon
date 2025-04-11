@@ -166,7 +166,7 @@ NULL
 #' \itemize{
 #'
 #' \item \code{raw} Specifies the directory to raw HRMS files (\emph{e.g.} \file{.raw}, \file{.d}). This is used by
-#' \emph{e.g.} \link[=convertMSFiles]{conversion of raw MS data}.
+#' \emph{e.g.} \link[=MSConversion]{conversion of raw MS data}.
 #'
 #' \item \code{centroid} Specifies the directory to centroided and exported HRMS files (\file{.mzML}, \file{.mzXML}).
 #' These files are required by most feature finding algorithms.
@@ -185,7 +185,7 @@ NULL
 #'   mixed then centroided \file{.mzML} and \file{.mzXML} files are needed, and files with both file formats must be
 #'   stored in the directory specified by \code{path_centroid}.
 #'
-#'   If non-raw data files are not yet present and should be exported by \link[=convertMSFiles]{MS file conversion},
+#'   If non-raw data files are not yet present and should be exported by \link[=MSConversion]{MS file conversion},
 #'   then \code{path_centroid}, \code{path_profile} and \code{path_ims} should specify the desired destination paths of
 #'   the converted files.
 #'

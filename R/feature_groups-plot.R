@@ -14,8 +14,13 @@ NULL
 #' @param pch,type,lty Common plotting parameters passed to \emph{e.g.} \code{\link[graphics]{plot}}. For \code{plot}:
 #'   if \code{pch=NULL} then values are automatically assigned.
 #' @param col Colour(s) used. If \code{col=NULL} then colours are automatically generated.
-#' @param colourBy Sets the automatic colour selection: \code{"none"} for a single colour or
-#'   \code{"rGroups"}/\code{"fGroups"} for a distinct colour per replicate/feature group.
+#' @param groupBy Specifies how results are grouped in the plot. Should be a name of a column in the
+#'   \link[=analysis-information]{analysis information} table which is used to make analysis groups (\emph{e.g.}
+#'   \code{"replicate"}). Set to \code{NULL} for no grouping.
+#'
+#'   For \code{plotChord}: the grouping is used to generate 'outer groups'.
+#'
+#'   For other functions: the \code{groupBy} argument can also be set to \code{"fGroups"} to group by feature groups.
 #' @param showLegend Plot a legend if \code{TRUE}.
 #' @param which A character vector with the selection to compare (\emph{e.g.} replicates, as set by the \code{aggregate}
 #'   argument). Set to \code{NULL} to select everything.
@@ -32,7 +37,7 @@ NULL
 #'   \item \code{plotGraph} only plots data per set, and requires the \code{set} argument to be set.
 #'
 #'   }
-#' 
+#'
 #' @author Rick Helmus <\email{r.helmus@@uva.nl}> and Ricardo Cunha <\email{cunha@@iuta.de}> (\code{plotTICs} and
 #'   \code{plotBPCs} functions)
 #'
@@ -41,12 +46,12 @@ NULL
 #' @name feature-plotting
 NULL
 
-#' @details \code{plot} Generates an \emph{m/z} \emph{vs} retention time
-#'   plot for all featue groups. Optionally highlights unique/overlapping
-#'   presence amongst replicates.
-#' @param onlyUnique If \code{TRUE} and \code{colourBy="rGroups"} then only
-#'   feature groups that are unique to a replicate are plotted.
-#' 
+#' @details \code{plot} Generates an \emph{m/z} \emph{vs} retention time plot for all featue groups. Optionally
+#'   highlights unique/overlapping presence amongst replicates.
+#' @param onlyUnique If \code{TRUE} and \code{groupBy} is set to a column name of the
+#'   \link[=analysis-information]{analysis information} then only feature groups that are unique to a replicate are
+#'   plotted.
+#'
 #' @rdname feature-plotting
 #' @export
 setMethod("plot", c(x = "featureGroups", y = "missing"), function(x, groupBy = NULL, onlyUnique = FALSE,
@@ -357,12 +362,6 @@ setMethod("plotIntHash", "featureGroups", function(obj, ...) makeHash(groupTable
 #'   (\emph{e.g.} location, age, type) may be grouped to enhance visualization
 #'   between these 'outer groups'.
 #'
-#' @param outerGroups Character vector of names to be used as outer groups. The
-#'   values in the specified vector should be named by analysis names
-#'   (\code{average} set to \code{FALSE}) or replicate names
-#'   (\code{average} set to \code{TRUE}), for instance: \code{c(analysis1 =
-#'   "group1", analysis2 = "group1", analysis3 = "group2")}. Set to \code{NULL}
-#'   to disable outer groups.
 #' @param addIntraOuterGroupLinks If \code{TRUE} then links will be added within
 #'   outer groups.
 #'
@@ -934,7 +933,8 @@ setMethod("plotGraph", "featureGroups", function(obj, onlyPresent = TRUE, width 
 #' @export
 setMethod("plotGraph", "featureGroupsSet", function(obj, onlyPresent = TRUE, set, ...) plotGraph(unset(obj, set), onlyPresent = onlyPresent, ...))
 
-#' @describeIn featureGroups Plots the total ion chromatogram/s (TICs) of the analyses.
+#' @details \code{plotTICs} Plots the total ion chromatogram/s (TICs) of the analyses.
+#' @rdname feature-plotting
 #' @export
 setMethod("plotTICs", "featureGroups", function(obj, retentionRange = NULL, MSLevel = 1, retMin = FALSE, title = NULL,
                                                 groupBy = NULL, showLegend = TRUE, xlim = NULL, ylim = NULL, ...)
@@ -942,7 +942,8 @@ setMethod("plotTICs", "featureGroups", function(obj, retentionRange = NULL, MSLe
     plotTICs(obj@features, retentionRange, MSLevel, retMin, title, groupBy, showLegend, xlim, ylim, ...)
 })
 
-#' @describeIn featureGroups Plots the base peak chromatogram/s (BPCs) of the analyses.
+#' @details \code{plotTICs} Plots the base peak chromatogram/s (BPCs) of the analyses.
+#' @rdname feature-plotting
 #' @export
 setMethod("plotBPCs", "featureGroups", function(obj, retentionRange = NULL, MSLevel = 1, retMin = FALSE, title = NULL,
                                                 groupBy = NULL, showLegend = TRUE, xlim = NULL, ylim = NULL, ...)

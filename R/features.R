@@ -45,8 +45,6 @@ printFeatStats <- function(fList)
 #'
 #' @param retMin Plot retention time in minutes (instead of seconds).
 #' @param title Character string used for title of the plot. If \code{NULL} a title will be automatically generated.
-#' @param colourBy Sets the automatic colour selection: "none" for a single colour or "analyses"/"rGroups" for a
-#'   distinct colour per analysis or analysis replicate.
 #' @param showLegend Plot a legend if TRUE.
 #' @template plot-lim
 #' @param \dots For \code{delete}: passed to the function specified as \code{j}.
@@ -491,8 +489,7 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
 })
 
 #' @describeIn features Obtain the total ion chromatogram/s (TICs) of the analyses.
-#' @param MSLevel Integer vector with the ms levels (i.e., 1 for MS1 and 2 for MS2) 
-#' to obtain TIC traces.
+#' @inheritParams getTICs,data.frame-method
 #' @export
 setMethod("getTICs", "features", function(obj, retentionRange = NULL, MSLevel = 1)
 {

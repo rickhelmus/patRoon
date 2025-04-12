@@ -56,7 +56,7 @@ newProjectFeaturesUI <- function(id)
                         fillCol(
                             width = "95%",
                             fileSelect(ns("suspectListNeg"), ns("suspectListButtonNeg"), "Suspect list (negative)",
-                                       placeholder = "Leave empty if same as positive")
+                                       placeholder = "Leave empty for same as positive")
                         )
                     )
                 ),
@@ -136,7 +136,7 @@ newProjectFeaturesServer <- function(id, ionization, settings)
                 title = "EIC feature parameters",
                 fillCol(
                     flex = NA,
-                    width = 500,
+                    width = 600,
                     fillRow(
                         height = 75,
                         selectInput(ns("methodMZ"), "EIC method (m/z)", c("bins", "suspects", "ms2"),
@@ -150,41 +150,37 @@ newProjectFeaturesServer <- function(id, ionization, settings)
                         condition = "input.methodMZ == \"suspects\" && output.ionization != \"both\"",
                         ns = ns,
                         fillRow(
-                            height = 50,
+                            height = 75,
+                            width = "97.5%", # 97.5% is from the 2x 95% widths for the method selectInputs
                             fileSelect(ns("featEICSuspectList"), ns("featEICSuspectListButton"), "Suspect list",
-                                       rValues$featEICParams$suspects)
+                                       rValues$featEICParams$suspects,
+                                       placeholder = "Empty for same as Features tab")
                         )
                     ),
                     conditionalPanel(
                         condition = "input.methodMZ == \"suspects\" && output.ionization == \"both\"",
                         ns = ns,
                         fillRow(
-                            height = 50,
+                            height = 75,
                             fillCol(
                                 width = "95%",
                                 fileSelect(ns("featEICSuspectListPos"), ns("featEICSuspectListButtonPos"),
-                                           "Suspect list (positive)", rValues$featEICParams$suspectsPos)
+                                           "Suspect list (positive)", rValues$featEICParams$suspectsPos,
+                                           placeholder = "Empty for same as Features tab")
                             ),
                             fillCol(
                                 width = "95%",
                                 fileSelect(ns("featEICSuspectListNeg"), ns("featEICSuspectListButtonNeg"),
-                                           "Suspect list (negative)", rValues$featEICParams$suspectsNeg)
+                                           "Suspect list (negative)", rValues$featEICParams$suspectsNeg,
+                                           placeholder = "Empty for same as positive")
                             )
-                        )
-                    ),
-                    conditionalPanel(
-                        condition = "input.methodMZ == \"suspects\"",
-                        ns = ns,
-                        fillRow(
-                            height = 40,
-                            textNote("Leave empty to use the suspect list(s) set in the Features tab.")
                         )
                     ),
                     fillRow(
                         height = 75,
                         # NOTE: 97.5% is from the 2x 95% widths for the method selectInputs
                         selectInput(ns("peaksAlgo"), "Peak detection algorithm",
-                                    c(Dietrich = "dietrich", "OpenMS" = " openms", "XCMS3" = "xcms3", "enviPick" = "envipick"),
+                                    c(Dietrich = "dietrich", "OpenMS" = "openms", "XCMS3" = "xcms3", "enviPick" = "envipick"),
                                     selected = rValues$featEICParams$peaksAlgo, width = "97.5%")
                     )
                 ),

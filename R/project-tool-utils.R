@@ -59,7 +59,7 @@ fileSelect <- function(idText, idButton, label, value = "", ...)
     fillRow(
         flex = c(1, NA),
         textInput(idText, label, value, width = "100%", ...),
-        actionButton(idButton, "", icon("folder-open"), style = "margin: 25px 0 0 15px")
+        actionButton(idButton, "", icon("folder-open"), style = "margin: 25px 0 0 10px;")
     )
 }
 

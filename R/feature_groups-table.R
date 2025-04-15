@@ -1,6 +1,71 @@
 #' @include main.R
 NULL
 
+#' Feature group to table conversion
+#'
+#' Convert feature group data to a \code{\link{data.table}} (or \code{data.frame}).
+#'
+#' The \code{as.data.table} generic function converts most feature group data to a highly customizable
+#' \code{\link{data.table}}. If a classical \code{data.frame} is preferred, the \code{as.data.frame} generic function
+#' can be used instead and accepts the exact same arguments. The methods defined for \link[=suspect-screening]{suspect
+#' screening worfklows} will merge the information from \code{screenInfo}, such as
+#' suspect names and other properties and annotation data.
+#'
+#' @param average Controls the averaging of feature intensities. Averaging also influences the calculation of regression
+#'   parameters. Set to \code{FALSE} to disable averaging, \code{TRUE} to average per replicate or to the name of a
+#'   column in the \link[=analysis-information]{analysis information} to compare by a custom grouping of analyses.
+#'
+#'   If \code{features=TRUE} all numerical properties are averaged and non-numericals are collapsed. Each row represents
+#'   the feature aggregated data and the groups used for aggregation (\emph{e.g.} replicates) are stored in the
+#'   \code{average_group} column. It is also possible to average these data per feature group, by setting
+#'   \code{average="fGroups"}.
+#' @param averageFunc Function used for averaging. Only used when data is averaged or \code{FCParams != NULL}.
+#' @param features If \code{TRUE} then feature specific data will be added. Also see the \code{average} argument.
+#' @param areas If set to \code{TRUE} then areas are output instead of peak intensities. Ignored if
+#'   \code{features=TRUE}, as areas of features are always reported.
+#' @param normalized If \code{TRUE} then normalized intensities are used (see the \verb{Feature intensity normalization}
+#'   section). If no normalization data is available (\emph{e.g.} because \code{normInts} was not used) then an
+#'   automatic group normalization is performed.
+#' @param qualities Adds feature (group) qualities (\code{qualities="quality"}), scores (\code{qualities="score"}) or
+#'   both (\code{qualities="both"}), if this data is available (\emph{i.e.} from \code{calculatePeakQualities}). If
+#'   \code{qualities=FALSE} then nothing is reported.
+#' @param regression Set to \code{TRUE} to add regression data for each feature group. For this a linear model is
+#'   created (intensity/area [depending on \code{areas} argument] \emph{vs} concentration). The model concentrations
+#'   (e.g. of a set of standards) is derived from the \code{conc} column of the \link[=analysis-information]{analysis
+#'   information}. From this model the intercept, slope and R2 is added to the output. In addition, when
+#'   \code{features=TRUE}, concentrations for each feature are added. Note that no regression information is added when
+#'   no \code{conc} column is present in the analysis information or when less than two concentrations are specified
+#'   (\emph{i.e.} the minimum amount).
+#' @param concAggrParams,toxAggrParams Parameters to aggregate calculated concentrations/toxicities (obtained with
+#'   \code{\link{calculateConcs}}/\code{\link{calculateTox}}). See \link[=pred-aggr-params]{prediction aggregation
+#'   parameters} for more information. Set to \code{NULL} to omit this data.
+#' @param normConcToTox Set to \code{TRUE} to normalize concentrations to toxicities. Only relevant if this data is
+#'   present (see \code{\link{calculateConcs}}/\code{\link{calculateTox}}).
+#' @param collapseSuspects If a \code{character} then any suspects that were matched to the same feature group are
+#'   collapsed to a single row and suspect names are separated by the value of \code{collapseSuspects}. If \code{NULL}
+#'   then no collapsing occurs, and each suspect match is reported on a single row. See the \verb{Suspect collapsing}
+#'   section below for additional details.
+#'
+#' @section {Suspect collapsing}: The \code{as.data.table} method for \code{featureGroupsScreening} supports an
+#'   additional format where each suspect hit is reported on a separate row (enabled by setting
+#'   \code{collapseSuspects=NULL}). In this format the suspect
+#'   properties from the \code{screenInfo} method are merged with each suspect row. Alternatively, if \emph{suspect
+#'   collapsing} is enabled (the default) then the regular \code{as.data.table} format is used, and amended with the
+#'   names of all suspects matched to a feature group (separated by the value of the \code{collapseSuspects} argument).
+#'
+#'   Suspect collapsing also influences how calculated feature concentrations/toxicities are reported (\emph{i.e.}
+#'   obtained with \code{\link{calculateConcs}}/\code{\link{calculateTox}}). If these values were directly predicted for
+#'   suspects, \emph{i.e.} by using \code{\link{predictRespFactors}}/\code{\link{predictTox}} on the feature groups
+#'   object, \emph{and} suspects are \emph{not} collapsed, then the calculated concentration/toxicity reported for each
+#'   suspect row is not aggregated and specific for that suspect (unless not available). Hence, this allows you to
+#'   obtain specific concentration/toxicity values for each suspect/feature group pair.
+#'
+#' @section Sets workflows: In a \link[=sets-workflow]{sets workflow} normalization of feature intensities occur per
+#'   set.
+#'
+#' @name feature-table
+NULL
+
 getADTIntCols <- function(wh) paste0(wh, "_intensity")
 stripADTIntSuffix <- function(cols) sub("_intensity$", "", cols)
 getADTRegCols <- function() c("RSQ", "intercept", "slope", "p")
@@ -307,7 +372,7 @@ doFGAADTFeatures <- function(fGroups, fgTab, intColNames, average, averageBy, ad
         # average all numeric columns
         numCols <- setdiff(names(which(sapply(featTab, is.numeric))), "average_group")
         # avoid DT warning when averaging int values that lead to decimal values
-        # UNDONE: or collapse int values instead: for Dietrich peaks they are scan numbers, OpenMS iscounts, so could make sense
+        # UNDONE: or collapse int values instead: for Dietrich peaks they are scan numbers, OpenMS isocounts, so could make sense
         featTab[, (numCols) := lapply(.SD, as.numeric), .SDcols = numCols]
         featTab[, (numCols) := lapply(.SD, averageFunc), .SDcols = numCols, by = by]
         
@@ -491,25 +556,7 @@ doFGScrAsDataTable <- function(x, ..., collapseSuspects = ",", onlyHits = FALSE)
 }
 
 
-#' @describeIn featureGroups Obtain a summary table (a \code{\link{data.table}}) with retention, \emph{m/z}, intensity
-#'   and optionally other feature data.
-#' @param features If \code{TRUE} then feature specific data will be added. If \code{average=TRUE} this data will be
-#'   averaged for each feature group.
-#' @param qualities Adds feature (group) qualities (\code{qualities="quality"}), scores (\code{qualities="score"}) or
-#'   both (\code{qualities="both"}), if this data is available (\emph{i.e.} from \code{calculatePeakQualities}). If
-#'   \code{qualities=FALSE} then nothing is reported.
-#' @param regression Set to \code{TRUE} to add regression data for each feature group. For this a linear model is
-#'   created (intensity/area [depending on \code{areas} argument] \emph{vs} concentration). The model concentrations
-#'   (e.g. of a set of standards) is derived from the \code{conc} column of the \link[=analysis-information]{analysis
-#'   information}. From this model the intercept, slope and R2 is added to the output. In addition, when
-#'   \code{features=TRUE}, concentrations for each feature are added. Note that no regression information is added when
-#'   no \code{conc} column is present in the analysis information or when less than two concentrations are specified
-#'   (\emph{i.e.} the minimum amount).
-#' @param concAggrParams,toxAggrParams Parameters to aggregate calculated concentrations/toxicities (obtained with
-#'   \code{\link{calculateConcs}}/\code{\link{calculateTox}}). See \link[=pred-aggr-params]{prediction aggregation
-#'   parameters} for more information. Set to \code{NULL} to omit this data.
-#' @param normConcToTox Set to \code{TRUE} to normalize concentrations to toxicities. Only relevant if this data is
-#'   present (see \code{\link{calculateConcs}}/\code{\link{calculateTox}}).
+#' @rdname feature-table
 #' @export
 setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas = FALSE, features = FALSE,
                                                      qualities = FALSE, regression = FALSE, regressionBy = NULL,
@@ -522,32 +569,10 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
                            FCParams, concAggrParams, toxAggrParams, normConcToTox, anaInfoCols))
 })
 
-#' @describeIn featureGroupsScreening Obtain a summary table (a \code{\link{data.table}}) with retention, \emph{m/z},
-#'   intensity and optionally other feature data. Furthermore, the output table will be merged with information from
-#'   \code{screenInfo}, such as suspect names and other properties and annotation data.
-#'
-#' @param collapseSuspects If a \code{character} then any suspects that were matched to the same feature group are
-#'   collapsed to a single row and suspect names are separated by the value of \code{collapseSuspects}. If \code{NULL}
-#'   then no collapsing occurs, and each suspect match is reported on a single row. See the \verb{Suspect collapsing}
-#'   section below for additional details.
-#'
-#' @section {Suspect collapsing}: The \code{as.data.table} method for \code{featureGroupsScreening} supports an
-#'   additional format where each suspect hit is reported on a separate row (enabled by setting
-#'   \code{collapseSuspects=NULL}). In this format the suspect
-#'   properties from the \code{screenInfo} method are merged with each suspect row. Alternatively, if \emph{suspect
-#'   collapsing} is enabled (the default) then the regular \code{as.data.table} format is used, and amended with the
-#'   names of all suspects matched to a feature group (separated by the value of the \code{collapseSuspects} argument).
-#'
-#'   Suspect collapsing also influences how calculated feature concentrations/toxicities are reported (\emph{i.e.}
-#'   obtained with \code{\link{calculateConcs}}/\code{\link{calculateTox}}). If these values were directly predicted for
-#'   suspects, \emph{i.e.} by using \code{\link{predictRespFactors}}/\code{\link{predictTox}} on the feature groups
-#'   object, \emph{and} suspects are \emph{not} collapsed, then the calculated concentration/toxicity reported for each
-#'   suspect row is not aggregated and specific for that suspect (unless not available). Hence, this allows you to
-#'   obtain specific concentration/toxicity values for each suspect/feature group pair.
-#'
+#' @rdname feature-table
 #' @export
 setMethod("as.data.table", "featureGroupsScreening", doFGScrAsDataTable)
 
-#' @rdname featureGroupsScreening-class
+#' @rdname feature-table
 #' @export
 setMethod("as.data.table", "featureGroupsScreeningSet", doFGScrAsDataTable)

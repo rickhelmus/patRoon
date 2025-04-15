@@ -29,18 +29,9 @@ NULL
 #'
 #'   For \code{adducts<-}: A \code{character} with adduct annotations assigned to each feature group. The length should
 #'   equal the number of feature groups. Can be named with feature group names to customize the assignment order.
-#' @param average If \code{TRUE} then data within replicates are averaged.
-#'
-#'   For \code{as.data.table}: if \code{features=TRUE} other feature properties are also averaged.
-#' @param averageFunc Function used for averaging. Only used when \code{average=TRUE} or \code{FCParams != NULL}.
 #' @param areas If set to \code{TRUE} then areas are considered instead of peak intensities.
-#'
-#'   For \code{as.data.table}: ignored if \code{features=TRUE}, as areas of features are always reported.
 #' @param normalized If \code{TRUE} then normalized intensity data is used (see the \verb{Feature intensity
 #'   normalization} section.
-#'
-#'   For \code{as.data.table}: if no normalization data is available (\emph{e.g.} because \code{normInts} was not used)
-#'   then an automatic group normalization is performed.
 #' @param which A character vector with the selection to compare (\emph{e.g.} replicates, as set by the \code{aggregate}
 #'   argument).
 #'
@@ -98,8 +89,8 @@ NULL
 #' @templateVar class featureGroups
 #' @template class-hierarchy
 #'
-#' @seealso \code{\link{groupFeatures}} for generating feature groups, \link{feature-filtering} and
-#'   \link{feature-plotting} for more advanced \code{featureGroups} methods.
+#' @seealso \code{\link{groupFeatures}} for generating feature groups, \link{feature-filtering}, \link{feature-table}
+#'   and \link{feature-plotting} for more advanced \code{featureGroups} methods.
 #'
 #' @export
 featureGroups <- setClass("featureGroups",
@@ -1075,8 +1066,8 @@ setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduc
 #' @section Feature intensity normalization: The \code{normInts} method performs normalization of feature intensities
 #'   (and areas). These values are amended in the \code{features} slot, while the original intensities/areas are kept.
 #'   To use the normalized intensities set \code{normalized=TRUE} to methods such as \code{\link{plotInt}},
-#'   \code{\link{generateComponentsIntClust}} and \code{as.data.table}. Please see the \code{normalized} argument
-#'   documentation for these methods for more details.
+#'   \code{\link{generateComponentsIntClust}} and \code{\link[=feature-table]{as.data.table}}. Please see the
+#'   \code{normalized} argument documentation for these methods for more details.
 #'
 #'   The \code{normInts} method supports several methods to normalize intensities/areas of features within the same
 #'   analysis. Most methods are influenced by the \emph{normalization concentration} (\code{norm_conc} in the

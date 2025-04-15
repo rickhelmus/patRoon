@@ -16,6 +16,7 @@
 - BUG: annSim.1 column (in formulas?)?
 - install timsconvert and c3sdb in Docker and bundle
 - fix default IDLs
+- ADT: averaged data is now always per replicate, change to averageBy?
 
 
 ## Maybe
@@ -219,6 +220,8 @@
         - colourBy --> groupBy
         - outerGroups --> groupBy, also update (incorrect) example in handbook
         - plotVenn()/overlap()/unique(): update for removal of sets arg: give examples with aggregate
+        - plotInt(): give examples for xBy, groupBy etc
+        - mention that "set" can be used in sets WFs for groupBy etc
 - TC
     - ES contributions for IDLs
     - explicitly mention annSim can be filtered with scoreLimits?
@@ -226,9 +229,6 @@
     - annSimForm / annSimBoth are added by compounds method of estimateIDLevels() if formulas/MSPL are set, may be used for ID levels (not by default)
     - reorderAnalyses(): doc that XCMS/XCMS3/KPIC2 fGroups internal slot is not updated, maybe also improve general docs for what is updated and for XCMS what it means for exporting data
     - as.data.table()
-        - average arg
-            - different for features==T&&average==T --> fGroups
-            - rGroups also supported
         - regressionBy arg
             - mention that "set" can be used for sets workflows
             - regressionBy column with features=T
@@ -238,7 +238,6 @@
         - updates for changed regression arg and conc_reg --> x_reg
         - anaInfoCols arg
             - only works with features==T and cols must be numeric if average==T
-        - make new page with all as.data.table() methods
     - minimum max intensity feature filter
     - maxMZOverPrecMS/maxMZOverPrecMSMS MSPL filters
     - filter() for screening: k arg, including NA to clearout results for fGroups specified by j (or all if j==NULL)
@@ -395,6 +394,7 @@
             - clarify that same columns are used for areas?
         - adduct column: now split per set and renamed to group_adduct
         - added susp_bestEstIDLevel column
+        - moved docs to new page with all as.data.table() methods
     - plotInt()
         - xnames --> xNames
         - new args: areas, xBy, groupBy, averageFunc, regression

@@ -30,8 +30,6 @@ NULL
 #'   \item the subset operator (\code{[}) has specific arguments to choose (feature presence in) sets. See the argument
 #'   descriptions.
 #'
-#'   \item \code{as.data.table}: normalization of intensities is performed per set.
-#'
 #'   \item \code{export} Only allows to export data from one set. The \code{unset} method is used prior to exporting the
 #'   data.
 #'

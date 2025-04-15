@@ -11,19 +11,27 @@ NULL
 #'
 #' @param obj,x \code{featureGroups} object to be used for plotting.
 #' @param retMin Plot retention time in minutes (instead of seconds).
-#' @param pch,type,lty Common plotting parameters passed to \emph{e.g.} \code{\link[graphics]{plot}}. For \code{plot}:
-#'   if \code{pch=NULL} then values are automatically assigned.
+#' @param pch,type,lty Common plotting parameters passed to \emph{e.g.} \code{\link[graphics]{plot}}.
+#'
+#'   For \code{plot}: if \code{pch=NULL} then values are automatically assigned.
+#'
+#'   for \code{plotInt}: the \code{type} argument defaults to single points (\code{"p"}) when \code{regression=TRUE},
+#'   and lines+points (\code{"b"}) otherwise. For non-aggregated data, it probably makes more sense to set \emph{e.g.}
+#'   \code{type="p"} to avoid lines being drawn to points with equal x-values.
 #' @param col Colour(s) used. If \code{col=NULL} then colours are automatically generated.
 #' @param groupBy Specifies how results are grouped in the plot. Should be a name of a column in the
 #'   \link[=analysis-information]{analysis information} table which is used to make analysis groups (\emph{e.g.}
-#'   \code{"replicate"}). Set to \code{NULL} for no grouping.
+#'   \code{"replicate"}). Set to \code{NULL} for no grouping. The \code{groupBy} argument can also be set to
+#'   \code{"fGroups"} to group by feature groups (except \code{plotChord}).
+#'
+#'   For \code{plotInt}: see the \verb{Data aggregation in intensity plots} section for more details.
 #'
 #'   For \code{plotChord}: the grouping is used to generate 'outer groups'.
-#'
-#'   For other functions: the \code{groupBy} argument can also be set to \code{"fGroups"} to group by feature groups.
 #' @param showLegend Plot a legend if \code{TRUE}.
 #' @param which A character vector with the selection to compare (\emph{e.g.} replicates, as set by the \code{aggregate}
 #'   argument). Set to \code{NULL} to select everything.
+#' @param averageFunc,normalized Used for intensity data treatment, see the documentation for the
+#'   \code{\link[=as.data.table,featureGroups-method]{as.data.table method}}.
 #' @param \dots passed to \code{\link[base]{plot}} (\code{plot}, \code{plotChroms}, \code{plotTICs} and
 #'   \code{plotBPCs}), \pkg{\link{VennDiagram}} plotting functions (\code{plotVenn}), \code{\link{chordDiagram}}
 #'   (\code{plotChord}) or \code{\link[UpSetR]{upset}} (\code{plotUpSet}).
@@ -175,10 +183,43 @@ setMethod("plotHash", "featureGroups", function(x, ...)
     return(makeHash(groupTable(x), ...))
 })
 
-#' @details \code{plotInt} Generates a line plot for the (averaged) intensity of feature groups within all analyses
-#' @param xnames Plot analysis (or replicate if \code{average=TRUE}) names on the x axis.
+#' @details \code{plotInt} Generates a line plot with feature intensities.
+#'
+#' @param average Controls plot data averaging: see the \verb{Data aggregation in intensity plots} section.
+#' @param xBy Controls x-value grouping in the plot: see the \verb{Data aggregation in intensity plots} section.
+#' @param areas Set to \code{TRUE} to use feature areas instead of peak intensities for plotting.
+#' @param xNames Plot names (\code{xNames=TRUE}) or a number sequence (\code{xNames=FALSE}) on the x axis.
+#' @param regression If \code{TRUE} then a regression line is plotted for each group, using the x values set by
+#'   \code{xBy} (see \verb{Data aggregation in intensity plots}). if \code{showLegend=TRUE} then the R-squared value is
+#'   show in the legend for each group (unless there are multiple feature groups and \code{groupBy != "fGroups"}).
 #' @param plotArgs,linesArgs A \code{list} with further arguments passed to \code{\link[base]{plot}} and
-#'    \code{\link[graphics]{lines}}, respectively.
+#'   \code{\link[graphics]{lines}}, respectively.
+#'
+#' @section Data aggregation in intensity plots: the \code{average}, \code{xBy} and \code{groupBy} arguments control how
+#'   data is aggregated in intensity plots: \itemize{
+#'
+#'   \item \code{average}: controls the averaging of feature intensities prior to plotting.
+#'
+#'   \item \code{xBy}: can map the x value of individual points to analysis metadata. For example, exposure time or
+#'   sample location. Non-numeric values are allowed (unless \code{regression=TRUE}).
+#'
+#'   \item \code{groupBy}: controls the grouping of points in the plot. Equal groups are plotted in sequence so they can
+#'   be connected with lines and are coloured equally. Examples include experiment type or feature groups.
+#'
+#'   }
+#'
+#'   The following values are valid: \itemize{
+#'
+#'   \item \code{FALSE} (\code{average}) or \code{NULL} (\code{xBy} and \code{groupBy}): aggregation is disabled.
+#'
+#'   \item \code{TRUE} (only \code{average}): results are averaged for each replicate
+#'
+#'   \item a name of a column in the \link[=analysis-information]{analysis information}: results are aggregated for
+#'   analyses with the same table column value.
+#'
+#'   \item \code{"fGroups"} (only \code{groupBy}): plots are grouped by feature groups.
+#'
+#'   }
 #'
 #' @rdname feature-plotting
 #' @export
@@ -790,8 +831,6 @@ setMethod("plotUpSetHash", "featureGroups", function(obj, ...)
 
 #' @details \code{plotVolcano} Plots Fold change data in a 'Volcano plot'.
 #' @param FCParams A parameter list to calculate Fold change data. See \code{getFCParams} for more details.
-#' @param averageFunc,normalized Used for intensity data treatment, see the documentation for the
-#'   \code{\link[=as.data.table,featureGroups-method]{as.data.table method}}.
 #' @rdname feature-plotting
 #' @export
 setMethod("plotVolcano", "featureGroups", function(obj, FCParams, showLegend = TRUE, averageFunc = mean,

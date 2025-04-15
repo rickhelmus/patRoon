@@ -519,5 +519,5 @@ getOldNewRefs <- function(ref)
 compareRef <- function(ref)
 {
     on <- getOldNewRefs(ref)
-    waldo::compare(on$old, on$new, tolerance = 0.00001)
+    waldo::compare(on$old, on$new, tolerance = 0.00001, max_diffs = Inf)
 }

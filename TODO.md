@@ -241,10 +241,6 @@
         - make new page with all as.data.table() methods
     - minimum max intensity feature filter
     - maxMZOverPrecMS/maxMZOverPrecMSMS MSPL filters
-    - plotInt()
-        - xnames --> xNames
-        - new args: areas, xBy, averageFunc, regression
-        - RSQs in legend only shown if length(fGroups==1) or groupBy = "fGroups"
     - filter() for screening: k arg, including NA to clearout results for fGroups specified by j (or all if j==NULL)
     - MS/MS bg subtraction
         - abundance filter args
@@ -270,12 +266,10 @@
     - compoundsLibrary: mention that libMatch == annSim
     - MetFrag: don't do MP for non-local databases to avoid connection errors
 - msdata
-    - getMSFileFormats(), getMSConversionFormats(), ...
+    - getMSFileFormats()
     - patRoon.threads, patRoon.MS.backends, patRoon.MS.preferIMS, patRoon.path.BrukerTIMS and patRoon.path.limits options
         - patRoon.MS.preferIMS: only works for MSTK/SC, ie putting OTIMS in front doesn't work
     - update PListParams
-    - updated convertMSFilesXXX() functions, including changed args
-        - add docs for algo specific functions that are now exported
     - update generateMSPeakLists()
         - also in Handbook
         - no more precursorMzWindow
@@ -289,7 +283,6 @@
         - note that additional columns are only available for output=="raw"
     - doc that minAbundanceAbs will be maxed to actual spec count
     - timsconvert; add refs, installation
-    - minIntensity arg for pwiz conversion, set by default for eg Agilent data
 - IMS
     - hasMobilities slot for features
     - Dietrich features
@@ -320,7 +313,6 @@
         - annotate has mob option
         - intMax can only work for EICs (mob inten may not be stored)
         - plotChroms(): IMS arg overrides analysis/groupNames args for availability after IMS selection
-    - IMS arg for [, filter() and plotting functions, export(), getXCMS...()
     - doc that IMS arg should most likely be FALSE for export/getXCMS...()
     - applyIMS arg for all fGroups filter methods
         - ignores negate!
@@ -361,7 +353,6 @@
     - defaults also used for params (EIXs etc) --> doc somehow
     - doc new functions
     - appendix in Handbook
-- updates for generateAnalysisInfo()
 - MS2QuantMeta slots for fGroyupsScreeningSet, formulasSet and compoundsSet (latter already present but wasn't filled in)
 - add Handbook section on file conversion
     - mention mzXML/mzML requirements as newProject() doesn't give note anymore

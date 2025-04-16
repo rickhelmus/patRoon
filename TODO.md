@@ -228,6 +228,8 @@
         - filter() for screening: k arg
     - MSPL
         - new filter names
+        - generateMSPeakLists() usage
+            - no more precursorMzWindow
 - TC
     - ES contributions for IDLs
     - explicitly mention annSim can be filtered with scoreLimits?
@@ -235,7 +237,7 @@
     - annSimForm / annSimBoth are added by compounds method of estimateIDLevels() if formulas/MSPL are set, may be used for ID levels (not by default)
     - reorderAnalyses(): doc that XCMS/XCMS3/KPIC2 fGroups internal slot is not updated, maybe also improve general docs for what is updated and for XCMS what it means for exporting data
     - MSPL
-        - abundance columns in mspl --> section in generateMSPeakLists()
+        - abundance columns in mspl --> section in generateMSPeakLists()?
     - generateComponentsTPs()
         - new args
         - as.data.table candidates arg
@@ -254,9 +256,7 @@
     - patRoon.threads, patRoon.MS.backends, patRoon.MS.preferIMS, patRoon.path.BrukerTIMS and patRoon.path.limits options
         - patRoon.MS.preferIMS: only works for MSTK/SC, ie putting OTIMS in front doesn't work
     - update generateMSPeakLists()
-        - also in Handbook
-        - no more precursorMzWindow
-        - don't refer to deprecated MSPL generators
+        - section for raw data interface
     - availableBackends()
         - also invisible return value
     - EICParams for getPICSet() and calculatePeakQualities()
@@ -432,6 +432,7 @@
     - generateMSPeakLists()
         - now uses backends, old methods still available but deprecated
         - no more precursorMzWindow, and avg params were changed
+        - averaging is now intensity weighted
     - EICParams for getPICSet() and calculatePeakQualities() (needed for m/z IMS expansion)
     - mzExpIMSWindow EIXParam
     - (subsetDTColumnsIfPresent: use order of requested cols instead of original) --> may change column order in some places

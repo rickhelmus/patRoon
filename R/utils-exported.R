@@ -451,6 +451,43 @@ getEICs <- function(analysisInfo, ranges, output = "fill", minIntensityIMS = 25)
     return(ret)
 }
 
+#' Background MS/MS peak detection
+#'
+#' Detects background MS/MS peaks by gathering frequently occurring peaks in MS/MS spectra from blanks.
+#'
+#' This function iterates through all MS/MS spectra of the given analyses and collects the most frequently occurring
+#' peaks. It first averages all spectra within the same analyses, and retains those peaks above an abundance threshold
+#' (set by \code{avgSpectraParams}). The analyses-averaged spectra are then also averaged, and again peaks with a
+#' minimum abundance are kept (set by \code{avgAnalysesParams}).
+#'
+#' The frequent occurrence of a peak throughout MS/MS spectra, including DDA spectra different isolation m/z values, is
+#' often a sign of contamination from the analytical system (\emph{e.g.} from the mobile phase, MS quadrupoles etc).
+#' Hence, the analyses used for blank subtraction are typically just measurements of \emph{e.g.} ultrapure water or
+#' another solvent, and not need to be treated by any extraction procedure.
+#'
+#' The output of this function can directly be used to the \code{\link[=filter,MSPeakLists-method]{filter method for
+#' MSPeakLists}} to subsequently remove these background peaks, which possibly improves subsequent feature annotation.
+#'
+#' @param anaInfo The \link[=analysis-information]{analysis info} object with the analyses to be used for background
+#'   peak detection.
+#' @param replicates A \code{character} with names of replicates for the analyses used for background peak detection. If
+#'   \code{NULL} then all the analyses defined in \code{anaInfo} will be used.
+#' @param MSLevel The MS level of the spectra to be used for background peak detection. This should be \samp{1} or
+#'   \samp{2}. This function is only tested with \code{MSLevel=2}. And while \code{MSLevel=1} is possible, it may be
+#'   rather computationally intensive due to the relatively large number of MS peaks to iterate through.
+#' @param retentionRange,mobilityRange A two-sized \code{numeric} vector with the minimum and maximum retention time and
+#'   ion mobility to consider, respectively. If \code{NULL} then the full range is used.
+#' @param minBPIntensity The minimum basepeak intensity of a spectrum to be considered for background peak detection.
+#'   This is primarily intended to optimize the detection procedure.
+#' @param avgSpectraParams,avgAnalysesParams A \code{list} with parameters used for averaging the MS spectra within and
+#'   between analyses, respectively. See \code{\link{getDefAvgPListParams}} for more details.
+#'
+#' @return A \code{\link{data.table}} with the detected background peaks and abundance statistics. The table can
+#'   directly be passed to the \code{removeMZs} argument of the \code{\link[=filter,MSPeakLists-method]{filter method for
+#' MSPeakLists}}.
+#'
+#' @references \insertRef{Helmus2025}{patRoon}
+#'
 #' @export
 getBGMSMSPeaks <- function(anaInfo, replicates = NULL, MSLevel = 2, retentionRange = NULL, mobilityRange = NULL,
                            minBPIntensity = 5000,

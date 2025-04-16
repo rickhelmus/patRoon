@@ -73,6 +73,7 @@
     - add im_collapse and timsconvert
 - remove default limits that are in limits.yml
 - copy limits file and UI to specify IMS default
+- get rid of stringsAsFactors
 
 
 ## Param defaults

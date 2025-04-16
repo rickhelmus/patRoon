@@ -231,11 +231,10 @@
     - annSimForm / annSimBoth are added by compounds method of estimateIDLevels() if formulas/MSPL are set, may be used for ID levels (not by default)
     - reorderAnalyses(): doc that XCMS/XCMS3/KPIC2 fGroups internal slot is not updated, maybe also improve general docs for what is updated and for XCMS what it means for exporting data
     - maxMZOverPrecMS/maxMZOverPrecMSMS MSPL filters
-    - MS/MS bg subtraction
+    - MSPL
         - abundance filter args
         - abundance columns in mspl
         - abundance parameter in average params
-        - getBGMSMSPeaks()
         - new/shortened filter() args
         - removeMZs and mzWindow filter() args
             - removeMZs list for sets

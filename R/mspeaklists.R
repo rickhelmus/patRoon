@@ -15,9 +15,11 @@ NULL
 #' @param reAverage Set to \code{TRUE} to regenerate group averaged MS peak lists. \strong{NOTE} it is very important
 #'   that any annotation data relying on MS peak lists (formulae/compounds) are regenerated afterwards! Otherwise it is
 #'   likely that \emph{e.g.} plotting methods will use wrong MS/MS data.
-#' @param MSLevel The MS level: \samp{1} for regular MS, \samp{2} for MSMS.
+#' @param MSLevel The MS level for which data is plotted or filtered: \samp{1} for regular MS, \samp{2} for MSMS.
+#'
+#'   For \code{filter}: can also be \code{1:2} to specify both.
 #' @param \dots Further arguments passed to \code{\link[graphics]{plot}}.
-#' 
+#'
 #'   \setsPassedArgs1{MSPeakLists}
 #'
 #' @template plot-lim
@@ -39,8 +41,10 @@ NULL
 #' @templateVar delj MS peaks
 #' @templateVar deljtype numeric indices (rows)
 #' @templateVar delfwhat feature group
-#' @templateVar delfa the peak list table (a \code{data.table}), feature group name, analysis (\code{NULL} if averaged peak list), type (\code{"MS"} or \code{"MSMS"})
-#' @templateVar delfr the peak list indices (rows) to be removed (specified as an \code{integer} or \code{logical} vector)
+#' @templateVar delfa the peak list table (a \code{data.table}), feature group name, analysis (\code{NULL} if averaged
+#'   peak list), type (\code{"MS"} or \code{"MSMS"})
+#' @templateVar delfr the peak list indices (rows) to be removed (specified as an \code{integer} or \code{logical}
+#'   vector)
 #' @templateVar dollarOpName feature group
 #' @template sub_sel_del-args
 #'
@@ -451,24 +455,37 @@ setMethod("delete", "MSPeakLists", function(obj, i = NULL, j = NULL, k = NULL, r
 #'   processes. The filters are applied to peak lists for each feature and feature group. The feature group peak lists
 #'   are \emph{not} re-averaged by default (see the \code{reAverage} argument). \emph{not} filtered afterwards.
 #'
-#' @param absMSIntThr,absMSMSIntThr,relMSIntThr,relMSMSIntThr Absolute/relative intensity threshold for MS or MS/MS peak
-#'   lists. \code{NULL} for none.
-#' @param topMSPeaks,topMSMSPeaks Only consider this amount of MS or MS/MS peaks with highest intensity. \code{NULL} to
-#'   consider all.
-#' @param minMSMSPeaks If the number of peaks in an MS/MS peak list (\strong{excluding} the precursor peak) is lower
-#'   than this it will be completely removed. Set to \code{NULL} to ignore.
+#' @param absMinIntensity,relMinIntensity Absolute/relative intensity threshold for peaks. Set to \code{NULL} for none.
+#' @param topMostPeaks Only consider this number of most intense peaks. Set to \code{NULL} to consider all.
+#' @param minPeaks If the number of peaks in an MS/MS peak list (\strong{excluding} the precursor peak) is lower than
+#'   this it will be completely removed. Set to \code{NULL} to ignore.
+#' @param maxMZOverPrec Any mass peaks with an m/z higher than this value (relative to the precursor) will be removed.
+#'   Set to \code{NULL} to ignore.
+#' @param minAbundanceFeatAbs,minAbundanceFeatRel The minimum absolute/relative abundance for a mass peak across spectra
+#'   that are averaged for a feature. The feature group peak lists are also filtered, using the mean averaged peak
+#'   abundance from the peak lists in the group. Set to \code{NULL} to ignore.
+#' @param minAbundanceFGroupAbs,minAbundanceFGroupRel The minimum absolute/relative abundance of a mass peak across
+#'   spectra that are averaged for a feature group. Set to \code{NULL} to ignore.
 #' @param isolatePrec If not \code{NULL} then value should be a \code{list} with parameters used for isolating the
 #'   precursor and its isotopes in MS peak lists (see \verb{Isolating precursor data}). Alternatively, \code{TRUE} to
 #'   apply the filter with default settings (as given with \code{getDefIsolatePrecParams}).
 #' @param deIsotopeMS,deIsotopeMSMS Remove any isotopic peaks in MS or MS/MS peak lists. This may improve data
 #'   processing steps which do not assume the presence of isotopic peaks (e.g. MetFrag for MS/MS). Note that
 #'   \code{getMzRPeakLists} does not (yet) support flagging of isotopes.
+#' @param removeMZs A set of m/z values to be removed from the peak lists. This is typically used to remove background
+#'   peaks. The m/z values should be specified by either be a \code{numeric} vector or a \code{data.frame} with an
+#'   \code{mz} column. The latter is returned by the \code{\link{getBGMSMSPeaks}} function, which attempts to
+#'   automatically detect background peaks.
+#'
+#'   \setsWF Should be a \code{list} that specifies the m/z values to be removed (in above mentioned format) for each
+#'   set. The order should match that of the sets in the \code{MSPeakLists} object.
 #' @param withMSMS If set to \code{TRUE} then only results will be retained for which MS/MS data is available. if
 #'   \code{negate=TRUE} then only results \emph{without} MS/MS data will be retained.
 #' @param annotatedBy Either a \code{\link{formulas}} or \code{\link{compounds}} object, or a \code{list} with both. Any
 #'   MS/MS peaks that are \emph{not} annotated by any of the candidates in the specified objects are removed.
-#' @param retainPrecursorMSMS If \code{TRUE} then precursor peaks will never be filtered out from MS/MS peak lists (note
+#' @param retainPrecursor If \code{TRUE} then precursor peaks will never be filtered out from MS/MS peak lists (note
 #'   that precursors are never removed from MS peak lists). The \code{negate} argument does not affect this setting.
+#' @param mzWindow The m/z window used to find peaks to be removed from the \code{removeMZs} filter.
 #' @param negate If \code{TRUE} then filters are applied in opposite manner.
 #'
 #' @export

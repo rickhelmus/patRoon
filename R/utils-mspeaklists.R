@@ -41,22 +41,24 @@ emptyMSPeakList <- function(abundanceColumn, avgCols)
 #' (applied prior to any other treatment steps).
 #'
 #' \item \code{minAbundanceAbs},\code{minAbundanceRel} Minimum absolute/relative abundance of an MS peak across the
-#' spectra that are averaged.
+#' spectra that are averaged. If \code{minAbundanceAbs} exceeds the number of spectra then the threshold is
+#' automatically lowered to the number of spectra.
 #'
 #' \item \code{minAbundanceIMSAbs},\code{minAbundanceIMSRel} Minimum absolute/relative abundance of an MS peak across
-#' the spectra that are summed within an IMS frame.
+#' the spectra that are summed within an IMS frame. If \code{minAbundanceIMSAbs} exceeds the number of spectra in the
+#' IMS frame then the threshold is automatically lowered to the number of spectra.
 #'
 #' \item \code{method} Method used to average MS spectra. Valid values are: \itemize{
 #'
 #'   \item \code{"hclust"}: uses hierarhcical clustering to find similar mass peaks (using
 #'   \href{https://github.com/cdalitz/hclust-cpp}{hclust-cpp}, which is based on the \CRANpkg{fastcluster} package).
-#'   
+#'
 #'   \item \code{"distance"}: uses the distance between sorted mass peaks to find close mass peaks.
-#'   
+#'
 #'   \item \code{"bin"}: uses a similar binning approach to cluster similar mass peaks.
 #'
 #' }
-#' 
+#'
 #' The \code{hclust} method may give more accurate results, but is more computationally demanding and generally
 #' unsuitable for IMS workflows due to excessive use of RAM.
 #'

@@ -221,23 +221,15 @@
         - outerGroups --> groupBy, also update (incorrect) example in handbook
         - plotVenn()/overlap()/unique(): update for removal of sets arg: give examples with aggregate
         - plotInt(): give examples for xBy, groupBy etc
-        - mention that "set" can be used in sets WFs for groupBy etc
+        - mention that "set" can be used in sets WFs for groupBy, regressionBy, etc
+            - mention that in sets workflow, regressionBy column can be set to set unique names (eg UV-pos)
+            - maybe also in sets WFs section in ref docs?
 - TC
     - ES contributions for IDLs
     - explicitly mention annSim can be filtered with scoreLimits?
     - annSim for sets is calculated as max
     - annSimForm / annSimBoth are added by compounds method of estimateIDLevels() if formulas/MSPL are set, may be used for ID levels (not by default)
     - reorderAnalyses(): doc that XCMS/XCMS3/KPIC2 fGroups internal slot is not updated, maybe also improve general docs for what is updated and for XCMS what it means for exporting data
-    - as.data.table()
-        - regressionBy arg
-            - mention that "set" can be used for sets workflows
-            - regressionBy column with features=T
-            - mention that regressionBy values for average groups should be equal
-            - mention that in sets workflow, regressionBy column can be set to set unique names (eg UV-pos)
-        - fix: mention how pred results are merged with collapseSuspects=NULL (ie all non-suspect type values are removed if fGroup has suspect result)
-        - updates for changed regression arg and conc_reg --> x_reg
-        - anaInfoCols arg
-            - only works with features==T and cols must be numeric if average==T
     - minimum max intensity feature filter
     - maxMZOverPrecMS/maxMZOverPrecMSMS MSPL filters
     - filter() for screening: k arg, including NA to clearout results for fGroups specified by j (or all if j==NULL)

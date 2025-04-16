@@ -29,36 +29,52 @@ NULL
 #' @param qualities Adds feature (group) qualities (\code{qualities="quality"}), scores (\code{qualities="score"}) or
 #'   both (\code{qualities="both"}), if this data is available (\emph{i.e.} from \code{calculatePeakQualities}). If
 #'   \code{qualities=FALSE} then nothing is reported.
-#' @param regression Set to \code{TRUE} to add regression data for each feature group. For this a linear model is
-#'   created (intensity/area [depending on \code{areas} argument] \emph{vs} concentration). The model concentrations
-#'   (e.g. of a set of standards) is derived from the \code{conc} column of the \link[=analysis-information]{analysis
-#'   information}. From this model the intercept, slope and R2 is added to the output. In addition, when
-#'   \code{features=TRUE}, concentrations for each feature are added. Note that no regression information is added when
-#'   no \code{conc} column is present in the analysis information or when less than two concentrations are specified
-#'   (\emph{i.e.} the minimum amount).
+#' @param regression,regressionBy Used for regression calculations. See the \verb{Regression calculation} section below.
+#'   Set to \code{NULL} to ignore.
 #' @param concAggrParams,toxAggrParams Parameters to aggregate calculated concentrations/toxicities (obtained with
 #'   \code{\link{calculateConcs}}/\code{\link{calculateTox}}). See \link[=pred-aggr-params]{prediction aggregation
 #'   parameters} for more information. Set to \code{NULL} to omit this data.
 #' @param normConcToTox Set to \code{TRUE} to normalize concentrations to toxicities. Only relevant if this data is
 #'   present (see \code{\link{calculateConcs}}/\code{\link{calculateTox}}).
+#' @param anaInfoCols A \code{character} with any additional columns from the \link[=analysis-information]{analysis
+#'   information} table. Only supported if \code{features=TRUE}. If averaging is performed then the data in the
+#'   specified columns should be numeric. Set to \code{NULL} to ignore.
 #' @param collapseSuspects If a \code{character} then any suspects that were matched to the same feature group are
 #'   collapsed to a single row and suspect names are separated by the value of \code{collapseSuspects}. If \code{NULL}
 #'   then no collapsing occurs, and each suspect match is reported on a single row. See the \verb{Suspect collapsing}
 #'   section below for additional details.
+#'
+#' @section Regression calculation: The \code{regression} argument controls the calculation of regression parameters
+#'   from a regression model calculated with feature intensities (or areas if \code{areas=TRUE}). Here, simple linear
+#'   regression is used, \emph{i.e.} \samp{y=ax+b} with \samp{a} the slope and \samp{b} the intercept. The value for
+#'   \code{regression} should be the name of a column in the \link[=analysis-information]{analysis information} table
+#'   with numerical data to be used for x-values. Alternatively, if \code{regression=TRUE} then the \code{"conc"} column
+#'   is used. Any \code{NA} x-values are ignored, and no regression will be calculated if less than two (non-NA)
+#'   x-values are available. The output table will contain properties such as the slope and correlation coefficient
+#'   (R-squared). Furthermore, if \code{features=TRUE} then x-values will be calculated from the model and stored in the
+#'   \code{x_reg} column.
+#'
+#'   The \code{regressionBy} argument can be used to construct separate regression models for different groups of
+#'   analysis. It should be set to the name of a column in the \link[=analysis-information]{analysis information} table
+#'   which defines the grouping between samples. If \code{features=TRUE} then the grouping is stored in the
+#'   \code{regression_group} column of the output table.
+#'
+#'   Please see the handbook for examples on how to use the regression functionality.
 #'
 #' @section {Suspect collapsing}: The \code{as.data.table} method for \code{featureGroupsScreening} supports an
 #'   additional format where each suspect hit is reported on a separate row (enabled by setting
 #'   \code{collapseSuspects=NULL}). In this format the suspect
 #'   properties from the \code{screenInfo} method are merged with each suspect row. Alternatively, if \emph{suspect
 #'   collapsing} is enabled (the default) then the regular \code{as.data.table} format is used, and amended with the
-#'   names of all suspects matched to a feature group (separated by the value of the \code{collapseSuspects} argument).
+#'   names and estimated ID levels (if available) of the suspects matched to a feature group (each separated by the
+#'   value of the \code{collapseSuspects} argument).
 #'
-#'   Suspect collapsing also influences how calculated feature concentrations/toxicities are reported (\emph{i.e.}
-#'   obtained with \code{\link{calculateConcs}}/\code{\link{calculateTox}}). If these values were directly predicted for
-#'   suspects, \emph{i.e.} by using \code{\link{predictRespFactors}}/\code{\link{predictTox}} on the feature groups
-#'   object, \emph{and} suspects are \emph{not} collapsed, then the calculated concentration/toxicity reported for each
-#'   suspect row is not aggregated and specific for that suspect (unless not available). Hence, this allows you to
-#'   obtain specific concentration/toxicity values for each suspect/feature group pair.
+#'   Suspect collapsing also influences the reporting of predicted \link[=pred-quant]{feature concentrations} and
+#'   \link[=pred-tox]{toxicities}. In the case that (1) suspects are \emph{not} collapsed in the output table and (2)
+#'   predictions are available for a specific suspect hit (\emph{i.e.} if \code{\link{predictRespFactors}} or
+#'   \code{\link{predictTox}} was called on the feature groups object), then only the suspect specific data is reported
+#'   and no aggregation is performed. Hence, this allows you to obtain specific concentration/toxicity values for each
+#'   suspect/feature group pair.
 #'
 #' @section Sets workflows: In a \link[=sets-workflow]{sets workflow} normalization of feature intensities occur per
 #'   set.

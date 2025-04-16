@@ -474,8 +474,8 @@ setMethod("delete", "MSPeakLists", function(obj, i = NULL, j = NULL, k = NULL, r
 #' @export
 setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity = NULL, relMinIntensity = NULL,
                                             topMostPeaks = NULL, minPeaks = NULL, maxMZOverPrec = NULL,
-                                            minAbundanceFeatRel = NULL, minAbundanceFeatAbs = NULL,
-                                            minAbundanceFGroupRel = NULL, minAbundanceFGroupAbs = NULL,
+                                            minAbundanceFeatAbs = NULL, minAbundanceFeatRel = NULL,
+                                            minAbundanceFGroupAbs = NULL, minAbundanceFGroupRel = NULL,
                                             isolatePrec = NULL, deIsotope = FALSE, removeMZs = NULL, withMSMS = FALSE,
                                             annotatedBy = NULL, retainPrecursor = TRUE,
                                             mzWindow = defaultLim("mz", "medium"), reAverage = FALSE, negate = FALSE)
@@ -486,7 +486,7 @@ setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity 
     ac <- checkmate::makeAssertCollection()
     checkmate::assertSubset(MSLevel, 1:2, add = ac)
     aapply(checkmate::assertNumber, . ~ absMinIntensity + relMinIntensity + maxMZOverPrec +
-               minAbundanceFeatRel + minAbundanceFeatAbs +  minAbundanceFGroupRel + minAbundanceFGroupAbs,
+               minAbundanceFeatAbs + minAbundanceFeatRel +  minAbundanceFGroupAbs + minAbundanceFGroupRel,
            lower = 0, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertCount, . ~ topMostPeaks + minPeaks, positive = TRUE, null.ok = TRUE, fixed = list(add = ac))
     assertPListIsolatePrecParams(isolatePrec, add = ac)
@@ -523,7 +523,7 @@ setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity 
         return(obj)
 
     hash <- makeHash(obj, MSLevel, absMinIntensity, relMinIntensity, topMostPeaks, minPeaks, maxMZOverPrec,
-                     minAbundanceFeatRel, minAbundanceFeatAbs, minAbundanceFGroupRel, minAbundanceFGroupAbs,
+                     minAbundanceFeatAbs, minAbundanceFeatRel, minAbundanceFGroupAbs, minAbundanceFGroupRel,
                      isolatePrec, deIsotope, removeMZs, withMSMS, annotatedBy, retainPrecursor, mzWindow, reAverage,
                      negate)
     cache <- loadCacheData("filterMSPeakLists", hash)
@@ -547,9 +547,9 @@ setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity 
                 return(FALSE)
             
             plF <- doMSPeakListFilter(plF, absMinIntensity, relMinIntensity, topMostPeaks, NULL, maxMZOverPrec,
-                                      minAbundanceFeatRel, minAbundanceFeatAbs,
-                                      if (is.null(ana)) minAbundanceFGroupRel else NULL,
+                                      minAbundanceFeatAbs, minAbundanceFeatRel,
                                       if (is.null(ana)) minAbundanceFGroupAbs else NULL,
+                                      if (is.null(ana)) minAbundanceFGroupRel else NULL,
                                       deIsotope, removeMZs, TRUE, plF[precursor == TRUE]$mz, mzWindow, negate)
             if (!is.null(isolatePrec))
                 plF <- isolatePrecInMSPeakList(plF, isolatePrec, negate)
@@ -596,9 +596,9 @@ setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity 
                     obj[[grp]]$MS[precursor == TRUE]$mz
             }
             plF <- doMSPeakListFilter(plF, absMinIntensity, relMinIntensity, topMostPeaks, minPeaks, maxMZOverPrec,
-                                      minAbundanceFeatRel, minAbundanceFeatAbs,
-                                      if (is.null(ana)) minAbundanceFGroupRel else NULL,
+                                      minAbundanceFeatAbs, minAbundanceFeatRel,
                                       if (is.null(ana)) minAbundanceFGroupAbs else NULL,
+                                      if (is.null(ana)) minAbundanceFGroupRel else NULL,
                                       deIsotope, removeMZs, retainPrecursor, precMZ, mzWindow, negate)
         }
         

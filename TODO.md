@@ -90,6 +90,7 @@
 ## TC
 
 - rename estimateIDLevels() and have the same name as annotateSuspects()?
+- minAbundanceFeatAbs/Rel: does it make sense to also filter fGroup peak lists? If not, remove and update docs.
 
 ## msdata
 
@@ -232,12 +233,8 @@
     - reorderAnalyses(): doc that XCMS/XCMS3/KPIC2 fGroups internal slot is not updated, maybe also improve general docs for what is updated and for XCMS what it means for exporting data
     - maxMZOverPrecMS/maxMZOverPrecMSMS MSPL filters
     - MSPL
-        - abundance filter args
         - abundance columns in mspl
         - abundance parameter in average params
-        - new/shortened filter() args
-        - removeMZs and mzWindow filter() args
-            - removeMZs list for sets
     - generateComponentsTPs()
         - new args
         - as.data.table candidates arg

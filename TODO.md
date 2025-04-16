@@ -215,8 +215,8 @@
     - clMethod and mzWindow for IM collapse --> see how this can be combined with others
     - link to HRMS interface in convertMSFilesIMSCollapse()
     - update handbook and tutorial
-- features
-    - handbook/tutorial
+- handbook/tutorial
+    - features
         - mention somewhere that IMS="maybe" for e.g. plotting
         - colourBy --> groupBy
         - outerGroups --> groupBy, also update (incorrect) example in handbook
@@ -225,6 +225,8 @@
         - mention that "set" can be used in sets WFs for groupBy, regressionBy, etc
             - mention that in sets workflow, regressionBy column can be set to set unique names (eg UV-pos)
         - filter() for screening: k arg
+    - MSPL
+        - new filter names
 - TC
     - ES contributions for IDLs
     - explicitly mention annSim can be filtered with scoreLimits?

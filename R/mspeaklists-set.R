@@ -44,11 +44,14 @@ syncMSPeakListsSetObjects <- function(MSPeakListsSet)
 #'   \setsWFChangedMethods{
 #'
 #'   \item \code{filter} and the subset operator (\code{[}) Can be used to select data that is only present for selected
-#'   sets. The \code{filter} method is applied for each set individually, and afterwards the results are combined again
-#'   (see \code{\link{generateMSPeakLists}}). Note that this has important implications for \emph{e.g.} relative
-#'   intensity filters (\code{relMSIntThr}/\code{relMSMSIntThr}), \code{topMSPeaks}/\code{topMSMSPeaks} and
-#'   \code{minMSMSPeaks}. Similarly, when the \code{annotatedBy} filter is applied, each set specific MS peak list is
-#'   filtered by the annotation results from only that set.
+#'   sets (\code{sets} argument).
+#'
+#'   \item The \code{filter} method is applied for each set individually, and afterwards the results are combined again
+#'   (see \code{\link{generateMSPeakLists}}). Note that this has important implications for \emph{e.g.} intensity
+#'   filters (\code{absMinIntensity}/\code{relMinIntensity}), \code{topMostPeaks} and
+#'   \code{minPeaks}. Furthermore, when the \code{annotatedBy} filter is applied, each set specific MS peak list is
+#'   filtered by the annotation results from only that set. Finally, the \code{removeMZs} filter should be set for each
+#'   set separately.
 #'
 #'   \item \code{plotSpectrum} Is able to highlight set specific mass peaks (\code{perSet} and \code{mirror} arguments).
 #'

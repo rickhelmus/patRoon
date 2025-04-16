@@ -79,6 +79,10 @@ NULL
 #' @section Sets workflows: In a \link[=sets-workflow]{sets workflow} normalization of feature intensities occur per
 #'   set.
 #'
+#'   In sets workflows the \link[=analysis-information]{analysis information} contains an additional \code{"set"}
+#'   column, which can be used for arguments that involve grouping of analyses. For instance, if
+#'   \code{regressionBy="set"} then regression models will be calculated for each set.
+#'
 #' @name feature-table
 NULL
 

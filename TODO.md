@@ -223,7 +223,6 @@
         - plotInt(): give examples for xBy, groupBy etc
         - mention that "set" can be used in sets WFs for groupBy, regressionBy, etc
             - mention that in sets workflow, regressionBy column can be set to set unique names (eg UV-pos)
-            - maybe also in sets WFs section in ref docs?
 - TC
     - ES contributions for IDLs
     - explicitly mention annSim can be filtered with scoreLimits?

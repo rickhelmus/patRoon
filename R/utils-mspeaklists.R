@@ -327,8 +327,8 @@ deIsotopeMSPeakList <- function(MSPeakList, negate)
     return(MSPeakList[unique_iso])
 }
 
-doMSPeakListFilter <- function(pList, absIntThr, relIntThr, topMost, minPeaks, maxMZOverPrec, minAbundanceFeatRel,
-                               minAbundanceFeatAbs, minAbundanceFGroupRel, minAbundanceFGroupAbs, deIsotope, removeMZs,
+doMSPeakListFilter <- function(pList, absIntThr, relIntThr, topMost, minPeaks, maxMZOverPrec, minAbundanceFeatAbs,
+                               minAbundanceFeatRel, minAbundanceFGroupAbs, minAbundanceFGroupRel, deIsotope, removeMZs,
                                retainPrecursor, precursorMZ, mzWindow, negate)
 {
     ret <- pList
@@ -357,13 +357,6 @@ doMSPeakListFilter <- function(pList, absIntThr, relIntThr, topMost, minPeaks, m
         ret <- ret[pred(mz)]
     }
     
-    if (!is.null(minAbundanceFeatRel))
-    {
-        if (!is.null(ret[["feat_abundance_rel"]]))
-            ret <- ret[intPred(feat_abundance_rel, minAbundanceFeatRel)] # averaged PL
-        else
-            ret <- ret[intPred(abundance_rel, minAbundanceFeatRel)] # feat PL
-    }
     if (!is.null(minAbundanceFeatAbs))
     {
         if (!is.null(ret[["feat_abundance_abs"]]))
@@ -371,10 +364,17 @@ doMSPeakListFilter <- function(pList, absIntThr, relIntThr, topMost, minPeaks, m
         else
             ret <- ret[intPred(abundance_abs, minAbundanceFeatAbs)] # feat PL
     }
-    if (!is.null(minAbundanceFGroupRel) && !is.null(ret[["fgroup_abundance_rel"]]))
-        ret <- ret[intPred(fgroup_abundance_rel, minAbundanceFGroupRel)]
+    if (!is.null(minAbundanceFeatRel))
+    {
+        if (!is.null(ret[["feat_abundance_rel"]]))
+            ret <- ret[intPred(feat_abundance_rel, minAbundanceFeatRel)] # averaged PL
+        else
+            ret <- ret[intPred(abundance_rel, minAbundanceFeatRel)] # feat PL
+    }
     if (!is.null(minAbundanceFGroupAbs) && !is.null(ret[["fgroup_abundance_abs"]]))
         ret <- ret[intPred(fgroup_abundance_abs, minAbundanceFGroupAbs)]
+    if (!is.null(minAbundanceFGroupRel) && !is.null(ret[["fgroup_abundance_rel"]]))
+        ret <- ret[intPred(fgroup_abundance_rel, minAbundanceFGroupRel)]
 
     if (deIsotope)
         ret <- deIsotopeMSPeakList(ret, negate)

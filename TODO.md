@@ -252,7 +252,6 @@
             - filter()
             - mention that suspect list parents are not filtered out from candidate list
         - parallel=T is only useful with many candidates
-    - compoundsLibrary: mention that libMatch == annSim
 - msdata
     - getMSFileFormats()
     - patRoon.threads, patRoon.MS.backends, patRoon.MS.preferIMS, patRoon.path.BrukerTIMS and patRoon.path.limits options

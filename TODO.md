@@ -253,7 +253,6 @@
             - mention that suspect list parents are not filtered out from candidate list
         - parallel=T is only useful with many candidates
     - compoundsLibrary: mention that libMatch == annSim
-    - MetFrag: don't do MP for non-local databases to avoid connection errors
 - msdata
     - getMSFileFormats()
     - patRoon.threads, patRoon.MS.backends, patRoon.MS.preferIMS, patRoon.path.BrukerTIMS and patRoon.path.limits options

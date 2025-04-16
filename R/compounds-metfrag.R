@@ -557,6 +557,9 @@ MFMPErrorHandler <- function(cmd, exitStatus, retries)
 #'   the \pkg{patRoonExt} package. Note that these files must \emph{also} be present on the local host computer, even if
 #'   it is not participating in computations.
 #'
+#'   If the compound database is \emph{not} local, \emph{e.g.} \code{database="pubchem"}, then parallelization is
+#'   disabled to avoid connection errors that typically occur otherwise.
+#'
 #' @references \insertRef{Ruttkies2016}{patRoon}
 #'
 #' @templateVar what generateCompoundsMetFrag

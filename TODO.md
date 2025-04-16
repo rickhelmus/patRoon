@@ -229,7 +229,6 @@
     - annSim for sets is calculated as max
     - annSimForm / annSimBoth are added by compounds method of estimateIDLevels() if formulas/MSPL are set, may be used for ID levels (not by default)
     - reorderAnalyses(): doc that XCMS/XCMS3/KPIC2 fGroups internal slot is not updated, maybe also improve general docs for what is updated and for XCMS what it means for exporting data
-    - minimum max intensity feature filter
     - maxMZOverPrecMS/maxMZOverPrecMSMS MSPL filters
     - filter() for screening: k arg, including NA to clearout results for fGroups specified by j (or all if j==NULL)
     - MS/MS bg subtraction

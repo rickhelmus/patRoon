@@ -168,15 +168,10 @@ averageSpectraMZR <- function(spectra, hd, clusterMzWindow, topMost, minIntensit
 # use mzR to generate MS peaklists.
 # limitations compared to DA: no bg subtraction, no isotope information
 
-#' Generate peak lists with mzR
+#' Generate peak lists with mzR (deprecated)
 #'
-#' Uses the \pkg{mzR} package to read the MS data needed for MS peak lists.
-#'
-#' @templateVar algo mzR
-#' @templateVar do generate MS peak lists
-#' @templateVar generic generateMSPeakLists
-#' @templateVar algoParam mzr
-#' @template algo_generator
+#' Uses the \pkg{mzR} package to read the MS data needed for MS peak lists. This function is now deprecated, please use
+#' \code{\link{generateMSPeakLists}} instead.
 #'
 #' @details The MS data files should be either in \file{.mzXML} or \file{.mzML} format.
 #'

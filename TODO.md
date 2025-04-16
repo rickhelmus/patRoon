@@ -263,7 +263,6 @@
     - mzExpIMSWindow and minIntensityIMS EIXParam
     - update all for getEICs()
         - note that additional columns are only available for output=="raw"
-    - doc that minAbundanceAbs will be maxed to actual spec count
     - timsconvert; add refs, installation
 - IMS
     - hasMobilities slot for features

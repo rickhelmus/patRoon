@@ -213,6 +213,7 @@
     - maybe add more examples where eg raw data can be used
 - convert
     - add patRoon 3.0 citation for im_collapse
+    - mention raw data interface for im_collapse
     - clMethod and mzWindow for IM collapse --> see how this can be combined with others
     - link to HRMS interface in convertMSFilesIMSCollapse()
     - update handbook and tutorial
@@ -252,7 +253,6 @@
             - mention that suspect list parents are not filtered out from candidate list
         - parallel=T is only useful with many candidates
 - msdata
-    - getMSFileFormats()
     - patRoon.threads, patRoon.MS.backends, patRoon.MS.preferIMS, patRoon.path.BrukerTIMS and patRoon.path.limits options
         - patRoon.MS.preferIMS: only works for MSTK/SC, ie putting OTIMS in front doesn't work
     - update generateMSPeakLists()

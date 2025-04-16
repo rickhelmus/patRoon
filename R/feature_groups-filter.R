@@ -525,6 +525,8 @@ minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, ne
 #'   \emph{before} any other filters. This is typically used to speed-up subsequent filter steps. However, care must be
 #'   taken that a sufficiently low value is chosen that is not expected to affect subsequent filtering steps. See below
 #'   why this may be important.
+#' @param absMinMaxIntensity,relMinMaxIntensity Feature groups are only kept if at least one feature in the group has an
+#'   intensity above this absolute/relative threshold.
 #' @param absMinAnalyses,relMinAnalyses Feature groups are only kept when they contain data for at least this (absolute
 #'   or relative) amount of analyses. Set to \code{NULL} to ignore.
 #' @param absMinReplicates,relMinReplicates Feature groups are only kept when they contain data for at least this
@@ -532,11 +534,11 @@ minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, ne
 #' @param absMinFeatures,relMinFeatures Analyses are only kept when they contain at least this (absolute or relative)
 #'   amount of features. Set to \code{NULL} to ignore.
 #' @param absMinReplicateAbundance,relMinReplicateAbundance Minimum absolute/relative abundance that a grouped feature
-#'   should be present within a replicate. If this minimum is not met all features within the replicate are
-#'   removed. Set to \code{NULL} to skip this step.
+#'   should be present within a replicate. If this minimum is not met all features within the replicate are removed. Set
+#'   to \code{NULL} to skip this step.
 #' @param maxReplicateIntRSD Maximum relative standard deviation (RSD) of intensity values for features within a
-#'   replicate. If the RSD is above this value all features within the replicate are removed. Set to
-#'   \code{NULL} to ignore.
+#'   replicate. If the RSD is above this value all features within the replicate are removed. Set to \code{NULL} to
+#'   ignore.
 #' @param absMinConc,relMinConc The minimum absolute/relative predicted concentration (calculated by
 #'   \code{\link{calculateConcs}}) assigned to a feature. The toxicities are first aggregated prior to filtering, as
 #'   controlled by the \code{predAggrParams} argument. Also see the \code{removeNA} argument.
@@ -555,8 +557,8 @@ minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, ne
 #'   threshold. For instance, a value of \samp{5} means that only features with an intensity five times higher than that
 #'   of the blank are kept. The relative intensity values between blanks and non-blanks are determined from the mean of
 #'   all non-zero blank intensities. Set to \code{NULL} to skip this step.
-#' @param removeBlanks Set to \code{TRUE} to remove all analyses that belong to replicates that are specified as a
-#'   blank in the \link{analysis-information}. This is useful to simplify the analyses in the specified
+#' @param removeBlanks Set to \code{TRUE} to remove all analyses that belong to replicates that are specified as a blank
+#'   in the \link{analysis-information}. This is useful to simplify the analyses in the specified
 #'   \code{\link{featureGroups}} object after blank subtraction. When both \code{blankThreshold} and this argument are
 #'   set, blank subtraction is performed prior to removing any analyses.
 #' @param removeISTDs If \code{TRUE} then all feature groups marked as internal standard (IS) are removed. This requires
@@ -575,7 +577,7 @@ minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, ne
 #'
 #' @templateVar feat FALSE
 #' @template feat-filter-args
-#' 
+#'
 #' @templateVar append Set to \code{NULL} to ignore.
 #' @template IMS-arg
 #'
@@ -605,6 +607,8 @@ minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, ne
 #'   \item Intensity filters (\emph{i.e.} \code{absMinIntensity} and \code{relMinIntensity}).
 #'
 #'   \item Replicate abundance filters (2nd time, only if previous filters affected results).
+#'
+#'   \item Minimum-maximum intensity filters (\emph{i.e.} \code{absMinMaxIntensity} and \code{relMinMaxIntensity}).
 #'
 #'   \item General abundance filters (\emph{i.e.} \code{absMinAnalyses}, \code{relMinAnalyses}, \code{absMinReplicates},
 #'   \code{relMinReplicates}, \code{absMinFeatures}, \code{relMinFeatures}), \code{absMinConc}, \code{relMinConc},
@@ -643,10 +647,10 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
     
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertNumber, . ~ absMinIntensity + relMinIntensity + preAbsMinIntensity + preRelMinIntensity +
-               absMinIntensity + relMinIntensity + absMinAnalyses + relMinAnalyses + absMinReplicates +
-               relMinReplicates + absMinFeatures + relMinFeatures + absMinReplicateAbundance +
-               relMinReplicateAbundance + absMinConc + relMinConc + absMaxTox + relMaxTox + absMinConcTox +
-               relMinConcTox + maxReplicateIntRSD + blankThreshold,
+               absMinIntensity + relMinIntensity + absMinMaxIntensity + relMinMaxIntensity + absMinAnalyses +
+               relMinAnalyses + absMinReplicates + relMinReplicates + absMinFeatures + relMinFeatures +
+               absMinReplicateAbundance + relMinReplicateAbundance + absMinConc + relMinConc + absMaxTox + relMaxTox +
+               absMinConcTox + relMinConcTox + maxReplicateIntRSD + blankThreshold,
            lower = 0, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
     aapply(assertRange, . ~ retentionRange + mzRange + mzDefectRange + chromWidthRange, null.ok = TRUE,
            fixed = list(add = ac))

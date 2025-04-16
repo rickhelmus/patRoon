@@ -223,6 +223,7 @@
         - plotInt(): give examples for xBy, groupBy etc
         - mention that "set" can be used in sets WFs for groupBy, regressionBy, etc
             - mention that in sets workflow, regressionBy column can be set to set unique names (eg UV-pos)
+        - filter() for screening: k arg
 - TC
     - ES contributions for IDLs
     - explicitly mention annSim can be filtered with scoreLimits?
@@ -230,7 +231,6 @@
     - annSimForm / annSimBoth are added by compounds method of estimateIDLevels() if formulas/MSPL are set, may be used for ID levels (not by default)
     - reorderAnalyses(): doc that XCMS/XCMS3/KPIC2 fGroups internal slot is not updated, maybe also improve general docs for what is updated and for XCMS what it means for exporting data
     - maxMZOverPrecMS/maxMZOverPrecMSMS MSPL filters
-    - filter() for screening: k arg, including NA to clearout results for fGroups specified by j (or all if j==NULL)
     - MS/MS bg subtraction
         - abundance filter args
         - abundance columns in mspl

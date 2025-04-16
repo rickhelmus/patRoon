@@ -98,6 +98,7 @@
 - see what is the best default for backends
     - set mzR in front for safety?
 - MSPL: hclust seems unusable due to high mem usage with IMS data? --> just default to distance and doc change/IMS need?
+    - update getDefAvgPListParams() docs
 - embed TIMS-SDK? --> in patRoonExt
 - Agilent
     - SC doesn't recognize IM
@@ -233,10 +234,8 @@
     - annSim for sets is calculated as max
     - annSimForm / annSimBoth are added by compounds method of estimateIDLevels() if formulas/MSPL are set, may be used for ID levels (not by default)
     - reorderAnalyses(): doc that XCMS/XCMS3/KPIC2 fGroups internal slot is not updated, maybe also improve general docs for what is updated and for XCMS what it means for exporting data
-    - maxMZOverPrecMS/maxMZOverPrecMSMS MSPL filters
     - MSPL
-        - abundance columns in mspl
-        - abundance parameter in average params
+        - abundance columns in mspl --> section in generateMSPeakLists()
     - generateComponentsTPs()
         - new args
         - as.data.table candidates arg
@@ -254,11 +253,9 @@
     - getMSFileFormats()
     - patRoon.threads, patRoon.MS.backends, patRoon.MS.preferIMS, patRoon.path.BrukerTIMS and patRoon.path.limits options
         - patRoon.MS.preferIMS: only works for MSTK/SC, ie putting OTIMS in front doesn't work
-    - update PListParams
     - update generateMSPeakLists()
         - also in Handbook
         - no more precursorMzWindow
-        - update avg params
         - don't refer to deprecated MSPL generators
     - availableBackends()
         - also invisible return value

@@ -28,6 +28,17 @@ COMStop <- function(...)
 
 # nocov end
 
+#' Get supported MS file types
+#' @export
+getMSFileTypes <- function() c("raw", "centroid", "profile", "ims")
+
+#' Get supported MS file formats
+#'
+#' Returns the supported file formats of MS files in \pkg{patRoon}.
+#'
+#' @param fileType The type of file for which formats should be returned (see \code{\link{getMSFileTypes}}). If
+#'   \code{NULL} then all file formats are returned.
+#'
 #' @export
 getMSFileFormats <- function(fileType = NULL)
 {

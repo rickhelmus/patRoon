@@ -13,24 +13,45 @@ makeAnaInfoR <- function(anaInfo, varName = NULL)
                                          constructive::opts_data.frame("read.table"))$code)
 }
 
-getScriptCode <- function(anaInfoData, settings)
-{
-    txtCon <- withr::local_connection(textConnection(NULL, "w"))
+scriptGenerator <- setRefClass("scriptGenerator",
+                               fields = list(settings = "list", txtCon = "ANY"))
+scriptGenerator$methods(
+    initialize = function(...)
+    {
+        txtCon <<- textConnection(NULL, "w")
+        return(callSuper(...))
+    },
     
-    # helper functions
-    doQuote <- function(txt) paste0("\"", txt, "\"")
-    addText <- function(txt) writeLines(txt, txtCon)
-    addNL <- function(count = 1) addText(rep("", count))
-    addComment <- function(txt, condition = TRUE) { if (condition) addText(paste("#", txt)) }
-    addHeader <- function(title)
+    finalize = function()
+    {
+        if (!is.null(txtCon))
+        {
+            close(txtCon)
+            txtCon <<- NULL
+        }
+    },
+    
+    getCode = function() paste0(textConnectionValue(txtCon), collapse = "\n"),
+    
+    doQuote = function(txt) paste0("\"", txt, "\""),
+    
+    addText = function(txt) writeLines(txt, txtCon),
+    
+    addNL = function(count = 1) addText(rep("", count)),
+    
+    addComment = function(txt, condition = TRUE) { if (condition) addText(paste("#", txt)) },
+    
+    addHeader = function(title)
     {
         hd <- strrep("-", 25)
         addNL()
         addComment(c(hd, title, hd))
         addNL()
-    }
-    addAssignment <- function(var, val, quote = FALSE) addText(paste(var, "<-", if (quote) doQuote(val) else val))
-    addCall <- function(var, func, args, condition = TRUE, indent = 0)
+    },
+    
+    addAssignment = function(var, val, quote = FALSE) addText(paste(var, "<-", if (quote) doQuote(val) else val)),
+    
+    addCall = function(var, func, args, condition = TRUE, indent = 0)
     {
         if (!condition)
             return(NULL)
@@ -90,48 +111,104 @@ getScriptCode <- function(anaInfoData, settings)
         
         cl <- paste0(callPrefix, argText, ")")
         addText(cl)
+    },
+    
+    addLoadSuspCall = function(var, file)
+    {
+        addCall(var, "read.csv", list(
+            list(value = file, quote = TRUE),
+            list(name = "stringsAsFactors", value = FALSE)
+        ))
+    },
+    
+    addLoadSuspList = function(ionization, suspects, varBase)
+    {
+        varNames <- if (ionization == "both" && nzchar(suspects$sets$neg))
+            paste0(varBase, c("Pos", "Neg"))
+        else
+            varBase
+        
+        suspectsPath <- if (ionization != "both")
+            suspects$single
+        else if (!nzchar(suspects$sets$neg))
+            c(suspects$sets$pos, suspects$sets$pos)
+        else
+            c(suspects$sets$pos, suspects$sets$neg)
+        
+        for (i in seq_along(varNames))
+            addLoadSuspCall(varNames[[i]], suspectsPath[[i]])
+    },
+    
+    addSuspListEx = function(ionization, exPos, exNeg, varBase)
+    {
+        if (ionization == "positive")
+            addAssignment(varBase, exPos)
+        else if (ionization == "negative")
+            addAssignment(varBase, exNeg)
+        else
+        {
+            addAssignment(paste0(varBase, "Pos"), exPos)
+            addAssignment(paste0(varBase, "Neg"), exNeg)
+        }
+    },
+    
+    addScreenCall = function(susp, adductArg, oh = TRUE, am = NULL)
+    {
+        addCall("fGroups", "screenSuspects", list(
+            list(value = "fGroups"),
+            list(value = susp),
+            list(name = "rtWindow", value = 12),
+            list(name = "mzWindow", value = 0.005),
+            adductArg,
+            list(name = "onlyHits", value = oh),
+            list(name = "amend", value = am, condition = !is.null(am))
+        ))
     }
+)
+
+genScriptInitBlock <- function(anaInfoData, destination, ionization, settingsAna, settingsPre, generator)
+{
     addAnaInfo <- function(anaInfoVarName, aid, comment)
     {
-        if (settings$analyses$generateAnaInfo == "table")
+        if (settingsAna$generateAnaInfo == "table")
         {
-            if (settings$analyses$analysisTableFileType == "embedded")
+            if (settingsAna$analysisTableFileType == "embedded")
             {
-                addComment("Create analysis table", condition = comment)
-                addText(makeAnaInfoR(aid$tab, anaInfoVarName))
+                generator$addComment("Create analysis table", condition = comment)
+                generator$addText(makeAnaInfoR(aid$tab, anaInfoVarName))
             }
             else
             {
-                addComment("Load analysis table", condition = comment)
-                if (settings$analyses$analysisTableFileType == "CSV")
-                    addCall(anaInfoVarName, "read.csv", list(value = aid$file, quote = TRUE))
+                generator$addComment("Load analysis table", condition = comment)
+                if (settingsAna$analysisTableFileType == "CSV")
+                    generator$addCall(anaInfoVarName, "read.csv", list(value = aid$file, quote = TRUE))
                 else # R
-                    addCall(anaInfoVarName, "source", list(value = aid$file, quote = TRUE))
+                    generator$addCall(anaInfoVarName, "source", list(value = aid$file, quote = TRUE))
             }
         }
-        else if (settings$analyses$generateAnaInfo == "dynamic")
+        else if (settingsAna$generateAnaInfo == "dynamic")
         {
-            addCall(anaInfoVarName, "generateAnalysisInfo", list(
+            generator$addCall(anaInfoVarName, "generateAnalysisInfo", list(
                 list(name = "fromRaw", value = aid$fromRaw, quote = TRUE),
                 list(name = "fromCentroid", value = aid$fromCentroid, quote = TRUE),
                 list(name = "fromProfile", value = aid$fromProfile, quote = TRUE),
                 list(name = "fromIMS", value = aid$fromIMS, quote = TRUE),
-                list(name = "convCentroid", value = settings$preTreatment$output$centroid, quote = TRUE),
-                list(name = "convProfile", value = settings$preTreatment$output$profile, quote = TRUE),
-                list(name = "convIMS", value = settings$preTreatment$output$ims, quote = TRUE)
+                list(name = "convCentroid", value = settingsPre$output$centroid, quote = TRUE),
+                list(name = "convProfile", value = settingsPre$output$profile, quote = TRUE),
+                list(name = "convIMS", value = settingsPre$output$ims, quote = TRUE)
             ))
         }
-        else if (settings$analyses$generateAnaInfo == "example")
+        else if (settingsAna$generateAnaInfo == "example")
         {
-            addComment("Example data from patRoonData package (triplicate solvent blank + triplicate standard)",
+            generator$addComment("Example data from patRoonData package (triplicate solvent blank + triplicate standard)",
                        condition = comment)
-            addCall(anaInfoVarName, "patRoonData::exampleAnalysisInfo", list(value = ionization, quote = TRUE))
+            generator$addCall(anaInfoVarName, "patRoonData::exampleAnalysisInfo", list(value = ionization, quote = TRUE))
         }
         else # none
         {
-            addComment("NOTE: please set to a valid data.frame with analysis information. See ?`analysis-information` for more details.",
-                       condition = comment)
-            addCall(anaInfoVarName, "data.frame", list(
+            generator$addComment("NOTE: please set to a valid data.frame with analysis information. See ?`analysis-information` for more details.",
+                                 condition = comment)
+            generator$addCall(anaInfoVarName, "data.frame", list(
                 list(name = "path_centroid", value = "character()"),
                 list(name = "analysis", value = "character()"),
                 list(name = "replicate", value = "character()"),
@@ -141,120 +218,34 @@ getScriptCode <- function(anaInfoData, settings)
     }
     addPrepBlock <- function(anaInfoVarName, DAMethodVarName)
     {
-        addCall(NULL, "setDAMethod", list(
+        generator$addCall(NULL, "setDAMethod", list(
             list(value = anaInfoVarName),
-            list(value = settings$preTreatment$brukerCalib[[DAMethodVarName]], quote = TRUE)
-        ), condition = settings$preTreatment$brukerCalib$enabled && nzchar(settings$preTreatment$brukerCalib[[DAMethodVarName]]), indent = 4)
-        addCall(NULL, "recalibrarateDAFiles", list(value = anaInfoVarName),
-                condition = settings$preTreatment$brukerCalib$enabled, indent = 4)
-        itf <- splitConvTypeFormat(settings$preTreatment$steps$from); otf <- splitConvTypeFormat(settings$preTreatment$steps$to)
-        for (i in seq_len(nrow(settings$preTreatment$steps)))
+            list(value = settingsPre$brukerCalib[[DAMethodVarName]], quote = TRUE)
+        ), condition = settingsPre$brukerCalib$enabled && nzchar(settingsPre$brukerCalib[[DAMethodVarName]]), indent = 4)
+        generator$addCall(NULL, "recalibrarateDAFiles", list(value = anaInfoVarName),
+                          condition = settingsPre$brukerCalib$enabled, indent = 4)
+        itf <- splitConvTypeFormat(settingsPre$steps$from); otf <- splitConvTypeFormat(settingsPre$steps$to)
+        for (i in seq_len(nrow(settingsPre$steps)))
         {
-            addCall(NULL, "convertMSFilesAnaInfo", list(
+            generator$addCall(NULL, "convertMSFilesAnaInfo", list(
                 list(value = anaInfoVarName),
                 list(name = "typeFrom", value = itf[[i]][1], quote = TRUE),
                 list(name = "formatFrom", value = itf[[i]][2], quote = TRUE),
                 list(name = "typeTo", value = otf[[i]][1], quote = TRUE),
                 list(name = "formatTo", value = otf[[i]][2], quote = TRUE),
-                list(name = "algorithm", value = settings$preTreatment$steps$algorithm[i], quote = TRUE),
+                list(name = "algorithm", value = settingsPre$steps$algorithm[i], quote = TRUE),
                 list(name = "overWrite", value = FALSE)
             ), indent = 4)
         }
     }
-    addFindFeatures <- function(varName, anaInfoVarName)
-    {
-        addCall(varName, "findFeatures", list(
-            list(value = anaInfoVarName),
-            list(value = if (settings$features$featAlgo == "XCMS") "xcms3" else tolower(settings$features$featAlgo), quote = TRUE),
-            list(name = "noiseThrInt", value = 1000, condition = settings$features$featAlgo == "OpenMS"),
-            list(name = "chromSNR", value = 3, condition = settings$features$featAlgo == "OpenMS"),
-            list(name = "chromFWHM", value = 5, condition = settings$features$featAlgo == "OpenMS"),
-            list(name = "minFWHM", value = 1, condition = settings$features$featAlgo == "OpenMS"),
-            list(name = "maxFWHM", value = 30, condition = settings$features$featAlgo == "OpenMS"),
-            list(name = "kmeans", value = TRUE, condition = settings$features$featAlgo == "KPIC2"),
-            list(name = "level", value = 1000, condition = settings$features$featAlgo == "KPIC2"),
-            list(name = "doFMF", value = TRUE, condition = settings$features$featAlgo == "Bruker")
-        ))
-    }
-    getAdductArg <- function(cond = TRUE) list(name = "adduct", value = if (settings$general$ionization == "positive") "[M+H]+" else "[M-H]-",
-                                               quote = TRUE,
-                                               condition = settings$general$ionization != "both" &&
-                                                   (!nzchar(settings$annotation$componAlgo) || settings$annotation$componAlgo == "nontarget" || !settings$annotation$selectIons) &&
-                                                   cond)
-    addLoadSuspCall <- function(var, file)
-    {
-        addCall(var, "read.csv", list(
-            list(value = file, quote = TRUE),
-            list(name = "stringsAsFactors", value = FALSE)
-        ))
-    }
-    addLoadSuspList <- function(name, ionization, doEx, featSettings, varBase, exVarBase, inpVarBase)
-    {
-        # Generalized for suspect screening and ISTD normalization
-        
-        varBasePos <- paste0(varBase, "Pos"); varBaseNeg <- paste0(varBase, "Neg")
-        
-        if (doEx)
-        {
-            addComment(paste("Get example", name))
-            
-            exVarBasePos <- paste0("patRoonData::", exVarBase, "Pos")
-            exVarBaseNeg <- paste0("patRoonData::", exVarBase, "Neg")
-            
-            if (ionization == "positive")
-                addAssignment(varBase, exVarBasePos)
-            else if (ionization == "negative")
-                addAssignment(varBase, exVarBaseNeg)
-            else
-            {
-                addAssignment(varBasePos, exVarBasePos)
-                addAssignment(varBaseNeg, exVarBaseNeg)
-            }
-        }
-        else
-        {
-            addComment(paste("Load", name))
-            
-            if (ionization != "both")
-                addLoadSuspCall(varBase, featSettings[[inpVarBase]])
-            else
-            {
-                inpVarBasePos <- paste0(inpVarBase, "Pos"); inpVarBaseNeg <- paste0(inpVarBase, "Neg")
-                if (nzchar(featSettings[[inpVarBaseNeg]]))
-                {
-                    addLoadSuspCall(varBasePos, featSettings[[inpVarBasePos]])
-                    addLoadSuspCall(varBaseNeg, featSettings[[inpVarBaseNeg]])
-                }
-                else
-                    addLoadSuspCall(varBase, featSettings[[inpVarBasePos]])
-            }
-        }
-    }
-    addScreenCall <- function(susp, oh = TRUE, am = NULL)
-    {
-        addCall("fGroups", "screenSuspects", list(
-            list(value = "fGroups"),
-            list(value = susp),
-            list(name = "rtWindow", value = 12),
-            list(name = "mzWindow", value = 0.005),
-            getAdductArg(),
-            list(name = "onlyHits", value = oh),
-            list(name = "amend", value = am, condition = !is.null(am))
-        ))
-    }
     
+    generator$addHeader("initialization")
     
-    addComment(paste("Script automatically generated on", date()))
-    addNL()
-    addCall(NULL, "library", list(value = "patRoon"))
+    generator$addAssignment("workPath", destination, quote = TRUE)
+    generator$addCall(NULL, "setwd", list(value = "workPath"))
+    generator$addNL()
     
-    addHeader("initialization")
-    
-    addAssignment("workPath", settings$general$destination, quote = TRUE)
-    addCall(NULL, "setwd", list(value = "workPath"))
-    addNL()
-    
-    if (settings$general$ionization != "both")
+    if (ionization != "both")
         addAnaInfo("anaInfo", anaInfoData, TRUE)
     else
     {
@@ -262,436 +253,523 @@ getScriptCode <- function(anaInfoData, settings)
         addAnaInfo("anaInfoNeg", anaInfoData$negative, FALSE)
     }
     
-    if (nrow(settings$preTreatment$steps) > 0 || settings$preTreatment$brukerCalib$enabled)
+    if (nrow(settingsPre$steps) > 0 || settingsPre$brukerCalib$enabled)
     {
-        addNL()
-        addComment("Set to FALSE to skip data pre-treatment")
-        addAssignment("doDataPretreatment", TRUE)
-        addText("if (doDataPretreatment)\n{")
-        if (settings$general$ionization != "both")
+        generator$addNL()
+        generator$addComment("Set to FALSE to skip data pre-treatment")
+        generator$addAssignment("doDataPretreatment", TRUE)
+        generator$addText("if (doDataPretreatment)\n{")
+        if (ionization != "both")
             addPrepBlock("anaInfo", "method")
         else
         {
             addPrepBlock("anaInfoPos", "methodPos")
-            addNL()
+            generator$addNL()
             addPrepBlock("anaInfoNeg", "methodNeg")
         }
-        addText("}")
+        generator$addText("}")
+    }
+}
+
+genScriptFeaturesBlock <- function(ionization, settingsFeat, generator)
+{
+    addFindFeatures <- function(varName, anaInfoVarName)
+    {
+        generator$addCall(varName, "findFeatures", list(
+            list(value = anaInfoVarName),
+            list(value = if (settingsFeat$featAlgo == "XCMS") "xcms3" else tolower(settingsFeat$featAlgo), quote = TRUE),
+            list(name = "noiseThrInt", value = 1000, condition = settingsFeat$featAlgo == "OpenMS"),
+            list(name = "chromSNR", value = 3, condition = settingsFeat$featAlgo == "OpenMS"),
+            list(name = "chromFWHM", value = 5, condition = settingsFeat$featAlgo == "OpenMS"),
+            list(name = "minFWHM", value = 1, condition = settingsFeat$featAlgo == "OpenMS"),
+            list(name = "maxFWHM", value = 30, condition = settingsFeat$featAlgo == "OpenMS"),
+            list(name = "kmeans", value = TRUE, condition = settingsFeat$featAlgo == "KPIC2"),
+            list(name = "level", value = 1000, condition = settingsFeat$featAlgo == "KPIC2"),
+            list(name = "doFMF", value = TRUE, condition = settingsFeat$featAlgo == "Bruker")
+        ))
     }
     
-    addHeader("features")
+    generator$addHeader("features")
     
-    if (settings$features$fGroupsAlgo != "SIRIUS") # NOTE: never the case with sets
+    if (settingsFeat$fGroupsAlgo != "SIRIUS") # NOTE: never the case with sets
     {
-        addComment("Find all features")
-        addComment(sprintf("NOTE: see the %s manual for many more options",
-                           if (settings$features$featAlgo == "OpenMS") "reference" else settings$features$featAlgo),
-                   condition = !settings$features$featAlgo %in% c("Bruker", "SIRIUS"))
-        if (settings$general$ionization != "both")
+        generator$addComment("Find all features")
+        generator$addComment(sprintf("NOTE: see the %s manual for many more options",
+                                     if (settingsFeat$featAlgo == "OpenMS") "reference" else settingsFeat$featAlgo),
+                             condition = !settingsFeat$featAlgo %in% c("Bruker", "SIRIUS"))
+        if (ionization != "both")
             addFindFeatures("fList", "anaInfo")
         else
         {
             addFindFeatures("fListPos", "anaInfoPos")
             addFindFeatures("fListNeg", "anaInfoNeg")
-            addCall("fList", "makeSet", list(
+            generator$addCall("fList", "makeSet", list(
                 list(value = "fListPos"),
                 list(value = "fListNeg"),
                 list(name = "adducts", value = c("[M+H]+", "[M-H]-"), quote = TRUE)
             ))
         }
-        
-        addNL()
+        generator$addNL()
     }
     
-    addComment("Group and align features between analyses")
-    addCall("fGroups", "groupFeatures", list(
-        list(value = "fList", condition = settings$features$fGroupsAlgo != "SIRIUS"),
-        list(value = "anaInfo", condition = settings$features$fGroupsAlgo == "SIRIUS"),
-        list(value = if (settings$features$fGroupsAlgo == "XCMS") "xcms3" else tolower(settings$features$fGroupsAlgo), quote = TRUE),
-        list(name = "rtalign", value = TRUE, condition = settings$features$fGroupsAlgo != "SIRIUS"),
+    generator$addComment("Group and align features between analyses")
+    generator$addCall("fGroups", "groupFeatures", list(
+        list(value = "fList", condition = settingsFeat$fGroupsAlgo != "SIRIUS"),
+        list(value = "anaInfo", condition = settingsFeat$fGroupsAlgo == "SIRIUS"),
+        list(value = if (settingsFeat$fGroupsAlgo == "XCMS") "xcms3" else tolower(settingsFeat$fGroupsAlgo), quote = TRUE),
+        list(name = "rtalign", value = TRUE, condition = settingsFeat$fGroupsAlgo != "SIRIUS"),
         list(name = "groupParam", value = "xcms::PeakDensityParam(sampleGroups = analysisInfo(fList)$replicate)",
-             condition = settings$features$fGroupsAlgo == "XCMS"),
-        list(name = "retAlignParam", value = "xcms::ObiwarpParam()", condition = settings$features$fGroupsAlgo == "XCMS")
+             condition = settingsFeat$fGroupsAlgo == "XCMS"),
+        list(name = "retAlignParam", value = "xcms::ObiwarpParam()", condition = settingsFeat$fGroupsAlgo == "XCMS")
     ))
     
-    retRange <- settings$features$fGroupsAdv$retention
+    retRange <- settingsFeat$fGroupsAdv$retention
     if (all(retRange == 0))
         retRange <- NULL
     else if (retRange[2] == 0)
         retRange[2] <- Inf
-    mzRange <- settings$features$fGroupsAdv$mz
+    mzRange <- settingsFeat$fGroupsAdv$mz
     if (all(mzRange == 0))
         mzRange <- NULL
     else if (mzRange[2] == 0)
         mzRange[2] <- Inf
-    addNL()
-    addComment("Basic rule based filtering")
-    addCall("fGroups", "filter", list(
+    generator$addNL()
+    generator$addComment("Basic rule based filtering")
+    generator$addCall("fGroups", "filter", list(
         list(value = "fGroups"),
-        list(name = "preAbsMinIntensity", value = settings$features$fGroupsAdv$preIntThr, zeroToNULL = TRUE),
-        list(name = "absMinIntensity", value = settings$features$fGroupsAdv$intThr, zeroToNULL = TRUE),
-        list(name = "relMinReplicateAbundance", value = settings$features$fGroupsAdv$repAbundance, zeroToNULL = TRUE),
-        list(name = "maxReplicateIntRSD", value = settings$features$fGroupsAdv$maxRepRSD, zeroToNULL = TRUE),
-        list(name = "blankThreshold", value = settings$features$fGroupsAdv$blankThr, zeroToNULL = TRUE),
-        list(name = "removeBlanks", value = settings$features$fGroupsAdv$removeBlanks),
+        list(name = "preAbsMinIntensity", value = settingsFeat$fGroupsAdv$preIntThr, zeroToNULL = TRUE),
+        list(name = "absMinIntensity", value = settingsFeat$fGroupsAdv$intThr, zeroToNULL = TRUE),
+        list(name = "relMinReplicateAbundance", value = settingsFeat$fGroupsAdv$repAbundance, zeroToNULL = TRUE),
+        list(name = "maxReplicateIntRSD", value = settingsFeat$fGroupsAdv$maxRepRSD, zeroToNULL = TRUE),
+        list(name = "blankThreshold", value = settingsFeat$fGroupsAdv$blankThr, zeroToNULL = TRUE),
+        list(name = "removeBlanks", value = settingsFeat$fGroupsAdv$removeBlanks),
         list(name = "retentionRange", value = retRange),
         list(name = "mzRange", value = mzRange)
     ))
+}
+
+genScriptComponBlock <- function(ionization, settingsAnnon, generator)
+{
+    generator$addHeader("componentization")
     
-    if (nzchar(settings$annotation$componAlgo))
+    generator$addComment("Perform automatic generation of components")
+    generator$addCall("components", "generateComponents", list(
+        list(value = "fGroups"),
+        list(value = tolower(settingsAnnon$componAlgo), quote = TRUE),
+        list(name = "ionization", value = ionization, quote = TRUE, condition = ionization != "both"),
+        list(name = "rtRange", value = c(-120, 120), condition = settingsAnnon$componAlgo == "nontarget"),
+        list(name = "mzRange", value = c(5, 120), condition = settingsAnnon$componAlgo == "nontarget"),
+        list(name = "elements", value = c("C", "H", "O"), quote = TRUE, condition = settingsAnnon$componAlgo == "nontarget"),
+        list(name = "rtDev", value = defaultLim("retention", "wide"), condition = settingsAnnon$componAlgo == "nontarget"),
+        list(name = "absMzDev", value = 0.002, condition = settingsAnnon$componAlgo == "nontarget")
+    ))
+    
+    if (settingsAnnon$selectIons && settingsAnnon$componAlgo != "nontarget")
     {
-        addHeader("componentization")
-        
-        addComment("Perform automatic generation of components")
-        addCall("components", "generateComponents", list(
+        pa <- switch(ionization,
+                     positive = "[M+H]+",
+                     negative = "[M-H]-",
+                     both = c("[M+H]+", "[M-H]-"))
+        generator$addCall("fGroups", "selectIons", list(
             list(value = "fGroups"),
-            list(value = tolower(settings$annotation$componAlgo), quote = TRUE),
-            list(name = "ionization", value = settings$general$ionization, quote = TRUE, condition = settings$general$ionization != "both"),
-            list(name = "rtRange", value = c(-120, 120), condition = settings$annotation$componAlgo == "nontarget"),
-            list(name = "mzRange", value = c(5, 120), condition = settings$annotation$componAlgo == "nontarget"),
-            list(name = "elements", value = c("C", "H", "O"), quote = TRUE, condition = settings$annotation$componAlgo == "nontarget"),
-            list(name = "rtDev", value = defaultLim("retention", "wide"), condition = settings$annotation$componAlgo == "nontarget"),
-            list(name = "absMzDev", value = 0.002, condition = settings$annotation$componAlgo == "nontarget")
+            list(value = "components"),
+            list(name = "prefAdduct", value = pa, quote = TRUE),
+            list(name = "onlyMonoIso", value = TRUE)
         ))
-        
-        if (settings$annotation$selectIons && settings$annotation$componAlgo != "nontarget")
+    }
+}
+
+genScriptFGNormBlock <- function(ionization, settingsFeat, adductArg, generator)
+{
+    adductArg$condition <- adductArg$condition && settingsFeat$fGroupsAdv$featNorm == "istd"
+    
+    generator$addHeader("normalization")
+    
+    if (settingsFeat$fGroupsAdv$featNorm == "istd")
+    {
+        doEx <- (ionization != "both" && !nzchar(settingsFeat$fGroupsAdv$ISTDLists$single)) ||
+            (ionization == "both" && !nzchar(settingsFeat$fGroupsAdv$ISTDLists$sets$pos))
+        if (doEx)
         {
-            pa <- switch(settings$general$ionization,
-                         positive = "[M+H]+",
-                         negative = "[M-H]-",
-                         both = c("[M+H]+", "[M-H]-"))
-            addCall("fGroups", "selectIons", list(
-                list(value = "fGroups"),
-                list(value = "components"),
-                list(name = "prefAdduct", value = pa, quote = TRUE),
-                list(name = "onlyMonoIso", value = TRUE)
+            generator$addComment("Get example ISTD list")
+            generator$addSuspListEx(ionization, "patRoonData::ISTDListPos", "patRoonData::ISTDListNeg", "ISTDList")
+        }
+        else
+        {
+            generator$addComment("Load ISTD list")
+            generator$addLoadSuspList(ionization, settingsFeat$fGroupsAdv$ISTDLists, "ISTDList")
+        }
+        
+        generator$addNL()
+        if (ionization != "both")
+            generator$addComment("Set adduct to NULL if ISTD list contains an adduct column")
+        
+        standards <- if (ionization != "both" ||
+                         (nzchar(settingsFeat$fGroupsAdv$ISTDLists$sets$pos) &&
+                          !nzchar(settingsFeat$fGroupsAdv$ISTDLists$sets$neg)))
+            "ISTDList"
+        else
+            c("ISTDListPos", "ISTDListNeg")
+    }
+    else
+        standards <- NULL
+    
+    generator$addCall("fGroups", "normInts", list(
+        list(value = "fGroups"),
+        list(name = "featNorm", value = settingsFeat$fGroupsAdv$featNorm, quote = TRUE),
+        list(name = "groupNorm", value = settingsFeat$fGroupsAdv$groupNorm),
+        list(name = "normFunc", value = "max"),
+        list(name = "standards", value = standards, condition = settingsFeat$fGroupsAdv$featNorm == "istd"),
+        list(name = "ISTDRTWindow", value = 120, condition = settingsFeat$fGroupsAdv$featNorm == "istd"),
+        list(name = "ISTDMZWindow", value = 300, condition = settingsFeat$fGroupsAdv$featNorm == "istd"),
+        list(name = "minISTDs", value = 3, condition = settingsFeat$fGroupsAdv$featNorm == "istd"),
+        list(name = "rtWindow", value = 12, condition = settingsFeat$fGroupsAdv$featNorm == "istd"),
+        list(name = "mzWindow", value = 0.005, condition = settingsFeat$fGroupsAdv$featNorm == "istd"),
+        adductArg
+    ))
+}
+
+genScriptScreenBlock <- function(ionization, settingsFeat, adductArg, amendScrForTPs, generator)
+{
+    generator$addHeader("suspect screening")
+    
+    if (settingsFeat$exSuspList)
+    {
+        generator$addComment("Get example suspect list")
+        generator$addSuspListEx(ionization, "patRoonData::suspectsPos", "patRoonData::suspectsNeg", "suspList")
+    }
+    else
+    {
+        generator$addComment("Load suspect list")
+        generator$addLoadSuspList(ionization, settingsFeat$suspects, "suspList")
+    }
+    
+    generator$addNL()
+    
+    if (amendScrForTPs)
+        generator$addComment("NOTE: onlyHits is set to FALSE to ensure TPs can be found below")
+    else
+        generator$addComment("Set onlyHits to FALSE to retain features without suspects (eg for full NTA)")
+    if (ionization != "both")
+        generator$addComment("Set adduct to NULL if suspect list contains an adduct column")
+    
+    if (ionization != "both" || (!settingsFeat$exSuspList && !nzchar(settingsFeat$suspects$sets$neg)))
+        generator$addScreenCall("suspList", adductArg, !amendScrForTPs)
+    else
+        generator$addScreenCall("list(suspListPos, suspListNeg)", adductArg, !amendScrForTPs)
+}
+
+genScriptTPScrBlock <- function(ionization, settingsTP, adductArg, amendScrForTPs, generator)
+{
+    adductArg$condition <- adductArg$condition && settingsTP$TPGen == "Logic"
+    
+    generator$addHeader("transformation products")
+    
+    if (settingsTP$TPGen != "Logic" && settingsTP$TPGenInput == "suspects")
+    {
+        generator$addComment("Load parent suspect list")
+        generator$addLoadSuspCall("suspListParents", settingsTP$TPSuspectList)
+        generator$addNL()
+    }
+    
+    generator$addComment("Obtain TPs")
+    generator$addCall("TPs", "generateTPs", list(
+        list(value = tolower(settingsTP$TPGen), quote = TRUE),
+        list(name = "parents", value = switch(settingsTP$TPGenInput,
+                                              suspects = "suspListParents",
+                                              screening = "fGroups",
+                                              all = "NULL"),
+             condition = settingsTP$TPGen != "Logic"),
+        list(value = "fGroups", condition = settingsTP$TPGen == "Logic"),
+        adductArg,
+        list(name = "type", value = "env", quote = TRUE, condition = settingsTP$TPGen == "BioTransformer"),
+        list(name = "transLibrary", value = "photolysis_ranked", quote = TRUE, condition = settingsTP$TPGen == "CTS"),
+        list(name = "generations", value = if (settingsTP$TPGen == "BioTransformer") 2 else 1,
+             condition = settingsTP$TPGen != "Logic"),
+        list(name = "calcSims", value = FALSE, condition = settingsTP$TPGen != "Logic")
+    ))
+    
+    generator$addNL()
+    generator$addComment("Screen TPs")
+    generator$addCall("suspListTPs", "convertToSuspects", list(
+        list(value = "TPs"),
+        list(name = "includeParents", value = FALSE)
+    ))
+    if (amendScrForTPs)
+        generator$addComment("Amend with TP screening")
+    generator$addScreenCall("suspListTPs", adductArg, am = if (amendScrForTPs) TRUE else NULL)
+}
+
+genScriptAnnBlock <- function(ionization, settingsAnn, adductArg, doSusps, addMFDB, generator)
+{
+    doForms <- nzchar(settingsAnn$formulasAlgo); doComps <- nzchar(settingsAnn$compoundsAlgo)
+    
+    generator$addHeader("annotation")
+    
+    useFMF <- F# UNDONE settings$features$featAlgo == "Bruker" && settingsAnn$peakListGen == "Bruker"
+    generator$addComment("Retrieve MS peak lists")
+    generator$addCall("avgMSListParams", "getDefAvgPListParams", list(name = "clusterMzWindow", value = 0.005))
+    generator$addCall("mslists", "generateMSPeakLists", list(
+        list(value = "fGroups"),
+        list(value = "mzr", quote = TRUE, condition = settingsAnn$peakListGen == "mzR"),
+        list(value = if (useFMF) "brukerfmf" else "bruker", quote = TRUE, condition = settingsAnn$peakListGen == "Bruker"),
+        list(name = "maxMSRtWindow", value = 5, condition = !useFMF),
+        list(name = "precursorMzWindow", value = if (settingsAnn$DIA) "NULL" else settingsAnn$precursorMzWindow,
+             settingsAnn$peakListGen == "mzR"),
+        list(name = "bgsubtr", value = TRUE, condition = !useFMF && settingsAnn$peakListGen == "Bruker"),
+        list(name = "MSMSType", value = if (settingsAnn$DIA) "BBCID" else "MSMS", quote = TRUE,
+             condition = !useFMF && settingsAnn$peakListGen == "Bruker"),
+        list(name = "avgFeatParams", value = "avgMSListParams", condition = settingsAnn$peakListGen == "mzR"),
+        list(name = "avgFGroupParams", value = "avgMSListParams")
+    ))
+    generator$addComment("Rule based filtering of MS peak lists. You may want to tweak this. See the manual for more information.")
+    generator$addCall("mslists", "filter", list(
+        list(value = "mslists"),
+        list(name = "absMSIntThr", value = "NULL"),
+        list(name = "absMSMSIntThr", value = "NULL"),
+        list(name = "relMSIntThr", value = "NULL"),
+        list(name = "relMSMSIntThr", value = 0.05),
+        list(name = "topMSPeaks", value = "NULL"),
+        list(name = "topMSMSPeaks", value = 25)
+    ))
+    
+    if (doForms)
+    {
+        generator$addNL()
+        generator$addComment("Calculate formula candidates")
+        generator$addCall("formulas", "generateFormulas", list(
+            list(value = "fGroups"),
+            list(value = "mslists"),
+            list(value = tolower(settingsAnn$formulasAlgo), quote = TRUE),
+            list(name = "relMzDev", value = 5, condition = settingsAnn$formulasAlgo != "Bruker"),
+            list(name = "precursorMzSearchWindow", value = defaultLim("mz", "narrow"),
+                 condition = settingsAnn$formulasAlgo == "Bruker"),
+            adductArg,
+            list(name = "elements", value = "CHNOP", quote = TRUE, condition = settingsAnn$formulasAlgo != "Bruker"),
+            list(name = "oc", value = FALSE, condition = settingsAnn$formulasAlgo == "GenForm"),
+            list(name = "profile", value = "qtof", quote = TRUE, condition = settingsAnn$formulasAlgo == "SIRIUS"),
+            list(name = "calculateFeatures", value = "TRUE", condition = settingsAnn$formulasAlgo != "Bruker"),
+            list(name = "featThresholdAnn", value = 0.75),
+            list(name = "setThresholdAnn", value = 0, condition = ionization == "both")
+        ))
+    }
+    
+    if (doComps)
+    {
+        generator$addNL()
+        
+        if (settingsAnn$compoundsAlgo == "Library")
+        {
+            generator$addComment("Load MS library. You may want to filter it, please see the manuals for more details.")
+            generator$addCall("mslibrary", "loadMSLibrary", list(
+                list(value = settingsAnn$MSLibraryPath, quote = TRUE),
+                list(value = settingsAnn$MSLibraryFormat, quote = TRUE),
+                list(name = "absMzDev", value = 0.002)
+            ))
+        }
+        
+        addMFDB <- settingsAnn$compoundsAlgo == "MetFrag" && addMFDB
+        if (addMFDB)
+        {
+            generator$addCall(NULL, "convertToMFDB", list(
+                list(value = "TPs"),
+                list(value = "TP-database.csv", quote = TRUE),
+                list(name = "includeParents", value = TRUE)))
+        }
+        
+        generator$addComment("Calculate compound structure candidates")
+        
+        if (settingsAnn$compoundsAlgo == "SIRIUS")
+            generator$addComment("Please see the handbook for SIRIUS login options. If you want to disable automatic login set login=FALSE")
+        
+        generator$addCall("compounds", "generateCompounds", list(
+            list(value = "fGroups"),
+            list(value = "mslists"),
+            list(value = tolower(settingsAnn$compoundsAlgo), quote = TRUE),
+            list(name = "dbRelMzDev", value = 5, condition = settingsAnn$compoundsAlgo == "MetFrag"),
+            list(name = "fragRelMzDev", value = 5, condition = settingsAnn$compoundsAlgo == "MetFrag"),
+            list(name = "fragAbsMzDev", value = 0.002, condition = settingsAnn$compoundsAlgo == "MetFrag"),
+            list(name = "relMzDev", value = 5, condition = settingsAnn$compoundsAlgo == "SIRIUS"),
+            adductArg,
+            list(name = "database", value = "pubchem", quote = TRUE, condition = settingsAnn$compoundsAlgo == "MetFrag" && !addMFDB),
+            list(name = "database", value = "csv", quote = TRUE, condition = addMFDB),
+            list(name = "extraOpts", value = "list(LocalDatabasePath = \"TP-database.csv\")", condition = addMFDB),
+            list(name = "maxCandidatesToStop", value = 2500, condition = settingsAnn$compoundsAlgo == "MetFrag"),
+            list(name = "fingerIDDatabase", value = "pubchem", quote = TRUE, condition = settingsAnn$compoundsAlgo == "SIRIUS"),
+            list(name = "elements", value = "CHNOP", quote = TRUE, condition = settingsAnn$compoundsAlgo == "SIRIUS"),
+            list(name = "profile", value = "qtof", quote = TRUE, condition = settingsAnn$compoundsAlgo == "SIRIUS"),
+            list(name = "login", value = "interactive", quote = TRUE, condition = settingsAnn$compoundsAlgo == "SIRIUS"),
+            list(name = "alwaysLogin", value = FALSE, condition = settingsAnn$compoundsAlgo == "SIRIUS"),
+            list(name = "MSLibrary", value = "mslibrary", condition = settingsAnn$compoundsAlgo == "Library"),
+            list(name = "minSim", value = 0.75, condition = settingsAnn$compoundsAlgo == "Library"),
+            list(name = "absMzDev", value = 0.002, condition = settingsAnn$compoundsAlgo == "Library"),
+            list(name = "specSimParams", value = "getDefSpecSimParams()", condition = settingsAnn$compoundsAlgo == "Library"),
+            list(name = "setThresholdAnn", value = 0, condition = ionization == "both")
+        ))
+        if (settingsAnn$compoundsAlgo == "MetFrag" && doForms)
+        {
+            generator$addCall("compounds", "addFormulaScoring", list(
+                list(value = "compounds"),
+                list(value = "formulas"),
+                list(name = "updateScore", value = TRUE)
             ))
         }
     }
     
-    if (settings$features$fGroupsAdv$featNorm != "none" || settings$features$fGroupsAdv$groupNorm)
+    if (doSusps && settingsAnn$annotateSus && (doForms || doComps))
     {
-        addHeader("normalization")
-        
-        if (settings$features$fGroupsAdv$featNorm == "istd")
-        {
-            addLoadSuspList("ISTD list", settings$general$ionization,
-                            (settings$general$ionization != "both" && !nzchar(settings$features$fGroupsAdv$ISTDList)) ||
-                                (settings$general$ionization == "both" && !nzchar(settings$features$fGroupsAdv$ISTDListPos)),
-                            settings$features$fGroupsAdv, "ISTDList", "ISTDList", "ISTDList")
-            addNL()
-            if (settings$general$ionization != "both")
-                addComment("Set adduct to NULL if ISTD list contains an adduct column")
-            
-            standards <- if (settings$general$ionization != "both" ||
-                             (!settings$features$exSuspList && !nzchar(settings$features$fGroupsAdv$ISTDListNeg)))
-                "ISTDList"
-            else
-                c("ISTDListPos", "ISTDListNeg")
-        }
-        else
-            standards <- NULL
-        
-        addCall("fGroups", "normInts", list(
+        generator$addNL()
+        generator$addComment("Annotate suspects")
+        generator$addCall("fGroups", "annotateSuspects", list(
             list(value = "fGroups"),
-            list(name = "featNorm", value = settings$features$fGroupsAdv$featNorm, quote = TRUE),
-            list(name = "groupNorm", value = settings$features$fGroupsAdv$groupNorm),
-            list(name = "normFunc", value = "max"),
-            list(name = "standards", value = standards, condition = settings$features$fGroupsAdv$featNorm == "istd"),
-            list(name = "ISTDRTWindow", value = 120, condition = settings$features$fGroupsAdv$featNorm == "istd"),
-            list(name = "ISTDMZWindow", value = 300, condition = settings$features$fGroupsAdv$featNorm == "istd"),
-            list(name = "minISTDs", value = 3, condition = settings$features$fGroupsAdv$featNorm == "istd"),
-            list(name = "rtWindow", value = 12, condition = settings$features$fGroupsAdv$featNorm == "istd"),
-            list(name = "mzWindow", value = 0.005, condition = settings$features$fGroupsAdv$featNorm == "istd"),
-            getAdductArg(settings$features$fGroupsAdv$featNorm == "istd")
+            list(name = "formulas", value = "formulas", isNULL = !doForms),
+            list(name = "compounds", value = "compounds", isNULL = !doComps),
+            list(name = "MSPeakLists", value = "mslists"),
+            list(name = "IDFile", value = "idlevelrules.yml", quote = TRUE, condition = settingsAnn$genIDLevelFile)
+        ))
+    }
+}
+
+genScriptTPCompBlock <- function(doFormAnn, doCompAnn, TPGen, generator)
+{
+    generator$addHeader("Parent and TP linkage")
+    
+    generator$addComment("You probably want to prioritize the data before componentization. Please see the handbook for more info.")
+    generator$addCall("componentsTP", "generateComponents", list(
+        list(value = "fGroups"),
+        list(value = "tp", quote = TRUE),
+        list(name = "fGroupsTPs", value = "fGroups"),
+        list(name = "TPs", value = "TPs"),
+        list(name = "MSPeakLists", value = "mslists", condition = doFormAnn || doCompAnn),
+        list(name = "formulas", value = "formulas", condition = doFormAnn),
+        list(name = "compounds", value = "compounds", condition = doCompAnn)
+    ))
+    
+    generator$addNL()
+    generator$addComment("You may want to configure the filtering step below. See the manuals for more details.")
+    generator$addCall("componentsTP", "filter", list(
+        list(value = "componentsTP"),
+        list(name = "retDirMatch", value = FALSE),
+        list(name = "minSpecSim", value = "NULL"),
+        list(name = "minSpecSimPrec", value = "NULL"),
+        list(name = "minSpecSimBoth", value = "NULL"),
+        list(name = "minFragMatches", value = "NULL"),
+        list(name = "minNLMatches", value = "NULL"),
+        list(name = "formulas", value = "formulas", isNULL = !doFormAnn, TPGen == "Logic")
+    ))
+    
+    generator$addNL()
+    generator$addComment("Only keep linked feature groups")
+    generator$addAssignment("fGroups", "fGroups[results = componentsTP]")
+}
+
+genScriptReportBlock <- function(settingsAnn, settingsReport, doTPs, generator)
+{
+    # UNDONE: for now TP components are always reported instead of others
+    componVal <- if (doTPs)
+        "componentsTP"
+    else if (nzchar(settingsAnn$componAlgo) && (!settingsAnn$selectIons || settingsAnn$componAlgo == "nontarget"))
+        "components"
+    else
+        "NULL"
+    doForms <- nzchar(settingsAnn$formulasAlgo); doComps <- nzchar(settingsAnn$compoundsAlgo)
+    
+    generator$addHeader("reporting")
+    
+    if ("HTML" %in% settingsReport$reportGen)
+    {
+        generator$addComment("Advanced report settings can be edited in the report.yml file.")
+        generator$addCall(NULL, "report", list(
+            list(value = "fGroups"),
+            list(name = "MSPeakLists", value = "mslists", isNULL = !doForms && !doComps),
+            list(name = "formulas", value = "formulas", isNULL = !doForms),
+            list(name = "compounds", value = "compounds", isNULL = !doComps),
+            list(name = "components", value = componVal),
+            list(name = "TPs", value = "TPs", condition = doTPs),
+            list(name = "settingsFile", value = "report.yml", quote = TRUE),
+            list(name = "openReport", value = TRUE)
         ))
     }
     
-    doSusps <- settings$features$exSuspList || (settings$general$ionization != "both" && nzchar(settings$features$suspectList)) ||
-        (settings$general$ionization == "both" && nzchar(settings$features$suspectListPos))
+    if ("legacy" %in% settingsReport$reportGen)
+    {
+        if ("HTML" %in% settingsReport$reportGen)
+            generator$addNL()
+        
+        generator$addComment("Generate reports with legacy interface.")
+        generator$addCall(NULL, "reportCSV", condition = "CSV" %in% settingsReport$reportLegacy, list(
+            list(value = "fGroups"),
+            list(name = "path", value = "report", quote = TRUE),
+            list(name = "formulas", value = "formulas", isNULL = !doForms),
+            list(name = "compounds", value = "compounds", isNULL = !doComps),
+            list(name = "components", value = componVal)
+        ))
+        generator$addCall(NULL, "reportPDF", condition = "PDF" %in% settingsReport$reportLegacy, list(
+            list(value = "fGroups"),
+            list(name = "path", value = "report", quote = TRUE),
+            list(name = "formulas", value = "formulas", isNULL = !doForms),
+            list(name = "compounds", value = "compounds", isNULL = !doComps),
+            list(name = "MSPeakLists", value = "mslists", condition = doForms || doComps),
+            list(name = "components", value = componVal)
+        ))
+    }
+}
+
+getScriptCode <- function(anaInfoData, settings)
+{
+    ionization <- settings$general$ionization
+    doSusps <- settings$features$exSuspList || (ionization != "both" && nzchar(settings$features$suspects$single)) ||
+        (ionization == "both" && nzchar(settings$features$suspects$sets$pos))
+    amendScrForTPs <- doSusps && settings$TP$doTPs && settings$TP$TPGen != "Logic" && settings$TP$TPGenInput == "screening"
+    
+    # This will be passed to script generators for suspect screening, annotation etc. We do the conditional here, so we
+    # don't need to pass all the conditional variables to the generator functions.
+    adductArg <- list(
+        name = "adduct", value = if (ionization == "positive") "[M+H]+" else "[M-H]-",
+        quote = TRUE,
+        condition = ionization != "both" &&
+            (!nzchar(settings$annotation$componAlgo) || settings$annotation$componAlgo == "nontarget" || !settings$annotation$selectIons)
+    )
+    
+    generator <- scriptGenerator$new()
+    
+    generator$addComment(paste("Script automatically generated on", date()))
+    generator$addNL()
+    generator$addCall(NULL, "library", list(value = "patRoon"))
+    
+    genScriptInitBlock(anaInfoData, settings$general$destination, ionization, settings$analyses, settings$preTreatment,
+                       generator)
+    
+    genScriptFeaturesBlock(ionization, settings$features, generator)
+    
+    if (nzchar(settings$annotation$componAlgo))
+        genScriptComponBlock(ionization, settings$annotation, generator)
+    
+    if (settings$features$fGroupsAdv$featNorm != "none" || settings$features$fGroupsAdv$groupNorm)
+        genScriptFGNormBlock(ionization, settings$features, adductArg, generator)
     
     if (doSusps)
-    {
-        addHeader("suspect screening")
-        
-        addLoadSuspList("suspect list", settings$ionization, settings$features$exSuspList, settings$features,
-                        "suspList", "suspects", "suspectList")
-        
-        useScrForTPScreening <- settings$TP$doTPs && settings$TP$TPGen != "Logic" && settings$TP$TPGenInput == "screening"
-        
-        addNL()
-        
-        if (useScrForTPScreening)
-            addComment("NOTE: onlyHits is set to FALSE to ensure TPs can be found below")
-        else
-            addComment("Set onlyHits to FALSE to retain features without suspects (eg for full NTA)")
-        if (settings$general$ionization != "both")
-            addComment("Set adduct to NULL if suspect list contains an adduct column")
-        
-        if (settings$general$ionization != "both" || (!settings$features$exSuspList && !nzchar(settings$features$suspectListNeg)))
-            addScreenCall("suspList", !useScrForTPScreening)
-        else
-            addScreenCall("list(suspListPos, suspListNeg)", !useScrForTPScreening)
-    }
-    else
-        useScrForTPScreening <- FALSE
+        genScriptScreenBlock(ionization, settings$features, adductArg, amendScrForTPs, generator)
     
     if (settings$TP$doTPs)
-    {
-        addHeader("transformation products")
-        
-        if (settings$TP$TPGen != "Logic" && settings$TP$TPGenInput == "suspects")
-        {
-            addComment("Load parent suspect list")
-            addLoadSuspCall("suspListParents", settings$TP$TPSuspectList)
-            addNL()
-        }
-        
-        addComment("Obtain TPs")
-        addCall("TPs", "generateTPs", list(
-            list(value = tolower(settings$TP$TPGen), quote = TRUE),
-            list(name = "parents", value = switch(settings$TP$TPGenInput,
-                                                  suspects = "suspListParents",
-                                                  screening = "fGroups",
-                                                  all = "NULL"),
-                 condition = settings$TP$TPGen != "Logic"),
-            list(value = "fGroups", condition = settings$TP$TPGen == "Logic"),
-            getAdductArg(settings$TP$TPGen == "Logic"),
-            list(name = "type", value = "env", quote = TRUE, condition = settings$TP$TPGen == "BioTransformer"),
-            list(name = "transLibrary", value = "photolysis_ranked", quote = TRUE, condition = settings$TP$TPGen == "CTS"),
-            list(name = "generations", value = if (settings$TP$TPGen == "BioTransformer") 2 else 1,
-                 condition = settings$TP$TPGen != "Logic"),
-            list(name = "calcSims", value = FALSE, condition = settings$TP$TPGen != "Logic")
-        ))
-        
-        addNL()
-        addComment("Screen TPs")
-        addCall("suspListTPs", "convertToSuspects", list(
-            list(value = "TPs"),
-            list(name = "includeParents", value = FALSE)
-        ))
-        if (useScrForTPScreening)
-            addComment("Amend with TP screening")
-        addScreenCall("suspListTPs", am = if (useScrForTPScreening) TRUE else NULL)
-    }
-    
-    doMSPL <- nzchar(settings$annotation$formulasAlgo) || nzchar(settings$annotation$compoundsAlgo)
+        genScriptTPScrBlock(ionization, settings$TP, adductArg, amendScrForTPs, generator)
     
     if (nzchar(settings$annotation$formulasAlgo) || nzchar(settings$annotation$compoundsAlgo))
     {
-        addHeader("annotation")
-        
-        useFMF <- settings$features$featAlgo == "Bruker" && settings$annotation$peakListGen == "Bruker"
-        addComment("Retrieve MS peak lists")
-        addCall("avgMSListParams", "getDefAvgPListParams", list(name = "clusterMzWindow", value = 0.005))
-        addCall("mslists", "generateMSPeakLists", list(
-            list(value = "fGroups"),
-            list(value = "mzr", quote = TRUE, condition = settings$annotation$peakListGen == "mzR"),
-            list(value = if (useFMF) "brukerfmf" else "bruker", quote = TRUE, condition = settings$annotation$peakListGen == "Bruker"),
-            list(name = "maxMSRtWindow", value = 5, condition = !useFMF),
-            list(name = "precursorMzWindow", value = if (settings$annotation$DIA) "NULL" else settings$annotation$precursorMzWindow,
-                 settings$annotation$peakListGen == "mzR"),
-            list(name = "bgsubtr", value = TRUE, condition = !useFMF && settings$annotation$peakListGen == "Bruker"),
-            list(name = "MSMSType", value = if (settings$annotation$DIA) "BBCID" else "MSMS", quote = TRUE,
-                 condition = !useFMF && settings$annotation$peakListGen == "Bruker"),
-            list(name = "avgFeatParams", value = "avgMSListParams", condition = settings$annotation$peakListGen == "mzR"),
-            list(name = "avgFGroupParams", value = "avgMSListParams")
-        ))
-        addComment("Rule based filtering of MS peak lists. You may want to tweak this. See the manual for more information.")
-        addCall("mslists", "filter", list(
-            list(value = "mslists"),
-            list(name = "absMSIntThr", value = "NULL"),
-            list(name = "absMSMSIntThr", value = "NULL"),
-            list(name = "relMSIntThr", value = "NULL"),
-            list(name = "relMSMSIntThr", value = 0.05),
-            list(name = "topMSPeaks", value = "NULL"),
-            list(name = "topMSMSPeaks", value = 25)
-        ))
-        
-        if (nzchar(settings$annotation$formulasAlgo))
-        {
-            addNL()
-            addComment("Calculate formula candidates")
-            addCall("formulas", "generateFormulas", list(
-                list(value = "fGroups"),
-                list(value = "mslists"),
-                list(value = tolower(settings$annotation$formulasAlgo), quote = TRUE),
-                list(name = "relMzDev", value = 5, condition = settings$annotation$formulasAlgo != "Bruker"),
-                list(name = "precursorMzSearchWindow", value = defaultLim("mz", "narrow"),
-                     condition = settings$annotation$formulasAlgo == "Bruker"),
-                getAdductArg(),
-                list(name = "elements", value = "CHNOP", quote = TRUE, condition = settings$annotation$formulasAlgo != "Bruker"),
-                list(name = "oc", value = FALSE, condition = settings$annotation$formulasAlgo == "GenForm"),
-                list(name = "profile", value = "qtof", quote = TRUE, condition = settings$annotation$formulasAlgo == "SIRIUS"),
-                list(name = "calculateFeatures", value = "TRUE", condition = settings$annotation$formulasAlgo != "Bruker"),
-                list(name = "featThresholdAnn", value = 0.75),
-                list(name = "setThresholdAnn", value = 0, condition = settings$general$ionization == "both")
-            ))
-        }
-        
-        if (nzchar(settings$annotation$compoundsAlgo))
-        {
-            addNL()
-            
-            if (settings$annotation$compoundsAlgo == "Library")
-            {
-                addComment("Load MS library. You may want to filter it, please see the manuals for more details.")
-                addCall("mslibrary", "loadMSLibrary", list(
-                    list(value = settings$annotation$MSLibraryPath, quote = TRUE),
-                    list(value = settings$annotation$MSLibraryFormat, quote = TRUE),
-                    list(name = "absMzDev", value = 0.002)
-                ))
-            }
-            
-            doTPDB <- settings$annotation$compoundsAlgo == "MetFrag" && settings$TP$doTPs && settings$TP$TPGen != "Logic" && settings$TP$TPDoMFDB
-            if (doTPDB)
-                addCall(NULL, "convertToMFDB", list(
-                    list(value = "TPs"),
-                    list(value = "TP-database.csv", quote = TRUE),
-                    list(name = "includeParents", value = TRUE)))
-            
-            
-            addComment("Calculate compound structure candidates")
-            
-            if (settings$annotation$compoundsAlgo == "SIRIUS")
-                addComment("Please see the handbook for SIRIUS login options. If you want to disable automatic login set login=FALSE")
-            
-            addCall("compounds", "generateCompounds", list(
-                list(value = "fGroups"),
-                list(value = "mslists"),
-                list(value = tolower(settings$annotation$compoundsAlgo), quote = TRUE),
-                list(name = "dbRelMzDev", value = 5, condition = settings$annotation$compoundsAlgo == "MetFrag"),
-                list(name = "fragRelMzDev", value = 5, condition = settings$annotation$compoundsAlgo == "MetFrag"),
-                list(name = "fragAbsMzDev", value = 0.002, condition = settings$annotation$compoundsAlgo == "MetFrag"),
-                list(name = "relMzDev", value = 5, condition = settings$annotation$compoundsAlgo == "SIRIUS"),
-                getAdductArg(),
-                list(name = "database", value = "pubchem", quote = TRUE, condition = settings$annotation$compoundsAlgo == "MetFrag" && !doTPDB),
-                list(name = "database", value = "csv", quote = TRUE, condition = doTPDB),
-                list(name = "extraOpts", value = "list(LocalDatabasePath = \"TP-database.csv\")", condition = doTPDB),
-                list(name = "maxCandidatesToStop", value = 2500, condition = settings$annotation$compoundsAlgo == "MetFrag"),
-                list(name = "fingerIDDatabase", value = "pubchem", quote = TRUE, condition = settings$annotation$compoundsAlgo == "SIRIUS"),
-                list(name = "elements", value = "CHNOP", quote = TRUE, condition = settings$annotation$compoundsAlgo == "SIRIUS"),
-                list(name = "profile", value = "qtof", quote = TRUE, condition = settings$annotation$compoundsAlgo == "SIRIUS"),
-                list(name = "login", value = "interactive", quote = TRUE, condition = settings$annotation$compoundsAlgo == "SIRIUS"),
-                list(name = "alwaysLogin", value = FALSE, condition = settings$annotation$compoundsAlgo == "SIRIUS"),
-                list(name = "MSLibrary", value = "mslibrary", condition = settings$annotation$compoundsAlgo == "Library"),
-                list(name = "minSim", value = 0.75, condition = settings$annotation$compoundsAlgo == "Library"),
-                list(name = "absMzDev", value = 0.002, condition = settings$annotation$compoundsAlgo == "Library"),
-                list(name = "specSimParams", value = "getDefSpecSimParams()", condition = settings$annotation$compoundsAlgo == "Library"),
-                list(name = "setThresholdAnn", value = 0, condition = settings$general$ionization == "both")
-            ))
-            if (settings$annotation$compoundsAlgo == "MetFrag")
-            {
-                addCall("compounds", "addFormulaScoring", list(
-                    list(value = "compounds"),
-                    list(value = "formulas"),
-                    list(name = "updateScore", value = TRUE)
-                ))
-            }
-        }
-        
-        if (doSusps && settings$annotation$annotateSus && (nzchar(settings$annotation$formulasAlgo) || nzchar(settings$annotation$compoundsAlgo)))
-        {
-            addNL()
-            addComment("Annotate suspects")
-            addCall("fGroups", "annotateSuspects", list(
-                list(value = "fGroups"),
-                list(name = "formulas", value = "formulas", isNULL = !nzchar(settings$annotation$formulasAlgo)),
-                list(name = "compounds", value = "compounds", isNULL = !nzchar(settings$annotation$compoundsAlgo)),
-                list(name = "MSPeakLists", value = "mslists", condition = doMSPL),
-                list(name = "IDFile", value = "idlevelrules.yml", quote = TRUE, condition = settings$annotation$genIDLevelFile)
-            ))
-        }
+        addMFDB <- settings$TP$doTPs && settings$TP$TPGen != "Logic" && settings$TP$TPDoMFDB
+        genScriptAnnBlock(ionization, settings$annotation, adductArg, doSusps, addMFDB, generator)
     }
     
     if (settings$TP$doTPs)
-    {
-        addHeader("Parent and TP linkage")
-        
-        addComment("You probably want to prioritize the data before componentization. Please see the handbook for more info.")
-        addCall("componentsTP", "generateComponents", list(
-            list(value = "fGroups"),
-            list(value = "tp", quote = TRUE),
-            list(name = "fGroupsTPs", value = "fGroups"),
-            list(name = "TPs", value = "TPs"),
-            list(name = "MSPeakLists", value = "mslists", condition = doMSPL),
-            list(name = "formulas", value = "formulas", condition = nzchar(settings$annotation$formulasAlgo)),
-            list(name = "compounds", value = "compounds", condition = nzchar(settings$annotation$compoundsAlgo))
-        ))
-        
-        addNL()
-        addComment("You may want to configure the filtering step below. See the manuals for more details.")
-        addCall("componentsTP", "filter", list(
-            list(value = "componentsTP"),
-            list(name = "retDirMatch", value = FALSE),
-            list(name = "minSpecSim", value = "NULL"),
-            list(name = "minSpecSimPrec", value = "NULL"),
-            list(name = "minSpecSimBoth", value = "NULL"),
-            list(name = "minFragMatches", value = "NULL"),
-            list(name = "minNLMatches", value = "NULL"),
-            list(name = "formulas", value = "formulas", isNULL = !nzchar(settings$annotation$formulasAlgo),
-                 condition = settings$TP$TPGen == "Logic")
-        ))
-        
-        addNL()
-        addComment("Only keep linked feature groups")
-        addAssignment("fGroups", "fGroups[results = componentsTP]")
-    }
+        genScriptTPCompBlock(nzchar(settings$annotation$formulasAlgo), nzchar(settings$annotation$compoundsAlgo),
+                             settings$TP$TPGen, generator)
     
     if (length(settings$report$reportGen) > 0)
-    {
-        # UNDONE: for now TP components are always reported instead of others
-        componVal <- if (settings$TP$doTPs)
-            "componentsTP"
-        else if (nzchar(settings$annotation$componAlgo) && (!settings$annotation$selectIons || settings$annotation$componAlgo == "nontarget"))
-            "components"
-        else
-            "NULL"
-        
-        addHeader("reporting")
-        
-        if ("HTML" %in% settings$report$reportGen)
-        {
-            addComment("Advanced report settings can be edited in the report.yml file.")
-            addCall(NULL, "report", list(
-                list(value = "fGroups"),
-                list(name = "MSPeakLists", value = "mslists", isNULL = !doMSPL),
-                list(name = "formulas", value = "formulas", isNULL = !nzchar(settings$annotation$formulasAlgo)),
-                list(name = "compounds", value = "compounds", isNULL = !nzchar(settings$annotation$compoundsAlgo)),
-                list(name = "components", value = componVal),
-                list(name = "TPs", value = "TPs", condition = settings$TP$doTPs),
-                list(name = "settingsFile", value = "report.yml", quote = TRUE),
-                list(name = "openReport", value = TRUE)
-            ))
-        }
-        
-        if ("legacy" %in% settings$report$reportGen)
-        {
-            if ("HTML" %in% settings$report$reportGen)
-                addNL()
-            
-            addComment("Generate reports with legacy interface.")
-            addCall(NULL, "reportCSV", condition = "CSV" %in% settings$report$reportLegacy, list(
-                list(value = "fGroups"),
-                list(name = "path", value = "report", quote = TRUE),
-                list(name = "formulas", value = "formulas", isNULL = !nzchar(settings$annotation$formulasAlgo)),
-                list(name = "compounds", value = "compounds", isNULL = !nzchar(settings$annotation$compoundsAlgo)),
-                list(name = "components", value = componVal)
-            ))
-            addCall(NULL, "reportPDF", condition = "PDF" %in% settings$report$reportLegacy, list(
-                list(value = "fGroups"),
-                list(name = "path", value = "report", quote = TRUE),
-                list(name = "formulas", value = "formulas", isNULL = !nzchar(settings$annotation$formulasAlgo)),
-                list(name = "compounds", value = "compounds", isNULL = !nzchar(settings$annotation$compoundsAlgo)),
-                list(name = "MSPeakLists", value = "mslists", condition = doMSPL),
-                list(name = "components", value = componVal)
-            ))
-        }
-    }
+        genScriptReportBlock(settings$annotation, settings$report, settings$TP$doTPs, generator)
     
-    addNL()
+    generator$addNL()
     
-    return(paste0(textConnectionValue(txtCon), collapse = "\n"))
+    return(generator$getCode())
 }
 
 doCreateProject <- function(anaInfoTabs, settings)
@@ -753,8 +831,8 @@ doCreateProject <- function(anaInfoTabs, settings)
             settings$preTreatment$output[[t]] <- "."
     }
     
-    doSusps <- settings$features$exSuspList || (settings$general$ionization != "both" && nzchar(settings$features$suspectList)) ||
-        (settings$general$ionization == "both" && nzchar(settings$features$suspectListPos))
+    doSusps <- settings$features$exSuspList || (settings$general$ionization != "both" && nzchar(settings$features$suspects$single)) ||
+        (settings$general$ionization == "both" && nzchar(settings$features$suspects$sets$pos))
     if (doSusps && settings$annotation$annotateSus && settings$annotation$genIDLevelFile)
         genIDLevelRulesFile(file.path(settings$general$destination, "idlevelrules.yml"))
     

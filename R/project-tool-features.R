@@ -101,9 +101,9 @@ newProjectFeaturesServer <- function(id, ionization, settings)
             rValues$featEICParams <- settings()$featEICParams
             updateSelectInput(session, "fGroupsAlgo", selected = settings()$fGroupsAlgo)
             rValues$fGroupsAdv <- settings()$fGroupsAdv
-            updateTextInput(session, "suspectList", value = settings()$suspectList)
-            updateTextInput(session, "suspectListPos", value = settings()$suspectListPos)
-            updateTextInput(session, "suspectListNeg", value = settings()$suspectListNeg)
+            updateTextInput(session, "suspectList", value = settings()$suspects$single)
+            updateTextInput(session, "suspectListPos", value = settings()$suspects$sets$pos)
+            updateTextInput(session, "suspectListNeg", value = settings()$suspects$sets$neg)
             updateCheckboxInput(session, "exSuspList", value = settings()$exSuspList)
         })
 
@@ -266,7 +266,7 @@ newProjectFeaturesServer <- function(id, ionization, settings)
                             condition = "input.featNorm == \"istd\" && output.ionization != \"both\"",
                             ns = ns,
                             fileSelect(ns("ISTDList"), ns("ISTDListButton"), "Internal standard list",
-                                       rValues$fGroupsAdv$ISTDList, placeholder = "Leave empty for example list")
+                                       rValues$fGroupsAdv$ISTDLists$single, placeholder = "Leave empty for example list")
                         ),
                         conditionalPanel(
                             condition = "input.featNorm == \"istd\" && output.ionization == \"both\"",
@@ -277,14 +277,14 @@ newProjectFeaturesServer <- function(id, ionization, settings)
                                     width = "95%",
                                     fileSelect(ns("ISTDListPos"), ns("ISTDListButtonPos"),
                                                "Internal standard list (positive)",
-                                               rValues$fGroupsAdv$ISTDListPos,
+                                               rValues$fGroupsAdv$ISTDLists$sets$pos,
                                                placeholder = "Leave empty for example list")
                                 ),
                                 fillCol(
                                     width = "95%",
                                     fileSelect(ns("ISTDListNeg"), ns("ISTDListButtonNeg"),
                                                "Internal standard list (negative)",
-                                               rValues$fGroupsAdv$ISTDListNeg,
+                                               rValues$fGroupsAdv$ISTDLists$sets$neg,
                                                placeholder = "Leave empty if same as positive")
                                 )
                             )
@@ -317,9 +317,8 @@ newProjectFeaturesServer <- function(id, ionization, settings)
                 mz = c(input[["mz-min"]], input[["mz-max"]]),
                 featNorm = input$featNorm,
                 groupNorm = input$groupNorm,
-                ISTDList = input$ISTDList,
-                ISTDListPos = input$ISTDListPos,
-                ISTDListNeg = input$ISTDListNeg
+                ISTDLists = list(single = input$ISTDList,
+                                 sets = list(pos = input$ISTDListPos, neg = input$ISTDListNeg))
             )
         })
         
@@ -330,9 +329,8 @@ newProjectFeaturesServer <- function(id, ionization, settings)
             settings = reactive(list(
                 featAlgo = input$featAlgo,
                 fGroupsAlgo = input$fGroupsAlgo,
-                suspectList = input$suspectList,
-                suspectListPos = input$suspectListPos,
-                suspectListNeg = input$suspectListNeg,
+                suspects = list(single = input$suspectList,
+                                sets = list(pos = input$suspectListPos, neg = input$suspectListNeg)),
                 exSuspList = input$exSuspList,
                 fGroupsAdv = rValues$fGroupsAdv
             ))
@@ -345,9 +343,7 @@ defaultFeaturesSettings <- function()
     return(list(
         featAlgo = "OpenMS",
         fGroupsAlgo = "OpenMS",
-        suspectList = "",
-        suspectListPos = "",
-        suspectListNeg = "",
+        suspects = list(single = "", sets = list(pos = "", neg = "")),
         exSuspList = FALSE,
         featEICParams = list(
             methodMZ = "bins",
@@ -368,9 +364,7 @@ defaultFeaturesSettings <- function()
             mz = c(0, 0),
             featNorm = "none",
             groupNorm = FALSE,
-            ISTDList = "",
-            ISTDListPos = "",
-            ISTDListNeg = ""
+            ISTDLists = list(single = "", sets = list(pos = "", neg = ""))
         )
     ))
 }
@@ -378,13 +372,17 @@ defaultFeaturesSettings <- function()
 upgradeFeaturesSettings <- function(settings)
 {
     # NOTE: this updates from first file version
-    ret <- modifyList(defaultFeaturesSettings(),
-                      settings[c("suspectList", "suspectListPos", "suspectListNeg", "exSuspList")])
+    ret <- defaultFeaturesSettings()
+    ret$suspects <- list(single = settings$suspectList,
+                         sets = list(pos = settings$suspectListPos, neg = settings$suspectListNeg))
+    ret$exSuspList <- settings$exSuspList
     ret$featAlgo <- settings$featFinder
     ret$fGroupsAlgo <- settings$featGrouper
     ret$retention <- c(settings[["retention-min"]], settings[["retention-max"]])
     ret$mz <- c(settings[["mz-min"]], settings[["mz-max"]])
     ret$fGroupsAdv <- settings[c("preIntThr", "intThr", "repAbundance", "maxRepRSD", "blankThr", "removeBlanks",
-                                 "retention", "mz", "featNorm", "groupNorm", "ISTDList", "ISTDListPos", "ISTDListNeg")]
+                                 "retention", "mz", "featNorm", "groupNorm")]
+    ret$fGroupsAdv$ISTDLists <- list(single = settings$ISTDList,
+                                     sets = list(pos = settings$ISTDListPos, neg = settings$ISTDListNeg))
     return(ret)
 }

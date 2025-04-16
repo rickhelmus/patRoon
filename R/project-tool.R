@@ -129,8 +129,8 @@ newProject <- function(destPath = NULL)
         data$preTreatment <- newProjectPreTreatServer("pretreat", ionization, reactive(loadedSettings$preTreatment))
         data$features <- newProjectFeaturesServer("features", ionization, reactive(loadedSettings$features))
         hasSusp <- reactive({
-            data$features$settings()$exSuspList || (ionization() != "both" && nzchar(data$features$settings()$suspectList) ||
-                (ionization() == "both" && nzchar(data$features$settings()$suspectListPos)))
+            data$features$settings()$exSuspList || (ionization() != "both" && nzchar(data$features$settings()$suspects$single) ||
+                (ionization() == "both" && nzchar(data$features$settings()$suspects$positive)))
         })
         data$annotations <- newProjectAnnotationServer("annotation", hasSusp, reactive(loadedSettings$annotation))
         data$TPs <- newProjectTPServer("tp", hasSusp, reactive(loadedSettings$TP))

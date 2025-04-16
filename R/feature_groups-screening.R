@@ -13,6 +13,7 @@ NULL
 #' This class derives from \code{\link{featureGroups}} and adds suspect screening information.
 #'
 #' @param obj,object,x,fGroups The \code{featureGroupsScreening} object.
+#' @param i,j See \code{\link{featureGroups}}.
 #' @param \dots Further arguments passed to the base method.
 #' @param onlyHits For \code{as.data.table}: if \code{TRUE} then only feature groups with suspect hits are reported.
 #'
@@ -133,7 +134,6 @@ setMethod("show", "featureGroupsScreening", function(object)
 #' @describeIn featureGroupsScreening Subset on analyses, feature groups and/or
 #'   suspects.
 #'   
-#' @param i,j,\dots Used for subsetting analyses, feature groups and others, see \code{\link{featureGroups}}.
 #' @param suspects An optional \code{character} vector with suspect names. If
 #'   specified, only \code{featureGroups} will be kept that are assigned to
 #'   these suspects.
@@ -153,7 +153,26 @@ setMethod("[", c("featureGroupsScreening", "ANY", "ANY", "missing"), function(x,
     return(x)
 })
 
-#' @rdname featureGroupsScreening-class
+#' @templateVar where featureGroupsScreening
+#' @templateVar what feature groups or screening results
+#' @template delete
+#' @param k The \code{k} argument is used to delete screening results (instead of features) and should be: \itemize{
+#'
+#'   \item a \code{character} vector with suspect names that should be removed
+#'
+#'   \item a \code{function} that is called with the screening info table and should return a \code{logical} vector for
+#'   each suspect row to be removed
+#'
+#'   \item \code{NA} to remove all screening results, which is especially useful when paired with the \code{j} argument,
+#'   \emph{i.e.} to remove all screening results for a particular set of feature groups.
+#'
+#'   \item \code{NULL} to not touch screening results and only perform deletion as the \code{\link{featureGroups}}
+#'   method.
+#'
+#'   }
+#'
+#'   Setting both \code{i} and \code{k} is currently not supported.
+#'
 #' @export
 setMethod("delete", "featureGroupsScreening", doSFGroupsScreeningDelete)
 

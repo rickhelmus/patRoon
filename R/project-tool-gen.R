@@ -116,8 +116,7 @@ scriptGenerator$methods(
     addLoadSuspCall = function(var, file)
     {
         addCall(var, "read.csv", list(
-            list(value = file, quote = TRUE),
-            list(name = "stringsAsFactors", value = FALSE)
+            list(value = file, quote = TRUE)
         ))
     },
     

@@ -270,6 +270,44 @@ genScriptInitBlock <- function(anaInfoData, destination, ionization, settingsAna
     }
 }
 
+genScriptSuspListsBlock <- function(ionization, settingsFeat, doSusps, doISTDs, generator)
+{
+    generator$addHeader("setup suspect lists")
+    
+    if (doSusps)
+    {
+        if (settingsFeat$exSuspList)
+        {
+            generator$addComment("Get example suspect list")
+            generator$addSuspListEx(ionization, "patRoonData::suspectsPos", "patRoonData::suspectsNeg", "suspList")
+        }
+        else
+        {
+            generator$addComment("Load suspect list")
+            generator$addLoadSuspList(ionization, settingsFeat$suspects, "suspList")
+        }
+    }
+    
+    if (doISTDs)
+    {
+        if (doSusps)
+            generator$addNL()
+        
+        doEx <- (ionization != "both" && !nzchar(settingsFeat$fGroupsAdv$ISTDLists$single)) ||
+            (ionization == "both" && !nzchar(settingsFeat$fGroupsAdv$ISTDLists$sets$pos))
+        if (doEx)
+        {
+            generator$addComment("Get example ISTD list")
+            generator$addSuspListEx(ionization, "patRoonData::ISTDListPos", "patRoonData::ISTDListNeg", "ISTDList")
+        }
+        else
+        {
+            generator$addComment("Load ISTD list")
+            generator$addLoadSuspList(ionization, settingsFeat$fGroupsAdv$ISTDLists, "ISTDList")
+        }
+    }
+}
+
 genScriptFeaturesBlock <- function(ionization, settingsFeat, generator)
 {
     addFindFeatures <- function(varName, anaInfoVarName)
@@ -386,19 +424,6 @@ genScriptFGNormBlock <- function(ionization, settingsFeat, adductArg, generator)
     
     if (settingsFeat$fGroupsAdv$featNorm == "istd")
     {
-        doEx <- (ionization != "both" && !nzchar(settingsFeat$fGroupsAdv$ISTDLists$single)) ||
-            (ionization == "both" && !nzchar(settingsFeat$fGroupsAdv$ISTDLists$sets$pos))
-        if (doEx)
-        {
-            generator$addComment("Get example ISTD list")
-            generator$addSuspListEx(ionization, "patRoonData::ISTDListPos", "patRoonData::ISTDListNeg", "ISTDList")
-        }
-        else
-        {
-            generator$addComment("Load ISTD list")
-            generator$addLoadSuspList(ionization, settingsFeat$fGroupsAdv$ISTDLists, "ISTDList")
-        }
-        
         generator$addNL()
         if (ionization != "both")
             generator$addComment("Set adduct to NULL if ISTD list contains an adduct column")
@@ -431,19 +456,6 @@ genScriptFGNormBlock <- function(ionization, settingsFeat, adductArg, generator)
 genScriptScreenBlock <- function(ionization, settingsFeat, adductArg, amendScrForTPs, generator)
 {
     generator$addHeader("suspect screening")
-    
-    if (settingsFeat$exSuspList)
-    {
-        generator$addComment("Get example suspect list")
-        generator$addSuspListEx(ionization, "patRoonData::suspectsPos", "patRoonData::suspectsNeg", "suspList")
-    }
-    else
-    {
-        generator$addComment("Load suspect list")
-        generator$addLoadSuspList(ionization, settingsFeat$suspects, "suspList")
-    }
-    
-    generator$addNL()
     
     if (amendScrForTPs)
         generator$addComment("NOTE: onlyHits is set to FALSE to ensure TPs can be found below")
@@ -719,6 +731,8 @@ getScriptCode <- function(anaInfoData, settings)
     ionization <- settings$general$ionization
     doSusps <- settings$features$exSuspList || (ionization != "both" && nzchar(settings$features$suspects$single)) ||
         (ionization == "both" && nzchar(settings$features$suspects$sets$pos))
+    doFGNorm <- settings$features$fGroupsAdv$featNorm != "none" || settings$features$fGroupsAdv$groupNorm
+    doISTDs <- doFGNorm && settings$features$fGroupsAdv$featNorm == "istd"
     amendScrForTPs <- doSusps && settings$TP$doTPs && settings$TP$TPGen != "Logic" && settings$TP$TPGenInput == "screening"
     
     # This will be passed to script generators for suspect screening, annotation etc. We do the conditional here, so we
@@ -738,13 +752,16 @@ getScriptCode <- function(anaInfoData, settings)
     
     genScriptInitBlock(anaInfoData, settings$general$destination, ionization, settings$analyses, settings$preTreatment,
                        generator)
-    
+
+    if (doSusps || doISTDs)
+        genScriptSuspListsBlock(ionization, settings$features, doSusps, doISTDs, generator)
+        
     genScriptFeaturesBlock(ionization, settings$features, generator)
     
     if (nzchar(settings$annotation$componAlgo))
         genScriptComponBlock(ionization, settings$annotation, generator)
     
-    if (settings$features$fGroupsAdv$featNorm != "none" || settings$features$fGroupsAdv$groupNorm)
+    if (doFGNorm)
         genScriptFGNormBlock(ionization, settings$features, adductArg, generator)
     
     if (doSusps)

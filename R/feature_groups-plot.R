@@ -46,6 +46,10 @@ NULL
 #'
 #'   }
 #'
+#'   In sets workflows the \link[=analysis-information]{analysis information} contains an additional \code{"set"}
+#'   column, which can be used for arguments that involve grouping of analyses. For instance, if \code{groupBy="set"}
+#'   then plotting data is grouped per set.
+#'
 #' @author Rick Helmus <\email{r.helmus@@uva.nl}> and Ricardo Cunha <\email{cunha@@iuta.de}> (\code{plotTICs} and
 #'   \code{plotBPCs} functions)
 #'

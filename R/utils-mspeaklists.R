@@ -33,17 +33,38 @@ emptyMSPeakList <- function(abundanceColumn, avgCols)
 #' excluding lower intense MS peaks that may still be of interest.
 #'
 #' \item \code{minIntensityPre} MS peaks with intensities below this value will be removed (applied prior to selection
-#' by \code{topMost}) before averaging.
+#' by \code{topMost} and averaging).
 #'
-#' \item \code{minIntensityPost} MS peaks with intensities below this value will be removed after averaging.
+#' \item \code{minIntensityPost} MS peaks with intensities below this value will be removed (after averaging).
+#'
+#' \item \code{minIntensityIMS} MS peaks in spectra of raw IMS frames with intensities below this value will be removed
+#' (applied prior to any other treatment steps).
+#'
+#' \item \code{minAbundanceAbs},\code{minAbundanceRel} Minimum absolute/relative abundance of an MS peak across the
+#' spectra that are averaged.
+#'
+#' \item \code{minAbundanceIMSAbs},\code{minAbundanceIMSRel} Minimum absolute/relative abundance of an MS peak across
+#' the spectra that are summed within an IMS frame.
+#'
+#' \item \code{method} Method used to average MS spectra. Valid values are: \itemize{
+#'
+#'   \item \code{"hclust"}: uses hierarhcical clustering to find similar mass peaks (using
+#'   \href{https://github.com/cdalitz/hclust-cpp}{hclust-cpp}, which is based on the \CRANpkg{fastcluster} package).
+#'   
+#'   \item \code{"distance"}: uses the distance between sorted mass peaks to find close mass peaks.
+#'   
+#'   \item \code{"bin"}: uses a similar binning approach to cluster similar mass peaks.
+#'
+#' }
 #' 
-#' \item \code{minAbundanceRel},\item \code{minAbundanceAbs}  Minimum relative/absolute abundance of an MS peak across
-#' the spectra that are averaged (\samp{0-1}).
+#' The \code{hclust} method may give more accurate results, but is more computationally demanding and generally
+#' unsuitable for IMS workflows due to excessive use of RAM.
 #'
-#' \item \code{method} Method used for producing averaged MS spectra. Valid values are \code{"hclust"}, used for
-#' hierarchical clustering (using the \pkg{\link{fastcluster}} package), and \code{"distance"}, to use the between peak
-#' distance. The latter method may reduces processing time and memory requirements, at the potential cost of reduced
-#' accuracy.
+#' \item \code{withPrecursorMS} For MS data only: ignore any spectra that do not contain the precursor peak.
+#'
+#'   For IMS data this excludes MS spectra within an IMS frame that do not contain the precursor peak, typically due to
+#'   mobility separation. Hence, setting this option performs some crude cleanup of MS spectra, even for features for
+#'   which no mobilities were assigned (\emph{e.g.} non-IMS workflows).
 #'
 #' \item \code{pruneMissingPrecursorMS} For MS data only: if \code{TRUE} then peak lists without a precursor peak are
 #' removed. Note that even when this is set to \code{FALSE}, functionality that relies on MS (not MS/MS) peak lists
@@ -64,10 +85,7 @@ emptyMSPeakList <- function(abundanceColumn, avgCols)
 #'
 #' @return \code{getDefAvgPListParams} returns a \code{list} with the peak list averaging parameters.
 #'
-#' @note With Bruker algorithms these parameters only control generation of feature groups averaged peak lists: how peak
-#'   lists for features are generated is controlled by DataAnalysis.
-#'
-#' @section Source: Averaging of mass spectra algorithms used by are based on the
+#' @section Source: Averaging of mass spectra was originally based on algorithms from the
 #'   \href{https://github.com/zeehio/msProcess}{msProcess} R package (now archived on CRAN).
 #'
 #' @references \addCitations{fastcluster}
@@ -80,10 +98,10 @@ getDefAvgPListParams <- function(...)
                 minIntensityPre = 500,
                 minIntensityPost = 500,
                 minIntensityIMS = 25,
-                minAbundanceRel = 0,
                 minAbundanceAbs = 0,
-                minAbundanceIMSRel = 0,
+                minAbundanceRel = 0,
                 minAbundanceIMSAbs = 2,
+                minAbundanceIMSRel = 0,
                 method = "hclust",
                 withPrecursorMS = TRUE,
                 pruneMissingPrecursorMS = TRUE,

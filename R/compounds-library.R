@@ -86,6 +86,9 @@ unifyLibNames <- function(cTab)
 #'
 #' @inheritParams generateCompounds
 #'
+#' @note The \code{score}, \code{libMatch} and \code{annSim} output columns are all equal and resemble the spectral
+#'   similarity between the experimental and library spectra.
+#'
 #' @seealso \code{\link{loadMSLibrary}} to obtain MS library data and the methods for \code{\link{MSLibrary}} to treat
 #'   the data before using it for annotation.
 #'

@@ -207,6 +207,7 @@
 
 ## Docs
 
+- Rcpp refs don't seem to work anymore?
 - move all plotBPC(), getEIC() etc methods into one doc file?
 - anaInfo
     - link to IMS section where path_IMS is explained
@@ -218,6 +219,8 @@
     - clMethod and mzWindow for IM collapse --> see how this can be combined with others
     - link to HRMS interface in convertMSFilesIMSCollapse()
     - update handbook and tutorial
+- backend
+    - refer to it in zzz, MSPL, plotChroms() etc
 - handbook/tutorial
     - features
         - mention somewhere that IMS="maybe" for e.g. plotting

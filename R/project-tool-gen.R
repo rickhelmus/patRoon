@@ -119,23 +119,20 @@ scriptGenerator$methods(
             list(value = file, quote = TRUE)
         ))
     },
-    
+
     addLoadSuspList = function(ionization, suspects, varBase)
     {
-        varNames <- if (ionization == "both" && nzchar(suspects$sets$neg))
-            paste0(varBase, c("Pos", "Neg"))
+        if (ionization != "both")
+            addLoadSuspCall(varBase, suspects$single)
         else
-            varBase
-        
-        suspectsPath <- if (ionization != "both")
-            suspects$single
-        else if (!nzchar(suspects$sets$neg))
-            c(suspects$sets$pos, suspects$sets$pos)
-        else
-            c(suspects$sets$pos, suspects$sets$neg)
-        
-        for (i in seq_along(varNames))
-            addLoadSuspCall(varNames[[i]], suspectsPath[[i]])
+        {
+            varPos <- paste0(varBase, "Pos"); varNeg <- paste0(varBase, "Neg")
+            addLoadSuspCall(varPos, suspects$sets$pos)
+            if (nzchar(suspects$sets$neg))
+                addLoadSuspCall(varNeg, suspects$sets$neg)
+            else
+                addAssignment(varNeg, paste0(varBase, "Pos"))
+        }
     },
     
     addSuspListEx = function(ionization, exPos, exNeg, varBase)
@@ -428,12 +425,7 @@ genScriptFGNormBlock <- function(ionization, settingsFeat, adductArg, generator)
         if (ionization != "both")
             generator$addComment("Set adduct to NULL if ISTD list contains an adduct column")
         
-        standards <- if (ionization != "both" ||
-                         (nzchar(settingsFeat$fGroupsAdv$ISTDLists$sets$pos) &&
-                          !nzchar(settingsFeat$fGroupsAdv$ISTDLists$sets$neg)))
-            "ISTDList"
-        else
-            c("ISTDListPos", "ISTDListNeg")
+        standards <- if (ionization != "both") "ISTDList" else c("ISTDListPos", "ISTDListNeg")
     }
     else
         standards <- NULL
@@ -464,7 +456,7 @@ genScriptScreenBlock <- function(ionization, settingsFeat, adductArg, amendScrFo
     if (ionization != "both")
         generator$addComment("Set adduct to NULL if suspect list contains an adduct column")
     
-    if (ionization != "both" || (!settingsFeat$exSuspList && !nzchar(settingsFeat$suspects$sets$neg)))
+    if (ionization != "both")
         generator$addScreenCall("suspList", adductArg, !amendScrForTPs)
     else
         generator$addScreenCall("list(suspListPos, suspListNeg)", adductArg, !amendScrForTPs)

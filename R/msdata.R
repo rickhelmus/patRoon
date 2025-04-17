@@ -1,6 +1,87 @@
 #' @include main.R
 NULL
 
+#' Interface for HRMS and IMS-HRMS raw data
+#'
+#' Description, configuration and utilities for the raw (IMS-)HRMS data interface of \pkg{patRoon}.
+#'
+#' Version 3.0 of \pkg{patRoon} introduced an extensible and highly optimized interface to read raw data from HRMS and
+#' IMS-HRMS instruments. This interface supports chooseable 'backends' which perform the reading of file data from
+#' various formats. Subsequent steps such as the formation of extracted ion chromatograms, mobilograms and collection
+#' and averaging of mass spectra are then performed in \code{patRoon}. The interface is largely coded in C++ (using
+#' \CRANpkg{Rcpp}), uses \href{https://www.openmp.org/}{OpenMP} parallelization and applies several other optimization
+#' strategies to make it suitable to rapidly process large amounts of raw data, \emph{e.g.} as encountered in IMS-HRMS
+#' workflow.
+#'
+#' The following backends for reading (IMS-)HRMS data are currently available: \itemize{
+#'
+#'   \item \code{"opentims"}: uses the \href{https://github.com/michalsta/opentims}{OpenTIMS} library to read Bruker
+#'   TIMS data. This backends supports very fast reading of raw instrument \file{.d} data files directly, and therefore
+#'   does not require any file conversions. This backend only supports 64 bit Windows and Linux systems. See the
+#'   \verb{Backend installation} section below installation instructions.
+#'
+#'   \item \code{"mzr"}: uses the \CRANpkg{mzR} package to read \file{.mzML} and \file{.mzXML} files. This package was
+#'   more or less the default in \pkg{patRoon} prior to 3.0, and due to its popularity and age is a stable and well
+#'   tested option. The \code{mzr} backend currently reads the complete analysis file at once, which makes it more RAM
+#'   intensive compared to other backends. This backend currently does not support IMS data. Since \pkg{mzR} is a
+#'   dependency of \pkg{patRoon}, no additional installation is necessary.
+#'
+#'   \item \code{"mstoolkit"}: Uses the \href{https://github.com/mhoopmann/mstoolkit}{MSToolKit} C++ library to read
+#'   \file{.mzML} and \file{.mzXML} files, including IMS-HRMS data. The \command{MSToolKit} library has been developed
+#'   for many years, and was recently updated with IMS-HRMS support. See the \verb{Backend installation} section below
+#'   installation instructions.
+#'
+#'   \item \code{"streamcraft"}: Uses the \href{https://github.com/odea-project/streamcraft}{StreamCraft} C++ library to
+#'   read \file{.mzML} and \file{.mzXML} files, including IMS-HRMS data. The \command{StreamCraft} library is still
+#'   young and somewhat experimental. The library is integrated within \pkg{patRoon} and therefore does not require any
+#'   further installation.
+#'
+#' }
+#'
+#' @section Configuration: The following package options influence the behavior of raw data interface: \itemize{
+#'
+#'   \item \code{patRoon.MS.backends}: A \code{character} vector with the names of the backends that may be choosen. The
+#'   default is all backends. The first backend will be chosen that is available, is able to read at least one of the
+#'   available analysis file types and formats (as configured by the \link[=analysis-information]{analysis information})
+#'   and supports IMS if needed.
+#'
+#'   \item \code{patRoon.MS.preferIMS}: A \code{logical} value that indicates whether the IMS data should be prefferred,
+#'   even if the processing step does not require IMS data and non-IMS data is also available. Setting this to
+#'   \code{TRUE} probably result in some additional computational overhead, but may avoid any inconsistencies between
+#'   the IMS data and non-IMS data that may have been introduced during the conversion step of the latter. This option
+#'   is only relevant for the \code{mstoolkit} and \code{streamcraft} backends.
+#'
+#'   \item \code{patRoon.threads}: An \code{integer} value that indicates the number of threads to use for
+#'   parallelization (multithreading). The default is determined from the number of physical cores of the system
+#'   (obtained with the \link[parallel:detectCores]{parallel::detectCores} function).
+#'
+#'   \item \code{patRoon.path.BrukerTIMS}: The file path to the Bruker \command{TDF-SDK} library file. See the
+#'   \verb{Backend installation} section below.
+#'
+#'   }
+#'
+#'
+#' @section Backend installation: The \code{opentims} backend requires the \file{win64/timsdata.dll} (Windows) or
+#'   \file{linux64/libtimsdata.so} (Linux) file from the \command{TDF-SDK} from
+#'   \href{https://www.bruker.com/protected/en/services/software-downloads/mass-spectrometry/raw-data-access-libraries.html}{Bruker}
+#'   (requires login). The \pkg{patRoonExt} package makes these files automatically available for \pkg{patRoon}.
+#'   Otherwise the \code{patRoon.path.BrukerTIMS} option should be manually set to the file path of the
+#'   \file{timsdata.dll} or \file{linux64/libtimsdata.so} file.
+#'
+#'   When \pkg{patRoon} is installed from source, \emph{e.g.} on Linux/macOS systems or when using
+#'   \code{\link{remotes::install_github}} for installation, then the
+#'   \href{https://github.com/rickhelmus/Rmstoolkitlib}{https://github.com/rickhelmus/Rmstoolkitlib} \R package must be
+#'   installed in advance.
+#'
+#'   The \code{availableBackends} function can be used to verify if the dependencies for these backends are met.
+#'
+#' @references \addCitations{Rcpp}{1} \cr\cr \addCitations{Rcpp}{2} \cr\cr \addCitations{Rcpp}{3} \cr\cr
+#'   \insertRef{Dagum1998}{patRoon} \cr\cr \insertRef{Lacki2021}{patRoon} \cr\cr \addCitations{mzR}{1} \cr\cr
+#'   \addCitations{mzR}{2} \cr\cr \addCitations{mzR}{3} \cr\cr \addCitations{mzR}{4} \cr\cr \addCitations{mzR}{5}
+#'
+#' @name msdata
+NULL
+
 Rcpp::loadModule("MSReadBackend", TRUE)
 
 maybeGetMSFilesForOTIMS <- function(anaInfo, types, formats, needIMS)
@@ -251,4 +332,54 @@ applyMSData <- function(anaInfo, func,  ..., types = getMSFileTypes(), formats =
         msg <- paste(msg, "IMS data is required.")
     stop(msg, " Please ensure all data is present and the \"patRoon.MS.backends\" option is configured properly: see ?patRoon",
          call. = FALSE)
+}
+
+#' @details The \code{availableBackends} function is used to query the available backends on the system.
+#'
+#' @param anaInfo Optional. If not \code{NULL} then \code{anaInfo} should be a \link[=analysis-information]{analysis
+#'   information} table, and only those backends that can read each of the analyses are returned.
+#' @param verbose Set to \code{TRUE} to print the status of each backend.
+#'
+#' @return \code{availableBackends} returns (invisibly) a \code{character} vector with the names of the available
+#'   backends.
+#'
+#' @rdname msdata
+#' @export
+availableBackends <- function(anaInfo = NULL, verbose = TRUE)
+{
+    anaInfo <- assertAndPrepareAnaInfo(anaInfo, null.ok = TRUE)
+    checkmate::assertFlag(verbose)
+    
+    allBackends <- getMSReadBackends()
+    
+    unselected <- setdiff(allBackends, getOption("patRoon.MS.backends", character()))
+    notCompiled <- allBackends[!sapply(allBackends, backendAvailable)]
+    noAnas <- if (is.null(anaInfo))
+        character()
+    else
+        allBackends[sapply(allBackends, function(b) is.null(maybeGetMSFiles(b, anaInfo, getMSFileTypes(), names(MSFileExtensions()))))]
+    
+    checkAvail <- function(b)
+    {
+        stat <- character()
+        if (b %in% unselected)
+            stat <- c(stat, "not in patRoon.MS.backends")
+        if (b %in% notCompiled)
+            stat <- c(stat, "not compiled during installation or unavailable on your system")
+        if (b %in% noAnas)
+            stat <- c(stat, "no suitable analyses found")
+        if (length(stat) == 0)
+            return("yes")
+        return(sprintf("no (%s)", paste0(stat, collapse = ", ")))
+    }
+    
+    check <- sapply(allBackends, checkAvail)
+    
+    if (verbose)
+    {
+        for (b in allBackends)
+            printf("Backend '%s': %s\n", b, check[[b]])
+    }
+    
+    return(invisible(names(check[sapply(check, identical, "yes")])))
 }

@@ -205,9 +205,8 @@ newProjectFeaturesServer <- function(id, ionization, settings)
             rValues$featEICParams <- list(
                 methodMZ = input$methodMZ,
                 methodIMS = input$methodIMS,
-                suspects = input$featEICSuspectList,
-                suspectsPos = input$featEICSuspectListPos,
-                suspectsNeg = input$featEICSuspectListNeg,
+                suspects = list(single = input$featEICSuspectList,
+                                sets = list(pos = input$featEICSuspectListPos, neg = input$featEICSuspectListNeg)),
                 peaksAlgo = input$peaksAlgo
             )
         })
@@ -325,7 +324,20 @@ newProjectFeaturesServer <- function(id, ionization, settings)
         output <- exportShinyOutputVal(output, "ionization", ionization)
         
         list(
-            valid = \() TRUE,
+            valid = reactive({
+                suspEmpty <- (ionization() != "both" && !nzchar(input$suspectList)) ||
+                    (ionization() == "both" && !nzchar(input$suspectListPos))
+                suspEICEmpty <- (ionization() != "both" && !nzchar(rValues$featEICParams$suspects$single)) ||
+                    (ionization() == "both" && !nzchar(rValues$featEICParams$suspects$pos))
+                if (input$featAlgo == "EIC" && rValues$featEICParams$methodMZ == "suspects" && suspEmpty &&
+                    suspEICEmpty)
+                {
+                    list(title = "No suspect list",
+                         msg = "Please select suspect data when finding features from suspect EICs!")
+                }
+                else
+                    TRUE
+            }),
             settings = reactive(list(
                 featAlgo = input$featAlgo,
                 featEICParams = rValues$featEICParams,

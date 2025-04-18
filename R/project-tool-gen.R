@@ -267,7 +267,7 @@ genScriptInitBlock <- function(anaInfoData, destination, ionization, settingsAna
     }
 }
 
-genScriptSuspListsBlock <- function(ionization, settingsFeat, doSusps, doISTDs, generator)
+genScriptSuspListsBlock <- function(ionization, settingsFeat, doSusps, doFeatEICSusps, doISTDs, generator)
 {
     generator$addHeader("setup suspect lists")
     
@@ -285,9 +285,31 @@ genScriptSuspListsBlock <- function(ionization, settingsFeat, doSusps, doISTDs, 
         }
     }
     
-    if (doISTDs)
+    if (doFeatEICSusps)
     {
         if (doSusps)
+            generator$addNL()
+        generator$addComment("Init feature EIC suspect list")
+        
+        copySusps <- (ionization != "both" && !nzchar(settingsFeat$featEICParams$suspects$single)) ||
+            (ionization == "both" && !nzchar(settingsFeat$featEICParams$suspects$sets$pos))
+        if (copySusps)
+        {
+            if (ionization != "both")
+                generator$addAssignment("suspListEIC", "suspList")
+            else
+            {
+                generator$addAssignment("suspListEICPos", "suspListPos")
+                generator$addAssignment("suspListEICNeg", "suspListNeg")
+            }
+        }
+        else
+            generator$addLoadSuspList(ionization, settingsFeat$featEICParams$suspects, "suspListEIC")
+    }
+    
+    if (doISTDs)
+    {
+        if (doSusps || doFeatEICSusps)
             generator$addNL()
         
         doEx <- (ionization != "both" && !nzchar(settingsFeat$fGroupsAdv$ISTDLists$single)) ||
@@ -307,19 +329,29 @@ genScriptSuspListsBlock <- function(ionization, settingsFeat, doSusps, doISTDs, 
 
 genScriptFeaturesBlock <- function(ionization, settingsFeat, generator)
 {
-    addFindFeatures <- function(varName, anaInfoVarName)
+    addFindFeatures <- function(varName, anaInfoVarName, suspEICL, suspEICA)
     {
+        peakParams <- if (settingsFeat$featAlgo == "EIC")
+            sprintf("getDefEICPeakParams(\"%s\")", settingsFeat$featEICParams$peaksAlgo)
+        
+        fa <- settingsFeat$featAlgo
         generator$addCall(varName, "findFeatures", list(
             list(value = anaInfoVarName),
-            list(value = if (settingsFeat$featAlgo == "XCMS") "xcms3" else tolower(settingsFeat$featAlgo), quote = TRUE),
-            list(name = "noiseThrInt", value = 1000, condition = settingsFeat$featAlgo == "OpenMS"),
-            list(name = "chromSNR", value = 3, condition = settingsFeat$featAlgo == "OpenMS"),
-            list(name = "chromFWHM", value = 5, condition = settingsFeat$featAlgo == "OpenMS"),
-            list(name = "minFWHM", value = 1, condition = settingsFeat$featAlgo == "OpenMS"),
-            list(name = "maxFWHM", value = 30, condition = settingsFeat$featAlgo == "OpenMS"),
-            list(name = "kmeans", value = TRUE, condition = settingsFeat$featAlgo == "KPIC2"),
-            list(name = "level", value = 1000, condition = settingsFeat$featAlgo == "KPIC2"),
-            list(name = "doFMF", value = TRUE, condition = settingsFeat$featAlgo == "Bruker")
+            list(value = if (fa == "XCMS") "xcms3" else tolower(fa), quote = TRUE),
+            list(name = "noiseThrInt", value = 1000, condition = fa == "OpenMS"),
+            list(name = "chromSNR", value = 3, condition = fa == "OpenMS"),
+            list(name = "chromFWHM", value = 5, condition = fa == "OpenMS"),
+            list(name = "minFWHM", value = 1, condition = fa == "OpenMS"),
+            list(name = "maxFWHM", value = 30, condition = fa == "OpenMS"),
+            list(name = "kmeans", value = TRUE, condition = fa == "KPIC2"),
+            list(name = "level", value = 1000, condition = fa == "KPIC2"),
+            list(name = "featParams", value = "featParams", condition = fa == "EIC"),
+            list(name = "peakParams", value = peakParams, condition = fa == "EIC"),
+            list(name = "suspects", value = suspEICL,
+                 condition = fa == "EIC" && settingsFeat$featEICParams$methodMZ == "suspects"),
+            list(name = "adduct", value = suspEICA, quote = TRUE,
+                 condition = fa == "EIC" && settingsFeat$featEICParams$methodMZ == "suspects"),
+            list(name = "doFMF", value = TRUE, condition = fa == "Bruker")
         ))
     }
     
@@ -328,15 +360,42 @@ genScriptFeaturesBlock <- function(ionization, settingsFeat, generator)
     if (settingsFeat$fGroupsAlgo != "SIRIUS") # NOTE: never the case with sets
     {
         generator$addComment("Find all features")
-        generator$addComment(sprintf("NOTE: see the %s manual for many more options",
-                                     if (settingsFeat$featAlgo == "OpenMS") "reference" else settingsFeat$featAlgo),
+        generator$addComment("NOTE: see the reference manual for many more options",
                              condition = !settingsFeat$featAlgo %in% c("Bruker", "SIRIUS"))
+        
+        if (settingsFeat$featAlgo == "EIC")
+        {
+            # UNDONE: handle IMS mode
+            mmz <- settingsFeat$featEICParams$methodMZ; mims <- settingsFeat$featEICParams$methodIMS
+            def <- list(
+                bins = getFeaturesEICsParams("bins", "bins"),
+                susp = getFeaturesEICsParams("suspects", "suspects"),
+                ms2 = getFeaturesEICsParams("ms2", "ms2")
+            )
+            
+            generator$addCall("featParams", "getDefEICParams", list(
+                list(name = "methodMZ", value = mmz, quote = TRUE),
+                list(name = "methodIMS", value = mims, quote = TRUE),
+                list(name = "mzRange", value = def$bins$mzRange, condition = mmz == "bins"),
+                list(name = "mzStep", value = def$bins$mzStep, condition = mmz == "bins"),
+                list(name = "mobRange", value = def$bins$mobRange, condition = mims == "bins"),
+                list(name = "mobStep", value = def$bins$mobStep, condition = mims == "bins"),
+                list(name = "rtWindow", value = def$susp$rtWindow, condition = mmz == "suspects"),
+                list(name = "mzWindow", value = def$susp$mzWindow, condition = mmz == "suspects"),
+                list(name = "IMSWindow", value = def$susp$IMSWindow, condition = mims == "suspects"),
+                list(name = "rtWindow", value = def$ms2$rtWindow, condition = mmz == "ms2"),
+                list(name = "mzWindow", value = def$ms2$mzWindow, condition = mmz == "ms2"),
+                list(name = "IMSWindow", value = def$ms2$IMSWindow, condition = mims == "ms2"),
+                list(name = "minTIC", value = def$ms2$minTIC, condition = mmz == "ms2")
+            ))
+        }
+        
         if (ionization != "both")
-            addFindFeatures("fList", "anaInfo")
+            addFindFeatures("fList", "anaInfo", "suspectsEIC", if (ionization == "positive") "[M+H]+" else "[M-H]-")
         else
         {
-            addFindFeatures("fListPos", "anaInfoPos")
-            addFindFeatures("fListNeg", "anaInfoNeg")
+            addFindFeatures("fListPos", "anaInfoPos", "suspectsEICPos", "[M+H]+")
+            addFindFeatures("fListNeg", "anaInfoNeg", "suspectsEICNeg", "[M-H]-")
             generator$addCall("fList", "makeSet", list(
                 list(value = "fListPos"),
                 list(value = "fListNeg"),
@@ -723,6 +782,7 @@ getScriptCode <- function(anaInfoData, settings)
     ionization <- settings$general$ionization
     doSusps <- settings$features$exSuspList || (ionization != "both" && nzchar(settings$features$suspects$single)) ||
         (ionization == "both" && nzchar(settings$features$suspects$sets$pos))
+    doFeatEICSusps <- settings$features$featAlgo == "EIC" && settings$features$featEICParams$methodMZ == "suspects"
     doFGNorm <- settings$features$fGroupsAdv$featNorm != "none" || settings$features$fGroupsAdv$groupNorm
     doISTDs <- doFGNorm && settings$features$fGroupsAdv$featNorm == "istd"
     amendScrForTPs <- doSusps && settings$TP$doTPs && settings$TP$TPGen != "Logic" && settings$TP$TPGenInput == "screening"
@@ -745,8 +805,8 @@ getScriptCode <- function(anaInfoData, settings)
     genScriptInitBlock(anaInfoData, settings$general$destination, ionization, settings$analyses, settings$preTreatment,
                        generator)
 
-    if (doSusps || doISTDs)
-        genScriptSuspListsBlock(ionization, settings$features, doSusps, doISTDs, generator)
+    if (doSusps || doFeatEICSusps || doISTDs)
+        genScriptSuspListsBlock(ionization, settings$features, doSusps, doFeatEICSusps, doISTDs, generator)
         
     genScriptFeaturesBlock(ionization, settings$features, generator)
     

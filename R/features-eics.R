@@ -44,7 +44,7 @@ removeDuplicateFeatsSusps <- function(tab, checkRet, selectTopIntens, nameCol)
     return(tab[duplicate == FALSE][, duplicate := NULL])
 }
 
-getFeatEICsInfo <- function(params, withIMS, MS2Info)
+getFeatEICsInfo <- function(params, suspects, withIMS, MS2Info)
 {
     EICInfo <- NULL
     if (params$methodMZ == "bins")
@@ -56,7 +56,7 @@ getFeatEICsInfo <- function(params, withIMS, MS2Info)
         EICInfo <- data.table(mzmin = binsMZ, mzmax = binsMZ + params$mzStep, EIC_ID_MZ = names(binsMZ))
     }
     else if (params$methodMZ == "suspects")
-        EICInfo <- data.table(mzmin = params$suspects$mz - params$mzWindow, mzmax = params$suspects$mz + params$mzWindow)
+        EICInfo <- data.table(mzmin = suspects$mz - params$mzWindow, mzmax = suspects$mz + params$mzWindow)
     else if (params$methodMZ == "ms2")
         EICInfo <- data.table(mzmin = MS2Info$mz - params$mzWindow, mzmax = MS2Info$mz + params$mzWindow)
     
@@ -75,8 +75,8 @@ getFeatEICsInfo <- function(params, withIMS, MS2Info)
         }
         else if (params$methodIMS == "suspects")
         {
-            EICInfo <- EICInfo[, c("mobmin", "mobmax") := .(params$suspects$mobility - params$IMSWindow,
-                                                            params$suspects$mobility + params$IMSWindow)]
+            EICInfo <- EICInfo[, c("mobmin", "mobmax") := .(suspects$mobility - params$IMSWindow,
+                                                            suspects$mobility + params$IMSWindow)]
         }
         else if (params$methodIMS == "ms2")
         {
@@ -167,35 +167,37 @@ setMethod("initialize", "featuresEICs",
           function(.Object, ...) callNextMethod(.Object, algorithm = "eics", ...))
 
 #' @export
-findFeaturesEICs <- function(analysisInfo, featParams, peakParams, minIntensityIMS = 25, verbose = TRUE)
+findFeaturesEICs <- function(analysisInfo, featParams, peakParams, suspects = NULL, adduct = NULL, minIntensityIMS = 25,
+                             verbose = TRUE)
 {
     # UNDONE: add refs to docs, and highlight changes
     # UNDONE: use BP intensity?
     # UNDONE: test empties, eg no EICs
     
+    if (!is.null(adduct))
+        adduct <- checkAndToAdduct(adduct)
+    
     ac <- checkmate::makeAssertCollection()
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, add = ac)
     assertFeaturesEICsParams(featParams, add = ac)
     assertFindPeakParams(peakParams, add = ac)
+    assertSuspectList(suspects, needsAdduct = is.null(adduct), skipInvalid = featParams$skipInvalid,
+                      .var.name = .var.name, add = add)
     checkmate::assertNumber(minIntensityIMS, lower = 0, finite = TRUE, add = ac)
     checkmate::assertFlag(verbose, add = ac)
     checkmate::reportAssertions(ac)
     
     maybePrintf <- \(...) if (verbose) printf(...)
     
-    if (!is.null(featParams[["adduct"]]))
-        featParams$adduct <- checkAndToAdduct(featParams$adduct)
-    
     if (featParams$methodMZ == "suspects")
     {
-        featParams$suspects <- prepareSuspectList(featParams$suspects, adduct = featParams$adduct,
-                                                  skipInvalid = featParams$skipInvalid, checkDesc = TRUE,
-                                                  prefCalcChemProps = featParams$prefCalcChemProps,
-                                                  neutralChemProps = featParams$neutralChemProps)
-        featParams$suspectsOrig <- featParams$suspects
-        featParams$suspects <- removeDuplicateFeatsSusps(featParams$suspects, FALSE, FALSE, "name")
-        featParams$suspects <- featParams$suspects[order(mz)]
-        suspsRM <- setdiff(featParams$suspectsOrig$name, featParams$suspects$name)
+        suspects <- prepareSuspectList(suspects, adduct = adduct, skipInvalid = featParams$skipInvalid,
+                                       checkDesc = TRUE, prefCalcChemProps = featParams$prefCalcChemProps,
+                                       neutralChemProps = featParams$neutralChemProps)
+        suspectsOrig <- suspects
+        suspects <- removeDuplicateFeatsSusps(suspects, FALSE, FALSE, "name")
+        suspects <- suspects[order(mz)]
+        suspsRM <- setdiff(suspectsOrig$name, suspects$name)
         maybePrintf("The following %d non-unique suspects were removed %s.\n", length(suspsRM),
                     getStrListWithMax(suspsRM, 10, ", "))
     }
@@ -254,7 +256,7 @@ findFeaturesEICs <- function(analysisInfo, featParams, peakParams, minIntensityI
             }
             
             EICs <- EICInfo <- NULL
-            EICInfoMZ <- getFeatEICsInfo(featParams, withIMS = FALSE, MS2Info = MS2Info)
+            EICInfoMZ <- getFeatEICsInfo(featParams, suspects, withIMS = FALSE, MS2Info = MS2Info)
             if (withIMS)
             {
                 maybePrintf("Pre-checking %d m/z EICs... ", nrow(EICInfoMZ))
@@ -267,7 +269,7 @@ findFeaturesEICs <- function(analysisInfo, featParams, peakParams, minIntensityI
                 # remove complete m/z bins that were filtered out before
                 temp <- EICInfoMZ[, c("mzmin", "mzmax"), with = FALSE]
                 setkeyv(temp, c("mzmin", "mzmax"))
-                EICInfoMob <- getFeatEICsInfo(featParams, withIMS = TRUE, MS2Info = MS2Info)
+                EICInfoMob <- getFeatEICsInfo(featParams, suspects, withIMS = TRUE, MS2Info = MS2Info)
                 ov <- foverlaps(EICInfoMob, temp, type = "within", nomatch = NULL, which = TRUE)
                 EICInfo <- EICInfoMob[ov$xid]
                 
@@ -299,14 +301,14 @@ findFeaturesEICs <- function(analysisInfo, featParams, peakParams, minIntensityI
                 peaks[, binMobStart := EICInfo[match(peaks$EIC_ID, EIC_ID)]$mobmin]
                 peaks <- peaks[between(mobility, binMobStart + featParams$mobStep/4, binMobStart + featParams$mobStep/4*3) == TRUE]
             }
-            if (featParams$methodMZ == "suspects" && is.finite(featParams$rtWindow) && !is.null(featParams$suspects[["rt"]]))
+            if (featParams$methodMZ == "suspects" && is.finite(featParams$rtWindow) && !is.null(suspects[["rt"]]))
             {
                 # only keep peaks with at least one closely eluting suspect
                 peaks[, keep := {
-                    susp <- featParams$suspectsOrig[numLTE(abs(mz - omz), featParams$mzWindow) &
-                                                        numLTE(abs(rt - ort), featParams$rtWindow),
-                                                    env = list(omz = mz, ort = ret)]
-                    if (identical(featParams[["methodIMS"]], "ms2") && !is.null(featParams$suspects[["mobility"]]))
+                    susp <- suspectsOrig[numLTE(abs(mz - omz), featParams$mzWindow) &
+                                             numLTE(abs(rt - ort), featParams$rtWindow),
+                                         env = list(omz = mz, ort = ret)]
+                    if (identical(featParams[["methodIMS"]], "ms2") && !is.null(suspects[["mobility"]]))
                         susp <- susp[numLTE(abs(mobility - omob), featParams$IMSWindow), env = list(omob = mobility)]
                     nrow(susp) > 0
                 }, by = .I]

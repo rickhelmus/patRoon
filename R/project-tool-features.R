@@ -153,7 +153,7 @@ newProjectFeaturesServer <- function(id, ionization, settings)
                             height = 75,
                             width = "97.5%", # 97.5% is from the 2x 95% widths for the method selectInputs
                             fileSelect(ns("featEICSuspectList"), ns("featEICSuspectListButton"), "Suspect list",
-                                       rValues$featEICParams$suspects,
+                                       rValues$featEICParams$suspects$single,
                                        placeholder = "Empty for same as Features tab")
                         )
                     ),
@@ -165,13 +165,13 @@ newProjectFeaturesServer <- function(id, ionization, settings)
                             fillCol(
                                 width = "95%",
                                 fileSelect(ns("featEICSuspectListPos"), ns("featEICSuspectListButtonPos"),
-                                           "Suspect list (positive)", rValues$featEICParams$suspectsPos,
+                                           "Suspect list (positive)", rValues$featEICParams$suspects$sets$pos,
                                            placeholder = "Empty for same as Features tab")
                             ),
                             fillCol(
                                 width = "95%",
                                 fileSelect(ns("featEICSuspectListNeg"), ns("featEICSuspectListButtonNeg"),
-                                           "Suspect list (negative)", rValues$featEICParams$suspectsNeg,
+                                           "Suspect list (negative)", rValues$featEICParams$suspects$sets$neg,
                                            placeholder = "Empty for same as positive")
                             )
                         )
@@ -328,6 +328,7 @@ newProjectFeaturesServer <- function(id, ionization, settings)
             valid = \() TRUE,
             settings = reactive(list(
                 featAlgo = input$featAlgo,
+                featEICParams = rValues$featEICParams,
                 fGroupsAlgo = input$fGroupsAlgo,
                 suspects = list(single = input$suspectList,
                                 sets = list(pos = input$suspectListPos, neg = input$suspectListNeg)),
@@ -348,9 +349,7 @@ defaultFeaturesSettings <- function()
         featEICParams = list(
             methodMZ = "bins",
             methodIMS = "bins",
-            suspects = "",
-            suspectsPos = "",
-            suspectsNeg = "",
+            suspects = list(single = "", sets = list(pos = "", neg = "")),
             peaksAlgo = "dietrich"
         ),
         fGroupsAdv = list(

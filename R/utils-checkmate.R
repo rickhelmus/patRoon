@@ -1157,9 +1157,6 @@ assertFeaturesEICsParams <- function(x, .var.name = checkmate::vname(x), add = N
         assertListVal(x, "skipInvalid", checkmate::assertFlag, .var.name = .var.name, add = add)
         assertListVal(x, "prefCalcChemProps", checkmate::assertFlag, .var.name = .var.name, add = add)
         assertListVal(x, "neutralChemProps", checkmate::assertFlag, .var.name = .var.name, add = add)
-        
-        assertListVal(x, "suspects", assertSuspectList, needsAdduct = is.null(x[["adduct"]]), skipInvalid = x$skipInvalid,
-                      .var.name = .var.name, add = add)
     }
     else if (x$methodMZ == "ms2")
     {

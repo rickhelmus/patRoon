@@ -568,31 +568,22 @@ genScriptAnnBlock <- function(ionization, settingsAnn, adductArg, doSusps, addMF
     
     generator$addHeader("annotation")
     
-    useFMF <- F# UNDONE settings$features$featAlgo == "Bruker" && settingsAnn$peakListGen == "Bruker"
     generator$addComment("Retrieve MS peak lists")
-    generator$addCall("avgMSListParams", "getDefAvgPListParams", list(name = "clusterMzWindow", value = 0.005))
+    generator$addCall("avgMSListParams", "getDefAvgPListParams", list(name = "clusterMzWindow", value = defaultLim("mz", "narrow")))
     generator$addCall("mslists", "generateMSPeakLists", list(
         list(value = "fGroups"),
-        list(value = "mzr", quote = TRUE, condition = settingsAnn$peakListGen == "mzR"),
-        list(value = if (useFMF) "brukerfmf" else "bruker", quote = TRUE, condition = settingsAnn$peakListGen == "Bruker"),
-        list(name = "maxMSRtWindow", value = 5, condition = !useFMF),
-        list(name = "precursorMzWindow", value = if (settingsAnn$DIA) "NULL" else settingsAnn$precursorMzWindow,
-             settingsAnn$peakListGen == "mzR"),
-        list(name = "bgsubtr", value = TRUE, condition = !useFMF && settingsAnn$peakListGen == "Bruker"),
-        list(name = "MSMSType", value = if (settingsAnn$DIA) "BBCID" else "MSMS", quote = TRUE,
-             condition = !useFMF && settingsAnn$peakListGen == "Bruker"),
-        list(name = "avgFeatParams", value = "avgMSListParams", condition = settingsAnn$peakListGen == "mzR"),
+        list(name = "maxMSRtWindow", value = defaultLim("retention", "narrow")),
+        list(name = "avgFeatParams", value = "avgMSListParams"),
         list(name = "avgFGroupParams", value = "avgMSListParams")
     ))
     generator$addComment("Rule based filtering of MS peak lists. You may want to tweak this. See the manual for more information.")
     generator$addCall("mslists", "filter", list(
         list(value = "mslists"),
-        list(name = "absMSIntThr", value = "NULL"),
-        list(name = "absMSMSIntThr", value = "NULL"),
-        list(name = "relMSIntThr", value = "NULL"),
-        list(name = "relMSMSIntThr", value = 0.05),
-        list(name = "topMSPeaks", value = "NULL"),
-        list(name = "topMSMSPeaks", value = 25)
+        list(name = "MSLevel", value = 2),
+        list(name = "absMinIntensity", value = "NULL"),
+        list(name = "absMinIntensity", value = 0.05),
+        list(name = "topMostPeaks", value = 25),
+        list(name = "maxMZOverPrec", value = 4)
     ))
     
     if (doForms)
@@ -614,6 +605,13 @@ genScriptAnnBlock <- function(ionization, settingsAnn, adductArg, doSusps, addMF
             list(name = "featThresholdAnn", value = 0.75),
             list(name = "setThresholdAnn", value = 0, condition = ionization == "both")
         ))
+        if ("formulas" %in% settingsAnn$estIDConf)
+        {
+            generator$addCall("formulas", "estimateIDLevels", list(
+                list(value = "formulas"),
+                list(name = "IDFile", value = "idlevelrules.yml", quote = TRUE)
+            ))
+        }
     }
     
     if (doComps)
@@ -676,9 +674,18 @@ genScriptAnnBlock <- function(ionization, settingsAnn, adductArg, doSusps, addMF
                 list(name = "updateScore", value = TRUE)
             ))
         }
+        if ("compounds" %in% settingsAnn$estIDConf)
+        {
+            generator$addCall("compounds", "estimateIDLevels", list(
+                list(value = "compounds"),
+                list(name = "MSPeakLists", value = "mslists", isNULL = !doForms),
+                list(name = "formulas", value = "formulas", isNULL = !doForms),
+                list(name = "IDFile", value = "idlevelrules.yml", quote = TRUE)
+            ))
+        }
     }
     
-    if (doSusps && settingsAnn$annotateSus && (doForms || doComps))
+    if (doSusps && "suspects" %in% settingsAnn$estIDConf && (doForms || doComps))
     {
         generator$addNL()
         generator$addComment("Annotate suspects")
@@ -687,7 +694,7 @@ genScriptAnnBlock <- function(ionization, settingsAnn, adductArg, doSusps, addMF
             list(name = "formulas", value = "formulas", isNULL = !doForms),
             list(name = "compounds", value = "compounds", isNULL = !doComps),
             list(name = "MSPeakLists", value = "mslists"),
-            list(name = "IDFile", value = "idlevelrules.yml", quote = TRUE, condition = settingsAnn$genIDLevelFile)
+            list(name = "IDFile", value = "idlevelrules.yml", quote = TRUE)
         ))
     }
 }
@@ -901,7 +908,8 @@ doCreateProject <- function(anaInfoTabs, settings)
     
     doSusps <- settings$features$exSuspList || (settings$general$ionization != "both" && nzchar(settings$features$suspects$single)) ||
         (settings$general$ionization == "both" && nzchar(settings$features$suspects$sets$pos))
-    if (doSusps && settings$annotation$annotateSus && settings$annotation$genIDLevelFile)
+    if (doSusps && "suspects" %in% settings$annotation$estIDConf &&
+        (!nzchar(settings$annotation$formulasAlgo) || !nzchar(settings$annotation$compoundsAlgo)))
         genIDLevelRulesFile(file.path(settings$general$destination, "idlevelrules.yml"))
     
     if ("HTML" %in% settings$report$reportGen)

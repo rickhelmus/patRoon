@@ -1,3 +1,12 @@
+getIDConfUIOpts <- function()
+{
+    return(c(
+        "Suspects" = "suspects",
+        "Formula candidates" = "formulas",
+        "Compound candidates" = "compounds"
+    ))
+}
+
 newProjectAnnotationUI <- function(id)
 {
     ns <- NS(id)
@@ -10,7 +19,7 @@ newProjectAnnotationUI <- function(id)
                 height = 100,
                 selectInput(ns("componAlgo"), "Component generation",
                             c("None" = "", "RAMClustR", "CAMERA", "OpenMS", "CliqueMS", "nontarget"),
-                            multiple = FALSE, width = "100%"),
+                            multiple = FALSE, width = "97.5%"),
                 conditionalPanel(
                     condition = "input.componAlgo != \"nontarget\" && input.componAlgo != \"\"",
                     ns = ns,
@@ -18,35 +27,23 @@ newProjectAnnotationUI <- function(id)
                 )
             ),
             fillRow(
-                height = 90,
+                height = 120,
                 fillCol(
-                    flex = c(1, NA),
-                    selectInput(ns("formulasAlgo"), "Formula generation",
-                                c("None" = "", "GenForm", "SIRIUS", "Bruker DataAnalysis" = "Bruker"),
-                                multiple = FALSE, width = "95%"),
-                    textNote("DataAnalysis only works with features from DataAnalysis")
+                    flex = NA,
+                    fillCol(
+                        height = 50,
+                        selectInput(ns("formulasAlgo"), "Formula generation",
+                                    c("None" = "", "GenForm", "SIRIUS", "Bruker DataAnalysis" = "Bruker"),
+                                    multiple = FALSE, width = "95%")
+                    ),
+                    fillCol(
+                        height = 25,
+                        textNote("DataAnalysis only works with features from DataAnalysis")    
+                    )
                 ),
                 selectInput(ns("compoundsAlgo"), "Compound identification",
                             c("None" = "", "SIRIUS+CSI:FingerID" = "SIRIUS", "MetFrag", "Library"),
-                            multiple = FALSE, width = "100%")
-            ),
-            conditionalPanel(
-                condition = "input.formulasAlgo != \"\" || input.compoundsAlgo != \"\"",
-                ns = ns,
-                fillRow(
-                    height = 110,
-                    fillCol(
-                        selectInput(ns("peakListGen"), "Peak list generator",
-                                    c("mzR", "Bruker DataAnalysis" = "Bruker"),
-                                    multiple = FALSE, width = "95%"),
-                        checkboxInput(ns("DIA"), "Data Independent Acquisition (DIA) MS/MS")
-                    ),
-                    conditionalPanel(
-                        condition = "input.peakListGen == \"mzR\" && !input.DIA",
-                        ns = ns,
-                        numericInput(ns("precursorMzWindow"), "MS/MS precursor m/z search window", 4, width = "100%"),
-                    )
-                )
+                            multiple = FALSE, width = "95%")
             ),
             conditionalPanel(
                 condition = "input.compoundsAlgo == \"Library\"",
@@ -56,7 +53,7 @@ newProjectAnnotationUI <- function(id)
                     fillCol(
                         width = "95%",
                         selectInput(ns("MSLibraryFormat"), "Library format",
-                                    c("MSP" = "msp", "MoNA JSON" = "json"), multiple = FALSE)
+                                    c("MSP" = "msp", "MoNA JSON" = "json"), multiple = FALSE, width = "100%")
                     ),
                     fillCol(
                         width = "95%",
@@ -64,22 +61,17 @@ newProjectAnnotationUI <- function(id)
                     )
                 )
             ),
-            conditionalPanel(
-                condition = "output.hasSuspects && (input.formulasAlgo != \"\" || input.compoundsAlgo != \"\")",
-                ns = ns,
-                fillRow(
+            
+            fillCol(
+                flex = NA,
+                fillCol(
                     height = 90,
-                    fillCol(
-                        strong("Suspect annotation"),
-                        checkboxInput(ns("annotateSus"), "Annotate suspects", TRUE, width = "100%"),
-                        conditionalPanel(
-                            condition = "input.annotateSus",
-                            ns = ns,
-                            checkboxInput(ns("genIDLevelFile"), "Generate template file with configurable identification levels",
-                                          width = "100%")
-                        ),
-                        textNote("Suspect annotation is currently only optimized for GenForm/MetFrag")
-                    )
+                    checkboxGroupInput(ns("estIDConf"), "Identification confidence estimation (if data is present)",
+                                       getIDConfUIOpts(), getIDConfUIOpts(), width = "100%"),
+                ),
+                fillCol(
+                    height = 25,
+                    textNote("ID confidence estimation is currently only optimized for GenForm/MetFrag")
                 )
             )
         )
@@ -95,13 +87,9 @@ newProjectAnnotationServer <- function(id, hasSuspects, settings)
             updateCheckboxInput(session, "selectIons", value = settings()$selectIons)
             updateSelectInput(session, "formulasAlgo", selected = settings()$formulasAlgo)
             updateSelectInput(session, "compoundsAlgo", selected = settings()$compoundsAlgo)
-            updateSelectInput(session, "peakListGen", selected = settings()$peakListGen)
-            updateCheckboxInput(session, "DIA", value = settings()$DIA)
-            updateNumericInput(session, "precursorMzWindow", value = settings()$precursorMzWindow)
             updateSelectInput(session, "MSLibraryFormat", selected = settings()$MSLibraryFormat)
             updateTextInput(session, "MSLibraryPath", value = settings()$MSLibraryPath)
-            updateCheckboxInput(session, "annotateSus", value = settings()$annotateSus)
-            updateCheckboxInput(session, "genIDLevelFile", value = settings()$genIDLevelFile)
+            updateCheckboxGroupInput(session, "estIDConf", selected = settings()$estIDConf)
         })
         
         observeEvent(input$MSLibraryPathButton, {
@@ -109,7 +97,7 @@ newProjectAnnotationServer <- function(id, hasSuspects, settings)
             if (!is.null(MSFile))
                 updateTextInput(session, "MSLibraryPath", value = MSFile)
         })
-        
+
         output <- exportShinyOutputVal(output, "hasSuspects", hasSuspects)
         
         list(
@@ -124,13 +112,9 @@ newProjectAnnotationServer <- function(id, hasSuspects, settings)
                 selectIons = input$selectIons,
                 formulasAlgo = input$formulasAlgo,
                 compoundsAlgo = input$compoundsAlgo,
-                peakListGen = input$peakListGen,
-                DIA = input$DIA,
-                precursorMzWindow = input$precursorMzWindow,
                 MSLibraryFormat = input$MSLibraryFormat,
                 MSLibraryPath = input$MSLibraryPath,
-                annotateSus = input$annotateSus,
-                genIDLevelFile = input$genIDLevelFile
+                estIDConf = input$estIDConf
             ))
         )
     })
@@ -143,24 +127,21 @@ defaultAnnotationSettings <- function()
         selectIons = TRUE,
         formulasAlgo = "",
         compoundsAlgo = "",
-        peakListGen = "mzR",
-        DIA = FALSE,
-        precursorMzWindow = 4,
         MSLibraryFormat = "msp",
         MSLibraryPath = "",
-        annotateSus = TRUE,
-        genIDLevelFile = TRUE
+        estIDConf = unname(getIDConfUIOpts())
     ))
 }
 
 upgradeAnnotationSettings <- function(settings)
 {
     # NOTE: this updates from first file version
-    ret <- modifyList(defaultAnnotationSettings(),
-                      settings[c("selectIons", "peakListGen", "DIA", "precursorMzWindow", "MSLibraryFormat",
-                                 "MSLibraryPath", "annotateSus", "genIDLevelFile")])
+    # NOTE: some settings are ignored (eg MSPL algos, DIA)
+    ret <- modifyList(defaultAnnotationSettings(), settings[c("selectIons", "MSLibraryFormat", "MSLibraryPath")])
     ret$componAlgo <- settings$components
     ret$formulasAlgo <- ret$formulaGen
     ret$compoundsAlgo <- ret$compIdent
+    if (!settings$annotateSus)
+        ret$estIDConf <- setdiff(ret$estIDConf, "suspects")
     return(ret)
 }

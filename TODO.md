@@ -62,9 +62,6 @@
 
 ## newProject()
 
-- update MSPL filters and set maxMZOverPrec (and other new?) by default
-- add estimateIDLevels()
-- remove precursorMzWindow
 - anaInfo.R
     - source(...) doesn't return anaInfo but a list, either subset that result or set anaInfo in the R file?
     - conc/norm conc are set to "NA_real_"
@@ -73,6 +70,7 @@
     - add im_collapse and timsconvert
 - remove default limits that are in limits.yml
 - copy limits file and UI to specify IMS default
+- move components to features tab?
 
 ## Param defaults
 

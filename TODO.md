@@ -68,9 +68,39 @@
 - conversion/anaInfo
     - see if getAllMSFilesFromAnaInfo() can be used, otherwise remove it
     - add im_collapse and timsconvert
+- remove conc column?
 - remove default limits that are in limits.yml
 - copy limits file and UI to specify IMS default
 - move components to features tab?
+- IMS changes
+    - General
+        - IMS mode: none, direct, post
+        - CCS calculation (bruker, agilent, etc)
+            - specify calib file for agilent
+    - Analyses
+        - Toggle IMS file type
+            - what to do if analyses are already present? Warn and remove? Or don't toggle and warn on project creation?
+        - Select right example anaInfo
+    - Conversion
+        - Toggle IMS to format?
+            - what to do if already present? Warn and remove? Or don't toggle and warn on project creation?
+    - Features
+        - None: disable IMS binning option for piek
+        - Post
+            - disable IMS binning option for piek
+            - Set peak algos for mobilograms and re-integration
+            - Option to predict CCS values for suspects
+        - Direct
+            - As post, but only enable piek for feature detection and enable mobility binning
+            - Set peak algos for mobilograms and re-integration
+    - Annotation
+        - Predict CCS values for compounds
+            - what to do if pubchemlite is already choosen?
+        - Change default for compounds to pubchemlite?
+    - Codegen
+        - Add mobility filters for suspects & compounds?
+        - Do assignMobilities() before/after suspect screening?
+            - after would make filter not needed
 
 ## Param defaults
 

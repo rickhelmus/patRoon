@@ -908,9 +908,13 @@ doCreateProject <- function(anaInfoTabs, settings)
     
     doSusps <- settings$features$exSuspList || (settings$general$ionization != "both" && nzchar(settings$features$suspects$single)) ||
         (settings$general$ionization == "both" && nzchar(settings$features$suspects$sets$pos))
-    if (doSusps && "suspects" %in% settings$annotation$estIDConf &&
-        (!nzchar(settings$annotation$formulasAlgo) || !nzchar(settings$annotation$compoundsAlgo)))
+    doFormAnn <- nzchar(settings$annotation$formulasAlgo); doCompAnn <- nzchar(settings$annotation$compoundsAlgo)
+    if ((doSusps && "suspects" %in% settings$annotation$estIDConf && (doFormAnn || doCompAnn)) ||
+        (doFormAnn && "formulas" %in% settings$annotation$estIDConf) ||
+        (doCompAnn && "compounds" %in% settings$annotation$estIDConf))
+    {
         genIDLevelRulesFile(file.path(settings$general$destination, "idlevelrules.yml"))
+    }
     
     if ("HTML" %in% settings$report$reportGen)
         genReportSettingsFile(file.path(settings$general$destination, "report.yml"))

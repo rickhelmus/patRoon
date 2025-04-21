@@ -133,7 +133,8 @@ newProject <- function(destPath = NULL)
                 (ionization() == "both" && nzchar(data$features$settings()$suspects$positive)))
         })
         data$annotations <- newProjectAnnotationServer("annotation", hasSusp, reactive(loadedSettings$annotation))
-        data$TPs <- newProjectTPServer("tp", hasSusp, reactive(loadedSettings$TP))
+        data$TPs <- newProjectTPServer("tp", hasSusp, reactive(data$annotations$settings()$formulasAlgo),
+                                       reactive(data$annotations$settings()$compoundsAlgo), reactive(loadedSettings$TP))
         data$report <- newProjectReportServer("report", reactive(loadedSettings$report))
         
         getSettings <- function() sapply(data, \(d) d$settings(), simplify = FALSE)

@@ -89,6 +89,7 @@
 - rename estimateIDLevels() and have the same name as annotateSuspects()?
     - estimateIDConfidence()?
 - minAbundanceFeatAbs/Rel: does it make sense to also filter fGroup peak lists? If not, remove and update docs.
+- default thresholds for ann forms/comps
 
 ## msdata
 
@@ -200,6 +201,7 @@
 - newProject()
     - importing old yml files, esp wrt file conversion
     - verify suspect/ISTD loading with all polarity options and examples
+    - creation of yml files
 
 
 ## Docs

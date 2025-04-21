@@ -521,13 +521,13 @@ genScriptScreenBlock <- function(ionization, settingsFeat, adductArg, amendScrFo
         generator$addScreenCall("list(suspListPos, suspListNeg)", adductArg, !amendScrForTPs)
 }
 
-genScriptTPScrBlock <- function(ionization, settingsTP, adductArg, amendScrForTPs, generator)
+genScriptTPInitBlock <- function(ionization, settingsTP, adductArg, amendScrForTPs, generator)
 {
-    adductArg$condition <- adductArg$condition && settingsTP$TPGen == "Logic"
+    adductArg$condition <- adductArg$condition && settingsTP$TPsAlgo == "logic"
     
     generator$addHeader("transformation products")
     
-    if (settingsTP$TPGen != "Logic" && settingsTP$TPGenInput == "suspects")
+    if (settingsTP$TPsAlgo != "logic" && settingsTP$TPGenInput == "suspects")
     {
         generator$addComment("Load parent suspect list")
         generator$addLoadSuspCall("suspListParents", settingsTP$TPSuspectList)
@@ -536,30 +536,38 @@ genScriptTPScrBlock <- function(ionization, settingsTP, adductArg, amendScrForTP
     
     generator$addComment("Obtain TPs")
     generator$addCall("TPs", "generateTPs", list(
-        list(value = tolower(settingsTP$TPGen), quote = TRUE),
+        list(value = settingsTP$TPsAlgo, quote = TRUE),
         list(name = "parents", value = switch(settingsTP$TPGenInput,
                                               suspects = "suspListParents",
                                               screening = "fGroups",
                                               all = "NULL"),
-             condition = settingsTP$TPGen != "Logic"),
-        list(value = "fGroups", condition = settingsTP$TPGen == "Logic"),
+             condition = settingsTP$TPsAlgo != "Logic"),
+        list(value = "fGroups", condition = settingsTP$TPsAlgo == "logic"),
         adductArg,
-        list(name = "type", value = "env", quote = TRUE, condition = settingsTP$TPGen == "BioTransformer"),
-        list(name = "transLibrary", value = "photolysis_ranked", quote = TRUE, condition = settingsTP$TPGen == "CTS"),
-        list(name = "generations", value = if (settingsTP$TPGen == "BioTransformer") 2 else 1,
-             condition = settingsTP$TPGen != "Logic"),
-        list(name = "calcSims", value = FALSE, condition = settingsTP$TPGen != "Logic")
+        list(name = "type", value = "env", quote = TRUE, condition = settingsTP$TPsAlgo == "biotransformer"),
+        list(name = "transLibrary", value = "photolysis_ranked", quote = TRUE, condition = settingsTP$TPsAlgo == "cts"),
+        list(name = "generations", value = if (settingsTP$TPsAlgo == "biotransformer") 2 else 1,
+             condition = settingsTP$TPsAlgo %in% c("biotransformer", "cts", "lobrary")),
+        list(name = "formulas", value = "formulas", condition = settingsTP$TPsAlgo == "ann_form"),
+        list(name = "compounds", value = "compounds", condition = settingsTP$TPsAlgo == "ann_comp"),
+        list(name = "TPsRef", value = "NULL", condition = settingsTP$TPsAlgo == "ann_comp"),
+        list(name = "fGroupsComps", value = "fGroups", condition = settingsTP$TPsAlgo == "ann_comp"),
+        list(name = "TPStructParams", value = "getDefTPStructParams()",
+             condition = settingsTP$TPsAlgo %in% c("biotransformer", "cts", "library", "ann_comp"))
     ))
     
-    generator$addNL()
-    generator$addComment("Screen TPs")
-    generator$addCall("suspListTPs", "convertToSuspects", list(
-        list(value = "TPs"),
-        list(name = "includeParents", value = FALSE)
-    ))
-    if (amendScrForTPs)
-        generator$addComment("Amend with TP screening")
-    generator$addScreenCall("suspListTPs", adductArg, am = if (amendScrForTPs) TRUE else NULL)
+    if (!settingsTP$TPsAlgo %in% c("ann_form", "ann_comp"))
+    {
+        generator$addNL()
+        generator$addComment("Screen TPs")
+        generator$addCall("suspListTPs", "convertToSuspects", list(
+            list(value = "TPs"),
+            list(name = "includeParents", value = FALSE)
+        ))
+        if (amendScrForTPs)
+            generator$addComment("Amend with TP screening")
+        generator$addScreenCall("suspListTPs", adductArg, am = if (amendScrForTPs) TRUE else NULL)
+    }
 }
 
 genScriptAnnBlock <- function(ionization, settingsAnn, adductArg, doSusps, addMFDB, generator)
@@ -699,7 +707,7 @@ genScriptAnnBlock <- function(ionization, settingsAnn, adductArg, doSusps, addMF
     }
 }
 
-genScriptTPCompBlock <- function(doFormAnn, doCompAnn, TPGen, generator)
+genScriptTPCompBlock <- function(doFormAnn, doCompAnn, TPsAlgo, generator)
 {
     generator$addHeader("Parent and TP linkage")
     
@@ -724,7 +732,7 @@ genScriptTPCompBlock <- function(doFormAnn, doCompAnn, TPGen, generator)
         list(name = "minSpecSimBoth", value = "NULL"),
         list(name = "minFragMatches", value = "NULL"),
         list(name = "minNLMatches", value = "NULL"),
-        list(name = "formulas", value = "formulas", isNULL = !doFormAnn, TPGen == "Logic")
+        list(name = "formulas", value = "formulas", isNULL = !doFormAnn, TPsAlgo == "logic")
     ))
     
     generator$addNL()
@@ -792,7 +800,10 @@ getScriptCode <- function(anaInfoData, settings)
     doFeatEICSusps <- settings$features$featAlgo == "EIC" && settings$features$featEICParams$methodMZ == "suspects"
     doFGNorm <- settings$features$fGroupsAdv$featNorm != "none" || settings$features$fGroupsAdv$groupNorm
     doISTDs <- doFGNorm && settings$features$fGroupsAdv$featNorm == "istd"
-    amendScrForTPs <- doSusps && settings$TP$doTPs && settings$TP$TPGen != "Logic" && settings$TP$TPGenInput == "screening"
+    doTPs <- nzchar(settings$TP$TPsAlgo)
+    doTPsStructScr <- doTPs && settings$TP$TPsAlgo %in% c("biotransformer", "cts", "library")
+    doTPsAnn <- doTPs && settings$TP$TPsAlgo %in% c("ann_form", "ann_comp")
+    amendScrForTPs <- doSusps && doTPsStructScr && settings$TP$TPGenInput == "screening"
     
     # This will be passed to script generators for suspect screening, annotation etc. We do the conditional here, so we
     # don't need to pass all the conditional variables to the generator functions.
@@ -826,21 +837,27 @@ getScriptCode <- function(anaInfoData, settings)
     if (doSusps)
         genScriptScreenBlock(ionization, settings$features, adductArg, amendScrForTPs, generator)
     
-    if (settings$TP$doTPs)
-        genScriptTPScrBlock(ionization, settings$TP, adductArg, amendScrForTPs, generator)
+    # NOTE: we do TPs from ann_form/ann_comp later as it needs feature annotations (and doesn't need screening of TP
+    # suspects)
+    if (doTPs && !doTPsAnn)
+        genScriptTPInitBlock(ionization, settings$TP, adductArg, amendScrForTPs, generator)
     
     if (nzchar(settings$annotation$formulasAlgo) || nzchar(settings$annotation$compoundsAlgo))
     {
-        addMFDB <- settings$TP$doTPs && settings$TP$TPGen != "Logic" && settings$TP$TPDoMFDB
+        addMFDB <- doTPsStructScr && settings$TP$TPDoMFDB
         genScriptAnnBlock(ionization, settings$annotation, adductArg, doSusps, addMFDB, generator)
     }
     
-    if (settings$TP$doTPs)
+    if (doTPs)
+    {
+        if (doTPsAnn)
+            genScriptTPInitBlock(ionization, settings$TP, adductArg, amendScrForTPs, generator)
         genScriptTPCompBlock(nzchar(settings$annotation$formulasAlgo), nzchar(settings$annotation$compoundsAlgo),
-                             settings$TP$TPGen, generator)
+                             settings$TP$TPsAlgo, generator)
+    }
     
     if (length(settings$report$reportGen) > 0)
-        genScriptReportBlock(settings$annotation, settings$report, settings$TP$doTPs, generator)
+        genScriptReportBlock(settings$annotation, settings$report, doTPs, generator)
     
     generator$addNL()
     

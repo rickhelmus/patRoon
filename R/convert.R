@@ -73,7 +73,7 @@ getMSConversionTypes <- function(algorithm, direction)
  
     if (direction == "input")
     {
-        return(switch(algo,
+        return(switch(algorithm,
                       pwiz = getMSFileTypes(),
                       openms = c("centroid", "profile"),
                       bruker = "raw",
@@ -81,7 +81,7 @@ getMSConversionTypes <- function(algorithm, direction)
                       timsconvert = "raw"))
     }
 
-    return(switch(algo,
+    return(switch(algorithm,
                   pwiz = c("centroid", "profile", "ims"),
                   openms = c("centroid"),
                   bruker = c("centroid", "profile"),
@@ -101,7 +101,9 @@ getMSConversionFormats <- function(algorithm, direction, type = NULL)
 
     ret <- if (direction == "input")
     {
-        if (algorithm == "openms")
+        if (algorithm == "pwiz")
+            getMSFileFormats()
+        else if (algorithm == "openms")
             c("mzML", "mzXML")
         else if (algorithm == "bruker")
             "bruker"

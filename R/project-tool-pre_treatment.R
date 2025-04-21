@@ -41,7 +41,7 @@ newProjectPreTreatServer <- function(id, ionization, settings)
         fTypes <- getMSConversionTypes(algo, dir)
         return(sapply(fTypes, function(ft)
         {
-            formats <- getMSConversionFormats(algo, ft, dir)
+            formats <- getMSConversionFormats(algo, dir, ft)
             return(setNames(paste0(ft, "_", formats), paste0(formats, " (", ft, ")")))
         }, simplify = FALSE))
     }

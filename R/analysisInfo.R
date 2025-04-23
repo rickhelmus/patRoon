@@ -15,6 +15,9 @@
 #'
 #' @author Ricardo Cunha (\email{cunha@@iuta.de}) and Rick Helmus (\email{r.helmus@@uva.nl})
 #'
+#' @templateVar what these functions
+#' @template uses-msdata
+#'
 #' @name analysisinfo-dataframe
 NULL
 

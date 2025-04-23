@@ -138,6 +138,9 @@ adjustReportSettings <- function(settings, adjSettings) return(modifyList(settin
 #'   files are removed unless they were recently created (controlled by the \code{keepUnusedPlots} setting, see previous
 #'   section). The \code{clearPath} argument can be used to completely remove any old files.
 #'
+#' @templateVar what \code{report}
+#' @template uses-msdata
+#'
 #' @note No data will be reported for feature groups in any of the reported objects (\code{formulas}, \code{compounds}
 #'   etc) which are \emph{not} present in the input \code{\link{featureGroups}} object (\code{fGroups}).
 #'

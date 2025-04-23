@@ -381,12 +381,15 @@ setMethod("delete", "features", function(obj, i = NULL, j = NULL, ...)
 #'   \code{\link[MetaClean]{calculateJaggedness}} and \code{\link[MetaClean]{calculateModality}}.
 #'
 #' @template parallel-arg
-#' 
+#'
+#' @templateVar what \code{calculatePeakQualities} and TIC/BPC related functions
+#' @template uses-msdata
+#'
 #' @references \insertRef{Chetnik2020}{patRoon}
 #'
 #' @return \code{calculatePeakQualities} returns a modified object amended with peak qualities and scores.
 #'
-#' @note For \code{calculatePeakQualities}: sometimes \pkg{MetaClean} may return \code{NA} for the \verb{Gaussian
+#' @note For \code{calculatePeakQualities}: sometimes \pkg{MetaClean} may return \code{NA} for the \emph{Gaussian
 #'   Similarity} metric, in which case it will be set to \samp{0}.
 #' @export
 setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessFactor,

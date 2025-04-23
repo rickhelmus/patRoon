@@ -306,6 +306,9 @@ convertMSFilesBruker <- function(inFiles, outFiles, formatTo = "mzML", centroid 
 #'   excluded to reduce computational times and file sizes. Setting \code{includeMSMS=TRUE} is primarily intended to
 #'   perform 'classical LC-MS workflows' with IMS data.
 #'
+#' @templateVar what \code{convertMSFilesIMSCollapse}
+#' @template uses-msdata
+#'
 #' @rdname MSConversion
 #' @export
 convertMSFilesIMSCollapse <- function(inFiles, outFiles, typeFrom, formatTo = "mzML", mzRange = NULL, mobilityRange = NULL,

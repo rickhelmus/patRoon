@@ -44,6 +44,9 @@ NULL
 #' @templateVar normParam compoundsNormalizeScores,formulasNormalizeScores
 #' @templateVar excludeParam compoundsExclNormScores,formulasExclNormScores
 #' @template norm-args
+#' 
+#' @templateVar what the report functions
+#' @template uses-msdata
 #'
 #' @note Any formulae and compounds for feature groups which are not present within \code{fGroups} (\emph{i.e.} because
 #'   it has been subset afterwards) will not be reported.

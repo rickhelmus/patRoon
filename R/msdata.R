@@ -49,7 +49,8 @@ NULL
 #'   even if the processing step does not require IMS data and non-IMS data is also available. Setting this to
 #'   \code{TRUE} probably result in some additional computational overhead, but may avoid any inconsistencies between
 #'   the IMS data and non-IMS data that may have been introduced during the conversion step of the latter. This option
-#'   is only relevant for the \code{mstoolkit} and \code{streamcraft} backends.
+#'   is only relevant for the \code{mstoolkit} and \code{streamcraft} backends (and if one of these backends is actually
+#'   used).
 #'
 #'   \item \code{patRoon.threads}: An \code{integer} value that indicates the number of threads to use for
 #'   parallelization (multithreading). The default is determined from the number of physical cores of the system

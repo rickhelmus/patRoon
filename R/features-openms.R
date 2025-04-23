@@ -77,6 +77,9 @@ setMethod("initialize", "featuresOpenMS",
 #' @templateVar what \code{findFeaturesOpenMS}
 #' @template uses-multiProc
 #' @template parallelization-cache_input
+#' 
+#' @templateVar what \code{findFeaturesOpenMS} with \code{useFFMIntensities=FALSE}
+#' @template uses-msdata
 #'
 #' @template refs-openms
 #'

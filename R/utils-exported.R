@@ -1284,6 +1284,20 @@ installc3sdb <- function(envname = "patRoon-c3sdb", clearEnv = FALSE, ...)
     reticulate::py_install("git+https://github.com/dylanhross/c3sdb", envname = envname, ...)
 }
 
+#' Automatically installs TIMSCONVERT
+#'
+#' Automatically installs the \href{https://gtluu.github.io/timsconvert/}{TIMSCONVERT} Python package
+#'
+#' This function uses \CRANpkg{reticulate} to install the \href{https://gtluu.github.io/timsconvert/}{TIMSCONVERT}
+#' Python package in a virtual environment.
+#'
+#' @param envname The name of the virtual Python environment to install \command{TIMSCONVERT} into. Passed to
+#'   \link[reticulate:py_install]{reticulate::py_install}. Set to \code{NULL} to not set any virtual Python environment.
+#' @param clearEnv Set to \code{TRUE} to remove the virtual environment if it already exists (using
+#'   \link[reticulate:virtualenv_remove]{reticulate::virtualenv_remove}). Ignored if \code{envname} is \code{NULL}.
+#'
+#' @references \insertRef{Luu2022}{patRoon}
+#'
 #' @export
 installTIMSCONVERT <- function(envname = "patRoon-TIMSCONVERT", clearEnv = FALSE, ...)
 {

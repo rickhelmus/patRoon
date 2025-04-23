@@ -29,10 +29,10 @@ NULL
 #'   }
 #'
 #' @slot screenInfo A (\code{\link{data.table}}) with results from suspect screening. This table will be amended with
-#'   annotation data when \code{annotateSuspects} is run.
+#'   annotation data when \code{estimateIDConfidence} is run.
 #' @slot MS2QuantMeta Metadata from \pkg{MS2Quant} filled in by \code{predictRespFactors}.
 #'
-#' @section Suspect annotation: The \code{annotateSuspects} method is used to annotate suspects after
+#' @section Suspect annotation: The \code{estimateIDConfidence} method is used to annotate suspects after
 #'   \code{\link{screenSuspects}} was used to collect suspect screening results and other workflow steps such as formula
 #'   and compound annotation steps have been completed. The annotation results, which can be acquired with the
 #'   \code{as.data.table} and \code{screenInfo} methods, amends the current screening data with the following columns:
@@ -47,7 +47,7 @@ NULL
 #'   peaks were annotated. If both formula and compound annotations are available then \code{annSimBoth} is calculated
 #'   after combining all the annotated peaks, otherwise \code{annSimBoth} equals the available value for
 #'   \code{annSimForm} or \code{annSimComp}. The similarity calculation can be configured with the \code{specSimParams}
-#'   argument to \code{annotateSuspects}.
+#'   argument to \code{estimateIDConfidence}.
 #'
 #'   \item \code{maxFrags} The maximum number of MS/MS fragments that can be matched for this suspect (based on the
 #'   \code{fragments_*} columns from the suspect list).
@@ -55,7 +55,7 @@ NULL
 #'   \item \code{maxFragMatches},\code{maxFragMatchesRel} The absolute and relative amount of experimental MS/MS peaks
 #'   that were matched from the fragments specified in the suspect list. The value for \code{maxFragMatchesRel} is
 #'   relative to the value for \code{maxFrags}. The calculation of this column is influenced by the
-#'   \code{checkFragments} argument to \code{annotateSuspects}.
+#'   \code{checkFragments} argument to \code{estimateIDConfidence}.
 #'
 #'   \item \code{estIDLevel} Provides an \emph{estimation} of the identification level, roughly following that of
 #'   \insertCite{Schymanski2014}{patRoon}. However, please note that this value is only an estimation, and manual
@@ -96,7 +96,7 @@ NULL
 #'   }
 #'
 #'   A template rules file can be generated with the \code{\link{genIDLevelRulesFile}} function, and this file can
-#'   subsequently passed to \code{annotateSuspects}. The file format is highly flexible and (sub)levels can be added or
+#'   subsequently passed to \code{estimateIDConfidence}. The file format is highly flexible and (sub)levels can be added or
 #'   removed if desired. Note that the default file is currently only suitable when annotation is performed with GenForm
 #'   and MetFrag, for other algorithms it is crucial to modify the rules.
 #'
@@ -307,22 +307,23 @@ setMethod("calculateTox", "featureGroupsScreening", function(fGroups, featureAnn
 #'   \verb{Suspect annotation} section for more details. If not specified then a default rules file will be used.
 #' @param logPath A directory path to store logging information. If \code{NULL} then logging is disabled.
 #'
-#' @return \code{annotateSuspects} returns a \code{featureGroupsScreening} object, which is a
+#' @return \code{estimateIDConfidence} returns a \code{featureGroupsScreening} object, which is a
 #'   \code{\link{featureGroups}} object amended with annotation data.
 #'
 #' @author Rick Helmus <\email{r.helmus@@uva.nl}>, Emma Schymanski <\email{emma.schymanski@@uni.lu}> (contributions to
 #'   identification level rules), Bas van de Velde (contributions to spectral similarity calculation).
 #'
-#' @aliases annotateSuspects
+#' @aliases estimateIDConfidence
 #' @export
-setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeakLists, formulas, compounds,
-                                                                 absMzDev = defaultLim("mz", "medium"),
-                                                                 checkFragments = c("mz", "formula", "compound"),
-                                                                 formulasNormalizeScores = "max",
-                                                                 compoundsNormalizeScores = "max",
-                                                                 IDFile = system.file("misc", "IDLevelRules.yml",
-                                                                                      package = "patRoon"),
-                                                                 logPath = file.path("log", "ident"))
+setMethod("estimateIDConfidence", "featureGroupsScreening", function(obj, MSPeakLists = NULL, formulas = NULL,
+                                                                     compounds = NULL,
+                                                                     absMzDev = defaultLim("mz", "medium"),
+                                                                     checkFragments = c("mz", "formula", "compound"),
+                                                                     formulasNormalizeScores = "max",
+                                                                     compoundsNormalizeScores = "max",
+                                                                     IDFile = system.file("misc", "IDLevelRules.yml",
+                                                                                          package = "patRoon"),
+                                                                     logPath = file.path("log", "ident"))
 {
     # NOTE: keep args in sync with sets method
     
@@ -339,24 +340,24 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
         assertCanCreateDir(logPath, add = ac)
     checkmate::reportAssertions(ac)
 
-    hash <- makeHash(fGroups, MSPeakLists, formulas, compounds, absMzDev, checkFragments, formulasNormalizeScores,
+    hash <- makeHash(obj, MSPeakLists, formulas, compounds, absMzDev, checkFragments, formulasNormalizeScores,
                      compoundsNormalizeScores, makeFileHash(IDFile))
-    cd <- loadCacheData("annotateSuspects", hash)
+    cd <- loadCacheData("estimateIDConfidence", hash)
     if (!is.null(cd))
         return(cd)
     
     IDLevelRules <- readIDLRules(IDFile)
     
-    if (nrow(screenInfo(fGroups)) == 0)
+    if (nrow(screenInfo(obj)) == 0)
     {
         cat("No suspect hits, nothing to annotate")
-        return(fGroups)
+        return(obj)
     }
         
         
     mzWithin <- function(mz1, mz2) abs(mz1 - mz2) <= absMzDev
 
-    si <- copy(screenInfo(fGroups))
+    si <- copy(screenInfo(obj))
     annCols <- suspAnnCols()
     si <- si[, setdiff(names(si), annCols), with = FALSE] # remove any previous results
     
@@ -463,13 +464,13 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
     if (length(rmCols) > 0)
         si <- si[, setdiff(names(si), rmCols), with = FALSE]
     
-    fGroups@screenInfo <- si
+    obj@screenInfo <- si
     
     close(prog)
     
-    saveCacheData("annotateSuspects", fGroups, hash)
+    saveCacheData("estimateIDConfidence", obj, hash)
     
-    return(fGroups)
+    return(obj)
 })
 
 #' @describeIn featureGroupsScreening Performs rule based filtering. This method builds on the comprehensive filter
@@ -632,7 +633,7 @@ setMethod("assignMobilities", "featureGroupsScreening", function(obj, mobPeakPar
 #'
 #'   \item \code{fragments_mz},\code{fragments_formula} One or more MS/MS fragments (specified as \emph{m/z} or
 #'   formulae, respectively). Multiple values can be specified by separating them with a semicolon (\verb{;}). This data
-#'   is used by \code{\link{annotateSuspects}} to report detected MS/MS fragments and calculate identification levels.
+#'   is used by \code{\link{estimateIDConfidence}} to report detected MS/MS fragments and calculate identification levels.
 #'   (\strong{optional})
 #'
 #'   }
@@ -740,7 +741,7 @@ numericIDLevel <- function(level)
 #' @details \code{genIDLevelRulesFile} Generates a template YAML file that is
 #'   used to configure the rules for automatic estimation of identification
 #'   levels. This file can then be used as input for
-#'   \code{\link{annotateSuspects}}.
+#'   \code{\link{estimateIDConfidence}}.
 #' @param out The file path to the target file.
 #' @param inLevels,exLevels A \link[=regex]{regular expression} for the
 #'   identification levels to include or exclude, respectively. For instance,

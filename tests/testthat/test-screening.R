@@ -105,7 +105,7 @@ test_that("Screen delete", {
                             disjunct.from = dupSuspGrps)
 })
 
-doAnnot <- function(...) annotateSuspects(..., logPath = NULL) # disable logging as it slow downs testing
+doEstIDC <- function(...) estimateIDConfidence(..., logPath = NULL) # disable logging as it slow downs testing
 
 # NOTE: try keep this in sync with MF tests for caching purposes
 hasMF <- TRUE # !is.null(getOption("patRoon.path.MetFragCL")) && nzchar(getOption("patRoon.path.MetFragCL"))
@@ -117,25 +117,25 @@ if (hasMF)
                           db = file.path(getTestDataPath(), "test-mf-db-isomers.csv"))
     forms <- doGenForms(fGroupsScrNoRT, plists, "genform", calculateFeatures = FALSE)
     
-    compsMF <- estimateIDLevels(compsMF, MSPeakLists = plists, formulas = forms)
-    compsMFMoNa <- estimateIDLevels(compsMFMoNa, MSPeakLists = plists, formulas = forms)
+    compsMF <- estimateIDConfidence(compsMF, MSPeakLists = plists, formulas = forms)
+    compsMFMoNa <- estimateIDConfidence(compsMFMoNa, MSPeakLists = plists, formulas = forms)
     
-    fGroupsAnnNothing <- doAnnot(fGroupsScr)
-    fGroupsAnnMF <- doAnnot(fGroupsScr, MSPeakLists = plists, formulas = forms, compounds = compsMF)
+    fGroupsAnnNothing <- doEstIDC(fGroupsScr)
+    fGroupsAnnMF <- doEstIDC(fGroupsScr, MSPeakLists = plists, formulas = forms, compounds = compsMF)
 
-    fGroupsAnnMoNA <- doAnnot(fGroupsScr, MSPeakLists = plists, formulas = forms, compounds = compsMFMoNa)
-    fGroupsOnlyForms <- doAnnot(fGroupsScr, MSPeakLists = plists, formulas = forms)
-    fGroupsAnnNoRT <- doAnnot(fGroupsScrNoRT, MSPeakLists = plists, formulas = forms, compounds = compsMFMoNa)
+    fGroupsAnnMoNA <- doEstIDC(fGroupsScr, MSPeakLists = plists, formulas = forms, compounds = compsMFMoNa)
+    fGroupsOnlyForms <- doEstIDC(fGroupsScr, MSPeakLists = plists, formulas = forms)
+    fGroupsAnnNoRT <- doEstIDC(fGroupsScrNoRT, MSPeakLists = plists, formulas = forms, compounds = compsMFMoNa)
     
     fGroupsAnnFragNoRT <- doScreen(fGroupsScr, suspsFrag[, -"rt"], onlyHits = TRUE)
-    fGroupsAnnFragNoRT <- doAnnot(fGroupsAnnFragNoRT, MSPeakLists = plists)
+    fGroupsAnnFragNoRT <- doEstIDC(fGroupsAnnFragNoRT, MSPeakLists = plists)
     fGroupsAnnFrag <- doScreen(fGroupsScr, suspsFrag, onlyHits = TRUE)
-    fGroupsAnnFrag <- doAnnot(fGroupsAnnFrag, MSPeakLists = plists)
+    fGroupsAnnFrag <- doEstIDC(fGroupsAnnFrag, MSPeakLists = plists)
     
     idlFrag <- getWorkPath("fragtest.yml")
     genIDLevelRulesFile(idlFrag, exLevels = "3a|c")
     fGroupsAnnFragFormNoRT <- doScreen(fGroups, suspsFragForm[, -"rt"], onlyHits = TRUE)
-    fGroupsAnnFragForm <- doAnnot(fGroupsAnnFragFormNoRT, MSPeakLists = plists, formulas = forms,
+    fGroupsAnnFragForm <- doEstIDC(fGroupsAnnFragFormNoRT, MSPeakLists = plists, formulas = forms,
                                   compounds = compsMF, IDFile = idlFrag)
 }
 
@@ -162,8 +162,8 @@ test_that("Suspect annotation works", {
     expect_equal(minIDLevel(fGroupsAnnMoNA), 2)
     expect_equal(minIDLevel(fGroupsAnnFrag), 1)
     
-    expect_equal(fGroupsAnnFrag, doAnnot(fGroupsAnnFrag, MSPeakLists = plists, checkFragments = "mz"))
-    expect_false(isTRUE(all.equal(fGroupsAnnFrag, doAnnot(fGroupsAnnFrag, MSPeakLists = plists, checkFragments = "formula"))))
+    expect_equal(fGroupsAnnFrag, doEstIDC(fGroupsAnnFrag, MSPeakLists = plists, checkFragments = "mz"))
+    expect_false(isTRUE(all.equal(fGroupsAnnFrag, doEstIDC(fGroupsAnnFrag, MSPeakLists = plists, checkFragments = "formula"))))
     expect_true(all(is.na(screenInfo(fGroupsAnnMF)$annSimBoth) |
                         screenInfo(fGroupsAnnMF)$annSimBoth >= pmax(screenInfo(fGroupsAnnMF)$annSimForm, screenInfo(fGroupsAnnMF)$annSimComp, na.rm = TRUE)))
 })
@@ -258,7 +258,7 @@ suspsEmpty <- data.table(name = "doesnotexist", SMILES = "C", mz = 12, adduct = 
 fGroupsScrEmpty <- doScreen(fGroups, suspsEmpty)
 
 if (hasMF)
-    fGroupsScrAnnEmpty <- doAnnot(fGroupsScrEmpty, MSPeakLists = plists, formulas = forms, compounds = compsMF)
+    fGroupsScrAnnEmpty <- doEstIDC(fGroupsScrEmpty, MSPeakLists = plists, formulas = forms, compounds = compsMF)
 
 test_that("Empty objects", {
     expect_length(doScreen(fGroupsEmpty, suspsEmpty), 0)

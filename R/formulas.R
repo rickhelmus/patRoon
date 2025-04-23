@@ -427,9 +427,9 @@ setMethod("plotScoresHash", "formulas", function(obj, index, groupName, analysis
 })
 
 #' @export
-setMethod("estimateIDLevels", "formulas", function(obj, absMzDev = defaultLim("mz", "medium"), normalizeScores = "max",
-                                                   IDFile = system.file("misc", "IDLevelRules.yml", package = "patRoon"),
-                                                   logPath = NULL, parallel = TRUE)
+setMethod("estimateIDConfidence", "formulas", function(obj, absMzDev = defaultLim("mz", "medium"), normalizeScores = "max",
+                                                       IDFile = system.file("misc", "IDLevelRules.yml", package = "patRoon"),
+                                                       logPath = NULL, parallel = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertNumber(absMzDev, lower = 0, finite = TRUE, add = ac)

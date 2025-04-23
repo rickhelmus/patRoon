@@ -182,7 +182,7 @@ test_that("as.data.table() works", {
 })
 
 formsGFJ <- doGenForms(fGroups, plists, "genform", specSimParams = getDefSpecSimParams(method = "jaccard"))
-formsGFIDL <- estimateIDLevels(formsGF)
+formsGFIDL <- estimateIDConfidence(formsGF)
 annSimCols <- getMergedConsCols("annSim", names(as.data.table(formsGFJ)), mergedConsensusNames(formsGFJ))
 test_that("annSims and IDLs", {
     # only annSims should be affected

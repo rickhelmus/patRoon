@@ -139,4 +139,14 @@ compoundTable <- function(...)
     annotations(...)
 }
 
+#' @details Please use \code{\link{estimateIDConfidence}} instead.
+#' @rdname patRoon-deprecated
+#' @export
+#' @keywords internal
+annotateSuspects <- function(...)
+{
+    .Deprecated("estimateIDConfidence")
+    estimateIDConfidence(...)
+}
+
 # nocov end

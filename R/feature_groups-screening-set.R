@@ -122,7 +122,7 @@ syncScreeningSetObjects <- function(obj, unsetFGroups)
 #'
 #'   \setsWFChangedMethods{
 #'
-#'   \item \code{annotateSuspects} Suspect annotation is performed per set. Thus, formula/compound ranks, estimated
+#'   \item \code{estimateIDConfidence} Suspect annotation is performed per set. Thus, formula/compound ranks, estimated
 #'   identification levels etc are calculated for each set. Subsequently, these results are merged in the final
 #'   \code{screenInfo}. In addition, an overall \code{formRank} and \code{compRank} column is created based on the
 #'   rankings of the suspect candidate in the set consensus data. Furthermore, an overall \code{estIDLevel} is generated
@@ -208,29 +208,30 @@ setMethod("delete", "featureGroupsScreeningSet", doSFGroupsScreeningDelete)
 
 #' @rdname featureGroupsScreening-class
 #' @export
-setMethod("annotateSuspects", "featureGroupsScreeningSet", function(fGroups, MSPeakLists, formulas, compounds,
-                                                                    absMzDev = defaultLim("mz", "medium"),
-                                                                    checkFragments = c("mz", "formula", "compound"),
-                                                                    formulasNormalizeScores = "max",
-                                                                    compoundsNormalizeScores = "max",
-                                                                    IDFile = system.file("misc", "IDLevelRules.yml",
-                                                                                         package = "patRoon"),
-                                                                    logPath = file.path("log", "ident"))
+setMethod("estimateIDConfidence", "featureGroupsScreeningSet", function(obj, MSPeakLists = NULL, formulas = NULL,
+                                                                        compounds = NULL,
+                                                                        absMzDev = defaultLim("mz", "medium"),
+                                                                        checkFragments = c("mz", "formula", "compound"),
+                                                                        formulasNormalizeScores = "max",
+                                                                        compoundsNormalizeScores = "max",
+                                                                        IDFile = system.file("misc", "IDLevelRules.yml",
+                                                                                             package = "patRoon"),
+                                                                        logPath = file.path("log", "ident"))
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertClass, . ~ MSPeakLists + formulas + compounds,
            c("MSPeakListsSet", "formulasSet", "compoundsSet"), null.ok = TRUE, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
-    unsetFGroups <- sapply(sets(fGroups), unset, obj = fGroups, simplify = FALSE)
-    unsetMSPeakLists <- checkAndUnSetOther(sets(fGroups), MSPeakLists, "MSPeakLists", TRUE)
-    unsetFormulas <- checkAndUnSetOther(sets(fGroups), formulas, "formulas", TRUE)
-    unsetCompounds <- checkAndUnSetOther(sets(fGroups), compounds, "compounds", TRUE)
+    unsetFGroups <- sapply(sets(obj), unset, obj = obj, simplify = FALSE)
+    unsetMSPeakLists <- checkAndUnSetOther(sets(obj), MSPeakLists, "MSPeakLists", TRUE)
+    unsetFormulas <- checkAndUnSetOther(sets(obj), formulas, "formulas", TRUE)
+    unsetCompounds <- checkAndUnSetOther(sets(obj), compounds, "compounds", TRUE)
     
-    logPath <- if (is.null(logPath)) rep(list(NULL), length(sets(fGroups))) else file.path(logPath, sets(fGroups))
+    logPath <- if (is.null(logPath)) rep(list(NULL), length(sets(obj))) else file.path(logPath, sets(obj))
     
     unsetFGroups <- Map(unsetFGroups, unsetMSPeakLists, unsetFormulas, unsetCompounds, logPath = logPath,
-                        f = annotateSuspects, MoreArgs = list(absMzDev = absMzDev,
+                        f = estimateIDConfidence, MoreArgs = list(absMzDev = absMzDev,
                                                               checkFragments = checkFragments,
                                                               formulasNormalizeScores = formulasNormalizeScores,
                                                               compoundsNormalizeScores = compoundsNormalizeScores,
@@ -238,14 +239,14 @@ setMethod("annotateSuspects", "featureGroupsScreeningSet", function(fGroups, MSP
     
     # re-generate so that annotation specific columns are added
     # NOTE: this will also clearout any previously added annotation columns
-    fGroups@screenInfo <- mergeScreeningSetInfos(unsetFGroups)
+    obj@screenInfo <- mergeScreeningSetInfos(unsetFGroups)
     
     # add non set specific columns
 
-    cols <- getAllSuspCols("formRank", names(screenInfo(fGroups)), mergedConsensusNames(fGroups))
+    cols <- getAllSuspCols("formRank", names(screenInfo(obj)), mergedConsensusNames(obj))
     if (length(cols) > 0)
     {
-        fGroups@screenInfo[, formRank := {
+        obj@screenInfo[, formRank := {
             if (is.na(formula) || !group %in% groupNames(formulas) || all(is.na(unlist(mget(cols)))))
                 NA_integer_
             else
@@ -256,13 +257,13 @@ setMethod("annotateSuspects", "featureGroupsScreeningSet", function(fGroups, MSP
                 else
                     NA_integer_
             }
-        }, by = seq_len(nrow(fGroups@screenInfo))][]
+        }, by = seq_len(nrow(obj@screenInfo))][]
     }
 
-    cols <- getAllSuspCols("compRank", names(screenInfo(fGroups)), mergedConsensusNames(fGroups))
+    cols <- getAllSuspCols("compRank", names(screenInfo(obj)), mergedConsensusNames(obj))
     if (length(cols) > 0)
     {
-        fGroups@screenInfo[, compRank := {
+        obj@screenInfo[, compRank := {
             if (is.na(InChIKey) || !group %in% groupNames(compounds) || all(is.na(unlist(mget(cols)))))
                 NA_integer_
             else
@@ -273,12 +274,12 @@ setMethod("annotateSuspects", "featureGroupsScreeningSet", function(fGroups, MSP
                 else
                     NA_integer_
             }
-        }, by = seq_len(nrow(fGroups@screenInfo))][]
+        }, by = seq_len(nrow(obj@screenInfo))][]
     }
 
-    fGroups@screenInfo <- assignSetsIDLs(fGroups@screenInfo, mergedConsensusNames(fGroups))
+    obj@screenInfo <- assignSetsIDLs(obj@screenInfo, mergedConsensusNames(obj))
 
-    return(fGroups)
+    return(obj)
 })
 
 #' @rdname featureGroupsScreening-class

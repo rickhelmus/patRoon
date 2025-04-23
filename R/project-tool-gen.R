@@ -615,7 +615,7 @@ genScriptAnnBlock <- function(ionization, settingsAnn, adductArg, doSusps, addMF
         ))
         if ("formulas" %in% settingsAnn$estIDConf)
         {
-            generator$addCall("formulas", "estimateIDLevels", list(
+            generator$addCall("formulas", "estimateIDConfidence", list(
                 list(value = "formulas"),
                 list(name = "IDFile", value = "idlevelrules.yml", quote = TRUE)
             ))
@@ -684,7 +684,7 @@ genScriptAnnBlock <- function(ionization, settingsAnn, adductArg, doSusps, addMF
         }
         if ("compounds" %in% settingsAnn$estIDConf)
         {
-            generator$addCall("compounds", "estimateIDLevels", list(
+            generator$addCall("compounds", "estimateIDConfidence", list(
                 list(value = "compounds"),
                 list(name = "MSPeakLists", value = "mslists", isNULL = !doForms),
                 list(name = "formulas", value = "formulas", isNULL = !doForms),
@@ -697,7 +697,7 @@ genScriptAnnBlock <- function(ionization, settingsAnn, adductArg, doSusps, addMF
     {
         generator$addNL()
         generator$addComment("Annotate suspects")
-        generator$addCall("fGroups", "annotateSuspects", list(
+        generator$addCall("fGroups", "estimateIDConfidence", list(
             list(value = "fGroups"),
             list(name = "formulas", value = "formulas", isNULL = !doForms),
             list(name = "compounds", value = "compounds", isNULL = !doComps),

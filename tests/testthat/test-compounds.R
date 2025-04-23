@@ -286,8 +286,8 @@ test_that("MetFrag can timeout", {
 })
 
 compsMFJ <- callMF(fGroups, plists, specSimParams = getDefSpecSimParams(method = "jaccard"))
-compsMFIDL <- estimateIDLevels(compsMF)
-compsMFIDLF <- estimateIDLevels(compsMF, MSPeakLists = plists, formulas = forms)
+compsMFIDL <- estimateIDConfidence(compsMF)
+compsMFIDLF <- estimateIDConfidence(compsMF, MSPeakLists = plists, formulas = forms)
 annSimCols <- getMergedConsCols("annSim", names(as.data.table(compsMFJ)), mergedConsensusNames(compsMFJ))
 annSimColsF <- getMergedConsCols(c("annSim", "annSimForm", "annSimBoth"), names(as.data.table(compsMFIDLF)),
                                  mergedConsensusNames(compsMFIDLF))

@@ -415,7 +415,7 @@ setMethod("filter", "featureAnnotations", function(obj, minExplainedPeaks = NULL
         {
             cols <- getMergedConsCols("estIDLevel", names(annTable), mConsNames)
             if (length(cols) == 0)
-                stop("No estimated identification levels found. Please run estimateIDLevels() first.", call. = FALSE)
+                stop("No estimated identification levels found. Please run estimateIDConfidence() first.", call. = FALSE)
             
             annTable[keep == TRUE, keep := mark(do.call(pmin, c(lapply(.SD, numericIDLevel), list(na.rm = TRUE))) <= maxLevel),
                      .SDcols = cols]

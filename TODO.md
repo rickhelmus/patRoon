@@ -117,8 +117,6 @@
 
 ## TC
 
-- rename estimateIDLevels() and have the same name as annotateSuspects()?
-    - estimateIDConfidence()?
 - minAbundanceFeatAbs/Rel: does it make sense to also filter fGroup peak lists? If not, remove and update docs.
 - default thresholds for ann forms/comps
 
@@ -266,11 +264,14 @@
         - new filter names
         - generateMSPeakLists() usage
             - no more precursorMzWindow
+    - ann
+        - annotateSuspects() --> estimateIDConfidence()
+        - estimateIDConfidence() description for formulas/compounds
 - TC
     - ES contributions for IDLs
     - explicitly mention annSim can be filtered with scoreLimits?
     - annSim for sets is calculated as max
-    - annSimForm / annSimBoth are added by compounds method of estimateIDLevels() if formulas/MSPL are set, may be used for ID levels (not by default)
+    - annSimForm / annSimBoth are added by compounds method of estimateIDConfidence() if formulas/MSPL are set, may be used for ID levels (not by default)
     - reorderAnalyses(): doc that XCMS/XCMS3/KPIC2 fGroups internal slot is not updated, maybe also improve general docs for what is updated and for XCMS what it means for exporting data
     - MSPL
         - abundance columns in mspl --> section in generateMSPeakLists()?
@@ -367,7 +368,8 @@
 
 - TC
     - specSimParamsMatch --> specSimParams
-    - annotateSuspects() now copies annSims from feat annotations instead of calculating
+    - annotateSuspects() --> estimateIDConfidence()
+    - annotateSuspects()/estimateIDConfidence() now copies annSims from feat annotations instead of calculating
         - change in func args
         - annSimBoth is copied, so needs to be present in compounds (ie from IDLs)
     - annSuspects should be faster now (no need to calc annSims, and estIDLevel is faster)

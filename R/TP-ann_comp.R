@@ -157,7 +157,65 @@ getTPsCompounds <- function(annTable, parentRow, TPStructParams, extraOptsFMCSR,
 }
 
 
+#' Obtain transformation products (TPs) from compound annotation candidates
+#'
+#' Transforms and prioritizes \link[=compounds]{compound annotation candidates} to obtain TPs.
+#'
+#' The \code{generateTPsAnnComp} function implements the unknown TP screening from compound candidates approach as
+#' described in \insertCite{Helmus2025}{patRoon}. This algorithm does not rely on any known or predicted TPs and is
+#' therefore suitable for 'full non-target' workflows. For each of the input parents, \emph{all} compound candidates are
+#' ranked by the \code{TP score} to evaluate their likeliness to be a TP candidates. The TP score is calculated as
+#' \deqn{TP score = max(fitCompound,simSusp) + annSim}
+#'
+#' With: \itemize{
+#'
+#'   \item \code{annSim}: the \link[=id-conf]{annotation similarity}
+#'
+#'   \item \code{fitCompound}: the structural fit of the compound candidate into the parent (or vice versa, maximum is
+#'   taken). Calculated as the \code{"Overlap coefficient"} with \code{\link[fmcsR:fmcs]{fmcsR::fmcs}}.
+#'
+#'   \item \code{simSusp}: the maximum structural similarity with TP suspect candidates for this parent, \emph{i.e.}
+#'   obtained from other algorithms of \code{\link{generateTPs}}). The calculation is configured by the
+#'   \link[=getDefTPStructParams]{TPStructParams}.
+#'
+#' }
+#'
+#' To speed up the calculation process, several thresholds are applied to rule out unlikely candidates. These thresholds
+#' are defaulted to those derived in \insertCite{Helmus2025}{patRoon}. Nevertheless, calculations can take a very long
+#' time (multiple hours), especially when processing large numbers of candidates from \emph{e.g.} PubChem.
+#'
+#'
+#' Unlike most other TP generation algorithms, no additional suspect screening step is required.
+#'
+#' @param TPsRef A \code{\link{transformationProductsStructure}} object containing suspect TP candidates obtained for
+#'   the same \code{parents} from another TP generation algorithm (\emph{e.g.} \code{\link{generateTPsBioTransformer}}).
+#'   This is used for the calculation of \code{simSusps} (see Details). Set to \code{NULL} to skip its calculation.
+#' @param compounds The \code{\link{compounds}} object containing the compound candidates.
+#' @param fGroupsComps The \code{\link{featureGroups}} object for which the \code{compounds} were generated. This is
+#'   used to obtain retention times for the calculation for \link[=retDir]{retention order directions}. Set to
+#'   \code{NULL} to skip its calculation.
+#' @param minRTDiff Minimum retention time (in seconds) difference between the parent and a TP to calculate the
+#'   \link[=retDir]{retention order direction}. Candidates with unexpected retention orders are filtered out.
+#' @param minFitFormula,minFitCompound,minSimSusp Thresholds to filter out unlikely candidates. For \code{fitFormula}:
+#'   see \code{\link{generateTPsAnnForm}}, for the others see the Details section.
+#' @param minFitCompOrSimSusp A two-sized numeric vector specifying the thresholds for \code{fitCompound} \emph{or}
+#'   \code{simSusp}, respectively.
+#' @param extraOptsFMCSR A \code{list} with additional options passed to the \code{\link[fmcsR:fmcs]{fmcsR::fmcs}}
+#'   function. The following defaults are set: \code{au=1, bu=4, matching.mode="aromatic"}.
+#'
+#' @template parallel-arg
+#' @template tp_gen-scr
 #' @template tp_gen-struct_params
+#'
+#' @note Setting \code{parents} to a \code{compounds} object is technically possible, but probably not very useful and
+#'   is mainly supported for consistency with other TP generation algorithms.
+#'
+#'   Setting \code{parallel=TRUE} can speed up calculations considerably on multi-core systems. but will also add to RAM
+#'   usage. Furthermore, parallelization is only favorable for long calculations due to the overhead of setting up
+#'   multiple \R processes.
+#'
+#' @references \insertAllCited{} \cr\cr \insertRef{Wang2013}{patRoon}
+#'
 #' @export
 generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, fGroupsComps = NULL, minRTDiff = 20, minFitFormula = 0,
                                minFitCompound = 0, minSimSusp = 0, minFitCompOrSimSusp = c(0, 0),
@@ -166,11 +224,10 @@ generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, fGroupsComps =
                                parallel = TRUE)
 {
     # UNDONE: support >1 generations? Probably not really worthwhile...
-    # UNDONE: doc that FP params are also used for suspSim
     
     checkmate::assert(
         checkmate::checkClass(parents, "data.frame"),
-        checkmate::checkClass(parents, "compounds"), # UNDONE: doesn't make much sense here, but keep for consistency?
+        checkmate::checkClass(parents, "compounds"),
         checkmate::checkClass(parents, "featureGroupsScreening"),
         checkmate::checkClass(parents, "featureGroupsScreeningSet"),
         .var.name = "parents"

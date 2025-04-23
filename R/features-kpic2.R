@@ -223,9 +223,15 @@ importFeaturesKPIC2 <- function(picsList, analysisInfo)
 #' Converts a \code{\link{features}} object to an \pkg{KPIC} object.
 #'
 #' @param obj The \code{features} object that should be converted.
+#' 
 #' @template loadrawdata-arg
 #' @template IMS-arg
+#' 
 #' @param \dots Ignored
+#' 
+#' @templateVar what \code{getPICSet}
+#' @template uses-msdata
+#' 
 #' @rdname kpic2-conv
 #' @aliases getPICSet
 #' @export

@@ -874,6 +874,9 @@ setMethod("spectrumSimilarityMobility", "MSPeakLists", function(obj, fGroups, do
 #'   current interface is much faster and provides most of the previous functionality (and additional). However, please
 #'   provide feedback if you feel any functionality is missing.
 #'
+#' @templateVar what \code{generateMSPeakLists}
+#' @template uses-msdata
+#'
 #' @section Sets workflows: With a \link[=sets-workflow]{sets workflow}, the feature group averaged peak lists are made
 #'   per set. This is important, because for averaging peak lists cannot be mixed, for instance, when different
 #'   ionization modes were used to generate the sets. The group averaged peaklists are then simply combined and labelled

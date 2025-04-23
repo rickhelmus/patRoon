@@ -83,6 +83,9 @@ NULL
 #'   Assigned by the \code{\link{calculateConcs}}/\code{\link{calculateTox}} methods. Use the
 #'   \code{concentratrions}/\code{toxicities} methods for access.
 #'
+#' @templateVar what \code{calculatePeakQualities} and \code{assignMobilities}
+#' @template uses-msdata
+#'
 #' @author Rick Helmus <\email{r.helmus@@uva.nl}> and Ricardo Cunha <\email{cunha@@iuta.de}> (\code{getTICs} and
 #'   \code{getBPCs} functions)
 #'

@@ -77,6 +77,9 @@ NULL
 #'   \item \code{patRoon.cache.maxEntries}: a \code{numeric} specifying the maximum number of entries per cache
 #'   category (default is 100000). When this limit is exceeded, the oldest entries are automatically removed.
 #'
+#'   \item \code{patRoon.MS.backends},\code{patRoon.MS.preferIMS},\code{patRoon.threads},\code{patRoon.path.BrukerTIMS}:
+#'   Options related to the \link[=msdata]{raw data interface}.
+#'   
 #'   \item \code{patRoon.MP.maxProcs}: The maximum number of processes that should be initiated in parallel. A good
 #'   starting point is the number of physical cores, which is the default as detected by
 #'   \code{\link[parallel]{detectCores}}. This option is only used when \option{patRoon.MP.method="classic"}.
@@ -120,7 +123,7 @@ NULL
 #'   \url{https://bitbucket.org/djoumbou/biotransformer/src/master}.
 #'
 #'   }
-#'   
+#'
 #'   Most external dependencies are provided by \pkg{patRoonExt} or otherwise found in the system environment
 #'   \option{PATH} variable. However, the \code{patRoon.path.*} options should be set if this fails or you want to
 #'   override the location. The \code{\link{verifyDependencies}} function can be used to assess if dependencies are
@@ -178,7 +181,7 @@ NULL
 #' (\file{.mzML}, \file{.mzXML}). This is currently only used by \code{\link{findFeaturesSAFD}}.
 #'
 #' \item \code{ims} Specifies the directory to exported IMS-HRMS data (\file{.mzML}). This is required in IMS workflows,
-#' unless raw IMS-HRMS data is directly loaded with the OpenTIMS backend.
+#' unless raw IMS-HRMS data is directly loaded with the \link[=msdata]{OpenTIMS backend}.
 #'
 #' }
 #'
@@ -502,6 +505,9 @@ NULL
 #'   removes all selections for data removal.
 #'
 #' @template EICParams-arg
+#' 
+#' @templateVar what these functions
+#' @template uses-msdata
 #' 
 #' @note The \code{topMost} and \code{topMostByReplicate} EIC parameters (\code{\link{EICParams}}) are ignored.
 #'

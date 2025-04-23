@@ -4,8 +4,8 @@
 
 defaultPkgOpts <- function(pkgname)
 {
-    ret <- list(cache.mode = "both",
-                checkCentroided = TRUE,
+    ret <- list(checkCentroided = TRUE,
+                cache.mode = "both",
                 cache.fileName = "cache.sqlite",
                 cache.maxEntries = 100000,
                 MSBackends = getMSReadBackends(),

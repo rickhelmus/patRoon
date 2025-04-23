@@ -506,7 +506,7 @@ NULL
 #' @templateVar what these functions
 #' @template uses-msdata
 #' 
-#' @note The \code{topMost} and \code{topMostByReplicate} EIC parameters (\code{\link{EICParams}}) are ignored.
+#' @note The \code{topMost} and \code{topMostByReplicate} \link[EIXParams]{EIC parameters} are ignored.
 #'
 #' @references \insertRef{Chetnik2020}{patRoon}
 #'

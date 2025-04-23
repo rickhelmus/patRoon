@@ -375,10 +375,18 @@ getFCParams <- function(replicates, ...)
 #'
 #' @param ranges A \code{list} with for each analysis a \code{data.frame} with \code{numeric} columns \code{"retmin"},
 #'   \code{"retmax"}, \code{"mzmin"}, \code{"mzmax"} with the lower/upper ranges of the retention time and \emph{m/z}.
-#'   Furthermore, columns \code{"mobmin"} and \code{"mobmax"} can be added for IMS data.
+#'   Furthermore, columns \code{"mobmin"} and \code{"mobmax"} can be added for mobility lower/upper ranges in IMS data.
+#' @param output Should be \code{"fill"}, \code{"pad"} or \code{"raw"}. Internally, EIC data is compressed by omitting
+#'   any zero intensity data points. If \code{output="fill"} then the zero intensity points are re-added to obtain
+#'   continuous chromatograms. If \code{output="pad"} then zero intensity points are only re-added that surround others,
+#'   which is sufficient for \emph{e.g.} plotting. If \code{output="raw"} then the original compressed data is returned.
 #'
 #' @return A \code{list} with for each analysis a \code{list} with EIC data for each of the rows in \code{ranges}.
 #' 
+#'   If \code{output="raw"} then additional columns with \emph{e.g.} mean-averaged and base peak \emph{m/z} values for
+#'   each data point are returned. Furthermore, the \code{allXValues} attribute is set that can be used to obtain the
+#'   original retention time values to reconstruct the original complete chromatogram.
+#'
 #' @templateVar what \code{getEICs}
 #' @template uses-msdata
 #'

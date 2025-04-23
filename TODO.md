@@ -283,9 +283,9 @@
         - TPsComp/TPsForm
             - filter()
             - mention that suspect list parents are not filtered out from candidate list
-        - parallel=T is only useful with many candidates
         - update seealso for other TP classes
-        - docs for TP ann form/comp classes
+        - docs for TP ann form class
+    - tp_gen-scr: rewrite/move note about algo using structural data, as it doesn't make much sense for ann_comp
 - IMS
     - minIntensityIMS template, also for getEICs()
     - hasMobilities slot for features

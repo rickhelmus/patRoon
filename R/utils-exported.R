@@ -531,37 +531,47 @@ getBGMSMSPeaks <- function(anaInfo, replicates = NULL, MSLevel = 2, retentionRan
     return(ret[])
 }
 
-#' Extracted Ion Chromatogram parameters
+#' Extracted Ion Chromatogram and Mobilogram parameters
 #'
-#' Parameters for creation of extracted ion chromatograms.
+#' Parameters for creation of extracted ion chromatograms and mobilograms.
 #'
-#' To configure the creation of extracted ion chromatograms (EICs) several parameters exist:
+#' The following parameters exist to configure the creation of extracted ion chromatograms (EICs) and extracted ion
+#' mobilograms (EIMs):
 #'
 #' \itemize{
 #'
-#' \item \code{rtWindow} Retention time (in seconds) that will be subtracted/added to respectively the minimum and
-#' maximum retention time of the feature. Thus, setting this value to \samp{>0} will 'zoom out' on the retention time
-#' axis.
-#' 
-#' \item \code{topMost} Only create EICs for this number of top most intense features. If \code{NULL} then EICs are
-#' created for all features.
-#' 
-#' \item \code{topMostByReplicate} If set to \code{TRUE} and \code{topMost} is set: only create EICs for the top most
-#' features in each replicate. For instance, when \code{topMost=1} and \code{topMostByReplicate=TRUE}, then EICs will
-#' be plotted for the most intense feature of each replicate.
-#' 
-#' \item \code{onlyPresent} If \code{TRUE} then EICs are created only for analyses in which a feature was detected. If
-#' \code{onlyPresent=FALSE} then EICs are generated for \strong{all} analyses. The latter is handy to evaluate if a peak
-#' was 'missed' during feature detection or removed during \emph{e.g.} filtering.
-#' 
+#' \item \code{window} A value that is subtracted or added to the minimum and maximum retention time (EICs) or mobility
+#' (EIMs) of the feature. Thus, setting this value to \samp{>0} will 'zoom out' on the x-axis of a chromatogram or
+#' mobilogram.
+#'
+#' \item \code{topMost} Only create EICs/EIMs for this number of top most intense features. If \code{NULL} then
+#' EICs/EIMs are created for all features.
+#'
+#' \item \code{topMostByReplicate} If set to \code{TRUE} and \code{topMost} is set: only create EICs/EIMs for the top
+#' most features in each replicate. For instance, when \code{topMost=1} and \code{topMostByReplicate=TRUE}, then only
+#' the most intense feature of each replicate is considered.
+#'
+#' \item \code{onlyPresent} If \code{TRUE} then EICs/EIMs are created only for analyses in which a feature was detected,
+#' if \code{onlyPresent=FALSE} then data is generated for \strong{all} analyses. The latter is handy to evaluate if a
+#' peak was 'missed' during peak detection or removed during \emph{e.g.} filtering.
+#'
+#' \item \code{mzExpIMSWindow} Specifically for IMS data: additional \emph{m/z} tolerance on top of the feature limits.
+#' This is for IMS workflows where features were detected from centroided LC-MS like data, while EICs/EIMs are generated
+#' from raw IMS data. In this case the feature \emph{m/z} limits were derived from centroided data, which typically has
+#' smaller \emph{m/z} deviations across scans compared to IMS data. The \code{mzExpIMSWindow} parameter sets an
+#' additional \emph{m/z} tolerance to specifically handle this case.
+#'
+#' \item \code{minIntensityIMS} Raw intensity threshold for IMS data. This is primarily intended to speed up raw data
+#' processing.
+#'
 #' }
-#' 
+#'
 #' if \code{onlyPresent=FALSE} then the following parameters are also relevant: \itemize{
 #'
-#' \item \code{mzExpWindow} To create EICs for analyses in which no feature was found, the \emph{m/z} value is derived
-#' from the min/max values of all features in the feature group. The value of \code{mzExpWindow} further expands this
-#' window.
-#' 
+#' \item \code{mzExpWindow},\code{mobExpWindow} To create EICs or EIMs for analyses in which no feature was found, the
+#' \emph{m/z} or mobility value is derived from the min/max values of all features in the feature group. The value of
+#' \code{mzExpWindow} and \code{mobExpWindow} further expands this window to allow a greater tolerance.
+#'
 #' \item \code{setsAdductPos},\code{setsAdductNeg} \setsWF In sets workflows the adduct must be known to calculate the
 #' ionized \emph{m/z}. If a feature is completely absent in a particular set then it follows no adduct annotations are
 #' available and the value of \code{setsAdductPos} (positive ionization data) or \code{setsAdductNeg} (negative
@@ -569,12 +579,22 @@ getBGMSMSPeaks <- function(anaInfo, replicates = NULL, MSLevel = 2, retentionRan
 #'
 #' }
 #'
-#' These parameters are passed as a named \code{list} as the \code{EICParams} argument to functions that use EICs. The
-#' \code{getDefEICParams} function can be used to generate such parameter list with defaults.
+#' The following additional parameters exist specifically for EIMs (\code{EIMParams}): \itemize{
+#'
+#'   \item \code{maxRTWindow} Maximum retention time window (seconds, +/- feature retention time) in which mobilograms
+#'   are collected and averaged.
+#'
+#'   \item \code{IMSWindow},\code{clusterMethod}: IMS clustering parameters.
+#'
+#' }
+#'
+#' These parameters are passed as a named \code{list} as the \code{EICParams} or \code{EIMParams} argument to functions
+#' that work with EIC or EIM data. The \code{getDefEICParams} and \code{getDefEIMParams} functions generate such
+#' parameter list with defaults.
 #'
 #' @param \dots optional named arguments that override defaults.
 #'
-#' @name EICParams
+#' @name EIXParams
 #' @export
 getDefEICParams <- function(...)
 {
@@ -592,7 +612,7 @@ getDefEICParams <- function(...)
     return(modifyList(def, mod, keep.null = TRUE))
 }
 
-#' @name EICParams
+#' @rdname EIXParams
 #' @export
 getDefEIMParams <- function(...)
 {

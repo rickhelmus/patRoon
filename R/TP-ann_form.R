@@ -103,6 +103,43 @@ getTPsFormulas <- function(annTable, parName, parFormula, minFitFormula)
 }
 
 
+#' Obtain transformation products (TPs) from formula annotation candidates
+#'
+#' Transforms and prioritizes \link[=formulas]{formula annotation candidates} to obtain TPs.
+#'
+#' The \code{generateTPsAnnForm} function implements the unknown TP screening from formula candidates approach as
+#' described in \insertCite{Helmus2025}{patRoon}. This algorithm does not rely on any known or predicted TPs and is
+#' therefore suitable for 'full non-target' workflows. \emph{All} formula candidates are considered as potential TPs and
+#' are ranked by the \code{TP score}: \deqn{TP score = fitFormula + annSim}
+#'
+#' With: \itemize{
+#'
+#'   \item \code{annSim}: the \link[=id-conf]{annotation similarity}
+#'
+#'   \item \code{fitFormula}: the common element count divided by the total element count for the formulae of the
+#'   parent/TP or TP/parent (maximum is taken)
+#'
+#' }
+#'
+#' To speed up the calculation process, several thresholds are applied to rule out unlikely candidates. These thresholds
+#' are defaulted to those derived in \insertCite{Helmus2025}{patRoon}.
+#'
+#' Unlike most other TP generation algorithms, no additional suspect screening step is required.
+#'
+#' @param formulas The \code{\link{formulas}} object containing the formula candidates.
+#' @param minFitFormula Minimum \code{fitFormula} (see Details sections) to filter out unlikely candidates.
+#'
+#' @template parallel-arg
+#' @template tp_gen-scr
+#'
+#' @note Setting \code{parents} to a \code{compounds} object is technically possible, but probably not very useful and
+#'   is mainly supported for consistency with other TP generation algorithms.
+#'
+#'   Setting \code{parallel=TRUE} may speed up calculations, but is only favorable for long calculations due to the
+#'   overhead of setting up multiple \R processes.
+#'
+#' @references \insertAllCited{}
+#'
 #' @export
 generateTPsAnnForm <- function(parents, formulas, minFitFormula = 0, skipInvalid = TRUE, prefCalcChemProps = TRUE,
                                neutralChemProps = FALSE, parallel = TRUE)
@@ -111,7 +148,7 @@ generateTPsAnnForm <- function(parents, formulas, minFitFormula = 0, skipInvalid
     
     checkmate::assert(
         checkmate::checkClass(parents, "data.frame"),
-        checkmate::checkClass(parents, "compounds"), # UNDONE: doesn't make much sense here, but keep for consistency?
+        checkmate::checkClass(parents, "compounds"),
         checkmate::checkClass(parents, "featureGroupsScreening"),
         checkmate::checkClass(parents, "featureGroupsScreeningSet"),
         .var.name = "parents"

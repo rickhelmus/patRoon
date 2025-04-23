@@ -800,6 +800,7 @@ setMethod("overlap", "featureGroups", function(fGroups, which, aggregate, exclus
 #' @inheritParams calculatePeakQualities,features-method
 #' @param avgFunc The function used to average the peak qualities and scores for each feature group.
 #'
+#' @template EICParams-arg
 #' @template parallel-arg
 #' 
 #' @references \insertRef{Chetnik2020}{patRoon}

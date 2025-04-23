@@ -287,7 +287,6 @@
             - mention that suspect list parents are not filtered out from candidate list
         - parallel=T is only useful with many candidates
 - msdata
-    - EICParams for getPICSet() and calculatePeakQualities()
     - mzExpIMSWindow and minIntensityIMS EIXParam
     - update all for getEICs()
         - note that additional columns are only available for output=="raw"

@@ -380,6 +380,7 @@ setMethod("delete", "features", function(obj, i = NULL, j = NULL, ...)
 #' @param flatnessFactor Passed to \pkg{MetaClean} as the \code{flatness.factor} argument to
 #'   \code{\link[MetaClean]{calculateJaggedness}} and \code{\link[MetaClean]{calculateModality}}.
 #'
+#' @template EICParams-arg
 #' @template parallel-arg
 #'
 #' @templateVar what \code{calculatePeakQualities} and TIC/BPC related functions

@@ -640,23 +640,22 @@ getDefEIMParams <- function(...)
 #'
 #' The following parameters can be configured: \itemize{
 #'
-#'   \item \code{calcLogP} A \code{character} specifying whether \verb{Log P} values should be calculated with
+#'   \item \code{calcLogP} A \code{character} specifying whether \verb{log P} values should be calculated with
 #'   \code{\link[rcdk:get.xlogp]{rcdk::get.xlogp}} (\code{calcLogP="rcdk"}),
 #'   \href{https://github.com/openbabel/openbabel}{OpenBabel} (\code{calcLogP="obabel"}) or not at all
-#'   (\code{calcLogP="none"}). The \code{log P} are values of parents and TPs are used to predict their relative
-#'   retention order (\code{retDir}).
+#'   (\code{calcLogP="none"}). The \code{log P} are values of parents and TPs are used for \link[=retDir]{retention
+#'   order calculation}.
 #'
 #'   \item \code{forceCalcLogP} Force calculation of \verb{Log P} values, even if already provided by the TP generation
-#'   algorithm. This is primarily useful to obtain Log P values that were consistently calculated with the same
+#'   algorithm. This is primarily useful to obtain log P values that were consistently calculated with the same
 #'   algorithm, as some algorithms may only partially output these values (\emph{e.g.} not for parents).
 #'
-#'   \item \code{forceCalcRetDir} Force calculation of retention order directions, even if already provided by the TP
-#'   generation algorithm. This is primarily intended for re-calculation of library TP data, which may have been
-#'   calculated with different Log P values.
+#'   \item \code{forceCalcRetDir} Force calculation of \link[=retDir]{retention order directions}, even if
+#'   already provided by the TP generation algorithm. This is primarily intended for re-calculation of library TP data,
+#'   which may have been calculated with different log P values.
 #'
-#'   \item \code{minLogPDiff} The minimum difference in \verb{Log P} values between a parent and its TPs to be
-#'   considered eluting differently. If less than this value the the retention time direction is assigned as unknown
-#'   (\samp{0}).
+#'   \item \code{minLogPDiff} The minimum difference in \verb{log P} values between a parent and its TPs to be
+#'   considered eluting differently. This is used for \link[=retDir]{retention order calculation}.
 #'
 #'   \item \code{calcSims} If set to \code{TRUE} then structural similarities between the parent and its TPs are
 #'   calculated. The \link[=filter,transformationProductsStructure-method]{filter method} can be used to threshold
@@ -673,9 +672,9 @@ getDefEIMParams <- function(...)
 #' }
 #'
 #' These parameters are passed as a named \code{list} as the \code{TPStructParams} argument to functions.
-#' 
+#'
 #' The \code{getDefTPStructParams} function generates such parameter list with defaults.
-#' 
+#'
 #' @param \dots optional named arguments that override defaults.
 #'
 #' @references \addCitations{rcdk}{1} \cr\cr \insertRef{OBoyle2011}{patRoon}

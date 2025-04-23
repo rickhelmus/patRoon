@@ -11,9 +11,7 @@
 #'
 #'   \item \code{sub} The elements that are removed by this reaction (\emph{e.g.} \code{"H2O"}).
 #'
-#'   \item \code{retDir} The expected retention time direction relative to the parent (assuming a reversed phase like LC
-#'   separation). Valid values are: \samp{-1} (elutes before the parent), \samp{1} (elutes after the parent) or \samp{0}
-#'   (no significant change or unknown).
+#'   \item \code{retDir} The expected \link[=retDir]{retention order direction}.
 #'
 #'   }
 #'

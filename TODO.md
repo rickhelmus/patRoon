@@ -284,7 +284,6 @@
             - filter()
             - mention that suspect list parents are not filtered out from candidate list
         - parallel=T is only useful with many candidates
-        - retdir explanation somewhere for getDefTPStructParams()
         - update seealso for other TP classes
         - docs for TP ann form/comp classes
 - IMS

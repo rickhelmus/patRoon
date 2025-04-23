@@ -13,17 +13,10 @@ NULL
 #' This class holds all generated data for transformation products for a set of parents. The class is \code{virtual} and
 #' derived objects are created by \link[=generateTPs]{TP generators}.
 #'
-#' The TP data in objects from this class include a \code{retDir} column. These are \code{numeric} values that hint what
-#' the the chromatographic retention order of a TP might be compared to its parent: a value of \samp{-1} means it will
-#' elute earlier, \samp{1} it will elute later and \samp{0} that there is no significant difference or the direction is
-#' unknown. These values are based on a typical reversed phase separation. When structural information is available
-#' (\emph{e.g.} when \code{\link{generateTPsBioTransformer}} or \code{\link{generateTPsLibrary}} was used to generate
-#' the data), the \code{retDir} values are based on calculated \code{log P} values of the parent and its TPs.
-#'
 #' @param TPs,x,obj,object \code{transformationProducts} object to be accessed
 #'
-#' @seealso The derived \code{\link{transformationProductsStructure}} class for more methods and
-#'   \code{\link{generateTPs}}
+#' @seealso The derived \code{\link{transformationProductsStructure}} class for more methods, \code{\link{generateTPs}}
+#'   and \code{\link{retDir}}.
 #'
 #' @slot parents A \code{\link{data.table}} with metadata for all parents that have TPs in this object. Use the
 #'   \code{parents} method for access.
@@ -38,10 +31,11 @@ NULL
 #' @templateVar deljtype numeric index (row) or name of the TP
 #' @templateVar delfwhat parent
 #' @templateVar delfa the TP info table (a \code{data.table}), the parent name
-#' @templateVar delfr the TP indices (rows) (specified as an \code{integer} or \code{logical} vector) or names to be removed
+#' @templateVar delfr the TP indices (rows) (specified as an \code{integer} or \code{logical} vector) or names to be
+#'   removed
 #' @templateVar dollarOpName parent
 #' @template sub_sel_del-args
-#' 
+#'
 #' @param \dots For \code{delete}: passed to the function specified as \code{j}. Otherwise ignored.
 #'
 #' @templateVar class transformationProducts

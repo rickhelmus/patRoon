@@ -362,6 +362,136 @@ NULL
 #' @name feature-optimization
 NULL
 
+#' Identification confidence estimation
+#'
+#' Functions to estimate the identification confidence for suspects and annotation candidates.
+#'
+#' The \code{estimateIDConfidence} methods are used to estimate various properties to estimate the confidence of
+#' identifications assigned to suspects and feature annotation candidates. These functions are typically executed after
+#' running \code{\link{screenSuspects}}, \code{\link{generateFormulas}} and \code{\link{generateCompounds}}. Afterwards,
+#' the following columns are added to the result tables (obtained with \emph{e.g.} \code{\link{screenInfo}},
+#' \code{\link{annotations}} and \code{\link{as.data.table}}): \itemize{
+#'
+#'   \item \code{annSim} The \emph{annotation similarity}, defined as the similarity between the MS/MS peak list of a
+#'   feature with (a) only the peaks that were annotated and (b) all the peaks. Thus, a value of one means that all
+#'   MS/MS peaks were annotated. The similarity calculation is configured with the \code{specSimParams} argument to
+#'   \code{estimateIDConfidence}.
+#'
+#'   \item \code{annSimForm} The annotation similarity specifically for formula annotations (equaling the \code{annSim}
+#'   column from formula annotations). Only calculated for \link[=featureGroupsScreening]{suspects} and
+#'   \code{\link{compounds}}.
+#'
+#'   \item \code{annSimBoth} The annotation similarity calculated with the combined set of annotated MS/MS peaks from
+#'   formula and compound annotations. Only calculated for \link[=featureGroupsScreening]{suspects} and
+#'   \code{\link{compounds}}.
+#'
+#'   \item \code{estIDLevel} Provides an \emph{estimation} of the identification level, roughly following that of
+#'   \insertCite{Schymanski2014}{patRoon}. However, please note that this value is only an estimation, and manual
+#'   interpretation is still necessary to assign final identification levels. The estimation is done through a set of
+#'   rules, see the \verb{Identification level rules} section below.
+#'
+#' }
+#'
+#' In addition, the following columns are specifically added to suspect screening results: \itemize{
+#'
+#'   \item \code{annSimComp} The annotation similarity specifically for compound annotations (this equals the
+#'   \code{annSim} column in compound annotations.
+#'
+#'   \item \code{formRank},\code{compRank} The rank of the suspect within the formula/compound annotation results.
+#'
+#'   \item \code{maxFrags} The maximum number of MS/MS fragments that can be matched for this suspect (based on the
+#'   \code{fragments_*} columns from the suspect list).
+#'
+#'   \item \code{maxFragMatches},\code{maxFragMatchesRel} The absolute and relative amount of experimental MS/MS peaks
+#'   that were matched from the fragments specified in the suspect list. The value for \code{maxFragMatchesRel} is
+#'   relative to the value for \code{maxFrags}. The calculation of this column is influenced by the
+#'   \code{checkFragments} argument to \code{estimateIDConfidence}.
+#'
+#' }
+#'
+#' The data for these columns is only calculated if \code{estimateIDConfidence} has the required data to do so. For
+#' instance, \code{annSimForm} and \code{formRank} are only calculated if the \code{formulas} argument is set, and
+#' levels for \code{estIDLevel} will be poor if no compound annotations are available.
+#'
+#' @templateVar normParam compoundsNormalizeScores,formulasNormalizeScores
+#' @templateVar noNone TRUE
+#' @template norm-args
+#'
+#' @template specSimParams-arg
+#' @template parallel-arg
+#'
+#' @param MSPeakLists,formulas,compounds Annotation data (\code{\link{MSPeakLists}}, \code{\link{formulas}} and
+#'   \code{\link{compounds}}). All arguments can be \code{NULL}, but it is recommended to set them if possible to allow
+#'   the most complete estimations.
+#' @param absMzDev Maximum absolute \emph{m/z} deviation.
+#' @param IDFile A file path to a YAML file with rules used for estimation of identification levels. See the
+#'   \verb{Suspect annotation} section for more details. If not specified then a default rules file will be used.
+#' @param logPath A directory path to store logging information. If \code{NULL} then logging is disabled. \strong{NOTE}:
+#'   To avoid slowdowns by logging for potentially large number of candidates, logging is disabled for the
+#'   \code{\link{formulas}} and \code{\link{compounds}} methods by default.
+#'
+#' @section Identification level rules: The estimation of identification levels is configured through a YAML file which
+#'   specifies the rules for each level. The default file is shown below.
+#'
+#' @eval paste0("@@section Identification level rules: \\preformatted{", patRoon:::readAllFile(system.file("misc",
+#'   "IDLevelRules.yml", package = "patRoon")), "}")
+#'
+#' @section Identification level rules: Most of the file should be self-explanatory. Some notes:
+#'
+#'   \itemize{
+#'
+#'   \item Each rule is either a field of \code{suspectFragments} (minimum number of MS/MS fragments matched from
+#'   suspect list), \code{retention} (maximum retention deviation from suspect list), \code{rank} (the maximum
+#'   annotation rank from formula or compound annotations), \code{all} (this level is always matched) or any of the
+#'   scorings available from the formula or compound annotations.
+#'
+#'   \item In case any of the rules could be applied to either formula or compound annotations, the annotation type must
+#'   be specified with the \code{type} field (\code{formula} or \code{compound}).
+#'
+#'   \item Identification levels should start with a number and may optionally be followed by a alphabetic character.
+#'   The lowest levels are checked first.
+#'
+#'   \item If \code{relative=yes} then the relative scoring will be used for testing.
+#'
+#'   \item For \code{suspectFragments}: if the number of fragments from the suspect list (\code{maxFrags} column) is
+#'   less then the minimum rule value, the minimum is adjusted to the number of available fragments.
+#'
+#'   \item The \code{or} and \code{and} keywords can be used to combine multiple conditions.
+#'
+#'   \item Any conditions that require suspect data (\emph{e.g.} \code{suspectFragments}) are only met with the suspects
+#'   method for \code{estimateIDConfidence} method.
+#'
+#'   }
+#'
+#'   A template rules file can be generated with the \code{\link{genIDLevelRulesFile}} function, and this file can
+#'   subsequently passed to \code{estimateIDConfidence}. The file format is highly flexible and (sub)levels can be added
+#'   or removed if desired. Note that the default file is currently only suitable when annotation is performed with
+#'   \command{GenForm} and \command{MetFrag}, for other algorithms it is crucial to modify the rules.
+#'
+#' @section Sets workflows: \code{estimateIDConfidence} performs its estimations per set. In addition, the
+#'   following overall (not set specific) columns are calculated: \itemize{
+#'
+#'     \item \code{formRank} and \code{compRank} based on the ranking of the formula/compound in the set consensus data.
+#'
+#'     \item \code{estIDLevel}: based on the 'best' estimated identification level among the sets data (\emph{i.e.} the
+#'     lowest). In case there is a tie between sub-levels (\emph{e.g.} \samp{3a} and \samp{3b}), then the sub-level is
+#'     stripped (\emph{e.g.} \samp{3}).
+#'
+#'     \item Annotation similarities: taken as the maximum value from the data for each set.
+#'
+#'   }
+#'
+#' @return \code{estimateIDConfidence} amends the input object with aforementioned identification confidence properties.
+#'
+#' @author Rick Helmus <\email{r.helmus@@uva.nl}>, Emma Schymanski <\email{emma.schymanski@@uni.lu}> (contributions to
+#'   identification level rules), Bas van de Velde (contributions to spectral similarity calculation).
+#'
+#' @references \insertAllCited{} \cr \cr \insertRef{Stein1994}{patRoon}
+#'
+#' @aliases estimateIDConfidence
+#' @name id-conf
+NULL
+
 #' Sets workflows
 #'
 #' With sets workflows in \pkg{patRoon} a complete non-target (or suspect) screening workflow is performed with sample

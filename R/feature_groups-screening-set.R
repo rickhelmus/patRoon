@@ -122,13 +122,8 @@ syncScreeningSetObjects <- function(obj, unsetFGroups)
 #'
 #'   \setsWFChangedMethods{
 #'
-#'   \item \code{estimateIDConfidence} Suspect annotation is performed per set. Thus, formula/compound ranks, estimated
-#'   identification levels etc are calculated for each set. Subsequently, these results are merged in the final
-#'   \code{screenInfo}. In addition, an overall \code{formRank} and \code{compRank} column is created based on the
-#'   rankings of the suspect candidate in the set consensus data. Furthermore, an overall \code{estIDLevel} is generated
-#'   that is based on the 'best' estimated identification level among the sets data (\emph{i.e.} the lowest). In case
-#'   there is a tie between sub-levels (\emph{e.g.} \samp{3a} and \samp{3b}), then the sub-level is stripped
-#'   (\emph{e.g.} \samp{3}).
+#'   \item \code{estimateIDConfidence} See the \verb{Sets workflows} section in the documentation for
+#'   \code{\link{estimateIDConfidence}}.
 #'
 #'   \item \code{filter} All filters related to estimated identification levels and formula/compound rankings  are
 #'   applied to the overall set data (see above). All others are applied to set specific data: in this case candidates
@@ -206,7 +201,7 @@ setMethod("[", c("featureGroupsScreeningSet", "ANY", "ANY", "missing"), function
 #' @export
 setMethod("delete", "featureGroupsScreeningSet", doSFGroupsScreeningDelete)
 
-#' @rdname featureGroupsScreening-class
+#' @rdname id-conf
 #' @export
 setMethod("estimateIDConfidence", "featureGroupsScreeningSet", function(obj, MSPeakLists = NULL, formulas = NULL,
                                                                         compounds = NULL,

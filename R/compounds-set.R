@@ -247,6 +247,7 @@ setMethod("predictRespFactors", "compoundsSet", doFeatAnnPredictRFSets)
 #' @export
 setMethod("predictTox", "compoundsSet", doFeatAnnPredictToxSets)
 
+#' @rdname id-conf
 #' @export
 setMethod("estimateIDConfidence", "compoundsSet", function(obj, absMzDev = defaultLim("mz", "medium"), MSPeakLists = NULL,
                                                            formulas = NULL,  formulasNormalizeScores = "max",

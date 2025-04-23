@@ -1313,3 +1313,47 @@ installTIMSCONVERT <- function(envname = "patRoon-TIMSCONVERT", clearEnv = FALSE
     
     reticulate::py_install("git+https://github.com/gtluu/timsconvert", envname = envname, ...)
 }
+
+#' @details \code{numericIDLevel} Extracts the numeric part of a given identification level (\emph{e.g.} \code{"3a"}
+#'   becomes \samp{3}).
+#' @param level The identification level to be converted.
+#' @rdname id-conf
+#' @export
+numericIDLevel <- function(level)
+{
+    checkmate::assertCharacter(level, any.missing = TRUE, min.chars = 1)
+    ret <- integer(length(level))
+    ret[is.na(level)] <- NA_integer_
+    ret[!is.na(level)] <- as.integer(gsub("[[:alpha:]]*", "", level[!is.na(level)]))
+    return(ret)
+}
+
+#' @details \code{genIDLevelRulesFile} Generates a template YAML file that is used to configure the rules for automatic
+#'   estimation of identification levels. This file can then be used as input for \code{\link{estimateIDConfidence}}.
+#' @param out The file path to the target file.
+#' @param inLevels,exLevels A \link[=regex]{regular expression} for the identification levels to include or exclude,
+#'   respectively. For instance, \code{exLevels="4|5"} would exclude level 4 and 5 from the output file. Set to
+#'   \code{NULL} to ignore.
+#' @rdname id-conf
+#' @export
+genIDLevelRulesFile <- function(out, inLevels = NULL, exLevels = NULL)
+{
+    aapply(checkmate::assertCharacter, . ~ inLevels + exLevels, null.ok = TRUE)
+    checkmate::assertPathForOutput(out, overwrite = TRUE)
+    
+    defFile <- system.file("misc", "IDLevelRules.yml", package = "patRoon")
+    
+    if (is.null(inLevels) && is.null(exLevels))
+        file.copy(defFile, out, overwrite = TRUE)
+    else
+    {
+        rules <- readYAML(defFile)
+        if (!is.null(inLevels))
+            rules <- rules[grepl(inLevels, names(rules))]
+        if (!is.null(exLevels))
+            rules <- rules[!grepl(exLevels, names(rules))]
+        # UNDONE: this quotes ID levels without sub-level, fix?
+        writeYAML(rules, out)
+    }
+    invisible(NULL)
+}

@@ -398,19 +398,3 @@ prepareDataForTPLibrary <- function(parents, TPLibrary, generations, matchParent
     
     return(list(parents = parents, products = products))
 }
-
-#' @export
-getDefTPStructParams <- function(...)
-{
-    def <- list(
-        calcLogP = "rcdk",
-        forceCalcLogP = FALSE,
-        forceCalcRetDir = FALSE,
-        minLogPDiff = 1,
-        calcSims = FALSE,
-        fpType = "extended",
-        fpSimMethod = "tanimoto"
-    )
-    
-    return(modifyList(def, list(...)))
-}

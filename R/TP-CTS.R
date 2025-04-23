@@ -86,18 +86,12 @@ runCTS <- function(parentRow, transLibrary, generations, errorRetries, neutraliz
 #' @param generations An \code{integer} that specifies the number of transformation generations to predict.
 #' @param errorRetries The maximum number of connection retries. Sets the \code{times} argument to the
 #'   \code{\link[httr:RETRY]{http::RETRY}} function.
-#' @param calcLogP A \code{character} specifying whether \code{Log P} values should be calculated with
-#'   \code{\link[rcdk:get.xlogp]{rcdk::get.xlogp}} (\code{calcLogP="rcdk"}),
-#'   \href{https://github.com/openbabel/openbabel}{OpenBabel} (\code{calcLogP="obabel"}) or not at all
-#'   (\code{calcLogP="none"}). The \code{log P} values will be calculated of parent and TPs to predict their retention
-#'   order (\code{retDir}).
 #'
 #' @return The TPs are stored in an object derived from the \code{\link{transformationProductsStructure}} class.
 #'
 #' @template parallel-arg
 #' @template tp_gen-scr
-#' @template tp_gen-sim
-#' @template fp-args
+#' @template tp_gen-struct_params
 #'
 #' @templateVar whatCP parent suspect list
 #' @template chemPropCalc

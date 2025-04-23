@@ -825,6 +825,7 @@ setMethod("overlap", "featureGroups", function(fGroups, which, aggregate, exclus
 #'   \code{\link[=feature-quality]{featureGroupQualities}} function for more details.
 #' @param avgFunc The function used to average the peak qualities and scores for each feature group.
 #'
+#' @template EICParams-arg
 #' @template parallel-arg
 #'
 #' @references \insertRef{Chetnik2020}{patRoon}

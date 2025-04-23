@@ -226,6 +226,7 @@ importFeaturesKPIC2 <- function(picsList, analysisInfo)
 #' 
 #' @template loadrawdata-arg
 #' @template IMS-arg
+#' @template EICParams-arg
 #' 
 #' @param \dots Ignored
 #' 

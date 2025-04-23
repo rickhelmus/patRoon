@@ -402,6 +402,7 @@ setMethod("delete", "features", function(obj, i = NULL, j = NULL, ...)
 #'   "Symmetry")}), or a \code{list} of custom quality definitions. See the
 #'   \code{\link[=feature-quality]{featureQualities}} function for more details.
 #'
+#' @template EICParams-arg
 #' @template parallel-arg
 #'
 #' @templateVar what \code{calculatePeakQualities} and TIC/BPC related functions

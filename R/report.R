@@ -144,7 +144,7 @@ adjustReportSettings <- function(settings, adjSettings) return(modifyList(settin
 #' @note No data will be reported for feature groups in any of the reported objects (\code{formulas}, \code{compounds}
 #'   etc) which are \emph{not} present in the input \code{\link{featureGroups}} object (\code{fGroups}).
 #'
-#'   The \code{topMost}, \code{topMostByReplicate} and \code{onlyPresent} \link[=EICParams]{EIC parameters} may be ignored,
+#'   The \code{topMost}, \code{topMostByReplicate} and \code{onlyPresent} \link[=EIXParams]{EIC parameters} may be ignored,
 #'   \emph{e.g.}, when generating overview plots.
 #'
 #' @references Creating MetFrag landing page URLs based on code from

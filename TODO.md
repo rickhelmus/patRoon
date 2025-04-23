@@ -287,7 +287,6 @@
             - mention that suspect list parents are not filtered out from candidate list
         - parallel=T is only useful with many candidates
 - msdata
-    - mzExpIMSWindow and minIntensityIMS EIXParam
     - update all for getEICs()
         - note that additional columns are only available for output=="raw"
     - timsconvert; add refs, installation
@@ -296,8 +295,7 @@
     - Dietrich features
     - getDefPeakParams()
     - getDefEICParams() / getDefEIMParams()
-        - update for retWindow --> window
-        - add docs for getDefEIMParams()
+        - finish docs for IMSWindow/clusterMethod
         - update handbook
     - assignMobilities()
         - mention that feature properties (except intensity, rt, area) are simply copied from parent

@@ -424,6 +424,9 @@ setMethod("assignMobilities", "featureGroupsScreeningSet", function(obj, mobPeak
     return(obj)
 })
 
+#' @section Sets workflows: In a \link[=sets-workflow]{sets workflow}, \code{screenSuspects} performs suspect screening
+#'   for each set separately, and the screening results are combined afterwards. The \code{sets} column in the
+#'   \code{screenInfo} data marks in which sets the suspect hit was found.
 #' @rdname suspect-screening
 #' @export
 setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWindow, mzWindow, IMSMatchParams,

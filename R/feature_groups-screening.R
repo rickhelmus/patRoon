@@ -580,8 +580,15 @@ setMethod("assignMobilities", "featureGroupsScreening", function(obj, mobPeakPar
     return(obj)
 })
 
-
-#' @details \code{screenSuspects} is used to perform suspect screening. The input \code{\link{featureGroups}} object
+#' Target and suspect screening
+#'
+#' Utilities to screen for analytes with known or suspected identity.
+#'
+#' Besides 'full non-target analysis', where compounds may be identified with little to no prior knowledge, a common
+#' strategy is to screen for compounds with known or suspected identity. This may be a generally favorable approach if
+#' possible, as it can significantly reduce the load on data interpretation.
+#' 
+#' \code{screenSuspects} is used to perform suspect screening. The input \code{\link{featureGroups}} object
 #'   will be screened for suspects by \emph{m/z} values and optionally retention times. Afterwards, any feature groups
 #'   not matched may be kept or removed, depending whether a full non-target analysis is desired.
 #'
@@ -651,9 +658,13 @@ setMethod("assignMobilities", "featureGroupsScreening", function(obj, mobPeakPar
 #' @return \code{screenSuspects} returns a \code{\link{featureGroupsScreening}} object, which is a copy of the input
 #'   \code{fGroups} object amended with additional screening information.
 #'
+#' @note \code{screenSuspects} may use the suspect names to base file names used for reporting, logging etc.
+#'   Therefore, it is important that these are file-compatible names. For this purpose, \code{screenSuspects} will
+#'   automatically try to convert long, non-unique and/or otherwise incompatible suspect names.
+#'
 #' @seealso \code{featureGroupsScreening}
 #'
-#' @rdname suspect-screening
+#' @name suspect-screening
 #' @aliases screenSuspects
 #' @export
 setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindow, mzWindow, IMSMatchParams,

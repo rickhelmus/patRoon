@@ -378,6 +378,9 @@ getFCParams <- function(replicates, ...)
 #'   Furthermore, columns \code{"mobmin"} and \code{"mobmax"} can be added for IMS data.
 #'
 #' @return A \code{list} with for each analysis a \code{list} with EIC data for each of the rows in \code{ranges}.
+#' 
+#' @templateVar what \code{getEICs}
+#' @template uses-msdata
 #'
 #' @export
 getEICs <- function(analysisInfo, ranges, output = "fill", minIntensityIMS = 25)

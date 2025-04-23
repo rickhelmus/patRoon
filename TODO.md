@@ -132,6 +132,9 @@
 - Agilent
     - SC doesn't recognize IM
 - re-introduce isolation window for MSPL? eg if file doesn't contain ranges (is that a thing?) or for some reason a more narrow range is desired
+- naming: im_collapse and IMSCollapse
+- patRoon.checkCentroided removed: update (incl docs) or remove?
+
 
 ## IMS
 
@@ -159,6 +162,7 @@
 - update fGroupsComparison/consensus()
 - update featAnn consensus?
 - update checkFeatures()
+
 
 ## Tests
 
@@ -240,16 +244,13 @@
 - move all plotBPC(), getEIC() etc methods into one doc file?
 - anaInfo
     - link to IMS section where path_IMS is explained
-    - add link to backends for OpenTIMS
     - maybe add more examples where eg raw data can be used
 - convert
     - add patRoon 3.0 citation for im_collapse
-    - mention raw data interface for im_collapse
     - clMethod and mzWindow for IM collapse --> see how this can be combined with others
-    - link to HRMS interface in convertMSFilesIMSCollapse()
     - update handbook and tutorial
 - backend
-    - refer to it in zzz, MSPL, plotChroms() etc
+    - refer to it in assignMobilities() methods and piek
 - handbook/tutorial
     - features
         - mention somewhere that IMS="maybe" for e.g. plotting
@@ -286,12 +287,6 @@
             - mention that suspect list parents are not filtered out from candidate list
         - parallel=T is only useful with many candidates
 - msdata
-    - patRoon.threads, patRoon.MS.backends, patRoon.MS.preferIMS, patRoon.path.BrukerTIMS and patRoon.path.limits options
-        - patRoon.MS.preferIMS: only works for MSTK/SC, ie putting OTIMS in front doesn't work
-    - update generateMSPeakLists()
-        - section for raw data interface
-    - availableBackends()
-        - also invisible return value
     - EICParams for getPICSet() and calculatePeakQualities()
     - mzExpIMSWindow and minIntensityIMS EIXParam
     - update all for getEICs()
@@ -367,6 +362,7 @@
     - defaults also used for params (EIXs etc) --> doc somehow
     - doc new functions
     - appendix in Handbook
+    - patRoon.path.limits options
 - MS2QuantMeta slots for fGroyupsScreeningSet, formulasSet and compoundsSet (latter already present but wasn't filled in)
 - add Handbook section on file conversion
     - mention mzXML/mzML requirements as newProject() doesn't give note anymore

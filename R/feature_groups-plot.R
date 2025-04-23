@@ -39,6 +39,9 @@ NULL
 #' @template IMS-arg
 #'
 #' @inheritParams featureGroups-class
+#' 
+#' @templateVar what \code{plotChroms}, \code{plotMobilograms}, \code{plotTICs} and \code{plotBPCs}
+#' @template uses-msdata
 #'
 #' @section Sets workflows: \setsWFChangedMethods{
 #'

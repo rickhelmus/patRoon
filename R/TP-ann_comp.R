@@ -163,8 +163,9 @@ getTPsCompounds <- function(annTable, parentRow, TPStructParams, extraOptsFMCSR,
 #'
 #' The \code{generateTPsAnnComp} function implements the unknown TP screening from compound candidates approach as
 #' described in \insertCite{Helmus2025}{patRoon}. This algorithm does not rely on any known or predicted TPs and is
-#' therefore suitable for 'full non-target' workflows. For each of the input parents, \emph{all} compound candidates are
-#' ranked by the \code{TP score} to evaluate their likeliness to be a TP candidates. The TP score is calculated as
+#' therefore suitable for 'full non-target' workflows. \emph{All} compound candidates are considered as potential TPs
+#' and are ranked by the \code{TP score}:
+#'
 #' \deqn{TP score = max(fitCompound,simSusp) + annSim}
 #'
 #' With: \itemize{
@@ -183,7 +184,6 @@ getTPsCompounds <- function(annTable, parentRow, TPStructParams, extraOptsFMCSR,
 #' To speed up the calculation process, several thresholds are applied to rule out unlikely candidates. These thresholds
 #' are defaulted to those derived in \insertCite{Helmus2025}{patRoon}. Nevertheless, calculations can take a very long
 #' time (multiple hours), especially when processing large numbers of candidates from \emph{e.g.} PubChem.
-#'
 #'
 #' Unlike most other TP generation algorithms, no additional suspect screening step is required.
 #'

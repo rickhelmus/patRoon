@@ -58,6 +58,7 @@
 - convertMobilityToCCS() / convertCCSToMobility(): handle Waters data?
 - start using saveCacheDataList() on more places?
 - basic and default error handling for executeCommand()?
+- getEIMs() function?
 
 
 ## newProject()
@@ -287,10 +288,9 @@
             - mention that suspect list parents are not filtered out from candidate list
         - parallel=T is only useful with many candidates
 - msdata
-    - update all for getEICs()
-        - note that additional columns are only available for output=="raw"
     - timsconvert; add refs, installation
 - IMS
+    - minIntensityIMS template, also for getEICs()
     - hasMobilities slot for features
     - Dietrich features
     - getDefPeakParams()

@@ -29,81 +29,11 @@ NULL
 #'   }
 #'
 #' @slot screenInfo A (\code{\link{data.table}}) with results from suspect screening. This table will be amended with
-#'   annotation data when \code{estimateIDConfidence} is run.
+#'   ID confidence data when \code{\link{estimateIDConfidence}} is run.
 #' @slot MS2QuantMeta Metadata from \pkg{MS2Quant} filled in by \code{predictRespFactors}.
-#'
-#' @section Suspect annotation: The \code{estimateIDConfidence} method is used to annotate suspects after
-#'   \code{\link{screenSuspects}} was used to collect suspect screening results and other workflow steps such as formula
-#'   and compound annotation steps have been completed. The annotation results, which can be acquired with the
-#'   \code{as.data.table} and \code{screenInfo} methods, amends the current screening data with the following columns:
-#'
-#'   \itemize{
-#'
-#'   \item \code{formRank},\code{compRank} The rank of the suspect within the formula/compound annotation results.
-#'
-#'   \item \code{annSimForm},\code{annSimComp},\code{annSimBoth} A similarity measure between measured and annotated
-#'   MS/MS peaks from annotation of formulae, compounds or both. The similarity is calculated as the spectral similarity
-#'   between a peaklist with (a) all MS/MS peaks and (b) only annotated peaks. Thus, a value of one means that all MS/MS
-#'   peaks were annotated. If both formula and compound annotations are available then \code{annSimBoth} is calculated
-#'   after combining all the annotated peaks, otherwise \code{annSimBoth} equals the available value for
-#'   \code{annSimForm} or \code{annSimComp}. The similarity calculation can be configured with the \code{specSimParams}
-#'   argument to \code{estimateIDConfidence}.
-#'
-#'   \item \code{maxFrags} The maximum number of MS/MS fragments that can be matched for this suspect (based on the
-#'   \code{fragments_*} columns from the suspect list).
-#'
-#'   \item \code{maxFragMatches},\code{maxFragMatchesRel} The absolute and relative amount of experimental MS/MS peaks
-#'   that were matched from the fragments specified in the suspect list. The value for \code{maxFragMatchesRel} is
-#'   relative to the value for \code{maxFrags}. The calculation of this column is influenced by the
-#'   \code{checkFragments} argument to \code{estimateIDConfidence}.
-#'
-#'   \item \code{estIDLevel} Provides an \emph{estimation} of the identification level, roughly following that of
-#'   \insertCite{Schymanski2014}{patRoon}. However, please note that this value is only an estimation, and manual
-#'   interpretation is still necessary to assign final identification levels. The estimation is done through a set of
-#'   rules, see the \verb{Identification level rules} section below.
-#'
-#'   }
-#'
-#'   Note that only columns are present if sufficient data is available for their calculation.
-#'
-#' @section Identification level rules: The estimation of identification levels is configured through a YAML file which
-#'   specifies the rules for each level. The default file is shown below.
-#'
-#' @eval paste0("@@section Identification level rules: \\preformatted{", patRoon:::readAllFile(system.file("misc",
-#'   "IDLevelRules.yml", package = "patRoon")), "}")
-#'
-#' @section Identification level rules: Most of the file should be self-explanatory. Some notes:
-#'
-#'   \itemize{
-#'
-#'   \item Each rule is either a field of \code{suspectFragments} (minimum number of MS/MS fragments matched from
-#'   suspect list), \code{retention} (maximum retention deviation from suspect list), \code{rank} (the maximum
-#'   annotation rank from formula or compound annotations), \code{all} (this level is always matched) or any of the
-#'   scorings available from the formula or compound annotations.
-#'
-#'   \item In case any of the rules could be applied to either formula or compound annotations, the annotation type must
-#'   be specified with the \code{type} field (\code{formula} or \code{compound}).
-#'
-#'   \item Identification levels should start with a number and may optionally be followed by a alphabetic character.
-#'   The lowest levels are checked first.
-#'
-#'   \item If \code{relative=yes} then the relative scoring will be used for testing.
-#'
-#'   \item For \code{suspectFragments}: if the number of fragments from the suspect list (\code{maxFrags} column) is
-#'   less then the minimum rule value, the minimum is adjusted to the number of available fragments.
-#'
-#'   \item The \code{or} and \code{and} keywords can be used to combine multiple conditions.
-#'   }
-#'
-#'   A template rules file can be generated with the \code{\link{genIDLevelRulesFile}} function, and this file can
-#'   subsequently passed to \code{estimateIDConfidence}. The file format is highly flexible and (sub)levels can be added or
-#'   removed if desired. Note that the default file is currently only suitable when annotation is performed with GenForm
-#'   and MetFrag, for other algorithms it is crucial to modify the rules.
 #'
 #' @templateVar class featureGroupsScreening
 #' @template class-hierarchy
-#'
-#' @references \insertAllCited{} \cr \cr \insertRef{Stein1994}{patRoon}
 #'
 #' @seealso \code{\link{featureGroups}}
 #'
@@ -282,38 +212,13 @@ setMethod("calculateTox", "featureGroupsScreening", function(fGroups, featureAnn
     return(fGroups)
 })
 
-#' @describeIn featureGroupsScreening Incorporates annotation data obtained during the workflow to annotate suspects
-#'   with matched known MS/MS fragments, formula/candidate ranks and automatic estimation of identification levels. See
-#'   the \verb{Suspect annotation} section for more details. The estimation of identification levels for each suspect is
-#'   logged in the \code{log/ident} directory.
-#'
-#' @templateVar normParam compoundsNormalizeScores,formulasNormalizeScores
-#' @templateVar noNone TRUE
-#' @template norm-args
-#' 
-#' @template specSimParams-arg
-#'
-#' @param MSPeakLists,formulas,compounds Annotation data (\code{\link{MSPeakLists}}, \code{\link{formulas}} and
-#'   \code{\link{compounds}}) obtained for this \code{featureGroupsScreening} object. All arguments can be \code{NULL}
-#'   to exclude it from the annotation.
-#' @param absMzDev Maximum absolute \emph{m/z} deviation.
 #' @param checkFragments Which type(s) of MS/MS fragments from workflow data should be checked to evaluate the number of
 #'   suspect fragment matches (\emph{i.e.} from the \code{fragments_mz}/\code{fragments_formula} columns in the suspect
 #'   list). Valid values are: \code{"mz"}, \code{"formula"}, \code{"compounds"}. The former uses \emph{m/z} values in
 #'   the specified \code{MSPeakLists} object, whereas the others use the formulae that were annotated to MS/MS peaks in
 #'   the given \code{formulas} or \code{compounds} objects. Multiple values are possible: in this case the maximum
 #'   number of fragment matches will be reported.
-#' @param IDFile A file path to a YAML file with rules used for estimation of identification levels. See the
-#'   \verb{Suspect annotation} section for more details. If not specified then a default rules file will be used.
-#' @param logPath A directory path to store logging information. If \code{NULL} then logging is disabled.
-#'
-#' @return \code{estimateIDConfidence} returns a \code{featureGroupsScreening} object, which is a
-#'   \code{\link{featureGroups}} object amended with annotation data.
-#'
-#' @author Rick Helmus <\email{r.helmus@@uva.nl}>, Emma Schymanski <\email{emma.schymanski@@uni.lu}> (contributions to
-#'   identification level rules), Bas van de Velde (contributions to spectral similarity calculation).
-#'
-#' @aliases estimateIDConfidence
+#' @rdname id-conf
 #' @export
 setMethod("estimateIDConfidence", "featureGroupsScreening", function(obj, MSPeakLists = NULL, formulas = NULL,
                                                                      compounds = NULL,
@@ -477,7 +382,7 @@ setMethod("estimateIDConfidence", "featureGroupsScreening", function(obj, MSPeak
 #'   functionality from the base \code{\link{filter,featureGroups-method}}. It adds several filters to select
 #'   \emph{e.g.} the best ranked suspects or those with a minimum estimated identification level. \strong{NOTE}: most
 #'   filters \emph{only} affect suspect hits, not feature groups. Set \code{onlyHits=TRUE} to subsequently remove any
-#'   feature groups that lost any suspect matches due to other filter steps.
+#'   feature groups that lost any suspect matches due to these filter steps.
 #'
 #' @param selectHitsBy Should be \code{"intensity"} or \code{"level"}. For cases where the same suspect is matched to
 #'   multiple feature groups, only the suspect to the feature group with highest mean intensity
@@ -723,50 +628,3 @@ setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindo
 #' @rdname suspect-screening
 #' @export
 setMethod("screenSuspects", "featureGroupsScreening", doScreenSuspectsAmend)
-
-#' @details \code{numericIDLevel} Extracts the numeric part of a given
-#'   identification level (\emph{e.g.} \code{"3a"} becomes \samp{3}).
-#' @param level The identification level to be converted.
-#' @rdname suspect-screening
-#' @export
-numericIDLevel <- function(level)
-{
-    checkmate::assertCharacter(level, any.missing = TRUE, min.chars = 1)
-    ret <- integer(length(level))
-    ret[is.na(level)] <- NA_integer_
-    ret[!is.na(level)] <- as.integer(gsub("[[:alpha:]]*", "", level[!is.na(level)]))
-    return(ret)
-}
-
-#' @details \code{genIDLevelRulesFile} Generates a template YAML file that is
-#'   used to configure the rules for automatic estimation of identification
-#'   levels. This file can then be used as input for
-#'   \code{\link{estimateIDConfidence}}.
-#' @param out The file path to the target file.
-#' @param inLevels,exLevels A \link[=regex]{regular expression} for the
-#'   identification levels to include or exclude, respectively. For instance,
-#'   \code{exLevels="4|5"} would exclude level 4 and 5 from the output file. Set
-#'   to \code{NULL} to ignore.
-#' @rdname suspect-screening
-#' @export
-genIDLevelRulesFile <- function(out, inLevels = NULL, exLevels = NULL)
-{
-    aapply(checkmate::assertCharacter, . ~ inLevels + exLevels, null.ok = TRUE)
-    checkmate::assertPathForOutput(out, overwrite = TRUE)
-    
-    defFile <- system.file("misc", "IDLevelRules.yml", package = "patRoon")
-    
-    if (is.null(inLevels) && is.null(exLevels))
-        file.copy(defFile, out, overwrite = TRUE)
-    else
-    {
-        rules <- readYAML(defFile)
-        if (!is.null(inLevels))
-            rules <- rules[grepl(inLevels, names(rules))]
-        if (!is.null(exLevels))
-            rules <- rules[!grepl(exLevels, names(rules))]
-        # UNDONE: this quotes ID levels without sub-level, fix?
-        writeYAML(rules, out)
-    }
-    invisible(NULL)
-}

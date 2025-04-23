@@ -624,6 +624,31 @@ NULL
 #' @name check-GUI
 NULL
 
+#' Retention order direction
+#'
+#' Calculation of the relative retention order between a parent and its transformation product (TP).
+#'
+#' The relative retention order between a parent and its TP (\code{retDir}) is used throughout TP screening workflows
+#' for characterization and prioritization purposes. These are \code{numeric} values that hint what the the
+#' chromatographic retention order of a TP might be compared to its parent: a value of \samp{-1} means it will elute
+#' earlier, \samp{1} it will elute later and \samp{0} that there is no significant difference or the direction is
+#' unknown.
+#'
+#' For TP data obtained with \code{\link{generateTPs}}, the missing \code{retDir} values are automatically calculated
+#' based on the \verb{log P} difference between the parent and TP. Here, a typical reversed phase separation is assumed,
+#' \emph{i.e.} compounds with (significantly) lower log P values likely elute earlier. The \code{minLogPDiff} parameter
+#' of the \link[=getDefTPStructParams]{TPStructParams} argument sets the minimum log P difference to be considered
+#' significant.
+#'
+#' For TP feature candidates that were linked by \code{\link{generateComponentsTPs}}, the \code{retDir} values are
+#' calculated based on the retention time difference between the parent and TP feature groups. The \code{minRTDiff}
+#' argument sets the minimum difference to be considered significant.
+#'
+#' @references \insertRef{Helmus2025}{patRoon}
+#' 
+#' @name retDir
+NULL
+
 #' Functionality to predict quantitative data
 #'
 #' Functions to predict response factors and feature concentrations from \acronym{SMILES} and/or

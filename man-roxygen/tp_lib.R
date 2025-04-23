@@ -15,8 +15,7 @@
 #'
 #'   \item \code{parent_<%=id%>} and \code{TP_<%=id%>} The <%=id%> of the parent/TP structure.
 #'
-#'   \item \code{retDir} The retention direction of the TP compared to its parent: \samp{-1} (elutes before), \samp{1}
-#'   (elutes after) or \samp{0} (elutes similarly or unknown). (\strong{optional})
+#'   \item \code{retDir} The expected \link[=retDir]{retention order direction}. (\strong{optional})
 #'
 #'   For \code{generateTPsLibrary}: If not specified or \code{forceCalcRetDir=TRUE} from
 #'   \code{\link[=getDefTPStructParams]{TPStructParams}}, then the \code{log P} values below may be used to calculate
@@ -24,7 +23,7 @@
 #'   
 #'   \item \code{parent_LogP} and \code{TP_LogP} The \code{log P} values for the parent/TP. (\strong{optional})
 #'
-#'   \item \code{LogPDiff} The difference between parent and TP \code{Log P} values. Ignored if \emph{both}
+#'   \item \code{logPDiff} The difference between parent and TP \code{Log P} values. Ignored if \emph{both}
 #'   \code{parent_LogP} and \code{TP_LogP} are specified. (\strong{optional})
 #'
 #'   }

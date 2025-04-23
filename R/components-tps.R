@@ -447,9 +447,10 @@ setMethod("as.data.table", "componentsTPs", function(x, candidates = FALSE)
 #' @describeIn componentsTPs Provides various rule based filtering options to clean and prioritize TP data.
 #'
 #' @param \dots,verbose Further arguments passed to the base \code{\link[=filter,components-method]{filter method}}.
-#' @param retDirMatch If set to \code{TRUE}, only keep TPs for which the retention time direction (\code{retDir}, see
-#'   Details in \link{componentsTPs}) matches with the observed direction. TPs will never be removed if the
-#'   expected/observed direction is \samp{0} (\emph{i.e.} unknown or not significantly different than the parent).
+#' @param retDirMatch If set to \code{TRUE}, only keep TPs for which the \link[=retDir]{retention order direction} from
+#'   feature group data matches that of the expected values from TP data (\code{retDir} and \code{TP_retDir} columns).
+#'   TPs will never be removed if either of the directions is \samp{0} (\emph{i.e.} unknown or not significantly
+#'   different than the parent).
 #' @param minSpecSim,minSpecSimPrec,minSpecSimBoth The minimum spectral similarity of a TP compared to its parent
 #'   (\samp{0-1}). The \code{minSpecSimPrec} and \code{minSpecSimBoth} apply to binned data that is shifted with the
 #'   \code{"precursor"} and \code{"both"} method, respectively (see \link[=specSimParams]{MS spectral similarity
@@ -667,8 +668,8 @@ setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked = TRUE, width =
 #' @param MSPeakLists,formulas,compounds A \code{\link{MSPeakLists}}/\code{\link{formulas}}/\code{\link{compounds}}
 #'   object to calculate MS/MS or annotation similarities between parents and TPs. If \code{NULL} then this data is not
 #'   calculated. For more details see the \verb{Linking parents and transformation products} section below.
-#' @param minRTDiff Minimum retention time (in seconds) difference between the parent and a TP to determine whether a TP
-#'   elutes prior/after the parent (to calculate \code{retDir} values, see Details in \link{componentsTPs}))
+#' @param minRTDiff Minimum retention time (in seconds) difference between the parent and a TP to calculate the
+#'   \link[=retDir]{retention order direction}.
 #'
 #' @template specSimParams-arg
 #' @template IMS-arg
@@ -725,8 +726,8 @@ setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked = TRUE, width =
 #'
 #'   \item \code{totalNeutralLossMatches} As \code{totalFragmentMatches}, but counting overlapping neutral loss formulae.
 #'
-#'   \item \code{retDir} The retention time direction of the TP relative to its parent. See Details in
-#'   \link{componentsTPs}. If TP data was specified, the expected direction is stored in \code{TP_retDir}.
+#'   \item \code{retDir},\code{TP_retDir} The \link[=retDir]{retention order direction} derived from the feature groups
+#'   (\code{retDir}) or the (expected) value from TP data (\code{TP_retDir}).
 #'
 #'   \item \code{retDiff},\code{mzDiff},\code{formulaDiff} The retention time, \emph{m/z} and formula difference between
 #'   the parent and TP (latter only available if data TP formula is available).

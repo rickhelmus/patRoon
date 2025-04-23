@@ -634,6 +634,68 @@ getDefEIMParams <- function(...)
     return(modifyList(def, list(...), keep.null = TRUE))
 }
 
+#' Parameters to handle TP data with structural information
+#'
+#' Parameters used by \code{\link{generateTPs}} with algorithms that use structural information.
+#'
+#' The following parameters can be configured: \itemize{
+#'
+#'   \item \code{calcLogP} A \code{character} specifying whether \verb{Log P} values should be calculated with
+#'   \code{\link[rcdk:get.xlogp]{rcdk::get.xlogp}} (\code{calcLogP="rcdk"}),
+#'   \href{https://github.com/openbabel/openbabel}{OpenBabel} (\code{calcLogP="obabel"}) or not at all
+#'   (\code{calcLogP="none"}). The \code{log P} are values of parents and TPs are used to predict their relative
+#'   retention order (\code{retDir}).
+#'
+#'   \item \code{forceCalcLogP} Force calculation of \verb{Log P} values, even if already provided by the TP generation
+#'   algorithm. This is primarily useful to obtain Log P values that were consistently calculated with the same
+#'   algorithm, as some algorithms may only partially output these values (\emph{e.g.} not for parents).
+#'
+#'   \item \code{forceCalcRetDir} Force calculation of retention order directions, even if already provided by the TP
+#'   generation algorithm. This is primarily intended for re-calculation of library TP data, which may have been
+#'   calculated with different Log P values.
+#'
+#'   \item \code{minLogPDiff} The minimum difference in \verb{Log P} values between a parent and its TPs to be
+#'   considered eluting differently. If less than this value the the retention time direction is assigned as unknown
+#'   (\samp{0}).
+#'
+#'   \item \code{calcSims} If set to \code{TRUE} then structural similarities between the parent and its TPs are
+#'   calculated. The \link[=filter,transformationProductsStructure-method]{filter method} can be used to threshold
+#'   structural similarities. This may be useful under the assumption that parents and TPs who have a high structural
+#'   similarity, also likely have a high MS/MS spectral similarity (which can be evaluated after componentization with
+#'   \code{\link{generateComponentsTPs}}).
+#'
+#'   \item \code{fpType} The type of structural fingerprint that should be calculated. See the \code{type} argument of
+#'   the \code{\link{get.fingerprint}} function of \CRANpkg{rcdk}.
+#'
+#'   \item \code{fpSimMethod} The method for calculating similarities (i.e. not dissimilarity!). See the \code{method}
+#'   argument of the \code{\link{fp.sim.matrix}} function of the \CRANpkg{fingerprint} package.
+#'
+#' }
+#'
+#' These parameters are passed as a named \code{list} as the \code{TPStructParams} argument to functions.
+#' 
+#' The \code{getDefTPStructParams} function generates such parameter list with defaults.
+#' 
+#' @param \dots optional named arguments that override defaults.
+#'
+#' @references \addCitations{rcdk}{1} \cr\cr \insertRef{OBoyle2011}{patRoon}
+#'
+#' @export
+getDefTPStructParams <- function(...)
+{
+    def <- list(
+        calcLogP = "rcdk",
+        forceCalcLogP = FALSE,
+        forceCalcRetDir = FALSE,
+        minLogPDiff = 1,
+        calcSims = FALSE,
+        fpType = "extended",
+        fpSimMethod = "tanimoto"
+    )
+    
+    return(modifyList(def, list(...)))
+}
+
 #' @export
 getDefPeakParams <- function(type, algorithm, ...)
 {

@@ -157,6 +157,7 @@ getTPsCompounds <- function(annTable, parentRow, TPStructParams, extraOptsFMCSR,
 }
 
 
+#' @template tp_gen-struct_params
 #' @export
 generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, fGroupsComps = NULL, minRTDiff = 20, minFitFormula = 0,
                                minFitCompound = 0, minSimSusp = 0, minFitCompOrSimSusp = c(0, 0),

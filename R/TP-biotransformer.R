@@ -165,8 +165,7 @@ BTMPPrepareHandler <- function(cmd)
 #'   the \code{maxExpGenerations} argument is used to avoid excessive expansions.
 #'
 #' @template tp_gen-scr
-#' @template tp_gen-sim
-#' @template fp-args
+#' @template tp_gen-struct_params
 #'
 #' @templateVar whatCP parent suspect list
 #' @template chemPropCalc

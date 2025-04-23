@@ -34,9 +34,8 @@ setMethod("initialize", "transformationProductsLibrary",
 #'
 #' @templateVar parNULL TRUE
 #' @template tp_gen-scr
-#'
-#' @template tp_gen-sim
-#' @template fp-args
+#' 
+#' @template tp_gen-struct_params
 #'
 #' @templateVar whatCP parent suspect list
 #' @template chemPropCalc

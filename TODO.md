@@ -119,7 +119,7 @@
 
 - minAbundanceFeatAbs/Rel: does it make sense to also filter fGroup peak lists? If not, remove and update docs.
 - default thresholds for ann forms/comps
-- calc sets annSims like those for formulas/compounds (and update docs if not)
+- calc sets annSims like those for formulas/compounds, update NEWS (and update docs if we don't change this)
 
 ## msdata
 
@@ -280,12 +280,13 @@
         - new slots
     - generateTPs()
         - ann_comp/ann_form algos
-        - forceCalcRetDir: only relevant for library atm, clearly mention its use in genTPsLib docs
-        - TPStructParams: all parameters, explain when logPs are calculated (ie if both parent/TP is absent)
         - TPsComp/TPsForm
             - filter()
             - mention that suspect list parents are not filtered out from candidate list
         - parallel=T is only useful with many candidates
+        - retdir explanation somewhere for getDefTPStructParams()
+        - update seealso for other TP classes
+        - docs for TP ann form/comp classes
 - IMS
     - minIntensityIMS template, also for getEICs()
     - hasMobilities slot for features

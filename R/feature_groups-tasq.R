@@ -3,8 +3,9 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 #' @include feature_groups.R
+NULL
 
-#' @rdname suspect-screening
+#' @rdname importFeatureGroupsBrukerTASQ
 featureGroupsBrukerTASQ <- setClass("featureGroupsBrukerTASQ", contains = "featureGroups")
 
 setMethod("initialize", "featureGroupsBrukerTASQ",

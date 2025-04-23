@@ -288,10 +288,6 @@ setGeneric("generateTPsLogic", function(fGroups, minMass = 40, ...) standardGene
 #' @rdname featureGroupsScreening-class
 setGeneric("screenInfo", function(obj) standardGeneric("screenInfo"))
 
-#' @rdname featureGroupsScreening-class
-setGeneric("annotateSuspects", function(fGroups, MSPeakLists = NULL, formulas = NULL,
-                                        compounds = NULL, ...) standardGeneric("annotateSuspects"))
-
 #' @param \dots Further arguments specified to the methods.
 #' @rdname suspect-screening
 setGeneric("screenSuspects", function(fGroups, suspects, rtWindow = defaultLim("retention", "medium"),
@@ -472,10 +468,10 @@ setGeneric("defaultExclNormScores", function(obj) standardGeneric("defaultExclNo
 #' @template generics
 setGeneric("expandForIMS", function(obj, ...) standardGeneric("expandForIMS"))
 
-#' @templateVar func estimateIDLevels
-#' @templateVar desc estimates identification confidence levels.
+#' @templateVar func estimateIDConfidence
+#' @templateVar desc estimates identification confidence.
 #' @template generics
-setGeneric("estimateIDLevels", function(obj, ...) standardGeneric("estimateIDLevels"))
+setGeneric("estimateIDConfidence", function(obj, ...) standardGeneric("estimateIDConfidence"))
 
 #' @templateVar func export
 #' @templateVar desc exports workflow data to a given format.

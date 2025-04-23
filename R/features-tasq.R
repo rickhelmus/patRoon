@@ -22,7 +22,7 @@ loadTASQFile <- function(path, analysisInfo)
     return(tExport)
 }
 
-#' @rdname suspect-screening
+#' @rdname importFeatureGroupsBrukerTASQ
 featuresBrukerTASQ <- setClass("featuresBrukerTASQ", contains = "features")
 
 setMethod("initialize", "featuresBrukerTASQ",

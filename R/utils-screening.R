@@ -513,7 +513,7 @@ doSuspectFilter <- function(obj, onlyHits, selectHitsBy, selectBestFGroups, maxL
             }
             return(si)
         }
-        colFilterAnn <- function(...) colFilter(dataWhich = "annotation", funcToRun = "annotateSuspects", ...)
+        colFilterAnn <- function(...) colFilter(dataWhich = "annotation", funcToRun = "estimateIDConfidence", ...)
         minPred <- function(x, v) x >= v
         maxPred <- function(x, v) x <= v
         levPred <- function(x, v) maxPred(numericIDLevel(x), v)
@@ -538,7 +538,7 @@ doSuspectFilter <- function(obj, onlyHits, selectHitsBy, selectBestFGroups, maxL
             doSelectFilter <- function(si, by, byCol)
             {
                 if (by == "level" && is.null(si[["estIDLevel"]]))
-                    warning("Cannot select by identification level: no annotation data available (did you run annotateSuspects()?).")
+                    warning("Cannot select by identification level: no annotation data available (did you run estimateIDConfidence()?).")
                 else
                 {
                     gTab <- as.data.table(obj, collapseSuspects = NULL, onlyHits = TRUE)

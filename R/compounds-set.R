@@ -248,11 +248,11 @@ setMethod("predictRespFactors", "compoundsSet", doFeatAnnPredictRFSets)
 setMethod("predictTox", "compoundsSet", doFeatAnnPredictToxSets)
 
 #' @export
-setMethod("estimateIDLevels", "compoundsSet", function(obj, absMzDev = defaultLim("mz", "medium"), MSPeakLists = NULL,
-                                                       formulas = NULL,  formulasNormalizeScores = "max",
-                                                       compoundsNormalizeScores = "max",
-                                                       IDFile = system.file("misc", "IDLevelRules.yml", package = "patRoon"),
-                                                       logPath = NULL, parallel = TRUE)
+setMethod("estimateIDConfidence", "compoundsSet", function(obj, absMzDev = defaultLim("mz", "medium"), MSPeakLists = NULL,
+                                                           formulas = NULL,  formulasNormalizeScores = "max",
+                                                           compoundsNormalizeScores = "max",
+                                                           IDFile = system.file("misc", "IDLevelRules.yml", package = "patRoon"),
+                                                           logPath = NULL, parallel = TRUE)
 {
     checkmate::assertClass(MSPeakLists, "MSPeakListsSet", null.ok = TRUE)
     checkmate::assertClass(formulas, "formulasSet", null.ok = TRUE)
@@ -263,10 +263,10 @@ setMethod("estimateIDLevels", "compoundsSet", function(obj, absMzDev = defaultLi
     logPath <- if (is.null(logPath)) rep(list(NULL), length(sets(obj))) else file.path(logPath, sets(obj))
     
     obj@setObjects <- Map(setObjects(obj), MSPeakLists = unsetMSPL, formulas = unsetFormulas, logPath = logPath,
-                          f = estimateIDLevels, MoreArgs = list(absMzDev = absMzDev,
-                                                                formulasNormalizeScores = formulasNormalizeScores,
-                                                                compoundsNormalizeScores = compoundsNormalizeScores,
-                                                                IDFile = IDFile, parallel = parallel))
+                          f = estimateIDConfidence, MoreArgs = list(absMzDev = absMzDev,
+                                                                    formulasNormalizeScores = formulasNormalizeScores,
+                                                                    compoundsNormalizeScores = compoundsNormalizeScores,
+                                                                    IDFile = IDFile, parallel = parallel))
     obj <- updateSetConsensus(obj)
     obj@groupAnnotations <- lapply(annotations(obj), assignSetsIDLs, sets(obj))
 

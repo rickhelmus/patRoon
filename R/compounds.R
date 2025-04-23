@@ -665,6 +665,7 @@ setMethod("predictTox", "compounds", function(obj, LC50Mode = "static", concUnit
     return(addCompoundScore(obj, "LC50_SMILES", updateScore, scoreWeight))
 })
 
+#' @rdname id-conf
 #' @export
 setMethod("estimateIDConfidence", "compounds", function(obj, absMzDev = defaultLim("mz", "medium"), MSPeakLists = NULL,
                                                         formulas = NULL,

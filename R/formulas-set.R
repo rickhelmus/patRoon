@@ -218,6 +218,7 @@ setMethod("predictRespFactors", "formulasSet", doFeatAnnPredictRFSets)
 #' @export
 setMethod("predictTox", "formulasSet", doFeatAnnPredictToxSets)
 
+#' @rdname id-conf
 #' @export
 setMethod("estimateIDConfidence", "formulasSet", function(obj, absMzDev = defaultLim("mz", "medium"),
                                                           normalizeScores = "max",

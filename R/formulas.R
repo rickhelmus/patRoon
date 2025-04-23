@@ -426,6 +426,7 @@ setMethod("plotScoresHash", "formulas", function(obj, index, groupName, analysis
     return(makeHash(index, annTable, normalizeScores, excludeNormScores))
 })
 
+#' @rdname id-conf
 #' @export
 setMethod("estimateIDConfidence", "formulas", function(obj, absMzDev = defaultLim("mz", "medium"), normalizeScores = "max",
                                                        IDFile = system.file("misc", "IDLevelRules.yml", package = "patRoon"),

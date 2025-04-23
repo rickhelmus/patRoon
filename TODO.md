@@ -119,6 +119,7 @@
 
 - minAbundanceFeatAbs/Rel: does it make sense to also filter fGroup peak lists? If not, remove and update docs.
 - default thresholds for ann forms/comps
+- calc sets annSims like those for formulas/compounds (and update docs if not)
 
 ## msdata
 
@@ -267,11 +268,8 @@
     - ann
         - annotateSuspects() --> estimateIDConfidence()
         - estimateIDConfidence() description for formulas/compounds
+        - example where annSim is filtered with scoreLimits
 - TC
-    - ES contributions for IDLs
-    - explicitly mention annSim can be filtered with scoreLimits?
-    - annSim for sets is calculated as max
-    - annSimForm / annSimBoth are added by compounds method of estimateIDConfidence() if formulas/MSPL are set, may be used for ID levels (not by default)
     - reorderAnalyses(): doc that XCMS/XCMS3/KPIC2 fGroups internal slot is not updated, maybe also improve general docs for what is updated and for XCMS what it means for exporting data
     - MSPL
         - abundance columns in mspl --> section in generateMSPeakLists()?

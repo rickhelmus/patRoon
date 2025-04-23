@@ -287,8 +287,6 @@
             - filter()
             - mention that suspect list parents are not filtered out from candidate list
         - parallel=T is only useful with many candidates
-- msdata
-    - timsconvert; add refs, installation
 - IMS
     - minIntensityIMS template, also for getEICs()
     - hasMobilities slot for features

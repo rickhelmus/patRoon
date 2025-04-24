@@ -345,7 +345,6 @@
     - doc new functions
     - appendix in Handbook
     - patRoon.path.limits options
-- MS2QuantMeta slots for fGroyupsScreeningSet, formulasSet and compoundsSet (latter already present but wasn't filled in)
 - add Handbook section on file conversion
     - mention mzXML/mzML requirements as newProject() doesn't give note anymore
 
@@ -475,7 +474,7 @@
 - sets names are now checked to not contain any special characters (besides underscores). Automatic labels are now separated by underscores instead of dots.
 - FIXED: SIRIUS with calculateFeatures=T may sometimes fail due to file name truncation
 - generateAnalysisInfo()
-- MS2QuantMeta slots for fGroyupsScreeningSet, formulasSet and compoundsSet (latter already present but wasn;t filled in)
+- MS2QuantMeta slots for fGroupsScreeningSet, formulasSet and compoundsSet (latter already present but wasn;t filled in)
 
 
 ## Features

@@ -11,6 +11,7 @@ NULL
 #' screening worfklows} will merge the information from \code{screenInfo}, such as
 #' suspect names and other properties and annotation data.
 #'
+#' @param x The \code{featureGroups} like object to be exported as table.
 #' @param average Controls the averaging of feature intensities. Averaging also influences the calculation of regression
 #'   parameters. Set to \code{FALSE} to disable averaging, \code{TRUE} to average per replicate or to the name of a
 #'   column in the \link[=analysis-information]{analysis information} to compare by a custom grouping of analyses.
@@ -26,6 +27,8 @@ NULL
 #' @param normalized If \code{TRUE} then normalized intensities are used (see the \verb{Feature intensity normalization}
 #'   section). If no normalization data is available (\emph{e.g.} because \code{normInts} was not used) then an
 #'   automatic group normalization is performed.
+#' @param FCParams A parameter list to calculate Fold change data. See \code{getFCParams} for more details. Set to
+#'   \code{NULL} to not perform FC calculations.
 #' @param qualities Adds feature (group) qualities (\code{qualities="quality"}), scores (\code{qualities="score"}) or
 #'   both (\code{qualities="both"}), if this data is available (\emph{i.e.} from \code{calculatePeakQualities}). If
 #'   \code{qualities=FALSE} then nothing is reported.
@@ -43,6 +46,8 @@ NULL
 #'   collapsed to a single row and suspect names are separated by the value of \code{collapseSuspects}. If \code{NULL}
 #'   then no collapsing occurs, and each suspect match is reported on a single row. See the \verb{Suspect collapsing}
 #'   section below for additional details.
+#' @param onlyHits If \code{TRUE} then only feature groups with suspect hits are reported.
+#' @param \dots Passed to the parent \code{as.data.table} method.
 #'
 #' @section Regression calculation: The \code{regression} argument controls the calculation of regression parameters
 #'   from a regression model calculated with feature intensities (or areas if \code{areas=TRUE}). Here, simple linear

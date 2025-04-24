@@ -242,7 +242,7 @@
 
 ## Docs
 
-- Rcpp refs don't seem to work anymore?
+- Rcpp refs and fastcluster refs don't seem to work anymore?
 - move all plotBPC(), getEIC() etc methods into one doc file?
 - anaInfo
     - link to IMS section where path_IMS is explained
@@ -447,6 +447,7 @@
     - (subsetDTColumnsIfPresent: use order of requested cols instead of original) --> may change column order in some places
     - minIntensity arg for pwiz conversion, set by default
     - getBPCs(): doen't return m/z anymore
+    - SAFD: fileType replaces profPath argument
 - IMS
     - hasMobilities slot for features
     - Dietrich features

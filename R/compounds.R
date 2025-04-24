@@ -940,6 +940,8 @@ setMethod("consensus", "compounds", function(obj, ..., MSPeakLists,
 #'   feature groups in the subset are considered.
 #' @param MSPeakLists A \code{\link{MSPeakLists}} object that was generated for the supplied \code{fGroups}.
 #' @param \dots Any parameters to be passed to the selected compound generation algorithm.
+#' 
+#' @template specSimParams_annSim-arg
 #'
 #' @section Scorings: Each algorithm implements their own scoring system. Their names have been simplified and
 #'   harmonized where possible. The \code{\link{compoundScorings}} function can be used to get an overview of both the

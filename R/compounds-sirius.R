@@ -261,6 +261,7 @@ setMethod("predictTox", "compoundsSIRIUS", function(obj, type = "FP", LC50Mode =
 #' @template sirius_form-args
 #' @template adduct-arg
 #' @template comp_algo-args
+#' @template specSimParams_annSim-arg
 #'
 #' @inheritParams generateCompounds
 #'

@@ -547,6 +547,8 @@ setMethod("consensus", "formulas", function(obj, ..., MSPeakLists,
 #' @param MSPeakLists An \code{\link{MSPeakLists}} object that was generated for the supplied \code{fGroups}.
 #' @param \dots Any parameters to be passed to the selected formula generation algorithm.
 #'
+#' @template specSimParams_annSim-arg
+#'
 #' @section Candidate assignment: Formula candidate assignment occurs in one of the following ways: \itemize{
 #'
 #'   \item Candidates are first generated for each feature and then pooled to form consensus candidates for the feature

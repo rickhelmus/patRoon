@@ -240,6 +240,9 @@ getTPsCompounds <- function(annTable, parentRow, TPStructParams, extraOptsFMCSR,
 #' 
 #' @template parallel-arg
 #' @template tp_gen-struct_params
+#' 
+#' @templateVar whatCP parent suspect list
+#' @template chemPropCalc
 #'
 #' @return \code{generateTPsAnnComp} returns an object of the class \code{\link{transformationProductsAnnComp}}. Please
 #'   see its documentation for \emph{e.g.} filtering steps that can be performed on this object.

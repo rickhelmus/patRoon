@@ -39,8 +39,6 @@ NULL
 #' @param aggregate Specifies how data should be aggregated prior to comparison. Set to \code{FALSE} to compare
 #'   analyses, \code{TRUE} to compare replicates or to the name of a column in the \link[=analysis-information]{analysis
 #'   information} to compare by a custom grouping of analyses.
-#' @param FCParams A parameter list to calculate Fold change data. See \code{getFCParams} for more details. Set to
-#'   \code{NULL} to not perform FC calculations.
 #' @param MSLevel Integer vector with the ms levels (i.e., 1 for MS1 and 2 for MS2) to obtain TIC traces.
 #' @param retentionRange Range of retention time (in seconds) to collect TIC traces. Should be a numeric vector with
 #'   length of two containing the min/max values. Set to NULL to ignore.
@@ -705,12 +703,13 @@ setMethod("export", "featureGroups", function(obj, type, out, IMS = FALSE)
 })
 
 #' @describeIn featureGroups Obtain a subset with unique feature groups present in one or more specified replicate(s).
+#' @param incomparables Not used.
 #' @param relativeTo A character vector with replicates that should be used for unique comparison. If \code{NULL} then
 #'   all replicates are used for comparison. replicates specified in \code{which} are ignored.
 #' @param outer If \code{TRUE} then only feature groups are kept which do not overlap between the specified replicates
 #'   for the \code{which} parameter.
 #' @export
-setMethod("unique", "featureGroups", function(x, which, aggregate = TRUE, relativeTo = NULL, outer = FALSE)
+setMethod("unique", "featureGroups", function(x, incomparables = FALSE, which, aggregate = TRUE, relativeTo = NULL, outer = FALSE)
 {
     anaInfo <- analysisInfo(x)
     aggregate <- assertAndPrepareAnaInfoBy(aggregate, anaInfo, FALSE)

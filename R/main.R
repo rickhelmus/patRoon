@@ -415,13 +415,14 @@ NULL
 #' instance, \code{annSimForm} and \code{formRank} are only calculated if the \code{formulas} argument is set, and
 #' levels for \code{estIDLevel} will be poor if no compound annotations are available.
 #'
-#' @templateVar normParam compoundsNormalizeScores,formulasNormalizeScores
+#' @templateVar normParam normalizeScores,compoundsNormalizeScores,formulasNormalizeScores
 #' @templateVar noNone TRUE
 #' @template norm-args
 #'
 #' @template specSimParams-arg
 #' @template parallel-arg
 #'
+#' @param obj The object for which identification confidence should be estimated.
 #' @param MSPeakLists,formulas,compounds Annotation data (\code{\link{MSPeakLists}}, \code{\link{formulas}} and
 #'   \code{\link{compounds}}). All arguments can be \code{NULL}, but it is recommended to set them if possible to allow
 #'   the most complete estimations.

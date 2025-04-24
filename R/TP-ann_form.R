@@ -24,8 +24,7 @@ setMethod("initialize", "transformationProductsAnnForm",
 #' @describeIn transformationProductsAnnForm Performs rule-based filtering. Useful to simplify and clean-up the data.
 #'
 #' @param obj The \code{transformationProductsAnnForm} object that should be filtered.
-#' @param \dots Further arguments passed to the {\link[=filter,transformationProductsFormula-method]{parent filter
-#'   method}}.
+#' @param \dots Further arguments passed to the {\link[=filter,transformationProducts-method]{parent filter method}}.
 #' @param minFitFormula,minTPScore Thresholds related to TP scoring. See \code{\link{generateTPsAnnForm}} for more
 #'   details.
 #' @param topMost Only keep this number of top-most TPs (based on \code{TPScore}) for each parent/feature group
@@ -164,6 +163,9 @@ getTPsFormulas <- function(annTable, parName, parFormula, minFitFormula)
 #' @template tp_gen-scr
 #'
 #' @template parallel-arg
+#' 
+#' @templateVar whatCP parent suspect list
+#' @template chemPropCalc
 #'
 #' @return \code{generateTPsAnnForm} returns an object of the class \code{\link{transformationProductsAnnForm}}. Please
 #'   see its documentation for \emph{e.g.} filtering steps that can be performed on this object.

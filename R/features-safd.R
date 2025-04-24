@@ -60,33 +60,29 @@ makeSAFDCommand <- function(inPath, fileName, cent, mzRange, maxNumbIter, maxTPe
 #'
 #' @details The support for SAFD is still experimental, and its interface might change in the future.
 #'
-#'   In order to use SAFD, please make sure that its \code{julia} packages are installed and you have verified that
+#'   In order to use SAFD, please make sure that its \command{julia} packages are installed and you have verified that
 #'   everything works, \emph{e.g.} by running the test data.
 #'
-#'   This algorithm supports profile and centroided MS data. If the use of profile data is desired, centroided data
-#'   must still be available for other functionality of \code{patRoon}. The centroided data is specified through the
-#'   'regular' \link[=analysis-information]{analysis info} mechanism. The location to any profile data is specified
-#'   through the \code{profPath} argument (\code{NULL} for no profile data). The base file names (\emph{i.e.} the file
-#'   name without path and extension) of both centroid and profile data must be the same. Furthermore, the format of the
-#'   profile data must be \file{mzXML}.
+#'   This algorithm supports profile and centroided MS data. If the use of profile data is desired, centroided data must
+#'   still be available for other functionality of \code{patRoon}.
 #'
 #' @inheritParams findFeatures
 #'
-#' @param profPath A \code{character} vector with paths to the profile MS data for each analysis (will be re-cycled if
-#'   necessary). See the \verb{Using SAFD} section for more details.
+#' @param fileType Should be \code{"centroid"}, \code{"profile"} or \code{NULL}. In the latter case the function will
+#'   first try profiled data and then centroided data.
 #' @param mzRange The \emph{m/z} window to be imported (passed to the \code{import_files_MS1} function).
 #' @param maxNumbIter,maxTPeakW,resolution,minMSW,RThreshold,minInt,sigIncThreshold,S2N,minPeakWS Parameters directly
 #'   passed to the \code{safd_s3D} function.
 #'
 #' @templateVar what \code{findFeaturesSAFD}
 #' @template uses-multiProc
-#' 
+#'
 #' @template parallelization-cache_input
 #'
 #' @references \insertRef{Samanipour2019}{patRoon}
-#' 
+#'
 #' @inherit findFeatures return
-#' 
+#'
 #' @export
 findFeaturesSAFD <- function(analysisInfo, fileType = NULL, mzRange = c(0, 400), 
                              maxNumbIter = 1000, maxTPeakW = 300, resolution = 30000,
@@ -113,7 +109,7 @@ findFeaturesSAFD <- function(analysisInfo, fileType = NULL, mzRange = c(0, 400),
     {
         filePaths <- getMSFilesFromAnaInfo(analysisInfo, "profile", c("mzML", "mzXML"), mustExist = FALSE)
         takeCent <- is.null(filePaths)
-        if (is.null(filePaths))
+        if (takeCent)
             filePaths <- getCentroidedMSFilesFromAnaInfo(analysisInfo, mustExist = FALSE)
         if (is.null(filePaths))
             stop("Couldn't find (a complete set) of profile or centroided data", call. = FALSE)

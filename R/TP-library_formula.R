@@ -38,8 +38,6 @@ setMethod("initialize", "transformationProductsLibraryFormula",
 #' @templateVar whatCP parent suspect list
 #' @template chemPropCalc
 #'
-#' @inheritParams generateTPsLibrary
-#'
 #' @return The TPs are stored in an object derived from the \code{\link{transformationProductsFormula}} class.
 #'
 #' @note Unlike \code{\link{generateTPsLibrary}}, this function defaults the \code{matchParentsBy} and

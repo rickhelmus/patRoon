@@ -77,11 +77,11 @@ unifyLibNames <- function(cTab)
 #' @param checkIons A \code{character} that excludes library records with different adduct (\code{checkIons="adduct"})
 #'   or MS ionization polarity (\code{checkIons="polarity"}). If \code{checkIons="none"} then these filters are not
 #'   applied.
-#' @param specSimParamsLib Like \code{specSimParams}, but these parameters \emph{only} influence pre-treatment of
-#'   library spectra (only the \code{removePrecursor}, \code{relMinIntensity} and \code{minPeaks} parameters are used).
+#' @param specSimParamsLib Like \code{specSimParams}, but these parameters are used for the pre-treatment of library
+#'   spectra (only the \code{removePrecursor}, \code{relMinIntensity} and \code{minPeaks} parameters are used).
 #'
 #' @template adduct-arg
-#' @template specSimParams-arg
+#' @template specSimParams_annSim-arg
 #' @template spectrumType-arg
 #'
 #' @inheritParams generateCompounds

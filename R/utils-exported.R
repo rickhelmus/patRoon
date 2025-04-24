@@ -883,6 +883,7 @@ getIMSMatchParams <- function(param, ...)
     return(ret)
 }
 
+#' @template IMS-arg
 #' @rdname pred-quant
 #' @export
 getQuantCalibFromScreening <- function(fGroups, concs, areas = FALSE, average = FALSE, IMS = "maybe")
@@ -1362,6 +1363,7 @@ installc3sdb <- function(envname = "patRoon-c3sdb", clearEnv = FALSE, ...)
 #'   \link[reticulate:py_install]{reticulate::py_install}. Set to \code{NULL} to not set any virtual Python environment.
 #' @param clearEnv Set to \code{TRUE} to remove the virtual environment if it already exists (using
 #'   \link[reticulate:virtualenv_remove]{reticulate::virtualenv_remove}). Ignored if \code{envname} is \code{NULL}.
+#' @param \dots Further arguments passed to \code{\link[reticulate:py_install]{reticulate::py_install}}.
 #'
 #' @references \insertRef{Luu2022}{patRoon}
 #'

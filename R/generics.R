@@ -375,6 +375,11 @@ setGeneric("report", function(fGroups, MSPeakLists = NULL, formulas = NULL, comp
 #' @name generics
 NULL
 
+#' @param \dots Method specific arguments.
+#' @rdname id-conf
+setGeneric("estimateIDConfidence", function(obj, ...) standardGeneric("estimateIDConfidence"))
+
+
 #' @templateVar func adducts
 #' @templateVar desc returns assigned adducts of the object.
 #' @template generics
@@ -467,11 +472,6 @@ setGeneric("defaultExclNormScores", function(obj) standardGeneric("defaultExclNo
 #' @templateVar desc expands data for ion mobilities assigned to features.
 #' @template generics
 setGeneric("expandForIMS", function(obj, ...) standardGeneric("expandForIMS"))
-
-#' @templateVar func estimateIDConfidence
-#' @templateVar desc estimates identification confidence.
-#' @template generics
-setGeneric("estimateIDConfidence", function(obj, ...) standardGeneric("estimateIDConfidence"))
 
 #' @templateVar func export
 #' @templateVar desc exports workflow data to a given format.

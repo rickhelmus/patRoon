@@ -326,11 +326,10 @@
             - unless screening occurred before mobility assignment, which needs to be in a expand workflow?
         - doc expandForIMS() generic and methods
         - clearly doc the difference if TP components are generated after assignMobilities(); there will be no IMS TP parents with expanding
-    - convertMobilityToCCS() / convertCCSToMobility()
+    - convertMobilityToCCS() / convertCCSToMobility() / getCCSParams()
         - clearly refer to papers and implementations
-        - mention that length of charge param is expanded
-    - getCCSParams()
         - doc where Mason-Schamp const comes from
+        - finish details, eg formulas
     - suspects/compounds
         - doc order of data selection for mobility and CCS columns
     - getIMSRangeParams() and getIMSMatchParams()

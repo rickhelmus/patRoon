@@ -59,6 +59,7 @@
 - start using saveCacheDataList() on more places?
 - basic and default error handling for executeCommand()?
 - getEIMs() function?
+- add TP-formula filter() method, so parent-duplicates can be removed (ie removeParentIsomers filter)? If so, link to it in ann_form docs like ann_comp
 
 
 ## newProject()
@@ -278,14 +279,6 @@
         - as.data.table candidates arg
         - candidate specific frag/NL matches, also filter
         - new slots
-    - generateTPs()
-        - TPsComp/TPsForm
-            - filter()
-            - mention that suspect list parents are not filtered out from candidate list
-        - update seealso for other TP classes
-        - docs for TP ann form class
-            - link to them in generator functions, eg filter method for additional filtering
-    - tp_gen-scr: rewrite/move note about algo using structural data, as it doesn't make much sense for ann_comp/ann_form
 - IMS
     - minIntensityIMS template, also for getEICs()
     - hasMobilities slot for features

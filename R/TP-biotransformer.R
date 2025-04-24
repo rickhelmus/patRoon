@@ -164,7 +164,11 @@ BTMPPrepareHandler <- function(cmd)
 #'   Note that this may result in pathways with more generations than defined by the \code{generations} argument. Thus,
 #'   the \code{maxExpGenerations} argument is used to avoid excessive expansions.
 #'
+#' @templateVar parComp TRUE
+#' @templateVar req \acronym{SMILES} or \acronym{InChI}
+#' @templateVar neutTPs TRUE
 #' @template tp_gen-scr
+#'
 #' @template tp_gen-struct_params
 #'
 #' @templateVar whatCP parent suspect list

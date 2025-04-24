@@ -89,8 +89,12 @@ runCTS <- function(parentRow, transLibrary, generations, errorRetries, neutraliz
 #'
 #' @return The TPs are stored in an object derived from the \code{\link{transformationProductsStructure}} class.
 #'
-#' @template parallel-arg
+#' @templateVar parComp TRUE
+#' @templateVar req \acronym{SMILES} or \acronym{InChI}
+#' @templateVar neutTPs TRUE
 #' @template tp_gen-scr
+#'
+#' @template parallel-arg
 #' @template tp_gen-struct_params
 #'
 #' @templateVar whatCP parent suspect list

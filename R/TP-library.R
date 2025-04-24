@@ -32,7 +32,10 @@ setMethod("initialize", "transformationProductsLibrary",
 #' @templateVar id SMILES
 #' @template tp_lib
 #'
+#' @templateVar parComp TRUE
+#' @templateVar req \acronym{SMILES} or \acronym{InChI}
 #' @templateVar parNULL TRUE
+#' @templateVar neutTPs TRUE
 #' @template tp_gen-scr
 #' 
 #' @template tp_gen-struct_params

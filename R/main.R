@@ -118,6 +118,8 @@ NULL
 #'   \item \code{patRoon.path.BiotransFormer} The full file path to the \command{biotransformer} \file{.jar} command
 #'   line utility. This needs to be set when \code{\link{generateTPsBioTransformer}} is used. For more details see
 #'   \url{https://bitbucket.org/djoumbou/biotransformer/src/master}.
+#'   
+#'   \item \code{patRoon.path.limits} A path to a customized \link[=limits]{limits YAML file}.
 #'
 #'   }
 #'

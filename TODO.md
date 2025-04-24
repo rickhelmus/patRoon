@@ -79,6 +79,7 @@
         - IMS mode: none, direct, post
         - CCS calculation (bruker, agilent, etc)
             - specify calib file for agilent
+        - set instrument type for limits.yml
     - Analyses
         - Toggle IMS file type
             - what to do if analyses are already present? Warn and remove? Or don't toggle and warn on project creation?
@@ -270,6 +271,9 @@
         - annotateSuspects() --> estimateIDConfidence()
         - estimateIDConfidence() description for formulas/compounds
         - example where annSim is filtered with scoreLimits
+    - file conversion
+        - mention mzXML/mzML requirements as newProject() doesn't give note anymore
+    - appendix section for limits? Mention patRoon.path.limits option?
 - TC
     - reorderAnalyses(): doc that XCMS/XCMS3/KPIC2 fGroups internal slot is not updated, maybe also improve general docs for what is updated and for XCMS what it means for exporting data
     - MSPL
@@ -278,6 +282,7 @@
     - minIntensityIMS template, also for getEICs()
     - hasMobilities slot for features
     - Dietrich features
+        - refer to defaults/limits for getFeaturesEICsParams() (and removeDuplicateFeatsSusps()?)
     - getDefPeakParams()
     - getDefEICParams() / getDefEIMParams()
         - finish docs for IMSWindow/clusterMethod
@@ -329,6 +334,7 @@
     - suspects/compounds
         - doc order of data selection for mobility and CCS columns
     - getIMSRangeParams() and getIMSMatchParams()
+        - refer to defaults/limits
     - get CCS values from MetFrag
         - use PCL w/ CCSbase
         - still need to call assignMobilities() with from = NULL to get CCS deviations, mobility conversions etc
@@ -340,13 +346,6 @@
         - results are simply copied from parent (including annSims)
         - only fragInfos are updated
         - ignored for MS only formulas
-- limits
-    - defaults also used for params (EIXs etc) --> doc somehow
-    - doc new functions
-    - appendix in Handbook
-    - patRoon.path.limits options
-- add Handbook section on file conversion
-    - mention mzXML/mzML requirements as newProject() doesn't give note anymore
 
 
 ## NEWS

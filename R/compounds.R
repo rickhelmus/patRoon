@@ -40,7 +40,7 @@ NULL
 #' @templateVar excludeParam excludeNormScores
 #' @template norm-args
 #'
-#' @slot MS2QuantMeta Metadata from \pkg{MS2Quant} filled in by \code{predictRespFactors}.
+#' @template ms2q-slot
 #' 
 #' @note The values ranges in the \code{scoreLimits} slot, which are used for normalization of scores, are based on the
 #'   \emph{original} scorings when the compounds were generated (\emph{prior} to employing the \code{topMost} filter to

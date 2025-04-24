@@ -206,6 +206,7 @@ setMethod("averagedPeakLists", "MSPeakLists", function(obj) obj@averagedPeakList
 #' @templateVar class MSPeakLists
 #' @templateVar what analyses
 #' @template strmethod
+#' @param df If \code{TRUE} then a \code{data.frame} is returned, otherwise a \code{data.table} is returned.
 #' @export
 setMethod("analyses", "MSPeakLists", function(obj) names(obj@peakLists))
 
@@ -469,9 +470,9 @@ setMethod("delete", "MSPeakLists", function(obj, i = NULL, j = NULL, k = NULL, r
 #' @param isolatePrec If not \code{NULL} then value should be a \code{list} with parameters used for isolating the
 #'   precursor and its isotopes in MS peak lists (see \verb{Isolating precursor data}). Alternatively, \code{TRUE} to
 #'   apply the filter with default settings (as given with \code{getDefIsolatePrecParams}).
-#' @param deIsotopeMS,deIsotopeMSMS Remove any isotopic peaks in MS or MS/MS peak lists. This may improve data
-#'   processing steps which do not assume the presence of isotopic peaks (e.g. MetFrag for MS/MS). Note that
-#'   \code{getMzRPeakLists} does not (yet) support flagging of isotopes.
+#' @param deIsotope Remove any isotopic peaks in peak lists. This may improve data processing steps which do not assume
+#'   the presence of isotopic peaks (e.g. MetFrag for MS/MS). Note that \code{getMSPeakLists} does not (yet) support
+#'   flagging of isotopes.
 #' @param removeMZs A set of m/z values to be removed from the peak lists. This is typically used to remove background
 #'   peaks. The m/z values should be specified by either be a \code{numeric} vector or a \code{data.frame} with an
 #'   \code{mz} column. The latter is returned by the \code{\link{getBGMSMSPeaks}} function, which attempts to

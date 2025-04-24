@@ -12,17 +12,15 @@ NULL
 #'
 #' This class derives from \code{\link{featureGroups}} and adds suspect screening information.
 #'
-#' @param obj,object,x,fGroups The \code{featureGroupsScreening} object.
-#' @param i,j See \code{\link{featureGroups}}.
+#' @param obj,object,x The \code{featureGroupsScreening} object.
+#' @param i,j,reorder See \code{\link{featureGroups}}.
 #' @param \dots Further arguments passed to the base method.
-#' @param onlyHits For \code{as.data.table}: if \code{TRUE} then only feature groups with suspect hits are reported.
+#' @param onlyHits If \itemize{
 #'
-#'   For \code{filter} \itemize{
-#'
-#'   \item if \code{negate=FALSE} and \code{onlyHits=TRUE} then all feature groups without suspect hits will be removed.
+#'   \item \code{negate=FALSE} and \code{onlyHits=TRUE} then all feature groups without suspect hits will be removed.
 #'   Otherwise nothing will be done.
 #'
-#'   \item if \code{negate=TRUE} then \code{onlyHits=TRUE} will select feature groups without suspect hits,
+#'   \item \code{negate=TRUE} then \code{onlyHits=TRUE} will select feature groups without suspect hits,
 #'   \code{onlyHits=FALSE} will only retain feature groups with suspect matches and this filter is ignored if
 #'   \code{onlyHits=NULL}.
 #'
@@ -573,6 +571,7 @@ setMethod("assignMobilities", "featureGroupsScreening", function(obj, mobPeakPar
 #'
 #' @name suspect-screening
 #' @aliases screenSuspects
+#' @aliases screenSuspects,featureGroups-method
 #' @export
 setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindow, mzWindow, IMSMatchParams,
                                                       adduct, skipInvalid, prefCalcChemProps, neutralChemProps,

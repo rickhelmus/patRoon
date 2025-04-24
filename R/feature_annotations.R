@@ -323,6 +323,7 @@ setMethod("delete", "featureAnnotations", function(obj, i = NULL, j = NULL, ...)
 #'   least one of the terms falls within the range. Set to \code{NULL} to skip this filter.
 #' @param topMost Only keep a maximum of \code{topMost} candidates with highest score (or least highest if
 #'   \code{negate=TRUE}). Set to \code{NULL} to ignore.
+#' @param maxLevel Filter by maximum identification level (\emph{e.g.} \code{"3a"}). Set to \code{NULL} to ignore.
 #' @param negate If \code{TRUE} then filters are applied in opposite manner.
 #'
 #' @template element-args

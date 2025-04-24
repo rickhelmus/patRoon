@@ -70,7 +70,7 @@ NULL
 #'   \file{timsdata.dll} or \file{linux64/libtimsdata.so} file.
 #'
 #'   When \pkg{patRoon} is installed from source, \emph{e.g.} on Linux/macOS systems or when using
-#'   \code{\link{remotes::install_github}} for installation, then the
+#'   \code{\link[remotes:install_github]{remotes::install_github}} for installation, then the
 #'   \href{https://github.com/rickhelmus/Rmstoolkitlib}{https://github.com/rickhelmus/Rmstoolkitlib} \R package must be
 #'   installed in advance.
 #'

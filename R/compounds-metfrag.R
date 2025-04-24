@@ -516,6 +516,7 @@ MFMPErrorHandler <- function(cmd, exitStatus, retries)
 #'
 #' @template adduct-arg
 #' @template comp_algo-args
+#' @template specSimParams_annSim-arg
 #'
 #' @inheritParams generateCompounds
 #'

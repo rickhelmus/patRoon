@@ -840,6 +840,49 @@ getDefPredAggrParams <- function(all = mean, ...)
     return(modifyList(def, list(...)))
 }
 
+#' Parameters for CCS calculation
+#'
+#' Configuration and description of parameters used for CCS calculation.
+#'
+#' The following parameters exist to configure the CCS calculation: \itemize{
+#'
+#'   \item \code{method} The CCS calculation method. Should be \code{"bruker"}, \code{"mason-schamp_k"},
+#'   \code{"mason-schamp_1/k"} or \code{"agilent"}. See details below.
+#'
+#'   \item \code{defaultCharge} The default charge of the ions. This is used when no charge information is available.
+#'
+#'   \item \code{temperature},\code{massGas} The temperature (Kelvin) and exact mass of the drift gas. See calculation
+#'   details below.
+#'
+#'   \item \code{MasonSchampConstant} The Mason-Schamp constant. See calculation details below.
+#'
+#'   \item \code{calibrant} If \code{method="agilent"}: the calibrant data to be used for CCS calculation. This should
+#'   either be \itemize{
+#'
+#'     \item A path to an Agilent \file{.d} file.
+#'
+#'     \item A path to an \file{OverrideImsCal.xml} file (found in \file{sample.d/AcqData}).
+#'
+#'     \item A named \code{list} with the elements \code{massGas}, \code{TFix} and \code{beta}.
+#'
+#'    }
+#'    
+#' }
+#'
+#' The CCS calculation depends on the \code{method} parameter: \itemize{
+#'
+#'   \item \code{bruker}: uses the Bruker \command{TDF-SDK} for calculations. See \link{msdata} for configuration
+#'   options. Only applicable to TIMS data.
+#'   
+#'   \item \code{mason-schamp_k}: uses the Mason-Schamp equation: 
+#'   
+#'   \item \code{mason-schamp_1/k}: the inverse of \code{mason-schamp_k}. This is meant for TIMS data and gives nearly
+#'   identical results as \code{method="bruker"} (but doesn't rely on the \command{TDF-SDK}).
+#'   
+#'   \item \code{agilent}: uses Agilent calibration data with the following equation: 
+#'
+#' }
+#'
 #' @export
 getCCSParams <- function(method, ..., calibrant = NULL)
 {
@@ -980,6 +1023,17 @@ TPLogicTransformations <- function()
     return(patRoon:::TPsLogicTransformations) # stored inside R/sysdata.rda
 }
 
+#' Conversion between mobility and CCS
+#'
+#' Utility functions to convert between mobility and \acronym{CCS} data
+#'
+#' @param mobility,ccs A \code{numeric} vector with mobility or \acronym{CCS} values that should be converted.
+#' @param mz A \code{numeric} vector with the \emph{m/z} values that map to the input mobility or \acronym{CCS} values.
+#' @param CCSParams A \code{list} with parameters for the conversion. See \code{\link{getCCSParams}} for details.
+#' @param charge A \code{numeric} vector with the ion charges that map to the input mobility or \acronym{CCS} data. Will
+#'   be recycled if necessary. If \code{NULL} then the charge configured in \code{CCSParams} is used.
+#'
+#' @name CCS-Conversion
 #' @export
 convertMobilityToCCS <- function(mobility, mz, CCSParams, charge = NULL)
 {
@@ -988,7 +1042,7 @@ convertMobilityToCCS <- function(mobility, mz, CCSParams, charge = NULL)
     checkmate::reportAssertions(ac)
 
     if (is.null(charge))
-        charge <- rep(CCSParams$defaultCharge, length(mobility))
+        charge <- CCSParams$defaultCharge
     charge <- rep(abs(charge), length.out = length(mobility))
     
     u = ((mz * CCSParams$massGas) / (mz + CCSParams$massGas))
@@ -1020,6 +1074,7 @@ convertMobilityToCCS <- function(mobility, mz, CCSParams, charge = NULL)
     # }
 }
 
+#' @rdname CCS-Conversion
 #' @export
 convertCCSToMobility <- function(ccs, mz, CCSParams, charge = NULL)
 {
@@ -1028,7 +1083,7 @@ convertCCSToMobility <- function(ccs, mz, CCSParams, charge = NULL)
     checkmate::reportAssertions(ac)
     
     if (is.null(charge))
-        charge <- rep(CCSParams$defaultCharge, length(mobility))
+        charge <- CCSParams$defaultCharge
     charge <- rep(abs(charge), length.out = length(ccs))
     
     u = ((mz * CCSParams$massGas) / (mz + CCSParams$massGas))

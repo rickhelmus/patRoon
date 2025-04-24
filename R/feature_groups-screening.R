@@ -30,7 +30,8 @@ NULL
 #'
 #' @slot screenInfo A (\code{\link{data.table}}) with results from suspect screening. This table will be amended with
 #'   ID confidence data when \code{\link{estimateIDConfidence}} is run.
-#' @slot MS2QuantMeta Metadata from \pkg{MS2Quant} filled in by \code{predictRespFactors}.
+#' 
+#' @template ms2q-slot
 #'
 #' @templateVar class featureGroupsScreening
 #' @template class-hierarchy

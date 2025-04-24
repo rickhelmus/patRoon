@@ -18,6 +18,9 @@ NULL
 #' @templateVar consAlgo2 GenForm
 #' @template featAnnSets-class
 #'
+#' @slot MS2QuantMeta \setsWF A named \code{list} with for each set the metadata from \pkg{MS2Quant} filled in by
+#'   \code{predictRespFactors}.
+#'
 #' @rdname formulas-class
 #' @export
 formulasSet <- setClass("formulasSet", slots = c(setThreshold = "numeric",

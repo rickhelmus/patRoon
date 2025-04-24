@@ -1204,8 +1204,10 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
             
             for (add in adductsNoNone)
             {
-                wh <- !hasAddCol | !predictAdductOnly | is.na(objDo$adduct) | !nzchar(objDo$adduct) | objDo$adduct == add
-                wh <- rep(wh, length.out = nrow(objDo))
+                wh <- if (!hasAddCol || !predictAdductOnly)
+                    rep(TRUE, nrow(objDo))
+                else
+                    is.na(objDo$adduct) | !nzchar(objDo$adduct) | objDo$adduct == add
                 if (any(wh))
                 {
                     printf("Predicting %d CCS values for adduct '%s'... ", sum(wh), add)

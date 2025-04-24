@@ -2,12 +2,37 @@
 #' @include TP-structure.R
 NULL
 
-#' @rdname transformationProductsStructure-class
+#' Transformation products obtained from compound annotations
+#'
+#' Class to store results transformation products (TPs) obtained from compound annotations.
+#'
+#' This class is derived from the \code{\link{transformationProductsStructure}} base class, please see its documentation
+#' for more details. Objects from this class are returned by \code{\link{generateTPsAnnComp}}.
+#'
+#' @seealso The base class \code{\link{transformationProductsStructure}} for more relevant methods and
+#'   \code{\link{generateTPsAnnComp}}
+#'
+#' @templateVar class transformationProductsAnnComp
+#' @template class-hierarchy
+#'
+#' @export
 transformationProductsAnnComp <- setClass("transformationProductsAnnComp", contains = "transformationProductsStructure")
 
 setMethod("initialize", "transformationProductsAnnComp",
           function(.Object, ...) callNextMethod(.Object, algorithm = "ann_comp", ...))
 
+#' @describeIn transformationProductsAnnComp Performs rule-based filtering. Useful to simplify and clean-up the data.
+#'
+#' @param obj The \code{transformationProductsAnnComp} object that should be filtered.
+#' @param \dots Further arguments passed to the {\link[=filter,transformationProductsStructure-method]{parent filter
+#'   method}}.
+#' @param minFitFormula,minFitCompound,minSimSusp,minFitCompOrSimSusp,minTPScore Thresholds related to TP scoring. See
+#'   \code{\link{generateTPsAnnComp}} for more details.
+#' @param topMost Only keep this number of top-most TPs (based on \code{TPScore}) for each parent/feature group
+#'   combination. Set to \code{NULL} to skip this step.
+#' 
+#' @inheritParams filter,transformationProducts-method
+#'
 #' @export
 setMethod("filter", "transformationProductsAnnComp", function(obj, ..., minFitFormula = 0, minFitCompound = 0,
                                                               minSimSusp = 0, minFitCompOrSimSusp = c(0, 0),
@@ -161,12 +186,18 @@ getTPsCompounds <- function(annTable, parentRow, TPStructParams, extraOptsFMCSR,
 #'
 #' Transforms and prioritizes \link[=compounds]{compound annotation candidates} to obtain TPs.
 #'
-#' The \code{generateTPsAnnComp} function implements the unknown TP screening from compound candidates approach as
-#' described in \insertCite{Helmus2025}{patRoon}. This algorithm does not rely on any known or predicted TPs and is
-#' therefore suitable for 'full non-target' workflows. \emph{All} compound candidates are considered as potential TPs
-#' and are ranked by the \code{TP score}:
+#' @templateVar algo compound annotations
+#' @templateVar do obtain transformation products
+#' @templateVar generic generateTPs
+#' @templateVar algoParam ann_comp
+#' @template algo_generator
 #'
-#' \deqn{TP score = max(fitCompound,simSusp) + annSim}
+#' @details The \code{generateTPsAnnComp} function implements the unknown TP screening from compound candidates approach
+#'   as described in \insertCite{Helmus2025}{patRoon}. This algorithm does not rely on any known or predicted TPs and is
+#'   therefore suitable for 'full non-target' workflows. \emph{All} compound candidates are considered as potential TPs
+#'   and are ranked by the \code{TP score}:
+#'
+#'   \deqn{TP score = max(fitCompound,simSusp) + annSim}
 #'
 #' With: \itemize{
 #'
@@ -181,11 +212,11 @@ getTPsCompounds <- function(annTable, parentRow, TPStructParams, extraOptsFMCSR,
 #'
 #' }
 #'
-#' To speed up the calculation process, several thresholds are applied to rule out unlikely candidates. These thresholds
-#' are defaulted to those derived in \insertCite{Helmus2025}{patRoon}. Nevertheless, calculations can take a very long
-#' time (multiple hours), especially when processing large numbers of candidates from \emph{e.g.} PubChem.
+#'   To speed up the calculation process, several thresholds are applied to rule out unlikely candidates. These
+#'   thresholds are defaulted to those derived in \insertCite{Helmus2025}{patRoon}. Nevertheless, calculations can take
+#'   a very long time (multiple hours), especially when processing large numbers of candidates from \emph{e.g.} PubChem.
 #'
-#' Unlike most other TP generation algorithms, no additional suspect screening step is required.
+#'   Unlike most other TP generation algorithms, no additional suspect screening step is required.
 #'
 #' @param TPsRef A \code{\link{transformationProductsStructure}} object containing suspect TP candidates obtained for
 #'   the same \code{parents} from another TP generation algorithm (\emph{e.g.} \code{\link{generateTPsBioTransformer}}).
@@ -203,16 +234,22 @@ getTPsCompounds <- function(annTable, parentRow, TPStructParams, extraOptsFMCSR,
 #' @param extraOptsFMCSR A \code{list} with additional options passed to the \code{\link[fmcsR:fmcs]{fmcsR::fmcs}}
 #'   function. The following defaults are set: \code{au=1, bu=4, matching.mode="aromatic"}.
 #'
-#' @template parallel-arg
+#' @templateVar req \acronym{SMILES} or \acronym{InChI}
+#' @templateVar neutTPs TRUE
 #' @template tp_gen-scr
+#' 
+#' @template parallel-arg
 #' @template tp_gen-struct_params
 #'
-#' @note Setting \code{parents} to a \code{compounds} object is technically possible, but probably not very useful and
-#'   is mainly supported for consistency with other TP generation algorithms.
+#' @return \code{generateTPsAnnComp} returns an object of the class \code{\link{transformationProductsAnnComp}}. Please
+#'   see its documentation for \emph{e.g.} filtering steps that can be performed on this object.
 #'
-#'   Setting \code{parallel=TRUE} can speed up calculations considerably on multi-core systems. but will also add to RAM
+#' @note Setting \code{parallel=TRUE} can speed up calculations considerably on multi-core systems. but will also add to RAM
 #'   usage. Furthermore, parallelization is only favorable for long calculations due to the overhead of setting up
 #'   multiple \R processes.
+#'
+#'   It is possible that candidates are equal to their parent. To remove these the \code{removeParentIsomers}
+#'   \code{\link[=filter,transformationProductsStructure-method]{filter}} can be used afterwards.
 #'
 #' @references \insertAllCited{} \cr\cr \insertRef{Wang2013}{patRoon}
 #'
@@ -227,7 +264,6 @@ generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, fGroupsComps =
     
     checkmate::assert(
         checkmate::checkClass(parents, "data.frame"),
-        checkmate::checkClass(parents, "compounds"),
         checkmate::checkClass(parents, "featureGroupsScreening"),
         checkmate::checkClass(parents, "featureGroupsScreeningSet"),
         .var.name = "parents"

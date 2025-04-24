@@ -550,7 +550,8 @@ getBGMSMSPeaks <- function(anaInfo, replicates = NULL, MSLevel = 2, retentionRan
 #'
 #' \item \code{window} A value that is subtracted or added to the minimum and maximum retention time (EICs) or mobility
 #' (EIMs) of the feature. Thus, setting this value to \samp{>0} will 'zoom out' on the x-axis of a chromatogram or
-#' mobilogram.
+#' mobilogram. Defaults to \code{defaultLim("retention", "wide")} (EICs) or \code{defaultLim("mobility", "wide")} (EIMs)
+#' (see \link{limits}).
 #'
 #' \item \code{topMost} Only create EICs/EIMs for this number of top most intense features. If \code{NULL} then
 #' EICs/EIMs are created for all features.
@@ -567,7 +568,8 @@ getBGMSMSPeaks <- function(anaInfo, replicates = NULL, MSLevel = 2, retentionRan
 #' This is for IMS workflows where features were detected from centroided LC-MS like data, while EICs/EIMs are generated
 #' from raw IMS data. In this case the feature \emph{m/z} limits were derived from centroided data, which typically has
 #' smaller \emph{m/z} deviations across scans compared to IMS data. The \code{mzExpIMSWindow} parameter sets an
-#' additional \emph{m/z} tolerance to specifically handle this case.
+#' additional \emph{m/z} tolerance to specifically handle this case. Defaults to \code{defaultLim("mz", "default")}
+#' (see \link{limits}).
 #'
 #' \item \code{minIntensityIMS} Raw intensity threshold for IMS data. This is primarily intended to speed up raw data
 #' processing.
@@ -578,7 +580,8 @@ getBGMSMSPeaks <- function(anaInfo, replicates = NULL, MSLevel = 2, retentionRan
 #'
 #' \item \code{mzExpWindow},\code{mobExpWindow} To create EICs or EIMs for analyses in which no feature was found, the
 #' \emph{m/z} or mobility value is derived from the min/max values of all features in the feature group. The value of
-#' \code{mzExpWindow} and \code{mobExpWindow} further expands this window to allow a greater tolerance.
+#' \code{mzExpWindow} and \code{mobExpWindow} further expands this window to allow a greater tolerance. Defaults to
+#' \code{defaultLim("mz", "very_narrow")} and \code{defaultLim("mobility", "very_narrow")} (see \link{limits}).
 #'
 #' \item \code{setsAdductPos},\code{setsAdductNeg} \setsWF In sets workflows the adduct must be known to calculate the
 #' ionized \emph{m/z}. If a feature is completely absent in a particular set then it follows no adduct annotations are
@@ -590,9 +593,10 @@ getBGMSMSPeaks <- function(anaInfo, replicates = NULL, MSLevel = 2, retentionRan
 #' The following additional parameters exist specifically for EIMs (\code{EIMParams}): \itemize{
 #'
 #'   \item \code{maxRTWindow} Maximum retention time window (seconds, +/- feature retention time) in which mobilograms
-#'   are collected and averaged.
+#'   are collected and averaged. Defaults to \code{defaultLim("retention", "very_narrow")} (see \link{limits}).
 #'
-#'   \item \code{IMSWindow},\code{clusterMethod}: IMS clustering parameters.
+#'   \item \code{IMSWindow},\code{clusterMethod}: IMS clustering parameters. \code{IMSWindow} defaults to
+#'   \code{defaultLim("mobility", "medium")} (see \link{limits}).
 #'
 #' }
 #'

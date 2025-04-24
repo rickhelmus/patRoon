@@ -23,10 +23,11 @@ emptyMSPeakList <- function(abundanceColumn, avgCols)
 #' specified as a named \code{list} with the following values: \itemize{
 #'
 #' \item \code{clusterMzWindow} \emph{m/z} window (in Da) used for clustering \emph{m/z} values when spectra are
-#' averaged. For \code{method="hclust"} this corresponds to the cluster height, while for \code{method="distance"} this
-#' value is used to find nearby masses (+/- window).  Too small windows will prevent clustering \emph{m/z} values (thus
-#' erroneously treating equal masses along spectra as different), whereas too big windows may cluster unrelated
-#' \emph{m/z} values from different or even the same spectrum together.
+#' averaged. For \code{method="hclust"} this corresponds to the cluster height, for \code{method="distance"} this value
+#' is used to find nearby masses (+/- window) and for \code{method="bin"} it corresponds to he bin width. Too small
+#' windows will prevent clustering \emph{m/z} values (thus erroneously treating equal masses along spectra as
+#' different), whereas too big windows may cluster unrelated \emph{m/z} values from different or even the same spectrum
+#' together. This value is defaulted as \code{defaultLim("mz", "narrow")} (see \link{limits}).
 #'
 #' \item \code{topMost} Only retain this maximum number of MS peaks when generating averaged spectra. Lowering this
 #' number may exclude more irrelevant (noisy) MS peaks and decrease processing time, whereas higher values may avoid
@@ -160,7 +161,8 @@ getDefIsolatePrecParamsRD <- function()
 #'
 #' \item \code{mzWeight},\code{intWeight} Mass and intensity weights used for cosine calculation.
 #'
-#' \item \code{absMzDev} Maximum absolute \emph{m/z} deviation between mass peaks, used for binning spectra.
+#' \item \code{absMzDev} Maximum absolute \emph{m/z} deviation between mass peaks, used for binning spectra. Defaults to
+#' \code{defaultLim("mz", "medium")} (see \link{limits}).
 #'
 #' \item \code{relMinIntensity} The minimum relative intensity for mass peaks (\samp{0-1}). Peaks with lower intensities
 #' are not considered for similarity calculation. The relative intensities are called after the precursor peak is

@@ -2,12 +2,37 @@
 #' @include TP-formula.R
 NULL
 
-#' @rdname transformationProductsFormula-class
+#' Transformation products obtained from formula annotations
+#'
+#' Class to store results transformation products (TPs) obtained from formula annotations.
+#'
+#' This class is derived from the \code{\link{transformationProductsFormula}} base class, please see its documentation
+#' for more details. Objects from this class are returned by \code{\link{generateTPsAnnForm}}.
+#'
+#' @seealso The base class \code{\link{transformationProductsFormula}} for more relevant methods and
+#'   \code{\link{generateTPsAnnForm}}
+#'
+#' @templateVar class transformationProductsAnnForm
+#' @template class-hierarchy
+#'
+#' @export
 transformationProductsAnnForm <- setClass("transformationProductsAnnForm", contains = "transformationProductsFormula")
 
 setMethod("initialize", "transformationProductsAnnForm",
           function(.Object, ...) callNextMethod(.Object, algorithm = "ann_form", ...))
 
+#' @describeIn transformationProductsAnnForm Performs rule-based filtering. Useful to simplify and clean-up the data.
+#'
+#' @param obj The \code{transformationProductsAnnForm} object that should be filtered.
+#' @param \dots Further arguments passed to the {\link[=filter,transformationProductsFormula-method]{parent filter
+#'   method}}.
+#' @param minFitFormula,minTPScore Thresholds related to TP scoring. See \code{\link{generateTPsAnnForm}} for more
+#'   details.
+#' @param topMost Only keep this number of top-most TPs (based on \code{TPScore}) for each parent/feature group
+#'   combination. Set to \code{NULL} to skip this step.
+#'
+#' @inheritParams filter,transformationProducts-method
+#'
 #' @export
 setMethod("filter", "transformationProductsAnnForm", function(obj, ..., minFitFormula = 0, minTPScore = 0,
                                                               topMost = NULL, verbose = TRUE, negate = FALSE)
@@ -107,10 +132,16 @@ getTPsFormulas <- function(annTable, parName, parFormula, minFitFormula)
 #'
 #' Transforms and prioritizes \link[=formulas]{formula annotation candidates} to obtain TPs.
 #'
-#' The \code{generateTPsAnnForm} function implements the unknown TP screening from formula candidates approach as
-#' described in \insertCite{Helmus2025}{patRoon}. This algorithm does not rely on any known or predicted TPs and is
-#' therefore suitable for 'full non-target' workflows. \emph{All} formula candidates are considered as potential TPs and
-#' are ranked by the \code{TP score}: \deqn{TP score = fitFormula + annSim}
+#' @templateVar algo formula annotations
+#' @templateVar do obtain transformation products
+#' @templateVar generic generateTPs
+#' @templateVar algoParam ann_form
+#' @template algo_generator
+#'
+#' @details The \code{generateTPsAnnForm} function implements the unknown TP screening from formula candidates approach
+#'   as described in \insertCite{Helmus2025}{patRoon}. This algorithm does not rely on any known or predicted TPs and is
+#'   therefore suitable for 'full non-target' workflows. \emph{All} formula candidates are considered as potential TPs
+#'   and are ranked by the \code{TP score}: \deqn{TP score = fitFormula + annSim}
 #'
 #' With: \itemize{
 #'
@@ -121,21 +152,23 @@ getTPsFormulas <- function(annTable, parName, parFormula, minFitFormula)
 #'
 #' }
 #'
-#' To speed up the calculation process, several thresholds are applied to rule out unlikely candidates. These thresholds
-#' are defaulted to those derived in \insertCite{Helmus2025}{patRoon}.
+#'   To speed up the calculation process, several thresholds are applied to rule out unlikely candidates. These
+#'   thresholds are defaulted to those derived in \insertCite{Helmus2025}{patRoon}.
 #'
-#' Unlike most other TP generation algorithms, no additional suspect screening step is required.
+#'   Unlike most other TP generation algorithms, no additional suspect screening step is required.
 #'
 #' @param formulas The \code{\link{formulas}} object containing the formula candidates.
 #' @param minFitFormula Minimum \code{fitFormula} (see Details sections) to filter out unlikely candidates.
 #'
-#' @template parallel-arg
+#' @templateVar req formula
 #' @template tp_gen-scr
 #'
-#' @note Setting \code{parents} to a \code{compounds} object is technically possible, but probably not very useful and
-#'   is mainly supported for consistency with other TP generation algorithms.
+#' @template parallel-arg
 #'
-#'   Setting \code{parallel=TRUE} may speed up calculations, but is only favorable for long calculations due to the
+#' @return \code{generateTPsAnnForm} returns an object of the class \code{\link{transformationProductsAnnForm}}. Please
+#'   see its documentation for \emph{e.g.} filtering steps that can be performed on this object.
+#'
+#' @note Setting \code{parallel=TRUE} may speed up calculations, but is only favorable for long calculations due to the
 #'   overhead of setting up multiple \R processes.
 #'
 #' @references \insertAllCited{}
@@ -148,7 +181,6 @@ generateTPsAnnForm <- function(parents, formulas, minFitFormula = 0, skipInvalid
     
     checkmate::assert(
         checkmate::checkClass(parents, "data.frame"),
-        checkmate::checkClass(parents, "compounds"),
         checkmate::checkClass(parents, "featureGroupsScreening"),
         checkmate::checkClass(parents, "featureGroupsScreeningSet"),
         .var.name = "parents"

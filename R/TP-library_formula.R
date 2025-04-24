@@ -27,10 +27,9 @@ setMethod("initialize", "transformationProductsLibraryFormula",
 #' @details This function is similar to \code{\link{generateTPsLibrary}}, however, it only require formula information
 #'   of the parent and TPs.
 #'
-#' @param parents The parents for which transformation products should be obtained. This should be either a suspect list
-#'   (see \link[=suspect-screening]{suspect screening} for more information) or the resulting output of
-#'   \code{\link{screenSuspects}}. The suspect (hits) are used as parents. If \code{NULL} then TPs for all parents in
-#'   the library are obtained.
+#' @templateVar req formula
+#' @template tp_gen-scr
+#'
 #' @param TPLibrary A \code{data.frame}. See the details below.
 #'
 #' @templateVar id formula

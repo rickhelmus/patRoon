@@ -287,8 +287,9 @@ setMethod("filter", "transformationProducts", function(obj, properties = NULL, v
 #'
 #' @return A \code{\link{transformationProducts}} (derived) object containing all generated TPs.
 #'
-#' @seealso The derived class \code{\link{transformationProductsStructure}} for more specific methods to post-process TP
-#'   data.
+#' @seealso The derived classes \code{\link{transformationProductsFormula}},
+#'   \code{\link{transformationProductsStructure}}, \code{\link{transformationProductsAnnForm}} and
+#'   \code{\link{transformationProductsAnnComp}} for more specific methods to post-process TP data.
 #'
 #' @export
 generateTPs <- function(algorithm, ...)

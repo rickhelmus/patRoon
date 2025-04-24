@@ -398,7 +398,9 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, 
 #' @param x,obj A \code{componentsTPs} object.
 #'
 #' @slot fromTPs A \code{logical} that is \code{TRUE} when the componentization was performed with
-#'   \code{\link{transformationProducts}} data.
+#'   \code{\link{transformationProducts}} data (\emph{i.e.} the TPs argument was not \code{NULL}).
+#' @slot parentsFromScreening A \code{logical} that is \code{TRUE} when the parents were obtained from screening data.
+#' @slot TPsFromScreening A \code{logical} that is \code{TRUE} when the TPs were obtained from screening data.
 #'
 #' @seealso \code{\link{components}} for other relevant methods and \code{\link{generateComponents}}
 #'
@@ -425,6 +427,8 @@ setMethod("parentsFromScreening", "componentsTPs", function(obj) obj@parentsFrom
 setMethod("TPsFromScreening", "componentsTPs", function(obj) obj@TPsFromScreening)
 
 #' @describeIn componentsTPs Returns all component data as a \code{\link{data.table}}.
+#' @param candidates If \code{TRUE} then candidate specific tables are merged in the result table. See
+#'   \code{\link{generateComponentsTPs}} (\verb{Result columns} section) for more details.
 #' @export
 setMethod("as.data.table", "componentsTPs", function(x, candidates = FALSE)
 {
@@ -455,8 +459,8 @@ setMethod("as.data.table", "componentsTPs", function(x, candidates = FALSE)
 #'   (\samp{0-1}). The \code{minSpecSimPrec} and \code{minSpecSimBoth} apply to binned data that is shifted with the
 #'   \code{"precursor"} and \code{"both"} method, respectively (see \link[=specSimParams]{MS spectral similarity
 #'   parameters} for more details). Set to \code{NULL} to ignore.
-#' @param minFragMatches,minNLMatches Minimum number of parent/TP fragment and neutral loss matches, respectively. Set
-#'   to \code{NULL} to ignore. See the \verb{Linking parents and transformation products} section in
+#' @param minTotFragMatches,minTotNLMatches,minFragMatches,minNLMatches Minimum number of (total) parent/TP fragment and
+#'   neutral loss matches. Set to \code{NULL} to ignore. See the \verb{Result columns} section in
 #'   \code{\link{generateComponentsTPs}} for more details.
 #' @param formulas A \code{\link{formulas}} object. The formula annotation data in this object is to verify if elemental
 #'   additions/subtractions from metabolic logic reactions are possible (hence, it only works with data from
@@ -686,14 +690,20 @@ setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked = TRUE, width =
 #'   therefore be considered as both a parent or TP.
 #'
 #'   If transformation product data is given, \emph{i.e.} the \code{TPs} argument is set, then a suspect screening of
-#'   the TPs must be performed in advance (see \code{\link{screenSuspects}} and \code{\link{convertToSuspects}} to
-#'   create the suspect list). Furthermore, if TPs were generated with \code{\link{generateTPsBioTransformer}} or
-#'   \code{\link{generateTPsLibrary}} then the suspect screening must also include the parents (\emph{e.g.} by setting
-#'   \code{includeParents=TRUE} when calling \code{convertToSuspects} or by amending results by setting
-#'   \code{amend=TRUE} to \code{screenSuspects}). The suspect screening is necessary for the componentization algorithm
-#'   to map the feature groups of the parent or TP. If the the suspect screening yields multiple TP hits, all will be
-#'   reported. Similarly, if the suspect screening contains multiple hits for a parent, a component is made for each of
-#'   the parent hits.
+#'   the parents and/or TPs may need to be performed in advance to facilitate linkage. This depends on the algorithm
+#'   that was used to generate the TPs: \itemize{
+#'
+#'     \item the parents need to be screened for all algorithms except \code{logic} (\code{\link{generateTPsLogic}})
+#'
+#'     \item the TPs need to be screened for all algorithms except \code{ann_form} and \code{ann_comp}
+#'     (\code{\link{generateTPsAnnForm}} and \code{\link{generateTPsAnnComp}}).
+#'   }
+#'
+#'   See \code{\link{screenSuspects}} to perform the screening and \code{\link{convertToSuspects}} to create the suspect
+#'   list. To include parents make sure to set \code{includeParents=TRUE} when calling \code{convertToSuspects} or first
+#'   screen for the parents and then amend the screening object with TP screening results by setting \code{amend=TRUE}
+#'   to \code{screenSuspects}. If the the suspect screening yields multiple TP hits, all will be reported. Similarly, if
+#'   the suspect screening contains multiple hits for a parent, a component is made for each of the parent hits.
 #'
 #'   In case no transformation product data is provided (\code{TPs=NULL}), the componentization algorithm simply assumes
 #'   that each feature group from \code{fGroupsTPs} is a potential TP for every parent feature group in \code{fGroups}.
@@ -706,31 +716,46 @@ setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked = TRUE, width =
 #'   calculating Fold Changes (see the \code{\link[=as.data.table,featureGroups-method]{as.data.table}} method for
 #'   feature groups and \code{\link{plotVolcano}}). Of course, other statistical techniques from \R are also suitable.
 #'
-#'   During componentization, several characteristics are calculated which may be useful for post-processing: \itemize{
+#' @section Result columns: During componentization, several characteristics are calculated which may be useful for
+#'   post-processing. These can be obtained with \emph{e.g.}
+#'   \code{\link[=as.data.table,componentsTPs-method]{as.data.table}} or \code{\link{componentTable}}. The properties
+#'   are either reported for each feature group in a component, or for each candidate of a feature group in a component
+#'   (only if \code{TPs} was set).
 #'
-#'   \item \code{specSimilarity}: the MS/MS spectral similarity between the feature groups of the TP and its parent
-#'   (\samp{0-1}).
+#'   The following properties may be reported for each feature group: \itemize{
 #'
-#'   \item \code{specSimilarityPrec},\code{specSimilarityBoth}: as \code{specSimilarity}, but calculated with binned
-#'   data using the \code{"precursor"} and \code{"both"} method, respectively (see \link[=specSimParams]{MS spectral
-#'   similarity parameters} for more details).
+#'     \item \code{specSimilarity}: the MS/MS spectral similarity between the feature groups of the TP and its parent
+#'     (\samp{0-1}).
 #'
-#'   \item \code{totalFragmentMatches} The number of MS/MS fragment formula annotations that overlap between the TP and
-#'   parent. If both the \code{formulas} and \code{compounds} arguments are specified then the annotation data is pooled
-#'   prior to calculation. Note that only unique matches are counted. Furthermore, note that annotations from \emph{all}
-#'   candidates are considered, even if the formula/structure of the parent/TP is known. Hence, \code{totalFragmentMatches}
-#'   is mainly useful when little or no chemical information is known on the parents/TPs, \emph{i.e.}, when
-#'   \code{TPs=NULL} or originates from \code{\link{generateTPsLogic}}. Since annotations for all candidates are used,
-#'   it is highly recommended that the annotation objects are first processed with the \code{\link{filter}} method, for
-#'   instance, to select only the top ranked candidates.
+#'     \item \code{specSimilarityPrec},\code{specSimilarityBoth}: as \code{specSimilarity}, but calculated with binned
+#'     data using the \code{"precursor"} and \code{"both"} method, respectively (see \link[=specSimParams]{MS spectral
+#'     similarity parameters} for more details).
 #'
-#'   \item \code{totalNeutralLossMatches} As \code{totalFragmentMatches}, but counting overlapping neutral loss formulae.
+#'     \item \code{totalFragmentMatches} The total number of MS/MS fragment annotations that overlap between \emph{all}
+#'     feature annotation candidates for the TP feature group and the feature annotations specifically for the parent
+#'     (based on the assigned fragment formula). If both the \code{formulas} and \code{compounds} arguments are
+#'     specified then the annotation data is pooled prior to calculation. Each unique match is only counted once.
 #'
-#'   \item \code{retDir},\code{TP_retDir} The \link[=retDir]{retention order direction} derived from the feature groups
-#'   (\code{retDir}) or the (expected) value from TP data (\code{TP_retDir}).
+#'     \item \code{totalNeutralLossMatches} As \code{totalFragmentMatches}, but counting overlapping neutral loss
+#'     formulae.
 #'
-#'   \item \code{retDiff},\code{mzDiff},\code{formulaDiff} The retention time, \emph{m/z} and formula difference between
-#'   the parent and TP (latter only available if data TP formula is available).
+#'     \item \code{retDir},\code{TP_retDir} The \link[=retDir]{retention order direction} derived from the feature groups
+#'     (\code{retDir}) or the (expected) value from TP data (\code{TP_retDir}).
+#'
+#'     \item \code{retDiff},\code{mzDiff}, The retention time and \emph{m/z} difference between the parent and TP.
+#'
+#'   }
+#'
+#'   The candidate specific properties are stored inside the \code{candidates} column in component tables, and can be
+#'   obtained with \code{as.data.table} by setting \code{candidates=TRUE}. The following properties may be present: \itemize{
+#'
+#'     \item \code{fragmentMatches},\code{neutralLossMatches} As \code{totalFragmentMatches} and
+#'     \code{totalNeutralLossMatches}, but only considering the feature annotations specifically for this candidate.
+#'
+#'     \item \code{formulaDiff} The formula difference between the parent and TP (if formula data is available).
+#'
+#'     \item \code{TPScore},\code{annSim},\code{fitFormula},\code{fitCompound},\code{simSusps}: TP scoring properties,
+#'     see \code{\link{generateTPsAnnForm}} and \code{\link{generateTPsAnnComp}}.
 #'
 #'   }
 #'

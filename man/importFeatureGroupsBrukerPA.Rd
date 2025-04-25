@@ -25,9 +25,6 @@ used to find back features within feature groups from PA (+/- the retention/mass
 }
 \value{
 An object of a class which is derived from \code{\link{featureGroups}}.
-
-The \code{featuresSet} method (for \link[=sets-workflow]{sets workflows}) returns a
-  \code{\link{featureGroupsSet}} object.
 }
 \description{
 Imports a 'bucket table' produced by Bruker ProfileAnalysis (PA)

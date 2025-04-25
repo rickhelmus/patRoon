@@ -14,9 +14,6 @@ importFeatureGroupsKPIC2(picsSetGrouped, analysisInfo)
 }
 \value{
 An object of a class which is derived from \code{\link{featureGroups}}.
-
-The \code{featuresSet} method (for \link[=sets-workflow]{sets workflows}) returns a
-  \code{\link{featureGroupsSet}} object.
 }
 \description{
 Imports grouped features from an \pkg{KPIC} object.

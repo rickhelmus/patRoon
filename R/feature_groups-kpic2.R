@@ -78,8 +78,9 @@ setMethod("groupFeaturesKPIC2", "featuresSet", function(feat, groupArgs = list(t
     # HACK: force non-set features method to allow grouping of neutralized features
     # UNDONE: or simply export this functionality with a flag?
     picsSet <- selectMethod("getPICSet", "features")(feat, loadRawData = FALSE)
-    return(doGroupFeaturesKPIC2(picsSet, feat, rtalign = FALSE, loadRawData = FALSE, groupArgs = groupArgs,
-                                alignArgs = list(), verbose = verbose))
+    ret <- doGroupFeaturesKPIC2(picsSet, feat, rtalign = FALSE, loadRawData = FALSE, groupArgs = groupArgs,
+                                alignArgs = list(), verbose = verbose)
+    return(finishFGroupsForSets(ret, groupArgs = groupArgs, verbose = verbose))
 })
 
 doGroupFeaturesKPIC2 <- function(picsSet, feat, rtalign, loadRawData, groupArgs, alignArgs, verbose)

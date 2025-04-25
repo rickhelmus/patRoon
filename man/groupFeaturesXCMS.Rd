@@ -39,9 +39,6 @@ data is not loaded, and some dummy data (\emph{e.g.} file paths) is used in the 
 }
 \value{
 An object of a class which is derived from \code{\link{featureGroups}}.
-
-The \code{featuresSet} method (for \link[=sets-workflow]{sets workflows}) returns a
-  \code{\link{featureGroupsSet}} object.
 }
 \description{
 Group and align features with the legacy \code{\link[xcms]{xcmsSet}} function from the \pkg{xcms} package.

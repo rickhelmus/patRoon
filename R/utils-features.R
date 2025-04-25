@@ -500,6 +500,24 @@ getAnnotationsFromSetFeatures <- function(fGroups)
         ret <- data.table()
 }
 
+finishFGroupsForSets <- function(fGroups, ..., verbose)
+{
+    otherArgs <- list(...)
+    feat <- getFeatures(fGroups) # may have been changed (eg in initialize())
+    ret <- featureGroupsSet(groupAlgo = algorithm(fGroups), groupArgs = otherArgs, groupVerbose = verbose,
+                            groups = groupTable(fGroups), groupInfo = groupInfo(fGroups),
+                            analysisInfo = analysisInfo(fGroups), features = feat, ftindex = groupFeatIndex(fGroups),
+                            algorithm = makeSetAlgorithm(list(fGroups)))
+    ret@annotations <- getAnnotationsFromSetFeatures(ret)
+    return(ret)
+}
+
+groupFeaturesSets <- function(feat, grouper, ..., verbose)
+{
+    fGroups <- selectMethod(grouper, "features")(feat = feat, ...)
+    return(finishFGroupsForSets(fGroups, ..., verbose = verbose))
+}
+
 filterEICs <- function(EICs, fGroups, analysis = NULL, groupName = NULL, topMost = NULL, topMostByRGroup = FALSE,
                        onlyPresent = FALSE)
 {

@@ -77,7 +77,8 @@ setMethod("groupFeaturesXCMS", "featuresSet", function(feat, groupArgs = list(mz
     # UNDONE: or simply export this functionality with a flag?
     xs <- selectMethod("getXCMSSet", "features")(feat, verbose = verbose, loadRawData = FALSE)
     
-    return(doGroupFeaturesXCMS(xs, feat, rtalign = FALSE, loadRawData = FALSE, groupArgs, list(), verbose))
+    ret <- doGroupFeaturesXCMS(xs, feat, rtalign = FALSE, loadRawData = FALSE, groupArgs, list(), verbose)
+    return(finishFGroupsForSets(ret, groupArgs = groupArgs, verbose = verbose))
 })
 
 doGroupFeaturesXCMS <- function(xs, feat, rtalign, loadRawData, groupArgs, retcorArgs, verbose)

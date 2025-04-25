@@ -16,7 +16,7 @@ NULL
 #' @slot groupAlgo,groupArgs,groupVerbose \setsWF Grouping parameters that were used when this object was created. Used
 #'   by \code{adducts<-} and \code{selectIons} when these methods perform a re-grouping of features.
 #' @slot annotations,ISTDAssignments \setsWF As the \code{featureGroups} slots, but contains the data per set.
-#' @slot annotationsChanged Set internally by \code{adducts()<-} and applied as soon as \code{reGroup=TRUE}. 
+#' @slot annotationsChanged Set internally by \code{adducts()<-} and applied as soon as \code{reGroup=TRUE}.
 #'
 #' @section Sets workflows: \setsWFClass{featureGroupsSet}{featureGroups}
 #'
@@ -41,7 +41,7 @@ NULL
 #'   \item \code{overlap} and \code{unique} allow to handle data per set. See the \code{sets} argument description.
 #'
 #'   \item \code{selectIons} Will perform a re-grouping of features. The implications of this are discussed below.
-#'   
+#'
 #'   \item \code{normInts} Performs normalization for each set \emph{independently}.
 #'
 #'   }
@@ -343,28 +343,6 @@ setMethod("calculateTox", "featureGroupsSet", function(fGroups, featureAnn)
     checkmate::assertClass(featureAnn, c("featureAnnotations", "workflowStepSet"), null.ok = TRUE)
     
     return(doCalcToxSets(fGroups, featureAnn))
-})
-
-#' @return The \code{featuresSet} method (for \link[=sets-workflow]{sets workflows}) returns a
-#'   \code{\link{featureGroupsSet}} object.
-#' @rdname groupFeatures
-#' @export
-setMethod("groupFeatures", "featuresSet", function(obj, algorithm, ..., verbose = TRUE)
-{
-    checkmate::assertChoice(algorithm, c("openms", "xcms", "xcms3", "kpic2"))
-    
-    otherArgs <- list(...)
-    
-    fGroups <- do.call(callNextMethod, c(list(obj = obj, algorithm = algorithm, verbose = verbose), otherArgs))
-    obj <- getFeatures(fGroups) # may have been changed (eg in initialize())
-    
-    ret <- featureGroupsSet(groupAlgo = algorithm, groupArgs = otherArgs, groupVerbose = verbose,
-                            groups = groupTable(fGroups), groupInfo = groupInfo(fGroups),
-                            analysisInfo = analysisInfo(fGroups), features = obj, ftindex = groupFeatIndex(fGroups),
-                            algorithm = makeSetAlgorithm(list(fGroups)))
-    ret@annotations <- getAnnotationsFromSetFeatures(ret)
-    
-    return(ret)
 })
 
 #' @param groupAlgo groupAlgo The name of the feature grouping algorithm. See the \code{algorithm} argument of

@@ -3,6 +3,7 @@
 \name{groupFeaturesOpenMS}
 \alias{groupFeaturesOpenMS}
 \alias{groupFeaturesOpenMS,features-method}
+\alias{groupFeaturesOpenMS,featuresSet-method}
 \title{Group features using OpenMS}
 \usage{
 groupFeaturesOpenMS(feat, ...)
@@ -19,6 +20,8 @@ groupFeaturesOpenMS(feat, ...)
   extraOptsGroup = NULL,
   verbose = TRUE
 )
+
+\S4method{groupFeaturesOpenMS}{featuresSet}(feat, ..., verbose = TRUE)
 }
 \arguments{
 \item{feat}{The \code{\link{features}} object with the features to be grouped.}
@@ -48,9 +51,6 @@ options specified here will override any of the above. Example:
 }
 \value{
 An object of a class which is derived from \code{\link{featureGroups}}.
-
-The \code{featuresSet} method (for \link[=sets-workflow]{sets workflows}) returns a
-  \code{\link{featureGroupsSet}} object.
 }
 \description{
 Group and align features with OpenMS tools

@@ -13,9 +13,6 @@ importFeatureGroupsXCMS3(xdata, analysisInfo)
 }
 \value{
 An object of a class which is derived from \code{\link{featureGroups}}.
-
-The \code{featuresSet} method (for \link[=sets-workflow]{sets workflows}) returns a
-  \code{\link{featureGroupsSet}} object.
 }
 \description{
 Imports grouped features from a \code{\link{XCMSnExp}} object from the \pkg{xcms} package.

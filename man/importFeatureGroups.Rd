@@ -16,9 +16,6 @@ importFeatureGroups(path, type, ...)
 }
 \value{
 An object of a class which is derived from \code{\link{featureGroups}}.
-
-The \code{featuresSet} method (for \link[=sets-workflow]{sets workflows}) returns a
-  \code{\link{featureGroupsSet}} object.
 }
 \description{
 Generic function to import feature groups produced by other software from files.

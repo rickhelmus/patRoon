@@ -83,8 +83,10 @@ setMethod("groupFeaturesXCMS3", "featuresSet", function(feat,
     # UNDONE: or simply export this functionality with a flag?
     xdata <- selectMethod("getXCMSnExp", "features")(feat, verbose = verbose, loadRawData = FALSE)
     
-    return(doGroupFeaturesXCMS3(xdata, feat, rtalign = FALSE, loadRawData = FALSE, groupParam, groupParam,
-                                xcms::ObiwarpParam(), verbose))
+    ret <- doGroupFeaturesXCMS3(xdata, feat, rtalign = FALSE, loadRawData = FALSE, groupParam, groupParam,
+                                xcms::ObiwarpParam(), verbose)
+    
+    return(finishFGroupsForSets(ret, groupParam = groupParam, verbose = verbose))
 })
 
 doGroupFeaturesXCMS3 <- function(xdata, feat, rtalign, loadRawData, groupParam, preGroupParam, retAlignParam, verbose)

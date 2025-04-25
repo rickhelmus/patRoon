@@ -100,6 +100,13 @@ setMethod("groupFeaturesOpenMS", "features", function(feat, rtalign = TRUE, QT =
     return(ret)
 })
 
+#' @rdname groupFeaturesOpenMS
+#' @export
+setMethod("groupFeaturesOpenMS", "featuresSet", function(feat, ..., verbose = TRUE)
+{
+    groupFeaturesSets(feat, "groupFeaturesOpenMS", ..., verbose = verbose)
+})
+
 generateConsensusXML <- function(feat, out, rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT,
                                  maxGroupMZ, extraOptsRT, extraOptsGroup, verbose)
 {

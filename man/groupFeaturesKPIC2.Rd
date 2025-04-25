@@ -41,9 +41,6 @@ respectively.}
 }
 \value{
 An object of a class which is derived from \code{\link{featureGroups}}.
-
-The \code{featuresSet} method (for \link[=sets-workflow]{sets workflows}) returns a
-  \code{\link{featureGroupsSet}} object.
 }
 \description{
 Uses the the \href{https://github.com/hcji/KPIC2}{KPIC2} \R package for grouping of features.

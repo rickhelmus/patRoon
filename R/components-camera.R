@@ -48,7 +48,7 @@ setMethod("initialize", "componentsCamera",
 #' @templateVar class componentsSet
 #' @template compon_gen-sets-merged
 #'
-#' @references \addCitations{CAMERA}{1}
+#' @references \addCitations{CAMERA}
 #' 
 #' @templateVar what generateComponentsCAMERA
 #' @template main-rd-method

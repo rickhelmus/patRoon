@@ -486,7 +486,7 @@ setMethod("filter", "componentsTPs", function(obj, ..., retDirMatch = FALSE,
 #' 
 #' @template plotGraph
 #'
-#' @references \addCitations{igraph}{2}
+#' @references \addCitations{igraph}
 #' 
 #' @export
 setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked = TRUE, width = NULL, height = NULL)

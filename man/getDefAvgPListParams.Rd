@@ -67,5 +67,5 @@ With Bruker algorithms these parameters only control generation of feature group
 }
 
 \references{
-\addCitations{fastcluster}{1}
+\addCitations{fastcluster}
 }

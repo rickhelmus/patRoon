@@ -58,7 +58,7 @@ Grouping of features and
 }
 
 \references{
-\addCitations{xcms}{1} \cr\cr \addCitations{xcms}{2} \cr\cr \addCitations{xcms}{3}
+\addCitations{xcms}
 }
 \seealso{
 \code{\link{groupFeatures}} for more details and other algorithms.

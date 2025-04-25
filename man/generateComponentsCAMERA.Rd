@@ -70,7 +70,7 @@ The default value for \code{minSize} and \code{relMinReplicates} results in
 }
 
 \references{
-\addCitations{CAMERA}{1}
+\addCitations{CAMERA}
 }
 \seealso{
 \code{\link{generateComponents}} for more details and other algorithms.

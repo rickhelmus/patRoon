@@ -96,7 +96,7 @@ The intensity values for components (used by \code{plotSpectrum}) are set
 }
 
 \references{
-\addCitations{igraph}{2}
+\addCitations{igraph}
 }
 \seealso{
 \code{\link{components}} for other relevant methods and \code{\link{generateComponents}}

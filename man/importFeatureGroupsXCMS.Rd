@@ -18,7 +18,7 @@ An object of a class which is derived from \code{\link{featureGroups}}.
 Imports grouped features from a legacy \code{\link{xcmsSet}} object from the \pkg{xcms} package.
 }
 \references{
-\addCitations{xcms}{1} \cr\cr \addCitations{xcms}{2} \cr\cr \addCitations{xcms}{3}
+\addCitations{xcms}
 }
 \seealso{
 \code{\link{importFeaturesXCMS3}} and \code{\link{groupFeatures}}

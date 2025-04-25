@@ -304,7 +304,7 @@ setMethod("plotSilhouettes", "compoundsCluster", function(obj, kSeq, groupName, 
 #'
 #' @return \code{makeHCluster} returns an \code{\link{compoundsCluster}} object.
 #' 
-#' @references \addCitations{rcdk}{1}
+#' @references \addCitations{rcdk}
 #' 
 #' @rdname compounds-cluster
 #' @aliases makeHCluster

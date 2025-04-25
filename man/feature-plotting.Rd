@@ -267,7 +267,7 @@ Various plotting functions for feature group data.
 }
 
 \references{
-\addCitations{circlize}{1}
+\addCitations{circlize}
 
 \insertRef{Conway2017}{patRoon} \cr\cr \insertRef{Lex2014}{patRoon}
 }

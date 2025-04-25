@@ -58,15 +58,7 @@ The input MS data files need to be centroided. The \code{\link{convertMSFiles}} 
   centroid data.
 }
 \references{
-\addCitations{mzR}{1} \cr\cr
-
-  \addCitations{mzR}{2} \cr\cr
-
-  \addCitations{mzR}{3} \cr\cr
-
-  \addCitations{mzR}{4} \cr\cr
-
-  \addCitations{mzR}{5} \cr\cr
+\addCitations{mzR}
 }
 \seealso{
 \code{\link{generateMSPeakLists}} for more details and other algorithms.

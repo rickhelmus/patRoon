@@ -69,5 +69,5 @@
 #'   \href{http://ipb-halle.github.io/MetFrag/}{MetFrag}.
 #'
 #' @references \insertRef{Wohlgemuth2016}{patRoon} \cr\cr \insertRef{Ruttkies2016}{patRoon} \cr\cr
-#'   \addCitations{Rcpp}{1} \cr\cr \addCitations{Rcpp}{2} \cr\cr \addCitations{Rcpp}{3}
+#'   \addCitations{Rcpp}
 #'   

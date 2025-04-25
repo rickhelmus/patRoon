@@ -39,15 +39,7 @@ NULL
 #'
 #' @inherit generateMSPeakLists return
 #'
-#' @references \addCitations{mzR}{1} \cr\cr
-#'
-#'   \addCitations{mzR}{2} \cr\cr
-#'
-#'   \addCitations{mzR}{3} \cr\cr
-#'
-#'   \addCitations{mzR}{4} \cr\cr
-#'
-#'   \addCitations{mzR}{5} \cr\cr
+#' @references \addCitations{mzR}
 #'
 #' @templateVar what generateMSPeakListsMzR
 #' @template main-rd-method

@@ -4,4 +4,4 @@
 #'   have a high MS/MS spectral similarity (which can be evaluated after componentization with
 #'   \code{\link{generateComponentsTPs}}).
 #' 
-#' @references \addCitations{rcdk}{1}
+#' @references \addCitations{rcdk}

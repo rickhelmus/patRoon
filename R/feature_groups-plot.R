@@ -218,7 +218,7 @@ setMethod("plotIntHash", "featureGroups", function(obj, average = FALSE, ...) ma
 #'
 #' @template plotChord-args
 #'
-#' @references \addCitations{circlize}{1}
+#' @references \addCitations{circlize}
 #'
 #' @rdname feature-plotting
 #' @export

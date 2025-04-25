@@ -152,7 +152,7 @@ from \acronym{SMILES} data.
 }
 
 \references{
-\insertRef{OBoyle2011}{patRoon} \cr \cr \addCitations{rcdk}{1}
+\insertRef{OBoyle2011}{patRoon} \cr \cr \addCitations{rcdk}
 
 \insertRef{Peets2022}{patRoon}
 }

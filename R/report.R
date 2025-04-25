@@ -145,8 +145,7 @@ adjustReportSettings <- function(settings, adjSettings) return(modifyList(settin
 #'   \emph{e.g.}, when generating overview plots.
 #'
 #' @references Creating MetFrag landing page URLs based on code from
-#'   \href{https://github.com/Treutler/MetFamily}{MetFamily} R package. \cr\cr \addCitations{knitr}{2} \cr\cr
-#'   \addCitations{knitr}{3}
+#'   \href{https://github.com/Treutler/MetFamily}{MetFamily} R package. \cr\cr \addCitations{knitr}
 #'
 #' @aliases report
 #' @rdname reporting

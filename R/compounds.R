@@ -279,7 +279,7 @@ setMethod("getMCS", "compounds", function(obj, index, groupName)
 #' @param width,height The dimensions (in pixels) of the raster image that
 #'   should be plotted.
 #'
-#' @references \addCitations{rcdk}{1}
+#' @references \addCitations{rcdk}
 #'
 #' @export
 setMethod("plotStructure", "compounds", function(obj, index, groupName, width = 500, height = 500)

@@ -22,7 +22,7 @@ This function imports data from XCMS3. This function is called when calling \cod
   \code{type="xcms3"}.
 }
 \references{
-\addCitations{xcms}{1} \cr\cr \addCitations{xcms}{2} \cr\cr \addCitations{xcms}{3}
+\addCitations{xcms}
 }
 \seealso{
 \code{\link{importFeatures}} for more details and other algorithms.

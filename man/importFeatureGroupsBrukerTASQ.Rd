@@ -42,7 +42,7 @@ This function uses estimated min/max values for retention times and dummy min/ma
   that these are file-compatible names.
 }
 \references{
-\addCitations{fastcluster}{1}
+\addCitations{fastcluster}
 }
 \seealso{
 \code{\link{importFeatureGroups}} for more details and other algorithms.

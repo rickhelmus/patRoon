@@ -43,7 +43,7 @@ setMethod("initialize", "featureGroupsXCMS",
 #'
 #' @template sets-loadrawdata-RTalign-note
 #'
-#' @references \addCitations{xcms}{1} \cr\cr \addCitations{xcms}{2} \cr\cr \addCitations{xcms}{3}
+#' @references \addCitations{xcms}
 #'
 #' @templateVar what groupFeaturesXCMS
 #' @templateVar cl features

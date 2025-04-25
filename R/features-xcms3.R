@@ -47,7 +47,7 @@ setMethod("delete", "featuresXCMS3", function(obj, i = NULL, j = NULL, ...)
 #'   \code{\link[xcms:findChromPeaks]{xcms::findChromPeaks}}
 #' @param \dots Further parameters passed to \code{\link[xcms:findChromPeaks]{xcms::findChromPeaks}}.
 #'
-#' @references \addCitations{xcms}{1} \cr\cr \addCitations{xcms}{2} \cr\cr \addCitations{xcms}{3}
+#' @references \addCitations{xcms}
 #'
 #' @inherit findFeatures return
 #'

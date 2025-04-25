@@ -20,7 +20,7 @@ NULL
 #' @slot homol A \code{list} with \code{homol} objects for each replicate group
 #'   as returned by \code{\link[nontarget]{homol.search}}
 #'
-#' @references \insertRef{Loos2017}{patRoon} \cr\cr \addCitations{enviPat}{1}
+#' @references \insertRef{Loos2017}{patRoon} \cr\cr \addCitations{enviPat}
 #'
 #' @seealso \code{\link{components}} and \code{\link{generateComponents}}
 #'
@@ -51,7 +51,7 @@ setMethod("collapseComponents", "componentsNT", function(obj)
 #'
 #' @template plotGraph
 #' 
-#' @references \addCitations{igraph}{2}
+#' @references \addCitations{igraph}
 #' 
 #' @export
 setMethod("plotGraph", "componentsNT", function(obj, onlyLinked = TRUE, width = NULL, height = NULL)
@@ -117,7 +117,7 @@ setMethod("plotGraph", "componentsNT", function(obj, onlyLinked = TRUE, width = 
 #'
 #' @section Sets workflows: The output class supports additional methods such as \code{plotGraph}.
 #'
-#' @references \insertRef{Loos2017}{patRoon} \cr\cr \addCitations{enviPat}{1}
+#' @references \insertRef{Loos2017}{patRoon} \cr\cr \addCitations{enviPat}
 #'
 #' @templateVar what generateComponentsNontarget
 #' @template main-rd-method

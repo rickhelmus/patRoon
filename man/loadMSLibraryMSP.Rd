@@ -156,7 +156,7 @@ The mass spectrum parser currently only supports space separated entries (MSP fo
 
 \references{
 \insertRef{Wohlgemuth2016}{patRoon} \cr\cr \insertRef{Ruttkies2016}{patRoon} \cr\cr
-  \addCitations{Rcpp}{1} \cr\cr \addCitations{Rcpp}{2} \cr\cr \addCitations{Rcpp}{3}
+  \addCitations{Rcpp}
 
 \insertRef{OBoyle2011}{patRoon}
 }

@@ -131,7 +131,7 @@ When the \code{parents} argument is a \code{\link{compounds}} object, the candid
 }
 
 \references{
-\addCitations{rcdk}{1}
+\addCitations{rcdk}
 
 \insertRef{OBoyle2011}{patRoon}
 

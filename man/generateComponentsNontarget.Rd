@@ -83,7 +83,7 @@ In the first step the \code{\link[nontarget]{homol.search}} function is used to 
 }
 
 \references{
-\insertRef{Loos2017}{patRoon} \cr\cr \addCitations{enviPat}{1}
+\insertRef{Loos2017}{patRoon} \cr\cr \addCitations{enviPat}
 }
 \seealso{
 \code{\link{generateComponents}} for more details and other algorithms.

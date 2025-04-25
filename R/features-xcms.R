@@ -50,7 +50,7 @@ setMethod("delete", "featuresXCMS", function(obj, i = NULL, j = NULL, ...)
 #' @param method The method setting used by XCMS peak finding, see \code{\link[xcms:findPeaks-methods]{xcms::findPeaks}}
 #' @param \dots Further parameters passed to \code{\link[xcms]{xcmsSet}}.
 #'
-#' @references \addCitations{xcms}{1} \cr\cr \addCitations{xcms}{2} \cr\cr \addCitations{xcms}{3}
+#' @references \addCitations{xcms}
 #'
 #' @inherit findFeatures return
 #'

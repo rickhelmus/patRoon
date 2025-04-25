@@ -43,7 +43,7 @@ setMethod("initialize", "featureGroupsBrukerTASQ",
 #'   This function may use suspect names to base file names used for reporting, logging etc. Therefore, it is important
 #'   that these are file-compatible names.
 #'
-#' @references \addCitations{fastcluster}{1}
+#' @references \addCitations{fastcluster}
 #'
 #' @export
 importFeatureGroupsBrukerTASQ <- function(path, analysisInfo, clusterRTWindow = 12)

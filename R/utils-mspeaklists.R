@@ -60,7 +60,7 @@ emptyMSPeakList <- function() data.table(mz = numeric(), intensity = numeric(), 
 #' @section Source: Averaging of mass spectra algorithms used by are based on the
 #'   \href{https://github.com/zeehio/msProcess}{msProcess} R package (now archived on CRAN).
 #'
-#' @references \addCitations{fastcluster}{1}
+#' @references \addCitations{fastcluster}
 #'
 #' @export
 getDefAvgPListParams <- function(...)

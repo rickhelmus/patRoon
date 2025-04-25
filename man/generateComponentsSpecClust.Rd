@@ -55,7 +55,7 @@ The similarities are converted to a distance matrix and used as input for hierar
 }
 
 \references{
-\addCitations{fastcluster}{1}
+\addCitations{fastcluster}
 }
 \seealso{
 \code{\link{generateComponents}} for more details and other algorithms.

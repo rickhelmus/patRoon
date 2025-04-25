@@ -61,4 +61,4 @@
 #' @note The \CRANpkg{rcdk} package and \href{https://github.com/openbabel/openbabel}{OpenBabel} tool are used
 #'   internally to calculate molecular weights. Please make sure that \command{OpenBabel} is installed.
 #'
-#' @references \insertRef{OBoyle2011}{patRoon} \cr \cr \addCitations{rcdk}{1}
+#' @references \insertRef{OBoyle2011}{patRoon} \cr \cr \addCitations{rcdk}

@@ -56,7 +56,7 @@ Hierarchical clustering is performed on normalized (and optionally replicate ave
 }
 
 \references{
-\addCitations{fastcluster}{1}
+\addCitations{fastcluster}
 
 \insertRef{Scholle2018}{patRoon}
 }

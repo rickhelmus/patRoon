@@ -67,7 +67,7 @@ resulting clusters can then be characterized by evaluating their
 }
 
 \references{
-\addCitations{rcdk}{1}
+\addCitations{rcdk}
 }
 \seealso{
 compoundsCluster

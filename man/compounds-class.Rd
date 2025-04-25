@@ -467,7 +467,7 @@ The values ranges in the \code{scoreLimits} slot, which are used for normalizati
 }
 
 \references{
-\addCitations{rcdk}{1}
+\addCitations{rcdk}
 }
 \seealso{
 The \code{\link{featureAnnotations}} base class for more relevant methods and

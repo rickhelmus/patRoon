@@ -207,6 +207,5 @@ No data will be reported for feature groups in any of the reported objects (\cod
 
 \references{
 Creating MetFrag landing page URLs based on code from
-  \href{https://github.com/Treutler/MetFamily}{MetFamily} R package. \cr\cr \addCitations{knitr}{2} \cr\cr
-  \addCitations{knitr}{3}
+  \href{https://github.com/Treutler/MetFamily}{MetFamily} R package. \cr\cr \addCitations{knitr}
 }

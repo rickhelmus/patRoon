@@ -38,10 +38,9 @@ readMSDataForXCMS3 <- function(anaInfo)
 {
     anaFiles <- mapply(anaInfo$analysis, anaInfo$path, FUN = getMzMLOrMzXMLAnalysisPath, MoreArgs = list(mustExist = TRUE))
     return(MSnbase::readMSData(files = anaFiles,
-                               pdata = new("NAnnotatedDataFrame",
-                                           data.frame(sample_name = anaInfo$analysis,
-                                                      sample_group = anaInfo$group,
-                                                      stringsAsFactors = FALSE)),
+                               pdata = Biobase::AnnotatedDataFrame(data.frame(sample_name = anaInfo$analysis,
+                                                                              sample_group = anaInfo$group,
+                                                                              stringsAsFactors = FALSE)),
                                mode = "onDisk"))
 }
 
@@ -239,11 +238,10 @@ setMethod("getXCMSnExp", "features", function(obj, verbose, loadRawData)
         anaInfo <- analysisInfo(obj)
         rawData <- new("OnDiskMSnExp", processingData = new("MSnProcess",
                                                             files = anaInfo$analysis),
-                       featureData = new("AnnotatedDataFrame", data = dummySpecs))
-        xcms::phenoData(rawData) <- new("NAnnotatedDataFrame",
-                                        data.frame(sample_name = anaInfo$analysis,
-                                                   sample_group = anaInfo$group,
-                                                   stringsAsFactors = FALSE))
+                       featureData = Biobase::AnnotatedDataFrame(data = dummySpecs))
+        xcms::phenoData(rawData) <- Biobase::AnnotatedDataFrame(data.frame(sample_name = anaInfo$analysis,
+                                                                           sample_group = anaInfo$group,
+                                                                           stringsAsFactors = FALSE))
     }
 
     msLevel = 1L # UNDONE?

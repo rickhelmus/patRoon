@@ -26,11 +26,16 @@ if (doDATests())
     plistsDAFMF <- generateMSPeakLists(fgDA2, "brukerfmf")
 }
 
-# remove Ion Mobility data as it inconsistently is present or not
+# remove some inconsistent metadata
 plistsNoIM <- plists
-plistsNoIM@metadata <- lapply(plistsNoIM@metadata, function(mda) lapply(mda, function(mdf) lapply(mdf, function(mds) mds[, setdiff(names(mds), "ionMobilityDriftTime"), with = FALSE])))
+rmCols <- c("electronBeamEnergy")
+clearMD <- function(md) lapply(md, function(mda) lapply(mda, function(mdf) lapply(mdf, function(mds) mds[, setdiff(names(mds), rmCols), with = FALSE])))
+plistsNoIM@metadata <- clearMD(plistsNoIM@metadata)
 if (testWithSets())
+{
+    plistsNoIM@setObjects <- lapply(setObjects(plistsNoIM), function(so) { so@metadata <- clearMD(so@metadata); so })
     plistsNoIM@analysisInfo <- data.frame() # remove as it is system dependent
+}
 
 test_that("verify generation of MS peak lists", {
     expect_known_value(plistsNoIM, testFile("plists-mzr"))

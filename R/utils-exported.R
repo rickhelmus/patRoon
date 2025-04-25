@@ -866,22 +866,54 @@ getDefPredAggrParams <- function(all = mean, ...)
 #'     \item A named \code{list} with the elements \code{massGas}, \code{TFix} and \code{beta}.
 #'
 #'    }
-#'    
+#'
 #' }
 #'
 #' The CCS calculation depends on the \code{method} parameter: \itemize{
 #'
 #'   \item \code{bruker}: uses the Bruker \command{TDF-SDK} for calculations. See \link{msdata} for configuration
 #'   options. Only applicable to TIMS data.
-#'   
-#'   \item \code{mason-schamp_k}: uses the Mason-Schamp equation: 
-#'   
-#'   \item \code{mason-schamp_1/k}: the inverse of \code{mason-schamp_k}. This is meant for TIMS data and gives nearly
-#'   identical results as \code{method="bruker"} (but doesn't rely on the \command{TDF-SDK}).
-#'   
-#'   \item \code{agilent}: uses Agilent calibration data with the following equation: 
+#'
+#'   \item \code{mason-schamp_k}: uses the Mason-Schamp equation:
+#'     \deqn{CCS = C \cdot \frac{charge}{\sqrt{u \cdot T}} \cdot \frac{1}{mobility}}
+#'
+#'     With \itemize{
+#'
+#'       \item \emph{C} the Mason-Schamp constant, can be changed by setting the \code{MasonSchampConstant} parameter.
+#'       See \insertCite{George2024}{patRoon} for details.
+#'
+#'       \item \emph{u} the reduced mass of the drift gas and the ion:
+#'       \deqn{u = \frac{m_{gas} \cdot m_{ion}}{m_{gas} + m_{ion}}}
+#'       The mass of the drift gas is defined by the \code{massGas} parameter.
+#'
+#'       \item \emph{T} the temperature (Kelvin) as defined by the \code{temperature} parameter.
+#'
+#'     }
+#'
+#'   \item \code{mason-schamp_1/k}: as \code{mason-schamp_k} but assuming an inversed mobility (\eqn{\frac{1}{k}}).
+#'   This is meant for TIMS data. Compared to \code{method="bruker"}, this doesn't rely on the \command{TDF-SDK} and may
+#'   produce results with very minor differences \insertCite{George2024}{patRoon}.
+#'
+#'   \item \code{agilent}: uses Agilent calibration data with the following equation:
+#'
+#'     \deqn{CCS = (mobility - t_{fix}) \cdot \frac{charge}{\beta} \cdot \frac{1}{\sqrt{\frac{m_{ion}}{m_{ion} + m_{gas}}}}}
+#'
+#'     With \eqn{t_{fix}} and \eqn{\beta} the \code{TFix} and \code{beta} values from the calibration data. The
+#'     \code{massGas} parameter sets the \eqn{m_{gas}} value.
 #'
 #' }
+#'
+#' The \code{getCCSParams} function generates such parameter list with defaults.
+#'
+#' @param method,calibrant Sets the CCS calculation method and the calibrant data (only required if
+#'   \code{method="agilent"}). See details.
+#' @param \dots optional named arguments that override defaults.
+#'
+#' @source The calculation formulas was derived from \insertCite{Haler2017}{patRoon}, \insertCite{George2024}{patRoon}
+#'   and the implementation used by \href{https://systemsomicslab.github.io/compms/msdial/main.html}{MS-DIAL}
+#'   (\code{MobilityToCrossSection} method from the \code{IonMobilityUtility} class).
+#'
+#' @references \insertAllCited{}
 #'
 #' @export
 getCCSParams <- function(method, ..., calibrant = NULL)
@@ -1025,7 +1057,7 @@ TPLogicTransformations <- function()
 
 #' Conversion between mobility and CCS
 #'
-#' Utility functions to convert between mobility and \acronym{CCS} data
+#' Utility functions to convert between mobility and \acronym{CCS} data.
 #'
 #' @param mobility,ccs A \code{numeric} vector with mobility or \acronym{CCS} values that should be converted.
 #' @param mz A \code{numeric} vector with the \emph{m/z} values that map to the input mobility or \acronym{CCS} values.

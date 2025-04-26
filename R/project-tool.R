@@ -38,7 +38,7 @@ getNewProjectUI <- function()
                 newProjectAnalysesUI("analyses")
             ),
             miniUI::miniTabPanel(
-                "Data pre-treatment", icon = icon("upload"),
+                "Pre-treatment", icon = icon("file-export"),
                 newProjectPreTreatUI("pretreat")
             ),
             miniUI::miniTabPanel(

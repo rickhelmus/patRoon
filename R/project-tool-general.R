@@ -26,8 +26,8 @@ newProjectGeneralUI <- function(id)
             )
         ),
         miniUI::miniButtonBlock(
-            actionButton(ns("loadParams"), "Load parameters"),
-            actionButton(ns("saveParams"), "Save parameters")
+            actionButton(ns("loadParams"), "Load parameters", icon("upload")),
+            actionButton(ns("saveParams"), "Save parameters", icon("download")),
         )
     )
 }

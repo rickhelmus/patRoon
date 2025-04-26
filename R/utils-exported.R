@@ -891,7 +891,7 @@ getDefPredAggrParams <- function(all = mean, ...)
 #'     }
 #'
 #'   \item \code{mason-schamp_1/k}: as \code{mason-schamp_k} but assuming an inversed mobility (\eqn{\frac{1}{k}}).
-#'   This is meant for TIMS data. Compared to \code{method="bruker"}, this doesn't rely on the \command{TDF-SDK} and may
+#'   This is meant for TIMS data. Compared to \code{method="bruker"}, this doesn't rely on the \command{TDF-SDK} but may
 #'   produce results with very minor differences \insertCite{George2024}{patRoon}.
 #'
 #'   \item \code{agilent}: uses Agilent calibration data with the following equation:
@@ -911,7 +911,7 @@ getDefPredAggrParams <- function(all = mean, ...)
 #'
 #' @source The calculation formulas was derived from \insertCite{Haler2017}{patRoon}, \insertCite{George2024}{patRoon}
 #'   and the implementation used by \href{https://systemsomicslab.github.io/compms/msdial/main.html}{MS-DIAL}
-#'   (\code{MobilityToCrossSection} method from the \code{IonMobilityUtility} class).
+#'   \insertCite{Tsugawa2020}{patRoon}. (\code{MobilityToCrossSection} method from the \code{IonMobilityUtility} class).
 #'
 #' @references \insertAllCited{}
 #'

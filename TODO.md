@@ -95,7 +95,6 @@
             - Option to predict CCS values for suspects
         - Direct
             - As post, but only enable piek for feature detection and enable mobility binning
-            - Set peak algos for mobilograms and re-integration
     - Annotation
         - Predict CCS values for compounds
             - what to do if pubchemlite is already choosen?

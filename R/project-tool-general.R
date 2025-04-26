@@ -4,25 +4,56 @@ newProjectGeneralUI <- function(id)
     tagList(
         miniUI::miniContentPanel(
             fillCol(
-                flex = NA,
-                fileSelect(ns("destination"), ns("destinationButton"), "Project destination"),
-                br(),
+                flex = c(1, NA, 1, NA, 1),
                 fillRow(
-                    height = 100,
-                    radioButtons(ns("outputScriptTo"), "Insert code into", c("New file" = "newFile",
-                                                                             "Current file" = "curFile")),
-                    conditionalPanel(
-                        condition = "input.outputScriptTo == \"newFile\"",
-                        ns = ns,
-                        textInput(ns("scriptFile"), "Script file", width = "80%"),
+                    fillCol(
+                        height = 105,
+                        width = "90%",
+                        fileSelect(ns("destination"), ns("destinationButton"), "Project destination"),
                         checkboxInput(ns("createRStudioProj"), "Create (and open) RStudio project")
+                    ),
+                    fillCol(
+                        height = 100,
+                        textInput(ns("scriptFile"), label = "Script file", width = "90%"),
+                        textNote("Make empty to add code to currently opened file.")
                     )
                 ),
-                br(),
+                hr(),
                 fillRow(
-                    height = 100,
-                    radioButtons(ns("ionization"), "Ionization", c("positive", "negative", "both (sets)" = "both"))
-                )
+                    flex = c(1, 2),
+                    width = "90%",
+                    radioButtons(ns("ims"), "Mobility asignment", c("none", "from features" = "direct",
+                                                                    "post features" = "post")),
+                    conditionalPanel(
+                        condition = "input.ims != \"none\"",
+                        ns = ns,
+                        fillRow(
+                            height = 130,
+                            fillCol(
+                                radioButtons(ns("IMSInstrument"), "Mobility configuration",
+                                             c("Bruker" = "bruker", "Agilent" = "agilent")),
+                                textNote("Configures the limits.yml file.")
+                            ),
+                            fillCol(
+                                selectInput(ns("CCSMethod"), "CCS calculation method",
+                                            choices = c("none",
+                                                        "Bruker (TIMS)" = "bruker",
+                                                        "Mason-Schamp 1/k (TIMS)" = "mason-schamp_1/k",
+                                                        "Agilent (DTIMS)" = "agilent",
+                                                        "Mason-Schamp" = "mason-schamp_k"),
+                                            selected = "none"),
+                                conditionalPanel(
+                                    condition = "input.CCSMethod == 'agilent'",
+                                    ns = ns,
+                                    fileSelect(ns("CCSCalibrant"), ns("CCSCalibrantButton"), NULL,
+                                               placeholder = "Calibrant .d file")
+                                )
+                            )
+                        )
+                    )
+                ),
+                hr(),
+                radioButtons(ns("ionization"), "Ionization", c("positive", "negative", "both (sets)" = "both"))
             )
         ),
         miniUI::miniButtonBlock(
@@ -37,6 +68,7 @@ newProjectGeneralServer <- function(id, settings)
     moduleServer(id, function(input, output, session)
     {
         doObserveSelDir(input, session, "destination", "destinationButton")
+        doObserveSelDir(input, session, "CCSCalibrant", "CCSCalibrantButton")
         
         observeEvent(settings(), {
             updateTextInput(session, "destination", value = settings()$destination)

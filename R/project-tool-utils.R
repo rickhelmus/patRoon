@@ -56,10 +56,11 @@ exportShinyOutputVal <- function(output, var, r)
 
 fileSelect <- function(idText, idButton, label, value = "", ...)
 {
+    abstyle <- if (!is.null(label)) "margin: 25px 0 0 10px;" else "margin: 0px 0 0 10px;"
     fillRow(
         flex = c(1, NA),
         textInput(idText, label, value, width = "100%", ...),
-        actionButton(idButton, "", icon("folder-open"), style = "margin: 25px 0 0 10px;")
+        actionButton(idButton, "", icon("folder-open"), style = abstyle)
     )
 }
 

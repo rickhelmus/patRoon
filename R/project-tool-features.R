@@ -1,70 +1,87 @@
 newProjectFeaturesUI <- function(id)
 {
     ns <- NS(id)
+ 
+    getPeakAlgoSelections <- function() c("piek", openms = "OpenMS", xcms3 = "XCMS", envipick = "enviPick")
     
-    miniUI::miniContentPanel(
-        fillCol(
-            flex = NA,
-            fillRow(
-                height = 90,
-                selectInput(ns("featAlgo"), "Feature finding algorithm",
-                            c("OpenMS", "XCMS", "enviPick", "SIRIUS", "KPIC2", EICs = "EIC",
-                              "Bruker DataAnalysis" = "Bruker"), multiple = FALSE, width = "95%"),
-                conditionalPanel(
-                    condition = "input.featAlgo == \"EIC\"",
-                    ns = ns,
-                    style = "margin-top: 25px;", # align with select label: https://stackoverflow.com/a/70543848
-                    actionButton(ns("featEICParams"), "", icon = icon("cog"), title = "EIC parameters")
-                )
-            ),
-            fillRow(
-                height = 90,
-                fillCol(
-                    flex = c(1, NA),
-                    selectInput(ns("fGroupsAlgo"), "Feature grouping algorithm", c("OpenMS", "XCMS", "KPIC2", "SIRIUS"),
-                                multiple = FALSE, width = "95%"),
-                    conditionalPanel(
-                        condition = "input.fGroupsAlgo == \"SIRIUS\"",
-                        ns = ns,
-                        textNote(HTML("This will always find <b>and</b> group features with SIRIUS."))
-                    )
-                ),
-                fillCol(
-                    style = "margin-top: 25px;",
-                    actionButton(ns("fGroupsAdv"), "", icon = icon("cog"), title = "Advanced settings")
-                )
-            ),
+    tagList(
+        miniUI::miniContentPanel(
             fillCol(
-                height = 125,
-                flex = NA,
-                conditionalPanel(
-                    condition = "output.ionization != \"both\"",
-                    ns = ns,
-                    fileSelect(ns("suspectList"), ns("suspectListButton"), "Suspect list",
-                               placeholder = "Leave empty for no suspect screening")
-                ),
-                conditionalPanel(
-                    condition = "output.ionization == \"both\"",
-                    ns = ns,
-                    fillRow(
-                        height = 60,
-                        fillCol(
-                            width = "95%",
-                            fileSelect(ns("suspectListPos"), ns("suspectListButtonPos"), "Suspect list (positive)",
-                                       placeholder = "Leave empty for no suspect screening")
+                flex = c(1, NA, 1),
+                fillRow(
+                    flex = c(1, NA, 1),
+                    fillCol(
+                        fillRow(
+                            flex = c(1, NA),
+                            selectInput(ns("featAlgo"), "Feature finding algorithm",
+                                        c("OpenMS", "XCMS", "enviPick", "SIRIUS", "KPIC2", EICs = "EIC",
+                                          "Bruker DataAnalysis" = "Bruker"), multiple = FALSE, width = "100%"),
+                            conditionalPanel(
+                                condition = "input.featAlgo == \"EIC\"",
+                                ns = ns,
+                                # align with select label: https://stackoverflow.com/a/70543848
+                                style = "margin-top: 25px; margin-left: 10px;",
+                                actionButton(ns("featEICParams"), "", icon = icon("cog"), title = "EIC parameters")
+                            )
                         ),
                         fillCol(
-                            width = "95%",
-                            fileSelect(ns("suspectListNeg"), ns("suspectListButtonNeg"), "Suspect list (negative)",
-                                       placeholder = "Leave empty for same as positive")
+                            flex = c(1, NA),
+                            selectInput(ns("fGroupsAlgo"), "Feature grouping algorithm",
+                                        c("OpenMS", "XCMS", "KPIC2", "SIRIUS"), multiple = FALSE, width = "100%"),
+                            conditionalPanel(
+                                condition = "input.fGroupsAlgo == \"SIRIUS\"",
+                                ns = ns,
+                                textNote(HTML("This will always find <b>and</b> group features with SIRIUS."))
+                            )
                         )
+                    ),
+                    div(style = "width: 25px;"),
+                    fillCol(
+                        selectInput(ns("IMSPeaksMob"), "Mobility peak detection", getPeakAlgoSelections(),
+                                    width = "90%"),
+                        selectInput(ns("IMSPeaksChrom"), "Mobility feature peak re-integration",
+                                    c(None = "", getPeakAlgoSelections()), width = "90%")
                     )
                 ),
-                fillRow(
-                    height = 50,
-                    checkboxInput(ns("exSuspList"), "Example suspect list(s)")
+                hr(),
+                fillCol(
+                    flex = NA,
+                    conditionalPanel(
+                        condition = "output.ionization != \"both\"",
+                        ns = ns,
+                        fileSelect(ns("suspectList"), ns("suspectListButton"), "Suspect list",
+                                   placeholder = "Leave empty for no suspect screening")
+                    ),
+                    conditionalPanel(
+                        condition = "output.ionization == \"both\"",
+                        ns = ns,
+                        fillRow(
+                            height = 60,
+                            fillCol(
+                                width = "95%",
+                                fileSelect(ns("suspectListPos"), ns("suspectListButtonPos"), "Suspect list (positive)",
+                                           placeholder = "Leave empty for no suspect screening")
+                            ),
+                            fillCol(
+                                width = "95%",
+                                fileSelect(ns("suspectListNeg"), ns("suspectListButtonNeg"), "Suspect list (negative)",
+                                           placeholder = "Leave empty for same as positive")
+                            )
+                        )
+                    ),
+                    fillRow(
+                        height = 50,
+                        checkboxInput(ns("exSuspList"), "Example suspect list(s)")
+                    ),
+                    fillRow(
+                        height = 75,
+                        radioButtons(ns("IMSSuspCCSPred"), "CCS prediction", getCCSPredSelections(), inline = TRUE)
+                    )
                 )
             )
+        ),
+        miniUI::miniButtonBlock(
+            actionButton(ns("fGroupsAdv"), "Advanced", icon = icon("cog"))
         )
     )
 }

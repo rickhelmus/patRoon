@@ -26,52 +26,59 @@ newProjectAnnotationUI <- function(id)
                     checkboxInput(ns("selectIons"), "Select feature adduct ions")
                 )
             ),
-            fillRow(
-                height = 120,
-                fillCol(
-                    flex = NA,
-                    fillCol(
-                        height = 50,
-                        selectInput(ns("formulasAlgo"), "Formula generation",
-                                    c("None" = "", "GenForm", "SIRIUS", "Bruker DataAnalysis" = "Bruker"),
-                                    multiple = FALSE, width = "95%")
-                    ),
+            fillCol(
+                height = 100,
+                selectInput(ns("formulasAlgo"), "Formula generation",
+                            c("None" = "", "GenForm", "SIRIUS", "Bruker DataAnalysis" = "Bruker"),
+                            multiple = FALSE, width = "97.5%"),
+                conditionalPanel(
+                    condition = "input.formulasAlgo == \"Bruker\"",
+                    ns = ns,
                     fillCol(
                         height = 25,
                         textNote("DataAnalysis only works with features from DataAnalysis")    
                     )
-                ),
+                )
+            ),
+            fillCol(
+                height = 150,
                 selectInput(ns("compoundsAlgo"), "Compound identification",
                             c("None" = "", "SIRIUS+CSI:FingerID" = "SIRIUS", "MetFrag", "Library"),
-                            multiple = FALSE, width = "95%")
-            ),
-            conditionalPanel(
-                condition = "input.compoundsAlgo == \"Library\"",
-                ns = ns,
-                fillRow(
-                    height = 90,
-                    fillCol(
-                        width = "95%",
-                        selectInput(ns("MSLibraryFormat"), "Library format",
-                                    c("MSP" = "msp", "MoNA JSON" = "json"), multiple = FALSE, width = "100%")
-                    ),
-                    fillCol(
-                        width = "95%",
-                        fileSelect(ns("MSLibraryPath"), ns("MSLibraryPathButton"), "MS library path")
+                            multiple = FALSE, width = "97.5%"),
+                conditionalPanel(
+                    condition = "input.compoundsAlgo == \"Library\"",
+                    ns = ns,
+                    fillRow(
+                        height = 90,
+                        fillCol(
+                            width = "95%",
+                            selectInput(ns("MSLibraryFormat"), "Library format",
+                                        c("MSP" = "msp", "MoNA JSON" = "json"), multiple = FALSE, width = "100%")
+                        ),
+                        fillCol(
+                            width = "95%",
+                            fileSelect(ns("MSLibraryPath"), ns("MSLibraryPathButton"), "MS library path")
+                        )
                     )
                 )
             ),
-            
-            fillCol(
-                flex = NA,
+            fillRow(
+                flex = c(2, 1),
                 fillCol(
-                    height = 90,
-                    checkboxGroupInput(ns("estIDConf"), "Identification confidence estimation (if data is present)",
-                                       getIDConfUIOpts(), getIDConfUIOpts(), width = "100%"),
+                    flex = NA,
+                    fillCol(
+                        height = 90,
+                        checkboxGroupInput(ns("estIDConf"), "Identification confidence estimation (if data is present)",
+                                           getIDConfUIOpts(), getIDConfUIOpts(), width = "100%"),
+                    ),
+                    fillCol(
+                        height = 25,
+                        textNote("ID confidence estimation is currently only optimized for GenForm/MetFrag")
+                    )
                 ),
-                fillCol(
-                    height = 25,
-                    textNote("ID confidence estimation is currently only optimized for GenForm/MetFrag")
+                fillRow(
+                    height = 75,
+                    radioButtons(ns("IMSSuspCCSPred"), "CCS prediction", getCCSPredSelections())
                 )
             )
         )

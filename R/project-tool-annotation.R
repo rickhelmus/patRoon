@@ -14,54 +14,59 @@ newProjectAnnotationUI <- function(id)
     miniUI::miniContentPanel(
         fillCol(
             flex = NA,
-            
             fillCol(
-                height = 100,
+                height = 55,
                 selectInput(ns("componAlgo"), "Component generation",
                             c("None" = "", "RAMClustR", "CAMERA", "OpenMS", "CliqueMS", "nontarget"),
-                            multiple = FALSE, width = "97.5%"),
-                conditionalPanel(
-                    condition = "input.componAlgo != \"nontarget\" && input.componAlgo != \"\"",
-                    ns = ns,
+                            multiple = FALSE, width = "97.5%")
+            ),
+            conditionalPanel(
+                condition = "input.componAlgo != \"nontarget\" && input.componAlgo != \"\"",
+                ns = ns,
+                fillRow(
+                    height = 25,
                     checkboxInput(ns("selectIons"), "Select feature adduct ions")
                 )
             ),
+            br(),
             fillCol(
-                height = 100,
+                height = 55,
                 selectInput(ns("formulasAlgo"), "Formula generation",
                             c("None" = "", "GenForm", "SIRIUS", "Bruker DataAnalysis" = "Bruker"),
-                            multiple = FALSE, width = "97.5%"),
-                conditionalPanel(
-                    condition = "input.formulasAlgo == \"Bruker\"",
-                    ns = ns,
-                    fillCol(
-                        height = 25,
-                        textNote("DataAnalysis only works with features from DataAnalysis")    
-                    )
+                            multiple = FALSE, width = "97.5%")
+            ),
+            conditionalPanel(
+                condition = "input.formulasAlgo == \"Bruker\"",
+                ns = ns,
+                fillCol(
+                    height = 25,
+                    textNote("DataAnalysis only works with features from DataAnalysis")    
                 )
             ),
+            br(),
             fillCol(
-                height = 150,
+                height = 60,
                 selectInput(ns("compoundsAlgo"), "Compound identification",
                             c("None" = "", "SIRIUS+CSI:FingerID" = "SIRIUS", "MetFrag", "Library"),
-                            multiple = FALSE, width = "97.5%"),
-                conditionalPanel(
-                    condition = "input.compoundsAlgo == \"Library\"",
-                    ns = ns,
-                    fillRow(
-                        height = 90,
-                        fillCol(
-                            width = "95%",
-                            selectInput(ns("MSLibraryFormat"), "Library format",
-                                        c("MSP" = "msp", "MoNA JSON" = "json"), multiple = FALSE, width = "100%")
-                        ),
-                        fillCol(
-                            width = "95%",
-                            fileSelect(ns("MSLibraryPath"), ns("MSLibraryPathButton"), "MS library path")
-                        )
+                            multiple = FALSE, width = "97.5%")
+            ),
+            conditionalPanel(
+                condition = "input.compoundsAlgo == \"Library\"",
+                ns = ns,
+                fillRow(
+                    height = 60,
+                    fillCol(
+                        width = "95%",
+                        selectInput(ns("MSLibraryFormat"), "Library format",
+                                    c("MSP" = "msp", "MoNA JSON" = "json"), multiple = FALSE, width = "100%")
+                    ),
+                    fillCol(
+                        width = "95%",
+                        fileSelect(ns("MSLibraryPath"), ns("MSLibraryPathButton"), "MS library path")
                     )
                 )
             ),
+            hr(),
             fillRow(
                 flex = c(2, 1),
                 fillCol(
@@ -76,16 +81,20 @@ newProjectAnnotationUI <- function(id)
                         textNote("ID confidence estimation is currently only optimized for GenForm/MetFrag")
                     )
                 ),
-                fillRow(
-                    height = 75,
-                    radioButtons(ns("IMSSuspCCSPred"), "CCS prediction", getCCSPredSelections())
+                conditionalPanel(
+                    condition = "output.IMS != 'none'",
+                    ns = ns,
+                    fillRow(
+                        height = 75,
+                        radioButtons(ns("IMSSuspCCSPred"), "CCS prediction", getCCSPredSelections())
+                    )
                 )
             )
         )
     )
 }
 
-newProjectAnnotationServer <- function(id, hasSuspects, settings)
+newProjectAnnotationServer <- function(id, hasSuspects, IMS, settings)
 {
     moduleServer(id, function(input, output, session)
     {
@@ -97,6 +106,7 @@ newProjectAnnotationServer <- function(id, hasSuspects, settings)
             updateSelectInput(session, "MSLibraryFormat", selected = settings()$MSLibraryFormat)
             updateTextInput(session, "MSLibraryPath", value = settings()$MSLibraryPath)
             updateCheckboxGroupInput(session, "estIDConf", selected = settings()$estIDConf)
+            updateRadioButtons(session, "IMSSuspCCSPred", selected = settings()$IMSSuspCCSPred)
         })
         
         observeEvent(input$MSLibraryPathButton, {
@@ -106,6 +116,7 @@ newProjectAnnotationServer <- function(id, hasSuspects, settings)
         })
 
         output <- exportShinyOutputVal(output, "hasSuspects", hasSuspects)
+        output <- exportShinyOutputVal(output, "IMS", IMS)
         
         list(
             valid = reactive({
@@ -121,7 +132,8 @@ newProjectAnnotationServer <- function(id, hasSuspects, settings)
                 compoundsAlgo = input$compoundsAlgo,
                 MSLibraryFormat = input$MSLibraryFormat,
                 MSLibraryPath = input$MSLibraryPath,
-                estIDConf = input$estIDConf
+                estIDConf = input$estIDConf,
+                IMSSuspCCSPred = input$IMSSuspCCSPred
             ))
         )
     })
@@ -136,7 +148,8 @@ defaultAnnotationSettings <- function()
         compoundsAlgo = "",
         MSLibraryFormat = "msp",
         MSLibraryPath = "",
-        estIDConf = unname(getIDConfUIOpts())
+        estIDConf = unname(getIDConfUIOpts()),
+        IMSSuspCCSPred = "none"
     ))
 }
 

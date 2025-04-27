@@ -1,3 +1,9 @@
+getFeatAlgoSelections <- function()
+{
+    c("OpenMS", "XCMS", "enviPick", "SIRIUS", "KPIC2", EICs = "EIC",
+      "Bruker DataAnalysis" = "Bruker")
+}
+
 newProjectFeaturesUI <- function(id)
 {
     ns <- NS(id)
@@ -7,15 +13,15 @@ newProjectFeaturesUI <- function(id)
     tagList(
         miniUI::miniContentPanel(
             fillCol(
-                flex = c(1, NA, 1),
+                flex = NA,
                 fillRow(
                     flex = c(1, NA, 1),
+                    height = 130,
                     fillCol(
                         fillRow(
                             flex = c(1, NA),
-                            selectInput(ns("featAlgo"), "Feature finding algorithm",
-                                        c("OpenMS", "XCMS", "enviPick", "SIRIUS", "KPIC2", EICs = "EIC",
-                                          "Bruker DataAnalysis" = "Bruker"), multiple = FALSE, width = "100%"),
+                            selectInput(ns("featAlgo"), "Feature finding algorithm", getFeatAlgoSelections(),
+                                        width = "100%"),
                             conditionalPanel(
                                 condition = "input.featAlgo == \"EIC\"",
                                 ns = ns,
@@ -36,16 +42,22 @@ newProjectFeaturesUI <- function(id)
                         )
                     ),
                     div(style = "width: 25px;"),
-                    fillCol(
-                        selectInput(ns("IMSPeaksMob"), "Mobility peak detection", getPeakAlgoSelections(),
-                                    width = "90%"),
-                        selectInput(ns("IMSPeaksChrom"), "Mobility feature peak re-integration",
-                                    c(None = "", getPeakAlgoSelections()), width = "90%")
+                    conditionalPanel(
+                        condition = "output.IMS != \"none\"",
+                        ns = ns,
+                        fillCol(
+                            height = 130,
+                            selectInput(ns("IMSPeaksMob"), "Mobility peak detection", getPeakAlgoSelections(),
+                                        width = "90%"),
+                            selectInput(ns("IMSPeaksChrom"), "Mobility feature peak re-integration",
+                                        c(None = "", getPeakAlgoSelections()), width = "90%")
+                        )
                     )
                 ),
                 hr(),
                 fillCol(
                     flex = NA,
+                    height = 130,
                     conditionalPanel(
                         condition = "output.ionization != \"both\"",
                         ns = ns,
@@ -73,9 +85,13 @@ newProjectFeaturesUI <- function(id)
                         height = 50,
                         checkboxInput(ns("exSuspList"), "Example suspect list(s)")
                     ),
-                    fillRow(
-                        height = 75,
-                        radioButtons(ns("IMSSuspCCSPred"), "CCS prediction", getCCSPredSelections(), inline = TRUE)
+                    conditionalPanel(
+                        condition = "output.IMS != \"none\"",
+                        ns = ns,
+                        fillRow(
+                            height = 75,
+                            radioButtons(ns("IMSSuspCCSPred"), "CCS prediction", getCCSPredSelections(), inline = TRUE)
+                        )
                     )
                 )
             )
@@ -86,7 +102,7 @@ newProjectFeaturesUI <- function(id)
     )
 }
 
-newProjectFeaturesServer <- function(id, ionization, settings)
+newProjectFeaturesServer <- function(id, ionization, IMS, settings)
 {
     ns <- NS(id)
     
@@ -117,11 +133,26 @@ newProjectFeaturesServer <- function(id, ionization, settings)
             updateSelectInput(session, "featAlgo", selected = settings()$featAlgo)
             rValues$featEICParams <- settings()$featEICParams
             updateSelectInput(session, "fGroupsAlgo", selected = settings()$fGroupsAlgo)
+            updateSelectInput(session, "IMSPeaksMob", selected = settings()$IMSPeaksMob)
+            updateSelectInput(session, "IMSPeaksChrom", selected = settings()$IMSPeaksChrom)
             rValues$fGroupsAdv <- settings()$fGroupsAdv
             updateTextInput(session, "suspectList", value = settings()$suspects$single)
             updateTextInput(session, "suspectListPos", value = settings()$suspects$sets$pos)
             updateTextInput(session, "suspectListNeg", value = settings()$suspects$sets$neg)
             updateCheckboxInput(session, "exSuspList", value = settings()$exSuspList)
+            updateRadioButtons(session, "IMSSuspCCSPred", selected = settings()$IMSSuspCCSPred)
+        })
+        
+        observeEvent(IMS(), {
+            sels <- getFeatAlgoSelections()
+            curSel <- input$featAlgo
+            if (IMS() == "direct")
+            {
+                sels <- sels[sels == "EIC"]
+            }
+            if (!curSel %in% sels)
+                curSel <- sels[1]
+            updateSelectInput(session, "featAlgo", choices = sels, selected = curSel)
         })
 
         observeEvent(input$suspectListButton, selectSuspList(session, "suspectList"))
@@ -148,7 +179,6 @@ newProjectFeaturesServer <- function(id, ionization, settings)
         })
 
         observeEvent(input$featEICParams, {
-            # UNDONE: update methodIMS options based on methodMZ selection
             showModal(modalDialog(
                 title = "EIC feature parameters",
                 fillCol(
@@ -158,17 +188,24 @@ newProjectFeaturesServer <- function(id, ionization, settings)
                         height = 75,
                         selectInput(ns("methodMZ"), "EIC method (m/z)", c("bins", "suspects", "ms2"),
                                     selected = rValues$featEICParams$methodMZ, width = "95%"),
-                        # UNDONE: only in post-IMS workflows
-                        selectInput(ns("methodIMS"), "EIC method (IMS)",
-                                    getEICIMSMethods(rValues$featEICParams$methodMZ),
-                                    selected = rValues$featEICParams$methodIMS, width = "95%"),
+                        
+                    ),
+                    conditionalPanel(
+                        condition = "output.IMS == \"direct\"",
+                        ns = ns,
+                        fillRow(
+                            height = 75,
+                            selectInput(ns("methodIMS"), "EIC method (IMS)",
+                                        getEICIMSMethods(rValues$featEICParams$methodMZ),
+                                        selected = rValues$featEICParams$methodIMS, width = "95%")
+                        )
                     ),
                     conditionalPanel(
                         condition = "input.methodMZ == \"suspects\" && output.ionization != \"both\"",
                         ns = ns,
                         fillRow(
                             height = 75,
-                            width = "97.5%", # 97.5% is from the 2x 95% widths for the method selectInputs
+                            width = "95%",
                             fileSelect(ns("featEICSuspectList"), ns("featEICSuspectListButton"), "Suspect list",
                                        rValues$featEICParams$suspects$single,
                                        placeholder = "Empty for same as Features tab")
@@ -180,13 +217,13 @@ newProjectFeaturesServer <- function(id, ionization, settings)
                         fillRow(
                             height = 75,
                             fillCol(
-                                width = "95%",
+                                width = "90%",
                                 fileSelect(ns("featEICSuspectListPos"), ns("featEICSuspectListButtonPos"),
                                            "Suspect list (positive)", rValues$featEICParams$suspects$sets$pos,
                                            placeholder = "Empty for same as Features tab")
                             ),
                             fillCol(
-                                width = "95%",
+                                width = "90%",
                                 fileSelect(ns("featEICSuspectListNeg"), ns("featEICSuspectListButtonNeg"),
                                            "Suspect list (negative)", rValues$featEICParams$suspects$sets$neg,
                                            placeholder = "Empty for same as positive")
@@ -195,10 +232,9 @@ newProjectFeaturesServer <- function(id, ionization, settings)
                     ),
                     fillRow(
                         height = 75,
-                        # NOTE: 97.5% is from the 2x 95% widths for the method selectInputs
                         selectInput(ns("peaksAlgo"), "Peak detection algorithm",
                                     c(Dietrich = "dietrich", "OpenMS" = "openms", "XCMS3" = "xcms3", "enviPick" = "envipick"),
-                                    selected = rValues$featEICParams$peaksAlgo, width = "97.5%")
+                                    selected = rValues$featEICParams$peaksAlgo, width = "95%")
                     )
                 ),
                 easyClose = TRUE,
@@ -339,6 +375,7 @@ newProjectFeaturesServer <- function(id, ionization, settings)
         })
         
         output <- exportShinyOutputVal(output, "ionization", ionization)
+        output <- exportShinyOutputVal(output, "IMS", IMS)
         
         list(
             valid = reactive({
@@ -359,9 +396,12 @@ newProjectFeaturesServer <- function(id, ionization, settings)
                 featAlgo = input$featAlgo,
                 featEICParams = rValues$featEICParams,
                 fGroupsAlgo = input$fGroupsAlgo,
+                IMSPeaksMob = input$IMSPeaksMob,
+                IMSPeaksChrom = input$IMSPeaksChrom,
                 suspects = list(single = input$suspectList,
                                 sets = list(pos = input$suspectListPos, neg = input$suspectListNeg)),
                 exSuspList = input$exSuspList,
+                IMSSuspCCSPred = input$IMSSuspCCSPred,
                 fGroupsAdv = rValues$fGroupsAdv
             ))
         )
@@ -373,8 +413,11 @@ defaultFeaturesSettings <- function()
     return(list(
         featAlgo = "OpenMS",
         fGroupsAlgo = "OpenMS",
+        IMSPeaksMob = "piek",
+        IMSPeaksChrom = "piek",
         suspects = list(single = "", sets = list(pos = "", neg = "")),
         exSuspList = FALSE,
+        IMSSuspCCSPred = "none",
         featEICParams = list(
             methodMZ = "bins",
             methodIMS = "bins",

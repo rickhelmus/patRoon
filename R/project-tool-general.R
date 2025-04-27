@@ -22,15 +22,15 @@ newProjectGeneralUI <- function(id)
                 fillRow(
                     flex = c(1, 2),
                     width = "90%",
-                    radioButtons(ns("ims"), "Mobility asignment", c("none", "from features" = "direct",
+                    radioButtons(ns("IMS"), "Mobility asignment", c("none", "from features" = "direct",
                                                                     "post features" = "post")),
                     conditionalPanel(
-                        condition = "input.ims != \"none\"",
+                        condition = "input.IMS != \"none\"",
                         ns = ns,
                         fillRow(
                             height = 130,
                             fillCol(
-                                radioButtons(ns("IMSInstrument"), "Mobility configuration",
+                                radioButtons(ns("IMSLimits"), "IMS configuration",
                                              c("Bruker" = "bruker", "Agilent" = "agilent")),
                                 textNote("Configures the limits.yml file.")
                             ),
@@ -75,6 +75,9 @@ newProjectGeneralServer <- function(id, settings)
             updateRadioButtons(session, "outputScriptTo", selected = settings()$outputScriptTo)
             updateTextInput(session, "scriptFile", value = settings()$scriptFile)
             updateCheckboxInput(session, "createRStudioProj", value = settings()$createRStudioProj)
+            updateRadioButtons(session, "IMS", selected = settings()$IMS)
+            updateRadioButtons(session, "IMSLimits", selected = settings()$IMSLimits)
+            updateSelectInput(session, "CCSMethod", selected = settings()$CCSMethod)
             updateRadioButtons(session, "ionization", selected = settings()$ionization)
         })
         
@@ -92,8 +95,12 @@ newProjectGeneralServer <- function(id, settings)
                 outputScriptTo = input$outputScriptTo,
                 scriptFile = input$scriptFile,
                 createRStudioProj = input$createRStudioProj,
+                IMS = input$IMS,
+                IMSLimits = input$IMSLimits,
+                CCSMethod = input$CCSMethod,
                 ionization = input$ionization
             )),
+            CCSCalibrant = reactive(input$CCSCalibrant),
             loadParams = reactive(input$loadParams),
             saveParams = reactive(input$saveParams)
         )
@@ -107,6 +114,9 @@ defaultGeneralSettings <- function(destPath)
         outputScriptTo = "newFile",
         scriptFile = "process.R",
         createRStudioProj = TRUE,
+        IMS = "none",
+        IMSLimits = "bruker",
+        CCSMethod = "none",
         ionization = "positive"
     ))
 }

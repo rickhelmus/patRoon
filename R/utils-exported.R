@@ -1040,12 +1040,69 @@ getCCSParams <- function(method, ..., calibrant = NULL)
     return(modifyList(ret, list(...)))
 }
 
+#' Parameters to specify a IMS data range
+#'
+#' Parameters that define a range of mobility or \acronym{CCS} values.
+#'
+#' The following parameters are used to define an IMS range: \itemize{
+#'
+#'   \item \code{param} Should be \code{"mobility"} or \code{"CCS"} to specify a mobility or \acronym{CCS} range,
+#'   respectively.
+#'   
+#'   \item \code{lower},\code{upper} The lower and upper range.
+#'   
+#'   \item \code{mzRelative} Set to \code{TRUE} to specify an IMS range that is normalized by \emph{m/z}.
+#'
+#' }
+#'
+#' These parameters are passed as a named \code{list} as the \code{IMSRangeParams} argument to functions.
+#'
+#' The \code{getIMSRangeParams} function generates such parameter list with defaults.
+#'
+#' @param param,lower,upper,mzRelative Arguments to specify the IMS range parameters, see Details.
+#' 
 #' @export
 getIMSRangeParams <- function(param, lower, upper, mzRelative = FALSE)
 {
     return(list(param = param, lower = lower, upper = upper, mzRelative = mzRelative))
 }
 
+#' Parameters for IMS matching
+#'
+#' Parameters that define how mobility or \acronym{CCS} values between \emph{e.g.} features and suspects should be
+#' matched.
+#'
+#' The following parameters should be defined: \itemize{
+#'
+#'   \item \code{param} Should be \code{"mobility"} or \code{"CCS"} to match by mobility or \acronym{CCS}, respectively.
+#'   
+#'   \item \code{window},\code{relative} The \code{window} parameter sets the tolerance window size used for matching.
+#'   If \code{relative=TRUE} then the tolerance is relative (\samp{0-1}). The defaults for \code{window} are
+#'   (see \link{limits}): \itemize{
+#'
+#'     \item \code{defaultLim("mobility", "medium")} (\code{param="mobility"} and \code{relative=FALSE})
+#'
+#'     \item \code{defaultLim("mobility", "medium_rel")} (\code{param="mobility"} and \code{relative=TRUE})
+#'
+#'     \item \code{defaultLim("CCS", "medium")} (\code{param="CCS"} and \code{relative=FALSE})
+#'
+#'     \item \code{defaultLim("CCS", "medium_rel")} (\code{param="CCS"} and \code{relative=TRUE})
+#'
+#'   }
+#'   
+#'   \item \code{minMatches} The minimum number of mobility/\acronym{CCS} matches for a suspect hit. If the number of
+#'   available reference mobility/\acronym{CCS} values in the suspect list is less than \code{minMatches}, then that
+#'   number is used as threshold. Set to \code{0} to disable.
+#'
+#' }
+#'
+#' These parameters are passed as a named \code{list} as the \code{IMSMatchParams} argument to functions.
+#'
+#' The \code{getIMSMatchParams} function generates such parameter list with defaults.
+#'
+#' @param param Should be \code{"mobility"} or \code{"CCS"} to match by mobility or \acronym{CCS}, respectively.
+#' @param \dots optional named arguments that override defaults.
+#'
 #' @export
 getIMSMatchParams <- function(param, ...)
 {

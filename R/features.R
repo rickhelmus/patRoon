@@ -30,6 +30,7 @@ printFeatStats <- function(fList)
 #' @slot features List of features per analysis file. Use the \code{featureTable} method for access.
 #' @slot analysisInfo A \code{data.table} with the \link[=analysis-information]{analysis information}. Use the
 #'   \code{analysisInfo} method for access.
+#' @slot hasMobilities A \code{logical} that is \code{TRUE} if the features object contain mobility information.
 #'
 #' @templateVar seli analyses
 #' @templateVar selOrderi analyses()

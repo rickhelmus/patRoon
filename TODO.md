@@ -268,7 +268,6 @@
         - abundance columns in mspl --> section in generateMSPeakLists()?
 - IMS
     - minIntensityIMS template, also for getEICs()
-    - hasMobilities slot for features
     - Dietrich features
         - refer to defaults/limits for getFeaturesEICsParams() (and removeDuplicateFeatsSusps()?)
     - getDefPeakParams()

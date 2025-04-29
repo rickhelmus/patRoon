@@ -77,9 +77,13 @@ NULL
 #'   \item \code{patRoon.cache.maxEntries}: a \code{numeric} specifying the maximum number of entries per cache
 #'   category (default is 100000). When this limit is exceeded, the oldest entries are automatically removed.
 #'
-#'   \item \code{patRoon.MS.backends},\code{patRoon.MS.preferIMS},\code{patRoon.threads},\code{patRoon.path.BrukerTIMS}:
+#'   \item \code{patRoon.MS.backends},\code{patRoon.MS.preferIMS},\code{patRoon.path.BrukerTIMS}:
 #'   Options related to the \link[=msdata]{raw data interface}.
-#'   
+#'
+#'   \item \code{patRoon.threads}: The number of threads to be used for parallelization. This is currently only used by
+#'   the \link[=msdata]{raw data interface} and when the \code{piek} algorithm is used for \link[=getDefPeakParams]{peak
+#'   detection}.
+#'
 #'   \item \code{patRoon.MP.maxProcs}: The maximum number of processes that should be initiated in parallel. A good
 #'   starting point is the number of physical cores, which is the default as detected by
 #'   \code{\link[parallel]{detectCores}}. This option is only used when \option{patRoon.MP.method="classic"}.
@@ -121,7 +125,7 @@ NULL
 #'   \item \code{patRoon.path.BiotransFormer} The full file path to the \command{biotransformer} \file{.jar} command
 #'   line utility. This needs to be set when \code{\link{generateTPsBioTransformer}} is used. For more details see
 #'   \url{https://bitbucket.org/djoumbou/biotransformer/src/master}.
-#'   
+#'
 #'   \item \code{patRoon.path.limits} A path to a customized \link[=limits]{limits YAML file}.
 #'
 #'   }

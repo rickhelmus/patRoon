@@ -314,8 +314,6 @@
         - clearly doc the difference if TP components are generated after assignMobilities(); there will be no IMS TP parents with expanding
     - suspects/compounds
         - doc order of data selection for mobility and CCS columns
-    - getIMSRangeParams() and getIMSMatchParams()
-        - refer to defaults/limits
     - get CCS values from MetFrag
         - use PCL w/ CCSbase
         - still need to call assignMobilities() with from = NULL to get CCS deviations, mobility conversions etc

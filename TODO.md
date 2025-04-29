@@ -270,7 +270,6 @@
     - minIntensityIMS template, also for getEICs()
     - Dietrich features
         - refer to defaults/limits for getFeaturesEICsParams() (and removeDuplicateFeatsSusps()?)
-    - getDefPeakParams()
     - getDefEICParams() / getDefEIMParams()
         - finish docs for IMSWindow/clusterMethod
         - update handbook

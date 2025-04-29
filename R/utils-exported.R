@@ -699,6 +699,116 @@ getDefTPStructParams <- function(...)
     return(modifyList(def, list(...)))
 }
 
+#' Peak detection parameters
+#'
+#' Algorithms and parameters for automatic detection of peaks in chromatograms and mobilograms.
+#'
+#' The algorithm and its parameters for peak detection should be in a named \code{list} with the format:
+#'
+#' \code{list(algorithm = <algorithm>, param1 = ..., param2 = ..., ...)}
+#'
+#' Where \code{<algorithm>} is the name of the algorithm and \code{param1}, \code{param2} etc are the parameters. The
+#' \code{getDefPeakParams} function generates such parameter list with the algorithm and default parameters.
+#'
+#' The following algorithms are currently supported: \itemize{
+#'
+#'   \item \code{"openms"}: uses
+#'   \href{https://abibuilder.cs.uni-tuebingen.de/archive/openms/Documentation/nightly/html/TOPP_MRMTransitionGroupPicker.html}{MRMTransitionGroupPicker}
+#'   tool from \href{http://www.openms.de}{OpenMS}.
+#'
+#'   \item \code{"xcms3"}: uses the \code{\link[xcms:peaksWithCentWave]{xcms::peaksWithCentWave}} function.
+#'
+#'   \item \code{"envipick"}: uses the \code{\link[enviPick:mzpick]{enviPick::mzpick}} function.
+#'
+#'   \item \code{"piek"}: uses an optimized peak detection algorithm derived from \insertCite{Dietrich2021}{patRoon}.
+#' }
+#'
+#' The parameters are discussed in the next sections.
+#'
+#' @param type The type of parameter defaults: \code{"chrom"} for chromatograms and \code{"bruker_ims"} and
+#'   \code{"agilent_ims"} for mobilograms coming from Bruker and Agilent systems, respectively.
+#' @param algorithm The peak detection algorithm: \code{"openms"}, \code{"xcms3"}, \code{"envipick"} or \code{"piek"}.
+#' @param \dots optional named arguments that override defaults.
+#'
+#' @section General parameters: These parameters are applicable to all algorithms \itemize{
+#'
+#'   \item \code{forcePeakRange} a two-sized \code{numeric} vector with the minimum and maximum width for a peak. Peaks
+#'   that are more narrow or wide will be clamped to this range. This is especially useful for algorithms that consider
+#'   an extensive part of the fronting/tailing noise as part as the peak. Set to \code{c(0, 0)} to disable.
+#'
+#'   \item \code{relMinIntensity} the minimum intensity threshold for a peak relative to the highest peak in the same
+#'   chromatogram/mobilogram. This is \emph{e.g.} useful to exclude noise in mobilograms where normally few peaks are
+#'   expected.
+#'
+#'   }
+#'
+#' @section Parameters for \code{openms}: The parameters directly map to the command line options for
+#'   \code{MRMTransitionGroupPicker}, please see
+#'   \href{https://abibuilder.cs.uni-tuebingen.de/archive/openms/Documentation/nightly/html/TOPP_MRMTransitionGroupPicker.html}{its
+#'   documentation}. \itemize{
+#'
+#'     \item \code{minPeakWidth} the minimum peak width, sets the \command{min_peak_width} option.
+#'
+#'     \item \code{backgroundSubtraction} the background subtraction method, sets the
+#'     \command{-algorithm:background_subtraction} option.
+#'
+#'     \item \code{SGolayFrameLength} the frame length for Savitzky-Golay smoothing, sets the
+#'     \command{-algorithm:PeakPickerMRM:sgolay_frame_length} option.
+#'
+#'     \item \code{SGolayPolyOrder} order of the polynomial, sets the
+#'     \command{-algorithm:PeakPickerMRM:sgolay_polynomial_order} option.
+#'
+#'     \item \code{useGauss} set to \code{TRUE} to use Gaussian smoothing (instead of Savitzky-Golay, sets the
+#'     \command{-algorithm:PeakPickerMRM:use_gauss} option.
+#'
+#'     \item \code{gauss_width} the Gaussian width, estimated peak size, sets the
+#'     \command{-algorithm:PeakPickerMRM:gauss_width} option.
+#'
+#'     \item \code{SN} signal to noise threshold, sets the \command{-algorithm:PeakPickerMRM:signal_to_noise} option.
+#'
+#'     \item \code{SNWinLen} \code{SN} window length, sets the \command{-algorithm:PeakPickerMRM:sn_win_len} option.
+#'
+#'     \item \code{SNBinCount} \code{SN} bin count, sets the \command{-algorithm:PeakPickerMRM:sn_bin_count} option.
+#'
+#'     \item \code{method} peak picking method, sets the \command{-algorithm:PeakPickerMRM:method} option.
+#'
+#'     \item \code{integrationType} the integration technique, sets the
+#'     \command{-algorithm:PeakIntegrator:integration_type} option.
+#'
+#'     \item \code{baselineType} the baseline type, sets the \command{-algorithm:PeakIntegrator:baseline_type} option.
+#'
+#'     \item \code{fitEMG} if \code{TRUE} then the EMG model is used for fitting, sets the
+#'     \command{-algorithm:PeakIntegrator:fit_EMG} option.
+#'
+#'   }
+#'
+#' @section Parameters for \code{xcms3} and \code{envipick}: See the documentation for
+#'   \code{\link[xcms:peaksWithCentWave]{xcms::peaksWithCentWave}} and \code{\link[enviPick:mzpick]{enviPick::mzpick}}
+#'   for \code{xcms3} and \code{envipick}, respectively.
+#'
+#' @section Parameters for \code{piek}: \itemize{
+#'
+#'   \item \code{minIntensity} the minimum intensity of a peak.
+#'
+#'   \item \code{SN} the signal to noise ratio.
+#'
+#'   \item \code{peakWidth} two-sized \code{vector} with the minimum and maximum peak width (seconds)
+#'
+#'   \item \code{RTRange} two-sized \code{vector} with the minimum and maximum retention time range (seconds). Set the
+#'   2nd element to \code{Inf} for no upper limit.
+#'
+#'   \item \code{maxPeaksPerSignal} upper threshold for consecutive maxima of similar size to be regarded as noise.
+#'
+#'   }
+#'
+#' @note The peak detection used by \code{algorithm="openms"} is different than that of
+#'   \code{\link{findFeaturesOpenMS}}.
+#'
+#'   The \code{patRoon.threads} package option sets the number of threads for the \code{piek} algorithm.
+#'
+#' @template refs-openms
+#' @references \insertAllCited{} \addCitations{xcms}{1} \cr\cr \addCitations{xcms}{2} \cr\cr \addCitations{xcms}{3}
+#'
 #' @export
 getDefPeakParams <- function(type, algorithm, ...)
 {

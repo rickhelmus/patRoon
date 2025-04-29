@@ -32,6 +32,7 @@ printFeatStats <- function(fList)
 #'   \code{analysisInfo} method for access.
 #' @slot featureQualityNames Character vector with the names of the chromatographic peak quality metrics that are
 #'   present.
+#' @slot hasMobilities A \code{logical} that is \code{TRUE} if the features object contain mobility information.
 #'
 #' @templateVar seli analyses
 #' @templateVar selOrderi analyses()

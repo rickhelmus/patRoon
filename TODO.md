@@ -75,20 +75,17 @@
 - copy limits file and UI to specify IMS default
 - move components to features tab?
 - IMS changes
-    - Analyses
-        - Toggle IMS file type
-            - what to do if analyses are already present? Warn and remove? Or don't toggle and warn on project creation?
-        - Select right example anaInfo
-    - Conversion
-        - Toggle IMS to format?
-            - what to do if already present? Warn and remove? Or don't toggle and warn on project creation?
-    - Annotation
-        - Predict CCS values for compounds
-            - what to do if pubchemlite is already choosen?
-        - Change default for compounds to pubchemlite?
+    - Analyses/Toggles: any checks?
+        - could instead check if the right file type is selected, either in anaInfo or as conversion step
+            - make it dependable on feat finder, then also check file format
+            - only check if anaTable is made
+            - if no suitable file is found, check if conversion to type/format is there, otherwise warn
     - Codegen
-        - set instrument type for limits.yml
+        - set instrument type for limits.yml and mob peak params
+        - Select right example anaInfo
         - Add mobility filters for suspects & compounds?
+        - Predict CCS values for compounds: what to do if pubchemlite is already chosen as compound lib?
+            - Change default for compounds to pubchemlite?
         - Do assignMobilities() before/after suspect screening?
             - after would make filter not needed
 

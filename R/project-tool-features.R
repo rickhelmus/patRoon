@@ -43,7 +43,7 @@ newProjectFeaturesUI <- function(id)
                     ),
                     div(style = "width: 25px;"),
                     conditionalPanel(
-                        condition = "output.IMS != \"none\"",
+                        condition = "output.IMSMode != \"none\"",
                         ns = ns,
                         fillCol(
                             height = 130,
@@ -86,7 +86,7 @@ newProjectFeaturesUI <- function(id)
                         checkboxInput(ns("exSuspList"), "Example suspect list(s)")
                     ),
                     conditionalPanel(
-                        condition = "output.IMS != \"none\"",
+                        condition = "output.IMSMode != \"none\"",
                         ns = ns,
                         fillRow(
                             height = 75,
@@ -102,7 +102,7 @@ newProjectFeaturesUI <- function(id)
     )
 }
 
-newProjectFeaturesServer <- function(id, ionization, IMS, settings)
+newProjectFeaturesServer <- function(id, ionization, IMSMode, settings)
 {
     ns <- NS(id)
     
@@ -143,10 +143,10 @@ newProjectFeaturesServer <- function(id, ionization, IMS, settings)
             updateRadioButtons(session, "IMSSuspCCSPred", selected = settings()$IMSSuspCCSPred)
         })
         
-        observeEvent(IMS(), {
+        observeEvent(IMSMode(), {
             sels <- getFeatAlgoSelections()
             curSel <- input$featAlgo
-            if (IMS() == "direct")
+            if (IMSMode() == "direct")
             {
                 sels <- sels[sels == "EIC"]
             }
@@ -191,7 +191,7 @@ newProjectFeaturesServer <- function(id, ionization, IMS, settings)
                         
                     ),
                     conditionalPanel(
-                        condition = "output.IMS == \"direct\"",
+                        condition = "output.IMSMode == \"direct\"",
                         ns = ns,
                         fillRow(
                             height = 75,
@@ -375,7 +375,7 @@ newProjectFeaturesServer <- function(id, ionization, IMS, settings)
         })
         
         output <- exportShinyOutputVal(output, "ionization", ionization)
-        output <- exportShinyOutputVal(output, "IMS", IMS)
+        output <- exportShinyOutputVal(output, "IMSMode", IMSMode)
         
         list(
             valid = reactive({

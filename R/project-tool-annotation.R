@@ -82,7 +82,7 @@ newProjectAnnotationUI <- function(id)
                     )
                 ),
                 conditionalPanel(
-                    condition = "output.IMS != 'none'",
+                    condition = "output.IMSMode != 'none'",
                     ns = ns,
                     fillRow(
                         height = 75,
@@ -94,7 +94,7 @@ newProjectAnnotationUI <- function(id)
     )
 }
 
-newProjectAnnotationServer <- function(id, hasSuspects, IMS, settings)
+newProjectAnnotationServer <- function(id, hasSuspects, IMSMode, settings)
 {
     moduleServer(id, function(input, output, session)
     {
@@ -116,7 +116,7 @@ newProjectAnnotationServer <- function(id, hasSuspects, IMS, settings)
         })
 
         output <- exportShinyOutputVal(output, "hasSuspects", hasSuspects)
-        output <- exportShinyOutputVal(output, "IMS", IMS)
+        output <- exportShinyOutputVal(output, "IMSMode", IMSMode)
         
         list(
             valid = reactive({

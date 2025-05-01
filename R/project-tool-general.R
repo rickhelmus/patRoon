@@ -22,10 +22,10 @@ newProjectGeneralUI <- function(id)
                 fillRow(
                     flex = c(1, 2),
                     width = "90%",
-                    radioButtons(ns("IMS"), "Mobility asignment", c("none", "from features" = "direct",
+                    radioButtons(ns("IMSMode"), "Mobility asignment", c("none", "from features" = "direct",
                                                                     "post features" = "post")),
                     conditionalPanel(
-                        condition = "input.IMS != \"none\"",
+                        condition = "input.IMSMode != \"none\"",
                         ns = ns,
                         fillRow(
                             height = 130,
@@ -74,9 +74,9 @@ newProjectGeneralServer <- function(id, settings)
             updateTextInput(session, "destination", value = settings()$destination)
             updateTextInput(session, "scriptFile", value = settings()$scriptFile)
             updateCheckboxInput(session, "createRStudioProj", value = settings()$createRStudioProj)
-            updateRadioButtons(session, "IMS", selected = settings()$IMS)
-            updateRadioButtons(session, "IMSLimits", selected = settings()$IMSLimits)
-            updateSelectInput(session, "CCSMethod", selected = settings()$CCSMethod)
+            updateRadioButtons(session, "IMSMode", selected = settings()$IMS$mode)
+            updateRadioButtons(session, "IMSLimits", selected = settings()$IMS$limits)
+            updateSelectInput(session, "CCSMethod", selected = settings()$IMS$CCSMethod)
             updateRadioButtons(session, "ionization", selected = settings()$ionization)
         })
         
@@ -84,19 +84,20 @@ newProjectGeneralServer <- function(id, settings)
             valid = reactive({
                 if (!nzchar(input$destination))
                     list(title = "Invalid destination", msg = "Please select a destination path!")
-                else if (input$outputScriptTo != "curFile" && !nzchar(input$scriptFile))
-                    list(title = "No script file", msg = "Please select a destination script file!")
+                else if (input$IMSMode != "none" && input$CCSMethod == "agilent" && !nzchar(input$CCSCalibrant))
+                    list(title = "No CCS calibrant", msg = "Please select a CCS calibrant file!")
                 else
                     TRUE
             }),
             settings = reactive(list(
                 destination = input$destination,
-                outputScriptTo = input$outputScriptTo,
                 scriptFile = input$scriptFile,
                 createRStudioProj = input$createRStudioProj,
-                IMS = input$IMS,
-                IMSLimits = input$IMSLimits,
-                CCSMethod = input$CCSMethod,
+                IMS = list(
+                    mode = input$IMSMode,
+                    limits = input$IMSLimits,
+                    CCSMethod = input$CCSMethod
+                ),
                 ionization = input$ionization
             )),
             CCSCalibrant = reactive(input$CCSCalibrant),
@@ -110,12 +111,13 @@ defaultGeneralSettings <- function(destPath)
 {
     return(list(
         destination = if (is.null(destPath)) "~/" else destPath,
-        outputScriptTo = "newFile",
         scriptFile = "process.R",
         createRStudioProj = TRUE,
-        IMS = "none",
-        IMSLimits = "bruker",
-        CCSMethod = "none",
+        IMS = list(
+            mode = "none",
+            limits = "bruker",
+            CCSMethod = "none"
+        ),
         ionization = "positive"
     ))
 }
@@ -124,5 +126,5 @@ upgradeGeneralSettings <- function(settings, destPath)
 {
     # NOTE: this updates from first file version
     return(modifyList(defaultGeneralSettings(destPath),
-                      settings[c("outputScriptTo", "scriptFile", "createRStudioProj", "ionization")]))
+                      settings[c("scriptFile", "createRStudioProj", "ionization")]))
 }

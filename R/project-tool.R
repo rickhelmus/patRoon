@@ -126,15 +126,16 @@ newProject <- function(destPath = NULL)
         data <- list()
         
         data$general <- newProjectGeneralServer("general", reactive(loadedSettings$general))
-        ionization <- reactive(data$general$settings()$ionization); IMS <- reactive(data$general$settings()$IMS)
+        ionization <- reactive(data$general$settings()$ionization)
+        IMSMode <- reactive(data$general$settings()$IMS$mode)
         data$analyses <- newProjectAnalysesServer("analyses", ionization, reactive(loadedSettings$analyses))
         data$preTreatment <- newProjectPreTreatServer("pretreat", ionization, reactive(loadedSettings$preTreatment))
-        data$features <- newProjectFeaturesServer("features", ionization, IMS, reactive(loadedSettings$features))
+        data$features <- newProjectFeaturesServer("features", ionization, IMSMode, reactive(loadedSettings$features))
         hasSusp <- reactive({
             data$features$settings()$exSuspList || (ionization() != "both" && nzchar(data$features$settings()$suspects$single) ||
                 (ionization() == "both" && nzchar(data$features$settings()$suspects$positive)))
         })
-        data$annotations <- newProjectAnnotationServer("annotation", hasSusp, IMS, reactive(loadedSettings$annotation))
+        data$annotations <- newProjectAnnotationServer("annotation", hasSusp, IMSMode, reactive(loadedSettings$annotation))
         data$TPs <- newProjectTPServer("tp", hasSusp, reactive(data$annotations$settings()$formulasAlgo),
                                        reactive(data$annotations$settings()$compoundsAlgo), reactive(loadedSettings$TP))
         data$report <- newProjectReportServer("report", reactive(loadedSettings$report))

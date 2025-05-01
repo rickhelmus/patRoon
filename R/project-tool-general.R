@@ -30,9 +30,9 @@ newProjectGeneralUI <- function(id)
                         fillRow(
                             height = 130,
                             fillCol(
-                                radioButtons(ns("IMSLimits"), "IMS configuration",
+                                radioButtons(ns("IMSLimits"), "IMS defaults",
                                              c("Bruker" = "bruker", "Agilent" = "agilent")),
-                                textNote("Configures the limits.yml file.")
+                                textNote("Sets default limits and tolerances.")
                             ),
                             fillCol(
                                 selectInput(ns("CCSMethod"), "CCS calculation method",

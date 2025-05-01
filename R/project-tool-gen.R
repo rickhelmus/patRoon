@@ -162,9 +162,9 @@ scriptGenerator$methods(
     }
 )
 
-genScriptInitBlock <- function(anaInfoData, destination, ionization, settingsAna, settingsPre, generator)
+genScriptInitBlock <- function(anaInfoData, settingsGen, settingsAna, settingsPre, generator)
 {
-    addAnaInfo <- function(anaInfoVarName, aid, comment)
+    addAnaInfo <- function(anaInfoVarName, aid, comment, exPol)
     {
         if (settingsAna$generateAnaInfo == "table")
         {
@@ -198,7 +198,7 @@ genScriptInitBlock <- function(anaInfoData, destination, ionization, settingsAna
         {
             generator$addComment("Example data from patRoonData package (triplicate solvent blank + triplicate standard)",
                        condition = comment)
-            generator$addCall(anaInfoVarName, "patRoonData::exampleAnalysisInfo", list(value = ionization, quote = TRUE))
+            generator$addCall(anaInfoVarName, "patRoonData::exampleAnalysisInfo", list(value = exPol, quote = TRUE))
         }
         else # none
         {
@@ -237,16 +237,16 @@ genScriptInitBlock <- function(anaInfoData, destination, ionization, settingsAna
     
     generator$addHeader("initialization")
     
-    generator$addAssignment("workPath", destination, quote = TRUE)
+    generator$addAssignment("workPath", settingsGen$destination, quote = TRUE)
     generator$addCall(NULL, "setwd", list(value = "workPath"))
     generator$addNL()
     
-    if (ionization != "both")
-        addAnaInfo("anaInfo", anaInfoData, TRUE)
+    if (settingsGen$ionization != "both")
+        addAnaInfo("anaInfo", anaInfoData, TRUE, settingsGen$ionization)
     else
     {
-        addAnaInfo("anaInfoPos", anaInfoData$positive, TRUE)
-        addAnaInfo("anaInfoNeg", anaInfoData$negative, FALSE)
+        addAnaInfo("anaInfoPos", anaInfoData$positive, TRUE, "positive")
+        addAnaInfo("anaInfoNeg", anaInfoData$negative, FALSE, "negative")
     }
     
     if (nrow(settingsPre$steps) > 0 || settingsPre$brukerCalib$enabled)
@@ -255,7 +255,7 @@ genScriptInitBlock <- function(anaInfoData, destination, ionization, settingsAna
         generator$addComment("Set to FALSE to skip data pre-treatment")
         generator$addAssignment("doDataPretreatment", TRUE)
         generator$addText("if (doDataPretreatment)\n{")
-        if (ionization != "both")
+        if (settingsGen$ionization != "both")
             addPrepBlock("anaInfo", "method")
         else
         {
@@ -820,8 +820,7 @@ getScriptCode <- function(anaInfoData, settings)
     generator$addNL()
     generator$addCall(NULL, "library", list(value = "patRoon"))
     
-    genScriptInitBlock(anaInfoData, settings$general$destination, ionization, settings$analyses, settings$preTreatment,
-                       generator)
+    genScriptInitBlock(anaInfoData, settings$general, settings$analyses, settings$preTreatment, generator)
 
     if (doSusps || doFeatEICSusps || doISTDs)
         genScriptSuspListsBlock(ionization, settings$features, doSusps, doFeatEICSusps, doISTDs, generator)

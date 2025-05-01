@@ -72,7 +72,6 @@ newProjectGeneralServer <- function(id, settings)
         
         observeEvent(settings(), {
             updateTextInput(session, "destination", value = settings()$destination)
-            updateRadioButtons(session, "outputScriptTo", selected = settings()$outputScriptTo)
             updateTextInput(session, "scriptFile", value = settings()$scriptFile)
             updateCheckboxInput(session, "createRStudioProj", value = settings()$createRStudioProj)
             updateRadioButtons(session, "IMS", selected = settings()$IMS)

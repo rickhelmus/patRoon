@@ -937,7 +937,7 @@ doCreateProject <- function(anaInfoTabs, settings)
         genReportSettingsFile(file.path(settings$general$destination, "report.yml"))
     
     code <- getScriptCode(aid, settings)
-    if (settings$general$outputScriptTo == "curFile")
+    if (!nzchar(settings$general$scriptFile))
     {
         # insert at end of current document
         rstudioapi::insertText(Inf, code, rstudioapi::getSourceEditorContext()$id)

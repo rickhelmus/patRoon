@@ -81,10 +81,12 @@ newProject <- function(destPath = NULL)
     
     checkExistingScript <- function(settings)
     {
+        if (!nzchar(settings$scriptFile))
+            return(TRUE)
         p <- file.path(settings$destination, settings$scriptFile)
-        return(settings$outputScriptTo == "curFile" || !file.exists(p) ||
-                   rstudioapi::showQuestion("Script file already exists",
-                                            sprintf("Script file already exists: '%s'.\nOverwrite?", p), "Yes", "No"))
+        return(!file.exists(p) || rstudioapi::showQuestion("Script file already exists",
+                                                           sprintf("Script file already exists: '%s'.\nOverwrite?", p),
+                                                           "Yes", "No"))
     }
     
     checkExistingAnaInfo <- function(settingsGen, settingsAna)

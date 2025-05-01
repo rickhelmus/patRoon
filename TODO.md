@@ -84,8 +84,7 @@
         - set instrument type for limits.yml and mob peak params
         - Select right example anaInfo
         - Add mobility filters for suspects & compounds?
-        - Predict CCS values for compounds: what to do if pubchemlite is already chosen as compound lib?
-            - Change default for compounds to pubchemlite?
+        - Change default for compounds to pubchemlite
         - Do assignMobilities() before/after suspect screening?
             - after would make filter not needed
 

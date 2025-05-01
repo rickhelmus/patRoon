@@ -787,6 +787,13 @@ setMethod("assignMobilities", "compounds", function(obj, fGroups, IMS = TRUE, fr
     allTab <- as.data.table(obj)[group %chin% names(fGroups)]
     allTab <- subsetDTColumnsIfPresent(allTab, c("group", "SMILES", "InChI", "InChIKey", "InChIKey1", "UID", "CCS"))
     
+    if (!overwrite && !is.null(allTab[["CCS"]]) && !any(is.na(allTab[["CCS"]])))
+    {
+        printf("NOTE: skipping CCS assignment from '%s': CCS values are already present. Set overwrite=TRUE to force re-calculation.\n",
+               from)
+        from <- NULL
+    }
+    
     # add some columns for so that the DT method can do its calculations
     allTab[, mz := gInfo$mz[match(group, gInfo$group)]]
     annFG <- annotations(fGroups)

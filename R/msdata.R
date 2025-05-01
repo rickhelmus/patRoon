@@ -127,7 +127,7 @@ maybeGetMSFilesForSC <- function(anaInfo, types, formats, needIMS)
 
 maybeGetMSFilesForMSTK <- function(anaInfo, types, formats, needIMS)
 {
-    # so far the same constraints as
+    # so far the same constraints as SC
     return(maybeGetMSFilesForSC(anaInfo, types, formats, needIMS))
 }
 

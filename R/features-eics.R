@@ -181,8 +181,8 @@ findFeaturesEICs <- function(analysisInfo, featParams, peakParams, suspects = NU
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, add = ac)
     assertFeaturesEICsParams(featParams, add = ac)
     assertFindPeakParams(peakParams, add = ac)
-    assertSuspectList(suspects, needsAdduct = is.null(adduct), skipInvalid = featParams$skipInvalid,
-                      .var.name = .var.name, add = add)
+    assertSuspectList(suspects, needsAdduct = is.null(adduct), skipInvalid = featParams$skipInvalid, null.ok = TRUE,
+                      add = ac)
     checkmate::assertNumber(minIntensityIMS, lower = 0, finite = TRUE, add = ac)
     checkmate::assertFlag(verbose, add = ac)
     checkmate::reportAssertions(ac)

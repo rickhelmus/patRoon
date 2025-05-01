@@ -177,7 +177,10 @@ getMSFileHashesFromAvailBackend <- function(anaInfo, types = getMSFileTypes(), f
 # shortcut for common case
 getCentroidedMSFilesFromAnaInfo <- function(anaInfo, formats = c("mzML", "mzXML"), mustExist = TRUE)
 {
-    setNames(getMSFilesFromAnaInfo(anaInfo, "centroid", formats, mustExist), anaInfo$analysis)
+    msf <- getMSFilesFromAnaInfo(anaInfo, "centroid", formats, mustExist)
+    if (is.null(msf))
+        return(NULL)
+    return(setNames(msf, anaInfo$analysis))
 }
 
 doGetEICsForAna <- function(...)

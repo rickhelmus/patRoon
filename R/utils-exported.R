@@ -1314,7 +1314,7 @@ convertCCSToMobility <- function(ccs, mz, CCSParams, charge = NULL)
 #' @export
 setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFromBy = "InChIKey",
                                                      overwrite = FALSE, adducts = c("[M+H]+", "[M-H]-", "none"),
-                                                     adductDef = NULL, predictAdductOnly = TRUE, CCSParams = NULL,
+                                                     predictAdductOnly = TRUE, CCSParams = NULL,
                                                      prepareChemProps = TRUE, prefCalcChemProps = TRUE,
                                                      neutralChemProps = FALSE, virtualenv = "patRoon-c3sdb")
 {
@@ -1337,51 +1337,78 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
 
     if (!is.null(obj[["adduct"]]))
         adducts <- union(adducts, obj[!is.na(adduct) & nzchar(adduct)]$adduct) # expand with adducts from suspect list
-    if (!is.null(adductDef))
-        adductDef <- checkAndToAdduct(adductDef)
 
-    hash <- makeHash(obj, from, matchFromBy, overwrite, adducts, adductDef, predictAdductOnly, CCSParams,
-                     prepareChemProps, prefCalcChemProps, neutralChemProps)
+    hash <- makeHash(obj, from, matchFromBy, overwrite, adducts, predictAdductOnly, CCSParams, prepareChemProps,
+                     prefCalcChemProps, neutralChemProps)
     cd <- loadCacheData("assignMobilitiesDT", hash)
     if (!is.null(cd))
         return(cd)
     
     do_c3sdb <- identical(from, "c3sdb")
     if (do_c3sdb)
-    {
         checkPackage("reticulate")
-        if (is.null(obj[["SMILES"]]))
-            stop("No SMILES data found in the input data, this is necessary for c3sdb predictions.", call. = FALSE)
-    }
     
     obj <- copy(obj)
     
     if (prepareChemProps)
-    {
-        if (is.null(adductDef) && (is.null(obj[["adduct"]]) || anyNA(obj$adduct) || any(!nzchar(obj$adduct))))
-            stop("Please set the 'adductDef' argument so that m/z values can be calculated.", call. = FALSE)
         obj <- prepareChemTable(obj, prefCalcChemProps, neutralChemProps)
-        obj <- calcSuspMZs(obj, adductDef)
-    }
     
-    if (do_c3sdb || !is.null(CCSParams))
+    adductsNoNone <- setdiff(adducts, "none")
+    needMZs <- do_c3sdb || !is.null(CCSParams)
+    mzTab <- NULL
+    if (needMZs)
     {
-        msg <- paste("Mass data is necessary for c3sdb pedictions and mobility <--> CCS conversions.",
-                     "This data can be automatically calculated by setting prepareChemProps=TRUE and ensuring a SMILES,",
-                     "InChI or formula column is present.")
-        if (is.null(obj[["mz"]]))
-            stop(paste("No m/z data found in the input data (mz column).", msg), call. = FALSE)
-        if (anyNA(obj$mz))
-            warning(paste(sprintf("The following rows do not contain m/z data and will be ignored: %s.",
-                                  paste0(obj[is.na(mz), which = TRUE], collapse = ", ")), msg), call. = FALSE)
+        mzTab <- copy(subsetDTColumnsIfPresent(obj, c("name", "neutralMass", "mz")))
+        
+        if (length(adductsNoNone) > 0)
+        {
+            msg <- paste("Mass data is necessary for c3sdb pedictions and mobility <--> CCS conversions.",
+                         "This data can be automatically calculated by setting prepareChemProps=TRUE and ensuring a SMILES,",
+                         "InChI or formula column is present.")
+            collAdd <- paste0(adductsNoNone, collapse = ", ")
+            if (is.null(mzTab[["neutralMass"]]))
+            {
+                warning(sprintf("Calculations for adducts (%s) will be skipped as there is no neutralMass data.",
+                                collAdd), msg, call. = FALSE)
+                adductsNoNone <- character()
+                adducts <- intersect(adducts, "none")
+            }
+            else if (anyNA(mzTab$neutralMass))
+                warning(sprintf("Calculations for adducts (%s) will be skipped for these rows with NA neutralMass values: %s. ",
+                                collAdd, paste0(mzTab[is.na(neutralMass), which = TRUE], collapse = ", ")),
+                        msg, call. = FALSE)
+        }
+        if ("none" %in% adducts && !is.null(CCSParams))
+        {
+            if (is.null(mzTab[["mz"]]))
+                warning("Mobility <--> CCS conversions for non-adduct specific values will be skipped as there is no mz data.",
+                        call. = FALSE)
+            else if (anyNA(mzTab$mz))
+                warning(sprintf("Mobility <--> CCS conversions for non-adduct specific values will be skipped for the following rows with NA mz values: %s.",
+                        paste0(mzTab[is.na(mz), which = TRUE], collapse = ", ")), call. = FALSE)
+        }
+        
+        if (!is.null(mzTab[["neutralMass"]]))
+        {
+            for (add in adductsNoNone)
+            {
+                col <- paste0("mz_", add)
+                mzTab[, (col) := calculateMasses(neutralMass,
+                                                 checkAndToAdduct(add, .var.name = sprintf("adducts ('%s')", add)), "mz")]
+            }
+        }
     }
     
     if (do_c3sdb)
     {
-        if (is.null(obj[["SMILES"]]))
-            stop("No SMILES data found in the input data (SMILES column). This is necessary for c3sdb predictions",
-                 call. = FALSE)
-        if (anyNA(obj$SMILES))
+        if (is.null(obj[["neutralMass"]]) || is.null(obj[["SMILES"]]))
+        {
+            warning("No neutralMass or SMILES data found in the input data. c3sdb predictions will be skipped.",
+                    call. = FALSE)
+            do_c3sdb <- FALSE
+            from <- NULL
+        }
+        if (!is.null(obj[["SMILES"]]) && (anyNA(obj$SMILES) || any(!nzchar(obj$SMILES))))
             warning("The following rows do not contain SMILES data and will be excluded from c3sdb predictions: ",
                     paste0(obj[is.na(SMILES), which = TRUE], collapse = ", "), call. = FALSE)
     }
@@ -1397,8 +1424,6 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
             warning(sprintf("The following rows in the input data are NA in the match column ('%s') and are therefore not matched: %s.",
                             matchFromBy, paste0(obj[is.na(get(matchFromBy)), which = TRUE], collapse = ", ")),
                     call. = FALSE)
-        
-        adductsNoNone <- setdiff(adducts, "none")
         
         if (is.data.frame(from))
         {
@@ -1431,7 +1456,8 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
                              py_pickle$load(pf))
             
             # only do predictions for suspects with SMILES and mass data
-            objDo <- obj[!is.na(SMILES) & nzchar(SMILES) & !is.na(mz)]
+            wh <- !is.na(obj$neutralMass) & !is.na(obj$SMILES) & nzchar(obj$SMILES)
+            objDo <- obj[wh]; mzTabDo <- mzTab[wh]
             
             doPred <- function(mzs, SMILES, add)
             {
@@ -1456,7 +1482,7 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
                 return(ret)
             }
             
-            from <- data.table(objDo[[matchFromBy]], mz = objDo$mz, SMILES = objDo$SMILES)
+            from <- data.table(objDo[[matchFromBy]], SMILES = objDo$SMILES)
             setnames(from, 1, matchFromBy)
             
             hasAddCol <- !is.null(objDo[["adduct"]])
@@ -1470,7 +1496,7 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
                 if (any(wh))
                 {
                     printf("Predicting %d CCS values for adduct '%s'... ", sum(wh), add)
-                    from[wh, paste0("CCS_", add) := doPred(mz, SMILES, add)]
+                    from[wh, paste0("CCS_", add) := doPred(mzTabDo[wh][[paste0("mz_", add)]], SMILES, add)]
                     printf(" Done!\n")
                 }
             }
@@ -1485,8 +1511,7 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
             addMobCols <- c(addMobCols, "mobility")
             addCCSCols <- c(addCCSCols, "CCS")
         }
-        predCols <- c(grep("^mobility", names(from), value = TRUE), grep("^CCS", names(from), value = TRUE))
-        predCols <- intersect(predCols, c(addMobCols, addCCSCols))
+        predCols <- intersect(names(from), c(addMobCols, addCCSCols))
         if (length(predCols) == 0)
             stop("No (adduct relevant) mobility/CCS columns found in the provided data.", call. = FALSE)
         
@@ -1537,13 +1562,15 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
         printf("Calculating missing mobility/CCS values... ")
         for (addChr in adducts)
         {
-            mCol <- "mobility"; cCol <- "CCS"
+            mCol <- "mobility"; cCol <- "CCS"; mzCol <- "mz"
             if (addChr != "none")
             {
-                mCol <- paste0(mCol, "_", addChr); cCol <- paste0(cCol, "_", addChr)
+                mCol <- paste0(mCol, "_", addChr); cCol <- paste0(cCol, "_", addChr); mzCol <- paste0(mzCol, "_", addChr)
             }
             
             if (is.null(obj[[mCol]]) && is.null(obj[[cCol]]))
+                next
+            if (is.null(mzTab[[mzCol]]))
                 next
             
             charges <- if (addChr == "none")
@@ -1562,17 +1589,17 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
                 as.adduct(addChr)@charge
             
             if (is.null(obj[[mCol]]))
-                obj[, (mCol) := doConvert("CCS", get(cCol), obj$mz, charges)]
+                obj[, (mCol) := doConvert("CCS", get(cCol), mzTab[[mzCol]], charges)]
             else if (is.null(obj[[cCol]]))
-                obj[, (cCol) := doConvert("mobility", get(mCol), obj$mz, charges)]
+                obj[, (cCol) := doConvert("mobility", get(mCol), mzTab[[mzCol]], charges)]
             else # both present: only consider NAs
             {
                 hasVal <- function(x) !is.na(x) & (!is.character(x) | nzchar(x))
                 # temporarily add charges to handle subset assignments below
                 # UNDONE: handle the (unlikely) case that the column is already present?
                 obj[, .charge := charges]
-                obj[!hasVal(get(mCol)) & hasVal(get(cCol)), (mCol) := doConvert("CCS", get(cCol), obj$mz, .charge)]
-                obj[hasVal(get(mCol)) & !hasVal(get(cCol)), (cCol) := doConvert("mobility", get(mCol), obj$mz, .charge)]
+                obj[!hasVal(get(mCol)) & hasVal(get(cCol)), (mCol) := doConvert("CCS", get(cCol), mzTab[[mzCol]], .charge)]
+                obj[hasVal(get(mCol)) & !hasVal(get(cCol)), (cCol) := doConvert("mobility", get(mCol), mzTab[[mzCol]], .charge)]
                 obj[, .charge := NULL]
             }
         }

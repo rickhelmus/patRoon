@@ -1313,7 +1313,7 @@ convertCCSToMobility <- function(ccs, mz, CCSParams, charge = NULL)
 
 #' @export
 setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFromBy = "InChIKey",
-                                                     overwrite = FALSE, adducts = c("[M+H]+", "[M-H]-", "none"),
+                                                     overwrite = FALSE, adducts = c("[M+H]+", "[M-H]-", NA),
                                                      predictAdductOnly = TRUE, CCSParams = NULL,
                                                      prepareChemProps = TRUE, prefCalcChemProps = TRUE,
                                                      neutralChemProps = FALSE, virtualenv = "patRoon-c3sdb")
@@ -1330,7 +1330,7 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
     checkmate::assertChoice(matchFromBy, c("InChIKey", "InChIKey1", "InChI", "SMILES", "name"), add = ac)
     aapply(checkmate::assertFlag, . ~ overwrite + predictAdductOnly + prepareChemProps + prefCalcChemProps +
                neutralChemProps, fixed = list(add = ac))
-    checkmate::assertCharacter(adducts, min.chars = 1, any.missing = FALSE, add = ac)
+    checkmate::assertCharacter(adducts, min.chars = 1, any.missing = TRUE, add = ac)
     assertCCSParams(CCSParams, null.ok = TRUE, add = ac)
     checkmate::assertString(virtualenv, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
@@ -1353,7 +1353,7 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
     if (prepareChemProps)
         obj <- prepareChemTable(obj, prefCalcChemProps, neutralChemProps)
     
-    adductsNoNone <- setdiff(adducts, "none")
+    adductsNoNone <- na.omit(adducts)
     needMZs <- do_c3sdb || !is.null(CCSParams)
     mzTab <- NULL
     if (needMZs)
@@ -1378,7 +1378,7 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
                                 collAdd, paste0(mzTab[is.na(neutralMass), which = TRUE], collapse = ", ")),
                         msg, call. = FALSE)
         }
-        if ("none" %in% adducts && !is.null(CCSParams))
+        if (anyNA(adducts) && !is.null(CCSParams))
         {
             if (is.null(mzTab[["mz"]]))
                 warning("Mobility <--> CCS conversions for non-adduct specific values will be skipped as there is no mz data.",
@@ -1506,7 +1506,7 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
         
         addMobCols <- paste0("mobility_", adductsNoNone)
         addCCSCols <- paste0("CCS_", adductsNoNone)
-        if ("none" %in% adducts)
+        if (anyNA(adducts))
         {
             addMobCols <- c(addMobCols, "mobility")
             addCCSCols <- c(addCCSCols, "CCS")
@@ -1563,7 +1563,7 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
         for (addChr in adducts)
         {
             mCol <- "mobility"; cCol <- "CCS"; mzCol <- "mz"
-            if (addChr != "none")
+            if (!is.na(addChr))
             {
                 mCol <- paste0(mCol, "_", addChr); cCol <- paste0(cCol, "_", addChr); mzCol <- paste0(mzCol, "_", addChr)
             }
@@ -1573,7 +1573,7 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
             if (is.null(mzTab[[mzCol]]))
                 next
             
-            charges <- if (addChr == "none")
+            charges <- if (is.na(addChr))
             {
                 if (!is.null(obj[["adduct"]]))
                 {

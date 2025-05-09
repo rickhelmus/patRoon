@@ -148,9 +148,6 @@
 - update fGroupsComparison/consensus()
 - update featAnn consensus?
 - update checkFeatures()
-- fix CCS/adducts
-    - convertMobilityToCCS() / convertCCSToMobility(): convert m/z to m
-        - needed for mason schamp, not for bruker, agilent?
 
 
 ## Tests

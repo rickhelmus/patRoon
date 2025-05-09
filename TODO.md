@@ -151,7 +151,6 @@
 - fix CCS/adducts
     - convertMobilityToCCS() / convertCCSToMobility(): convert m/z to m
         - needed for mason schamp, not for bruker, agilent?
-- assignMobilities(): NA instead of "none" for adducts
 
 
 ## Tests

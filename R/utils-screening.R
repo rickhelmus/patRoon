@@ -39,22 +39,18 @@ doScreeningShow <- function(obj)
     printf("Suspects annotated: %s\n", if (isSuspAnnotated(obj)) "yes" else "no")
 }
 
-calcSuspMZs <- function(suspects, adduct)
+calcMZsFromAdducts <- function(neutralMasses, suspAdductCol, adduct)
 {
-    suspects <- copy(suspects)
-    
-    if (is.null(suspects[["mz"]]))
-        suspects[, mz := NA_real_] # make it present to simplify code below
-    
     if (!is.null(adduct))
-        suspects[is.na(mz), mz := calculateMasses(neutralMass, ..adduct, type = "mz")]
-    else if (!is.null(suspects[["adduct"]]))
+        return(calculateMasses(neutralMasses, adduct, type = "mz"))
+    
+    else if (!is.null(suspAdductCol))
     {
-        unAdducts <- sapply(unique(suspects[is.na(mz) & !is.na(adduct) & nzchar(adduct)]$adduct), as.adduct)
-        suspects[is.na(mz) & !is.na(adduct) & nzchar(adduct), mz := calculateMasses(neutralMass, unAdducts[adduct], type = "mz")]
+        unAdducts <- sapply(unique(suspAdductCol[!is.na(suspAdductCol) & nzchar(suspAdductCol)]), as.adduct)
+        return(calculateMasses(neutralMasses, unAdducts[suspAdductCol], type = "mz"))
     }
     
-    return(suspects[])
+    return(rep(NA_real_, length(neutralMasses)))
 }
 
 prepareSuspectList <- function(suspects, adduct, skipInvalid, checkDesc, prefCalcChemProps, neutralChemProps,
@@ -111,7 +107,7 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid, checkDesc, prefCal
         # calculate ionic masses if possible (not possible if no adducts are given and fGroups are annotated)
         if (calcMZs && (is.null(suspects[["mz"]]) || any(is.na(suspects[["mz"]]))) &&
             (!is.null(adduct) || !is.null(suspects[["adduct"]])))
-            suspects <- calcSuspMZs(suspects, adduct)
+            suspects[, mz := calcMZsFromAdducts(suspects$neutralMass, suspects$adduct, adduct)]
         else if (is.null(suspects[["mz"]]))
             suspects[, mz := NA_real_]
 

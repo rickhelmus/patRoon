@@ -17,6 +17,7 @@
 - install timsconvert and c3sdb in Docker and bundle
 - fix default IDLs
 - ADT: averaged data is now always per replicate, change to averageBy?
+- remove RcppProgress?
 
 
 ## Maybe
@@ -147,6 +148,10 @@
 - update fGroupsComparison/consensus()
 - update featAnn consensus?
 - update checkFeatures()
+- fix CCS/adducts
+    - convertMobilityToCCS() / convertCCSToMobility(): convert m/z to m
+        - needed for mason schamp, not for bruker, agilent?
+- assignMobilities(): NA instead of "none" for adducts
 
 
 ## Tests
@@ -190,7 +195,9 @@
     - suspects
         - test order of data selection for mobility and CCS columns, missing data etc
     - assignMobilities()
-        - DT method: robustness with missing data in input/from
+        - DT method
+            - robustness with missing data in input/from
+            - check warnings
         - fGroups methods
             - verify relevant slots are copied
             - from screenInfo(), eg for fGroups with >1 suspect assigned

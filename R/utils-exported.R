@@ -1289,7 +1289,7 @@ convertMobilityToCCS <- function(mobility, mz, CCSParams, charge = NULL)
         charge <- CCSParams$defaultCharge
     charge <- rep(abs(charge), length.out = length(mobility))
     
-    u = ((mz * CCSParams$massGas) / (mz + CCSParams$massGas))
+    m <- mz * charge
     
     if (CCSParams$method == "bruker")
     {
@@ -1301,12 +1301,13 @@ convertMobilityToCCS <- function(mobility, mz, CCSParams, charge = NULL)
     {
         if (CCSParams$method == "mason-schamp_k")
             mobility <- 1 / mobility
+        u <- ((m * CCSParams$massGas) / (m + CCSParams$massGas))
         return(CCSParams$MasonSchampConst * (charge / (sqrt(u * CCSParams$temperature))) * mobility)
     }
     else if (CCSParams$method == "agilent")
     {
         calibrant <- prepareAgilentIMSCalib(CCSParams$calibrant, CCSParams$massGas)
-        return((mobility - calibrant$TFix) * charge / calibrant$beta / sqrt(mz / (mz + calibrant$massGas)))
+        return((mobility - calibrant$TFix) * charge / calibrant$beta / sqrt(m / (m + calibrant$massGas)))
     }
     # UNDONE: support waters later, procedure seems unclear how it affects different instruments and need test data
     # else # waters
@@ -1330,7 +1331,7 @@ convertCCSToMobility <- function(ccs, mz, CCSParams, charge = NULL)
         charge <- CCSParams$defaultCharge
     charge <- rep(abs(charge), length.out = length(ccs))
     
-    u = ((mz * CCSParams$massGas) / (mz + CCSParams$massGas))
+    m <- mz * charge
     
     if (CCSParams$method == "bruker")
     {
@@ -1340,6 +1341,7 @@ convertCCSToMobility <- function(ccs, mz, CCSParams, charge = NULL)
     }
     else if (CCSParams$method %in% c("mason-schamp_k", "mason-schamp_1/k"))
     {
+        u <- ((m * CCSParams$massGas) / (m + CCSParams$massGas))
         mob <- ccs / CCSParams$MasonSchampConst / (charge / (sqrt(u * CCSParams$temperature)))
         if (CCSParams$method == "mason-schamp_k")
             mob <- 1 / mob
@@ -1348,7 +1350,7 @@ convertCCSToMobility <- function(ccs, mz, CCSParams, charge = NULL)
     else if (CCSParams$method == "agilent")
     {
         calibrant <- prepareAgilentIMSCalib(CCSParams$calibrant, CCSParams$massGas)
-        return((ccs * sqrt(mz / (mz + calibrant$massGas)) * calibrant$beta / charge) + calibrant$TFix)
+        return((ccs * sqrt(m / (m + calibrant$massGas)) * calibrant$beta / charge) + calibrant$TFix)
     }
     # UNDONE: support waters later, procedure seems unclear how it affects different instruments and need test data
     # else # waters

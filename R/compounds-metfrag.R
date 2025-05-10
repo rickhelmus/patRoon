@@ -573,7 +573,7 @@ setMethod("generateCompoundsMetFrag", "featureGroups", function(fGroups, MSPeakL
                                                                 dbRelMzDev = defaultLim("mz", "narrow_rel"),
                                                                 fragRelMzDev = defaultLim("mz", "narrow_rel"),
                                                                 fragAbsMzDev = defaultLim("mz", "narrow"), adduct = NULL,
-                                                                database = "pubchem", extendedPubChem = "auto", chemSpiderToken = "",
+                                                                database = "pubchemlite", extendedPubChem = "auto", chemSpiderToken = "",
                                                                 scoreTypes = compoundScorings("metfrag", database, onlyDefault = TRUE)$name,
                                                                 scoreWeights = 1.0,
                                                                 preProcessingFilters = c("UnconnectedCompoundFilter", "IsotopeFilter"),

@@ -86,7 +86,7 @@ newProjectAnnotationUI <- function(id)
                     ns = ns,
                     fillRow(
                         height = 75,
-                        radioButtons(ns("IMSSuspCCSPred"), "CCS prediction", getCCSPredSelections())
+                        radioButtons(ns("compCCSPred"), "CCS prediction", getCCSPredSelections())
                     )
                 )
             )
@@ -106,7 +106,7 @@ newProjectAnnotationServer <- function(id, hasSuspects, IMSMode, settings)
             updateSelectInput(session, "MSLibraryFormat", selected = settings()$MSLibraryFormat)
             updateTextInput(session, "MSLibraryPath", value = settings()$MSLibraryPath)
             updateCheckboxGroupInput(session, "estIDConf", selected = settings()$estIDConf)
-            updateRadioButtons(session, "IMSSuspCCSPred", selected = settings()$IMSSuspCCSPred)
+            updateRadioButtons(session, "compCCSPred", selected = settings()$compCCSPred)
         })
         
         observeEvent(input$MSLibraryPathButton, {
@@ -133,7 +133,7 @@ newProjectAnnotationServer <- function(id, hasSuspects, IMSMode, settings)
                 MSLibraryFormat = input$MSLibraryFormat,
                 MSLibraryPath = input$MSLibraryPath,
                 estIDConf = input$estIDConf,
-                IMSSuspCCSPred = input$IMSSuspCCSPred
+                compCCSPred = input$compCCSPred
             ))
         )
     })
@@ -149,7 +149,7 @@ defaultAnnotationSettings <- function()
         MSLibraryFormat = "msp",
         MSLibraryPath = "",
         estIDConf = unname(getIDConfUIOpts()),
-        IMSSuspCCSPred = "none"
+        compCCSPred = "none"
     ))
 }
 

@@ -85,7 +85,6 @@
         - set instrument type for limits.yml
         - Select right example anaInfo
         - Add mobility filters for suspects & compounds?
-        - Change default for compounds to pubchemlite
         - is assignMobilities() before TP componentization OK?
             - IMS="maybe", so probably fine?
 
@@ -231,6 +230,7 @@
 
 - Rcpp refs and fastcluster refs don't seem to work anymore?
 - move all plotBPC(), getEIC() etc methods into one doc file?
+- Changed default db for MetFrag to pubchemlite --> check tutorial etc
 - anaInfo
     - link to IMS section where path_IMS is explained
     - maybe add more examples where eg raw data can be used
@@ -453,6 +453,7 @@
 - FIXED: SIRIUS with calculateFeatures=T may sometimes fail due to file name truncation
 - generateAnalysisInfo()
 - MS2QuantMeta slots for fGroupsScreeningSet, formulasSet and compoundsSet (latter already present but wasn;t filled in)
+- Changed default db for MetFrag to pubchemlite
 
 
 ## Features

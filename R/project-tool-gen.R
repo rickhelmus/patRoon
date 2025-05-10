@@ -178,8 +178,8 @@ genScriptInitBlock <- function(anaInfoData, settingsGen, settingsAna, settingsPr
                 generator$addComment("Load analysis table", condition = comment)
                 if (settingsAna$analysisTableFileType == "CSV")
                     generator$addCall(anaInfoVarName, "read.csv", list(value = aid$file, quote = TRUE))
-                else # R
-                    generator$addCall(anaInfoVarName, "source", list(value = aid$file, quote = TRUE))
+                else # R: NOTE: cannot use addCall() as there is a nested function call
+                    generator$addAssignment(anaInfoVarName, sprintf("eval(parse(\"%s\"))", aid$file))
             }
         }
         else if (settingsAna$generateAnaInfo == "dynamic")

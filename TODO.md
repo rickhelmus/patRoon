@@ -66,7 +66,6 @@
 ## newProject()
 
 - anaInfo.R
-    - source(...) doesn't return anaInfo but a list, either subset that result or set anaInfo in the R file?
     - conc/norm conc are set to "NA_real_"
 - conversion/anaInfo
     - see if getAllMSFilesFromAnaInfo() can be used, otherwise remove it

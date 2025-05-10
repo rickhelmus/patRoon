@@ -82,12 +82,12 @@
             - only check if anaTable is made
             - if no suitable file is found, check if conversion to type/format is there, otherwise warn
     - Codegen
-        - set instrument type for limits.yml and mob peak params
+        - set instrument type for limits.yml
         - Select right example anaInfo
         - Add mobility filters for suspects & compounds?
         - Change default for compounds to pubchemlite
-        - Do assignMobilities() before/after suspect screening?
-            - after would make filter not needed
+        - is assignMobilities() before TP componentization OK?
+            - IMS="maybe", so probably fine?
 
 ## Param defaults
 

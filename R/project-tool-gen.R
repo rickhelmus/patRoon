@@ -265,9 +265,19 @@ genScriptInitBlock <- function(anaInfoData, settingsGen, settingsAna, settingsPr
         }
         generator$addText("}")
     }
+    
+    if (settingsGen$IMS$mode != "none" && settingsGen$IMS$CCSMethod != "none")
+    {
+        generator$addNL()
+        generator$addCall("CCSParams", "getCCSParams", list(
+            list(name = "method", value = settingsGen$IMS$CCSMethod, quote = TRUE),
+            list(name = "calibrant", value = settingsGen$CCSCalibrant, quote = TRUE,
+                 condition = settingsGen$IMS$CCSMethod == "agilent")
+        ))
+    }
 }
 
-genScriptSuspListsBlock <- function(ionization, settingsFeat, doSusps, doFeatEICSusps, doISTDs, generator)
+genScriptSuspListsBlock <- function(ionization, IMSMode, settingsFeat, doSusps, doFeatEICSusps, doISTDs, generator)
 {
     generator$addHeader("setup suspect lists")
     
@@ -282,6 +292,32 @@ genScriptSuspListsBlock <- function(ionization, settingsFeat, doSusps, doFeatEIC
         {
             generator$addComment("Load suspect list")
             generator$addLoadSuspList(ionization, settingsFeat$suspects, "suspList")
+        }
+        
+        if (IMSMode != "none" && settingsFeat$IMSSuspCCSPred != "none")
+        {
+            # UNDONE: also call if IMSSuspCCSPred == "none"?
+            
+            addACall <- function(varName, add)
+            {
+                generator$addCall(varName, "assignMobilities", list(
+                    list(value = varName),
+                    list(name = "from", value = settingsFeat$IMSSuspCCSPred, quote = TRUE),
+                    list(name = "CCSParams", value = "CCSParams"),
+                    list(name = "adducts", value = c(paste0('"', add, '"'), NA)),
+                    list(name = "overwrite", value = FALSE)
+                ))
+            }
+            
+            generator$addNL()
+            generator$addComment("Add mobility and CCS to suspect list(s)")
+            if (ionization != "both")
+                addACall("suspList", if (ionization == "positive") "[M+H]+" else "[M-H]-")
+            else
+            {
+                addACall("suspListPos", "[M+H]+")
+                addACall("suspListNeg", "[M-H]-")
+            }
         }
     }
     
@@ -327,7 +363,7 @@ genScriptSuspListsBlock <- function(ionization, settingsFeat, doSusps, doFeatEIC
     }
 }
 
-genScriptFeaturesBlock <- function(ionization, settingsFeat, generator)
+genScriptFeaturesBlock <- function(ionization, IMS, settingsFeat, generator)
 {
     addFindFeatures <- function(varName, anaInfoVarName, suspEICL, suspEICA)
     {
@@ -439,6 +475,18 @@ genScriptFeaturesBlock <- function(ionization, settingsFeat, generator)
         list(name = "retentionRange", value = retRange),
         list(name = "mzRange", value = mzRange)
     ))
+    
+    # NOTE: for direct we only want to add CCS calculations, for post there is also the mobility assignment, which can
+    # be done better later
+    if (IMS$mode == "direct" && IMS$CCSMethod != "none")
+    {
+        generator$addNL()
+        generator$addComment("Assign CCS values")
+        generator$addCall("fGroups", "assignMobilities", list(
+            list(value = "fGroups"),
+            list(name = "CCSParams", value = "CCSParams")
+        ))
+    }
 }
 
 genScriptComponBlock <- function(ionization, settingsAnnon, generator)
@@ -570,7 +618,28 @@ genScriptTPInitBlock <- function(ionization, settingsTP, adductArg, amendScrForT
     }
 }
 
-genScriptAnnBlock <- function(ionization, settingsAnn, adductArg, doSusps, addMFDB, generator)
+genScriptFeatMobBlock <- function(IMS, settingsFeat, doSusps, generator)
+{
+    defIMM <- getIMSMatchParams("mobility")
+    
+    generator$addHeader("mobility assignment")
+    generator$addCall("fGroups", "assignMobilities", list(
+        list(value = "fGroups"),
+        list(name = "mobPeakParams", value = sprintf("getDefPeakParams(type = \"%s_ims\", algorithm = \"%s\")",
+                                                    IMS$limits, settingsFeat$IMSPeaksMob)),
+        list(name = "chromPeakParams", value = sprintf("getDefPeakParams(type = \"chrom\", algorithm = \"%s\")",
+                                                     settingsFeat$IMSPeaksChrom)),
+        list(name = "calcArea", value = "integrate", quote = TRUE),
+        list(name = "fallbackEIC", value = TRUE),
+        list(name = "CCSParams", value = "CCSParams", condition = IMS$CCSMethod != "none"),
+        list(name = "fromSuspects", value = FALSE, condition = doSusps),
+        list(name = "IMSMatchParams",
+             value = sprintf("getIMSMatchParams(\"mobility\", relative = %s, window = %.2f)", defIMM$relative,
+                             defIMM$window), condition = doSusps)
+    ))
+}
+
+genScriptAnnBlock <- function(ionization, IMS, settingsAnn, adductArg, doSusps, addMFDB, generator)
 {
     doForms <- nzchar(settingsAnn$formulasAlgo); doComps <- nzchar(settingsAnn$compoundsAlgo)
     
@@ -682,8 +751,30 @@ genScriptAnnBlock <- function(ionization, settingsAnn, adductArg, doSusps, addMF
                 list(name = "updateScore", value = TRUE)
             ))
         }
+        if (IMS$mode != "none")
+        {
+            doConv <- IMS$CCSMethod != "none"; doPred <- settingsAnn$compCCSPred != "none"
+            if (doConv || doPred)
+            {
+                generator$addNL()
+                if (doConv && doPred)
+                    generator$addComment("Predict and convert mobility and CCS data")
+                else if (doConv)
+                    generator$addComment("Convert mobility and CCS data (if possible)")
+                else
+                    generator$addComment("Predict CCS data")
+                generator$addCall("compounds", "assignMobilities", list(
+                    list(value = "compounds"),
+                    list(name = "from", value = settingsAnn$compCCSPred, quote = TRUE, condition = doPred),
+                    list(name = "overwrite", value = FALSE),
+                    adductArg,
+                    list(name = "CCSParams", value = "CCSParams", condition = doConv)
+                ))
+            }
+        }
         if ("compounds" %in% settingsAnn$estIDConf)
         {
+            generator$addNL()
             generator$addCall("compounds", "estimateIDConfidence", list(
                 list(value = "compounds"),
                 list(name = "MSPeakLists", value = "mslists", isNULL = !doForms),
@@ -795,6 +886,7 @@ genScriptReportBlock <- function(settingsAnn, settingsReport, doTPs, generator)
 getScriptCode <- function(anaInfoData, settings)
 {
     ionization <- settings$general$ionization
+    IMSMode <- settings$general$IMS$mode
     doSusps <- settings$features$exSuspList || (ionization != "both" && nzchar(settings$features$suspects$single)) ||
         (ionization == "both" && nzchar(settings$features$suspects$sets$pos))
     doFeatEICSusps <- settings$features$featAlgo == "EIC" && settings$features$featEICParams$methodMZ == "suspects"
@@ -823,10 +915,10 @@ getScriptCode <- function(anaInfoData, settings)
     genScriptInitBlock(anaInfoData, settings$general, settings$analyses, settings$preTreatment, generator)
 
     if (doSusps || doFeatEICSusps || doISTDs)
-        genScriptSuspListsBlock(ionization, settings$features, doSusps, doFeatEICSusps, doISTDs, generator)
+        genScriptSuspListsBlock(ionization, IMSMode, settings$features, doSusps, doFeatEICSusps, doISTDs, generator)
         
-    genScriptFeaturesBlock(ionization, settings$features, generator)
-    
+    genScriptFeaturesBlock(ionization, settings$general$IMS, settings$features, generator)
+
     if (nzchar(settings$annotation$componAlgo))
         genScriptComponBlock(ionization, settings$annotation, generator)
     
@@ -841,10 +933,13 @@ getScriptCode <- function(anaInfoData, settings)
     if (doTPs && !doTPsAnn)
         genScriptTPInitBlock(ionization, settings$TP, adductArg, amendScrForTPs, generator)
     
+    if (IMSMode == "post")
+        genScriptFeatMobBlock(settings$general$IMS, settings$features, doSusps, generator)
+    
     if (nzchar(settings$annotation$formulasAlgo) || nzchar(settings$annotation$compoundsAlgo))
     {
         addMFDB <- doTPsStructScr && settings$TP$TPDoMFDB
-        genScriptAnnBlock(ionization, settings$annotation, adductArg, doSusps, addMFDB, generator)
+        genScriptAnnBlock(ionization, settings$general$IMS, settings$annotation, adductArg, doSusps, addMFDB, generator)
     }
     
     if (doTPs)

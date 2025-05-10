@@ -1017,6 +1017,8 @@ doCreateProject <- function(anaInfoTabs, settings)
             settings$preTreatment$output[[t]] <- "."
     }
     
+    genLimitsFile(settings$general$destination, settings$general$IMS$limits)
+    
     doSusps <- settings$features$exSuspList || (settings$general$ionization != "both" && nzchar(settings$features$suspects$single)) ||
         (settings$general$ionization == "both" && nzchar(settings$features$suspects$sets$pos))
     doFormAnn <- nzchar(settings$annotation$formulasAlgo); doCompAnn <- nzchar(settings$annotation$compoundsAlgo)

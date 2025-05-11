@@ -126,32 +126,6 @@ getMSFilesFromAnaInfo <- function(anaInfo, types, formats, mustExist = TRUE)
          call. = FALSE)
 }
 
-getAllMSFilesFromAnaInfo <- function(anaInfo, types, formats)
-{
-    if (!is.list(formats))
-    {
-        # formats can be a vector if only one type was specified (common scenario)
-        stopifnot(length(types) == 1)
-        formats <- list(formats)
-    }
-    
-    ret <- Map(types, formats, f = function(type, forms)
-    {
-        lapply(forms, function(f)
-        {
-            aip <- getPathsFromAnaInfo(anaInfo, type)
-            if (is.null(aip))
-                next
-            msFilePaths <- listMSFiles(aip, f)
-            msFilesNoExt <- tools::file_path_sans_ext(basename(msFilePaths))
-            found <- anaInfo$analysis %in% msFilesNoExt
-            return(msFilePaths[match(anaInfo$analysis[found], msFilesNoExt[found])])
-        })
-    })
-    
-    return(unique(unlist(ret)))
-}
-
 getMSFileHashesFromAvailBackend <- function(anaInfo, types = getMSFileTypes(), formats = names(MSFileExtensions()),
                                             needIMS = FALSE)
 {

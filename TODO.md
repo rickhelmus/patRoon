@@ -66,9 +66,6 @@
 
 - anaInfo.R
     - conc/norm conc are set to "NA_real_"
-- conversion/anaInfo
-    - see if getAllMSFilesFromAnaInfo() can be used, otherwise remove it
-    - add im_collapse and timsconvert
 - remove conc column?
 - remove default limits that are in limits.yml
 - move components to features tab?

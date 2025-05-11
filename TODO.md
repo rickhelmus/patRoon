@@ -2,7 +2,6 @@
 
 ## general
 
-- newProject: don't break lines of text strings, e.g. long paths with spaces in them passed to generateAnalysisInfo()
 - lossElements: handbook suggests it takes a whole formula --> maybe make fragFormula/lossFormula filters?
 - BUG: annotatedBy filter incorrectly filters feature level peak lists
     - record group IDs in feature tabs and use them to remove
@@ -451,6 +450,7 @@
 - generateAnalysisInfo()
 - MS2QuantMeta slots for fGroupsScreeningSet, formulasSet and compoundsSet (latter already present but wasn;t filled in)
 - Changed default db for MetFrag to pubchemlite
+- Fixed: codegen for functions: don't break lines of args with long text strings
 
 
 ## Features

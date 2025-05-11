@@ -89,24 +89,38 @@ scriptGenerator$methods(
         
         argText <- paste0(args, collapse = ", ")
         callPrefix <- paste0(strrep(" ", indent), if (!is.null(var)) paste0(var, " <- ") else "", func, "(")
-        
         singleLineLength <- nchar(callPrefix) + nchar(argText) + nchar(")")
+        
         if (singleLineLength > 120)
         {
-            # HACK: temporary replace " = " with "|=|" in order to keep var assignments on the same line
-            args <- lapply(args, function(a) 
+            argStart <- nchar(callPrefix)
+            argPos <- argStart
+            argText <- ""
+            for (i in seq_along(args))
             {
-                a <- gsub(", ", ",|", a, fixed = TRUE) # items in a list
-                a <- gsub(" = ", "|=|", a, fixed = TRUE) # named arg assignments
-                return(a)
-            })
-            argText <- paste0(args, collapse = ", ")
-            
-            argText <- paste0(strwrap(argText, 120 - nchar(callPrefix) - 1, # -1: trailing ")"
-                                      exdent = nchar(callPrefix)),
-                              collapse = "\n")
-            
-            argText <- gsub("|", " ", argText, fixed = TRUE)
+                a <- args[[i]]
+                isLast <- i == length(args)
+                if (!isLast)
+                    a <- paste0(a, ", ")
+                na <- nchar(a)
+                if (isLast)
+                    na <- na + 1 # +1: for trailing ")" NOTE: the actual addition of ")" is done below
+                
+                if (argPos > argStart && (argPos + na) > 120)
+                {
+                    # add a newline and indent if adding the next argument would make the line longer than 120 chars
+                    # NOTE: this will not work if the first argument is longer than 120 chars, ignoring that...
+                    # NOTE: use trimws() as there might be a trailing whitespace of the previous arg from the addition
+                    # of ", " above
+                    argText <- paste0(trimws(argText, "right", " "), "\n", strrep(" ", argStart), a)
+                    argPos <- argStart + na
+                }
+                else
+                {
+                    argText <- paste0(argText, a)
+                    argPos <- argPos + na
+                }
+            }
         }
         
         cl <- paste0(callPrefix, argText, ")")

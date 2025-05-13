@@ -412,18 +412,18 @@ defaultFeaturesSettings <- function()
 {
     return(list(
         featAlgo = "OpenMS",
-        fGroupsAlgo = "OpenMS",
-        IMSPeaksMob = "piek",
-        IMSPeaksChrom = "piek",
-        suspects = list(single = "", sets = list(pos = "", neg = "")),
-        exSuspList = FALSE,
-        IMSSuspCCSPred = "none",
         featEICParams = list(
             methodMZ = "bins",
             methodIMS = "bins",
             suspects = list(single = "", sets = list(pos = "", neg = "")),
             peaksAlgo = "dietrich"
         ),
+        fGroupsAlgo = "OpenMS",
+        IMSPeaksMob = "piek",
+        IMSPeaksChrom = "piek",
+        suspects = list(single = "", sets = list(pos = "", neg = "")),
+        exSuspList = FALSE,
+        IMSSuspCCSPred = "none",
         fGroupsAdv = list(
             preIntThr = 1E2,
             intThr = 1E4,

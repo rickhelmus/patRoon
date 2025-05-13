@@ -176,7 +176,7 @@ scriptGenerator$methods(
     }
 )
 
-genScriptInitBlock <- function(anaInfoData, settingsGen, settingsAna, settingsPre, generator)
+genScriptInitBlock <- function(CCSCalibrant, anaInfoData, settingsGen, settingsAna, settingsPre, generator)
 {
     addAnaInfo <- function(anaInfoVarName, aid, comment, exPol)
     {
@@ -285,7 +285,7 @@ genScriptInitBlock <- function(anaInfoData, settingsGen, settingsAna, settingsPr
         generator$addNL()
         generator$addCall("CCSParams", "getCCSParams", list(
             list(name = "method", value = settingsGen$IMS$CCSMethod, quote = TRUE),
-            list(name = "calibrant", value = settingsGen$CCSCalibrant, quote = TRUE,
+            list(name = "calibrant", value = CCSCalibrant, quote = TRUE,
                  condition = settingsGen$IMS$CCSMethod == "agilent")
         ))
     }
@@ -897,7 +897,7 @@ genScriptReportBlock <- function(settingsAnn, settingsReport, doTPs, generator)
     }
 }
 
-getScriptCode <- function(anaInfoData, settings)
+getScriptCode <- function(CCSCalibrant, anaInfoData, settings, noDate = FALSE)
 {
     ionization <- settings$general$ionization
     IMSMode <- settings$general$IMS$mode
@@ -922,11 +922,12 @@ getScriptCode <- function(anaInfoData, settings)
     
     generator <- scriptGenerator$new()
     
-    generator$addComment(paste("Script automatically generated on", date()))
+    if (!noDate)
+        generator$addComment(paste("Script automatically generated on", date()))
     generator$addNL()
     generator$addCall(NULL, "library", list(value = "patRoon"))
     
-    genScriptInitBlock(anaInfoData, settings$general, settings$analyses, settings$preTreatment, generator)
+    genScriptInitBlock(CCSCalibrant, anaInfoData, settings$general, settings$analyses, settings$preTreatment, generator)
 
     if (doSusps || doFeatEICSusps || doISTDs)
         genScriptSuspListsBlock(ionization, IMSMode, settings$features, doSusps, doFeatEICSusps, doISTDs, generator)
@@ -972,7 +973,7 @@ getScriptCode <- function(anaInfoData, settings)
     return(generator$getCode())
 }
 
-doCreateProject <- function(anaInfoTabs, settings)
+doCreateProject <- function(CCSCalibrant, anaInfoTabs, settings)
 {
     mkdirp(settings$general$destination)
     
@@ -1046,7 +1047,7 @@ doCreateProject <- function(anaInfoTabs, settings)
     if ("HTML" %in% settings$report$reportGen)
         genReportSettingsFile(file.path(settings$general$destination, "report.yml"))
     
-    code <- getScriptCode(aid, settings)
+    code <- getScriptCode(CCSCalibrant, aid, settings)
     if (!nzchar(settings$general$scriptFile))
     {
         # insert at end of current document

@@ -61,24 +61,45 @@ getNewProjectUI <- function()
     )
 }
 
-#' Easily create new \pkg{patRoon} projects
-#' 
-#' The \code{newProject} function is used to quickly generate a processing R script. This tool allows the user to
-#' quickly select the targeted analyses, workflow steps and configuring some of their common parameters. This function
-#' requires to be run within a \href{https://www.rstudio.com/}{RStudio} session. The resulting script is either added to
-#' the current open file or to a new file. The \link[=analysis-information]{analysis information} will be written to a
-#' \file{.csv} file so that it can easily be modified afterwards.
-#'
-#' @param destPath Set destination path value to this value (useful for debugging). Set to \code{NULL} for a default
-#'   value.
-#'
-#' @export
-newProject <- function(destPath = NULL)
+# NOTE: the read/write functions below are also used by tests
+readProjectSettings <- function(file, destPath)
 {
-    rstudioapi::verifyAvailable()
-
-    # UNDONE: warning/message about empty groups
+    settings <- readYAML(file)
     
+    if (is.null(settings[["version"]]))
+        settings$version <- 1L # first file version was unversioned
+    if (settings$version < 2L) 
+    {
+        settings <- list(general = upgradeGeneralSettings(settings, destPath),
+                         analyses = upgradeAnalysesSettings(settings),
+                         preTreatment = upgradePreTreatSettings(settings),
+                         features = upgradeFeatureSettings(settings),
+                         annotations = upgradeAnnotationSettings(settings),
+                         TPs = upgradeTPSettings(settings),
+                         report = upgradeReportSettings(settings))
+    }
+    
+    # HACK: make sure format/content matches regular settings. If this gets more complex, separate this into
+    # functions.
+    
+    settings <- settings[names(settings) != "version"] # added in when saving YML
+    
+    # steps is a DT, which isn't transferred well to/from YML
+    settings$preTreatment$steps <- data.table(algorithm = as.character(settings$preTreatment$steps$algorithm),
+                                              from = as.character(settings$preTreatment$steps$from),
+                                              to = as.character(settings$preTreatment$steps$to))
+    
+    return(settings)
+}
+
+writeProjectSettings <- function(settings, file)
+{
+    settings$version <- 2L
+    writeYAML(settings, file)
+}
+
+newProjectServer <- function(destPath)
+{
     checkExistingScript <- function(settings)
     {
         if (!nzchar(settings$scriptFile))
@@ -120,8 +141,8 @@ newProject <- function(destPath = NULL)
                                          analyses = defaultAnalysesSettings(),
                                          preTreatment = defaultPreTreatSettings(),
                                          features = defaultFeaturesSettings(),
-                                         annotation = defaultAnnotationSettings(),
-                                         TP = defaultTPSettings(),
+                                         annotations = defaultAnnotationSettings(),
+                                         TPs = defaultTPSettings(),
                                          report = defaultReportSettings())
         data <- list()
         
@@ -133,15 +154,15 @@ newProject <- function(destPath = NULL)
         data$features <- newProjectFeaturesServer("features", ionization, IMSMode, reactive(loadedSettings$features))
         hasSusp <- reactive({
             data$features$settings()$exSuspList || (ionization() != "both" && nzchar(data$features$settings()$suspects$single) ||
-                (ionization() == "both" && nzchar(data$features$settings()$suspects$positive)))
+                                                        (ionization() == "both" && nzchar(data$features$settings()$suspects$positive)))
         })
-        data$annotations <- newProjectAnnotationServer("annotation", hasSusp, IMSMode, reactive(loadedSettings$annotation))
+        data$annotations <- newProjectAnnotationServer("annotation", hasSusp, IMSMode, reactive(loadedSettings$annotations))
         data$TPs <- newProjectTPServer("tp", hasSusp, reactive(data$annotations$settings()$formulasAlgo),
-                                       reactive(data$annotations$settings()$compoundsAlgo), reactive(loadedSettings$TP))
+                                       reactive(data$annotations$settings()$compoundsAlgo), reactive(loadedSettings$TPs))
         data$report <- newProjectReportServer("report", reactive(loadedSettings$report))
         
         getSettings <- function() sapply(data, \(d) d$settings(), simplify = FALSE)
-
+        
         validate <- function()
         {
             for (d in data)
@@ -165,28 +186,16 @@ newProject <- function(destPath = NULL)
             {}
             else
             {
-                doCreateProject(data$analyses$anaInfoTabs(), getSettings())
+                doCreateProject(data$general$CCSCalibrant(), data$analyses$anaInfoTabs(), getSettings())
                 stopApp(TRUE)
             }
         })
-
+        
         observeEvent(data$general$loadParams(), {
             sl <- rstudioapi::selectFile("Select parameter file", filter = "yml files (*.yml)")
             if (!is.null(sl))
             {
-                ymlSettings <- readYAML(sl)
-                if (is.null(ymlSettings[["version"]]))
-                    ymlSettings$version <- 1L # first file version was unversioned
-                if (ymlSettings$version < 2L) 
-                {
-                    ymlSettings <- list(general = upgradeGeneralSettings(ymlSettings, destPath),
-                                        analyses = upgradeAnalysesSettings(ymlSettings),
-                                        preTreatment = upgradePreTreatSettings(ymlSettings),
-                                        feature = upgradeFeatureSettings(ymlSettings),
-                                        annotation = upgradeAnnotationSettings(ymlSettings),
-                                        TP = upgradeTPSettings(ymlSettings),
-                                        report = upgradeReportSettings(ymlSettings))
-                }
+                ymlSettings <- readProjectSettings(sl, destPath)
                 for (s in names(ymlSettings))
                     loadedSettings[[s]] <- ymlSettings[[s]]
             }
@@ -197,12 +206,33 @@ newProject <- function(destPath = NULL)
             if (!is.null(sl))
             {
                 out <- getSettings()
-                out$version <- 2L
-                writeYAML(out, sl)
+                writeProjectSettings(out, sl)
             }
         })
     }
+    
+    return(server)
+}
 
-    runGadget(getNewProjectUI(), server, viewer = dialogViewer("Create new project", width = 800, height = 600))
+#' Easily create new \pkg{patRoon} projects
+#' 
+#' The \code{newProject} function is used to quickly generate a processing R script. This tool allows the user to
+#' quickly select the targeted analyses, workflow steps and configuring some of their common parameters. This function
+#' requires to be run within a \href{https://www.rstudio.com/}{RStudio} session. The resulting script is either added to
+#' the current open file or to a new file. The \link[=analysis-information]{analysis information} will be written to a
+#' \file{.csv} file so that it can easily be modified afterwards.
+#'
+#' @param destPath Set destination path value to this value (useful for debugging). Set to \code{NULL} for a default
+#'   value.
+#'
+#' @export
+newProject <- function(destPath = NULL)
+{
+    rstudioapi::verifyAvailable()
+
+    # UNDONE: warning/message about empty groups
+    
+    runGadget(getNewProjectUI(), newProjectServer(destPath),
+              viewer = dialogViewer("Create new project", width = 800, height = 600))
     # runGadget(getNewProjectUI(), server, viewer = paneViewer())
 }

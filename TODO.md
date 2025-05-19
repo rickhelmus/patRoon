@@ -218,6 +218,14 @@
     - importing old yml files, esp wrt file conversion
     - verify suspect/ISTD loading with all polarity options and examples
     - creation of yml files
+        - check if right IMS instrument is set in limits.yml
+    - analyses
+        - create anaInfo.R and anaInfo.csv, for pos/neg/none --> fill in anaInfoTabs
+        - use genAnaInfo --> set paths, check for polarities etc
+    - pretreat
+        - steps table
+        - output paths
+        - brukerCalib
 
 
 ## Docs

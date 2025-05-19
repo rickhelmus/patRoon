@@ -897,7 +897,7 @@ genScriptReportBlock <- function(settingsAnn, settingsReport, doTPs, generator)
     }
 }
 
-getScriptCode <- function(CCSCalibrant, anaInfoData, settings, noDate = FALSE)
+getScriptCode <- function(CCSCalibrant, anaInfoData, settings, noDate)
 {
     ionization <- settings$general$ionization
     IMSMode <- settings$general$IMS$mode
@@ -973,7 +973,7 @@ getScriptCode <- function(CCSCalibrant, anaInfoData, settings, noDate = FALSE)
     return(generator$getCode())
 }
 
-doCreateProject <- function(CCSCalibrant, anaInfoTabs, settings)
+doCreateProject <- function(CCSCalibrant, anaInfoTabs, settings, noDate = FALSE)
 {
     mkdirp(settings$general$destination)
     
@@ -1047,7 +1047,7 @@ doCreateProject <- function(CCSCalibrant, anaInfoTabs, settings)
     if ("HTML" %in% settings$report$reportGen)
         genReportSettingsFile(file.path(settings$general$destination, "report.yml"))
     
-    code <- getScriptCode(CCSCalibrant, aid, settings)
+    code <- getScriptCode(CCSCalibrant, aid, settings, noDate)
     if (!nzchar(settings$general$scriptFile))
     {
         # insert at end of current document

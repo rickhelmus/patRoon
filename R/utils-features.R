@@ -944,19 +944,18 @@ doAssignFeatureMobilities <- function(fTable, mobTable)
     return(fTable)
 }
 
-assignFeatureMobilitiesPeaks <- function(features, peakParams, IMSWindow, clusterMethod, minIntensityIMS,
-                                         maxMSRTWindow)
+assignFeatureMobilitiesPeaks <- function(features, peakParams, EIMParams)
 {
-    hash <- makeHash(features, peakParams, IMSWindow, clusterMethod, minIntensityIMS, maxMSRTWindow)
+    hash <- makeHash(features, peakParams, EIMParams)
     cd <- loadCacheData("assignFeatureMobilitiesPeaks", hash)
     if (!is.null(cd))
         return(cd)
     
+    EIMParams$topMost <- NULL; EIMParams$onlyPresent <- TRUE
+    
     printf("Finding mobilities for all features from mobilogram peaks...\n")
     oldCount <- countMobilityFeatures(features)
     
-    EIMParams <- getDefEIMParams(window = NULLToZero(maxMSRTWindow), clusterMethod = clusterMethod,
-                                 IMSWindow = IMSWindow, minIntensityIMS = minIntensityIMS)
     # skip any mobility features and IMS parents
     EIMSelFunc <- \(tab) if (is.null(tab[["mobility"]])) tab else tab[is.na(mobility) & !ID %chin% ims_parent_ID]
     allEIMs <- getFeatureEIXs(features, "EIM", EIXParams = EIMParams, selectFunc = EIMSelFunc, compress = FALSE)
@@ -994,22 +993,21 @@ assignFeatureMobilitiesPeaks <- function(features, peakParams, IMSWindow, cluste
 }
 
 # UNDONE: make this an exported method?
-reintegrateMobilityFeatures <- function(features, EICRTWindow, peakRTWindow, calcArea, minIntensityIMS, peakParams,
-                                        fallbackEIC, parallel)
+reintegrateMobilityFeatures <- function(features, peakParams, EICParams, peakRTWindow, fallbackEIC, calcArea, parallel)
 {
     cacheDB <- openCacheDBScope()
-    hash <- makeHash(features, EICRTWindow, peakRTWindow, calcArea, minIntensityIMS, peakParams, fallbackEIC)
+    hash <- makeHash(features, peakParams, EICParams, peakRTWindow, fallbackEIC, calcArea)
     cd <- loadCacheData("reintegrateMobilityFeatures", hash, cacheDB)
     if (!is.null(cd))
         return(cd)
     
     anaInfo <- analysisInfo(features)
     
+    EICParams$topMost <- NULL; EICParams$onlyPresent <- TRUE
+    
     printf("Loading EICs...\n")
     EICSelFunc <- \(tab) tab[!is.null(tab[["mobility"]]) & !is.na(mobility)]
-    allEICs <- getFeatureEIXs(features, type = "EIC", EIXParams = getDefEICParams(window = EICRTWindow,
-                                                                                  minIntensityIMS = minIntensityIMS),
-                              selectFunc = EICSelFunc, cacheDB = cacheDB)
+    allEICs <- getFeatureEIXs(features, type = "EIC", EIXParams = EICParams, selectFunc = EICSelFunc, cacheDB = cacheDB)
     
     if (!is.null(peakParams))
     {

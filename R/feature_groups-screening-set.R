@@ -345,20 +345,18 @@ setMethod("calculateTox", "featureGroupsScreeningSet", function(fGroups, feature
     callNextMethod(fGroups, featureAnn)
 })
 
-setMethod("assignMobilities", "featureGroupsScreeningSet", function(obj, mobPeakParams = NULL,
+setMethod("assignMobilities", "featureGroupsScreeningSet", function(obj, mobPeakParams = NULL, chromPeakParams = NULL,
+                                                                    EIMParams = getDefEIMParams(),
+                                                                    EICParams = getDefEICParams(),
                                                                     IMSWindow = defaultLim("mobility", "medium"),
-                                                                    clusterMethod = "distance", minIntensityIMS = 25,
-                                                                    maxMSRTWindow = defaultLim("retention", "very_narrow"),
-                                                                    chromPeakParams = NULL,
-                                                                    EICRTWindow = defaultLim("retention", "wide"),
                                                                     peakRTWindow = defaultLim("retention", "narrow"),
                                                                     calcArea = "integrate", fallbackEIC = TRUE,
                                                                     CCSParams = NULL, parallel = TRUE,
                                                                     fromSuspects = FALSE, IMSMatchParams = NULL)
 {
     ac <- checkmate::makeAssertCollection()
-    assertFindMobilitiesArgs(mobPeakParams, IMSWindow, clusterMethod, minIntensityIMS, maxMSRTWindow,
-                             chromPeakParams, EICRTWindow, peakRTWindow, calcArea, fallbackEIC, CCSParams, parallel, ac)
+    assertFindMobilitiesArgs(mobPeakParams, chromPeakParams, EIMParams, EICParams, IMSWindow, peakRTWindow,
+                             calcArea, fallbackEIC, CCSParams, parallel, ac)
     checkmate::assertFlag(fromSuspects, add = ac)
     assertIMSMatchParams(IMSMatchParams, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
@@ -381,10 +379,9 @@ setMethod("assignMobilities", "featureGroupsScreeningSet", function(obj, mobPeak
             }
         }
         if (!is.null(mobPeakParams))
-            obj@features <- assignFeatureMobilitiesPeaks(obj@features, mobPeakParams, IMSWindow, clusterMethod,
-                                                         minIntensityIMS, maxMSRTWindow)
-        obj@features <- reintegrateMobilityFeatures(obj@features, EICRTWindow, peakRTWindow, calcArea, minIntensityIMS,
-                                                    chromPeakParams, fallbackEIC, parallel)
+            obj@features <- assignFeatureMobilitiesPeaks(obj@features, mobPeakParams, EIMParams)
+        obj@features <- reintegrateMobilityFeatures(obj@features, chromPeakParams, EICParams, peakRTWindow, calcArea,
+                                                    fallbackEIC, parallel)
         obj <- clusterFGroupMobilities(obj, IMSWindow, TRUE)
     }
     

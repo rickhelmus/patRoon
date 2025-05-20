@@ -1228,9 +1228,10 @@ TPLogicTransformations <- function()
 #'
 #' @param mobility,ccs A \code{numeric} vector with mobility or \acronym{CCS} values that should be converted.
 #' @param mz A \code{numeric} vector with the \emph{m/z} values that map to the input mobility or \acronym{CCS} values.
-#' @param CCSParams A \code{list} with parameters for the conversion. See \code{\link{getCCSParams}} for details.
 #' @param charge A \code{numeric} vector with the ion charges that map to the input mobility or \acronym{CCS} data. Will
 #'   be recycled if necessary. If \code{NULL} then the charge configured in \code{CCSParams} is used.
+#' 
+#' @template CCSParams-arg
 #'
 #' @name CCS-Conversion
 #' @export

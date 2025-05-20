@@ -266,7 +266,10 @@
         - finish docs for IMSWindow/clusterMethod
         - update handbook
     - assignMobilities()
-        - mention that feature properties (except intensity, rt, area) are simply copied from parent
+        - refs to paper
+        - fGroups method
+            - check why man page isn't loaded with `?`
+            - finish docs for eg screening
         - suspect/compounds method
             - mention when mobility <--> CCS conversions occur
             - doc how charge is taken and adducts are used

@@ -1041,16 +1041,16 @@ assertFindPeakParams <- function(x, null.ok = FALSE, .var.name = checkmate::vnam
     invisible(NULL)
 }
 
-assertFindMobilitiesArgs <- function(mobPeakParams, chromPeakParams, EIMParams, EICParams, IMSWindow, peakRTWindow,
-                                     calcArea, fallbackEIC, CCSParams, parallel, add = NULL)
+assertFindMobilitiesArgs <- function(mobPeakParams, chromPeakParams, EIMParams, EICParams, peakRTWindow, fallbackEIC,
+                                     calcArea, IMSWindow, CCSParams, parallel, add = NULL)
 {
     assertFindPeakParams(mobPeakParams, null.ok = TRUE, add = add)
     assertFindPeakParams(chromPeakParams, null.ok = TRUE, add = add)
     assertEIMParams(EIMParams, add = add)
     assertEICParams(EICParams, add = add)
-    aapply(checkmate::assertNumber, . ~ IMSWindow + peakRTWindow, finite = TRUE, fixed = list(add = add))
-    checkmate::assertChoice(calcArea, c("integrate", "sum"), add = add)
+    aapply(checkmate::assertNumber, . ~ peakRTWindow + IMSWindow, finite = TRUE, fixed = list(add = add))
     aapply(checkmate::assertFlag, . ~ fallbackEIC + parallel, fixed = list(add = add))
+    checkmate::assertChoice(calcArea, c("integrate", "sum"), add = add)
     assertCCSParams(CCSParams, null.ok = TRUE, add = add)
     invisible(NULL)
 }

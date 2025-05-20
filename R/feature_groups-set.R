@@ -304,15 +304,15 @@ setMethod("calculateTox", "featureGroupsSet", function(fGroups, featureAnn)
 #' @export
 setMethod("assignMobilities", "featureGroupsSet", function(obj, mobPeakParams = NULL, chromPeakParams = NULL,
                                                            EIMParams = getDefEIMParams(), EICParams = getDefEICParams(),
-                                                           IMSWindow = defaultLim("mobility", "medium"),
                                                            peakRTWindow = defaultLim("retention", "narrow"),
-                                                           calcArea = "integrate", fallbackEIC = TRUE,
+                                                           fallbackEIC = TRUE, calcArea = "integrate",
+                                                           IMSWindow = defaultLim("mobility", "medium"),
                                                            CCSParams = NULL, parallel = TRUE)
 {
     # NOTE: keep args in sync with other methods
     
-    assertFindMobilitiesArgs(mobPeakParams, chromPeakParams, EIMParams, EICParams, IMSWindow, peakRTWindow,
-                             calcArea, fallbackEIC, CCSParams, parallel)
+    assertFindMobilitiesArgs(mobPeakParams, chromPeakParams, EIMParams, EICParams, peakRTWindow, fallbackEIC,
+                             calcArea, IMSWindow, CCSParams, parallel)
     
     if (length(obj) == 0)
         return(obj) # nothing to do...
@@ -321,8 +321,8 @@ setMethod("assignMobilities", "featureGroupsSet", function(obj, mobPeakParams = 
     {
         obj <- checkAssignedMobilityFGroups(obj)
         obj@features <- assignFeatureMobilitiesPeaks(obj@features, mobPeakParams, EIMParams)
-        obj@features <- reintegrateMobilityFeatures(obj@features, chromPeakParams, EICParams, peakRTWindow, calcArea,
-                                                    fallbackEIC, parallel)
+        obj@features <- reintegrateMobilityFeatures(obj@features, chromPeakParams, EICParams, peakRTWindow, fallbackEIC,
+                                                    calcArea, parallel)
         obj <- clusterFGroupMobilities(obj, IMSWindow, TRUE)
     }
     

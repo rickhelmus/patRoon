@@ -1,4 +1,5 @@
 options(Ncpus = 8)
+options(timeout = 300)
 
 install.packages("remotes")
 remotes::install_github("rickhelmus/patRoonInst")

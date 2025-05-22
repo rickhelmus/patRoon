@@ -126,14 +126,14 @@ components by unsupervised detection of homologous series.</p>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Any further arguments passed to <code><a href="https://rdrr.io/pkg/nontarget/man/homol.search.html" class="external-link">homol.search</a></code>.<br><br>  Further arguments passed to the non-sets workflow method.</p></dd>
+<dd><p>Any further arguments passed to <code><a href="https://rdrr.io/pkg/nontarget/man/homol.search.html" class="external-link">homol.search</a></code>.<br><br> (<strong>sets workflow</strong>) Further arguments passed to the non-sets workflow method.</p></dd>
 
 
 <dt id="arg-ionization">ionization<a class="anchor" aria-label="anchor" href="#arg-ionization"></a></dt>
 <dd><p>Which ionization polarity was used to generate the data: should be <code>"positive"</code>
   or <code>"negative"</code>. If the <code>featureGroups</code> object has adduct annotations, and <code>ionization=NULL</code>, the
   ionization will be detected automatically.</p>
-<p>This parameter is not supported for sets workflows, as the ionization will always be detected
+<p>(<strong>sets workflow</strong>) This parameter is not supported for sets workflows, as the ionization will always be detected
   automatically.</p></dd>
 
 
@@ -196,7 +196,15 @@ enabled by default on these R versions, implements a (messy) workaround
     </div>
     <div id="references">
     <h2>References</h2>
-    <p>Loos2017patRoon <br><br> enviPat</p>
+    <p>Loos M, Singer H (2017).
+“Nontargeted homologue series extraction from hyphenated high resolution mass spectrometry data.”
+<em>Journal of Cheminformatics</em>, <b>9</b>(1).
+<a href="https://doi.org/10.1186/s13321-017-0197-z" class="external-link">doi:10.1186/s13321-017-0197-z</a>
+.
+ <br><br> Loos M, Gerber C, Corona F, Hollender J, Singer H (2015).
+“Accelerated Isotope Fine Structure Calculation Using Pruned Transition Trees.”
+<em>Analytical Chemistry</em>, <b>87</b>(11), 5738-5744.
+<a href="https://pubs.acs.org/doi/abs/10.1021/acs.analchem.5b00941" class="external-link">https://pubs.acs.org/doi/abs/10.1021/acs.analchem.5b00941</a>.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -215,7 +223,7 @@ enabled by default on these R versions, implements a (messy) workaround
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
 </div>
 
       </footer></div>

@@ -126,11 +126,11 @@ package.</p>
 
 
 <dt id="arg-set">set<a class="anchor" aria-label="anchor" href="#arg-set"></a></dt>
-<dd><p>The name of the set.</p></dd>
+<dd><p>(<strong>sets workflow</strong>) The name of the set.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Further arguments passed to the non-sets workflow method.</p></dd>
+<dd><p>(<strong>sets workflow</strong>) Further arguments passed to the non-sets workflow method.</p></dd>
 
 </dl></div>
     <div id="value">
@@ -164,18 +164,33 @@ as returned by <code><a href="https://rdrr.io/pkg/nontarget/man/homol.search.htm
 </dl></div>
     <div id="sets-workflows">
     <h2>Sets workflows</h2>
-    <p>componentsNTSetcomponentsNT</p>
-<p>componentsNTUnsetOnly the components in the specified set are kept. Furthermore, the
-  component names are restored to non-set specific names (see <code><a href="generateComponents.html">generateComponents</a></code> for more details).</p>
-<p><code>plotGraph</code> Currently can only create graph networks from one set (specified by the <code>set</code>
-  argument).</p>
-<p>Note that the <code>componentsNTSet</code> class does not have a <code>homol</code> slot. Instead, the <code><a href="generics.html">setObjects</a></code>
+    <p>The <code>componentsNTSet</code> class is applicable for <a href="sets-workflow.html">sets workflows</a>. This class is derived from <code>componentsNT</code> and therefore largely follows the same user interface.</p>
+<p>The following methods are specifically defined for sets workflows:</p><ul><li><p><code>unset</code> Converts the object data for a specified set into a 'non-set' object (<code>componentsNTUnset</code>), which allows it to be used in 'regular' workflows. Only the components in the specified set are kept. Furthermore, the
+  component names are restored to non-set specific names (see <code><a href="generateComponents.html">generateComponents</a></code> for more details).</p></li>
+</ul><p>The following methods are changed or with new functionality:</p><ul><li><p><code>plotGraph</code> Currently can only create graph networks from one set (specified by the <code>set</code>
+  argument).</p></li>
+</ul><p>Note that the <code>componentsNTSet</code> class does not have a <code>homol</code> slot. Instead, the <code><a href="generics.html">setObjects</a></code>
   method can be used to access this data for a specific set.</p>
     </div>
     <div id="references">
     <h2>References</h2>
-    <p>Loos2017patRoon <br><br> enviPat</p>
-<p>igraph</p>
+    <p>Loos M, Singer H (2017).
+“Nontargeted homologue series extraction from hyphenated high resolution mass spectrometry data.”
+<em>Journal of Cheminformatics</em>, <b>9</b>(1).
+<a href="https://doi.org/10.1186/s13321-017-0197-z" class="external-link">doi:10.1186/s13321-017-0197-z</a>
+.
+ <br><br> Loos M, Gerber C, Corona F, Hollender J, Singer H (2015).
+“Accelerated Isotope Fine Structure Calculation Using Pruned Transition Trees.”
+<em>Analytical Chemistry</em>, <b>87</b>(11), 5738-5744.
+<a href="https://pubs.acs.org/doi/abs/10.1021/acs.analchem.5b00941" class="external-link">https://pubs.acs.org/doi/abs/10.1021/acs.analchem.5b00941</a>.</p>
+<p>Csardi G, Nepusz T (2006).
+“The igraph software package for complex network research.”
+<em>InterJournal</em>, <b>Complex Systems</b>, 1695.
+<a href="https://igraph.org" class="external-link">https://igraph.org</a>.<br><br>
+Csárdi G, Nepusz T, Traag V, Horvát S, Zanini F, Noom D, Müller K (2025).
+<em>igraph: Network Analysis and Visualization in R</em>.
+<a href="https://doi.org/10.5281/zenodo.7682609" class="external-link">doi:10.5281/zenodo.7682609</a>
+, R package version 2.1.4, <a href="https://CRAN.R-project.org/package=igraph" class="external-link">https://CRAN.R-project.org/package=igraph</a>.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -194,7 +209,7 @@ as returned by <code><a href="https://rdrr.io/pkg/nontarget/man/homol.search.htm
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
 </div>
 
       </footer></div>

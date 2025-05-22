@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='UTF-8' ?>
-<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' class='svglite' width='720.00pt' height='288.00pt' viewBox='0 0 720.00 288.00'>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='720.00pt' height='288.00pt' viewBox='0 0 720.00 288.00'>
+<g class='svglite'>
 <defs>
   <style type='text/css'><![CDATA[
     .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {
@@ -11,6 +12,10 @@
     }
     .svglite text {
       white-space: pre;
+    }
+    .svglite g.glyphgroup path {
+      fill: inherit;
+      stroke: none;
     }
   ]]></style>
 </defs>
@@ -82,9 +87,10 @@
 <text transform='translate(40.32,76.10) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Nimbus Sans";' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>160</text>
 <text transform='translate(40.32,29.65) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Nimbus Sans";' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>180</text>
 <polygon points='57.60,223.20 712.80,223.20 712.80,7.20 57.60,7.20 ' style='stroke-width: 0.75;' />
-<text x='385.20' y='277.92' text-anchor='middle' style='font-size: 12.00px; font-family: "Nimbus Sans";' textLength='108.02px' lengthAdjust='spacingAndGlyphs'>Retention time (min)</text>
-<text transform='translate(11.52,115.20) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Nimbus Sans";' textLength='19.32px' lengthAdjust='spacingAndGlyphs'>m/z</text>
+<text x='385.20' y='277.92' text-anchor='middle' style='font-size: 12.00px; font-family: "Nimbus Sans";' textLength='107.53px' lengthAdjust='spacingAndGlyphs'>Retention time (min)</text>
+<text transform='translate(11.52,115.20) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Nimbus Sans";' textLength='19.34px' lengthAdjust='spacingAndGlyphs'>m/z</text>
 </g>
 <g clip-path='url(#cpNTcuNjB8NzEyLjgwfDcuMjB8MjIzLjIw)'>
+</g>
 </g>
 </svg>

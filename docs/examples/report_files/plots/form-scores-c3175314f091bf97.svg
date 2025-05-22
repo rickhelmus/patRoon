@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='UTF-8' ?>
-<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' class='svglite' width='432.00pt' height='360.00pt' viewBox='0 0 432.00 360.00'>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='432.00pt' height='360.00pt' viewBox='0 0 432.00 360.00'>
+<g class='svglite'>
 <defs>
   <style type='text/css'><![CDATA[
     .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {
@@ -12,6 +13,10 @@
     .svglite text {
       white-space: pre;
     }
+    .svglite g.glyphgroup path {
+      fill: inherit;
+      stroke: none;
+    }
   ]]></style>
 </defs>
 <rect width='100%' height='100%' style='stroke: none; fill: #FFFFFF;'/>
@@ -21,20 +26,20 @@
   </clipPath>
 </defs>
 <g clip-path='url(#cpMC4wMHw0MzIuMDB8MC4wMHwzNjAuMDA=)'>
-<rect x='50.67' y='59.04' width='366.67' height='220.75' style='stroke-width: 0.75; stroke: #A6CEE3; fill: #A6CEE3;' />
-<text transform='translate(238.37,296.40) rotate(-90)' text-anchor='end' style='font-size: 12.00px; font-family: "Nimbus Sans";' textLength='46.68px' lengthAdjust='spacingAndGlyphs'>isoScore</text>
-<line x1='36.00' y1='279.79' x2='36.00' y2='95.99' style='stroke-width: 0.75;' />
-<line x1='36.00' y1='279.79' x2='28.80' y2='279.79' style='stroke-width: 0.75;' />
-<line x1='36.00' y1='233.84' x2='28.80' y2='233.84' style='stroke-width: 0.75;' />
-<line x1='36.00' y1='187.89' x2='28.80' y2='187.89' style='stroke-width: 0.75;' />
-<line x1='36.00' y1='141.94' x2='28.80' y2='141.94' style='stroke-width: 0.75;' />
-<line x1='36.00' y1='95.99' x2='28.80' y2='95.99' style='stroke-width: 0.75;' />
-<text x='21.60' y='283.72' text-anchor='end' style='font-size: 10.80px; font-family: "Nimbus Sans";' textLength='15.01px' lengthAdjust='spacingAndGlyphs'>0.0</text>
-<text x='21.60' y='237.77' text-anchor='end' style='font-size: 10.80px; font-family: "Nimbus Sans";' textLength='15.01px' lengthAdjust='spacingAndGlyphs'>0.2</text>
-<text x='21.60' y='191.82' text-anchor='end' style='font-size: 10.80px; font-family: "Nimbus Sans";' textLength='15.01px' lengthAdjust='spacingAndGlyphs'>0.4</text>
-<text x='21.60' y='145.88' text-anchor='end' style='font-size: 10.80px; font-family: "Nimbus Sans";' textLength='15.01px' lengthAdjust='spacingAndGlyphs'>0.6</text>
-<text x='21.60' y='99.93' text-anchor='end' style='font-size: 10.80px; font-family: "Nimbus Sans";' textLength='15.01px' lengthAdjust='spacingAndGlyphs'>0.8</text>
-<text x='234.00' y='51.84' text-anchor='middle' style='font-size: 9.60px; font-family: "Nimbus Sans";' textLength='18.67px' lengthAdjust='spacingAndGlyphs'>0.96</text>
+<rect x='50.67' y='59.04' width='366.67' height='220.80' style='stroke-width: 0.75; stroke: #A6CEE3; fill: #A6CEE3;' />
+<text transform='translate(238.37,296.45) rotate(-90)' text-anchor='end' style='font-size: 12.00px; font-family: "Nimbus Sans";' textLength='46.64px' lengthAdjust='spacingAndGlyphs'>isoScore</text>
+<line x1='36.00' y1='279.84' x2='36.00' y2='96.00' style='stroke-width: 0.75;' />
+<line x1='36.00' y1='279.84' x2='28.80' y2='279.84' style='stroke-width: 0.75;' />
+<line x1='36.00' y1='233.88' x2='28.80' y2='233.88' style='stroke-width: 0.75;' />
+<line x1='36.00' y1='187.92' x2='28.80' y2='187.92' style='stroke-width: 0.75;' />
+<line x1='36.00' y1='141.96' x2='28.80' y2='141.96' style='stroke-width: 0.75;' />
+<line x1='36.00' y1='96.00' x2='28.80' y2='96.00' style='stroke-width: 0.75;' />
+<text x='21.60' y='283.77' text-anchor='end' style='font-size: 10.80px; font-family: "Nimbus Sans";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>0.0</text>
+<text x='21.60' y='237.81' text-anchor='end' style='font-size: 10.80px; font-family: "Nimbus Sans";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>0.2</text>
+<text x='21.60' y='191.85' text-anchor='end' style='font-size: 10.80px; font-family: "Nimbus Sans";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>0.4</text>
+<text x='21.60' y='145.89' text-anchor='end' style='font-size: 10.80px; font-family: "Nimbus Sans";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>0.6</text>
+<text x='21.60' y='99.93' text-anchor='end' style='font-size: 10.80px; font-family: "Nimbus Sans";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>0.8</text>
+<text x='234.00' y='51.84' text-anchor='middle' style='font-size: 9.60px; font-family: "Nimbus Sans";' textLength='18.66px' lengthAdjust='spacingAndGlyphs'>0.96</text>
 </g>
 <defs>
   <clipPath id='cpNTkuMDR8NDAxLjc2fDU5LjA0fDI4Ni41Ng=='>
@@ -42,5 +47,6 @@
   </clipPath>
 </defs>
 <g clip-path='url(#cpNTkuMDR8NDAxLjc2fDU5LjA0fDI4Ni41Ng==)'>
+</g>
 </g>
 </svg>

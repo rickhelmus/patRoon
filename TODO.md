@@ -172,6 +172,7 @@
         - availableBackends()
         - use eg mzR, MSTK, SC to get eg EICs or PLs
 - IMS
+    - add IMSRangeParams/withIMSParent/applyIMS filters also to features method?
     - more verification that normInts() works before/after assignMobilities()
     - IMS arg for [, filter(), ADT, and plotting functions
     - applyMS for filter()
@@ -279,10 +280,8 @@
         - annotate has mob option
         - intMax can only work for EICs (mob inten may not be stored)
         - plotChroms(): IMS arg overrides analysis/groupNames args for availability after IMS selection
+    - IMSRangeParams filter
     - doc that IMS arg should most likely be FALSE for export/getXCMS...()
-    - applyIMS arg for all fGroups filter methods
-        - ignores negate!
-    - withIMSParent arg for filter()
     - calculateConcs()
         - clearly doc that mobility parent intensities are used to calculate concentrations (if available).
         - Also note that the mobility fGroup's RF is still used (only relevant for SIRIUS or RT changes), and is different then when assignMobilities() copies results

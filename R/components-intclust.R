@@ -134,6 +134,8 @@ setMethod("plotIntHash", "componentsIntClust", function(obj, index, ...)
 #' @template compon_algo-args
 #' @template compon_gen-clust
 #' @template dynamictreecut
+#' 
+#' @templateVar consider for componentization
 #' @template IMS-arg
 #'
 #' @inheritParams generateComponents

@@ -1125,6 +1125,7 @@ getIMSMatchParams <- function(param, ...)
     return(ret)
 }
 
+#' @templateVar consider for generating calibrant data
 #' @template IMS-arg
 #' @rdname pred-quant
 #' @export

@@ -269,9 +269,8 @@
         - refs to paper
         - fGroups method
             - add link to piek, and possibly import for direct IMS assignment
-        - suspect/compounds method
-            - compounds: mobility etc assumed to be specific per set (due to different adducts and m/z values), but equal for consensus() (structure should be the same)
-            - matchFromBy == "InChIKey" is not supported by SIRIUS
+        - compounds method
+            - PCL already has CCSbase, so no need to convert (also mention elsewhere?)
     - normInts()
         - istd hits of mobility features are not used (IMS="maybe")
         - mobility features are ignored (IMS="maybe") for tic

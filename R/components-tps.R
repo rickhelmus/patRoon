@@ -676,6 +676,8 @@ setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked = TRUE, width =
 #'   \link[=retDir]{retention order direction}.
 #'
 #' @template specSimParams-arg
+#' 
+#' @templateVar consider for componentization
 #' @template IMS-arg
 #'
 #' @note The \code{shift} parameter of \code{specSimParams} is ignored by \code{generateComponentsTPs}, since it always

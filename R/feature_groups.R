@@ -58,6 +58,7 @@ NULL
 #' @templateVar dollarOpName feature group
 #' @template sub_sel_del-args
 #'
+#' @templateVar consider to be kept (\code{"["}) or exported (\code{export})
 #' @templateVar append For \code{"["}: Leave unassigned to perform no IMS selection.
 #' @template IMS-arg
 #'

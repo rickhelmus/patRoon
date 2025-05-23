@@ -763,7 +763,7 @@ setMethod("estimateIDConfidence", "compounds", function(obj, absMzDev = defaultL
 setMethod("assignMobilities", "compounds", function(obj, fGroups, IMS = TRUE, from = NULL, matchFromBy = "InChIKey1",
                                                     overwrite = FALSE, adduct = NULL, CCSParams = NULL,
                                                     prefCalcChemProps = TRUE, neutralChemProps = FALSE,
-                                                    virtualenv = "patRoon-c3sdb")
+                                                    virtualenv = "patRoon-C3SDB")
 {
     # UNDONE: doc how adducts are dealt with
     #   - uses fGroup annotations, not what was used for annotation

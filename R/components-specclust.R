@@ -45,6 +45,8 @@ componentsSpecClust <- setClass("componentsSpecClust", contains = "componentsClu
 #' @template compon_gen-clust
 #' @template dynamictreecut
 #' @template specSimParams-arg
+#' 
+#' @templateVar consider for componentization
 #' @template IMS-arg
 #'
 #' @inheritParams generateComponents

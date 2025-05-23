@@ -36,6 +36,7 @@ NULL
 #'   \code{plotBPCs}), \pkg{\link{VennDiagram}} plotting functions (\code{plotVenn}), \code{\link{chordDiagram}}
 #'   (\code{plotChord}) or \code{\link[UpSetR]{upset}} (\code{plotUpSet}).
 #'
+#' @templateVar consider for plotting
 #' @template IMS-arg
 #'
 #' @inheritParams featureGroups-class

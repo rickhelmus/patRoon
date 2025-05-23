@@ -578,6 +578,7 @@ minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, ne
 #' @templateVar feat FALSE
 #' @template feat-filter-args
 #'
+#' @templateVar consider to be kept
 #' @templateVar append Set to \code{NULL} to ignore.
 #' @template IMS-arg
 #'

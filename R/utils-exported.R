@@ -1704,6 +1704,22 @@ C3SDBAdducts <- function()
     c("[M+H]+", "[M+Na]+", "[M-H]-", "[M+NH4]+", "[M+K]+", "[M+H-H2O]+", "[M+HCOO]-", "[M+CH3COO]-", "[M+Na-2H]-")
 }
 
+#' Automatically installs C3SDB
+#'
+#' Automatically installs the \href{https://github.com/dylanhross/c3sdb}{C3SDB} \command{Python} package
+#'
+#' This function uses \CRANpkg{reticulate} to install the \href{https://github.com/dylanhross/c3sdb}{C3SDB}
+#' \command{Python} package in a virtual environment.
+#'
+#' @param envname The name of the virtual \command{Python} environment to install \command{C3SDB} into. Passed to
+#'   \link[reticulate:py_install]{reticulate::py_install}. Set to \code{NULL} to not set any virtual \command{Python}
+#'   environment.
+#' @param clearEnv Set to \code{TRUE} to remove the virtual environment if it already exists (using
+#'   \link[reticulate:virtualenv_remove]{reticulate::virtualenv_remove}). Ignored if \code{envname} is \code{NULL}.
+#' @param \dots Further arguments passed to \code{\link[reticulate:py_install]{reticulate::py_install}}.
+#'
+#' @references \insertRef{Ross2020}{patRoon}
+#'
 #' @export
 installC3SDB <- function(envname = "patRoon-C3SDB", clearEnv = FALSE, ...)
 {
@@ -1722,7 +1738,7 @@ installC3SDB <- function(envname = "patRoon-C3SDB", clearEnv = FALSE, ...)
 
 #' Automatically installs TIMSCONVERT
 #'
-#' Automatically installs the \href{https://gtluu.github.io/timsconvert/}{TIMSCONVERT} Python package
+#' Automatically installs the \href{https://gtluu.github.io/timsconvert/}{TIMSCONVERT} \command{Python} package
 #'
 #' This function uses \CRANpkg{reticulate} to install the \href{https://gtluu.github.io/timsconvert/}{TIMSCONVERT}
 #' Python package in a virtual environment.

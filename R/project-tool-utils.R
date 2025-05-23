@@ -91,4 +91,4 @@ selectSuspList <- function(session, inputName)
     }
 }
 
-getCCSPredSelections <- function() c(None = "", "PubChemLite" = "pubchemlite",  "CCSbase (c3sdb)" = "c3sdb")
+getCCSPredSelections <- function() c(None = "", "PubChemLite" = "pubchemlite",  "C3SDB (CCSbase)" = "C3sdb")

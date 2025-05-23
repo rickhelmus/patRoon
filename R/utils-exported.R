@@ -1319,7 +1319,7 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
                                                      overwrite = FALSE, adducts = c("[M+H]+", "[M-H]-", NA),
                                                      predictAdductOnly = TRUE, CCSParams = NULL,
                                                      prepareChemProps = TRUE, prefCalcChemProps = TRUE,
-                                                     neutralChemProps = FALSE, virtualenv = "patRoon-c3sdb")
+                                                     neutralChemProps = FALSE, virtualenv = "patRoon-C3SDB")
 {
     # NOTE: keep args in sync with other methods
     
@@ -1347,8 +1347,8 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
     if (!is.null(cd))
         return(cd)
     
-    do_c3sdb <- identical(from, "c3sdb")
-    if (do_c3sdb)
+    do_C3SDB <- identical(from, "c3sdb")
+    if (do_C3SDB)
         checkPackage("reticulate")
     
     obj <- copy(obj)
@@ -1357,7 +1357,7 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
         obj <- prepareChemTable(obj, prefCalcChemProps, neutralChemProps)
     
     adductsNoNone <- na.omit(adducts)
-    needMZs <- do_c3sdb || !is.null(CCSParams)
+    needMZs <- do_C3SDB || !is.null(CCSParams)
     mzTab <- NULL
     if (needMZs)
     {
@@ -1365,7 +1365,7 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
         
         if (length(adductsNoNone) > 0)
         {
-            msg <- paste("Mass data is necessary for c3sdb pedictions and mobility <--> CCS conversions.",
+            msg <- paste("Mass data is necessary for C3SDB pedictions and mobility <--> CCS conversions.",
                          "This data can be automatically calculated by setting prepareChemProps=TRUE and ensuring a SMILES,",
                          "InChI or formula column is present.")
             collAdd <- paste0(adductsNoNone, collapse = ", ")
@@ -1402,17 +1402,17 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
         }
     }
     
-    if (do_c3sdb)
+    if (do_C3SDB)
     {
         if (is.null(obj[["neutralMass"]]) || is.null(obj[["SMILES"]]))
         {
-            warning("No neutralMass or SMILES data found in the input data. c3sdb predictions will be skipped.",
+            warning("No neutralMass or SMILES data found in the input data. C3SDB predictions will be skipped.",
                     call. = FALSE)
-            do_c3sdb <- FALSE
+            do_C3SDB <- FALSE
             from <- NULL
         }
         if (!is.null(obj[["SMILES"]]) && (anyNA(obj$SMILES) || any(!nzchar(obj$SMILES))))
-            warning("The following rows do not contain SMILES data and will be excluded from c3sdb predictions: ",
+            warning("The following rows do not contain SMILES data and will be excluded from C3SDB predictions: ",
                     paste0(obj[is.na(SMILES), which = TRUE], collapse = ", "), call. = FALSE)
     }
     
@@ -1447,15 +1447,15 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
                              path), call. = FALSE)
             setnames(from, predCols, gsub(pat, "CCS_", predCols))
         }
-        else # c3sdb
+        else # C3SDB
         {
             if (!is.null(virtualenv))
                 reticulate::use_virtualenv(virtualenv)
             py_pickle <- reticulate::import("pickle")
-            py_c3sdb <- reticulate::import("c3sdb.ml.data")
+            py_C3SDB <- reticulate::import("c3sdb.ml.data")
             py_bi <- reticulate::import_builtins()
             
-            kmcm_svr <- with(py_bi$open(py_c3sdb$pretrained_data("c3sdb_kmcm_svr.pkl"), "rb"), as = "pf",
+            kmcm_svr <- with(py_bi$open(py_C3SDB$pretrained_data("c3sdb_kmcm_svr.pkl"), "rb"), as = "pf",
                              py_pickle$load(pf))
             
             # only do predictions for suspects with SMILES and mass data
@@ -1467,16 +1467,16 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
                 if (length(mzs) == 0)
                     return(numeric())
                 
-                if (!add %in% c3sdbAdducts())
+                if (!add %in% C3SDBAdducts())
                 {
                     warning(sprintf("Skipping predictions for unsupported adduct '%s'.", add), call. = FALSE)
                     return(rep(NA_real_, length(mzs))) 
                 }
 
                 # use as.list() to handle scalars: https://github.com/rstudio/reticulate/issues/258
-                dfi <- py_c3sdb$data_for_inference(as.list(mzs), as.list(rep(add, length(mzs))), as.list(SMILES),
-                                                   py_c3sdb$pretrained_data("c3sdb_OHEncoder.pkl"),
-                                                   py_c3sdb$pretrained_data("c3sdb_SScaler.pkl"))
+                dfi <- py_C3SDB$data_for_inference(as.list(mzs), as.list(rep(add, length(mzs))), as.list(SMILES),
+                                                   py_C3SDB$pretrained_data("c3sdb_OHEncoder.pkl"),
+                                                   py_C3SDB$pretrained_data("c3sdb_SScaler.pkl"))
                 ret <- rep(NA_real_, length(mzs))
                 ret[dfi[[2]]] <- kmcm_svr$predict(dfi[[1]])
                 if (any(!dfi[[2]]))
@@ -1621,7 +1621,13 @@ setMethod("assignMobilities", "data.frame", function(obj, ...)
 })
 
 #' @export
-installc3sdb <- function(envname = "patRoon-c3sdb", clearEnv = FALSE, ...)
+C3SDBAdducts <- function()
+{
+    c("[M+H]+", "[M+Na]+", "[M-H]-", "[M+NH4]+", "[M+K]+", "[M+H-H2O]+", "[M+HCOO]-", "[M+CH3COO]-", "[M+Na-2H]-")
+}
+
+#' @export
+installC3SDB <- function(envname = "patRoon-C3SDB", clearEnv = FALSE, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertString(envname, min.chars = 1, null.ok = TRUE)

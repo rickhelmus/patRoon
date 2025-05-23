@@ -403,6 +403,9 @@ setMethod("estimateIDConfidence", "featureGroupsScreening", function(obj, MSPeak
 #' @param maxLC50 Filter suspect hits by the given maximum toxicity (LC50) (as calculated by
 #'   \code{\link[=predictTox]{predictTox}}). Set to \code{NULL} to ignore.
 #' @param negate If set to \code{TRUE} then filtering operations are performed in opposite manner.
+#' @param applyIMS For IMS workflows: whether the filters are only applied to IMS parents (\code{applyIMS=FALSE}), only
+#'   to mobility features (\code{applyIMS=TRUE}) or to both (\code{applyIMS="both"}). Other feature groups will always
+#'   be kept. The \code{negate} option does not affect \code{applyIMS}.
 #'
 #' @return \code{filter} returns a filtered \code{featureGroupsScreening} object.
 #'

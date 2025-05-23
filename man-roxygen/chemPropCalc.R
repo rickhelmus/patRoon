@@ -8,7 +8,7 @@
 #'   for more details.
 #'
 #' @section Validating and calculating chemical properties: Chemical properties such as \acronym{SMILES},
-#'   \acronym{InChIKey} and formula in the <%=whatCP%> are automatically validated and calculated if missing/invalid.
+#'   \acronym{InChIKey} and formulae in the <%=whatCP%> are automatically validated and calculated if missing/invalid.
 #'
 #'   The internal validation/calculation process performs the following steps: \itemize{
 #'

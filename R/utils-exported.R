@@ -1698,6 +1698,10 @@ setMethod("assignMobilities", "data.frame", function(obj, ...)
     return(as.data.frame(assignMobilities(as.data.table(obj), ...)))
 })
 
+#' Returns the adducts supported by C3SDB
+#' 
+#' Returns the adducts supported by the \href{https://github.com/dylanhross/c3sdb}{C3SDB} \command{Python} package.
+#' 
 #' @export
 C3SDBAdducts <- function()
 {

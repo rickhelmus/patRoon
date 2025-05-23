@@ -422,7 +422,7 @@ setGeneric("annotatedPeakList", function(obj, ...) standardGeneric("annotatedPea
 setGeneric("annotations", function(obj, ...) standardGeneric("annotations"))
 
 #' @templateVar func assignMobilities
-#' @templateVar desc finds ion mobilities for all features.
+#' @templateVar desc assigns ion mobility and/or \acronym{CCS} values to workflow data.
 #' @template generics
 setGeneric("assignMobilities", function(obj, ...) standardGeneric("assignMobilities"))
 

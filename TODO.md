@@ -268,8 +268,7 @@
     - assignMobilities()
         - refs to paper
         - fGroups method
-            - check why man page isn't loaded with `?`
-            - finish docs for eg screening
+            - add link to piek, and possibly import for direct IMS assignment
         - suspect/compounds method
             - mention when mobility <--> CCS conversions occur
             - doc how charge is taken and adducts are used
@@ -277,11 +276,6 @@
             - DT: adducts arg can be character() if adduct column is present
             - matchFromBy == "InChIKey1" will automatically calculate IK1 if missing, and DT method keeps it in output
             - matchFromBy == "InChIKey" is not supported by SIRIUS
-        - doc the use for fromSuspects, eg
-            - doesn't rely on mobility peak detection, so might be less prone to false negatives with eg low intensities
-            - scenario 1: we know the mobility very well, eg from a database --> use a narrow IMSWindow
-            - scenario 2: we only have the mobility from eg a prediction and don't care so much about identification by CCS match --> use wide IMSWindow
-        - clearly doc what IMSWindow is used for
     - normInts()
         - istd hits of mobility features are not used (IMS="maybe")
         - mobility features are ignored (IMS="maybe") for tic

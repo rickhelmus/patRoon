@@ -1432,41 +1432,21 @@ setMethod("calculateTox", "featureGroups", function(fGroups, featureAnn)
 #' Various approaches to assign mobilities to features and perform \acronym{CCS} conversions.
 #'
 #' The \code{assignMobilities} method function for features is used (1) to assign Ion Mobility values and (2) calculate
-#' \acronym{CCS} values from these mobilities. If mobility values are already present, \emph{i.e.} if already assigned
-#' by the feature detection algorithm, then only the \acronym{CCS} conversion functionality should be used.
+#' \acronym{CCS} values from these mobilities.
 #'
-#' The assignment of mobilities is discussed in the next section. The assignment of \acronym{CCS} values occurs is
-#' controlled by the \code{CCSParams} argument (see above).
+#' In \pkg{patRoon}, two approaches are supported to assign mobilities to features: \emph{direct} and \emph{post}. In
+#' the \emph{direct} approach mobility values are directly assigned during feature detection. This is only supported by
+#' some algorithms (\emph{e.g.} \link{piek}). In the \emph{post} approach, the mobility values are assigned after
+#' feature detection and grouping (and possibly other steps such as filtering). Thus, the \emph{post} approach is
+#' supported by all available feature detection algorithms in \pkg{patRoon}. The \emph{post} approach is further
+#' described below. Only the \acronym{CCS} conversion functionality of \code{assignMobilities} should be used in
+#' \emph{direct} mobility assignment workflows.
 #'
-#' @section Mobility assignment: The assignment of mobilities occurs in the following steps: \enumerate{
-#'
-#'   \item Extracted ion mobilograms (EIMs) are first generated for all features and subjected to automatic peak
-#'   detection to obtain \emph{mobility peaks}.
-#'
-#'   \item The detected mobility peaks in an EIM are then used to form \emph{mobility features}. These features inherit
-#'   their LC-MS parameters (RT, \emph{m/z}, etc) from the corresponding \emph{IMS parent}, \emph{i.e.} the feature for
-#'   which the EIM was created. The mobility peak centroids and ranges are used to assign IMS data to the mobility
-#'   features. Multiple mobility peaks within the same EIM result in multiple mobility features, and each are linked to
-#'   the same IMS parent. This is especially useful to keep a relation between \emph{e.g.} protomers.
-#'
-#'   \item LC-MS properties such as the area, intensity and RTs are (optionally) updated by re-integration of detected
-#'   peaks from mobility filtered extracted ion chromatograms. If this step is disabled or peak detection fails, then
-#'   the intensity and areas can be updated from raw EIC data (\code{fallbackEIC} argument).
-#'
-#'   \item Any mobility features that could not be re-integrated (either by peak detection or EIC fallback) are removed.
-#'
-#'   \item The feature grouping is updated: mobility features with close mobilities within a feature group are split-off
-#'   into new feature groups and linked to the original \emph{IMS parent} feature group.
-#'
-#'   }
-#'
-#'   Most data-processing functionality, such as subsetting, plotting, filtering, etc., allows to selectively operate
-#'   either on the mobility features, their IMS parents or both (controlled by the \code{IMS} argument to the
-#'   corresponding functions).
+#' The assignment of \acronym{CCS} values is controlled by the \code{CCSParams} argument (see above).
 #'
 #' @param obj A \code{\link{featureGroups}} (derived) object to which IMS data should be assigned.
 #' @param mobPeakParams A \code{list} with peak detection parameters for mobility peaks, generated with
-#'   \code{\link{getDefPeakParams}}. Set to \code{NULL} to completely skip mobility assignment.
+#'   \code{\link{getDefPeakParams}}. Set to \code{NULL} to skip detection of mobility peaks.
 #' @param chromPeakParams A \code{list} with peak detection parameters for the re-integration of mobility features,
 #'   generated with \code{\link{getDefPeakParams}}. Set to \code{NULL} to skip re-integration by peak detection.
 #' @param EIMParams,EICParams Parameters to be used for the generation of EIMs (for mobility peak detection) and EICs
@@ -1487,10 +1467,48 @@ setMethod("calculateTox", "featureGroups", function(fGroups, featureAnn)
 #' @template CCSParams-arg
 #' @template parallel-arg
 #'
+#' @section Post mobility assignment: The \emph{post} assignment of mobilities occurs in the following steps:
+#'   \enumerate{
+#'
+#'   \item Extracted ion mobilograms (EIMs) are generated for all features and subjected to automatic peak detection to
+#'   obtain \emph{mobility peaks}.
+#'
+#'   \item The detected mobility peaks in an EIM are then used to form \emph{mobility features}. These features inherit
+#'   their LC-MS properties (RT, \emph{m/z}, etc) from the corresponding \emph{IMS parent}, \emph{i.e.} the feature for
+#'   which the EIM was created. The mobility peak centroids and ranges are used to assign IMS data to the mobility
+#'   features. Multiple mobility peaks within the same EIM result in multiple mobility features, and each are linked to
+#'   the same IMS parent. The linkage is especially useful to keep a relation between \emph{e.g.} protomers.
+#'
+#'   \item LC-MS properties such as the area, intensity and RTs are (optionally) updated by re-integration of detected
+#'   peaks from mobility filtered extracted ion chromatograms. If peak detection is disabled or fails, then the
+#'   intensity and areas can be estimated directly from raw EIC data (\code{fallbackEIC} argument).
+#'
+#'   \item Any mobility features that could not be re-integrated (either by peak detection or EIC fallback) are removed.
+#'
+#'   \item The feature grouping is updated: the mobility features with close mobilities (defined by \code{IMSWindow})
+#'   within a feature group are split-off into new feature groups and linked to the original \emph{IMS parent} feature
+#'   group.
+#'
+#'   }
+#'
+#'   Note that re-running \code{assignMobilities} will first remove any existing mobility features.
+#'
+#' @section Mobility features: The features (and feature groups) with IMS properties are referred to \emph{mobility
+#'   features} (and \emph{mobility feature groups}). These are referred to \emph{orphans} if their link to the original
+#'   IMS parent is removed (in \emph{post} workflows, see previous section) or non-existent (\emph{direct} workflows).
+#'   The formation of orphans in \emph{post} workflows typically occurs by removal of IMS parents by subsetting or
+#'   filtering operations.
+#'
+#'   Most data-processing functionality, such as subsetting, plotting, filtering, etc., allows to selectively operate
+#'   either on the mobility features, their IMS parents, both or either the parent or orphans (controlled by the
+#'   \code{IMS} argument to the corresponding functions).
+#'
 #' @source The re-grouping of IMS features uses \CRANpkg{fastcluster} to group features with close mobilities.
 #'
 #' @references \addCitations{fastcluster}{1}
 #'
+#' @name assignMobilities_feat
+#' @aliases assignMobilities,featureGroups-method
 #' @export
 setMethod("assignMobilities", "featureGroups", function(obj, mobPeakParams = NULL, chromPeakParams = NULL,
                                                         EIMParams = getDefEIMParams(), EICParams = getDefEICParams(),

@@ -439,6 +439,30 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = NULL
     return(obj)
 })
 
+#' @param fromSuspects If \code{TRUE} then mobilities values are directly copied from suspect list data (if available).
+#'   See the \verb{Post mobility assignment} section.
+#'
+#' @section Post mobility assignment: \subsection{Suspect screening workflows}{In suspect screening workflows the
+#'   \code{fromSuspects} arguments can be set to alternatively perform mobility assignment directly from the suspect
+#'   list data (replacing Steps 1-2). The feature mobility is simply assigned from the suspect data and the mobility
+#'   range is derived from the \code{IMSWindow} argument. Relationships with IMS parents (Step 2) are similarly formed.
+#'   An advantage of this approach is that no mobility peak detection is needed, which may useful for low intensity
+#'   features where this could be difficult. However, it is strongly recommended to set \code{fallbackEICs=FALSE} to
+#'   still have a means of verification that the mobility feature is actually present.
+#'
+#'   Setting \code{fromSuspects=TRUE} is primarily intended for workflows where (1) the mobility of a suspect is
+#'   accurately known upfront or (2) IMS data should only be used as a rough filtering step for feature data. In the
+#'   latter case accurate feature mobility assignment is not of interest and the suspect IMS data is typically not
+#'   accurately known (\emph{e.g.} predicted), hence, for these workflows the tolerance specified by \code{IMSWindow}
+#'   should be increased.
+#'
+#'   If both \code{fromSuspects} and \code{mobPeakParams} are set, regular mobility assignment (Steps 1-2) is performed
+#'   for features without suspect hit.}
+#'
+#' @template IMSMatchParams-arg
+#'
+#' @rdname assignMobilities_feat
+#' @aliases assignMobilities,featureGroupsScreening-method
 #' @export
 setMethod("assignMobilities", "featureGroupsScreening", function(obj, mobPeakParams = NULL, chromPeakParams = NULL,
                                                                  EIMParams = getDefEIMParams(),

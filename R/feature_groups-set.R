@@ -301,6 +301,8 @@ setMethod("calculateTox", "featureGroupsSet", function(fGroups, featureAnn)
     return(doCalcToxSets(fGroups, featureAnn))
 })
 
+#' @rdname assignMobilities_feat
+#' @aliases assignMobilities,featureGroupsSet-method
 #' @export
 setMethod("assignMobilities", "featureGroupsSet", function(obj, mobPeakParams = NULL, chromPeakParams = NULL,
                                                            EIMParams = getDefEIMParams(), EICParams = getDefEICParams(),

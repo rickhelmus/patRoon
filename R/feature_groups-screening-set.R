@@ -345,6 +345,9 @@ setMethod("calculateTox", "featureGroupsScreeningSet", function(fGroups, feature
     callNextMethod(fGroups, featureAnn)
 })
 
+#' @rdname assignMobilities_feat
+#' @aliases assignMobilities,featureGroupsScreeningSet-method
+#' @export
 setMethod("assignMobilities", "featureGroupsScreeningSet", function(obj, mobPeakParams = NULL, chromPeakParams = NULL,
                                                                     EIMParams = getDefEIMParams(),
                                                                     EICParams = getDefEICParams(),

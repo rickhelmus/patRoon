@@ -1314,6 +1314,81 @@ convertCCSToMobility <- function(ccs, mz, CCSParams, charge = NULL)
     # }
 }
 
+#' Assign IMS data to suspects
+#'
+#' Adds calculated mobility and/or \acronym{CCS} data to a suspect list.
+#'
+#' The \code{assignMobilities} method for suspect lists is used to (1) add IMS data to suspects from predictions or
+#' library data and (2) convert (previously added) mobility <--> \acronym{CCS} values. These steps are controlled by the
+#' \code{from} and \code{CCSParams} arguments, respectively.
+#'
+#' Mobility and \acronym{CCS} values assigned in the suspect list are either adduct specific or not. Adduct specific
+#' values are preferred, as the 'correct' value can be automatically selected during suspect screening based on the
+#' adduct assigned to the feature (or passed as the \code{adduct} argument to \code{\link{screenSuspects}}). The
+#' non-adduct specific values are typically used when the corresponding adduct for the mobility/\acronym{CCS} value is
+#' unknown (or not of interest). These values get precedence over adduct specific values. The adduct specific values are
+#' stored in \code{mobility_<adduct>} and \code{CCS_<adduct>} columns, where \code{<adduct>} is the adduct name
+#' (\emph{e.g.} \code{[M+H]+}, \code{[M-H]-}). The \code{mobility} and \acronym{CCS} columns store any non-adduct
+#' specific values. The \code{adducts} argument ultimately defines the use of adduct and non-adduct specific values.
+#'
+#' The mobility <--> \acronym{CCS} conversions occur both ways, \emph{i.e.} missing \acronym{CCS} values will be
+#' converted from mobility values and \emph{vice versa}. If adduct specific values are converted then the charge value
+#' used for these calculations is taken from the corresponding adduct. For non-adduct specific values the charge is
+#' taken from the adduct specified in suspect list if present, or from the default charge specified in \code{CCSParams}
+#' otherwise.
+#'
+#' @param obj The suspect list to which the mobility and/or CCS data should be added. Should be a \code{data.frame} or
+#'   \code{data.table}.
+#' @param from Specifies from where IMS data is added to the suspect list. This can be the following: \itemize{
+#'
+#'   \item \code{"pubchemlite"}: \acronym{CCS} data is matched from predicted values of the
+#'   \href{https://pubchemlite.lcsb.uni.lu/}{PubChemLite} database. \strong{Note}: this requires a local copy of the
+#'   \href{https://zenodo.org/records/15311000}{CCS amended PubChemLite database} (see the Handbook for more details),
+#'   which is automatically installed by \pkg{patRoonExt}.
+#'
+#'   \item \code{"c3sdb"}: Uses the \href{https://github.com/dylanhross/c3sdb}{C3SDB} \command{Python} package to
+#'   predict \acronym{CCS} values. This requires a local installation of \command{C3SDB}, \emph{e.g.} performed with
+#'   \code{\link{installC3SDB}}.
+#'
+#'   \item A \code{data.table} or \code{data.frame} to which IMS data is matched. Should contain the column defined by
+#'   \code{matchFromBy} and columns storing (non-)adduct specific mobility/\acronym{CCS} columns (see Details).
+#'
+#'   \item \code{NULL}: No IMS data is added to the suspect list.
+#'
+#'   }
+#'
+#'   Any \code{NA} values in \code{from} are ignored.
+#' @param matchFromBy Which column should be used to match the IMS data from \code{from} and suspects. Valid options are
+#'   \code{"InChIKey"}, \code{"InChIKey1"} (first block InChIKey), \code{"InChI"}, \code{"SMILES"}, \code{"name"}.
+#'   However, this also depends on which columns are available in either of the data sources. \code{InChIKey1} values
+#'   are automatically calculated from \code{InChIKey}s, if possible.
+#' @param overwrite Set to \code{TRUE} to overwrite any existing suspect IMS data with data from \code{from}.
+#' @param adducts A \code{character} with the adduct(s) to consider for assigning mobility data to suspects and mobility
+#'   <--> \acronym{CCS} conversions. This may be limited by what is available in the data source specified by
+#'   \code{from} (see \code{\link{C3SDBAdducts}} for \code{from="c3sdb"}). Inclusion of \code{NA} in \code{adducts}
+#'   allows the use of non-adduct specific values (see Details).
+#'
+#'   The value for \code{adducts} is automatically expanded by the adducts specified in the \code{adduct} column of the
+#'   suspect list. Hence, \code{adducts} can be empty (\code{character()}) if no calculations for other adducts are
+#'   desired.
+#' @param predictAdductOnly If \code{from="c3sdb"} and \code{predictAdductOnly=TRUE} then only predictions are performed
+#'   for the adduct specified in the \code{adduct} column in the suspect list (if present).
+#' @param prepareChemProps Set to \code{TRUE} to perform chemical property calculation and validation on the suspect
+#'   list (described below).
+#' @param virtualenv The virtual \command{Python} environment in which \command{C3SDB} is installed. This is passed to
+#'   \code{\link[reticulate:use_virtualenv]{reticulate::use_virtualenv}}. Set to \code{NULL} to skip this and not setup
+#'   the environment.
+#'
+#' @template CCSParams-arg
+#'
+#' @templateVar whatCP suspect data (if \code{prepareChemProps=TRUE}) and \code{from} data (if a table)
+#' @template chemPropCalc
+#'
+#' @references \insertRef{Schymanski2021}{patRoon} \cr\cr \insertRef{Elapavalore2025}{patRoon} \cr\cr
+#'   \insertRef{Ross2020}{patRoon}
+#'
+#' @name assignMobilities_susp
+#' @aliases assignMobilities,data.table-method
 #' @export
 setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFromBy = "InChIKey",
                                                      overwrite = FALSE, adducts = c("[M+H]+", "[M-H]-", NA),
@@ -1614,6 +1689,8 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
     return(obj[])
 })
 
+#' @rdname assignMobilities_susp
+#' @aliases assignMobilities,data.frame-method
 #' @export
 setMethod("assignMobilities", "data.frame", function(obj, ...)
 {

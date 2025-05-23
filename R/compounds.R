@@ -758,7 +758,37 @@ setMethod("estimateIDConfidence", "compounds", function(obj, absMzDev = defaultL
     return(obj)
 })
 
+#' Assign IMS data to a \code{compounds} object.
+#'
+#' Assigns ion mobility and \acronym{CCS} values to the candidates in a \code{\link{compounds}} object.
+#'
+#' The \code{assignMobilities} method for \code{\link{compounds}} is used to (1) add predicted or known IMS data to
+#' annotation candidates and (2) convert (previously added) mobility <--> \acronym{CCS} values. Internally, the
+#' \link[=assignMobilities_susp]{assignMobilities method for suspects} is used to perform these operations, please see
+#' its documentation for more details.
+#'
+#' @param obj The \code{\link{compounds}} object for which IMS assignments should be performed.
+#' @param fGroups The \code{\link{featureGroups}} object for which the compound candidates (\code{obj}) were calculated.
+#' @param from,matchFromBy,overwrite,CCSParams,prefCalcChemProps,neutralChemProps,virtualenv Passed to the
+#'   \link[=assignMobilities_susp]{method for suspects}
+#' @param adduct description
+#'
+#' @template adduct-arg
+#' 
+#' @templateVar consider for IMS assignments
 #' @template IMS-arg
+#'
+#' @note \command{SIRIUS} does currently not report \acronym{InChIKey} values, hence, \code{matchFromBy="InChIKey"} is
+#'   not supported in this case.
+#'
+#'   If compound annotation is performed with \code{\link{generateCompoundsMetFrag}} with \code{database="pubchemlite"}
+#'   then \acronym{CCS} data is already added, provided the local database has it. If you want to overwrite this data,
+#'   set \code{overwrite=TRUE}.
+#'
+#' @seealso The \link[=assignMobilities_susp]{assignMobilities method for suspects}.
+#'
+#' @name assignMobilities_comp
+#' @aliases assignMobilities,compounds-method
 #' @export
 setMethod("assignMobilities", "compounds", function(obj, fGroups, IMS = TRUE, from = NULL, matchFromBy = "InChIKey1",
                                                     overwrite = FALSE, adduct = NULL, CCSParams = NULL,

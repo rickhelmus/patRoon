@@ -274,7 +274,16 @@ setMethod("estimateIDConfidence", "compoundsSet", function(obj, absMzDev = defau
     return(obj)
 })
 
-#' @template IMS-arg
+#' @param \dots \setsWF Further arguments passed to the non-sets workflow method.
+#'
+#' @section Sets workflows: In a \link[=sets-workflow]{sets workflow} the calculations are performed and stored
+#'   independently for each set, as adducts, charges and \emph{m/z} values typically differ.
+#'
+#'   The \code{from} argument may be a \code{list} that specifies the \code{from} values for each set. This is primarily
+#'   intended when tables are used to set \code{from}.
+#'
+#' @rdname assignMobilities_comp
+#' @aliases assignMobilities,compounds-method
 #' @export
 setMethod("assignMobilities", "compoundsSet", function(obj, fGroups, IMS = TRUE, from = NULL, ...)
 {

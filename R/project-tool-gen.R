@@ -996,7 +996,7 @@ doCreateProject <- function(CCSCalibrant, anaInfoTabs, settings, noDate = FALSE)
             {
                 n <- paste0("analysisTableFile", settings$analyses$analysisTableFileType)
                 if (settings$general$ionization == "both")
-                    n <- paste0(n, if (settings$general$ionization == "positive") "Pos" else "Neg")
+                    n <- paste0(n, if (pol == "positive") "Pos" else "Neg")
                 fp <- file.path(settings$general$destination, settings$analyses[[n]])
                 
                 if (settings$analyses$analysisTableFileType == "CSV")
@@ -1008,15 +1008,16 @@ doCreateProject <- function(CCSCalibrant, anaInfoTabs, settings, noDate = FALSE)
             
             ret$tab <- aTab
         }
-        else (settings$analyses$generateAnaInfo == "dynamic")
+        else if (settings$analyses$generateAnaInfo == "dynamic")
         {
-            pf <- if (is.null(pol)) "" else if (pol == "positive") "Pos" else "Neg"
+            pf <- if (settings$general$ionization != "both") "" else if (pol == "positive") "Pos" else "Neg"
             ret <- list(
-                fromRaw = settings$analyses[[paste0("genAnaInfoDynRaw", pol)]],
-                fromCentroid = settings$analyses[[paste0("genAnaInfoDynCentroid", pol)]],
-                fromIMS = settings$analyses[[paste0("genAnaInfoDynIMS", pol)]],
-                fromProfile = settings$analyses[[paste0("genAnaInfoDynProfile", pol)]]
+                fromRaw = settings$analyses[[paste0("genAnaInfoDynRaw", pf)]],
+                fromCentroid = settings$analyses[[paste0("genAnaInfoDynCentroid", pf)]],
+                fromIMS = settings$analyses[[paste0("genAnaInfoDynIMS", pf)]],
+                fromProfile = settings$analyses[[paste0("genAnaInfoDynProfile", pf)]]
             )
+            ret[!sapply(ret, nzchar)] <- list(NULL)
         }
         return(ret)
     }

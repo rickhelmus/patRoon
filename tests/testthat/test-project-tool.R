@@ -120,6 +120,43 @@ testNewProj <- function(..., name, CCSCalib = "", aid = list())
                                        pager = "off", format = "raw", mode = "unified", rds = FALSE, disp.width = 200)),
                      file = diffp, sep = "\n")
     expect_snapshot_file(diffp, name = name, cran = TRUE)
+    
+    if (settings$analyses$generateAnaInfo == "table")
+    {
+        checkCols <- c("analysis", "replicate", "blank", "path_centroid")
+        if (settings$analyses$analysisTableFileType == "CSV")
+        {
+            checkAnaF <- function(f, t)
+            {
+                expect_equal(fread(file.path(path, f), select = checkCols), t[, checkCols, with = FALSE])
+            }
+            if (settings$general$ionization == "positive")
+                checkAnaF(settings$analyses$analysisTableFileCSV, aid$positive)
+            else if (settings$general$ionization == "negative")
+                checkAnaF(settings$analyses$analysisTableFileCSV, aid$negative)
+            else if (settings$general$ionization == "both")
+            {
+                checkAnaF(settings$analyses$analysisTableFileCSVPos, aid$positive)
+                checkAnaF(settings$analyses$analysisTableFileCSVNeg, aid$negative)
+            }
+        }
+        else if (settings$analyses$analysisTableFileType == "R")
+        {
+            checkAnaF <- function(f, t)
+            {
+                expect_equal(eval(parse(file.path(path, f)))[, checkCols], as.data.frame(t)[, checkCols])
+            }
+            if (settings$general$ionization == "positive")
+                checkAnaF(settings$analyses$analysisTableFileR, aid$positive)
+            else if (settings$general$ionization == "negative")
+                checkAnaF(settings$analyses$analysisTableFileR, aid$negative)
+            else if (settings$general$ionization == "both")
+            {
+                checkAnaF(settings$analyses$analysisTableFileRPos, aid$positive)
+                checkAnaF(settings$analyses$analysisTableFileRNeg, aid$negative)
+            }
+        }
+    }
 }
 
 test_that("Default settings", {
@@ -131,7 +168,7 @@ test_that("Default settings", {
 test_that("General settings", {
     # NOTE: ionization pos/neg will not change the default script --> test it in later cases where it does
     testNewProj(general = list(ionization = "both"), name = "general-sets")
-    testNewProj(general = list(IMS = list(mode = "direct"), features = list(featAlgo = "EIC")),
+    testNewProj(general = list(IMS = list(mode = "direct")), features = list(featAlgo = "EIC"),
                 name = "general-ims_direct")
     testNewProj(general = list(IMS = list(mode = "post")), name = "general-ims_post")
     # UNDONE: verify limits.yml instrument
@@ -139,5 +176,53 @@ test_that("General settings", {
 })
 
 test_that("Analysis settings", {
+    aid <- list(positive = makeDT(patRoonData::exampleAnalysisInfo("positive")),
+                negative = makeDT(patRoonData::exampleAnalysisInfo("negative")))
+    aid$positive$type <- aid$negative$type <- "centroid"
+    
     testNewProj(analyses = list(generateAnaInfo = "example"), name = "analysis-example")
+    
+    testNewProj(analyses = list(generateAnaInfo = "table", analysisTableFileType = "CSV"), aid = aid,
+                name = "analysis-tab_csv_pos")
+    testNewProj(general = list(ionization = "negative"),
+                analyses = list(generateAnaInfo = "table", analysisTableFileType = "CSV"), aid = aid,
+                name = "analysis-tab_csv_neg")
+    testNewProj(general = list(ionization = "both"),
+                analyses = list(generateAnaInfo = "table", analysisTableFileType = "CSV"), aid = aid,
+                name = "analysis-tab_csv_both")
+    
+    testNewProj(analyses = list(generateAnaInfo = "table", analysisTableFileType = "R"), aid = aid,
+                name = "analysis-tab_R_pos")
+    testNewProj(general = list(ionization = "negative"),
+                analyses = list(generateAnaInfo = "table", analysisTableFileType = "R"), aid = aid,
+                name = "analysis-tab_R_neg")
+    testNewProj(general = list(ionization = "both"),
+                analyses = list(generateAnaInfo = "table", analysisTableFileType = "R"), aid = aid,
+                name = "analysis-tab_R_both")
+    
+    testNewProj(analyses = list(generateAnaInfo = "table", analysisTableFileType = "embedded"), aid = aid,
+                name = "analysis-tab_emb_pos")
+    testNewProj(general = list(ionization = "negative"),
+                analyses = list(generateAnaInfo = "table", analysisTableFileType = "embedded"), aid = aid,
+                name = "analysis-tab_emb_neg")
+    testNewProj(general = list(ionization = "both"),
+                analyses = list(generateAnaInfo = "table", analysisTableFileType = "embedded"), aid = aid,
+                name = "analysis-tab_emb_both")
+    
+    testNewProj(analyses = list(generateAnaInfo = "dynamic", genAnaInfoDynRaw = "raw"), name = "analysis-dyn_raw_only")
+    testNewProj(analyses = list(generateAnaInfo = "dynamic", genAnaInfoDynRaw = "raw",
+                                genAnaInfoDynCentroid = "centroid", genAnaInfoDynIMS = "ims",
+                                genAnaInfoDynProfile = "profile"),
+                name = "analysis-dyn")
+    testNewProj(general = list(ionization = "both"),
+                analyses = list(generateAnaInfo = "dynamic",
+                                genAnaInfoDynRawPos = "rawpos",
+                                genAnaInfoDynRawNeg = "rawneg",
+                                genAnaInfoDynCentroidPos = "centroidpos",
+                                genAnaInfoDynCentroidNeg = "centroidneg",
+                                genAnaInfoDynIMSPos = "imspos",
+                                genAnaInfoDynIMSNeg = "imsneg",
+                                genAnaInfoDynProfilePos = "profilepos",
+                                genAnaInfoDynProfileNeg = "profileneg"),
+                name = "analysis-dyn_sets")
 })

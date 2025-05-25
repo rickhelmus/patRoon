@@ -1,4 +1,5 @@
-splitConvTypeFormat <- function(typeFormat) strsplit(typeFormat, "_")
+joinConvTypeFormat <- function(t, f) paste0(t, "+", f)
+splitConvTypeFormat <- function(typeFormat) strsplit(typeFormat, "+", fixed = TRUE)
 
 newProjectPreTreatUI <- function(id)
 {
@@ -42,7 +43,7 @@ newProjectPreTreatServer <- function(id, ionization, settings)
         return(sapply(fTypes, function(ft)
         {
             formats <- getMSConversionFormats(algo, dir, ft)
-            return(setNames(paste0(ft, "_", formats), paste0(formats, " (", ft, ")")))
+            return(setNames(joinConvTypeFormat(ft, formats), paste0(formats, " (", ft, ")")))
         }, simplify = FALSE))
     }
     
@@ -313,8 +314,8 @@ upgradePreTreatSettings <- function(settings)
             "centroid"
         else
             "profile"
-        ret$steps <- data.table(algorithm = settings$convAlgo, from = paste0(fromt, "_", settings$convFrom),
-                                to = paste0(tot, "_", settings$convTo))
+        ret$steps <- data.table(algorithm = settings$convAlgo, from = joinConvTypeFormat(fromt, settings$convFrom),
+                                to = joinConvTypeFormat(tot, settings$convTo))
     }
     
     ret$brukerCalib <- list(enabled = settings$doDACalib, method = settings$DAMethod,

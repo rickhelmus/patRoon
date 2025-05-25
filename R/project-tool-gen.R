@@ -791,7 +791,7 @@ genScriptAnnBlock <- function(ionization, IMS, settingsAnn, adductArg, doSusps, 
             generator$addNL()
             generator$addCall("compounds", "estimateIDConfidence", list(
                 list(value = "compounds"),
-                list(name = "MSPeakLists", value = "mslists", isNULL = !doForms),
+                list(name = "MSPeakLists", value = "mslists"),
                 list(name = "formulas", value = "formulas", isNULL = !doForms),
                 list(name = "IDFile", value = "idlevelrules.yml", quote = TRUE)
             ))

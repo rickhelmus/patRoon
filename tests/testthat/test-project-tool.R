@@ -330,3 +330,28 @@ test_that("Feature settings", {
     testNewProj(features = list(fGroupsAdv = list(featNorm = "tic", groupNorm = TRUE)),
                 name = "features-norm_tic_group")
 })
+
+test_that("annotation settings", {
+    testNewProj(annotations = list(componAlgo = "RAMClustR"), name = "annotation-compon_rc")
+    testNewProj(annotations = list(componAlgo = "CAMERA", selectIons = FALSE),
+                name = "annotation-compon_camera_nosel")
+    testNewProj(annotations = list(componAlgo = "nontarget"), name = "annotation-compon_nt")
+    
+    testNewProj(annotations = list(formulasAlgo = "GenForm"), name = "annotation-formulas_genform")
+    testNewProj(annotations = list(formulasAlgo = "SIRIUS", estIDConf = character()),
+                name = "annotation-formulas_sirius_noann")
+    
+    testNewProj(annotations = list(compoundsAlgo = "MetFrag"), name = "annotation-compounds_metfrag")
+    testNewProj(annotations = list(compoundsAlgo = "SIRIUS", estIDConf = character()),
+                name = "annotation-compounds_sirius_noann")
+    testNewProj(annotations = list(compoundsAlgo = "Library", MSLibraryPath = "lib", MSLibraryFormat = "json"),
+                name = "annotation-compounds_library")
+    
+    testNewProj(general = list(IMS = list(mode = "post", CCSMethod = "bruker")),
+                annotations = list(compoundsAlgo = "MetFrag", compCCSPred = "c3sdb"),
+                name = "annotation-compounds_ims_conv_pred")
+    
+    testNewProj(features = list(exSuspList = TRUE),
+                annotations = list(formulasAlgo = "GenForm", compoundsAlgo = "MetFrag"),
+                name = "annotation-susp_ann")
+})

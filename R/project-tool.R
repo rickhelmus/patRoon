@@ -89,6 +89,9 @@ readProjectSettings <- function(file, destPath)
                                               from = as.character(settings$preTreatment$steps$from),
                                               to = as.character(settings$preTreatment$steps$to))
     
+    # handle empty vector to list converion
+    settings$annotations$estIDConf <- as.character(settings$annotations$estIDConf)
+    
     return(settings)
 }
 

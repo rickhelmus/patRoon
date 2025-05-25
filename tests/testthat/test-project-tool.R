@@ -376,3 +376,8 @@ test_that("TP settings", {
                 TPs = list(TPsAlgo = "ann_comp", TPGenInput = "suspects", TPSuspectList = "suspects"),
                 name = "tp-ann_comp")
 })
+
+test_that("Report settings", {
+    testNewProj(report = list(reportGen = c("HTML", "legacy"), reportLegacy = c("CSV", "PDF")), 
+                name = "report-html_legacy_csv_pdf")
+})

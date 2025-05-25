@@ -78,7 +78,13 @@ modifyDefSettings <- function(general = NULL, analyses = NULL, preTreatment = NU
     if (!is.null(analyses))
         settings$analyses <- modifyList(settings$analyses, analyses)
     if (!is.null(preTreatment))
-        settings$preTreatment <- modifyList(settings$preTreatment, preTreatment)
+    {
+        # HACK: don't try to change steps with modifyList(), gives errors
+        ptNoSteps <- preTreatment[names(preTreatment) != "steps"]
+        settings$preTreatment <- modifyList(settings$preTreatment, ptNoSteps)
+        if (!is.null(preTreatment[["steps"]]))
+            settings$preTreatment$steps <- copy(preTreatment$steps)
+    }
     if (!is.null(features))
         settings$features <- modifyList(settings$features, features)
     if (!is.null(annotations))
@@ -225,4 +231,29 @@ test_that("Analysis settings", {
                                 genAnaInfoDynProfilePos = "profilepos",
                                 genAnaInfoDynProfileNeg = "profileneg"),
                 name = "analysis-dyn_sets")
+})
+
+test_that("Pre-treatment settings", {
+    testNewProj(preTreatment = list(
+        steps = rbindlist(list(
+            # just try to cover most algos with some formats
+            data.table(algorithm = "pwiz", from = joinConvTypeFormat("raw", "thermo"),
+                       to = joinConvTypeFormat("centroid", "mzML")),
+            data.table(algorithm = "openms", from = joinConvTypeFormat("centroid", "mzML"),
+                       to = joinConvTypeFormat("centroid", "mzXML")),
+            data.table(algorithm = "bruker", from = joinConvTypeFormat("raw", "bruker"),
+                       to = joinConvTypeFormat("profile", "mzML")),
+            data.table(algorithm = "im_collapse", from = joinConvTypeFormat("ims", "mzML"),
+                       to = joinConvTypeFormat("centroid", "mzML")),
+            data.table(algorithm = "timsconvert", from = joinConvTypeFormat("raw", "bruker_ims"),
+                       to = joinConvTypeFormat("profile", "mzML"))
+        ))),
+        name = "pretreatment-steps"
+    )
+    testNewProj(preTreatment = list(brukerCalib = list(enabled = TRUE, method = "method")),
+                name = "pretreatment-bruker_calib")
+    testNewProj(general = list(ionization = "both"),
+                preTreatment = list(brukerCalib = list(enabled = TRUE, methodPos = "method-pos",
+                                                       methodNeg = "method-neg")),
+                name = "pretreatment-bruker_calib_sets")
 })

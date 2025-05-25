@@ -383,3 +383,8 @@ test_that("Report settings", {
     testNewProj(report = list(reportGen = c("HTML", "legacy"), reportLegacy = c("CSV", "PDF")), 
                 name = "report-html_legacy_csv_pdf")
 })
+
+test_that("Old setting conversion", {
+    expect_snapshot(readProjectSettings(file.path(getTestDataPath(), "newProject-23.yml"), defaultTestDir),
+                    cran = TRUE)
+})

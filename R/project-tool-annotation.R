@@ -153,14 +153,14 @@ defaultAnnotationSettings <- function()
     ))
 }
 
-upgradeAnnotationSettings <- function(settings)
+upgradeAnnotationsSettings <- function(settings)
 {
     # NOTE: this updates from first file version
     # NOTE: some settings are ignored (eg MSPL algos, DIA)
     ret <- modifyList(defaultAnnotationSettings(), settings[c("selectIons", "MSLibraryFormat", "MSLibraryPath")])
     ret$componAlgo <- settings$components
-    ret$formulasAlgo <- ret$formulaGen
-    ret$compoundsAlgo <- ret$compIdent
+    ret$formulasAlgo <- settings$formulaGen
+    ret$compoundsAlgo <- settings$compIdent
     if (!settings$annotateSus)
         ret$estIDConf <- setdiff(ret$estIDConf, "suspects")
     return(ret)

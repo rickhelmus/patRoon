@@ -452,7 +452,9 @@ upgradeFeaturesSettings <- function(settings)
     ret$retention <- c(settings[["retention-min"]], settings[["retention-max"]])
     ret$mz <- c(settings[["mz-min"]], settings[["mz-max"]])
     ret$fGroupsAdv <- settings[c("preIntThr", "intThr", "repAbundance", "maxRepRSD", "blankThr", "removeBlanks",
-                                 "retention", "mz", "featNorm", "groupNorm")]
+                                 "featNorm", "groupNorm")]
+    ret$fGroupsAdv$retention <- c(settings[["retention-min"]], settings[["retention-max"]])
+    ret$fGroupsAdv$mz <- c(settings[["mz-min"]], settings[["mz-max"]])
     ret$fGroupsAdv$ISTDLists <- list(single = settings$ISTDList,
                                      sets = list(pos = settings$ISTDListPos, neg = settings$ISTDListNeg))
     return(ret)

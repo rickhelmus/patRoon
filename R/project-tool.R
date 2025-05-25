@@ -73,9 +73,9 @@ readProjectSettings <- function(file, destPath)
         settings <- list(general = upgradeGeneralSettings(settings, destPath),
                          analyses = upgradeAnalysesSettings(settings),
                          preTreatment = upgradePreTreatSettings(settings),
-                         features = upgradeFeatureSettings(settings),
-                         annotations = upgradeAnnotationSettings(settings),
-                         TPs = upgradeTPSettings(settings),
+                         features = upgradeFeaturesSettings(settings),
+                         annotations = upgradeAnnotationsSettings(settings),
+                         TPs = upgradeTPsSettings(settings),
                          report = upgradeReportSettings(settings))
     }
     

@@ -332,26 +332,47 @@ test_that("Feature settings", {
 })
 
 test_that("annotation settings", {
-    testNewProj(annotations = list(componAlgo = "RAMClustR"), name = "annotation-compon_rc")
+    testNewProj(annotations = list(componAlgo = "RAMClustR"), name = "annotations-compon_rc")
     testNewProj(annotations = list(componAlgo = "CAMERA", selectIons = FALSE),
-                name = "annotation-compon_camera_nosel")
-    testNewProj(annotations = list(componAlgo = "nontarget"), name = "annotation-compon_nt")
+                name = "annotations-compon_camera_nosel")
+    testNewProj(annotations = list(componAlgo = "nontarget"), name = "annotations-compon_nt")
     
-    testNewProj(annotations = list(formulasAlgo = "GenForm"), name = "annotation-formulas_genform")
+    testNewProj(annotations = list(formulasAlgo = "GenForm"), name = "annotations-formulas_genform")
     testNewProj(annotations = list(formulasAlgo = "SIRIUS", estIDConf = character()),
-                name = "annotation-formulas_sirius_noann")
+                name = "annotations-formulas_sirius_noann")
     
-    testNewProj(annotations = list(compoundsAlgo = "MetFrag"), name = "annotation-compounds_metfrag")
+    testNewProj(annotations = list(compoundsAlgo = "MetFrag"), name = "annotations-compounds_metfrag")
     testNewProj(annotations = list(compoundsAlgo = "SIRIUS", estIDConf = character()),
-                name = "annotation-compounds_sirius_noann")
+                name = "annotations-compounds_sirius_noann")
     testNewProj(annotations = list(compoundsAlgo = "Library", MSLibraryPath = "lib", MSLibraryFormat = "json"),
-                name = "annotation-compounds_library")
+                name = "annotations-compounds_library")
     
     testNewProj(general = list(IMS = list(mode = "post", CCSMethod = "bruker")),
                 annotations = list(compoundsAlgo = "MetFrag", compCCSPred = "c3sdb"),
-                name = "annotation-compounds_ims_conv_pred")
+                name = "annotations-compounds_ims_conv_pred")
     
     testNewProj(features = list(exSuspList = TRUE),
                 annotations = list(formulasAlgo = "GenForm", compoundsAlgo = "MetFrag"),
-                name = "annotation-susp_ann")
+                name = "annotations-susp_ann")
+})
+
+test_that("TP settings", {
+    testNewProj(TPs = list(TPsAlgo = "logic"), name = "tp-logic")
+    testNewProj(TPs = list(TPsAlgo = "biotransformer", TPGenInput = "suspects", TPSuspectList = "suspects"),
+                name = "tp-biotransformer_suspects")
+    testNewProj(annotations = list(compoundsAlgo = "MetFrag"),
+                TPs = list(TPsAlgo = "biotransformer", TPGenInput = "suspects", TPSuspectList = "suspects",
+                           TPDoMFDB = TRUE), name = "tp-biotransformer_mfdb")
+    testNewProj(annotations = list(compoundsAlgo = "MetFrag"),
+                TPs = list(TPsAlgo = "biotransformer", TPGenInput = "suspects", TPSuspectList = "suspects",
+                           TPDoMFDB = FALSE), name = "tp-biotransformer_no_mfdb")
+    testNewProj(features = list(exSuspList = TRUE),
+                TPs = list(TPsAlgo = "cts", TPGenInput = "screening"), name = "tp-cts_scr")
+    testNewProj(TPs = list(TPsAlgo = "library", TPGenInput = "all"), name = "tp-library")
+    testNewProj(annotations = list(formulasAlgo = "GenForm"),
+                TPs = list(TPsAlgo = "ann_form", TPGenInput = "suspects", TPSuspectList = "suspects"),
+                name = "tp-ann_form")
+    testNewProj(annotations = list(compoundsAlgo = "MetFrag"),
+                TPs = list(TPsAlgo = "ann_comp", TPGenInput = "suspects", TPSuspectList = "suspects"),
+                name = "tp-ann_comp")
 })

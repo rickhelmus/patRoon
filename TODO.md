@@ -215,7 +215,6 @@
     - manually check all HTML reporting functionality at the end
     - generateAnalysisInfo()?
 - newProject()
-    - importing old yml files, esp wrt file conversion
     - see where testing is slow, possibly disable testServer() on CI?
 
 

@@ -257,3 +257,76 @@ test_that("Pre-treatment settings", {
                                                        methodNeg = "method-neg")),
                 name = "pretreatment-bruker_calib_sets")
 })
+
+test_that("Feature settings", {
+    testNewProj(features = list(featAlgo = "XCMS"), name = "features-xcms")
+    testNewProj(features = list(featAlgo = "enviPick"), name = "features-envipick")
+    testNewProj(features = list(featAlgo = "KPIC2"), name = "features-kpic2")
+    testNewProj(features = list(featAlgo = "SIRIUS"), name = "features-sirius")
+    testNewProj(features = list(featAlgo = "Bruker"), name = "features-bruker")
+    
+    testNewProj(features = list(featAlgo = "EIC", featEICParams = list(methodMZ = "bins")), name = "features-eic_bins")
+    testNewProj(features = list(featAlgo = "EIC", featEICParams = list(methodMZ = "bins", peaksAlgo = "openms")),
+                name = "features-eic_bins_openms")
+    testNewProj(features = list(featAlgo = "EIC", featEICParams = list(methodMZ = "suspects",
+                                                                       suspects = list(single = "suspects"))),
+                name = "features-eic_suspects")
+    testNewProj(general = list(ionization = "both"),
+                features = list(featAlgo = "EIC",
+                                featEICParams = list(methodMZ = "suspects",
+                                                     suspects = list(sets = list(pos = "suspects-pos",
+                                                                                 neg = "suspects-neg")))),
+                name = "features-eic_suspects_sets")
+    testNewProj(features = list(featAlgo = "EIC", featEICParams = list(methodMZ = "ms2")), name = "features-eic_ms2")
+    
+    testNewProj(features = list(fGroupsAlgo = "XCMS"), name = "features-fgroups-xcms")
+    testNewProj(features = list(fGroupsAlgo = "KPIC2"), name = "features-fgroups-kpic2")
+    testNewProj(features = list(fGroupsAlgo = "SIRIUS"), name = "features-fgroups-sirius")
+    
+    testNewProj(general = list(IMS = list(mode = "post")),
+                features = list(IMSPeaksMob = "xcms", IMSPeaksChrom = "envipick"), name = "features-ims_peak")
+    
+    testNewProj(features = list(suspects = list(single = "suspects")), name = "features-suspects")
+    testNewProj(features = list(featAlgo = "EIC", featEICParams = list(methodMZ = "suspects",
+                                                                       suspects = list(single = "")),
+                                suspects = list(single = "suspects")), name = "features-suspects_eic")
+    testNewProj(features = list(featAlgo = "EIC", featEICParams = list(methodMZ = "suspects",
+                                                                       suspects = list(single = "suspectsEIC")),
+                                suspects = list(single = "suspects")), name = "features-suspects_eic_suspects")
+    testNewProj(general = list(ionization = "both"),
+                features = list(suspects = list(sets = list(pos = "suspectsPos", neg = "suspectsNeg"))),
+                name = "features-suspects_sets")
+    testNewProj(general = list(ionization = "both"),
+                features = list(featAlgo = "EIC",
+                                featEICParams = list(methodMZ = "suspects",
+                                                     suspects = list(sets = list(pos = "suspectsEICPos", 
+                                                                                 neg = "suspectsEICNeg"))),
+                                suspects = list(sets = list(pos = "suspectsPos", neg = "suspectsNeg"))),
+                name = "features-suspects_sets_eic_suspects")
+    testNewProj(features = list(exSuspList = TRUE), name = "features-suspects_ex")
+    testNewProj(general = list(ionization = "both"), features = list(exSuspList = TRUE),
+                name = "features-suspects_sets_ex")
+    
+    testNewProj(general = list(IMS = list(mode = "single")),
+                features = list(exSuspList = TRUE, IMSSuspCCSPred = "c3sdb"),
+                name = "features-ims_susp_pred")
+    testNewProj(general = list(ionization = "both", IMS = list(mode = "single")),
+                features = list(exSuspList = TRUE, IMSSuspCCSPred = "c3sdb"),
+                name = "features-ims_susp_pred_sets")
+    
+    testNewProj(features = list(fGroupsAdv = list(preIntThr = 3E5, intThr = 3E6, repAbundance = 0.5,
+                                                  maxRepRSD = 0.25, blankThr = 10, removeBlanks = FALSE,
+                                                  retention = c(60, 10000), mz = c(10, 1000))),
+                name = "features-filters")
+    
+    testNewProj(features = list(fGroupsAdv = list(featNorm = "istd", ISTDLists = list(single = "istd"))),
+                name = "features-norm_istd")
+    testNewProj(general = list(ionization = "both"),
+                features = list(fGroupsAdv = list(featNorm = "istd",
+                                                  ISTDLists = list(sets = list(pos = "istd-pos", neg = "istd-neg")))),
+                name = "features-norm_istd_sets")
+    testNewProj(features = list(exSuspList = TRUE, fGroupsAdv = list(featNorm = "istd")),
+                name = "features-norm_istd_ex")
+    testNewProj(features = list(fGroupsAdv = list(featNorm = "tic", groupNorm = TRUE)),
+                name = "features-norm_tic_group")
+})

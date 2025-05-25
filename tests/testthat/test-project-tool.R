@@ -177,8 +177,10 @@ test_that("General settings", {
     testNewProj(general = list(IMS = list(mode = "direct")), features = list(featAlgo = "EIC"),
                 name = "general-ims_direct")
     testNewProj(general = list(IMS = list(mode = "post")), name = "general-ims_post")
-    # UNDONE: verify limits.yml instrument
-    testNewProj(general = list(IMS = list(mode = "post", CCSMethod = "agilent")), name = "general-ims_post_agilent")
+    
+    testNewProj(general = list(IMS = list(mode = "post", CCSMethod = "agilent", limits = "agilent")),
+                name = "general-ims_post_agilent")
+    expect_equal(readYAML(file.path(testBaseDir, "general-ims_post_agilent", "limits.yml"))$general$IMS, "agilent")
 })
 
 test_that("Analysis settings", {

@@ -216,8 +216,7 @@
     - generateAnalysisInfo()?
 - newProject()
     - importing old yml files, esp wrt file conversion
-    - creation of yml files
-        - check if right IMS instrument is set in limits.yml
+    - see where testing is slow, possibly disable testServer() on CI?
 
 
 ## Docs

@@ -173,6 +173,7 @@
         - use eg mzR, MSTK, SC to get eg EICs or PLs
 - IMS
     - add IMSRangeParams/withIMSParent/applyIMS filters also to features method?
+         - only IMSRangeParams would make sense, as others don't for direct workflows
     - more verification that normInts() works before/after assignMobilities()
     - IMS arg for [, filter(), ADT, and plotting functions
     - applyMS for filter()
@@ -270,10 +271,6 @@
             - add link to piek, and possibly import for direct IMS assignment
         - compounds method
             - PCL already has CCSbase, so no need to convert (also mention elsewhere?)
-    - normInts()
-        - istd hits of mobility features are not used (IMS="maybe")
-        - mobility features are ignored (IMS="maybe") for tic
-        - relative intensities/areas are copied from parents
     - plotChroms()/plotMobilograms()
         - annotate has mob option
         - intMax can only work for EICs (mob inten may not be stored)

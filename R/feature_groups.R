@@ -1129,6 +1129,11 @@ setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduc
 #'   still occurs automatically if \code{normInts} was not called when a method is executed that requests normalized
 #'   data.
 #'
+#'   In IMS workflows with post mobility assignment (see \link[=assignMobilities_feat]{assignMobilities}), any mobility
+#'   features are excluded for the assignment of internal standards (\code{featNorm="istd"}) or calculation of TICs
+#'   (\code{featNorm="tic"}). Furthermore, the normalized intensities and areas for mobility features are copied from
+#'   their IMS parents.
+#'
 #' @return \code{normInts} returns a \code{featureGroups} object, amended with data in the \code{ISTDs} and
 #'   \code{ISTDAssignments} slots if \code{featNorm="istd"}.
 #'

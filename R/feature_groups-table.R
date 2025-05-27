@@ -49,6 +49,9 @@ NULL
 #' @param onlyHits If \code{TRUE} then only feature groups with suspect hits are reported.
 #' @param \dots Passed to the parent \code{as.data.table} method.
 #'
+#' @templateVar consider to be returned
+#' @template IMS-arg
+#'
 #' @section Regression calculation: The \code{regression} argument controls the calculation of regression parameters
 #'   from a regression model calculated with feature intensities (or areas if \code{areas=TRUE}). Here, simple linear
 #'   regression is used, \emph{i.e.} \samp{y=ax+b} with \samp{a} the slope and \samp{b} the intercept. The value for
@@ -80,6 +83,12 @@ NULL
 #'   \code{\link{predictTox}} was called on the feature groups object), then only the suspect specific data is reported
 #'   and no aggregation is performed. Hence, this allows you to obtain specific concentration/toxicity values for each
 #'   suspect/feature group pair.
+#'
+#' @section IMS workflows: If the \code{IMS} argument is set to \code{"both"} or \code{"maybe"} then
+#'   \code{"mobility_collapsed"} and \code{"CCS_collapsed"} columns will be added that summarize all
+#'   mobility/\acronym{CCS} values of the mobility features (or feature groups) assigned to this IMS parent. These
+#'   numbers are currently rounded to \samp{3} decimals.
+#'
 #'
 #' @section Sets workflows: In a \link[=sets-workflow]{sets workflow} normalization of feature intensities occur per
 #'   set.
@@ -224,6 +233,7 @@ doFGAADTGroups <- function(fGroups, intColNames, average, averageBy, areas, addQ
                 }
             }
             # UNDONE: is the rounding with a good number?
+            # NOTE: update docs if this is changed
             doCollapse("mobility", 3)
             doCollapse("CCS", 3)
         }
@@ -410,7 +420,11 @@ doFGAADTFeatures <- function(fGroups, fgTab, intColNames, average, averageBy, ad
     if (IMS != "both" && hasMobilities(fGroups))
     {
         fTabOrig <- featureTable(fGroupsOrig)
-        digits <- 3 # UNDONE: is this a good number?
+        
+        # UNDONE: is this a good number?
+        # NOTE: update docs if this is changed
+        digits <- 3
+        
         featTab[!is.na(mobility), mobility_collapsed := as.character(round(mobility, digits))]
         featTab[is.na(mobility), mobility_collapsed := mapply(ID, analysis, FUN = function(i, a)
         {

@@ -273,8 +273,6 @@
         - compounds method
             - PCL already has CCSbase, so no need to convert (also mention elsewhere?)
     - IMSRangeParams filter --> when feature filter is there
-    - ADT
-        - IMS option and mobility_collapsed column, which contains rounded numbers
     - components
         - doc that expandForIMS() may needs to be called after tree splitting
             - improve printed NOTE with link to manual?

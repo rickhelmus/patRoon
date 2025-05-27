@@ -8,9 +8,7 @@
 
 
 checkFeaturesInterface <- setRefClass("checkFeaturesInterface", contains = "checkUIInterface",
-                                      fields = c(fGroups = "featureGroups", EICParams = "list",
-                                                 EICsTopMost = "list", EICsTopMostRep = "list", EICsAll = "list",
-                                                 EICPreviews = "list"))
+                                      fields = c(fGroups = "featureGroups", EIC = "list", EIM = "list"))
 
 checkFeaturesInterface$methods(
     
@@ -49,7 +47,7 @@ checkFeaturesInterface$methods(
             ),
             fillRow(
                 checkboxGroupInput("fGroupColumns", "Feature groub table columns",
-                                   c("Retention time & m/z" = "retMZ",
+                                   c("Retention time, m/z & IMS" = "retMZIMS",
                                      "EIC preview" = "EICPreview",
                                      "Ion annotations" = "ionAnn",
                                      "Total score" = "totalScore",
@@ -58,7 +56,7 @@ checkFeaturesInterface$methods(
             ),
             fillRow(
                 checkboxGroupInput("featureColumns", "Feature table columns",
-                                   c("Retention time & m/z" = "retMZ",
+                                   c("Retention time, m/z & IMS" = "retMZIMS",
                                      "Replicate" = "replicate",
                                      "Blank" = "blank",
                                      "Quantity" = "quantity",
@@ -76,10 +74,20 @@ checkFeaturesInterface$methods(
     defaultUISettings = function()
     {
         return(list(retUnit = "sec", featQuantity = "intensity", fGroupQuantity = "average",
-                    fGroupColumns = c("retMZ", "estIDLevel", "totalScore"),
-                    featureColumns = c("retMZ", "quantity", "totalScore")))
+                    fGroupColumns = c("retMZIMS", "totalScore"),
+                    featureColumns = c("retMZIMS", "quantity", "totalScore")))
     },
     UISettingsFileName = function() "check_features.yml",
+    UISettingsVersion = function() 2L,
+    upgradeUISettings = function(settings)
+    {
+        if (settings$version < 2L)
+        {
+            settings$fGroupColumns <- sub("retMZ", "retMZIMS", settings$fGroupColumns)
+            settings$featureColumns <- sub("retMZ", "retMZIMS", settings$featureColumns)
+        }
+        return(settings)
+    },
     
     getSecondarySelections = function(primSel)
     {
@@ -151,16 +159,17 @@ checkFeaturesInterface$methods(
         {
             gData[, EIC := sapply(names(fGroups), function(g)
             {
-                jsonlite::toJSON(list(values = EICPreviews[[g]]$intensity, xvalues = EICPreviews[[g]]$time,
+                jsonlite::toJSON(list(values = EIC$previews[[g]]$intensity, xvalues = EIC$previews[[g]]$time,
                                       options = list(type = "line", height = 50)))
             })]
             setcolorder(gData, c("group", "EIC"))
         }
         
-        if (!"retMZ" %in% rValues$settings$fGroupColumns)
-            gData[, c("ret", "mz") := NULL]
+        if (!"retMZIMS" %in% rValues$settings$fGroupColumns)
+            gData <- removeDTColumnsIfPresent(gData, c("ret", "mz", "mobility", "CCS"))
         else if (rValues$settings$retUnit == "min")
             gData[, ret := ret / 60]
+        gData <- removeDTColumnsIfPresent(gData, c("mobility_collapsed", "CCS_collapsed"))
         
         if (!"ionAnn" %in% rValues$settings$fGroupColumns)
         {
@@ -190,8 +199,16 @@ checkFeaturesInterface$methods(
         divret <- if (rValues$settings$retUnit == "min") 60 else 1
         
         fData <- data.table(analysis = ai$analysis)
-        if ("retMZ" %in% rValues$settings$featureColumns)
+        if ("retMZIMS" %in% rValues$settings$featureColumns)
+        {
             fData[, c("ret", "mz") := .(feat$ret / divret, feat$mz)]
+            for (col in c("mobility", "CCS"))
+            if (hasMobilities(fGroups))
+            {
+                if (!is.null(feat[[col]]))
+                    fData[, (col) := feat[[col]]]
+            }
+        }
         if ("replicate" %in% rValues$settings$featureColumns)
             fData[, replicate := ai$replicate]
         if ("blank" %in% rValues$settings$featureColumns)
@@ -228,18 +245,27 @@ checkFeaturesInterface$methods(
         })
         
         observeEvent(input$fGroupPlotMode, {
-            if ((input$fGroupPlotMode == "topMostByReplicate" && length(EICsTopMostRep) == 0) ||
-                (input$fGroupPlotMode == "all" && length(EICsAll) == 0))
+            for (type in c("EIC", "EIM"))
             {
-                not <- showNotification("Loading EICs...", duration = NULL, closeButton = FALSE, type = "message")
-                if (input$fGroupPlotMode == "topMostByReplicate")
-                    EICsTopMostRep <<- getFeatureEIXs(fGroups, type = "EIC",
-                                                     EIXParams = modifyList(EICParams, list(topMost = 1,
-                                                                                            topMostByReplicate = TRUE)))
-                else
-                    EICsAll <<- getFeatureEIXs(fGroups, type = "EIC",
-                                               EIXParams = modifyList(EICParams, list(topMost = NULL), keep.null = TRUE))
-                removeNotification(not)
+                if (type == "EIM" && !hasMobilities(fGroups))
+                    next
+                if ((input$fGroupPlotMode == "topMostByReplicate" && length(.self[[type]]$topMostRep) == 0) ||
+                    (input$fGroupPlotMode == "all" && length(.self[[type]]$all) == 0))
+                {
+                    not <- showNotification(sprintf("Loading %ss...", type), duration = NULL, closeButton = FALSE,
+                                            type = "message")
+                    if (input$fGroupPlotMode == "topMostByReplicate")
+                    {
+                        eixp <- modifyList(.self[[type]]$params, list(topMost = 1, topMostByReplicate = TRUE))
+                        .self[[type]]$topMostRep <- getFeatureEIXs(fGroups, type = type, EIXParams = eixp)
+                    }
+                    else
+                    {
+                        eixp <-  modifyList(.self[[type]]$params, list(topMost = NULL), keep.null = TRUE)
+                        .self[[type]]$all <- getFeatureEIXs(fGroups, type = type, EIXParams = eixp)
+                    }
+                    removeNotification(not)
+                }
             }
             rValues$fGroupPlotMode <- input$fGroupPlotMode
         })
@@ -247,13 +273,19 @@ checkFeaturesInterface$methods(
     
     plotMain = function(input, rValues)
     {
-        EICs <- switch(rValues$fGroupPlotMode,
-                       topMost = EICsTopMost,
-                       topMostByReplicate = EICsTopMostRep,
-                       all = EICsAll
-        )
-        if (length(EICs) == 0)
-            EICs <- NULL # not (yet) loaded, in this case plotChroms() will make its own but EICs must be NULL
+        doEIM <- hasMobilities(fGroups)
+        
+        getEIX <- function(type)
+        {
+            ret <- switch(rValues$fGroupPlotMode,
+                          topMost = .self[[type]]$topMost,
+                          topMostByReplicate = .self[[type]]$topMostRep,
+                          all = .self[[type]]$all
+            )
+            if (length(ret) == 0)
+                ret <- NULL # not (yet) loaded, in this case plotChroms()/plotMobilogram() will make its own but EIXs must be NULL
+            return(ret)
+        }
         
         fg <- fGroups[, rValues$currentPrimSel]
         if (rValues$fGroupPlotMode == "all") # UNDONE: also for replicates top most somehow?
@@ -263,19 +295,38 @@ checkFeaturesInterface$methods(
                 fg <- fg[setdiff(getSecondarySelections(rValues$currentPrimSel), rp)]
         }
         
-        ep <- getDefEICParams(topMost = if (rValues$fGroupPlotMode == "all") NULL else 1,
-                              topMostByReplicate = rValues$fGroupPlotMode == "topMostByReplicate")
-        
         bg <- if (rValues$currentPrimSel %in% rValues$removeFully) RColorBrewer::brewer.pal(9, "Reds")[[1]] else "white"
         withr::with_par(list(mar = c(4, 4, 0.1, 1), cex = 1.5, bg = bg), {
+            scr <- NULL
+            
+            if (doEIM)
+            {
+                scr <- split.screen(c(1, 2))
+                screen(scr[1])
+            }
+            
+            EICs <- getEIX("EIC")
+            ep <- getDefEICParams(topMost = if (rValues$fGroupPlotMode == "all") NULL else 1,
+                                  topMostByReplicate = rValues$fGroupPlotMode == "topMostByReplicate")
             plotChroms(fg, EICs = EICs, groupBy = "replicate", showPeakArea = TRUE, EICParams = ep,
                        showFGroupRect = FALSE, title = "", retMin = rValues$settings$retUnit == "min")
+            
+            if (doEIM)
+            {
+                EIMs <- getEIX("EIM")
+                ep <- getDefEIMParams(topMost = if (rValues$fGroupPlotMode == "all") NULL else 1,
+                                      topMostByReplicate = rValues$fGroupPlotMode == "topMostByReplicate")
+                screen(scr[2])
+                plotMobilogram(fg, EIMs = EIMs, groupBy = "replicate", showPeakArea = TRUE, EIMParams = ep,
+                               showFGroupRect = FALSE, title = "")
+                close.screen(scr)
+            }
         })
     },
     
     saveSession = function(s)
     {
-        # remove oldd selections if present, eg now removed due to subsetting fGroups
+        # remove old selections if present, eg now removed due to subsetting fGroups
         s$removeFully <- intersect(s$removeFully, names(fGroups))
         s$removePartially <- s$removePartially[names(s$removePartially) %in% names(fGroups)]
         sessionGrps <- s$removeFully
@@ -351,7 +402,7 @@ importCheckFeaturesSession <- function(sessionIn, sessionOut, fGroups, rtWindow 
 #' @rdname check-GUI
 #' @aliases checkFeatures
 #' @export
-setMethod("checkFeatures", "featureGroups", function(fGroups, session, EICParams, clearSession)
+setMethod("checkFeatures", "featureGroups", function(fGroups, session, EICParams, EIMParams, clearSession)
 {
     if (length(fGroups) == 0)
         stop("No feature groups, nothing to check...")
@@ -359,6 +410,7 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, EICParams
     ac <- checkmate::makeAssertCollection()
     assertCheckSession(session, mustExist = FALSE, add = ac)
     assertEICParams(EICParams, add = ac)
+    assertEIMParams(EIMParams, add = ac)
     checkmate::assertFlag(clearSession, add = ac)
     checkmate::reportAssertions(ac)
     
@@ -369,28 +421,34 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, EICParams
     fTable <- featureTable(fGroups)
     ftind <- groupFeatIndex(fGroups)
     
-    EICsTopMost <- getFeatureEIXs(fGroups, type = "EIC", EIXParams = modifyList(EICParams, list(topMost = 1,
-                                                                                                topMostByReplicate = FALSE)))
-    EICsTopMostRep <- EICsAll <- list()
-    
-    # format is in [[ana]][[fGroup]], since we only took top most intensive we can throw away the ana dimension
-    EICPreviews <- Reduce(modifyList, EICsTopMost)
-    EICPreviews <- Map(EICPreviews, names(EICPreviews), f = function(eic, grp)
+    prepEIXs <- function(type, params)
     {
-        anai <- which.max(fGroups[[grp]])
-        return(eic[numGTE(eic$time, fTable[[anai]]$retmin[ftind[[grp]][anai]]) &
-                       numLTE(eic$time, fTable[[anai]]$retmax[ftind[[grp]][anai]]), ])
-    })
+        topMost <- getFeatureEIXs(fGroups, type = type,
+                                  EIXParams = modifyList(params, list(topMost = 1, topMostByReplicate = FALSE)))
+        topMostRep <- all <- list() # loaded if needed
+        
+        # format is in [[ana]][[fGroup]], since we only took top most intensive we can throw away the ana dimension
+        previews <- Reduce(modifyList, topMost)
+        colMin <- if (type == "EIC") "retmin" else "mobmin"; colMax <- if (type == "EIC") "retmax" else "mobmax"
+        previews <- Map(previews, names(previews), f = function(eix, grp)
+        {
+            anai <- which.max(fGroups[[grp]])
+            return(eix[numGTE(eix[[1]], fTable[[anai]][[colMin]][ftind[[grp]][anai]]) &
+                           numLTE(eix[[1]], fTable[[anai]][[colMax]][ftind[[grp]][anai]]), ])
+        })
+        return(list(params = params, topMost = topMost, topMostRep = topMostRep, all = all, previews = previews))
+    }
     
+    EIC <- prepEIXs("EIC", EICParams)
+    EIM <- if (hasMobilities(fGroups)) prepEIXs("EIM", EIMParams) # UNDONE: also get EIMs if there is IMS raw data?
+
     curSession <- NULL
     if (file.exists(session))
         curSession <- readCheckSession(session, "featureGroups")
     else
         curSession <- list(removeFully = character(), removePartially = list())
     
-    int <- checkFeaturesInterface$new(fGroups = fGroups, EICParams = EICParams, EICsTopMost = EICsTopMost,
-                                      EICsTopMostRep = EICsTopMostRep, EICsAll = EICsAll,
-                                      EICPreviews = EICPreviews, primarySelections = gNames,
+    int <- checkFeaturesInterface$new(fGroups = fGroups, EIC = EIC, EIM = EIM, primarySelections = gNames,
                                       curSession = curSession, session = session)
     return(runCheckUI(int))
 })

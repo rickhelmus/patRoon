@@ -43,7 +43,9 @@ checkComponentsInterface$methods(
         return(list(retUnit = "sec"))
     },
     UISettingsFileName = function() "check_components.yml",
-    
+    UISettingsVersion = function() 1L,
+    upgradeUISettings = function(settings) settings,
+
     getSecondarySelections = function(primSel) components[[primSel]]$group,
     getSecondarySelectionsFromTab = function(tab) tab[["group"]],
 

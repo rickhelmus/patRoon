@@ -280,11 +280,11 @@
     - peakParams
         - doc common parameters that may need to be changed for IMS
         - doc that they could probably be optimized further
-    - spectrumSimilarityMobility() method/generic
     - minMobSpecSim: clearly doc how things work
         - results are simply copied from parent (including annSims)
         - only fragInfos are updated
         - ignored for MS only formulas
+        - make template section?
 
 
 ## NEWS

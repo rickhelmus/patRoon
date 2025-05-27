@@ -18,7 +18,13 @@ NULL
 #' @param MSLevel The MS level for which data is plotted or filtered: \samp{1} for regular MS, \samp{2} for MSMS.
 #'
 #'   For \code{filter}: can also be \code{1:2} to specify both.
-#' @param \dots Further arguments passed to \code{\link[graphics]{plot}}.
+#' @param \dots For the \code{"["} operator: ignored.
+#'
+#'   For \code{delete}: passed to the function specified as \code{j}.
+#'   
+#'   For \code{plotSpectrum}: passed to \code{\link[graphics]{plot}}.
+#'   
+#'   For \code{spectrumSimilarityMobility}: passed to \code{spectrumSimilarity}
 #'
 #'   \setsPassedArgs1{MSPeakLists}
 #'
@@ -802,6 +808,18 @@ setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupNa
     return(if (drop && length(sims) == 1) drop(sims) else sims)
 })
 
+#' @describeIn MSPeakLists Calculates the spectral similarity between spectra from mobility features (or feature groups)
+#'   and their IMS parents in post IMS workflows (see \code{\link[=assignMobilities_feat]{assignMobilities}}).
+#'
+#' @param doFGroups Set to \code{TRUE} to compare spectra of feature groups, \code{FALSE} to compare spectra of
+#'   features.
+#' @param warn Set to \code{TRUE} to show a warning when no relevant feature group data is found.
+#'
+#' @return \code{spectrumSimilarityMobility} returns a \code{data.table} with spectral similarities for each mobility
+#'   feature (group) and IMS pair.
+#'
+#' @aliases spectrumSimilarityMobility,MSPeakLists-method
+#' @aliases spectrumSimilarityMobility
 #' @export
 setMethod("spectrumSimilarityMobility", "MSPeakLists", function(obj, fGroups, doFGroups = TRUE, warn = TRUE, ...)
 {

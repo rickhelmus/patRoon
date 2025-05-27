@@ -694,16 +694,16 @@ setMethod("plotChromsHash", "featureGroups", function(obj, analysis = analyses(o
              analysisInfo(obj)[analysis %chin% anas])
 })
 
-#' @details \code{plotMobilogram} Plots extracted ion mobilograms (EIMs) of feature groups.
+#' @details \code{plotMobilograms} Plots extracted ion mobilograms (EIMs) of feature groups.
 #' @template EIMParams-arg
 #' @rdname feature-plotting
 #' @export
-setMethod("plotMobilogram", "featureGroups", function(obj, analysis = analyses(obj), groupName = names(obj),
-                                                      showPeakArea = FALSE, showFGroupRect = TRUE, title = NULL,
-                                                      groupBy = NULL, showLegend = TRUE,
-                                                      annotate = c("none", "ret", "mz", "mob"),
-                                                      EIMParams = getDefEIMParams(), showProgress = FALSE, xlim = NULL,
-                                                      ylim = NULL, EIMs = NULL, ...)
+setMethod("plotMobilograms", "featureGroups", function(obj, analysis = analyses(obj), groupName = names(obj),
+                                                       showPeakArea = FALSE, showFGroupRect = TRUE, title = NULL,
+                                                       groupBy = NULL, showLegend = TRUE,
+                                                       annotate = c("none", "ret", "mz", "mob"),
+                                                       EIMParams = getDefEIMParams(), showProgress = FALSE, xlim = NULL,
+                                                       ylim = NULL, EIMs = NULL, ...)
 {
     ac <- checkmate::makeAssertCollection()
     assertPlotEIXArgs(obj, analysis, groupName, showPeakArea, showFGroupRect, title, groupBy, showLegend, annotate,

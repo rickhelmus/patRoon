@@ -164,7 +164,7 @@ genHTMLReportPlotsMobilogramsLarge <- function(fGroups, settings, outPath, EIMs,
     doApply("sapply", parallel, gInfo$group, function(grp)
     {
         doProgress()
-        makeHTMLReportPlot("mobilogram_large-", outPath, "plotMobilogram",
+        makeHTMLReportPlot("mobilogram_large-", outPath, "plotMobilograms",
                            list(fGroups, groupName = grp, EIMs = EIMs,
                                 EIMParams = EIMParams, groupBy = "replicate", title = "", bty = "l"),
                            parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)),
@@ -184,7 +184,7 @@ genHTMLReportPlotsMobilogramsSmall <- function(fGroups, settings, outPath, EIMs,
     doApply("sapply", parallel, gInfo$group, function(grp)
     {
         doProgress()
-        makeHTMLReportPlot("mobilogram_small-", outPath, "plotMobilogram",
+        makeHTMLReportPlot("mobilogram_small-", outPath, "plotMobilograms",
                            list(fGroups, groupName = grp, EIMs = EIMs,
                                 EIMParams = modifyList(EIMParams, list(topMost = 1, topMostByReplicate = FALSE,
                                                                        onlyPresent = TRUE)),
@@ -209,7 +209,7 @@ genHTMLReportPlotsMobilogramsFeatures <- function(fGroups, settings, outPath, EI
         {
             if (settings$features$mobilograms$features != "all" && fGroups[[grp]][anai] == 0)
                 return("")
-            makeHTMLReportPlot("mobilogram_feat", outPath, "plotMobilogram",
+            makeHTMLReportPlot("mobilogram_feat", outPath, "plotMobilograms",
                                list(fGroups, analysis = ana, groupName = grp, EIMs = EIMs,
                                     EIMParams = modifyList(EIMParams, list(topMost = NULL,
                                                                            onlyPresent = settings$features$mobilograms$features != "all"),

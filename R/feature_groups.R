@@ -1493,7 +1493,11 @@ setMethod("calculateTox", "featureGroups", function(fGroups, featureAnn)
 #'
 #'   \item The feature grouping is updated: the mobility features with close mobilities (defined by \code{IMSWindow})
 #'   within a feature group are split-off into new feature groups and linked to the original \emph{IMS parent} feature
-#'   group.
+#'   group. LC-MS properties and most other data such as feature group qualities and scores
+#'   (\code{\link{calculatePeakQualities}}), adduct annotations (\emph{e.g.} \code{\link{selectIons}}), predicted
+#'   concentrations and toxicities (\code{\link{calculateConcs}} and \code{\link{calculateTox}}) and internal standards
+#'   for intensity normalization (\code{\link{normInts}}) are copied from the IMS parents to the mobility feature
+#'   groups.
 #'
 #'   }
 #'

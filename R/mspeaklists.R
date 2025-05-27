@@ -803,15 +803,13 @@ setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupNa
 })
 
 #' @export
-setMethod("spectrumSimilarityMobility", "MSPeakLists", function(obj, fGroups, doFGroups = TRUE, warn = TRUE, ...,
-                                                                drop = FALSE)
+setMethod("spectrumSimilarityMobility", "MSPeakLists", function(obj, fGroups, doFGroups = TRUE, warn = TRUE, ...)
 {
     if (length(obj) == 0)
         return(NULL)
     
     checkmate::assertClass(fGroups, "featureGroups")
     aapply(checkmate::assertFlag, . ~ doFGroups + warn)
-    checkmate::assertFALSE(drop)
     
     if (!hasMobilities(fGroups))
         stop("No mobility data available in feature groups.", call. = FALSE)
@@ -833,14 +831,14 @@ setMethod("spectrumSimilarityMobility", "MSPeakLists", function(obj, fGroups, do
         
         if (doFGroups)
         {
-            s <- spectrumSimilarity(obj, groupName1 = mg, groupName2 = g, ..., drop = drop)
+            s <- spectrumSimilarity(obj, groupName1 = mg, groupName2 = g, ..., drop = FALSE)
             return(data.table(group = mg, ims_parent_group = g, similarity = s[, 1]))
         }
         
         rbindlist(lapply(anas, function(a)
         {
             s <- spectrumSimilarity(obj, groupName1 = mg, groupName2 = g, analysis1 = rep(a, length(mg)),
-                                    analysis2 = a, ..., drop = drop)
+                                    analysis2 = a, ..., drop = FALSE)
             return(data.table(group = mg, ims_parent_group = g, analysis = a, similarity = s[, 1]))
         }))
     })))

@@ -204,7 +204,7 @@
         - verify removal duplicate suspects/features?
     - groupFeaturesIMS()
     - plotChroms(): mob annotation
-    - plotMobilogram()
+    - plotMobilograms()
     - XCMS features/fGroups, eg with subsetting & exporting
     - normInts(): verify results are copied
     - CCS/Mob conversion utilities? Or rely on assignMobilities() tests?

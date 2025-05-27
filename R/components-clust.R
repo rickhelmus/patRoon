@@ -64,6 +64,9 @@ verifyCompNotAltered <- function(obj)
 #' @template components_noint
 #' @template components-altered-note
 #' 
+#' @section IMS workflows: When components are re-made by \code{\link{treeCut}} or \code{\link{treeCutDynamic}} any
+#'   expanded data should be re-added by calling \code{\link{expandForIMS}}.
+#' 
 #' @templateVar class componentsClust
 #' @template class-hierarchy
 #' 

@@ -676,7 +676,7 @@ setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked = TRUE, width =
 #'   \link[=retDir]{retention order direction}.
 #'
 #' @template specSimParams-arg
-#' 
+#'
 #' @templateVar consider for componentization
 #' @template IMS-arg
 #'
@@ -760,6 +760,12 @@ setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked = TRUE, width =
 #'     see \code{\link{generateTPsAnnForm}} and \code{\link{generateTPsAnnComp}}.
 #'
 #'   }
+#'
+#' @template compon_ims_expand
+#'
+#' @section IMS workflows: \strong{NOTE}: IMS expansion by \code{\link{expandForIMS}} only expands results for TP
+#'   candidates, \emph{i.e.} no new components from parents assigned to mobility feature groups will be added.
+#'
 #'
 #' @section Sets workflows: In a \link[=sets-workflow]{sets workflow} the component tables are amended with extra
 #'   information such as overall/specific set spectrum similarities. As sets data is mixed, transformation products are

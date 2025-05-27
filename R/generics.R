@@ -222,6 +222,10 @@ setGeneric("generateComponentsSpecClust", function(fGroups, ...) standardGeneric
 #' @rdname generateComponentsTPs
 setGeneric("generateComponentsTPs", function(fGroups, ...) standardGeneric("generateComponentsTPs"))
 
+#' @rdname components-class
+setGeneric("expandForIMS", function(obj, ...) standardGeneric("expandForIMS"))
+
+
 ### Formulas
 
 #' @rdname generateFormulas
@@ -472,11 +476,6 @@ setGeneric("cutClusters", function(obj) standardGeneric("cutClusters"))
 #' @templateVar desc Returns default scorings that are excluded from normalization.
 #' @template generics
 setGeneric("defaultExclNormScores", function(obj) standardGeneric("defaultExclNormScores"))
-
-#' @templateVar func expandForIMS
-#' @templateVar desc expands data for ion mobilities assigned to features.
-#' @template generics
-setGeneric("expandForIMS", function(obj, ...) standardGeneric("expandForIMS"))
 
 #' @templateVar func export
 #' @templateVar desc exports workflow data to a given format.

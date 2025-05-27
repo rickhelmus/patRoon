@@ -52,6 +52,8 @@ componentsSpecClust <- setClass("componentsSpecClust", contains = "componentsClu
 #' @inheritParams generateComponents
 #'
 #' @return The components are stored in objects derived from \code{\link{componentsSpecClust}}.
+#' 
+#' @template compon_ims_expand
 #'
 #' @section Sets workflows: In a \link[=sets-workflow]{sets workflow} the spectral similarities for each set are
 #'   combined as is described for the \code{\link[=spectrumSimilarity,MSPeakListsSet-method]{spectrumSimilarity}} method

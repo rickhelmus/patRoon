@@ -134,13 +134,15 @@ setMethod("plotIntHash", "componentsIntClust", function(obj, index, ...)
 #' @template compon_algo-args
 #' @template compon_gen-clust
 #' @template dynamictreecut
-#' 
+#'
 #' @templateVar consider for componentization
 #' @template IMS-arg
 #'
 #' @inheritParams generateComponents
 #'
 #' @return The components are stored in objects derived from \code{\link{componentsIntClust}}.
+#'
+#' @template compon_ims_expand
 #'
 #' @section Sets workflows: In a \link[=sets-workflow]{sets workflow} normalization of feature intensities occur per
 #'   set.

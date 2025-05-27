@@ -54,6 +54,8 @@ setMethod("expandForIMS", "componentsCliqueMS", function(obj, ...) cannotExpandC
 #' @return A \code{\link{componentsFeatures}} derived object.
 #'
 #' @template compon_gen-feat
+#' 
+#' @template compon_ims_unsupported
 #'
 #' @templateVar class componentsSet
 #' @template compon_gen-sets-merged

@@ -56,6 +56,8 @@ setMethod("expandForIMS", "componentsRC", function(obj, ...) cannotExpandComponI
 #' @templateVar minSize FALSE
 #' @template compon_gen-filters
 #'
+#' @template compon_ims_unsupported
+#'
 #' @templateVar class componentsSet
 #' @template compon_gen-sets-merged
 #'

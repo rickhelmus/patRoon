@@ -40,7 +40,7 @@ setMethod("collapseComponents", "componentsNTSet", function(obj)
 #' @export
 setMethod("plotGraph", "componentsNTSet", function(obj, onlyLinked = TRUE, set, ...) plotGraph(unset(obj, set), onlyLinked = onlyLinked, ...))
 
-#' @rdname componentsNT-class
+#' @rdname components-class
 #' @export
 setMethod("expandForIMS", "componentsNTSet", function(obj, ...) cannotExpandComponIMS(obj))
 

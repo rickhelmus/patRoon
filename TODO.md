@@ -252,6 +252,9 @@
         - annotateSuspects() --> estimateIDConfidence()
         - estimateIDConfidence() description for formulas/compounds
         - example where annSim is filtered with scoreLimits
+        - minMobSpecSim
+    - componentization
+        - expandForIMS()?
     - file conversion
         - mention mzXML/mzML requirements as newProject() doesn't give note anymore
     - appendix section for limits? Mention patRoon.path.limits option?
@@ -273,13 +276,6 @@
         - compounds method
             - PCL already has CCSbase, so no need to convert (also mention elsewhere?)
     - IMSRangeParams filter --> when feature filter is there
-    - components
-        - doc that expandForIMS() may needs to be called after tree splitting
-            - improve printed NOTE with link to manual?
-        - clearly doc that expandForIMS() just simple copying only; and this may lead to eg TP candidates that were not actually found by screening and therefore have NAs in the report
-            - unless screening occurred before mobility assignment, which needs to be in a expand workflow?
-        - doc expandForIMS() generic and methods
-        - clearly doc the difference if TP components are generated after assignMobilities(); there will be no IMS TP parents with expanding
     - suspects/compounds
         - doc order of data selection for mobility and CCS columns
     - get CCS values from MetFrag

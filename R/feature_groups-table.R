@@ -443,8 +443,9 @@ doFGAADTFeatures <- function(fGroups, fgTab, intColNames, average, averageBy, ad
         fgTab[, average_group := stripADTIntSuffix(average_group)]
     }
     fgTab <- removeDTColumnsIfPresent(fgTab, "intensity")
-    setnames(fgTab, c("ret", "mz", "mobility", "mobility_collapsed"),
-             c("group_ret", "group_mz", "group_mobility", "group_mobility_collapsed"), skip_absent = TRUE)
+    setnames(fgTab, c("ret", "mz", "mobility", "mobility_collapsed", "CCS", "CCS_collapsed"),
+             c("group_ret", "group_mz", "group_mobility", "group_mobility_collapsed", "group_CCS", "group_CCS_collapsed"),
+             skip_absent = TRUE)
     annCols <- grep("^(neutralMass|ion_mz|adduct)", names(fgTab), value = TRUE)
     if (length(annCols) > 0)
         setnames(fgTab, annCols, paste0("group_", annCols))
@@ -588,7 +589,7 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
                                                      averageFunc = mean, normalized = FALSE, FCParams = NULL,
                                                      concAggrParams = getDefPredAggrParams(),
                                                      toxAggrParams = getDefPredAggrParams(), normConcToTox = FALSE,
-                                                     anaInfoCols = NULL)
+                                                     anaInfoCols = NULL, IMS ="both")
 {
     return(doFGAsDataTable(x, average, areas, features, qualities, regression, regressionBy, averageFunc, normalized,
                            FCParams, concAggrParams, toxAggrParams, normConcToTox, anaInfoCols))

@@ -12,3 +12,4 @@
 #'   }
 #'
 #'   <%= if (is.character(append)) append else "" %>
+#'   <%= if (exists("append2")) append2 else "" %>

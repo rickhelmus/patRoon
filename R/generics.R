@@ -136,6 +136,7 @@ setGeneric("checkFeatures", function(fGroups, session = "checked-features.yml", 
 #' @template loadrawdata-arg
 #' 
 #' @templateVar consider for export
+#' @templateVar append This should be kept \code{FALSE} as \pkg{XCMS} export currently does not support IMS features.
 #' @template IMS-arg
 #'
 #' @section Sets workflows: In a \link[=sets-workflow]{sets workflow}, \code{\link{unset}} is used to convert the

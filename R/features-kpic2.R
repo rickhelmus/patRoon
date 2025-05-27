@@ -228,6 +228,7 @@ importFeaturesKPIC2 <- function(picsList, analysisInfo)
 #' @template EICParams-arg
 #' 
 #' @templateVar consider for export
+#' @templateVar append This should be kept \code{FALSE} as \pkg{KPIC2} export currently does not support IMS features.
 #' @template IMS-arg
 #' 
 #' @param \dots Ignored

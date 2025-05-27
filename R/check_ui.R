@@ -20,6 +20,8 @@ checkUIInterface$methods(
     
     defaultUISettings = function() stop("VIRTUAL"),
     UISettingsFileName = function() stop("VIRTUAL"),
+    UISettingsVersion = function() stop("VIRTUAL"),
+    upgradeUISettings = function(settings) stop("VIRTUAL"),
     
     getSecondarySelections = function(primSel) stop("VIRTUAL"),
     getSecondarySelectionsFromTab = function(tab) stop("VIRTUAL"),
@@ -48,23 +50,32 @@ getUISettingsPath <- function(fileName)
     return(file.path(dirPath, fileName))
 }
 
-getUISettings <- function(fileName, default)
+getUISettings <- function(fileName, version, default, upgradeSettings)
 {
     path <- getUISettingsPath(fileName)
     if (!file.exists(path))
     {
         ret <- default
-        saveUISettings(fileName, ret)
+        saveUISettings(fileName, version, ret)
     }
     else
+    {
         ret <- readYAML(path)
-    ret <- ret[setdiff(names(ret), "version")]
+        if (ret$version < version)
+        {
+            printf("Upgrading UI settings from version %d to %d\n", ret$version, version)
+            ret <- upgradeSettings(ret)
+            ret$version <- version
+            saveUISettings(fileName, version, ret)
+        }
+        ret <- ret[setdiff(names(ret), "version")]
+    }
     return(ret)
 }
 
-saveUISettings <- function(fileName, settings)
+saveUISettings <- function(fileName, version, settings)
 {
-    settings$version <- 1 # just store for now, in case if ever needed in the future
+    settings$version <- version
     writeYAML(settings, getUISettingsPath(fileName))
 }
 
@@ -245,7 +256,8 @@ runCheckUI <- function(UIInterface)
                   });
                 }", tab)
     
-    settings <- getUISettings(UIInterface$UISettingsFileName(), UIInterface$defaultUISettings())
+    settings <- getUISettings(UIInterface$UISettingsFileName(), UIInterface$UISettingsVersion(),
+                              UIInterface$defaultUISettings(), UIInterface$upgradeUISettings)
     sessionChanged <- FALSE
     
     server <- function(input, output, session)
@@ -328,7 +340,7 @@ runCheckUI <- function(UIInterface)
             if (UIInterface$secondarySettingsChanged(curSettings, settings))
                 reAddHOT("secondaryHot")
             
-            saveUISettings(UIInterface$UISettingsFileName(), settings)
+            saveUISettings(UIInterface$UISettingsFileName(), UIInterface$UISettingsVersion(), settings)
         }
         
         setSessionChanged <- function(changed)

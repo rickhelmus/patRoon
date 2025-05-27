@@ -60,6 +60,9 @@
 - basic and default error handling for executeCommand()?
 - getEIMs() function?
 - add TP-formula filter() method, so parent-duplicates can be removed (ie removeParentIsomers filter)? If so, link to it in ann_form docs like ann_comp
+- checkFeatures()
+    - optionally disable mobilograms?
+    - mobilogram previews?
 
 
 ## newProject()
@@ -139,7 +142,6 @@
     - group IMS: add to groupFeatures, (force) disable RT align and group fractions?
 - update fGroupsComparison/consensus()
 - update featAnn consensus?
-- update checkFeatures()
 
 
 ## Tests

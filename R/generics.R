@@ -116,6 +116,7 @@ setGeneric("groupFeaturesKPIC2", function(feat, ...) standardGeneric("groupFeatu
 
 #' @rdname check-GUI
 setGeneric("checkFeatures", function(fGroups, session = "checked-features.yml", EICParams = getDefEICParams(),
+                                     EIMParams = getDefEIMParams(),
                                      clearSession = FALSE) standardGeneric("checkFeatures"))
 
 

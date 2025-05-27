@@ -174,6 +174,7 @@
 - IMS
     - add IMSRangeParams/withIMSParent/applyIMS filters also to features method?
          - only IMSRangeParams would make sense, as others don't for direct workflows
+         --> add docs in general feature filter args
     - more verification that normInts() works before/after assignMobilities()
     - IMS arg for [, filter(), ADT, and plotting functions
     - applyMS for filter()
@@ -271,11 +272,7 @@
             - add link to piek, and possibly import for direct IMS assignment
         - compounds method
             - PCL already has CCSbase, so no need to convert (also mention elsewhere?)
-    - plotChroms()/plotMobilograms()
-        - annotate has mob option
-        - intMax can only work for EICs (mob inten may not be stored)
-        - plotChroms(): IMS arg overrides analysis/groupNames args for availability after IMS selection
-    - IMSRangeParams filter
+    - IMSRangeParams filter --> when feature filter is there
     - doc that IMS arg should most likely be FALSE for export/getXCMS...()
     - calculateConcs()
         - clearly doc that mobility parent intensities are used to calculate concentrations (if available).

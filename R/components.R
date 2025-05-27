@@ -10,32 +10,31 @@ NULL
 
 #' Component class
 #'
-#' Contains data for feature groups that are related in some way. These
-#' \emph{components} commonly include adducts, isotopes and homologues.
+#' Contains data for feature groups that are related in some way. These \emph{components} commonly include adducts,
+#' isotopes and homologues.
 #'
 #' \code{components} objects are obtained from \code{\link{generateComponents}}.
 #'
-#' @slot components List of all components in this object. Use the
-#'   \code{componentTable} method for access.
-#' @slot componentInfo A \code{\link{data.table}} containing general information
-#'   for each component. Use the \code{componentInfo} method for access.
+#' @slot components List of all components in this object. Use the \code{componentTable} method for access.
+#' @slot componentInfo A \code{\link{data.table}} containing general information for each component. Use the
+#'   \code{componentInfo} method for access.
 #'
 #' @param obj,object,x The \code{component} object.
-#' @param index The index of the component. Can be a numeric index or a
-#'   character with its name.
+#' @param fGroups The \code{\link{featureGroups}} object that was used to generate the components.
+#'
+#'   For \code{expandForIMS}, this should be the \code{featureGroups} object that contains the post mobility feature
+#'   groups.
+#' @param index The index of the component. Can be a numeric index or a character with its name.
 #' @param \dots For \code{delete}: passed to the function specified as \code{j}.
-#' 
-#'   For \code{plotChroms}: Further (optional) arguments passed to the
-#'   \code{plotChroms} method for the \code{\link{featureGroups}} class. Note that
-#'   the \code{groupBy}, \code{showPeakArea}, \code{showFGroupRect} and
+#'
+#'   For \code{plotChroms}: Further (optional) arguments passed to the \code{plotChroms} method for the
+#'   \code{\link{featureGroups}} class. Note that the \code{groupBy}, \code{showPeakArea}, \code{showFGroupRect} and
 #'   \code{topMost} arguments cannot be set as these are set by this method.
 #'
-#'   For \code{plotSpectrum}: Further arguments passed to
-#'   \code{\link[graphics]{plot}}.
+#'   For \code{plotSpectrum}: Further arguments passed to \code{\link[graphics]{plot}}.
 #'
-#'   For \code{consensus}: \code{components} objects that should be used to
-#'   generate the consensus.
-#'   
+#'   For \code{consensus}: \code{components} objects that should be used to generate the consensus.
+#'
 #'   \setsPassedArgs1{components}
 #'
 #' @templateVar seli components
@@ -235,6 +234,21 @@ setMethod("as.data.table", "components", function(x)
     return(ret)
 })
 
+#' @describeIn components Expands the components data for mobility feature groups. See the \verb{IMS expansion} section
+#'   below.
+#'
+#' @section IMS expansion: In IMS workflows with post mobility assignment (see
+#'   \code{\link[=assignMobilities_feat]{assignMobilities}}), specifically when the assignment occurs \emph{after}
+#'   generation of the components, it may be desired to copy the results of the IMS parents to the mobility feature
+#'   groups. For instance, for components from \link[=generateComponentsIntClust]{intensity clusters} or
+#'   \link[=generateComponentsTPs]{TPs} one could assume that results for mobility feature groups will be largely the
+#'   same as their IMS parents. The \code{expandForIMS} method function is used to \emph{expand} the original
+#'   \code{components} object by adding in mobility feature groups with data copied from their IMS parents.
+#'
+#'   Currently, only components generated with \code{\link{generateComponentsIntClust}},
+#'   \code{\link{generateComponentsSpecClust}} and \code{\link{generateComponentsTPs}} support this operation.
+#'
+#' @aliases expandForIMS
 #' @export
 setMethod("expandForIMS", "components", function(obj, fGroups)
 {
@@ -513,7 +527,6 @@ setMethod("plotSpectrumHash", "components", function(obj, index, markFGroup = NU
 })
 
 #' @describeIn components Plot an extracted ion chromatogram (EIC) for all feature groups within a single component.
-#' @param fGroups The \code{\link{featureGroups}} object that was used to generate the components.
 #' @template EICParams-arg
 #' @note For \code{plotChroms}: The \code{topMost} and \code{topMostByReplicate} EIC parameters are ignored unless the
 #'   components are from homologous series.

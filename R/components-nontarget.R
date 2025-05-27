@@ -72,7 +72,7 @@ setMethod("plotGraph", "componentsNT", function(obj, onlyLinked = TRUE, width = 
     makeGraph(obj, onlyLinked, titles, width, height)
 })
 
-#' @rdname componentsNT-class
+#' @rdname components-class
 #' @export
 setMethod("expandForIMS", "componentsNT", function(obj, ...) cannotExpandComponIMS(obj))
 
@@ -118,6 +118,8 @@ setMethod("expandForIMS", "componentsNT", function(obj, ...) cannotExpandComponI
 #'
 #' @templateVar class componentsNTSet
 #' @template compon_gen-sets-merged
+#' 
+#' @template compon_ims_unsupported
 #'
 #' @section Sets workflows: The output class supports additional methods such as \code{plotGraph}.
 #'

@@ -60,6 +60,7 @@ NULL
 #'
 #' @templateVar consider to be kept (\code{"["}) or exported (\code{export})
 #' @templateVar append For \code{"["}: Leave unassigned to perform no IMS selection.
+#' @templateVar append2 For \code{export}: keep \code{FALSE} as the export formats currently do not support IMS data.
 #' @template IMS-arg
 #'
 #' @slot groups Matrix (\code{\link{data.table}}) with intensities for each feature group (columns) per analysis (rows).

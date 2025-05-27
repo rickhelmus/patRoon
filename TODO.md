@@ -273,7 +273,6 @@
         - compounds method
             - PCL already has CCSbase, so no need to convert (also mention elsewhere?)
     - IMSRangeParams filter --> when feature filter is there
-    - doc that IMS arg should most likely be FALSE for export/getXCMS...()
     - calculateConcs()
         - clearly doc that mobility parent intensities are used to calculate concentrations (if available).
         - Also note that the mobility fGroup's RF is still used (only relevant for SIRIUS or RT changes), and is different then when assignMobilities() copies results

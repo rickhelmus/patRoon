@@ -226,7 +226,6 @@ finalizeScreenInfoForIMS <- function(scr, gInfo, IMSMatchParams)
 
     scrOrigExp <- expandSuspMobilities(scr)
     
-    # pick mobility that is closest to that of a feature group
     scr[, mob_group := gInfo$mobility[match(group, gInfo$group)]]
     scr[, ims_parent_group := gInfo$ims_parent_group[match(group, gInfo$group)]]
     
@@ -255,7 +254,7 @@ finalizeScreenInfoForIMS <- function(scr, gInfo, IMSMatchParams)
         if (IMSMatchParams$minMatches > 0)
         {
             # NOTE: if parent groups have been filtered or not assigned at all, then nothing is filtered as the min(...)
-            # call below evalues to zero.
+            # call below evaluates to zero.
             scr[, keep := .N >= min(IMSMatchParams$minMatches, scrOrigExp[ims_parent_group == group, .N]),
                 by = c("ims_parent_group", "name")]
             scr <- scr[keep == TRUE, -"keep"]

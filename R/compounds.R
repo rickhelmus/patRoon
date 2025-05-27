@@ -40,8 +40,14 @@ NULL
 #' @templateVar excludeParam excludeNormScores
 #' @template norm-args
 #'
+#' @section IMS workflows: In IMS workflows, reference IMS data to candidates can be assigned with
+#'   \code{\link[=assignMobilities_comp]{assignMobilities}} method function. Furthermore, \acronym{CCS} values may be
+#'   assigned directly to candidates with \code{\link{generateCompounds}} if \code{database="pubchemlite"}.
+#'
+#'   This data can be used to prioritize candidates with the \code{IMSMatchParams} and \code{IMSRangeParams} filters.
+#'
 #' @template ms2q-slot
-#' 
+#'
 #' @note The values ranges in the \code{scoreLimits} slot, which are used for normalization of scores, are based on the
 #'   \emph{original} scorings when the compounds were generated (\emph{prior} to employing the \code{topMost} filter to
 #'   \code{\link{generateCompounds}}).
@@ -127,10 +133,11 @@ setMethod("identifiers", "compounds", function(compounds)
 #'
 #' @param minExplainedPeaks,scoreLimits Passed to the
 #'   \code{\link[=filter,featureAnnotations-method]{featureAnnotations}} method.
-#'
 #' @param minScore,minFragScore,minFormulaScore Minimum overall score, in-silico fragmentation score and formula score,
 #'   respectively. Set to \code{NULL} to ignore. The \code{scoreLimits} argument allows for more advanced score
 #'   filtering.
+#' 
+#' @template IMSMatchParams-arg
 #'
 #' @export
 setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScore = NULL, minFragScore = NULL,
@@ -767,6 +774,11 @@ setMethod("estimateIDConfidence", "compounds", function(obj, absMzDev = defaultL
 #' \link[=assignMobilities_susp]{assignMobilities method for suspects} is used to perform these operations, please see
 #' its documentation for more details.
 #'
+#' If both adduct specific and non-adduct specific mobility and \acronym{CCS} data is available (and not \code{NA}),
+#' then the non-adduct specific data is assigned to the compound candidate. Otherwise, data corresponding to the
+#' \code{adduct} argument or the adduct assigned to the feature group is taken. The
+#' \code{\link[=filter,compounds-method]{filter}} method can be used to filter out candidates with deviating IMS data.
+#'
 #' @param obj The \code{\link{compounds}} object for which IMS assignments should be performed.
 #' @param fGroups The \code{\link{featureGroups}} object for which the compound candidates (\code{obj}) were calculated.
 #' @param from,matchFromBy,overwrite,CCSParams,prefCalcChemProps,neutralChemProps,virtualenv Passed to the
@@ -774,7 +786,7 @@ setMethod("estimateIDConfidence", "compounds", function(obj, absMzDev = defaultL
 #' @param adduct description
 #'
 #' @template adduct-arg
-#' 
+#'
 #' @templateVar consider for IMS assignments
 #' @template IMS-arg
 #'

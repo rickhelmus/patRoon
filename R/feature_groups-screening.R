@@ -445,6 +445,10 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = NULL
 #' @param fromSuspects If \code{TRUE} then mobilities values are directly copied from suspect list data (if available).
 #'   See the \verb{Post mobility assignment} section.
 #'
+#' @details In suspect screening workflows \code{assignMobilities} also assigns reference mobility and \acronym{CCS}
+#'   values to suspect hits, and can filter hits if \code{IMSMatchParams} is set. This is similarly performed as
+#'   \code{\link{screenSuspects}}, please see its documentation for more details.
+#'
 #' @section Post mobility assignment: \subsection{Suspect screening workflows}{In suspect screening workflows the
 #'   \code{fromSuspects} arguments can be set to alternatively perform mobility assignment directly from the suspect
 #'   list data (replacing Steps 1-2). The feature mobility is simply assigned from the suspect data and the mobility
@@ -516,10 +520,10 @@ setMethod("assignMobilities", "featureGroupsScreening", function(obj, mobPeakPar
 #' Besides 'full non-target analysis', where compounds may be identified with little to no prior knowledge, a common
 #' strategy is to screen for compounds with known or suspected identity. This may be a generally favorable approach if
 #' possible, as it can significantly reduce the load on data interpretation.
-#' 
-#' \code{screenSuspects} is used to perform suspect screening. The input \code{\link{featureGroups}} object
-#'   will be screened for suspects by \emph{m/z} values and optionally retention times. Afterwards, any feature groups
-#'   not matched may be kept or removed, depending whether a full non-target analysis is desired.
+#'
+#' \code{screenSuspects} is used to perform suspect screening. The input \code{\link{featureGroups}} object will be
+#' screened for suspects by \emph{m/z} values and optionally retention times. Afterwards, any feature groups not matched
+#' may be kept or removed, depending whether a full non-target analysis is desired.
 #'
 #' @param fGroups The \code{\link{featureGroups}} object that should be screened.
 #' @param suspects A \code{data.frame} with suspect information. See the \verb{Suspect list format} section below.
@@ -536,6 +540,8 @@ setMethod("assignMobilities", "featureGroupsScreening", function(obj, mobPeakPar
 #'   data) will be ignored with a warning. Similarly, any suspects for which mass calculation failed (when no \code{mz}
 #'   column is present in the suspect list), for instance, due to invalid \code{SMILES}, will be ignored with a warning.
 #' @param onlyHits If \code{TRUE} then all feature groups not matched by any of the suspects will be removed.
+#'
+#' @template IMSMatchParams-arg
 #'
 #' @section Suspect list format: the \code{suspects} argument for \code{screenSuspects} should be a \code{data.frame}
 #'   with the following mandatory and optional columns:
@@ -564,6 +570,11 @@ setMethod("assignMobilities", "featureGroupsScreening", function(obj, mobPeakPar
 #'   is used by \code{\link{estimateIDConfidence}} to report detected MS/MS fragments and calculate identification levels.
 #'   (\strong{optional})
 #'
+#'   \item \code{mobility},\code{CCS} The mobility or \acronym{CCS} value of the suspect. These values may be used to
+#'   filter out suspects, see the \code{IMSMatchParams} argument. Multiple values for a single suspect can be specified
+#'   by separating them with a semicolon(\verb{;}). Adduct specific columns may be added by suffixing the adduct to the
+#'   column name, \emph{e.g.} \code{mobility_[M+H]+} and \code{CCS_[M-H]-}. (\strong{optional})
+#'
 #'   }
 #'
 #' @section Matching of suspect masses: How the mass of a suspect is matched with the mass of a feature depends on the
@@ -581,15 +592,21 @@ setMethod("assignMobilities", "featureGroupsScreening", function(obj, mobPeakPar
 #'
 #'   }
 #'
+#' @section IMS reference assignment: If both adduct specific and non-adduct specific reference values are available,
+#'   then non-adduct specific data is chosen (unless \code{NA}) as reference for the suspect hit. Otherwise, data is
+#'   taken from the adduct specific data corresponding to the adduct assigned to the feature group (or \code{adduct}
+#'   argument). If multiple mobility or \acronym{CCS} values for a suspect are specified in the suspect list, then the
+#'   reference value is chosen which is the closest to that of the feature.
+#'
 #' @templateVar whatCP suspect list
 #' @template chemPropCalc
 #'
 #' @return \code{screenSuspects} returns a \code{\link{featureGroupsScreening}} object, which is a copy of the input
 #'   \code{fGroups} object amended with additional screening information.
 #'
-#' @note \code{screenSuspects} may use the suspect names to base file names used for reporting, logging etc.
-#'   Therefore, it is important that these are file-compatible names. For this purpose, \code{screenSuspects} will
-#'   automatically try to convert long, non-unique and/or otherwise incompatible suspect names.
+#' @note \code{screenSuspects} may use the suspect names to base file names used for reporting, logging etc. Therefore,
+#'   it is important that these are file-compatible names. For this purpose, \code{screenSuspects} will automatically
+#'   try to convert long, non-unique and/or otherwise incompatible suspect names.
 #'
 #' @seealso \code{featureGroupsScreening}
 #'

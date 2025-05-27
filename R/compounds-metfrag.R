@@ -535,7 +535,7 @@ MFMPErrorHandler <- function(cmd, exitStatus, retries)
 #'   For all \command{MetFrag} scoring types refer to the \verb{Candidate Scores} section on the
 #'   \href{http://ipb-halle.github.io/MetFrag/projects/metfragr/}{MetFragR homepage}.
 #'
-#' @section Usage of MetFrag databases: When \code{database="chemspider"} setting the \code{chemSpiderToken} argument is
+#' @section MetFrag databases: When \code{database="chemspider"} setting the \code{chemSpiderToken} argument is
 #'   mandatory.
 #'
 #'   If a local database is chosen via \code{sdf}, \code{psv}, or \code{csv} then its file location should be set with
@@ -546,6 +546,12 @@ MFMPErrorHandler <- function(cmd, exitStatus, retries)
 #'   file location must be specified as above or by setting the
 #'   \code{patRoon.path.MetFragPubChemLite}/\code{patRoon.path.MetFragCompTox} option. See the installation section in
 #'   the handbook for more details.
+#'
+#'   If \code{database="pubchemlite"} and the local file has \acronym{CCS} predictions (see
+#'   \url{https://zenodo.org/records/15311000}), then \acronym{CCS} values will be copied from the corresponding adduct
+#'   of the feature groups (or as specified by the \code{adduct} argument). These can be converted to mobilities with
+#'   \code{\link[=assignMobilities_comp]{assignMobilities}} and used for candidate filtering with
+#'   \code{\link[=filter,compounds-method]{filter}}.
 #'
 #' @templateVar what \code{generateCompoundsMetFrag}
 #' @template uses-multiProc
@@ -561,7 +567,8 @@ MFMPErrorHandler <- function(cmd, exitStatus, retries)
 #'   If the compound database is \emph{not} local, \emph{e.g.} \code{database="pubchem"}, then parallelization is
 #'   disabled to avoid connection errors that typically occur otherwise.
 #'
-#' @references \insertRef{Ruttkies2016}{patRoon}
+#' @references \insertRef{Ruttkies2016}{patRoon} \cr\cr \insertRef{Schymanski2021}{patRoon} \cr\cr
+#'   \insertRef{Elapavalore2025}{patRoon} \cr\cr \insertRef{Ross2020}{patRoon}
 #'
 #' @templateVar what generateCompoundsMetFrag
 #' @template main-rd-method

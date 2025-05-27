@@ -276,11 +276,7 @@
         - compounds method
             - PCL already has CCSbase, so no need to convert (also mention elsewhere?)
     - IMSRangeParams filter --> when feature filter is there
-    - suspects/compounds
-        - doc order of data selection for mobility and CCS columns
-    - get CCS values from MetFrag
-        - use PCL w/ CCSbase
-        - still need to call assignMobilities() with from = NULL to get CCS deviations, mobility conversions etc
+        - also for compounds
     - peakParams
         - doc common parameters that may need to be changed for IMS
         - doc that they could probably be optimized further

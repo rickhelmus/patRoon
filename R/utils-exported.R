@@ -1126,6 +1126,7 @@ getIMSMatchParams <- function(param, ...)
 }
 
 #' @templateVar consider for generating calibrant data
+#' @templateVar append Best to keep this \code{"maybe"}, as calibration typically doesn't support IMS filtered data.
 #' @template IMS-arg
 #' @rdname pred-quant
 #' @export

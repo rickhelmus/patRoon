@@ -692,7 +692,7 @@ NULL
 #' @templateVar scoreName response factor
 #' @templateVar scoreWeightName scoreWeight
 #' @template update_comp_score-args
-#' 
+#'
 #' @template parallel-arg
 #'
 #' @section Calibration: The \pkg{MS2Quant} package requires calibration to convert predicted ionization efficiencies to
@@ -741,6 +741,13 @@ NULL
 #' @templateVar calcFunc calculateConcs
 #' @template pred-desc
 #'
+#' @section Assigning concentrations: In IMS workflows with post mobility assignments (see
+#'   \code{\link[=assignMobilities_feat]{assignMobilities}}), the intensities of \emph{IMS parents} are used for the
+#'   calculation of concentrations for mobility features (as calibration typically does not consider differences due to
+#'   mobility filtering). However, the response factor assigned to mobility features are still used. This may yield
+#'   small differences compared to workflows where concentrations are assigned prior to mobility assignments, as
+#'   \code{assignMobilities} simply copies concentrations from IMS parents to mobility features.
+#'
 #' @return \code{predictRespFactors} returns an object amended with response factors (\code{RF_SMILES}/\code{LRF_SIRFP}
 #'   columns).
 #'
@@ -748,11 +755,11 @@ NULL
 #'   feature group (accessed with the \code{\link{concentrations}} method).
 #'
 #' @note \pkg{MS2Quant} currently \emph{only} supports \samp{M+H} and \samp{M+} adducts when performing predictions with
-#'   \command{SIRIUS:FingerID} fingerprints. Predictions for candidates with other adducts, including \samp{M-H]}, are
+#'   \command{SIRIUS:FingerID} fingerprints. Predictions for candidates with other adducts, including \samp{M-H}, are
 #'   skipped with a warning.
 #'
 #' @references \insertRef{Sepman2023}{patRoon}
-#' 
+#'
 #' @seealso \link[=pred-tox]{Toxicity prediction}
 #'
 #' @name pred-quant

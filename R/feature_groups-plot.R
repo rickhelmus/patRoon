@@ -32,6 +32,23 @@ NULL
 #'   argument). Set to \code{NULL} to select everything.
 #' @param averageFunc,normalized Used for intensity data treatment, see the documentation for the
 #'   \code{\link[=as.data.table,featureGroups-method]{as.data.table method}}.
+#' @param analysis,groupName \code{character} vector with the analyses/group names to be considered for plotting.
+#'   Compared to subsetting the \code{featureGroups} object (\code{obj}) upfront this is slightly faster. Furthermore,
+#'   if \code{onlyPresent=FALSE} in \code{EICParams} or \code{EIMParams}, this allows plotting chromatograms for feature
+#'   groups where none of the specified analyses contain the feature (which is impossible otherwise since subsetting
+#'   leads to removal of 'empty' feature groups).
+#'
+#'   For \code{plotChroms} and IMS workflows: if \code{IMS!="both"} then the \code{analysis} and \code{groupName}
+#'   arguments are adjusted for the remaining data after IMS selection.
+#' @param EICs,EIMs Internal parameter for now and should be kept at \code{NULL} (default).
+#' @param showPeakArea Set to \code{TRUE} to display integrated peak ranges by filling (shading) their areas.
+#' @param showFGroupRect Set to \code{TRUE} to mark the full integration/intensity range of all features within a
+#'   feature group by drawing a rectangle around it.
+#' @param title Character string used for title of the plot. If \code{NULL} a title will be automatically generated.
+#' @param annotate Set to \code{"ret"}, \code{"mz"} and/or \code{"mob"} to annotate peaks with the retention time,
+#'   \emph{m/z} and/or ion mobility (if available) feature group values, respectively.
+#' @param showProgress if set to \code{TRUE} then a text progressbar will be displayed when all EICs are being plot. Set
+#'   to \code{"none"} to disable any annotation.
 #' @param \dots passed to \code{\link[base]{plot}} (\code{plot}, \code{plotChroms}, \code{plotTICs} and
 #'   \code{plotBPCs}), \pkg{\link{VennDiagram}} plotting functions (\code{plotVenn}), \code{\link{chordDiagram}}
 #'   (\code{plotChord}) or \code{\link[UpSetR]{upset}} (\code{plotUpSet}).
@@ -39,8 +56,10 @@ NULL
 #' @templateVar consider for plotting
 #' @template IMS-arg
 #'
+#' @template plot-lim
+#'
 #' @inheritParams featureGroups-class
-#' 
+#'
 #' @templateVar what \code{plotChroms}, \code{plotMobilograms}, \code{plotTICs} and \code{plotBPCs}
 #' @template uses-msdata
 #'
@@ -569,25 +588,10 @@ setMethod("plotChordHash", "featureGroups", function(obj, ...)
 
 #' @details \code{plotChroms} Plots extracted ion chromatograms (EICs) of feature groups.
 #'
-#' @param analysis,groupName \code{character} vector with the analyses/group names to be considered for plotting.
-#'   Compared to subsetting the \code{featureGroups} object (\code{obj}) upfront this is slightly faster and (if
-#'   \code{onlyPresent=FALSE}) allows plotting chromatograms for feature groups where none of the specified analyses
-#'   contain the feature (which is impossible otherwise since subsetting leads to removal of 'empty' feature groups).
-#' @param EICs Internal parameter for now and should be kept at \code{NULL} (default).
-#' @param showPeakArea Set to \code{TRUE} to display integrated chromatographic peak ranges by filling (shading) their
-#'   areas.
-#' @param showFGroupRect Set to \code{TRUE} to mark the full retention/intensity range of all features within a feature
-#'   group by drawing a rectangle around it.
-#' @param title Character string used for title of the plot. If \code{NULL} a title will be automatically generated.
-#' @param annotate If set to \code{"ret"} and/or \code{"mz"} then retention and/or \emph{m/z} values will be drawn for
-#'   each plotted feature group.
 #' @param intMax Method used to determine the maximum intensity plot limit. Should be \code{"eic"} (from EIC data) or
 #'   \code{"feature"} (from feature data). Ignored if the \code{ylim} parameter is specified.
-#' @param showProgress if set to \code{TRUE} then a text progressbar will be displayed when all EICs are being plot. Set
-#'   to \code{"none"} to disable any annotation.
 #'
 #' @template EICParams-arg
-#' @template plot-lim
 #'
 #' @rdname feature-plotting
 #' @export
@@ -690,6 +694,9 @@ setMethod("plotChromsHash", "featureGroups", function(obj, analysis = analyses(o
              analysisInfo(obj)[analysis %chin% anas])
 })
 
+#' @details \code{plotMobilogram} Plots extracted ion mobilograms (EIMs) of feature groups.
+#' @template EIMParams-arg
+#' @rdname feature-plotting
 #' @export
 setMethod("plotMobilogram", "featureGroups", function(obj, analysis = analyses(obj), groupName = names(obj),
                                                       showPeakArea = FALSE, showFGroupRect = TRUE, title = NULL,

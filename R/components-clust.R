@@ -6,6 +6,12 @@
 #' @include components.R
 NULL
 
+IMSRestoreNote <- function(gInfo)
+{
+    if (!is.null(gInfo[["mobility"]]))
+        printf("NOTE: you may need to call expandForIMS() to restore mobility feature groups in the new components.\n")
+}
+
 genClustComponents <- function(cutClusters, gInfo)
 {
     clinds <- seq_along(unique(cutClusters))
@@ -17,9 +23,6 @@ genClustComponents <- function(cutClusters, gInfo)
         return(ret)
     })
     names(comps) <- paste0("CMP", seq_along(clinds))
-    
-    if (!is.null(gInfo[["mobility"]]))
-        printf("NOTE: you may need to call expandForIMS() to restore mobility feature groups in the new components.\n")
     
     return(comps)
 }
@@ -147,6 +150,8 @@ setMethod("treeCut", "componentsClust", function(obj, k = NULL, h = NULL)
     obj@components <- genClustComponents(obj@cutClusters, obj@gInfo)
     obj@componentInfo <- genClustComponentInfo(obj@cutClusters)
     
+    IMSRestoreNote(obj@gInfo)
+    
     return(obj)
 })
 
@@ -170,6 +175,8 @@ setMethod("treeCutDynamic", "componentsClust", function(obj, maxTreeHeight, deep
     
     obj@components <- genClustComponents(obj@cutClusters, obj@gInfo)
     obj@componentInfo <- genClustComponentInfo(obj@cutClusters)
+    
+    IMSRestoreNote(obj@gInfo)
     
     return(obj)
 })

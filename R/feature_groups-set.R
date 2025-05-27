@@ -195,7 +195,7 @@ setMethod("[", c("featureGroupsSet", "ANY", "ANY", "missing"), function(x, i, j,
 # UNDONE: mention that object will be unset
 #' @rdname featureGroups-class
 #' @export
-setMethod("export", "featureGroupsSet", function(obj, type, out, set) export(unset(obj, set), type, out))
+setMethod("export", "featureGroupsSet", function(obj, ..., set) export(unset(obj, set), ...))
 
 #' @rdname featureGroups-class
 #' @export

@@ -76,9 +76,8 @@ NULL
 #'
 #'   The \code{availableBackends} function can be used to verify if the dependencies for these backends are met.
 #'
-#' @references \addCitations{Rcpp}{1} \cr\cr \addCitations{Rcpp}{2} \cr\cr \addCitations{Rcpp}{3} \cr\cr
-#'   \insertRef{Dagum1998}{patRoon} \cr\cr \insertRef{Lacki2021}{patRoon} \cr\cr \addCitations{mzR}{1} \cr\cr
-#'   \addCitations{mzR}{2} \cr\cr \addCitations{mzR}{3} \cr\cr \addCitations{mzR}{4} \cr\cr \addCitations{mzR}{5}
+#' @references \addCitations{Rcpp} \cr\cr \insertRef{Dagum1998}{patRoon} \cr\cr \insertRef{Lacki2021}{patRoon} \cr\cr
+#'   \addCitations{mzR}
 #'
 #' @name msdata
 NULL

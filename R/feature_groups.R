@@ -1516,7 +1516,7 @@ setMethod("calculateTox", "featureGroups", function(fGroups, featureAnn)
 #'
 #' @source The re-grouping of IMS features uses \CRANpkg{fastcluster} to group features with close mobilities.
 #'
-#' @references \addCitations{fastcluster}{1}
+#' @references \addCitations{fastcluster}
 #'
 #' @name assignMobilities_feat
 #' @aliases assignMobilities,featureGroups-method

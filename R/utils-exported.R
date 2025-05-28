@@ -681,7 +681,7 @@ getDefEIMParams <- function(...)
 #'
 #' @param \dots optional named arguments that override defaults.
 #'
-#' @references \addCitations{rcdk}{1} \cr\cr \insertRef{OBoyle2011}{patRoon}
+#' @references \addCitations{rcdk} \cr\cr \insertRef{OBoyle2011}{patRoon}
 #'
 #' @export
 getDefTPStructParams <- function(...)
@@ -807,7 +807,7 @@ getDefTPStructParams <- function(...)
 #'   The \code{patRoon.threads} package option sets the number of threads for the \code{piek} algorithm.
 #'
 #' @template refs-openms
-#' @references \insertAllCited{} \addCitations{xcms}{1} \cr\cr \addCitations{xcms}{2} \cr\cr \addCitations{xcms}{3}
+#' @references \insertAllCited{} \addCitations{xcms}
 #'
 #' @export
 getDefPeakParams <- function(type, algorithm, ...)

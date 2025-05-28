@@ -83,7 +83,7 @@ NULL
 #'   Assigned by the \code{\link{calculateConcs}}/\code{\link{calculateTox}} methods. Use the
 #'   \code{concentratrions}/\code{toxicities} methods for access.
 #'
-#' @templateVar what \code{calculatePeakQualities} and \code{assignMobilities}
+#' @templateVar what \code{calculatePeakQualities}
 #' @template uses-msdata
 #'
 #' @author Rick Helmus <\email{r.helmus@@uva.nl}> and Ricardo Cunha <\email{cunha@@iuta.de}> (\code{getTICs} and
@@ -1514,6 +1514,9 @@ setMethod("calculateTox", "featureGroups", function(fGroups, featureAnn)
 #'   either on the mobility features, their IMS parents, both or either the parent or orphans (controlled by the
 #'   \code{IMS} argument to the corresponding functions).
 #'
+#' @templateVar what \code{assignMobilities}
+#' @template uses-msdata
+#' 
 #' @source The re-grouping of IMS features uses \CRANpkg{fastcluster} to group features with close mobilities.
 #'
 #' @references \addCitations{fastcluster}

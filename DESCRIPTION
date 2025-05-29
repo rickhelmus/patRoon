@@ -292,6 +292,8 @@ Collate:
     'utils-checkmate.R'
     'utils-exported.R'
     'utils-feat_annotations.R'
+    'utils-features-ims.R'
+    'utils-features-sets.R'
     'utils-features.R'
     'utils-formulas.R'
     'utils-mol.R'

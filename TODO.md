@@ -2,7 +2,6 @@
 
 ## general
 
-- newProject: don't break lines of text strings, e.g. long paths with spaces in them passed to generateAnalysisInfo()
 - lossElements: handbook suggests it takes a whole formula --> maybe make fragFormula/lossFormula filters?
 - BUG: annotatedBy filter incorrectly filters feature level peak lists
     - record group IDs in feature tabs and use them to remove
@@ -15,6 +14,9 @@
 - formulas: calcFeatures by default FALSE?
 - BUG: annSim.1 column (in formulas?)?
 - install timsconvert and c3sdb in Docker and bundle
+- fix default IDLs
+- ADT: averaged data is now always per replicate, change to averageBy?
+- remove RcppProgress?
 
 
 ## Maybe
@@ -56,24 +58,31 @@
 - convertMobilityToCCS() / convertCCSToMobility(): handle Waters data?
 - start using saveCacheDataList() on more places?
 - basic and default error handling for executeCommand()?
+- getEIMs() function?
+- add TP-formula filter() method, so parent-duplicates can be removed (ie removeParentIsomers filter)? If so, link to it in ann_form docs like ann_comp
+- checkFeatures()
+    - optionally disable mobilograms?
+    - mobilogram previews?
 
 
 ## newProject()
 
-- update MSPL filters and set maxMZOverPrec (and other new?) by default
-- add estimateIDLevels()
-- remove precursorMzWindow
 - anaInfo.R
-    - source(...) doesn't return anaInfo but a list, either subset that result or set anaInfo in the R file?
     - conc/norm conc are set to "NA_real_"
-- conversion/anaInfo
-    - see if getAllMSFilesFromAnaInfo() can be used, otherwise remove it
-    - use of getMSInConversionFormats() / getMSOutConversionFormats()
-    - add im_collapse and timsconvert
+- remove conc column?
 - remove default limits that are in limits.yml
-- copy limits file and UI to specify IMS default
-- update getNewProjectWidgetTypes()
-
+- move components to features tab?
+- IMS changes
+    - Analyses/Toggles: any checks?
+        - could instead check if the right file type is selected, either in anaInfo or as conversion step
+            - make it dependable on feat finder, then also check file format
+            - only check if anaTable is made
+            - if no suitable file is found, check if conversion to type/format is there, otherwise warn
+    - Codegen
+        - Select right example anaInfo
+        - Add mobility filters for suspects & compounds?
+        - is assignMobilities() before TP componentization OK?
+            - IMS="maybe", so probably fine?
 
 ## Param defaults
 
@@ -89,7 +98,9 @@
 
 ## TC
 
-- rename estimateIDLevels() and have the same name as annotateSuspects()?
+- minAbundanceFeatAbs/Rel: does it make sense to also filter fGroup peak lists? If not, remove and update docs.
+- default thresholds for ann forms/comps
+- calc sets annSims like those for formulas/compounds, update NEWS (and update docs if we don't change this)
 
 ## msdata
 
@@ -97,10 +108,14 @@
 - see what is the best default for backends
     - set mzR in front for safety?
 - MSPL: hclust seems unusable due to high mem usage with IMS data? --> just default to distance and doc change/IMS need?
+    - update getDefAvgPListParams() docs
 - embed TIMS-SDK? --> in patRoonExt
 - Agilent
     - SC doesn't recognize IM
 - re-introduce isolation window for MSPL? eg if file doesn't contain ranges (is that a thing?) or for some reason a more narrow range is desired
+- naming: im_collapse and IMSCollapse
+- patRoon.checkCentroided removed: update (incl docs) or remove?
+
 
 ## IMS
 
@@ -127,15 +142,14 @@
     - group IMS: add to groupFeatures, (force) disable RT align and group fractions?
 - update fGroupsComparison/consensus()
 - update featAnn consensus?
-- update checkFeatures()
+
 
 ## Tests
 
 - Features
     - SAFD?
+    - set reordering?
 - Feat Ann
-    - IDL filter and filtering annSim, annSimForm, annSimBoth
-    - annSim: jaccard (as was done for suspects)
     - MSPL
         - new spec averaging params: add IMS
         - more extensively test filters/summing/averaging
@@ -145,14 +159,10 @@
         - see if current default abundance threshold is fine
 
 - TPs
-    - TP components
-        - candidates arg for ADT
     - ann TPs
         - also filter methods
         - comp method: TPsRef, fGroupsComps, min... thresholds
     - verify TP retDirs?
-    - run CTS tests
-    - update lib refs for new PCL
 - msdata
     - new verifyFileForFormat() usage in convertMSFiles()
     - file conversion?
@@ -164,6 +174,9 @@
         - availableBackends()
         - use eg mzR, MSTK, SC to get eg EICs or PLs
 - IMS
+    - add IMSRangeParams/withIMSParent/applyIMS filters also to features method?
+         - only IMSRangeParams would make sense, as others don't for direct workflows
+         --> add docs in general feature filter args
     - more verification that normInts() works before/after assignMobilities()
     - IMS arg for [, filter(), ADT, and plotting functions
     - applyMS for filter()
@@ -171,10 +184,13 @@
     - expandForIMS()
         - verify things are copied or error is thrown for unsupported algos
     - convertMobilityToCCS() / convertCCSToMobility()
+        - eg convert back and forth
     - suspects
         - test order of data selection for mobility and CCS columns, missing data etc
     - assignMobilities()
-        - DT method: robustness with missing data in input/from
+        - DT method
+            - robustness with missing data in input/from
+            - check warnings
         - fGroups methods
             - verify relevant slots are copied
             - from screenInfo(), eg for fGroups with >1 suspect assigned
@@ -190,7 +206,7 @@
         - verify removal duplicate suspects/features?
     - groupFeaturesIMS()
     - plotChroms(): mob annotation
-    - plotMobilogram()
+    - plotMobilograms()
     - XCMS features/fGroups, eg with subsetting & exporting
     - normInts(): verify results are copied
     - CCS/Mob conversion utilities? Or rely on assignMobilities() tests?
@@ -202,181 +218,83 @@
     - DA features and formulas?
     - manually check all HTML reporting functionality at the end
     - generateAnalysisInfo()?
+- newProject()
+    - see where testing is slow, possibly disable testServer() on CI?
 
 
 ## Docs
 
-- TC
-    - ES contributions for IDLs
-    - explicitly mention annSim can be filtered with scoreLimits?
-    - annSim for sets is calculated as max
-    - annSimForm / annSimBoth are added by compounds method of estimateIDLevels() if formulas/MSPL are set, may be used for ID levels (not by default)
-    - analysisInfo slot/accessor is now data.table()
-    - reorderAnalyses(): doc that XCMS/XCMS3/KPIC2 fGroups internal slot is not updated, maybe also improve general docs for what is updated and for XCMS what it means for exporting data
-    - analysisInfo<-()
-        - doc methods (eg add limitations)
-        - doc that anaInfo shouldn't be changed by reference?
-    - new subset args (ni, reorder, reorder sets)
-    - plotVenn()/unique()/overlap(): aggregate arg
-    - overlap(): which can be NULL
-    - plotUpSet()
-        - aggregate arg
-        - nsets can be NULL
-    - plotChord()
-        - aggregate arg (replaces average)
-        - outerGroups --> groupBy and now expects anaInfo column name
-            - also update (incorrect) example in handbook
-    - plot()/plotChroms()
+- Rcpp refs and fastcluster refs don't seem to work anymore?
+- move all plotBPC(), getEIC() etc methods into one doc file?
+- Changed default db for MetFrag to pubchemlite --> check tutorial etc
+- anaInfo
+    - link to IMS section where path_IMS is explained
+    - maybe add more examples where eg raw data can be used
+- convert
+    - add patRoon 3.0 citation for im_collapse
+    - clMethod and mzWindow for IM collapse --> see how this can be combined with others
+    - update handbook and tutorial
+- backend
+    - refer to it in piek
+- handbook/tutorial
+    - features
+        - mention somewhere that IMS="maybe" for e.g. plotting
         - colourBy --> groupBy
-            - "none" --> NULL
-            - anaInfo col possible
-    - as.data.table()
-        - average arg
-            - different for features==T&&average==T --> fGroups
-            - rGroups also supported
-        - regressionBy arg
-            - mention that "set" can be used for sets workflows
-            - regressionBy column with features=T
-            - mention that regressionBy values for average groups should be equal
+        - outerGroups --> groupBy, also update (incorrect) example in handbook
+        - plotVenn()/overlap()/unique(): update for removal of sets arg: give examples with aggregate
+        - plotInt(): give examples for xBy, groupBy etc
+        - mention that "set" can be used in sets WFs for groupBy, regressionBy, etc
             - mention that in sets workflow, regressionBy column can be set to set unique names (eg UV-pos)
-        - fix: mention how pred results are merged with collapseSuspects=NULL (ie all non-suspect type values are removed if fGroup has suspect result)
-        - updates for changed regression arg and conc_reg --> x_reg
-        - anaInfoCols arg
-            - only works with features==T and cols must be numeric if average==T
-        - make new page with all as.data.table() methods
-    - minimum max intensity feature filter
-    - maxMZOverPrecMS/maxMZOverPrecMSMS MSPL filters
-    - plotInt()
-        - xnames --> xNames
-        - new args: areas, xBy, groupBy, averageFunc, regression
-        - RSQs in legend only shown if length(fGroups==1) or groupBy = "fGroups"
-    - filter() for screening: k arg, including NA to clearout results for fGroups specified by j (or all if j==NULL)
-    - MS/MS bg subtraction
-        - abundance filter args
-        - abundance columns in mspl
-        - abundance parameter in average params
-        - getBGMSMSPeaks()
-        - new/shortened filter() args
-        - removeMZs and mzWindow filter() args
-            - removeMZs list for sets
-    - generateComponentsTPs()
-        - new args
-        - as.data.table candidates arg
-        - candidate specific frag/NL matches, also filter
-        - new slots
-    - generateTPs()
-        - ann_comp/ann_form algos
-        - forceCalcRetDir: only relevant for library atm, clearly mention its use in genTPsLib docs
-        - TPStructParams: all parameters, explain when logPs are calculated (ie if both parent/TP is absent)
-        - TPsComp/TPsForm: filter()
-        - parallel=T is only useful with many candidates
-    - compoundsLibrary: mention that libMatch == annSim
-    - plotVenn()/overlap()/unique(): update for removal of sets arg, give examples with aggregate
-    - plotVenn()/overlap/plotUpSet(): update for removal of list arg possibility for which
-    - MetFrag: don't do MP for non-local databases to avoid connection errors
-- msdata
-    - getMSFileFormats(), getMSOutConversionFormats(), ...
-    - patRoon.threads, patRoon.MS.backends, patRoon.MS.preferIMS, patRoon.path.BrukerTIMS and patRoon.path.limits options
-        - patRoon.MS.preferIMS: only works for MSTK/SC, ie putting OTIMS in front doesn't work
-    - update PListParams
-    - updated convertMSFilesXXX() functions, including changed args
-        - add docs for algo specific functions that are now exported
-    - update generateMSPeakLists()
-        - also in Handbook
-        - no more precursorMzWindow
-        - update avg params
-        - don't refer to deprecated MSPL generators
-    - availableBackends()
-        - also invisible return value
-    - EICParams for getPICSet() and calculatePeakQualities()
-    - mzExpIMSWindow and minIntensityIMS EIXParam
-    - update all for getEICs()
-        - note that additional columns are only available for output=="raw"
-    - doc that minAbundanceAbs will be maxed to actual spec count
-    - timsconvert; add refs, installation
-    - minIntensity arg for pwiz conversion, set by default for eg Agilent data
+        - filter() for screening: k arg
+    - MSPL
+        - new filter names
+        - generateMSPeakLists() usage
+            - no more precursorMzWindow
+    - ann
+        - annotateSuspects() --> estimateIDConfidence()
+        - estimateIDConfidence() description for formulas/compounds
+        - example where annSim is filtered with scoreLimits
+        - minMobSpecSim
+    - componentization
+        - expandForIMS()?
+    - file conversion
+        - mention mzXML/mzML requirements as newProject() doesn't give note anymore
+    - appendix section for limits? Mention patRoon.path.limits option?
+- TC
+    - reorderAnalyses(): doc that XCMS/XCMS3/KPIC2 fGroups internal slot is not updated, maybe also improve general docs for what is updated and for XCMS what it means for exporting data
+    - MSPL
+        - abundance columns in mspl --> section in generateMSPeakLists()?
 - IMS
-    - hasMobilities slot for features
+    - minIntensityIMS template, also for getEICs()
     - Dietrich features
-    - getDefPeakParams()
+        - refer to defaults/limits for getFeaturesEICsParams() (and removeDuplicateFeatsSusps()?)
     - getDefEICParams() / getDefEIMParams()
-        - update for retWindow --> window
-        - add docs for getDefEIMParams()
+        - finish docs for IMSWindow/clusterMethod
         - update handbook
     - assignMobilities()
-        - mention that feature properties (except intensity, rt, area) are simply copied from parent
-        - suspect/compounds method
-            - mention when mobility <--> CCS conversions occur
-            - doc how charge is taken and adducts are used
-            - compounds: mobility etc assumed to be specific per set (due to different adducts and m/z values), but equal for consensus() (structure should be the same)
-            - DT: adducts arg can be character() if adduct column is present
-            - matchFromBy == "InChIKey1" will automatically calculate IK1 if missing, and DT method keeps it in output
-            - matchFromBy == "InChIKey" is not supported by SIRIUS
-        - doc the use for fromSuspects, eg
-            - doesn't rely on mobility peak detection, so might be less prone to false negatives with eg low intensities
-            - scenario 1: we know the mobility very well, eg from a database --> use a narrow IMSWindow
-            - scenario 2: we only have the mobility from eg a prediction and don't care so much about identification by CCS match --> use wide IMSWindow
-        - clearly doc what IMSWindow is used for
-    - normInts()
-        - istd hits of mobility features are not used (IMS="maybe")
-        - mobility features are ignored (IMS="maybe") for tic
-        - relative intensities/areas are copied from parents
-    - plotChroms()/plotMobilograms()
-        - annotate has mob option
-        - intMax can only work for EICs (mob inten may not be stored)
-        - plotChroms(): IMS arg overrides analysis/groupNames args for availability after IMS selection
-    - IMS arg for [, filter() and plotting functions, export(), getXCMS...()
-    - doc that IMS arg should most likely be FALSE for export/getXCMS...()
-    - applyIMS arg for all fGroups filter methods
-        - ignores negate!
-    - withIMSParent arg for filter()
-    - calculateConcs()
-        - clearly doc that mobility parent intensities are used to calculate concentrations (if available).
-        - Also note that the mobility fGroup's RF is still used (only relevant for SIRIUS or RT changes), and is different then when assignMobilities() copies results
-        - IMS arg for getQuantCalibFromScreening() --> clearly doc that default is best
-    - ADT
-        - IMS option and mobility_collapsed column, which contains rounded numbers
-    - components
-        - doc that expandForIMS() may needs to be called after tree splitting
-            - improve printed NOTE with link to manual?
-        - clearly doc that expandForIMS() just simple copying only; and this may lead to eg TP candidates that were not actually found by screening and therefore have NAs in the report
-            - unless screening occurred before mobility assignment, which needs to be in a expand workflow?
-        - doc expandForIMS() generic and methods
-        - clearly doc the difference if TP components are generated after assignMobilities(); there will be no IMS TP parents with expanding
-    - convertMobilityToCCS() / convertCCSToMobility()
-        - clearly refer to papers and implementations
-        - mention that length of charge param is expanded
-    - getCCSParams()
-        - doc where Mason-Schamp const comes from
-    - suspects/compounds
-        - doc order of data selection for mobility and CCS columns
-    - getIMSRangeParams() and getIMSMatchParams()
-    - get CCS values from MetFrag
-        - use PCL w/ CCSbase
-        - still need to call assignMobilities() with from = NULL to get CCS deviations, mobility conversions etc
+        - refs to paper
+        - fGroups method
+            - add link to piek, and possibly import for direct IMS assignment
+        - compounds method
+            - PCL already has CCSbase, so no need to convert (also mention elsewhere?)
+    - IMSRangeParams filter --> when feature filter is there
+        - also for compounds
     - peakParams
         - doc common parameters that may need to be changed for IMS
         - doc that they could probably be optimized further
-    - spectrumSimilarityMobility() method/generic
     - minMobSpecSim: clearly doc how things work
         - results are simply copied from parent (including annSims)
         - only fragInfos are updated
         - ignored for MS only formulas
-- limits
-    - defaults also used for params (EIXs etc) --> doc somehow
-    - doc new functions
-    - appendix in Handbook
-- updates for generateAnalysisInfo()
-- MS2QuantMeta slots for fGroyupsScreeningSet, formulasSet and compoundsSet (latter already present but wasn't filled in)
-- add Handbook section on file conversion
-    - mention mzXML/mzML requirements as newProject() doesn't give note anymore
+        - make template section?
 
 
 ## NEWS
 
 - TC
     - specSimParamsMatch --> specSimParams
-    - annotateSuspects() now copies annSims from feat annotations instead of calculating
+    - annotateSuspects() --> estimateIDConfidence()
+    - annotateSuspects()/estimateIDConfidence() now copies annSims from feat annotations instead of calculating
         - change in func args
         - annSimBoth is copied, so needs to be present in compounds (ie from IDLs)
     - annSuspects should be faster now (no need to calc annSims, and estIDLevel is faster)
@@ -392,7 +310,7 @@
     - overlap(): which can be NULL
     - plotUpSet():
         - aggregate arg
-        - nsets can be/defaults to NULL
+        - nsets can be/defaults to NULL (all methods)
     - plotChord()
         - aggregate arg (replaces average)
         - outerGroups --> groupBy and now expects anaInfo column name
@@ -409,6 +327,7 @@
             - clarify that same columns are used for areas?
         - adduct column: now split per set and renamed to group_adduct
         - added susp_bestEstIDLevel column
+        - moved docs to new page with all as.data.table() methods
     - plotInt()
         - xnames --> xNames
         - new args: areas, xBy, groupBy, averageFunc, regression
@@ -451,7 +370,7 @@
     - MetFrag: don't do MP for non-local databases to avoid connection errors
     - componentsNT: renamed "rt" to "ret" for consistency
 - msdata
-    - MSFileFormats() --> getMSInConversionFormats() / getMSOutConversionFormats() / getMSFileFormats()
+    - MSFileFormats() --> getMSConversionFormats() / getMSFileFormats()
     - new behavior of getMSFilesFromAnaInfo(): file types are checked one by one to avoid mixes and always checked to be present (mustExist was set a bit randomly...)
     - better checking of analysis file directory checking (verifyFileForFormat())
     - new/changed PListParams
@@ -463,11 +382,13 @@
     - generateMSPeakLists()
         - now uses backends, old methods still available but deprecated
         - no more precursorMzWindow, and avg params were changed
+        - averaging is now intensity weighted
     - EICParams for getPICSet() and calculatePeakQualities() (needed for m/z IMS expansion)
     - mzExpIMSWindow EIXParam
     - (subsetDTColumnsIfPresent: use order of requested cols instead of original) --> may change column order in some places
     - minIntensity arg for pwiz conversion, set by default
     - getBPCs(): doen't return m/z anymore
+    - SAFD: fileType replaces profPath argument
 - IMS
     - hasMobilities slot for features
     - Dietrich features
@@ -494,7 +415,9 @@
 - sets names are now checked to not contain any special characters (besides underscores). Automatic labels are now separated by underscores instead of dots.
 - FIXED: SIRIUS with calculateFeatures=T may sometimes fail due to file name truncation
 - generateAnalysisInfo()
-- MS2QuantMeta slots for fGroyupsScreeningSet, formulasSet and compoundsSet (latter already present but wasn;t filled in)
+- MS2QuantMeta slots for fGroupsScreeningSet, formulasSet and compoundsSet (latter already present but wasn;t filled in)
+- Changed default db for MetFrag to pubchemlite
+- Fixed: codegen for functions: don't break lines of args with long text strings
 
 
 ## Features

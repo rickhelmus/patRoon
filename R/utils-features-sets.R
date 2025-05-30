@@ -34,22 +34,19 @@ getAnnotationsFromSetFeatures <- function(fGroups)
     return(ret)
 }
 
-finishFGroupsForSets <- function(fGroups, ..., verbose)
+setMethod("doGroupFeatures", "featuresSet", function(feat, grouper, groupAlgo, ..., IMSWindow, verbose)
 {
+    fg <- callNextMethod()
+    
     otherArgs <- list(...)
-    feat <- getFeatures(fGroups) # may have been changed (eg in initialize())
-    ret <- featureGroupsSet(groupAlgo = algorithm(fGroups), groupArgs = otherArgs, groupVerbose = verbose,
-                            groups = groupTable(fGroups), groupInfo = groupInfo(fGroups), features = feat,
-                            ftindex = groupFeatIndex(fGroups), algorithm = makeSetAlgorithm(list(fGroups)))
+    feat <- getFeatures(fg) # may have been changed (eg in initialize())
+    ret <- featureGroupsSet(groupAlgo = algorithm(fg), groupArgs = otherArgs, groupVerbose = verbose,
+                            groups = groupTable(fg), groupInfo = groupInfo(fg), features = feat,
+                            ftindex = groupFeatIndex(fg), algorithm = makeSetAlgorithm(list(fg)))
     ret@annotations <- getAnnotationsFromSetFeatures(ret)
+    
     return(ret)
-}
-
-groupFeaturesSets <- function(feat, grouper, ..., verbose)
-{
-    fGroups <- selectMethod(grouper, "features")(feat = feat, ...)
-    return(finishFGroupsForSets(fGroups, ..., verbose = verbose))
-}
+})
 
 setMethod("getFeatureEIXInputTab", "featureGroupsSet", function(obj, type, analysis, groupName, EIXParams)
 {

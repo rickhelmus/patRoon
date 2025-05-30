@@ -54,7 +54,8 @@ setMethod("initialize", "featureGroupsXCMS3",
 setMethod("groupFeaturesXCMS3", "features", function(feat, rtalign = TRUE, loadRawData = TRUE,
                                                      groupParam = xcms::PeakDensityParam(sampleGroups = analysisInfo(feat)$replicate),
                                                      preGroupParam = groupParam,
-                                                     retAlignParam = xcms::ObiwarpParam(), verbose = TRUE)
+                                                     retAlignParam = xcms::ObiwarpParam(),
+                                                     IMSWindow = defaultLim("mobility", "medium"), verbose = TRUE)
 {
     # UNDONE: aligning gives XCMS errors when multithreading
 
@@ -62,34 +63,46 @@ setMethod("groupFeaturesXCMS3", "features", function(feat, rtalign = TRUE, loadR
     checkmate::assertClass(feat, "features", add = ac)
     aapply(checkmate::assertFlag, . ~ rtalign + loadRawData + verbose, fixed = list(add = ac))
     aapply(assertS4, . ~ groupParam + preGroupParam + retAlignParam, fixed = list(add = ac))
+    checkmate::assertNumber(IMSWindow, lower = 0, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
-
-    xdata <- getXCMSnExp(feat, verbose = verbose, loadRawData = loadRawData)
-    return(doGroupFeaturesXCMS3(xdata, feat, rtalign, loadRawData, groupParam, preGroupParam, retAlignParam, verbose))
+    
+    doG <- function(feat, ...)
+    {
+        xdata <- getXCMSnExp(feat, verbose = verbose, loadRawData = loadRawData, IMS = "both")
+        doGroupFeaturesXCMS3(feat, xdata, ...)
+    }
+    
+    return(doGroupFeatures(feat, doG, "xcms3", rtalign = rtalign, loadRawData = loadRawData, groupParam = groupParam,
+                           preGroupParam = preGroupParam, retAlignParam = retAlignParam, IMSWindow = IMSWindow,
+                           verbose = verbose))
 })
 
 #' @rdname groupFeaturesXCMS3
 #' @export
 setMethod("groupFeaturesXCMS3", "featuresSet", function(feat,
                                                         groupParam = xcms::PeakDensityParam(sampleGroups = analysisInfo(feat)$replicate),
-                                                        verbose = TRUE)
+                                                        IMSWindow = defaultLim("mobility", "medium"), verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(verbose, add = ac)
     assertS4(groupParam, add = ac)
+    checkmate::assertNumber(IMSWindow, lower = 0, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
-    # HACK: force non-set features method to allow grouping of neutralized features
-    # UNDONE: or simply export this functionality with a flag?
-    xdata <- selectMethod("getXCMSnExp", "features")(feat, verbose = verbose, loadRawData = FALSE)
+    doG <- function(feat, ...)
+    {
+        # HACK: force non-set features method to allow grouping of neutralized features
+        # UNDONE: or simply export this functionality with a flag?
+        xdata <- selectMethod("getXCMSnExp", "features")(feat, verbose = verbose, loadRawData = FALSE, IMS = "both")
+        doGroupFeaturesXCMS3(feat, xdata, ...)
+    }
     
-    ret <- doGroupFeaturesXCMS3(xdata, feat, rtalign = FALSE, loadRawData = FALSE, groupParam, groupParam,
-                                xcms::ObiwarpParam(), verbose)
-    
-    return(finishFGroupsForSets(ret, groupParam = groupParam, verbose = verbose))
+    return(doGroupFeatures(feat, doG, "xcms3", rtalign = FALSE, loadRawData = FALSE, groupParam = groupParam,
+                           preGroupParam = groupParam, retAlignParam = xcms::ObiwarpParam(), IMSWindow = IMSWindow,
+                           verbose = verbose))
 })
 
-doGroupFeaturesXCMS3 <- function(xdata, feat, rtalign, loadRawData, groupParam, preGroupParam, retAlignParam, verbose)
+doGroupFeaturesXCMS3 <- function(feat, xdata, rtalign, loadRawData, groupParam, preGroupParam, retAlignParam, verbose)
 {
     anaInfo <- analysisInfo(feat)
     

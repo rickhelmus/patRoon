@@ -49,7 +49,8 @@ setMethod("initialize", "featureGroupsKPIC2",
 #' @export
 setMethod("groupFeaturesKPIC2", "features", function(feat, rtalign = TRUE, loadRawData = TRUE,
                                                      groupArgs = list(tolerance = c(0.005, 12)),
-                                                     alignArgs = list(), verbose = TRUE)
+                                                     alignArgs = list(), IMSWindow = defaultLim("mobility", "medium"),
+                                                     verbose = TRUE)
 {
     checkPackage("KPIC", "rickhelmus/KPIC2")
     
@@ -57,33 +58,40 @@ setMethod("groupFeaturesKPIC2", "features", function(feat, rtalign = TRUE, loadR
     aapply(checkmate::assertFlag, . ~ rtalign + loadRawData + verbose, fixed = list(add = ac))
     aapply(checkmate::assertList, . ~ groupArgs + alignArgs, any.missing = FALSE, names = "unique",
            fixed = list(add = ac))
+    checkmate::assertNumber(IMSWindow, lower = 0, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
-    picsSet <- getPICSet(feat, loadRawData = loadRawData)
-    return(doGroupFeaturesKPIC2(picsSet, feat, rtalign, loadRawData, groupArgs, alignArgs, verbose))
+    doG <- \(feat, ...) doGroupFeaturesKPIC2(feat, getPICSet(feat, loadRawData = loadRawData, IMS = "both"), ...)
+    return(doGroupFeatures(feat, doG, "kpic2", rtalign = rtalign, loadRawData = loadRawData, groupArgs = groupArgs,
+                           alignArgs = alignArgs, IMSWindow = IMSWindow, verbose = verbose))
 })
 
 #' @rdname groupFeaturesKPIC2
 #' @export
 setMethod("groupFeaturesKPIC2", "featuresSet", function(feat, groupArgs = list(tolerance = c(0.005, 12)),
-                                                        verbose = TRUE)
+                                                        IMSWindow = defaultLim("mobility", "medium"), verbose = TRUE)
 {
     checkPackage("KPIC", "rickhelmus/KPIC2")
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(verbose, add = ac)
     checkmate::assertList(groupArgs, any.missing = FALSE, names = "unique", add = ac)
+    checkmate::assertNumber(IMSWindow, lower = 0, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
-    # HACK: force non-set features method to allow grouping of neutralized features
-    # UNDONE: or simply export this functionality with a flag?
-    picsSet <- selectMethod("getPICSet", "features")(feat, loadRawData = FALSE)
-    ret <- doGroupFeaturesKPIC2(picsSet, feat, rtalign = FALSE, loadRawData = FALSE, groupArgs = groupArgs,
-                                alignArgs = list(), verbose = verbose)
-    return(finishFGroupsForSets(ret, groupArgs = groupArgs, verbose = verbose))
+    doG <- function(feat, ...)
+    {
+        # HACK: force non-set features method to allow grouping of neutralized features
+        # UNDONE: or simply export this functionality with a flag?
+        picsSet <- selectMethod("getPICSet", "features")(feat, loadRawData = FALSE, IMS = "both")
+        doGroupFeaturesKPIC2(feat, picsSet, ...)
+    }
+    
+    return(doGroupFeatures(feat, doG, "kpic2", rtalign = FALSE, loadRawData = FALSE, groupArgs = groupArgs,
+                           alignArgs = list(), IMSWindow = IMSWindow, verbose = verbose))
 })
 
-doGroupFeaturesKPIC2 <- function(picsSet, feat, rtalign, loadRawData, groupArgs, alignArgs, verbose)
+doGroupFeaturesKPIC2 <- function(feat, picsSet, rtalign, loadRawData, groupArgs, alignArgs, verbose)
 {
     if (length(feat) == 0)
         return(featureGroupsKPIC2(features = feat))

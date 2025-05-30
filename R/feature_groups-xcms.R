@@ -51,37 +51,49 @@ setMethod("initialize", "featureGroupsXCMS",
 #' @export
 setMethod("groupFeaturesXCMS", "features", function(feat, rtalign = TRUE, loadRawData = TRUE,
                                                     groupArgs = list(mzwid = 0.015), 
-                                                    retcorArgs = list(method = "obiwarp"), verbose = TRUE)
+                                                    retcorArgs = list(method = "obiwarp"),
+                                                    IMSWindow = defaultLim("mobility", "medium"), verbose = TRUE)
 {
-    # UNDONE: keep loadRawData things? Or just require that it's exported? If keep document also for OpenMS and implications.
-
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertFlag, . ~ rtalign + loadRawData + verbose, fixed = list(add = ac))
     aapply(checkmate::assertList, . ~ groupArgs + retcorArgs, any.missing = FALSE, names = "unique", fixed = list(add = ac))
+    checkmate::assertNumber(IMSWindow, lower = 0, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
-    xs <- getXCMSSet(feat, verbose = verbose, loadRawData = loadRawData)
-    return(doGroupFeaturesXCMS(xs, feat, rtalign, loadRawData, groupArgs, retcorArgs, verbose))
+    doG <- function(feat, ...)
+    {
+        xs <- getXCMSSet(feat, verbose = verbose, loadRawData = loadRawData, IMS = "both")
+        doGroupFeaturesXCMS(feat, xs, ...)
+    }
+    
+    return(doGroupFeatures(feat, doG, "xcms", rtalign = rtalign, loadRawData = loadRawData, groupArgs = groupArgs,
+                           retcorArgs = retcorArgs, IMSWindow = IMSWindow, verbose = verbose))
 })
 
 #' @rdname groupFeaturesXCMS
 #' @export
-setMethod("groupFeaturesXCMS", "featuresSet", function(feat, groupArgs = list(mzwid = 0.015), verbose = TRUE)
+setMethod("groupFeaturesXCMS", "featuresSet", function(feat, groupArgs = list(mzwid = 0.015),
+                                                       IMSWindow = defaultLim("mobility", "medium"), verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(verbose, add = ac)
     checkmate::assertList(groupArgs, any.missing = FALSE, names = "unique", add = ac)
+    checkmate::assertNumber(IMSWindow, lower = 0, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
-    # HACK: force non-set features method to allow grouping of neutralized features
-    # UNDONE: or simply export this functionality with a flag?
-    xs <- selectMethod("getXCMSSet", "features")(feat, verbose = verbose, loadRawData = FALSE)
+    doG <- function(feat, ...)
+    {
+        # HACK: force non-set features method to allow grouping of neutralized features
+        # UNDONE: or simply export this functionality with a flag?
+        xs <- selectMethod("getXCMSSet", "features")(feat, verbose = verbose, loadRawData = FALSE, IMS = "both")
+        doGroupFeaturesXCMS(feat, xs, ...)
+    }
     
-    ret <- doGroupFeaturesXCMS(xs, feat, rtalign = FALSE, loadRawData = FALSE, groupArgs, list(), verbose)
-    return(finishFGroupsForSets(ret, groupArgs = groupArgs, verbose = verbose))
+    return(doGroupFeatures(feat, doG, "xcms", rtalign = FALSE, loadRawData = FALSE, groupArgs = groupArgs,
+                           retcorArgs = list(), IMSWindow = IMSWindow, verbose = verbose))
 })
 
-doGroupFeaturesXCMS <- function(xs, feat, rtalign, loadRawData, groupArgs, retcorArgs, verbose)
+doGroupFeaturesXCMS <- function(feat, xs, rtalign, loadRawData, groupArgs, retcorArgs, verbose)
 {
     if (length(feat) == 0)
         return(featureGroupsXCMS(features = feat))

@@ -17,6 +17,7 @@
 - fix default IDLs
 - ADT: averaged data is now always per replicate, change to averageBy?
 - remove RcppProgress?
+- update REUSE
 
 
 ## Maybe
@@ -139,9 +140,15 @@
     - group orphans in eg "orphan" group?
 - feat EICs
     - tweak default EIC filtering params, more strict for binning?
-    - group IMS: add to groupFeatures, (force) disable RT align and group fractions?
+    - group IMS
+        - (force) disable RT align and group fractions?
+        - support CCS?
+        - verbose: currently doesn't make so much sense, with all repeated callings. Maybe just have a progressbar?
 - update fGroupsComparison/consensus()
 - update featAnn consensus?
+- makeSet()
+    - check for IMS parents?
+    - should all object have or not have mobilities?
 
 
 ## Tests
@@ -287,6 +294,9 @@
         - only fragInfos are updated
         - ignored for MS only formulas
         - make template section?
+    - IMS grouping
+        - doc how it is done, and with sets too
+        - IMSWindow args
 
 
 ## NEWS

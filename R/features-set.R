@@ -63,7 +63,9 @@ doMakeFeaturesSet <- function(featuresList, adducts)
     # combine (neutralized) features
     combFeatures <- Reduce(modifyList, lapply(neutralizedFeatures, featureTable))
     
-    return(featuresSet(features = combFeatures, analysisInfo = combAnaInfo,
+    hasMob <- if (length(featuresList) > 0) any(sapply(featuresList, hasMobilities)) else FALSE
+    
+    return(featuresSet(features = combFeatures, analysisInfo = combAnaInfo, hasMobilities = hasMob,
                        algorithm = makeSetAlgorithm(featuresList)))
 }
 

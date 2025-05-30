@@ -207,6 +207,31 @@ reintegrateMobilityFeatures <- function(features, peakParams, EICParams, peakRTW
     return(features)
 }
 
+clusterFTableMobilities <- function(feat, IMSWindow, byGroup)
+{
+    fTableAll <- as.data.table(feat)
+    
+    byCols <- if (byGroup) "group" else character()
+    # HACK
+    if (!is.null(fTableAll[["set"]]))
+        byCols <- c(byCols, "set")
+    
+    fTableAll[!is.na(mobility), IMSClust := {
+        cl <- if (.N == 0)
+            integer()
+        else if (.N == 1)
+            1L
+        else
+        {
+            hc <- fastcluster::hclust(dist(mobility))
+            cutree(hc, h = IMSWindow)
+        }
+        paste0(paste0(unlist(.BY), collapse = "_"), "-", cl)
+    }, by = byCols]
+    
+    return(fTableAll)
+}
+
 clusterFGroupMobilities <- function(fGroups, IMSWindow, sets)
 {
     # UNDONE: do something more polymorphic than hackish sets arg?
@@ -216,25 +241,9 @@ clusterFGroupMobilities <- function(fGroups, IMSWindow, sets)
     if (!is.null(cd))
         return(cd)
     
-    fTableAll <- rbindlist(featureTable(fGroups), idcol = "analysis")
-    if (sets)
-        fTableAll[, set := analysisInfo(fGroups)$set[match(analysis, analyses(fGroups))]]
-    
-    printf("Clustering mobilities... ")
     # cluster features within original fGroups with similar mobilities together    
-    byCols <- if (sets) c("group", "set") else "group"
-    fTableAll[!is.na(mobility), IMSClust := {
-        cl <- if (.N == 0)
-            integer()
-        else if (.N == 1)
-            1
-        else
-        {
-            hc <- fastcluster::hclust(dist(mobility))
-            cutree(hc, h = IMSWindow)
-        }
-        paste0(paste0(unlist(.BY), collapse = "_"), "-", cl)
-    }, by = byCols]
+    printf("Clustering mobilities... ")
+    fTableAll <- clusterFTableMobilities(getFeatures(fGroups), IMSWindow, byGroup = TRUE)
     printf("Done!\n")
     
     printf("Updating feature group data... ")

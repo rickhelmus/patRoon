@@ -9,18 +9,9 @@ featureGroupsIMS <- setClass("featureGroupsIMS", contains = "featureGroups")
 setMethod("initialize", "featureGroupsIMS",
           function(.Object, groupAlgo, ...) callNextMethod(.Object, algorithm = paste0("ims-", groupAlgo), ...))
 
-setMethod("groupFeaturesIMS", "features", function(feat, groupAlgo, IMSWindow = defaultLim("mobility", "medium"), ...,
-                                                   verbose = FALSE)
+setMethod("groupFeaturesIMS", "features", function(feat, grouper, groupAlgo, ..., IMSWindow, verbose)
 {
     # UNDONE: doc verbose bahavior
-    
-    ac <- checkmate::makeAssertCollection()
-    checkmate::assertString(groupAlgo, add = ac)
-    checkmate::assertNumber(IMSWindow, lower = 0, finite = TRUE, add = ac)
-    checkmate::reportAssertions(ac)
-    
-    if (!hasMobilities(feat))
-        stop("Features have no mobilities assigned!", call. = FALSE)
     
     anaInfo <- analysisInfo(feat)
     fTable <- featureTable(feat)
@@ -30,24 +21,16 @@ setMethod("groupFeaturesIMS", "features", function(feat, groupAlgo, IMSWindow = 
         stop("All features must have mobilities assigned.", call. = FALSE)
     
     # clusters features with similar mobilities
-    if (nrow(fTableAll) == 0)
-        fTableAll[, cl := integer()]
-    else if (nrow(fTableAll) == 1)
-        fTableAll[, cl := 1L]
-    else
+    fTableAll <- clusterFTableMobilities(feat, IMSWindow, byGroup = FALSE)
+    
+    fgIMSClusts <- lapply(unique(fTableAll$IMSClust), function(clust)
     {
-        hc <- fastcluster::hclust(dist(fTableAll$mobility))
-        fTableAll[, cl := cutree(hc, h = IMSWindow)]
-    }
-    fgIMSClusts <- lapply(seq_len(max(fTableAll$cl)), function(clust)
-    {
-        featSub <- delete(feat, j = function(ft, ana, ...) !ft$ID %chin% fTableAll[analysis == ana & cl == clust]$ID)
-        ret <- groupFeatures(featSub, groupAlgo, ..., verbose = verbose)
+        featSub <- delete(feat, j = function(ft, ana, ...) !ft$ID %chin% fTableAll[analysis == ana & IMSClust == clust]$ID)
+        ret <- grouper(featSub, ..., verbose = verbose)
         ft <- as.data.table(getFeatures(ret))
         ret@groupInfo[, mobility := mean(ft$mobility[ft$group == group]), by = "group"]
         return(ret)
     })
-    
     fgInfoAll <- rbindlist(lapply(fgIMSClusts, function(fg) copy(groupInfo(fg))), idcol = "IMSClust")
     fgInfoAll[, group_ims := makeIMSFGroupName(.I, ret, mz, mobility)]
 

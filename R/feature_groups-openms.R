@@ -64,48 +64,20 @@ setMethod("groupFeaturesOpenMS", "features", function(feat, rtalign = TRUE, QT =
                                                       maxAlignMZ = defaultLim("mz", "medium"),
                                                       maxGroupRT = defaultLim("retention", "medium"),
                                                       maxGroupMZ = defaultLim("mz", "medium"), extraOptsRT = NULL,
-                                                      extraOptsGroup = NULL, verbose = TRUE)
+                                                      extraOptsGroup = NULL,
+                                                      IMSWindow = defaultLim("mobility", "medium"), verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(feat, "features", add = ac)
     aapply(checkmate::assertFlag, . ~ rtalign + QT + verbose, fixed = list(add = ac))
-    aapply(checkmate::assertNumber, . ~ maxAlignRT + maxAlignMZ + maxGroupRT + maxGroupMZ,
+    aapply(checkmate::assertNumber, . ~ maxAlignRT + maxAlignMZ + maxGroupRT + maxGroupMZ + IMSWindow,
            finite = TRUE, lower = 0, fixed = list(add = ac))
     aapply(checkmate::assertList, . ~ extraOptsRT + extraOptsGroup, any.missing = FALSE,
            names = "unique", null.ok = TRUE, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
-    if (length(feat) == 0)
-        return(featureGroupsOpenMS(features = feat))
-
-    hash <- makeHash(feat, rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT, maxGroupMZ, extraOptsRT, extraOptsGroup)
-    cachefg <- loadCacheData("featureGroupsOpenMS", hash)
-    if (!is.null(cachefg))
-        return(cachefg)
-
-    if (verbose)
-        cat("Grouping features with OpenMS...\n===========\n")
-
-    cfile <- tempfile("cons", fileext = ".consensusXML")
-    generateConsensusXML(feat, cfile, rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT, maxGroupMZ,
-                         extraOptsRT, extraOptsGroup, verbose)
-    fgimp <- importConsensusXML(feat, cfile, verbose)
-
-    ret <- featureGroupsOpenMS(groups = fgimp$groups, groupInfo = fgimp$gInfo, features = feat, ftindex = fgimp$ftindex)
-
-    saveCacheData("featureGroupsOpenMS", ret, hash)
-
-    if (verbose)
-        cat("\n===========\nDone!\n")
-
-    return(ret)
-})
-
-#' @rdname groupFeaturesOpenMS
-#' @export
-setMethod("groupFeaturesOpenMS", "featuresSet", function(feat, ..., verbose = TRUE)
-{
-    groupFeaturesSets(feat, "groupFeaturesOpenMS", ..., verbose = verbose)
+    return(doGroupFeatures(feat, doGroupFeaturesOpenMS, "openms", rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT,
+                           maxGroupMZ, extraOptsRT, extraOptsGroup, IMSWindow = IMSWindow, verbose = verbose))
 })
 
 generateConsensusXML <- function(feat, out, rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT,
@@ -208,5 +180,34 @@ importConsensusXML <- function(feat, cfile, verbose)
     if (verbose)
         cat("Done!\n")
 
+    return(ret)
+}
+
+doGroupFeaturesOpenMS <- function(feat, rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT, maxGroupMZ,
+                                  extraOptsRT, extraOptsGroup, verbose)
+{
+    if (length(feat) == 0)
+        return(featureGroupsOpenMS(features = feat))
+    
+    hash <- makeHash(feat, rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT, maxGroupMZ, extraOptsRT, extraOptsGroup)
+    cachefg <- loadCacheData("featureGroupsOpenMS", hash)
+    if (!is.null(cachefg))
+        return(cachefg)
+    
+    if (verbose)
+        cat("Grouping features with OpenMS...\n===========\n")
+    
+    cfile <- tempfile("cons", fileext = ".consensusXML")
+    generateConsensusXML(feat, cfile, rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT, maxGroupMZ,
+                         extraOptsRT, extraOptsGroup, verbose)
+    fgimp <- importConsensusXML(feat, cfile, verbose)
+    
+    ret <- featureGroupsOpenMS(groups = fgimp$groups, groupInfo = fgimp$gInfo, features = feat, ftindex = fgimp$ftindex)
+    
+    saveCacheData("featureGroupsOpenMS", ret, hash)
+    
+    if (verbose)
+        cat("\n===========\nDone!\n")
+    
     return(ret)
 }

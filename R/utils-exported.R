@@ -109,7 +109,7 @@ generateAnalysisInfo <- function(fromRaw = NULL, fromCentroid = NULL, fromProfil
     }
     
     # UNDONE: use getMSFileTypes() somehow?
-    allPaths <- Map(list(fromRaw, fromCentroid, fromIMS, fromProfile), c("raw", "centroid", "profile", "ims"), f = addPath)
+    allPaths <- Map(list(fromRaw, fromCentroid, fromProfile, fromIMS), c("raw", "centroid", "profile", "ims"), f = addPath)
     allPaths <- pruneList(allPaths)
     anaInfo <- if (length(allPaths) > 0)
         Reduce(allPaths, f = function(x, y) merge(x, y, by = "analysis", all = TRUE))

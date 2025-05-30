@@ -165,6 +165,7 @@ importFeatureGroupsKPIC2FromFeat <- function(picsSetGrouped, analysisInfo, feat)
         })]
         
         gInfo[, group_kp2 := NULL]
+        setcolorder(gInfo, c("group", "ret", "mz"))
     }
     
     return(featureGroupsKPIC2(picsSetGrouped = picsSetGrouped, groups = groups, groupInfo = gInfo, features = feat,

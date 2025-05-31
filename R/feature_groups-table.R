@@ -438,22 +438,25 @@ doFGAADTFeatures <- function(fGroups, fgTab, intColNames, average, averageBy, ad
     {
         # Melt by intensity column to get the proper format. Afterwards, we remove the dummy intensity column, as we
         # want the raw feature intensity data.
-        mCols <- list(intensity = intColNames)
         
+        # If there is also concentration data, then we melt both the intensity and concentration columns.
         concCols <- paste0(stripADTIntSuffix(intColNames), "_conc")
         if (all(concCols %in% names(fgTab)))
-            mCols <- c(mCols, list(conc = concCols))
-        
-        fgTab <- melt(fgTab, measure.vars = mCols, variable.name = "average_group", variable.factor = FALSE,
-                      value.name = "intensity")
-        fgTab <- fgTab[intensity != 0]
-        
-        if (length(mCols) > 1)
         {
+            fgTab <- melt(fgTab, measure.vars = list(intensity = intColNames, conc = concCols),
+                          variable.name = "average_group", variable.factor = FALSE)
             # DT changes the analyses names to (character) indices with >1 measure vars: https://github.com/Rdatatable/data.table/issues/4047
             fgTab[, average_group := intColNames[as.integer(average_group)]]
         }
+        else
+        {
+            # NOTE: we recent data.table versions, we cannot use measure.vars with a list of length 1:
+            # https://github.com/Rdatatable/data.table/issues/5209
+            fgTab <- melt(fgTab, measure.vars = intColNames, variable.name = "average_group", variable.factor = FALSE,
+                          value.name = "intensity")
+        }
         
+        fgTab <- fgTab[intensity != 0]
         fgTab[, average_group := stripADTIntSuffix(average_group)]
     }
     fgTab <- removeDTColumnsIfPresent(fgTab, "intensity")

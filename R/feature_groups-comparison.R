@@ -122,6 +122,7 @@ convertFGroupsToPseudoFeatures <- function(fGroupsList)
     fGNames <- names(fGroupsList)
 
     flist <- list()
+    hasM <- FALSE
     for (fgi in seq_along(fGroupsList))
     {
         if (length(fGroupsList[[fgi]]) == 0)
@@ -156,13 +157,21 @@ convertFGroupsToPseudoFeatures <- function(fGroupsList)
 
         # dummy area
         ft[, area := intensity * 2.5]
+        
+        if (hasMobilities(fGroupsList[[fgi]]))
+        {
+            ft[, mobility := gi$mobility]
+            ft[, mobmin := mobility - 0.05]
+            ft[, mobmax := mobility + 0.05]
+            hasM <- TRUE
+        }
 
         flist[[fGNames[fgi]]] <- ft
     }
 
     anaInfo <- data.table(analysis = fGNames, replicate = fGNames, blank = "", path = ".")
 
-    return(featuresFromFeatGroups(features = flist, analysisInfo = anaInfo))
+    return(featuresFromFeatGroups(features = flist, analysisInfo = anaInfo, hasMobilities = hasM))
 }
 
 groupPseudoFeatures <- function(pf, groupAlgo, groupArgs)
@@ -216,6 +225,8 @@ setMethod("comparison", "featureGroups", function(..., groupAlgo, groupArgs = li
 
     return(featureGroupsComparison(fGroupsList = fGroupsList, comparedFGroups = compGroups))
 })
+
+setMethod("hasMobilities", "featureGroupsComparison", function(obj) return(hasMobilities(obj@comparedFGroups)))
 
 #' @details \code{plot} generates an \emph{m/z} \emph{vs} retention time plot.
 #' @param retMin If \code{TRUE} retention times are plotted as minutes (seconds otherwise).
@@ -365,6 +376,8 @@ setMethod("consensus", "featureGroupsComparison", function(obj, absMinAbundance 
             ret[, ID := as.character(seq_len(nrow(ret)))]
 
             colsToAvg <- c("ret", "mz", "area", "retmin", "retmax", "mzmin", "mzmax", "intensity")
+            if (hasMobilities(obj))
+                colsToAvg <- c(colsToAvg, "mobility", "mobmin", "mobmax")
 
             for (col in colsToAvg)
                 set(ret, j = col, value = rowMeans(ret[, c(paste0(col, ".x"), paste0(col, ".y")), with = FALSE], na.rm = TRUE))
@@ -410,8 +423,8 @@ setMethod("consensus", "featureGroupsComparison", function(obj, absMinAbundance 
     setTxtProgressBar(prog, nrow(anaInfo))
     close(prog)
 
-    return(featureGroupsConsensus(groups = consGroups, groupInfo = copy(groupInfo(comparedFGroups)), features = retFeatures,
-                                  ftindex = consFeatInds, algorithm = allAlgos))
+    return(featureGroupsConsensus(groups = consGroups, groupInfo = copy(groupInfo(comparedFGroups)),
+                                  features = retFeatures, ftindex = consFeatInds, algorithm = allAlgos))
 })
 
 #' @rdname featureGroups-compare

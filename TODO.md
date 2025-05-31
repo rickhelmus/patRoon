@@ -145,6 +145,7 @@
         - support CCS?
         - verbose: currently doesn't make so much sense, with all repeated callings. Maybe just have a progressbar?
 - update fGroupsComparison/consensus()
+    - support ccs?
 - update featAnn consensus?
 - makeSet()
     - check for IMS parents?
@@ -219,6 +220,7 @@
     - CCS/Mob conversion utilities? Or rely on assignMobilities() tests?
     - spectrumSimilarityMobility()
     - susp lists with >1 mobility/CCS values. Test if mob/CCS counts differ.
+    - feat comparison() and consensus()
 - misc
     - genLimitsFile() and verify that it overrides
     - checkFeatures()/checkComponents() verify if things still work
@@ -297,7 +299,8 @@
     - IMS grouping
         - doc how it is done, and with sets too
         - IMSWindow args
-
+    - feat consensus
+        - doc that all feats must have IMS data. For post workflows, IMS subset could be used
 
 ## NEWS
 

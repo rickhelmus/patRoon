@@ -515,7 +515,7 @@ calcFeatureConcs <- function(fGroups, resp, areas)
         gInfoChange <- groupInfo(fGroups)[!is.na(mobility) & group %chin% resp$group & ims_parent_group %chin% group]
         if (nrow(gInfoChange) > 0)
         {
-            for (grpi in seq_along(gInfoChange))
+            for (grpi in seq_len(nrow(gInfoChange)))
                 set(gt, j = gInfoChange$group[grpi], value = fGroups[[gInfoChange$ims_parent_group[grpi]]])
         }
     }

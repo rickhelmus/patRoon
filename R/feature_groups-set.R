@@ -414,7 +414,11 @@ setMethod("makeSet", "featureGroups", function(obj, ..., groupAlgo, groupArgs = 
     fgFeat@features <- Map(featureTable(fgFeat), adductsChr, lapply(fGroupsList, annotations), f = assignAdductsToFeatTab,
                            MoreArgs = list(mcol = "ID"))
     fgFeat <- neutralizeFeatures(fgFeat, adduct = NULL)
-    setGroups <- groupPseudoFeatures(fgFeat, groupAlgo, c(groupArgs, list(verbose = verbose)))
+    # convert it into a featuresSet
+    fgFeatSet <- featuresSet(features = fgFeat@features, analysisInfo = fgFeat@analysisInfo,
+                             algorithm = fgFeat@algorithm, hasMobilities = fgFeat@hasMobilities)
+    fgFeatSet@analysisInfo[, set := names(fGroupsList)]
+    setGroups <- groupPseudoFeatures(fgFeatSet, groupAlgo, c(groupArgs, list(verbose = verbose)))
     featSet@features <- Map(featureTable(featSet), analysisInfo(featSet)$set, f = function(ft, s)
     {
         ft <- copy(ft)

@@ -143,18 +143,17 @@
 - group IMS
     - (force) disable RT align and group fractions?
     - support CCS columns?
-    - verbose: currently doesn't make so much sense, with all repeated callings. Maybe just have a progressbar?
+        - now CCSs are only in fGroups, so would only be for compare() and makeSet(fGroups)
+        - otherwise doc!
     - support non IMS features?
         - currently not
         - could support it, but clear out IMS parents
         - doc either way
         - also relevant for indirect things that depend on it, eg comparison() and makeSet(fGroups)
-- update fGroupsComparison/consensus()
-    - support ccs?
-- update featAnn consensus?
 - makeSet()
     - check for IMS parents?
     - should all object have or not have mobilities?
+- update featAnn consensus?
 
 
 ## Tests
@@ -306,6 +305,7 @@
         - IMSWindow args
     - feat consensus
         - doc that all feats must have IMS data. For post workflows, IMS subset could be used
+    - "full" option for verbose grouping
 
 ## NEWS
 

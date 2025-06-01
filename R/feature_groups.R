@@ -1644,7 +1644,7 @@ setMethod("groupFeatures", "features", function(obj, algorithm, ..., verbose = T
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertChoice(algorithm, c("openms", "xcms", "xcms3", "kpic2"), add = ac)
-    checkmate::assertFlag(verbose, add = ac)
+    assertGroupFeatVerbose(verbose, add = ac)
     checkmate::reportAssertions(ac)
     
     f <- switch(algorithm,
@@ -1664,7 +1664,7 @@ setMethod("groupFeatures", "data.frame", function(obj, algorithm, ..., verbose =
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertChoice(algorithm, c("sirius"), add = ac)
-    checkmate::assertFlag(verbose, add = ac)
+    assertGroupFeatVerbose(verbose, add = ac)
     checkmate::reportAssertions(ac)
     
     f <- switch(algorithm,

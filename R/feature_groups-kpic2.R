@@ -55,10 +55,11 @@ setMethod("groupFeaturesKPIC2", "features", function(feat, rtalign = TRUE, loadR
     checkPackage("KPIC", "rickhelmus/KPIC2")
     
     ac <- checkmate::makeAssertCollection()
-    aapply(checkmate::assertFlag, . ~ rtalign + loadRawData + verbose, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ rtalign + loadRawData, fixed = list(add = ac))
     aapply(checkmate::assertList, . ~ groupArgs + alignArgs, any.missing = FALSE, names = "unique",
            fixed = list(add = ac))
     checkmate::assertNumber(IMSWindow, lower = 0, finite = TRUE, add = ac)
+    assertGroupFeatVerbose(verbose, add = ac)
     checkmate::reportAssertions(ac)
     
     doG <- \(feat, ...) doGroupFeaturesKPIC2(feat, getPICSet(feat, loadRawData = loadRawData, IMS = "both"), ...)
@@ -74,9 +75,9 @@ setMethod("groupFeaturesKPIC2", "featuresSet", function(feat, groupArgs = list(t
     checkPackage("KPIC", "rickhelmus/KPIC2")
     
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertFlag(verbose, add = ac)
     checkmate::assertList(groupArgs, any.missing = FALSE, names = "unique", add = ac)
     checkmate::assertNumber(IMSWindow, lower = 0, finite = TRUE, add = ac)
+    assertGroupFeatVerbose(verbose, add = ac)
     checkmate::reportAssertions(ac)
     
     doG <- function(feat, ...)
@@ -95,6 +96,8 @@ doGroupFeaturesKPIC2 <- function(feat, picsSet, rtalign, loadRawData, groupArgs,
 {
     if (length(feat) == 0)
         return(featureGroupsKPIC2(features = feat))
+    
+    verbose <- !isFALSE(verbose)
     
     hash <- makeHash(feat, rtalign, loadRawData, groupArgs, alignArgs)
     cachefg <- loadCacheData("featureGroupsKPIC2", hash)

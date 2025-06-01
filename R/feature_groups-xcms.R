@@ -55,9 +55,10 @@ setMethod("groupFeaturesXCMS", "features", function(feat, rtalign = TRUE, loadRa
                                                     IMSWindow = defaultLim("mobility", "medium"), verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
-    aapply(checkmate::assertFlag, . ~ rtalign + loadRawData + verbose, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ rtalign + loadRawData, fixed = list(add = ac))
     aapply(checkmate::assertList, . ~ groupArgs + retcorArgs, any.missing = FALSE, names = "unique", fixed = list(add = ac))
     checkmate::assertNumber(IMSWindow, lower = 0, finite = TRUE, add = ac)
+    assertGroupFeatVerbose(verbose, add = ac)
     checkmate::reportAssertions(ac)
 
     doG <- function(feat, ...)
@@ -76,9 +77,9 @@ setMethod("groupFeaturesXCMS", "featuresSet", function(feat, groupArgs = list(mz
                                                        IMSWindow = defaultLim("mobility", "medium"), verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertFlag(verbose, add = ac)
     checkmate::assertList(groupArgs, any.missing = FALSE, names = "unique", add = ac)
     checkmate::assertNumber(IMSWindow, lower = 0, finite = TRUE, add = ac)
+    assertGroupFeatVerbose(verbose, add = ac)
     checkmate::reportAssertions(ac)
     
     doG <- function(feat, ...)
@@ -97,6 +98,8 @@ doGroupFeaturesXCMS <- function(feat, xs, rtalign, loadRawData, groupArgs, retco
 {
     if (length(feat) == 0)
         return(featureGroupsXCMS(features = feat))
+    
+    verbose <- !isFALSE(verbose)
     
     hash <- makeHash(feat, rtalign, loadRawData, groupArgs, retcorArgs)
     cachefg <- loadCacheData("featureGroupsXCMS", hash)

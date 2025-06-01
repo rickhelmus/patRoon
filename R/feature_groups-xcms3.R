@@ -61,9 +61,10 @@ setMethod("groupFeaturesXCMS3", "features", function(feat, rtalign = TRUE, loadR
 
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(feat, "features", add = ac)
-    aapply(checkmate::assertFlag, . ~ rtalign + loadRawData + verbose, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ rtalign + loadRawData, fixed = list(add = ac))
     aapply(assertS4, . ~ groupParam + preGroupParam + retAlignParam, fixed = list(add = ac))
     checkmate::assertNumber(IMSWindow, lower = 0, finite = TRUE, add = ac)
+    assertGroupFeatVerbose(verbose, add = ac)
     checkmate::reportAssertions(ac)
     
     doG <- function(feat, ...)
@@ -84,9 +85,9 @@ setMethod("groupFeaturesXCMS3", "featuresSet", function(feat,
                                                         IMSWindow = defaultLim("mobility", "medium"), verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertFlag(verbose, add = ac)
     assertS4(groupParam, add = ac)
     checkmate::assertNumber(IMSWindow, lower = 0, finite = TRUE, add = ac)
+    assertGroupFeatVerbose(verbose, add = ac)
     checkmate::reportAssertions(ac)
     
     doG <- function(feat, ...)
@@ -108,6 +109,8 @@ doGroupFeaturesXCMS3 <- function(feat, xdata, rtalign, loadRawData, groupParam, 
     
     if (length(feat) == 0)
         return(featureGroupsXCMS3(features = feat))
+    
+    verbose <- !isFALSE(verbose)
     
     hash <- makeHash(feat, rtalign, loadRawData, groupParam, preGroupParam, retAlignParam)
     cachefg <- loadCacheData("featureGroupsXCMS3", hash)

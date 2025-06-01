@@ -69,11 +69,12 @@ setMethod("groupFeaturesOpenMS", "features", function(feat, rtalign = TRUE, QT =
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(feat, "features", add = ac)
-    aapply(checkmate::assertFlag, . ~ rtalign + QT + verbose, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ rtalign + QT , fixed = list(add = ac))
     aapply(checkmate::assertNumber, . ~ maxAlignRT + maxAlignMZ + maxGroupRT + maxGroupMZ + IMSWindow,
            finite = TRUE, lower = 0, fixed = list(add = ac))
     aapply(checkmate::assertList, . ~ extraOptsRT + extraOptsGroup, any.missing = FALSE,
            names = "unique", null.ok = TRUE, fixed = list(add = ac))
+    assertGroupFeatVerbose(verbose, add = ac)
     checkmate::reportAssertions(ac)
 
     return(doGroupFeatures(feat, doGroupFeaturesOpenMS, "openms", rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT,
@@ -189,6 +190,7 @@ doGroupFeaturesOpenMS <- function(feat, rtalign, QT, maxAlignRT, maxAlignMZ, max
     if (length(feat) == 0)
         return(featureGroupsOpenMS(features = feat))
     
+    verbose <- !isFALSE(verbose)
     hash <- makeHash(feat, rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT, maxGroupMZ, extraOptsRT, extraOptsGroup)
     cachefg <- loadCacheData("featureGroupsOpenMS", hash)
     if (!is.null(cachefg))

@@ -23,14 +23,19 @@ setMethod("groupFeaturesIMS", "features", function(feat, grouper, groupAlgo, ...
     # clusters features with similar mobilities
     fTableAll <- clusterFTableMobilities(feat, IMSWindow, byGroup = FALSE)
     
-    fgIMSClusts <- lapply(unique(fTableAll$IMSClust), function(clust)
+    if (!isFALSE(verbose))
+        printf("Grouping features in %d IMS clusters... \n", uniqueN(fTableAll$IMSClust))
+    
+    fgIMSClusts <- doApply("lapply", doPar = FALSE, prog = isTRUE(verbose), unique(fTableAll$IMSClust), \(clust)
     {
         featSub <- delete(feat, j = function(ft, ana, ...) !ft$ID %chin% fTableAll[analysis == ana & IMSClust == clust]$ID)
-        ret <- grouper(featSub, ..., verbose = verbose)
+        ret <- grouper(featSub, ..., verbose = if (identical(verbose, "full")) verbose else FALSE)
         ft <- as.data.table(getFeatures(ret))
         ret@groupInfo[, mobility := mean(ft$mobility[ft$group == group]), by = "group"]
+        doProgress()
         return(ret)
     })
+    
     fgInfoAll <- rbindlist(lapply(fgIMSClusts, function(fg) copy(groupInfo(fg))), idcol = "IMSClust")
     fgInfoAll[, group_ims := makeIMSFGroupName(.I, ret, mz, mobility)]
 

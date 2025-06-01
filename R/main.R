@@ -40,6 +40,8 @@ setOldClass(c("dissimilarity", "dist"))
 # doesn't work with devtools::load_all(): confuses xcmsRaw "[" operator (!?!?)
 #setClassUnion("numChar", c("character", "numeric"))
 
+setClassUnion("logChar", c("character", "logical"))
+
 # this appears to fix the occasional error "cannot coerce type 'S4' to vector of type 'double'"
 setGeneric("plot")
 

@@ -176,6 +176,15 @@ assertAndPrepareAnaInfo <- function(x, ..., null.ok = FALSE, .var.name = checkma
     return(x)
 }
 
+assertGroupFeatVerbose <- function(x, .var.name = checkmate::vname(x), add = NULL)
+{
+    checkmate::assert(
+        checkmate::checkFlag(x),
+        checkmate::checkChoice(x, "full"),
+        .var.name = .var.name, add = add
+    )
+}
+
 assertAnaInfoBy <- function(x, anaInfo, withFGroups, null.ok = FALSE, any.missing = FALSE,
                             .var.name = checkmate::vname(x), add = NULL)
 {

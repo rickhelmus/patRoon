@@ -49,7 +49,7 @@ NULL
 #' @rdname featureGroups-class
 #' @export
 featureGroupsSet <- setClass("featureGroupsSet",
-                             slots = c(groupAlgo = "character", groupArgs = "list", groupVerbose = "logical",
+                             slots = c(groupAlgo = "character", groupArgs = "list", groupVerbose = "logChar",
                                        annotationsChanged = "list"),
                              contains = "featureGroups")
 

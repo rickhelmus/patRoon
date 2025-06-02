@@ -18,6 +18,15 @@
 - ADT: averaged data is now always per replicate, change to averageBy?
 - remove RcppProgress?
 - update REUSE
+- Harmonize/consistent names
+    - maxMSRtWindow --> maxMSRTWindow
+    - be consistent in mobility vs IMS and mobilograms and EIMs
+        - mobWindow and IMSWindow now randomly used
+        - IMS arg but affects mobility features
+        - withMobility vs withIMS
+    - mob_area/mob_intensity vs mobmin/mobmax
+- feat import
+    - update generic methods
 
 
 ## Maybe
@@ -87,12 +96,6 @@
 
 ## Param defaults
 
-- Harmonize/consistent names
-    - maxMSRtWindow --> maxMSRTWindow
-    - be consistent in mobility vs IMS and mobilograms and EIMs
-        - mobWindow and IMSWindow now randomly used
-        - IMS arg but affects mobility features
-        - withMobility vs withIMS
 - don't use defaults for eg feature finding (and grouping)?
 - somehow cache defaultLim()?
 - tweak agilent defaults --> after application?
@@ -306,6 +309,9 @@
     - feat consensus
         - doc that all feats must have IMS data. For post workflows, IMS subset could be used
     - "full" option for verbose grouping
+- feat import
+    - doc mandatory columns and how missing columns are filled in
+    - doc what is and isn't supported
 
 ## NEWS
 

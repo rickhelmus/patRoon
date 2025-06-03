@@ -242,16 +242,12 @@
 ## Docs
 
 - move all plotBPC(), getEIC() etc methods into one doc file?
-- Changed default db for MetFrag to pubchemlite --> check tutorial etc
-- anaInfo
-    - link to IMS section where path_IMS is explained
-    - maybe add more examples where eg raw data can be used
 - convert
     - add patRoon 3.0 citation for im_collapse
-    - update handbook and tutorial
 - backend
     - refer to it in piek
 - handbook/tutorial
+    - update/extend file conversion
     - features
         - mention somewhere that IMS="maybe" for e.g. plotting
         - colourBy --> groupBy
@@ -276,6 +272,7 @@
         - mention mzXML/mzML requirements as newProject() doesn't give note anymore
     - appendix section for limits? Mention patRoon.path.limits option?
     - update getDefEICParams() / getDefEIMParams()
+    - Changed default db for MetFrag to pubchemlite
 - TC
     - reorderAnalyses(): doc that XCMS/XCMS3/KPIC2 fGroups internal slot is not updated, maybe also improve general docs for what is updated and for XCMS what it means for exporting data
     - MSPL

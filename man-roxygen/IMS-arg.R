@@ -1,5 +1,5 @@
-#' @param IMS Specifies which feature groups are considered <%=consider%> in IMS workflows. The following options are
-#'   valid: \itemize{
+#' @param IMS \IMSWF Specifies which feature groups are considered <%=consider%> in IMS workflows. The following options
+#'   are valid: \itemize{
 #'
 #'   \item \code{"both"}: Selects IMS and non-IMS features.
 #'

@@ -564,8 +564,8 @@ minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, ne
 #' @param removeISTDs If \code{TRUE} then all feature groups marked as internal standard (IS) are removed. This requires
 #'   IS assignments done by \code{\link{normInts}}, see its documentation for more details.
 #' @param groupQualityRange Like \code{featQualityRange}, but filters on group specific or averaged qualities/scores.
-#' @param withIMSParent For IMS workflows: only keep mobility feature groups with IMS parents, \emph{i.e.} remove all
-#'   orphans. Unaffected by \code{negate=TRUE}.
+#' @param withIMSParent \IMSWF only keep mobility feature groups with IMS parents, \emph{i.e.} remove all orphans.
+#'   Unaffected by \code{negate=TRUE}.
 #' @param name description
 #' @param checkFeaturesSession If set then features and/or feature groups are removed that were selected for removal
 #'   (see \link{check-GUI}). The session files are typically generated with the \code{\link{checkFeatures}} and
@@ -577,9 +577,9 @@ minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, ne
 #'   parameters} for more information.
 #' @param removeNA Set to \code{TRUE} to remove \code{NA} values. Currently only applicable to the concentration and
 #'   toxicity filters.
-#' @param applyIMS For IMS workflows: whether the filters are only applied to IMS parents (\code{applyIMS=FALSE}), only
-#'   to mobility features (\code{applyIMS=TRUE}) or to both (\code{applyIMS="both"}). Other feature groups will always
-#'   be kept. The \code{negate} option does not affect \code{applyIMS}.
+#' @param applyIMS \IMSWF whether the filters are only applied to IMS parents (\code{applyIMS=FALSE}), only to mobility
+#'   features (\code{applyIMS=TRUE}) or to both (\code{applyIMS="both"}). Other feature groups will always be kept. The
+#'   \code{negate} option does not affect \code{applyIMS}.
 #'
 #' @templateVar feat FALSE
 #' @template feat-filter-args

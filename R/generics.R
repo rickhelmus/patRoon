@@ -128,6 +128,11 @@ setGeneric("checkFeatures", function(fGroups, session = "checked-features.yml", 
 #' Converts a \code{\link{features}} or \code{\link{featureGroups}} object to an \code{\link{xcmsSet}} or
 #' \code{\link{XCMSnExp}} object.
 #'
+#' The conversion process will introduce some dummy values for metadata not present in \pkg{patRoon} objects. If the
+#' \code{features} or \code{featureGroups} object was generated with \pkg{XCMS}, then no conversion is performed and the
+#' original \pkg{XCMS} object will be returned, if possible. Conversion may still occur \emph{e.g.} due to the
+#' application of some subsetting or filtering steps or the re-ordering of analyses.
+#'
 #' @param obj The object that should be converted.
 #' @param \dots \setsWF Further arguments passed to non-sets method.
 #'
@@ -136,7 +141,7 @@ setGeneric("checkFeatures", function(fGroups, session = "checked-features.yml", 
 #' @param set \setsWF The name of the set to be exported.
 #'
 #' @template loadrawdata-arg
-#' 
+#'
 #' @templateVar consider for export
 #' @templateVar append This should be kept \code{FALSE} as \pkg{XCMS} export currently does not support IMS features.
 #' @template IMS-arg
@@ -144,7 +149,9 @@ setGeneric("checkFeatures", function(fGroups, session = "checked-features.yml", 
 #' @section Sets workflows: In a \link[=sets-workflow]{sets workflow}, \code{\link{unset}} is used to convert the
 #'   feature (group) data before the object is exported.
 #'
-#' @rdname xcms-conv
+#' @references reference \addCitations{xcms}
+#'
+#' @name xcms-conv
 setGeneric("getXCMSSet", function(obj, verbose = TRUE, ...) standardGeneric("getXCMSSet"))
 
 #' @rdname xcms-conv

@@ -222,20 +222,24 @@ importFeaturesKPIC2 <- function(picsList, analysisInfo)
 #'
 #' Converts a \code{\link{features}} object to an \pkg{KPIC} object.
 #'
+#' The conversion process will introduce some dummy values for metadata not present in \pkg{patRoon} objects. If the
+#' \code{features} object was generated with \pkg{KPIC2} and no post mobility assignment was performed, then no
+#' conversion is performed and the original \pkg{KPIC2} object will be returned.
+#'
 #' @param obj The \code{features} object that should be converted.
-#' 
+#'
 #' @template loadrawdata-arg
 #' @template EICParams-arg
-#' 
+#'
 #' @templateVar consider for export
 #' @templateVar append This should be kept \code{FALSE} as \pkg{KPIC2} export currently does not support IMS features.
 #' @template IMS-arg
-#' 
+#'
 #' @param \dots Ignored
-#' 
+#'
 #' @templateVar what \code{getPICSet}
 #' @template uses-msdata
-#' 
+#'
 #' @rdname kpic2-conv
 #' @aliases getPICSet
 #' @export

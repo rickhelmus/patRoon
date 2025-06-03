@@ -274,7 +274,6 @@
     - update getDefEICParams() / getDefEIMParams()
     - Changed default db for MetFrag to pubchemlite
 - TC
-    - reorderAnalyses(): doc that XCMS/XCMS3/KPIC2 fGroups internal slot is not updated, maybe also improve general docs for what is updated and for XCMS what it means for exporting data
     - MSPL
         - abundance columns in mspl --> section in generateMSPeakLists()?
 - IMS

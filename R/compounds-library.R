@@ -83,6 +83,7 @@ unifyLibNames <- function(cTab)
 #' @template adduct-arg
 #' @template specSimParams_annSim-arg
 #' @template spectrumType-arg
+#' @template minMobSpecSim-arg
 #'
 #' @inheritParams generateCompounds
 #'

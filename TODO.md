@@ -338,9 +338,8 @@
             - also plotInt()
         - pred: update for IMS for calibration
         - add MS/MS bg subtraction section
-        - Parallelization:
-            - add threading and opt
-            - update MP and future table
+        - section on msdata? otherwise refer to ?msdata somewhere in prep?
+            - refer to something in multithread section
 - IMS
     - piek
         - refer to defaults/limits for getFeaturesEICsParams() (and removeDuplicateFeatsSusps()?)

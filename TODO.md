@@ -115,7 +115,7 @@
 - see what is the best default for backends
     - set mzR in front for safety?
 - MSPL: hclust seems unusable due to high mem usage with IMS data? --> just default to distance and doc change/IMS need?
-    - update getDefAvgPListParams() docs
+    - update getDefAvgPListParams()/cluster-params docs
 - embed TIMS-SDK? --> in patRoonExt
 - Agilent
     - SC doesn't recognize IM
@@ -248,7 +248,6 @@
     - maybe add more examples where eg raw data can be used
 - convert
     - add patRoon 3.0 citation for im_collapse
-    - clMethod and mzWindow for IM collapse --> see how this can be combined with others
     - update handbook and tutorial
 - backend
     - refer to it in piek
@@ -276,6 +275,7 @@
     - file conversion
         - mention mzXML/mzML requirements as newProject() doesn't give note anymore
     - appendix section for limits? Mention patRoon.path.limits option?
+    - update getDefEICParams() / getDefEIMParams()
 - TC
     - reorderAnalyses(): doc that XCMS/XCMS3/KPIC2 fGroups internal slot is not updated, maybe also improve general docs for what is updated and for XCMS what it means for exporting data
     - MSPL
@@ -283,13 +283,11 @@
 - IMS
     - Dietrich features
         - refer to defaults/limits for getFeaturesEICsParams() (and removeDuplicateFeatsSusps()?)
-    - getDefEICParams() / getDefEIMParams()
-        - finish docs for IMSWindow/clusterMethod
-        - update handbook
+        - link to cluster params
     - assignMobilities()
         - refs to paper
         - fGroups method
-            - add link to piek, and possibly import for direct IMS assignment
+            - add link to piek and import for direct IMS assignment
     - peakParams: refs to paper
     - IMS grouping
         - doc how it is done, and with sets too

@@ -597,8 +597,9 @@ getBGMSMSPeaks <- function(anaInfo, replicates = NULL, MSLevel = 2, retentionRan
 #'   \item \code{maxRTWindow} Maximum retention time window (seconds, +/- feature retention time) in which mobilograms
 #'   are collected and averaged. Defaults to \code{defaultLim("retention", "very_narrow")} (see \link{limits}).
 #'
-#'   \item \code{IMSWindow},\code{clusterMethod}: IMS clustering parameters. \code{IMSWindow} defaults to
-#'   \code{defaultLim("mobility", "medium")} (see \link{limits}).
+#'   \item \code{clusterMethod},\code{IMSWindow}: The clustering method and window (see \link[=cluster-params]{clustering
+#'   parameters}) to average mobilograms. \code{IMSWindow} defaults to \code{defaultLim("mobility", "medium")}
+#'   (see \link{limits}).
 #'
 #' }
 #'

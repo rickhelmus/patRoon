@@ -224,6 +224,42 @@ NULL
 #' @name analysis-information
 NULL
 
+#' Clustering parameters
+#'
+#' Parameters for clustering data such as mass spectra and mobilograms.
+#'
+#' Different functionality within \pkg{patRoon} uses clustering to group similar data together, for instance, to average
+#' mass spectra or mobilograms. A fast \code{C++} backend based on \CRANpkg{Rcpp} is used to perform the clustering.
+#'
+#' The clustering can be configured by the \emph{method} and \emph{window} parameter. The following clustering methods
+#' are available: \itemize{
+#'
+#'   \item \code{"hclust"}: uses hierarchical clustering to find similar data points (using
+#'   \href{https://github.com/cdalitz/hclust-cpp}{hclust-cpp}, which is based on the \CRANpkg{fastcluster} package).
+#'
+#'   \item \code{"distance"}: uses the distance between sorted data points to find close points.
+#'
+#'   \item \code{"bin"}: uses a simple binning approach to cluster similar mass peaks.
+#'
+#' }
+#'
+#' The \code{hclust} method may give more accurate results, but is more computationally demanding and generally
+#' unsuitable for IMS workflows due to excessive use of RAM. The \code{distance} method is a good default in most cases.
+#'
+#' The window parameter defines the clustering tolerance. For \code{method="hclust"} this corresponds to the cluster
+#' height, for \code{method="distance"} this value is used to find nearby data points (+/- window) and for
+#' \code{method="bin"} it corresponds to the bin width. Too small windows will prevent clustering close data points
+#' (\emph{e.g.} resulting in split mass peaks in averaged spectra), whereas too big windows may cluster unrelated data
+#' points together.
+#'
+#' @section Source: Averaging of mass spectra was originally based on algorithms from the
+#'   \href{https://github.com/zeehio/msProcess}{msProcess} R package (now archived on CRAN).
+#'
+#' @references \addCitations{Rcpp} \cr\cr \addCitations{fastcluster} \cr\cr
+#'
+#' @name cluster-params
+NULL
+
 #' Optimization of feature finding and grouping parameters
 #'
 #' Automatic optimization of feature finding and grouping parameters through Design of Experiments (DoE).

@@ -22,12 +22,9 @@ emptyMSPeakList <- function(abundanceColumn, avgCols)
 #' arguments to \code{\link{generateMSPeakLists}} and its related algorithm specific functions. The parameters are
 #' specified as a named \code{list} with the following values: \itemize{
 #'
-#' \item \code{clusterMzWindow} \emph{m/z} window (in Da) used for clustering \emph{m/z} values when spectra are
-#' averaged. For \code{method="hclust"} this corresponds to the cluster height, for \code{method="distance"} this value
-#' is used to find nearby masses (+/- window) and for \code{method="bin"} it corresponds to he bin width. Too small
-#' windows will prevent clustering \emph{m/z} values (thus erroneously treating equal masses along spectra as
-#' different), whereas too big windows may cluster unrelated \emph{m/z} values from different or even the same spectrum
-#' together. This value is defaulted as \code{defaultLim("mz", "narrow")} (see \link{limits}).
+#' \item \code{method},\code{clusterMzWindow} The cluster method and window (see \link[=cluster-params]{clustering
+#' parameters}) used to average mass spectra. \code{clusterMzWindow} is defaulted as \code{defaultLim("mz", "narrow")} (see
+#' \link{limits}).
 #'
 #' \item \code{topMost} Only retain this maximum number of MS peaks when generating averaged spectra. Lowering this
 #' number may exclude more irrelevant (noisy) MS peaks and decrease processing time, whereas higher values may avoid
@@ -48,20 +45,6 @@ emptyMSPeakList <- function(abundanceColumn, avgCols)
 #' \item \code{minAbundanceIMSAbs},\code{minAbundanceIMSRel} Minimum absolute/relative abundance of an MS peak across
 #' the spectra that are summed within an IMS frame. If \code{minAbundanceIMSAbs} exceeds the number of spectra in the
 #' IMS frame then the threshold is automatically lowered to the number of spectra.
-#'
-#' \item \code{method} Method used to average MS spectra. Valid values are: \itemize{
-#'
-#'   \item \code{"hclust"}: uses hierarhcical clustering to find similar mass peaks (using
-#'   \href{https://github.com/cdalitz/hclust-cpp}{hclust-cpp}, which is based on the \CRANpkg{fastcluster} package).
-#'
-#'   \item \code{"distance"}: uses the distance between sorted mass peaks to find close mass peaks.
-#'
-#'   \item \code{"bin"}: uses a similar binning approach to cluster similar mass peaks.
-#'
-#' }
-#'
-#' The \code{hclust} method may give more accurate results, but is more computationally demanding and generally
-#' unsuitable for IMS workflows due to excessive use of RAM.
 #'
 #' \item \code{withPrecursorMS} For MS data only: ignore any spectra that do not contain the precursor peak.
 #'
@@ -87,11 +70,6 @@ emptyMSPeakList <- function(abundanceColumn, avgCols)
 #' @param \dots Optional named arguments that override defaults.
 #'
 #' @return \code{getDefAvgPListParams} returns a \code{list} with the peak list averaging parameters.
-#'
-#' @section Source: Averaging of mass spectra was originally based on algorithms from the
-#'   \href{https://github.com/zeehio/msProcess}{msProcess} R package (now archived on CRAN).
-#'
-#' @references \addCitations{fastcluster}
 #'
 #' @export
 getDefAvgPListParams <- function(...)

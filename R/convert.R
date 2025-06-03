@@ -287,6 +287,8 @@ convertMSFilesBruker <- function(inFiles, outFiles, formatTo = "mzML", centroid 
 #'
 #' @param mzRange,mobilityRange A two sized vector specifying the m/z and mobility range to be exported, respectively.
 #'   Set to \code{NULL} to export the full range.
+#' @param clusterMethod,mzWindow The clustering method and window (see \link[=cluster-params]{clustering parameters})
+#'   used to cluster the mass peaks across the spectra within a single IMS frame.
 #' @param minAbundanceRel,minAbundanceAbs The minimum relative and absolute abundance for a mass peak across the spectra
 #'   within a single IMS frame. Set to \samp{0} to include all mass peaks.
 #' @param topMost Only consider these top most intense peaks in each spectrum within a frame. Set to \code{NULL} to

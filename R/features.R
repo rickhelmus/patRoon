@@ -205,28 +205,34 @@ setMethod("as.data.table", "features", function(x) rbindlist(featureTable(x), id
 #'   amounts of features.
 #' @templateVar feat TRUE
 #' @template feat-filter-args
+#' @template IMSRangeParams-arg
 #' @export
 setMethod("filter", "features", function(obj, absMinIntensity = NULL, relMinIntensity = NULL,
                                          retentionRange = NULL, mzRange = NULL, mzDefectRange = NULL,
-                                         chromWidthRange = NULL, qualityRange = NULL, negate = FALSE)
+                                         chromWidthRange = NULL, IMSRangeParams = NULL, qualityRange = NULL,
+                                         negate = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertNumber, . ~ absMinIntensity + relMinIntensity, lower = 0, finite = TRUE,
            null.ok = TRUE, fixed = list(add = ac))
     aapply(assertRange, . ~ retentionRange + mzRange + mzDefectRange + chromWidthRange, null.ok = TRUE,
            fixed = list(add = ac))
+    assertIMSRangeParams(IMSRangeParams, null.ok = TRUE, add = ac)
     assertScoreRange(qualityRange, c(featureQualityNames(group = FALSE),
                                      featureQualityNames(group = FALSE, scores = TRUE)), add = ac)
     checkmate::assertFlag(negate, add = ac)
     checkmate::reportAssertions(ac)
 
+    if (!is.null(IMSRangeParams) && !hasMobilities(obj))
+        stop("Cannot apply IMS Range filter: no mobilities assigned", call. = FALSE)
+    
     if (length(obj) == 0)
         return(obj)
 
     oldn <- length(obj)
 
     hash <- makeHash(obj, absMinIntensity, relMinIntensity, retentionRange, mzRange, mzDefectRange, chromWidthRange,
-                     qualityRange, negate)
+                     IMSRangeParams, qualityRange, negate)
     cache <- loadCacheData("filterFeatures", hash)
     if (!is.null(cache))
         obj <- cache
@@ -273,6 +279,19 @@ setMethod("filter", "features", function(obj, absMinIntensity = NULL, relMinInte
             if (!is.null(chromWidthRange))
                 ft[keep == TRUE, keep := rangePred(retmax - retmin, chromWidthRange)]
 
+            if (!is.null(IMSRangeParams))
+            {
+                # UNDONE: CCS feature assignment isn't actually supported yet
+                if (is.null(ft[["CCS"]]) && IMSRangeParams$param == "CCS")
+                    stop("Cannot apply IMS Range filter: no CCS values assigned", call. = FALSE)
+                
+                vals <- ft[[IMSRangeParams$param]]
+                if (IMSRangeParams$mzRelative)
+                    vals <- vals / ft$mz
+                
+                ft[keep == TRUE, keep := rangePred(vals, c(IMSRangeParams$lower, IMSRangeParams$upper))]
+            }
+            
             if (!is.null(qualityRange))
                 ft[keep == TRUE, keep := scorePred(.SD, qualityRange), .SDcols = names(qualityRange)]
             

@@ -137,6 +137,7 @@ setMethod("identifiers", "compounds", function(compounds)
 #'   respectively. Set to \code{NULL} to ignore. The \code{scoreLimits} argument allows for more advanced score
 #'   filtering.
 #' 
+#' @template IMSRangeParams-arg
 #' @template IMSMatchParams-arg
 #'
 #' @export

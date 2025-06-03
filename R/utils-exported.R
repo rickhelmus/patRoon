@@ -90,7 +90,7 @@ generateAnalysisInfo <- function(fromRaw = NULL, fromCentroid = NULL, fromProfil
            any.missing = FALSE, min.len = 1, null.ok = TRUE, fixed = list(add = ac))
     if (length(otherArgs) > 0)
         checkmate::assertNames(names(otherArgs), "unique", .var.name = "...", add = ac)
-    checkmate::qassertr(otherArgs, "V", .var.name = "...")
+    checkmate::qassertr(otherArgs, "v", .var.name = "...")
     checkmate::reportAssertions(ac)
 
     addPath <- function(path, type)

@@ -256,6 +256,7 @@
             - estimateIDLevels for annotateSuspects and add for formulas/compounds
             - add IMS things?
             - add note of things that are missing
+        - discuss file formats here?
     - preparations
         - update/extend data-pretreatment section
         - update anaInfo section
@@ -332,7 +333,6 @@
         - update for annotateSuspects() --> estimateIDConfidence()
     - Advanced
         - Feature intensity normalization: IMS notes
-        - Section for limits? Mention patRoon.path.limits option?
         - Exporting and converting feature data: mention IMS limitations?
         - Update Feature regression analysis
             - also plotInt()

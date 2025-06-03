@@ -304,7 +304,7 @@ convertMSFilesBruker <- function(inFiles, outFiles, formatTo = "mzML", centroid 
 #' @rdname MSConversion
 #' @export
 convertMSFilesIMSCollapse <- function(inFiles, outFiles, typeFrom, formatTo = "mzML", mzRange = NULL, mobilityRange = NULL,
-                                      clMethod = "distance", mzWindow = defaultLim("mz", "medium"),
+                                      clusterMethod = "distance", mzWindow = defaultLim("mz", "medium"),
                                       minAbundanceRel = 0, minAbundanceAbs = 0, topMost = NULL,
                                       minIntensityIMS = NULL, minIntensityPre = NULL, includeMSMS = FALSE, ...)
 {
@@ -314,7 +314,7 @@ convertMSFilesIMSCollapse <- function(inFiles, outFiles, typeFrom, formatTo = "m
     checkmate::assertChoice(typeFrom, c("raw", "ims"), add = ac)
     checkmate::assertChoice(formatTo, getMSConversionFormats("im_collapse", "output"), add = ac)
     aapply(assertRange, . ~ mzRange + mobilityRange, null.ok = TRUE, fixed = list(add = ac))
-    assertClusterMethod(clMethod, add = ac)
+    assertClusterMethod(clusterMethod, add = ac)
     aapply(checkmate::assertNumber, . ~ mzWindow + minAbundanceRel + minAbundanceAbs + minIntensityIMS + minIntensityPre,
            lower = 0, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertCount(topMost, positive = TRUE, null.ok = TRUE, add = ac)
@@ -385,7 +385,7 @@ convertMSFilesIMSCollapse <- function(inFiles, outFiles, typeFrom, formatTo = "m
         
         openMSReadBackend(backend, path)
         collapsedSpectra <- collapseIMSFrames(backend, NULLToZero(mzRange[1]), NULLToZero(mzRange[2]),
-                                              NULLToZero(mobilityRange[1]), NULLToZero(mobilityRange[2]), clMethod,
+                                              NULLToZero(mobilityRange[1]), NULLToZero(mobilityRange[2]), clusterMethod,
                                               mzWindow, minAbundanceRel, minAbundanceAbs, NULLToZero(topMost),
                                               NULLToZero(minIntensityIMS), NULLToZero(minIntensityPre), includeMSMS)
         

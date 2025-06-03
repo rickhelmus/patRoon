@@ -246,6 +246,7 @@ setMethod("predictTox", "formulasSIRIUS", function(obj, LC50Mode = "static", con
 #' @template adduct-arg
 #' @templateVar algo sirius
 #' @template form_algo-args
+#' @template minMobSpecSim-arg
 #'
 #' @inheritParams generateFormulas
 #'

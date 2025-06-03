@@ -240,7 +240,6 @@
 
 ## Docs
 
-- Rcpp refs and fastcluster refs don't seem to work anymore?
 - move all plotBPC(), getEIC() etc methods into one doc file?
 - Changed default db for MetFrag to pubchemlite --> check tutorial etc
 - anaInfo
@@ -298,11 +297,6 @@
     - peakParams
         - doc common parameters that may need to be changed for IMS
         - doc that they could probably be optimized further
-    - minMobSpecSim: clearly doc how things work
-        - results are simply copied from parent (including annSims)
-        - only fragInfos are updated
-        - ignored for MS only formulas
-        - make template section?
     - IMS grouping
         - doc how it is done, and with sets too
         - IMSWindow args

@@ -304,8 +304,12 @@ processGenFormResultFile <- function(file, isMSMS, adduct, topMost)
 #'   \option{patRoon.MP.method="future"}.
 #'
 #' @template adduct-arg
+#' 
 #' @templateVar algo genform
 #' @template form_algo-args
+#' 
+#' @templateVar append This argument does not affect the annotation results for MS-only formulae.
+#' @template minMobSpecSim-arg
 #'
 #' @inheritParams generateFormulas
 #'

@@ -10,3 +10,4 @@
 \newcommand{\setsPassedArgs}{For \link[=sets-workflow]{sets workflow} methods: further arguments passed to the base #1.}
 \newcommand{\setsPassedArgs1}{\setsPassedArgs{\code{\link{#1}} method}}
 
+\newcommand{\IMSWF}{(\strong{IMS workflow})}

@@ -30,6 +30,8 @@
     - support feature CCS?
 - FIX: IMSRangeParams: in sets workflows, the mz column is taken so relative filtering is done to neutralMasses
     - maybe add _mz rel column like compounds?
+- rename convertMSFilesAnaInfo() to convertMSFiles() or something else and shorter?
+    - update Handbook/Tutorial if needed
 
 
 ## Maybe
@@ -247,37 +249,100 @@
 - backend
     - refer to it in piek
 - handbook/tutorial
-    - update/extend file conversion
-    - features
-        - mention somewhere that IMS="maybe" for e.g. plotting
-        - colourBy --> groupBy
-        - outerGroups --> groupBy, also update (incorrect) example in handbook
+    - intro
+        - update convertMSFiles() in table
+        - update scheme
+            - add file conversion?
+            - estimateIDLevels for annotateSuspects and add for formulas/compounds
+            - add IMS things?
+            - add note of things that are missing
+    - preparations
+        - update/extend data-pretreatment section
+        - update anaInfo section
+        - update newProject screenshot
+    - workflow gen
+        - features
+            - update algo tables (piek, import)
+            - describe piek params
+            - suspect screening: update list format
+            - mention mzXML/mzML requirements as newProject() doesn't give note anymore
+                - can also be tims for piek
+                - or just in prep chapter?
+        - annotation
+            - update MSPL section
+            - Changed default db for MetFrag to pubchemlite
+            - estIDLevels --> replace suspect annotation section
+    - processing
+        - Inspecting
+            - FIX: fList[["standard-1"]][, 1:6]
+            - update for aggregation etc
+        - Filtering
+            - fix feature filters table
+            - add new feature filters
+            - update MSPL filters
+            - example where annSim is filtered with scoreLimits
+        - Subsetting
+            - features: add (subsections) on ana re-ordering and ni subsetting
+        - Delete
+            - delete() for screening: k arg, also update table
+        - Unique and overlapping features
+            - update for aggregation
+        - Visualization
+            - colourBy --> groupBy
+            - outerGroups --> groupBy, also update (incorrect) example in handbook
+            - plotInt(): give examples for xBy, groupBy etc
+            - plotChord(): update for outerGroups (now commented out!)
+            - update EIC params?
+        - using anaInfo metadata
+            - aggregation for plotting, ADT, ...
+            - changing anaInfo metadata
+            - anaInfoCols ADT arg
+    - IMS chapter
+        - before/after sets?
+        - workflows
+            - direct and post
+            - piek examples for both
+            - componentization: order and eg adducts not supported
+            - annotation: minMobSpecSim
+        - processing
+            - features
+                - mention somewhere that IMS="maybe" for e.g. plotting
+                - plotMobilograms() and EIMParams
+            - componentization
+                - expandForIMS()?
+            - annotation
+                - mob spec sims
+    - sets chapter
         - plotVenn()/overlap()/unique(): update for removal of sets arg: give examples with aggregate
-        - plotInt(): give examples for xBy, groupBy etc
         - mention that "set" can be used in sets WFs for groupBy, regressionBy, etc
             - mention that in sets workflow, regressionBy column can be set to set unique names (eg UV-pos)
-        - filter() for screening: k arg
-    - MSPL
-        - new filter names
-        - generateMSPeakLists() usage
-            - no more precursorMzWindow
-    - ann
-        - annotateSuspects() --> estimateIDConfidence()
-        - estimateIDConfidence() description for formulas/compounds
-        - example where annSim is filtered with scoreLimits
-        - minMobSpecSim
-    - componentization
-        - expandForIMS()?
-    - file conversion
-        - mention mzXML/mzML requirements as newProject() doesn't give note anymore
-    - appendix section for limits? Mention patRoon.path.limits option?
-    - update getDefEICParams() / getDefEIMParams()
-    - Changed default db for MetFrag to pubchemlite
-- TC
-    - MSPL
-        - abundance columns in mspl --> section in generateMSPeakLists()?
+        - mention ion_mz columns?
+        - IMS
+            - makeSet() limitations for IMS workflows
+            - assignMobilities() (all methods) work per set
+    - TPs chapter
+        - Obtaining TPs
+            - new algos: update table, categories
+            - update args table, eg for calcSims and new algos
+            - Parent input: can be NULL for lib
+        - Linkage
+            - candidates ADT arg
+            - add sections for ann algos? (eg filtering)
+            - update Annotation similarity calculation
+        - update for annotateSuspects() --> estimateIDConfidence()
+    - Advanced
+        - Feature intensity normalization: IMS notes
+        - Section for limits? Mention patRoon.path.limits option?
+        - Exporting and converting feature data: mention IMS limitations?
+        - Update Feature regression analysis
+            - also plotInt()
+        - pred: update for IMS for calibration
+        - add MS/MS bg subtraction section
+        - Parallelization:
+            - add threading and opt
+            - update MP and future table
 - IMS
-    - Dietrich features
+    - piek
         - refer to defaults/limits for getFeaturesEICsParams() (and removeDuplicateFeatsSusps()?)
         - link to cluster params
     - assignMobilities()
@@ -344,7 +409,7 @@
     - minimum max intensity feature filter
     - maxMZOverPrecMS/maxMZOverPrecMSMS MSPL filters
     - The default metabolic logic transformations are now accessible through the `TPLogicTransformations()` function.
-    - filter() for screening: k arg
+    - delete() for screening: k arg
     - MS/MS bg subtraction
         - abundance filter args
         - abundance columns in mspl

@@ -69,10 +69,10 @@ All methods (except `"none"`) are influenced by the _normalization concentration
 ```{r eval=runData}
 # obtain analysis information as usual, but add normalization concentrations.
 # The blanks are set to NA, and will therefore not be normalized.
-generateAnalysisInfo(paths = patRoonData::exampleDataPath(),
-                     groups = c(rep("solvent", 3), rep("standard", 3)),
-                     blanks = "solvent",
-                     norm_concs = c(NA, NA, NA, 2, 2, 1))
+generateAnalysisInfo(fromCentroid = patRoonData::exampleDataPath(),
+                     replicate = c(rep("solvent", 3), rep("standard", 3)),
+                     blank = "solvent",
+                     norm_conc = c(NA, NA, NA, 2, 2, 1))
 ```
 
 The normalization concentration does not need to be an absolute value. In the end, what matters are the relative numbers between the sample analyses. For example, if the concentrations for two analyses are `c(1, 2)` or `c(1.5, 3.0)` the normalization occurs the same. Setting the concentration to `NA` (or `0`) will skip normalization for an analysis. If the normalization concentration is absent from the analysis information it will be defaulted to `1`.

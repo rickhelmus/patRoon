@@ -40,6 +40,27 @@ formulas <- generateFormulas(..., adduct = "[M-H]-") # same as above
 
 More details can be found in the reference manual (`?adduct` and ``?`adduct-utils` ``).
 
+## Default numeric limits and tolerances
+
+The functions in `patRoon` use various numeric limits and tolerances to configure e.g. tolerances applied to match retention times and _m/z_ values. Since `patRoon 3.0` the defaults for these limits are centralized, which simplifies configuration and switching defaults between different HRMS instruments.
+
+The configuration is done through the `limits.yml` file. This is an easily editable [YAML] text file, and by default looks like this:
+
+```yaml
+`r patRoon:::readAllFile(system.file("misc", "limits.yml", package = "patRoon"))`
+```
+
+The `IMS` setting under `general` specifies which IMS defaults are applied: this should be `bruker` or `agilent`. Depending on this setting, defaults are either taken from the `mobility_buker` or `mobility_agilent` setting blocks.
+
+If you used the [newProject tool](#newProject) to create a new project, the `limits.yml` file is automatically copied to the project directory. Otherwise, it can be created by the `genLimitsFile()` function:
+
+```{r eval=FALSE}
+genLimitsFile() # copy default limits file to current working directory
+genLimitsFile("my/path", IMS = "agilent") # copy file to `my/path` with Agilent IMS defaults
+```
+
+More information on the limits can be found in the reference manual (`?limits`).
+
 ## Feature intensity normalization {#fNorm}
 
 Feature intensities are often compared between sample analyses, for instance, to evaluate trends between sample points. However, matrix effects, varying detector sensitivity and differences in analysed sample amount may complicate such comparison. For this reason, it may be desired to _normalize_ the feature intensities.

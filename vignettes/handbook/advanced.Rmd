@@ -829,7 +829,17 @@ clearCache("all") # same as simply removing the file
 
 Some steps in the non-target screening workflow are inherently computationally intensive. To reduce computational times `patRoon` is able to perform _parallelization_ for most of the important functionality. This is especially useful if you have a modern system with multiple CPU cores and sufficient RAM.
 
-For various technical reasons several parallelization techniques are used, these can be categorized as _parallelization of `R` functions_ and _multiprocessing_. The next sections describe both parallelization approaches in order to let you optimize the workflow.
+For various technical reasons several parallelization techniques are used, these can be categorized as _multithreading_, _parallelization of `R` functions_ and _multiprocessing_. The next sections describe these parallelization approaches in order to let you optimize the workflow.
+
+### Multithreading
+
+Multithreading is the most efficient form of parallelization, but is limited to `C/C++` code. In `patRoon` this is realized through the [OpenMP] API. Multithreading is currently only used by the `msdata` interface to load raw (IMS-)HRMS data and by the `piek` algorithm for peak detection in chromatograms and mobilograms.
+
+The maximum number of threads used for parallelization is configured through the `patRoon.threads` option. By default it is set to the number of available CPU cores, which results usually in the best performance. However, this could be lowered, for instance, to keep your computer more responsive while processing.
+
+```{r eval=FALSE}
+options(patRoon.threads = 2) # do not use more than two threads
+```
 
 ### Parellization of R functions
 
@@ -839,8 +849,10 @@ Function                 | Purpose                             | Remarks
 ------------------------ | ----------------------------------- | ------------------------
 `findFeatures`           | Obtain feature data                 | Only `envipick` and `kpic2` algorithms.
 `generateComponents`     | Generate components                 | Only `cliquems` algorithm.
+`estimateIDConfidence`   | Estimate ID confidence              | Only for `formulas` and `compounds`.
 `report`                 | Reporting data                      |
-`generateTPs`            | Obtain transformation products      | Only `cts` algorithm.
+`assignMobilities`       | Assign IMS data                     | Only for `featureGroups`.
+`generateTPs`            | Obtain transformation products      | Only `cts`, `ann_form` and `ann_comp` algorithms.
 `optimizeFeatureFinding`, `optimizeFeatureGrouping` | Optimize feature finding/grouping parameters | Discussed [here](#fOpt).
 `calculatePeakQualities` | Calculate feature (group) qualities | Discussed [here](#peakQual).
 `predictTox` / `predictRespFactors` | Prediction of toxicities/concentrations } | Only `compounds` methods. Discussed [here](#pred).
@@ -861,18 +873,20 @@ It is important to properly configure the right future plan. Please see the docu
 
 `patRoon` relies on several external (command-line) tools to generate workflow data. These commands may be executed in _parallel_ to reduce computational times ('multiprocessing'). The table below outlines the tools that are executed in parallel.
 
-Tool                  | Used by                                      | Notes
---------------------- | -------------------------------------------- | ---------------------------------
-`msConvert`           | `convertMSFiles(algorithm="pwiz", ...)`      |
-`FileConverter`       | `convertMSFiles(algorithm="openms", ...)`    |
-`FeatureFinderMetabo` | `findFeatures(algorithm="openms", ...)`      |
-`julia`               | `findFeatures(algorithm="safd", ...)`        |
-`SIRIUS`              | `findFeatures(algorithm="sirius", ...)`      |
+Tool                  | Used by                                        | Notes
+--------------------- | ---------------------------------------------- | ---------------------------------
+`msConvert`           | `convertMSFiles(algorithm="pwiz", ...)`        |
+`FileConverter`       | `convertMSFiles(algorithm="openms", ...)`      |
+`TIMSCONVERT`         | `convertMSFiles(algorithm="timsconvert", ...)` | Only if `useTimsTOF=TRUE`
+`FeatureFinderMetabo` | `findFeatures(algorithm="openms", ...)`        |
+`julia`               | `findFeatures(algorithm="safd", ...)`          |
+`SIRIUS`              | `findFeatures(algorithm="sirius", ...)`        |
 `MetaboliteAdductDecharger` | `generateComponents(algorithm="openms", ...)` |
-`GenForm`             | `generateFormulas(agorithm="genform", ...)`  |
+`GenForm`             | `generateFormulas(agorithm="genform", ...)`    |
 `SIRIUS`              | `generateFormulas(agorithm="sirius", ...)`, `generateCompounds(agorithm="sirius", ...)`  | Only if `splitBatches=TRUE`
-`MetFrag`             | `generateCompounds(agorithm="metfrag", ...)` |
-`BioTransformer`      | `generateTPs(algorithm = "biotransformer")`  | Disabled by default (see `?generateTPs` for details).
+`MetFrag`             | `generateCompounds(agorithm="metfrag", ...)`   |
+`BioTransformer`      | `generateTPs(algorithm = "biotransformer")`    | Disabled by default (see `?generateTPs` for details).
+`OpenBabel`           | various                                        | Used to convert and verify chemical data, such as formulae and SMILES
 
 Multiprocessing is either performed by executing processes in the background with the [processx] `R` package (_classic interface_) or by futures, which were introduced in the previous section. An overview of the characteristics of both parallelization techniques is shown below.
 

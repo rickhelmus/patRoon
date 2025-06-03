@@ -72,3 +72,4 @@
 [MoNA]: https://mona.fiehnlab.ucdavis.edu/
 [MS2Tox]: https://github.com/kruvelab/MS2Tox
 [MS2Quant]: https://github.com/kruvelab/MS2Quant
+[OpenMP]: https://www.openmp.org/

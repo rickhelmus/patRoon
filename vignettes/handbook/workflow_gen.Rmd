@@ -551,7 +551,7 @@ Argument                                      | Algorithm   | Default          |
 --------------------------------------------- | ----------- | ---------------- | ----------------------------------------------
 `method`                                      | All         | `"complete"`     | Clustering method. See `?hclust`
 `metric`                                      | `intclust`  | `"euclidean"`    | Metric used to calculate the distance matrix. See `?daisy`.
-`normalized                                   | `intclust`  | `TRUE`           | Whether normalized feature intensities should be used. Detailed [here](#fNorm).
+`normalized`                                  | `intclust`  | `TRUE`           | Whether normalized feature intensities should be used. Detailed [here](#fNorm).
 `average`                                     | `intclust`  | `TRUE`           | Whether intensities of replicates should first be averaged.
 `MSPeakLists`                                 | `specclust` | -                | The [MS peak lists] object used for spectral similarity calculations
 `specSimParams`                               | `specclust` | `getDefSpecSimParams()` | Parameters used for [spectral similarity calculation](#specSim).

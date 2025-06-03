@@ -62,7 +62,7 @@ as.data.table(fGroups, average = TRUE) # average intensities for replicates
 # As above, but with suspect matches on separate rows and additional screening information
 # (select some columns to simplify the output below)
 as.data.table(fGroupsSusp, average = TRUE, collapseSuspects = NULL,
-              onlyHits = TRUE)[, c("group", "susp_name", "susp_compRank", "susp_annSimBoth", "susp_estIDLevel")]
+              onlyHits = TRUE)[, c("group", "susp_name", "susp_compRank", "susp_annSimComp", "susp_estIDLevel")]
 
 # Returns all peak lists for each feature group
 as.data.table(mslists)
@@ -158,7 +158,7 @@ Filter                                     | Classes                     | Remar
 `absMinReplicateAbundance`, `relMinReplicateAbundance` | `featureGroups` | Minimum feature abundance in a replicate
 `maxReplicateIntRSD`                       | `featureGroups`             | Maximum relative standard deviation of feature intensities in a replicate.
 `blankThreshold`                           | `featureGroups`             | Minimum intensity factor above blank intensity
-`replicate                                 | `featureGroups`             | Only keep (features of) these replicates
+`replicate`                                | `featureGroups`             | Only keep (features of) these replicates
 `results`                                  | `featureGroups`             | Only keep feature groups with formula/compound annotations or componentization results
 
 Application of filters to feature data is important for (environmental) non-target analysis. Especially blank and replicate filters (i.e. `blankThreshold` and `absMinReplicateAbundance`/`relMinReplicateAbundance`) are important filters and are highly recommended to always apply for cleaning up your dataset.
@@ -795,8 +795,8 @@ plotUpSet(fGroups) # compare replicates
 plotVenn(fGroups, which = c("repl1", "repl2")) # compare some replicates
 plotChord(fGroups, aggregate = TRUE) # overlap between replicates
 # compare with custom made groups
-plotChord(fGroups, aggregate = TRUE,
-          outer = c(repl1 = "grp1", repl2 = "grp1", repl3 = "grp2", repl4 = "grp3"))
+# plotChord(fGroups, aggregate = TRUE,
+#           outer = c(repl1 = "grp1", repl2 = "grp1", repl3 = "grp2", repl4 = "grp3"))
 
 # compare GenForm and SIRIUS results
 plotVenn(formsGF, formsSIR,

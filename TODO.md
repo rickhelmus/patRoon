@@ -27,6 +27,9 @@
     - mob_area/mob_intensity vs mobmin/mobmax
 - feat import
     - update generic methods
+    - support feature CCS?
+- FIX: IMSRangeParams: in sets workflows, the mz column is taken so relative filtering is done to neutralMasses
+    - maybe add _mz rel column like compounds?
 
 
 ## Maybe
@@ -146,7 +149,7 @@
 - group IMS
     - (force) disable RT align and group fractions?
     - support CCS columns?
-        - now CCSs are only in fGroups, so would only be for compare() and makeSet(fGroups)
+        - no assignMobilities() method yet, but CCS column can be present from fGroups method
         - otherwise doc!
     - support non IMS features?
         - currently not
@@ -189,9 +192,7 @@
         - availableBackends()
         - use eg mzR, MSTK, SC to get eg EICs or PLs
 - IMS
-    - add IMSRangeParams/withIMSParent/applyIMS filters also to features method?
-         - only IMSRangeParams would make sense, as others don't for direct workflows
-         --> add docs in general feature filter args
+    - IMSRangeParams/withIMSParent/applyIMS filters
     - more verification that normInts() works before/after assignMobilities()
     - IMS arg for [, filter(), ADT, and plotting functions
     - applyMS for filter()
@@ -292,8 +293,6 @@
             - add link to piek, and possibly import for direct IMS assignment
         - compounds method
             - PCL already has CCSbase, so no need to convert (also mention elsewhere?)
-    - IMSRangeParams filter --> when feature filter is there
-        - also for compounds
     - peakParams
         - doc common parameters that may need to be changed for IMS
         - doc that they could probably be optimized further

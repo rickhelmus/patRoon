@@ -177,7 +177,7 @@ NULL
 #' \itemize{
 #'
 #' \item \code{raw} Specifies the directory to raw HRMS files (\emph{e.g.} \file{.raw}, \file{.d}). This is used by
-#' \emph{e.g.} \link[=MSConversion]{conversion of raw MS data}.
+#' \emph{e.g.} \link[=MSConversion]{conversion of raw MS data} and the \link[=msdata]{OpenTIMS backend}.
 #'
 #' \item \code{centroid} Specifies the directory to centroided and exported HRMS files (\file{.mzML}, \file{.mzXML}).
 #' These files are required by most feature finding algorithms.
@@ -186,7 +186,8 @@ NULL
 #' (\file{.mzML}, \file{.mzXML}). This is currently only used by \code{\link{findFeaturesSAFD}}.
 #'
 #' \item \code{ims} Specifies the directory to exported IMS-HRMS data (\file{.mzML}). This is required in IMS workflows,
-#' unless raw IMS-HRMS data is directly loaded with the \link[=msdata]{OpenTIMS backend}.
+#' unless raw IMS-HRMS data is directly loaded with the \link[=msdata]{OpenTIMS backend}. See \emph{e.g.}
+#' \code{\link[=assignMobilities_feat]{assignMobilities}} for more details.
 #'
 #' }
 #'
@@ -196,9 +197,9 @@ NULL
 #'   mixed then centroided \file{.mzML} and \file{.mzXML} files are needed, and files with both file formats must be
 #'   stored in the directory specified by \code{path_centroid}.
 #'
-#'   If non-raw data files are not yet present and should be exported by \link[=MSConversion]{MS file conversion},
-#'   then \code{path_centroid}, \code{path_profile} and \code{path_ims} should specify the desired destination paths of
-#'   the converted files.
+#'   If non-raw data files are not yet present and should be exported by \link[=MSConversion]{MS file conversion}, then
+#'   \code{path_centroid}, \code{path_profile} and \code{path_ims} should specify the desired destination paths of the
+#'   converted files.
 #'
 #' @section Optional columns and sample metadata:
 #'

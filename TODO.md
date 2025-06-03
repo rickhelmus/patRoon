@@ -436,6 +436,7 @@
 - MS2QuantMeta slots for fGroupsScreeningSet, formulasSet and compoundsSet (latter already present but wasn;t filled in)
 - Changed default db for MetFrag to pubchemlite
 - Fixed: codegen for functions: don't break lines of args with long text strings
+- Fixed: feature filter didn't hash qualityRange
 
 
 ## Features

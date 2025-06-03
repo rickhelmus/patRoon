@@ -225,7 +225,8 @@ setMethod("filter", "features", function(obj, absMinIntensity = NULL, relMinInte
 
     oldn <- length(obj)
 
-    hash <- makeHash(obj, absMinIntensity, relMinIntensity, retentionRange, mzRange, mzDefectRange, chromWidthRange, negate)
+    hash <- makeHash(obj, absMinIntensity, relMinIntensity, retentionRange, mzRange, mzDefectRange, chromWidthRange,
+                     qualityRange, negate)
     cache <- loadCacheData("filterFeatures", hash)
     if (!is.null(cache))
         obj <- cache

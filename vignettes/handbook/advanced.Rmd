@@ -406,6 +406,31 @@ fGroupsCons <- consensus(fGroupComp,
 ```
 
 
+## Background removal in MS/MS data
+
+Even if data-dependent acquisition (DDA) is used to acquire MS/MS data, there may still be a substantial number of background peaks present in the MS/MS spectra. The [filtering section](#filtering) introduced several filters to remove these.
+
+Another approach to remove background is to identify frequently occurring background peaks, which typically are a sign of contamination in the analytical system, and subsequently remove these. The `getBGMSMSPeaks()` function inspects all MS/MS data in a set of blank analyses and identifies frequently occurring peaks.
+
+```{r bgMSMS,eval=runData}
+# get background MS/MS peaks from blank analyses
+bgPeaks <- getBGMSMSPeaks(anaInfo, replicates = "solvent-pos")
+bgPeaks
+```
+
+The `replicates` function argument tells which analyses are used for blank subtraction, in the above example all the analyses with the replicate set to "solvent-pos" are used. It is also possible to specify multiple replicate names. Typically, you will choose sample analyses here that did not undergo any sample preparation, such as pure solvent blanks.
+
+The `filter()` function is then used to remove these peaks in the peak list data.
+
+```{r bgMSMSFilt,eval=FALSE}
+# remove background peaks from MS/MS spectra
+mslists <- filter(mslists, removeMZs = bgPeaks)
+```
+
+The `removeMZs` filter removes all the MS/MS peaks from the `mz` column. You can also specify a vector with _m/z_ values to remove, for instance, if you identified background peaks by other means than the `getBGMSMSPeaks()` function.
+
+For more details, see the reference manual (`?getBGMSMSPeaks`).
+
 ## MS libraries {#MSLibraries}
 
 The `loadMSLibraries()` function is used to load MS spectral libraries, and was already briefly introduced for [compound annotation](#compAnnLib). Currently, loading of MSP files and [MoNA] JSON files is supported, while loading of formula annotations for MS peaks is currently only supported for the latter. The underlying algorithms implement several optimizations to efficiently load large number of records. Furthermore, `loadMSLibraries()` automatically verifies record data such as formulas, adducts and masses, and automatically calculates missing or invalid data where possible.

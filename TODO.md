@@ -278,7 +278,6 @@
             - FIX: fList[["standard-1"]][, 1:6]
             - update for aggregation etc
         - Filtering
-            - fix feature filters table
             - add new feature filters
             - update MSPL filters
             - example where annSim is filtered with scoreLimits
@@ -337,7 +336,6 @@
         - Update Feature regression analysis
             - also plotInt()
         - pred: update for IMS for calibration
-        - add MS/MS bg subtraction section
         - section on msdata? otherwise refer to ?msdata somewhere in prep?
             - refer to something in multithread section
 - IMS

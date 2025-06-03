@@ -166,6 +166,7 @@ featuresEICs <- setClass("featuresEICs", contains = "features")
 setMethod("initialize", "featuresEICs",
           function(.Object, ...) callNextMethod(.Object, algorithm = "eics", ...))
 
+#' @template minIntensityIMS-arg
 #' @export
 findFeaturesEICs <- function(analysisInfo, featParams, peakParams, suspects = NULL, adduct = NULL, minIntensityIMS = 25,
                              verbose = TRUE)

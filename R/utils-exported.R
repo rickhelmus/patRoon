@@ -380,6 +380,8 @@ getFCParams <- function(replicates, ...)
 #'   any zero intensity data points. If \code{output="fill"} then the zero intensity points are re-added to obtain
 #'   continuous chromatograms. If \code{output="pad"} then zero intensity points are only re-added that surround others,
 #'   which is sufficient for \emph{e.g.} plotting. If \code{output="raw"} then the original compressed data is returned.
+#' 
+#' @template minIntensityIMS-arg
 #'
 #' @return A \code{list} with for each analysis a \code{list} with EIC data for each of the rows in \code{ranges}.
 #' 
@@ -564,15 +566,15 @@ getBGMSMSPeaks <- function(anaInfo, replicates = NULL, MSLevel = 2, retentionRan
 #' if \code{onlyPresent=FALSE} then data is generated for \strong{all} analyses. The latter is handy to evaluate if a
 #' peak was 'missed' during peak detection or removed during \emph{e.g.} filtering.
 #'
-#' \item \code{mzExpIMSWindow} Specifically for IMS data: additional \emph{m/z} tolerance on top of the feature limits.
-#' This is for IMS workflows where features were detected from centroided LC-MS like data, while EICs/EIMs are generated
-#' from raw IMS data. In this case the feature \emph{m/z} limits were derived from centroided data, which typically has
-#' smaller \emph{m/z} deviations across scans compared to IMS data. The \code{mzExpIMSWindow} parameter sets an
-#' additional \emph{m/z} tolerance to specifically handle this case. Defaults to \code{defaultLim("mz", "default")}
-#' (see \link{limits}).
+#' \item \code{mzExpIMSWindow} \IMSWF Additional \emph{m/z} tolerance on top of the feature limits. This is for IMS
+#' workflows where features were detected from centroided LC-MS like data, while EICs/EIMs are generated from raw IMS
+#' data. In this case the feature \emph{m/z} limits were derived from centroided data, which typically has smaller
+#' \emph{m/z} deviations across scans compared to IMS data. The \code{mzExpIMSWindow} parameter sets an additional
+#' \emph{m/z} tolerance to specifically handle this case. Defaults to \code{defaultLim("mz", "default")} (see
+#' \link{limits}).
 #'
-#' \item \code{minIntensityIMS} Raw intensity threshold for IMS data. This is primarily intended to speed up raw data
-#' processing.
+#' \item \code{minIntensityIMS} \IMSWF Raw intensity threshold for IMS data. This is primarily intended to speed up raw
+#' data processing.
 #'
 #' }
 #'

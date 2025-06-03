@@ -189,9 +189,9 @@ The `generateAnalysisInfo()` function can be used to (semi-)automatically genera
 
 ```{r genAnaInfo,eval=TRUE}
 # Take example data from patRoonData package (triplicate solvent blank + triplicate standard)
-generateAnalysisInfo(paths = patRoonData::exampleDataPath(),
-                     groups = c(rep("solvent-pos", 3), rep("standard-pos", 3)),
-                     blanks = "solvent-pos")
+generateAnalysisInfo(fromCentroid = patRoonData::exampleDataPath(),
+                     replicate = c(rep("solvent-pos", 3), rep("standard-pos", 3)),
+                     blank = "solvent-pos")
 ```
 
 (Note that for the example data the `patRoonData::exampleAnalysisInfo()` function can also be used.)

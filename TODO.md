@@ -281,7 +281,6 @@
     - MSPL
         - abundance columns in mspl --> section in generateMSPeakLists()?
 - IMS
-    - minIntensityIMS template, also for getEICs()
     - Dietrich features
         - refer to defaults/limits for getFeaturesEICsParams() (and removeDuplicateFeatsSusps()?)
     - getDefEICParams() / getDefEIMParams()
@@ -291,11 +290,7 @@
         - refs to paper
         - fGroups method
             - add link to piek, and possibly import for direct IMS assignment
-        - compounds method
-            - PCL already has CCSbase, so no need to convert (also mention elsewhere?)
-    - peakParams
-        - doc common parameters that may need to be changed for IMS
-        - doc that they could probably be optimized further
+    - peakParams: refs to paper
     - IMS grouping
         - doc how it is done, and with sets too
         - IMSWindow args

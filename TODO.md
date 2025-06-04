@@ -32,6 +32,8 @@
     - maybe add _mz rel column like compounds?
 - rename convertMSFilesAnaInfo() to convertMSFiles() or something else and shorter?
     - update Handbook/Tutorial if needed
+- overwrite vs overWrite
+- update some anaInfo$path leftovers (mainly Bruker)
 
 
 ## Maybe
@@ -249,19 +251,27 @@
 - backend
     - refer to it in piek
 - handbook/tutorial
-    - intro
-        - update convertMSFiles() in table
-        - update scheme
-            - add file conversion?
-            - estimateIDLevels for annotateSuspects and add for formulas/compounds
-            - add IMS things?
-            - add note of things that are missing
-        - discuss file formats here?
-    - preparations
-        - update/extend data-pretreatment section
-        - update anaInfo section
-        - update newProject screenshot
+    - installation
+        - add additional external deps, eg Python, TIMS-SDK, c3sdb, PCL/CCS etc
+    - workflow concepts: add link to IMS chapter at end, maybe mention mobility as possible feature property
     - workflow gen
+        - intro
+            - update convertMSFiles() in table
+            - update scheme
+                - add file conversion?
+                - estimateIDLevels for annotateSuspects and add for formulas/compounds
+                - add IMS things?
+                - add note of things that are missing
+            - discuss file formats here?
+        - preparations
+            - update anaInfo section
+                - fill in IMS chapter link
+                - fill in feature detection link, assuming we add mz(X)ML requirements somewhere
+                - fill in metadata link
+            - update/extend data-pretreatment section
+                - mention im_collapse uses msdata?
+                - fill in IMS chapter link, see what details to put where
+        - update newProject screenshot
         - features
             - update algo tables (piek, import)
             - describe piek params

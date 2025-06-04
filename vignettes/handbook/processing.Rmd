@@ -509,16 +509,18 @@ fGroups <- fGroups[, groupsOfInterest]
 
 The `delete()` generic function can be used to manually delete workflow data. This function is used internally within `patRoon` to implement filtering and subsetting operations, but may also be useful for advanced data processing.
 
-Like the subset operator this function accepts a `i` and `j` parameter to specify which data should be operated on:
+Similar to the subset operator, this function accepts a `i`, `j` and additionally `k` parameter to specify which data should be operated on:
 
-Class                   | Argument `i`  | Argument `j`
------------------------ | ------------- | -------------
-`features`              | analysis      | feature index
-`featureGroups`         | analysis      | feature group
-`formulas`, `compounds` | feature group | candidate index
-`components`            | component     | feature group
+Class                    | Argument `i`  | Argument `j`     | Argument `k`
+------------------------ | ------------- | ---------------- | ---------------------------------------
+`features`               | analysis      | feature index    |
+`featureGroups`          | analysis      | feature group    |
+`featureGroupsScreening` | analysis      | feature group    | suspect (can be `NA`, i` must be `NULL`)
+`MSPeakLists`            | feature group | mass peak        | analysis (if set, no deletion occurs on group-averaged peak lists)
+`formulas`, `compounds`  | feature group | candidate index  |
+`components`             | component     | feature group    |
 
-If `i` or `j` is not specified (`NULL`) then data is removed for the complete selection. Some examples are shown below:
+If `i`, `j` and/or `k` is not specified (`NULL`) then data is removed for the complete selection. Some examples are shown below:
 
 ```{r del,eval=FALSE}
 # delete 2nd feature in analysis-1
@@ -526,12 +528,26 @@ fList <- delete(fList, i = "analysis-1", j = 2)
 # delete first ten features in all analyses
 fList <- delete(fList, i = NULL, j = 1:10)
 
-# completely remove third/fourth analyses from feature groups
+# completely remove third+fourth analyses from feature groups
 fGroups <- delete(fGroups, i = 3:4)
 # delete specific feature group
 fGroups <- delete(fGroups, j = "M120_R268_30")
 # delete range of feature groups
 fGroups <- delete(fGroups, j = 500:750)
+
+# remove all hits for atrazine
+fGroupsSusp <- delete(k = "atrazine")
+# for a specific feature group
+fGroupsSusp <- delete(j = "M120_R268_30", k = "atrazine")
+# remove all hits for a feature group
+fGroupsSusp <- delete(j = "M120_R268_30", k = NA)
+
+# remove all MS peak lists for a feature group
+mslists <- delete(mslists, i = "M120_R268_30")
+# removes the first 5 peaks in all peak lists
+mslists <- delete(mslists, j = 1:5)
+# remove all MS peak lists for a specific analysis
+mslists <- delete(mslists, k = "standard-pos-1")
 
 # remove all results for a feature group
 formulas <- delete(formulas, i = "M120_R268_30")
@@ -547,14 +563,16 @@ components <- delete(components, i = "CMP1", j = "M120_R268_30")
 components <- delete(components, j = "M120_R268_30")
 ```
 
-The `j` parameter can also be a function: in this case it is called repeatedly on parts of the data to select what should be deleted. How the function is called and what it should return depends on the workflow data class:
+The value set to the `j` and `k` (for suspect screening results) can also be a function: the function called repeatedly on parts of the data to select what should be deleted. How the function is called and what it should return depends on the workflow data class:
 
-Class                   | Called on every | First argument                   | Second argument    | Return value
------------------------ | --------------- | -------------------------------- | ------------------ | -------------------------------------------
-`features`              | analysis        | `data.table` with features       | analysis name      | Features indices (as `integer` or `logical`)
-`featureGroups`         | feature group   | vector with group intensities    | feature group name | The analyses of the features to remove (as `character`, `integer`, `logical`)
-`formulas`, `compounds` | feature group   | `data.table` with annotations    | feature group name | Candidate indices (rows)
-`components`            | component       | `data.table` with the component  | component name     | The feature groups (as `character`, `integer`)
+Class                   | Called on every | Arguments                                      | Return value
+----------------------- | --------------- | ---------------------------------------------- | -------------------------------------------
+`features`              | analysis        | features (`data.table`), analysis name         | Features indices (as `integer` or `logical`)
+`featureGroups`, `featureGroupsScreening` | feature group | group intensities (vector), feature group name | The analyses of the features to remove (as `character`, `integer`, `logical`)
+`featureGroupsScreening` (`k`) | -        | The screening table                            | A `logical` vector for the rows to delete.
+`mslists`               | peak list       | mass peaks (`data.table`), feature group name, analysis name (`NULL` for group averaged data), type (`"MS"` or `"MSMS"`) | Mass peak indices (as `integer`, `logical`)
+`formulas`, `compounds` | feature group   | annotations (`data.table`), feature group name | Candidate indices (rows)
+`components`            | component       | component (`data.table`), component name       | The feature groups (as `character`, `integer`)
 
 Some examples for this:
 
@@ -563,7 +581,17 @@ Some examples for this:
 fList <- delete(fList, j = function(f, ...) f$intensity <= 5E3)
 
 # same, but for features in all feature groups from specific analyses
-fGroups <- delete(i = 1:3, j = function(g, ...) g <= 5E3)
+fGroups <- delete(fGroups, i = 1:3, j = function(g, ...) g <= 5E3)
+
+# remove hits for suspects with mass above 400 Da
+fGroupsSusp <- delete(fGroupsSusp, k = function(tab) tab$neutralMass > 400)
+
+mslists <- delete(mslists, j = function(pl, grp, ana, type)
+{
+    if (!is.null(ana) || type == "MS")
+        return(FALSE) # only delete peaks from group averaged MS/MS peak lists
+    return(pl$mz > 500) # remove peaks with m/z > 500
+})
 
 # remove formula candidates with high relative mass deviation
 formulas <- delete(formulas, j = function(ft, ...) ft$error > 5)

@@ -246,6 +246,7 @@
 ## Docs
 
 - move all plotBPC(), getEIC() etc methods into one doc file?
+- update relativeTo arg (not just replicates)
 - convert
     - add patRoon 3.0 citation for im_collapse
 - backend
@@ -290,7 +291,7 @@
         - Subsetting
             - features: add (subsections) on ana re-ordering and ni subsetting --> separate section
         - Unique and overlapping features
-            - update for aggregation
+            - fill in link to metadata
         - Visualization
             - colourBy --> groupBy
             - outerGroups --> groupBy, also update (incorrect) example in handbook

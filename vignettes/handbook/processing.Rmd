@@ -387,7 +387,7 @@ Class           | Argument `i`   | Argument `j`   | Remarks
 --------------- | -------------- | -------------- | ------------------------------------------------
 `features`      | analyses       |                |
 `featureGroups` | analyses       | feature groups |
-`MSPeakLists`   | analyses       | feature groups | peak lists for feature groups will be re-averaged when subset on analyses (by default)
+`MSPeakLists`   | analyses       | feature groups | set `reAverage=TRUE` to re-average peak lists after subsetting
 `formulas`      | feature groups |                | 
 `compounds`     | feature groups |                |
 `components`    | components     | feature groups |
@@ -445,6 +445,13 @@ components[c("CMP1", "CMP5")]
 # only retain feature groups in components for which compound annotations are
 # available
 components[, groupNames(compounds)]
+
+# select five feature groups
+mslists[, 1:5]
+
+# ... and perform re-averaging
+# NOTE: this will invalidate any existing formulas/compound annotation data!
+mslists[, 1:5, reAverage = TRUE]
 ```
 
 In addition, feature groups can also be subset by given replicates or annotation/componentization results (similar to `filter()`). Similarly, suspect screening results can also be subset by given suspect names.
@@ -457,8 +464,6 @@ fGroups[results = compounds]
 # only keep feature groups assigned to given suspects
 fGroupsSusp[suspects = c("1H-benzotriazole", "2-Hydroxyquinoline")]
 ```
-
-> **_NOTE_** As of `patRoon 2.0` MS peak lists are **not** re-generated after a subsetting operation (unless the `reAverage` parameter is explicity set to `TRUE`). The reason for this change is that re-averaging invalidates any formula/compound annotation data (e.g. used for plotting and reporting) that were generated prior to the subset operation.
 
 
 ### Prioritization workflow

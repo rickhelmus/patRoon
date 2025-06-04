@@ -280,8 +280,10 @@
                 - update links/mentions to suspAnn
         - annotation
             - update MSPL section
-            - Changed default db for MetFrag to pubchemlite
-            - estIDLevels --> replace suspect annotation section
+                - add back precursorMzWindow if we re-add it
+                - add supported file formats and/or link to msdata
+            - estIDLevels
+                - update thresholds when we change these
     - processing
         - Inspecting
             - FIX: fList[["standard-1"]][, 1:6]
@@ -312,7 +314,9 @@
             - direct and post
             - piek examples for both
             - componentization: order and eg adducts not supported
-            - annotation: minMobSpecSim
+            - annotation
+                - MSPL averaging params?
+                - minMobSpecSim
         - processing
             - features
                 - mention somewhere that IMS="maybe" for e.g. plotting

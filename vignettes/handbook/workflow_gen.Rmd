@@ -609,8 +609,6 @@ componNT2 <- generateComponents(fGroups, "nontarget", ionization = "positive",
 
 ### Intensity and MS/MS similarity {#compClust}
 
-<!-- UNDONE: refs? -->
-
 The previous componentization methods utilized chemical properties to relate features. The two componentization algorithms described in this section use a statistical approach based on hierarchical clustering. The first algorithm normalizes all feature intensities and then clusters features with similar intensity profiles across sample analyses together. The second algorithm compares all MS/MS spectra from all feature groups, and then uses hierarchical clustering to generate components from feature groups that have a high MS/MS spectrum similarity.
 
 Some common arguments to `generateComponents()` are listed below. It is recommended to test various settings (especially for `method`) to optimize the clustering results.
@@ -695,7 +693,7 @@ When feature groups have adduct annotations available this may simplify and impr
 
 ## Annotation
 
-The annotation consists of collecting MS peak lists and then formula and/or compound annotation:
+The annotation consists of collecting MS peak lists, formula and/or compound annotations and finally estimation of identification confidence for the candidates (including suspects):
 
 ```{r annWorkflow,echo=FALSE,out.width="50%"}
 plotGV("
@@ -703,7 +701,7 @@ digraph Annotation {
   graph [ rankdir = LR ]
   node [ shape = box,
          fixedsize = true,
-         width = 2.3,
+         width = 2.5,
          height = 1,
          fontsize = 18,
          fillcolor = darkseagreen1,
@@ -711,52 +709,43 @@ digraph Annotation {
 
     'MS peak lists' -> 'Formula annotation'
     'MS peak lists' -> 'Compound annotation'
-    'Formula annotation':n -> 'Suspect annotation':n [style = dotted]
-    'Compound annotation':s -> 'Suspect annotation':s [style = dotted]
+    'Formula annotation':n -> 'ID confidence est':n [style = dotted]
+    'Compound annotation':s -> 'ID confidence est':s [style = dotted]
     'Formula annotation':e -> 'Compound annotation':e [style = dotted, constraint = false]
+    'ID confidence est':e -> 'Suspects':w [style = dotted; dir=back]
 }", height = 120, width = 500)
 ```
 
-Note that compound annotation is normally not dependent upon formula annotation. However, formula data can be used to improve ranking of candidates afterwards by the `addFormulaScoring()` function, which will be discussed later in this section. Furthermore, suspect annotation is not mandatory, and may use data from peak lists, formulae and/or comounds.
+Note that compound annotation is not dependent upon formula annotation. However, formula data can be used to improve ranking of candidates afterwards by the `addFormulaScoring()` function, which will be discussed later in this section. The estimation of ID confidence is optional, and can be performed for candidates from formula annotations, compounds annotations and suspect matches.
 
 ### MS peak lists
 
-Algorithm    | Usage                                                   | Remarks
------------- | ------------------------------------------------------- | -----------------------------------------------------
-[mzR]        | `generateMSPeakLists(algorithm = "mzr", ...)`           | Uses [mzR] for spectra retrieval. Recommended default.
-DataAnalysis | `generateMSPeakLists(algorithm = "bruker", ...)`        | Loads data after automatically generating MS and MS/MS spectra in DataAnalysis
-DataAnalysis FMF | `generateMSPeakLists(algorithm = "brukerfmf", ...)` | Uses spectra from the  _find molecular features_ algorithm.
+> **_NOTE_** The `generateMSPeakLists()` function was significantly changed in `patRoon 3.0`, and now uses internal algorithms to retrieve MS and MS/MS spectra. The previous algorithms (`mzr`, `bruker` and `brukerfmf`) are now deprecated and should not be used anymore.
 
-The recommended default algorithm is `mzr`: this algorithm is generally faster and is not limited to a vendor data format as it will read the open `mzML` and `mzXML` file formats. On the other hand, when DataAnalysis is used with Bruker data the spectra can be automatically background subtracted and there is no need for file conversion. Note that the `brukerfmf` algorithm only works when `findFeatures()` was called with the `bruker` algorithm.
+The `generateMSPeakLists()` generates MS peak lists for features and feature groups. When it is called it will:
 
-When `generateMSPeakists()` is called it will
+1. Find all MS and MS/MS spectra that 'belong' to a feature, i.e. those spectra that were recorded close to the retention time of the feature. For MS/MS data only spectra will be considered with a precursor mass close to that of the feature (unless the data was recorded with data independent acquisition (DIA, MS^E, bbCID, ...)).
+2. Average the MS or MS/MS spectra for each feature to produce the peak lists for features.
+3. Average the peak lists for the features within the same group to obtain feature group peak lists.
 
-1. Find all MS and MS/MS spectra that 'belong' to a feature. For MS spectra this means that all spectra close to the retention time of a feature will be collected. In addition, for MS/MS normally only spectra will be considered that have a precursor mass close to that of the feature (however, this can be disabled for data that was recorded with data independent acquisition (DIA, MS^E, bbCID, ...)).
-2. Average all MS and MS/MS spectra to produce peak lists for each feature.
-3. Average all peak lists for features within the same group.
-
-Data from either (2) or (3) is used for subsequent annotation steps. Formula calculation can use either (as a trade-off between possibly more accurate results by outlier removal _vs_ speed), whereas compound annotation will always use data from (3) since annotating single features (as opposed to their groups) would take a very long time.
+Data from either (2) or (3) is used for subsequent annotation steps. Formula calculation can use either (as a trade-off between possibly more accurate results by outlier removal _vs_ speed), whereas compound annotation will always use data from (3) since annotating single features would take a very long time.
 
 There are several common function arguments to `generateMSPeakLists()` that can be used to optimize its behaviour:
 
-<!-- UNDONE: add topMost for Bruker when it's there -->
+Argument                              | Remarks
+------------------------------------- |  ----------------------------------------------------------------------
+`maxMSRtWindow`                       |  Maximum time window +/- the feature retention time (in seconds) to collect spectra for averaging. Higher values may increase processing times.
+`topMost`                             |  Only retain feature data for no more than this amount analyses with highest intensity. For instance, a value of _1_ will only keep peak lists for the feature with highest intensity in a feature group.  
+`avgFeatParams` and `avgFGroupParams` | Parameters that configure the averaging of feature and feature group peak lists, respectively (discussed below).
 
-Argument                             | Algorithm(s)          | Remarks
------------------------------------- | --------------------- | ----------------------------------------------------------------------
-`maxMSRtWindow`                      | `mzr`, `bruker`       | Maximum time window +/- the feature retention time (in seconds) to collect spectra for averaging. Higher values may significantly increase processing times.
-`precursorMzWindow`                  | `mzr`                 | Maximum precursor _m/z_ search window to find MS/MS spectra. Set to `NULL` to disable (i.e. for DIA experiments).
-`topMost`                            | `mzr`                 | Only retain feature data for no more than this amount analyses with highest intensity. For instance, a value of _1_ will only keep peak lists for the feature with highest intensity in a feature group.  
-`bgsubtr`                            | `bruker`              | Perform background subtraction (if the spectra type supports this, e.g. MS and bbCID)
-`minMSIntensity`, `minMSMSIntensity` | `bruker`, `brukerfmf` | Minimum MS and MS/MS intensity. Note that DataAnalysis reports many zero intensity peaks so a value of at least _1_ is recommended.
-`MSMSType`                           | `bruker`              | The type of spectra that should be used for MSMS: `"BBCID"` for bbCID experiments, otherwise `"MSMS"` (the default).
+The parameters passed to `avgFeatParams` and `avgFGroupParams` are passed as a `list` and some typical parameters include:
 
-In addition, several parameters can be set that affect spectral averaging. These parameters are passed as a `list` to the `avgFeatParams` (`mzr` algorithm only) and `avgFGroupParams` arguments, which affect averaging of feature and feature group data, respectively. Some typical parameters include:
-
-* `clusterMzWindow`: Maximum _m/z_ window used to cluster mass peaks when averaging. The better the MS resolution, the lower this value should be.
-* `topMost`: Retain no more than this amount of most intense mass peaks. Useful to filter out 'noisy' peaks.
+* `clusterMzWindow`: Maximum _m/z_ window used to cluster mass peaks when averaging. May be lowered for HRMS instruments with very high resolution and accuracy.
+* `topMost`: Retain no more than this amount of most intense mass peaks prior to averaging.
 * `minIntensityPre` / `minIntensityPost`: Mass peaks below this intensity will be removed before/after averaging.
+* `minAbundanceAbs` / `minAbundanceRel`: Minimum absolute or relative abundance of a mass peak to be retained after averaging.
 
-See `?generateMSPeakLists` for all possible parameters.
+Optimizing the thresholds may be useful to remove noise and speed-up the averaging of spectra.
 
 A suitable list object to set averaging parameters can be obtained with the `getDefAvgPListParams()` function.
 
@@ -765,8 +754,10 @@ A suitable list object to set averaging parameters can be obtained with the `get
 avgPListParams <- getDefAvgPListParams(clusterMzWindow = 0.001)
 
 # Apply to both feature and feature group averaging
-plists <- generateMSPeakLists(fGroups, "mzr", avgFeatParams = avgPListParams, avgFGroupParams = avgPListParams)
+plists <- generateMSPeakLists(fGroups, avgFeatParams = avgPListParams, avgFGroupParams = avgPListParams)
 ```
+
+See `?getDefAvgPListParams` for all possible averaging parameters and `?generateMSPeakLists` for further details.
 
 ### Formulae
 
@@ -825,7 +816,7 @@ Library                | `generateCompounds(algorithm = "library", ...)` | Obtai
 
 All algorithms rank their candidates by matching MS/MS data with in-silico generated MS/MS data (MetFrag and SIRIUS) and/or experimental MS/MS data from an MS library (MetFrag with MoNA scoring and Library algorithm). The latter may yield better candidates, and the Library algorithm is also generally much faster. However, in-silico annotation is not limited by the availability of experimental MS/MS data.
 
-Compound annotation is often a relative time and resource intensive procedure. For this reason, annotation occurs for each feature group and not individual features. Nevertheless, it is not uncommon that this is the most time consuming step in the workflow. For this reason, prioritization of features is highly important, even more so to avoid 'abusing' servers when an online database is used for compound retrieval.
+Compound annotation is often a relative time and resource intensive procedure. For this reason, annotation occurs for each feature group and not individual features. It is not uncommon that this is the most time consuming step in the workflow. For this reason, prioritization of features is highly important, even more so to avoid 'abusing' servers when an online database is used for compound retrieval.
 
 #### Database selection for MetFrag and SIRIUS
 
@@ -835,10 +826,10 @@ Selecting the right database is important for proper candidate assignment. If th
 
 Database            | Algorithm(s)            | Remarks
 ------------------- | ----------------------- | -----------------------
+`pubchemlite`       | `"metfrag"`             | A specialized subset of the PubChem database. Often a good default. May need manual installation (see next section).
 `pubchem`           | `"metfrag"`, `"sirius"` | [PubChem] is currently the largest compound database and is used by default.
 `chemspider`        | `"metfrag"`             | [ChemSpider] is another large database. Requires security token from [here](http://www.chemspider.com/AboutServices.aspx) (see next section).
-`comptox`           | `"metfrag"`             | The EPA [CompTox] contains many compounds and scorings relevant to environmental studies. Needs manual download (see next section).
-`pubchemlite`       | `"metfrag"`             | A specialized subset of the PubChem database. Needs manual download (see next section).
+`comptox`           | `"metfrag"`             | The EPA [CompTox] contains many compounds and scorings relevant to environmental studies. May need manual installation (see next section).
 `for-ident`         | `"metfrag"`             | The [FOR-IDENT] (STOFF-IDENT) database for water related substances.
 `kegg`              | `"metfrag"`, `"sirius"` | The [KEGG] database for biological compounds
 `hmdb`              | `"metfrag"`, `"sirius"` | The [HMDB] contains many human metabolites.
@@ -848,7 +839,7 @@ Database            | Algorithm(s)            | Remarks
 
 #### Configuring MetFrag databases and scoring
 
-Some extra configuration may be necessary when using certain databases with MetFrag. In order to use the ChemSpider database a [security token](http://www.chemspider.com/AboutServices.aspx) should be requested and set with the `chemSpiderToken` argument to `generateCompounds()`. The CompTox and PubChemLite databases need to be manually downloaded from [CompTox][CompTox-dl] (or variations with [smoking][CompTox-smoke] or [wastewater][CompTox-WW] metadata) and [PubChemLite][PCLite-dl] (or the PubChem derived [OECD PFAS database][PC-PFAS]). The file location of this and other local databases (`csv`, `psv`, `sdf`) needs to be manually configured, see the examples below and/or `?generateCompounds` for more information on how to do this.
+Some extra configuration may be necessary when using certain databases with MetFrag. The CompTox and PubChemLite databases need to be manually downloaded from [CompTox][CompTox-dl] (or variations with [smoking][CompTox-smoke] or [wastewater][CompTox-WW] metadata) and [PubChemLite][PCLite-dl] (or the PubChem derived [OECD PFAS database][PC-PFAS]). The file location of this and other local databases (`csv`, `psv`, `sdf`) needs to be manually configured, see the [Installation chapter](#Installation), examples below and/or `?generateCompounds` for more information on how to do this. In order to use the ChemSpider database a [security token](http://www.chemspider.com/AboutServices.aspx) should be requested and set with the `chemSpiderToken` argument to `generateCompounds()`.
 
 ```{r compDB,eval=FALSE}
 # PubChem: the default
@@ -873,7 +864,7 @@ compsMF5 <- generateCompounds(fGroups, mslists, "metfrag", database = "csv", add
 
 An example of a custom _.csv_ database can be found [here][csvDB-ex].
 
-With MetFrag compound databases are not only used to retrieve candidate structures but are also used to obtain metadata for further ranking. Each database has its own scorings, a table with currently supported scorings can be obtained with the `compoundScorings()` function (some columns omitted):
+With MetFrag compound databases are not only used to retrieve candidate structures but are also used to obtain metadata for further ranking. Each database has its own scorings, a table with currently supported scorings can be obtained with the `compoundScorings()` function: (some columns omitted)
 
 ```{r compSc,echo=FALSE}
 makeTable(compoundScorings()[, c("name", "metfrag", "database", "default")])
@@ -901,7 +892,7 @@ compsMF <- generateCompounds(fGroups, mslists, "metfrag", adduct = "[M+H]+",
                              scoreWeights = c(1, 2))
 ```
 
-Sometimes thousands or more structural candidates are found when annotating a feature group. In this situation processing all these candidates will too involving (especially when external databases are used). To avoid this a default cut-off is set: when the number of candidates exceed a certain amount the search will be aborted and no results will be reported for that feature group. The maximum number of candidates can be set with the `maxCandidatesToStop` argument. The default value is relative conservative, especially for local databases it may be useful to increase this number.
+Sometimes thousands or more structural candidates are found when annotating a feature group. In this situation processing all these candidates will be too involving (especially when external databases are used). To avoid this a default cut-off is set: when the number of candidates exceed a certain amount the search will be aborted and no results will be reported for that feature group. The maximum number of candidates can be set with the `maxCandidatesToStop` argument. The default value is relative conservative, especially for local databases it may be useful to increase this number.
 
 
 #### MetFrag error and timeout handling
@@ -947,33 +938,48 @@ Here, corresponding formula and explained fragments will be used to calculate a 
 
 There are _many_ more options and parameters that affect compound annotation. For a full overview please have a look at the reference manual (e.g. by running `?generateCompounds`).
 
-### Suspect annotation {#suspAnn}
+### Estimation of identification confidence {#estIDConf}
 
-The data obtained during the previously described annotation steps can be used to improve a suspect screening workflow. The `annotateSuspects()` method uses the annotation data to calculate various annotation properties for each suspect, such as their rank in formula/compound candidates, which fragments from the suspect list were matched, and a _rough_ indication of the identification level according to @Schymanski2014
+> **_NOTE_** The `annotateSuspects()` function was replaced by the `estimateIDConfidence()` function in `patRoon 3.0`. This section describes the updated interface.
 
-```{r annSusps,eval=runData}
-fGroupsSusp <- annotateSuspects(fGroupsSusp, MSPeakLists = mslists,
-                                formulas = formulas, compounds = compounds)
-```
+Full identification of features is often difficult, and often you are left with tentative suspect, formula and compound assignments. A common way to communicate the confidence of these assignments is by using identification levels, as proposed by @Schymanski2014.
 
-The calculation of identification levels is performed by a set of pre-defined rules. The `genIDLevelRulesFile()` can be used to inspect the default rules or to create your own rules file, which can subsequently passed to `annotateSuspects()` with the `IDFile` argument. See `?annotateSuspects` for more details on the file format and options. The default identification levels can be summarized as follows:
+The `estimateIDConfidence()` function provides an _estimate_ of the identification confidence for candidates assigned to suspects, formulae and compounds. It uses a rule based approach to estimate identification levels:
 
 Level | Description | Rules
 ----- | ----------- | --------------------------------
 1     | Target match               | Retention time deviates <12 seconds from suspect list. At least `3` (or all if the suspect list contains less) fragments from the suspect list must match.
-2a    | Good MS/MS library match   | Suspect is top ranked in the `compounds` results. The `individualMoNAScore` (MetFrag) or `libMatch` (Library algorithm) is at least `0.9` and no other candidates were matched with the MS library.
+2a    | Good MS/MS library match   | Candidate is top ranked in the `compounds` results. The `individualMoNAScore` (MetFrag) or `libMatch` (Library algorithm) is at least `0.9` and no other candidates were matched with the MS library.
 3a    | Fair library match | The `individualMoNAScore` or `libMatch` is at least 0.4.
 3b    | Known MS/MS match          | At least `3` (or all if the suspect list contains less) fragments from the suspect list must match.
-3c    | Good in-silico MS/MS match | The annotation MS/MS similarity (`annSimComp` column) is at least `0.7`.
-4a    | Good formula MS/MS match   | Suspect is top ranked formula candidate, annotation MS/MS similarity (`annSimForm` column) is at least `0.7` and isotopic match (`isoScore`) of at least 0.5. The latter two scores are at least `0.2` higher than next best ranked candidate.
-4b    | Good formula isotopic pattern match | Suspect is top ranked formula candidate and isotopic match (`isoScore`) of at least `0.9` and at least `0.2` higher than next best ranked candidate.
+3c    | Good in-silico MS/MS match | The compound annotation MS/MS similarity (discussed below) is at least `0.7`.
+4a    | Good formula MS/MS match   | Candidate is top ranked, formula annotation MS/MS similarity (discussed below) is at least `0.7` and isotopic match (`isoScore`) of at least 0.5. The latter two scores are at least `0.2` higher than next best ranked candidate.
+4b    | Good formula isotopic pattern match | Candidate is top ranked and isotopic match (`isoScore`) of at least `0.9` and at least `0.2` higher than next best ranked candidate.
 5     | Unknown                    | All else.
 
-In general, the more data provided by the suspect list and to `annotateSuspects()`, the better identification level estimation works. For instance, when considering the default rules, either the `fragments_mz` or `fragments_formula` column is necessary to be able assign a `level 3b`. Similarly, the suspect list needs retention times (as well as fragment data) to be able to assign `level 1`. As you can imagine, providing the annotation workflow objects (i.e. `MSPeakLists`, `formulas`, `compounds`) to `annotateSuspects()` is necessary for calculation of most levels.
+> **_NOTE_** The current identification level rules are _only_ optimized for GenForm and MetFrag annotation algorithms.
 
-The `annotateSuspects()` function will log decisions for identification level assignments to the `log/` sub-directory in the current working directory. This is useful to inspect level assignments and especially useful when you customized any rules.
+The `genIDLevelRulesFile()` can be used to inspect the default rules or to create your own rules file, which can subsequently passed to `estimateIDConfidence()` with the `IDFile` argument. A file with defaults is automatically created inside the project directory when using the [newProject tool](#newProject). Note that some rules are limited to suspect annotation.
 
-> **_NOTE_**: The current identification level rules are _only_ optimized for GenForm and MetFrag annotation algorithms.
+The _annotation similarity_ is a measure of how well the experimental MS/MS data is explained by the annotation algorithm. This is calculated as a spectral similarity between the spectrum with only the explained mass peaks and the full spectrum. A value of _1.0_ means a full match, and is is obtained when all experimental mass peaks could be explained. The annotation similarity is a straightforward measure to quickly evaluate the identification confidence, and is used for the estimation of identification levels (see Table above). For formulae and compounds, the annotation similarity is calculated automatically by `generateFormulas()` and `generateCompounds()`, respectively. The `estimateIDConfidence()` function for compounds can incorporate formula annotation similarities into compounds results. Furthermore, the `estimateIDConfidence()` function can be used to calculate formula and compound annotation similarities for suspects.
+
+The estimation of confidence depends on the data is available to `estimateIDConfidence()`. For instance, either the `fragments_mz` or `fragments_formula` suspect data is necessary to be able assign a `level 3b`. Similarly, the suspect list needs retention times as well as fragment data to be able to assign `level 1`. For compounds and suspects, providing additional annotation workflow objects (`MSPeakLists`, `formulas`, `compounds`) as input to `estimateIDConfidence()` is necessary for calculation of most levels.
+
+The `estimateIDConfidence()` function logs decisions for identification level assignments. This is useful to inspect level assignments and especially useful when you customized any rules. Note that this is disabled by default for formulae and compounds, since this often leads to a large number of log files. The `logPath` function argument is used set to configure logging.
+
+Some examples on how to use `estimateIDConfidence()` are shown below:
+
+```{r estIDConf,eval=runData}
+# calculate ID confidence for formulae
+formulas <- estimateIDConfidence(formulas)
+
+# calculate ID confidence for compounds. Supply peak lists and formulae to improve the estimations and enable logging.
+compounds <- estimateIDConfidence(compounds, MSPeakLists = mslists, formulas = formulas, logPath = "log/comp-ident")
+
+# calculate ID confidence for suspects. Supply peak lists, formulae and compounds to improve the estimations.
+fGroupsSusp <- estimateIDConfidence(fGroupsSusp, MSPeakLists = mslists, formulas = formulas, compounds = compounds)
+```
+
 
 ### Account login for SIRIUS {#SIRLogin}
 

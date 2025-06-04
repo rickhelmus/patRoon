@@ -272,12 +272,12 @@
                 - mention im_collapse uses msdata?
                 - fill in IMS chapter link, see what details to put where
         - features
-            - update algo tables (piek, import)
+            - update algo tables (piek, import) and file support (mention msdata for piek somewhere?)
             - describe piek params
-            - suspect screening: update list format
-            - mention mzXML/mzML requirements as newProject() doesn't give note anymore
-                - can also be tims for piek
-                - or just in prep chapter?
+            - possibly split feature import into sub-section?
+            - suspect screening
+                - fill in IMS links
+                - update links/mentions to suspAnn
         - annotation
             - update MSPL section
             - Changed default db for MetFrag to pubchemlite

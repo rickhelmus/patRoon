@@ -303,21 +303,23 @@ digraph Features {
 
 Several algorithms are available for finding features. These are listed in the table below alongside their usage and general remarks.
 
-Algorithm        | Usage                                       | Remarks
----------------- | ------------------------------------------- | --------------
-[OpenMS]         | `findFeatures(algorithm = "openms", ...)`   | Uses the [FeatureFinderMetabo] algorithm
-[XCMS]           | `findFeatures(algorithm = "xcms", ...)`     | Uses `xcms::xcmsSet()` function
-[XCMS] (import)  | `importFeatures(algorithm = "xcms", ...)`   | Imports an existing `xcmsSet` object
-[XCMS3]          | `findFeatures(algorithm = "xcms3", ...)`    | Uses `xcms::findChromPeaks()` from the new XCMS3 interface
-[XCMS3] (import) | `importFeatures(algorithm = "xcms3", ...)`  | Imports an existing `XCMSnExp` object
-[enviPick]       | `findFeatures(algorithm = "envipick", ...)` | Uses `enviPick::enviPickwrap()`
-[KPIC2]          | `findFeatures(algorithm = "kpic2", ...)`    | Uses the [KPIC2] `R` package
-[KPIC2] (import) | `importFeatures(algorithm = "kpic2", ...)`  | Imports features from [KPIC2]
-[SIRIUS]         | `findFeatures(algorithm = "sirius", ...)`   | Uses [SIRIUS] to find features
-[SAFD]           | `findFeatures(algorithm = "safd", ...)`     | Uses the [SAFD] algorithm (experimental)
-DataAnalysis     | `findFeatures(algorithm = "bruker", ...)`   | Uses Find Molecular Features from DataAnalysis (Bruker only)
+Algorithm        | Usage                                       | Input                         | Remarks
+---------------- | ------------------------------------------- | ----------------------------- | ----------------------------
+[OpenMS]         | `findFeatures(algorithm = "openms", ...)`   | centroid (`mzML`)             | Uses [FeatureFinderMetabo]
+[XCMS]           | `findFeatures(algorithm = "xcms", ...)`     | centroid (`mzML` or `mzXML`)  | Uses `xcms::xcmsSet()`
+[XCMS] (import)  | `importFeatures(algorithm = "xcms", ...)`   | `xcmsSet` object              |
+[XCMS3]          | `findFeatures(algorithm = "xcms3", ...)`    | centroid (`mzML` or `mzXML`)  | Uses `xcms::findChromPeaks()`
+[XCMS3] (import) | `importFeatures(algorithm = "xcms3", ...)`  | `XCMSnExp` object             |
+[enviPick]       | `findFeatures(algorithm = "envipick", ...)` | centroid (`mzXML`)            | Uses `enviPick::enviPickwrap()`
+[KPIC2]          | `findFeatures(algorithm = "kpic2", ...)`    | centroid (`mzML` or `mzXML`)  |
+[KPIC2] (import) | `importFeatures(algorithm = "kpic2", ...)`  | Features from [KPIC2]         |
+[SIRIUS]         | `findFeatures(algorithm = "sirius", ...)`   | centroid (`mzML` or `mzXML`)  |
+[SAFD]           | `findFeatures(algorithm = "safd", ...)`     | centroid or profile (`mzXML`) | **Experimental**
+DataAnalysis     | `findFeatures(algorithm = "bruker", ...)`   | raw (Bruker `.d`)             | Uses Find Molecular Features from DataAnalysis (Bruker only)
 
-Most often the performance of these algorithms heavily depend on the data and parameter settings that are used. Since obtaining a good feature dataset is crucial for the rest of the workflow, it is highly recommended to experiment with different settings (this process can also be automated, see [the feature optimization section](#fOpt) for more details). Some common parameters to look at are listed in the table below. However, there are many more parameters that can be set, please see the reference documentation for these (e.g. `?findFeatures`).
+The feature finding algorithms have different requirements on the data file types and formats (_Input_ column). See the [data conversion section](#pre-treat) to perform data conversion.
+
+Most often the performance of these algorithms heavily depends on the data and parameter settings that are used. Since obtaining a good feature dataset is crucial for the rest of the workflow, it is highly recommended to experiment with different settings (this process can also be automated, see [the feature optimization section](#fOpt) for more details). Some common parameters to look at are listed in the table below. However, there are many more parameters that can be set, please see the reference documentation for these (e.g. `?findFeatures`).
 
 Algorithm        | Common parameters
 ---------------- | ---------------------------------------------------------------------------------
@@ -328,8 +330,6 @@ Algorithm        | Common parameters
 [SIRIUS]         | The `sirius` algorithm is currently parameterless
 [SAFD]           | `mzRange`, `maxNumbIter`, `resolution`, `minInt` (see `?findFeatures`)
 DataAnalysis     | See _Find_ -> _Parameters..._ -> _Molecular Features_ in DataAnalysis.
-
-> **_NOTE_** Support for SAFD is still experimental and some extra work is required to set everything up. Please see the reference documentation for this algorithm (`?findFeatures`).
 
 > **_NOTE_** DataAnalysis feature settings have to be configured in DataAnalysis prior to calling `findFeatures()`.
 
@@ -352,7 +352,7 @@ TASQ             | `importFeatureGroups(algorithm = "brukertasq", ...)`     | Im
 
 Just like finding features, each algorithm has their own set of parameters. Often the defaults are a good start but it is recommended to have look at them. See `?groupFeatures` for more details.
 
-When using the [XCMS] algorithms both the 'classical' interface and latest `XCMS3` interfaces are supported. Currently, both interfaces are mostly the same regarding functionalities and implementation. However, since future developments of XCMS are primarily focused the latter this interface is recommended.
+When using the [XCMS] algorithms both the 'classical' interface and latest `XCMS3` interfaces are supported. The implementation and functionality is largely the same within `patRoon`, however, the latter is recommended as the classical interface is not further developed anymore.
 
 Some examples of finding and grouping features are shown below.
 
@@ -385,13 +385,14 @@ fGroupsSIRIUS <- groupFeatures(anaInfo, "sirius") # find/group features with SIR
 
 ### Suspect screening {#suspscr}
 
-After features have been grouped a so called suspect screening step may be performed to find features that may correspond to suspects within a given suspect list. The `screenSuspects()` function is used for this purpose, for instance:
+After features have been grouped a so called _suspect screening_ step may be performed. During this step a _suspect list_ is used to screen the detected features and match them to the suspects in the list. Suspect screening can simplify the identification of unknown features, and can simplify the overall workflow by removing the features without matches. The `screenSuspects()` function is used for this purpose, for instance:
 
 
 ```{r suspmz,eval=FALSE}
+# Perform a very basic suspect screening workflow. The suspects are matched by m/z values, and any non-hits are removed.
 suspects <- data.frame(name = c("1H-benzotriazole", "N-Phenyl urea", "2-Hydroxyquinoline"),
                        mz = c(120.0556, 137.0709, 146.0600))
-fGroupsSusp <- screenSuspects(fGroups, suspects)
+fGroupsSusp <- screenSuspects(fGroups, suspects, onlyHits = TRUE)
 ```
 
 #### Suspect list format {#suspFormat}
@@ -403,6 +404,7 @@ The example above has a very simple suspect list with just three compounds. The 
 - `mz`, `SMILES`, `InChI`, `formula`, `neutralMass`: _at least_ one of these columns must hold data for each suspect row. The `mz` column specifies the ionized mass of the suspect. If this is not available then data from any of the other columns is used to determine the suspect mass.
 - `adduct`: The adduct of the suspect. Optional. Set this if you are sure that a suspect should be matched by a particular adduct ion and no data in the `mz` column is available.
 - `fragments_mz` and `fragments_formula`: optional columns that may assist [suspect annotation](#suspAnn).
+- `mobility` and `CCS` columns: these are for [IMS workflows] and can increase the confidence of a suspect match. This is discussed in the [IMS chapter](section here).
 
 In most cases a suspect list is best made as a `csv` file which can then be imported with e.g. the `read.csv()` function. This is exactly what happen when you specify a suspect list when using the `newProject()` function.
 
@@ -411,7 +413,7 @@ Quite often, the ionized masses are not readily available and these have to be c
 ```{r suspSMI,eval=runData}
 suspects <- data.frame(name = c("1H-benzotriazole", "N-Phenyl urea", "2-Hydroxyquinoline"),
                        SMILES = c("[nH]1nnc2ccccc12", "NC(=O)Nc1ccccc1", "Oc1ccc2ccccc2n1"))
-fGroupsSusp <- screenSuspects(fGroups, suspects, adduct = "[M+H]+")
+fGroupsSusp <- screenSuspects(fGroups, suspects, adduct = "[M+H]+", onlyHits = TRUE)
 ```
 
 > **_NOTE_**: It is highly recommended to install [OpenBabel] to automatically validate and amend chemical properties such as SMILES, InChI, formulae etc in the suspect list.
@@ -425,7 +427,7 @@ Finally, when the adduct is known for a suspect it can be specified in the suspe
 suspects <- data.frame(name = c("1H-benzotriazole", "N-Phenyl urea", "Aldicarb"),
                        SMILES = c("[nH]1nnc2ccccc12", "NC(=O)Nc1ccccc1", "CC(C)(C=NOC(=O)NC)SC"),
                        adduct = c("[M+H]+", "[M+H]+", "[M+Na]+"))
-fGroupsSusp <- screenSuspects(fGroups, suspects)
+fGroupsSusp <- screenSuspects(fGroups, suspects, onlyHits = TRUE)
 ```
 
 To summarize:

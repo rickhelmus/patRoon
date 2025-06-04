@@ -139,53 +139,35 @@ digraph workflow {
 
 The next sections in this chapter will further detail on how to actually perform the non-target workflow steps to generate data. The transformation product screening workflows are discussed in [a separate chapter](#TPs).
 
-## Preparations
+## Sample analyses
 
-### Data pre-treatment
+In `patRoon` a _sample analysis_, or _analysis_, refers to a single HRMS measurement of a sample. The raw data for an analysis is typically stored in different file types and file formats, which are discussed in the next section. The [analysis information](#anaInfo) informs `patRoon` which analyses should be processed, where to find the raw data and is used to store any other metadata. The [data pre-treatment](#pre-treat) section describes how to convert and prepare the raw data.
 
-Prior to performing the actual non-target data processing workflow some preparations often need to be made. Often data has to be pre-treated, for instance, by converting it to an open format that is usable for subsequent workflow steps or to perform mass re-calibration. Some common functions are listed below.
+### Analysis file types and formats
 
-Task                                |  Function                | Algorithms | Supported file formats
-------------------------------------| ------------------------ | -------------------------------------- | -------
-Conversion                          | `convertMSFiles()`       | [OpenMS], [ProteoWizard], DataAnalysis | All common (algorithm dependent)
-Advanced (e.g. spectral filtering)  | `convertMSFiles()`       | [ProteoWizard]                         | All common
-Mass re-calibration                 | `recalibrarateDAFiles()` | DataAnalysis                           | Bruker
+In `patRoon` a distinction is made between four types of raw data files:
 
-The `convertMSFiles()` function supports conversion between many different file formats typically used in non-target analysis. Furthermore, other pre-treatment steps are available (e.g. centroiding, filtering) when the [ProteoWizard] algorithm is used. For an overview of these functionalities see the [MsConvert documentation](http://proteowizard.sourceforge.net/tools/msconvert.html). Some examples:
+* **raw**: the original raw data files from the HRMS instrument, with formats such as `.raw` (Thermo, Waters) or `.d` (Bruker, Agilent).
+* **centroid**: exported and centroided data files in the `mzML` or `mzXML` format.
+* **profile**: exported but not centroided (i.e. profile) data files in `mzML` or `mzXML` formats.
+* **ims**: exported ion mobility HRMS data files in the `mzML` format.
 
-```{r convert,eval=FALSE}
-# Converts a single mzXML file to mzML format
-convertMSFiles("standard-1.mzXML", to = "mzML", algorithm = "openms")
-
-# Converts all Thermo files with ProteoWizard (the default) in the analyses/raw
-# directory and stores the mzML files in analyses/raw. Afterwards, only MS1
-# spectra are retained.
-convertMSFiles("analyses/raw", "analyses/mzml", from = "thermo",
-               centroid = "vendor", filters = "msLevel 1")
-```
-
-> **_NOTE_** Most algorithms further down the workflow require the _mzML_ or _mzXML_ file format and additionally require that mass peaks have been centroided. When using the ProteoWizard algorithm (the default), centroiding by vendor algorithms is generally recommended (i.e. by setting `centroid="vendor"` as shown in the above example).
-
-When Bruker MS data is used it can be automatically re-calibrated to improve its mass accuracy. Often this is preceeded by calling the `setDAMethod()` function to set a DataAnalysis method to all files in order to configure automatic re-calibration. The `recalibrarateDAFiles()` function performs the actual re-calibration. The `getDACalibrationError()` function can be used at anytime to request the current calibration error of each analysis. An example of these functions is shown below.
-
-```{r brukerCalib,eval=FALSE}
-# anaInfo is a data.frame with information on analyses (see next section)
-setDAMethod(anaInfo, "path/to/DAMethod.m") # configure Bruker files with given method that has automatic calibration setup
-recalibrarateDAFiles(anaInfo) # trigger re-calibration for each analysis
-getDACalibrationError(anaInfo) # get calibration error for each analysis (NOTE: also shown when previous function is finished)
-```
+Most algorithms in non-target workflows exclusively operate on centroided data files. In most cases the centroided data should be stored in the `mzML` format, but [some feature detection algorithms] only work with `mzXML`. The raw data files are primarily used for data conversion to any of the other types. The raw and ims data file types are (also) used in [IMS workflows].
 
 ### Analysis information {#anaInfo}
 
-The final bits of preparation is constructing the information for the analyses that need to be processed. In `patRoon` this is referred to as the _analysis information_ and often stored in a variable `anaInfo` (of course you are free to choose a different name!). The analysis information should be a `data.frame` with the following columns:
+In `patRoon`, the _analysis information_ describes the analyses that are to be processed, where they are located and holds any metadata such as replicate information. The analysis information should be a `data.frame` and is often stored in a variable called `anaInfo` (of course you are free to choose a different name!). 
 
-* **path**: the directory path of the file containing the analysis data
-* **analysis**: the name of the analysis. This should be the file name _without_ file extension.
-* **replicate**: to which _replicate_ the analysis belongs. All analysis which are replicates of each other get the same name.
-* **blank**: which replicate should be used for blank subtraction.
-* **conc** (optional, advanced) A numeric value describing the concentration or any other value for which the intensity in this sample may correlate, for instance, dilution factor, sampling time etc. This column is only required when you want to obtain quantitative information (e.g. concentrations) using the `as.data.table()` method function (see `?featureGroups` for more information).
+The analysis information table has a few mandatory columns:
 
-The `generateAnalysisInfo()` function can be used to (semi-)automatically generate a suitable `data.frame` that contains all the required information for a set of analysis. For, instance:
+* **path_raw**,**path_centroid**,**path_profile**,**path_ims**: the directory path to the analyses in the raw, centroided, profile and ims formats, respectively. See the previous section for details on the file types. Leave empty if the file type is not present.
+* **analysis**: the name of the analysis. This should be the file name _without_ file extension and _without_ directory path (e.g. `C:\\MyAnalysis\\sample1.d` becomes `sample1`). Each value in the `analysis` column must be unique.
+* **replicate**: to which _replicate_ the analysis belongs. The analysis which are replicates of each other get the same name.
+* **blank**: which replicate should be used for blank subtraction. Can be left empty if no subtraction is desired.
+
+If a workflow requires multiple file formats of a same file type, e.g. centroided `mzML` and `mzXML` files, then simply store both file formats in the directory specified in the `path_XXX` column. If data needs to be exported (discussed in the next section), simply assign its _destination path_ to the respective `path_XXX` column.
+
+The analysis information table can be manually constructed in `R` (e.g. through import of an `CSV` file), through a graphical interface with `newProject()` ([discussed later](#newProject)) or automatically by the `generateAnalysisInfo()` function. Here is an example of the latter for the example data in the `patRoonData` package:
 
 ```{r genAnaInfo,eval=TRUE}
 # Take example data from patRoonData package (triplicate solvent blank + triplicate standard)
@@ -196,9 +178,90 @@ generateAnalysisInfo(fromCentroid = patRoonData::exampleDataPath(),
 
 (Note that for the example data the `patRoonData::exampleAnalysisInfo()` function can also be used.)
 
-Alternatively, the `newProject()` function discussed in the next section can be used to interactively construct this information.
+It is possible to add more columns to the analysis information: these can be used to attach additional metadata to each sample analysis. These columns can be added later to the table, or specified directly to `generateAnalysisInfo()`:
 
-### Automatic project generation with newProject() {#newProject}
+```{r genAnaInfoMD,eval=TRUE}
+# As above, but add some (nonsensical) metadata: location and exposure
+generateAnalysisInfo(fromCentroid = patRoonData::exampleDataPath(),
+                     replicate = c(rep("solvent-pos", 3), rep("standard-pos", 3)),
+                     blank = "solvent-pos",
+                     location = c("NL", "NL", "NL", "DE", "DE", "DE"),
+                     exposure = c(0, 0, 0, 2, 2, 2))
+```
+
+The metadata (`location` and `exposure` in the example above) can be used in various ways [later in the workflow] to process the non-target data.
+
+See the reference manual for more details on the analysis information and `generateAnalysisInfo()` (``?`analysis-information`` `).
+
+### Data conversion and pre-treatment {#pre-treat}
+
+As noted in the previous sections, analyses are typically stored in different file types and formats, and algorithms in the workflow typically only support some of these. Hence, it is often required to perform file conversion.
+
+The `convertMSFiles()` function supports various algorithms to perform the necessary file conversions:
+
+Algorithm      | Usage                                            | Input file types and formats              | Output file types and formats | Remarks
+-------------- | ------------------------------------------------ | ----------------------------------------- | ----------------------------- | --------------
+[ProteoWizard] | `convertMSFiles(algorithm = "pwiz", ...)`        | all formats and types                     | all except raw
+[OpenMS]       | `convertMSFiles(algorithm = "openms", ...)`      | centroid and profile (`mzML` and `mzXML`) | centroid and profile (`mzML` and `mzXML`) | Does not support centroiding.
+DataAnalysis   | `convertMSFiles(algorithm = "bruker", ...)`      | raw (Bruker `.d`)                         | centroid and profile (`mzML` and `mzXML`)
+IM collapse    | `convertMSFiles(algorithm = "im_collapse", ...)` | raw (Bruker TIMS) and ims (mzML)          | centroid (`mzML` and `mzXML`)
+[TIMSCONVERT]  | `convertMSFiles(algorithm = "timsconvert", ...)` | raw (Bruker TIMS)                         | centroid, profile, ims (`mzML`)
+
+> **_NOTE_** For the conversion of IMS to centroided data it is highly recommended to use the IM collapse or [TIMSCONVERT] algorithms, as [ProteoWizard] currently does not support accurate centroiding. For the conversion of Agilent IMS data, [ProteoWizard] can be used to convert the raw `.d` files to the ims (`mzML`) files, and subsequently IM collapse can be used to convert these to centroided files. See the [IMS chapter] for more details. 
+
+The `convertMSFiles()` function uses the [analysis information](#anaInfo) to locate the input files and the destination paths for the output. The `path_XXX` columns should contain the desired destination directories for those file types that should be exported. For instance:
+
+```{r anaInfoConv}
+anaInfo <- data.frame(
+    analysis = c("sample1", "sample2"),
+    replicate = "replicate",
+    blank = "",
+    path_raw = "raw_files", # directory containing the raw HRMS instrument files (.d, .raw, ...)
+    path_centroid = "centroid_files" # destination directory where the centroided files will be placed
+)
+anaInfo
+```
+
+The `generateAnalysisInfo()` function supports specifying conversion destination directories through the `convXXX` function arguments (see `?generateAnalysisInfo`). The [newProject() utility](#newProject) will automatically generate a proper analysis information table.
+
+The `convertMSFiles()` takes the analysis information and performs the necessary conversions:
+
+```{r eval=FALSE}
+# Convert thermo raw files to centroided mzML files
+convertMSFiles(anaInfo, typeFrom = "raw", formatFrom = "thermo", typeTo = "centroid", formatTo = "mzML",
+               algorithm = "pwiz")
+
+# convert TIMS data to LC-MS like centroided data
+convertMSFiles(anaInfo, typeFrom = "raw", formatFrom = "bruker_ims", typeTo = "centroid", formatTo = "mzML",
+               algorithm = "timsconvert")
+
+# convert Agilent IMS-HRMS data to ims data in mzML format
+convertMSFiles(anaInfo, typeFrom = "raw", formatFrom = "agilent_ims", typeTo = "ims", formatTo = "mzML",
+               algorithm = "pwiz")
+# ... and then to LC-MS like centroided mzML files
+convertMSFiles(anaInfo, typeFrom = "ims", formatFrom = "mzML", typeTo = "centroid", formatTo = "mzML",
+               algorithm = "im_collapse")
+```
+
+
+Besides conversion, other types of data pre-treatment may also need to be performed. For instance, [ProteoWizard] can be used to apply various data filters, and several utility functions exist to apply mass re-calibration of Bruker data files.
+
+```{r eval=FALSE}
+# Use ProteoWizard to perform conversion and apply a filter to only keep MS 1 data
+# See http://proteowizard.sourceforge.net/tools/msconvert.html for supported filters
+convertMSFiles(anaInfo, typeFrom = "raw", formatFrom = "thermo", typeTo = "centroid", formatTo = "mzML",
+               algorithm = "pwiz", filters = "msLevel 1")
+
+# perform m/z re-calibration of Bruker data (should be performed prior to file conversion!)
+# NOTE: this requires Bruker DataAnalysis
+setDAMethod(anaInfo, "path/to/DAMethod.m") # configure Bruker files with given method that has automatic calibration configured
+recalibrarateDAFiles(anaInfo) # trigger re-calibration for each analysis
+getDACalibrationError(anaInfo) # get calibration error for each analysis
+```
+
+Please see the reference manual for more details (`?convertMSFiles`, ``?`bruker-utils` ``).
+
+## Automatic project generation with newProject() {#newProject}
 
 The previous sections already highlighted some steps that have to be performed prior to starting a new non-target analysis workflow: data pre-treatment and gathering information on the analysis. Most of the times you will put this and other `R` code a script file so you can recall what you have done before (i.e. reproducible research).
 

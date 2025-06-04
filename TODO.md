@@ -293,11 +293,9 @@
         - Unique and overlapping features
             - fill in link to metadata
         - Visualization
-            - colourBy --> groupBy
             - outerGroups --> groupBy, also update (incorrect) example in handbook
-            - plotInt(): give examples for xBy, groupBy etc
-            - plotChord(): update for outerGroups (now commented out!)
-            - update EIC params?
+            - plotInt(): give examples for xBy, groupBy etc --> regression section?
+            - plotChord(): update for outerGroups (now commented out!) --> anaInfo metadata section
         - using anaInfo metadata
             - aggregation for plotting, ADT, ...
             - changing anaInfo metadata

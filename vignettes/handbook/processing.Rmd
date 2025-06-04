@@ -716,6 +716,7 @@ Generic           | Classes                                              | Remar
 `plotSpectrum()`  | `MSPeakLists`, `formulas`, `compounds`, `components` | Plots (annotated) spectra
 `plotStructure()` | `compounds`                                          | Draws candidate structures
 `plotScores()`    | `formulas`, `compounds`                              | Barplot with candidate scoring
+`plot()`          | `componentsClust`                                    | Creates a dendrogram for the clustered components
 `plotGraph()`     | `componentsNT`                                       | Draws interactive graphs of linked homologous series
 
 The most common plotting functions are `plotChroms()`, which plots chromatographic data for features, and `plotSpectrum()`, which will plot (annotated) spectra. An overview of their most important function arguments are shown below.
@@ -726,9 +727,9 @@ Argument                                      | Generic                         
 `EICParams`                                   | `plotChroms()`                   | Advanced parameters to control the creation of extracted ion chromatograms (described below)
 `showPeakArea`, `showFGroupRect`              | `plotChroms()`                   | Fill peak areas / draw rectangles around feature groups?
 `title`                                       | `plotChroms()`, `plotSpectrum()` | Override plot title
-`colourBy`                                    | `plotChroms()`                   | Colour individual feature groups (`"fGroups"`) or replicates (`"rGroups"`). By default nothing is coloured (`"none"`)
-`showLegend`                                  | `plotChroms()`                   | Display a legend? (only if `colourBy!="none"`)
+`showLegend`                                  | `plot()`, `plotInt()`, `plotChroms()` | Display a legend?
 `xlim`, `ylim`                                | `plotChroms()`, `plotSpectrum()` | Override x/y axis ranges, i.e. to manually set plotting range.
+`groupBy`                                     | `plot()`, `plotInt()`, `plotChroms()` | Defines if and how data is grouped in the plot (e.g. by replicate)
 `groupName`, `analysis`, `precursor`, `index` | `plotSpectrum()`                 | What to plot. See examples below.
 `MSLevel`                                     | `plotSpectrum()`                 | Whether to plot an MS or MS/MS spectrum (only `MSPeakLists`)
 `formulas`                                    | `plotSpectrum()`                 | Whether `formula` annotations should be added (only `compounds`)
@@ -757,10 +758,17 @@ Some other common and less common plotting operations are shown below.
 
 ```{r plotFeatAnn,eval=runData}
 plot(fGroups) # simple scatter plot of retention and m/z values
+plot(fGroups, groupBy = "fGroups", showLegend = FALSE) # colour each feature group
+
+plotInt(fGroups[, 1:10], groupBy = "fGroups") # plot intensities of first ten feature groups and group them
 
 plotChroms(fGroups) # plot EICs for all features
 plotChroms(fGroups[, 1], # only plot all features of first group
-           colourBy = "replicate") # and mark them individually per replicate
+           groupBy = "replicate") # and mark them individually per replicate
+plotChroms(fGroups[, 1:10], # only first ten feature groups
+           groupBy = "fGroups", # group each feature group
+           showPeakArea = TRUE, # show integrated areas
+           showFGroupRect = FALSE) # no rectangles around feature groups
 plotChroms(components, index = 7, fGroups = fGroups) # EICs from a component
 
 plotSpectrum(mslists, "M120_R268_30") # non-annotated MS spectrum
@@ -807,7 +815,7 @@ plotChroms(fGroups[, 10], EICParams = getDefEICParams(onlyPresent = FALSE))
 
 # get overview of all feature groups
 plotChroms(fGroups,
-           colourBy = "fGroups", # unique colour for each group
+           groupBy = "fGroups", # unique colour for each group
            EICParams = getDefEICParams(topMost = 1), # only most intense feature in each group
            showPeakArea = TRUE, # show integrated areas
            showFGroupRect = FALSE,
@@ -839,7 +847,7 @@ fGroups <- fGroupsRep
 
 ```{r plotComp,eval=runData}
 plotUpSet(fGroups) # compare replicates
-plotVenn(fGroups, which = c("repl1", "repl2")) # compare some replicates
+plotVenn(fGroups, which = c("repl1", "repl2"), aggregate = TRUE) # compare some replicates
 plotChord(fGroups, aggregate = TRUE) # overlap between replicates
 # compare with custom made groups
 # plotChord(fGroups, aggregate = TRUE,

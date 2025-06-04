@@ -139,6 +139,21 @@ digraph workflow {
 
 The next sections in this chapter will further detail on how to actually perform the non-target workflow steps to generate data. The transformation product screening workflows are discussed in [a separate chapter](#TPs).
 
+## Data processing projects {#newProject}
+
+While not strictly necessary, it is recommended to perform each non-target data processing analysis in a _project_. In _patRoon_, these projects typically contain one or more `R` script files, configuration files and tables with the [analysis information](#anaInfo).
+
+To start a new project, or to simply explore the capabilities of `patRoon`, it is easiest to run the `newProject()` function within [RStudio]. This function launches a small tool (see screenshot below) where you can select your analyses and configure the various workflow steps which you want to execute (e.g. data pre-treatment, finding features, annotation etc). After setting everything up the function will generate a template script which can easily be edited afterwards. In addition, you have the option to create a new RStudio project, which makes it easier to re-open the project in future data processing sessions.
+
+
+```{r newp,echo=FALSE,out.width="450px"}
+knitr::include_graphics(file.path(vignDir, "newp.png"))
+```
+
+> **_NOTE_** At the moment `newProject()` _requires_ [RStudio].
+
+The next sections further describe the steps needed to setup the sample analysis and how to perform the workflow. This information can be used to manually create projects or serve as an explanation to what `newProject()` performs automatically for you.
+
 ## Sample analyses
 
 In `patRoon` a _sample analysis_, or _analysis_, refers to a single HRMS measurement of a sample. The raw data for an analysis is typically stored in different file types and file formats, which are discussed in the next section. The [analysis information](#anaInfo) informs `patRoon` which analyses should be processed, where to find the raw data and is used to store any other metadata. The [data pre-treatment](#pre-treat) section describes how to convert and prepare the raw data.
@@ -167,7 +182,7 @@ The analysis information table has a few mandatory columns:
 
 If a workflow requires multiple file formats of a same file type, e.g. centroided `mzML` and `mzXML` files, then simply store both file formats in the directory specified in the `path_XXX` column. If data needs to be exported (discussed in the next section), simply assign its _destination path_ to the respective `path_XXX` column.
 
-The analysis information table can be manually constructed in `R` (e.g. through import of an `CSV` file), through a graphical interface with `newProject()` ([discussed later](#newProject)) or automatically by the `generateAnalysisInfo()` function. Here is an example of the latter for the example data in the `patRoonData` package:
+The analysis information table can be manually constructed in `R` (e.g. through import of an `CSV` file), through a graphical interface with `newProject()` ([discussed previously](#newProject)) or automatically by the `generateAnalysisInfo()` function. Here is an example of the latter for the example data in the `patRoonData` package:
 
 ```{r genAnaInfo,eval=TRUE}
 # Take example data from patRoonData package (triplicate solvent blank + triplicate standard)
@@ -260,18 +275,6 @@ getDACalibrationError(anaInfo) # get calibration error for each analysis
 ```
 
 Please see the reference manual for more details (`?convertMSFiles`, ``?`bruker-utils` ``).
-
-## Automatic project generation with newProject() {#newProject}
-
-The previous sections already highlighted some steps that have to be performed prior to starting a new non-target analysis workflow: data pre-treatment and gathering information on the analysis. Most of the times you will put this and other `R` code a script file so you can recall what you have done before (i.e. reproducible research).
-
-The `newProject()` function can be used to setup a new project. When you run this function it will launch a small tool (see screenshot below) where you can select your analyses and configure the various workflow steps which you want to execute (e.g. data pre-treatment, finding features, annotation etc). After setting everything up the function will generate a template script which can easily be edited afterwards. In addition, you have the option to create a new RStudio project, which is advantegeous as it neatly seperates your data processing work from the rest.
-
-```{r newp,echo=FALSE,out.width="450px"}
-knitr::include_graphics(file.path(vignDir, "newp.png"))
-```
-
-> **_NOTE_** At the moment `newProject()` _only_ works with [RStudio].
 
 
 ## Features

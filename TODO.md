@@ -271,7 +271,6 @@
             - update/extend data-pretreatment section
                 - mention im_collapse uses msdata?
                 - fill in IMS chapter link, see what details to put where
-        - update newProject screenshot
         - features
             - update algo tables (piek, import)
             - describe piek params

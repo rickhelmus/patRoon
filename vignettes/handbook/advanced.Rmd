@@ -406,7 +406,7 @@ fGroupsCons <- consensus(fGroupComp,
 ```
 
 
-## Background removal in MS/MS data
+## Background removal in MS/MS data {#bgMSMS}
 
 Even if data-dependent acquisition (DDA) is used to acquire MS/MS data, there may still be a substantial number of background peaks present in the MS/MS spectra. The [filtering section](#filtering) introduced several filters to remove these.
 

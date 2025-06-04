@@ -286,12 +286,7 @@
                 - update thresholds when we change these
     - processing
         - Inspecting
-            - FIX: fList[["standard-1"]][, 1:6]
-            - update for aggregation etc
-        - Filtering
-            - add new feature filters
-            - update MSPL filters
-            - example where annSim is filtered with scoreLimits
+            - update for aggregation etc?
         - Subsetting
             - features: add (subsections) on ana re-ordering and ni subsetting
         - Delete
@@ -321,10 +316,12 @@
             - features
                 - mention somewhere that IMS="maybe" for e.g. plotting
                 - plotMobilograms() and EIMParams
+                - IMS filters
             - componentization
                 - expandForIMS()?
             - annotation
                 - mob spec sims
+                - IMS filters
     - sets chapter
         - plotVenn()/overlap()/unique(): update for removal of sets arg: give examples with aggregate
         - mention that "set" can be used in sets WFs for groupBy, regressionBy, etc

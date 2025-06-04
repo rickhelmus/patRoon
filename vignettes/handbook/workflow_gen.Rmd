@@ -227,14 +227,14 @@ IM collapse    | `convertMSFiles(algorithm = "im_collapse", ...)` | raw (Bruker 
 The `convertMSFiles()` function uses the [analysis information](#anaInfo) to locate the input files and the destination paths for the output. The `path_XXX` columns should contain the desired destination directories for those file types that should be exported. For instance:
 
 ```{r anaInfoConv}
-anaInfo <- data.frame(
+anaInfoConv <- data.frame(
     analysis = c("sample1", "sample2"),
     replicate = "replicate",
     blank = "",
     path_raw = "raw_files", # directory containing the raw HRMS instrument files (.d, .raw, ...)
     path_centroid = "centroid_files" # destination directory where the centroided files will be placed
 )
-anaInfo
+anaInfoConv
 ```
 
 The `generateAnalysisInfo()` function supports specifying conversion destination directories through the `convXXX` function arguments (see `?generateAnalysisInfo`). The [newProject() utility](#newProject) will automatically generate a proper analysis information table.

@@ -288,7 +288,7 @@
         - Inspecting
             - update for aggregation etc?
         - Subsetting
-            - features: add (subsections) on ana re-ordering and ni subsetting
+            - features: add (subsections) on ana re-ordering and ni subsetting --> separate section
         - Delete
             - delete() for screening: k arg, also update table
         - Unique and overlapping features

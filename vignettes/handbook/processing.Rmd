@@ -599,38 +599,39 @@ formulas <- delete(formulas, j = function(ft, ...) ft$error > 5)
 
 ## Unique and overlapping features {#unOv}
 
-Often an analysis batch is composed of different sample groups, such as different treatments, influent/effluent etc. In such scenarios it may be highly interesting to evaluate uniqueness or overlap between these samples. Furthermore, extracting overlapping or unique features is a simple but effective prioritization strategy.
+Often an analysis batch is composed of different sample groups, such as different treatments, influent/effluent etc. In such scenarios it may be interesting to evaluate uniqueness or overlap between these samples. Furthermore, extracting overlapping or unique features is a simple but effective prioritization strategy.
 
-The `overlap()` and `unique()` functions can be used to extract overlapping and unique features between replicates, respectively. Both functions return a subset of the given `featureGroups` object. An overview of their arguments is given below.
+The `overlap()` and `unique()` functions can be used to extract overlapping and unique features between analyses or replicates. Both functions return a subset of the given `featureGroups` object. An overview of their arguments is given below.
 
 Argument     | Function(s)             | Remarks
 ------------ | ----------------------- | ----------------------------------------------------------------
-`which`      | `unique()`, `overlap()` | The replicates to compare.
-`relativeTo` | `unique()`              | Only return unique features compared to these replicates (`NULL` for all). Replicates in `which` are ignored.
-`outer`      | `unique()`              | If `TRUE` then only return features which are _also_ unique among the compared replicates groups.
-`exclusive`  | `overlap`               | Only keep features that _only_ overlap between the compared replicates.
+`which`      | `unique()`, `overlap()` | Which data is compared (e.g. names of replicates). Can be `NULL` for overlap to include all data.
+`aggregate`  | `unique()`, `overlap()` | What should be compared: analyses (`aggregate=FALSE`), replicates (`aggregate=TRUE`) or other groups of analyses based on their metadata ([discussed later]).
+`relativeTo` | `unique()`              | Uniqueness of features is ony determined by these analyses, replicates, ... (`NULL` for all). Entries in `which` are ignored.
+`outer`      | `unique()`              | If `TRUE` then only return features which are _also_ unique among the compared data selected in `which`.
+`exclusive`  | `overlap`               | Only keep features that _only_ overlap between the compared data selected by which.
 
 Some examples:
 
 ```{r compUn,eval=FALSE}
 # only keep features uniquely present in replicate "repl1"
-fGroupsUn1 <- unique(fGroups, which = "repl1")
+fGroupsUn1 <- unique(fGroups, which = "repl1", aggregate = TRUE)
 # only keep features in repl1/repl2 which are not in repl3
-fGroupsUn2 <- unique(fGroups, which = c("repl1", "repl2"),
+fGroupsUn2 <- unique(fGroups, which = c("repl1", "repl2"), aggregate = TRUE,
                      relativeTo = "repl3")
 # only keep features that are only present in repl1 OR repl2
-fGroupsUn3 <- unique(fGroups, which = c("repl1", "repl2"),
+fGroupsUn3 <- unique(fGroups, which = c("repl1", "repl2"), aggregate = TRUE,
                      outer = TRUE)
 
 # only keep features overlapping in repl1/repl2
-fGroupsOv1 <- overlap(fGroups, which = c("repl1", "repl2"))
+fGroupsOv1 <- overlap(fGroups, which = c("repl1", "repl2"), aggregate = TRUE)
 # only keep features overlapping in repl1/repl2 AND are not present in any other
 # replicate
-fGroupsOv2 <- overlap(fGroups, which = c("repl1", "repl2"),
+fGroupsOv2 <- overlap(fGroups, which = c("repl1", "repl2"), aggregate = TRUE,
                       exclusive = TRUE)
 ```
 
-In addition, several plotting functions are [discussed in the visualization section](#visComp) that visualize overlap and uniqueness of features.
+Note that several plotting functions that are [discussed in the visualization section](#visComp) can also assist in determining overlap and uniqueness of features.
 
 ## MS similarity {#specSim}
 

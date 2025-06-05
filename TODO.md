@@ -30,6 +30,7 @@
     - support feature CCS?
 - FIX: IMSRangeParams: in sets workflows, the mz column is taken so relative filtering is done to neutralMasses
     - maybe add _mz rel column like compounds?
+    - same for feat CCS calculation!
 - rename convertMSFilesAnaInfo() to convertMSFiles() or something else and shorter?
     - update Handbook/Tutorial if needed
 - overwrite vs overWrite
@@ -241,6 +242,7 @@
     - generateAnalysisInfo()?
 - newProject()
     - see where testing is slow, possibly disable testServer() on CI?
+    - add snapshots
 
 
 ## Docs

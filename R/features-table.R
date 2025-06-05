@@ -14,6 +14,11 @@ setMethod("initialize", "featuresTable", function(.Object, ...) callNextMethod(.
 #' @export
 importFeaturesTable <- function(analysisInfo, input)
 {
+    # UNDONE: verify that IDs are unique per ana
+    # UNDONE: remove replicate column?
+    # UNDONE: automatically add ID column?
+    # split sets function
+    
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo)
     checkmate::assert(
         checkmate::checkDataFrame(input),
@@ -142,7 +147,7 @@ importFeaturesTable <- function(analysisInfo, input)
     
     setcolorder(input, c("ID", "ret", "retmin", "retmax", "mz", "mzmin", "mzmax", "mobility", "mobmin", "mobmax",
                          "intensity", "area"), skip_absent = TRUE)
-    
+
     fTable <- split(input, by = "analysis", keep.by = FALSE)
     fTable <- fTable[anasCommon] # subset and sync to anaInfo order
     

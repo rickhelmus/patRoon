@@ -210,7 +210,7 @@ Setting `reGroup=FALSE` will not perform any re-neutralization and re-grouping, 
 
 ## Processing data
 
-All data objects that are generated during a sets workflow _inherit_ from the classes from a 'regular' workflow. This means that, with some minor exceptions, _all_ of the data processing functionality discussed in the [previous chapter](#processing) (e.g. subsetting, inspection, filtering, plotting, reporting) is also applicable to a sets workflow. For instance, the `as.data.table()` method can be used for general inspection:
+All data objects that are generated during a sets workflow _inherit_ from the classes from a 'regular' workflow. This means that, with some minor exceptions, _all_ of the data processing functionality discussed in the [previous chapter](#processing) (e.g. subsetting, inspection, filtering, plotting, reporting) is also applicable to a sets workflow. In addition, data from sets workflows also bring some additional data processing functionality. Some examples:
 
 ```{r include=FALSE,eval=runData}
 fGroupsO <- fGroups
@@ -222,28 +222,30 @@ compounds <- compoundsSets
 ```
 
 ```{r setsProcData,eval=runData}
+# only keep feature groups that have positive data
+fGroupsPos <- fGroups[, sets = "positive"]
+# only keep feature groups with features present in all sets
+fGroupsF <- filter(fGroups, relMinSets = 1)
+
+# In sets workflows, the m/z values of features are 'neutralized', the `ion_mz` columns contains the original 'ionized' m/z values.
+as.data.table(fGroups)[1:5, c("group", "mz", "ion_mz-positive", "ion_mz-negative")]
+
+# Inspect set specific data.
 as.data.table(compounds)[1:5, c("group", "score-positive", "score-negative", "compoundName", "set")]
 ```
 
-In addition, some the data processing functionality contains additional functionality for a sets workflow:
+In sets workflows the [analysis information](#anaInfo) is amended with a `set` column to specify the set each analysis belongs to. Just like [other columns](#useMeta) in the analysis information, the `set` column can be used to group and aggregate data:
 
-```{r setsProcDataExtra,eval=FALSE}
-
-# only keep feature groups that have positive data
-fGroupsPos <- fGroups[, sets = "positive"]
-# only keep feature groups that have feature data for all sets
-fGroupsF <- filter(fGroups, relMinSets = 1)
-
+```{r setsProcMeta,eval=runData}
 # only keep feature groups with features present in both polarities
-fGroupsPosNeg <- overlap(fGroups, which = c("positive", "negative"), sets = TRUE)
+fGroupsPosNeg <- overlap(fGroups, which = c("positive", "negative"), aggregate = "set")
 # only keep feature groups with features that are present only in positive mode
-fGroupsOnlyPos <- unique(fGroups, which = "positive", sets = TRUE)
-```
+fGroupsOnlyPos <- unique(fGroups, which = "positive", aggregate = "set")
 
-And plotting:
+plotVenn(fGroups, aggregate = "set", margin = 0.1) # compare positive/negative features
+plotChord(fGroups, aggregate = TRUE, groupBy = "set") # compare replicate aggregated positive/negative features
 
-```{r setsProcDataExtraPlotting,eval=runData,fig.show="hold"}
-plotVenn(fGroups, sets = TRUE) # compare positive/negative features
+# plot annotated positive/negative mirror spectrum
 plotSpectrum(compounds, index = 1, groupName = "M198_R317_273", MSPeakLists = mslists,
              plotStruct = TRUE)
 ```

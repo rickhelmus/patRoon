@@ -17,7 +17,7 @@ fGroups <- groupFeatures(fList, "openms")
 fGroups <- filter(fGroups, absMinIntensity = 10000, relMinReplicateAbundance = 1, maxReplicateIntRSD = 0.75,
                   blankThreshold = 5, removeBlanks = TRUE)
 
-mslists <- generateMSPeakLists(fGroups, "mzr")
+mslists <- generateMSPeakLists(fGroups)
 formulas <- generateFormulas(fGroups, mslists, "genform", adduct = "[M+H]+")
 compounds <- generateCompounds(fGroups, mslists, "metfrag", adduct = "[M+H]+")
 
@@ -39,7 +39,7 @@ fGroups <- groupFeatures(fList, "openms")
 fGroups <- filter(fGroups, absMinIntensity = 10000, relMinReplicateAbundance = 1, maxReplicateIntRSD = 0.75,
                   blankThreshold = 5, removeBlanks = TRUE)
 
-mslists <- generateMSPeakLists(fGroups, "mzr")
+mslists <- generateMSPeakLists(fGroups)
 formulas <- generateFormulas(fGroups, mslists, "genform")
 compounds <- generateCompounds(fGroups, mslists, "metfrag")
 

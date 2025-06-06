@@ -22,7 +22,7 @@ digraph Workflow {
 
 * **Parent screening** During this step a common `patRoon` workflow is used to screen for the parent chemicals of interest. This could be a full non-target analysis with compound annotation or a relative simple suspect or target screening.
 * **Obtaining TPs** Data is obtained of potential TPs for the parents of interest. The TPs may originate from a library or predicted _in-silico_. Note that in some workflows this step is omitted (discussed later).
-* **TP screening** A suspect screening is performed to find the TPs in the analysis data. 
+* **TP screening** A suspect screening is performed to find the TPs in the analysis data. Some workflows skip this step.
 * **Linking parents and TPs** In the step the parent features are linked with the TP features. Several post-processing functionality exists to improve and prioritize the data.
 
 The next sections will outline more details on these steps are performed and configured. The [last section](#TPsExamples) in this chapter outlines several example workflows.
@@ -33,48 +33,44 @@ The next sections will outline more details on these steps are performed and con
 
 The `generateTPs` function is used to obtain TPs for a particular set of parents. Like other workflow generator functions (`findFeatures`, `generateCompounds`), several algorithms are available that do the actual work.
 
-Algorithm        | Usage                                             | Remarks
----------------- | ------------------------------------------------- | ---------------------------------
-[BioTransformer] | `generateTPs(algorithm = "biotransformer", ...)`  | Predicts TPs with full structural information
-[CTS]            | `generateTPs(algorithm = "cts", ...)`             | Predicts TPs with full structural information
-Library          | `generateTPs(algorithm = "library", ...)`         | Obtains transformation products from a library ([PubChem transformations][PubChemLiteTR] or custom)
-Formula library  | `generateTPs(algorithm = "library_formula", ...)` | Obtains transformation products from a library (only formula data) 
-Metabolic logic  | `generateTPs(algorithm = "logic", ...)`           | Uses pre-defined logic to predict TPs based on common elemental differences (e.g. hydroxylation, demethylation). Based on @Scholle2015.
 
-The output of these algorithms can be distinguished in three categories:
+Algorithm            | Usage                                             | Input                        | Output
+-------------------- | ------------------------------------------------- | ---------------------------- | ------------------------------------------
+[BioTransformer]     | `generateTPs(algorithm = "biotransformer", ...)`  | Parents                      | TPs structural information
+[CTS]                | `generateTPs(algorithm = "cts", ...)`             | Parents                      | TPs with structural information
+Library              | `generateTPs(algorithm = "library", ...)`         | Parents (optional), Library ([PubChem][PubChemLiteTR] or custom) | TPs with structural information
+Formula library      | `generateTPs(algorithm = "library_formula", ...)` | Parents                      | TPs with formula information
+Metabolic logic      | `generateTPs(algorithm = "logic", ...)`           | Feature groups | TPs from _m/z_ differences from pre-defined elemental transformations (based on @Scholle2015).
+Formula Annotations  | `generateTPs(algorithm = "ann_form", ...)`        | Parents, formula annotations | Prioritized TPs from annotation candidates (based on @Helmus2025).
+Compound Annotations | `generateTPs(algorithm = "ann_comp", ...)`        | Parents, compound annotaions | Prioritized TPs from  annotation candidates (based on @Helmus2025).
 
-1. **Structural TPs** (`biotransformer`, `cts` and `library`) come with full structural information for the TPs (e.g. formula, SMILES, predicted Log P). As such, the corresponding algorithms also require the full chemical structure of the parent compound.
-2. **Formula TPs** (`library_formula`) are similar to structural TPs, but only involve formula and no other structural information.
-2. **Calculated TPs** (`logic`) are based solely on _m/z_ differences and only require the feature masses. 
+For most workflows the `biotransformer`, `cts` and `library` algorithms are a good starting point. They are fairly straightforward to use and output TPs with full structural information. The `library_formula` algorithm may be a suitable alternative if only no parents with formula information are available. The `ann_comp` and `ann_form` algorithms are meant to elucidate completely unknown TPs, i.e. those that are not predicted or found in literature, and are discussed [further below](#TPsAnn). Finally, the `logic` algorithm is primarily meant if no or very little information on possible parents and/or TPs is available.
 
-Algorithms that fall into the first category are typically used when parents are known in advance, for instance, from a target or suspect screening. This is also true for the second category, however, here only formula data is used, which is useful when the complete structure of parents and/or TPs are not known. Calculated TPs allow TP prediction for all features, even when nothing is known about their structure. This is most suitable for full non-target analysis, however, extra care must be taken to rule out false positives. Finally, the logic used to calculate TPs can also be used to automatically to generate a library suitable for the `library_formula` algorithm, which allows a hybrid approach of the second and third categories.
+The parent information that is needed for most algorithms is taken from one of the following:
+
+1. The data in a suspect list (follows the same format as [suspect screening](#suspscr))
+2. The data from suspects that were matched to feature groups (e.g. obtained with `screenSuspects`, see [suspect screening](#suspscr))
+3. A `compounds` object obtained with [compound annotation](#compounds) (only `biotransformer`, `cts` and `library`)
+
+The second option is often used in most workflows. The use of compound annotations as parent input could be considered if the parents are not  known. However, care must be taken since _all_ the candidates are used, and it is highly recommend to filter the object in advance with e.g. the `topMost` filter. For `library` and `library_formula`, the parent input is optional: if no parents are specified (`parents=NULL`) then TP data for _all_ parents in the database is used.
 
 An overview of common arguments for TP generation is listed below.
 
 Argument                      | Algorithm(s)      | Remarks
 ----------------------------- | ----------------- | --------------------------------------------------------
-`parents`                     | `biotransformer`, `cts`, `library` | The input parents. See section below.
+`parents`                     | `biotransformer`, `cts`, `library`, `library_formula`, `ann_form`, `ann_comp` | The input parents.
 `fGroups`                     | `logic`           | The input feature groups to calculate TPs for.
 `type`                        | `biotransformer`  | The prediction type: `"env"`, `"ecbased"`, `"cyp450"`, `"phaseII"`, `"hgut"`, `"superbio"`, `"allHuman"`. See [BioTransformer] for more details.
 `transLibrary`                | `cts`             | The transformation library that should be used: `"hydrolysis"`, `"abiotic_reduction"`, `"photolysis_unranked"`, `"photolysis_ranked"`, `"mammalian_metabolism"`, `"combined_abioticreduction_hydrolysis"`, `"combined_photolysis_abiotic_hydrolysis"`. See [cts] for more details.
-`TPLibrary`/`transformations` | `library`/`logic` | [Custom TP library/transformation rules](#TPsCustom).
-`generation`                  | `biotransformer`, `cts`, `library` | The amount of transformation generations to predict.
+`TPLibrary`                   | `library`, `library_formula` | [Custom TP library](#TPsCustom).
+`transformations`             | `logic`           | [Custom TP transformation rules](#TPsCustom).
+`generations`                 | `biotransformer`, `cts`, `library`, `library_formula` | The number of transformation generations to consider.
 `adduct`                      | `logic`           | The assumed adduct of the parents (e.g. `"[M+H]+"`). Not needed when [adduct annotations](#incorpAdductIso) are available.
-`calcSims`                    | `biotransformer`, `cts`, `library` | If `TRUE` then structural similarities between the parent and TPs is calculated, which can be useful for post-processing (discussed later).
+`formulas`/`compounds`        | `ann_form`/`ann_comp` | The input formula/compound annotations to extract TPs from.
+`TPsRef`, `fGroupsComps`      | `ann_comp`        | The reference TPs and feature groups to use for candidate ranking. See [below](#TPsAnn) for more details.
+`TPStructParams`              | `biotransformer`, `cts`, `library`, `ann_comp` | Other advanced parameters, e.g. to calculate structural similarities. See `?getDefTPStructParams` for more details.
 
-### Parent input
-
-The input parent structures to generate structural/formula TPs (`biotransformer`, `cts`, `library` and `library_formula` algorithms) must be specified as one of the following:
-
-* A suspect list (follows the same format as [suspect screening](#suspscr))
-* A feature groups object with screening results (e.g. obtained with `screenSuspects`, see [suspect screening](#suspscr))
-* A `compounds` object obtained with [compound annotation](#compounds) (not supported for `library_formula`)
-
-In the former two cases the parent information is taken from the suspect list or from the hits in a suspect screening worklow, respectively. The last case is more suitable for when the parents are not completely known. In this case, the candidate structures from a [compound annotation](#compounds) are used as input to obtain TPs. Since _all_ the candidates are used, it is highly recommend to filter the object in advance, for instance, with the `topMost` filter. For `library` and `library_formula`, the parent input is optional: if no parents are specified then TP data for _all_ parents in the database is used.
-
-For the `logic` algorithm TPs are predicted directly for feature groups. Since this algorithm can only perform very basic validity checks, it is strongly recommended to first prioritize the feature group data.
-
-Some typical examples:
+Some examples on how to generate TPs are shown below:
 
 ```{r eval=FALSE}
 # predict environmental TPs with BioTransformer for all parents in a suspect list
@@ -82,96 +78,18 @@ TPsBT <- generateTPs("biotransformer", parents = patRoonData::suspectsPos,
                      type = "env")
 # obtain all TPs from the default library
 TPsLib <- generateTPs("library")
-# get TPs for the parents from a suspect screening
+# get TPs for the parents matched in a suspect screening
 TPsLib <- generateTPs("library", parents = fGroupsScr)
+
 # calculate TPs for all feature groups
 TPsLogic <- generateTPs("logic", fGroups, adduct = "[M+H]+")
+
+# use formula annotations to obtain TPs
+TPsAnnForm <- generateTPs("ann_form", formulas = formulas)
+
+# use compound annotations to obtain TPs and provide additional suspect and feature data for candidate ranking
+TPsAnnComp <- generateTPs("ann_comp", compounds = compounds, TPsRef = TPsBT, fGroupsComps = fGroups)
 ```
-
-### Processing data
-
-Similar to other workflow data, several generic functions are available to inspect the data:
-
-Generic                            | Remarks                                                             
------------------------------------|----------------------------------------------------------------------
-`length()`                         | Returns the total number of transformation products
-`names()`                          | Returns the names of the parents
-`parents()`                        | Returns a table with information about the parents
-`products()`                       | Returns a `list` with for each parent a table with TPs
-`as.data.table()`, `as.data.frame` | Convert all the object information into a `data.table`/`data.frame`
-`"[["` / `"$"` operators           | Extract TP information for a specified parent
-
-Some examples:
-
-```{r TPsProcInsp,eval=runData}
-# just show a few columns in this example, there are many more!
-# note: the double dot syntax (..cols) is necessary since the data is stored as data.tables
-cols <- c("name", "formula", "InChIKey")
-parents(TPs)[1:5, ..cols]
-TPs[["DEET"]][, ..cols]
-TPs[[2]][, ..cols]
-as.data.table(TPs)[1:5, 1:3]
-```
-
-In addition, the following generic functions are available to modify or convert the object data:
-
-Generic             | Classes                    | Remarks
-------------------- | -------------------------- | --------------------------------------------------------
-`"["` operator      | All                        | Subset this object on given parents
-`filter`            | All                        | Filters this object
-`convertToSuspects` | All                        | Generates a suspect list of all TPs (and optionally parents) that is suitable for `screenSuspects`
-
-```{r TPsProcMod,eval=FALSE}
-TPs2 <- TPs[1:10] # only keep results for first ten parents
-
-# only keep TPs with likely/probably likelihood (specific property for CTS algorithm)
-TPsF <- filter(TPs, properties = list(likelihood = c("LIKELY", "PROBABLE")))
-
-# do a suspect screening for all TPs and their parents
-suspects <- convertToSuspects(TPs, includeParents = TRUE)
-fGroupsScr <- screenSuspects(fGroups, suspects, onlyHits = TRUE)
-```
-
-The `convertToSuspects` function is always part of a workflow, and is discussed further in the next section.
-
-#### Structural TPs specifics
-
-For structural TPs several additional generic functions are available:
-
-Generic             | Remarks
-------------------- | --------------------------------------------------------
-`filter`            | Filters this object (additional functionality for structural TPs)
-`convertToMFDB`     | Generates a [MetFrag] database for all TPs (and optionally parents)
-`plotGraph`         | Generates an interactive plot to explore transformation hierarchies
-`plotVenn`, `plotUpSet` | Compare results between different algorithms with Venn/UpSet diagrams
-
-The `convertToMFDB` function is especially handy with predicted TPs, as it allows generating a compound database for TPs that may not be available in commonly used databases. This is further demonstrated in the [first example](#TPsEx1).
-
-```{r TPsProcStruct,eval=FALSE}
-# remove transformation products that are isomers to their parent or sibling TPs
-# may simplify data as these are often difficult to identify
-TPsF <- filter(TPs, removeParentIsomers = TRUE, removeTPIsomers = TRUE)
-
-# remove duplicate transformation products from each parent
-# these can occur if different pathways yield the same TPs
-TPsF <- filter(TPs, removeDuplicates = TRUE)
-
-# only keep TPs that have a structural similarity to their parent of >= 0.5
-# (needs calcSims=TRUE when executing generateTPs())
-TPsF <- filter(TPs, minSimilarity = 0.5)
-
-# use the TP data for a specialized MetFrag database
-convertToMFDB(TPs, "TP-database.csv", includeParents = FALSE)
-compoundsTPs <- generateCompounds(fGroups, mslists, "metfrag", database = "csv",
-                                  extraOpts = list(LocalDatabasePath = "TP-database.csv"))
-```
-
-```{r TPsPlots,eval=runData}
-plotVenn(TPsLib, TPsBT, labels = c("lib", "BT"))
-plotGraph(TPsBT, which = "Triazophos") # hierarchy for Triazophos parent
-```
-
-Finally, results from different algorithms can be combined with the `consensus` generic function. This is further discussed in [algorithm consensus](#consensus).
 
 ### (Custom) Libraries and transformations {#TPsCustom}
 
@@ -225,9 +143,95 @@ TPs <- generateTPs("library_formula", TPLibrary = myTPFormLib)
 
 Compared to the `logic` algorithm, the `library_formula` algorithm is more (and only) suitable for suspect/target screening workflows, allows multiple transformation generations and allows better customization through manually adding/removing TPs from the library prior to passing it to `generateTPs()`.
 
+### TPs from feature annotation candidates {#TPsAnn}
+
+The `ann_form` and `ann_comp` algorithms are intended to provide a thorough screening and elucidation of TPs that are otherwise difficult to find with other algorithms. These algorithms assume that TPs of interest can be revealed from a thorough feature annotation workflow based on formulae (`ann_form`) or compounds (`ann_comp`). The annotation candidates are prioritized and ranked by the _TP Score_, which is calculated from properties such as the fit of the candidate structure or formula into the parent (or vice versa) and similarity to suspects (i.e. TPs obtained by other algorithms). For more details see @Helmus2025, `?generateTPsAnnForm` and `?generateTPsAnnComp`.
+
+To provide a thorough screening with `ann_comp`, often a large compound database such as PubChem is used for compound annotation. This can typically results in tens of thousands of candidates for each parent. Hence, obtaining the compound annotations and generating TPs with `ann_comp` is computationally intensive and can take multiple hours. Afterwards, the `topMost` filter should be used to reduce the number of candidates to a manageable size (see the next section).
+
+
+### Processing data {#TPsProc}
+
+Similar to other workflow data, several generic functions are available to inspect the data:
+
+Generic                            | Remarks                                                             
+-----------------------------------|----------------------------------------------------------------------
+`length()`                         | Returns the total number of transformation products
+`names()`                          | Returns the names of the parents
+`parents()`                        | Returns a table with information about the parents
+`products()`                       | Returns a `list` with for each parent a table with TPs
+`as.data.table()`, `as.data.frame` | Convert all the object information into a `data.table`/`data.frame`
+`"[["` / `"$"` operators           | Extract TP information for a specified parent
+
+Some examples:
+
+```{r TPsProcInsp,eval=runData}
+# just show a few columns in this example, there are many more!
+# note: the double dot syntax (..cols) is necessary since the data is stored as data.tables
+cols <- c("name", "formula", "InChIKey")
+parents(TPs)[1:5, ..cols]
+TPs[["DEET"]][, ..cols]
+TPs[[2]][, ..cols]
+as.data.table(TPs)[1:5, 1:3]
+```
+
+In addition, the following generic functions are available to modify or convert the object data:
+
+Generic                 | Remarks
+----------------------- | ---------------------------------------------------------------------
+`"["` operator          | Subset this object on given parents
+`filter`                | Filters this object (available functionality depends on TP generation algorithm)
+`convertToSuspects`     | Generates a suspect list of all TPs (and optionally parents) that is suitable for `screenSuspects`
+`convertToMFDB`         | Generates a [MetFrag] database for all TPs (and optionally parents, only for TPs with structural information)
+`plotGraph`             | Generates an interactive plot to explore transformation hierarchies (only for TPs with structural or formula information)
+`plotVenn`, `plotUpSet` | Compare results between different algorithms with Venn/UpSet diagrams (only for TPs with structural information)
+`consensus`             | Combine results from different algorithms (only for TPs with structural information). See the [algorithm consensus](#consensus) section.
+
+
+The `convertToMFDB` function is especially handy with predicted TPs, as it allows generating a compound database for TPs that may not be available in commonly used databases. This is further demonstrated in the [first example](#TPsEx1).
+
+```{r TPsProcMod,eval=FALSE}
+TPs2 <- TPs[1:10] # only keep results for first ten parents
+
+# only keep TPs with likely/probably likelihood (specific property for CTS algorithm)
+TPsF <- filter(TPs, properties = list(likelihood = c("LIKELY", "PROBABLE")))
+
+# remove transformation products that are isomers to their parent or sibling TPs
+# may simplify data as these are often difficult to identify
+TPsF <- filter(TPs, removeParentIsomers = TRUE, removeTPIsomers = TRUE)
+
+# remove duplicate transformation products from each parent
+# these can occur if different pathways yield the same TPs
+TPsF <- filter(TPs, removeDuplicates = TRUE)
+
+# only keep TPs that have a structural similarity to their parent of >= 0.5
+# (set TPStructParams=getDefTPStructParams(calcSims=TRUE) when executing generateTPs())
+TPsF <- filter(TPs, minSimilarity = 0.5)
+
+# only keep TPs with a TP Score >= 0.5 and the highest 25 TPs per parent
+# see ?transformationProductsAnnComp for specific filters
+TPsAnnCompF <- filter(TPsAnnComp, minTPScore = 0.5, topMost = 25)
+
+# do a suspect screening for all TPs and their parents
+# this is often part of a workflow and is discussed further in the next section.
+suspects <- convertToSuspects(TPs, includeParents = TRUE)
+fGroupsScr <- screenSuspects(fGroups, suspects, onlyHits = TRUE)
+
+# use the TP data for a specialized MetFrag database
+convertToMFDB(TPs, "TP-database.csv", includeParents = FALSE)
+compoundsTPs <- generateCompounds(fGroups, mslists, "metfrag", database = "csv",
+                                  extraOpts = list(LocalDatabasePath = "TP-database.csv"))
+```
+
+```{r TPsPlots,eval=runData}
+plotVenn(TPsLib, TPsBT, labels = c("lib", "BT"))
+plotGraph(TPsBT, which = "Triazophos") # hierarchy for Triazophos parent
+```
+
+
 ## Linking parent and transformation product features
 
-This section discusses one of the most important steps in a TP screening workflow, which is to link feature groups of parents with those of candidate transformation products. During this step, _components_ are made, where each component consist of one or more feature groups of detected TPs for a particular parent. Note that componentization was [already introduced before](#componentization), but for very different algorithms. However, the data format for TP componentization is highly similar. After componentization, several filters are available to clean and prioritize the data. These can even allow workflows without obtaining potential TPs in advance, which is discussed in the last subsection.
+This section discusses one of the most important steps in a TP screening workflow, which is to link feature groups of parents with those of candidate transformation products. During this step, _TP components_ are made, where each component consist of one or more feature groups of detected TPs for a particular parent. Note that componentization was [already introduced before](#componentization), but for very different algorithms. However, the data format for TP componentization is quite similar. After componentization, several filters are available to clean and prioritize the data. These can even allow workflows without obtaining potential TP candidates in advance, which is discussed in the last subsection.
 
 ### Componentization
 
@@ -258,16 +262,16 @@ In all other cases it is recommended to use either the second or third scenario,
 
 ```{r eval=FALSE}
 componTP <- generateComponents(algorithm = "tp",
-                               fGroups = fGroups[replicate = "before"],
-                               fGroupsTPs = fGroups[replicate = "after"])
+                               fGroups = fGroups[ni = treatment == "before"],
+                               fGroupsTPs = fGroups[ni = treatment == "after"])
 ```
 
-In this example, only those feature groups present in the "before" replicate are considered as parents, and those in "after" may be considered as a TP. Since it is likely that there will be some overlap in feature groups between both sample groups, the `ignoreParents` flag can be used to not consider any of the overlap for TP assignments:
+In this example, only those feature groups with features present in the "before" treatment group are considered as parents, and those in "after" may be considered as a TP (see [this section](#useMeta) on how to set and use metadata). Since it is likely that there will be some overlap in feature groups between both sample groups, the `ignoreParents` flag can be used to not consider any of the overlap for TP assignments:
 
 ```{r eval=FALSE}
 componTP <- generateComponents(algorithm = "tp",
-                               fGroups = fGroups[replicate = "before"],
-                               fGroupsTPs = fGroups[replicate = "after"],
+                               fGroups = fGroups[ni = treatment == "before"],
+                               fGroupsTPs = fGroups[ni = treatment == "after"],
                                ignoreParents = TRUE)
 ```
 
@@ -275,7 +279,7 @@ More sophisticates ways are of course possible to provide an upfront distinction
 
 > **_NOTE_** The feature groups specified for `fGroups`/`fGroupsTPs` _must_ always originate from the same `featureGroups` object.
 
-For the `library` and `biotransformer` algorithms it is mandatory that a suspect screening of parents and TPs is performed prior to componentization. This is necessary for the componentization algorithm to map the feature groups that belong to a particular parent or TP. To do so, the `convertToSuspects` function is used to prepare the suspect list:
+If TPs were generated with an algorithm that requires parent input (see [Obtaining TPs](#genTPs)), then it is often mandatory that a suspect screening of parents and TPs is performed prior to componentization. This is necessary for the componentization algorithm to map the feature groups that belong to a particular parent or TP. Note that this step should _not_ be performed for the `ann_form` and `ann_comp` algorithms, as these algorithms already provide the necessary mappings. The `convertToSuspects` function is used to prepare the suspect list:
 
 ```{r eval=FALSE}
 # set includeParents to TRUE since both the parents and TPs are needed
@@ -304,15 +308,27 @@ fGroupsScr <- screenSuspects(fGroups, suspects, onlyHits = FALSE)
 
 #### Annotation similarity calculation
 
-If additional annotation data for parents and TPs is given to the componentization algorithm, it will be used to calculate various similarity properties. Often, the chemical structure for a transformation product is similar to that of its parent. Hence, there is a good chance that a parent and its TPs also share similar MS/MS data.
+If additional annotation data for parents and TPs is given to the componentization algorithm, it will be used to calculate various similarity metrics. Often, the chemical structure for a transformation product is similar to that of its parent. Hence, there is a good chance that a parent and its TPs also share similar MS/MS data.
 
 Firstly, if MS peak lists are provided, then the [spectrum similarity](#specSim) is calculated between each parent and its potential TP candidates. This is performed with all the three different alignment shifts (see the [spectrum similarity section](#specSim) for more details).
 
-In case `formulas` and/or `compounds` objects are specified, then a parent/TP comparison is made by counting the number of fragments and neutral losses that they share (by using the formula annotations). This property is mainly used for non-target workflows where the identity for a parent and TP is not yet well established. For this reason, fragments and neutral losses reported for _all_ candidates for the parent/TP feature group are considered. Hence, it is highly recommend to pre-treat the annotation objects, for instance, with the `topMost` filter. If both `formulas` and `compounds` are given the results are pooled. Note that each unique fragment/neutral loss is only counted once, thus multiple formula/compound candidates with the same annotations will not skew the results.
+In case `formulas` and/or `compounds` objects are given as input to `generateComponents()`, then a parent/TP comparison is made by counting the number of fragments and neutral losses that they share (based on the formulae assigned to the MS/MS fragments). The counts are in two different ways:
 
-### Processing data {#TPsProc}
+1. from the matches between the parent and the TP candidate
+2. from the matches between the parent and _all_ the annotation candidates in the input `formulas`/`compounds` object for the TP feature group 
+
+The latter is mainly used (and only available) in workflows [where componentization is performed without previously generated TPs](#TPsOmit). To improve the usefulness of the total similarity metric, it is highly recommend to pre-treat the annotation objects with e.g. the `topMost` filter. Both calculation methods pool the data from the input `formulas` and `compounds` and only count unique fragment/neutral loss matches.
+
+### Processing data {#TPCompProc}
 
 The output of TP componentization is an object of the `componentsTPs` class. This _derives_ from the 'regular' `components` class, therefore, all the data processing functionality described [before](#processing) (extraction, subsetting, filtering etc) are also valid for TP components.
+
+For the `as.data.table()` method function (and `as.data.frame()`) the `candidates` argument can be used to specify if individual candidates should be included in the output:
+
+```{r TPCompProcADT,eval=runData}
+as.data.table(componTP, candidates = FALSE)[name == "CMP2", .(name, parent_name, group)]
+as.data.table(componTP, candidates = TRUE)[name == "CMP2", .(name, parent_name, group, candidate_name, formula)]
+```
 
 Several additional filters are available to prioritize the data:
 
@@ -321,11 +337,12 @@ Filter        | Remarks
 `retDirMatch` | If `TRUE` only keep TPs with an expected chromatographic retention direction compared to the parent.
 `minSpecSim`, `minSpecPrec`, `minSpecSimBoth` | The minimum spectrum similarity between the parent and TP. Calculated with no, `"precursor"` and `"both"` alignment shifting (see [spectrum similarity](#specSim)).
 `minFragMatches`, `minNLMatches` | Minimum number of formula fragment/neutral loss matches between parent and TP (discussed in previous section).
+`minTotFragMatches`, `minTotNLMatches` | As above, but for total matches.
 `formulas`    | A `formulas` object used to further verify candidate TPs that were generated by the `logic` algorithm.
 
-The `retDirMatch` filter compares the expected and observed _retention time direction_ of a TP in order to decide if it should be kept. The direction is a value of either `-1` (TP elutes before parent), `+1` (TP elutes after parent) or `0` (TP elutes very close to the parent or its direction is unknown). The directions are taken from the [generated transformation products](#genTPs). For the `library` and `biotransformer` algorithms the log P values are compared of a TP and its parent. Here, it is assumed that lower log P values result in earlier elution (i.e. typical with reversed phase LC). For the `logic` algorithm the retention time direction is taken from the transformation rules table. Note that specifying a large enough value for the `minRTDiff` argument to `generateComponents` is important to ensure that some tolerance exists while comparing retention time directions of parent and TPs. This filter does nothing if either the observed or expected direction is zero.
+The `retDirMatch` filter compares the expected and observed _retention time direction_ of a TP in order to decide if it should be kept. The direction is a value of either `-1` (TP elutes before parent), `+1` (TP elutes after parent) or `0` (TP elutes very close to the parent or its direction is unknown). The directions are taken from the [generated transformation products](#genTPs). In most cases the log P values are compared of a TP and its parent. Here, it is assumed that lower log P values result in earlier elution (i.e. typical with reversed phase LC). For the `logic` algorithm the retention time direction is taken from the transformation rules table. Note that specifying a large enough value for the `minRTDiff` argument to `generateComponents` is important to ensure that some tolerance exists while comparing retention time directions of parent and TPs. Furthermore, the `TPStructParams` argument to `generateTPs()` can be used to tweak the calculation of expected retention time directions from log P values (see `?getDefTPStructParams`). This filter does nothing if either the observed or expected direction is zero.
 
-When TPs data was generated with the `logic` algorithm it is recommended to use the `formulas` filter. This filter uses formula annotations to verify that (1) a parent feature group contains the elements that are subtracted during the transformation and (2) the TP feature group contains the elements that were added during the transformation. Since the 'right' candidate formula is most likely not yet known, this filter looks at _all_ candidates. Therefore, it is recommended to filter the `formulas` object, for instance, with the `topMost` filter.
+When TP data was generated with the `logic` algorithm it is recommended to use the `formulas` filter. This filter uses formula annotations to verify that (1) a parent feature group contains the elements that are subtracted during the transformation and (2) the TP feature group contains the elements that were added during the transformation. Since the 'right' candidate formula is most likely not yet known, this filter looks at _all_ candidates. Therefore, it is recommended to filter the `formulas` object, for instance, with the `topMost` filter.
 
 Finally, the `plotGraph()` method function that was introduced exploring transformation hierarchies for structure TPs, can also incorporate componentization results to simplify the plot and mark TP hits:
 
@@ -333,11 +350,11 @@ Finally, the `plotGraph()` method function that was introduced exploring transfo
 plotGraph(TPsBT, which = "Atrazine", components = componTP)
 ```
 
-### Omitting transformation product input
+### Omitting transformation product input {#TPsOmit}
 
 The `TPs` argument to `generateComponents` can also be omitted. In this case every feature group of `fGroupTPs` is considered to be a potential TP for the potential parents specified for `fGroups`. An advantage is that the screening workflow is not limited to any known TPs or transformations. However, such a workflow has high demands on prioritiation steps before and after the componentization to rule out the many false positives that may occur.
 
-When no transformation data is supplied it is crucial to make [a prior distinction](#TPsFGroups) between parent and TP feature groups. Afterwards, the MS/MS spectral and other annotation similarity filters mentioned in the previous section may be a powerful way to further prioritize data.
+When no transformation data is supplied it is crucial to make [a prior distinction](#TPsFGroups) between parent and TP feature groups. Afterwards, the MS/MS spectral and other annotation similarity filters mentioned in the previous section may helpful to further prioritize data.
 
 The [fourth example](#TPsEx4) demonstrates such a workflow.
 
@@ -368,7 +385,7 @@ suspectsTPs <- convertToSuspects(TPs, includeParents = FALSE)
 fGroupsTPs <- screenSuspects(fGroups, suspectsTPs, adduct = "[M+H]+", onlyHits = TRUE)
 
 # perform annotation of TPs
-mslistsTPs <- generateMSPeakLists(fGroupsTPs, "mzr")
+mslistsTPs <- generateMSPeakLists(fGroupsTPs)
 convertToMFDB(TPs, "TP-database.csv", includeParents = FALSE) # generate MetFrag database
 compoundsTPs <- generateCompounds(fGroupsTPs, mslistsTPs, "metfrag", adduct = "[M+H]+", database = "csv",
                                   extraOpts = list(LocalDatabasePath = "TP-database.csv"))
@@ -399,7 +416,7 @@ suspects <- convertToSuspects(TPs)
 fGroupsScr <- screenSuspects(fGroupsScr, suspects, adduct = "[M+H]+", onlyHits = TRUE, amend = TRUE)
 
 # step 4
-mslistsScr <- generateMSPeakLists(fGroupsScr, "mzr")
+mslistsScr <- generateMSPeakLists(fGroupsScr)
 convertToMFDB(TPs, "TP-database.csv", includeParents = TRUE)
 compoundsScr <- generateCompounds(fGroupsScr, mslistsScr, "metfrag", adduct = "[M+H]+", database = "csv",
                                   extraOpts = list(LocalDatabasePath = "TP-database.csv"))
@@ -408,8 +425,8 @@ compoundsScr <- generateCompounds(fGroupsScr, mslistsScr, "metfrag", adduct = "[
 compoundsScr <- filter(compoundsScr, minExplainedPeaks = 1)
 
 # step 5b
-fGroupsScrAnn <- annotateSuspects(fGroupsScr, MSPeakLists = mslistsScr,
-                                  compounds = compoundsScr)
+fGroupsScrAnn <- estimateIDConfidence(fGroupsScr, MSPeakLists = mslistsScr,
+                                      compounds = compoundsScr)
 fGroupsScrAnn <- filter(fGroupsScrAnn, maxLevel = 3, onlyHits = TRUE)
 
 # step 6
@@ -432,13 +449,13 @@ This example uses metabolic logic to calculate possible TPs for all feature grou
 4. A suspect screening is performed to find the TPs. Unlike the previous example feature groups without hits are kept ([discussed here](#TPsFGroups)).
 5. The components are generated
 6. The components are filtered:
-    a. The TPs must follow an expected [retention time direction](#TPsProc)
+    a. The TPs must follow an expected [retention time direction](#TPCompProc)
     b. The parent/TPs should have at least one candidate formula that fits with the transformation.
 7. Only feature groups are kept with parent/TP assignments and all results are reported.
 
 ```{r eval=FALSE}
 # steps 1-2
-mslists <- generateMSPeakLists(fGroups, "mzr")
+mslists <- generateMSPeakLists(fGroups)
 formulas <- generateFormulas(fGroups, mslists, "genform", adduct = "[M+H]+")
 formulas <- filter(formulas, topMost = 5)
 fGroups <- fGroups[results = formulas]
@@ -482,7 +499,7 @@ groupsTPs <- tab[classification == "increase"]$group
 fGroups <- fGroups[, union(groupsParents, groupsTPs)]
 
 # step 3
-mslists <- generateMSPeakLists(fGroups, "mzr")
+mslists <- generateMSPeakLists(fGroups)
 formulas <- generateFormulas(fGroups, mslists, "genform", adduct = "[M+H]+")
 formulas <- filter(formulas, topMost = 5)
 fGroups <- fGroups[results = formulas]
@@ -494,7 +511,7 @@ componTP <- generateComponents(algorithm = "tp",
                                MSPeakLists = mslists, formulas = formulas)
 
 # step 5
-componTP <- filter(componTP, minSpecSimBoth = 0.75, minFragMatches = 1)
+componTP <- filter(componTP, minSpecSimBoth = 0.75, minTotFragMatches = 1)
 
 # step 6
 fGroups <- fGroups[results = componTP]

@@ -382,7 +382,7 @@ genScriptFeaturesBlock <- function(ionization, IMS, settingsFeat, generator)
     addFindFeatures <- function(varName, anaInfoVarName, suspEICL, suspEICA)
     {
         peakParams <- if (settingsFeat$featAlgo == "EIC")
-            sprintf("getDefEICPeakParams(\"%s\")", settingsFeat$featEICParams$peaksAlgo)
+            sprintf("getDefPeakParams(\"chrom\", \"%s\")", settingsFeat$featEICParams$peaksAlgo)
         
         fa <- settingsFeat$featAlgo
         generator$addCall(varName, "findFeatures", list(
@@ -423,7 +423,7 @@ genScriptFeaturesBlock <- function(ionization, IMS, settingsFeat, generator)
                 ms2 = getFeaturesEICsParams("ms2", "ms2")
             )
             
-            generator$addCall("featParams", "getDefEICParams", list(
+            generator$addCall("featParams", "getFeaturesEICsParams", list(
                 list(name = "methodMZ", value = mmz, quote = TRUE),
                 list(name = "methodIMS", value = mims, quote = TRUE),
                 list(name = "mzRange", value = def$bins$mzRange, condition = mmz == "bins"),

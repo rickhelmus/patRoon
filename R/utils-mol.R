@@ -163,6 +163,9 @@ babelConvert <- function(input, inFormat, outFormat, appendFormula = FALSE, must
     iterations <- 1
     repeat
     {
+        if (length(indsToDo) == 0)
+            break # nothing to begin with...
+        
         batches <- splitInNBatches(indsToDo, batchn)
         indsToDo <- integer()
         cmdQueue <- lapply(seq_along(batches), function(bi)

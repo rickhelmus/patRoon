@@ -101,6 +101,8 @@
         - Add mobility filters for suspects & compounds?
         - is assignMobilities() before TP componentization OK?
             - IMS="maybe", so probably fine?
+- BUG piek: methodIMS is set for non-IMS workflows
+- BUG newProject(): XCMS3 groupFeatures has rtalign args in sets mode
 
 ## Param defaults
 
@@ -151,6 +153,7 @@
     - group orphans in eg "orphan" group?
 - feat EICs
     - tweak default EIC filtering params, more strict for binning?
+        - current defaults way to strict for patRoonData neg samples (for filtering of EICs _and_ peaks)
 - group IMS
     - (force) disable RT align and group fractions?
     - support CCS columns?

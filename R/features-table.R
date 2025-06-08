@@ -17,7 +17,9 @@ importFeaturesTable <- function(analysisInfo, input)
     # UNDONE: verify that IDs are unique per ana
     # UNDONE: remove replicate column?
     # UNDONE: automatically add ID column?
-    # split sets function
+    # UNDONE: split sets function?
+    # UNDONE: explicitly specify additional columns to add and stick by those used by patRoon by default?
+    
     
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo)
     checkmate::assert(
@@ -26,8 +28,7 @@ importFeaturesTable <- function(analysisInfo, input)
         .var.name = "input"
     )
     
-    if (is.character(input))
-        input <- fread(input)
+    input <- if (is.character(input)) fread(input) else makeDT(input)
  
     ac <- checkmate::makeAssertCollection()
     checkmate::assert(
@@ -121,6 +122,7 @@ importFeaturesTable <- function(analysisInfo, input)
 
     if (!is.null(analysisInfo[["set"]]))
     {
+        # UNDONE: there usually is a set column in anaInfo for sets workflows, no warnings in that case?
         warning("The 'set' column in the analysisInfo is not used and will be removed")
         analysisInfo[, set := NULL]
     }

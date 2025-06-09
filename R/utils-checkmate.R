@@ -52,6 +52,17 @@ checkChoiceSilent <- function(x, ch)
 }
 assertChoiceSilent <- checkmate::makeAssertionFunction(checkChoiceSilent)
 
+checkUniqueDTBy <- function(x, by)
+{
+    ret <- checkmate::checkDataTable(x)
+    if (isTRUE(ret))
+        ret <- checkHasNames(x, by)
+    if (isTRUE(ret) && anyDuplicated(x, by = by))
+        ret <- sprintf("Found non-unique value pairs in columns %s", paste0(by, collapse = "+"))
+    return(ret)
+}
+assertUniqueDTBy <- checkmate::makeAssertionFunction(checkUniqueDTBy)
+
 assertListVal <- function(x, field, assertFunc, mustExist = TRUE, ..., .var.name = checkmate::vname(x))
 {
     if (!field %in% names(x))

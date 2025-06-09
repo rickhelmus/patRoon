@@ -10,8 +10,7 @@ setMethod("initialize", "featureGroupsTable",
 importFeatureGroupsTable <- function(analysisInfo, input)
 {
     # UNDONE: doc that additional columns go in the features table
-    # UNDONE: verify that groups are unique per ana
-    
+
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo)
     checkmate::assert(
         checkmate::checkDataFrame(input),
@@ -36,6 +35,7 @@ importFeatureGroupsTable <- function(analysisInfo, input)
     
     ac <- checkmate::makeAssertCollection()
     assertListVal(input, "group", checkmate::assertCharacter, any.missing = FALSE, min.chars = 1, add = ac)
+    assertUniqueDTBy(input, c("group", "analysis"), add = ac)
     for (col in gInfoColsPrefix)
     {
         assertListVal(input, col, checkmate::assertNumeric, any.missing = FALSE, finite = TRUE, add = ac,

@@ -1646,7 +1646,7 @@ setMethod("getBPCs", "featureGroups", function(obj, retentionRange = NULL, MSLev
 setMethod("groupFeatures", "features", function(obj, algorithm, ..., verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertChoice(algorithm, c("openms", "xcms", "xcms3", "kpic2"), add = ac)
+    assertGroupFeatAlgo(algorithm, add = ac)
     assertGroupFeatVerbose(verbose, add = ac)
     checkmate::reportAssertions(ac)
     

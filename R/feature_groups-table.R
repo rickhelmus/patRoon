@@ -7,7 +7,7 @@ featureGroupsTable <- setClass("featureGroupsTable", contains = "featureGroups")
 setMethod("initialize", "featureGroupsTable",
           function(.Object, ...) callNextMethod(.Object, algorithm = "table", ...))
 
-importFeatureGroupsTable <- function(analysisInfo, input, addCols = NULL)
+importFeatureGroupsTable <- function(analysisInfo, input, addCols = NULL, groupAlgo, groupArgs = NULL)
 {
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo)
     checkmate::assert(
@@ -32,6 +32,9 @@ importFeatureGroupsTable <- function(analysisInfo, input, addCols = NULL)
     }
     
     ac <- checkmate::makeAssertCollection()
+    # NOTE: groupAlgo is checked below and only if sets data is being imported
+    checkmate::assertList(groupArgs, null.ok = TRUE, add = ac)
+    
     assertListVal(input, "group", checkmate::assertCharacter, any.missing = FALSE, min.chars = 1, add = ac)
     assertUniqueDTBy(input, c("group", "analysis"), add = ac)
     for (col in gInfoColsPrefix)
@@ -136,6 +139,8 @@ importFeatureGroupsTable <- function(analysisInfo, input, addCols = NULL)
     constArgs <- list(groups = gTable, groupInfo = gInfo, ftindex = ftindex, features = importedFeat)
     ret <- if (hasSets)
     {
+        assertGroupFeatAlgo(groupAlgo)
+        
         ann <- unique(input, by = c("set", "group"))[, c("set", "group", setsAnnAddCols, setsAnnNumCols), with = FALSE]
         for (s in setsNames)
         {
@@ -145,14 +150,11 @@ importFeatureGroupsTable <- function(analysisInfo, input, addCols = NULL)
         }
         setnames(ann, "group_neutralMass", "neutralMass")
         setcolorder(ann, c("set", "group", "adduct", "neutralMass", "ion_mz"))
-        do.call(featureGroupsSet, c(constArgs, list(annotations = ann, algorithm = "table-set")))
+        do.call(featureGroupsSet, c(constArgs, list(annotations = ann, algorithm = "table-set", groupAlgo = groupAlgo,
+                                                    groupArgs = if (is.null(groupArgs)) list() else groupArgs)))
     }
     else
         do.call(featureGroupsTable, constArgs)
-    
-    # UNDONE: sets: fill in annotations slot (calc ion_mz column or neutralMass?), handle that there is no actual grouping algo...
-    # --> make separate function for sets, with groupAlgo/groupArgs arguments
-    # --> make args empty by default, and check in adducts<-()/selectIons() if set?
     
     printf("Imported %d feature groups.\n", nrow(gInfo))
     

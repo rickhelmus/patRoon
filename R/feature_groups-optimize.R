@@ -98,7 +98,7 @@ optimizeFeatureGrouping <- function(features, algorithm, ..., templateParams = l
 
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(features, "features", add = ac)
-    checkmate::assertChoice(algorithm, c("openms", "xcms", "xcms3", "kpic2"), add = ac)
+    assertGroupFeatAlgo(algorithm, add = ac)
     assertOptimArgs(params, templateParams, paramRanges, maxIterations, maxModelDeviation, parallel, ac)
     checkmate::reportAssertions(ac)
     
@@ -122,7 +122,7 @@ optimizeFeatureGrouping <- function(features, algorithm, ..., templateParams = l
 #' @export
 generateFGroupsOptPSet <- function(algorithm, ...)
 {
-    checkmate::assertChoice(algorithm, c("openms", "xcms", "xcms3", "kpic2"))
+    assertGroupFeatAlgo(algorithm)
 
     f <- switch(algorithm,
                 openms = generateFGroupsOptPSetOpenMS,
@@ -138,7 +138,7 @@ generateFGroupsOptPSet <- function(algorithm, ...)
 #' @export
 getDefFGroupsOptParamRanges <- function(algorithm)
 {
-    checkmate::assertChoice(algorithm, c("openms", "xcms", "xcms3", "kpic2"))
+    assertGroupFeatAlgo(algorithm)
 
     if (algorithm == "openms")
         return(getDefFGroupsOptParamRangesOpenMS())

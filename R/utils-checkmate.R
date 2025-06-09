@@ -187,6 +187,11 @@ assertAndPrepareAnaInfo <- function(x, ..., null.ok = FALSE, .var.name = checkma
     return(x)
 }
 
+assertGroupFeatAlgo <- function(x, .var.name = checkmate::vname(x), add = NULL)
+{
+    checkmate::assertChoice(x, c("openms", "xcms", "xcms3", "kpic2"), .var.name = .var.name, add = add)
+}
+
 assertGroupFeatVerbose <- function(x, .var.name = checkmate::vname(x), add = NULL)
 {
     checkmate::assert(

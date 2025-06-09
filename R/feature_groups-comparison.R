@@ -210,7 +210,7 @@ setMethod("comparison", "featureGroups", function(..., groupAlgo, groupArgs = li
     fGroupsList <- list(...)
 
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertChoice(groupAlgo, c("xcms", "xcms3", "openms", "kpic2"), add = ac)
+    assertGroupFeatAlgo(groupAlgo, add = ac)
     checkmate::assertList(groupArgs, any.missing = FALSE, names = "unique", add = ac)
     checkmate::assertList(fGroupsList, types = "featureGroups", min.len = 2, any.missing = FALSE,
                           unique = TRUE, .var.name = "...", add = ac)

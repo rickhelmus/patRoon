@@ -7,10 +7,8 @@ featureGroupsTable <- setClass("featureGroupsTable", contains = "featureGroups")
 setMethod("initialize", "featureGroupsTable",
           function(.Object, ...) callNextMethod(.Object, algorithm = "table", ...))
 
-importFeatureGroupsTable <- function(analysisInfo, input)
+importFeatureGroupsTable <- function(analysisInfo, input, addCols = NULL)
 {
-    # UNDONE: doc that additional columns go in the features table
-
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo)
     checkmate::assert(
         checkmate::checkDataFrame(input),
@@ -104,7 +102,7 @@ importFeatureGroupsTable <- function(analysisInfo, input)
     inputFeat <- copy(input)
     inputFeat <- removeDTColumnsIfPresent(inputFeat, c("group", gInfoColsPrefix, "group_mobility_collapsed",
                                                        "group_CCS_collapsed", setsAnnAddCols, setsAnnNumCols))
-    importedFeat <- importFeaturesTable(analysisInfo, inputFeat)
+    importedFeat <- importFeaturesTable(analysisInfo, inputFeat, addCols = addCols)
     
     for (col in gInfoCols)
     {

@@ -14,12 +14,9 @@ setMethod("initialize", "featuresTable", function(.Object, ...) callNextMethod(.
 #' @export
 importFeaturesTable <- function(analysisInfo, input)
 {
-    # UNDONE: verify that IDs are unique per ana
     # UNDONE: remove replicate column?
-    # UNDONE: automatically add ID column?
     # UNDONE: split sets function?
     # UNDONE: explicitly specify additional columns to add and stick by those used by patRoon by default?
-    
     
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo)
     checkmate::assert(
@@ -31,11 +28,17 @@ importFeaturesTable <- function(analysisInfo, input)
     input <- if (is.character(input)) fread(input) else makeDT(input)
  
     ac <- checkmate::makeAssertCollection()
-    checkmate::assert(
-        checkmate::checkNumeric(input$ID, any.missing = FALSE),
-        checkmate::checkCharacter(input$ID, any.missing = FALSE, min.chars = 1),
-        .var.name = "input$ID", add = ac
-    )
+    if (is.null(input[["ID"]]))
+        input[, ID := seq_len(.N), by = "analysis"]
+    else
+    {
+        checkmate::assert(
+            checkmate::checkNumeric(input$ID, any.missing = FALSE),
+            checkmate::checkCharacter(input$ID, any.missing = FALSE, min.chars = 1),
+            .var.name = "input$ID", add = ac
+        )
+        assertUniqueDTBy(input, c("ID", "analysis"), add = ac)
+    }
     for (col in c("ret", "mz", "intensity"))
         assertListVal(input, col, checkmate::assertNumeric, any.missing = FALSE, finite = TRUE, add = ac)
     

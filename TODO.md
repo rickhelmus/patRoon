@@ -343,6 +343,7 @@
     - "full" option for verbose grouping
 - feat import
     - doc mandatory columns and how missing columns are filled in
+        - anaInfo set column is removed and ignored
     - doc what is and isn't supported
 
 ## NEWS

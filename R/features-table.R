@@ -134,11 +134,7 @@ importFeaturesTable <- function(analysisInfo, input, addCols = NULL)
     analysisInfo <- analysisInfo[analysis %in% anasCommon]
 
     if (!is.null(analysisInfo[["set"]]))
-    {
-        # UNDONE: there usually is a set column in anaInfo for sets workflows, no warnings in that case?
-        warning("The 'set' column in the analysisInfo is not used and will be removed")
         analysisInfo[, set := NULL]
-    }
     
     if (hasSets)
     {
@@ -154,7 +150,15 @@ importFeaturesTable <- function(analysisInfo, input, addCols = NULL)
     fTable <- fTable[anasCommon] # subset and sync to anaInfo order
     
     constArgs <- list(analysisInfo = analysisInfo, features = fTable, hasMobilities = hasMob)
-    if (hasSets)
-        return(do.call(featuresSet, c(constArgs, list(algorithm = "table-set"))))
-    return(do.call(featuresTable, constArgs))
+    ret <- if (hasSets)
+        do.call(featuresSet, c(constArgs, list(algorithm = "table-set")))
+    else
+        do.call(featuresTable, constArgs)
+
+    printf("Done importing features!\n")
+    printf("IMS mode: %s\n", if (hasMob) "yes" else "no")
+    printf("Sets mode: %s\n", if (hasSets) sprintf("yes (%s)", paste0(unique(analysisInfo$set), collapse = ", ")) else "no")
+    printFeatStats(fTable)
+    
+    return(ret)
 }

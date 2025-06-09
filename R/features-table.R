@@ -12,21 +12,33 @@ featuresTable <- setClass("featuresTable", contains = "features")
 setMethod("initialize", "featuresTable", function(.Object, ...) callNextMethod(.Object, algorithm = "table", ...))
 
 #' @export
-importFeaturesTable <- function(analysisInfo, input)
+importFeaturesTable <- function(analysisInfo, input, addCols = NULL)
 {
-    # UNDONE: remove replicate column?
-    # UNDONE: split sets function?
-    # UNDONE: explicitly specify additional columns to add and stick by those used by patRoon by default?
-    
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo)
     checkmate::assert(
         checkmate::checkDataFrame(input),
         checkmate::checkFileExists(input, access = "r"),
         .var.name = "input"
     )
+    checkmate::assertCharacter(addCols, any.missing = FALSE, min.chars = 1, null.ok = TRUE)
     
     input <- if (is.character(input)) fread(input) else makeDT(input)
- 
+    addCols <- if (is.null(addCols)) character(0) else addCols
+    
+    internalColsPresent <- intersect(c("group", "intensity_rel", "area_rel"), addCols)
+    if (length(internalColsPresent) > 0)
+    {
+        warning("The following columns in 'addCols' are used internally and will not be considered: ",
+                paste(internalColsPresent, collapse = ", "), call. = FALSE)
+        addCols <- setdiff(addCols, internalColsPresent)
+    }
+
+    mobCols <- c("mobility", "mobmin", "mobmax", "mob_area", "mob_intensity", "ims_parent_ID", "mob_assign_method")
+    setsCols <- c("set", "adduct", "ion_mz")
+    
+    input <- subsetDTColumnsIfPresent(input, c("analysis", "ID", "ret", "retmin", "retmax", "mz", "mzmin", "mzmax",
+                                               "intensity", "area", mobCols, setsCols, addCols))
+    
     ac <- checkmate::makeAssertCollection()
     if (is.null(input[["ID"]]))
         input[, ID := seq_len(.N), by = "analysis"]
@@ -72,17 +84,15 @@ importFeaturesTable <- function(analysisInfo, input)
     }
     else
     {
-        mobCols <- intersect(c("mobmin", "mobmax", "mob_area", "mob_intensity", "ims_parent_ID", "mob_assign_method"),
-                             names(input))
-        if (length(mobCols) > 0)
+        mobColsPresent <- intersect(mobCols, names(input))
+        if (length(mobColsPresent) > 0)
         {
             warning("The following columns are invalid in non-IMS workflows and will be removed: ",
-                    paste(mobCols, collapse = ", "), call. = FALSE)
-            input[, (mobCols) := NULL]
+                    paste(mobColsPresent, collapse = ", "), call. = FALSE)
+            input[, (mobColsPresent) := NULL]
         }
     }
     
-    setsCols <- c("set", "adduct", "ion_mz")
     hasSets <- all(setsCols %chin% names(input))
     if (hasSets)
     {
@@ -135,19 +145,6 @@ importFeaturesTable <- function(analysisInfo, input)
         # move set assignments to anaInfo
         analysisInfo[, set := input$set[match(analysis, input$analysis)]]
         input[, set := NULL]
-    }
-    
-    if (!is.null(input[["group"]]))
-    {
-        warning("The 'group' column conflicts internally and will be removed.", call. = FALSE)
-        input[, group := NULL]
-    }
-    normCols <- intersect(c("intensity_rel", "area_rel"), names(input))
-    if (length(normCols) > 0)
-    {
-        warning("The following columns are used internally for normalization and will be removed.",
-                paste(normCols, collapse = ", "), call. = FALSE)
-        input[, (normCols) := NULL]
     }
     
     setcolorder(input, c("ID", "ret", "retmin", "retmax", "mz", "mzmin", "mzmax", "mobility", "mobmin", "mobmax",

@@ -44,7 +44,7 @@ Metabolic logic      | `generateTPs(algorithm = "logic", ...)`           | Featu
 Formula Annotations  | `generateTPs(algorithm = "ann_form", ...)`        | Parents, formula annotations | Prioritized TPs from annotation candidates (based on @Helmus2025).
 Compound Annotations | `generateTPs(algorithm = "ann_comp", ...)`        | Parents, compound annotaions | Prioritized TPs from  annotation candidates (based on @Helmus2025).
 
-For most workflows the `biotransformer`, `cts` and `library` algorithms are a good starting point. They are fairly straightforward to use and output TPs with full structural information. The `library_formula` algorithm may be a suitable alternative if only no parents with formula information are available. The `ann_comp` and `ann_form` algorithms are meant to elucidate completely unknown TPs, i.e. those that are not predicted or found in literature, and are discussed [further below](#TPsAnn). Finally, the `logic` algorithm is primarily meant if no or very little information on possible parents and/or TPs is available.
+For most workflows the `biotransformer`, `cts` and `library` algorithms are a good starting point. They are fairly straightforward to use and output TPs with full structural information. The `library_formula` algorithm may be a suitable alternative if only parents with formula information are available. The `ann_comp` and `ann_form` algorithms are meant to elucidate completely unknown TPs, i.e. those that are not predicted or found in literature, and are discussed [further below](#TPsAnn). Finally, the `logic` algorithm is primarily meant if no or very little information on possible parents and/or TPs is available.
 
 The parent information that is needed for most algorithms is taken from one of the following:
 
@@ -61,7 +61,7 @@ Argument                      | Algorithm(s)      | Remarks
 `parents`                     | `biotransformer`, `cts`, `library`, `library_formula`, `ann_form`, `ann_comp` | The input parents.
 `fGroups`                     | `logic`           | The input feature groups to calculate TPs for.
 `type`                        | `biotransformer`  | The prediction type: `"env"`, `"ecbased"`, `"cyp450"`, `"phaseII"`, `"hgut"`, `"superbio"`, `"allHuman"`. See [BioTransformer] for more details.
-`transLibrary`                | `cts`             | The transformation library that should be used: `"hydrolysis"`, `"abiotic_reduction"`, `"photolysis_unranked"`, `"photolysis_ranked"`, `"mammalian_metabolism"`, `"combined_abioticreduction_hydrolysis"`, `"combined_photolysis_abiotic_hydrolysis"`. See [cts] for more details.
+`transLibrary`                | `cts`             | The transformation library that should be used: `"hydrolysis"`, `"abiotic_reduction"`, `"photolysis_unranked"`, `"photolysis_ranked"`, `"mammalian_metabolism"`, `"combined_abioticreduction_hydrolysis"`, `"combined_photolysis_abiotic_hydrolysis"`, `"pfas_environmental"`, `"pfas_metabolism"`. See [cts] for more details.
 `TPLibrary`                   | `library`, `library_formula` | [Custom TP library](#TPsCustom).
 `transformations`             | `logic`           | [Custom TP transformation rules](#TPsCustom).
 `generations`                 | `biotransformer`, `cts`, `library`, `library_formula` | The number of transformation generations to consider.
@@ -95,7 +95,7 @@ TPsAnnComp <- generateTPs("ann_comp", compounds = compounds, TPsRef = TPsBT, fGr
 
 By default the `library` and `logic` algorithms use data that is installed with `patRoon` (based on [PubChem transformations][PubChemLiteTR] and @Scholle2015, respectively). However, it is also possible to use custom data. For the `library_formula` no default library is provided, however, these can easily be generated as is discussed at the end of the section. 
 
-To use a custom TP structure library a simple `data.frame` is needed with the names, SMILES and optionally `log P` values for the parents and TPs. The `log P` values are used for prediction of the retention time direction of a TP compared to its parent, as is discussed further in the next section. The following small library has two TPs for benzotriazole and one for DEET:
+To use a custom TP structure library for the `library` algorithm a simple `data.frame` is needed with the names, SMILES and optionally `log P` values for the parents and TPs. The `log P` values are used for prediction of the retention time direction of a TP compared to its parent, as is [discussed later](#TPCompProc). The following small library has two TPs for benzotriazole and one for DEET:
 
 ```{r TPsCustomDB,eval=TRUE}
 myTPLib <- data.frame(parent_name = c("1H-Benzotriazole", "1H-Benzotriazole", "DEET"),
@@ -111,7 +111,7 @@ To use this library, simply pass it to the `TPLibrary` argument:
 TPs <- generateTPs("library", TPLibrary = myTPLib)
 ```
 
-For `library_formula` the library follows the same format. However, here the formula should be specified instead of the `SMILES` with the `parent_formula` and `TP_formula` columns (although it is still allowed to only specify SMILES, as in this case the formulae are automatically calculated).
+For `library_formula` the library follows the same format. However, here the formula should be specified instead of the `SMILES` with the `parent_formula` and `TP_formula` columns (although it is still allowed to only specify SMILES, in which case the formulae are calculated from the SMILES).
 
 For the `logic` algorithm a table with custom transformation rules can be specified for TP calculations:
 
@@ -123,7 +123,7 @@ myTrans <- data.frame(transformation = c("hydroxylation", "demethylation"),
 myTrans
 ```
 
-The `add` and `sub` columns are used to denote the elements that are added or subtracted by the reaction. These are used to calculate mass differences between parents and TPs. The `retDir` column is used to indicate the retention time direction of the parent compared to the TP: `-1` (elutes before parent), `1` (elutes after parent) or `0` (similar or unknown). The next section describes how this data can be used to filter TPs. The custom rules can be used by passing them to the `transformations` argument:
+The `add` and `sub` columns are used to denote the elements that are added or subtracted by the reaction. These are used to calculate mass differences between parents and TPs. The `retDir` column is used to indicate the retention time direction of the parent compared to the TP: `-1` (elutes before parent), `1` (elutes after parent) or `0` (similar or unknown). This is [discussed later](#TPCompProc) how this data can be used to filter TP candidates. The custom rules can be used by passing them to the `transformations` argument:
 
 ```{r eval=FALSE}
 TPs <- generateTPs("logic", fGroups, adduct = "[M+H]+", transformations = myTrans)
@@ -147,12 +147,12 @@ Compared to the `logic` algorithm, the `library_formula` algorithm is more (and 
 
 The `ann_form` and `ann_comp` algorithms are intended to provide a thorough screening and elucidation of TPs that are otherwise difficult to find with other algorithms. These algorithms assume that TPs of interest can be revealed from a thorough feature annotation workflow based on formulae (`ann_form`) or compounds (`ann_comp`). The annotation candidates are prioritized and ranked by the _TP Score_, which is calculated from properties such as the fit of the candidate structure or formula into the parent (or vice versa) and similarity to suspects (i.e. TPs obtained by other algorithms). For more details see @Helmus2025, `?generateTPsAnnForm` and `?generateTPsAnnComp`.
 
-To provide a thorough screening with `ann_comp`, often a large compound database such as PubChem is used for compound annotation. This can typically results in tens of thousands of candidates for each parent. Hence, obtaining the compound annotations and generating TPs with `ann_comp` is computationally intensive and can take multiple hours. Afterwards, the `topMost` filter should be used to reduce the number of candidates to a manageable size (see the next section).
+To provide a thorough screening with `ann_comp`, often a large compound database such as PubChem is used for compound annotation. This typically results in tens of thousands of candidates for each parent. Hence, obtaining the compound annotations and generating TPs with `ann_comp` is computationally intensive and can take multiple hours. Afterwards, the `topMost` filter should be used to reduce the number of candidates to a manageable size (see the next section).
 
 
 ### Processing data {#TPsProc}
 
-Similar to other workflow data, several generic functions are available to inspect the data:
+Similar to other workflow data, several generic functions are available to inspect the TP data:
 
 Generic                            | Remarks                                                             
 -----------------------------------|----------------------------------------------------------------------
@@ -254,7 +254,7 @@ The `fGroups`, `fGroupsTPs` and `ignoreParents` arguments are used by the compon
 
 1. `fGroups=fGroupsTPs` and `ignoreParents=FALSE`: in this case no distinction is made, and all feature groups are considered a parent or TP (default if `fGroupsTPs` is not specified).
 2. `fGroups` and `fGroupsTPs` contain different subsets of the _same_ `featureGroups` object and `ignoreParents=FALSE`:  only the feature groups in `fGroups`/`fGroupsTPs` are considered as parents/TPs.
-3. As above, but with `ignoreParents=TRUE`: the same distinction is made as above, but any feature groups in `fGroupsTPs` are ignored if also present in `fGroups`.
+3. As above, but with `ignoreParents=TRUE`: the same distinction is made as above, but any feature groups in `fGroupsTPs` are ignored for TP candidate selection if also present in `fGroups`.
 
 The first scenario is often used if it is unknown which feature groups may be parents or which are TPs. Furthermore, this scenario may also be used if the dataset is sufficiently simple, for instance, because a suspect screening with the results from `convertToSuspects` (discussed in the previous section) would reliably discriminate between parents and TPs. A workflow with the first scenario is demonstrated in the [second example](#TPsEx2).
 
@@ -266,7 +266,7 @@ componTP <- generateComponents(algorithm = "tp",
                                fGroupsTPs = fGroups[ni = treatment == "after"])
 ```
 
-In this example, only those feature groups with features present in the "before" treatment group are considered as parents, and those in "after" may be considered as a TP (see [this section](#useMeta) on how to set and use metadata). Since it is likely that there will be some overlap in feature groups between both sample groups, the `ignoreParents` flag can be used to not consider any of the overlap for TP assignments:
+In this example, only those feature groups with features present in the "before" treatment group are considered as parents, and those in "after" may be considered as a TP (see [this section](#useMeta) on how to group sample analyses with metadata). Since it is likely that there will be some overlap in feature groups between both sample groups, the `ignoreParents` flag can be used to not consider any of the overlap for TP assignments:
 
 ```{r eval=FALSE}
 componTP <- generateComponents(algorithm = "tp",
@@ -282,7 +282,9 @@ More sophisticates ways are of course possible to provide an upfront distinction
 If TPs were generated with an algorithm that requires parent input (see [Obtaining TPs](#genTPs)), then it is often mandatory that a suspect screening of parents and TPs is performed prior to componentization. This is necessary for the componentization algorithm to map the feature groups that belong to a particular parent or TP. Note that this step should _not_ be performed for the `ann_form` and `ann_comp` algorithms, as these algorithms already provide the necessary mappings. The `convertToSuspects` function is used to prepare the suspect list:
 
 ```{r eval=FALSE}
-# set includeParents to TRUE since both the parents and TPs are needed
+# perform suspect screening
+# NOTE: set includeParents to TRUE since both the parents and TPs should be screened
+# NOTE: for the ann_form and ann_comp algorithms no suspect screening is necessary
 suspects <- convertToSuspects(TPs, includeParents = TRUE)
 fGroupsScr <- screenSuspects(fGroups, suspects, onlyHits = TRUE)
 
@@ -293,7 +295,7 @@ componTP <- generateComponents(fGroups = fGroupsScr, ...)
 
 If a parent screening was already performed in advance, for instance when the input parents to `generateTPs` are screening results, the screening results for parents and TPs can also be combined. The [second example](#TPsEx2) demonstrates this.
 
-Note that in the case a parent suspect is matched to multiple feature groups, a component is made for each match. Similarly, if multiple feature groups match to a TP suspect, all of them will be incorporated in the component.
+Note that in the case a parent suspect is matched to multiple feature groups, a component is made for each match. Similarly, if multiple feature groups match to the same TP suspect, all of them will be incorporated in the component.
 
 When TPs were generated with the `logic` algorithm a suspect screening must also be carried out in advance. However, in this case it is not necessary to include the parents (since each parent equals a feature group no mapping is necessary). The `onlyHits` variable to `screenSuspects` must not be set in order to keep the parents.
 
@@ -312,7 +314,7 @@ If additional annotation data for parents and TPs is given to the componentizati
 
 Firstly, if MS peak lists are provided, then the [spectrum similarity](#specSim) is calculated between each parent and its potential TP candidates. This is performed with all the three different alignment shifts (see the [spectrum similarity section](#specSim) for more details).
 
-In case `formulas` and/or `compounds` objects are given as input to `generateComponents()`, then a parent/TP comparison is made by counting the number of fragments and neutral losses that they share (based on the formulae assigned to the MS/MS fragments). The counts are in two different ways:
+In case `formulas` and/or `compounds` objects are given as input to `generateComponents()`, then a parent/TP comparison is made by counting the number of fragments and neutral losses that they share (based on the formulae assigned to the MS/MS fragments). The counts are calculated in two different ways:
 
 1. from the matches between the parent and the TP candidate
 2. from the matches between the parent and _all_ the annotation candidates in the input `formulas`/`compounds` object for the TP feature group 
@@ -323,10 +325,12 @@ The latter is mainly used (and only available) in workflows [where componentizat
 
 The output of TP componentization is an object of the `componentsTPs` class. This _derives_ from the 'regular' `components` class, therefore, all the data processing functionality described [before](#processing) (extraction, subsetting, filtering etc) are also valid for TP components.
 
-For the `as.data.table()` method function (and `as.data.frame()`) the `candidates` argument can be used to specify if individual candidates should be included in the output:
+For the `as.data.table()` method function (and `as.data.frame()`) the `candidates` argument can be used to specify if individual candidates for each feature group in the component should be included in the output:
 
 ```{r TPCompProcADT,eval=runData}
+# only output feature group data
 as.data.table(componTP, candidates = FALSE)[name == "CMP2", .(name, parent_name, group)]
+# also include the candidates for each feature group
 as.data.table(componTP, candidates = TRUE)[name == "CMP2", .(name, parent_name, group, candidate_name, formula)]
 ```
 
@@ -352,7 +356,7 @@ plotGraph(TPsBT, which = "Atrazine", components = componTP)
 
 ### Omitting transformation product input {#TPsOmit}
 
-The `TPs` argument to `generateComponents` can also be omitted. In this case every feature group of `fGroupTPs` is considered to be a potential TP for the potential parents specified for `fGroups`. An advantage is that the screening workflow is not limited to any known TPs or transformations. However, such a workflow has high demands on prioritiation steps before and after the componentization to rule out the many false positives that may occur.
+The `TPs` argument to `generateComponents` can also be omitted (i.e. `TPs=NULL`). In this case every feature group from `fGroupTPs` is considered to be a potential TP for the potential parents specified for `fGroups`. An advantage is that the screening workflow is not limited to any known TPs or transformations. However, such a workflow has high demands on prioritiation steps before and after the componentization to rule out the many false positives that may occur.
 
 When no transformation data is supplied it is crucial to make [a prior distinction](#TPsFGroups) between parent and TP feature groups. Afterwards, the MS/MS spectral and other annotation similarity filters mentioned in the previous section may helpful to further prioritize data.
 

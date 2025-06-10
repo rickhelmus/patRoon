@@ -273,8 +273,6 @@
         - preparations
             - update anaInfo section
                 - fill in IMS chapter link
-                - fill in feature detection link, assuming we add mz(X)ML requirements somewhere
-                - fill in metadata link
             - update/extend data-pretreatment section
                 - mention im_collapse uses msdata?
                 - fill in IMS chapter link, see what details to put where
@@ -284,7 +282,6 @@
             - possibly split feature import into sub-section?
             - suspect screening
                 - fill in IMS links
-                - update links/mentions to suspAnn
         - annotation
             - update MSPL section
                 - add back precursorMzWindow if we re-add it
@@ -292,8 +289,6 @@
             - estIDLevels
                 - update thresholds when we change these
     - processing
-        - Visualization
-            - plotInt(): give examples for xBy, groupBy etc --> regression section
     - IMS chapter
         - before/after sets?
         - workflows

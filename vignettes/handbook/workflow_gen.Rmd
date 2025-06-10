@@ -167,7 +167,7 @@ In `patRoon` a distinction is made between four types of raw data files:
 * **profile**: exported but not centroided (i.e. profile) data files in `mzML` or `mzXML` formats.
 * **ims**: exported ion mobility HRMS data files in the `mzML` format.
 
-Most algorithms in non-target workflows exclusively operate on centroided data files. In most cases the centroided data should be stored in the `mzML` format, but [some feature detection algorithms] only work with `mzXML`. The raw data files are primarily used for data conversion to any of the other types. The raw and ims data file types are (also) used in [IMS workflows].
+Most algorithms in non-target workflows exclusively operate on centroided data files. In most cases the centroided data should be stored in the `mzML` format, but [some feature detection algorithms](#findGrpFeat) only work with `mzXML`. The raw data files are primarily used for data conversion to any of the other types. The raw and ims data file types are (also) used in [IMS workflows].
 
 ### Analysis information {#anaInfo}
 
@@ -204,7 +204,7 @@ generateAnalysisInfo(fromCentroid = patRoonData::exampleDataPath(),
                      exposure = c(0, 0, 0, 2, 2, 2))
 ```
 
-The metadata (`location` and `exposure` in the example above) can be used in various ways [later in the workflow] to process the non-target data.
+The metadata (`location` and `exposure` in the example above) can be used in various ways [later in the workflow](#useMeta) to process the non-target data.
 
 See the reference manual for more details on the analysis information and `generateAnalysisInfo()` (``?`analysis-information`` `).
 
@@ -299,7 +299,7 @@ digraph Features {
 }", height = 70, width = 500)
 ```
 
-### Finding and grouping features
+### Finding and grouping features {#findGrpFeat}
 
 Several algorithms are available for finding features. These are listed in the table below alongside their usage and general remarks.
 
@@ -403,12 +403,12 @@ The example above has a very simple suspect list with just three compounds. The 
 - `rt`: The retention time in seconds. Optional. If specified any feature groups with a different retention time will not be considered to match suspects.
 - `mz`, `SMILES`, `InChI`, `formula`, `neutralMass`: _at least_ one of these columns must hold data for each suspect row. The `mz` column specifies the ionized mass of the suspect. If this is not available then data from any of the other columns is used to determine the suspect mass.
 - `adduct`: The adduct of the suspect. Optional. Set this if you are sure that a suspect should be matched by a particular adduct ion and no data in the `mz` column is available.
-- `fragments_mz` and `fragments_formula`: optional columns that may assist [suspect annotation](#suspAnn).
+- `fragments_mz` and `fragments_formula`: optional columns that may assist [ID confidence estimation](#estIDConf).
 - `mobility` and `CCS` columns: these are for [IMS workflows] and can increase the confidence of a suspect match. This is discussed in the [IMS chapter](section here).
 
 In most cases a suspect list is best made as a `csv` file which can then be imported with e.g. the `read.csv()` function. This is exactly what happen when you specify a suspect list when using the `newProject()` function.
 
-Quite often, the ionized masses are not readily available and these have to be calculated. In this case, data in any of the `SMILES`/`InChI`/`formula`/`neutralMass` columns should be provided. Whenever possible, it is _strongly_ recommended to fill in `SMILES` column (or `InChI`), as this will assist [annotation](#suspAnn). Applying this to the above example:
+Quite often, the ionized masses are not readily available and these have to be calculated. In this case, data in any of the `SMILES`/`InChI`/`formula`/`neutralMass` columns should be provided. Whenever possible, it is _strongly_ recommended to fill in `SMILES` column (or `InChI`), as this will assist [ID confidence estimation](#estIDConf). Applying this to the above example:
 
 ```{r suspSMI,eval=runData}
 suspects <- data.frame(name = c("1H-benzotriazole", "N-Phenyl urea", "2-Hydroxyquinoline"),
@@ -436,7 +436,7 @@ To summarize:
 * Otherwise, if the suspect has data in the `adduct` column, the `m/z` value for the suspect is calculated from its neutral mass and the adduct and then matched with the `m/z` of a feature group.
 * Otherwise, suspects and feature groups are matched by their the neutral mass.
 
-The `fragments_mz` and `fragments_formula` columns in the suspect list can be used to specify known fragments for a suspect, which can help [suspect annotation](#suspAnn). The former specifies the ionized _m/z_ of known MS/MS peaks, whereas the second specifies known formulas. Multiple values can be given by separating them with a semicolon:
+The `fragments_mz` and `fragments_formula` columns in the suspect list can be used to specify known fragments for a suspect, which can help [ID confidence estimation for suspects](#estIDConf). The former specifies the ionized _m/z_ of known MS/MS peaks, whereas the second specifies known formulas. Multiple values can be given by separating them with a semicolon:
 
 ```{r suspFrags,eval=FALSE}
 suspects <- data.frame(name = c("1H-benzotriazole", "N-Phenyl urea", "2-Hydroxyquinoline"),

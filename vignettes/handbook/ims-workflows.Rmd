@@ -1,0 +1,62 @@
+# Ion mobility spectrometry (IMS-HRMS) workflows
+
+## Introduction
+
+This chapter describes workflows to process data from Ion Mobility Spectrometry coupled to high resolution mass spectrometry (IMS-HRMS) instruments in `patRoon`. These are simply referred to as _IMS workflows_.
+
+IMS is increasingly used to improve non-target analysis, and has the potential to improve separation of isomeric and isobaric compounds, clean up HRMS data and use the collision cross section (CCS) to improve identification of compounds. `patRoon 3.0` adds IMS support throughout the complete workflow and data processing functionality to take advantage of the additional information provided by IMS.
+
+In `patRoon` three types of IMS workflows can be distinguished:
+
+1. **LC-MS workflows with IMS data**: These workflows are like regular (non-IMS) workflows, but work with IMS data.
+2. **Direct mobility assignment**: Feature mobilities are assigned directly during feature detection.
+3. **Post mobility assignment**: Feature mobilities are assigned after finding and grouping features.
+
+The following sections further detail each of these workflows, including the required data and the steps involved.
+
+> **_NOTE_** IMS workflows are considerably more computationally demanding, as the raw IMS data typically contain several orders of magnitude more mass spectra. This is especially apparent during feature detection, but also subsequent steps such as creation of chromatograms and spectra will take up more time and RAM. The direct mobility assignment workflows are generally most demanding.
+
+### LC-MS workflows with IMS data
+
+In this workflow the raw IMS data is 'collapsed' and is converted in such a way it looks like 'regular' LC-MS data. This is achieved by summing up the mass spectra in each IMS frame and subsequently replacing the IMS frames by the combined spectra. The workflow then proceeds as a regular LC-MS workflow. Hence, this type of workflow does not bring any of the benefits of IMS data, but allows full compatibility with software tools that do not support IMS data. Furthermore, this type of workflow is much less computationally intensive, which makes it suitable for e.g. initial exploration of data.
+
+### Direct mobility assignment
+
+This workflow relies on a feature detection algorithm that separates features by ion mobility and assigns the feature mobilities directly during feature detection. In `patRoon` this is currently only supported by the `piek` algorithm or by [importing feature data from other algorithms]. None of the feature grouping algorithms currently interfaced by `patRoon` support IMS data. To circumvent this, features with close mobilities are first clustered and then any of the non-IMS algorithms is used to perform sample analysis grouping with each cluster. The grouping results for each cluster are then combined to obtain the final feature groups. Most of the remaining workflow is the same as non-IMS workflows. However, it typically adds steps to calculate CCS values for features and matches these with (predicted) CCS values of suspects and/or compound annotation candidates. Furthermore, the IMS data is internally used to cleanup extracted ion chromatograms and mass spectra, which can improve their visualization and quality of feature annotation.
+
+### Post mobility assignment
+
+Post mobility assignment workflows can be considered as a hybrid approach to the two previous workflow types: the workflow starts with feature detection and grouping as in a regular LC-MS workflow, followed by assigning IMS data to features and then proceeding much like the direct mobility assignment workflow.
+
+The mobility assignment consists of the following steps:
+
+1. Feature detection and grouping is performed with classical algorithms like regular LC-MS workflows.
+2. Extracted ion mobilograms are generated for each feature and automatic peak detection is used to detect mobilities.
+3. Each of the detected mobilities for a feature are used to generate a new set of _mobility features_. These features inherit their properties from the original features, which are referred to as _IMS parents_. A link is formed between the mobility features and the IMS parent.
+4. The mobility feature data such as retention time and range is updated from mobility filtered extracted ion chromatograms. Any features that could not be detected from the filtered data are removed.
+5. The feature groups are updated with IMS data and similar links between _mobility feature groups_ and _IMS parents_ are formed.
+
+All these steps are automatically performed by the `assignMobilities()` method function that will be discussed later.
+
+An advantage of post mobility workflows is the compatibility with any of the feature detection and grouping algorithms supported in `patRoon`. In addition, post assignment is often less computationally intensive than direct mobility assignment workflows. Furthermore, the links between mobility features and IMS parents facilitate the recognition of possible protomers (i.e. redundant features of a same compound with the same retention time and _m/z_ but different mobility) and enables the use of [sets workflows](#setsWorkflow). Finally, post mobility assignment workflows can selectively fallback to 'regular' LC-MS feature data from the IMS parents in steps where this makes more sense, this will be discussed later. Potential disadvantages of post mobility assignment workflows are the reliance on raw data that is with and without IMS dimesnion, and the mobility assignment typically relies on two steps of peak detection (steps 2 and 4) which may fail with e.g. low intensity data. Nevertheless, this type of workflow is usually recommended for most IMS data processing projects.
+
+### Summary
+
+The following table summarizes the differences between the three IMS workflows:
+
+|                               | LC-MS with IMS data | Direct mobility assignment | Post mobility assignment
+------------------------------- | ------------------- | -------------------------- | --------------------------
+Raw data requirements^1^        | IMS collapsed       | Raw IMS data               | IMS and IMS collapsed raw data
+Feature detection               | Regular non-IMS     | Utilizes IMS separation    | Regular non-IMS
+Feature grouping                | Regular non-IMS     | Regular non-IMS with IMS clustering | Regular non-IMS
+Feature mobility assignment     | No                  | During feature detection   | After feature grouping
+Feature CCS assignment          | No                  | Yes                        | Yes
+Mobility/IMS parent links       | No                  | No                         | Yes
+Suspect & compound CCS matching | No                  | Yes                        | Yes
+HRMS cleanup                    | No                  | Yes                        | Yes
+non-IMS feature fallback        | -                   | No                         | Yes
+Supports [sets workflows](#setsWorkflow) | Yes        | No                         | Yes
+
+Notes:
+
+1. If the `piek` feature detection algorithm is used then (only) IMS raw data may suffice, see [more info here].

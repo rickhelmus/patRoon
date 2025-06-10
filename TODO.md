@@ -288,16 +288,31 @@
                 - add supported file formats and/or link to msdata
             - estIDLevels
                 - update thresholds when we change these
-    - processing
     - IMS chapter
-        - before/after sets?
+        - put before/after sets?
+        - intro
+            - 3 workflows: none, direct, post
+            - fill in link to feature import
+            - table
+                - add more rows, eg for componentization and sets support?
+                    - now included sets
+                - add more notes?
+                - fill in link for piek not needing centroided data
+        - file formats and conversion
+            - none needs centroid
+            - direct just ims
+            - post needs ims and centroid
         - workflows
-            - direct and post
-            - piek examples for both
+            - refer to newProject
+            - piek examples for direct and post
+            - suspect screening
+                - order, mobility filtering CCS prediction
             - componentization: order and eg adducts not supported
             - annotation
                 - MSPL averaging params?
+                - mobility/CCS prediction
                 - minMobSpecSim
+            - discuss sets?
         - processing
             - features
                 - mention somewhere that IMS="maybe" for e.g. plotting

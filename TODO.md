@@ -154,8 +154,10 @@
 - feat EICs
     - tweak default EIC filtering params, more strict for binning?
         - current defaults way to strict for patRoonData neg samples (for filtering of EICs _and_ peaks)
+    - mob range: doc that defaults are for TIMS? Or just not give any defaults? Give instrument? Put it in limits?
 - group IMS
     - (force) disable RT align and group fractions?
+        - if not add in docs and Direct IMS workflows feature section in Handbook
     - support CCS columns?
         - no assignMobilities() method yet, but CCS column can be present from fGroups method
         - otherwise doc!
@@ -299,12 +301,13 @@
                 - add more notes?
                 - fill in link for piek not needing centroided data
         - file formats and conversion
-            - none needs centroid
-            - direct just ims
-            - post needs ims and centroid
+            - fill in link to msdata or similar that explains that TIMS data can be used directly
         - workflows
-            - refer to newProject
-            - piek examples for direct and post
+            - refer to newProject --> where?
+            - features
+                - fill in link to importing features
+                - fill in links to piek
+                - verify if piek info is up-to-date and aligned once the rest of the docs are there
             - suspect screening
                 - order, mobility filtering CCS prediction
             - componentization: order and eg adducts not supported

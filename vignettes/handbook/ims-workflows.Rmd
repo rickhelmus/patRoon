@@ -20,7 +20,7 @@ The following sections further detail each of these workflows, including the req
 
 In this workflow the raw IMS data is 'collapsed' and is converted in such a way it looks like 'regular' LC-MS data. This is achieved by summing up the mass spectra in each IMS frame and subsequently replacing the IMS frames by the combined spectra. The workflow then proceeds as a regular LC-MS workflow. Hence, this type of workflow does not bring any of the benefits of IMS data, but allows full compatibility with software tools that do not support IMS data. Furthermore, this type of workflow is much less computationally intensive, which makes it suitable for e.g. initial exploration of data.
 
-### Direct mobility assignment
+### Direct mobility assignment {#directIMS}
 
 This workflow relies on a feature detection algorithm that separates features by ion mobility and assigns the feature mobilities directly during feature detection. In `patRoon` this is currently only supported by the `piek` algorithm or by [importing feature data from other algorithms]. None of the feature grouping algorithms currently interfaced by `patRoon` support IMS data. To circumvent this, features with close mobilities are first clustered and then any of the non-IMS algorithms is used to perform sample analysis grouping with each cluster. The grouping results for each cluster are then combined to obtain the final feature groups. Most of the remaining workflow is the same as non-IMS workflows. However, it typically adds steps to calculate CCS values for features and matches these with (predicted) CCS values of suspects and/or compound annotation candidates. Furthermore, the IMS data is internally used to cleanup extracted ion chromatograms and mass spectra, which can improve their visualization and quality of feature annotation.
 
@@ -60,3 +60,53 @@ Supports [sets workflows](#setsWorkflow) | Yes        | No                      
 Notes:
 
 1. If the `piek` feature detection algorithm is used then (only) IMS raw data may suffice, see [more info here].
+
+## Performing IMS workflows
+
+### Raw data
+
+The [data conversion and pre-treatment](#pre-treat) section already discussed how raw data can be converted to make it suitable for processing. For the workflows that require raw data that has IMS data (see the Table of the previous section) there are two options:
+
+1. Use the raw instrument directly. This is currently only supported for Bruker TIMS data, see [details here].
+2. Convert the data to the `ims` type in the `mzML` file format, e.g. by using `convertMSFiles()` ([explained here](#pre-treat)).
+
+If IMS collapsed data is needed (see the Table of the previous section) then raw data of the type `raw` or `ims` should be converted to the type `centroid`.
+
+The [data conversion and pre-treatment](#pre-treat) section includes some examples on how to do these conversion steps.
+
+### Feature detection and grouping in direct mobility assignment workflows
+
+In direct IMS workflows the feature detection needs to be aware of the IMS dimension. In `patRoon` this is currently only supported by the `piek` algorithm. Alternatively, feature data from another IMS aware feature detection [can also be imported].
+
+The `piek` algorithm was already [discussed before]. In IMS workflows the `methodIMS` parameter should additionally be configured, and influences the formation of extracted ion chromatograms (EICs) similarly as the `methodMZ` parameter. Like `methodMZ`, it should be set to `"bins"`, `"suspects"` or `"ms2"`. The following combinations of `methodMZ` and `methodIMS` are supported:
+
+`methodMZ`   | `methodIMS`  | EIC formation
+------------ | ------------ | -----------------------------------------------------------------------
+`"bins"`     | `"bins"`     | from two dimensional _m/z_ and ion mobility bins.
+`"suspects"` | `"suspects"` | from HRMS and IMS data in a suspect list.
+`"suspects"` | `"bins"`     | from suspect HRMS data that is expanded with IMS bins.
+`"ms2"`      | `"ms2"`      | from the HRMS and IMS data of the precursors detected in Bruker DDA-PASEF MS2 experiments.
+`"ms2"`      | `"bins"`     | from the HRMS data of the precursors detected in Bruker DDA-PASEF MS2 experiments that is expanded with IMS bins.
+
+Some examples are given below:
+
+```{r eval=FALSE}
+# comprehensive feature detection from 2 dimensional bins
+fParams <- getPiekParams(methodMZ = "bins", methodIMS = "bins", mzRange = c(100, 300), mobRange = c(0.5, 1.5))
+pParams <- getDefPeakParams("chrom", "piek")
+fList <- findFeatures(anaInfo, "piek", featParams = fParams, peakParams = pParams)
+
+# use PASEF MS2 data to detect features
+fParams <- getPiekParams(methodMZ = "ms2", methodIMS = "ms2", minTIC = 1000)
+fList <- findFeatures(anaInfo, "piek", featParams = fParams, peakParams = pParams)
+
+# combine suspect data with IMS bins (e.g. if suspect list doesn't contain IMS data)
+fParams <- getPiekParams(methodMZ = "suspects", methodIMS = "bins", mobRange = c(0.5, 1.5))
+fList <- findFeatures(anaInfo, "piek", featParams = fParams, peakParams = pParams,
+                      suspects = suspList, adduct = "[M+H]+")
+```
+
+> **_NOTE_** when both `methodMZ` and `methodIMS` are set to `"bins"` then peak detection will need to cover a very large number of EICs, which can be be quite computationally intensive. Tweaking the EIC filtering parameters can improve the situation, see `?getPiekParams` for more details.
+
+The grouping of features is performed with `groupFeatures()` as in non-IMS workflows. This automatically perform the necessary IMS clustering and grouping steps ([discussed here](#directIMS)).
+

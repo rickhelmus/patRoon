@@ -48,17 +48,6 @@ if (runData)
     fGroupsNorm <- normInts(fGroupsNorm, featNorm = "istd", standards = patRoonData::ISTDListPos, adduct = "[M+H]+",
                             ISTDRTWindow = 20, ISTDMZWindow = 200, minISTDs = 2)
                                         
-    anaInfoConc <- generateAnalysisInfo(fromCentroid = patRoonData::exampleDataPath(),
-                                        replicate = c(rep("solvent", 3), rep("standard", 3)),
-                                        blank = "solvent",
-                                        conc = c(NA, NA, NA, 1, 2, 3))
-    fListConc <- getFeats(anaInfoConc)
-    fGroupsConc <- groupFeatures(fListConc, "openms")
-    fGroupsConc <- filter(fGroupsConc, preAbsMinIntensity = 100, absMinIntensity = 10000,
-                          relMinReplicateAbundance = 1, maxReplicateIntRSD = 0.75,
-                          blankThreshold = 5, removeBlanks = TRUE,
-                          retentionRange = c(120, Inf), mzRange = NULL)
-    
     fGroupsAnn <- screenSuspects(fGroups, patRoonData::suspectsPos[patRoonData::suspectsPos$name %in%
                                                                        c("1H-benzotriazole", "N-Phenyl urea",
                                                                          "2-Hydroxyquinoline", "DEET"), ],

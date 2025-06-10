@@ -320,9 +320,6 @@
     - Advanced
         - Feature intensity normalization: IMS notes
         - Exporting and converting feature data: mention IMS limitations?
-        - Update Feature regression analysis
-            - also plotInt()
-            - mention that in sets workflow, regressionBy column can be set to set unique names (eg UV-pos)
         - pred: update for IMS for calibration
         - section on msdata? otherwise refer to ?msdata somewhere in prep?
             - refer to something in multithread section

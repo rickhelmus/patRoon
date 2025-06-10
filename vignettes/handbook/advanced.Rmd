@@ -545,38 +545,53 @@ For a complete overview see the reference manual (`?compoundsCluster`).
 
 ## Feature regression analysis
 
-Some basic support in `patRoon` is available to perform simple linear regression on feature intensities vs given experimental conditions. Examples of such conditions are dilution factor, sampling time or initial concentration of a parent in a degradation experiment. By testing if there is a significant linearity, features of interest can be isolated in a relative easy way. Originally, this functionality was implemented as a very basic method to perform rough calculations of concentrations. However, the next sections describes a much better way by using the `MS2Quant` package. Regardless, this functionality still uses 'concentrations' as terminology for the experimental conditions of interest. The conditions are specified in the `conc` column of the [analysis information](#anaInfo), for instance:
+Basic support in `patRoon` is available to perform simple linear regression (using `y=ax+b` with `a` the slope `b` the intercept) on feature intensities vs given x values. The x values typically are experimental conditions such as sampling time or initial concentration of a parent in a degradation experiment. The linearity could then be used as a way to prioritize features (as performed in @Helmus2025). Originally, this functionality was implemented as a very basic method to perform rough calculations of concentrations. However, the next section describes a much better way by using the `MS2Quant` package.
 
-```{r quantAnaInfo,eval=FALSE}
-# obtain analysis information as usual, but add some experimental parameters of interest (dilution, time etc).
-# The blanks are set to NA, whereas the standards are set to increasing levels.
-anaInfo <- generateAnalysisInfo(paths = patRoonData::exampleDataPath(),
-                                groups = c(rep("solvent", 3), rep("standard", 3)),
-                                blanks = "solvent",
-                                concs = c(NA, NA, NA, 1, 2, 3))
+The x-values should be specified as metadata in the [analysis information](#anaInfo), for instance:
+
+```{r anaInfoRegr,eval=runData}
+# create analysis information: for demonstrative purposes we just base it on the example data
+anaInfoRegr <- anaInfo
+anaInfoRegr$experiment <- c("UV", "UV", "UV", "H2O2", "H2O2", "H2O2")
+anaInfoRegr$exposure <- c(0, 30, 60, 0, 30, 60) # time in minutes
+anaInfoRegr[, c("analysis", "experiment", "exposure")]
 ```
 
-If no experimental conditions are available for a particular analysis then the `conc` value should be `NA`. For these analyses the experimental condition will be calculated using the regression model obtained from the other analyses.
+The x-values can be set to `NA` in case no experimental conditions are available; the regression properties will be calculated from all non-`NA` data.
 
 The `as.data.table()` function (or `as.data.frame()`) can then be used to calculate regression data:
 
-```{r quantDT,eval=FALSE}
-# use areas for quantitation and make sure that feature data is reported
+```{r fGroupsRegr,eval=runData,include=FALSE}
+fGroupsRegr <- fGroupsRep
+analysisInfo(fGroupsRegr) <- anaInfoRegr
+```
+
+```{r ADTRegr,eval=runData}
+# use areas for regression calculation and make sure that feature data is reported
+# the exposure metadata is used as x values, the experiment metadata is used to calculate the regression for analyses groups
 # (only relevant columns are shown for clarity)
-as.data.table(fGroups, areas = TRUE, features = TRUE, regression = TRUE)
+as.data.table(fGroupsRegr, areas = TRUE, features = TRUE,
+              regression = "exposure", regressionBy = "experiment")[, .(analysis, group, x_reg, RSQ, intercept, slope, p)]
 ```
 
-```{r quantDTDo,echo=FALSE,eval=runData}
-as.data.table(fGroupsConc, areas = TRUE, features = TRUE, regression = TRUE)[, c("group", "RSQ", "intercept", "slope", "x_reg")]
+The `regressionBy` argument in the above example is set to ensure that regression is calculated for each experiment separately. In [sets workflows](#setsWorkflow) you can set `regressionBy="set"` to perform the calculations per set. The `regressionBy` argument can be omitted if the regression should be calculated for all analyses together. The `x_reg` output column stores the x values calculated by the regression model (only present if `features=TRUE`). Other regression properties such as the `RSQ`, `slope` and `p` can be used as a basic trend analysis for prioritization:
+
+```{r prioRegr,eval=runData}
+fGroupsTab <- as.data.table(fGroupsRegr, areas = TRUE, features = TRUE,
+                            regression = "exposure", regressionBy = "experiment")
+# subset features that appear to increase in intensity with longer UV exposure
+increasingFGroups <- fGroupsRegr[, fGroupsTab[RSQ >= 0.8 & p < 0.05 & slope > 0, group]]
 ```
 
-The calculated experimental conditions are stored in the `conc_reg` column (this column is only present if `features=TRUE`). In addition, the table also contains other regression data such as `RSQ`, `intercept` and `slope`. To perform basic trend analysis the `RSQ` (i.e. R squared) can be used:
+The `plotInt()` function can also work with regression data and is helpful for visualization purposes.
 
-```{r quantRSQ,eval=FALSE}
-fGroupsTab <- as.data.table(fGroups, areas = TRUE, features = FALSE, regression = TRUE)
-# subset fGroups with reasonable correlation
-increasingFGroups <- fGroups[, fGroupsTab[RSQ >= 0.8, group]]
+```{r plotRegr,eval=runData}
+# plot regression for a specific feature group
+plotInt(fGroupsRegr[, 13], areas = TRUE, regression = TRUE, xBy = "exposure",
+        groupBy = "experiment", showLegend = TRUE)
 ```
+
+For more details, see the reference manual for the feature groups methods for `as.data.table()` and `plotInt()` (`?as.data.table` and `?plotInt`).
 
 ## Predicting toxicities and concentrations (MS2Tox and MS2Quant integration) {#pred}
 

@@ -295,6 +295,7 @@
         - intro
             - 3 workflows: none, direct, post
             - fill in link to feature import
+            - make sure to update step numbers of post assignment throughout the chapter if this is changed
             - table
                 - add more rows, eg for componentization and sets support?
                     - now included sets
@@ -304,18 +305,26 @@
             - fill in link to msdata or similar that explains that TIMS data can be used directly
         - workflows
             - refer to newProject --> where?
+            - see which knitr chunks to enable for execution
             - features
                 - fill in link to importing features
                 - fill in links to piek
                 - verify if piek info is up-to-date and aligned once the rest of the docs are there
+            - assignMobilities
+                - add link for in-between steps (filtering, componentization)?
+                - fill in link for suspect screening
+                - discuss fromSuspects arg for suspect screening workflows
+                - refer to ref docs
+            - add CCS prediction before susp screening
             - suspect screening
-                - order, mobility filtering CCS prediction
+                - order, mobility filtering CCS prediction, discuss assignMobilities to some extend here?
             - componentization: order and eg adducts not supported
             - annotation
                 - MSPL averaging params?
                 - mobility/CCS prediction
                 - minMobSpecSim
             - discuss sets?
+            - example workflows (direct, post)
         - processing
             - features
                 - mention somewhere that IMS="maybe" for e.g. plotting

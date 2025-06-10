@@ -24,7 +24,7 @@ In this workflow the raw IMS data is 'collapsed' and is converted in such a way 
 
 This workflow relies on a feature detection algorithm that separates features by ion mobility and assigns the feature mobilities directly during feature detection. In `patRoon` this is currently only supported by the `piek` algorithm or by [importing feature data from other algorithms]. None of the feature grouping algorithms currently interfaced by `patRoon` support IMS data. To circumvent this, features with close mobilities are first clustered and then any of the non-IMS algorithms is used to perform sample analysis grouping with each cluster. The grouping results for each cluster are then combined to obtain the final feature groups. Most of the remaining workflow is the same as non-IMS workflows. However, it typically adds steps to calculate CCS values for features and matches these with (predicted) CCS values of suspects and/or compound annotation candidates. Furthermore, the IMS data is internally used to cleanup extracted ion chromatograms and mass spectra, which can improve their visualization and quality of feature annotation.
 
-### Post mobility assignment
+### Post mobility assignment {#postIMS}
 
 Post mobility assignment workflows can be considered as a hybrid approach to the two previous workflow types: the workflow starts with feature detection and grouping as in a regular LC-MS workflow, followed by assigning IMS data to features and then proceeding much like the direct mobility assignment workflow.
 
@@ -90,7 +90,7 @@ The `piek` algorithm was already [discussed before]. In IMS workflows the `metho
 
 Some examples are given below:
 
-```{r eval=FALSE}
+```{r exDirectMob, eval=FALSE}
 # comprehensive feature detection from 2 dimensional bins
 fParams <- getPiekParams(methodMZ = "bins", methodIMS = "bins", mzRange = c(100, 300), mobRange = c(0.5, 1.5))
 pParams <- getDefPeakParams("chrom", "piek")
@@ -110,3 +110,104 @@ fList <- findFeatures(anaInfo, "piek", featParams = fParams, peakParams = pParam
 
 The grouping of features is performed with `groupFeatures()` as in non-IMS workflows. This automatically perform the necessary IMS clustering and grouping steps ([discussed here](#directIMS)).
 
+### Post mobility assignment with `assignMobilities()` {#assignMobFeat}
+
+The `assignMobilities()` method function is used to assign mobilities to features and feature groups in post mobility assignment workflows. It is executed after executing `groupFeatures()`, with often some intermediate steps (e.g. filtering, componentization) steps in-between (discussed later). A single call to `assignMobilities()` will perform all [the steps that were introduced before](#postIMS), and includes some additional functionality for suspect screening workflows ([discussed later]). The most important function arguments are:
+
+Argument                 | Description
+------------------------ | ------------------------------------------------
+`mobPeaksParams`, `chromPeaksParams` | Parameters for the peak detection in mobilograms and chromatograms, respectively. See `getDefPeakParams()` for more details.
+`EIMParams`, `EICParams` | Parameters for the extraction of ion mobilograms (EIMs) and chromatograms (EICs), respectively. See `getDefEIMParams()` and `getDefEICParams()` for more details.
+`fallbackEIC`            | Set to `TRUE` to use the raw EIC data to update properties of mobility features, in case peak detection in mobility filtered EICs failed ([steps 3-4](#postIMS)).
+
+Some examples of how to use `assignMobilities()` are given below:
+
+```{r exPostMob, eval=FALSE}
+fGroups <- assignMobilities(fGroups, mobPeaksParams = getDefPeakParams("bruker_ims", "piek"),
+                            chromPeaksParams = getDefPeakParams("chrom", "piek"))
+
+# customized peak detection
+fGroups <- assignMobilities(fGroups, mobPeaksParams = getDefPeakParams("agilent_ims", "xcms3", peakwidth = c(0.2, 3)),
+                            chromPeaksParams = getDefPeakParams("chrom", "openms", gaussWidth = 20))
+```
+
+### Suspect screening
+
+[Suspect screening](#suspscr) in IMS workflows is mostly the same as in non-IMS workflows. However, the suspect list can be extended with IMS properties to improve suspect matching, and performing the screening step is slightly different.
+
+#### Suspect list
+
+The suspect list can contain the following additional columns (all optional):
+
+* `mobility`: The mobility of the suspect.
+* `CCS`: The collision cross section (CCS) of the suspect.
+* `mobility_<adduct>`, `CCS_<adduct>`: The mobility and CCS of the suspect for a specific adduct. The `<adduct>` should be replaced with the adduct name, e.g. `mobility_[H+Na]+` or `CCS_[M-H]-`.
+
+Multiple suspect reference values can specified in each of the columns by separating them with a semicolon (`;`). If data for both the adduct and non-adduct specific columns is available (and not `NA`), then the latter gets precedence. It is recommended to include the adduct specific data whenever possible. During the suspect screening step to correct data is automatically chosen based on the adduct assigned to the feature (or assigned to the `adduct` function argument).
+
+#### Prediction of mobility and CCS data
+
+The `assignMobilities()` function that [was discussed before](#assignMobFeat) also has a method specifically for suspect lists. It can be used for the prediction (or library matching) of IMS data for suspects and convert CCS values to mobilities (or vice versa). The common function arguments include:
+
+Function argument | Description
+----------------- | ---------------------------------------------------------------
+`from`            | Specifies from where IMS data is added. See below for more details.
+`adducts`         | Specifies for which adducts IMS data is added or converted. A `character` vector with multiple values is allowed. Include `NA` to also consider the usage of non-adduct specific data. Any adducts specified in the suspect list (`adduct` column) are always considered.
+`CCSParams`       | Parameters for the mobility <--> CCS conversions. See the previous section for more details.
+`overwrite`       | Set to `TRUE` to overwrite any existing IMS data in the suspect list.
+
+The following options exist for the `from` function argument:
+
+* `from=NULL` (default): No IMS data is added.
+* `from="pubchemlite"`: IMS data is matched from the [PubChemLite database with CCS][PCLiteCCS-dl] data. See the [Installation chapter](#Installation) for details on how to install the database.
+* `from="c3sdb"`: Uses [C3SDB] to predict CCS values for suspects. See the [Installation chapter](#Installation) for installation details.
+* a `data.table` or `data.frame`: A custom library with IMS data.
+
+Some examples:
+
+```{r assignMobSusps, eval=FALSE}
+# adds CCS values from PubChemLite and converts them to mobilities
+suspList <- assignMobilities(suspList, from = "pubchemlite", adducts = c("[M+H]+", "[M+Na]+", "[M+H]-"),
+                             CCSParams = getCCSParams("bruker"))
+
+# adds (non-adduct specific) CCS values from custom library
+IMSLib <- data.frame(
+    name = c("Caffeine", "Acetaminophen"), # name column is not mandatory
+    InChIKey = c("RYYVLZVUVIJVGH-UHFFFAOYSA-N", "RZVAJINKPMORJF-UHFFFAOYSA-N"),
+    CCS = c(150, 160)
+))
+suspList <- assignMobilities(suspList, from = IMSLib, adducts = NA)
+```
+
+#### Performing suspect screening
+
+The `screenSuspects()` method function [introduced before](#suspscr) is also used to perform the suspect screening in IMS workflows. The `IMSMatchParams` argument configures how IMS data is used to match suspects and features. See `?getIMSMatchParams` and the examples below for more details.
+
+In post mobility assignment workflows, it is possible to perform the suspect screening _before_ `assignMobilities()` is executed to assign the feature mobilities. In this case the `IMSMatchParams` argument can also be passed to `assignMobilities()` to filter out any suspect hits with deviating IMS data after feature mobilities have been assigned. This may be useful to e.g. first prioritize features with suspect screening and other steps before assigning mobilities to the remaining features.
+
+Some examples are shown below:
+
+```{r screenIMS,eval=FALSE}
+# suspList is a suspect list with CCS and mobility data (see previous subsections)
+
+# screen with default CCS matching parameters
+fGroupsScr <- screenSuspects(fGroups, suspects = suspList, adduct = "[M+H]+",
+                             IMSMatchParams = getIMSMatchParams("CCS"))
+
+# match suspects on mobility with a +/- 0.1 tolerance
+fGroupsScr <- screenSuspects(fGroups, suspects = suspList, adduct = "[M+H]+",
+                             IMSMatchParams = getIMSMatchParams("mobility", window = 0.1))
+
+# match suspects on CCS with a +/- 6% tolerance
+fGroupsScr <- screenSuspects(fGroups, suspects = suspList, adduct = "[M+H]+",
+                             IMSMatchParams = getIMSMatchParams("CCS", window = 0.06, relative = TRUE))
+
+# post mobility assignment workflow with prior suspect screening
+# regular non-IMS suspect screening
+fGroupsScr <- screenSuspects(fGroups, suspects = suspList, adduct = "[M+H]+", onlyHits = TRUE)
+# ... do other things such as more feature prioritization
+# ... and assign mobilities to the remaining features, match already screened suspects by CCS
+fGroupsScr <- assignMobilities(fGroupsScr, mobPeaksParams = getDefPeakParams("bruker_ims", "piek"),
+                               chromPeaksParams = getDefPeakParams("chrom", "piek"),
+                               IMSMatchParams = getIMSMatchParams("CCS"))
+```

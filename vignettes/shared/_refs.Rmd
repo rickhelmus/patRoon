@@ -25,6 +25,7 @@
 [PCLite-dl]: https://zenodo.org/record/6503754
 [PCLite-paper]: https://doi.org/10.1186/s13321-021-00489-0
 [PC-PFAS]: https://zenodo.org/record/6385954
+[PCLiteCCS-dl]: https://zenodo.org/records/15311000
 [csvDB-ex]: https://raw.githubusercontent.com/rickhelmus/patRoon/master/tests/testthat/test_data/test-mf-db-isomers.csv
 [SIRIUS]: https://bio.informatik.uni-jena.de/software/sirius/
 [CSI:FingerID]: https://www.csi-fingerid.uni-jena.de/
@@ -74,3 +75,4 @@
 [MS2Quant]: https://github.com/kruvelab/MS2Quant
 [OpenMP]: https://www.openmp.org/
 [TIMSCONVERT]: https://gtluu.github.io/timsconvert/
+[C3SDB]: https://github.com/dylanhross/c3sdb

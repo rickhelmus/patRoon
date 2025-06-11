@@ -175,7 +175,7 @@ if (verifyWithIPO)
     IPOParamsFeat <- sapply(IPOParamsFeat, function(p) if (is.numeric(p) && length(p) == 2) mean(p) else p,
                             simplify = FALSE)
     IPOParamsFeat$min_peakwidth <- c(4, 12)
-    IPOResultFeat <- IPO::optimizeXcmsSet(paste0(file.path(anaInfo$path, anaInfo$analysis), ".mzML"),
+    IPOResultFeat <- IPO::optimizeXcmsSet(paste0(file.path(anaInfo$path_centroid, anaInfo$analysis), ".mzML"),
                                           IPOParamsFeat, nSlaves = 1, plot = FALSE)
     IPOOptParamsFeat <- IPOResultFeat$best_settings$parameters
     # modify output parameter format a bit so that it matches ours...

@@ -136,10 +136,10 @@ setDAMethod <- function(anaInfo, method, close = TRUE)
         printf("Setting DA method of analysis '%s' to %s (%d/%d)...\n", anaInfo$analysis[i], method, i, nrow(anaInfo))
 
         # HACK: need to close file (if open) otherwise method is not applied
-        ind <- getDAFileIndex(DA, anaInfo$analysis[i], anaInfo$path[i], openFileIfClosed = FALSE)
+        ind <- getDAFileIndex(DA, anaInfo$analysis[i], anaInfo$path_raw[i], openFileIfClosed = FALSE)
         closeSaveDAFile(DA, ind, TRUE, TRUE)
 
-        ind <- getDAFileIndex(DA, anaInfo$analysis[i], anaInfo$path[i])
+        ind <- getDAFileIndex(DA, anaInfo$analysis[i], anaInfo$path_raw[i])
         if (ind == -1)
             next
         DA[["Analyses"]][[ind]]$LoadMethod(method)
@@ -167,7 +167,7 @@ revertDAAnalyses <- function(anaInfo, close = TRUE, save = close)
     {
         printf("Reverting DA analysis '%s' (%d/%d)...\n", anaInfo$analysis[i], i, nrow(anaInfo))
 
-        ind <- getDAFileIndex(DA, anaInfo$analysis[i], anaInfo$path[i])
+        ind <- getDAFileIndex(DA, anaInfo$analysis[i], anaInfo$path_raw[i])
         if (ind == -1)
             next
         DA[["Analyses"]][[ind]]$LoadRawData()
@@ -197,7 +197,7 @@ recalibrarateDAFiles <- function(anaInfo, close = TRUE, save = close)
     {
         printf("Recalibrating analysis '%s' (%d/%d)... ", anaInfo$analysis[i], i, nrow(anaInfo))
 
-        ind <- getDAFileIndex(DA, anaInfo$analysis[i], anaInfo$path[i])
+        ind <- getDAFileIndex(DA, anaInfo$analysis[i], anaInfo$path_raw[i])
         if (ind == -1 || !DA[["Analyses"]][[ind]]$RecalibrateAutomatically())
         {
             warning(sprintf("Failed to calibrate analysis '%s'", anaInfo$analysis[i]))
@@ -236,7 +236,7 @@ getDACalibrationError <- function(anaInfo)
     {
         printf("Getting error of analysis '%s' (%d/%d): ", anaInfo$analysis[i], i, nrow(anaInfo))
 
-        ind <- getDAFileIndex(DA, anaInfo$analysis[i], anaInfo$path[i])
+        ind <- getDAFileIndex(DA, anaInfo$analysis[i], anaInfo$path_raw[i])
         if (ind == -1)
         {
             warning(sprintf("Failed to open analysis '%s'", anaInfo$analysis[i]))
@@ -402,7 +402,7 @@ addAllDAEICs <- function(fGroups, mzWindow = defaultLim("mz", "medium"), ctype =
 
         if (length(grpsInAna) > 0)
         {
-            ind <- getDAFileIndex(DA, anaInfo$analysis[anai], anaInfo$path[anai])
+            ind <- getDAFileIndex(DA, anaInfo$analysis[anai], anaInfo$path_raw[anai])
             if (ind != -1)
             {
                 eics <- sapply(grpsInAna, function(grpi)

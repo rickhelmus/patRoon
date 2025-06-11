@@ -83,7 +83,7 @@ setMethod("generateMSPeakListsDA", "featureGroups", function(fGroups, bgsubtr = 
             return(NULL)
 
         anaGNames <- names(anaFTInds)
-        DAFind <- getDAFileIndex(DA, ana, anaInfo$path[anai])
+        DAFind <- getDAFileIndex(DA, ana, anaInfo$path_raw[anai])
 
         setHash <- makeHash(baseHash, ana) # UNDONE
         cachedSet <- loadCacheSet("MSPeakListsDA", setHash, cacheDB)
@@ -108,7 +108,7 @@ setMethod("generateMSPeakListsDA", "featureGroups", function(fGroups, bgsubtr = 
             featInfo <- rbindlist(lapply(uncachedFTInds, function(fti) fTable[[ana]][fti]),
                                   idcol = "group")
 
-            DAEICs <- generateDAEICsForPeakLists(DA, ana, anaInfo$path[anai], bgsubtr, MSMSType,
+            DAEICs <- generateDAEICsForPeakLists(DA, ana, anaInfo$path_raw[anai], bgsubtr, MSMSType,
                                                  uncachedGNames, featInfo, DAFind)
 
             DASpecs <- generateDASpecsForPeakLists(DA, maxMSRtWindow, MSMSType, uncachedGNames, featInfo,
@@ -222,11 +222,11 @@ setMethod("generateMSPeakListsDAFMF", "featureGroups", function(fGroups, minMSIn
     {
         ana <- anaInfo$analysis[anai]
 
-        setHash <- makeHash(ana, anaInfo$path[anai])
+        setHash <- makeHash(ana, anaInfo$path_raw[anai])
         cachedSet <- loadCacheSet("MSPeakListsDAFMF", setHash, cacheDB)
         resultHashes <- vector("character", gcount)
 
-        findDA <- getDAFileIndex(DA, ana, anaInfo$path[anai])
+        findDA <- getDAFileIndex(DA, ana, anaInfo$path_raw[anai])
         checkDAFMFCompounds(DA, fTable[[ana]], findDA, TRUE)
 
         cmpds <- DA[["Analyses"]][[findDA]][["Compounds"]]

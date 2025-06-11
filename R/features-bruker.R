@@ -66,7 +66,7 @@ findFeaturesBruker <- function(analysisInfo, doFMF = "auto", startRange = 0, end
     hideDAInScope()
 
     ret@features = sapply(seq_len(nrow(analysisInfo)),
-                          function(i) getDAFeatures(DA, analysisInfo$analysis[i], analysisInfo$path[i], doFMF,
+                          function(i) getDAFeatures(DA, analysisInfo$analysis[i], analysisInfo$path_raw[i], doFMF,
                                                     startRange, endRange, close, save, verbose), simplify = FALSE)
     names(ret@features) <- analysisInfo$analysis
 

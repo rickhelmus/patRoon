@@ -114,7 +114,7 @@ setMethod("generateFormulasDA", "featureGroups", function(fGroups, MSPeakLists,
     for (anai in seq_len(nrow(anaInfo)))
     {
         ana <- anaInfo$analysis[anai]
-        DAAnaInd <- getDAFileIndex(DA, ana, anaInfo$path[anai])
+        DAAnaInd <- getDAFileIndex(DA, ana, anaInfo$path_raw[anai])
         checkDAFMFCompounds(DA, fts[[ana]], DAAnaInd, TRUE)
 
         printf("Loading all formulas from analysis '%s'...\n", ana)

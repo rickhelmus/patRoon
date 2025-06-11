@@ -313,10 +313,7 @@
                 - verify if piek info is up-to-date and aligned once the rest of the docs are there
             - assignMobilities
                 - add link for in-between steps (filtering, componentization)?
-            - annotation
-                - MSPL averaging params?
-                - mobility/CCS prediction
-                - minMobSpecSim
+            - annotation: fill in link for filtering
             - discuss sets?
             - example workflows (direct, post)
         - processing

@@ -171,7 +171,7 @@ fGroups <- assignMobilities(fGroups, mobPeaksParams = getDefPeakParams("bruker_i
                             CCSParams = getCCSParams("bruker"))
 ```
 
-### Suspect screening
+### Suspect screening {#IMSSuspScr}
 
 [Suspect screening](#suspscr) in IMS workflows is mostly the same as in non-IMS workflows. However, the suspect list can be extended with IMS properties to improve suspect matching, and performing the screening step is slightly different.
 
@@ -185,7 +185,7 @@ The suspect list can contain the following additional columns (all optional):
 
 Multiple suspect reference values can specified in each of the columns by separating them with a semicolon (`;`). If data for both the adduct and non-adduct specific columns is available (and not `NA`), then the latter gets precedence. It is recommended to include the adduct specific data whenever possible. During the suspect screening step to correct data is automatically chosen based on the adduct assigned to the feature (or assigned to the `adduct` function argument).
 
-#### Prediction of mobility and CCS data
+#### Prediction of mobility and CCS data {#assignMobSusps}
 
 The `assignMobilities()` function that [was discussed before](#assignMobFeat) also has a method specifically for suspect lists. It can be used for the prediction (or library matching) of IMS data for suspects and convert CCS values to mobilities (or vice versa). The common function arguments include:
 
@@ -306,4 +306,67 @@ fGroups <- assignMobilities(fGroups, mobPeaksParams = getDefPeakParams("bruker_i
                             chromPeaksParams = getDefPeakParams("chrom", "piek"))
 # expand componentization results for mobility features
 components <- expandForIMS(components, fGroups)
+```
+
+### Annotation
+
+IMS workflows bring several advantages to feature annotation. The `generateMSPeakLists()` function automatically filters MS and MS/MS spectra by the mobility range assigned to the feature, which can considerably improve the quality of peak lists. Furthermore, CCS data can be assigned to compound annotation candidates and used to eliminate unlikely candidates.
+
+> **_NOTE_** In post mobility assignment workflows it is important that the `assignMobilities()` method function is called _prior_ to any feature annotation steps in order to take advantage IMS data during feature annotation.
+
+#### MS peak lists
+
+The `generateMSPeakLists()` function automatically filters MS and MS/MS spectra by mobility data assigned to features, and is therefore used similarly like non-IMS workflows. The function supports Bruker PASEF experiments, and can therefore assign _m/z_ and mobility filtered MS/MS data to features. In post mobility assignment workflows, the MS and MS/MS data that will be assigned to IMS parents are based on combined spectra for each IMS frame.
+
+A few additional averaging parameters (assigned to the `avgFeatParams` and `avgMSParams` arguments) are available in IMS workflows. These are discussed in the reference manual (`?getDefAvgPListParams`).
+
+#### Compound annotation
+
+Candidates from compound annotations can be matched with IMS data for features, similarly as was discussed for [candidates from suspect screening](#IMSSuspScr). The `assignMobilities()` method function works similarly to assign IMS data to candidates and perform mobility <--> CCS conversions. The `filter()` method function ([discussed later]) can subsequently be used to eliminate candidates that match poorly with features.
+
+The `assignMobilities()` function has similar arguments as the method for suspect screening:
+
+Function argument | Description
+----------------- | ---------------------------------------------------------------
+`fGroups`         | The feature groups for which the `compounds` were generated.
+`from`            | Specifies from where IMS data is added. See [the suspects section](#assignMobSusps) for more details.
+`adduct`          | Should match the value of the `adduct` argument that was passed to `generateCompounds()`. Set to `NULL` if [adduct annotations are available for features](#incorpAdductIso) or in [sets workflows](#setsWorkflow).
+`CCSParams`       | Parameters for the mobility <--> CCS conversions. See [the previous discussion](#mobCCSConv).
+`overwrite`       | Set to `TRUE` to overwrite any existing IMS data in the candidate list.
+`IMS`             | For which type of features IMS data should be added to the candidates: `FALSE` (only IMS parents), `TRUE` (only mobility features, default), `"both"` (both IMS parents and mobility features) or `"maybe"` (IMS parents if available, otherwise mobility features).
+
+> **_NOTE_** If [MetFrag] with the [PubChemLite database with CCS][PCLiteCCS-dl] is used for compound annotation, then the mobility data is copied from the database and there is no need to set the `from` argument.
+
+Some examples:
+
+```{r exCompIMS, eval=FALSE}
+# generate compound candidates
+compounds <- generateCompounds(fGroups, "metfrag", adduct = "[M+H]+", database = "comptox")
+# perform CCS prediction with C3SDB and convert the values to mobilities
+compounds <- assignMobilities(compounds, fGroups, from = "c3sdb", adduct = "[M+H]+",
+                              CCSParams = getCCSParams("bruker"))
+
+# generate compound candidates
+# NOTE: if PubChemLite with CCS data is installed, then the mobility data is automatically added
+compounds <- generateCompounds(fGroups, "metfrag", adduct = "[M+H]+", database = "pubchemlite")
+# overwrite CCS data from a custom library (candidates not in the library will be untouched)
+IMSLib <- data.frame(
+    name = c("Caffeine", "Acetaminophen"), # name column is not mandatory
+    InChIKey = c("RYYVLZVUVIJVGH-UHFFFAOYSA-N", "RZVAJINKPMORJF-UHFFFAOYSA-N"),
+    CCS = c(150, 160)
+))
+compounds <- assignMobilities(compounds, fGroups, from = IMSLib, adduct = "[M+H]+",
+                              overwrite = TRUE)
+
+```
+
+For more details see the reference manual (`?assignMobilities_comp`).
+
+#### Copying annotation data to mobility features with similar MS/MS data
+
+The number of features in post mobility assignment workflows can be very large, considering that both mobility features and their IMS parents are present. Since formula and compound annotation is largely influenced by MS/MS data, it is possible to skip annotation for mobility features with highly similar MS/MS data as their IMS parent, and copy the annotations from the IMS parent result instead. The `minMobSpecSim` argument to `generateFormulas()` and `generateCompounds()` sets the minimum spectral similarity threshold for when MS/MS data is considered similar.
+
+```{r minMobSpecSim, eval=FALSE}
+# generate formulas: copy IMS parent results when the spectral similarity is at least 0.9
+formulas <- generateFormulas(fGroups, "genform", adduct = "[M+H]+", minMobSpecSim = 0.9)
 ```

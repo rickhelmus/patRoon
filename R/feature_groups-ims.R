@@ -11,7 +11,7 @@ setMethod("initialize", "featureGroupsIMS",
 
 setMethod("groupFeaturesIMS", "features", function(feat, grouper, groupAlgo, ..., IMSWindow, verbose)
 {
-    # UNDONE: doc verbose bahavior
+    # UNDONE: doc verbose behavior
     
     anaInfo <- analysisInfo(feat)
     fTable <- featureTable(feat)

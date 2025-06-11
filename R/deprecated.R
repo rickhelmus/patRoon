@@ -42,7 +42,7 @@ reportHTML <- function(...)
 #' @rdname patRoon-deprecated
 #' @keywords internal
 #' @export
-exportDAFiles <- function(anaInfo, format = "mzML", exportLine = TRUE, outPath = anaInfo$path, overWrite = FALSE)
+exportDAFiles <- function(anaInfo, format = "mzML", exportLine = TRUE, outPath = anaInfo$path_raw, overWrite = FALSE)
 {
     .Deprecated("convertMSFilesAnaInfo")
 
@@ -55,7 +55,7 @@ exportDAFiles <- function(anaInfo, format = "mzML", exportLine = TRUE, outPath =
     checkmate::assertFlag(overWrite, add = ac)
     checkmate::reportAssertions(ac)
 
-    outPath <- rep(outPath, length.out = length(anaInfo$path))
+    outPath <- rep(outPath, length.out = length(anaInfo$path_raw))
 
     expConstant <- if (format == "mzXML") DAConstants$daMzXML else if (format == "mzData") DAConstants$daMzData else DAConstants$daMzML
     expSpecConstant <- if (exportLine) DAConstants$daLine else DAConstants$daProfile
@@ -74,7 +74,7 @@ exportDAFiles <- function(anaInfo, format = "mzML", exportLine = TRUE, outPath =
             next
         }
 
-        ind <- getDAFileIndex(DA, anaInfo$analysis[i], anaInfo$path[i])
+        ind <- getDAFileIndex(DA, anaInfo$analysis[i], anaInfo$path_raw[i])
         if (ind == -1)
         {
             cat("Failed!!")

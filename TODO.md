@@ -33,7 +33,6 @@
 - rename convertMSFilesAnaInfo() to convertMSFiles() or something else and shorter?
     - update Handbook/Tutorial if needed
 - overwrite vs overWrite
-- update some anaInfo$path leftovers (mainly Bruker)
 
 
 ## Maybe

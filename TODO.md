@@ -317,13 +317,8 @@
             - discuss sets?
             - example workflows (direct, post)
         - processing
-            - features
-                - mention somewhere that IMS="maybe" for e.g. plotting
-                - plotMobilograms() and EIMParams
-                - IMS filters
-            - annotation
-                - mob spec sims
-                - IMS filters
+            - evaluate the examples once they can be run
+                - maybe add or improve plotMobilogram examples
     - sets chapter
         - IMS
             - makeSet() limitations for IMS workflows

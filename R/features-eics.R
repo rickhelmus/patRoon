@@ -225,7 +225,7 @@ findFeaturesEICs <- function(analysisInfo, featParams, peakParams, suspects = NU
     {
         args <- list(backend, EICInfo$mzmin, EICInfo$mzmax, featParams$retRange[1], featParams$retRange[2],
                      EICInfo$mobmin, EICInfo$mobmax, mzExpIMSWindow = 0, minIntensityIMS = minIntensityIMS,
-                     mode = mode, showProgress = FALSE, minEICIntensity = featParams$minEICIntensity,
+                     mode = mode, minEICIntensity = featParams$minEICIntensity,
                      minEICAdjTime = featParams$minEICAdjTime,
                      minEICAdjPoints = featParams$minEICAdjPoints,
                      minEICAdjIntensity = featParams$minEICAdjIntensity, topMost = topMost)

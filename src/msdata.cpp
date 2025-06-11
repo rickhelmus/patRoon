@@ -1,8 +1,4 @@
-// [[Rcpp::depends(RcppProgress)]]
-
 #include <Rcpp.h>
-#include <progress.hpp>
-#include <progress_bar.hpp>
 
 #include <algorithm>
 #include <vector>
@@ -24,7 +20,6 @@ template<typename OutType, typename FuncType, typename... Args>
 std::vector<std::vector<OutType>> applyMSData(const MSReadBackend &backend, SpectrumRawTypes::MSLevel MSLevel,
                                               const std::vector<std::vector<SpectrumRawSelection>> &scanSels,
                                               FuncType func, SpectrumRawTypes::Intensity minIntensityIMS,
-                                              bool showProgress = false,
                                               std::function<SpectrumRaw(const SpectrumRaw &)> prepFunc = {},
                                               Args... args)
 {
@@ -69,7 +64,6 @@ std::vector<std::vector<OutType>> applyMSData(const MSReadBackend &backend, Spec
         ret.emplace_back(scanSels[i].size());
     
     ThreadExceptionHandler exHandler;
-    Progress progb(allScanSelInds.size(), showProgress);
 
     #pragma omp parallel
     {
@@ -114,7 +108,6 @@ std::vector<std::vector<OutType>> applyMSData(const MSReadBackend &backend, Spec
                     }
                 }
             });
-            progb.increment();
         }
     }
     
@@ -602,10 +595,9 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                       const std::vector<SpectrumRawTypes::Mobility> &startMobs,
                       const std::vector<SpectrumRawTypes::Mobility> &endMobs,
                       SpectrumRawTypes::Mass mzExpIMSWindow, SpectrumRawTypes::Intensity minIntensityIMS,
-                      const std::string &mode = "simple", bool showProgress = false,
-                      SpectrumRawTypes::Intensity minEICIntensity = 0, SpectrumRawTypes::Time minEICAdjTime = 0,
-                      unsigned minEICAdjPoints = 0, SpectrumRawTypes::Intensity minEICAdjIntensity = 0,
-                      unsigned topMost = 0)
+                      const std::string &mode = "simple", SpectrumRawTypes::Intensity minEICIntensity = 0,
+                      SpectrumRawTypes::Time minEICAdjTime = 0, unsigned minEICAdjPoints = 0,
+                      SpectrumRawTypes::Intensity minEICAdjIntensity = 0, unsigned topMost = 0)
 {
     // NOTE: startTimes/endTimes may be length one vectors, in which case they are used for all EICs
     
@@ -741,7 +733,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         scanSels[0].emplace_back(scan);
     
     auto allSpectra = applyMSData<SpectrumRaw>(backend, SpectrumRawTypes::MSLevel::MS1, scanSels, sfunc,
-                                               minIntensityIMS, showProgress);
+                                               minIntensityIMS);
     
     if (allSpectra.empty())
         return Rcpp::List();

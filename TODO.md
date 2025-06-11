@@ -16,7 +16,6 @@
 - install timsconvert and c3sdb in Docker and bundle
 - fix default IDLs
 - ADT: averaged data is now always per replicate, change to averageBy?
-- remove RcppProgress?
 - update REUSE
 - Harmonize/consistent names
     - maxMSRtWindow --> maxMSRTWindow

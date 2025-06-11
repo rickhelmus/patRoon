@@ -370,3 +370,75 @@ The number of features in post mobility assignment workflows can be very large, 
 # generate formulas: copy IMS parent results when the spectral similarity is at least 0.9
 formulas <- generateFormulas(fGroups, "genform", adduct = "[M+H]+", minMobSpecSim = 0.9)
 ```
+
+## Processing data
+
+The data processing functionality of `patRoon` that was [discussed before](#processing) equally applies to IMS workflows. In addition, some extra functionality exists to inspect and filter the data. These are discussed in the next subsections.
+
+### Inspecting and plotting data
+
+The `plotMobilograms()` method function is used to plot extracted ion mobilograms (EIMs), and works very similar as the `plotChroms()` function [introduced before](#vis_feat_ann). The function arguments are mostly equal, and the `EIMParams` argument is similarly used to configure advanced parameters (see `?getDefEIMParams` for details).
+
+Most other plotting functions have an `IMS` argument that controls the inclusion of mobility features and IMS parents in the plots. This argument is similar as discussed before for e.g. componentization and feature annotation and supports the following values:
+
+- `IMS=FALSE`: Do not plot any mobility features (only supported in post mobility assignment workflows).
+- `IMS=TRUE`: Only plot mobility features and ignore any IMS parents.
+- `IMS="both"`: Plot both mobility features and IMS parents.
+- `IMS="maybe"`: Plot IMS parents if present, and mobility features otherwise. This is the default value.
+
+The default is `"maybe"` since most plotting functions primarily use LC-MS data and therefore produce similar plots for mobility features and their IMS parents.
+
+The `spectrumSimilarityMobility()` method function calculates the spectrum similarity between MS (or MS/MS) data of a mobility feature and its IMS parent. This function is internally used by feature annotation if the `minMobSpecSim` argument is set, and uses the `spectrumSimilarity()` function [introduced earlier](#specSim).
+
+Some examples are shown below:
+
+```{r exInspPlotIMS, eval=FALSE}
+# plot mobilogram for first feature
+plotMobilograms(fGroups[, 1])
+# plot mobilogram for a mobility feature: this highlights the mobility (range) assigned to the feature
+plotMobilograms(fGroups[, 2], showPeakArea = TRUE, showFGroupRect = TRUE)
+
+plot(fGroups, IMS = TRUE) # make a scatter plot with only mobility features
+
+# returns a table with spectral similarities between mobility features and their IMS parents
+spectrumSimilarityMobility(mslists, fGroups)
+```
+
+### Subsetting and filtering data
+
+The following filters are specifically for IMS workflows available:
+
+Filter           | Classes         | Remarks
+-----------------|-----------------|---------------------------------------------------------------------------
+`IMS`            | `featureGroups` | Only keep IMS parents (`IMS=FALSE`), mobility features (`IMS=TRUE`), both (`IMS="both"`) or IMS parents if available and mobility features otherwise (`IMS="maybe"`). The `IMS` argument is also available for the `[` operator.
+`withIMSParent`  | `featureGroups` | Only keep mobility features that have an IMS parent.
+`applyIMS`       | `featureGroups` | Only apply other filters to a subset of features. Should be set like the `IMS` argument.
+`IMSRangeParams` | `features`, `featureGroups`, `compounds` | Only keep features/annotations within the specified mobility range. The range is configured with the `getIMSRangeParams()` function.
+`IMSMatchParams` | `compounds`     | Only keep candidates that match reference IMS data. See [its description in suspect screening workflows](#screenIMS) for more details.
+
+Some examples are shown below:
+
+```{r exFiltIMS, eval=FALSE}
+# keep only mobility features
+# NOTE: this effectively results in data that is equal to a direct IMS workflow
+fGroupsMob <- filter(fGroups, IMS = TRUE)
+fGroupsMob <- fGroups[IMS = TRUE] # same as above
+
+# only keep IMS parents (post mobility assignment workflows only)
+# NOTE: this effectively results in data that is equal to before `assignMobilities()` was called
+fGroupsIMSPar <- filter(fGroups, IMS = FALSE)
+
+# perform various filtering steps and ensure that only mobility features with an IMS parent are kept
+fGroupsF <- filter(fGroups, absMinIntensity = 1E5, relMinReplicateAbundance = 1,
+                   withIMSParent = TRUE)
+
+# perform various filtering steps, but not on mobility features
+fGroupsF <- filter(fGroups, absMinIntensity = 1E5, relMinReplicateAbundance = 1,
+                   applyIMS = FALSE)
+
+# only keep compound candidates within a defined CCS range
+compoundsF <- filter(compounds, IMSRangeParams = getIMSRangeParams("CCS", 150, 200))
+
+# only keep compound candidates with matching CCS (6% tolerance)
+compoundsF <- filter(compounds, IMSMatchParams = getIMSMatchParams("CCS", window = 0.06, relative = TRUE))
+```

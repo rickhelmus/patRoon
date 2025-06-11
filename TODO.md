@@ -315,10 +315,12 @@
                 - add link for in-between steps (filtering, componentization)?
             - annotation: fill in link for filtering
             - discuss sets?
-            - example workflows (direct, post)
         - processing
             - evaluate the examples once they can be run
                 - maybe add or improve plotMobilogram examples
+        - example workflows
+            - set MSPL averaging if we don't default to distance clustering
+                - also discuss this elsewhere?
     - sets chapter
         - IMS
             - makeSet() limitations for IMS workflows

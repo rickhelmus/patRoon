@@ -87,20 +87,13 @@
     - conc/norm conc are set to "NA_real_"
 - remove conc column?
 - remove default limits that are in limits.yml
-- move components to features tab?
 - IMS changes
-    - Analyses/Toggles: any checks?
-        - could instead check if the right file type is selected, either in anaInfo or as conversion step
-            - make it dependable on feat finder, then also check file format
-            - only check if anaTable is made
-            - if no suitable file is found, check if conversion to type/format is there, otherwise warn
     - Codegen
         - Select right example anaInfo
         - Add mobility filters for suspects & compounds?
         - is assignMobilities() before TP componentization OK?
             - IMS="maybe", so probably fine?
 - BUG piek: methodIMS is set for non-IMS workflows
-- BUG newProject(): XCMS3 groupFeatures has rtalign args in sets mode
 
 ## Param defaults
 
@@ -468,6 +461,7 @@
 - Changed default db for MetFrag to pubchemlite
 - Fixed: codegen for functions: don't break lines of args with long text strings
 - Fixed: feature filter didn't hash qualityRange
+- Fixed: newProject(): XCMS3/KPIC2 groupFeatures tried to do RT alignment in sets worfklow
 
 
 ## Features

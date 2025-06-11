@@ -390,6 +390,8 @@ The default is `"maybe"` since most plotting functions primarily use LC-MS data 
 
 The `spectrumSimilarityMobility()` method function calculates the spectrum similarity between MS (or MS/MS) data of a mobility feature and its IMS parent. This function is internally used by feature annotation if the `minMobSpecSim` argument is set, and uses the `spectrumSimilarity()` function [introduced earlier](#specSim).
 
+The [reporting functionality](#report) of `patRoon` contains various functionality that facilitates processing of IMS data.
+
 Some examples are shown below:
 
 ```{r exInspPlotIMS, eval=FALSE}
@@ -441,4 +443,56 @@ compoundsF <- filter(compounds, IMSRangeParams = getIMSRangeParams("CCS", 150, 2
 
 # only keep compound candidates with matching CCS (6% tolerance)
 compoundsF <- filter(compounds, IMSMatchParams = getIMSMatchParams("CCS", window = 0.06, relative = TRUE))
+```
+
+## Example workflow
+
+The example below shows a complete IMS workflow which uses post mobility assignment for features, and includes matching of suspect and compound annotation candidates by CCS.
+
+> **_NOTE_** The [newProject tool](#newProject) tool supports the creation of IMS workflows, and makes it easy to to create and explore different types of IMS workflows.
+
+```{r exIMSWorkflow, eval=FALSE}
+# anaInfo should be a data.frame with the analysis information
+
+# convert raw data to ims and to centroid data
+convertMSFiles(anaInfo, typeFrom = "raw", formatFrom = "bruker_ims", typeTo = "ims", formatTo = "mzML",
+               algorithm = "pwiz")
+convertMSFiles(anaInfo, typeFrom = "ims", formatFrom = "mzML", typeTo = "centroid", formatTo = "mzML",
+               algorithm = "im_collapse")
+
+# perform feature detection and grouping
+fList <- findFeatures(anaInfo, "openms")
+fGroups <- groupFeatures(fList, "openms")
+
+# perform basic filtering
+fGroups <- filter(fGroups, absMinIntensity = 1E4, relMinReplicateAbundance = 1)
+
+# assign mobilities and CCS values
+CCSParams <- getCCSParams("mason-schamp_1/k")
+fGroups <- assignMobilities(fGroups, mobPeaksParams = getDefPeakParams("bruker_ims", "piek"),
+                            chromPeaksParams = getDefPeakParams("chrom", "piek"),
+                            CCSParams = CCSParams)
+
+# suspect screening
+suspList <- read.csv("suspects.csv")
+# add CCS data from PubChemLite and convert them to mobilities
+suspList <- assignMobilities(suspList, from = "pubchemlite", adducts = "[M+H]+",
+                             CCSParams = CCSParams)
+# screen suspects and only keep fair matches (10% CCS tolerance)
+IMSMatchParams <- getIMSMatchParams("CCS", window = 0.1, relative = TRUE)
+fGroups <- screenSuspects(fGroups, suspects = suspList, adduct = "[M+H]+",
+                          IMSMatchParams = IMSMatchParams, onlyHits = TRUE)
+
+# perform feature annotation
+mslists <- generateMSPeakLists(fGroups)
+formulas <- generateFormulas(fGroups, mslists, "genform", adduct = "[M+H]+")
+# skip compound annotation for mobility features with similar MS/MS data as their IMS parent
+compounds <- generateCompounds(fGroups, mslists, "metfrag", adduct = "[M+H]+", database = "pubchemlite",
+                               minMobSpecSim = 0.9)
+# NOTE: assume that PubChemLite with CCS data is installed, so only mobility conversions needs to be applied
+compounds <- assignMobilities(compounds, fGroups, adduct = "[M+H]+", CCSParams = CCSParams)
+# filter out deviating candidates
+compounds <- filter(compounds, IMSMatchParams = IMSMatchParams)
+
+report(fGroups, mslists, formulas, compounds)
 ```

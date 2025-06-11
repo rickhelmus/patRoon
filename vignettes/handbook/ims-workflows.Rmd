@@ -33,7 +33,7 @@ The mobility assignment consists of the following steps:
 1. Feature detection and grouping is performed with classical algorithms like regular LC-MS workflows.
 2. Extracted ion mobilograms are generated for each feature and automatic peak detection is used to detect mobilities.
 3. Each of the detected mobilities for a feature are used to generate a new set of _mobility features_. These features inherit their properties from the original features, which are referred to as _IMS parents_. A link is formed between the mobility features and the IMS parent.
-4. The mobility feature data such as retention time and range is updated from mobility filtered extracted ion chromatograms. Any features that could not be detected from the filtered data are removed.
+4. The mobility feature data such as retention time and intensities is updated from mobility filtered extracted ion chromatograms. Any features that could not be detected from the filtered data are removed.
 5. The feature groups are updated with IMS data and similar links between _mobility feature groups_ and _IMS parents_ are formed.
 
 All these steps are automatically performed by the `assignMobilities()` method function that will be discussed later.
@@ -108,27 +108,67 @@ fList <- findFeatures(anaInfo, "piek", featParams = fParams, peakParams = pParam
 
 > **_NOTE_** when both `methodMZ` and `methodIMS` are set to `"bins"` then peak detection will need to cover a very large number of EICs, which can be be quite computationally intensive. Tweaking the EIC filtering parameters can improve the situation, see `?getPiekParams` for more details.
 
-The grouping of features is performed with `groupFeatures()` as in non-IMS workflows. This automatically perform the necessary IMS clustering and grouping steps ([discussed here](#directIMS)).
+The grouping of features is performed with `groupFeatures()` as in non-IMS workflows. This automatically performs the necessary IMS clustering and grouping steps ([discussed here](#directIMS)).
 
-### Post mobility assignment with `assignMobilities()` {#assignMobFeat}
+### Assigning mobility and CCS values to features {#assignMobFeat}
 
-The `assignMobilities()` method function is used to assign mobilities to features and feature groups in post mobility assignment workflows. It is executed after executing `groupFeatures()`, with often some intermediate steps (e.g. filtering, componentization) steps in-between (discussed later). A single call to `assignMobilities()` will perform all [the steps that were introduced before](#postIMS), and includes some additional functionality for suspect screening workflows ([discussed later]). The most important function arguments are:
+The `assignMobilities()` method function has two purposes:
+
+1. Assign mobilities to features in a post mobility assignment workflow.
+2. Convert mobility to CCS values in both direct and post mobility assignment workflows.
+
+The most important function arguments are:
 
 Argument                 | Description
 ------------------------ | ------------------------------------------------
 `mobPeaksParams`, `chromPeaksParams` | Parameters for the peak detection in mobilograms and chromatograms, respectively. See `getDefPeakParams()` for more details.
 `EIMParams`, `EICParams` | Parameters for the extraction of ion mobilograms (EIMs) and chromatograms (EICs), respectively. See `getDefEIMParams()` and `getDefEICParams()` for more details.
-`fallbackEIC`            | Set to `TRUE` to use the raw EIC data to update properties of mobility features, in case peak detection in mobility filtered EICs failed ([steps 3-4](#postIMS)).
+`fallbackEIC`            | Set to `TRUE` to use the raw EIC data to update properties of mobility features, in case peak detection fails in mobility filtered EICs ([steps 3-4](#postIMS)).
+`fromSuspects`           | _Suspect screening workflows_: Use suspect data for mobility assignment, this is [discussed later](#assignMobFromSusps).
+`IMSMatchParams`         | _Suspect screening workflows_: parameters to match IMS data between features and suspects, this is [discussed later](#screenIMS).
+`CCSParams`              | Parameters for converting mobility <--> CCS values.
 
-Some examples of how to use `assignMobilities()` are given below:
+The following subsections further discuss the two purposes of `assignMobilities()` in more detail. More details on `assignMobilities()` are found in the reference manual (`?assignMobilities_feat`).
+
+#### Feature mobility assignment
+
+Mobility assignment (purpose \#1) is only performed if either `mobPeaksParams` or `fromSuspects` is set. The latter is [discussed later](#assignMobFromSusps). The `assignMobilities()` method function is executed after executing `groupFeatures()`, with often some intermediate steps in-between (e.g. filtering, componentization, discussed later). A single call to `assignMobilities()` will perform all [the mobility assignment steps that were introduced before](#postIMS). 
+
+Some examples of how to use `assignMobilities()` for mobility assignment are given below:
 
 ```{r exPostMob, eval=FALSE}
 fGroups <- assignMobilities(fGroups, mobPeaksParams = getDefPeakParams("bruker_ims", "piek"),
                             chromPeaksParams = getDefPeakParams("chrom", "piek"))
 
-# customized peak detection
+# customized peak detection parameters
 fGroups <- assignMobilities(fGroups, mobPeaksParams = getDefPeakParams("agilent_ims", "xcms3", peakwidth = c(0.2, 3)),
                             chromPeaksParams = getDefPeakParams("chrom", "openms", gaussWidth = 20))
+```
+
+#### Mobility <--> CCS conversion {#mobCCSConv}
+
+Conversion of mobility <--> CCS values (purpose \#2) is performed if the `CCSParams` function argument is set. This argument should be assigned with a `list` that contains the parameters to configure the conversions process. The parameters are instrument specific and the parameter list can be obtained with the `getCCSParams()` function. The most important arguments for `getCCSParams()` are:
+
+Function argument | Description
+----------------- | ---------------------------------------------------------------
+`method`          | Specifies the conversion method. Valid values are: `"bruker"`, `"mason-schamp_k"` `"mason-schamp_1/k"` or `"agilent"`.
+`calibrant`       | Specifies the calibrant file or parameters if `method="agilent"`.
+
+The function currently only supports Bruker TIMS and Agilent IMS data (contributions to Waters data and information are _very welcome!_). For Bruker TIMS instruments, the `method` should be set to `"bruker"` or `"mason-schamp_1/k"`. The former relies on the Bruker TDF-SDK (see the [Installation](#Installation) chapter to install it). The latter doesn't, but may give very minor differences in the results compared to how Bruker software performs its calculations. For Agilent IMS data, the `method` should be set to `"agilent"` and the `calibrant` argument should be set to configure the calibration settings. The value for `calibrant` is either a file path to the `.d` or `‘OverrideImsCal.xml` file that should be used for re-calibration, or a `list` with the elements `massGas`, `TFix` and `beta`. It is recommended to read the reference manual for the `getCCSParams()` function for more details (`?getCCSParams`).
+
+Some examples of how to use `assignMobilities()` for mobility <--> CCS conversion are given below:
+
+```{r exMobCCS, eval=FALSE}
+# conversion of Bruker TIMS data using the TDF-SDK
+fGroups <- assignMobilities(fGroups, CCSParams = getCCSParams("bruker"))
+
+# conversion of Agilent IMS data
+fGroups <- assignMobilities(fGroups, CCSParams = getCCSParams("agilent", calibrant = "path/to/Calibrant.d"))
+
+# combine mobility assignment and CCS conversion into one step
+fGroups <- assignMobilities(fGroups, mobPeaksParams = getDefPeakParams("bruker_ims", "piek"),
+                            chromPeaksParams = getDefPeakParams("chrom", "piek"),
+                            CCSParams = getCCSParams("bruker"))
 ```
 
 ### Suspect screening
@@ -153,7 +193,7 @@ Function argument | Description
 ----------------- | ---------------------------------------------------------------
 `from`            | Specifies from where IMS data is added. See below for more details.
 `adducts`         | Specifies for which adducts IMS data is added or converted. A `character` vector with multiple values is allowed. Include `NA` to also consider the usage of non-adduct specific data. Any adducts specified in the suspect list (`adduct` column) are always considered.
-`CCSParams`       | Parameters for the mobility <--> CCS conversions. See the previous section for more details.
+`CCSParams`       | Parameters for the mobility <--> CCS conversions. See [its previous introduction](#mobCCSConv).
 `overwrite`       | Set to `TRUE` to overwrite any existing IMS data in the suspect list.
 
 The following options exist for the `from` function argument:
@@ -179,7 +219,7 @@ IMSLib <- data.frame(
 suspList <- assignMobilities(suspList, from = IMSLib, adducts = NA)
 ```
 
-#### Performing suspect screening
+#### Performing suspect screening {#screenIMS}
 
 The `screenSuspects()` method function [introduced before](#suspscr) is also used to perform the suspect screening in IMS workflows. The `IMSMatchParams` argument configures how IMS data is used to match suspects and features. See `?getIMSMatchParams` and the examples below for more details.
 
@@ -211,3 +251,34 @@ fGroupsScr <- assignMobilities(fGroupsScr, mobPeaksParams = getDefPeakParams("br
                                chromPeaksParams = getDefPeakParams("chrom", "piek"),
                                IMSMatchParams = getIMSMatchParams("CCS"))
 ```
+
+#### Assigning feature mobilities from suspect data {#assignMobFromSusps}
+
+In post mobility assignment workflows, the `assignMobilities()` method function can also be used to assign feature mobilities from suspect data by setting the `fromSuspects` argument to `TRUE`. This replaces the mobility assignment step from mobilograms ([step 2](#postIMS)), and copies the assigned reference value for a suspect directly to feature data. If both `fromSuspects` and `mobPeaksParams` are set, then the mobility detection from mobilograms is performed in case of missing suspect data. The `IMSRange` function argument is used to derive the mobility range for the feature. Assigning mobilities from suspect data is only supported if the suspect screening was already performed prior to calling `assignMobilities()`.
+
+Bypassing the need for peak detection for mobility assignment may be advantageous for low intensity features. However, no adjustments are performed for any shifts observed experimentally, hence, the assigned mobility values could be less accurate. Furthermore, the assigned mobility range to the feature may not cover the actual experimental range (i.e. the peak width in a mobilogram). Thus, when intensities are updated for mobility features ([step 4](#postIMS)), these can be superficially low (i.e. partial removal of signal) or high (i.e. inclusion of data of neighboring mobility peaks). With this in mind, this approach is primarily intended for the following scenarios:
+
+1. The mobility for a suspect is accurately known in advance, and no additional peak detection is needed. In this case the `IMSWindow` argument is typically set to a narrow tolerance window.
+2. There is no interest for accurate mobility (and CCS) assignment, and IMS data should only be used as a rough filtering step. In this scenario the `IMSWindow` argument is typically set to a relatively large tolerance window.
+
+> **_NOTE_** It is strongly recommended to set `fallBackEICs=FALSE` when using `fromSuspects=TRUE`, as otherwise no actual verification steps for the presence of mobility features are performed.
+
+Below are some example of how to use `assignMobilities()` to assign feature mobilities from suspect data:
+
+```{r assignMobFromSusps, eval=FALSE}
+# suspect screening must be performed in advance
+# suspList is a suspect list with IMS data (see previous subsections)
+fGroups <- screenSuspects(fGroups, suspects = suspList, adduct = "[M+H]+", onlyHits = TRUE)
+
+# scenario #1: assume suspect data is accurate
+fGroups <- assignMobilities(fGroups, fromSuspects = TRUE, IMSWindow = 0.01, fallBackEICs = FALSE)
+
+# scenario #2: wide tolerance window, no interest in accurate mobility assignment
+# add fallback to mobility detection for suspects with mobility data
+# set IMSMatchParams to also filter out suspect hits with deviating mobilities
+fGroups <- assignMobilities(fGroups, fromSuspects = TRUE, IMSWindow = 0.1, fallBackEICs = FALSE,
+                            mobPeaksParams = getDefPeakParams("bruker_ims", "piek"),
+                            IMSMatchParams = getIMSMatchParams("CCS"))
+```
+
+For more details see the reference manual (`?assignMobilities_feat`).

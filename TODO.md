@@ -147,6 +147,7 @@
     - parent-less/orphaned IMS features
         - done?
     - switch to PCL w/ CCSbase in patRoonExt
+    - warn if fromSuspects && fallBackEICs == TRUE (or throw an error? or enforce fallBackEICs=FALSE with a warning? update docs/handbook)
 - reporting
     - comps-clust: don't have imgs double in reportPlots
     - hide ims_precursor_group if all are NA (e.g. all orphans)
@@ -312,12 +313,6 @@
                 - verify if piek info is up-to-date and aligned once the rest of the docs are there
             - assignMobilities
                 - add link for in-between steps (filtering, componentization)?
-                - fill in link for suspect screening
-                - discuss fromSuspects arg for suspect screening workflows
-                - refer to ref docs
-            - add CCS prediction before susp screening
-            - suspect screening
-                - order, mobility filtering CCS prediction, discuss assignMobilities to some extend here?
             - componentization: order and eg adducts not supported
             - annotation
                 - MSPL averaging params?

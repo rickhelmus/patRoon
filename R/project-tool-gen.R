@@ -415,7 +415,6 @@ genScriptFeaturesBlock <- function(ionization, IMS, settingsFeat, generator)
         
         if (settingsFeat$featAlgo == "EIC")
         {
-            # UNDONE: handle IMS mode
             mmz <- settingsFeat$featEICParams$methodMZ; mims <- settingsFeat$featEICParams$methodIMS
             def <- list(
                 bins = getFeaturesEICsParams("bins", "bins"),
@@ -423,19 +422,20 @@ genScriptFeaturesBlock <- function(ionization, IMS, settingsFeat, generator)
                 ms2 = getFeaturesEICsParams("ms2", "ms2")
             )
             
+            doDirectIMS <- IMS$mode == "direct"
             generator$addCall("featParams", "getFeaturesEICsParams", list(
                 list(name = "methodMZ", value = mmz, quote = TRUE),
-                list(name = "methodIMS", value = mims, quote = TRUE),
+                list(name = "methodIMS", value = mims, quote = TRUE, condition = doDirectIMS),
                 list(name = "mzRange", value = def$bins$mzRange, condition = mmz == "bins"),
                 list(name = "mzStep", value = def$bins$mzStep, condition = mmz == "bins"),
-                list(name = "mobRange", value = def$bins$mobRange, condition = mims == "bins"),
-                list(name = "mobStep", value = def$bins$mobStep, condition = mims == "bins"),
+                list(name = "mobRange", value = def$bins$mobRange, condition = mims == "bins" && doDirectIMS),
+                list(name = "mobStep", value = def$bins$mobStep, condition = mims == "bins" && doDirectIMS),
                 list(name = "rtWindow", value = def$susp$rtWindow, condition = mmz == "suspects"),
                 list(name = "mzWindow", value = def$susp$mzWindow, condition = mmz == "suspects"),
-                list(name = "IMSWindow", value = def$susp$IMSWindow, condition = mims == "suspects"),
+                list(name = "IMSWindow", value = def$susp$IMSWindow, condition = mims == "suspects" && doDirectIMS),
                 list(name = "rtWindow", value = def$ms2$rtWindow, condition = mmz == "ms2"),
                 list(name = "mzWindow", value = def$ms2$mzWindow, condition = mmz == "ms2"),
-                list(name = "IMSWindow", value = def$ms2$IMSWindow, condition = mims == "ms2"),
+                list(name = "IMSWindow", value = def$ms2$IMSWindow, condition = mims == "ms2" && doDirectIMS),
                 list(name = "minTIC", value = def$ms2$minTIC, condition = mmz == "ms2")
             ))
         }

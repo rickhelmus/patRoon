@@ -93,7 +93,6 @@
         - Add mobility filters for suspects & compounds?
         - is assignMobilities() before TP componentization OK?
             - IMS="maybe", so probably fine?
-- BUG piek: methodIMS is set for non-IMS workflows
 
 ## Param defaults
 

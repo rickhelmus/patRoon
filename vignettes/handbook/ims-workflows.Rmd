@@ -282,3 +282,28 @@ fGroups <- assignMobilities(fGroups, fromSuspects = TRUE, IMSWindow = 0.1, fallB
 ```
 
 For more details see the reference manual (`?assignMobilities_feat`).
+
+### Componentization
+
+The algorithms that use componentization to detect adducts, isotopes, homologous series etc. (e.g. [CAMERA], [cliqueMS] and [nontarget]) currently do not support IMS data. They are not supported in direct mobility assignment workflows. However, in post mobility assignment workflows they can operate on the IMS parents (either before or after calling `assignMobilities()`).
+
+The other componentization algorithms (e.g. intensity clustering and [transformation products](#TPs)) optionally include mobility features and IMS parents during the componentization. This is controlled by the `IMS` function argument to the `generateComponents()` function, and can be set as following:
+
+1. `IMS=FALSE`: Do not consider any mobility features (only supported in post mobility assignment workflows).
+2. `IMS=TRUE`: Only consider mobility features and ignore any IMS parents.
+3. `IMS="both"`: Consider both mobility features and IMS parents.
+4. `IMS="maybe"`: Consider IMS parents if present, and mobility features otherwise. This is the default value.
+
+In the case that mobility features are not considered (i.e. `IMS=FALSE` or `IMS="maybe"`), then the componentization data from the IMS parents is directly copied to the mobility features. This is useful when the componentization results for IMS parents and mobility features are expected to be similar, which is often the case for the algorithms that support the `IMS` argument.
+
+In post mobility assignment workflows, it is possible to perform the componentization prior to calling `assignMobilities()`. In this case the componentization results can be 'expanded' by copying the IMS parent results to the mobility features afterwards. This is performed by the `expandForIMS()` method function:
+
+```{r expandComponIMS, eval=FALSE}
+# perform componentization
+components <- generateComponents(fGroups, "intclust")
+# assign mobilities
+fGroups <- assignMobilities(fGroups, mobPeaksParams = getDefPeakParams("bruker_ims", "piek"),
+                            chromPeaksParams = getDefPeakParams("chrom", "piek"))
+# expand componentization results for mobility features
+components <- expandForIMS(components, fGroups)
+```

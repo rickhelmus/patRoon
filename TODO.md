@@ -313,7 +313,6 @@
                 - verify if piek info is up-to-date and aligned once the rest of the docs are there
             - assignMobilities
                 - add link for in-between steps (filtering, componentization)?
-            - componentization: order and eg adducts not supported
             - annotation
                 - MSPL averaging params?
                 - mobility/CCS prediction
@@ -325,8 +324,6 @@
                 - mention somewhere that IMS="maybe" for e.g. plotting
                 - plotMobilograms() and EIMParams
                 - IMS filters
-            - componentization
-                - expandForIMS()?
             - annotation
                 - mob spec sims
                 - IMS filters

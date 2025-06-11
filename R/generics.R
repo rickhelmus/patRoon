@@ -91,7 +91,7 @@ setGeneric("calculateConcs", function(fGroups, ...) standardGeneric("calculateCo
 setGeneric("toxicities", function(fGroups, ...) standardGeneric("toxicities"))
 setGeneric("calculateTox", function(fGroups, ...) standardGeneric("calculateTox"))
 
-#' @rdname featureGroups-class
+#' @rdname feature-plotting
 setGeneric("plotMobilograms", function(obj, ...) standardGeneric("plotMobilograms"))
 
 #' @rdname kpic2-conv

@@ -167,8 +167,8 @@ doGetEICsForAna <- function(...)
 }
 
 doGetEICs <- function(anaInfo, EICInfoList, mzExpIMSWindow = 0, minIntensityIMS = 0, mode = "simple",
-                      showProgress = "batch", minEICIntensity = 0, minEICAdjTime = 0, minEICAdjPoints = 0,
-                      minEICAdjIntensity = 0, pad = FALSE, doCache = TRUE, cacheDB = NULL)
+                      minEICIntensity = 0, minEICAdjTime = 0, minEICAdjPoints = 0, minEICAdjIntensity = 0,
+                      pad = FALSE, doCache = TRUE, cacheDB = NULL)
 {
     if (length(EICInfoList) == 0)
         return(list())
@@ -187,7 +187,7 @@ doGetEICs <- function(anaInfo, EICInfoList, mzExpIMSWindow = 0, minIntensityIMS 
                              minEICAdjIntensity)
     }
     
-    allEICs <- applyMSData(anaInfo, EICInfoList, showProgress = showProgress == "batch", needIMS = needIMS,
+    allEICs <- applyMSData(anaInfo, EICInfoList, showProgress = TRUE, needIMS = needIMS,
                            func = function(ana, path, backend, EICInfo)
     {
         EICInfo <- copy(EICInfo)
@@ -225,9 +225,9 @@ doGetEICs <- function(anaInfo, EICInfoList, mzExpIMSWindow = 0, minIntensityIMS 
             ToDo <- EICInfo[isCached == FALSE]
             openMSReadBackend(backend, path)
             
-            newEICs <- doGetEICsForAna(backend, ToDo$mzmin, ToDo$mzmax, ToDo$retmin, ToDo$retmax, ToDo$mobmin, ToDo$mobmax,
-                                       mzExpIMSWindow, minIntensityIMS, mode = mode, showProgress = showProgress == "ana",
-                                       minEICIntensity, minEICAdjTime, minEICAdjPoints, minEICAdjIntensity)
+            newEICs <- doGetEICsForAna(backend, ToDo$mzmin, ToDo$mzmax, ToDo$retmin, ToDo$retmax, ToDo$mobmin,
+                                       ToDo$mobmax, mzExpIMSWindow, minIntensityIMS, mode, minEICIntensity,
+                                       minEICAdjTime, minEICAdjPoints, minEICAdjIntensity)
             EICs[!isCached] <- newEICs
             attr(EICs, "allXValues") <- attr(newEICs, "allXValues")
             

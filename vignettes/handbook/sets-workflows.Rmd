@@ -260,7 +260,7 @@ The reference manual for the workflow objects contains specific notes applicable
 
 ## Advanced
 
-### Initiating a sets workflow from feature groups
+### Initiating a sets workflow from feature groups {#makeSetFG}
 
 The `makeSet` function can also be used to initiate a sets workflow from feature groups:
 

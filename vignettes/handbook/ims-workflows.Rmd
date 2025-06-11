@@ -16,6 +16,8 @@ The following sections further detail each of these workflows, including the req
 
 > **_NOTE_** IMS workflows are considerably more computationally demanding, as the raw IMS data typically contain several orders of magnitude more mass spectra. This is especially apparent during feature detection, but also subsequent steps such as creation of chromatograms and spectra will take up more time and RAM. The direct mobility assignment workflows are generally most demanding.
 
+> **_NOTE_** While IMS workflows are largely the same as non-IMS workflows, there are some important considerations (outlined in this chapter). It is highly recommended to experiment with the [newProject tool](#newProject) and study the [example workflow](#exIMSWorkflow) to get a feeling of how IMS workflows work.
+
 ### LC-MS workflows with IMS data
 
 In this workflow the raw IMS data is 'collapsed' and is converted in such a way it looks like 'regular' LC-MS data. This is achieved by summing up the mass spectra in each IMS frame and subsequently replacing the IMS frames by the combined spectra. The workflow then proceeds as a regular LC-MS workflow. Hence, this type of workflow does not bring any of the benefits of IMS data, but allows full compatibility with software tools that do not support IMS data. Furthermore, this type of workflow is much less computationally intensive, which makes it suitable for e.g. initial exploration of data.
@@ -42,7 +44,7 @@ An advantage of post mobility workflows is the compatibility with any of the fea
 
 ### Summary
 
-The following table summarizes the differences between the three IMS workflows:
+The following table summarizes the differences between the three IMS workflows (some of these are introduced later in this chapter):
 
 |                               | LC-MS with IMS data | Direct mobility assignment | Post mobility assignment
 ------------------------------- | ------------------- | -------------------------- | --------------------------
@@ -55,11 +57,12 @@ Mobility/IMS parent links       | No                  | No                      
 Suspect & compound CCS matching | No                  | Yes                        | Yes
 HRMS cleanup                    | No                  | Yes                        | Yes
 non-IMS feature fallback        | -                   | No                         | Yes
-Supports [sets workflows](#setsWorkflow) | Yes        | No                         | Yes
+Supports [sets workflows](#setsWorkflow)^2^ | Yes        | Limited                    | Limited
 
 Notes:
 
 1. If the `piek` feature detection algorithm is used then (only) IMS raw data may suffice, see [more info here].
+2. Discussed further [here](#IMSSetsWorkflow) 
 
 ## Performing IMS workflows
 
@@ -132,7 +135,7 @@ The following subsections further discuss the two purposes of `assignMobilities(
 
 #### Feature mobility assignment
 
-Mobility assignment (purpose \#1) is only performed if either `mobPeaksParams` or `fromSuspects` is set. The latter is [discussed later](#assignMobFromSusps). The `assignMobilities()` method function is executed after executing `groupFeatures()`, with often some intermediate steps in-between (e.g. filtering, componentization, discussed later). A single call to `assignMobilities()` will perform all [the mobility assignment steps that were introduced before](#postIMS). 
+Mobility assignment (purpose \#1) is only performed if either `mobPeaksParams` or `fromSuspects` is set. The latter is [discussed later](#assignMobFromSusps). The `assignMobilities()` method function is executed after executing `groupFeatures()`, with often some intermediate steps in-between (e.g. filtering, componentization, discussed later in this chapter). A single call to `assignMobilities()` will perform all [the mobility assignment steps that were introduced before](#postIMS). 
 
 Some examples of how to use `assignMobilities()` for mobility assignment are given below:
 
@@ -322,7 +325,7 @@ A few additional averaging parameters (assigned to the `avgFeatParams` and `avgM
 
 #### Compound annotation
 
-Candidates from compound annotations can be matched with IMS data for features, similarly as was discussed for [candidates from suspect screening](#IMSSuspScr). The `assignMobilities()` method function works similarly to assign IMS data to candidates and perform mobility <--> CCS conversions. The `filter()` method function ([discussed later]) can subsequently be used to eliminate candidates that match poorly with features.
+Candidates from compound annotations can be matched with IMS data for features, similarly as was discussed for [candidates from suspect screening](#IMSSuspScr). The `assignMobilities()` method function works similarly to assign IMS data to candidates and perform mobility <--> CCS conversions. The `filter()` method function can subsequently be used to eliminate candidates that match poorly with features ([discussed later](#IMSFiltering)).
 
 The `assignMobilities()` function has similar arguments as the method for suspect screening:
 
@@ -371,6 +374,12 @@ The number of features in post mobility assignment workflows can be very large, 
 formulas <- generateFormulas(fGroups, "genform", adduct = "[M+H]+", minMobSpecSim = 0.9)
 ```
 
+### Sets workflows {#IMSSetsWorkflow}
+
+There is basic functionality to combine IMS workflows and [sets workflows](#setsWorfklow). However, an important limitation currently is that there is no way to group mobility features across the different sets. This is because mobility values among polarities (e.g. `[M+H]+` and `[M-H]-`) typically differ slightly and there is not a straightforward way to normalize for this. However, in post mobility assignment workflows grouping of IMS parents across sets still occurs (similar to non-IMS workflows). Hence, the links between mobility features and IMS parents can still give some indication which mobility features across sets are related. Thus, combined IMS and sets workflows are therefore mainly useful to e.g. process positive and negative sample analyses in one workflow, but lack other advantages of non-IMS sets workflows, such as easily relating features among sets and improving feature annotation with combined positive/negative MS/MS data.
+
+Like non-IMS workflows, the `makeSet()` function is used to initialize the sets workflow. However, the method that [combines feature groups objects](#makeSetFG) is only supported for direct mobility assignment workflows.
+
 ## Processing data
 
 The data processing functionality of `patRoon` that was [discussed before](#processing) equally applies to IMS workflows. In addition, some extra functionality exists to inspect and filter the data. These are discussed in the next subsections.
@@ -406,7 +415,7 @@ plot(fGroups, IMS = TRUE) # make a scatter plot with only mobility features
 spectrumSimilarityMobility(mslists, fGroups)
 ```
 
-### Subsetting and filtering data
+### Subsetting and filtering data {#IMSFiltering}
 
 The following filters are specifically for IMS workflows available:
 
@@ -445,7 +454,7 @@ compoundsF <- filter(compounds, IMSRangeParams = getIMSRangeParams("CCS", 150, 2
 compoundsF <- filter(compounds, IMSMatchParams = getIMSMatchParams("CCS", window = 0.06, relative = TRUE))
 ```
 
-## Example workflow
+## Example workflow {#exIMSWorkflow}
 
 The example below shows a complete IMS workflow which uses post mobility assignment for features, and includes matching of suspect and compound annotation candidates by CCS.
 

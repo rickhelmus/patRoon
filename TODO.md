@@ -254,7 +254,7 @@
 - handbook/tutorial
     - installation
         - add additional external deps, eg Python, TIMS-SDK, c3sdb, PCL/CCS etc
-    - workflow concepts: add link to IMS chapter at end, maybe mention mobility as possible feature property
+    - workflow concepts: maybe mention mobility as possible feature property
     - workflow gen
         - intro
             - update convertMSFiles() in table
@@ -265,17 +265,12 @@
                 - add note of things that are missing
             - discuss file formats here?
         - preparations
-            - update anaInfo section
-                - fill in IMS chapter link
             - update/extend data-pretreatment section
                 - mention im_collapse uses msdata?
-                - fill in IMS chapter link, see what details to put where
         - features
             - update algo tables (piek, import) and file support (mention msdata for piek somewhere?)
             - describe piek params
             - possibly split feature import into sub-section?
-            - suspect screening
-                - fill in IMS links
         - annotation
             - update MSPL section
                 - add back precursorMzWindow if we re-add it

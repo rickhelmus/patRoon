@@ -167,7 +167,7 @@ In `patRoon` a distinction is made between four types of raw data files:
 * **profile**: exported but not centroided (i.e. profile) data files in `mzML` or `mzXML` formats.
 * **ims**: exported ion mobility HRMS data files in the `mzML` format.
 
-Most algorithms in non-target workflows exclusively operate on centroided data files. In most cases the centroided data should be stored in the `mzML` format, but [some feature detection algorithms](#findGrpFeat) only work with `mzXML`. The raw data files are primarily used for data conversion to any of the other types. The raw and ims data file types are (also) used in [IMS workflows].
+Most algorithms in non-target workflows exclusively operate on centroided data files. In most cases the centroided data should be stored in the `mzML` format, but [some feature detection algorithms](#findGrpFeat) only work with `mzXML`. The raw data files are primarily used for data conversion to any of the other types. The raw and ims data file types are (also) used in [IMS workflows](#IMSWorkflow).
 
 ### Analysis information {#anaInfo}
 
@@ -222,7 +222,7 @@ DataAnalysis   | `convertMSFiles(algorithm = "bruker", ...)`      | raw (Bruker 
 IM collapse    | `convertMSFiles(algorithm = "im_collapse", ...)` | raw (Bruker TIMS) and ims (mzML)          | centroid (`mzML` and `mzXML`)
 [TIMSCONVERT]  | `convertMSFiles(algorithm = "timsconvert", ...)` | raw (Bruker TIMS)                         | centroid, profile, ims (`mzML`)
 
-> **_NOTE_** For the conversion of IMS to centroided data it is highly recommended to use the IM collapse or [TIMSCONVERT] algorithms, as [ProteoWizard] currently does not support accurate centroiding. For the conversion of Agilent IMS data, [ProteoWizard] can be used to convert the raw `.d` files to the ims (`mzML`) files, and subsequently IM collapse can be used to convert these to centroided files. See the [IMS chapter] for more details. 
+> **_NOTE_** For the conversion of IMS to centroided data it is highly recommended to use the IM collapse or [TIMSCONVERT] algorithms, as [ProteoWizard] currently does not support accurate centroiding of IMS data. For the conversion of Agilent IMS data, [ProteoWizard] can be used to convert the raw `.d` files to the ims (`mzML`) files, and subsequently IM collapse can be used to convert these to centroided files.
 
 The `convertMSFiles()` function uses the [analysis information](#anaInfo) to locate the input files and the destination paths for the output. The `path_XXX` columns should contain the desired destination directories for those file types that should be exported. For instance:
 
@@ -404,7 +404,7 @@ The example above has a very simple suspect list with just three compounds. The 
 - `mz`, `SMILES`, `InChI`, `formula`, `neutralMass`: _at least_ one of these columns must hold data for each suspect row. The `mz` column specifies the ionized mass of the suspect. If this is not available then data from any of the other columns is used to determine the suspect mass.
 - `adduct`: The adduct of the suspect. Optional. Set this if you are sure that a suspect should be matched by a particular adduct ion and no data in the `mz` column is available.
 - `fragments_mz` and `fragments_formula`: optional columns that may assist [ID confidence estimation](#estIDConf).
-- `mobility` and `CCS` columns: these are for [IMS workflows] and can increase the confidence of a suspect match. This is discussed in the [IMS chapter](section here).
+- `mobility` and `CCS` columns: these are for [IMS workflows](#IMSWorkflow) and can increase the confidence of a suspect match. This is discussed [here](#IMSSuspScr).
 
 In most cases a suspect list is best made as a `csv` file which can then be imported with e.g. the `read.csv()` function. This is exactly what happen when you specify a suspect list when using the `newProject()` function.
 

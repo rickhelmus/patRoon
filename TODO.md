@@ -113,6 +113,7 @@
     - set mzR in front for safety?
 - MSPL: hclust seems unusable due to high mem usage with IMS data? --> just default to distance and doc change/IMS need?
     - update getDefAvgPListParams()/cluster-params docs
+    - or make new auto option (default) which checks if there is IMS data
 - embed TIMS-SDK? --> in patRoonExt
 - Agilent
     - SC doesn't recognize IM
@@ -303,7 +304,6 @@
             - set MSPL averaging if we don't default to distance clustering
                 - also discuss this elsewhere?
     - Advanced
-        - Feature intensity normalization: IMS notes
         - Exporting and converting feature data: mention IMS limitations?
         - pred: update for IMS for calibration
         - say something about consensus/comparison?

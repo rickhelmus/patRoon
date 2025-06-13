@@ -354,6 +354,8 @@ The feature group data obtained during the workflow can be exported to various f
 
 The `getXCMSSet()` function converts a `features` or `featureGroups` object to an `xcmsSet` object which can be used for further processing with [xcms]. Similarly, the `getXCMSnExp()` function can be used for conversion to an XCMS3 style `XCMSnExp` object, and the `getPICSet()` function can be used to convert `features` to [KPIC2] data.
 
+> **_NOTE_** None of the exporting and conversion functions support data from [sets workflows](#setsWorkflow) or [IMS workflows](#IMSWorkflow). For this reason, the `set` argument must be given to specify for which features should be exported in sets workflows, and any mobility features will _not_ be exported.
+
 Some examples for these functions are shown below.
 
 ```{r fExpConv,eval=FALSE}
@@ -368,6 +370,7 @@ xsetg <- getXCMSSet(fGroups, loadRawData = TRUE) # get grouped xcmsSet
 # using the new XCMS3 interface
 xdata <- getXCMSnExp(fList)
 xdata <- getXCMSnExp(fGroups)
+xdataPos <- getXCMSnExp(fGroupsSet, set = "positive") # sets workflow
 
 # KPIC2 conversion. Like XCMS it optionally loads the raw data.
 picSet <- getPICSet(fList, loadRawData = TRUE)
@@ -681,7 +684,7 @@ calibrants <- getQuantCalibFromScreening(fGroups, concs)
 calibrants <- getQuantCalibFromScreening(fGroups, concs, areas = TRUE) # obtain feature areas instead of intensities
 ```
 
-The first step is to perform a [screening](#suspscr) for the calibrant compounds. Please ensure that this list should contains SMILES data, and to ensure correct feature assignment it is highly recommended to include retention times. The second requirement for `getQuantCalibFromScreening()` is a table with concentrations for each calibrant compound, e.g.:
+The first step is to perform a [screening](#suspscr) for the calibrant compounds. Please ensure that this list contains SMILES data, and to ensure correct feature assignment it is highly recommended to include retention times. The second requirement for `getQuantCalibFromScreening()` is a table with concentrations for each calibrant compound, e.g.:
 
 ```{r}
 concs <- data.frame(
@@ -697,6 +700,8 @@ concs
 ```
 
 The concentrations are specified separately for each calibrant compound. The column names should follow the names of the [replicate assigned to the standards](#anaInfo). The concentration unit is &#x00B5;g/l by default. The next section describes how this can be changed. 
+
+>**_NOTE_** The `getQuantCalibFromScreening()` function ignores any mobility features in [IMS workflows](#IMSWorkflow) with post mobility assignment, as the calibration procedure does not take any differences due to IMS separation into account.
 
 The gradient elution program is also specified by a `data.frame`, which for every time point (in seconds!) describes the percentage of 'B'. In this case, 'B' represents the total amount of organic modifier.
 

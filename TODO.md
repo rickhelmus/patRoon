@@ -304,9 +304,8 @@
             - set MSPL averaging if we don't default to distance clustering
                 - also discuss this elsewhere?
     - Advanced
-        - Exporting and converting feature data: mention IMS limitations?
-        - pred: update for IMS for calibration
         - say something about consensus/comparison?
+            - first finish (ref) docs for IMS grouping
         - section on msdata? otherwise refer to ?msdata somewhere in prep?
             - refer to something in multithread section
 - IMS

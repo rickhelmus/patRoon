@@ -1,4 +1,4 @@
-# Ion mobility spectrometry (IMS-HRMS) workflows
+# Ion mobility spectrometry (IMS-HRMS) workflows {#IMSWorkflow}
 
 ## Introduction
 
@@ -57,7 +57,7 @@ Mobility/IMS parent links       | No                  | No                      
 Suspect & compound CCS matching | No                  | Yes                        | Yes
 HRMS cleanup                    | No                  | Yes                        | Yes
 non-IMS feature fallback        | -                   | No                         | Yes
-Supports [sets workflows](#setsWorkflow)^2^ | Yes        | Limited                    | Limited
+Supports [sets workflows](#setsWorkflow)^2^ | Yes     | Limited                    | Limited
 
 Notes:
 

@@ -83,7 +83,7 @@ Internal Standard  | `normInts(featNorm = "istd", ...)` | Uses internal standard
 Concentration      | `normInts(featNorm = "conc", ...)` | Normalizes feature intensities of a sample analysis by its _normalization concentration_ (explained below).
 None               | `normInts(featNorm = "none", ...)` | Performs no feature normalization. Set this if you only want to perform group normalization (discussed in the next section). 
 
-#### Normalization concetration
+#### Normalization concentration
 
 All methods (except `"none"`) are influenced by the _normalization concentration_, which is a property set for each sample analysis. For IS normalization, this should equal the concentration of the IS present in the sample. Otherwise the normalization concentration resembles the injected sample amount. The normalization concentration is defined in the `norm_conc` column of the [analysis information](#anaInfo). For example:
 
@@ -165,7 +165,11 @@ Several other `patRoon` functions also accept the `normalized` argument to use n
 
 ### Default normalization
 
-If normalized data is requested (`normalized=TRUE`, see previous section) and `normInts()` was _not_ called on the feature group data, a _default normalization_ will occur. This is nothing more than a group normalization (`normInts(groupNorm=TRUE, ...)`), and was mainly implemented to ensure backwards compatibility with previous `patRoon` versions. 
+If normalized data is requested (`normalized=TRUE`, see previous section) and `normInts()` was _not_ called on the feature group data, a _default normalization_ will occur. This is nothing more than a group normalization (`normInts(groupNorm=TRUE, ...)`), and was mainly implemented to ensure backwards compatibility with previous `patRoon` versions.
+
+### IMS workflows
+
+In [IMS workflows](#IMSWorkflow) with post mobility assignment `normInts()` will not consider any mobility features for the assignment of internal standards and calculation of TICs and the normalized intensity values for mobility features will be copied from IMS parents. 
 
 ## Feature parameter optimization {#fOpt}
 

@@ -1,6 +1,6 @@
-# Ion mobility spectrometry (IMS-HRMS) workflows {#IMSWorkflow}
+# Ion mobility spectrometry (IMS-HRMS) workflows
 
-## Introduction
+## Introduction {#IMSWorkflow}
 
 This chapter describes workflows to process data from Ion Mobility Spectrometry coupled to high resolution mass spectrometry (IMS-HRMS) instruments in `patRoon`. These are simply referred to as _IMS workflows_.
 

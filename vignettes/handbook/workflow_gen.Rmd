@@ -32,7 +32,9 @@ plotSpectrum(formulas, ...) # plot annotated spectrum from formula annotation da
 plotSpectrum(compounds, ...) # likewise but for compound annotation.
 ```
 
-### Overview of all functions and their output
+### Overview of workflow functions and their output
+
+Below is an overview of the common workflow function, their output and how they interact. Note that [sets workflows](#setsWorkflow), [IMS workflows](#IMSWorkflow) and other [advanced functionality](#advanced_usage) is not shown here.
 
 ```{r workflowFuncsClasses,echo=FALSE,out.width="100%",fig.cap="**Workflow functions and output classes.**"}
 
@@ -44,12 +46,11 @@ makeRefURLPage <- function(node, page) makeRefURL(node, page, node, node)
 URLs <- paste0(makeRefURLClass(c("transformationProducts", "featureGroupsScreening", "features", "featureGroups",
                                  "MSPeakLists", "formulas", "compounds", "components")),
                makeRefURLFunc(c("findFeatures", "groupFeatures", "generateTPs", "generateMSPeakLists",
-                                "generateFormulas", "generateCompounds", "generateComponents")),
-               makeRefURLFunc(c("screenSuspects", "annotateSuspects", "generateAnalysisInfo", "addFormulaScoring",
-                                "selectIons", "convertToSuspects", "convertToMFDB"),
-                              c("suspect-screening", "featureGroupsScreening-class", "analysis-information",
-                                "compounds-class", "featureGroups-class", "transformationProducts-class",
-                                "generics")),
+                                "generateFormulas", "generateCompounds", "generateComponents", "estimateIDConfidence")),
+               makeRefURLFunc(c("screenSuspects", "generateAnalysisInfo", "convertMSFiles",
+                                "addFormulaScoring", "selectIons", "convertToSuspects", "convertToMFDB"),
+                              c("suspect-screening", "analysis-information", "MSConversion", "compounds-class",
+                                "featureGroups-class", "transformationProducts-class", "generics")),
                makeRefURLPage(c("Analysis information", "Suspect list", "database"),
                               c("analysis-information", "suspect-screening", "generateCompoundsMetFrag")), collapse = "\n")
 
@@ -65,14 +66,14 @@ digraph workflow {
 
   subgraph cluster_suspAnn {
     graph [style = invis; margin=20 ]
-    'Suspect list' -> screenSuspects -> featureGroupsScreening -> annotateSuspects
-    annotateSuspects -> featureGroupsScreening
+    'Suspect list' -> screenSuspects -> featureGroupsScreening
   }
 
   subgraph cluster_fGroups {
     graph [style = invis; margin=25 ]
     'Raw MS data' -> 'Analysis information' -> 'findFeatures' -> 'features' -> 'groupFeatures' -> 'featureGroups'
     generateAnalysisInfo -> 'Analysis information'
+    'Analysis information' -> 'convertMSFiles'
   }
 
   subgraph cluster_tps {
@@ -112,23 +113,25 @@ digraph workflow {
   featureGroups -> screenSuspects [constraint=none]
   MSPeakLists -> generateFormulas
   MSPeakLists -> generateCompounds
-  MSPeakLists -> annotateSuspects [style=dashed, constraint=none]
-  formulas -> annotateSuspects [style=dashed, constraint=none]
-  compounds -> annotateSuspects [style=dashed, constraint=none]
+  MSPeakLists -> estimateIDConfidence [style=dashed, constraint=none]
+  formulas -> estimateIDConfidence [style=dashed, constraint=none]
+  compounds -> estimateIDConfidence [style=dashed, constraint=none]
   formulas -> addFormulaScoring
   compounds -> addFormulaScoring
   addFormulaScoring -> compounds
   transformationProducts -> generateComponents [constraint=none, style=dashed]
   database -> generateCompounds [constraint=none, style=dashed]
+  featureGroupsScreening -> estimateIDConfidence [style=dashed, constraint=none]
 
   { rank=same; 'findFeatures'; Parents; 'Suspect list' }
+  { rank=same; generateComponents; estimateIDConfidence }
   { rank=same; generateMSPeakLists; generateComponents }
   { rank=same; addFormulaScoring; compounds }
-  { rank=same; 'Analysis information'; generateAnalysisInfo }
+  { rank=same; 'Analysis information'; generateAnalysisInfo; 'convertMSFiles' }
                   
   Parents, 'Suspect list', 'Raw MS data', database [shape=cylinder; fillcolor=cadetblue1]
-  generateAnalysisInfo, findFeatures, groupFeatures, generateTPs, convertToSuspects, convertToMFDB, screenSuspects,
-    annotateSuspects, generateMSPeakLists, generateFormulas, generateCompounds, generateComponents,
+  generateAnalysisInfo, convertMSFiles, findFeatures, groupFeatures, generateTPs, convertToSuspects, convertToMFDB, screenSuspects,
+    estimateIDConfidence, generateMSPeakLists, generateFormulas, generateCompounds, generateComponents,
     selectIons, addFormulaScoring [ shape=Mrecord; fillcolor=\"#FFE6CC\" ]
   transformationProducts, featureGroupsScreening, 'Analysis information', features, featureGroups,
     MSPeakLists, formulas, compounds, components [ shape=octagon; fillcolor=\"#D5E8D4\" ]

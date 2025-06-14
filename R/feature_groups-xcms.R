@@ -190,7 +190,7 @@ importFeatureGroupsXCMSFromFeat <- function(xs, analysisInfo, feat)
 #' Imports grouped features from a legacy \code{\link{xcmsSet}} object from the \pkg{xcms} package.
 #'
 #' @template analysisInfo-arg
-#' @param xs An \code{\link{xcmsSet}} object.
+#' @param input An \code{\link{xcmsSet}} object.
 #' 
 #' @inherit groupFeaturesXCMS references
 #' @inherit importFeatureGroups return
@@ -198,18 +198,18 @@ importFeatureGroupsXCMSFromFeat <- function(xs, analysisInfo, feat)
 #' @seealso \code{\link{importFeaturesXCMS3}} and \code{\link{groupFeatures}}
 #'
 #' @export
-importFeatureGroupsXCMS <- function(xs, analysisInfo)
+importFeatureGroupsXCMS <- function(input, analysisInfo)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertClass(xs, "xcmsSet", add = ac)
+    checkmate::assertClass(input, "xcmsSet", add = ac)
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, fileTypes = "centroid", add = ac)
     checkmate::reportAssertions(ac)
 
-    if (length(xcms::groups(xs)) == 0)
+    if (length(xcms::groups(input)) == 0)
         stop("Provided xcmsSet does not contain any grouped features!")
 
-    feat <- importFeaturesXCMS(xs, analysisInfo)
-    return(importFeatureGroupsXCMSFromFeat(xs, analysisInfo, feat))
+    feat <- importFeaturesXCMS(input, analysisInfo)
+    return(importFeatureGroupsXCMSFromFeat(input, analysisInfo, feat))
 }
 
 #' @rdname featureGroups-class

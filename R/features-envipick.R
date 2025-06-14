@@ -101,21 +101,21 @@ findFeaturesEnviPick <- function(analysisInfo, ..., parallel = TRUE, verbose = T
 #' @templateVar algoParam envimass
 #' @template algo_importer
 #'
-#' @inheritParams importFeatures
-#'
-#' @param enviProjPath The path of the enviMass project.
+#' @param input The path of the enviMass project.
+#' 
+#' @template analysisInfo-arg
 #'
 #' @note This functionality has only been tested with older versions of \pkg{enviMass}.
 #' 
 #' @inherit importFeatures return
 #' 
 #' @export
-importFeaturesEnviMass <- function(analysisInfo, enviProjPath)
+importFeaturesEnviMass <- function(input, analysisInfo)
 {
     ac <- checkmate::makeAssertCollection()
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, fileTypes = "centroid", allowedFormats = "mzXML", add = ac)
-    checkmate::assertDirectoryExists(enviProjPath, "r", add = ac)
-    checkmate::assertDirectoryExists(file.path(enviProjPath, "peaklist"), "r", .var.name = "enviProjPath", add = ac)
+    checkmate::assertDirectoryExists(input, "r", add = ac)
+    checkmate::assertDirectoryExists(file.path(input, "peaklist"), "r", .var.name = "enviProjPath", add = ac)
     checkmate::reportAssertions(ac)
 
     cat("Importing features from enviMass...\n")
@@ -128,7 +128,7 @@ importFeaturesEnviMass <- function(analysisInfo, enviProjPath)
 
     for (i in seq_len(nrow(analysisInfo)))
     {
-        load(file.path(enviProjPath, "peaklist", analysisInfo$analysis[i])) # load into 'peaklist'
+        load(file.path(input, "peaklist", analysisInfo$analysis[i])) # load into 'peaklist'
         fts[[analysisInfo$analysis[i]]] <- importEnviPickPeakList(as.data.frame(peaklist))
         setTxtProgressBar(prog, i)
     }

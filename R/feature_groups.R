@@ -1643,32 +1643,34 @@ setMethod("groupFeatures", "data.frame", function(obj, algorithm, ..., verbose =
 #'
 #' @templateVar func importFeatureGroups
 #' @templateVar what import feature groups from files
-#' @templateVar ex1 importFeatureGroupsBrukerTASQ
-#' @templateVar ex2 importFeatureGroupsBrukerPA
-#' @templateVar algosSuffix BrukerPA,BrukerTASQ,EnviMass
+#' @templateVar ex1 importFeatureGroupsXCMS3
+#' @templateVar ex2 importFeatureGroupsTable
+#' @templateVar algosSuffix XCMS,XCMS3,KPIC2,Table,BrukerPA,BrukerTASQ,EnviMass
 #' @templateVar ret featureGroups
 #' @templateVar noParam TRUE
 #' @template generic-algo
 #'
-#' @param path The path that should be used for importing. See the algorithm specific functions for more details.
-#' @param type Which file type should be imported: \code{"brukerpa"} (Bruker ProfileAnalysis), \code{"brukertasq"}
-#'   (Bruker TASQ) or \code{"envimass"} (\pkg{enviMass}).
+#' @param input The input object or path that should be imported. See the algorithm specific functions for more details.
+#' @param type What type of data should be imported: \code{"xcms"}, \code{"xcms3"}, \code{"kpic2"}, \code{"table"},
+#'   \code{"brukerpa"} (Bruker ProfileAnalysis), \code{"brukertasq"} (Bruker TASQ) or \code{"envimass"}.
 #' @param \dots Further arguments passed to the selected import algorithm function.
 #'
 #' @inherit groupFeatures return
 #'
-#' @seealso \code{\link{groupFeatures}} to group features. Other import functions:
-#'   \code{\link{importFeatureGroupsXCMS}}, \code{\link{importFeatureGroupsXCMS3}} and
-#'   \code{\link{importFeatureGroupsKPIC2}}.
+#' @seealso \code{\link{groupFeatures}} to group features.
 #'
 #' @export
-importFeatureGroups <- function(path, type, ...)
+importFeatureGroups <- function(input, type, ...)
 {
     f <- switch(type,
+                xcms = importFeatureGroupsXCMS,
+                xcms3 = importFeatureGroupsXCMS3,
+                kpic2 = importFeatureGroupsKPIC2,
+                table = importFeatureGroupsTable,
                 brukerpa = importFeatureGroupsBrukerPA,
                 brukertasq = importFeatureGroupsBrukerTASQ,
                 envimass = importFeatureGroupsEnviMass,
-                stop("Invalid algorithm! Should be: brukerpa, brukertasq or envimass"))
+                stop("Invalid algorithm! Should be: xcms, xcms3, kpic2, table, brukerpa, brukertasq or envimass"))
 
-    f(path, ...)
+    f(input, ...)
 }

@@ -25,7 +25,6 @@
         - withMobility vs withIMS
     - mob_area/mob_intensity vs mobmin/mobmax
 - feat import
-    - update generic methods
     - support feature CCS?
 - FIX: IMSRangeParams: in sets workflows, the mz column is taken so relative filtering is done to neutralMasses
     - maybe add _mz rel column like compounds?
@@ -450,6 +449,12 @@
 - Fixed: codegen for functions: don't break lines of args with long text strings
 - Fixed: feature filter didn't hash qualityRange
 - Fixed: newProject(): XCMS3/KPIC2 groupFeatures tried to do RT alignment in sets worfklow
+- importFeatures() / importFeatureGroups()
+    - made interface if both function more consistent: same (order) of arguments
+    - added XCMS, XCMS3 and KPIC2 to importFeatureGroups()
+    - renamed `path` to more generic `input`
+    - removed `analysisInfo` argument from importFeatures()
+    - added `table` import (importFeaturesTable() and importFeatureGroupsTable())
 
 
 ## Features

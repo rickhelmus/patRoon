@@ -12,14 +12,14 @@ featuresTable <- setClass("featuresTable", contains = "features")
 setMethod("initialize", "featuresTable", function(.Object, ...) callNextMethod(.Object, algorithm = "table", ...))
 
 #' @export
-importFeaturesTable <- function(analysisInfo, input, addCols = NULL)
+importFeaturesTable <- function(input, analysisInfo, addCols = NULL)
 {
-    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo)
     checkmate::assert(
         checkmate::checkDataFrame(input),
         checkmate::checkFileExists(input, access = "r"),
         .var.name = "input"
     )
+    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo)
     checkmate::assertCharacter(addCols, any.missing = FALSE, min.chars = 1, null.ok = TRUE)
     
     input <- if (is.character(input)) fread(input) else makeDT(input)

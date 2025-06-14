@@ -614,8 +614,7 @@ findFeatures <- function(analysisInfo, algorithm, ..., verbose = TRUE)
 #' @templateVar noParam TRUE
 #' @template generic-algo
 #'
-#' @template analysisInfo-arg
-#'
+#' @param input The input object or path that should be imported. See the algorithm specific functions for more details.
 #' @param type What type of data should be imported: \code{"xcms"}, \code{"xcms3"}, \code{"kpic2"}, \code{"table"}, or
 #'   \code{"envimass"}.
 #' @param \dots Further arguments passed to the selected import algorithm function.
@@ -625,10 +624,8 @@ findFeatures <- function(analysisInfo, algorithm, ..., verbose = TRUE)
 #' @seealso \code{\link{findFeatures}} to find new features.
 #'
 #' @export
-importFeatures <- function(analysisInfo, type, ...)
+importFeatures <- function(input, type, ...)
 {
-    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo)
-
     f <- switch(type,
                 xcms = importFeaturesXCMS,
                 xcms3 = importFeaturesXCMS3,
@@ -637,5 +634,5 @@ importFeatures <- function(analysisInfo, type, ...)
                 envimass = importFeaturesEnviMass,
                 stop("Invalid algorithm! Should be: xcms, xcms3, kpic2, table or envimass"))
 
-    f(analysisInfo = analysisInfo, ...)
+    f(input, ...)
 }

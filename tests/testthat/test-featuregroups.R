@@ -120,15 +120,15 @@ test_that("XCMS conversion", {
     expect_known_value(xcms::groups(XCMSImpKPIC2), testFile("fg-xcms_import_kpic2"))
     expect_known_value(xcms::groups(XCMSImpSIRIUS), testFile("fg-xcms_import_sirius"))
     
-    expect_equal(unname(groupTable(importFeatureGroupsXCMS(XCMSImpXCMS, getExpAnaInfo()))),
+    expect_equal(unname(groupTable(importFeatureGroups(XCMSImpXCMS, "xcms", getExpAnaInfo()))),
                  unname(groupTable(getExpFG(fgXCMS))))
-    expect_equal(unname(groupTable(importFeatureGroupsXCMS(XCMSImpXCMS3, getExpAnaInfo()))),
+    expect_equal(unname(groupTable(importFeatureGroups(XCMSImpXCMS3, "xcms", getExpAnaInfo()))),
                  unname(groupTable(getExpFG(fgXCMS3))))
-    expect_equal(unname(groupTable(importFeatureGroupsXCMS(XCMSImpOpenMS, getExpAnaInfo()))),
+    expect_equal(unname(groupTable(importFeatureGroups(XCMSImpOpenMS, "xcms", getExpAnaInfo()))),
                  unname(groupTable(getExpFG(fgOpenMS))))
-    expect_equal(unname(groupTable(importFeatureGroupsXCMS(XCMSImpKPIC2, getExpAnaInfo()))),
+    expect_equal(unname(groupTable(importFeatureGroups(XCMSImpKPIC2, "xcms", getExpAnaInfo()))),
                  unname(groupTable(getExpFG(fgKPIC2))))
-    expect_equal(unname(groupTable(importFeatureGroupsXCMS(XCMSImpSIRIUS, getExpAnaInfo()[1, ]))),
+    expect_equal(unname(groupTable(importFeatureGroups(XCMSImpSIRIUS, "xcms", getExpAnaInfo()[1, ]))),
                  unname(groupTable(getExpFG(fgSIRIUS))))
 })
 
@@ -152,15 +152,15 @@ test_that("XCMS3 conversion", {
     expect_known_value(xcms::featureDefinitions(XCMS3ImpSIRIUS)[, names(xcms::featureDefinitions(XCMS3ImpSIRIUS)) != "peakidx"],
                        testFile("fg-xcms3_import_sirius")) # NOTE: peakidx not consistent
     
-    expect_equal(unname(groupTable(importFeatureGroupsXCMS3(XCMS3ImpXCMS, getExpAnaInfo()))),
+    expect_equal(unname(groupTable(importFeatureGroups(XCMS3ImpXCMS, "xcms3", getExpAnaInfo()))),
                  unname(groupTable(getExpFG(fgXCMS))))
-    expect_equal(unname(groupTable(importFeatureGroupsXCMS3(XCMS3ImpXCMS3, getExpAnaInfo()))),
+    expect_equal(unname(groupTable(importFeatureGroups(XCMS3ImpXCMS3, "xcms3", getExpAnaInfo()))),
                  unname(groupTable(getExpFG(fgXCMS3))))
-    expect_equal(unname(groupTable(importFeatureGroupsXCMS3(XCMS3ImpOpenMS, getExpAnaInfo()))),
+    expect_equal(unname(groupTable(importFeatureGroups(XCMS3ImpOpenMS, "xcms3", getExpAnaInfo()))),
                  unname(groupTable(getExpFG(fgOpenMS))))
-    expect_equal(unname(groupTable(importFeatureGroupsXCMS3(XCMS3ImpKPIC2, getExpAnaInfo()))),
+    expect_equal(unname(groupTable(importFeatureGroups(XCMS3ImpKPIC2, "xcms3", getExpAnaInfo()))),
                  unname(groupTable(getExpFG(fgKPIC2))))
-    expect_equal(unname(groupTable(importFeatureGroupsXCMS3(XCMS3ImpSIRIUS, getExpAnaInfo()[1, ]))),
+    expect_equal(unname(groupTable(importFeatureGroups(XCMS3ImpSIRIUS, "xcms3", getExpAnaInfo()[1, ]))),
                  unname(groupTable(getExpFG(fgSIRIUS))))
 })
 

@@ -30,7 +30,7 @@ setMethod("initialize", "featureGroupsBrukerTASQ",
 #'
 #' @template analysisInfo-arg
 #'
-#' @param path The file path to an Excel export of the Global results table from TASQ, converted to \file{.csv} format.
+#' @param input The file path to an Excel export of the Global results table from TASQ, converted to \file{.csv} format.
 #' @param clusterRTWindow This retention time window (in seconds) is used to group hits across analyses together. See
 #'   also the details section.
 #'
@@ -47,19 +47,19 @@ setMethod("initialize", "featureGroupsBrukerTASQ",
 #' @references \addCitations{fastcluster}
 #'
 #' @export
-importFeatureGroupsBrukerTASQ <- function(path, analysisInfo, clusterRTWindow = defaultLim("retention", "medium"))
+importFeatureGroupsBrukerTASQ <- function(input, analysisInfo, clusterRTWindow = defaultLim("retention", "medium"))
 {
     ac <- checkmate::makeAssertCollection()
-    assertCSVFile(path, TASQImportCols(), add = ac)
+    assertCSVFile(input, TASQImportCols(), add = ac)
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, add = ac)
     checkmate::assertNumber(clusterRTWindow, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
-    fts <- importFeaturesBrukerTASQ(analysisInfo, path)
+    fts <- importFeaturesBrukerTASQ(inputFeat, analysisInfo)
     fTable <- featureTable(fts)
     analysisInfo <- fts@analysisInfo # may have been updated
     
-    tExport <- loadTASQFile(path, analysisInfo)
+    tExport <- loadTASQFile(input, analysisInfo)
 
     # If no retention times were specified in TASQ for a suspect then we cannot
     # assume that suspect hits across analyses are from the same peak. Hence, to

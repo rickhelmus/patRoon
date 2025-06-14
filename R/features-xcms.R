@@ -122,9 +122,9 @@ findFeaturesXCMS <- function(analysisInfo, method = "centWave", ..., verbose = T
 #' @templateVar algoParam xcms
 #' @template algo_importer
 #'
-#' @inheritParams importFeatures
+#' @param input An \code{\link{xcmsSet}} object.
 #' 
-#' @param xs An \code{\link{xcmsSet}} object.
+#' @template analysisInfo-arg
 #' 
 #' @inherit findFeaturesXCMS references
 #' @inherit importFeatures return
@@ -132,14 +132,14 @@ findFeaturesXCMS <- function(analysisInfo, method = "centWave", ..., verbose = T
 #' @seealso \code{\link{importFeaturesXCMS3}}
 #'
 #' @export
-importFeaturesXCMS <- function(xs, analysisInfo)
+importFeaturesXCMS <- function(input, analysisInfo)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertClass(xs, "xcmsSet", add = ac)
+    checkmate::assertClass(input, "xcmsSet", add = ac)
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, fileTypes = "centroid", add = ac)
     checkmate::reportAssertions(ac)
 
-    feat <- importXCMSPeaks(xcms::peaks(xs), analysisInfo)
+    feat <- importXCMSPeaks(xcms::peaks(input), analysisInfo)
 
-    return(featuresXCMS(xs = xs, features = feat, analysisInfo = analysisInfo))
+    return(featuresXCMS(xs = input, features = feat, analysisInfo = analysisInfo))
 }

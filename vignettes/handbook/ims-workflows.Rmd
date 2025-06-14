@@ -95,21 +95,21 @@ Some examples are given below:
 
 ```{r exDirectMob, eval=FALSE}
 # comprehensive feature detection from 2 dimensional bins
-fParams <- getPiekParams(methodMZ = "bins", methodIMS = "bins", mzRange = c(100, 300), mobRange = c(0.5, 1.5))
-pParams <- getDefPeakParams("chrom", "piek")
-fList <- findFeatures(anaInfo, "piek", featParams = fParams, peakParams = pParams)
+genEICParams <- getPiekGenEICParams(methodMZ = "bins", methodIMS = "bins", mzRange = c(100, 300), mobRange = c(0.5, 1.5))
+peakParams <- getDefPeakParams("chrom", "piek")
+fList <- findFeatures(anaInfo, "piek", genEICParams = genEICParams, peakParams = peakParams)
 
 # use PASEF MS2 data to detect features
-fParams <- getPiekParams(methodMZ = "ms2", methodIMS = "ms2", minTIC = 1000)
-fList <- findFeatures(anaInfo, "piek", featParams = fParams, peakParams = pParams)
+genEICParams <- getPiekGenEICParams(methodMZ = "ms2", methodIMS = "ms2", minTIC = 1000)
+fList <- findFeatures(anaInfo, "piek", genEICParams = genEICParams, peakParams = peakParams)
 
 # combine suspect data with IMS bins (e.g. if suspect list doesn't contain IMS data)
-fParams <- getPiekParams(methodMZ = "suspects", methodIMS = "bins", mobRange = c(0.5, 1.5))
-fList <- findFeatures(anaInfo, "piek", featParams = fParams, peakParams = pParams,
+genEICParams <- getPiekGenEICParams(methodMZ = "suspects", methodIMS = "bins", mobRange = c(0.5, 1.5))
+fList <- findFeatures(anaInfo, "piek", genEICParams = genEICParams, peakParams = peakParams,
                       suspects = suspList, adduct = "[M+H]+")
 ```
 
-> **_NOTE_** when both `methodMZ` and `methodIMS` are set to `"bins"` then peak detection will need to cover a very large number of EICs, which can be be quite computationally intensive. Tweaking the EIC filtering parameters can improve the situation, see `?getPiekParams` for more details.
+> **_NOTE_** when both `methodMZ` and `methodIMS` are set to `"bins"` then peak detection will need to cover a very large number of EICs, which can be be quite computationally intensive. Tweaking the EIC filtering parameters can improve the situation, see `?getPiekGenEICParams` for more details.
 
 The grouping of features is performed with `groupFeatures()` as in non-IMS workflows. This automatically performs the necessary IMS clustering and grouping steps ([discussed here](#directIMS)).
 

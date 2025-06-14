@@ -538,9 +538,9 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
-// doFindPeaksDietrich
-Rcpp::List doFindPeaksDietrich(Rcpp::List EICs, bool fillEICs, double minIntensity, int SN, double peakWidthMin, double peakWidthMax, double RTMin, double RTMax, int maxPeaksPerSignal, bool verbose);
-RcppExport SEXP _patRoon_doFindPeaksDietrich(SEXP EICsSEXP, SEXP fillEICsSEXP, SEXP minIntensitySEXP, SEXP SNSEXP, SEXP peakWidthMinSEXP, SEXP peakWidthMaxSEXP, SEXP RTMinSEXP, SEXP RTMaxSEXP, SEXP maxPeaksPerSignalSEXP, SEXP verboseSEXP) {
+// doFindPeaksPiek
+Rcpp::List doFindPeaksPiek(Rcpp::List EICs, bool fillEICs, double minIntensity, int SN, double peakWidthMin, double peakWidthMax, double RTMin, double RTMax, int maxPeaksPerSignal, bool verbose);
+RcppExport SEXP _patRoon_doFindPeaksPiek(SEXP EICsSEXP, SEXP fillEICsSEXP, SEXP minIntensitySEXP, SEXP SNSEXP, SEXP peakWidthMinSEXP, SEXP peakWidthMaxSEXP, SEXP RTMinSEXP, SEXP RTMaxSEXP, SEXP maxPeaksPerSignalSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -554,7 +554,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type RTMax(RTMaxSEXP);
     Rcpp::traits::input_parameter< int >::type maxPeaksPerSignal(maxPeaksPerSignalSEXP);
     Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
-    rcpp_result_gen = Rcpp::wrap(doFindPeaksDietrich(EICs, fillEICs, minIntensity, SN, peakWidthMin, peakWidthMax, RTMin, RTMax, maxPeaksPerSignal, verbose));
+    rcpp_result_gen = Rcpp::wrap(doFindPeaksPiek(EICs, fillEICs, minIntensity, SN, peakWidthMin, peakWidthMax, RTMin, RTMax, maxPeaksPerSignal, verbose));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -840,7 +840,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_parseFeatureMRMXMLFile", (DL_FUNC) &_patRoon_parseFeatureMRMXMLFile, 1},
     {"_patRoon_parseFeatConsXMLFile", (DL_FUNC) &_patRoon_parseFeatConsXMLFile, 2},
     {"_patRoon_writeFeatureXML", (DL_FUNC) &_patRoon_writeFeatureXML, 4},
-    {"_patRoon_doFindPeaksDietrich", (DL_FUNC) &_patRoon_doFindPeaksDietrich, 10},
+    {"_patRoon_doFindPeaksPiek", (DL_FUNC) &_patRoon_doFindPeaksPiek, 10},
     {"_patRoon_specDistMatrix", (DL_FUNC) &_patRoon_specDistMatrix, 7},
     {"_patRoon_specDistRect", (DL_FUNC) &_patRoon_specDistRect, 9},
     {"_patRoon_testSpecFilter", (DL_FUNC) &_patRoon_testSpecFilter, 7},

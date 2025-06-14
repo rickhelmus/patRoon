@@ -1,7 +1,6 @@
 getFeatAlgoSelections <- function()
 {
-    c("OpenMS", "XCMS", "enviPick", "SIRIUS", "KPIC2", EICs = "EIC",
-      "Bruker DataAnalysis" = "Bruker")
+    c("OpenMS", "XCMS", "enviPick", "SIRIUS", "KPIC2", "piek", "Bruker DataAnalysis" = "Bruker")
 }
 
 newProjectFeaturesUI <- function(id)
@@ -23,11 +22,11 @@ newProjectFeaturesUI <- function(id)
                             selectInput(ns("featAlgo"), "Feature finding algorithm", getFeatAlgoSelections(),
                                         width = "100%"),
                             conditionalPanel(
-                                condition = "input.featAlgo == \"EIC\"",
+                                condition = "input.featAlgo == \"piek\"",
                                 ns = ns,
                                 # align with select label: https://stackoverflow.com/a/70543848
                                 style = "margin-top: 25px; margin-left: 10px;",
-                                actionButton(ns("featEICParams"), "", icon = icon("cog"), title = "EIC parameters")
+                                actionButton(ns("piekParams"), "", icon = icon("cog"), title = "piek parameters")
                             )
                         ),
                         fillCol(
@@ -114,7 +113,7 @@ newProjectFeaturesServer <- function(id, ionization, IMSMode, settings)
         )
     }
     
-    getEICIMSMethods <- function(methodMZ)
+    getPiekEICIMSMethods <- function(methodMZ)
     {
         switch(methodMZ,
                bins = "bins",
@@ -125,13 +124,13 @@ newProjectFeaturesServer <- function(id, ionization, IMSMode, settings)
     moduleServer(id, function(input, output, session)
     {
         rValues <- reactiveValues(
-            featEICParams = defaultFeaturesSettings()$featEICParams,
+            piekParams = defaultFeaturesSettings()$piekParams,
             fGroupsAdv = defaultFeaturesSettings()$fGroupsAdv
         )
         
         observeEvent(settings(), {
             updateSelectInput(session, "featAlgo", selected = settings()$featAlgo)
-            rValues$featEICParams <- settings()$featEICParams
+            rValues$piekParams <- settings()$piekParams
             updateSelectInput(session, "fGroupsAlgo", selected = settings()$fGroupsAlgo)
             updateSelectInput(session, "IMSPeaksMob", selected = settings()$IMSPeaksMob)
             updateSelectInput(session, "IMSPeaksChrom", selected = settings()$IMSPeaksChrom)
@@ -148,7 +147,7 @@ newProjectFeaturesServer <- function(id, ionization, IMSMode, settings)
             curSel <- input$featAlgo
             if (IMSMode() == "direct")
             {
-                sels <- sels[sels == "EIC"]
+                sels <- sels[sels == "piek"]
             }
             if (!curSel %in% sels)
                 curSel <- sels[1]
@@ -178,16 +177,16 @@ newProjectFeaturesServer <- function(id, ionization, IMSMode, settings)
                 shinyjs::toggleState("featAlgo", input$fGroupsAlgo != "SIRIUS")
         })
 
-        observeEvent(input$featEICParams, {
+        observeEvent(input$piekParams, {
             showModal(modalDialog(
-                title = "EIC feature parameters",
+                title = "piek feature parameters",
                 fillCol(
                     flex = NA,
                     width = 600,
                     fillRow(
                         height = 75,
                         selectInput(ns("methodMZ"), "EIC method (m/z)", c("bins", "suspects", "ms2"),
-                                    selected = rValues$featEICParams$methodMZ, width = "95%"),
+                                    selected = rValues$piekParams$methodMZ, width = "95%"),
                         
                     ),
                     conditionalPanel(
@@ -196,8 +195,8 @@ newProjectFeaturesServer <- function(id, ionization, IMSMode, settings)
                         fillRow(
                             height = 75,
                             selectInput(ns("methodIMS"), "EIC method (IMS)",
-                                        getEICIMSMethods(rValues$featEICParams$methodMZ),
-                                        selected = rValues$featEICParams$methodIMS, width = "95%")
+                                        getPiekEICIMSMethods(rValues$piekParams$methodMZ),
+                                        selected = rValues$piekParams$methodIMS, width = "95%")
                         )
                     ),
                     conditionalPanel(
@@ -206,8 +205,8 @@ newProjectFeaturesServer <- function(id, ionization, IMSMode, settings)
                         fillRow(
                             height = 75,
                             width = "95%",
-                            fileSelect(ns("featEICSuspectList"), ns("featEICSuspectListButton"), "Suspect list",
-                                       rValues$featEICParams$suspects$single,
+                            fileSelect(ns("piekSuspectList"), ns("piekSuspectListButton"), "Suspect list",
+                                       rValues$piekParams$suspects$single,
                                        placeholder = "Empty for same as Features tab")
                         )
                     ),
@@ -218,14 +217,14 @@ newProjectFeaturesServer <- function(id, ionization, IMSMode, settings)
                             height = 75,
                             fillCol(
                                 width = "90%",
-                                fileSelect(ns("featEICSuspectListPos"), ns("featEICSuspectListButtonPos"),
-                                           "Suspect list (positive)", rValues$featEICParams$suspects$sets$pos,
+                                fileSelect(ns("piekSuspectListPos"), ns("piekSuspectListButtonPos"),
+                                           "Suspect list (positive)", rValues$piekParams$suspects$sets$pos,
                                            placeholder = "Empty for same as Features tab")
                             ),
                             fillCol(
                                 width = "90%",
-                                fileSelect(ns("featEICSuspectListNeg"), ns("featEICSuspectListButtonNeg"),
-                                           "Suspect list (negative)", rValues$featEICParams$suspects$sets$neg,
+                                fileSelect(ns("piekSuspectListNeg"), ns("piekSuspectListButtonNeg"),
+                                           "Suspect list (negative)", rValues$piekParams$suspects$sets$neg,
                                            placeholder = "Empty for same as positive")
                             )
                         )
@@ -233,33 +232,33 @@ newProjectFeaturesServer <- function(id, ionization, IMSMode, settings)
                     fillRow(
                         height = 75,
                         selectInput(ns("peaksAlgo"), "Peak detection algorithm",
-                                    c(Dietrich = "dietrich", "OpenMS" = "openms", "XCMS3" = "xcms3", "enviPick" = "envipick"),
-                                    selected = rValues$featEICParams$peaksAlgo, width = "95%")
+                                    c("piek", "OpenMS" = "openms", "XCMS3" = "xcms3", "enviPick" = "envipick"),
+                                    selected = rValues$piekParams$peaksAlgo, width = "95%")
                     )
                 ),
                 easyClose = TRUE,
                 footer = tagList(
                     modalButton("Cancel"),
-                    actionButton(ns("featEICParamsOK"), "OK")
+                    actionButton(ns("piekParamsOK"), "OK")
                 )
             ))
         })
         
         observeEvent(input$methodMZ, {
-            ch <- getEICIMSMethods(input$methodMZ)
+            ch <- getPiekEICIMSMethods(input$methodMZ)
             sel <- input$methodIMS
             if (!sel %in% ch)
                 sel <- ch[1]
             updateSelectInput(session, "methodIMS", choices = ch, selected = sel)
         })
         
-        observeEvent(input$featEICParamsOK, {
+        observeEvent(input$piekParamsOK, {
             removeModal()
-            rValues$featEICParams <- list(
+            rValues$piekParams <- list(
                 methodMZ = input$methodMZ,
                 methodIMS = input$methodIMS,
-                suspects = list(single = input$featEICSuspectList,
-                                sets = list(pos = input$featEICSuspectListPos, neg = input$featEICSuspectListNeg)),
+                suspects = list(single = input$piekSuspectList,
+                                sets = list(pos = input$piekSuspectListPos, neg = input$piekSuspectListNeg)),
                 peaksAlgo = input$peaksAlgo
             )
         })
@@ -381,20 +380,20 @@ newProjectFeaturesServer <- function(id, ionization, IMSMode, settings)
             valid = reactive({
                 suspEmpty <- (ionization() != "both" && !nzchar(input$suspectList)) ||
                     (ionization() == "both" && !nzchar(input$suspectListPos))
-                suspEICEmpty <- (ionization() != "both" && !nzchar(rValues$featEICParams$suspects$single)) ||
-                    (ionization() == "both" && !nzchar(rValues$featEICParams$suspects$pos))
-                if (input$featAlgo == "EIC" && rValues$featEICParams$methodMZ == "suspects" && suspEmpty &&
-                    suspEICEmpty)
+                suspPiekEmpty <- (ionization() != "both" && !nzchar(rValues$piekParams$suspects$single)) ||
+                    (ionization() == "both" && !nzchar(rValues$piekParams$suspects$pos))
+                if (input$featAlgo == "piek" && rValues$piekParams$methodMZ == "suspects" && suspEmpty &&
+                    suspPiekEmpty)
                 {
                     list(title = "No suspect list",
-                         msg = "Please select suspect data when finding features from suspect EICs!")
+                         msg = "Please select suspect data for the piek feature finding algorithm!")
                 }
                 else
                     TRUE
             }),
             settings = reactive(list(
                 featAlgo = input$featAlgo,
-                featEICParams = rValues$featEICParams,
+                piekParams = rValues$piekParams,
                 fGroupsAlgo = input$fGroupsAlgo,
                 IMSPeaksMob = input$IMSPeaksMob,
                 IMSPeaksChrom = input$IMSPeaksChrom,
@@ -412,11 +411,11 @@ defaultFeaturesSettings <- function()
 {
     return(list(
         featAlgo = "OpenMS",
-        featEICParams = list(
+        piekParams = list(
             methodMZ = "bins",
             methodIMS = "bins",
             suspects = list(single = "", sets = list(pos = "", neg = "")),
-            peaksAlgo = "dietrich"
+            peaksAlgo = "piek"
         ),
         fGroupsAlgo = "OpenMS",
         IMSPeaksMob = "piek",

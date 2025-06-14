@@ -125,8 +125,8 @@ writeFeatureXML <- function(featList, fPath, out, hulls) {
     invisible(.Call(`_patRoon_writeFeatureXML`, featList, fPath, out, hulls))
 }
 
-doFindPeaksDietrich <- function(EICs, fillEICs, minIntensity, SN, peakWidthMin, peakWidthMax, RTMin, RTMax, maxPeaksPerSignal, verbose = TRUE) {
-    .Call(`_patRoon_doFindPeaksDietrich`, EICs, fillEICs, minIntensity, SN, peakWidthMin, peakWidthMax, RTMin, RTMax, maxPeaksPerSignal, verbose)
+doFindPeaksPiek <- function(EICs, fillEICs, minIntensity, SN, peakWidthMin, peakWidthMax, RTMin, RTMax, maxPeaksPerSignal, verbose = TRUE) {
+    .Call(`_patRoon_doFindPeaksPiek`, EICs, fillEICs, minIntensity, SN, peakWidthMin, peakWidthMax, RTMin, RTMax, maxPeaksPerSignal, verbose)
 }
 
 specDistMatrix <- function(specList, method, shift, precMZs, mzWeight, intWeight, mzWindow) {

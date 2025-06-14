@@ -407,7 +407,7 @@ doFGAADTFeatures <- function(fGroups, fgTab, intColNames, average, averageBy, ad
         # average all numeric columns
         numCols <- setdiff(names(which(sapply(featTab, is.numeric))), "average_group")
         # avoid DT warning when averaging int values that lead to decimal values
-        # UNDONE: or collapse int values instead: for Dietrich peaks they are scan numbers, OpenMS isocounts, so could make sense
+        # UNDONE: or collapse int values instead: for piek they are scan numbers, OpenMS isocounts, so could make sense
         featTab[, (numCols) := lapply(.SD, as.numeric), .SDcols = numCols]
         featTab[, (numCols) := lapply(.SD, averageFunc), .SDcols = numCols, by = by]
         

@@ -371,9 +371,9 @@ PeakPickingResults peakPicking_cpp(const std::vector<SpectrumRawTypes::Intensity
 }
 
 // [[Rcpp::export]]
-Rcpp::List doFindPeaksDietrich(Rcpp::List EICs, bool fillEICs, double minIntensity, int SN, double peakWidthMin,
-                               double peakWidthMax, double RTMin, double RTMax, int maxPeaksPerSignal,
-                               bool verbose = true)
+Rcpp::List doFindPeaksPiek(Rcpp::List EICs, bool fillEICs, double minIntensity, int SN, double peakWidthMin,
+                           double peakWidthMax, double RTMin, double RTMax, int maxPeaksPerSignal,
+                           bool verbose = true)
 {
     // UNDONE: set default args
     
@@ -403,7 +403,6 @@ Rcpp::List doFindPeaksDietrich(Rcpp::List EICs, bool fillEICs, double minIntensi
             ppresults[i] = peakPicking_cpp(intens, fullEICTimes, minIntensity, SN, peakWidthMin, peakWidthMax,
                                            RTMin, RTMax, maxPeaksPerSignal);
         }
-        
     }
     else
     {
@@ -413,7 +412,6 @@ Rcpp::List doFindPeaksDietrich(Rcpp::List EICs, bool fillEICs, double minIntensi
             ppresults[i] = peakPicking_cpp(allIntensities[i], allTimes[i], minIntensity, SN, peakWidthMin, peakWidthMax,
                                            RTMin, RTMax, maxPeaksPerSignal);
         }
-        
     }
 
     if (verbose)

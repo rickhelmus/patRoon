@@ -1024,7 +1024,7 @@ assertFindPeakParams <- function(x, null.ok = FALSE, .var.name = checkmate::vnam
     if (null.ok && is.null(x))
         return(invisible(NULL))
     
-    assertListVal(x, "algorithm", checkmate::assertChoice, choices = c("xcms3", "envipick", "openms", "dietrich"),
+    assertListVal(x, "algorithm", checkmate::assertChoice, choices = c("xcms3", "envipick", "openms", "piek"),
                   .var.name = .var.name) # NOTE: don't add, must fail for next line
     if (x$algorithm == "openms")
     {
@@ -1048,7 +1048,7 @@ assertFindPeakParams <- function(x, null.ok = FALSE, .var.name = checkmate::vnam
         assertListVal(x, "fitEMG", checkmate::assertFlag, .var.name = .var.name, add = add)
         assertListVal(x, "extraOpts", checkmate::assertList, .var.name = .var.name, add = add)
     }
-    else if (x$algorithm == "dietrich")
+    else if (x$algorithm == "piek")
     {
         assertListVal(x, "minIntensity", checkmate::assertNumber, finite = TRUE, .var.name = .var.name, add = add)
         assertListVal(x, "SN", checkmate::assertCount, .var.name = .var.name, add = add)
@@ -1151,7 +1151,7 @@ assertIMSMatchParams <- function(x, null.ok = FALSE, .var.name = checkmate::vnam
     assertListVal(x, "minMatches", checkmate::assertCount, positive = FALSE, .var.name = .var.name, add = add)
 }
 
-assertFeaturesEICsParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
+assertPiekGenEICParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
 {
     checkmate::assertList(x, .var.name = .var.name)
     assertListVal(x, "methodMZ", checkmate::assertChoice, choices = c("bins", "suspects", "ms2"), .var.name = .var.name)

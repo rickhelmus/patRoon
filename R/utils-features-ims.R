@@ -346,26 +346,39 @@ assignFGroupsCCS <- function(fGroups, CCSParams)
     if (!hasMobilities(fGroups))
         stop("Cannot calculate CCS values: feature groups are without mobility assignments", call. = FALSE)
     
-    charges <- if (nrow(annotations(fGroups)) > 0)
+    # HACK: may be do some polymorhic things some day...
+    hasSets <- isFGSet(fGroups)
+    
+    # NOTE: there is at most 1 mobility fGroup per set, so we don't have to worry about multiple annotations in sets workflows
+    ann <- if (nrow(annotations(fGroups)) > 0)
+        annotations(fGroups)[group %chin% groupInfo(fGroups)[!is.na(mobility)]$group]
+    else
+        NULL
+    
+    grpCharges <- if (!is.null(ann))
     {
-        # NOTE: there is at most 1 mobility fGroup per set, so we don't have to worry about multiple annotations in sets workflows
-        ann <- annotations(fGroups)[group %chin% groupInfo(fGroups)[!is.na(mobility)]$group]
         unAdd <- unique(ann$adduct)
         addCharges <- sapply(unAdd, function(a) as.adduct(a)@charge)
         setNames(addCharges[ann$adduct], ann$group)
     }
     else
-        setNames(rep(CCSParams$defaultCharge, length(fGroups)), names(fGroups))
+        grpCharges <- setNames(rep(CCSParams$defaultCharge, length(fGroups)), names(fGroups))
     
+    grpMZs <- if (hasSets)
+        setNames(ann$ion_mz, ann$group)
+    else
+        grpMZs <- setNames(groupInfo(fGroups)$mz, names(fGroups))
+
+    featMZCol <- if (hasSets) "ion_mz" else "mz"
     fGroups@features@features <- lapply(featureTable(fGroups), function(ft)
     {
         ft <- copy(ft)
-        ft[!is.na(mobility), CCS := convertMobilityToCCS(mobility, mz, CCSParams, charges[group])]
+        ft[!is.na(mobility), CCS := convertMobilityToCCS(mobility, get(featMZCol), CCSParams, grpCharges[group])]
         return(ft[])
     })
     
     fGroups@groupInfo <- copy(groupInfo(fGroups))
-    fGroups@groupInfo[!is.na(mobility), CCS := convertMobilityToCCS(mobility, mz, CCSParams, charges[group])]
+    fGroups@groupInfo[!is.na(mobility), CCS := convertMobilityToCCS(mobility, grpMZs[group], CCSParams, grpCharges[group])][]
     
     return(fGroups)
 }

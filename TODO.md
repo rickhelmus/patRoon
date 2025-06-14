@@ -28,7 +28,7 @@
     - support feature CCS?
 - FIX: IMSRangeParams: in sets workflows, the mz column is taken so relative filtering is done to neutralMasses
     - maybe add _mz rel column like compounds?
-    - same for feat CCS calculation!
+    - actually, the same is the case for the mz filter (also IMS and mz for features) --> maybe just document difference? the actual results will not change much in general
 - rename convertMSFilesAnaInfo() to convertMSFiles() or something else and shorter?
     - update Handbook/Tutorial if needed
 - overwrite vs overWrite

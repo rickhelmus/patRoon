@@ -44,7 +44,7 @@ removeDuplicateFeatsSusps <- function(tab, checkRet, selectTopIntens, nameCol)
     return(tab[duplicate == FALSE][, duplicate := NULL])
 }
 
-getFeatEICsInfo <- function(params, suspects, withIMS, MS2Info)
+getPiekEICsInfo <- function(params, suspects, withIMS, MS2Info)
 {
     EICInfo <- NULL
     if (params$methodMZ == "bins")
@@ -93,7 +93,7 @@ getFeatEICsInfo <- function(params, suspects, withIMS, MS2Info)
 }
 
 #' @export
-getFeaturesEICsParams <- function(methodMZ, methodIMS = NULL, ...)
+getPiekGenEICParams <- function(methodMZ, methodIMS = NULL, ...)
 {
     checkmate::assertChoice(methodMZ, c("bins", "suspects", "ms2"))
     checkmate::assertChoice(methodIMS, c("bins", "suspects", "ms2"), null.ok = TRUE)
@@ -161,15 +161,15 @@ getFeaturesEICsParams <- function(methodMZ, methodIMS = NULL, ...)
 
 #' @rdname features-class
 #' @export
-featuresEICs <- setClass("featuresEICs", contains = "features")
+featuresPiek <- setClass("featuresPiek", contains = "features")
 
-setMethod("initialize", "featuresEICs",
-          function(.Object, ...) callNextMethod(.Object, algorithm = "eics", ...))
+setMethod("initialize", "featuresPiek",
+          function(.Object, ...) callNextMethod(.Object, algorithm = "piek", ...))
 
 #' @template minIntensityIMS-arg
 #' @export
-findFeaturesEICs <- function(analysisInfo, featParams, peakParams, suspects = NULL, adduct = NULL, minIntensityIMS = 25,
-                             verbose = TRUE)
+findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = NULL, adduct = NULL,
+                             minIntensityIMS = 25, verbose = TRUE)
 {
     # UNDONE: add refs to docs, and highlight changes
     # UNDONE: use BP intensity?
@@ -180,9 +180,9 @@ findFeaturesEICs <- function(analysisInfo, featParams, peakParams, suspects = NU
     
     ac <- checkmate::makeAssertCollection()
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, add = ac)
-    assertFeaturesEICsParams(featParams, add = ac)
+    assertPiekGenEICParams(genEICParams, add = ac)
     assertFindPeakParams(peakParams, add = ac)
-    assertSuspectList(suspects, needsAdduct = is.null(adduct), skipInvalid = featParams$skipInvalid, null.ok = TRUE,
+    assertSuspectList(suspects, needsAdduct = is.null(adduct), skipInvalid = genEICParams$skipInvalid, null.ok = TRUE,
                       add = ac)
     checkmate::assertNumber(minIntensityIMS, lower = 0, finite = TRUE, add = ac)
     checkmate::assertFlag(verbose, add = ac)
@@ -190,11 +190,11 @@ findFeaturesEICs <- function(analysisInfo, featParams, peakParams, suspects = NU
     
     maybePrintf <- \(...) if (verbose) printf(...)
     
-    if (featParams$methodMZ == "suspects")
+    if (genEICParams$methodMZ == "suspects")
     {
-        suspects <- prepareSuspectList(suspects, adduct = adduct, skipInvalid = featParams$skipInvalid,
-                                       checkDesc = TRUE, prefCalcChemProps = featParams$prefCalcChemProps,
-                                       neutralChemProps = featParams$neutralChemProps)
+        suspects <- prepareSuspectList(suspects, adduct = adduct, skipInvalid = genEICParams$skipInvalid,
+                                       checkDesc = TRUE, prefCalcChemProps = genEICParams$prefCalcChemProps,
+                                       neutralChemProps = genEICParams$neutralChemProps)
         suspectsOrig <- suspects
         suspects <- removeDuplicateFeatsSusps(suspects, FALSE, FALSE, "name")
         suspects <- suspects[order(mz)]
@@ -203,16 +203,16 @@ findFeaturesEICs <- function(analysisInfo, featParams, peakParams, suspects = NU
                     getStrListWithMax(suspsRM, 10, ", "))
     }
     
-    if (is.null(featParams[["retRange"]]))
-        featParams$retRange <- c(0, 0)
+    if (is.null(genEICParams[["retRange"]]))
+        genEICParams$retRange <- c(0, 0)
     
-    withIMS <- !is.null(featParams[["methodIMS"]])
+    withIMS <- !is.null(genEICParams[["methodIMS"]])
     
     cacheDB <- openCacheDBScope()
-    baseHash <- makeHash(featParams, peakParams, minIntensityIMS)
+    baseHash <- makeHash(genEICParams, peakParams, minIntensityIMS)
     anaHashes <- getMSFileHashesFromAvailBackend(analysisInfo, needIMS = withIMS)
     anaHashes <- sapply(anaHashes, makeHash, baseHash)
-    cachedData <- pruneList(loadCacheData("featuresEICs", anaHashes, simplify = FALSE, dbArg = cacheDB))
+    cachedData <- pruneList(loadCacheData("featuresPiek", anaHashes, simplify = FALSE, dbArg = cacheDB))
     if (length(cachedData) > 0)
     {
         names(cachedData) <- names(anaHashes)[match(names(cachedData), anaHashes)]
@@ -223,12 +223,12 @@ findFeaturesEICs <- function(analysisInfo, featParams, peakParams, suspects = NU
     
     getEICsAna <- function(backend, EICInfo, mode, topMost)
     {
-        args <- list(backend, EICInfo$mzmin, EICInfo$mzmax, featParams$retRange[1], featParams$retRange[2],
+        args <- list(backend, EICInfo$mzmin, EICInfo$mzmax, genEICParams$retRange[1], genEICParams$retRange[2],
                      EICInfo$mobmin, EICInfo$mobmax, mzExpIMSWindow = 0, minIntensityIMS = minIntensityIMS,
-                     mode = mode, minEICIntensity = featParams$minEICIntensity,
-                     minEICAdjTime = featParams$minEICAdjTime,
-                     minEICAdjPoints = featParams$minEICAdjPoints,
-                     minEICAdjIntensity = featParams$minEICAdjIntensity, topMost = topMost)
+                     mode = mode, minEICIntensity = genEICParams$minEICIntensity,
+                     minEICAdjTime = genEICParams$minEICAdjTime,
+                     minEICAdjPoints = genEICParams$minEICAdjPoints,
+                     minEICAdjIntensity = genEICParams$minEICAdjIntensity, topMost = topMost)
         ret <- do.call(if (mode == "test") getEICList else doGetEICsForAna, args)
         names(ret) <- EICInfo$EIC_ID
         if (mode != "test")
@@ -246,22 +246,22 @@ findFeaturesEICs <- function(analysisInfo, featParams, peakParams, suspects = NU
             openMSReadBackend(backend, path)
          
             MS2Info <- NULL
-            if (featParams$methodMZ == "ms2")
+            if (genEICParams$methodMZ == "ms2")
             {
-                MS2Info <- if (identical(featParams$methodIMS, "ms2"))
-                    getIsolationMZsAndMobs(backend, featParams$clusterMethod, featParams$mzWindow, featParams$IMSWindow,
-                                           featParams$minTIC)
+                MS2Info <- if (identical(genEICParams$methodIMS, "ms2"))
+                    getIsolationMZsAndMobs(backend, genEICParams$clusterMethod, genEICParams$mzWindow,
+                                           genEICParams$IMSWindow, genEICParams$minTIC)
                 else
-                    getIsolationMZs(backend, featParams$clusterMethod, featParams$mzWindow, featParams$minTIC)
+                    getIsolationMZs(backend, genEICParams$clusterMethod, genEICParams$mzWindow, genEICParams$minTIC)
                 setDT(MS2Info)
             }
             
             EICs <- EICInfo <- NULL
-            EICInfoMZ <- getFeatEICsInfo(featParams, suspects, withIMS = FALSE, MS2Info = MS2Info)
+            EICInfoMZ <- getPiekEICsInfo(genEICParams, suspects, withIMS = FALSE, MS2Info = MS2Info)
             if (withIMS)
             {
                 maybePrintf("Pre-checking %d m/z EICs... ", nrow(EICInfoMZ))
-                testEICs <- getEICsAna(backend, EICInfoMZ, "test", featParams$topMostEICPre)
+                testEICs <- getEICsAna(backend, EICInfoMZ, "test", genEICParams$topMostEICPre)
                 testEICs <- unlist(testEICs)
                 EICInfoMZ <- EICInfoMZ[EIC_ID %chin% names(testEICs)[testEICs]]
                 maybePrintf("Done! Eliminated %d (%.2f%%) EICs\n", sum(!testEICs),
@@ -270,18 +270,18 @@ findFeaturesEICs <- function(analysisInfo, featParams, peakParams, suspects = NU
                 # remove complete m/z bins that were filtered out before
                 temp <- EICInfoMZ[, c("mzmin", "mzmax"), with = FALSE]
                 setkeyv(temp, c("mzmin", "mzmax"))
-                EICInfoMob <- getFeatEICsInfo(featParams, suspects, withIMS = TRUE, MS2Info = MS2Info)
+                EICInfoMob <- getPiekEICsInfo(genEICParams, suspects, withIMS = TRUE, MS2Info = MS2Info)
                 ov <- foverlaps(EICInfoMob, temp, type = "within", nomatch = NULL, which = TRUE)
                 EICInfo <- EICInfoMob[ov$xid]
                 
                 maybePrintf("Loading %d m/z+mobility EICs... ", nrow(EICInfo))
-                EICs <- getEICsAna(backend, EICInfo, "full", featParams$topMostEIC)
+                EICs <- getEICsAna(backend, EICInfo, "full", genEICParams$topMostEIC)
                 maybePrintf("Done!\n")
             }
             else
             {
                 maybePrintf("Loading %d m/z EICs... ", nrow(EICInfoMZ))
-                EICs <- getEICsAna(backend, EICInfoMZ, "full_mz", featParams$topMostEIC)
+                EICs <- getEICsAna(backend, EICInfoMZ, "full_mz", genEICParams$topMostEIC)
                 EICInfo <- EICInfoMZ[EIC_ID %chin% names(EICs)] # omit missing
                 maybePrintf("Done!\n")
             }
@@ -292,38 +292,38 @@ findFeaturesEICs <- function(analysisInfo, featParams, peakParams, suspects = NU
             maybePrintf("Done! Found %d peaks.\n", nrow(peaks))
 
             # only keep those peaks with m/z in the "center" of the analyzed m/z and mobility range
-            if (featParams$methodMZ == "bins")
+            if (genEICParams$methodMZ == "bins")
             {
                 peaks[, binMZStart := EICInfo[match(peaks$EIC_ID, EIC_ID)]$mzmin]
-                peaks <- peaks[between(mz, binMZStart + featParams$mzStep/4, binMZStart + featParams$mzStep/4*3) == TRUE]
+                peaks <- peaks[between(mz, binMZStart + genEICParams$mzStep/4, binMZStart + genEICParams$mzStep/4*3) == TRUE]
             }
-            if (identical(featParams[["methodIMS"]], "bins"))
+            if (identical(genEICParams[["methodIMS"]], "bins"))
             {
                 peaks[, binMobStart := EICInfo[match(peaks$EIC_ID, EIC_ID)]$mobmin]
-                peaks <- peaks[between(mobility, binMobStart + featParams$mobStep/4, binMobStart + featParams$mobStep/4*3) == TRUE]
+                peaks <- peaks[between(mobility, binMobStart + genEICParams$mobStep/4, binMobStart + genEICParams$mobStep/4*3) == TRUE]
             }
-            if (featParams$methodMZ == "suspects" && is.finite(featParams$rtWindow) && !is.null(suspects[["rt"]]))
+            if (genEICParams$methodMZ == "suspects" && is.finite(genEICParams$rtWindow) && !is.null(suspects[["rt"]]))
             {
                 # only keep peaks with at least one closely eluting suspect
                 peaks[, keep := {
-                    susp <- suspectsOrig[numLTE(abs(mz - omz), featParams$mzWindow) &
-                                             numLTE(abs(rt - ort), featParams$rtWindow),
+                    susp <- suspectsOrig[numLTE(abs(mz - omz), genEICParams$mzWindow) &
+                                             numLTE(abs(rt - ort), genEICParams$rtWindow),
                                          env = list(omz = mz, ort = ret)]
-                    if (identical(featParams[["methodIMS"]], "ms2") && !is.null(suspects[["mobility"]]))
-                        susp <- susp[numLTE(abs(mobility - omob), featParams$IMSWindow), env = list(omob = mobility)]
+                    if (identical(genEICParams[["methodIMS"]], "ms2") && !is.null(suspects[["mobility"]]))
+                        susp <- susp[numLTE(abs(mobility - omob), genEICParams$IMSWindow), env = list(omob = mobility)]
                     nrow(susp) > 0
                 }, by = .I]
                 peaks <- peaks[keep == TRUE]
             }
-            else if (featParams$methodMZ %in% "ms2" && is.finite(featParams$rtWindow))
+            else if (genEICParams$methodMZ %in% "ms2" && is.finite(genEICParams$rtWindow))
             {
                 # only keep peaks that elute closely to at least one MS2 spectrum
                 peaks[, keep := {
-                    MS2Peaks <- MS2Info[numLTE(abs(mz - omz), featParams$mzWindow), env = list(omz = mz)]
-                    if (identical(featParams[["methodIMS"]], "ms2"))
-                        MS2Peaks <- MS2Peaks[numLTE(abs(mobility - omob), featParams$IMSWindow), env = list(omob = mobility)]
+                    MS2Peaks <- MS2Info[numLTE(abs(mz - omz), genEICParams$mzWindow), env = list(omz = mz)]
+                    if (identical(genEICParams[["methodIMS"]], "ms2"))
+                        MS2Peaks <- MS2Peaks[numLTE(abs(mobility - omob), genEICParams$IMSWindow), env = list(omob = mobility)]
                     allRet <- unlist(MS2Peaks$times)
-                    any(numLTE(abs(ret - allRet), featParams$rtWindow))
+                    any(numLTE(abs(ret - allRet), genEICParams$rtWindow))
                 }, by = .I]
                 peaks <- peaks[keep == TRUE]
             }
@@ -337,7 +337,7 @@ findFeaturesEICs <- function(analysisInfo, featParams, peakParams, suspects = NU
         })
         
         for (a in anaInfoTBD$analysis)
-            saveCacheData("featuresEICs", fList[[a]], anaHashes[[a]], dbArg = cacheDB)
+            saveCacheData("featuresPiek", fList[[a]], anaHashes[[a]], dbArg = cacheDB)
     }
     
     if (length(cachedData) > 0)
@@ -352,5 +352,5 @@ findFeaturesEICs <- function(analysisInfo, featParams, peakParams, suspects = NU
         printFeatStats(fList)
     }
     
-    return(featuresEICs(analysisInfo = analysisInfo, features = fList, hasMobilities = withIMS))
+    return(featuresPiek(analysisInfo = analysisInfo, features = fList, hasMobilities = withIMS))
 }

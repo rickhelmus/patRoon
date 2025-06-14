@@ -608,7 +608,7 @@ findFeatures <- function(analysisInfo, algorithm, ..., verbose = TRUE)
     ac <- checkmate::makeAssertCollection()
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, add = ac)
     checkmate::assertChoice(algorithm, c("bruker", "openms", "xcms", "xcms3", "envipick", "sirius", "kpic2", "safd",
-                                         "eics"), add = ac)
+                                         "piek"), add = ac)
     checkmate::assertFlag(verbose, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -621,7 +621,7 @@ findFeatures <- function(analysisInfo, algorithm, ..., verbose = TRUE)
                 sirius = findFeaturesSIRIUS,
                 kpic2 = findFeaturesKPIC2,
                 safd = findFeaturesSAFD,
-                eics = findFeaturesEICs)
+                piek = findFeaturesPiek)
 
     f(analysisInfo, ..., verbose = verbose)
 }

@@ -9,7 +9,7 @@ findPeaks <- function(EICs, fillEICs, params, logPath)
                 openms = findPeaksOpenMS,
                 xcms3 = findPeaksXCMS3,
                 envipick = findPeaksEnviPick,
-                dietrich = findPeaksDietrich)
+                piek = findPeaksPiek)
     
     if (params$algorithm == "openms") # UNDONE: change in case we get additional algos with logging
         mkdirp(dirname(logPath))
@@ -171,15 +171,15 @@ findPeaksEnviPick <- function(EICs, fillEICs, params, logPath)
     return(ret)
 }
 
-findPeaksDietrich <- function(EICs, fillEICs, params, logPath)
+findPeaksPiek <- function(EICs, fillEICs, params, logPath)
 {
     setOMPThreads()
     # UNDONE: log output?
-    peaks <- doFindPeaksDietrich(EICs, fillEICs = fillEICs, minIntensity = params$minIntensity, SN = params$SN,
-                                 peakWidthMin = params$peakWidth[1], peakWidthMax = params$peakWidth[2],
-                                 RTMin = params$RTRange[1],
-                                 RTMax = if (!is.finite(params$RTRange[2])) 0 else params$RTRange[2],
-                                 maxPeaksPerSignal = params$maxPeaksPerSignal, verbose = FALSE)
+    peaks <- doFindPeaksPiek(EICs, fillEICs = fillEICs, minIntensity = params$minIntensity, SN = params$SN,
+                             peakWidthMin = params$peakWidth[1], peakWidthMax = params$peakWidth[2],
+                             RTMin = params$RTRange[1],
+                             RTMax = if (!is.finite(params$RTRange[2])) 0 else params$RTRange[2],
+                             maxPeaksPerSignal = params$maxPeaksPerSignal, verbose = FALSE)
     names(peaks) <- names(EICs)
     peaks <- lapply(peaks, setDT)
     peaks <- pruneList(peaks, checkZeroRows = TRUE)

@@ -300,7 +300,7 @@
             - refer to something in multithread section
 - IMS
     - piek
-        - refer to defaults/limits for getFeaturesEICsParams() (and removeDuplicateFeatsSusps()?)
+        - refer to defaults/limits for getPiekGenEICParams() (and removeDuplicateFeatsSusps()?)
         - link to cluster params
     - assignMobilities()
         - refs to paper

@@ -861,7 +861,7 @@ getDefTPStructParams <- function(...)
 getDefPeakParams <- function(type, algorithm, ...)
 {
     checkmate::assertChoice(type, c("chrom", "bruker_ims", "agilent_ims"))
-    checkmate::assertChoice(algorithm, c("openms", "xcms3", "envipick", "dietrich"))
+    checkmate::assertChoice(algorithm, c("openms", "xcms3", "envipick", "piek"))
     
     def <- NULL
     # UNDONE: put all this in eg an internal YAML?
@@ -905,7 +905,7 @@ getDefPeakParams <- function(type, algorithm, ...)
                    maxint = 1E7,
                    ended = 2
                ),
-               dietrich = list(
+               piek = list(
                    minIntensity = 1,
                    SN = 3,
                    peakWidth = c(5, 60),
@@ -924,7 +924,7 @@ getDefPeakParams <- function(type, algorithm, ...)
             openms = list(gaussWidth = 0.02),
             xcms3 = list(peakwidth = c(0.01, 0.5), prefilter = c(3, 10), firstBaselineCheck = FALSE),
             envipick = list(drtsmall = 0.2, drtfill = 0.02, drttotal = 1, minint = 10),
-            dietrich = list(peakWidth = c(0.02, 0.5))
+            piek = list(peakWidth = c(0.02, 0.5))
         ))
         def$forcePeakRange = c(0.01, 0.1)
         def$relMinIntensity <- 0.25
@@ -937,7 +937,7 @@ getDefPeakParams <- function(type, algorithm, ...)
             openms = list(gaussWidth = 0.05),
             xcms3 = list(peakwidth = c(0.1, 5), prefilter = c(3, 10), firstBaselineCheck = FALSE),
             envipick = list(drtsmall = 2, drtfill = 0.4, drttotal = 1, minint = 10),
-            dietrich = list(peakWidth = c(0.2, 5))
+            piek = list(peakWidth = c(0.2, 5))
         ))
         def$forcePeakRange = c(0.2, 1)
         def$relMinIntensity <- 0.25

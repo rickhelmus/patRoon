@@ -608,19 +608,20 @@ findFeatures <- function(analysisInfo, algorithm, ..., verbose = TRUE)
 #' @templateVar func importFeatures
 #' @templateVar what import features
 #' @templateVar ex1 importFeaturesXCMS3
-#' @templateVar ex2 importFeaturesKPIC2
-#' @templateVar algosSuffix XCMS,XCMS3,KPIC2,EnviMass
+#' @templateVar ex2 importFeaturesTable
+#' @templateVar algosSuffix XCMS,XCMS3,KPIC2,Table,EnviMass
 #' @templateVar ret features
 #' @templateVar noParam TRUE
 #' @template generic-algo
 #'
 #' @template analysisInfo-arg
-#' 
-#' @param type What type of data should be imported: \code{"xcms"}, \code{"xcms3"}, \code{"kpic2"} or \code{"envimass"}.
+#'
+#' @param type What type of data should be imported: \code{"xcms"}, \code{"xcms3"}, \code{"kpic2"}, \code{"table"}, or
+#'   \code{"envimass"}.
 #' @param \dots Further arguments passed to the selected import algorithm function.
 #'
 #' @inherit findFeatures return
-#' 
+#'
 #' @seealso \code{\link{findFeatures}} to find new features.
 #'
 #' @export
@@ -632,8 +633,9 @@ importFeatures <- function(analysisInfo, type, ...)
                 xcms = importFeaturesXCMS,
                 xcms3 = importFeaturesXCMS3,
                 kpic2 = importFeaturesKPIC2,
+                table = importFeaturesTable,
                 envimass = importFeaturesEnviMass,
-                stop("Invalid algorithm! Should be: xcms, xcms3, kpic2 or envimass"))
+                stop("Invalid algorithm! Should be: xcms, xcms3, kpic2, table or envimass"))
 
     f(analysisInfo = analysisInfo, ...)
 }

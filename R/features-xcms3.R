@@ -106,22 +106,22 @@ findFeaturesXCMS3 <- function(analysisInfo, param = xcms::CentWaveParam(), ..., 
 #' @templateVar algoParam xcms3
 #' @template algo_importer
 #'
-#' @inheritParams importFeatures
-#'
-#' @param xdata An \code{\link{XCMSnExp}} object.
+#' @param input An \code{\link{XCMSnExp}} object.
+#' 
+#' @template analysisInfo-arg
 #' 
 #' @inherit findFeaturesXCMS3 references
 #' @inherit importFeatures return
 #'
 #' @export
-importFeaturesXCMS3 <- function(xdata, analysisInfo)
+importFeaturesXCMS3 <- function(input, analysisInfo)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertClass(xdata, "XCMSnExp", add = ac)
+    checkmate::assertClass(input, "XCMSnExp", add = ac)
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, fileTypes = "centroid", add = ac)
     checkmate::reportAssertions(ac)
 
-    feat <- importXCMSPeaks(xcms::chromPeaks(xdata), analysisInfo)
+    feat <- importXCMSPeaks(xcms::chromPeaks(input), analysisInfo)
 
-    return(featuresXCMS3(xdata = xdata, features = feat, analysisInfo = analysisInfo))
+    return(featuresXCMS3(xdata = input, features = feat, analysisInfo = analysisInfo))
 }

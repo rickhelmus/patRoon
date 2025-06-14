@@ -7,15 +7,15 @@ featureGroupsTable <- setClass("featureGroupsTable", contains = "featureGroups")
 setMethod("initialize", "featureGroupsTable",
           function(.Object, ...) callNextMethod(.Object, algorithm = "table", ...))
 
-importFeatureGroupsTable <- function(analysisInfo, input, addCols = NULL, groupAlgo, groupArgs = NULL)
+importFeatureGroupsTable <- function(input, analysisInfo, addCols = NULL, groupAlgo, groupArgs = NULL)
 {
-    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo)
     checkmate::assert(
         checkmate::checkDataFrame(input),
         checkmate::checkFileExists(input, access = "r"),
         .var.name = "input"
     )
     input <- if (is.character(input)) fread(input) else makeDT(input)
+    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo)
     
     gInfoCols <- c("ret", "mz", "mobility", "CCS")
     gInfoColsPrefix <- paste0("group_", gInfoCols)
@@ -105,7 +105,7 @@ importFeatureGroupsTable <- function(analysisInfo, input, addCols = NULL, groupA
     inputFeat <- copy(input)
     inputFeat <- removeDTColumnsIfPresent(inputFeat, c("group", gInfoColsPrefix, "group_mobility_collapsed",
                                                        "group_CCS_collapsed", setsAnnAddCols, setsAnnNumCols))
-    importedFeat <- importFeaturesTable(analysisInfo, inputFeat, addCols = addCols)
+    importedFeat <- importFeaturesTable(inputFeat, analysisInfo, addCols = addCols)
     
     for (col in gInfoCols)
     {

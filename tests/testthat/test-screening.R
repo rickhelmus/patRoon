@@ -345,9 +345,9 @@ getTQAnalytes <- function(path)
 }
 
 TQFile <- file.path(getTestDataPath(), "GlobalResults-TASQ-pos.csv")
-fGroupsTQ <- importFeatureGroupsBrukerTASQ(TQFile, getTestAnaInfo(), clusterRTWindow = 14) # HACK: increase RT window a bit to avoid split groups
+fGroupsTQ <- importFeatureGroups(TQFile, "brukertasq", getTestAnaInfo(), clusterRTWindow = 14) # HACK: increase RT window a bit to avoid split groups
 TQFileNoRT <- file.path(getTestDataPath(), "GlobalResults-TASQ_noRT-pos.csv")
-fGroupsTQNoRT <- importFeatureGroupsBrukerTASQ(TQFileNoRT, getTestAnaInfo())
+fGroupsTQNoRT <- importFeatureGroups(TQFileNoRT, "brukertasq", getTestAnaInfo())
 fGroupsTQNoRT <- filter(fGroupsTQNoRT, blankThreshold = 5, removeBlanks = TRUE)
 
 test_that("TASQ import works", {

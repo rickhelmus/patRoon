@@ -187,26 +187,26 @@ findFeaturesKPIC2 <- function(analysisInfo, kmeans = TRUE, level = 1000, ..., pa
 #' @templateVar algoParam kpic2
 #' @template algo_importer
 #'
-#' @inheritParams importFeatures
-#'
-#' @param picsList A \code{list} with a \code{pics} objects obtained with \code{\link[KPIC]{getPIC}} or
+#' @param input A \code{list} with a \code{pics} objects obtained with \code{\link[KPIC]{getPIC}} or
 #'   \code{\link[KPIC]{getPIC.kmeans}} for each analysis.
+#' 
+#' @template analysisInfo-arg
 #'
 #' @inherit findFeaturesKPIC2 references
 #' @inherit importFeatures return
 #' 
 #' @export
-importFeaturesKPIC2 <- function(picsList, analysisInfo)
+importFeaturesKPIC2 <- function(input, analysisInfo)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertList(picsList, "list", min.len = 1, add = ac)
+    checkmate::assertList(input, "list", min.len = 1, add = ac)
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, fileTypes = "centroid", add = ac)
     checkmate::reportAssertions(ac)
     
-    if (length(picsList) != nrow(analysisInfo))
+    if (length(input) != nrow(analysisInfo))
         stop("Length of picsList should be equal to number analyses")
 
-    feat <- setNames(lapply(picsList, function(pics)
+    feat <- setNames(lapply(input, function(pics)
     {
         ret <- as.data.table(pics$peakinfo)
         setnames(ret, c("rt", "rtmin", "rtmax", "maxo", "snr"),
@@ -215,7 +215,7 @@ importFeaturesKPIC2 <- function(picsList, analysisInfo)
         return(ret)
     }), analysisInfo$analysis)
     
-    return(featuresKPIC2(picsList = picsList, features = feat, analysisInfo = analysisInfo))
+    return(featuresKPIC2(picsList = input, features = feat, analysisInfo = analysisInfo))
 }
 
 #' Conversion to KPIC2 objects

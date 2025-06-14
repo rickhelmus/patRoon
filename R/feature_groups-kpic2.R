@@ -180,7 +180,7 @@ importFeatureGroupsKPIC2FromFeat <- function(picsSetGrouped, analysisInfo, feat)
 #' Imports grouped features from an \pkg{KPIC} object.
 #'
 #' @template analysisInfo-arg
-#' @param picsSetGrouped A grouped \code{PIC set} object (\emph{e.g.} as returned by
+#' @param input A grouped \code{PIC set} object (\emph{e.g.} as returned by
 #'   \code{\link[KPIC:PICset.group]{KPIC::PICset.group}}).
 #' 
 #' @inherit groupFeaturesKPIC2 references
@@ -189,16 +189,16 @@ importFeatureGroupsKPIC2FromFeat <- function(picsSetGrouped, analysisInfo, feat)
 #' @seealso \code{\link{groupFeatures}}
 #' 
 #' @export
-importFeatureGroupsKPIC2 <- function(picsSetGrouped, analysisInfo)
+importFeatureGroupsKPIC2 <- function(input, analysisInfo)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertList(picsSetGrouped, add = ac)
-    checkmate::assertNames(names(picsSetGrouped), must.include = c("group.info", "peakmat", "picset"), add = ac)
+    checkmate::assertList(input, add = ac)
+    checkmate::assertNames(names(input), must.include = c("group.info", "peakmat", "picset"), add = ac)
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, fileTypes = "centroid", add = ac)
     checkmate::reportAssertions(ac)
     
-    feat <- importFeaturesKPIC2(picsSetGrouped$picset, analysisInfo)
-    return(importFeatureGroupsKPIC2FromFeat(picsSetGrouped, analysisInfo, feat))
+    feat <- importFeaturesKPIC2(input$picset, analysisInfo)
+    return(importFeatureGroupsKPIC2FromFeat(input, analysisInfo, feat))
 }
 
 #' @rdname featureGroups-class

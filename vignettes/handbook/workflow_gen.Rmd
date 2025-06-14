@@ -342,14 +342,14 @@ Algorithm        | Usage                                                    | Re
 ---------------- | -------------------------------------------------------- | -------------------------------------
 [OpenMS]         | `groupFeatures(algorithm = "openms", ...)`               | Uses the [FeatureLinkerUnlabeled] algorithm (and [MapAlignerPoseClustering] for retention alignment)
 [XCMS]           | `groupFeatures(algorithm = "xcms", ...)`                 | Uses `xcms::group()` `xcms::retcor()` functions
-[XCMS] (import)  | `importFeatureGroupsXCMS(...)`                           | Imports an existing `xcmsSet` object.
+[XCMS] (import)  | `importFeatureGroups(type = "xcms", ...)`                | Imports an existing `xcmsSet` object.
 [XCMS3]          | `groupFeatures(algorithm = "xcms3", ...)`                | Uses `xcms::groupChromPeaks()` and `xcms::adjustRtime()` functions
-[XCMS3] (import) | `importFeatureGroupsXCMS3(...)`                          | Imports an existing `XCMSnExp` object.
+[XCMS3] (import) | `importFeatureGroups(type = "xcms3", ...)`               | Imports an existing `XCMSnExp` object.
 [KPIC2]          | `groupFeatures(algorithm = "kpic2", ...)`                | Uses the [KPIC2] package
-[KPIC2] (import) | `importFeatureGroupsKPIC2(...)`                          | Imports a `PIC set` object
+[KPIC2] (import) | `importFeatureGroups(type = "kpic2", ...)`               | Imports a `PIC set` object
 [SIRIUS]         | `groupFeatures(anaInfo, algorithm = "sirius")`           | Finds _and_ groups features with [SIRIUS]
-ProfileAnalysis  | `importFeatureGroups(algorithm = "brukerpa", ...)`       | Import `.csv` file exported from Bruker ProfileAnalysis
-TASQ             | `importFeatureGroups(algorithm = "brukertasq", ...)`     | Imports a _Global result table_ (exported to Excel file and then saved as `.csv` file)
+ProfileAnalysis  | `importFeatureGroups(type = "brukerpa", ...)`            | Import `.csv` file exported from Bruker ProfileAnalysis
+TASQ             | `importFeatureGroups(type = "brukertasq", ...)`          | Imports a _Global result table_ (exported to Excel file and then saved as `.csv` file)
 
 > **_NOTE_**: Grouping features with the `sirius` algorithm will perform both finding and grouping features with [SIRIUS]. This algorithm cannot work with features from another algorithm.
 
@@ -366,7 +366,7 @@ Some examples of finding and grouping features are shown below.
 fListOMS <- findFeatures(anaInfo, "openms") # OpenMS, with default settings
 fListOMS2 <- findFeatures(anaInfo, "openms", noiseThrInt = 500, chromSNR = 10) # OpenMS, adjusted minimum intensity and S/N
 fListXCMS <- findFeatures(anaInfo, "xcms", ppm = 10) # XCMS
-fListXCMSImp <- importFeatures(anaInfo, "xcms", xset) # import XCMS xcmsSet object
+fListXCMSImp <- importFeatures(xset, "xcms", anaInfo) # import XCMS xcmsSet object
 fListXCMS3 <- findFeatures(anaInfo, "xcms3", CentWaveParam(peakwidth = c(5, 15))) # XCMS3
 fListEP <- findFeatures(anaInfo, "envipick", minint = 1E3) # enviPick
 fListKPIC2 <- findFeatures(anaInfo, "kpic2", kmeans = TRUE, level = 1E4) # KPIC2

@@ -29,7 +29,7 @@ setMethod("initialize", "featureGroupsBruker",
 #'   back the original features and care must be taken to correctly specify search parameters (\code{rtWindow},
 #'   \code{mzWindow}, \code{intWindow}).
 #'
-#' @param path The file path to a exported 'bucket table' \file{.txt} file from PA.
+#' @param input The file path to a exported 'bucket table' \file{.txt} file from PA.
 #' @param feat The \code{\link{features}} object obtained with \code{\link{findFeaturesBruker}}.
 #' @param rtWindow,mzWindow,intWindow Search window values for retention time (seconds), \emph{m/z} (Da) and intensity
 #'   used to find back features within feature groups from PA (+/- the retention/mass/intensity value of a feature).
@@ -38,17 +38,17 @@ setMethod("initialize", "featureGroupsBruker",
 #' @inherit importFeatureGroups return
 #'
 #' @export
-importFeatureGroupsBrukerPA <- function(path, feat, rtWindow = defaultLim("retention", "medium"),
+importFeatureGroupsBrukerPA <- function(input, feat, rtWindow = defaultLim("retention", "medium"),
                                         mzWindow = defaultLim("mz", "medium"), intWindow = 5, warn = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertFileExists(path, "r", add = ac)
+    checkmate::assertFileExists(input, "r", add = ac)
     checkmate::assertClass(feat, "featuresBruker", add = ac)
     aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow + intWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertFlag(warn, add = ac)
     checkmate::reportAssertions(ac)
 
-    hash <- makeHash(makeFileHash(path), feat, rtWindow, mzWindow, intWindow)
+    hash <- makeHash(makeFileHash(input), feat, rtWindow, mzWindow, intWindow)
     cachefg <- loadCacheData("featureGroupsPA", hash)
     if (!is.null(cachefg))
         return(cachefg)
@@ -56,7 +56,7 @@ importFeatureGroupsBrukerPA <- function(path, feat, rtWindow = defaultLim("reten
     cat("Importing ProfileAnalysis file...")
 
     # disable check.names: keep original names as much as possible
-    f <- fread(path, check.names = F, sep = "\t", stringsAsFactors = FALSE, header = TRUE)
+    f <- fread(input, check.names = F, sep = "\t", stringsAsFactors = FALSE, header = TRUE)
     setnames(f, make.unique(colnames(f))) # still make them unique
 
     # assume first column contains filenames

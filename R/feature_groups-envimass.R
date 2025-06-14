@@ -32,23 +32,23 @@ setMethod("initialize", "featureGroupsEnviMass",
 #'   \pkg{enviMass}. Finally, please note that this function only supports features imported by
 #'   \code{\link{importFeaturesEnviMass}} (obviously, the same project should be used for both importing functions).
 #'
-#' @param path The path of the enviMass project.
+#' @param input The path of the enviMass project.
 #' @param feat The \code{\link{features}} object obtained with \code{\link{importFeaturesEnviMass}}.
 #' @param positive Whether data from positive (\code{TRUE}) or negative (\code{FALSE}) should be loaded.
 #'
 #' @inherit importFeatureGroups return
 #' 
 #' @export
-importFeatureGroupsEnviMass <- function(path, feat, positive)
+importFeatureGroupsEnviMass <- function(input, feat, positive)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertDirectoryExists(path, "r", add = ac)
+    checkmate::assertDirectoryExists(input, "r", add = ac)
     checkmate::assertClass(feat, "featuresEnviPick", add = ac)
     checkmate::assertFlag(positive, add = ac)
     
     if (ac$isEmpty())
     {
-        resPath <- file.path(path, "results")
+        resPath <- file.path(input, "results")
         profPeaksPath <- file.path(resPath, sprintf("profpeaks_%s", if (positive) "pos" else "neg"))
         profListPath <- file.path(resPath, sprintf("profileList_%s", if (positive) "pos" else "neg"))
         checkmate::assertFileExists(profPeaksPath, "r", .var.name = "path", add = ac)
@@ -57,7 +57,7 @@ importFeatureGroupsEnviMass <- function(path, feat, positive)
         
     checkmate::reportAssertions(ac)
     
-    hash <- makeHash(feat, path, positive)
+    hash <- makeHash(feat, input, positive)
     cachefg <- loadCacheData("featureGroupsEnviMass", hash)
     if (!is.null(cachefg))
         return(cachefg)

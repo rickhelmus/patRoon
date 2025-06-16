@@ -508,7 +508,7 @@ getBGMSMSPeaks <- function(anaInfo, replicates = NULL, MSLevel = 2, retentionRan
         openMSReadBackend(backend, path)
         
         avgsp <- getMSPeakLists(backend, retentionRange[1], retentionRange[2], 0,
-                                withPrecursor = FALSE, retainPrecursor = FALSE,
+                                fixedIsolationWidth = 0.0, withPrecursor = FALSE, retainPrecursor = FALSE,
                                 MSLevel = MSLevel, method = avgSpectraParams$method,
                                 mzWindow = avgSpectraParams$clusterMzWindow,
                                 startMobs = mobilityRange[1], endMobs = mobilityRange[2],

@@ -28,12 +28,17 @@ template<typename Spec> std::vector<size_t> flattenedSpecIDs(const std::vector<S
 }
 
 bool precWithinIsoWindow(SpectrumRawTypes::Mass prec, SpectrumRawTypes::Mass specPrec,
-                         NumRange<SpectrumRawTypes::Mass> range)
+                         SpectrumRawTypes::Mass fixedIsoWidth, NumRange<SpectrumRawTypes::Mass> range)
 {
     // NOTE: in case of MS/MS, we match all spectra if the precursor or iso window was unset (0.0)
     if (prec == 0.0 || !range.isSet())
         return true;
     
+    if (fixedIsoWidth != 0.0)
+    {
+        range.start = std::min(range.start, fixedIsoWidth);
+        range.end = std::min(range.end, fixedIsoWidth);
+    }
     range.start = specPrec - range.start; range.end += specPrec;
     return range.within(prec);
 }
@@ -44,6 +49,7 @@ std::vector<SpectrumRawSelection> getSpecRawSelections(const SpectrumRawMetadata
                                                        const NumRange<SpectrumRawTypes::Time> &timeRange,
                                                        SpectrumRawTypes::MSLevel MSLevel,
                                                        SpectrumRawTypes::Mass precursor,
+                                                       SpectrumRawTypes::Mass fixedIsoWidth,
                                                        SpectrumRawTypes::Intensity minBPIntensity)
 {
     const SpectrumRawMetadataMS &metaMS = (MSLevel == SpectrumRawTypes::MSLevel::MS1) ? specMeta.first : specMeta.second;
@@ -67,16 +73,19 @@ std::vector<SpectrumRawSelection> getSpecRawSelections(const SpectrumRawMetadata
             {
                 for (size_t j=0; j<specMeta.second.MSMSFrames[i].isolationRanges.size(); ++j)
                 {
-                    if (precWithinIsoWindow(precursor, specMeta.second.MSMSFrames[i].precursorMZs[j],
+                    if (precWithinIsoWindow(precursor, specMeta.second.MSMSFrames[i].precursorMZs[j], fixedIsoWidth,
                                             specMeta.second.MSMSFrames[i].isolationRanges[j]))
                         sel.MSMSFrameIndices.push_back(j);
                 }
                 if (sel.MSMSFrameIndices.empty())
                     continue; // no MS/MS data for this one
             }
-            else if (isMSMS && !precWithinIsoWindow(precursor, specMeta.second.precursorMZs[i],
-                                                    specMeta.second.isolationRanges[i]))
-                continue;
+            else if (isMSMS)
+            {
+                if (!precWithinIsoWindow(precursor, specMeta.second.precursorMZs[i], fixedIsoWidth,
+                                         specMeta.second.isolationRanges[i]))
+                    continue;
+            }
             
             ret.push_back(std::move(sel));
         }

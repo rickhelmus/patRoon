@@ -148,6 +148,9 @@ setMethod("averageMSPeakLists", "MSPeakLists", function(obj)
             return(lapply(avgPL, function(pl)
             {
                 pl <- copy(pl)
+                if (nrow(pl) == 0)
+                    pl[, c("abundance_prev_rel", "abundance_prev_abs") := numeric()] # won't be set by averaging if zero rows
+                
                 setnames(pl, c("abundance_rel", "abundance_abs", "abundance_prev_rel", "abundance_prev_abs"),
                          c("fgroup_abundance_rel", "fgroup_abundance_abs", "feat_abundance_rel", "feat_abundance_abs"))
                 return(pl)
@@ -878,6 +881,19 @@ setMethod("spectrumSimilarityMobility", "MSPeakLists", function(obj, fGroups, do
 #' averaged peak lists.
 #'
 #' @param fGroups The \code{\link{featureGroups}} object for which MS peak lists should be generated.
+#' @param fixedIsolationWidth Configures how MS/MS spectra are selected for a feature: \itemize{
+#'
+#'   \item \code{NULL} Select all spectra unconditionally.
+#'
+#'   \item \code{FALSE} Select the spectra of which the precursor m/z value matches that of the feature m/z, using the
+#'   instrumental isolation window that was applied when recording the spectra as the tolerance.
+#'
+#'   \item A numeric value: like \code{FALSE}, but manually set the tolerance window (+/- precursor m/z). The maximum
+#'   tolerance is always determined by the instrumental isolation windows that was applied to record the MS/MS spectrum.
+#'   Hence, manual values can only be used to tighten the tolerance.
+#'
+#'   }
+#'   In data-independent MS/MS experiments all MS/MS spectra will be selected.
 #' @param topMost Only extract MS peak lists from a maximum of \code{topMost} features with highest intensity. If
 #'   \code{NULL} all features will be used.
 #' @param avgFeatParams Parameters used for averaging MS peak lists of individual features. Analogous to
@@ -908,12 +924,20 @@ setMethod("spectrumSimilarityMobility", "MSPeakLists", function(obj, fGroups, do
 #'
 #' @export
 setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRtWindow = defaultLim("retention", "narrow"),
-                                                           topMost = NULL,
+                                                           fixedIsolationWidth = FALSE, topMost = NULL,
                                                            avgFeatParams = getDefAvgPListParams(),
                                                            avgFGroupParams = getDefAvgPListParams())
 {
+    # UNDONE: FIW=NULL removed all MS1 spectra (no precursors) --> find other way to do this
+    
     ac <- checkmate::makeAssertCollection()
     checkmate::assertNumber(maxMSRtWindow, lower = 1, finite = TRUE, null.ok = TRUE, add = ac)
+    checkmate::assert(
+        checkmate::checkFALSE(fixedIsolationWidth),
+        checkmate::checkNull(fixedIsolationWidth),
+        checkmate::checkNumber(fixedIsolationWidth, lower = 0, finite = TRUE),
+        .var.name = "fixedIsolationWidth", add = ac
+    )
     checkmate::assertCount(topMost, positive = TRUE, null.ok = TRUE, add = ac)
     assertAvgPListParams(avgFeatParams, add = ac)
     assertAvgPListParams(avgFGroupParams, add = ac)
@@ -940,10 +964,12 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRtWindo
     
     getMSPL <- function(backend, ft, params, MSLevel)
     {
-        ret <- getMSPeakLists(backend, ft$retmin, ft$retmax, ft$mz,
-                              withPrecursor = params$withPrecursor, retainPrecursor = params$retainPrecursor,
-                              MSLevel = MSLevel, method = params$method, mzWindow = params$clusterMzWindow,
-                              startMobs = ft$mobmin, endMobs = ft$mobmax, minAbundanceRel = params$minAbundanceRel,
+        precMZs <- if (is.null(fixedIsolationWidth)) rep(0, nrow(ft)) else ft$mz
+        fiw <- if (isFALSE(fixedIsolationWidth) || is.null(fixedIsolationWidth)) 0 else fixedIsolationWidth
+        ret <- getMSPeakLists(backend, ft$retmin, ft$retmax, precMZs, fiw, withPrecursor = params$withPrecursor,
+                              retainPrecursor = params$retainPrecursor, MSLevel = MSLevel, method = params$method,
+                              mzWindow = params$clusterMzWindow, startMobs = ft$mobmin,
+                              endMobs = ft$mobmax, minAbundanceRel = params$minAbundanceRel,
                               minAbundanceAbs = params$minAbundanceAbs, minAbundanceIMSRel = params$minAbundanceIMSRel,
                               minAbundanceIMSAbs = params$minAbundanceIMSAbs, topMost = params$topMost,
                               minIntensityIMS = params$minIntensityIMS, minIntensityPre = params$minIntensityPre,
@@ -974,7 +1000,7 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRtWindo
            length(analyses(fGroups)))
     featurePLs <- applyMSData(analysisInfo(fGroups), fTable, needIMS = needIMS, func = function(ana, path, backend, ft)
     {
-        baseHash <- makeHash(anaHashes[[ana]], maxMSRtWindow, topMost, avgFeatParams)
+        baseHash <- makeHash(anaHashes[[ana]], maxMSRtWindow, fixedIsolationWidth, topMost, avgFeatParams)
         
         ft <- copy(ft)
         ft <- subsetDTColumnsIfPresent(ft, c("mz", "ret", "retmin", "retmax", "mobmin", "mobmax", "group"))

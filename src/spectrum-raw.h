@@ -27,9 +27,10 @@ enum class MSPolarity { POSITIVE = 1, NEGATIVE = -1, UNKNOWN = 0 };
 struct frameMSMSInfo
 {
     std::vector<SpectrumRawTypes::IsolationRange> isolationRanges;
+    std::vector<SpectrumRawTypes::Mass> precursorMZs;
     std::vector<SpectrumRawTypes::Scan> subScans, subScanEnds;
     bool empty(void) const { return isolationRanges.empty(); }
-    void clear(void) { isolationRanges.clear(); subScans.clear(); subScanEnds.clear(); }
+    void clear(void) { isolationRanges.clear(); precursorMZs.clear(); subScans.clear(); subScanEnds.clear(); }
     size_t size(void) const { return isolationRanges.size(); }
 };
 
@@ -54,17 +55,19 @@ struct SpectrumRawMetadataMS
 struct SpectrumRawMetadataMSMS: public SpectrumRawMetadataMS
 {
     std::vector<SpectrumRawTypes::IsolationRange> isolationRanges;
+    std::vector<SpectrumRawTypes::Mass> precursorMZs;
     std::vector<frameMSMSInfo> MSMSFrames;
     SpectrumRawMetadataMSMS(void) = default;
     SpectrumRawMetadataMSMS(size_t s, bool ims = false) : SpectrumRawMetadataMS(s),
-        isolationRanges((!ims) ? s : 0), MSMSFrames((ims) ? s : 0) { }
+        isolationRanges((!ims) ? s : 0), precursorMZs((!ims) ? s : 0), MSMSFrames((ims) ? s : 0) { }
     
     // NOTE: not virtual, to keep the class simple
-    void clear(void) { SpectrumRawMetadataMS::clear(); isolationRanges.clear(); MSMSFrames.clear(); }
+    void clear(void) { SpectrumRawMetadataMS::clear(); isolationRanges.clear(); precursorMZs.clear(); MSMSFrames.clear(); }
     void append(const SpectrumRawMetadataMSMS &other)
     {
         SpectrumRawMetadataMS::append(other);
         isolationRanges.insert(isolationRanges.end(), other.isolationRanges.begin(), other.isolationRanges.end());
+        precursorMZs.insert(precursorMZs.end(), other.precursorMZs.begin(), other.precursorMZs.end());
         MSMSFrames.insert(MSMSFrames.end(), other.MSMSFrames.begin(), other.MSMSFrames.end());
     }
 };

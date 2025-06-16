@@ -1132,7 +1132,8 @@ Rcpp::DataFrame getMSMetadata(const MSReadBackend &backend, int msLevel)
                                        Rcpp::Named("BPC") = meta.second.BPCs,
                                        Rcpp::Named("polarity") = polsToInts(meta.second.polarities),
                                        Rcpp::Named("isolationRangeMin") = isolationMins,
-                                       Rcpp::Named("isolationRangeMax") = isolationMaxs);
+                                       Rcpp::Named("isolationRangeMax") = isolationMaxs,
+                                       Rcpp::Named("precursorMZ") = meta.second.precursorMZs);
     }
     
     // MS2 / IMS --> convert to tidy format
@@ -1142,6 +1143,7 @@ Rcpp::DataFrame getMSMetadata(const MSReadBackend &backend, int msLevel)
     std::vector<SpectrumRawTypes::Intensity> TICs, BPCs;
     std::vector<int> polaritiesInt;
     std::vector<SpectrumRawTypes::Mass> isolationMins, isolationMaxs;
+    std::vector<SpectrumRawTypes::Mass> precursorMZs;
     std::vector<SpectrumRawTypes::Scan> subScans, subScanEnds;
     
     for (size_t i=0; i<meta.second.scans.size(); ++i)
@@ -1156,6 +1158,7 @@ Rcpp::DataFrame getMSMetadata(const MSReadBackend &backend, int msLevel)
             polaritiesInt.push_back(static_cast<int>(meta.second.polarities[i]));
             isolationMins.push_back(fi.isolationRanges[j].start);
             isolationMaxs.push_back(fi.isolationRanges[j].end);
+            precursorMZs.push_back(fi.precursorMZs[j]);
             subScans.push_back(fi.subScans[j]);
             if (!fi.subScanEnds.empty())
                 subScanEnds.push_back(fi.subScanEnds[j]);
@@ -1169,6 +1172,7 @@ Rcpp::DataFrame getMSMetadata(const MSReadBackend &backend, int msLevel)
                                        Rcpp::Named("polarity") = polaritiesInt,
                                        Rcpp::Named("isolationRangeMin") = isolationMins,
                                        Rcpp::Named("isolationRangeMax") = isolationMaxs,
+                                       Rcpp::Named("precursorMZ") = precursorMZs,
                                        Rcpp::Named("subScan") = subScans);
     if (!subScanEnds.empty())
         ret["subScanEnd"] = subScanEnds;
@@ -1202,6 +1206,7 @@ void setSpecMetadata(MSReadBackend &backend, const Rcpp::DataFrame &mdMS, const 
     std::vector<SpectrumRawTypes::Intensity> R_TICs = mdMSMS["TIC"], R_BPCs = mdMSMS["BPC"];
     auto R_polarities = polsFromInts(Rcpp::as<std::vector<int>>(mdMSMS["polarity"]));
     std::vector<SpectrumRawTypes::Mass> R_isoStarts = mdMSMS["isolationRangeMin"], R_isoEnds = mdMSMS["isolationRangeMax"];
+    std::vector<SpectrumRawTypes::Mass> R_precursorMZs = mdMSMS["precursorMZ"];
     
     const std::vector<std::string> cn = mdMSMS.names();
     
@@ -1215,6 +1220,8 @@ void setSpecMetadata(MSReadBackend &backend, const Rcpp::DataFrame &mdMS, const 
         
         for (size_t i=0; i<R_isoStarts.size(); ++i)
             meta.second.isolationRanges.emplace_back(R_isoStarts[i], R_isoEnds[i]);
+        
+        meta.second.precursorMZs = std::move(R_precursorMZs);
     }
     else
     {
@@ -1242,6 +1249,7 @@ void setSpecMetadata(MSReadBackend &backend, const Rcpp::DataFrame &mdMS, const 
                 }
             }
             curFI.isolationRanges.emplace_back(R_isoStarts[i], R_isoEnds[i]);
+            curFI.precursorMZs.push_back(R_precursorMZs[i]);
             curFI.subScans.push_back(R_subScans[i]);
             if (!R_subScanEnds.empty())
                 curFI.subScanEnds.push_back(R_subScanEnds[i]);
@@ -1589,19 +1597,14 @@ Rcpp::List collapseIMSFrames(const MSReadBackend &backend, SpectrumRawTypes::Mas
             else
             {
                 const auto ir = specMetaMS2.MSMSFrames[i].isolationRanges[0];
-                scanPrecursorMZs.push_back((ir.start + ir.end) / 2.0);
                 isolationStarts.push_back(ir.start); isolationEnds.push_back(ir.end);
+                scanPrecursorMZs.push_back(specMetaMS2.MSMSFrames[i].precursorMZs[0]);
             }
             continue;
         }
         
         // for PASEF data we combine spectra with close precursor m/z
-        std::vector<SpectrumRawTypes::Mass> precMZs;
-        std::transform(specMetaMS2.MSMSFrames[i].isolationRanges.cbegin(),
-                       specMetaMS2.MSMSFrames[i].isolationRanges.cend(),
-                       std::back_inserter(precMZs),
-                       [](const auto &ir) { return (ir.start + ir.end) / 2.0; });
-        const auto precMZClusts = clusterNums(precMZs, clMethod, mzWindow);
+        const auto precMZClusts = clusterNums(specMetaMS2.MSMSFrames[i].precursorMZs, clMethod, mzWindow);
         const int maxClust = *(std::max_element(precMZClusts.begin(), precMZClusts.end()));
         
         for (int cl=0; cl<=maxClust; ++cl)
@@ -1609,12 +1612,12 @@ Rcpp::List collapseIMSFrames(const MSReadBackend &backend, SpectrumRawTypes::Mas
             SpectrumRawSelection ssel(i);
             SpectrumRawTypes::Mass prec = 0.0;
             SpectrumRawTypes::IsolationRange ir(0.0, 0.0);
-            for (size_t j=0; j<precMZs.size(); ++j)
+            for (size_t j=0; j<specMetaMS2.MSMSFrames[i].precursorMZs.size(); ++j)
             {
                 if (cl == precMZClusts[j])
                 {
                     ssel.MSMSFrameIndices.push_back(j);
-                    prec += precMZs[j];
+                    prec += specMetaMS2.MSMSFrames[i].precursorMZs[j];
                     ir.start += specMetaMS2.MSMSFrames[i].isolationRanges[j].start;
                     ir.end += specMetaMS2.MSMSFrames[i].isolationRanges[j].end;
                 }
@@ -1648,12 +1651,11 @@ Rcpp::List getIsolationMZs(const MSReadBackend &backend, const std::string &meth
     std::vector<SpectrumRawTypes::Mass> isolationMZs;
     std::vector<SpectrumRawTypes::Intensity> TICs;
     
-    if (!specMeta.isolationRanges.empty()) // non-IMS
+    if (!specMeta.precursorMZs.empty()) // non-IMS
     {
         times = specMeta.times;
         TICs = specMeta.TICs;
-        for (const auto &r : specMeta.isolationRanges)
-            isolationMZs.push_back((r.start + r.end) / 2.0);
+        isolationMZs = specMeta.precursorMZs;
     }
     else
     {
@@ -1668,14 +1670,13 @@ Rcpp::List getIsolationMZs(const MSReadBackend &backend, const std::string &meth
         std::vector<std::vector<SpectrumRawSelection>> scanSels(1);
         for (size_t i=0; i<specMeta.scans.size(); ++i)
         {
-            for (size_t j=0; j<specMeta.MSMSFrames[i].isolationRanges.size(); ++j)
+            for (size_t j=0; j<specMeta.MSMSFrames[i].precursorMZs.size(); ++j)
             {
                 SpectrumRawSelection ssel(i);
                 ssel.MSMSFrameIndices.push_back(j);
                 scanSels[0].push_back(std::move(ssel));
                 times.push_back(specMeta.times[i]);
-                isolationMZs.push_back((specMeta.MSMSFrames[i].isolationRanges[j].start +
-                    specMeta.MSMSFrames[i].isolationRanges[j].end) / 2.0);
+                isolationMZs.push_back(specMeta.MSMSFrames[i].precursorMZs[j]);
             }
         }
         
@@ -1770,14 +1771,13 @@ Rcpp::List getIsolationMZsAndMobs(const MSReadBackend &backend, const std::strin
     std::vector<SpectrumRawTypes::Time> times;
     for (size_t i=0; i<specMeta.scans.size(); ++i)
     {
-        for (size_t j=0; j<specMeta.MSMSFrames[i].isolationRanges.size(); ++j)
+        for (size_t j=0; j<specMeta.MSMSFrames[i].precursorMZs.size(); ++j)
         {
             SpectrumRawSelection ssel(i);
             ssel.MSMSFrameIndices.push_back(j);
             scanSels[0].push_back(std::move(ssel));
             times.push_back(specMeta.times[i]);
-            mzs.push_back((specMeta.MSMSFrames[i].isolationRanges[j].start +
-                           specMeta.MSMSFrames[i].isolationRanges[j].end) / 2.0);
+            mzs.push_back(specMeta.MSMSFrames[i].precursorMZs[j]);
         }
     }
     

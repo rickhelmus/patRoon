@@ -107,8 +107,8 @@ void MSReadBackendSC::generateSpecMetadata(void)
         {
             if (!hasMob)
             {
-                const SpectrumRawTypes::Mass l = hd.precursor_mz[i] - hd.window_mzlow[i], h = hd.precursor_mz[i] + hd.window_mzhigh[i];
-                meta.second.isolationRanges.emplace_back(l, h);
+                meta.second.isolationRanges.emplace_back(hd.window_mzlow[i], hd.window_mzhigh[i]);
+                meta.second.precursorMZs.push_back(hd.precursor_mz[i]);
             }
             else
             {
@@ -119,8 +119,8 @@ void MSReadBackendSC::generateSpecMetadata(void)
                 bool finished = false;
                 while (!finished)
                 {
-                    const SpectrumRawTypes::Mass l = hd.precursor_mz[i] - hd.window_mzlow[i], h = hd.precursor_mz[i] + hd.window_mzhigh[i];
-                    fi.isolationRanges.emplace_back(l, h);
+                    fi.isolationRanges.emplace_back(hd.window_mzlow[i], hd.window_mzhigh[i]);
+                    fi.precursorMZs.push_back(hd.precursor_mz[i]);
                     fi.subScans.push_back(hd.index[i]);
                     ++i;
                     if (i >= hd.index.size())

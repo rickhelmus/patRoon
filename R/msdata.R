@@ -189,9 +189,8 @@ setMethod("initMSReadBackend", "Rcpp_MSReadBackendOTIMS", function(backend)
             }
             setnames(ret, c("Frame", "IsolationMz", "TriggerMass", "ScanNumBegin", "ScanNumEnd"),
                      c("scan", "precursorMZ", "precursorMZ", "subScan", "subScanEnd"), skip_absent = TRUE)
-            ret[, c("isolationRangeMin", "isolationRangeMax") := .(precursorMZ - IsolationWidth/2,
-                                                                   precursorMZ + IsolationWidth/2)]
-            ret[, c("precursorMZ", "IsolationWidth") := NULL]
+            ret[, c("isolationRangeMin", "isolationRangeMax") := .(IsolationWidth/2, IsolationWidth/2)]
+            ret[, IsolationWidth := NULL]
             
             if (type == "MSMS")
             {
@@ -247,13 +246,13 @@ setMethod("initMSReadBackend", "Rcpp_MSReadBackendMem", function(backend)
         setnames(hd, c("acquisitionNum", "retentionTime", "totIonCurrent", "basePeakIntensity"),
                  c("scan", "time", "TIC", "BPC"))
         hd[polarity == 0, polarity := -1] # 0 is negative mode for mzR
-        hd[, isolationRangeMin := precursorMZ - isolationWindowLowerOffset]
-        hd[, isolationRangeMax := precursorMZ + isolationWindowUpperOffset]
+        setnames(hd, c("isolationWindowLowerOffset", "isolationWindowUpperOffset"),
+                 c("isolationRangeMin", "isolationRangeMax"))
         
         cols <- c("scan", "time", "TIC", "BPC", "polarity")
         
         return(list(MS1 = hd[msLevel == 1, cols, with = FALSE],
-                    MS2 = hd[msLevel > 1, c(cols, "isolationRangeMin", "isolationRangeMax"), with = FALSE]))
+                    MS2 = hd[msLevel > 1, c(cols, "isolationRangeMin", "isolationRangeMax", "precursorMZ"), with = FALSE]))
     })
     
     specs <- loadCacheData("MSReadBackendMzR", hash, db)

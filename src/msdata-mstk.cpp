@@ -124,7 +124,11 @@ void MSReadBackendMSTK::generateSpecMetadata(void)
                 curMS1MD->BPCs.push_back(spec.getBPI());
                 curMS1MD->polarities.push_back(spec.getPositiveScan() ? SpectrumRawTypes::MSPolarity::POSITIVE : SpectrumRawTypes::MSPolarity::NEGATIVE);
                 if (!isMS1)
-                    threadMeta.second.isolationRanges.emplace_back(spec.getSelWindowLower(), spec.getSelWindowUpper());
+                {
+                    const auto prec = spec.getPrecursor();
+                    threadMeta.second.isolationRanges.emplace_back(prec.isoOffsetLower, prec.isoOffsetUpper);
+                    threadMeta.second.precursorMZs.push_back(prec.isoMz);
+                }
             });
         }
         
@@ -165,6 +169,7 @@ void MSReadBackendMSTK::generateSpecMetadata(void)
             while (!finished)
             {
                 fi.isolationRanges.push_back(meta.second.isolationRanges[i]);
+                fi.precursorMZs.push_back(meta.second.precursorMZs[i]);
                 fi.subScans.push_back(meta.second.scans[i]);
                 ++i;
                 if (i > lastScan)

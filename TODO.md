@@ -117,6 +117,7 @@
 - Agilent
     - SC doesn't recognize IM
 - re-introduce isolation window for MSPL? eg if file doesn't contain ranges (is that a thing?) or for some reason a more narrow range is desired
+    - finish fixedIsolationWidth: fix if it is NULL
 - naming: im_collapse and IMSCollapse
 - patRoon.checkCentroided removed: update (incl docs) or remove?
 
@@ -193,6 +194,7 @@
     - backends
         - availableBackends()
         - use eg mzR, MSTK, SC to get eg EICs or PLs
+    - fixedIsolationWidth?
 - IMS
     - IMSRangeParams/withIMSParent/applyIMS filters
     - more verification that normInts() works before/after assignMobilities()

@@ -80,7 +80,7 @@ public:
 template <typename T> struct NumRange
 {
     T start, end;
-    NumRange(void) = default;
+    NumRange(void) : start(), end() { }
     NumRange(T s, T e) : start(s), end(e) { }
     void set(T s, T e) { start = s; end = e; }
     bool isSet(void) const { return start != 0 || end != 0; }

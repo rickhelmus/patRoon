@@ -165,6 +165,7 @@ std::vector<SpectrumRawSelection> getSpecRawSelections(const SpectrumRawMetadata
                                                        const NumRange<SpectrumRawTypes::Time> &timeRange,
                                                        SpectrumRawTypes::MSLevel MSLevel,
                                                        SpectrumRawTypes::Mass precursor,
+                                                       SpectrumRawTypes::Mass fixedIsoWidth = 0.0,
                                                        SpectrumRawTypes::Intensity minBPIntensity = 0);
 SpectrumRaw filterSpectrumRaw(const SpectrumRaw &spectrum, const SpectrumRawFilter &filter,
                               SpectrumRawTypes::Mass precursor);

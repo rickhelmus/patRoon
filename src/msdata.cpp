@@ -302,11 +302,11 @@ Rcpp::DataFrame getCentroidedFrame(const MSReadBackend &backend, int index, Spec
 
 // [[Rcpp::export]]
 Rcpp::DataFrame getScans(const MSReadBackend &backend, SpectrumRawTypes::Time timeStart, SpectrumRawTypes::Time timeEnd,
-                         int MSLevel, SpectrumRawTypes::Mass prec)
+                         int MSLevel, SpectrumRawTypes::Mass prec, SpectrumRawTypes::Mass fixedIsoWidth = 0.0)
 {
     const auto sels = getSpecRawSelections(backend.getSpecMetadata(), makeNumRange(timeStart, timeEnd),
                                            (MSLevel == 1) ? SpectrumRawTypes::MSLevel::MS1 : SpectrumRawTypes::MSLevel::MS2,
-                                           prec);
+                                           prec, fixedIsoWidth);
     std::vector<SpectrumRawTypes::Scan> inds, frInds;
     for (const auto &sel : sels)
     {
@@ -1264,7 +1264,8 @@ void setSpecMetadata(MSReadBackend &backend, const Rcpp::DataFrame &mdMS, const 
 // [[Rcpp::export]]
 Rcpp::List getMSPeakLists(const MSReadBackend &backend, const std::vector<SpectrumRawTypes::Time> &startTimes,
                           const std::vector<SpectrumRawTypes::Time> &endTimes,
-                          const std::vector<SpectrumRawTypes::Mass> &precursorMZs, bool withPrecursor,
+                          const std::vector<SpectrumRawTypes::Mass> &precursorMZs,
+                          SpectrumRawTypes::Mass fixedIsolationWidth, bool withPrecursor,
                           bool retainPrecursor, int MSLevel, const std::string &method, SpectrumRawTypes::Mass mzWindow,
                           const std::vector<SpectrumRawTypes::Mobility> startMobs,
                           const std::vector<SpectrumRawTypes::Mobility> endMobs,
@@ -1306,7 +1307,7 @@ Rcpp::List getMSPeakLists(const MSReadBackend &backend, const std::vector<Spectr
     for (size_t i=0; i<entries; ++i)
     {
         scanSels.push_back(getSpecRawSelections(specMeta, makeNumRange(startTimes[i], endTimes[i]), MSLev,
-                                                precursorMZs[i], minBPIntensity));
+                                                precursorMZs[i], fixedIsolationWidth, minBPIntensity));
         /*Rcpp::Rcout << "ss " << i << "/" << precursorMZs[i] << ": ";
         for (const auto &ss : scanSels.back())
             Rcpp::Rcout << ss.index << "/" << specMeta.second.scans[ss.index] << " ";

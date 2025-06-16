@@ -297,6 +297,7 @@
             - first finish (ref) docs for IMS grouping
         - section on msdata? otherwise refer to ?msdata somewhere in prep?
             - refer to something in multithread section
+    - mention somewhere that IM collapse doesn't export MS/MS spectra by default and why
 - IMS
     - piek
         - refer to defaults/limits for getPiekGenEICParams() (and removeDuplicateFeatsSusps()?)

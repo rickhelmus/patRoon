@@ -27,11 +27,15 @@ template<typename Spec> std::vector<size_t> flattenedSpecIDs(const std::vector<S
     return ret;
 }
 
-bool precWithinIsoWindow(SpectrumRawTypes::Mass prec, const NumRange<SpectrumRawTypes::Mass> &range)
+bool precWithinIsoWindow(SpectrumRawTypes::Mass prec, SpectrumRawTypes::Mass specPrec,
+                         NumRange<SpectrumRawTypes::Mass> range)
 {
-    // NOTE: in case of MS/MS, we match all spectra if the precursor was unset (0.0) or the raw data does not
-    // contain isolation windows (i.e. start==end, e.g. exported Bruker TIMS bbCID data)
-    return prec == 0.0 || !range.isSet() || compareTol(range.start, range.end) || range.within(prec);
+    // NOTE: in case of MS/MS, we match all spectra if the precursor or iso window was unset (0.0)
+    if (prec == 0.0 || !range.isSet())
+        return true;
+    
+    range.start = specPrec - range.start; range.end += specPrec;
+    return range.within(prec);
 }
 
 }
@@ -63,13 +67,15 @@ std::vector<SpectrumRawSelection> getSpecRawSelections(const SpectrumRawMetadata
             {
                 for (size_t j=0; j<specMeta.second.MSMSFrames[i].isolationRanges.size(); ++j)
                 {
-                    if (precWithinIsoWindow(precursor, specMeta.second.MSMSFrames[i].isolationRanges[j]))
+                    if (precWithinIsoWindow(precursor, specMeta.second.MSMSFrames[i].precursorMZs[j],
+                                            specMeta.second.MSMSFrames[i].isolationRanges[j]))
                         sel.MSMSFrameIndices.push_back(j);
                 }
                 if (sel.MSMSFrameIndices.empty())
                     continue; // no MS/MS data for this one
             }
-            else if (isMSMS && !precWithinIsoWindow(precursor, specMeta.second.isolationRanges[i]))
+            else if (isMSMS && !precWithinIsoWindow(precursor, specMeta.second.precursorMZs[i],
+                                                    specMeta.second.isolationRanges[i]))
                 continue;
             
             ret.push_back(std::move(sel));

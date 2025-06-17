@@ -310,13 +310,10 @@ Algorithm        | Usage                                       | Input          
 ---------------- | ------------------------------------------- | ----------------------------- | ----------------------------
 [OpenMS]         | `findFeatures(algorithm = "openms", ...)`   | centroid (`mzML`)             | Uses [FeatureFinderMetabo]
 [XCMS]           | `findFeatures(algorithm = "xcms", ...)`     | centroid (`mzML` or `mzXML`)  | Uses `xcms::xcmsSet()`
-[XCMS] (import)  | `importFeatures(algorithm = "xcms", ...)`   | `xcmsSet` object              |
 [XCMS3]          | `findFeatures(algorithm = "xcms3", ...)`    | centroid (`mzML` or `mzXML`)  | Uses `xcms::findChromPeaks()`
-[XCMS3] (import) | `importFeatures(algorithm = "xcms3", ...)`  | `XCMSnExp` object             |
 `piek`           | `findFeatures(algorithm = "piek", ...)`     | raw data loaded with [msdata] | Introduced in `patRoon 3.0`
 [enviPick]       | `findFeatures(algorithm = "envipick", ...)` | centroid (`mzXML`)            | Uses `enviPick::enviPickwrap()`
 [KPIC2]          | `findFeatures(algorithm = "kpic2", ...)`    | centroid (`mzML` or `mzXML`)  |
-[KPIC2] (import) | `importFeatures(algorithm = "kpic2", ...)`  | Features from [KPIC2]         |
 [SIRIUS]         | `findFeatures(algorithm = "sirius", ...)`   | centroid (`mzML` or `mzXML`)  |
 [SAFD]           | `findFeatures(algorithm = "safd", ...)`     | centroid or profile (`mzXML`) | **Experimental**
 DataAnalysis     | `findFeatures(algorithm = "bruker", ...)`   | raw (Bruker `.d`)             | Uses Find Molecular Features from DataAnalysis (Bruker only)
@@ -349,7 +346,6 @@ Some examples of finding features are shown below.
 fListOMS <- findFeatures(anaInfo, "openms") # OpenMS, with default settings
 fListOMS2 <- findFeatures(anaInfo, "openms", noiseThrInt = 500, chromSNR = 10) # OpenMS, adjusted minimum intensity and S/N
 fListXCMS <- findFeatures(anaInfo, "xcms", ppm = 10) # XCMS
-fListXCMSImp <- importFeatures(xset, "xcms", anaInfo) # import XCMS xcmsSet object
 fListXCMS3 <- findFeatures(anaInfo, "xcms3", CentWaveParam(peakwidth = c(5, 15))) # XCMS3
 fListEP <- findFeatures(anaInfo, "envipick", minint = 1E3) # enviPick
 fListKPIC2 <- findFeatures(anaInfo, "kpic2", kmeans = TRUE, level = 1E4) # KPIC2
@@ -404,14 +400,9 @@ Algorithm        | Usage                                                    | Re
 ---------------- | -------------------------------------------------------- | -------------------------------------
 [OpenMS]         | `groupFeatures(algorithm = "openms", ...)`               | Uses the [FeatureLinkerUnlabeled] algorithm (and [MapAlignerPoseClustering] for retention alignment)
 [XCMS]           | `groupFeatures(algorithm = "xcms", ...)`                 | Uses `xcms::group()` `xcms::retcor()` functions
-[XCMS] (import)  | `importFeatureGroups(type = "xcms", ...)`                | Imports an existing `xcmsSet` object.
 [XCMS3]          | `groupFeatures(algorithm = "xcms3", ...)`                | Uses `xcms::groupChromPeaks()` and `xcms::adjustRtime()` functions
-[XCMS3] (import) | `importFeatureGroups(type = "xcms3", ...)`               | Imports an existing `XCMSnExp` object.
 [KPIC2]          | `groupFeatures(algorithm = "kpic2", ...)`                | Uses the [KPIC2] package
-[KPIC2] (import) | `importFeatureGroups(type = "kpic2", ...)`               | Imports a `PIC set` object
 [SIRIUS]         | `groupFeatures(anaInfo, algorithm = "sirius")`           | Finds _and_ groups features with [SIRIUS]
-ProfileAnalysis  | `importFeatureGroups(type = "brukerpa", ...)`            | Import `.csv` file exported from Bruker ProfileAnalysis
-TASQ             | `importFeatureGroups(type = "brukertasq", ...)`          | Imports a _Global result table_ (exported to Excel file and then saved as `.csv` file)
 
 > **_NOTE_**: Grouping features with the `sirius` algorithm will perform both finding and grouping features with [SIRIUS]. This algorithm cannot work with features from another algorithm.
 
@@ -518,6 +509,36 @@ fGroupsSusp <- screenSuspects(fGroupsSusp, suspects2, onlyHits = TRUE, amend = T
 
 In this example the suspect lists defined in `suspects` and `suspects2` are both used for screening. By setting `amend=TRUE` the original screening results (i.e. from `suspects`) are preserved. Note that `onlyHits` should only be set in the final call to `screenSuspects` to ensure that all feature groups are screened.
 
+### Importing feature data {#importFeat}
+
+The `importFeatures()` and `importFeatureGroups()` functions can be used to import existing feature data. This is useful when you have already performed feature finding and/or grouping with another software or package, or when you want to use features from a previous workflow run.
+
+The most important input types are:
+
+Input type | Remarks
+---------- | -------------------------------------------------
+`"xcms"`   | Imports an `xcmsSet` object from [XCMS].
+`"xcms3"`  | Imports an `XCMSnExp` object from [XCMS].
+`"kpic2"`  | Imports a `PIC set` object from [KPIC2].
+`"table"`  | Imports data from a table (e.g. `data.frame` or `.csv` file).
+
+The `table` input type allows the import of data from any external feature detection algorithm, and follows the the format of the `as.data.table()` function [introduced later](#procInspect).
+
+A workflow where data is first exported and later re-imported can be useful to modify feature data outside `patRoon`. For instance, the [export functionality](#exportFeat) can be used to export `XCMS` feature data, process it with [XCMS] and then re-import it with `importFeatures()` or `importFeatureGroups` to continue the `patRoon` workflow. Similarly, the `as.data.table()` function can be used to export feature data to a `data.table`, which can then be modified and re-imported.
+
+Some examples are shown below:
+
+```{r importFeat,eval=FALSE}
+fListXCMSImp <- importFeatures(xset, "xcms", anaInfo) # import XCMS xcmsSet object
+fGroupsXCMS3 <- importFeatureGroups(xs, "xcms3", anaInfo) # import XCMSnExp object with grouped features
+
+# export, modify and re-import features
+fListTab <- as.data.table(fList)
+fListTab[, mz := mz * 1.0001] # modify the m/z values
+fList <- importFeatures(fListTab, "table", anaInfo) # re-import the modified features
+```
+
+See the reference manual for more details, especially for tabular data import (`?importFeatures`, `?importFeatureGroups`).
 
 ## Componentization {#componentization}
 

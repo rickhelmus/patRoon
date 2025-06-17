@@ -348,7 +348,7 @@ This will generate another _check session file_: all the feature groups that are
 > **_NOTE_** `MetaClean` only predicts at the feature group level. Thus, only the kept feature groups from a _feature check session_ will be used for training, and any indivual features that were marked as removed will be ignored.
 
 
-## Exporting and converting feature data
+## Exporting and converting feature data {#exportFeat}
 
 The feature group data obtained during the workflow can be exported to various formats with the `export()` generic function. There are currently three formats supported: `"brukerpa"` (Bruker ProfileAnalysis), `"brukertasq"` (Bruker TASQ) and `"mzmine"` (mzMine). The former exports a 'bucket table' which can be loaded in ProfileAnalysis, the second and third export a target list that can be processed with TASQ and mzMine, respectively.
 

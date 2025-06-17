@@ -102,8 +102,9 @@ setMethod("initialize", "featuresTable", function(.Object, ...) callNextMethod(.
 #'   data (this column is present when obtaining the analysis information from a sets object with
 #'   \code{\link{analysisInfo}}).
 #'
-#' @seealso \code{\link[=as.data.table,features-method]{as.data.table}} for converting features to a \code{data.table}
-#'   format. \code{\link{findFeatures}} to generate feature data.
+#' @seealso \code{\link{importFeatureGroupsTable}} to import feature group data from a table. 
+#'   \code{\link[=as.data.table,features-method]{as.data.table}} for converting features to a \code{data.table} format.
+#'   \code{\link{findFeatures}} to generate feature data.
 #'
 #' @export
 importFeaturesTable <- function(input, analysisInfo, addCols = NULL)

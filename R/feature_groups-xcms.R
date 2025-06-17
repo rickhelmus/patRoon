@@ -187,7 +187,10 @@ importFeatureGroupsXCMSFromFeat <- function(xs, analysisInfo, feat)
 
 #' Imports feature groups from XCMS (old interface)
 #'
-#' Imports grouped features from a legacy \code{\link{xcmsSet}} object from the \pkg{xcms} package.
+#' @templateVar algo XCMS
+#' @templateVar generic importFeatureGroups
+#' @templateVar algoParam xcms
+#' @template algo_importer
 #'
 #' @template analysisInfo-arg
 #' @param input An \code{\link{xcmsSet}} object.
@@ -195,7 +198,7 @@ importFeatureGroupsXCMSFromFeat <- function(xs, analysisInfo, feat)
 #' @inherit groupFeaturesXCMS references
 #' @inherit importFeatureGroups return
 #'
-#' @seealso \code{\link{importFeaturesXCMS3}} and \code{\link{groupFeatures}}
+#' @seealso \code{\link{groupFeaturesXCMS}}
 #'
 #' @export
 importFeatureGroupsXCMS <- function(input, analysisInfo)

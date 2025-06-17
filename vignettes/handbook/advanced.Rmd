@@ -903,7 +903,7 @@ For various technical reasons several parallelization techniques are used, these
 
 ### Multithreading
 
-Multithreading is the most efficient form of parallelization, but is limited to `C/C++` code. In `patRoon` this is realized through the [OpenMP] API. Multithreading is currently only used by the `msdata` interface to load raw (IMS-)HRMS data and by the `piek` algorithm for peak detection in chromatograms and mobilograms.
+Multithreading is the most efficient form of parallelization, but is limited to `C/C++` code. In `patRoon` this is realized through the [OpenMP] API. Multithreading is currently only used by the [msdata](#fileTypes) interface to load raw (IMS-)HRMS data and by the `piek`  algorithm for peak detection in chromatograms and mobilograms.
 
 The maximum number of threads used for parallelization is configured through the `patRoon.threads` option. By default it is set to the number of available CPU cores, which results usually in the best performance. However, this could be lowered, for instance, to keep your computer more responsive while processing.
 

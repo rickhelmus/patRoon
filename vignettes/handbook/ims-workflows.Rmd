@@ -61,7 +61,7 @@ Supports [sets workflows](#setsWorkflow)^2^ | Yes     | Limited                 
 
 Notes:
 
-1. If the `piek` feature detection algorithm is used then (only) IMS raw data may suffice, see [more info here].
+1. If the `piek` feature detection algorithm is used then (only) IMS raw data may suffice, see [more info here](#fileTypes).
 2. Discussed further [here](#IMSSetsWorkflow) 
 
 ## Performing IMS workflows
@@ -70,7 +70,7 @@ Notes:
 
 The [data conversion and pre-treatment](#pre-treat) section already discussed how raw data can be converted to make it suitable for processing. For the workflows that require raw data that has IMS data (see the Table of the previous section) there are two options:
 
-1. Use the raw instrument directly. This is currently only supported for Bruker TIMS data, see [details here].
+1. Use the raw instrument directly. This is currently only supported for Bruker TIMS data, see [details here](#fileTypes).
 2. Convert the data to the `ims` type in the `mzML` file format, e.g. by using `convertMSFiles()` ([explained here](#pre-treat)).
 
 If IMS collapsed data is needed (see the Table of the previous section) then raw data of the type `raw` or `ims` should be converted to the type `centroid`.

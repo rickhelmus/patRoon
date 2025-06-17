@@ -161,7 +161,7 @@ The next sections further describe the steps needed to setup the sample analysis
 
 In `patRoon` a _sample analysis_, or _analysis_, refers to a single HRMS measurement of a sample. The raw data for an analysis is typically stored in different file types and file formats, which are discussed in the next section. The [analysis information](#anaInfo) informs `patRoon` which analyses should be processed, where to find the raw data and is used to store any other metadata. The [data pre-treatment](#pre-treat) section describes how to convert and prepare the raw data.
 
-### Analysis file types and formats
+### Analysis file types and formats and the `msdata` interface {#fileTypes}
 
 In `patRoon` a distinction is made between four types of raw data files:
 
@@ -170,7 +170,23 @@ In `patRoon` a distinction is made between four types of raw data files:
 * **profile**: exported but not centroided (i.e. profile) data files in `mzML` or `mzXML` formats.
 * **ims**: exported ion mobility HRMS data files in the `mzML` format.
 
-Most algorithms in non-target workflows exclusively operate on centroided data files. In most cases the centroided data should be stored in the `mzML` format, but [some feature detection algorithms](#findFeat) only work with `mzXML`. The raw data files are primarily used for data conversion to any of the other types. The raw and ims data file types are (also) used in [IMS workflows](#IMSWorkflow).
+Unfortunately, algorithms within the workflow may require different file types/formats, and it is often necessary to [convert raw data](#pre-treat) to one or more other file types/formats. In `patRoon` the choice of file type and format is primarily based on:
+
+1. The feature detection algorithm that is used. An overview of requirements is [listed in the feature detection section](#findFeat).
+2. The internal code of `patRoon` to process raw data. This is called the `msdata` interface.
+
+The `msdata` interface is used throughout many operations within `patRoon`, such as loading mass spectra for [feature annotation](#MSPL) and generating extracted ion chromatograms (EICs) for [plotting](#vis_feat_ann) and [reporting](#report) data. The `msdata` interface itself supports different backends, each of which support different file types and formats. By default the most suitable backend is chosen automatically, depending on the available raw data and which backends are available on your system. The currently supported backends are:
+
+Backend         | Supported file types and formats
+--------------- | --------------------------------------------------------------------------
+`"opentims"`    | Uses [OpenTIMS] for highly efficient reading of raw Bruker TIMS data (only available on Windows and Linux)
+`"mzr"`         | uses [mzR] to read `centroid` files in the `mzML` and `mzXML` formats. This was always used in before `patRoon 3.0`.
+`"mstoolkit"`   | Uses [mstoolkit] to read `ims` files (`mzML` format) and `centroid` files in the `mzML` and `mzXML` formats. Requires the [Rmstoolkitlib] `R` package (see the [Installation chapter](#Installation)).
+`"streamcraft"` | Uses [StreamCraft] to read `ims` files (`mzML` format) and `centroid` files in the `mzML` and `mzXML` formats.
+
+> **_NOTE_** The [piek feature detection algorithm](#piek) uses the `msdata` interface directly and therefore supports a wide range of raw data file types and formats.
+
+See the reference manual for more details on the `msdata` interface (`?msdata`).
 
 ### Analysis information {#anaInfo}
 
@@ -222,7 +238,7 @@ Algorithm      | Usage                                            | Input file t
 [ProteoWizard] | `convertMSFiles(algorithm = "pwiz", ...)`        | all formats and types                     | all except raw
 [OpenMS]       | `convertMSFiles(algorithm = "openms", ...)`      | centroid and profile (`mzML` and `mzXML`) | centroid and profile (`mzML` and `mzXML`) | Does not support centroiding.
 DataAnalysis   | `convertMSFiles(algorithm = "bruker", ...)`      | raw (Bruker `.d`)                         | centroid and profile (`mzML` and `mzXML`)
-IM collapse    | `convertMSFiles(algorithm = "im_collapse", ...)` | raw (Bruker TIMS) and ims (mzML)          | centroid (`mzML` and `mzXML`)
+IM collapse    | `convertMSFiles(algorithm = "im_collapse", ...)` | raw (Bruker TIMS) and ims (mzML) (uses [msdata](#fileTypes)) | centroid (`mzML` and `mzXML`)
 [TIMSCONVERT]  | `convertMSFiles(algorithm = "timsconvert", ...)` | raw (Bruker TIMS)                         | centroid, profile, ims (`mzML`)
 
 > **_NOTE_** For the conversion of IMS to centroided data it is highly recommended to use the IM collapse or [TIMSCONVERT] algorithms, as [ProteoWizard] currently does not support accurate centroiding of IMS data. For the conversion of Agilent IMS data, [ProteoWizard] can be used to convert the raw `.d` files to the ims (`mzML`) files, and subsequently IM collapse can be used to convert these to centroided files.
@@ -311,7 +327,7 @@ Algorithm        | Usage                                       | Input          
 [OpenMS]         | `findFeatures(algorithm = "openms", ...)`   | centroid (`mzML`)             | Uses [FeatureFinderMetabo]
 [XCMS]           | `findFeatures(algorithm = "xcms", ...)`     | centroid (`mzML` or `mzXML`)  | Uses `xcms::xcmsSet()`
 [XCMS3]          | `findFeatures(algorithm = "xcms3", ...)`    | centroid (`mzML` or `mzXML`)  | Uses `xcms::findChromPeaks()`
-`piek`           | `findFeatures(algorithm = "piek", ...)`     | raw data loaded with [msdata] | Introduced in `patRoon 3.0`
+`piek`           | `findFeatures(algorithm = "piek", ...)`     | raw data loaded with [msdata](#fileTypes) | Introduced in `patRoon 3.0`
 [enviPick]       | `findFeatures(algorithm = "envipick", ...)` | centroid (`mzXML`)            | Uses `enviPick::enviPickwrap()`
 [KPIC2]          | `findFeatures(algorithm = "kpic2", ...)`    | centroid (`mzML` or `mzXML`)  |
 [SIRIUS]         | `findFeatures(algorithm = "sirius", ...)`   | centroid (`mzML` or `mzXML`)  |
@@ -790,7 +806,7 @@ digraph Annotation {
 
 Note that compound annotation is not dependent upon formula annotation. However, formula data can be used to improve ranking of candidates afterwards by the `addFormulaScoring()` function, which will be discussed later in this section. The estimation of ID confidence is optional, and can be performed for candidates from formula annotations, compounds annotations and suspect matches.
 
-### MS peak lists
+### MS peak lists {#MSPL}
 
 > **_NOTE_** The `generateMSPeakLists()` function was significantly changed in `patRoon 3.0`, and now uses internal algorithms to retrieve MS and MS/MS spectra. The previous algorithms (`mzr`, `bruker` and `brukerfmf`) are now deprecated and should not be used anymore.
 

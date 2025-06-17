@@ -1443,10 +1443,10 @@ setMethod("calculateTox", "featureGroups", function(fGroups, featureAnn)
 #'
 #' In \pkg{patRoon}, two approaches are supported to assign mobilities to features: \emph{direct} and \emph{post}. In
 #' the \emph{direct} approach mobility values are directly assigned during feature detection. This is only supported by
-#' some algorithms (\emph{e.g.} \link{piek}). In the \emph{post} approach, the mobility values are assigned after
-#' feature detection and grouping (and possibly other steps such as filtering). Thus, the \emph{post} approach is
-#' supported by all available feature detection algorithms in \pkg{patRoon}. The \emph{post} approach is further
-#' described below. Only the \acronym{CCS} conversion functionality of \code{assignMobilities} should be used in
+#' some algorithms (\emph{e.g.} \link[=findFeaturesPiek]{piek}). In the \emph{post} approach, the mobility values are
+#' assigned after feature detection and grouping (and possibly other steps such as filtering). Thus, the \emph{post}
+#' approach is supported by all available feature detection algorithms in \pkg{patRoon}. The \emph{post} approach is
+#' further described below. Only the \acronym{CCS} conversion functionality of \code{assignMobilities} should be used in
 #' \emph{direct} mobility assignment workflows.
 #'
 #' The assignment of \acronym{CCS} values is controlled by the \code{CCSParams} argument (see above).
@@ -1516,7 +1516,7 @@ setMethod("calculateTox", "featureGroups", function(fGroups, featureAnn)
 #'
 #' @templateVar what \code{assignMobilities}
 #' @template uses-msdata
-#' 
+#'
 #' @source The re-grouping of IMS features uses \CRANpkg{fastcluster} to group features with close mobilities.
 #'
 #' @references \addCitations{fastcluster}

@@ -23,6 +23,7 @@
         - mobWindow and IMSWindow now randomly used
         - IMS arg but affects mobility features
         - withMobility vs withIMS
+        - methodMZ and methodIMS --> methodMS+methodIMS or methodMZ+methodMob?
     - mob_area/mob_intensity vs mobmin/mobmax
 - feat import
     - support feature CCS?
@@ -250,8 +251,6 @@
 - update relativeTo arg (not just replicates)
 - convert
     - add patRoon 3.0 citation for im_collapse
-- backend
-    - refer to it in piek
 - handbook/tutorial
     - installation
         - add additional external deps, eg Python, TIMS-SDK, c3sdb, PCL/CCS etc
@@ -302,8 +301,7 @@
     - mention somewhere that IM collapse doesn't export MS/MS spectra by default and why
 - IMS
     - piek
-        - refer to defaults/limits for getPiekGenEICParams() (and removeDuplicateFeatsSusps()?)
-        - link to cluster params
+        - refs to paper
     - assignMobilities()
         - refs to paper
         - fGroups method

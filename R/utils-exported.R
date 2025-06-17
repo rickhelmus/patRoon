@@ -723,7 +723,8 @@ getDefTPStructParams <- function(...)
 #'
 #'   \item \code{"envipick"}: uses the \code{\link[enviPick:mzpick]{enviPick::mzpick}} function.
 #'
-#'   \item \code{"piek"}: uses an optimized peak detection algorithm derived from \insertCite{Dietrich2021}{patRoon}.
+#'   \item \code{"piek"}: uses the peak detection algorithm from \insertCite{Dietrich2021}{patRoon}, which was optimized
+#'   with \href{https://www.openmp.org/}{OpenMP} parallelization. See \code{\link{findFeaturesPiek}} for more details.
 #' }
 #'
 #' The parameters are discussed in the next sections.

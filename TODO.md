@@ -263,8 +263,8 @@
             - update/extend data-pretreatment section
                 - mention im_collapse uses msdata?
         - features
-            - update algo tables (piek, import) and file support (mention msdata for piek somewhere?)
-            - describe piek params
+            - update algo tables (piek, import) and file support
+                - fill in link to msdata for piek
             - possibly split feature import into sub-section?
         - annotation
             - update MSPL section
@@ -285,8 +285,6 @@
             - see which knitr chunks to enable for execution
             - features
                 - fill in link to importing features
-                - fill in links to piek
-                - verify if piek info is up-to-date and aligned once the rest of the docs are there
         - processing
             - evaluate the examples once they can be run
                 - maybe add or improve plotMobilogram examples

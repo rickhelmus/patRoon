@@ -170,7 +170,7 @@ In `patRoon` a distinction is made between four types of raw data files:
 * **profile**: exported but not centroided (i.e. profile) data files in `mzML` or `mzXML` formats.
 * **ims**: exported ion mobility HRMS data files in the `mzML` format.
 
-Most algorithms in non-target workflows exclusively operate on centroided data files. In most cases the centroided data should be stored in the `mzML` format, but [some feature detection algorithms](#findGrpFeat) only work with `mzXML`. The raw data files are primarily used for data conversion to any of the other types. The raw and ims data file types are (also) used in [IMS workflows](#IMSWorkflow).
+Most algorithms in non-target workflows exclusively operate on centroided data files. In most cases the centroided data should be stored in the `mzML` format, but [some feature detection algorithms](#findFeat) only work with `mzXML`. The raw data files are primarily used for data conversion to any of the other types. The raw and ims data file types are (also) used in [IMS workflows](#IMSWorkflow).
 
 ### Analysis information {#anaInfo}
 
@@ -302,7 +302,7 @@ digraph Features {
 }", height = 70, width = 500)
 ```
 
-### Finding and grouping features {#findGrpFeat}
+### Finding features {#findFeat}
 
 Several algorithms are available for finding features. These are listed in the table below alongside their usage and general remarks.
 
@@ -313,6 +313,7 @@ Algorithm        | Usage                                       | Input          
 [XCMS] (import)  | `importFeatures(algorithm = "xcms", ...)`   | `xcmsSet` object              |
 [XCMS3]          | `findFeatures(algorithm = "xcms3", ...)`    | centroid (`mzML` or `mzXML`)  | Uses `xcms::findChromPeaks()`
 [XCMS3] (import) | `importFeatures(algorithm = "xcms3", ...)`  | `XCMSnExp` object             |
+`piek`           | `findFeatures(algorithm = "piek", ...)`     | raw data loaded with [msdata] | Introduced in `patRoon 3.0`
 [enviPick]       | `findFeatures(algorithm = "envipick", ...)` | centroid (`mzXML`)            | Uses `enviPick::enviPickwrap()`
 [KPIC2]          | `findFeatures(algorithm = "kpic2", ...)`    | centroid (`mzML` or `mzXML`)  |
 [KPIC2] (import) | `importFeatures(algorithm = "kpic2", ...)`  | Features from [KPIC2]         |
@@ -322,21 +323,82 @@ DataAnalysis     | `findFeatures(algorithm = "bruker", ...)`   | raw (Bruker `.d
 
 The feature finding algorithms have different requirements on the data file types and formats (_Input_ column). See the [data conversion section](#pre-treat) to perform data conversion.
 
+When using the [XCMS] algorithms both the 'classical' interface and latest `XCMS3` interfaces are supported. The implementation and functionality is largely the same within `patRoon`, however, the latter is recommended as the classical interface is not further developed anymore.
+
 Most often the performance of these algorithms heavily depends on the data and parameter settings that are used. Since obtaining a good feature dataset is crucial for the rest of the workflow, it is highly recommended to experiment with different settings (this process can also be automated, see [the feature optimization section](#fOpt) for more details). Some common parameters to look at are listed in the table below. However, there are many more parameters that can be set, please see the reference documentation for these (e.g. `?findFeatures`).
 
 Algorithm        | Common parameters
 ---------------- | ---------------------------------------------------------------------------------
-[OpenMS]         | `noiseThrInt`, `chromSNR`, `chromFWHM`, `mzPPM`, `minFWHM`, `maxFWHM` (see `?findFeatures`)
+[OpenMS]         | `noiseThrInt`, `chromSNR`, `chromFWHM`, `mzPPM`, `minFWHM`, `maxFWHM` (see `?findFeaturesOpenMS`)
 [XCMS] / [XCMS3] | `peakwidth`, `mzdiff`, `prefilter`, `noise` (assuming default `centWave` algorithm, see `?findPeaks.centWave` / `?CentWaveParam`)
+`piek`           | `genEICParams`, `peakParams`, see next section and `?findFeaturesPiek`
 [enviPick]       | `dmzgap`, `dmzdens`, `drtgap`, `drtsmall`, `drtdens`, `drtfill`, `drttotal`, `minpeak`, `minint`, `maxint` (see `?enviPickwrap`)
 [KPIC2]          | `kmeans`, `level`, `min_snr` (see `?findFeatures` and `?getPIC` / `?getPIC.kmeans`)
 [SIRIUS]         | The `sirius` algorithm is currently parameterless
-[SAFD]           | `mzRange`, `maxNumbIter`, `resolution`, `minInt` (see `?findFeatures`)
+[SAFD]           | `mzRange`, `maxNumbIter`, `resolution`, `minInt` (see `?findFeaturesSAFD`)
 DataAnalysis     | See _Find_ -> _Parameters..._ -> _Molecular Features_ in DataAnalysis.
 
 > **_NOTE_** DataAnalysis feature settings have to be configured in DataAnalysis prior to calling `findFeatures()`.
 
-Similarly, for grouping features across analyses several algorithms are supported.
+Some examples of finding features are shown below.
+
+```{r feat,eval=FALSE}
+# The anaInfo variable contains analysis information, see the previous section
+
+# Finding features
+fListOMS <- findFeatures(anaInfo, "openms") # OpenMS, with default settings
+fListOMS2 <- findFeatures(anaInfo, "openms", noiseThrInt = 500, chromSNR = 10) # OpenMS, adjusted minimum intensity and S/N
+fListXCMS <- findFeatures(anaInfo, "xcms", ppm = 10) # XCMS
+fListXCMSImp <- importFeatures(xset, "xcms", anaInfo) # import XCMS xcmsSet object
+fListXCMS3 <- findFeatures(anaInfo, "xcms3", CentWaveParam(peakwidth = c(5, 15))) # XCMS3
+fListEP <- findFeatures(anaInfo, "envipick", minint = 1E3) # enviPick
+fListKPIC2 <- findFeatures(anaInfo, "kpic2", kmeans = TRUE, level = 1E4) # KPIC2
+fListSIRIUS <- findFeatures(anaInfo, "sirius") # SIRIUS
+```
+
+#### Feature detection with piek {#piek}
+
+The `piek` algorithm was introduced in `patRoon 3.0`, and extends the work done by @Dietrich2021. This algorithm finds features from extracted ion chromatograms (EICs) and can use different peak detection algorithms to find features. The EICs can be generated from one of the following:
+
+* fixed-width _m/z_ bins
+* data from a suspect list (the format follows that of suspect lists for [suspect screening workflows](#suspFormat))
+* data from precursors detected in data-dependent MS/MS experiments (DDA)
+
+The `getPiekGenEICParams()` function is used to create the parameters that are used to generate the EICs. Its output is passed to the `genEICParams` argument to `findFeatures()` function. Similarly, the `getDefPeakParams()` function is used to create the parameters that are used to detect peaks, and its output is passed to the `peakParams` argument of `findFeatures()`.
+
+Some examples are shown below:
+
+```{r piek,eval=FALSE}
+# find features from m/z bins with piek's native peak detection algorithm
+genEICParams <- getPiekGenEICParams(methodMZ = "bins")
+peakParams <- getDefPeakParams("chrom", "piek")
+fList <- findFeatures(anaInfo, "piek", genEICParams = genEICParams, peakParams = peakParams)
+
+# as above, but customize binning
+genEICParams <- getPiekGenEICParams(methodMZ = "bins", mzRange = c(50, 1000), mzStep = 0.01)
+peakParams <- getDefPeakParams("chrom", "piek")
+fList <- findFeatures(anaInfo, "piek", genEICParams = genEICParams, peakParams = peakParams)
+
+# find features from a suspect list with XCMS peak detection
+# see the suspect screening section for more details on the suspect list format
+genEICParams <- getPiekGenEICParams(methodMZ = "suspects")
+peakParams <- getDefPeakParams("chrom", "xcms3")
+fList <- findFeatures(anaInfo, "piek", genEICParams = genEICParams, peakParams = peakParams,
+                      suspects = suspList, adduct = "[M+H]+")
+
+# use DDA MS/MS data to find features
+# only find features with data between two and ten minutes retention time.
+# increase minimum spectrum TIC to focus on features with high intensity MS/MS data
+genEICParams <- getPiekGenEICParams(methodMZ = "ms2", retRange = c(120, 600), minTIC = 1E5)
+peakParams <- getDefPeakParams("chrom", "openms")
+fList <- findFeatures(anaInfo, "piek", genEICParams = genEICParams, peakParams = peakParams)
+```
+
+For more details, please see the reference manual (`?findFeaturesPiek`).
+
+### Feature grouping
+
+For grouping features across analyses several algorithms are supported.
 
 Algorithm        | Usage                                                    | Remarks
 ---------------- | -------------------------------------------------------- | -------------------------------------
@@ -353,26 +415,12 @@ TASQ             | `importFeatureGroups(type = "brukertasq", ...)`          | Im
 
 > **_NOTE_**: Grouping features with the `sirius` algorithm will perform both finding and grouping features with [SIRIUS]. This algorithm cannot work with features from another algorithm.
 
-Just like finding features, each algorithm has their own set of parameters. Often the defaults are a good start but it is recommended to have look at them. See `?groupFeatures` for more details.
+Just like finding features, each algorithm has their own set of parameters. Often the defaults are a good start but it is recommended to have look at them. See `?groupFeatures` for more details. The algorithm used to group features does not have to match to the algorithm that was used to find the features.
 
-When using the [XCMS] algorithms both the 'classical' interface and latest `XCMS3` interfaces are supported. The implementation and functionality is largely the same within `patRoon`, however, the latter is recommended as the classical interface is not further developed anymore.
+Some examples of grouping features are shown below.
 
-Some examples of finding and grouping features are shown below.
-
-```{r feat,eval=FALSE}
-# The anaInfo variable contains analysis information, see the previous section
-
-# Finding features
-fListOMS <- findFeatures(anaInfo, "openms") # OpenMS, with default settings
-fListOMS2 <- findFeatures(anaInfo, "openms", noiseThrInt = 500, chromSNR = 10) # OpenMS, adjusted minimum intensity and S/N
-fListXCMS <- findFeatures(anaInfo, "xcms", ppm = 10) # XCMS
-fListXCMSImp <- importFeatures(xset, "xcms", anaInfo) # import XCMS xcmsSet object
-fListXCMS3 <- findFeatures(anaInfo, "xcms3", CentWaveParam(peakwidth = c(5, 15))) # XCMS3
-fListEP <- findFeatures(anaInfo, "envipick", minint = 1E3) # enviPick
-fListKPIC2 <- findFeatures(anaInfo, "kpic2", kmeans = TRUE, level = 1E4) # KPIC2
-fListSIRIUS <- findFeatures(anaInfo, "sirius") # SIRIUS
-
-# Grouping features
+```{r featGroup,eval=FALSE}
+# Group features, using the fList objects created in the previous feature finding section
 fGroupsOMS <- groupFeatures(fListOMS, "openms") # OpenMS grouping, default settings
 fGroupsOMS2 <- groupFeatures(fListOMS2, "openms", rtalign = FALSE) # OpenMS grouping, no RT alignment
 fGroupsOMS3 <- groupFeatures(fListXCMS, "openms", maxGroupRT = 6) # group XCMS features with OpenMS, adjusted grouping parameter

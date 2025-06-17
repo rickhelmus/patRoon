@@ -81,7 +81,7 @@ The [data conversion and pre-treatment](#pre-treat) section includes some exampl
 
 In direct IMS workflows the feature detection needs to be aware of the IMS dimension. In `patRoon` this is currently only supported by the `piek` algorithm. Alternatively, feature data from another IMS aware feature detection [can also be imported].
 
-The `piek` algorithm was already [discussed before]. In IMS workflows the `methodIMS` parameter should additionally be configured, and influences the formation of extracted ion chromatograms (EICs) similarly as the `methodMZ` parameter. Like `methodMZ`, it should be set to `"bins"`, `"suspects"` or `"ms2"`. The following combinations of `methodMZ` and `methodIMS` are supported:
+The `piek` algorithm was already [discussed before](#piek). In IMS workflows the `methodIMS` parameter should additionally be configured, and influences the formation of extracted ion chromatograms (EICs) similarly as the `methodMZ` parameter. Like `methodMZ`, it should be set to `"bins"`, `"suspects"` or `"ms2"`. The following combinations of `methodMZ` and `methodIMS` are supported:
 
 `methodMZ`   | `methodIMS`  | EIC formation
 ------------ | ------------ | -----------------------------------------------------------------------

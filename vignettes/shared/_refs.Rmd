@@ -76,3 +76,7 @@
 [OpenMP]: https://www.openmp.org/
 [TIMSCONVERT]: https://gtluu.github.io/timsconvert/
 [C3SDB]: https://github.com/dylanhross/c3sdb
+[OpenTIMS]: https://github.com/michalsta/opentims
+[mstoolkit]: https://github.com/mhoopmann/mstoolkit
+[Rmstoolkitlib]: https://github.com/rickhelmus/Rmstoolkitlib
+[StreamCraft]: https://github.com/odea-project/streamcraft

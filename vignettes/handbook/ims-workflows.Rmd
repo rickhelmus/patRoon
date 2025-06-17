@@ -24,7 +24,7 @@ In this workflow the raw IMS data is 'collapsed' and is converted in such a way 
 
 ### Direct mobility assignment {#directIMS}
 
-This workflow relies on a feature detection algorithm that separates features by ion mobility and assigns the feature mobilities directly during feature detection. In `patRoon` this is currently only supported by the `piek` algorithm or by [importing feature data from other algorithms]. None of the feature grouping algorithms currently interfaced by `patRoon` support IMS data. To circumvent this, features with close mobilities are first clustered and then any of the non-IMS algorithms is used to perform sample analysis grouping with each cluster. The grouping results for each cluster are then combined to obtain the final feature groups. Most of the remaining workflow is the same as non-IMS workflows. However, it typically adds steps to calculate CCS values for features and matches these with (predicted) CCS values of suspects and/or compound annotation candidates. Furthermore, the IMS data is internally used to cleanup extracted ion chromatograms and mass spectra, which can improve their visualization and quality of feature annotation.
+This workflow relies on a feature detection algorithm that separates features by ion mobility and assigns the feature mobilities directly during feature detection. In `patRoon` this is currently only supported by the `piek` algorithm or by [importing feature data from other algorithms](#importFeat). None of the feature grouping algorithms currently interfaced by `patRoon` support IMS data. To circumvent this, features with close mobilities are first clustered and then any of the non-IMS algorithms is used to perform sample analysis grouping with each cluster. The grouping results for each cluster are then combined to obtain the final feature groups. Most of the remaining workflow is the same as non-IMS workflows. However, it typically adds steps to calculate CCS values for features and matches these with (predicted) CCS values of suspects and/or compound annotation candidates. Furthermore, the IMS data is internally used to cleanup extracted ion chromatograms and mass spectra, which can improve their visualization and quality of feature annotation.
 
 ### Post mobility assignment {#postIMS}
 
@@ -79,7 +79,7 @@ The [data conversion and pre-treatment](#pre-treat) section includes some exampl
 
 ### Feature detection and grouping in direct mobility assignment workflows
 
-In direct IMS workflows the feature detection needs to be aware of the IMS dimension. In `patRoon` this is currently only supported by the `piek` algorithm. Alternatively, feature data from another IMS aware feature detection [can also be imported].
+In direct IMS workflows the feature detection needs to be aware of the IMS dimension. In `patRoon` this is currently only supported by the `piek` algorithm. Alternatively, feature data from another IMS aware feature detection [can also be imported](#importFeat).
 
 The `piek` algorithm was already [discussed before](#piek). In IMS workflows the `methodIMS` parameter should additionally be configured, and influences the formation of extracted ion chromatograms (EICs) similarly as the `methodMZ` parameter. Like `methodMZ`, it should be set to `"bins"`, `"suspects"` or `"ms2"`. The following combinations of `methodMZ` and `methodIMS` are supported:
 

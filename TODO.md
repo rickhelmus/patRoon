@@ -265,7 +265,6 @@
         - features
             - update algo tables (piek, import) and file support
                 - fill in link to msdata for piek
-            - possibly split feature import into sub-section?
         - annotation
             - update MSPL section
                 - add back precursorMzWindow if we re-add it
@@ -274,7 +273,6 @@
                 - update thresholds when we change these
     - IMS chapter
         - intro
-            - fill in link to feature import
             - make sure to update step numbers of post assignment throughout the chapter if this is changed
             - table
                 - add more rows, eg for componentization?
@@ -283,8 +281,6 @@
             - fill in link to msdata or similar that explains that TIMS data can be used directly
         - workflows
             - see which knitr chunks to enable for execution
-            - features
-                - fill in link to importing features
         - processing
             - evaluate the examples once they can be run
                 - maybe add or improve plotMobilogram examples

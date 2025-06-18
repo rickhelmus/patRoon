@@ -883,17 +883,18 @@ setMethod("spectrumSimilarityMobility", "MSPeakLists", function(obj, fGroups, do
 #' @param fGroups The \code{\link{featureGroups}} object for which MS peak lists should be generated.
 #' @param fixedIsolationWidth Configures how MS/MS spectra are selected for a feature: \itemize{
 #'
-#'   \item \code{NULL} Select all spectra unconditionally.
+#'   \item \code{NA}: select all spectra unconditionally, \emph{i.e.} ignoring any precursor information of spectra.
 #'
-#'   \item \code{FALSE} Select the spectra of which the precursor m/z value matches that of the feature m/z, using the
-#'   instrumental isolation window that was applied when recording the spectra as the tolerance.
+#'   \item \code{FALSE}: select the spectra that were recorded for the feature m/z, using the instrumental precursor
+#'   isolation window (\emph{e.g.} quadrupole m/z width) as the selection tolerance.
 #'
-#'   \item A numeric value: like \code{FALSE}, but manually set the tolerance window (+/- precursor m/z). The maximum
-#'   tolerance is always determined by the instrumental isolation windows that was applied to record the MS/MS spectrum.
-#'   Hence, manual values can only be used to tighten the tolerance.
+#'   \item A numeric value: select the spectra that were recorded for the feature m/z within this tolerance window (+/-
+#'   precursor m/z).
 #'
 #'   }
-#'   In data-independent MS/MS experiments all MS/MS spectra will be selected.
+#'
+#'   If no isolation was applied to record MS/MS data (\emph{e.g.} data-independent MS/MS), then all MS/MS spectra will
+#'   be always be selected.
 #' @param topMost Only extract MS peak lists from a maximum of \code{topMost} features with highest intensity. If
 #'   \code{NULL} all features will be used.
 #' @param avgFeatParams Parameters used for averaging MS peak lists of individual features. Analogous to
@@ -934,7 +935,7 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRtWindo
     checkmate::assertNumber(maxMSRtWindow, lower = 1, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assert(
         checkmate::checkFALSE(fixedIsolationWidth),
-        checkmate::checkNull(fixedIsolationWidth),
+        checkmate::checkScalarNA(fixedIsolationWidth),
         checkmate::checkNumber(fixedIsolationWidth, lower = 0, finite = TRUE),
         .var.name = "fixedIsolationWidth", add = ac
     )
@@ -964,9 +965,8 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRtWindo
     
     getMSPL <- function(backend, ft, params, MSLevel)
     {
-        precMZs <- if (is.null(fixedIsolationWidth)) rep(0, nrow(ft)) else ft$mz
-        fiw <- if (isFALSE(fixedIsolationWidth) || is.null(fixedIsolationWidth)) 0 else fixedIsolationWidth
-        ret <- getMSPeakLists(backend, ft$retmin, ft$retmax, precMZs, fiw, withPrecursor = params$withPrecursor,
+        fiw <- if (isFALSE(fixedIsolationWidth)) 0 else if (is.na(fixedIsolationWidth)) -1 else fixedIsolationWidth
+        ret <- getMSPeakLists(backend, ft$retmin, ft$retmax, ft$mz, fiw, withPrecursor = params$withPrecursor,
                               retainPrecursor = params$retainPrecursor, MSLevel = MSLevel, method = params$method,
                               mzWindow = params$clusterMzWindow, startMobs = ft$mobmin,
                               endMobs = ft$mobmax, minAbundanceRel = params$minAbundanceRel,

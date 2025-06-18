@@ -31,13 +31,12 @@ bool precWithinIsoWindow(SpectrumRawTypes::Mass prec, SpectrumRawTypes::Mass spe
                          SpectrumRawTypes::Mass fixedIsoWidth, NumRange<SpectrumRawTypes::Mass> range)
 {
     // NOTE: in case of MS/MS, we match all spectra if the precursor or iso window was unset (0.0)
-    if (prec == 0.0 || !range.isSet())
+    if (prec == 0.0 || !range.isSet() || fixedIsoWidth < 0.0)
         return true;
     
     if (fixedIsoWidth != 0.0)
     {
-        range.start = std::min(range.start, fixedIsoWidth);
-        range.end = std::min(range.end, fixedIsoWidth);
+        range.start = range.end = fixedIsoWidth;
     }
     range.start = specPrec - range.start; range.end += specPrec;
     return range.within(prec);

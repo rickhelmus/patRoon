@@ -10,10 +10,13 @@
     - check if ref docs are OK
     - add to handbook
     - add NEWS
-- update patRoonInst for new deps?
+- update patRoonInst/patRoonExt/patRoonData for new deps
+    - install timsconvert and c3sdb in Docker and bundle
+    - embed TIMS-SDK in patRoonExt
+    - add MRMTransitionGroupPicker to patRoonExt
+    - switch to PCL w/ CCSbase in patRoonExt
 - formulas: calcFeatures by default FALSE?
 - BUG: annSim.1 column (in formulas?)?
-- install timsconvert and c3sdb in Docker and bundle
 - fix default IDLs
 - ADT: averaged data is now always per replicate, change to averageBy?
 - update REUSE
@@ -25,14 +28,15 @@
         - withMobility vs withIMS
         - methodMZ and methodIMS --> methodMS+methodIMS or methodMZ+methodMob?
     - mob_area/mob_intensity vs mobmin/mobmax
+    - naming: im_collapse and IMSCollapse
+    - overwrite vs overWrite
 - feat import
     - support feature CCS?
 - FIX: IMSRangeParams: in sets workflows, the mz column is taken so relative filtering is done to neutralMasses
     - maybe add _mz rel column like compounds?
     - actually, the same is the case for the mz filter (also IMS and mz for features) --> maybe just document difference? the actual results will not change much in general
 - rename convertMSFilesAnaInfo() to convertMSFiles() or something else and shorter?
-    - update Handbook/Tutorial if needed
-- overwrite vs overWrite
+    - update Handbook/Tutorial/NEWS if needed
 
 
 ## Maybe
@@ -108,23 +112,16 @@
 
 ## msdata
 
-- FIX: handle empty EICs when filling, padding etc
 - see what is the best default for backends
     - set mzR in front for safety?
-- embed TIMS-SDK? --> in patRoonExt
 - Agilent
     - SC doesn't recognize IM
-- re-introduce isolation window for MSPL? eg if file doesn't contain ranges (is that a thing?) or for some reason a more narrow range is desired
-    - finish fixedIsolationWidth: fix if it is NULL
-- naming: im_collapse and IMSCollapse
 - patRoon.checkCentroided removed: update (incl docs) or remove?
 
 
 ## IMS
 
 - findPeaks()
-    - OpenMS
-        - add MRMTransitionGroupPicker to patRoonExt
     - Dietrich
         - Disabled noise removal for reported intensities/areas
             - keep doing this?
@@ -135,7 +132,6 @@
     - SC seems to hang?
     - parent-less/orphaned IMS features
         - done?
-    - switch to PCL w/ CCSbase in patRoonExt
     - warn if fromSuspects && fallBackEICs == TRUE (or throw an error? or enforce fallBackEICs=FALSE with a warning? update docs/handbook)
 - reporting
     - comps-clust: don't have imgs double in reportPlots

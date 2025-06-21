@@ -8,7 +8,7 @@
 #define PATROON_PARSE_XML_H
 
 #define PUGIXML_HEADER_ONLY
-#define PUGIXML_NO_XPATH
+// #define PUGIXML_NO_XPATH // StreamCraft needs xpath
 #include "pugixml/pugixml.hpp"
 
 #include <functional>

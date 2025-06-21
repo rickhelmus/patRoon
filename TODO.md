@@ -115,9 +115,9 @@
 - see what is the best default for backends
     - set mzR in front for safety?
 - Agilent
-    - SC doesn't recognize IM
+    - SC doesn't recognize IM --> fixed now?
 - patRoon.checkCentroided removed: update (incl docs) or remove?
-
+- SC errors on mzML IMS data on mac: Compression with accession MS:1000574 or MS:1000576 not found!
 
 ## IMS
 
@@ -129,7 +129,6 @@
             - document
 - assignMobilities()
     - better names for ims_parent_ID/ims_parent_group?
-    - SC seems to hang?
     - parent-less/orphaned IMS features
         - done?
     - warn if fromSuspects && fallBackEICs == TRUE (or throw an error? or enforce fallBackEICs=FALSE with a warning? update docs/handbook)

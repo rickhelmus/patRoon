@@ -1,1 +1,1 @@
-This directory contains the C++ source files of StreamCraft (82c4cd2, see https://github.com/odea-project/StreamCraft). Other files were stripped out.
+This directory contains the C++ source files of StreamCraft (076cf73, dev_combine branch, see https://github.com/odea-project/StreamCraft). Other files were stripped out and a few minor changed were made to fix compilation (disabling of std::filesystem and pugixml include).

@@ -3,14 +3,12 @@
 #include "msdata-sc.h"
 #include "spectrum-raw.h"
 
-#define PUGIXML_PATH "../pugixml/pugixml.hpp"
-#define STREAMCRAFT_HEADER_ONLY
-#include "StreamCraft/StreamCraft_lib.hpp"
-#undef PUGIXML_PATH
+#include "utils-xml.h" // for pugixml
+#include "StreamCraft/StreamCraft_lib.cpp"
 
 namespace {
 
-SpectrumRaw getSCSpectrum(sc::MS_ANALYSIS *analysis, SpectrumRawTypes::Scan scan,
+SpectrumRaw getSCSpectrum(sc::MS_FILE *analysis, SpectrumRawTypes::Scan scan,
                           const SpectrumRawTypes::MobilityRange &mobRange, SpectrumRawTypes::Intensity minIntensityIMS)
 {
     const auto s = analysis->get_spectrum(scan);
@@ -47,7 +45,7 @@ SpectrumRaw getSCSpectrum(sc::MS_ANALYSIS *analysis, SpectrumRawTypes::Scan scan
 
 MSReadBackend::ThreadDataType MSReadBackendSC::doGetThreadData(void) const
 {
-    return std::make_shared<sc::MS_ANALYSIS>(getCurrentFile());
+    return std::make_shared<sc::MS_FILE>(getCurrentFile());
 }
 
 SpectrumRaw MSReadBackendSC::doReadSpectrum(const ThreadDataType &tdata, SpectrumRawTypes::MSLevel MSLevel,
@@ -55,7 +53,7 @@ SpectrumRaw MSReadBackendSC::doReadSpectrum(const ThreadDataType &tdata, Spectru
                                             const SpectrumRawTypes::MobilityRange &mobRange,
                                             SpectrumRawTypes::Intensity minIntensityIMS) const
 {
-    auto *analysis = reinterpret_cast<sc::MS_ANALYSIS *>(tdata.get());
+    auto *analysis = reinterpret_cast<sc::MS_FILE *>(tdata.get());
     const auto &meta = getSpecMetadata();
     
     if (MSLevel == SpectrumRawTypes::MSLevel::MS1)
@@ -78,7 +76,7 @@ void MSReadBackendSC::generateSpecMetadata(void)
     if (getCurrentFile().empty())
         return;
 
-    sc::MS_ANALYSIS analysis(getCurrentFile());
+    sc::MS_FILE analysis(getCurrentFile());
     
     const auto hd = analysis.get_spectra_headers();
     

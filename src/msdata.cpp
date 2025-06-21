@@ -1899,3 +1899,32 @@ void testMS1Writer(const MSReadBackend &backend, const std::string &out, Spectru
     
 #endif
 }
+
+// [[Rcpp::export]]
+Rcpp::List getChromMob(const MSReadBackend &backend, SpectrumRawTypes::Mass mzStart, SpectrumRawTypes::Mass mzEnd)
+{
+    const auto specf = SpectrumRawFilter().setMZRange(mzStart, mzEnd);
+    const auto sfunc = [&](const SpectrumRaw &spec, const SpectrumRawSelection &, size_t)
+    {
+        return filterSpectrumRaw(spec, specf, 0.0);
+    };
+    
+    const auto &meta = backend.getSpecMetadata();
+    
+    std::vector<std::vector<SpectrumRawSelection>> sels(1);
+    for (size_t i=0; i<meta.first.scans.size(); ++i)
+        sels[0].emplace_back(i);
+    
+    const auto specs = applyMSData<SpectrumRaw>(backend, SpectrumRawTypes::MSLevel::MS1, sels, sfunc, 0)[0];
+    SpectrumRaw flatSpec;
+    std::vector<SpectrumRawTypes::Time> times;
+    for (size_t i=0; i<specs.size(); ++i)
+    {
+        flatSpec.append(specs[i]);
+        times.insert(times.end(), specs[i].size(), meta.first.times[i]);
+    }
+    
+    return Rcpp::List::create(Rcpp::Named("time") = times,
+                              Rcpp::Named("mobility") = flatSpec.getMobilities(),
+                              Rcpp::Named("intensity") = flatSpec.getIntensities());
+}

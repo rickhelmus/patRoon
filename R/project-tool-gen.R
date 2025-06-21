@@ -693,7 +693,7 @@ genScriptAnnBlock <- function(ionization, IMS, settingsAnn, adductArg, doSusps, 
             list(name = "elements", value = "CHNOP", quote = TRUE, condition = settingsAnn$formulasAlgo != "Bruker"),
             list(name = "oc", value = FALSE, condition = settingsAnn$formulasAlgo == "GenForm"),
             list(name = "profile", value = "qtof", quote = TRUE, condition = settingsAnn$formulasAlgo == "SIRIUS"),
-            list(name = "calculateFeatures", value = "TRUE", condition = settingsAnn$formulasAlgo != "Bruker"),
+            list(name = "calculateFeatures", value = "FALSE", condition = settingsAnn$formulasAlgo != "Bruker"),
             list(name = "featThresholdAnn", value = 0.75),
             list(name = "setThresholdAnn", value = 0, condition = ionization == "both")
         ))

@@ -346,7 +346,7 @@ setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLi
                                                                elements = "CHNOP", hetero = TRUE, oc = FALSE,
                                                                thrMS = NULL, thrMSMS = NULL, thrComb = NULL,
                                                                maxCandidates = Inf, extraOpts = NULL,
-                                                               calculateFeatures = TRUE, featThreshold = 0,
+                                                               calculateFeatures = FALSE, featThreshold = 0,
                                                                featThresholdAnn = 0.75,
                                                                absAlignMzDev = defaultLim("mz", "narrow"),
                                                                MSMode = "both", isolatePrec = TRUE, minMobSpecSim = 0,

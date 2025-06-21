@@ -14,6 +14,7 @@ plistsEmptyMSMS <- removeMSPlists(plists, "MSMS")
 doSIRIUS <- TRUE # !is.null(getOption("patRoon.path.SIRIUS")) && nzchar(getOption("patRoon.path.SIRIUS"))
 
 formsGF <- doGenForms(fGroups, plists, "genform")
+formsGFCF <- doGenForms(fGroups, plists, "genform", calculateFeatures = TRUE)
 formsGFEmpty <- doGenForms(fGroupsEmpty, plistsEmpty, "genform")
 formsGFEmptyPL <- doGenForms(fGroups, plistsEmpty, "genform")
 formsGFEmptyPLMS <- doGenForms(fGroups, plistsEmptyMS, "genform")
@@ -44,13 +45,14 @@ if (doDATests())
 
 test_that("verify formula generation", {
     expect_known_value(formsGF, testFile("formulas-gf"))
+    expect_known_value(formsGFCF, testFile("formulas-gf_cf"))
     expect_length(formsGFEmpty, 0)
     expect_length(formsGFEmptyPL, 0)
     expect_length(formsGFEmptyPLMS, 0)
     expect_equal(doGenForms(fGroups, plistsEmptyMSMS, "genform"), formsGFMS)
 
-    expect_gt(length(doGenForms(fGroups, plists, "genform", featThresholdAnn = 0)),
-              length(formsGF))
+    expect_gt(length(doGenForms(fGroups, plists, "genform", calculateFeatures = TRUE, featThresholdAnn = 0)),
+              length(formsGFCF))
 
     skip_if_not(doSIRIUS)
     expect_known_value(formsSIR, testFile("formulas-sir"))
@@ -62,6 +64,7 @@ test_that("verify formula generation", {
 
 test_that("verify formula show output", {
     expect_known_show(formsGF, testFile("formulas-gf", text = TRUE))
+    expect_known_show(formsGFCF, testFile("formulas-gf_cf", text = TRUE))
     skip_if_not(doSIRIUS)
     expect_known_show(formsSIR, testFile("formulas-sir", text = TRUE))
     expect_known_show(formsSIRFPs, testFile("formulas-sir-fps", text = TRUE))
@@ -82,9 +85,9 @@ test_that("basic subsetting", {
     expect_equal(length(formsGF[FALSE]), 0)
     expect_length(formsGFEmpty[1:5], 0)
 
-    expect_equivalent(formsGF[[2, 5]], annotations(formsGF, TRUE)[[2]][[groupNames(formsGF)[5]]])
-    expect_equivalent(formsGF[[analyses(formsGF)[2], groupNames(formsGF)[5]]],
-                      annotations(formsGF, TRUE)[[2]][[groupNames(formsGF)[5]]])
+    expect_equivalent(formsGFCF[[2, 5]], annotations(formsGFCF, TRUE)[[2]][[groupNames(formsGFCF)[5]]])
+    expect_equivalent(formsGFCF[[analyses(formsGFCF)[2], groupNames(formsGFCF)[5]]],
+                      annotations(formsGFCF, TRUE)[[2]][[groupNames(formsGFCF)[5]]])
 
     expect_equivalent(formsGF[[5]], annotations(formsGF)[[5]])
     expect_equivalent(formsGF[[groupNames(formsGF)[5]]], annotations(formsGF)[[5]])

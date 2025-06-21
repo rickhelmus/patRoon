@@ -266,7 +266,7 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
                                                               noise = NULL, cores = NULL, getFingerprints = FALSE,
                                                               topMost = 100, login = FALSE, alwaysLogin = FALSE,
                                                               extraOptsGeneral = NULL, extraOptsFormula = NULL,
-                                                              calculateFeatures = TRUE, featThreshold = 0,
+                                                              calculateFeatures = FALSE, featThreshold = 0,
                                                               featThresholdAnn = 0.75,
                                                               absAlignMzDev = defaultLim("mz", "narrow"),
                                                               minMobSpecSim = 0, verbose = TRUE, splitBatches = FALSE,

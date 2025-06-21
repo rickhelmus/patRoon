@@ -15,7 +15,6 @@
     - embed TIMS-SDK in patRoonExt
     - add MRMTransitionGroupPicker to patRoonExt
     - switch to PCL w/ CCSbase in patRoonExt
-- formulas: calcFeatures by default FALSE?
 - BUG: annSim.1 column (in formulas?)?
 - fix default IDLs
 - ADT: averaged data is now always per replicate, change to averageBy?
@@ -117,7 +116,6 @@
 - Agilent
     - SC doesn't recognize IM --> fixed now?
 - patRoon.checkCentroided removed: update (incl docs) or remove?
-- SC errors on mzML IMS data on mac: Compression with accession MS:1000574 or MS:1000576 not found!
 
 ## IMS
 
@@ -160,6 +158,7 @@
 
 ## Tests
 
+- update snapshots/refs because of MSPL averaging method change
 - Features
     - SAFD?
     - set reordering?
@@ -287,6 +286,7 @@
 
 ## NEWS
 
+- formulas: calculateFeatures by default now FALSE
 - TC
     - specSimParamsMatch --> specSimParams
     - annotateSuspects() --> estimateIDConfidence()

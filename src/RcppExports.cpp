@@ -447,6 +447,19 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// getChromMob
+Rcpp::List getChromMob(const MSReadBackend& backend, SpectrumRawTypes::Mass mzStart, SpectrumRawTypes::Mass mzEnd);
+RcppExport SEXP _patRoon_getChromMob(SEXP backendSEXP, SEXP mzStartSEXP, SEXP mzEndSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const MSReadBackend& >::type backend(backendSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type mzStart(mzStartSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type mzEnd(mzEndSEXP);
+    rcpp_result_gen = Rcpp::wrap(getChromMob(backend, mzStart, mzEnd));
+    return rcpp_result_gen;
+END_RCPP
+}
 // readMSP
 Rcpp::List readMSP(Rcpp::CharacterVector file, Rcpp::LogicalVector pc);
 RcppExport SEXP _patRoon_readMSP(SEXP fileSEXP, SEXP pcSEXP) {
@@ -834,6 +847,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_getIsolationMZs", (DL_FUNC) &_patRoon_getIsolationMZs, 4},
     {"_patRoon_getIsolationMZsAndMobs", (DL_FUNC) &_patRoon_getIsolationMZsAndMobs, 5},
     {"_patRoon_testMS1Writer", (DL_FUNC) &_patRoon_testMS1Writer, 12},
+    {"_patRoon_getChromMob", (DL_FUNC) &_patRoon_getChromMob, 3},
     {"_patRoon_readMSP", (DL_FUNC) &_patRoon_readMSP, 2},
     {"_patRoon_writeMSPLibrary", (DL_FUNC) &_patRoon_writeMSPLibrary, 3},
     {"_patRoon_readMoNAJSON", (DL_FUNC) &_patRoon_readMoNAJSON, 1},

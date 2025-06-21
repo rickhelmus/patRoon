@@ -93,6 +93,10 @@ testMS1Writer <- function(backend, out, mzStart, mzEnd, mobilityStart, mobilityE
     invisible(.Call(`_patRoon_testMS1Writer`, backend, out, mzStart, mzEnd, mobilityStart, mobilityEnd, method, mzWindow, minAbundance, topMost, minIntensityIMS, minIntensityPre))
 }
 
+getChromMob <- function(backend, mzStart, mzEnd) {
+    .Call(`_patRoon_getChromMob`, backend, mzStart, mzEnd)
+}
+
 readMSP <- function(file, pc) {
     .Call(`_patRoon_readMSP`, file, pc)
 }

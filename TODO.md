@@ -111,9 +111,6 @@
 - FIX: handle empty EICs when filling, padding etc
 - see what is the best default for backends
     - set mzR in front for safety?
-- MSPL: hclust seems unusable due to high mem usage with IMS data? --> just default to distance and doc change/IMS need?
-    - update getDefAvgPListParams()/cluster-params docs
-    - or make new auto option (default) which checks if there is IMS data
 - embed TIMS-SDK? --> in patRoonExt
 - Agilent
     - SC doesn't recognize IM
@@ -273,9 +270,6 @@
         - processing
             - evaluate the examples once they can be run
                 - maybe add or improve plotMobilogram examples
-        - example workflows
-            - set MSPL averaging if we don't default to distance clustering
-                - also discuss this elsewhere?
     - Advanced
         - say something about consensus/comparison?
             - first finish (ref) docs for IMS grouping
@@ -390,6 +384,7 @@
         - now uses backends, old methods still available but deprecated
         - no more precursorMzWindow, and avg params were changed
         - averaging is now intensity weighted
+        - spec avg params now default to distance --> faster and suitable for large datasets (eg IMS)
     - EICParams for getPICSet() and calculatePeakQualities() (needed for m/z IMS expansion)
     - mzExpIMSWindow EIXParam
     - (subsetDTColumnsIfPresent: use order of requested cols instead of original) --> may change column order in some places

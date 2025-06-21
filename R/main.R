@@ -244,8 +244,9 @@ NULL
 #'
 #' }
 #'
-#' The \code{hclust} method may give more accurate results, but is more computationally demanding and generally
-#' unsuitable for IMS workflows due to excessive use of RAM. The \code{distance} method is a good default in most cases.
+#' The \code{hclust} method may give more accurate results and was the default prior to \pkg{patRoon 3.0}, but is more
+#' computationally demanding and generally unsuitable for IMS workflows due to excessive use of RAM. The \code{distance}
+#' method is now default and suits most cases.
 #'
 #' The window parameter defines the clustering tolerance. For \code{method="hclust"} this corresponds to the cluster
 #' height, for \code{method="distance"} this value is used to find nearby data points (+/- window) and for

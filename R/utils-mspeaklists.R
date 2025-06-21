@@ -83,7 +83,7 @@ getDefAvgPListParams <- function(...)
                 minAbundanceRel = 0,
                 minAbundanceIMSAbs = 2,
                 minAbundanceIMSRel = 0,
-                method = "hclust",
+                method = "distance",
                 withPrecursorMS = TRUE,
                 pruneMissingPrecursorMS = TRUE,
                 retainPrecursorMSMS = TRUE)

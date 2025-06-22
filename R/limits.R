@@ -70,16 +70,30 @@ getLimitsFile <- function()
 #'   related limits, the \code{category="mobility"} (instead of instrument specific categories) should be used.
 #' @rdname limits
 #' @export
-defaultLim <- function(category, level)
+defaultLim <- function(category, level) doDefaultLim(category, level)
+
+defaultLimClosure <- function()
 {
-    limits <- readYAML(getLimitsFile())
-    limits <- assertAndPrepareLimits(limits)
-    
-    checkmate::assertChoice(category, setdiff(names(limits), "general"))
-    checkmate::assertChoice(level, names(limits[[category]]))
-    
-    return(limits[[category]][[level]])
+    cachedLimits <- cachedFileHash <- NULL
+    function(category, level)
+    {
+        limFile <- getLimitsFile()
+        limHash <- makeFileHash(limFile)
+        if (is.null(cachedLimits) || is.null(cachedFileHash) || cachedFileHash != limHash)
+        {
+            cachedLimits <<- readYAML(limFile)
+            cachedLimits <<- assertAndPrepareLimits(cachedLimits)
+            cachedFileHash <<- makeFileHash(limFile)
+        }
+        
+        checkmate::assertChoice(category, setdiff(names(cachedLimits), "general"))
+        checkmate::assertChoice(level, names(cachedLimits[[category]]))
+        
+        return(cachedLimits[[category]][[level]])
+    }
 }
+
+doDefaultLim <- defaultLimClosure()
 
 #' @details \code{genLimitsFile} generates a new \file{limits.yml} configuration file in the specified path. The file is
 #'   created with the defaults embedded in \pkg{patRoon} (see details below). Generating a custom limits is primarily

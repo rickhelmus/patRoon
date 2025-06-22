@@ -107,7 +107,6 @@
 
 - minAbundanceFeatAbs/Rel: does it make sense to also filter fGroup peak lists? If not, remove and update docs.
 - default thresholds for ann forms/comps
-- calc sets annSims like those for formulas/compounds, update NEWS (and update docs if we don't change this)
 
 ## msdata
 
@@ -294,6 +293,7 @@
         - change in func args
         - annSimBoth is copied, so needs to be present in compounds (ie from IDLs)
     - annSuspects should be faster now (no need to calc annSims, and estIDLevel is faster)
+    - sets annSims are now max value (as is done now for forms/comps)
     - analysisInfo slot/accessor is now data.table()
     - no analysisInfo slot in fGroups anymore
     - analysisInfo()<-

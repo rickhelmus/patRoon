@@ -516,9 +516,9 @@ doSuspectFilter <- function(obj, onlyHits, selectHitsBy, selectBestFGroups, maxL
         filteredSI <- colFilterAnn(filteredSI, levPred, "maxLevel", "estIDLevel", ac = FALSE)
         filteredSI <- colFilterAnn(filteredSI, maxPred, "maxFormRank", "formRank", ac = FALSE)
         filteredSI <- colFilterAnn(filteredSI, maxPred, "maxCompRank", "compRank", ac = FALSE)
-        filteredSI <- colFilterAnn(filteredSI, minPred, "minAnnSimForm", "annSimForm")
-        filteredSI <- colFilterAnn(filteredSI, minPred, "minAnnSimComp", "annSimComp")
-        filteredSI <- colFilterAnn(filteredSI, minPred, "minAnnSimBoth", "annSimBoth")
+        filteredSI <- colFilterAnn(filteredSI, minPred, "minAnnSimForm", "annSimForm", ac = FALSE)
+        filteredSI <- colFilterAnn(filteredSI, minPred, "minAnnSimComp", "annSimComp", ac = FALSE)
+        filteredSI <- colFilterAnn(filteredSI, minPred, "minAnnSimBoth", "annSimBoth", ac = FALSE)
         filteredSI <- colFilterAnn(filteredSI, minPred, "absMinFragMatches", "maxFragMatches")
         filteredSI <- colFilterAnn(filteredSI, minPred, "relMinFragMatches", "maxFragMatchesRel")
         

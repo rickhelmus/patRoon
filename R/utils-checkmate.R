@@ -988,13 +988,13 @@ checkQuantEluent <- function(x, fGroups)
 }
 assertQuantEluent <- checkmate::makeAssertionFunction(checkQuantEluent)
 
-assertConvertMSFilesArgs <- function(formatFrom, formatTo, overWrite, algorithm, add)
+assertConvertMSFilesArgs <- function(formatFrom, formatTo, overwrite, algorithm, add)
 {
     # no adding: should fail first
     assertMSConvAlgo(algorithm)
     
     checkmate::assertChoice(formatTo, getMSConversionFormats(algorithm, "output"), add = add)
-    checkmate::assertFlag(overWrite, add = add)
+    checkmate::assertFlag(overwrite, add = add)
     
     validFormatsFrom <- switch(algorithm,
                                pwiz = getMSFileFormats(),

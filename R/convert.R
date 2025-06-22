@@ -33,7 +33,7 @@
 #'   or \command{FileConverter}. Set to \code{NULL} to ignore. For options: see
 #'   \href{https://abibuilder.cs.uni-tuebingen.de/archive/openms/Documentation/nightly/html/TOPP_FileConverter.html}{FileConverter}
 #'   and \href{http://proteowizard.sourceforge.net/tools/msconvert.html}{msconvert}.
-#' @param overWrite Should existing destination file be overwritten (\code{TRUE}) or not (\code{FALSE})?
+#' @param overwrite Should existing destination file be overwritten (\code{TRUE}) or not (\code{FALSE})?
 #' @param \dots For \code{convertMSFilesIMSCollapse}: further arguments passed to
 #'   \code{\link[mzR:writeMSData]{mzR::writeMSData}}.
 #'
@@ -490,11 +490,11 @@ convertMSFilesTIMSCONVERT <- function(inFiles, outFiles, formatTo = "mzML", cent
 #'
 #' @rdname MSConversion
 #' @export
-convertMSFilePaths <- function(files, formatFrom, formatTo = "mzML", outPath = NULL, dirs = TRUE, overWrite = FALSE,
+convertMSFilePaths <- function(files, formatFrom, formatTo = "mzML", outPath = NULL, dirs = TRUE, overwrite = FALSE,
                                algorithm = "pwiz", ...)
 {
     ac <- checkmate::makeAssertCollection()
-    assertConvertMSFilesArgs(formatFrom, formatTo, overWrite, algorithm, add = ac)
+    assertConvertMSFilesArgs(formatFrom, formatTo, overwrite, algorithm, add = ac)
     checkmate::assertCharacter(files, min.len = 1, min.chars = 1, add = ac)
     checkmate::assertCharacter(outPath, min.chars = 1, min.len = 1, null.ok = TRUE, add = ac)
     assertCanCreateDirs(outPath, add = ac)
@@ -533,7 +533,7 @@ convertMSFilePaths <- function(files, formatFrom, formatTo = "mzML", outPath = N
     {
         if (!file.exists(files[fi]))
             printf("Skipping non-existing input analysis %s\n", files[fi])
-        else if (!overWrite && file.exists(output[fi]))
+        else if (!overwrite && file.exists(output[fi]))
             printf("Skipping existing output analysis %s\n", output[fi])
         else
             return(TRUE)
@@ -570,10 +570,10 @@ convertMSFilePaths <- function(files, formatFrom, formatTo = "mzML", outPath = N
 #' @rdname MSConversion
 #' @export
 convertMSFilesAnaInfo <- function(anaInfo, typeFrom = "raw", typeTo = "centroid", formatFrom, formatTo = "mzML",
-                                  overWrite = FALSE, algorithm = "pwiz", centroidVendor = TRUE, ...)
+                                  overwrite = FALSE, algorithm = "pwiz", centroidVendor = TRUE, ...)
 {
     ac <- checkmate::makeAssertCollection()
-    assertConvertMSFilesArgs(formatFrom, formatTo, overWrite, algorithm, add = ac)
+    assertConvertMSFilesArgs(formatFrom, formatTo, overwrite, algorithm, add = ac)
     checkmate::assertChoice(typeFrom, getMSConversionTypes(algorithm, "input"), add = ac)
     checkmate::assertChoice(typeTo, getMSConversionTypes(algorithm, "output"), add = ac)
     checkmate::assertFlag(centroidVendor, add = ac)
@@ -588,7 +588,7 @@ convertMSFilesAnaInfo <- function(anaInfo, typeFrom = "raw", typeTo = "centroid"
     files <- getMSFilesFromAnaInfo(anaInfo, typeFrom, formatFrom)
 
     args <- list(files = files, formatFrom = formatFrom, formatTo = formatTo, outPath = outPath, dirs = FALSE,
-                 overWrite = overWrite, algorithm = algorithm, ...)
+                 overwrite = overwrite, algorithm = algorithm, ...)
 
     if (algorithm == "pwiz")
     {

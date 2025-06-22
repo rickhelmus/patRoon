@@ -195,7 +195,7 @@ makeMZXMLs <- function(anaInfo)
                          file.path(outpath, paste0(anaInfo$analysis, ".mzXML")), "mzXML")
     anaInfo$path_centroid <- outpath
     convertMSFilesAnaInfo(anaInfo = anaInfo, typeFrom = "centroid", formatFrom = "mzXML", formatTo = "mzXML",
-                          algorithm = "openms", overWrite = TRUE)
+                          algorithm = "openms", overwrite = TRUE)
     return(anaInfo)
 }
 

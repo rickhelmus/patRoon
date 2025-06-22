@@ -33,8 +33,6 @@
 - FIX: IMSRangeParams: in sets workflows, the mz column is taken so relative filtering is done to neutralMasses
     - maybe add _mz rel column like compounds?
     - actually, the same is the case for the mz filter (also IMS and mz for features) --> maybe just document difference? the actual results will not change much in general
-- rename convertMSFilesAnaInfo() to convertMSFiles() or something else and shorter?
-    - update Handbook/Tutorial/NEWS if needed
 
 
 ## Maybe
@@ -239,7 +237,7 @@
 - update relativeTo arg (not just replicates)
 - convert
     - add patRoon 3.0 citation for im_collapse
-- handbook/tutorial
+- handbook
     - installation
         - add additional external deps, eg Python, TIMS-SDK, c3sdb, PCL/CCS etc
     - workflow concepts: maybe mention mobility as possible feature property
@@ -265,6 +263,7 @@
         - say something about consensus/comparison?
             - first finish (ref) docs for IMS grouping
     - mention somewhere that IM collapse doesn't export MS/MS spectra by default and why
+- update tutorial
 - IMS
     - piek
         - refs to paper

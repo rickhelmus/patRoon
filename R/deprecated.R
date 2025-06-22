@@ -44,7 +44,7 @@ reportHTML <- function(...)
 #' @export
 exportDAFiles <- function(anaInfo, format = "mzML", exportLine = TRUE, outPath = anaInfo$path_raw, overWrite = FALSE)
 {
-    .Deprecated("convertMSFilesAnaInfo")
+    .Deprecated("convertMSFiles")
 
     ac <- checkmate::makeAssertCollection()
     anaInfo <- assertAndPrepareAnaInfo(anaInfo, fileTypes = "raw", allowedFormats = "bruker", add = ac)

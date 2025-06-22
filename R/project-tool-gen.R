@@ -237,7 +237,7 @@ genScriptInitBlock <- function(CCSCalibrant, anaInfoData, settingsGen, settingsA
         itf <- splitConvTypeFormat(settingsPre$steps$from); otf <- splitConvTypeFormat(settingsPre$steps$to)
         for (i in seq_len(nrow(settingsPre$steps)))
         {
-            generator$addCall(NULL, "convertMSFilesAnaInfo", list(
+            generator$addCall(NULL, "convertMSFiles", list(
                 list(value = anaInfoVarName),
                 list(name = "typeFrom", value = itf[[i]][1], quote = TRUE),
                 list(name = "formatFrom", value = itf[[i]][2], quote = TRUE),

@@ -37,8 +37,8 @@
 #' @param \dots For \code{convertMSFilesIMSCollapse}: further arguments passed to
 #'   \code{\link[mzR:writeMSData]{mzR::writeMSData}}.
 #'
-#'   For \code{convertMSFilePaths} and \code{convertMSFilesAnaInfo}: further arguments passed to algorithm specific
-#'   conversion functions.
+#'   For \code{convertMSFilePaths} and \code{convertMSFiles}: further arguments passed to algorithm specific conversion
+#'   functions.
 #'
 #' @templateVar what \code{convertMSFilesPWiz}, \code{convertMSFilesOpenMS} and \code{convertMSFilesTIMSCONVERT}
 #' @template uses-multiProc
@@ -50,7 +50,7 @@
 #'   \insertRef{Luu2022}{patRoon} \cr\cr
 #'
 #'   \addCitations{mzR}
-#'   
+#'
 #' @name MSConversion
 NULL
 
@@ -558,7 +558,7 @@ convertMSFilePaths <- function(files, formatFrom, formatTo = "mzML", outPath = N
     }
 }
 
-#' @details \code{convertMSFilesAnaInfo} is a wrapper function that simplifies the use of \code{convertMSFilePaths}.
+#' @details \code{convertMSFiles} is a wrapper function that simplifies the use of \code{convertMSFilePaths}.
 #'
 #' @param anaInfo An \link[=analysis-information]{analysis info table} that is used to retrieve the input files. The
 #'   paths set by \code{path_centroid}, \code{path_profile} and \code{path_ims} are used to determine the output
@@ -569,8 +569,8 @@ convertMSFilePaths <- function(files, formatFrom, formatTo = "mzML", outPath = N
 #'
 #' @rdname MSConversion
 #' @export
-convertMSFilesAnaInfo <- function(anaInfo, typeFrom = "raw", typeTo = "centroid", formatFrom, formatTo = "mzML",
-                                  overwrite = FALSE, algorithm = "pwiz", centroidVendor = TRUE, ...)
+convertMSFiles <- function(anaInfo, typeFrom = "raw", typeTo = "centroid", formatFrom, formatTo = "mzML",
+                           overwrite = FALSE, algorithm = "pwiz", centroidVendor = TRUE, ...)
 {
     ac <- checkmate::makeAssertCollection()
     assertConvertMSFilesArgs(formatFrom, formatTo, overwrite, algorithm, add = ac)

@@ -151,8 +151,8 @@ getTPsFormulas <- function(annTable, parName, parFormula, minFitFormula)
 #'
 #' }
 #'
-#'   To speed up the calculation process, several thresholds are applied to rule out unlikely candidates. These
-#'   thresholds are defaulted to those derived in \insertCite{Helmus2025}{patRoon}.
+#'   To speed up the calculation process, a threshold for \code{fitFormula} is applied to rule out unlikely candidates.
+#'   The default was derived in \insertCite{Helmus2025}{patRoon}.
 #'
 #'   Unlike most other TP generation algorithms, no additional suspect screening step is required.
 #'
@@ -176,7 +176,7 @@ getTPsFormulas <- function(annTable, parName, parFormula, minFitFormula)
 #' @references \insertAllCited{}
 #'
 #' @export
-generateTPsAnnForm <- function(parents, formulas, minFitFormula = 0, skipInvalid = TRUE, prefCalcChemProps = TRUE,
+generateTPsAnnForm <- function(parents, formulas, minFitFormula = 0.94, skipInvalid = TRUE, prefCalcChemProps = TRUE,
                                neutralChemProps = FALSE, parallel = TRUE)
 {
     # UNDONE: support >1 generations? Probably not really worthwhile...

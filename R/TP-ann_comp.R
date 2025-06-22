@@ -257,11 +257,11 @@ getTPsCompounds <- function(annTable, parentRow, TPStructParams, extraOptsFMCSR,
 #' @references \insertAllCited{} \cr\cr \insertRef{Wang2013}{patRoon}
 #'
 #' @export
-generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, fGroupsComps = NULL, minRTDiff = 20, minFitFormula = 0,
-                               minFitCompound = 0, minSimSusp = 0, minFitCompOrSimSusp = c(0, 0),
-                               extraOptsFMCSR = NULL, skipInvalid = TRUE, prefCalcChemProps = TRUE,
-                               neutralChemProps = FALSE, neutralizeTPs = TRUE, TPStructParams = getDefTPStructParams(),
-                               parallel = TRUE)
+generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, fGroupsComps = NULL, minRTDiff = 20,
+                               minFitFormula = 0.94, minFitCompound = 0, minSimSusp = 0,
+                               minFitCompOrSimSusp = c(0.54, 0.65), extraOptsFMCSR = NULL, skipInvalid = TRUE,
+                               prefCalcChemProps = TRUE, neutralChemProps = FALSE, neutralizeTPs = TRUE,
+                               TPStructParams = getDefTPStructParams(), parallel = TRUE)
 {
     # UNDONE: support >1 generations? Probably not really worthwhile...
     

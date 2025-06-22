@@ -106,7 +106,6 @@
 ## TC
 
 - minAbundanceFeatAbs/Rel: does it make sense to also filter fGroup peak lists? If not, remove and update docs.
-- default thresholds for ann forms/comps
 
 ## msdata
 

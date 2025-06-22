@@ -272,6 +272,14 @@ setMethod("estimateIDConfidence", "featureGroupsScreeningSet", function(obj, MSP
         }, by = seq_len(nrow(obj@screenInfo))][]
     }
 
+    # assign annSims: max of all sets
+    for (col in c("annSimForm", "annSimComp", "annSimBoth"))
+    {
+        asnames <- getMergedConsCols(col, names(obj@screenInfo), mergedConsensusNames(obj))
+        if (length(asnames) > 0)
+            obj@screenInfo[, (col) := do.call(pmax, c(.SD, list(na.rm = TRUE))), .SDcols = asnames]
+    }
+    
     obj@screenInfo <- assignSetsIDLs(obj@screenInfo, mergedConsensusNames(obj))
 
     return(obj)

@@ -114,6 +114,7 @@ setMethod("show", "features", function(object)
     printf("Average feature count/analysis: %.0f\n", if (length(object) > 0) sum(ftcounts) / nrow(analysisInfo(object)) else 0)
     printf("Least features: %s\n", names(object)[which.min(ftcounts)])
     printf("Most features: %s\n", names(object)[which.max(ftcounts)])
+    printf("Has IMS data: %s\n", if (hasMobilities(object)) "yes" else "no")
     showAnaInfo(analysisInfo(object))
 })
 

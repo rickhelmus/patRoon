@@ -194,6 +194,7 @@ setMethod("show", "featureGroups", function(object)
     fCount <- length(getFeatures(object)); gCount <- length(object)
     printf("Feature groups: %s (%d total)\n", getStrListWithMax(names(object), 6, ", "), gCount)
     printf("Features: %d (%.1f per group)\n", fCount, if (gCount > 0) fCount / gCount)
+    printf("Has IMS data: %s\n", if (hasMobilities(object)) "yes" else "no")
     if (length(object) > 0)
     {
         printf("Has normalized intensities: %s\n", as.character(!is.null(featureTable(object)[[1]][["intensity_rel"]])))

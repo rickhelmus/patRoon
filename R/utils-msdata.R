@@ -20,7 +20,7 @@ MSFileExtensions <- function()
          mzXML = "mzXML")
 }
 
-getMSReadBackends <- function() c("opentims", "streamcraft", "mstoolkit", "mzr")
+getMSReadBackends <- function() c("opentims", "mzr", "mstoolkit", "streamcraft")
 
 getMSDataFileHash <- function(path)
 {

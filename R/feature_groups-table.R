@@ -84,8 +84,8 @@ importFeatureGroupsTable <- function(input, analysisInfo, addCols = NULL, groupA
     input <- if (is.character(input)) fread(input) else makeDT(input)
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo)
     
-    gInfoCols <- c("ret", "mz", "mobility", "CCS")
-    gInfoColsPrefix <- paste0("group_", gInfoCols)
+    gInfoNumCols <- c("ret", "mz", "mobility", "CCS")
+    gInfoNumColsPrefix <- paste0("group_", gInfoNumCols)
     
     hasSets <- !is.null(input[["set"]])
     sufSets <- \(x) paste0(x, "-", setsNames)
@@ -104,11 +104,12 @@ importFeatureGroupsTable <- function(input, analysisInfo, addCols = NULL, groupA
     
     assertListVal(input, "group", checkmate::assertCharacter, any.missing = FALSE, min.chars = 1, add = ac)
     assertUniqueDTBy(input, c("group", "analysis"), add = ac)
-    for (col in gInfoColsPrefix)
-    {
-        assertListVal(input, col, checkmate::assertNumeric, any.missing = FALSE, finite = TRUE, add = ac,
-                      mustExist = FALSE)
-    }
+    for (col in gInfoNumColsPrefix)
+        assertListVal(input, col, checkmate::assertNumeric, any.missing = col %in% c("group_mobility", "group_CCS"),
+                      finite = TRUE, add = ac, mustExist = FALSE)
+    assertListVal(input, "ims_parent_group", checkmate::assertCharacter, any.missing = TRUE, min.chars = 1, add = ac,
+                  mustExist = FALSE)
+    
     if (hasSets)
     {
         for (col in setsAnnNumCols)
@@ -170,11 +171,11 @@ importFeatureGroupsTable <- function(input, analysisInfo, addCols = NULL, groupA
     }
     
     inputFeat <- copy(input)
-    inputFeat <- removeDTColumnsIfPresent(inputFeat, c("group", gInfoColsPrefix, "group_mobility_collapsed",
-                                                       "group_CCS_collapsed", setsAnnAddCols, setsAnnNumCols))
+    # inputFeat <- removeDTColumnsIfPresent(inputFeat, c("group", gInfoColsPrefix, "group_mobility_collapsed",
+    #                                                    "group_CCS_collapsed", setsAnnAddCols, setsAnnNumCols))
     importedFeat <- importFeaturesTable(inputFeat, analysisInfo, addCols = addCols)
     
-    for (col in gInfoCols)
+    for (col in gInfoNumCols)
     {
         gcol <- paste0("group_", col)
         if (is.null(input[[gcol]]) && !is.null(input[[col]]))
@@ -182,8 +183,9 @@ importFeatureGroupsTable <- function(input, analysisInfo, addCols = NULL, groupA
     }
     
     gInfo <- unique(input, by = "group")
-    gInfo <- subsetDTColumnsIfPresent(gInfo, c("group", gInfoCols, "ims_parent_group"))
-    setnames(gInfo, gInfoColsPrefix, gInfoCols, skip_absent = TRUE)
+    gInfo <- subsetDTColumnsIfPresent(gInfo, c("group", gInfoNumColsPrefix, "ims_parent_group"))
+    setnames(gInfo, gInfoNumColsPrefix, gInfoNumCols, skip_absent = TRUE)
+    setcolorder(gInfo, "CCS", after = last(names(gInfo)), skip_absent = TRUE) # put CCS at the end of the table
     
     if (hasMobilities(importedFeat) && is.null(gInfo[["ims_parent_group"]]))
         gInfo[, ims_parent_group := NA_character_]

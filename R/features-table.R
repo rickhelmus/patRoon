@@ -128,7 +128,8 @@ importFeaturesTable <- function(input, analysisInfo, addCols = NULL)
         addCols <- setdiff(addCols, internalColsPresent)
     }
 
-    mobCols <- c("mobility", "mobmin", "mobmax", "mob_area", "mob_intensity", "ims_parent_ID", "mob_assign_method")
+    mobCols <- c("mobility", "mobmin", "mobmax", "mob_area", "mob_intensity", "ims_parent_ID", "mob_assign_method",
+                 "mob_reintegr_method", "CCS")
     setsCols <- c("set", "adduct", "ion_mz")
     
     input <- subsetDTColumnsIfPresent(input, c("analysis", "ID", "ret", "retmin", "retmax", "mz", "mzmin", "mzmax",
@@ -149,12 +150,12 @@ importFeaturesTable <- function(input, analysisInfo, addCols = NULL)
     for (col in c("ret", "mz", "intensity"))
         assertListVal(input, col, checkmate::assertNumeric, any.missing = FALSE, finite = TRUE, add = ac)
     
-    maybeAddCol <- function(col, ...)
+    maybeAddCol <- function(col, ..., am = FALSE)
     {
         if (is.null(input[[col]]))
             eval(substitute(input[, (col) := .v], list(.v = substitute(...))))
         else
-            assertListVal(input, col, checkmate::assertNumeric, any.missing = FALSE, finite = TRUE, add = ac)
+            assertListVal(input, col, checkmate::assertNumeric, any.missing = am, finite = TRUE, add = ac)
         return(input)
     }
     
@@ -168,14 +169,16 @@ importFeaturesTable <- function(input, analysisInfo, addCols = NULL)
     if (hasMob)
     {
         assertListVal(input, "mobility", checkmate::assertNumeric, any.missing = TRUE, finite = TRUE, add = ac)
-        maybeAddCol("mobmin", mobility - defaultLim("mobility", "narrow"))
-        maybeAddCol("mobmax", mobility + defaultLim("mobility", "narrow"))
-        maybeAddCol("mob_area", NA_real_)
-        maybeAddCol("mob_intensity", NA_real_)
+        maybeAddCol("mobmin", mobility - defaultLim("mobility", "narrow"), am = TRUE)
+        maybeAddCol("mobmax", mobility + defaultLim("mobility", "narrow"), am = TRUE)
+        maybeAddCol("mob_area", NA_real_, am = TRUE)
+        maybeAddCol("mob_intensity", NA_real_, am = TRUE)
         if (is.null(input[["ims_parent_ID"]]))
             input[, ims_parent_ID := NA_character_]
         if (is.null(input[["mob_assign_method"]]))
             input[, mob_assign_method := NA_character_]
+        if (is.null(input[["mob_reintegr_method"]]))
+            input[, mob_reintegr_method := NA_character_]
     }
     else
     {

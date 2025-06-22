@@ -4,28 +4,29 @@
 
 defaultPkgOpts <- function(pkgname)
 {
-    ret <- list(checkCentroided = TRUE,
-                cache.mode = "both",
-                cache.fileName = "cache.sqlite",
-                MS.backends = getMSReadBackends(),
-                MS.preferIMS = FALSE,
-                threads = parallel::detectCores(logical = FALSE),
-                MP.method = "classic",
-                # backwards compat
-                MP.maxProcs = getOption("patRoon.maxProcAmount", parallel::detectCores(logical = FALSE)),
-                MP.futureSched = 1.0,
-                MP.logPath = "log",
-                path.BrukerTIMS = "",
-                path.pwiz = "",
-                path.GenForm = "",
-                path.MetFragCL = getOption("patRoon.path.metFragCL", ""), # backwards compat
-                path.MetFragCompTox = "",
-                path.MetFragPubChemLite = "",
-                path.SIRIUS = "",
-                path.OpenMS = "",
-                path.obabel = "",
-                path.BioTransformer = "",
-                path.limits = "")
+    ret <- list(
+        cache.mode = "both",
+        cache.fileName = "cache.sqlite",
+        MS.backends = getMSReadBackends(),
+        MS.preferIMS = FALSE,
+        threads = parallel::detectCores(logical = FALSE),
+        MP.method = "classic",
+        # backwards compat
+        MP.maxProcs = getOption("patRoon.maxProcAmount", parallel::detectCores(logical = FALSE)),
+        MP.futureSched = 1.0,
+        MP.logPath = "log",
+        path.BrukerTIMS = "",
+        path.pwiz = "",
+        path.GenForm = "",
+        path.MetFragCL = getOption("patRoon.path.metFragCL", ""), # backwards compat
+        path.MetFragCompTox = "",
+        path.MetFragPubChemLite = "",
+        path.SIRIUS = "",
+        path.OpenMS = "",
+        path.obabel = "",
+        path.BioTransformer = "",
+        path.limits = ""
+    )
     return(setNames(ret, paste0(pkgname, ".", names(ret))))
 }
 

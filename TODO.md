@@ -97,7 +97,6 @@
 ## Param defaults
 
 - don't use defaults for eg feature finding (and grouping)?
-- somehow cache defaultLim()?
 - tweak agilent defaults --> after application?
 
 ## TC

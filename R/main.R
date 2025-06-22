@@ -64,10 +64,6 @@ NULL
 #'
 #'   \itemize{
 #'
-#'   \item \code{patRoon.checkCentroided}: If set to \code{TRUE} (the default) then the analyses files are verified to
-#'   be centroided before loading any MS data. While these checks are optimized and cached, it may be useful to
-#'   set this option to \code{FALSE} when processing very large numbers of analyses.
-#'
 #'   \item \code{patRoon.cache.mode}: A \code{character} setting the current caching mode: \code{"save"} and
 #'   \code{"load"} will only save/load results to/from the cache, \code{"both"} (default) will do both and \code{"none"}
 #'   to completely disable caching. This option can be changed anytime, which might be useful, for instance, to

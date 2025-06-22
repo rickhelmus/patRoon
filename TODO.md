@@ -107,7 +107,6 @@
 
 - Agilent
     - SC doesn't recognize IM --> fixed now?
-- patRoon.checkCentroided removed: update (incl docs) or remove?
 
 ## IMS
 
@@ -379,6 +378,7 @@
     - minIntensity arg for pwiz conversion, set by default
     - getBPCs(): doen't return m/z anymore
     - SAFD: fileType replaces profPath argument
+    - patRoon.checkCentroided option removed (not needed anymore, checks are faster now and part of regular reading operations)
 - IMS
     - hasMobilities slot for features
     - Dietrich features

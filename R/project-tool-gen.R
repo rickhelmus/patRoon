@@ -244,7 +244,7 @@ genScriptInitBlock <- function(CCSCalibrant, anaInfoData, settingsGen, settingsA
                 list(name = "typeTo", value = otf[[i]][1], quote = TRUE),
                 list(name = "formatTo", value = otf[[i]][2], quote = TRUE),
                 list(name = "algorithm", value = settingsPre$steps$algorithm[i], quote = TRUE),
-                list(name = "overWrite", value = FALSE)
+                list(name = "overwrite", value = FALSE)
             ), indent = 4)
         }
     }

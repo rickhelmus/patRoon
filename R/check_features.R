@@ -343,24 +343,24 @@ checkFeaturesInterface$methods(
 #' @param sessionIn,sessionOut The file names for the input and output sessions.
 #' @param rtWindow The retention time window (seconds) used to relate 'old' with 'new' feature groups.
 #' @param mzWindow The \emph{m/z} window (in Da) used to relate 'old' with 'new' feature groups.
-#' @param overWrite Set to \code{TRUE} to overwrite the output session file if it already exists. If \code{FALSE}, the
+#' @param overwrite Set to \code{TRUE} to overwrite the output session file if it already exists. If \code{FALSE}, the
 #'   function will stop with an error message.
 #' 
 #' @rdname check-GUI
 #' @export
 importCheckFeaturesSession <- function(sessionIn, sessionOut, fGroups, rtWindow = defaultLim("retention", "narrow"),
-                                       mzWindow = defaultLim("mz", "narrow"), overWrite = FALSE)
+                                       mzWindow = defaultLim("mz", "narrow"), overwrite = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     assertCheckSession(sessionIn, mustExist = TRUE, add = ac)
     assertCheckSession(sessionOut, mustExist = FALSE, add = ac)
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
-    checkmate::assertFlag(overWrite, add = ac)
+    checkmate::assertFlag(overwrite, add = ac)
     checkmate::reportAssertions(ac)
     
-    if (file.exists(sessionOut) && !overWrite)
-        stop("Output session already exists. Set overWrite=TRUE to proceed anyway.")
+    if (file.exists(sessionOut) && !overwrite)
+        stop("Output session already exists. Set overwrite=TRUE to proceed anyway.")
     
     if (length(fGroups) == 0)
     {
@@ -507,7 +507,7 @@ getMCTrainData <- function(fGroups, session)
 #'   The dataframe has the four columns: EIC, Pred_Class, Pred_Prob_Pass, Pred_Prob_Fail.
 #' @rdname check-GUI
 #' @export
-predictCheckFeaturesSession <- function(fGroups, session, model = NULL, overWrite = FALSE)
+predictCheckFeaturesSession <- function(fGroups, session, model = NULL, overwrite = FALSE)
 {
     checkPackage("MetaClean")
     
@@ -515,7 +515,7 @@ predictCheckFeaturesSession <- function(fGroups, session, model = NULL, overWrit
     checkmate::assertClass(fGroups, "featureGroups")
     checkmate::assertClass(model, "train", null.ok = TRUE, add = ac)
     assertCheckSession(session, mustExist = FALSE, add = ac)
-    checkmate::assertFlag(overWrite, add = ac)
+    checkmate::assertFlag(overwrite, add = ac)
     checkmate::reportAssertions(ac)
     
     if (length(fGroups) == 0)
@@ -529,8 +529,8 @@ predictCheckFeaturesSession <- function(fGroups, session, model = NULL, overWrit
         model <- example_model
     }
     
-    if (file.exists(session) && !overWrite)
-        stop("Output session already exists. Set overWrite=TRUE to proceed anyway.")
+    if (file.exists(session) && !overwrite)
+        stop("Output session already exists. Set overwrite=TRUE to proceed anyway.")
     
     testd <- convertQualitiesToMCData(fGroups)
     preds <- MetaClean::getPredicitons(model = model, testData = testd, eicColumn = "EICNo")

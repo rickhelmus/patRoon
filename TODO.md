@@ -28,7 +28,6 @@
         - methodMZ and methodIMS --> methodMS+methodIMS or methodMZ+methodMob?
     - mob_area/mob_intensity vs mobmin/mobmax
     - naming: im_collapse and IMSCollapse
-    - overwrite vs overWrite
 - feat import
     - support feature CCS?
 - FIX: IMSRangeParams: in sets workflows, the mz column is taken so relative filtering is done to neutralMasses
@@ -422,7 +421,7 @@
     - renamed `path` to more generic `input`
     - removed `analysisInfo` argument from importFeatures()
     - added `table` import (importFeaturesTable() and importFeatureGroupsTable())
-
+- overWrite --> overwrite for consistency, applies to predictCheckFeaturesSession() and file conversion (clearly doc in NEWS)
 
 ## Features
 

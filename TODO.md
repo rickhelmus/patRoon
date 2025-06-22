@@ -106,8 +106,6 @@
 
 ## msdata
 
-- see what is the best default for backends
-    - set mzR in front for safety?
 - Agilent
     - SC doesn't recognize IM --> fixed now?
 - patRoon.checkCentroided removed: update (incl docs) or remove?

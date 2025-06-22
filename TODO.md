@@ -146,7 +146,6 @@
     - check for IMS parents?
     - should all object have or not have mobilities?
 - update featAnn consensus?
-- fGroups/features show(): hasIMS
 
 
 ## Tests

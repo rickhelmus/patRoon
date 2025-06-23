@@ -736,12 +736,12 @@ setMethod("plotMobilograms", "featureGroups", function(obj, analysis = analyses(
                 showProgress, annotate, xlim, ylim, EIMs, EIMParams$window, EIMParams$onlyPresent, "Mobility", ...)
 })
 
-setMethod("plotMobilogramHash", "featureGroups", function(obj, analysis = analyses(obj), groupName = names(obj),
-                                                          showPeakArea = FALSE, showFGroupRect = TRUE, title = NULL,
-                                                          groupBy = NULL, showLegend = TRUE,
-                                                          annotate = c("none", "ret", "mz", "mob"),
-                                                          EIMParams = getDefEIMParams(), showProgress = FALSE, xlim = NULL,
-                                                          ylim = NULL, EIMs = NULL, ...)
+setMethod("plotMobilogramsHash", "featureGroups", function(obj, analysis = analyses(obj), groupName = names(obj),
+                                                           showPeakArea = FALSE, showFGroupRect = TRUE, title = NULL,
+                                                           groupBy = NULL, showLegend = TRUE,
+                                                           annotate = c("none", "ret", "mz", "mob"),
+                                                           EIMParams = getDefEIMParams(), showProgress = FALSE, xlim = NULL,
+                                                           ylim = NULL, EIMs = NULL, ...)
 {
     annotate <- checkmate::matchArg(annotate, c("none", "ret", "mz", "mob"), several.ok = TRUE)
     if ("none" %in% annotate)

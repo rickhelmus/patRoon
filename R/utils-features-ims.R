@@ -126,7 +126,7 @@ reintegrateMobilityFeatures <- function(features, peakParams, EICParams, peakRTW
     {
         peaksList <- doApply("Map", parallel, allEICs, featureTable(features), analyses(features), f = function(EICs, ft, ana)
         {
-            peaks <- findPeaksInEICs(EICs, peakParams, withMobility = FALSE,
+            peaks <- findPeaksInEICs(EICs, peakParams, withMobility = FALSE, calcStats = FALSE,
                                      logPath = file.path("log", "assignMobilities", paste0("reintegrate-", ana, ".txt")),
                                      cacheDB = cacheDB)
             # filter out peaks outside original retmin/retmax and with high RT deviation

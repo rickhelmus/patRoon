@@ -31,6 +31,7 @@
 - FIX: IMSRangeParams: in sets workflows, the mz column is taken so relative filtering is done to neutralMasses
     - maybe add _mz rel column like compounds?
     - actually, the same is the case for the mz filter (also IMS and mz for features) --> maybe just document difference? the actual results will not change much in general
+- check what happened with report() theme
 
 
 ## Maybe
@@ -114,6 +115,7 @@
             - keep doing this?
             - report both?
             - document
+    - xcms3 for mobilities params seem not working
 - assignMobilities()
     - better names for ims_parent_ID/ims_parent_group?
     - parent-less/orphaned IMS features
@@ -130,9 +132,6 @@
 - group IMS
     - (force) disable RT align and group fractions?
         - if not add in docs and Direct IMS workflows feature section in Handbook
-- makeSet()
-    - check for IMS parents?
-    - should all object have or not have mobilities?
 - update featAnn consensus?
 
 

@@ -392,7 +392,7 @@ setMethod("consensus", "featureGroupsComparison", function(obj, absMinAbundance 
     allAlgos <- paste0(sapply(fGroupsList, algorithm), collapse = ",")
 
     retFeatures <- featuresConsensus(features = consFeatures, analysisInfo = anaInfo,
-                                     algorithm = allAlgos)
+                                     algorithm = allAlgos, hasMobilities = hasMobilities(comparedFGroups))
 
     if (nrow(compFeatInds) == 0) # all input were empty feature groups
         return(featureGroupsConsensus(groups = data.table(), groupInfo = data.table(), features = retFeatures,

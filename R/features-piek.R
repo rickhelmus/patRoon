@@ -414,7 +414,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
             }
             
             maybePrintf("Finding peaks in %d remaining EICs... ", length(EICs))
-            peaks <- findPeaksInEICs(EICs, peakParams, withMobility = withIMS,
+            peaks <- findPeaksInEICs(EICs, peakParams, withMobility = withIMS, calcStats = TRUE,
                                      logPath = file.path("log", "featEICs", paste0(ana, ".txt")), cacheDB = cacheDB)
             maybePrintf("Done! Found %d peaks.\n", nrow(peaks))
 

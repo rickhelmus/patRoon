@@ -631,7 +631,7 @@ aggregateTox <- function(tox, aggrParams, splitSuspects = FALSE)
     return(tox[])
 }
 
-findPeaksInEICs <- function(EICs, peakParams, withMobility, logPath, cacheDB = NULL)
+findPeaksInEICs <- function(EICs, peakParams, withMobility, calcStats, logPath, cacheDB = NULL)
 {
     baseHash <- makeHash(peakParams)
     
@@ -644,32 +644,37 @@ findPeaksInEICs <- function(EICs, peakParams, withMobility, logPath, cacheDB = N
     
     peaks <- findPeaks(EICs, TRUE, peakParams, logPath)
     peaks <- rbindlist(peaks, idcol = "EIC_ID")
-    
-    if (!is.null(EICs[[1]][["mz"]])) # EICs made with mode == "full"?
+
+    if (nrow(peaks) == 0)
     {
-        if (nrow(peaks) == 0)
+        peaks[, EIC_ID := character()]
+        peaks[, c("retmin", "retmax", "ret", "area", "intensity") := numeric()]
+        if (calcStats)
+            peaks[, c("mzmin", "mzmax", "mz") := numeric()]
+        if (withMobility)
         {
-            peaks[, EIC_ID := character()]
-            peaks[, c("retmin", "retmax", "ret", "area", "intensity", "mzmin", "mzmax", "mz", "mobmin", "mobmax", "mobility") := numeric()]
+            if (calcStats)
+                peaks[, c("mobmin", "mobmax") := numeric()]
+            peaks[, mobility := numeric()]
         }
-        else
-        {
-            peaks[, c("mzmin", "mzmax", "mz", "mobmin", "mobmax", "mobility") := {
-                eic <- EICs[[EIC_ID]]
-                eic <- eic[numGTETol(eic$time, retmin) & numLTETol(eic$time, retmax), ]
-                if (nrow(eic) == 0)
-                    numeric(1)
-                else
-                {
-                    if (is.null(eic[["mobility"]]))
-                        eic$mobility <- eic$mobilityBP <- eic$mobmin <- eic$mobmax <- NA_real_
-                    # UNDONE: also use mobility BP data?
-                    list(min(eic$mzmin), max(eic$mzmax), weighted.mean(eic$mzBP, eic$intensity),
-                         min(eic$mobmin), max(eic$mobmax),
-                         weighted.mean(eic$mobilityBP, eic$intensity))
-                }
-            }, by = seq_len(nrow(peaks))]
-        }
+    }
+    else if (calcStats)
+    {
+        peaks[, c("mzmin", "mzmax", "mz", "mobmin", "mobmax", "mobility") := {
+            eic <- EICs[[EIC_ID]]
+            eic <- eic[numGTETol(eic$time, retmin) & numLTETol(eic$time, retmax), ]
+            if (nrow(eic) == 0)
+                numeric(1)
+            else
+            {
+                if (is.null(eic[["mobility"]]))
+                    eic$mobility <- eic$mobilityBP <- eic$mobmin <- eic$mobmax <- NA_real_
+                # UNDONE: also use mobility BP data?
+                list(min(eic$mzmin), max(eic$mzmax), weighted.mean(eic$mzBP, eic$intensity),
+                     min(eic$mobmin), max(eic$mobmax),
+                     weighted.mean(eic$mobilityBP, eic$intensity))
+            }
+        }, by = seq_len(nrow(peaks))]
         
         # NOTE: we could also set mobilities after checking if data is available, but then we need to repeat the EIC subsetting above
         if (!withMobility || length(EICs) == 0 || is.null(EICs[[1]][["mobility"]]))

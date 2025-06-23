@@ -32,6 +32,8 @@ setMethod("groupFeaturesIMS", "features", function(feat, grouper, groupAlgo, ...
         ret <- grouper(featSub, ..., verbose = if (identical(verbose, "full")) verbose else FALSE)
         ft <- as.data.table(getFeatures(ret))
         ret@groupInfo[, mobility := mean(ft$mobility[ft$group == group]), by = "group"]
+        if (!is.null(ft[["CCS"]]))
+            ret@groupInfo[, CCS := mean(ft$CCS[ft$group == group]), by = "group"]
         doProgress()
         return(ret)
     })
@@ -58,9 +60,10 @@ setMethod("groupFeaturesIMS", "features", function(feat, grouper, groupAlgo, ...
         return(inds)
     })]
     
-    gInfo <- subsetDTColumnsIfPresent(copy(fgInfoAll), c("group_ims", "ret", "mz", "mobility"))
+    gInfo <- subsetDTColumnsIfPresent(copy(fgInfoAll), c("group_ims", "ret", "mz", "mobility", "CCS"))
     gInfo[, ims_parent_group := NA_character_]
     setnames(gInfo, "group_ims", "group")
+    setcolorder(gInfo, "CCS", after = last(names(gInfo)), skip_absent = TRUE) # put CCS at the end of the table
     
     return(featureGroupsIMS(groupAlgo = groupAlgo, groups = gTable, groupInfo = gInfo, features = feat,
                             ftindex = ftind))

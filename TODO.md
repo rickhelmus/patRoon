@@ -130,9 +130,6 @@
 - group IMS
     - (force) disable RT align and group fractions?
         - if not add in docs and Direct IMS workflows feature section in Handbook
-    - support CCS columns?
-        - no assignMobilities() method yet, but CCS column can be present from fGroups method
-        - otherwise doc!
     - support non IMS features?
         - currently not
         - could support it, but clear out IMS parents

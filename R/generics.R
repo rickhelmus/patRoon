@@ -5,6 +5,7 @@
 ### Non-exported generics
 
 setGeneric("doGroupFeatures", function(feat, grouper, ..., IMSWindow, verbose) standardGeneric("doGroupFeatures"))
+setGeneric("groupFeaturesIMS", function(feat, ...) standardGeneric("groupFeaturesIMS"))
 setGeneric("featureTable<-", function(obj, value) standardGeneric("featureTable<-"))
 setGeneric("reorderAnalyses", function(obj, anas) standardGeneric("reorderAnalyses"))
 setGeneric("removeEmptyAnalyses", function(fGroups) standardGeneric("removeEmptyAnalyses"))
@@ -99,9 +100,6 @@ setGeneric("getPICSet", function(obj, ...) standardGeneric("getPICSet"))
 
 #' @rdname groupFeatures
 setGeneric("groupFeatures", function(obj, algorithm, ...) standardGeneric("groupFeatures"))
-
-#' @rdname groupFeaturesIMS
-setGeneric("groupFeaturesIMS", function(feat, ...) standardGeneric("groupFeaturesIMS"))
 
 #' @rdname groupFeaturesOpenMS
 setGeneric("groupFeaturesOpenMS", function(feat, ...) standardGeneric("groupFeaturesOpenMS"))

@@ -216,6 +216,7 @@ clusterFTableMobilities <- function(feat, IMSWindow, byGroup)
     if (!is.null(fTableAll[["set"]]))
         byCols <- c(byCols, "set")
     
+    fTableAll[, IMSClust := NA_character_]
     fTableAll[!is.na(mobility), IMSClust := {
         cl <- if (.N == 0)
             integer()

@@ -130,11 +130,6 @@
 - group IMS
     - (force) disable RT align and group fractions?
         - if not add in docs and Direct IMS workflows feature section in Handbook
-    - support non IMS features?
-        - currently not
-        - could support it, but clear out IMS parents
-        - doc either way
-        - also relevant for indirect things that depend on it, eg comparison() and makeSet(fGroups)
 - makeSet()
     - check for IMS parents?
     - should all object have or not have mobilities?
@@ -266,6 +261,7 @@
     - IMS grouping
         - doc how it is done, and with sets too
         - IMSWindow args
+        - mention that links are removed for mobility features
     - feat consensus
         - doc that all feats must have IMS data. For post workflows, IMS subset could be used
     - "full" option for verbose grouping

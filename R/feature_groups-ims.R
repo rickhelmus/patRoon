@@ -17,9 +17,9 @@ setMethod("groupFeaturesIMS", "features", function(feat, grouper, groupAlgo, ...
     fTable <- featureTable(feat)
     fTableAll <- as.data.table(feat)
     
-    if (any(is.na(fTableAll$mobility)))
-        stop("All features must have mobilities assigned.", call. = FALSE)
-    
+    if (any(!is.na(fTableAll$ims_parent_ID)))
+        warning("Any links between IMS parents and mobility features will be removed!", call. = FALSE)
+        
     # clusters features with similar mobilities
     fTableAll <- clusterFTableMobilities(feat, IMSWindow, byGroup = FALSE)
     
@@ -28,7 +28,13 @@ setMethod("groupFeaturesIMS", "features", function(feat, grouper, groupAlgo, ...
     
     fgIMSClusts <- doApply("lapply", doPar = FALSE, prog = isTRUE(verbose), unique(fTableAll$IMSClust), \(clust)
     {
-        featSub <- delete(feat, j = function(ft, ana, ...) !ft$ID %chin% fTableAll[analysis == ana & IMSClust == clust]$ID)
+        if (is.na(clust))
+        {
+            # special case: these are non-IMS features
+            featSub <- delete(feat, j = \(ft, ...) !is.na(ft$mobility))
+        }
+        else
+            featSub <- delete(feat, j = \(ft, ana, ...) !ft$ID %chin% fTableAll[analysis == ana & IMSClust == clust]$ID)
         ret <- grouper(featSub, ..., verbose = if (identical(verbose, "full")) verbose else FALSE)
         ft <- as.data.table(getFeatures(ret))
         ret@groupInfo[, mobility := mean(ft$mobility[ft$group == group]), by = "group"]
@@ -39,7 +45,8 @@ setMethod("groupFeaturesIMS", "features", function(feat, grouper, groupAlgo, ...
     })
     
     fgInfoAll <- rbindlist(lapply(fgIMSClusts, function(fg) copy(groupInfo(fg))), idcol = "IMSClust")
-    fgInfoAll[, group_ims := makeIMSFGroupName(.I, ret, mz, mobility)]
+    setorderv(fgInfoAll, c("ret", "mz", "mobility"), na.last = FALSE)
+    fgInfoAll[, group_ims := fifelse(!is.na(mobility), makeIMSFGroupName(.I, ret, mz, mobility), makeFGroupName(.I, ret, mz))]
 
     gTable <- data.table()
     gTable[, (fgInfoAll$group_ims) := Map(fgInfoAll$IMSClust, fgInfoAll$group, f = function(cl, g)

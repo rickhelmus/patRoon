@@ -199,6 +199,7 @@ reportHTMLUtils$methods(
                                     "accordion-body-padding-y" = 0, "accordion-button-padding-x" = "1.25em",
                                     "accordion-button-padding-y" = "0.2em", "nav-link-padding-x" = "0.5rem",
                                     "nav-link-padding-y" = "0.25rem"),
+            navbar_options = bslib::navbar_options(class = "bg-primary", theme = "dark"),
             title = "report",
             bslib::nav_panel("Summary", genSummaryUI()),
             bslib::nav_panel("Details", genDetailsUI()),

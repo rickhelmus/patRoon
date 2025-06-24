@@ -17,7 +17,6 @@
     - switch to PCL w/ CCSbase in patRoonExt
 - BUG: annSim.1 column (in formulas?)?
 - fix default IDLs
-- ADT: averaged data is now always per replicate, change to averageBy?
 - update REUSE
 - Harmonize/consistent names
     - maxMSRtWindow --> maxMSRTWindow

@@ -27,8 +27,9 @@ NULL
 #' @param normalized If \code{TRUE} then normalized intensities are used (see the \verb{Feature intensity normalization}
 #'   section). If no normalization data is available (\emph{e.g.} because \code{normInts} was not used) then an
 #'   automatic group normalization is performed.
-#' @param FCParams A parameter list to calculate Fold change data. See \code{getFCParams} for more details. Set to
-#'   \code{NULL} to not perform FC calculations.
+#' @param FCParams A parameter list to calculate fold change data. See \code{getFCParams} for more details. Set to
+#'   \code{NULL} to not perform FC calculations. \strong{NOTE}: the intensity data is always averaged to calculate fold
+#'   changes (using \code{averageFunc}) by replicates, irrespective of the \code{average} argument.
 #' @param qualities Adds feature (group) qualities (\code{qualities="quality"}), scores (\code{qualities="score"}) or
 #'   both (\code{qualities="both"}), if this data is available (\emph{i.e.} from \code{calculatePeakQualities}). If
 #'   \code{qualities=FALSE} then nothing is reported.
@@ -192,7 +193,7 @@ doFGAADTGroups <- function(fGroups, intColNames, average, averageBy, areas, addQ
         }
         
         gTableNonAvg <- groupTable(fGroups, areas, normalized)
-        gTableAvg <- averageGroups(fGroups, areas, normalized, by = "replicate", func = averageFunc) # UNDONE: support averageBy
+        gTableAvg <- averageGroups(fGroups, areas, normalized, by = "replicate", func = averageFunc)
         
         repInds <- match(FCParams$replicates, replicates(fGroups))
         for (i in seq_along(gTableAvg))

@@ -13,8 +13,8 @@ getFGReactTab <- function(objects, settings, ...)
     
     if (!is.null(tab[["ims_parent_group"]]))
     {
-        # link IMS parents and orphans to themselves for grouping
-        tab[is.na(ims_parent_group), ims_parent_group := group]
+        # link IMS parents to themselves and assign orphans to "none" for grouping
+        tab[is.na(ims_parent_group), ims_parent_group := fifelse(is.na(mobility), group, "none")]
     }
     
     if (settings$features$chromatograms$small)

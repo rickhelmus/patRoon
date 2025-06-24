@@ -339,7 +339,6 @@ makeMainResultsReactable <- function(tab, tabName, retMin, colGroupOrder = NULL,
     })
     
     grpStartCols <- getReactColGrpStartCols(groupDefs)
-    hasMob <- !is.null(tab[["ims_parent_group"]])
     
     # build reactable column defs: set display names, cell formatting, filters, visibility
     colDefs <- sapply(names(tab), function(col)
@@ -372,6 +371,11 @@ makeMainResultsReactable <- function(tab, tabName, retMin, colGroupOrder = NULL,
                                annotations = getReactFilterMethodAnnotations())
         
         isHTML <- cdrow$formatting %in% c("chromLarge", "chromSmall", "mobLarge", "mobSmall", "structure")
+        
+        # HACK!
+        if (col == "ims_parent_group" && all(tab$ims_parent_group == "none"))
+            cdrow$hidden <- TRUE
+        
         return(reactable::colDef(name = cdrow$displayName, show = !cdrow$hidden, format = format, cell = cell,
                                  html = isHTML, minWidth = if (!is.na(cdrow$minWidth)) cdrow$minWidth else 100,
                                  align = if (nzchar(cdrow$align)) cdrow$align, style = style,

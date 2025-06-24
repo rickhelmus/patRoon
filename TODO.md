@@ -121,7 +121,6 @@
     - warn if fromSuspects && fallBackEICs == TRUE (or throw an error? or enforce fallBackEICs=FALSE with a warning? update docs/handbook)
 - reporting
     - comps-clust: don't have imgs double in reportPlots
-    - hide ims_precursor_group if all are NA (e.g. all orphans)
 - feat EICs
     - tweak default EIC filtering params, more strict for binning?
         - current defaults way to strict for patRoonData neg samples (for filtering of EICs _and_ peaks)

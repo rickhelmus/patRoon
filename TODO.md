@@ -89,6 +89,7 @@
         - Add mobility filters for suspects & compounds?
         - is assignMobilities() before TP componentization OK?
             - IMS="maybe", so probably fine?
+        - predict CCS for TPs?
 
 ## Param defaults
 
@@ -223,6 +224,7 @@
             - see which knitr chunks to enable for execution
             - details for IMS grouping
             - note that fallbackEIC only works for EIM mob assignments and setting chromPeakParams is mandatory when fromSuspects=TRUE
+            - don't say that fGroups makeSet() is only supported for direct workflows
         - processing
             - evaluate the examples once they can be run
                 - maybe add or improve plotMobilogram examples

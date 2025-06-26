@@ -118,7 +118,6 @@
     - better names for ims_parent_ID/ims_parent_group?
     - parent-less/orphaned IMS features
         - done?
-    - warn if fromSuspects && fallbackEIC == TRUE (or throw an error? or enforce fallbackEIC=FALSE with a warning? update docs/handbook)
 - reporting
     - comps-clust: don't have imgs double in reportPlots
 - feat EICs
@@ -234,6 +233,7 @@
         - workflows
             - see which knitr chunks to enable for execution
             - details for IMS grouping
+            - note that fallbackEIC only works for EIM mob assignments and setting chromPeakParams is mandatory when fromSuspects=TRUE
         - processing
             - evaluate the examples once they can be run
                 - maybe add or improve plotMobilogram examples
@@ -259,6 +259,7 @@
     - feat consensus
         - doc that all feats must have IMS data. For post workflows, IMS subset could be used
     - "full" option for verbose grouping
+    - note that fallbackEIC only works for EIM mob assignments and setting chromPeakParams is mandatory when fromSuspects=TRUE
 
 ## NEWS
 

@@ -157,13 +157,14 @@ reintegrateMobilityFeatures <- function(features, peakParams, EICParams, peakRTW
         else
             peakIDs <- character()
         
-        ft[, keep := TRUE]
+        # only keep IMS parents and those updated from a new peak
+        ft[, keep := ((is.null(ft[["mobility"]]) | is.na(mobility))) | ID %chin% peakIDs]
         
         if (fallbackEIC)
         {
-            # update those not assigned by a peak from EICs
-            doRows <- which(ft$ID %chin% names(eics) & !ft$ID %chin% peakIDs)
-            
+            # update those not assigned by a peak from EICs, only consider those with mobility assignment from EIMs
+            # (i.e. not suspects, as they need some kind of verification)
+            doRows <- which(ft$ID %chin% names(eics) & !ft$ID %chin% peakIDs & ft$mob_assign_method == "peak")
             ft[doRows, c("intensity", "area") := {
                 eic <- eics[[ID]]
                 eic <- eic[numGTETol(eic$time, retmin) & numLTETol(eic$time, retmax), ]
@@ -183,13 +184,8 @@ reintegrateMobilityFeatures <- function(features, peakParams, EICParams, peakRTW
             }, by = seq_along(doRows)]
             ft[doRows, mob_reintegr_method := "EIC"]
             
-            ft[doRows, keep := intensity > 0]
+            ft[doRows, keep := intensity > 0] # also keep updated features
             updatedFeatsFromEICs <<- updatedFeatsFromEICs + ft[doRows][keep == TRUE, .N]
-        }
-        else
-        {
-            # only keep those updated from a new peak
-            ft[, keep := ((is.null(ft[["mobility"]]) | is.na(mobility))) | ID %chin% peakIDs]
         }
         
         notAssigned <<- notAssigned + sum(!ft$keep)

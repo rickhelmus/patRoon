@@ -49,7 +49,7 @@ setMethod("initialize", "featureGroupsXCMS",
 #' @templateVar cl features
 #' @template main-rd-method
 #' @export
-setMethod("groupFeaturesXCMS", "features", function(feat, rtalign = TRUE, loadRawData = TRUE,
+setMethod("groupFeaturesXCMS", "features", function(feat, rtalign = !hasMobilities(feat), loadRawData = TRUE,
                                                     groupArgs = list(mzwid = 0.015), 
                                                     retcorArgs = list(method = "obiwarp"),
                                                     IMSWindow = defaultLim("mobility", "medium"), verbose = TRUE)

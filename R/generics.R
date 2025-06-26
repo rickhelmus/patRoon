@@ -11,7 +11,6 @@ setGeneric("reorderAnalyses", function(obj, anas) standardGeneric("reorderAnalys
 setGeneric("removeEmptyAnalyses", function(fGroups) standardGeneric("removeEmptyAnalyses"))
 setGeneric("averageGroups", function(fGroups, areas = FALSE, normalized = FALSE, by = "group",
                                      func = mean) standardGeneric("averageGroups"))
-setGeneric("hasMobilities", function(obj) standardGeneric("hasMobilities"))
 setGeneric("clearMobilities", function(obj) standardGeneric("clearMobilities"))
 setGeneric("averageMSPeakLists", function(obj) standardGeneric("averageMSPeakLists"))
 setGeneric("collapseComponents", function(obj) standardGeneric("collapseComponents"))
@@ -522,6 +521,11 @@ setGeneric("getTICs", function(obj, ...) standardGeneric("getTICs"))
 #' @templateVar desc returns a \code{character} vector with the names of the feature groups for which data is present in this object.
 #' @template generics
 setGeneric("groupNames", function(obj) standardGeneric("groupNames"))
+
+#' @templateVar func hasMobilities
+#' @templateVar desc returns \code{TRUE} if the object has ion mobility values
+#' @template generics
+setGeneric("hasMobilities", function(obj) standardGeneric("hasMobilities"))
 
 #' @templateVar func plotBPCs
 #' @templateVar desc plots base peak chromatogram(s).

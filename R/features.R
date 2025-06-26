@@ -30,7 +30,8 @@ printFeatStats <- function(fList)
 #' @slot features List of features per analysis file. Use the \code{featureTable} method for access.
 #' @slot analysisInfo A \code{data.table} with the \link[=analysis-information]{analysis information}. Use the
 #'   \code{analysisInfo} method for access.
-#' @slot hasMobilities A \code{logical} that is \code{TRUE} if the features object contain mobility information.
+#' @slot hasMobilities A \code{logical} that is \code{TRUE} if the features object contain mobility information. Use the
+#'   \code{hasMobilities} method for access.
 #'
 #' @templateVar seli analyses
 #' @templateVar selOrderi analyses()
@@ -73,8 +74,6 @@ setMethod("initialize", "features", function(.Object, ...)
         .Object@hasMobilities <- FALSE # initialize
     return(.Object)
 })
-
-setMethod("hasMobilities", "features", function(obj) obj@hasMobilities)
 
 setMethod("clearMobilities", "features", function(obj)
 {
@@ -194,6 +193,10 @@ setMethod("analyses", "features", function(obj) analysisInfo(obj)$analysis)
 #' @template strmethod
 #' @export
 setMethod("replicates", "features", function(obj) unique(analysisInfo(obj)$replicate))
+
+#' @describeIn features Returns \code{TRUE} if the features object has mobility information.
+#' @export
+setMethod("hasMobilities", "features", function(obj) obj@hasMobilities)
 
 #' @describeIn features Returns all feature data in a table.
 #' @export

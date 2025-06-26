@@ -226,6 +226,9 @@ setMethod("comparison", "featureGroups", function(..., groupAlgo, groupArgs = li
     return(featureGroupsComparison(fGroupsList = fGroupsList, comparedFGroups = compGroups))
 })
 
+#' @details \code{hasMobilities} returns \code{TRUE} if the object has ion mobility information.
+#' @rdname featureGroups-compare
+#' @export
 setMethod("hasMobilities", "featureGroupsComparison", function(obj) return(hasMobilities(obj@comparedFGroups)))
 
 #' @details \code{plot} generates an \emph{m/z} \emph{vs} retention time plot.

@@ -64,7 +64,7 @@ local_mocked_bindings(
 makeNewProj <- function(settings, CCSCalib = "", aid = list())
 {
     doCreateProject(CCSCalib, aid, settings, noDate = TRUE)
-    return(readAllFile(file.path(settings$general$destination, settings$general$scriptFile)))
+    return(file.path(settings$general$destination, settings$general$scriptFile))
 }
 
 defaultCode <- makeNewProj(defaultSettings)
@@ -119,13 +119,16 @@ testNewProj <- function(..., name, CCSCalib = "", aid = list())
     
     unlink(path, recursive = TRUE)
     settings$general$destination <- path
-    code <- makeNewProj(settings, CCSCalib, aid)
+    scriptFile <- makeNewProj(settings, CCSCalib, aid)
     
     # diffobj package is used to create diffs so we don't need snapshot whole scripts for each test
-    cat(as.character(diffobj::diffFile(file.path(defaultTestDir, "process.R"), file.path(path, settings$general$scriptFile),
-                                       pager = "off", format = "raw", mode = "unified", rds = FALSE, disp.width = 200)),
-                     file = diffp, sep = "\n")
-    expect_snapshot_file(diffp, name = name, cran = TRUE)
+    # UNDONE: this seems to slow down things, at least on macOS --> disabled for now
+    # cat(as.character(diffobj::diffFile(file.path(defaultTestDir, "process.R"), file.path(path, settings$general$scriptFile),
+    #                                    pager = "off", format = "raw", mode = "unified", rds = FALSE, disp.width = 200)),
+    #                  file = diffp, sep = "\n")
+    # expect_snapshot_file(diffp, name = name, cran = TRUE)
+    
+    expect_snapshot_file(scriptFile, name = name, cran = TRUE)
     
     if (settings$analyses$generateAnaInfo == "table")
     {

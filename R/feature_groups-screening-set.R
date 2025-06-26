@@ -375,6 +375,9 @@ setMethod("assignMobilities", "featureGroupsScreeningSet", function(obj, mobPeak
     if (length(obj) == 0 || (is.null(mobPeakParams) && !fromSuspects && is.null(CCSParams)))
         return(obj) # nothing to do...
 
+    if (is.null(chromPeakParams) && fromSuspects)
+        stop("Please set chromPeakParams when fromSuspects=TRUE", call. = FALSE)
+    
     if (!is.null(mobPeakParams) || fromSuspects)
     {
         obj <- checkAssignedMobilityFGroups(obj)

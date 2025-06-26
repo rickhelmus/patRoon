@@ -118,7 +118,7 @@
     - better names for ims_parent_ID/ims_parent_group?
     - parent-less/orphaned IMS features
         - done?
-    - warn if fromSuspects && fallBackEICs == TRUE (or throw an error? or enforce fallBackEICs=FALSE with a warning? update docs/handbook)
+    - warn if fromSuspects && fallbackEIC == TRUE (or throw an error? or enforce fallbackEIC=FALSE with a warning? update docs/handbook)
 - reporting
     - comps-clust: don't have imgs double in reportPlots
 - feat EICs
@@ -178,7 +178,7 @@
         - fGroups methods
             - verify relevant slots are copied
             - from screenInfo(), eg for fGroups with >1 suspect assigned
-            - mobPeakParams, fromSuspects, chromPeakParams, calcArea, fallBackEIC, CCSParams, IMSMatchParams
+            - mobPeakParams, fromSuspects, chromPeakParams, calcArea, fallbackEIC, CCSParams, IMSMatchParams
         - compounds method: IMS, from overwrite, CCSParams args
     - selectIMS filter: ensure that objects is fully reverted with IMS=FALSE
     - minMobSpecSim

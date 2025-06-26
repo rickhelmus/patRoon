@@ -454,7 +454,7 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = NULL
 #'   list data (replacing Steps 1-2). The feature mobility is simply assigned from the suspect data and the mobility
 #'   range is derived from the \code{IMSWindow} argument. Relationships with IMS parents (Step 2) are similarly formed.
 #'   An advantage of this approach is that no mobility peak detection is needed, which may useful for low intensity
-#'   features where this could be difficult. However, it is strongly recommended to set \code{fallbackEICs=FALSE} to
+#'   features where this could be difficult. However, it is strongly recommended to set \code{fallbackEIC=FALSE} to
 #'   still have a means of verification that the mobility feature is actually present.
 #'
 #'   Setting \code{fromSuspects=TRUE} is primarily intended for workflows where (1) the mobility of a suspect is

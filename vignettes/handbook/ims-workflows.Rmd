@@ -264,7 +264,7 @@ Bypassing the need for peak detection for mobility assignment may be advantageou
 1. The mobility for a suspect is accurately known in advance, and no additional peak detection is needed. In this case the `IMSWindow` argument is typically set to a narrow tolerance window.
 2. There is no interest for accurate mobility (and CCS) assignment, and IMS data should only be used as a rough filtering step. In this scenario the `IMSWindow` argument is typically set to a relatively large tolerance window.
 
-> **_NOTE_** It is strongly recommended to set `fallBackEICs=FALSE` when using `fromSuspects=TRUE`, as otherwise no actual verification steps for the presence of mobility features are performed.
+> **_NOTE_** It is strongly recommended to set `fallbackEIC=FALSE` when using `fromSuspects=TRUE`, as otherwise no actual verification steps for the presence of mobility features are performed.
 
 Below are some example of how to use `assignMobilities()` to assign feature mobilities from suspect data:
 
@@ -274,12 +274,12 @@ Below are some example of how to use `assignMobilities()` to assign feature mobi
 fGroups <- screenSuspects(fGroups, suspects = suspList, adduct = "[M+H]+", onlyHits = TRUE)
 
 # scenario #1: assume suspect data is accurate
-fGroups <- assignMobilities(fGroups, fromSuspects = TRUE, IMSWindow = 0.01, fallBackEICs = FALSE)
+fGroups <- assignMobilities(fGroups, fromSuspects = TRUE, IMSWindow = 0.01, fallbackEIC = FALSE)
 
 # scenario #2: wide tolerance window, no interest in accurate mobility assignment
 # add fallback to mobility detection for suspects with mobility data
 # set IMSMatchParams to also filter out suspect hits with deviating mobilities
-fGroups <- assignMobilities(fGroups, fromSuspects = TRUE, IMSWindow = 0.1, fallBackEICs = FALSE,
+fGroups <- assignMobilities(fGroups, fromSuspects = TRUE, IMSWindow = 0.1, fallbackEIC = FALSE,
                             mobPeaksParams = getDefPeakParams("bruker_ims", "piek"),
                             IMSMatchParams = getIMSMatchParams("CCS"))
 ```

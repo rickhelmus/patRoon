@@ -49,7 +49,7 @@
             - make title/href configurable?
     - overview tab of all EICs?
         - needs JS to set imgs from plot table and way to attach titles to imgs
-
+    - comps-clust: don't have imgs double in reportPlots
 - TPs
     - add set specific frag/NL matches for candidates
         - report them?
@@ -116,10 +116,6 @@
     - xcms3 for mobilities params seem not working
 - assignMobilities()
     - better names for ims_parent_ID/ims_parent_group?
-    - parent-less/orphaned IMS features
-        - done?
-- reporting
-    - comps-clust: don't have imgs double in reportPlots
 - feat EICs
     - tweak default EIC filtering params, more strict for binning?
         - current defaults way to strict for patRoonData neg samples (for filtering of EICs _and_ peaks)

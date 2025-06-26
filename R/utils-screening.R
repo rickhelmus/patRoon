@@ -180,7 +180,7 @@ assignFeatureMobilitiesSuspects <- function(features, scr, IMSWindow, selectFunc
     printf("Finding mobilities for all features from suspects...\n")
     oldCount <- countMobilityFeatures(features)
     
-    if (is.null(scr[["mobility"]]))
+    if (is.null(scr[["mobility_susp"]]))
     {
         warning("Cannot load mobilities from suspects: No suspect mobility data", call. = FALSE)
         return(features)

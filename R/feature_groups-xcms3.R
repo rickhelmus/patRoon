@@ -51,7 +51,7 @@ setMethod("initialize", "featureGroupsXCMS3",
 #' @templateVar cl features
 #' @template main-rd-method
 #' @export
-setMethod("groupFeaturesXCMS3", "features", function(feat, rtalign = TRUE, loadRawData = TRUE,
+setMethod("groupFeaturesXCMS3", "features", function(feat, rtalign = !hasMobilities(feat), loadRawData = TRUE,
                                                      groupParam = xcms::PeakDensityParam(sampleGroups = analysisInfo(feat)$replicate),
                                                      preGroupParam = groupParam,
                                                      retAlignParam = xcms::ObiwarpParam(),

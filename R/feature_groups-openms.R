@@ -59,7 +59,7 @@ setMethod("initialize", "featureGroupsOpenMS",
 #' @templateVar cl features
 #' @template main-rd-method
 #' @export
-setMethod("groupFeaturesOpenMS", "features", function(feat, rtalign = TRUE, QT = FALSE,
+setMethod("groupFeaturesOpenMS", "features", function(feat, rtalign = !hasMobilities(feat), QT = FALSE,
                                                       maxAlignRT = defaultLim("retention", "wide"),
                                                       maxAlignMZ = defaultLim("mz", "medium"),
                                                       maxGroupRT = defaultLim("retention", "medium"),

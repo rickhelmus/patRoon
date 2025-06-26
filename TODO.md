@@ -125,9 +125,6 @@
     - tweak default EIC filtering params, more strict for binning?
         - current defaults way to strict for patRoonData neg samples (for filtering of EICs _and_ peaks)
     - mob range: doc that defaults are for TIMS? Or just not give any defaults? Give instrument? Put it in limits?
-- group IMS
-    - (force) disable RT align and group fractions?
-        - if not add in docs and Direct IMS workflows feature section in Handbook
 - update featAnn consensus?
 
 
@@ -236,6 +233,7 @@
                 - add more rows, eg for componentization?
         - workflows
             - see which knitr chunks to enable for execution
+            - details for IMS grouping
         - processing
             - evaluate the examples once they can be run
                 - maybe add or improve plotMobilogram examples
@@ -257,6 +255,7 @@
         - doc how it is done, and with sets too
         - IMSWindow args
         - mention that links are removed for mobility features
+        - mention that and why rtalign=FALSE by default
     - feat consensus
         - doc that all feats must have IMS data. For post workflows, IMS subset could be used
     - "full" option for verbose grouping

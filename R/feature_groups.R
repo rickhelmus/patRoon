@@ -150,8 +150,6 @@ setMethod("initialize", "featureGroups", function(.Object, ...)
     return(.Object)
 })
 
-setMethod("hasMobilities", "featureGroups", function(obj) hasMobilities(getFeatures(obj)))
-
 setMethod("clearMobilities", "featureGroups", function(obj)
 {
     if (!hasMobilities(obj))
@@ -185,6 +183,10 @@ setMethod("groupNames", "featureGroups", function(obj) names(obj))
 #' @describeIn featureGroups Obtain number of feature groups.
 #' @export
 setMethod("length", "featureGroups", function(x) ncol(x@groups))
+
+#' @describeIn featureGroups Returns \code{TRUE} if the feature groups object has ion mobility information.
+#' @export
+setMethod("hasMobilities", "featureGroups", function(obj) hasMobilities(getFeatures(obj)))
 
 #' @describeIn featureGroups Shows summary information for this object.
 #' @export

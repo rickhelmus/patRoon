@@ -30,7 +30,7 @@
 - FIX: IMSRangeParams: in sets workflows, the mz column is taken so relative filtering is done to neutralMasses
     - maybe add _mz rel column like compounds?
     - actually, the same is the case for the mz filter (also IMS and mz for features) --> maybe just document difference? the actual results will not change much in general
-
+- check why mstk and sc give different EICs for peak qualities
 
 ## Maybe
 
@@ -128,7 +128,6 @@
 - update snapshots/refs because of MSPL averaging method change
 - Features
     - SAFD?
-    - set reordering?
 - Feat Ann
     - MSPL
         - new spec averaging params: add IMS
@@ -137,11 +136,7 @@
             - also mixed bbCID/PASEF file (ie with different segments)
             - are m/z ranges always present?
         - see if current default abundance threshold is fine
-
 - TPs
-    - ann TPs
-        - also filter methods
-        - comp method: TPsRef, fGroupsComps, min... thresholds
     - verify TP retDirs?
 - msdata
     - new verifyFileForFormat() usage in convertMSFiles()
@@ -194,14 +189,14 @@
     - feat comparison() and consensus()
 - misc
     - genLimitsFile() and verify that it overrides
-    - checkFeatures()/checkComponents() verify if things still work
-    - DA features and formulas?
-    - manually check all HTML reporting functionality at the end
     - generateAnalysisInfo()?
 - newProject()
     - see where testing is slow, possibly disable testServer() on CI?
     - add snapshots
-
+- manual checks
+    - checkFeatures()/checkComponents() verify if things still work
+    - DA features and formulas?
+    - manually check all HTML reporting functionality at the end
 
 ## Docs
 

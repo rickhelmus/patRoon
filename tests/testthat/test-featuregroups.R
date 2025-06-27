@@ -561,6 +561,7 @@ test_that("sets functionality", {
     expect_equal(sets(fgOpenMS[, ni = set == "positive"]), "positive")
     expect_length(fgOpenMS[, sets = character()], 0)
     expect_length(fgOpenMS[, sets = "positive"], length(fgOpenMS) - length(fgUniqueSet2))
+    expect_equal(sets(fgOpenMS[, sets = rev(sets(fgOpenMS)), reorder = TRUE]), rev(sets(fgOpenMS)))
     expect_length(unset(fgOpenMS, set = "positive"), length(fgOpenMS) - length(fgUniqueSet2))
     expect_equal(sets(filter(fgOpenMS, sets = "positive", negate = TRUE)), "negative")
     

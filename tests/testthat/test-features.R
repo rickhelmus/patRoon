@@ -268,6 +268,7 @@ test_that("Sets functionality", {
     expect_equal(sets(filter(ffOpenMS, sets = "positive", negate = TRUE)), "negative")
     expect_length(ffOpenMS[, sets = character()], 0)
     expect_equal(sets(ffOpenMS[, sets = "positive"]), "positive")
+    expect_equal(sets(ffOpenMS[, sets = rev(sets(ffOpenMS)), reorder = TRUE]), rev(sets(ffOpenMS)))
     expect_equal(sets(ffOpenMS[, ni = set == "positive"]), "positive")
     expect_length(makeSet(ffXCMS3, ffXCMS3[FALSE], adducts = "[M+H]+"), length(ffXCMS3))
     expect_length(makeSet(ffXCMS3[FALSE], ffXCMS3[FALSE], adducts = "[M+H]+"), 0)

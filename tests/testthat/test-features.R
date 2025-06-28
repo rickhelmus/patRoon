@@ -22,11 +22,18 @@ exDataFiles <- list.files(patRoonData::exampleDataPath(), "\\.mzML$", full.names
 epAnaInfo <- makeMZXMLs(anaInfoOne)
 ffEP <- findFeatures(epAnaInfo, "envipick", minpeak = 25)
 
+getPiek <- \(genp, peakp = getDefPeakParams("chrom", "piek"), ...) findFeatures(anaInfoOne, "piek", genp, peakp, ...)
+ffPiekBins <- getPiek(getPiekGenEICParams("bins", mzRange = c(200, 300)))
+ffPiekSusp <- getPiek(getPiekGenEICParams("suspects"), suspects = patRoonData::suspectsPos)
+ffPiekMS2 <- getPiek(getPiekGenEICParams("bins"))
+ffPiekMS2OpenMS <- getPiek(getPiekGenEICParams("ms2"), getDefPeakParams("chrom", "openms"))
+ffPiekMS2XCMS3 <- getPiek(getPiekGenEICParams("ms2"), getDefPeakParams("chrom", "xcms3"))
+ffPiekMS2EP <- getPiek(getPiekGenEICParams("ms2"), getDefPeakParams("chrom", "envipick"))
+
 ffOpenMSQ <- calculatePeakQualities(ffOpenMS)
 
 ffEmpty <- getTestFeatures(anaInfoOne, noiseThrInt = 1E9)
 ffEmptyQ <- calculatePeakQualities(ffEmpty)
-
 
 if (doDATests())
 {
@@ -70,6 +77,31 @@ test_that("verify show output", {
     
     skip_if_not(doDATests())
     expect_known_show(ffDA, testFile("ff-DA", text = TRUE))
+})
+
+test_that("piek", {
+    expect_known_value(featureTable(ffPiekBins), testFile("ff-piek-bins"))
+    expect_known_value(featureTable(ffPiekSusp), testFile("ff-piek-suspects"))
+    expect_known_value(featureTable(ffPiekMS2), testFile("ff-piek-ms2"))
+    expect_known_value(featureTable(ffPiekMS2OpenMS), testFile("ff-piek-ms2-openms"))
+    expect_known_value(featureTable(ffPiekMS2XCMS3), testFile("ff-piek-ms2-xcms3"))
+    expect_known_value(featureTable(ffPiekMS2EP), testFile("ff-piek-ms2-envipick"))
+    
+    expect_known_show(ffPiekBins, testFile("ff-show-piek-bins", text = TRUE))
+    expect_known_show(ffPiekSusp, testFile("ff-show-piek-suspects", text = TRUE))
+    expect_known_show(ffPiekMS2, testFile("ff-show-piek-ms2", text = TRUE))
+    expect_known_show(ffPiekMS2OpenMS, testFile("ff-show-piek-ms2-openms", text = TRUE))
+    expect_known_show(ffPiekMS2XCMS3, testFile("ff-show-piek-ms2-xcms3", text = TRUE))
+    expect_known_show(ffPiekMS2EP, testFile("ff-show-piek-ms2-envipick", text = TRUE))
+    
+    expect_range(as.data.table(ffPiekBins)$mz, c(200, 300))
+    expect_lte(length(ffPiekSusp), nrow(patRoonData::suspectsPos))
+    expect_gt(length(ffPiekMS2), length(getPiek(getPiekGenEICParams("ms2", minTIC = 1E5))))
+    
+    expect_range(as.data.table(getPiek(getPiekGenEICParams("ms2", retRange = c(60, 120))))$ret, c(60, 120))
+    expect_lt(length(getPiek(getPiekGenEICParams("ms2", minEICIntensity = 1E5))), length(ffPiekMS2))
+    expect_lt(length(getPiek(getPiekGenEICParams("ms2", topMostEIC = 25))), length(ffPiekMS2))
+    expect_lte(max(getPiek(getPiekGenEICParams("ms2"), getDefPeakParams("chrom", "piek", forcePeakRange = c(0, 10)))[[1]][, retmax - ret]), 10)
 })
 
 test_that("verify empty object can be generated", {

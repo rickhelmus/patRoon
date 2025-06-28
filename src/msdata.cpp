@@ -864,7 +864,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
             }
 
             const auto time = specMeta.first.times[scanInd];
-            if (!timeGTE(timeStart, time) || (timeEnd != 0.0 && !timeLTE(time, timeEnd)))
+            if (!timeGTE(time, timeStart) || (timeEnd != 0.0 && !timeLTE(time, timeEnd)))
                 continue;
             
             //Rcpp::Rcout << "EIC: " << allPeaksSortedInd << "/" << j << "/" << specMeta.first.times[allPeaksSorted.indices[allPeaksSortedInd]] << "/" << mz << "/" << mzStart << "/" << mzEnd << "\n";

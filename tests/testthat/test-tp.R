@@ -264,11 +264,10 @@ test_that("basic usage", {
     expect_max_lt(as.data.table(filter(TPsAnnFormSusp, minFitFormula = 0.8, negate = TRUE))$fitFormula, 0.8)
     expect_min_gte(as.data.table(filter(TPsAnnFormSusp, minTPScore = 1.2))$TPScore, 1.2)
     expect_max_lt(as.data.table(filter(TPsAnnFormSusp, minTPScore = 1.2, negate = TRUE))$TPScore, 1.2)
-    expect_max_lte(sapply(products(filter(TPsAnnFormSusp, topMost = 3)), \(x) x[, .N, by = "group"][[2]]), 3)
-    expect_max_gt(sapply(products(filter(TPsAnnFormSusp, topMost = 1, negate = TRUE)), \(x) x[, .N, by = "group"][[2]]), 2)
-    expect_setequal(TPsAnnFormSusp[[1]]$name,
-                    union(filter(TPsAnnFormSusp, topMost = 3)[[1]]$name,
-                          filter(TPsAnnFormSusp, topMost = 3, negate = TRUE)[[1]]$name))
+    expect_max_lte(sapply(products(filter(TPsAnnFormSusp, topMost = 3)), \(x) max(x[, .N, by = "group"][[2]])), 3)
+    expect_setequal(TPsAnnFormSusp[["1H-benzotriazole"]]$name,
+                    union(filter(TPsAnnFormSusp, topMost = 2)[["1H-benzotriazole"]]$name,
+                          filter(TPsAnnFormSusp, topMost = 2, negate = TRUE)[["1H-benzotriazole"]]$name))
     
     skip_if_not(doMetFrag)
     

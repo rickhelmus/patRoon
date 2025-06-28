@@ -30,7 +30,7 @@ setMethod("initialize", "featuresBrukerTASQ",
 
 
 # internally used by TASQ feature groups
-importFeaturesBrukerTASQ <- function(analysisInfo, TASQExportFile)
+importFeaturesBrukerTASQ <- function(TASQExportFile, analysisInfo)
 {
     cat("Importing features from TASQ...")
 

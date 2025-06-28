@@ -26,7 +26,7 @@ SpectrumRaw getSCSpectrum(sc::MS_FILE *analysis, SpectrumRawTypes::Scan scan,
         for (int i=0; i<s.array_length; ++i)
         {
             const auto mob = s.binary_data[mobArrayInd][i];
-            if ((!mobRange.isSet() || mobRange.within(mob)) && s.binary_data[1][1] >= minIntensityIMS)
+            if ((!mobRange.isSet() || mobRange.within(mob)) && s.binary_data[1][i] >= minIntensityIMS)
                 ret.setPeak(i, s.binary_data[0][i], s.binary_data[1][i], mob);
         }
     }

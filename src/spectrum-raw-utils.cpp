@@ -57,11 +57,12 @@ std::vector<SpectrumRawSelection> getSpecRawSelections(const SpectrumRawMetadata
     const bool isIMSMSMS = isMSMS && specMeta.second.isolationRanges.empty();
     
     const auto startIt = (timeRange.start == 0.0) ? metaMS.times.begin() :
-        std::lower_bound(metaMS.times.begin(), metaMS.times.end(), timeRange.start);
+        std::lower_bound(metaMS.times.begin(), metaMS.times.end(), timeRange.start,
+                         [](SpectrumRawTypes::Time t1, SpectrumRawTypes::Time t2) { return !timeGTE(t1, t2); });
     if (startIt != metaMS.times.end())
     {
         for (size_t i=std::distance(metaMS.times.begin(), startIt);
-             i<metaMS.times.size() && (timeRange.end == 0 || metaMS.times[i]<=timeRange.end); ++i)
+             i<metaMS.times.size() && (timeRange.end == 0 || timeLTE(metaMS.times[i], timeRange.end)); ++i)
         {
             if (minBPIntensity > 0 && metaMS.BPCs[i] < minBPIntensity)
                 continue;

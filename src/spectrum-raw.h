@@ -196,4 +196,9 @@ std::vector<size_t> frameSubSpecIDs(const SpectrumRaw &frame);
 SpectrumRaw centroidIMSFrame(const SpectrumRaw &frame, const clusterMethod method, SpectrumRawTypes::Mass mzWindow,
                              SpectrumRawTypes::Mobility mobWindow, SpectrumRawTypes::Intensity minIntensity);
 
+// HACK: use a relative large tolerance for RT comparisons, mainly to accomedate MSTK which internally mixes
+// double+floats and min/sec conversions
+inline bool timeLTE(SpectrumRawTypes::Time t1, SpectrumRawTypes::Time t2) { return numberLTE(t1, t2, 0.0001); }
+inline bool timeGTE(SpectrumRawTypes::Time t1, SpectrumRawTypes::Time t2) { return numberGTE(t1, t2, 0.0001); }
+
 #endif

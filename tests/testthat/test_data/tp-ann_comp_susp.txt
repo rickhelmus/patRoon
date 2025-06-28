@@ -1,1 +1,1 @@
-A transformationProductsAnnComp objectHierarchy:transformationProductsStructure    |-- transformationProductsAnnComp---Algorithm: ann_compParents: DEET, 1H-benzotriazole, Chloridazon, Diuron, Fluometuron, Linuron, ... (9 total)Total TPs: 72
+A transformationProductsAnnComp objectHierarchy:transformationProductsStructure    |-- transformationProductsAnnComp---Algorithm: ann_compParents: DEET, 1H-benzotriazole, Chloridazon, Diuron, Fluometuron, Linuron, ... (9 total)Total TPs: 26

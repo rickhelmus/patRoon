@@ -119,7 +119,7 @@ void MSReadBackendMSTK::generateSpecMetadata(void)
                 
                 SpectrumRawMetadataMS *curMS1MD = (isMS1) ? &threadMeta.first : &threadMeta.second;
                 curMS1MD->scans.push_back(spec.getScanNumber());
-                curMS1MD->times.push_back(spec.getRTime() * 60); // NOTE: MSTK takes minutes
+                curMS1MD->times.push_back(spec.getRTime() * 60.0f); // NOTE: MSTK takes minutes
                 curMS1MD->TICs.push_back(spec.getTIC());
                 curMS1MD->BPCs.push_back(spec.getBPI());
                 curMS1MD->polarities.push_back(spec.getPositiveScan() ? SpectrumRawTypes::MSPolarity::POSITIVE : SpectrumRawTypes::MSPolarity::NEGATIVE);

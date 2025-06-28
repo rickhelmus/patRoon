@@ -44,7 +44,7 @@ calcMZsFromAdducts <- function(neutralMasses, suspAdductCol, adduct)
     if (!is.null(adduct))
         return(calculateMasses(neutralMasses, adduct, type = "mz"))
     
-    else if (!is.null(suspAdductCol))
+    if (!is.null(suspAdductCol))
     {
         unAdducts <- sapply(unique(suspAdductCol[!is.na(suspAdductCol) & nzchar(suspAdductCol)]), as.adduct)
         return(calculateMasses(neutralMasses, unAdducts[suspAdductCol], type = "mz"))
@@ -107,7 +107,7 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid, checkDesc, prefCal
         # calculate ionic masses if possible (not possible if no adducts are given and fGroups are annotated)
         if (calcMZs && (is.null(suspects[["mz"]]) || any(is.na(suspects[["mz"]]))) &&
             (!is.null(adduct) || !is.null(suspects[["adduct"]])))
-            suspects[, mz := calcMZsFromAdducts(suspects$neutralMass, suspects$adduct, adduct)]
+            suspects[, mz := calcMZsFromAdducts(suspects$neutralMass, suspects$adduct, addArg), env = list(addArg = adduct)]
         else if (is.null(suspects[["mz"]]))
             suspects[, mz := NA_real_]
 

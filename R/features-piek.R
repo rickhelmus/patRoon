@@ -499,6 +499,8 @@ getPiekGenEICParams <- function(methodMZ, methodIMS = NULL, ...)
     
     if (methodMZ != "suspects" && identical(methodIMS, "suspects"))
         stop("methodIMS can only be 'suspects' if methodMZ is also set to 'suspects'", call. = FALSE)
+    if (methodMZ != "ms2" && identical(methodIMS, "ms2"))
+        stop("methodIMS can only be 'ms2' if methodMZ is also set to 'ms2'", call. = FALSE)
     
     ret <- list(methodMZ = methodMZ, methodIMS = methodIMS, retRange = NULL, minEICIntensity = 5000,
                 minEICAdjTime = 5, minEICAdjPoints = 5, minEICAdjIntensity = 250, topMostEIC = 10000,

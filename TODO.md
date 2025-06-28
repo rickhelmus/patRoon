@@ -124,7 +124,6 @@
 
 ## Tests
 
-- update snapshots/refs because of MSPL averaging method change
 - Features
     - SAFD?
 - Feat Ann
@@ -173,9 +172,8 @@
     - minMobSpecSim
         - verify that everything is copied, including fingerprints and scoreRanges
     - IMSRangeParams (incl mobility_mz/CCS_mz) and IMSMatchParams filters for suspects (screenSuspects() and assignMobilities()) and compounds
-    - EIC features
-        - from bins, mob bins, ms2 and susps (validate m/z range features?)
-        - with different peak finders
+    - piek
+        - tests with ims data
         - verify removal duplicate suspects/features?
     - groupFeaturesIMS()
     - plotChroms(): mob annotation
@@ -235,6 +233,7 @@
 - IMS
     - piek
         - refs to paper
+        - mention that bins are overlapping and twice as much
     - assignMobilities()
         - refs to paper
         - fGroups method

@@ -199,6 +199,7 @@
 
 - move all plotBPC(), getEIC() etc methods into one doc file?
 - update relativeTo arg (not just replicates)
+- mention that mzR backend caches as loads all at once
 - convert
     - add patRoon 3.0 citation for im_collapse
 - handbook

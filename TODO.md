@@ -235,6 +235,7 @@
     - piek
         - refs to paper
         - mention that bins are overlapping and twice as much
+        - summarize code changes and fixes
     - assignMobilities()
         - refs to paper
         - fGroups method

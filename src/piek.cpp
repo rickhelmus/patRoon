@@ -22,6 +22,7 @@ namespace {
  * Disabled noise removal for reported intensities/areas
  * Converted peakwidth_min and max from ints to doubles
  * Use SpectrumRawTypes for intensity and time vectors
+ * Few small fixes, marked in the code below
  * 
  * UNDONE: convert int args to doubles?
  */ 
@@ -118,8 +119,9 @@ PeakPickingResults peakPicking_cpp(const std::vector<SpectrumRawTypes::Intensity
                         if (amountofpeaks[i-1] > maxPeaksPerSignal) {
                             noiselevel[i-1] = intensity[maxima[i-1]];
                             left_end[i-1] = left_end[i];
+                            maxima[i-1] = maxima[i]; // ADDED: FIX: don't change maxima of this peak in the if line below as it is considered noise  
                         }
-                        if ((intensity[maxima[i-1]] > intensity[maxima[i]]) & (anzahlmaxima > i)) {
+                        if ((intensity[maxima[i-1]] > intensity[maxima[i]]) && (anzahlmaxima > i)) { // CHANGED: fixed single '&' usage
                             if (std::min(intensity[maxima[i]],intensity[maxima[i+1]])-noiselevel[i] > (std::max(intensity[maxima[i]],intensity[maxima[i+1]])-noiselevel[i])/2) {
                                 right_end[i] = right_end[i-1];
                                 amountofpeaks[i] = amountofpeaks[i-1];

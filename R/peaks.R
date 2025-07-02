@@ -85,8 +85,8 @@ findPeaksOpenMS <- function(EICs, fillEICs, params, logPath)
         settings <- modifyList(settings, params$extraOpts)
     osettings <- OpenMSArgListToOpts(settings)
     osettings <- c(osettings, "-algorithm:compute_peak_shape_metrics") # not a value, just a flag
-    logPrintf(executeCommand(getExtDepPath("openms", "MRMTransitionGroupPicker", "OpenMS"), osettings, stdout = TRUE,
-                             stderr = TRUE))
+    logPrintf("%s", executeCommand(getExtDepPath("openms", "MRMTransitionGroupPicker", "OpenMS"), osettings,
+                                   stdout = TRUE, stderr = TRUE))
     logPrintf("\n-----------\n")
     
     logPrintf("Importing peaks... ")

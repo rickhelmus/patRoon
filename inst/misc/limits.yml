@@ -19,6 +19,7 @@ mobility_bruker:
     wide: 0.2
     medium_rel: 0.05
 mobility_agilent:
+    very_narrow: 0.05
     narrow: 0.1
     medium: 0.2
     wide: 2

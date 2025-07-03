@@ -1614,6 +1614,10 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
             }
             else
             {
+                # make sure from is character if needed for fifelse below
+                if (is.character(obj[[col]]) && !is.character(from[[col]]))
+                    from[, (col) := as.character(get(col))]
+                
                 takeVal <- function(x) overwrite | is.na(x) | (is.character(x) & !nzchar(x))
                 obj[from, (col) := fifelse(takeVal(get(col)), get(paste0("i.", col)), get(col)),
                     on = matchFromBy][]

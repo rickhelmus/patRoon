@@ -83,7 +83,7 @@ setMethod("clearMobilities", "features", function(obj)
     featureTable(obj) <- lapply(featureTable(obj), function(ft)
     {
         ft <- copy(ft)
-        ft <- ft[, c("mobility", "CCS", "ims_parent_ID", "mobmin", "mobmax") := NULL]
+        ft <- removeDTColumnsIfPresent(ft, c("mobility", "CCS", "ims_parent_ID", "mobmin", "mobmax"))
         mob_cols <- grep("^mob_", names(ft), value = TRUE)
         if (length(mob_cols) > 0)
             ft <- ft[, (mob_cols) := NULL]

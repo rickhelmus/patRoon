@@ -116,10 +116,12 @@
     - xcms3 for mobilities params seem not working
 - assignMobilities()
     - better names for ims_parent_ID/ims_parent_group?
+    - susps/compounds: overwrite doesn't overwrite converted mobilities, change?
 - feat EICs
     - tweak default EIC filtering params, more strict for binning?
         - current defaults way to strict for patRoonData neg samples (for filtering of EICs _and_ peaks)
     - mob range: doc that defaults are for TIMS? Or just not give any defaults? Give instrument? Put it in limits?
+    - support mobility expansion for suspect lists and adduct selection
 - update featAnn consensus?
 
 
@@ -238,6 +240,7 @@
         - refs to paper
         - mention that bins are overlapping and twice as much
         - summarize code changes and fixes
+        - mention that only mobility column for suspects is used so assignMobilities must be used for CCS conversion
     - assignMobilities()
         - refs to paper
         - fGroups method

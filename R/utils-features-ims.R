@@ -9,7 +9,7 @@ checkAssignedMobilityFGroups <- function(fGroups)
 {
     if (hasMobilities(fGroups))
     {
-        if (all(!is.na(fGroups$mobility)))
+        if (all(!is.na(groupInfo(fGroups)$mobility)))
             stop("There are no feature groups without mobility assignments available for which mobility features can be assigned.", call. = FALSE)
         
         warning("Mobility features already have been assigned, these will be cleared now!", call. = FALSE)
@@ -409,11 +409,17 @@ expandTableForIMSFGroups <- function(tab, gInfo)
     tab <- copy(tab)
     tab[, orderOrig := seq_len(.N)]
     imspars <- fifelse(is.na(gInfo$ims_parent_group), gInfo$group, gInfo$ims_parent_group)
-    tab <- tab[match(imspars, group)] # expand & copy
-    tab[, group := gInfo$group]
-    setorderv(tab, "orderOrig")
-    tab[, orderOrig := NULL]
-    return(tab[])
+    expanded <- rbindlist(lapply(seq_len(nrow(tab)), function(row)
+    {
+        rowTab <- tab[row]
+        ipInds <- which(rowTab$group == imspars)
+        expTab <- rowTab[rep(1, length(ipInds))]
+        expTab[, group := gInfo$group[ipInds]]
+        return(expTab)
+    }))
+    setorderv(expanded, "orderOrig")
+    expanded[, orderOrig := NULL]
+    return(expanded[])
 }
 
 assignTabIMSDeviations <- function(tab, gInfo)

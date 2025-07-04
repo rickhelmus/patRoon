@@ -309,8 +309,9 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, add = ac)
     assertPiekGenEICParams(genEICParams, add = ac)
     assertFindPeakParams(peakParams, add = ac)
-    assertSuspectList(suspects, needsAdduct = is.null(adduct), skipInvalid = genEICParams$skipInvalid, null.ok = TRUE,
-                      add = ac)
+    if (genEICParams$methodMZ == "suspects")
+        assertSuspectList(suspects, needsAdduct = is.null(adduct), skipInvalid = genEICParams$skipInvalid, null.ok = TRUE,
+                          add = ac)
     checkmate::assertNumber(minIntensityIMS, lower = 0, finite = TRUE, add = ac)
     checkmate::assertFlag(verbose, add = ac)
     checkmate::reportAssertions(ac)

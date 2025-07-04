@@ -185,7 +185,7 @@ setMethod("initMSReadBackend", "Rcpp_MSReadBackendOTIMS", function(backend)
             else # PASEF
             {
                 getTIMSMetaTable("PasefFrameMsMsInfo",
-                                 c("Frame", "ScanNumBegin", "ScanNumEnd", "IsolationMz", "IsolationWidth"))
+                                 c("Frame", "ScanNumBegin", "ScanNumEnd", "IsolationMz", "IsolationWidth", "Precursor"))
             }
             setnames(ret, c("Frame", "IsolationMz", "TriggerMass", "ScanNumBegin", "ScanNumEnd"),
                      c("scan", "precursorMZ", "precursorMZ", "subScan", "subScanEnd"), skip_absent = TRUE)
@@ -197,6 +197,19 @@ setMethod("initMSReadBackend", "Rcpp_MSReadBackendOTIMS", function(backend)
                 # so we have a table with consistent columns
                 # NOTE: having a consistent PASEF/nonPASEF structure is handy, in case data files have both MS/MS types
                 ret[, c("subScan", "subScanEnd") := 0]
+            }
+            else # PASEF
+            {
+                # Fix isolationMz and range from precursor table
+                
+                precTab <- getTIMSMetaTable("Precursors", c("Id", "MonoisotopicMz"))
+                setnames(ret, "precursorMZ", "precursorMZ_orig")
+                ret[, precursorMZ := precTab[match(ret$Precursor, Id)]$MonoisotopicMz]
+                ret[is.na(precursorMZ), precursorMZ := precursorMZ_orig] # in case precursor is missing (why?? but it happens...)
+                # adjust range in such a way that it covers the original range
+                ret[, c("isolationRangeMin", "isolationRangeMax") := .(precursorMZ - (precursorMZ_orig - isolationRangeMin),
+                                                                       (precursorMZ_orig + isolationRangeMax) - precursorMZ)]
+                ret[, c("Precursor", "precursorMZ_orig") := NULL]
             }
             
             return(ret)

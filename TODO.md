@@ -122,6 +122,7 @@
         - current defaults way to strict for patRoonData neg samples (for filtering of EICs _and_ peaks)
     - mob range: doc that defaults are for TIMS? Or just not give any defaults? Give instrument? Put it in limits?
     - support mobility expansion for suspect lists and adduct selection
+    - split IMSWindow arg for setting mobmin/mobmax? this currently sets very narrow ranges
 - update featAnn consensus?
 
 

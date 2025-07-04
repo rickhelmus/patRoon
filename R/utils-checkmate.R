@@ -1173,7 +1173,7 @@ assertPiekGenEICParams <- function(x, .var.name = checkmate::vname(x), add = NUL
     }
     else if (x$methodMZ == "suspects")
     {
-        assertListVal(x, "rtWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
+        assertListVal(x, "rtWindow", checkmate::assertNumber, lower = 0, finite = FALSE, .var.name = .var.name, add = add)
         assertListVal(x, "mzWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
         
         # UNDONE these to separate param and also use elsewhere?
@@ -1183,7 +1183,7 @@ assertPiekGenEICParams <- function(x, .var.name = checkmate::vname(x), add = NUL
     }
     else if (x$methodMZ == "ms2")
     {
-        assertListVal(x, "rtWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
+        assertListVal(x, "rtWindow", checkmate::assertNumber, lower = 0, finite = FALSE, .var.name = .var.name, add = add)
         assertListVal(x, "mzWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
         assertListVal(x, "minTIC", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
         assertListVal(x, "clusterMethod", assertClusterMethod, .var.name = .var.name, add = add)

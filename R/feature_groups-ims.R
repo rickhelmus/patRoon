@@ -11,7 +11,10 @@ setMethod("initialize", "featureGroupsIMS",
 
 setMethod("groupFeaturesIMS", "features", function(feat, grouper, groupAlgo, ..., IMSWindow, verbose)
 {
-    # UNDONE: doc verbose behavior
+    hash <- makeHash(feat, groupAlgo, list(...), IMSWindow)
+    cd <- loadCacheData("groupFeaturesIMS", hash)
+    if (!is.null(cd))
+        return(cd)
     
     anaInfo <- analysisInfo(feat)
     fTable <- featureTable(feat)
@@ -49,22 +52,16 @@ setMethod("groupFeaturesIMS", "features", function(feat, grouper, groupAlgo, ...
     fgInfoAll[, group_ims := fifelse(!is.na(mobility), makeIMSFGroupName(.I, ret, mz, mobility), makeFGroupName(.I, ret, mz))]
 
     gTable <- data.table()
-    gTable[, (fgInfoAll$group_ims) := Map(fgInfoAll$IMSClust, fgInfoAll$group, f = function(cl, g)
-    {
-        ints <- numeric(length(fTable))
-        fg <- fgIMSClusts[[cl]][, g]
-        ints[match(analyses(fg), anaInfo$analysis)] <- fg[[1]]
-        return(ints)
-    })]
-    
+    gTable[, (fgInfoAll$group_ims) := Map(fgInfoAll$IMSClust, fgInfoAll$group, f = \(cl, g) fgIMSClusts[[cl]][[g]])]
+
     ftind <- data.table()
     ftind[, (fgInfoAll$group_ims) := Map(fgInfoAll$IMSClust, fgInfoAll$group, f = function(cl, g)
     {
-        inds <- integer(length(fTable))
-        fg <- removeEmptyAnalyses(fgIMSClusts[[cl]][, g])
-        anaInds <- match(analyses(fg), anaInfo$analysis)
-        inds[anaInds] <- mapply(featureTable(fg), anaInds, FUN = function(ft, ai) match(ft$ID, fTable[[ai]]$ID))
-        return(inds)
+        mapply(featureTable(fgIMSClusts[[cl]]), seq_len(nrow(anaInfo)), FUN = function(ft, ai)
+        {
+            ID <- ft$ID[ft$group == g]
+            if (length(ID) == 0) 0L else match(ID, fTable[[ai]]$ID, nomatch = 0L)
+        })
     })]
     
     gInfo <- subsetDTColumnsIfPresent(copy(fgInfoAll), c("group_ims", "ret", "mz", "mobility", "CCS"))
@@ -72,6 +69,8 @@ setMethod("groupFeaturesIMS", "features", function(feat, grouper, groupAlgo, ...
     setnames(gInfo, "group_ims", "group")
     setcolorder(gInfo, "CCS", after = last(names(gInfo)), skip_absent = TRUE) # put CCS at the end of the table
     
-    return(featureGroupsIMS(groupAlgo = groupAlgo, groups = gTable, groupInfo = gInfo, features = feat,
-                            ftindex = ftind))
+    ret <- featureGroupsIMS(groupAlgo = groupAlgo, groups = gTable, groupInfo = gInfo, features = feat,
+                            ftindex = ftind)
+    saveCacheData("groupFeaturesIMS", ret, hash)
+    return(ret)
 })

@@ -10,9 +10,11 @@ setMethod("initialize", "featureGroupsGreedy",
 
 calcFeatDist <- function(ret, mz, mob, retRef, mzRef, mobRef, rtWindow, mzWindow, IMSWindow)
 {
+    retd <- abs(ret - retRef); mzd <- abs(mz - mzRef)
     if (is.null(mob))
-        return(sqrt((ret / rtWindow)^2 + (mz / mzWindow)^2))
-    return(sqrt((ret / rtWindow)^2 + (mz / mzWindow)^2 + (mob / IMSWindow)^2))
+        return(sqrt((retd / rtWindow)^2 + (mzd / mzWindow)^2))
+    mobd <- abs(mob - mobRef)
+    return(sqrt((retd / rtWindow)^2 + (mzd / mzWindow)^2 + (mobd / IMSWindow)^2))
 }
 
 calcGroupScore <- function(fTableGrp, curAna, rtWindow, mzWindow, IMSWindow)

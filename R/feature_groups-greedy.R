@@ -70,6 +70,7 @@ groupFeaturesGreedy <- function(features, rtWindow = defaultLim("retention", "me
     # UNDONE: IMS support
     
     anaInfo <- analysisInfo(features)
+    sqeps <- sqrt(.Machine$double.eps) # cache for numLTE below
     
     fTable <- as.data.table(features)
     fTable[, groupID := NA_integer_]
@@ -81,14 +82,14 @@ groupFeaturesGreedy <- function(features, rtWindow = defaultLim("retention", "me
         if (!is.na(fTable$groupID[ftRow]))
             next # already assigned
         
-        grpInds <- fTable[numLTE(abs(ret - ret[ftRow]), rtWindow) & numLTE(abs(mz - mz[ftRow]), mzWindow) & is.na(groupID),
+        grpInds <- fTable[is.na(groupID) & numLTE(abs(ret - ret[ftRow]), rtWindow, sqeps) & numLTE(abs(mz - mz[ftRow]), mzWindow, sqeps),
                           which = TRUE]
         if (length(grpInds) > 1 && anyDuplicated(fTable$analysis[grpInds]))
         {
             fTable[grpInds, groupID := {
                 scores <- calcGroupScore(fTable[grpInds], analysis, rtWindow, mzWindow, IMSWindow)
                 gid <- rep(NA_integer_, .N)
-                gid[which.max(scores)] <- curGroup # select highest score if duplicate feature in one analysis
+                gid[seq_along(gid) == which.max(scores) & scores >= 0] <- curGroup # select highest score if duplicate feature in one analysis
                 gid
             }, by = "analysis"]
         }

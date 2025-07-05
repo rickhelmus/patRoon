@@ -28,7 +28,14 @@ calcGroupScore <- function(fTableGrp, curAna, rtWindow, mzWindow, IMSWindow)
     {
         # select potential group
         # UNDONE: also keep track if max/min of group stays within tolerance?
+        
         fTableGrpOtherAna <- fTableGrp[analysis != curAna]
+        
+        grpRetD <- max(fTableGrpOtherAna$ret, refRT) - min(fTableGrpOtherAna$ret, refRT)
+        grpMZD <- max(fTableGrpOtherAna$mz, refMZ) - min(fTableGrpOtherAna$mz, refMZ)
+        if (grpRetD > rtWindow || grpMZD > mzWindow)
+            return(-1) # this feature would lead to an invalid group
+        
         fTableGrpOtherAna[, keep := {
             if (.N == 1L)
                 TRUE
@@ -41,6 +48,9 @@ calcGroupScore <- function(fTableGrp, curAna, rtWindow, mzWindow, IMSWindow)
         fTableGrpOtherAna <- fTableGrpOtherAna[keep == TRUE]
         
         # calc score
+        
+        if (nrow(fTableGrpOtherAna) == 0)
+            return(0)
         
         volume <- getDim(c(refRT, fTableGrpOtherAna$ret), rtWindow) *
             getDim(c(refMZ, fTableGrpOtherAna$mz), mzWindow)

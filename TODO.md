@@ -247,6 +247,7 @@
         - fGroups method
             - add link to piek and import for direct IMS assignment
         - give some notes about sets workflows?
+        - mention that fromSuspects only takes suspects assigned to a single fGroup (also in handbook?)
     - peakParams: refs to paper
     - IMS grouping
         - doc how it is done, and with sets too

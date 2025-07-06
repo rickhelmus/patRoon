@@ -373,7 +373,7 @@ makeMainResultsReactable <- function(tab, tabName, retMin, colGroupOrder = NULL,
         isHTML <- cdrow$formatting %in% c("chromLarge", "chromSmall", "mobLarge", "mobSmall", "structure")
         
         # HACK!
-        if (col == "ims_parent_group" && all(tab$ims_parent_group == "none"))
+        if (col == "ims_parent_group" && (all(is.na(tab$ims_parent_group)) || all(tab$ims_parent_group == "none")))
             cdrow$hidden <- TRUE
         
         return(reactable::colDef(name = cdrow$displayName, show = !cdrow$hidden, format = format, cell = cell,

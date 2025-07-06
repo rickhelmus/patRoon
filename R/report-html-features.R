@@ -11,7 +11,7 @@ getFGReactTab <- function(objects, settings, ...)
     tab <- as.data.table(objects$fGroups, qualities = "score", average = TRUE,
                          concAggrParams = settings$features$aggregateConcs, toxAggrParams = settings$features$aggregateTox, ...)
     
-    if (!is.null(tab[["ims_parent_group"]]))
+    if (!is.null(tab[["ims_parent_group"]]) && any(!is.na(tab$ims_parent_group)))
     {
         # link IMS parents to themselves and assign orphans to "none" for grouping
         tab[is.na(ims_parent_group), ims_parent_group := fifelse(is.na(mobility), group, "none")]

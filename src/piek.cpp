@@ -381,6 +381,9 @@ Rcpp::List doFindPeaksPiek(Rcpp::List EICs, bool fillEICs, double minIntensity, 
     
     const size_t entries = EICs.size();
     
+    if (entries == 0)
+        return Rcpp::List();
+
     const std::vector<SpectrumRawTypes::Time> fullEICTimes = (fillEICs) ? EICs.attr("allXValues") : std::vector<SpectrumRawTypes::Time>();
     std::vector<std::vector<SpectrumRawTypes::Time>> allTimes;
     std::vector<std::vector<SpectrumRawTypes::Intensity>> allIntensities;

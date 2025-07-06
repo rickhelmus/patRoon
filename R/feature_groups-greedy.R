@@ -76,6 +76,11 @@ groupFeaturesGreedy <- function(features, rtWindow = defaultLim("retention", "me
 {
     # UNDONE: rtalign arg?
     
+    hash <- makeHash(features, rtWindow, mzWindow, IMSWindow)
+    cd <- loadCacheData("groupFeaturesGreedy", hash)
+    if (!is.null(cd))
+        return(cd)
+    
     anaInfo <- analysisInfo(features)
     hasMob <- hasMobilities(features)
     sqeps <- sqrt(.Machine$double.eps) # cache for numLTE below
@@ -179,5 +184,7 @@ groupFeaturesGreedy <- function(features, rtWindow = defaultLim("retention", "me
         warning("Any links between IMS parents and mobility features are removed!", call. = FALSE)
     }
     
-    return(featureGroupsGreedy(groups = gTable, groupInfo = gInfo, features = features, ftindex = ftindex))
+    ret <- featureGroupsGreedy(groups = gTable, groupInfo = gInfo, features = features, ftindex = ftindex)
+    saveCacheData("groupFeaturesGreedy", ret, hash)
+    return(ret)
 }

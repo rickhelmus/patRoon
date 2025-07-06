@@ -14,13 +14,16 @@
 #include <numeric>
 #include <vector>
 
-template <typename C> std::vector<size_t> getSortedInds(const C &cont)
+template <typename C> std::vector<size_t> getSortedInds(const C &cont, bool decr = false)
 {
     // get sorted indices
     // inspired from https://stackoverflow.com/a/40183830
     std::vector<size_t> ret(cont.size());
     std::iota(ret.begin(), ret.end(), 0);
-    std::sort(ret.begin(), ret.end(), [&](size_t i, size_t j) { return (cont[i] < cont[j]); });
+    if (decr)
+        std::sort(ret.begin(), ret.end(), [&](size_t i, size_t j) { return (cont[i] > cont[j]); });
+    else
+        std::sort(ret.begin(), ret.end(), [&](size_t i, size_t j) { return (cont[i] < cont[j]); });
     return ret;
 }
 

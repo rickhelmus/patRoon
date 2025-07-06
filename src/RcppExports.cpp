@@ -37,6 +37,24 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// getGroupIDs
+Rcpp::IntegerVector getGroupIDs(const Rcpp::NumericVector& featRTs, const Rcpp::NumericVector& featMZs, const Rcpp::NumericVector& featMobs, const Rcpp::NumericVector& ints, const Rcpp::IntegerVector& anaIDs, double rtWindow, double mzWindow, double mobWindow);
+RcppExport SEXP _patRoon_getGroupIDs(SEXP featRTsSEXP, SEXP featMZsSEXP, SEXP featMobsSEXP, SEXP intsSEXP, SEXP anaIDsSEXP, SEXP rtWindowSEXP, SEXP mzWindowSEXP, SEXP mobWindowSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type featRTs(featRTsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type featMZs(featMZsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type featMobs(featMobsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type ints(intsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::IntegerVector& >::type anaIDs(anaIDsSEXP);
+    Rcpp::traits::input_parameter< double >::type rtWindow(rtWindowSEXP);
+    Rcpp::traits::input_parameter< double >::type mzWindow(mzWindowSEXP);
+    Rcpp::traits::input_parameter< double >::type mobWindow(mobWindowSEXP);
+    rcpp_result_gen = Rcpp::wrap(getGroupIDs(featRTs, featMZs, featMobs, ints, anaIDs, rtWindow, mzWindow, mobWindow));
+    return rcpp_result_gen;
+END_RCPP
+}
 // initBrukerLibrary
 bool initBrukerLibrary(const std::string& path, bool force);
 static SEXP _patRoon_initBrukerLibrary_try(SEXP pathSEXP, SEXP forceSEXP) {
@@ -826,6 +844,7 @@ RcppExport SEXP _rcpp_module_boot_MSReadBackend();
 static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_writeTraML", (DL_FUNC) &_patRoon_writeTraML, 2},
     {"_patRoon_writeChromsToMzML", (DL_FUNC) &_patRoon_writeChromsToMzML, 4},
+    {"_patRoon_getGroupIDs", (DL_FUNC) &_patRoon_getGroupIDs, 8},
     {"_patRoon_initBrukerLibrary", (DL_FUNC) &_patRoon_initBrukerLibrary, 2},
     {"_patRoon_getBrukerCCS", (DL_FUNC) &_patRoon_getBrukerCCS, 3},
     {"_patRoon_getBrukerMob", (DL_FUNC) &_patRoon_getBrukerMob, 3},

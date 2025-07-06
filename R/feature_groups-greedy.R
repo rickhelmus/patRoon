@@ -17,31 +17,37 @@ calcFeatDist <- function(ret, mz, mob, retRef, mzRef, mobRef, rtWindow, mzWindow
     return(sqrt((retd / rtWindow)^2 + (mzd / mzWindow)^2 + (mobd / IMSWindow)^2))
 }
 
-calcGroupScore <- function(fTableGrp, curAna, rtWindow, mzWindow, IMSWindow)
+calcGroupScore <- function(fTableGrp, curAna, rtWindow, mzWindow, IMSWindow, withMob)
 {
     # add eps: avoid zeros
     getDim <- \(x, win) ((max(x) - min(x)) / win) + .Machine$double.eps
     
     wh <- fTableGrp[analysis == curAna, which = TRUE]
     
-    ret <- mapply(fTableGrp$ret[wh], fTableGrp$mz[wh], FUN = function(refRT, refMZ)
+    refMobs <- if (withMob) fTableGrp$mobility[wh] else rep(NA_real_, length(wh))
+    ret <- mapply(fTableGrp$ret[wh], fTableGrp$mz[wh], refMobs, FUN = function(refRT, refMZ, refMob)
     {
         # select potential group
-        # UNDONE: also keep track if max/min of group stays within tolerance?
-        
         fTableGrpOtherAna <- fTableGrp[analysis != curAna]
         
+        # check if this feature would lead to an invalid group
         grpRetD <- max(fTableGrpOtherAna$ret, refRT) - min(fTableGrpOtherAna$ret, refRT)
         grpMZD <- max(fTableGrpOtherAna$mz, refMZ) - min(fTableGrpOtherAna$mz, refMZ)
         if (grpRetD > rtWindow || grpMZD > mzWindow)
-            return(-1) # this feature would lead to an invalid group
+            return(-1)
+        if (withMob)
+        {
+            grpMobD <- max(fTableGrpOtherAna$mobility, refMob) - min(fTableGrpOtherAna$mobility, refMob)
+            if (grpMobD > IMSWindow)
+                return(-1)
+        }
         
         fTableGrpOtherAna[, keep := {
             if (.N == 1L)
                 TRUE
             else
             {
-                dists <- calcFeatDist(ret, mz, NULL, refRT, refMZ, NULL, rtWindow, mzWindow, IMSWindow)
+                dists <- calcFeatDist(ret, mz, if (withMob) mobility else NULL, refRT, refMZ, refMob, rtWindow, mzWindow, IMSWindow)
                 seq_len(.N) == which.min(dists)
             }
         }, by = "analysis"]
@@ -54,6 +60,8 @@ calcGroupScore <- function(fTableGrp, curAna, rtWindow, mzWindow, IMSWindow)
         
         volume <- getDim(c(refRT, fTableGrpOtherAna$ret), rtWindow) *
             getDim(c(refMZ, fTableGrpOtherAna$mz), mzWindow)
+        if (withMob)
+            volume <- volume * getDim(c(refMob, fTableGrpOtherAna$mobility), IMSWindow)
         
         # higher score for less volume and more members
         return(1/volume + nrow(fTableGrpOtherAna) * 0.1)
@@ -67,43 +75,80 @@ groupFeaturesGreedy <- function(features, rtWindow = defaultLim("retention", "me
                                 verbose = TRUE)
 {
     # UNDONE: rtalign arg?
-    # UNDONE: IMS support
     
     anaInfo <- analysisInfo(features)
+    hasMob <- hasMobilities(features)
     sqeps <- sqrt(.Machine$double.eps) # cache for numLTE below
     
     fTable <- as.data.table(features)
     fTable[, groupID := NA_integer_]
     fTable[, anaRow := seq_len(.N), by = "analysis"]
+    fTable[, row := seq_len(.N)]
     
     curGroup <- 1L
-    for (ftRow in order(fTable$intensity, decreasing = TRUE))
+    doGroup <- function(withMob)
     {
-        if (!is.na(fTable$groupID[ftRow]))
-            next # already assigned
-        
-        grpInds <- fTable[is.na(groupID) & numLTE(abs(ret - ret[ftRow]), rtWindow, sqeps) & numLTE(abs(mz - mz[ftRow]), mzWindow, sqeps),
-                          which = TRUE]
-        if (length(grpInds) > 1 && anyDuplicated(fTable$analysis[grpInds]))
+        for (ftRow in order(fTable$intensity, decreasing = TRUE))
         {
-            fTable[grpInds, groupID := {
-                scores <- calcGroupScore(fTable[grpInds], analysis, rtWindow, mzWindow, IMSWindow)
-                gid <- rep(NA_integer_, .N)
-                gid[seq_along(gid) == which.max(scores) & scores >= 0] <- curGroup # select highest score if duplicate feature in one analysis
-                gid
-            }, by = "analysis"]
+            if (!is.na(fTable$groupID[ftRow]))
+                next # already assigned
+            
+            # NOTE: withMob is only TRUE if hasMob is
+            if ((withMob && is.na(fTable$mobility[ftRow])) || (!withMob && hasMob && !is.na(fTable$mobility[ftRow])))
+                next
+            
+            fTableGrp <- fTable[is.na(groupID) & numLTE(abs(ret - ret[ftRow]), rtWindow, sqeps) &
+                                    numLTE(abs(mz - mz[ftRow]), mzWindow, sqeps)]
+            if (withMob)
+                fTableGrp <- fTableGrp[numLTE(abs(mobility - mobility[ftRow]), IMSWindow, sqeps)]
+            
+            if (nrow(fTableGrp) > 1 && anyDuplicated(fTableGrp$analysis))
+            {
+                fTable[match(fTableGrp$row, row), groupID := {
+                    scores <- calcGroupScore(fTableGrp, analysis, rtWindow, mzWindow, IMSWindow, withMob)
+                    gid <- rep(NA_integer_, .N)
+                    gid[seq_along(gid) == which.max(scores) & scores >= 0] <- curGroup # select highest score if duplicate feature in one analysis
+                    gid
+                }, by = "analysis"]
+            }
+            else
+                fTable[match(fTableGrp$anaRow, anaRow), groupID := curGroup]
+            
+            curGroup <<- curGroup + 1L
         }
-        else
-            fTable[grpInds, groupID := curGroup]
-        
-        curGroup <- curGroup + 1L
+    }
+    
+    if (hasMob)
+    {
+        if (verbose)
+            message("Grouping features with mobilities...")
+        doGroup(TRUE)
+    }
+    if (!hasMob || any(is.na(fTable$mobility)))
+    {
+        if (verbose && hasMob)
+            message("Grouping features without mobilities...")
+        doGroup(FALSE)
     }
     
     # some duplicate features in a single analysis may be unassigned --> fix here
     fTable[is.na(groupID), groupID := seq_len(.N) + curGroup]
     
     gInfo <- fTable[, .(ret = mean(ret), mz = mean(mz)), by = "groupID"]
-    gInfo[, group := makeFGroupName(seq_len(nrow(gInfo)), ret, mz)]
+    if (hasMob)
+    {
+        gInfo[, mobility := fTable[, mean(mobility), by = "groupID"][[2]]]
+        gInfo[, ims_parent_group := NA_character_]
+        if (!is.null(fTable[["CCS"]]))
+            gInfo[, CCS := fTable[, mean(CCS), by = "groupID"][[2]]]
+        setorderv(gInfo, c("ret", "mz", "mobility"), na.last = FALSE)
+        gInfo[, group := fifelse(!is.na(mobility), makeIMSFGroupName(.I, ret, mz, mobility), makeFGroupName(.I, ret, mz))]
+    }
+    else
+    {
+        setorderv(gInfo, c("ret", "mz"))
+        gInfo[, group := makeFGroupName(.I, ret, mz)]
+    }
     setcolorder(gInfo, "group")
     
     gTable <- data.table(matrix(0, nrow = nrow(anaInfo), ncol = nrow(gInfo)))
@@ -121,6 +166,18 @@ groupFeaturesGreedy <- function(features, rtWindow = defaultLim("retention", "me
     }
     
     gInfo[, groupID := NULL]
+    
+    if (hasMob && any(!is.na(fTable$ims_parent_ID)))
+    {
+        fTableNoIMSPar <- lapply(featureTable(features), function(ft)
+        {
+            ft <- copy(ft)
+            ft[, ims_parent_ID := NA_character_]
+            return(ft)
+        })
+        featureTable(features) <- fTableNoIMSPar
+        warning("Any links between IMS parents and mobility features are removed!", call. = FALSE)
+    }
     
     return(featureGroupsGreedy(groups = gTable, groupInfo = gInfo, features = features, ftindex = ftindex))
 }

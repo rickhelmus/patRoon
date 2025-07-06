@@ -136,7 +136,7 @@ importFeaturesTable <- function(input, analysisInfo, addCols = NULL)
                                                "intensity", "area", mobCols, setsCols, addCols))
     
     ac <- checkmate::makeAssertCollection()
-    if (is.null(input[["ID"]]))
+    if (is.null(input[["ID"]]) && !is.null(input[["analysis"]]))
         input[, ID := seq_len(.N), by = "analysis"]
     else
     {

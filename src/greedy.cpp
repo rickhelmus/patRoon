@@ -149,14 +149,21 @@ std::vector<int> checkTentativeGroup(const std::vector<Feature> &tentativeGroup,
 Rcpp::IntegerVector getGroupIDs(const Rcpp::NumericVector &featRTs, const Rcpp::NumericVector  &featMZs,
                                 const Rcpp::NumericVector &featMobs, const Rcpp::NumericVector &ints,
                                 const Rcpp::IntegerVector &anaIDs, double rtWindow, double mzWindow,
-                                double mobWindow)
+                                double mobWindow, bool verbose)
 {
     Rcpp::IntegerVector ret(featRTs.size(), -1);
     int curGroup = 0;
     const auto intSortedInds = getSortedInds(ints, true);
     const auto mzSortedInds = getSortedInds(featMZs);
+    
+    if (verbose)
+        Rcpp::Rcout << "Grouping " << featRTs.size() << " features...\n";
+    
     for (size_t i=0; i<intSortedInds.size(); ++i)
     {
+        if (verbose && i > 0 && (i % 5000) == 0)
+            Rcpp::Rcout << "Processed " << i << " features...\n";
+        
         const auto refInd = intSortedInds[i];
         
         if (ret[refInd] != -1)
@@ -187,33 +194,16 @@ Rcpp::IntegerVector getGroupIDs(const Rcpp::NumericVector &featRTs, const Rcpp::
                                         groupInd);
         }
         
-        if (curGroup == 14)
-        {
-            Rcpp::Rcout << "Processing group " << curGroup << " with reference feature: "
-                        << "RT: " << refRT << ", MZ: " << refMZ << ", MOB: " << refMob
-                        << ", AnaID: " << anaIDs[refInd] << ", FeatID: " << refInd << "\n";
-            for (const auto &feat : tentativeGroup)
-            {
-                Rcpp::Rcout << "Tentative group feature: "
-                            << "RT: " << feat.ret << ", MZ: " << feat.mz << ", MOB: " << feat.mob
-                            << ", AnaID: " << feat.anaID << ", FeatID: " << feat.featID << "\n";
-            }
-        }
-        
         const auto groupIDs = checkTentativeGroup(tentativeGroup, rtWindow, mzWindow, mobWindow);
         
         for (const auto &gID : groupIDs)
-        {
-            if (curGroup == 14)
-            {
-                Rcpp::Rcout << "Adding feature to group " << curGroup << ": "
-                            << "RT: " << featRTs[gID] << ", MZ: " << featMZs[gID] << ", MOB: " << featMobs[gID]
-                            << ", AnaID: " << anaIDs[gID] << ", FeatID: " << gID << "\n";
-            }
             ret[gID] = curGroup;
-        }
+        
         ++curGroup;
     }
+    
+    if (verbose)
+        Rcpp::Rcout << "Done!\n";
     
     return ret;
 }

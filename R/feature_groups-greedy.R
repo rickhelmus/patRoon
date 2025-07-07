@@ -59,20 +59,21 @@ calcGroupScore <- function(fTableGrp, curAna, rtWindow, mzWindow, IMSWindow)
 }
 
 #' @export
-groupFeaturesGreedy <- function(features, rtWindow = defaultLim("retention", "medium"),
-                                mzWindow = defaultLim("mz", "medium"),
-                                IMSWindow = defaultLim("mobility", "medium"),
+groupFeaturesGreedy <- function(features, rtalign = FALSE, rtWindow = defaultLim("retention", "medium"),
+                                mzWindow = defaultLim("mz", "medium"), IMSWindow = defaultLim("mobility", "medium"),
                                 verbose = TRUE, useCPP = TRUE)
 {
-    # UNDONE: rtalign arg?
     # UNDONE: remove useCPP and R code
     
-    # add checkmates
     ac <- checkmate::makeAssertCollection()
+    checkmate::assertFlag(rtalign, add = ac)
     aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow + IMSWindow, lower = 0, finite = TRUE,
            fixed = list(add = ac))
     checkmate::assertFlag(verbose, add = ac)
     checkmate::reportAssertions(ac)
+    
+    if (rtalign)
+        stop("Retention time alignment (rtalign=TRUE) is not yet supported for greedy grouping!", call. = FALSE)
     
     hash <- makeHash(features, rtWindow, mzWindow, IMSWindow)
     cd <- loadCacheData("groupFeaturesGreedy", hash)

@@ -128,13 +128,21 @@ groupFeaturesGreedy <- function(features, rtalign = FALSE, rtWindow = defaultLim
     }
     
     # HACK: add dummy mobilities so grouping code can handle features without mobilities
-    if (!hasMob || all(is.na(fTable$mobility)))
+    if (!hasMob)
         fTable[, mobility := -100] # some random value so mobilities will not influence grouping
-    else if (any(is.na(fTable$mobility)))
+    else
     {
-        unreasonableMob <- max(fTable$mobility, na.rm = TRUE) + (10 * IMSWindow)
         fTable[, mobility_orig := mobility] # we need the original data later
-        fTable[is.na(mobility), mobility := unreasonableMob]
+        
+        if (any(is.na(fTable$mobility)))
+        {
+            unreasonableMob <- if (all(is.na(fTable$mobility)))
+                -100
+            else
+                max(fTable$mobility, na.rm = TRUE) + (10 * IMSWindow)
+            
+            fTable[is.na(mobility), mobility := unreasonableMob]
+        }
     }
 
     if (useCPP)

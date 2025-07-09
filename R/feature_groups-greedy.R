@@ -61,6 +61,7 @@ calcGroupScore <- function(fTableGrp, curAna, rtWindow, mzWindow, IMSWindow)
 #' @export
 groupFeaturesGreedy <- function(features, rtalign = FALSE, rtWindow = defaultLim("retention", "medium"),
                                 mzWindow = defaultLim("mz", "medium"), IMSWindow = defaultLim("mobility", "medium"),
+                                scoreWeights = c(retention = 1, mz = 1, mobility = 1, size = 1),
                                 verbose = TRUE, useCPP = TRUE)
 {
     # UNDONE: remove useCPP and R code
@@ -69,6 +70,8 @@ groupFeaturesGreedy <- function(features, rtalign = FALSE, rtWindow = defaultLim
     checkmate::assertFlag(rtalign, add = ac)
     aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow + IMSWindow, lower = 0, finite = TRUE,
            fixed = list(add = ac))
+    checkmate::assertNumeric(scoreWeights, len = 4, lower = 0, finite = TRUE, any.missing = FALSE, add = ac)
+    assertHasNames(scoreWeights, c("retention", "mz", "mobility", "size"), add = ac)
     checkmate::assertFlag(verbose, add = ac)
     checkmate::reportAssertions(ac)
     
@@ -129,7 +132,10 @@ groupFeaturesGreedy <- function(features, rtalign = FALSE, rtWindow = defaultLim
     
     # HACK: add dummy mobilities so grouping code can handle features without mobilities
     if (!hasMob)
+    {
         fTable[, mobility := -100] # some random value so mobilities will not influence grouping
+        scoreWeights["mobility"] <- 0 # do not use mobility in scoring
+    }
     else
     {
         fTable[, mobility_orig := mobility] # we need the original data later
@@ -148,7 +154,7 @@ groupFeaturesGreedy <- function(features, rtalign = FALSE, rtWindow = defaultLim
     if (useCPP)
     {
         fTable[, groupID := getGroupIDs(ret, mz, mobility, intensity, match(analysis, anaInfo$analysis), rtWindow,
-                                        mzWindow, IMSWindow, verbose)]
+                                        mzWindow, IMSWindow, scoreWeights, verbose)]
         curGroup <- max(fTable$groupID) + 1L
     }
     else

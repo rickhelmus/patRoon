@@ -112,6 +112,9 @@ setGeneric("groupFeaturesXCMS3", function(feat, ...) standardGeneric("groupFeatu
 #' @rdname groupFeaturesKPIC2
 setGeneric("groupFeaturesKPIC2", function(feat, ...) standardGeneric("groupFeaturesKPIC2"))
 
+#' @rdname groupFeaturesGreedy
+setGeneric("groupFeaturesGreedy", function(feat, ...) standardGeneric("groupFeaturesGreedy"))
+
 #' @rdname check-GUI
 setGeneric("checkFeatures", function(fGroups, session = "checked-features.yml", EICParams = getDefEICParams(),
                                      EIMParams = getDefEIMParams(),

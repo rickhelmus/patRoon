@@ -59,10 +59,12 @@ calcGroupScore <- function(fTableGrp, curAna, rtWindow, mzWindow, IMSWindow)
 }
 
 #' @export
-groupFeaturesGreedy <- function(features, rtalign = FALSE, rtWindow = defaultLim("retention", "medium"),
-                                mzWindow = defaultLim("mz", "medium"), IMSWindow = defaultLim("mobility", "medium"),
-                                scoreWeights = c(retention = 1, mz = 1, mobility = 1, size = 1),
-                                verbose = TRUE, useCPP = TRUE)
+setMethod("groupFeaturesGreedy", "features", function(feat, rtalign = FALSE,
+                                                      rtWindow = defaultLim("retention", "medium"),
+                                                      mzWindow = defaultLim("mz", "medium"),
+                                                      IMSWindow = defaultLim("mobility", "medium"),
+                                                      scoreWeights = c(retention = 1, mz = 1, mobility = 1, size = 1),
+                                                      verbose = TRUE, useCPP = TRUE)
 {
     # UNDONE: remove useCPP and R code
     
@@ -78,16 +80,16 @@ groupFeaturesGreedy <- function(features, rtalign = FALSE, rtWindow = defaultLim
     if (rtalign)
         stop("Retention time alignment (rtalign=TRUE) is not yet supported for greedy grouping!", call. = FALSE)
     
-    hash <- makeHash(features, rtWindow, mzWindow, IMSWindow)
+    hash <- makeHash(feat, rtWindow, mzWindow, IMSWindow)
     cd <- loadCacheData("groupFeaturesGreedy", hash)
     if (!is.null(cd))
         return(cd)
     
-    anaInfo <- analysisInfo(features)
-    hasMob <- hasMobilities(features)
+    anaInfo <- analysisInfo(feat)
+    hasMob <- hasMobilities(feat)
     sqeps <- sqrt(.Machine$double.eps) # cache for numLTE below
     
-    fTable <- as.data.table(features)
+    fTable <- as.data.table(feat)
     fTable[, groupID := NA_integer_]
     fTable[, anaRow := seq_len(.N), by = "analysis"]
     fTable[, row := seq_len(.N)]
@@ -229,17 +231,17 @@ groupFeaturesGreedy <- function(features, rtalign = FALSE, rtWindow = defaultLim
     
     if (hasMob && any(!is.na(fTable$ims_parent_ID)))
     {
-        fTableNoIMSPar <- lapply(featureTable(features), function(ft)
+        fTableNoIMSPar <- lapply(featureTable(feat), function(ft)
         {
             ft <- copy(ft)
             ft[, ims_parent_ID := NA_character_]
             return(ft)
         })
-        featureTable(features) <- fTableNoIMSPar
+        featureTable(feat) <- fTableNoIMSPar
         warning("Any links between IMS parents and mobility features are removed!", call. = FALSE)
     }
     
-    ret <- featureGroupsGreedy(groups = gTable, groupInfo = gInfo, features = features, ftindex = ftindex)
+    ret <- featureGroupsGreedy(groups = gTable, groupInfo = gInfo, features = feat, ftindex = ftindex)
     saveCacheData("groupFeaturesGreedy", ret, hash)
     return(ret)
-}
+})

@@ -1588,21 +1588,21 @@ setMethod("getBPCs", "featureGroups", function(obj, retentionRange = NULL, MSLev
 #' @templateVar what group features
 #' @templateVar ex1 groupFeaturesOpenMS
 #' @templateVar ex2 groupFeaturesXCMS3
-#' @templateVar algos openms,xcms,xcms3,kpic2
-#' @templateVar algosSuffix OpenMS,XCMS,XCMS3,KPIC2,SIRIUS
+#' @templateVar algosSuffix OpenMS,XCMS,XCMS3,KPIC2,Greedy,SIRIUS
 #' @templateVar noParam TRUE
 #' @templateVar ret featureGroups
 #' @template generic-algo
-#' 
+#'
 #' @param algorithm A \code{character} that specifies the algorithm to be used: either \code{"openms"}, \code{"xcms"},
-#'   \code{"xcms3"} or \code{"kpic2"} (\code{features method}), or \code{"sirius"} (\code{data.frame} method).
+#'   \code{"xcms3"}, \code{"kpic2"} or \code{"greedy"} (\code{features} method), or \code{"sirius"} (\code{data.frame}
+#'   method).
 #' @param obj Either a \code{\link{features}} object to be grouped, or a \code{data.frame} with
 #'   \link[=analysis-information]{analysis info} to be passed to \code{groupFeaturesSIRIUS}
 #' @param \dots Further parameters passed to the selected grouping algorithm.
 #' @param verbose if \code{FALSE} then no text output will be shown.
-#'  
+#'
 #' @return An object of a class which is derived from \code{\link{featureGroups}}.
-#' 
+#'
 #' @templateVar what groupFeatures
 #' @templateVar cl features
 #' @template main-rd-method
@@ -1618,7 +1618,8 @@ setMethod("groupFeatures", "features", function(obj, algorithm, ..., verbose = T
                 openms = groupFeaturesOpenMS,
                 xcms = groupFeaturesXCMS,
                 xcms3 = groupFeaturesXCMS3,
-                kpic2 = groupFeaturesKPIC2)
+                kpic2 = groupFeaturesKPIC2,
+                greedy = groupFeaturesGreedy)
 
     f(obj, ..., verbose = verbose)
 })

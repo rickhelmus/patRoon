@@ -227,6 +227,7 @@ Collate:
     'feature_groups-comparison.R'
     'feature_groups-envimass.R'
     'feature_groups-filter.R'
+    'feature_groups-greedy.R'
     'feature_groups-ims.R'
     'feature_groups-kpic2.R'
     'feature_groups-openms.R'

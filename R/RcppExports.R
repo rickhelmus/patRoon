@@ -9,8 +9,8 @@ writeChromsToMzML <- function(EICs, fillEICs, IDs, out) {
     invisible(.Call(`_patRoon_writeChromsToMzML`, EICs, fillEICs, IDs, out))
 }
 
-getGroupIDs <- function(featRTs, featMZs, featMobs, ints, anaIDs, rtWindow, mzWindow, mobWindow, verbose) {
-    .Call(`_patRoon_getGroupIDs`, featRTs, featMZs, featMobs, ints, anaIDs, rtWindow, mzWindow, mobWindow, verbose)
+getGroupIDs <- function(featRTs, featMZs, featMobs, ints, anaIDs, rtWindow, mzWindow, mobWindow, weightsList, verbose) {
+    .Call(`_patRoon_getGroupIDs`, featRTs, featMZs, featMobs, ints, anaIDs, rtWindow, mzWindow, mobWindow, weightsList, verbose)
 }
 
 initBrukerLibrary <- function(path, force = FALSE) {

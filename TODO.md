@@ -125,10 +125,10 @@
     - split IMSWindow arg for setting mobmin/mobmax? this currently sets very narrow ranges
 - update featAnn consensus?
 - greedy
-    - add in groupFeatures()
     - disable fGroupsIMS
     - set default weights
     - remove size scoring and weight
+    - newProject(): UI, code, tests
 
 
 ## Tests

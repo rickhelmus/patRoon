@@ -194,7 +194,7 @@ groupPseudoFeatures <- function(pf, groupAlgo, groupArgs)
 #'
 #' @param groupAlgo The \code{\link[=groupFeatures]{feature grouping
 #'   algorithm}} that should be used for grouping \emph{pseudo} features (see
-#'   details). Valid values are: \code{"xcms"}, \code{xcms3}, \code{kpic2} or \code{"openms"}.
+#'   details). Valid values are: \code{"xcms"}, \code{xcms3}, \code{kpic2}, \code{"openms"} or \code{"greedy"}.
 #' @param groupArgs A \code{list} containing further parameters for
 #'   \code{\link[=groupFeatures]{feature grouping}}.
 #' @param x,obj The \code{featureGroupsComparison} object.

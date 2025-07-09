@@ -572,8 +572,8 @@ setMethod("plotBPCs", "features", function(obj, retentionRange = NULL, MSLevel =
 #' @templateVar what find features
 #' @templateVar ex1 findFeaturesOpenMS
 #' @templateVar ex2 findFeaturesXCMS
-#' @templateVar algos bruker,openms,xcms,xcms3,envipick,sirius,kpic2,safd,eics
-#' @templateVar algosSuffix Bruker,OpenMS,XCMS,XCMS3,EnviPick,SIRIUS,KPIC2,SAFD,EICs
+#' @templateVar algos bruker,openms,xcms,xcms3,envipick,sirius,kpic2,safd,piek
+#' @templateVar algosSuffix Bruker,OpenMS,XCMS,XCMS3,EnviPick,SIRIUS,KPIC2,SAFD,Piek
 #' @templateVar ret features
 #' @template generic-algo
 #'

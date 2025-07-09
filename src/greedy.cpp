@@ -195,7 +195,7 @@ std::vector<int> checkTentativeGroup(const std::vector<Feature> &tentativeGroup,
 Rcpp::IntegerVector getGroupIDs(const Rcpp::NumericVector &featRTs, const Rcpp::NumericVector  &featMZs,
                                 const Rcpp::NumericVector &featMobs, const Rcpp::NumericVector &ints,
                                 const Rcpp::IntegerVector &anaIDs, double rtWindow, double mzWindow,
-                                double mobWindow, const Rcpp::List &weightsList, bool verbose)
+                                double mobWindow, const Rcpp::List &weightsList)
 {
     const ScoreWeights weights(weightsList["retention"], weightsList["mz"], weightsList["mobility"], weightsList["size"]);
     Rcpp::IntegerVector ret(featRTs.size(), -1);
@@ -203,14 +203,8 @@ Rcpp::IntegerVector getGroupIDs(const Rcpp::NumericVector &featRTs, const Rcpp::
     const auto intSortedInds = getSortedInds(ints, true);
     const auto mzSortedInds = getSortedInds(featMZs);
     
-    if (verbose)
-        Rcpp::Rcout << "Grouping " << featRTs.size() << " features...\n";
-    
     for (size_t i=0; i<intSortedInds.size(); ++i)
     {
-        if (verbose && i > 0 && (i % 5000) == 0)
-            Rcpp::Rcout << "Processed " << i << " features...\n";
-        
         const auto refInd = intSortedInds[i];
         
         if (ret[refInd] != -1)
@@ -248,9 +242,6 @@ Rcpp::IntegerVector getGroupIDs(const Rcpp::NumericVector &featRTs, const Rcpp::
         
         ++curGroup;
     }
-    
-    if (verbose)
-        Rcpp::Rcout << "Done!\n";
     
     return ret;
 }

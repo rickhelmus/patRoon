@@ -151,10 +151,13 @@ groupFeaturesGreedy <- function(features, rtalign = FALSE, rtWindow = defaultLim
         }
     }
 
+    if (verbose)
+        printf("Grouping %d features... ", nrow(fTable))
+    
     if (useCPP)
     {
         fTable[, groupID := getGroupIDs(ret, mz, mobility, intensity, match(analysis, anaInfo$analysis), rtWindow,
-                                        mzWindow, IMSWindow, scoreWeights, verbose)]
+                                        mzWindow, IMSWindow, scoreWeights)]
         curGroup <- max(fTable$groupID) + 1L
     }
     else
@@ -187,6 +190,9 @@ groupFeaturesGreedy <- function(features, rtalign = FALSE, rtWindow = defaultLim
     
     # some duplicate features in a single analysis may be unassigned --> fix here
     fTable[is.na(groupID) | groupID < 0, groupID := seq_len(.N) + curGroup]
+    
+    if (verbose)
+        printf("Done! Found %d groups.\n", max(fTable$groupID))
     
     gInfo <- fTable[, .(ret = mean(ret), mz = mean(mz)), by = "groupID"]
     if (hasMob)

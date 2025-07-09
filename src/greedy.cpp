@@ -1,25 +1,34 @@
 #include <Rcpp.h>
 
 #include <cmath>
+#include <set>
 
 #include "utils.h"
 
 namespace{
-
-struct Feature
-{
-    double ret, mz, mob;
-    int anaID;
-    size_t featID;
-    Feature(void) = default;
-    Feature(double rt, double mzVal, double mobVal, int ana, size_t id) : ret(rt), mz(mzVal), mob(mobVal), anaID(ana), featID(id) { }
-};
 
 struct FeatureDim
 {
     double ret, mz, mob;
     FeatureDim(void) = default;
     FeatureDim(double r, double m, double mb) : ret(r), mz(m), mob(mb) { }
+};
+
+struct Feature
+{
+    FeatureDim dims;
+    int anaID;
+    size_t featID;
+    Feature(void) = default;
+    Feature(double r, double m, double mb, int ana, size_t id) : dims(r, m, mb), anaID(ana), featID(id) { }
+};
+
+struct ScoreWeights
+{
+    FeatureDim dims;
+    double size;
+    ScoreWeights(void) = default;
+    ScoreWeights(double r, double m, double mb, double sz) : dims(r, m, mb), size(sz) { }
 };
 
 FeatureDim getFeatureDim(const std::vector<Feature> &group)
@@ -30,16 +39,16 @@ FeatureDim getFeatureDim(const std::vector<Feature> &group)
     {
         if (init)
         {
-            minRT = maxRT = feat.ret;
-            minMZ = maxMZ = feat.mz;
-            minMob = maxMob = feat.mob;
+            minRT = maxRT = feat.dims.ret;
+            minMZ = maxMZ = feat.dims.mz;
+            minMob = maxMob = feat.dims.mob;
             init = false;
         }
         else
         {
-            minRT = std::min(minRT, feat.ret); maxRT = std::max(maxRT, feat.ret);
-            minMZ = std::min(minMZ, feat.mz); maxMZ = std::max(maxMZ, feat.mz);
-            minMob = std::min(minMob, feat.mob); maxMob = std::max(maxMob, feat.mob);
+            minRT = std::min(minRT, feat.dims.ret); maxRT = std::max(maxRT, feat.dims.ret);
+            minMZ = std::min(minMZ, feat.dims.mz); maxMZ = std::max(maxMZ, feat.dims.mz);
+            minMob = std::min(minMob, feat.dims.mob); maxMob = std::max(maxMob, feat.dims.mob);
         }
     }
     return FeatureDim{(maxRT - minRT), (maxMZ - minMZ), (maxMob - minMob)};
@@ -48,9 +57,9 @@ FeatureDim getFeatureDim(const std::vector<Feature> &group)
 double calcFeatureDist(const Feature &feat1, const Feature &feat2, double rtWindow, double mzWindow, double mobWindow)
 {
     // calculate distance between two features
-    const double retDiff = std::abs(feat1.ret - feat2.ret);
-    const double mzDiff = std::abs(feat1.mz - feat2.mz);
-    const double mobDiff = std::abs(feat1.mob - feat2.mob);
+    const double retDiff = std::abs(feat1.dims.ret - feat2.dims.ret);
+    const double mzDiff = std::abs(feat1.dims.mz - feat2.dims.mz);
+    const double mobDiff = std::abs(feat1.dims.mob - feat2.dims.mob);
     
     return std::sqrt(std::pow(retDiff / rtWindow, 2.0) +
                      std::pow(mzDiff / mzWindow, 2.0) +

@@ -38,7 +38,7 @@ verifyFileForFormat <- function(path, format)
             return(TRUE)
         if (format == "agilent_ims" && file.exists(file.path(path, "AcqData")))
             return(TRUE) # UNDONE: more checks?
-        if (format == "bruker" && file.exists(file.path(path, "analysis.baf")))
+        if (format == "bruker" && (file.exists(file.path(path, "analysis.baf")) || file.exists(file.path(path, "analysis.tsf"))))
             return(TRUE)
         if (format == "bruker_ims" && file.exists(file.path(path, "analysis.tdf")))
             return(TRUE)

@@ -337,7 +337,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
     withIMS <- !is.null(genEICParams[["methodIMS"]])
     
     cacheDB <- openCacheDBScope()
-    baseHash <- makeHash(genEICParams, peakParams, minIntensityIMS)
+    baseHash <- makeHash(genEICParams, peakParams, suspects, adduct, minIntensityIMS)
     anaHashes <- getMSFileHashesFromAvailBackend(analysisInfo, needIMS = withIMS)
     anaHashes <- sapply(anaHashes, makeHash, baseHash)
     cachedData <- pruneList(loadCacheData("featuresPiek", anaHashes, simplify = FALSE, dbArg = cacheDB))

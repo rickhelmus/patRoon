@@ -807,7 +807,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
             
             const auto allPeaksSortedInd = (ended) ? 0 : (startInd + sortedInds[j]);
             const auto scanInd = allPeaksSorted.indices[allPeaksSortedInd];
-            //Rcpp::Rcout << "EIC: " << j << "/" << sortedInds.size() << "/" << scanInd << "/" << curScanInd << "/" << init << "/" << ended << "/" << time << "/" << startInd << "/" << endInd << "\n";
+            // Rcpp::Rcout << "EIC: " << j << "/" << sortedInds.size() << "/" << specMeta.first.scans[curScanInd] << "/" << curScanInd << "/" << init << "/" << ended << "/" << time << "/" << startInd << "/" << endInd << "\n";
             
             if (ended || (!init && scanInd != curScanInd))
             {
@@ -830,8 +830,14 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                 
                 if ((!enoughTimeAboveThr && minEICAdjTime > 0.0) || (!enoughPointsAboveThr && minEICAdjPoints > 0))
                 {
+                    if (prvScanInd != (curScanInd - 1))
+                    {
+                        // Rcpp::Rcout << "Stop! EIC: " << i << "/" << j << "/" << specMeta.first.scans[curScanInd] << "/" << curTime << "/" << curPoint.intensity << "/" << minEICAdjPoints << "/" << adjPointsAboveThr << "\n";
+                        startTimeAboveThr = 0.0;
+                        adjPointsAboveThr = 0;   
+                    }
+                    
                     if (prvScanInd != allPeaksSorted.indices.size() &&
-                        prvScanInd == (curScanInd - 1) &&
                         numberGTE(curPoint.intensity, minEICAdjIntensity))
                     {
                         if (minEICAdjTime > 0.0)
@@ -844,14 +850,10 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                         if (minEICAdjPoints > 0)
                         {
                             ++adjPointsAboveThr;
+                            // Rcpp::Rcout << "above: EIC: " << i << "/" << j << "/" << specMeta.first.scans[curScanInd] << "/" << curTime << "/" << curPoint.intensity << "/" << minEICAdjPoints << "/" << adjPointsAboveThr << "\n";
                             if (adjPointsAboveThr >= minEICAdjPoints)
                                 enoughPointsAboveThr = true;
                         }
-                    }
-                    else
-                    {
-                        startTimeAboveThr = 0.0;
-                        adjPointsAboveThr = 0;   
                     }
                 }
                 

@@ -123,7 +123,12 @@ double calcGroupScore(const std::vector<Feature> &tentativeGroup, const Feature 
         }
         
         if (closestDist != -1.0)
+        {
             otherFeatures.push_back(closestFeat);
+            totRTDev += std::abs(anaFeat.dims.ret - closestFeat.dims.ret) / rtWindow;
+            totMZDev += std::abs(anaFeat.dims.mz - closestFeat.dims.mz) / mzWindow;
+            totMobDev += std::abs(anaFeat.dims.mob - closestFeat.dims.mob) / mobWindow;
+        }
     }
     
     // don't consider size==1 groups: these are undesired and if the feature stays unassigned, it will be put in a
@@ -131,10 +136,10 @@ double calcGroupScore(const std::vector<Feature> &tentativeGroup, const Feature 
     if (otherFeatures.size() <= 1)
         return -1.0;
     
-    FeatureDim dim = getFeatureDim(otherFeatures);
-    const double retScore = 1.0 - (dim.ret / (rtWindow * 2.0));
-    const double mzScore = 1.0 - (dim.mz / (mzWindow * 2.0));
-    const double mobScore = 1.0 - (dim.mob / (mobWindow * 2.0));
+    const double dblSize = static_cast<double>(otherFeatures.size());
+    const double retScore = 1.0 - (totRTDev / dblSize);
+    const double mzScore = 1.0 - (totMZDev / dblSize);
+    const double mobScore = 1.0 - (totMobDev / dblSize);
     
     // max size corresponds to number of analyses
     // UNDONE: this is not used as no group members can be removed, see above

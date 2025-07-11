@@ -819,6 +819,23 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// findFeatSuspTableDups
+Rcpp::LogicalVector findFeatSuspTableDups(const Rcpp::NumericVector& rts, const Rcpp::NumericVector& mzs, const Rcpp::NumericVector& mobs, const Rcpp::NumericVector& ints, double tolRT, double tolMZ, double tolMob);
+RcppExport SEXP _patRoon_findFeatSuspTableDups(SEXP rtsSEXP, SEXP mzsSEXP, SEXP mobsSEXP, SEXP intsSEXP, SEXP tolRTSEXP, SEXP tolMZSEXP, SEXP tolMobSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type rts(rtsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type mzs(mzsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type mobs(mobsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type ints(intsSEXP);
+    Rcpp::traits::input_parameter< double >::type tolRT(tolRTSEXP);
+    Rcpp::traits::input_parameter< double >::type tolMZ(tolMZSEXP);
+    Rcpp::traits::input_parameter< double >::type tolMob(tolMobSEXP);
+    rcpp_result_gen = Rcpp::wrap(findFeatSuspTableDups(rts, mzs, mobs, ints, tolRT, tolMZ, tolMob));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 // validate (ensure exported C++ functions exist before calling them)
 static int _patRoon_RcppExport_validate(const char* sig) { 
@@ -893,6 +910,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_loadAgilentIMSCalibration", (DL_FUNC) &_patRoon_loadAgilentIMSCalibration, 1},
     {"_patRoon_getOMPMaxNumThreads", (DL_FUNC) &_patRoon_getOMPMaxNumThreads, 0},
     {"_patRoon_setOMPNumThreads", (DL_FUNC) &_patRoon_setOMPNumThreads, 1},
+    {"_patRoon_findFeatSuspTableDups", (DL_FUNC) &_patRoon_findFeatSuspTableDups, 7},
     {"_rcpp_module_boot_MSReadBackend", (DL_FUNC) &_rcpp_module_boot_MSReadBackend, 0},
     {"_patRoon_RcppExport_registerCCallable", (DL_FUNC) &_patRoon_RcppExport_registerCCallable, 0},
     {NULL, NULL, 0}

@@ -277,12 +277,8 @@ filterEIXs <- function(EIXs, fGroups, analysis = NULL, groupName = NULL, topMost
     if (onlyPresent)
     {
         gTable <- groupTable(fGroups)
-        EIXs <- Map(names(EIXs), EIXs, f = function(ana, aeix)
-        {
-            anaInd <- match(ana, analyses(fGroups))
-            absentFGs <- names(gTable)[gTable[anaInd] == 0]
-            return(subListAttr(aeix, !names(aeix) %chin% absentFGs))
-        })
+        fTable <- featureTable(fGroups)
+        EIXs <- Map(names(EIXs), EIXs, f = \(ana, aeix) subListAttr(aeix, names(aeix) %chin% fTable[[ana]]$group))
     }
     
     if (!is.null(topMost))

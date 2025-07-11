@@ -124,3 +124,48 @@ void setOMPNumThreads(int n)
     omp_set_num_threads(n);
 #endif
 }
+
+// [[Rcpp::export]]
+Rcpp::LogicalVector findFeatSuspTableDups(const Rcpp::NumericVector &rts, const Rcpp::NumericVector &mzs,
+                                          const Rcpp::NumericVector &mobs, const Rcpp::NumericVector &ints,
+                                          double tolRT, double tolMZ, double tolMob)
+{
+    // NOTE: rts, mobs and ints are optional
+    
+    Rcpp::LogicalVector ret(mzs.size(), false);
+    const bool hasRT = rts.size() > 0, hasMobs = mobs.size() > 0, hasInts = ints.size() > 0;
+    
+    if (mzs.size() < 2)
+        return ret; // no duplicates possible
+    
+    for (size_t i = 0; i<mzs.size()-1; ++i)
+    {
+        std::vector<size_t> dups;
+        for (size_t j=i+1; j<mzs.size(); ++j)
+        {
+            if (ret[j]) // already marked as duplicate
+                continue;
+            
+            if (!numberLTE(std::abs(mzs[i] - mzs[j]), tolMZ))
+                continue;
+            if (hasRT && (Rcpp::NumericVector::is_na(rts[i]) || Rcpp::NumericVector::is_na(rts[j]) ||
+                !numberLTE(std::abs(rts[i] - rts[j]), tolRT)))
+                continue;
+            if (hasMobs && !numberLTE(std::abs(mobs[i] - mobs[j]), tolMob))
+                continue;
+            
+            if (hasInts)
+            {
+                // ensure top most intense stays
+                const bool meHighest = ints[i] >= ints[j];
+                ret[i] = !meHighest;
+                ret[j] = meHighest;
+            }
+            else
+                ret[j] = true; // just keep first
+        }
+    }
+    
+    return ret;
+}
+

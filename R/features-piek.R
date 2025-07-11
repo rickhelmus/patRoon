@@ -1,49 +1,6 @@
 #' @include features.R
 NULL
 
-removeDuplicateFeatsSusps <- function(tab, checkRet, selectTopIntens, nameCol)
-{
-    # marks duplicates in feature or suspect table, and keeps the feature with the highest intensity
-
-    if (nrow(tab) <= 1)
-        return(tab)
-
-    isSame <- function(x, y)
-    {
-        yes <- numLTE(abs(x$mz - y$mz), defaultLim("mz", "very_narrow"))
-        if (checkRet)
-            yes <- yes & ((is.na(x$ret) & is.na(y$ret)) | numLTE(abs(x$ret - y$ret), defaultLim("retention", "very_narrow")))
-        if (!is.null(x[["mobility"]]))
-            yes <- yes & numLTE(abs(x$mobility - y$mobility), defaultLim("mobility", "very_narrow"))
-        return(yes)
-    }
-    
-    tab <- copy(tab)
-    tab[, duplicate := FALSE]
-    for (r in seq_len(nrow(tab) - 1))
-    {
-        if (tab$duplicate[r])
-            next
-        rTab <- tab[r]
-        nextTab <- tab[seq(r + 1, nrow(tab))]
-        nextTab <- nextTab[duplicate == FALSE & isSame(rTab, nextTab)]
-        if (nrow(nextTab) > 0)
-        {
-            if (selectTopIntens)
-            {
-                maxInt <- max(rTab$intensity, nextTab$intensity)
-                tab[get(nameCol) %chin% c(rTab[[nameCol]], nextTab[[nameCol]]), duplicate := !numEQ(intensity, maxInt)]
-            }
-            else
-            {
-                # otherwise just keep current and mark all from next rows
-                tab[get(nameCol) %chin% nextTab[[nameCol]], duplicate := TRUE]
-            }
-        }
-    }
-    return(tab[duplicate == FALSE][, duplicate := NULL])
-}
-
 getPiekEICsInfo <- function(params, suspects, withIMS, MS2Info)
 {
     EICInfo <- NULL
@@ -324,7 +281,11 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
                                        checkDesc = TRUE, prefCalcChemProps = genEICParams$prefCalcChemProps,
                                        neutralChemProps = genEICParams$neutralChemProps)
         suspectsOrig <- suspects
-        suspects <- removeDuplicateFeatsSusps(suspects, FALSE, FALSE, "name")
+        dups <- findFeatSuspTableDups(numeric(), peaks$mz,
+                                      if (!is.null(suspects[["mobility"]])) suspects$mobility else numeric(),
+                                      numeric(), defaultLim("retention", "very_narrow"),
+                                      defaultLim("mz", "very_narrow"), defaultLim("mobility", "very_narrow"))
+        suspects <- suspects[!dups]
         suspects <- suspects[order(mz)]
         suspsRM <- setdiff(suspectsOrig$name, suspects$name)
         maybePrintf("The following %d non-unique suspects were removed %s.\n", length(suspsRM),
@@ -437,8 +398,14 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
                     susp <- suspectsOrig[numLTE(abs(mz - omz), genEICParams$mzWindow) &
                                              numLTE(abs(rt - ort), genEICParams$rtWindow),
                                          env = list(omz = mz, ort = ret)]
-                    if (identical(genEICParams[["methodIMS"]], "ms2") && !is.null(suspects[["mobility"]]))
+                    if (identical(genEICParams[["methodIMS"]], "suspects") && !is.null(suspects[["mobility"]]))
                         susp <- susp[numLTE(abs(mobility - omob), genEICParams$IMSWindow), env = list(omob = mobility)]
+                    if (nrow(susp) > 1)
+                    {
+                        warning(sprintf("Found multiple suspects (%s) for peak %s in analysis %s. ",
+                                        paste0(susp$name, collapse = ", "), peaks$ID[.I], ana),
+                                "You may want to consider lowering tolerances.", call. = FALSE)
+                    }
                     nrow(susp) > 0
                 }, by = .I]
                 peaks <- peaks[keep == TRUE]
@@ -456,7 +423,11 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
                 peaks <- peaks[keep == TRUE]
             }
             
-            peaks <- removeDuplicateFeatsSusps(peaks, TRUE, TRUE, "ID")
+            dups <- findFeatSuspTableDups(peaks$ret, peaks$mz, if (withIMS) peaks$mobility else numeric(),
+                                          peaks$intensity, defaultLim("retention", "very_narrow"),
+                                          defaultLim("mz", "very_narrow"), defaultLim("mobility", "very_narrow"))
+            
+            peaks <- peaks[!dups]
             peaks <- removeDTColumnsIfPresent(peaks, c("binMZStart", "binMobStart", "keep"))
 
             maybePrintf("%d peaks remain after filtering.\n", nrow(peaks))            

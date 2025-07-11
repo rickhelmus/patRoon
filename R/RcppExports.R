@@ -201,6 +201,10 @@ setOMPNumThreads <- function(n) {
     invisible(.Call(`_patRoon_setOMPNumThreads`, n))
 }
 
+findFeatSuspTableDups <- function(rts, mzs, mobs, ints, tolRT, tolMZ, tolMob) {
+    .Call(`_patRoon_findFeatSuspTableDups`, rts, mzs, mobs, ints, tolRT, tolMZ, tolMob)
+}
+
 # Register entry points for exported C++ functions
 methods::setLoadAction(function(ns) {
     .Call(`_patRoon_RcppExport_registerCCallable`)

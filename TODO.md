@@ -30,6 +30,8 @@
 - FIX: IMSRangeParams: in sets workflows, the mz column is taken so relative filtering is done to neutralMasses
     - maybe add _mz rel column like compounds?
     - actually, the same is the case for the mz filter (also IMS and mz for features) --> maybe just document difference? the actual results will not change much in general
+- report: delta RT is now in seconds --> convert to minutes
+
 
 ## Maybe
 
@@ -122,7 +124,8 @@
         - current defaults way to strict for patRoonData neg samples (for filtering of EICs _and_ peaks)
     - mob range: doc that defaults are for TIMS? Or just not give any defaults? Give instrument? Put it in limits?
     - support mobility expansion for suspect lists and adduct selection
-    - split IMSWindow arg for setting mobmin/mobmax? this currently sets very narrow ranges
+    - split IMSWindow arg for setting mobmin/mobmax? this currently sets very narrow ranges. Same for mz and ms2
+    - somehow better handle overlapping EICs for suspects? Ie for isobaric compounds, with m/z differences > very_narrow
 - update featAnn consensus?
 - greedy
     - disable fGroupsIMS

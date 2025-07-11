@@ -281,7 +281,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
                                        checkDesc = TRUE, prefCalcChemProps = genEICParams$prefCalcChemProps,
                                        neutralChemProps = genEICParams$neutralChemProps)
         suspectsOrig <- suspects
-        dups <- findFeatSuspTableDups(numeric(), peaks$mz,
+        dups <- findFeatSuspTableDups(numeric(), suspects$mz,
                                       if (!is.null(suspects[["mobility"]])) suspects$mobility else numeric(),
                                       numeric(), defaultLim("retention", "very_narrow"),
                                       defaultLim("mz", "very_narrow"), defaultLim("mobility", "very_narrow"))

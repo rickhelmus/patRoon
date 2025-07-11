@@ -132,6 +132,7 @@
     - set default weights
     - remove size scoring and weight
     - newProject(): UI, code, tests
+- tweak default EIMParams: clustering width should be much smaller (~0.01) --> sortof smooths data, mzExpIMSWindow can be reduced too?
 
 
 ## Tests

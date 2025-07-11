@@ -86,11 +86,18 @@ double calcGroupScore(const std::vector<Feature> &tentativeGroup, const Feature 
     std::vector<Feature> otherFeatures; // all features from other analyses, and only closest if >1 in analysis
     otherFeatures.push_back(anaFeat); // add the feature itself to the group
     
+    std::set<int> visitedAnas;
+    visitedAnas.insert(anaFeat.anaID);
+    
+    double totRTDev = 0.0, totMZDev = 0.0, totMobDev = 0.0;
+    
     for (const auto &feat : tentativeGroup)
     {
-        if (feat.anaID == anaFeat.anaID)
+        if (visitedAnas.find(feat.anaID) != visitedAnas.end())
             continue;
 
+        visitedAnas.insert(feat.anaID);
+        
         // take the best if there are more features in this analysis
         double closestDist = -1.0;
         Feature closestFeat = feat;
@@ -162,10 +169,14 @@ std::vector<int> checkTentativeGroup(const std::vector<Feature> &tentativeGroup,
     if (tentativeGroup.empty())
         return ret;
     
-    std::set<int> allAnaIDs;
+    // NOTE: use a vector to keep the order the same
+    std::vector<int> allAnaIDs;
     for (const auto &feat : tentativeGroup)
-        allAnaIDs.insert(feat.anaID);
-
+    {
+        if (std::find(allAnaIDs.begin(), allAnaIDs.end(), feat.anaID) == allAnaIDs.end())
+            allAnaIDs.push_back(feat.anaID);
+    }
+    
     for (int anaID : allAnaIDs)
     {
         double highestScore = -1.0;
@@ -234,6 +245,9 @@ Rcpp::IntegerVector getGroupIDs(const Rcpp::NumericVector &featRTs, const Rcpp::
             tentativeGroup.emplace_back(featRTs[groupInd], featMZs[groupInd], featMobs[groupInd], anaIDs[groupInd],
                                         groupInd);
         }
+        
+        std::sort(tentativeGroup.begin(), tentativeGroup.end(),
+            [&ints](const Feature &a, const Feature &b) { return ints[a.featID] > ints[b.featID]; });
         
         const auto groupIDs = checkTentativeGroup(tentativeGroup, rtWindow, mzWindow, mobWindow, weights);
         

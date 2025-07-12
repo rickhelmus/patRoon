@@ -9,6 +9,9 @@ featureGroupsIMS <- setClass("featureGroupsIMS", contains = "featureGroups")
 setMethod("initialize", "featureGroupsIMS",
           function(.Object, groupAlgo, ...) callNextMethod(.Object, algorithm = paste0("ims-", groupAlgo), ...))
 
+# UNDONE: this was an attempt to use classical grouping algorithms with IMS features. It first clusters all features by
+# mobility and then does the grouping and merges the final groups. The problem is that mobility clustering cannot work
+# well with reasonable amounts of features. Maybe fix this someday?
 setMethod("groupFeaturesIMS", "features", function(feat, grouper, groupAlgo, ..., IMSWindow, verbose)
 {
     hash <- makeHash(feat, groupAlgo, list(...), IMSWindow)

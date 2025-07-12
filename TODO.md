@@ -127,7 +127,6 @@
     - somehow better handle overlapping EICs for suspects? Ie for isobaric compounds, with m/z differences > very_narrow
 - update featAnn consensus?
 - greedy
-    - disable fGroupsIMS
     - set default weights
 - tweak default EIMParams: clustering width should be much smaller (~0.01) --> sortof smooths data, mzExpIMSWindow can be reduced too?
 
@@ -185,7 +184,7 @@
     - piek
         - tests with ims data
         - verify removal duplicate suspects/features?
-    - groupFeaturesIMS()
+    - groupFeaturesGreedy()
     - plotChroms(): mob annotation
     - plotMobilograms()
     - XCMS features/fGroups, eg with subsetting & exporting
@@ -255,14 +254,11 @@
         - give some notes about sets workflows?
         - mention that fromSuspects only takes suspects assigned to a single fGroup (also in handbook?)
     - peakParams: refs to paper
-    - IMS grouping
-        - doc how it is done, and with sets too
-        - IMSWindow args
+    - Greedy
         - mention that links are removed for mobility features
         - mention that and why rtalign=FALSE by default
     - feat consensus
         - doc that all feats must have IMS data. For post workflows, IMS subset could be used
-    - "full" option for verbose grouping
     - note that fallbackEIC only works for EIM mob assignments and setting chromPeakParams is mandatory when fromSuspects=TRUE
 
 ## NEWS

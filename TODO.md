@@ -122,7 +122,6 @@
     - tweak default EIC filtering params, more strict for binning?
         - current defaults way to strict for patRoonData neg samples (for filtering of EICs _and_ peaks)
     - mob range: doc that defaults are for TIMS? Or just not give any defaults? Give instrument? Put it in limits?
-    - support mobility expansion for suspect lists and adduct selection
     - split IMSWindow arg for setting mobmin/mobmax? this currently sets very narrow ranges. Same for mz and ms2
     - somehow better handle overlapping EICs for suspects? Ie for isobaric compounds, with m/z differences > very_narrow
 - update featAnn consensus?

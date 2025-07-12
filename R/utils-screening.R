@@ -141,17 +141,17 @@ expandSuspMobilities <- function(suspects)
     if (!hasMob && !hasCCS)
         return(copy(suspects))
 
-    verifyCol <- function(col)
+    verifyCol <- function(col, origCol)
     {
         # NOTE: also allow all NA columns, which are mostly logical by default
         if (!is.numeric(suspects[[col]]) && !is.character(suspects[[col]]) && !all(is.na(suspects[[col]])))
-            stop(sprintf("%s column must be numeric or character (now %s)", col, class(suspects[[col]])), call. = FALSE)
+            stop(sprintf("%s column must be numeric or character (now %s)", origCol, class(suspects[[col]])), call. = FALSE)
     }
     
     if (hasMob)
-        verifyCol("mobility_susp")
+        verifyCol("mobility_susp", "mobility")
     if (hasCCS)
-        verifyCol("CCS_susp")
+        verifyCol("CCS_susp", "CCS")
     
     doSplit <- function(x)
     {

@@ -138,6 +138,20 @@ Rcpp::LogicalVector findFeatSuspTableDups(const Rcpp::NumericVector &rts, const 
     if (mzs.size() < 2)
         return ret; // no duplicates possible
     
+    const auto isSame = [](double a, double b, double tol)
+    {
+        // handling of NAs
+        // both NA: ignore dimension in comparison
+        // one NA: don't compare, skip
+        // both not NA: compare values
+        
+        if (Rcpp::NumericVector::is_na(a) && Rcpp::NumericVector::is_na(b))
+            return true;
+        if (Rcpp::NumericVector::is_na(a) || Rcpp::NumericVector::is_na(b))
+            return false;
+        return numberLTE(std::abs(a - b), tol);
+    };
+    
     for (size_t i = 0; i<mzs.size()-1; ++i)
     {
         std::vector<size_t> dups;
@@ -146,12 +160,11 @@ Rcpp::LogicalVector findFeatSuspTableDups(const Rcpp::NumericVector &rts, const 
             if (ret[j]) // already marked as duplicate
                 continue;
             
-            if (!numberLTE(std::abs(mzs[i] - mzs[j]), tolMZ))
+            if (!isSame(mzs[i], mzs[j], tolMZ))
                 continue;
-            if (hasRT && (Rcpp::NumericVector::is_na(rts[i]) || Rcpp::NumericVector::is_na(rts[j]) ||
-                !numberLTE(std::abs(rts[i] - rts[j]), tolRT)))
+            if (hasRT && !isSame(rts[i], rts[j], tolRT))
                 continue;
-            if (hasMobs && !numberLTE(std::abs(mobs[i] - mobs[j]), tolMob))
+            if (hasMobs && !isSame(mobs[i], mobs[j], tolMob))
                 continue;
             
             if (hasInts)

@@ -3,6 +3,11 @@ getFeatAlgoSelections <- function()
     c("OpenMS", "XCMS", "enviPick", "SIRIUS", "KPIC2", "piek", "Bruker DataAnalysis" = "Bruker")
 }
 
+getFeatGroupAlgoSelections <- function()
+{
+    c("OpenMS", "XCMS", "KPIC2", "SIRIUS", "Greedy")
+}
+
 newProjectFeaturesUI <- function(id)
 {
     ns <- NS(id)
@@ -31,8 +36,8 @@ newProjectFeaturesUI <- function(id)
                         ),
                         fillCol(
                             flex = c(1, NA),
-                            selectInput(ns("fGroupsAlgo"), "Feature grouping algorithm",
-                                        c("OpenMS", "XCMS", "KPIC2", "SIRIUS"), multiple = FALSE, width = "100%"),
+                            selectInput(ns("fGroupsAlgo"), "Feature grouping algorithm", getFeatGroupAlgoSelections(),
+                                        multiple = FALSE, width = "100%"),
                             conditionalPanel(
                                 condition = "input.fGroupsAlgo == \"SIRIUS\"",
                                 ns = ns,
@@ -146,12 +151,19 @@ newProjectFeaturesServer <- function(id, ionization, IMSMode, settings)
             sels <- getFeatAlgoSelections()
             curSel <- input$featAlgo
             if (IMSMode() == "direct")
-            {
                 sels <- sels[sels == "piek"]
-            }
             if (!curSel %in% sels)
                 curSel <- sels[1]
             updateSelectInput(session, "featAlgo", choices = sels, selected = curSel)
+            
+            sels <- getFeatGroupAlgoSelections()
+            curSel <- input$fGroupsAlgo
+            if (IMSMode() == "direct")
+                sels <- sels[sels == "Greedy"]
+            if (!curSel %in% sels)
+                curSel <- sels[1]
+            updateSelectInput(session, "fGroupsAlgo", choices = sels, selected = curSel)
+            
         })
 
         observeEvent(input$suspectListButton, selectSuspList(session, "suspectList"))

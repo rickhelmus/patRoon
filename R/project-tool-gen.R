@@ -456,7 +456,8 @@ genScriptFeaturesBlock <- function(ionization, IMS, settingsFeat, generator)
     }
     
     generator$addComment("Group and align features between analyses")
-    doRTAlign <- settingsFeat$fGroupsAlgo != "SIRIUS" && (ionization != "both" || settingsFeat$fGroupsAlgo == "OpenMS")
+    doRTAlign <- !settingsFeat$fGroupsAlgo %in% c("SIRIUS", "Greedy") &&
+        (ionization != "both" || settingsFeat$fGroupsAlgo == "OpenMS")
     generator$addCall("fGroups", "groupFeatures", list(
         list(value = "fList", condition = settingsFeat$fGroupsAlgo != "SIRIUS"),
         list(value = "anaInfo", condition = settingsFeat$fGroupsAlgo == "SIRIUS"),
@@ -464,7 +465,8 @@ genScriptFeaturesBlock <- function(ionization, IMS, settingsFeat, generator)
         list(name = "rtalign", value = TRUE, condition = doRTAlign),
         list(name = "groupParam", value = "xcms::PeakDensityParam(sampleGroups = analysisInfo(fList)$replicate)",
              condition = settingsFeat$fGroupsAlgo == "XCMS"),
-        list(name = "retAlignParam", value = "xcms::ObiwarpParam()", condition = doRTAlign && settingsFeat$fGroupsAlgo == "XCMS")
+        list(name = "retAlignParam", value = "xcms::ObiwarpParam()", condition = doRTAlign && settingsFeat$fGroupsAlgo == "XCMS"),
+        list(name = "scoreWeights", value = "c(retention = 1, mz = 1, mobility = 1)", condition = settingsFeat$fGroupsAlgo == "Greedy")
     ))
     
     retRange <- settingsFeat$fGroupsAdv$retention

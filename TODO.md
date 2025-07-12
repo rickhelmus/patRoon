@@ -128,6 +128,7 @@
 - greedy
     - set default weights
 - tweak default EIMParams: clustering width should be much smaller (~0.01) --> sortof smooths data, mzExpIMSWindow can be reduced too?
+    - check agilent data, if mobilities are equalish between frames too then just always use distance clustering with a small number (still configurable, remove cluster opt)
 
 
 ## Tests

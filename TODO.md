@@ -30,7 +30,6 @@
 - FIX: IMSRangeParams: in sets workflows, the mz column is taken so relative filtering is done to neutralMasses
     - maybe add _mz rel column like compounds?
     - actually, the same is the case for the mz filter (also IMS and mz for features) --> maybe just document difference? the actual results will not change much in general
-- report: delta RT is now in seconds --> convert to minutes
 
 
 ## Maybe

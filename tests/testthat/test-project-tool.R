@@ -177,7 +177,7 @@ test_that("Default settings", {
 test_that("General settings", {
     # NOTE: ionization pos/neg will not change the default script --> test it in later cases where it does
     testNewProj(general = list(ionization = "both"), name = "general-sets")
-    testNewProj(general = list(IMS = list(mode = "direct")), features = list(featAlgo = "piek"),
+    testNewProj(general = list(IMS = list(mode = "direct")), features = list(featAlgo = "piek", fGroupsAlgo = "Greedy"),
                 name = "general-ims_direct")
     testNewProj(general = list(IMS = list(mode = "post")), name = "general-ims_post")
     
@@ -287,6 +287,7 @@ test_that("Feature settings", {
     testNewProj(features = list(fGroupsAlgo = "XCMS"), name = "features-fgroups-xcms")
     testNewProj(features = list(fGroupsAlgo = "KPIC2"), name = "features-fgroups-kpic2")
     testNewProj(features = list(fGroupsAlgo = "SIRIUS"), name = "features-fgroups-sirius")
+    testNewProj(features = list(fGroupsAlgo = "Greedy"), name = "features-fgroups-greedy")
     
     testNewProj(general = list(IMS = list(mode = "post")),
                 features = list(IMSPeaksMob = "xcms", IMSPeaksChrom = "envipick"), name = "features-ims_peak")

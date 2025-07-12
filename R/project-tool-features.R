@@ -42,7 +42,7 @@ newProjectFeaturesUI <- function(id)
                     ),
                     div(style = "width: 25px;"),
                     conditionalPanel(
-                        condition = "output.IMSMode != \"none\"",
+                        condition = "output.IMSMode == \"post\"",
                         ns = ns,
                         fillCol(
                             height = 130,

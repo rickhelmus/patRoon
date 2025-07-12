@@ -22,8 +22,9 @@ newProjectGeneralUI <- function(id)
                 fillRow(
                     flex = c(1, 2),
                     width = "90%",
-                    radioButtons(ns("IMSMode"), "Mobility asignment", c("none", "from features" = "direct",
-                                                                    "post features" = "post")),
+                    radioButtons(ns("IMSMode"), "Mobility asignment",
+                                 c("none", "directly during feature detection" = "direct",
+                                   "post feature detection" = "post")),
                     conditionalPanel(
                         condition = "input.IMSMode != \"none\"",
                         ns = ns,

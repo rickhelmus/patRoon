@@ -267,7 +267,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
     assertPiekGenEICParams(genEICParams, add = ac)
     assertFindPeakParams(peakParams, add = ac)
     if (genEICParams$methodMZ == "suspects")
-        assertSuspectList(suspects, needsAdduct = is.null(adduct), skipInvalid = genEICParams$skipInvalid, null.ok = TRUE,
+        assertSuspectList(suspects, needsAdduct = is.null(adduct), skipInvalid = genEICParams$skipInvalid, null.ok = FALSE,
                           add = ac)
     checkmate::assertNumber(minIntensityIMS, lower = 0, finite = TRUE, add = ac)
     checkmate::assertFlag(verbose, add = ac)
@@ -277,9 +277,26 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
     
     if (genEICParams$methodMZ == "suspects")
     {
+        if (nrow(suspects) == 0)
+            stop("The suspect list empty.", call. = FALSE)
+        
         suspects <- prepareSuspectList(suspects, adduct = adduct, skipInvalid = genEICParams$skipInvalid,
                                        checkDesc = TRUE, prefCalcChemProps = genEICParams$prefCalcChemProps,
                                        neutralChemProps = genEICParams$neutralChemProps)
+        
+        if (genEICParams$methodIMS == "suspects")
+        {
+            suspects[, mobility_susp := selectFromSuspAdductCol(suspects, "mobility", data.table(), if (!is.null(adduct)) as.character(adduct))]
+            if (any(is.na(suspects$mobility_susp)))
+            {
+                stop("The suspect list contains no or missing mobility data!.",
+                     "Please note that CCS data first must be converted to mobilities, e.g. with assignMobilities().",
+                     call. = FALSE)
+            }
+            else
+                suspects <- expandSuspMobilities(suspects)
+        }
+        
         suspectsOrig <- suspects
         dups <- findFeatSuspTableDups(numeric(), suspects$mz,
                                       if (!is.null(suspects[["mobility"]])) suspects$mobility else numeric(),
@@ -402,8 +419,9 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
                         susp <- susp[numLTE(abs(mobility - omob), genEICParams$IMSWindow), env = list(omob = mobility)]
                     if (nrow(susp) > 1)
                     {
+                        # NOTE: take unique suspect names as mobility expanding might cause duplicates
                         warning(sprintf("Found multiple suspects (%s) for peak %s in analysis %s. ",
-                                        paste0(susp$name, collapse = ", "), peaks$ID[.I], ana),
+                                        paste0(unique(susp$name), collapse = ", "), peaks$ID[.I], ana),
                                 "You may want to consider lowering tolerances.", call. = FALSE)
                     }
                     nrow(susp) > 0

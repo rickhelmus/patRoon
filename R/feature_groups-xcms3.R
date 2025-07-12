@@ -54,8 +54,7 @@ setMethod("initialize", "featureGroupsXCMS3",
 setMethod("groupFeaturesXCMS3", "features", function(feat, rtalign = !hasMobilities(feat), loadRawData = TRUE,
                                                      groupParam = xcms::PeakDensityParam(sampleGroups = analysisInfo(feat)$replicate),
                                                      preGroupParam = groupParam,
-                                                     retAlignParam = xcms::ObiwarpParam(),
-                                                     IMSWindow = defaultLim("mobility", "medium"), verbose = TRUE)
+                                                     retAlignParam = xcms::ObiwarpParam(), verbose = TRUE)
 {
     # UNDONE: aligning gives XCMS errors when multithreading
 
@@ -63,7 +62,6 @@ setMethod("groupFeaturesXCMS3", "features", function(feat, rtalign = !hasMobilit
     checkmate::assertClass(feat, "features", add = ac)
     aapply(checkmate::assertFlag, . ~ rtalign + loadRawData, fixed = list(add = ac))
     aapply(assertS4, . ~ groupParam + preGroupParam + retAlignParam, fixed = list(add = ac))
-    checkmate::assertNumber(IMSWindow, lower = 0, finite = TRUE, add = ac)
     assertGroupFeatVerbose(verbose, add = ac)
     checkmate::reportAssertions(ac)
     
@@ -74,19 +72,17 @@ setMethod("groupFeaturesXCMS3", "features", function(feat, rtalign = !hasMobilit
     }
     
     return(doGroupFeatures(feat, doG, "xcms3", rtalign = rtalign, loadRawData = loadRawData, groupParam = groupParam,
-                           preGroupParam = preGroupParam, retAlignParam = retAlignParam, IMSWindow = IMSWindow,
-                           verbose = verbose))
+                           preGroupParam = preGroupParam, retAlignParam = retAlignParam, verbose = verbose))
 })
 
 #' @rdname groupFeaturesXCMS3
 #' @export
 setMethod("groupFeaturesXCMS3", "featuresSet", function(feat,
                                                         groupParam = xcms::PeakDensityParam(sampleGroups = analysisInfo(feat)$replicate),
-                                                        IMSWindow = defaultLim("mobility", "medium"), verbose = TRUE)
+                                                        verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     assertS4(groupParam, add = ac)
-    checkmate::assertNumber(IMSWindow, lower = 0, finite = TRUE, add = ac)
     assertGroupFeatVerbose(verbose, add = ac)
     checkmate::reportAssertions(ac)
     
@@ -99,8 +95,7 @@ setMethod("groupFeaturesXCMS3", "featuresSet", function(feat,
     }
     
     return(doGroupFeatures(feat, doG, "xcms3", rtalign = FALSE, loadRawData = FALSE, groupParam = groupParam,
-                           preGroupParam = groupParam, retAlignParam = xcms::ObiwarpParam(), IMSWindow = IMSWindow,
-                           verbose = verbose))
+                           preGroupParam = groupParam, retAlignParam = xcms::ObiwarpParam(), verbose = verbose))
 })
 
 doGroupFeaturesXCMS3 <- function(feat, xdata, rtalign, loadRawData, groupParam, preGroupParam, retAlignParam, verbose)

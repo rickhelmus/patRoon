@@ -194,11 +194,13 @@ assertGroupFeatAlgo <- function(x, .var.name = checkmate::vname(x), add = NULL)
 
 assertGroupFeatVerbose <- function(x, .var.name = checkmate::vname(x), add = NULL)
 {
-    checkmate::assert(
-        checkmate::checkFlag(x),
-        checkmate::checkChoice(x, "full"),
-        .var.name = .var.name, add = add
-    )
+    checkmate::assertFlag(x, .var.name = .var.name, add = add)
+    # UNDONE: in case we want to use fGroupsIMS again    
+    # checkmate::assert(
+    #     checkmate::checkFlag(x),
+    #     checkmate::checkChoice(x, "full"),
+    #     .var.name = .var.name, add = add
+    # )
 }
 
 assertAnaInfoBy <- function(x, anaInfo, withFGroups, null.ok = FALSE, any.missing = FALSE,

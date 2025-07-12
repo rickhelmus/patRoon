@@ -52,11 +52,13 @@ doSubsetFeaturesByAna <- function(obj, i, ..., reorder, env)
     return(obj)
 }
 
-setMethod("doGroupFeatures", "features", function(feat, grouper, groupAlgo, ..., IMSWindow, verbose)
+setMethod("doGroupFeatures", "features", function(feat, grouper, groupAlgo, ..., verbose)
 {
-    if (!hasMobilities(feat))
-        return(grouper(feat, ..., verbose = verbose))
-    return(groupFeaturesIMS(feat, grouper, groupAlgo, ..., IMSWindow = IMSWindow, verbose = verbose))
+    # UNDONE: disabled: groupFeaturesIMS() doesn't really work...
+    # if (!hasMobilities(feat))
+    #     return(grouper(feat, ..., verbose = verbose))
+    # return(groupFeaturesIMS(feat, grouper, groupAlgo, ..., IMSWindow = IMSWindow, verbose = verbose))
+    return(grouper(feat, ..., verbose = verbose))
 })
 
 reGenerateFTIndex <- function(fGroups)

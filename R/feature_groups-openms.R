@@ -64,13 +64,12 @@ setMethod("groupFeaturesOpenMS", "features", function(feat, rtalign = !hasMobili
                                                       maxAlignMZ = defaultLim("mz", "medium"),
                                                       maxGroupRT = defaultLim("retention", "medium"),
                                                       maxGroupMZ = defaultLim("mz", "medium"), extraOptsRT = NULL,
-                                                      extraOptsGroup = NULL,
-                                                      IMSWindow = defaultLim("mobility", "medium"), verbose = TRUE)
+                                                      extraOptsGroup = NULL, verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(feat, "features", add = ac)
     aapply(checkmate::assertFlag, . ~ rtalign + QT , fixed = list(add = ac))
-    aapply(checkmate::assertNumber, . ~ maxAlignRT + maxAlignMZ + maxGroupRT + maxGroupMZ + IMSWindow,
+    aapply(checkmate::assertNumber, . ~ maxAlignRT + maxAlignMZ + maxGroupRT + maxGroupMZ,
            finite = TRUE, lower = 0, fixed = list(add = ac))
     aapply(checkmate::assertList, . ~ extraOptsRT + extraOptsGroup, any.missing = FALSE,
            names = "unique", null.ok = TRUE, fixed = list(add = ac))
@@ -78,7 +77,7 @@ setMethod("groupFeaturesOpenMS", "features", function(feat, rtalign = !hasMobili
     checkmate::reportAssertions(ac)
 
     return(doGroupFeatures(feat, doGroupFeaturesOpenMS, "openms", rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT,
-                           maxGroupMZ, extraOptsRT, extraOptsGroup, IMSWindow = IMSWindow, verbose = verbose))
+                           maxGroupMZ, extraOptsRT, extraOptsGroup, verbose = verbose))
 })
 
 generateConsensusXML <- function(feat, out, rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT,

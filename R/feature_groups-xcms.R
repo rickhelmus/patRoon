@@ -51,13 +51,11 @@ setMethod("initialize", "featureGroupsXCMS",
 #' @export
 setMethod("groupFeaturesXCMS", "features", function(feat, rtalign = !hasMobilities(feat), loadRawData = TRUE,
                                                     groupArgs = list(mzwid = 0.015), 
-                                                    retcorArgs = list(method = "obiwarp"),
-                                                    IMSWindow = defaultLim("mobility", "medium"), verbose = TRUE)
+                                                    retcorArgs = list(method = "obiwarp"), verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertFlag, . ~ rtalign + loadRawData, fixed = list(add = ac))
     aapply(checkmate::assertList, . ~ groupArgs + retcorArgs, any.missing = FALSE, names = "unique", fixed = list(add = ac))
-    checkmate::assertNumber(IMSWindow, lower = 0, finite = TRUE, add = ac)
     assertGroupFeatVerbose(verbose, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -68,17 +66,15 @@ setMethod("groupFeaturesXCMS", "features", function(feat, rtalign = !hasMobiliti
     }
     
     return(doGroupFeatures(feat, doG, "xcms", rtalign = rtalign, loadRawData = loadRawData, groupArgs = groupArgs,
-                           retcorArgs = retcorArgs, IMSWindow = IMSWindow, verbose = verbose))
+                           retcorArgs = retcorArgs, verbose = verbose))
 })
 
 #' @rdname groupFeaturesXCMS
 #' @export
-setMethod("groupFeaturesXCMS", "featuresSet", function(feat, groupArgs = list(mzwid = 0.015),
-                                                       IMSWindow = defaultLim("mobility", "medium"), verbose = TRUE)
+setMethod("groupFeaturesXCMS", "featuresSet", function(feat, groupArgs = list(mzwid = 0.015), verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertList(groupArgs, any.missing = FALSE, names = "unique", add = ac)
-    checkmate::assertNumber(IMSWindow, lower = 0, finite = TRUE, add = ac)
     assertGroupFeatVerbose(verbose, add = ac)
     checkmate::reportAssertions(ac)
     
@@ -91,7 +87,7 @@ setMethod("groupFeaturesXCMS", "featuresSet", function(feat, groupArgs = list(mz
     }
     
     return(doGroupFeatures(feat, doG, "xcms", rtalign = FALSE, loadRawData = FALSE, groupArgs = groupArgs,
-                           retcorArgs = list(), IMSWindow = IMSWindow, verbose = verbose))
+                           retcorArgs = list(), verbose = verbose))
 })
 
 doGroupFeaturesXCMS <- function(feat, xs, rtalign, loadRawData, groupArgs, retcorArgs, verbose)

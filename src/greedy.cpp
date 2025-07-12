@@ -23,17 +23,11 @@ struct Feature
     Feature(double r, double m, double mb, int ana, size_t id) : dims(r, m, mb), anaID(ana), featID(id) { }
 };
 
-struct ScoreWeights
-{
-    FeatureDim dims;
-    double size;
-    ScoreWeights(void) = default;
-    ScoreWeights(double r, double m, double mb, double sz) : dims(r, m, mb), size(sz) { }
-};
+using ScoreWeights = FeatureDim;
 
 FeatureDim getFeatureDim(const std::vector<Feature> &group)
 {
-    double minRT, maxRT, minMZ, maxMZ, minMob, maxMob;
+    double minRT = 0.0, maxRT = 0.0, minMZ = 0.0, maxMZ = 0.0, minMob = 0.0, maxMob = 0.0;
     bool init = true;
     for (const auto &feat : group)
     {
@@ -66,20 +60,6 @@ double calcFeatureDist(const Feature &feat1, const Feature &feat2, double rtWind
                      std::pow(mobDiff / mobWindow, 2.0));
 }
 
-double getFeatGroupVolume(const std::vector<Feature> &group, double rtWindow, double mzWindow, double mobWindow)
-{
-    if (group.empty())
-        return 0.0;
-
-    FeatureDim dim = getFeatureDim(group);
-    
-    const double eps = 1E-8; // small epsilon to avoid division by zero
-    const double dimRT = (dim.ret / rtWindow) + eps;
-    const double dimMZ = (dim.mz / mzWindow) + eps;
-    const double dimMob = (dim.mob / mobWindow) + eps;
-    return dimRT * dimMZ * dimMob;
-}
-
 double calcGroupScore(const std::vector<Feature> &tentativeGroup, const Feature &anaFeat, double rtWindow,
                       double mzWindow, double mobWindow, const ScoreWeights &weights)
 {
@@ -104,14 +84,6 @@ double calcGroupScore(const std::vector<Feature> &tentativeGroup, const Feature 
         for (const auto &sameAnaFeat : tentativeGroup)
         {
             if (sameAnaFeat.anaID != feat.anaID || sameAnaFeat.featID == anaFeat.featID)
-                continue;
-            
-            // check if this feature would lead to an invalid group
-            // UNDONE: this doesn't seem to be necessary?
-            auto tempGroup = otherFeatures;
-            tempGroup.push_back(sameAnaFeat);
-            FeatureDim dim = getFeatureDim(tempGroup);
-            if (dim.ret > (rtWindow * 2.0) || dim.mz > (mzWindow * 2.0) || dim.mob > (mobWindow * 2.0))
                 continue;
             
             const double dist = calcFeatureDist(anaFeat, sameAnaFeat, rtWindow, mzWindow, mobWindow);
@@ -141,19 +113,12 @@ double calcGroupScore(const std::vector<Feature> &tentativeGroup, const Feature 
     const double mzScore = 1.0 - (totMZDev / dblSize);
     const double mobScore = 1.0 - (totMobDev / dblSize);
     
-    // max size corresponds to number of analyses
-    // UNDONE: this is not used as no group members can be removed, see above
-    std::set<int> allAnaIDs;
-    for (const auto &feat : tentativeGroup)
-        allAnaIDs.insert(feat.anaID);
-    const double sizeScore = static_cast<double>(otherFeatures.size()) / static_cast<double>(allAnaIDs.size());
-    
-    if (sizeScore < 1.0)
+#if 0
+    if (false)
     {
         Rcpp::Rcout << "anaFeat:" << anaFeat.anaID << " scores: " << "ret: " << retScore << " mz: " << mzScore
                     << "mob: " << mobScore << ", " << "size: " << sizeScore << " total:"
-                    << retScore * weights.dims.ret + mzScore * weights.dims.mz + mobScore * weights.dims.mob + sizeScore * weights.size
-                    << "\n";
+                    << retScore * weights.ret + mzScore * weights.mz + mobScore * weights.mob << "\n";
         Rcpp::Rcout << "tentative group size: " << tentativeGroup.size() << ", other features size: " << otherFeatures.size() << "\n";
         Rcpp::Rcout << "group:\n";
         for (const auto &feat : otherFeatures)
@@ -163,8 +128,9 @@ double calcGroupScore(const std::vector<Feature> &tentativeGroup, const Feature 
                         << ", MOB: " << feat.dims.mob << "\n";
         }
     }
+#endif
     
-    return retScore * weights.dims.ret + mzScore * weights.dims.mz + mobScore * weights.dims.mob + sizeScore * weights.size;
+    return retScore * weights.ret + mzScore * weights.mz + mobScore * weights.mob;
 }
 
 std::vector<int> checkTentativeGroup(const std::vector<Feature> &tentativeGroup, double rtWindow, double mzWindow,
@@ -213,7 +179,7 @@ Rcpp::IntegerVector getGroupIDs(const Rcpp::NumericVector &featRTs, const Rcpp::
                                 const Rcpp::IntegerVector &anaIDs, double rtWindow, double mzWindow,
                                 double mobWindow, const Rcpp::List &weightsList)
 {
-    const ScoreWeights weights(weightsList["retention"], weightsList["mz"], weightsList["mobility"], weightsList["size"]);
+    const ScoreWeights weights(weightsList["retention"], weightsList["mz"], weightsList["mobility"]);
     Rcpp::IntegerVector ret(featRTs.size(), -1);
     int curGroup = 0;
     const auto intSortedInds = getSortedInds(ints, true);
@@ -255,6 +221,8 @@ Rcpp::IntegerVector getGroupIDs(const Rcpp::NumericVector &featRTs, const Rcpp::
             [&ints](const Feature &a, const Feature &b) { return ints[a.featID] > ints[b.featID]; });
         
         const auto groupIDs = checkTentativeGroup(tentativeGroup, rtWindow, mzWindow, mobWindow, weights);
+        if (groupIDs.empty())
+            continue;
         
         for (const auto &gID : groupIDs)
             ret[gID] = curGroup;

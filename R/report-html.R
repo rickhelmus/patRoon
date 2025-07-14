@@ -242,18 +242,20 @@ doReportHTML <- function(fGroups, MSPeakLists, formulas, compounds, compsCluster
     path <- normalizePath(path)
 
     cat("Loading all EICs... ")
-    EICParams$onlyPresent <- settings$features$chromatograms$features != "all"
+    EICParamsForLoading <- EICParams
+    EICParamsForLoading$onlyPresent <- settings$features$chromatograms$features != "all"
     if (!settings$features$chromatograms$large && isFALSE(settings$features$chromatograms$features) &&
         settings$features$chromatograms$small)
     {
         # plot only small chromatograms (and summary overview), get minimum set of EICs
-        EICParams$topMost <- 1
-        EICParams$topMostByReplicate <- FALSE
+        EICParamsForLoading$topMost <- 1
+        EICParamsForLoading$topMostByReplicate <- FALSE
     }
-    else
-        EICParams["topMost"] <- list(NULL)
+    else if (!isFALSE(settings$features$chromatograms$features))
+        EICParamsForLoading["topMost"] <- list(NULL)
     
-    EICs <- getFeatureEIXs(fGroups, type = "EIC", EIXParams = EICParams)
+    EICs <- getFeatureEIXs(fGroups, type = "EIC", EIXParams = EICParamsForLoading, pad = TRUE)
+    
     cat("Done!\n")
 
     EIMs <- NULL

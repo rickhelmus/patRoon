@@ -254,16 +254,21 @@ checkFeaturesInterface$methods(
                 {
                     not <- showNotification(sprintf("Loading %ss...", type), duration = NULL, closeButton = FALSE,
                                             type = "message")
-                    if (input$fGroupPlotMode == "topMostByReplicate")
-                    {
-                        eixp <- modifyList(.self[[type]]$params, list(topMost = 1, topMostByReplicate = TRUE))
-                        .self[[type]]$topMostRep <- getFeatureEIXs(fGroups, type = type, EIXParams = eixp)
-                    }
+                    eixp <- if (input$fGroupPlotMode == "topMostByReplicate")
+                        modifyList(.self[[type]]$params, list(topMost = 1, topMostByReplicate = TRUE))
                     else
-                    {
-                        eixp <-  modifyList(.self[[type]]$params, list(topMost = NULL), keep.null = TRUE)
-                        .self[[type]]$all <- getFeatureEIXs(fGroups, type = type, EIXParams = eixp)
-                    }
+                        modifyList(.self[[type]]$params, list(topMost = NULL), keep.null = TRUE)
+                    
+                    EIXs <- if (type == "EIC")
+                        getFeatureEIXs(fGroups, type = type, EIXParams = eixp, pad = TRUE)
+                    else
+                        getFeatureEIXs(fGroups, type = type, EIXParams = eixp)
+                    
+                    if (input$fGroupPlotMode == "topMostByReplicate")
+                        .self[[type]]$topMostRep <- EIXs
+                    else
+                        .self[[type]]$all <- EIXs
+                    
                     removeNotification(not)
                 }
             }
@@ -423,8 +428,10 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, EICParams
     
     prepEIXs <- function(type, params)
     {
-        topMost <- getFeatureEIXs(fGroups, type = type,
-                                  EIXParams = modifyList(params, list(topMost = 1, topMostByReplicate = FALSE)))
+        args <- list(fGroups, type = type, EIXParams = modifyList(params, list(topMost = 1, topMostByReplicate = FALSE)))
+        if (type == "EIC")
+            args$pad <- TRUE
+        topMost <- do.call(getFeatureEIXs, args)
         topMostRep <- all <- list() # loaded if needed
         
         # format is in [[ana]][[fGroup]], since we only took top most intensive we can throw away the ana dimension
@@ -440,7 +447,7 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, EICParams
     }
     
     EIC <- prepEIXs("EIC", EICParams)
-    EIM <- if (hasMobilities(fGroups)) prepEIXs("EIM", EIMParams) # UNDONE: also get EIMs if there is IMS raw data?
+    EIM <- if (hasMobilities(fGroups)) prepEIXs("EIM", EIMParams) else list() # UNDONE: also get EIMs if there is IMS raw data?
 
     curSession <- NULL
     if (file.exists(session))

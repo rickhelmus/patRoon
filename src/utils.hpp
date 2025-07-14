@@ -14,6 +14,23 @@
 #include <numeric>
 #include <vector>
 
+// based on https://stackoverflow.com/a/55779158
+template <typename C> C median(std::vector<C> v)
+{
+    const auto n = v.size();
+    const auto middleIt = v.begin() + n / 2;
+    std::nth_element(v.begin(), middleIt, v.end());
+    
+    if (n % 2 == 0)
+    {
+        // get 2nd highest element from first half
+        const auto middlePrevIt = std::max_element(v.begin(), middleIt);
+        return (*middleIt + *middlePrevIt) / 2.0;
+    }
+    
+    return *middleIt;
+}
+
 template <typename C> std::vector<size_t> getSortedInds(const C &cont, bool decr = false)
 {
     // get sorted indices

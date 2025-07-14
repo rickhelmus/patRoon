@@ -620,7 +620,7 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
     if (reportFGroups || !is.null(formulas) || !is.null(compounds) || !is.null(components))
     {
         cat("Loading all EICs... ")
-        EICs <- getFeatureEIXs(fGroups, type = "EIC", EIXParams = EICParams)
+        EICs <- getFeatureEIXs(fGroups, type = "EIC", EIXParams = EICParams, pad = TRUE)
         cat("Done!\n")
     }
 

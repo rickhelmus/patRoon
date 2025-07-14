@@ -589,6 +589,7 @@ assertEIXParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
 assertEICParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
 {
     assertEIXParams(x, .var.name = .var.name, add = add)
+    assertListVal(x, "gapFactor", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
     invisible(NULL)
 }
 
@@ -1160,6 +1161,7 @@ assertPiekGenEICParams <- function(x, .var.name = checkmate::vname(x), add = NUL
     assertListVal(x, "methodIMS", checkmate::assertChoice, choices = c("bins", "suspects", "ms2"), null.ok = TRUE,
                   .var.name = .var.name)
     assertListVal(x, "retRange", assertRange, null.ok = TRUE, .var.name = .var.name, add = add)
+    assertListVal(x, "gapFactor", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
     assertListVal(x, "minEICIntensity", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
     assertListVal(x, "minEICAdjTime", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
     assertListVal(x, "minEICAdjPoints", checkmate::assertCount, .var.name = .var.name, add = add)

@@ -151,6 +151,9 @@ setMethod("initialize", "featuresPiek",
 #'     \item \code{retRange} A \code{numeric} vector of length two that specifies the retention time range for the EICs.
 #'     Data outside this range is excluded. Set to \code{NULL} to use the full range.
 #'
+#'     \item \code{gapFactor} A \code{numeric} that configures gap filling for EICs. See \code{\link{getDefEICParams}}
+#'     for further details.
+#'
 #'     \item \code{minEICIntensity} The minimum intensity of the highest data point in the EIC. Used to filter EICs.
 #'
 #'     \item \code{minEICAdjTime},\code{minEICAdjPoints},\code{minEICAdjIntensity} The EIC should have at least a
@@ -330,10 +333,9 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
     getEICsAna <- function(backend, EICInfo, mode, topMost)
     {
         args <- list(backend, EICInfo$mzmin, EICInfo$mzmax, genEICParams$retRange[1], genEICParams$retRange[2],
-                     EICInfo$mobmin, EICInfo$mobmax, mzExpIMSWindow = 0, minIntensityIMS = minIntensityIMS,
-                     mode = mode, minEICIntensity = genEICParams$minEICIntensity,
-                     minEICAdjTime = genEICParams$minEICAdjTime,
-                     minEICAdjPoints = genEICParams$minEICAdjPoints,
+                     EICInfo$mobmin, EICInfo$mobmax, gapFactor = genEICParams$gapFactor, mzExpIMSWindow = 0,
+                     minIntensityIMS = minIntensityIMS, mode = mode, minEICIntensity = genEICParams$minEICIntensity,
+                     minEICAdjTime = genEICParams$minEICAdjTime, minEICAdjPoints = genEICParams$minEICAdjPoints,
                      minEICAdjIntensity = genEICParams$minEICAdjIntensity, topMost = topMost)
         ret <- do.call(if (mode == "test") getEICList else doGetEICsForAna, args)
         names(ret) <- EICInfo$EIC_ID
@@ -492,7 +494,7 @@ getPiekGenEICParams <- function(methodMZ, methodIMS = NULL, ...)
     if (methodMZ != "ms2" && identical(methodIMS, "ms2"))
         stop("methodIMS can only be 'ms2' if methodMZ is also set to 'ms2'", call. = FALSE)
     
-    ret <- list(methodMZ = methodMZ, methodIMS = methodIMS, retRange = NULL, minEICIntensity = 5000,
+    ret <- list(methodMZ = methodMZ, methodIMS = methodIMS, retRange = NULL, gapFactor = 3, minEICIntensity = 5000,
                 minEICAdjTime = 5, minEICAdjPoints = 5, minEICAdjIntensity = 250, topMostEIC = 10000,
                 topMostEICPre = 10000)
     

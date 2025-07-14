@@ -376,6 +376,7 @@ getFCParams <- function(replicates, ...)
 #' @param ranges A \code{list} with for each analysis a \code{data.frame} with \code{numeric} columns \code{"retmin"},
 #'   \code{"retmax"}, \code{"mzmin"}, \code{"mzmax"} with the lower/upper ranges of the retention time and \emph{m/z}.
 #'   Furthermore, columns \code{"mobmin"} and \code{"mobmax"} can be added for mobility lower/upper ranges in IMS data.
+#' @param gapFactor A \code{numeric} that configures gap filling. See \code{\link{getDefEICParams}} for more details.
 #' @param output Should be \code{"fill"}, \code{"pad"} or \code{"raw"}. Internally, EIC data is compressed by omitting
 #'   any zero intensity data points. If \code{output="fill"} then the zero intensity points are re-added to obtain
 #'   continuous chromatograms. If \code{output="pad"} then zero intensity points are only re-added that surround others,
@@ -393,7 +394,7 @@ getFCParams <- function(replicates, ...)
 #' @template uses-msdata
 #'
 #' @export
-getEICs <- function(analysisInfo, ranges, output = "fill", minIntensityIMS = 25)
+getEICs <- function(analysisInfo, ranges, gapFactor = 3, output = "fill", minIntensityIMS = 25)
 {
     ac <- checkmate::makeAssertCollection()
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, add = ac)
@@ -402,8 +403,9 @@ getEICs <- function(analysisInfo, ranges, output = "fill", minIntensityIMS = 25)
         checkmate::checkDataFrame(ranges, types = "numeric", any.missing = FALSE),
         .var.name = "ranges", add = ac
     )
+    aapply(checkmate::assertNumber, . ~ gapFactor + minIntensityIMS, lower = 0, finite = TRUE, na.ok = FALSE,
+           fixed = list(add = ac))
     checkmate::assertChoice(output, c("fill", "pad", "raw"), add = ac)
-    checkmate::assertNumber(minIntensityIMS, lower = 0, finite = TRUE, na.ok = FALSE, add = ac)
     checkmate::reportAssertions(ac)
 
     if (checkmate::testDataFrame(ranges))
@@ -419,7 +421,8 @@ getEICs <- function(analysisInfo, ranges, output = "fill", minIntensityIMS = 25)
         checkmate::assertDataFrame(r, types = "numeric", any.missing = FALSE)
         assertHasNames(r, c("mzmin", "mzmax", "retmin", "retmax"))
     }
-    ret <- doGetEICs(analysisInfo, ranges, mode = "full", minIntensityIMS = minIntensityIMS, pad = output == "pad")
+    ret <- doGetEICs(analysisInfo, ranges, gapFactor, mode = "full", minIntensityIMS = minIntensityIMS,
+                     pad = output == "pad")
     if (output == "fill")
     {
         ret <- lapply(ret, function(anaEICs)
@@ -592,6 +595,15 @@ getBGMSMSPeaks <- function(anaInfo, replicates = NULL, MSLevel = 2, retentionRan
 #'
 #' }
 #'
+#' The following additional parameters exist specifically for EICs (\code{EICParams}): \itemize{
+#'
+#'   \item \code{gapFactor} Bruker TIMS data (and maybe others?) seem to omit zero intensity scans, which will lead to
+#'   time gaps between spectra and incorrect EICs. To determine a time gap, the \code{gapFactor} is multiplied with the
+#'   median of time differences between scans. If a gap is detected, then appropriate zero intensity points are added to
+#'   the EIC. Set to \code{0} to disable this.
+#'
+#' }
+#'
 #' The following additional parameters exist specifically for EIMs (\code{EIMParams}): \itemize{
 #'
 #'   \item \code{maxRTWindow} Maximum retention time window (seconds, +/- feature retention time) in which mobilograms
@@ -615,6 +627,7 @@ getDefEICParams <- function(...)
 {
     def <- getDefEIXParams()
     def$window <- defaultLim("retention", "wide")
+    def$gapFactor <- 3
     
     mod <- list(...)
     if (!is.null(mod[["rtWindow"]]))

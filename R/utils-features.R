@@ -328,7 +328,8 @@ extendEIXInputTab <- function(tab, type, EIXParams)
 getEICsOREIMs <- function(obj, type, inputTab, EIXParams, ...)
 {
     if (type == "EIC")
-        doGetEICs(analysisInfo(obj), inputTab, EIXParams$mzExpIMSWindow, EIXParams$minIntensityIMS, ...)
+        doGetEICs(analysisInfo(obj), inputTab, EIXParams$gapFactor, EIXParams$mzExpIMSWindow, EIXParams$minIntensityIMS,
+                  ...)
     else # EIM
         doGetEIMs(analysisInfo(obj), inputTab, EIXParams$IMSWindow, EIXParams$clusterMethod, EIXParams$minIntensityIMS,
                   EIXParams$mzExpIMSWindow, ...)

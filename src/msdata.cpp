@@ -594,8 +594,9 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                       const std::vector<SpectrumRawTypes::Time> &endTimes,
                       const std::vector<SpectrumRawTypes::Mobility> &startMobs,
                       const std::vector<SpectrumRawTypes::Mobility> &endMobs,
-                      SpectrumRawTypes::Mass mzExpIMSWindow, SpectrumRawTypes::Intensity minIntensityIMS,
-                      const std::string &mode = "simple", SpectrumRawTypes::Intensity minEICIntensity = 0,
+                      SpectrumRawTypes::Time gapFactor, SpectrumRawTypes::Mass mzExpIMSWindow,
+                      SpectrumRawTypes::Intensity minIntensityIMS, const std::string &mode = "simple",
+                      SpectrumRawTypes::Intensity minEICIntensity = 0,
                       SpectrumRawTypes::Time minEICAdjTime = 0, unsigned minEICAdjPoints = 0,
                       SpectrumRawTypes::Intensity minEICAdjIntensity = 0, unsigned topMost = 0)
 {
@@ -989,7 +990,37 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     }
     
     if (eicMode != EICMode::TEST)
-        ret.attr("allXValues") = specMeta.first.times;
+    {
+        if (specMeta.first.times.size() > 1 && gapFactor > 0.0)
+        {
+            // NOTE: Bruker TIMS data (and maybe others?) seem to omit zero intensity scans, leading to time gaps. Since
+            // this leads to incorrect EICs, we pad here. To detect gaps, we take the median difference between scans
+            // and assume a gap is at least X higher than that.For padding we just have to add additional time points,
+            // EIC filling and padding functions will assume these are zero intensity points.
+            std::vector<SpectrumRawTypes::Time> diffs(specMeta.first.times.size() - 1, 0);
+            for (size_t i=1; i<specMeta.first.times.size(); ++i)
+                diffs[i - 1] = specMeta.first.times[i] - specMeta.first.times[i - 1];
+            const double medianDiff = median(diffs);
+            std::vector<SpectrumRawTypes::Time> allXValues;
+            for (size_t i=0; i<specMeta.first.times.size(); ++i)
+            {
+                allXValues.push_back(specMeta.first.times[i]);
+                if (i == (specMeta.first.times.size() - 1))
+                    break;
+                
+                const auto diff = specMeta.first.times[i + 1] - specMeta.first.times[i];
+                if (diff > medianDiff * gapFactor) // add dummy point after current
+                {
+                    allXValues.push_back(specMeta.first.times[i] + medianDiff);
+                    if (diff > medianDiff * 2.0) // add dummy point before next
+                        allXValues.push_back(specMeta.first.times[i + 1] - medianDiff);
+                }
+            }
+            ret.attr("allXValues") = allXValues;
+        }
+        else
+            ret.attr("allXValues") = specMeta.first.times;
+    }
     
     return ret;
 }

@@ -262,17 +262,19 @@ doReportHTML <- function(fGroups, MSPeakLists, formulas, compounds, compsCluster
     if (hasMobilities(fGroups))
     {
         cat("Loading all EIMs... ")
-        EIMParams$onlyPresent <- settings$features$mobilograms$features != "all"
-        if (!settings$features$mobilograms$large && settings$features$mobilograms$small)
+        EIMParamsForLoading <- EIMParams
+        EIMParamsForLoading$onlyPresent <- settings$features$mobilograms$features != "all"
+        if (!settings$features$mobilograms$large && isFALSE(settings$features$mobilograms$features) &&
+            settings$features$mobilograms$small)
         {
             # plot only small mobilogram (and summary overview), get minimum set of EIMs
-            EIMParams$topMost <- 1
-            EIMParams$topMostByReplicate <- FALSE
+            EIMParamsForLoading$topMost <- 1
+            EIMParamsForLoading$topMostByReplicate <- FALSE
         }
-        else
-            EIMParams["topMost"] <- list(NULL)
+        else (!isFALSE(settings$features$mobilograms$features))
+            EIMParamsForLoading["topMost"] <- list(NULL)
         
-        EIMs <- getFeatureEIXs(fGroups, type = "EIM", EIXParams = EIMParams)
+        EIMs <- getFeatureEIXs(fGroups, type = "EIM", EIXParams = EIMParamsForLoading)
         cat("Done!\n")
         
     }

@@ -105,6 +105,7 @@
 
 - Agilent
     - SC doesn't recognize IM --> fixed now?
+- pwiz: disable/remove intensity filter for IMS data
 
 ## IMS
 
@@ -118,6 +119,7 @@
 - assignMobilities()
     - better names for ims_parent_ID/ims_parent_group?
     - susps/compounds: overwrite doesn't overwrite converted mobilities, change?
+    - compounds: call assignTabIMSDeviations() also in generateCompounds with eg PCL? Otherwise doc clearly and check newProject and examples
 - feat EICs
     - tweak default EIC filtering params, more strict for binning?
         - current defaults way to strict for patRoonData neg samples (for filtering of EICs _and_ peaks)
@@ -261,6 +263,8 @@
     - feat consensus
         - doc that all feats must have IMS data. For post workflows, IMS subset could be used
     - note that fallbackEIC only works for EIM mob assignments and setting chromPeakParams is mandatory when fromSuspects=TRUE
+    - assignMobilities() doesn't do clustering anymore but greedy grouping
+        - maybe remove some fc refs?
 
 ## NEWS
 

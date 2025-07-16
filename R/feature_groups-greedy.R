@@ -68,8 +68,6 @@ setMethod("groupFeaturesGreedy", "features", function(feat, rtalign = FALSE,
     
     fTable[, groupID := getGroupIDs(ret, mz, mobility, intensity, match(analysis, anaInfo$analysis), rtWindow,
                                     mzWindow, IMSWindow, scoreWeights)]
-    # some duplicate features in a single analysis may be unassigned --> fix here
-    fTable[groupID < 0, groupID := seq_len(.N) + max(fTable$groupID)]
 
     if (verbose)
         printf("Done! Found %d groups.\n", max(fTable$groupID))

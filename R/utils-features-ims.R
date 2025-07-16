@@ -203,7 +203,7 @@ reintegrateMobilityFeatures <- function(features, peakParams, EICParams, peakRTW
     return(features)
 }
 
-clusterFTableMobilities <- function(feat, IMSWindow, byGroup)
+groupFTableMobilities <- function(feat, IMSWindow, byGroup)
 {
     fTableAll <- as.data.table(feat)
     
@@ -212,16 +212,17 @@ clusterFTableMobilities <- function(feat, IMSWindow, byGroup)
     if (!is.null(fTableAll[["set"]]))
         byCols <- c(byCols, "set")
     
-    fTableAll[, IMSClust := NA_character_]
-    fTableAll[!is.na(mobility), IMSClust := {
+    fTableAll[, IMSGroup := NA_character_]
+    fTableAll[!is.na(mobility), IMSGroup := {
         cl <- if (.N == 0)
             integer()
         else if (.N == 1)
             1L
         else
         {
-            hc <- fastcluster::hclust(dist(mobility))
-            cutree(hc, h = IMSWindow)
+            # do a greedy grouping with just mobilities, setting dummy values for RT and mz (we don't want to regroup these)
+            getGroupIDs(rep(100, .N), rep(100, .N), mobility, intensity, match(analysis, analysisInfo(feat)$analysis),
+                        5, 1, IMSWindow, c(retention = 1, mz = 1, mobility = 1))
         }
         paste0(paste0(unlist(.BY), collapse = "_"), "-", cl)
     }, by = byCols]
@@ -229,32 +230,32 @@ clusterFTableMobilities <- function(feat, IMSWindow, byGroup)
     return(fTableAll)
 }
 
-clusterFGroupMobilities <- function(fGroups, IMSWindow, sets)
+updateFGroupsForMobilities <- function(fGroups, IMSWindow, sets)
 {
     # UNDONE: do something more polymorphic than hackish sets arg?
     
     hash <- makeHash(fGroups, IMSWindow)
-    cd <- loadCacheData("clusterFGroupMobilities", hash)
+    cd <- loadCacheData("updateFGroupsForMobilities", hash)
     if (!is.null(cd))
         return(cd)
     
     # cluster features within original fGroups with similar mobilities together    
-    printf("Clustering mobilities... ")
-    fTableAll <- clusterFTableMobilities(getFeatures(fGroups), IMSWindow, byGroup = TRUE)
+    printf("Grouping mobilities... ")
+    fTableAll <- groupFTableMobilities(getFeatures(fGroups), IMSWindow, byGroup = TRUE)
     printf("Done!\n")
     
     printf("Updating feature group data... ")
     
     # prepare group info
-    gMobInfo <- fTableAll[, .(mobility = mean(mobility)), by = c("group", "IMSClust")]
+    gMobInfo <- fTableAll[, .(mobility = mean(mobility)), by = c("group", "IMSGroup")]
     setnames(gMobInfo, "group", "ims_parent_group")
     gMobInfo[is.na(mobility), group := ims_parent_group]
     gMobInfo[!is.na(mobility), group := appendMobToName(ims_parent_group, mobility)]
     
     # update features
     setnames(fTableAll, "group", "ims_parent_group") # UNDONE: better colname
-    fTableAll[gMobInfo, group := i.group, on = c("ims_parent_group", "IMSClust")]
-    fTableAllClean <- removeDTColumnsIfPresent(fTableAll, c("IMSClust", "set", "ims_parent_group"))
+    fTableAll[gMobInfo, group := i.group, on = c("ims_parent_group", "IMSGroup")]
+    fTableAllClean <- removeDTColumnsIfPresent(fTableAll, c("IMSGroup", "set", "ims_parent_group"))
     fTable <- split(fTableAllClean, by = "analysis", keep.by = FALSE)
     # NOTE: the above will not restore any empty feature tables
     missingAna <- setdiff(analyses(fGroups), names(fTable))
@@ -268,7 +269,7 @@ clusterFGroupMobilities <- function(fGroups, IMSWindow, sets)
     gInfo <- merge(gInfo, gMobInfo, by = "ims_parent_group", sort = FALSE)
     setcolorder(gInfo, c("group", "ret", "mz", "mobility", "ims_parent_group"))
     gInfo[is.na(mobility), ims_parent_group := NA_character_]
-    fGroups@groupInfo <- gInfo[, -"IMSClust"]
+    fGroups@groupInfo <- gInfo[, -"IMSGroup"]
     
     # re-fill group table
     fTablePerGroup <- split(fTableAll, by = "group")
@@ -331,7 +332,7 @@ clusterFGroupMobilities <- function(fGroups, IMSWindow, sets)
             fGroups@ISTDAssignments <- c(fGroups@ISTDAssignments, addMobISTDAssigns(internalStandardAssignments(fGroups)))
     }
     
-    saveCacheData("clusterFGroupMobilities", fGroups, hash)
+    saveCacheData("updateFGroupsForMobilities", fGroups, hash)
     
     printf("Done!\n")
     

@@ -287,7 +287,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
                                        checkDesc = TRUE, prefCalcChemProps = genEICParams$prefCalcChemProps,
                                        neutralChemProps = genEICParams$neutralChemProps)
         
-        if (genEICParams$methodIMS == "suspects")
+        if (identical(genEICParams$methodIMS, "suspects"))
         {
             suspects[, mobility_susp := selectFromSuspAdductCol(suspects, "mobility", data.table(), if (!is.null(adduct)) as.character(adduct))]
             if (any(is.na(suspects$mobility_susp)))

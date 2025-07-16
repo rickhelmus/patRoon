@@ -227,20 +227,34 @@ finalizeScreenInfoForIMS <- function(scr, gInfo, IMSMatchParams)
     scrOrigExp <- expandSuspMobilities(scr)
     
     scr[, mob_group := gInfo$mobility[match(group, gInfo$group)]]
+    scr[, CCS_group := NA_real_]
+    if (!is.null(gInfo[["CCS"]]))
+        scr[, CCS_group := gInfo$CCS[match(group, gInfo$group)]]
     scr[, ims_parent_group := gInfo$ims_parent_group[match(group, gInfo$group)]]
-    
-    # assign closest mobility/CCS from suspect list
-    scr[, c("mobility", "CCS") := NA_real_]
-    scr[!is.na(mob_group), c("mobility", "CCS") := {
-        g <- group; n <- name
-        soe <- scrOrigExp[group == g & name == n]
-        wh <- which.min(abs(soe$mobility - mob_group))
-        if (length(wh) == 0)
-            list(NA_real_, NA_real_)
-        else
-            list(soe$mobility[wh], soe$CCS[wh])
-    }, by = seq_len(nrow(scr[!is.na(mob_group)]))]
 
+    assignClosest <- function(col, groupVal, scrGroup, scrName)
+    {
+        soe <- scrOrigExp[group == scrGroup & name == scrName]
+        wh <- which.min(abs(soe[[col]] - groupVal))
+        if (length(wh) == 0)
+            return(NA_real_)
+        return(soe[[col]][wh])
+    }
+        
+    # assign closest mobility/CCS from suspect list
+    scr[, mobility := NA_real_]
+    if (any(!is.na(scr$mob_group)))
+    {
+        scr[!is.na(mob_group), mobility := assignClosest("mobility", mob_group, group, name),
+            by = seq_len(nrow(scr[!is.na(mob_group)]))]
+    }
+    scr[, CCS := NA_real_]
+    if (!is.null(gInfo[["CCS"]]) && any(!is.na(scr$CCS_group)))
+    {
+        scr[!is.na(CCS_group), CCS := assignClosest("CCS", CCS_group, group, name),
+            by = seq_len(nrow(scr[!is.na(CCS_group)]))]
+    }
+    
     scr <- assignTabIMSDeviations(scr, gInfo)
 
     if (!is.null(IMSMatchParams))
@@ -261,7 +275,7 @@ finalizeScreenInfoForIMS <- function(scr, gInfo, IMSMatchParams)
         }
     }
     
-    return(removeDTColumnsIfPresent(scr, c("mob_group", "ims_parent_group")))
+    return(removeDTColumnsIfPresent(scr, c("mob_group", "CCS_group", "ims_parent_group")))
 }
 
 selectFromSuspAdductCol <- function(tab, col, fgAnn, adductChrDef)

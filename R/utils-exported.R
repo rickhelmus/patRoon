@@ -1465,7 +1465,7 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
             collAdd <- paste0(adductsNoNone, collapse = ", ")
             if (is.null(mzTab[["neutralMass"]]))
             {
-                warning(sprintf("Calculations for adducts (%s) will be skipped as there is no neutralMass data.",
+                warning(sprintf("Calculations for adducts (%s) will be skipped as there is no neutralMass data. ",
                                 collAdd), msg, call. = FALSE)
                 adductsNoNone <- character()
                 adducts <- intersect(adducts, "none")

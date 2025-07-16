@@ -396,7 +396,7 @@ setMethod("assignMobilities", "featureGroupsScreeningSet", function(obj, mobPeak
             obj@features <- assignFeatureMobilitiesPeaks(obj@features, mobPeakParams, EIMParams)
         obj@features <- reintegrateMobilityFeatures(obj@features, chromPeakParams, EICParams, peakRTWindow, fallbackEIC,
                                                     calcArea, parallel)
-        obj <- clusterFGroupMobilities(obj, IMSWindow, TRUE)
+        obj <- updateFGroupsForMobilities(obj, IMSWindow, TRUE)
     }
     
     if (!is.null(CCSParams))

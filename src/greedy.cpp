@@ -230,5 +230,15 @@ Rcpp::IntegerVector getGroupIDs(const Rcpp::NumericVector &featRTs, const Rcpp::
         ++curGroup;
     }
     
+    // Fix unassigned groups
+    for (size_t i=0; i<ret.size(); ++i)
+    {
+        if (ret[i] == -1)
+        {
+            ret[i] = curGroup;
+            ++curGroup;
+        }
+    }
+    
     return ret;
 }

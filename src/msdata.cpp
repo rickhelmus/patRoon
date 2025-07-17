@@ -1374,12 +1374,13 @@ Rcpp::List getEIMList(const MSReadBackend &backend, const std::vector<SpectrumRa
                       const std::vector<SpectrumRawTypes::Time> &endTimes,
                       const std::vector<SpectrumRawTypes::Mobility> &startMobs,
                       const std::vector<SpectrumRawTypes::Mobility> &endMobs,
-                      const std::string &method, SpectrumRawTypes::Mobility mobWindow,
                       SpectrumRawTypes::Intensity minIntensity, SpectrumRawTypes::Mass mzExpIMSWindow, bool compress)
 {
     const auto entries = startTimes.size();
-    const auto clMethod = clustMethodFromStr(method);
     const auto specMeta = backend.getSpecMetadata();
+    
+    // tolerance used for summing up equal mobility peaks. Normally these values are equivalent between frames
+    const SpectrumRawTypes::Mobility avgTol = 0.00001;
     
     struct EIM
     {
@@ -1454,7 +1455,7 @@ Rcpp::List getEIMList(const MSReadBackend &backend, const std::vector<SpectrumRa
         if (flatEIM.mobilities.size() == 0)
             continue;
         
-        const auto clusts = clusterNums(flatEIM.mobilities, clMethod, mobWindow);
+        const auto clusts = clusterNums(flatEIM.mobilities, clusterMethod::DISTANCE, avgTol);
         const int maxClust = *(std::max_element(clusts.begin(), clusts.end()));
         EIM avgEIM(maxClust + 1);
         std::vector<size_t> clSizes(maxClust + 1);

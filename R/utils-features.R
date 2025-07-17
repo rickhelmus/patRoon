@@ -331,7 +331,8 @@ getEICsOREIMs <- function(obj, type, inputTab, EIXParams, ...)
         doGetEICs(analysisInfo(obj), inputTab, EIXParams$gapFactor, EIXParams$mzExpIMSWindow, EIXParams$minIntensityIMS,
                   ...)
     else # EIM
-        doGetEIMs(analysisInfo(obj), inputTab, EIXParams$minIntensityIMS, EIXParams$mzExpIMSWindow, ...)
+        doGetEIMs(analysisInfo(obj), inputTab, EIXParams$minIntensityIMS, EIXParams$sgOrder, EIXParams$sgLength,
+                  EIXParams$mzExpIMSWindow, ...)
 }
 
 setMethod("getFeatureEIXInputTab", "features", function(obj, type, EIXParams, selectFunc)

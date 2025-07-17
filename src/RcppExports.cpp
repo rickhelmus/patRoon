@@ -378,6 +378,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// compressEIM
+Rcpp::List compressEIM(const std::vector<SpectrumRawTypes::Mobility>& mobilities, const std::vector<SpectrumRawTypes::Intensity>& intensities);
+RcppExport SEXP _patRoon_compressEIM(SEXP mobilitiesSEXP, SEXP intensitiesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Mobility>& >::type mobilities(mobilitiesSEXP);
+    Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Intensity>& >::type intensities(intensitiesSEXP);
+    rcpp_result_gen = Rcpp::wrap(compressEIM(mobilities, intensities));
+    return rcpp_result_gen;
+END_RCPP
+}
 // getPeakIntensities
 Rcpp::NumericVector getPeakIntensities(const MSReadBackend& backend, const std::vector<SpectrumRawTypes::Mass>& startMZs, const std::vector<SpectrumRawTypes::Mass>& endMZs, const std::vector<SpectrumRawTypes::Time>& times);
 RcppExport SEXP _patRoon_getPeakIntensities(SEXP backendSEXP, SEXP startMZsSEXP, SEXP endMZsSEXP, SEXP timesSEXP) {
@@ -878,6 +890,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_setSpecMetadata", (DL_FUNC) &_patRoon_setSpecMetadata, 3},
     {"_patRoon_getMSPeakLists", (DL_FUNC) &_patRoon_getMSPeakLists, 21},
     {"_patRoon_getEIMList", (DL_FUNC) &_patRoon_getEIMList, 10},
+    {"_patRoon_compressEIM", (DL_FUNC) &_patRoon_compressEIM, 2},
     {"_patRoon_getPeakIntensities", (DL_FUNC) &_patRoon_getPeakIntensities, 4},
     {"_patRoon_collapseIMSFrames", (DL_FUNC) &_patRoon_collapseIMSFrames, 13},
     {"_patRoon_getIsolationMZs", (DL_FUNC) &_patRoon_getIsolationMZs, 4},

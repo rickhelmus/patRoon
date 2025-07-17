@@ -1511,6 +1511,33 @@ Rcpp::List getEIMList(const MSReadBackend &backend, const std::vector<SpectrumRa
 }
 
 // [[Rcpp::export]]
+Rcpp::List compressEIM(const std::vector<SpectrumRawTypes::Mobility> &mobilities,
+                       const std::vector<SpectrumRawTypes::Intensity> &intensities)
+{
+    // compress EIM data by removing zero intensity points that are neighbored by other zero intensity points.
+    // NOTE: we always keep the first and last point, so we need at least 3 points to compress.
+    if (mobilities.size() < 3)
+        return Rcpp::List::create(Rcpp::Named("mobility") = mobilities,
+                                  Rcpp::Named("intensity") = intensities);
+    
+    std::vector<SpectrumRawTypes::Mobility> outMobs;
+    std::vector<SpectrumRawTypes::Intensity> outInts;
+    
+    for (size_t i=0; i<mobilities.size(); ++i)
+    {
+        if (intensities[i] == 0 && i > 0 && i < (mobilities.size() - 1) &&
+            intensities[i - 1] == 0 && intensities[i + 1] == 0)
+            continue; // skip zero intensity point that is neighbored by other zero intensity points
+        
+        outMobs.push_back(mobilities[i]);
+        outInts.push_back(intensities[i]);
+    }
+    
+    return Rcpp::List::create(Rcpp::Named("mobility") = outMobs,
+                              Rcpp::Named("intensity") = outInts);
+}
+
+// [[Rcpp::export]]
 Rcpp::NumericVector getPeakIntensities(const MSReadBackend &backend,
                                        const std::vector<SpectrumRawTypes::Mass> &startMZs,
                                        const std::vector<SpectrumRawTypes::Mass> &endMZs,

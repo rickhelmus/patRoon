@@ -129,7 +129,9 @@
 - update featAnn consensus?
 - greedy
     - set default weights
-- tweak default EIMParams: lower mzExpIMSWindow?
+- tweak default EIMParams
+    - lower mzExpIMSWindow?
+    - default smoothing? different for Agilent? Convert to mobility units?
 - throw error from classic groupers with IMS data
 
 

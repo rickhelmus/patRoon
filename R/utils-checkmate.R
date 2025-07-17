@@ -596,11 +596,7 @@ assertEICParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
 assertEIMParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
 {
     assertEIXParams(x, .var.name = .var.name, add = add)
-    
     assertListVal(x, "maxRTWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
-    assertListVal(x, "IMSWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
-    assertListVal(x, "clusterMethod", assertClusterMethod, .var.name = .var.name, add = add)
-    
     invisible(NULL)
 }
 

@@ -253,8 +253,7 @@ doGetEICs <- function(anaInfo, EICInfoList, gapFactor, mzExpIMSWindow = 0, minIn
     return(allEICs)
 }
 
-doGetEIMs <- function(anaInfo, EIMInfoList, IMSWindow, clusterMethod, minIntensity, mzExpIMSWindow = 0,
-                      compress = TRUE, cacheDB = NULL)
+doGetEIMs <- function(anaInfo, EIMInfoList, minIntensity, mzExpIMSWindow = 0, compress = TRUE, cacheDB = NULL)
 {
     if (length(EIMInfoList) == 0)
         return(list())
@@ -278,8 +277,7 @@ doGetEIMs <- function(anaInfo, EIMInfoList, IMSWindow, clusterMethod, minIntensi
         }
         
         # NOTE: subset columns here, so any additional columns from e.g. feature tables are not considered
-        hashes <- EIMInfo[, makeHash(anaHashes[[ana]], IMSWindow, clusterMethod, minIntensity, mzExpIMSWindow,
-                                     compress, .SD),
+        hashes <- EIMInfo[, makeHash(anaHashes[[ana]], minIntensity, mzExpIMSWindow, compress, .SD),
                           by = seq_len(nrow(EIMInfo)), .SDcols = c("retmin", "retmax", "mzmin", "mzmax", "mobmin",
                                                                    "mobmax")][[2]]
         
@@ -299,7 +297,7 @@ doGetEIMs <- function(anaInfo, EIMInfoList, IMSWindow, clusterMethod, minIntensi
         # NOTE: getEIMList() return lists, which are converted to data.frames and is a lot faster than returning
         # data.frames directly.
         newEIMs <- getEIMList(backend, ToDo$mzmin, ToDo$mzmax, ToDo$retmin, ToDo$retmax, ToDo$mobmin, ToDo$mobmax,
-                              clusterMethod, IMSWindow, minIntensity, mzExpIMSWindow, compress)
+                              minIntensity, mzExpIMSWindow, compress)
         newEIMs <- lapply(newEIMs, setDF)
         EIMs[!isCached] <- newEIMs
         

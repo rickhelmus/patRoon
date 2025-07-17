@@ -609,10 +609,6 @@ getBGMSMSPeaks <- function(anaInfo, replicates = NULL, MSLevel = 2, retentionRan
 #'   \item \code{maxRTWindow} Maximum retention time window (seconds, +/- feature retention time) in which mobilograms
 #'   are collected and averaged. Defaults to \code{defaultLim("retention", "very_narrow")} (see \link{limits}).
 #'
-#'   \item \code{clusterMethod},\code{IMSWindow}: The clustering method and window (see \link[=cluster-params]{clustering
-#'   parameters}) to average mobilograms. \code{IMSWindow} defaults to \code{defaultLim("mobility", "medium")}
-#'   (see \link{limits}).
-#'
 #' }
 #'
 #' These parameters are passed as a named \code{list} as the \code{EICParams} or \code{EIMParams} argument to functions
@@ -647,9 +643,7 @@ getDefEIMParams <- function(...)
     def <- getDefEIXParams()
     def <- modifyList(def, list(
         window = defaultLim("mobility", "wide"),
-        maxRTWindow = defaultLim("retention", "very_narrow"),
-        IMSWindow = defaultLim("mobility", "medium"),
-        clusterMethod = "distance"
+        maxRTWindow = defaultLim("retention", "very_narrow")
     ))
     return(modifyList(def, list(...), keep.null = TRUE))
 }

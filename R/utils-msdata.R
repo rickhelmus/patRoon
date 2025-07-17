@@ -253,12 +253,14 @@ doGetEICs <- function(anaInfo, EICInfoList, gapFactor, mzExpIMSWindow = 0, minIn
     return(allEICs)
 }
 
-doGetEIMs <- function(anaInfo, EIMInfoList, minIntensity, mzExpIMSWindow = 0, compress = TRUE, cacheDB = NULL)
+doGetEIMs <- function(anaInfo, EIMInfoList, minIntensity, sgOrder, sgLength, mzExpIMSWindow = 0, compress = TRUE,
+                      cacheDB = NULL)
 {
     if (length(EIMInfoList) == 0)
         return(list())
     
     anaInfo <- anaInfo[analysis %in% names(EIMInfoList)]
+    doSmooth <- sgOrder > 0 && sgLength > 0
     
     anaHashes <- NULL
     if (is.null(cacheDB))
@@ -277,7 +279,7 @@ doGetEIMs <- function(anaInfo, EIMInfoList, minIntensity, mzExpIMSWindow = 0, co
         }
         
         # NOTE: subset columns here, so any additional columns from e.g. feature tables are not considered
-        hashes <- EIMInfo[, makeHash(anaHashes[[ana]], minIntensity, mzExpIMSWindow, compress, .SD),
+        hashes <- EIMInfo[, makeHash(anaHashes[[ana]], minIntensity, sgOrder, sgLength, mzExpIMSWindow, compress, .SD),
                           by = seq_len(nrow(EIMInfo)), .SDcols = c("retmin", "retmax", "mzmin", "mzmax", "mobmin",
                                                                    "mobmax")][[2]]
         
@@ -296,9 +298,26 @@ doGetEIMs <- function(anaInfo, EIMInfoList, minIntensity, mzExpIMSWindow = 0, co
         
         # NOTE: getEIMList() return lists, which are converted to data.frames and is a lot faster than returning
         # data.frames directly.
+        # NOTE: compression is only done here if we're not smoothing below, otherwise data is compressed after smoothing
         newEIMs <- getEIMList(backend, ToDo$mzmin, ToDo$mzmax, ToDo$retmin, ToDo$retmax, ToDo$mobmin, ToDo$mobmax,
-                              minIntensity, mzExpIMSWindow, compress)
+                              minIntensity, mzExpIMSWindow, compress && !doSmooth)
         newEIMs <- lapply(newEIMs, setDF)
+        
+        if (doSmooth)
+        {
+            # apply Savitzky-Golay smoothing
+            newEIMs <- lapply(newEIMs, function(eim)
+            {
+                if (nrow(eim) > 0)
+                {
+                    eim$intensity <- signal::sgolayfilt(eim$intensity, p = sgOrder, n = sgLength)
+                    if (compress)
+                        eim <- setDF(compressEIM(eim$mobility, eim$intensity))
+                }
+                return(eim)
+            })
+        }
+        
         EIMs[!isCached] <- newEIMs
         
         saveCacheDataList("EIMs", EIMs[!isCached], hashes[!isCached], cacheDB)

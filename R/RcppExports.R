@@ -77,6 +77,10 @@ getEIMList <- function(backend, startMZs, endMZs, startTimes, endTimes, startMob
     .Call(`_patRoon_getEIMList`, backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, minIntensity, mzExpIMSWindow, compress)
 }
 
+compressEIM <- function(mobilities, intensities) {
+    .Call(`_patRoon_compressEIM`, mobilities, intensities)
+}
+
 getPeakIntensities <- function(backend, startMZs, endMZs, times) {
     .Call(`_patRoon_getPeakIntensities`, backend, startMZs, endMZs, times)
 }

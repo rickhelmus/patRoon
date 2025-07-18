@@ -194,7 +194,7 @@ Rcpp::IntegerVector getGroupIDs(const Rcpp::NumericVector &featRTs, const Rcpp::
         
         const auto refRT = featRTs[refInd], refMZ = featMZs[refInd], refMob = featMobs[refInd];
         
-        auto groupStartIndIt = std::lower_bound(mzSortedInds.begin(), mzSortedInds.end(), refInd,
+        const auto groupStartIndIt = std::lower_bound(mzSortedInds.begin(), mzSortedInds.end(), refInd,
             [&](size_t ind, size_t val) { return (featMZs[ind] < (refMZ - mzWindow)); });
         
         std::vector<Feature> tentativeGroup;

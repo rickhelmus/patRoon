@@ -174,6 +174,7 @@ importFeatureGroupsTable <- function(input, analysisInfo, addCols = NULL, groupA
     # inputFeat <- removeDTColumnsIfPresent(inputFeat, c("group", gInfoColsPrefix, "group_mobility_collapsed",
     #                                                    "group_CCS_collapsed", setsAnnAddCols, setsAnnNumCols))
     importedFeat <- importFeaturesTable(inputFeat, analysisInfo, addCols = addCols)
+    analysisInfo <- analysisInfo(importedFeat) # may be updated
     
     for (col in gInfoNumCols)
     {

@@ -171,6 +171,35 @@ std::vector<int> checkTentativeGroup(const std::vector<Feature> &tentativeGroup,
     return ret;
 }
 
+std::vector<std::vector<Feature>> getTentativeGroups(const std::vector<Feature> &curGroup,
+                                                     std::queue<int> remainingAnaIDs)
+{
+    std::vector<std::vector<size_t>> ret;
+    if (curGroup.empty())
+        return ret;
+    
+    const int curAnaID = remainingAnaIDs.front();
+    remainingAnaIDs.pop();
+    
+    for (const auto &feat : curGroup)
+    {
+        if (feat.anaID != curAnaID)
+            continue;
+        std::vector<feat> newGrp = curGroup;
+        newGrp.push_back(feat);
+        const auto tentGroups = getTentativeGroup(newGrp, remainingAnaIDs);
+        for (const auto &nextGroup : tentGroups)
+        {
+            if (nextGroup.empty())
+                continue;
+            ret.push_back(nextGroup);
+        }
+    }
+    
+    return ret;
+}
+
+
 }
 
 // [[Rcpp::export]]

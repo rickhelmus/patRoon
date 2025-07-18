@@ -1801,7 +1801,7 @@ Rcpp::List getIsolationMZsAndMobs(const MSReadBackend &backend, const std::strin
     
     const auto &sfunc = [&](const SpectrumRaw &spec, const SpectrumRawSelection &ssel, size_t)
     {
-        if (!spec.hasMobilities())
+        if (!spec.empty() && !spec.hasMobilities())
             Rcpp::stop("Need IMS data!");
         
         SpectrumRawTypes::Mobility curMob = -1.0, totMob = 0.0;

@@ -287,7 +287,7 @@ setMethod("estimateIDConfidence", "featureGroupsScreeningSet", function(obj, MSP
 
 #' @rdname featureGroupsScreening-class
 #' @export
-setMethod("filter", "featureGroupsScreeningSet", function(obj, ..., onlyHits = NULL,
+setMethod("filter", "featureGroupsScreeningSet", function(obj, ..., onlyHits = NULL, IMSMatchParams = NULL,
                                                           selectHitsBy = NULL, selectBestFGroups = FALSE,
                                                           maxLevel = NULL, maxFormRank = NULL, maxCompRank = NULL,
                                                           minAnnSimForm = NULL, minAnnSimComp = NULL, minAnnSimBoth = NULL,
@@ -296,6 +296,7 @@ setMethod("filter", "featureGroupsScreeningSet", function(obj, ..., onlyHits = N
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertFlag, . ~ onlyHits + selectBestFGroups + negate, null.ok = c(TRUE, FALSE, FALSE), fixed = list(add = ac))
+    assertIMSMatchParams(IMSMatchParams, null.ok = TRUE, add = ac)
     checkmate::assertChoice(selectHitsBy, choices = c("intensity", "level"), null.ok = TRUE, add = ac)
     aapply(checkmate::assertCount, . ~ maxLevel + maxFormRank + maxCompRank + absMinFragMatches + relMinFragMatches,
            null.ok = TRUE, fixed = list(add = ac))
@@ -304,9 +305,9 @@ setMethod("filter", "featureGroupsScreeningSet", function(obj, ..., onlyHits = N
     assertApplyIMSArg(applyIMS, add = ac)
     checkmate::reportAssertions(ac)
     
-    obj <- doSuspectFilter(obj, onlyHits = onlyHits, selectHitsBy, selectBestFGroups, maxLevel, maxFormRank, maxCompRank,
-                           minAnnSimForm, minAnnSimComp, minAnnSimBoth, absMinFragMatches, relMinFragMatches, minRF,
-                           maxLC50, negate, applyIMS)
+    obj <- doSuspectFilter(obj, onlyHits, IMSMatchParams, selectHitsBy, selectBestFGroups, maxLevel, maxFormRank,
+                           maxCompRank, minAnnSimForm, minAnnSimComp, minAnnSimBoth, absMinFragMatches,
+                           relMinFragMatches, minRF, maxLC50, negate, applyIMS)
     
     # filter functionality from fGroupsSet
     if (...length() > 0)

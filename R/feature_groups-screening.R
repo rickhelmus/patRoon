@@ -407,13 +407,15 @@ setMethod("estimateIDConfidence", "featureGroupsScreening", function(obj, MSPeak
 #'   features (\code{applyIMS=TRUE}) or to both (\code{applyIMS="both"}). Other feature groups will always be kept. The
 #'   \code{negate} option does not affect \code{applyIMS}.
 #'
+#' @template IMSMatchParams-arg
+#'
 #' @return \code{filter} returns a filtered \code{featureGroupsScreening} object.
 #'
 #' @note \code{filter} removes suspect hits with \code{NA} values when any of the filters related to minimum or maximum
 #'   values are applied (unless \code{negate=TRUE}).
 #'
 #' @export
-setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = NULL,
+setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = NULL, IMSMatchParams = NULL,
                                                        selectHitsBy = NULL, selectBestFGroups = FALSE,
                                                        maxLevel = NULL, maxFormRank = NULL, maxCompRank = NULL,
                                                        minAnnSimForm = NULL, minAnnSimComp = NULL, minAnnSimBoth = NULL,
@@ -424,6 +426,7 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = NULL
     
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertFlag, . ~ onlyHits + selectBestFGroups + negate, null.ok = c(TRUE, FALSE, FALSE), fixed = list(add = ac))
+    assertIMSMatchParams(IMSMatchParams, null.ok = TRUE, add = ac)
     checkmate::assertChoice(selectHitsBy, choices = c("intensity", "level"), null.ok = TRUE, add = ac)
     aapply(checkmate::assertCount, . ~ maxLevel + maxFormRank + maxCompRank + absMinFragMatches + relMinFragMatches,
            null.ok = TRUE, fixed = list(add = ac))
@@ -432,9 +435,9 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = NULL
     assertApplyIMSArg(applyIMS, add = ac)
     checkmate::reportAssertions(ac)
     
-    obj <- doSuspectFilter(obj, onlyHits, selectHitsBy, selectBestFGroups, maxLevel, maxFormRank, maxCompRank,
-                           minAnnSimForm, minAnnSimComp, minAnnSimBoth, absMinFragMatches, relMinFragMatches, minRF,
-                           maxLC50, negate, applyIMS)
+    obj <- doSuspectFilter(obj, onlyHits, IMSMatchParams, selectHitsBy, selectBestFGroups, maxLevel, maxFormRank,
+                           maxCompRank, minAnnSimForm, minAnnSimComp, minAnnSimBoth, absMinFragMatches,
+                           relMinFragMatches, minRF, maxLC50, negate, applyIMS)
 
     if (...length() > 0)
         obj <- callNextMethod(obj, ..., negate = negate, applyIMS = applyIMS)

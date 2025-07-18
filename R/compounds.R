@@ -178,9 +178,7 @@ setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScor
     }
     if (!is.null(IMSMatchParams))
     {
-        col <- if (IMSMatchParams$param == "mobility") "d_mob" else "d_CCS"
-        if (IMSMatchParams$relative)
-            col <- paste0(col, "_rel")
+        col <- getIMSMatchCol(IMSMatchParams)
         scoreLimits[[col]] <- c(-IMSMatchParams$window, IMSMatchParams$window)
     }
 

@@ -175,6 +175,14 @@ expandSuspMobilities <- function(suspects)
     })))
 }
 
+getIMSMatchCol <- function(IMSMatchParams)
+{
+    ret <- if (IMSMatchParams$param == "mobility") "d_mob" else "d_CCS"
+    if (IMSMatchParams$relative)
+        ret <- paste0(ret, "_rel")
+    return(ret)
+}
+
 assignFeatureMobilitiesSuspects <- function(features, scr, IMSWindow, selectFunc = NULL)
 {
     printf("Finding mobilities for all features from suspects...\n")
@@ -259,10 +267,7 @@ finalizeScreenInfoForIMS <- function(scr, gInfo, IMSMatchParams)
 
     if (!is.null(IMSMatchParams))
     {
-        checkCol <- if (IMSMatchParams$param == "mobility") "d_mob" else "d_CCS"
-        if (IMSMatchParams$relative)
-            checkCol <- paste0(checkCol, "_rel")
-        
+        checkCol <- getIMSMatchCol(IMSMatchParams)
         scr <- scr[is.na(get(checkCol)) | numLTE(abs(get(checkCol)), IMSMatchParams$window)]
         
         if (IMSMatchParams$minMatches > 0)
@@ -487,18 +492,20 @@ doSFGroupsScreeningDelete <- function(obj, i = NULL, j = NULL, k = NULL, ...)
     return(obj)
 }
 
-doSuspectFilter <- function(obj, onlyHits, selectHitsBy, selectBestFGroups, maxLevel, maxFormRank, maxCompRank,
-                            minAnnSimForm, minAnnSimComp, minAnnSimBoth, absMinFragMatches, relMinFragMatches, minRF,
-                            maxLC50, negate, applyIMS)
+doSuspectFilter <- function(obj, onlyHits, IMSMatchParams, selectHitsBy, selectBestFGroups, maxLevel, maxFormRank,
+                            maxCompRank, minAnnSimForm, minAnnSimComp, minAnnSimBoth, absMinFragMatches,
+                            relMinFragMatches, minRF, maxLC50, negate, applyIMS)
 {
+    if (!is.null(IMSMatchParams) && !hasMobilities(obj))
+        stop("Cannot apply IMS match filter: no feature mobility data available", call. = FALSE)
+
     if (nrow(screenInfo(obj)) > 0)
     {
         filteredSI <- copy(screenInfo(obj))
         filteredSI[, rowID := seq_len(nrow(filteredSI))] # so we can see what was removed (for applyIMS)
         
-        colFilter <- function(si, pred, what, col, dataWhich, funcToRun, ac = TRUE)
+        colFilter <- function(si, pred, what, col, dataWhich, funcToRun, ac = TRUE, val = get(what))
         {
-            val <- get(what)
             if (!is.null(val))
             {
                 allCols <- if (ac)
@@ -523,9 +530,17 @@ doSuspectFilter <- function(obj, onlyHits, selectHitsBy, selectBestFGroups, maxL
             return(si)
         }
         colFilterAnn <- function(...) colFilter(dataWhich = "annotation", funcToRun = "estimateIDConfidence", ...)
+        tolPred <- function(x, v) abs(x) <= v
         minPred <- function(x, v) x >= v
         maxPred <- function(x, v) x <= v
         levPred <- function(x, v) maxPred(numericIDLevel(x), v)
+        
+        if (!is.null(IMSMatchParams))
+        {
+            col <- getIMSMatchCol(IMSMatchParams)
+            filteredSI <- colFilter(filteredSI, tolPred, "IMSMatchParams", col, dataWhich = "mobility data",
+                                    funcToRun = "assignMobilities", ac = FALSE, val = IMSMatchParams$window)
+        }
         
         filteredSI <- colFilterAnn(filteredSI, levPred, "maxLevel", "estIDLevel", ac = FALSE)
         filteredSI <- colFilterAnn(filteredSI, maxPred, "maxFormRank", "formRank", ac = FALSE)

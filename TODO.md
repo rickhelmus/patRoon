@@ -67,7 +67,6 @@
         - no support for mzXML
 - add smoothing for XCMS3/enviPick peaks? e.g. with signal::sgolayfilt()
     - might also be nice for plotting chroms?
-- add IMSMatch filter for suspects?
 - convertMobilityToCCS() / convertCCSToMobility(): handle Waters data?
 - start using saveCacheDataList() on more places?
 - basic and default error handling for executeCommand()?
@@ -172,6 +171,7 @@
         - eg convert back and forth
     - suspects
         - test order of data selection for mobility and CCS columns, missing data etc
+        - IMSMatchParams filter
     - assignMobilities()
         - DT method
             - robustness with missing data in input/from

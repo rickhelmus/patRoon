@@ -13,15 +13,15 @@ setMethod("groupFeaturesGreedy", "features", function(feat, rtalign = FALSE,
                                                       rtWindow = defaultLim("retention", "medium"),
                                                       mzWindow = defaultLim("mz", "medium"),
                                                       IMSWindow = defaultLim("mobility", "medium"),
-                                                      scoreWeights = c(retention = 1, mz = 1, mobility = 1),
+                                                      scoreWeights = c(retention = 1, mz = 1, mobility = 1, intensity = 1),
                                                       verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(rtalign, add = ac)
     aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow + IMSWindow, lower = 0, finite = TRUE,
            fixed = list(add = ac))
-    checkmate::assertNumeric(scoreWeights, len = 3, lower = 0, finite = TRUE, any.missing = FALSE, add = ac)
-    assertHasNames(scoreWeights, c("retention", "mz", "mobility"), add = ac)
+    checkmate::assertNumeric(scoreWeights, len = 4, lower = 0, finite = TRUE, any.missing = FALSE, add = ac)
+    assertHasNames(scoreWeights, c("retention", "mz", "mobility", "intensity"), add = ac)
     checkmate::assertFlag(verbose, add = ac)
     checkmate::reportAssertions(ac)
     
@@ -66,8 +66,9 @@ setMethod("groupFeaturesGreedy", "features", function(feat, rtalign = FALSE,
     if (verbose)
         printf("Grouping %d features... ", nrow(fTable))
     
-    fTable[, groupID := getGroupIDs(ret, mz, mobility, intensity, match(analysis, anaInfo$analysis), rtWindow,
-                                    mzWindow, IMSWindow, scoreWeights)]
+    fTable[, replicate := anaInfo$replicate[match(analysis, anaInfo$analysis)]]
+    fTable[, groupID := getGroupIDs(ret, mz, mobility, intensity, match(analysis, anaInfo$analysis),
+                                    match(replicate, anaInfo$replicate), rtWindow, mzWindow, IMSWindow, scoreWeights)]
 
     if (verbose)
         printf("Done! Found %d groups.\n", max(fTable$groupID))

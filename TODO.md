@@ -65,8 +65,6 @@
         - best would be to do write spectra while reading, so we can do MP
             - or skip MP and do complete batch in C++
         - no support for mzXML
-- add smoothing for XCMS3/enviPick peaks? e.g. with signal::sgolayfilt()
-    - might also be nice for plotting chroms?
 - convertMobilityToCCS() / convertCCSToMobility(): handle Waters data?
 - start using saveCacheDataList() on more places?
 - basic and default error handling for executeCommand()?

@@ -310,7 +310,11 @@ doGetEIMs <- function(anaInfo, EIMInfoList, minIntensity, sgOrder, sgLength, mzE
             {
                 if (nrow(eim) > 0)
                 {
-                    eim$intensity <- signal::sgolayfilt(eim$intensity, p = sgOrder, n = sgLength)
+                    if (nrow(eim) < sgLength)
+                        warning(sprintf("Cannot smooth EIM because the number of points (%d) is less than the filter length (%d)",
+                                        nrow(eim), sgLength), call. = FALSE)
+                    else
+                        eim$intensity <- signal::sgolayfilt(eim$intensity, p = sgOrder, n = sgLength)
                     if (compress)
                         eim <- setDF(compressEIM(eim$mobility, eim$intensity))
                 }

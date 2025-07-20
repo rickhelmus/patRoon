@@ -442,3 +442,94 @@ Rcpp::List doFindPeaksPiek(Rcpp::List EICs, bool fillEICs, double minIntensity, 
     
     return ret;
 }
+
+
+// utils for findFeaturesPiek()
+
+// [[Rcpp::export]]
+Rcpp::LogicalVector findFeatSuspTableDups(const Rcpp::NumericVector &rts, const Rcpp::NumericVector &mzs,
+                                          const Rcpp::NumericVector &mobs, const Rcpp::NumericVector &ints,
+                                          double tolRT, double tolMZ, double tolMob)
+{
+    // NOTE: rts, mobs and ints are optional
+    
+    Rcpp::LogicalVector ret(mzs.size(), false);
+    const bool hasRT = rts.size() > 0, hasMobs = mobs.size() > 0, hasInts = ints.size() > 0;
+    
+    if (mzs.size() < 2)
+        return ret; // no duplicates possible
+    
+    const auto isSame = [](double a, double b, double tol)
+    {
+        // handling of NAs
+        // both NA: ignore dimension in comparison
+        // one NA: don't compare, skip
+        // both not NA: compare values
+        
+        if (Rcpp::NumericVector::is_na(a) && Rcpp::NumericVector::is_na(b))
+            return true;
+        if (Rcpp::NumericVector::is_na(a) || Rcpp::NumericVector::is_na(b))
+            return false;
+        return numberLTE(std::abs(a - b), tol);
+    };
+    
+    for (size_t i = 0; i<mzs.size()-1; ++i)
+    {
+        std::vector<size_t> dups;
+        for (size_t j=i+1; j<mzs.size(); ++j)
+        {
+            if (ret[j]) // already marked as duplicate
+                continue;
+            
+            if (!isSame(mzs[i], mzs[j], tolMZ))
+                continue;
+            if (hasRT && !isSame(rts[i], rts[j], tolRT))
+                continue;
+            if (hasMobs && !isSame(mobs[i], mobs[j], tolMob))
+                continue;
+            
+            if (hasInts)
+            {
+                // ensure top most intense stays
+                const bool meHighest = ints[i] >= ints[j];
+                ret[i] = !meHighest;
+                ret[j] = meHighest;
+            }
+            else
+                ret[j] = true; // just keep first
+        }
+    }
+    
+    return ret;
+}
+
+// [[Rcpp::export]]
+Rcpp::LogicalVector filterEICBins(const Rcpp::NumericVector &binStartMZs, const double mzBinWidth,
+                                  const Rcpp::NumericVector &binStartMobs, const double mobBinWidth,
+                                  const Rcpp::NumericVector &checkStartMZs, const Rcpp::NumericVector &checkEndMZs,
+                                  const Rcpp::NumericVector &checkStartMobs, const Rcpp::NumericVector &checkEndMobs)
+    
+{
+    // NOTE: bins should be sorted by start MZs
+    
+    Rcpp::LogicalVector keep(binStartMZs.size(), false);
+    
+    for (size_t i=0; i<checkStartMZs.size(); ++i)
+    {
+        auto it = std::lower_bound(binStartMZs.begin(), binStartMZs.end(), checkStartMZs[i] - mzBinWidth);
+        for (; it!=binStartMZs.end() && numberLTE(*it, checkEndMZs[i]); ++it)
+        {
+            const size_t binIndex = std::distance(binStartMZs.begin(), it);
+            if (!numberLTE(checkStartMZs[i], binStartMZs[binIndex] + mzBinWidth) ||
+                !numberGTE(checkEndMZs[i], binStartMZs[binIndex]))
+                continue;
+            if (binStartMobs.size() != 0 && (!numberLTE(checkStartMobs[i], binStartMobs[binIndex] + mobBinWidth) ||
+                !numberGTE(checkEndMobs[i], binStartMobs[binIndex])))
+                continue;
+            
+            keep[binIndex] = true;
+        }
+    }
+    
+    return keep;
+}

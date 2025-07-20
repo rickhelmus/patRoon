@@ -141,6 +141,14 @@ doFindPeaksPiek <- function(EICs, fillEICs, minIntensity, SN, peakWidthMin, peak
     .Call(`_patRoon_doFindPeaksPiek`, EICs, fillEICs, minIntensity, SN, peakWidthMin, peakWidthMax, RTMin, RTMax, maxPeaksPerSignal, verbose)
 }
 
+findFeatSuspTableDups <- function(rts, mzs, mobs, ints, tolRT, tolMZ, tolMob) {
+    .Call(`_patRoon_findFeatSuspTableDups`, rts, mzs, mobs, ints, tolRT, tolMZ, tolMob)
+}
+
+filterEICBins <- function(binStartMZs, mzBinWidth, binStartMobs, mobBinWidth, checkStartMZs, checkEndMZs, checkStartMobs, checkEndMobs) {
+    .Call(`_patRoon_filterEICBins`, binStartMZs, mzBinWidth, binStartMobs, mobBinWidth, checkStartMZs, checkEndMZs, checkStartMobs, checkEndMobs)
+}
+
 specDistMatrix <- function(specList, method, shift, precMZs, mzWeight, intWeight, mzWindow) {
     .Call(`_patRoon_specDistMatrix`, specList, method, shift, precMZs, mzWeight, intWeight, mzWindow)
 }
@@ -203,10 +211,6 @@ getOMPMaxNumThreads <- function() {
 
 setOMPNumThreads <- function(n) {
     invisible(.Call(`_patRoon_setOMPNumThreads`, n))
-}
-
-findFeatSuspTableDups <- function(rts, mzs, mobs, ints, tolRT, tolMZ, tolMob) {
-    .Call(`_patRoon_findFeatSuspTableDups`, rts, mzs, mobs, ints, tolRT, tolMZ, tolMob)
 }
 
 # Register entry points for exported C++ functions

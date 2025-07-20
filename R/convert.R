@@ -360,6 +360,7 @@ convertMSFilesIMSCollapse <- function(inFiles, outFiles, typeFrom, formatTo = "m
             filterString = NA_character_,
             centroided = TRUE,
             ionMobilityDriftTime = NA_real_,
+            isolationWindowTargetMZ = if (MSLevel == 1) NA_real_ else collapsedSpectra$precursorMZs,
             isolationWindowLowerOffset = if (MSLevel == 1) NA_real_ else collapsedSpectra$isolationStarts,
             isolationWindowUpperOffset = if (MSLevel == 1) NA_real_ else collapsedSpectra$isolationEnds,
             # UNDONE: below are technically not scan limits, but might be good enough?

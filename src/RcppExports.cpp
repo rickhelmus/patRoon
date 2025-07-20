@@ -604,6 +604,41 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// findFeatSuspTableDups
+Rcpp::LogicalVector findFeatSuspTableDups(const Rcpp::NumericVector& rts, const Rcpp::NumericVector& mzs, const Rcpp::NumericVector& mobs, const Rcpp::NumericVector& ints, double tolRT, double tolMZ, double tolMob);
+RcppExport SEXP _patRoon_findFeatSuspTableDups(SEXP rtsSEXP, SEXP mzsSEXP, SEXP mobsSEXP, SEXP intsSEXP, SEXP tolRTSEXP, SEXP tolMZSEXP, SEXP tolMobSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type rts(rtsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type mzs(mzsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type mobs(mobsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type ints(intsSEXP);
+    Rcpp::traits::input_parameter< double >::type tolRT(tolRTSEXP);
+    Rcpp::traits::input_parameter< double >::type tolMZ(tolMZSEXP);
+    Rcpp::traits::input_parameter< double >::type tolMob(tolMobSEXP);
+    rcpp_result_gen = Rcpp::wrap(findFeatSuspTableDups(rts, mzs, mobs, ints, tolRT, tolMZ, tolMob));
+    return rcpp_result_gen;
+END_RCPP
+}
+// filterEICBins
+Rcpp::LogicalVector filterEICBins(const Rcpp::NumericVector& binStartMZs, const double mzBinWidth, const Rcpp::NumericVector& binStartMobs, const double mobBinWidth, const Rcpp::NumericVector& checkStartMZs, const Rcpp::NumericVector& checkEndMZs, const Rcpp::NumericVector& checkStartMobs, const Rcpp::NumericVector& checkEndMobs);
+RcppExport SEXP _patRoon_filterEICBins(SEXP binStartMZsSEXP, SEXP mzBinWidthSEXP, SEXP binStartMobsSEXP, SEXP mobBinWidthSEXP, SEXP checkStartMZsSEXP, SEXP checkEndMZsSEXP, SEXP checkStartMobsSEXP, SEXP checkEndMobsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type binStartMZs(binStartMZsSEXP);
+    Rcpp::traits::input_parameter< const double >::type mzBinWidth(mzBinWidthSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type binStartMobs(binStartMobsSEXP);
+    Rcpp::traits::input_parameter< const double >::type mobBinWidth(mobBinWidthSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type checkStartMZs(checkStartMZsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type checkEndMZs(checkEndMZsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type checkStartMobs(checkStartMobsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type checkEndMobs(checkEndMobsSEXP);
+    rcpp_result_gen = Rcpp::wrap(filterEICBins(binStartMZs, mzBinWidth, binStartMobs, mobBinWidth, checkStartMZs, checkEndMZs, checkStartMobs, checkEndMobs));
+    return rcpp_result_gen;
+END_RCPP
+}
 // specDistMatrix
 Rcpp::NumericMatrix specDistMatrix(Rcpp::List specList, Rcpp::CharacterVector method, Rcpp::CharacterVector shift, Rcpp::NumericVector precMZs, Rcpp::NumericVector mzWeight, Rcpp::NumericVector intWeight, Rcpp::NumericVector mzWindow);
 RcppExport SEXP _patRoon_specDistMatrix(SEXP specListSEXP, SEXP methodSEXP, SEXP shiftSEXP, SEXP precMZsSEXP, SEXP mzWeightSEXP, SEXP intWeightSEXP, SEXP mzWindowSEXP) {
@@ -831,23 +866,6 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
-// findFeatSuspTableDups
-Rcpp::LogicalVector findFeatSuspTableDups(const Rcpp::NumericVector& rts, const Rcpp::NumericVector& mzs, const Rcpp::NumericVector& mobs, const Rcpp::NumericVector& ints, double tolRT, double tolMZ, double tolMob);
-RcppExport SEXP _patRoon_findFeatSuspTableDups(SEXP rtsSEXP, SEXP mzsSEXP, SEXP mobsSEXP, SEXP intsSEXP, SEXP tolRTSEXP, SEXP tolMZSEXP, SEXP tolMobSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type rts(rtsSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type mzs(mzsSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type mobs(mobsSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type ints(intsSEXP);
-    Rcpp::traits::input_parameter< double >::type tolRT(tolRTSEXP);
-    Rcpp::traits::input_parameter< double >::type tolMZ(tolMZSEXP);
-    Rcpp::traits::input_parameter< double >::type tolMob(tolMobSEXP);
-    rcpp_result_gen = Rcpp::wrap(findFeatSuspTableDups(rts, mzs, mobs, ints, tolRT, tolMZ, tolMob));
-    return rcpp_result_gen;
-END_RCPP
-}
 
 // validate (ensure exported C++ functions exist before calling them)
 static int _patRoon_RcppExport_validate(const char* sig) { 
@@ -907,6 +925,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_parseFeatConsXMLFile", (DL_FUNC) &_patRoon_parseFeatConsXMLFile, 2},
     {"_patRoon_writeFeatureXML", (DL_FUNC) &_patRoon_writeFeatureXML, 4},
     {"_patRoon_doFindPeaksPiek", (DL_FUNC) &_patRoon_doFindPeaksPiek, 10},
+    {"_patRoon_findFeatSuspTableDups", (DL_FUNC) &_patRoon_findFeatSuspTableDups, 7},
+    {"_patRoon_filterEICBins", (DL_FUNC) &_patRoon_filterEICBins, 8},
     {"_patRoon_specDistMatrix", (DL_FUNC) &_patRoon_specDistMatrix, 7},
     {"_patRoon_specDistRect", (DL_FUNC) &_patRoon_specDistRect, 9},
     {"_patRoon_testSpecFilter", (DL_FUNC) &_patRoon_testSpecFilter, 7},
@@ -923,7 +943,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_loadAgilentIMSCalibration", (DL_FUNC) &_patRoon_loadAgilentIMSCalibration, 1},
     {"_patRoon_getOMPMaxNumThreads", (DL_FUNC) &_patRoon_getOMPMaxNumThreads, 0},
     {"_patRoon_setOMPNumThreads", (DL_FUNC) &_patRoon_setOMPNumThreads, 1},
-    {"_patRoon_findFeatSuspTableDups", (DL_FUNC) &_patRoon_findFeatSuspTableDups, 7},
     {"_rcpp_module_boot_MSReadBackend", (DL_FUNC) &_rcpp_module_boot_MSReadBackend, 0},
     {"_patRoon_RcppExport_registerCCallable", (DL_FUNC) &_patRoon_RcppExport_registerCCallable, 0},
     {NULL, NULL, 0}

@@ -122,7 +122,7 @@
         - current defaults way to strict for patRoonData neg samples (for filtering of EICs _and_ peaks)
     - mob range: doc that defaults are for TIMS? Or just not give any defaults? Give instrument? Put it in limits?
     - split IMSWindow arg for setting mobmin/mobmax? this currently sets very narrow ranges. Same for mz and ms2
-    - somehow better handle overlapping EICs for suspects? Ie for isobaric compounds, with m/z differences > very_narrow
+    - warn if ms2/suspects are outside bin range?
 - update featAnn consensus?
 - greedy
     - set default weights
@@ -249,6 +249,7 @@
         - mention that bins are overlapping and twice as much
         - summarize code changes and fixes
         - mention that only mobility column for suspects is used so assignMobilities must be used for CCS conversion
+        - update docs for EIC filtering by suspects/ms2
     - assignMobilities()
         - refs to paper
         - fGroups method

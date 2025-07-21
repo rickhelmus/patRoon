@@ -1,7 +1,65 @@
 #' @include features.R
 NULL
 
-getPiekEICsInfo <- function(params, suspects, withIMS, MS2Info)
+getPiekEICsInfo <- function(params, withIMS, suspects, MS2Info, verbose)
+{
+    # UNDONE: also support other binning approaches?
+    binsMZ <- seq(params$mzRange[1], params$mzRange[2], by = params$mzStep * 0.5)
+    names(binsMZ) <- paste0("bin_M", binsMZ)
+    
+    EICInfo <- data.table(mzmin = binsMZ, mzmax = binsMZ + params$mzStep, EIC_ID_MZ = names(binsMZ))
+    
+    if (nrow(EICInfo) == 0)
+        stop("Cannot form EICs with the given m/z parameters (there are no bins)! Please check the m/z range and step size.", call. = FALSE)
+    
+    if (withIMS)
+    {
+        binsIMS <- seq(params$mobRange[1], params$mobRange[2], by = params$mobStep * 0.5)
+        names(binsIMS) <- paste0("bin_I", binsIMS)
+        tab <- CJ(EIC_ID_MZ = names(binsMZ), EIC_ID_IMS = names(binsIMS), sorted = FALSE)
+        tab[, c("mobmin", "mobmax") := .(binsIMS[EIC_ID_IMS], binsIMS[EIC_ID_IMS] + params$mobStep)]
+        EICInfo <- merge(EICInfo, tab, by = "EIC_ID_MZ", sort = FALSE)
+    }
+    else
+        EICInfo[, c("mobmin", "mobmax") := 0]
+    
+    if (params$methodMZ == "suspects")
+    {
+        if (withIMS && identical(params$methodIMS, "suspects"))
+            EICInfo[, keep := filterEICBins(mzmin, params$mzStep, mobmin, params$mobStep,
+                                            suspects$mz - params$mzWindow, suspects$mz + params$mzWindow,
+                                            suspects$mobility - params$IMSWindow, suspects$mobility + params$IMSWindow)]
+        else
+            EICInfo[, keep := filterEICBins(mzmin, params$mzStep, numeric(), 0,
+                                            suspects$mz - params$mzWindow, suspects$mz + params$mzWindow, 0, 0)]
+        if (verbose)
+        {
+            printf("Removed %d (%.2f%%) EICs after suspect filtering. Remaining: %d\n", sum(!EICInfo$keep),
+                   sum(!EICInfo$keep) / nrow(EICInfo) * 100, sum(EICInfo$keep))
+        }
+        EICInfo <- EICInfo[keep == TRUE][, keep := NULL]
+    }
+    else if (params$methodMZ == "ms2")
+    {
+        if (withIMS && identical(params$methodIMS, "ms2"))
+            EICInfo[, keep := filterEICBins(mzmin, params$mzStep, mobmin, params$mobStep, MS2Info$mzmin, MS2Info$mzmax,
+                                            MS2Info$mobmin, MS2Info$mobmax)]
+        else
+            EICInfo[, keep := filterEICBins(mzmin, params$mzStep, numeric(), 0, MS2Info$mzmin, MS2Info$mzmax, 0, 0)]
+        if (verbose)
+        {
+            printf("Removed %d (%.2f%%) EICs after MS2 filtering. Remaining: %d\n", sum(!EICInfo$keep),
+                   sum(!EICInfo$keep) / nrow(EICInfo) * 100, sum(EICInfo$keep))
+        }
+        EICInfo <- EICInfo[keep == TRUE][, keep := NULL]
+    }
+    
+    EICInfo[, EIC_ID := paste0("EIC_", .I)]
+    
+    return(EICInfo)
+}
+
+getPiekEICsInfoOld <- function(params, suspects, withIMS, MS2Info)
 {
     EICInfo <- NULL
     if (params$methodMZ == "bins")
@@ -299,17 +357,6 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
             else
                 suspects <- expandSuspMobilities(suspects)
         }
-        
-        suspectsOrig <- suspects
-        dups <- findFeatSuspTableDups(numeric(), suspects$mz,
-                                      if (!is.null(suspects[["mobility"]])) suspects$mobility else numeric(),
-                                      numeric(), defaultLim("retention", "very_narrow"),
-                                      defaultLim("mz", "very_narrow"), defaultLim("mobility", "very_narrow"))
-        suspects <- suspects[!dups]
-        suspects <- suspects[order(mz)]
-        suspsRM <- setdiff(suspectsOrig$name, suspects$name)
-        maybePrintf("The following %d non-unique suspects were removed %s.\n", length(suspsRM),
-                    getStrListWithMax(suspsRM, 10, ", "))
     }
     
     if (is.null(genEICParams[["retRange"]]))
@@ -356,16 +403,26 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
             MS2Info <- NULL
             if (genEICParams$methodMZ == "ms2")
             {
-                MS2Info <- if (identical(genEICParams$methodIMS, "ms2"))
-                    getIsolationMZsAndMobs(backend, genEICParams$clusterMethod, genEICParams$mzWindow,
-                                           genEICParams$IMSWindow, genEICParams$minTIC)
+                MS2Info <- if (withIMS)
+                    setDT(getIMSIsolationInfo(backend))
                 else
-                    getIsolationMZs(backend, genEICParams$clusterMethod, genEICParams$mzWindow, genEICParams$minTIC)
-                setDT(MS2Info)
+                    setDT(getMSMetadata(backend, 2))
+                setnames(MS2Info, c("mobStart", "mobEnd"), c("mobmin", "mobmax"), skip_absent = TRUE)
+                if (!is.finite(genEICParams$mzIsoWindow))
+                {
+                    MS2Info[, c("mzmin", "mzmax") := .(precursorMZ - isolationRangeMin,
+                                                       precursorMZ + isolationRangeMax)]
+                }
+                else
+                {
+                    MS2Info[, c("mzmin", "mzmax") := .(precursorMZ - min(genEICParams$mzIsoWindow, isolationRangeMin),
+                                                       precursorMZ + min(genEICParams$mzIsoWindow, isolationRangeMax))]
+                }
+                MS2Info <- MS2Info[TIC >= genEICParams$minTIC]
             }
             
             EICs <- EICInfo <- NULL
-            EICInfoMZ <- getPiekEICsInfo(genEICParams, suspects, withIMS = FALSE, MS2Info = MS2Info)
+            EICInfoMZ <- getPiekEICsInfo(genEICParams, FALSE, suspects, MS2Info, verbose)
             if (withIMS)
             {
                 maybePrintf("Pre-checking %d m/z EICs... ", nrow(EICInfoMZ))
@@ -378,7 +435,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
                 # remove complete m/z bins that were filtered out before
                 temp <- EICInfoMZ[, c("mzmin", "mzmax"), with = FALSE]
                 setkeyv(temp, c("mzmin", "mzmax"))
-                EICInfoMob <- getPiekEICsInfo(genEICParams, suspects, withIMS = TRUE, MS2Info = MS2Info)
+                EICInfoMob <- getPiekEICsInfo(genEICParams, TRUE, suspects, MS2Info, verbose)
                 ov <- foverlaps(EICInfoMob, temp, type = "within", nomatch = NULL, which = TRUE)
                 EICInfo <- EICInfoMob[ov$xid]
                 
@@ -414,18 +471,11 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
             {
                 # only keep peaks with at least one closely eluting suspect
                 peaks[, keep := {
-                    susp <- suspectsOrig[numLTE(abs(mz - omz), genEICParams$mzWindow) &
-                                             numLTE(abs(rt - ort), genEICParams$rtWindow),
-                                         env = list(omz = mz, ort = ret)]
+                    susp <- suspects[numLTE(abs(mz - omz), genEICParams$mzWindow) &
+                                         numLTE(abs(rt - ort), genEICParams$rtWindow),
+                                     env = list(omz = mz, ort = ret)]
                     if (identical(genEICParams[["methodIMS"]], "suspects") && !is.null(suspects[["mobility"]]))
                         susp <- susp[numLTE(abs(mobility - omob), genEICParams$IMSWindow), env = list(omob = mobility)]
-                    if (nrow(susp) > 1)
-                    {
-                        # NOTE: take unique suspect names as mobility expanding might cause duplicates
-                        warning(sprintf("Found multiple suspects (%s) for peak %s in analysis %s. ",
-                                        paste0(unique(susp$name), collapse = ", "), peaks$ID[.I], ana),
-                                "You may want to consider lowering tolerances.", call. = FALSE)
-                    }
                     nrow(susp) > 0
                 }, by = .I]
                 peaks <- peaks[keep == TRUE]
@@ -434,11 +484,10 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
             {
                 # only keep peaks that elute closely to at least one MS2 spectrum
                 peaks[, keep := {
-                    MS2Peaks <- MS2Info[numLTE(abs(mz - omz), genEICParams$mzWindow), env = list(omz = mz)]
+                    MS2Peaks <- MS2Info[mz %inrange% list(mzmin, mzmax) & numLTE(abs(ret - time), genEICParams$rtWindow)]
                     if (identical(genEICParams[["methodIMS"]], "ms2"))
-                        MS2Peaks <- MS2Peaks[numLTE(abs(mobility - omob), genEICParams$IMSWindow), env = list(omob = mobility)]
-                    allRet <- unlist(MS2Peaks$times)
-                    any(numLTE(abs(ret - allRet), genEICParams$rtWindow))
+                        MS2Peaks <- MS2Info[mobility %inrange% list(mobmin, mobmax)]
+                    nrow(MS2Peaks) > 0
                 }, by = .I]
                 peaks <- peaks[keep == TRUE]
             }
@@ -494,18 +543,12 @@ getPiekGenEICParams <- function(methodMZ, methodIMS = NULL, ...)
     if (methodMZ != "ms2" && identical(methodIMS, "ms2"))
         stop("methodIMS can only be 'ms2' if methodMZ is also set to 'ms2'", call. = FALSE)
     
-    ret <- list(methodMZ = methodMZ, methodIMS = methodIMS, retRange = NULL, gapFactor = 3, minEICIntensity = 5000,
-                minEICAdjTime = 5, minEICAdjPoints = 5, minEICAdjIntensity = 250, topMostEIC = 10000,
+    ret <- list(methodMZ = methodMZ, methodIMS = methodIMS, mzRange = c(80, 600), mzStep = 0.02, mobRange = c(0.5, 1.3),
+                mobStep = 0.04, retRange = NULL, gapFactor = 3, minEICIntensity = 5000, minEICAdjTime = 5,
+                minEICAdjPoints = 5, minEICAdjIntensity = 250, topMostEIC = 10000,
                 topMostEICPre = 10000)
     
-    if (methodMZ == "bins")
-    {
-        ret <- modifyList(ret, list(
-            mzRange = c(80, 600),
-            mzStep = 0.02
-        ))
-    }
-    else if (methodMZ == "suspects")
+    if (methodMZ == "suspects")
     {
         ret <- modifyList(ret, list(
             rtWindow = defaultLim("retention", "medium"),
@@ -520,31 +563,17 @@ getPiekGenEICParams <- function(methodMZ, methodIMS = NULL, ...)
     {
         ret <- modifyList(ret, list(
             rtWindow = defaultLim("retention", "very_narrow"),
-            mzWindow = defaultLim("mz", "narrow"),
-            minTIC = 10000,
-            clusterMethod = "distance"
+            mzIsoWindow = 1,
+            minTIC = 10000
         ))
     }
     
     if (!is.null(methodIMS))
     {
-        if (methodIMS == "bins")
-        {
-            ret <- modifyList(ret, list(
-                mobRange = c(0.5, 1.3),
-                mobStep = 0.04
-            ))
-        }
-        else if (methodIMS == "suspects")
+        if (methodIMS == "suspects")
         {
             ret <- modifyList(ret, list(
                 IMSWindow = defaultLim("mobility", "medium")
-            ))
-        }
-        else if (methodIMS == "ms2")
-        {
-            ret <- modifyList(ret, list(
-                IMSWindow = defaultLim("mobility", "medium") # UNDONE: or narrow? If yes, update docs
             ))
         }
     }

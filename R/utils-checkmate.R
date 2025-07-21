@@ -1162,6 +1162,14 @@ assertPiekGenEICParams <- function(x, .var.name = checkmate::vname(x), add = NUL
     assertListVal(x, "methodMZ", checkmate::assertChoice, choices = c("bins", "suspects", "ms2"), .var.name = .var.name)
     assertListVal(x, "methodIMS", checkmate::assertChoice, choices = c("bins", "suspects", "ms2"), null.ok = TRUE,
                   .var.name = .var.name)
+    
+    assertListVal(x, "mzRange", assertRange, .var.name = .var.name, add = add)
+    assertListVal(x, "mzStep", checkmate::assertNumber, lower = 0.000001, finite = TRUE,
+                  .var.name = .var.name, add = add)
+    assertListVal(x, "mobRange", assertRange, .var.name = .var.name, add = add)
+    assertListVal(x, "mobStep", checkmate::assertNumber, lower = 0.000001, finite = TRUE,
+                  .var.name = .var.name, add = add)
+    
     assertListVal(x, "retRange", assertRange, null.ok = TRUE, .var.name = .var.name, add = add)
     assertListVal(x, "gapFactor", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
     assertListVal(x, "minEICIntensity", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
@@ -1171,13 +1179,7 @@ assertPiekGenEICParams <- function(x, .var.name = checkmate::vname(x), add = NUL
     assertListVal(x, "topMostEIC", checkmate::assertCount, positive = FALSE, .var.name = .var.name, add = add)
     assertListVal(x, "topMostEICPre", checkmate::assertCount, positive = FALSE, .var.name = .var.name, add = add)
     
-    if (x$methodMZ == "bins")
-    {
-        assertListVal(x, "mzRange", assertRange, .var.name = .var.name, add = add)
-        assertListVal(x, "mzStep", checkmate::assertNumber, lower = 0.000001, finite = TRUE,
-                      .var.name = .var.name, add = add)
-    }
-    else if (x$methodMZ == "suspects")
+    if (x$methodMZ == "suspects")
     {
         assertListVal(x, "rtWindow", checkmate::assertNumber, lower = 0, finite = FALSE, .var.name = .var.name, add = add)
         assertListVal(x, "mzWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
@@ -1190,9 +1192,8 @@ assertPiekGenEICParams <- function(x, .var.name = checkmate::vname(x), add = NUL
     else if (x$methodMZ == "ms2")
     {
         assertListVal(x, "rtWindow", checkmate::assertNumber, lower = 0, finite = FALSE, .var.name = .var.name, add = add)
-        assertListVal(x, "mzWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
+        assertListVal(x, "mzIsoWindow", checkmate::assertNumber, lower = 0, finite = FALSE, .var.name = .var.name, add = add)
         assertListVal(x, "minTIC", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
-        assertListVal(x, "clusterMethod", assertClusterMethod, .var.name = .var.name, add = add)
     }
 
     if (!is.null(x[["methodIMS"]]))
@@ -1200,18 +1201,7 @@ assertPiekGenEICParams <- function(x, .var.name = checkmate::vname(x), add = NUL
         if (x$methodIMS != "bins" && x$methodIMS != x$methodMZ)
             stop("'methodIMS' should be set to 'bins' or match 'methodMZ'.", call. = FALSE)
         
-        if (x$methodIMS == "bins")
-        {
-            assertListVal(x, "mobRange", assertRange, .var.name = .var.name, add = add)
-            assertListVal(x, "mobStep", checkmate::assertNumber, lower = 0.000001, finite = TRUE,
-                          .var.name = .var.name, add = add)
-        }
-        else if (x$methodIMS == "suspects")
-        {
-            assertListVal(x, "IMSWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name,
-                          add = add)
-        }
-        else if (x$methodIMS == "ms2")
+        if (x$methodIMS == "suspects")
         {
             assertListVal(x, "IMSWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name,
                           add = add)

@@ -457,6 +457,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// getIMSIsolationInfo
+Rcpp::List getIMSIsolationInfo(const MSReadBackend& backend);
+RcppExport SEXP _patRoon_getIMSIsolationInfo(SEXP backendSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const MSReadBackend& >::type backend(backendSEXP);
+    rcpp_result_gen = Rcpp::wrap(getIMSIsolationInfo(backend));
+    return rcpp_result_gen;
+END_RCPP
+}
 // testMS1Writer
 void testMS1Writer(const MSReadBackend& backend, const std::string& out, SpectrumRawTypes::Mass mzStart, SpectrumRawTypes::Mass mzEnd, SpectrumRawTypes::Mobility mobilityStart, SpectrumRawTypes::Mobility mobilityEnd, const std::string& method, SpectrumRawTypes::Mass mzWindow, SpectrumRawTypes::PeakAbundance minAbundance, unsigned topMost, SpectrumRawTypes::Intensity minIntensityIMS, SpectrumRawTypes::Intensity minIntensityPre);
 RcppExport SEXP _patRoon_testMS1Writer(SEXP backendSEXP, SEXP outSEXP, SEXP mzStartSEXP, SEXP mzEndSEXP, SEXP mobilityStartSEXP, SEXP mobilityEndSEXP, SEXP methodSEXP, SEXP mzWindowSEXP, SEXP minAbundanceSEXP, SEXP topMostSEXP, SEXP minIntensityIMSSEXP, SEXP minIntensityPreSEXP) {
@@ -914,6 +925,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_collapseIMSFrames", (DL_FUNC) &_patRoon_collapseIMSFrames, 13},
     {"_patRoon_getIsolationMZs", (DL_FUNC) &_patRoon_getIsolationMZs, 4},
     {"_patRoon_getIsolationMZsAndMobs", (DL_FUNC) &_patRoon_getIsolationMZsAndMobs, 5},
+    {"_patRoon_getIMSIsolationInfo", (DL_FUNC) &_patRoon_getIMSIsolationInfo, 1},
     {"_patRoon_testMS1Writer", (DL_FUNC) &_patRoon_testMS1Writer, 12},
     {"_patRoon_getChromMob", (DL_FUNC) &_patRoon_getChromMob, 3},
     {"_patRoon_readMSP", (DL_FUNC) &_patRoon_readMSP, 2},

@@ -97,6 +97,10 @@ getIsolationMZsAndMobs <- function(backend, method, mzWindow, mobWindow, minTIC)
     .Call(`_patRoon_getIsolationMZsAndMobs`, backend, method, mzWindow, mobWindow, minTIC)
 }
 
+getIMSIsolationInfo <- function(backend) {
+    .Call(`_patRoon_getIMSIsolationInfo`, backend)
+}
+
 testMS1Writer <- function(backend, out, mzStart, mzEnd, mobilityStart, mobilityEnd, method, mzWindow, minAbundance, topMost, minIntensityIMS, minIntensityPre) {
     invisible(.Call(`_patRoon_testMS1Writer`, backend, out, mzStart, mzEnd, mobilityStart, mobilityEnd, method, mzWindow, minAbundance, topMost, minIntensityIMS, minIntensityPre))
 }

@@ -225,7 +225,8 @@ int walkSpectra(const MSReadBackend &backend)
 }
 
 // [[Rcpp::export]]
-Rcpp::DataFrame getMSSpectrum(const MSReadBackend &backend, int index, int MSLevel, int frameIndex = -1)
+Rcpp::DataFrame getMSSpectrum(const MSReadBackend &backend, int index, int MSLevel, int frameIndex = -1,
+                              double minIntensity = 0)
 {
     SpectrumRawSelection sel(index);
     if (MSLevel == 2 && frameIndex != -1)
@@ -238,7 +239,7 @@ Rcpp::DataFrame getMSSpectrum(const MSReadBackend &backend, int index, int MSLev
     };
     
     const auto MSLev = (MSLevel == 1) ? SpectrumRawTypes::MSLevel::MS1 : SpectrumRawTypes::MSLevel::MS2;
-    const auto spectra = applyMSData<SpectrumRaw>(backend, MSLev, sels, sfunc, 0);
+    const auto spectra = applyMSData<SpectrumRaw>(backend, MSLev, sels, sfunc, minIntensity);
     const auto &spec = spectra[0][0];
     
     if (!spec.getMobilities().empty())

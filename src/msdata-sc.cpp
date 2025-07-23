@@ -16,26 +16,39 @@ SpectrumRaw getSCSpectrum(sc::MS_FILE *analysis, SpectrumRawTypes::Scan scan,
     const auto mobArrayIt = std::find(s.binary_names.cbegin(), s.binary_names.cend(), "ion_mobility");
     const bool hasMob = mobArrayIt != s.binary_names.cend();
     
-    SpectrumRaw ret(s.array_length, hasMob);
     
     // UNDONE: always safe to assume that m/z / intensity are in first two arrays?
     
     if (hasMob)
     {
         const size_t mobArrayInd = std::distance(s.binary_names.begin(), mobArrayIt);
-        for (int i=0; i<s.array_length; ++i)
+        
+        // For IMS we don't know yet the size if intensity/mob filters are set: only preallocate if intensity == 0
+        
+        if (!mobRange.isSet() && minIntensityIMS == 0)
         {
-            const auto mob = s.binary_data[mobArrayInd][i];
-            if ((!mobRange.isSet() || mobRange.within(mob)) && s.binary_data[1][i] >= minIntensityIMS)
-                ret.setPeak(i, s.binary_data[0][i], s.binary_data[1][i], mob);
+            SpectrumRaw ret(s.array_length, true);
+            for (int i=0; i<s.array_length; ++i)
+                ret.setPeak(i, s.binary_data[0][i], s.binary_data[1][i], s.binary_data[mobArrayInd][i]);
+            return ret;
+        }
+        else
+        {
+            SpectrumRaw ret;
+            for (size_t i=0; i<s.array_length; ++i)
+            {
+                const auto mob = s.binary_data[mobArrayInd][i];
+                if ((!mobRange.isSet() || mobRange.within(mob)) && s.binary_data[1][i] >= minIntensityIMS)
+                    ret.append(s.binary_data[0][i], s.binary_data[1][i], mob);
+            }
+            return ret;
         }
     }
-    else
-    {
-        for (int i=0; i<s.array_length; ++i)
-            ret.setPeak(i, s.binary_data[0][i], s.binary_data[1][i]);
-    }
     
+    // No IMS
+    SpectrumRaw ret(s.array_length, false);
+    for (int i=0; i<s.array_length; ++i)
+        ret.setPeak(i, s.binary_data[0][i], s.binary_data[1][i]);
     return ret;
 }
 

@@ -33,8 +33,8 @@ walkSpectra <- function(backend) {
     .Call(`_patRoon_walkSpectra`, backend)
 }
 
-getMSSpectrum <- function(backend, index, MSLevel, frameIndex = -1L) {
-    .Call(`_patRoon_getMSSpectrum`, backend, index, MSLevel, frameIndex)
+getMSSpectrum <- function(backend, index, MSLevel, frameIndex = -1L, minIntensity = 0) {
+    .Call(`_patRoon_getMSSpectrum`, backend, index, MSLevel, frameIndex, minIntensity)
 }
 
 getCollapsedFrame <- function(backend, index, mzWindow, minIntensityIMS, minIntensityPre, minAbundanceRel, minAbundanceAbs, method) {

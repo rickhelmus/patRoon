@@ -1482,12 +1482,12 @@ Rcpp::List getEIMList(const MSReadBackend &backend, const std::vector<SpectrumRa
         // sort and compress data
         const auto sInds = getSortedInds(avgEIM.mobilities);
         EIM sortedEIM;
-        compress = compress && EIMSize >= 3; // we always keep first/last point, so need >=3 points
+        const bool doComp = compress && EIMSize >= 3; // we always keep first/last point, so need >=3 points
         for (size_t i=0; i<EIMSize; ++i)
         {
             // if we want to (1) compress, (2) current intensity == 0, (3) is not the first sorted point, (4) is not the
             // last point to check and (5) and not the last sorted point.
-            if (compress && avgEIM.intensities[sInds[i]] == 0 && sInds[i] > 0 && i < (EIMSize-1) &&
+            if (doComp && avgEIM.intensities[sInds[i]] == 0 && sInds[i] > 0 && i < (EIMSize-1) &&
                 sInds[i] != (EIMSize-1))
             {
                 const auto prevInt = avgEIM.intensities[sInds[i-1]], nextInt = avgEIM.intensities[sInds[i+1]];

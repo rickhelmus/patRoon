@@ -428,35 +428,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// getIsolationMZs
-Rcpp::List getIsolationMZs(const MSReadBackend& backend, const std::string& method, SpectrumRawTypes::Mass mzWindow, SpectrumRawTypes::Intensity minTIC);
-RcppExport SEXP _patRoon_getIsolationMZs(SEXP backendSEXP, SEXP methodSEXP, SEXP mzWindowSEXP, SEXP minTICSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const MSReadBackend& >::type backend(backendSEXP);
-    Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
-    Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type mzWindow(mzWindowSEXP);
-    Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minTIC(minTICSEXP);
-    rcpp_result_gen = Rcpp::wrap(getIsolationMZs(backend, method, mzWindow, minTIC));
-    return rcpp_result_gen;
-END_RCPP
-}
-// getIsolationMZsAndMobs
-Rcpp::List getIsolationMZsAndMobs(const MSReadBackend& backend, const std::string& method, SpectrumRawTypes::Mass mzWindow, SpectrumRawTypes::Mobility mobWindow, SpectrumRawTypes::Intensity minTIC);
-RcppExport SEXP _patRoon_getIsolationMZsAndMobs(SEXP backendSEXP, SEXP methodSEXP, SEXP mzWindowSEXP, SEXP mobWindowSEXP, SEXP minTICSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const MSReadBackend& >::type backend(backendSEXP);
-    Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
-    Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type mzWindow(mzWindowSEXP);
-    Rcpp::traits::input_parameter< SpectrumRawTypes::Mobility >::type mobWindow(mobWindowSEXP);
-    Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minTIC(minTICSEXP);
-    rcpp_result_gen = Rcpp::wrap(getIsolationMZsAndMobs(backend, method, mzWindow, mobWindow, minTIC));
-    return rcpp_result_gen;
-END_RCPP
-}
 // getIMSIsolationInfo
 Rcpp::List getIMSIsolationInfo(const MSReadBackend& backend);
 RcppExport SEXP _patRoon_getIMSIsolationInfo(SEXP backendSEXP) {
@@ -923,8 +894,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_compressEIM", (DL_FUNC) &_patRoon_compressEIM, 2},
     {"_patRoon_getPeakIntensities", (DL_FUNC) &_patRoon_getPeakIntensities, 4},
     {"_patRoon_collapseIMSFrames", (DL_FUNC) &_patRoon_collapseIMSFrames, 13},
-    {"_patRoon_getIsolationMZs", (DL_FUNC) &_patRoon_getIsolationMZs, 4},
-    {"_patRoon_getIsolationMZsAndMobs", (DL_FUNC) &_patRoon_getIsolationMZsAndMobs, 5},
     {"_patRoon_getIMSIsolationInfo", (DL_FUNC) &_patRoon_getIMSIsolationInfo, 1},
     {"_patRoon_testMS1Writer", (DL_FUNC) &_patRoon_testMS1Writer, 12},
     {"_patRoon_getChromMob", (DL_FUNC) &_patRoon_getChromMob, 3},

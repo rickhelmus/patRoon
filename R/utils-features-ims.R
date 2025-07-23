@@ -206,6 +206,8 @@ reintegrateMobilityFeatures <- function(features, peakParams, EICParams, peakRTW
 groupFTableMobilities <- function(feat, IMSWindow, byGroup)
 {
     fTableAll <- as.data.table(feat)
+    anaInfo <- analysisInfo(feat)
+    reps <- replicates(feat)
     
     byCols <- if (byGroup) "group" else character()
     # HACK
@@ -213,6 +215,7 @@ groupFTableMobilities <- function(feat, IMSWindow, byGroup)
         byCols <- c(byCols, "set")
     
     fTableAll[, IMSGroup := NA_character_]
+    fTableAll[, replicate := anaInfo$replicate[match(analysis, anaInfo$analysis)]]
     fTableAll[!is.na(mobility), IMSGroup := {
         cl <- if (.N == 0)
             integer()
@@ -221,11 +224,12 @@ groupFTableMobilities <- function(feat, IMSWindow, byGroup)
         else
         {
             # do a greedy grouping with just mobilities, setting dummy values for RT and mz (we don't want to regroup these)
-            getGroupIDs(rep(100, .N), rep(100, .N), mobility, intensity, match(analysis, analysisInfo(feat)$analysis),
-                        5, 1, IMSWindow, c(retention = 1, mz = 1, mobility = 1))
+            getGroupIDs(rep(100, .N), rep(100, .N), mobility, intensity, match(analysis, anaInfo$analysis),
+                        match(replicate, reps), 5, 1, IMSWindow, c(retention = 1, mz = 1, mobility = 1, intensity = 1))
         }
         paste0(paste0(unlist(.BY), collapse = "_"), "-", cl)
     }, by = byCols]
+    fTableAll[, replicate := NULL]
     
     return(fTableAll)
 }

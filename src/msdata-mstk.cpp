@@ -26,23 +26,33 @@ SpectrumRaw getMSTKSpec(MSToolkit::MSReader *msr, const std::string &file, Spect
     if (!msr->readFile(file.c_str(), s, scan) || s.getScanNumber() == 0)
         Rcpp::stop("Abort: invalid spectrum scan index: %d", scan);
     
-    const bool hasMob = s.hasIonMobilityArray();
-    SpectrumRaw ret(s.size(), hasMob);
-    
-    if (hasMob)
+    if (s.hasIonMobilityArray())
     {
-        for(size_t i=0; i<ret.size(); ++i)
+        // For IMS we don't know yet the size if intensity/mob filters are set: only preallocate if intensity == 0
+        
+        if (!mobRange.isSet() && minIntensityIMS == 0)
         {
-            if ((!mobRange.isSet() || mobRange.within(s.atIM(i))) && s.at(i).intensity >= minIntensityIMS)
+            SpectrumRaw ret(s.size(), true);
+            for (size_t i=0; i<s.size(); ++i)
                 ret.setPeak(i, s.at(i).mz, s.at(i).intensity, s.atIM(i));
+            return ret;
+        }
+        else
+        {
+            SpectrumRaw ret;
+            for (size_t i=0; i<s.size(); ++i)
+            {
+                if ((!mobRange.isSet() || mobRange.within(s.atIM(i))) && s.at(i).intensity >= minIntensityIMS)
+                    ret.append(s.at(i).mz, s.at(i).intensity, s.atIM(i));
+            }
+            return ret;
         }
     }
-    else
-    {
-        for(size_t i=0; i<ret.size(); ++i)
-            ret.setPeak(i, s.at(i).mz, s.at(i).intensity);
-    }
     
+    // No IMS
+    SpectrumRaw ret(s.size(), false);
+    for (size_t i=0; i<s.size(); ++i)
+        ret.setPeak(i, s.at(i).mz, s.at(i).intensity);
     return ret;
 }
 

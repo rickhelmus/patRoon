@@ -187,8 +187,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // getMSSpectrum
-Rcpp::DataFrame getMSSpectrum(const MSReadBackend& backend, int index, int MSLevel, int frameIndex);
-RcppExport SEXP _patRoon_getMSSpectrum(SEXP backendSEXP, SEXP indexSEXP, SEXP MSLevelSEXP, SEXP frameIndexSEXP) {
+Rcpp::DataFrame getMSSpectrum(const MSReadBackend& backend, int index, int MSLevel, int frameIndex, double minIntensity);
+RcppExport SEXP _patRoon_getMSSpectrum(SEXP backendSEXP, SEXP indexSEXP, SEXP MSLevelSEXP, SEXP frameIndexSEXP, SEXP minIntensitySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -196,7 +196,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type index(indexSEXP);
     Rcpp::traits::input_parameter< int >::type MSLevel(MSLevelSEXP);
     Rcpp::traits::input_parameter< int >::type frameIndex(frameIndexSEXP);
-    rcpp_result_gen = Rcpp::wrap(getMSSpectrum(backend, index, MSLevel, frameIndex));
+    Rcpp::traits::input_parameter< double >::type minIntensity(minIntensitySEXP);
+    rcpp_result_gen = Rcpp::wrap(getMSSpectrum(backend, index, MSLevel, frameIndex, minIntensity));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -880,7 +881,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_getBrukerMob", (DL_FUNC) &_patRoon_getBrukerMob, 3},
     {"_patRoon_backendAvailable", (DL_FUNC) &_patRoon_backendAvailable, 1},
     {"_patRoon_walkSpectra", (DL_FUNC) &_patRoon_walkSpectra, 1},
-    {"_patRoon_getMSSpectrum", (DL_FUNC) &_patRoon_getMSSpectrum, 4},
+    {"_patRoon_getMSSpectrum", (DL_FUNC) &_patRoon_getMSSpectrum, 5},
     {"_patRoon_getCollapsedFrame", (DL_FUNC) &_patRoon_getCollapsedFrame, 8},
     {"_patRoon_getCentroidedFrame", (DL_FUNC) &_patRoon_getCentroidedFrame, 6},
     {"_patRoon_getScans", (DL_FUNC) &_patRoon_getScans, 6},

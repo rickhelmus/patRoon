@@ -131,6 +131,7 @@
     - lower mzExpIMSWindow?
     - default smoothing? different for Agilent? Convert to mobility units?
 - throw error from classic groupers with IMS data
+- BUG?: screening screened object with IMS info results in zeros for d_rt?
 
 
 ## Tests

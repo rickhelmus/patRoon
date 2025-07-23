@@ -67,8 +67,9 @@ setMethod("groupFeaturesGreedy", "features", function(feat, rtalign = FALSE,
         printf("Grouping %d features... ", nrow(fTable))
     
     fTable[, replicate := anaInfo$replicate[match(analysis, anaInfo$analysis)]]
+    reps <- replicates(feat)
     fTable[, groupID := getGroupIDs(ret, mz, mobility, intensity, match(analysis, anaInfo$analysis),
-                                    match(replicate, anaInfo$replicate), rtWindow, mzWindow, IMSWindow, scoreWeights)]
+                                    match(replicate, reps), rtWindow, mzWindow, IMSWindow, scoreWeights)]
 
     if (verbose)
         printf("Done! Found %d groups.\n", max(fTable$groupID))

@@ -89,14 +89,6 @@ collapseIMSFrames <- function(backend, mzStart, mzEnd, mobilityStart, mobilityEn
     .Call(`_patRoon_collapseIMSFrames`, backend, mzStart, mzEnd, mobilityStart, mobilityEnd, method, mzWindow, minAbundanceRel, minAbundanceAbs, topMost, minIntensityIMS, minIntensityPre, includeMSMS)
 }
 
-getIsolationMZs <- function(backend, method, mzWindow, minTIC) {
-    .Call(`_patRoon_getIsolationMZs`, backend, method, mzWindow, minTIC)
-}
-
-getIsolationMZsAndMobs <- function(backend, method, mzWindow, mobWindow, minTIC) {
-    .Call(`_patRoon_getIsolationMZsAndMobs`, backend, method, mzWindow, mobWindow, minTIC)
-}
-
 getIMSIsolationInfo <- function(backend) {
     .Call(`_patRoon_getIMSIsolationInfo`, backend)
 }

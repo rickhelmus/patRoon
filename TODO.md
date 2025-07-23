@@ -126,6 +126,7 @@
 - update featAnn consensus?
 - greedy
     - set default weights
+        - also configurable weights for assignMobilities()?
 - tweak default EIMParams
     - lower mzExpIMSWindow?
     - default smoothing? different for Agilent? Convert to mobility units?

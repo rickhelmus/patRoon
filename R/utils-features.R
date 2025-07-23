@@ -371,7 +371,7 @@ setMethod("getFeatureEIXInputTab", "featureGroups", function(obj, type, analysis
     
     # subset relevant things in advance
     featTab <- subsetDTColumnsIfPresent(featTab, c("group", "analysis", "intensity", "retmin", "retmax", "mzmin",
-                                                   "mzmax", "mobmin", "mobmax"))
+                                                   "mzmax", "mobmin", "mobmax", "ret"))
 
     # NOTE: we subset and split here in advance, as doing it in the loop below gets quite slow with many fGroups
     featTabAnaSub <- featTab[analysis %chin% takeAnalysis]
@@ -417,8 +417,14 @@ setMethod("getFeatureEIXInputTab", "featureGroups", function(obj, type, analysis
             }
         }
         
-        if (type == "EIM" && is.null(ret[["mobmin"]]))
-            ret[, c("mobmin", "mobmax") := NA_real_]
+        if (type == "EIM")
+        {
+            if (is.null(ret[["mobmin"]]))
+                ret[, c("mobmin", "mobmax") := NA_real_]
+            ret[, c("retmin", "retmax") := .(max(retmin, ret - EIXParams$maxRTWindow), min(retmax, ret + EIXParams$maxRTWindow))]
+        }
+        
+        ret[, ret := NULL]
         ret <- extendEIXInputTab(ret, type, EIXParams)
         
         return(ret)

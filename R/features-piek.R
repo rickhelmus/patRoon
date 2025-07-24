@@ -457,23 +457,21 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
             maybePrintf("Done! Found %d peaks.\n", nrow(peaks))
 
             # only keep those peaks with m/z in the "center" of the analyzed m/z and mobility range
-            if (genEICParams$methodMZ == "bins")
-            {
-                peaks[, binMZStart := EICInfo[match(peaks$EIC_ID, EIC_ID)]$mzmin]
-                peaks <- peaks[between(mz, binMZStart + genEICParams$mzStep/4, binMZStart + genEICParams$mzStep/4*3) == TRUE]
-            }
-            if (identical(genEICParams[["methodIMS"]], "bins"))
+            peaks[, binMZStart := EICInfo[match(peaks$EIC_ID, EIC_ID)]$mzmin]
+            peaks <- peaks[between(mz, binMZStart + genEICParams$mzStep/4, binMZStart + genEICParams$mzStep/4*3) == TRUE]
+            if (withIMS)
             {
                 peaks[, binMobStart := EICInfo[match(peaks$EIC_ID, EIC_ID)]$mobmin]
                 peaks <- peaks[between(mobility, binMobStart + genEICParams$mobStep/4, binMobStart + genEICParams$mobStep/4*3) == TRUE]
             }
-            if (genEICParams$methodMZ == "suspects" && is.finite(genEICParams$rtWindow) && !is.null(suspects[["rt"]]))
+            if (genEICParams$methodMZ == "suspects")
             {
-                # only keep peaks with at least one closely eluting suspect
+                # only keep peaks that match with a suspect
+                checkRT <- is.finite(genEICParams$rtWindow) && !is.null(suspects[["rt"]])
                 peaks[, keep := {
-                    susp <- suspects[numLTE(abs(mz - omz), genEICParams$mzWindow) &
-                                         numLTE(abs(rt - ort), genEICParams$rtWindow),
-                                     env = list(omz = mz, ort = ret)]
+                    susp <- suspects[numLTE(abs(mz - omz), genEICParams$mzWindow), env = list(omz = mz)]
+                    if (checkRT)
+                        susp <- susp[numLTE(abs(rt - ort), genEICParams$rtWindow), env = list(ort = ret)]
                     if (identical(genEICParams[["methodIMS"]], "suspects") && !is.null(suspects[["mobility"]]))
                         susp <- susp[numLTE(abs(mobility - omob), genEICParams$IMSWindow), env = list(omob = mobility)]
                     nrow(susp) > 0

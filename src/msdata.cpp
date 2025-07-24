@@ -1820,7 +1820,7 @@ Rcpp::List getChromMob(const MSReadBackend &backend, SpectrumRawTypes::Mass mzSt
     const auto specf = SpectrumRawFilter().setMZRange(mzStart, mzEnd);
     const auto sfunc = [&](const SpectrumRaw &spec, const SpectrumRawSelection &, size_t)
     {
-        return filterSpectrumRaw(spec, specf, 0.0);
+        return filterIMSFrame(spec, specf, 0.0, SpectrumRawTypes::MobilityRange());
     };
     
     const auto &meta = backend.getSpecMetadata();
@@ -1829,7 +1829,7 @@ Rcpp::List getChromMob(const MSReadBackend &backend, SpectrumRawTypes::Mass mzSt
     for (size_t i=0; i<meta.first.scans.size(); ++i)
         sels[0].emplace_back(i);
     
-    const auto specs = applyMSData<SpectrumRaw>(backend, SpectrumRawTypes::MSLevel::MS1, sels, sfunc, 0)[0];
+    const auto specs = applyMSData<SpectrumRaw>(backend, SpectrumRawTypes::MSLevel::MS1, sels, sfunc, 25)[0];
     SpectrumRaw flatSpec;
     std::vector<SpectrumRawTypes::Time> times;
     for (size_t i=0; i<specs.size(); ++i)
@@ -1839,6 +1839,7 @@ Rcpp::List getChromMob(const MSReadBackend &backend, SpectrumRawTypes::Mass mzSt
     }
     
     return Rcpp::List::create(Rcpp::Named("time") = times,
+                              Rcpp::Named("mz") = flatSpec.getMZs(),
                               Rcpp::Named("mobility") = flatSpec.getMobilities(),
                               Rcpp::Named("intensity") = flatSpec.getIntensities());
 }

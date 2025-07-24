@@ -421,7 +421,9 @@ setMethod("getFeatureEIXInputTab", "featureGroups", function(obj, type, analysis
         {
             if (is.null(ret[["mobmin"]]))
                 ret[, c("mobmin", "mobmax") := NA_real_]
-            ret[, c("retmin", "retmax") := .(max(retmin, ret - EIXParams$maxRTWindow), min(retmax, ret + EIXParams$maxRTWindow))]
+            
+            ret[, c("retmin", "retmax") := .(pmax(ret - EIXParams$maxRTWindow, retmin),
+                                             pmin(ret + EIXParams$maxRTWindow, retmax))]
         }
         
         ret[, ret := NULL]

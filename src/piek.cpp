@@ -533,3 +533,43 @@ Rcpp::LogicalVector filterEICBins(const Rcpp::NumericVector &binStartMZs, const 
     
     return keep;
 }
+
+// [[Rcpp::export]]
+Rcpp::LogicalVector filterPiekResults(const Rcpp::NumericVector &resultRTs, const Rcpp::NumericVector &resultMZs,
+                                      const Rcpp::NumericVector &resultMobs, const Rcpp::NumericVector &checkRTs,
+                                      const Rcpp::NumericVector &checkStartMZs, const Rcpp::NumericVector &checkEndMZs,
+                                      const Rcpp::NumericVector &checkMobs, double tolRT, double tolMob)
+{
+    // NOTE: mz range may be isolation ranges with unknown centers, so these are given as start/end range
+    // NOTE: RT/mob checking is only done if check vectors are given
+    
+    Rcpp::LogicalVector keep(resultMZs.size(), false);
+    const auto sortedStartMZInds = getSortedInds(checkStartMZs);
+    const bool doCheckRTs = checkRTs.size() > 0, doCheckMobs = checkMobs.size() > 0;
+    
+    double maxMZWidth = 0.0;
+    for (size_t i=0; i<checkStartMZs.size(); ++i)
+        maxMZWidth = std::max(maxMZWidth, checkEndMZs[i] - checkStartMZs[i]);
+    
+    for (int i=0; i<resultMZs.size(); ++i)
+    {
+        const auto mz = resultMZs[i];
+        auto it = std::lower_bound(sortedStartMZInds.begin(), sortedStartMZInds.end(), mz - maxMZWidth,
+                                   [&checkStartMZs](size_t ind, double m) { return checkStartMZs[ind] < m; });
+        for (; it!=sortedStartMZInds.end() && numberLTE(checkStartMZs[*it], mz); ++it)
+        {
+            const size_t j = *it;
+            if (!numberGTE(checkEndMZs[j], mz))
+                continue;
+            if (doCheckRTs && !numberLTE(std::abs(checkRTs[j] - resultRTs[i]), tolRT))
+                continue;
+            if (doCheckMobs && !numberLTE(std::abs(checkMobs[j] - resultMobs[i]), tolMob))
+                continue;
+            
+            keep[i] = true;
+            break; // found a match
+        }
+    }
+    
+    return keep;
+}

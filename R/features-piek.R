@@ -468,25 +468,22 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
             {
                 # only keep peaks that match with a suspect
                 checkRT <- is.finite(genEICParams$rtWindow) && !is.null(suspects[["rt"]])
-                peaks[, keep := {
-                    susp <- suspects[numLTE(abs(mz - omz), genEICParams$mzWindow), env = list(omz = mz)]
-                    if (checkRT)
-                        susp <- susp[numLTE(abs(rt - ort), genEICParams$rtWindow), env = list(ort = ret)]
-                    if (identical(genEICParams[["methodIMS"]], "suspects") && !is.null(suspects[["mobility"]]))
-                        susp <- susp[numLTE(abs(mobility - omob), genEICParams$IMSWindow), env = list(omob = mobility)]
-                    nrow(susp) > 0
-                }, by = .I]
+                checkMob <- identical(genEICParams[["methodIMS"]], "suspects") && !is.null(suspects[["mobility"]])
+                keep <- filterPiekResults(peaks$ret, peaks$mz, if (checkMob) peaks$mobility else numeric(),
+                                          if (checkRT) suspects$rt, suspects$mz - genEICParams$mzWindow,
+                                          suspects$mz + genEICParams$mzWindow,
+                                          if (checkMob) suspects$mobility else numeric(),
+                                          genEICParams$rtWindow, if (checkMob) genEICParams$IMSWindow else 0)
                 peaks <- peaks[keep == TRUE]
             }
             else if (genEICParams$methodMZ %in% "ms2" && is.finite(genEICParams$rtWindow))
             {
-                # only keep peaks that elute closely to at least one MS2 spectrum
-                peaks[, keep := {
-                    MS2Peaks <- MS2Info[mz %inrange% list(mzmin, mzmax) & numLTE(abs(ret - time), genEICParams$rtWindow)]
-                    if (identical(genEICParams[["methodIMS"]], "ms2"))
-                        MS2Peaks <- MS2Info[mobility %inrange% list(mobmin, mobmax)]
-                    nrow(MS2Peaks) > 0
-                }, by = .I]
+                keep <- if (identical(genEICParams[["methodIMS"]], "ms2"))
+                    filterPiekResults(peaks$ret, peaks$mz, peaks$mobility, MS2Info$time, MS2Info$mzmin, MS2Info$mzmax,
+                                      MS2Info$mobility, genEICParams$rtWindow, genEICParams$IMSWindow)
+                else
+                    filterPiekResults(peaks$ret, peaks$mz, numeric(), MS2Info$time, MS2Info$mzmin, MS2Info$mzmax,
+                                      numeric(), genEICParams$rtWindow, 0)
                 peaks <- peaks[keep == TRUE]
             }
             

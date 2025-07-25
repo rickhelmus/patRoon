@@ -622,6 +622,25 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// filterPiekResults
+Rcpp::LogicalVector filterPiekResults(const Rcpp::NumericVector& resultRTs, const Rcpp::NumericVector& resultMZs, const Rcpp::NumericVector& resultMobs, const Rcpp::NumericVector& checkRTs, const Rcpp::NumericVector& checkStartMZs, const Rcpp::NumericVector& checkEndMZs, const Rcpp::NumericVector& checkMobs, double tolRT, double tolMob);
+RcppExport SEXP _patRoon_filterPiekResults(SEXP resultRTsSEXP, SEXP resultMZsSEXP, SEXP resultMobsSEXP, SEXP checkRTsSEXP, SEXP checkStartMZsSEXP, SEXP checkEndMZsSEXP, SEXP checkMobsSEXP, SEXP tolRTSEXP, SEXP tolMobSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type resultRTs(resultRTsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type resultMZs(resultMZsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type resultMobs(resultMobsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type checkRTs(checkRTsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type checkStartMZs(checkStartMZsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type checkEndMZs(checkEndMZsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type checkMobs(checkMobsSEXP);
+    Rcpp::traits::input_parameter< double >::type tolRT(tolRTSEXP);
+    Rcpp::traits::input_parameter< double >::type tolMob(tolMobSEXP);
+    rcpp_result_gen = Rcpp::wrap(filterPiekResults(resultRTs, resultMZs, resultMobs, checkRTs, checkStartMZs, checkEndMZs, checkMobs, tolRT, tolMob));
+    return rcpp_result_gen;
+END_RCPP
+}
 // specDistMatrix
 Rcpp::NumericMatrix specDistMatrix(Rcpp::List specList, Rcpp::CharacterVector method, Rcpp::CharacterVector shift, Rcpp::NumericVector precMZs, Rcpp::NumericVector mzWeight, Rcpp::NumericVector intWeight, Rcpp::NumericVector mzWindow);
 RcppExport SEXP _patRoon_specDistMatrix(SEXP specListSEXP, SEXP methodSEXP, SEXP shiftSEXP, SEXP precMZsSEXP, SEXP mzWeightSEXP, SEXP intWeightSEXP, SEXP mzWindowSEXP) {
@@ -909,6 +928,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_doFindPeaksPiek", (DL_FUNC) &_patRoon_doFindPeaksPiek, 10},
     {"_patRoon_findFeatSuspTableDups", (DL_FUNC) &_patRoon_findFeatSuspTableDups, 7},
     {"_patRoon_filterEICBins", (DL_FUNC) &_patRoon_filterEICBins, 8},
+    {"_patRoon_filterPiekResults", (DL_FUNC) &_patRoon_filterPiekResults, 9},
     {"_patRoon_specDistMatrix", (DL_FUNC) &_patRoon_specDistMatrix, 7},
     {"_patRoon_specDistRect", (DL_FUNC) &_patRoon_specDistRect, 9},
     {"_patRoon_testSpecFilter", (DL_FUNC) &_patRoon_testSpecFilter, 7},

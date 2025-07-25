@@ -538,14 +538,15 @@ Rcpp::LogicalVector filterEICBins(const Rcpp::NumericVector &binStartMZs, const 
 Rcpp::LogicalVector filterPiekResults(const Rcpp::NumericVector &resultRTs, const Rcpp::NumericVector &resultMZs,
                                       const Rcpp::NumericVector &resultMobs, const Rcpp::NumericVector &checkRTs,
                                       const Rcpp::NumericVector &checkStartMZs, const Rcpp::NumericVector &checkEndMZs,
-                                      const Rcpp::NumericVector &checkMobs, double tolRT, double tolMob)
+                                      const Rcpp::NumericVector &checkStartMobs,
+                                      const Rcpp::NumericVector &checkEndMobs, double tolRT)
 {
     // NOTE: mz range may be isolation ranges with unknown centers, so these are given as start/end range
     // NOTE: RT/mob checking is only done if check vectors are given
     
     Rcpp::LogicalVector keep(resultMZs.size(), false);
     const auto sortedStartMZInds = getSortedInds(checkStartMZs);
-    const bool doCheckRTs = checkRTs.size() > 0, doCheckMobs = checkMobs.size() > 0;
+    const bool doCheckRTs = checkRTs.size() > 0, doCheckMobs = checkStartMobs.size() > 0;
     
     double maxMZWidth = 0.0;
     for (size_t i=0; i<checkStartMZs.size(); ++i)
@@ -563,7 +564,8 @@ Rcpp::LogicalVector filterPiekResults(const Rcpp::NumericVector &resultRTs, cons
                 continue;
             if (doCheckRTs && !numberLTE(std::abs(checkRTs[j] - resultRTs[i]), tolRT))
                 continue;
-            if (doCheckMobs && !numberLTE(std::abs(checkMobs[j] - resultMobs[i]), tolMob))
+            if (doCheckMobs && (!numberLTE(checkStartMobs[j], resultMobs[i]) ||
+                !numberGTE(checkEndMobs[j], resultMobs[i])))
                 continue;
             
             keep[i] = true;

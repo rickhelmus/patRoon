@@ -472,18 +472,18 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
                 keep <- filterPiekResults(peaks$ret, peaks$mz, if (checkMob) peaks$mobility else numeric(),
                                           if (checkRT) suspects$rt, suspects$mz - genEICParams$mzWindow,
                                           suspects$mz + genEICParams$mzWindow,
-                                          if (checkMob) suspects$mobility else numeric(),
-                                          genEICParams$rtWindow, if (checkMob) genEICParams$IMSWindow else 0)
+                                          if (checkMob) suspects$mobility - genEICParams$IMSWindow else numeric(),
+                                          if (checkMob) suspects$mobility + genEICParams$IMSWindow else numeric(),
+                                          genEICParams$rtWindow)
                 peaks <- peaks[keep == TRUE]
             }
             else if (genEICParams$methodMZ %in% "ms2" && is.finite(genEICParams$rtWindow))
             {
-                keep <- if (identical(genEICParams[["methodIMS"]], "ms2"))
-                    filterPiekResults(peaks$ret, peaks$mz, peaks$mobility, MS2Info$time, MS2Info$mzmin, MS2Info$mzmax,
-                                      MS2Info$mobility, genEICParams$rtWindow, genEICParams$IMSWindow)
-                else
-                    filterPiekResults(peaks$ret, peaks$mz, numeric(), MS2Info$time, MS2Info$mzmin, MS2Info$mzmax,
-                                      numeric(), genEICParams$rtWindow, 0)
+                checkMob <- identical(genEICParams[["methodIMS"]], "ms2")
+                keep <- filterPiekResults(peaks$ret, peaks$mz, if (checkMob) peaks$mobility else numeric(),
+                                          MS2Info$time, MS2Info$mzmin, MS2Info$mzmax,
+                                          if (checkMob) MS2Info$mobmin else numeric(),
+                                          if (checkMob) MS2Info$mobmax else numeric(), genEICParams$rtWindow)
                 peaks <- peaks[keep == TRUE]
             }
             

@@ -145,8 +145,8 @@ filterEICBins <- function(binStartMZs, mzBinWidth, binStartMobs, mobBinWidth, ch
     .Call(`_patRoon_filterEICBins`, binStartMZs, mzBinWidth, binStartMobs, mobBinWidth, checkStartMZs, checkEndMZs, checkStartMobs, checkEndMobs)
 }
 
-filterPiekResults <- function(resultRTs, resultMZs, resultMobs, checkRTs, checkStartMZs, checkEndMZs, checkMobs, tolRT, tolMob) {
-    .Call(`_patRoon_filterPiekResults`, resultRTs, resultMZs, resultMobs, checkRTs, checkStartMZs, checkEndMZs, checkMobs, tolRT, tolMob)
+filterPiekResults <- function(resultRTs, resultMZs, resultMobs, checkRTs, checkStartMZs, checkEndMZs, checkStartMobs, checkEndMobs, tolRT) {
+    .Call(`_patRoon_filterPiekResults`, resultRTs, resultMZs, resultMobs, checkRTs, checkStartMZs, checkEndMZs, checkStartMobs, checkEndMobs, tolRT)
 }
 
 specDistMatrix <- function(specList, method, shift, precMZs, mzWeight, intWeight, mzWindow) {

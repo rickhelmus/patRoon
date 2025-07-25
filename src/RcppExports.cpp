@@ -623,8 +623,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // filterPiekResults
-Rcpp::LogicalVector filterPiekResults(const Rcpp::NumericVector& resultRTs, const Rcpp::NumericVector& resultMZs, const Rcpp::NumericVector& resultMobs, const Rcpp::NumericVector& checkRTs, const Rcpp::NumericVector& checkStartMZs, const Rcpp::NumericVector& checkEndMZs, const Rcpp::NumericVector& checkMobs, double tolRT, double tolMob);
-RcppExport SEXP _patRoon_filterPiekResults(SEXP resultRTsSEXP, SEXP resultMZsSEXP, SEXP resultMobsSEXP, SEXP checkRTsSEXP, SEXP checkStartMZsSEXP, SEXP checkEndMZsSEXP, SEXP checkMobsSEXP, SEXP tolRTSEXP, SEXP tolMobSEXP) {
+Rcpp::LogicalVector filterPiekResults(const Rcpp::NumericVector& resultRTs, const Rcpp::NumericVector& resultMZs, const Rcpp::NumericVector& resultMobs, const Rcpp::NumericVector& checkRTs, const Rcpp::NumericVector& checkStartMZs, const Rcpp::NumericVector& checkEndMZs, const Rcpp::NumericVector& checkStartMobs, const Rcpp::NumericVector& checkEndMobs, double tolRT);
+RcppExport SEXP _patRoon_filterPiekResults(SEXP resultRTsSEXP, SEXP resultMZsSEXP, SEXP resultMobsSEXP, SEXP checkRTsSEXP, SEXP checkStartMZsSEXP, SEXP checkEndMZsSEXP, SEXP checkStartMobsSEXP, SEXP checkEndMobsSEXP, SEXP tolRTSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -634,10 +634,10 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type checkRTs(checkRTsSEXP);
     Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type checkStartMZs(checkStartMZsSEXP);
     Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type checkEndMZs(checkEndMZsSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type checkMobs(checkMobsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type checkStartMobs(checkStartMobsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type checkEndMobs(checkEndMobsSEXP);
     Rcpp::traits::input_parameter< double >::type tolRT(tolRTSEXP);
-    Rcpp::traits::input_parameter< double >::type tolMob(tolMobSEXP);
-    rcpp_result_gen = Rcpp::wrap(filterPiekResults(resultRTs, resultMZs, resultMobs, checkRTs, checkStartMZs, checkEndMZs, checkMobs, tolRT, tolMob));
+    rcpp_result_gen = Rcpp::wrap(filterPiekResults(resultRTs, resultMZs, resultMobs, checkRTs, checkStartMZs, checkEndMZs, checkStartMobs, checkEndMobs, tolRT));
     return rcpp_result_gen;
 END_RCPP
 }

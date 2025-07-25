@@ -675,7 +675,7 @@ genScriptAnnBlock <- function(ionization, IMS, settingsAnn, adductArg, doSusps, 
         list(value = "mslists"),
         list(name = "MSLevel", value = 2),
         list(name = "absMinIntensity", value = "NULL"),
-        list(name = "absMinIntensity", value = 0.05),
+        list(name = "relMinIntensity", value = 0.05),
         list(name = "topMostPeaks", value = 25),
         list(name = "maxMZOverPrec", value = 4)
     ))

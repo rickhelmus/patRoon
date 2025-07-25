@@ -20,6 +20,18 @@ auto getTIMSDecompBuffers(size_t size)
 // From http://mochan.info/c++/2019/06/12/returntype-deduction.html
 using TIMSDecompBufferPair = decltype(getTIMSDecompBuffers(std::declval<size_t>()));
 
+struct OTIMSThreadData
+{
+    TIMSDecompBufferPair buffers;
+    
+    size_t curFrame;
+    bool initialized = false;
+    std::vector<uint32_t> IDs, intensities;
+    std::vector<double> mzs, mobilities;
+    
+    OTIMSThreadData(TIMSDecompBufferPair &&b) : buffers(std::move(b)) { }
+};
+
 // utility class to load and use the TIMS SDK
 class BrukerLibrary
 {
@@ -97,7 +109,7 @@ void MSReadBackendOTIMS::doClose(void)
 
 MSReadBackend::ThreadDataType MSReadBackendOTIMS::doGetThreadData(void) const
 {
-    return std::make_shared<TIMSDecompBufferPair>(getTIMSDecompBuffers(handle->get_decomp_buffer_size()));
+    return std::make_shared<OTIMSThreadData>(getTIMSDecompBuffers(handle->get_decomp_buffer_size()));
 }
 
 SpectrumRaw MSReadBackendOTIMS::doReadSpectrum(const ThreadDataType &tdata, SpectrumRawTypes::MSLevel MSLevel,
@@ -135,21 +147,27 @@ SpectrumRaw MSReadBackendOTIMS::doReadSpectrum(const ThreadDataType &tdata, Spec
     tframe.save_to_buffs(nullptr, IDs.data(), nullptr, intensities.data(), mzs.data(), mobilities.data(), nullptr);
     tframe.close();
 #elif 1
-    std::vector<uint32_t> IDs, intensities;
-    std::vector<double> mzs, mobilities;
-
-    #pragma omp critical (VeryCritical1)
+    auto *otd = reinterpret_cast<OTIMSThreadData *>(tdata.get());
+    if (!otd->initialized || otd->curFrame != scanSel.index)
     {
-        auto &tframe = handle->get_frame(metaMS.scans[scanSel.index]);
-        
-        IDs.assign(tframe.num_peaks, 0); intensities.assign(tframe.num_peaks, 0.0);
-        mzs.assign(tframe.num_peaks, 0.0); mobilities.assign(tframe.num_peaks, 0.0);
-        
-        auto *bufs = reinterpret_cast<TIMSDecompBufferPair *>(tdata.get());
-        tframe.decompress(bufs->second.get(), bufs->first.get());
-        tframe.save_to_buffs(nullptr, IDs.data(), nullptr, intensities.data(), mzs.data(), mobilities.data(), nullptr);
-        tframe.close();
+        #pragma omp critical (VeryCritical1)
+        {
+            auto &tframe = handle->get_frame(metaMS.scans[scanSel.index]);
+            
+            otd->IDs.assign(tframe.num_peaks, 0); otd->intensities.assign(tframe.num_peaks, 0.0);
+            otd->mzs.assign(tframe.num_peaks, 0.0); otd->mobilities.assign(tframe.num_peaks, 0.0);
+            
+            auto *bufs = reinterpret_cast<TIMSDecompBufferPair *>(tdata.get());
+            tframe.decompress(otd->buffers.second.get(), otd->buffers.first.get());
+            tframe.save_to_buffs(nullptr, otd->IDs.data(), nullptr, otd->intensities.data(), otd->mzs.data(),
+                                 otd->mobilities.data(), nullptr);
+            tframe.close();
+        }
+        otd->curFrame = scanSel.index;
+        otd->initialized = true;
     }
+
+    
 #else
     std::vector<uint32_t> IDs, intensities;
     std::vector<double> mzs, mobilities;
@@ -180,21 +198,21 @@ SpectrumRaw MSReadBackendOTIMS::doReadSpectrum(const ThreadDataType &tdata, Spec
 #endif
     
     SpectrumRaw ret;
-    for (size_t i=0; i<IDs.size(); ++i)
+    for (size_t i=0; i<otd->IDs.size(); ++i)
     {
         if (mobRange.isSet())
         {
             // NOTE: mobilities are sorted from high to low
-            if (mobilities[i] < mobRange.start)
+            if (otd->mobilities[i] < mobRange.start)
                 continue;
-            if (mobilities[i] > mobRange.end)
+            if (otd->mobilities[i] > mobRange.end)
                 break;
         }
         
         if (!scanSel.MSMSFrameIndices.empty())
         {
             bool inRange = false;
-            const auto curScanID = IDs[i];
+            const auto curScanID = otd->IDs[i];
             for (size_t j=0; j<scanSel.MSMSFrameIndices.size() && !inRange; ++j)
             {
                 const auto fri = scanSel.MSMSFrameIndices[j];
@@ -207,14 +225,14 @@ SpectrumRaw MSReadBackendOTIMS::doReadSpectrum(const ThreadDataType &tdata, Spec
             if (!inRange)
             {
                 // try again with next scan: increment until last element (i will be incremented again in main for loop)
-                for (; i < (IDs.size()-1) && IDs[i+1] == curScanID; ++i)
+                for (; i < (otd->IDs.size()-1) && otd->IDs[i+1] == curScanID; ++i)
                     ;
                 continue;
             }
         }
         
-        if (intensities[i] >= minIntensityIMS)
-            ret.append(mzs[i], intensities[i], mobilities[i]);
+        if (otd->intensities[i] >= minIntensityIMS)
+            ret.append(otd->mzs[i], otd->intensities[i], otd->mobilities[i]);
     }
     
     return ret;

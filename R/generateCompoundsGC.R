@@ -1,0 +1,241 @@
+#' Generate compounds for GC-EI-HRMS workflows
+#'
+#' This method is adapted from generateCompoundsLibrary() to support GC-EI full scan data.
+#' It uses the "MS" slot and optionally filters by Retention Index (RI).
+#' 
+#' @inheritParams generateCompoundsLibrary
+#' @param RI Optional numeric vector of retention indices for each feature group.
+#' @param RItol Retention index tolerance (default: 10 units).
+#' @export
+
+setMethod("generateCompoundsGC", "featureGroups", function(fGroups, MSPeakLists, MSLibrary, minSim = 0.75,
+                                                                minAnnSim = minSim, absMzDev = 0.002, adduct = NULL,
+                                                                checkIons = "adduct", spectrumType = "MS2",
+                                                                specSimParams = getDefSpecSimParams(),
+                                                                specSimParamsLib = getDefSpecSimParams(),
+                                                                RI = NULL,  # NEW: retention index vector for feature groups
+                                                                RItol = 10) # NEW: tolerance for retention index matching
+{
+  ac <- checkmate::makeAssertCollection()
+  checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
+  checkmate::assertClass(MSLibrary, "MSLibrary", add = ac)
+  aapply(checkmate::assertNumber, . ~ minSim + minAnnSim + absMzDev, lower = 0, finite = TRUE, fixed = list(add = ac))
+  checkmate::assertChoice(checkIons, c("adduct", "polarity", "none"), add = ac)
+  checkmate::assertCharacter(spectrumType, min.len = 1, min.chars = 1, null.ok = TRUE, add = ac)
+  assertSpecSimParams(specSimParams, add = ac)
+  assertSpecSimParams(specSimParamsLib, add = ac)
+  checkmate::reportAssertions(ac)
+  
+  if (specSimParams$shift != "none")
+    stop("Spectral shifting not supported", call. = FALSE)
+  
+  if (length(fGroups) == 0)
+    return(compounds(algorithm = "library-GC"))
+  
+  adduct <- checkAndToAdduct(adduct, fGroups)
+  
+  gCount <- length(fGroups)
+  gInfo <- groupInfo(fGroups)
+  annTbl <- annotations(fGroups)
+  libRecs <- records(MSLibrary)
+  libSpecs <- spectra(MSLibrary)
+  
+  libRecs <- libRecs[!is.na(PrecursorMZ) & !is.na(SMILES) & !is.na(InChI) & !is.na(InChIKey) & !is.na(formula)]
+  if (checkIons == "adduct")
+    libRecs <- libRecs[!is.na(Precursor_type)]
+  else if (checkIons == "polarity")
+    libRecs <- libRecs[!is.na(Ion_mode)]
+  
+  getRecsForAdduct <- function(recs, add, addChr)
+  {
+    if (checkIons == "none")
+      return(recs)
+    else if (checkIons == "polarity")
+    {
+      pos <- add@charge > 0
+      recs <- recs[((pos & Ion_mode == "POSITIVE") | (!pos & Ion_mode == "NEGATIVE"))]
+    }
+    else # if (checkIons == "adduct")
+      recs <- recs[Precursor_type == addChr]
+    return(recs)
+  }
+  
+  if (!is.null(adduct))
+    libRecs <- getRecsForAdduct(libRecs, adduct, as.character(adduct))
+  else
+    allAdducts <- sapply(unique(annTbl$adduct), as.adduct)
+  
+  if (!is.null(spectrumType))
+    libRecs <- libRecs[Spectrum_type %chin% spectrumType]
+  
+  cacheDB <- openCacheDBScope()
+  baseHash <- makeHash(minSim, minAnnSim, absMzDev, adduct, checkIons, specSimParams, specSimParamsLib)
+  setHash <- makeHash(fGroups, MSPeakLists, MSLibrary, baseHash)
+  cachedSet <- loadCacheSet("compoundsLibrary", setHash, cacheDB)
+  resultHashes <- vector("character", gCount)
+  resultHashCount <- 0
+  
+  printf("Processing %d feature groups with a library of %d records...\n", gCount, nrow(libRecs))
+  
+  compList <- withProg(length(fGroups), FALSE, sapply(names(fGroups), function(grp)
+  {
+    # HACK: call here since there are quite a few early returns below
+    doProgress()
+    
+    if (is.null(MSPeakLists[[grp]]) || is.null(MSPeakLists[[grp]][["MS"]]))
+      return(NULL)
+    spec <- MSPeakLists[[grp]][["MS"]]  # Changed from MSMS to MS for GC-EI full scan
+    if (is.null(spec))
+      return(NULL)
+    
+    precMZ <- MSPeakLists[[grp]]$MS[precursor == TRUE]$mz
+    
+    spec <- prepSpecSimilarityPL(spec, removePrecursor = specSimParams$removePrecursor,
+                                 relMinIntensity = specSimParams$relMinIntensity, minPeaks = specSimParams$minPeaks)
+    if (nrow(spec) == 0)
+      return(NULL)
+    
+    cTab <- libRecs[numLTE(abs(precMZ - PrecursorMZ), absMzDev)]
+    if (is.null(adduct))
+    {
+      addChr <- annTbl[group == grp]$adduct
+      cTab <- getRecsForAdduct(cTab, allAdducts[[addChr]], addChr)
+    }
+    
+    if (nrow(cTab) == 0)
+      return(NULL)
+    
+    hash <- makeHash(baseHash, spec, cTab, libSpecs[cTab$identifier])
+    resultHashCount <<- resultHashCount + 1
+    resultHashes[resultHashCount] <<- hash
+    
+    cached <- NULL
+    if (!is.null(cachedSet))
+      cached <- cachedSet[[hash]]
+    if (is.null(cached))
+      cached <- loadCacheData("compoundsLibrary", hash, cacheDB)
+    if (!is.null(cached))
+      return(cached)
+    
+    cTab <- unifyLibNames(cTab)
+    cTab[, InChIKey1 := getIKBlock1(InChIKey)]
+    lspecs <- Map(libSpecs[cTab$identifier], cTab$ion_formula_mz, cTab$identifier, f = function(sp, pmz, lid)
+    {
+      # convert to MSPeakLists format
+      ret <- copy(sp)
+      ret[, ID := seq_len(.N)]
+      ret <- assignPrecursorToMSPeakList(ret, pmz)
+      ret <- prepSpecSimilarityPL(ret, removePrecursor = specSimParamsLib$removePrecursor,
+                                  relMinIntensity = specSimParamsLib$relMinIntensity,
+                                  minPeaks = specSimParamsLib$minPeaks)
+      return(ret)
+    })
+    lspecs <- pruneList(lspecs, checkZeroRows = TRUE)
+    cTab <- cTab[identifier %in% names(lspecs)]
+    if (nrow(cTab) == 0)
+      return(NULL)
+    
+    sims <- specDistRect(list(spec), lspecs, specSimParams$method, specSimParams$shift, 0,
+                         0, specSimParams$mzWeight, specSimParams$intWeight, specSimParams$absMzDev)
+    
+    cTab[, c("score", "libMatch") := sims[1, ]]
+    
+    hasAnnons <- FALSE
+    for (sp in lspecs)
+    {
+      if (!is.null(sp[["annotation"]]))
+      {
+        hasAnnons <- TRUE
+        break
+      }
+    }
+    
+    if (hasAnnons)
+    {
+      cTabAnn <- cTab[numGTE(score, minAnnSim)] # store before filtering/de-duplicating
+      # needed below for neutral loss calculation
+      thisAdduct <- if (!is.null(adduct)) adduct else as.adduct(annTbl[group == grp]$adduct)
+    }
+    
+    cTab <- cTab[numGTE(score, minSim)]
+    
+    setorderv(cTab, "score", -1)
+    
+    cTab <- unique(cTab, by = "InChIKey1") # NOTE: prior sorting ensure top ranked stays
+    
+    # fill in fragInfos
+    cTab[, fragInfo := list(Map(lspecs[identifier], InChIKey1, neutral_formula, f = function(ls, ik1, form)
+    {
+      bsp <- as.data.table(binSpectra(spec, ls, "none", 0, specSimParams$absMzDev))
+      bsp <- bsp[intensity_1 != 0 & intensity_2 != 0] # overlap
+      
+      # NOTE: the mz values from the binned spectra could be slightly different --> take the original values
+      fi <- data.table(mz = spec[match(bsp$ID_1, ID)]$mz, PLID = bsp$ID_1)
+      
+      fi[, c("ion_formula", "neutral_loss") := NA_character_]
+      setorderv(fi, "PLID")
+      
+      if (hasAnnons)
+      {
+        cta <- cTabAnn[InChIKey1 == ik1]
+        specMatched <- spec[ID %in% fi$PLID] # get peak list with only matched peaks, we need it for binning
+        ann <- rbindlist(lapply(lspecs[cta$identifier], function(lsp)
+        {
+          if (is.null(lsp[["annotation"]]))
+            return(NULL)
+          
+          # verify annotations
+          lsp <- lsp[verifyFormulas(annotation)]
+          
+          if (nrow(lsp) == 0)
+            return(NULL)
+          
+          # find overlapping peaks
+          bsp2 <- as.data.table(binSpectra(specMatched, lsp, "none", 0, specSimParams$absMzDev))
+          bsp2 <- bsp2[intensity_1 != 0 & intensity_2 != 0] # overlap
+          
+          if (nrow(bsp2) == 0)
+            return(NULL)
+          
+          return(data.table(ID = bsp2$ID_1, annotation = lsp[match(bsp2$ID_2, ID)]$annotation))
+        }))
+        
+        if (nrow(ann) > 0)
+        {
+          # resolve conflicts in annotation: keep most abundant
+          ann[, count := .N, by = c("ID", "annotation")]
+          setorderv(ann, c("ID", "count"), order = c(1, -1))
+          ann <- unique(ann, by = "ID")
+          
+          fi[match(ann$ID, PLID), ion_formula := ann$annotation]
+          ionform <- calculateIonFormula(form, thisAdduct)
+          fi[!is.na(ion_formula), neutral_loss := sapply(ion_formula, subtractFormula, formula1 = ionform)]
+        }
+      }
+      
+      return(fi)
+    }))]
+    
+    cTab[, explainedPeaks := sapply(fragInfo, nrow)]
+    cTab[, libPeaksCompared := sapply(lspecs[identifier], nrow)]
+    cTab[, libPeaksTotal := sapply(libSpecs[identifier], nrow)]
+    cTab[, database := "library"]
+    
+    saveCacheData("compoundsLibrary", cTab, hash, cacheDB)
+    
+    return(cTab)
+  }, simplify = FALSE))
+  
+  if (is.null(cachedSet))
+    saveCacheSet("compoundsLibrary", resultHashes[seq_len(resultHashCount)], setHash, cacheDB)
+  
+  compList <- pruneList(compList, checkZeroRows = TRUE)
+  
+  ngrp <- length(compList)
+  printf("Loaded %d compounds from %d features (%.2f%%).\n", sum(unlist(lapply(compList, nrow))),
+         ngrp, if (gCount == 0) 0 else ngrp * 100 / gCount)
+  
+  return(compounds(groupAnnotations = compList, scoreTypes = c("score", "libMatch"),
+                   scoreRanges = sapply(compList, function(ct) list(score = range(ct$score), libMatch = range(ct$libMatch)), simplify = FALSE),
+                   algorithm = "library"))
+})

@@ -46,3 +46,7 @@ dumpPkgOpts <- function(printFunc)
     packageStartupMessage("Configuration:")
     dumpPkgOpts(packageStartupMessage)
 }
+
+.onLoad <- function(libname, pkgname) {
+  source("R/generateCompoundsGC.R")
+}

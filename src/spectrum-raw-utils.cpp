@@ -307,8 +307,9 @@ SpectrumRawAveraged averageSpectraRaw(const SpectrumRawAveraged &flattenedSpecs,
     // average data
     for (size_t i=0; i<binnedSpectrum.size(); ++i)
     {
-        const SpectrumRawTypes::Mass mz = binnedSpectrum.getMZs()[i] / static_cast<SpectrumRawTypes::Mass>(binnedSpectrum.getIntensities()[i]);
         SpectrumRawTypes::Intensity inten = binnedSpectrum.getIntensities()[i];
+        // NOTE: need to handle zero intensities (eg Agilent data...) --> zero intensity points are removed below
+        const SpectrumRawTypes::Mass mz = (inten == 0) ? -1 : binnedSpectrum.getMZs()[i] / static_cast<SpectrumRawTypes::Mass>(inten);
         if (averageIntensities)
             inten /= static_cast<SpectrumRawTypes::Intensity>(numSpecs);
         binnedSpectrum.setPeak(i, mz, inten);
@@ -330,7 +331,8 @@ SpectrumRawAveraged averageSpectraRaw(const SpectrumRawAveraged &flattenedSpecs,
     for (size_t i=0; i<sortedInds.size(); ++i)
     {
         const auto j = sortedInds[i];
-        if (minIntensity > 0 && binnedSpectrum.getIntensities()[j] < minIntensity)
+        const auto inten = binnedSpectrum.getIntensities()[j];
+        if (inten == 0 || (minIntensity > 0 && inten < minIntensity))
             continue;
         
         const auto abundanceAbs = static_cast<SpectrumRawTypes::PeakAbundance>(binIDs[j].size());
@@ -339,12 +341,11 @@ SpectrumRawAveraged averageSpectraRaw(const SpectrumRawAveraged &flattenedSpecs,
             continue;
         
         if (alreadyAveraged)
-            sortedSpectrum.append(binnedSpectrum.getMZs()[j], binnedSpectrum.getIntensities()[j], abundanceRel,
-                                  abundanceAbs, binnedSpectrum.getAvgPrevAbundancesRel()[j],
+            sortedSpectrum.append(binnedSpectrum.getMZs()[j], inten, abundanceRel, abundanceAbs,
+                                  binnedSpectrum.getAvgPrevAbundancesRel()[j],
                                   binnedSpectrum.getAvgPrevAbundancesAbs()[j]);
         else
-            sortedSpectrum.append(binnedSpectrum.getMZs()[j], binnedSpectrum.getIntensities()[j], abundanceRel,
-                                  abundanceAbs);
+            sortedSpectrum.append(binnedSpectrum.getMZs()[j], inten, abundanceRel, abundanceAbs);
     }
     
     // Rcpp::Rcout << "sortedSpectrum: " << sortedSpectrum.size() << "\n";

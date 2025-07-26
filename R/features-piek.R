@@ -59,54 +59,6 @@ getPiekEICsInfo <- function(params, withIMS, suspects, MS2Info, verbose)
     return(EICInfo)
 }
 
-getPiekEICsInfoOld <- function(params, suspects, withIMS, MS2Info)
-{
-    EICInfo <- NULL
-    if (params$methodMZ == "bins")
-    {
-        # UNDONE: also support other binning approaches?
-        binsMZ <- seq(params$mzRange[1], params$mzRange[2], by = params$mzStep * 0.5)
-        names(binsMZ) <- paste0("bin_M", binsMZ)
-        
-        EICInfo <- data.table(mzmin = binsMZ, mzmax = binsMZ + params$mzStep, EIC_ID_MZ = names(binsMZ))
-    }
-    else if (params$methodMZ == "suspects")
-        EICInfo <- data.table(mzmin = suspects$mz - params$mzWindow, mzmax = suspects$mz + params$mzWindow)
-    else if (params$methodMZ == "ms2")
-        EICInfo <- data.table(mzmin = MS2Info$mz - params$mzWindow, mzmax = MS2Info$mz + params$mzWindow)
-    
-    if (withIMS)
-    {
-        if (params$methodIMS == "bins")
-        {
-            binsIMS <- NULL
-            {
-                binsIMS <- seq(params$mobRange[1], params$mobRange[2], by = params$mobStep * 0.5)
-                names(binsIMS) <- paste0("bin_I", binsIMS)
-            }
-            tab <- CJ(EIC_ID_MZ = names(binsMZ), EIC_ID_IMS = names(binsIMS), sorted = FALSE)
-            tab[, c("mobmin", "mobmax") := .(binsIMS[EIC_ID_IMS], binsIMS[EIC_ID_IMS] + params$mobStep)]
-            EICInfo <- merge(EICInfo, tab, by = "EIC_ID_MZ", sort = FALSE)
-        }
-        else if (params$methodIMS == "suspects")
-        {
-            EICInfo <- EICInfo[, c("mobmin", "mobmax") := .(suspects$mobility - params$IMSWindow,
-                                                            suspects$mobility + params$IMSWindow)]
-        }
-        else if (params$methodIMS == "ms2")
-        {
-            EICInfo <- EICInfo[, c("mobmin", "mobmax") := .(MS2Info$mobility - params$IMSWindow,
-                                                            MS2Info$mobility + params$IMSWindow)]
-        }
-    }
-    else
-        EICInfo[, c("mobmin", "mobmax") := 0]
-    
-    EICInfo[, EIC_ID := paste0("EIC_", .I)]
-    
-    return(EICInfo)
-}
-
 #' @rdname features-class
 #' @export
 featuresPiek <- setClass("featuresPiek", contains = "features")

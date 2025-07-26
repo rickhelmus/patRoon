@@ -511,26 +511,85 @@ Rcpp::LogicalVector filterEICBins(const Rcpp::NumericVector &binStartMZs, const 
     
 {
     // NOTE: bins should be sorted by start MZs
+    // NOTE: if bins contain mobility information, the mzs are repeated and mobilities are sorted
     
     Rcpp::LogicalVector keep(binStartMZs.size(), false);
+    if (binStartMZs.size() == 0 || checkStartMZs.size() == 0)
+        return keep;
     
-    for (size_t i=0; i<checkStartMZs.size(); ++i)
+    const bool hasMobs = binStartMobs.size() > 0 && checkStartMobs.size() > 0;
+    const auto sortedCheckStartMZInds = getSortedInds(checkStartMZs);
+    auto prevBinIt = binStartMZs.begin();
+    
+    for (size_t i=0; i<sortedCheckStartMZInds.size(); ++i)
     {
-        auto it = std::lower_bound(binStartMZs.begin(), binStartMZs.end(), checkStartMZs[i] - mzBinWidth);
-        for (; it!=binStartMZs.end() && numberLTE(*it, checkEndMZs[i]); ++it)
+        const size_t j = sortedCheckStartMZInds[i];
+        auto binIt = prevBinIt;
+        if (i == 0 || *binIt > checkEndMZs[j] || (*binIt + mzBinWidth) < checkStartMZs[j])
+            binIt = std::lower_bound(prevBinIt, binStartMZs.end(), checkStartMZs[j] - mzBinWidth);
+        
+        if (binIt == binStartMZs.end())
+            break; // no more bins to check
+        
+        if (hasMobs)
         {
-            const size_t binIndex = std::distance(binStartMZs.begin(), it);
-            if (!numberLTE(checkStartMZs[i], binStartMZs[binIndex] + mzBinWidth) ||
-                !numberGTE(checkEndMZs[i], binStartMZs[binIndex]))
-                continue;
-            if (binStartMobs.size() != 0 && (!numberLTE(checkStartMobs[i], binStartMobs[binIndex] + mobBinWidth) ||
-                !numberGTE(checkEndMobs[i], binStartMobs[binIndex])))
-                continue;
-            
-            keep[binIndex] = true;
+            // For IMS checks: start here again for next check item as it may have different mobilities, otherwise we
+            // continue after all bins that will be checked below
+            prevBinIt = binIt;
         }
+        
+        while (binIt!=binStartMZs.end() && numberLTE(*binIt, checkEndMZs[j]))
+        {
+            const size_t binIndex = std::distance(binStartMZs.begin(), binIt);
+            
+            if (!numberLTE(checkStartMZs[j], binStartMZs[binIndex] + mzBinWidth) ||
+                !numberGTE(checkEndMZs[j], binStartMZs[binIndex]))
+            {
+                // didn't reach proper mz bin yet
+                ++binIt;
+                continue;
+            }
+            
+            if (hasMobs)
+            {
+                const auto binMZ = binStartMZs[binIndex];
+                const auto endMZBinIt = std::upper_bound(binIt, binStartMZs.end(), binMZ);
+                
+                if (Rcpp::NumericVector::is_na(checkStartMobs[j]))
+                {
+                    // no mobility check, just keep all bins in this MZ bin
+                    for (auto ind = binIndex; binIt!=endMZBinIt; ++binIt, ++ind)
+                        keep[ind] = true;
+                }
+                else
+                {
+                    const auto endMZBinInd = std::distance(binStartMZs.begin(), endMZBinIt);
+                    const auto mobEndIt = std::next(binStartMobs.begin(), endMZBinInd);
+                    
+                    auto mobIt = std::lower_bound(std::next(binStartMobs.begin(), binIndex), mobEndIt,
+                                                  checkStartMobs[j] - mobBinWidth);
+                    for (; mobIt!=mobEndIt && numberLTE(*mobIt, checkEndMobs[j]); ++mobIt)
+                    {
+                        if (!numberLTE(checkStartMobs[j], *mobIt + mobBinWidth) || !numberGTE(checkEndMobs[j], *mobIt))
+                            continue;
+                        const size_t mobIndex = std::distance(binStartMobs.begin(), mobIt);
+                        // Rcpp::Rcout << "Found it!\n";
+                        keep[mobIndex] = true;
+                    }
+                    binIt = endMZBinIt; // skip to end of MZ bin
+                }
+            }
+            else
+            {
+                keep[binIndex] = true;
+                ++binIt;
+            }
+        }
+        
+        if (!hasMobs)
+            prevBinIt = binIt;
     }
-    
+
     return keep;
 }
 

@@ -72,7 +72,7 @@ setMethod("groupFeaturesGreedy", "features", function(feat, rtalign = FALSE,
                                     match(replicate, reps), rtWindow, mzWindow, IMSWindow, scoreWeights)]
 
     if (verbose)
-        printf("Done! Found %d groups.\n", max(fTable$groupID))
+        printf("Done! Found %d groups.\n", if (nrow(fTable) > 0) max(fTable$groupID) else 0L)
     
     gInfo <- fTable[, .(ret = mean(ret), mz = mean(mz)), by = "groupID"]
     if (hasMob)

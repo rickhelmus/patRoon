@@ -152,7 +152,7 @@ Rcpp::IntegerVector getGroupIDs(const Rcpp::NumericVector &featRTs, const Rcpp::
                                weightsList["intensity"]);
     Rcpp::IntegerVector ret(featRTs.size(), -1);
     int curGroup = 0;
-    const auto intSortedInds = getSortedInds(ints, true);
+    const auto intSortedInds = getSortedInds(ints, [&ints](size_t i, size_t j) { return ints[i] > ints[j]; });
     const auto mzSortedInds = getSortedInds(featMZs);
     
     for (size_t i=0; i<intSortedInds.size(); ++i)

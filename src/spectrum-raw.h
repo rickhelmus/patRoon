@@ -21,6 +21,7 @@ using PeakAbundance = float;
 
 enum class MSLevel { MS1, MS2 };
 enum class MSPolarity { POSITIVE = 1, NEGATIVE = -1, UNKNOWN = 0 };
+enum class MSSortType { NONE, MZ, MOBILITY_MZ };
 
 }
 
@@ -90,6 +91,7 @@ public:
     const auto &getMobilities(void) const { return mobilities; }
     
     bool hasMobilities(void) const { return !mobilities.empty(); }
+    void setAllMobilities(SpectrumRawTypes::Mobility mob) { mobilities.assign(mzs.size(), mob); }
     
     void append(SpectrumRawTypes::Mass mz, SpectrumRawTypes::Intensity inten);
     void append(SpectrumRawTypes::Mass mz, SpectrumRawTypes::Intensity inten, SpectrumRawTypes::Mobility mob);
@@ -103,6 +105,8 @@ public:
     auto size(void) const { return mzs.size(); }
     bool empty(void) const { return mzs.empty(); }
     void clear(void) { mzs.clear(); intensities.clear(); mobilities.clear(); }
+    
+    void sort(SpectrumRawTypes::MSSortType stype);
 };
 
 class SpectrumRawAveraged: public SpectrumRaw

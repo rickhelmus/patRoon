@@ -193,9 +193,13 @@ SpectrumRaw filterIMSFrame(const SpectrumRaw &frame, const SpectrumRawFilter &fi
     // filter each sub-spectrum and combine spectra back to output frame
     SpectrumRawTypes::Mobility curMob;
     SpectrumRaw curSpec;
-    for (size_t i=0; ; ++i)
+    const auto startMobIt = (mobRange.isSet()) ? 
+        std::lower_bound(frame.getMobilities().begin(), frame.getMobilities().end(), mobRange.start) :
+        frame.getMobilities().begin();
+    for (size_t i=std::distance(frame.getMobilities().begin(), startMobIt); ; ++i)
     {
-        if (i == 0 || i >= frame.size() || curMob != frame.getMobilities()[i])
+        const bool ended = i >= frame.size() || (mobRange.isSet() && frame.getMobilities()[i] > mobRange.end);
+        if (i == 0 || ended || curMob != frame.getMobilities()[i])
         {
             if (i > 0)
             {
@@ -203,15 +207,11 @@ SpectrumRaw filterIMSFrame(const SpectrumRaw &frame, const SpectrumRawFilter &fi
                 curSpec.clear();
             }
             
-            if (i >= frame.size())
-                break; // done
+            if (ended)
+                break;
             
             curMob = frame.getMobilities()[i];
         }
-        
-        // UNDONE: optimize eg for TIMS data where mobilities are sorted?
-        if (mobRange.isSet() && !mobRange.within(curMob))
-            continue;
         
         curSpec.append(frame.getMZs()[i], frame.getIntensities()[i], frame.getMobilities()[i]);
     }

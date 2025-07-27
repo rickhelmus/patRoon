@@ -202,8 +202,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // getCollapsedFrame
-Rcpp::DataFrame getCollapsedFrame(const MSReadBackend& backend, int index, SpectrumRawTypes::Mass mzWindow, SpectrumRawTypes::Intensity minIntensityIMS, SpectrumRawTypes::Intensity minIntensityPre, SpectrumRawTypes::PeakAbundance minAbundanceRel, SpectrumRawTypes::PeakAbundance minAbundanceAbs, const std::string& method);
-RcppExport SEXP _patRoon_getCollapsedFrame(SEXP backendSEXP, SEXP indexSEXP, SEXP mzWindowSEXP, SEXP minIntensityIMSSEXP, SEXP minIntensityPreSEXP, SEXP minAbundanceRelSEXP, SEXP minAbundanceAbsSEXP, SEXP methodSEXP) {
+Rcpp::DataFrame getCollapsedFrame(const MSReadBackend& backend, int index, SpectrumRawTypes::Mass mzWindow, SpectrumRawTypes::Intensity minIntensityIMS, SpectrumRawTypes::Intensity minIntensityPre, SpectrumRawTypes::PeakAbundance minAbundanceRel, SpectrumRawTypes::PeakAbundance minAbundanceAbs, const std::string& method, double mzMin, double mzMax, double minInt, unsigned topMost, double prec, double mobMin, double mobMax);
+RcppExport SEXP _patRoon_getCollapsedFrame(SEXP backendSEXP, SEXP indexSEXP, SEXP mzWindowSEXP, SEXP minIntensityIMSSEXP, SEXP minIntensityPreSEXP, SEXP minAbundanceRelSEXP, SEXP minAbundanceAbsSEXP, SEXP methodSEXP, SEXP mzMinSEXP, SEXP mzMaxSEXP, SEXP minIntSEXP, SEXP topMostSEXP, SEXP precSEXP, SEXP mobMinSEXP, SEXP mobMaxSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -215,7 +215,33 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< SpectrumRawTypes::PeakAbundance >::type minAbundanceRel(minAbundanceRelSEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::PeakAbundance >::type minAbundanceAbs(minAbundanceAbsSEXP);
     Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
-    rcpp_result_gen = Rcpp::wrap(getCollapsedFrame(backend, index, mzWindow, minIntensityIMS, minIntensityPre, minAbundanceRel, minAbundanceAbs, method));
+    Rcpp::traits::input_parameter< double >::type mzMin(mzMinSEXP);
+    Rcpp::traits::input_parameter< double >::type mzMax(mzMaxSEXP);
+    Rcpp::traits::input_parameter< double >::type minInt(minIntSEXP);
+    Rcpp::traits::input_parameter< unsigned >::type topMost(topMostSEXP);
+    Rcpp::traits::input_parameter< double >::type prec(precSEXP);
+    Rcpp::traits::input_parameter< double >::type mobMin(mobMinSEXP);
+    Rcpp::traits::input_parameter< double >::type mobMax(mobMaxSEXP);
+    rcpp_result_gen = Rcpp::wrap(getCollapsedFrame(backend, index, mzWindow, minIntensityIMS, minIntensityPre, minAbundanceRel, minAbundanceAbs, method, mzMin, mzMax, minInt, topMost, prec, mobMin, mobMax));
+    return rcpp_result_gen;
+END_RCPP
+}
+// getFilteredFrame
+Rcpp::DataFrame getFilteredFrame(const MSReadBackend& backend, int index, double mzMin, double mzMax, double minInt, unsigned topMost, double prec, double mobMin, double mobMax);
+RcppExport SEXP _patRoon_getFilteredFrame(SEXP backendSEXP, SEXP indexSEXP, SEXP mzMinSEXP, SEXP mzMaxSEXP, SEXP minIntSEXP, SEXP topMostSEXP, SEXP precSEXP, SEXP mobMinSEXP, SEXP mobMaxSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const MSReadBackend& >::type backend(backendSEXP);
+    Rcpp::traits::input_parameter< int >::type index(indexSEXP);
+    Rcpp::traits::input_parameter< double >::type mzMin(mzMinSEXP);
+    Rcpp::traits::input_parameter< double >::type mzMax(mzMaxSEXP);
+    Rcpp::traits::input_parameter< double >::type minInt(minIntSEXP);
+    Rcpp::traits::input_parameter< unsigned >::type topMost(topMostSEXP);
+    Rcpp::traits::input_parameter< double >::type prec(precSEXP);
+    Rcpp::traits::input_parameter< double >::type mobMin(mobMinSEXP);
+    Rcpp::traits::input_parameter< double >::type mobMax(mobMaxSEXP);
+    rcpp_result_gen = Rcpp::wrap(getFilteredFrame(backend, index, mzMin, mzMax, minInt, topMost, prec, mobMin, mobMax));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -901,7 +927,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_backendAvailable", (DL_FUNC) &_patRoon_backendAvailable, 1},
     {"_patRoon_walkSpectra", (DL_FUNC) &_patRoon_walkSpectra, 1},
     {"_patRoon_getMSSpectrum", (DL_FUNC) &_patRoon_getMSSpectrum, 5},
-    {"_patRoon_getCollapsedFrame", (DL_FUNC) &_patRoon_getCollapsedFrame, 8},
+    {"_patRoon_getCollapsedFrame", (DL_FUNC) &_patRoon_getCollapsedFrame, 15},
+    {"_patRoon_getFilteredFrame", (DL_FUNC) &_patRoon_getFilteredFrame, 9},
     {"_patRoon_getCentroidedFrame", (DL_FUNC) &_patRoon_getCentroidedFrame, 6},
     {"_patRoon_getScans", (DL_FUNC) &_patRoon_getScans, 6},
     {"_patRoon_getEICList", (DL_FUNC) &_patRoon_getEICList, 16},

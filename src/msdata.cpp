@@ -20,6 +20,7 @@ template<typename OutType, typename FuncType, typename... Args>
 std::vector<std::vector<OutType>> applyMSData(const MSReadBackend &backend, SpectrumRawTypes::MSLevel MSLevel,
                                               const std::vector<std::vector<SpectrumRawSelection>> &scanSels,
                                               FuncType func, SpectrumRawTypes::Intensity minIntensityIMS,
+                                              SpectrumRawTypes::MSSortType IMSSortType,
                                               std::function<SpectrumRaw(const SpectrumRaw &)> prepFunc = {},
                                               Args... args)
 {
@@ -97,6 +98,8 @@ std::vector<std::vector<OutType>> applyMSData(const MSReadBackend &backend, Spec
                             curSel = *it;
                             curSpec = backend.readSpectrum(tdata, MSLevel, curSel, SpectrumRawTypes::MobilityRange(),
                                                            minIntensityIMS);
+                            if (curSpec.hasMobilities()) // NOTE: for non-IMS data we assume data is always mz sorted
+                                curSpec.sort(IMSSortType);
                             if (prepFunc)
                                 curSpec = prepFunc(curSpec);
                         }
@@ -201,7 +204,8 @@ int walkSpectra(const MSReadBackend &backend)
     for (size_t i=0; i<meta.first.scans.size(); ++i)
         sels[0].emplace_back(i);
     
-    const auto ret = applyMSData<size_t>(backend, SpectrumRawTypes::MSLevel::MS1, sels, sfunc, 0);
+    const auto ret = applyMSData<size_t>(backend, SpectrumRawTypes::MSLevel::MS1, sels, sfunc, 0,
+                                         SpectrumRawTypes::MSSortType::NONE);
     return std::accumulate(ret[0].begin(), ret[0].end(), 0);
     
 #if 0
@@ -239,7 +243,8 @@ Rcpp::DataFrame getMSSpectrum(const MSReadBackend &backend, int index, int MSLev
     };
     
     const auto MSLev = (MSLevel == 1) ? SpectrumRawTypes::MSLevel::MS1 : SpectrumRawTypes::MSLevel::MS2;
-    const auto spectra = applyMSData<SpectrumRaw>(backend, MSLev, sels, sfunc, minIntensity);
+    const auto spectra = applyMSData<SpectrumRaw>(backend, MSLev, sels, sfunc, minIntensity,
+                                                  SpectrumRawTypes::MSSortType::NONE);
     const auto &spec = spectra[0][0];
     
     if (!spec.getMobilities().empty())
@@ -256,19 +261,31 @@ Rcpp::DataFrame getCollapsedFrame(const MSReadBackend &backend, int index, Spect
                                   SpectrumRawTypes::Intensity minIntensityIMS,
                                   SpectrumRawTypes::Intensity minIntensityPre,
                                   SpectrumRawTypes::PeakAbundance minAbundanceRel,
-                                  SpectrumRawTypes::PeakAbundance minAbundanceAbs, const std::string &method)
+                                  SpectrumRawTypes::PeakAbundance minAbundanceAbs, const std::string &method,
+                                  double mzMin = 0.0, double mzMax = 0.0, double minInt = 0.0, unsigned topMost = 0,
+                                  double prec = 0.0, double mobMin = 0.0, double mobMax = 0.0)
 {
     const auto clMethod = clustMethodFromStr(method);
     
     SpectrumRawSelection sel(index);
     std::vector<std::vector<SpectrumRawSelection>> sels(1, std::vector<SpectrumRawSelection>{sel});
     
-    const auto sfunc = [](const SpectrumRaw &spec, const SpectrumRawSelection &, size_t)
+    SpectrumRawFilter filter;
+    if (mzMin > 0.0 || mzMax > 0.0)
+        filter.setMZRange(mzMin, mzMax);
+    if (minInt > 0.0)
+        filter.setMinIntensity(minInt);
+    if (topMost > 0)
+        filter.setTopMost(topMost);
+    
+    
+    const auto sfunc = [&](const SpectrumRaw &spec, const SpectrumRawSelection &, size_t)
     {
-        return spec;
+        return filterIMSFrame(spec, filter, prec, SpectrumRawTypes::MobilityRange(mobMin, mobMax));
     };
     
-    const auto spectra = applyMSData<SpectrumRaw>(backend, SpectrumRawTypes::MSLevel::MS1, sels, sfunc, minIntensityIMS);
+    const auto spectra = applyMSData<SpectrumRaw>(backend, SpectrumRawTypes::MSLevel::MS1, sels, sfunc,
+                                                  minIntensityIMS, SpectrumRawTypes::MSSortType::MOBILITY_MZ);
     const auto &spec = averageSpectraRaw(spectra[0][0], frameSubSpecIDs(spectra[0][0]), clMethod, mzWindow, false,
                                          minIntensityPre, minAbundanceRel, minAbundanceAbs);
     
@@ -276,6 +293,35 @@ Rcpp::DataFrame getCollapsedFrame(const MSReadBackend &backend, int index, Spect
                                    Rcpp::Named("intensity") = spec.getIntensities(),
                                    Rcpp::Named("abundance_rel") = spec.getAbundancesRel(),
                                    Rcpp::Named("abundance_abs") = spec.getAbundancesAbs());
+}
+
+// [[Rcpp::export]]
+Rcpp::DataFrame getFilteredFrame(const MSReadBackend &backend, int index, double mzMin = 0.0, double mzMax = 0.0,
+                                 double minInt = 0.0, unsigned topMost = 0, double prec = 0.0, double mobMin = 0.0,
+                                 double mobMax = 0.0)
+{
+    SpectrumRawSelection sel(index);
+    std::vector<std::vector<SpectrumRawSelection>> sels(1, std::vector<SpectrumRawSelection>{sel});
+    
+    SpectrumRawFilter filter;
+    if (mzMin > 0.0 || mzMax > 0.0)
+        filter.setMZRange(mzMin, mzMax);
+    if (minInt > 0.0)
+        filter.setMinIntensity(minInt);
+    if (topMost > 0)
+        filter.setTopMost(topMost);
+    
+    const auto sfunc = [&](const SpectrumRaw &spec, const SpectrumRawSelection &, size_t)
+    {
+        return filterIMSFrame(spec, filter, prec, SpectrumRawTypes::MobilityRange(mobMin, mobMax));
+    };
+    
+    const auto spec = applyMSData<SpectrumRaw>(backend, SpectrumRawTypes::MSLevel::MS1, sels, sfunc,
+                                                  0, SpectrumRawTypes::MSSortType::MOBILITY_MZ)[0][0];
+
+    return Rcpp::DataFrame::create(Rcpp::Named("mz") = spec.getMZs(),
+                                   Rcpp::Named("intensity") = spec.getIntensities(),
+                                   Rcpp::Named("mobility") = spec.getMobilities());
 }
 
 // [[Rcpp::export]]
@@ -293,7 +339,8 @@ Rcpp::DataFrame getCentroidedFrame(const MSReadBackend &backend, int index, Spec
         return spec;
     };
     
-    const auto spectra = applyMSData<SpectrumRaw>(backend, SpectrumRawTypes::MSLevel::MS1, sels, sfunc, 0);
+    const auto spectra = applyMSData<SpectrumRaw>(backend, SpectrumRawTypes::MSLevel::MS1, sels, sfunc, 0,
+                                                  SpectrumRawTypes::MSSortType::MOBILITY_MZ);
     const auto &spec = centroidIMSFrame(spectra[0][0], clMethod, mzWindow, mobWindow, minIntensity);
     
     return Rcpp::DataFrame::create(Rcpp::Named("mz") = spec.getMZs(),
@@ -694,30 +741,23 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         
         const bool hasMob = spec.hasMobilities();
         
-        // NOTE: assume non-IMS specs are mz sorted
-        
-        const auto startIt = (!hasMob) ? std::lower_bound(spec.getMZs().begin(), spec.getMZs().end(), minMZ) : spec.getMZs().begin();
+        // NOTE: specs are mz sorted
+        const auto startIt = std::lower_bound(spec.getMZs().begin(), spec.getMZs().end(), minMZ);
         
         SpectrumRaw specf;
         for (size_t i=std::distance(spec.getMZs().begin(), startIt); i<spec.size(); ++i)
         {
-            if (spec.getMZs()[i] < minMZ)
-                continue;
+            if (spec.getMZs()[i] > maxMZ)
+                break;
             
             if (hasMob)
             {
-                if (spec.getMZs()[i] > maxMZ)
-                    continue;
                 if (spec.getMobilities()[i] < minMob || (maxMob != 0.0 && spec.getMobilities()[i] > maxMob))
                     continue;
                 specf.append(spec.getMZs()[i], spec.getIntensities()[i], spec.getMobilities()[i]);
             }
             else
-            {
-                if (spec.getMZs()[i] > maxMZ)
-                    break;
                 specf.append(spec.getMZs()[i], spec.getIntensities()[i]);
-            }
         }
         return specf;
     };
@@ -735,7 +775,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         scanSels[0].emplace_back(scan);
     
     auto allSpectra = applyMSData<SpectrumRaw>(backend, SpectrumRawTypes::MSLevel::MS1, scanSels, sfunc,
-                                               minIntensityIMS);
+                                               minIntensityIMS, SpectrumRawTypes::MSSortType::MZ);
     
     if (allSpectra.empty())
         return Rcpp::List();
@@ -1348,7 +1388,8 @@ Rcpp::List getMSPeakLists(const MSReadBackend &backend, const std::vector<Spectr
         Rcpp::Rcout << "\n";*/
     }
     
-    const auto allSpectra = applyMSData<SpectrumRaw>(backend, MSLev, scanSels, sfunc, minIntensityIMS);
+    const auto allSpectra = applyMSData<SpectrumRaw>(backend, MSLev, scanSels, sfunc, minIntensityIMS,
+                                                     SpectrumRawTypes::MSSortType::MOBILITY_MZ);
     
     std::vector<SpectrumRawAveraged> averagedSpectra(entries);
     #pragma omp parallel for
@@ -1399,36 +1440,27 @@ Rcpp::List getEIMList(const MSReadBackend &backend, const std::vector<SpectrumRa
             Rcpp::stop("Cannot load mobilogram: no mobility data found!");
         
         EIM ret;
-        SpectrumRawTypes::Mobility curMob = -1.0;
-        SpectrumRawTypes::Intensity curIntensity;
-        for (size_t i=0; ; ++i)
+        auto it = (startMobs[e] == 0.0) ?  spec.getMobilities().begin() :
+            std::lower_bound(spec.getMobilities().begin(), spec.getMobilities().end(), startMobs[e]);
+        while (it != spec.getMobilities().end() && (endMobs[e] == 0.0 || numberLTE(*it, endMobs[e])))
         {
-            const auto mob = (i < spec.size()) ? spec.getMobilities()[i] : -1.0;
-            if (mob != -1.0 && (mob < startMobs[e] || (endMobs[e] != 0.0 && mob > endMobs[e])))
-                continue;
-            
-            if (i >= spec.size() || curMob == -1.0 || curMob != mob)
+            const auto nextMobIt = std::upper_bound(it, spec.getMobilities().end(), *it);
+            const auto startInd = std::distance(spec.getMobilities().begin(), it);
+            const auto endInd = std::distance(spec.getMobilities().begin(), nextMobIt);
+            const auto endMzIt = std::next(spec.getMZs().begin(), endInd);
+            auto mzIt = std::lower_bound(std::next(spec.getMZs().begin(), startInd), endMzIt,
+                                         startMZs[e] - mzExpIMSWindow);
+            SpectrumRawTypes::Intensity curIntensity = 0;
+            for (; mzIt != endMzIt && numberLTE(*mzIt, endMZs[e] + mzExpIMSWindow); ++mzIt)
             {
-                if (curMob != -1.0)
-                {
-                    ret.mobilities.push_back(curMob);
-                    ret.intensities.push_back(curIntensity);
-                }
-                
-                if (i >= spec.size())
-                    break;
-                
-                curMob = mob;
-                curIntensity = 0;
+                curIntensity += spec.getIntensities()[std::distance(spec.getMZs().begin(), mzIt)];
             }
             
-            const auto mz = spec.getMZs()[i];
-            if (mz < (startMZs[e] - mzExpIMSWindow) || mz > (endMZs[e] + mzExpIMSWindow))
-                continue;
+            ret.mobilities.push_back(*it);
+            ret.intensities.push_back(curIntensity);
             
-            curIntensity += spec.getIntensities()[i];
+            it = nextMobIt; // continue with next mobility
         }
-        
         return ret;
     };
     
@@ -1439,7 +1471,8 @@ Rcpp::List getEIMList(const MSReadBackend &backend, const std::vector<SpectrumRa
                                                 SpectrumRawTypes::MSLevel::MS1, 0));
     }
     
-    const auto allEIMs = applyMSData<EIM>(backend, SpectrumRawTypes::MSLevel::MS1, scanSels, sfunc, minIntensity);
+    const auto allEIMs = applyMSData<EIM>(backend, SpectrumRawTypes::MSLevel::MS1, scanSels, sfunc, minIntensity,
+                                          SpectrumRawTypes::MSSortType::MOBILITY_MZ);
 
     std::vector<EIM> averageEIMs(entries);
 
@@ -1580,7 +1613,7 @@ Rcpp::NumericVector getPeakIntensities(const MSReadBackend &backend,
     }
     
     const auto ints = applyMSData<SpectrumRawTypes::Intensity>(backend, SpectrumRawTypes::MSLevel::MS1, scanSels,
-                                                               sfunc, 0);
+                                                               sfunc, 0, SpectrumRawTypes::MSSortType::MZ);
     
     auto ret = Rcpp::NumericVector(entries);
     for (size_t i=0; i<entries; ++i)
@@ -1620,7 +1653,8 @@ Rcpp::List collapseIMSFrames(const MSReadBackend &backend, SpectrumRawTypes::Mas
         scanSelsMS[0].emplace_back(i);
     
     const auto spectraMS = applyMSData<SpectrumRawAveraged>(backend, SpectrumRawTypes::MSLevel::MS1, scanSelsMS, sfunc,
-                                                            minIntensityIMS)[0];
+                                                            minIntensityIMS,
+                                                            SpectrumRawTypes::MSSortType::MOBILITY_MZ)[0];
     
     const auto &getSpecRList = [](const auto &spectra)
     {
@@ -1694,7 +1728,8 @@ Rcpp::List collapseIMSFrames(const MSReadBackend &backend, SpectrumRawTypes::Mas
     }
     
     const auto spectraMS2 = applyMSData<SpectrumRawAveraged>(backend, SpectrumRawTypes::MSLevel::MS2, scanSelsMS2, sfunc,
-                                                             minIntensityIMS)[0];
+                                                             minIntensityIMS,
+                                                             SpectrumRawTypes::MSSortType::MOBILITY_MZ)[0];
     
     return Rcpp::List::create(Rcpp::Named("MS1") = getSpecRList(spectraMS),
                               Rcpp::Named("MS2") = getSpecRList(spectraMS2),
@@ -1754,7 +1789,8 @@ Rcpp::List getIMSIsolationInfo(const MSReadBackend &backend)
     if (isolationMins.empty())
         return Rcpp::List();
     
-    const auto mats = applyMSData<MobRangeAndTIC>(backend, SpectrumRawTypes::MSLevel::MS2, scanSels, sfunc, 0)[0];
+    const auto mats = applyMSData<MobRangeAndTIC>(backend, SpectrumRawTypes::MSLevel::MS2, scanSels, sfunc, 0,
+                                                  SpectrumRawTypes::MSSortType::NONE)[0];
     std::vector<SpectrumRawTypes::Mobility> mobStarts(mats.size());
     std::vector<SpectrumRawTypes::Mobility> mobEnds(mats.size());
     std::vector<SpectrumRawTypes::Intensity> TICs(mats.size());
@@ -1829,7 +1865,8 @@ Rcpp::List getChromMob(const MSReadBackend &backend, SpectrumRawTypes::Mass mzSt
     for (size_t i=0; i<meta.first.scans.size(); ++i)
         sels[0].emplace_back(i);
     
-    const auto specs = applyMSData<SpectrumRaw>(backend, SpectrumRawTypes::MSLevel::MS1, sels, sfunc, 25)[0];
+    const auto specs = applyMSData<SpectrumRaw>(backend, SpectrumRawTypes::MSLevel::MS1, sels, sfunc, 25,
+                                                SpectrumRawTypes::MSSortType::MOBILITY_MZ)[0];
     SpectrumRaw flatSpec;
     std::vector<SpectrumRawTypes::Time> times;
     for (size_t i=0; i<specs.size(); ++i)

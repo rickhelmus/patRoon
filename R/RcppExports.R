@@ -37,8 +37,12 @@ getMSSpectrum <- function(backend, index, MSLevel, frameIndex = -1L, minIntensit
     .Call(`_patRoon_getMSSpectrum`, backend, index, MSLevel, frameIndex, minIntensity)
 }
 
-getCollapsedFrame <- function(backend, index, mzWindow, minIntensityIMS, minIntensityPre, minAbundanceRel, minAbundanceAbs, method) {
-    .Call(`_patRoon_getCollapsedFrame`, backend, index, mzWindow, minIntensityIMS, minIntensityPre, minAbundanceRel, minAbundanceAbs, method)
+getCollapsedFrame <- function(backend, index, mzWindow, minIntensityIMS, minIntensityPre, minAbundanceRel, minAbundanceAbs, method, mzMin = 0.0, mzMax = 0.0, minInt = 0.0, topMost = 0L, prec = 0.0, mobMin = 0.0, mobMax = 0.0) {
+    .Call(`_patRoon_getCollapsedFrame`, backend, index, mzWindow, minIntensityIMS, minIntensityPre, minAbundanceRel, minAbundanceAbs, method, mzMin, mzMax, minInt, topMost, prec, mobMin, mobMax)
+}
+
+getFilteredFrame <- function(backend, index, mzMin = 0.0, mzMax = 0.0, minInt = 0.0, topMost = 0L, prec = 0.0, mobMin = 0.0, mobMax = 0.0) {
+    .Call(`_patRoon_getFilteredFrame`, backend, index, mzMin, mzMax, minInt, topMost, prec, mobMin, mobMax)
 }
 
 getCentroidedFrame <- function(backend, index, mzWindow, mobWindow, minIntensity, method) {

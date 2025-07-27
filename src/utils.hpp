@@ -31,16 +31,23 @@ template <typename C> C median(std::vector<C> v)
     return *middleIt;
 }
 
-template <typename C> std::vector<size_t> getSortedInds(const C &cont, bool decr = false)
+template <typename C, typename F> std::vector<size_t> getSortedInds(const C &cont, F func)
 {
     // get sorted indices
     // inspired from https://stackoverflow.com/a/40183830
     std::vector<size_t> ret(cont.size());
     std::iota(ret.begin(), ret.end(), 0);
-    if (decr)
-        std::sort(ret.begin(), ret.end(), [&](size_t i, size_t j) { return (cont[i] > cont[j]); });
-    else
-        std::sort(ret.begin(), ret.end(), [&](size_t i, size_t j) { return (cont[i] < cont[j]); });
+    std::sort(ret.begin(), ret.end(), [&](size_t i, size_t j) { return func(i, j); });
+    return ret;
+}
+
+template <typename C> std::vector<size_t> getSortedInds(const C &cont)
+{
+    // get sorted indices
+    // inspired from https://stackoverflow.com/a/40183830
+    std::vector<size_t> ret(cont.size());
+    std::iota(ret.begin(), ret.end(), 0);
+    std::sort(ret.begin(), ret.end(), [&](size_t i, size_t j) { return cont[i] < cont[j]; });
     return ret;
 }
 

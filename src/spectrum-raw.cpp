@@ -33,6 +33,37 @@ void SpectrumRaw::insert(size_t i, SpectrumRawTypes::Mass mz, SpectrumRawTypes::
     mobilities.insert(mobilities.begin() + i, mob);
 }
 
+void SpectrumRaw::sort(SpectrumRawTypes::MSSortType stype)
+{
+    if (empty() || stype == SpectrumRawTypes::MSSortType::NONE)
+        return;
+    
+    const auto mobMZLT = [this](size_t i, size_t j)
+    {
+        return std::tie(mobilities[i], mzs[i]) < std::tie(mobilities[j], mzs[j]);
+    };
+    const auto sortedInds = (stype == SpectrumRawTypes::MSSortType::MZ) ? getSortedInds(mzs) : getSortedInds(mzs, mobMZLT);
+    
+    std::vector<SpectrumRawTypes::Mass> sortedMZs(mzs.size());
+    std::vector<SpectrumRawTypes::Intensity> sortedInts(intensities.size());
+    for (size_t i=0; i<sortedInds.size(); ++i)
+    {
+        const auto j = sortedInds[i];
+        sortedMZs[i] = mzs[j];
+        sortedInts[i] = intensities[j];
+    }
+    mzs = std::move(sortedMZs);
+    intensities = std::move(sortedInts);
+    
+    if (hasMobilities())
+    {
+        std::vector<SpectrumRawTypes::Mobility> sortedMobs(mobilities.size());
+        for (size_t i=0; i<sortedInds.size(); ++i)
+            sortedMobs[i] = mobilities[sortedInds[i]];
+        mobilities = std::move(sortedMobs);
+    }
+}
+
 void SpectrumRawAveraged::append(SpectrumRawTypes::Mass mz, SpectrumRawTypes::Intensity inten,
                                  SpectrumRawTypes::PeakAbundance abr, SpectrumRawTypes::PeakAbundance aba)
 {

@@ -49,10 +49,22 @@ SpectrumRaw getMSTKSpec(MSToolkit::MSReader *msr, const std::string &file, Spect
         }
     }
     
-    // No IMS
     SpectrumRaw ret(s.size(), false);
     for (size_t i=0; i<s.size(); ++i)
         ret.setPeak(i, s.at(i).mz, s.at(i).intensity);
+    
+    auto specMob = s.getIonMobilityDriftTime();
+    if (specMob == 0)
+        specMob = s.getInverseReducedIonMobility();
+    if (specMob != 0)
+    {
+        // IMS spectrum w/out array, eg MS2 produced by TIMSCONVERT
+        if (mobRange.isSet() && !mobRange.within(specMob))
+            return SpectrumRaw(); // UNDONE?
+        // HACK: to simplify things, we just set the mobility of all peaks to the same value
+        ret.setAllMobilities(specMob);
+    }
+    
     return ret;
 }
 

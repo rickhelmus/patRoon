@@ -432,10 +432,18 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
             else if (genEICParams$methodMZ %in% "ms2" && is.finite(genEICParams$rtWindow))
             {
                 checkMob <- identical(genEICParams[["methodIMS"]], "ms2")
+                mobCheckMin <- mobCheckMax <- numeric()
+                if (checkMob)
+                {
+                    mobMeans <- mapply(MS2Info$mobmin, MS2Info$mobmax, FUN = mean)
+                    mobWidths <- (MS2Info$mobmax - MS2Info$mobmin) / 2
+                    mobWidths <- fifelse(mobWidths < genEICParams$IMSWindow, genEICParams$IMSWindow, mobWidths)
+                    mobCheckMin <- mobMeans - mobWidths
+                    mobCheckMax <- mobMeans + mobWidths
+                }
                 keep <- filterPiekResults(peaks$ret, peaks$mz, if (checkMob) peaks$mobility else numeric(),
-                                          MS2Info$time, MS2Info$mzmin, MS2Info$mzmax,
-                                          if (checkMob) MS2Info$mobmin else numeric(),
-                                          if (checkMob) MS2Info$mobmax else numeric(), genEICParams$rtWindow)
+                                          MS2Info$time, MS2Info$mzmin, MS2Info$mzmax, mobCheckMin, mobCheckMax,
+                                          genEICParams$rtWindow)
                 peaks <- peaks[keep == TRUE]
             }
             
@@ -517,7 +525,7 @@ getPiekGenEICParams <- function(methodMZ, methodIMS = NULL, ...)
     
     if (!is.null(methodIMS))
     {
-        if (methodIMS == "suspects")
+        if (methodIMS %in% c("suspects", "ms2"))
         {
             ret <- modifyList(ret, list(
                 IMSWindow = defaultLim("mobility", "medium")

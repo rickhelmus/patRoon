@@ -1201,7 +1201,7 @@ assertPiekGenEICParams <- function(x, .var.name = checkmate::vname(x), add = NUL
         if (x$methodIMS != "bins" && x$methodIMS != x$methodMZ)
             stop("'methodIMS' should be set to 'bins' or match 'methodMZ'.", call. = FALSE)
         
-        if (x$methodIMS == "suspects")
+        if (x$methodIMS %in% c("suspects", "ms2"))
         {
             assertListVal(x, "IMSWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name,
                           add = add)

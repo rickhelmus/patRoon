@@ -59,6 +59,7 @@ SpectrumRaw getMSTKSpec(MSToolkit::MSReader *msr, const std::string &file, Spect
     if (specMob != 0)
     {
         // IMS spectrum w/out array, eg MS2 produced by TIMSCONVERT
+        // NOTE: agilent also has valid zero mobilities, so this wouldn't work with Agilent data (but these are generally with arrays...)
         if (mobRange.isSet() && !mobRange.within(specMob))
             return SpectrumRaw(); // UNDONE?
         // HACK: to simplify things, we just set the mobility of all peaks to the same value

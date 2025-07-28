@@ -14,12 +14,12 @@ SpectrumRaw getSCSpectrum(sc::MS_FILE *analysis, SpectrumRawTypes::Scan scan,
     const auto s = analysis->get_spectrum(scan);
     
     const auto mobArrayIt = std::find(s.binary_names.cbegin(), s.binary_names.cend(), "ion_mobility");
-    const bool hasMob = mobArrayIt != s.binary_names.cend();
+    const bool hasMobArray = mobArrayIt != s.binary_names.cend();
     
     
     // UNDONE: always safe to assume that m/z / intensity are in first two arrays?
     
-    if (hasMob)
+    if (hasMobArray)
     {
         const size_t mobArrayInd = std::distance(s.binary_names.begin(), mobArrayIt);
         
@@ -45,10 +45,20 @@ SpectrumRaw getSCSpectrum(sc::MS_FILE *analysis, SpectrumRawTypes::Scan scan,
         }
     }
     
-    // No IMS
+    // No IMS or no IMS array
     SpectrumRaw ret(s.array_length, false);
     for (int i=0; i<s.array_length; ++i)
         ret.setPeak(i, s.binary_data[0][i], s.binary_data[1][i]);
+    
+    if (s.mobility != 0)
+    {
+        // IMS spectrum w/out array, eg MS2 produced by TIMSCONVERT
+        if (mobRange.isSet() && !mobRange.within(s.mobility))
+            return SpectrumRaw(); // UNDONE?
+        // HACK: to simplify things, we just set the mobility of all peaks to the same value
+        ret.setAllMobilities(s.mobility);
+    }
+    
     return ret;
 }
 

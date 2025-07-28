@@ -901,6 +901,12 @@ float sc::mzml::MZML_SPECTRUM::extract_scan_mobility() const
     return mobility_node.attribute("value").as_float();
 
   pugi::xml_node mobility_node_tims = node_scan.find_child_by_attribute("cvParam", "accession", "MS:1002815");
+  if (mobility_node_tims)
+      return mobility_node_tims.attribute("value").as_float();
+  
+  // added by Rick: TIMSCONVERT data
+  mobility_node_tims = spec.child("precursorList").child("precursor").child("selectedIonList").child("selectedIon")
+                           .find_child_by_attribute("cvParam", "accession", "MS:1002815");
   return mobility_node_tims.attribute("value").as_float();
 };
 

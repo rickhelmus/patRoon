@@ -251,7 +251,7 @@
         - mention that bins are overlapping and twice as much
         - summarize code changes and fixes
         - mention that only mobility column for suspects is used so assignMobilities must be used for CCS conversion
-        - update docs for EIC filtering by suspects/ms2 (also mzIsoWindow)
+        - update docs for EIC filtering by suspects/ms2 (also mzIsoWindow, IMSWindow for ms2)
     - assignMobilities()
         - refs to paper
         - fGroups method

@@ -122,8 +122,8 @@ getMSConversionFormats <- function(algorithm, direction, type = NULL)
 #'   \href{http://proteowizard.sourceforge.net/}{ProteoWizard}.
 #'
 #' @param minIntensity The minimum intensity of the mass peaks to be kept. Applying an intensity threshold is especially
-#'   beneficial to reduce export file size when there are a lot of zero or very low intensity mass peaks (\emph{e.g.}
-#'   Agilent data).
+#'   beneficial to reduce export file size when there are a lot of zero or very low intensity mass peaks. \strong{NOTE}
+#'   this currently does \emph{not} work well with IMS data.
 #' @param filters A \code{character} vector specifying one or more filters to \command{msconvert}. The elements of the
 #'   specified vector are directly passed to the \code{--filter} option (see
 #'   \href{http://proteowizard.sourceforge.net/tools/filters.html}{here})
@@ -132,7 +132,7 @@ getMSConversionFormats <- function(algorithm, direction, type = NULL)
 #'
 #' @rdname MSConversion
 #' @export
-convertMSFilesPWiz <- function(inFiles, outFiles, formatTo = "mzML", centroid = TRUE, IMS = FALSE, minIntensity = 5,
+convertMSFilesPWiz <- function(inFiles, outFiles, formatTo = "mzML", centroid = TRUE, IMS = FALSE, minIntensity = 0,
                                filters = NULL, extraOpts = NULL, PWizBatchSize = 1)
 {
     ac <- checkmate::makeAssertCollection()
@@ -148,6 +148,9 @@ convertMSFilesPWiz <- function(inFiles, outFiles, formatTo = "mzML", centroid = 
     checkmate::assertCharacter(extraOpts, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::assertCount(PWizBatchSize, positive = TRUE, add = ac)
     checkmate::reportAssertions(ac)
+    
+    if (!isFALSE(IMS) && minIntensity > 0)
+        warning("The minIntensity argument currently results in incorrect file conversion of IMS data!", call. = FALSE)
     
     if (centroid != FALSE)
         filters <- c(paste("peakPicking", if (is.character(centroid)) centroid else ""), filters)

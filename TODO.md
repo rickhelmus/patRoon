@@ -98,12 +98,6 @@
 
 - minAbundanceFeatAbs/Rel: does it make sense to also filter fGroup peak lists? If not, remove and update docs.
 
-## msdata
-
-- Agilent
-    - SC doesn't recognize IM --> fixed now?
-- pwiz: disable/remove intensity filter for IMS data
-
 ## IMS
 
 - findPeaks()

@@ -14,12 +14,13 @@ findPeaks <- function(EICs, fillEICs, params, logPath)
     if (params$algorithm == "openms") # UNDONE: change in case we get additional algos with logging
         mkdirp(dirname(logPath))
     
-    ret <- f(EICs, fillEICs, params[setdiff(names(params), c("algorithm", "forcePeakRange", "relMinIntensity"))],
+    ret <- f(EICs, fillEICs, params[setdiff(names(params), c("algorithm", "forcePeakRange", "relMinIntensity",
+                                                             "calcCentroid"))],
              logPath = logPath)
     
-    if (any(params$forcePeakRange != 0) || params$relMinIntensity > 0)
+    if (any(params$forcePeakRange != 0) || params$relMinIntensity > 0 || params$calcCentroid != "algorithm")
     {
-        ret <- lapply(ret, function(pl)
+        ret <- Map(ret, EICs[names(ret)], f = function(pl, eic)
         {
             if (nrow(pl) == 0)
                 return(pl)
@@ -38,6 +39,26 @@ findPeaks <- function(EICs, fillEICs, params, logPath)
             if (params$forcePeakRange[2] > 0)
                 pl[, c("retmin", "retmax") := .(pmax(ret - params$forcePeakRange[2], retmin),
                                                 pmin(ret + params$forcePeakRange[2], retmax))]
+            
+            if (params$calcCentroid != "algorithm")
+            {
+                for (row in seq_len(nrow(pl)))
+                {
+                    eicS <- eic[numGTETol(eic$time, pl$retmin[row]) & numLTETol(eic$time, pl$retmax[row]), ]
+                    if (nrow(eicS) > 1)
+                    {
+                        if (params$calcCentroid == "max")
+                            set(pl, row, "ret", eicS[which.max(eicS$intensity), "time"])
+                        else if (params$calcCentroid == "weighted.mean")
+                            set(pl, row, "ret", weighted.mean(eicS$time, eicS$intensity))
+                        else # if (params$calcCentroid == "centerOfMass")
+                            set(pl, row, "ret", calcCenterOfMass(eicS$time, eicS$intensity))
+                    }
+                    
+                }
+            }
+            
+            return(pl)
         })
     }
     

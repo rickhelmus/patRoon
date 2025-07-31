@@ -1096,6 +1096,8 @@ assertFindPeakParams <- function(x, null.ok = FALSE, .var.name = checkmate::vnam
     
     assertListVal(x, "forcePeakRange", assertRange, .var.name = .var.name, add = add)
     assertListVal(x, "relMinIntensity", checkmate::assertNumber, .var.name = .var.name, add = add)
+    assertListVal(x, "calcCentroid", checkmate::assertChoice,
+                  choices = c("algorithm", "max", "weighted.mean", "centerOfMass"), .var.name = .var.name, add = add)
     
     invisible(NULL)
 }

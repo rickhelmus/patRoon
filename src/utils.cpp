@@ -124,3 +124,30 @@ void setOMPNumThreads(int n)
     omp_set_num_threads(n);
 #endif
 }
+
+// [[Rcpp::export]]
+double calcCenterOfMass(const Rcpp::NumericVector &x, const Rcpp::NumericVector &y)
+{
+    const auto size = x.size();
+    
+    if (size == 0)
+        return 0.0;
+    if (x.size() == 1)
+        return x[0];
+    
+    double area = 0.0, wArea = 0.0;
+    
+    for (int i=1; i<x.size(); ++i)
+    {
+        const double dx = x[i] - x[i-1];
+        const double avgY = (std::max(0.0, y[i]) + std::max(0.0, y[i-1])) / 2.0;
+        const double avgX = (x[i] + x[i-1]) / 2.0;
+        area += (dx * avgY);
+        wArea += (dx * avgY * avgX);
+    }
+    
+    if (area == 0.0)
+        return 0.0; // avoid division by zero
+    
+    return wArea / area;
+}

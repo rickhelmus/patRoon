@@ -288,7 +288,7 @@ checkFeaturesInterface$methods(
                           all = .self[[type]]$all
             )
             if (length(ret) == 0)
-                ret <- NULL # not (yet) loaded, in this case plotChroms()/plotMobilogram() will make its own but EIXs must be NULL
+                ret <- NULL # not (yet) loaded, in this case plotChroms()/plotMobilograms() will make its own but EIXs must be NULL
             return(ret)
         }
         
@@ -322,8 +322,8 @@ checkFeaturesInterface$methods(
                 ep <- getDefEIMParams(topMost = if (rValues$fGroupPlotMode == "all") NULL else 1,
                                       topMostByReplicate = rValues$fGroupPlotMode == "topMostByReplicate")
                 screen(scr[2])
-                plotMobilogram(fg, EIMs = EIMs, groupBy = "replicate", showPeakArea = TRUE, EIMParams = ep,
-                               showFGroupRect = FALSE, title = "")
+                plotMobilograms(fg, EIMs = EIMs, groupBy = "replicate", showPeakArea = TRUE, EIMParams = ep,
+                                showFGroupRect = FALSE, title = "")
                 close.screen(scr)
             }
         })

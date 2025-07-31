@@ -884,6 +884,7 @@ getDefPeakParams <- function(type, algorithm, ...)
         )
         def$forcePeakRange <- c(0, 0)
         def$relMinIntensity <- 0
+        def$calcCentroid <- "algorithm"
     }
     else if (type == "bruker_ims")
     {
@@ -897,6 +898,7 @@ getDefPeakParams <- function(type, algorithm, ...)
         ))
         def$forcePeakRange = c(0.01, 0.1)
         def$relMinIntensity <- 0.25
+        def$calcCentroid <- "centerOfMass"
     }
     else if (type == "agilent_ims")
     {
@@ -910,6 +912,7 @@ getDefPeakParams <- function(type, algorithm, ...)
         ))
         def$forcePeakRange = c(0.2, 1)
         def$relMinIntensity <- 0.25
+        def$calcCentroid <- "centerOfMass"
     }
     
     return(modifyList(def, c(list(...), algorithm = algorithm)))

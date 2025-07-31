@@ -120,6 +120,7 @@
     - split IMSWindow arg for setting mobmin/mobmax? this currently sets very narrow ranges. Same for mz and ms2
     - warn if ms2/suspects are outside bin range?
     - change methodMZ/methodIMS to eg filterMZ/filterMob
+    - also make mobility centroid determination optional? doc in any case
 - update featAnn consensus?
 - greedy
     - set default weights
@@ -254,7 +255,9 @@
             - add link to piek and import for direct IMS assignment
         - give some notes about sets workflows?
         - mention that fromSuspects only takes suspects assigned to a single fGroup (also in handbook?)
-    - peakParams: refs to paper
+    - peakParams
+        - refs to paper
+        - calcCentroid option
     - Greedy
         - mention that links are removed for mobility features
         - mention that and why rtalign=FALSE by default

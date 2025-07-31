@@ -894,6 +894,18 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// calcCenterOfMass
+double calcCenterOfMass(const Rcpp::NumericVector& x, const Rcpp::NumericVector& y);
+RcppExport SEXP _patRoon_calcCenterOfMass(SEXP xSEXP, SEXP ySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type y(ySEXP);
+    rcpp_result_gen = Rcpp::wrap(calcCenterOfMass(x, y));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 // validate (ensure exported C++ functions exist before calling them)
 static int _patRoon_RcppExport_validate(const char* sig) { 
@@ -972,6 +984,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_loadAgilentIMSCalibration", (DL_FUNC) &_patRoon_loadAgilentIMSCalibration, 1},
     {"_patRoon_getOMPMaxNumThreads", (DL_FUNC) &_patRoon_getOMPMaxNumThreads, 0},
     {"_patRoon_setOMPNumThreads", (DL_FUNC) &_patRoon_setOMPNumThreads, 1},
+    {"_patRoon_calcCenterOfMass", (DL_FUNC) &_patRoon_calcCenterOfMass, 2},
     {"_rcpp_module_boot_MSReadBackend", (DL_FUNC) &_rcpp_module_boot_MSReadBackend, 0},
     {"_patRoon_RcppExport_registerCCallable", (DL_FUNC) &_patRoon_RcppExport_registerCCallable, 0},
     {NULL, NULL, 0}

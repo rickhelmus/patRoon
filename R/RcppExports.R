@@ -217,6 +217,10 @@ setOMPNumThreads <- function(n) {
     invisible(.Call(`_patRoon_setOMPNumThreads`, n))
 }
 
+calcCenterOfMass <- function(x, y) {
+    .Call(`_patRoon_calcCenterOfMass`, x, y)
+}
+
 # Register entry points for exported C++ functions
 methods::setLoadAction(function(ns) {
     .Call(`_patRoon_RcppExport_registerCCallable`)

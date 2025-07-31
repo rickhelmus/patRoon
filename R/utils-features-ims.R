@@ -83,7 +83,7 @@ assignFeatureMobilitiesPeaks <- function(features, peakParams, EIMParams)
             # pretend we have EICs so we can find peaks
             EIMs <- lapply(EIMs, setnames, old = "mobility", new = "time")
             peaksList <- findPeaks(EIMs, FALSE, peakParams, file.path("log", "assignMobilities", paste0("mobilogram_peaks-", ana, ".txt")))
-            peaksTable <- rbindlist(peaksList, idcol = "ims_parent_ID")                
+            peaksTable <- rbindlist(peaksList, idcol = "ims_parent_ID")
             setnames(peaksTable, c("ret", "retmin", "retmax", "area", "intensity"), mobNumCols, skip_absent = TRUE)
             # NOTE: we subset columns here to remove any algo specific columns that may also be present in the feature
             # table (UNDONE?)

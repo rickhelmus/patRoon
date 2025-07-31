@@ -345,11 +345,18 @@ setMethod("getFeatureEIXInputTab", "features", function(obj, type, EIXParams, se
         tab <- copy(tab)
         # HACK: we keep group column for featureGroups method
         tab <- subsetDTColumnsIfPresent(tab, c("group", "analysis", "intensity", "retmin", "retmax", "mzmin",
-                                               "mzmax", "mobmin", "mobmax"))
+                                               "mzmax", "mobmin", "mobmax", "ret"))
 
-        if (type == "EIM" && is.null(tab[["mobmin"]]))
-            tab[, c("mobmin", "mobmax") := NA_real_]
-
+        if (type == "EIM")
+        {
+            if (is.null(tab[["mobmin"]]))
+                tab[, c("mobmin", "mobmax") := NA_real_]
+            
+            tab[, c("retmin", "retmax") := .(pmax(ret - EIXParams$maxRTWindow, retmin),
+                                             pmin(ret + EIXParams$maxRTWindow, retmax))]
+        }
+        
+        tab[, ret := NULL]
         tab <- extendEIXInputTab(tab, type, EIXParams)
 
         return(tab)

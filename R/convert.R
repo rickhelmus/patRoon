@@ -455,7 +455,7 @@ convertMSFilesTIMSCONVERT <- function(inFiles, outFiles, formatTo = "mzML", cent
     
     mainArgs <- character()
     if (IMS)
-        mainArgs <- c(mainArgs, "--mode", "raw")
+        mainArgs <- c(mainArgs, "--mode", "centroid")
     else if (centroid && centroidRaw)
         mainArgs <- c(mainArgs, "--mode", "raw")
     else if (centroid)

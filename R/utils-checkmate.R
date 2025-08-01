@@ -1180,6 +1180,7 @@ assertPiekGenEICParams <- function(x, .var.name = checkmate::vname(x), add = NUL
     assertListVal(x, "minEICAdjIntensity", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
     assertListVal(x, "topMostEIC", checkmate::assertCount, positive = FALSE, .var.name = .var.name, add = add)
     assertListVal(x, "topMostEICPre", checkmate::assertCount, positive = FALSE, .var.name = .var.name, add = add)
+    assertListVal(x, "minEICsIMSPreCheck", checkmate::assertCount, positive = FALSE, .var.name = .var.name, add = add)
     
     if (x$methodMZ == "suspects")
     {

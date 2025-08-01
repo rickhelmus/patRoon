@@ -141,8 +141,8 @@ doFindPeaksPiek <- function(EICs, fillEICs, minIntensity, SN, peakWidthMin, peak
     .Call(`_patRoon_doFindPeaksPiek`, EICs, fillEICs, minIntensity, SN, peakWidthMin, peakWidthMax, RTMin, RTMax, maxPeaksPerSignal, verbose)
 }
 
-findFeatSuspTableDups <- function(rts, mzs, mobs, ints, tolRT, tolMZ, tolMob) {
-    .Call(`_patRoon_findFeatSuspTableDups`, rts, mzs, mobs, ints, tolRT, tolMZ, tolMob)
+findFeatTableDups <- function(rts, mzs, mobs, ints, tolRT, tolMZ, tolMob) {
+    .Call(`_patRoon_findFeatTableDups`, rts, mzs, mobs, ints, tolRT, tolMZ, tolMob)
 }
 
 filterEICBins <- function(binStartMZs, mzBinWidth, binStartMobs, mobBinWidth, checkStartMZs, checkEndMZs, checkStartMobs, checkEndMobs) {

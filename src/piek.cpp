@@ -447,14 +447,13 @@ Rcpp::List doFindPeaksPiek(Rcpp::List EICs, bool fillEICs, double minIntensity, 
 // utils for findFeaturesPiek()
 
 // [[Rcpp::export]]
-Rcpp::LogicalVector findFeatSuspTableDups(const Rcpp::NumericVector &rts, const Rcpp::NumericVector &mzs,
-                                          const Rcpp::NumericVector &mobs, const Rcpp::NumericVector &ints,
-                                          double tolRT, double tolMZ, double tolMob)
+Rcpp::LogicalVector findFeatTableDups(const Rcpp::NumericVector &rts, const Rcpp::NumericVector &mzs,
+                                      const Rcpp::NumericVector &mobs, const Rcpp::NumericVector &ints,
+                                      double tolRT, double tolMZ, double tolMob)
 {
     // NOTE: rts, mobs and ints are optional
     
     Rcpp::LogicalVector ret(mzs.size(), false);
-    const bool hasRT = rts.size() > 0, hasMobs = mobs.size() > 0, hasInts = ints.size() > 0;
     
     if (mzs.size() < 2)
         return ret; // no duplicates possible
@@ -472,31 +471,28 @@ Rcpp::LogicalVector findFeatSuspTableDups(const Rcpp::NumericVector &rts, const 
             return false;
         return numberLTE(std::abs(a - b), tol);
     };
+
+    const bool hasMobs = mobs.size() > 0;
+    const auto intSortedInds = getSortedInds(ints, [&ints](size_t i, size_t j) { return ints[i] > ints[j]; });
     
-    for (size_t i = 0; i<mzs.size()-1; ++i)
+    for (size_t i=0; i<intSortedInds.size()-1; ++i)
     {
-        std::vector<size_t> dups;
-        for (size_t j=i+1; j<mzs.size(); ++j)
+        const auto indi = intSortedInds[i];
+        for (size_t j=i+1; j<intSortedInds.size(); ++j)
         {
-            if (ret[j]) // already marked as duplicate
+            const auto indj = intSortedInds[j];
+            
+            if (ret[indj]) // already marked as duplicate
                 continue;
             
-            if (!isSame(mzs[i], mzs[j], tolMZ))
+            if (!isSame(rts[indi], rts[indj], tolRT))
                 continue;
-            if (hasRT && !isSame(rts[i], rts[j], tolRT))
+            if (!isSame(mzs[indi], mzs[indj], tolMZ))
                 continue;
-            if (hasMobs && !isSame(mobs[i], mobs[j], tolMob))
+            if (hasMobs && !isSame(mobs[indi], mobs[indj], tolMob))
                 continue;
             
-            if (hasInts)
-            {
-                // ensure top most intense stays
-                const bool meHighest = ints[i] >= ints[j];
-                ret[i] = !meHighest;
-                ret[j] = meHighest;
-            }
-            else
-                ret[j] = true; // just keep first
+            ret[indj] = true; // just keep first (which should be more intense)
         }
     }
     

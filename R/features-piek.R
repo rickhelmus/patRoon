@@ -377,19 +377,25 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
             EICInfoMZ <- getPiekEICsInfo(genEICParams, FALSE, suspects, MS2Info, verbose)
             if (withIMS)
             {
-                maybePrintf("Pre-checking %d m/z EICs... ", nrow(EICInfoMZ))
-                testEICs <- getEICsAna(backend, EICInfoMZ, "test", genEICParams$topMostEICPre)
-                testEICs <- unlist(testEICs)
-                EICInfoMZ <- EICInfoMZ[EIC_ID %chin% names(testEICs)[testEICs]]
-                maybePrintf("Done! Eliminated %d (%.2f%%) EICs\n", sum(!testEICs),
-                            (sum(!testEICs) / length(testEICs)) * 100)
-                
-                # remove complete m/z bins that were filtered out before
-                temp <- EICInfoMZ[, c("mzmin", "mzmax"), with = FALSE]
-                setkeyv(temp, c("mzmin", "mzmax"))
                 EICInfoMob <- getPiekEICsInfo(genEICParams, TRUE, suspects, MS2Info, verbose)
-                ov <- foverlaps(EICInfoMob, temp, type = "within", nomatch = NULL, which = TRUE)
-                EICInfo <- EICInfoMob[ov$xid]
+                
+                if (nrow(EICInfoMob) > genEICParams$minEICsIMSPreCheck)
+                {
+                    maybePrintf("Pre-checking %d m/z EICs... ", nrow(EICInfoMZ))
+                    testEICs <- getEICsAna(backend, EICInfoMZ, "test", genEICParams$topMostEICPre)
+                    testEICs <- unlist(testEICs)
+                    EICInfoMZ <- EICInfoMZ[EIC_ID %chin% names(testEICs)[testEICs]]
+                    maybePrintf("Done! Eliminated %d (%.2f%%) EICs\n", sum(!testEICs),
+                                (sum(!testEICs) / length(testEICs)) * 100)
+                    
+                    # remove complete m/z bins that were filtered out before
+                    temp <- EICInfoMZ[, c("mzmin", "mzmax"), with = FALSE]
+                    setkeyv(temp, c("mzmin", "mzmax"))
+                    ov <- foverlaps(EICInfoMob, temp, type = "within", nomatch = NULL, which = TRUE)
+                    EICInfo <- EICInfoMob[ov$xid]
+                }
+                else
+                    EICInfo <- EICInfoMob
                 
                 maybePrintf("Loading %d m/z+mobility EICs... ", nrow(EICInfo))
                 EICs <- getEICsAna(backend, EICInfo, "full", genEICParams$topMostEIC)
@@ -422,7 +428,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
                 checkRT <- is.finite(genEICParams$rtWindow) && !is.null(suspects[["rt"]])
                 checkMob <- identical(genEICParams[["methodIMS"]], "suspects") && !is.null(suspects[["mobility"]])
                 keep <- filterPiekResults(peaks$ret, peaks$mz, if (checkMob) peaks$mobility else numeric(),
-                                          if (checkRT) suspects$rt, suspects$mz - genEICParams$mzWindow,
+                                          if (checkRT) suspects$rt else numeric(), suspects$mz - genEICParams$mzWindow,
                                           suspects$mz + genEICParams$mzWindow,
                                           if (checkMob) suspects$mobility - genEICParams$IMSWindow else numeric(),
                                           if (checkMob) suspects$mobility + genEICParams$IMSWindow else numeric(),
@@ -501,7 +507,7 @@ getPiekGenEICParams <- function(methodMZ, methodIMS = NULL, ...)
     ret <- list(methodMZ = methodMZ, methodIMS = methodIMS, mzRange = c(80, 600), mzStep = 0.02, mobRange = c(0.5, 1.3),
                 mobStep = 0.04, retRange = NULL, gapFactor = 3, minEICIntensity = 5000, minEICAdjTime = 5,
                 minEICAdjPoints = 5, minEICAdjIntensity = 250, topMostEIC = 10000,
-                topMostEICPre = 10000)
+                topMostEICPre = 10000, minEICsIMSPreCheck = 50000)
     
     if (methodMZ == "suspects")
     {

@@ -121,6 +121,7 @@
     - warn if ms2/suspects are outside bin range?
     - change methodMZ/methodIMS to eg filterMZ/filterMob
     - also make mobility centroid determination optional? doc in any case
+    - instead of topMost+topMostPre have topMostMZ+topMostMob?
 - update featAnn consensus?
 - greedy
     - set default weights
@@ -249,6 +250,7 @@
         - summarize code changes and fixes
         - mention that only mobility column for suspects is used so assignMobilities must be used for CCS conversion
         - update docs for EIC filtering by suspects/ms2 (also mzIsoWindow, IMSWindow for ms2)
+        - docs for minEICsIMSPreCheck
     - assignMobilities()
         - refs to paper
         - fGroups method

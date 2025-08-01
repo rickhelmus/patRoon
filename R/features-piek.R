@@ -382,7 +382,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
                 if (nrow(EICInfoMob) > genEICParams$minEICsIMSPreCheck)
                 {
                     maybePrintf("Pre-checking %d m/z EICs... ", nrow(EICInfoMZ))
-                    testEICs <- getEICsAna(backend, EICInfoMZ, "test", genEICParams$topMostEICPre)
+                    testEICs <- getEICsAna(backend, EICInfoMZ, "test", genEICParams$topMostEICMZ)
                     testEICs <- unlist(testEICs)
                     EICInfoMZ <- EICInfoMZ[EIC_ID %chin% names(testEICs)[testEICs]]
                     maybePrintf("Done! Eliminated %d (%.2f%%) EICs\n", sum(!testEICs),
@@ -398,13 +398,13 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
                     EICInfo <- EICInfoMob
                 
                 maybePrintf("Loading %d m/z+mobility EICs... ", nrow(EICInfo))
-                EICs <- getEICsAna(backend, EICInfo, "full", genEICParams$topMostEIC)
+                EICs <- getEICsAna(backend, EICInfo, "full", genEICParams$topMostEICMZMob)
                 maybePrintf("Done!\n")
             }
             else
             {
                 maybePrintf("Loading %d m/z EICs... ", nrow(EICInfoMZ))
-                EICs <- getEICsAna(backend, EICInfoMZ, "full_mz", genEICParams$topMostEIC)
+                EICs <- getEICsAna(backend, EICInfoMZ, "full_mz", genEICParams$topMostEICMZ)
                 EICInfo <- EICInfoMZ[EIC_ID %chin% names(EICs)] # omit missing
                 maybePrintf("Done!\n")
             }
@@ -506,8 +506,8 @@ getPiekGenEICParams <- function(methodMZ, methodIMS = NULL, ...)
     
     ret <- list(methodMZ = methodMZ, methodIMS = methodIMS, mzRange = c(80, 600), mzStep = 0.02, mobRange = c(0.5, 1.3),
                 mobStep = 0.04, retRange = NULL, gapFactor = 3, minEICIntensity = 5000, minEICAdjTime = 5,
-                minEICAdjPoints = 5, minEICAdjIntensity = 250, topMostEIC = 10000,
-                topMostEICPre = 10000, minEICsIMSPreCheck = 50000)
+                minEICAdjPoints = 5, minEICAdjIntensity = 250, topMostEICMZ = 10000,
+                topMostEICMZMob = 10000, minEICsIMSPreCheck = 50000)
     
     if (methodMZ == "suspects")
     {

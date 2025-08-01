@@ -452,11 +452,10 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
                                           genEICParams$rtWindow)
                 peaks <- peaks[keep == TRUE]
             }
-            
-            dups <- findFeatSuspTableDups(peaks$ret, peaks$mz, if (withIMS) peaks$mobility else numeric(),
-                                          peaks$intensity, defaultLim("retention", "very_narrow"),
-                                          defaultLim("mz", "very_narrow"), defaultLim("mobility", "very_narrow"))
-            
+
+            dups <- findFeatTableDups(peaks$ret, peaks$mz, if (withIMS) peaks$mobility else numeric(),
+                                      peaks$intensity, defaultLim("retention", "very_narrow"),
+                                      genEICParams$mzStep / 2, genEICParams$mobStep / 2)
             peaks <- peaks[!dups]
             peaks <- removeDTColumnsIfPresent(peaks, c("binMZStart", "binMobStart", "keep"))
 

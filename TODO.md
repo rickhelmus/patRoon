@@ -121,7 +121,6 @@
     - warn if ms2/suspects are outside bin range?
     - change methodMZ/methodIMS to eg filterMZ/filterMob
     - also make mobility centroid determination optional? doc in any case
-    - instead of topMost+topMostPre have topMostMZ+topMostMob?
 - update featAnn consensus?
 - greedy
     - set default weights
@@ -130,6 +129,7 @@
     - lower mzExpIMSWindow?
     - default smoothing? different for Agilent? Convert to mobility units?
 - throw error from classic groupers with IMS data
+- consensus: copy/avg CCS
 
 
 ## Tests
@@ -251,6 +251,7 @@
         - mention that only mobility column for suspects is used so assignMobilities must be used for CCS conversion
         - update docs for EIC filtering by suspects/ms2 (also mzIsoWindow, IMSWindow for ms2)
         - docs for minEICsIMSPreCheck
+        - update docs for topMostEICMZ/topMostEICMZMob
     - assignMobilities()
         - refs to paper
         - fGroups method

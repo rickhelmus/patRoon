@@ -420,7 +420,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
             if (withIMS)
             {
                 peaks[, binMobStart := EICInfo[match(peaks$EIC_ID, EIC_ID)]$mobmin]
-                peaks <- peaks[between(mobility, binMobStart + genEICParams$mobStep/4, binMobStart + genEICParams$mobStep/4*3) == TRUE]
+                peaks <- peaks[between(mobilityBP, binMobStart + genEICParams$mobStep/4, binMobStart + genEICParams$mobStep/4*3) == TRUE]
             }
             if (genEICParams$methodMZ == "suspects")
             {

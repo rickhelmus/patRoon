@@ -749,7 +749,7 @@ getDefTPStructParams <- function(...)
 #'
 #' @section General parameters: These parameters are applicable to all algorithms \itemize{
 #'
-#'   \item \code{forcePeakRange} a two-sized \code{numeric} vector with the minimum and maximum width for a peak. Peaks
+#'   \item \code{forcePeakWidth} a two-sized \code{numeric} vector with the minimum and maximum width for a peak. Peaks
 #'   that are more narrow or wide will be clamped to this range. This is especially useful for algorithms that consider
 #'   an extensive part of the fronting/tailing noise as part as the peak. Set to \code{c(0, 0)} to disable.
 #'
@@ -882,7 +882,7 @@ getDefPeakParams <- function(type, algorithm, ...)
                    maxPeaksPerSignal = 10
                )
         )
-        def$forcePeakRange <- c(0, 0)
+        def$forcePeakWidth <- c(0, 0)
         def$relMinIntensity <- 0
         def$calcCentroid <- "algorithm"
     }
@@ -896,7 +896,7 @@ getDefPeakParams <- function(type, algorithm, ...)
             envipick = list(drtsmall = 0.2, drtfill = 0.02, drttotal = 1, minint = 10),
             piek = list(peakWidth = c(0.02, 0.5))
         ))
-        def$forcePeakRange = c(0.01, 0.1)
+        def$forcePeakWidth = c(0.01, 0.1)
         def$relMinIntensity <- 0.25
         def$calcCentroid <- "centerOfMass"
     }
@@ -910,7 +910,7 @@ getDefPeakParams <- function(type, algorithm, ...)
             envipick = list(drtsmall = 2, drtfill = 0.4, drttotal = 1, minint = 10),
             piek = list(peakWidth = c(0.2, 5))
         ))
-        def$forcePeakRange = c(0.2, 1)
+        def$forcePeakWidth = c(0.2, 1)
         def$relMinIntensity <- 0.25
         def$calcCentroid <- "centerOfMass"
     }

@@ -1065,7 +1065,7 @@ assertFindPeakParams <- function(x, null.ok = FALSE, .var.name = checkmate::vnam
     }
     # NOTE: for XCMS/enviPick we just let the package functions throw an error...
     
-    assertListVal(x, "forcePeakRange", assertRange, .var.name = .var.name, add = add)
+    assertListVal(x, "forcePeakWidth", assertRange, .var.name = .var.name, add = add)
     assertListVal(x, "relMinIntensity", checkmate::assertNumber, .var.name = .var.name, add = add)
     assertListVal(x, "calcCentroid", checkmate::assertChoice,
                   choices = c("algorithm", "max", "weighted.mean", "centerOfMass"), .var.name = .var.name, add = add)

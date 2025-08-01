@@ -101,7 +101,7 @@ test_that("piek", {
     expect_range(as.data.table(getPiek(getPiekGenEICParams("ms2", retRange = c(60, 120))))$ret, c(60, 120))
     expect_lt(length(getPiek(getPiekGenEICParams("ms2", minEICIntensity = 1E5))), length(ffPiekMS2))
     expect_lt(length(getPiek(getPiekGenEICParams("ms2", topMostEIC = 25))), length(ffPiekMS2))
-    expect_lte(max(getPiek(getPiekGenEICParams("ms2"), getDefPeakParams("chrom", "piek", forcePeakRange = c(0, 10)))[[1]][, retmax - ret]), 10)
+    expect_lte(max(getPiek(getPiekGenEICParams("ms2"), getDefPeakParams("chrom", "piek", forcePeakWidth = c(0, 10)))[[1]][, retmax - retmin]), 10)
 })
 
 test_that("verify empty object can be generated", {

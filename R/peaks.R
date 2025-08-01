@@ -14,11 +14,11 @@ findPeaks <- function(EICs, fillEICs, params, logPath)
     if (params$algorithm == "openms") # UNDONE: change in case we get additional algos with logging
         mkdirp(dirname(logPath))
     
-    ret <- f(EICs, fillEICs, params[setdiff(names(params), c("algorithm", "forcePeakRange", "relMinIntensity",
+    ret <- f(EICs, fillEICs, params[setdiff(names(params), c("algorithm", "forcePeakWidth", "relMinIntensity",
                                                              "calcCentroid"))],
              logPath = logPath)
     
-    if (any(params$forcePeakRange != 0) || params$relMinIntensity > 0 || params$calcCentroid != "algorithm")
+    if (any(params$forcePeakWidth != 0) || params$relMinIntensity > 0 || params$calcCentroid != "algorithm")
     {
         ret <- Map(ret, EICs[names(ret)], f = function(pl, eic)
         {
@@ -33,12 +33,18 @@ findPeaks <- function(EICs, fillEICs, params, logPath)
                 pl <- pl[numGTE(intensity, minInt) == TRUE]
             }
             
-            if (params$forcePeakRange[1] > 0)
-                pl[, c("retmin", "retmax") := .(pmin(ret - params$forcePeakRange[1], retmin),
-                                                pmax(ret + params$forcePeakRange[1], retmax))]
-            if (params$forcePeakRange[2] > 0)
-                pl[, c("retmin", "retmax") := .(pmax(ret - params$forcePeakRange[2], retmin),
-                                                pmin(ret + params$forcePeakRange[2], retmax))]
+            if (params$forcePeakWidth[1] > 0)
+            {
+                pl[(retmax - retmin) < params$forcePeakWidth[1],
+                   c("retmin", "retmax") := .(pmin(ret - params$forcePeakWidth[1] / 2, retmin),
+                                              pmax(ret + params$forcePeakWidth[1] / 2, retmax))]
+            }
+            if (params$forcePeakWidth[2] > 0)
+            {
+                pl[(retmax - retmin) > params$forcePeakWidth[2],
+                   c("retmin", "retmax") := .(pmax(ret - params$forcePeakWidth[2] / 2, retmin),
+                                              pmin(ret + params$forcePeakWidth[2] / 2, retmax))]
+            }
             
             if (params$calcCentroid != "algorithm")
             {

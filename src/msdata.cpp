@@ -973,7 +973,6 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     if (topMost > 0 && allEICMaxIntensities.size() > topMost)
     {
         auto sortedAEMI = allEICMaxIntensities;
-        sortedAEMI.erase(std::remove(sortedAEMI.begin(), sortedAEMI.end(), 0.0), sortedAEMI.end());
         std::nth_element(sortedAEMI.begin(), sortedAEMI.begin() + (topMost-1), sortedAEMI.end(),
                          std::greater<SpectrumRawTypes::Intensity>());
         minMaxIntens = sortedAEMI[topMost-1];

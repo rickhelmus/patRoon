@@ -31,8 +31,7 @@
     - maybe add _mz rel column like compounds?
     - actually, the same is the case for the mz filter (also IMS and mz for features) --> maybe just document difference? the actual results will not change much in general
 - revert default clusterMzWindow back to 0.005, or a least for IMS
-- TC convert: doc that centroid mode is used for IMS conversion (and/or make it optional?
-)
+- TC convert: doc that centroid mode is used for IMS conversion (and/or make it optional?)
 
 ## Maybe
 

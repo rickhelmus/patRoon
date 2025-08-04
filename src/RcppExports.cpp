@@ -487,16 +487,21 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
-// getChromMob
-Rcpp::List getChromMob(const MSReadBackend& backend, SpectrumRawTypes::Mass mzStart, SpectrumRawTypes::Mass mzEnd);
-RcppExport SEXP _patRoon_getChromMob(SEXP backendSEXP, SEXP mzStartSEXP, SEXP mzEndSEXP) {
+// getChromPoints
+Rcpp::List getChromPoints(const MSReadBackend& backend, SpectrumRawTypes::Time rtStart, SpectrumRawTypes::Time rtEnd, SpectrumRawTypes::Mass mzStart, SpectrumRawTypes::Mass mzEnd, bool withMob, SpectrumRawTypes::Mobility mobilityStart, SpectrumRawTypes::Mobility mobilityEnd);
+RcppExport SEXP _patRoon_getChromPoints(SEXP backendSEXP, SEXP rtStartSEXP, SEXP rtEndSEXP, SEXP mzStartSEXP, SEXP mzEndSEXP, SEXP withMobSEXP, SEXP mobilityStartSEXP, SEXP mobilityEndSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const MSReadBackend& >::type backend(backendSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Time >::type rtStart(rtStartSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Time >::type rtEnd(rtEndSEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type mzStart(mzStartSEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type mzEnd(mzEndSEXP);
-    rcpp_result_gen = Rcpp::wrap(getChromMob(backend, mzStart, mzEnd));
+    Rcpp::traits::input_parameter< bool >::type withMob(withMobSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Mobility >::type mobilityStart(mobilityStartSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Mobility >::type mobilityEnd(mobilityEndSEXP);
+    rcpp_result_gen = Rcpp::wrap(getChromPoints(backend, rtStart, rtEnd, mzStart, mzEnd, withMob, mobilityStart, mobilityEnd));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -955,7 +960,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_collapseIMSFrames", (DL_FUNC) &_patRoon_collapseIMSFrames, 13},
     {"_patRoon_getIMSIsolationInfo", (DL_FUNC) &_patRoon_getIMSIsolationInfo, 1},
     {"_patRoon_testMS1Writer", (DL_FUNC) &_patRoon_testMS1Writer, 12},
-    {"_patRoon_getChromMob", (DL_FUNC) &_patRoon_getChromMob, 3},
+    {"_patRoon_getChromPoints", (DL_FUNC) &_patRoon_getChromPoints, 8},
     {"_patRoon_readMSP", (DL_FUNC) &_patRoon_readMSP, 2},
     {"_patRoon_writeMSPLibrary", (DL_FUNC) &_patRoon_writeMSPLibrary, 3},
     {"_patRoon_readMoNAJSON", (DL_FUNC) &_patRoon_readMoNAJSON, 1},

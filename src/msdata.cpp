@@ -1850,31 +1850,47 @@ void testMS1Writer(const MSReadBackend &backend, const std::string &out, Spectru
 }
 
 // [[Rcpp::export]]
-Rcpp::List getChromMob(const MSReadBackend &backend, SpectrumRawTypes::Mass mzStart, SpectrumRawTypes::Mass mzEnd)
+Rcpp::List getChromPoints(const MSReadBackend &backend, SpectrumRawTypes::Time rtStart, SpectrumRawTypes::Time rtEnd,
+                          SpectrumRawTypes::Mass mzStart, SpectrumRawTypes::Mass mzEnd, bool withMob,
+                          SpectrumRawTypes::Mobility mobilityStart, SpectrumRawTypes::Mobility mobilityEnd)
 {
     const auto specf = SpectrumRawFilter().setMZRange(mzStart, mzEnd);
+    const auto mobRange = makeNumRange(mobilityStart, mobilityEnd);
     const auto sfunc = [&](const SpectrumRaw &spec, const SpectrumRawSelection &, size_t)
     {
-        return filterIMSFrame(spec, specf, 0.0, SpectrumRawTypes::MobilityRange());
+        return (spec.hasMobilities()) ? filterIMSFrame(spec, specf, 0.0, mobRange) : filterSpectrumRaw(spec, specf, 0.0);
     };
     
     const auto &meta = backend.getSpecMetadata();
     
     std::vector<std::vector<SpectrumRawSelection>> sels(1);
-    for (size_t i=0; i<meta.first.scans.size(); ++i)
-        sels[0].emplace_back(i);
-    
+    auto startIt = std::lower_bound(meta.first.times.begin(), meta.first.times.end(), rtStart);
+    std::vector<SpectrumRawTypes::Time> times;
+    for (; startIt != meta.first.times.end() && numberLTE(*startIt, rtEnd); ++startIt)
+    {
+        const auto ind = std::distance(meta.first.times.begin(), startIt);
+        sels[0].emplace_back(ind);
+        times.push_back(*startIt);
+    }
+
     const auto specs = applyMSData<SpectrumRaw>(backend, SpectrumRawTypes::MSLevel::MS1, sels, sfunc, 25,
                                                 SpectrumRawTypes::MSSortType::MOBILITY_MZ)[0];
     SpectrumRaw flatSpec;
-    std::vector<SpectrumRawTypes::Time> times;
+    std::vector<SpectrumRawTypes::Time> flatTimes;
     for (size_t i=0; i<specs.size(); ++i)
     {
         flatSpec.append(specs[i]);
-        times.insert(times.end(), specs[i].size(), meta.first.times[i]);
+        flatTimes.insert(flatTimes.end(), specs[i].size(), times[i]);
     }
     
-    return Rcpp::List::create(Rcpp::Named("time") = times,
+    if (!withMob)
+    {
+        return Rcpp::List::create(Rcpp::Named("time") = flatTimes,
+                                  Rcpp::Named("mz") = flatSpec.getMZs(),
+                                  Rcpp::Named("intensity") = flatSpec.getIntensities());
+    }
+    
+    return Rcpp::List::create(Rcpp::Named("time") = flatTimes,
                               Rcpp::Named("mz") = flatSpec.getMZs(),
                               Rcpp::Named("mobility") = flatSpec.getMobilities(),
                               Rcpp::Named("intensity") = flatSpec.getIntensities());

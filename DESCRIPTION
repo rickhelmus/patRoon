@@ -115,7 +115,8 @@ Imports:
     getPass,
     lzstring,
     constructive,
-    signal
+    signal,
+    interp
 Suggests: 
     RDCOMClient,
     metfRag,

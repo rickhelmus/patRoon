@@ -547,6 +547,11 @@ setGeneric("plotChord", function(obj, addSelfLinks = FALSE, addRetMzPlots = TRUE
 #' @template generics
 setGeneric("plotChroms", function(obj, ...) standardGeneric("plotChroms"))
 
+#' @templateVar func plotChroms3D
+#' @templateVar desc plots a three dimensional chromatogram.
+#' @template generics
+setGeneric("plotChroms3D", function(obj, ...) standardGeneric("plotChroms3D"))
+
 #' @templateVar func plotGraph
 #' @templateVar desc Plots an interactive network graph.
 #' @template generics

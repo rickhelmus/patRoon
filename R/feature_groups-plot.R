@@ -694,6 +694,78 @@ setMethod("plotChromsHash", "featureGroups", function(obj, analysis = analyses(o
              analysisInfo(obj)[analysis %chin% anas])
 })
 
+setMethod("plotChroms3D", "featureGroups", function(obj, analysis = analyses(obj), groupName = names(obj),
+                                                    dim3 = "mz", retMin = FALSE, showLimits = TRUE,
+                                                    rtWindow = defaultLim("retention", "medium"),
+                                                    mzWindow = defaultLim("mz", "medium"),
+                                                    IMSWindow = defaultLim("mobility", "medium"),
+                                                    title = NULL, ...)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertChoice(analysis, analyses(obj), add = ac)
+    checkmate::assertChoice(groupName, names(obj), add = ac)
+    checkmate::assertChoice(dim3, c("mz", "mobility"), add = ac)
+    aapply(checkmate::assertFlag, . ~ retMin + showLimits, fixed = list(add = ac))
+    checkmate::reportAssertions(ac)
+
+    if (!hasMobilities(obj) && dim3 == "mobility")
+        stop("There are no mobilities assigned to features.", call. = FALSE)
+    
+    if (length(obj) == 0)
+    {
+        noDataPlot()
+        return(invisible(NULL))
+    }
+    
+    anai <- match(analysis, analyses(obj))
+    anaInfo <- analysisInfo(obj)[anai]
+    feat <- copy(getFeatures(obj)[[analysis]][group == groupName])
+    
+    if (is.null(title))
+    {
+        title <- sprintf("Group '%s'\nrt: %.1f - m/z: %.4f", groupName, feat$ret, feat$mz)
+        if (!is.null(feat[["mobility"]]))
+            title <- sprintf("%s - mob: %.2f", title, feat$mobility)
+    }
+    
+    applyMSData(anaInfo, needIMS = dim3 == "mobility", showProgress = FALSE, function(ana, path, backend)
+    {
+        openMSReadBackend(backend, path)
+        doMob <- dim3 == "mobility"
+        hasMobNum <- doMob && !is.na(feat$mobility)
+        points <- getChromPoints(backend, feat$retmin - rtWindow, feat$retmax + rtWindow, feat$mzmin - mzWindow,
+                                 feat$mzmax + mzWindow, doMob, if (hasMobNum) feat$mobmin - IMSWindow else 0,
+                                 if (hasMobNum) feat$mobmax + IMSWindow else 0)
+
+        interpd <- interp::interp(points$time, if (dim3 == "mz") points$mz else points$mobility, points$intensity,
+                                 seq(feat$retmin - rtWindow, feat$retmax + rtWindow, length = 40),
+                                 seq(if (dim3 == "mz") feat$mzmin - mzWindow else feat$mobmin - IMSWindow,
+                                     if (dim3 == "mz") feat$mzmax + mzWindow else feat$mobmax + IMSWindow,
+                                     length = 40),
+                                 duplicate = "mean", method = "linear", extrap = TRUE)
+        if (retMin)
+            interpd$x <- interpd$x / 60
+        interpd$z[is.na(interpd$z)] <- 0 # UNDONE?
+        
+        filled.contour(interpd$x, interpd$y, interpd$z, color.palette = topo.colors,
+                       xlab = sprintf("Retention time (%s)", if (retMin) "min." else "sec."),
+                       ylab = if (dim3 == "mz") "m/z" else "mobility", main = title,
+                       plot.axes = {
+                           axis(1); axis(2);
+                           if (showLimits)
+                           {
+                               if (retMin)
+                                   feat[, c("retmin", "retmax") := .(retmin / 60, retmax / 60)]
+                               if (dim3 == "mz")
+                                   rect(feat$retmin, feat$mzmin, feat$retmax, feat$mzmax, border = "red", lty = 2)
+                               else if (hasMobNum)
+                                   rect(feat$retmin, feat$mobmin, feat$retmax, feat$mobmax, border = "red", lty = 2)
+                           }
+                       }, ...)
+    })
+    invisible(NULL)
+})
+
 #' @details \code{plotMobilograms} Plots extracted ion mobilograms (EIMs) of feature groups.
 #' @template EIMParams-arg
 #' @rdname feature-plotting

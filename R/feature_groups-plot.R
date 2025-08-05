@@ -733,16 +733,19 @@ setMethod("plotChroms3D", "featureGroups", function(obj, analysis = analyses(obj
         openMSReadBackend(backend, path)
         doMob <- dim3 == "mobility"
         hasMobNum <- doMob && !is.na(feat$mobility)
+        mobmin <- if (hasMobNum) feat$mobmin - IMSWindow else 0; mobmax <- if (hasMobNum) feat$mobmax + IMSWindow else 0
         points <- getChromPoints(backend, feat$retmin - rtWindow, feat$retmax + rtWindow, feat$mzmin - mzWindow,
-                                 feat$mzmax + mzWindow, doMob, if (hasMobNum) feat$mobmin - IMSWindow else 0,
-                                 if (hasMobNum) feat$mobmax + IMSWindow else 0)
+                                 feat$mzmax + mzWindow, doMob, mobmin, mobmax)
+        if (doMob && !hasMobNum)
+            mobmax <- max(points$mobility)
 
         interpd <- interp::interp(points$time, if (dim3 == "mz") points$mz else points$mobility, points$intensity,
                                  seq(feat$retmin - rtWindow, feat$retmax + rtWindow, length = 40),
-                                 seq(if (dim3 == "mz") feat$mzmin - mzWindow else feat$mobmin - IMSWindow,
-                                     if (dim3 == "mz") feat$mzmax + mzWindow else feat$mobmax + IMSWindow,
+                                 seq(if (dim3 == "mz") feat$mzmin - mzWindow else mobmin,
+                                     if (dim3 == "mz") feat$mzmax + mzWindow else mobmax,
                                      length = 40),
                                  duplicate = "mean", method = "linear", extrap = TRUE)
+
         if (retMin)
             interpd$x <- interpd$x / 60
         interpd$z[is.na(interpd$z)] <- 0 # UNDONE?

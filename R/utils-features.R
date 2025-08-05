@@ -401,7 +401,8 @@ setMethod("getFeatureEIXInputTab", "featureGroups", function(obj, type, analysis
                 dummy <- data.table(analysis = setdiff(analysis, ret$analysis), intensity = 0,
                                     retmin = min(ftAllAna$retmin), retmax = max(ftAllAna$retmax),
                                     mzmin = min(ftAllAna$mzmin) - EIXParams$mzExpWindow,
-                                    mzmax = max(ftAllAna$mzmax) + EIXParams$mzExpWindow)
+                                    mzmax = max(ftAllAna$mzmax) + EIXParams$mzExpWindow,
+                                    ret = mean(ftAllAna$ret))
                 if (!is.null(ftAllAna[["mobmin"]]))
                     dummy[, c("mobmin", "mobmax") := .(min(ftAllAna$mobmin) - EIXParams$mobExpWindow,
                                                        max(ftAllAna$mobmax) + EIXParams$mobExpWindow)]

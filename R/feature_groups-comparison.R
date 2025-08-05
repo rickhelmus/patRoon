@@ -293,7 +293,7 @@ setMethod("consensus", "featureGroupsComparison", function(obj, absMinAbundance 
     allAnaInfos <- lapply(obj@fGroupsList, analysisInfo)
 
     # UNDONE: is this a limitation?
-    if (!all(sapply(allAnaInfos[-1], identical, allAnaInfos[[1]]))) # from https://stackoverflow.com/a/30850654
+    if (!all(sapply(allAnaInfos[-1], \(ai) isTRUE(all.equal(ai$analysis, allAnaInfos[[1]]$analysis)))))
     {
         msg <- "This function only works with feature groups with equal analyses"
         if (verifyAnaInfo)

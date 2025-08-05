@@ -163,6 +163,8 @@ convertFGroupsToPseudoFeatures <- function(fGroupsList)
             ft[, mobility := gi$mobility]
             ft[, mobmin := mobility - 0.05]
             ft[, mobmax := mobility + 0.05]
+            if (!is.null(gi$CCS))
+                ft[, CCS := gi$CCS]
             hasM <- TRUE
         }
 
@@ -380,7 +382,7 @@ setMethod("consensus", "featureGroupsComparison", function(obj, absMinAbundance 
 
             colsToAvg <- c("ret", "mz", "area", "retmin", "retmax", "mzmin", "mzmax", "intensity")
             if (hasMobilities(obj))
-                colsToAvg <- c(colsToAvg, "mobility", "mobmin", "mobmax")
+                colsToAvg <- c(colsToAvg, "mobility", "mobmin", "mobmax", if (!is.null(ret[["CCS"]])) "CCS")
 
             for (col in colsToAvg)
                 set(ret, j = col, value = rowMeans(ret[, c(paste0(col, ".x"), paste0(col, ".y")), with = FALSE], na.rm = TRUE))

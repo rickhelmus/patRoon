@@ -129,8 +129,7 @@
     - lower mzExpIMSWindow?
     - default smoothing? different for Agilent? Convert to mobility units?
 - throw error from classic groupers with IMS data
-- consensus: copy/avg CCS
-
+- ADT gives "susp_mobility_susp"/"susp_CCS_susp" cols --> rename
 
 ## Tests
 

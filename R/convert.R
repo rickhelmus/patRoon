@@ -451,7 +451,12 @@ convertMSFilesTIMSCONVERT <- function(inFiles, outFiles, formatTo = "mzML", cent
 
     # NOTE: activate virtualenv will setup the right PATH
     if (!is.null(virtualenv))
+    {
         reticulate::use_virtualenv(virtualenv)
+        # UNDONE: the path is only added when loading the virtualenv on Windows?
+        if (Sys.info()[["sysname"]] != "Windows")
+            withr::local_path(file.path(reticulate::py_config()$virtualenv, "bin"))
+    }
     
     mainArgs <- character()
     if (IMS)

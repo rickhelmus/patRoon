@@ -706,6 +706,8 @@ setMethod("plotChroms3D", "featureGroups", function(obj, analysis = analyses(obj
     checkmate::assertChoice(groupName, names(obj), add = ac)
     checkmate::assertChoice(dim3, c("mz", "mobility"), add = ac)
     aapply(checkmate::assertFlag, . ~ retMin + showLimits, fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow + IMSWindow, lower = 0, finite = TRUE,
+           fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
     if (!hasMobilities(obj) && dim3 == "mobility")
@@ -733,24 +735,34 @@ setMethod("plotChroms3D", "featureGroups", function(obj, analysis = analyses(obj
         openMSReadBackend(backend, path)
         doMob <- dim3 == "mobility"
         hasMobNum <- doMob && !is.na(feat$mobility)
+        retmin <- feat$retmin - rtWindow; retmax <- feat$retmax + rtWindow
+        mzmin <- feat$mzmin - mzWindow; mzmax <- feat$mzmax + mzWindow
         mobmin <- if (hasMobNum) feat$mobmin - IMSWindow else 0; mobmax <- if (hasMobNum) feat$mobmax + IMSWindow else 0
-        points <- getChromPoints(backend, feat$retmin - rtWindow, feat$retmax + rtWindow, feat$mzmin - mzWindow,
-                                 feat$mzmax + mzWindow, doMob, mobmin, mobmax)
+        points <- getChromPoints(backend, retmin, retmax, feat$mzmin, mzmax, doMob, mobmin, mobmax)
+        points <- data.table(x = points$time, y = if (doMob) points$mobility else points$mz, z = points$intensity)
+        
+        padLeft <- padRight <- padBottom <- padTop <- data.table()
+        ymin <- if (doMob) mobmin else mzmin; ymax <- if (doMob) mobmax else mzmax
+        gridSize <- 50 # UNDONE: make configurable?
+        if (min(points$x) > retmin)
+            padLeft <- data.table(x = retmin, y = seq(ymin, ymax, length.out = gridSize), z = 0)
+        if (max(points$x) < retmax)
+            padRight <- data.table(x = retmax, y = seq(ymin, ymax, length.out = gridSize), z = 0)
+        if (min(points$y) > ymin)
+            padBottom <- data.table(x = seq(retmin, retmax, length.out = gridSize), y = ymin, z = 0)
+        if (max(points$y) < ymax)
+            padTop <- data.table(x = seq(retmin, retmax, length.out = gridSize), y = ymax, z = 0)
+        
+        points <- rbindlist(list(points, padLeft, padRight, padBottom, padTop))
+        
         if (doMob && !hasMobNum)
             mobmax <- max(points$mobility)
 
-        interpd <- interp::interp(points$time, if (dim3 == "mz") points$mz else points$mobility, points$intensity,
-                                 seq(feat$retmin - rtWindow, feat$retmax + rtWindow, length = 40),
-                                 seq(if (dim3 == "mz") feat$mzmin - mzWindow else mobmin,
-                                     if (dim3 == "mz") feat$mzmax + mzWindow else mobmax,
-                                     length = 40),
-                                 duplicate = "mean", method = "linear", extrap = TRUE)
-
+        interpd <- MBA::mba.surf(points, no.X = gridSize, no.Y = gridSize, extend = TRUE)
         if (retMin)
-            interpd$x <- interpd$x / 60
-        interpd$z[is.na(interpd$z)] <- 0 # UNDONE?
-        
-        filled.contour(interpd$x, interpd$y, interpd$z, color.palette = topo.colors,
+            interpd$xyz.est$x <- interpd$xyz.est$x / 60
+        interpd$xyz.est$z[interpd$xyz.est$z < 0] <- 0 # UNDONE?
+        filled.contour(interpd$xyz.est$x, interpd$xyz.est$y, interpd$xyz.est$z, color.palette = topo.colors,
                        xlab = sprintf("Retention time (%s)", if (retMin) "min." else "sec."),
                        ylab = if (dim3 == "mz") "m/z" else "mobility", main = title,
                        plot.axes = {

@@ -116,7 +116,7 @@ Imports:
     lzstring,
     constructive,
     signal,
-    interp
+    MBA
 Suggests: 
     RDCOMClient,
     metfRag,

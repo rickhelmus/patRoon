@@ -185,7 +185,7 @@
     - IMSRangeParams (incl mobility_mz/CCS_mz) and IMSMatchParams filters for suspects (screenSuspects() and assignMobilities()) and compounds
     - piek
         - tests with ims data
-        - verify removal duplicate suspects/features?
+        - verify removal duplicate features?
     - groupFeaturesGreedy()
     - plotChroms(): mob annotation
     - plotMobilograms()

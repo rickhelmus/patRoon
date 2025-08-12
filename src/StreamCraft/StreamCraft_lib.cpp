@@ -1099,7 +1099,7 @@ std::vector<sc::MZML_BINARY_METADATA> sc::mzml::MZML_SPECTRUM::extract_binary_me
 
     bool has_bin_data_type = false;
 
-    for (size_t i = 0; 1 < mzml_possible_accessions_binary_data.size(); ++i)
+    for (size_t i = 0; i < mzml_possible_accessions_binary_data.size(); ++i)
     {
       pugi::xml_node node_data_type = bin.find_child_by_attribute("cvParam", "accession", mzml_possible_accessions_binary_data[i].c_str());
 
@@ -2367,7 +2367,7 @@ bool sc::mzml::MZML::has_ion_mobility()
 {
   const std::vector<float> &mobilily = get_spectra_mobility();
   std::set<float> unique_mobilily(mobilily.begin(), mobilily.end());
-  return unique_mobilily.size() > 1;
+  return unique_mobilily.size() > 1 || (unique_mobilily.size() == 1 && *unique_mobilily.begin() != 0);
 };
 
 sc::MS_SUMMARY sc::mzml::MZML::get_summary()

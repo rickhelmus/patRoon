@@ -368,7 +368,7 @@ namespace sc
         "MS:1000821", "MS:1000822", "MS:1002478", "MS:1002529",
         "MS:1002530", "MS:1002742", "MS:1002743", "MS:1002744",
         "MS:1002745", "MS:1002893", "MS:1003143", "MS:1003157",
-        "MS:1003158", "MS:1003006"};
+        "MS:1003158", "MS:1003006", "MS:1003007"};
 
     const std::vector<std::string> mzml_possible_short_name_binary_data = {
         "mz", "intensity", "charge", "sn",
@@ -376,7 +376,7 @@ namespace sc
         "pressure", "temperature", "mean_charge", "resolution",
         "baseline", "noise", "sampled_noise_mz", "sampled_noise_intensity",
         "sampled_noise_baseline", "ion_mobility", "mass", "quadrupole_position_lower_bound_mz",
-        "quadrupole_position_upper_bound_mz", "ion_mobility"};
+        "quadrupole_position_upper_bound_mz", "ion_mobility", "ion_mobility"};
 
     class MZML_BINARY_METADATA
     {

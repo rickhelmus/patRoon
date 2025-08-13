@@ -710,7 +710,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         std::vector<SpectrumRawTypes::Intensity> intensities;
         std::vector<SpectrumRawTypes::Mobility> mobilities;
         AllPeaks() = default;
-        AllPeaks(size_t size) : indices(size), mzs(size), intensities(size), mobilities(size) { }
+        AllPeaks(size_t size, bool withMob) : indices(size), mzs(size), intensities(size), mobilities((withMob) ? size : 0) { }
         void clear(void)
         {
             indices.clear();
@@ -780,26 +780,44 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     if (allSpectra.empty())
         return Rcpp::List();
     
-    bool anySpecHasMob = false; // NOTE: assume all MS spectra have or have not IMS data (UNDONE?)
-    AllPeaks allPeaks;
-    for (size_t i=0; i<allSpectra[0].size(); ++i)
+    const auto totalPeaks = std::accumulate(allSpectra[0].begin(), allSpectra[0].end(), 0,
+        [](size_t sum, const SpectrumRaw &spec) { return sum + spec.size(); });
+    
+    const bool anySpecHasMob = allSpectra[0][0].hasMobilities(); // NOTE: assume all MS spectra have or have not IMS data (UNDONE?)
+    AllPeaks allPeaks(totalPeaks, anySpecHasMob);
+    for (size_t i=0, peaksi=0; i<allSpectra[0].size(); ++i)
     {
-        allPeaks.indices.insert(allPeaks.indices.end(), allSpectra[0][i].size(), scanSels[0][i].index);
-        allPeaks.mzs.insert(allPeaks.mzs.end(), allSpectra[0][i].getMZs().begin(), allSpectra[0][i].getMZs().end());
-        allPeaks.intensities.insert(allPeaks.intensities.end(), allSpectra[0][i].getIntensities().begin(),
-                                    allSpectra[0][i].getIntensities().end());
-        if (allSpectra[0][i].hasMobilities())
-            anySpecHasMob = true;
+        if (allSpectra[0][i].getMZs().empty())
+            continue; // no peaks in this spectrum
+      
+        std::fill(allPeaks.indices.begin() + peaksi, allPeaks.indices.begin() + peaksi + allSpectra[0][i].size(),
+                  scanSels[0][i].index);
+        std::copy(allSpectra[0][i].getMZs().begin(), allSpectra[0][i].getMZs().end(),
+                  allPeaks.mzs.begin() + peaksi);
+        std::copy(allSpectra[0][i].getIntensities().begin(), allSpectra[0][i].getIntensities().end(),
+                  allPeaks.intensities.begin() + peaksi);
         if (anySpecHasMob)
-            allPeaks.mobilities.insert(allPeaks.mobilities.end(), allSpectra[0][i].getMobilities().begin(),
-                                       allSpectra[0][i].getMobilities().end());
+        {
+            std::copy(allSpectra[0][i].getMobilities().begin(), allSpectra[0][i].getMobilities().end(),
+                      allPeaks.mobilities.begin() + peaksi);
+        }
+        
+        peaksi += allSpectra[0][i].size();
         allSpectra[0][i].clear();
     }
 
     const auto sortedInds = getSortedInds(allPeaks.mzs);
-    
+
+#if 0
+    applyPermutation(allPeaks.indices, sortedInds);
+    applyPermutation(allPeaks.mzs, sortedInds);
+    applyPermutation(allPeaks.intensities, sortedInds);
+    if (anySpecHasMob)
+        applyPermutation(allPeaks.mobilities, sortedInds);
+    auto &allPeaksSorted = allPeaks; // UNDONE
+#else
     // UNDONE: see if we can do the sorting at once, eg: https://devblogs.microsoft.com/oldnewthing/20170102-00/?p=95095
-    AllPeaks allPeaksSorted(allPeaks.indices.size());
+    AllPeaks allPeaksSorted(allPeaks.indices.size(), anySpecHasMob);
     for (size_t i=0; i<sortedInds.size(); ++i)
     {
         const auto j = sortedInds[i];
@@ -810,7 +828,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
             allPeaksSorted.mobilities[i] = allPeaks.mobilities[j];
     }
     allPeaks.clear();
-
+#endif
     std::vector<EIC> allEICs(EICCount);
     std::vector<SpectrumRawTypes::Intensity> allEICMaxIntensities(EICCount);
     #pragma omp parallel for

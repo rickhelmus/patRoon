@@ -66,9 +66,14 @@ SpectrumRaw getSCSpectrum(sc::MS_FILE *analysis, SpectrumRawTypes::Scan scan,
 
 // [[Rcpp::interfaces(r, cpp)]]
 
-MSReadBackend::ThreadDataType MSReadBackendSC::doGetThreadData(void) const
+void MSReadBackendSC::doOpen(const std::string &file)
 {
-    return std::make_shared<sc::MS_FILE>(getCurrentFile());
+    handle = std::make_unique<sc::MS_FILE>(file);
+}
+
+void MSReadBackendSC::doClose(void)
+{
+    handle.reset();
 }
 
 SpectrumRaw MSReadBackendSC::doReadSpectrum(const ThreadDataType &tdata, SpectrumRawTypes::MSLevel MSLevel,
@@ -76,19 +81,18 @@ SpectrumRaw MSReadBackendSC::doReadSpectrum(const ThreadDataType &tdata, Spectru
                                             const SpectrumRawTypes::MobilityRange &mobRange,
                                             SpectrumRawTypes::Intensity minIntensityIMS) const
 {
-    auto *analysis = reinterpret_cast<sc::MS_FILE *>(tdata.get());
     const auto &meta = getSpecMetadata();
     
     if (MSLevel == SpectrumRawTypes::MSLevel::MS1)
-        return getSCSpectrum(analysis, meta.first.scans[scanSel.index], mobRange, minIntensityIMS);
+        return getSCSpectrum(handle.get(), meta.first.scans[scanSel.index], mobRange, minIntensityIMS);
     if (scanSel.MSMSFrameIndices.empty())
-        return getSCSpectrum(analysis, meta.second.scans[scanSel.index], mobRange, minIntensityIMS);
+        return getSCSpectrum(handle.get(), meta.second.scans[scanSel.index], mobRange, minIntensityIMS);
     
     // if we are here we need to get MS2 data from an IMS frame...
     
     SpectrumRaw ret;
     for (const auto i : scanSel.MSMSFrameIndices)
-        ret.append(getSCSpectrum(analysis, meta.second.MSMSFrames[scanSel.index].subScans[i], mobRange,
+        ret.append(getSCSpectrum(handle.get(), meta.second.MSMSFrames[scanSel.index].subScans[i], mobRange,
                                  minIntensityIMS));
     
     return ret;

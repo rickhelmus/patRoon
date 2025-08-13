@@ -9,7 +9,7 @@ OBJECTS_GF=$(SRC:.cpp=.o)
 DEST_GF=GenForm
 
 CXX_STD = CXX14
-PKG_LIBS = $(SHLIB_OPENMP_CXXFLAGS)
+PKG_LIBS = $(SHLIB_OPENMP_CXXFLAGS) -lz
 PKG_CXXFLAGS = $(SHLIB_OPENMP_CXXFLAGS)
 
 PKG_CFLAGS += $(shell echo 'source("../tools/build_flags.R"); getFlags("PKG_CFLAGS")' | "${R_HOME}/bin/R" --vanilla --slave)

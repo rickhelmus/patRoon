@@ -131,6 +131,8 @@
 - throw error from classic groupers with IMS data
 - ADT gives "susp_mobility_susp"/"susp_CCS_susp" cols --> rename
 - function to update fg properties (RT, m/z, mobility, CCS) after eg filtering, or make it an option in filter()/delete()?
+- plotChroms() etc: mention that only precursors are plot? Now seems confusing as number of fGroups seems less when reporting
+
 
 ## Tests
 

@@ -808,15 +808,6 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
 
     const auto sortedInds = getSortedInds(allPeaks.mzs);
 
-#if 0
-    applyPermutation(allPeaks.indices, sortedInds);
-    applyPermutation(allPeaks.mzs, sortedInds);
-    applyPermutation(allPeaks.intensities, sortedInds);
-    if (anySpecHasMob)
-        applyPermutation(allPeaks.mobilities, sortedInds);
-    auto &allPeaksSorted = allPeaks; // UNDONE
-#else
-    // UNDONE: see if we can do the sorting at once, eg: https://devblogs.microsoft.com/oldnewthing/20170102-00/?p=95095
     AllPeaks allPeaksSorted(allPeaks.indices.size(), anySpecHasMob);
     for (size_t i=0; i<sortedInds.size(); ++i)
     {
@@ -828,7 +819,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
             allPeaksSorted.mobilities[i] = allPeaks.mobilities[j];
     }
     allPeaks.clear();
-#endif
+
     std::vector<EIC> allEICs(EICCount);
     std::vector<SpectrumRawTypes::Intensity> allEICMaxIntensities(EICCount);
     #pragma omp parallel for

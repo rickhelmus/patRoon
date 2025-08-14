@@ -185,21 +185,4 @@ template <typename NumType> std::vector<int> clusterNums(const std::vector<NumTy
     return ret;
 }
 
-// slightly modified version from https://devblogs.microsoft.com/oldnewthing/20170102-00/?p=95095
-template<typename T, typename S> void applyPermutation(std::vector<T> &v, std::vector<S> indices)
-{
-    for (size_t i=0; i<indices.size(); i++)
-    {
-        auto current = i;
-        while (i != indices[current])
-        {
-            const auto next = indices[current];
-            std::swap(v[current], v[next]);
-            indices[current] = current;
-            current = next;
-        }
-        indices[current] = current;
-    }
-}
-
 #endif

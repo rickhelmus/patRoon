@@ -84,6 +84,8 @@ public:
     SpectrumRaw(void) = default;
     SpectrumRaw(const std::vector<SpectrumRawTypes::Mass> &m,
                 const std::vector<SpectrumRawTypes::Intensity> &i) : mzs(m), intensities(i) { }
+    SpectrumRaw(std::vector<SpectrumRawTypes::Mass> &&m,
+                std::vector<SpectrumRawTypes::Intensity> &&i) : mzs(std::move(m)), intensities(std::move(i)) { }
     SpectrumRaw(size_t size, bool mobs = false) : mzs(size), intensities(size), mobilities((mobs) ? size : 0) { }
     
     const auto &getMZs(void) const { return mzs; }

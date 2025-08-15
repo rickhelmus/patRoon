@@ -170,6 +170,8 @@ doGetEICs <- function(anaInfo, EICInfoList, gapFactor, mzExpIMSWindow = 0, minIn
                       minEICIntensity = 0, minEICAdjTime = 0, minEICAdjPoints = 0, minEICAdjIntensity = 0,
                       pad = FALSE, doCache = TRUE, cacheDB = NULL)
 {
+    doCache <- doCache && getCacheMode() != "none"
+    
     if (length(EICInfoList) == 0)
         return(list())
     

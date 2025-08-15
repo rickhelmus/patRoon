@@ -247,10 +247,12 @@ setMethod("initMSReadBackend", "Rcpp_MSReadBackendMem", function(backend)
     hash <- getMSDataFileHash(path)
     db <- openCacheDBScope()
     
+    hd <- NULL # might be set below, so we don't need to load it twice
+    
     backend <- setMSReadBackendMetadata(backend, hash, function()
     {
         msf <- mzR::openMSfile(path)
-        hd <- as.data.table(mzR::header(msf))
+        hd <<- as.data.table(mzR::header(msf))
         mzR::close(msf)
         
         if (!is.null(hd[["centroided"]]) && !all(hd$centroided))
@@ -273,10 +275,10 @@ setMethod("initMSReadBackend", "Rcpp_MSReadBackendMem", function(backend)
     if (is.null(specs))
     {
         msf <- mzR::openMSfile(path)
-        hd <- as.data.table(mzR::header(msf))
+        if (is.null(hd))
+            hd <- as.data.table(mzR::header(msf))
         ps <- mzR::peaks(msf)
         mzR::close(msf)
-        
         specs <- list(MS1 = ps[hd$msLevel == 1], MS2 = ps[hd$msLevel > 1])
         saveCacheData("MSReadBackendMzR", specs, hash, db)
     }

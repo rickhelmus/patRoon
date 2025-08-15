@@ -33,6 +33,10 @@ walkSpectra <- function(backend) {
     .Call(`_patRoon_walkSpectra`, backend)
 }
 
+countAllPeaks <- function(backend) {
+    .Call(`_patRoon_countAllPeaks`, backend)
+}
+
 getMSSpectrum <- function(backend, index, MSLevel, frameIndex = -1L, minIntensity = 0) {
     .Call(`_patRoon_getMSSpectrum`, backend, index, MSLevel, frameIndex, minIntensity)
 }

@@ -229,6 +229,41 @@ int walkSpectra(const MSReadBackend &backend)
 }
 
 // [[Rcpp::export]]
+int countAllPeaks(const MSReadBackend &backend)
+{
+    const auto sfunc = [](const SpectrumRaw &spec, const SpectrumRawSelection &, size_t) { return spec.size(); };
+    const auto &meta = backend.getSpecMetadata();
+    
+    std::vector<std::vector<SpectrumRawSelection>> sels(1);
+    for (size_t i=0; i<meta.first.scans.size(); ++i)
+        sels[0].emplace_back(i);
+    const auto peaksMS1 = applyMSData<size_t>(backend, SpectrumRawTypes::MSLevel::MS1, sels, sfunc, 0,
+                                              SpectrumRawTypes::MSSortType::NONE);
+    const auto totPeaksMS1 = std::accumulate(peaksMS1[0].begin(), peaksMS1[0].end(), 0);
+
+    sels[0].clear();
+    for (size_t i=0; i<meta.second.scans.size(); ++i)
+    {
+        if (meta.second.MSMSFrames.empty())
+            sels[0].emplace_back(i);
+        else
+        {
+            for (size_t j=0; j<meta.second.MSMSFrames[i].precursorMZs.size(); ++j)
+            {
+                SpectrumRawSelection ssel(i);
+                ssel.MSMSFrameIndices.push_back(j);
+                sels[0].push_back(std::move(ssel));
+            }
+        }
+    }
+    const auto peaksMS2 = applyMSData<size_t>(backend, SpectrumRawTypes::MSLevel::MS2, sels, sfunc, 0,
+                                              SpectrumRawTypes::MSSortType::NONE);
+    const auto totPeaksMS2 = std::accumulate(peaksMS2[0].begin(), peaksMS2[0].end(), 0);
+    
+    return totPeaksMS1 + totPeaksMS2;
+}
+
+// [[Rcpp::export]]
 Rcpp::DataFrame getMSSpectrum(const MSReadBackend &backend, int index, int MSLevel, int frameIndex = -1,
                               double minIntensity = 0)
 {

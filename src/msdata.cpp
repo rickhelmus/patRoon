@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <vector>
+#include <chrono>
 
 #ifdef _OPENMP
 #include <omp.h>
@@ -15,6 +16,44 @@
 #include "spectrum-raw.h"
 
 namespace {
+
+class SimpleTimer
+{
+    using clock = std::chrono::steady_clock;
+    
+    clock::time_point startTime;
+    bool running, enabled;
+    
+public:
+    SimpleTimer(bool e = true) : running(false), enabled(e) {}
+    
+    void start(const std::string &msg = "")
+    {
+        if (!enabled)
+            return;
+        
+        if (!msg.empty())
+            std::cerr << msg << ": ";
+        startTime = clock::now();
+        running = true;
+    }
+    
+    double stop(void)
+    {
+        if (!running || !enabled)
+            return 0.0;
+        const auto end = clock::now();
+        running = false;
+        const double ms = std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(end - startTime).count();
+        
+        if (ms >= 1000.0)
+            std::cerr << std::fixed << std::setprecision(3) << (ms / 1000.0) << " s\n";
+        else
+            std::cerr << std::fixed << std::setprecision(3) << ms << " ms\n";
+        
+        return ms;
+    }
+};
 
 template<typename OutType, typename FuncType, typename... Args>
 std::vector<std::vector<OutType>> applyMSData(const MSReadBackend &backend, SpectrumRawTypes::MSLevel MSLevel,
@@ -797,6 +836,9 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         return specf;
     };
     
+    SimpleTimer timer(true);
+    
+    timer.start("Collecting all scans");
     std::set<SpectrumRawTypes::Scan> allScans;
     for (size_t i=0; i<startTimes.size(); ++i)
     {
@@ -808,13 +850,16 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     std::vector<std::vector<SpectrumRawSelection>> scanSels(1);
     for (const auto &scan : allScans)
         scanSels[0].emplace_back(scan);
+    timer.stop();
     
+    timer.start("Loading all MS spectra");
     auto allSpectra = applyMSData<SpectrumRaw>(backend, SpectrumRawTypes::MSLevel::MS1, scanSels, sfunc,
                                                minIntensityIMS, SpectrumRawTypes::MSSortType::MZ);
-    
+    timer.stop();
     if (allSpectra.empty())
         return Rcpp::List();
     
+    timer.start("Preparing EICs (AllPeaks)");
     const auto totalPeaks = std::accumulate(allSpectra[0].begin(), allSpectra[0].end(), 0,
         [](size_t sum, const SpectrumRaw &spec) { return sum + spec.size(); });
     
@@ -840,7 +885,9 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         peaksi += allSpectra[0][i].size();
         allSpectra[0][i].clear();
     }
+    timer.stop();
 
+    timer.start("Sorting all peaks");
     const auto sortedInds = getSortedInds(allPeaks.mzs);
 
     AllPeaks allPeaksSorted(allPeaks.indices.size(), anySpecHasMob);
@@ -854,7 +901,9 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
             allPeaksSorted.mobilities[i] = allPeaks.mobilities[j];
     }
     allPeaks.clear();
+    timer.stop();
 
+    timer.start("Processing EICs");
     std::vector<EIC> allEICs(EICCount);
     std::vector<SpectrumRawTypes::Intensity> allEICMaxIntensities(EICCount);
     #pragma omp parallel for
@@ -1012,7 +1061,9 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     }
     
     allPeaksSorted.clear(); // no need for this anymore
+    timer.stop();
     
+    timer.start("Converting EICs to R data");
     SpectrumRawTypes::Intensity minMaxIntens = 0.0;
     if (topMost > 0 && allEICMaxIntensities.size() > topMost)
     {
@@ -1105,6 +1156,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         else
             ret.attr("allXValues") = specMeta.first.times;
     }
+    timer.stop();
     
     return ret;
 }

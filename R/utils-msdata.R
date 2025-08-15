@@ -244,7 +244,7 @@ doGetEICs <- function(anaInfo, EICInfoList, gapFactor, mzExpIMSWindow = 0, minIn
             EICs[] <- Map(EICs, EICInfo$retmin, EICInfo$retmax, f = function(eic, rmin, rmax)
             {
                 px <- padEIX(attr(EICs, "allXValues"), rmin, rmax, eic$time, eic$intensity)
-                data.frame(time = px[[1]], intensity = px[[2]])
+                setDF(list(time = px[[1]], intensity = px[[2]]))
             })
         }
         

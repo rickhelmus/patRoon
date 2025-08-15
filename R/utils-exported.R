@@ -431,8 +431,8 @@ getEICs <- function(analysisInfo, ranges, gapFactor = 3, output = "fill", minInt
             if (is.null(at))
                 return(anaEICs) # no EICs
         
-            return(lapply(anaEICs, function(eic) data.frame(time = at,
-                                                            intensity = doFillEIXIntensities(at, eic$time, eic$intensity))))
+            return(lapply(anaEICs, function(eic) setDF(list(time = at,
+                                                            intensity = doFillEIXIntensities(at, eic$time, eic$intensity)))))
         })
     }
     return(ret)

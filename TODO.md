@@ -75,6 +75,10 @@
 - checkFeatures()
     - optionally disable mobilograms?
     - mobilogram previews?
+- EIC optims
+    - matrix conversion
+        - getEICs(), calculatePeakQualities(), getPICSet(): filling --> check if we move that to C++
+    - move calcStats to C++? --> return as attributes?
 
 
 ## newProject()

@@ -1089,32 +1089,53 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     
         if (eicMode == EICMode::SIMPLE)
         {
-            ret[i] = Rcpp::List::create(Rcpp::Named("time") = eic.times,
-                                        Rcpp::Named("intensity") = eic.intensities);
+            auto mat = Rcpp::NumericMatrix(eic.times.size(), 2);
+            for (size_t i=0; i<eic.times.size(); ++i)
+            {
+                mat(i, 0) = eic.times[i];
+                mat(i, 1) = eic.intensities[i];
+            }
+            Rcpp::colnames(mat) = Rcpp::CharacterVector::create("time", "intensity");
+            ret[i] = mat;
         }
         else if (eicMode == EICMode::FULL && anySpecHasMob)
         {
-            ret[i] = Rcpp::List::create(Rcpp::Named("time") = eic.times,
-                                        Rcpp::Named("intensity") = eic.intensities,
-                                        Rcpp::Named("intensityBP") = eic.intensitiesBP,
-                                        Rcpp::Named("mz") = eic.mzs,
-                                        Rcpp::Named("mzBP") = eic.mzsBP,
-                                        Rcpp::Named("mzmin") = eic.mzMins,
-                                        Rcpp::Named("mzmax") = eic.mzMaxs,
-                                        Rcpp::Named("mobility") = eic.mobilities,
-                                        Rcpp::Named("mobmin") = eic.mobMins,
-                                        Rcpp::Named("mobmax") = eic.mobMaxs,
-                                        Rcpp::Named("mobilityBP") = eic.mobilitiesBP);
+            auto mat = Rcpp::NumericMatrix(eic.times.size(), 11);
+            for (size_t i=0; i<eic.times.size(); ++i)
+            {
+                mat(i, 0) = eic.times[i];
+                mat(i, 1) = eic.intensities[i];
+                mat(i, 2) = eic.intensitiesBP[i];
+                mat(i, 3) = eic.mzs[i];
+                mat(i, 4) = eic.mzsBP[i];
+                mat(i, 5) = eic.mzMins[i];
+                mat(i, 6) = eic.mzMaxs[i];
+                mat(i, 7) = eic.mobilities[i];
+                mat(i, 8) = eic.mobMins[i];
+                mat(i, 9) = eic.mobMaxs[i];
+                mat(i, 10) = eic.mobilitiesBP[i];
+            }
+            Rcpp::colnames(mat) = Rcpp::CharacterVector::create("time", "intensity", "intensityBP", "mz", "mzBP",
+                                                                "mzmin", "mzmax", "mobility", "mobmin", "mobmax",
+                                                                "mobilityBP");
+            ret[i] = mat;
         }
         else if (eicMode == EICMode::FULL || eicMode == EICMode::FULL_MZ)
         {
-            ret[i] = Rcpp::List::create(Rcpp::Named("time") = eic.times,
-                                        Rcpp::Named("intensity") = eic.intensities,
-                                        Rcpp::Named("intensityBP") = eic.intensitiesBP,
-                                        Rcpp::Named("mz") = eic.mzs,
-                                        Rcpp::Named("mzBP") = eic.mzsBP,
-                                        Rcpp::Named("mzmin") = eic.mzMins,
-                                        Rcpp::Named("mzmax") = eic.mzMaxs);
+            auto mat = Rcpp::NumericMatrix(eic.times.size(), 7);
+            for (size_t i=0; i<eic.times.size(); ++i)
+            {
+                mat(i, 0) = eic.times[i];
+                mat(i, 1) = eic.intensities[i];
+                mat(i, 2) = eic.intensitiesBP[i];
+                mat(i, 3) = eic.mzs[i];
+                mat(i, 4) = eic.mzsBP[i];
+                mat(i, 5) = eic.mzMins[i];
+                mat(i, 6) = eic.mzMaxs[i];
+            }
+            Rcpp::colnames(mat) = Rcpp::CharacterVector::create("time", "intensity", "intensityBP", "mz", "mzBP",
+                                                                "mzmin", "mzmax");
+            ret[i] = mat;
         }
         else // if (eicMode == EICMode::TEST)
         {
@@ -1170,25 +1191,32 @@ std::vector<SpectrumRawTypes::Intensity> doFillEIXIntensities(const std::vector<
 }
 
 // [[Rcpp::export]]
-Rcpp::List padEIX(const std::vector<SpectrumRawTypes::Time> &allXValues,
-                  SpectrumRawTypes::Time startX, SpectrumRawTypes::Time endX,
-                  const std::vector<SpectrumRawTypes::Time> &xvalues,
-                  const std::vector<SpectrumRawTypes::Intensity> &intensities)
+Rcpp::NumericMatrix padEIC(const std::vector<SpectrumRawTypes::Time> &allXValues,
+                           SpectrumRawTypes::Time startX, SpectrumRawTypes::Time endX,
+                           const std::vector<SpectrumRawTypes::Time> &xvalues,
+                           const std::vector<SpectrumRawTypes::Intensity> &intensities)
 {
     std::vector<SpectrumRawTypes::Time> outXValues;
     std::vector<SpectrumRawTypes::Intensity> outIntensities;
     
     if (allXValues.empty())
     {
-        return Rcpp::List::create(Rcpp::Named("xvalue") = xvalues,
-                                  Rcpp::Named("intensity") = intensities);
+        Rcpp::NumericMatrix mat(xvalues.size(), 2);
+        for (size_t i=0; i<xvalues.size(); ++i)
+        {
+            mat(i, 0) = xvalues[i];
+            mat(i, 1) = intensities[i];
+        }
+        Rcpp::colnames(mat) = Rcpp::CharacterVector::create("time", "intensity");
+        return mat;
     }
     if (xvalues.empty())
     {
-        outXValues = { allXValues.front(), allXValues.back() };
-        outIntensities.resize(2, 0.0);
-        return Rcpp::List::create(Rcpp::Named("xvalue") = outXValues,
-                                  Rcpp::Named("intensity") = outIntensities);
+        Rcpp::NumericMatrix mat(2, 2);
+        mat(0, 0) = allXValues.front();
+        mat(1, 0) = allXValues.back();
+        Rcpp::colnames(mat) = Rcpp::CharacterVector::create("time", "intensity");
+        return mat;
     }
     
     // snap start/end ranges to allXValues
@@ -1259,8 +1287,14 @@ Rcpp::List padEIX(const std::vector<SpectrumRawTypes::Time> &allXValues,
         outIntensities.push_back(0.0);
     }
 
-    return Rcpp::List::create(Rcpp::Named("xvalue") = outXValues,
-                              Rcpp::Named("intensity") = outIntensities);    
+    Rcpp::NumericMatrix mat(outXValues.size(), 2);
+    for (size_t i=0; i<outXValues.size(); ++i)
+    {
+        mat(i, 0) = outXValues[i];
+        mat(i, 1) = outIntensities[i];
+    }
+    Rcpp::colnames(mat) = Rcpp::CharacterVector::create("time", "intensity");
+    return mat;
 }
 
 // [[Rcpp::export]]
@@ -1632,22 +1666,36 @@ Rcpp::List getEIMList(const MSReadBackend &backend, const std::vector<SpectrumRa
     Rcpp::List ret(entries);
     for (size_t i=0; i<entries; ++i)
     {
-        ret[i] = Rcpp::List::create(Rcpp::Named("mobility") = averageEIMs[i].mobilities,
-                                    Rcpp::Named("intensity") = averageEIMs[i].intensities);
+        auto mat = Rcpp::NumericMatrix(averageEIMs[i].mobilities.size(), 2);
+        for (size_t j=0; j<averageEIMs[i].mobilities.size(); ++j)
+        {
+            mat(j, 0) = averageEIMs[i].mobilities[j];
+            mat(j, 1) = averageEIMs[i].intensities[j];
+        }
+        Rcpp::colnames(mat) = Rcpp::CharacterVector::create("mobility", "intensity");
+        ret[i] = mat;
     }
     
     return ret;
 }
 
 // [[Rcpp::export]]
-Rcpp::List compressEIM(const std::vector<SpectrumRawTypes::Mobility> &mobilities,
-                       const std::vector<SpectrumRawTypes::Intensity> &intensities)
+Rcpp::NumericMatrix compressEIM(const std::vector<SpectrumRawTypes::Mobility> &mobilities,
+                                const std::vector<SpectrumRawTypes::Intensity> &intensities)
 {
     // compress EIM data by removing zero intensity points that are neighbored by other zero intensity points.
     // NOTE: we always keep the first and last point, so we need at least 3 points to compress.
     if (mobilities.size() < 3)
-        return Rcpp::List::create(Rcpp::Named("mobility") = mobilities,
-                                  Rcpp::Named("intensity") = intensities);
+    {
+        auto mat = Rcpp::NumericMatrix(mobilities.size(), 2);
+        for (size_t i=0; i<mobilities.size(); ++i)
+        {
+            mat(i, 0) = mobilities[i];
+            mat(i, 1) = intensities[i];
+        }
+        Rcpp::colnames(mat) = Rcpp::CharacterVector::create("mobility", "intensity");
+        return mat;
+    }
     
     std::vector<SpectrumRawTypes::Mobility> outMobs;
     std::vector<SpectrumRawTypes::Intensity> outInts;
@@ -1662,8 +1710,14 @@ Rcpp::List compressEIM(const std::vector<SpectrumRawTypes::Mobility> &mobilities
         outInts.push_back(intensities[i]);
     }
     
-    return Rcpp::List::create(Rcpp::Named("mobility") = outMobs,
-                              Rcpp::Named("intensity") = outInts);
+    auto mat = Rcpp::NumericMatrix(outMobs.size(), 2);
+    for (size_t i=0; i<outMobs.size(); ++i)
+    {
+        mat(i, 0) = outMobs[i];
+        mat(i, 1) = outInts[i];
+    }
+    Rcpp::colnames(mat) = Rcpp::CharacterVector::create("mobility", "intensity");
+    return mat;
 }
 
 // [[Rcpp::export]]

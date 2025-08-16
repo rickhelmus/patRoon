@@ -327,9 +327,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// padEIX
-Rcpp::List padEIX(const std::vector<SpectrumRawTypes::Time>& allXValues, SpectrumRawTypes::Time startX, SpectrumRawTypes::Time endX, const std::vector<SpectrumRawTypes::Time>& xvalues, const std::vector<SpectrumRawTypes::Intensity>& intensities);
-RcppExport SEXP _patRoon_padEIX(SEXP allXValuesSEXP, SEXP startXSEXP, SEXP endXSEXP, SEXP xvaluesSEXP, SEXP intensitiesSEXP) {
+// padEIC
+Rcpp::NumericMatrix padEIC(const std::vector<SpectrumRawTypes::Time>& allXValues, SpectrumRawTypes::Time startX, SpectrumRawTypes::Time endX, const std::vector<SpectrumRawTypes::Time>& xvalues, const std::vector<SpectrumRawTypes::Intensity>& intensities);
+RcppExport SEXP _patRoon_padEIC(SEXP allXValuesSEXP, SEXP startXSEXP, SEXP endXSEXP, SEXP xvaluesSEXP, SEXP intensitiesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -338,7 +338,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< SpectrumRawTypes::Time >::type endX(endXSEXP);
     Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Time>& >::type xvalues(xvaluesSEXP);
     Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Intensity>& >::type intensities(intensitiesSEXP);
-    rcpp_result_gen = Rcpp::wrap(padEIX(allXValues, startX, endX, xvalues, intensities));
+    rcpp_result_gen = Rcpp::wrap(padEIC(allXValues, startX, endX, xvalues, intensities));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -418,7 +418,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // compressEIM
-Rcpp::List compressEIM(const std::vector<SpectrumRawTypes::Mobility>& mobilities, const std::vector<SpectrumRawTypes::Intensity>& intensities);
+Rcpp::NumericMatrix compressEIM(const std::vector<SpectrumRawTypes::Mobility>& mobilities, const std::vector<SpectrumRawTypes::Intensity>& intensities);
 RcppExport SEXP _patRoon_compressEIM(SEXP mobilitiesSEXP, SEXP intensitiesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -962,7 +962,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_getScans", (DL_FUNC) &_patRoon_getScans, 6},
     {"_patRoon_getEICList", (DL_FUNC) &_patRoon_getEICList, 16},
     {"_patRoon_doFillEIXIntensities", (DL_FUNC) &_patRoon_doFillEIXIntensities, 3},
-    {"_patRoon_padEIX", (DL_FUNC) &_patRoon_padEIX, 5},
+    {"_patRoon_padEIC", (DL_FUNC) &_patRoon_padEIC, 5},
     {"_patRoon_getMSMetadata", (DL_FUNC) &_patRoon_getMSMetadata, 2},
     {"_patRoon_setSpecMetadata", (DL_FUNC) &_patRoon_setSpecMetadata, 3},
     {"_patRoon_getMSPeakLists", (DL_FUNC) &_patRoon_getMSPeakLists, 21},

@@ -331,12 +331,11 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
     
     getEICsAna <- function(backend, EICInfo, mode, topMost)
     {
-        args <- list(backend, EICInfo$mzmin, EICInfo$mzmax, genEICParams$retRange[1], genEICParams$retRange[2],
-                     EICInfo$mobmin, EICInfo$mobmax, gapFactor = genEICParams$gapFactor, mzExpIMSWindow = 0,
-                     minIntensityIMS = minIntensityIMS, mode = mode, minEICIntensity = genEICParams$minEICIntensity,
-                     minEICAdjTime = genEICParams$minEICAdjTime, minEICAdjPoints = genEICParams$minEICAdjPoints,
-                     minEICAdjIntensity = genEICParams$minEICAdjIntensity, topMost = topMost)
-        ret <- do.call(if (mode == "test") getEICList else doGetEICsForAna, args)
+        ret <- getEICList(backend, EICInfo$mzmin, EICInfo$mzmax, genEICParams$retRange[1], genEICParams$retRange[2],
+                          EICInfo$mobmin, EICInfo$mobmax, gapFactor = genEICParams$gapFactor, mzExpIMSWindow = 0,
+                          minIntensityIMS = minIntensityIMS, mode = mode, minEICIntensity = genEICParams$minEICIntensity,
+                          minEICAdjTime = genEICParams$minEICAdjTime, minEICAdjPoints = genEICParams$minEICAdjPoints,
+                          minEICAdjIntensity = genEICParams$minEICAdjIntensity, topMost = topMost)
         names(ret) <- EICInfo$EIC_ID
         if (mode != "test")
             ret <- pruneList(ret, checkZeroRows = TRUE, keepAttr = TRUE)

@@ -157,15 +157,6 @@ getCentroidedMSFilesFromAnaInfo <- function(anaInfo, formats = c("mzML", "mzXML"
     return(setNames(msf, anaInfo$analysis))
 }
 
-doGetEICsForAna <- function(...)
-{
-    # NOTE: getEICList() return lists, which are converted to data.frames and is a lot faster than returning
-    # data.frames directly.
-    EICs <- getEICList(...)
-    EICs[] <- lapply(EICs, setDF)
-    return(EICs)
-}
-
 doGetEICs <- function(anaInfo, EICInfoList, gapFactor, mzExpIMSWindow = 0, minIntensityIMS = 0, mode = "simple",
                       minEICIntensity = 0, minEICAdjTime = 0, minEICAdjPoints = 0, minEICAdjIntensity = 0,
                       pad = FALSE, doCache = TRUE, cacheDB = NULL)
@@ -227,9 +218,9 @@ doGetEICs <- function(anaInfo, EICInfoList, gapFactor, mzExpIMSWindow = 0, minIn
             ToDo <- EICInfo[isCached == FALSE]
             openMSReadBackend(backend, path)
             
-            newEICs <- doGetEICsForAna(backend, ToDo$mzmin, ToDo$mzmax, ToDo$retmin, ToDo$retmax, ToDo$mobmin,
-                                       ToDo$mobmax, gapFactor, mzExpIMSWindow, minIntensityIMS, mode, minEICIntensity,
-                                       minEICAdjTime, minEICAdjPoints, minEICAdjIntensity)
+            newEICs <- getEICList(backend, ToDo$mzmin, ToDo$mzmax, ToDo$retmin, ToDo$retmax, ToDo$mobmin,
+                                  ToDo$mobmax, gapFactor, mzExpIMSWindow, minIntensityIMS, mode, minEICIntensity,
+                                  minEICAdjTime, minEICAdjPoints, minEICAdjIntensity)
             EICs[!isCached] <- newEICs
             attr(EICs, "allXValues") <- attr(newEICs, "allXValues")
             
@@ -241,10 +232,10 @@ doGetEICs <- function(anaInfo, EICInfoList, gapFactor, mzExpIMSWindow = 0, minIn
         }
         if (pad)
         {
+            allXValues <- attr(EICs, "allXValues")
             EICs[] <- Map(EICs, EICInfo$retmin, EICInfo$retmax, f = function(eic, rmin, rmax)
             {
-                px <- padEIX(attr(EICs, "allXValues"), rmin, rmax, eic$time, eic$intensity)
-                setDF(list(time = px[[1]], intensity = px[[2]]))
+                padEIC(allXValues, rmin, rmax, eic[, "time"], eic[, "intensity"])
             })
         }
         
@@ -303,7 +294,6 @@ doGetEIMs <- function(anaInfo, EIMInfoList, minIntensity, sgOrder, sgLength, mzE
         # NOTE: compression is only done here if we're not smoothing below, otherwise data is compressed after smoothing
         newEIMs <- getEIMList(backend, ToDo$mzmin, ToDo$mzmax, ToDo$retmin, ToDo$retmax, ToDo$mobmin, ToDo$mobmax,
                               minIntensity, mzExpIMSWindow, compress && !doSmooth)
-        newEIMs <- lapply(newEIMs, setDF)
         
         if (doSmooth)
         {
@@ -316,9 +306,9 @@ doGetEIMs <- function(anaInfo, EIMInfoList, minIntensity, sgOrder, sgLength, mzE
                         warning(sprintf("Cannot smooth EIM because the number of points (%d) is less than the filter length (%d)",
                                         nrow(eim), sgLength), call. = FALSE)
                     else
-                        eim$intensity <- signal::sgolayfilt(eim$intensity, p = sgOrder, n = sgLength)
+                        eim[, "intensity"] <- signal::sgolayfilt(eim[, "intensity"], p = sgOrder, n = sgLength)
                     if (compress)
-                        eim <- setDF(compressEIM(eim$mobility, eim$intensity))
+                        eim <- compressEIM(eim[, "mobility"], eim[, "intensity"])
                 }
                 return(eim)
             })

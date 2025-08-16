@@ -177,7 +177,7 @@ doGetEICs <- function(anaInfo, EICInfoList, gapFactor, mzExpIMSWindow = 0, minIn
             cacheDB <- openCacheDBScope()
         anaHashes <- getMSFileHashesFromAvailBackend(anaInfo, needIMS = needIMS)
         baseHash <- makeHash(gapFactor, mzExpIMSWindow, minIntensityIMS, mode, minEICIntensity, minEICAdjTime,
-                             minEICAdjPoints, minEICAdjIntensity)
+                             minEICAdjPoints, minEICAdjIntensity, pad)
     }
     
     allEICs <- applyMSData(anaInfo, EICInfoList, showProgress = TRUE, needIMS = needIMS,
@@ -219,7 +219,7 @@ doGetEICs <- function(anaInfo, EICInfoList, gapFactor, mzExpIMSWindow = 0, minIn
             openMSReadBackend(backend, path)
             
             newEICs <- getEICList(backend, ToDo$mzmin, ToDo$mzmax, ToDo$retmin, ToDo$retmax, ToDo$mobmin,
-                                  ToDo$mobmax, gapFactor, mzExpIMSWindow, minIntensityIMS, mode, minEICIntensity,
+                                  ToDo$mobmax, gapFactor, mzExpIMSWindow, minIntensityIMS, mode, pad, minEICIntensity,
                                   minEICAdjTime, minEICAdjPoints, minEICAdjIntensity)
             EICs[!isCached] <- newEICs
             attr(EICs, "allXValues") <- attr(newEICs, "allXValues")
@@ -230,15 +230,7 @@ doGetEICs <- function(anaInfo, EICInfoList, gapFactor, mzExpIMSWindow = 0, minIn
                 saveCacheData("EICAllTimes", attr(EICs, "allXValues"), anaEICHash, cacheDB)
             }
         }
-        if (pad)
-        {
-            allXValues <- attr(EICs, "allXValues")
-            EICs[] <- Map(EICs, EICInfo$retmin, EICInfo$retmax, f = function(eic, rmin, rmax)
-            {
-                padEIC(allXValues, rmin, rmax, eic[, "time"], eic[, "intensity"])
-            })
-        }
-        
+
         doProgress()
         return(EICs)
     })

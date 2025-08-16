@@ -289,8 +289,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // getEICList
-Rcpp::List getEICList(const MSReadBackend& backend, const std::vector<SpectrumRawTypes::Mass>& startMZs, const std::vector<SpectrumRawTypes::Mass>& endMZs, const std::vector<SpectrumRawTypes::Time>& startTimes, const std::vector<SpectrumRawTypes::Time>& endTimes, const std::vector<SpectrumRawTypes::Mobility>& startMobs, const std::vector<SpectrumRawTypes::Mobility>& endMobs, SpectrumRawTypes::Time gapFactor, SpectrumRawTypes::Mass mzExpIMSWindow, SpectrumRawTypes::Intensity minIntensityIMS, const std::string& mode, SpectrumRawTypes::Intensity minEICIntensity, SpectrumRawTypes::Time minEICAdjTime, unsigned minEICAdjPoints, SpectrumRawTypes::Intensity minEICAdjIntensity, unsigned topMost);
-RcppExport SEXP _patRoon_getEICList(SEXP backendSEXP, SEXP startMZsSEXP, SEXP endMZsSEXP, SEXP startTimesSEXP, SEXP endTimesSEXP, SEXP startMobsSEXP, SEXP endMobsSEXP, SEXP gapFactorSEXP, SEXP mzExpIMSWindowSEXP, SEXP minIntensityIMSSEXP, SEXP modeSEXP, SEXP minEICIntensitySEXP, SEXP minEICAdjTimeSEXP, SEXP minEICAdjPointsSEXP, SEXP minEICAdjIntensitySEXP, SEXP topMostSEXP) {
+Rcpp::List getEICList(const MSReadBackend& backend, const std::vector<SpectrumRawTypes::Mass>& startMZs, const std::vector<SpectrumRawTypes::Mass>& endMZs, const std::vector<SpectrumRawTypes::Time>& startTimes, const std::vector<SpectrumRawTypes::Time>& endTimes, const std::vector<SpectrumRawTypes::Mobility>& startMobs, const std::vector<SpectrumRawTypes::Mobility>& endMobs, SpectrumRawTypes::Time gapFactor, SpectrumRawTypes::Mass mzExpIMSWindow, SpectrumRawTypes::Intensity minIntensityIMS, const std::string& mode, bool pad, SpectrumRawTypes::Intensity minEICIntensity, SpectrumRawTypes::Time minEICAdjTime, unsigned minEICAdjPoints, SpectrumRawTypes::Intensity minEICAdjIntensity, unsigned topMost);
+RcppExport SEXP _patRoon_getEICList(SEXP backendSEXP, SEXP startMZsSEXP, SEXP endMZsSEXP, SEXP startTimesSEXP, SEXP endTimesSEXP, SEXP startMobsSEXP, SEXP endMobsSEXP, SEXP gapFactorSEXP, SEXP mzExpIMSWindowSEXP, SEXP minIntensityIMSSEXP, SEXP modeSEXP, SEXP padSEXP, SEXP minEICIntensitySEXP, SEXP minEICAdjTimeSEXP, SEXP minEICAdjPointsSEXP, SEXP minEICAdjIntensitySEXP, SEXP topMostSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -305,12 +305,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type mzExpIMSWindow(mzExpIMSWindowSEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minIntensityIMS(minIntensityIMSSEXP);
     Rcpp::traits::input_parameter< const std::string& >::type mode(modeSEXP);
+    Rcpp::traits::input_parameter< bool >::type pad(padSEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minEICIntensity(minEICIntensitySEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::Time >::type minEICAdjTime(minEICAdjTimeSEXP);
     Rcpp::traits::input_parameter< unsigned >::type minEICAdjPoints(minEICAdjPointsSEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minEICAdjIntensity(minEICAdjIntensitySEXP);
     Rcpp::traits::input_parameter< unsigned >::type topMost(topMostSEXP);
-    rcpp_result_gen = Rcpp::wrap(getEICList(backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, gapFactor, mzExpIMSWindow, minIntensityIMS, mode, minEICIntensity, minEICAdjTime, minEICAdjPoints, minEICAdjIntensity, topMost));
+    rcpp_result_gen = Rcpp::wrap(getEICList(backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, gapFactor, mzExpIMSWindow, minIntensityIMS, mode, pad, minEICIntensity, minEICAdjTime, minEICAdjPoints, minEICAdjIntensity, topMost));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -324,21 +325,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Time>& >::type xvalues(xvaluesSEXP);
     Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Intensity>& >::type intensities(intensitiesSEXP);
     rcpp_result_gen = Rcpp::wrap(doFillEIXIntensities(allXValues, xvalues, intensities));
-    return rcpp_result_gen;
-END_RCPP
-}
-// padEIC
-Rcpp::NumericMatrix padEIC(const std::vector<SpectrumRawTypes::Time>& allXValues, SpectrumRawTypes::Time startX, SpectrumRawTypes::Time endX, const std::vector<SpectrumRawTypes::Time>& xvalues, const std::vector<SpectrumRawTypes::Intensity>& intensities);
-RcppExport SEXP _patRoon_padEIC(SEXP allXValuesSEXP, SEXP startXSEXP, SEXP endXSEXP, SEXP xvaluesSEXP, SEXP intensitiesSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Time>& >::type allXValues(allXValuesSEXP);
-    Rcpp::traits::input_parameter< SpectrumRawTypes::Time >::type startX(startXSEXP);
-    Rcpp::traits::input_parameter< SpectrumRawTypes::Time >::type endX(endXSEXP);
-    Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Time>& >::type xvalues(xvaluesSEXP);
-    Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Intensity>& >::type intensities(intensitiesSEXP);
-    rcpp_result_gen = Rcpp::wrap(padEIC(allXValues, startX, endX, xvalues, intensities));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -960,9 +946,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_getFilteredFrame", (DL_FUNC) &_patRoon_getFilteredFrame, 9},
     {"_patRoon_getCentroidedFrame", (DL_FUNC) &_patRoon_getCentroidedFrame, 6},
     {"_patRoon_getScans", (DL_FUNC) &_patRoon_getScans, 6},
-    {"_patRoon_getEICList", (DL_FUNC) &_patRoon_getEICList, 16},
+    {"_patRoon_getEICList", (DL_FUNC) &_patRoon_getEICList, 17},
     {"_patRoon_doFillEIXIntensities", (DL_FUNC) &_patRoon_doFillEIXIntensities, 3},
-    {"_patRoon_padEIC", (DL_FUNC) &_patRoon_padEIC, 5},
     {"_patRoon_getMSMetadata", (DL_FUNC) &_patRoon_getMSMetadata, 2},
     {"_patRoon_setSpecMetadata", (DL_FUNC) &_patRoon_setSpecMetadata, 3},
     {"_patRoon_getMSPeakLists", (DL_FUNC) &_patRoon_getMSPeakLists, 21},

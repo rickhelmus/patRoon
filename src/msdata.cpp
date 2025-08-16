@@ -927,20 +927,34 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     
     SimpleTimer timer(true);
     
-    timer.start("Collecting all scans");
-    std::set<SpectrumRawTypes::Scan> allScans;
-    for (size_t i=0; i<startTimes.size(); ++i)
-    {
-        const auto sels = getSpecRawSelections(specMeta, makeNumRange(startTimes[i], endTimes[i]),
-                                               SpectrumRawTypes::MSLevel::MS1, 0);
-        for (const auto &sel : sels)
-            allScans.insert(sel.index);
-    }
+    // get scan selections: if EICCount is small, we minimize them to save file reads. For larger counts, we just read
+    // the full min/max time range, as figuring out the specifics will take relatively long
     std::vector<std::vector<SpectrumRawSelection>> scanSels(1);
-    for (const auto &scan : allScans)
-        scanSels[0].emplace_back(scan);
-    timer.stop();
     
+    if (EICCount < 1000)
+    {
+        timer.start("Collecting all scans (selectively)");
+        std::set<SpectrumRawTypes::Scan> allScans;
+        for (size_t i=0; i<startTimes.size(); ++i)
+        {
+            const auto sels = getSpecRawSelections(specMeta, makeNumRange(startTimes[i], endTimes[i]),
+                                                   SpectrumRawTypes::MSLevel::MS1, 0);
+            for (const auto &sel : sels)
+                allScans.insert(sel.index);
+        }
+        for (const auto &scan : allScans)
+            scanSels[0].emplace_back(scan);
+        timer.stop();
+    }
+    else
+    {
+        timer.start("Collecting all scans (range)");
+        scanSels[0] = getSpecRawSelections(specMeta, makeNumRange(*std::min_element(startTimes.begin(), startTimes.end()),
+                                                                  *std::max_element(endTimes.begin(), endTimes.end())),
+                                                                  SpectrumRawTypes::MSLevel::MS1, 0);
+        timer.stop();
+    }
+
     timer.start("Loading all MS spectra");
     auto allSpectra = applyMSData<SpectrumRaw>(backend, SpectrumRawTypes::MSLevel::MS1, scanSels, sfunc,
                                                minIntensityIMS, SpectrumRawTypes::MSSortType::MZ);

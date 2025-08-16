@@ -50,15 +50,15 @@ findPeaks <- function(EICs, fillEICs, params, logPath)
             {
                 for (row in seq_len(nrow(pl)))
                 {
-                    eicS <- eic[numGTETol(eic$time, pl$retmin[row]) & numLTETol(eic$time, pl$retmax[row]), ]
+                    eicS <- eic[numGTETol(eic[, "time"], pl$retmin[row]) & numLTETol(eic[, "time"], pl$retmax[row]), , drop = FALSE]
                     if (nrow(eicS) > 1)
                     {
                         if (params$calcCentroid == "max")
-                            set(pl, row, "ret", eicS[which.max(eicS$intensity), "time"])
+                            set(pl, row, "ret", eicS[which.max(eicS[, "intensity"]), "time"])
                         else if (params$calcCentroid == "weighted.mean")
-                            set(pl, row, "ret", weighted.mean(eicS$time, eicS$intensity))
+                            set(pl, row, "ret", weighted.mean(eicS[, "time"], eicS[, "intensity"]))
                         else # if (params$calcCentroid == "centerOfMass")
-                            set(pl, row, "ret", calcCenterOfMass(eicS$time, eicS$intensity))
+                            set(pl, row, "ret", calcCenterOfMass(eicS[, "time"], eicS[, "intensity"]))
                     }
                     
                 }
@@ -135,8 +135,8 @@ findPeaksXCMS3 <- function(EICs, fillEICs, params, logPath)
     allTime <- attr(EICs, "allXValues")
     ret <- sapply(EICs, function(eic)
     {
-        inten <- if (fillEICs) doFillEIXIntensities(allTime, eic$time, eic$intensity) else eic$intensity
-        tim <- if (fillEICs) allTime else eic$time
+        inten <- if (fillEICs) doFillEIXIntensities(allTime, eic[, "time"], eic[, "intensity"]) else eic[, "intensity"]
+        tim <- if (fillEICs) allTime else eic[, "time"]
         p <- as.data.table(suppressWarnings(do.call(xcms::peaksWithCentWave, c(list(inten, tim), params))))
         cols <- c("ret", "retmin", "retmax", "area", "intensity")
         setnames(p, c("rt", "rtmin", "rtmax", "into", "maxo"), cols)
@@ -169,12 +169,12 @@ findPeaksEnviPick <- function(EICs, fillEICs, params, logPath)
         if (fillEICs)
         {
             dummyPL$Scans[[1]] <- allTime
-            sc <- data.table(RT = allTime, intensity = doFillEIXIntensities(allTime, eic$time, eic$intensity))
+            sc <- data.table(RT = allTime, intensity = doFillEIXIntensities(allTime, eic[, "time"], eic[, "intensity"]))
         }
         else
         {
-            dummyPL$Scans[[1]] <- eic$time
-            sc <- data.table(RT = eic$time, intensity = eic$intensity)
+            dummyPL$Scans[[1]] <- eic[, "time"]
+            sc <- data.table(RT = eic[, "time"], intensity = eic[, "intensity"])
         }
         sc[, "m/z" := 100] # dummy, no need for this
         sc[, measureID := seq_len(.N)]

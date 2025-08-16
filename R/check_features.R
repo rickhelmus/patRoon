@@ -159,7 +159,7 @@ checkFeaturesInterface$methods(
         {
             gData[, EIC := sapply(names(fGroups), function(g)
             {
-                jsonlite::toJSON(list(values = EIC$previews[[g]]$intensity, xvalues = EIC$previews[[g]]$time,
+                jsonlite::toJSON(list(values = EIC$previews[[g]][, "intensity"], xvalues = EIC$previews[[g]][, "time"],
                                       options = list(type = "line", height = 50)))
             })]
             setcolorder(gData, c("group", "EIC"))
@@ -440,8 +440,8 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, EICParams
         previews <- Map(previews, names(previews), f = function(eix, grp)
         {
             anai <- which.max(fGroups[[grp]])
-            return(eix[numGTE(eix[[1]], fTable[[anai]][[colMin]][ftind[[grp]][anai]]) &
-                           numLTE(eix[[1]], fTable[[anai]][[colMax]][ftind[[grp]][anai]]), ])
+            return(eix[numGTE(eix[, 1], fTable[[anai]][[colMin]][ftind[[grp]][anai]]) &
+                           numLTE(eix[, 1], fTable[[anai]][[colMax]][ftind[[grp]][anai]]), ])
         })
         return(list(params = params, topMost = topMost, topMostRep = topMostRep, all = all, previews = previews))
     }

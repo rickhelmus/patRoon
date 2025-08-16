@@ -635,16 +635,17 @@ setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj),
 
     # prepare EICs for plotting
     
-    EICs <- lapply(EICs, function(ea)
+    if (retMin)
     {
-        ax <- attr(ea, "allXValues")
-        lapply(ea, function(eg)
+        EICs <- lapply(EICs, function(ea)
         {
-            if (retMin)
-                eg$time <- eg$time/60
-            return(eg)
+            lapply(ea, function(eg)
+            {
+                eg[, "time"] <- eg[, "time"] / 60
+                return(eg)
+            })
         })
-    })
+    }
 
     takeAnalysis <- analysis
     anaInfo <- analysisInfo(obj)

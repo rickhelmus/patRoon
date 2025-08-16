@@ -65,8 +65,8 @@ doFillEIXIntensities <- function(allXValues, xvalues, intensities) {
     .Call(`_patRoon_doFillEIXIntensities`, allXValues, xvalues, intensities)
 }
 
-padEIX <- function(allXValues, startX, endX, xvalues, intensities) {
-    .Call(`_patRoon_padEIX`, allXValues, startX, endX, xvalues, intensities)
+padEIC <- function(allXValues, startX, endX, xvalues, intensities) {
+    .Call(`_patRoon_padEIC`, allXValues, startX, endX, xvalues, intensities)
 }
 
 getMSMetadata <- function(backend, msLevel) {

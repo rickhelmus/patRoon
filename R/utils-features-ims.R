@@ -81,7 +81,7 @@ assignFeatureMobilitiesPeaks <- function(features, peakParams, EIMParams)
         if (length(EIMs) > 0)
         {
             # pretend we have EICs so we can find peaks
-            EIMs <- lapply(EIMs, setnames, old = "mobility", new = "time")
+            EIMs <- lapply(EIMs, \(e) { colnames(e)[1] <- "time"; e })
             peaksList <- findPeaks(EIMs, FALSE, peakParams, file.path("log", "assignMobilities", paste0("mobilogram_peaks-", ana, ".txt")))
             peaksTable <- rbindlist(peaksList, idcol = "ims_parent_ID")
             setnames(peaksTable, c("ret", "retmin", "retmax", "area", "intensity"), mobNumCols, skip_absent = TRUE)
@@ -167,15 +167,15 @@ reintegrateMobilityFeatures <- function(features, peakParams, EICParams, peakRTW
             doRows <- which(ft$ID %chin% names(eics) & !ft$ID %chin% peakIDs & ft$mob_assign_method == "peak")
             ft[doRows, c("intensity", "area") := {
                 eic <- eics[[ID]]
-                eic <- eic[numGTETol(eic$time, retmin) & numLTETol(eic$time, retmax), ]
+                eic <- eic[numGTETol(eic[ , "time"], retmin) & numLTETol(eic[, "time"], retmax), , drop = FALSE]
                 
-                eicnz <- eic[eic$intensity > 0, ]
-                i <- if (nrow(eicnz) > 0) eicnz[which.min(abs(eicnz$time - ret)), "intensity"] else 0
+                eicnz <- eic[eic[, "intensity"] > 0, , drop = FALSE]
+                i <- if (nrow(eicnz) > 0) eicnz[which.min(abs(eicnz[, "time"] - ret)), "intensity"] else 0
                 
                 a <- 0
                 if (nrow(eic) > 0)
                 {
-                    a <- sum(eic$intensity)
+                    a <- sum(eic[, "intensity"])
                     if (calcArea == "integrate")
                         a <- a * ((retmax - retmin) / nrow(eic))
                 }

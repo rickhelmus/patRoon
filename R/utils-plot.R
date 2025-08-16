@@ -203,7 +203,7 @@ makeEIXPlot <- function(featPlotTab, anaInfo, gInfo, showPeakArea, showFGroupRec
     if (is.null(xlim))
     {
         xlim <- if (anyNA(featPlotTab$xmin))
-            range(unlist(lapply(EIXs, function(ea) lapply(ea, "[[", 1))))
+            range(unlist(lapply(EIXs, \(ea) lapply(ea, \(x) x[, 1]))))
         else
             c(min(featPlotTab$xmin) - window, max(featPlotTab$xmax) + window)
     }
@@ -219,11 +219,11 @@ makeEIXPlot <- function(featPlotTab, anaInfo, gInfo, showPeakArea, showFGroupRec
                 if (!is.null(xr))
                 {
                     eixi <- if (is.na(xr[1]))
-                        eix$intensity
+                        eix[, "intensity"]
                     else
                     {
                         xr <- c(max(xr[1], xlim[1]), min(xr[2], xlim[2]))
-                        eix[eix[[1]] %between% xr, "intensity"]
+                        eix[eix[, 1] %between% xr, "intensity"]
                     }
                     if (length(eixi) > 0)
                         return(max(eixi))
@@ -281,22 +281,23 @@ makeEIXPlot <- function(featPlotTab, anaInfo, gInfo, showPeakArea, showFGroupRec
             else
                 anaInfo[match(ana, analysis)][[groupBy]]
             
-            points(EIX[[1]], EIX$intensity, type = "l", col = EIXColors[colInd])
+            points(EIX[, 1], EIX[, "intensity"], type = "l", col = EIXColors[colInd])
             
             if (showPeakArea && nrow(featRow) != 0 && !is.na(featRow$xmin))
             {
-                EIXFill <- setDT(EIX[numGTETol(EIX[[1]], featRow$xmin) & numLTETol(EIX[[1]], featRow$xmax), ])
-                EIXFill <- EIXFill[EIXFill[[1]] %inrange% effectiveXlim]
+                EIXFill <- EIX[numGTETol(EIX[, 1], featRow$xmin) & numLTETol(EIX[, 1], featRow$xmax), , drop = FALSE]
+                EIXFill <- EIXFill[EIXFill[, 1] %inrange% effectiveXlim, , drop = FALSE]
+                
                 # filling doesn't work if outside y plot range
-                EIXFill[intensity < effectiveYlim[1], intensity := effectiveYlim[1]]
-                EIXFill[intensity > effectiveYlim[2], intensity := effectiveYlim[2]]
-                polygon(c(EIXFill[[1]], rev(EIXFill[[1]])), c(EIXFill$intensity, rep(0, length(EIXFill$intensity))),
+                EIXFill[EIXFill[, "intensity"] < effectiveYlim[1], "intensity"] <- effectiveYlim[1]
+                EIXFill[EIXFill[, "intensity"] > effectiveYlim[2], "intensity"] <- effectiveYlim[2]
+                polygon(c(EIXFill[, 1], rev(EIXFill[, 1])), c(EIXFill[, "intensity"], rep(0, nrow(EIXFill))),
                         col = fillColors[colInd], border = NA)
             }
             
             if (doRectOrAnn)
             {
-                ints <- EIX[numGTETol(EIX[[1]], xRange[1]) & numLTETol(EIX[[1]], xRange[2]), "intensity"]
+                ints <- EIX[numGTETol(EIX[, 1], xRange[1]) & numLTETol(EIX[, 1], xRange[2]), "intensity"]
                 if (length(ints) > 0)
                     maxEIXInt <- max(maxEIXInt, ints)
             }

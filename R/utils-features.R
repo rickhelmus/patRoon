@@ -677,16 +677,16 @@ findPeaksInEICs <- function(EICs, peakParams, withMobility, calcStats, logPath, 
     {
         peaks[, c("mzmin", "mzmax", "mz", "mobmin", "mobmax", "mobility", "mobilityBP") := {
             eic <- EICs[[EIC_ID]]
-            eic <- eic[numGTETol(eic$time, retmin) & numLTETol(eic$time, retmax), ]
+            eic <- eic[numGTETol(eic[, "time"], retmin) & numLTETol(eic[, "time"], retmax), , drop = FALSE]
             if (nrow(eic) == 0)
                 numeric(1)
             else
             {
-                if (is.null(eic[["mobility"]]))
-                    eic$mobility <- eic$mobilityBP <- eic$mobmin <- eic$mobmax <- NA_real_
-                list(min(eic$mzmin), max(eic$mzmax), weighted.mean(eic$mzBP, eic$intensity),
-                     min(eic$mobmin), max(eic$mobmax),
-                     weighted.mean(eic$mobility, eic$intensity), weighted.mean(eic$mobilityBP, eic$intensity))
+                if (!"mobility" %in% colnames(eic))
+                    eic <- cbind(eic, mobility = NA, mobilityBP = NA, mobmin = NA, mobmax = NA)
+                list(min(eic[, "mzmin"]), max(eic[, "mzmax"]), weighted.mean(eic[, "mzBP"], eic[, "intensity"]),
+                     min(eic[, "mobmin"]), max(eic[, "mobmax"]),
+                     weighted.mean(eic[, "mobility"], eic[, "intensity"]), weighted.mean(eic[, "mobilityBP"], eic[, "intensity"]))
             }
         }, by = seq_len(nrow(peaks))]
         

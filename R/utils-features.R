@@ -665,12 +665,14 @@ findPeaksInEICs <- function(EICs, peakParams, withMobility, calcStats, logPath, 
         peaks[, EIC_ID := character()]
         peaks[, c("retmin", "retmax", "ret", "area", "intensity") := numeric()]
         if (calcStats)
-            peaks[, c("mzmin", "mzmax", "mz") := numeric()]
+            peaks[, c("mzmin", "mzmax", "mz", "mzBP") := numeric()]
         if (withMobility)
         {
             if (calcStats)
                 peaks[, c("mobmin", "mobmax") := numeric()]
             peaks[, mobility := numeric()]
+            if (calcStats)
+                peaks[, mobilityBP := numeric()]
         }
     }
     else if (calcStats)
@@ -691,7 +693,7 @@ findPeaksInEICs <- function(EICs, peakParams, withMobility, calcStats, logPath, 
         }, by = seq_len(nrow(peaks))]
         
         # NOTE: we could also set mobilities after checking if data is available, but then we need to repeat the EIC subsetting above
-        if (!withMobility || length(EICs) == 0 || is.null(EICs[[1]][["mobility"]]))
+        if (!withMobility || length(EICs) == 0 || !"mobility" %in% colnames(EICs[[1]]))
             peaks[, c("mobmin", "mobmax", "mobility", "mobilityBP") := NULL]
     }
     

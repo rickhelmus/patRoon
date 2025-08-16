@@ -952,7 +952,15 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     const auto totalPeaks = std::accumulate(allSpectra[0].begin(), allSpectra[0].end(), 0,
         [](size_t sum, const SpectrumRaw &spec) { return sum + spec.size(); });
     
-    const bool anySpecHasMob = allSpectra[0][0].hasMobilities(); // NOTE: assume all MS spectra have or have not IMS data (UNDONE?)
+    bool anySpecHasMob = false; // NOTE: assume all MS spectra have or have not IMS data (UNDONE?)
+    for (size_t i=0, peaksi=0; i<allSpectra[0].size(); ++i)
+    {
+        if (allSpectra[0][i].getMZs().empty())
+            continue; // no peaks in this spectrum, need some to see if there are mobilities
+        anySpecHasMob = allSpectra[0][i].hasMobilities();
+        break;
+    }
+    
     AllPeaks allPeaks(totalPeaks, anySpecHasMob);
     for (size_t i=0, peaksi=0; i<allSpectra[0].size(); ++i)
     {

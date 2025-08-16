@@ -456,9 +456,8 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
     
     calcFeatQualities <- function(ret, retmin, retmax, intensity, EIC, EICAT)
     {
-        EIC <- data.frame(time = EICAT, intensity = doFillEIXIntensities(EICAT, EIC$time, EIC$intensity))
-        EIC <- EIC[numGTETol(EIC$time, retmin) & numLTETol(EIC$time, retmax), ]
-        EIC <- as.matrix(EIC) # NOTE: MetaClean expects matrices
+        EIC <- cbind(time = EICAT, intensity = doFillEIXIntensities(EICAT, EIC[, "time"], EIC[, "intensity"]))
+        EIC <- EIC[numGTETol(EIC$time, retmin) & numLTETol(EIC$time, retmax), , drop = FALSE]
         tol <- 1E-4 # HACK: otherwise MetaClean won't subset well as it uses equal operators
         args <- list(c(rt = ret, rtmin = retmin - tol, rtmax = retmax + tol, maxo = intensity), EIC)
         return(sapply(featQualityNames, function(q)

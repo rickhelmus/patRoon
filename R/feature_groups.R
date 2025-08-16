@@ -878,9 +878,9 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flat
         eic <- lapply(doAna, function(a)
         {
             at <- attr(EICs[[a]], "allXValues")
-            ints <- doFillEIXIntensities(at, EICs[[a]][[grp]]$time, EICs[[a]][[grp]]$intensity)
+            ints <- doFillEIXIntensities(at, EICs[[a]][[grp]][, "time"], EICs[[a]][[grp]][, "intensity"])
             # NOTE: MetaClean expects EIC matrices
-            as.matrix(data.frame(time = at, intensity = ints))
+            cbind(time = at, intensity = ints)
         })
         gq <- sapply(lapply(fgQualities, "[[", "func"), do.call, list(pdata, eic), simplify = FALSE)
         

@@ -158,6 +158,95 @@ std::vector<std::vector<OutType>> applyMSData(const MSReadBackend &backend, Spec
     return ret;
 }
 
+std::pair<std::vector<SpectrumRawTypes::Time>, std::vector<SpectrumRawTypes::Intensity>>
+    padEIC(const std::vector<SpectrumRawTypes::Time> &allTimes,
+           SpectrumRawTypes::Time startTime, SpectrumRawTypes::Time endTime,
+           const std::vector<SpectrumRawTypes::Time> &times,
+           const std::vector<SpectrumRawTypes::Intensity> &intensities)
+{
+    std::vector<SpectrumRawTypes::Time> outTimes;
+    std::vector<SpectrumRawTypes::Intensity> outIntensities;
+    
+    if (allTimes.empty())
+        return std::make_pair(outTimes, outIntensities);
+    if (times.empty())
+    {
+        outTimes = { allTimes.front(), allTimes.back() };
+        outIntensities.resize(2, 0.0);
+        return std::make_pair(outTimes, outIntensities);
+    }
+    
+    // snap start/end ranges to allTimes
+    auto startTimeIt = std::lower_bound(allTimes.begin(), allTimes.end(), startTime);
+    if (startTimeIt == allTimes.end())
+        startTimeIt = std::prev(allTimes.end());
+    startTime = *startTimeIt;
+    auto endTimeIt = std::lower_bound(startTimeIt, allTimes.end(), endTime);
+    if (endTimeIt == allTimes.end() || (endTimeIt != allTimes.begin() && *endTimeIt > endTime))
+        --endTimeIt;
+    endTime = *endTimeIt;
+    
+    auto it = times.begin();
+    auto allIt = allTimes.begin();
+    
+    while (it != times.end() && allIt != allTimes.end())
+    {
+        // corresponding iterator in allTimes
+        const auto allItCorresp = std::lower_bound(allIt, allTimes.end(), *it);
+        
+        // add zero point if previous was missing in EIC and within the RT range
+        if (allItCorresp != allTimes.begin())
+        {
+            const auto aicPrv = std::prev(allItCorresp);
+            if ((it == times.begin() || (!compareTol(*(std::prev(it)), *aicPrv) && !compareTol(*aicPrv, outTimes.back()))) &&
+                numberGTE(*aicPrv, startTime))
+                
+            {
+                outTimes.push_back(*aicPrv);
+                outIntensities.push_back(0.0);
+            }
+        }
+        
+        // add EIC point
+        outTimes.push_back(*it);
+        outIntensities.push_back(intensities[std::distance(times.begin(), it)]);
+        
+        allIt = std::next(allItCorresp);
+        if (allIt == allTimes.end())
+            break;
+        
+        // add zero point if next is missing in EIC
+        ++it;
+        if ((it == times.end() || !compareTol(*it, *allIt)) && numberLTE(*allIt, endTime))
+        {
+            outTimes.push_back(*allIt);
+            outIntensities.push_back(0.0);
+            ++allIt;
+        }
+    }
+    
+    // add final point if needed
+    if (allIt != allTimes.end() && numberLTE(allTimes.back(), endTime))
+    {
+        outTimes.push_back(allTimes.back());
+        outIntensities.push_back(0.0);
+    }
+    
+    // add start/stop points if needed
+    if (outTimes.empty() || outTimes.front() > startTime)
+    {
+        outTimes.insert(outTimes.begin(), startTime);
+        outIntensities.insert(outIntensities.begin(), 0.0);
+    }
+    if (outTimes.empty() || outTimes.back() < endTime)
+    {
+        outTimes.push_back(endTime);
+        outIntensities.push_back(0.0);
+    }
+    
+    return std::make_pair(outTimes, outIntensities);
+}
+
 }
 
 
@@ -718,7 +807,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                       const std::vector<SpectrumRawTypes::Mobility> &endMobs,
                       SpectrumRawTypes::Time gapFactor, SpectrumRawTypes::Mass mzExpIMSWindow,
                       SpectrumRawTypes::Intensity minIntensityIMS, const std::string &mode = "simple",
-                      SpectrumRawTypes::Intensity minEICIntensity = 0,
+                      bool pad = false, SpectrumRawTypes::Intensity minEICIntensity = 0,
                       SpectrumRawTypes::Time minEICAdjTime = 0, unsigned minEICAdjPoints = 0,
                       SpectrumRawTypes::Intensity minEICAdjIntensity = 0, unsigned topMost = 0)
 {
@@ -1056,6 +1145,13 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         if (!enoughPointsAboveThr && minEICAdjPoints > 0)
             continue;
         
+        if (eicMode == EICMode::SIMPLE && pad && !eic.empty())
+        {
+            const auto padded = padEIC(specMeta.first.times, timeStart, timeEnd, eic.times, eic.intensities);
+            eic.times = std::move(padded.first);
+            eic.intensities = std::move(padded.second);
+        }
+        
         allEICs[i] = std::move(eic);
         allEICMaxIntensities[i] = maxInten;
     }
@@ -1063,16 +1159,18 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     allPeaksSorted.clear(); // no need for this anymore
     timer.stop();
     
-    timer.start("Converting EICs to R data");
     SpectrumRawTypes::Intensity minMaxIntens = 0.0;
     if (topMost > 0 && allEICMaxIntensities.size() > topMost)
     {
+        timer.start("Determining EIC topMost...");
         auto sortedAEMI = allEICMaxIntensities;
         std::nth_element(sortedAEMI.begin(), sortedAEMI.begin() + (topMost-1), sortedAEMI.end(),
                          std::greater<SpectrumRawTypes::Intensity>());
         minMaxIntens = sortedAEMI[topMost-1];
+        timer.stop();
     }
     
+    timer.start("Converting EICs to R data");
     Rcpp::List ret(EICCount);
     for (size_t i=0; i<EICCount; ++i)
     {
@@ -1188,113 +1286,6 @@ std::vector<SpectrumRawTypes::Intensity> doFillEIXIntensities(const std::vector<
                                                               const std::vector<SpectrumRawTypes::Intensity> &intensities)
 {
     return fillEIXIntensities(allXValues, xvalues, intensities);
-}
-
-// [[Rcpp::export]]
-Rcpp::NumericMatrix padEIC(const std::vector<SpectrumRawTypes::Time> &allXValues,
-                           SpectrumRawTypes::Time startX, SpectrumRawTypes::Time endX,
-                           const std::vector<SpectrumRawTypes::Time> &xvalues,
-                           const std::vector<SpectrumRawTypes::Intensity> &intensities)
-{
-    std::vector<SpectrumRawTypes::Time> outXValues;
-    std::vector<SpectrumRawTypes::Intensity> outIntensities;
-    
-    if (allXValues.empty())
-    {
-        Rcpp::NumericMatrix mat(xvalues.size(), 2);
-        for (size_t i=0; i<xvalues.size(); ++i)
-        {
-            mat(i, 0) = xvalues[i];
-            mat(i, 1) = intensities[i];
-        }
-        Rcpp::colnames(mat) = Rcpp::CharacterVector::create("time", "intensity");
-        return mat;
-    }
-    if (xvalues.empty())
-    {
-        Rcpp::NumericMatrix mat(2, 2);
-        mat(0, 0) = allXValues.front();
-        mat(1, 0) = allXValues.back();
-        Rcpp::colnames(mat) = Rcpp::CharacterVector::create("time", "intensity");
-        return mat;
-    }
-    
-    // snap start/end ranges to allXValues
-    auto startXIt = std::lower_bound(allXValues.begin(), allXValues.end(), startX);
-    if (startXIt == allXValues.end())
-        startXIt = std::prev(allXValues.end());
-    startX = *startXIt;
-    auto endXIt = std::lower_bound(startXIt, allXValues.end(), endX);
-    if (endXIt == allXValues.end() || (endXIt != allXValues.begin() && *endXIt > endX))
-        --endXIt;
-    endX = *endXIt;
-    
-    auto it = xvalues.begin();
-    auto allIt = allXValues.begin();
-    
-    while (it != xvalues.end() && allIt != allXValues.end())
-    {
-        // corresponding iterator in allXValues
-        const auto allItCorresp = std::lower_bound(allIt, allXValues.end(), *it);
-        
-        // add zero point if previous was missing in EIC and within the RT range
-        if (allItCorresp != allXValues.begin())
-        {
-            const auto aicPrv = std::prev(allItCorresp);
-            if ((it == xvalues.begin() || (!compareTol(*(std::prev(it)), *aicPrv) && !compareTol(*aicPrv, outXValues.back()))) &&
-                numberGTE(*aicPrv, startX))
-                
-            {
-                outXValues.push_back(*aicPrv);
-                outIntensities.push_back(0.0);
-            }
-        }
-        
-        // add EIC point
-        outXValues.push_back(*it);
-        outIntensities.push_back(intensities[std::distance(xvalues.begin(), it)]);
-        
-        allIt = std::next(allItCorresp);
-        if (allIt == allXValues.end())
-            break;
-        
-        // add zero point if next is missing in EIC
-        ++it;
-        if ((it == xvalues.end() || !compareTol(*it, *allIt)) && numberLTE(*allIt, endX))
-        {
-            outXValues.push_back(*allIt);
-            outIntensities.push_back(0.0);
-            ++allIt;
-        }
-    }
-    
-    // add final point if needed
-    if (allIt != allXValues.end() && numberLTE(allXValues.back(), endX))
-    {
-        outXValues.push_back(allXValues.back());
-        outIntensities.push_back(0.0);
-    }
-    
-    // add start/stop points if needed
-    if (outXValues.empty() || outXValues.front() > startX)
-    {
-        outXValues.insert(outXValues.begin(), startX);
-        outIntensities.insert(outIntensities.begin(), 0.0);
-    }
-    if (outXValues.empty() || outXValues.back() < endX)
-    {
-        outXValues.push_back(endX);
-        outIntensities.push_back(0.0);
-    }
-
-    Rcpp::NumericMatrix mat(outXValues.size(), 2);
-    for (size_t i=0; i<outXValues.size(); ++i)
-    {
-        mat(i, 0) = outXValues[i];
-        mat(i, 1) = outIntensities[i];
-    }
-    Rcpp::colnames(mat) = Rcpp::CharacterVector::create("time", "intensity");
-    return mat;
 }
 
 // [[Rcpp::export]]

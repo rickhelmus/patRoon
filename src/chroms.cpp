@@ -74,9 +74,9 @@ void writeChromsToMzML(Rcpp::List EICs, bool fillEICs, const std::vector<std::st
     
     for (int i = 0; i < EICs.size(); ++i)
     {
-        const Rcpp::List item = EICs[i];
-        const auto times = Rcpp::as<std::vector<double>>(item["time"]);
-        const auto ints = Rcpp::as<std::vector<double>>(item["intensity"]);
+        const Rcpp::NumericMatrix item = EICs[i];
+        const auto times = Rcpp::as<std::vector<double>>(static_cast<Rcpp::NumericVector>(item(Rcpp::_, 0)));
+        const auto ints = Rcpp::as<std::vector<double>>(static_cast<Rcpp::NumericVector>(item(Rcpp::_, 1)));
         std::string timesEnc, intsEnc;
         if (fillEICs)
         {

@@ -32,7 +32,6 @@
     - actually, the same is the case for the mz filter (also IMS and mz for features) --> maybe just document difference? the actual results will not change much in general
 - revert default clusterMzWindow back to 0.005, or a least for IMS
 - TC convert: doc that centroid mode is used for IMS conversion (and/or make it optional?)
-- finish plotChroms3D(): docs, tests, batch mode?, tweaks?
 
 ## Maybe
 
@@ -416,6 +415,7 @@
     - removed `analysisInfo` argument from importFeatures()
     - added `table` import (importFeaturesTable() and importFeatureGroupsTable())
 - overWrite --> overwrite for consistency, applies to predictCheckFeaturesSession() and file conversion (clearly doc in NEWS)
+- plotChroms3D()
 
 ## Features
 

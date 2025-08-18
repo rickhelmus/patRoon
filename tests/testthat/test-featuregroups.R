@@ -501,6 +501,10 @@ test_that("plotting works", {
     expect_doppel("eic-sub2", function() plotChroms(subFGroups, analysis = analyses(subFGroups)[1],
                                                     groupName = names(subFGroups)[1]))
 
+    expect_doppel("eic-3d-def", function() plotChroms3D(subFGroups[1, 1]))
+    expect_doppel("eic-3d-rtmin", function() plotChroms3D(subFGroups[1, 1], retMin = TRUE))
+    expect_doppel("eic-3d-nolim", function() plotChroms3D(subFGroups[1, 1], showLimits = FALSE))
+
     expect_doppel("venn", function() plotVenn(fgOpenMS))
     # use conc fGroups as it has >2 replicates
     expect_doppel("venn-multiple", function() plotVenn(fgOpenMS, which = c("standard-pos", "solvent-pos"),
@@ -531,6 +535,7 @@ test_that("plotting empty objects works", {
     expect_error(plotChord(fgCompBothEmpty))
 
     expect_doppel("eic-def-empty", function() plotChroms(fgOpenMSEmpty))
+    expect_doppel("eic-3d-def-empty", function() plotChroms3D(fgOpenMSEmpty[1]))
 
     expect_error(plotVenn(fgOpenMSEmpty))
     expect_error(plotVenn(fgCompBothEmpty))

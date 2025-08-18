@@ -33,13 +33,16 @@ NULL
 #' @param averageFunc,normalized Used for intensity data treatment, see the documentation for the
 #'   \code{\link[=as.data.table,featureGroups-method]{as.data.table method}}.
 #' @param analysis,groupName \code{character} vector with the analyses/group names to be considered for plotting.
-#'   Compared to subsetting the \code{featureGroups} object (\code{obj}) upfront this is slightly faster. Furthermore,
-#'   if \code{onlyPresent=FALSE} in \code{EICParams} or \code{EIMParams}, this allows plotting chromatograms for feature
-#'   groups where none of the specified analyses contain the feature (which is impossible otherwise since subsetting
-#'   leads to removal of 'empty' feature groups).
 #'
-#'   For \code{plotChroms} and IMS workflows: if \code{IMS!="both"} then the \code{analysis} and \code{groupName}
-#'   arguments are adjusted for the remaining data after IMS selection.
+#'   For \code{plotChroms} and \code{plotMobilograms}: Compared to subsetting the \code{featureGroups} object
+#'   (\code{obj}) upfront this is slightly faster. Furthermore, if \code{onlyPresent=FALSE} in \code{EICParams} or
+#'   \code{EIMParams}, this allows plotting chromatograms for feature groups where none of the specified analyses
+#'   contain the feature (which is impossible otherwise since subsetting leads to removal of 'empty' feature groups).
+#'   For IMS workflows: if \code{IMS!="both"} then the \code{analysis} and \code{groupName} arguments are adjusted for
+#'   the remaining data after IMS selection.
+#'
+#'   For \code{plotChroms3D}: a single analysis and group name should be specified (unless \code{obj} contains only a
+#'   single feature, \emph{e.g.} created as \code{fGroups[1, 1]}).
 #' @param EICs,EIMs Internal parameter for now and should be kept at \code{NULL} (default).
 #' @param showPeakArea Set to \code{TRUE} to display integrated peak ranges by filling (shading) their areas.
 #' @param showFGroupRect Set to \code{TRUE} to mark the full integration/intensity range of all features within a
@@ -49,9 +52,10 @@ NULL
 #'   \emph{m/z} and/or ion mobility (if available) feature group values, respectively.
 #' @param showProgress if set to \code{TRUE} then a text progressbar will be displayed when all EICs are being plot. Set
 #'   to \code{"none"} to disable any annotation.
-#' @param \dots passed to \code{\link[base]{plot}} (\code{plot}, \code{plotChroms}, \code{plotTICs} and
-#'   \code{plotBPCs}), \pkg{\link{VennDiagram}} plotting functions (\code{plotVenn}), \code{\link{chordDiagram}}
-#'   (\code{plotChord}) or \code{\link[UpSetR]{upset}} (\code{plotUpSet}).
+#' @param \dots passed to \code{\link[base]{plot}} (\code{plot}, \code{plotChroms}, \code{plotMobilograms},
+#'   \code{plotTICs} and \code{plotBPCs}), \code{\link{filled.contour}} (\code{plotChroms3D}), \pkg{\link{VennDiagram}}
+#'   plotting functions (\code{plotVenn}), \code{\link{chordDiagram}} (\code{plotChord}), \code{\link[UpSetR]{upset}}
+#'   (\code{plotUpSet}).
 #'
 #' @templateVar consider for plotting
 #' @template IMS-arg
@@ -695,13 +699,35 @@ setMethod("plotChromsHash", "featureGroups", function(obj, analysis = analyses(o
              analysisInfo(obj)[analysis %chin% anas])
 })
 
+#' @details \code{plotChroms3D} generates a 3D plot of chromatographic data for a single feature group in a single
+#'   analysis. The plot shows retention time on the x-axis, m/z or mobility on the y-axis, and intensity as color in a
+#'   contour plot. The plot is made with the \code{\link{filled.contour}} function.
+#'
+#' @param dim3 The third dimension to plot besides retention time and intensity. Can be either \code{"mz"} or
+#'   \code{"mobility"}.
+#' @param showLimits If \code{TRUE}, a rectangle is drawn to indicate the feature limits.
+#' @param rtWindow,mzWindow,IMSWindow Numeric values specifying the window size around the feature for retention time,
+#'   m/z, and ion mobility respectively. Values \code{>0} will effectively zoom out.
+#' @param gridSize The size of the grid for interpolation.
+#'
+#' @return \code{plotChroms3D} returns the interpolated grid used for plotting (generated with
+#'   \link[MBA:mba.surf]{mba.surf}).
+#'
+#' @rdname feature-plotting
+#' @export
 setMethod("plotChroms3D", "featureGroups", function(obj, analysis = analyses(obj), groupName = names(obj),
                                                     dim3 = "mz", retMin = FALSE, showLimits = TRUE,
                                                     rtWindow = defaultLim("retention", "medium"),
                                                     mzWindow = defaultLim("mz", "medium"),
                                                     IMSWindow = defaultLim("mobility", "medium"),
-                                                    title = NULL, ...)
+                                                    gridSize = 50, title = NULL, ...)
 {
+    if (length(analysis) < 1 || length(groupName) < 1)
+    {
+        noDataPlot()
+        return(invisible(NULL))
+    }
+    
     ac <- checkmate::makeAssertCollection()
     checkmate::assertChoice(analysis, analyses(obj), add = ac)
     checkmate::assertChoice(groupName, names(obj), add = ac)
@@ -709,6 +735,7 @@ setMethod("plotChroms3D", "featureGroups", function(obj, analysis = analyses(obj
     aapply(checkmate::assertFlag, . ~ retMin + showLimits, fixed = list(add = ac))
     aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow + IMSWindow, lower = 0, finite = TRUE,
            fixed = list(add = ac))
+    checkmate::assertCount(gridSize, positive = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
     if (!hasMobilities(obj) && dim3 == "mobility")
@@ -731,55 +758,81 @@ setMethod("plotChroms3D", "featureGroups", function(obj, analysis = analyses(obj
             title <- sprintf("%s - mob: %.2f", title, feat$mobility)
     }
     
-    applyMSData(anaInfo, needIMS = dim3 == "mobility", showProgress = FALSE, function(ana, path, backend)
+    doMob <- dim3 == "mobility"
+    hasMobNum <- doMob && !is.na(feat$mobility)
+    retmin <- feat$retmin - rtWindow; retmax <- feat$retmax + rtWindow
+    mzmin <- feat$mzmin - mzWindow; mzmax <- feat$mzmax + mzWindow
+    mobmin <- if (hasMobNum) feat$mobmin - IMSWindow else 0; mobmax <- if (hasMobNum) feat$mobmax + IMSWindow else 0
+    
+    points <- applyMSData(anaInfo, needIMS = doMob, showProgress = FALSE, function(ana, path, backend)
     {
         openMSReadBackend(backend, path)
-        doMob <- dim3 == "mobility"
-        hasMobNum <- doMob && !is.na(feat$mobility)
-        retmin <- feat$retmin - rtWindow; retmax <- feat$retmax + rtWindow
-        mzmin <- feat$mzmin - mzWindow; mzmax <- feat$mzmax + mzWindow
-        mobmin <- if (hasMobNum) feat$mobmin - IMSWindow else 0; mobmax <- if (hasMobNum) feat$mobmax + IMSWindow else 0
-        points <- getChromPoints(backend, retmin, retmax, feat$mzmin, mzmax, doMob, mobmin, mobmax)
-        points <- data.table(x = points$time, y = if (doMob) points$mobility else points$mz, z = points$intensity)
-        
-        padLeft <- padRight <- padBottom <- padTop <- data.table()
-        ymin <- if (doMob) mobmin else mzmin; ymax <- if (doMob) mobmax else mzmax
-        gridSize <- 50 # UNDONE: make configurable?
-        if (min(points$x) > retmin)
-            padLeft <- data.table(x = retmin, y = seq(ymin, ymax, length.out = gridSize), z = 0)
-        if (max(points$x) < retmax)
-            padRight <- data.table(x = retmax, y = seq(ymin, ymax, length.out = gridSize), z = 0)
-        if (min(points$y) > ymin)
-            padBottom <- data.table(x = seq(retmin, retmax, length.out = gridSize), y = ymin, z = 0)
-        if (max(points$y) < ymax)
-            padTop <- data.table(x = seq(retmin, retmax, length.out = gridSize), y = ymax, z = 0)
-        
-        points <- rbindlist(list(points, padLeft, padRight, padBottom, padTop))
-        
-        if (doMob && !hasMobNum)
-            mobmax <- max(points$mobility)
+        points <- getChromPoints(backend, retmin, retmax, mzmin, mzmax, doMob, mobmin, mobmax)
+        return(data.table(x = points$time, y = if (doMob) points$mobility else points$mz, z = points$intensity))
+    })[[1]]
+    
+    if (nrow(points) == 0)
+    {
+        noDataPlot()
+        return(invisible(NULL))
+    }
 
-        interpd <- MBA::mba.surf(points, no.X = gridSize, no.Y = gridSize, extend = TRUE)
-        if (retMin)
-            interpd$xyz.est$x <- interpd$xyz.est$x / 60
-        interpd$xyz.est$z[interpd$xyz.est$z < 0] <- 0 # UNDONE?
-        filled.contour(interpd$xyz.est$x, interpd$xyz.est$y, interpd$xyz.est$z, color.palette = topo.colors,
-                       xlab = sprintf("Retention time (%s)", if (retMin) "min." else "sec."),
-                       ylab = if (dim3 == "mz") "m/z" else "mobility", main = title,
-                       plot.axes = {
-                           axis(1); axis(2);
-                           if (showLimits)
-                           {
-                               if (retMin)
-                                   feat[, c("retmin", "retmax") := .(retmin / 60, retmax / 60)]
-                               if (dim3 == "mz")
-                                   rect(feat$retmin, feat$mzmin, feat$retmax, feat$mzmax, border = "red", lty = 2)
-                               else if (hasMobNum)
-                                   rect(feat$retmin, feat$mobmin, feat$retmax, feat$mobmax, border = "red", lty = 2)
-                           }
-                       }, ...)
-    })
-    invisible(NULL)
+    # padding for missing points
+    padLeft <- padRight <- padBottom <- padTop <- data.table()
+    ymin <- if (doMob) mobmin else mzmin; ymax <- if (doMob) mobmax else mzmax
+    if (min(points$x) > retmin)
+        padLeft <- data.table(x = retmin, y = seq(ymin, ymax, length.out = gridSize), z = 0)
+    if (max(points$x) < retmax)
+        padRight <- data.table(x = retmax, y = seq(ymin, ymax, length.out = gridSize), z = 0)
+    if (min(points$y) > ymin)
+        padBottom <- data.table(x = seq(retmin, retmax, length.out = gridSize), y = ymin, z = 0)
+    if (max(points$y) < ymax)
+        padTop <- data.table(x = seq(retmin, retmax, length.out = gridSize), y = ymax, z = 0)
+    points <- rbindlist(list(points, padLeft, padRight, padBottom, padTop))
+    
+    if (doMob && !hasMobNum)
+        mobmax <- max(points$mobility)
+    
+    interpd <- MBA::mba.surf(points, no.X = gridSize, no.Y = gridSize, extend = TRUE)
+    if (retMin)
+        interpd$xyz.est$x <- interpd$xyz.est$x / 60
+    interpd$xyz.est$z[interpd$xyz.est$z < 0] <- 0 # UNDONE?
+    
+    plotAxisFunc <- function()
+    {
+        axis(1); axis(2);
+        if (showLimits)
+        {
+            if (retMin)
+                feat[, c("retmin", "retmax") := .(retmin / 60, retmax / 60)]
+            if (dim3 == "mz")
+                rect(feat$retmin, feat$mzmin, feat$retmax, feat$mzmax, border = "red", lty = 2)
+            else if (hasMobNum)
+                rect(feat$retmin, feat$mobmin, feat$retmax, feat$mobmax, border = "red", lty = 2)
+        }
+    }
+    
+    filled.contour(interpd$xyz.est$x, interpd$xyz.est$y, interpd$xyz.est$z, color.palette = topo.colors,
+                   xlab = sprintf("Retention time (%s)", if (retMin) "min." else "sec."),
+                   ylab = if (dim3 == "mz") "m/z" else "mobility", main = title,
+                   plot.axes = plotAxisFunc(), ...)
+    
+    invisible(interpd$xyz.est)
+})
+
+#' @rdname feature-plotting
+#' @export
+setMethod("plotChroms3D", "featureGroupsSet", function(obj, analysis = analyses(obj), ...)
+{
+    if (length(analysis) < 1)
+    {
+        noDataPlot()
+        return(invisible(NULL))
+    }
+    
+    checkmate::assertChoice(analysis, analyses(obj))
+    reqSet <- analysisInfo(obj)$set[match(analysis, analysisInfo(obj)$analysis)]
+    return(callNextMethod(unset(obj, reqSet), analysis = analysis, ...))
 })
 
 #' @details \code{plotMobilograms} Plots extracted ion mobilograms (EIMs) of feature groups.

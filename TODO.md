@@ -121,7 +121,6 @@
     - split IMSWindow arg for setting mobmin/mobmax? this currently sets very narrow ranges. Same for mz and ms2
     - warn if ms2/suspects are outside bin range?
     - change methodMZ/methodIMS to eg filterMZ/filterMob
-    - also make mobility centroid determination optional? doc in any case
 - update featAnn consensus?
 - greedy
     - set default weights

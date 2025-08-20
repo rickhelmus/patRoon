@@ -770,12 +770,16 @@ setMethod("overlap", "featureGroups", function(fGroups, which, exclusive)
 #' @return \code{calculatePeakQualities} returns a modified object amended with peak qualities and scores.
 #'
 #' @export
-setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flatnessFactor, avgFunc = mean,
+setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flatnessFactor, featureQualities = NULL, avgFunc = mean,
                                                               parallel = TRUE)
 {
     checkPackage("MetaClean")
     
-    allScores <- featureQualityNames(scores = TRUE, totScore = FALSE)
+    # Get qualities first to determine score names
+    featQualities <- featureQualities(featureQualities)
+    featQualityNames <- names(featQualities)
+    featScoreNames <- paste0(featQualityNames, "Score")
+    allScores <- c(featScoreNames, featureQualityNames(feat = FALSE, scores = TRUE, totScore = FALSE))
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assertNumeric(weights, finite = TRUE, any.missing = FALSE, min.len = 1, names = "unique",
@@ -787,7 +791,7 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flat
     checkmate::assertFlag(parallel, add = ac)
     checkmate::reportAssertions(ac)
     
-    hash <- makeHash(obj, weights, flatnessFactor, avgFunc)
+    hash <- makeHash(obj, weights, flatnessFactor, featQualities, avgFunc)
     cd <- loadCacheData("calculatePeakQualities", hash)
     if (!is.null(cd))
         return(cd)
@@ -801,10 +805,10 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flat
         weights <- weights[allScores]
     }
     
-    fs <- featureQualityNames(group = FALSE, scores = TRUE, totScore = FALSE)
+    fs <- featScoreNames
     w <- if (!is.null(weights) && any(names(weights) %in% fs)) weights[names(weights) %in% fs] else NULL
     obj@features <- calculatePeakQualities(getFeatures(obj), weights = w, flatnessFactor = flatnessFactor,
-                                           parallel = parallel)
+                                           featureQualities = featureQualities, parallel = parallel)
     
     ftind <- groupFeatIndex(obj)
     anas <- analyses(obj)
@@ -822,8 +826,7 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flat
         doAna <- anas[featInds != 0]
         featInds <- featInds[featInds != 0]
         fList <- rbindlist(Map(doAna, featInds, f = function(ana, row) obj@features[[ana]][row]))
-        featAvgs <- sapply(c(featureQualityNames(group = FALSE),
-                             featureQualityNames(group = FALSE, scores = TRUE, totScore = FALSE)), function(q)
+        featAvgs <- sapply(c(featQualityNames, featScoreNames), function(q)
         {
             if (all(is.na(fList[[q]])))
                 return(NA_real_)
@@ -845,7 +848,10 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flat
                              Map(scoreFeatQuality, fgQualities, .SD),
                          .SDcols = featureQualityNames(feat = FALSE)]
     
-    obj@groupQualities <- groupQualitiesScores[, c("group", featureQualityNames()), with = FALSE]
+    # Create names for group and feature qualities combined
+    allQualityNames <- c(featQualityNames, featureQualityNames(feat = FALSE))
+    
+    obj@groupQualities <- groupQualitiesScores[, c("group", allQualityNames), with = FALSE]
     obj@groupScores <- groupQualitiesScores[, c("group", allScores), with = FALSE]
     
     if (is.null(weights))

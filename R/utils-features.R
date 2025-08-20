@@ -22,18 +22,52 @@ reGenerateFTIndex <- function(fGroups)
 }
 isFGSet <- function(fGroups) inherits(fGroups, "featureGroupsSet")
 
-featureQualities <- function()
+featureQualities <- function(qualities = NULL)
 {
     checkPackage("MetaClean")
-    list(ApexBoundaryRatio = list(func = MetaClean::calculateApexMaxBoundaryRatio, HQ = "LV", range = c(0, 1)),
-         FWHM2Base = list(func = MetaClean::calculateFWHM, HQ = "HV", range = c(0, 1)),
-         Jaggedness = list(func = MetaClean::calculateJaggedness, HQ = "LV", range = Inf),
-         Modality = list(func = MetaClean::calculateModality, HQ = "LV", range = Inf),
-         Symmetry = list(func = MetaClean::calculateSymmetry, HQ = "HV", range = c(-1, 1)),
-         GaussianSimilarity = list(func = MetaClean::calculateGaussianSimilarity, HQ = "HV", range = c(0, 1)),
-         Sharpness = list(func = MetaClean::calculateSharpness, HQ = "HV", range = Inf),
-         TPASR = list(func = MetaClean::calculateTPASR, HQ = "LV", range = Inf),
-         ZigZag = list(func = MetaClean::calculateZigZagIndex, HQ = "LV", range = Inf))
+    
+    # Default set of all available qualities
+    allQualities <- list(ApexBoundaryRatio = list(func = MetaClean::calculateApexMaxBoundaryRatio, HQ = "LV", range = c(0, 1)),
+                         FWHM2Base = list(func = MetaClean::calculateFWHM, HQ = "HV", range = c(0, 1)),
+                         Jaggedness = list(func = MetaClean::calculateJaggedness, HQ = "LV", range = Inf),
+                         Modality = list(func = MetaClean::calculateModality, HQ = "LV", range = Inf),
+                         Symmetry = list(func = MetaClean::calculateSymmetry, HQ = "HV", range = c(-1, 1)),
+                         GaussianSimilarity = list(func = MetaClean::calculateGaussianSimilarity, HQ = "HV", range = c(0, 1)),
+                         Sharpness = list(func = MetaClean::calculateSharpness, HQ = "HV", range = Inf),
+                         TPASR = list(func = MetaClean::calculateTPASR, HQ = "LV", range = Inf),
+                         ZigZag = list(func = MetaClean::calculateZigZagIndex, HQ = "LV", range = Inf))
+    
+    # If no specific qualities requested, return all
+    if (is.null(qualities))
+        return(allQualities)
+    
+    # If qualities is a character vector, subset from default qualities
+    if (is.character(qualities))
+    {
+        missing <- setdiff(qualities, names(allQualities))
+        if (length(missing) > 0)
+            stop("Unknown feature qualities specified: ", paste(missing, collapse = ", "))
+        return(allQualities[qualities])
+    }
+    
+    # If qualities is a list (custom qualities), validate and return
+    if (is.list(qualities))
+    {
+        # Validate that each quality has the required structure
+        for (i in seq_along(qualities))
+        {
+            q <- qualities[[i]]
+            if (!is.list(q) || is.null(q$func) || is.null(q$HQ) || is.null(q$range))
+                stop("Invalid quality definition at position ", i, ". Each quality must be a list with 'func', 'HQ', and 'range' elements.")
+            if (!is.function(q$func))
+                stop("Quality function at position ", i, " must be a function.")
+            if (!q$HQ %in% c("HV", "LV"))
+                stop("Quality HQ at position ", i, " must be either 'HV' (high value) or 'LV' (low value).")
+        }
+        return(qualities)
+    }
+    
+    stop("featureQualities parameter must be NULL, a character vector of quality names, or a list of quality definitions.")
 }
 
 featureGroupQualities <- function()

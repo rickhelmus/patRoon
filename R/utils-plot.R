@@ -195,7 +195,7 @@ makeEIXPlot <- function(featPlotTab, anaInfo, gInfo, showPeakArea, showFGroupRec
             if ("mz" %in% annotate)
                 antxt <- paste(antxt, sprintf("%.4f", gInfo$mz[match(group[1], gInfo$group)]), sep = "\n")
             if ("mob" %in% annotate && !is.null(gInfo[["mobility"]]))
-                antxt <- paste(antxt, sprintf("%.2f", gInfo$mobility[match(group[1], gInfo$group)]), sep = "\n")
+                antxt <- paste(antxt, sprintf("%.3f", gInfo$mobility[match(group[1], gInfo$group)]), sep = "\n")
             antxt
         }, by = "group"]
     }

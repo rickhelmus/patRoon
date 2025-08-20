@@ -375,7 +375,15 @@ reportHTMLUtils$methods(
             tab[, c("ret", "retmin", "retmax") := .(ret / 60, retmin / 60, retmax / 60)]
         
         for (col in names(tab)[sapply(tab, is.numeric)])
-            set(tab, j = col, value = round(tab[[col]], if (col %in% c("mz", "mzmin", "mzmax", "ion_mz")) 5 else 2))
+        {
+            rnd <- if (col %in% c("mz", "mzmin", "mzmax", "ion_mz"))
+                5
+            else if (col %in% c("mobility", "mobmin", "mobmax"))
+                3
+            else
+                2
+            set(tab, j = col, value = rnd)
+        }
         
         anaInfo <- analysisInfo(objects$fGroups)
         

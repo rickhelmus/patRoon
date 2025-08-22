@@ -121,6 +121,7 @@
     - split IMSWindow arg for setting mobmin/mobmax? this currently sets very narrow ranges. Same for mz and ms2
     - warn if ms2/suspects are outside bin range?
     - change methodMZ/methodIMS to eg filterMZ/filterMob
+    - remove suspects with NA mobilities and warn, instead of throwing an error
 - update featAnn consensus?
 - greedy
     - set default weights
@@ -188,6 +189,7 @@
     - piek
         - tests with ims data
         - verify removal duplicate features?
+        - mobAssignMethod and mobAssignAggr
     - groupFeaturesGreedy()
     - plotChroms(): mob annotation
     - plotMobilograms()

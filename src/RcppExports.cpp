@@ -212,6 +212,29 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// getMSSpectra
+Rcpp::List getMSSpectra(const MSReadBackend& backend, SpectrumRawTypes::Time timeStart, SpectrumRawTypes::Time timeEnd, SpectrumRawTypes::Mobility mobStart, SpectrumRawTypes::Mobility mobEnd, int MSLevel, SpectrumRawTypes::Mass prec, SpectrumRawTypes::Intensity minIntensityIMS, SpectrumRawTypes::Intensity minIntensityPre, int topMost, bool withPrecursor, int minAbundanceIMSAbs, bool retainPrecursor);
+RcppExport SEXP _patRoon_getMSSpectra(SEXP backendSEXP, SEXP timeStartSEXP, SEXP timeEndSEXP, SEXP mobStartSEXP, SEXP mobEndSEXP, SEXP MSLevelSEXP, SEXP precSEXP, SEXP minIntensityIMSSEXP, SEXP minIntensityPreSEXP, SEXP topMostSEXP, SEXP withPrecursorSEXP, SEXP minAbundanceIMSAbsSEXP, SEXP retainPrecursorSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const MSReadBackend& >::type backend(backendSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Time >::type timeStart(timeStartSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Time >::type timeEnd(timeEndSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Mobility >::type mobStart(mobStartSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Mobility >::type mobEnd(mobEndSEXP);
+    Rcpp::traits::input_parameter< int >::type MSLevel(MSLevelSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type prec(precSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minIntensityIMS(minIntensityIMSSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minIntensityPre(minIntensityPreSEXP);
+    Rcpp::traits::input_parameter< int >::type topMost(topMostSEXP);
+    Rcpp::traits::input_parameter< bool >::type withPrecursor(withPrecursorSEXP);
+    Rcpp::traits::input_parameter< int >::type minAbundanceIMSAbs(minAbundanceIMSAbsSEXP);
+    Rcpp::traits::input_parameter< bool >::type retainPrecursor(retainPrecursorSEXP);
+    rcpp_result_gen = Rcpp::wrap(getMSSpectra(backend, timeStart, timeEnd, mobStart, mobEnd, MSLevel, prec, minIntensityIMS, minIntensityPre, topMost, withPrecursor, minAbundanceIMSAbs, retainPrecursor));
+    return rcpp_result_gen;
+END_RCPP
+}
 // getCollapsedFrame
 Rcpp::DataFrame getCollapsedFrame(const MSReadBackend& backend, int index, SpectrumRawTypes::Mass mzWindow, SpectrumRawTypes::Intensity minIntensityIMS, SpectrumRawTypes::Intensity minIntensityPre, SpectrumRawTypes::PeakAbundance minAbundanceRel, SpectrumRawTypes::PeakAbundance minAbundanceAbs, const std::string& method, double mzMin, double mzMax, double minInt, unsigned topMost, double prec, double mobMin, double mobMax);
 RcppExport SEXP _patRoon_getCollapsedFrame(SEXP backendSEXP, SEXP indexSEXP, SEXP mzWindowSEXP, SEXP minIntensityIMSSEXP, SEXP minIntensityPreSEXP, SEXP minAbundanceRelSEXP, SEXP minAbundanceAbsSEXP, SEXP methodSEXP, SEXP mzMinSEXP, SEXP mzMaxSEXP, SEXP minIntSEXP, SEXP topMostSEXP, SEXP precSEXP, SEXP mobMinSEXP, SEXP mobMaxSEXP) {
@@ -942,6 +965,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_walkSpectra", (DL_FUNC) &_patRoon_walkSpectra, 1},
     {"_patRoon_countAllPeaks", (DL_FUNC) &_patRoon_countAllPeaks, 1},
     {"_patRoon_getMSSpectrum", (DL_FUNC) &_patRoon_getMSSpectrum, 5},
+    {"_patRoon_getMSSpectra", (DL_FUNC) &_patRoon_getMSSpectra, 13},
     {"_patRoon_getCollapsedFrame", (DL_FUNC) &_patRoon_getCollapsedFrame, 15},
     {"_patRoon_getFilteredFrame", (DL_FUNC) &_patRoon_getFilteredFrame, 9},
     {"_patRoon_getCentroidedFrame", (DL_FUNC) &_patRoon_getCentroidedFrame, 6},

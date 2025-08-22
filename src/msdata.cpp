@@ -420,6 +420,61 @@ Rcpp::DataFrame getMSSpectrum(const MSReadBackend &backend, int index, int MSLev
 }
 
 // [[Rcpp::export]]
+Rcpp::List getMSSpectra(const MSReadBackend &backend, SpectrumRawTypes::Time timeStart, SpectrumRawTypes::Time timeEnd,
+                        SpectrumRawTypes::Mobility mobStart, SpectrumRawTypes::Mobility mobEnd,
+                        int MSLevel, SpectrumRawTypes::Mass prec = 0.0, SpectrumRawTypes::Intensity minIntensityIMS = 25,
+                        SpectrumRawTypes::Intensity minIntensityPre = 0, int topMost = 50, bool withPrecursor = false,
+                        int minAbundanceIMSAbs = 2, bool retainPrecursor = true)
+{
+    
+    const auto baseSpecFilter = SpectrumRawFilter()
+        .setTopMost(topMost)
+        .setWithPrecursor(withPrecursor)
+        .setRetainPrecursor(retainPrecursor);
+    const auto specFilter = SpectrumRawFilter(baseSpecFilter).setMinIntensity(minIntensityPre);
+    const auto specFilterIMS = SpectrumRawFilter(baseSpecFilter);
+    
+    // NOTE: for IMS data, averageSpectraRaw() is called which returns a SpectrumRawAveraged. Since we don't care about
+    // the additional metadata from this class, we purposely slice it by explicitly specifying the lambda's return type.
+    const auto &sfunc = [&](const SpectrumRaw &spec, const SpectrumRawSelection &, size_t) -> SpectrumRaw
+    {
+        const bool hasMob = spec.hasMobilities();
+        
+        if (hasMob)
+        {
+            const auto specf = filterIMSFrame(spec, specFilterIMS, prec, makeNumRange(mobStart, mobEnd));
+            // return specf;
+            return averageSpectraRaw(specf, frameSubSpecIDs(specf), clusterMethod::DISTANCE, 0.005, false,
+                                     minIntensityPre, 0, minAbundanceIMSAbs);
+        }
+        return filterSpectrumRaw(spec, specFilter, prec);
+    };
+    
+    const auto MSLev = (MSLevel == 1) ? SpectrumRawTypes::MSLevel::MS1 : SpectrumRawTypes::MSLevel::MS2;
+    const auto sels = getSpecRawSelections(backend.getSpecMetadata(), makeNumRange(timeStart, timeEnd), MSLev,
+                                           prec, 0.0, 0);
+    const std::vector<std::vector<SpectrumRawSelection>> selsList(1, std::vector<SpectrumRawSelection>{sels});
+    
+    const auto spectra = applyMSData<SpectrumRaw>(backend, MSLev, selsList, sfunc, minIntensityIMS,
+                                                  SpectrumRawTypes::MSSortType::MOBILITY_MZ)[0];
+    
+    Rcpp::List ret(spectra.size());
+    for (size_t i=0; i<spectra.size(); ++i)
+    {
+        const auto &spec = spectra[i];
+        if (!spec.getMobilities().empty())
+            ret[i] = Rcpp::DataFrame::create(Rcpp::Named("mz") = spec.getMZs(),
+                                             Rcpp::Named("intensity") = spec.getIntensities(),
+                                             Rcpp::Named("mobility") = spec.getMobilities());
+        else
+            ret[i] = Rcpp::DataFrame::create(Rcpp::Named("mz") = spec.getMZs(),
+                                             Rcpp::Named("intensity") = spec.getIntensities());
+    }
+    
+    return ret;
+}
+
+// [[Rcpp::export]]
 Rcpp::DataFrame getCollapsedFrame(const MSReadBackend &backend, int index, SpectrumRawTypes::Mass mzWindow,
                                   SpectrumRawTypes::Intensity minIntensityIMS,
                                   SpectrumRawTypes::Intensity minIntensityPre,

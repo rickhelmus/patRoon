@@ -683,6 +683,14 @@ assertPListIsolatePrecParams <- function(x, .var.name = checkmate::vname(x), add
     assertListVal(x, "maxGap", checkmate::assertCount, positive = TRUE, .var.name = .var.name, add = add)
 }
 
+assertPlotSpecNorm <- function(x, .var.name = checkmate::vname(x), add = NULL)
+{
+    checkmate::assert(
+        checkmate::checkFlag(x),
+        checkmate::checkChoice(x, c("multiple")),
+        .var.name = .var.name, add = add)
+}
+
 assertSpecSimParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
 {
     checkmate::assertList(x, names = "unique", .var.name = .var.name) # no add: should fail

@@ -74,7 +74,7 @@ setMethod("filter", "compoundsSet", doFeatAnnFilterSets)
 #' @rdname compounds-class
 #' @export
 setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeakLists, formulas = NULL,
-                                                   plotStruct = FALSE, title = NULL,
+                                                   plotStruct = FALSE, title = NULL, normalized = "multiple",
                                                    specSimParams = getDefSpecSimParams(),
                                                    mincex = 0.9, xlim = NULL, ylim = NULL, maxMolSize = c(0.2, 0.4),
                                                    molRes = c(100, 100), perSet = TRUE, mirror = TRUE, ...)
@@ -84,6 +84,8 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
     checkmate::assertCharacter(groupName, min.len = 1, max.len = 2, min.chars = 1, add = ac)
     if (length(index) != length(groupName))
         stop("Lengths of index and groupName should be equal.")
+    checkmate::assertString(title, null.ok = TRUE, add = ac)
+    assertPlotSpecNorm(normalized, add = ac)
     assertSpecSimParams(specSimParams, add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakListsSet", add = ac)
     checkmate::assertClass(formulas, "formulasSet", null.ok = TRUE, add = ac)
@@ -94,7 +96,7 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
     checkmate::reportAssertions(ac)
     
     if (!perSet || length(sets(obj)) == 1)
-        return(callNextMethod(obj, index, groupName, MSPeakLists, formulas, plotStruct, title, specSimParams,
+        return(callNextMethod(obj, index, groupName, MSPeakLists, formulas, plotStruct, title, normalized, specSimParams,
                               mincex, xlim, ylim, maxMolSize, molRes, ...))
 
     if (length(groupName) == 1)
@@ -126,9 +128,9 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
             return(x)
         })
         
-        plotData <- getMSPlotDataOverlay(specs, mirror, TRUE, 1, NULL)
-        return(makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, ...,  mol = mol, maxMolSize = maxMolSize,
-                                 molRes = molRes))
+        plotData <- getMSPlotDataOverlay(specs, mirror, !isFALSE(normalized), 1, NULL)
+        return(makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, !isFALSE(normalized), ...,  mol = mol,
+                                 maxMolSize = maxMolSize, molRes = molRes))
     }
     else
     {
@@ -164,7 +166,8 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
         usMSPL <- checkAndUnSetOther(theSets, MSPeakLists, "MSPeakLists")
         binnedPLs <- Map(usMSPL, theSets, f = getBinnedPLPair,
                          MoreArgs = list(groupNames = groupName, analyses = NULL, MSLevel = 2,
-                                         specSimParams = specSimParams, mustExist = FALSE))
+                                         specSimParams = specSimParams, mustExist = FALSE,
+                                         normalizedIntensies = !isFALSE(normalized)))
         
         if (!is.null(formulas))
             usForm <- checkAndUnSetOther(theSets, formulas, "formulas")
@@ -190,19 +193,19 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
         specs <- split(allSpectra, by = "which")
         plotData <- getMSPlotDataOverlay(specs, mirror, FALSE, 2, "overlap")
         
-        makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, ...)
+        makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, !isFALSE(normalized), ...)
     }
 })
 
 setMethod("plotSpectrumHash", "compoundsSet", function(obj, index, groupName, MSPeakLists, formulas = NULL,
-                                                       plotStruct = FALSE, title = NULL,
+                                                       plotStruct = FALSE, title = NULL, normalized = "multiple",
                                                        specSimParams = getDefSpecSimParams(),
                                                        mincex = 0.9, xlim = NULL, ylim = NULL,
                                                        maxMolSize = c(0.2, 0.4), molRes = c(100, 100),
                                                        perSet = TRUE, mirror = TRUE, ...)
 {
-    return(makeHash(callNextMethod(obj, index, groupName, MSPeakLists, formulas, plotStruct, title, specSimParams,
-                                   mincex, xlim, ylim, maxMolSize, molRes, ...),
+    return(makeHash(callNextMethod(obj, index, groupName, MSPeakLists, formulas, plotStruct, title, normalized,
+                                   specSimParams, mincex, xlim, ylim, maxMolSize, molRes, ...),
                     perSet, mirror))
 })
 

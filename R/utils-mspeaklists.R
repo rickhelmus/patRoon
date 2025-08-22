@@ -614,7 +614,8 @@ prepSpecSimilarityPL <- function(pl, removePrecursor, relMinIntensity, minPeaks)
     return(pl)
 }
 
-getBinnedPLPair <- function(MSPeakLists, groupNames, analyses, MSLevel, specSimParams, uniqueName, mustExist)
+getBinnedPLPair <- function(MSPeakLists, groupNames, analyses, MSLevel, specSimParams, uniqueName, mustExist,
+                            normalizedIntensities = TRUE)
 {
     PLP1 <- getSimPLAndPrec(MSPeakLists, groupNames[1], analyses[1], MSLevel, specSimParams, 1)
     PLP2 <- getSimPLAndPrec(MSPeakLists, groupNames[2], analyses[2], MSLevel, specSimParams, 2)
@@ -668,6 +669,12 @@ getBinnedPLPair <- function(MSPeakLists, groupNames, analyses, MSLevel, specSimP
         ret <- setnames(bin[get(paste0("intensity_", nr)) != 0, setdiff(names(bin), rmCols), with = FALSE],
                         paste0(c("intensity_", "ID_"), nr), c("intensity", "ID"))
         setorderv(ret, "ID") # restore order
+        
+        if (!normalizedIntensities)
+        {
+            PLP <- if (nr == 1) PLP1 else PLP2
+            ret[, intensity := PLP$specs[[1]]$intensity[match(ID, PLP$specs[[1]]$ID)]]
+        }
         
         # re-add precursor
         ret[, precursor := if (nr == 1) PLP1$specs[[1]][match(ret$ID, ID)]$precursor else PLP2$specs[[1]][match(ret$ID, ID)]$precursor]

@@ -268,7 +268,7 @@ setMethod("filter", "MSPeakListsSet", function(obj, ..., removeMZs = NULL, withM
 #' @rdname MSPeakLists-class
 #' @export
 setMethod("plotSpectrum", "MSPeakListsSet", function(obj, groupName, analysis = NULL, MSLevel = 1, title = NULL,
-                                                     specSimParams = getDefSpecSimParams(),
+                                                     normalized = "multiple", specSimParams = getDefSpecSimParams(),
                                                      xlim = NULL, ylim = NULL, perSet = TRUE, mirror = TRUE, ...)
 {
     ac <- checkmate::makeAssertCollection()
@@ -278,12 +278,13 @@ setMethod("plotSpectrum", "MSPeakListsSet", function(obj, groupName, analysis = 
         stop("Lengths of analysis and groupName should be equal.")
     assertSpecSimParams(specSimParams, add = ac)
     checkmate::assertChoice(MSLevel, 1:2, add = ac)
+    assertPlotSpecNorm(normalized, add = ac)
     assertXYLim(xlim, ylim, add = ac)
-    aapply(checkmate::assertFlag, . ~ perSet, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ perSet + mirror, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
     argsParent <- list(groupName = groupName, analysis = analysis, MSLevel = MSLevel, title = title,
-                       specSimParams = specSimParams, xlim = xlim, ylim = ylim, ...)
+                       normalized = normalized, specSimParams = specSimParams, xlim = xlim, ylim = ylim, ...)
     
     if (!perSet || length(sets(obj)) == 1 || !is.null(analysis))
         return(do.call(callNextMethod, c(list(obj), argsParent)))
@@ -301,8 +302,8 @@ setMethod("plotSpectrum", "MSPeakListsSet", function(obj, groupName, analysis = 
         specs <- split(spec, by = "set")
         specs <- lapply(specs, setnames, "set", "mergedBy")
         
-        plotData <- getMSPlotDataOverlay(specs, mirror, TRUE, 1, NULL)
-        return(makeMSPlotOverlay(plotData, title, 1, xlim, ylim, ...))
+        plotData <- getMSPlotDataOverlay(specs, mirror, !isFALSE(normalized), 1, NULL)
+        return(makeMSPlotOverlay(plotData, title, 1, xlim, ylim, !isFALSE(normalized), ...))
     }
     else
     {
@@ -318,7 +319,8 @@ setMethod("plotSpectrum", "MSPeakListsSet", function(obj, groupName, analysis = 
         
         binnedPLs <- Map(usObj, theSets, f = getBinnedPLPair,
                          MoreArgs = list(groupNames = groupName, analyses = analysis, MSLevel = MSLevel,
-                                         specSimParams = specSimParams, mustExist = FALSE))
+                                         specSimParams = specSimParams, mustExist = FALSE,
+                                         normalizedIntensities = !isFALSE(normalized)))
         if (all(unlist(lapply(binnedPLs, sapply, nrow)) == 0))
             return(NULL)
 
@@ -326,15 +328,16 @@ setMethod("plotSpectrum", "MSPeakListsSet", function(obj, groupName, analysis = 
         bottomSpec <- rbindlist(sapply(binnedPLs, "[[", 2, simplify = FALSE), idcol = "set")
         
         plotData <- getMSPlotDataOverlay(list(topSpec, bottomSpec), mirror, FALSE, 2, "overlap")
-        makeMSPlotOverlay(plotData, title, 1, xlim, ylim, ...)
+        makeMSPlotOverlay(plotData, title, 1, xlim, ylim, !isFALSE(normalized), ...)
     }
 })
 
 setMethod("plotSpectrumHash", "MSPeakListsSet", function(obj, groupName, analysis = NULL, MSLevel = 1, title = NULL,
-                                                         specSimParams = getDefSpecSimParams(), xlim = NULL,
+                                                         normalized = "multiple", specSimParams = getDefSpecSimParams(), xlim = NULL,
                                                          ylim = NULL, perSet = TRUE, mirror = TRUE, ...)
 {
-    return(makeHash(callNextMethod(obj, groupName, analysis, MSLevel, title, specSimParams, xlim, ylim, ...),
+    return(makeHash(callNextMethod(obj, groupName = groupName, analysis = analysis, MSLevel = MSLevel, title = title,
+                                   normalized = normalized, specSimParams = specSimParams, xlim = xlim, ylim = ylim, ...),
                     perSet, mirror))
 })
 
@@ -458,4 +461,3 @@ setMethod("unset", "MSPeakListsSet", function(obj, set)
                             metadata = list(), avgPeakListArgs = avArgs, setIDs = FALSE, doAverage = FALSE,
                             origFGNames = obj@origFGNames, algorithm = paste0(algorithm(obj), "_unset")))
 })
-

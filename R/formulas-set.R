@@ -80,7 +80,7 @@ setMethod("filter", "formulasSet", doFeatAnnFilterSets)
 #' @rdname formulas-class
 #' @export
 setMethod("plotSpectrum", "formulasSet", function(obj, index, groupName, analysis = NULL, MSPeakLists,
-                                                  title = NULL, specSimParams = getDefSpecSimParams(),
+                                                  title = NULL, normalized = "multiple", specSimParams = getDefSpecSimParams(),
                                                   mincex = 0.9, xlim = NULL, ylim = NULL, perSet = TRUE,
                                                   mirror = TRUE, ...)
 {
@@ -95,14 +95,15 @@ setMethod("plotSpectrum", "formulasSet", function(obj, index, groupName, analysi
     assertSpecSimParams(specSimParams, add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakListsSet", add = ac)
     checkmate::assertString(title, null.ok = TRUE, add = ac)
+    assertPlotSpecNorm(normalized, add = ac)
     checkmate::assertNumber(mincex, lower = 0, finite = TRUE, add = ac)
     assertXYLim(xlim, ylim, add = ac)
     aapply(checkmate::assertFlag, . ~ perSet + mirror, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
     if (!perSet || length(sets(obj)) == 1 || !is.null(analysis))
-        return(callNextMethod(obj, index, groupName, analysis, MSPeakLists, title, specSimParams = specSimParams,
-                              mincex, xlim, ylim, ...))
+        return(callNextMethod(obj, index, groupName, analysis, MSPeakLists, title, normalized = normalized,
+                              specSimParams = specSimParams, mincex, xlim, ylim, ...))
     
     if (length(groupName) == 1)
     {
@@ -124,8 +125,8 @@ setMethod("plotSpectrum", "formulasSet", function(obj, index, groupName, analysi
             return(x)
         })
         
-        plotData <- getMSPlotDataOverlay(specs, mirror, TRUE, 1, NULL)
-        return(makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, ...))
+        plotData <- getMSPlotDataOverlay(specs, mirror, !isFALSE(normalized), 1, NULL)
+        return(makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, !isFALSE(normalized), ...))
     }
     else
     {
@@ -164,7 +165,8 @@ setMethod("plotSpectrum", "formulasSet", function(obj, index, groupName, analysi
         
         binnedPLs <- Map(usMSPL, theSets, f = getBinnedPLPair,
                          MoreArgs = list(groupNames = groupName, analyses = NULL, MSLevel = 2,
-                                         specSimParams = specSimParams, mustExist = FALSE))
+                                         specSimParams = specSimParams, mustExist = FALSE,
+                                         normalizedIntensities = !isFALSE(normalized)))
 
         mergeBinnedAnn <- function(nr)
         {
@@ -185,17 +187,17 @@ setMethod("plotSpectrum", "formulasSet", function(obj, index, groupName, analysi
         specs <- split(allSpectra, by = "which")
         plotData <- getMSPlotDataOverlay(specs, mirror, FALSE, 2, "overlap")
         
-        makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, ...)
+        makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, !isFALSE(normalized), ...)
     }
 })
 
 setMethod("plotSpectrumHash", "formulasSet", function(obj, index, groupName, analysis = NULL, MSPeakLists,
-                                                      title = NULL, specSimParams = getDefSpecSimParams(),
+                                                      title = NULL, normalized = "multiple", specSimParams = getDefSpecSimParams(),
                                                       mincex = 0.9, xlim = NULL, ylim = NULL,
                                                       perSet = TRUE, mirror = TRUE, ...)
 {
     return(makeHash(callNextMethod(obj, index, groupName, analysis, MSPeakLists,
-                                   title, specSimParams, mincex, xlim, ylim, ...),
+                                   title, normalized = normalized, specSimParams = specSimParams, mincex = mincex, xlim = xlim, ylim = ylim, ...),
                     perSet, mirror))
 })
 

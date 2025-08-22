@@ -202,6 +202,7 @@
 - misc
     - genLimitsFile() and verify that it overrides
     - generateAnalysisInfo()?
+    - plotSpectrum() methods: normalization
 - newProject()
     - see where testing is slow, possibly disable testServer() on CI?
     - add snapshots
@@ -215,6 +216,7 @@
 - move all plotBPC(), getEIC() etc methods into one doc file?
 - update relativeTo arg (not just replicates)
 - mention that mzR backend caches as loads all at once
+- normalized arg for plotSpectrum()
 - convert
     - add patRoon 3.0 citation for im_collapse
 - handbook

@@ -1054,8 +1054,7 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRtWindo
         
         mspl <- mspl[intersect(gNames, names(mspl))] # sync fg order
 
-        for (fg in names(mspl))
-            saveCacheData("MSPeakLists", mspl[[fg]], ft$hash[match(fg, ft$group)], cacheDB)
+        saveCacheDataList("MSPeakLists", mspl, ft$hash[match(names(mspl), ft$group)], cacheDB)
         
         doProgress()
         

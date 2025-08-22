@@ -41,6 +41,10 @@ getMSSpectrum <- function(backend, index, MSLevel, frameIndex = -1L, minIntensit
     .Call(`_patRoon_getMSSpectrum`, backend, index, MSLevel, frameIndex, minIntensity)
 }
 
+getMSSpectra <- function(backend, timeStart, timeEnd, mobStart, mobEnd, MSLevel, prec = 0.0, minIntensityIMS = 25L, minIntensityPre = 0L, topMost = 50L, withPrecursor = FALSE, minAbundanceIMSAbs = 2L, retainPrecursor = TRUE) {
+    .Call(`_patRoon_getMSSpectra`, backend, timeStart, timeEnd, mobStart, mobEnd, MSLevel, prec, minIntensityIMS, minIntensityPre, topMost, withPrecursor, minAbundanceIMSAbs, retainPrecursor)
+}
+
 getCollapsedFrame <- function(backend, index, mzWindow, minIntensityIMS, minIntensityPre, minAbundanceRel, minAbundanceAbs, method, mzMin = 0.0, mzMax = 0.0, minInt = 0.0, topMost = 0L, prec = 0.0, mobMin = 0.0, mobMax = 0.0) {
     .Call(`_patRoon_getCollapsedFrame`, backend, index, mzWindow, minIntensityIMS, minIntensityPre, minAbundanceRel, minAbundanceAbs, method, mzMin, mzMax, minInt, topMost, prec, mobMin, mobMax)
 }

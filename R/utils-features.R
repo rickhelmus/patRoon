@@ -677,7 +677,7 @@ findPeaksInEICs <- function(EICs, peakParams, withMobility, calcStats, logPath, 
     }
     else if (calcStats)
     {
-        peaks[, c("mzmin", "mzmax", "mz", "mobmin", "mobmax", "mobility", "mobilityBP") := {
+        peaks[, c("mzmin", "mzmax", "mz", "mobmin", "mobmax", "mobility", "mobilityBP", "mobilityMax", "mobilityBPMax") := {
             eic <- EICs[[EIC_ID]]
             eic <- eic[numGTETol(eic[, "time"], retmin) & numLTETol(eic[, "time"], retmax), , drop = FALSE]
             if (nrow(eic) == 0)
@@ -688,13 +688,14 @@ findPeaksInEICs <- function(EICs, peakParams, withMobility, calcStats, logPath, 
                     eic <- cbind(eic, mobility = NA, mobilityBP = NA, mobmin = NA, mobmax = NA)
                 list(min(eic[, "mzmin"]), max(eic[, "mzmax"]), weighted.mean(eic[, "mzBP"], eic[, "intensity"]),
                      min(eic[, "mobmin"]), max(eic[, "mobmax"]),
-                     weighted.mean(eic[, "mobility"], eic[, "intensity"]), weighted.mean(eic[, "mobilityBP"], eic[, "intensity"]))
+                     weighted.mean(eic[, "mobility"], eic[, "intensity"]), weighted.mean(eic[, "mobilityBP"], eic[, "intensity"]),
+                     eic[which.max(eic[, "intensity"]), "mobility"], eic[which.max(eic[, "intensity"]), "mobilityBP"])
             }
         }, by = seq_len(nrow(peaks))]
         
         # NOTE: we could also set mobilities after checking if data is available, but then we need to repeat the EIC subsetting above
         if (!withMobility || length(EICs) == 0 || !"mobility" %in% colnames(EICs[[1]]))
-            peaks[, c("mobmin", "mobmax", "mobility", "mobilityBP") := NULL]
+            peaks[, c("mobmin", "mobmax", "mobility", "mobilityBP", "mobilityMax", "mobilityBPMax") := NULL]
     }
     
     # make unique IDs

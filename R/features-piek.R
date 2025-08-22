@@ -127,10 +127,14 @@ setMethod("initialize", "featuresPiek",
 #' @param adduct An \code{\link{adduct}} object (or something that can be converted to it with \code{\link{as.adduct}}).
 #'   Examples: \code{"[M-H]-"}, \code{"[M+Na]+"}. Only needs to be specified when EICs are formed from suspect data.
 #' @param mobAssignMethod \IMSWF Should be \code{"basepeak"} or \code{"weighted.mean"}. This parameter sets how measured
-#'   mobilities across the EIC datapoints are aggregated to determine the mobility for a feature. If
-#'   \code{mobAssignMethod="basepeak"}, then the mobility of the base peak from each EIC datapoint is collected.
-#'   Otherwise the intensity weighted mean is calculated of the mobilities that fall within the EIC bin. The final
-#'   feature mobility is then determined by the intensity weighted mean of all the collected points.
+#'   mobilities across the EIC datapoints are used to determine the mobility for a feature. If
+#'   \code{mobAssignMethod="basepeak"}, then the mobility of the base peak (=highest intensity peak) from each EIC
+#'   datapoint is collected. If \code{mobAssignMethod="weighted.mean"} then the intensity weighted mean is calculated of
+#'   the mobilities that fall within the EIC bin.
+#' @param mobAssignAggr \IMSWF Should be \code{"max"} or \code{"weighted.mean"}. This parameter sets how the mobilities
+#'   determined for each datapoint (see \code{mobAssignMethod}) are aggregated to determine the final mobility for the
+#'   feature. If \code{mobAssignAggr="weighted.mean"} then the intensity weighted mean is used. With
+#'   \code{mobAssignAggr="max"} the mobility data at the the highest intensity of the chromatographic peak is taken.
 #'
 #' @inheritParams findFeatures
 #' @template minIntensityIMS-arg
@@ -271,7 +275,8 @@ setMethod("initialize", "featuresPiek",
 #'
 #' @export
 findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = NULL, adduct = NULL,
-                             mobAssignMethod = "basepeak", minIntensityIMS = 25, verbose = TRUE)
+                             mobAssignMethod = "basepeak", mobAssignAggr = "weighted.mean", minIntensityIMS = 25,
+                             verbose = TRUE)
 {
     # UNDONE: add refs to docs, and highlight changes
     # UNDONE: use BP intensity?
@@ -288,6 +293,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
         assertSuspectList(suspects, needsAdduct = is.null(adduct), skipInvalid = genEICParams$skipInvalid, null.ok = FALSE,
                           add = ac)
     checkmate::assertChoice(mobAssignMethod, c("basepeak", "weighted.mean"), add = ac)
+    checkmate::assertChoice(mobAssignAggr, c("max", "weighted.mean"), add = ac)
     checkmate::assertNumber(minIntensityIMS, lower = 0, finite = TRUE, add = ac)
     checkmate::assertFlag(verbose, add = ac)
     checkmate::reportAssertions(ac)
@@ -323,7 +329,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
     withIMS <- !is.null(genEICParams[["methodIMS"]])
     
     cacheDB <- openCacheDBScope()
-    baseHash <- makeHash(genEICParams, peakParams, suspects, adduct, mobAssignMethod, minIntensityIMS)
+    baseHash <- makeHash(genEICParams, peakParams, suspects, adduct, mobAssignMethod, mobAssignAggr, minIntensityIMS)
     anaHashes <- getMSFileHashesFromAvailBackend(analysisInfo, needIMS = withIMS)
     anaHashes <- sapply(anaHashes, makeHash, baseHash)
     cachedData <- pruneList(loadCacheData("featuresPiek", anaHashes, simplify = FALSE, dbArg = cacheDB))
@@ -427,10 +433,20 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
             {
                 peaks[, binMobStart := EICInfo[match(peaks$EIC_ID, EIC_ID)]$mobmin]
                 peaks <- peaks[between(mobilityBP, binMobStart + genEICParams$mobStep/4, binMobStart + genEICParams$mobStep/4*3) == TRUE]
-                if (mobAssignMethod == "basepeak")
-                    peaks[, mobility := mobilityBP]
-                # NOTE: peaks$mobility is weighted mean otherwise
-                peaks[, mobilityBP := NULL]
+                if (mobAssignMethod == "max")
+                {
+                    if (mobAssignMethod == "basepeak")
+                        peaks[, mobility := mobilityBPMax]
+                    else
+                        peaks[, mobility := mobilityMax]
+                }
+                else # mobAssignMethod == "weighted.mean"
+                {
+                    if (mobAssignMethod == "basepeak")
+                        peaks[, mobility := mobilityBP]
+                    # else peaks$mobility is already weighted mean
+                }
+                peaks[, c("mobilityBP", "mobilityMax", "mobilityBPMax") := NULL]
             }
             if (genEICParams$methodMZ == "suspects")
             {

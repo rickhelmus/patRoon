@@ -295,7 +295,7 @@ setMethod("annotatedPeakList", "formulas", function(obj, index, groupName, analy
 #'
 #' @export
 setMethod("plotSpectrum", "formulas", function(obj, index, groupName, analysis = NULL, MSPeakLists,
-                                               title = NULL, specSimParams = getDefSpecSimParams(),
+                                               title = NULL, normalized = "multiple", specSimParams = getDefSpecSimParams(),
                                                mincex = 0.9, xlim = NULL, ylim = NULL, ...)
 {
     ac <- checkmate::makeAssertCollection()
@@ -309,6 +309,7 @@ setMethod("plotSpectrum", "formulas", function(obj, index, groupName, analysis =
     assertSpecSimParams(specSimParams, add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertString(title, null.ok = TRUE, add = ac)
+    assertPlotSpecNorm(normalized, add = ac)
     checkmate::assertNumber(mincex, lower = 0, finite = TRUE, add = ac)
     assertXYLim(xlim, ylim, add = ac)
     checkmate::reportAssertions(ac)
@@ -325,7 +326,7 @@ setMethod("plotSpectrum", "formulas", function(obj, index, groupName, analysis =
         if (is.null(title))
             title <- subscriptFormula(obj[[groupName]]$neutral_formula[index])
         
-        makeMSPlot(getMSPlotData(spec, 2), mincex, xlim, ylim, ..., main = title)
+        makeMSPlot(getMSPlotData(spec, 2, isTRUE(normalized)), mincex, xlim, ylim, ..., main = title)
     }
     else
     {
@@ -342,7 +343,8 @@ setMethod("plotSpectrum", "formulas", function(obj, index, groupName, analysis =
             title <- subscriptFormula(obj[[groupName[1]]]$neutral_formula[index[1]],
                                       formulas2 = obj[[groupName[2]]]$neutral_formula[index])
         
-        binnedPLs <- getBinnedPLPair(MSPeakLists, groupName, analysis, 2, specSimParams, "unique", mustExist = TRUE)
+        binnedPLs <- getBinnedPLPair(MSPeakLists, groupName, analysis, 2, specSimParams, "unique", mustExist = TRUE,
+                                     normalizedIntensities = !isFALSE(normalized))
         
         topSpec <- mergeBinnedAndAnnPL(binnedPLs[[1]], annotatedPeakList(obj, index[1], groupName[1], analysis[1],
                                                                          MSPeakLists), 1)
@@ -350,19 +352,19 @@ setMethod("plotSpectrum", "formulas", function(obj, index, groupName, analysis =
         bottomSpec <- mergeBinnedAndAnnPL(binnedPLs[[2]], annotatedPeakList(obj, index[2], groupName[2],
                                                                             analysis[2], MSPeakLists), 2)
         plotData <- getMSPlotDataOverlay(list(topSpec, bottomSpec), TRUE, FALSE, 2, "overlap")
-        makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, ...)
+        makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, !isFALSE(normalized), ...)
     }
 })
 
 setMethod("plotSpectrumHash", "formulas", function(obj, index, groupName, analysis = NULL, MSPeakLists,
-                                                     title = NULL, specSimParams = getDefSpecSimParams(),
+                                                     title = NULL, normalized = "multiple", specSimParams = getDefSpecSimParams(),
                                                      mincex = 0.9, xlim = NULL, ylim = NULL, ...)
 {
     if (length(groupName) > 1)
     {
         # recursive call for both candidates
         args <- list(obj = obj, MSPeakLists = MSPeakLists, title = title, specSimParams = specSimParams,
-                     mincex = mincex, xlim = xlim, ylim = ylim, ...)
+                     normalized = normalized, mincex = mincex, xlim = xlim, ylim = ylim, ...)
         return(makeHash(do.call(plotSpectrumHash, c(args, list(index = index[1], groupName = groupName[1],
                                                                analysis = analysis[1]))),
                         do.call(plotSpectrumHash, c(args, list(index = index[2], groupName = groupName[2],
@@ -372,7 +374,7 @@ setMethod("plotSpectrumHash", "formulas", function(obj, index, groupName, analys
     formTable <- annotations(obj)[[groupName]]
     fRow <- if (is.null(formTable) || nrow(formTable) == 0) NULL else formTable[index]
     
-    return(makeHash(fRow, getSpec(MSPeakLists, groupName, 2, NULL), title, mincex, xlim, ylim, ...))
+    return(makeHash(fRow, getSpec(MSPeakLists, groupName, 2, NULL), title, normalized, mincex, xlim, ylim, ...))
 })
 
 #' @describeIn formulas Plots a barplot with scoring of a candidate formula.

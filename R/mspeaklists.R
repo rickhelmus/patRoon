@@ -673,7 +673,7 @@ setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity 
 #'
 #' @export
 setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NULL, MSLevel = 1, title = NULL,
-                                                  specSimParams = getDefSpecSimParams(),
+                                                  normalized = "multiple", specSimParams = getDefSpecSimParams(),
                                                   xlim = NULL, ylim = NULL, ...)
 {
     ac <- checkmate::makeAssertCollection()
@@ -681,8 +681,10 @@ setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NUL
     checkmate::assertCharacter(analysis, min.len = 1, max.len = 2, min.chars = 1, null.ok = TRUE, add = ac)
     if (!is.null(analysis) && length(analysis) != length(groupName))
         stop("Lengths of analysis and groupName should be equal.")
-    assertSpecSimParams(specSimParams, add = ac)
     checkmate::assertChoice(MSLevel, 1:2, add = ac)
+    checkmate::assertString(title, null.ok = TRUE, add = ac)
+    assertPlotSpecNorm(normalized, add = ac)
+    assertSpecSimParams(specSimParams, add = ac)
     assertXYLim(xlim, ylim, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -699,7 +701,7 @@ setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NUL
         if (is.null(spec))
             return(NULL)
         
-        makeMSPlot(getMSPlotData(spec, 2), 1, xlim, ylim, main = title, ...)
+        makeMSPlot(getMSPlotData(spec, 2, isTRUE(normalized)), 1, xlim, ylim, main = title, ...)
     }
     else
     {
@@ -710,21 +712,23 @@ setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NUL
             title <- c(title, sprintf("Similarity: %.2f", sim))
         }
         
-        binnedPLs <- getBinnedPLPair(obj, groupName, analysis, MSLevel, specSimParams, "unique", mustExist = TRUE)
+        binnedPLs <- getBinnedPLPair(obj, groupName, analysis, MSLevel, specSimParams, "unique", mustExist = TRUE,
+                                     normalizedIntensities = !isFALSE(normalized))
         plotData <- getMSPlotDataOverlay(binnedPLs, TRUE, FALSE, 2, "overlap")
-        makeMSPlotOverlay(plotData, title, 1, xlim, ylim, ...)
+        makeMSPlotOverlay(plotData, title, 1, xlim, ylim, !isFALSE(normalized), ...)
     }
 })
 
 setMethod("plotSpectrumHash", "MSPeakLists", function(obj, groupName, analysis = NULL, MSLevel = 1, title = NULL,
-                                                      specSimParams = getDefSpecSimParams(), ...)
+                                                      normalized = "multiple", specSimParams = getDefSpecSimParams(),
+                                                      ...)
 {
     if (length(groupName) == 1)
         sp <- getSpec(obj, groupName, MSLevel, analysis)
     else
         sp <- c(getSpec(obj, groupName[1], MSLevel, analysis[1]),
                 getSpec(obj, groupName[2], MSLevel, analysis[2]))
-    return(makeHash(sp, title, specSimParams, ...))
+    return(makeHash(sp, title, normalized, specSimParams, ...))
 })
 
 #' @describeIn MSPeakLists Calculates the spectral similarity between two or more spectra.

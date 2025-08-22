@@ -488,7 +488,7 @@ setMethod("annotatedPeakList", "compounds", function(obj, index, groupName, MSPe
 #'
 #' @export
 setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLists, formulas = NULL,
-                                                plotStruct = FALSE, title = NULL, specSimParams = getDefSpecSimParams(),
+                                                plotStruct = FALSE, title = NULL, normalized = "multiple", specSimParams = getDefSpecSimParams(),
                                                 mincex = 0.9, xlim = NULL, ylim = NULL,
                                                 maxMolSize = c(0.2, 0.4), molRes = c(100, 100), ...)
 {
@@ -504,6 +504,7 @@ setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLis
     checkmate::assertNumber(mincex, lower = 0, finite = TRUE, add = ac)
     assertXYLim(xlim, ylim, add = ac)
     aapply(checkmate::assertNumeric, . ~ maxMolSize + molRes, finite = TRUE, len = 2, fixed = list(add = ac))
+    assertPlotSpecNorm(normalized, add = ac)
     checkmate::reportAssertions(ac)
 
     if (length(groupName) == 1)
@@ -527,7 +528,7 @@ setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLis
         if (is.null(title))
             title <- getCompoundsSpecPlotTitle(compr$compoundName, compr$neutral_formula)
         
-        makeMSPlot(getMSPlotData(spec, 2), mincex, xlim, ylim, main = title, ..., mol = mol,
+        makeMSPlot(getMSPlotData(spec, 2, isTRUE(normalized)), mincex, xlim, ylim, main = title, ..., mol = mol,
                    maxMolSize = maxMolSize, molRes = molRes)
     }
     else
@@ -551,7 +552,8 @@ setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLis
                                                compr2$compoundName, compr2$neutral_formula)
         }
         
-        binnedPLs <- getBinnedPLPair(MSPeakLists, groupName, NULL, 2, specSimParams, "unique", mustExist = TRUE)
+        binnedPLs <- getBinnedPLPair(MSPeakLists, groupName, NULL, 2, specSimParams, "unique", mustExist = TRUE,
+                                     normalizedIntensities = !isFALSE(normalized))
         
         topSpec <- mergeBinnedAndAnnPL(binnedPLs[[1]], annotatedPeakList(obj, index[1], groupName[1], MSPeakLists,
                                                                          formulas), 1)
@@ -559,21 +561,20 @@ setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLis
         bottomSpec <- mergeBinnedAndAnnPL(binnedPLs[[2]], annotatedPeakList(obj, index[2], groupName[2], MSPeakLists,
                                                                             formulas), 2)
         plotData <- getMSPlotDataOverlay(list(topSpec, bottomSpec), TRUE, FALSE, 2, "overlap")
-        makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, ...)
+        makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, !isFALSE(normalized), ...)
     }
 })
 
 setMethod("plotSpectrumHash", "compounds", function(obj, index, groupName, MSPeakLists, formulas = NULL,
-                                                    plotStruct = FALSE, title = NULL,
-                                                    specSimParams = getDefSpecSimParams(),
-                                                    mincex = 0.9, xlim = NULL, ylim = NULL,
+                                                    plotStruct = FALSE, title = NULL, normalized = "multiple",
+                                                    specSimParams = getDefSpecSimParams(), mincex = 0.9, xlim = NULL, ylim = NULL,
                                                     maxMolSize = c(0.2, 0.4), molRes = c(100, 100), ...)
 {
     if (length(groupName) > 1)
     {
         # recursive call for both candidates
         args <- list(obj = obj, MSPeakLists = MSPeakLists, formulas = formulas, plotStruct = plotStruct, title = title,
-                     specSimParams = specSimParams, mincex = mincex, xlim = xlim, ylim = ylim, maxMolSize = maxMolSize,
+                     specSimParams = specSimParams, normalized = normalized, mincex = mincex, xlim = xlim, ylim = ylim, maxMolSize = maxMolSize,
                      molRes = molRes, ...)
         return(makeHash(do.call(plotSpectrumHash, c(args, list(index = index[1], groupName = groupName[1]))),
                         do.call(plotSpectrumHash, c(args, list(index = index[2], groupName = groupName[2])))))
@@ -589,7 +590,7 @@ setMethod("plotSpectrumHash", "compounds", function(obj, index, groupName, MSPea
         fRow <- if (is.na(wh)) NULL else formulas[[groupName]][wh]
     }
     
-    return(makeHash(cRow, fRow, getSpec(MSPeakLists, groupName, 2, NULL), plotStruct, title, mincex, xlim, ylim, ...))
+    return(makeHash(cRow, fRow, getSpec(MSPeakLists, groupName, 2, NULL), plotStruct, title, normalized, mincex, xlim, ylim, ...))
 })
 
 #' @rdname pred-quant

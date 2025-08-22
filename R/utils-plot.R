@@ -332,10 +332,13 @@ makeEIXPlot <- function(featPlotTab, anaInfo, gInfo, showPeakArea, showFGroupRec
     invisible(NULL)
 }
 
-getMSPlotData <- function(spec, marklwd, markWhich = NULL)
+getMSPlotData <- function(spec, marklwd, normInts, markWhich = NULL)
 {
     hasFragInfo <- !is.null(spec[["ion_formula"]])
     plotData <- copy(spec)
+    
+    if (normInts)
+        plotData[, intensity := normalize(intensity, minMax = FALSE)]
     
     # default colour/line width
     plotData[, c("colour", "lwd", "legend") := .("grey", 1, "unassigned")]
@@ -475,7 +478,10 @@ makeMSPlot <- function(plotData, mincex, xlim, ylim, ylab = "Intensity", ..., mo
         {
             # extend both vertical directions 
             if (max(plotData$intensity) > 0)
-                ylim <- range(plotData$intensity) * expand
+            {
+                mx <- max(abs(plotData$intensity))
+                ylim <- c(-mx, mx) * expand #range(plotData$intensity) * expand
+            }
             else # only bottom plot
                 ylim <- c(min(plotData$intensity), abs(min(plotData$intensity)))
         }
@@ -614,14 +620,14 @@ getMSPlotDataOverlay <- function(specs, mirror, normalize, marklwd, markWhich)
     combinedSpec <- rbindlist(specs, fill = TRUE) # columns may be different due to fragInfos
     setorderv(combinedSpec, "intensity")
     
-    plotData <- getMSPlotData(combinedSpec, marklwd, markWhich)
+    plotData <- getMSPlotData(combinedSpec, marklwd, FALSE, markWhich)
     return(plotData)
 }
 
-makeMSPlotOverlay <- function(plotData, title, mincex, xlim, ylim, ..., mol = NULL, maxMolSize = NULL,
+makeMSPlotOverlay <- function(plotData, title, mincex, xlim, ylim, isNorm, ..., mol = NULL, maxMolSize = NULL,
                               molRes = NULL)
 {
-    makeMSPlot(plotData, mincex, xlim, ylim, ylab = "Normalized intensity",
+    makeMSPlot(plotData, mincex, xlim, ylim, ylab = if (isNorm) "Normalized intensity" else "Intensity",
                main = title, ..., mol = mol, maxMolSize = maxMolSize, molRes = molRes)
 }
 

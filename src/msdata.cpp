@@ -1,6 +1,7 @@
 #include <Rcpp.h>
 
 #include <algorithm>
+#include <fstream>
 #include <vector>
 #include <chrono>
 
@@ -862,7 +863,8 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                       const std::vector<SpectrumRawTypes::Mobility> &endMobs,
                       SpectrumRawTypes::Time gapFactor, SpectrumRawTypes::Mass mzExpIMSWindow,
                       SpectrumRawTypes::Intensity minIntensityIMS, const std::string &mode = "simple",
-                      bool pad = false, SpectrumRawTypes::Intensity minEICIntensity = 0,
+                      bool smooth = false, int smoothWindow = 3, bool pad = false,
+                      SpectrumRawTypes::Intensity minEICIntensity = 0,
                       SpectrumRawTypes::Time minEICAdjTime = 0, unsigned minEICAdjPoints = 0,
                       SpectrumRawTypes::Intensity minEICAdjIntensity = 0, unsigned topMost = 0)
 {
@@ -1022,7 +1024,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         [](size_t sum, const SpectrumRaw &spec) { return sum + spec.size(); });
     
     bool anySpecHasMob = false; // NOTE: assume all MS spectra have or have not IMS data (UNDONE?)
-    for (size_t i=0, peaksi=0; i<allSpectra[0].size(); ++i)
+    for (size_t i=0; i<allSpectra[0].size(); ++i)
     {
         if (allSpectra[0][i].getMZs().empty())
             continue; // no peaks in this spectrum, need some to see if there are mobilities
@@ -1099,6 +1101,13 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
 
         EICPoint curPoint;
         size_t curScanInd = allPeaksSorted.indices.size(), prvScanInd = allPeaksSorted.indices.size();
+        // for smoothing
+        std::vector<SpectrumRawTypes::Mobility> curPointMobs;
+        std::vector<SpectrumRawTypes::Intensity> curPointInts;
+        std::ofstream ofsRaw(std::string("eic-raw-") + std::to_string(i) + ".csv");
+        ofsRaw << "scan,time,mz,intensity,mobility\n";
+        std::ofstream ofsSmooth(std::string("eic-smooth-") + std::to_string(i) + ".csv");
+        ofsSmooth << "scan,time,mz,intensity,mobility\n";
         bool init = true;
         for (size_t j=0; ; ++j)
         {
@@ -1120,7 +1129,34 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                     {
                         curPoint.mz /= curPoint.intensity;
                         if (anySpecHasMob && eicMode != EICMode::FULL_MZ)
-                            curPoint.mobility /= curPoint.intensity;
+                        {
+                            if (smooth && curPointInts.size() >= smoothWindow)
+                            {
+                                const auto sortedMobInds = getSortedInds(curPointMobs);
+                                std::vector<SpectrumRawTypes::Intensity> sortedInts(curPointInts.size());
+                                for (const auto ind : sortedMobInds)
+                                    sortedInts[ind] = curPointInts[ind];
+                                const auto smi = movingAverage(sortedInts, smoothWindow);
+                                const auto apexInd = std::distance(smi.cbegin(),
+                                                                   std::max_element(smi.cbegin(), smi.cend()));
+                                const auto it = std::find(sortedMobInds.cbegin(), sortedMobInds.cend(), apexInd);
+                                curPoint.mobilityBP = curPointMobs[std::distance(sortedMobInds.cbegin(), it)];
+                                
+                                // calc weighted mean mobility from smoothed intensities
+                                SpectrumRawTypes::Intensity totSmoInt = 0;
+                                SpectrumRawTypes::Mobility totSmoMob = 0;
+                                for (size_t k=0; k<smi.size(); ++k)
+                                {
+                                    const auto ind = sortedMobInds[k];
+                                    totSmoInt += smi[k];
+                                    totSmoMob += (smi[k] * curPointMobs[ind]);
+                                    ofsSmooth << curScanInd << "," << curTime << "," << curPoint.mz << "," << smi[k] << "," << curPointMobs[ind] << "\n";
+                                }
+                                curPoint.mobility = totSmoMob / totSmoInt;
+                            }    
+                            else
+                                curPoint.mobility /= curPoint.intensity;
+                        }
                         eic.addPoint(curPoint);
                     }
                     else
@@ -1164,6 +1200,11 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                 curPoint = EICPoint();
                 prvScanInd = curScanInd;
                 curScanInd = scanInd;
+                if (smooth)
+                {
+                    curPointMobs.clear();
+                    curPointInts.clear();
+                }
             }
 
             const auto time = specMeta.first.times[scanInd];
@@ -1203,6 +1244,12 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                             curPoint.mobMin = mob;
                         if (mob > curPoint.mobMax)
                             curPoint.mobMax = mob;
+                        if (smooth)
+                        {
+                            curPointMobs.push_back(mob);
+                            curPointInts.push_back(inten);
+                            ofsRaw << scanInd << "," << time << "," << mz << "," << inten << "," << mob << "\n";
+                        }
                     }
                     if (inten > curPoint.intensityBP)
                     {

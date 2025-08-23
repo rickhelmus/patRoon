@@ -61,8 +61,8 @@ getScans <- function(backend, timeStart, timeEnd, MSLevel, prec, fixedIsoWidth =
     .Call(`_patRoon_getScans`, backend, timeStart, timeEnd, MSLevel, prec, fixedIsoWidth)
 }
 
-getEICList <- function(backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, gapFactor, mzExpIMSWindow, minIntensityIMS, mode = "simple", pad = FALSE, minEICIntensity = 0L, minEICAdjTime = 0L, minEICAdjPoints = 0L, minEICAdjIntensity = 0L, topMost = 0L) {
-    .Call(`_patRoon_getEICList`, backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, gapFactor, mzExpIMSWindow, minIntensityIMS, mode, pad, minEICIntensity, minEICAdjTime, minEICAdjPoints, minEICAdjIntensity, topMost)
+getEICList <- function(backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, gapFactor, mzExpIMSWindow, minIntensityIMS, mode = "simple", smooth = FALSE, smoothWindow = 3L, pad = FALSE, minEICIntensity = 0L, minEICAdjTime = 0L, minEICAdjPoints = 0L, minEICAdjIntensity = 0L, topMost = 0L) {
+    .Call(`_patRoon_getEICList`, backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, gapFactor, mzExpIMSWindow, minIntensityIMS, mode, smooth, smoothWindow, pad, minEICIntensity, minEICAdjTime, minEICAdjPoints, minEICAdjIntensity, topMost)
 }
 
 doFillEIXIntensities <- function(allXValues, xvalues, intensities) {
@@ -223,6 +223,10 @@ setOMPNumThreads <- function(n) {
 
 calcCenterOfMass <- function(x, y) {
     .Call(`_patRoon_calcCenterOfMass`, x, y)
+}
+
+testMovingAverage <- function(data, window) {
+    .Call(`_patRoon_testMovingAverage`, data, window)
 }
 
 # Register entry points for exported C++ functions

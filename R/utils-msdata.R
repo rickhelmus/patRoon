@@ -158,8 +158,8 @@ getCentroidedMSFilesFromAnaInfo <- function(anaInfo, formats = c("mzML", "mzXML"
 }
 
 doGetEICs <- function(anaInfo, EICInfoList, gapFactor, mzExpIMSWindow = 0, minIntensityIMS = 0, mode = "simple",
-                      minEICIntensity = 0, minEICAdjTime = 0, minEICAdjPoints = 0, minEICAdjIntensity = 0,
-                      pad = FALSE, doCache = TRUE, cacheDB = NULL)
+                      smooth = FALSE, smoothWindow = 3, minEICIntensity = 0, minEICAdjTime = 0, minEICAdjPoints = 0,
+                      minEICAdjIntensity = 0, pad = FALSE, doCache = TRUE, cacheDB = NULL)
 {
     doCache <- doCache && getCacheMode() != "none"
     
@@ -219,8 +219,8 @@ doGetEICs <- function(anaInfo, EICInfoList, gapFactor, mzExpIMSWindow = 0, minIn
             openMSReadBackend(backend, path)
             
             newEICs <- getEICList(backend, ToDo$mzmin, ToDo$mzmax, ToDo$retmin, ToDo$retmax, ToDo$mobmin,
-                                  ToDo$mobmax, gapFactor, mzExpIMSWindow, minIntensityIMS, mode, pad, minEICIntensity,
-                                  minEICAdjTime, minEICAdjPoints, minEICAdjIntensity)
+                                  ToDo$mobmax, gapFactor, mzExpIMSWindow, minIntensityIMS, mode, smooth, smoothWindow,
+                                  pad, minEICIntensity, minEICAdjTime, minEICAdjPoints, minEICAdjIntensity)
             EICs[!isCached] <- newEICs
             attr(EICs, "allXValues") <- attr(newEICs, "allXValues")
             

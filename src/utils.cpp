@@ -17,6 +17,7 @@
 #include <cmath>
 
 #include "utils.h"
+#include "utils.hpp"
 
 // HACK
 #include "hclust-cpp/fastcluster.cpp"
@@ -150,4 +151,10 @@ double calcCenterOfMass(const Rcpp::NumericVector &x, const Rcpp::NumericVector 
         return 0.0; // avoid division by zero
     
     return wArea / area;
+}
+
+// [[Rcpp::export]]
+std::vector<double> testMovingAverage(const std::vector<double> &data, int window)
+{
+    return movingAverage(data, window);
 }

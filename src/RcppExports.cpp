@@ -312,8 +312,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // getEICList
-Rcpp::List getEICList(const MSReadBackend& backend, const std::vector<SpectrumRawTypes::Mass>& startMZs, const std::vector<SpectrumRawTypes::Mass>& endMZs, const std::vector<SpectrumRawTypes::Time>& startTimes, const std::vector<SpectrumRawTypes::Time>& endTimes, const std::vector<SpectrumRawTypes::Mobility>& startMobs, const std::vector<SpectrumRawTypes::Mobility>& endMobs, SpectrumRawTypes::Time gapFactor, SpectrumRawTypes::Mass mzExpIMSWindow, SpectrumRawTypes::Intensity minIntensityIMS, const std::string& mode, bool smooth, int smoothWindow, bool pad, SpectrumRawTypes::Intensity minEICIntensity, SpectrumRawTypes::Time minEICAdjTime, unsigned minEICAdjPoints, SpectrumRawTypes::Intensity minEICAdjIntensity, unsigned topMost);
-RcppExport SEXP _patRoon_getEICList(SEXP backendSEXP, SEXP startMZsSEXP, SEXP endMZsSEXP, SEXP startTimesSEXP, SEXP endTimesSEXP, SEXP startMobsSEXP, SEXP endMobsSEXP, SEXP gapFactorSEXP, SEXP mzExpIMSWindowSEXP, SEXP minIntensityIMSSEXP, SEXP modeSEXP, SEXP smoothSEXP, SEXP smoothWindowSEXP, SEXP padSEXP, SEXP minEICIntensitySEXP, SEXP minEICAdjTimeSEXP, SEXP minEICAdjPointsSEXP, SEXP minEICAdjIntensitySEXP, SEXP topMostSEXP) {
+Rcpp::List getEICList(const MSReadBackend& backend, const std::vector<SpectrumRawTypes::Mass>& startMZs, const std::vector<SpectrumRawTypes::Mass>& endMZs, const std::vector<SpectrumRawTypes::Time>& startTimes, const std::vector<SpectrumRawTypes::Time>& endTimes, const std::vector<SpectrumRawTypes::Mobility>& startMobs, const std::vector<SpectrumRawTypes::Mobility>& endMobs, SpectrumRawTypes::Time gapFactor, SpectrumRawTypes::Mass mzExpIMSWindow, SpectrumRawTypes::Intensity minIntensityIMS, const std::string& mode, unsigned sumEIMs, int smoothWindow, bool pad, SpectrumRawTypes::Intensity minEICIntensity, SpectrumRawTypes::Time minEICAdjTime, unsigned minEICAdjPoints, SpectrumRawTypes::Intensity minEICAdjIntensity, unsigned topMost);
+RcppExport SEXP _patRoon_getEICList(SEXP backendSEXP, SEXP startMZsSEXP, SEXP endMZsSEXP, SEXP startTimesSEXP, SEXP endTimesSEXP, SEXP startMobsSEXP, SEXP endMobsSEXP, SEXP gapFactorSEXP, SEXP mzExpIMSWindowSEXP, SEXP minIntensityIMSSEXP, SEXP modeSEXP, SEXP sumEIMsSEXP, SEXP smoothWindowSEXP, SEXP padSEXP, SEXP minEICIntensitySEXP, SEXP minEICAdjTimeSEXP, SEXP minEICAdjPointsSEXP, SEXP minEICAdjIntensitySEXP, SEXP topMostSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -328,7 +328,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type mzExpIMSWindow(mzExpIMSWindowSEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minIntensityIMS(minIntensityIMSSEXP);
     Rcpp::traits::input_parameter< const std::string& >::type mode(modeSEXP);
-    Rcpp::traits::input_parameter< bool >::type smooth(smoothSEXP);
+    Rcpp::traits::input_parameter< unsigned >::type sumEIMs(sumEIMsSEXP);
     Rcpp::traits::input_parameter< int >::type smoothWindow(smoothWindowSEXP);
     Rcpp::traits::input_parameter< bool >::type pad(padSEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minEICIntensity(minEICIntensitySEXP);
@@ -336,7 +336,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< unsigned >::type minEICAdjPoints(minEICAdjPointsSEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minEICAdjIntensity(minEICAdjIntensitySEXP);
     Rcpp::traits::input_parameter< unsigned >::type topMost(topMostSEXP);
-    rcpp_result_gen = Rcpp::wrap(getEICList(backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, gapFactor, mzExpIMSWindow, minIntensityIMS, mode, smooth, smoothWindow, pad, minEICIntensity, minEICAdjTime, minEICAdjPoints, minEICAdjIntensity, topMost));
+    rcpp_result_gen = Rcpp::wrap(getEICList(backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, gapFactor, mzExpIMSWindow, minIntensityIMS, mode, sumEIMs, smoothWindow, pad, minEICIntensity, minEICAdjTime, minEICAdjPoints, minEICAdjIntensity, topMost));
     return rcpp_result_gen;
 END_RCPP
 }

@@ -118,6 +118,7 @@
     - tweak default EIC filtering params, more strict for binning?
         - current defaults way to strict for patRoonData neg samples (for filtering of EICs _and_ peaks)
     - mob range: doc that defaults are for TIMS? Or just not give any defaults? Give instrument? Put it in limits?
+        - enable EIM summing and smoothing by default for TIMS?
     - split IMSWindow arg for setting mobmin/mobmax? this currently sets very narrow ranges. Same for mz and ms2
     - warn if ms2/suspects are outside bin range?
     - change methodMZ/methodIMS to eg filterMZ/filterMob
@@ -134,6 +135,7 @@
 - function to update fg properties (RT, m/z, mobility, CCS) after eg filtering, or make it an option in filter()/delete()?
 - plotChroms() etc: mention that only precursors are plot? Now seems confusing as number of fGroups seems less when reporting
 - MSPL: do topMost filter after averaging IMS subspectrum? Would be more consistent with HRMS, but may need larger default
+- getEIMs(): don't average intensities, replace clustering with map as is done with EIMRunner?
 
 ## Tests
 
@@ -190,6 +192,7 @@
         - tests with ims data
         - verify removal duplicate features?
         - mobAssignMethod and mobAssignAggr
+        - EIM summing and smoothing
     - groupFeaturesGreedy()
     - plotChroms(): mob annotation
     - plotMobilograms()
@@ -258,6 +261,7 @@
         - update docs for EIC filtering by suspects/ms2 (also mzIsoWindow, IMSWindow for ms2)
         - docs for minEICsIMSPreCheck
         - update docs for topMostEICMZ/topMostEICMZMob
+        - EIM summing and smoothing
     - assignMobilities()
         - refs to paper
         - fGroups method

@@ -345,7 +345,8 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
     {
         ret <- getEICList(backend, EICInfo$mzmin, EICInfo$mzmax, genEICParams$retRange[1], genEICParams$retRange[2],
                           EICInfo$mobmin, EICInfo$mobmax, gapFactor = genEICParams$gapFactor, mzExpIMSWindow = 0,
-                          minIntensityIMS = minIntensityIMS, mode = mode, pad = FALSE,
+                          minIntensityIMS = minIntensityIMS, mode = mode, sumEIMs = genEICParams$sumEIMs,
+                          smoothWindow = genEICParams$smoothWindow, pad = FALSE,
                           minEICIntensity = genEICParams$minEICIntensity, minEICAdjTime = genEICParams$minEICAdjTime,
                           minEICAdjPoints = genEICParams$minEICAdjPoints,
                           minEICAdjIntensity = genEICParams$minEICAdjIntensity, topMost = topMost)
@@ -530,8 +531,8 @@ getPiekGenEICParams <- function(methodMZ, methodIMS = NULL, ...)
         stop("methodIMS can only be 'ms2' if methodMZ is also set to 'ms2'", call. = FALSE)
     
     ret <- list(methodMZ = methodMZ, methodIMS = methodIMS, mzRange = c(80, 600), mzStep = 0.02, mobRange = c(0.5, 1.3),
-                mobStep = 0.04, retRange = NULL, gapFactor = 3, minEICIntensity = 5000, minEICAdjTime = 5,
-                minEICAdjPoints = 5, minEICAdjIntensity = 250, topMostEICMZ = 10000,
+                mobStep = 0.04, retRange = NULL, gapFactor = 3, sumEIMs = 1, smoothWindow = 0, minEICIntensity = 5000,
+                minEICAdjTime = 5, minEICAdjPoints = 5, minEICAdjIntensity = 250, topMostEICMZ = 10000,
                 topMostEICMZMob = 10000, minEICsIMSPreCheck = 50000)
     
     if (methodMZ == "suspects")

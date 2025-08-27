@@ -61,48 +61,31 @@ template <typename IT> std::vector<size_t> getSortedInds(const IT &start, const 
     return ret;
 }
 
-template <typename T> std::vector<T> movingAverage(const std::vector<T> &data, int window)
+template <typename T> std::vector<T> movingAverage(const std::vector<T> &data, unsigned window)
 {
-    if (data.size() < window || window <= 0)
+    if (data.size() < window)
+        window = data.size();
+    if (window % 2 == 0)
+        --window; // make window size odd
+    if (window < 3)
         return data;
     
+    const unsigned flank = (window - 1) / 2;
     std::vector<T> ret(data.size());
-    /*
-    T sum = 0.0L;
-    for (size_t i=0; i<ret.size(); ++i) {
-        sum += data[i];
-        if (i >= window)
-            sum -= (data[i - window]);
-        if (i + 1 >= window)
-            ret[i] = sum / window;
-    }*/
-    
-    const size_t halfWindowSize = window / 2;
     
     // Process each element
-    for (size_t i = 0; i < data.size(); ++i) {
+    for (size_t i=0; i<data.size(); ++i)
+    {
         // Determine the range of elements to average
-        const size_t start = (i >= halfWindowSize) ? i - halfWindowSize : 0;
-        const size_t end = (i + halfWindowSize < data.size()) ? i + halfWindowSize : data.size() - 1;
+        const size_t start = (i >= flank) ? i - flank : 0;
+        const size_t end = ((i + flank) < data.size()) ? i + flank : data.size() - 1;
         
-        // Calculate the sum of elements in the window
         T sum = T{};
-        for (size_t j = start; j <= end; ++j) {
+        for (size_t j=start; j<=end; ++j)
             sum += data[j];
-        }
         
-        // Store the average
         ret[i] = sum / static_cast<T>(end - start + 1);
     }
-    
-    // for (size_t i=0; i<=(data.size()-window); ++i)
-    // {
-    //     // Calculate the sum of the current window
-    //     T windowSum = 0.0;
-    //     for (int j=0; j<window; ++j)
-    //         windowSum += data[i + j];
-    //     ret.push_back(windowSum / window);
-    // }
     
     return ret;
 }

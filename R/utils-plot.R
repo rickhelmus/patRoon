@@ -495,13 +495,13 @@ makeMSPlot <- function(plotData, mincex, xlim, ylim, ylab = "Intensity", ..., mo
         }
     }
 
-    ticks <- pretty(c(-plotData$intensity, plotData$intensity))
     
     plot(0, xlab = "m/z", ylab = ylab, xlim = xlim, ylim = ylim, yaxt = "n", type = "n", bty = "l", ...)
     
     segments(plotData[["mz"]], 0, plotData[["mz"]], plotData[["intensity"]], col = plotData[["colour"]],
              lwd = plotData[["lwd"]])
 
+    ticks <- pretty(ylim)
     axis(2, at = ticks, labels = abs(ticks))
     
     if (min(plotData$intensity) < 0) # add horizontal line for mirror plots

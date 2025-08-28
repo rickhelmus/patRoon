@@ -81,8 +81,8 @@ setMethod("filter", "formulasSet", doFeatAnnFilterSets)
 #' @export
 setMethod("plotSpectrum", "formulasSet", function(obj, index, groupName, analysis = NULL, MSPeakLists,
                                                   title = NULL, normalized = "multiple", specSimParams = getDefSpecSimParams(),
-                                                  mincex = 0.9, xlim = NULL, ylim = NULL, perSet = TRUE,
-                                                  mirror = TRUE, ...)
+                                                  mincex = 0.9, xlim = NULL, ylim = NULL, showLegend = TRUE,
+                                                  perSet = TRUE, mirror = TRUE, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertIntegerish(index, lower = 1, min.len = 1, max.len = 2, any.missing = FALSE, add = ac)
@@ -98,12 +98,12 @@ setMethod("plotSpectrum", "formulasSet", function(obj, index, groupName, analysi
     assertPlotSpecNorm(normalized, add = ac)
     checkmate::assertNumber(mincex, lower = 0, finite = TRUE, add = ac)
     assertXYLim(xlim, ylim, add = ac)
-    aapply(checkmate::assertFlag, . ~ perSet + mirror, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ perSet + mirror + showLegend, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
     if (!perSet || length(sets(obj)) == 1 || !is.null(analysis))
         return(callNextMethod(obj, index, groupName, analysis, MSPeakLists, title, normalized = normalized,
-                              specSimParams = specSimParams, mincex, xlim, ylim, ...))
+                              specSimParams = specSimParams, mincex, xlim, ylim, showLegend = showLegend, ...))
     
     if (length(groupName) == 1)
     {
@@ -126,7 +126,7 @@ setMethod("plotSpectrum", "formulasSet", function(obj, index, groupName, analysi
         })
         
         plotData <- getMSPlotDataOverlay(specs, mirror, !isFALSE(normalized), 1, NULL)
-        return(makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, !isFALSE(normalized), ...))
+        return(makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, !isFALSE(normalized), showLegend = showLegend, ...))
     }
     else
     {
@@ -187,7 +187,7 @@ setMethod("plotSpectrum", "formulasSet", function(obj, index, groupName, analysi
         specs <- split(allSpectra, by = "which")
         plotData <- getMSPlotDataOverlay(specs, mirror, FALSE, 2, "overlap")
         
-        makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, !isFALSE(normalized), ...)
+        makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, !isFALSE(normalized), showLegend = showLegend, ...)
     }
 })
 

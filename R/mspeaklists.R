@@ -674,7 +674,7 @@ setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity 
 #' @export
 setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NULL, MSLevel = 1, title = NULL,
                                                   normalized = "multiple", specSimParams = getDefSpecSimParams(),
-                                                  xlim = NULL, ylim = NULL, ...)
+                                                  xlim = NULL, ylim = NULL, showLegend = TRUE, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCharacter(groupName, min.len = 1, max.len = 2, min.chars = 1, add = ac)
@@ -686,6 +686,7 @@ setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NUL
     assertPlotSpecNorm(normalized, add = ac)
     assertSpecSimParams(specSimParams, add = ac)
     assertXYLim(xlim, ylim, add = ac)
+    checkmate::assertFlag(showLegend, add = ac)
     checkmate::reportAssertions(ac)
 
     if (length(obj) == 0)
@@ -701,7 +702,7 @@ setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NUL
         if (is.null(spec))
             return(NULL)
         
-        makeMSPlot(getMSPlotData(spec, 2, isTRUE(normalized)), 1, xlim, ylim, main = title, ...)
+        makeMSPlot(getMSPlotData(spec, 2, isTRUE(normalized)), 1, xlim, ylim, main = title, showLegend = showLegend, ...)
     }
     else
     {
@@ -715,7 +716,7 @@ setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NUL
         binnedPLs <- getBinnedPLPair(obj, groupName, analysis, MSLevel, specSimParams, "unique", mustExist = TRUE,
                                      normalizedIntensities = !isFALSE(normalized))
         plotData <- getMSPlotDataOverlay(binnedPLs, TRUE, FALSE, 2, "overlap")
-        makeMSPlotOverlay(plotData, title, 1, xlim, ylim, !isFALSE(normalized), ...)
+        makeMSPlotOverlay(plotData, title, 1, xlim, ylim, !isFALSE(normalized), showLegend = showLegend, ...)
     }
 })
 

@@ -205,7 +205,7 @@
 - misc
     - genLimitsFile() and verify that it overrides
     - generateAnalysisInfo()?
-    - plotSpectrum() methods: normalization
+    - plotSpectrum() methods: normalization and showLegend
 - newProject()
     - see where testing is slow, possibly disable testServer() on CI?
     - add snapshots
@@ -219,7 +219,7 @@
 - move all plotBPC(), getEIC() etc methods into one doc file?
 - update relativeTo arg (not just replicates)
 - mention that mzR backend caches as loads all at once
-- normalized arg for plotSpectrum()
+- normalized and showLegend args for plotSpectrum() methods
 - convert
     - add patRoon 3.0 citation for im_collapse
 - handbook
@@ -423,6 +423,8 @@
     - added `table` import (importFeaturesTable() and importFeatureGroupsTable())
 - overWrite --> overwrite for consistency, applies to predictCheckFeaturesSession() and file conversion (clearly doc in NEWS)
 - plotChroms3D()
+- plotSpectrum() methods: normalization and showLegend
+
 
 ## Features
 

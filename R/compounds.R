@@ -489,7 +489,7 @@ setMethod("annotatedPeakList", "compounds", function(obj, index, groupName, MSPe
 #' @export
 setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLists, formulas = NULL,
                                                 plotStruct = FALSE, title = NULL, normalized = "multiple", specSimParams = getDefSpecSimParams(),
-                                                mincex = 0.9, xlim = NULL, ylim = NULL,
+                                                mincex = 0.9, xlim = NULL, ylim = NULL, showLegend = TRUE,
                                                 maxMolSize = c(0.2, 0.4), molRes = c(100, 100), ...)
 {
     ac <- checkmate::makeAssertCollection()
@@ -505,8 +505,9 @@ setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLis
     assertXYLim(xlim, ylim, add = ac)
     aapply(checkmate::assertNumeric, . ~ maxMolSize + molRes, finite = TRUE, len = 2, fixed = list(add = ac))
     assertPlotSpecNorm(normalized, add = ac)
+    checkmate::assertFlag(showLegend, add = ac)
     checkmate::reportAssertions(ac)
-
+    
     if (length(groupName) == 1)
     {
         spec <- annotatedPeakList(obj, index, groupName, MSPeakLists, formulas)
@@ -528,8 +529,8 @@ setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLis
         if (is.null(title))
             title <- getCompoundsSpecPlotTitle(compr$compoundName, compr$neutral_formula)
         
-        makeMSPlot(getMSPlotData(spec, 2, isTRUE(normalized)), mincex, xlim, ylim, main = title, ..., mol = mol,
-                   maxMolSize = maxMolSize, molRes = molRes)
+        makeMSPlot(getMSPlotData(spec, 2, isTRUE(normalized)), mincex, xlim, ylim, main = title,
+                   showLegend = showLegend, ..., mol = mol, maxMolSize = maxMolSize, molRes = molRes)
     }
     else
     {
@@ -561,7 +562,7 @@ setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLis
         bottomSpec <- mergeBinnedAndAnnPL(binnedPLs[[2]], annotatedPeakList(obj, index[2], groupName[2], MSPeakLists,
                                                                             formulas), 2)
         plotData <- getMSPlotDataOverlay(list(topSpec, bottomSpec), TRUE, FALSE, 2, "overlap")
-        makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, !isFALSE(normalized), ...)
+        makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, !isFALSE(normalized), showLegend = showLegend, ...)
     }
 })
 

@@ -76,8 +76,9 @@ setMethod("filter", "compoundsSet", doFeatAnnFilterSets)
 setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeakLists, formulas = NULL,
                                                    plotStruct = FALSE, title = NULL, normalized = "multiple",
                                                    specSimParams = getDefSpecSimParams(),
-                                                   mincex = 0.9, xlim = NULL, ylim = NULL, maxMolSize = c(0.2, 0.4),
-                                                   molRes = c(100, 100), perSet = TRUE, mirror = TRUE, ...)
+                                                   mincex = 0.9, xlim = NULL, ylim = NULL, showLegend = TRUE,
+                                                   maxMolSize = c(0.2, 0.4), molRes = c(100, 100), perSet = TRUE,
+                                                   mirror = TRUE, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertIntegerish(index, lower = 1, min.len = 1, max.len = 2, any.missing = FALSE, add = ac)
@@ -89,7 +90,7 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
     assertSpecSimParams(specSimParams, add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakListsSet", add = ac)
     checkmate::assertClass(formulas, "formulasSet", null.ok = TRUE, add = ac)
-    aapply(checkmate::assertFlag, . ~ plotStruct +  perSet + mirror, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ plotStruct +  perSet + mirror + showLegend, fixed = list(add = ac))
     checkmate::assertNumber(mincex, lower = 0, finite = TRUE, add = ac)
     assertXYLim(xlim, ylim, add = ac)
     aapply(checkmate::assertNumeric, . ~ maxMolSize + molRes, finite = TRUE, len = 2, fixed = list(add = ac))
@@ -97,7 +98,7 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
     
     if (!perSet || length(sets(obj)) == 1)
         return(callNextMethod(obj, index, groupName, MSPeakLists, formulas, plotStruct, title, normalized, specSimParams,
-                              mincex, xlim, ylim, maxMolSize, molRes, ...))
+                              mincex, xlim, ylim, showLegend = showLegend, maxMolSize, molRes, ...))
 
     if (length(groupName) == 1)
     {
@@ -129,7 +130,7 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
         })
         
         plotData <- getMSPlotDataOverlay(specs, mirror, !isFALSE(normalized), 1, NULL)
-        return(makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, !isFALSE(normalized), ...,  mol = mol,
+        return(makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, !isFALSE(normalized), showLegend = showLegend, ...,  mol = mol,
                                  maxMolSize = maxMolSize, molRes = molRes))
     }
     else
@@ -193,7 +194,7 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
         specs <- split(allSpectra, by = "which")
         plotData <- getMSPlotDataOverlay(specs, mirror, FALSE, 2, "overlap")
         
-        makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, !isFALSE(normalized), ...)
+        makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, !isFALSE(normalized), showLegend = showLegend, ...)
     }
 })
 

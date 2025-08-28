@@ -296,7 +296,7 @@ setMethod("annotatedPeakList", "formulas", function(obj, index, groupName, analy
 #' @export
 setMethod("plotSpectrum", "formulas", function(obj, index, groupName, analysis = NULL, MSPeakLists,
                                                title = NULL, normalized = "multiple", specSimParams = getDefSpecSimParams(),
-                                               mincex = 0.9, xlim = NULL, ylim = NULL, ...)
+                                               mincex = 0.9, xlim = NULL, ylim = NULL, showLegend = TRUE, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertIntegerish(index, lower = 1, min.len = 1, max.len = 2, any.missing = FALSE, add = ac)
@@ -312,6 +312,7 @@ setMethod("plotSpectrum", "formulas", function(obj, index, groupName, analysis =
     assertPlotSpecNorm(normalized, add = ac)
     checkmate::assertNumber(mincex, lower = 0, finite = TRUE, add = ac)
     assertXYLim(xlim, ylim, add = ac)
+    checkmate::assertFlag(showLegend, add = ac)
     checkmate::reportAssertions(ac)
     
     if (length(groupName) == 1)
@@ -326,7 +327,7 @@ setMethod("plotSpectrum", "formulas", function(obj, index, groupName, analysis =
         if (is.null(title))
             title <- subscriptFormula(obj[[groupName]]$neutral_formula[index])
         
-        makeMSPlot(getMSPlotData(spec, 2, isTRUE(normalized)), mincex, xlim, ylim, ..., main = title)
+        makeMSPlot(getMSPlotData(spec, 2, isTRUE(normalized)), mincex, xlim, ylim, main = title, showLegend = showLegend, ...)
     }
     else
     {
@@ -352,7 +353,7 @@ setMethod("plotSpectrum", "formulas", function(obj, index, groupName, analysis =
         bottomSpec <- mergeBinnedAndAnnPL(binnedPLs[[2]], annotatedPeakList(obj, index[2], groupName[2],
                                                                             analysis[2], MSPeakLists), 2)
         plotData <- getMSPlotDataOverlay(list(topSpec, bottomSpec), TRUE, FALSE, 2, "overlap")
-        makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, !isFALSE(normalized), ...)
+        makeMSPlotOverlay(plotData, title, mincex, xlim, ylim, !isFALSE(normalized), showLegend = showLegend, ...)
     }
 })
 

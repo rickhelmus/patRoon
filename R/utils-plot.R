@@ -436,7 +436,7 @@ makeScoresPlot <- function(scoreTable, mcn)
 }
 
 # spec may be annotated
-makeMSPlot <- function(plotData, mincex, xlim, ylim, ylab = "Intensity", ..., mol = NULL, maxMolSize, molRes)
+makeMSPlot <- function(plotData, mincex, xlim, ylim, ylab = "Intensity", ..., showLegend = TRUE, mol = NULL, maxMolSize, molRes)
 {
     if (is.null(xlim))
         xlim <- range(plotData$mz) * c(0.9, 1.1)
@@ -447,7 +447,7 @@ makeMSPlot <- function(plotData, mincex, xlim, ylim, ylab = "Intensity", ..., mo
             return(noDataPlot())
     }
     
-    doLegend <- !is.null(plotData[["legend"]]) && any(!is.na(plotData[["legend"]]) & nzchar(plotData[["legend"]]))
+    doLegend <- showLegend && !is.null(plotData[["legend"]]) && any(!is.na(plotData[["legend"]]) & nzchar(plotData[["legend"]]))
     if (doLegend)
     {
         makeLegend <- function(x, y, ...)

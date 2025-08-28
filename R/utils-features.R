@@ -672,7 +672,7 @@ findPeaksInEICs <- function(EICs, peakParams, withMobility, calcStats, logPath, 
                 peaks[, c("mobmin", "mobmax") := numeric()]
             peaks[, mobility := numeric()]
             if (calcStats)
-                peaks[, mobilityBP := numeric()]
+                peaks[, c("mobilityBP", "mobilityMax", "mobilityBPMax") := numeric()]
         }
     }
     else if (calcStats)

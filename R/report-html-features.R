@@ -381,7 +381,7 @@ reportHTMLUtils$methods(
                 3
             else
                 2
-            set(tab, j = col, value = rnd)
+            set(tab, j = col, value = round(tab[[col]], rnd))
         }
         
         anaInfo <- analysisInfo(objects$fGroups)

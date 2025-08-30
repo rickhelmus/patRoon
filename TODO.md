@@ -206,6 +206,7 @@
     - genLimitsFile() and verify that it overrides
     - generateAnalysisInfo()?
     - plotSpectrum() methods: normalization and showLegend
+    - updateGroups()
 - newProject()
     - see where testing is slow, possibly disable testServer() on CI?
     - add snapshots
@@ -229,6 +230,7 @@
     - workflow gen
         - intro
             - update convertMSFiles() in table
+        - updateGroups()?
         - annotation
             - update MSPL section
                 - add back precursorMzWindow if we re-add it
@@ -425,6 +427,7 @@
 - overWrite --> overwrite for consistency, applies to predictCheckFeaturesSession() and file conversion (clearly doc in NEWS)
 - plotChroms3D()
 - plotSpectrum() methods: normalization and showLegend
+- updateGroups()
 
 
 ## Features

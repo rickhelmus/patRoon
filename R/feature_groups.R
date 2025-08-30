@@ -1571,6 +1571,42 @@ setMethod("getBPCs", "featureGroups", function(obj, retentionRange = NULL, MSLev
     getBPCs(obj@features, retentionRange, MSLevel)
 })
 
+#' @describeIn featureGroups Recalculate group information from feature data.
+#' @param what A \code{character} vector specifying which group-wise values to update. Valid values are \code{"ret"}
+#'   (retention time, in seconds), \code{"mz"} and \code{"mobility"}. At least one must be specified. If
+#'   \code{"mobility"} is specified an no IMS information is present, it will be ignored.
+#' @param intWeight If \code{TRUE}, calculate intensity-weighted means per group; otherwise use simple arithmetic means.
+#'
+#' @export
+setMethod("updateGroups", "featureGroups", function(fGroups, what = c("ret", "mz", "mobility"), intWeight = FALSE)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertSubset(what, empty.ok = FALSE, choices = c("ret", "mz", "mobility"), add = ac)
+    checkmate::assertFlag(intWeight, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (length(fGroups) == 0)
+        return(fGroups)
+    
+    gInfo <- copy(groupInfo(fGroups))
+    
+    tab <- as.data.table(fGroups, features = TRUE)
+    for (col in what)
+    {
+        if (col == "mobility" && !hasMobilities(fGroups))
+            next
+        gVal <- if (intWeight)
+            tab[, weighted.mean(get(col), intensity), by = group]
+        else
+            tab[, mean(get(col)), by = group]
+        gInfo[match(gVal$group, group), (col) := gVal[["V1"]]]
+    }
+
+    fGroups@groupInfo <- gInfo
+    
+    return(fGroups)
+})
+
 #' Grouping of features
 #'
 #' Group equal features across analyses.

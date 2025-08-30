@@ -86,10 +86,20 @@ setGeneric("internalStandardAssignments", function(fGroups, ...) standardGeneric
 setGeneric("normInts", function(fGroups, featNorm = "none", groupNorm = FALSE, normFunc = max, standards = NULL,
                                 ISTDRTWindow = 120, ISTDMZWindow = 300, minISTDs = 3, ...) standardGeneric("normInts"))
 
+#' @rdname featureGroups-class
 setGeneric("concentrations", function(fGroups, ...) standardGeneric("concentrations"))
+
+#' @rdname featureGroups-class
 setGeneric("calculateConcs", function(fGroups, ...) standardGeneric("calculateConcs"))
+
+#' @rdname featureGroups-class
 setGeneric("toxicities", function(fGroups, ...) standardGeneric("toxicities"))
+
+#' @rdname featureGroups-class
 setGeneric("calculateTox", function(fGroups, ...) standardGeneric("calculateTox"))
+
+#' @rdname featureGroups-class
+setGeneric("updateGroups", function(fGroups, ...) standardGeneric("updateGroups"))
 
 #' @rdname feature-plotting
 setGeneric("plotMobilograms", function(obj, ...) standardGeneric("plotMobilograms"))

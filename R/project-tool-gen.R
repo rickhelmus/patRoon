@@ -493,6 +493,14 @@ genScriptFeaturesBlock <- function(ionization, IMS, settingsFeat, generator)
         list(name = "mzRange", value = mzRange)
     ))
     
+    generator$addNL()
+    generator$addComment("Update group centroids")
+    generator$addCall("fGroups", "updateGroups", list(
+        list(value = "fGroups"),
+        list(name = "what", value = c("ret", "mz", "mobility"), quote = TRUE),
+        list(name = "intWeight", value = FALSE)
+    ))
+    
     # NOTE: for direct we only want to add CCS calculations, for post there is also the mobility assignment, which can
     # be done better later
     if (IMS$mode == "direct" && IMS$CCSMethod != "none")

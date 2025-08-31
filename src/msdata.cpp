@@ -993,8 +993,6 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         if (eic.empty())
             return;
         
-        // retrospectively fill in mobility info
-        // get current center index --> should truncate and sum counts are odd
         const auto scanTime = specMeta.first.times[scanInd];
         
         for (size_t i=eic.size()-1; ; --i)
@@ -1017,7 +1015,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                     }
                     /*ofsSmooth << scanInd << "," << scanTime << "," << eic.mzs[i]
                               << "," << EIM.intensities[j] << "," << EIM.mobilities[j]
-                              << "," << EIMRun.size() + 1<< "\n";*/
+                              << "," << EIMRun.size() << "," << EIMRun.sizeNoZero() << "\n";*/
                 }
                 
                 if (totInten > 0)
@@ -1155,9 +1153,9 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         std::vector<SpectrumRawTypes::Intensity> curPointInts;
         
         /*std::ofstream ofsRaw(std::string("eic-raw-") + std::to_string(i) + ".csv");
-        ofsRaw << "scan,time,mz,intensity,mobility\n";
-        std::ofstream ofsSmooth(std::string("eic-smooth-") + std::to_string(i) + ".csv");
-        ofsSmooth << "scan,time,mz,intensity,mobility,summed\n";*/
+        ofsRaw << "scan,time,mz,intensity,mobility\n";*/
+        /*std::ofstream ofsSmooth(std::string("eic-smooth-") + std::to_string(i) + ".csv");
+        ofsSmooth << "scan,time,mz,intensity,mobility,summed,summedNo0\n";*/
         bool init = true;
         for (size_t j=0; ; ++j)
         {

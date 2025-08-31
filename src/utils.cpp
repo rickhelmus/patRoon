@@ -154,7 +154,7 @@ double calcCenterOfMass(const Rcpp::NumericVector &x, const Rcpp::NumericVector 
 }
 
 // [[Rcpp::export]]
-std::vector<double> testMovingAverage(const std::vector<double> &data, int window)
+Rcpp::NumericVector doMovingAverage(const Rcpp::NumericVector &data, int window)
 {
     return movingAverage(data, window);
 }

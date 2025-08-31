@@ -225,8 +225,8 @@ calcCenterOfMass <- function(x, y) {
     .Call(`_patRoon_calcCenterOfMass`, x, y)
 }
 
-testMovingAverage <- function(data, window) {
-    .Call(`_patRoon_testMovingAverage`, data, window)
+doMovingAverage <- function(data, window) {
+    .Call(`_patRoon_doMovingAverage`, data, window)
 }
 
 # Register entry points for exported C++ functions

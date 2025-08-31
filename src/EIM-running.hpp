@@ -85,8 +85,18 @@ public:
             EIMs.pop_front();
     }
     
-    size_t size(void) const { return EIMs.size(); }
     bool empty(void) const { return EIMs.empty(); }
+    size_t size(void) const { return EIMs.size(); }
+    size_t sizeNoZero(void) const
+    {
+        size_t count = 0;
+        for (const auto& eim : EIMs)
+        {
+            if (!eim.mobilities.empty())
+                ++count;
+        }
+        return count;
+    }
 };
 
 #endif // PATROON_EIM_RUNNING_H

@@ -933,15 +933,15 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// testMovingAverage
-std::vector<double> testMovingAverage(const std::vector<double>& data, int window);
-RcppExport SEXP _patRoon_testMovingAverage(SEXP dataSEXP, SEXP windowSEXP) {
+// doMovingAverage
+Rcpp::NumericVector doMovingAverage(const Rcpp::NumericVector& data, int window);
+RcppExport SEXP _patRoon_doMovingAverage(SEXP dataSEXP, SEXP windowSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const std::vector<double>& >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type data(dataSEXP);
     Rcpp::traits::input_parameter< int >::type window(windowSEXP);
-    rcpp_result_gen = Rcpp::wrap(testMovingAverage(data, window));
+    rcpp_result_gen = Rcpp::wrap(doMovingAverage(data, window));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -1025,7 +1025,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_getOMPMaxNumThreads", (DL_FUNC) &_patRoon_getOMPMaxNumThreads, 0},
     {"_patRoon_setOMPNumThreads", (DL_FUNC) &_patRoon_setOMPNumThreads, 1},
     {"_patRoon_calcCenterOfMass", (DL_FUNC) &_patRoon_calcCenterOfMass, 2},
-    {"_patRoon_testMovingAverage", (DL_FUNC) &_patRoon_testMovingAverage, 2},
+    {"_patRoon_doMovingAverage", (DL_FUNC) &_patRoon_doMovingAverage, 2},
     {"_rcpp_module_boot_MSReadBackend", (DL_FUNC) &_rcpp_module_boot_MSReadBackend, 0},
     {"_patRoon_RcppExport_registerCCallable", (DL_FUNC) &_patRoon_RcppExport_registerCCallable, 0},
     {NULL, NULL, 0}

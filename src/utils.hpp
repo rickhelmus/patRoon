@@ -61,8 +61,10 @@ template <typename IT> std::vector<size_t> getSortedInds(const IT &start, const 
     return ret;
 }
 
-template <typename T> std::vector<T> movingAverage(const std::vector<T> &data, unsigned window)
+template <typename C> C movingAverage(const C &data, unsigned window)
 {
+    using T = typename std::remove_reference<typename C::value_type>::type;
+    
     if (data.size() < window)
         window = data.size();
     if (window % 2 == 0)
@@ -71,7 +73,7 @@ template <typename T> std::vector<T> movingAverage(const std::vector<T> &data, u
         return data;
     
     const unsigned flank = (window - 1) / 2;
-    std::vector<T> ret(data.size());
+    C ret(data.size());
     
     // Process each element
     for (size_t i=0; i<data.size(); ++i)

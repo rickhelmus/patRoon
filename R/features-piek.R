@@ -434,14 +434,14 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
             {
                 peaks[, binMobStart := EICInfo[match(peaks$EIC_ID, EIC_ID)]$mobmin]
                 peaks <- peaks[between(mobilityBP, binMobStart + genEICParams$mobStep/4, binMobStart + genEICParams$mobStep/4*3) == TRUE]
-                if (mobAssignMethod == "max")
+                if (mobAssignAggr == "max")
                 {
                     if (mobAssignMethod == "basepeak")
                         peaks[, mobility := mobilityBPMax]
                     else
                         peaks[, mobility := mobilityMax]
                 }
-                else # mobAssignMethod == "weighted.mean"
+                else # mobAssignAggr == "weighted.mean"
                 {
                     if (mobAssignMethod == "basepeak")
                         peaks[, mobility := mobilityBP]

@@ -239,14 +239,14 @@ doGetEICs <- function(anaInfo, EICInfoList, gapFactor, mzExpIMSWindow = 0, minIn
     return(allEICs)
 }
 
-doGetEIMs <- function(anaInfo, EIMInfoList, minIntensity, sgOrder, sgLength, mzExpIMSWindow = 0, compress = TRUE,
+doGetEIMs <- function(anaInfo, EIMInfoList, minIntensity, smooth, smLength, sgOrder, mzExpIMSWindow = 0, compress = TRUE,
                       cacheDB = NULL)
 {
     if (length(EIMInfoList) == 0)
         return(list())
     
     anaInfo <- anaInfo[analysis %in% names(EIMInfoList)]
-    doSmooth <- sgOrder > 0 && sgLength > 0
+    doSmooth <- smooth != "none" && smLength > 0 && (sgOrder > 0 || smooth != "sg")
     
     anaHashes <- NULL
     if (is.null(cacheDB))
@@ -265,7 +265,7 @@ doGetEIMs <- function(anaInfo, EIMInfoList, minIntensity, sgOrder, sgLength, mzE
         }
         
         # NOTE: subset columns here, so any additional columns from e.g. feature tables are not considered
-        hashes <- EIMInfo[, makeHash(anaHashes[[ana]], minIntensity, sgOrder, sgLength, mzExpIMSWindow, compress, .SD),
+        hashes <- EIMInfo[, makeHash(anaHashes[[ana]], minIntensity, smooth, smLength, sgOrder, mzExpIMSWindow, compress, .SD),
                           by = seq_len(nrow(EIMInfo)), .SDcols = c("retmin", "retmax", "mzmin", "mzmax", "mobmin",
                                                                    "mobmax")][[2]]
         
@@ -295,11 +295,16 @@ doGetEIMs <- function(anaInfo, EIMInfoList, minIntensity, sgOrder, sgLength, mzE
             {
                 if (nrow(eim) > 0)
                 {
-                    if (nrow(eim) < sgLength)
+                    if (nrow(eim) < smLength)
                         warning(sprintf("Cannot smooth EIM because the number of points (%d) is less than the filter length (%d)",
-                                        nrow(eim), sgLength), call. = FALSE)
+                                        nrow(eim), smLength), call. = FALSE)
                     else
-                        eim[, "intensity"] <- signal::sgolayfilt(eim[, "intensity"], p = sgOrder, n = sgLength)
+                    {
+                        if (smooth == "ma")
+                            eim[, "intensity"] <- doMovingAverage(eim[, "intensity"], smLength)
+                        else # sg
+                            eim[, "intensity"] <- signal::sgolayfilt(eim[, "intensity"], p = sgOrder, n = smLength)
+                    }
                     if (compress)
                         eim <- compressEIM(eim[, "mobility"], eim[, "intensity"])
                 }

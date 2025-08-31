@@ -597,12 +597,13 @@ assertEIMParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
 {
     assertEIXParams(x, .var.name = .var.name, add = add)
     assertListVal(x, "maxRTWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
+    assertListVal(x, "smooth", checkmate::assertChoice, choices = c("none", "ma", "sg"), .var.name = .var.name, add = add)
+    assertListVal(x, "smLength", checkmate::assertCount, .var.name = .var.name, add = add)
     assertListVal(x, "sgOrder", checkmate::assertCount, .var.name = .var.name, add = add)
-    assertListVal(x, "sgLength", checkmate::assertCount, .var.name = .var.name, add = add)
-    if (x$sgLength != 0 && (x$sgLength %% 2) == 0)
-        stop("sgLength must be an odd number", call. = FALSE)
-    if (x$sgLength != 0 && x$sgLength < x$sgOrder)
-        stop("sgLength must be larger than sgOrder", call. = FALSE)
+    if (x$smLength != 0 && (x$smLength %% 2) == 0)
+        stop("smLength must be an odd number", call. = FALSE)
+    if (x$smooth == "sg" && x$smLength != 0 && x$smLength < x$sgOrder)
+        stop("smLength must be larger than sgOrder", call. = FALSE)
     invisible(NULL)
 }
 

@@ -608,7 +608,7 @@ getBGMSMSPeaks <- function(anaInfo, replicates = NULL, MSLevel = 2, retentionRan
 #'   \item \code{maxRTWindow} Maximum retention time window (seconds, +/- feature retention time) in which mobilograms
 #'   are collected and averaged. Defaults to \code{defaultLim("retention", "very_narrow")} (see \link{limits}).
 #'
-#'   \item \code{sgOrder},\code{sgLength} The order and length of the Savitzky-Golay filter that is applied to smooth
+#'   \item \code{sgOrder},\code{smLength} The order and length of the Savitzky-Golay filter that is applied to smooth
 #'   the EIM. Passed as the \code{p} and \code{n} arguments to the \code{\link[signal:sgolayfilt]{signal::sgolayfilt}}.
 #'   Set either to \code{0} to disable smoothing.
 #'
@@ -647,8 +647,9 @@ getDefEIMParams <- function(...)
     def <- modifyList(def, list(
         window = defaultLim("mobility", "wide"),
         maxRTWindow = defaultLim("retention", "very_narrow"),
-        sgOrder = 3,
-        sgLength = 15
+        smooth = "sg",
+        smLength = 15,
+        sgOrder = 3
     ))
     return(modifyList(def, list(...), keep.null = TRUE))
 }

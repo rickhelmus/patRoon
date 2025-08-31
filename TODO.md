@@ -279,6 +279,7 @@
     - note that fallbackEIC only works for EIM mob assignments and setting chromPeakParams is mandatory when fromSuspects=TRUE
     - assignMobilities() doesn't do clustering anymore but greedy grouping
         - maybe remove some fc refs?
+    - update for MA smoothing for EIMs
 
 ## NEWS
 

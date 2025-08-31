@@ -224,6 +224,7 @@ Collate:
     'deprecated.R'
     'utils-IPO.R'
     'doe-optimizer.R'
+    'eic_eim_gui.R'
     'feature_groups-ADT.R'
     'feature_groups-bruker.R'
     'feature_groups-comparison.R'

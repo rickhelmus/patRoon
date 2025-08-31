@@ -721,3 +721,5 @@ NULL
 #' @templateVar desc Prints information about this object.
 #' @template existing-generics
 NULL
+
+setGeneric("launchEICGUI", function(obj, ...) standardGeneric("launchEICGUI"))

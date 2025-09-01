@@ -55,304 +55,353 @@ setMethod("launchEICGUI", "featureGroupsScreening", function(obj)
 
 createEICGUI <- function(obj, analysisInfo, suspects = NULL)
 {
-    featureChoices <- NULL
-    suspectChoices <- NULL
-    if (is(obj, "features"))
-    {
-        ft <- featureTable(obj)[[analysisInfo$analysis[1]]]
-        featureChoices <- seq_len(nrow(ft))
-        names(featureChoices) <- sapply(seq_len(nrow(ft)), function(i) {
-            f <- ft[i, ]
-            label <- sprintf("%s (mz: %.5f, rt: %.2f", f$ID, f$mz, f$ret)
-            if ("mobility" %in% names(ft) && !is.na(f$mobility)) label <- paste(label, sprintf(", mob: %.3f)", f$mobility))
-            else label <- paste(label, ")")
-            label
-        })
-    }
-    else if (is(obj, "featureGroups"))
-    {
-        ft <- featureTable(obj)[[analysisInfo$analysis[1]]]
-        groups <- unique(ft$group)
-        featureChoices <- seq_along(groups)
-        names(featureChoices) <- sapply(seq_along(groups), function(i) {
-            g <- groups[i]
-            gf <- ft[group == g][1]  # Use first feature in group
-            label <- sprintf("%s (mz: %.5f, rt: %.2f", g, gf$mz, gf$ret)
-            if ("mobility" %in% names(gf) && !is.na(gf$mobility)) label <- paste(label, sprintf(", mob: %.3f)", gf$mobility))
-            else label <- paste(label, ")")
-            label
-        })
-    }
-    if (!is.null(suspects))
-    {
-        suspectChoices <- seq_len(nrow(suspects))
-        names(suspectChoices) <- sapply(seq_len(nrow(suspects)), function(i) {
-            s <- suspects[i, ]
-            label <- s$name
-            hasMZ <- "mz" %in% names(suspects) && !is.na(s$mz)
-            hasRT <- "rt" %in% names(suspects) && !is.na(s$rt)
-            hasMob <- "mobility" %in% names(suspects) && !is.na(s$mobility)
-            hasCCS <- "CCS" %in% names(suspects) && !is.na(s$CCS)
-            hasGroup <- is(obj, "featureGroupsScreening") && "group" %in% names(suspects) && !is.na(s$group)
-            if (hasMZ || hasRT || hasMob || hasCCS || hasGroup)
-            {
-                details <- c()
-                if (hasMZ) details <- c(details, sprintf("mz: %.5f", s$mz))
-                if (hasRT) details <- c(details, sprintf("rt: %.2f", s$rt))
-                if (hasMob) details <- c(details, sprintf("mob: %.3f", s$mobility))
-                if (hasCCS) details <- c(details, sprintf("CCS: %.1f", s$CCS))
-                if (hasGroup) details <- c(details, sprintf("group: %s", s$group))
-                label <- paste(label, sprintf("(%s)", paste(details, collapse = ", ")))
-            }
-            label
-        })
-    }
     
     ui <- shiny::fluidPage(
         shiny::titlePanel("EIC/EIM Viewer"),
         shiny::sidebarLayout(
-            shiny::sidebarPanel(
-                shiny::selectInput("analysis", "Analysis", choices = analysisInfo$analysis, selected = analysisInfo$analysis[1]),
-                if (!is.null(featureChoices))
-                    shiny::selectInput("feature", "Select Feature", choices = featureChoices),
-                if (!is.null(suspectChoices))
-                    shiny::selectInput("suspect", "Select Suspect", choices = suspectChoices),
-                shiny::radioButtons("mzMode", "MZ Specification", choices = c("Range", "Center +/- Window", "Neutral Mass +/- MZ Window", "Formula +/- MZ Window"), selected = if (is(obj, "features") || is(obj, "featureGroups")) "Center +/- Window" else "Range", inline = TRUE),
-                shiny::conditionalPanel(
-                    condition = "input.mzMode == 'Range'",
-                    shiny::fluidRow(
-                        shiny::column(6, shiny::numericInput("mzmin", "MZ Min", value = 100, min = 0)),
-                        shiny::column(6, shiny::numericInput("mzmax", "MZ Max", value = 200, min = 0))
+            shiny::sidebarPanel(width = 3,
+                shiny::tabsetPanel(
+                    shiny::tabPanel("MZ",
+                        shiny::selectInput("analysis", "Analysis", choices = analysisInfo$analysis, selected = analysisInfo$analysis[1]),
+                        shiny::radioButtons("mzMode", "MZ Specification", choices = c("Range", "Center +/- Window", "Neutral Mass +/- MZ Window", "Formula +/- MZ Window"), selected = if (is(obj, "features") || is(obj, "featureGroups")) "Center +/- Window" else "Range", inline = TRUE),
+                        shiny::conditionalPanel(
+                            condition = "input.mzMode == 'Range'",
+                            shiny::fluidRow(
+                                shiny::column(6, shiny::numericInput("mzmin", "MZ Min", value = 100, min = 0)),
+                                shiny::column(6, shiny::numericInput("mzmax", "MZ Max", value = 200, min = 0))
+                            )
+                        ),
+                        shiny::conditionalPanel(
+                            condition = "input.mzMode == 'Center +/- Window'",
+                            shiny::fluidRow(
+                                shiny::column(6, shiny::numericInput("mzcenter", "MZ Center", value = 150, min = 0)),
+                                shiny::column(6, shiny::numericInput("mzwindow", "MZ Window", value = 0.005, min = 0))
+                            )
+                        ),
+                        shiny::conditionalPanel(
+                            condition = "input.mzMode == 'Neutral Mass +/- MZ Window'",
+                            shiny::fluidRow(
+                                shiny::column(4, shiny::numericInput("neutralMass", "Neutral Mass", value = 100, min = 0)),
+                                shiny::column(4, shiny::selectInput("adductNM", "Adduct", choices = c("[M+H]+", "[M-H]-", "[M+Na]+", "[M+K]+", "[2M+H]+", "[2M-H]-", "[2M+Na]+", "[2M+K]+"))),
+                                shiny::column(4, shiny::numericInput("mzWindowNM", "MZ Window", value = 0.005, min = 0))
+                            )
+                        ),
+                        shiny::conditionalPanel(
+                            condition = "input.mzMode == 'Formula +/- MZ Window'",
+                            shiny::fluidRow(
+                                shiny::column(4, shiny::textInput("formula", "Formula", value = "C6H12O6")),
+                                shiny::column(4, shiny::selectInput("adductF", "Adduct", choices = c("[M+H]+", "[M-H]-", "[M+Na]+", "[M+K]+", "[2M+H]+", "[2M-H]-", "[2M+Na]+", "[2M+K]+"))),
+                                shiny::column(4, shiny::numericInput("mzWindowF", "MZ Window", value = 0.005, min = 0))
+                            )
+                        )
+                    ),
+                    shiny::tabPanel("RT",
+                        shiny::radioButtons("rtMode", "RT Specification", choices = c("Disabled", "Range", "Value +/- Window"), selected = if (is(obj, "features") || is(obj, "featureGroups")) "Value +/- Window" else "Disabled", inline = TRUE),
+                        shiny::conditionalPanel(
+                            condition = "input.rtMode == 'Range'",
+                            shiny::fluidRow(
+                                shiny::column(6, shiny::numericInput("retmin", "RT Min", value = 0, min = 0)),
+                                shiny::column(6, shiny::numericInput("retmax", "RT Max", value = 10, min = 0))
+                            )
+                        ),
+                        shiny::conditionalPanel(
+                            condition = "input.rtMode == 'Value +/- Window'",
+                            shiny::fluidRow(
+                                shiny::column(6, shiny::numericInput("retvalue", "RT Value", value = 5, min = 0)),
+                                shiny::column(6, shiny::numericInput("retwindow", "RT Window", value = 0.5, min = 0))
+                            )
+                        )
+                    ),
+                    shiny::tabPanel("Mobility",
+                        shiny::radioButtons("mobMode", "Mobility Specification", choices = c("Disabled", "Range", "Value +/- Window"), selected = if (is(obj, "features") || is(obj, "featureGroups")) "Value +/- Window" else "Disabled", inline = TRUE),
+                        shiny::conditionalPanel(
+                            condition = "input.mobMode == 'Range'",
+                            shiny::fluidRow(
+                                shiny::column(6, shiny::numericInput("mobmin", "Mobility Min", value = 0, min = 0, step = 0.01)),
+                                shiny::column(6, shiny::numericInput("mobmax", "Mobility Max", value = 1.3, min = 0, step = 0.01))
+                            )
+                        ),
+                        shiny::conditionalPanel(
+                            condition = "input.mobMode == 'Value +/- Window'",
+                            shiny::fluidRow(
+                                shiny::column(6, shiny::numericInput("mobvalue", "Mobility Value", value = 0.5, min = 0, step = 0.01)),
+                                shiny::column(6, shiny::numericInput("mobwindow", "Mobility Window", value = 0.1, min = 0, step = 0.01))
+                            )
+                        )
+                    ),
+                    shiny::tabPanel("EIM & Options",
+                        shiny::checkboxInput("plotEIM", "Also plot EIM", value = FALSE),
+                        shiny::conditionalPanel(
+                            condition = "input.plotEIM == true",
+                            shiny::selectInput("eimSmooth", "EIM Smoothing Method", choices = c("none", "ma", "sg"), selected = "none"),
+                            shiny::conditionalPanel(
+                                condition = "input.eimSmooth != 'none'",
+                                shiny::numericInput("sgLength", "Smoothing Length", value = 5, min = 3, step = 2)
+                            ),
+                            shiny::conditionalPanel(
+                                condition = "input.rtMode == 'Range'",
+                                shiny::fluidRow(
+                                    shiny::column(6, shiny::numericInput("eimRetmin", "EIM RT Min", value = 0, min = 0)),
+                                    shiny::column(6, shiny::numericInput("eimRetmax", "EIM RT Max", value = 10, min = 0))
+                                )
+                            ),
+                            shiny::conditionalPanel(
+                                condition = "input.rtMode == 'Value +/- Window'",
+                                shiny::fluidRow(
+                                    shiny::column(6, shiny::numericInput("eimRetvalue", "EIM RT Value", value = 5, min = 0)),
+                                    shiny::column(6, shiny::numericInput("eimRetwindow", "EIM RT Window", value = 0.5, min = 0))
+                                )
+                            )
+                        ),
+                        shiny::checkboxInput("autoGenerate", "Auto-generate plots on input change", value = TRUE),
+                        shiny::conditionalPanel(
+                            condition = "input.autoGenerate == false",
+                            shiny::actionButton("generate", "Generate plot(s)")
+                        )
                     )
-                ),
-                shiny::conditionalPanel(
-                    condition = "input.mzMode == 'Center +/- Window'",
-                    shiny::fluidRow(
-                        shiny::column(6, shiny::numericInput("mzcenter", "MZ Center", value = 150, min = 0)),
-                        shiny::column(6, shiny::numericInput("mzwindow", "MZ Window", value = 0.005, min = 0))
-                    )
-                ),
-                shiny::conditionalPanel(
-                    condition = "input.mzMode == 'Neutral Mass +/- MZ Window'",
-                    shiny::fluidRow(
-                        shiny::column(4, shiny::numericInput("neutralMass", "Neutral Mass", value = 100, min = 0)),
-                        shiny::column(4, shiny::selectInput("adductNM", "Adduct", choices = c("[M+H]+", "[M-H]-", "[M+Na]+", "[M+K]+", "[2M+H]+", "[2M-H]-", "[2M+Na]+", "[2M+K]+"))),
-                        shiny::column(4, shiny::numericInput("mzWindowNM", "MZ Window", value = 0.005, min = 0))
-                    )
-                ),
-                shiny::conditionalPanel(
-                    condition = "input.mzMode == 'Formula +/- MZ Window'",
-                    shiny::fluidRow(
-                        shiny::column(4, shiny::textInput("formula", "Formula", value = "C6H12O6")),
-                        shiny::column(4, shiny::selectInput("adductF", "Adduct", choices = c("[M+H]+", "[M-H]-", "[M+Na]+", "[M+K]+", "[2M+H]+", "[2M-H]-", "[2M+Na]+", "[2M+K]+"))),
-                        shiny::column(4, shiny::numericInput("mzWindowF", "MZ Window", value = 0.005, min = 0))
-                    )
-                ),
-                shiny::radioButtons("rtMode", "RT Specification", choices = c("Disabled", "Range", "Value +/- Window"), selected = if (is(obj, "features") || is(obj, "featureGroups")) "Value +/- Window" else "Disabled", inline = TRUE),
-                shiny::conditionalPanel(
-                    condition = "input.rtMode == 'Range'",
-                    shiny::fluidRow(
-                        shiny::column(6, shiny::numericInput("retmin", "RT Min", value = 0, min = 0)),
-                        shiny::column(6, shiny::numericInput("retmax", "RT Max", value = 10, min = 0))
-                    )
-                ),
-                shiny::conditionalPanel(
-                    condition = "input.rtMode == 'Value +/- Window'",
-                    shiny::fluidRow(
-                        shiny::column(6, shiny::numericInput("retvalue", "RT Value", value = 5, min = 0)),
-                        shiny::column(6, shiny::numericInput("retwindow", "RT Window", value = 0.5, min = 0))
-                    )
-                ),
-                shiny::radioButtons("mobMode", "Mobility Specification", choices = c("Disabled", "Range", "Value +/- Window"), selected = if (is(obj, "features") || is(obj, "featureGroups")) "Value +/- Window" else "Disabled", inline = TRUE),
-                shiny::conditionalPanel(
-                    condition = "input.mobMode == 'Range'",
-                    shiny::fluidRow(
-                        shiny::column(6, shiny::numericInput("mobmin", "Mobility Min", value = 0, min = 0, step = 0.01)),
-                        shiny::column(6, shiny::numericInput("mobmax", "Mobility Max", value = 1.3, min = 0, step = 0.01))
-                    )
-                ),
-                shiny::conditionalPanel(
-                    condition = "input.mobMode == 'Value +/- Window'",
-                    shiny::fluidRow(
-                        shiny::column(6, shiny::numericInput("mobvalue", "Mobility Value", value = 0.5, min = 0, step = 0.01)),
-                        shiny::column(6, shiny::numericInput("mobwindow", "Mobility Window", value = 0.1, min = 0, step = 0.01))
-                    )
-                ),
-                shiny::checkboxInput("plotEIM", "Also plot EIM", value = FALSE),
-                shiny::conditionalPanel(
-                    condition = "input.plotEIM == true",
-                    shiny::checkboxInput("enableEIMSmoothing", "Enable EIM Smoothing", value = FALSE),
-                    shiny::conditionalPanel(
-                        condition = "input.enableEIMSmoothing == true",
-                        shiny::numericInput("sgLength", "Smoothing Length", value = 5, min = 3, step = 2)
-                    )
-                ),
-                shiny::checkboxInput("autoGenerate", "Auto-generate plots on input change", value = TRUE),
-                shiny::conditionalPanel(
-                    condition = "input.autoGenerate == false",
-                    shiny::actionButton("generate", "Generate plot(s)")
                 )
             ),
             shiny::mainPanel(
-                shiny::plotOutput("eicPlot"),
-                shiny::conditionalPanel(
-                    condition = "input.plotEIM == true",
-                    shiny::plotOutput("eimPlot")
-                )
+                shiny::uiOutput("plotsUI"),
+                if (is(obj, "features") || is(obj, "featureGroups") || !is.null(suspects))
+                    shiny::tabsetPanel(
+                        if (is(obj, "features") || is(obj, "featureGroups"))
+                            shiny::tabPanel("Features", DT::dataTableOutput("featureTable")),
+                        if (!is.null(suspects))
+                            shiny::tabPanel("Suspects", DT::dataTableOutput("suspectTable"))
+                    )
             )
         )
     )
     
     server <- function(input, output, session)
     {
-        if (!is.null(featureChoices))
-        {
-            observeEvent(input$analysis, {
-                if (is(obj, "features"))
-                {
-                    ft <- featureTable(obj)[[input$analysis]]
-                    featureChoices <- seq_len(nrow(ft))
-                    names(featureChoices) <- sapply(seq_len(nrow(ft)), function(i) {
-                        f <- ft[i, ]
-                        label <- sprintf("%s (mz: %.5f, rt: %.2f", f$ID, f$mz, f$ret)
-                        if ("mobility" %in% names(ft) && !is.na(f$mobility)) label <- paste(label, sprintf(", mob: %.3f)", f$mobility))
-                        else label <- paste(label, ")")
-                        label
+        featureData <- shiny::reactive({
+            if (is(obj, "features"))
+            {
+                ft <- featureTable(obj)[[input$analysis]]
+                data.frame(
+                    ID = ft$ID,
+                    mz = round(ft$mz, 5),
+                    rt = round(ft$ret, 2),
+                    mobility = if ("mobility" %in% names(ft)) round(ft$mobility, 3) else NA,
+                    mzmin = round(ft$mzmin, 5),
+                    mzmax = round(ft$mzmax, 5),
+                    retmin = round(ft$retmin, 2),
+                    retmax = round(ft$retmax, 2),
+                    mobmin = if ("mobmin" %in% names(ft)) round(ft$mobmin, 3) else NA,
+                    mobmax = if ("mobmax" %in% names(ft)) round(ft$mobmax, 3) else NA
+                )
+            }
+            else if (is(obj, "featureGroups"))
+            {
+                ft <- featureTable(obj)[[input$analysis]]
+                groups <- unique(ft$group)
+                data.frame(
+                    Group = groups,
+                    mz = sapply(groups, function(g) round(ft[group == g][1]$mz, 5)),
+                    rt = sapply(groups, function(g) round(ft[group == g][1]$ret, 2)),
+                    mobility = sapply(groups, function(g) {
+                        mob <- ft[group == g][1]$mobility
+                        if (!is.na(mob)) round(mob, 3) else NA
+                    }),
+                    mzmin = sapply(groups, function(g) round(ft[group == g][1]$mzmin, 5)),
+                    mzmax = sapply(groups, function(g) round(ft[group == g][1]$mzmax, 5)),
+                    retmin = sapply(groups, function(g) round(ft[group == g][1]$retmin, 2)),
+                    retmax = sapply(groups, function(g) round(ft[group == g][1]$retmax, 2)),
+                    mobmin = sapply(groups, function(g) {
+                        mobmin <- ft[group == g][1]$mobmin
+                        if (!is.na(mobmin)) round(mobmin, 3) else NA
+                    }),
+                    mobmax = sapply(groups, function(g) {
+                        mobmax <- ft[group == g][1]$mobmax
+                        if (!is.na(mobmax)) round(mobmax, 3) else NA
                     })
-                    updateSelectInput(session, "feature", choices = featureChoices)
-                }
-                else if (is(obj, "featureGroups"))
-                {
-                    ft <- featureTable(obj)[[input$analysis]]
-                    groups <- unique(ft$group)
-                    featureChoices <- seq_along(groups)
-                    names(featureChoices) <- sapply(seq_along(groups), function(i) {
-                        g <- groups[i]
-                        gf <- ft[group == g][1]  # Use first feature in group
-                        label <- sprintf("%s (mz: %.5f, rt: %.2f", g, gf$mz, gf$ret)
-                        if ("mobility" %in% names(gf) && !is.na(gf$mobility)) label <- paste(label, sprintf(", mob: %.3f)", gf$mobility))
-                        else label <- paste(label, ")")
-                        label
-                    })
-                    updateSelectInput(session, "feature", choices = featureChoices)
-                }
-                # For featureGroups, no change needed
-            })
-            observeEvent(input$feature, {
-                if (is(obj, "features"))
-                {
-                    ft <- featureTable(obj)[[input$analysis]]
-                    feat <- ft[as.integer(input$feature)]
-                }
-                else if (is(obj, "featureGroups"))
-                {
-                    ft <- featureTable(obj)[[input$analysis]]
-                    feat <- ft[group == names(obj)[as.integer(input$feature)]][1]  # Use first feature in the group
-                }
-                if (nrow(feat) == 0)
-                    return()
-                # Update MZ
-                if (length(feat$mz) > 0 && !is.na(feat$mz))
-                {
-                    updateNumericInput(session, "mzcenter", value = round(feat$mz, 5))
-                    updateNumericInput(session, "mzwindow", value = round((feat$mzmax - feat$mzmin) / 2, 5))
-                    updateNumericInput(session, "mzmin", value = round(feat$mzmin, 5))
-                    updateNumericInput(session, "mzmax", value = round(feat$mzmax, 5))
-                }
-                # Update RT
-                if (length(feat$ret) > 0 && !is.na(feat$ret))
-                {
-                    updateNumericInput(session, "retvalue", value = round(feat$ret, 2))
-                    updateNumericInput(session, "retwindow", value = round((feat$retmax - feat$retmin) / 2, 2))
-                    updateNumericInput(session, "retmin", value = round(feat$retmin, 2))
-                    updateNumericInput(session, "retmax", value = round(feat$retmax, 2))
-                }
-                # Update Mobility
-                print(feat)
-                if (length(feat$mobility) > 0 && !is.na(feat$mobility) && length(feat$mobmin) > 0 && !is.na(feat$mobmin))
-                {
-                    updateNumericInput(session, "mobvalue", value = round(feat$mobility, 3))
-                    updateNumericInput(session, "mobwindow", value = round((feat$mobmax - feat$mobmin) / 2, 3))
-                    updateNumericInput(session, "mobmin", value = round(feat$mobmin, 3))
-                    updateNumericInput(session, "mobmax", value = round(feat$mobmax, 3))
-                }
-            })
-        }
-        if (!is.null(suspects))
-        {
-            observeEvent(input$suspect, {
-                susp <- suspects[as.integer(input$suspect)]
-                if (nrow(susp) == 0)
-                    return()
-                # For featureGroupsScreening, use the corresponding feature
-                if (is(obj, "featureGroupsScreening") && "group" %in% names(suspects) && !is.na(susp$group))
-                {
-                    ft <- featureTable(obj)[[input$analysis]]
-                    feat <- ft[group == susp$group][1]
-                    if (nrow(feat) > 0)
-                    {
-                        # Update from feature
-                        if (length(feat$mz) > 0 && !is.na(feat$mz))
-                        {
-                            updateNumericInput(session, "mzcenter", value = round(feat$mz, 5))
-                            updateNumericInput(session, "mzwindow", value = round((feat$mzmax - feat$mzmin) / 2, 5))
-                            updateNumericInput(session, "mzmin", value = round(feat$mzmin, 5))
-                            updateNumericInput(session, "mzmax", value = round(feat$mzmax, 5))
-                        }
-                        if (length(feat$ret) > 0 && !is.na(feat$ret))
-                        {
-                            updateNumericInput(session, "retvalue", value = round(feat$ret, 2))
-                            updateNumericInput(session, "retwindow", value = round((feat$retmax - feat$retmin) / 2, 2))
-                            updateNumericInput(session, "retmin", value = round(feat$retmin, 2))
-                            updateNumericInput(session, "retmax", value = round(feat$retmax, 2))
-                        }
-                        if (length(feat$mobility) > 0 && !is.na(feat$mobility) && length(feat$mobmin) > 0 && !is.na(feat$mobmin))
-                        {
-                            updateNumericInput(session, "mobvalue", value = round(feat$mobility, 3))
-                            updateNumericInput(session, "mobwindow", value = round((feat$mobmax - feat$mobmin) / 2, 3))
-                            updateNumericInput(session, "mobmin", value = round(feat$mobmin, 3))
-                            updateNumericInput(session, "mobmax", value = round(feat$mobmax, 3))
-                        }
-                    }
-                }
-                else
-                {
-                    # Update from suspect
-                    if (length(susp$mz) > 0 && !is.na(susp$mz))
-                    {
-                        updateNumericInput(session, "mzcenter", value = round(susp$mz, 5))
-                        updateNumericInput(session, "mzwindow", value = 0.005)
-                        updateNumericInput(session, "mzmin", value = round(susp$mz - 0.005, 5))
-                        updateNumericInput(session, "mzmax", value = round(susp$mz + 0.005, 5))
-                    }
-                    if (length(susp$rt) > 0 && !is.na(susp$rt))
-                    {
-                        updateNumericInput(session, "retvalue", value = round(susp$rt, 2))
-                        updateNumericInput(session, "retwindow", value = 0.5)
-                        updateNumericInput(session, "retmin", value = round(susp$rt - 0.5, 2))
-                        updateNumericInput(session, "retmax", value = round(susp$rt + 0.5, 2))
-                    }
-                    if (length(susp$mobility) > 0 && !is.na(susp$mobility))
-                    {
-                        updateNumericInput(session, "mobvalue", value = round(susp$mobility, 3))
-                        updateNumericInput(session, "mobwindow", value = 0.1)
-                        updateNumericInput(session, "mobmin", value = round(susp$mobility - 0.1, 3))
-                        updateNumericInput(session, "mobmax", value = round(susp$mobility + 0.1, 3))
-                    }
-                }
-                # Update Adduct and Formula from suspect
-                if (length(susp$adduct) > 0 && !is.na(susp$adduct))
-                {
-                    updateSelectInput(session, "adductNM", selected = susp$adduct)
-                    updateSelectInput(session, "adductF", selected = susp$adduct)
-                }
-                if (length(susp$formula) > 0 && !is.na(susp$formula))
-                {
-                    updateTextInput(session, "formula", value = susp$formula)
-                }
-            })
-        }
+                )
+            }
+            else
+                NULL
+        })
+
+        output$featureTable <- DT::renderDT({
+            req(featureData())
+            DT::datatable(featureData(), selection = 'single', options = list(pageLength = 10))
+        })
+
+        observeEvent(input$featureTable_rows_selected, {
+            req(featureData())
+            selected <- input$featureTable_rows_selected
+            if (length(selected) == 0) return()
+            feat <- featureData()[selected, ]
+            if (is(obj, "features"))
+            {
+                ft <- featureTable(obj)[[input$analysis]]
+                feat_full <- ft[ft$ID == feat$ID, ]
+            }
+            else if (is(obj, "featureGroups"))
+            {
+                ft <- featureTable(obj)[[input$analysis]]
+                feat_full <- ft[group == feat$Group][1]
+            }
+            if (nrow(feat_full) == 0) return()
+            # Update MZ
+            if (!is.na(feat_full$mz))
+            {
+                updateNumericInput(session, "mzcenter", value = round(feat_full$mz, 5))
+                updateNumericInput(session, "mzwindow", value = round((feat_full$mzmax - feat_full$mzmin) / 2, 5))
+                updateNumericInput(session, "mzmin", value = round(feat_full$mzmin, 5))
+                updateNumericInput(session, "mzmax", value = round(feat_full$mzmax, 5))
+            }
+            # Update RT
+            if (!is.na(feat_full$ret))
+            {
+                updateNumericInput(session, "retvalue", value = round(feat_full$ret, 2))
+                updateNumericInput(session, "retwindow", value = round((feat_full$retmax - feat_full$retmin) / 2, 2))
+                updateNumericInput(session, "retmin", value = round(feat_full$retmin, 2))
+                updateNumericInput(session, "retmax", value = round(feat_full$retmax, 2))
+                # Update EIM RT to match
+                updateNumericInput(session, "eimRetvalue", value = round(feat_full$ret, 2))
+                updateNumericInput(session, "eimRetwindow", value = round((feat_full$retmax - feat_full$retmin) / 2, 2))
+                updateNumericInput(session, "eimRetmin", value = round(feat_full$retmin, 2))
+                updateNumericInput(session, "eimRetmax", value = round(feat_full$retmax, 2))
+            }
+            # Update Mobility
+            if (!is.na(feat_full$mobility) && !is.na(feat_full$mobmin))
+            {
+                updateNumericInput(session, "mobvalue", value = round(feat_full$mobility, 3))
+                updateNumericInput(session, "mobwindow", value = round((feat_full$mobmax - feat_full$mobmin) / 2, 3))
+                updateNumericInput(session, "mobmin", value = round(feat_full$mobmin, 3))
+                updateNumericInput(session, "mobmax", value = round(feat_full$mobmax, 3))
+            }
+        })
+        # Sync EIM RT inputs with EIC RT inputs
+        observeEvent(c(input$retmin, input$retmax), {
+            updateNumericInput(session, "eimRetmin", value = input$retmin)
+            updateNumericInput(session, "eimRetmax", value = input$retmax)
+        })
         
+        observeEvent(c(input$retvalue, input$retwindow), {
+            updateNumericInput(session, "eimRetvalue", value = input$retvalue)
+            updateNumericInput(session, "eimRetwindow", value = input$retwindow)
+        })
+        
+        suspectData <- shiny::reactive({
+            if (!is.null(suspects))
+            {
+                data.frame(
+                    Name = suspects$name,
+                    mz = if ("mz" %in% names(suspects)) round(suspects$mz, 5) else NA,
+                    rt = if ("rt" %in% names(suspects)) round(suspects$rt, 2) else NA,
+                    mobility = if ("mobility" %in% names(suspects)) round(suspects$mobility, 3) else NA,
+                    adduct = if ("adduct" %in% names(suspects)) suspects$adduct else NA,
+                    formula = if ("formula" %in% names(suspects)) suspects$formula else NA,
+                    group = if ("group" %in% names(suspects)) suspects$group else NA
+                )
+            }
+            else
+                NULL
+        })
+
+        output$suspectTable <- DT::renderDT({
+            req(suspectData())
+            DT::datatable(suspectData(), selection = 'single', options = list(pageLength = 10))
+        })
+
+        observeEvent(input$suspectTable_rows_selected, {
+            req(suspectData())
+            selected <- input$suspectTable_rows_selected
+            if (length(selected) == 0) return()
+            susp <- suspects[selected, ]
+            if (nrow(susp) == 0) return()
+            # For featureGroupsScreening, use the corresponding feature
+            if (is(obj, "featureGroupsScreening") && "group" %in% names(suspects) && !is.na(susp$group))
+            {
+                ft <- featureTable(obj)[[input$analysis]]
+                feat <- ft[group == susp$group][1]
+                if (nrow(feat) > 0)
+                {
+                    # Update from feature
+                    if (!is.na(feat$mz))
+                    {
+                        updateNumericInput(session, "mzcenter", value = round(feat$mz, 5))
+                        updateNumericInput(session, "mzwindow", value = round((feat$mzmax - feat$mzmin) / 2, 5))
+                        updateNumericInput(session, "mzmin", value = round(feat$mzmin, 5))
+                        updateNumericInput(session, "mzmax", value = round(feat$mzmax, 5))
+                    }
+                    if (!is.na(feat$ret))
+                    {
+                        updateNumericInput(session, "retvalue", value = round(feat$ret, 2))
+                        updateNumericInput(session, "retwindow", value = round((feat$retmax - feat$retmin) / 2, 2))
+                        updateNumericInput(session, "retmin", value = round(feat$retmin, 2))
+                        updateNumericInput(session, "retmax", value = round(feat$retmax, 2))
+                        # Update EIM RT
+                        updateNumericInput(session, "eimRetvalue", value = round(feat$ret, 2))
+                        updateNumericInput(session, "eimRetwindow", value = round((feat$retmax - feat$retmin) / 2, 2))
+                        updateNumericInput(session, "eimRetmin", value = round(feat$retmin, 2))
+                        updateNumericInput(session, "eimRetmax", value = round(feat$retmax, 2))
+                    }
+                    if (!is.na(feat$mobility) && !is.na(feat$mobmin))
+                    {
+                        updateNumericInput(session, "mobvalue", value = round(feat$mobility, 3))
+                        updateNumericInput(session, "mobwindow", value = round((feat$mobmax - feat$mobmin) / 2, 3))
+                        updateNumericInput(session, "mobmin", value = round(feat$mobmin, 3))
+                        updateNumericInput(session, "mobmax", value = round(feat$mobmax, 3))
+                    }
+                }
+            }
+            else
+            {
+                # Update from suspect
+                if (!is.na(susp$mz))
+                {
+                    updateNumericInput(session, "mzcenter", value = round(susp$mz, 5))
+                    updateNumericInput(session, "mzwindow", value = 0.005)
+                    updateNumericInput(session, "mzmin", value = round(susp$mz - 0.005, 5))
+                    updateNumericInput(session, "mzmax", value = round(susp$mz + 0.005, 5))
+                }
+                if (!is.na(susp$rt))
+                {
+                    updateNumericInput(session, "retvalue", value = round(susp$rt, 2))
+                    updateNumericInput(session, "retwindow", value = 0.5)
+                    updateNumericInput(session, "retmin", value = round(susp$rt - 0.5, 2))
+                    updateNumericInput(session, "retmax", value = round(susp$rt + 0.5, 2))
+                    # Update EIM RT
+                    updateNumericInput(session, "eimRetvalue", value = round(susp$rt, 2))
+                    updateNumericInput(session, "eimRetwindow", value = 0.5)
+                    updateNumericInput(session, "eimRetmin", value = round(susp$rt - 0.5, 2))
+                    updateNumericInput(session, "eimRetmax", value = round(susp$rt + 0.5, 2))
+                }
+                if (!is.na(susp$mobility))
+                {
+                    updateNumericInput(session, "mobvalue", value = round(susp$mobility, 3))
+                    updateNumericInput(session, "mobwindow", value = 0.1)
+                    updateNumericInput(session, "mobmin", value = round(susp$mobility - 0.1, 3))
+                    updateNumericInput(session, "mobmax", value = round(susp$mobility + 0.1, 3))
+                }
+            }
+            # Update Adduct and Formula from suspect
+            if (!is.null(susp[["adduct"]]) && !is.na(susp$adduct))
+            {
+                updateSelectInput(session, "adductNM", selected = susp$adduct)
+                updateSelectInput(session, "adductF", selected = susp$adduct)
+            }
+            if (!is.na(susp$formula))
+            {
+                updateTextInput(session, "formula", value = susp$formula)
+            }
+        })
+
+        output$plotsUI <- shiny::renderUI({
+            if (input$plotEIM) {
+                shiny::fluidRow(
+                    shiny::column(6, shiny::plotOutput("eicPlot")),
+                    shiny::column(6, shiny::plotOutput("eimPlot"))
+                )
+            } else {
+                shiny::plotOutput("eicPlot")
+            }
+        })
+
         eicData <- shiny::reactive({
             req(input$mzMode, input$rtMode, input$mobMode, input$analysis)
             if (!input$autoGenerate)
@@ -489,16 +538,15 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
             eimInfo <- data.table::data.table(
                 mzmin = mzmin,
                 mzmax = mzmax,
-                retmin = if (input$rtMode == "Disabled") 0 else if (input$rtMode == "Range") input$retmin else input$retvalue - input$retwindow,
-                retmax = if (input$rtMode == "Disabled") 0 else if (input$rtMode == "Range") input$retmax else input$retvalue + input$retwindow,
+                retmin = if (input$rtMode == "Disabled") 0 else if (input$rtMode == "Range") input$eimRetmin else input$eimRetvalue - input$eimRetwindow,
+                retmax = if (input$rtMode == "Disabled") 0 else if (input$rtMode == "Range") input$eimRetmax else input$eimRetvalue + input$eimRetwindow,
                 mobmin = if (input$mobMode == "Disabled") 0 else if (input$mobMode == "Range") input$mobmin else input$mobvalue - input$mobwindow,
                 mobmax = if (input$mobMode == "Disabled") 0 else if (input$mobMode == "Range") input$mobmax else input$mobvalue + input$mobwindow
             )
             eimList <- list(eimInfo)
             names(eimList) <- input$analysis
-            sgLength <- if (input$enableEIMSmoothing) input$sgLength else 0
-            shiny::validate(shiny::need(!input$enableEIMSmoothing || (sgLength %% 2 == 1 && sgLength >= 3), "Smoothing length must be odd and >= 3"))
-            patRoon:::doGetEIMs(analysisInfo, eimList, minIntensity = 25, sgOrder = 3, sgLength = sgLength)
+            shiny::validate(shiny::need(input$eimSmooth == 'none' || (input$sgLength %% 2 == 1 && input$sgLength >= 3), "Smoothing length must be odd and >= 3"))
+            patRoon:::doGetEIMs(analysisInfo, eimList, minIntensity = 25, smooth = input$eimSmooth, sgOrder = 3, smLength = input$sgLength)
         })
         
         output$eicPlot <- shiny::renderPlot(

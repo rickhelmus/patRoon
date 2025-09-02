@@ -367,7 +367,7 @@ groupQualityFilter <- function(fGroups, qualityRanges, negate)
             return(tab[keep == TRUE]$group)
         }
         
-        ret <- character()
+        ret <- names(fGroups)
         if (length(qRanges) > 0)
             ret <- doF(fGroups, qRanges, groupQualities(fGroups))
         if (length(qRangesScore) > 0)

@@ -13,6 +13,7 @@
 * Changed cache for filtering of feature groups to reduce cache size (#98)
 * Updated PubChem Transformations to 0.2.0
 * Replaced the `featuresSets` method for `groupFeatures` with (updated) `featuresSets` algorithm specific `groupFeatures` methods (`groupFeaturesOpenMS` etc), so that the latter can be called directly in sets workflows (#128)
+* Fixed regression: `groupQualityRange` filter would always remove all feature groups (reported by Geert Franken)
 
 
 # patRoon 2.3.3

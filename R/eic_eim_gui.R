@@ -158,18 +158,24 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
                             condition = "input.autoGenerate == false",
                             shiny::actionButton("generate", "Generate plot(s)")
                         )
+                    ),
+                    shiny::tabPanel("Peaks",
+                        shiny::radioButtons("peakTarget", "Detect peaks in", choices = c("EIC", "EIM"), selected = "EIC", inline = TRUE),
+                        shiny::selectInput("peakAlgorithm", "Algorithm", choices = c("openms", "xcms3", "envipick", "piek"), selected = "piek"),
+                        shiny::selectInput("peakIMSType", "IMS Type", choices = c("bruker_ims", "agilent_ims"), selected = "bruker_ims"),
+                        shiny::selectInput("peakTrace", "Trace", choices = NULL),
+                        shiny::actionButton("editPeakParams", "Advanced peak params"),
+                        shiny::verbatimTextOutput("peakParamsSummary"),
+                        shiny::conditionalPanel(
+                            condition = "input.autoGenerate == false",
+                            shiny::actionButton("detectPeaks", "Detect peaks")
+                        )
                     )
                 )
             ),
             shiny::mainPanel(
                 shiny::uiOutput("plotsUI"),
-                if (is(obj, "features") || is(obj, "featureGroups") || !is.null(suspects))
-                    shiny::tabsetPanel(
-                        if (is(obj, "features") || is(obj, "featureGroups"))
-                            shiny::tabPanel("Features", DT::dataTableOutput("featureTable")),
-                        if (!is.null(suspects))
-                            shiny::tabPanel("Suspects", DT::dataTableOutput("suspectTable"))
-                    )
+                shiny::uiOutput("tablesUI")
             )
         )
     )
@@ -307,6 +313,36 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
             DT::datatable(suspectData(), selection = 'single', options = list(pageLength = 10))
         })
 
+        eicTableData <- shiny::reactive({
+            req(eicData())
+            eic <- eicData()[[1]][[1]]  # Assuming single analysis and single range
+            if (is.null(eic) || nrow(eic) == 0) return(NULL)
+            data.frame(
+                Time = eic[, "time"],
+                Intensity = eic[, "intensity"]
+            )
+        })
+
+        output$eicTable <- DT::renderDT({
+            req(eicTableData())
+            DT::datatable(eicTableData(), options = list(pageLength = 10))
+        })
+
+        eimTableData <- shiny::reactive({
+            req(input$plotEIM, eimData())
+            eim <- eimData()[[1]][[1]]  # Assuming single analysis and single range
+            if (is.null(eim) || nrow(eim) == 0) return(NULL)
+            data.frame(
+                Mobility = eim[, "mobility"],
+                Intensity = eim[, "intensity"]
+            )
+        })
+
+        output$eimTable <- DT::renderDT({
+            req(eimTableData())
+            DT::datatable(eimTableData(), options = list(pageLength = 10))
+        })
+
         observeEvent(input$suspectTable_rows_selected, {
             req(suspectData())
             selected <- input$suspectTable_rows_selected
@@ -359,7 +395,7 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
                     updateNumericInput(session, "mzmin", value = round(susp$mz - 0.005, 5))
                     updateNumericInput(session, "mzmax", value = round(susp$mz + 0.005, 5))
                 }
-                if (!is.na(susp$rt))
+                if (!is.null(susp[["rt"]]) && !is.na(susp$rt))
                 {
                     updateNumericInput(session, "retvalue", value = round(susp$rt, 2))
                     updateNumericInput(session, "retwindow", value = 0.5)
@@ -371,7 +407,7 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
                     updateNumericInput(session, "eimRetmin", value = round(susp$rt - 0.5, 2))
                     updateNumericInput(session, "eimRetmax", value = round(susp$rt + 0.5, 2))
                 }
-                if (!is.na(susp$mobility))
+                if (!is.null(susp[["mobility"]]) && !is.na(susp$mobility))
                 {
                     updateNumericInput(session, "mobvalue", value = round(susp$mobility, 3))
                     updateNumericInput(session, "mobwindow", value = 0.1)
@@ -399,6 +435,21 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
                 )
             } else {
                 shiny::plotOutput("eicPlot")
+            }
+        })
+
+        output$tablesUI <- shiny::renderUI({
+            if (is(obj, "features") || is(obj, "featureGroups") || !is.null(suspects)) {
+                shiny::tabsetPanel(
+                    if (is(obj, "features") || is(obj, "featureGroups"))
+                        shiny::tabPanel("Features", DT::dataTableOutput("featureTable")),
+                    if (!is.null(suspects))
+                        shiny::tabPanel("Suspects", DT::dataTableOutput("suspectTable")),
+                    shiny::tabPanel("EIC", DT::dataTableOutput("eicTable")),
+                    if (input$plotEIM)
+                        shiny::tabPanel("EIM", DT::dataTableOutput("eimTable")),
+                    shiny::tabPanel("Peaks", DT::dataTableOutput("peaksTable"))
+                )
             }
         })
 
@@ -549,6 +600,216 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
             patRoon:::doGetEIMs(analysisInfo, eimList, minIntensity = 25, smooth = input$eimSmooth, sgOrder = 3, smLength = input$sgLength)
         })
         
+        ## Peak detection reactive storage
+        peaksRV <- shiny::reactiveVal(NULL)
+        peaksDT <- shiny::reactiveVal(data.table::data.table())
+        peakParams <- shiny::reactiveVal(NULL)
+        
+        # initialize default peak params when algorithm/target/type changes
+        shiny::observeEvent(list(input$peakAlgorithm, input$peakTarget, input$peakIMSType), {
+            type <- if (isTRUE(input$peakTarget == "EIC")) "chrom" else input$peakIMSType
+            # safe call to getDefPeakParams
+            p <- tryCatch(getDefPeakParams(type = type, algorithm = input$peakAlgorithm), error = function(e) list(algorithm = input$peakAlgorithm))
+            peakParams(p)
+        }, ignoreNULL = TRUE)
+        
+        output$peakParamsSummary <- shiny::renderPrint({
+            req(peakParams())
+            print(peakParams())
+        })
+        
+        # modal for editing peak params (dynamic per-parameter inputs)
+        shiny::observeEvent(input$editPeakParams, {
+            p <- peakParams()
+            if (is.null(p))
+            {
+                shiny::showNotification("Peak parameters not initialized", type = "error")
+                return()
+            }
+            # build dynamic inputs based on parameter types
+            inputs <- lapply(names(p), function(nm) {
+                id <- paste0("pp_", nm)
+                val <- p[[nm]]
+                # logical scalar
+                if (is.logical(val) && length(val) == 1)
+                    return(shiny::checkboxInput(id, nm, value = val))
+                # numeric scalar
+                if (is.numeric(val) && length(val) == 1)
+                    return(shiny::numericInput(id, nm, value = val))
+                # numeric vector length 2 -> two numeric inputs
+                if (is.numeric(val) && length(val) == 2)
+                    return(shiny::fluidRow(
+                        shiny::column(6, shiny::numericInput(paste0(id, "_1"), paste0(nm, " (min)"), value = val[1])),
+                        shiny::column(6, shiny::numericInput(paste0(id, "_2"), paste0(nm, " (max)"), value = val[2]))
+                    ))
+                # character scalar
+                if (is.character(val) && length(val) == 1)
+                    return(shiny::textInput(id, nm, value = val))
+                # fallback: JSON textarea for complex/list values
+                shiny::tagList(
+                    paste(id, nm),
+                    shiny::textAreaInput(id, NULL, value = tryCatch(jsonlite::toJSON(val, auto_unbox = TRUE, pretty = TRUE), error = function(e) ""),
+                                         rows = 4, width = "100%")
+                )
+            })
+            shiny::showModal(shiny::modalDialog(
+                title = "Edit peak detection parameters",
+                shiny::tagList(inputs),
+                footer = shiny::tagList(
+                    shiny::modalButton("Cancel"),
+                    shiny::actionButton("savePeakParams", "Save")
+                ),
+                size = "l",
+                easyClose = TRUE
+            ))
+        })
+        
+        shiny::observeEvent(input$savePeakParams, {
+            oldp <- peakParams()
+            if (is.null(oldp))
+                return()
+            newp <- list()
+            for (nm in names(oldp))
+            {
+                id <- paste0("pp_", nm)
+                # vector inputs
+                val1 <- NULL; val2 <- NULL
+                if (!is.null(input[[paste0(id, "_1")]]) || !is.null(input[[paste0(id, "_2")]]))
+                {
+                    val1 <- input[[paste0(id, "_1")]]
+                    val2 <- input[[paste0(id, "_2")]]
+                    newp[[nm]] <- c(val1, val2)
+                    next
+                }
+                # simple scalar inputs
+                if (!is.null(input[[id]]))
+                {
+                    v <- input[[id]]
+                    # if textarea was used for complex values, attempt JSON parse
+                    if (is.character(v) && grepl("^\\s*\\{", v) || grepl("^\\s*\\[", v))
+                    {
+                        parsed <- tryCatch(jsonlite::fromJSON(v, simplifyVector = FALSE), error = function(e) v)
+                        newp[[nm]] <- parsed
+                    }
+                    else
+                        newp[[nm]] <- v
+                    next
+                }
+                # fallback to old value
+                newp[[nm]] <- oldp[[nm]]
+            }
+            # ensure algorithm key present
+            if (!is.null(oldp$algorithm) && is.null(newp$algorithm))
+                newp$algorithm <- oldp$algorithm
+            peakParams(newp)
+            shiny::removeModal()
+        })
+        
+        # Run detection function
+        runDetect <- function()
+        {
+            p <- peakParams()
+            if (is.null(p))
+                return(NULL)
+            
+            # prepare EIC-like list for findPeaks
+            EICs <- NULL
+            fillEICs <- NULL
+            if (isTRUE(input$peakTarget == "EIC"))
+            {
+                ed <- eicData()
+                if (is.null(ed) || length(ed) == 0)
+                {
+                    shiny::showNotification("No EIC data available for peak detection", type = "warning")
+                    return(NULL)
+                }
+                # assume single analysis
+                EICs <- ed[[1]]
+                fillEICs <- TRUE
+            }
+            else # EIM
+            {
+                ed <- eimData()
+                if (is.null(ed) || length(ed) == 0)
+                {
+                    shiny::showNotification("No EIM data available for peak detection", type = "warning")
+                    return(NULL)
+                }
+                eims <- ed[[1]]
+                # convert mobility -> time for peak detection
+                EICs <- lapply(eims, function(mat) {
+                    if (is.null(mat) || nrow(mat) == 0) return(mat)
+                    m <- as.matrix(mat)
+                    cn <- colnames(m)
+                    if ("mobility" %in% cn)
+                        cn[cn == "mobility"] <- "time"
+                    colnames(m) <- cn
+                    return(m)
+                })
+                fillEICs <- FALSE
+            }
+            
+            # ensure named list
+            if (is.null(names(EICs)))
+                names(EICs) <- as.character(seq_along(EICs))
+            
+            logPath <- tempfile(fileext = ".log")
+            peaks <- tryCatch({
+                findPeaks(EICs, fillEICs, p, logPath)
+            }, error = function(e) {
+                shiny::showNotification(sprintf("Peak finding failed: %s", e$message), type = "error")
+                return(NULL)
+            })
+            if (is.null(peaks))
+                return(NULL)
+            
+            peaksRV(peaks)
+            
+            # flatten peaks into table for DT
+            tbls <- lapply(names(peaks), function(nm) {
+                pl <- peaks[[nm]]
+                if (is.null(pl) || nrow(pl) == 0) return(NULL)
+                dt <- data.table::copy(pl)
+                dt[, trace := nm]
+                dt[, analysis := input$analysis]
+                dt[, algorithm := input$peakAlgorithm]
+                return(dt)
+            })
+            tbls <- Filter(Negate(is.null), tbls)
+            if (length(tbls) == 0)
+            {
+                peaksDT(data.table::data.table())
+                updateSelectInput(session, "peakTrace", choices = character(0), selected = NULL)
+            }
+            else
+            {
+                big <- data.table::rbindlist(tbls, fill = TRUE)
+                peaksDT(big)
+                # update available traces for selection
+                trnames <- unique(big$trace)
+                updateSelectInput(session, "peakTrace", choices = trnames, selected = trnames[1])
+            }
+            invisible(NULL)
+        }
+        
+        # detect on demand or when autoGenerate is TRUE and inputs/data change
+        shiny::observeEvent(input$detectPeaks, {
+            runDetect()
+        })
+        shiny::observeEvent(list(eicData(), input$peakAlgorithm, input$peakTarget, input$peakIMSType), {
+            if (input$autoGenerate)
+                runDetect()
+        }, ignoreNULL = FALSE)
+        shiny::observeEvent(eicData(), {
+            if (input$autoGenerate && input$peakTarget == "EIM")
+                runDetect()
+        }, ignoreNULL = FALSE)
+        
+        output$peaksTable <- DT::renderDT({
+            req(peaksDT())
+            DT::datatable(peaksDT(), selection = 'single', options = list(pageLength = 10))
+        })
+        
         output$eicPlot <- shiny::renderPlot(
         {
             req(eicData())
@@ -561,6 +822,33 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
             }
             plot(eic[, "time"], eic[, "intensity"], type = "l", xlab = "Retention Time", ylab = "Intensity",
                  main = "Extracted Ion Chromatogram")
+            
+            # overlay detected peaks if present
+            peaks <- peaksRV()
+            if (!is.null(peaks) && length(peaks) > 0)
+            {
+                sel <- input$peakTrace
+                if (!is.null(sel) && sel %in% names(peaks))
+                    pl <- peaks[[sel]]
+                else
+                    pl <- peaks[[1]]
+                
+                if (!is.null(pl) && nrow(pl) > 0)
+                {
+                    for (r in seq_len(nrow(pl)))
+                    {
+                        prow <- pl[r, ]
+                        EIXFill <- eic[eic[, "time"] >= prow$retmin & eic[, "time"] <= prow$retmax, , drop = FALSE]
+                        if (nrow(EIXFill) > 0)
+                        {
+                            col <- adjustcolor("blue", alpha.f = 0.35)
+                            polygon(c(EIXFill[, 1], rev(EIXFill[, 1])),
+                                    c(EIXFill[, "intensity"], rep(0, nrow(EIXFill))),
+                                    col = col, border = NA)
+                        }
+                    }
+                }
+            }
         })
         
         output$eimPlot <- shiny::renderPlot(
@@ -575,6 +863,34 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
             }
             plot(eim[, "mobility"], eim[, "intensity"], type = "l", xlab = "Mobility", ylab = "Intensity",
                  main = "Extracted Ion Mobilogram")
+            
+            # overlay detected peaks if present
+            peaks <- peaksRV()
+            if (!is.null(peaks) && length(peaks) > 0)
+            {
+                sel <- input$peakTrace
+                if (!is.null(sel) && sel %in% names(peaks))
+                    pl <- peaks[[sel]]
+                else
+                    pl <- peaks[[1]]
+                
+                if (!is.null(pl) && nrow(pl) > 0)
+                {
+                    for (r in seq_len(nrow(pl)))
+                    {
+                        prow <- pl[r, ]
+                        # peaks detected on EIM were created by renaming mobility -> time, so retmin/retmax are mobility units
+                        EIXFill <- eim[eim[, "mobility"] >= prow$retmin & eim[, "mobility"] <= prow$retmax, , drop = FALSE]
+                        if (nrow(EIXFill) > 0)
+                        {
+                            col <- adjustcolor("blue", alpha.f = 0.35)
+                            polygon(c(EIXFill[, "mobility"], rev(EIXFill[, "mobility"])),
+                                    c(EIXFill[, "intensity"], rep(0, nrow(EIXFill))),
+                                    col = col, border = NA)
+                        }
+                    }
+                }
+            }
         })
     }
     

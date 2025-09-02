@@ -318,6 +318,11 @@ setMethod("delete", "features", function(obj, i = NULL, j = NULL, ...)
 #'   Example: \code{weights=c(ApexBoundaryRatioScore=0.5, GaussianSimilarityScore=2)}.
 #' @param flatnessFactor Passed to \pkg{MetaClean} as the \code{flatness.factor} argument to
 #'   \code{\link[MetaClean]{calculateJaggedness}} and \code{\link[MetaClean]{calculateModality}}.
+#' @param featureQualities Specifies which feature qualities to calculate. Can be \code{NULL} (default, calculates all 
+#'   qualities), a \code{character} vector with names of qualities to calculate (e.g., \code{c("FWHM2Base", "Symmetry")}), 
+#'   or a \code{list} of custom quality definitions. Each custom quality must be a list with elements: \code{func} (the 
+#'   calculation function with the same signature as \pkg{MetaClean} functions), \code{HQ} (either \code{"HV"} for 
+#'   high-value-is-good or \code{"LV"} for low-value-is-good), and \code{range} (the expected range of values).
 #'
 #' @template parallel-arg
 #' 
@@ -328,16 +333,16 @@ setMethod("delete", "features", function(obj, i = NULL, j = NULL, ...)
 #' @note For \code{calculatePeakQualities}: sometimes \pkg{MetaClean} may return \code{NA} for the \verb{Gaussian
 #'   Similarity} metric, in which case it will be set to \samp{0}.
 #' @export
-setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessFactor, parallel = TRUE)
+setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessFactor, featureQualities = NULL, parallel = TRUE)
 {
     checkPackage("MetaClean")
     
     if (length(obj) == 0)
         return(obj) # nothing to do...
     
-    featQualities <- featureQualities()
-    featQualityNames <- featureQualityNames(group = FALSE)
-    featScoreNames <- featureQualityNames(group = FALSE, scores = TRUE, totScore = FALSE)
+    featQualities <- featureQualities(featureQualities)
+    featQualityNames <- names(featQualities)
+    featScoreNames <- paste0(featQualityNames, "Score")
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assertNumeric(weights, finite = TRUE, any.missing = FALSE, min.len = 1, names = "unique",
@@ -348,7 +353,7 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
     checkmate::assertFlag(parallel, add = ac)
     checkmate::reportAssertions(ac)
     
-    hash <- makeHash(obj, weights, flatnessFactor)
+    hash <- makeHash(obj, weights, flatnessFactor, featQualities)
     cd <- loadCacheData("calculatePeakQualities", hash)
     if (!is.null(cd))
         return(cd)

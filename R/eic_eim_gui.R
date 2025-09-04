@@ -163,7 +163,6 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
                         shiny::radioButtons("peakTarget", "Detect peaks in", choices = c("EIC", "EIM"), selected = "EIC", inline = TRUE),
                         shiny::selectInput("peakAlgorithm", "Algorithm", choices = c("openms", "xcms3", "envipick", "piek"), selected = "piek"),
                         shiny::selectInput("peakIMSType", "IMS Type", choices = c("bruker_ims", "agilent_ims"), selected = "bruker_ims"),
-                        shiny::selectInput("peakTrace", "Trace", choices = NULL),
                         shiny::actionButton("editPeakParams", "Advanced peak params"),
                         shiny::verbatimTextOutput("peakParamsSummary"),
                         shiny::conditionalPanel(
@@ -763,31 +762,19 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
             if (is.null(peaks))
                 return(NULL)
             
+            peaks <- peaks[[1]]
             peaksRV(peaks)
             
-            # flatten peaks into table for DT
-            tbls <- lapply(names(peaks), function(nm) {
-                pl <- peaks[[nm]]
-                if (is.null(pl) || nrow(pl) == 0) return(NULL)
-                dt <- data.table::copy(pl)
-                dt[, trace := nm]
-                dt[, analysis := input$analysis]
-                dt[, algorithm := input$peakAlgorithm]
-                return(dt)
-            })
-            tbls <- Filter(Negate(is.null), tbls)
-            if (length(tbls) == 0)
+            if (nrow(peaks) == 0)
             {
                 peaksDT(data.table::data.table())
-                updateSelectInput(session, "peakTrace", choices = character(0), selected = NULL)
             }
             else
             {
-                big <- data.table::rbindlist(tbls, fill = TRUE)
-                peaksDT(big)
-                # update available traces for selection
-                trnames <- unique(big$trace)
-                updateSelectInput(session, "peakTrace", choices = trnames, selected = trnames[1])
+                peaksdt <- copy(peaks)
+                peaksdt[, analysis := input$analysis]
+                peaksdt[, algorithm := input$peakAlgorithm]
+                peaksDT(peaksdt)
             }
             invisible(NULL)
         }
@@ -827,25 +814,16 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
             peaks <- peaksRV()
             if (!is.null(peaks) && length(peaks) > 0)
             {
-                sel <- input$peakTrace
-                if (!is.null(sel) && sel %in% names(peaks))
-                    pl <- peaks[[sel]]
-                else
-                    pl <- peaks[[1]]
-                
-                if (!is.null(pl) && nrow(pl) > 0)
+                for (r in seq_len(nrow(peaks)))
                 {
-                    for (r in seq_len(nrow(pl)))
+                    prow <- peaks[r, ]
+                    EIXFill <- eic[eic[, "time"] >= prow$retmin & eic[, "time"] <= prow$retmax, , drop = FALSE]
+                    if (nrow(EIXFill) > 0)
                     {
-                        prow <- pl[r, ]
-                        EIXFill <- eic[eic[, "time"] >= prow$retmin & eic[, "time"] <= prow$retmax, , drop = FALSE]
-                        if (nrow(EIXFill) > 0)
-                        {
-                            col <- adjustcolor("blue", alpha.f = 0.35)
-                            polygon(c(EIXFill[, 1], rev(EIXFill[, 1])),
-                                    c(EIXFill[, "intensity"], rep(0, nrow(EIXFill))),
-                                    col = col, border = NA)
-                        }
+                        col <- adjustcolor("blue", alpha.f = 0.35)
+                        polygon(c(EIXFill[, 1], rev(EIXFill[, 1])),
+                                c(EIXFill[, "intensity"], rep(0, nrow(EIXFill))),
+                                col = col, border = NA)
                     }
                 }
             }
@@ -868,26 +846,17 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
             peaks <- peaksRV()
             if (!is.null(peaks) && length(peaks) > 0)
             {
-                sel <- input$peakTrace
-                if (!is.null(sel) && sel %in% names(peaks))
-                    pl <- peaks[[sel]]
-                else
-                    pl <- peaks[[1]]
-                
-                if (!is.null(pl) && nrow(pl) > 0)
+                for (r in seq_len(nrow(peaks)))
                 {
-                    for (r in seq_len(nrow(pl)))
+                    prow <- peaks[r, ]
+                    # peaks detected on EIM were created by renaming mobility -> time, so retmin/retmax are mobility units
+                    EIXFill <- eim[eim[, "mobility"] >= prow$retmin & eim[, "mobility"] <= prow$retmax, , drop = FALSE]
+                    if (nrow(EIXFill) > 0)
                     {
-                        prow <- pl[r, ]
-                        # peaks detected on EIM were created by renaming mobility -> time, so retmin/retmax are mobility units
-                        EIXFill <- eim[eim[, "mobility"] >= prow$retmin & eim[, "mobility"] <= prow$retmax, , drop = FALSE]
-                        if (nrow(EIXFill) > 0)
-                        {
-                            col <- adjustcolor("blue", alpha.f = 0.35)
-                            polygon(c(EIXFill[, "mobility"], rev(EIXFill[, "mobility"])),
-                                    c(EIXFill[, "intensity"], rep(0, nrow(EIXFill))),
-                                    col = col, border = NA)
-                        }
+                        col <- adjustcolor("blue", alpha.f = 0.35)
+                        polygon(c(EIXFill[, "mobility"], rev(EIXFill[, "mobility"])),
+                                c(EIXFill[, "intensity"], rep(0, nrow(EIXFill))),
+                                col = col, border = NA)
                     }
                 }
             }

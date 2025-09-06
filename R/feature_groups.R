@@ -1545,7 +1545,7 @@ setMethod("assignMobilities", "featureGroups", function(obj, mobPeakParams = NUL
     if (!is.null(mobPeakParams))
     {
         obj <- checkAssignedMobilityFGroups(obj)
-        obj@features <- assignFeatureMobilitiesPeaks(obj@features, mobPeakParams, EIMParams)
+        obj@features <- assignFeatureMobilitiesPeaks(obj@features, mobPeakParams, EIMParams, parallel)
         obj@features <- reintegrateMobilityFeatures(obj@features, chromPeakParams, EICParams, peakRTWindow, fallbackEIC,
                                                     calcArea, parallel)
         obj <- updateFGroupsForMobilities(obj, IMSWindow, FALSE)

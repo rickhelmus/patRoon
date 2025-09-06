@@ -57,7 +57,35 @@ doAssignFeatureMobilities <- function(fTable, mobTable)
     return(fTable)
 }
 
-assignFeatureMobilitiesPeaks <- function(features, peakParams, EIMParams)
+# split into separate function for future parallelization
+doFindPeaksForMobilities <- function(EIMs, ana, peakParams)
+{
+    mobNumCols <- getMobilityCols()
+    
+    peaksTable <- data.table()
+    if (length(EIMs) > 0)
+    {
+        # pretend we have EICs so we can find peaks
+        EIMs <- lapply(EIMs, \(e) { colnames(e)[1] <- "time"; e })
+        peaksList <- findPeaks(EIMs, FALSE, peakParams, file.path("log", "assignMobilities", paste0("mobilogram_peaks-", ana, ".txt")))
+        peaksTable <- rbindlist(peaksList, idcol = "ims_parent_ID")
+        setnames(peaksTable, c("ret", "retmin", "retmax", "area", "intensity"), mobNumCols, skip_absent = TRUE)
+        # NOTE: we subset columns here to remove any algo specific columns that may also be present in the feature
+        # table (UNDONE?)
+        peaksTable <- subsetDTColumnsIfPresent(peaksTable, c(mobNumCols, "ims_parent_ID"))
+    }
+    if (length(peaksTable) == 0)
+        peaksTable <- data.table()[, (mobNumCols) := numeric()][, ims_parent_ID := character()]
+    
+    peaksTable[, mob_assign_method := "peak"]
+    
+    doProgress()
+    
+    return(peaksTable)
+    # return(doAssignFeatureMobilities(fTable, peaksTable))
+}
+
+assignFeatureMobilitiesPeaks <- function(features, peakParams, EIMParams, parallel)
 {
     hash <- makeHash(features, peakParams, EIMParams)
     cd <- loadCacheData("assignFeatureMobilitiesPeaks", hash)
@@ -73,29 +101,9 @@ assignFeatureMobilitiesPeaks <- function(features, peakParams, EIMParams)
     EIMSelFunc <- \(tab) if (is.null(tab[["mobility"]])) tab else tab[is.na(mobility) & !ID %chin% ims_parent_ID]
     allEIMs <- getFeatureEIXs(features, "EIM", EIXParams = EIMParams, selectFunc = EIMSelFunc, compress = FALSE)
     
-    mobNumCols <- getMobilityCols()
-    
-    features@features <- Map(features@features, allEIMs, analyses(features), f = function(fTable, EIMs, ana)
-    {
-        peaksTable <-  data.table()
-        if (length(EIMs) > 0)
-        {
-            # pretend we have EICs so we can find peaks
-            EIMs <- lapply(EIMs, \(e) { colnames(e)[1] <- "time"; e })
-            peaksList <- findPeaks(EIMs, FALSE, peakParams, file.path("log", "assignMobilities", paste0("mobilogram_peaks-", ana, ".txt")))
-            peaksTable <- rbindlist(peaksList, idcol = "ims_parent_ID")
-            setnames(peaksTable, c("ret", "retmin", "retmax", "area", "intensity"), mobNumCols, skip_absent = TRUE)
-            # NOTE: we subset columns here to remove any algo specific columns that may also be present in the feature
-            # table (UNDONE?)
-            peaksTable <- subsetDTColumnsIfPresent(peaksTable, c(mobNumCols, "ims_parent_ID"))
-        }
-        if (length(peaksTable) == 0)
-            peaksTable <- data.table()[, (mobNumCols) := numeric()][, ims_parent_ID := character()]
-        
-        peaksTable[, mob_assign_method := "peak"]
-        return(doAssignFeatureMobilities(fTable, peaksTable))
-    })
-    
+    peaksList <- doApply("Map", parallel, allEIMs, analyses(features), f = patRoon:::doFindPeaksForMobilities,
+                         MoreArgs = list(peakParams = peakParams), future.globals = FALSE)
+    features@features <- Map(featureTable(features), peaksList, f = doAssignFeatureMobilities)
     printf("Assigned %d mobility features.\n", countMobilityFeatures(features) - oldCount)
     
     features@hasMobilities <- TRUE
@@ -104,6 +112,24 @@ assignFeatureMobilitiesPeaks <- function(features, peakParams, EIMParams)
     
     return(features)
 }
+
+# split into separate function for future parallelization
+doFindPeaksForReintegration <- function(EICs, peakParams, peakRTWindow, ft, ana, cacheDB)
+{
+    peaks <- findPeaksInEICs(EICs, peakParams, withMobility = FALSE, calcStats = FALSE,
+                             logPath = file.path("log", "assignMobilities", paste0("reintegrate-", ana, ".txt")),
+                             cacheDB = cacheDB)
+    # filter out peaks outside original retmin/retmax and with high RT deviation
+    parFT <- ft[match(peaks$EIC_ID, ID)]
+    peaks <- peaks[numGTE(ret, parFT$retmin) & numLTE(ret, parFT$retmax) & numLTE(abs(ret - parFT$ret), peakRTWindow)]
+    # filter out all peaks for EICs with >1 result
+    peaks[, N := .N, by = "EIC_ID"]
+    
+    doProgress()
+    
+    return(peaks[N == 1][, N := NULL])
+}
+
 
 # UNDONE: make this an exported method?
 reintegrateMobilityFeatures <- function(features, peakParams, EICParams, peakRTWindow, fallbackEIC, calcArea, parallel)
@@ -124,21 +150,10 @@ reintegrateMobilityFeatures <- function(features, peakParams, EICParams, peakRTW
     
     if (!is.null(peakParams))
     {
-        peaksList <- doApply("Map", parallel, allEICs, featureTable(features), analyses(features), f = function(EICs, ft, ana)
-        {
-            peaks <- findPeaksInEICs(EICs, peakParams, withMobility = FALSE, calcStats = FALSE,
-                                     logPath = file.path("log", "assignMobilities", paste0("reintegrate-", ana, ".txt")),
-                                     cacheDB = cacheDB)
-            # filter out peaks outside original retmin/retmax and with high RT deviation
-            parFT <- ft[match(peaks$EIC_ID, ID)]
-            peaks <- peaks[numGTE(ret, parFT$retmin) & numLTE(ret, parFT$retmax) & numLTE(abs(ret - parFT$ret), peakRTWindow)]
-            # filter out all peaks for EICs with >1 result
-            peaks[, N := .N, by = "EIC_ID"]
-            
-            doProgress()
-            
-            return(peaks[N == 1][, N := NULL])
-        })
+        peaksList <- doApply("Map", parallel, allEICs, featureTable(features), analyses(features),
+                             f = patRoon:::doFindPeaksForReintegration,
+                             MoreArgs = list(peakParams = peakParams, peakRTWindow = peakRTWindow,
+                                             cacheDB = if (!parallel) cacheDB), future.globals = FALSE)
     }
     else
         peaksList <- vector("list", nrow(anaInfo))

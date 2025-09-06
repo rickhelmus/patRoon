@@ -682,13 +682,13 @@ getAllMergedConsCols <- function(allCols, mConsNames) grep(sprintf("\\-(%s)$", p
 
 getDuplicatedStrings <- function(x) names(which(table(x) > 1))
 
-doApply <- function(applyf, doPar, data, ..., prog = TRUE)
+doApply <- function(applyf, doPar, data, ..., future.globals = TRUE, prog = TRUE)
 {
     args <- list(...)
     if (doPar)
     {
         applyf <- get(paste0("future_", applyf), envir = asNamespace("future.apply"))
-        args <- c(args, list(future.seed = TRUE))
+        args <- c(args, list(future.seed = TRUE, future.globals = future.globals))
     }
     if (prog)
         return(withProg(length(data), doPar, do.call(applyf, c(list(data), args))))

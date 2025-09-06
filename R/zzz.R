@@ -48,6 +48,9 @@ dumpPkgOpts <- function(printFunc)
     missingOpts <- !names(dopts) %in% names(options())
     if (length(missingOpts) > 0)
         options(dopts[missingOpts])
+
+    # for getLimitsFile()
+    assign("pkgCachedLimitsFile", system.file("misc", "limits.yml", package = pkgname), envir = asNamespace(pkgname))
 }
 
 .onAttach <- function(libname, pkgname)

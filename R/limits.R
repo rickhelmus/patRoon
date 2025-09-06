@@ -52,25 +52,19 @@
 #' @name limits
 NULL
 
-getLimitsFileClosure <- function()
+getLimitsFile <- function()
 {
     # NOTE: under certain circumstances, the system.file() call may be slow (noticed during tests on macOS), so we cache
-    # the result here
-    pkgCachedFile <- system.file("misc", "limits.yml", package = "patRoon")
-    function()
+    # pkgCachedLimitsFile in .onLoad()
+    for (p in c(getOption("patRoon.path.limits", ""), file.path(getwd(), "limits.yml"), pkgCachedLimitsFile))
     {
-        for (p in c(getOption("patRoon.path.limits", ""), file.path(getwd(), "limits.yml"), pkgCachedFile))
-        {
-            if (!nzchar(p))
-                next
-            if (file.exists(p))
-                return(p)
-        }
-        stop("Cannot find limits configuration file!")
+        if (!nzchar(p))
+            next
+        if (file.exists(p))
+            return(p)
     }
+    stop("Cannot find limits configuration file!")
 }
-
-getLimitsFile <- getLimitsFileClosure()    
 
 #' @details \code{defaultLim} returns the limits for a specific category and tolerance level.
 #' @param category,level The category and level of the limit to be returned. See the detail sections below. For mobility

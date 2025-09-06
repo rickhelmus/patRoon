@@ -1206,10 +1206,16 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                                     if (!eic.empty() && EIMRun.size() > EIMFlank)
                                         updateSummedEIMs(sc - EIMFlank, EIMRun, eic/*, ofsSmooth*/);
                                     
+                                    // Rcpp::Rcout << "EIC update: " << specMeta.first.times[sc] << "/" << j << "/" << sc << "/" << curScanInd
+                                    //             << "/" << prvScanInd << "/" << EIMRun.size() << "/" << EIMRun.sizeNoZero() << "\n";
+                                    
                                     if (sc == curScanInd)
                                         break;
                                     
-                                    ++sc;
+                                    if (sc >= (prvScanInd + sumEIMs))
+                                        sc = curScanInd; // jump to current: doesn't make sense to add more zeroes
+                                    else
+                                        ++sc;
                                 }
                                 
                                 curPointMobs.clear();

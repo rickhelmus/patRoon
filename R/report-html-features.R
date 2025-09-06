@@ -160,7 +160,6 @@ genHTMLReportPlotsMobilogramsLarge <- function(fGroups, settings, outPath, EIMs,
         return(list())
     
     cat("Generate large mobilograms...\n")
-    # UNDONE: only do IMS parent (if present)?
     doApply("sapply", parallel, gInfo$group, function(grp)
     {
         doProgress()
@@ -172,6 +171,12 @@ genHTMLReportPlotsMobilogramsLarge <- function(fGroups, settings, outPath, EIMs,
     }, simplify = FALSE)
 }
 
+# makeHTMLReportPlotFut <- function(args)
+# {
+#     doProgress()
+#     do.call(makeHTMLReportPlot, args)
+# }
+
 genHTMLReportPlotsMobilogramsSmall <- function(fGroups, settings, outPath, EIMs, EIMParams, parallel)
 {
     gInfo <- groupInfo(fGroups)
@@ -180,7 +185,6 @@ genHTMLReportPlotsMobilogramsSmall <- function(fGroups, settings, outPath, EIMs,
         return(list())
     
     cat("Generate small mobilograms...\n")
-    # UNDONE: only do IMS parent (if present)?
     doApply("sapply", parallel, gInfo$group, function(grp)
     {
         doProgress()
@@ -191,8 +195,20 @@ genHTMLReportPlotsMobilogramsSmall <- function(fGroups, settings, outPath, EIMs,
                                 showFGroupRect = FALSE, showPeakArea = TRUE, title = "", bty = "n"),
                            parParams = list(mai = c(0, 0, 0, 0), lwd = 10), width = 12, height = 4, bg = "transparent",
                            pointsize = 16)
-        
+
     }, simplify = FALSE)
+    
+    # UNDONE: this seems to improve things, but is still slower than no parallelization
+    # mainArgs <- list("mobilogram_small-", outPath, "plotMobilograms",
+    #                  parParams = list(mai = c(0, 0, 0, 0), lwd = 10), width = 12, height = 4, bg = "transparent",
+    #                  pointsize = 16)
+    # mainPlotArgs <- list(fGroups, EIMs = EIMs,
+    #                      EIMParams = modifyList(EIMParams, list(topMost = 1, topMostByReplicate = FALSE,
+    #                                                             onlyPresent = TRUE)),
+    #                      showFGroupRect = FALSE, showPeakArea = TRUE, title = "", bty = "n")
+    # args <- sapply(gInfo$group, \(x) c(mainArgs, list(args = c(mainPlotArgs, list(groupName = x)))), simplify = FALSE)
+    # doApply("sapply", parallel, args, patRoon:::makeHTMLReportPlotFut, simplify = FALSE,
+    #         future.globals = FALSE)
 }
 
 genHTMLReportPlotsMobilogramsFeatures <- function(fGroups, settings, outPath, EIMs, EIMParams, parallel)

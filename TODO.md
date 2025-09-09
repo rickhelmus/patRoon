@@ -116,6 +116,7 @@
     - better names for ims_parent_ID/ims_parent_group?
     - susps/compounds: overwrite doesn't overwrite converted mobilities, change?
     - compounds: call assignTabIMSDeviations() also in generateCompounds with eg PCL? Otherwise doc clearly and check newProject and examples
+    - disable parallelization if piek is used
 - feat EICs
     - tweak default EIC filtering params, more strict for binning?
         - current defaults way to strict for patRoonData neg samples (for filtering of EICs _and_ peaks)

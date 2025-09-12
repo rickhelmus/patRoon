@@ -182,8 +182,8 @@ setMethod("filter", "features", function(obj, absMinIntensity = NULL, relMinInte
            null.ok = TRUE, fixed = list(add = ac))
     aapply(assertRange, . ~ retentionRange + mzRange + mzDefectRange + chromWidthRange, null.ok = TRUE,
            fixed = list(add = ac))
-    assertScoreRange(qualityRange, c(featureQualityNames(group = FALSE),
-                                     featureQualityNames(group = FALSE, scores = TRUE)), add = ac)
+    assertScoreRange(qualityRange, c(getFeatureQualityNames(obj, group = FALSE),
+                                     getFeatureQualityNames(obj, group = FALSE, scores = TRUE)), add = ac)
     checkmate::assertFlag(negate, add = ac)
     checkmate::reportAssertions(ac)
 

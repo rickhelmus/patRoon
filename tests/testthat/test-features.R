@@ -167,6 +167,9 @@ test_that("basic usage", {
                  "must be a function")
     expect_error(calculatePeakQualities(ffOpenMS, featureQualities = list(CustomQuality = list(func = mean, HQ = "INVALID", range = c(0, 1)))),
                  "must be either 'HV' \\(high value\\) or 'LV' \\(low value\\)")
+    
+    # Test that featureGroupQualities parameter is accepted (even though not used by features method)
+    expect_silent(calculatePeakQualities(ffOpenMS, featureGroupQualities = c("ElutionShift")))
 })
 
 # XCMSImpXCMS <- getXCMSSet(ffXCMS)

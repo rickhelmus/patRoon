@@ -65,8 +65,8 @@ reportHTMLUtils$methods(
     {
         tab <- getFGTable(objects$fGroups, ",", settings$features$retMin, settings$features$aggregateConcs,
                           settings$features$aggregateTox)
-        groupDefs <- getFGGroupDefs(tab, "component", replicateGroups(objects$fGroups))
-        colDefs <- getFeatGroupColDefs(tab)
+        groupDefs <- getFGGroupDefs(tab, "component", replicateGroups(objects$fGroups), objects$fGroups)
+        colDefs <- getFeatGroupColDefs(tab, objects$fGroups)
         
         ctab <- as.data.table(objects$components)
         setnames(ctab, "name", "component")

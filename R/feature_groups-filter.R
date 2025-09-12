@@ -350,8 +350,8 @@ featQualityFilter <- function(fGroups, qualityRanges, negate)
 
 groupQualityFilter <- function(fGroups, qualityRanges, negate)
 {
-    qRanges <- qualityRanges[names(qualityRanges) %in% featureQualityNames()]
-    qRangesScore <- qualityRanges[names(qualityRanges) %in% featureQualityNames(scores = TRUE)]
+    qRanges <- qualityRanges[names(qualityRanges) %in% getFeatureQualityNames(fGroups)]
+    qRangesScore <- qualityRanges[names(qualityRanges) %in% getFeatureQualityNames(fGroups, scores = TRUE)]
     
     return(doFGroupsFilter(fGroups, "group quality", c(qualityRanges, negate), function(fGroups)
     {
@@ -548,8 +548,8 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
     aapply(assertRange, . ~ retentionRange + mzRange + mzDefectRange + chromWidthRange, null.ok = TRUE,
            fixed = list(add = ac))
     aapply(assertScoreRange, . ~ featQualityRange + groupQualityRange,
-           list(c(featureQualityNames(group = FALSE), featureQualityNames(group = FALSE, scores = TRUE)),
-                c(featureQualityNames(), featureQualityNames(scores = TRUE))), fixed = list(add = ac))
+           list(c(getFeatureQualityNames(obj, group = FALSE), getFeatureQualityNames(obj, group = FALSE, scores = TRUE)),
+                c(getFeatureQualityNames(obj), getFeatureQualityNames(obj, scores = TRUE))), fixed = list(add = ac))
     checkmate::assertCharacter(rGroups, min.chars = 1, min.len = 1, any.missing = FALSE, null.ok = TRUE, add = ac)
     checkmate::assert(checkmate::checkNull(results),
                       checkmate::checkClass(results, "featureAnnotations"),

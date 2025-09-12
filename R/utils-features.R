@@ -50,22 +50,9 @@ featureQualities <- function(qualities = NULL)
         return(allQualities[qualities])
     }
     
-    # If qualities is a list (custom qualities), validate and return
+    # If qualities is a list (custom qualities), return as-is (validation done elsewhere)
     if (is.list(qualities))
-    {
-        # Validate that each quality has the required structure
-        for (i in seq_along(qualities))
-        {
-            q <- qualities[[i]]
-            if (!is.list(q) || is.null(q$func) || is.null(q$HQ) || is.null(q$range))
-                stop("Invalid quality definition at position ", i, ". Each quality must be a list with 'func', 'HQ', and 'range' elements.")
-            if (!is.function(q$func))
-                stop("Quality function at position ", i, " must be a function.")
-            if (!q$HQ %in% c("HV", "LV"))
-                stop("Quality HQ at position ", i, " must be either 'HV' (high value) or 'LV' (low value).")
-        }
         return(qualities)
-    }
     
     stop("featureQualities parameter must be NULL, a character vector of quality names, or a list of quality definitions.")
 }
@@ -194,14 +181,14 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
             ret[, (paste0("group_", names(gq))) := gq]
         }
         else if (hasFGroupScores(fGroups))
-            ret[, (intersect(featureQualityNames(group = FALSE), names(ret))) := NULL]
+            ret[, (intersect(getFeatureQualityNames(fGroups, group = FALSE), names(ret))) := NULL]
         if (addScores)
         {
             gs <- groupScores(fGroups)[match(ret$group, group), -"group"]
             ret[, (paste0("group_", names(gs))) := gs]
         }
         else if (hasFGroupScores(fGroups))
-            ret[, (intersect(featureQualityNames(group = FALSE, scores = TRUE), names(ret))) := NULL]
+            ret[, (intersect(getFeatureQualityNames(fGroups, group = FALSE, scores = TRUE), names(ret))) := NULL]
         
         if (average)
         {

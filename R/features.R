@@ -340,18 +340,20 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
     if (length(obj) == 0)
         return(obj) # nothing to do...
     
+    ac <- checkmate::makeAssertCollection()
+    assertFeatureQualities(featureQualities, null.ok = TRUE, add = ac)
+    checkmate::assertNumeric(weights, finite = TRUE, any.missing = FALSE, min.len = 1, names = "unique",
+                             null.ok = TRUE, add = ac)
+    checkmate::assertNumber(flatnessFactor, add = ac)
+    checkmate::assertFlag(parallel, add = ac)
+    checkmate::reportAssertions(ac)
+    
     featQualities <- featureQualities(featureQualities)
     featQualityNames <- names(featQualities)
     featScoreNames <- paste0(featQualityNames, "Score")
     
-    ac <- checkmate::makeAssertCollection()
-    checkmate::assertNumeric(weights, finite = TRUE, any.missing = FALSE, min.len = 1, names = "unique",
-                             null.ok = TRUE, add = ac)
     if (!is.null(weights))
-        checkmate::assertNames(names(weights), subset.of = featScoreNames, add = ac)
-    checkmate::assertNumber(flatnessFactor, add = ac)
-    checkmate::assertFlag(parallel, add = ac)
-    checkmate::reportAssertions(ac)
+        checkmate::assertNames(names(weights), subset.of = featScoreNames)
     
     hash <- makeHash(obj, weights, flatnessFactor, featQualities)
     cd <- loadCacheData("calculatePeakQualities", hash)

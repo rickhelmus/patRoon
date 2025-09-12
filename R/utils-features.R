@@ -57,13 +57,40 @@ featureQualities <- function(qualities = NULL)
     stop("featureQualities parameter must be NULL, a character vector of quality names, or a list of quality definitions.")
 }
 
-featureGroupQualities <- function()
+featureGroupQualities <- function(qualities = NULL)
 {
     checkPackage("MetaClean")
-    list(
+    
+    # Default set of all available group qualities
+    allQualities <- list(
         ElutionShift = list(func = MetaClean::calculateElutionShift, HQ = "LV", range = Inf),
         RetentionTimeCorrelation = list(func = MetaClean::calculateRetentionTimeConsistency, HQ = "LV", range = Inf)
     )
+    
+    # If no specific qualities requested, return all
+    if (is.null(qualities))
+        return(allQualities)
+    
+    # If qualities is a character vector, subset from default qualities
+    if (is.character(qualities))
+    {
+        missing <- setdiff(qualities, names(allQualities))
+        if (length(missing) > 0)
+            stop("Unknown feature group qualities specified: ", paste(missing, collapse = ", "))
+        return(allQualities[qualities])
+    }
+    
+    # If qualities is a list, it should contain custom quality definitions
+    if (is.list(qualities))
+    {
+        # Validate that all qualities are named
+        if (is.null(names(qualities)) || any(names(qualities) == ""))
+            stop("Custom featureGroupQualities must be named")
+        
+        return(qualities)
+    }
+    
+    stop("featureGroupQualities parameter must be NULL, a character vector of quality names, or a list of quality definitions.")
 }
 
 # normalize, invert if necessary to get low (worst) to high (best) order

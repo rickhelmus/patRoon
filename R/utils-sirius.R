@@ -584,7 +584,7 @@ predictLC50SIRFPs <- function(featAnnSIR, LC50Mode, concUnit)
 
     # NOTE: do unit conversion the last thing, so we can still use cached data if the user merely changed the unit
     # NOTE: need to take the inverse before conversion
-    LC50s[, LC50_SIRFP := convertConc(LC50_SIRFP[1], "log mM", concUnit, formulaMW(neutral_formula[1])),
+    LC50s[, LC50_SIRFP := convertConc(LC50_SIRFP[1], "log10 mM", concUnit, formulaMW(neutral_formula[1])),
         by = "neutral_formula"]
 
     return(LC50s[])

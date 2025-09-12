@@ -482,7 +482,7 @@ predictLC50SMILES <- function(SMILES, LC50Mode, concUnit)
 
     # NOTE: do unit conversion the last thing, so we can still use cached data if the user merely changed the unit
     LC50s[, MW := babelConvert(SMILES, "smi", "MW", mustWork = TRUE)]
-    LC50s[, LC50_SMILES := convertConc(LC50_SMILES[1], "log mM", concUnit, MW[1]), by = "SMILES"]
+    LC50s[, LC50_SMILES := convertConc(LC50_SMILES[1], "log10 mM", concUnit, MW[1]), by = "SMILES"]
     LC50s[, MW := NULL]
     
     return(LC50s[])

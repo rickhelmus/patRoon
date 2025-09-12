@@ -152,8 +152,8 @@ test_that("Basics for calculation", {
                    na.rm = TRUE), 0.2)
     expect_gte(min(as.data.table(filter(fGroupsCompsC, absMinConcTox = 1E-6), normConcToTox = TRUE)[, paste0(analyses(fGroupsCompsC), "_conc"), with = FALSE],
                    na.rm = TRUE), 1E-6)
-    expect_lt(min(as.data.table(filter(fGroupsCompsC, absMinConcTox = 1E-6, negate = TRUE), normConcToTox = TRUE)[, paste0(analyses(fGroupsCompsC), "_conc"), with = FALSE],
-                  na.rm = TRUE), 1E-6)
+    expect_lt(min(as.data.table(filter(fGroupsCompsC, absMinConcTox = 1E-5, negate = TRUE), normConcToTox = TRUE)[, paste0(analyses(fGroupsCompsC), "_conc"), with = FALSE],
+                  na.rm = TRUE), 1E-5)
     expect_lte(max(as.data.table(filter(fGroupsCompsC, absMaxTox = 6E4))$LC50, na.rm = TRUE), 6E4)
     expect_gt(max(as.data.table(filter(fGroupsCompsC, absMaxTox = 6E4, negate = TRUE))$LC50, na.rm = TRUE), 6E4)
     

@@ -1,4 +1,10 @@
-# Devel
+# patRoon 2.3.4
+
+## Important changes
+
+* Fixed: previous versions incorrectly assumed that MS2Tox returned LC50 values as natural logarithms instead of log10. (reported by Alessia Ore)
+
+## Other changes and fixes:
 
 * Fixed: `reAverage = TRUE` was not handled correctly for the `delete()` method for `MSPeakListsSet`
 * Speed up 'unsetting' of large formulas/compounds objects, which affects eg plotting TP similarities, annotatedPeakList() etc (reported by Alessia Ore)

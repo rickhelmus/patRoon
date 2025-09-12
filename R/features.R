@@ -62,13 +62,19 @@ printFeatStats <- function(fList)
 #'
 #' @export
 features <- setClass("features",
-                     slots = c(features = "list", analysisInfo = "data.frame"),
+                     slots = c(features = "list", analysisInfo = "data.frame", featureQualityNames = "character"),
                      contains = c("VIRTUAL", "workflowStep"))
 
 setMethod("initialize", "features", function(.Object, ...)
 {
+    args <- list(...)
     .Object <- callNextMethod(.Object, ...)
     .Object@features <- makeEmptyListNamed(.Object@features)
+    
+    # Initialize featureQualityNames slot
+    if (is.null(args[["featureQualityNames"]]))
+        .Object@featureQualityNames <- character()
+    
     return(.Object)
 })
 
@@ -116,6 +122,32 @@ setReplaceMethod("featureTable", "features", function(obj, value)
 #'   (\code{blank}).
 #' @export
 setMethod("analysisInfo", "features", function(obj) obj@analysisInfo)
+
+#' @describeIn features Accessor for \code{featureQualityNames} slot.
+#' @export
+setMethod("featureQualityNames", "features", function(obj) obj@featureQualityNames)
+
+#' @describeIn features Returns chromatographic peak quality and score names for features and/or feature groups.
+#' @param feat If \code{TRUE} then names specific to features are returned.
+#' @param group If \code{TRUE} then names specific to groups are returned.
+#' @param scores If \code{TRUE} the score names are returned, otherwise the quality names.
+#' @param totScore If \code{TRUE} (and \code{scores=TRUE}) then the name of the total score is included.
+#' @export
+setMethod("getFeatureQualityNames", "features", function(fGroups, feat = TRUE, group = TRUE, scores = FALSE, totScore = TRUE)
+{
+    ret <- character()
+    if (feat && length(fGroups@featureQualityNames) > 0)
+        ret <- fGroups@featureQualityNames
+    if (group)
+        ret <- c(ret, "ElutionShift", "RetentionTimeCorrelation")
+    if (scores)
+    {
+        ret <- paste0(ret, "Score")
+        if (totScore)
+            ret <- c(ret, "totalScore")
+    }
+    return(ret)
+})
 
 #' @templateVar class features
 #' @templateVar what analyses
@@ -333,7 +365,7 @@ setMethod("delete", "features", function(obj, i = NULL, j = NULL, ...)
 #' @note For \code{calculatePeakQualities}: sometimes \pkg{MetaClean} may return \code{NA} for the \verb{Gaussian
 #'   Similarity} metric, in which case it will be set to \samp{0}.
 #' @export
-setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessFactor, featureQualities = NULL, parallel = TRUE)
+setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessFactor, featureQualities = NULL, featureGroupQualities = NULL, parallel = TRUE)
 {
     checkPackage("MetaClean")
     
@@ -422,6 +454,7 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
     })
 
     featureTable(obj) <- fTable
+    obj@featureQualityNames <- featQualityNames
     
     saveCacheData("calculatePeakQualities", obj, hash)
     

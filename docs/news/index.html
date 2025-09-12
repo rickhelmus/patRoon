@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.4</span>
       </span>
     </div>
 
@@ -89,6 +89,34 @@
       <small>Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="2.3.4" id="patroon-234">patRoon 2.3.4<a class="anchor" aria-label="anchor" href="#patroon-234"></a></h2>
+<div class="section level3">
+<h3 id="important-changes-2-3-4">Important changes<a class="anchor" aria-label="anchor" href="#important-changes-2-3-4"></a></h3>
+<ul><li>Fixed: previous versions incorrectly assumed that MS2Tox returned LC50 values as natural logarithms instead of log10. (reported by Alessia Ore)</li>
+</ul></div>
+<div class="section level3">
+<h3 id="other-changes-and-fixes-2-3-4">Other changes and fixes:<a class="anchor" aria-label="anchor" href="#other-changes-and-fixes-2-3-4"></a></h3>
+<ul><li>Fixed: <code>reAverage = TRUE</code> was not handled correctly for the <code><a href="../reference/generics.html">delete()</a></code> method for <code>MSPeakListsSet</code>
+</li>
+<li>Speed up ‘unsetting’ of large formulas/compounds objects, which affects eg plotting TP similarities, annotatedPeakList() etc (reported by Alessia Ore)</li>
+<li>
+<code><a href="../reference/reporting.html">report()</a></code>: correctly handle removed suspect hits while reporting TP similarities (reported by Alessia Ore)</li>
+<li>Added visual clue to <code><a href="../reference/check-GUI.html">checkFeatures()</a></code> and <code><a href="../reference/check-GUI.html">checkComponents()</a></code> to see whether a feature or component is marked to be removed (pull request <a href="https://github.com/rickhelmus/patRoon/issues/117" class="external-link">#117</a> as suggested by Leon Saal)</li>
+<li>
+<code><a href="../reference/loadMSLibrary.html">loadMSLibrary()</a></code>: don’t always set <code>Ion_mode</code> of records to positive and guess missing <code>Ion_mode</code> data (issue <a href="https://github.com/rickhelmus/patRoon/issues/119" class="external-link">#119</a>)</li>
+<li>Fixed: <code><a href="../reference/generateFormulasGenForm.html">generateFormulasGenForm()</a></code> <code>topMost</code> was not considered for cached results</li>
+<li>Small doc updates for <code>MSPeakLists</code>
+</li>
+<li>Fixed: the score filters for the <code><a href="../reference/generics.html">filter()</a></code> method of formulas/compounds could in rare cases not be applied correctly for consensus and/or sets results</li>
+<li>MSP MS libraries: don’t be case sensitive when checking the “Num Peaks” field (Bas van de Velde)</li>
+<li>Small fixes in example code from the Handbook (reported by Boris Droz and Jan Specker)</li>
+<li>Changed cache for filtering of feature groups to reduce cache size (<a href="https://github.com/rickhelmus/patRoon/issues/98" class="external-link">#98</a>)</li>
+<li>Updated PubChem Transformations to 0.2.0</li>
+<li>Replaced the <code>featuresSets</code> method for <code>groupFeatures</code> with (updated) <code>featuresSets</code> algorithm specific <code>groupFeatures</code> methods (<code>groupFeaturesOpenMS</code> etc), so that the latter can be called directly in sets workflows (<a href="https://github.com/rickhelmus/patRoon/issues/128" class="external-link">#128</a>)</li>
+<li>Fixed regression: <code>groupQualityRange</code> filter would always remove all feature groups (reported by Geert Franken)</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="2.3.3" id="patroon-233">patRoon 2.3.3<a class="anchor" aria-label="anchor" href="#patroon-233"></a></h2>
 <div class="section level3">

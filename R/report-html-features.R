@@ -62,7 +62,7 @@ getFGColGrpStartCols <- function(groupDefs) sapply(groupDefs[-1], function(col) 
 
 featGroupTabHasSusps <- function(tab) !is.null(tab[["susp_d_mz"]]) # HACK: this column should always be there if there are (non-collapsed) suspect results
 
-getFeatGroupColDefs <- function(tab)
+getFeatGroupColDefs <- function(tab, fGroups = NULL)
 {
     colDefs <- list()
     
@@ -99,7 +99,7 @@ getFeatGroupColDefs <- function(tab)
     # InChIKeys are only there for internal usage
     setCD("susp_InChIKey", "show", FALSE)
     
-    featScoreNames <- intersect(featureQualityNames(scores = TRUE), names(tab))
+    featScoreNames <- intersect(if (is.null(fGroups)) featureQualityNames(scores = TRUE) else getFeatureQualityNames(fGroups, scores = TRUE), names(tab))
     for (col in featScoreNames)
     {
         setCD(col, "name", sub("Score$", "", col))
@@ -109,12 +109,12 @@ getFeatGroupColDefs <- function(tab)
     return(colDefs)
 }
 
-getFGGroupDefs <- function(tab, groupBy, rgs)
+getFGGroupDefs <- function(tab, groupBy, rgs, fGroups = NULL)
 {
     colSepStyle <- getFGColSepStyle()
     hasSusp <- featGroupTabHasSusps(tab)
     isGrouped <- !is.null(groupBy)
-    featScoreNames <- intersect(featureQualityNames(scores = TRUE), names(tab))
+    featScoreNames <- intersect(if (is.null(fGroups)) featureQualityNames(scores = TRUE) else getFeatureQualityNames(fGroups, scores = TRUE), names(tab))
     concCols <- intersect(c(paste0(rgs, "_conc"), "conc_types"), names(tab))
     
     return(pruneList(list(
@@ -408,8 +408,8 @@ reportHTMLUtils$methods(
         mdprintf("Feature groups... ")
         tab <- getFGTable(objects$fGroups, ",", settings$features$retMin, settings$features$aggregateConcs,
                           settings$features$aggregateTox)
-        groupDefs <- getFGGroupDefs(tab, NULL, replicateGroups(objects$fGroups))
-        colDefs <- getFeatGroupColDefs(tab)
+        groupDefs <- getFGGroupDefs(tab, NULL, replicateGroups(objects$fGroups), objects$fGroups)
+        colDefs <- getFeatGroupColDefs(tab, objects$fGroups)
         makeFGReactable(tab, "detailsTabPlain", colDefs = colDefs, groupDefs = groupDefs, visible = TRUE, plots = plots,
                         settings = settings, objects = objects)
     },
@@ -417,8 +417,8 @@ reportHTMLUtils$methods(
     {
         tab <- getFGTable(objects$fGroups, NULL, settings$features$retMin, settings$features$aggregateConcs,
                           settings$features$aggregateTox)[!is.na(susp_name)]
-        groupDefs <- getFGGroupDefs(tab, "susp_name", replicateGroups(objects$fGroups))
-        colDefs <- getFeatGroupColDefs(tab)
+        groupDefs <- getFGGroupDefs(tab, "susp_name", replicateGroups(objects$fGroups), objects$fGroups)
+        colDefs <- getFeatGroupColDefs(tab, objects$fGroups)
         makeFGReactable(tab, "detailsTabSuspects", colDefs = colDefs, groupDefs = groupDefs, visible = FALSE,
                         plots = plots, settings = settings, objects = objects, groupBy = "susp_name")
     },
@@ -441,8 +441,8 @@ reportHTMLUtils$methods(
         tab <- merge(ftab, istds, by = "group")
         tab <- roundFGTab(tab, objects$fGroups)
         
-        groupDefs <- getFGGroupDefs(tab, "susp_name", replicateGroups(objects$fGroups))
-        colDefs <- getFeatGroupColDefs(tab)
+        groupDefs <- getFGGroupDefs(tab, "susp_name", replicateGroups(objects$fGroups), objects$fGroups)
+        colDefs <- getFeatGroupColDefs(tab, objects$fGroups)
         colDefs$susp_name$name <- "Internal standard" # HACK
         makeFGReactable(tab, "detailsTabISTDs", colDefs = colDefs, groupDefs = groupDefs, visible = FALSE,
                         plots = plots, settings = settings, objects = objects, groupBy = "susp_name")
@@ -500,7 +500,7 @@ reportHTMLUtils$methods(
         
         tab <- as.data.table(getFeatures(objects$fGroups))
         tab <- removeDTColumnsIfPresent(tab, "adduct") # can already be seen in group table
-        tab <- removeDTColumnsIfPresent(tab, featureQualityNames(group = FALSE, scores = FALSE)) # only show scores
+        tab <- removeDTColumnsIfPresent(tab, getFeatureQualityNames(objects$fGroups, group = FALSE, scores = FALSE)) # only show scores
         
         if (settings$features$retMin)
             tab[, c("ret", "retmin", "retmax") := .(ret / 60, retmin / 60, retmax / 60)]
@@ -552,7 +552,7 @@ reportHTMLUtils$methods(
                                                                                                     values, name))
         }
         
-        fqn <- featureQualityNames(group = FALSE, scores = TRUE)
+        fqn <- getFeatureQualityNames(objects$fGroups, group = FALSE, scores = TRUE)
         for (col in fqn)
         {
             if (!is.null(tab[[col]]))

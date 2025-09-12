@@ -74,6 +74,9 @@ setGeneric("groupQualities", function(fGroups) standardGeneric("groupQualities")
 setGeneric("groupScores", function(fGroups) standardGeneric("groupScores"))
 
 #' @rdname featureGroups-class
+setGeneric("getFeatureQualityNames", function(fGroups, ...) standardGeneric("getFeatureQualityNames"))
+
+#' @rdname featureGroups-class
 setGeneric("internalStandards", function(fGroups) standardGeneric("internalStandards"))
 
 #' @rdname featureGroups-class

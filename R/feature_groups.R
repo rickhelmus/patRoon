@@ -101,7 +101,7 @@ featureGroups <- setClass("featureGroups",
                                     features = "features", ftindex = "data.table", groupQualities = "data.table",
                                     groupScores = "data.table", annotations = "data.table",
                                     ISTDs = "data.table", ISTDAssignments = "list", concentrations = "data.table",
-                                    toxicities = "data.table"),
+                                    toxicities = "data.table", featureQualityNames = "character"),
                           contains = c("VIRTUAL", "workflowStep"))
 
 setMethod("initialize", "featureGroups", function(.Object, ...)
@@ -115,6 +115,10 @@ setMethod("initialize", "featureGroups", function(.Object, ...)
         if (is.null(args[[s]]))
             args[[s]] <- data.table()
     }
+    
+    # Initialize featureQualityNames slot
+    if (is.null(args[["featureQualityNames"]]))
+        args[["featureQualityNames"]] <- character()
     
     .Object@ISTDAssignments <- makeEmptyListNamed(.Object@ISTDAssignments)
 
@@ -287,6 +291,29 @@ setMethod("groupQualities", "featureGroups", function(fGroups) fGroups@groupQual
 #' @aliases groupScores
 #' @export
 setMethod("groupScores", "featureGroups", function(fGroups) fGroups@groupScores)
+
+#' @describeIn featureGroups Returns feature quality names that were calculated for this object.
+#' @param feat If \code{TRUE} then names specific to features are returned.
+#' @param group If \code{TRUE} then names specific to groups are returned.
+#' @param scores If \code{TRUE} the score names are returned, otherwise the quality names.
+#' @param totScore If \code{TRUE} (and \code{scores=TRUE}) then the name of the total score is included.
+#' @aliases getFeatureQualityNames
+#' @export
+setMethod("getFeatureQualityNames", "featureGroups", function(fGroups, feat = TRUE, group = TRUE, scores = FALSE, totScore = TRUE)
+{
+    ret <- character()
+    if (feat && length(fGroups@featureQualityNames) > 0)
+        ret <- fGroups@featureQualityNames
+    if (group)
+        ret <- c(ret, "ElutionShift", "RetentionTimeCorrelation")
+    if (scores)
+    {
+        ret <- paste0(ret, "Score")
+        if (totScore)
+            ret <- c(ret, "totalScore")
+    }
+    return(ret)
+})
 
 #' @describeIn featureGroups Accessor for \code{annotations} slot.
 #' @export
@@ -775,21 +802,23 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flat
 {
     checkPackage("MetaClean")
     
-    # Get qualities first to determine score names
+    ac <- checkmate::makeAssertCollection()
+    assertFeatureQualities(featureQualities, null.ok = TRUE, add = ac)
+    checkmate::assertNumber(flatnessFactor, add = ac)
+    checkmate::assertFunction(avgFunc, add = ac)
+    checkmate::assertFlag(parallel, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    # Get qualities after validation
     featQualities <- featureQualities(featureQualities)
     featQualityNames <- names(featQualities)
     featScoreNames <- paste0(featQualityNames, "Score")
     allScores <- c(featScoreNames, featureQualityNames(feat = FALSE, scores = TRUE, totScore = FALSE))
     
-    ac <- checkmate::makeAssertCollection()
     checkmate::assertNumeric(weights, finite = TRUE, any.missing = FALSE, min.len = 1, names = "unique",
-                             null.ok = TRUE, add = ac)
+                             null.ok = TRUE)
     if (!is.null(weights))
-        checkmate::assertNames(names(weights), subset.of = allScores, add = ac)
-    checkmate::assertNumber(flatnessFactor, add = ac)
-    checkmate::assertFunction(avgFunc, add = ac)
-    checkmate::assertFlag(parallel, add = ac)
-    checkmate::reportAssertions(ac)
+        checkmate::assertNames(names(weights), subset.of = allScores)
     
     hash <- makeHash(obj, weights, flatnessFactor, featQualities, avgFunc)
     cd <- loadCacheData("calculatePeakQualities", hash)
@@ -853,6 +882,9 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flat
     
     obj@groupQualities <- groupQualitiesScores[, c("group", allQualityNames), with = FALSE]
     obj@groupScores <- groupQualitiesScores[, c("group", allScores), with = FALSE]
+    
+    # Store the feature quality names that were calculated
+    obj@featureQualityNames <- featQualityNames
     
     if (is.null(weights))
         obj@groupScores[, totalScore := rowSums(.SD, na.rm = TRUE), .SDcols = allScores][]

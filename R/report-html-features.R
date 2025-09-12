@@ -26,7 +26,7 @@ getFGTable <- function(fGroups, colSusp, retMin, concAggrParams, toxAggrParams)
     tab <- subsetDTColumnsIfPresent(tab, c("group", "ret", "mz", replicateGroups(fGroups), "adduct", "neutralMass",
                                            paste0(replicateGroups(fGroups), "_conc"), "conc_types", "LC50", "LC50_types",
                                            paste0("susp_", c("name", "estIDLevel", "d_rt", "d_mz", "sets", "InChIKey")),
-                                           featureQualityNames(scores = TRUE),
+                                           getFeatureQualityNames(fGroups, scores = TRUE),
                                            grep("^ISTD_assigned", names(tab), value = TRUE)))
     
     if (retMin)

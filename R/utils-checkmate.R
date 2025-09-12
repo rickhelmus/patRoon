@@ -773,6 +773,50 @@ checkQuantEluent <- function(x, fGroups)
 }
 assertQuantEluent <- checkmate::makeAssertionFunction(checkQuantEluent)
 
+checkFeatureQualities <- function(x, null.ok = FALSE)
+{
+    if (null.ok && is.null(x))
+        return(TRUE)
+    
+    ret <- checkmate::checkCharacter(x, min.chars = 1, any.missing = FALSE, null.ok = null.ok)
+    if (!isTRUE(ret))
+    {
+        ret <- checkmate::checkList(x, any.missing = FALSE, names = "unique", min.len = 1, null.ok = null.ok)
+        if (isTRUE(ret))
+        {
+            # Check if list has names
+            if (is.null(names(x)) || any(names(x) == ""))
+                ret <- "Custom feature qualities must be named"
+            else
+            {
+                # Validate each quality definition
+                for (i in seq_along(x))
+                {
+                    q <- x[[i]]
+                    if (!checkmate::testList(q))
+                        return(paste("Invalid quality definition at position", i, ". Each quality must be a list."))
+                    if (is.null(q$func))
+                        return(paste("Quality definition at position", i, "is missing required 'func' element."))
+                    if (is.null(q$HQ))
+                        return(paste("Quality definition at position", i, "is missing required 'HQ' element."))
+                    if (is.null(q$range))
+                        return(paste("Quality definition at position", i, "is missing required 'range' element."))
+                    if (!checkmate::testFunction(q$func))
+                        return(paste("Quality function at position", i, "must be a function."))
+                    if (!checkmate::testChoice(q$HQ, c("HV", "LV")))
+                        return(paste("Quality HQ at position", i, "must be either 'HV' (high value) or 'LV' (low value)."))
+                }
+            }
+        }
+    }
+    
+    if (!isTRUE(ret))
+        ret <- "featureQualities parameter must be NULL, a character vector of quality names, or a named list of quality definitions."
+    
+    return(ret)
+}
+assertFeatureQualities <- checkmate::makeAssertionFunction(checkFeatureQualities)
+
 # from https://github.com/mllg/checkmate/issues/115
 aapply = function(fun, formula, ..., fixed = list())
 {

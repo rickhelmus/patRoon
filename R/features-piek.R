@@ -276,6 +276,7 @@ setMethod("initialize", "featuresPiek",
 #' @export
 findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = NULL, adduct = NULL,
                              mobAssignMethod = "basepeak", mobAssignAggr = "weighted.mean", minIntensityIMS = 25,
+                             prefDupIntensityRatio = 0.5, assignRTWindow = defaultLim("retention", "very_narrow"),
                              verbose = TRUE)
 {
     # UNDONE: add refs to docs, and highlight changes
@@ -294,7 +295,8 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
                           add = ac)
     checkmate::assertChoice(mobAssignMethod, c("basepeak", "weighted.mean"), add = ac)
     checkmate::assertChoice(mobAssignAggr, c("max", "weighted.mean"), add = ac)
-    checkmate::assertNumber(minIntensityIMS, lower = 0, finite = TRUE, add = ac)
+    aapply(checkmate::assertNumber, . ~ minIntensityIMS + prefDupIntensityRatio + assignRTWindow, lower = 0,
+           finite = TRUE, fixed = list(add = ac))
     checkmate::assertFlag(verbose, add = ac)
     checkmate::reportAssertions(ac)
     
@@ -329,7 +331,8 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
     withIMS <- !is.null(genEICParams[["methodIMS"]])
     
     cacheDB <- openCacheDBScope()
-    baseHash <- makeHash(genEICParams, peakParams, suspects, adduct, mobAssignMethod, mobAssignAggr, minIntensityIMS)
+    baseHash <- makeHash(genEICParams, peakParams, suspects, adduct, mobAssignMethod, mobAssignAggr, minIntensityIMS,
+                         prefDupIntensityRatio, assignRTWindow)
     anaHashes <- getMSFileHashesFromAvailBackend(analysisInfo, needIMS = withIMS)
     anaHashes <- sapply(anaHashes, makeHash, baseHash)
     cachedData <- pruneList(loadCacheData("featuresPiek", anaHashes, simplify = FALSE, dbArg = cacheDB))
@@ -424,16 +427,22 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
             
             maybePrintf("Finding peaks in %d remaining EICs... ", length(EICs))
             peaks <- findPeaksInEICs(EICs, peakParams, withMobility = withIMS, calcStats = TRUE,
+                                     assignRTWindow = assignRTWindow,
                                      logPath = file.path("log", "featEICs", paste0(ana, ".txt")), cacheDB = cacheDB)
             maybePrintf("Done! Found %d peaks.\n", nrow(peaks))
 
             # only keep those peaks with m/z in the "center" of the analyzed m/z and mobility range
             peaks[, binMZStart := EICInfo[match(peaks$EIC_ID, EIC_ID)]$mzmin]
-            peaks <- peaks[between(mz, binMZStart + genEICParams$mzStep/4, binMZStart + genEICParams$mzStep/4*3) == TRUE]
+            peaks[, mzCentered := between(mz, binMZStart + genEICParams$mzStep/4, binMZStart + genEICParams$mzStep/4*3)]
+            # peaks <- peaks[between(mz, binMZStart + genEICParams$mzStep/4, binMZStart + genEICParams$mzStep/4*3) == TRUE]
             if (withIMS)
             {
+                chkCol <- if (mobAssignAggr == "max") "mobilityBPMax" else "mobilityBP"
                 peaks[, binMobStart := EICInfo[match(peaks$EIC_ID, EIC_ID)]$mobmin]
-                peaks <- peaks[between(mobilityBP, binMobStart + genEICParams$mobStep/4, binMobStart + genEICParams$mobStep/4*3) == TRUE]
+                peaks[, mobCentered := between(get(chkCol), binMobStart + genEICParams$mobStep/4,
+                                               binMobStart + genEICParams$mobStep/4*3)]
+                # peaks <- peaks[between(get(chkCol), binMobStart + genEICParams$mobStep/4, binMobStart + genEICParams$mobStep/4*3) == TRUE]
+                
                 if (mobAssignAggr == "max")
                 {
                     if (mobAssignMethod == "basepeak")
@@ -482,9 +491,11 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
 
             dups <- findFeatTableDups(peaks$ret, peaks$mz, if (withIMS) peaks$mobility else numeric(),
                                       peaks$intensity, defaultLim("retention", "very_narrow"),
-                                      genEICParams$mzStep / 2, genEICParams$mobStep / 2)
+                                      genEICParams$mzStep / 2, genEICParams$mobStep / 2,
+                                      peaks$mzCentered, if (withIMS) peaks$mobCentered else numeric(),
+                                      prefDupIntensityRatio)
             peaks <- peaks[!dups]
-            peaks <- removeDTColumnsIfPresent(peaks, c("binMZStart", "binMobStart", "keep"))
+            peaks <- removeDTColumnsIfPresent(peaks, c("binMZStart", "binMobStart", "mzCentered", "mobCentered", "keep"))
 
             maybePrintf("%d peaks remain after filtering.\n", nrow(peaks))            
             

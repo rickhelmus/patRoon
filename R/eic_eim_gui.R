@@ -18,14 +18,11 @@ setMethod("launchEICGUI", "data.frame", function(obj, suspects = NULL, adduct = 
     
     if (!is.null(suspects))
     {
+        # UNDONE: warn that mobility values may be ignored if no adduct is provided
         suspects <- prepareSuspectList(suspects, adduct = adduct, skipInvalid = TRUE, checkDesc = TRUE,
                                        prefCalcChemProps = TRUE, neutralChemProps = FALSE)
-        
-        if (!is.null(suspects[["mobility"]]) || !is.null(suspects[["CCS"]]))
-        {
-            suspects[, mobility_susp := selectFromSuspAdductCol(suspects, "mobility", data.table(), if (!is.null(adduct)) as.character(adduct))]
-            suspects <- expandSuspMobilities(suspects)
-        }
+        suspects[, mobility_susp := selectFromSuspAdductCol(suspects, "mobility", data.table(), if (!is.null(adduct)) as.character(adduct))]
+        suspects <- expandSuspMobilities(suspects)
     }
     gui <- createEICGUI(obj, analysisInfo, suspects)
     shiny::shinyApp(gui$ui, gui$server)
@@ -101,14 +98,14 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
                             condition = "input.rtMode == 'Range'",
                             shiny::fluidRow(
                                 shiny::column(6, shiny::numericInput("retmin", "RT Min", value = 0, min = 0)),
-                                shiny::column(6, shiny::numericInput("retmax", "RT Max", value = 10, min = 0))
+                                shiny::column(6, shiny::numericInput("retmax", "RT Max", value = 1000, min = 0))
                             )
                         ),
                         shiny::conditionalPanel(
                             condition = "input.rtMode == 'Value +/- Window'",
                             shiny::fluidRow(
                                 shiny::column(6, shiny::numericInput("retvalue", "RT Value", value = 5, min = 0)),
-                                shiny::column(6, shiny::numericInput("retwindow", "RT Window", value = 0.5, min = 0))
+                                shiny::column(6, shiny::numericInput("retwindow", "RT Window", value = 30, min = 0))
                             )
                         )
                     ),
@@ -153,6 +150,7 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
                                 )
                             )
                         ),
+                        shiny::checkboxInput("plotChromPoints", "Also plot Chromatogram Points", value = FALSE),
                         shiny::checkboxInput("autoGenerate", "Auto-generate plots on input change", value = TRUE),
                         shiny::conditionalPanel(
                             condition = "input.autoGenerate == false",
@@ -164,6 +162,7 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
                         shiny::selectInput("peakAlgorithm", "Algorithm", choices = c("openms", "xcms3", "envipick", "piek"), selected = "piek"),
                         shiny::selectInput("peakIMSType", "IMS Type", choices = c("bruker_ims", "agilent_ims"), selected = "bruker_ims"),
                         shiny::actionButton("editPeakParams", "Advanced peak params"),
+                        shiny::actionButton("resetPeakParams", "Restore default peak params"),
                         shiny::verbatimTextOutput("peakParamsSummary"),
                         shiny::conditionalPanel(
                             condition = "input.autoGenerate == false",
@@ -342,6 +341,21 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
             DT::datatable(eimTableData(), options = list(pageLength = 10))
         })
 
+        chromPointsTableData <- shiny::reactive({
+            req(input$plotChromPoints, chromPointsData())
+            chromData <- chromPointsData()
+            if (is.null(chromData) || nrow(chromData) == 0) return(NULL)
+            data.frame(
+                MZ = chromData$mz,
+                Intensity = chromData$intensity
+            )
+        })
+
+        output$chromPointsTable <- DT::renderDT({
+            req(chromPointsTableData())
+            DT::datatable(chromPointsTableData(), options = list(pageLength = 10))
+        })
+
         observeEvent(input$suspectTable_rows_selected, {
             req(suspectData())
             selected <- input$suspectTable_rows_selected
@@ -427,10 +441,21 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
         })
 
         output$plotsUI <- shiny::renderUI({
-            if (input$plotEIM) {
+            if (input$plotEIM && input$plotChromPoints) {
+                shiny::fluidRow(
+                    shiny::column(4, shiny::plotOutput("eicPlot")),
+                    shiny::column(4, shiny::plotOutput("eimPlot")),
+                    shiny::column(4, shiny::plotOutput("chromPointsPlot"))
+                )
+            } else if (input$plotEIM) {
                 shiny::fluidRow(
                     shiny::column(6, shiny::plotOutput("eicPlot")),
                     shiny::column(6, shiny::plotOutput("eimPlot"))
+                )
+            } else if (input$plotChromPoints) {
+                shiny::fluidRow(
+                    shiny::column(6, shiny::plotOutput("eicPlot")),
+                    shiny::column(6, shiny::plotOutput("chromPointsPlot"))
                 )
             } else {
                 shiny::plotOutput("eicPlot")
@@ -438,18 +463,18 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
         })
 
         output$tablesUI <- shiny::renderUI({
-            if (is(obj, "features") || is(obj, "featureGroups") || !is.null(suspects)) {
-                shiny::tabsetPanel(
-                    if (is(obj, "features") || is(obj, "featureGroups"))
-                        shiny::tabPanel("Features", DT::dataTableOutput("featureTable")),
-                    if (!is.null(suspects))
-                        shiny::tabPanel("Suspects", DT::dataTableOutput("suspectTable")),
-                    shiny::tabPanel("EIC", DT::dataTableOutput("eicTable")),
-                    if (input$plotEIM)
-                        shiny::tabPanel("EIM", DT::dataTableOutput("eimTable")),
-                    shiny::tabPanel("Peaks", DT::dataTableOutput("peaksTable"))
-                )
-            }
+            shiny::tabsetPanel(
+                if (is(obj, "features") || is(obj, "featureGroups"))
+                    shiny::tabPanel("Features", DT::dataTableOutput("featureTable")),
+                if (!is.null(suspects))
+                    shiny::tabPanel("Suspects", DT::dataTableOutput("suspectTable")),
+                shiny::tabPanel("EIC", DT::dataTableOutput("eicTable")),
+                if (input$plotEIM)
+                    shiny::tabPanel("EIM", DT::dataTableOutput("eimTable")),
+                if (input$plotChromPoints)
+                    shiny::tabPanel("Chromatogram Points", DT::dataTableOutput("chromPointsTable")),
+                shiny::tabPanel("Peaks", DT::dataTableOutput("peaksTable"))
+            )
         })
 
         eicData <- shiny::reactive({
@@ -598,19 +623,147 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
             shiny::validate(shiny::need(input$eimSmooth == 'none' || (input$sgLength %% 2 == 1 && input$sgLength >= 3), "Smoothing length must be odd and >= 3"))
             patRoon:::doGetEIMs(analysisInfo, eimList, minIntensity = 25, smooth = input$eimSmooth, sgOrder = 3, smLength = input$sgLength)
         })
-        
-        ## Peak detection reactive storage
+
+        chromPointsData <- shiny::reactive({
+            req(input$plotChromPoints, input$mzMode, input$rtMode, input$analysis)
+            if (!input$autoGenerate)
+                req(input$generate)
+
+            if (!input$plotChromPoints)
+            {
+                return(NULL)
+            }
+
+            mzmin <- mzmax <- NULL
+            if (input$mzMode == "Range")
+            {
+                mzmin <- input$mzmin
+                mzmax <- input$mzmax
+            }
+            else if (input$mzMode == "Center +/- Window")
+            {
+                mzmin <- input$mzcenter - input$mzwindow
+                mzmax <- input$mzcenter + input$mzwindow
+            }
+            else if (input$mzMode == "Neutral Mass +/- MZ Window")
+            {
+                neutralMass <- input$neutralMass
+                mz <- tryCatch(calculateMasses(neutralMass, as.adduct(input$adductNM), "mz"), error = function(e)
+                {
+                    shiny::showNotification("Error calculating MZ from neutral mass and adduct", type = "error")
+                    NA
+                })
+                if (!is.na(mz))
+                {
+                    mzmin <- mz - input$mzWindowNM
+                    mzmax <- mz + input$mzWindowNM
+                }
+            }
+            else if (input$mzMode == "Formula +/- MZ Window")
+            {
+                neutralMass <- tryCatch(getFormulaMass(input$formula), error = function(e)
+                {
+                    shiny::showNotification("Error parsing formula", type = "error")
+                    NA
+                })
+                if (!is.na(neutralMass))
+                {
+                    mz <- tryCatch(calculateMasses(neutralMass, as.adduct(input$adductF), "mz"), error = function(e)
+                    {
+                        shiny::showNotification("Error calculating MZ from formula and adduct", type = "error")
+                        NA
+                    })
+                    if (!is.na(mz))
+                    {
+                        mzmin <- mz - input$mzWindowF
+                        mzmax <- mz + input$mzWindowF
+                    }
+                }
+            }
+
+            if (is.null(mzmin) || is.null(mzmax))
+            {
+                mzmin <- 100
+                mzmax <- 200
+            }
+
+            pointsInfo <- data.table::data.table(
+                mzmin = mzmin,
+                mzmax = mzmax,
+                retmin = if (input$rtMode == "Disabled") 0 else if (input$rtMode == "Range") input$retmin else input$retvalue - input$retwindow,
+                retmax = if (input$rtMode == "Disabled") 0 else if (input$rtMode == "Range") input$retmax else input$retvalue + input$retwindow,
+                mobmin = if (input$mobMode == "Disabled") 0 else if (input$mobMode == "Range") input$mobmin else input$mobvalue - input$mobwindow,
+                mobmax = if (input$mobMode == "Disabled") 0 else if (input$mobMode == "Range") input$mobmax else input$mobvalue + input$mobwindow
+            )
+            
+            if (pointsInfo$mobmin == 0 && pointsInfo$mobmax == 0)
+                pointsInfo[, c("mobmin", "mobmax") := NULL]
+            printf("points: %s\n", paste(capture.output(print(pointsInfo)), collapse = "; "))
+            
+            pointsList <- list(pointsInfo)
+            names(pointsList) <- input$analysis
+
+            chromPoints <- doGetChromPoints(analysisInfo[analysis == input$analysis], pointsList)
+
+            # Process the data: aggregate by MZ, sum intensities
+            if (length(chromPoints) > 0 && !is.null(chromPoints[[1]][[1]]) && nrow(chromPoints[[1]][[1]]) > 0)
+            {
+                points <- as.data.table(chromPoints[[1]][[1]])
+                aggData <- points[, .(intensity = sum(intensity)), by = mz][order(mz)]
+                return(aggData)
+            }
+            return(NULL)
+        })
+
+        ## Peak detection reactive storage (persist per target / algorithm / IMS type)
         peaksRV <- shiny::reactiveVal(NULL)
         peaksDT <- shiny::reactiveVal(data.table::data.table())
         peakParams <- shiny::reactiveVal(NULL)
-        
+
+        # store: nested list stored as reactiveVal; keys: target -> algorithm -> imstype (or "default")
+        peakParamsStore <- shiny::reactiveVal(list())
+
+        getStoreParams <- function(target, algorithm, imstype) {
+          store <- peakParamsStore()
+          if (!is.list(store)) return(NULL)
+          if (!is.null(store[[target]]) && !is.null(store[[target]][[algorithm]])) {
+            # imstype-aware: prefer exact imstype, then fallback to algorithm-level
+            algNode <- store[[target]][[algorithm]]
+            if (!is.null(algNode[[imstype]])) return(algNode[[imstype]])
+            if (!is.null(algNode[["default"]])) return(algNode[["default"]])
+          }
+          NULL
+        }
+
+        setStoreParams <- function(target, algorithm, imstype, params) {
+          store <- peakParamsStore()
+          if (!is.list(store)) store <- list()
+          if (is.null(store[[target]])) store[[target]] <- list()
+          if (is.null(store[[target]][[algorithm]])) store[[target]][[algorithm]] <- list()
+          # for EIM we store under imstype, for EIC we store under "default" (or still imstype)
+          key <- if (is.null(imstype) || imstype == "") "default" else as.character(imstype)
+          store[[target]][[algorithm]][[key]] <- params
+          peakParamsStore(store)
+        }
+
         # initialize default peak params when algorithm/target/type changes
         shiny::observeEvent(list(input$peakAlgorithm, input$peakTarget, input$peakIMSType), {
-            type <- if (isTRUE(input$peakTarget == "EIC")) "chrom" else input$peakIMSType
-            # safe call to getDefPeakParams
-            p <- tryCatch(getDefPeakParams(type = type, algorithm = input$peakAlgorithm), error = function(e) list(algorithm = input$peakAlgorithm))
-            peakParams(p)
-        }, ignoreNULL = TRUE)
+          target <- as.character(input$peakTarget)
+          algorithm <- as.character(input$peakAlgorithm)
+          imstype <- ifelse(is.null(input$peakIMSType), "default", as.character(input$peakIMSType))
+          # try store first
+          sp <- tryCatch(getStoreParams(target, algorithm, imstype), error = function(e) NULL)
+          if (!is.null(sp)) {
+            peakParams(sp)
+            return()
+          }
+          # fallback to default provider
+          typeArg <- if (isTRUE(target == "EIC")) "chrom" else imstype
+          p <- tryCatch(getDefPeakParams(type = typeArg, algorithm = algorithm), error = function(e) list(algorithm = algorithm))
+          peakParams(p)
+          # also store as default for this key so user's subsequent edits persist even if they haven't saved
+          setStoreParams(target, algorithm, imstype, p)
+        }, ignoreNULL = FALSE)
         
         output$peakParamsSummary <- shiny::renderPrint({
             req(peakParams())
@@ -700,10 +853,38 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
             # ensure algorithm key present
             if (!is.null(oldp$algorithm) && is.null(newp$algorithm))
                 newp$algorithm <- oldp$algorithm
+            # persist to store
+            target <- as.character(input$peakTarget)
+            algorithm <- as.character(ifelse(is.null(input$peakAlgorithm), "unknown", input$peakAlgorithm))
+            imstype <- ifelse(is.null(input$peakIMSType), "default", as.character(input$peakIMSType))
+            setStoreParams(target, algorithm, imstype, newp)
             peakParams(newp)
             shiny::removeModal()
         })
-        
+
+        # restore defaults observer
+        shiny::observeEvent(input$resetPeakParams, {
+            target <- as.character(input$peakTarget)
+            algorithm <- as.character(input$peakAlgorithm)
+            imstype <- ifelse(is.null(input$peakIMSType), "default", as.character(input$peakIMSType))
+            # get defaults
+            typeArg <- if (isTRUE(target == "EIC")) "chrom" else imstype
+            defaults <- tryCatch(getDefPeakParams(type = typeArg, algorithm = algorithm), error = function(e) list(algorithm = algorithm))
+            # overwrite stored settings
+            setStoreParams(target, algorithm, imstype, defaults)
+            # update current
+            peakParams(defaults)
+            shiny::showNotification("Peak parameters restored to defaults", type = "message")
+        })
+
+        # re-run peak detection whenever peak parameters are updated (only when auto-generate is enabled)
+        shiny::observeEvent(list(peakParams(), input$autoGenerate), {
+          req(peakParams())
+          if (isTRUE(input$autoGenerate)) {
+            runDetect()
+          }
+        }, ignoreNULL = TRUE)
+
         # Run detection function
         runDetect <- function()
         {
@@ -762,15 +943,15 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
             if (is.null(peaks))
                 return(NULL)
             
-            peaks <- peaks[[1]]
-            peaksRV(peaks)
-            
-            if (nrow(peaks) == 0)
+            if (length(peaks) == 0 || nrow(peaks[[1]]) == 0)
             {
+                peaksRV(data.table::data.table())
                 peaksDT(data.table::data.table())
             }
             else
             {
+                peaks <- peaks[[1]]
+                peaksRV(peaks)
                 peaksdt <- copy(peaks)
                 peaksdt[, analysis := input$analysis]
                 peaksdt[, algorithm := input$peakAlgorithm]
@@ -841,7 +1022,7 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
             }
             plot(eim[, "mobility"], eim[, "intensity"], type = "l", xlab = "Mobility", ylab = "Intensity",
                  main = "Extracted Ion Mobilogram")
-            
+
             # overlay detected peaks if present
             peaks <- peaksRV()
             if (!is.null(peaks) && length(peaks) > 0)
@@ -860,6 +1041,20 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
                     }
                 }
             }
+        })
+
+        output$chromPointsPlot <- shiny::renderPlot(
+        {
+            req(chromPointsData())
+            chromData <- chromPointsData()
+            if (is.null(chromData) || nrow(chromData) == 0)
+            {
+                plot.new()
+                text(0.5, 0.5, "No Chromatogram Points data", cex = 2)
+                return()
+            }
+            plot(chromData$mz, chromData$intensity, type = "l", xlab = "m/z", ylab = "Intensity",
+                 main = "Chromatogram Points")
         })
     }
     

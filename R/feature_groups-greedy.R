@@ -28,7 +28,7 @@ setMethod("groupFeaturesGreedy", "features", function(feat, rtalign = FALSE,
     if (rtalign)
         stop("Retention time alignment (rtalign=TRUE) is not yet supported for greedy grouping!", call. = FALSE)
     
-    hash <- makeHash(feat, rtWindow, mzWindow, IMSWindow)
+    hash <- makeHash(feat, rtWindow, mzWindow, IMSWindow, scoreWeights)
     cd <- loadCacheData("groupFeaturesGreedy", hash)
     if (!is.null(cd))
         return(cd)

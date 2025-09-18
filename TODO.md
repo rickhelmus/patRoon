@@ -126,6 +126,7 @@
     - warn if ms2/suspects are outside bin range?
     - change methodMZ/methodIMS to eg filterMZ/filterMob
     - remove suspects with NA mobilities and warn, instead of throwing an error
+    - make allowing non-centered features optional?
 - update featAnn consensus?
 - greedy
     - set default weights

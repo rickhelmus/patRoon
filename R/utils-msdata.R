@@ -323,6 +323,62 @@ doGetEIMs <- function(anaInfo, EIMInfoList, minIntensity, smooth, smLength, sgOr
     return(allEIMs)
 }
 
+doGetChromPoints <- function(anaInfo, pointsInfoList)
+{
+    if (length(pointsInfoList) == 0)
+        return(list())
+
+    anaInfo <- anaInfo[analysis %in% names(pointsInfoList)]
+
+    needIMS <- !is.null(pointsInfoList[[1]][["mobmin"]])
+
+    anaHashes <- NULL
+    cacheDB <- openCacheDBScope()
+    anaHashes <- getMSFileHashesFromAvailBackend(anaInfo, needIMS = needIMS)
+
+    allChromPoints <- applyMSData(anaInfo, pointsInfoList, needIMS = needIMS, func = function(ana, path, backend, pointsInfo)
+    {
+        pointsInfo <- copy(pointsInfo)
+        for (col in c("mobmin", "mobmax"))
+        {
+            if (is.null(pointsInfo[[col]]))
+                set(pointsInfo, j = col, value = 0)
+            else
+                setnafill(pointsInfo, fill = 0, cols = col)
+        }
+
+        # NOTE: subset columns here, so any additional columns from e.g. feature tables are not considered
+        hashes <- pointsInfo[, makeHash(anaHashes[[ana]], .SD), by = seq_len(nrow(pointsInfo)),
+                             .SDcols = c("retmin", "retmax", "mzmin", "mzmax", "mobmin", "mobmax")][[2]]
+
+        chromPoints <- loadCacheData(category = "chromPoints", hashes, dbArg = cacheDB, simplify = FALSE)
+        isCached <- !sapply(chromPoints, is.null)
+        if (all(isCached))
+        {
+            # everything is in the cache
+            doProgress()
+            return(unname(chromPoints))
+        }
+
+        ToDo <- pointsInfo[isCached == FALSE]
+
+        openMSReadBackend(backend, path)
+
+        # NOTE: getChromPoints() return lists
+        newChromPoints <- getChromPoints(backend, ToDo$retmin, ToDo$retmax, ToDo$mzmin, ToDo$mzmax, ToDo$mobmin,
+                                         ToDo$mobmax, needIMS)
+
+        chromPoints[!isCached] <- newChromPoints
+
+        saveCacheDataList("chromPoints", chromPoints[!isCached], hashes[!isCached], cacheDB)
+
+        doProgress()
+        return(unname(chromPoints))
+    })
+
+    return(allChromPoints)
+}
+
 prepareAgilentIMSCalib <- function(calibrant, massGas)
 {
     if (is.list(calibrant))

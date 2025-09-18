@@ -1335,7 +1335,8 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         
         if (eicMode == EICMode::SIMPLE && pad && !eic.empty())
         {
-            const auto padded = padEIC(specMeta.first.times, eic.times.front(), eic.times.back(), eic.times,
+            const auto padded = padEIC(specMeta.first.times, timeStart,
+                                       (timeEnd == 0) ? specMeta.first.times.back() : timeEnd, eic.times,
                                        eic.intensities);
             eic.times = std::move(padded.first);
             eic.intensities = std::move(padded.second);

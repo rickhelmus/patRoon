@@ -986,9 +986,9 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         return specf;
     };
     
-    const auto updateSummedEIMs = [sumEIMs, smoothWindow, &specMeta](SpectrumRawTypes::Scan scanInd,
-                                                                     const EIMRunning &EIMRun, EIC &eic/*,
-                                                                     std::ofstream &ofsSmooth*/)
+    const auto updateSummedEIMs = [smoothWindow, &specMeta](SpectrumRawTypes::Scan scanInd,
+                                                            const EIMRunning &EIMRun, EIC &eic/*,
+                                                            std::ofstream &ofsSmooth*/)
     {
         if (eic.empty())
             return;
@@ -1234,15 +1234,15 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                 
                 if ((!enoughTimeAboveThr && minEICAdjTime > 0.0) || (!enoughPointsAboveThr && minEICAdjPoints > 0))
                 {
-                    if (prvScanInd != (curScanInd - 1))
+                    // if first point, gap in scans, or below intensity threshold, reset
+                    if (prvScanInd == allPeaksSorted.indices.size() || prvScanInd != (curScanInd - 1) ||
+                        !numberGTE(curPoint.intensity, minEICAdjIntensity))
                     {
                         // Rcpp::Rcout << "Stop! EIC: " << i << "/" << j << "/" << specMeta.first.scans[curScanInd] << "/" << curTime << "/" << curPoint.intensity << "/" << minEICAdjPoints << "/" << adjPointsAboveThr << "\n";
                         startTimeAboveThr = 0.0;
                         adjPointsAboveThr = 0;   
                     }
-                    
-                    if (prvScanInd != allPeaksSorted.indices.size() &&
-                        numberGTE(curPoint.intensity, minEICAdjIntensity))
+                    else
                     {
                         if (minEICAdjTime > 0.0)
                         {
@@ -1343,14 +1343,15 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         }
         
         // fill in left-over trailing scans
-        for (SpectrumRawTypes::Scan s=curScanInd+1; !EIMRun.empty() && s<=(curScanInd+EIMFlank); ++s)
+        // NOTE: at this point, prvScanInd refers to the last filled in scan
+        for (SpectrumRawTypes::Scan s=prvScanInd+1; !EIMRun.empty() && s<specMeta.first.times.size(); ++s)
         {
             EIMRun.pop(); // first pop: we are one ahead of the last added scan
             // Rcpp::Rcout << "EIM purge: " << s << "/" << (s-EIMFlank) << "/" << curScanInd << "/" << specMeta.first.times[s] << "/"
-            //             << EIMRun.size() << "\n";
+            //             << specMeta.first.times[s-EIMFlank] << "/" << EIMRun.size() << "\n";
             updateSummedEIMs(s - EIMFlank, EIMRun, eic/*, ofsSmooth*/);
         }
-        
+
         allEICs[i] = std::move(eic);
         allEICMaxIntensities[i] = maxInten;
     }

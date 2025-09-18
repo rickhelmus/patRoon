@@ -2189,48 +2189,83 @@ void testMS1Writer(const MSReadBackend &backend, const std::string &out, Spectru
 }
 
 // [[Rcpp::export]]
-Rcpp::List getChromPoints(const MSReadBackend &backend, SpectrumRawTypes::Time rtStart, SpectrumRawTypes::Time rtEnd,
-                          SpectrumRawTypes::Mass mzStart, SpectrumRawTypes::Mass mzEnd, bool withMob,
-                          SpectrumRawTypes::Mobility mobilityStart, SpectrumRawTypes::Mobility mobilityEnd)
+Rcpp::List getChromPoints(const MSReadBackend &backend, const std::vector<SpectrumRawTypes::Time> &startTimes,
+                          const std::vector<SpectrumRawTypes::Time> &endTimes,
+                          const std::vector<SpectrumRawTypes::Mass> &startMZs,
+                          const std::vector<SpectrumRawTypes::Mass> &endMZs,
+                          const std::vector<SpectrumRawTypes::Mobility> &startMobs,
+                          const std::vector<SpectrumRawTypes::Mobility> &endMobs,
+                          bool withMob)
 {
-    const auto specf = SpectrumRawFilter().setMZRange(mzStart, mzEnd);
-    const auto mobRange = makeNumRange(mobilityStart, mobilityEnd);
-    const auto sfunc = [&](const SpectrumRaw &spec, const SpectrumRawSelection &, size_t)
+    const auto entries = startTimes.size();
+    if (entries == 0)
+        return Rcpp::List();
+
+    const auto specMeta = backend.getSpecMetadata();
+
+    std::vector<std::vector<SpectrumRawSelection>> scanSels(entries);
+    std::vector<std::vector<SpectrumRawTypes::Time>> allTimes(entries);
+    for (size_t i=0; i<entries; ++i)
     {
-        return (spec.hasMobilities()) ? filterIMSFrame(spec, specf, 0.0, mobRange) : filterSpectrumRaw(spec, specf, 0.0);
-    };
-    
-    const auto &meta = backend.getSpecMetadata();
-    
-    std::vector<std::vector<SpectrumRawSelection>> sels(1);
-    auto startIt = std::lower_bound(meta.first.times.begin(), meta.first.times.end(), rtStart);
-    std::vector<SpectrumRawTypes::Time> times;
-    for (; startIt != meta.first.times.end() && numberLTE(*startIt, rtEnd); ++startIt)
-    {
-        const auto ind = std::distance(meta.first.times.begin(), startIt);
-        sels[0].emplace_back(ind);
-        times.push_back(*startIt);
+        const auto sels = getSpecRawSelections(specMeta, makeNumRange(startTimes[i], endTimes[i]),
+                                               SpectrumRawTypes::MSLevel::MS1, 0);
+        std::vector<SpectrumRawTypes::Time> times(sels.size());
+        for (size_t j=0; j<sels.size(); ++j)
+            times[j] = specMeta.first.times[sels[j].index];
+        allTimes[i] = std::move(times);
+        scanSels[i] = std::move(sels);
     }
 
-    const auto specs = applyMSData<SpectrumRaw>(backend, SpectrumRawTypes::MSLevel::MS1, sels, sfunc, 25,
-                                                SpectrumRawTypes::MSSortType::MOBILITY_MZ)[0];
-    SpectrumRaw flatSpec;
-    std::vector<SpectrumRawTypes::Time> flatTimes;
-    for (size_t i=0; i<specs.size(); ++i)
+    const auto sfunc = [&](const SpectrumRaw &spec, const SpectrumRawSelection &, size_t entry)
     {
-        flatSpec.append(specs[i]);
-        flatTimes.insert(flatTimes.end(), specs[i].size(), times[i]);
-    }
+        const auto specf = SpectrumRawFilter().setMZRange(startMZs[entry], endMZs[entry]);
+        const auto mobRange = makeNumRange(startMobs[entry], endMobs[entry]);
+        return (spec.hasMobilities()) ? filterIMSFrame(spec, specf, 0.0, mobRange) : filterSpectrumRaw(spec, specf, 0.0);
+    };
+
+    const auto allSpectra = applyMSData<SpectrumRaw>(backend, SpectrumRawTypes::MSLevel::MS1, scanSels, sfunc, 25,
+                                                     SpectrumRawTypes::MSSortType::MOBILITY_MZ);
     
-    if (!withMob)
+    Rcpp::List ret(entries);
+    for (size_t i = 0; i < entries; ++i)
     {
-        return Rcpp::List::create(Rcpp::Named("time") = flatTimes,
-                                  Rcpp::Named("mz") = flatSpec.getMZs(),
-                                  Rcpp::Named("intensity") = flatSpec.getIntensities());
+        const auto &specs = allSpectra[i];
+        const auto &times = allTimes[i];
+        SpectrumRaw flatSpec;
+        std::vector<SpectrumRawTypes::Time> flatTimes;
+        for (size_t j=0; j<specs.size(); ++j)
+        {
+            flatSpec.append(specs[j]);
+            flatTimes.insert(flatTimes.end(), specs[j].size(), times[j]);
+        }
+
+        const auto nPoints = flatTimes.size();
+        if (!withMob)
+        {
+            auto mat = Rcpp::NumericMatrix(nPoints, 3);
+            for (size_t j = 0; j<nPoints; ++j)
+            {
+                mat(j, 0) = flatTimes[j];
+                mat(j, 1) = flatSpec.getMZs()[j];
+                mat(j, 2) = flatSpec.getIntensities()[j];
+            }
+            Rcpp::colnames(mat) = Rcpp::CharacterVector::create("time", "mz", "intensity");
+            ret[i] = mat;
+        }
+        else
+        {
+            auto mat = Rcpp::NumericMatrix(nPoints, 4);
+            for (size_t j=0; j<nPoints; ++j)
+            {
+                mat(j, 0) = flatTimes[j];
+                mat(j, 1) = flatSpec.getMZs()[j];
+                mat(j, 2) = flatSpec.getMobilities()[j];
+                mat(j, 3) = flatSpec.getIntensities()[j];
+            }
+            Rcpp::colnames(mat) = Rcpp::CharacterVector::create("time", "mz", "mobility", "intensity");
+            ret[i] = mat;
+        }
     }
-    
-    return Rcpp::List::create(Rcpp::Named("time") = flatTimes,
-                              Rcpp::Named("mz") = flatSpec.getMZs(),
-                              Rcpp::Named("mobility") = flatSpec.getMobilities(),
-                              Rcpp::Named("intensity") = flatSpec.getIntensities());
+
+    return ret;
 }

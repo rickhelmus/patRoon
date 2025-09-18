@@ -510,20 +510,20 @@ BEGIN_RCPP
 END_RCPP
 }
 // getChromPoints
-Rcpp::List getChromPoints(const MSReadBackend& backend, SpectrumRawTypes::Time rtStart, SpectrumRawTypes::Time rtEnd, SpectrumRawTypes::Mass mzStart, SpectrumRawTypes::Mass mzEnd, bool withMob, SpectrumRawTypes::Mobility mobilityStart, SpectrumRawTypes::Mobility mobilityEnd);
-RcppExport SEXP _patRoon_getChromPoints(SEXP backendSEXP, SEXP rtStartSEXP, SEXP rtEndSEXP, SEXP mzStartSEXP, SEXP mzEndSEXP, SEXP withMobSEXP, SEXP mobilityStartSEXP, SEXP mobilityEndSEXP) {
+Rcpp::List getChromPoints(const MSReadBackend& backend, const std::vector<SpectrumRawTypes::Time>& startTimes, const std::vector<SpectrumRawTypes::Time>& endTimes, const std::vector<SpectrumRawTypes::Mass>& startMZs, const std::vector<SpectrumRawTypes::Mass>& endMZs, const std::vector<SpectrumRawTypes::Mobility>& startMobs, const std::vector<SpectrumRawTypes::Mobility>& endMobs, bool withMob);
+RcppExport SEXP _patRoon_getChromPoints(SEXP backendSEXP, SEXP startTimesSEXP, SEXP endTimesSEXP, SEXP startMZsSEXP, SEXP endMZsSEXP, SEXP startMobsSEXP, SEXP endMobsSEXP, SEXP withMobSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const MSReadBackend& >::type backend(backendSEXP);
-    Rcpp::traits::input_parameter< SpectrumRawTypes::Time >::type rtStart(rtStartSEXP);
-    Rcpp::traits::input_parameter< SpectrumRawTypes::Time >::type rtEnd(rtEndSEXP);
-    Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type mzStart(mzStartSEXP);
-    Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type mzEnd(mzEndSEXP);
+    Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Time>& >::type startTimes(startTimesSEXP);
+    Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Time>& >::type endTimes(endTimesSEXP);
+    Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Mass>& >::type startMZs(startMZsSEXP);
+    Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Mass>& >::type endMZs(endMZsSEXP);
+    Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Mobility>& >::type startMobs(startMobsSEXP);
+    Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Mobility>& >::type endMobs(endMobsSEXP);
     Rcpp::traits::input_parameter< bool >::type withMob(withMobSEXP);
-    Rcpp::traits::input_parameter< SpectrumRawTypes::Mobility >::type mobilityStart(mobilityStartSEXP);
-    Rcpp::traits::input_parameter< SpectrumRawTypes::Mobility >::type mobilityEnd(mobilityEndSEXP);
-    rcpp_result_gen = Rcpp::wrap(getChromPoints(backend, rtStart, rtEnd, mzStart, mzEnd, withMob, mobilityStart, mobilityEnd));
+    rcpp_result_gen = Rcpp::wrap(getChromPoints(backend, startTimes, endTimes, startMZs, endMZs, startMobs, endMobs, withMob));
     return rcpp_result_gen;
 END_RCPP
 }

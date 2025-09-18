@@ -139,6 +139,9 @@
 - plotChroms() etc: mention that only precursors are plot? Now seems confusing as number of fGroups seems less when reporting
 - MSPL: do topMost filter after averaging IMS subspectrum? Would be more consistent with HRMS, but may need larger default
 - getEIMs(): don't average intensities, replace clustering with map as is done with EIMRunner?
+- getEICList()/piek
+    - sumMS: TRUE by default for IMS, ignore it for non-IMS? (eg rename to sumIMSFrame?). Somehow combine with EIM summing?
+
 
 ## Tests
 

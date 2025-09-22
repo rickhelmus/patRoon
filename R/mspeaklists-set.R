@@ -242,7 +242,7 @@ setMethod("filter", "MSPeakListsSet", function(obj, ..., removeMZs = NULL, withM
     if (!is.null(sets) && length(sets) > 0)
     {
         if (negate)
-            sets <- setdiff(get("sets", pos = 2)(obj), sets)
+            sets <- setdiff(sets(obj), sets)
         obj <- obj[, sets = sets]
         removeMZsList <- removeMZsList[sets(obj)]; annotatedByList <- annotatedByList[sets(obj)]
     }

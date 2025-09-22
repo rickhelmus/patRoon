@@ -97,7 +97,6 @@ setMethod("linkTPsToFGroups", "transformationProductsAnnForm", function(TPs, fGr
 })
 
 
-# NOTE: this function is called by a withProg() block, so handles progression updates
 # NOTE: parGroup may be NULL, eg when parents are from a suspect list
 getTPsFormulas <- function(annTable, parName, parFormula, minFitFormula)
 {
@@ -120,8 +119,6 @@ getTPsFormulas <- function(annTable, parName, parFormula, minFitFormula)
                                            "annSim", "fitFormula", "TPScore"))
 
     tab <- tab[numGTE(fitFormula, minFitFormula)]
-    
-    doProgress()
     
     return(tab)
 }
@@ -228,12 +225,11 @@ generateTPsAnnForm <- function(parents, formulas, minFitFormula = 0.94, skipInva
         newResults <- list()
         if (length(parsTBD) > 0)
         {
-            newResults <- doApply("sapply", parallel, parsSplit[parsTBD], function(par)
+            newResults <- doMap(parallel, parsSplit[parsTBD], f = function(par, annTable, minFitFormula)
             {
-                nr <- getTPsFormulas(annTable, par$name, par$formula, minFitFormula)
-                saveCacheData("TPsAnnForm", nr, hashes[[par$name]], cacheDB)
-                return(nr)
-            }, simplify = FALSE)
+                patRoon:::getTPsFormulas(annTable, par$name, par$formula, minFitFormula)
+            }, MoreArgs = list(annTable = annTable, minFitFormula = minFitFormula))
+            saveCacheDataList("TPsAnnForm", newResults, hashes[parsTBD[i]], cacheDB)
             newResults <- pruneList(newResults, checkZeroRows = TRUE)
         }
         

@@ -228,6 +228,7 @@
 - update relativeTo arg (not just replicates)
 - mention that mzR backend caches as loads all at once
 - normalized and showLegend args for plotSpectrum() methods
+- getFMCS(): parallel=TRUE can only work on local machine
 - convert
     - add patRoon 3.0 citation for im_collapse
 - handbook
@@ -270,7 +271,7 @@
         - update docs for EIC filtering by suspects/ms2 (also mzIsoWindow, IMSWindow for ms2)
         - docs for minEICsIMSPreCheck
         - update docs for topMostEICMZ/topMostEICMZMob
-        - EIM summing and smoothing
+        - EIM & frame summing and smoothing
     - assignMobilities()
         - refs to paper
         - fGroups method
@@ -435,6 +436,7 @@
 - plotChroms3D()
 - plotSpectrum() methods: normalization and showLegend
 - updateGroups()
+- improved future parallelization, esp reporting
 
 
 ## Features

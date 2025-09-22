@@ -285,7 +285,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, 
     else
         compInfo <- data.table(parent_group = names(fGroups), parent_name = names(fGroups))
 
-    compList <- doApply("Map", FALSE, compInfo$parent_name, compInfo$parent_group, f = function(parn, parfg)
+    compList <- doMap(FALSE, compInfo$parent_name, compInfo$parent_group, stripEnv = FALSE, f = function(parn, parfg)
     {
         cmpTab <- NULL
         if (fromTPs)
@@ -308,7 +308,6 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, 
             cmpTab[, TP_name := paste0(parfg, "-TP", seq_len(nrow(cmpTab)))]
         }
         cmpTab <- prepareComponent(cmpTab, parfg)
-        doProgress()
         return(cmpTab)
     })
     

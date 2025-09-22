@@ -58,18 +58,16 @@ findFeaturesEnviPick <- function(analysisInfo, ..., parallel = TRUE, verbose = T
     cachedData <- lapply(hashes, loadCacheData, category = "featuresEnviPick")
     cachedData <- pruneList(setNames(cachedData, anas))
     
-    doFP <- function(fp)
+    doFP <- function(fp, ...)
     {
         invisible(utils::capture.output(ep <- enviPick::enviPickwrap(fp, ...)))
-        f <- importEnviPickPeakList(ep$Peaklist)
-        patRoon:::doProgress()
-        return(f)
+        return(patRoon:::importEnviPickPeakList(ep$Peaklist))
     }
 
     anasTBD <- setdiff(anas, names(cachedData))
     if (length(anasTBD) > 0)
     {
-        feats <- doApply("lapply", parallel, filePaths[anasTBD], doFP)
+        feats <- doMap(parallel, filePaths[anasTBD], f = doFP, MoreArgs = list(...))
         names(feats) <- anasTBD
         for (a in anasTBD)
             saveCacheData("featuresEnviPick", feats[[a]], hashes[[a]])

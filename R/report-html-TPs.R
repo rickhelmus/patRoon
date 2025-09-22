@@ -18,7 +18,10 @@ genHTMLReportPlotsTPs <- function(fGroups, components, MSPeakLists, formulas, co
     cInfoSplit <- split(componentInfo(components), seq_len(length(components)))
 
     cat("Generate TP similarity plots...\n")
-    return(doApply("Map", parallel, names(components), cmpTabSplit, cInfoSplit, f = function(cmpName, cmpTab, cmpInfoRow)
+    # UNDONE: disable parallelization for now, as it seems to make things slower --> combine with generateHTMLReportPlotsFeatsAnns() someday
+    return(doMap(FALSE, names(components), cmpTabSplit, cInfoSplit, f = function(cmpName, cmpTab, cmpInfoRow, fGroups,
+                                                                                 formulas, compounds, MSPeakLists,
+                                                                                 specSimParams, outPath)
     {
         ret <- mapply(split(cmpTab, seq_len(nrow(cmpTab))), seq_len(nrow(cmpTab)), FUN = function(ctRow, ctInd)
         {
@@ -68,10 +71,9 @@ genHTMLReportPlotsTPs <- function(fGroups, components, MSPeakLists, formulas, co
                                       pointsize = 16))
         })
         
-        doProgress()
-        
         return(ret)
-    }))
+    }, MoreArgs = list(fGroups = fGroups, formulas = formulas, compounds = compounds, MSPeakLists = MSPeakLists,
+                       specSimParams = specSimParams, outPath = outPath)))
 }
 
 getTPCandReactTab <- function(obj)

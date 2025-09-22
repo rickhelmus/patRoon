@@ -1057,8 +1057,6 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRtWindo
 
         saveCacheDataList("MSPeakLists", mspl, ft$hash[match(names(mspl), ft$group)], cacheDB)
         
-        doProgress()
-        
         return(mspl)        
     })
     

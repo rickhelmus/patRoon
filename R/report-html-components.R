@@ -13,15 +13,15 @@ genHTMLReportPlotsComponents <- function(fGroups, components, settings, outPath,
     if (length(components) == 0)
         return(list())
     
-    isIntCl <- inherits(components, "componentsIntClust")
     ret <- list()
     
-    if (isIntCl || inherits(components, "componentsSpecClust"))
+    if (inherits(components, "componentsIntClust") || inherits(components, "componentsSpecClust"))
         ret$dendro <- makeHTMLReportPlot("compon-dendro.svg", outPath, "plot", list(components))
     
-    ret$components <- pruneList(doApply("Map", parallel, names(components), componentTable(components), f = function(cn, ct)
+    # UNDONE: disable parallelization for now, as it seems to make things slower --> combine with generateHTMLReportPlotsFeatsAnns() someday
+    pruneList(doMap(FALSE, names(components), f = function(cn, fGroups, components, settings, outPath, EICs, EICParams)
     {
-        if (!any(ct$group %chin% names(fGroups)))
+        if (!any(components[[cn]]$group %chin% names(fGroups)))
             return(NULL)
         
         pl <- list()
@@ -37,7 +37,7 @@ genHTMLReportPlotsComponents <- function(fGroups, components, settings, outPath,
                                       parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)), width = 7, height = 4,
                                       pointsize = 16)
         
-        if (isIntCl)
+        if (inherits(components, "componentsIntClust"))
         {
             pl$profileRel <- makeHTMLReportPlot("compon-int_rel", outPath, "plotInt",
                                                 list(components, index = cn,
@@ -51,12 +51,9 @@ genHTMLReportPlotsComponents <- function(fGroups, components, settings, outPath,
                                                 width = 7, height = 6, pointsize = 16)
         }
         
-        doProgress()
-        
         return(pl)
-    }))
-    
-    return(ret)
+    }, MoreArgs = list(fGroups = fGroups, components = components, settings = settings, outPath = outPath, EICs = EICs,
+                       EICParams = EICParams)))
 }
 
 

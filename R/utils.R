@@ -682,17 +682,46 @@ getAllMergedConsCols <- function(allCols, mConsNames) grep(sprintf("\\-(%s)$", p
 
 getDuplicatedStrings <- function(x) names(which(table(x) > 1))
 
-doApply <- function(applyf, doPar, data, ..., future.globals = TRUE, prog = TRUE)
+makeApplyFuncWrapper <- function(applyFunc)
+{
+    ret <- function(..., doProg)
+    {
+        ret <- applyFunc(...)
+        if (doProg)
+            doProgress()
+        return(ret)
+    }
+    env <- new.env(parent = asNamespace("patRoon"))
+    assign("applyFunc", applyFunc, envir = env)
+    environment(ret) <- env
+    return(ret)
+}
+
+doMap <- function(doPar, f, data, ..., future.globals = FALSE, prog = TRUE, stripEnv = TRUE)
 {
     args <- list(...)
+    applyf <- "Map"
+    
     if (doPar)
     {
-        applyf <- get(paste0("future_", applyf), envir = asNamespace("future.apply"))
+        applyf <- get("future_Map", envir = asNamespace("future.apply"))
         args <- c(args, list(future.seed = TRUE, future.globals = future.globals))
     }
-    if (prog)
-        return(withProg(length(data), doPar, do.call(applyf, c(list(data), args))))
-    return(do.call(applyf, c(list(data), args)))
+    
+    if (stripEnv)
+        environment(f) <- asNamespace("patRoon")
+    
+    if (!prog)
+        return(do.call(applyf, c(list(data), args, list(f = f))))
+
+    maxProgUpdates <- 10
+    doProg <- if (length(data) > maxProgUpdates)
+        seq_along(data) %in% round(seq(1 / maxProgUpdates, 1, by = 1 / maxProgUpdates) * length(data))
+    else
+        doProg <- rep(TRUE, length(data))
+
+    return(withProg(maxProgUpdates, doPar,
+                    do.call(applyf, c(list(data), args, list(f = patRoon:::makeApplyFuncWrapper(f), doProg = doProg)))))
 }
 
 getMS2QuantRes <- function(calibrants, unknowns, eluent, organicModifier, pHAq, allFPs)

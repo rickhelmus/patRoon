@@ -124,7 +124,7 @@ function updateTabSelFGroups(rowValues, rowIndex)
     
     let intEl = document.getElementById('int_plot');
     if (intEl)
-        intEl.src = reportPlots.intPlots[grp];
+        intEl.src = reportPlots.featsAndAnns[grp].intPlot;
     
     if (document.getElementById('MSPLTab'))
     {
@@ -134,8 +134,8 @@ function updateTabSelFGroups(rowValues, rowIndex)
         if (specEl) // not present if !settings$MSPeakLists$spectra
         {
             // NOTE: undefined if filtered away
-            specEl.src = (reportPlots.MSPeakLists[grp] && reportPlots.MSPeakLists[grp].MS) || "";
-            document.getElementById('spectrumMSMS').src = (reportPlots.MSPeakLists[grp] && reportPlots.MSPeakLists[grp].MSMS) || "";
+            specEl.src = (reportPlots.featsAndAnns[grp].MSPeakLists && reportPlots.featsAndAnns[grp].MSPeakLists.MS) || "";
+            document.getElementById('spectrumMSMS').src = (reportPlots.featsAndAnns[grp].MSPeakLists && reportPlots.featsAndAnns[grp].MSPeakLists.MSMS) || "";
         }
     }
 
@@ -152,7 +152,7 @@ function updateTabSelFGroups(rowValues, rowIndex)
     const ccd = document.getElementById('comps_cluster-dendro');
     if (ccd)
     {
-        ccd.src = reportPlots.compsCluster[grp].dendro;
+        ccd.src = reportPlots.featsAndAnns[grp].compsCluster.dendro;
         Array.from(document.getElementsByClassName('mcs')).forEach(el => el.style.display = (el.classList.contains('mcs-' + grp)) ? '' : 'none');
     }
 }
@@ -346,7 +346,7 @@ function updateCompon(cmpName, activateFG = true)
     let specEl = document.getElementById('spectrum_view-component');
     let profileRelEl = document.getElementById('profileRel_view-component');
     let profileAbsEl = document.getElementById('profileAbs_view-component');
-    const pl = reportPlots.components.components[cmpName];
+    const pl = reportPlots.components[cmpName];
     chromEl.src = pl.chrom;
     specEl.src = pl.spec;
     if (profileRelEl != undefined)
@@ -370,9 +370,9 @@ function updateTPCompon(cmpName, activateFG = true)
     const structEl = document.getElementById('struct_view-parent');
     
     if (chromEl)
-        chromEl.src = reportPlots.chromsLarge[TPComponParentInfo[cmpName].group];
+        chromEl.src = reportPlots.featsAndAnns[TPComponParentInfo[cmpName].group].chromLarge;
     if (intEl)
-        intEl.src = reportPlots.intPlots[TPComponParentInfo[cmpName].group];
+        intEl.src = reportPlots.featsAndAnns[TPComponParentInfo[cmpName].group].intPlot;
     if (structEl)
         structEl.src = reportPlots.structs[TPComponParentInfo[cmpName].InChIKey1] || "";
     
@@ -564,8 +564,15 @@ function toggleTabFilters(tableID, e)
     internFilterable.forEach(function(col, index) { Reactable.setFilter(tableID, col, curInternFilters[index]); } );
 }
 
+function annTableHasSuspects(ann)
+{
+    return Reactable.getInstance(ann + "Tab").allColumns.includes("suspect");
+}
+
 function applyAnnSuspFilter(ann, suspect = undefined)
 {
+    if (!annTableHasSuspects(ann))
+        return;
     const elName = ann + "Tab";
     if (suspect === undefined)
         suspect = Reactable.getState(elName).meta.suspectFilter;
@@ -574,6 +581,8 @@ function applyAnnSuspFilter(ann, suspect = undefined)
 
 function toggleAnnSuspFilter(ann, e)
 {
+    if (!annTableHasSuspects(ann))
+        return;
     if (!e)
         Reactable.setFilter(ann + "Tab", "suspect", undefined);
     else

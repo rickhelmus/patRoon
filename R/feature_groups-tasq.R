@@ -55,7 +55,7 @@ importFeatureGroupsBrukerTASQ <- function(input, analysisInfo, clusterRTWindow =
     checkmate::assertNumber(clusterRTWindow, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
-    fts <- importFeaturesBrukerTASQ(inputFeat, analysisInfo)
+    fts <- importFeaturesBrukerTASQ(input, analysisInfo)
     fTable <- featureTable(fts)
     analysisInfo <- fts@analysisInfo # may have been updated
     

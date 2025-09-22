@@ -1205,7 +1205,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                         {
                             if (doEIMSum)
                             {
-                                SpectrumRawTypes::Scan sc = (eic.empty()) ? curScanInd : (prvScanInd + 1);
+                                SpectrumRawTypes::Scan sc = (prvScanInd == allPeaksSorted.indices.size()) ? curScanInd : (prvScanInd + 1);
                                 
                                 // Rcpp::Rcout << "EIC sum: " << i << "/" << j << "/" << sc << "/" << scanInd
                                 //             << "/" << EIMRun.size() << "/" <<  specMeta.first.times[sc] << "/" << curTime << "\n";

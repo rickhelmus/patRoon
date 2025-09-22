@@ -228,14 +228,14 @@ setMethod("predictTox", "formulasSet", doFeatAnnPredictToxSets)
 setMethod("estimateIDConfidence", "formulasSet", function(obj, absMzDev = defaultLim("mz", "medium"),
                                                           normalizeScores = "max",
                                                           IDFile = system.file("misc", "IDLevelRules.yml", package = "patRoon"),
-                                                          logPath = NULL, parallel = TRUE)
+                                                          logPath = NULL)
 {
     logPath <- if (is.null(logPath)) rep(list(NULL), length(sets(obj))) else file.path(logPath, sets(obj))
     
     obj@setObjects <- Map(setObjects(obj), logPath = logPath,
                           f = estimateIDConfidence, MoreArgs = list(absMzDev = absMzDev,
                                                                     normalizeScores = normalizeScores,
-                                                                    IDFile = IDFile, parallel = parallel))
+                                                                    IDFile = IDFile))
     obj <- updateSetConsensus(obj)
     obj@groupAnnotations <- lapply(annotations(obj), assignSetsIDLs, sets(obj))
     

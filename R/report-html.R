@@ -5,6 +5,45 @@
 #' @include main.R
 NULL
 
+generateHTMLReportPlotsFeatAnn <- function(grp, fGroups, MSPeakLists, formulas, compounds, compsCluster, settings,
+                                           outPath, EICs, EICParams, EIMs, EIMParams)
+{
+    ret <- list()
+    
+    ret$chromLarge <- genHTMLReportPlotsChromLarge(grp, fGroups, settings, outPath, EICs, EICParams)
+    ret$chromSmall <- genHTMLReportPlotsChromSmall(grp, fGroups, settings, outPath, EICs, EICParams)
+    ret$chromsFeatures <- genHTMLReportPlotsChromsFeatures(grp, fGroups, settings, outPath, EICs, EICParams)
+    
+    ret$mobilogramLarge <- genHTMLReportPlotsMobilogramLarge(grp, fGroups, settings, outPath, EIMs, EIMParams)
+    ret$mobilogramSmall <- genHTMLReportPlotsMobilogramSmall(grp, fGroups, settings, outPath, EIMs, EIMParams)
+    ret$mobilogramsFeatures <- genHTMLReportPlotsMobilogramsFeatures(grp, fGroups, settings, outPath, EIMs, EIMParams)
+    
+    ret$intPlot <- genHTMLReportPlotsIntPlot(grp, fGroups, settings, outPath)
+    
+    if (!is.null(MSPeakLists))
+        ret$MSPeakLists <- genHTMLReportPlotsMSPeakLists(grp, MSPeakLists, settings, outPath)    
+    if (!is.null(formulas))
+        ret$formulas <- genHTMLReportPlotsFormulas(grp, formulas, MSPeakLists, settings, outPath)
+    if (!is.null(compounds))
+        ret$compounds <- genHTMLReportPlotsCompounds(grp, compounds, MSPeakLists, formulas, settings, outPath)
+    if (!is.null(compsCluster))
+        ret$compsCluster <- genHTMLReportPlotsCompsCluster(grp, compsCluster, settings, outPath)
+    
+    return(ret)
+}
+
+generateHTMLReportPlotsFeatsAnns <- function(fGroups, MSPeakLists, formulas, compounds, compsCluster, settings, outPath,
+                                             EICs, EICParams, EIMs, EIMParams, parallel)
+    
+{
+    cat("Generate feature and annotation plots...")
+    gNames <- names(fGroups)
+    doMap(parallel, names(fGroups), f = patRoon:::generateHTMLReportPlotsFeatAnn,
+          MoreArgs = list(fGroups, if (!is.null(MSPeakLists)) MSPeakLists[, gNames],
+                          if (!is.null(formulas)) formulas[gNames], if (!is.null(compounds)) compounds[gNames],
+                          if (!is.null(compsCluster)) compsCluster[gNames], settings, outPath, EICs, EICParams,
+                          EIMs, EIMParams))
+}
 
 generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, compsCluster, components, TPs, settings,
                                     outPath, EICs, EICParams, EIMs, EIMParams, specSimParams, parallel)
@@ -60,30 +99,11 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
     }
     cat(" Done!\n")
     
-    ret$chromsLarge <- genHTMLReportPlotsChromsLarge(fGroups, settings, outPath, EICs, EICParams, parallel)
-    ret$chromsSmall <- genHTMLReportPlotsChromsSmall(fGroups, settings, outPath, EICs, EICParams, parallel)
-    ret$chromsFeatures <- genHTMLReportPlotsChromsFeatures(fGroups, settings, outPath, EICs, EICParams, parallel)
-    
-    ret$mobilogramsLarge <- genHTMLReportPlotsMobilogramsLarge(fGroups, settings, outPath, EIMs, EIMParams, parallel)
-    ret$mobilogramsSmall <- genHTMLReportPlotsMobilogramsSmall(fGroups, settings, outPath, EIMs, EIMParams, parallel)
-    ret$mobilogramsFeatures <- genHTMLReportPlotsMobilogramsFeatures(fGroups, settings, outPath, EIMs, EIMParams, parallel)
-    
-    ret$intPlots <- genHTMLReportPlotsIntPlots(fGroups, settings, outPath, parallel)
-    
-    gNames <- names(fGroups)
-    if (!is.null(compounds))
-        compounds <- compounds[gNames]
+    ret$featsAndAnns <- generateHTMLReportPlotsFeatsAnns(fGroups, MSPeakLists, formulas, compounds, compsCluster,
+                                                         settings, outPath, EICs, EICParams, EIMs, EIMParams, parallel)
     
     ret$structs <- genHTMLReportPlotsStructs(fGroups, compounds, components, settings, outPath, parallel)
     
-    if (!is.null(MSPeakLists))
-        ret$MSPeakLists <- genHTMLReportPlotsMSPeakLists(MSPeakLists[, gNames], settings, outPath, parallel)    
-    if (!is.null(formulas))
-        ret$formulas <- genHTMLReportPlotsFormulas(formulas[gNames], MSPeakLists, settings, outPath, parallel)
-    if (!is.null(compounds))
-        ret$compounds <- genHTMLReportPlotsCompounds(compounds, MSPeakLists, formulas, settings, outPath, parallel)
-    if (!is.null(compsCluster))
-        ret$compsCluster <- genHTMLReportPlotsCompsCluster(compsCluster[gNames], settings, outPath, parallel)
     if (!is.null(components))
     {
         if (!inherits(components, "componentsTPs"))
@@ -93,6 +113,7 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
             ret$TPs <- genHTMLReportPlotsTPs(fGroups, components, MSPeakLists, formulas, compounds, settings,
                                              specSimParams, outPath, EICs, parallel)
     }
+
     return(ret)
 }
 

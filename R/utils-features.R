@@ -117,6 +117,25 @@ featureGroupQualities <- function()
     )
 }
 
+calcFeatQualities <- function(ret, retmin, retmax, intensity, EIC, EICAT, flatnessFactor)
+{
+    featQualities <- featureQualities()
+    EIC <- cbind(time = EICAT, intensity = doFillEIXIntensities(EICAT, EIC[, "time"], EIC[, "intensity"]))
+    EIC <- EIC[numGTETol(EIC[, "time"], retmin) & numLTETol(EIC[, "time"], retmax), , drop = FALSE]
+    tol <- 1E-4 # HACK: otherwise MetaClean won't subset well as it uses equal operators
+    args <- list(c(rt = ret, rtmin = retmin - tol, rtmax = retmax + tol, maxo = intensity), EIC)
+    return(sapply(featureQualityNames(group = FALSE), function(q)
+    {
+        a <- args
+        if (q %in% c("Jaggedness", "Modality"))
+            a <- c(a, flatnessFactor)
+        qual <- do.call(featQualities[[q]]$func, a)
+        if (q == "GaussianSimilarity" && is.na(qual))
+            qual <- 0
+        return(qual)
+    }, simplify = FALSE))
+}
+
 # normalize, invert if necessary to get low (worst) to high (best) order
 scoreFeatQuality <- function(quality, values)
 {

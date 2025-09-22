@@ -619,22 +619,26 @@ setMethod("predictRespFactors", "compounds", function(obj, fGroups, calibrants, 
     
     printf("Predicting response factors from SMILES with MS2Quant for %d candidates...\n", length(obj))
     
+    annSMI <- lapply(annotations(obj), \(ann) ann$SMILES)
+    preds <- doMap(parallel, split(groupInfo(fGroups), seq_len(length(fGroups))), annSMI,
+                   f = function(gInfo, SMI, calibrants, eluent, organicModifier, pHAq, concUnit)
+    {
+        patRoon:::predictRespFactorsSMILES(data.table(group = gInfo$group, SMILES = SMI), gInfo, calibrants,
+                                           eluent, organicModifier, pHAq, concUnit)
+    }, MoreArgs = list(calibrants, eluent, organicModifier, pHAq, concUnit))
+
     MS2QMD <- list()
-    
-    obj@groupAnnotations <- doApply("Map", parallel, groupNames(obj), annotations(obj), f = function(grp, ann)
+    obj@groupAnnotations <- Map(annotatiobs(obj), preds, f = function(ann, res)
     {
         ann <- copy(ann)
-        inp <- data.table(group = grp, SMILES = ann$SMILES)
-        res <- predictRespFactorsSMILES(inp, groupInfo(fGroups), calibrants, eluent, organicModifier, pHAq, concUnit)
-        if (length(MS2QMD) == 0)
-            MS2QMD <<- res$MD
         if (!is.null(ann[["RF_SMILES"]]))
             ann[, RF_SMILES := NULL] # clearout for merge below
         ann <- merge(ann, res$RFs[, c("SMILES", "RF_SMILES"), with = FALSE], by = "SMILES", sort = FALSE, all.x = TRUE)
-        doProgress()
+        if (length(MS2QMD) == 0)
+            MS2QMD <<- res$MD
         return(ann)
     })
-
+    
     obj@MS2QuantMeta <- MS2QMD
     
     return(addCompoundScore(obj, "RF_SMILES", updateScore, scoreWeight))
@@ -659,16 +663,15 @@ setMethod("predictTox", "compounds", function(obj, LC50Mode = "static", concUnit
     
     printf("Predicting LC50 values from SMILES with MS2Tox for %d candidates...\n", length(obj))
     
-    obj@groupAnnotations <- doApply("Map", parallel, groupNames(obj), annotations(obj), f = function(grp, ann)
+    obj@groupAnnotations <- doMap(parallel, groupNames(obj), annotations(obj), f = function(grp, ann, LC50Mode, concUnit)
     {
         ann <- copy(ann)
         pr <- predictLC50SMILES(ann$SMILES, LC50Mode, concUnit)
         if (!is.null(ann[["LC50_SMILES"]]))
             ann[, LC50_SMILES := NULL] # clearout for merge below
         ann <- merge(ann, pr, by = "SMILES", sort = FALSE, all.x = TRUE)
-        doProgress()
         return(ann)
-    })
+    }, MoreArgs = list(LC50Mode, concUnit))
     
     return(addCompoundScore(obj, "LC50_SMILES", updateScore, scoreWeight))
 })
@@ -680,7 +683,7 @@ setMethod("estimateIDConfidence", "compounds", function(obj, absMzDev = defaultL
                                                         specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
                                                         formulasNormalizeScores = "max", compoundsNormalizeScores = "max",
                                                         IDFile = system.file("misc", "IDLevelRules.yml", package = "patRoon"),
-                                                        logPath = NULL, parallel = TRUE)
+                                                        logPath = NULL)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertNumber(absMzDev, lower = 0, finite = TRUE, add = ac)
@@ -692,7 +695,6 @@ setMethod("estimateIDConfidence", "compounds", function(obj, absMzDev = defaultL
     checkmate::assertFileExists(IDFile, "r", add = ac)
     if (!is.null(logPath))
         assertCanCreateDir(logPath, add = ac)
-    checkmate::assertFlag(parallel, add = ac)
     checkmate::reportAssertions(ac)
     
     IDLevelRules <- readIDLRules(IDFile)
@@ -706,7 +708,8 @@ setMethod("estimateIDConfidence", "compounds", function(obj, absMzDev = defaultL
     printf("Estimating identification levels for %d feature groups with a total of %d candidates...\n",
            length(groupNames(obj)), length(obj))
     
-    obj@groupAnnotations <- doApply("Map", parallel, groupNames(obj), annotations(obj), f = function(grp, ann)
+    # UNDONE: this could be parallelized, but uses a lot of objects now which complicates things and slows things down
+    obj@groupAnnotations <- doMap(FALSE, groupNames(obj), annotations(obj), stripEnv = FALSE, f = function(grp, ann)
     {
         annNorm <- normalizeAnnScores(ann, compScoreNames(TRUE), obj@scoreRanges[[grp]], mCompNames,
                                       compoundsNormalizeScores == "minmax")
@@ -759,7 +762,6 @@ setMethod("estimateIDConfidence", "compounds", function(obj, absMzDev = defaultL
         
         setcolorder(ann, intersect(c("annSimForm", "annSimBoth", "estIDLevel"), names(ann)), after = "annSim")
         
-        doProgress()
         return(ann)
     })
     

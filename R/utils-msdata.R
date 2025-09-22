@@ -231,8 +231,7 @@ doGetEICs <- function(anaInfo, EICInfoList, gapFactor, mzExpIMSWindow = 0, minIn
                 saveCacheData("EICAllTimes", attr(EICs, "allXValues"), anaEICHash, cacheDB)
             }
         }
-
-        doProgress()
+        
         return(EICs)
     })
     
@@ -274,7 +273,6 @@ doGetEIMs <- function(anaInfo, EIMInfoList, minIntensity, smooth, smLength, sgOr
         if (all(isCached))
         {
             # everything is in the cache
-            doProgress()
             return(unname(EIMs))
         }
 
@@ -316,7 +314,6 @@ doGetEIMs <- function(anaInfo, EIMInfoList, minIntensity, smooth, smLength, sgOr
         
         saveCacheDataList("EIMs", EIMs[!isCached], hashes[!isCached], cacheDB)
         
-        doProgress()
         return(EIMs)
     })
     

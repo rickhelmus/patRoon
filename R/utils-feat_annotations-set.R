@@ -441,7 +441,7 @@ doFeatAnnFilterSets <- function(obj, ..., sets = NULL, updateConsensus = FALSE, 
     if (!is.null(sets) && length(sets) > 0)
     {
         if (negate)
-            sets <- setdiff(get("sets", pos = 2)(obj), sets)
+            sets <- setdiff(sets(obj), sets)
         obj <- obj[, sets = sets, updateConsensus = updateConsensus]
     }
     

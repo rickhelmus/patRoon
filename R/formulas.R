@@ -433,7 +433,7 @@ setMethod("plotScoresHash", "formulas", function(obj, index, groupName, analysis
 #' @export
 setMethod("estimateIDConfidence", "formulas", function(obj, absMzDev = defaultLim("mz", "medium"), normalizeScores = "max",
                                                        IDFile = system.file("misc", "IDLevelRules.yml", package = "patRoon"),
-                                                       logPath = NULL, parallel = TRUE)
+                                                       logPath = NULL)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertNumber(absMzDev, lower = 0, finite = TRUE, add = ac)
@@ -441,7 +441,6 @@ setMethod("estimateIDConfidence", "formulas", function(obj, absMzDev = defaultLi
     checkmate::assertFileExists(IDFile, "r", add = ac)
     if (!is.null(logPath))
         assertCanCreateDir(logPath, add = ac)
-    checkmate::assertFlag(parallel, add = ac)
     checkmate::reportAssertions(ac)
     
     IDLevelRules <- readIDLRules(IDFile)
@@ -455,7 +454,8 @@ setMethod("estimateIDConfidence", "formulas", function(obj, absMzDev = defaultLi
     printf("Estimating identification levels for %d feature groups with a total of %d candidates...\n",
            length(groupNames(obj)), length(obj))
     
-    obj@groupAnnotations <- doApply("Map", parallel, groupNames(obj), annotations(obj), f = function(grp, ann)
+    # UNDONE: this could be parallelized, but is not for consistency with the compounds method
+    obj@groupAnnotations <- doMap(FALSE, groupNames(obj), annotations(obj), stripEnv = FALSE, f = function(grp, ann)
     {
         annNorm <- normalizeAnnScores(obj[[grp]], formScoreNames(TRUE), obj@scoreRanges[[grp]], mFormNames,
                                       normalizeScores == "minmax")
@@ -473,7 +473,6 @@ setMethod("estimateIDConfidence", "formulas", function(obj, absMzDev = defaultLi
                                                                      formRank = .I, compTable = NULL,
                                                                      compTableNorm = NULL, compRank = NULL)))
         }, by = seq_len(nrow(ann))]
-        doProgress()
         return(ann)
     })
     

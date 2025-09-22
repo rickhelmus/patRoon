@@ -6,6 +6,21 @@
 #' @include components-features.R
 NULL
 
+doGetCliques <- function(xdata, maxCharge, maxGrade, ppm, adductInfo, ionization, extraOptsCli, extraOptsIso,
+                         extraOptsAnn)
+{
+    suppressMessages(invisible(utils::capture.output({
+        cliques <- do.call(cliqueMS::getCliques, c(list(xdata), extraOptsCli))
+        cliques <- do.call(cliqueMS::getIsotopes,
+                           c(list(cliques, maxCharge = maxCharge, maxGrade = maxGrade, ppm = ppm), extraOptsIso))
+        cliques <- do.call(cliqueMS::getAnnotation,
+                           c(list(cliques, ppm = ppm, adinfo = adductInfo, polarity = ionization,
+                                  normalizeScore = TRUE), extraOptsAnn))
+    })))
+    return(cliques)
+}
+
+
 #' @rdname components-class
 #' @export
 componentsCliqueMS <- setClass("componentsCliqueMS", slots = c(cliques = "list"),
@@ -124,20 +139,6 @@ setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ioniz
     cachedCliques <- sapply(hashes, loadCacheData, category = "componentsCliqueMS", dbArg = db, simplify = FALSE)
     cachedCliques <- pruneList(cachedCliques)
     
-    getCliques <- function(xdata)
-    {
-        suppressMessages(invisible(utils::capture.output({
-            cliques <- do.call(cliqueMS::getCliques, c(list(xdata), extraOptsCli))
-            cliques <- do.call(cliqueMS::getIsotopes,
-                               c(list(cliques, maxCharge = maxCharge, maxGrade = maxGrade, ppm = ppm), extraOptsIso))
-            cliques <- do.call(cliqueMS::getAnnotation,
-                               c(list(cliques, ppm = ppm, adinfo = adductInfo, polarity = ionization,
-                                      normalizeScore = TRUE), extraOptsAnn))
-        })))
-        patRoon:::doProgress()
-        return(cliques)
-    }
-
     anasTBD <- setdiff(anas, names(cachedCliques))
     if (length(anasTBD) > 0)
     {
@@ -146,7 +147,9 @@ setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ioniz
                       simplify = FALSE)
         cat("Done!\n")
         
-        allCliques <- doApply("sapply", parallel, xds, getCliques, simplify = FALSE)
+        allCliques <- doMap(parallel, xds, f = patRoon:::doGetCliques,
+                            MoreArgs = list(maxCharge, maxGrade, ppm, adductInfo, ionization, extraOptsCli,
+                                            extraOptsIso, extraOptsAnn))
 
         for (a in anasTBD)
             saveCacheData("componentsCliqueMS", allCliques[[a]], hashes[[a]], db)

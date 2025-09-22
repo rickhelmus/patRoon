@@ -24,9 +24,6 @@ runCTS <- function(parentRow, transLibrary, generations, errorRetries, neutraliz
     
     httr::warn_for_status(resp)
     
-    # HACK: do here to simplify NULL returns below
-    doProgress()
-    
     if (httr::status_code(resp) != 200)
         return(NULL)
     
@@ -162,8 +159,8 @@ generateTPsCTS <- function(parents, transLibrary, generations = 1, errorRetries 
         newResults <- list()
         if (length(parsTBD) > 0)
         {
-            newResults <- doApply("sapply", parallel, parsSplit[parsTBD], patRoon:::runCTS, transLibrary, generations,
-                                  errorRetries, neutralizeTPs, simplify = FALSE)
+            newResults <- doMap(parallel, parsSplit[parsTBD], f = patRoon:::runCTS,
+                                MoreArgs = list(transLibrary, generations, errorRetries, neutralizeTPs))
 
             for (pn in names(newResults))
             {

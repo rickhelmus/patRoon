@@ -426,8 +426,6 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
     if (length(obj) == 0)
         return(obj) # nothing to do...
     
-    featQualities <- featureQualities()
-    featQualityNames <- featureQualityNames(group = FALSE)
     featScoreNames <- featureQualityNames(group = FALSE, scores = TRUE, totScore = FALSE)
     
     ac <- checkmate::makeAssertCollection()
@@ -454,26 +452,12 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
     eg$SSgauss <- xcms::SSgauss
     withr::local_environment(eg)
     
-    calcFeatQualities <- function(ret, retmin, retmax, intensity, EIC, EICAT)
+    doCalcs <- function(ft, eic, flatf)
     {
-        EIC <- cbind(time = EICAT, intensity = doFillEIXIntensities(EICAT, EIC[, "time"], EIC[, "intensity"]))
-        EIC <- EIC[numGTETol(EIC[, "time"], retmin) & numLTETol(EIC[, "time"], retmax), , drop = FALSE]
-        tol <- 1E-4 # HACK: otherwise MetaClean won't subset well as it uses equal operators
-        args <- list(c(rt = ret, rtmin = retmin - tol, rtmax = retmax + tol, maxo = intensity), EIC)
-        return(sapply(featQualityNames, function(q)
-        {
-            a <- args
-            if (q %in% c("Jaggedness", "Modality"))
-                a <- c(a, flatnessFactor)
-            qual <- do.call(featQualities[[q]]$func, a)
-            if (q == "GaussianSimilarity" && is.na(qual))
-                qual <- 0
-            return(qual)
-        }, simplify = FALSE))
-    }
-    
-    doCalcs <- function(ft, eic)
-    {
+        featQualities <- featureQualities()
+        featQualityNames <- featureQualityNames(group = FALSE)
+        featScoreNames <- featureQualityNames(group = FALSE, scores = TRUE, totScore = FALSE)
+        
         ft <- copy(ft)
         
         if (nrow(ft) == 0)
@@ -481,16 +465,16 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
         else
         {
             eicat <- attr(eic, "allXValues")
-            ft[, (featQualityNames) := rbindlist(Map(calcFeatQualities, ret, retmin, retmax, intensity, eic, MoreArgs = list(eicat)))]
+            ft[, (featQualityNames) := rbindlist(Map(patRoon:::calcFeatQualities, ret, retmin, retmax, intensity, eic,
+                                                     MoreArgs = list(eicat, flatf)))]
             ft[, (featScoreNames) := Map(patRoon:::scoreFeatQuality, featQualities, .SD), .SDcols = featQualityNames]
         }
-        patRoon:::doProgress()
         return(ft)
     }
     
     printf("Calculating feature peak qualities and scores...\n")
 
-    fTable <- doApply("Map", parallel, featureTable(obj)[names(EICs)], EICs, f = doCalcs)
+    fTable <- doMap(parallel, featureTable(obj)[names(EICs)], EICs, f = doCalcs, MoreArgs = list(flatnessFactor))
     
     if (!is.null(weights))
     {

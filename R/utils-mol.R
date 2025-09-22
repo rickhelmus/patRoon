@@ -18,19 +18,28 @@ getMoleculesFromSMILES <- function(SMILES, doTyping = FALSE, doIsotopes = FALSE,
             ret <- rcdk::parse.smiles(sm, kekulise = FALSE, smiles.parser = SMILESParser)[[1]] # might work w/out kekulization
         if (!isValidMol(ret))
         {
-            warning(paste("Failed to parse SMILES:", sm))
+            warning(paste("Failed to parse SMILES:", sm), call. = FALSE)
             if (emptyIfFails)
                 ret <- emptyMol()
         }
-        else if (!isEmptyMol(ret))
+        else if (!isEmptyMol(ret) && (doTyping || doIsotopes))
         {
-            if (doTyping)
+            suc <- tryCatch({
+                if (doTyping)
+                {
+                    rcdk::set.atom.types(ret)
+                    rcdk::do.aromaticity(ret)
+                }
+                if (doIsotopes)
+                    rcdk::do.isotopes(ret)
+                TRUE
+            }, error = \(...) FALSE)
+            if (!suc)
             {
-                rcdk::set.atom.types(ret)
-                rcdk::do.aromaticity(ret)
+                warning("Failed to set molecule information for:", sm, call. = FALSE)
+                if (emptyIfFails)
+                    ret <- emptyMol()
             }
-            if (doIsotopes)
-                rcdk::do.isotopes(ret)
         }
         return(ret)
     })
@@ -499,7 +508,7 @@ getFMCS <- function(refSMILES, otherSMILES, parallel, au = 1, bu = 4, matching.m
     # makes aromatic rings look better...
     
     otherSMILESUn <- unique(otherSMILES)
-    SDFPaths <- doApply("sapply", parallel, c(refSMILES, otherSMILESUn), prog = FALSE, function(SMI)
+    SDFPaths <- doMap(parallel, c(refSMILES, otherSMILESUn), prog = FALSE, function(SMI)
     {
         mol <- patRoon:::getMoleculesFromSMILES(SMI, doTyping = TRUE, emptyIfFails = FALSE)
         if (!patRoon:::isValidMol(mol[[1]]))
@@ -513,18 +522,18 @@ getFMCS <- function(refSMILES, otherSMILES, parallel, au = 1, bu = 4, matching.m
         sdfFile <- tempfile(fileext = ".sdf")
         rcdk::write.molecules(mol, sdfFile, together = TRUE)
         return(sdfFile)
-    })
+    }, SIMPLIFY = TRUE)
     
     if (is.null(SDFPaths[refSMILES]))
         return(list())
     
-    refSDF <- ChemmineR::read.SDFset(SDFPaths[refSMILES])
-    return(setNames(doApply("lapply", parallel, SDFPaths[otherSMILESUn], prog = FALSE, function(p)
+    return(setNames(doMap(parallel, SDFPaths[otherSMILESUn], prog = FALSE, function(p, ref, ...)
     {
         oSDF <- ChemmineR::read.SDFset(p)
-        f <- fmcsR::fmcs(refSDF[[1]], oSDF[[1]], au = au, bu = bu, matching.mode = matching.mode, ...)
+        f <- fmcsR::fmcs(ref, oSDF[[1]], ...)
         return(f)
-    }), otherSMILESUn))
+    }, MoreArgs = list(ref = ChemmineR::read.SDFset(SDFPaths[refSMILES])[[1]], au = au, bu = bu,
+                       matching.mode = matching.mode, ...)), otherSMILESUn))
 }
 
 calcStructFitFMCS <- function(...)

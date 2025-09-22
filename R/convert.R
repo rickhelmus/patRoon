@@ -417,8 +417,6 @@ convertMSFilesIMSCollapse <- function(inFiles, outFiles, typeFrom, formatTo = "m
         allSpectra <- allSpectra[ord]
 
         mzR::writeMSData(allSpectra, outp, header, outformat = formatTo, ...)
-
-        doProgress()
     })
     
     invisible(NULL)

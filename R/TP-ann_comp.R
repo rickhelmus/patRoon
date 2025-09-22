@@ -150,13 +150,19 @@ getTPsCompounds <- function(annTable, parentRow, TPStructParams, extraOptsFMCSR,
         {
             simSusps <- copy(simSusps)
             setnames(simSusps, paste0("simSusp", names(simSusps)))
-            tab[, c("simSusp", names(simSusps)) := rbindlist(doApply("lapply", parallel, SMILES, function(SMI)
+            simSuspsWh <- doMap(parallel, tab$SMILES, f = function(SMI, SMISusp, fpType, fpSimMethod)
             {
-                dists <- sapply(simSusps$simSuspSMILES, patRoon:::distSMILES, SMI1 = SMI, fpType = TPStructParams$fpType,
-                                fpSimMethod = TPStructParams$fpSimMethod)
+                dists <- sapply(SMISusp, patRoon:::distSMILES, SMI1 = SMI, fpType = fpType, fpSimMethod = fpSimMethod)
                 wh <- which.max(dists)
-                return(c(list(dists[wh]), as.list(simSusps[wh])))
-            }, prog = FALSE))]
+                return(list(dist = dists[wh], wh = wh))
+            }, MoreArgs = list(SMISusp = simSusps$simSuspSMILES, fpType = TPStructParams$fpType,
+                               fpSimMethod = TPStructParams$fpSimMethod), prog = FALSE)
+            for (r in seq_len(nrow(tab)))
+            {
+                set(tab, i = r, j = "simSusp", value = simSuspsWh[[r]]$dist)
+                set(tab, i = r, j = paste0("simSusp", names(simSusps)), value = as.list(simSusps[simSuspsWh[[r]]$wh]))
+            }
+            
             tab <- tab[numGTE(NAToZero(simSusp), minSimSusp)]
         }
         else

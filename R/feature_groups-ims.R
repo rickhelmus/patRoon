@@ -32,7 +32,7 @@ setMethod("groupFeaturesIMS", "features", function(feat, grouper, groupAlgo, ...
     if (!isFALSE(verbose))
         printf("Grouping features in %d IMS clusters... \n", uniqueN(fTableAll$IMSClust))
     
-    fgIMSClusts <- doApply("lapply", doPar = FALSE, prog = isTRUE(verbose), unique(fTableAll$IMSClust), \(clust)
+    fgIMSClusts <- doMap(FALSE, prog = isTRUE(verbose), stripEnv = FALSE, unique(fTableAll$IMSClust), f = \(clust)
     {
         if (is.na(clust))
         {
@@ -46,7 +46,6 @@ setMethod("groupFeaturesIMS", "features", function(feat, grouper, groupAlgo, ...
         ret@groupInfo[, mobility := mean(ft$mobility[ft$group == group]), by = "group"]
         if (!is.null(ft[["CCS"]]))
             ret@groupInfo[, CCS := mean(ft$CCS[ft$group == group]), by = "group"]
-        doProgress()
         return(ret)
     })
     

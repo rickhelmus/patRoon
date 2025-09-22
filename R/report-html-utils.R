@@ -25,15 +25,15 @@ makeReactCellRoundMerged <- function(rounding)
 
 makeReactCellLargeChromMob <- function(type)
 {
-    imgTags <- sprintf("'src=\"' + reportPlots.%sLarge[ci.value] + '\"'", type)
+    imgTags <- sprintf("'src=\"' + reportPlots.featsAndAnns[ci.value].%sLarge + '\"'", type)
     return(getReactCellImgJS(imgTags))
 }
 
 makeReactCellSmallChromMob <- function(hasLarge, type)
 {
-    imgTags <- sprintf("'src=\"' + reportPlots.%sSmall[ci.value] + '\"'", type)
+    imgTags <- sprintf("'src=\"' + reportPlots.featsAndAnns[ci.value].%sSmall + '\"'", type)
     imgTags <- if (hasLarge)
-        paste(imgTags, sprintf("+ ' data-srcZoom=\"' + reportPlots.%sLarge[ci.value] + '\"'", type))
+        paste(imgTags, sprintf("+ ' data-srcZoom=\"' + reportPlots.featsAndAnns[ci.value].%sLarge + '\"'", type))
     else
         paste(imgTags, "+ ' class=\"noZoomImg\"'")
     return(getReactCellImgJS(imgTags, 20))
@@ -349,10 +349,10 @@ makeMainResultsReactable <- function(tab, tabName, retMin, colGroupOrder = NULL,
         
         cell <- switch(cdrow$formatting,
                        round_merged = makeReactCellRoundMerged(cdrow$rounding),
-                       chromLarge = makeReactCellLargeChromMob("chroms"),
-                       chromSmall = makeReactCellSmallChromMob("chromLarge" %chin% colDefDB$formatting, "chroms"),
-                       mobLarge = makeReactCellLargeChromMob("mobilograms"),
-                       mobSmall = makeReactCellSmallChromMob("mobLarge" %chin% colDefDB$formatting, "mobilograms"),
+                       chromLarge = makeReactCellLargeChromMob("chrom"),
+                       chromSmall = makeReactCellSmallChromMob("chromLarge" %chin% colDefDB$formatting, "chrom"),
+                       mobLarge = makeReactCellLargeChromMob("mobilogram"),
+                       mobSmall = makeReactCellSmallChromMob("mobLarge" %chin% colDefDB$formatting, "mobilogram"),
                        ISTD = makeReactCellISTD(),
                        annotations = makeReactCellAnnotations(),
                        structure = makeReactCellStructure(),

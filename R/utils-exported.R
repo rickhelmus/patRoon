@@ -525,7 +525,6 @@ getBGMSMSPeaks <- function(anaInfo, replicates = NULL, MSLevel = 2, retentionRan
                                 minBPIntensity = minBPIntensity)[[1]]
         setDT(avgsp)
         saveCacheData("avgBGMSMS", avgsp, hash, cacheDB)
-        doProgress()
         return(avgsp)
     })
     blSpecs <- pruneList(blSpecs, checkZeroRows = TRUE)

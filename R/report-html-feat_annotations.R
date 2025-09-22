@@ -99,7 +99,7 @@ makeAnnReactable <- function(tab, id, detailsFuncs = NULL, ...)
 
 makeReactCellAnn <- function(ann, what)
 {
-    return(getReactCellImgJS(sprintf("'src=\"' + reportPlots.%s[ci.value].%s[ci.row.candidate-1] + '\"'", ann, what),
+    return(getReactCellImgJS(sprintf("'src=\"' + reportPlots.featsAndAnns[ci.value].%s.%s[ci.row.candidate-1] + '\"'", ann, what),
                              maxHeight = 300))
 }
 
@@ -132,158 +132,129 @@ genHTMLReportPlotsStructs <- function(fGroups, compounds, components, settings, 
     structInfo <- rbindlist(list(scrStructInfo, compStructInfo, TPsStructInfo))
     if (nrow(structInfo) > 0 && any(!is.na(structInfo$SMILES)))
     {
+        # NOTE: we use the first block InChIKey here instead of makeHash()
+        # NOTE: we don't use the full IK, as this may be unavailable (e.g. SIRIUS)
         structInfo <- unique(structInfo[!is.na(SMILES)], by = "IK1")
-        cat("Generate structures...\n")
-        return(doApply("Map", parallel, structInfo$IK1, structInfo$SMILES, f = function(ik1, smi)
+        structInfo[, path := file.path(getHTMLReportPlotPath(outPath), paste0("struct-", IK1, ".svg"))]
+        structInfoNew <- structInfo[!file.exists(path)]
+        
+        if (nrow(structInfoNew) > 0)
         {
-            # NOTE: we use the first block InChIKey here instead of makeHash()
-            # NOTE: we don't use the full IK, as this may be unavailable (e.g. SIRIUS)
-            pf <- file.path(getHTMLReportPlotPath(outPath), paste0("struct-", ik1, ".svg"))
-            if (!file.exists(pf))
-                saveRCDKStructure(getMoleculesFromSMILES(smi)[[1]], "svg", pf, 100, 100)
-            doProgress()
-            return(pf)
-        }))
+            printf("Generating %d structures...\n", nrow(structInfoNew))
+            doMap(parallel, structInfoNew$IK1, structInfoNew$SMILES, structInfoNew$path, f = function(ik1, smi, p)
+            {
+                patRoon:::saveRCDKStructure(patRoon:::getMoleculesFromSMILES(smi)[[1]], "svg", p, 100, 100)
+            })
+        }
+        return(setNames(as.list(structInfo$path), structInfo$IK1))
     }
     return(list())
 }
 
-genHTMLReportPlotsMSPeakLists <- function(MSPeakLists, settings, outPath, parallel)
+genHTMLReportPlotsMSPeakLists <- function(grp, MSPeakLists, settings, outPath)
 {
-    if (!settings$MSPeakLists$spectra)
-        return(list())
+    if (!settings$MSPeakLists$spectra || length(MSPeakLists) == 0 || is.null(MSPeakLists[[grp]]))
+        return("")
     
-    cat("Generate MS spectra...\n")
+    ret <- list()
     
-    if (length(MSPeakLists) == 0)
-        return(list())
+    args <- list(MSPeakLists, groupName = grp, title = "")
+    pp <- list(mar = c(4.1, 4.1, 0.2, 0.2))
     
-    return(doApply("sapply", parallel, groupNames(MSPeakLists), function(grp)
+    ret$MS <- makeHTMLReportPlot("spec-MS", outPath, "plotSpectrum", c(list(MSLevel = 1), args), parParams = pp,
+                                 width = 7, height = 4)
+    
+    ret$MSMS <- if (!is.null(MSPeakLists[[grp]][["MSMS"]]))
     {
-        ret <- list()
-        
-        args <- list(MSPeakLists, groupName = grp, title = "")
-        pp <- list(mar = c(4.1, 4.1, 0.2, 0.2))
-        
-        ret$MS <- makeHTMLReportPlot("spec-MS", outPath, "plotSpectrum", c(list(MSLevel = 1), args), parParams = pp,
-                                     width = 7, height = 4)
-        
-        ret$MSMS <- if (!is.null(MSPeakLists[[grp]][["MSMS"]]))
-        {
-            makeHTMLReportPlot("spec-MSMS", outPath, "plotSpectrum", c(list(MSLevel = 2), args), parParams = pp,
-                               width = 7, height = 4)
-        }
-        else
-            ""
-        
-        doProgress()
-        
-        return(ret)
-    }, simplify = FALSE))
+        makeHTMLReportPlot("spec-MSMS", outPath, "plotSpectrum", c(list(MSLevel = 2), args), parParams = pp,
+                           width = 7, height = 4)
+    }
+    else
+        ""
+    
+    return(ret)
 }
 
-genHTMLReportPlotsFormulas <- function(formulas, MSPeakLists, settings, outPath, parallel)
+genHTMLReportPlotsFormulas <- function(grp, formulas, MSPeakLists, settings, outPath)
 {
-    if (!settings$formulas$include)
+    if (!settings$formulas$include || length(formulas) == 0 || is.null(formulas[[grp]]))
         return(list())
     
-    cat("Generate formula annotation plots...\n")
+    ret <- list()
+    ann <- annotations(formulas)[[grp]]
     
-    if (length(formulas) == 0)
-        return(list())
+    if (nrow(ann) > settings$formulas$topMost)
+        ann <- ann[seq_len(settings$formulas$topMost)]
     
-    return(doApply("Map", parallel, groupNames(formulas), annotations(formulas), f = function(grp, ann)
+    ret$spectra <- sapply(seq_len(nrow(ann)), function(index)
     {
-        ret <- list()
+        if (is.null(MSPeakLists[[grp]][["MSMS"]]))
+            return("")
+        makeHTMLReportPlot("form-spec", outPath, "plotSpectrum", list(formulas, index, grp,
+                                                                      MSPeakLists = MSPeakLists),
+                           width = 7, height = 4)
+    })
+    
+    ret$scores <- sapply(seq_len(nrow(ann)), function(index)
+    {
+        makeHTMLReportPlot("form-scores", outPath, "plotScores",
+                           list(formulas, index, grp, normalizeScores = settings$formulas$normalizeScores,
+                                excludeNormScores = settings$formulas$exclNormScores), width = 6, height = 5)
+    })
+    
         
-        if (nrow(ann) > settings$formulas$topMost)
-            ann <- ann[seq_len(settings$formulas$topMost)]
-        
-        ret$spectra <- sapply(seq_len(nrow(ann)), function(index)
-        {
-            if (is.null(MSPeakLists[[grp]][["MSMS"]]))
-                return("")
-            makeHTMLReportPlot("form-spec", outPath, "plotSpectrum", list(formulas, index, grp,
-                                                                          MSPeakLists = MSPeakLists),
-                               width = 7, height = 4)
-        })
-        
-        ret$scores <- sapply(seq_len(nrow(ann)), function(index)
-        {
-            makeHTMLReportPlot("form-scores", outPath, "plotScores",
-                               list(formulas, index, grp, normalizeScores = settings$formulas$normalizeScores,
-                                    excludeNormScores = settings$formulas$exclNormScores), width = 6, height = 5)
-        })
-        
-        doProgress()
-        
-        return(ret)
-    }))
+    return(ret)
 }
 
-genHTMLReportPlotsCompounds <- function(compounds, MSPeakLists, formulas, settings, outPath, parallel)
+genHTMLReportPlotsCompounds <- function(grp, compounds, MSPeakLists, formulas, settings, outPath)
 {
-    cat("Generate compound annotation plots...\n")
-    
-    if (length(compounds) == 0)
+    if (length(compounds) == 0 || is.null(compounds[[grp]]))
         return(list())
     
-    return(doApply("Map", parallel, groupNames(compounds), annotations(compounds), f = function(grp, ann)
+    ret <- list()
+    ann <- annotations(compounds)[[grp]]
+    
+    if (nrow(ann) > settings$compounds$topMost)
+        ann <- ann[seq_len(settings$compounds$topMost)]
+    
+    ret$spectra <- sapply(seq_len(nrow(ann)), function(index)
     {
-        ret <- list()
-        
-        if (nrow(ann) > settings$compounds$topMost)
-            ann <- ann[seq_len(settings$compounds$topMost)]
-        
-        ret$spectra <- sapply(seq_len(nrow(ann)), function(index)
-        {
-            if (is.null(MSPeakLists[[grp]][["MSMS"]]))
-                return("")
-            makeHTMLReportPlot("comp-spec", outPath, "plotSpectrum",
-                               list(compounds, index, grp, MSPeakLists, formulas, FALSE, title = ""),
-                               parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)), width = 7, height = 4, pointsize = 16)
-        })
-        
-        ret$scores <- sapply(seq_len(nrow(ann)), function(index)
-        {
-            makeHTMLReportPlot("comp-scores", outPath, "plotScores",
-                               list(compounds, index, grp, normalizeScores = settings$compounds$normalizeScores,
-                                    excludeNormScores = settings$compounds$exclNormScores),
-                               parParams = list(mar = c(4.1, 4.1, 0.4, 0.2)), width = 7, height = 4, pointsize = 16)
-        })
-        
-        doProgress()
-        
-        return(ret)
-    }))
+        if (is.null(MSPeakLists[[grp]][["MSMS"]]))
+            return("")
+        makeHTMLReportPlot("comp-spec", outPath, "plotSpectrum",
+                           list(compounds, index, grp, MSPeakLists, formulas, FALSE, title = ""),
+                           parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)), width = 7, height = 4, pointsize = 16)
+    })
+    
+    ret$scores <- sapply(seq_len(nrow(ann)), function(index)
+    {
+        makeHTMLReportPlot("comp-scores", outPath, "plotScores",
+                           list(compounds, index, grp, normalizeScores = settings$compounds$normalizeScores,
+                                excludeNormScores = settings$compounds$exclNormScores),
+                           parParams = list(mar = c(4.1, 4.1, 0.4, 0.2)), width = 7, height = 4, pointsize = 16)
+    })
+    
+    return(ret)
 }
 
-genHTMLReportPlotsCompsCluster <- function(compsCluster, settings, outPath, parallel)
+genHTMLReportPlotsCompsCluster <- function(grp, compsCluster, settings, outPath)
 {
-    cat("Generate compound cluster plots...\n")
+    if (length(compsCluster) == 0 || !grp %chin% groupNames(compsCluster))
+        return("")
     
-    if (length(compsCluster) == 0)
-        return(list())
+    ret <- list()
     
-    return(doApply("Map", parallel, groupNames(compsCluster), cutClusters(compsCluster), f = function(grp, ct)
+    ret$dendro <- makeHTMLReportPlot("comp-clust-dendro", outPath, "plot", list(compsCluster, groupName = grp),
+                                     width = 12, height = 4, pointsize = 16)
+    
+    ret$mcs <- sapply(sort(unique(cutClusters(compsCluster)[[grp]])), function(cli)
     {
-        ret <- list()
-        
-        ret$dendro <- makeHTMLReportPlot("comp-clust-dendro", outPath, "plot", list(compsCluster, groupName = grp),
-                                         width = 12, height = 4, pointsize = 16)
-        
-        ret$mcs <- sapply(sort(unique(ct)), function(cli)
-        {
-            makeHTMLReportPlot("comp-clust-mcs", outPath, "plotStructure",
-                               list(compsCluster, groupName = grp, cluster = cli, 100, 100), width = 5, height = 4)
-        })
-        
-        doProgress()
-        
-        return(ret)
-    }))
+        makeHTMLReportPlot("comp-clust-mcs", outPath, "plotStructure",
+                           list(compsCluster, groupName = grp, cluster = cli, 100, 100), width = 5, height = 4)
+    })
+    
+    return(ret)
 }
-
 
 reportHTMLUtils$methods(
     genMSPLTable = function(MSLevel)
@@ -696,8 +667,9 @@ reportHTMLUtils$methods(
     
     genCompClustsImgs = function()
     {
-        elements <- unlist(Map(names(plots$compsCluster), plots$compsCluster, f = function(grp, pl)
+        elements <- unlist(lapply(groupNames(objects$compsCluster), function(grp)
         {
+            pl <- plots$featsAndAnns[[grp]]$compsCluster
             lapply(seq_along(pl$mcs), function(i)
             {
                 img <- htmltools::img(src = pl$mcs[[i]], class = paste0("mcs mcs-", grp),

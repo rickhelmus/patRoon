@@ -79,8 +79,6 @@ doFindPeaksForMobilities <- function(EIMs, ana, peakParams)
     
     peaksTable[, mob_assign_method := "peak"]
     
-    doProgress()
-    
     return(peaksTable)
     # return(doAssignFeatureMobilities(fTable, peaksTable))
 }
@@ -101,8 +99,8 @@ assignFeatureMobilitiesPeaks <- function(features, peakParams, EIMParams, parall
     EIMSelFunc <- \(tab) if (is.null(tab[["mobility"]])) tab else tab[is.na(mobility) & !ID %chin% ims_parent_ID]
     allEIMs <- getFeatureEIXs(features, "EIM", EIXParams = EIMParams, selectFunc = EIMSelFunc, compress = FALSE)
     
-    peaksList <- doApply("Map", parallel, allEIMs, analyses(features), f = patRoon:::doFindPeaksForMobilities,
-                         MoreArgs = list(peakParams = peakParams), future.globals = FALSE)
+    peaksList <- doMap(parallel, allEIMs, analyses(features), f = patRoon:::doFindPeaksForMobilities,
+                       MoreArgs = list(peakParams = peakParams))
     features@features <- Map(featureTable(features), peaksList, f = doAssignFeatureMobilities)
     printf("Assigned %d mobility features.\n", countMobilityFeatures(features) - oldCount)
     
@@ -124,8 +122,6 @@ doFindPeaksForReintegration <- function(EICs, peakParams, peakRTWindow, ft, ana,
     peaks <- peaks[numGTE(ret, parFT$retmin) & numLTE(ret, parFT$retmax) & numLTE(abs(ret - parFT$ret), peakRTWindow)]
     # filter out all peaks for EICs with >1 result
     peaks[, N := .N, by = "EIC_ID"]
-    
-    doProgress()
     
     return(peaks[N == 1][, N := NULL])
 }
@@ -150,10 +146,10 @@ reintegrateMobilityFeatures <- function(features, peakParams, EICParams, peakRTW
     
     if (!is.null(peakParams))
     {
-        peaksList <- doApply("Map", parallel, allEICs, featureTable(features), analyses(features),
-                             f = patRoon:::doFindPeaksForReintegration,
-                             MoreArgs = list(peakParams = peakParams, peakRTWindow = peakRTWindow,
-                                             cacheDB = if (!parallel) cacheDB), future.globals = FALSE)
+        peaksList <- doMap(parallel, allEICs, featureTable(features), analyses(features),
+                           f = patRoon:::doFindPeaksForReintegration,
+                           MoreArgs = list(peakParams = peakParams, peakRTWindow = peakRTWindow,
+                                           cacheDB = if (!parallel) cacheDB))
     }
     else
         peaksList <- vector("list", nrow(anaInfo))

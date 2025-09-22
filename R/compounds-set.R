@@ -168,7 +168,7 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
         binnedPLs <- Map(usMSPL, theSets, f = getBinnedPLPair,
                          MoreArgs = list(groupNames = groupName, analyses = NULL, MSLevel = 2,
                                          specSimParams = specSimParams, mustExist = FALSE,
-                                         normalizedIntensies = !isFALSE(normalized)))
+                                         normalizedIntensities = !isFALSE(normalized)))
         
         if (!is.null(formulas))
             usForm <- checkAndUnSetOther(theSets, formulas, "formulas")
@@ -257,7 +257,7 @@ setMethod("estimateIDConfidence", "compoundsSet", function(obj, absMzDev = defau
                                                            formulas = NULL,  formulasNormalizeScores = "max",
                                                            compoundsNormalizeScores = "max",
                                                            IDFile = system.file("misc", "IDLevelRules.yml", package = "patRoon"),
-                                                           logPath = NULL, parallel = TRUE)
+                                                           logPath = NULL)
 {
     checkmate::assertClass(MSPeakLists, "MSPeakListsSet", null.ok = TRUE)
     checkmate::assertClass(formulas, "formulasSet", null.ok = TRUE)
@@ -271,7 +271,7 @@ setMethod("estimateIDConfidence", "compoundsSet", function(obj, absMzDev = defau
                           f = estimateIDConfidence, MoreArgs = list(absMzDev = absMzDev,
                                                                     formulasNormalizeScores = formulasNormalizeScores,
                                                                     compoundsNormalizeScores = compoundsNormalizeScores,
-                                                                    IDFile = IDFile, parallel = parallel))
+                                                                    IDFile = IDFile))
     obj <- updateSetConsensus(obj)
     obj@groupAnnotations <- lapply(annotations(obj), assignSetsIDLs, sets(obj))
 

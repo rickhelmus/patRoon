@@ -140,23 +140,21 @@ findFeaturesKPIC2 <- function(analysisInfo, kmeans = TRUE, level = 1000, ..., pa
     if (verbose)
         printf("Finding features with KPIC2 for %d analyses ...\n", nrow(analysisInfo))
 
-    doKP <- function(inFile)
+    doKP <- function(inFile, kmeans, level, verbose, ...)
     {
         raw <- KPIC::LoadData(inFile)
         pics <- do.call(if (kmeans) KPIC::getPIC.kmeans else KPIC::getPIC,
                         c(list(raw = raw, level = level), ...), verbose)
         pics <- KPIC::PICsplit(pics) # UNDONE: make optional?
         pics <- KPIC::getPeaks(pics)
-        
-        patRoon:::doProgress()
-        
         return(pics)
     }
 
     anasTBD <- setdiff(anas, names(cachedData))
     if (length(anasTBD) > 0)
     {
-        allPics <- doApply("lapply", parallel, filePaths[anasTBD], doKP)
+        allPics <- doMap(parallel, filePaths[anasTBD], f = doKP,
+                         MoreArgs = list(kmeans = kmeans, level = level, verbose = verbose, ...))
 
         for (a in anasTBD)
             saveCacheData("featuresKPIC2", allPics[[a]], hashes[[a]])

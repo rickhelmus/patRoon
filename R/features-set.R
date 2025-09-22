@@ -141,7 +141,7 @@ setMethod("filter", "featuresSet", function(obj, ..., negate = FALSE, sets = NUL
     if (!is.null(sets) && length(sets) > 0)
     {
         if (negate)
-            sets <- setdiff(get("sets", pos = 2)(obj), sets)
+            sets <- setdiff(sets(obj), sets)
         obj <- obj[, sets = sets]
     }
     

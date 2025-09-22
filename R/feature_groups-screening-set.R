@@ -170,7 +170,7 @@ setMethod("[", c("featureGroupsScreeningSet", "ANY", "ANY", "missing"), function
     checkmate::assertCharacter(suspects, null.ok = TRUE)
     assertSets(x, sets, TRUE)
     
-    curSets <- get("sets", pos = 2)(x)
+    curSets <- sets(x)
     
     x <- callNextMethod(x, i, j, ..., sets = sets, reorder = reorder, drop = drop)
     

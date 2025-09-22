@@ -87,174 +87,119 @@ prepFGPredUID <- function(tab, objects)
 }
 
 
-genHTMLReportPlotsChromsLarge <- function(fGroups, settings, outPath, EICs, EICParams, parallel)
+genHTMLReportPlotsChromLarge <- function(grp, fGroups, settings, outPath, EICs, EICParams)
 {
     if (!settings$features$chromatograms$large)
-        return(list())
+        return("")
     
-    cat("Generate large chromatograms...\n")
-    doApply("sapply", parallel, names(fGroups), function(grp)
-    {
-        doProgress()
-        makeHTMLReportPlot("chrom_large-", outPath, "plotChroms",
-                           list(fGroups, groupName = grp, retMin = settings$features$retMin,
-                                intMax = settings$features$chromatograms$intMax, EICs = EICs,
-                                EICParams = EICParams, groupBy = "replicate", IMS = "both", title = "", bty = "l"),
-                           parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)),
-                           width = 6, height = 4, bg = "transparent", pointsize = 16)
-    }, simplify = FALSE)
+    makeHTMLReportPlot("chrom_large-", outPath, "plotChroms",
+                       list(fGroups, groupName = grp, retMin = settings$features$retMin,
+                            intMax = settings$features$chromatograms$intMax, EICs = EICs,
+                            EICParams = EICParams, groupBy = "replicate", IMS = "both", title = "", bty = "l"),
+                       parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)),
+                       width = 6, height = 4, bg = "transparent", pointsize = 16)
 }
 
-genHTMLReportPlotsChromsSmall <- function(fGroups, settings, outPath, EICs, EICParams, parallel)
+genHTMLReportPlotsChromSmall <- function(grp, fGroups, settings, outPath, EICs, EICParams)
 {
     if (!settings$features$chromatograms$small)
-        return(list())
+        return("")
     
-    cat("Generate small chromatograms...\n")
-    doApply("sapply", parallel, names(fGroups), function(grp)
-    {
-        doProgress()
-        makeHTMLReportPlot("chrom_small", outPath, "plotChroms",
-                           list(fGroups, groupName = grp, retMin = settings$features$retMin, EICs = EICs,
-                                EICParams = modifyList(EICParams, list(topMost = 1, topMostByReplicate = FALSE,
-                                                                       onlyPresent = TRUE)),
-                                showFGroupRect = FALSE, showPeakArea = TRUE, IMS = "both", title = "",
-                                intMax = settings$features$chromatograms$intMax, bty = "n"),
-                           parParams = list(mai = c(0, 0, 0, 0), lwd = 10), width = 12, height = 4, bg = "transparent",
-                           pointsize = 16)
-    }, simplify = FALSE)
+    makeHTMLReportPlot("chrom_small", outPath, "plotChroms",
+                       list(fGroups, groupName = grp, retMin = settings$features$retMin, EICs = EICs,
+                            EICParams = modifyList(EICParams, list(topMost = 1, topMostByReplicate = FALSE,
+                                                                   onlyPresent = TRUE)),
+                            showFGroupRect = FALSE, showPeakArea = TRUE, IMS = "both", title = "",
+                            intMax = settings$features$chromatograms$intMax, bty = "n"),
+                       parParams = list(mai = c(0, 0, 0, 0), lwd = 10), width = 12, height = 4, bg = "transparent",
+                       pointsize = 16)
 }
 
-genHTMLReportPlotsChromsFeatures <- function(fGroups, settings, outPath, EICs, EICParams, parallel)
+genHTMLReportPlotsChromsFeatures <- function(grp, fGroups, settings, outPath, EICs, EICParams)
 {
     if (isFALSE(settings$features$chromatograms$features))
-        return(list())
+        return("")
     
     anas <- analyses(fGroups)
-    cat("Generate individual feature chromatograms...\n")
-    doApply("sapply", parallel, names(fGroups), function(grp)
+    Map(anas, seq_along(anas), f = function(ana, anai)
     {
-        doProgress()
-        Map(anas, seq_along(anas), f = function(ana, anai)
-        {
-            if (settings$features$chromatograms$features != "all" && fGroups[[grp]][anai] == 0)
-                return("")
-            makeHTMLReportPlot("chrom_feat", outPath, "plotChroms",
-                               list(fGroups, analysis = ana, groupName = grp, retMin = settings$features$retMin,
-                                    EICs = EICs, EICParams = modifyList(EICParams, list(topMost = NULL,
-                                                                                        onlyPresent = settings$features$chromatograms$features != "all"),
-                                                                        keep.null = TRUE), showFGroupRect = FALSE,
-                                    showPeakArea = TRUE, IMS = "both", title = "",
-                                    intMax = settings$features$chromatograms$intMax, bty = "l"),
-                               parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)), width = 6, height = 4, bg = "transparent",
-                               pointsize = 20, scaling = 1)
-        })
-    }, simplify = FALSE)
+        if (settings$features$chromatograms$features != "all" && fGroups[[grp]][anai] == 0)
+            return("")
+        makeHTMLReportPlot("chrom_feat", outPath, "plotChroms",
+                           list(fGroups, analysis = ana, groupName = grp, retMin = settings$features$retMin,
+                                EICs = EICs, EICParams = modifyList(EICParams, list(topMost = NULL,
+                                                                                    onlyPresent = settings$features$chromatograms$features != "all"),
+                                                                    keep.null = TRUE), showFGroupRect = FALSE,
+                                showPeakArea = TRUE, IMS = "both", title = "",
+                                intMax = settings$features$chromatograms$intMax, bty = "l"),
+                           parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)), width = 6, height = 4, bg = "transparent",
+                           pointsize = 20, scaling = 1)
+    })
 }
 
-genHTMLReportPlotsMobilogramsLarge <- function(fGroups, settings, outPath, EIMs, EIMParams, parallel)
+genHTMLReportPlotsMobilogramLarge <- function(grp, fGroups, settings, outPath, EIMs, EIMParams)
 {
     gInfo <- groupInfo(fGroups)
     
     if (!settings$features$mobilograms$large || !hasMobilities(fGroups))
-        return(list())
+        return("")
     
-    cat("Generate large mobilograms...\n")
-    doApply("sapply", parallel, gInfo$group, function(grp)
-    {
-        doProgress()
-        makeHTMLReportPlot("mobilogram_large-", outPath, "plotMobilograms",
-                           list(fGroups, groupName = grp, EIMs = EIMs,
-                                EIMParams = EIMParams, groupBy = "replicate", title = "", bty = "l"),
-                           parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)),
-                           width = 6, height = 4, bg = "transparent", pointsize = 16)
-    }, simplify = FALSE)
+    makeHTMLReportPlot("mobilogram_large-", outPath, "plotMobilograms",
+                       list(fGroups, groupName = grp, EIMs = EIMs,
+                            EIMParams = EIMParams, groupBy = "replicate", title = "", bty = "l"),
+                       parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)),
+                       width = 6, height = 4, bg = "transparent", pointsize = 16)
 }
 
-# makeHTMLReportPlotFut <- function(args)
-# {
-#     doProgress()
-#     do.call(makeHTMLReportPlot, args)
-# }
-
-genHTMLReportPlotsMobilogramsSmall <- function(fGroups, settings, outPath, EIMs, EIMParams, parallel)
+genHTMLReportPlotsMobilogramSmall <- function(grp, fGroups, settings, outPath, EIMs, EIMParams)
 {
     gInfo <- groupInfo(fGroups)
     
     if (!settings$features$mobilograms$small || !hasMobilities(fGroups))
-        return(list())
+        return("")
     
-    cat("Generate small mobilograms...\n")
-    doApply("sapply", parallel, gInfo$group, function(grp)
-    {
-        doProgress()
-        makeHTMLReportPlot("mobilogram_small-", outPath, "plotMobilograms",
-                           list(fGroups, groupName = grp, EIMs = EIMs,
-                                EIMParams = modifyList(EIMParams, list(topMost = 1, topMostByReplicate = FALSE,
-                                                                       onlyPresent = TRUE)),
-                                showFGroupRect = FALSE, showPeakArea = TRUE, title = "", bty = "n"),
-                           parParams = list(mai = c(0, 0, 0, 0), lwd = 10), width = 12, height = 4, bg = "transparent",
-                           pointsize = 16)
-
-    }, simplify = FALSE)
-    
-    # UNDONE: this seems to improve things, but is still slower than no parallelization
-    # mainArgs <- list("mobilogram_small-", outPath, "plotMobilograms",
-    #                  parParams = list(mai = c(0, 0, 0, 0), lwd = 10), width = 12, height = 4, bg = "transparent",
-    #                  pointsize = 16)
-    # mainPlotArgs <- list(fGroups, EIMs = EIMs,
-    #                      EIMParams = modifyList(EIMParams, list(topMost = 1, topMostByReplicate = FALSE,
-    #                                                             onlyPresent = TRUE)),
-    #                      showFGroupRect = FALSE, showPeakArea = TRUE, title = "", bty = "n")
-    # args <- sapply(gInfo$group, \(x) c(mainArgs, list(args = c(mainPlotArgs, list(groupName = x)))), simplify = FALSE)
-    # doApply("sapply", parallel, args, patRoon:::makeHTMLReportPlotFut, simplify = FALSE,
-    #         future.globals = FALSE)
+    makeHTMLReportPlot("mobilogram_small-", outPath, "plotMobilograms",
+                       list(fGroups, groupName = grp, EIMs = EIMs,
+                            EIMParams = modifyList(EIMParams, list(topMost = 1, topMostByReplicate = FALSE,
+                                                                   onlyPresent = TRUE)),
+                            showFGroupRect = FALSE, showPeakArea = TRUE, title = "", bty = "n"),
+                       parParams = list(mai = c(0, 0, 0, 0), lwd = 10), width = 12, height = 4, bg = "transparent",
+                       pointsize = 16)
 }
 
-genHTMLReportPlotsMobilogramsFeatures <- function(fGroups, settings, outPath, EIMs, EIMParams, parallel)
+genHTMLReportPlotsMobilogramsFeatures <- function(grp, fGroups, settings, outPath, EIMs, EIMParams)
 {
     if (isFALSE(settings$features$mobilograms$features) || !hasMobilities(fGroups))
-        return(list())
+        return("")
     
     anas <- analyses(fGroups)
-    cat("Generate individual feature mobilograms...\n")
-    doApply("sapply", parallel, names(fGroups), function(grp)
+    Map(anas, seq_along(anas), f = function(ana, anai)
     {
-        doProgress()
-        Map(anas, seq_along(anas), f = function(ana, anai)
-        {
-            if (settings$features$mobilograms$features != "all" && fGroups[[grp]][anai] == 0)
-                return("")
-            makeHTMLReportPlot("mobilogram_feat", outPath, "plotMobilograms",
-                               list(fGroups, analysis = ana, groupName = grp, EIMs = EIMs,
-                                    EIMParams = modifyList(EIMParams, list(topMost = NULL,
-                                                                           onlyPresent = settings$features$mobilograms$features != "all"),
-                                                           keep.null = TRUE), showFGroupRect = FALSE,
-                                    showPeakArea = TRUE, title = "", bty = "l"),
-                               parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)), width = 6, height = 4, bg = "transparent",
-                               pointsize = 20, scaling = 1)
-        })
-    }, simplify = FALSE)
+        if (settings$features$mobilograms$features != "all" && fGroups[[grp]][anai] == 0)
+            return("")
+        makeHTMLReportPlot("mobilogram_feat", outPath, "plotMobilograms",
+                           list(fGroups, analysis = ana, groupName = grp, EIMs = EIMs,
+                                EIMParams = modifyList(EIMParams, list(topMost = NULL,
+                                                                       onlyPresent = settings$features$mobilograms$features != "all"),
+                                                       keep.null = TRUE), showFGroupRect = FALSE,
+                                showPeakArea = TRUE, title = "", bty = "l"),
+                           parParams = list(mar = c(4.1, 4.1, 0.2, 0.2)), width = 6, height = 4, bg = "transparent",
+                           pointsize = 20, scaling = 1)
+    })
 }
 
-genHTMLReportPlotsIntPlots <- function(fGroups, settings, outPath, parallel)
+genHTMLReportPlotsIntPlot <- function(grp, fGroups, settings, outPath)
 {
     if (!settings$features$intensityPlots)
-        return(list())
-    
-    cat("Generate intensity plots...\n")
+        return("")
     
     mainArgs <- list(average = TRUE, normalize = TRUE, plotArgs = list(bty = "l"))
     if (isFGSet(fGroups))
         mainArgs <- c(mainArgs, list(groupBy = "set", showLegend = TRUE))
     
-    doApply("sapply", parallel, names(fGroups), function(grp)
-    {
-        doProgress()
-        makeHTMLReportPlot("int_plot", outPath, "plotInt", c(list(fGroups[, grp]), mainArgs),
-                           parParams = list(mar = c(4.1, 4.1, 1, 0.1)), width = 8, height = 4, bg = "transparent",
-                           pointsize = 16)
-    }, simplify = FALSE)
+    makeHTMLReportPlot("int_plot", outPath, "plotInt", c(list(fGroups[, grp]), mainArgs),
+                       parParams = list(mar = c(4.1, 4.1, 1, 0.1)), width = 8, height = 4, bg = "transparent",
+                       pointsize = 16)
 }
 
 makeReactCellFeatChromMob <- function(type)

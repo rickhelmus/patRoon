@@ -82,22 +82,21 @@ DoEOptimizer$methods(
         designParams <- combineParams(designParams, typParams$no_optimization)
         tasks <- seq_len(nrow(design))
 
-        doExp <- function(task)
+        doExp <- function(task, runParams, .self)
         {
             # simplified optimizeSlaveCluster() from IPO
-
-            runParams <- as.list(designParams[task, ])
-            runParams <- runParams[!names(runParams) %in% c("run.order", "std.order", "Block")]
-            runParams <- convertOptToCallParams(runParams)
-            result <- calculateResponse(runParams, task, FALSE)
+            result <- .self$calculateResponse(runParams, task, FALSE)
             result$experiment <- task
-
-            patRoon:::doProgress()
-            
             return(result)
         }
-        
-        response <- rbindlist(doApply("lapply", parallel, tasks, doExp))
+        taskRunParams <- split(designParams, tasks)
+        taskRunParams <- lapply(taskRunParams, function(trp)
+        {
+            trp <- as.list(trp)
+            trp <- trp[!names(trp) %in% c("run.order", "std.order", "Block")]
+            return(convertOptToCallParams(trp))
+        })
+        response <- rbindlist(doMap(parallel, tasks, taskRunParams, f = doExp, MoreArgs = list(.self = .self)))
 
         ret <- list()
         ret$params <- typParams

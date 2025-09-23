@@ -23,7 +23,7 @@ getCacheMode <- function()
 }
 
 getCacheFile <- function() getOption("patRoon.cache.fileName")
-getMaxCacheEntries <- function() 100000 # UNDONE
+getMaxCacheEntries <- function() getOption("patRoon.cache.maxEntries", 100000)
 
 #' @details \code{makeHash} Make a hash string of given arguments.
 #'

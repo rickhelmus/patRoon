@@ -7,6 +7,7 @@ defaultPkgOpts <- function(pkgname)
     ret <- list(cache.mode = "both",
                 checkCentroided = TRUE,
                 cache.fileName = "cache.sqlite",
+                cache.maxEntries = 100000,
                 MP.method = "classic",
                 # backwards compat
                 MP.maxProcs = getOption("patRoon.maxProcAmount", parallel::detectCores(logical = FALSE)),

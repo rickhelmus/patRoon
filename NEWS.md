@@ -1,3 +1,7 @@
+# DEVEL
+
+* `patRoon.cache.maxEntries` package option (issue #139)
+
 # patRoon 2.3.4
 
 ## Important changes

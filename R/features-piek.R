@@ -66,6 +66,23 @@ featuresPiek <- setClass("featuresPiek", slots = c(EIMs = "list"), contains = "f
 setMethod("initialize", "featuresPiek",
           function(.Object, ...) callNextMethod(.Object, algorithm = "piek", ...))
 
+#' @rdname features-class
+#' @export
+setMethod("delete", "featuresPiek", function(obj, i = NULL, j = NULL, ...)
+{
+    old <- obj
+    obj <- callNextMethod()
+    
+    if (length(obj@EIMs) > 0)
+    {
+        obj@EIMs <- obj@EIMs[intersect(names(obj@EIMs), analyses(obj))]
+        obj@EIMs <- Map(obj@EIMs, featureTable(obj), f = \(eims, ft) eims[intersect(names(eims), ft$ID)])
+    }
+    
+    return(obj)
+})
+
+
 #' Find features using piek
 #'
 #' Uses the \code{piek} algorithm to find features.

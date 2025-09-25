@@ -993,11 +993,11 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         return specf;
     };
     
-    const auto updateSummedEIMs = [saveEIMs, smoothWindow, &specMeta](SpectrumRawTypes::Scan scanInd,
-                                                                      const EIMRunning &EIMRun, EIC &eic,
-                                                                      SpectrumRawTypes::Mobility mobStart,
-                                                                      SpectrumRawTypes::Mobility mobEnd /*,
-                                                                      std::ofstream &ofsSmooth*/)
+    const auto updateSummedEIMs = [saveEIMs, smoothWindow, smoothExt, &specMeta](SpectrumRawTypes::Scan scanInd,
+                                                                                 const EIMRunning &EIMRun, EIC &eic,
+                                                                                 SpectrumRawTypes::Mobility mobStart,
+                                                                                 SpectrumRawTypes::Mobility mobEnd /*,
+                                                                                 std::ofstream &ofsSmooth*/)
     {
         if (eic.empty())
             return;
@@ -1011,7 +1011,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                 break; // point not actually added
             if (compareTol(scanTime, eic.times[i]))
             {
-                const auto EIM = EIMRun.get(smoothWindow);
+                const auto EIM = EIMRun.get(smoothWindow, mobStart - smoothExt, mobEnd + smoothExt);
                 SpectrumRawTypes::Intensity totInten = 0, maxInten = 0;
                 for (size_t j=0; j<EIM.mobilities.size(); ++j)
                 {

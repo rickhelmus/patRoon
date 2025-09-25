@@ -158,7 +158,7 @@ getCentroidedMSFilesFromAnaInfo <- function(anaInfo, formats = c("mzML", "mzXML"
 }
 
 doGetEICs <- function(anaInfo, EICInfoList, gapFactor, mzExpIMSWindow = 0, minIntensityIMS = 0, mode = "simple",
-                      sumMS = FALSE, sumEIMs = 1, smoothWindow = 0, smoothExt = 0, saveEIMs, minEICIntensity = 0,
+                      sumMS = FALSE, sumEIMs = 1, smoothWindow = 0, smoothExt = 0, saveEIMs = FALSE, minEICIntensity = 0,
                       minEICAdjTime = 0, minEICAdjPoints = 0, minEICAdjIntensity = 0, pad = FALSE, doCache = TRUE,
                       cacheDB = NULL)
 {

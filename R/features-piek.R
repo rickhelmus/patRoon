@@ -61,7 +61,7 @@ getPiekEICsInfo <- function(params, withIMS, suspects, MS2Info, verbose)
 
 #' @rdname features-class
 #' @export
-featuresPiek <- setClass("featuresPiek", contains = "features")
+featuresPiek <- setClass("featuresPiek", slots = c(EIMs = "list"), contains = "features")
 
 setMethod("initialize", "featuresPiek",
           function(.Object, ...) callNextMethod(.Object, algorithm = "piek", ...))
@@ -349,9 +349,9 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
         ret <- getEICList(backend, EICInfo$mzmin, EICInfo$mzmax, genEICParams$retRange[1], genEICParams$retRange[2],
                           EICInfo$mobmin, EICInfo$mobmax, gapFactor = genEICParams$gapFactor, mzExpIMSWindow = 0,
                           minIntensityIMS = minIntensityIMS, mode = mode, sumEIMs = genEICParams$sumEIMs,
-                          sumMS = genEICParams$sumMS, smoothWindow = genEICParams$smoothWindow, pad = FALSE,
-                          minEICIntensity = genEICParams$minEICIntensity, minEICAdjTime = genEICParams$minEICAdjTime,
-                          minEICAdjPoints = genEICParams$minEICAdjPoints,
+                          sumMS = genEICParams$sumMS, smoothWindow = genEICParams$smoothWindow,
+                          saveEIMs = genEICParams$saveEIMs, pad = FALSE, minEICIntensity = genEICParams$minEICIntensity,
+                          minEICAdjTime = genEICParams$minEICAdjTime, minEICAdjPoints = genEICParams$minEICAdjPoints,
                           minEICAdjIntensity = genEICParams$minEICAdjIntensity, topMost = topMost)
         names(ret) <- EICInfo$EIC_ID
         if (mode != "test")
@@ -360,6 +360,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
     }
     
     fList <- list()
+    EIMs <- list()
     if (nrow(anaInfoTBD) > 0)
     {
         fList <- applyMSData(anaInfoTBD, needIMS = withIMS, showProgress = FALSE, func = function(ana, path, backend)
@@ -499,11 +500,24 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
 
             maybePrintf("%d peaks remain after filtering.\n", nrow(peaks))            
             
+            if (genEICParams$saveEIMs && withIMS)
+            {
+                eims <- attr(EICs, "EIMs")
+                if (length(eims) > 0)
+                {
+                    EIMs[[ana]] <<- Map(peaks$EIC_ID, peaks$ret, f = function(EIC_ID, ret)
+                    {
+                        # eims[match(peaks$EIC_ID, EICInfo$EIC_ID)], peaks$ret, EICs[[peaks$EIC_ID]]$time
+                        eims[[match(EIC_ID, EICInfo$EIC_ID)]][[which.min(abs(EICs[[EIC_ID]][, "time"] - ret))]]
+                    })
+                    names(EIMs[[ana]]) <<- peaks$ID
+                }
+            }
+            
             return(peaks)
         })
         
-        for (a in anaInfoTBD$analysis)
-            saveCacheData("featuresPiek", fList[[a]], anaHashes[[a]], dbArg = cacheDB)
+        saveCacheDataList("featuresPiek", fList[anaInfoTBD$analysis], anaHashes[anaInfoTBD$analysis], dbArg = cacheDB)
     }
     
     if (length(cachedData) > 0)
@@ -518,7 +532,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
         printFeatStats(fList)
     }
     
-    return(featuresPiek(analysisInfo = analysisInfo, features = fList, hasMobilities = withIMS))
+    return(featuresPiek(analysisInfo = analysisInfo, features = fList, hasMobilities = withIMS, EIMs = EIMs))
 }
 
 #' @param methodMZ,methodIMS Sets the \code{methodMZ} and \code{methodIMS} parameters for the EIC generation. See the
@@ -543,8 +557,8 @@ getPiekGenEICParams <- function(methodMZ, methodIMS = NULL, ...)
     
     ret <- list(methodMZ = methodMZ, methodIMS = methodIMS, mzRange = c(80, 600), mzStep = 0.02, mobRange = c(0.5, 1.3),
                 mobStep = 0.04, retRange = NULL, gapFactor = 3, sumMS = FALSE, sumEIMs = 1, smoothWindow = 0,
-                minEICIntensity = 5000, minEICAdjTime = 5, minEICAdjPoints = 5, minEICAdjIntensity = 250,
-                topMostEICMZ = 10000, topMostEICMZMob = 10000, minEICsIMSPreCheck = 50000)
+                saveEIMs = FALSE, minEICIntensity = 5000, minEICAdjTime = 5, minEICAdjPoints = 5,
+                minEICAdjIntensity = 250, topMostEICMZ = 10000, topMostEICMZMob = 10000, minEICsIMSPreCheck = 50000)
     
     if (methodMZ == "suspects")
     {

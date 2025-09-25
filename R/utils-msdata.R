@@ -220,7 +220,7 @@ doGetEICs <- function(anaInfo, EICInfoList, gapFactor, mzExpIMSWindow = 0, minIn
             
             newEICs <- getEICList(backend, ToDo$mzmin, ToDo$mzmax, ToDo$retmin, ToDo$retmax, ToDo$mobmin,
                                   ToDo$mobmax, gapFactor, mzExpIMSWindow, minIntensityIMS, mode, sumMS, sumEIMs,
-                                  smoothWindow, pad, minEICIntensity, minEICAdjTime, minEICAdjPoints,
+                                  smoothWindow, FALSE, pad, minEICIntensity, minEICAdjTime, minEICAdjPoints,
                                   minEICAdjIntensity)
             EICs[!isCached] <- newEICs
             attr(EICs, "allXValues") <- attr(newEICs, "allXValues")

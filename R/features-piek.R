@@ -350,8 +350,9 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
                           EICInfo$mobmin, EICInfo$mobmax, gapFactor = genEICParams$gapFactor, mzExpIMSWindow = 0,
                           minIntensityIMS = minIntensityIMS, mode = mode, sumEIMs = genEICParams$sumEIMs,
                           sumMS = genEICParams$sumMS, smoothWindow = genEICParams$smoothWindow,
-                          saveEIMs = genEICParams$saveEIMs, pad = FALSE, minEICIntensity = genEICParams$minEICIntensity,
-                          minEICAdjTime = genEICParams$minEICAdjTime, minEICAdjPoints = genEICParams$minEICAdjPoints,
+                          smoothExt = genEICParams$smoothExt, saveEIMs = genEICParams$saveEIMs, pad = FALSE,
+                          minEICIntensity = genEICParams$minEICIntensity, minEICAdjTime = genEICParams$minEICAdjTime,
+                          minEICAdjPoints = genEICParams$minEICAdjPoints,
                           minEICAdjIntensity = genEICParams$minEICAdjIntensity, topMost = topMost)
         names(ret) <- EICInfo$EIC_ID
         if (mode != "test")
@@ -557,7 +558,8 @@ getPiekGenEICParams <- function(methodMZ, methodIMS = NULL, ...)
     
     ret <- list(methodMZ = methodMZ, methodIMS = methodIMS, mzRange = c(80, 600), mzStep = 0.02, mobRange = c(0.5, 1.3),
                 mobStep = 0.04, retRange = NULL, gapFactor = 3, sumMS = FALSE, sumEIMs = 1, smoothWindow = 0,
-                saveEIMs = FALSE, minEICIntensity = 5000, minEICAdjTime = 5, minEICAdjPoints = 5,
+                smoothExt = defaultLim("mobility", "narrow"), saveEIMs = FALSE, minEICIntensity = 5000,
+                minEICAdjTime = 5, minEICAdjPoints = 5,
                 minEICAdjIntensity = 250, topMostEICMZ = 10000, topMostEICMZMob = 10000, minEICsIMSPreCheck = 50000)
     
     if (methodMZ == "suspects")

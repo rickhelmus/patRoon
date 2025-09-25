@@ -877,9 +877,8 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         SpectrumRawTypes::Time time = 0.0;
         SpectrumRawTypes::Mass mz = 0.0, mzMin = 0.0, mzMax = 0.0;
         SpectrumRawTypes::Intensity intensity = 0;
-        SpectrumRawTypes::Mobility mobility = 0.0, mobMin = 0.0, mobMax = 0.0;
+        SpectrumRawTypes::Mobility mobMin = 0.0, mobMax = 0.0;
         SpectrumRawTypes::Mass mzBP = 0.0;
-        SpectrumRawTypes::Mobility mobilityBP = 0.0;
         SpectrumRawTypes::Intensity intensityBP = 0.0;
     };
     
@@ -893,21 +892,25 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         std::vector<SpectrumRawTypes::Mobility> mobilitiesBP;
         std::vector<SpectrumRawTypes::Intensity> intensitiesBP;
         std::vector<std::pair<std::vector<SpectrumRawTypes::Mobility>, std::vector<SpectrumRawTypes::Intensity>>> EIMs; // for summed EIMs
-        void addPoint(const EICPoint &p, bool eim)
+        void addPoint(const EICPoint &p, bool withMob, bool saveEIM)
         {
             times.push_back(p.time);
             mzs.push_back(p.mz);
             mzMins.push_back(p.mzMin);
             mzMaxs.push_back(p.mzMax);
             intensities.push_back(p.intensity);
-            mobilities.push_back(p.mobility);
-            mobMins.push_back(p.mobMin);
-            mobMaxs.push_back(p.mobMax);
             mzsBP.push_back(p.mzBP);
-            mobilitiesBP.push_back(p.mobilityBP);
             intensitiesBP.push_back(p.intensityBP);
-            if (eim)
-                EIMs.emplace_back(std::make_pair(std::vector<SpectrumRawTypes::Mobility>(), std::vector<SpectrumRawTypes::Intensity>()));
+            if (withMob)
+            {
+                mobMins.push_back(p.mobMin);
+                mobMaxs.push_back(p.mobMax);
+                // will be set by updateSummedEIMs()
+                mobilities.push_back(0);
+                mobilitiesBP.push_back(0);
+                if (saveEIM)
+                    EIMs.emplace_back(std::make_pair(std::vector<SpectrumRawTypes::Mobility>(), std::vector<SpectrumRawTypes::Intensity>()));
+            }
         }
         void addPoint(SpectrumRawTypes::Time t, SpectrumRawTypes::Intensity i) { times.push_back(t); intensities.push_back(i); }
         void clear(void)
@@ -917,11 +920,9 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
             mzMins.clear();
             mzMaxs.clear();
             intensities.clear();
-            mobilities.clear();
             mobMins.clear();
             mobMaxs.clear();
             mzsBP.clear();
-            mobilitiesBP.clear();
             intensitiesBP.clear();
         }
         size_t size(void) const { return times.size(); }
@@ -955,7 +956,6 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     const auto &specMeta = backend.getSpecMetadata();
     
     // NOTE: need summing for smoothing or when MS points are summed
-    const bool doEIMSum = eicMode == EICMode::FULL && (sumEIMs > 1 || smoothWindow > 0 || sumMS);
     const unsigned EIMFlank = (sumEIMs > 1) ? (sumEIMs - 1) / 2 : 0;
     if (smoothWindow == 0 || eicMode != EICMode::FULL)
         smoothExt = 0;
@@ -1006,7 +1006,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         
         for (size_t i=eic.size()-1; ; --i)
         {
-            // Rcpp::Rcout << " compare to: " << i << "/" << scanInd << "/" << scanTime << "/" << eic.times[i] << "\n";
+            // Rcpp::Rcout << " compare to: " << i << "/" << scanInd << "/" << scanTime << "/" << eic.times[i] << std::endl;
             if (scanTime > eic.times[i])
                 break; // point not actually added
             if (compareTol(scanTime, eic.times[i]))
@@ -1039,7 +1039,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                 
                 if (saveEIMs)
                     eic.EIMs[i] = std::make_pair(EIM.mobilities, EIM.intensities);
-                // Rcpp::Rcout << "  set: " << totInten << "/" << maxInten << "/" << eic.mobilities[i] << "/" << scanTime << "\n";
+                // Rcpp::Rcout << "  set: " << totInten << "/" << maxInten << "/" << eic.mobilities[i] << "/" << scanTime << std::endl;
                 
                 break;
             }
@@ -1189,7 +1189,8 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
             
             const auto allPeaksSortedInd = (ended) ? 0 : (startInd + sortedInds[j]);
             const auto scanInd = allPeaksSorted.indices[allPeaksSortedInd];
-            // Rcpp::Rcout << "EIC: " << j << "/" << sortedInds.size() << "/" << specMeta.first.scans[curScanInd] << "/" << curScanInd << "/" << init << "/" << ended << "/" << time << "/" << startInd << "/" << endInd << "\n";
+            
+            //Rcpp::Rcout << "EIC: " << j << "/" << sortedInds.size() << "/" << specMeta.first.scans[curScanInd] << "/" << curScanInd << "/" << init << "/" << ended << "/" << startInd << "/" << endInd << "\n";
             
             if (ended || (!init && scanInd != curScanInd))
             {
@@ -1209,60 +1210,52 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                                 {
                                     curPoint.intensityBP = p.second;
                                     curPoint.mzBP = p.first;
-                                    /*if (!doEIMSum)
-                                        curPoint.mobilityBP = mob;*/ // UNDONE: support this? --> for now force EIM summing
                                 }
                             }
                             curPointMS.clear();
                         }
                         
                         curPoint.mz /= curPoint.intensity;
-                        if (anySpecHasMob && eicMode != EICMode::FULL_MZ && !doEIMSum)
-                            curPoint.mobility /= curPoint.intensity;
-                        eic.addPoint(curPoint, saveEIMs);
+                        eic.addPoint(curPoint, anySpecHasMob, saveEIMs);
                         
                         if (anySpecHasMob && eicMode != EICMode::FULL_MZ)
                         {
-                            if (doEIMSum)
+                            SpectrumRawTypes::Scan sc = (prvScanInd == allPeaksSorted.indices.size()) ? curScanInd : (prvScanInd + 1);
+                            
+                            // Rcpp::Rcout << "EIC sum: " << i << "/" << j << "/" << sc << "/" << scanInd
+                            //             << "/" << EIMRun.size() << "/" <<  specMeta.first.times[sc] << "/" << curTime << std::endl;
+                            
+                            while (true)
                             {
-                                SpectrumRawTypes::Scan sc = (prvScanInd == allPeaksSorted.indices.size()) ? curScanInd : (prvScanInd + 1);
-                                
-                                // Rcpp::Rcout << "EIC sum: " << i << "/" << j << "/" << sc << "/" << scanInd
-                                //             << "/" << EIMRun.size() << "/" <<  specMeta.first.times[sc] << "/" << curTime << "\n";
-                                
-                                while (true)
+                                if (sc != curScanInd)
                                 {
-                                    if (sc != curScanInd)
-                                    {
-                                        // add zero-intensity points for missing scans
-                                        EIMRun.addZero();
-                                        // Rcpp::Rcout << "added zero:" << i << "/" << j << "/" << sc << "/" << curScanInd << "\n";
-                                    }
-                                    else
-                                    {
-                                        EIMRun.add(std::move(curPointMobs), std::move(curPointInts));
-                                        // Rcpp::Rcout << "added points:" << i << "/" << j << "/" << curPointMobs.size() << "/" << curScanInd << "\n";
-                                    }
-                                    
-                                    // sumEIMs == 3 --> flank == 1 --> set position 1 back from current
-                                    // sumEIMs == 5 --> flank == 2 --> set position 2 back from current
-                                    // etc
-                                    
-                                    if (!eic.empty() && sc >= EIMFlank)
-                                        updateSummedEIMs(sc - EIMFlank, EIMRun, eic, mobStart, mobEnd/*, ofsSmooth*/);
-                                    
-                                    // Rcpp::Rcout << "EIC update: " << specMeta.first.times[sc] << "/" << j << "/" << sc << "/" << curScanInd
-                                    //             << "/" << prvScanInd << "/" << EIMRun.size() << "/" << EIMRun.sizeNoZero() << "\n";
-                                    
-                                    if (sc == curScanInd)
-                                        break;
-                                    
-                                    if (sc >= (prvScanInd + sumEIMs))
-                                        sc = curScanInd; // jump to current: doesn't make sense to add more zeroes
-                                    else
-                                        ++sc;
+                                    // add zero-intensity points for missing scans
+                                    EIMRun.addZero();
+                                    // Rcpp::Rcout << "added zero:" << i << "/" << j << "/" << sc << "/" << curScanInd << std::endl;
+                                }
+                                else
+                                {
+                                    EIMRun.add(std::move(curPointMobs), std::move(curPointInts));
+                                    // Rcpp::Rcout << "added points:" << i << "/" << j << "/" << curPointMobs.size() << "/" << curScanInd << std::endl;
                                 }
                                 
+                                // sumEIMs == 3 --> flank == 1 --> set position 1 back from current
+                                // sumEIMs == 5 --> flank == 2 --> set position 2 back from current
+                                // etc
+                                
+                                if (!eic.empty() && sc >= EIMFlank)
+                                    updateSummedEIMs(sc - EIMFlank, EIMRun, eic, mobStart, mobEnd/*, ofsSmooth*/);
+                                
+                                // Rcpp::Rcout << "EIC update: " << specMeta.first.times[sc] << "/" << j << "/" << sc << "/" << curScanInd
+                                //             << "/" << prvScanInd << "/" << EIMRun.size() << "/" << EIMRun.sizeNoZero() << std::endl;
+                                
+                                if (sc == curScanInd)
+                                    break;
+                                
+                                if (sc >= (prvScanInd + sumEIMs))
+                                    sc = curScanInd; // jump to current: doesn't make sense to add more zeroes
+                                else
+                                    ++sc;
                             }
                         }
                     }
@@ -1359,8 +1352,6 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                         {
                             curPoint.intensityBP = inten;
                             curPoint.mzBP = mz;
-                            if (!doEIMSum)
-                                curPoint.mobilityBP = mob;
                         }
                     }
                     
@@ -1370,16 +1361,11 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                             curPoint.mobMin = mob;
                         if (mob > curPoint.mobMax)
                             curPoint.mobMax = mob;
-                        if (doEIMSum)
-                        {
-                            curPointMobs.push_back(mob);
-                            curPointInts.push_back(inten);
-                            //ofsRaw << scanInd << "," << time << "," << mz << "," << inten << "," << mob << "\n";
-                        }
-                        else
-                            curPoint.mobility += mob * inten;
+                        curPointMobs.push_back(mob);
+                        curPointInts.push_back(inten);
+                        //ofsRaw << scanInd << "," << time << "," << mz << "," << inten << "," << mob << "\n";
                     }
-                    //Rcpp::Rcout << "EIC: " << curPoint.time << "/" << j << "\t" << std::fixed << mz << "\t" << inten << "\t" << curPoint.mzMin << "/" << curPoint.mzMax << "\t" << mob << "\n";
+                    // Rcpp::Rcout << "EIC: " << curPoint.time << "/" << j << "\t" << std::fixed << mz << "\t" << inten << "\t" << curPoint.mzMin << "/" << curPoint.mzMax << "\t" << mob << std::endl;
                 }
             }
         }
@@ -1402,11 +1388,12 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         
         // fill in left-over trailing scans
         // NOTE: at this point, prvScanInd refers to the last filled in scan
-        for (SpectrumRawTypes::Scan s=prvScanInd+1; !EIMRun.empty() && s<specMeta.first.times.size(); ++s)
+        for (SpectrumRawTypes::Scan s=std::max(prvScanInd+1, static_cast<size_t>(EIMFlank));
+             !EIMRun.empty() && s<specMeta.first.times.size(); ++s)
         {
             EIMRun.pop(); // first pop: we are one ahead of the last added scan
             // Rcpp::Rcout << "EIM purge: " << s << "/" << (s-EIMFlank) << "/" << curScanInd << "/" << specMeta.first.times[s] << "/"
-            //             << specMeta.first.times[s-EIMFlank] << "/" << EIMRun.size() << "\n";
+            //             << specMeta.first.times[s-EIMFlank] << "/" << EIMRun.size() << std::endl;
             updateSummedEIMs(s - EIMFlank, EIMRun, eic, mobStart, mobEnd/*, ofsSmooth*/);
         }
 
@@ -1507,7 +1494,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         {
             // NOTE: Bruker TIMS data (and maybe others?) seem to omit zero intensity scans, leading to time gaps. Since
             // this leads to incorrect EICs, we pad here. To detect gaps, we take the median difference between scans
-            // and assume a gap is at least X higher than that.For padding we just have to add additional time points,
+            // and assume a gap is at least X higher than that. For padding we just have to add additional time points,
             // EIC filling and padding functions will assume these are zero intensity points.
             std::vector<SpectrumRawTypes::Time> diffs(specMeta.first.times.size() - 1, 0);
             for (size_t i=1; i<specMeta.first.times.size(); ++i)

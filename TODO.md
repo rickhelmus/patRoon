@@ -200,6 +200,7 @@
         - verify removal duplicate features?
         - mobAssignMethod and mobAssignAggr
         - EIM summing and smoothing
+        - MS summing, EIM saving, ...
     - groupFeaturesGreedy()
     - plotChroms(): mob annotation
     - plotMobilograms()
@@ -271,7 +272,8 @@
         - update docs for EIC filtering by suspects/ms2 (also mzIsoWindow, IMSWindow for ms2)
         - docs for minEICsIMSPreCheck
         - update docs for topMostEICMZ/topMostEICMZMob
-        - EIM & frame summing and smoothing
+        - EIM & frame summing and smoothing, and other new options
+        - EIM saving: always stores EIM at feat RT, irrespective of mobAssignMethod/mobAggrMethod
     - assignMobilities()
         - refs to paper
         - fGroups method

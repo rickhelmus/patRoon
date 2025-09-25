@@ -61,8 +61,8 @@ getScans <- function(backend, timeStart, timeEnd, MSLevel, prec, fixedIsoWidth =
     .Call(`_patRoon_getScans`, backend, timeStart, timeEnd, MSLevel, prec, fixedIsoWidth)
 }
 
-getEICList <- function(backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, gapFactor, mzExpIMSWindow, minIntensityIMS, mode = "simple", sumMS = FALSE, sumEIMs = 1L, smoothWindow = 3L, pad = FALSE, minEICIntensity = 0L, minEICAdjTime = 0L, minEICAdjPoints = 0L, minEICAdjIntensity = 0L, topMost = 0L) {
-    .Call(`_patRoon_getEICList`, backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, gapFactor, mzExpIMSWindow, minIntensityIMS, mode, sumMS, sumEIMs, smoothWindow, pad, minEICIntensity, minEICAdjTime, minEICAdjPoints, minEICAdjIntensity, topMost)
+getEICList <- function(backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, gapFactor, mzExpIMSWindow, minIntensityIMS, mode = "simple", sumMS = FALSE, sumEIMs = 1L, smoothWindow = 3L, saveEIMs = FALSE, pad = FALSE, minEICIntensity = 0L, minEICAdjTime = 0L, minEICAdjPoints = 0L, minEICAdjIntensity = 0L, topMost = 0L) {
+    .Call(`_patRoon_getEICList`, backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, gapFactor, mzExpIMSWindow, minIntensityIMS, mode, sumMS, sumEIMs, smoothWindow, saveEIMs, pad, minEICIntensity, minEICAdjTime, minEICAdjPoints, minEICAdjIntensity, topMost)
 }
 
 doFillEIXIntensities <- function(allXValues, xvalues, intensities) {

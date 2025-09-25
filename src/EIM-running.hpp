@@ -56,7 +56,7 @@ public:
         maybePop();
     }
     
-    EIM get(unsigned smoothWindow) const
+    EIM get(unsigned smoothWindow, SpectrumRawTypes::Mobility mobStart, SpectrumRawTypes::Mobility mobEnd) const
     {
         std::map<SpectrumRawTypes::Mobility, SpectrumRawTypes::Intensity> merged;
         for (const auto& eim : EIMs)
@@ -73,8 +73,38 @@ public:
             ret.intensities[i] = it->second;
         }
         
-        if (smoothWindow > 0)
+        if (smoothWindow > 0 && ret.mobilities.size() >= 3)
+        {
+            // pad to get smoothing right
+            
+            SpectrumRawTypes::Mobility minDiff = 0;
+            for (size_t j=1; j<ret.mobilities.size(); ++j)
+            {
+                const auto diff = ret.mobilities[j] - ret.mobilities[j-1];
+                if (minDiff == 0 || diff < minDiff)
+                    minDiff = diff;
+            }
+            if (minDiff > 0.0)
+            {
+                auto mobMinDiff = ret.mobilities.front() - mobStart;
+                for (unsigned j=0; j<smoothWindow && mobMinDiff>0.0; ++j)
+                {
+                    const auto m = ret.mobilities.front() - minDiff;
+                    ret.mobilities.insert(ret.mobilities.begin(), m);
+                    ret.intensities.insert(ret.intensities.begin(), 0);
+                    mobMinDiff -= minDiff;
+                }
+                auto mobMaxDiff = mobEnd - ret.mobilities.back();
+                for (unsigned j=0; j<smoothWindow && mobMaxDiff>0.0; ++j)
+                {
+                    const auto m = ret.mobilities.back() + minDiff;
+                    ret.mobilities.push_back(m);
+                    ret.intensities.push_back(0);
+                    mobMaxDiff -= minDiff;
+                }
+            }
             ret.intensities = movingAverage(ret.intensities, smoothWindow);
+        }
         
         return ret;
     }

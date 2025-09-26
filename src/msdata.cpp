@@ -864,9 +864,8 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                       const std::vector<SpectrumRawTypes::Mobility> &endMobs,
                       SpectrumRawTypes::Time gapFactor, SpectrumRawTypes::Mass mzExpIMSWindow,
                       SpectrumRawTypes::Intensity minIntensityIMS, const std::string &mode = "simple",
-                      bool sumMS = false, unsigned sumEIMs = 1, int smoothWindow = 3,
-                      SpectrumRawTypes::Mobility smoothExt = 0, bool saveEIMs = false,
-                      bool pad = false, SpectrumRawTypes::Intensity minEICIntensity = 0,
+                      unsigned sumEIMs = 1, int smoothWindow = 3, SpectrumRawTypes::Mobility smoothExt = 0,
+                      bool saveEIMs = false, bool pad = false, SpectrumRawTypes::Intensity minEICIntensity = 0,
                       SpectrumRawTypes::Time minEICAdjTime = 0, unsigned minEICAdjPoints = 0,
                       SpectrumRawTypes::Intensity minEICAdjIntensity = 0, unsigned topMost = 0)
 {
@@ -1180,6 +1179,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         EIMRunning EIMRun(sumEIMs);
         std::vector<SpectrumRawTypes::Mobility> curPointMobs;
         std::vector<SpectrumRawTypes::Intensity> curPointInts;
+        // for summing spectra in an IMS frame
         std::map<SpectrumRawTypes::Mass, SpectrumRawTypes::Intensity> curPointMS;
         
         /*std::ofstream ofsRaw(std::string("eic-raw-") + std::to_string(i) + ".csv");
@@ -1206,7 +1206,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                     curPoint.time = curTime;
                     if (eicMode == EICMode::FULL || eicMode == EICMode::FULL_MZ)
                     {
-                        if (sumMS)
+                        if (anySpecHasMob)
                         {
                             SpectrumRawTypes::Intensity maxInten = 0, totInten = 0;
                             for (const auto &p : curPointMS)
@@ -1356,7 +1356,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                         curPoint.mzMin = mz;
                     if (mz > curPoint.mzMax)
                         curPoint.mzMax = mz;
-                    if (sumMS)
+                    if (anySpecHasMob)
                         curPointMS[mz] += inten;
                     else
                     {

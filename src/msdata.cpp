@@ -872,6 +872,8 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
 {
     // NOTE: startTimes/endTimes may be length one vectors, in which case they are used for all EICs
     
+// #define LOG_EIM
+
     struct EICPoint
     {
         SpectrumRawTypes::Time time = 0.0;
@@ -1006,7 +1008,9 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         
         for (size_t i=eic.size()-1; ; --i)
         {
-            // Rcpp::Rcout << " compare to: " << i << "/" << scanInd << "/" << scanTime << "/" << eic.times[i] << std::endl;
+#ifdef LOG_EIM
+            Rcpp::Rcout << " compare to: " << i << "/" << scanInd << "/" << scanTime << "/" << eic.times[i] << std::endl;
+#endif
             if (scanTime > eic.times[i])
                 break; // point not actually added
             if (compareTol(scanTime, eic.times[i]))
@@ -1039,8 +1043,9 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                 
                 if (saveEIMs)
                     eic.EIMs[i] = std::make_pair(EIM.mobilities, EIM.intensities);
-                // Rcpp::Rcout << "  set: " << totInten << "/" << maxInten << "/" << eic.mobilities[i] << "/" << scanTime << std::endl;
-                
+#ifdef LOG_EIM
+                Rcpp::Rcout << "  set: " << totInten << "/" << maxInten << "/" << eic.mobilities[i] << "/" << scanTime << std::endl;
+#endif  
                 break;
             }
             if (i == 0)
@@ -1140,6 +1145,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     timer.start("Processing EICs");
     std::vector<EIC> allEICs(EICCount);
     std::vector<SpectrumRawTypes::Intensity> allEICMaxIntensities(EICCount);
+    
     #pragma omp parallel for
     for (size_t i=0; i<EICCount; ++i)
     {
@@ -1222,8 +1228,10 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                         {
                             SpectrumRawTypes::Scan sc = (prvScanInd == allPeaksSorted.indices.size()) ? curScanInd : (prvScanInd + 1);
                             
-                            // Rcpp::Rcout << "EIC sum: " << i << "/" << j << "/" << sc << "/" << scanInd
-                            //             << "/" << EIMRun.size() << "/" <<  specMeta.first.times[sc] << "/" << curTime << std::endl;
+#ifdef LOG_EIM
+                            Rcpp::Rcout << "EIC sum: " << i << "/" << j << "/" << sc << "/" << scanInd
+                                        << "/" << EIMRun.size() << "/" <<  specMeta.first.times[sc] << "/" << curTime << std::endl;
+#endif
                             
                             while (true)
                             {
@@ -1231,12 +1239,16 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                                 {
                                     // add zero-intensity points for missing scans
                                     EIMRun.addZero();
-                                    // Rcpp::Rcout << "added zero:" << i << "/" << j << "/" << sc << "/" << curScanInd << std::endl;
+#ifdef LOG_EIM
+                                    Rcpp::Rcout << "added zero:" << i << "/" << j << "/" << sc << "/" << curScanInd << std::endl;
+#endif
                                 }
                                 else
                                 {
                                     EIMRun.add(std::move(curPointMobs), std::move(curPointInts));
-                                    // Rcpp::Rcout << "added points:" << i << "/" << j << "/" << curPointMobs.size() << "/" << curScanInd << std::endl;
+#ifdef LOG_EIM
+                                    Rcpp::Rcout << "added points:" << i << "/" << j << "/" << curPointMobs.size() << "/" << curScanInd << std::endl;
+#endif
                                 }
                                 
                                 // sumEIMs == 3 --> flank == 1 --> set position 1 back from current
@@ -1245,9 +1257,10 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                                 
                                 if (!eic.empty() && sc >= EIMFlank)
                                     updateSummedEIMs(sc - EIMFlank, EIMRun, eic, mobStart, mobEnd/*, ofsSmooth*/);
-                                
-                                // Rcpp::Rcout << "EIC update: " << specMeta.first.times[sc] << "/" << j << "/" << sc << "/" << curScanInd
-                                //             << "/" << prvScanInd << "/" << EIMRun.size() << "/" << EIMRun.sizeNoZero() << std::endl;
+#ifdef LOG_EIM
+                                Rcpp::Rcout << "EIC update: " << specMeta.first.times[sc] << "/" << j << "/" << sc << "/" << curScanInd
+                                            << "/" << prvScanInd << "/" << EIMRun.size() << "/" << EIMRun.sizeNoZero() << std::endl;
+#endif
                                 
                                 if (sc == curScanInd)
                                     break;
@@ -1294,11 +1307,11 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                     }
                 }
                 
+                if (curPoint.intensity > 0)
+                    prvScanInd = curScanInd;
                 if (ended)
                     break;
                 
-                if (curPoint.intensity > 0)
-                    prvScanInd = curScanInd;
                 curScanInd = scanInd;
                 curPoint = EICPoint();
                 curPointMobs.clear();
@@ -1388,13 +1401,17 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         
         // fill in left-over trailing scans
         // NOTE: at this point, prvScanInd refers to the last filled in scan
-        for (SpectrumRawTypes::Scan s=std::max(prvScanInd+1, static_cast<size_t>(EIMFlank));
+        for (SpectrumRawTypes::Scan s=prvScanInd+1-std::min(EIMFlank, static_cast<unsigned>(EIMRun.size()));
              !EIMRun.empty() && s<specMeta.first.times.size(); ++s)
         {
-            EIMRun.pop(); // first pop: we are one ahead of the last added scan
-            // Rcpp::Rcout << "EIM purge: " << s << "/" << (s-EIMFlank) << "/" << curScanInd << "/" << specMeta.first.times[s] << "/"
-            //             << specMeta.first.times[s-EIMFlank] << "/" << EIMRun.size() << std::endl;
-            updateSummedEIMs(s - EIMFlank, EIMRun, eic, mobStart, mobEnd/*, ofsSmooth*/);
+#ifdef LOG_EIM
+            Rcpp::Rcout << "EIM purge: " << s << "/" << curScanInd << "/" << specMeta.first.times[s] << "/"
+                        << EIMRun.size() << std::endl;
+#endif
+            if (specMeta.first.times[s] > eic.times.back())
+                break; // nothing more to set
+            updateSummedEIMs(s, EIMRun, eic, mobStart, mobEnd/*, ofsSmooth*/);
+            EIMRun.pop();
         }
 
         allEICs[i] = std::move(eic);

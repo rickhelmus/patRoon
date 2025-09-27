@@ -1208,7 +1208,6 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                     {
                         if (anySpecHasMob)
                         {
-                            SpectrumRawTypes::Intensity maxInten = 0, totInten = 0;
                             for (const auto &p : curPointMS)
                             {
                                 curPoint.mz += (p.first * p.second);

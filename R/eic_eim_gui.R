@@ -146,7 +146,7 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
                                 condition = "input.rtMode == 'Value +/- Window'",
                                 shiny::fluidRow(
                                     shiny::column(6, shiny::numericInput("eimRetvalue", "EIM RT Value", value = 5, min = 0)),
-                                    shiny::column(6, shiny::numericInput("eimRetwindow", "EIM RT Window", value = 0.5, min = 0))
+                                    shiny::column(6, shiny::numericInput("eimRetwindow", "EIM RT Window", value = 15, min = 0))
                                 )
                             )
                         ),
@@ -411,14 +411,14 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
                 if (!is.null(susp[["rt"]]) && !is.na(susp$rt))
                 {
                     updateNumericInput(session, "retvalue", value = round(susp$rt, 2))
-                    updateNumericInput(session, "retwindow", value = 0.5)
-                    updateNumericInput(session, "retmin", value = round(susp$rt - 0.5, 2))
-                    updateNumericInput(session, "retmax", value = round(susp$rt + 0.5, 2))
+                    updateNumericInput(session, "retwindow", value = 15)
+                    updateNumericInput(session, "retmin", value = round(susp$rt - 15, 2))
+                    updateNumericInput(session, "retmax", value = round(susp$rt + 15, 2))
                     # Update EIM RT
                     updateNumericInput(session, "eimRetvalue", value = round(susp$rt, 2))
-                    updateNumericInput(session, "eimRetwindow", value = 0.5)
-                    updateNumericInput(session, "eimRetmin", value = round(susp$rt - 0.5, 2))
-                    updateNumericInput(session, "eimRetmax", value = round(susp$rt + 0.5, 2))
+                    updateNumericInput(session, "eimRetwindow", value = 15)
+                    updateNumericInput(session, "eimRetmin", value = round(susp$rt - 15, 2))
+                    updateNumericInput(session, "eimRetmax", value = round(susp$rt + 15, 2))
                 }
                 if (!is.null(susp[["mobility"]]) && !is.na(susp$mobility))
                 {

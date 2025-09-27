@@ -1,7 +1,7 @@
 #include <Rcpp.h>
 
+#include "msdata.hpp"
 #include "spectrum-raw.h"
-#include "msdata.h"
 
 namespace {
 

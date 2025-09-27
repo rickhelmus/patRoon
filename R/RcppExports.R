@@ -13,6 +13,14 @@ getGroupIDs <- function(featRTs, featMZs, featMobs, ints, anaIDs, repIDs, rtWind
     .Call(`_patRoon_getGroupIDs`, featRTs, featMZs, featMobs, ints, anaIDs, repIDs, rtWindow, mzWindow, mobWindow, weightsList)
 }
 
+getEICList <- function(backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, gapFactor, mzExpIMSWindow, minIntensityIMS, mode = "simple", sumEIMs = 1L, smoothWindow = 3L, smoothExt = 0L, saveEIMs = FALSE, pad = FALSE, minEICIntensity = 0L, minEICAdjTime = 0L, minEICAdjPoints = 0L, minEICAdjIntensity = 0L, topMost = 0L) {
+    .Call(`_patRoon_getEICList`, backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, gapFactor, mzExpIMSWindow, minIntensityIMS, mode, sumEIMs, smoothWindow, smoothExt, saveEIMs, pad, minEICIntensity, minEICAdjTime, minEICAdjPoints, minEICAdjIntensity, topMost)
+}
+
+doFillEIXIntensities <- function(allXValues, xvalues, intensities) {
+    .Call(`_patRoon_doFillEIXIntensities`, allXValues, xvalues, intensities)
+}
+
 initBrukerLibrary <- function(path, force = FALSE) {
     .Call(`_patRoon_initBrukerLibrary`, path, force)
 }
@@ -59,14 +67,6 @@ getCentroidedFrame <- function(backend, index, mzWindow, mobWindow, minIntensity
 
 getScans <- function(backend, timeStart, timeEnd, MSLevel, prec, fixedIsoWidth = 0.0) {
     .Call(`_patRoon_getScans`, backend, timeStart, timeEnd, MSLevel, prec, fixedIsoWidth)
-}
-
-getEICList <- function(backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, gapFactor, mzExpIMSWindow, minIntensityIMS, mode = "simple", sumEIMs = 1L, smoothWindow = 3L, smoothExt = 0L, saveEIMs = FALSE, pad = FALSE, minEICIntensity = 0L, minEICAdjTime = 0L, minEICAdjPoints = 0L, minEICAdjIntensity = 0L, topMost = 0L) {
-    .Call(`_patRoon_getEICList`, backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, gapFactor, mzExpIMSWindow, minIntensityIMS, mode, sumEIMs, smoothWindow, smoothExt, saveEIMs, pad, minEICIntensity, minEICAdjTime, minEICAdjPoints, minEICAdjIntensity, topMost)
-}
-
-doFillEIXIntensities <- function(allXValues, xvalues, intensities) {
-    .Call(`_patRoon_doFillEIXIntensities`, allXValues, xvalues, intensities)
 }
 
 getMSMetadata <- function(backend, msLevel) {

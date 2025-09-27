@@ -4,7 +4,7 @@
 
 #include <Rcpp.h>
 
-#include "msdata.h"
+#include "msdata.hpp"
 
 #include "cpp-base64/base64.cpp"
 

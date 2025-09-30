@@ -447,7 +447,8 @@ Rcpp::List doFindPeaksPiek(Rcpp::List EICs, bool fillEICs, double minIntensity, 
 // utils for findFeaturesPiek()
 
 // [[Rcpp::export]]
-Rcpp::LogicalVector findFeatTableDups(const Rcpp::NumericVector &rts, const Rcpp::NumericVector &mzs,
+Rcpp::LogicalVector findFeatTableDups(const Rcpp::NumericVector &rts, const Rcpp::NumericVector &rtMins,
+                                      const Rcpp::NumericVector &rtMaxs, const Rcpp::NumericVector &mzs,
                                       const Rcpp::NumericVector &mobs, const Rcpp::NumericVector &ints,
                                       double tolRT, double tolMZ, double tolMob, const Rcpp::LogicalVector &mzCentered,
                                       const Rcpp::LogicalVector &mobCentered, double prefIntensityRatio)
@@ -496,6 +497,10 @@ Rcpp::LogicalVector findFeatTableDups(const Rcpp::NumericVector &rts, const Rcpp
             if (!isSame(mzs[indi], mzs[indj], tolMZ))
                 continue;
             if (hasMobs && !isSame(mobs[indi], mobs[indj], tolMob))
+                continue;
+            
+            // make sure RT range overlaps
+            if (!numberLTE(rtMins[indi], rtMaxs[indj]) || !numberGTE(rtMaxs[indi], rtMins[indj]))
                 continue;
             
             const bool mzCentj = mzCentered[indj];

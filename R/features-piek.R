@@ -507,8 +507,9 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
                 peaks <- peaks[keep == TRUE]
             }
 
-            dups <- findFeatTableDups(peaks$ret, peaks$mz, if (withIMS) peaks$mobility else numeric(),
-                                      peaks$intensity, defaultLim("retention", "very_narrow"),
+            dups <- findFeatTableDups(peaks$ret, peaks$retmin, peaks$retmax,  peaks$mz,
+                                      if (withIMS) peaks$mobility else numeric(),
+                                      peaks$intensity, defaultLim("retention", "narrow"),
                                       genEICParams$mzStep / 2, genEICParams$mobStep / 2,
                                       peaks$mzCentered, if (withIMS) peaks$mobCentered else numeric(),
                                       prefDupIntensityRatio)

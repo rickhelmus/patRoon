@@ -122,6 +122,8 @@
   temporarily disable cached results before running a function.</p></li>
 <li><p><code>patRoon.cache.fileName</code>: a <code>character</code> specifying the name of the cache file (default is
   <code class="file">cache.sqlite</code>).</p></li>
+<li><p><code>patRoon.cache.maxEntries</code>: a <code>numeric</code> specifying the maximum number of entries per cache
+  category (default is 100000). When this limit is exceeded, the oldest entries are automatically removed.</p></li>
 <li><p><code>patRoon.MP.maxProcs</code>: The maximum number of processes that should be initiated in parallel. A good
   starting point is the number of physical cores, which is the default as detected by
   <code><a href="https://rdrr.io/r/parallel/detectCores.html" class="external-link">detectCores</a></code>. This option is only used when <span class="option">patRoon.MP.method="classic"</span>.</p></li>

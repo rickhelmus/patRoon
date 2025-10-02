@@ -260,7 +260,7 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
             if (!is.na(feat_full$ret))
             {
                 updateNumericInput(session, "retvalue", value = round(feat_full$ret, 2))
-                updateNumericInput(session, "retwindow", value = round((feat_full$retmax - feat_full$retmin) / 2, 2))
+                updateNumericInput(session, "retwindow", value = max(15, round((feat_full$retmax - feat_full$retmin) / 2), 2))
                 updateNumericInput(session, "retmin", value = round(feat_full$retmin, 2))
                 updateNumericInput(session, "retmax", value = round(feat_full$retmax, 2))
                 # Update EIM RT to match

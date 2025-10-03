@@ -620,6 +620,58 @@ NULL
 #' @references \insertRef{Peets2022}{patRoon}
 #'
 #' @seealso \link[=pred-quant]{Concentration prediction}
-#' 
+#'
 #' @name pred-tox
+NULL
+
+#' Feature quality definitions and utilities
+#'
+#' Functions to define and work with chromatographic peak quality metrics used for feature and feature group quality
+#' calculations.
+#'
+#' These functions provide access to quality metrics that are used to assess the quality of detected features and
+#' feature groups by the \code{\link{calculatePeakQualities}} function. The quality metrics are calculated using the
+#' \pkg{MetaClean} package and are useful for filtering out low-quality features before further analysis.
+#'
+#' @section Feature qualities: The \code{featureQualities} function defines quality metrics that are calculated for
+#'   individual features. The following quality metrics are available:
+#'
+#' \itemize{
+#' \item ApexBoundaryRatio - Ratio between apex and boundary intensities
+#' \item FWHM2Base - Full width at half maximum to base ratio
+#' \item Jaggedness - Measure of peak smoothness
+#' \item Modality - Measure of peak multiplicity
+#' \item Symmetry - Measure of peak symmetry (range: -1 to 1)
+#' \item GaussianSimilarity - Similarity to Gaussian distribution
+#' \item Sharpness - Measure of peak sharpness
+#' \item TPASR - Triangle peak area similarity ratio
+#' \item ZigZag - Zig-zag index measure
+#' }
+#'
+#' @section Feature group qualities: The \code{featureGroupQualities} function defines quality metrics that are
+#'   calculated for feature groups across multiple analyses. The following quality metrics are available:
+#'
+#' \itemize{
+#' \item ElutionShift - Measure of retention time consistency across analyses
+#' \item RetentionTimeCorrelation - Correlation of retention times across analyses
+#' }
+#'
+#' @param qualities A character vector specifying which qualities to return. If \code{NULL}, returns all available
+#'   quality definitions.
+#'
+#' @return For \code{featureQualities} and \code{featureGroupQualities}: A named list containing quality definitions.
+#'   Each element contains:
+#' \itemize{
+#' \item \code{func}: The MetaClean function to calculate the quality metric
+#' \item \code{HQ}: "HV" (high values good) or "LV" (low values good)
+#' \item \code{range}: Expected range of values (may be Inf for unbounded ranges)
+#' }
+#'
+#'   For \code{featureQualityNames}: A character vector with quality and/or score names.
+#'
+#' @seealso \code{\link{calculatePeakQualities}}
+#'
+#' @references \insertRef{Chetnik2020}{patRoon}
+#'
+#' @name feature-quality
 NULL

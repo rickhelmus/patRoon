@@ -62,7 +62,7 @@ getFGColGrpStartCols <- function(groupDefs) sapply(groupDefs[-1], function(col) 
 
 featGroupTabHasSusps <- function(tab) !is.null(tab[["susp_d_mz"]]) # HACK: this column should always be there if there are (non-collapsed) suspect results
 
-getFeatGroupColDefs <- function(tab, fGroups = NULL)
+getFeatGroupColDefs <- function(tab, fGroups)
 {
     colDefs <- list()
     
@@ -99,7 +99,7 @@ getFeatGroupColDefs <- function(tab, fGroups = NULL)
     # InChIKeys are only there for internal usage
     setCD("susp_InChIKey", "show", FALSE)
     
-    featScoreNames <- intersect(if (is.null(fGroups)) featureQualityNames(scores = TRUE) else getFeatureQualityNames(fGroups, scores = TRUE), names(tab))
+    featScoreNames <- intersect(getFeatureQualityNames(fGroups, scores = TRUE), names(tab))
     for (col in featScoreNames)
     {
         setCD(col, "name", sub("Score$", "", col))
@@ -109,12 +109,12 @@ getFeatGroupColDefs <- function(tab, fGroups = NULL)
     return(colDefs)
 }
 
-getFGGroupDefs <- function(tab, groupBy, rgs, fGroups = NULL)
+getFGGroupDefs <- function(tab, groupBy, rgs, fGroups)
 {
     colSepStyle <- getFGColSepStyle()
     hasSusp <- featGroupTabHasSusps(tab)
     isGrouped <- !is.null(groupBy)
-    featScoreNames <- intersect(if (is.null(fGroups)) featureQualityNames(scores = TRUE) else getFeatureQualityNames(fGroups, scores = TRUE), names(tab))
+    featScoreNames <- intersect(getFeatureQualityNames(fGroups, scores = TRUE), names(tab))
     concCols <- intersect(c(paste0(rgs, "_conc"), "conc_types"), names(tab))
     
     return(pruneList(list(

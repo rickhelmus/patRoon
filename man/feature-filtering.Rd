@@ -121,7 +121,7 @@ values. The maximum can be \code{Inf} to specify no maximum range. Set to \code{
 
 \item{featQualityRange}{Used to filter features by their peak qualities/scores
 (see \code{\link{calculatePeakQualities}}). Should be a named \code{list} with min/max ranges for each
-quality/score to be filtered (the \code{\link{featureQualityNames}} function can be used to obtain valid names).
+quality/score to be filtered (the \code{\link{getFeatureQualityNames}} function can be used to obtain valid names).
 Example: \code{featQualityRange=list(ModalityScore=c(0.3, Inf),
 SymmetryScore=c(0.5, Inf))}. Set to \code{NULL} to ignore.}
 

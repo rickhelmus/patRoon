@@ -289,24 +289,33 @@ setMethod("groupQualities", "featureGroups", function(fGroups) fGroups@groupQual
 setMethod("groupScores", "featureGroups", function(fGroups) fGroups@groupScores)
 
 #' @describeIn featureGroups Returns feature quality names that were calculated for this object.
-#' @param feat If \code{TRUE} then names specific to features are returned.
-#' @param group If \code{TRUE} then names specific to groups are returned.
-#' @param scores If \code{TRUE} the score names are returned, otherwise the quality names.
-#' @param totScore If \code{TRUE} (and \code{scores=TRUE}) then the name of the total score is included.
-#' @aliases getFeatureQualityNames
+#' @param feat,group If \code{TRUE} then names specific to features and feature groups are returned, respectively.
+#' @inheritParams getFeatureQualityNames,features-method
 #' @export
-setMethod("getFeatureQualityNames", "featureGroups", function(fGroups, feat = TRUE, group = TRUE, scores = FALSE, totScore = TRUE)
+setMethod("getFeatureQualityNames", "featureGroups", function(obj, feat = TRUE, group = TRUE, scores = FALSE,
+                                                              totScore = TRUE)
 {
-    return(getFeatureQualityNames(fGroups@features, feat = feat, group = group, scores = scores, totScore = totScore))
+    aapply(checkmate::assertFlag, . ~ feat + group + scores + totScore)
+    featn <- getFeatureQualityNames(getFeatures(obj), scores = scores)
+    ret <- character()
+    if (group)
+    {
+        # contains both feat and fg names
+        ret <- names(if (scores) groupScores(obj) else groupQualities(obj))
+        ret <- setdiff(ret, "group")
+        if (!feat)
+            ret <- setdiff(ret, featn)
+    }
+    else if (feat)
+        ret <- featn
+    if (scores && totScore)
+        ret <- c(ret, "totalScore")
+    return(ret)
 })
 
 #' @describeIn featureGroups Accessor for \code{annotations} slot.
 #' @export
 setMethod("annotations", "featureGroups", function(obj) obj@annotations)
-
-#' @describeIn featureGroups Accessor for \code{featureQualityNames} slot.
-#' @export
-setMethod("featureQualityNames", "featureGroups", function(obj) featureQualityNames(obj@features))
 
 #' @describeIn featureGroups Accessor for \code{ISTDs} slot.
 #' @aliases internalStandards
@@ -768,48 +777,47 @@ setMethod("overlap", "featureGroups", function(fGroups, which, exclusive)
 
 #' @describeIn featureGroups Calculates peak and group qualities for all features and feature groups. The peak qualities
 #'   (and scores) are calculated with the \link[=calculatePeakQualities,features-method]{features method of this
-#'   function}, and subsequently averaged per feature group. Then, \pkg{MetaClean} is used to calculate the
-#'   \verb{Elution Shift} and \verb{Retention Time Consistency} group quality metrics (see the \pkg{MetaClean}
-#'   publication cited below for more details). Similarly to the \code{\link{features}} method, these metrics are scored
-#'   by normalizing qualities among all groups and scaling them from \samp{0} (worst) to \samp{1} (best). The
+#'   function}, and subsequently averaged per feature group. Group metrics are then calculated and scored and
+#'   scaled by normalizing qualities among all groups and scaling them from \samp{0} (worst) to \samp{1} (best). The
 #'   \verb{totalScore} for each group is then calculated as the weighted sum from all feature (group) scores. The
 #'   \code{\link{getMCTrainData}} and \code{\link{predictCheckFeaturesSession}} functions can be used to train and apply
 #'   Pass/Fail ML models from \pkg{MetaClean}.
 #'
 #' @inheritParams calculatePeakQualities,features-method
+#' @param featureGroupQualities Analogous to \code{featureQualities} for feature groups metrics. See the
+#'   \code{\link[=feature-quality]{featureGroupQualities}} function for more details.
 #' @param avgFunc The function used to average the peak qualities and scores for each feature group.
 #'
 #' @template parallel-arg
-#' 
+#'
 #' @references \insertRef{Chetnik2020}{patRoon}
 #'
 #' @return \code{calculatePeakQualities} returns a modified object amended with peak qualities and scores.
 #'
 #' @export
-setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flatnessFactor, featureQualities = NULL, featureGroupQualities = NULL, avgFunc = mean,
+setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flatnessFactor, featureQualities = NULL,
+                                                              featureGroupQualities = NULL, avgFunc = mean,
                                                               parallel = TRUE)
 {
     checkPackage("MetaClean")
     
     ac <- checkmate::makeAssertCollection()
     assertFeatureQualities(featureQualities, null.ok = TRUE, add = ac)
-    assertFeatureGroupQualities(featureGroupQualities, null.ok = TRUE, add = ac)
+    assertFeatureQualities(featureGroupQualities, null.ok = TRUE, add = ac)
     checkmate::assertNumber(flatnessFactor, add = ac)
     checkmate::assertFunction(avgFunc, add = ac)
     checkmate::assertFlag(parallel, add = ac)
     checkmate::reportAssertions(ac)
-    
-    # Get qualities after validation
-    featQualities <- featureQualities(featureQualities)
-    fgQualities <- featureGroupQualities(featureGroupQualities)
+
+    featQualities <- if (!is.list(featureQualities)) featureQualities(featureQualities) else featureQualities
+    fgQualities <- if (!is.list(featureGroupQualities)) featureGroupQualities(featureGroupQualities) else featureGroupQualities
     featQualityNames <- names(featQualities)
     featScoreNames <- paste0(featQualityNames, "Score")
     fgQualityNames <- names(fgQualities)
     fgScoreNames <- paste0(fgQualityNames, "Score")
     allScores <- c(featScoreNames, fgScoreNames)
     
-    checkmate::assertNumeric(weights, finite = TRUE, any.missing = FALSE, min.len = 1, names = "unique",
-                             null.ok = TRUE)
+    checkmate::assertNumeric(weights, finite = TRUE, any.missing = FALSE, min.len = 1, names = "unique", null.ok = TRUE)
     if (!is.null(weights))
         checkmate::assertNames(names(weights), subset.of = allScores)
     
@@ -837,7 +845,6 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flat
     gNames <- names(obj)
     gCount <- length(obj)
     EICs <- getEICsForFGroups(obj, EICParams = getDefEICParams(rtWindow = 0))
-    fgQualities <- featureGroupQualities(featureGroupQualities)
     
     printf("Calculating group peak qualities and scores...\n")
     prog <- openProgBar(0, gCount)

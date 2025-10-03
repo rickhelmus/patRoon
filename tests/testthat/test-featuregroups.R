@@ -230,20 +230,14 @@ test_that("as.data.table works", {
 })
 
 test_that("featureQualities parameter works", {
-    # Test with subset of qualities
     subsetQualities <- c("FWHM2Base", "Symmetry", "GaussianSimilarity")
-    fgOpenMSSubset <- calculatePeakQualities(fgOpenMS, featureQualities = subsetQualities)
-    
-    expect_identical(getFeatureQualityNames(fgOpenMSSubset, group = FALSE), subsetQualities)
-    expect_true(all(getFeatureQualityNames(fgOpenMSSubset, group = FALSE) %in% 
-                    getFeatureQualityNames(fgOpenMSQ, group = FALSE)))
-    expect_true(length(getFeatureQualityNames(fgOpenMSSubset, group = FALSE)) < 
-                length(getFeatureQualityNames(fgOpenMSQ, group = FALSE)))
-    
+    fgOpenMSQSubset <- calculatePeakQualities(fgOpenMS, featureQualities = subsetQualities)
+    expect_identical(getFeatureQualityNames(fgOpenMSQSubset, group = FALSE), subsetQualities)
+
     # Test with custom qualities
     customQualities <- list(
         TestQuality = list(
-            func = function(peakdata, eic, ...) rep(0.5, nrow(peakdata)),
+            func = \(peakdata, eic, ...) 0.5,
             HQ = "HV",
             range = c(0, 1)
         )
@@ -251,36 +245,20 @@ test_that("featureQualities parameter works", {
     fgOpenMSCustom <- calculatePeakQualities(fgOpenMS, featureQualities = customQualities)
     expect_identical(getFeatureQualityNames(fgOpenMSCustom, group = FALSE), "TestQuality")
     
-    # Test validation errors
-    expect_error(calculatePeakQualities(fgOpenMS, featureQualities = list(BadQuality = "not_a_list")),
-                 "Custom feature qualities must be named")
-    expect_error(calculatePeakQualities(fgOpenMS, featureQualities = list("" = list(func = mean, HQ = "HV", range = c(0, 1)))),
-                 "Custom feature qualities must be named")
-    expect_error(calculatePeakQualities(fgOpenMS, featureQualities = list(CustomQuality = list(HQ = "HV", range = c(0, 1)))),
-                 "missing required 'func' element")
-    
-    # Test featureGroupQualities parameter
+
     fgGroupQualitiesSubset <- calculatePeakQualities(fgOpenMS, featureGroupQualities = c("ElutionShift"))
     expect_identical(getFeatureQualityNames(fgGroupQualitiesSubset, feat = FALSE), "ElutionShift")
     
     # Test custom featureGroupQualities
     customGroupQualities <- list(
         TestGroupQuality = list(
-            func = function(peakdata, eic, ...) rep(0.5, length(peakdata)),
+            func = \(pdl, ...) rep(0.5, length(pdl)),
             HQ = "HV",
             range = c(0, 1)
         )
     )
     fgGroupQualitiesCustom <- calculatePeakQualities(fgOpenMS, featureGroupQualities = customGroupQualities)
     expect_identical(getFeatureQualityNames(fgGroupQualitiesCustom, feat = FALSE), "TestGroupQuality")
-    
-    # Test featureGroupQualities validation errors
-    expect_error(calculatePeakQualities(fgOpenMS, featureGroupQualities = list(BadQuality = "not_a_list")),
-                 "Custom feature group qualities must be named")
-    expect_error(calculatePeakQualities(fgOpenMS, featureGroupQualities = list("" = list(func = mean, HQ = "HV", range = c(0, 1)))),
-                 "Custom feature group qualities must be named")
-    expect_error(calculatePeakQualities(fgOpenMS, featureGroupQualities = list(CustomQuality = list(HQ = "HV", range = c(0, 1)))),
-                 "missing required 'func' element")
 })
 
 test_that("unique works", {

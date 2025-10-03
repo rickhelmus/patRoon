@@ -16,7 +16,7 @@ Fold change calculation
 }
 \details{
 Fold change calculation can be used to easily identify significant changes between replicate groups. The
-  calculation process is configured through a paramater list, which can be constructed with the \code{getFCParams}
+  calculation process is configured through a parameter list, which can be constructed with the \code{getFCParams}
   function. The parameter list has the following entries: \itemize{
 
   \item \code{rGroups} the name of the two replicate groups to compare (taken from the \code{rGroups} argument to

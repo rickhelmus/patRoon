@@ -145,31 +145,10 @@ test_that("delete and filter", {
 test_that("basic usage", {
     expect_equal(nrow(as.data.table(ffOpenMS)), length(ffOpenMS))
     
-    # Check that calculated feature quality names are stored and accessible
-    expect_true(length(getFeatureQualityNames(fgOpenMSQ, group = FALSE)) > 0)
-    expect_identical(getFeatureQualityNames(fgOpenMSQ, group = FALSE), 
-                     c("ApexBoundaryRatio", "FWHM2Base", "Jaggedness", "Modality", 
-                       "Symmetry", "GaussianSimilarity", "Sharpness", "TPASR", "ZigZag"))
-    
-    # Check that the data table contains the calculated quality names
+    expect_identical(getFeatureQualityNames(ffOpenMSQ), featureQualityNames(group = FALSE))
     checkmate::expect_names(names(as.data.table(ffOpenMSQ)),
-                            must.include = c(getFeatureQualityNames(fgOpenMSQ, group = FALSE),
-                                             getFeatureQualityNames(fgOpenMSQ, group = FALSE, scores = TRUE)))
-    
-    # Test custom featureQualities parameter validation
-    expect_error(calculatePeakQualities(ffOpenMS, featureQualities = list(BadQuality = "not_a_list")),
-                 "Custom feature qualities must be named")
-    expect_error(calculatePeakQualities(ffOpenMS, featureQualities = list("" = list(func = mean, HQ = "HV", range = c(0, 1)))),
-                 "Custom feature qualities must be named")
-    expect_error(calculatePeakQualities(ffOpenMS, featureQualities = list(CustomQuality = list(HQ = "HV", range = c(0, 1)))),
-                 "missing required 'func' element")
-    expect_error(calculatePeakQualities(ffOpenMS, featureQualities = list(CustomQuality = list(func = "not_function", HQ = "HV", range = c(0, 1)))),
-                 "must be a function")
-    expect_error(calculatePeakQualities(ffOpenMS, featureQualities = list(CustomQuality = list(func = mean, HQ = "INVALID", range = c(0, 1)))),
-                 "must be either 'HV' \\(high value\\) or 'LV' \\(low value\\)")
-    
-    # Test that featureGroupQualities parameter is accepted (even though not used by features method)
-    expect_silent(calculatePeakQualities(ffOpenMS, featureGroupQualities = c("ElutionShift")))
+                            must.include = c(getFeatureQualityNames(ffOpenMSQ),
+                                             getFeatureQualityNames(ffOpenMSQ, scores = TRUE)))
 })
 
 # XCMSImpXCMS <- getXCMSSet(ffXCMS)

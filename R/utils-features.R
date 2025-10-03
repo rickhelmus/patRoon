@@ -22,76 +22,7 @@ reGenerateFTIndex <- function(fGroups)
 }
 isFGSet <- function(fGroups) inherits(fGroups, "featureGroupsSet")
 
-featureQualities <- function(qualities = NULL)
-{
-    checkPackage("MetaClean")
-    
-    # Default set of all available qualities
-    allQualities <- list(ApexBoundaryRatio = list(func = MetaClean::calculateApexMaxBoundaryRatio, HQ = "LV", range = c(0, 1)),
-                         FWHM2Base = list(func = MetaClean::calculateFWHM, HQ = "HV", range = c(0, 1)),
-                         Jaggedness = list(func = MetaClean::calculateJaggedness, HQ = "LV", range = Inf),
-                         Modality = list(func = MetaClean::calculateModality, HQ = "LV", range = Inf),
-                         Symmetry = list(func = MetaClean::calculateSymmetry, HQ = "HV", range = c(-1, 1)),
-                         GaussianSimilarity = list(func = MetaClean::calculateGaussianSimilarity, HQ = "HV", range = c(0, 1)),
-                         Sharpness = list(func = MetaClean::calculateSharpness, HQ = "HV", range = Inf),
-                         TPASR = list(func = MetaClean::calculateTPASR, HQ = "LV", range = Inf),
-                         ZigZag = list(func = MetaClean::calculateZigZagIndex, HQ = "LV", range = Inf))
-    
-    # If no specific qualities requested, return all
-    if (is.null(qualities))
-        return(allQualities)
-    
-    # If qualities is a character vector, subset from default qualities
-    if (is.character(qualities))
-    {
-        missing <- setdiff(qualities, names(allQualities))
-        if (length(missing) > 0)
-            stop("Unknown feature qualities specified: ", paste(missing, collapse = ", "))
-        return(allQualities[qualities])
-    }
-    
-    # If qualities is a list (custom qualities), return as-is (validation done elsewhere)
-    if (is.list(qualities))
-        return(qualities)
-    
-    stop("featureQualities parameter must be NULL, a character vector of quality names, or a list of quality definitions.")
-}
 
-featureGroupQualities <- function(qualities = NULL)
-{
-    checkPackage("MetaClean")
-    
-    # Default set of all available group qualities
-    allQualities <- list(
-        ElutionShift = list(func = MetaClean::calculateElutionShift, HQ = "LV", range = Inf),
-        RetentionTimeCorrelation = list(func = MetaClean::calculateRetentionTimeConsistency, HQ = "LV", range = Inf)
-    )
-    
-    # If no specific qualities requested, return all
-    if (is.null(qualities))
-        return(allQualities)
-    
-    # If qualities is a character vector, subset from default qualities
-    if (is.character(qualities))
-    {
-        missing <- setdiff(qualities, names(allQualities))
-        if (length(missing) > 0)
-            stop("Unknown feature group qualities specified: ", paste(missing, collapse = ", "))
-        return(allQualities[qualities])
-    }
-    
-    # If qualities is a list, it should contain custom quality definitions
-    if (is.list(qualities))
-    {
-        # Validate that all qualities are named
-        if (is.null(names(qualities)) || any(names(qualities) == ""))
-            stop("Custom featureGroupQualities must be named")
-        
-        return(qualities)
-    }
-    
-    stop("featureGroupQualities parameter must be NULL, a character vector of quality names, or a list of quality definitions.")
-}
 
 # normalize, invert if necessary to get low (worst) to high (best) order
 scoreFeatQuality <- function(quality, values)

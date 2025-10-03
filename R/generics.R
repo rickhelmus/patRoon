@@ -74,12 +74,6 @@ setGeneric("groupQualities", function(fGroups) standardGeneric("groupQualities")
 setGeneric("groupScores", function(fGroups) standardGeneric("groupScores"))
 
 #' @rdname featureGroups-class
-setGeneric("getFeatureQualityNames", function(fGroups, ...) standardGeneric("getFeatureQualityNames"))
-
-#' @rdname features-class  
-setGeneric("featureQualityNames", function(obj) standardGeneric("featureQualityNames"))
-
-#' @rdname featureGroups-class
 setGeneric("internalStandards", function(fGroups) standardGeneric("internalStandards"))
 
 #' @rdname featureGroups-class
@@ -482,6 +476,11 @@ setGeneric("getBPCs", function(obj, ...) standardGeneric("getBPCs"))
 #' @templateVar desc returns the object's \code{\link{features}} object.
 #' @template generics
 setGeneric("getFeatures", function(obj) standardGeneric("getFeatures"))
+
+#' @templateVar func getFeatureQualityNames
+#' @templateVar desc returns the object's feature quality names.
+#' @template generics
+setGeneric("getFeatureQualityNames", function(obj, ...) standardGeneric("getFeatureQualityNames"))
 
 #' @templateVar func getMCS
 #' @templateVar desc Calculates the maximum common substructure.

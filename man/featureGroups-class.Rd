@@ -33,6 +33,7 @@
 \alias{groupFeatIndex,featureGroups-method}
 \alias{groupQualities,featureGroups-method}
 \alias{groupScores,featureGroups-method}
+\alias{getFeatureQualityNames,featureGroups-method}
 \alias{annotations,featureGroups-method}
 \alias{internalStandards,featureGroups-method}
 \alias{internalStandardAssignments,featureGroups-method}
@@ -154,6 +155,14 @@ normInts(
 
 \S4method{groupScores}{featureGroups}(fGroups)
 
+\S4method{getFeatureQualityNames}{featureGroups}(
+  obj,
+  feat = TRUE,
+  group = TRUE,
+  scores = FALSE,
+  totScore = TRUE
+)
+
 \S4method{annotations}{featureGroups}(obj)
 
 \S4method{internalStandards}{featureGroups}(fGroups)
@@ -201,6 +210,8 @@ normInts(
   obj,
   weights,
   flatnessFactor,
+  featureQualities = NULL,
+  featureGroupQualities = NULL,
   avgFunc = mean,
   parallel = TRUE
 )
@@ -360,6 +371,12 @@ section for details.}
   For \code{as.data.table}: if no normalization data is available (\emph{e.g.} because \code{normInts} was not used)
   then an automatic group normalization is performed.}
 
+\item{feat, group}{If \code{TRUE} then names specific to features and feature groups are returned, respectively.}
+
+\item{scores}{If \code{TRUE} the score names are returned, otherwise the quality names.}
+
+\item{totScore}{If \code{TRUE} (and \code{scores=TRUE}) then the name of the total score is included.}
+
 \item{value}{For \code{adducts<-}: A \code{character} with adduct annotations assigned to each feature group. The
 length should equal the number of feature groups. Can be named with feature group names to customize the assignment
 order.}
@@ -435,6 +452,14 @@ Example: \code{weights=c(ApexBoundaryRatioScore=0.5, GaussianSimilarityScore=2)}
 
 \item{flatnessFactor}{Passed to \pkg{MetaClean} as the \code{flatness.factor} argument to
 \code{\link[MetaClean]{calculateJaggedness}} and \code{\link[MetaClean]{calculateModality}}.}
+
+\item{featureQualities}{Specifies which feature qualities to calculate. Can be \code{NULL} (default, calculates all
+qualities), a \code{character} vector with names of qualities to calculate (e.g., \code{c("FWHM2Base",
+"Symmetry")}), or a \code{list} of custom quality definitions. See the
+\code{\link[=feature-quality]{featureQualities}} function for more details.}
+
+\item{featureGroupQualities}{Analogous to \code{featureQualities} for feature groups metrics. See the
+\code{\link[=feature-quality]{featureGroupQualities}} function for more details.}
 
 \item{avgFunc}{The function used to average the peak qualities and scores for each feature group.}
 
@@ -530,6 +555,8 @@ replicate groups for which data is present in this object.
 
 \item \code{groupScores(featureGroups)}: Accessor for \code{groupScores} slot.
 
+\item \code{getFeatureQualityNames(featureGroups)}: Returns feature quality names that were calculated for this object.
+
 \item \code{annotations(featureGroups)}: Accessor for \code{annotations} slot.
 
 \item \code{internalStandards(featureGroups)}: Accessor for \code{ISTDs} slot.
@@ -568,10 +595,8 @@ between a set of specified replicate group(s).
 
 \item \code{calculatePeakQualities(featureGroups)}: Calculates peak and group qualities for all features and feature groups. The peak qualities
 (and scores) are calculated with the \link[=calculatePeakQualities,features-method]{features method of this
-function}, and subsequently averaged per feature group. Then, \pkg{MetaClean} is used to calculate the
-\verb{Elution Shift} and \verb{Retention Time Consistency} group quality metrics (see the \pkg{MetaClean}
-publication cited below for more details). Similarly to the \code{\link{features}} method, these metrics are scored
-by normalizing qualities among all groups and scaling them from \samp{0} (worst) to \samp{1} (best). The
+function}, and subsequently averaged per feature group. Group metrics are then calculated and scored and
+scaled by normalizing qualities among all groups and scaling them from \samp{0} (worst) to \samp{1} (best). The
 \verb{totalScore} for each group is then calculated as the weighted sum from all feature (group) scores. The
 \code{\link{getMCTrainData}} and \code{\link{predictCheckFeaturesSession}} functions can be used to train and apply
 Pass/Fail ML models from \pkg{MetaClean}.

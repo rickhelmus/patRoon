@@ -141,15 +141,15 @@ class EIC
     std::vector<SpectrumRawTypes::Mobility> mobilities, mobMins, mobMaxs;
     std::vector<SpectrumRawTypes::Mass> mzsBP;
     std::vector<SpectrumRawTypes::Mobility> mobilitiesBP;
-    std::vector<SpectrumRawTypes::Intensity> intensitiesBP;
     
     // for storing m/z profiles and EIMs for each point
-    std::vector<std::pair<std::vector<SpectrumRawTypes::Mass>, std::vector<SpectrumRawTypes::Intensity>>> MZProfiles;
+    std::vector<std::pair<std::vector<SpectrumRawTypes::Mass>, std::vector<SpectrumRawTypes::Intensity>>> mzProfiles;
     std::vector<std::pair<std::vector<SpectrumRawTypes::Mobility>, std::vector<SpectrumRawTypes::Intensity>>> EIMs;
     
     EICMode mode;
     bool withMob;
     EICPoint curPoint;
+    SpectrumRawTypes::Intensity maxIntensity = 0;
     
     // validity checks
     SpectrumRawTypes::Intensity minEICAdjIntensity = 0.0;
@@ -169,8 +169,19 @@ class EIC
     SpectrumRawTypes::Mobility mobStart, mobEnd;
     bool saveMZProfiles, saveEIMs;
     
+    bool pointMZInRange(SpectrumRawTypes::Mass mz) const
+    {
+        return numberGTE(mz, mzStart && (mzEnd == 0.0 || numberLTE(mz, mzEnd)));
+    }
+    bool pointMobInRange(SpectrumRawTypes::Mobility mob) const
+    {
+        return (!withMob || (numberGTE(mob, mobStart) && (mobEnd == 0.0 || numberLTE(mob, mobEnd))));
+    }
+    
+    void addToFrameSummer(SpectrumRawTypes::Mass mz, SpectrumRawTypes::Intensity inten);
+    void addToFrameSummer(SpectrumRawTypes::Mass mz, SpectrumRawTypes::Mobility mob, SpectrumRawTypes::Intensity inten);
     void setSummedFrame(SpectrumRawTypes::Scan scanInd);
-    void updateFrameSummer(SpectrumRawTypes::Scan curScanInd);
+    void updateFrameSummer(void);
     void commitPoints(SpectrumRawTypes::Scan curScanInd);
 
 public:
@@ -187,7 +198,6 @@ public:
         mobStart = mobS; mobEnd = mobE;
     }
     
-    void addPoint(SpectrumRawTypes::Intensity inten);
     void addPoint(SpectrumRawTypes::Mass mz, SpectrumRawTypes::Intensity inten);
     void addPoint(SpectrumRawTypes::Mass mz, SpectrumRawTypes::Mobility mob, SpectrumRawTypes::Intensity inten);
     void commit(SpectrumRawTypes::Scan curScanInd, SpectrumRawTypes::Time curTime);
@@ -213,12 +223,12 @@ public:
         mobMins.clear();
         mobMaxs.clear();
         mzsBP.clear();
-        intensitiesBP.clear();
         mobilities.clear();
         mobilitiesBP.clear();
-        MZProfiles.clear();
+        mzProfiles.clear();
         EIMs.clear();
         curPoint.clear();
+        maxIntensity = 0;
         enoughTimeAboveThr = false;
         enoughPointsAboveThr = false;
         startTimeAboveThr = 0.0;
@@ -229,10 +239,20 @@ public:
     size_t size(void) const { return scanInds.size(); }
     bool empty(void) const { return scanInds.empty(); }
     
-    /* re-use eic in OpenMP loop
-     * set capacity in constructor to max size
-     * store as vector of structs
-    */
+    SpectrumRawTypes::Intensity getMaxIntensity(void) const { return maxIntensity; }
+    
+    auto getScanIndices(void) const { return scanInds; }
+    auto getMZs(void) const { return mzs; }
+    auto getMZMins(void) const { return mzMins; }
+    auto getMZMaxs(void) const { return mzMaxs; }
+    auto getIntensities(void) const { return intensities; }
+    auto getMobMins(void) const { return mobMins; }
+    auto getMobMaxs(void) const { return mobMaxs; }
+    auto getMobilities(void) const { return mobilities; }
+    auto getMZsBP(void) const { return mzsBP; }
+    auto getMobilitiesBP(void) const { return mobilitiesBP; }
+    auto getMZProfiles(void) const { return mzProfiles; }
+    auto getEIMs(void) const { return EIMs; }
 };
 
 

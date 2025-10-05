@@ -158,9 +158,9 @@ getCentroidedMSFilesFromAnaInfo <- function(anaInfo, formats = c("mzML", "mzXML"
 }
 
 doGetEICs <- function(anaInfo, EICInfoList, gapFactor, mzExpIMSWindow = 0, minIntensityIMS = 0, mode = "simple",
-                      sumEIMs = 1, smoothWindow = 0, smoothExt = 0, saveEIMs = FALSE, minEICIntensity = 0,
-                      minEICAdjTime = 0, minEICAdjPoints = 0, minEICAdjIntensity = 0, pad = FALSE, doCache = TRUE,
-                      cacheDB = NULL)
+                      sumFrames = 1, smoothWindowMZ = 0, smoothWindowMob = 0, smoothExtMZ = 0, smoothExtMob = 0,
+                      saveMZProfiles = FALSE, saveEIMs = FALSE, minEICIntensity = 0, minEICAdjTime = 0,
+                      minEICAdjPoints = 0, minEICAdjIntensity = 0, pad = FALSE, doCache = TRUE, cacheDB = NULL)
 {
     doCache <- doCache && getCacheMode() != "none"
     
@@ -220,9 +220,9 @@ doGetEICs <- function(anaInfo, EICInfoList, gapFactor, mzExpIMSWindow = 0, minIn
             openMSReadBackend(backend, path)
             
             newEICs <- getEICList(backend, ToDo$mzmin, ToDo$mzmax, ToDo$retmin, ToDo$retmax, ToDo$mobmin,
-                                  ToDo$mobmax, gapFactor, mzExpIMSWindow, minIntensityIMS, mode, sumEIMs,
-                                  smoothWindow, smoothExt, saveEIMs, pad, minEICIntensity, minEICAdjTime,
-                                  minEICAdjPoints, minEICAdjIntensity)
+                                  ToDo$mobmax, gapFactor, mzExpIMSWindow, minIntensityIMS, mode, sumFrames,
+                                  smoothWindowMZ, smoothWindowMob, smoothExtMZ, smoothExtMob, saveMZProfiles, saveEIMs,
+                                  pad, minEICIntensity, minEICAdjTime, minEICAdjPoints, minEICAdjIntensity)
             EICs[!isCached] <- newEICs
             attr(EICs, "allXValues") <- attr(newEICs, "allXValues")
             

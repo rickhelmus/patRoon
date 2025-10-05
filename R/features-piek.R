@@ -365,8 +365,8 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
     {
         ret <- getEICList(backend, EICInfo$mzmin, EICInfo$mzmax, genEICParams$retRange[1], genEICParams$retRange[2],
                           EICInfo$mobmin, EICInfo$mobmax, gapFactor = genEICParams$gapFactor, mzExpIMSWindow = 0,
-                          minIntensityIMS = minIntensityIMS, mode = mode, sumEIMs = genEICParams$sumEIMs,
-                          smoothWindow = genEICParams$smoothWindow, smoothExt = genEICParams$smoothExt,
+                          minIntensityIMS = minIntensityIMS, mode = mode, sumFrames = genEICParams$sumEIMs,
+                          smoothWindowMob = genEICParams$smoothWindow, smoothExtMob = genEICParams$smoothExt,
                           saveEIMs = genEICParams$saveEIMs, pad = FALSE, minEICIntensity = genEICParams$minEICIntensity,
                           minEICAdjTime = genEICParams$minEICAdjTime, minEICAdjPoints = genEICParams$minEICAdjPoints,
                           minEICAdjIntensity = genEICParams$minEICAdjIntensity, topMost = topMost)

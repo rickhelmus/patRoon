@@ -156,9 +156,9 @@ class EIC
     SpectrumRawTypes::Intensity maxIntensity = 0;
     
     // validity checks
-    SpectrumRawTypes::Intensity minEICAdjIntensity = 0.0;
-    SpectrumRawTypes::Time minEICAdjTime = 0.0;
-    unsigned minEICAdjPoints = 0;
+    SpectrumRawTypes::Intensity minAdjIntensity;
+    SpectrumRawTypes::Time minAdjTime;
+    unsigned minAdjPoints;
     bool enoughTimeAboveThr = false;
     bool enoughPointsAboveThr = false;
     SpectrumRawTypes::Time startTimeAboveThr = 0.0;
@@ -187,9 +187,11 @@ class EIC
     void commitPoints(SpectrumRawTypes::Scan curScanInd);
 
 public:
-    EIC(EICMode em, bool wm, size_t sumFrames, unsigned smoMZ, unsigned smoMob, SpectrumRawTypes::Mass smoExtMZ,
+    EIC(EICMode em, bool wm, SpectrumRawTypes::Intensity minAdjI, SpectrumRawTypes::Time minAdjT, unsigned minAdjP,
+        size_t sumFrames, unsigned smoMZ, unsigned smoMob, SpectrumRawTypes::Mass smoExtMZ,
         SpectrumRawTypes::Mobility smoExtMob, bool svMZPs,
-        bool svEIMs) : mode(em), withMob(wm), frameSummer((withMob && (mode == EICMode::FULL || mode == EICMode::FULL_MZ)) ? sumFrames : 0),
+        bool svEIMs) : mode(em), withMob(wm), minAdjIntensity(minAdjI), minAdjTime(minAdjT), minAdjPoints(minAdjP),
+        frameSummer((withMob && (mode == EICMode::FULL || mode == EICMode::FULL_MZ)) ? sumFrames : 0),
         smoothWindowMZ(smoMZ), smoothWindowMob(smoMob), smoothExtMZ(smoExtMZ), smoothExtMob(smoExtMob),
         saveMZProfiles(svMZPs), saveEIMs(svEIMs) { }
     
@@ -208,11 +210,11 @@ public:
     
     bool verifyAdjancency(void) const
     {
-        if (minEICAdjIntensity != 0.0)
+        if (minAdjIntensity != 0.0)
         {
-            if (minEICAdjTime > 0.0 && !enoughTimeAboveThr)
+            if (minAdjTime > 0.0 && !enoughTimeAboveThr)
                 return false;
-            if (minEICAdjPoints > 0 && !enoughPointsAboveThr)
+            if (minAdjPoints > 0 && !enoughPointsAboveThr)
                 return false;
         }
         return true;

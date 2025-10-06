@@ -2,6 +2,7 @@
 #define MSDATA_EIC_H
 
 #include <deque>
+#include <map>
 #include <vector>
 
 #include "spectrum-raw.h"
@@ -175,7 +176,7 @@ class EIC
     
     bool pointMZInRange(SpectrumRawTypes::Mass mz) const
     {
-        return numberGTE(mz, mzStart && (mzEnd == 0.0 || numberLTE(mz, mzEnd)));
+        return numberGTE(mz, mzStart) && (mzEnd == 0.0 || numberLTE(mz, mzEnd));
     }
     bool pointMobInRange(SpectrumRawTypes::Mobility mob) const
     {

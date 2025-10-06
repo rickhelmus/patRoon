@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <chrono>
 #include <iomanip>
-#include <map>
 
 #include "msdata.hpp"
 #include "msdata-eic.h"
@@ -144,6 +143,8 @@ template<typename T> Rcpp::List convertEICProfilesToR(const T &profiles, const c
 
 void EIC::setSummedFrame(SpectrumRawTypes::Scan scanInd)
 {
+    if (empty())
+        return;
     size_t ind = scanInds.size() - 1;
     for (; ; --ind)
     {
@@ -322,12 +323,13 @@ void EIC::addPoint(SpectrumRawTypes::Mass mz, SpectrumRawTypes::Mobility mob, Sp
     
        // Rcpp::Rcout << "addPoint mob: " << mz << "/" << mob << "\t" << inten << "\t" << curPoint.mzMin << "/" << curPoint.mzMax << "\t" << std::endl;
     
-    if (mode == EICMode::FULL)
+    if (mode == EICMode::FULL || mode == EICMode::FULL_MZ)
     {
         // add data for frame summer
         curPoint.allMZs.push_back(mz);
-        curPoint.allMobs.push_back(mob);
         curPoint.allInts.push_back(inten);
+        if (mode == EICMode::FULL)
+            curPoint.allMobs.push_back(mob);
         // Rcpp::Rcout << "  addPoint mob: " << mz << "/" << mob << "/" << inten  << std::endl;
     }
     
@@ -406,8 +408,9 @@ void EIC::pad(SpectrumRawTypes::Scan scanStart, SpectrumRawTypes::Scan scanEnd)
     {
         scanInds = { scanStart, scanEnd };
         intensities.resize(2, 0.0);
+        return;
     }
-    
+
     std::vector<SpectrumRawTypes::Scan> paddedScans;
     std::vector<SpectrumRawTypes::Intensity> paddedInts;
     

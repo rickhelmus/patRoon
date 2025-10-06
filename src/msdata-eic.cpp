@@ -452,12 +452,12 @@ void EIC::commit(SpectrumRawTypes::Scan curScanInd, SpectrumRawTypes::Time curTi
         }
     }
     
-    if (minEICAdjIntensity > 0.0 && ((!enoughTimeAboveThr && minEICAdjTime > 0.0) ||
-        (!enoughPointsAboveThr && minEICAdjPoints > 0)))
+    if (minAdjIntensity > 0.0 && ((!enoughTimeAboveThr && minAdjTime > 0.0) ||
+        (!enoughPointsAboveThr && minAdjPoints > 0)))
     {
         // if first point, gap in scans, or below intensity threshold, reset
         if (curPoint.intensity == 0.0 || scanInds.size() == 1 || prevScanInd != (curScanInd - 1) ||
-            !numberGTE(curPoint.intensity, minEICAdjIntensity))
+            !numberGTE(curPoint.intensity, minAdjIntensity))
         {
             // Rcpp::Rcout << "Stop! EIC: " << i << "/" << j << "/" << specMeta.first.scans[curScanInd] << "/" << curTime << "/" << curPoint.intensity << "/" << minEICAdjPoints << "/" << adjPointsAboveThr << "\n";
             startTimeAboveThr = 0.0;
@@ -465,18 +465,18 @@ void EIC::commit(SpectrumRawTypes::Scan curScanInd, SpectrumRawTypes::Time curTi
         }
         else
         {
-            if (minEICAdjTime > 0.0)
+            if (minAdjTime > 0.0)
             {
                 if (startTimeAboveThr == 0.0)
                     startTimeAboveThr = curTime;
-                else if (numberGTE(curTime - startTimeAboveThr, minEICAdjTime))
+                else if (numberGTE(curTime - startTimeAboveThr, minAdjTime))
                     enoughTimeAboveThr = true;
             }
-            if (minEICAdjPoints > 0)
+            if (minAdjPoints > 0)
             {
                 ++adjPointsAboveThr;
                 // Rcpp::Rcout << "above: EIC: " << i << "/" << j << "/" << specMeta.first.scans[curScanInd] << "/" << curTime << "/" << curPoint.intensity << "/" << minEICAdjPoints << "/" << adjPointsAboveThr << "\n";
-                if (adjPointsAboveThr >= minEICAdjPoints)
+                if (adjPointsAboveThr >= minAdjPoints)
                     enoughPointsAboveThr = true;
             }
         }
@@ -1458,8 +1458,8 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     
     allEICs.reserve(EICCount);
     for (size_t i=0; i<EICCount; ++i)
-        allEICs.emplace_back(eicMode, anySpecHasMob, sumFrames, smoothWindowMZ, smoothWindowMob, smoothExtMZ,
-                             smoothExtMob, saveMZProfiles, saveEIMs);
+        allEICs.emplace_back(eicMode, anySpecHasMob, minEICAdjIntensity, minEICAdjTime, minEICAdjPoints, sumFrames,
+                             smoothWindowMZ, smoothWindowMob, smoothExtMZ, smoothExtMob, saveMZProfiles, saveEIMs);
     
     #pragma omp parallel for
     for (size_t i=0; i<EICCount; ++i)

@@ -20,7 +20,7 @@ class IMSFrameSummer
             : mzs(std::move(m)), intensities(std::move(i)) { }
         Frame(std::vector<SpectrumRawTypes::Mass> &&m, std::vector<SpectrumRawTypes::Mobility> &&mob,
               std::vector<SpectrumRawTypes::Intensity> &&i)
-            : mzs(std::move(m)), mobilities(mob), intensities(std::move(i)) { }
+            : mzs(std::move(m)), mobilities(std::move(mob)), intensities(std::move(i)) { }
         size_t size(void) const { return mzs.size(); }
     };
     
@@ -50,6 +50,7 @@ class IMSFrameSummer
         {
             xvalues[i] = it->first;
             ints[i] = it->second;
+            // Rcpp::Rcout << "  Merged point: " << xvalues[i] << " " << ints[i] << "\n";
         }
         
         return std::make_pair(std::move(xvalues), std::move(ints));
@@ -71,6 +72,9 @@ public:
              std::vector<SpectrumRawTypes::Intensity> &&intensities)
     {
         frames.emplace_back(std::move(mzs), std::move(mobilities), std::move(intensities));
+        // Rcpp::Rcout << "Added frame with " << frames.back().size() << " points.\n";
+        // for (size_t i=0; i<frames.back().size(); ++i)
+        //     Rcpp::Rcout << "  " << frames.back().mzs[i] << " " << frames.back().mobilities[i] << " " << frames.back().intensities[i] << "\n";
         maybePop();
     }
     
@@ -178,8 +182,6 @@ class EIC
         return (!withMob || (numberGTE(mob, mobStart) && (mobEnd == 0.0 || numberLTE(mob, mobEnd))));
     }
     
-    void addToFrameSummer(SpectrumRawTypes::Mass mz, SpectrumRawTypes::Intensity inten);
-    void addToFrameSummer(SpectrumRawTypes::Mass mz, SpectrumRawTypes::Mobility mob, SpectrumRawTypes::Intensity inten);
     void setSummedFrame(SpectrumRawTypes::Scan scanInd);
     void updateFrameSummer(void);
     void commitPoints(SpectrumRawTypes::Scan curScanInd);
@@ -204,12 +206,15 @@ public:
     void finalize(void);
     void pad(SpectrumRawTypes::Scan scanStart, SpectrumRawTypes::Scan scanEnd);
     
-    bool valid(void) const
+    bool verifyAdjancency(void) const
     {
-        if (minEICAdjTime > 0.0 && !enoughTimeAboveThr)
-            return false;
-        if (minEICAdjPoints > 0 && !enoughPointsAboveThr)
-            return false;
+        if (minEICAdjIntensity != 0.0)
+        {
+            if (minEICAdjTime > 0.0 && !enoughTimeAboveThr)
+                return false;
+            if (minEICAdjPoints > 0 && !enoughPointsAboveThr)
+                return false;
+        }
         return true;
     }
     

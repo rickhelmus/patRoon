@@ -43,6 +43,8 @@ PeakPickingResults peakPicking_cpp(const std::vector<SpectrumRawTypes::Intensity
                                    double min_intensity, int sn, double peakwidth_min, double peakwidth_max, double rt_min,
                                    double rt_max, int maxPeaksPerSignal)
 {
+    if (intensity.size() < 2)
+        return PeakPickingResults(); // ADDED
     
     std::vector<double> derivative((intensity.size()-1));
     std::vector<int> maxima(intensity.size(),0);
@@ -274,7 +276,7 @@ PeakPickingResults peakPicking_cpp(const std::vector<SpectrumRawTypes::Intensity
     double slope = 0;
     for(int i = 0; i < (anzahlmaxima); ++i) { 
         j = left_end[i];
-        while (j < (intensity.size()-1) && intensity[j]-noiselevel[i] < (intensity[maxima[i]]-noiselevel[i])/2) {
+        while (j < (intensity.size()-1) && ((intensity[j]-noiselevel[i]) < ((intensity[maxima[i]]-noiselevel[i])/2))) {
             j++;
         }
         if (j >= 1) {
@@ -303,7 +305,7 @@ PeakPickingResults peakPicking_cpp(const std::vector<SpectrumRawTypes::Intensity
             }
         }
         else {
-            FWHM_right[i] = scantime[j]; // ADDED: fallback
+            FWHM_right[i] = scantime.back(); // ADDED: fallback
         }
     }
     

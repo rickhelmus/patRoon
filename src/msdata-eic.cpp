@@ -7,7 +7,7 @@
 #include "msdata.hpp"
 #include "msdata-eic.h"
 
-//#define LOG_EIC
+// #define LOG_EIC
 
 namespace {
 
@@ -141,24 +141,35 @@ template<typename T> Rcpp::List convertEICProfilesToR(const T &profiles, const c
 
 }
 
-void EIC::setSummedFrame(SpectrumRawTypes::Scan scanInd)
+size_t EIC::findEICIndexFromScan(SpectrumRawTypes::Scan scanInd) const
 {
-    if (empty())
-        return;
+    if (scanInds.empty())
+        return std::numeric_limits<size_t>::max();
     size_t ind = scanInds.size() - 1;
     for (; ; --ind)
     {
         if (scanInds[ind] == scanInd)
-            break; // found it
+            return ind;
         if (scanInds[ind] < scanInd || ind == 0)
-            return; // not actually present
+            return std::numeric_limits<size_t>::max();
     }
-    
+    // Should not reach here
+    return std::numeric_limits<size_t>::max();
+}
+
+void EIC::setSummedFrameMZ(SpectrumRawTypes::Scan scanInd)
+{
+    if (empty() || mzSummer.maxSize() == 0)
+        return;
+    const size_t ind = findEICIndexFromScan(scanInd);
+    if (ind == std::numeric_limits<size_t>::max())
+        return;
+
 #ifdef LOG_EIC
-    Rcpp::Rcout << "EIC set: " << ind << "/" << scanInd << "/" << frameSummer.size() << std::endl;
+    Rcpp::Rcout << "EIC set MZ: " << ind << "/" << scanInd << std::endl;
 #endif
-    
-    auto summedMZFrame = frameSummer.getMZs();
+
+    auto summedMZFrame = mzSummer.get();
 #ifdef LOG_EIC
     Rcpp::Rcout << "  EIC mz frame: " << summedMZFrame.first.size() << "/" << summedMZFrame.second.size() << std::endl;
     for (size_t i=0; i<std::min(summedMZFrame.first.size(), size_t(5)); ++i)
@@ -173,82 +184,93 @@ void EIC::setSummedFrame(SpectrumRawTypes::Scan scanInd)
     mzs[ind] = propsMZ.first; mzsBP[ind] = propsMZ.second;
     if (saveMZProfiles)
         mzProfiles[ind] = std::move(summedMZFrame);
-    
-    if (mode == EICMode::FULL)
-    {
-        auto summedMobFrame = frameSummer.getMobilities();
+}
+
+void EIC::setSummedFrameMob(SpectrumRawTypes::Scan scanInd)
+{
+    if (empty() || mobSummer.maxSize() == 0)
+        return;
+    size_t ind = findEICIndexFromScan(scanInd);
+    if (ind == std::numeric_limits<size_t>::max())
+        return;
+
 #ifdef LOG_EIC
-        Rcpp::Rcout << "  EIC mob frame: " << summedMobFrame.first.size() << "/" << summedMobFrame.second.size() << std::endl;
-        for (size_t i=0; i<std::min(summedMobFrame.first.size(), size_t(5)); ++i)
-            Rcpp::Rcout << "    " << summedMobFrame.first[i] << "/" << summedMobFrame.second[i] << std::endl;
+    Rcpp::Rcout << "EIC set Mob: " << ind << "/" << scanInd << std::endl;
 #endif
-        if (smoothWindowMob > 0)
-            smoothSummedFrameData(summedMobFrame, smoothWindowMob, mobStart - smoothExtMob, mobEnd + smoothExtMob);
-        const auto propsMob = summedFrameProps(summedMobFrame, mobStart, mobEnd);
+
+    auto summedMobFrame = mobSummer.get();
 #ifdef LOG_EIC
-        Rcpp::Rcout << "  EIC mob props: " << propsMob.first << "/" << propsMob.second << std::endl;
+    Rcpp::Rcout << "  EIC mob frame: " << summedMobFrame.first.size() << "/" << summedMobFrame.second.size() << std::endl;
+    for (size_t i=0; i<std::min(summedMobFrame.first.size(), size_t(5)); ++i)
+        Rcpp::Rcout << "    " << summedMobFrame.first[i] << "/" << summedMobFrame.second[i] << std::endl;
 #endif
-        mobilities[ind] = propsMob.first; mobilitiesBP[ind] = propsMob.second;
-        if (saveEIMs)
-            EIMs[ind] = std::move(summedMobFrame);
-    }
+    if (smoothWindowMob > 0)
+        smoothSummedFrameData(summedMobFrame, smoothWindowMob, mobStart - smoothExtMob, mobEnd + smoothExtMob);
+    const auto propsMob = summedFrameProps(summedMobFrame, mobStart, mobEnd);
+#ifdef LOG_EIC
+    Rcpp::Rcout << "  EIC mob props: " << propsMob.first << "/" << propsMob.second << std::endl;
+#endif
+    mobilities[ind] = propsMob.first; mobilitiesBP[ind] = propsMob.second;
+    if (saveEIMs)
+        EIMs[ind] = std::move(summedMobFrame);
 }
 
 void EIC::updateFrameSummer()
 {
     if (empty())
         return;
-    
+
     const auto curScanInd = scanInds.back();
     const auto prvScanInd = (size() < 2) ? 0 : scanInds[size() - 2];
     SpectrumRawTypes::Scan sc = (size() < 2) ? curScanInd : (prvScanInd + 1);
-    
+
 #ifdef LOG_EIC
-    Rcpp::Rcout << "EIC sum: " << curScanInd << "/" << prvScanInd << "/" << sc << "/" 
-                << frameSummer.size() << std::endl;
+    Rcpp::Rcout << "EIC sum: " << curScanInd << "/" << prvScanInd << "/" << sc << "/" << mzSummer.size() << "/"
+                << mobSummer.size() << std::endl;
 #endif
-    
+
+    const auto mzFlank = mzSummer.flank();
+    const auto mobFlank = mobSummer.flank();
+
     while (true)
     {
         if (sc != curScanInd)
         {
             // add zero-intensity points for missing scans
-            frameSummer.addZero();
+            if (mzSummer.maxSize() != 0)
+                mzSummer.addZero();
+            if (mobSummer.maxSize() != 0)
+                mobSummer.addZero();
 #ifdef LOG_EIC
             Rcpp::Rcout << "added zero:" << sc << "/" << curScanInd << std::endl;
 #endif
         }
         else
         {
-            // Rcpp::Rcout << "EIC add: " << curPoint.allMZs.size() << "/" << curPoint.allInts.size() << std::endl;
-            // for (size_t i=0; i<std::min(curPoint.allMZs.size(), size_t(5)); ++i)
-            //     Rcpp::Rcout << "    " << curPoint.allMZs[i] << "/" << curPoint.allMobs[i]
-            //                 << "/" << curPoint.allInts[i] << std::endl;
-            if (mode == EICMode::FULL)
-                frameSummer.add(std::move(curPoint.allMZs), std::move(curPoint.allMobs),
-                                std::move(curPoint.allInts));
-            else
-                frameSummer.add(std::move(curPoint.allMZs), std::move(curPoint.allInts));
+            // add data points
+            if (mzSummer.maxSize() != 0)
+                mzSummer.add(std::move(curPoint.allMZs), std::move(curPoint.allIntsMZs));
+            if (mobSummer.maxSize() != 0)
+                mobSummer.add(std::move(curPoint.allMobs), std::move(curPoint.allIntsMobs));
 #ifdef LOG_EIC
-            Rcpp::Rcout << "added points:" << frameSummer.size() << "/" << curScanInd << std::endl;
+            Rcpp::Rcout << "added points:" << mzSummer.size() << "/" << mobSummer.size() << "/" << curScanInd << std::endl;
 #endif
         }
-        
-        // sumEIMs == 3 --> flank == 1 --> set position 1 back from current
-        // sumEIMs == 5 --> flank == 2 --> set position 2 back from current
-        // etc
-        
-        if (!empty() && sc >= frameSummer.flank())
-            setSummedFrame(sc - frameSummer.flank());
+
+        // set summed frame if flank reached
+        if (mzSummer.maxSize() != 0 && !empty() && sc >= mzFlank)
+            setSummedFrameMZ(sc - mzFlank);
+        if (mobSummer.maxSize() != 0 && !empty() && sc >= mobFlank)
+            setSummedFrameMob(sc - mobFlank);
 #ifdef LOG_EIC
-        Rcpp::Rcout << "EIC update: " << sc << "/" << curScanInd << "/" << prvScanInd << "/" << frameSummer.size()
-                    << "/" << frameSummer.sizeNoZero() << std::endl;
+        Rcpp::Rcout << "EIC update: " << sc << "/" << curScanInd << "/" << prvScanInd << "/" << std::endl;
 #endif
-        
+
         if (sc == curScanInd)
             break;
-        
-        if (sc >= (prvScanInd + frameSummer.maxSize()))
+
+        const size_t maxSz = std::max(mzSummer.maxSize(), mobSummer.maxSize());
+        if (sc >= (prvScanInd + maxSz))
             sc = curScanInd; // jump to current: doesn't make sense to add more zeroes
         else
             ++sc;
@@ -270,7 +292,7 @@ void EIC::commitPoints(SpectrumRawTypes::Scan curScanInd)
     {
         mobMins.push_back(curPoint.mobMin);
         mobMaxs.push_back(curPoint.mobMax);
-        // will be set by updateSummedEIMs()
+        // will be set by updateFrameSummer()
         mobilities.push_back(0);
         mobilitiesBP.push_back(0);
         if (saveMZProfiles)
@@ -285,17 +307,6 @@ void EIC::addPoint(SpectrumRawTypes::Mass mz, SpectrumRawTypes::Intensity inten)
     if (inten == 0.0)
         return;
     
-    if (!withMob && (mode == EICMode::FULL || mode == EICMode::FULL_MZ))
-    {
-        // add data for frame summer
-        // HACK: check withMob as with IMS data the summer was already updated
-        curPoint.allMZs.push_back(mz);
-        curPoint.allInts.push_back(inten);
-    }
-    
-    if (!pointMZInRange(mz))
-        return; // out of range (but may be in extension range, as that should've been checked before calling addPoint())
-
     curPoint.intensity += inten;
     
     if ((mode == EICMode::FULL || mode == EICMode::FULL_MZ))
@@ -325,11 +336,20 @@ void EIC::addPoint(SpectrumRawTypes::Mass mz, SpectrumRawTypes::Mobility mob, Sp
     
     if (mode == EICMode::FULL || mode == EICMode::FULL_MZ)
     {
-        // add data for frame summer
-        curPoint.allMZs.push_back(mz);
-        curPoint.allInts.push_back(inten);
-        if (mode == EICMode::FULL)
+        // add data for frame summers
+        // NOTE: point is outside mz/mob range then it is a smoothing extension point
+        
+        if (pointMobInRange(mob))
+        {
+            curPoint.allMZs.push_back(mz);
+            curPoint.allIntsMZs.push_back(inten);
+        }
+        if (mode == EICMode::FULL && pointMZInRange(mz)) // NOTE: if not then in mz extension range
+        {
             curPoint.allMobs.push_back(mob);
+            curPoint.allIntsMobs.push_back(inten);
+        }
+        
         // Rcpp::Rcout << "  addPoint mob: " << mz << "/" << mob << "/" << inten  << std::endl;
     }
     
@@ -461,17 +481,31 @@ void EIC::finalize()
     {
         // fill in left-over trailing scans
         const auto lastScanInd = scanInds.back();
-        for (SpectrumRawTypes::Scan s=lastScanInd+1-std::min(frameSummer.flank(), frameSummer.size());
-             !frameSummer.empty() && s<=lastScanInd; ++s)
+        if (mzSummer.maxSize() != 0)
         {
+            const size_t minSz = std::min(mzSummer.flank(), mzSummer.size());
+            for (SpectrumRawTypes::Scan s = lastScanInd + 1 - minSz; !mzSummer.empty() && s <= lastScanInd; ++s)
+            {
 #ifdef LOG_EIC
-            Rcpp::Rcout << "EIM purge: " << s << "/" << lastScanInd << "/" << frameSummer.size() << std::endl;
+                Rcpp::Rcout << "mzSummer purge: " << s << "/" << lastScanInd << "/" << mzSummer.size() << std::endl;
 #endif
-            setSummedFrame(s);
-            frameSummer.pop();
+                setSummedFrameMZ(s);
+                mzSummer.pop();
+            }
+        }
+        if (mobSummer.maxSize() != 0)
+        {
+            const size_t minSz = std::min(mobSummer.flank(), mobSummer.size());
+            for (SpectrumRawTypes::Scan s = lastScanInd + 1 - minSz; !mobSummer.empty() && s <= lastScanInd; ++s)
+            {
+#ifdef LOG_EIC
+                Rcpp::Rcout << "mobSummer purge: " << s << "/" << lastScanInd << "/" << mobSummer.size() << std::endl;
+#endif
+                setSummedFrameMob(s);
+                mobSummer.pop();
+            }
         }
     }
-    
 }
 
 
@@ -484,12 +518,12 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                       const std::vector<SpectrumRawTypes::Mobility> &endMobs,
                       SpectrumRawTypes::Time gapFactor, SpectrumRawTypes::Mass mzExpIMSWindow,
                       SpectrumRawTypes::Intensity minIntensityIMS, const std::string &mode = "simple",
-                      unsigned sumFrames = 1, unsigned smoothWindowMZ = 3, unsigned smoothWindowMob = 3,
-                      SpectrumRawTypes::Mass smoothExtMZ = 0, SpectrumRawTypes::Mobility smoothExtMob = 0,
-                      bool saveMZProfiles = false, bool saveEIMs = false, bool pad = false,
-                      SpectrumRawTypes::Intensity minEICIntensity = 0, SpectrumRawTypes::Time minEICAdjTime = 0,
-                      unsigned minEICAdjPoints = 0, SpectrumRawTypes::Intensity minEICAdjIntensity = 0,
-                      unsigned topMost = 0)
+                      unsigned sumFramesMZ = 1, unsigned sumFramesMob = 1, unsigned smoothWindowMZ = 3,
+                      unsigned smoothWindowMob = 3, SpectrumRawTypes::Mass smoothExtMZ = 0,
+                      SpectrumRawTypes::Mobility smoothExtMob = 0, bool saveMZProfiles = false, bool saveEIMs = false,
+                      bool pad = false, SpectrumRawTypes::Intensity minEICIntensity = 0,
+                      SpectrumRawTypes::Time minEICAdjTime = 0, unsigned minEICAdjPoints = 0,
+                      SpectrumRawTypes::Intensity minEICAdjIntensity = 0, unsigned topMost = 0)
 {
     // NOTE: startTimes/endTimes may be length one vectors, in which case they are used for all EICs
     
@@ -657,8 +691,9 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     
     allEICs.reserve(EICCount);
     for (size_t i=0; i<EICCount; ++i)
-        allEICs.emplace_back(eicMode, anySpecHasMob, minEICAdjIntensity, minEICAdjTime, minEICAdjPoints, sumFrames,
-                             smoothWindowMZ, smoothWindowMob, smoothExtMZ, smoothExtMob, saveMZProfiles, saveEIMs);
+        allEICs.emplace_back(eicMode, anySpecHasMob, minEICAdjIntensity, minEICAdjTime, minEICAdjPoints, sumFramesMZ,
+                             sumFramesMob, smoothWindowMZ, smoothWindowMob, smoothExtMZ, smoothExtMob, saveMZProfiles,
+                             saveEIMs);
     
     #pragma omp parallel for
     for (size_t i=0; i<EICCount; ++i)

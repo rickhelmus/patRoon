@@ -89,7 +89,7 @@ PeakPickingResults peakPicking_cpp(const std::vector<SpectrumRawTypes::Intensity
         left_end[i] = j+1; 
         /* find end of peak (right_end) */
         j = maxima[i];
-        while ((derivative[j] < 0) && (j < intensity.size())) {
+        while ((j < (intensity.size()-1)) && (derivative[j] < 0)) {
             j++;
         }
         right_end[i] = j; 
@@ -122,7 +122,7 @@ PeakPickingResults peakPicking_cpp(const std::vector<SpectrumRawTypes::Intensity
                             left_end[i-1] = left_end[i];
                             maxima[i-1] = maxima[i]; // ADDED: FIX: don't change maxima of this peak in the if line below as it is considered noise  
                         }
-                        if ((intensity[maxima[i-1]] > intensity[maxima[i]]) && (anzahlmaxima > i)) { // CHANGED: fixed single '&' usage
+                        if ((intensity[maxima[i-1]] > intensity[maxima[i]]) && (anzahlmaxima > (i+1))) { // CHANGED: fixed single '&' usage and out of bound access
                             if (std::min(intensity[maxima[i]],intensity[maxima[i+1]])-noiselevel[i] > (std::max(intensity[maxima[i]],intensity[maxima[i+1]])-noiselevel[i])/2) {
                                 right_end[i] = right_end[i-1];
                                 amountofpeaks[i] = amountofpeaks[i-1];
@@ -274,26 +274,36 @@ PeakPickingResults peakPicking_cpp(const std::vector<SpectrumRawTypes::Intensity
     double slope = 0;
     for(int i = 0; i < (anzahlmaxima); ++i) { 
         j = left_end[i];
-        while (intensity[j]-noiselevel[i] < (intensity[maxima[i]]-noiselevel[i])/2) {
+        while (j < (intensity.size()-1) && intensity[j]-noiselevel[i] < (intensity[maxima[i]]-noiselevel[i])/2) {
             j++;
         }
-        slope = (intensity[j]-intensity[j-1])/(scantime[j]-scantime[j-1]);
-        if (slope == 0) {
-            FWHM_left[i] = scantime[j];
-        } else {
-            FWHM_left[i] = scantime[j-1]+(intensity[maxima[i]]/2-intensity[j-1]+noiselevel[i])/slope;
+        if (j >= 1) {
+            slope = (intensity[j]-intensity[j-1])/(scantime[j]-scantime[j-1]);
+            if (slope == 0) {
+                FWHM_left[i] = scantime[j];
+            } else {
+                FWHM_left[i] = scantime[j-1]+(intensity[maxima[i]]/2-intensity[j-1]+noiselevel[i])/slope;
+            }
+        }
+        else {
+            FWHM_left[i] = scantime[j]; // ADDED: fallback
         }
         
         
         j = right_end[i];
-        while (intensity[j]-noiselevel[i] < (intensity[maxima[i]]-noiselevel[i])/2) {
+        while (j > 0 && ((intensity[j]-noiselevel[i]) < (intensity[maxima[i]]-noiselevel[i])/2)) {
             j--;
         }
-        slope = (intensity[j+1]-intensity[j])/(scantime[j+1]-scantime[j]);
-        if (slope == 0) {
-            FWHM_right[i] = scantime[j];
-        } else {
-            FWHM_right[i] = scantime[j]+(intensity[maxima[i]]/2-intensity[j]+noiselevel[i])/slope;
+        if (j < (intensity.size()-1)) {
+            slope = (intensity[j+1]-intensity[j])/(scantime[j+1]-scantime[j]);
+            if (slope == 0) {
+                FWHM_right[i] = scantime[j];
+            } else {
+                FWHM_right[i] = scantime[j]+(intensity[maxima[i]]/2-intensity[j]+noiselevel[i])/slope;
+            }
+        }
+        else {
+            FWHM_right[i] = scantime[j]; // ADDED: fallback
         }
     }
     

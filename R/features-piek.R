@@ -61,7 +61,7 @@ getPiekEICsInfo <- function(params, withIMS, suspects, MS2Info, verbose)
 
 #' @rdname features-class
 #' @export
-featuresPiek <- setClass("featuresPiek", slots = c(EIMs = "list"), contains = "features")
+featuresPiek <- setClass("featuresPiek", slots = c(mzProfiles = "list", EIMs = "list"), contains = "features")
 
 setMethod("initialize", "featuresPiek",
           function(.Object, ...) callNextMethod(.Object, algorithm = "piek", ...))
@@ -365,8 +365,10 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
     {
         ret <- getEICList(backend, EICInfo$mzmin, EICInfo$mzmax, genEICParams$retRange[1], genEICParams$retRange[2],
                           EICInfo$mobmin, EICInfo$mobmax, gapFactor = genEICParams$gapFactor, mzExpIMSWindow = 0,
-                          minIntensityIMS = minIntensityIMS, mode = mode, sumFrames = genEICParams$sumEIMs,
-                          smoothWindowMob = genEICParams$smoothWindow, smoothExtMob = genEICParams$smoothExt,
+                          minIntensityIMS = minIntensityIMS, mode = mode, sumFramesMZ = genEICParams$sumFramesMZ,
+                          sumFramesMob = genEICParams$sumFramesMob, smoothWindowMZ = genEICParams$smoothWindowMZ,
+                          smoothExtMZ = genEICParams$smoothExtMob, smoothWindowMob = genEICParams$smoothWindowMob,
+                          smoothExtMob = genEICParams$smoothExtMob, saveMZProfiles = genEICParams$saveMZProfiles,
                           saveEIMs = genEICParams$saveEIMs, pad = FALSE, minEICIntensity = genEICParams$minEICIntensity,
                           minEICAdjTime = genEICParams$minEICAdjTime, minEICAdjPoints = genEICParams$minEICAdjPoints,
                           minEICAdjIntensity = genEICParams$minEICAdjIntensity, topMost = topMost)
@@ -376,7 +378,22 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
         return(ret)
     }
     
+    getIMSProfiles <- function(profAttr, peaks, EICs, EICInfo)
+    {
+        ret <- list()
+        if (length(profAttr) > 0)
+        {
+            ret <- Map(peaks$EIC_ID, peaks$ret, f = function(EIC_ID, ret)
+            {
+                profAttr[[match(EIC_ID, EICInfo$EIC_ID)]][[which.min(abs(EICs[[EIC_ID]][, "time"] - ret))]]
+            })
+            names(ret) <- peaks$ID
+        }
+        return(ret)
+    }
+    
     fList <- list()
+    mzProfiles <- list()
     EIMs <- list()
     if (nrow(anaInfoTBD) > 0)
     {
@@ -518,20 +535,14 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
 
             maybePrintf("%d peaks remain after filtering.\n", nrow(peaks))            
             
-            if (genEICParams$saveEIMs && withIMS)
+            if (withIMS)
             {
-                eims <- attr(EICs, "EIMs")
-                if (length(eims) > 0)
-                {
-                    EIMs[[ana]] <<- Map(peaks$EIC_ID, peaks$ret, f = function(EIC_ID, ret)
-                    {
-                        # eims[match(peaks$EIC_ID, EICInfo$EIC_ID)], peaks$ret, EICs[[peaks$EIC_ID]]$time
-                        eims[[match(EIC_ID, EICInfo$EIC_ID)]][[which.min(abs(EICs[[EIC_ID]][, "time"] - ret))]]
-                    })
-                    names(EIMs[[ana]]) <<- peaks$ID
-                }
+                if (genEICParams$saveMZProfiles)
+                    mzProfiles[[ana]] <<- getIMSProfiles(attr(EICs, "mzProfiles"), peaks, EICs, EICInfo)
+                if (genEICParams$saveEIMs)
+                    EIMs[[ana]] <<- getIMSProfiles(attr(EICs, "EIMs"), peaks, EICs, EICInfo)
             }
-            
+
             return(peaks)
         })
         
@@ -550,7 +561,8 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
         printFeatStats(fList)
     }
     
-    return(featuresPiek(analysisInfo = analysisInfo, features = fList, hasMobilities = withIMS, EIMs = EIMs))
+    return(featuresPiek(analysisInfo = analysisInfo, features = fList, hasMobilities = withIMS, mzProfiles = mzProfiles,
+                        EIMs = EIMs))
 }
 
 #' @param methodMZ,methodIMS Sets the \code{methodMZ} and \code{methodIMS} parameters for the EIC generation. See the
@@ -574,10 +586,11 @@ getPiekGenEICParams <- function(methodMZ, methodIMS = NULL, ...)
         stop("methodIMS can only be 'ms2' if methodMZ is also set to 'ms2'", call. = FALSE)
     
     ret <- list(methodMZ = methodMZ, methodIMS = methodIMS, mzRange = c(80, 600), mzStep = 0.02, mobRange = c(0.5, 1.3),
-                mobStep = 0.04, retRange = NULL, gapFactor = 3, sumEIMs = 1, smoothWindow = 0,
-                smoothExt = defaultLim("mobility", "wide"), saveEIMs = FALSE, minEICIntensity = 5000,
-                minEICAdjTime = 5, minEICAdjPoints = 5,
-                minEICAdjIntensity = 250, topMostEICMZ = 10000, topMostEICMZMob = 10000, minEICsIMSPreCheck = 50000)
+                mobStep = 0.04, retRange = NULL, gapFactor = 3, sumFramesMZ = 1, sumFramesMob = 1, smoothWindowMZ = 0,
+                smoothWindowMob = 0, smoothExtMZ = defaultLim("mz", "wide"),
+                smoothExtMob = defaultLim("mobility", "wide"), saveMZProfiles = FALSE, saveEIMs = FALSE,
+                minEICIntensity = 5000, minEICAdjTime = 5, minEICAdjPoints = 5, minEICAdjIntensity = 250,
+                topMostEICMZ = 10000, topMostEICMZMob = 10000, minEICsIMSPreCheck = 50000)
     
     if (methodMZ == "suspects")
     {

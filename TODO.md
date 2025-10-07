@@ -142,6 +142,7 @@
 - getEIMs(): don't average intensities, replace clustering with map as is done with EIMRunner?
 - EICs
     - are even numbers for smoothing/summing correctly handled?
+    - fix gap filling + padding
 
 ## Tests
 

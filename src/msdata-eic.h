@@ -3,106 +3,82 @@
 
 #include <deque>
 #include <map>
+#include <memory>
 #include <vector>
 
 #include "spectrum-raw.h"
 
 enum class EICMode { SIMPLE, FULL, FULL_MZ, TEST };
 
-class IMSFrameSummer
+template <typename T> class IMSFrameSummer
 {
     struct Frame
     {
-        std::vector<SpectrumRawTypes::Mass> mzs;
-        std::vector<SpectrumRawTypes::Mobility> mobilities;
+        std::vector<T> xvalues;
         std::vector<SpectrumRawTypes::Intensity> intensities;
         Frame(void) = default;
-        Frame(std::vector<SpectrumRawTypes::Mass> &&m, std::vector<SpectrumRawTypes::Intensity> &&i)
-            : mzs(std::move(m)), intensities(std::move(i)) { }
-        Frame(std::vector<SpectrumRawTypes::Mass> &&m, std::vector<SpectrumRawTypes::Mobility> &&mob,
-              std::vector<SpectrumRawTypes::Intensity> &&i)
-            : mzs(std::move(m)), mobilities(std::move(mob)), intensities(std::move(i)) { }
-        size_t size(void) const { return mzs.size(); }
+        Frame(std::vector<T> &&x, std::vector<SpectrumRawTypes::Intensity> &&i)
+            : xvalues(std::move(x)), intensities(std::move(i)) { }
+        size_t size(void) const { return xvalues.size(); }
     };
-    
+
     const size_t maxQueueSize;
     std::deque<Frame> frames;
-    
+
     void maybePop(void)
     {
         if (frames.size() > maxQueueSize)
             frames.pop_front();
     }
-    
-    template <typename T, typename U>
-    std::pair<std::vector<T>, std::vector<SpectrumRawTypes::Intensity>> get(U Frame::* memberPtr) const
-    {
-        std::map<T, SpectrumRawTypes::Intensity> merged;
-        for (const auto &fr : frames)
-        {
-            for (size_t i=0; i<fr.size(); ++i)
-                merged[(fr.*memberPtr)[i]] += fr.intensities[i];
-        }
-        
-        std::vector<T> xvalues(merged.size());
-        std::vector<SpectrumRawTypes::Intensity> ints(merged.size());
-        size_t i = 0;
-        for (auto it=merged.begin(); it!=merged.end(); ++it, ++i)
-        {
-            xvalues[i] = it->first;
-            ints[i] = it->second;
-            // Rcpp::Rcout << "  Merged point: " << xvalues[i] << " " << ints[i] << "\n";
-        }
-        
-        return std::make_pair(std::move(xvalues), std::move(ints));
-    }
-    
+
 public:
-    using MassInts = std::pair<std::vector<SpectrumRawTypes::Mass>, std::vector<SpectrumRawTypes::Intensity>>;
-    using MobInts = std::pair<std::vector<SpectrumRawTypes::Mobility>, std::vector<SpectrumRawTypes::Intensity>>;
-    
+    using XInts = std::pair<std::vector<T>, std::vector<SpectrumRawTypes::Intensity>>;
+
     IMSFrameSummer(size_t sz) : maxQueueSize(sz) { }
-    
-    void add(std::vector<SpectrumRawTypes::Mass> &&mzs, std::vector<SpectrumRawTypes::Intensity> &&intensities)
+
+    void add(std::vector<T> &&xvalues, std::vector<SpectrumRawTypes::Intensity> &&intensities)
     {
-        frames.emplace_back(std::move(mzs), std::move(intensities));
+        frames.emplace_back(std::move(xvalues), std::move(intensities));
         maybePop();
     }
-    
-    void add(std::vector<SpectrumRawTypes::Mass> &&mzs, std::vector<SpectrumRawTypes::Mobility> &&mobilities,
-             std::vector<SpectrumRawTypes::Intensity> &&intensities)
-    {
-        frames.emplace_back(std::move(mzs), std::move(mobilities), std::move(intensities));
-        // Rcpp::Rcout << "Added frame with " << frames.back().size() << " points.\n";
-        // for (size_t i=0; i<frames.back().size(); ++i)
-        //     Rcpp::Rcout << "  " << frames.back().mzs[i] << " " << frames.back().mobilities[i] << " " << frames.back().intensities[i] << "\n";
-        maybePop();
-    }
-    
+
     void addZero(void)
     {
         frames.emplace_back();
         maybePop();
     }
-    
-    MassInts getMZs(void) const
+
+    XInts get(void) const
     {
-        return get<SpectrumRawTypes::Mass>(&Frame::mzs);
+        std::map<T, SpectrumRawTypes::Intensity> merged;
+        for (const auto &fr : frames)
+        {
+            for (size_t j=0; j<fr.size(); ++j)
+            {
+                merged[fr.xvalues[j]] += fr.intensities[j];
+            }
+        }
+
+        std::vector<T> xv(merged.size());
+        std::vector<SpectrumRawTypes::Intensity> ints(merged.size());
+        size_t i = 0;
+        for (auto it=merged.begin(); it!=merged.end(); ++it, ++i)
+        {
+            xv[i] = it->first;
+            ints[i] = it->second;
+        }
+
+        return std::make_pair(std::move(xv), std::move(ints));
     }
-    
-    MobInts getMobilities(void) const
-    {
-        return get<SpectrumRawTypes::Mobility>(&Frame::mobilities);
-    }
-    
+
     void pop(void)
     {
         if (!frames.empty())
             frames.pop_front();
     }
-    
+
     void clear(void) { frames.clear(); }
-    
+
     bool empty(void) const { return frames.empty(); }
     size_t size(void) const { return frames.size(); }
     size_t sizeNoZero(void) const
@@ -110,7 +86,7 @@ public:
         size_t count = 0;
         for (const auto& fr : frames)
         {
-            if (!fr.mobilities.empty())
+            if (!fr.xvalues.empty())
                 ++count;
         }
         return count;
@@ -128,7 +104,7 @@ class EIC
         SpectrumRawTypes::Mobility mobMin = 0, mobMax = 0;
         std::vector<SpectrumRawTypes::Mass> allMZs;
         std::vector<SpectrumRawTypes::Mobility> allMobs;
-        std::vector<SpectrumRawTypes::Intensity> allInts;
+        std::vector<SpectrumRawTypes::Intensity> allIntsMZs, allIntsMobs;
         void clear(void)
         {
             mz = mzMin = mzMax = mzBP = 0;
@@ -136,7 +112,8 @@ class EIC
             mobMin = mobMax = 0;
             allMZs.clear();
             allMobs.clear();
-            allInts.clear();
+            allIntsMZs.clear();
+            allIntsMobs.clear();
         }
     };
     
@@ -166,7 +143,8 @@ class EIC
     unsigned adjPointsAboveThr = 0;
     
     // IMS related
-    IMSFrameSummer frameSummer;
+    IMSFrameSummer<SpectrumRawTypes::Mass> mzSummer;
+    IMSFrameSummer<SpectrumRawTypes::Mobility> mobSummer;
     unsigned smoothWindowMZ, smoothWindowMob;
     SpectrumRawTypes::Mass smoothExtMZ;
     SpectrumRawTypes::Mobility smoothExtMob;
@@ -183,19 +161,22 @@ class EIC
         return (!withMob || (numberGTE(mob, mobStart) && (mobEnd == 0.0 || numberLTE(mob, mobEnd))));
     }
     
-    void setSummedFrame(SpectrumRawTypes::Scan scanInd);
+    size_t findEICIndexFromScan(SpectrumRawTypes::Scan scanInd) const;
+    void setSummedFrameMZ(SpectrumRawTypes::Scan scanInd);
+    void setSummedFrameMob(SpectrumRawTypes::Scan scanInd);
     void updateFrameSummer(void);
     void commitPoints(SpectrumRawTypes::Scan curScanInd);
 
 public:
     EIC(EICMode em, bool wm, SpectrumRawTypes::Intensity minAdjI, SpectrumRawTypes::Time minAdjT, unsigned minAdjP,
-        size_t sumFrames, unsigned smoMZ, unsigned smoMob, SpectrumRawTypes::Mass smoExtMZ,
+        size_t sumFramesMZ, size_t sumFramesMob, unsigned smoMZ, unsigned smoMob, SpectrumRawTypes::Mass smoExtMZ,
         SpectrumRawTypes::Mobility smoExtMob, bool svMZPs,
         bool svEIMs) : mode(em), withMob(wm), minAdjIntensity(minAdjI), minAdjTime(minAdjT), minAdjPoints(minAdjP),
-        frameSummer((withMob && (mode == EICMode::FULL || mode == EICMode::FULL_MZ)) ? sumFrames : 0),
-        smoothWindowMZ(smoMZ), smoothWindowMob(smoMob), smoothExtMZ(smoExtMZ), smoothExtMob(smoExtMob),
+        mzSummer((withMob && (em == EICMode::FULL || em == EICMode::FULL_MZ)) ? sumFramesMZ : 0),
+        mobSummer((withMob && mode == EICMode::FULL) ? sumFramesMob : 0), smoothWindowMZ(smoMZ),
+        smoothWindowMob(smoMob), smoothExtMZ(smoExtMZ), smoothExtMob(smoExtMob),
         saveMZProfiles(svMZPs), saveEIMs(svEIMs) { }
-    
+
     void setBoundaries(SpectrumRawTypes::Mass mzS, SpectrumRawTypes::Mass mzE,
                        SpectrumRawTypes::Mobility mobS, SpectrumRawTypes::Mobility mobE)
     {
@@ -241,7 +222,8 @@ public:
         enoughPointsAboveThr = false;
         startTimeAboveThr = 0.0;
         adjPointsAboveThr = 0;
-        frameSummer.clear();
+        mzSummer.clear();
+        mobSummer.clear();
     }
     
     size_t size(void) const { return scanInds.size(); }

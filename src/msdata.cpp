@@ -123,17 +123,35 @@ int walkSpectra(const MSReadBackend &backend)
 }
 
 // [[Rcpp::export]]
-int countAllPeaks(const MSReadBackend &backend)
+Rcpp::List getStats(const MSReadBackend &backend)
 {
-    const auto sfunc = [](const SpectrumRaw &spec, const SpectrumRawSelection &, size_t) { return spec.size(); };
+    const auto sfunc = [](const SpectrumRaw &spec, const SpectrumRawSelection &, size_t)
+    {
+        size_t specs = 0, peaks = 0;
+        SpectrumRawTypes::Mobility lastMob = -1;
+        for (size_t i=0; i<spec.getMobilities().size(); ++i)
+        {
+            if (lastMob != spec.getMobilities()[i])
+            {
+                lastMob = spec.getMobilities()[i];
+                ++specs;
+            }
+            ++peaks;
+        }
+        return std::make_pair(specs, peaks);
+    };
     const auto &meta = backend.getSpecMetadata();
     
     std::vector<std::vector<SpectrumRawSelection>> sels(1);
     for (size_t i=0; i<meta.first.scans.size(); ++i)
         sels[0].emplace_back(i);
-    const auto peaksMS1 = applyMSData<size_t>(backend, SpectrumRawTypes::MSLevel::MS1, sels, sfunc, 0,
-                                              SpectrumRawTypes::MSSortType::NONE);
-    const auto totPeaksMS1 = std::accumulate(peaksMS1[0].begin(), peaksMS1[0].end(), 0);
+    const auto statsMS1 = applyMSData<std::pair<size_t, size_t>>(backend, SpectrumRawTypes::MSLevel::MS1, sels, sfunc, 0,
+                                                                 SpectrumRawTypes::MSSortType::NONE)[0];
+    const auto totMS1 = std::accumulate(statsMS1.begin(), statsMS1.end(), std::make_pair(0, 0),
+                                        [](const std::pair<size_t, size_t> &a, const std::pair<size_t, size_t> &b)
+                                      {
+                                          return std::make_pair(a.first + b.first, a.second + b.second);
+                                      });
 
     sels[0].clear();
     for (size_t i=0; i<meta.second.scans.size(); ++i)
@@ -150,11 +168,19 @@ int countAllPeaks(const MSReadBackend &backend)
             }
         }
     }
-    const auto peaksMS2 = applyMSData<size_t>(backend, SpectrumRawTypes::MSLevel::MS2, sels, sfunc, 0,
-                                              SpectrumRawTypes::MSSortType::NONE);
-    const auto totPeaksMS2 = std::accumulate(peaksMS2[0].begin(), peaksMS2[0].end(), 0);
+    const auto statsMS2 = applyMSData<std::pair<size_t, size_t>>(backend, SpectrumRawTypes::MSLevel::MS2, sels, sfunc, 0,
+                                              SpectrumRawTypes::MSSortType::NONE)[0];
+    const auto totMS2 = std::accumulate(statsMS2.begin(), statsMS2.end(), std::make_pair(0, 0),
+                                        [](const std::pair<size_t, size_t> &a, const std::pair<size_t, size_t> &b)
+                                        {
+                                            return std::make_pair(a.first + b.first, a.second + b.second);
+                                        });
     
-    return totPeaksMS1 + totPeaksMS2;
+    
+    return Rcpp::List::create(Rcpp::Named("specsMS1") = totMS1.first,
+                              Rcpp::Named("pointsMS1") = totMS1.second,
+                              Rcpp::Named("specsMS2") = totMS2.first,
+                              Rcpp::Named("pointsMS2") = totMS2.second);
 }
 
 // [[Rcpp::export]]

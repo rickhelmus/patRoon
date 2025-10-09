@@ -234,14 +234,14 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// countAllPeaks
-int countAllPeaks(const MSReadBackend& backend);
-RcppExport SEXP _patRoon_countAllPeaks(SEXP backendSEXP) {
+// getStats
+Rcpp::List getStats(const MSReadBackend& backend);
+RcppExport SEXP _patRoon_getStats(SEXP backendSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const MSReadBackend& >::type backend(backendSEXP);
-    rcpp_result_gen = Rcpp::wrap(countAllPeaks(backend));
+    rcpp_result_gen = Rcpp::wrap(getStats(backend));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -990,7 +990,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_getBrukerMob", (DL_FUNC) &_patRoon_getBrukerMob, 3},
     {"_patRoon_backendAvailable", (DL_FUNC) &_patRoon_backendAvailable, 1},
     {"_patRoon_walkSpectra", (DL_FUNC) &_patRoon_walkSpectra, 1},
-    {"_patRoon_countAllPeaks", (DL_FUNC) &_patRoon_countAllPeaks, 1},
+    {"_patRoon_getStats", (DL_FUNC) &_patRoon_getStats, 1},
     {"_patRoon_getMSSpectrum", (DL_FUNC) &_patRoon_getMSSpectrum, 5},
     {"_patRoon_getMSSpectra", (DL_FUNC) &_patRoon_getMSSpectra, 13},
     {"_patRoon_getCollapsedFrame", (DL_FUNC) &_patRoon_getCollapsedFrame, 15},

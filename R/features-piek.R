@@ -381,6 +381,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
     getIMSProfiles <- function(profAttr, peaks, EICs, EICInfo)
     {
         ret <- list()
+        profAttr <- pruneList(profAttr) # NOTE: EICs/EICInfo is already pruned
         if (length(profAttr) > 0)
         {
             ret <- Map(peaks$EIC_ID, peaks$ret, f = function(EIC_ID, ret)
@@ -450,6 +451,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
                 
                 maybePrintf("Loading %d m/z+mobility EICs... ", nrow(EICInfo))
                 EICs <- getEICsAna(backend, EICInfo, "full", genEICParams$topMostEICMZMob)
+                EICInfo <- EICInfo[EIC_ID %chin% names(EICs)] # omit missing
                 maybePrintf("Done!\n")
             }
             else
@@ -535,13 +537,10 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
 
             maybePrintf("%d peaks remain after filtering.\n", nrow(peaks))            
             
-            if (withIMS)
-            {
-                if (genEICParams$saveMZProfiles)
-                    mzProfiles[[ana]] <<- getIMSProfiles(attr(EICs, "mzProfiles"), peaks, EICs, EICInfo)
-                if (genEICParams$saveEIMs)
-                    EIMs[[ana]] <<- getIMSProfiles(attr(EICs, "EIMs"), peaks, EICs, EICInfo)
-            }
+            if (genEICParams$saveMZProfiles)
+                mzProfiles[[ana]] <<- getIMSProfiles(attr(EICs, "mzProfiles"), peaks, EICs, EICInfo)
+            if (genEICParams$saveEIMs)
+                EIMs[[ana]] <<- getIMSProfiles(attr(EICs, "EIMs"), peaks, EICs, EICInfo)
 
             return(peaks)
         })

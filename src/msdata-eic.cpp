@@ -166,7 +166,7 @@ template<typename T> Rcpp::List convertEICProfilesToR(const T &profiles, const c
             mat(j, 0) = profiles[i].first[j];
             mat(j, 1) = profiles[i].second[j];
         }
-        Rcpp::colnames(ret) = Rcpp::CharacterVector::create(name, "intensity");
+        Rcpp::colnames(mat) = Rcpp::CharacterVector::create(name, "intensity");
         ret[i] = mat;
     }
     return ret;
@@ -469,13 +469,16 @@ void EIC::pad(SpectrumRawTypes::Scan scanStart, SpectrumRawTypes::Scan scanEnd)
     
     for (auto it=scanInds.begin(); it!=scanInds.end(); )
     {
-        // add zero point if previous was missing in EIC and within the RT range
-        const auto prevScanInd = *it - 1;
-        if ((paddedScans.empty() || prevScanInd != paddedScans.back()) && prevScanInd >= scanStart)
-            
+        if (*it > 0)
         {
-            paddedScans.push_back(prevScanInd);
-            paddedInts.push_back(0.0);
+            // add zero point if previous was missing in EIC and within the RT range
+            const auto prevScanInd = *it - 1;
+            if ((paddedScans.empty() || prevScanInd != paddedScans.back()) && prevScanInd >= scanStart)
+                
+            {
+                paddedScans.push_back(prevScanInd);
+                paddedInts.push_back(0.0);
+            }
         }
         
         // add EIC point
@@ -819,8 +822,8 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
             // figure out start/stop scans
             auto startIt = std::lower_bound(specMeta.first.times.begin(), specMeta.first.times.end(), timeStart);
             if (startIt == specMeta.first.times.end())
-                startIt = std::prev(specMeta.first.times.end());
-            auto endIt = std::lower_bound(startIt, specMeta.first.times.end(), timeEnd);
+                startIt = specMeta.first.times.begin();
+            auto endIt = (timeEnd == 0.0) ? specMeta.first.times.end() : std::lower_bound(startIt, specMeta.first.times.end(), timeEnd);
             if (endIt == specMeta.first.times.end() || (endIt != specMeta.first.times.begin() && *endIt > timeEnd))
                 --endIt;
             eic.pad(std::distance(specMeta.first.times.begin(), startIt),
@@ -912,7 +915,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
             ret[i] = !eic.empty();
         }
         
-        eic.clear(); // free memory as EICs may consume a lot
+        eic.clear(saveMZProfiles, saveEIMs); // free memory as EICs may consume a lot
     }
     
     if (eicMode != EICMode::TEST)
@@ -924,7 +927,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         for (size_t i=0; i<EICCount; ++i)
         {
             const auto &eic = allEICs[i];
-            if (eic.empty())
+            if (eic.getMZProfiles().empty())
                 continue;
             mzProfiles[i] = convertEICProfilesToR(eic.getMZProfiles(), "mz");
         }
@@ -937,7 +940,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         for (size_t i=0; i<EICCount; ++i)
         {
             const auto &eic = allEICs[i];
-            if (eic.empty())
+            if (eic.getEIMs().empty())
                 continue;
             allEIMs[i] = convertEICProfilesToR(eic.getEIMs(), "mobility");
         }

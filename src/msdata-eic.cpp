@@ -321,6 +321,8 @@ void EIC::commitPoints(SpectrumRawTypes::Scan curScanInd)
         mzMaxs.push_back(curPoint.mzMax);
         mzsBP.push_back(curPoint.mzBP);
     }
+    if (withMob && saveMZProfiles && (mode == EICMode::FULL || mode == EICMode::FULL_MZ))
+        mzProfiles.emplace_back(std::make_pair(std::vector<SpectrumRawTypes::Mass>(), std::vector<SpectrumRawTypes::Intensity>()));
     if (withMob && mode == EICMode::FULL)
     {
         mobMins.push_back(curPoint.mobMin);
@@ -328,8 +330,6 @@ void EIC::commitPoints(SpectrumRawTypes::Scan curScanInd)
         // will be set by updateFrameSummer()
         mobilities.push_back(0);
         mobilitiesBP.push_back(0);
-        if (saveMZProfiles)
-            mzProfiles.emplace_back(std::make_pair(std::vector<SpectrumRawTypes::Mass>(), std::vector<SpectrumRawTypes::Intensity>()));
         if (saveEIMs)
             EIMs.emplace_back(std::make_pair(std::vector<SpectrumRawTypes::Mobility>(), std::vector<SpectrumRawTypes::Intensity>()));
     }

@@ -202,7 +202,7 @@ public:
         return true;
     }
     
-    void clear(void)
+    void clear(bool keepMZProfiles = false, bool keepEIMs = false)
     {
         scanInds.clear();
         mzs.clear();
@@ -214,8 +214,6 @@ public:
         mzsBP.clear();
         mobilities.clear();
         mobilitiesBP.clear();
-        mzProfiles.clear();
-        EIMs.clear();
         curPoint.clear();
         maxIntensity = 0;
         enoughTimeAboveThr = false;
@@ -224,6 +222,10 @@ public:
         adjPointsAboveThr = 0;
         mzSummer.clear();
         mobSummer.clear();
+        if (!keepMZProfiles)
+            mzProfiles.clear();
+        if (!keepEIMs)
+            EIMs.clear();
     }
     
     size_t size(void) const { return scanInds.size(); }

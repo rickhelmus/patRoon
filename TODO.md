@@ -143,6 +143,9 @@
 - EICs
     - are even numbers for smoothing/summing correctly handled?
     - fix gap filling + padding
+- checkFeatures/checkComponents()
+    - add mobilities to session and update file import
+    - bump version
 
 ## Tests
 

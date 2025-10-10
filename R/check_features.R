@@ -354,13 +354,14 @@ checkFeaturesInterface$methods(
 #' @rdname check-GUI
 #' @export
 importCheckFeaturesSession <- function(sessionIn, sessionOut, fGroups, rtWindow = defaultLim("retention", "narrow"),
-                                       mzWindow = defaultLim("mz", "narrow"), overwrite = FALSE)
+                                       mzWindow = defaultLim("mz", "narrow"), IMSWindow = defaultLim("mobility", "narrow"),
+                                       overwrite = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     assertCheckSession(sessionIn, mustExist = TRUE, add = ac)
     assertCheckSession(sessionOut, mustExist = FALSE, add = ac)
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
-    aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow + IMSWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertFlag(overwrite, add = ac)
     checkmate::reportAssertions(ac)
     
@@ -381,7 +382,7 @@ importCheckFeaturesSession <- function(sessionIn, sessionOut, fGroups, rtWindow 
         return(invisible(NULL))
     }
     
-    newGroupsTab <- importCheckUISessionGroups(oldSession, fGroups, rtWindow, mzWindow)
+    newGroupsTab <- importCheckUISessionGroups(oldSession, fGroups, rtWindow, mzWindow, IMSWindow)
     
     if (nrow(newGroupsTab) == 0)
     {

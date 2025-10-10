@@ -143,9 +143,6 @@
 - EICs
     - are even numbers for smoothing/summing correctly handled?
     - fix gap filling + padding
-- checkFeatures/checkComponents()
-    - add mobilities to session and update file import
-    - bump version
 
 ## Tests
 
@@ -225,6 +222,8 @@
     - checkFeatures()/checkComponents() verify if things still work
     - DA features and formulas?
     - manually check all HTML reporting functionality at the end
+    - check updates for mobilities to checkFeatures(), checkComponents() and importCheckFeaturesSession()
+
 
 ## Docs
 
@@ -296,6 +295,7 @@
     - assignMobilities() doesn't do clustering anymore but greedy grouping
         - maybe remove some fc refs?
     - update for MA smoothing for EIMs
+    - update docs for importCheckFeaturesSession() (IMSWindow)
 
 ## NEWS
 

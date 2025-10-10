@@ -95,28 +95,48 @@ readCheckSession <- function(session, type)
 
 saveCheckSession <- function(session, path, fGroups, type)
 {
-    session$version <- 1
+    session$version <- 2
     session$type <- type
     
     gInfo <- groupInfo(fGroups)
-    session$featureGroups <- sapply(names(fGroups),
-                                    function(grp) list(ret = gInfo[group == grp]$ret, mz = gInfo[group == grp]$mz),
-                                    simplify = FALSE)
+    session$featureGroups <- sapply(names(fGroups), function(grp)
+    {
+        gi <- gInfo[group == grp]
+        li <- list(ret = gi$ret, mz = gi$mz, mobility = NA_real_)
+        if (hasMobilities(fGroups) && !is.null(gi[["mobility"]]))
+            li$mobility <- gi$mobility
+        return(li)
+    }, simplify = FALSE)
     
     writeYAML(session, path)
 }
 
-importCheckUISessionGroups <- function(oldSession, fGroups, rtWindow, mzWindow)
+importCheckUISessionGroups <- function(oldSession, fGroups, rtWindow, mzWindow, IMSWindow = 0.01)
 {
-    
+
     gInfo <- groupInfo(fGroups)
 
     oldGroupTab <- rbindlist(oldSession$featureGroups, idcol = "group")
     
+    if (hasMobilities(fGroups) != "mobility" %in% names(oldGroupTab))
+    {
+        warning("The current feature groups or the ones in the session file lack ion mobility information! ",
+                "Matching will be done without considering ion mobility.", call. = FALSE)
+    }
+    
+    hasMobilityData <- hasMobilities(fGroups) && "mobility" %in% names(oldGroupTab)
+
     warnTol <- FALSE
     newGroups <- setNames(lapply(split(oldGroupTab, seq_len(nrow(oldGroupTab))), function(ogtr)
     {
         gi <- gInfo[numLTE(abs(ret - ogtr$ret), rtWindow) & numLTE(abs(mz - ogtr$mz), mzWindow)]
+        if (hasMobilityData)
+        {
+            if (is.na(ogtr$mobility))
+                gi <- gi[is.na(mobility)]
+            else
+                gi <- gi[!is.na(mobility) & numLTE(abs(mobility - ogtr$mobility), IMSWindow)]
+        }
         if (nrow(gi) == 0)
         {
             printf("Could not find any matching feature groups for old group %s\n", ogtr$group)

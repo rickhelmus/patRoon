@@ -640,9 +640,6 @@ Rcpp::List getEIMList(const MSReadBackend &backend, const std::vector<SpectrumRa
     const auto entries = startTimes.size();
     const auto specMeta = backend.getSpecMetadata();
     
-    // tolerance used for summing up equal mobility peaks. Normally these values are equivalent between frames
-    const SpectrumRawTypes::Mobility avgTol = 0.00001;
-    
     struct EIM
     {
         std::vector<SpectrumRawTypes::Mobility> mobilities;
@@ -651,6 +648,7 @@ Rcpp::List getEIMList(const MSReadBackend &backend, const std::vector<SpectrumRa
         EIM(void) = default;
         EIM(size_t s) : mobilities(s), intensities(s) { }
         void append(SpectrumRawTypes::Mobility m, SpectrumRawTypes::Intensity i) { mobilities.push_back(m); intensities.push_back(i); }
+        size_t size(void) const { return mobilities.size(); }
     };
     
     const auto &sfunc = [mzExpIMSWindow, &startMZs, &endMZs, &startMobs, &endMobs](const SpectrumRaw &spec, const SpectrumRawSelection &ssel, size_t e)
@@ -693,74 +691,53 @@ Rcpp::List getEIMList(const MSReadBackend &backend, const std::vector<SpectrumRa
     const auto allEIMs = applyMSData<EIM>(backend, SpectrumRawTypes::MSLevel::MS1, scanSels, sfunc, minIntensity,
                                           SpectrumRawTypes::MSSortType::MOBILITY_MZ);
 
-    std::vector<EIM> averageEIMs(entries);
+    std::vector<EIM> summedEIMs(entries);
 
     #pragma omp parallel for
     for (size_t i=0; i<entries; ++i)
     {
-        EIM flatEIM;
+        std::map<SpectrumRawTypes::Mobility, SpectrumRawTypes::Intensity> sumEIMMap;
         for (const EIM &eim : allEIMs[i])
         {
-            std::copy(eim.mobilities.begin(), eim.mobilities.end(), std::back_inserter(flatEIM.mobilities));
-            std::copy(eim.intensities.begin(), eim.intensities.end(), std::back_inserter(flatEIM.intensities));
+            for (size_t i=0; i<eim.size(); ++i)
+                sumEIMMap[eim.mobilities[i]] += eim.intensities[i];
         }
         
-        if (flatEIM.mobilities.size() == 0)
-            continue;
+        // convert from map
+        EIM sumEIM;
+        for (const auto &p : sumEIMMap)
+            sumEIM.append(p.first, p.second);
         
-        const auto clusts = clusterNums(flatEIM.mobilities, clusterMethod::DISTANCE, avgTol);
-        const int maxClust = *(std::max_element(clusts.begin(), clusts.end()));
-        EIM avgEIM(maxClust + 1);
-        std::vector<size_t> clSizes(maxClust + 1);
-        
-        // sum data, averaging is done below
-        // NOTE: for now don't consider weighting averages, since there are likely to be clusters with zero intensities
-        for (size_t j=0; j<clusts.size(); ++j)
+        // compress data
+        const auto EIMSize = sumEIM.size();
+        if (compress && EIMSize >= 3) // we always keep first/last point, so need >=3 points
         {
-            const size_t cl = clusts[j];
-            avgEIM.mobilities[cl] += flatEIM.mobilities[j];
-            avgEIM.intensities[cl] += flatEIM.intensities[j];
-            ++clSizes[cl];
-        }
-        
-        const auto EIMSize = avgEIM.mobilities.size();
-        
-        // average data
-        for (size_t j=0; j<EIMSize; ++j)
-        {
-            avgEIM.mobilities[j] /= static_cast<SpectrumRawTypes::Mobility>(clSizes[j]); // mean of all values
-            avgEIM.intensities[j] /= allEIMs[i].size(); // mean of values (including frames without this cluster)
-        }
-        
-        // sort and compress data
-        const auto sInds = getSortedInds(avgEIM.mobilities);
-        EIM sortedEIM;
-        const bool doComp = compress && EIMSize >= 3; // we always keep first/last point, so need >=3 points
-        for (size_t i=0; i<EIMSize; ++i)
-        {
-            // if we want to (1) compress, (2) current intensity == 0, (3) is not the first sorted point, (4) is not the
-            // last point to check and (5) and not the last sorted point.
-            if (doComp && avgEIM.intensities[sInds[i]] == 0 && sInds[i] > 0 && i < (EIMSize-1) &&
-                sInds[i] != (EIMSize-1))
+            EIM comprEIM;
+            for (size_t i=0; i<EIMSize; ++i)
             {
-                const auto prevInt = avgEIM.intensities[sInds[i-1]], nextInt = avgEIM.intensities[sInds[i+1]];
-                if (prevInt == 0 && nextInt == 0)
-                    continue; // skip points with zero intensities that are neighbored by others.
+                // if current intensity == 0, is not the first point, and is not the last point to check.
+                if (sumEIM.intensities[i] == 0 && i == 0 && i < (EIMSize-1))
+                {
+                    const auto prevInt = comprEIM.intensities.back(), nextInt = sumEIM.intensities[i+1];
+                    if (prevInt == 0 && nextInt == 0)
+                        continue; // skip points with zero intensities that are neighbored by others.
+                }
+                comprEIM.append(sumEIM.mobilities[i], sumEIM.intensities[i]);
             }
-            sortedEIM.append(avgEIM.mobilities[sInds[i]], avgEIM.intensities[sInds[i]]);
+            summedEIMs[i] = std::move(comprEIM);
         }
-        
-        averageEIMs[i] = std::move(sortedEIM);
+        else
+            summedEIMs[i] = std::move(sumEIM);
     }
         
     Rcpp::List ret(entries);
     for (size_t i=0; i<entries; ++i)
     {
-        auto mat = Rcpp::NumericMatrix(averageEIMs[i].mobilities.size(), 2);
-        for (size_t j=0; j<averageEIMs[i].mobilities.size(); ++j)
+        auto mat = Rcpp::NumericMatrix(summedEIMs[i].mobilities.size(), 2);
+        for (size_t j=0; j<summedEIMs[i].mobilities.size(); ++j)
         {
-            mat(j, 0) = averageEIMs[i].mobilities[j];
-            mat(j, 1) = averageEIMs[i].intensities[j];
+            mat(j, 0) = summedEIMs[i].mobilities[j];
+            mat(j, 1) = summedEIMs[i].intensities[j];
         }
         Rcpp::colnames(mat) = Rcpp::CharacterVector::create("mobility", "intensity");
         ret[i] = mat;

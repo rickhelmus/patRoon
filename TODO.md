@@ -132,14 +132,13 @@
     - set default weights
         - also configurable weights for assignMobilities()?
 - tweak default EIMParams
-    - lower mzExpIMSWindow?
+    - lower mzExpIMSWindow? --> only do it for IMS data
     - default smoothing? different for Agilent? Convert to mobility units?
 - throw error from classic groupers with IMS data
 - ADT gives "susp_mobility_susp"/"susp_CCS_susp" cols --> rename
 - function to update fg properties (RT, m/z, mobility, CCS) after eg filtering, or make it an option in filter()/delete()?
 - plotChroms() etc: mention that only precursors are plot? Now seems confusing as number of fGroups seems less when reporting
 - MSPL: do topMost filter after averaging IMS subspectrum? Would be more consistent with HRMS, but may need larger default
-- getEIMs(): don't average intensities, replace clustering with map as is done with EIMRunner?
 - EICs
     - are even numbers for smoothing/summing correctly handled?
     - fix gap filling + padding

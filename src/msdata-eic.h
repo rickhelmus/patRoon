@@ -247,5 +247,28 @@ public:
     const auto &getEIMs(void) const { return EIMs; }
 };
 
+class SimpleEIC
+{
+    std::vector<SpectrumRawTypes::Time> times;
+    std::vector<SpectrumRawTypes::Intensity> intensities;
+    
+public:
+    SimpleEIC(void) = default;
+    SimpleEIC(const EIC &eic, const std::vector<SpectrumRawTypes::Time> &scanTimes) : times(eic.size()), intensities(eic.getIntensities())
+    {
+        for (size_t i=0; i<eic.size(); ++i)
+            times[i] = scanTimes[eic.getScanIndices()[i]];
+    }
+    
+    size_t size(void) const { return times.size(); }
+    bool empty(void) const { return times.empty(); }
+    
+    void fillGaps(SpectrumRawTypes::Time medRTDiff, double gapFactor, bool pad, SpectrumRawTypes::Time startTime,
+                  SpectrumRawTypes::Time endTime);
+    
+    const auto &getTimes(void) const { return times; }
+    const auto &getIntensities(void) const { return intensities; }
+};
+
 
 #endif // MSDATA_EIC_H

@@ -233,18 +233,18 @@ public:
     
     SpectrumRawTypes::Intensity getMaxIntensity(void) const { return maxIntensity; }
     
-    auto getScanIndices(void) const { return scanInds; }
-    auto getMZs(void) const { return mzs; }
-    auto getMZMins(void) const { return mzMins; }
-    auto getMZMaxs(void) const { return mzMaxs; }
-    auto getIntensities(void) const { return intensities; }
-    auto getMobMins(void) const { return mobMins; }
-    auto getMobMaxs(void) const { return mobMaxs; }
-    auto getMobilities(void) const { return mobilities; }
-    auto getMZsBP(void) const { return mzsBP; }
-    auto getMobilitiesBP(void) const { return mobilitiesBP; }
-    auto getMZProfiles(void) const { return mzProfiles; }
-    auto getEIMs(void) const { return EIMs; }
+    const auto &getScanIndices(void) const { return scanInds; }
+    const auto &getMZs(void) const { return mzs; }
+    const auto &getMZMins(void) const { return mzMins; }
+    const auto &getMZMaxs(void) const { return mzMaxs; }
+    const auto &getIntensities(void) const & { return intensities; }
+    const auto &getMobMins(void) const { return mobMins; }
+    const auto &getMobMaxs(void) const { return mobMaxs; }
+    const auto &getMobilities(void) const { return mobilities; }
+    const auto &getMZsBP(void) const { return mzsBP; }
+    const auto &getMobilitiesBP(void) const { return mobilitiesBP; }
+    const auto &getMZProfiles(void) const { return mzProfiles; }
+    const auto &getEIMs(void) const { return EIMs; }
 };
 
 

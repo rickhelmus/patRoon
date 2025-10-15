@@ -114,7 +114,7 @@ loadCacheData <- function(category, hashes, dbArg = NULL, simplify = TRUE, fixDT
     if (fixDTs)
         ret <- recursiveApplyDT(ret, setalloccol, sapply, simplify = FALSE)
 
-    if (simplify && length(hashes) == 1)
+    if (simplify && length(hashes) == 1 && !is.null(ret))
         ret <- ret[[1]]
     
     return(ret)

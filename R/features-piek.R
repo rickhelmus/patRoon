@@ -331,14 +331,21 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
         if (identical(genEICParams$methodIMS, "suspects"))
         {
             suspects[, mobility_susp := selectFromSuspAdductCol(suspects, "mobility", data.table(), if (!is.null(adduct)) as.character(adduct))]
-            if (any(is.na(suspects$mobility_susp)))
+            whMissing <- which(is.na(suspects$mobility_susp))
+            if (length(whMissing) > 0)
             {
-                stop("The suspect list contains no or missing mobility data!.",
-                     "Please note that CCS data first must be converted to mobilities, e.g. with assignMobilities().",
-                     call. = FALSE)
+                if (length(whMissing) == nrow(suspects))
+                    stop("The suspect list contains no mobility data! ",
+                         "Please note that CCS data first must be converted to mobilities, e.g. with assignMobilities().",
+                         call. = FALSE)
+                
+                warning(sprintf("The suspect list contains missing mobility data (rows %s), these will be ignored. ",
+                                paste0(whMissing, collapse = ", ")),
+                        "Please note that CCS data first must be converted to mobilities, e.g. with assignMobilities().",
+                        call. = FALSE)
+                suspects <- suspects[-whMissing]
             }
-            else
-                suspects <- expandSuspMobilities(suspects)
+            suspects <- expandSuspMobilities(suspects)
         }
     }
     

@@ -60,6 +60,8 @@ setMethod("groupFeaturesKPIC2", "features", function(feat, rtalign = !hasMobilit
     assertGroupFeatVerbose(verbose, add = ac)
     checkmate::reportAssertions(ac)
     
+    checkUnsupportedIMS(feat, "KPIC2")
+    
     doG <- \(feat, ...) doGroupFeaturesKPIC2(feat, getPICSet(feat, loadRawData = loadRawData, IMS = "both"), ...)
     return(doGroupFeatures(feat, doG, "kpic2", rtalign = rtalign, loadRawData = loadRawData, groupArgs = groupArgs,
                            alignArgs = alignArgs, verbose = verbose))
@@ -76,6 +78,8 @@ setMethod("groupFeaturesKPIC2", "featuresSet", function(feat, groupArgs = list(t
     checkmate::assertList(groupArgs, any.missing = FALSE, names = "unique", add = ac)
     assertGroupFeatVerbose(verbose, add = ac)
     checkmate::reportAssertions(ac)
+    
+    checkUnsupportedIMS(feat, "KPIC2")
     
     doG <- function(feat, ...)
     {

@@ -1475,6 +1475,8 @@ setMethod("calculateTox", "featureGroups", function(fGroups, featureAnn)
 #' @param IMSWindow The mobility tolerance window.
 #'
 #' @template CCSParams-arg
+#'
+#' @templateVar append Alternatively, set \code{parallel="maybe"} to disable parallelization if this normally will not benefit the algorithm (\emph{i.e.} \code{piek}).
 #' @template parallel-arg
 #'
 #' @section Post mobility assignment: The \emph{post} assignment of mobilities occurs in the following steps:
@@ -1532,7 +1534,7 @@ setMethod("assignMobilities", "featureGroups", function(obj, mobPeakParams = NUL
                                                         peakRTWindow = defaultLim("retention", "narrow"),
                                                         fallbackEIC = TRUE, calcArea = "integrate",
                                                         IMSWindow = defaultLim("mobility", "medium"),
-                                                        CCSParams = NULL, parallel = TRUE)
+                                                        CCSParams = NULL, parallel = "maybe")
 {
     # NOTE: keep args in sync with other methods
     

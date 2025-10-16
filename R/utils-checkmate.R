@@ -1090,8 +1090,13 @@ assertFindMobilitiesArgs <- function(mobPeakParams, chromPeakParams, EIMParams, 
     assertEIMParams(EIMParams, add = add)
     assertEICParams(EICParams, add = add)
     aapply(checkmate::assertNumber, . ~ peakRTWindow + IMSWindow, finite = TRUE, fixed = list(add = add))
-    aapply(checkmate::assertFlag, . ~ fallbackEIC + parallel, fixed = list(add = add))
+    aapply(checkmate::assertFlag, . ~ fallbackEIC, fixed = list(add = add))
     checkmate::assertChoice(calcArea, c("integrate", "sum"), add = add)
+    checkmate::assert(
+        checkmate::checkFlag(parallel),
+        checkmate::checkChoice(parallel, "maybe"),
+        .var.name = "parallel", add = add
+    )
     assertCCSParams(CCSParams, null.ok = TRUE, add = add)
     invisible(NULL)
 }

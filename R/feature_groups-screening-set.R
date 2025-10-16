@@ -363,7 +363,7 @@ setMethod("assignMobilities", "featureGroupsScreeningSet", function(obj, mobPeak
                                                                     peakRTWindow = defaultLim("retention", "narrow"),
                                                                     fallbackEIC = TRUE, calcArea = "integrate",
                                                                     IMSWindow = defaultLim("mobility", "medium"),
-                                                                    CCSParams = NULL, parallel = TRUE,
+                                                                    CCSParams = NULL, parallel = "maybe",
                                                                     fromSuspects = FALSE, IMSMatchParams = NULL)
 {
     ac <- checkmate::makeAssertCollection()

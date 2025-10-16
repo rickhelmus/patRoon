@@ -58,6 +58,7 @@ NULL
 #'   (\code{plotUpSet}).
 #'
 #' @templateVar consider for plotting
+#' @templateVar append For \code{plotChroms}: if the \code{groupName} argument is set to a subset of the feature groups, then the \code{IMS} argument is forced to \code{"both"} to ensure that the selected feature groups are plotted.
 #' @template IMS-arg
 #'
 #' @template plot-lim
@@ -621,6 +622,9 @@ setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj),
     if (intMax == "eic")
         intMax <- "eix" # for makeEIXPlot()
     
+    if (identical(IMS, "maybe") && !setequal(groupName, names(obj)))
+        IMS <- "both" # make sure selection is always plotted
+    
     obj <- prepIMSFGroupsForPlot(obj, IMS)
     if (IMS != "both")
     {
@@ -840,6 +844,7 @@ setMethod("plotChroms3D", "featureGroupsSet", function(obj, analysis = analyses(
 #' @details \code{plotMobilograms} Plots extracted ion mobilograms (EIMs) of feature groups.
 #' @template EIMParams-arg
 #' @rdname feature-plotting
+#' @aliases plotMobilograms
 #' @export
 setMethod("plotMobilograms", "featureGroups", function(obj, analysis = analyses(obj), groupName = names(obj),
                                                        showPeakArea = FALSE, showFGroupRect = TRUE, title = NULL,

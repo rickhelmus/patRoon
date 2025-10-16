@@ -328,6 +328,12 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
                                        checkDesc = TRUE, prefCalcChemProps = genEICParams$prefCalcChemProps,
                                        neutralChemProps = genEICParams$neutralChemProps)
         
+        whNotInRange <- suspects[!mz %between% genEICParams$mzRange, which = TRUE]
+        if (length(whNotInRange) > 0)
+            warning(sprintf("The following %d suspect rows have m/z values outside the binning range and will be ignored: %s",
+                            length(whNotInRange), paste0(whNotInRange, collapse = ", ")),
+                    call. = FALSE)
+        
         if (identical(genEICParams$methodIMS, "suspects"))
         {
             suspects[, mobility_susp := selectFromSuspAdductCol(suspects, "mobility", data.table(), if (!is.null(adduct)) as.character(adduct))]
@@ -345,7 +351,15 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
                         call. = FALSE)
                 suspects <- suspects[-whMissing]
             }
+            suspectsOrig <- suspects # to report original row numbers below
             suspects <- expandSuspMobilities(suspects)
+            
+            whNotInRange <- suspects[!mobility %between% genEICParams$mobRange, which = TRUE]
+            if (length(whNotInRange) > 0)
+                warning(sprintf("The following %d suspect rows have mobilities values outside the binning range and will be ignored: %s",
+                                length(whNotInRange), paste0(match(suspects$name[whNotInRange], suspectsOrig$name), collapse = ", ")),
+                        call. = FALSE)
+            
         }
     }
     

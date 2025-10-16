@@ -78,6 +78,7 @@
     - mobilogram previews?
 - EIC optims
     - move filling and calcStats to C++? --> return as attributes?
+- plotChroms() etc: mention that only precursors are plot? Now seems confusing as number of fGroups seems less when reporting
 
 
 ## newProject()
@@ -124,7 +125,6 @@
     - split IMSWindow arg for setting mobmin/mobmax? this currently sets very narrow ranges. Same for mz and ms2
     - warn if ms2/suspects are outside bin range?
     - change methodMZ/methodIMS to eg filterMZ/filterMob
-    - remove suspects with NA mobilities and warn, instead of throwing an error
     - make allowing non-centered features optional?
 - update featAnn consensus?
 - greedy
@@ -134,7 +134,6 @@
     - lower mzExpIMSWindow? --> only do it for IMS data
     - default smoothing? different for Agilent? Convert to mobility units?
 - ADT gives "susp_mobility_susp"/"susp_CCS_susp" cols --> rename
-- plotChroms() etc: mention that only precursors are plot? Now seems confusing as number of fGroups seems less when reporting
 - MSPL: do topMost filter after averaging IMS subspectrum? Would be more consistent with HRMS, but may need larger default
 - EICs
     - are even numbers for smoothing/summing correctly handled?

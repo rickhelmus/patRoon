@@ -65,6 +65,8 @@ setMethod("groupFeaturesXCMS3", "features", function(feat, rtalign = !hasMobilit
     assertGroupFeatVerbose(verbose, add = ac)
     checkmate::reportAssertions(ac)
     
+    checkUnsupportedIMS(feat, "XCMS3")
+    
     doG <- function(feat, ...)
     {
         xdata <- getXCMSnExp(feat, verbose = verbose, loadRawData = loadRawData, IMS = "both")
@@ -85,6 +87,8 @@ setMethod("groupFeaturesXCMS3", "featuresSet", function(feat,
     assertS4(groupParam, add = ac)
     assertGroupFeatVerbose(verbose, add = ac)
     checkmate::reportAssertions(ac)
+    
+    checkUnsupportedIMS(feat, "XCMS3")
     
     doG <- function(feat, ...)
     {

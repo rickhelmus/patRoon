@@ -58,6 +58,8 @@ setMethod("groupFeaturesXCMS", "features", function(feat, rtalign = !hasMobiliti
     aapply(checkmate::assertList, . ~ groupArgs + retcorArgs, any.missing = FALSE, names = "unique", fixed = list(add = ac))
     assertGroupFeatVerbose(verbose, add = ac)
     checkmate::reportAssertions(ac)
+    
+    checkUnsupportedIMS(feat, "XCMS")
 
     doG <- function(feat, ...)
     {
@@ -77,6 +79,8 @@ setMethod("groupFeaturesXCMS", "featuresSet", function(feat, groupArgs = list(mz
     checkmate::assertList(groupArgs, any.missing = FALSE, names = "unique", add = ac)
     assertGroupFeatVerbose(verbose, add = ac)
     checkmate::reportAssertions(ac)
+    
+    checkUnsupportedIMS(feat, "XCMS")
     
     doG <- function(feat, ...)
     {

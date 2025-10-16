@@ -5,6 +5,12 @@
 getMobilityCols <- function() c("mobility", "mobmin", "mobmax", "mob_area", "mob_intensity")
 countMobilityFeatures <- function(feat) sum(sapply(featureTable(feat), function(ft) sum(!is.null(ft[["mobility"]]) & !is.na(ft$mobility))))
 
+checkUnsupportedIMS <- function(feat, algorithm)
+{
+    if (hasMobilities(feat))
+        stop(sprintf("The '%s' algorithm does not support ion mobility data", algorithm), call. = FALSE)
+}
+
 checkAssignedMobilityFGroups <- function(fGroups)
 {
     if (hasMobilities(fGroups))

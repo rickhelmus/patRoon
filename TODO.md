@@ -133,7 +133,6 @@
 - tweak default EIMParams
     - lower mzExpIMSWindow? --> only do it for IMS data
     - default smoothing? different for Agilent? Convert to mobility units?
-- throw error from classic groupers with IMS data
 - ADT gives "susp_mobility_susp"/"susp_CCS_susp" cols --> rename
 - plotChroms() etc: mention that only precursors are plot? Now seems confusing as number of fGroups seems less when reporting
 - MSPL: do topMost filter after averaging IMS subspectrum? Would be more consistent with HRMS, but may need larger default

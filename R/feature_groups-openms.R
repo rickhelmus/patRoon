@@ -76,6 +76,8 @@ setMethod("groupFeaturesOpenMS", "features", function(feat, rtalign = !hasMobili
     assertGroupFeatVerbose(verbose, add = ac)
     checkmate::reportAssertions(ac)
 
+    checkUnsupportedIMS(feat, "OpenMS")
+    
     return(doGroupFeatures(feat, doGroupFeaturesOpenMS, "openms", rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT,
                            maxGroupMZ, extraOptsRT, extraOptsGroup, verbose = verbose))
 })

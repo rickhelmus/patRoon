@@ -32,7 +32,6 @@
     - actually, the same is the case for the mz filter (also IMS and mz for features) --> maybe just document difference? the actual results will not change much in general
 - revert default clusterMzWindow back to 0.005, or a least for IMS
 - TC convert: doc that centroid mode is used for IMS conversion (and/or make it optional?)
-- reporting: disable (parts of) parallelization?
 
 
 ## Maybe
@@ -98,7 +97,16 @@
 ## Param defaults
 
 - don't use defaults for eg feature finding (and grouping)?
-- tweak agilent defaults --> after application?
+- tweaks
+    - agilent defaults
+    - xcms3 for mobilities params seem not working
+    - tweak default EIC filtering params, more strict for binning?
+        - current defaults way to strict for patRoonData neg samples (for filtering of EICs _and_ peaks)
+    - set default greedy weights
+        - also configurable weights for assignMobilities()?
+    - tweak default EIMParams
+        - lower mzExpIMSWindow? --> only do it for IMS data
+        - default smoothing? different for Agilent? Convert to mobility units?
 
 ## TC
 
@@ -112,26 +120,17 @@
             - keep doing this?
             - report both?
             - document
-    - xcms3 for mobilities params seem not working
 - assignMobilities()
     - better names for ims_parent_ID/ims_parent_group?
     - susps/compounds: overwrite doesn't overwrite converted mobilities, change?
     - compounds: call assignTabIMSDeviations() also in generateCompounds with eg PCL? Otherwise doc clearly and check newProject and examples
 - feat EICs
-    - tweak default EIC filtering params, more strict for binning?
-        - current defaults way to strict for patRoonData neg samples (for filtering of EICs _and_ peaks)
     - mob range: doc that defaults are for TIMS? Or just not give any defaults? Give instrument? Put it in limits?
         - enable EIM summing and smoothing by default for TIMS?
     - split IMSWindow arg for setting mobmin/mobmax? this currently sets very narrow ranges. Same for mz and ms2
     - change methodMZ/methodIMS to eg filterMZ/filterMob
     - make allowing non-centered features optional?
 - update featAnn consensus?
-- greedy
-    - set default weights
-        - also configurable weights for assignMobilities()?
-- tweak default EIMParams
-    - lower mzExpIMSWindow? --> only do it for IMS data
-    - default smoothing? different for Agilent? Convert to mobility units?
 - ADT gives "susp_mobility_susp"/"susp_CCS_susp" cols --> rename
 - MSPL: do topMost filter after averaging IMS subspectrum? Would be more consistent with HRMS, but may need larger default
 - EICs

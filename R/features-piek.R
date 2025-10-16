@@ -72,6 +72,12 @@ setMethod("delete", "featuresPiek", function(obj, i = NULL, j = NULL, ...)
 {
     old <- obj
     obj <- callNextMethod()
+
+    if (length(obj@mzProfiles) > 0)
+    {
+        obj@mzProfiles <- obj@mzProfiles[intersect(names(obj@EIMs), analyses(obj))]
+        obj@mzProfiles <- Map(obj@mzProfiles, featureTable(obj), f = \(eims, ft) eims[intersect(names(eims), ft$ID)])
+    }
     
     if (length(obj@EIMs) > 0)
     {

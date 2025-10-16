@@ -2,6 +2,13 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
+#' @name feature-plotting
+NULL
+
+# NOTE/HACK: this file sets a lot of @name instead of @rdname roxygen tags, as it is parsed before other files and the
+# @name tag is otherwise ignored.
+
+
 ### Non-exported generics
 
 setGeneric("doGroupFeatures", function(feat, grouper, ..., verbose) standardGeneric("doGroupFeatures"))
@@ -45,69 +52,69 @@ setGeneric("initMSReadBackend", function(backend) standardGeneric("initMSReadBac
 
 ### Features and feature groups
 
-#' @rdname featureGroups-class
+#' @name featureGroups-class
 setGeneric("groupTable", function(object, ...) standardGeneric("groupTable"))
 
-#' @rdname featureGroups-class
+#' @name featureGroups-class
 setGeneric("groupFeatIndex", function(fGroups) standardGeneric("groupFeatIndex"))
 
-#' @rdname featureGroups-class
+#' @name featureGroups-class
 setGeneric("groupInfo", function(fGroups) standardGeneric("groupInfo"))
 
-#' @rdname featureGroups-class
+#' @name featureGroups-class
 setGeneric("unique", function(x, incomparables = FALSE, ...) standardGeneric("unique"))
 
-#' @rdname featureGroups-class
+#' @name featureGroups-class
 setGeneric("overlap", function(fGroups, which = NULL, aggregate = TRUE, exclusive = FALSE, ...) standardGeneric("overlap"))
 
-#' @rdname featureGroups-class
+#' @name featureGroups-class
 setGeneric("selectIons", function(fGroups, components, prefAdduct, ...) standardGeneric("selectIons"))
 
-#' @rdname featureGroups-compare
+#' @name featureGroups-compare
 setGeneric("comparison", function(..., groupAlgo,
                                   groupArgs = list(rtalign = FALSE)) standardGeneric("comparison"), signature = "...")
 
-#' @rdname feature-filtering
+#' @name feature-filtering
 setGeneric("replicateSubtract", function(fGroups, replicates, threshold = 0) standardGeneric("replicateSubtract"))
 
-#' @rdname featureGroups-class
+#' @name featureGroups-class
 setGeneric("groupQualities", function(fGroups) standardGeneric("groupQualities"))
 
-#' @rdname featureGroups-class
+#' @name featureGroups-class
 setGeneric("groupScores", function(fGroups) standardGeneric("groupScores"))
 
-#' @rdname featureGroups-class
+#' @name featureGroups-class
 setGeneric("internalStandards", function(fGroups) standardGeneric("internalStandards"))
 
-#' @rdname featureGroups-class
+#' @name featureGroups-class
 setGeneric("internalStandardAssignments", function(fGroups, ...) standardGeneric("internalStandardAssignments"))
 
-#' @rdname featureGroups-class
+#' @name featureGroups-class
 setGeneric("normInts", function(fGroups, featNorm = "none", groupNorm = FALSE, normFunc = max, standards = NULL,
                                 ISTDRTWindow = 120, ISTDMZWindow = 300, minISTDs = 3, ...) standardGeneric("normInts"))
 
-#' @rdname featureGroups-class
+#' @name featureGroups-class
 setGeneric("concentrations", function(fGroups, ...) standardGeneric("concentrations"))
 
-#' @rdname featureGroups-class
+#' @name featureGroups-class
 setGeneric("calculateConcs", function(fGroups, ...) standardGeneric("calculateConcs"))
 
-#' @rdname featureGroups-class
+#' @name featureGroups-class
 setGeneric("toxicities", function(fGroups, ...) standardGeneric("toxicities"))
 
-#' @rdname featureGroups-class
+#' @name featureGroups-class
 setGeneric("calculateTox", function(fGroups, ...) standardGeneric("calculateTox"))
 
-#' @rdname featureGroups-class
+#' @name featureGroups-class
 setGeneric("updateGroups", function(fGroups, ...) standardGeneric("updateGroups"))
 
-#' @rdname feature-plotting
+#' @name feature-plotting
 setGeneric("plotMobilograms", function(obj, ...) standardGeneric("plotMobilograms"))
 
-#' @rdname kpic2-conv
+#' @name kpic2-conv
 setGeneric("getPICSet", function(obj, ...) standardGeneric("getPICSet"))
 
-#' @rdname groupFeatures
+#' @name groupFeatures
 setGeneric("groupFeatures", function(obj, algorithm, ...) standardGeneric("groupFeatures"))
 
 #' @rdname groupFeaturesOpenMS
@@ -125,7 +132,7 @@ setGeneric("groupFeaturesKPIC2", function(feat, ...) standardGeneric("groupFeatu
 #' @rdname groupFeaturesGreedy
 setGeneric("groupFeaturesGreedy", function(feat, ...) standardGeneric("groupFeaturesGreedy"))
 
-#' @rdname check-GUI
+#' @name check-GUI
 setGeneric("checkFeatures", function(fGroups, session = "checked-features.yml", EICParams = getDefEICParams(),
                                      EIMParams = getDefEIMParams(),
                                      clearSession = FALSE) standardGeneric("checkFeatures"))
@@ -170,16 +177,16 @@ setGeneric("getXCMSnExp", function(obj, verbose = TRUE, ...) standardGeneric("ge
 
 ### MS Peak Lists
 
-#' @rdname MSPeakLists-class
+#' @name MSPeakLists-class
 setGeneric("peakLists", function(obj, ...) standardGeneric("peakLists"))
 
-#' @rdname MSPeakLists-class
+#' @name MSPeakLists-class
 setGeneric("averagedPeakLists", function(obj, ...) standardGeneric("averagedPeakLists"))
 
-#' @rdname MSPeakLists-class
+#' @name MSPeakLists-class
 setGeneric("spectrumSimilarity", function(obj, ...) standardGeneric("spectrumSimilarity"))
 
-#' @rdname MSPeakLists-class
+#' @name MSPeakLists-class
 setGeneric("spectrumSimilarityMobility", function(obj, ...) standardGeneric("spectrumSimilarityMobility"))
 
 #' @rdname generateMSPeakLists
@@ -197,16 +204,16 @@ setGeneric("generateMSPeakListsDAFMF", function(fGroups, ...) standardGeneric("g
 
 ### Components
 
-#' @rdname components-class
+#' @name components-class
 setGeneric("componentTable", function(obj) standardGeneric("componentTable"))
 
-#' @rdname components-class
+#' @name components-class
 setGeneric("componentInfo", function(obj) standardGeneric("componentInfo"))
 
-#' @rdname components-class
+#' @name components-class
 setGeneric("findFGroup", function(obj, fGroup) standardGeneric("findFGroup"))
 
-#' @rdname check-GUI
+#' @name check-GUI
 setGeneric("checkComponents", function(components, fGroups, session = "checked-components.yml",
                                        EICParams = getDefEICParams(),
                                        clearSession = FALSE) standardGeneric("checkComponents"))
@@ -239,7 +246,7 @@ setGeneric("generateComponentsSpecClust", function(fGroups, ...) standardGeneric
 #' @rdname generateComponentsTPs
 setGeneric("generateComponentsTPs", function(fGroups, ...) standardGeneric("generateComponentsTPs"))
 
-#' @rdname components-class
+#' @name components-class
 setGeneric("expandForIMS", function(obj, ...) standardGeneric("expandForIMS"))
 
 
@@ -260,11 +267,11 @@ setGeneric("generateFormulasDA", function(fGroups, ...) standardGeneric("generat
 
 ### Compounds
 
-#' @rdname compounds-class
+#' @name compounds-class
 setGeneric("addFormulaScoring", function(compounds, formulas, updateScore = FALSE,
                                          formulaScoreWeight = 1) standardGeneric("addFormulaScoring"))
 
-#' @rdname compoundsMF-class
+#' @name compoundsMF-class
 setGeneric("settings", function(compoundsMF) standardGeneric("settings"))
 
 #' @rdname generateCompounds
@@ -280,29 +287,29 @@ setGeneric("generateCompoundsSIRIUS", function(fGroups, ...) standardGeneric("ge
 #' @rdname generateCompoundsLibrary
 setGeneric("generateCompoundsLibrary", function(fGroups, ...) standardGeneric("generateCompoundsLibrary"))
 
-#' @rdname patRoon-defunct
+#' @name patRoon-defunct
 setGeneric("compoundViewer", function(fGroups, MSPeakLists, compounds) standardGeneric("compoundViewer"))
 
 ### clustering
 
 #' @param \dots further arguments specified to methods.
-#' @rdname compounds-cluster
+#' @name compounds-cluster
 setGeneric("makeHCluster", function(obj, method = "complete", ...) standardGeneric("makeHCluster"))
 
-#' @rdname componentsIntClust-class
+#' @name componentsIntClust-class
 setGeneric("plotHeatMap", function(obj, ...) standardGeneric("plotHeatMap"))
 
 ### Sets
 
-#' @rdname makeSet
+#' @name makeSet
 setGeneric("makeSet", function(obj, ...) standardGeneric("makeSet"))
 
 ### TP generation
 
-#' @rdname transformationProducts-class
+#' @name transformationProducts-class
 setGeneric("parents", function(TPs) standardGeneric("parents"))
 
-#' @rdname transformationProducts-class
+#' @name transformationProducts-class
 setGeneric("products", function(TPs) standardGeneric("products"))
 
 #' @param \dots Further arguments specified to the methods.
@@ -311,11 +318,11 @@ setGeneric("generateTPsLogic", function(fGroups, minMass = 40, ...) standardGene
 
 ### suspect screening
 
-#' @rdname featureGroupsScreening-class
+#' @name featureGroupsScreening-class
 setGeneric("screenInfo", function(obj) standardGeneric("screenInfo"))
 
 #' @param \dots Further arguments specified to the methods.
-#' @rdname suspect-screening
+#' @name suspect-screening
 setGeneric("screenSuspects", function(fGroups, suspects, rtWindow = defaultLim("retention", "medium"),
                                       mzWindow = defaultLim("mz", "medium"), IMSMatchParams = NULL,
                                       adduct = NULL, skipInvalid = TRUE, prefCalcChemProps = TRUE,
@@ -324,30 +331,30 @@ setGeneric("screenSuspects", function(fGroups, suspects, rtWindow = defaultLim("
 
 ### Optimization
 
-#' @rdname optimizationResult-class
+#' @name optimizationResult-class
 setGeneric("optimizedParameters", function(object, paramSet = NULL, DoEIteration = NULL) standardGeneric("optimizedParameters"))
 
-#' @rdname optimizationResult-class
+#' @name optimizationResult-class
 setGeneric("optimizedObject", function(object, paramSet = NULL) standardGeneric("optimizedObject"))
 
-#' @rdname optimizationResult-class
+#' @name optimizationResult-class
 setGeneric("scores", function(object, paramSet = NULL, DoEIteration = NULL) standardGeneric("scores"))
 
-#' @rdname optimizationResult-class
+#' @name optimizationResult-class
 setGeneric("experimentInfo", function(object, paramSet, DoEIteration) standardGeneric("experimentInfo"))
 
 
 ### MS library
 
-#' @rdname MSLibrary-class
+#' @name MSLibrary-class
 setGeneric("records", function(obj) standardGeneric("records"))
 
-#' @rdname MSLibrary-class
+#' @name MSLibrary-class
 setGeneric("spectra", function(obj) standardGeneric("spectra"))
 
 ### Reporting
 
-#' @rdname reporting-legacy
+#' @name reporting-legacy
 setGeneric("reportCSV", function(fGroups, path = "report", reportFeatures = FALSE, formulas = NULL,
                                  formulasNormalizeScores = "max", formulasExclNormScores = NULL,
                                  compounds = NULL, compoundsNormalizeScores = "max",
@@ -355,7 +362,7 @@ setGeneric("reportCSV", function(fGroups, path = "report", reportFeatures = FALS
                                                              "annotHitCount", "libMatch"),
                                  compsCluster = NULL, components = NULL,
                                  retMin = TRUE, clearPath = FALSE) standardGeneric("reportCSV"))
-#' @rdname reporting-legacy
+#' @name reporting-legacy
 setGeneric("reportPDF", function(fGroups, path = "report", reportFGroups = TRUE,
                                  formulas = NULL, formulasTopMost = 5,
                                  formulasNormalizeScores = "max", formulasExclNormScores = NULL,
@@ -368,7 +375,7 @@ setGeneric("reportPDF", function(fGroups, path = "report", reportFGroups = TRUE,
                                  EICGrid = c(2, 1), EICParams = getDefEICParams(window = 20, topMost = 1,
                                                                                 topMostByReplicate = TRUE),
                                  clearPath = FALSE) standardGeneric("reportPDF"))
-#' @rdname reporting
+#' @name reporting
 setGeneric("report", function(fGroups, MSPeakLists = NULL, formulas = NULL, compounds = NULL, compsCluster = NULL,
                               components = NULL, TPs = NULL,
                               settingsFile = system.file("report", "settings.yml", package = "patRoon"),
@@ -402,7 +409,7 @@ setGeneric("report", function(fGroups, MSPeakLists = NULL, formulas = NULL, comp
 NULL
 
 #' @param \dots Method specific arguments.
-#' @rdname id-conf
+#' @name id-conf
 setGeneric("estimateIDConfidence", function(obj, ...) standardGeneric("estimateIDConfidence"))
 
 

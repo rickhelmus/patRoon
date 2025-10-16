@@ -5,7 +5,7 @@
 #' @include feature_groups.R
 NULL
 
-#' @rdname importFeatureGroupsBrukerTASQ
+#' @name importFeatureGroupsBrukerTASQ
 featureGroupsBrukerTASQ <- setClass("featureGroupsBrukerTASQ", contains = "featureGroups")
 
 setMethod("initialize", "featureGroupsBrukerTASQ",

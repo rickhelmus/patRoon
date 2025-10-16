@@ -309,7 +309,7 @@ setMethod("assignMobilities", "featureGroupsSet", function(obj, mobPeakParams = 
                                                            peakRTWindow = defaultLim("retention", "narrow"),
                                                            fallbackEIC = TRUE, calcArea = "integrate",
                                                            IMSWindow = defaultLim("mobility", "medium"),
-                                                           CCSParams = NULL, parallel = TRUE)
+                                                           CCSParams = NULL, parallel = "maybe")
 {
     # NOTE: keep args in sync with other methods
     

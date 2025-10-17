@@ -23,7 +23,7 @@ emptyMSPeakList <- function(abundanceColumn, avgCols)
 #' specified as a named \code{list} with the following values: \itemize{
 #'
 #' \item \code{method},\code{clusterMzWindow} The cluster method and window (see \link[=cluster-params]{clustering
-#' parameters}) used to average mass spectra. \code{clusterMzWindow} is defaulted as \code{defaultLim("mz", "narrow")} (see
+#' parameters}) used to average mass spectra. \code{clusterMzWindow} is defaulted as \code{defaultLim("mz", "medium")} (see
 #' \link{limits}).
 #'
 #' \item \code{topMost} Only retain this maximum number of MS peaks when generating averaged spectra. Lowering this
@@ -74,7 +74,7 @@ emptyMSPeakList <- function(abundanceColumn, avgCols)
 #' @export
 getDefAvgPListParams <- function(...)
 {
-    def <- list(clusterMzWindow = defaultLim("mz", "narrow"),
+    def <- list(clusterMzWindow = defaultLim("mz", "medium"),
                 topMost = 50,
                 minIntensityPre = 500,
                 minIntensityPost = 500,

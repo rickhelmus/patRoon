@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2016-2025 Rick Helmus <r.helmus@uva.nl>
+#
+# SPDX-License-Identifier: GPL-3.0-only
+
 #' Launch EIC/EIM GUI
 #'
 #' Launches a Shiny app for generating and plotting EICs and EIMs.

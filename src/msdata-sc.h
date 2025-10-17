@@ -1,3 +1,9 @@
+/*
+ * SPDX-FileCopyrightText: 2016-2025 Rick Helmus <r.helmus@uva.nl>
+ *
+ * SPDX-License-Identifier: GPL-3.0-only
+ */
+
 #ifndef PATROON_SC_H
 #define PATROON_SC_H
 

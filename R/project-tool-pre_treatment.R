@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2016-2025 Rick Helmus <r.helmus@uva.nl>
+#
+# SPDX-License-Identifier: GPL-3.0-only
+
 joinConvTypeFormat <- function(t, f) paste0(t, "+", f)
 splitConvTypeFormat <- function(typeFormat) strsplit(typeFormat, "+", fixed = TRUE)
 

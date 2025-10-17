@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2016-2025 Rick Helmus <r.helmus@uva.nl>
+#
+# SPDX-License-Identifier: GPL-3.0-only
+
 makeAnaInfoR <- function(anaInfo, varName = NULL)
 {
     # NOTE: for constructive we convert to a data.frame to avoid need for data.table and allow read.table() to

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2016-2025 Rick Helmus <r.helmus@uva.nl>
+#
+# SPDX-License-Identifier: GPL-3.0-only
+
 getFeatAlgoSelections <- function()
 {
     c("OpenMS", "XCMS", "enviPick", "SIRIUS", "KPIC2", "piek", "Bruker DataAnalysis" = "Bruker")

@@ -39,3 +39,4 @@ src/patRoon.so
 .vscode/settings.json
 .gitignore
 .DS_Store
+.vscode

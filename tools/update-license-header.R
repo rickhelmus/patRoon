@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2016 - 2025 Rick Helmus <r.helmus@uva.nl>
+# SPDX-FileCopyrightText: 2016-2025 Rick Helmus <r.helmus@uva.nl>
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
@@ -32,7 +32,7 @@ local({
     
     annotateFiles(c("tests/testthat.R", "tests/testthat/*.R"))
     
-    annotateFiles(c("tools/update-license-header.R", "data-raw/prepare-data.R"))
+    annotateFiles(c("tools/update-license-header.R", "tools/build_flags.R", "data-raw/prepare-data.R"))
     
     # verify --> REUSE.toml lists licensisng for other files
     system2("reuse", "lint", stdout = "", stderr = "")

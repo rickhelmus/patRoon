@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2016-2025 Rick Helmus <r.helmus@uva.nl>
+#
+# SPDX-License-Identifier: GPL-3.0-only
+
 textNote <- function(txt) div(style = "margin: 8px 0 12px; font-size: small", txt)
 
 makeNewProjectHOT <- function(...)

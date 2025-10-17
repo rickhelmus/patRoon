@@ -17,7 +17,7 @@
     - switch to PCL w/ CCSbase in patRoonExt
 - BUG: annSim.1 column (in formulas?)?
 - fix default IDLs
-- update REUSE
+- update REUSE --> fill in license for SC
 - Harmonize/consistent names
     - maxMSRtWindow --> maxMSRTWindow
     - be consistent in mobility vs IMS and mobilograms and EIMs

@@ -23,3 +23,39 @@ path = ["src/pugixml/**"]
 precedence = "closest"
 SPDX-FileCopyrightText = "2006-2022 Arseny Kapoulkine <arseny.kapoulkine@gmail.com>"
 SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = ["src/cpp-base64/**"]
+precedence = "closest"
+SPDX-FileCopyrightText = "2004-2017 René Nyffenegger"
+SPDX-License-Identifier = "Zlib"
+
+[[annotations]]
+path = ["src/hclust-cpp/**"]
+precedence = "closest"
+SPDX-FileCopyrightText = "2020 Christoph Dalitz and 2011 Daniel Müllner"
+SPDX-License-Identifier = "BSD-2-Clause"
+
+[[annotations]]
+path = ["src/opentims++/sqlite/**"]
+precedence = "closest"
+SPDX-FileCopyrightText = ""
+SPDX-License-Identifier = "blessing"
+
+[[annotations]]
+path = ["src/opentims++/zstd/**"]
+precedence = "closest"
+SPDX-FileCopyrightText = "2016-2020 Yann Collet"
+SPDX-License-Identifier = "BSD-3-Clause OR GPL-2.0-only"
+
+[[annotations]]
+path = ["src/opentims++/**"]
+precedence = "closest"
+SPDX-FileCopyrightText = "2016-2020 Yann Collet"
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = ["src/StreamCraft/**"]
+precedence = "closest"
+SPDX-FileCopyrightText = "2016-2020 Ricardo Cunha"
+SPDX-License-Identifier = "MIT"

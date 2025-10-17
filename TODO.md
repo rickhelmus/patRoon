@@ -30,7 +30,6 @@
 - FIX: IMSRangeParams: in sets workflows, the mz column is taken so relative filtering is done to neutralMasses
     - maybe add _mz rel column like compounds?
     - actually, the same is the case for the mz filter (also IMS and mz for features) --> maybe just document difference? the actual results will not change much in general
-- revert default clusterMzWindow back to 0.005, or a least for IMS
 - TC convert: doc that centroid mode is used for IMS conversion (and/or make it optional?)
 
 
@@ -415,7 +414,6 @@
         - size optimizations, mainly for self contained (lzstring, no duplicate images)
         - candidate column in CSV of pred tables now doesn't contain images
 - limits
-    - lowered clusterMzWindow
 - sets names are now checked to not contain any special characters (besides underscores). Automatic labels are now separated by underscores instead of dots.
 - FIXED: SIRIUS with calculateFeatures=T may sometimes fail due to file name truncation
 - generateAnalysisInfo()

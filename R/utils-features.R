@@ -684,7 +684,7 @@ findPeaksInEICs <- function(EICs, peakParams, withMobility, calcStats, assignRTW
         peaks[, EIC_ID := character()]
         peaks[, c("retmin", "retmax", "ret", "area", "intensity") := numeric()]
         if (calcStats)
-            peaks[, c("mzmin", "mzmax", "mz", "mzBP") := numeric()]
+            peaks[, c("mzmin", "mzmax", "mz", "mzBP", "mzMax", "mzBPMax") := numeric()]
         if (withMobility)
         {
             if (calcStats)
@@ -696,7 +696,8 @@ findPeaksInEICs <- function(EICs, peakParams, withMobility, calcStats, assignRTW
     }
     else if (calcStats)
     {
-        peaks[, c("mzmin", "mzmax", "mz", "mobmin", "mobmax", "mobility", "mobilityBP", "mobilityMax", "mobilityBPMax") := {
+        peaks[, c("mzmin", "mzmax", "mz", "mzBP", "mzMax", "mzBPMax",
+                  "mobmin", "mobmax", "mobility", "mobilityBP", "mobilityMax", "mobilityBPMax") := {
             eic <- EICs[[EIC_ID]]
             eicWide <- eic[numGTETol(eic[, "time"], retmin) & numLTETol(eic[, "time"], retmax), , drop = FALSE]
             eicNarrow <- eic[numGTETol(eic[, "time"], max(retmin, ret - assignRTWindow)) & numLTETol(eic[, "time"], min(retmax, ret + assignRTWindow)), , drop = FALSE]
@@ -709,11 +710,14 @@ findPeaksInEICs <- function(EICs, peakParams, withMobility, calcStats, assignRTW
                     eicWide <- cbind(eicWide, mobmin = NA, mobmax = NA)
                     eicNarrow <- cbind(eicNarrow, mobility = NA, mobilityBP = NA)
                 }
+                whm <- which.max(eicNarrow[, "intensity"])
                 list(min(eicWide[, "mzmin"]), max(eicWide[, "mzmax"]), weighted.mean(eicNarrow[, "mzBP"], eicNarrow[, "intensity"]),
+                     weighted.mean(eicNarrow[, "mzBP"], eicNarrow[, "intensity"]),
+                     eicNarrow[whm, "mz"], eicNarrow[whm, "mzBP"],
                      min(eicWide[, "mobmin"]), max(eicWide[, "mobmax"]),
                      weighted.mean(eicNarrow[, "mobility"], eicNarrow[, "intensity"]),
                      weighted.mean(eicNarrow[, "mobilityBP"], eicNarrow[, "intensity"]),
-                     eicNarrow[which.max(eicNarrow[, "intensity"]), "mobility"], eicNarrow[which.max(eicNarrow[, "intensity"]), "mobilityBP"])
+                     eicNarrow[whm, "mobility"], eicNarrow[whm, "mobilityBP"])
             }
         }, by = seq_len(nrow(peaks))]
         

@@ -268,6 +268,7 @@
         - EIM & frame summing and smoothing, and other new options
         - EIM saving: always stores EIM at feat RT, irrespective of mobAssignMethod/mobAggrMethod
         - mention that frame data is summed to get mz data?
+        - further explain assignMethod/assignAggr, eg guide when to use what depending on frame summing
     - assignMobilities()
         - refs to paper
         - fGroups method

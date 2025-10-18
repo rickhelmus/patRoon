@@ -153,15 +153,15 @@ setMethod("delete", "featuresPiek", function(obj, i = NULL, j = NULL, ...)
 #'   \link[=suspect-screening]{suspect screening} for details on the suspect list format.
 #' @param adduct An \code{\link{adduct}} object (or something that can be converted to it with \code{\link{as.adduct}}).
 #'   Examples: \code{"[M-H]-"}, \code{"[M+Na]+"}. Only needs to be specified when EICs are formed from suspect data.
-#' @param mobAssignMethod \IMSWF Should be \code{"basepeak"} or \code{"weighted.mean"}. This parameter sets how measured
-#'   mobilities across the EIC datapoints are used to determine the mobility for a feature. If
-#'   \code{mobAssignMethod="basepeak"}, then the mobility of the base peak (=highest intensity peak) from each EIC
-#'   datapoint is collected. If \code{mobAssignMethod="weighted.mean"} then the intensity weighted mean is calculated of
-#'   the mobilities that fall within the EIC bin.
-#' @param mobAssignAggr \IMSWF Should be \code{"max"} or \code{"weighted.mean"}. This parameter sets how the mobilities
-#'   determined for each datapoint (see \code{mobAssignMethod}) are aggregated to determine the final mobility for the
-#'   feature. If \code{mobAssignAggr="weighted.mean"} then the intensity weighted mean is used. With
-#'   \code{mobAssignAggr="max"} the mobility data at the the highest intensity of the chromatographic peak is taken.
+#' @param assignMethod Should be \code{"basepeak"} or \code{"weighted.mean"}. This parameter sets how measured
+#'   \emph{m/z} or mobilities across the EIC datapoints are handled for feature assignment. If
+#'   \code{assignMethod="basepeak"}, then the value of the base peak (=highest intensity peak) from each EIC datapoint
+#'   is taken. If \code{assignMethod="weighted.mean"} then the intensity weighted mean is calculated of the values that
+#'   fall within the EIC bin.
+#' @param assignAggr Should be \code{"max"} or \code{"weighted.mean"}. This parameter sets how the \emph{m/z} or
+#'   mobility values determined for each datapoint (see \code{assignMethod}) are aggregated to determine the final
+#'   feature value. If \code{assignAggr="weighted.mean"} then the intensity weighted mean is used. With
+#'   \code{assignAggr="max"} the data at the the highest intensity of the chromatographic peak is taken.
 #'
 #' @inheritParams findFeatures
 #' @template minIntensityIMS-arg
@@ -302,7 +302,7 @@ setMethod("delete", "featuresPiek", function(obj, i = NULL, j = NULL, ...)
 #'
 #' @export
 findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = NULL, adduct = NULL,
-                             mobAssignMethod = "basepeak", mobAssignAggr = "weighted.mean", minIntensityIMS = 25,
+                             assignMethod = "basepeak", assignAggr = "weighted.mean", minIntensityIMS = 25,
                              prefDupIntensityRatio = 0.5, assignRTWindow = defaultLim("retention", "very_narrow"),
                              verbose = TRUE)
 {
@@ -320,8 +320,8 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
     if (genEICParams$methodMZ == "suspects")
         assertSuspectList(suspects, needsAdduct = is.null(adduct), skipInvalid = genEICParams$skipInvalid, null.ok = FALSE,
                           add = ac)
-    checkmate::assertChoice(mobAssignMethod, c("basepeak", "weighted.mean"), add = ac)
-    checkmate::assertChoice(mobAssignAggr, c("max", "weighted.mean"), add = ac)
+    checkmate::assertChoice(assignMethod, c("basepeak", "weighted.mean"), add = ac)
+    checkmate::assertChoice(assignAggr, c("max", "weighted.mean"), add = ac)
     aapply(checkmate::assertNumber, . ~ minIntensityIMS + prefDupIntensityRatio + assignRTWindow, lower = 0,
            finite = TRUE, fixed = list(add = ac))
     checkmate::assertFlag(verbose, add = ac)
@@ -379,7 +379,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
     withIMS <- !is.null(genEICParams[["methodIMS"]])
     
     cacheDB <- openCacheDBScope()
-    baseHash <- makeHash(genEICParams, peakParams, suspects, adduct, mobAssignMethod, mobAssignAggr, minIntensityIMS,
+    baseHash <- makeHash(genEICParams, peakParams, suspects, adduct, assignMethod, assignAggr, minIntensityIMS,
                          prefDupIntensityRatio, assignRTWindow)
     anaHashes <- getMSFileHashesFromAvailBackend(analysisInfo, needIMS = withIMS)
     anaHashes <- sapply(anaHashes, makeHash, baseHash)
@@ -407,6 +407,32 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
         if (mode != "test")
             ret <- pruneList(ret, checkZeroRows = TRUE, keepAttr = TRUE)
         return(ret)
+    }
+    
+    assignMZOrMobsToPeaks <- function(peaks, EICInfo, what)
+    {
+        chkCol <- paste0(what, if (assignAggr == "max") "BPMax" else "BP")
+        minCol <- if (what == "mz") "mzmin" else "mobmin"
+        centCol <- paste0(what, "Centered")
+        step <- if (what == "mz") genEICParams$mzStep else genEICParams$mobStep
+        peaks[, binStart := EICInfo[match(peaks$EIC_ID, EIC_ID)][[minCol]]]
+        peaks[, (centCol) := between(get(chkCol), binStart + step/4, binStart + step/4*3)]
+        if (assignAggr == "max")
+        {
+            if (assignMethod == "basepeak")
+                peaks[, (what) := get(paste0(what, "BPMax"))]
+            else
+                peaks[, (what) := get(paste0(what, "Max"))]
+        }
+        else # assignAggr == "weighted.mean"
+        {
+            if (assignMethod == "basepeak")
+                peaks[, (what) := get(paste0(what, "BP"))]
+            # else already weighted mean
+        }
+        # NOTE: centered is kept and removed later to allow filtering redundant peaks
+        peaks[, c(paste0(what, c("BP", "BPMax", "Max")), "binStart") := NULL]
+        return(peaks)
     }
     
     getIMSProfiles <- function(profAttr, peaks, EICs, EICInfo)
@@ -499,33 +525,18 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
                                      logPath = file.path("log", "featEICs", paste0(ana, ".txt")), cacheDB = cacheDB)
             maybePrintf("Done! Found %d peaks.\n", nrow(peaks))
 
-            # only keep those peaks with m/z in the "center" of the analyzed m/z and mobility range
-            peaks[, binMZStart := EICInfo[match(peaks$EIC_ID, EIC_ID)]$mzmin]
-            peaks[, mzCentered := between(mz, binMZStart + genEICParams$mzStep/4, binMZStart + genEICParams$mzStep/4*3)]
-            # peaks <- peaks[between(mz, binMZStart + genEICParams$mzStep/4, binMZStart + genEICParams$mzStep/4*3) == TRUE]
+            peaks <- assignMZOrMobsToPeaks(peaks, EICInfo, "mz")
             if (withIMS)
-            {
-                chkCol <- if (mobAssignAggr == "max") "mobilityBPMax" else "mobilityBP"
-                peaks[, binMobStart := EICInfo[match(peaks$EIC_ID, EIC_ID)]$mobmin]
-                peaks[, mobCentered := between(get(chkCol), binMobStart + genEICParams$mobStep/4,
-                                               binMobStart + genEICParams$mobStep/4*3)]
-                # peaks <- peaks[between(get(chkCol), binMobStart + genEICParams$mobStep/4, binMobStart + genEICParams$mobStep/4*3) == TRUE]
-                
-                if (mobAssignAggr == "max")
-                {
-                    if (mobAssignMethod == "basepeak")
-                        peaks[, mobility := mobilityBPMax]
-                    else
-                        peaks[, mobility := mobilityMax]
-                }
-                else # mobAssignAggr == "weighted.mean"
-                {
-                    if (mobAssignMethod == "basepeak")
-                        peaks[, mobility := mobilityBP]
-                    # else peaks$mobility is already weighted mean
-                }
-                peaks[, c("mobilityBP", "mobilityMax", "mobilityBPMax") := NULL]
-            }
+                peaks <- assignMZOrMobsToPeaks(peaks, EICInfo, "mobility")
+            
+            dups <- findFeatTableDups(peaks$ret, peaks$retmin, peaks$retmax,  peaks$mz,
+                                      if (withIMS) peaks$mobility else numeric(),
+                                      peaks$intensity, defaultLim("retention", "narrow"),
+                                      genEICParams$mzStep / 2, genEICParams$mobStep / 2,
+                                      peaks$mzCentered, if (withIMS) peaks$mobilityCentered else numeric(),
+                                      prefDupIntensityRatio)
+            peaks <- peaks[!dups]
+            
             if (genEICParams$methodMZ == "suspects")
             {
                 # only keep peaks that match with a suspect
@@ -557,14 +568,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
                 peaks <- peaks[keep == TRUE]
             }
 
-            dups <- findFeatTableDups(peaks$ret, peaks$retmin, peaks$retmax,  peaks$mz,
-                                      if (withIMS) peaks$mobility else numeric(),
-                                      peaks$intensity, defaultLim("retention", "narrow"),
-                                      genEICParams$mzStep / 2, genEICParams$mobStep / 2,
-                                      peaks$mzCentered, if (withIMS) peaks$mobCentered else numeric(),
-                                      prefDupIntensityRatio)
-            peaks <- peaks[!dups]
-            peaks <- removeDTColumnsIfPresent(peaks, c("binMZStart", "binMobStart", "mzCentered", "mobCentered", "keep"))
+            peaks <- removeDTColumnsIfPresent(peaks, c("mzCentered", "mobilityCentered", "keep"))
 
             maybePrintf("%d peaks remain after filtering.\n", nrow(peaks))            
             

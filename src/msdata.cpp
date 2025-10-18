@@ -705,8 +705,8 @@ Rcpp::List getEIMList(const MSReadBackend &backend, const std::vector<SpectrumRa
         std::map<SpectrumRawTypes::Mobility, SpectrumRawTypes::Intensity> sumEIMMap;
         for (const EIM &eim : allEIMs[i])
         {
-            for (size_t i=0; i<eim.size(); ++i)
-                sumEIMMap[eim.mobilities[i]] += eim.intensities[i];
+            for (size_t j=0; j<eim.size(); ++j)
+                sumEIMMap[eim.mobilities[j]] += eim.intensities[j];
         }
         
         // convert from map
@@ -719,16 +719,16 @@ Rcpp::List getEIMList(const MSReadBackend &backend, const std::vector<SpectrumRa
         if (compress && EIMSize >= 3) // we always keep first/last point, so need >=3 points
         {
             EIM comprEIM;
-            for (size_t i=0; i<EIMSize; ++i)
+            for (size_t j=0; j<EIMSize; ++j)
             {
                 // if current intensity == 0, is not the first point, and is not the last point to check.
-                if (sumEIM.intensities[i] == 0 && i == 0 && i < (EIMSize-1))
+                if (sumEIM.intensities[j] == 0 && j != 0 && j < (EIMSize-1))
                 {
-                    const auto prevInt = comprEIM.intensities.back(), nextInt = sumEIM.intensities[i+1];
+                    const auto prevInt = comprEIM.intensities.back(), nextInt = sumEIM.intensities[j+1];
                     if (prevInt == 0 && nextInt == 0)
                         continue; // skip points with zero intensities that are neighbored by others.
                 }
-                comprEIM.append(sumEIM.mobilities[i], sumEIM.intensities[i]);
+                comprEIM.append(sumEIM.mobilities[j], sumEIM.intensities[j]);
             }
             summedEIMs[i] = std::move(comprEIM);
         }

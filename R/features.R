@@ -285,7 +285,6 @@ setMethod("filter", "features", function(obj, absMinIntensity = NULL, relMinInte
 
             if (!is.null(IMSRangeParams))
             {
-                # UNDONE: CCS feature assignment isn't actually supported yet
                 if (is.null(ft[["CCS"]]) && IMSRangeParams$param == "CCS")
                     stop("Cannot apply IMS Range filter: no CCS values assigned", call. = FALSE)
                 

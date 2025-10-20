@@ -22,13 +22,21 @@ exDataFiles <- list.files(patRoonData::exampleDataPath(), "\\.mzML$", full.names
 epAnaInfo <- makeMZXMLs(anaInfoOne)
 ffEP <- findFeatures(epAnaInfo, "envipick", minpeak = 25)
 
-getPiek <- \(genp, peakp = getDefPeakParams("chrom", "piek"), ...) findFeatures(anaInfoOne, "piek", genp, peakp, ...)
-ffPiekBins <- getPiek(getPiekGenEICParams("bins", mzRange = c(200, 300)))
-ffPiekSusp <- getPiek(getPiekGenEICParams("suspects"), suspects = patRoonData::suspectsPos)
-ffPiekMS2 <- getPiek(getPiekGenEICParams("ms2"))
-ffPiekMS2OpenMS <- getPiek(getPiekGenEICParams("ms2"), getDefPeakParams("chrom", "openms"))
-ffPiekMS2XCMS3 <- getPiek(getPiekGenEICParams("ms2"), getDefPeakParams("chrom", "xcms3"))
-ffPiekMS2EP <- getPiek(getPiekGenEICParams("ms2"), getDefPeakParams("chrom", "envipick"))
+getPiek <- \(genp, anaInfo, peakp = getDefPeakParams("chrom", "piek"), ...) findFeatures(anaInfo, "piek", genp, peakp, ...)
+getPiekHRMS <- \(genp, ...) getPiek(genp, anaInfoOne, ...)
+ffPiekBins <- getPiekHRMS(getPiekGenEICParams("bins", mzRange = c(200, 300)))
+ffPiekSusp <- getPiekHRMS(getPiekGenEICParams("suspects"), suspects = patRoonData::suspectsPos)
+ffPiekMS2 <- getPiekHRMS(getPiekGenEICParams("ms2"))
+ffPiekMS2OpenMS <- getPiekHRMS(getPiekGenEICParams("ms2"), getDefPeakParams("chrom", "openms"))
+ffPiekMS2XCMS3 <- getPiekHRMS(getPiekGenEICParams("ms2"), getDefPeakParams("chrom", "xcms3"))
+ffPiekMS2EP <- getPiekHRMS(getPiekGenEICParams("ms2"), getDefPeakParams("chrom", "envipick"))
+
+anaInfoOneIMS <- getTestAnaInfoIMS()[4, ]
+getPiekIMS <- \(genp, ...) getPiek(genp, anaInfoOneIMS, ...)
+ffPiekBinsIMS <- getPiekIMS(getPiekGenEICParams("bins", "bins", mzRange = c(200, 300), mobRange = c(0.6, 0.8)))
+ffPiekSuspIMS <- getPiekIMS(getPiekGenEICParams("suspects", "suspects"), suspects = patRoonDataIMS::suspectsPos,
+                            adduct = "[M+H]+")
+ffPiekMS2IMS <- getPiekIMS(getPiekGenEICParams("ms2", "ms2"))
 
 ffOpenMSQ <- calculatePeakQualities(ffOpenMS)
 
@@ -86,6 +94,9 @@ test_that("piek", {
     expect_known_value(featureTable(ffPiekMS2OpenMS), testFile("ff-piek-ms2-openms"))
     expect_known_value(featureTable(ffPiekMS2XCMS3), testFile("ff-piek-ms2-xcms3"))
     expect_known_value(featureTable(ffPiekMS2EP), testFile("ff-piek-ms2-envipick"))
+    expect_known_show(ffPiekBinsIMS, testFile("ff-show-piek-bins-ims", text = TRUE))
+    expect_known_show(ffPiekSuspIMS, testFile("ff-show-piek-suspects-ims", text = TRUE))
+    expect_known_show(ffPiekMS2IMS, testFile("ff-show-piek-ms2-ims", text = TRUE))
     
     expect_known_show(ffPiekBins, testFile("ff-show-piek-bins", text = TRUE))
     expect_known_show(ffPiekSusp, testFile("ff-show-piek-suspects", text = TRUE))
@@ -93,15 +104,25 @@ test_that("piek", {
     expect_known_show(ffPiekMS2OpenMS, testFile("ff-show-piek-ms2-openms", text = TRUE))
     expect_known_show(ffPiekMS2XCMS3, testFile("ff-show-piek-ms2-xcms3", text = TRUE))
     expect_known_show(ffPiekMS2EP, testFile("ff-show-piek-ms2-envipick", text = TRUE))
+    expect_known_value(featureTable(ffPiekBinsIMS), testFile("ff-piek-bins-ims"))
+    expect_known_value(featureTable(ffPiekSuspIMS), testFile("ff-piek-suspects-ims"))
+    expect_known_value(featureTable(ffPiekMS2IMS), testFile("ff-piek-ms2-ims"))
     
-    expect_range(as.data.table(ffPiekBins)$mz, c(200, 300))
+    expect_range(as.data.table(ffPiekBins)$mz, c(200, 300+0.02)) # +0.02: bin width
     expect_lte(length(ffPiekSusp), nrow(patRoonData::suspectsPos))
-    expect_gt(length(ffPiekMS2), length(getPiek(getPiekGenEICParams("ms2", minTIC = 1E5))))
+    expect_gt(length(ffPiekMS2), length(getPiekHRMS(getPiekGenEICParams("ms2", minTIC = 1E5))))
+
+    expect_true(hasMobilities(ffPiekBinsIMS))
+    expect_false(hasMobilities(ffPiekBins))
+    expect_range(as.data.table(ffPiekBinsIMS)$mz, c(200, 300+0.02))
+    expect_range(as.data.table(ffPiekBinsIMS)$mobility, c(0.6, 0.8+0.04))
+    expect_lte(length(ffPiekSuspIMS), nrow(patRoonData::suspectsPos))
+    expect_gt(length(ffPiekMS2IMS), length(getPiekIMS(getPiekGenEICParams("ms2", "ms2", minTIC = 1E5))))
     
-    expect_range(as.data.table(getPiek(getPiekGenEICParams("ms2", retRange = c(60, 120))))$ret, c(60, 120))
-    expect_lt(length(getPiek(getPiekGenEICParams("ms2", minEICIntensity = 1E5))), length(ffPiekMS2))
-    expect_lt(length(getPiek(getPiekGenEICParams("ms2", topMostEICMZ = 25))), length(ffPiekMS2))
-    expect_lte(max(getPiek(getPiekGenEICParams("ms2"), getDefPeakParams("chrom", "piek", forcePeakWidth = c(0, 10)))[[1]][, retmax - retmin]), 10)
+    expect_range(as.data.table(getPiekHRMS(getPiekGenEICParams("ms2", retRange = c(60, 120))))$ret, c(60, 120))
+    expect_lt(length(getPiekHRMS(getPiekGenEICParams("ms2", minEICIntensity = 1E5))), length(ffPiekMS2))
+    expect_lt(length(getPiekHRMS(getPiekGenEICParams("ms2", topMostEICMZ = 25))), length(ffPiekMS2))
+    expect_lte(max(getPiekHRMS(getPiekGenEICParams("ms2"), getDefPeakParams("chrom", "piek", forcePeakWidth = c(0, 10)))[[1]][, retmax - retmin]), 10)
 })
 
 test_that("verify empty object can be generated", {
@@ -174,6 +195,13 @@ test_that("delete and filter", {
                         testFile("ff-combi-neg", text = TRUE))
     expect_length(filter(ffEmpty, absMinIntensity = 500, retentionRange = c(120, Inf),
                          mzRange = c(100, 400)), 0)
+    
+    expect_range(as.data.table(filter(ffPiekBinsIMS, IMSRangeParams = getIMSRangeParams("mobility", 0.65, 0.75)))$mobility,
+                 c(0.65, 0.75))
+    expect_range(as.data.table(filter(ffPiekBinsIMS, IMSRangeParams = getIMSRangeParams("mobility", 0.0025, 0.003, TRUE)))[, mobility / mz],
+                 c(0.0025, 0.003))
+    expect_equivalent(filter(ffPiekBinsIMS, IMSRangeParams = getIMSRangeParams("mobility", 0, 10)), ffPiekBinsIMS)
+    expect_error(filter(ffPiekBinsIMS, IMSRangeParams = getIMSRangeParams("CCS", 0, 1000)), "CCS") # no CCS calculated
 })
 
 test_that("basic usage", {
@@ -210,6 +238,9 @@ test_that("XCMS conversion", {
     expect_equal(featMZs(importFeatures(XCMSImpEP, "xcms", epAnaInfo)), featMZs(ffEP))
     expect_equal(featMZs(importFeatures(XCMSImpKPIC2, "xcms", anaInfoOne)), featMZs(ffKPIC2))
     expect_equal(featMZs(importFeatures(XCMSImpSIRIUS, "xcms", anaInfoOne)), featMZs(ffSIRIUS))
+    
+    expect_equal(nrow(xcms::peaks(getXCMSSet(ffPiekBinsIMS, loadRawData = FALSE, IMS = FALSE))), 0)
+    expect_equal(nrow(xcms::peaks(getXCMSSet(ffPiekBinsIMS, loadRawData = FALSE, IMS = TRUE))), length(ffPiekBinsIMS))
 })
 
 # XCMS3ImpXCMS <- getXCMSnExp(ffXCMS, loadRawData = FALSE)
@@ -238,6 +269,10 @@ test_that("XCMS3 conversion", {
     expect_equal(featMZs(importFeatures(XCMS3ImpEP, "xcms3", epAnaInfo)), featMZs(ffEP))
     expect_equal(featMZs(importFeatures(XCMS3ImpKPIC2, "xcms3", anaInfoOne)), featMZs(ffKPIC2))
     expect_equal(featMZs(importFeatures(XCMS3ImpSIRIUS, "xcms3", anaInfoOne)), featMZs(ffSIRIUS))
+    
+    # BUG: xcms::chromPeaks() errors with zero features
+    expect_false(xcms::hasChromPeaks(getXCMSnExp(ffPiekBinsIMS, loadRawData = FALSE, IMS = FALSE)))
+    expect_equal(nrow(xcms::chromPeaks(getXCMSnExp(ffPiekBinsIMS, loadRawData = FALSE, IMS = TRUE))), length(ffPiekBinsIMS))
 })
 
 KPIC2ImpKPIC2 <- getPICSet(ffKPIC2)
@@ -314,5 +349,4 @@ XCMS3ImpOpenMSNS <- doExportXCMS3NS(ffNS, loadRawData = FALSE)
 test_that("set unsupported functionality", {
     expect_equal(featMZs(importFeatures(XCMSImpOpenMSNS, "xcms", anaInfoNS)), featMZs(ffNS))    
     expect_equal(featMZs(importFeatures(XCMS3ImpOpenMSNS, "xcms3", anaInfoNS)), featMZs(ffNS))
-    
 })

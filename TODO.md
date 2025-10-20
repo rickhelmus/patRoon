@@ -129,6 +129,7 @@
     - split IMSWindow arg for setting mobmin/mobmax? this currently sets very narrow ranges. Same for mz and ms2
     - change methodMZ/methodIMS to eg filterMZ/filterMob
     - make allowing non-centered features optional?
+    - better error when no adduct is specified if suspect list only contains adduct specific mobilities --> now complains that all values are NA
 - update featAnn consensus?
 - ADT gives "susp_mobility_susp"/"susp_CCS_susp" cols --> rename
 - MSPL: do topMost filter after averaging IMS subspectrum? Would be more consistent with HRMS, but may need larger default
@@ -187,7 +188,6 @@
         - verify that everything is copied, including fingerprints and scoreRanges
     - IMSRangeParams (incl mobility_mz/CCS_mz) and IMSMatchParams filters for suspects (screenSuspects() and assignMobilities()) and compounds
     - piek
-        - tests with ims data
         - verify removal duplicate features?
         - mobAssignMethod and mobAssignAggr
         - EIM summing and smoothing
@@ -206,6 +206,8 @@
     - generateAnalysisInfo()?
     - plotSpectrum() methods: normalization and showLegend
     - updateGroups()
+    - importFeatures() / importFeatureGroups()
+        - also with IMS data
 - newProject()
     - see where testing is slow, possibly disable testServer() on CI?
     - add snapshots
@@ -288,6 +290,7 @@
         - maybe remove some fc refs?
     - update for MA smoothing for EIMs
     - update docs for importCheckFeaturesSession() (IMSWindow)
+    - update docs to also mention patRoonDataIMS
 
 ## NEWS
 

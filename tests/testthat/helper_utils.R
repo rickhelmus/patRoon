@@ -13,6 +13,10 @@ getTestAnaInfo <- function()
     return(rbind(patRoonData::exampleAnalysisInfo("positive"), patRoonData::exampleAnalysisInfo("negative")))
 }
 getTestAnaInfoNS <- function() patRoonData::exampleAnalysisInfo()
+getTestAnaInfoIMS <- function()
+{
+    return(rbind(patRoonDataIMS::exampleAnalysisInfo("positive"), patRoonDataIMS::exampleAnalysisInfo("negative")))
+}
 getTestAnaInfoPos <- function(anaInfo = getTestAnaInfo()) anaInfo[!grepl("\\-neg", anaInfo$analysis), ]
 getDAAnaInfo <- function(pat = NULL)
 {

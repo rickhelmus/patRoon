@@ -190,8 +190,7 @@
     - piek
         - verify removal duplicate features?
         - mobAssignMethod and mobAssignAggr
-        - EIM summing and smoothing
-        - MS summing, EIM saving, ...
+        - mz profile & EIM saving, ...
     - groupFeaturesGreedy()
     - plotChroms(): mob annotation
     - plotMobilograms()

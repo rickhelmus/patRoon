@@ -164,7 +164,8 @@ getCentroidedMSFilesFromAnaInfo <- function(anaInfo, formats = c("mzML", "mzXML"
 doGetEICs <- function(anaInfo, EICInfoList, gapFactor, mzExpIMSWindow = 0, minIntensityIMS = 0, mode = "simple",
                       sumFramesMZ = 1, sumFramesMob = 1, smoothWindowMZ = 0, smoothWindowMob = 0, smoothExtMZ = 0,
                       smoothExtMob = 0, saveMZProfiles = FALSE, saveEIMs = FALSE, minEICIntensity = 0, minEICAdjTime = 0,
-                      minEICAdjPoints = 0, minEICAdjIntensity = 0, pad = FALSE, doCache = TRUE, cacheDB = NULL)
+                      minEICAdjPoints = 0, minEICAdjIntensity = 0, pad = FALSE, topMost = 0, doCache = TRUE,
+                      cacheDB = NULL)
 {
     doCache <- doCache && getCacheMode() != "none"
     
@@ -181,8 +182,10 @@ doGetEICs <- function(anaInfo, EICInfoList, gapFactor, mzExpIMSWindow = 0, minIn
         if (is.null(cacheDB))
             cacheDB <- openCacheDBScope()
         anaHashes <- getMSFileHashesFromAvailBackend(anaInfo, needIMS = needIMS)
-        baseHash <- makeHash(gapFactor, mzExpIMSWindow, minIntensityIMS, mode, minEICIntensity, minEICAdjTime,
-                             minEICAdjPoints, minEICAdjIntensity, pad)
+        baseHash <- makeHash(gapFactor, mzExpIMSWindow, minIntensityIMS, mode, sumFramesMZ, sumFramesMob,
+                             smoothWindowMZ, smoothWindowMob, smoothExtMZ, smoothExtMob, saveMZProfiles,
+                             saveEIMs, minEICIntensity, minEICAdjTime, minEICAdjPoints, minEICAdjIntensity, pad,
+                             topMost)
     }
     
     allEICs <- applyMSData(anaInfo, EICInfoList, showProgress = TRUE, needIMS = needIMS,
@@ -227,7 +230,7 @@ doGetEICs <- function(anaInfo, EICInfoList, gapFactor, mzExpIMSWindow = 0, minIn
                                   ToDo$mobmax, gapFactor, mzExpIMSWindow, minIntensityIMS, mode, sumFramesMZ,
                                   sumFramesMob, smoothWindowMZ, smoothWindowMob, smoothExtMZ, smoothExtMob,
                                   saveMZProfiles, saveEIMs, pad, minEICIntensity, minEICAdjTime, minEICAdjPoints,
-                                  minEICAdjIntensity)
+                                  minEICAdjIntensity, topMost)
             EICs[!isCached] <- newEICs
             attr(EICs, "allXValues") <- attr(newEICs, "allXValues")
             

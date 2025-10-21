@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-context("raw data parsing")
+local_edition(3) # for snapshots
 
 anaInfo <- getTestAnaInfo()
 
@@ -49,6 +49,8 @@ test_that("EICs", {
     EICInfoListOne <- EICInfoList
     EICInfoListOne[[1]] <- EICInfoListOne[[1]][1]
     
+    eicsRef <- doGetEICs(anaInfoIMSOne, EICInfoList[1], gapFactor = 3, mode = "full")
+    
     # Test adjacency and intensity filters
     # NOTE: the thresholds were based on manual EIC inspection...
     eicsAdjP <- doGetEICs(anaInfoIMSOne, EICInfoListOne, gapFactor = 3, minEICAdjIntensity = 5E3,
@@ -56,34 +58,43 @@ test_that("EICs", {
     eicsAdjT <- doGetEICs(anaInfoIMSOne, EICInfoListOne, gapFactor = 3, minEICAdjIntensity = 5E3,
                           minEICAdjPoints = 0, minEICAdjTime = 4, mode = "simple")
     eicsI <- doGetEICs(anaInfoIMSOne, EICInfoListOne, gapFactor = 3, minEICIntensity = 3E4, mode = "simple")
-    eicsNoF <- doGetEICs(anaInfoIMSOne, EICInfoListOne, gapFactor = 3, mode = "simple")
     
     expect_length(pruneList(eicsAdjP[[1]], checkZeroRows = TRUE), 0)
     expect_length(pruneList(eicsAdjT[[1]], checkZeroRows = TRUE), 0)
     expect_length(pruneList(eicsI[[1]], checkZeroRows = TRUE), 0)
-    expect_gt(length(pruneList(eicsNoF[[1]])), 0)
+    expect_gt(length(pruneList(eicsRef[[1]])), 0)
     
     # Test smoothing and frame summing affects mz or mobility results
-    eicsSmoothed <- doGetEICs(anaInfoIMSOne, EICInfoListOne, gapFactor = 3, mode = "full", sumFramesMZ = 7,
-                              smoothWindowMZ = 3, smoothExtMZ = 0.02, sumFramesMob = 7, smoothWindowMob = 7,
-                              smoothExtMob = 0.1)
-    eicsUnsmoothed <- doGetEICs(anaInfoIMSOne, EICInfoList[1], gapFactor = 3, mode = "full")
+    eicsSummed <- doGetEICs(anaInfoIMSOne, EICInfoListOne, gapFactor = 3, mode = "full", sumFramesMZ = 7,
+                            sumFramesMob = 7)
+    eicsSmoothed <- doGetEICs(anaInfoIMSOne, EICInfoListOne, gapFactor = 3, mode = "full", smoothWindowMZ = 3,
+                              smoothExtMZ = 0.02, smoothWindowMob = 7, smoothExtMob = 0.1)
+    for (col in c("mz", "mzBP", "mobility", "mobilityBP"))
+    {
+        expect_true(any(eicsSummed[[1]][[1]][, col] != eicsRef[[1]][[1]][, col]))
+        expect_true(any(eicsSmoothed[[1]][[1]][, col] != eicsRef[[1]][[1]][, col]))
+    }
 
-    expect_true(any(eicsSmoothed[[1]][[1]][, "mz"] != eicsUnsmoothed[[1]][[1]][, "mz"]))
-    expect_true(any(eicsSmoothed[[1]][[1]][, "mzBP"] != eicsUnsmoothed[[1]][[1]][, "mzBP"]))
-    expect_true(any(eicsSmoothed[[1]][[1]][, "mobility"] != eicsUnsmoothed[[1]][[1]][, "mobility"]))
-    expect_true(any(eicsSmoothed[[1]][[1]][, "mobilityBP"] != eicsUnsmoothed[[1]][[1]][, "mobilityBP"]))
-    
     # Test topMost filter
     eicsTop1 <- doGetEICs(anaInfoIMSOne, EICInfoList, gapFactor = 3, topMost = 1, mode = "full")
     expect_length(pruneList(eicsTop1[[1]], checkZeroRows = TRUE), 1)
     
     # Test pad=TRUE
     eicsPadded <- doGetEICs(anaInfoIMSOne, EICInfoListOne, gapFactor = 3, pad = TRUE, mode = "simple")
-    eicsUnpadded <- doGetEICs(anaInfoIMSOne, EICInfoListOne, gapFactor = 3, pad = FALSE, mode = "simple")
-    expect_true(nrow(eicsPadded[[1]][[1]]) >= nrow(eicsUnpadded[[1]][[1]]))
-    expect_false(any(eicsUnpadded[[1]][[1]][, "intensity"] == 0))
+    expect_true(nrow(eicsPadded[[1]][[1]]) >= nrow(eicsRef[[1]][[1]]))
+    expect_false(any(eicsRef[[1]][[1]][, "intensity"] == 0))
     expect_true(any(eicsPadded[[1]][[1]][, "intensity"] == 0))
+    
+    expect_snapshot_value(list(
+        eicsRef,
+        eicsAdjP,
+        eicsAdjT,
+        eicsI,
+        eicsSummed,
+        eicsSmoothed,
+        eicsTop1,
+        eicsPadded
+    ),  style = "json2")
 })
 
 test_that("EIMs", {

@@ -436,6 +436,7 @@
 - plotSpectrum() methods: normalization and showLegend
 - updateGroups()
 - improved future parallelization, esp reporting
+- FIXED: normInts() produced invalid output if no internal standards were found
 
 
 ## Features

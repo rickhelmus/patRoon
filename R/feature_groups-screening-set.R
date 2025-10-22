@@ -373,9 +373,6 @@ setMethod("assignMobilities", "featureGroupsScreeningSet", function(obj, mobPeak
     assertIMSMatchParams(IMSMatchParams, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
-    if (length(obj) == 0 || (is.null(mobPeakParams) && !fromSuspects && is.null(CCSParams)))
-        return(obj) # nothing to do...
-
     if (is.null(chromPeakParams) && fromSuspects)
         stop("Please set chromPeakParams when fromSuspects=TRUE", call. = FALSE)
     

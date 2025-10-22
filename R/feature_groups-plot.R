@@ -768,14 +768,15 @@ setMethod("plotChroms3D", "featureGroups", function(obj, analysis = analyses(obj
     mzmin <- feat$mzmin - mzWindow; mzmax <- feat$mzmax + mzWindow
     mobmin <- if (hasMobNum) feat$mobmin - IMSWindow else 0; mobmax <- if (hasMobNum) feat$mobmax + IMSWindow else 0
     
-    pointsInfo <- data.table(retmin = retmin, retmax = retmax, mzmin = mzmin, mzmax = mzmax,
-                            mobmin = mobmin, mobmax = mobmax)
+    pointsInfo <- data.table(retmin = retmin, retmax = retmax, mzmin = mzmin, mzmax = mzmax)
+    if (doMob)
+        pointsInfo[, c("mobmin", "mobmax") := .(mobmin, mobmax)]
     pointsInfoList <- setNames(list(pointsInfo), analysis)
     chromPoints <- doGetChromPoints(anaInfo, pointsInfoList)
-    pointsMatrix <- chromPoints[[1]]
+    pointsMatrix <- chromPoints[[1]][[1]]
     points <- data.table(x = pointsMatrix[, "time"],
-                        y = pointsMatrix[, if (doMob) "mobility" else "mz"],
-                        z = pointsMatrix[, "intensity"])
+                         y = pointsMatrix[, if (doMob) "mobility" else "mz"],
+                         z = pointsMatrix[, "intensity"])
     
     if (nrow(points) == 0)
     {

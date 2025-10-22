@@ -490,9 +490,6 @@ setMethod("assignMobilities", "featureGroupsScreening", function(obj, mobPeakPar
     assertIMSMatchParams(IMSMatchParams, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
-    if (length(obj) == 0 || (is.null(mobPeakParams) && !fromSuspects && is.null(CCSParams)))
-        return(obj) # nothing to do...
-
     if (!is.null(mobPeakParams) || fromSuspects)
     {
         obj <- checkAssignedMobilityFGroups(obj)

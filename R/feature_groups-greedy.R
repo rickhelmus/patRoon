@@ -32,6 +32,12 @@ setMethod("groupFeaturesGreedy", "features", function(feat, rtalign = FALSE,
     if (rtalign)
         stop("Retention time alignment (rtalign=TRUE) is not yet supported for greedy grouping!", call. = FALSE)
     
+    return(doGroupFeatures(feat, doGroupFeaturesGreedy, "greedy", rtWindow, mzWindow, IMSWindow, scoreWeights,
+                           verbose = verbose))
+})
+
+doGroupFeaturesGreedy <- function(feat, rtWindow, mzWindow, IMSWindow, scoreWeights, verbose)
+{
     hash <- makeHash(feat, rtWindow, mzWindow, IMSWindow, scoreWeights)
     cd <- loadCacheData("groupFeaturesGreedy", hash)
     if (!is.null(cd))
@@ -126,4 +132,4 @@ setMethod("groupFeaturesGreedy", "features", function(feat, rtalign = FALSE,
     ret <- featureGroupsGreedy(groups = gTable, groupInfo = gInfo, features = feat, ftindex = ftindex)
     saveCacheData("groupFeaturesGreedy", ret, hash)
     return(ret)
-})
+}

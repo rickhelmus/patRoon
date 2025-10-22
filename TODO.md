@@ -190,7 +190,6 @@
     - CCS/Mob conversion utilities? Or rely on assignMobilities() tests?
     - spectrumSimilarityMobility()
     - susp lists with >1 mobility/CCS values. Test if mob/CCS counts differ.
-    - feat comparison() and consensus()
 - misc
     - genLimitsFile() and verify that it overrides
     - generateAnalysisInfo()?

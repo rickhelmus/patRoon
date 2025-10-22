@@ -519,6 +519,9 @@ test_that("verify feature group comparison", {
 
     expect_length(fgCompOneEmpty, 2)
     expect_length(fgCompBothEmpty, 2)
+    
+    expect_false(hasMobilities(fGCompOpenMS@comparedFGroups))
+    expect_true(hasMobilities(comparison(fgIMS, fgAMInt, groupAlgo = "greedy")@comparedFGroups))
 })
 
 subFGroups <- fgOpenMS[, 1:25]
@@ -793,4 +796,12 @@ test_that("set unsupported functionality", {
     expect_length(consensus(fgCompNSBothEmpty, uniqueFrom = 1, uniqueOuter = TRUE), 0)
     
     expect_equal(expect_plot(plotVenn(fGCompNS))$intersectionCounts, length(consensus(fGCompNS, relMinAbundance = 1)))
+    
+    fgIMSNS <- unset(fgIMS, "positive")
+    fgAMIntNS <- unset(fgAMInt, "positive")
+    fGCompIMSNS <- comparison(noIMS = fgIMSNS, wIMS = fgAMIntNS, groupAlgo = "greedy")
+    fGConsIMSNS <- consensus(fGCompIMSNS)
+    expect_length(fGConsIMSNS[IMS = TRUE], length(fgAMIntNS[IMS = TRUE]))
+    expect_length(fGConsIMSNS[IMS = FALSE], length(fgIMSNS))
+    expect_true(hasMobilities(fGConsIMSNS))
 })

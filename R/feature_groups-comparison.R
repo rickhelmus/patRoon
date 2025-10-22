@@ -381,7 +381,7 @@ setMethod("consensus", "featureGroupsComparison", function(obj, absMinAbundance 
             ret[, ID := as.character(seq_len(nrow(ret)))]
 
             colsToAvg <- c("ret", "mz", "area", "retmin", "retmax", "mzmin", "mzmax", "intensity")
-            if (hasMobilities(obj))
+            if (hasMobilities(obj) && all(c("mobility.x", "mobility.y") %in% colnames(ret)))
                 colsToAvg <- c(colsToAvg, "mobility", "mobmin", "mobmax", if (!is.null(ret[["CCS"]])) "CCS")
 
             for (col in colsToAvg)

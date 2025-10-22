@@ -15,6 +15,14 @@ fgXCMS3 <- groupFeatures(fList, "xcms3")
 fgKPIC2 <- groupFeatures(fList, "kpic2")
 fgSIRIUS <- groupFeatures(analysisInfo(fList)[1,], "sirius") # only do first analysis to avoid long run times
 
+fgIMS <- groupFeatures(getTestFeaturesIMS(intThr = 2E5), "greedy")
+fgIMSEmpty <- groupFeatures(getEmptyFeaturesIMS(), "greedy")
+
+runAM <- \(fg, ...) assignMobilities(fg, mobPeakParams = getDefPeakParams("bruker_ims", "piek"),
+                                     chromPeakParams = getDefPeakParams("chrom", "piek"),
+                                     parallel = FALSE, CCSParams = getCCSParams("mason-schamp_1/k"), ...)
+fgAMInt <- runAM(fgIMS, calcArea = "integrate")
+
 fgOpenMSQ <- calculatePeakQualities(fgOpenMS)
 
 fListEmpty <- getEmptyFeatures()
@@ -22,6 +30,7 @@ fgOpenMSEmpty <- groupFeatures(fListEmpty, "openms")
 fgXCMSEmpty <- groupFeatures(fListEmpty, "xcms")
 fgXCMS3Empty <- groupFeatures(fListEmpty, "xcms3")
 fgKPIC2Empty <- groupFeatures(fListEmpty, "kpic2")
+fgAMEmpty <- runAM(fgIMSEmpty)
 fgOpenMSEmptyQ <- calculatePeakQualities(fgOpenMSEmpty)
 
 test_that("verify feature grouping output", {
@@ -39,6 +48,7 @@ test_that("verify feature grouping output", {
     expect_known_value(groupTable(fgXCMS3), testFile("fg-xcms3"))
     expect_known_value(groupTable(fgKPIC2), testFile("fg-kpic2"))
     expect_known_value(groupTable(fgSIRIUS), testFile("fg-sirius"))
+    expect_known_value(groupTable(fgAMInt), testFile("fg-am"))
     expect_known_value(groupTable(fgOpenMSQ), testFile("fg-openms-qual"))
 })
 
@@ -48,7 +58,39 @@ test_that("verify show output", {
     expect_known_show(fgXCMS3, testFile("fg-show-xcms3", text = TRUE))
     expect_known_show(fgKPIC2, testFile("fg-show-kpic2", text = TRUE))
     expect_known_show(fgSIRIUS, testFile("fg-show-sirius", text = TRUE))
+    expect_known_show(fgAMInt, testFile("fg-show-am", text = TRUE))
     expect_known_show(fgOpenMSQ, testFile("fg-show-openms-qual", text = TRUE))
+})
+
+test_that("assignMobilities", {
+    fgAMSum <- runAM(fgIMS, calcArea = "sum")
+    fgAMNoEIC <- runAM(fgIMS, fallbackEIC = FALSE)
+    
+    expect_true(hasMobilities(fgAMInt))
+    expect_true(hasMobilities(fgAMEmpty))
+    checkmate::expect_names(names(groupInfo(fgAMInt)), must.include = c("mobility", "CCS", "ims_parent_group"))
+    checkmate::expect_names(names(featureTable(fgAMInt)[[1]]),
+                            must.include = c(getMobilityCols(), "CCS", "mob_assign_method", "mob_reintegr_method",
+                                             "ims_parent_ID"))
+    expect_false(isTRUE(all.equal(featureTable(fgAMInt)[[4]][!is.na(mobility)]$area,
+                                  featureTable(fgAMSum)[[4]][!is.na(mobility)]$area)))
+    expect_equivalent(featureTable(fgAMInt)[[4]][!is.na(mobility), -"area"],
+                      featureTable(fgAMSum)[[4]][!is.na(mobility), -"area"])
+    expect_setequal(featureTable(fgAMInt[IMS=TRUE])[[4]]$mob_reintegr_method, c("EIC", "peak"))
+    expect_setequal(featureTable(fgAMNoEIC[IMS=TRUE])[[4]]$mob_reintegr_method, c("peak"))
+    
+    # verify slot copying
+    expect_setequal(annotations(fgAMInt)$group, names(fgAMInt))
+    fgAMQ <- calculatePeakQualities(fgAMInt)
+    expect_setequal(groupQualities(fgAMQ)$group, names(fgAMQ))
+    expect_setequal(groupScores(fgAMQ)$group, names(fgAMQ))
+    # NOTE: remove blanks as ISTDs are not present in those and would otherwise be removed
+    fgIMSISTD <- normInts(filter(fgIMS, removeBlanks = TRUE), featNorm = "istd",
+                          standards = list(patRoonDataIMS::ISTDListPos, patRoonDataIMS::ISTDListNeg))
+    fgAMISTD <- runAM(fgIMSISTD)
+    getAssignedFGs <- \(fg) unlist(lapply(internalStandardAssignments(fg), names))
+    gi <- groupInfo(fgAMISTD)[ims_parent_group %in% getAssignedFGs(fgIMSISTD)]
+    expect_setequal(getAssignedFGs(fgAMISTD), union(gi$group, gi$ims_parent_group))
 })
 
 test_that("empty objects work", {
@@ -56,6 +98,7 @@ test_that("empty objects work", {
     expect_length(fgXCMSEmpty, 0)
     expect_length(fgXCMS3Empty, 0)
     expect_length(fgKPIC2Empty, 0)
+    expect_length(fgIMSEmpty, 0)
     expect_length(fgOpenMSEmptyQ, 0)
 })
 
@@ -363,6 +406,36 @@ test_that("replicate subtraction", {
     expect_length(replicateSubtract(fgOpenMSEmpty, "solvent-pos"), 0)
 })
 
+test_that("IMS subset and filtering", {
+    delGI <- groupInfo(fgAMInt)[!is.na(mobility)][2:10]
+    fgAMDel <- delete(fgAMInt, j = delGI$ims_parent_group)
+    
+    expect_setequal(names(fgAMInt[IMS = TRUE]), groupInfo(fgAMInt)[!is.na(mobility)]$group)
+    expect_setequal(names(fgAMInt[IMS = FALSE]), groupInfo(fgAMInt)[is.na(mobility)]$group)
+    expect_false(hasMobilities(fgAMInt[IMS = FALSE]))
+    checkmate::expect_names(names(groupInfo(fgAMInt[IMS = FALSE])), disjunct.from = c("mobility", "CCS", "ims_parent_group"))
+    checkmate::expect_names(names(featureTable(fgAMInt[IMS = FALSE])[[1]]),
+                            disjunct.from = c(getMobilityCols(), "CCS", "mob_assign_method", "mob_reintegr_method",
+                                              "ims_parent_ID"))
+    expect_equal(fgAMInt, fgAMInt[IMS = "both"])
+    expect_setequal(names(fgAMInt[IMS = FALSE]), names(fgAMInt[IMS = "maybe"]))
+    expect_setequal(names(fgAMDel[IMS = "maybe"][IMS = TRUE]), delGI$group)
+    
+    checkmate::expect_disjunct(names(filter(fgAMDel, withIMSParent = TRUE)), fgAMDel$group)
+    expect_range(groupInfo(filter(fgAMInt, IMSRangeParams = getIMSRangeParams("mobility", 0.65, 0.75)))$mobility,
+                 c(0.65, 0.75))
+    expect_range(groupInfo(filter(fgAMInt, IMSRangeParams = getIMSRangeParams("mobility", 0.0025, 0.003, TRUE)))[, mobility / mz],
+                 c(0.0025, 0.003))
+    expect_range(groupInfo(filter(fgAMInt, IMSRangeParams = getIMSRangeParams("CCS", 100, 150)))$CCS, c(100, 150))
+    expect_range(groupInfo(filter(fgAMInt, IMSRangeParams = getIMSRangeParams("CCS", 0.7, 0.8, TRUE)))[, CCS / mz],
+                 c(0.7, 0.8))
+    expect_equal(filter(fgAMInt, IMSRangeParams = getIMSRangeParams("mobility", 0, 10)), fgAMInt)
+    expect_equal(filter(fgAMInt, IMSRangeParams = getIMSRangeParams("CCS", 0, 1000)), fgAMInt)
+    expect_equal(filter(fgAMInt, absMinIntensity = 1E9, applyIMS = FALSE), fgAMInt[IMS = TRUE])
+    expect_setequal(names(filter(fgAMInt, absMinIntensity = 1E9, applyIMS = TRUE)), names(fgAMInt[IMS = FALSE]))
+    expect_length(filter(fgAMInt, absMinIntensity = 1E9, applyIMS = "both"), 0)
+})
+
 fgISTD <- fgOpenMS
 fgISTD@features@analysisInfo <- copy(fgISTD@features@analysisInfo)
 fgISTD@features@analysisInfo[, norm_conc := rep(c(NA, NA, NA, 1, 2, 1), length.out = nrow(analysisInfo(fgISTD)))]
@@ -437,6 +510,7 @@ test_that("verify feature group comparison", {
 })
 
 subFGroups <- fgOpenMS[, 1:25]
+subFGroupsIMS <- filter(fgAMInt, removeBlanks = TRUE)[IMS = TRUE][, 1:25]
 test_that("reporting works", {
     expect_file(reportCSV(subFGroups, getWorkPath(), reportFeatures = TRUE),
                 file.path(getWorkPath(), sprintf("%s.csv", class(subFGroups))))
@@ -494,6 +568,7 @@ test_that("plotting works", {
     expect_doppel("eic-gbr", function() plotChroms(subFGroups, groupBy = "replicate"))
     expect_doppel("eic-gbf", function() plotChroms(subFGroups, groupBy = "fGroups"))
     expect_doppel("eic-ann", function() plotChroms(subFGroups, annotate = "mz"))
+    expect_doppel("eic-ann_mob", function() plotChroms(subFGroupsIMS, annotate = "mob"))
     # below two should be mostly the same, but xlim and group rect will be slightly different since subsetting removes
     # some of the feature data that is used to determine the limits for these. For now just compare the two figures
     # manually.
@@ -501,9 +576,28 @@ test_that("plotting works", {
     expect_doppel("eic-sub2", function() plotChroms(subFGroups, analysis = analyses(subFGroups)[1],
                                                     groupName = names(subFGroups)[1]))
 
+    expect_doppel("eim-smo_no", function() plotMobilograms(subFGroupsIMS, EIMParams = getDefEIMParams(smooth = "none")))
+    expect_doppel("eim-smo_sg", function() plotMobilograms(subFGroupsIMS, EIMParams = getDefEIMParams(smooth = "sg", smLength = 15)))
+    expect_doppel("eim-smo_ma", function() plotMobilograms(subFGroupsIMS, EIMParams = getDefEIMParams(smooth = "ma", smLength = 15)))
+    expect_doppel("eim-tm1", function() plotMobilograms(subFGroupsIMS, EIMParams = getDefEIMParams(topMost = 1)))
+    expect_doppel("eim-tm1rg", function() plotMobilograms(subFGroupsIMS,
+                                                     EIMParams = getDefEIMParams(topMost = 1, topMostByReplicate = TRUE)))
+    expect_doppel("eim-area", function() plotMobilograms(subFGroupsIMS, showPeakArea = TRUE))
+    expect_doppel("eim-gbr", function() plotMobilograms(subFGroupsIMS, groupBy = "replicate"))
+    expect_doppel("eim-gbf", function() plotMobilograms(subFGroupsIMS, groupBy = "fGroups"))
+    expect_doppel("eim-ann", function() plotMobilograms(subFGroupsIMS, annotate = "mz"))
+    expect_doppel("eim-ann_mob", function() plotMobilograms(subFGroupsIMS[IMS=TRUE], annotate = "mob"))
+    # below two should be mostly the same, but xlim and group rect will be slightly different since subsetting removes
+    # some of the feature data that is used to determine the limits for these. For now just compare the two figures
+    # manually.
+    expect_doppel("eim-sub", function() plotMobilograms(subFGroupsIMS[1, 1]))
+    expect_doppel("eim-sub2", function() plotMobilograms(subFGroupsIMS, analysis = analyses(subFGroupsIMS)[1],
+                                                         groupName = names(subFGroupsIMS)[1]))
+
     expect_doppel("eic-3d-def", function() plotChroms3D(subFGroups[1, 1]))
     expect_doppel("eic-3d-rtmin", function() plotChroms3D(subFGroups[1, 1], retMin = TRUE))
     expect_doppel("eic-3d-nolim", function() plotChroms3D(subFGroups[1, 1], showLimits = FALSE))
+    expect_doppel("eic-3d-mob", function() plotChroms3D(subFGroupsIMS[1, 1], dim3 = "mobility"))
 
     expect_doppel("venn", function() plotVenn(fgOpenMS))
     # use conc fGroups as it has >2 replicates
@@ -536,6 +630,7 @@ test_that("plotting empty objects works", {
 
     expect_doppel("eic-def-empty", function() plotChroms(fgOpenMSEmpty))
     expect_doppel("eic-3d-def-empty", function() plotChroms3D(fgOpenMSEmpty[1]))
+    expect_doppel("eim-def-empty", function() plotMobilograms(fgAMEmpty))
 
     expect_error(plotVenn(fgOpenMSEmpty))
     expect_error(plotVenn(fgCompBothEmpty))
@@ -619,9 +714,10 @@ test_that("sets functionality", {
     
     expect_doppel("chord-aggr-set", function() plotChord(fgOpenMS, aggregate = "set"))
     expect_doppel("chord-outer-set", function() plotChord(fgOpenMS, aggregate = TRUE, groupBy = "set"))
-    
+
     expect_doppel("eic-gby_set", function() plotChroms(subFGroups, groupBy = "set"))
-    
+    expect_doppel("eim-gby_set", function() plotMobilograms(subFGroupsIMS, groupBy = "set"))
+
     expect_HTML(plotGraph(fgNormISTDMin1, onlyPresent = FALSE, set = "positive"))
     expect_HTML(plotGraph(fgNormISTDMin1, onlyPresent = TRUE, set = "positive"))
     expect_HTML(plotGraph(fgNormISTDEmpty, set = "positive"))

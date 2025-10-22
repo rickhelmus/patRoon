@@ -162,28 +162,23 @@
         - use eg mzR, MSTK, SC to get eg EICs or PLs
     - fixedIsolationWidth?
 - IMS
-    - IMSRangeParams/withIMSParent/applyIMS filters
     - more verification that normInts() works before/after assignMobilities()
-    - IMS arg for [, filter(), ADT, and plotting functions
-    - applyMS for filter()
-    - IMSRangeFilter
+    - IMS arg for ADT, and plotting functions
     - expandForIMS()
         - verify things are copied or error is thrown for unsupported algos
     - convertMobilityToCCS() / convertCCSToMobility()
         - eg convert back and forth
     - suspects
         - test order of data selection for mobility and CCS columns, missing data etc
-        - IMSMatchParams filter
     - assignMobilities()
         - DT method
             - robustness with missing data in input/from
             - check warnings
         - fGroups methods
-            - verify relevant slots are copied
+            - verify that concentrations and toxicities slots are copied
             - from screenInfo(), eg for fGroups with >1 suspect assigned
-            - mobPeakParams, fromSuspects, chromPeakParams, calcArea, fallbackEIC, CCSParams, IMSMatchParams
+            - fromSuspects, CCSParams, IMSMatchParams
         - compounds method: IMS, from overwrite, CCSParams args
-    - selectIMS filter: ensure that objects is fully reverted with IMS=FALSE
     - minMobSpecSim
         - verify that everything is copied, including fingerprints and scoreRanges
     - IMSRangeParams (incl mobility_mz/CCS_mz) and IMSMatchParams filters for suspects (screenSuspects() and assignMobilities()) and compounds
@@ -192,10 +187,7 @@
         - mobAssignMethod and mobAssignAggr
         - mz profile & EIM saving, ...
     - groupFeaturesGreedy()
-    - plotChroms(): mob annotation
-    - plotMobilograms()
     - XCMS features/fGroups, eg with subsetting & exporting
-    - normInts(): verify results are copied
     - CCS/Mob conversion utilities? Or rely on assignMobilities() tests?
     - spectrumSimilarityMobility()
     - susp lists with >1 mobility/CCS values. Test if mob/CCS counts differ.

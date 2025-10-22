@@ -316,9 +316,6 @@ setMethod("assignMobilities", "featureGroupsSet", function(obj, mobPeakParams = 
     assertFindMobilitiesArgs(mobPeakParams, chromPeakParams, EIMParams, EICParams, peakRTWindow, fallbackEIC,
                              calcArea, IMSWindow, CCSParams, parallel)
     
-    if (length(obj) == 0)
-        return(obj) # nothing to do...
-    
     if (!is.null(mobPeakParams))
     {
         obj <- checkAssignedMobilityFGroups(obj)

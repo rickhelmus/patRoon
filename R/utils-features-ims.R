@@ -284,7 +284,7 @@ updateFGroupsForMobilities <- function(fGroups, IMSWindow, sets)
     fTable <- split(fTableAllClean, by = "analysis", keep.by = FALSE)
     # NOTE: the above will not restore any empty feature tables
     missingAna <- setdiff(analyses(fGroups), names(fTable))
-    fTable[missingAna] <- rep(list(fTableAllClean[0]), length(missingAna)) # get empty table with all cols
+    fTable[missingAna] <- rep(list(fTableAllClean[0, -"analysis"]), length(missingAna)) # get empty table with all cols
     fTable <- fTable[analyses(fGroups)] # restore order
     featureTable(fGroups) <- fTable
     
@@ -318,6 +318,8 @@ updateFGroupsForMobilities <- function(fGroups, IMSWindow, sets)
         if (length(d) > 0)
         {
             printf("NOTE: copying parent data from %s\n", sl)
+            if (nrow(d) == 0)
+                next # skip, otherwise we end up with a numm DT (ie columns removed)
             
             # slots are all data.tables with group column
             d <- rbindlist(lapply(split(d, seq_len(nrow(d))), function(r)
@@ -373,12 +375,9 @@ assignFGroupsCCS <- function(fGroups, CCSParams)
     hasSets <- isFGSet(fGroups)
     
     # NOTE: there is at most 1 mobility fGroup per set, so we don't have to worry about multiple annotations in sets workflows
-    ann <- if (nrow(annotations(fGroups)) > 0)
-        annotations(fGroups)[group %chin% groupInfo(fGroups)[!is.na(mobility)]$group]
-    else
-        NULL
+    ann <- annotations(fGroups)[group %chin% groupInfo(fGroups)[!is.na(mobility)]$group]
     
-    grpCharges <- if (!is.null(ann))
+    grpCharges <- if (nrow(ann) > 0)
     {
         unAdd <- unique(ann$adduct)
         addCharges <- sapply(unAdd, function(a) as.adduct(a)@charge)

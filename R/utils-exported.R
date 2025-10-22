@@ -645,7 +645,7 @@ getDefEIMParams <- function(...)
     def <- getDefEIXParams()
     def <- modifyList(def, list(
         window = defaultLim("mobility", "wide"),
-        maxRTWindow = defaultLim("retention", "very_narrow"),
+        maxRTWindow = defaultLim("retention", "wide"),
         smooth = "sg",
         smLength = 15,
         sgOrder = 3

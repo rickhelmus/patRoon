@@ -49,11 +49,26 @@ getTestFeaturesNS <- function(anaInfo = getTestAnaInfoNS(), noiseThrInt = 3E4, .
     ret <- findFeatures(anaInfo, "openms", noiseThrInt = noiseThrInt, ...)
     return(ret)
 }
+getTestFeaturesIMS <- function(anaInfo = getTestAnaInfoIMS(), intThr = 3E4)
+{
+    an <- isAnaInfoNeg(anaInfo)
+    featArgs <- list(algorithm = "piek",
+                     genEICParams = getPiekGenEICParams("bins", mzRange = c(200, 300), minEICIntensity = intThr),
+                     peakParams = getDefPeakParams("chrom", "piek", minIntensity = intThr * 0.3))
+    if (any(an))
+        ret <- makeSet(do.call(findFeatures, c(list(anaInfo[!an, ]), featArgs)),
+                       do.call(findFeatures, c(list(anaInfo[an, ]), featArgs)),
+                       adducts = c("[M+H]+", "[M-H]-"))
+    else
+        ret <- makeSet(do.call(findFeatures, c(list(anaInfo), featArgs)), adducts = "[M+H]+")
+    return(ret)
+}
 
 getTestFGroups <- function(anaInfo = getTestAnaInfo(), ...) groupFeatures(getTestFeatures(anaInfo, ...), "openms")
 getTestFGroupsNS <- function(anaInfo = getTestAnaInfoNS(), ...) groupFeatures(getTestFeaturesNS(anaInfo, ...), "openms")
 getEmptyFeatures <- function(anaInfo = getTestAnaInfo(), ...) getTestFeatures(anaInfo, noiseThrInt = 1E9, ...)
 getEmptyFeaturesNS <- function(anaInfo = getTestAnaInfoNS(), ...) getTestFeaturesNS(anaInfo, noiseThrInt = 1E9, ...)
+getEmptyFeaturesIMS <- function(anaInfo = getTestAnaInfoIMS(), ...) getTestFeaturesIMS(anaInfo, intThr = 1E9, ...)
 getEmptyTestFGroups <- function(anaInfo = getTestAnaInfo()) getTestFGroups(anaInfo)[, "none"]
 
 getTestFGroupsDA <- function(anaInfo)
@@ -276,10 +291,10 @@ expect_file <- function(object, file, removeIfExists = TRUE)
     invisible(act$val)
 }
 
-expect_range <- function(object, r)
+expect_range <- function(object, r, na.rm = TRUE)
 {
     act <- quasi_label(rlang::enquo(object))
-    act$r <- range(act$val)
+    act$r <- range(act$val, na.rm = na.rm)
     expect(numGTE(act$r[1], r[1]) && numLTE(act$r[2], r[2]),
            sprintf("range of %s is %f - %f which is outside %f - %f",
                    act$lab, act$r[1], act$r[2], r[1], r[2]))

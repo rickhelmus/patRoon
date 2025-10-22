@@ -30,7 +30,8 @@ getAnnotationsFromSetFeatures <- function(fGroups)
         ret[, ion_mz := calculateMasses(neutralMass, adducts[adduct], type = "mz")]
     }
     else
-        ret <- data.table()
+        ret <- data.table(set = character(), group = character(0), adduct = character(0), neutralMass = numeric(0),
+                          ion_mz = numeric(0))
     return(ret)
 }
 
@@ -64,6 +65,9 @@ setMethod("getFeatureEIXInputTab", "featureGroupsSet", function(obj, type, analy
     {
         featTabGrp <- featTab[group == grp]
         ranges[, adduct := featTabGrp[match(ranges$analysis, analysis)]$adduct]
+        
+        if (nrow(ranges) == 0)
+            return(ranges) # nothing to do (do here so that adduct column is still added)
         
         if (!EIXParams$onlyPresent && any(is.na(ranges$adduct))) # adduct will be NA for 'missing' features
         {

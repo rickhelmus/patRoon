@@ -208,9 +208,9 @@ doFGroupsFilter <- function(fGroups, what, hashParam, func, cacheCateg = what, a
                 if (!is.null(ret[["subset"]]) && !is.null(ret[["subset"]][["j"]]))
                 {
                     if (is.character(ret$subset$j))
-                        ret$subset$j <- intersect(ret$subset$j, gInfoKeep$group)
+                        ret$subset$j <- union(ret$subset$j, gInfoKeep$group)
                     else # logical/inds
-                        ret$subset$j <- intersect(names(fGroups)[ret$subset$j], gInfoKeep$group)
+                        ret$subset$j <- union(names(fGroups)[ret$subset$j], gInfoKeep$group)
                 }
             }
             
@@ -462,8 +462,6 @@ setMethod("getFeatureEIXInputTab", "featureGroups", function(obj, type, analysis
 
 setMethod("getFeatureEIXs", "features", function(obj, type, analysis = analyses(obj), EIXParams, selectFunc = NULL, ...)
 {
-    if (length(obj) == 0)
-        return(list())
     inputTab <- getFeatureEIXInputTab(obj, type, EIXParams, selectFunc)
     EIXs <- getEICsOREIMs(obj, type, inputTab, EIXParams, ...)
     EIXs <- Map(EIXs, featureTable(obj), f = function(eics, ft)
@@ -477,7 +475,7 @@ setMethod("getFeatureEIXs", "features", function(obj, type, analysis = analyses(
 setMethod("getFeatureEIXs", "featureGroups", function(obj, type, analysis = analyses(obj), groupName = names(obj),
                                                       EIXParams, ...)
 {
-    if (length(obj) == 0 || length(analysis) == 0 || length(groupName) == 0)
+    if (length(analysis) == 0 || length(groupName) == 0)
         return(list())
     
     takeAnalysis <- analysis # for DT subset below

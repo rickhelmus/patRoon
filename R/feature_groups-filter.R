@@ -384,9 +384,9 @@ IMSRangeFilter <- function(fGroups, IMSRangeParams, negate, applyIMS = TRUE)
             vals <- vals / gInfo$mz
         
         keep <- if (negate)
-            !numGTE(vals, IMSRangeParams$lower) | !numLTE(vals, IMSRangeParams$upper)
+            is.na(vals) | (!numGTE(vals, IMSRangeParams$lower) | !numLTE(vals, IMSRangeParams$upper))
         else
-            numGTE(vals, IMSRangeParams$lower) & numLTE(vals, IMSRangeParams$upper)
+            is.na(vals) | (numGTE(vals, IMSRangeParams$lower) & numLTE(vals, IMSRangeParams$upper))
         return(list(subset = list(j = keep)))
     }, "IMS_range", applyIMS = TRUE))
 }
@@ -780,7 +780,7 @@ setMethod("filter", "featureGroupsSet", function(obj, ..., negate = FALSE, apply
     }
     
     if (...length() > 0)
-        obj <- callNextMethod(obj, ..., negate = negate)
+        obj <- callNextMethod(obj, ..., negate = negate, applyIMS = applyIMS)
     
     if (!is.null(absMinSets) || !is.null(relMinSets))
         obj <- minSetsFGroupsFilter(obj, absMinSets, relMinSets, negate = negate, applyIMS = applyIMS)

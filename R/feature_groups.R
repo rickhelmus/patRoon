@@ -1220,7 +1220,7 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
         {
             ft <- copy(ft)
             
-            if (is.na(nconc) || nconc == 0)
+            if (is.na(nconc) || nconc == 0 || length(fGroups@ISTDAssignments) == 0)
                 ft[, c("intensity_rel", "area_rel") := 0]
             else
             {

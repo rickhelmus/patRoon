@@ -163,7 +163,6 @@
     - fixedIsolationWidth?
 - IMS
     - more verification that normInts() works before/after assignMobilities()
-    - IMS arg for ADT, and plotting functions
     - expandForIMS()
         - verify things are copied or error is thrown for unsupported algos
     - convertMobilityToCCS() / convertCCSToMobility()

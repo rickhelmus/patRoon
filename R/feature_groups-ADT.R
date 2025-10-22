@@ -223,7 +223,7 @@ doFGAADTGroups <- function(fGroups, intColNames, average, averageBy, areas, addQ
     {
         cols <- intersect(c("mobility", "CCS", "ims_parent_group"), names(gInfo))
         ret[, (cols) := gInfo[, cols, with = FALSE]]
-        if (!isTRUE(IMS))
+        if (IMS %in% c("both", "maybe"))
         {
             gInfoOrig <- groupInfo(fGroupsOrig)
             doCollapse <- function(coln, digits)
@@ -422,19 +422,23 @@ doFGAADTFeatures <- function(fGroups, fgTab, intColNames, average, averageBy, ad
         featTab <- unique(featTab, by = by)
     }
     
-    if (IMS != "both" && hasMobilities(fGroups))
+    if (IMS %in% c("both", "maybe") && hasMobilities(fGroups))
     {
         fTabOrig <- featureTable(fGroupsOrig)
         
-        # UNDONE: is this a good number?
         # NOTE: update docs if this is changed
         digits <- 3
-        
-        featTab[!is.na(mobility), mobility_collapsed := as.character(round(mobility, digits))]
-        featTab[is.na(mobility), mobility_collapsed := mapply(ID, analysis, FUN = function(i, a)
+
+        for (col in c("mobility", "CCS"))
         {
-            paste0(round(fTabOrig[[a]][ims_parent_ID == i]$mobility, digits), collapse = ",")
-        })]
+            if (is.null(featTab[[col]]))
+                next
+            featTab[!is.na(get(col)), (paste0(col, "_collapsed")) := as.character(round(get(col), digits))]
+            featTab[is.na(get(col)), (paste0(col, "_collapsed")) := mapply(ID, analysis, FUN = function(i, a)
+            {
+                paste0(round(fTabOrig[[a]][ims_parent_ID == i][[col]], digits), collapse = ",")
+            })]
+        }        
     }
     
     # prepare main table for merge
@@ -611,10 +615,10 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
                                                      averageFunc = mean, normalized = FALSE, FCParams = NULL,
                                                      concAggrParams = getDefPredAggrParams(),
                                                      toxAggrParams = getDefPredAggrParams(), normConcToTox = FALSE,
-                                                     anaInfoCols = NULL, IMS ="both")
+                                                     anaInfoCols = NULL, IMS = "both")
 {
     return(doFGAsDataTable(x, average, areas, features, qualities, regression, regressionBy, averageFunc, normalized,
-                           FCParams, concAggrParams, toxAggrParams, normConcToTox, anaInfoCols))
+                           FCParams, concAggrParams, toxAggrParams, normConcToTox, anaInfoCols, IMS))
 })
 
 #' @rdname feature-table

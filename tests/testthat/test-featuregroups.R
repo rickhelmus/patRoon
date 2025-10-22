@@ -243,6 +243,18 @@ test_that("as.data.table works", {
     checkmate::expect_names(names(as.data.table(fGroupsRegr, features = TRUE, anaInfoCols = "conc")),
                             must.include = "anaInfo_conc")
     
+    expect_setequal(as.data.table(fgAMInt, IMS = FALSE)$group, names(fgAMInt[IMS = FALSE]))
+    expect_setequal(as.data.table(fgAMInt, IMS = TRUE)$group, names(fgAMInt[IMS = TRUE]))
+    expect_setequal(as.data.table(fgAMInt, features = TRUE, IMS = FALSE)$group, names(fgAMInt[IMS = FALSE]))
+    expect_setequal(as.data.table(fgAMInt, features = TRUE, IMS = TRUE)$group, names(fgAMInt[IMS = TRUE]))
+    chkCols <- c("mobility_collapsed", "CCS_collapsed")
+    checkmate::expect_names(names(as.data.table(fgAMInt, IMS = "maybe")), must.include = chkCols)
+    checkmate::expect_names(names(as.data.table(fgAMInt, IMS = TRUE)), disjunct.from = chkCols)
+    checkmate::expect_names(names(as.data.table(fgAMInt, features = TRUE, IMS = "maybe")),
+                            must.include = c(chkCols, paste0("group_", chkCols)))
+    checkmate::expect_names(names(as.data.table(fgAMInt, features = TRUE, IMS = TRUE)),
+                            disjunct.from = c(chkCols, paste0("group_", chkCols)))
+    
     expect_error(as.data.table(fgOpenMS, regression = TRUE)) # no conc specified
     expect_equal(regr, as.data.table(fGroupsRegr, regression = "conc"))
     expect_equal(regrF, as.data.table(fGroupsRegr, features = TRUE, regression = "conc"))
@@ -510,7 +522,9 @@ test_that("verify feature group comparison", {
 })
 
 subFGroups <- fgOpenMS[, 1:25]
-subFGroupsIMS <- filter(fgAMInt, removeBlanks = TRUE)[IMS = TRUE][, 1:25]
+subFGroupsIMS <- filter(fgAMInt, removeBlanks = TRUE)
+subFGroupsIMSOnly <- subFGroupsIMS[IMS = TRUE][, 1:25]
+subFGroupsIMS <- subFGroupsIMS[, 1:25]
 test_that("reporting works", {
     expect_file(reportCSV(subFGroups, getWorkPath(), reportFeatures = TRUE),
                 file.path(getWorkPath(), sprintf("%s.csv", class(subFGroups))))
@@ -568,36 +582,43 @@ test_that("plotting works", {
     expect_doppel("eic-gbr", function() plotChroms(subFGroups, groupBy = "replicate"))
     expect_doppel("eic-gbf", function() plotChroms(subFGroups, groupBy = "fGroups"))
     expect_doppel("eic-ann", function() plotChroms(subFGroups, annotate = "mz"))
-    expect_doppel("eic-ann_mob", function() plotChroms(subFGroupsIMS, annotate = "mob"))
+    expect_doppel("eic-ann_mob", function() plotChroms(subFGroupsIMSOnly, annotate = "mob"))
     # below two should be mostly the same, but xlim and group rect will be slightly different since subsetting removes
     # some of the feature data that is used to determine the limits for these. For now just compare the two figures
     # manually.
     expect_doppel("eic-sub", function() plotChroms(subFGroups[1, 1]))
     expect_doppel("eic-sub2", function() plotChroms(subFGroups, analysis = analyses(subFGroups)[1],
                                                     groupName = names(subFGroups)[1]))
+    # IMS arg: note that all plotting functions use +/- the same mechanism to determine whether to plot IMS or not, so
+    # we just test plotChroms() which is slightly more advanced.
+    expect_doppel("eic-sub_imsF", function() plotChroms(subFGroupsIMS, IMS = FALSE))
+    expect_doppel("eic-sub_imsT", function() plotChroms(subFGroupsIMS, IMS = TRUE))
+    # groupName should override IMS arg
+    expect_doppel("eic-sub_imsT", function() plotChroms(subFGroupsIMS, groupName = names(subFGroupsIMS[IMS = TRUE]),
+                                                        IMS = FALSE))
 
-    expect_doppel("eim-smo_no", function() plotMobilograms(subFGroupsIMS, EIMParams = getDefEIMParams(smooth = "none")))
-    expect_doppel("eim-smo_sg", function() plotMobilograms(subFGroupsIMS, EIMParams = getDefEIMParams(smooth = "sg", smLength = 15)))
-    expect_doppel("eim-smo_ma", function() plotMobilograms(subFGroupsIMS, EIMParams = getDefEIMParams(smooth = "ma", smLength = 15)))
-    expect_doppel("eim-tm1", function() plotMobilograms(subFGroupsIMS, EIMParams = getDefEIMParams(topMost = 1)))
-    expect_doppel("eim-tm1rg", function() plotMobilograms(subFGroupsIMS,
+    expect_doppel("eim-smo_no", function() plotMobilograms(subFGroupsIMSOnly, EIMParams = getDefEIMParams(smooth = "none")))
+    expect_doppel("eim-smo_sg", function() plotMobilograms(subFGroupsIMSOnly, EIMParams = getDefEIMParams(smooth = "sg", smLength = 15)))
+    expect_doppel("eim-smo_ma", function() plotMobilograms(subFGroupsIMSOnly, EIMParams = getDefEIMParams(smooth = "ma", smLength = 15)))
+    expect_doppel("eim-tm1", function() plotMobilograms(subFGroupsIMSOnly, EIMParams = getDefEIMParams(topMost = 1)))
+    expect_doppel("eim-tm1rg", function() plotMobilograms(subFGroupsIMSOnly,
                                                      EIMParams = getDefEIMParams(topMost = 1, topMostByReplicate = TRUE)))
-    expect_doppel("eim-area", function() plotMobilograms(subFGroupsIMS, showPeakArea = TRUE))
-    expect_doppel("eim-gbr", function() plotMobilograms(subFGroupsIMS, groupBy = "replicate"))
-    expect_doppel("eim-gbf", function() plotMobilograms(subFGroupsIMS, groupBy = "fGroups"))
-    expect_doppel("eim-ann", function() plotMobilograms(subFGroupsIMS, annotate = "mz"))
-    expect_doppel("eim-ann_mob", function() plotMobilograms(subFGroupsIMS[IMS=TRUE], annotate = "mob"))
+    expect_doppel("eim-area", function() plotMobilograms(subFGroupsIMSOnly, showPeakArea = TRUE))
+    expect_doppel("eim-gbr", function() plotMobilograms(subFGroupsIMSOnly, groupBy = "replicate"))
+    expect_doppel("eim-gbf", function() plotMobilograms(subFGroupsIMSOnly, groupBy = "fGroups"))
+    expect_doppel("eim-ann", function() plotMobilograms(subFGroupsIMSOnly, annotate = "mz"))
+    expect_doppel("eim-ann_mob", function() plotMobilograms(subFGroupsIMSOnly[IMS=TRUE], annotate = "mob"))
     # below two should be mostly the same, but xlim and group rect will be slightly different since subsetting removes
     # some of the feature data that is used to determine the limits for these. For now just compare the two figures
     # manually.
-    expect_doppel("eim-sub", function() plotMobilograms(subFGroupsIMS[1, 1]))
-    expect_doppel("eim-sub2", function() plotMobilograms(subFGroupsIMS, analysis = analyses(subFGroupsIMS)[1],
-                                                         groupName = names(subFGroupsIMS)[1]))
+    expect_doppel("eim-sub", function() plotMobilograms(subFGroupsIMSOnly[1, 1]))
+    expect_doppel("eim-sub2", function() plotMobilograms(subFGroupsIMSOnly, analysis = analyses(subFGroupsIMSOnly)[1],
+                                                         groupName = names(subFGroupsIMSOnly)[1]))
 
     expect_doppel("eic-3d-def", function() plotChroms3D(subFGroups[1, 1]))
     expect_doppel("eic-3d-rtmin", function() plotChroms3D(subFGroups[1, 1], retMin = TRUE))
     expect_doppel("eic-3d-nolim", function() plotChroms3D(subFGroups[1, 1], showLimits = FALSE))
-    expect_doppel("eic-3d-mob", function() plotChroms3D(subFGroupsIMS[1, 1], dim3 = "mobility"))
+    expect_doppel("eic-3d-mob", function() plotChroms3D(subFGroupsIMSOnly[1, 1], dim3 = "mobility"))
 
     expect_doppel("venn", function() plotVenn(fgOpenMS))
     # use conc fGroups as it has >2 replicates
@@ -716,7 +737,7 @@ test_that("sets functionality", {
     expect_doppel("chord-outer-set", function() plotChord(fgOpenMS, aggregate = TRUE, groupBy = "set"))
 
     expect_doppel("eic-gby_set", function() plotChroms(subFGroups, groupBy = "set"))
-    expect_doppel("eim-gby_set", function() plotMobilograms(subFGroupsIMS, groupBy = "set"))
+    expect_doppel("eim-gby_set", function() plotMobilograms(subFGroupsIMSOnly, groupBy = "set"))
 
     expect_HTML(plotGraph(fgNormISTDMin1, onlyPresent = FALSE, set = "positive"))
     expect_HTML(plotGraph(fgNormISTDMin1, onlyPresent = TRUE, set = "positive"))

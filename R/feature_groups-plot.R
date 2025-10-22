@@ -622,7 +622,7 @@ setMethod("plotChroms", "featureGroups", function(obj, analysis = analyses(obj),
     if (intMax == "eic")
         intMax <- "eix" # for makeEIXPlot()
     
-    if (identical(IMS, "maybe") && !setequal(groupName, names(obj)))
+    if (!identical(IMS, "both") && !setequal(groupName, names(obj)))
         IMS <- "both" # make sure selection is always plotted
     
     obj <- prepIMSFGroupsForPlot(obj, IMS)

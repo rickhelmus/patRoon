@@ -13,6 +13,7 @@ fgOpenMS <- groupFeatures(fList, "openms")
 fgXCMS <- groupFeatures(fList, "xcms")
 fgXCMS3 <- groupFeatures(fList, "xcms3")
 fgKPIC2 <- groupFeatures(fList, "kpic2")
+fgGreedy <- groupFeatures(fList, "greedy")
 fgSIRIUS <- groupFeatures(analysisInfo(fList)[1,], "sirius") # only do first analysis to avoid long run times
 
 fgIMS <- groupFeatures(getTestFeaturesIMS(intThr = 2E5), "greedy")
@@ -30,6 +31,7 @@ fgOpenMSEmpty <- groupFeatures(fListEmpty, "openms")
 fgXCMSEmpty <- groupFeatures(fListEmpty, "xcms")
 fgXCMS3Empty <- groupFeatures(fListEmpty, "xcms3")
 fgKPIC2Empty <- groupFeatures(fListEmpty, "kpic2")
+fgGreedyEmpty <- groupFeatures(fListEmpty, "greedy")
 fgAMEmpty <- runAM(fgIMSEmpty)
 fgOpenMSEmptyQ <- calculatePeakQualities(fgOpenMSEmpty)
 
@@ -47,6 +49,7 @@ test_that("verify feature grouping output", {
     
     expect_known_value(groupTable(fgXCMS3), testFile("fg-xcms3"))
     expect_known_value(groupTable(fgKPIC2), testFile("fg-kpic2"))
+    expect_known_value(groupTable(fgGreedy), testFile("fg-greedy"))
     expect_known_value(groupTable(fgSIRIUS), testFile("fg-sirius"))
     expect_known_value(groupTable(fgAMInt), testFile("fg-am"))
     expect_known_value(groupTable(fgOpenMSQ), testFile("fg-openms-qual"))
@@ -57,6 +60,7 @@ test_that("verify show output", {
     expect_known_show(fgXCMS, testFile("fg-show-xcms", text = TRUE))
     expect_known_show(fgXCMS3, testFile("fg-show-xcms3", text = TRUE))
     expect_known_show(fgKPIC2, testFile("fg-show-kpic2", text = TRUE))
+    expect_known_show(fgGreedy, testFile("fg-show-greedy", text = TRUE))
     expect_known_show(fgSIRIUS, testFile("fg-show-sirius", text = TRUE))
     expect_known_show(fgAMInt, testFile("fg-show-am", text = TRUE))
     expect_known_show(fgOpenMSQ, testFile("fg-show-openms-qual", text = TRUE))
@@ -98,6 +102,7 @@ test_that("empty objects work", {
     expect_length(fgXCMSEmpty, 0)
     expect_length(fgXCMS3Empty, 0)
     expect_length(fgKPIC2Empty, 0)
+    expect_length(fgGreedyEmpty, 0)
     expect_length(fgIMSEmpty, 0)
     expect_length(fgOpenMSEmptyQ, 0)
 })
@@ -149,18 +154,21 @@ XCMSImpXCMS <- doExportXCMS(fgXCMS)
 XCMSImpXCMS3 <- doExportXCMS(fgXCMS3, loadRawData = FALSE)
 XCMSImpOpenMS <- doExportXCMS(fgOpenMS, loadRawData = FALSE)
 XCMSImpKPIC2 <- doExportXCMS(fgKPIC2, loadRawData = FALSE)
+XCMSImpGreedy <- doExportXCMS(fgGreedy, loadRawData = FALSE)
 XCMSImpSIRIUS <- doExportXCMS(fgSIRIUS, loadRawData = FALSE)
 test_that("XCMS conversion", {
     expect_equal(nrow(xcms::groups(XCMSImpXCMS)), length(getExpFG(fgXCMS)))
     expect_equal(nrow(xcms::groups(XCMSImpXCMS3)), length(getExpFG(fgXCMS3)))
     expect_equal(nrow(xcms::groups(XCMSImpOpenMS)), length(getExpFG(fgOpenMS)))
     expect_equal(nrow(xcms::groups(XCMSImpKPIC2)), length(getExpFG(fgKPIC2)))
+    expect_equal(nrow(xcms::groups(XCMSImpGreedy)), length(getExpFG(fgGreedy)))
     expect_equal(nrow(xcms::groups(XCMSImpSIRIUS)), length(getExpFG(fgSIRIUS)))
     
     expect_known_value(xcms::groups(XCMSImpXCMS), testFile("fg-xcms_import_xcms"))
     expect_known_value(xcms::groups(XCMSImpXCMS3), testFile("fg-xcms_import_xcms3"))
     expect_known_value(xcms::groups(XCMSImpOpenMS), testFile("fg-xcms_import_openms"))
     expect_known_value(xcms::groups(XCMSImpKPIC2), testFile("fg-xcms_import_kpic2"))
+    expect_known_value(xcms::groups(XCMSImpGreedy), testFile("fg-xcms_import_greedy"))
     expect_known_value(xcms::groups(XCMSImpSIRIUS), testFile("fg-xcms_import_sirius"))
     
     expect_equal(unname(groupTable(importFeatureGroups(XCMSImpXCMS, "xcms", getExpAnaInfo()))),
@@ -171,6 +179,8 @@ test_that("XCMS conversion", {
                  unname(groupTable(getExpFG(fgOpenMS))))
     expect_equal(unname(groupTable(importFeatureGroups(XCMSImpKPIC2, "xcms", getExpAnaInfo()))),
                  unname(groupTable(getExpFG(fgKPIC2))))
+    expect_equal(unname(groupTable(importFeatureGroups(XCMSImpGreedy, "xcms", getExpAnaInfo()))),
+                 unname(groupTable(getExpFG(fgGreedy))))
     expect_equal(unname(groupTable(importFeatureGroups(XCMSImpSIRIUS, "xcms", getExpAnaInfo()[1, ]))),
                  unname(groupTable(getExpFG(fgSIRIUS))))
 })
@@ -179,6 +189,7 @@ XCMS3ImpXCMS <- doExportXCMS3(fgXCMS, loadRawData = FALSE)
 XCMS3ImpXCMS3 <- doExportXCMS3(fgXCMS3)
 XCMS3ImpOpenMS <- doExportXCMS3(fgOpenMS, loadRawData = FALSE)
 XCMS3ImpKPIC2 <- doExportXCMS3(fgKPIC2, loadRawData = FALSE)
+XCMS3ImpGreedy <- doExportXCMS3(fgGreedy, loadRawData = FALSE)
 XCMS3ImpSIRIUS <- doExportXCMS3(fgSIRIUS, loadRawData = FALSE)
 
 test_that("XCMS3 conversion", {
@@ -186,12 +197,14 @@ test_that("XCMS3 conversion", {
     expect_equal(nrow(xcms::featureDefinitions(XCMS3ImpXCMS3)), length(getExpFG(fgXCMS3)))
     expect_equal(nrow(xcms::featureDefinitions(XCMS3ImpOpenMS)), length(getExpFG(fgOpenMS)))
     expect_equal(nrow(xcms::featureDefinitions(XCMS3ImpKPIC2)), length(getExpFG(fgKPIC2)))
+    expect_equal(nrow(xcms::featureDefinitions(XCMS3ImpGreedy)), length(getExpFG(fgGreedy)))
     expect_equal(nrow(xcms::featureDefinitions(XCMS3ImpSIRIUS)), length(getExpFG(fgSIRIUS)))
     
     expect_known_value(xcms::featureDefinitions(XCMS3ImpXCMS), testFile("fg-xcms3_import_xcms"))
     expect_known_value(xcms::featureDefinitions(XCMS3ImpXCMS3), testFile("fg-xcms3_import_xcms3"))
     expect_known_value(xcms::featureDefinitions(XCMS3ImpOpenMS), testFile("fg-xcms3_import_openms"))
     expect_known_value(xcms::featureDefinitions(XCMS3ImpKPIC2), testFile("fg-xcms3_import_kpic2"))
+    expect_known_value(xcms::featureDefinitions(XCMS3ImpGreedy), testFile("fg-xcms3_import_greedy"))
     expect_known_value(xcms::featureDefinitions(XCMS3ImpSIRIUS)[, names(xcms::featureDefinitions(XCMS3ImpSIRIUS)) != "peakidx"],
                        testFile("fg-xcms3_import_sirius")) # NOTE: peakidx not consistent
     
@@ -203,6 +216,8 @@ test_that("XCMS3 conversion", {
                  unname(groupTable(getExpFG(fgOpenMS))))
     expect_equal(unname(groupTable(importFeatureGroups(XCMS3ImpKPIC2, "xcms3", getExpAnaInfo()))),
                  unname(groupTable(getExpFG(fgKPIC2))))
+    expect_equal(unname(groupTable(importFeatureGroups(XCMS3ImpGreedy, "xcms3", getExpAnaInfo()))),
+                 unname(groupTable(getExpFG(fgGreedy))))
     expect_equal(unname(groupTable(importFeatureGroups(XCMS3ImpSIRIUS, "xcms3", getExpAnaInfo()[1, ]))),
                  unname(groupTable(getExpFG(fgSIRIUS))))
 })
@@ -496,6 +511,7 @@ fGCompOpenMS <- comparison(openms = fgOpenMS, xcms = fgXCMS, groupAlgo = "openms
 fGCompXCMS <- comparison(openms = fgOpenMS, xcms = fgXCMS, groupAlgo = "xcms")
 fGCompXCMS3 <- comparison(openms = fgOpenMS, xcms = fgXCMS, groupAlgo = "xcms3")
 fGCompKPIC2 <- comparison(openms = fgOpenMS, xcms = fgXCMS, groupAlgo = "kpic2")
+fGCompGreedy <- comparison(openms = fgOpenMS, xcms = fgXCMS, groupAlgo = "greedy")
 fgCompOneEmpty <- comparison(openms = fgOpenMS, xcms = fgXCMSEmpty, groupAlgo = "openms")
 fgCompBothEmpty <- comparison(openms = fgOpenMSEmpty, xcms = fgXCMSEmpty, groupAlgo = "openms")
 
@@ -504,11 +520,13 @@ test_that("verify feature group comparison", {
     expect_known_value(groupTable(fGCompXCMS@comparedFGroups), testFile("fg-comp-xcms"))
     expect_known_value(groupTable(fGCompXCMS3@comparedFGroups), testFile("fg-comp-xcms3"))
     expect_known_value(groupTable(fGCompKPIC2@comparedFGroups), testFile("fg-comp-kpic2"))
+    expect_known_value(groupTable(fGCompGreedy@comparedFGroups), testFile("fg-comp-greedy"))
 
     expect_named(fGCompOpenMS, c("openms", "xcms"))
     expect_named(fGCompXCMS, c("openms", "xcms"))
     expect_named(fGCompXCMS3, c("openms", "xcms"))
     expect_named(fGCompKPIC2, c("openms", "xcms"))
+    expect_named(fGCompGreedy, c("openms", "xcms"))
     expect_named(fGCompOpenMS[1], "openms")
     expect_named(fGCompOpenMS[2], "xcms")
 

@@ -55,7 +55,14 @@ SPDX-FileCopyrightText = "2016-2020 Yann Collet"
 SPDX-License-Identifier = "MIT"
 
 [[annotations]]
+path = ["src/StreamCraft/simdutf/**"]
+precedence = "closest"
+SPDX-FileCopyrightText = "2021 The simdutf authors"
+SPDX-License-Identifier = "Apache-2.0 OR MIT"
+
+[[annotations]]
 path = ["src/StreamCraft/**"]
 precedence = "closest"
-SPDX-FileCopyrightText = "2016-2020 Ricardo Cunha"
+SPDX-FileCopyrightText = "2025 StreamFind"
 SPDX-License-Identifier = "MIT"
+

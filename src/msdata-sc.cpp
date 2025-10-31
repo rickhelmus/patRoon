@@ -11,6 +11,7 @@
 
 #include "utils-xml.h" // for pugixml
 #include "StreamCraft/StreamCraft_lib.cpp"
+#include "StreamCraft/simdutf_wrapper.cpp"
 
 namespace {
 

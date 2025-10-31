@@ -168,10 +168,13 @@ namespace sc
     std::vector<int> level;
     std::vector<int> polarity;
     std::vector<bool> precursor;
+    std::vector<float> mz;
     std::vector<float> mzmin;
     std::vector<float> mzmax;
+    std::vector<float> rt;
     std::vector<float> rtmin;
     std::vector<float> rtmax;
+    std::vector<float> mobility;
     std::vector<float> mobilitymin;
     std::vector<float> mobilitymax;
 
@@ -182,10 +185,13 @@ namespace sc
       level.resize(n);
       polarity.resize(n);
       precursor.resize(n);
+      mz.resize(n);
       mzmin.resize(n);
       mzmax.resize(n);
+      rt.resize(n);
       rtmin.resize(n);
       rtmax.resize(n);
+      mobility.resize(n);
       mobilitymin.resize(n);
       mobilitymax.resize(n);
     }
@@ -198,10 +204,13 @@ namespace sc
       target.level.push_back(level[i]);
       target.polarity.push_back(polarity[i]);
       target.precursor.push_back(precursor[i]);
+      target.mz.push_back(mz[i]);
       target.mzmin.push_back(mzmin[i]);
       target.mzmax.push_back(mzmax[i]);
+      target.rt.push_back(rt[i]);
       target.rtmin.push_back(rtmin[i]);
       target.rtmax.push_back(rtmax[i]);
+      target.mobility.push_back(mobility[i]);
       target.mobilitymin.push_back(mobilitymin[i]);
       target.mobilitymax.push_back(mobilitymax[i]);
       return target;

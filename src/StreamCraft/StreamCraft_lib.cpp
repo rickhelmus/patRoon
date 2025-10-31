@@ -9,6 +9,7 @@
 #include <cmath>
 #include <zlib.h>
 #include <omp.h>
+#include "simdutf/simdutf.h"
 
 // MARK: FUNCTIONS
 
@@ -161,7 +162,7 @@ std::string sc::encode_big_endian_from_double(const std::vector<double> &input, 
 std::vector<float> sc::decode_little_endian_to_float(const std::string &str, const int &precision)
 {
 
-  std::vector<unsigned char> bytes(str.begin(), str.end());
+  std::vector<std::uint8_t> bytes(str.begin(), str.end());
 
   if (precision != sizeof(double) && precision != sizeof(float))
   {
@@ -451,54 +452,65 @@ std::string sc::encode_base64(const std::string &str)
 
 std::string sc::decode_base64(const std::string &encoded_string)
 {
-
-  std::string decoded_string;
-
-  decoded_string.reserve((encoded_string.size() * 3) / 4);
-
-  int val = 0;
-  int valb = -8;
-  for (char c : encoded_string)
-  {
-    if (c == '=')
-    {
-      valb -= 6;
-      continue;
-    }
-    if (c >= 'A' && c <= 'Z')
-    {
-      c -= 'A';
-    }
-    else if (c >= 'a' && c <= 'z')
-    {
-      c -= 'a' - 26;
-    }
-    else if (c >= '0' && c <= '9')
-    {
-      c -= '0' - 52;
-    }
-    else if (c == '+')
-    {
-      c = 62;
-    }
-    else if (c == '/')
-    {
-      c = 63;
-    }
-    else
-    {
-      continue;
-    }
-    val = (val << 6) + c;
-    valb += 6;
-    if (valb >= 0)
-    {
-      decoded_string.push_back(char((val >> valb) & 0xFF));
-      valb -= 8;
-    }
+  std::vector<uint8_t> buffer(
+  simdutf::maximal_binary_length_from_base64(encoded_string.data(), encoded_string.size()));
+  simdutf::result r = simdutf::base64_to_binary(
+    encoded_string.data(), encoded_string.size(), (char*)buffer.data()
+  );
+  if(r.error != simdutf::error_code::SUCCESS) {
+    std::cout << "output: error" << std::endl;
+  } else {
+    buffer.resize(r.count);
   }
+  return std::string(buffer.begin(), buffer.end());
 
-  return decoded_string;
+  // std::string decoded_string;
+
+  // decoded_string.reserve((encoded_string.size() * 3) / 4);
+
+  // int val = 0;
+  // int valb = -8;
+  // for (char c : encoded_string)
+  // {
+  //   if (c == '=')
+  //   {
+  //     valb -= 6;
+  //     continue;
+  //   }
+  //   if (c >= 'A' && c <= 'Z')
+  //   {
+  //     c -= 'A';
+  //   }
+  //   else if (c >= 'a' && c <= 'z')
+  //   {
+  //     c -= 'a' - 26;
+  //   }
+  //   else if (c >= '0' && c <= '9')
+  //   {
+  //     c -= '0' - 52;
+  //   }
+  //   else if (c == '+')
+  //   {
+  //     c = 62;
+  //   }
+  //   else if (c == '/')
+  //   {
+  //     c = 63;
+  //   }
+  //   else
+  //   {
+  //     continue;
+  //   }
+  //   val = (val << 6) + c;
+  //   valb += 6;
+  //   if (valb >= 0)
+  //   {
+  //     decoded_string.push_back(char((val >> valb) & 0xFF));
+  //     valb -= 8;
+  //   }
+  // }
+
+  // return decoded_string;
 };
 
 // MARK: MZXML
@@ -1183,9 +1195,13 @@ std::vector<std::vector<float>> sc::mzml::MZML_SPECTRUM::extract_binary_data(con
     if (mtd[counter].compressed)
       decoded_string = sc::decompress_zlib(decoded_string);
 
-    spectrum[counter] = sc::decode_little_endian_to_float(decoded_string, mtd[counter].precision_int / 8);
+    const std::vector<float> decoded_floats = sc::decode_little_endian_to_float(decoded_string, mtd[counter].precision_int / 8);
 
-    int bin_array_size = spectrum[counter].size();
+    const int bin_array_size = decoded_floats.size();
+    
+    spectrum[counter].resize(bin_array_size);
+
+    spectrum[counter] = decoded_floats;
 
     if (bin_array_size != number_traces)
       throw std::runtime_error("Number of traces in binary array does not match the value of the spectrum header!");
@@ -1365,6 +1381,10 @@ std::vector<std::vector<float>> sc::mzml::MZML_CHROMATOGRAM::extract_binary_data
         mtd.compressed = false;
       }
     }
+    else
+    {
+      mtd.compressed = false;
+    }
 
     bool has_bin_data_type = false;
 
@@ -1374,7 +1394,6 @@ std::vector<std::vector<float>> sc::mzml::MZML_CHROMATOGRAM::extract_binary_data
 
       if (node_data_type)
       {
-
         has_bin_data_type = true;
 
         mtd.data_name = node_data_type.attribute("name").as_string();
@@ -1419,13 +1438,11 @@ std::vector<std::vector<float>> sc::mzml::MZML_CHROMATOGRAM::extract_binary_data
       decoded_string = sc::decompress_zlib(decoded_string);
     }
 
-    chromatogram[counter] = sc::decode_little_endian_to_float(decoded_string, mtd.precision_int / 8);
+    const std::vector<float> decoded_floats = sc::decode_little_endian_to_float(decoded_string, mtd.precision_int / 8);
 
-    // const int bin_array_size = chromatogram[counter].size();
+    chromatogram[counter].resize(decoded_floats.size());
 
-    // if (bin_array_size != number_traces) {
-    //   throw std::runtime_error("Number of traces in binary array does not match the value of the chromatogram header!");
-    // }
+    chromatogram[counter] = decoded_floats;
 
     if (mtd.data_name_short == "time")
     {

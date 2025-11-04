@@ -118,7 +118,7 @@ doExportXCMS <- function(x, ...)
     if (is(x, "featureGroupsSIRIUS"))
         getXCMSSet(x, ...)
     else
-        getXCMSSet(x, loadRawData = FALSE, set = "positive")
+        getXCMSSet(x, ..., set = "positive")
 }
 doExportXCMS3 <- function(x, ...)
 {
@@ -126,7 +126,7 @@ doExportXCMS3 <- function(x, ...)
     if (is(x, "featureGroupsSIRIUS"))
         getXCMSnExp(x, ...)
     else
-        getXCMSnExp(x, loadRawData = FALSE, set = "positive")
+        getXCMSnExp(x, ..., set = "positive")
 }
 doExportXCMSNS <- function(x, ...) getXCMSSet(x, ...)
 doExportXCMS3NS <- function(x, ...) getXCMSnExp(x, ...)

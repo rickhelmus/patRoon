@@ -182,7 +182,7 @@ setMethod("getXCMSSet", "featureGroups", function(obj, verbose, loadRawData, IMS
     
     if (verbose)
         cat("Getting ungrouped xcmsSet...\n")
-    xs <- getXCMSSet(getFeatures(obj), verbose = verbose, loadRawData = loadRawData)
+    xs <- getXCMSSet(getFeatures(obj), verbose = verbose, loadRawData = loadRawData, IMS = IMS)
 
     xsgrps <- makeXCMSGroups(obj, verbose)
     xcms::groupidx(xs) <- xsgrps$idx
@@ -330,7 +330,7 @@ setMethod("getXCMSnExp", "featureGroups", function(obj, verbose, loadRawData, IM
 
     msLevel = 1L # UNDONE?
 
-    xdata <- getXCMSnExp(getFeatures(obj), verbose = verbose, loadRawData = loadRawData)
+    xdata <- getXCMSnExp(getFeatures(obj), verbose = verbose, loadRawData = loadRawData, IMS = IMS)
 
     xsgrps <- makeXCMSGroups(obj, verbose)
     xsgrps$groups[, peakidx := list(xsgrps$idx)]

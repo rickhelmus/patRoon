@@ -185,7 +185,6 @@
         - verify removal duplicate features?
         - mobAssignMethod and mobAssignAggr
         - mz profile & EIM saving, ...
-    - XCMS features/fGroups, eg with subsetting & exporting
     - CCS/Mob conversion utilities? Or rely on assignMobilities() tests?
     - spectrumSimilarityMobility()
     - susp lists with >1 mobility/CCS values. Test if mob/CCS counts differ.

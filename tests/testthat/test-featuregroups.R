@@ -89,8 +89,7 @@ test_that("assignMobilities", {
     expect_setequal(groupQualities(fgAMQ)$group, names(fgAMQ))
     expect_setequal(groupScores(fgAMQ)$group, names(fgAMQ))
     # NOTE: remove blanks as ISTDs are not present in those and would otherwise be removed
-    fgIMSISTD <- normInts(filter(fgIMS, removeBlanks = TRUE), featNorm = "istd",
-                          standards = list(patRoonDataIMS::ISTDListPos, patRoonDataIMS::ISTDListNeg))
+    fgIMSISTD <- doNormIntsIMS(filter(fgIMS, removeBlanks = TRUE), featNorm = "istd")
     fgAMISTD <- runAM(fgIMSISTD)
     getAssignedFGs <- \(fg) unlist(lapply(internalStandardAssignments(fg), names))
     gi <- groupInfo(fgAMISTD)[ims_parent_group %in% getAssignedFGs(fgIMSISTD)]
@@ -470,14 +469,18 @@ test_that("IMS subset and filtering", {
 })
 
 fgISTD <- fgOpenMS
-fgISTD@features@analysisInfo <- copy(fgISTD@features@analysisInfo)
-fgISTD@features@analysisInfo[, norm_conc := rep(c(NA, NA, NA, 1, 2, 1), length.out = nrow(analysisInfo(fgISTD)))]
-fgNormISTDMin1 <- doNormInts(fgISTD, "istd", ISTDRTWindow = 120, ISTDMZWindow = 300, minISTDs = 1)
-fgNormISTDMin2 <- doNormInts(fgISTD, "istd", ISTDRTWindow = 120, ISTDMZWindow = 300, minISTDs = 2)
+analysisInfo(fgISTD)$norm_conc <- rep(c(NA, NA, NA, 1, 2, 1), length.out = nrow(analysisInfo(fgISTD)))
+fgISTDIMS <- fgAMInt
+analysisInfo(fgISTDIMS)$norm_conc <- rep(c(NA, NA, NA, 1, 2, 1), length.out = nrow(analysisInfo(fgISTDIMS)))
+fgNormISTDMin1 <- doNormInts(fgISTD, "istd", minISTDs = 1)
+fgNormISTDMin2 <- doNormInts(fgISTD, "istd", minISTDs = 2)
+fgNormISTDIMS <- doNormIntsIMS(fgISTDIMS, "istd")
 fgNormISTDEmpty <- doNormInts(fgOpenMSEmpty, "istd")
 fgNormTIC <- doNormInts(fgISTD, "tic")
+fgNormTICIMS <- doNormIntsIMS(fgISTDIMS, "tic")
 fgNormConc <- doNormInts(fgISTD, "conc")
 fgNormGroup <- doNormInts(fgISTD, groupNorm = TRUE)
+
 
 checkISTDNormWindows <- function(fg, minISTD, RTWin, MZWin)
 {
@@ -506,6 +509,16 @@ test_that("Normalization", {
     expect_range(groupTable(fgNormGroup, normalized = TRUE), c(0, 1))
     # sample 5 in fgNormConc has halved intensities
     expect_equal(groupTable(fgNormConc[5], normalized = TRUE) * 2, groupTable(fgISTD[5]))
+    
+    # verify that IMS features do not affect normalization
+    expect_equal(groupTable(fgNormISTDIMS[IMS = FALSE], normalized = TRUE),
+                 groupTable(doNormIntsIMS(fgISTDIMS[IMS = FALSE], "istd"), normalized = TRUE))
+    expect_equal(groupTable(fgNormTICIMS[IMS = FALSE], normalized = TRUE),
+                 groupTable(doNormIntsIMS(fgISTDIMS[IMS = FALSE], "tic"), normalized = TRUE))
+    # verify that IMS features are normalized equally to their parents
+    expect_equal(groupTable(fgNormISTDIMS[IMS = TRUE], normalized = TRUE),
+                 groupTable(fgNormISTDIMS[IMS = FALSE], normalized = TRUE)[, groupInfo(fgNormISTDIMS[IMS = TRUE])$ims_parent_group, with = FALSE],
+                 check.attributes = FALSE)
     
     expect_length(fgNormISTDEmpty, 0)
     expect_length(doNormInts(fgOpenMSEmpty, "tic"), 0)

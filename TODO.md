@@ -163,6 +163,8 @@
     - fixedIsolationWidth?
 - IMS
     - more verification that normInts() works before/after assignMobilities()
+        - tests are there now, but 3rd test is failing because ISTD is not found in neg mode
+        - --> check when piek default settings are properly set
     - expandForIMS()
         - verify things are copied or error is thrown for unsupported algos
     - convertMobilityToCCS() / convertCCSToMobility()

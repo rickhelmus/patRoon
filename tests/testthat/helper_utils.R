@@ -151,8 +151,10 @@ doScreen <- function(fg, susp, ...)
     screenSuspects(fg, susp, ...)
 }
 
-doNormInts <- function(fg, ...) normInts(fg, ..., standards = list(patRoonData::ISTDListPos,
-                                                                   patRoonData::ISTDListNeg))
+doNormInts <- function(fg, ...) normInts(fg, ..., ISTDRTWindow = 120, ISTDMZWindow = 300,
+                                         standards = list(patRoonData::ISTDListPos, patRoonData::ISTDListNeg))
+doNormIntsIMS <- function(fg, ...) normInts(fg, ..., ISTDRTWindow = 120, ISTDMZWindow = 300,
+                                            standards = list(patRoonDataIMS::ISTDListPos, patRoonDataIMS::ISTDListNeg))
 
 # zero threshold makes comparisons in testing much easier
 doGenForms <- function(..., setThresholdAnn = 0) generateFormulas(..., setThresholdAnn = setThresholdAnn)

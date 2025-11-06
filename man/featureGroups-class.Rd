@@ -656,8 +656,8 @@ by \code{adducts<-} and \code{selectIons} when these methods perform a re-groupi
   The \code{normInts} method supports several methods to normalize intensities/areas of features within the same
   analysis. Most methods are influenced by the \emph{normalization concentration} (\code{norm_conc} in the
   \link[=analysis-information]{analysis information}) set for each sample analysis. For \code{NA} or zero values the
-  output will be zero. If the \code{norm_conc} is completely absent from the analysis information, the normalization
-  concentration is defaulted to one.
+  output will be zero. If \code{norm_conc} is completely absent from the analysis information or all values are
+  \code{NA}, the normalization concentration is defaulted to one.
 
   The different normalization methods are:
 

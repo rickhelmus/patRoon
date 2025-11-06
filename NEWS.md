@@ -1,7 +1,10 @@
 # DEVEL
 
 * `patRoon.cache.maxEntries` package option (issue #139)
-* Fixed syncing of xdata slots imported XCMS features that are not sortbed by analysis (eg after peak filling) (issue #141)
+* Fixed: syncing of xdata slots imported XCMS features that are not sortbed by analysis (eg after peak filling) (issue #141)
+* `normInts()` changes (feedback Jan Specker)
+    - Fixed: `groupNorm=TRUE` now correctly handles zero values which would result in `NaN` values
+    - Changed: `norm_conc` is set to one if all are values are NA (default for `newProject()`)
 
 # patRoon 2.3.4
 

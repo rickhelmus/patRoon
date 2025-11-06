@@ -1032,8 +1032,8 @@ setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduc
 #'   The \code{normInts} method supports several methods to normalize intensities/areas of features within the same
 #'   analysis. Most methods are influenced by the \emph{normalization concentration} (\code{norm_conc} in the
 #'   \link[=analysis-information]{analysis information}) set for each sample analysis. For \code{NA} or zero values the
-#'   output will be zero. If the \code{norm_conc} is completely absent from the analysis information, the normalization
-#'   concentration is defaulted to one.
+#'   output will be zero. If \code{norm_conc} is completely absent from the analysis information or all values are
+#'   \code{NA}, the normalization concentration is defaulted to one.
 #'
 #'   The different normalization methods are:
 #'
@@ -1114,9 +1114,9 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
     anaInfo <- analysisInfo(fGroups)
     
     normConcs <- anaInfo[["norm_conc"]]
-    if (is.null(normConcs))
+    if (is.null(normConcs) || all(is.na(normConcs)))
     {
-        printf("NOTE: No normalization concentrations defined (norm_conc column is absent in analysis information). Defaulting to 1.\n")
+        printf("NOTE: No normalization concentrations defined (norm_conc column is absent in analysis information or all values are NA). Defaulting to 1.\n")
         normConcs <- rep(1, nrow(anaInfo))
     }
     
@@ -1230,8 +1230,8 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
         fGroups@features@features <- lapply(featureTable(fGroups), function(ft)
         {
             ft <- copy(ft)
-            ft[, c("intensity_rel", "area_rel") := .(intensity_rel / nInts[group],
-                                                     area_rel / nAreas[group])]
+            ft[nInts[group] > 0, intensity_rel := intensity_rel / nInts[group]]
+            ft[nAreas[group] > 0, area_rel := area_rel / nAreas[group]]
             return(ft)
         })
     }

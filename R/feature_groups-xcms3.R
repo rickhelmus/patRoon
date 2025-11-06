@@ -136,20 +136,33 @@ doGroupFeaturesXCMS3 <- function(xdata, feat, rtalign, loadRawData, groupParam, 
     return(ret)
 }
 
-getFeatIndicesFromXCMSnExp <- function(xdata)
+getFeatIndicesFromXCMSnExp <- function(xdata, feat)
 {
-    plist <- as.data.table(xcms::chromPeaks(xdata))
-    plist[, subind := seq_len(.N), by = "sample"]
+    # HACK: if xdata came from a 'true' XCMS3 object (ie not constructed in getXCMSnExp()), then it may be that the the
+    # features in xdata are not sorted by analysis (eg when peak filling has been used). In that case, we match by ID
+    # instead: the ID column in feat corresponds to the rowname of the XCMS features.
+    isXCMS3Feat <- inherits(feat, "featuresXCMS3")
+    
+    xp <- xcms::chromPeaks(xdata)
+    tab <- as.data.table(feat)
+    tab[, srow := seq_len(.N), by = "analysis"]
 
     xdftidx <- xcms::featureValues(xdata, value = "index")
     ret <- as.data.table(t(xdftidx))
-
+    
     for (grp in seq_along(ret))
     {
-        idx <- plist[ret[, grp, with = FALSE][[1]], subind]
+        idx <- if (isXCMS3Feat)
+        {
+            fIDs <- rownames(xp)[ret[[grp]]]
+            tab$srow[match(fIDs, tab$ID)]
+        }
+        else
+            tab$srow[ret[[grp]]]
+        
         set(ret, j = grp, value = idx)
     }
-
+    
     ret[is.na(ret)] <- 0
 
     return(ret)
@@ -166,10 +179,10 @@ importFeatureGroupsXCMS3FromFeat <- function(xdata, analysisInfo, feat)
     groups[is.na(groups)] <- 0
 
     ret <- featureGroupsXCMS3(xdata = xdata, groups = groups, groupInfo = gInfo, analysisInfo = analysisInfo, features = feat,
-                              ftindex = setnames(getFeatIndicesFromXCMSnExp(xdata), gNames))
+                              ftindex = setnames(getFeatIndicesFromXCMSnExp(xdata, feat), gNames))
     
     # synchronize features: any that were without group have been removed
-    ret@xdata <- xcms::filterChromPeaks(ret@xdata, getKeptXCMSPeakInds(feat, ret@features))
+    ret@xdata <- xcms::filterChromPeaks(ret@xdata, getKeptXCMSPeakInds(feat, ret@features, ret@xdata))
     
     return(ret)
 }
@@ -218,7 +231,7 @@ setMethod("delete", "featureGroupsXCMS3", function(obj, ...)
         obj@xdata <- xcms::filterFile(obj@xdata, which(analyses(old) %in% analyses(obj)), keepFeatures = TRUE)
     
     if (nrow(xcms::chromPeaks(obj@xdata)) != length(obj@features)) # sync features
-        obj@xdata <- xcms::filterChromPeaks(obj@xdata, getKeptXCMSPeakInds(old, obj@features))
+        obj@xdata <- xcms::filterChromPeaks(obj@xdata, getKeptXCMSPeakInds(old@features, obj@features, obj@xdata))
 
     return(obj)
 })

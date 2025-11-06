@@ -1,6 +1,7 @@
 # DEVEL
 
 * `patRoon.cache.maxEntries` package option (issue #139)
+* Fixed syncing of xdata slots imported XCMS features that are not sortbed by analysis (eg after peak filling) (issue #141)
 
 # patRoon 2.3.4
 

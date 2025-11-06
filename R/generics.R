@@ -37,6 +37,7 @@ setGeneric("getEICsForFGroups", function(fGroups, analysis = analyses(fGroups), 
                                          ...) standardGeneric("getEICsForFGroups"))
 setGeneric("getEICsForFeatures", function(features) standardGeneric("getEICsForFeatures"))
 
+setGeneric("getKeptXCMSPeakInds", function(old, new, xd) standardGeneric("getKeptXCMSPeakInds"))
 
 ### Features and feature groups
 

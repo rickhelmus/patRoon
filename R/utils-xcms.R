@@ -166,6 +166,9 @@ setMethod("getXCMSSet", "features", function(obj, verbose, loadRawData)
 #' @export
 setMethod("getXCMSSet", "featuresXCMS", function(obj, ...)
 {
+    # in some cases the xset may be out of sync, see delete()
+    if (length(obj) != nrow(xcms::peaks(obj@xs)))
+        return(callNextMethod())
     return(obj@xs)
 })
 
@@ -196,7 +199,8 @@ setMethod("getXCMSSet", "featureGroupsXCMS", function(obj, verbose, loadRawData)
     anaInfo <- analysisInfo(obj)
 
     if (length(xcms::filepaths(obj@xs)) != length(anaInfo$analysis) ||
-        !all(simplifyAnalysisNames(xcms::filepaths(obj@xs)) == anaInfo$analysis))
+        !all(simplifyAnalysisNames(xcms::filepaths(obj@xs)) == anaInfo$analysis) ||
+        length(getFeatures(obj)) != nrow(xcms::peaks(obj@xs)))
     {
         # files changed, need to update group statistics which is rather complex so just fallback
         return(callNextMethod(obj, verbose = verbose, loadRawData = loadRawData))
@@ -374,11 +378,14 @@ loadXCMSRaw <- function(analyses, paths, cacheDB = NULL, verbose = TRUE)
 importXCMSPeaks <- function(peaks, analysisInfo)
 {
     plist <- as.data.table(peaks)
+    if (is.null(rownames(peaks)))
+        plist[, ID := as.character(seq_len(.N)), by = "sample"] # HACK: for old XCMS, just use row numbers
+    else
+        plist[, ID := rownames(peaks)]
 
     feat <- lapply(seq_len(nrow(analysisInfo)), function(sind)
     {
         ret <- plist[sample == sind]
-        ret[, ID := seq_len(nrow(ret))]
         setnames(ret, c("rt", "rtmin", "rtmax", "maxo", "into"), c("ret", "retmin", "retmax", "intensity", "area"))
         return(ret[, intersect(XCMSFeatCols(), names(ret)), with = FALSE])
     })
@@ -394,7 +401,7 @@ XCMSFeatTblEqual <- function(tbl1, tbl2)
 }
 
 # used by delete()
-getKeptXCMSPeakInds <- function(old, new)
+setMethod("getKeptXCMSPeakInds", c("features", "features"), function(old, new, xd)
 {
     newft <- featureTable(new)
     oldXCMSInds <- rbindlist(Map(featureTable(old), analyses(old), f = function(ft, ana)
@@ -407,7 +414,15 @@ getKeptXCMSPeakInds <- function(old, new)
     }))
     oldXCMSInds[, inds := seq_len(nrow(oldXCMSInds))]
     return(oldXCMSInds[keep == TRUE]$inds)
-}
+})
+
+setMethod("getKeptXCMSPeakInds", c("featuresXCMS3", "featuresXCMS3"), function(old, new, xd)
+{
+    # HACK: for XCMS3 features the features may not be sorted fully by analysis, eg when peak filling has been used the
+    # new features are simply added to the end of the feature list. For this reason, we use the XCMS feature IDs to get
+    # the 'proper' row numbers.
+    match(as.data.table(new)$ID, rownames(xcms::chromPeaks(xd)))
+})
 
 # UNDONE: use with feature group plot EIC plotting
 # UNDONE: update, some day...

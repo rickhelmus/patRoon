@@ -141,7 +141,7 @@ reportHTMLUtils$methods(
         tabTPs <- merge(tabTPs, tabTPsPar, by = "parent_group", sort = FALSE, all.x = TRUE)
         
         groupBy <- if (fromTPs) c("component", "susp_name") else "component"
-        groupDefs <- getFGGroupDefs(tabTPs, groupBy, rgs)
+        groupDefs <- getFGGroupDefs(tabTPs, groupBy, rgs, objects$fGroups)
         # squeeze in TP column
         groupDefs <- c(groupDefs[1:2],
                        list(reactable::colGroup("TP", columns = intersect(c("TP_name", "retDiff", "mzDiff",
@@ -151,7 +151,7 @@ reportHTMLUtils$methods(
                                                 headerStyle = getFGColSepStyle())),
                        groupDefs[seq(3, length(groupDefs))])
         
-        colDefs <- getFeatGroupColDefs(tabTPs)
+        colDefs <- getFeatGroupColDefs(tabTPs, objects$fGroups)
         
         # set parent 'aggregates': actual value of parent feature group
         for (col in grep("^parent_", names(tabTPs), value = TRUE))

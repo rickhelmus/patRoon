@@ -144,9 +144,11 @@ test_that("delete and filter", {
 
 test_that("basic usage", {
     expect_equal(nrow(as.data.table(ffOpenMS)), length(ffOpenMS))
+    
+    expect_identical(getFeatureQualityNames(ffOpenMSQ), featureQualityNames(group = FALSE))
     checkmate::expect_names(names(as.data.table(ffOpenMSQ)),
-                                  must.include = c(featureQualityNames(group = FALSE),
-                                                   featureQualityNames(group = FALSE, scores = TRUE)))
+                            must.include = c(getFeatureQualityNames(ffOpenMSQ),
+                                             getFeatureQualityNames(ffOpenMSQ, scores = TRUE)))
 })
 
 # XCMSImpXCMS <- getXCMSSet(ffXCMS)

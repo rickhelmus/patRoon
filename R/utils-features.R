@@ -22,28 +22,7 @@ reGenerateFTIndex <- function(fGroups)
 }
 isFGSet <- function(fGroups) inherits(fGroups, "featureGroupsSet")
 
-featureQualities <- function()
-{
-    checkPackage("MetaClean")
-    list(ApexBoundaryRatio = list(func = MetaClean::calculateApexMaxBoundaryRatio, HQ = "LV", range = c(0, 1)),
-         FWHM2Base = list(func = MetaClean::calculateFWHM, HQ = "HV", range = c(0, 1)),
-         Jaggedness = list(func = MetaClean::calculateJaggedness, HQ = "LV", range = Inf),
-         Modality = list(func = MetaClean::calculateModality, HQ = "LV", range = Inf),
-         Symmetry = list(func = MetaClean::calculateSymmetry, HQ = "HV", range = c(-1, 1)),
-         GaussianSimilarity = list(func = MetaClean::calculateGaussianSimilarity, HQ = "HV", range = c(0, 1)),
-         Sharpness = list(func = MetaClean::calculateSharpness, HQ = "HV", range = Inf),
-         TPASR = list(func = MetaClean::calculateTPASR, HQ = "LV", range = Inf),
-         ZigZag = list(func = MetaClean::calculateZigZagIndex, HQ = "LV", range = Inf))
-}
 
-featureGroupQualities <- function()
-{
-    checkPackage("MetaClean")
-    list(
-        ElutionShift = list(func = MetaClean::calculateElutionShift, HQ = "LV", range = Inf),
-        RetentionTimeCorrelation = list(func = MetaClean::calculateRetentionTimeConsistency, HQ = "LV", range = Inf)
-    )
-}
 
 # normalize, invert if necessary to get low (worst) to high (best) order
 scoreFeatQuality <- function(quality, values)
@@ -160,14 +139,14 @@ doFGAsDataTable <- function(fGroups, average = FALSE, areas = FALSE, features = 
             ret[, (paste0("group_", names(gq))) := gq]
         }
         else if (hasFGroupScores(fGroups))
-            ret[, (intersect(featureQualityNames(group = FALSE), names(ret))) := NULL]
+            ret[, (intersect(getFeatureQualityNames(fGroups, group = FALSE), names(ret))) := NULL]
         if (addScores)
         {
             gs <- groupScores(fGroups)[match(ret$group, group), -"group"]
             ret[, (paste0("group_", names(gs))) := gs]
         }
         else if (hasFGroupScores(fGroups))
-            ret[, (intersect(featureQualityNames(group = FALSE, scores = TRUE), names(ret))) := NULL]
+            ret[, (intersect(getFeatureQualityNames(fGroups, group = FALSE, scores = TRUE), names(ret))) := NULL]
         
         if (average)
         {

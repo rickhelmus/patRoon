@@ -175,7 +175,7 @@ checkFeaturesInterface$methods(
             if (!"totalScore" %in% rValues$settings$fGroupColumns)
                 gData[, totalScore := NULL]
             if (!"otherScores" %in% rValues$settings$fGroupColumns)
-                gData[, (featureQualityNames(scores = TRUE, totScore = FALSE)) := NULL]
+                gData[, (getFeatureQualityNames(fGroups, scores = TRUE, totScore = FALSE)) := NULL]
         }
         
         return(gData)
@@ -204,7 +204,7 @@ checkFeaturesInterface$methods(
         {
             if ("otherScores" %in% rValues$settings$featureColumns)
             {
-                fs <- featureQualityNames(group = FALSE, scores = TRUE, totScore = FALSE)
+                fs <- getFeatureQualityNames(fGroups, group = FALSE, scores = TRUE, totScore = FALSE)
                 fData[, (fs) := feat[, fs, with = FALSE]]
             }
             if ("totalScore" %in% rValues$settings$featureColumns)
@@ -411,7 +411,7 @@ convertQualitiesToMCData <- function(fGroups)
     
     ret[, EICNo := match(group, names(fGroups))]
     setcolorder(ret, "EICNo")
-    qcols <- featureQualityNames()
+    qcols <- getFeatureQualityNames(fGroups)
     setnames(ret, qcols, paste0(qcols, "_mean"))
     ret[, group := NULL][]
     return(ret)

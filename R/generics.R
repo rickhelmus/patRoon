@@ -412,9 +412,9 @@ setGeneric("annotations", function(obj, ...) standardGeneric("annotations"))
 #' @templateVar func calculatePeakQualities
 #' @templateVar desc calculates chromatographic peak qualities and scores.
 #' @template generics
-#' @param weights,flatnessFactor See method documentation.
+#' @param weights,flatnessFactor,featureQualities,featureGroupQualities See method documentation.
 setGeneric("calculatePeakQualities", function(obj, weights = NULL,
-                                              flatnessFactor = 0.05, ...) standardGeneric("calculatePeakQualities"))
+                                              flatnessFactor = 0.05, featureQualities = NULL, featureGroupQualities = NULL, ...) standardGeneric("calculatePeakQualities"))
 
 #' @templateVar func clusterProperties
 #' @templateVar desc Obtain a list with properties of the generated cluster(s).
@@ -476,6 +476,11 @@ setGeneric("getBPCs", function(obj, ...) standardGeneric("getBPCs"))
 #' @templateVar desc returns the object's \code{\link{features}} object.
 #' @template generics
 setGeneric("getFeatures", function(obj) standardGeneric("getFeatures"))
+
+#' @templateVar func getFeatureQualityNames
+#' @templateVar desc returns the object's feature quality names.
+#' @template generics
+setGeneric("getFeatureQualityNames", function(obj, ...) standardGeneric("getFeatureQualityNames"))
 
 #' @templateVar func getMCS
 #' @templateVar desc Calculates the maximum common substructure.

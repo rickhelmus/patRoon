@@ -29,6 +29,8 @@ printFeatStats <- function(fList)
 #'
 #' @slot features List of features per analysis file. Use the \code{featureTable} method for access.
 #' @slot analysisInfo Analysis group information. Use the \code{analysisInfo} method for access.
+#' @slot featureQualityNames Character vector with the names of the chromatographic peak quality metrics that are
+#'   present.
 #'
 #' @templateVar seli analyses
 #' @templateVar selOrderi analyses()
@@ -62,11 +64,12 @@ printFeatStats <- function(fList)
 #'
 #' @export
 features <- setClass("features",
-                     slots = c(features = "list", analysisInfo = "data.frame"),
+                     slots = c(features = "list", analysisInfo = "data.frame", featureQualityNames = "character"),
                      contains = c("VIRTUAL", "workflowStep"))
 
 setMethod("initialize", "features", function(.Object, ...)
 {
+    args <- list(...)
     .Object <- callNextMethod(.Object, ...)
     .Object@features <- makeEmptyListNamed(.Object@features)
     return(.Object)
@@ -117,6 +120,23 @@ setReplaceMethod("featureTable", "features", function(obj, value)
 #' @export
 setMethod("analysisInfo", "features", function(obj) obj@analysisInfo)
 
+#' @describeIn features Returns the present chromatographic peak quality and score names for features.
+#' @param scores If \code{TRUE} the score names are returned, otherwise the quality names.
+#' @param totScore If \code{TRUE} (and \code{scores=TRUE}) then the name of the total score is included.
+#' @export
+setMethod("getFeatureQualityNames", "features", function(obj, scores = FALSE, totScore = TRUE)
+{
+    aapply(checkmate::assertFlag, . ~ scores + totScore)
+    ret <- obj@featureQualityNames
+    if (scores)
+    {
+        ret <- paste0(ret, "Score")
+        if (totScore)
+            ret <- c(ret, "totalScore")
+    }
+    return(ret)
+})
+
 #' @templateVar class features
 #' @templateVar what analyses
 #' @template strmethod
@@ -150,8 +170,8 @@ setMethod("filter", "features", function(obj, absMinIntensity = NULL, relMinInte
            null.ok = TRUE, fixed = list(add = ac))
     aapply(assertRange, . ~ retentionRange + mzRange + mzDefectRange + chromWidthRange, null.ok = TRUE,
            fixed = list(add = ac))
-    assertScoreRange(qualityRange, c(featureQualityNames(group = FALSE),
-                                     featureQualityNames(group = FALSE, scores = TRUE)), add = ac)
+    assertScoreRange(qualityRange, c(getFeatureQualityNames(obj),
+                                     getFeatureQualityNames(obj, scores = TRUE)), add = ac)
     checkmate::assertFlag(negate, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -304,23 +324,24 @@ setMethod("delete", "features", function(obj, i = NULL, j = NULL, ...)
     return(obj)
 })
 
-#' @describeIn features Calculates peak qualities for each feature. This uses
-#'   \href{https://github.com/KelseyChetnik/MetaClean/}{MetaClean} \R package to calculate the following metrics:
-#'   \verb{Apex-Boundary Ratio}, \verb{FWHM2Base}, \verb{Jaggedness}, \verb{Modality}, \verb{Symmetry}, \verb{Gaussian
-#'   Similarity}, \verb{Sharpness}, \verb{Triangle Peak Area Similarity Ratio} and \verb{Zig-Zag index}. Please see the
-#'   \pkg{MetaClean} publication (referenced below) for more details. For each metric, an additional score is calculated
-#'   by normalizing all feature values (unless the quality metric definition has a fixed range) and scale from \samp{0}
-#'   (worst) to \samp{1} (best). Then, a \verb{totalScore} for each feature is calculated by the (weighted) sum of all
-#'   score values.
+#' @describeIn features Calculates peak qualities for each feature. Please see the
+#'   \code{\link[=feature-quality]{featureQualities}} function and \pkg{MetaClean} publication (referenced below) for
+#'   more details. For each metric, an additional score is calculated by normalizing all feature values (unless the
+#'   quality metric definition has a fixed range) and scale from \samp{0} (worst) to \samp{1} (best). Then, a
+#'   \verb{totalScore} for each feature is calculated by the (weighted) sum of all score values.
 #'
 #' @param weights A named \code{numeric} vector that defines the weight for each score to calculate the
 #'   \verb{totalScore}. The names of the vector follow the score names. Unspecified weights are defaulted to \samp{1}.
 #'   Example: \code{weights=c(ApexBoundaryRatioScore=0.5, GaussianSimilarityScore=2)}.
 #' @param flatnessFactor Passed to \pkg{MetaClean} as the \code{flatness.factor} argument to
 #'   \code{\link[MetaClean]{calculateJaggedness}} and \code{\link[MetaClean]{calculateModality}}.
+#' @param featureQualities Specifies which feature qualities to calculate. Can be \code{NULL} (default, calculates all
+#'   qualities), a \code{character} vector with names of qualities to calculate (e.g., \code{c("FWHM2Base",
+#'   "Symmetry")}), or a \code{list} of custom quality definitions. See the
+#'   \code{\link[=feature-quality]{featureQualities}} function for more details.
 #'
 #' @template parallel-arg
-#' 
+#'
 #' @references \insertRef{Chetnik2020}{patRoon}
 #'
 #' @return \code{calculatePeakQualities} returns a modified object amended with peak qualities and scores.
@@ -328,27 +349,30 @@ setMethod("delete", "features", function(obj, i = NULL, j = NULL, ...)
 #' @note For \code{calculatePeakQualities}: sometimes \pkg{MetaClean} may return \code{NA} for the \verb{Gaussian
 #'   Similarity} metric, in which case it will be set to \samp{0}.
 #' @export
-setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessFactor, parallel = TRUE)
+setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessFactor, featureQualities = NULL,
+                                                         parallel = TRUE)
 {
     checkPackage("MetaClean")
     
     if (length(obj) == 0)
         return(obj) # nothing to do...
     
-    featQualities <- featureQualities()
-    featQualityNames <- featureQualityNames(group = FALSE)
-    featScoreNames <- featureQualityNames(group = FALSE, scores = TRUE, totScore = FALSE)
-    
     ac <- checkmate::makeAssertCollection()
+    assertFeatureQualities(featureQualities, null.ok = TRUE, add = ac)
     checkmate::assertNumeric(weights, finite = TRUE, any.missing = FALSE, min.len = 1, names = "unique",
                              null.ok = TRUE, add = ac)
-    if (!is.null(weights))
-        checkmate::assertNames(names(weights), subset.of = featScoreNames, add = ac)
     checkmate::assertNumber(flatnessFactor, add = ac)
     checkmate::assertFlag(parallel, add = ac)
     checkmate::reportAssertions(ac)
     
-    hash <- makeHash(obj, weights, flatnessFactor)
+    featQualities <- if (!is.list(featureQualities)) featureQualities(featureQualities) else featureQualities
+    featQualityNames <- names(featQualities)
+    featScoreNames <- paste0(featQualityNames, "Score")
+    
+    if (!is.null(weights))
+        checkmate::assertNames(names(weights), subset.of = featScoreNames)
+    
+    hash <- makeHash(obj, weights, flatnessFactor, featQualities)
     cd <- loadCacheData("calculatePeakQualities", hash)
     if (!is.null(cd))
         return(cd)
@@ -415,6 +439,7 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
     })
 
     featureTable(obj) <- fTable
+    obj@featureQualityNames <- featQualityNames
     
     saveCacheData("calculatePeakQualities", obj, hash)
     

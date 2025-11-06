@@ -803,8 +803,8 @@ by <code>adducts&lt;-</code> and <code>selectIons</code> when these methods perf
 <p>The <code>normInts</code> method supports several methods to normalize intensities/areas of features within the same
   analysis. Most methods are influenced by the <em>normalization concentration</em> (<code>norm_conc</code> in the
   <a href="analysis-information.html">analysis information</a>) set for each sample analysis. For <code>NA</code> or zero values the
-  output will be zero. If the <code>norm_conc</code> is completely absent from the analysis information, the normalization
-  concentration is defaulted to one.</p>
+  output will be zero. If <code>norm_conc</code> is completely absent from the analysis information or all values are
+  <code>NA</code>, the normalization concentration is defaulted to one.</p>
 <p>The different normalization methods are:</p>
 <p></p><ol><li><p><code>featNorm="istd"</code> Uses <em>internal standards</em> (IS) for normalization. The IS are screened internally
   by the <code><a href="suspect-screening.html">screenSuspects</a></code> function. Hence, the IS specified by the <code>standards</code> argument should

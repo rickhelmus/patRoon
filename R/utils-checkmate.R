@@ -1117,6 +1117,9 @@ assertCCSParams <- function(x, null.ok = FALSE, .var.name = checkmate::vname(x),
         stop("Please set the calibrant CCS parameter", call. = FALSE)
     
     assertListVal(x, "defaultCharge", checkmate::assertInt, .var.name = .var.name, add = add)
+    assertListVal(x, "temperature", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
+    assertListVal(x, "massGas", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
+    assertListVal(x, "MasonSchampConstant", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
     
     assertListVal(x, "calibrant", function(..., .var.name)
     {

@@ -167,8 +167,6 @@
         - --> check when piek default settings are properly set
     - expandForIMS()
         - verify things are copied or error is thrown for unsupported algos
-    - convertMobilityToCCS() / convertCCSToMobility()
-        - eg convert back and forth
     - suspects
         - test order of data selection for mobility and CCS columns, missing data etc
     - assignMobilities()
@@ -187,7 +185,6 @@
         - verify removal duplicate features?
         - mobAssignMethod and mobAssignAggr
         - mz profile & EIM saving, ...
-    - CCS/Mob conversion utilities? Or rely on assignMobilities() tests?
     - spectrumSimilarityMobility()
     - susp lists with >1 mobility/CCS values. Test if mob/CCS counts differ.
 - misc

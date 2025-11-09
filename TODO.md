@@ -17,7 +17,6 @@
     - switch to PCL w/ CCSbase in patRoonExt
 - BUG: annSim.1 column (in formulas?)?
 - fix default IDLs
-- update REUSE --> fill in license for SC
 - Harmonize/consistent names
     - maxMSRtWindow --> maxMSRTWindow
     - be consistent in mobility vs IMS and mobilograms and EIMs
@@ -172,7 +171,7 @@
     - assignMobilities()
         - DT method
             - robustness with missing data in input/from
-            - check warnings
+            - CCSParams
         - fGroups methods
             - verify that concentrations and toxicities slots are copied
             - from screenInfo(), eg for fGroups with >1 suspect assigned

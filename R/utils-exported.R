@@ -1470,7 +1470,7 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
                 warning(sprintf("Calculations for adducts (%s) will be skipped as there is no neutralMass data. ",
                                 collAdd), msg, call. = FALSE)
                 adductsNoNone <- character()
-                adducts <- intersect(adducts, "none")
+                adducts <- intersect(adducts, NA)
             }
             else if (anyNA(mzTab$neutralMass))
                 warning(sprintf("Calculations for adducts (%s) will be skipped for these rows with NA neutralMass values: %s. ",
@@ -1591,7 +1591,7 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
                 wh <- if (!hasAddCol || !predictAdductOnly)
                     rep(TRUE, nrow(objDo))
                 else
-                    is.na(objDo$adduct) | !nzchar(objDo$adduct) | objDo$adduct == add
+                    !is.na(objDo$adduct) & objDo$adduct == add
                 if (any(wh))
                 {
                     printf("Predicting %d CCS values for adduct '%s'... ", sum(wh), add)
@@ -1612,7 +1612,7 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
         }
         predCols <- intersect(names(from), c(addMobCols, addCCSCols))
         if (length(predCols) == 0)
-            stop("No (adduct relevant) mobility/CCS columns found in the provided data.", call. = FALSE)
+            warning("No (adduct relevant) mobility/CCS columns found in the provided data.", call. = FALSE)
         
         if (matchFromBy == "InChIKey1" && is.null(from[["InChIKey1"]]) && !is.null(from[["InChIKey"]]))
             from[, InChIKey1 := getInChIKey1(InChIKey)]
@@ -1627,11 +1627,13 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
                 m <- match(obj[[matchFromBy]], from[[matchFromBy]])
                 set(obj, j = col, value = from[[col]][m])
             }
-            else
+            else if (overwrite || anyNA(obj[[col]]))
             {
-                # make sure from is character if needed for fifelse below
+                # make sure obj and from are characters if at least one of them is, needed for fifelse below
                 if (is.character(obj[[col]]) && !is.character(from[[col]]))
                     from[, (col) := as.character(get(col))]
+                if (!is.character(obj[[col]]) && is.character(from[[col]]))
+                    obj[, (col) := as.character(get(col))]
                 
                 takeVal <- function(x) overwrite | is.na(x) | (is.character(x) & !nzchar(x))
                 obj[from, (col) := fifelse(takeVal(get(col)), get(paste0("i.", col)), get(col)),

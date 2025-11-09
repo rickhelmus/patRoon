@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-context("CCS")
+local_edition(3) # for snapshots
 
 test_that("CCS conversion works", {
     susps <- as.data.table(patRoonDataIMS::suspectsPos); setnames(susps, "mobility_[M+H]+", "mobility_susp")
@@ -67,7 +67,8 @@ test_that("CCS conversion works", {
 test_that("assignMobilities() for suspects", {
     susps <- as.data.table(patRoonDataIMS::suspectsPos)
     susps <- assignMobilities(susps, CCSParam = getCCSParams("mason-schamp_1/k"))
-    suspsNoMob <- susps[1:5, -"mobility_[M+H]+"]
+    # NOTE: row 1 (hydroxy carbamazepine) is not found in PCL
+    suspsNoMob <- susps[2:6, -c("mobility_[M+H]+", "CCS_[M+H]+")]
     
     suspsPredC3SDB <- assignMobilities(suspsNoMob, "c3sdb")
     suspsPredPCL <- assignMobilities(suspsNoMob, "pubchemlite")
@@ -77,22 +78,75 @@ test_that("assignMobilities() for suspects", {
         suspsPredC3SDB,
         suspsPredPCL,
         suspsPredSelf
-    ))
+    ), style = "serialize")
     
     verifyPred <- function(suspsPred)
     {
-        checkmate::expect_data_table(suspsPred, nrows = nrow(suspsNoMob), ncols = ncol(suspsNoMob) + 1)
+        checkmate::expect_data_table(suspsPred, nrows = nrow(suspsNoMob))
         checkmate::expect_names(names(suspsPred), must.include = "CCS_[M+H]+")
-        checkmate::expect_numeric(suspsPred[["CCS_[M+H]+"]], any.missing = FALSE, lower = 0)
+        if (is.character(suspsPred[["CCS_[M+H]+"]]))
+            checkmate::expect_character(suspsPred[["CCS_[M+H]+"]], any.missing = FALSE)
+        else
+            checkmate::expect_numeric(suspsPred[["CCS_[M+H]+"]], any.missing = FALSE, lower = 0)
     }
+
     verifyPred(suspsPredC3SDB)
     verifyPred(suspsPredPCL)
     verifyPred(suspsPredSelf)
     
     expect_equal(assignMobilities(suspsNoMob, NULL), suspsNoMob)
     expect_equal(assignMobilities(suspsNoMob, susps, matchFromBy = "SMILES"), suspsPredSelf)
-    expect_equal(assignMobilities(suspsPredC3SDB, susps, overwrite = FALSE), suspsPredC3SDB)
-    epxect_false(isTRUE(all.equal(assignMobilities(suspsPredC3SDB, susps, overwrite = TRUE), suspsPredC3SDB)))
-    expect_equal(assignMobilities(suspsPredC3SDB, susps, overwrite = TRUE), suspsPredSelf)
-    expect_equal(assignMobilities(suspsPredC3SDB, susps[1:2], overwrite = TRUE)[-(1:2)], suspsPredC3SDB[-(1:2)])
+    expect_equal(assignMobilities(suspsPredC3SDB, susps[, -"mobility_[M+H]+"], overwrite = FALSE), suspsPredC3SDB)
+    expect_false(isTRUE(all.equal(assignMobilities(suspsPredC3SDB, susps, overwrite = TRUE), suspsPredC3SDB)))
+    expect_equal(assignMobilities(suspsPredC3SDB, susps, overwrite = TRUE)[["CCS_[M+H]+"]], suspsPredSelf[["CCS_[M+H]+"]])
+    # NOTE: susps CCSs are characters, so type will change
+    expect_equal(assignMobilities(suspsPredC3SDB, susps[1:2], overwrite = TRUE)[["CCS_[M+H]+"]][-(1:2)],
+                 as.character(suspsPredC3SDB[["CCS_[M+H]+"]][-(1:2)]))
+    
+    checkmate::expect_names(names(assignMobilities(suspsNoMob, "c3sdb", adducts = c("[M+H]+", "[M+K]+"))),
+                            must.include = c("CCS_[M+H]+", "CCS_[M+K]+"))
+    suspsNoMobAdd <- copy(suspsNoMob)
+    suspsNoMobAdd[, adduct := "[M+H]+"]
+    suspsNoMobAdd[2, adduct := "[M+K]+"]
+    suspsPredAddAO <- assignMobilities(suspsNoMobAdd, "c3sdb", predictAdductOnly = TRUE)
+    checkmate::expect_names(names(suspsPredAddAO), must.include = c("CCS_[M+H]+", "CCS_[M+K]+"))
+    checkmate::expect_scalar_na(suspsPredAddAO[["CCS_[M+H]+"]][2])
+    checkmate::expect_number(suspsPredAddAO[["CCS_[M+K]+"]][2], lower = 0, na.ok = FALSE)
+    expect_true(all(!is.na(suspsPredAddAO[["CCS_[M+H]+"]][-2])))
+    expect_true(all(is.na(suspsPredAddAO[["CCS_[M+K]+"]][-2])))
+    suspsPredAddNAO <- assignMobilities(suspsNoMobAdd, "c3sdb", adducts = c("[M+H]+", "[M+K]+"), predictAdductOnly = FALSE)
+    checkmate::expect_numeric(suspsPredAddNAO[["CCS_[M+H]+"]], lower = 0, any.missing = FALSE)
+    checkmate::expect_numeric(suspsPredAddNAO[["CCS_[M+K]+"]], lower = 0, any.missing = FALSE)
+    suspsPredAddAOOne <- assignMobilities(suspsNoMobAdd, "c3sdb", predictAdductOnly = TRUE, adducts = character())
+    expect_equal(suspsPredAddAOOne, suspsPredAddAO)
+    
+    suspsUnSpec <- copy(susps); setnames(suspsUnSpec, c("mobility_[M+H]+", "CCS_[M+H]+"), c("mobility", "CCS"))
+    checkmate::expect_names(names(assignMobilities(suspsNoMob, suspsUnSpec, adducts = NA)),
+                            must.include = c("mobility", "CCS"))
+
+    CCSParams <- getCCSParams("mason-schamp_1/k")
+    
+    # disable caching to get warnings (UNDONE?)
+    withOpt(cache.mode = "none", {
+        expect_warning(assignMobilities(suspsNoMob, susps, adducts = "[M-H]-"), "relevant") # susps only has M+H
+        
+        suspsNoMobMZ <- suspsNoMob[, -"mz"]
+        expect_warning(assignMobilities(suspsNoMobMZ[, -"neutralMass"], susps, CCSParams = CCSParams,
+                                        prepareChemProps = FALSE),
+                       "no neutralMass data", fixed = TRUE) |>
+            expect_warning("no mz data", fixed = TRUE) |>
+            expect_warning("relevant")
+        suspsNoMobNMNA <- copy(suspsNoMobMZ); suspsNoMobNMNA[2, neutralMass := NA]
+        expect_warning(assignMobilities(suspsNoMobNMNA, susps, CCSParams = CCSParams, prepareChemProps = FALSE),
+                       "rows with NA neutralMass values: 2", fixed = TRUE) |>
+            expect_warning("no mz data", fixed = TRUE)
+        expect_warning(assignMobilities(suspsNoMobMZ, suspsUnSpec, CCSParams = CCSParams, prepareChemProps = FALSE),
+                       "no mz data")
+        suspsNoMobMZNA <- copy(suspsNoMob); suspsNoMobMZNA[2, mz := NA]
+        expect_warning(assignMobilities(suspsNoMobMZNA, suspsUnSpec, CCSParams = CCSParams, prepareChemProps = FALSE),
+                       "rows with NA mz values: 2", fixed = TRUE)
+        expect_warning(assignMobilities(suspsNoMobMZ[, -"SMILES"], "c3sdb", prepareChemProps = FALSE), "skipped")
+        suspsNoMoSMNA <- copy(suspsNoMobMZ); suspsNoMoSMNA[2, SMILES := NA]
+        expect_warning(assignMobilities(suspsNoMoSMNA, "c3sdb", prepareChemProps = FALSE), "C3SDB predictions: 2", fixed = TRUE)
+    })    
 })

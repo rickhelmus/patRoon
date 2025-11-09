@@ -102,6 +102,10 @@ test_that("assignMobilities() for suspects", {
     # NOTE: susps CCSs are characters, so type will change
     expect_equal(assignMobilities(suspsPredC3SDB, susps[1:2], overwrite = TRUE)[["CCS_[M+H]+"]][-(1:2)],
                  as.character(suspsPredC3SDB[["CCS_[M+H]+"]][-(1:2)]))
+    # check if NA values in from are not overwritten
+    suspsPredC3SDBNA <- copy(suspsPredC3SDB); suspsPredC3SDBNA[2, "CCS_[M+H]+" := NA]
+    checkmate::expect_numeric(assignMobilities(suspsPredC3SDB, suspsPredC3SDBNA, overwrite = TRUE)[["CCS_[M+H]+"]],
+                              lower = 0, any.missing = FALSE)
     
     checkmate::expect_names(names(assignMobilities(suspsNoMob, "c3sdb", adducts = c("[M+H]+", "[M+K]+"))),
                             must.include = c("CCS_[M+H]+", "CCS_[M+K]+"))
@@ -125,6 +129,24 @@ test_that("assignMobilities() for suspects", {
                             must.include = c("mobility", "CCS"))
 
     CCSParams <- getCCSParams("mason-schamp_1/k")
+    expect_equal(assignMobilities(suspsNoMob, CCSParams = NULL), suspsNoMob)
+    expect_equal(assignMobilities(suspsNoMob, CCSParams = CCSParams), suspsNoMob)
+    checkmate::expect_character(assignMobilities(susps[, -"mobility_[M+H]+"], CCSParams = CCSParams)[["mobility_[M+H]+"]], any.missing = FALSE)
+    checkmate::expect_character(assignMobilities(susps[, -"CCS_[M+H]+"], CCSParams = CCSParams)[["CCS_[M+H]+"]], any.missing = FALSE)
+    suspsMobNA <- copy(susps); suspsMobNA[2, "mobility_[M+H]+" := NA]
+    checkmate::expect_character(assignMobilities(suspsMobNA, CCSParams = CCSParams)[["mobility_[M+H]+"]], any.missing = FALSE)
+    suspsMobAllNA <- copy(susps); suspsMobAllNA[, "mobility_[M+H]+" := NA]
+    checkmate::expect_character(assignMobilities(suspsMobAllNA, CCSParams = CCSParams)[["mobility_[M+H]+"]], any.missing = FALSE)
+    # first suspect has two CCSs
+    suspsMob1st <- assignMobilities(susps[1, -"mobility_[M+H]+"], CCSParams = CCSParams)
+    checkmate::expect_data_table(expandSuspMobilities(setnames(suspsMob1st, "CCS_[M+H]+", "CCS_susp")), nrows = 2)
+    suspsCh <- copy(susps); setnames(suspsCh, "CCS_[M+H]+", "CCS_[M+H]2+")
+    suspsNoMobCh <- assignMobilities(suspsNoMob, suspsCh, adducts = "[M+H]2+", CCSParams = CCSParams)
+    suspsNoMobCh2 <- copy(suspsNoMob); suspsNoMobCh2[, mz := calculateMasses(neutralMass, as.adduct("[M+H]2+"), "mz")]
+    suspsChUnSpec <- copy(suspsCh); setnames(suspsChUnSpec, "CCS_[M+H]2+", "CCS")
+    suspsNoMobCh2 <- assignMobilities(suspsNoMobCh2, suspsChUnSpec, adducts = NA,
+                                      CCSParams = modifyList(CCSParams, list(defaultCharge = 2)))
+    expect_equal(suspsNoMobCh[["CCS_[M+H]2+"]], suspsNoMobCh2[["CCS"]])
     
     # disable caching to get warnings (UNDONE?)
     withOpt(cache.mode = "none", {

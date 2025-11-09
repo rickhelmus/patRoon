@@ -169,9 +169,6 @@
     - suspects
         - test order of data selection for mobility and CCS columns, missing data etc
     - assignMobilities()
-        - DT method
-            - robustness with missing data in input/from
-            - CCSParams
         - fGroups methods
             - verify that concentrations and toxicities slots are copied
             - from screenInfo(), eg for fGroups with >1 suspect assigned

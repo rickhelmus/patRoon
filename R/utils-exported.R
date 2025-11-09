@@ -1635,9 +1635,9 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
                 if (!is.character(obj[[col]]) && is.character(from[[col]]))
                     obj[, (col) := as.character(get(col))]
                 
-                takeVal <- function(x) overwrite | is.na(x) | (is.character(x) & !nzchar(x))
-                obj[from, (col) := fifelse(takeVal(get(col)), get(paste0("i.", col)), get(col)),
-                    on = matchFromBy][]
+                emptyVal <- \(x) is.na(x) | (is.character(x) & !nzchar(x))
+                obj[from, (col) := fifelse(!emptyVal(get(paste0("i.", col))) & (overwrite | emptyVal(get(col))),
+                                           get(paste0("i.", col)), get(col)), on = matchFromBy][]
             }
         }
     }

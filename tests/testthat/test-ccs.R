@@ -63,3 +63,36 @@ test_that("CCS conversion works", {
     expect_equal(convertCCSToMobility(CCSs, mzs, getCCSParams("bruker")),
                  convertCCSToMobility(CCSs, mzs, getCCSParams("mason-schamp_1/k")), tolerance = 1e-3)
 })
+
+test_that("assignMobilities() for suspects", {
+    susps <- as.data.table(patRoonDataIMS::suspectsPos)
+    susps <- assignMobilities(susps, CCSParam = getCCSParams("mason-schamp_1/k"))
+    suspsNoMob <- susps[1:5, -"mobility_[M+H]+"]
+    
+    suspsPredC3SDB <- assignMobilities(suspsNoMob, "c3sdb")
+    suspsPredPCL <- assignMobilities(suspsNoMob, "pubchemlite")
+    suspsPredSelf <- assignMobilities(suspsNoMob, susps)
+    
+    expect_snapshot_value(list(
+        suspsPredC3SDB,
+        suspsPredPCL,
+        suspsPredSelf
+    ))
+    
+    verifyPred <- function(suspsPred)
+    {
+        checkmate::expect_data_table(suspsPred, nrows = nrow(suspsNoMob), ncols = ncol(suspsNoMob) + 1)
+        checkmate::expect_names(names(suspsPred), must.include = "CCS_[M+H]+")
+        checkmate::expect_numeric(suspsPred[["CCS_[M+H]+"]], any.missing = FALSE, lower = 0)
+    }
+    verifyPred(suspsPredC3SDB)
+    verifyPred(suspsPredPCL)
+    verifyPred(suspsPredSelf)
+    
+    expect_equal(assignMobilities(suspsNoMob, NULL), suspsNoMob)
+    expect_equal(assignMobilities(suspsNoMob, susps, matchFromBy = "SMILES"), suspsPredSelf)
+    expect_equal(assignMobilities(suspsPredC3SDB, susps, overwrite = FALSE), suspsPredC3SDB)
+    epxect_false(isTRUE(all.equal(assignMobilities(suspsPredC3SDB, susps, overwrite = TRUE), suspsPredC3SDB)))
+    expect_equal(assignMobilities(suspsPredC3SDB, susps, overwrite = TRUE), suspsPredSelf)
+    expect_equal(assignMobilities(suspsPredC3SDB, susps[1:2], overwrite = TRUE)[-(1:2)], suspsPredC3SDB[-(1:2)])
+})

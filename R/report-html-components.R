@@ -77,7 +77,7 @@ reportHTMLUtils$methods(
             # general component properties
             "mz_increment", "rt_increment", "ret_min", "ret_max", "ret_range",
             replicateGroups(objects$fGroups), # nontarget: presence in replicate groups
-            "cmp_ret", "cmp_mz", "cmp_retsd", "neutral_mass", "cmp_ppm", "analysis", "size",
+            "cmp_ret", "cmp_mz", "cmp_retsd", "neutral_mass", "neutralMass", "cmp_ppm", "analysis", "size",
             
             # for graphs
             "links"

@@ -118,7 +118,7 @@
                         <h4 data-toc-skip class="author">Rick
 Helmus</h4>
             
-            <h4 data-toc-skip class="date">2025-11-06</h4>
+            <h4 data-toc-skip class="date">2025-11-12</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/vignettes/tutorial.Rmd" class="external-link"><code>vignettes/tutorial.Rmd</code></a></small>
       <div class="hidden name"><code>tutorial.Rmd</code></div>
@@ -606,7 +606,7 @@ extracted ion chromatograms (EICs) for all feature groups:</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/generics.html">plotChroms</a></span><span class="op">(</span><span class="va">fGroups</span>, colourBy <span class="op">=</span> <span class="st">"fGroups"</span>, showFGroupRect <span class="op">=</span> <span class="cn">FALSE</span>, showPeakArea <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>           EICParams <span class="op">=</span> <span class="fu"><a href="../reference/EICParams.html">getDefEICParams</a></span><span class="op">(</span>topMost <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>, showLegend <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; Verifying if your data is centroided... Done!</span></span></code></pre>
-<p><img src="tutorial_files/figure-html/plotChroms-1.png" width="672"></p>
+<p><img src="tutorial_files/figure-html/plotChroms-1.png" class="r-plt" width="672"></p>
 <p>Note that we only plot the most intense feature of a feature group
 here (as set by <code>topMost=1</code>). See the reference docs for many
 more parameters to these functions (e.g. <code><a href="../reference/generics.html">?plotChroms</a></code>).</p>
@@ -844,13 +844,13 @@ data from the previous step.</p>
 <span><span class="co">#&gt; 865: M186_R293_1568              3 2.171674    185.2143 CC(C)CC(C)NC(C)CC(C)C</span></span></code></pre>
 <div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/generics.html">plotSpectrum</a></span><span class="op">(</span><span class="va">mslists</span>, <span class="st">"M186_R293_1568"</span>, MSLevel <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
-<p><img src="tutorial_files/figure-html/plotSpectrum-1.png" width="576"></p>
+<p><img src="tutorial_files/figure-html/plotSpectrum-1.png" class="r-plt" width="576"></p>
 <div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/generics.html">plotSpectrum</a></span><span class="op">(</span><span class="va">formulas</span>, <span class="fl">1</span>, <span class="st">"M109_R192_157"</span>, MSPeakLists <span class="op">=</span> <span class="va">mslists</span><span class="op">)</span></span></code></pre></div>
-<p><img src="tutorial_files/figure-html/plotSpectrum-2.png" width="576"></p>
+<p><img src="tutorial_files/figure-html/plotSpectrum-2.png" class="r-plt" width="576"></p>
 <div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/generics.html">plotSpectrum</a></span><span class="op">(</span><span class="va">compounds</span>, <span class="fl">1</span>, <span class="st">"M120_R268_288"</span>, <span class="va">mslists</span>, plotStruct <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="tutorial_files/figure-html/plotSpectrum-3.png" width="576"></p>
+<p><img src="tutorial_files/figure-html/plotSpectrum-3.png" class="r-plt" width="576"></p>
 </div>
 </div>
 <div class="section level2">
@@ -969,7 +969,7 @@ script look similar ot this:</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer>

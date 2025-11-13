@@ -13,8 +13,8 @@ getGroupIDs <- function(featRTs, featMZs, featMobs, ints, anaIDs, repIDs, rtWind
     .Call(`_patRoon_getGroupIDs`, featRTs, featMZs, featMobs, ints, anaIDs, repIDs, rtWindow, mzWindow, mobWindow, weightsList)
 }
 
-getEICList <- function(backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, gapFactor, mzExpIMSWindow, minIntensityIMS, mode = "simple", sumFramesMZ = 1L, sumFramesMob = 1L, smoothWindowMZ = 3L, smoothWindowMob = 3L, smoothExtMZ = 0L, smoothExtMob = 0L, saveMZProfiles = FALSE, saveEIMs = FALSE, pad = FALSE, minEICIntensity = 0L, minEICAdjTime = 0L, minEICAdjPoints = 0L, minEICAdjIntensity = 0L, topMost = 0L) {
-    .Call(`_patRoon_getEICList`, backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, gapFactor, mzExpIMSWindow, minIntensityIMS, mode, sumFramesMZ, sumFramesMob, smoothWindowMZ, smoothWindowMob, smoothExtMZ, smoothExtMob, saveMZProfiles, saveEIMs, pad, minEICIntensity, minEICAdjTime, minEICAdjPoints, minEICAdjIntensity, topMost)
+getEICList <- function(backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, gapFactor, mzExpIMSWindow, minIntensityIMS, mode = "simple", sumWindowMZ = 0L, sumWindowMob = 0L, smoothWindowMZ = 3L, smoothWindowMob = 3L, smoothExtMZ = 0L, smoothExtMob = 0L, saveMZProfiles = FALSE, saveEIMs = FALSE, pad = FALSE, minEICIntensity = 0L, minEICAdjTime = 0L, minEICAdjPoints = 0L, minEICAdjIntensity = 0L, topMost = 0L) {
+    .Call(`_patRoon_getEICList`, backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, gapFactor, mzExpIMSWindow, minIntensityIMS, mode, sumWindowMZ, sumWindowMob, smoothWindowMZ, smoothWindowMob, smoothExtMZ, smoothExtMob, saveMZProfiles, saveEIMs, pad, minEICIntensity, minEICAdjTime, minEICAdjPoints, minEICAdjIntensity, topMost)
 }
 
 doFillEIXIntensities <- function(allXValues, xvalues, intensities) {

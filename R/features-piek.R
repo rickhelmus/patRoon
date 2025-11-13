@@ -396,8 +396,8 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
     {
         ret <- getEICList(backend, EICInfo$mzmin, EICInfo$mzmax, genEICParams$retRange[1], genEICParams$retRange[2],
                           EICInfo$mobmin, EICInfo$mobmax, gapFactor = genEICParams$gapFactor, mzExpIMSWindow = 0,
-                          minIntensityIMS = minIntensityIMS, mode = mode, sumFramesMZ = genEICParams$sumFramesMZ,
-                          sumFramesMob = genEICParams$sumFramesMob, smoothWindowMZ = genEICParams$smoothWindowMZ,
+                          minIntensityIMS = minIntensityIMS, mode = mode, sumWindowMZ = genEICParams$sumWindowMZ,
+                          sumWindowMob = genEICParams$sumWindowMob, smoothWindowMZ = genEICParams$smoothWindowMZ,
                           smoothExtMZ = genEICParams$smoothExtMob, smoothWindowMob = genEICParams$smoothWindowMob,
                           smoothExtMob = genEICParams$smoothExtMob, saveMZProfiles = genEICParams$saveMZProfiles,
                           saveEIMs = genEICParams$saveEIMs, pad = FALSE, minEICIntensity = genEICParams$minEICIntensity,
@@ -620,11 +620,12 @@ getPiekGenEICParams <- function(methodMZ, methodIMS = NULL, ...)
         stop("methodIMS can only be 'ms2' if methodMZ is also set to 'ms2'", call. = FALSE)
     
     ret <- list(methodMZ = methodMZ, methodIMS = methodIMS, mzRange = c(80, 600), mzStep = 0.02, mobRange = c(0.5, 1.3),
-                mobStep = 0.04, retRange = NULL, gapFactor = 3, sumFramesMZ = 1, sumFramesMob = 1, smoothWindowMZ = 0,
-                smoothWindowMob = 0, smoothExtMZ = defaultLim("mz", "wide"),
-                smoothExtMob = defaultLim("mobility", "wide"), saveMZProfiles = FALSE, saveEIMs = FALSE,
-                minEICIntensity = 5000, minEICAdjTime = 5, minEICAdjPoints = 5, minEICAdjIntensity = 250,
-                topMostEICMZ = 10000, topMostEICMZMob = 10000, minEICsIMSPreCheck = 50000)
+                mobStep = 0.04, retRange = NULL, gapFactor = 3, sumWindowMZ = defaultLim("retention", "very_narrow"),
+                sumWindowMob = defaultLim("retention", "very_narrow"), smoothWindowMZ = 0, smoothWindowMob = 0,
+                smoothExtMZ = defaultLim("mz", "wide"), smoothExtMob = defaultLim("mobility", "wide"),
+                saveMZProfiles = FALSE, saveEIMs = FALSE, minEICIntensity = 5000, minEICAdjTime = 5,
+                minEICAdjPoints = 5, minEICAdjIntensity = 250, topMostEICMZ = 10000, topMostEICMZMob = 10000,
+                minEICsIMSPreCheck = 50000)
     
     if (methodMZ == "suspects")
     {

@@ -1191,8 +1191,8 @@ assertPiekGenEICParams <- function(x, .var.name = checkmate::vname(x), add = NUL
     
     assertListVal(x, "retRange", assertRange, null.ok = TRUE, .var.name = .var.name, add = add)
     assertListVal(x, "gapFactor", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
-    assertListVal(x, "sumFramesMZ", checkmate::assertCount, positive = TRUE, .var.name = .var.name, add = add)
-    assertListVal(x, "sumFramesMob", checkmate::assertCount, positive = TRUE, .var.name = .var.name, add = add)
+    assertListVal(x, "sumWindowMZ", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
+    assertListVal(x, "sumWindowMob", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
     assertListVal(x, "smoothWindowMZ", checkmate::assertCount, positive = FALSE, .var.name = .var.name, add = add)
     assertListVal(x, "smoothWindowMob", checkmate::assertCount, positive = FALSE, .var.name = .var.name, add = add)
     assertListVal(x, "smoothExtMZ", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)

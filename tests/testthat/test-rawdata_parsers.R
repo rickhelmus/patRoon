@@ -65,8 +65,8 @@ test_that("EICs", {
     expect_gt(length(pruneList(eicsRef[[1]])), 0)
     
     # Test smoothing and frame summing affects mz or mobility results
-    eicsSummed <- doGetEICs(anaInfoIMSOne, EICInfoListOne, gapFactor = 3, mode = "full", sumFramesMZ = 7,
-                            sumFramesMob = 7)
+    eicsSummed <- doGetEICs(anaInfoIMSOne, EICInfoListOne, gapFactor = 3, mode = "full", sumWindowMZ = 7,
+                            sumWindowMob = 7)
     eicsSmoothed <- doGetEICs(anaInfoIMSOne, EICInfoListOne, gapFactor = 3, mode = "full", smoothWindowMZ = 3,
                               smoothExtMZ = 0.02, smoothWindowMob = 7, smoothExtMob = 0.1)
     for (col in c("mz", "mzBP", "mobility", "mobilityBP"))

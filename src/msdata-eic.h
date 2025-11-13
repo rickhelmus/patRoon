@@ -20,38 +20,24 @@ template <typename T> class IMSFrameSummer
 {
     struct Frame
     {
+        SpectrumRawTypes::Time time = 0.0;
         std::vector<T> xvalues;
         std::vector<SpectrumRawTypes::Intensity> intensities;
         Frame(void) = default;
-        Frame(std::vector<T> &&x, std::vector<SpectrumRawTypes::Intensity> &&i)
-            : xvalues(std::move(x)), intensities(std::move(i)) { }
+        Frame(SpectrumRawTypes::Time t, std::vector<T> &&x, std::vector<SpectrumRawTypes::Intensity> &&i)
+            : time(t), xvalues(std::move(x)), intensities(std::move(i)) { }
         size_t size(void) const { return xvalues.size(); }
     };
 
-    const size_t maxQueueSize;
     std::deque<Frame> frames;
-
-    void maybePop(void)
-    {
-        if (frames.size() > maxQueueSize)
-            frames.pop_front();
-    }
 
 public:
     using XInts = std::pair<std::vector<T>, std::vector<SpectrumRawTypes::Intensity>>;
 
-    IMSFrameSummer(size_t sz) : maxQueueSize(sz) { }
-
-    void add(std::vector<T> &&xvalues, std::vector<SpectrumRawTypes::Intensity> &&intensities)
+    void add(SpectrumRawTypes::Time time, std::vector<T> &&xvalues,
+             std::vector<SpectrumRawTypes::Intensity> &&intensities)
     {
-        frames.emplace_back(std::move(xvalues), std::move(intensities));
-        maybePop();
-    }
-
-    void addZero(void)
-    {
-        frames.emplace_back();
-        maybePop();
+        frames.emplace_back(time, std::move(xvalues), std::move(intensities));
     }
 
     XInts get(void) const
@@ -59,6 +45,7 @@ public:
         std::map<T, SpectrumRawTypes::Intensity> merged;
         for (const auto &fr : frames)
         {
+            // Rcpp::Rcout << "  IMS frame: " << fr.size() << " points at time " << fr.time << std::endl;
             for (size_t j=0; j<fr.size(); ++j)
             {
                 merged[fr.xvalues[j]] += fr.intensities[j];
@@ -87,18 +74,8 @@ public:
 
     bool empty(void) const { return frames.empty(); }
     size_t size(void) const { return frames.size(); }
-    size_t sizeNoZero(void) const
-    {
-        size_t count = 0;
-        for (const auto& fr : frames)
-        {
-            if (!fr.xvalues.empty())
-                ++count;
-        }
-        return count;
-    }
-    size_t maxSize(void) const { return maxQueueSize; }
-    size_t flank(void) const { return (maxQueueSize - 1) / 2; }
+    SpectrumRawTypes::Time frontTime(void) const { return frames.empty() ? 0.0 : frames.front().time; }
+    SpectrumRawTypes::Time backTime(void) const { return frames.empty() ? 0.0 : frames.back().time; }
 };
 
 class EIC
@@ -134,15 +111,16 @@ class EIC
     std::vector<std::pair<std::vector<SpectrumRawTypes::Mass>, std::vector<SpectrumRawTypes::Intensity>>> mzProfiles;
     std::vector<std::pair<std::vector<SpectrumRawTypes::Mobility>, std::vector<SpectrumRawTypes::Intensity>>> EIMs;
     
-    EICMode mode;
-    bool withMob;
+    const std::vector<SpectrumRawTypes::Time> &EICTimes;
+    const EICMode mode;
+    const bool withMob;
     EICPoint curPoint;
     SpectrumRawTypes::Intensity maxIntensity = 0;
     
     // validity checks
-    SpectrumRawTypes::Intensity minAdjIntensity;
-    SpectrumRawTypes::Time minAdjTime;
-    unsigned minAdjPoints;
+    const SpectrumRawTypes::Intensity minAdjIntensity;
+    const SpectrumRawTypes::Time minAdjTime;
+    const unsigned minAdjPoints;
     bool enoughTimeAboveThr = false;
     bool enoughPointsAboveThr = false;
     SpectrumRawTypes::Time startTimeAboveThr = 0.0;
@@ -151,12 +129,14 @@ class EIC
     // IMS related
     IMSFrameSummer<SpectrumRawTypes::Mass> mzSummer;
     IMSFrameSummer<SpectrumRawTypes::Mobility> mobSummer;
-    unsigned smoothWindowMZ, smoothWindowMob;
-    SpectrumRawTypes::Mass smoothExtMZ;
-    SpectrumRawTypes::Mobility smoothExtMob;
+    const SpectrumRawTypes::Time sumWindowMZ, sumWindowMob;
+    size_t updateSumMZIndex = 0, updateSumMobIndex = 0;
+    const unsigned smoothWindowMZ, smoothWindowMob;
+    const SpectrumRawTypes::Mass smoothExtMZ;
+    const SpectrumRawTypes::Mobility smoothExtMob;
     SpectrumRawTypes::Mass mzStart, mzEnd;
     SpectrumRawTypes::Mobility mobStart, mobEnd;
-    bool saveMZProfiles, saveEIMs;
+    const bool saveMZProfiles, saveEIMs;
     
     bool pointMZInRange(SpectrumRawTypes::Mass mz) const
     {
@@ -167,21 +147,28 @@ class EIC
         return (!withMob || (numberGTE(mob, mobStart) && (mobEnd == 0.0 || numberLTE(mob, mobEnd))));
     }
     
-    size_t findEICIndexFromScan(SpectrumRawTypes::Scan scanInd) const;
-    void setSummedFrameMZ(SpectrumRawTypes::Scan scanInd);
-    void setSummedFrameMob(SpectrumRawTypes::Scan scanInd);
-    void updateFrameSummer(void);
+    SpectrumRawTypes::Time getUpdateSumMZTime(void) const
+    {
+        return (updateSumMZIndex >= scanInds.size()) ? 0.0 : EICTimes[scanInds[updateSumMZIndex]];
+    }
+    SpectrumRawTypes::Time getUpdateSumMobTime(void) const
+    {
+        return (updateSumMobIndex >= scanInds.size()) ? 0.0 : EICTimes[scanInds[updateSumMobIndex]];
+    }
+    
+    void setSummedFrameMZ(void);
+    void setSummedFrameMob(void);
+    void updateFrameSummer(SpectrumRawTypes::Time curTime);
     void commitPoints(SpectrumRawTypes::Scan curScanInd);
 
 public:
-    EIC(EICMode em, bool wm, SpectrumRawTypes::Intensity minAdjI, SpectrumRawTypes::Time minAdjT, unsigned minAdjP,
-        size_t sumFramesMZ, size_t sumFramesMob, unsigned smoMZ, unsigned smoMob, SpectrumRawTypes::Mass smoExtMZ,
-        SpectrumRawTypes::Mobility smoExtMob, bool svMZPs,
-        bool svEIMs) : mode(em), withMob(wm), minAdjIntensity(minAdjI), minAdjTime(minAdjT), minAdjPoints(minAdjP),
-        mzSummer((withMob && (em == EICMode::FULL || em == EICMode::FULL_MZ)) ? sumFramesMZ : 0),
-        mobSummer((withMob && mode == EICMode::FULL) ? sumFramesMob : 0), smoothWindowMZ(smoMZ),
-        smoothWindowMob(smoMob), smoothExtMZ(smoExtMZ), smoothExtMob(smoExtMob),
-        saveMZProfiles(svMZPs), saveEIMs(svEIMs) { }
+    EIC(const std::vector<SpectrumRawTypes::Time> &times, EICMode em, bool wm, SpectrumRawTypes::Intensity minAdjI,
+        SpectrumRawTypes::Time minAdjT, unsigned minAdjP, SpectrumRawTypes::Time sumMZ, SpectrumRawTypes::Time sumMob,
+        unsigned smoMZ, unsigned smoMob, SpectrumRawTypes::Mass smoExtMZ, SpectrumRawTypes::Mobility smoExtMob,
+        bool svMZPs, bool svEIMs) : EICTimes(times), mode(em), withMob(wm), minAdjIntensity(minAdjI),
+        minAdjTime(minAdjT), minAdjPoints(minAdjP), sumWindowMZ(sumMZ), sumWindowMob(sumMob), smoothWindowMZ(smoMZ),
+        smoothWindowMob(smoMob), smoothExtMZ(smoExtMZ), smoothExtMob(smoExtMob), saveMZProfiles(svMZPs),
+        saveEIMs(svEIMs) { }
 
     void setBoundaries(SpectrumRawTypes::Mass mzS, SpectrumRawTypes::Mass mzE,
                        SpectrumRawTypes::Mobility mobS, SpectrumRawTypes::Mobility mobE)
@@ -228,6 +215,7 @@ public:
         adjPointsAboveThr = 0;
         mzSummer.clear();
         mobSummer.clear();
+        updateSumMZIndex = updateSumMobIndex = 0;
         if (!keepMZProfiles)
             mzProfiles.clear();
         if (!keepEIMs)

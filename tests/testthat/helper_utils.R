@@ -66,6 +66,7 @@ getTestFeaturesIMS <- function(anaInfo = getTestAnaInfoIMS(), intThr = 3E4)
 
 getTestFGroups <- function(anaInfo = getTestAnaInfo(), ...) groupFeatures(getTestFeatures(anaInfo, ...), "openms")
 getTestFGroupsNS <- function(anaInfo = getTestAnaInfoNS(), ...) groupFeatures(getTestFeaturesNS(anaInfo, ...), "openms")
+getTestFGroupsIMS <- function(anaInfo = getTestAnaInfoIMS(), ...) groupFeatures(getTestFeaturesIMS(anaInfo, ...), "openms")
 getEmptyFeatures <- function(anaInfo = getTestAnaInfo(), ...) getTestFeatures(anaInfo, noiseThrInt = 1E9, ...)
 getEmptyFeaturesNS <- function(anaInfo = getTestAnaInfoNS(), ...) getTestFeaturesNS(anaInfo, noiseThrInt = 1E9, ...)
 getEmptyFeaturesIMS <- function(anaInfo = getTestAnaInfoIMS(), ...) getTestFeaturesIMS(anaInfo, intThr = 1E9, ...)
@@ -81,6 +82,13 @@ getTestFGroupsDA <- function(anaInfo)
     else
         feats <- makeSet(findFeatures(anaInfo[!an, ], "bruker"), adducts = c("[M+H]+", "[M-H]-"))
     return(groupFeatures(feats, "openms"))
+}
+
+doAssignMobs <- function(fg, mobPeakParams = getDefPeakParams("bruker_ims", "piek"),
+                         chromPeakParams = getDefPeakParams("chrom", "piek"), ...)
+{
+    assignMobilities(fg, mobPeakParams = mobPeakParams, chromPeakParams = chromPeakParams, parallel = FALSE,
+                     CCSParams = getCCSParams("mason-schamp_1/k"), ...)
 }
 
 getFormFGroups <- function()

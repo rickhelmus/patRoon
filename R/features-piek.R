@@ -346,7 +346,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
         
         if (identical(genEICParams$methodIMS, "suspects"))
         {
-            suspects[, mobility_susp := selectFromSuspAdductCol(suspects, "mobility", data.table(), if (!is.null(adduct)) as.character(adduct))]
+            suspects[, mobility_susp := selectFromSuspAdductCol(suspects, "mobility", if (!is.null(adduct)) as.character(adduct))]
             whMissing <- which(is.na(suspects$mobility_susp))
             if (length(whMissing) > 0)
             {

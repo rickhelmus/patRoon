@@ -25,7 +25,7 @@ setMethod("launchEICGUI", "data.frame", function(obj, suspects = NULL, adduct = 
         # UNDONE: warn that mobility values may be ignored if no adduct is provided
         suspects <- prepareSuspectList(suspects, adduct = adduct, skipInvalid = TRUE, checkDesc = TRUE,
                                        prefCalcChemProps = TRUE, neutralChemProps = FALSE)
-        suspects[, mobility_susp := selectFromSuspAdductCol(suspects, "mobility", data.table(), if (!is.null(adduct)) as.character(adduct))]
+        suspects[, mobility_susp := selectFromSuspAdductCol(suspects, "mobility", if (!is.null(adduct)) as.character(adduct))]
         suspects <- expandSuspMobilities(suspects)
     }
     gui <- createEICGUI(obj, analysisInfo, suspects)

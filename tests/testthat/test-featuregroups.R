@@ -19,10 +19,7 @@ fgSIRIUS <- groupFeatures(analysisInfo(fList)[1,], "sirius") # only do first ana
 fgIMS <- groupFeatures(getTestFeaturesIMS(intThr = 2E5), "greedy")
 fgIMSEmpty <- groupFeatures(getEmptyFeaturesIMS(), "greedy")
 
-runAM <- \(fg, ...) assignMobilities(fg, mobPeakParams = getDefPeakParams("bruker_ims", "piek"),
-                                     chromPeakParams = getDefPeakParams("chrom", "piek"),
-                                     parallel = FALSE, CCSParams = getCCSParams("mason-schamp_1/k"), ...)
-fgAMInt <- runAM(fgIMS, calcArea = "integrate")
+fgAMInt <- doAssignMobs(fgIMS, calcArea = "integrate")
 
 fgOpenMSQ <- calculatePeakQualities(fgOpenMS)
 
@@ -32,7 +29,7 @@ fgXCMSEmpty <- groupFeatures(fListEmpty, "xcms")
 fgXCMS3Empty <- groupFeatures(fListEmpty, "xcms3")
 fgKPIC2Empty <- groupFeatures(fListEmpty, "kpic2")
 fgGreedyEmpty <- groupFeatures(fListEmpty, "greedy")
-fgAMEmpty <- runAM(fgIMSEmpty)
+fgAMEmpty <- doAssignMobs(fgIMSEmpty)
 fgOpenMSEmptyQ <- calculatePeakQualities(fgOpenMSEmpty)
 
 test_that("verify feature grouping output", {
@@ -67,8 +64,8 @@ test_that("verify show output", {
 })
 
 test_that("assignMobilities", {
-    fgAMSum <- runAM(fgIMS, calcArea = "sum")
-    fgAMNoEIC <- runAM(fgIMS, fallbackEIC = FALSE)
+    fgAMSum <- doAssignMobs(fgIMS, calcArea = "sum")
+    fgAMNoEIC <- doAssignMobs(fgIMS, fallbackEIC = FALSE)
     
     expect_true(hasMobilities(fgAMInt))
     expect_true(hasMobilities(fgAMEmpty))
@@ -90,7 +87,7 @@ test_that("assignMobilities", {
     expect_setequal(groupScores(fgAMQ)$group, names(fgAMQ))
     # NOTE: remove blanks as ISTDs are not present in those and would otherwise be removed
     fgIMSISTD <- doNormIntsIMS(filter(fgIMS, removeBlanks = TRUE), featNorm = "istd")
-    fgAMISTD <- runAM(fgIMSISTD)
+    fgAMISTD <- doAssignMobs(fgIMSISTD)
     getAssignedFGs <- \(fg) unlist(lapply(internalStandardAssignments(fg), names))
     gi <- groupInfo(fgAMISTD)[ims_parent_group %in% getAssignedFGs(fgIMSISTD)]
     expect_setequal(getAssignedFGs(fgAMISTD), union(gi$group, gi$ims_parent_group))

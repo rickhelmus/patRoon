@@ -422,6 +422,9 @@ setMethod("assignMobilities", "featureGroupsScreeningSet", function(obj, mobPeak
         NACols <- getAllMergedConsCols(names(scr), rmSets)
         set(scr, i = i, j = NACols, NA)
     }
+    # remove rows no longer in any set, eg if an IMS feature was only detected in one set and the hit was not actually
+    # present in the suspect list for that set
+    scr <- scr[nzchar(sets) == TRUE]
 
     scr <- finalizeScreenInfoForIMS(scr, gInfo, IMSMatchParams)
     obj@screenInfo <- scr

@@ -365,12 +365,9 @@ doFGAADTGroups <- function(fGroups, intColNames, average, averageBy, areas, addQ
 doFGAADTFeatures <- function(fGroups, fgTab, intColNames, average, averageBy, addQualities, addScores, regression,
                              regressionBy, averageFunc, anaInfoCols, IMS)
 {
-    fGroupsOrig <- NULL
+    fGroupsOrig <- fGroups
     if (IMS != "both")
-    {
-        fGroupsOrig <- fGroups
         fGroups <- selectIMSFilter(fGroups, IMS = IMS, verbose = FALSE)
-    }
     
     anaInfo <- analysisInfo(fGroups)
     

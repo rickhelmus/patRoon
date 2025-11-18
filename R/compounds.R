@@ -859,8 +859,8 @@ setMethod("assignMobilities", "compounds", function(obj, fGroups, IMS = TRUE, fr
         allTab[, CCS := NA_real_]
 
     # copy the right mobility and CCS columns
-    allTab[, mobility := selectFromSuspAdductCol(allTab, "mobility", annotations(fGroups), adductChr)]
-    allTab[, CCS := selectFromSuspAdductCol(allTab, "CCS", annotations(fGroups), adductChr)]
+    allTab[, mobility := selectFromSuspAdductCol(allTab, "mobility", adductChr, allTab$group, annotations(fGroups))]
+    allTab[, CCS := selectFromSuspAdductCol(allTab, "CCS", adductChr, allTab$group, annotations(fGroups))]
     allTab[, c("mobility_mz", "CCS_mz") := .(mobility / mz, CCS / mz)]
     
     if (hasMobilities(fGroups))

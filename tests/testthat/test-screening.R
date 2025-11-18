@@ -313,6 +313,151 @@ test_that("reporting works", {
     expect_error(makeReportHTML(fGroupsScrAnnEmpty[, 1:10]), NA)
 })
 
+test_that("IMS worfklow", {
+    suspsPos <- as.data.table(patRoonDataIMS::suspectsPos); suspsNeg <- as.data.table(patRoonDataIMS::suspectsNeg)
+    
+    fGroupsIMS <- getTestFGroupsIMS()
+    fGroupsIMSScr <- screenSuspects(fGroupsIMS, list(suspsPos, suspsNeg), onlyHits = FALSE)
+    fGroupsAM <- doAssignMobs(fGroupsIMSScr, fromSuspects = TRUE)
+    fGroupsAMOnlySus <- doAssignMobs(fGroupsIMSScr, fromSuspects = TRUE, mobPeakParams = NULL)
+    fGroupsAMNoSus <- doAssignMobs(fGroupsIMS)
+    fGroupsAMSusPost <- screenSuspects(fGroupsAMNoSus, list(suspsPos, suspsNeg), onlyHits = FALSE)
+    
+    expect_known_value(as.data.table(fGroupsAM, collapseSuspects = NULL), testFile("susp-ims-am"))
+    expect_known_value(as.data.table(fGroupsAMOnlySus, collapseSuspects = NULL), testFile("susp-ims-am_only"))
+    expect_known_value(as.data.table(fGroupsAMSusPost, collapseSuspects = NULL), testFile("susp-ims-post"))
+    
+    expect_setequal(as.data.table(fGroupsAM, features = TRUE, collapseSuspects = NULL)$mob_assign_method, c(NA, "peak", "suspect"))
+    expect_setequal(as.data.table(fGroupsAMOnlySus, features = TRUE, collapseSuspects = NULL)$mob_assign_method, c(NA, "suspect"))
+    expect_setequal(as.data.table(fGroupsAMSusPost, features = TRUE, collapseSuspects = NULL)$mob_assign_method, c(NA, "peak"))
+    
+    # check that doubly assigned suspect is not used for mob assignment
+    # NOTE: it is important that the test suspect is found
+    suspsDouble <- data.table(name = c("suspect1", "suspect2"), mz = suspsPos$mz[1],
+                              mobility = suspsPos[["mobility_[M+H]+"]][1])
+    fGroupsIMSScrDouble <- screenSuspects(fGroupsIMS[, sets = "positive"], suspsDouble, onlyHits = TRUE)
+    fGroupsAMDouble <- doAssignMobs(fGroupsIMSScrDouble, fromSuspects = TRUE)
+    checkmate::expect_disjunct(as.data.table(fGroupsAMDouble, features = TRUE, collapseSuspects = NULL)$mob_assign_method, "suspect")
+    
+    expect_error(screenSuspects(fGroupsAMNoSus, data.table(name = "test", mz = patRoonDataIMS::suspectsPos$mz[1], mobility = 1, CCS = "100;101")), "differs")
+    expect_error(screenSuspects(fGroupsAMNoSus, data.table(name = "test", mz = patRoonDataIMS::suspectsPos$mz[1], mobility = "0.5;0.6", CCS = 100)), "differs")
+    expect_error(screenSuspects(fGroupsAMNoSus, data.table(name = "test", mz = patRoonDataIMS::suspectsPos$mz[1], mobility = list(c(0.5, 0.6)))), "must be numeric or character")
+    
+    suspsPosNoAdd <- copy(suspsPos); setnames(suspsPosNoAdd, sub("_[M+H]+", "", names(suspsPosNoAdd), fixed = TRUE))
+    suspsNegNoAdd <- copy(suspsNeg); setnames(suspsNegNoAdd, sub("_[M-H]-", "", names(suspsNegNoAdd), fixed = TRUE))
+    expect_equal(screenInfo(fGroupsAMSusPost),
+                 screenInfo(screenSuspects(fGroupsAMNoSus, list(suspsPosNoAdd, suspsNegNoAdd))), tolerance = 1E-6)
+    
+    suspsExp <- expandSuspMobilities(setnames(copy(suspsPos), "mobility_[M+H]+", "mobility_susp"))
+    scrOS <- copy(screenInfo(fGroupsAMOnlySus[IMS = TRUE][, sets = "positive"]))
+    scrOS[, fg_mob := groupInfo(fGroupsAMOnlySus)[match(scrOS$group, group)]$mobility]
+    expect_equal(scrOS$mobility, scrOS$fg_mob, tolerance = 1E-6)
+    
+    suspsNA <- copy(suspsPos)
+    suspsNA[1, "mobility_[M+H]+" := NA_character_]
+    suspsNA[2, "CCS_[M+H]+" := NA_character_]
+    scr <- screenInfo(screenSuspects(fGroupsAMNoSus[, sets = "positive", IMS = TRUE], suspsNA))
+    expect_true(all(is.na(scr[name == suspsNA$name[1]]$d_mob)))
+    expect_false(any(is.na(scr[name != suspsNA$name[1]]$d_mob)))
+    expect_true(all(is.na(scr[name == suspsNA$name[2]]$d_CCS)))
+    expect_false(any(is.na(scr[name != suspsNA$name[2]]$d_CCS)))
+    
+    getWrongSusps <- function(susps, wh = "all")
+    {
+        suspsWrong <- copy(susps)
+        fact <- withr::with_seed(20, runif(nrow(suspsWrong), min = 0.5, max = 2))
+        alter <- function(x)
+        {
+            mapply(strsplit(x, ";"), fact, FUN = function(y, fct)
+            {
+                if (wh == "all" || wh <= length(y))
+                {
+                    y <- as.numeric(y)
+                    w <- if (wh == "all") seq_along(y) else wh
+                    y[w] <- y[w] * fct
+                }
+                paste0(y, collapse = ";")
+            })
+        }
+        cols <- c(grep("mobility", names(suspsWrong), value = TRUE),
+                  grep("CCS", names(suspsWrong), value = TRUE))
+        suspsWrong[, (cols) :=  lapply(mget(cols), alter)]
+        return(suspsWrong)
+    }
+    suspsWrongPos <- getWrongSusps(suspsPos); suspsWrongNeg <- getWrongSusps(suspsNeg)
+    fGroupsIMSScrWrong <- screenSuspects(fGroupsIMS, list(suspsWrongPos, suspsWrongNeg), onlyHits = FALSE)
+    fGroupsAMWrong <- doAssignMobs(fGroupsIMSScrWrong, fromSuspects = FALSE)
+    fGroupsAMPostWrong <- screenSuspects(fGroupsAMNoSus, list(suspsWrongPos, suspsWrongNeg))
+    expect_setequal(screenInfo(fGroupsAMWrong)$name, screenInfo(fGroupsAM)$name)
+    expect_setequal(screenInfo(fGroupsAMPostWrong)$name, screenInfo(fGroupsAMSusPost)$name)
+    expect_range(screenInfo(fGroupsAMWrong)$d_mob_rel, c(-2, 2))
+    expect_range(screenInfo(fGroupsAMPostWrong)$d_mob_rel, c(-2, 2))
+    # rel differences should be similar'ish
+    expect_equal(screenInfo(fGroupsAMWrong)$d_mob_rel, screenInfo(fGroupsAMWrong)$d_CCS_rel, tolerance = 1E-3)
+    expect_equal(screenInfo(fGroupsAMPostWrong)$d_mob_rel, screenInfo(fGroupsAMPostWrong)$d_CCS_rel, tolerance = 1E-3)
+    expect_true(any(abs(na.omit(screenInfo(fGroupsAMWrong)$d_CCS_rel)) > 0.2))
+    expect_true(any(abs(na.omit(screenInfo(fGroupsAMPostWrong)$d_CCS_rel)) > 0.2))
+    
+    matchTest <- function(p, rel, thr)
+    {
+        IMP <- getIMSMatchParams(p, relative = rel, window = thr)
+        fg <- doAssignMobs(fGroupsIMSScrWrong, IMSMatchParams = IMP, fromSuspects = FALSE)
+        checkmate::expect_numeric(abs(screenInfo(fg)[[getIMSMatchCol(IMP)]]), upper = thr)
+    }
+    matchTest("mobility", rel = FALSE, thr = 0.2)
+    matchTest("mobility", rel = TRUE, thr = 0.5)
+    matchTest("CCS", rel = FALSE, thr = 5)
+    matchTest("CCS", rel = TRUE, thr = 0.2)
+    
+    matchTestPost <- function(p, rel, thr)
+    {
+        IMP <- getIMSMatchParams(p, relative = rel, window = thr)
+        fg <- screenSuspects(fGroupsAMNoSus, list(suspsWrongPos, suspsWrongNeg), IMSMatchParams = IMP)
+        checkmate::expect_numeric(abs(screenInfo(fg)[[getIMSMatchCol(IMP)]]), upper = thr)
+    }
+    matchTestPost("mobility", rel = FALSE, thr = 0.2)
+    matchTestPost("mobility", rel = TRUE, thr = 0.5)
+    matchTestPost("CCS", rel = FALSE, thr = 5)
+    matchTestPost("CCS", rel = TRUE, thr = 0.2)
+    
+    matchTestFilter <- function(p, rel, thr, negate = FALSE)
+    {
+        IMP <- getIMSMatchParams(p, relative = rel, window = thr)
+        fg <- filter(fGroupsAMWrong, IMSMatchParams = IMP, negate = negate)
+        if (negate)
+            checkmate::expect_numeric(abs(screenInfo(fg)[[getIMSMatchCol(IMP)]]), lower = thr)
+        else
+            checkmate::expect_numeric(abs(screenInfo(fg)[[getIMSMatchCol(IMP)]]), upper = thr)
+    }
+    matchTestFilter("mobility", rel = FALSE, thr = 0.2)
+    matchTestFilter("mobility", rel = TRUE, thr = 0.5)
+    matchTestFilter("CCS", rel = FALSE, thr = 5)
+    matchTestFilter("CCS", rel = TRUE, thr = 0.2)
+    matchTestFilter("mobility", rel = FALSE, thr = 0.2, negate = TRUE)
+    matchTestFilter("mobility", rel = TRUE, thr = 0.5, negate = TRUE)
+    matchTestFilter("CCS", rel = FALSE, thr = 5, negate = TRUE)
+    matchTestFilter("CCS", rel = TRUE, thr = 0.2, negate = TRUE)
+    
+    suspsWrongOnePos <- getWrongSusps(suspsPos, 2); suspsWrongOneNeg <- getWrongSusps(suspsNeg, 2)
+    fGroupsIMSScrWrongOne <- screenSuspects(fGroupsIMS, list(suspsWrongOnePos, suspsWrongOneNeg), onlyHits = FALSE)
+    fGroupsAMWrongOne <- doAssignMobs(fGroupsIMSScrWrongOne)
+    IMP <- getIMSMatchParams("mobility", window = 0.02, relative = TRUE, minMatches = 2)
+    expect_true(any(grepl(";", screenInfo(fGroupsAMWrongOne)$mobility_susp)))
+    expect_false(any(grepl(";", screenInfo(doAssignMobs(fGroupsIMSScrWrongOne, IMSMatchParams = IMP))[!is.na(d_mob)]$mobility_susp)))
+    expect_false(any(grepl(";", screenInfo(filter(fGroupsAMWrongOne, IMSMatchParams = IMP))[!is.na(d_mob)]$mobility_susp)))
+    # NOTE: if negate==T then the IMS matching is _not_negated. Since all suspects have only one mobility or otherwise
+    # only one is incorrect, the filter shouldn't remove anything.
+    expect_equal(screenInfo(filter(fGroupsAMWrongOne, IMSMatchParams = modifyList(IMP, list(minMatches = 0)))),
+                 screenInfo(filter(fGroupsAMWrongOne, IMSMatchParams = IMP, negate = TRUE)))
+    scr <- copy(screenInfo(filter(fGroupsAM, IMSMatchParams = IMP, negate = TRUE)))
+    scr[, ims_parent_group := groupInfo(fGroupsAM)$ims_parent_group[match(group, groupInfo(fGroupsAM)$group)]]
+    scr[, matchCount := uniqueN(mobility), by = c("ims_parent_group", "name")]
+    checkmate::expect_numeric(scr[!is.na(d_mob)]$matchCount, upper = 1)
+    scrPre <- screenInfo(fGroupsAMWrongOne)
+    scrPost <- screenInfo(screenSuspects(fGroupsAMNoSus, list(suspsWrongOnePos, suspsWrongOneNeg)))
+    expect_equal(scrPre[order(group)], scrPost[order(group)][, names(scrPre), with = FALSE], check.attributes = FALSE)
+})
+
 test_that("sets functionality", {
     # some tests from feature groups to ensure proper subsetting/unsetting
     expect_equal(analysisInfo(unset(fGroupsScr, "positive"), TRUE), getTestAnaInfoPos(getTestAnaInfoAnn()),

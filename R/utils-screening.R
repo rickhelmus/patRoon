@@ -153,6 +153,17 @@ expandSuspMobilities <- function(suspects)
     if (hasCCS)
         verifyCol("CCS_susp", "CCS")
     
+    if (nrow(suspects) == 0)
+    {
+        # otherwise a null table will be returned
+        suspects <- copy(suspects)
+        if (hasMob)
+            suspects[, mobility := numeric()]
+        if (hasCCS)
+            suspects[, CCS := numeric()]
+        return(suspects)
+    }
+    
     doSplit <- function(x)
     {
         if (is.na(x))
@@ -181,6 +192,51 @@ getIMSMatchCol <- function(IMSMatchParams)
     if (IMSMatchParams$relative)
         ret <- paste0(ret, "_rel")
     return(ret)
+}
+
+matchIMSScr <- function(scr, gInfo, IMSMatchParams, negate = FALSE)
+{
+    checkCol <- getIMSMatchCol(IMSMatchParams)
+    
+    if (is.null(scr[[checkCol]]))
+        warning(sprintf("Cannot apply IMS match filter: no %s data available in screening results", checkCol), call. = FALSE)
+    else
+    {
+        scr <- if (negate && IMSMatchParams$minMatches == 0)
+            scr[is.na(get(checkCol)) | !numLTE(abs(get(checkCol)), IMSMatchParams$window)]
+        else
+            scr[is.na(get(checkCol)) | numLTE(abs(get(checkCol)), IMSMatchParams$window)]
+    }
+    
+    if (IMSMatchParams$minMatches > 0)
+    {
+        if (all(is.na(gInfo$ims_parent_group)))
+        {
+            warning("No IMS parent group assignments available, cannot apply minMatches filter", call. = FALSE)
+            return(scr)
+        }
+        
+        scr <- copy(scr)
+        scr[, ims_parent_group := gInfo$ims_parent_group[match(group, gInfo$group)]]
+        scr[, suspIMSCount := {
+            v <- if (!is.na(mobility_susp[1])) mobility_susp[1] else CCS_susp[1]
+            if (is.na(v))
+                0L
+            else
+                length(strsplit(v, ";")[[1]])
+        }, by = "name"]
+        scr[!is.na(ims_parent_group), suspIMSMatches := {
+            uniqueN(if (!is.na(mobility_susp[1])) mobility else CCS)
+        }, by = c("ims_parent_group", "name")]
+        scr <- if (negate)
+            scr[is.na(ims_parent_group) | suspIMSCount < IMSMatchParams$minMatches |
+                       suspIMSMatches < IMSMatchParams$minMatches]
+        else
+            scr[is.na(ims_parent_group) | suspIMSCount < IMSMatchParams$minMatches |
+                       suspIMSMatches >= IMSMatchParams$minMatches]
+        scr <- removeDTColumnsIfPresent(scr, c("suspIMSCount", "suspIMSMatches", "ims_parent_group"))
+    }
+    return(scr)
 }
 
 assignFeatureMobilitiesSuspects <- function(features, scr, IMSWindow, selectFunc = NULL)
@@ -217,6 +273,8 @@ assignFeatureMobilitiesSuspects <- function(features, scr, IMSWindow, selectFunc
     })
     
     printf("Assigned %d mobility features.\n", countMobilityFeatures(features) - oldCount)
+    
+    features@hasMobilities <- TRUE
     
     return(features)
 }
@@ -266,24 +324,12 @@ finalizeScreenInfoForIMS <- function(scr, gInfo, IMSMatchParams)
     scr <- assignTabIMSDeviations(scr, gInfo)
 
     if (!is.null(IMSMatchParams))
-    {
-        checkCol <- getIMSMatchCol(IMSMatchParams)
-        scr <- scr[is.na(get(checkCol)) | numLTE(abs(get(checkCol)), IMSMatchParams$window)]
-        
-        if (IMSMatchParams$minMatches > 0)
-        {
-            # NOTE: if parent groups have been filtered or not assigned at all, then nothing is filtered as the min(...)
-            # call below evaluates to zero.
-            scr[, keep := .N >= min(IMSMatchParams$minMatches, scrOrigExp[ims_parent_group == group, .N]),
-                by = c("ims_parent_group", "name")]
-            scr <- scr[keep == TRUE, -"keep"]
-        }
-    }
-    
+        scr <- matchIMSScr(scr, gInfo, IMSMatchParams)
+
     return(removeDTColumnsIfPresent(scr, c("mob_group", "CCS_group", "ims_parent_group")))
 }
 
-selectFromSuspAdductCol <- function(tab, col, fgAnn, adductChrDef)
+selectFromSuspAdductCol <- function(tab, col, adductChrDef, gNames = NULL, fgAnn = data.table())
 {
     isUsable <- function(v) !is.na(v) & (!is.character(v) | nzchar(v))
     
@@ -310,8 +356,8 @@ selectFromSuspAdductCol <- function(tab, col, fgAnn, adductChrDef)
             v <- tryAddCol(adductChrDef, i)
         if (is.na(v) && !is.null(tab[["adduct"]]) && !is.na(tab$adduct[i]) && nzchar(tab$adduct[i]))
             v <- tryAddCol(tab$adduct[i], i)
-        if (is.na(v) && !is.null(tab[["group"]]) && nrow(fgAnn) > 0)
-            v <- tryAddCol(fgAnn[group == tab$group[i]]$adduct, i)
+        if (is.na(v) && !is.null(gNames) && nrow(fgAnn) > 0)
+            v <- tryAddCol(fgAnn[group == gNames[i]]$adduct, i)
         
         return(v)
     }))
@@ -390,8 +436,8 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, IMSMatchPara
                     setMetaData(ret, suspects[ti])
 
                     # copy the right mobility and CCS columns from the suspect list
-                    ret[, mobility_susp := selectFromSuspAdductCol(suspects[ti], "mobility", annTbl, adductTxt)]
-                    ret[, CCS_susp := selectFromSuspAdductCol(suspects[ti], "CCS", annTbl, adductTxt)]
+                    ret[, mobility_susp := selectFromSuspAdductCol(suspects[ti], "mobility", adductTxt, g, annTbl)]
+                    ret[, CCS_susp := selectFromSuspAdductCol(suspects[ti], "CCS", adductTxt, g, annTbl)]
                     
                     ret[, c("group", "d_rt", "d_mz") := .(g, d_rt = if (hasRT) gret - rt else NA_real_,
                                                           ifelse(is.na(mz), annTbl[group == g]$neutralMass - neutralMass,
@@ -536,12 +582,8 @@ doSuspectFilter <- function(obj, onlyHits, IMSMatchParams, selectHitsBy, selectB
         levPred <- function(x, v) maxPred(numericIDLevel(x), v)
         
         if (!is.null(IMSMatchParams))
-        {
-            col <- getIMSMatchCol(IMSMatchParams)
-            filteredSI <- colFilter(filteredSI, tolPred, "IMSMatchParams", col, dataWhich = "mobility data",
-                                    funcToRun = "assignMobilities", ac = FALSE, val = IMSMatchParams$window)
-        }
-        
+            filteredSI <- matchIMSScr(filteredSI, groupInfo(obj), IMSMatchParams, negate = negate)
+
         filteredSI <- colFilterAnn(filteredSI, levPred, "maxLevel", "estIDLevel", ac = FALSE)
         filteredSI <- colFilterAnn(filteredSI, maxPred, "maxFormRank", "formRank", ac = FALSE)
         filteredSI <- colFilterAnn(filteredSI, maxPred, "maxCompRank", "compRank", ac = FALSE)

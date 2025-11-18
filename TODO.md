@@ -167,23 +167,18 @@
         - --> check when piek default settings are properly set
     - expandForIMS()
         - verify things are copied or error is thrown for unsupported algos
-    - suspects
-        - test order of data selection for mobility and CCS columns, missing data etc
     - assignMobilities()
         - fGroups methods
             - verify that concentrations and toxicities slots are copied
-            - from screenInfo(), eg for fGroups with >1 suspect assigned
-            - fromSuspects, CCSParams, IMSMatchParams
         - compounds method: IMS, from overwrite, CCSParams args
     - minMobSpecSim
         - verify that everything is copied, including fingerprints and scoreRanges
-    - IMSRangeParams (incl mobility_mz/CCS_mz) and IMSMatchParams filters for suspects (screenSuspects() and assignMobilities()) and compounds
+    - IMSRangeParams (incl mobility_mz/CCS_mz) and IMSMatchParams filters for compounds
     - piek
         - verify removal duplicate features?
         - mobAssignMethod and mobAssignAggr
         - mz profile & EIM saving, ...
     - spectrumSimilarityMobility()
-    - susp lists with >1 mobility/CCS values. Test if mob/CCS counts differ.
 - misc
     - genLimitsFile() and verify that it overrides
     - generateAnalysisInfo()?
@@ -208,6 +203,7 @@
 - mention that mzR backend caches as loads all at once
 - normalized and showLegend args for plotSpectrum() methods
 - getFMCS(): parallel=TRUE can only work on local machine
+- IMSMatch filter suspect filter: if negation is enabled and minMatches>0 then window match filter is not negated. If both would be negated then we get unexpected results, ie unmatched suspects stay and then the number of matched suspects is unexpectedly higher for minMatches
 - convert
     - add patRoon 3.0 citation for im_collapse
 - handbook

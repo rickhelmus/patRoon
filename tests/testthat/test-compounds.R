@@ -464,3 +464,55 @@ test_that("set unsupported functionality", {
                         sapply(annotations(compsUST1N), function(a) max(a$score))))
     
 })
+
+test_that("IMS tests", {
+    # NOTE: tests are kept relatively short as most is already tested by the DT method of assignMobilities() and suspect
+    # matching
+    
+    skip_if_not(doMetFrag)
+    fGroupsIMS <- getCompFGroupsIMS()[, sets = "positive"] # UNDONE: sticking to positive for now  to make things easier
+    fGroupsIMS <- doAssignMobs(fGroupsIMS)
+    plistsIMS <- generateMSPeakLists(fGroupsIMS)
+    compsIMS <- callMF(fGroupsIMS, plistsIMS)
+    susps <- as.data.table(patRoonDataIMS::suspectsPos)
+    # take first mpb/CCS in case there are multiple
+    for (col in c("mobility_[M+H]+", "CCS_[M+H]+"))
+    {
+        susps[, (col) := sapply(strsplit(get(col), ";"), \(x) x[1])]
+        susps[, (col) := as.numeric(get(col))]
+    }
+    
+    doCompAM <- function(comps = compsIMS, from = susps, CCSParams = getCCSParams("mason-schamp_1/k"), ...)
+    {
+        assignMobilities(comps, fGroupsIMS, from = from, CCSParams = CCSParams, ...)
+    }
+    compsIMSAMNop <- doCompAM(from = NULL, CCSParams = NULL)
+    # don't do anything if from&CCSParams == NULL
+    expect_equal(as.data.table(compsIMS), as.data.table(compsIMSAMNop)[, !grep("mob|CCS", names(as.data.table(compsIMSAMNop))), with = FALSE])
+    
+    compsIMSAM <- doCompAM()
+    expect_known_value(compsIMSAM, testFile("compounds-mf-ims"))
+    checkmate::expect_names(names(as.data.table(compsIMSAM)), must.include = paste0(c("mobility", "mobility_mz", "CCS",
+                                                                                      "CCS_mz", "d_mob", "d_mob_rel",
+                                                                                      "d_CCS", "d_CCS_rel"),
+                                                                                    "-positive"))
+    nonIMSFGs <- names(fGroupsIMS[, IMS = FALSE])
+    IMSFGs <- names(fGroupsIMS[, IMS = TRUE])
+    expect_equal(compsIMS[nonIMSFGs], compsIMSAM[nonIMSFGs]) # non-IMS FGs should be unchanged
+    checkmate::expect_numeric(as.data.table(compsIMSAM[IMSFGs])[["mobility-positive"]], lower = 0, any.missing = FALSE)
+    checkmate::expect_numeric(as.data.table(compsIMSAM[IMSFGs])[["CCS-positive"]], lower = 0, any.missing = FALSE)
+    
+    compsIMSAMAll <- doCompAM(IMS = "both")
+    checkmate::expect_numeric(as.data.table(compsIMSAMAll)[["mobility-positive"]], lower = 0, any.missing = FALSE)
+    checkmate::expect_numeric(as.data.table(compsIMSAMAll)[["CCS-positive"]], lower = 0, any.missing = FALSE)
+    
+    expect_equal(compsIMSAM, doCompAM(compsIMSAM, overwrite = FALSE))
+    expect_equal(compsIMSAM, doCompAM(compsIMSAM, from = "c3sdb", overwrite = FALSE))
+    compsIMSAMOvr <- doCompAM(from = "c3sdb", overwrite = TRUE)
+    checkmate::expect_character(all.equal(as.data.table(compsIMSAMOvr)[["CCS-positive"]], as.data.table(compsIMSAM)[["CCS-positive"]], tolerance = 1E-4))
+    
+    compsIMSAMF <- filter(compsIMSAM, IMSMatchParams = getIMSMatchParams("CCS", window = 1, relative = FALSE))
+    checkmate::expect_numeric(as.data.table(compsIMSAMF[IMSFGs])[["d_CCS-positive"]], upper = 1, any.missing = FALSE)
+    compsIMSAMF2 <- filter(compsIMSAM, IMSRangeParam = getIMSRangeParams("CCS", 140, 150))
+    expect_range(as.data.table(compsIMSAMF2[IMSFGs])[["CCS-positive"]], c(140, 150))
+})

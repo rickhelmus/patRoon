@@ -108,6 +108,12 @@ getCompFGroups <- function()
     # just focus on few targets also present in MF test DB
     return(fGroups[, suspects = fread(getMFTestDBPath())$Name])
 }
+getCompFGroupsIMS <- function()
+{
+    fGroups <- doScreen(getTestFGroupsIMS(getTestAnaInfoAnnIMS()), patRoonDataIMS::suspectsPos, onlyHits = TRUE)
+    # just focus on few targets also present in MF test DB (NOTE: not all are present in IMS data)
+    return(fGroups[, suspects = fread(getMFTestDBPath())$Name])
+}
 
 callMF <- function(fGroups, plists, scoreTypes = "fragScore", db = getMFTestDBPath(), to = 300, ...)
 {
@@ -147,6 +153,7 @@ getISTDAssignments <- function(fg) internalStandardAssignments(fg, "positive")
 
 getTestAnaInfoAnn <- function() getTestAnaInfo()[grepl("standard\\-.+\\-[2-3]", getTestAnaInfo()$analysis), ]
 getTestAnaInfoAnnNS <- function() getTestAnaInfoNS()[4:5, ]
+getTestAnaInfoAnnIMS <- function() getTestAnaInfoIMS()[grepl("standard\\-.+\\-[2-3]", getTestAnaInfoIMS()$analysis), ]
 getTestAnaInfoComponents <- function() getTestAnaInfo()[grepl("(solvent|standard)\\-.+\\-1", getTestAnaInfo()$analysis), ]
 
 getSIRFormFPsProjPath <- function() file.path(getTestDataPath(), paste0("SIRProjFormFPs", c("-pos", "-neg")))

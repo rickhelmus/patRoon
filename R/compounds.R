@@ -830,16 +830,19 @@ setMethod("assignMobilities", "compounds", function(obj, fGroups, IMS = TRUE, fr
 
     # HACK: mimic a 'suspect list' from all annotation results (allTab) so we can use the DT method
     allTab <- as.data.table(obj)[group %chin% names(fGroups)]
-    allTab <- subsetDTColumnsIfPresent(allTab, c("group", "SMILES", "InChI", "InChIKey", "InChIKey1", "UID", "CCS"))
+    if (any(!c("neutralMass", "InChI", "InChIKey") %in% names(allTab))) # eg SIRIUS
+        allTab <- prepareChemTable(allTab, FALSE, FALSE, FALSE)
+    allTab <- subsetDTColumnsIfPresent(allTab, c("group", "neutralMass", "SMILES", "InChI", "InChIKey", "InChIKey1",
+                                                 "UID", "mobility", "CCS"))
     
-    if (!overwrite && !is.null(allTab[["CCS"]]) && !any(is.na(allTab[["CCS"]])))
+    if (!overwrite && ((!is.null(allTab[["mobility"]]) && !any(is.na(allTab[["mobility"]]))) ||
+                       (!is.null(allTab[["CCS"]]) && !any(is.na(allTab[["CCS"]])))))
     {
-        printf("NOTE: skipping CCS assignment from '%s': CCS values are already present. Set overwrite=TRUE to force re-calculation.\n",
-               from)
+        printf("NOTE: skipping mobility/CCS assignment: values are already present. Set overwrite=TRUE to force re-calculation.\n")
         from <- NULL
     }
     
-    # add some columns for so that the DT method can do its calculations
+    # add some columns so that the DT method can do its calculations
     allTab[, mz := gInfo$mz[match(group, gInfo$group)]]
     annFG <- annotations(fGroups)
     adductChr <- if (!is.null(adduct)) as.character(adduct)
@@ -849,10 +852,10 @@ setMethod("assignMobilities", "compounds", function(obj, fGroups, IMS = TRUE, fr
         allTab[, adduct := adductChr]
 
     allTab <- assignMobilities(allTab, from = from, matchFromBy = matchFromBy, overwrite = overwrite,
-                               adducts = "none", predictAdductOnly = TRUE, CCSParams = CCSParams,
+                               adducts = NA, predictAdductOnly = TRUE, CCSParams = CCSParams,
                                prepareChemProps = FALSE, prefCalcChemProps = prefCalcChemProps,
                                neutralChemProps = neutralChemProps, virtualenv = virtualenv)
-    
+
     if (is.null(allTab[["mobility"]]))
         allTab[, mobility := NA_real_]
     if (is.null(allTab[["CCS"]]))

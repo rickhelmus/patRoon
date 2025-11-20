@@ -1515,7 +1515,7 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
     if (!is.null(from))
     {
         if (matchFromBy == "InChIKey1" && is.null(obj[["InChIKey1"]]) && !is.null(obj[["InChIKey"]]))
-            obj[, InChIKey1 := getInChIKey1(InChIKey)]
+            obj[, InChIKey1 := getIKBlock1(InChIKey)]
         
         if (is.null(obj[[matchFromBy]]))
             stop(sprintf("Column '%s' not found to match input data.", matchFromBy), call. = FALSE)
@@ -1615,13 +1615,14 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
             warning("No (adduct relevant) mobility/CCS columns found in the provided data.", call. = FALSE)
         
         if (matchFromBy == "InChIKey1" && is.null(from[["InChIKey1"]]) && !is.null(from[["InChIKey"]]))
-            from[, InChIKey1 := getInChIKey1(InChIKey)]
+            from[, InChIKey1 := getIKBlock1(InChIKey)]
         
         if (is.null(from[[matchFromBy]]))
             stop(sprintf("Column '%s' not found to match data from.", matchFromBy), call. = FALSE)
 
         for (col in predCols)
         {
+            checkmate::assertNumeric(from[[col]], .var.name = sprintf("from[['%s']]", col))
             if (is.null(obj[[col]]))
             {
                 m <- match(obj[[matchFromBy]], from[[matchFromBy]])

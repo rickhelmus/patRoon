@@ -170,7 +170,6 @@
     - assignMobilities()
         - fGroups methods
             - verify that concentrations and toxicities slots are copied
-        - compounds method: IMS, from overwrite, CCSParams args
     - minMobSpecSim
         - verify that everything is copied, including fingerprints and scoreRanges
     - IMSRangeParams (incl mobility_mz/CCS_mz) and IMSMatchParams filters for compounds

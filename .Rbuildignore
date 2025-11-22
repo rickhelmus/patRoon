@@ -33,4 +33,4 @@
 ^logo.png$
 ^LICENSES$
 ^REUSE.toml$
-^tools$
+^tools/update-license-header.R$

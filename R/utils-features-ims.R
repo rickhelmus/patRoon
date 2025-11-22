@@ -105,8 +105,8 @@ assignFeatureMobilitiesPeaks <- function(features, peakParams, EIMParams, parall
     EIMSelFunc <- \(tab) if (is.null(tab[["mobility"]])) tab else tab[is.na(mobility) & !ID %chin% ims_parent_ID]
     allEIMs <- getFeatureEIXs(features, "EIM", EIXParams = EIMParams, selectFunc = EIMSelFunc, compress = FALSE)
     
-    if (identical(parallel, "maybe") && peakParams$algorithm == "piek")
-        parallel <- FALSE # piek is already parallelized internally
+    if (identical(parallel, "maybe"))
+        parallel <- peakParams$algorithm != "piek" # piek is already parallelized internally
     peaksList <- doMap(parallel, allEIMs, analyses(features), f = patRoon:::doFindPeaksForMobilities,
                        MoreArgs = list(peakParams = peakParams))
     features@features <- Map(featureTable(features), peaksList, f = doAssignFeatureMobilities)
@@ -154,8 +154,8 @@ reintegrateMobilityFeatures <- function(features, peakParams, EICParams, peakRTW
     
     if (!is.null(peakParams))
     {
-        if (identical(parallel, "maybe") && peakParams$algorithm == "piek")
-            parallel <- FALSE # piek is already parallelized internally
+        if (identical(parallel, "maybe"))
+            parallel <- peakParams$algorithm != "piek" # piek is already parallelized internally
         peaksList <- doMap(parallel, allEICs, featureTable(features), analyses(features),
                            f = patRoon:::doFindPeaksForReintegration,
                            MoreArgs = list(peakParams = peakParams, peakRTWindow = peakRTWindow,
@@ -375,7 +375,9 @@ assignFGroupsCCS <- function(fGroups, CCSParams)
     hasSets <- isFGSet(fGroups)
     
     # NOTE: there is at most 1 mobility fGroup per set, so we don't have to worry about multiple annotations in sets workflows
-    ann <- annotations(fGroups)[group %chin% groupInfo(fGroups)[!is.na(mobility)]$group]
+    ann <- annotations(fGroups)
+    if (nrow(ann) > 0)
+        ann <- ann[group %chin% groupInfo(fGroups)[!is.na(mobility)]$group]
     
     grpCharges <- if (nrow(ann) > 0)
     {

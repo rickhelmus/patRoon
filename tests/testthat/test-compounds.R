@@ -515,7 +515,9 @@ test_that("IMS tests", {
     checkmate::expect_numeric(as.data.table(compsIMSAMF[IMSFGs])[["d_CCS-positive"]], upper = 1, any.missing = FALSE)
     compsIMSAMF2 <- filter(compsIMSAM, IMSRangeParam = getIMSRangeParams("CCS", 140, 150))
     expect_range(as.data.table(compsIMSAMF2[IMSFGs])[["CCS-positive"]], c(140, 150))
-    
+    compsIMSAMF3 <- filter(compsIMSAM, IMSRangeParam = getIMSRangeParams("CCS", 0.62, 0.65, TRUE))
+    expect_range(as.data.table(compsIMSAMF3[IMSFGs])[["CCS_mz-positive"]], c(0.62, 0.65))
+
     # test minMobSpecSim
     # NOTE: the principle is the same for formulas, so we just test only for compounds here. Copying fingerprints is not
     # tested, but follows some principle as other slot copying

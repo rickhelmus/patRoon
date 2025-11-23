@@ -167,7 +167,6 @@
     - more verification that normInts() works before/after assignMobilities()
         - tests are there now, but 3rd test is failing because ISTD is not found in neg mode
         - --> check when piek default settings are properly set
-    - IMSRangeParams (incl mobility_mz/CCS_mz) and IMSMatchParams filters for compounds
     - piek
         - verify removal duplicate features?
             - can do this when there is an option to not filter features

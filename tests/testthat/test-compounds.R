@@ -515,4 +515,25 @@ test_that("IMS tests", {
     checkmate::expect_numeric(as.data.table(compsIMSAMF[IMSFGs])[["d_CCS-positive"]], upper = 1, any.missing = FALSE)
     compsIMSAMF2 <- filter(compsIMSAM, IMSRangeParam = getIMSRangeParams("CCS", 140, 150))
     expect_range(as.data.table(compsIMSAMF2[IMSFGs])[["CCS-positive"]], c(140, 150))
+    
+    # test minMobSpecSim
+    # NOTE: the principle is the same for formulas, so we just test only for compounds here. Copying fingerprints is not
+    # tested, but follows some principle as other slot copying
+    compsIMSSim <- callMF(fGroupsIMS, plistsIMS, minMobSpecSim = 0.01) # do almost zero threshold so everything should be copied (zero disables)
+    gInfo <- groupInfo(fGroupsIMS)
+    for (fg in groupNames(compsIMSSim))
+    {
+        parentFG <- gInfo[group == fg]$ims_parent_group
+        # skip if no parent or identical MS2
+        if (is.na(parentFG) || isTRUE(all.equal(plistsIMS[[fg]]$MSMS, plistsIMS[[parentFG]]$MSMS, tolerance = 1E-6)))
+            next
+        # all should be copied except fragInfo
+        fiCols <- getMergedConsCols("fragInfo", names(compsIMSSim[[1]]), mergedConsensusNames(compsIMSSim))
+        expect_equal(removeDTColumnsIfPresent(compsIMSSim[[fg]], fiCols), removeDTColumnsIfPresent(compsIMSSim[[parentFG]], fiCols), tolerance = 1E-6,
+                     info = paste0("Compound info should be equal for fg ", fg))
+        checkmate::expect_character(all.equal(subsetDTColumnsIfPresent(compsIMSSim[[fg]], fiCols), subsetDTColumnsIfPresent(compsIMSSim[[parentFG]], fiCols), tolerance = 1E-6),
+                                    info = paste0("Fragment info should differ for fg ", fg))
+        expect_equal(compsIMSSim@scoreRanges[[fg]], compsIMSSim@scoreRanges[[parentFG]], tolerance = 1E-6,
+                     info = paste0("Score ranges should be equal for fg ", fg))
+    }
 })

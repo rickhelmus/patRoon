@@ -30,6 +30,7 @@
     - maybe add _mz rel column like compounds?
     - actually, the same is the case for the mz filter (also IMS and mz for features) --> maybe just document difference? the actual results will not change much in general
 - TC convert: doc that centroid mode is used for IMS conversion (and/or make it optional?)
+- update verifyDependencies()
 
 
 ## Maybe
@@ -170,8 +171,6 @@
     - assignMobilities()
         - fGroups methods
             - verify that concentrations and toxicities slots are copied
-    - minMobSpecSim
-        - verify that everything is copied, including fingerprints and scoreRanges
     - IMSRangeParams (incl mobility_mz/CCS_mz) and IMSMatchParams filters for compounds
     - piek
         - verify removal duplicate features?

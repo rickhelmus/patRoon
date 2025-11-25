@@ -1577,10 +1577,10 @@ setMethod("getBPCs", "featureGroups", function(obj, retentionRange = NULL, MSLev
 #' @param intWeight If \code{TRUE}, calculate intensity-weighted means per group; otherwise use simple arithmetic means.
 #'
 #' @export
-setMethod("updateGroups", "featureGroups", function(fGroups, what = c("ret", "mz", "mobility"), intWeight = FALSE)
+setMethod("updateGroups", "featureGroups", function(fGroups, what = c("ret", "mz", "mobility", "CCS"), intWeight = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertSubset(what, empty.ok = FALSE, choices = c("ret", "mz", "mobility"), add = ac)
+    checkmate::assertSubset(what, empty.ok = FALSE, choices = c("ret", "mz", "mobility", "CCS"), add = ac)
     checkmate::assertFlag(intWeight, add = ac)
     checkmate::reportAssertions(ac)
     
@@ -1592,7 +1592,7 @@ setMethod("updateGroups", "featureGroups", function(fGroups, what = c("ret", "mz
     tab <- as.data.table(fGroups, features = TRUE)
     for (col in what)
     {
-        if (col == "mobility" && !hasMobilities(fGroups))
+        if (is.null(tab[[col]]))
             next
         gVal <- if (intWeight)
             tab[, weighted.mean(get(col), intensity), by = group]

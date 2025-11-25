@@ -106,50 +106,44 @@ std::pair<std::vector<size_t>, std::vector<SpectrumRawTypes::Time>> fillRTGaps(c
     return std::make_pair(std::move(filledInds), std::move(filledTimes));
 }
 
+template <typename T> using summedFrame = std::pair<std::vector<T>, std::vector<SpectrumRawTypes::Intensity>>;
+
 template <typename T>
-void smoothSummedFrameData(std::pair<std::vector<T>, std::vector<SpectrumRawTypes::Intensity>> &data,
-                           unsigned window, T start, T end)
+summedFrame<T> fillSummedFrameData(const summedFrame<T> &data, const std::vector<T> &allXs, T start, T end)
+{
+    summedFrame<T> ret;
+    if (allXs.empty())
+        return ret;
+    
+    size_t dataInd = 0;
+    auto it = (start == 0.0) ? allXs.begin() : std::lower_bound(allXs.begin(), allXs.end(), start);
+    for (; it != allXs.end() && (end == 0.0 || *it < end); ++it)
+    {
+        if (dataInd < data.first.size() && data.first[dataInd] == *it)
+        {
+            ret.first.push_back(*it);
+            ret.second.push_back(data.second[dataInd]);
+            ++dataInd;
+        }
+        else
+        {
+            ret.first.push_back(*it);
+            ret.second.push_back(0);
+        }
+    }
+
+    return ret;
+}
+    
+
+template <typename T> void smoothSummedFrameData(summedFrame<T> &data, unsigned window, T start, T end)
 {
     if (data.first.size() < 3 || window < 1)
         return;
-    
-    // pad to get smoothing right
-    
-    T minDiff = 0;
-    for (size_t i=1; i<data.first.size(); ++i)
-    {
-        const auto diff = data.first[i] - data.first[i-1];
-        if (minDiff == 0 || diff < minDiff)
-            minDiff = diff;
-    }
-    if (minDiff > 0.0)
-    {
-        auto startDiff = data.first.front() - start;
-        for (unsigned i=0; i<window && startDiff>0.0; ++i)
-        {
-            const auto m = std::max(data.first.front() - minDiff, start);
-            data.first.insert(data.first.begin(), m);
-            data.second.insert(data.second.begin(), 0);
-            startDiff -= minDiff;
-            // Rcpp::Rcout << "pad start: " << m << "/" << startDiff << "\n";
-        }
-        auto endDiff = end - data.first.back();
-        for (unsigned i=0; i<window && endDiff>0.0; ++i)
-        {
-            const auto m = std::min(data.first.back() + minDiff, end);
-            data.first.push_back(m);
-            data.second.push_back(0);
-            endDiff -= minDiff;
-            // Rcpp::Rcout << "pad end: " << m << "/" << endDiff << "\n";
-        }
-    }
-    
     data.second = movingAverage(data.second, window);
 }
 
-template <typename T> std::pair<T, T>
-summedFrameProps(const std::pair<std::vector<T>, std::vector<SpectrumRawTypes::Intensity>> &data,
-                 T start, T end)
+template <typename T> std::pair<T, T> summedFrameProps(const summedFrame<T> &data, T start, T end)
 {
     T wm = 0.0, bp = 0.0;
     SpectrumRawTypes::Intensity totInten = 0, maxInten = 0;
@@ -252,6 +246,7 @@ void EIC::setSummedFrameMob()
     for (size_t i=0; i<std::min(summedMobFrame.first.size(), size_t(5)); ++i)
         Rcpp::Rcout << "    " << summedMobFrame.first[i] << "/" << summedMobFrame.second[i] << std::endl;
 #endif
+    summedMobFrame = fillSummedFrameData(summedMobFrame, allMobilities, mobStart - smoothExtMob, mobEnd + smoothExtMob);
     if (smoothWindowMob > 0)
         smoothSummedFrameData(summedMobFrame, smoothWindowMob, mobStart - smoothExtMob, mobEnd + smoothExtMob);
     const auto propsMob = summedFrameProps(summedMobFrame, mobStart, mobEnd);
@@ -727,8 +722,8 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     allEICs.reserve(EICCount);
     for (size_t i=0; i<EICCount; ++i)
         allEICs.emplace_back(specMeta.first.times, eicMode, anySpecHasMob, minEICAdjIntensity, minEICAdjTime,
-                             minEICAdjPoints, sumWindowMZ, sumWindowMob, smoothWindowMZ, smoothWindowMob, smoothExtMZ,
-                             smoothExtMob, saveMZProfiles, saveEIMs);
+                             minEICAdjPoints, backend.getMobilities(), sumWindowMZ, sumWindowMob, smoothWindowMZ,
+                             smoothWindowMob, smoothExtMZ, smoothExtMob, saveMZProfiles, saveEIMs);
     
     #pragma omp parallel for
     for (size_t i=0; i<EICCount; ++i)

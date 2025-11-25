@@ -131,6 +131,7 @@
     - make allowing non-centered features optional?
     - better error when no adduct is specified if suspect list only contains adduct specific mobilities --> now complains that all values are NA
     - smooth extension: default to bin size instead of defaultLim()?
+    - getPiekGenEICParams --> getPiekEICParams
 - update featAnn consensus?
 - ADT gives "susp_mobility_susp"/"susp_CCS_susp" cols --> rename
 - MSPL: do topMost filter after averaging IMS subspectrum? Would be more consistent with HRMS, but may need larger default

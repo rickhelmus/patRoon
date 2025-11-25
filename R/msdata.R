@@ -166,6 +166,17 @@ setMSReadBackendMetadata <- function(backend, fileHash, generator, cacheDB = NUL
     
     setSpecMetadata(backend, meta$MS1, meta$MS2)
     
+    if (backend$getNeedIMS())
+    {
+        mobilities <- loadCacheData("MSReadBackendMobilities", hash, cacheDB)
+        if (is.null(mobilities))
+        {
+            mobilities <- backend$generateMobilities()
+            saveCacheData("MSReadBackendMobilities", mobilities, hash, cacheDB)
+        }
+        backend$setMobilities(mobilities)
+    }
+    
     return(backend)
 }
 

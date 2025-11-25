@@ -40,13 +40,42 @@ void MSReadBackend::close(void)
     }
 }
 
+std::vector<SpectrumRawTypes::Mobility> MSReadBackend::generateMobilities()
+{
+    if (!mobilities.empty())
+        return mobilities; // may already have been loaded or pre-loaded by backend
+    
+    const auto sfunc = [](const SpectrumRaw &spec, const SpectrumRawSelection &, size_t)
+    {
+        return spec.getMobilities();
+    };
+    std::vector<std::vector<SpectrumRawSelection>> sels(1);
+    const auto &meta = getSpecMetadata();
+    for (size_t i=0; i<meta.first.scans.size(); ++i)
+        sels[0].emplace_back(i);
+    const auto ret = applyMSData<std::vector<SpectrumRawTypes::Mobility>>(*this, SpectrumRawTypes::MSLevel::MS1, sels,
+                                                                          sfunc, 0, SpectrumRawTypes::MSSortType::NONE);
+    
+    // sort and make unique
+    std::set<SpectrumRawTypes::Mobility> unMobs;
+    for (const auto &mvec : ret[0])
+        unMobs.insert(mvec.begin(), mvec.end());
+    mobilities.assign(unMobs.begin(), unMobs.end());
+    
+    return mobilities;
+}
+
 RCPP_MODULE(MSReadBackend)
 {
     Rcpp::class_<MSReadBackend>("MSReadBackend")
         .method("setNeedIMS", &MSReadBackend::setNeedIMS)
+        .method("getNeedIMS", &MSReadBackend::getNeedIMS)
         .method("open", &MSReadBackend::open)
         .method("close", &MSReadBackend::close)
         .method("getCurrentFile", &MSReadBackend::getCurrentFile)
+        .method("generateMobilities", &MSReadBackend::generateMobilities)
+        // NOTE: select right overload
+        .method("setMobilities", static_cast<void (MSReadBackend::*)(const std::vector<SpectrumRawTypes::Mobility> &)>(&MSReadBackend::setMobilities))
     ;
     Rcpp::class_<MSReadBackendMem>("MSReadBackendMem")
         .derives<MSReadBackend>("MSReadBackend")
@@ -679,8 +708,11 @@ Rcpp::List getEIMList(const MSReadBackend &backend, const std::vector<SpectrumRa
                 curIntensity += spec.getIntensities()[std::distance(spec.getMZs().begin(), mzIt)];
             }
             
-            ret.mobilities.push_back(*it);
-            ret.intensities.push_back(curIntensity);
+            if (curIntensity > 0)
+            {
+                ret.mobilities.push_back(*it);
+                ret.intensities.push_back(curIntensity);
+            }
             
             it = nextMobIt; // continue with next mobility
         }
@@ -698,6 +730,7 @@ Rcpp::List getEIMList(const MSReadBackend &backend, const std::vector<SpectrumRa
                                           SpectrumRawTypes::MSSortType::MOBILITY_MZ);
 
     std::vector<EIM> summedEIMs(entries);
+    const auto &allMobs = backend.getMobilities();
 
     #pragma omp parallel for
     for (size_t i=0; i<entries; ++i)
@@ -708,6 +741,11 @@ Rcpp::List getEIMList(const MSReadBackend &backend, const std::vector<SpectrumRa
             for (size_t j=0; j<eim.size(); ++j)
                 sumEIMMap[eim.mobilities[j]] += eim.intensities[j];
         }
+        
+        // merge in complete mobilities set to get gap free data
+        auto it = (startMobs[i] == 0.0) ? allMobs.begin() : std::lower_bound(allMobs.begin(), allMobs.end(), startMobs[i]);
+        for (; it != allMobs.end() && (endMobs[i] == 0.0 || numberLTE(*it, endMobs[i])); ++it)
+            sumEIMMap.insert(std::make_pair(*it, 0)); // insert with zero intensity if not present
         
         // convert from map
         EIM sumEIM;

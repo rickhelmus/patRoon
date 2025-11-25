@@ -129,6 +129,7 @@ void MSReadBackendMSTK::generateSpecMetadata(void)
         Rcpp::stop("File '%s' does not contain ion mobility data!", getCurrentFile().c_str());
     
     SpectrumRawMetadata meta;
+    std::set<SpectrumRawTypes::Mobility> mobsUn;
     
     ThreadExceptionHandler exHandler;
     
@@ -137,6 +138,7 @@ void MSReadBackendMSTK::generateSpecMetadata(void)
         auto rd = getMSTKReader();
         MSToolkit::Spectrum spec;
         SpectrumRawMetadata threadMeta;
+        std::vector<SpectrumRawTypes::Mobility> threadMobs;
         
         #pragma omp for schedule(static) nowait
         for (size_t i=1; i<=lastScan; ++i)
@@ -152,7 +154,28 @@ void MSReadBackendMSTK::generateSpecMetadata(void)
                 curMS1MD->TICs.push_back(spec.getTIC());
                 curMS1MD->BPCs.push_back(spec.getBPI());
                 curMS1MD->polarities.push_back(spec.getPositiveScan() ? SpectrumRawTypes::MSPolarity::POSITIVE : SpectrumRawTypes::MSPolarity::NEGATIVE);
-                if (!isMS1)
+                
+                if (isMS1)
+                {
+                    if (haveIMS)
+                    {
+                        if (spec.hasIonMobilityArray())
+                        {
+                            for (size_t j=0; j<spec.size(); ++j)
+                                mobsUn.insert(spec.atIM(j));
+                        }
+                        else
+                        {
+                            // IMS MS1 spectrum w/out array, eg produced by TIMSCONVERT
+                            auto im = spec.getIonMobilityDriftTime();
+                            if (im == 0)
+                                im = spec.getInverseReducedIonMobility();
+                            if (im != 0)
+                                mobsUn.insert(im);
+                        }
+                    }                    
+                }
+                else
                 {
                     const auto prec = spec.getPrecursor();
                     threadMeta.second.isolationRanges.emplace_back(prec.isoOffsetLower, prec.isoOffsetUpper);
@@ -170,16 +193,18 @@ void MSReadBackendMSTK::generateSpecMetadata(void)
                 {
                     meta.first.append(threadMeta.first);
                     meta.second.append(threadMeta.second);
+                    mobsUn.insert(threadMobs.begin(), threadMobs.end());
                 }
             });
         }
     }
 
     exHandler.reThrow();
-    
 
     if (haveIMS)
     {
+        setMobilities(std::vector<SpectrumRawTypes::Mobility>(mobsUn.begin(), mobsUn.end()));
+        
         // For IMS-MS/MS data, the different spectra inside a frame are stored in separate spectra
         // --> move these spectra to MSMSFrames structs, so our main table only contains separate frames
         

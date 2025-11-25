@@ -127,6 +127,7 @@ class EIC
     unsigned adjPointsAboveThr = 0;
     
     // IMS related
+    const std::vector<SpectrumRawTypes::Mobility> &allMobilities;
     IMSFrameSummer<SpectrumRawTypes::Mass> mzSummer;
     IMSFrameSummer<SpectrumRawTypes::Mobility> mobSummer;
     const SpectrumRawTypes::Time sumWindowMZ, sumWindowMob;
@@ -163,12 +164,13 @@ class EIC
 
 public:
     EIC(const std::vector<SpectrumRawTypes::Time> &times, EICMode em, bool wm, SpectrumRawTypes::Intensity minAdjI,
-        SpectrumRawTypes::Time minAdjT, unsigned minAdjP, SpectrumRawTypes::Time sumMZ, SpectrumRawTypes::Time sumMob,
-        unsigned smoMZ, unsigned smoMob, SpectrumRawTypes::Mass smoExtMZ, SpectrumRawTypes::Mobility smoExtMob,
+        SpectrumRawTypes::Time minAdjT, unsigned minAdjP, const std::vector<SpectrumRawTypes::Mobility> &amobs,
+        SpectrumRawTypes::Time sumMZ, SpectrumRawTypes::Time sumMob, unsigned smoMZ, unsigned smoMob,
+        SpectrumRawTypes::Mass smoExtMZ, SpectrumRawTypes::Mobility smoExtMob,
         bool svMZPs, bool svEIMs) : EICTimes(times), mode(em), withMob(wm), minAdjIntensity(minAdjI),
-        minAdjTime(minAdjT), minAdjPoints(minAdjP), sumWindowMZ(sumMZ), sumWindowMob(sumMob), smoothWindowMZ(smoMZ),
-        smoothWindowMob(smoMob), smoothExtMZ(smoExtMZ), smoothExtMob(smoExtMob), saveMZProfiles(svMZPs),
-        saveEIMs(svEIMs) { }
+        minAdjTime(minAdjT), minAdjPoints(minAdjP), allMobilities(amobs), sumWindowMZ(sumMZ), sumWindowMob(sumMob),
+        smoothWindowMZ(smoMZ), smoothWindowMob(smoMob), smoothExtMZ(smoExtMZ), smoothExtMob(smoExtMob),
+        saveMZProfiles(svMZPs), saveEIMs(svEIMs) { }
 
     void setBoundaries(SpectrumRawTypes::Mass mzS, SpectrumRawTypes::Mass mzE,
                        SpectrumRawTypes::Mobility mobS, SpectrumRawTypes::Mobility mobE)

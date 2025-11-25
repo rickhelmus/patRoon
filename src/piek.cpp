@@ -413,9 +413,10 @@ Rcpp::List doFindPeaksPiek(Rcpp::List EICs, bool fillEICs, double minIntensity, 
     std::vector<std::vector<SpectrumRawTypes::Intensity>> allIntensities;
     for (size_t i=0; i<entries; ++i)
     {
-        Rcpp::DataFrame df = Rcpp::as<Rcpp::DataFrame>(EICs[i]);
-        allTimes.emplace_back(Rcpp::as<std::vector<SpectrumRawTypes::Time>>(df["time"]));
-        allIntensities.emplace_back(Rcpp::as<std::vector<SpectrumRawTypes::Intensity>>(df["intensity"]));
+        Rcpp::NumericMatrix mat = Rcpp::as<Rcpp::NumericMatrix>(EICs[i]);
+        Rcpp::NumericVector times = mat(Rcpp::_, 0), ints = mat(Rcpp::_, 1);
+        allTimes.emplace_back(Rcpp::as<std::vector<SpectrumRawTypes::Time>>(times));
+        allIntensities.emplace_back(Rcpp::as<std::vector<SpectrumRawTypes::Intensity>>(ints));
     }
     
     std::vector<PeakPickingResults> ppresults(entries);

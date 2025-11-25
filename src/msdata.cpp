@@ -37,6 +37,7 @@ void MSReadBackend::close(void)
         currentFile.clear();
         specMetadata.first.clear();
         specMetadata.second.clear();
+        mobilities.clear();
     }
 }
 

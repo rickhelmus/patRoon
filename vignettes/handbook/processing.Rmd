@@ -1061,7 +1061,7 @@ checkFeatures(fGroups, session = "checked-features-new.yml") # inspect new data
 
 Take care to monitor the messages that `importCheckFeaturesSession` may output, as it may be possible that some 'old' feature groups are not found or are matched by multiple candidates of the new dataset.
 
-Some additional parameters exist to the functions described in this section. As usualy check the reference manual for more details (_e.g._ `?checkFeatures`).
+Some additional parameters exist to the functions described in this section. As usually check the reference manual for more details (_e.g._ `?checkFeatures`).
 
 > **_NOTE_** Although the GUI tools described here allow you to easily filter out results, it is highly recommended to first prioritize your data to avoid doing a lot of unneeded manual work.
 

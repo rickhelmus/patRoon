@@ -119,7 +119,7 @@ summedFrame<T> fillSummedFrameData(const summedFrame<T> &data, const std::vector
     auto it = (start == 0.0) ? allXs.begin() : std::lower_bound(allXs.begin(), allXs.end(), start);
     for (; it != allXs.end() && (end == 0.0 || *it < end); ++it)
     {
-        if (dataInd < data.first.size() && data.first[dataInd] == *it)
+        if (dataInd < data.first.size() && compareTol(data.first[dataInd], *it))
         {
             ret.first.push_back(*it);
             ret.second.push_back(data.second[dataInd]);
@@ -136,10 +136,44 @@ summedFrame<T> fillSummedFrameData(const summedFrame<T> &data, const std::vector
 }
     
 
-template <typename T> void smoothSummedFrameData(summedFrame<T> &data, unsigned window, T start, T end)
+template <typename T> void smoothSummedFrameData(summedFrame<T> &data, unsigned window, T start, T end, bool pad)
 {
     if (data.first.size() < 3 || window < 1)
         return;
+    
+    if (pad)
+    {
+        // pad to get smoothing right
+        T minDiff = 0;
+        for (size_t i=1; i<data.first.size(); ++i)
+        {
+            const auto diff = data.first[i] - data.first[i-1];
+            if (minDiff == 0 || diff < minDiff)
+                minDiff = diff;
+        }
+        if (minDiff > 0.0)
+        {
+            auto startDiff = data.first.front() - start;
+            for (unsigned i=0; i<window && startDiff>0.0; ++i)
+            {
+                const auto m = std::max(data.first.front() - minDiff, start);
+                data.first.insert(data.first.begin(), m);
+                data.second.insert(data.second.begin(), 0);
+                startDiff -= minDiff;
+                // Rcpp::Rcout << "pad start: " << m << "/" << startDiff << "\n";
+            }
+            auto endDiff = end - data.first.back();
+            for (unsigned i=0; i<window && endDiff>0.0; ++i)
+            {
+                const auto m = std::min(data.first.back() + minDiff, end);
+                data.first.push_back(m);
+                data.second.push_back(0);
+                endDiff -= minDiff;
+                // Rcpp::Rcout << "pad end: " << m << "/" << endDiff << "\n";
+            }
+        }
+    }
+
     data.second = movingAverage(data.second, window);
 }
 
@@ -214,7 +248,7 @@ void EIC::setSummedFrameMZ()
         Rcpp::Rcout << "    " << summedMZFrame.first[i] << "/" << summedMZFrame.second[i] << std::endl;
 #endif
     if (smoothWindowMZ > 0)
-        smoothSummedFrameData(summedMZFrame, smoothWindowMZ, mzStart - smoothExtMZ, mzEnd + smoothExtMZ);
+        smoothSummedFrameData(summedMZFrame, smoothWindowMZ, mzStart - smoothExtMZ, mzEnd + smoothExtMZ, true);
     const auto propsMZ = summedFrameProps(summedMZFrame, mzStart, mzEnd);
 #ifdef LOG_EIC
     Rcpp::Rcout << "  EIC mz props: " << propsMZ.first << "/" << propsMZ.second << std::endl;
@@ -248,7 +282,7 @@ void EIC::setSummedFrameMob()
 #endif
     summedMobFrame = fillSummedFrameData(summedMobFrame, allMobilities, mobStart - smoothExtMob, mobEnd + smoothExtMob);
     if (smoothWindowMob > 0)
-        smoothSummedFrameData(summedMobFrame, smoothWindowMob, mobStart - smoothExtMob, mobEnd + smoothExtMob);
+        smoothSummedFrameData(summedMobFrame, smoothWindowMob, mobStart - smoothExtMob, mobEnd + smoothExtMob, false);
     const auto propsMob = summedFrameProps(summedMobFrame, mobStart, mobEnd);
 #ifdef LOG_EIC
     Rcpp::Rcout << "  EIC mob props: " << propsMob.first << "/" << propsMob.second << std::endl;

@@ -20,6 +20,7 @@ protected:
 private:
     std::string currentFile;
     SpectrumRawMetadata specMetadata;
+    std::vector<SpectrumRawTypes::Mobility> mobilities;
     bool needIMS = false;
     
     virtual void doOpen(const std::string &file) = 0;
@@ -29,6 +30,7 @@ private:
                                        const SpectrumRawSelection &scanSel,
                                        const SpectrumRawTypes::MobilityRange &mobRange,
                                        SpectrumRawTypes::Intensity minIntensityIMS) const = 0;
+    std::vector<SpectrumRawTypes::Mobility> doGetMobilities(void);
     
 public:
     MSReadBackend(void) = default;
@@ -49,6 +51,10 @@ public:
         { return doReadSpectrum(tdata, MSLevel, scanSel, mobRange, minIntensityIMS); };
     const SpectrumRawMetadata &getSpecMetadata(void) const { return specMetadata; }
     void setSpecMetadata(SpectrumRawMetadata &&msd) { specMetadata = std::move(msd); }
+    const std::vector<SpectrumRawTypes::Mobility> &getMobilities(void) const { return mobilities; }
+    std::vector<SpectrumRawTypes::Mobility> generateMobilities(void);
+    void setMobilities(const std::vector<SpectrumRawTypes::Mobility> &mobs) { mobilities = mobs; }
+    void setMobilities(std::vector<SpectrumRawTypes::Mobility> &&mobs) { mobilities = std::move(mobs); }
 };
 
 RCPP_EXPOSED_CLASS(MSReadBackend)

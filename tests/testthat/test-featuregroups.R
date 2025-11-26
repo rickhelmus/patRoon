@@ -532,7 +532,7 @@ test_that("plotting works", {
 
 test_that("plotting empty objects works", {
     expect_doppel("retmz-empty", function() plot(fgOpenMSEmpty))
-    expect_doppel("retmz-empty", function() plot(fgOpenMSEmpty, colourBy = "rGroups"))
+    expect_doppel_same_as("retmz-empty2", "retmz-empty", function() plot(fgOpenMSEmpty, colourBy = "rGroups"))
     expect_doppel("retmz-comp-empty", function() plot(fgCompBothEmpty))
 
     expect_doppel("intensity-def-empty", function() plotInt(fgOpenMSEmpty))
@@ -551,9 +551,9 @@ test_that("plotting empty objects works", {
     
     skip_if(testWithSets())
     
-    expect_doppel("retmz", function() plot(fGConsOneEmpty, colourBy = "fGroups", showLegend = FALSE)) # should be same as fgOpenMS
+    expect_doppel_same_as("retmzConsEmpty", "retmz", \() plot(fGConsOneEmpty, colourBy = "fGroups", showLegend = FALSE)) # should be same as fgOpenMS
     expect_doppel("chord-def", function() plotChord(fGConsOneEmpty)) # should be same as fgOpenMS
-    expect_doppel("venn", function() plotVenn(fGConsOneEmpty)) # should be same as fgOpenMS
+    expect_doppel_same_as("vennCons1Empty", "venn", function() plotVenn(fGConsOneEmpty)) # should be same as fgOpenMS
     expect_ggplot(plotUpSet(fGConsOneEmpty))
     
     expect_HTML(plotGraph(fgNormISTDEmpty))

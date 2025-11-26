@@ -456,6 +456,16 @@ expect_doppel <- function(title, fig)
     return(vdiffr::expect_doppelganger(title, fig))
 }
 
+expect_doppel_same_as <- function(title, titleSameAs, fig)
+{
+    expect_doppel(title, fig)
+    # HACK: figure out where actual snapshot files are...
+    snapDir <- file.path(testthat:::get_snapshotter()$snap_dir, testthat:::get_snapshotter()$file)
+    expect_true(compare_file_text(file.path(snapDir, paste0("sets-", title, ".svg")),
+                                  file.path(snapDir, paste0("sets-", titleSameAs, ".svg"))),
+                info = sprintf("snapshots for %s and %s differ", title, titleSameAs))
+}
+
 # HACK: workaround for non imported checkmate namespace
 makeExpectation <- checkmate::makeExpectation
 vname <- checkmate::vname

@@ -385,11 +385,22 @@ test_that("plotting works", {
                                                               MSLevel = 1))
     expect_doppel("mspl-spec-avg-msms", function() plotSpectrum(plistsMSMS, groupName = groupNames(plistsMSMS)[14],
                                                                 MSLevel = 2))
+
+    expect_doppel("mspl-spec-ms-noleg", function() plotSpectrum(plists, groupName = groupNames(plists)[70],
+                                                                analysis = analyses(plists)[1], MSLevel = 1,
+                                                                showLegend = FALSE))
+    expect_doppel("mspl-spec-ms-norm", function() plotSpectrum(plists, groupName = groupNames(plists)[70],
+                                                               analysis = analyses(plists)[1], MSLevel = 1,
+                                                               normalized = TRUE))
     
     expect_doppel("mspl-spec_sim-ms", function() plotSpectrum(plists,
                                                               groupName = c(groupNames(plistsMSMS)[2], groupNames(plistsMSMS)[3]),
                                                               analysis = c(analyses(plistsMSMS)[1], analyses(plistsMSMS)[1]),
                                                               MSLevel = 1))
+    expect_doppel("mspl-spec_sim-ms-nonorm", function() plotSpectrum(plists,
+                                                                     groupName = c(groupNames(plistsMSMS)[2], groupNames(plistsMSMS)[3]),
+                                                                     analysis = c(analyses(plistsMSMS)[1], analyses(plistsMSMS)[1]),
+                                                                     MSLevel = 1, normalized = FALSE))
     expect_doppel("mspl-spec_sim-msms", function() plotSpectrum(plistsMSMS,
                                                                 groupName = c(groupNames(plistsMSMS)[2], groupNames(plistsMSMS)[3]),
                                                                 analysis = c(analyses(plistsMSMS)[1], analyses(plistsMSMS)[1]),

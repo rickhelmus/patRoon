@@ -237,3 +237,24 @@ test_that("as.data.table functionality", {
     
     expect_equal(nrow(calcTab), nrow(calcTabFeatsAvg))
 })
+
+test_that("IMS tests", {
+    fGroupsIMS <- getTestFGroupsIMS() |>
+        screenSuspects(list(patRoonDataIMS::suspectsPos, patRoonDataIMS::suspectsNeg), onlyHits = TRUE) |>
+        predictRespFactors(calib, eluent, organicModifier = "MeOH", pHAq = 4, calibConcUnit = "M") |>
+        calculateConcs() |>
+        predictTox() |>
+        calculateTox() |>
+        doAssignMobs()
+    
+    expect_setequal(concentrations(fGroupsIMS)$group, names(fGroupsIMS))
+    expect_setequal(toxicities(fGroupsIMS)$group, names(fGroupsIMS))
+    
+    gInfo <- groupInfo(fGroupsIMS)
+    for (fg in unique(gInfo[!is.na(ims_parent_group)]$group))
+    {
+        parentFG <- gInfo[group == fg]$ims_parent_group
+        expect_equal(concentrations(fGroupsIMS)[group == fg][, -"group"], concentrations(fGroupsIMS)[group == parentFG][, -"group"])
+        expect_equal(toxicities(fGroupsIMS)[group == fg][, -"group"], toxicities(fGroupsIMS)[group == parentFG][, -"group"])
+    }
+})

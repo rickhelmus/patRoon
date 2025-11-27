@@ -319,7 +319,7 @@ updateFGroupsForMobilities <- function(fGroups, IMSWindow, sets)
         {
             printf("NOTE: copying parent data from %s\n", sl)
             if (nrow(d) == 0)
-                next # skip, otherwise we end up with a numm DT (ie columns removed)
+                next # skip, otherwise we end up with a null DT (ie columns removed)
             
             # slots are all data.tables with group column
             d <- rbindlist(lapply(split(d, seq_len(nrow(d))), function(r)

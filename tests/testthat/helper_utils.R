@@ -49,11 +49,12 @@ getTestFeaturesNS <- function(anaInfo = getTestAnaInfoNS(), noiseThrInt = 3E4, .
     ret <- findFeatures(anaInfo, "openms", noiseThrInt = noiseThrInt, ...)
     return(ret)
 }
-getTestFeaturesIMS <- function(anaInfo = getTestAnaInfoIMS(), intThr = 3E4)
+getTestFeaturesIMS <- function(anaInfo = getTestAnaInfoIMS(), intThr = 3E4, DMA = FALSE)
 {
     an <- isAnaInfoNeg(anaInfo)
     featArgs <- list(algorithm = "piek",
-                     genEICParams = getPiekGenEICParams("bins", mzRange = c(200, 300), minEICIntensity = intThr),
+                     genEICParams = getPiekGenEICParams("bins", if (DMA) "bins", mzRange = c(200, 300), mobRange = c(0.5, 0.8),
+                                                        minEICIntensity = intThr),
                      peakParams = getDefPeakParams("chrom", "piek", minIntensity = intThr * 0.3))
     if (any(an))
         ret <- makeSet(do.call(findFeatures, c(list(anaInfo[!an, ]), featArgs)),
@@ -67,6 +68,7 @@ getTestFeaturesIMS <- function(anaInfo = getTestAnaInfoIMS(), intThr = 3E4)
 getTestFGroups <- function(anaInfo = getTestAnaInfo(), ...) groupFeatures(getTestFeatures(anaInfo, ...), "openms")
 getTestFGroupsNS <- function(anaInfo = getTestAnaInfoNS(), ...) groupFeatures(getTestFeaturesNS(anaInfo, ...), "openms")
 getTestFGroupsIMS <- function(anaInfo = getTestAnaInfoIMS(), ...) groupFeatures(getTestFeaturesIMS(anaInfo, ...), "openms")
+getTestFGroupsIMSDMA <- function(anaInfo = getTestAnaInfoIMS(), ...) groupFeatures(getTestFeaturesIMS(anaInfo, DMA = TRUE, ...), "greedy")
 getEmptyFeatures <- function(anaInfo = getTestAnaInfo(), ...) getTestFeatures(anaInfo, noiseThrInt = 1E9, ...)
 getEmptyFeaturesNS <- function(anaInfo = getTestAnaInfoNS(), ...) getTestFeaturesNS(anaInfo, noiseThrInt = 1E9, ...)
 getEmptyFeaturesIMS <- function(anaInfo = getTestAnaInfoIMS(), ...) getTestFeaturesIMS(anaInfo, intThr = 1E9, ...)

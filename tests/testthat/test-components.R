@@ -293,3 +293,39 @@ test_that("set unsupported functionality", {
     
     expect_lt(length(fGroupsSIUS), length(fGroupsUS))
 })
+
+test_that("IMS tests", {
+    fGroupsIMS <- getTestFGroupsIMS()[, 1:50]
+    fGroupsAM <- doAssignMobs(fGroupsIMS)
+    compsIMS <- generateComponents(fGroupsIMS, "intclust", average = FALSE)
+    expComps <- expandForIMS(compsIMS, fGroupsAM)
+    
+    # verify that components for IMS features were properly copied
+    gInfo <- groupInfo(fGroupsAM)
+    for (cmpi in seq_len(length(expComps)))
+    {
+        cmp <- expComps[[cmpi]]
+        for (fg in cmp$group)
+        {
+            parentFG <- gInfo[group == fg]$ims_parent_group
+            if (is.na(parentFG))
+                next
+            expect_equal(cmp[group == fg][, -"group"], cmp[group == parentFG][, -"group"],
+                         info = sprintf("Component %s: group %s matches parent %s",
+                                        names(expComps)[cmpi], fg, parentFG))
+        }
+    }
+    
+    fGroupsDMA <- getTestFGroupsIMSDMA()[, 1:50]
+    compsIMSDMA <- generateComponents(fGroupsDMA, "intclust", average = FALSE)
+    expect_equal(compsIMSDMA, expandForIMS(compsIMSDMA, fGroupsDMA))
+    
+    expect_equal(expComps, generateComponents(fGroupsAM, "intclust", average = FALSE, IMS = F))
+    
+    expect_error(expandForIMS(compsIMS, fGroupsAM[, IMS = FALSE]), "No mobilities")
+    expect_error(expandForIMS(compsRC, fGroupsSimple), "not supported for this class")
+    expect_error(expandForIMS(compsCAM, fGroupsSimple), "not supported for this class")
+    expect_error(expandForIMS(compsOpenMS, fGroupsSimple), "not supported for this class")
+    expect_error(expandForIMS(compsNT, fGroups), "not supported for this class")
+    expect_error(expandForIMS(compsClMS, fGroupsSimple), "not supported for this class")
+})

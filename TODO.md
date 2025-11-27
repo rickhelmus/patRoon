@@ -167,9 +167,6 @@
     - more verification that normInts() works before/after assignMobilities()
         - tests are there now, but 3rd test is failing because ISTD is not found in neg mode
         - --> check when piek default settings are properly set
-    - assignMobilities()
-        - fGroups methods
-            - verify that concentrations and toxicities slots are copied
     - IMSRangeParams (incl mobility_mz/CCS_mz) and IMSMatchParams filters for compounds
     - piek
         - verify removal duplicate features?

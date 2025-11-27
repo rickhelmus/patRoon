@@ -425,6 +425,30 @@ test_that("sets functionality", {
                                                                   MSLevel = 2, perSet = TRUE, mirror = TRUE))
 })
 
+test_that("IMS tests", {
+    fGroupsIMS <- getTestFGroupsIMS()[, 1:50]
+    fGroupsIMS <- doAssignMobs(fGroupsIMS)
+    plistsIMS <- generateMSPeakLists(fGroupsIMS)
+    specSims <- spectrumSimilarityMobility(plistsIMS, fGroupsIMS, doFGroups = TRUE)
+    checkmate::expect_data_table(specSims)
+    checkmate::expect_names(names(specSims), identical.to = c("group", "ims_parent_group", "similarity"))
+    expect_range(specSims$similarity, c(0, 1))
+    expect_setequal(c(unique(specSims$group), unique(specSims$ims_parent_group)), groupNames(plistsIMS))
+    
+    specSimsFeats <- spectrumSimilarityMobility(plistsIMS, fGroupsIMS, doFGroups = FALSE)
+    checkmate::expect_data_table(specSimsFeats)
+    checkmate::expect_names(names(specSimsFeats), identical.to = c("group", "ims_parent_group", "analysis", "similarity"))
+    expect_range(specSimsFeats$similarity, c(0, 1))
+    expect_true(anyNA(specSimsFeats$similarity)) # since this is sets data the IMS features will only be present in one set
+    expect_setequal(c(unique(specSimsFeats$group), unique(specSimsFeats$ims_parent_group)), groupNames(plistsIMS))
+    
+    expect_null(spectrumSimilarityMobility(delete(plistsIMS), fGroupsIMS))
+    expect_warning(spectrumSimilarityMobility(plistsIMS, delete(fGroupsIMS)), "No relevant")
+    expect_warning(spectrumSimilarityMobility(plistsIMS, delete(fGroupsIMS), warn = FALSE), NA)
+    expect_error(spectrumSimilarityMobility(plistsIMS, fGroupsIMS[, IMS = FALSE]), "No mobility")
+    expect_warning(spectrumSimilarityMobility(plistsIMS, fGroupsIMS[, IMS = TRUE]), "No relevant")
+})
+
 doGetBG <- function(ai = getTestAnaInfoNS()[getTestAnaInfoNS()$replicate == "solvent-pos", ], minBPIntensity = 1E5, ...)
 {
     getBGMSMSPeaks(ai, minBPIntensity = minBPIntensity, ...)

@@ -577,6 +577,10 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
             if (genEICParams$saveEIMs)
                 EIMs[[ana]] <<- getIMSProfiles(attr(EICs, "EIMs"), peaks, EICs, EICInfo)
 
+            peaks[, EIC_ID := NULL][]
+            if (withIMS)
+                peaks[, ims_parent_ID := NA_character_]
+            
             return(peaks)
         })
         

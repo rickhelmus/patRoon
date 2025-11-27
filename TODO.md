@@ -177,7 +177,6 @@
         - verify removal duplicate features?
         - mobAssignMethod and mobAssignAggr
         - mz profile & EIM saving, ...
-    - spectrumSimilarityMobility()
 - misc
     - genLimitsFile() and verify that it overrides
     - generateAnalysisInfo()?

@@ -170,12 +170,12 @@
     - IMSRangeParams (incl mobility_mz/CCS_mz) and IMSMatchParams filters for compounds
     - piek
         - verify removal duplicate features?
+            - can do this when there is an option to not filter features
         - mobAssignMethod and mobAssignAggr
         - mz profile & EIM saving, ...
 - misc
     - genLimitsFile() and verify that it overrides
     - generateAnalysisInfo()?
-    - plotSpectrum() methods: normalization and showLegend
     - updateGroups()
     - importFeatures() / importFeatureGroups()
         - also with IMS data

@@ -170,8 +170,8 @@ importFeatureGroupsTable <- function(input, analysisInfo, addCols = NULL, groupA
             if (is.null(input[[cn]]))
                 input[, (cn) := mean(ion_mz), by = c("group", "set")]
         }
-        if (is.null(input[["neutralMass"]]))
-            input[, neutralMass := mean(mz), by = "group"]
+        if (is.null(input[["group_neutralMass"]]))
+            input[, group_neutralMass := mean(mz), by = "group"]
     }
     
     inputFeat <- copy(input)
@@ -224,6 +224,9 @@ importFeatureGroupsTable <- function(input, analysisInfo, addCols = NULL, groupA
         }
         setnames(ann, "group_neutralMass", "neutralMass")
         setcolorder(ann, c("set", "group", "adduct", "neutralMass", "ion_mz"))
+        ann[, ord := match(set, setsNames)]
+        setorderv(ann, "ord")
+        ann[, ord := NULL]
         do.call(featureGroupsSet, c(constArgs, list(annotations = ann, algorithm = "table-set", groupAlgo = groupAlgo,
                                                     groupArgs = if (is.null(groupArgs)) list() else groupArgs)))
     }

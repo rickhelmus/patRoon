@@ -1048,7 +1048,7 @@ doCreateProject <- function(CCSCalibrant, anaInfoTabs, settings, noDate = FALSE)
             settings$preTreatment$output[[t]] <- "."
     }
     
-    genLimitsFile(settings$general$destination, settings$general$IMS$limits)
+    genLimitsFile(file.path(settings$general$destination, "limits.yml"), settings$general$IMS$limits)
     
     doSusps <- settings$features$exSuspList || (settings$general$ionization != "both" && nzchar(settings$features$suspects$single)) ||
         (settings$general$ionization == "both" && nzchar(settings$features$suspects$sets$pos))

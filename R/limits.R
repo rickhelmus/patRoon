@@ -104,23 +104,21 @@ doDefaultLim <- defaultLimClosure()
 #'   created with the defaults embedded in \pkg{patRoon} (see details below). Generating a custom limits is primarily
 #'   useful for non-Bruker IMS workflows.
 #'
-#' @param outPath The output directory where the new \file{limits.yml} file will be created.
+#' @param out The full output path for the new file.
 #' @param IMS The IMS instrument type. This sets the \code{IMS} variable in the \strong{general} section. Valid values
 #'   are \code{"bruker"} and \code{"agilent"}.
 #'
 #' @rdname limits
 #' @export
-genLimitsFile <- function(outPath = normalizePath("."), IMS = "bruker")
+genLimitsFile <- function(out = "limits.yml", IMS = "bruker")
 {
-    checkmate::assertString(outPath, min.chars = 1)
+    checkmate::assertString(out, min.chars = 1)
+    checkmate::assertPathForOutput(out, overwrite = TRUE)
     checkmate::assertChoice(IMS, c("bruker", "agilent"))
-    
-    fp <- file.path(outPath, "limits.yml")
-    checkmate::assertPathForOutput(fp, overwrite = TRUE)
     
     limits <- readYAML(system.file("misc", "limits.yml", package = "patRoon"))
     limits$general$IMS <- IMS
-    writeYAML(limits, fp)
+    writeYAML(limits, out)
 
     return(invisible(NULL))    
 }

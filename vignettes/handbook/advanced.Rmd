@@ -55,8 +55,8 @@ The `IMS` setting under `general` specifies which IMS defaults are applied: this
 If you used the [newProject tool](#newProject) to create a new project, the `limits.yml` file is automatically copied to the project directory. Otherwise, it can be created by the `genLimitsFile()` function:
 
 ```{r eval=FALSE}
-genLimitsFile() # copy default limits file to current working directory
-genLimitsFile("my/path", IMS = "agilent") # copy file to `my/path` with Agilent IMS defaults
+genLimitsFile() # copy default limits.yml file to current working directory
+genLimitsFile("my/path/limits.yml", IMS = "agilent") # generate `my/path/limits.yml` with Agilent IMS defaults
 ```
 
 More information on the limits can be found in the reference manual (`?limits`).

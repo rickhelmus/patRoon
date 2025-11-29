@@ -175,7 +175,6 @@
 - misc
     - genLimitsFile() and verify that it overrides
     - generateAnalysisInfo()?
-    - updateGroups()
     - importFeatures() / importFeatureGroups()
         - also with IMS data
 - newProject()

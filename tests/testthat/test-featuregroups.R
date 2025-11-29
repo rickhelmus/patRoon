@@ -103,6 +103,20 @@ test_that("empty objects work", {
     expect_length(fgOpenMSEmptyQ, 0)
 })
 
+test_that("updateGroups works", {
+    fgAMSub <- fgAMInt[1]
+    fgAMSub <- updateGroups(fgAMSub)
+    tab <- as.data.table(fgAMSub, features = TRUE)
+    tab <- tab[match(names(fgAMSub), group)]
+    cols <- c("ret", "mz", "mobility", "CCS")
+    expect_equal(groupInfo(fgAMSub)[, cols, with = FALSE], tab[, cols, with = FALSE])
+    colsSub <- c("ret", "mz"); colsOther <- setdiff(cols, colsSub)
+    expect_equal(groupInfo(updateGroups(fgAMInt, what = colsSub))[, colsOther, with = FALSE],
+                 groupInfo(fgAMInt)[, colsOther, with = FALSE])
+    checkmate::expect_character(all.equal(updateGroups(fgAMInt), updateGroups(fgAMInt, intWeight = TRUE)))
+    expect_equal(updateGroups(fgOpenMSEmpty), fgOpenMSEmpty)
+})
+
 # to compare original anaInfo: ignore extra columns that may have been added afterwards
 getAnaInfo <- function(fg) analysisInfo(fg)[, -"set"]
 

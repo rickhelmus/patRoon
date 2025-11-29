@@ -173,7 +173,6 @@
         - mobAssignMethod and mobAssignAggr
         - mz profile & EIM saving, ...
 - misc
-    - genLimitsFile() and verify that it overrides
     - generateAnalysisInfo()?
     - importFeatures() / importFeatureGroups()
         - also with IMS data

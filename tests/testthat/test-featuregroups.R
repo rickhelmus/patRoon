@@ -322,6 +322,32 @@ test_that("as.data.table works", {
     expect_equal(nrow(as.data.table(fgOpenMSEmptyQ, qualities = "both")), 0)
 })
 
+test_that("importFeatureGroupsTable works", {
+    fgImp <- importFeatureGroupsTable(as.data.table(fgAMInt, features = TRUE), analysisInfo(fgAMInt), groupAlgo = "openms")
+    adtImp <- as.data.table(fgImp, features = TRUE)
+    expect_true(hasMobilities(fgImp))
+    expect_true(isFGSet(fgImp))
+    expect_equal(adtImp, as.data.table(fgAMInt, features = TRUE)[, names(adtImp), with = FALSE])
+    expect_equal(annotations(fgImp), annotations(fgAMInt))
+    
+    # test absence of group adduct, ion_mz and neutralMass columns
+    adtAdd <- as.data.table(fgAMInt, features = TRUE)
+    adtAdd[, adduct := fifelse(set == "positive", `group_adduct-positive`, `group_adduct-negative`)]
+    adtAdd[, c("group_adduct-positive", "group_adduct-negative", "group_neutralMass", "group_ion_mz-positive", "group_ion_mz-negative") := NULL]
+    # NOTE: some tolerance is needed, as neutralMass is calculated slightly different
+    expect_equal(importFeatureGroupsTable(adtAdd, analysisInfo(fgAMInt), groupAlgo = "openms"), fgImp, tolerance = 1E-6)
+    
+    # test absence of feat adduct and ion_mz columns. NOTE: feat adduct is not exported by ADT
+    checkmate::expect_names(names(as.data.table(getFeatures(importFeatureGroupsTable(as.data.table(fgAMInt, features = TRUE)[, -"ion_mz"],
+                                                                                     analysisInfo(fgAMInt), groupAlgo = "openms")))),
+                            must.include = c("adduct", "ion_mz"))
+    
+    # test if groupInfo is calculated if group properties are missing
+    checkmate::expect_names(names(groupInfo(importFeatureGroupsTable(as.data.table(fgAMInt, features = TRUE)[, -c("group_ret", "group_mz", "group_mobility", "group_CCS")],
+                                                                     analysisInfo(fgAMInt), groupAlgo = "openms"))),
+                            must.include = c("ret", "mz", "mobility", "CCS"))
+})
+
 test_that("unique works", {
     # note: only have two rep groups
 

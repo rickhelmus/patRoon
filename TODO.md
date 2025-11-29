@@ -174,8 +174,6 @@
         - mz profile & EIM saving, ...
 - misc
     - generateAnalysisInfo()?
-    - importFeatures() / importFeatureGroups()
-        - also with IMS data
 - newProject()
     - see where testing is slow, possibly disable testServer() on CI?
     - add snapshots

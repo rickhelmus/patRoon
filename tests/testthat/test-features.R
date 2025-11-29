@@ -282,6 +282,41 @@ test_that("KPIC2 conversion", {
     expect_equal(KPIC2ImpOpenMS[[1]]$peakinfo[, "mz"], ffOpenMS[[1]]$mz)
 })
 
+test_that("importFeaturesTable", {
+    ffImp <- importFeaturesTable(as.data.table(ffOpenMS), analysisInfo(ffOpenMS))
+    adtImp <- as.data.table(ffImp)
+    adtRef <- as.data.table(ffOpenMS)
+    expect_equal(as.data.table(adtImp), as.data.table(adtRef)[, names(adtImp), with = FALSE])
+    checkmate::expect_names(names(as.data.table(adtImp)), disjunct.from = "isocount")
+    checkmate::expect_names(names(as.data.table(importFeaturesTable(as.data.table(ffOpenMS), analysisInfo(ffOpenMS), addCols = "isocount"))),
+                            must.include = "isocount")
+    
+    setsCols <- c("set", "adduct", "ion_mz")    
+    mandCols <- c("analysis", "ret", "mz", "intensity")
+    calcCols <- c("ID", "retmin", "retmax", "mzmin", "mzmax", "area")
+    checkmate::expect_names(names(as.data.table(importFeaturesTable(as.data.table(ffOpenMS)[, c(mandCols, setsCols), with = FALSE], analysisInfo(ffOpenMS)))),
+                            must.include = c(mandCols, calcCols, setsCols))
+    
+    mandColsIMS <- c(mandCols, "mobility")
+    calcColsIMS <- c(calcCols, "mobmin", "mobmax", "mob_intensity", "mob_area", "ims_parent_ID", "mob_assign_method", "mob_reintegr_method")
+    checkmate::expect_names(names(as.data.table(importFeaturesTable(as.data.table(ffPiekSuspIMS)[, mandColsIMS, with = FALSE], analysisInfo(ffPiekSuspIMS)))),
+                            must.include = c(mandColsIMS, calcColsIMS))
+    
+    expect_warning(importFeaturesTable(as.data.table(ffOpenMS)[, intensity_rel := 1], analysisInfo(ffOpenMS), addCols = "intensity_rel"),
+                   "not be considered: intensity_rel")
+    expect_warning(importFeaturesTable(as.data.table(ffOpenMS)[, -"set"], analysisInfo(ffOpenMS)),
+                   "Assuming this is not a sets workflow")
+    expect_warning(importFeaturesTable(as.data.table(ffPiekSuspIMS)[, -"mobility"], analysisInfo(ffPiekSuspIMS)),
+                   "invalid in non-IMS")
+    expect_warning(importFeaturesTable(as.data.table(ffOpenMS)[analysis != analysisInfo(ffOpenMS)$analysis[1]], analysisInfo(ffOpenMS)),
+                   paste("in the input data:", analysisInfo(ffOpenMS)$analysis[1]))
+    expect_warning(importFeaturesTable(as.data.table(ffOpenMS), analysisInfo(ffOpenMS)[-1]),
+                   paste("in analysisInfo:", analysisInfo(ffOpenMS)$analysis[1]))
+    
+    suppressWarnings(expect_setequal(analyses(importFeaturesTable(as.data.table(ffOpenMS)[analysis != analysisInfo(ffOpenMS)$analysis[1]], analysisInfo(ffOpenMS)[-2])),
+                                     analyses(ffOpenMS)[-(1:2)]))
+})
+
 getModifiedAI <- function(ai)
 {
     ret <- ffOpenMS

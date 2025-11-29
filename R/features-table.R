@@ -203,8 +203,8 @@ importFeaturesTable <- function(input, analysisInfo, addCols = NULL)
         setsColsPresent <- intersect(setsCols, names(input))
         if (length(setsColsPresent) > 0)
         {
-            warning(sprintf("In sets workflows the %s column(s) must be present, but only %s is found. ", setsCols,
-                            setsColsPresent),
+            warning(sprintf("In sets workflows the %s column(s) must be present, but only %s is found. ", paste0(setsCols, collapse = "/"),
+                            paste0(setsColsPresent, collapse = "/")),
                     "Assuming this is not a sets workflow and removing interfering columns...", call. = FALSE)
             input[, (setsColsPresent) := NULL]
         }
@@ -212,6 +212,9 @@ importFeaturesTable <- function(input, analysisInfo, addCols = NULL)
     
     checkmate::reportAssertions(ac)
 
+    if (nrow(input) == 0)
+        stop("No features found in the input data after validation!", call. = FALSE)
+    
     input[, ID := as.character(ID)]
     
     # sync common analyses between analysisInfo

@@ -144,7 +144,6 @@
     - SAFD?
 - Feat Ann
     - MSPL
-        - new spec averaging params: add IMS
         - more extensively test filters/summing/averaging
         - further test bbCID data
             - also mixed bbCID/PASEF file (ie with different segments)

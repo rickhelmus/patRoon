@@ -440,6 +440,9 @@ test_that("IMS tests", {
     fGroupsIMS <- getTestFGroupsIMS()[, 1:50]
     fGroupsIMS <- doAssignMobs(fGroupsIMS)
     plistsIMS <- generateMSPeakLists(fGroupsIMS)
+    
+    expect_lt(length(generateMSPeakLists(fGroupsIMS, avgFeatParams = getDefAvgPListParams(minAbundanceIMSAbs = 3))), length(plistsIMS))
+    
     specSims <- spectrumSimilarityMobility(plistsIMS, fGroupsIMS, doFGroups = TRUE)
     checkmate::expect_data_table(specSims)
     checkmate::expect_names(names(specSims), identical.to = c("group", "ims_parent_group", "similarity"))

@@ -367,6 +367,7 @@ applyMSData <- function(anaInfo, func,  ..., types = getMSFileTypes(), formats =
 #'
 #' @param anaInfo Optional. If not \code{NULL} then \code{anaInfo} should be a \link[=analysis-information]{analysis
 #'   information} table, and only those backends that can read each of the analyses are returned.
+#' @param needIMS Only applicable if \code{anaInfo} is set: set to \code{TRUE} if IMS data is required.
 #' @param verbose Set to \code{TRUE} to print the status of each backend.
 #'
 #' @return \code{availableBackends} returns (invisibly) a \code{character} vector with the names of the available
@@ -374,9 +375,10 @@ applyMSData <- function(anaInfo, func,  ..., types = getMSFileTypes(), formats =
 #'
 #' @rdname msdata
 #' @export
-availableBackends <- function(anaInfo = NULL, verbose = TRUE)
+availableBackends <- function(anaInfo = NULL, needIMS = FALSE, verbose = TRUE)
 {
     anaInfo <- assertAndPrepareAnaInfo(anaInfo, null.ok = TRUE)
+    checkmate::assertFlag(needIMS)
     checkmate::assertFlag(verbose)
     
     allBackends <- getMSReadBackends()
@@ -386,7 +388,7 @@ availableBackends <- function(anaInfo = NULL, verbose = TRUE)
     noAnas <- if (is.null(anaInfo))
         character()
     else
-        allBackends[sapply(allBackends, function(b) is.null(maybeGetMSFiles(b, anaInfo, getMSFileTypes(), names(MSFileExtensions()))))]
+        allBackends[sapply(allBackends, function(b) is.null(maybeGetMSFiles(b, anaInfo, getMSFileTypes(), names(MSFileExtensions()), needIMS)))]
     
     checkAvail <- function(b)
     {

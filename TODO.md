@@ -158,9 +158,6 @@
         - testing with pwiz tricky for CI
         - would need raw data for other conversions
         --> check after we have IMS data
-    - backends
-        - availableBackends()
-        - use eg mzR, MSTK, SC to get eg EICs or PLs
     - fixedIsolationWidth?
 - IMS
     - more verification that normInts() works before/after assignMobilities()

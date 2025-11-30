@@ -39,6 +39,30 @@ test_that("test plot TICs and BPCs", {
     expect_doppel("raw-tic-fg", function() plotTICs(fgOpenMS[1, ]))
 })
 
+test_that("availableBackends", {
+    backends <- availableBackends(verbose = FALSE)
+    # if on macOS
+    if (Sys.info()["sysname"] == "Darwin")
+        expect_setequal(backends, c("mstoolkit", "streamcraft", "mzr"))
+    else
+        expect_setequal(backends, c("mstoolkit", "streamcraft", "mzr", "opentims"))
+
+    expect_setequal(availableBackends(patRoonData::exampleAnalysisInfo(), verbose = FALSE),
+                    c("mstoolkit", "streamcraft", "mzr"))
+    
+    aiIMSWithPaths <- \(...) patRoonDataIMS::exampleAnalysisInfo()[, c("analysis", "replicate", "blank", ...)]
+    expect_setequal(availableBackends(aiIMSWithPaths("path_centroid"), verbose = FALSE),
+                    c("mstoolkit", "streamcraft", "mzr"))
+    expect_setequal(availableBackends(aiIMSWithPaths("path_ims", "path_centroid"), needIMS = FALSE, verbose = FALSE),
+                    c("mstoolkit", "streamcraft", "mzr"))
+    expect_setequal(availableBackends(aiIMSWithPaths("path_ims", "path_centroid"), needIMS = TRUE, verbose = FALSE),
+                    c("mstoolkit", "streamcraft"))
+    expect_setequal(availableBackends(aiIMSWithPaths("path_ims"), verbose = FALSE),
+                    c("mstoolkit", "streamcraft"))
+    skip_on_os("mac") # opentims not available on MacOS
+    expect_setequal(availableBackends(aiIMSWithPaths("path_raw"), verbose = FALSE), "opentims")
+})
+
 test_that("EICs", {
     anaInfoIMSOne <- as.data.table(getTestAnaInfoIMS()[4, ])
     susps <- as.data.table(patRoonDataIMS::suspectsPos)[name %in% c("Sulfamethoxazole", "Benzotriazole", "Metoprolol")]
@@ -95,6 +119,36 @@ test_that("EICs", {
         eicsTop1,
         eicsPadded
     ),  style = "json2")
+    
+    # test if backends give same results
+    anaInfoHRMSOne <- as.data.table(getTestAnaInfo()[4, ])
+    suspsHRMS <- as.data.table(patRoonData::suspectsPos)[name %in% c("Sulfamethoxazole", "1H-benzotriazole", "Metoprolol")]
+    EICInfoListHRMS <- setNames(list(
+        data.table::data.table(mzmin = suspsHRMS$mz-0.01, mzmax = suspsHRMS$mz+0.01, retmin = suspsHRMS$rt-6,
+                               retmax = suspsHRMS$rt+6)
+    ), anaInfoHRMSOne$analysis)
+    
+    backEICsHRMS <- lapply(c("mstoolkit", "streamcraft", "mzr"), function(backend)
+    {
+        withOpt(MS.backends = backend, {
+            doGetEICs(anaInfoHRMSOne, EICInfoListHRMS[1], gapFactor = 3, mode = "full")
+        })
+    })
+    expect_equal(backEICsHRMS[["mstoolkit"]], backEICsHRMS[["streamcraft"]])
+    expect_equal(backEICsHRMS[["mstoolkit"]], backEICsHRMS[["mzr"]])
+    
+    backEICsIMS <- lapply(c("mstoolkit", "streamcraft", "opentims"), function(backend)
+    {
+        if (!backend %in% availableBackends(verbose = FALSE))
+            return(NULL)
+        withOpt(MS.backends = backend, {
+            doGetEICs(anaInfoIMSOne, EICInfoList[1], gapFactor = 3, mode = "full")
+        })
+    })
+    expect_equal(backEICsIMS[["mstoolkit"]], backEICsIMS[["streamcraft"]])
+    
+    skip_if_not("opentims" %in% availableBackends(verbose = FALSE))
+    expect_equal(backEICsIMS[["mstoolkit"]], backEICsIMS[["opentims"]])
 })
 
 test_that("EIMs", {

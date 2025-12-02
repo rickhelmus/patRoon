@@ -36,6 +36,16 @@ plistsNoIM@analysisInfo <- data.table() # remove as it is system dependent
 
 test_that("verify generation of MS peak lists", {
     expect_known_value(plistsNoIM, testFile("plists"))
+    
+    plistsTM <- generateMSPeakLists(fGroups, topMost = 1)
+    # check if there are at most one feature is used per feature group
+    adt <- as.data.table(plistsTM, averaged = FALSE)[, .(group, set, analysis)]
+    adt <- unique(adt)
+    adt[, anaCount := .N, by = .(group, set)]
+    expect_true(all(adt$anaCount == 1))
+
+    expect_gt(length(plists), length(generateMSPeakLists(fGroups, fixedIsolationWidth = 0.1)))
+    expect_lt(length(plists), length(generateMSPeakLists(fGroups, fixedIsolationWidth = NA)))
 
     skip_if_not(doDATests())
     expect_known_value(plistsDA, testFile("plists-DA"))
@@ -442,6 +452,10 @@ test_that("IMS tests", {
     plistsIMS <- generateMSPeakLists(fGroupsIMS)
     
     expect_lt(length(generateMSPeakLists(fGroupsIMS, avgFeatParams = getDefAvgPListParams(minAbundanceIMSAbs = 3))), length(plistsIMS))
+    
+    # also test this for IMS as frame selection is different
+    expect_gt(length(plistsIMS), length(generateMSPeakLists(fGroupsIMS, fixedIsolationWidth = 0.1)))
+    expect_lt(length(plistsIMS), length(generateMSPeakLists(fGroupsIMS, fixedIsolationWidth = NA)))
     
     specSims <- spectrumSimilarityMobility(plistsIMS, fGroupsIMS, doFGroups = TRUE)
     checkmate::expect_data_table(specSims)

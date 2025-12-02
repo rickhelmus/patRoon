@@ -158,7 +158,6 @@
         - testing with pwiz tricky for CI
         - would need raw data for other conversions
         --> check after we have IMS data
-    - fixedIsolationWidth?
 - IMS
     - more verification that normInts() works before/after assignMobilities()
         - tests are there now, but 3rd test is failing because ISTD is not found in neg mode

@@ -585,12 +585,32 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
         })
         
         saveCacheDataList("featuresPiek", fList[anaInfoTBD$analysis], anaHashes[anaInfoTBD$analysis], dbArg = cacheDB)
+        if (genEICParams$saveMZProfiles && length(mzProfiles) > 0)
+            saveCacheDataList("featuresPiekMZProfiles", mzProfiles[anaInfoTBD$analysis], anaHashes[anaInfoTBD$analysis],
+                              dbArg = cacheDB)
+        if (genEICParams$saveEIMs && length(EIMs) > 0)
+            saveCacheDataList("featuresPiekEIMs", EIMs[anaInfoTBD$analysis], anaHashes[anaInfoTBD$analysis],
+                              dbArg = cacheDB)
     }
     
     if (length(cachedData) > 0)
     {
         fList <- c(fList, cachedData)
         fList <- fList[analysisInfo$analysis] # put original order
+        if (genEICParams$saveMZProfiles)
+        {
+            cachedMZProfiles <- pruneList(loadCacheData("featuresPiekMZProfiles", names(cachedData),
+                                                        simplify = FALSE, dbArg = cacheDB))
+            mzProfiles <- c(mzProfiles, cachedMZProfiles)
+            mzProfiles <- mzProfiles[analysisInfo$analysis]
+        }
+        if (genEICParams$saveEIMs)
+        {
+            cachedEIMs <- pruneList(loadCacheData("featuresPiekEIMs", names(cachedData),
+                                                  simplify = FALSE, dbArg = cacheDB))
+            EIMs <- c(EIMs, cachedEIMs)
+            EIMs <- EIMs[analysisInfo$analysis]
+        }
     }
     
     if (verbose)

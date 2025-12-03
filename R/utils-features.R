@@ -663,7 +663,8 @@ aggregateTox <- function(tox, aggrParams, splitSuspects = FALSE)
     return(tox[])
 }
 
-findPeaksInEICs <- function(EICs, peakParams, withMobility, calcStats, assignRTWindow, logPath, cacheDB = NULL)
+findPeaksInEICs <- function(EICs, peakParams, withMobility, calcStats, assignRTWindow, sumWindowMZ, sumWindowMob,
+                            logPath, cacheDB = NULL)
 {
     baseHash <- makeHash(peakParams)
     
@@ -694,28 +695,47 @@ findPeaksInEICs <- function(EICs, peakParams, withMobility, calcStats, assignRTW
     }
     else if (calcStats)
     {
+        inAssignRange <- function(eicTimes, ret, retmin, retmax, sumWindow) {
+            minRTWin <- 0.01
+            retmin <- min(
+                # take peak left boundary, compensating for max assign window and points taken by sumWindow
+                max(retmin, ret - assignRTWindow) + sumWindow,
+                ret - minRTWin # but make sure we still stay reasonably left
+            )
+            retmax <- max(min(retmax, ret + assignRTWindow) - sumWindow, ret + minRTWin) # same for right boundary
+            return(numGTETol(eicTimes, retmin) & numLTETol(eicTimes, retmax))
+        }
         peaks[, c("mzmin", "mzmax", "mz", "mzBP", "mzMax", "mzBPMax",
                   "mobmin", "mobmax", "mobility", "mobilityBP", "mobilityMax", "mobilityBPMax") := {
             eic <- EICs[[EIC_ID]]
+            haveMobData <- "mobility" %in% colnames(eic)
             eicWide <- eic[numGTETol(eic[, "time"], retmin) & numLTETol(eic[, "time"], retmax), , drop = FALSE]
-            eicNarrow <- eic[numGTETol(eic[, "time"], max(retmin, ret - assignRTWindow)) & numLTETol(eic[, "time"], min(retmax, ret + assignRTWindow)), , drop = FALSE]
-            if (nrow(eicNarrow) == 0)
+            eicAssignMZ <- eic[inAssignRange(eic[, "time"], ret, retmin, retmax, sumWindowMZ), , drop = FALSE]
+            eicAssignMob <- if (haveMobData)
+                eic[inAssignRange(eic[, "time"], ret, retmin, retmax, sumWindowMob), , drop = FALSE]
+
+            if (nrow(eicAssignMZ) == 0 || (haveMobData && nrow(eicAssignMob) == 0))
                 numeric(1)
             else
             {
-                if (!"mobility" %in% colnames(eic))
+                whm <- which.max(eicAssignMZ[, "intensity"])
+                stats <- list(
+                    min(eicWide[, "mzmin"]), max(eicWide[, "mzmax"]),
+                    weighted.mean(eicAssignMZ[, "mz"], eicAssignMZ[, "intensity"]),
+                    weighted.mean(eicAssignMZ[, "mzBP"], eicAssignMZ[, "intensity"]),
+                    eicAssignMZ[whm, "mz"], eicAssignMZ[whm, "mzBP"])
+                if (!haveMobData)
+                    stats <- c(stats, rep(NA_real_, 6))
+                else
                 {
-                    eicWide <- cbind(eicWide, mobmin = NA, mobmax = NA)
-                    eicNarrow <- cbind(eicNarrow, mobility = NA, mobilityBP = NA)
+                    whm <- which.max(eicAssignMob[, "intensity"])
+                    stats <- c(stats,
+                               min(eicWide[, "mobmin"]), max(eicWide[, "mobmax"]),
+                               weighted.mean(eicAssignMob[, "mobility"], eicAssignMob[, "intensity"]),
+                               weighted.mean(eicAssignMob[, "mobilityBP"], eicAssignMob[, "intensity"]),
+                               eicAssignMob[whm, "mobility"], eicAssignMob[whm, "mobilityBP"])
                 }
-                whm <- which.max(eicNarrow[, "intensity"])
-                list(min(eicWide[, "mzmin"]), max(eicWide[, "mzmax"]), weighted.mean(eicNarrow[, "mzBP"], eicNarrow[, "intensity"]),
-                     weighted.mean(eicNarrow[, "mzBP"], eicNarrow[, "intensity"]),
-                     eicNarrow[whm, "mz"], eicNarrow[whm, "mzBP"],
-                     min(eicWide[, "mobmin"]), max(eicWide[, "mobmax"]),
-                     weighted.mean(eicNarrow[, "mobility"], eicNarrow[, "intensity"]),
-                     weighted.mean(eicNarrow[, "mobilityBP"], eicNarrow[, "intensity"]),
-                     eicNarrow[whm, "mobility"], eicNarrow[whm, "mobilityBP"])
+                stats
             }
         }, by = seq_len(nrow(peaks))]
         

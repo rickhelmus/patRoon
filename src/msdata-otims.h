@@ -27,6 +27,9 @@ class MSReadBackendOTIMS: public MSReadBackend
                                const SpectrumRawSelection &scanSel,
                                const SpectrumRawTypes::MobilityRange &mobRange,
                                SpectrumRawTypes::Intensity minIntensityIMS) const override;
+    
+public:
+    MSReadBackendOTIMS(void) : MSReadBackend() { setHaveIMS(true); }
 };
 
 #else

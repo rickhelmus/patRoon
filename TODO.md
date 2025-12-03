@@ -180,6 +180,7 @@
             - can do this when there is an option to not filter features
         - mobAssignMethod and mobAssignAggr
         - mz profile & EIM saving, ...
+        - assign window & sum windows
 - misc
     - generateAnalysisInfo()?
 - newProject()
@@ -248,6 +249,7 @@
         - EIM saving: always stores EIM at feat RT, irrespective of mobAssignMethod/mobAggrMethod
         - mention that frame data is summed to get mz data?
         - further explain assignMethod/assignAggr, eg guide when to use what depending on frame summing
+        - explain that sumWindowMZ/sumWindowMob compensate assignment window
     - assignMobilities()
         - refs to paper
         - fGroups method

@@ -115,6 +115,7 @@ void MSReadBackendSC::generateSpecMetadata(void)
     const auto hd = analysis.get_spectra_headers();
     
     const bool hasMob = analysis.has_ion_mobility();
+    setHaveIMS(hasMob);
 
     if (!hasMob && analysis.get_spectra_mode({0})[0] != 2)
         Rcpp::stop("Please make sure that file '%s' is centroided!", getCurrentFile().c_str());

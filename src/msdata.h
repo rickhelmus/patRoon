@@ -21,7 +21,7 @@ private:
     std::string currentFile;
     SpectrumRawMetadata specMetadata;
     std::vector<SpectrumRawTypes::Mobility> mobilities;
-    bool needIMS = false;
+    bool needIMS = false, haveIMS = false;
     
     virtual void doOpen(const std::string &file) = 0;
     virtual void doClose(void) = 0;
@@ -32,6 +32,9 @@ private:
                                        SpectrumRawTypes::Intensity minIntensityIMS) const = 0;
     std::vector<SpectrumRawTypes::Mobility> doGetMobilities(void);
     
+protected:
+    void setHaveIMS(bool h) { haveIMS = h; }
+    
 public:
     MSReadBackend(void) = default;
     MSReadBackend(const MSReadBackend &) = delete;
@@ -39,6 +42,7 @@ public:
     
     void setNeedIMS(bool n) { needIMS = n; }
     bool getNeedIMS(void) const { return needIMS; }
+    bool getHaveIMS(void) const { return haveIMS; }
     void open(const std::string &file);
     void close(void);
     const std::string &getCurrentFile(void) const { return currentFile; }

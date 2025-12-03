@@ -348,7 +348,7 @@ applyMSData <- function(anaInfo, func,  ..., types = getMSFileTypes(), formats =
             # NOTE: disable future parallelization as the backends are already OpenMP parallelized
             # NOTE: the callback can return cached data so opening the file should happen there.
             return(doMap(FALSE, prog = showProgress, stripEnv = FALSE, data = anaInfo$analysis, filePaths, ..., f = func,
-                           MoreArgs = list(backend = backend)))
+                         MoreArgs = list(backend = backend)))
         }
     }
 

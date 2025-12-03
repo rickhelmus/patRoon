@@ -120,7 +120,8 @@ void MSReadBackendMSTK::generateSpecMetadata(void)
     MSToolkit::Spectrum firstSpec;
     MSTKReader.readFile(getCurrentFile().c_str(), firstSpec, 0);
     const size_t lastScan = MSTKReader.getLastScan();
-    const bool haveIMS = firstSpec.hasIonMobilityArray();
+    const bool haveIMS = firstSpec.hasIonMobilityArray(); // UNDONE: this could potentially be a false negative if first spec is empty or is MS2 w/out array
+    setHaveIMS(haveIMS);
     
     if (!haveIMS && firstSpec.getCentroidStatus() != 1)
         Rcpp::stop("Please make sure that file '%s' is centroided!", getCurrentFile().c_str());

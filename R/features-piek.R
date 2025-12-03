@@ -522,6 +522,8 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
             maybePrintf("Finding peaks in %d remaining EICs... ", length(EICs))
             peaks <- findPeaksInEICs(EICs, peakParams, withMobility = withIMS, calcStats = TRUE,
                                      assignRTWindow = assignRTWindow,
+                                     sumWindowMZ = if (backend$getHaveIMS()) genEICParams$sumWindowMZ else 0,
+                                     sumWindowMob = if (backend$getHaveIMS()) genEICParams$sumWindowMob else 0,
                                      logPath = file.path("log", "featEICs", paste0(ana, ".txt")), cacheDB = cacheDB)
             maybePrintf("Done! Found %d peaks.\n", nrow(peaks))
 

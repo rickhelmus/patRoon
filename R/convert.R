@@ -399,12 +399,18 @@ convertMSFilesIMSCollapse <- function(inFiles, outFiles, typeFrom, formatTo = "m
         
         headerMS1 <- makeHeader(collapsedSpectra, 1, getMSMetadata(backend, 1))
         
-        if (!includeMSMS)
-            header <- headerMS1
+        header <- if (!includeMSMS)
+            headerMS1
         else
         {
-            headerMS2 <- makeHeader(collapsedSpectra, 2, getMSMetadata(backend, 2))
-            header <- rbind(headerMS1, headerMS2)
+            meta <- getMSMetadata(backend, 2)
+            if (nrow(meta) > 0)
+            {
+                headerMS2 <- makeHeader(collapsedSpectra, 2, meta)
+                rbind(headerMS1, headerMS2)
+            }
+            else
+                headerMS1
         }
         
         ord <- order(header$frame, header$precursorMZ)

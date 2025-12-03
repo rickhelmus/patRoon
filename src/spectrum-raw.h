@@ -98,6 +98,8 @@ public:
     const auto &getIntensities(void) const { return intensities; }
     const auto &getMobilities(void) const { return mobilities; }
     
+    void setIntensities(std::vector<SpectrumRawTypes::Intensity> &&i) { intensities = std::move(i); }
+    
     bool hasMobilities(void) const { return !mobilities.empty(); }
     void setAllMobilities(SpectrumRawTypes::Mobility mob) { mobilities.assign(mzs.size(), mob); }
     
@@ -205,8 +207,8 @@ SpectrumRawAveraged averageSpectraRaw(const std::vector<SpectrumRawAveraged> &sp
                                       SpectrumRawTypes::PeakAbundance minAbundanceRel,
                                       SpectrumRawTypes::PeakAbundance minAbundanceAbs);
 std::vector<size_t> frameSubSpecIDs(const SpectrumRaw &frame);
-SpectrumRaw centroidIMSFrame(const SpectrumRaw &frame, const clusterMethod method, SpectrumRawTypes::Mass mzWindow,
-                             SpectrumRawTypes::Mobility mobWindow, SpectrumRawTypes::Intensity minIntensity);
+SpectrumRaw centroidIMSFrame(const SpectrumRaw &frame, const SpectrumRawTypes::MobilityRange &mobRange,
+                             unsigned smoothWindow, unsigned halfWindow);
 
 // HACK: use a relative large tolerance for RT comparisons, mainly to accomedate MSTK which internally mixes
 // double+floats and min/sec conversions

@@ -134,7 +134,19 @@
     - getPiekGenEICParams --> getPiekEICParams
 - update featAnn consensus?
 - ADT gives "susp_mobility_susp"/"susp_CCS_susp" cols --> rename
-- MSPL: do topMost filter after averaging IMS subspectrum? Would be more consistent with HRMS, but may need larger default
+- MSPL:
+    - do topMost filter after averaging IMS subspectrum? Would be more consistent with HRMS, but may need larger default
+    - finalize centroiding changes
+        - update docs
+        - see if we want to keep both methods
+        - update assertions
+        - somehow handle gapped data?
+        - maybe improve cluster method?
+            - first sum frame spectra
+            - cluster remaining peaks as now
+            - then centroid based on either wt.mean or max
+        - --> recommend centroid for full profile Agilent data and cluster for quasi centroided TIMS data?
+        - --> then add back cluster option for IM collapse
 - EICs
     - are even numbers for smoothing/summing correctly handled?
 
@@ -189,6 +201,8 @@
 - IMSMatch filter suspect filter: if negation is enabled and minMatches>0 then window match filter is not negated. If both would be negated then we get unexpected results, ie unmatched suspects stay and then the number of matched suspects is unexpectedly higher for minMatches
 - convert
     - add patRoon 3.0 citation for im_collapse
+    - update docs for convertMSFilesIMCollapse() centroiding changes
+- add proper refs to MALDIquant for centroiding
 - handbook
     - installation
         - add additional external deps, eg Python, TIMS-SDK, c3sdb, PCL/CCS etc

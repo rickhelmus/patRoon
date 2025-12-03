@@ -291,13 +291,10 @@ convertMSFilesBruker <- function(inFiles, outFiles, formatTo = "mzML", centroid 
 #' @param mzRange,mobilityRange A two sized vector specifying the m/z and mobility range to be exported, respectively.
 #'   Set to \code{NULL} to export the full range.
 #' @param clusterMethod,mzWindow The clustering method and window (see \link[=cluster-params]{clustering parameters})
-#'   used to cluster the mass peaks across the spectra within a single IMS frame.
-#' @param minAbundanceRel,minAbundanceAbs The minimum relative and absolute abundance for a mass peak across the spectra
-#'   within a single IMS frame. Set to \samp{0} to include all mass peaks.
+#'   used to find and combine MS/MS spectra of precursors with close \emph{m/z}.
 #' @param topMost Only consider these top most intense peaks in each spectrum within a frame. Set to \code{NULL} to
 #'   include all peaks.
-#' @param minIntensityIMS,minIntensityPre The minimum intensity for MS peaks in raw and individual IMS spectra, and
-#'   combined and summed spectra, respectively.
+#' @param minIntensityIMS The minimum intensity for MS peaks in raw data.
 #' @param includeMSMS Set to \code{TRUE} to include MS/MS spectra in the output. For IMS workflows where IMS data is
 #'   only collapsed to produce compatible data files for feature detection, MS/MS data are not needed and can be
 #'   excluded to reduce computational times and file sizes. Setting \code{includeMSMS=TRUE} is primarily intended to
@@ -309,20 +306,18 @@ convertMSFilesBruker <- function(inFiles, outFiles, formatTo = "mzML", centroid 
 #' @rdname MSConversion
 #' @export
 convertMSFilesIMSCollapse <- function(inFiles, outFiles, typeFrom, formatTo = "mzML", mzRange = NULL, mobilityRange = NULL,
-                                      clusterMethod = "distance", mzWindow = defaultLim("mz", "medium"),
-                                      minAbundanceRel = 0, minAbundanceAbs = 0, topMost = NULL,
-                                      minIntensityIMS = NULL, minIntensityPre = NULL, includeMSMS = FALSE, ...)
+                                      smoothWindow = 0, halfWindow = 2, clusterMethod = "distance",
+                                      mzWindow = defaultLim("mz", "medium"), minIntensityIMS = 0, includeMSMS = FALSE, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCharacter(inFiles, min.chars = 1, min.len = 1, add = ac)
     checkmate::assertCharacter(outFiles, min.chars = 1, len = length(inFiles), add = ac)
     checkmate::assertChoice(typeFrom, c("raw", "ims"), add = ac)
     checkmate::assertChoice(formatTo, getMSConversionFormats("im_collapse", "output"), add = ac)
+    aapply(checkmate::assertCount, . ~ smoothWindow + halfWindow, positive = c(FALSE, TRUE), fixed = list(add = ac))
     aapply(assertRange, . ~ mzRange + mobilityRange, null.ok = TRUE, fixed = list(add = ac))
     assertClusterMethod(clusterMethod, add = ac)
-    aapply(checkmate::assertNumber, . ~ mzWindow + minAbundanceRel + minAbundanceAbs + minIntensityIMS + minIntensityPre,
-           lower = 0, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
-    checkmate::assertCount(topMost, positive = TRUE, null.ok = TRUE, add = ac)
+    aapply(checkmate::assertNumber, . ~ mzWindow + minIntensityIMS, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertFlag(includeMSMS, add = ac)
     checkmate::reportAssertions(ac)
         
@@ -391,9 +386,8 @@ convertMSFilesIMSCollapse <- function(inFiles, outFiles, typeFrom, formatTo = "m
         
         openMSReadBackend(backend, path)
         collapsedSpectra <- collapseIMSFrames(backend, NULLToZero(mzRange[1]), NULLToZero(mzRange[2]),
-                                              NULLToZero(mobilityRange[1]), NULLToZero(mobilityRange[2]), clusterMethod,
-                                              mzWindow, minAbundanceRel, minAbundanceAbs, NULLToZero(topMost),
-                                              NULLToZero(minIntensityIMS), NULLToZero(minIntensityPre), includeMSMS)
+                                              NULLToZero(mobilityRange[1]), NULLToZero(mobilityRange[2]), smoothWindow,
+                                              halfWindow, clusterMethod, mzWindow, minIntensityIMS, includeMSMS)
         
         
         

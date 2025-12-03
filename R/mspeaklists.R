@@ -480,7 +480,7 @@ setMethod("delete", "MSPeakLists", function(obj, i = NULL, j = NULL, k = NULL, r
 #'   precursor and its isotopes in MS peak lists (see \verb{Isolating precursor data}). Alternatively, \code{TRUE} to
 #'   apply the filter with default settings (as given with \code{getDefIsolatePrecParams}).
 #' @param deIsotope Remove any isotopic peaks in peak lists. This may improve data processing steps which do not assume
-#'   the presence of isotopic peaks (e.g. MetFrag for MS/MS). Note that \code{getMSPeakLists} does not (yet) support
+#'   the presence of isotopic peaks (e.g. MetFrag for MS/MS). Note that \code{generateMSPeakLists} does not (yet) support
 #'   flagging of isotopes.
 #' @param removeMZs A set of m/z values to be removed from the peak lists. This is typically used to remove background
 #'   peaks. The m/z values should be specified by either be a \code{numeric} vector or a \code{data.frame} with an
@@ -975,7 +975,9 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRtWindo
                               retainPrecursor = params$retainPrecursor, MSLevel = MSLevel, method = params$method,
                               mzWindow = params$clusterMzWindow, startMobs = ft$mobmin,
                               endMobs = ft$mobmax, minAbundanceRel = params$minAbundanceRel,
-                              minAbundanceAbs = params$minAbundanceAbs, minAbundanceIMSRel = params$minAbundanceIMSRel,
+                              minAbundanceAbs = params$minAbundanceAbs, IMSCentroidType = params$IMSCentroidType,
+                              smoothWindowIMS = params$smoothWindowIMS, halfWindowIMS = params$halfWindowIMS,
+                              minAbundanceIMSRel = params$minAbundanceIMSRel,
                               minAbundanceIMSAbs = params$minAbundanceIMSAbs, topMost = params$topMost,
                               minIntensityIMS = params$minIntensityIMS, minIntensityPre = params$minIntensityPre,
                               minIntensityPost = params$minIntensityPost, minBPIntensity = 0)

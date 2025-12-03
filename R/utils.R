@@ -714,7 +714,7 @@ doMap <- function(doPar, f, data, ..., future.globals = FALSE, prog = TRUE, stri
     if (!prog)
         return(do.call(applyf, c(list(data), args, list(f = f))))
 
-    maxProgUpdates <- 10
+    maxProgUpdates <- min(10, length(data))
     doProg <- if (length(data) > maxProgUpdates)
         seq_along(data) %in% round(seq(1 / maxProgUpdates, 1, by = 1 / maxProgUpdates) * length(data))
     else

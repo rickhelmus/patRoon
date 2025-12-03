@@ -398,7 +398,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
                           EICInfo$mobmin, EICInfo$mobmax, gapFactor = genEICParams$gapFactor, mzExpIMSWindow = 0,
                           minIntensityIMS = minIntensityIMS, mode = mode, sumWindowMZ = genEICParams$sumWindowMZ,
                           sumWindowMob = genEICParams$sumWindowMob, smoothWindowMZ = genEICParams$smoothWindowMZ,
-                          smoothExtMZ = genEICParams$smoothExtMob, smoothWindowMob = genEICParams$smoothWindowMob,
+                          smoothExtMZ = genEICParams$smoothExtMZ, smoothWindowMob = genEICParams$smoothWindowMob,
                           smoothExtMob = genEICParams$smoothExtMob, saveMZProfiles = genEICParams$saveMZProfiles,
                           saveEIMs = genEICParams$saveEIMs, pad = FALSE, minEICIntensity = genEICParams$minEICIntensity,
                           minEICAdjTime = genEICParams$minEICAdjTime, minEICAdjPoints = genEICParams$minEICAdjPoints,

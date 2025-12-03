@@ -314,12 +314,13 @@ void EIC::updateFrameSummer(SpectrumRawTypes::Time curTime)
 void EIC::commitPoints(SpectrumRawTypes::Scan curScanInd)
 {
     scanInds.push_back(curScanInd);
-    mzs.push_back(curPoint.mz);
     intensities.push_back(curPoint.intensity);
     if (mode == EICMode::FULL || mode == EICMode::FULL_MZ)
     {
         mzMins.push_back(curPoint.mzMin);
         mzMaxs.push_back(curPoint.mzMax);
+        // NOTE: for IMS data below will be overwritten later by setSummedFrameMZ()
+        mzs.push_back((curPoint.intensity > 0.0) ? (curPoint.mz / curPoint.intensity) : 0.0);
         mzsBP.push_back(curPoint.mzBP);
     }
     if (withMob && saveMZProfiles && (mode == EICMode::FULL || mode == EICMode::FULL_MZ))
@@ -414,8 +415,6 @@ void EIC::commit(SpectrumRawTypes::Scan curScanInd, SpectrumRawTypes::Time curTi
         {
             if (withMob)
                 updateFrameSummer(curTime);
-            else
-                curPoint.mz /= curPoint.intensity;
         }
     }
     

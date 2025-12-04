@@ -155,7 +155,7 @@ template <typename NumType> std::vector<int> clusterNums(const std::vector<NumTy
     if (nums.size() < 2)
         return ret; // no need to assign any clusters (for size==1 a one sized vector with value 0 will be returned)
     
-    if (method == clusterMethod::BIN || method == clusterMethod::DISTANCE)
+    if (method == clusterMethod::BIN || method == clusterMethod::DISTANCE_MEAN || method == clusterMethod::DISTANCE_POINT)
     {
         const auto sortedNumInds = getSortedInds(nums);
         
@@ -175,17 +175,23 @@ template <typename NumType> std::vector<int> clusterNums(const std::vector<NumTy
                 ret[i] = curCluster;
             }
         }
-        else // clusterMethod::DISTANCE
+        else // if (method == clusterMethod::DISTANCE_MEAN || method == clusterMethod::DISTANCE_POINT)
         {
             int curBinSize = 0;
             NumType binSum = 0;
             for (auto i : sortedNumInds)
             {
-                if (curBinSize > 0 && (nums[i] - (binSum / static_cast<NumType>(curBinSize))) > window)
+                if (curBinSize > 0)// && (nums[i] - (binSum / static_cast<NumType>(curBinSize))) > window)
                 {
-                    ++curCluster;
-                    curBinSize = 0;
-                    binSum = 0;
+                    const auto diff = (method == clusterMethod::DISTANCE_MEAN)
+                        ? nums[i] - (binSum / static_cast<NumType>(curBinSize))
+                        : nums[i] - nums[i - 1];
+                    if (diff > window)
+                    {
+                        ++curCluster;
+                        curBinSize = 0;
+                        binSum = 0;
+                    }
                 }
                 
                 ret[i] = curCluster;

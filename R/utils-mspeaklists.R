@@ -84,9 +84,10 @@ getDefAvgPListParams <- function(...)
                 IMSCentroidType = "centroid",
                 smoothWindowIMS = 0,
                 halfWindowIMS = 2,
+                maxGapIMS = 0.0,
                 minAbundanceIMSAbs = 2,
                 minAbundanceIMSRel = 0,
-                method = "distance",
+                method = "distance_mean",
                 withPrecursorMS = TRUE,
                 pruneMissingPrecursorMS = TRUE,
                 retainPrecursorMSMS = TRUE)

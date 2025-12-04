@@ -569,7 +569,8 @@ SpectrumRaw centroidIMSFrameOld(const SpectrumRaw &frame, const clusterMethod me
 }
 
 SpectrumRaw centroidIMSFrame(const SpectrumRaw &frame, const SpectrumRawTypes::MobilityRange &mobRange,
-                             unsigned smoothWindow, unsigned halfWindow)
+                             unsigned smoothWindow, unsigned halfWindow, SpectrumRawTypes::Mass maxGap,
+                             std::vector<SpectrumRaw> *clusters)
 {
     // centroids m/z data in an IMS frame
     // the maxima detection was heavily based on C_localMaxima() from MALDIquant
@@ -582,68 +583,88 @@ SpectrumRaw centroidIMSFrame(const SpectrumRaw &frame, const SpectrumRawTypes::M
             continue;
         merged[frame.getMZs()[i]] += frame.getIntensities()[i];
     }
+    
+    if (merged.empty())
+        return SpectrumRaw();
+    
+    SpectrumRaw mergedSpec(merged.size(), false);
+    size_t ind = 0;
+    for (auto it = merged.cbegin(); it != merged.cend(); ++it, ++ind)
+        mergedSpec.setPeak(ind, it->first, it->second);
 
     const size_t window = halfWindow * 2;
-
-    if (merged.size() <= (window + 1))
-    {
-        // not enough data to centroid
-        SpectrumRaw output;
-        for (const auto &m : merged)
-            output.append(m.first, m.second);
-        return output;
-    }
-
-    // combine map conversion, smoothing and padding in one go...
-    SpectrumRaw summedFrame = SpectrumRaw(merged.size() + window, false);
-    if (smoothWindow >= 3)
-    {
-        // first smooth then convert+pad
-        std::vector<SpectrumRawTypes::Intensity> ints(merged.size());
-        size_t ind = 0;
-        for (auto it = merged.cbegin(); it != merged.cend(); ++it, ++ind)
-            ints[ind] = it->second;
-        ints = movingAverage(ints, smoothWindow);
-        ind = 0;
-        for (auto it = merged.cbegin(); it != merged.cend(); ++it, ++ind)
-            summedFrame.setPeak(ind + halfWindow, it->first, ints[ind]);
-    }
-    else
-    {
-        // no smoothing, just convert+pad
-        size_t ind = halfWindow;
-        for (auto it = merged.cbegin(); it != merged.cend(); ++it, ++ind)
-            summedFrame.setPeak(ind, it->first, it->second);
-    }
+    const size_t padSize = std::max((smoothWindow / 2) + 1, halfWindow);
     
-    // detect centroids
+    std::vector<int> clusts = (maxGap > 0.0) ?
+        // cluster in case of gaps
+        clusterNums(mergedSpec.getMZs(), clusterMethod::DISTANCE_POINT, maxGap) :
+        // all in one cluster
+        std::vector<int>(mergedSpec.size(), 0);
+    
+    const int maxClust = *(std::max_element(clusts.cbegin(), clusts.cend()));
+    std::vector<SpectrumRaw> clustSpecs;
+    
+    // init spectra with left-padding
+    for (size_t i=0; i<=maxClust; ++i)
+        clustSpecs.emplace_back(padSize, false);
+    
+    for (size_t i=0; i<clusts.size(); ++i)
+        clustSpecs[clusts[i]].append(mergedSpec.getMZs()[i], mergedSpec.getIntensities()[i]);
+    
+    // construct final results: smooth and centroid clustered specs and add remaining peaks to output spectrum
     SpectrumRaw output;
-    auto maxIt = std::max_element(summedFrame.getIntensities().begin(), summedFrame.getIntensities().begin() + window + 1);
-    size_t maxInd = std::distance(summedFrame.getIntensities().begin(), maxIt);
-    
-    // handle first item
-    if (maxInd == halfWindow)
-        output.append(summedFrame.getMZs()[maxInd], summedFrame.getIntensities()[maxInd]);
-    
-    for (size_t right=window+1, left=1, mid=(left+right)/2; right<summedFrame.size(); ++right, ++mid, ++left)
+    for (size_t i=0; i<=maxClust; ++i)
     {
-        // Rcpp::Rcout << "left: " << left << " mid: " << mid << " right: " << right << " maxInd: " << maxInd << "\n";
+        auto &spec = clustSpecs[i];
         
-        if (maxInd < left)
+        // finalize spectrum with right-padding
+        for (size_t j=0; j<padSize; ++j)
+            spec.append(0.0, 0.0);
+        
+        if (smoothWindow >= 3)
+            spec.setIntensities(movingAverage(spec.getIntensities(), smoothWindow));
+        
+        if (clusters != nullptr)
+            clusters->push_back(spec);
+
+        if ((spec.size() - padSize) <= (window + 1))
         {
-            maxIt = std::max_element(summedFrame.getIntensities().begin() + left,
-                                     summedFrame.getIntensities().begin() + right + 1);
-            maxInd = std::distance(summedFrame.getIntensities().begin(), maxIt);
-        }
-        else if (summedFrame.getIntensities()[right] > *maxIt)
-        {
-            maxIt = summedFrame.getIntensities().begin() + right;
-            maxInd = right;
+            // insufficient points for centroiding algo: just add max
+            auto maxIt = std::max_element(spec.getIntensities().begin(), spec.getIntensities().end());
+            auto maxInd = std::distance(spec.getIntensities().begin(), maxIt);
+            if (spec.getMZs()[maxInd] != 0.0)
+                output.append(spec.getMZs()[maxInd], spec.getIntensities()[maxInd]);
+            continue;
         }
         
-        // add midpoint, but only if not in padding region
-        if (mid == maxInd && mid >= halfWindow && mid < (summedFrame.size() - halfWindow))
-            output.append(summedFrame.getMZs()[maxInd], summedFrame.getIntensities()[maxInd]);
+        // detect centroids
+        auto maxIt = std::max_element(spec.getIntensities().begin(), spec.getIntensities().begin() + window + 1);
+        size_t maxInd = std::distance(spec.getIntensities().begin(), maxIt);
+        
+        // handle first item
+        if (maxInd == halfWindow && spec.getMZs()[maxInd] != 0.0)
+            output.append(spec.getMZs()[maxInd], spec.getIntensities()[maxInd]);
+        
+        for (size_t right=window+1, left=1, mid=(left+right)/2; right<spec.size(); ++right, ++mid, ++left)
+        {
+            // Rcpp::Rcout << "left: " << left << " mid: " << mid << " right: " << right << " maxInd: " << maxInd << "\n";
+            
+            if (maxInd < left)
+            {
+                maxIt = std::max_element(spec.getIntensities().begin() + left,
+                                         spec.getIntensities().begin() + right + 1);
+                maxInd = std::distance(spec.getIntensities().begin(), maxIt);
+            }
+            else if (spec.getIntensities()[right] > *maxIt)
+            {
+                maxIt = spec.getIntensities().begin() + right;
+                maxInd = right;
+            }
+            
+            // add midpoint, but only if not in padding region
+            if (mid == maxInd && spec.getMZs()[mid] != 0.0)
+                output.append(spec.getMZs()[maxInd], spec.getIntensities()[maxInd]);
+        }
     }
     
     return output;
@@ -653,10 +674,21 @@ SpectrumRaw centroidIMSFrame(const SpectrumRaw &frame, const SpectrumRawTypes::M
 Rcpp::DataFrame testCentroidIMSFrame(const std::vector<SpectrumRawTypes::Mass> &mzs,
                                      const std::vector<SpectrumRawTypes::Intensity> &ints,
                                      SpectrumRawTypes::Mobility mobStart, SpectrumRawTypes::Mobility mobEnd,
-                                     unsigned smoothWindow, unsigned halfWindow)
+                                     unsigned smoothWindow, unsigned halfWindow,
+                                     SpectrumRawTypes::Mass maxGap = 0.0)
 {
     const SpectrumRaw frame(mzs, ints);
-    const SpectrumRaw centFrame = centroidIMSFrame(frame, makeNumRange(mobStart, mobEnd), smoothWindow, halfWindow);
-    return Rcpp::DataFrame::create(Rcpp::Named("mz") = centFrame.getMZs(),
-                                   Rcpp::Named("intensity") = centFrame.getIntensities());
+    std::vector<SpectrumRaw> clusters;
+    const SpectrumRaw centFrame = centroidIMSFrame(frame, makeNumRange(mobStart, mobEnd), smoothWindow, halfWindow,
+                                                   maxGap, &clusters);
+    auto ret = Rcpp::DataFrame::create(Rcpp::Named("mz") = centFrame.getMZs(),
+                                       Rcpp::Named("intensity") = centFrame.getIntensities());
+    Rcpp::List clustList(clusters.size());
+    for (size_t i=0; i<clusters.size(); ++i)
+    {
+        clustList[i] = Rcpp::DataFrame::create(Rcpp::Named("mz") = clusters[i].getMZs(),
+                                               Rcpp::Named("intensity") = clusters[i].getIntensities());
+    }
+    ret.attr("clusters") = clustList;
+    return ret;
 }

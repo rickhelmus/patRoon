@@ -561,7 +561,7 @@ assertNormalizationMethod <- function(x, withNone = TRUE, .var.name = checkmate:
 
 assertClusterMethod <- function(x, .var.name = checkmate::vname(x), add = NULL)
 {
-    checkmate::assertChoice(x, c("bin", "distance", "hclust"), .var.name = .var.name, add = add)
+    checkmate::assertChoice(x, c("bin", "distance_mean", "distance_point", "hclust"), .var.name = .var.name, add = add)
 }
 
 assertEIXParams <- function(x, .var.name = checkmate::vname(x), add = NULL)

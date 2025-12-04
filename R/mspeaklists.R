@@ -937,7 +937,7 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRtWindo
     # UNDONE: FIW=NULL removed all MS1 spectra (no precursors) --> find other way to do this
     
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertNumber(maxMSRtWindow, lower = 1, finite = TRUE, null.ok = TRUE, add = ac)
+    checkmate::assertNumber(maxMSRtWindow, lower = 0.01, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assert(
         checkmate::checkFALSE(fixedIsolationWidth),
         checkmate::checkScalarNA(fixedIsolationWidth),
@@ -977,11 +977,10 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRtWindo
                               endMobs = ft$mobmax, minAbundanceRel = params$minAbundanceRel,
                               minAbundanceAbs = params$minAbundanceAbs, IMSCentroidType = params$IMSCentroidType,
                               smoothWindowIMS = params$smoothWindowIMS, halfWindowIMS = params$halfWindowIMS,
-                              minAbundanceIMSRel = params$minAbundanceIMSRel,
+                              maxGapIMS = params$maxGapIMS, minAbundanceIMSRel = params$minAbundanceIMSRel,
                               minAbundanceIMSAbs = params$minAbundanceIMSAbs, topMost = params$topMost,
                               minIntensityIMS = params$minIntensityIMS, minIntensityPre = params$minIntensityPre,
                               minIntensityPost = params$minIntensityPost, minBPIntensity = 0)
-        
         names(ret) <- ft$group
         ret <- Map(ret, ft$mz[match(names(ret), ft$group)], f = function(pl, pmz)
         {

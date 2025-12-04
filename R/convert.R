@@ -306,7 +306,7 @@ convertMSFilesBruker <- function(inFiles, outFiles, formatTo = "mzML", centroid 
 #' @rdname MSConversion
 #' @export
 convertMSFilesIMSCollapse <- function(inFiles, outFiles, typeFrom, formatTo = "mzML", mzRange = NULL, mobilityRange = NULL,
-                                      smoothWindow = 0, halfWindow = 2, clusterMethod = "distance",
+                                      smoothWindow = 0, halfWindow = 2, clusterMethod = "distance_point",
                                       mzWindow = defaultLim("mz", "medium"), minIntensityIMS = 0, includeMSMS = FALSE, ...)
 {
     ac <- checkmate::makeAssertCollection()

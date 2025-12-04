@@ -51,7 +51,7 @@ averageSpectra <- function(spectra, clusterMzWindow, topMost, minIntensityPre, m
         hc <- fastcluster::hclust(mzd)
         spcomb[, cluster := cutree(hc, h = clusterMzWindow)]
     }
-    else if (method == "distance")
+    else if (method == "distance_point")
     {
         mzdiff <- abs(diff(spcomb$mz))
         spcomb[, cluster := 1 + c(0, cumsum(mzdiff > clusterMzWindow))]

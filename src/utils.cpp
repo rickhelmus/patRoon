@@ -90,8 +90,10 @@ clusterMethod clustMethodFromStr(const std::string &str)
 {
     if (str == "bin")
         return clusterMethod::BIN;
-    else if (str == "distance")
-        return clusterMethod::DISTANCE;
+    else if (str == "distance_mean")
+        return clusterMethod::DISTANCE_MEAN;
+    else if (str == "distance_point")
+        return clusterMethod::DISTANCE_POINT;
     else if (str == "hclust")
         return clusterMethod::HCLUST;
     

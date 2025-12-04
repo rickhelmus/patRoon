@@ -141,7 +141,7 @@
         - update docs
         - see if we want to keep both methods
         - update assertions
-        - somehow handle gapped data?
+        - somehow handle gapped data? --> update docs/asserts
         - maybe improve cluster method?
             - first sum frame spectra
             - cluster remaining peaks as now
@@ -205,6 +205,7 @@
     - add patRoon 3.0 citation for im_collapse
     - update docs for convertMSFilesIMCollapse() centroiding changes
 - add proper refs to MALDIquant for centroiding
+- update for distance_mean/point clustering
 - handbook
     - installation
         - add additional external deps, eg Python, TIMS-SDK, c3sdb, PCL/CCS etc

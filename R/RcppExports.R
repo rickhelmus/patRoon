@@ -61,8 +61,8 @@ getFilteredFrame <- function(backend, index, mzMin = 0.0, mzMax = 0.0, minInt = 
     .Call(`_patRoon_getFilteredFrame`, backend, index, mzMin, mzMax, minInt, topMost, prec, mobMin, mobMax)
 }
 
-getCentroidedFrame <- function(backend, index, mobStart, mobEnd, smoothWindow, halfWindow) {
-    .Call(`_patRoon_getCentroidedFrame`, backend, index, mobStart, mobEnd, smoothWindow, halfWindow)
+getCentroidedFrame <- function(backend, index, mobStart, mobEnd, smoothWindow, halfWindow, maxGap = 0.00) {
+    .Call(`_patRoon_getCentroidedFrame`, backend, index, mobStart, mobEnd, smoothWindow, halfWindow, maxGap)
 }
 
 getScans <- function(backend, timeStart, timeEnd, MSLevel, prec, fixedIsoWidth = 0.0) {
@@ -77,8 +77,8 @@ setSpecMetadata <- function(backend, mdMS, mdMSMS) {
     invisible(.Call(`_patRoon_setSpecMetadata`, backend, mdMS, mdMSMS))
 }
 
-getMSPeakLists <- function(backend, startTimes, endTimes, precursorMZs, fixedIsolationWidth, withPrecursor, retainPrecursor, MSLevel, method, mzWindow, startMobs, endMobs, minAbundanceRel, minAbundanceAbs, IMSCentroidType, smoothWindowIMS, halfWindowIMS, minAbundanceIMSRel, minAbundanceIMSAbs, topMost, minIntensityIMS, minIntensityPre, minIntensityPost, minBPIntensity) {
-    .Call(`_patRoon_getMSPeakLists`, backend, startTimes, endTimes, precursorMZs, fixedIsolationWidth, withPrecursor, retainPrecursor, MSLevel, method, mzWindow, startMobs, endMobs, minAbundanceRel, minAbundanceAbs, IMSCentroidType, smoothWindowIMS, halfWindowIMS, minAbundanceIMSRel, minAbundanceIMSAbs, topMost, minIntensityIMS, minIntensityPre, minIntensityPost, minBPIntensity)
+getMSPeakLists <- function(backend, startTimes, endTimes, precursorMZs, fixedIsolationWidth, withPrecursor, retainPrecursor, MSLevel, method, mzWindow, startMobs, endMobs, minAbundanceRel, minAbundanceAbs, IMSCentroidType, smoothWindowIMS, halfWindowIMS, maxGapIMS, minAbundanceIMSRel, minAbundanceIMSAbs, topMost, minIntensityIMS, minIntensityPre, minIntensityPost, minBPIntensity) {
+    .Call(`_patRoon_getMSPeakLists`, backend, startTimes, endTimes, precursorMZs, fixedIsolationWidth, withPrecursor, retainPrecursor, MSLevel, method, mzWindow, startMobs, endMobs, minAbundanceRel, minAbundanceAbs, IMSCentroidType, smoothWindowIMS, halfWindowIMS, maxGapIMS, minAbundanceIMSRel, minAbundanceIMSAbs, topMost, minIntensityIMS, minIntensityPre, minIntensityPost, minBPIntensity)
 }
 
 getEIMList <- function(backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, minIntensity, mzExpIMSWindow, compress) {
@@ -93,8 +93,8 @@ getPeakIntensities <- function(backend, startMZs, endMZs, times) {
     .Call(`_patRoon_getPeakIntensities`, backend, startMZs, endMZs, times)
 }
 
-collapseIMSFrames <- function(backend, mzStart, mzEnd, mobilityStart, mobilityEnd, smoothWindow, halfWindow, method, mzWindow, minIntensityIMS, includeMSMS) {
-    .Call(`_patRoon_collapseIMSFrames`, backend, mzStart, mzEnd, mobilityStart, mobilityEnd, smoothWindow, halfWindow, method, mzWindow, minIntensityIMS, includeMSMS)
+collapseIMSFrames <- function(backend, mzStart, mzEnd, mobilityStart, mobilityEnd, smoothWindow, halfWindow, maxGap, method, mzWindow, minIntensityIMS, includeMSMS) {
+    .Call(`_patRoon_collapseIMSFrames`, backend, mzStart, mzEnd, mobilityStart, mobilityEnd, smoothWindow, halfWindow, maxGap, method, mzWindow, minIntensityIMS, includeMSMS)
 }
 
 getIMSIsolationInfo <- function(backend) {
@@ -181,8 +181,8 @@ doAverageSpectraList <- function(specsList, method, window, minIntensity, minAbu
     .Call(`_patRoon_doAverageSpectraList`, specsList, method, window, minIntensity, minAbundanceRel, minAbundanceAbs)
 }
 
-testCentroidIMSFrame <- function(mzs, ints, mobStart, mobEnd, smoothWindow, halfWindow) {
-    .Call(`_patRoon_testCentroidIMSFrame`, mzs, ints, mobStart, mobEnd, smoothWindow, halfWindow)
+testCentroidIMSFrame <- function(mzs, ints, mobStart, mobEnd, smoothWindow, halfWindow, maxGap = 0.0) {
+    .Call(`_patRoon_testCentroidIMSFrame`, mzs, ints, mobStart, mobEnd, smoothWindow, halfWindow, maxGap)
 }
 
 loadEICIntensities <- function(spectra, featList, rtWindow) {

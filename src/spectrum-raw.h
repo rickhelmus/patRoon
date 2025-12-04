@@ -208,7 +208,8 @@ SpectrumRawAveraged averageSpectraRaw(const std::vector<SpectrumRawAveraged> &sp
                                       SpectrumRawTypes::PeakAbundance minAbundanceAbs);
 std::vector<size_t> frameSubSpecIDs(const SpectrumRaw &frame);
 SpectrumRaw centroidIMSFrame(const SpectrumRaw &frame, const SpectrumRawTypes::MobilityRange &mobRange,
-                             unsigned smoothWindow, unsigned halfWindow);
+                             unsigned smoothWindow, unsigned halfWindow, SpectrumRawTypes::Mass maxGap,
+                             std::vector<SpectrumRaw> *clusters = nullptr);
 
 // HACK: use a relative large tolerance for RT comparisons, mainly to accomedate MSTK which internally mixes
 // double+floats and min/sec conversions

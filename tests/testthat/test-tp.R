@@ -138,6 +138,16 @@ test_that("verify TP generation", {
     expect_range(as.data.table(TPsAnnFormSusp)$TPScore, c(0, 2))
     expect_min_gte(as.data.table(generateTPs("ann_form", fGroups, formsGF, minFitFormula = 0.8))$fitFormula, 0.8)
 
+    # log P and retDir calculation
+    TPsLPRCDK <- generateTPs("library", suspL, TPStructParams = getDefTPStructParams(calcLogP = "rcdk", forceCalcLogP = TRUE))
+    TPsLPOB <- generateTPs("library", suspL, TPStructParams = getDefTPStructParams(calcLogP = "obabel", forceCalcLogP = TRUE))
+    TPsRetDir <- generateTPs("library", suspL, TPStructParams = getDefTPStructParams(forceCalcLogP = TRUE, forceCalcRetDir = TRUE))
+    checkmate::expect_names(names(TPsLibSusp[[1]]), disjunct.from = "calc_logP")
+    checkmate::expect_names(names(TPsLPRCDK[[1]]), must.include = "calc_logP")
+    checkmate::expect_names(names(TPsLPOB[[1]]), must.include = "calc_logP")
+    checkmate::expect_character(all.equal(as.data.table(TPsLPRCDK)$calc_logP, as.data.table(TPsLPOB)$calc_logP, tolerance = 1E-6))
+    checkmate::expect_character(all.equal(as.data.table(TPsRetDir)$retDir, as.data.table(TPsLibSusp)$retDir, tolerance = 1E-6))
+    
     expect_length(TPsLogicEmpty, 0)
     expect_length(TPsLibEmpty, 0)
     expect_length(TPsLibFormEmpty, 0)

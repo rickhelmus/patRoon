@@ -162,8 +162,6 @@
             - also mixed bbCID/PASEF file (ie with different segments)
             - are m/z ranges always present?
         - see if current default abundance threshold is fine
-- TPs
-    - verify TP retDirs?
 - msdata
     - new verifyFileForFormat() usage in convertMSFiles()
     - file conversion?

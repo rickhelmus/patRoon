@@ -367,19 +367,20 @@ void EIC::addPoint(SpectrumRawTypes::Mass mz, SpectrumRawTypes::Mobility mob, Sp
     if (inten == 0.0)
         return;
     
-       // Rcpp::Rcout << "addPoint mob: " << mz << "/" << mob << "\t" << inten << "\t" << curPoint.mzMin << "/" << curPoint.mzMax << "\t" << std::endl;
+    // if (!pointMZInRange(mz) || !pointMobInRange(mob))
+    //     Rcpp::Rcout << "addPoint mob: " << mz << "/" << mob << "\t" << inten << "\t" << curPoint.mzMin << "/" << curPoint.mzMax << "/" << smoothExtMZ << std::endl;
     
     if (mode == EICMode::FULL || mode == EICMode::FULL_MZ)
     {
         // add data for frame summers
-        // NOTE: point is outside mz/mob range then it is a smoothing extension point
+        // NOTE: if point is outside mz/mob range then it is a smoothing extension point
         
         if (pointMobInRange(mob))
         {
             curPoint.allMZs.push_back(mz);
             curPoint.allIntsMZs.push_back(inten);
         }
-        if (mode == EICMode::FULL && pointMZInRange(mz)) // NOTE: if not then in mz extension range
+        if (mode == EICMode::FULL && pointMZInRange(mz))
         {
             curPoint.allMobs.push_back(mob);
             curPoint.allIntsMobs.push_back(inten);
@@ -773,10 +774,10 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         const auto mobExtStart = (mobStart > 0.0) ? (mobStart - smoothExtMob) : 0.0;
         const auto mobExtEnd = (mobEnd > 0.0) ? (mobEnd + smoothExtMob) : 0.0;
         
-        const auto itStart = std::lower_bound(allPeaksSorted.mzs.cbegin(), allPeaksSorted.mzs.cend(), mzStart);
-        if (itStart == allPeaksSorted.mzs.cend() || *itStart > mzEnd)
+        const auto itStart = std::lower_bound(allPeaksSorted.mzs.cbegin(), allPeaksSorted.mzs.cend(), mzExtStart);
+        if (itStart == allPeaksSorted.mzs.cend() || *itStart > mzExtEnd)
             continue;
-        const auto itEnd = std::prev(std::upper_bound(itStart, allPeaksSorted.mzs.cend(), mzEnd));
+        const auto itEnd = std::prev(std::upper_bound(itStart, allPeaksSorted.mzs.cend(), mzExtEnd));
         const auto startInd = std::distance(allPeaksSorted.mzs.cbegin(), itStart);
         auto endInd = std::distance(allPeaksSorted.mzs.cbegin(), itEnd);
         if (startInd > endInd)

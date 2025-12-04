@@ -116,10 +116,14 @@ SpectrumRaw filterSpectrumRaw(const SpectrumRaw &spectrum, const SpectrumRawFilt
              it!=spectrum.getMZs().end(); ++it)
         {
             const SpectrumRawTypes::Mass d = std::abs(precursor - *it);
-            if (d <= precTol && (minPrecMZDiff == -1.0 || d < minPrecMZDiff))
+            // Rcpp::Rcout << "Checking mz " << *it << "/" << precursor << "/" << d << "\n";
+            if (d <= precTol)
             {
-                closestPrecMZInd = std::distance(spectrum.getMZs().begin(), it);
-                minPrecMZDiff = d;
+                if (minPrecMZDiff == -1.0 || d < minPrecMZDiff)
+                {
+                    closestPrecMZInd = std::distance(spectrum.getMZs().begin(), it);
+                    minPrecMZDiff = d;
+                }
             }
             else
                 break; // data is sorted: all next mzs will be greater and therefore with higher deviation

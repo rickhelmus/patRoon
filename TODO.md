@@ -128,7 +128,7 @@
         - enable EIM summing and smoothing by default for TIMS?
     - split IMSWindow arg for setting mobmin/mobmax? this currently sets very narrow ranges. Same for mz and ms2
     - change methodMZ/methodIMS to eg filterMZ/filterMob
-    - make allowing non-centered features optional?
+    - make allowing non-centered features optional? --> see UNDONE comment
     - better error when no adduct is specified if suspect list only contains adduct specific mobilities --> now complains that all values are NA
     - smooth extension: default to bin size instead of defaultLim()?
     - getPiekGenEICParams --> getPiekEICParams

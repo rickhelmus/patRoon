@@ -531,6 +531,13 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
             if (withIMS)
                 peaks <- assignMZOrMobsToPeaks(peaks, EICInfo, "mobility")
             
+            # UNDONE: for now limit to peaks with centered m/zs and mobilities. Later either:
+            # 1. keep doing this --> update findFeatTableDups() to not bother with centered checks, remove prefDupIntensityRatio
+            # 2. make this optional
+            peaks <- peaks[mzCentered == TRUE]
+            if (withIMS)
+                peaks <- peaks[mobilityCentered == TRUE]
+            
             dups <- findFeatTableDups(peaks$ret, peaks$retmin, peaks$retmax,  peaks$mz,
                                       if (withIMS) peaks$mobility else numeric(),
                                       peaks$intensity, defaultLim("retention", "narrow"),

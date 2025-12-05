@@ -306,7 +306,7 @@ convertMSFilesBruker <- function(inFiles, outFiles, formatTo = "mzML", centroid 
 #' @rdname MSConversion
 #' @export
 convertMSFilesIMSCollapse <- function(inFiles, outFiles, typeFrom, formatTo = "mzML", mzRange = NULL, mobilityRange = NULL,
-                                      smoothWindow = 0, halfWindow = 2, clusterMethod = "distance_point",
+                                      smoothWindow = 0, halfWindow = 2, maxGap = 0, clusterMethod = "distance_point",
                                       mzWindow = defaultLim("mz", "medium"), minIntensityIMS = 0, includeMSMS = FALSE, ...)
 {
     ac <- checkmate::makeAssertCollection()
@@ -315,9 +315,9 @@ convertMSFilesIMSCollapse <- function(inFiles, outFiles, typeFrom, formatTo = "m
     checkmate::assertChoice(typeFrom, c("raw", "ims"), add = ac)
     checkmate::assertChoice(formatTo, getMSConversionFormats("im_collapse", "output"), add = ac)
     aapply(checkmate::assertCount, . ~ smoothWindow + halfWindow, positive = c(FALSE, TRUE), fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ maxGap + mzWindow + minIntensityIMS, lower = 0, finite = TRUE, fixed = list(add = ac))
     aapply(assertRange, . ~ mzRange + mobilityRange, null.ok = TRUE, fixed = list(add = ac))
     assertClusterMethod(clusterMethod, add = ac)
-    aapply(checkmate::assertNumber, . ~ mzWindow + minIntensityIMS, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertFlag(includeMSMS, add = ac)
     checkmate::reportAssertions(ac)
         
@@ -387,7 +387,7 @@ convertMSFilesIMSCollapse <- function(inFiles, outFiles, typeFrom, formatTo = "m
         openMSReadBackend(backend, path)
         collapsedSpectra <- collapseIMSFrames(backend, NULLToZero(mzRange[1]), NULLToZero(mzRange[2]),
                                               NULLToZero(mobilityRange[1]), NULLToZero(mobilityRange[2]), smoothWindow,
-                                              halfWindow, clusterMethod, mzWindow, minIntensityIMS, includeMSMS)
+                                              halfWindow, maxGap, clusterMethod, mzWindow, minIntensityIMS, includeMSMS)
         
         
         

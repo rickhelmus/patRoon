@@ -715,6 +715,7 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
             {
                 points <- as.data.table(chromPoints[[1]][[1]])
                 aggData <- points[, .(intensity = sum(intensity)), by = mz][order(mz)]
+                aggData <- unique(aggData, by = "mz")
                 return(aggData)
             }
             return(NULL)

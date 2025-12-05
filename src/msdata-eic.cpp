@@ -731,10 +731,11 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         peaksi += allSpectra[0][i].size();
         allSpectra[0][i].clear();
     }
+    allSpectra.clear();
     timer.stop();
     
     timer.start("Sorting all peaks");
-    const auto sortedInds = getSortedInds(allPeaks.mzs);
+    auto sortedInds = getSortedInds(allPeaks.mzs);
     
     AllPeaks allPeaksSorted(allPeaks.indices.size(), anySpecHasMob);
     for (size_t i=0; i<sortedInds.size(); ++i)
@@ -747,6 +748,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
             allPeaksSorted.mobilities[i] = allPeaks.mobilities[j];
     }
     allPeaks.clear();
+    sortedInds.clear();
     timer.stop();
     
     timer.start("Processing EICs");

@@ -740,7 +740,7 @@ findPeaksInEICs <- function(EICs, peakParams, withMobility, calcStats, assignRTW
         }, by = seq_len(nrow(peaks))]
         
         # NOTE: we could also set mobilities after checking if data is available, but then we need to repeat the EIC subsetting above
-        if (!withMobility || length(EICs) == 0 || !"mobility" %in% colnames(EICs[[1]]))
+        if (!withMobility)
             peaks[, c("mobmin", "mobmax", "mobility", "mobilityBP", "mobilityMax", "mobilityBPMax") := NULL]
     }
     

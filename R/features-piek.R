@@ -304,7 +304,7 @@ setMethod("delete", "featuresPiek", function(obj, i = NULL, j = NULL, ...)
 findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = NULL, adduct = NULL,
                              assignMethod = "basepeak", assignAggr = "weighted.mean", minIntensityIMS = 25,
                              prefDupIntensityRatio = 0.5, assignRTWindow = defaultLim("retention", "very_narrow"),
-                             verbose = TRUE)
+                             EICBatchSize = Inf, verbose = TRUE)
 {
     # UNDONE: add refs to docs, and highlight changes
     # UNDONE: use BP intensity?
@@ -324,6 +324,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
     checkmate::assertChoice(assignAggr, c("max", "weighted.mean"), add = ac)
     aapply(checkmate::assertNumber, . ~ minIntensityIMS + prefDupIntensityRatio + assignRTWindow, lower = 0,
            finite = TRUE, fixed = list(add = ac))
+    checkmate::assertNumber(EICBatchSize, lower = 1, finite = FALSE, add = ac)
     checkmate::assertFlag(verbose, add = ac)
     checkmate::reportAssertions(ac)
     
@@ -484,7 +485,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
             
             EICs <- EICInfo <- NULL
             EICInfoMZ <- getPiekEICsInfo(genEICParams, FALSE, suspects, MS2Info, verbose)
-            if (withIMS)
+            EICInfo <- if (withIMS)
             {
                 EICInfoMob <- getPiekEICsInfo(genEICParams, TRUE, suspects, MS2Info, verbose)
                 
@@ -501,43 +502,66 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
                     temp <- EICInfoMZ[, c("mzmin", "mzmax"), with = FALSE]
                     setkeyv(temp, c("mzmin", "mzmax"))
                     ov <- foverlaps(EICInfoMob, temp, type = "within", nomatch = NULL, which = TRUE)
-                    EICInfo <- EICInfoMob[ov$xid]
+                    EICInfoMob[ov$xid]
                 }
                 else
-                    EICInfo <- EICInfoMob
-                
-                maybePrintf("Loading %d m/z+mobility EICs... ", nrow(EICInfo))
-                EICs <- getEICsAna(backend, EICInfo, "full", genEICParams$topMostEICMZMob)
-                EICInfo <- EICInfo[EIC_ID %chin% names(EICs)] # omit missing
-                maybePrintf("Done!\n")
+                    EICInfoMob
             }
             else
+                EICInfoMZ
+            
+            EICInfoSplit <- if (nrow(EICInfo) > EICBatchSize)
+                split(EICInfo, ceiling(seq_len(nrow(EICInfo)) / EICBatchSize))
+            else
+                list(EICInfo)
+            
+            peaksRes <- Map(EICInfoSplit, seq_along(EICInfoSplit), f = function(EICInfoBatch, batch)
             {
-                maybePrintf("Loading %d m/z EICs... ", nrow(EICInfoMZ))
-                EICs <- getEICsAna(backend, EICInfoMZ, "full_mz", genEICParams$topMostEICMZ)
-                EICInfo <- EICInfoMZ[EIC_ID %chin% names(EICs)] # omit missing
+                if (length(EICInfoSplit) > 1)
+                    maybePrintf("Processing batch %d/%d...\n", batch, length(EICInfoSplit))
+                
+                EICs <- if (withIMS)
+                {
+                    maybePrintf("Loading %d m/z+mobility EICs... ", nrow(EICInfoBatch))
+                    getEICsAna(backend, EICInfoBatch, "full", genEICParams$topMostEICMZMob)
+                }
+                else
+                {
+                    maybePrintf("Loading %d m/z EICs... ", nrow(EICInfoBatch))
+                    getEICsAna(backend, EICInfoBatch, "full_mz", genEICParams$topMostEICMZ)
+                }
                 maybePrintf("Done!\n")
-            }
+                
+                EICInfoBatch <- EICInfoBatch[EIC_ID %chin% names(EICs)] # omit missing
+                
+                maybePrintf("Finding peaks in remaining %d EICs... ", length(EICs))
+                peaks <- findPeaksInEICs(EICs, peakParams, withMobility = withIMS, calcStats = TRUE,
+                                         assignRTWindow = assignRTWindow,
+                                         sumWindowMZ = if (backend$getHaveIMS()) genEICParams$sumWindowMZ else 0,
+                                         sumWindowMob = if (backend$getHaveIMS()) genEICParams$sumWindowMob else 0,
+                                         logPath = file.path("log", "featEICs", paste0(ana, ".txt")), cacheDB = cacheDB)
+                maybePrintf("Done! Found %d peaks.\n", nrow(peaks))
+                
+                peaks <- assignMZOrMobsToPeaks(peaks, EICInfoBatch, "mz")
+                if (withIMS)
+                    peaks <- assignMZOrMobsToPeaks(peaks, EICInfoBatch, "mobility")
+                
+                # UNDONE: for now limit to peaks with centered m/zs and mobilities. Later either:
+                # 1. keep doing this --> update findFeatTableDups() to not bother with centered checks, remove prefDupIntensityRatio
+                # 2. make this optional
+                peaks <- peaks[mzCentered == TRUE]
+                if (withIMS)
+                    peaks <- peaks[mobilityCentered == TRUE]
+                
+                mzProfs <- if (genEICParams$saveMZProfiles)
+                    getIMSProfiles(attr(EICs, "mzProfiles"), peaks, EICs, EICInfoBatch)
+                EIMs <- if (genEICParams$saveEIMs)
+                    getIMSProfiles(attr(EICs, "EIMs"), peaks, EICs, EICInfoBatch)
+                
+                return(list(peaks = peaks, mzProfs = mzProfs, EIMs = EIMs))
+            })
             
-            maybePrintf("Finding peaks in %d remaining EICs... ", length(EICs))
-            peaks <- findPeaksInEICs(EICs, peakParams, withMobility = withIMS, calcStats = TRUE,
-                                     assignRTWindow = assignRTWindow,
-                                     sumWindowMZ = if (backend$getHaveIMS()) genEICParams$sumWindowMZ else 0,
-                                     sumWindowMob = if (backend$getHaveIMS()) genEICParams$sumWindowMob else 0,
-                                     logPath = file.path("log", "featEICs", paste0(ana, ".txt")), cacheDB = cacheDB)
-            maybePrintf("Done! Found %d peaks.\n", nrow(peaks))
-
-            peaks <- assignMZOrMobsToPeaks(peaks, EICInfo, "mz")
-            if (withIMS)
-                peaks <- assignMZOrMobsToPeaks(peaks, EICInfo, "mobility")
-            
-            # UNDONE: for now limit to peaks with centered m/zs and mobilities. Later either:
-            # 1. keep doing this --> update findFeatTableDups() to not bother with centered checks, remove prefDupIntensityRatio
-            # 2. make this optional
-            peaks <- peaks[mzCentered == TRUE]
-            if (withIMS)
-                peaks <- peaks[mobilityCentered == TRUE]
-            
+            peaks <- rbindlist(lapply(peaksRes, `[[`, "peaks"), fill = TRUE) # NOTE: need to fill for empties
             dups <- findFeatTableDups(peaks$ret, peaks$retmin, peaks$retmax,  peaks$mz,
                                       if (withIMS) peaks$mobility else numeric(),
                                       peaks$intensity, defaultLim("retention", "narrow"),
@@ -576,16 +600,16 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
                                           genEICParams$rtWindow)
                 peaks <- peaks[keep == TRUE]
             }
-
+            
             peaks <- removeDTColumnsIfPresent(peaks, c("mzCentered", "mobilityCentered", "keep"))
 
             maybePrintf("%d peaks remain after filtering.\n", nrow(peaks))            
             
             if (genEICParams$saveMZProfiles)
-                mzProfiles[[ana]] <<- getIMSProfiles(attr(EICs, "mzProfiles"), peaks, EICs, EICInfo)
+                mzProfiles[[ana]] <<- Reduce(c, lapply(peaksRes, `[[`, "mzProfs"))[peaks$ID]
             if (genEICParams$saveEIMs)
-                EIMs[[ana]] <<- getIMSProfiles(attr(EICs, "EIMs"), peaks, EICs, EICInfo)
-
+                EIMs[[ana]] <<- Reduce(c, lapply(peaksRes, `[[`, "EIMs"))[peaks$ID]
+            
             peaks[, EIC_ID := NULL][]
             if (withIMS)
                 peaks[, ims_parent_ID := NA_character_]

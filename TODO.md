@@ -249,6 +249,7 @@
         - mention that frame data is summed to get mz data?
         - further explain assignMethod/assignAggr, eg guide when to use what depending on frame summing
         - explain that sumWindowMZ/sumWindowMob compensate assignment window
+        - EICBatchSize: arg description, add notes somewhere on how this and others can be used to tweak mem usage
     - assignMobilities()
         - refs to paper
         - fGroups method

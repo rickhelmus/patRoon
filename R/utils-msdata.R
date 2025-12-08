@@ -7,7 +7,7 @@ NULL
 
 doInitBrukerLib <- function()
 {
-    libp <- getOption("patRoon.path.BrukerTIMS", "")
+    libp <- getOption("patRoon.path.TDFSDK", "")
     return(nzchar(libp) && initBrukerLibrary(libp))
 }
 

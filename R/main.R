@@ -75,7 +75,7 @@ NULL
 #'   \item \code{patRoon.cache.maxEntries}: a \code{numeric} specifying the maximum number of entries per cache
 #'   category (default is 100000). When this limit is exceeded, the oldest entries are automatically removed.
 #'
-#'   \item \code{patRoon.MS.backends},\code{patRoon.MS.preferIMS},\code{patRoon.path.BrukerTIMS}:
+#'   \item \code{patRoon.MS.backends},\code{patRoon.MS.preferIMS},\code{patRoon.path.TDFSDK}:
 #'   Options related to the \link[=msdata]{raw data interface}.
 #'
 #'   \item \code{patRoon.threads}: The number of threads to be used for parallelization. This is currently only used by

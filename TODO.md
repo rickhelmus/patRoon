@@ -12,9 +12,9 @@
     - add NEWS
 - update patRoonInst/patRoonExt/patRoonData for new deps
     - install timsconvert and c3sdb in Docker and bundle
-    - embed TIMS-SDK in patRoonExt
-    - add MRMTransitionGroupPicker to patRoonExt
-    - switch to PCL w/ CCSbase in patRoonExt
+        - Docker: right Python already installed, but install python3-venv python3-pip python3-dev
+        - Windows: for now don't bundle, but install in GHA for testing: https://docs.github.com/en/actions/tutorials/build-and-test-code/python
+    - test new/updated patRoonExt deps
 - BUG: annSim.1 column (in formulas?)?
 - fix default IDLs
 - Harmonize/consistent names
@@ -30,7 +30,6 @@
     - maybe add _mz rel column like compounds?
     - actually, the same is the case for the mz filter (also IMS and mz for features) --> maybe just document difference? the actual results will not change much in general
 - TC convert: doc that centroid mode is used for IMS conversion (and/or make it optional?)
-- update verifyDependencies()
 
 
 ## Maybe
@@ -189,6 +188,7 @@
     - DA features and formulas?
     - manually check all HTML reporting functionality at the end
     - check updates for mobilities to checkFeatures(), checkComponents() and importCheckFeaturesSession()
+    - test updated verifyDependencies()
 
 
 ## Docs

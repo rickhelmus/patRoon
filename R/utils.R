@@ -131,6 +131,10 @@ getExtDepPath <- function(what, subTool = NULL, verify = TRUE)
         biotransformer = list(
             name = "BioTransformer",
             opt = "BioTransformer"
+        ),
+        "tdf-sdk" = list(
+            name = "TDF-SDK",
+            opt = "TDFSDK"
         )
     )
     

@@ -111,6 +111,9 @@ test_that("piek", {
     expect_range(as.data.table(ffPiekBins)$mz, c(200, 300+0.02)) # +0.02: bin width
     expect_lte(length(ffPiekSusp), nrow(patRoonData::suspectsPos))
     expect_gt(length(ffPiekMS2), length(getPiekHRMS(getPiekGenEICParams("ms2", minTIC = 1E5))))
+    expect_equal(ffPiekBins, withOpt(cache.mode="none",
+                                     getPiekHRMS(getPiekGenEICParams("bins", mzRange = c(200, 300)), EICBatchSize = 5E3)))
+    browser()
 
     expect_true(hasMobilities(ffPiekBinsIMS))
     expect_false(hasMobilities(ffPiekBins))

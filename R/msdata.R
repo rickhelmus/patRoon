@@ -60,7 +60,7 @@ NULL
 #'   parallelization (multithreading). The default is determined from the number of physical cores of the system
 #'   (obtained with the \link[parallel:detectCores]{parallel::detectCores} function).
 #'
-#'   \item \code{patRoon.path.BrukerTIMS}: The file path to the Bruker \command{TDF-SDK} library file. See the
+#'   \item \code{patRoon.path.TDFSDK}: The file path to the Bruker \command{TDF-SDK} library file. See the
 #'   \verb{Backend installation} section below.
 #'
 #'   }
@@ -70,7 +70,7 @@ NULL
 #'   \file{linux64/libtimsdata.so} (Linux) file from the \command{TDF-SDK} from
 #'   \href{https://www.bruker.com/protected/en/services/software-downloads/mass-spectrometry/raw-data-access-libraries.html}{Bruker}
 #'   (requires login). The \pkg{patRoonExt} package makes these files automatically available for \pkg{patRoon}.
-#'   Otherwise the \code{patRoon.path.BrukerTIMS} option should be manually set to the file path of the
+#'   Otherwise the \code{patRoon.path.TDFSDK} option should be manually set to the file path of the
 #'   \file{timsdata.dll} or \file{linux64/libtimsdata.so} file.
 #'
 #'   When \pkg{patRoon} is installed from source, \emph{e.g.} on Linux/macOS systems or when using

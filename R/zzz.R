@@ -15,7 +15,7 @@ defaultPkgOpts <- function(pkgname)
         MP.maxProcs = getOption("patRoon.maxProcAmount", parallel::detectCores(logical = FALSE)),
         MP.futureSched = 1.0,
         MP.logPath = "log",
-        path.BrukerTIMS = "",
+        path.TDFSDK = "",
         path.pwiz = "",
         path.GenForm = "",
         path.MetFragCL = getOption("patRoon.path.metFragCL", ""), # backwards compat

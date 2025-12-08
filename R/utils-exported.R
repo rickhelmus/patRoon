@@ -283,6 +283,7 @@ verifyDependencies <- function()
     check("MetFrag PubChemLite Database", getExtDepPath("metfragpcl", verify = FALSE), "patRoon.path.MetFragPubChemLite")
     check("OpenBabel", getExtDepPath("openbabel", verify = FALSE), "patRoon.path.obabel")
     check("BioTransformer", getExtDepPath("biotransformer", verify = FALSE), "patRoon.path.BioTransformer")
+    check("TDF-SDK", getExtDepPath("tdf-sdk", verify = FALSE), "patRoon.path.TDFSDK")
     
     if (!OK)
     {

@@ -72,7 +72,7 @@ NULL
 #'   \item \code{patRoon.cache.fileName}: a \code{character} specifying the name of the cache file (default is
 #'   \file{cache.sqlite}).
 #'
-#'   \item \code{patRoon.MS.backends},\code{patRoon.MS.preferIMS},\code{patRoon.path.BrukerTIMS}:
+#'   \item \code{patRoon.MS.backends},\code{patRoon.MS.preferIMS},\code{patRoon.path.TDFSDK}:
 #'   Options related to the \link[=msdata]{raw data interface}.
 #'
 #'   \item \code{patRoon.threads}: The number of threads to be used for parallelization. This is currently only used by

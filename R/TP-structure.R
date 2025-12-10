@@ -368,7 +368,7 @@ setMethod("consensus", "transformationProductsStructure", function(obj, ..., abs
     ac <- checkmate::makeAssertCollection()
     # HACK: only check uniqueness if not all are zero length
     checkmate::assertList(allTPs, types = "transformationProductsStructure", min.len = 2, any.missing = FALSE,
-                          unique = any(lengths(anyTPs) > 0), .var.name = "...", add = ac)
+                          unique = any(lengths(allTPs) > 0), .var.name = "...", add = ac)
     checkmate::assertCharacter(labels, min.chars = 1, len = length(allTPs), null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     

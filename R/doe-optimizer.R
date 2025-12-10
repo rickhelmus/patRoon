@@ -492,7 +492,12 @@ setMethod("plot", c(x = "optimizationResult", y = "missing"), function(x, paramS
 
         withr::local_par(list(mfrow = c(rows, cols)))
     }
-
+    
+    # HACK/BUG: contour() etc seem to inproperly(?) handle cases where unique(length(all.vars(forms[[i]]))) == 1: the
+    # function seems to want to skip these for plotting, but then don't properly update the naming variable. For now
+    # remove these before plotting...
+    forms <- forms[sapply(forms, \(f) length(unique(all.vars(f)))) > 1]
+    
     switch(type,
            contour = contour(ex$model, forms, image = image, at = maxSlice, ...),
            image = image(ex$model, forms, at = maxSlice, ...),

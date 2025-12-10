@@ -204,8 +204,9 @@ setMethod("comparison", "featureGroups", function(..., groupAlgo, groupArgs = li
     ac <- checkmate::makeAssertCollection()
     checkmate::assertChoice(groupAlgo, c("xcms", "xcms3", "openms", "kpic2"), add = ac)
     checkmate::assertList(groupArgs, any.missing = FALSE, names = "unique", add = ac)
+    # HACK: only check uniqueness if not all are zero length
     checkmate::assertList(fGroupsList, types = "featureGroups", min.len = 2, any.missing = FALSE,
-                          unique = TRUE, .var.name = "...", add = ac)
+                          unique = any(lengths(fGroupsList) > 0), .var.name = "...", add = ac)
     checkmate::reportAssertions(ac)
 
     n <- getArgNames(..., def = sapply(fGroupsList, algorithm))

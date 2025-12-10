@@ -684,8 +684,9 @@ setMethod("consensus", "compounds", function(obj, ..., absMinAbundance = NULL,
     allCompounds <- c(list(obj), list(...))
 
     ac <- checkmate::makeAssertCollection()
+    # HACK: only check uniqueness if not all are zero length
     checkmate::assertList(allCompounds, types = "compounds", min.len = 2, any.missing = FALSE,
-                          unique = TRUE, .var.name = "...", add = ac)
+                          unique = any(lengths(allCompounds) > 0), .var.name = "...", add = ac)
     checkmate::assertNumeric(rankWeights, lower = 0, finite = TRUE, add = ac)
     checkmate::assertCharacter(labels, min.chars = 1, len = length(allCompounds), null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)

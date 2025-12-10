@@ -118,8 +118,9 @@ setMethod("consensus", "componentsSet", function(obj, ...)
 {
     allComponents <- c(list(obj), list(...))
     
+    # HACK: only check uniqueness if not all are zero length
     checkmate::assertList(allComponents, types = "componentsSet", min.len = 2, any.missing = FALSE,
-                          unique = TRUE, .var.name = "...")
+                          unique = any(lengths(allComponents) > 0), .var.name = "...")
     
     if (!allSame(lapply(allComponents, sets)))
         stop("All objects must have the same sets.")

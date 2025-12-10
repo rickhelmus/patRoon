@@ -392,8 +392,9 @@ setMethod("plotVenn", "featureAnnotations", function(obj, ..., labels = NULL, ve
     allFeatAnnotations <- c(list(obj), list(...))
     
     ac <- checkmate::makeAssertCollection()
+    # HACK: only check uniqueness if not all are zero length
     checkmate::assertList(allFeatAnnotations, types = "featureAnnotations", min.len = 2, any.missing = FALSE,
-                          unique = TRUE, .var.name = "...", add = ac)
+                          unique = any(lengths(allFeatAnnotations) > 0), .var.name = "...", add = ac)
     checkmate::assertCharacter(labels, min.chars = 1, len = length(allFeatAnnotations), null.ok = TRUE, add = ac)
     checkmate::assertList(vennArgs, names = "unique", null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
@@ -423,8 +424,9 @@ setMethod("plotUpSet", "featureAnnotations", function(obj, ..., labels = NULL, n
     allFeatAnnotations <- c(list(obj), list(...))
     
     ac <- checkmate::makeAssertCollection()
+    # HACK: only check uniqueness if not all are zero length
     checkmate::assertList(allFeatAnnotations, types = "featureAnnotations", min.len = 2, any.missing = FALSE,
-                          unique = TRUE, .var.name = "...", add = ac)
+                          unique = any(lengths(allFeatAnnotations) > 0), .var.name = "...", add = ac)
     checkmate::assertCharacter(labels, min.chars = 1, len = length(allFeatAnnotations), null.ok = TRUE, add = ac)
     checkmate::assertList(upsetArgs, names = "unique", null.ok = TRUE, add = ac)
     checkmate::assertCount(nsets, positive = TRUE)

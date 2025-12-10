@@ -7,6 +7,7 @@
     - Changed: `norm_conc` is set to one if all are values are NA (default for `newProject()`)
 * Fixed: reporting components from `cliqueMS` and suspect screened features would fail (reported by Jan Specker)
 * Updated PubChem Transformations to 0.2.2
+* Fix: avoid error when `consensus()` is called with empty objects for a set (issue #144)
 
 
 # patRoon 2.3.4

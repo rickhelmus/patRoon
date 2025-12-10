@@ -560,8 +560,9 @@ setMethod("consensus", "components", function(obj, ...)
 {
     allComponents <- c(list(obj), list(...))
 
+    # HACK: only check uniqueness if not all are zero length
     checkmate::assertList(allComponents, types = "components", min.len = 2, any.missing = FALSE,
-                          unique = TRUE, .var.name = "...")
+                          unique = any(lengths(allComponents) > 0), .var.name = "...")
 
     compNames <- make.unique(sapply(allComponents, algorithm))
     mcmp <- mergeComponents(allComponents, compNames, "algorithm")

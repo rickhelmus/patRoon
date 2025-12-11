@@ -96,7 +96,17 @@ std::vector<Feature> getBestGroup(const std::vector<Feature> &allFeatures, doubl
         size_t nextAnaIndex;
         WorkItem(const std::vector<Feature> &tg, size_t ni) : tentativeGroup(tg), nextAnaIndex(ni) { }
     };
-    
+
+#if 0
+    Rcpp::Rcout << "Evaluating " << allFeatures.size() << " features for best group:\n";
+    for (const auto &feat : allFeatures)
+    {
+        Rcpp::Rcout << "  featID: " << feat.featID << ", anaID: " << feat.anaID
+                    << ", RT: " << feat.dims.ret << ", MZ: " << feat.dims.mz
+                    << ", MOB: " << feat.dims.mob << "\n";
+    }
+#endif
+
     // NOTE: use a vector to keep the order the same
     std::vector<int> allAnaIDs;
     for (const auto &feat : allFeatures)

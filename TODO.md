@@ -132,6 +132,14 @@
     - smooth extension: default to bin size instead of defaultLim()?
     - getPiekGenEICParams --> getPiekEICParams
     - include m/z+mob assignment RT window in feature output? or with debug option?
+    - assign mzmin/mzmax for centroid data from basepeaks?
+    - dup peaks: make mz and mob window configurable again
+    - intensityBP
+        - docs...
+        - does current mz/mob split make sense?
+        - make a non summed intensityBP in IMS mode? mainly for peak finding, but maybe also makes more sense for assignment
+            - otoh, BP single point doesn't make too much sense... maybe only use BP for non-IMS data?
+            - since we have profiles, taking sum intensities makes more sense, as unrelated peaks will be relatively fewer and probably less strongly affect than in centroided data 
 - update featAnn consensus?
 - ADT gives "susp_mobility_susp"/"susp_CCS_susp" cols --> rename
 - MSPL:
@@ -149,6 +157,11 @@
         - --> then add back cluster option for IM collapse
 - EICs
     - are even numbers for smoothing/summing correctly handled?
+- greedy
+    - somehow handle cases where...
+        1. there is >=1 adjacent feature to the most intense
+        2. the most intense groups poorer (more deviation, smaller in size) compared to the adjacent, because the adjacent is closer to the others
+- select backend for MS and IMS separately? eg SC for MS and OpenTIMS for IMS is probably fastest combo
 
 ## Tests
 

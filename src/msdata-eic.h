@@ -102,7 +102,7 @@ class EIC
     
     std::vector<SpectrumRawTypes::Scan> scanInds;
     std::vector<SpectrumRawTypes::Mass> mzs, mzMins, mzMaxs;
-    std::vector<SpectrumRawTypes::Intensity> intensities;
+    std::vector<SpectrumRawTypes::Intensity> intensities, intensitiesBP, intensitiesBPMob;
     std::vector<SpectrumRawTypes::Mobility> mobilities, mobMins, mobMaxs;
     std::vector<SpectrumRawTypes::Mass> mzsBP;
     std::vector<SpectrumRawTypes::Mobility> mobilitiesBP;
@@ -204,6 +204,8 @@ public:
         mzMins.clear();
         mzMaxs.clear();
         intensities.clear();
+        intensitiesBP.clear();
+        intensitiesBPMob.clear();
         mobMins.clear();
         mobMaxs.clear();
         mzsBP.clear();
@@ -234,6 +236,8 @@ public:
     const auto &getMZMins(void) const { return mzMins; }
     const auto &getMZMaxs(void) const { return mzMaxs; }
     const auto &getIntensities(void) const & { return intensities; }
+    const auto &getIntensitiesBP(void) const & { return intensitiesBP; }
+    const auto &getIntensitiesBPMob(void) const & { return intensitiesBPMob; }
     const auto &getMobMins(void) const { return mobMins; }
     const auto &getMobMaxs(void) const { return mobMaxs; }
     const auto &getMobilities(void) const { return mobilities; }

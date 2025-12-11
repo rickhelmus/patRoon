@@ -670,12 +670,23 @@ findPeaksInEICs <- function(EICs, peakParams, withMobility, calcStats, assignRTW
     
     # NOTE: EICs must be named
     
-    hash <- makeHash(baseHash, EICs)
+    hash <- makeHash(baseHash, EICs, peakParams, withMobility, calcStats, assignRTWindow, sumWindowMZ, sumWindowMob)
     cd <- loadCacheData("peaksEIC", hash, cacheDB)
     if (!is.null(cd))
         return(cd)
     
-    peaks <- findPeaks(EICs, TRUE, peakParams, logPath)
+    # make copy and use [] to keep attributes
+    EICsBP <- EICs
+    if (calcStats && sumWindowMZ == 0)
+    {
+        EICsBP[] <- lapply(EICs, function(eic) {
+            eicBP <- eic[, c("time", "intensityBP"), drop = FALSE]
+            colnames(eicBP)[2] <- "intensity"
+            return(eicBP)
+        })
+    }
+    
+    peaks <- findPeaks(EICsBP, TRUE, peakParams, logPath)
     peaks <- rbindlist(peaks, idcol = "EIC_ID")
 
     if (nrow(peaks) == 0)
@@ -719,21 +730,23 @@ findPeaksInEICs <- function(EICs, peakParams, withMobility, calcStats, assignRTW
             else
             {
                 whm <- which.max(eicAssignMZ[, "intensity"])
+                whmBP <- which.max(eicAssignMZ[, "intensityBP"])
                 stats <- list(
                     min(eicWide[, "mzmin"]), max(eicWide[, "mzmax"]),
                     weighted.mean(eicAssignMZ[, "mz"], eicAssignMZ[, "intensity"]),
-                    weighted.mean(eicAssignMZ[, "mzBP"], eicAssignMZ[, "intensity"]),
-                    eicAssignMZ[whm, "mz"], eicAssignMZ[whm, "mzBP"])
+                    weighted.mean(eicAssignMZ[, "mzBP"], eicAssignMZ[, "intensityBP"]),
+                    eicAssignMZ[whm, "mz"], eicAssignMZ[whmBP, "mzBP"])
                 if (!haveMobData)
                     stats <- c(stats, rep(NA_real_, 6))
                 else
                 {
                     whm <- which.max(eicAssignMob[, "intensity"])
+                    whmBP <- which.max(eicAssignMob[, "intensityBPMob"])
                     stats <- c(stats,
                                min(eicWide[, "mobmin"]), max(eicWide[, "mobmax"]),
                                weighted.mean(eicAssignMob[, "mobility"], eicAssignMob[, "intensity"]),
-                               weighted.mean(eicAssignMob[, "mobilityBP"], eicAssignMob[, "intensity"]),
-                               eicAssignMob[whm, "mobility"], eicAssignMob[whm, "mobilityBP"])
+                               weighted.mean(eicAssignMob[, "mobilityBP"], eicAssignMob[, "intensityBPMob"]),
+                               eicAssignMob[whm, "mobility"], eicAssignMob[whmBP, "mobilityBP"])
                 }
                 stats
             }

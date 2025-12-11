@@ -49,7 +49,7 @@ NULL
 #'   available analysis file types and formats (as configured by the \link[=analysis-information]{analysis information})
 #'   and supports IMS if needed.
 #'
-#'   \item \code{patRoon.MS.preferIMS}: A \code{logical} value that indicates whether the IMS data should be prefferred,
+#'   \item \code{patRoon.MS.preferIMS}: A \code{logical} value that indicates whether the IMS data should be preferred,
 #'   even if the processing step does not require IMS data and non-IMS data is also available. Setting this to
 #'   \code{TRUE} probably result in some additional computational overhead, but may avoid any inconsistencies between
 #'   the IMS data and non-IMS data that may have been introduced during the conversion step of the latter. This option

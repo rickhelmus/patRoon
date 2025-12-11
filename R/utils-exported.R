@@ -247,22 +247,67 @@ verifyDependencies <- function()
     invisible(NULL)
 }
 
-#' Returns chromatographic peak quality and score names for features and/or feature groups.
-#'
+#' @rdname feature-quality
+#' @export
+featureQualities <- function(qualities = NULL)
+{
+    checkPackage("MetaClean")
+
+    # Default set of all available qualities
+    allQualities <- list(ApexBoundaryRatio = list(func = MetaClean::calculateApexMaxBoundaryRatio, HQ = "LV", range = c(0, 1)),
+                         FWHM2Base = list(func = MetaClean::calculateFWHM, HQ = "HV", range = c(0, 1)),
+                         Jaggedness = list(func = MetaClean::calculateJaggedness, HQ = "LV", range = Inf),
+                         Modality = list(func = MetaClean::calculateModality, HQ = "LV", range = Inf),
+                         Symmetry = list(func = MetaClean::calculateSymmetry, HQ = "HV", range = c(-1, 1)),
+                         GaussianSimilarity = list(func = MetaClean::calculateGaussianSimilarity, HQ = "HV", range = c(0, 1)),
+                         Sharpness = list(func = MetaClean::calculateSharpness, HQ = "HV", range = Inf),
+                         TPASR = list(func = MetaClean::calculateTPASR, HQ = "LV", range = Inf),
+                         ZigZag = list(func = MetaClean::calculateZigZagIndex, HQ = "LV", range = Inf))
+
+    if (!is.null(qualities))
+    {
+        checkmate::assertSubset(qualities, names(allQualities), empty.ok = FALSE)
+        allQualities <- allQualities[qualities]        
+    }
+    
+    return(allQualities)
+}
+
+#' @rdname feature-quality
+#' @export
+featureGroupQualities <- function(qualities = NULL)
+{
+    checkPackage("MetaClean")
+
+    # Default set of all available group qualities
+    allQualities <- list(
+        ElutionShift = list(func = MetaClean::calculateElutionShift, HQ = "LV", range = Inf),
+        RetentionTimeCorrelation = list(func = MetaClean::calculateRetentionTimeConsistency, HQ = "LV", range = Inf)
+    )
+
+    if (!is.null(qualities))
+    {
+        checkmate::assertSubset(qualities, names(allQualities), empty.ok = FALSE)
+        allQualities <- allQualities[qualities]        
+    }
+    
+    return(allQualities)
+}
+
 #' @param feat If \code{TRUE} then names specific to features are returned.
 #' @param group If \code{TRUE} then names specific to groups are returned.
 #' @param scores If \code{TRUE} the score names are returned, otherwise the quality names.
 #' @param totScore If \code{TRUE} (and \code{scores=TRUE}) then the name of the total score is included.
-#'
+#' @rdname feature-quality
 #' @export
 featureQualityNames <- function(feat = TRUE, group = TRUE, scores = FALSE, totScore = TRUE)
 {
+    aapply(checkmate::assertFlag, . ~ feat + group + scores + totScore)
     ret <- character()
     if (feat)
-        ret <- c("ApexBoundaryRatio", "FWHM2Base", "Jaggedness", "Modality", "Symmetry", "GaussianSimilarity",
-                 "Sharpness", "TPASR", "ZigZag")
+        ret <- names(featureQualities())
     if (group)
-        ret <- c(ret, "ElutionShift", "RetentionTimeCorrelation")
+        ret <- c(ret, names(featureGroupQualities()))
     if (scores)
     {
         ret <- paste0(ret, "Score")
@@ -275,7 +320,7 @@ featureQualityNames <- function(feat = TRUE, group = TRUE, scores = FALSE, totSc
 #' Fold change calculation
 #'
 #' @details Fold change calculation can be used to easily identify significant changes between replicate groups. The
-#'   calculation process is configured through a paramater list, which can be constructed with the \code{getFCParams}
+#'   calculation process is configured through a parameter list, which can be constructed with the \code{getFCParams}
 #'   function. The parameter list has the following entries: \itemize{
 #'
 #'   \item \code{rGroups} the name of the two replicate groups to compare (taken from the \code{rGroups} argument to
@@ -524,4 +569,3 @@ getQuantCalibFromScreening <- function(fGroups, concs, areas = FALSE, average = 
     
     return(ret[])
 }
-

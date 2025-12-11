@@ -214,17 +214,51 @@ test_that("as.data.table works", {
 
     expect_identical(as.data.table(fgOpenMS), as.data.table(fgOpenMSQ, qualities = FALSE)) # nothing extra reported
     expect_identical(as.data.table(fgOpenMS), as.data.table(fgOpenMS, qualities = "both")) # nothing to report
-    checkmate::expect_names(names(as.data.table(fgOpenMSQ, qualities = "quality")), must.include = featureQualityNames())
+    checkmate::expect_names(names(as.data.table(fgOpenMSQ, qualities = "quality")), 
+                            must.include = getFeatureQualityNames(fgOpenMSQ))
     checkmate::expect_names(names(as.data.table(fgOpenMSQ, qualities = "score")),
-                            must.include = featureQualityNames(scores = TRUE))
+                            must.include = getFeatureQualityNames(fgOpenMSQ, scores = TRUE))
     checkmate::expect_names(names(as.data.table(fgOpenMSQ, qualities = "both")),
-                            must.include = c(featureQualityNames(), featureQualityNames(scores = TRUE)))
+                            must.include = c(getFeatureQualityNames(fgOpenMSQ), 
+                                             getFeatureQualityNames(fgOpenMSQ, scores = TRUE)))
     
     expect_equal(nrow(as.data.table(fgOpenMSEmpty, average = TRUE)), 0)
     expect_equal(nrow(as.data.table(fgOpenMSEmpty, features = TRUE)), 0)
     expect_equal(nrow(as.data.table(fgOpenMSEmpty, average = TRUE, features = TRUE)), 0)
     expect_equal(nrow(as.data.table(fgOpenMSEmpty, FCParams = FCParams)), 0)
     expect_equal(nrow(as.data.table(fgOpenMSEmptyQ, qualities = "both")), 0)
+})
+
+test_that("featureQualities parameter works", {
+    subsetQualities <- c("FWHM2Base", "Symmetry", "GaussianSimilarity")
+    fgOpenMSQSubset <- calculatePeakQualities(fgOpenMS, featureQualities = subsetQualities)
+    expect_identical(getFeatureQualityNames(fgOpenMSQSubset, group = FALSE), subsetQualities)
+
+    # Test with custom qualities
+    customQualities <- list(
+        TestQuality = list(
+            func = \(peakdata, eic, ...) 0.5,
+            HQ = "HV",
+            range = c(0, 1)
+        )
+    )
+    fgOpenMSCustom <- calculatePeakQualities(fgOpenMS, featureQualities = customQualities)
+    expect_identical(getFeatureQualityNames(fgOpenMSCustom, group = FALSE), "TestQuality")
+    
+
+    fgGroupQualitiesSubset <- calculatePeakQualities(fgOpenMS, featureGroupQualities = c("ElutionShift"))
+    expect_identical(getFeatureQualityNames(fgGroupQualitiesSubset, feat = FALSE), "ElutionShift")
+    
+    # Test custom featureGroupQualities
+    customGroupQualities <- list(
+        TestGroupQuality = list(
+            func = \(pdl, ...) rep(0.5, length(pdl)),
+            HQ = "HV",
+            range = c(0, 1)
+        )
+    )
+    fgGroupQualitiesCustom <- calculatePeakQualities(fgOpenMS, featureGroupQualities = customGroupQualities)
+    expect_identical(getFeatureQualityNames(fgGroupQualitiesCustom, feat = FALSE), "TestGroupQuality")
 })
 
 test_that("unique works", {

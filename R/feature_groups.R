@@ -288,6 +288,31 @@ setMethod("groupQualities", "featureGroups", function(fGroups) fGroups@groupQual
 #' @export
 setMethod("groupScores", "featureGroups", function(fGroups) fGroups@groupScores)
 
+#' @describeIn featureGroups Returns feature quality names that were calculated for this object.
+#' @param feat,group If \code{TRUE} then names specific to features and feature groups are returned, respectively.
+#' @inheritParams getFeatureQualityNames,features-method
+#' @export
+setMethod("getFeatureQualityNames", "featureGroups", function(obj, feat = TRUE, group = TRUE, scores = FALSE,
+                                                              totScore = TRUE)
+{
+    aapply(checkmate::assertFlag, . ~ feat + group + scores + totScore)
+    featn <- getFeatureQualityNames(getFeatures(obj), scores = scores)
+    ret <- character()
+    if (group)
+    {
+        # contains both feat and fg names
+        ret <- names(if (scores) groupScores(obj) else groupQualities(obj))
+        ret <- setdiff(ret, "group")
+        if (!feat)
+            ret <- setdiff(ret, featn)
+    }
+    else if (feat)
+        ret <- featn
+    if (scores && totScore)
+        ret <- c(ret, "totalScore")
+    return(ret)
+})
+
 #' @describeIn featureGroups Accessor for \code{annotations} slot.
 #' @export
 setMethod("annotations", "featureGroups", function(obj) obj@annotations)
@@ -752,42 +777,51 @@ setMethod("overlap", "featureGroups", function(fGroups, which, exclusive)
 
 #' @describeIn featureGroups Calculates peak and group qualities for all features and feature groups. The peak qualities
 #'   (and scores) are calculated with the \link[=calculatePeakQualities,features-method]{features method of this
-#'   function}, and subsequently averaged per feature group. Then, \pkg{MetaClean} is used to calculate the
-#'   \verb{Elution Shift} and \verb{Retention Time Consistency} group quality metrics (see the \pkg{MetaClean}
-#'   publication cited below for more details). Similarly to the \code{\link{features}} method, these metrics are scored
-#'   by normalizing qualities among all groups and scaling them from \samp{0} (worst) to \samp{1} (best). The
+#'   function}, and subsequently averaged per feature group. Group metrics are then calculated and scored and
+#'   scaled by normalizing qualities among all groups and scaling them from \samp{0} (worst) to \samp{1} (best). The
 #'   \verb{totalScore} for each group is then calculated as the weighted sum from all feature (group) scores. The
 #'   \code{\link{getMCTrainData}} and \code{\link{predictCheckFeaturesSession}} functions can be used to train and apply
 #'   Pass/Fail ML models from \pkg{MetaClean}.
 #'
 #' @inheritParams calculatePeakQualities,features-method
+#' @param featureGroupQualities Analogous to \code{featureQualities} for feature groups metrics. See the
+#'   \code{\link[=feature-quality]{featureGroupQualities}} function for more details.
 #' @param avgFunc The function used to average the peak qualities and scores for each feature group.
 #'
 #' @template parallel-arg
-#' 
+#'
 #' @references \insertRef{Chetnik2020}{patRoon}
 #'
 #' @return \code{calculatePeakQualities} returns a modified object amended with peak qualities and scores.
 #'
 #' @export
-setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flatnessFactor, avgFunc = mean,
+setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flatnessFactor, featureQualities = NULL,
+                                                              featureGroupQualities = NULL, avgFunc = mean,
                                                               parallel = TRUE)
 {
     checkPackage("MetaClean")
     
-    allScores <- featureQualityNames(scores = TRUE, totScore = FALSE)
-    
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertNumeric(weights, finite = TRUE, any.missing = FALSE, min.len = 1, names = "unique",
-                             null.ok = TRUE, add = ac)
-    if (!is.null(weights))
-        checkmate::assertNames(names(weights), subset.of = allScores, add = ac)
+    assertFeatureQualities(featureQualities, null.ok = TRUE, add = ac)
+    assertFeatureQualities(featureGroupQualities, null.ok = TRUE, add = ac)
     checkmate::assertNumber(flatnessFactor, add = ac)
     checkmate::assertFunction(avgFunc, add = ac)
     checkmate::assertFlag(parallel, add = ac)
     checkmate::reportAssertions(ac)
+
+    featQualities <- if (!is.list(featureQualities)) featureQualities(featureQualities) else featureQualities
+    fgQualities <- if (!is.list(featureGroupQualities)) featureGroupQualities(featureGroupQualities) else featureGroupQualities
+    featQualityNames <- names(featQualities)
+    featScoreNames <- paste0(featQualityNames, "Score")
+    fgQualityNames <- names(fgQualities)
+    fgScoreNames <- paste0(fgQualityNames, "Score")
+    allScores <- c(featScoreNames, fgScoreNames)
     
-    hash <- makeHash(obj, weights, flatnessFactor, avgFunc)
+    checkmate::assertNumeric(weights, finite = TRUE, any.missing = FALSE, min.len = 1, names = "unique", null.ok = TRUE)
+    if (!is.null(weights))
+        checkmate::assertNames(names(weights), subset.of = allScores)
+    
+    hash <- makeHash(obj, weights, flatnessFactor, featQualities, fgQualities, avgFunc)
     cd <- loadCacheData("calculatePeakQualities", hash)
     if (!is.null(cd))
         return(cd)
@@ -801,17 +835,16 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flat
         weights <- weights[allScores]
     }
     
-    fs <- featureQualityNames(group = FALSE, scores = TRUE, totScore = FALSE)
+    fs <- featScoreNames
     w <- if (!is.null(weights) && any(names(weights) %in% fs)) weights[names(weights) %in% fs] else NULL
     obj@features <- calculatePeakQualities(getFeatures(obj), weights = w, flatnessFactor = flatnessFactor,
-                                           parallel = parallel)
+                                           featureQualities = featureQualities, parallel = parallel)
     
     ftind <- groupFeatIndex(obj)
     anas <- analyses(obj)
     gNames <- names(obj)
     gCount <- length(obj)
     EICs <- getEICsForFGroups(obj, EICParams = getDefEICParams(rtWindow = 0))
-    fgQualities <- featureGroupQualities()
     
     printf("Calculating group peak qualities and scores...\n")
     prog <- openProgBar(0, gCount)
@@ -822,8 +855,7 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flat
         doAna <- anas[featInds != 0]
         featInds <- featInds[featInds != 0]
         fList <- rbindlist(Map(doAna, featInds, f = function(ana, row) obj@features[[ana]][row]))
-        featAvgs <- sapply(c(featureQualityNames(group = FALSE),
-                             featureQualityNames(group = FALSE, scores = TRUE, totScore = FALSE)), function(q)
+        featAvgs <- sapply(c(featQualityNames, featScoreNames), function(q)
         {
             if (all(is.na(fList[[q]])))
                 return(NA_real_)
@@ -841,12 +873,18 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flat
         return(c(featAvgs, gq))
     }, simplify = FALSE), idcol = "group")
     
-    groupQualitiesScores[, (featureQualityNames(feat = FALSE, scores = TRUE, totScore = FALSE)) :=
+    groupQualitiesScores[, (fgScoreNames) :=
                              Map(scoreFeatQuality, fgQualities, .SD),
-                         .SDcols = featureQualityNames(feat = FALSE)]
+                         .SDcols = fgQualityNames]
     
-    obj@groupQualities <- groupQualitiesScores[, c("group", featureQualityNames()), with = FALSE]
+    # Create names for group and feature qualities combined
+    allQualityNames <- c(featQualityNames, fgQualityNames)
+    
+    obj@groupQualities <- groupQualitiesScores[, c("group", allQualityNames), with = FALSE]
     obj@groupScores <- groupQualitiesScores[, c("group", allScores), with = FALSE]
+    
+    # Store the feature quality names in the features object
+    obj@features@featureQualityNames <- featQualityNames
     
     if (is.null(weights))
         obj@groupScores[, totalScore := rowSums(.SD, na.rm = TRUE), .SDcols = allScores][]

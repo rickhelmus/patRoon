@@ -22,6 +22,7 @@
 \alias{filter}
 \alias{getBPCs}
 \alias{getFeatures}
+\alias{getFeatureQualityNames}
 \alias{getMCS}
 \alias{getTICs}
 \alias{groupNames}
@@ -73,7 +74,14 @@ annotatedPeakList(obj, ...)
 
 annotations(obj, ...)
 
-calculatePeakQualities(obj, weights = NULL, flatnessFactor = 0.05, ...)
+calculatePeakQualities(
+  obj,
+  weights = NULL,
+  flatnessFactor = 0.05,
+  featureQualities = NULL,
+  featureGroupQualities = NULL,
+  ...
+)
 
 clusterProperties(obj)
 
@@ -98,6 +106,8 @@ filter(obj, ...)
 getBPCs(obj, ...)
 
 getFeatures(obj)
+
+getFeatureQualityNames(obj, ...)
 
 getMCS(obj, ...)
 
@@ -163,7 +173,7 @@ for details.}
 
 \item{value}{The replacement value.}
 
-\item{weights, flatnessFactor}{See method documentation.}
+\item{weights, flatnessFactor, featureQualities, featureGroupQualities}{See method documentation.}
 
 \item{TPs}{The \code{\link{transformationProducts}} derived object.}
 
@@ -312,6 +322,12 @@ please refer to the linked method documentation for each generic.
 
 \itemize{
     \item Methods are defined for: \code{\link[=getFeatures,featureGroups-method]{featureGroups}}.
+}
+
+\code{getFeatureQualityNames} returns the object's feature quality names.
+
+\itemize{
+    \item Methods are defined for: \code{\link[=getFeatureQualityNames,featureGroups-method]{featureGroups}}; \code{\link[=getFeatureQualityNames,features-method]{features}}.
 }
 
 \code{getMCS} Calculates the maximum common substructure.

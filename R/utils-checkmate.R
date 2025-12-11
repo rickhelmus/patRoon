@@ -773,6 +773,36 @@ checkQuantEluent <- function(x, fGroups)
 }
 assertQuantEluent <- checkmate::makeAssertionFunction(checkQuantEluent)
 
+assertFeatureQualities <- function(x, null.ok = FALSE, .var.name = checkmate::vname(x), add = NULL)
+{
+    if (null.ok && is.null(x))
+        return(invisible())
+    
+    checkmate::assert(
+        checkmate::checkCharacter(x, min.chars = 1, any.missing = FALSE),
+        checkmate::checkList(x, any.missing = FALSE, names = "unique", min.len = 1),
+        .var.name = .var.name, add = add
+    )
+    
+    if (is.list(x))
+    {
+        checkmate::qassertr(x, "l", .var.name = .var.name)
+        
+        for (qn in names(x))
+        {
+            qnvn <- sprintf("%s[['%s']]", .var.name, qn)
+            assertListVal(x[[qn]], "func", checkmate::assertFunction, .var.name = qnvn, add = add)
+            assertListVal(x[[qn]], "HQ", checkmate::assertChoice, choices = c("HV", "LV"), .var.name = qnvn, add = add)
+            if (length(x[[qn]]$range) != 1 || !is.infinite(x[[qn]]$range))
+            {
+                assertListVal(x[[qn]], "range", checkmate::assertNumeric, any.missing = FALSE, len = 2, lower = -Inf,
+                              upper = Inf, .var.name = qnvn, add = add)
+            }
+        }
+    }
+}
+
+
 # from https://github.com/mllg/checkmate/issues/115
 aapply = function(fun, formula, ..., fixed = list())
 {

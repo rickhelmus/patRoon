@@ -11,6 +11,7 @@
 \alias{show,features-method}
 \alias{featureTable,features-method}
 \alias{analysisInfo,features-method}
+\alias{getFeatureQualityNames,features-method}
 \alias{analyses,features-method}
 \alias{replicateGroups,features-method}
 \alias{as.data.table,features-method}
@@ -63,6 +64,8 @@
 
 \S4method{analysisInfo}{features}(obj)
 
+\S4method{getFeatureQualityNames}{features}(obj, scores = FALSE, totScore = TRUE)
+
 \S4method{analyses}{features}(obj)
 
 \S4method{replicateGroups}{features}(obj)
@@ -89,7 +92,13 @@
 
 \S4method{delete}{features}(obj, i = NULL, j = NULL, ...)
 
-\S4method{calculatePeakQualities}{features}(obj, weights, flatnessFactor, parallel = TRUE)
+\S4method{calculatePeakQualities}{features}(
+  obj,
+  weights,
+  flatnessFactor,
+  featureQualities = NULL,
+  parallel = TRUE
+)
 
 \S4method{getTICs}{features}(obj, retentionRange = NULL, MSLevel = 1)
 
@@ -142,6 +151,10 @@
 \arguments{
 \item{obj, x, object}{\code{features} object to be accessed}
 
+\item{scores}{If \code{TRUE} the score names are returned, otherwise the quality names.}
+
+\item{totScore}{If \code{TRUE} (and \code{scores=TRUE}) then the name of the total score is included.}
+
 \item{absMinIntensity, relMinIntensity}{Minimum absolute/relative intensity for features to be kept. The relative
 intensity is determined from the feature with highest intensity (within the same analysis). Set to \samp{0} or \code{NULL} to skip this step.}
 
@@ -152,7 +165,7 @@ values. The maximum can be \code{Inf} to specify no maximum range. Set to \code{
 
 \item{qualityRange}{Used to filter features by their peak qualities/scores
 (see \code{\link{calculatePeakQualities}}). Should be a named \code{list} with min/max ranges for each
-quality/score to be filtered (the \code{\link{featureQualityNames}} function can be used to obtain valid names).
+quality/score to be filtered (the \code{\link{getFeatureQualityNames}} function can be used to obtain valid names).
 Example: \code{qualityRange=list(ModalityScore=c(0.3, Inf),
 SymmetryScore=c(0.5, Inf))}. Set to \code{NULL} to ignore.}
 
@@ -182,6 +195,11 @@ Example: \code{weights=c(ApexBoundaryRatioScore=0.5, GaussianSimilarityScore=2)}
 
 \item{flatnessFactor}{Passed to \pkg{MetaClean} as the \code{flatness.factor} argument to
 \code{\link[MetaClean]{calculateJaggedness}} and \code{\link[MetaClean]{calculateModality}}.}
+
+\item{featureQualities}{Specifies which feature qualities to calculate. Can be \code{NULL} (default, calculates all
+qualities), a \code{character} vector with names of qualities to calculate (e.g., \code{c("FWHM2Base",
+"Symmetry")}), or a \code{list} of custom quality definitions. See the
+\code{\link[=feature-quality]{featureQualities}} function for more details.}
 
 \item{parallel}{If set to \code{TRUE} then code is executed in parallel through the \CRANpkg{futures} package. Please
 see the parallelization section in the handbook for more details.}
@@ -237,6 +255,8 @@ analyses. The class is \code{virtual} and derived objects are created by 'featur
 
 \item \code{analysisInfo(features)}: Get analysis information
 
+\item \code{getFeatureQualityNames(features)}: Returns the present chromatographic peak quality and score names for features.
+
 \item \code{analyses(features)}: returns a \code{character} vector with the names of the
 analyses for which data is present in this object.
 
@@ -259,14 +279,11 @@ amounts of features.
 
 \item \code{delete(features)}: Completely deletes specified features.
 
-\item \code{calculatePeakQualities(features)}: Calculates peak qualities for each feature. This uses
-\href{https://github.com/KelseyChetnik/MetaClean/}{MetaClean} \R package to calculate the following metrics:
-\verb{Apex-Boundary Ratio}, \verb{FWHM2Base}, \verb{Jaggedness}, \verb{Modality}, \verb{Symmetry}, \verb{Gaussian
-Similarity}, \verb{Sharpness}, \verb{Triangle Peak Area Similarity Ratio} and \verb{Zig-Zag index}. Please see the
-\pkg{MetaClean} publication (referenced below) for more details. For each metric, an additional score is calculated
-by normalizing all feature values (unless the quality metric definition has a fixed range) and scale from \samp{0}
-(worst) to \samp{1} (best). Then, a \verb{totalScore} for each feature is calculated by the (weighted) sum of all
-score values.
+\item \code{calculatePeakQualities(features)}: Calculates peak qualities for each feature. Please see the
+\code{\link[=feature-quality]{featureQualities}} function and \pkg{MetaClean} publication (referenced below) for
+more details. For each metric, an additional score is calculated by normalizing all feature values (unless the
+quality metric definition has a fixed range) and scale from \samp{0} (worst) to \samp{1} (best). Then, a
+\verb{totalScore} for each feature is calculated by the (weighted) sum of all score values.
 
 \item \code{getTICs(features)}: Obtain the total ion chromatogram/s (TICs) of the analyses.
 
@@ -283,6 +300,9 @@ score values.
 \item{\code{features}}{List of features per analysis file. Use the \code{featureTable} method for access.}
 
 \item{\code{analysisInfo}}{Analysis group information. Use the \code{analysisInfo} method for access.}
+
+\item{\code{featureQualityNames}}{Character vector with the names of the chromatographic peak quality metrics that are
+present.}
 }}
 
 \note{

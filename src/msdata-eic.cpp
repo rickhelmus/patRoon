@@ -177,7 +177,7 @@ template <typename T> void smoothSummedFrameData(summedFrame<T> &data, unsigned 
     data.second = movingAverage(data.second, window);
 }
 
-template <typename T> std::pair<T, T> summedFrameProps(const summedFrame<T> &data, T start, T end)
+template <typename T> std::tuple<T, T, SpectrumRawTypes::Intensity> summedFrameProps(const summedFrame<T> &data, T start, T end)
 {
     T wm = 0.0, bp = 0.0;
     SpectrumRawTypes::Intensity totInten = 0, maxInten = 0;
@@ -203,8 +203,8 @@ template <typename T> std::pair<T, T> summedFrameProps(const summedFrame<T> &dat
     
     if (totInten > 0)
         wm /= totInten;
-    
-    return std::make_pair(wm, bp);
+
+    return std::make_tuple(wm, bp, maxInten);
 }
 
 template<typename T> Rcpp::List convertEICProfilesToR(const T &profiles, const char *name)
@@ -251,9 +251,10 @@ void EIC::setSummedFrameMZ()
         smoothSummedFrameData(summedMZFrame, smoothWindowMZ, mzStart - smoothExtMZ, mzEnd + smoothExtMZ, true);
     const auto propsMZ = summedFrameProps(summedMZFrame, mzStart, mzEnd);
 #ifdef LOG_EIC
-    Rcpp::Rcout << "  EIC mz props: " << propsMZ.first << "/" << propsMZ.second << std::endl;
+    Rcpp::Rcout << "  EIC mz props: " << std::get<0>(propsMZ) << "/" << std::get<1>(propsMZ) << std::endl;
 #endif
-    mzs[updateSumMZIndex] = propsMZ.first; mzsBP[updateSumMZIndex] = propsMZ.second;
+    mzs[updateSumMZIndex] = std::get<0>(propsMZ); mzsBP[updateSumMZIndex] = std::get<1>(propsMZ);
+    intensitiesBP[updateSumMZIndex] = std::get<2>(propsMZ);
     if (saveMZProfiles)
         mzProfiles[updateSumMZIndex] = std::move(summedMZFrame);
     
@@ -285,9 +286,10 @@ void EIC::setSummedFrameMob()
         smoothSummedFrameData(summedMobFrame, smoothWindowMob, mobStart - smoothExtMob, mobEnd + smoothExtMob, false);
     const auto propsMob = summedFrameProps(summedMobFrame, mobStart, mobEnd);
 #ifdef LOG_EIC
-    Rcpp::Rcout << "  EIC mob props: " << propsMob.first << "/" << propsMob.second << std::endl;
+    Rcpp::Rcout << "  EIC mob props: " << std::get<0>(propsMob) << "/" << std::get<1>(propsMob) << std::endl;
 #endif
-    mobilities[updateSumMobIndex] = propsMob.first; mobilitiesBP[updateSumMobIndex] = propsMob.second;
+    mobilities[updateSumMobIndex] = std::get<0>(propsMob); mobilitiesBP[updateSumMobIndex] = std::get<1>(propsMob);
+    intensitiesBPMob[updateSumMobIndex] = std::get<2>(propsMob);
     if (saveEIMs)
         EIMs[updateSumMobIndex] = std::move(summedMobFrame);
     
@@ -317,6 +319,7 @@ void EIC::commitPoints(SpectrumRawTypes::Scan curScanInd)
     intensities.push_back(curPoint.intensity);
     if (mode == EICMode::FULL || mode == EICMode::FULL_MZ)
     {
+        intensitiesBP.push_back(curPoint.intensityBP);
         mzMins.push_back(curPoint.mzMin);
         mzMaxs.push_back(curPoint.mzMax);
         // NOTE: for IMS data below will be overwritten later by setSummedFrameMZ()
@@ -331,6 +334,7 @@ void EIC::commitPoints(SpectrumRawTypes::Scan curScanInd)
         mobMaxs.push_back(curPoint.mobMax);
         // will be set by updateFrameSummer()
         mobilities.push_back(0);
+        intensitiesBPMob.push_back(0);
         mobilitiesBP.push_back(0);
         if (saveEIMs)
             EIMs.emplace_back(std::make_pair(std::vector<SpectrumRawTypes::Mobility>(), std::vector<SpectrumRawTypes::Intensity>()));
@@ -917,37 +921,41 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         }
         else if (eicMode == EICMode::FULL && anySpecHasMob)
         {
-            auto mat = Rcpp::NumericMatrix(eic.size(), 10);
+            auto mat = Rcpp::NumericMatrix(eic.size(), 12);
             for (size_t i=0; i<eic.size(); ++i)
             {
                 mat(i, 0) = specMeta.first.times[eic.getScanIndices()[i]];
                 mat(i, 1) = eic.getIntensities()[i];
-                mat(i, 2) = eic.getMZs()[i];
-                mat(i, 3) = eic.getMZsBP()[i];
-                mat(i, 4) = eic.getMZMins()[i];
-                mat(i, 5) = eic.getMZMaxs()[i];
-                mat(i, 6) = eic.getMobilities()[i];
-                mat(i, 7) = eic.getMobMins()[i];
-                mat(i, 8) = eic.getMobMaxs()[i];
-                mat(i, 9) = eic.getMobilitiesBP()[i];
+                mat(i, 2) = eic.getIntensitiesBP()[i];
+                mat(i, 3) = eic.getIntensitiesBPMob()[i];
+                mat(i, 4) = eic.getMZs()[i];
+                mat(i, 5) = eic.getMZsBP()[i];
+                mat(i, 6) = eic.getMZMins()[i];
+                mat(i, 7) = eic.getMZMaxs()[i];
+                mat(i, 8) = eic.getMobilities()[i];
+                mat(i, 9) = eic.getMobMins()[i];
+                mat(i, 10) = eic.getMobMaxs()[i];
+                mat(i, 11) = eic.getMobilitiesBP()[i];
             }
-            Rcpp::colnames(mat) = Rcpp::CharacterVector::create("time", "intensity", "mz", "mzBP", "mzmin", "mzmax",
-                           "mobility", "mobmin", "mobmax", "mobilityBP");
+            Rcpp::colnames(mat) = Rcpp::CharacterVector::create("time", "intensity", "intensityBP", "intensityBPMob",
+                                                                "mz", "mzBP", "mzmin", "mzmax", "mobility", "mobmin",
+                                                                "mobmax", "mobilityBP");
             ret[i] = mat;
         }
         else if (eicMode == EICMode::FULL || eicMode == EICMode::FULL_MZ)
         {
-            auto mat = Rcpp::NumericMatrix(eic.size(), 6);
+            auto mat = Rcpp::NumericMatrix(eic.size(), 7);
             for (size_t i=0; i<eic.size(); ++i)
             {
                 mat(i, 0) = specMeta.first.times[eic.getScanIndices()[i]];
                 mat(i, 1) = eic.getIntensities()[i];
-                mat(i, 2) = eic.getMZs()[i];
-                mat(i, 3) = eic.getMZsBP()[i];
-                mat(i, 4) = eic.getMZMins()[i];
-                mat(i, 5) = eic.getMZMaxs()[i];
+                mat(i, 2) = eic.getIntensitiesBP()[i];
+                mat(i, 3) = eic.getMZs()[i];
+                mat(i, 4) = eic.getMZsBP()[i];
+                mat(i, 5) = eic.getMZMins()[i];
+                mat(i, 6) = eic.getMZMaxs()[i];
             }
-            Rcpp::colnames(mat) = Rcpp::CharacterVector::create("time", "intensity", "mz", "mzBP", "mzmin", "mzmax");
+            Rcpp::colnames(mat) = Rcpp::CharacterVector::create("time", "intensity", "intensityBP", "mz", "mzBP", "mzmin", "mzmax");
             ret[i] = mat;
         }
         else // if (eicMode == EICMode::TEST)

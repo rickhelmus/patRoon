@@ -12,7 +12,7 @@
     - add NEWS
 - update patRoonInst/patRoonExt/patRoonData for new deps
     - install timsconvert and c3sdb in Docker and bundle
-        - Docker: right Python already installed, but install python3-venv python3-pip python3-dev
+        - Docker: finish WIP
         - Windows: for now don't bundle, but install in GHA for testing: https://docs.github.com/en/actions/tutorials/build-and-test-code/python
     - test new/updated patRoonExt deps
 - BUG: annSim.1 column (in formulas?)?

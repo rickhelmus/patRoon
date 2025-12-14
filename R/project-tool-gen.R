@@ -421,13 +421,13 @@ genScriptFeaturesBlock <- function(ionization, IMS, settingsFeat, generator)
         {
             mmz <- settingsFeat$piekParams$methodMZ; mims <- settingsFeat$piekParams$methodIMS
             def <- list(
-                bins = getPiekGenEICParams("bins", "bins"),
-                susp = getPiekGenEICParams("suspects", "suspects"),
-                ms2 = getPiekGenEICParams("ms2", "ms2")
+                bins = getPiekEICParams("bins", "bins"),
+                susp = getPiekEICParams("suspects", "suspects"),
+                ms2 = getPiekEICParams("ms2", "ms2")
             )
             
             doDirectIMS <- IMS$mode == "direct"
-            generator$addCall("genEICParams", "getPiekGenEICParams", list(
+            generator$addCall("genEICParams", "getPiekEICParams", list(
                 list(name = "methodMZ", value = mmz, quote = TRUE),
                 list(name = "methodIMS", value = mims, quote = TRUE, condition = doDirectIMS),
                 list(name = "mzRange", value = def$bins$mzRange, condition = mmz == "bins"),

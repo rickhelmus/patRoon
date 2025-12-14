@@ -147,7 +147,7 @@ setMethod("delete", "featuresPiek", function(obj, i = NULL, j = NULL, ...)
 #'   base peaks from the EIC data in the retention time range of the feature.
 #'
 #' @param genEICParams A \code{list} of parameters for the EIC generation. See the \verb{EIC formation parameters}
-#'   section below. The \code{getPiekGenEICParams} is used to generate the parameter list.
+#'   section below. The \code{getPiekEICParams} is used to generate the parameter list.
 #' @param peakParams A \code{list} of parameters for the peak detection. See \code{\link{getDefPeakParams}} for details.
 #' @param suspects A suspect list that needs to be specified if EICs are formed from suspect data. See
 #'   \link[=suspect-screening]{suspect screening} for details on the suspect list format.
@@ -167,7 +167,7 @@ setMethod("delete", "featuresPiek", function(obj, i = NULL, j = NULL, ...)
 #' @template minIntensityIMS-arg
 #'
 #' @section EIC formation parameters: The \code{genEICParams} argument to \code{findFeaturesPiek} configures the
-#'   formation of EICs. The \code{getPiekGenEICParams} function should be used to generate the parameter list.
+#'   formation of EICs. The \code{getPiekEICParams} function should be used to generate the parameter list.
 #'
 #'   The following general parameters exist: \itemize{
 #'
@@ -661,12 +661,12 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
 #' @param \dots Any additional parameters to be set in the returned parameter list. These will override the defaults.
 #'   See the \verb{EIC formation parameters} section for details.
 #'
-#' @return \code{getPiekGenEICParams} returns a \code{list} of parameters for the EIC generation, which is used to set
+#' @return \code{getPiekEICParams} returns a \code{list} of parameters for the EIC generation, which is used to set
 #'   the \code{genEICParams} argument to \code{findFeaturesPiek}.
 #'
 #' @rdname findFeaturesPiek
 #' @export
-getPiekGenEICParams <- function(methodMZ, methodIMS = NULL, ...)
+getPiekEICParams <- function(methodMZ, methodIMS = NULL, ...)
 {
     checkmate::assertChoice(methodMZ, c("bins", "suspects", "ms2"))
     checkmate::assertChoice(methodIMS, c("bins", "suspects", "ms2"), null.ok = TRUE)

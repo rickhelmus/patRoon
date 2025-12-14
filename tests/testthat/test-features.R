@@ -24,19 +24,19 @@ ffEP <- findFeatures(epAnaInfo, "envipick", minpeak = 25)
 
 getPiek <- \(genp, anaInfo, peakp = getDefPeakParams("chrom", "piek"), ...) findFeatures(anaInfo, "piek", genp, peakp, ...)
 getPiekHRMS <- \(genp, ...) getPiek(genp, anaInfoOne, ...)
-ffPiekBins <- getPiekHRMS(getPiekGenEICParams("bins", mzRange = c(200, 300)))
-ffPiekSusp <- getPiekHRMS(getPiekGenEICParams("suspects"), suspects = patRoonData::suspectsPos)
-ffPiekMS2 <- getPiekHRMS(getPiekGenEICParams("ms2"))
-ffPiekMS2OpenMS <- getPiekHRMS(getPiekGenEICParams("ms2"), getDefPeakParams("chrom", "openms"))
-ffPiekMS2XCMS3 <- getPiekHRMS(getPiekGenEICParams("ms2"), getDefPeakParams("chrom", "xcms3"))
-ffPiekMS2EP <- getPiekHRMS(getPiekGenEICParams("ms2"), getDefPeakParams("chrom", "envipick"))
+ffPiekBins <- getPiekHRMS(getPiekEICParams("bins", mzRange = c(200, 300)))
+ffPiekSusp <- getPiekHRMS(getPiekEICParams("suspects"), suspects = patRoonData::suspectsPos)
+ffPiekMS2 <- getPiekHRMS(getPiekEICParams("ms2"))
+ffPiekMS2OpenMS <- getPiekHRMS(getPiekEICParams("ms2"), getDefPeakParams("chrom", "openms"))
+ffPiekMS2XCMS3 <- getPiekHRMS(getPiekEICParams("ms2"), getDefPeakParams("chrom", "xcms3"))
+ffPiekMS2EP <- getPiekHRMS(getPiekEICParams("ms2"), getDefPeakParams("chrom", "envipick"))
 
 anaInfoOneIMS <- getTestAnaInfoIMS()[4, ]
 getPiekIMS <- \(genp, ...) getPiek(genp, anaInfoOneIMS, ...)
-ffPiekBinsIMS <- getPiekIMS(getPiekGenEICParams("bins", "bins", mzRange = c(200, 300), mobRange = c(0.6, 0.8)))
-ffPiekSuspIMS <- getPiekIMS(getPiekGenEICParams("suspects", "suspects"), suspects = patRoonDataIMS::suspectsPos,
+ffPiekBinsIMS <- getPiekIMS(getPiekEICParams("bins", "bins", mzRange = c(200, 300), mobRange = c(0.6, 0.8)))
+ffPiekSuspIMS <- getPiekIMS(getPiekEICParams("suspects", "suspects"), suspects = patRoonDataIMS::suspectsPos,
                             adduct = "[M+H]+")
-ffPiekMS2IMS <- getPiekIMS(getPiekGenEICParams("ms2", "ms2"))
+ffPiekMS2IMS <- getPiekIMS(getPiekEICParams("ms2", "ms2"))
 
 ffOpenMSQ <- calculatePeakQualities(ffOpenMS)
 
@@ -110,9 +110,9 @@ test_that("piek", {
     
     expect_range(as.data.table(ffPiekBins)$mz, c(200, 300+0.02)) # +0.02: bin width
     expect_lte(length(ffPiekSusp), nrow(patRoonData::suspectsPos))
-    expect_gt(length(ffPiekMS2), length(getPiekHRMS(getPiekGenEICParams("ms2", minTIC = 1E5))))
+    expect_gt(length(ffPiekMS2), length(getPiekHRMS(getPiekEICParams("ms2", minTIC = 1E5))))
     expect_equal(ffPiekBins, withOpt(cache.mode="none",
-                                     getPiekHRMS(getPiekGenEICParams("bins", mzRange = c(200, 300)), EICBatchSize = 5E3)))
+                                     getPiekHRMS(getPiekEICParams("bins", mzRange = c(200, 300)), EICBatchSize = 5E3)))
     browser()
 
     expect_true(hasMobilities(ffPiekBinsIMS))
@@ -120,12 +120,12 @@ test_that("piek", {
     expect_range(as.data.table(ffPiekBinsIMS)$mz, c(200, 300+0.02))
     expect_range(as.data.table(ffPiekBinsIMS)$mobility, c(0.6, 0.8+0.04))
     expect_lte(length(ffPiekSuspIMS), nrow(patRoonData::suspectsPos))
-    expect_gt(length(ffPiekMS2IMS), length(getPiekIMS(getPiekGenEICParams("ms2", "ms2", minTIC = 1E5))))
+    expect_gt(length(ffPiekMS2IMS), length(getPiekIMS(getPiekEICParams("ms2", "ms2", minTIC = 1E5))))
     
-    expect_range(as.data.table(getPiekHRMS(getPiekGenEICParams("ms2", retRange = c(60, 120))))$ret, c(60, 120))
-    expect_lt(length(getPiekHRMS(getPiekGenEICParams("ms2", minEICIntensity = 1E5))), length(ffPiekMS2))
-    expect_lt(length(getPiekHRMS(getPiekGenEICParams("ms2", topMostEICMZ = 25))), length(ffPiekMS2))
-    expect_lte(max(getPiekHRMS(getPiekGenEICParams("ms2"), getDefPeakParams("chrom", "piek", forcePeakWidth = c(0, 10)))[[1]][, retmax - retmin]), 10)
+    expect_range(as.data.table(getPiekHRMS(getPiekEICParams("ms2", retRange = c(60, 120))))$ret, c(60, 120))
+    expect_lt(length(getPiekHRMS(getPiekEICParams("ms2", minEICIntensity = 1E5))), length(ffPiekMS2))
+    expect_lt(length(getPiekHRMS(getPiekEICParams("ms2", topMostEICMZ = 25))), length(ffPiekMS2))
+    expect_lte(max(getPiekHRMS(getPiekEICParams("ms2"), getDefPeakParams("chrom", "piek", forcePeakWidth = c(0, 10)))[[1]][, retmax - retmin]), 10)
 })
 
 test_that("verify empty object can be generated", {

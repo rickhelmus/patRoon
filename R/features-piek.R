@@ -679,7 +679,6 @@ getPiekGenEICParams <- function(methodMZ, methodIMS = NULL, ...)
     ret <- list(methodMZ = methodMZ, methodIMS = methodIMS, mzRange = c(80, 600), mzStep = 0.02, mobRange = c(0.5, 1.3),
                 mobStep = 0.04, retRange = NULL, gapFactor = 3, sumWindowMZ = defaultLim("retention", "very_narrow"),
                 sumWindowMob = defaultLim("retention", "very_narrow"), smoothWindowMZ = 0, smoothWindowMob = 0,
-                smoothExtMZ = defaultLim("mz", "wide"), smoothExtMob = defaultLim("mobility", "wide"),
                 saveMZProfiles = FALSE, saveEIMs = FALSE, minEICIntensity = 5000, minEICAdjTime = 5,
                 minEICAdjPoints = 5, minEICAdjIntensity = 250, topMostEICMZ = 10000, topMostEICMZMob = 10000,
                 minEICsIMSPreCheck = 50000)
@@ -714,5 +713,12 @@ getPiekGenEICParams <- function(methodMZ, methodIMS = NULL, ...)
         }
     }
     
-    return(modifyList(ret, list(...), keep.null = TRUE))
+    ret <- modifyList(ret, list(...), keep.null = TRUE)
+    
+    if (is.null(ret[["smoothExtMZ"]]))
+        ret$smoothExtMZ <- ret$mzStep
+    if (is.null(ret[["smoothExtMob"]]))
+        ret$smoothExtMob <- ret$mobStep
+    
+    return(ret)
 }

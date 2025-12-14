@@ -14,8 +14,8 @@
         type: compound
 3a:
     or:
-        - individualMoNAScore: 0.4
-        - libMatch: 0.4
+        - individualMoNAScore: 0.7
+        - libMatch: 0.7
 3b:
     suspectFragments: 3
 3c:

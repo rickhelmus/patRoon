@@ -1,7 +1,7 @@
 name,metfrag,sirius,database,suspect_list,default,description
 score,Score,score,,FALSE,TRUE,Overall score
 fragScore,FragmenterScore,,,FALSE,TRUE,In-silico MS/MS score
-metFusionScore,OfflineMetFusionScore,,,FALSE,TRUE,
+metFusionScore,OfflineMetFusionScore,,,FALSE,FALSE,
 individualMoNAScore,OfflineIndividualMoNAScore,,,FALSE,TRUE,
 numberPatents,PubChemNumberPatents,PubChemNumberPatents,pubchem,FALSE,TRUE,Not reported anymore by SIRIUS?
 numberPatents,Patent_Count,,pubchemlite,FALSE,TRUE,
@@ -62,7 +62,6 @@ toxicityInfo,ToxicityInfo,,pubchemlite,FALSE,FALSE,
 knownUse,KnownUse,,pubchemlite,FALSE,FALSE,
 disorderDisease,DisorderDisease,,pubchemlite,FALSE,FALSE,
 identification,Identification,,pubchemlite,FALSE,FALSE,
-annoTypeCount,FPSum,,pubchemlite,FALSE,TRUE,FPSum was renamed
 annoTypeCount,AnnoTypeCount,,pubchemlite,FALSE,TRUE,
 annotHitCount,AnnotHitCount,,pubchemlite,FALSE,TRUE,From OECD PFAS DB
 libMatch,,,,FALSE,TRUE,Spectral match with library

@@ -5,7 +5,7 @@
 #' @include features.R
 NULL
 
-getPiekEICsInfo <- function(params, withIMS, suspects, MS2Info, verbose)
+getPiekEICsInfo <- function(params, IMS, suspects, MS2Info, verbose)
 {
     # UNDONE: also support other binning approaches?
     binsMZ <- seq(params$mzRange[1], params$mzRange[2], by = params$mzStep * 0.5)
@@ -16,7 +16,7 @@ getPiekEICsInfo <- function(params, withIMS, suspects, MS2Info, verbose)
     if (nrow(EICInfo) == 0)
         stop("Cannot form EICs with the given m/z parameters (there are no bins)! Please check the m/z range and step size.", call. = FALSE)
     
-    if (withIMS)
+    if (IMS)
     {
         binsIMS <- seq(params$mobRange[1], params$mobRange[2], by = params$mobStep * 0.5)
         names(binsIMS) <- paste0("bin_I", binsIMS)
@@ -27,9 +27,9 @@ getPiekEICsInfo <- function(params, withIMS, suspects, MS2Info, verbose)
     else
         EICInfo[, c("mobmin", "mobmax") := 0]
     
-    if (params$methodMZ == "suspects")
+    if (params$filter == "suspects")
     {
-        if (withIMS && identical(params$methodIMS, "suspects"))
+        if (IMS && params$filterIMS == "suspects")
             EICInfo[, keep := filterEICBins(mzmin, params$mzStep, mobmin, params$mobStep,
                                             suspects$mz - params$mzWindow, suspects$mz + params$mzWindow,
                                             suspects$mobility - params$IMSWindow, suspects$mobility + params$IMSWindow)]
@@ -43,9 +43,9 @@ getPiekEICsInfo <- function(params, withIMS, suspects, MS2Info, verbose)
         }
         EICInfo <- EICInfo[keep == TRUE][, keep := NULL]
     }
-    else if (params$methodMZ == "ms2")
+    else if (params$filter == "ms2")
     {
-        if (withIMS && identical(params$methodIMS, "ms2"))
+        if (IMS && params$filterIMS ==  "ms2")
             EICInfo[, keep := filterEICBins(mzmin, params$mzStep, mobmin, params$mobStep, MS2Info$mzmin, MS2Info$mzmax,
                                             MS2Info$mobmin, MS2Info$mobmax)]
         else
@@ -171,24 +171,24 @@ setMethod("delete", "featuresPiek", function(obj, i = NULL, j = NULL, ...)
 #'
 #'   The following general parameters exist: \itemize{
 #'
-#'     \item \code{methodMZ} Sets how m/z data is used for the formation of EICs. Possible values are \code{"bins"} (use
+#'     \item \code{filter} Sets how m/z data is used for the formation of EICs. Possible values are \code{"bins"} (use
 #'     equally sized m/z bins), \code{"suspects"} (use the unique m/z values from a suspect list) and \code{"ms2"} (use
 #'     the m/z values from the precursors detected in a data-dependent MS/MS experiment).
 #'
-#'     \item \code{methodIMS} Equivalent as \code{methodMZ}, but for ion mobility data. If \code{NULL}, no IMS data will
+#'     \item \code{filterIMS} Equivalent as \code{filter}, but for ion mobility data. If \code{NULL}, no IMS data will
 #'     be used and no \link[=assignMobilities_feat]{direct mobility assignment} IMS workflow is initiated. Different
-#'     values for \code{methodMZ} and \code{methodIMS} can be specified to combine approaches. The following
+#'     values for \code{filter} and \code{filterIMS} can be specified to combine approaches. The following
 #'     combinations are supported: \itemize{
 #'
-#'       \item \code{methodMZ="bins"} and \code{methodIMS="bins"}
+#'       \item \code{filter="bins"} and \code{filterIMS="bins"}
 #'
-#'       \item \code{methodMZ="suspects"} and \code{methodIMS="suspects"}
+#'       \item \code{filter="suspects"} and \code{filterIMS="suspects"}
 #'
-#'       \item \code{methodMZ="suspects"} and \code{methodIMS="bins"}
+#'       \item \code{filter="suspects"} and \code{filterIMS="bins"}
 #'
-#'       \item \code{methodMZ="ms2"} and \code{methodIMS="ms2"}
+#'       \item \code{filter="ms2"} and \code{filterIMS="ms2"}
 #'
-#'       \item \code{methodMZ="ms2"} and \code{methodIMS="bins"}
+#'       \item \code{filter="ms2"} and \code{filterIMS="bins"}
 #'
 #'     }
 #'
@@ -222,14 +222,14 @@ setMethod("delete", "featuresPiek", function(obj, i = NULL, j = NULL, ...)
 #'     length two that specifies the min/max m/z range. \code{mzStep} specifies the bin widths.
 #'
 #'     \item \code{mobRange},\code{mobStep} Equivalent to above, but for ion mobility binning (\emph{i.e.} if
-#'     \code{methodIMS="bins"}).
+#'     \code{filterIMS="bins"}).
 #'
 #'   }
 #'
 #'   The following parameters are specifically for EICs from suspect data: \itemize{
 #'
 #'     \item \code{rtWindow},\code{mzwindow},\code{IMSWindow}: If retention times are present in the suspect list:
-#'     specify the retention time, m/z and mobility (if \code{methodIMS="suspects"}) tolerance window to match features
+#'     specify the retention time, m/z and mobility (if \code{filterIMS="suspects"}) tolerance window to match features
 #'     with suspects. This is done when eliminating features with deviating retention times. Set \code{rtWindow=Inf} to
 #'     disable this step.
 #'
@@ -250,7 +250,7 @@ setMethod("delete", "featuresPiek", function(obj, i = NULL, j = NULL, ...)
 #'     \code{rtWindow=Inf} to disable this filter. Defaults to \code{defaultLim("retention", "very_narrow")} (see
 #'     \link{limits}).
 #'
-#'     \item \code{mzWindow},\code{IMSWindow} The m/z and mobility (if \code{methodIMS="ms2"}) tolerance windows, used to \enumerate{
+#'     \item \code{mzWindow},\code{IMSWindow} The m/z and mobility (if \code{filterIMS="ms2"}) tolerance windows, used to \enumerate{
 #'
 #'       \item match features to MS/MS spectrum retention times (see \code{rtWindow}).
 #'
@@ -282,7 +282,7 @@ setMethod("delete", "featuresPiek", function(obj, i = NULL, j = NULL, ...)
 #'   \link[=cluster-params]{clustering parameters}).
 #'
 #'   In IMS workflows a 'pre-check' is formed to reduce the number of EICs that should be subjected to peak detection.
-#'   This is especially important when both \code{methodMZ} and \code{methodIMS} are set to \code{"bins"}, as this may
+#'   This is especially important when both \code{filter} and \code{filterIMS} are set to \code{"bins"}, as this may
 #'   lead to millions of EIC bins in total. During the pre-check EICs are formed by only considering the m/z dimension,
 #'   and these are subsequently filtered by parameters described in the previous section. The final EICs for feature
 #'   detection are then only formed if they have m/z data that was not removed during the pre-check.
@@ -301,13 +301,12 @@ setMethod("delete", "featuresPiek", function(obj, i = NULL, j = NULL, ...)
 #' @inherit findFeatures return
 #'
 #' @export
-findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = NULL, adduct = NULL,
+findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = NULL, adduct = NULL, IMS = FALSE,
                              assignMethod = "basepeak", assignAggr = "weighted.mean", minIntensityIMS = 25,
                              prefDupIntensityRatio = 0.5, assignRTWindow = defaultLim("retention", "very_narrow"),
                              EICBatchSize = Inf, verbose = TRUE)
 {
     # UNDONE: add refs to docs, and highlight changes
-    # UNDONE: use BP intensity?
     # UNDONE: test empties, eg no EICs
     
     if (!is.null(adduct))
@@ -317,9 +316,10 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, add = ac)
     assertPiekGenEICParams(genEICParams, add = ac)
     assertFindPeakParams(peakParams, add = ac)
-    if (genEICParams$methodMZ == "suspects")
+    if (genEICParams$filter == "suspects")
         assertSuspectList(suspects, needsAdduct = is.null(adduct), skipInvalid = genEICParams$skipInvalid, null.ok = FALSE,
                           add = ac)
+    checkmate::assertFlag(IMS, add = ac)
     checkmate::assertChoice(assignMethod, c("basepeak", "weighted.mean"), add = ac)
     checkmate::assertChoice(assignAggr, c("max", "weighted.mean"), add = ac)
     aapply(checkmate::assertNumber, . ~ minIntensityIMS + prefDupIntensityRatio + assignRTWindow, lower = 0,
@@ -330,7 +330,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
     
     maybePrintf <- \(...) if (verbose) printf(...)
     
-    if (genEICParams$methodMZ == "suspects")
+    if (genEICParams$filter == "suspects")
     {
         if (nrow(suspects) == 0)
             stop("The suspect list empty.", call. = FALSE)
@@ -345,7 +345,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
                             length(whNotInRange), paste0(whNotInRange, collapse = ", ")),
                     call. = FALSE)
         
-        if (identical(genEICParams$methodIMS, "suspects"))
+        if (genEICParams$filterIMS == "suspects")
         {
             suspects[, mobility_susp := selectFromSuspAdductCol(suspects, "mobility", if (!is.null(adduct)) as.character(adduct))]
             whMissing <- which(is.na(suspects$mobility_susp))
@@ -377,12 +377,10 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
     if (is.null(genEICParams[["retRange"]]))
         genEICParams$retRange <- c(0, 0)
     
-    withIMS <- !is.null(genEICParams[["methodIMS"]])
-    
     cacheDB <- openCacheDBScope()
     baseHash <- makeHash(genEICParams, peakParams, suspects, adduct, assignMethod, assignAggr, minIntensityIMS,
                          prefDupIntensityRatio, assignRTWindow)
-    anaHashes <- getMSFileHashesFromAvailBackend(analysisInfo, needIMS = withIMS)
+    anaHashes <- getMSFileHashesFromAvailBackend(analysisInfo, needIMS = IMS)
     anaHashes <- sapply(anaHashes, makeHash, baseHash)
     cachedData <- pruneList(loadCacheData("featuresPiek", anaHashes, simplify = FALSE, dbArg = cacheDB))
     if (length(cachedData) > 0)
@@ -456,16 +454,16 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
     EIMs <- list()
     if (nrow(anaInfoTBD) > 0)
     {
-        fList <- applyMSData(anaInfoTBD, needIMS = withIMS, showProgress = FALSE, func = function(ana, path, backend)
+        fList <- applyMSData(anaInfoTBD, needIMS = IMS, showProgress = FALSE, func = function(ana, path, backend)
         {
             maybePrintf("\n-------\nFinding features for '%s'...\n", ana)
             
             openMSReadBackend(backend, path)
          
             MS2Info <- NULL
-            if (genEICParams$methodMZ == "ms2")
+            if (genEICParams$filter == "ms2")
             {
-                MS2Info <- if (withIMS)
+                MS2Info <- if (IMS)
                     setDT(getIMSIsolationInfo(backend))
                 else
                     setDT(getMSMetadata(backend, 2))
@@ -485,7 +483,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
             
             EICs <- EICInfo <- NULL
             EICInfoMZ <- getPiekEICsInfo(genEICParams, FALSE, suspects, MS2Info, verbose)
-            EICInfo <- if (withIMS)
+            EICInfo <- if (IMS)
             {
                 EICInfoMob <- getPiekEICsInfo(genEICParams, TRUE, suspects, MS2Info, verbose)
                 
@@ -520,7 +518,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
                 if (length(EICInfoSplit) > 1)
                     maybePrintf("Processing batch %d/%d...\n", batch, length(EICInfoSplit))
                 
-                EICs <- if (withIMS)
+                EICs <- if (IMS)
                 {
                     maybePrintf("Loading %d m/z+mobility EICs... ", nrow(EICInfoBatch))
                     getEICsAna(backend, EICInfoBatch, "full", genEICParams$topMostEICMZMob)
@@ -535,7 +533,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
                 EICInfoBatch <- EICInfoBatch[EIC_ID %chin% names(EICs)] # omit missing
                 
                 maybePrintf("Finding peaks in remaining %d EICs... ", length(EICs))
-                peaks <- findPeaksInEICs(EICs, peakParams, withMobility = withIMS, calcStats = TRUE,
+                peaks <- findPeaksInEICs(EICs, peakParams, withMobility = IMS, calcStats = TRUE,
                                          assignRTWindow = assignRTWindow,
                                          sumWindowMZ = if (backend$getHaveIMS()) genEICParams$sumWindowMZ else 0,
                                          sumWindowMob = if (backend$getHaveIMS()) genEICParams$sumWindowMob else 0,
@@ -543,14 +541,14 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
                 maybePrintf("Done! Found %d peaks.\n", nrow(peaks))
                 
                 peaks <- assignMZOrMobsToPeaks(peaks, EICInfoBatch, "mz")
-                if (withIMS)
+                if (IMS)
                     peaks <- assignMZOrMobsToPeaks(peaks, EICInfoBatch, "mobility")
 
                 # UNDONE: for now limit to peaks with centered m/zs and mobilities. Later either:
                 # 1. keep doing this --> update findFeatTableDups() to not bother with centered checks, remove prefDupIntensityRatio
                 # 2. make this optional
                 peaks <- peaks[mzCentered == TRUE]
-                if (withIMS)
+                if (IMS)
                     peaks <- peaks[mobilityCentered == TRUE]
                 
                 mzProfs <- if (genEICParams$saveMZProfiles)
@@ -563,18 +561,18 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
             
             peaks <- rbindlist(lapply(peaksRes, `[[`, "peaks"), fill = TRUE) # NOTE: need to fill for empties
             dups <- findFeatTableDups(peaks$ret, peaks$retmin, peaks$retmax,  peaks$mz,
-                                      if (withIMS) peaks$mobility else numeric(),
+                                      if (IMS) peaks$mobility else numeric(),
                                       peaks$intensity, defaultLim("retention", "narrow"),
                                       defaultLim("mz", "medium"), defaultLim("mobility", "medium"),
-                                      peaks$mzCentered, if (withIMS) peaks$mobilityCentered else numeric(),
+                                      peaks$mzCentered, if (IMS) peaks$mobilityCentered else numeric(),
                                       prefDupIntensityRatio)
             peaks <- peaks[!dups]
             
-            if (genEICParams$methodMZ == "suspects")
+            if (genEICParams$filter == "suspects")
             {
                 # only keep peaks that match with a suspect
                 checkRT <- is.finite(genEICParams$rtWindow) && !is.null(suspects[["rt"]])
-                checkMob <- identical(genEICParams[["methodIMS"]], "suspects") && !is.null(suspects[["mobility"]])
+                checkMob <- IMS && genEICParams$filterIMS == "suspects" && !is.null(suspects[["mobility"]])
                 keep <- filterPiekResults(peaks$ret, peaks$mz, if (checkMob) peaks$mobility else numeric(),
                                           if (checkRT) suspects$rt else numeric(), suspects$mz - genEICParams$mzWindow,
                                           suspects$mz + genEICParams$mzWindow,
@@ -583,9 +581,9 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
                                           genEICParams$rtWindow)
                 peaks <- peaks[keep == TRUE]
             }
-            else if (genEICParams$methodMZ %in% "ms2" && is.finite(genEICParams$rtWindow))
+            else if (genEICParams$filter == "ms2" && is.finite(genEICParams$rtWindow))
             {
-                checkMob <- identical(genEICParams[["methodIMS"]], "ms2")
+                checkMob <- IMS && genEICParams$filterIMS == "ms2"
                 mobCheckMin <- mobCheckMax <- numeric()
                 if (checkMob)
                 {
@@ -611,7 +609,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
                 EIMs[[ana]] <<- Reduce(c, lapply(peaksRes, `[[`, "EIMs"))[peaks$ID]
             
             peaks[, EIC_ID := NULL][]
-            if (withIMS)
+            if (IMS)
                 peaks[, ims_parent_ID := NA_character_]
             
             return(peaks)
@@ -652,12 +650,10 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
         printFeatStats(fList)
     }
     
-    return(featuresPiek(analysisInfo = analysisInfo, features = fList, hasMobilities = withIMS, mzProfiles = mzProfiles,
+    return(featuresPiek(analysisInfo = analysisInfo, features = fList, hasMobilities = IMS, mzProfiles = mzProfiles,
                         EIMs = EIMs))
 }
 
-#' @param methodMZ,methodIMS Sets the \code{methodMZ} and \code{methodIMS} parameters for the EIC generation. See the
-#'   \verb{EIC formation parameters} section for details.
 #' @param \dots Any additional parameters to be set in the returned parameter list. These will override the defaults.
 #'   See the \verb{EIC formation parameters} section for details.
 #'
@@ -666,59 +662,48 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
 #'
 #' @rdname findFeaturesPiek
 #' @export
-getPiekEICParams <- function(methodMZ, methodIMS = NULL, ...)
+getPiekEICParams <- function(...)
 {
-    checkmate::assertChoice(methodMZ, c("bins", "suspects", "ms2"))
-    checkmate::assertChoice(methodIMS, c("bins", "suspects", "ms2"), null.ok = TRUE)
-    
-    if (methodMZ != "suspects" && identical(methodIMS, "suspects"))
-        stop("methodIMS can only be 'suspects' if methodMZ is also set to 'suspects'", call. = FALSE)
-    if (methodMZ != "ms2" && identical(methodIMS, "ms2"))
-        stop("methodIMS can only be 'ms2' if methodMZ is also set to 'ms2'", call. = FALSE)
-    
-    ret <- list(methodMZ = methodMZ, methodIMS = methodIMS, mzRange = c(80, 600), mzStep = 0.02, mobRange = c(0.5, 1.3),
+    ret <- list(filter = "none", filterIMS = "none", mzRange = c(80, 600), mzStep = 0.02, mobRange = c(0.5, 1.3),
                 mobStep = 0.04, retRange = NULL, gapFactor = 3, sumWindowMZ = defaultLim("retention", "very_narrow"),
                 sumWindowMob = defaultLim("retention", "very_narrow"), smoothWindowMZ = 0, smoothWindowMob = 0,
                 saveMZProfiles = FALSE, saveEIMs = FALSE, minEICIntensity = 5000, minEICAdjTime = 5,
                 minEICAdjPoints = 5, minEICAdjIntensity = 250, topMostEICMZ = 10000, topMostEICMZMob = 10000,
                 minEICsIMSPreCheck = 50000)
     
-    if (methodMZ == "suspects")
-    {
-        ret <- modifyList(ret, list(
-            rtWindow = defaultLim("retention", "medium"),
-            mzWindow = defaultLim("mz", "medium"),
-            # UNDONE these to separate param and also use elsewhere?
-            skipInvalid = TRUE,
-            prefCalcChemProps = TRUE,
-            neutralChemProps = FALSE
-        ))
-    }
-    else if (methodMZ == "ms2")
-    {
-        ret <- modifyList(ret, list(
-            rtWindow = defaultLim("retention", "very_narrow"),
-            mzIsoWindow = 1,
-            minTIC = 10000
-        ))
-    }
-    
-    if (!is.null(methodIMS))
-    {
-        if (methodIMS %in% c("suspects", "ms2"))
-        {
-            ret <- modifyList(ret, list(
-                IMSWindow = defaultLim("mobility", "medium")
-            ))
-        }
-    }
-    
     ret <- modifyList(ret, list(...), keep.null = TRUE)
     
-    if (is.null(ret[["smoothExtMZ"]]))
-        ret$smoothExtMZ <- ret$mzStep
-    if (is.null(ret[["smoothExtMob"]]))
-        ret$smoothExtMob <- ret$mobStep
+    maybeSetDefault <- function(param, default)
+    {
+        if (is.null(ret[[param]]))
+            ret[[param]] <<- default
+    }
+    
+    maybeSetDefault("smoothExtMZ", ret$mzStep)
+    maybeSetDefault("smoothExtMob", ret$mobStep)
+    
+    if (ret$filter != "suspects" && ret$filterIMS == "suspects")
+        stop("filterIMS can only be 'suspects' if filter is also set to 'suspects'", call. = FALSE)
+    if (ret$filter != "ms2" && ret$filterIMS == "ms2")
+        stop("filterIMS can only be 'ms2' if filter is also set to 'ms2'", call. = FALSE)
+    
+    if (ret$filter == "suspects")
+    {
+        maybeSetDefault("rtWindow", defaultLim("retention", "medium"))
+        maybeSetDefault("mzWindow", defaultLim("mz", "medium"))
+        maybeSetDefault("skipInvalid", TRUE)
+        maybeSetDefault("prefCalcChemProps", TRUE)
+        maybeSetDefault("neutralChemProps", FALSE)
+    }
+    else if (ret$filter == "ms2")
+    {
+        maybeSetDefault("rtWindow", defaultLim("retention", "very_narrow"))
+        maybeSetDefault("mzIsoWindow", 1)
+        maybeSetDefault("minTIC", 10000)
+    }
+    
+    if (ret$filterIMS != "none")
+        maybeSetDefault("IMSWindow", defaultLim("mobility", "medium"))
     
     return(ret)
 }

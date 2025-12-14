@@ -270,19 +270,19 @@ test_that("Feature settings", {
     testNewProj(features = list(featAlgo = "SIRIUS"), name = "features-sirius")
     testNewProj(features = list(featAlgo = "Bruker"), name = "features-bruker")
     
-    testNewProj(features = list(featAlgo = "piek", piekParams = list(methodMZ = "bins")), name = "features-piek_bins")
-    testNewProj(features = list(featAlgo = "piek", piekParams = list(methodMZ = "bins", peaksAlgo = "openms")),
-                name = "features-piek_bins_openms")
-    testNewProj(features = list(featAlgo = "piek", piekParams = list(methodMZ = "suspects",
+    testNewProj(features = list(featAlgo = "piek", name = "features-piek"))
+    testNewProj(features = list(featAlgo = "piek", piekParams = list(peaksAlgo = "openms")),
+                name = "features-piek_openms")
+    testNewProj(features = list(featAlgo = "piek", piekParams = list(filter = "suspects",
                                                                      suspects = list(single = "suspects"))),
                 name = "features-piek_suspects")
     testNewProj(general = list(ionization = "both"),
                 features = list(featAlgo = "piek",
-                                piekParams = list(methodMZ = "suspects",
-                                                     suspects = list(sets = list(pos = "suspects-pos",
-                                                                                 neg = "suspects-neg")))),
+                                piekParams = list(filter = "suspects",
+                                                  suspects = list(sets = list(pos = "suspects-pos",
+                                                                              neg = "suspects-neg")))),
                 name = "features-piek_suspects_sets")
-    testNewProj(features = list(featAlgo = "piek", piekParams = list(methodMZ = "ms2")), name = "features-piek_ms2")
+    testNewProj(features = list(featAlgo = "piek", piekParams = list(filter = "ms2")), name = "features-piek_ms2")
     
     testNewProj(features = list(fGroupsAlgo = "XCMS"), name = "features-fgroups-xcms")
     testNewProj(features = list(fGroupsAlgo = "KPIC2"), name = "features-fgroups-kpic2")
@@ -293,10 +293,10 @@ test_that("Feature settings", {
                 features = list(IMSPeaksMob = "xcms", IMSPeaksChrom = "envipick"), name = "features-ims_peak")
     
     testNewProj(features = list(suspects = list(single = "suspects")), name = "features-suspects")
-    testNewProj(features = list(featAlgo = "piek", piekParams = list(methodMZ = "suspects",
+    testNewProj(features = list(featAlgo = "piek", piekParams = list(filter = "suspects",
                                                                      suspects = list(single = "")),
                                 suspects = list(single = "suspects")), name = "features-suspects_eic")
-    testNewProj(features = list(featAlgo = "piek", piekParams = list(methodMZ = "suspects",
+    testNewProj(features = list(featAlgo = "piek", piekParams = list(filter = "suspects",
                                                                      suspects = list(single = "suspectsEIC")),
                                 suspects = list(single = "suspects")), name = "features-suspects_eic_suspects")
     testNewProj(general = list(ionization = "both"),
@@ -304,7 +304,7 @@ test_that("Feature settings", {
                 name = "features-suspects_sets")
     testNewProj(general = list(ionization = "both"),
                 features = list(featAlgo = "piek",
-                                piekParams = list(methodMZ = "suspects",
+                                piekParams = list(filter = "suspects",
                                                   suspects = list(sets = list(pos = "suspectsEICPos", 
                                                                                  neg = "suspectsEICNeg"))),
                                 suspects = list(sets = list(pos = "suspectsPos", neg = "suspectsNeg"))),

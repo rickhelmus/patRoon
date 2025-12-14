@@ -1181,9 +1181,9 @@ assertIMSMatchParams <- function(x, null.ok = FALSE, .var.name = checkmate::vnam
 assertPiekGenEICParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
 {
     checkmate::assertList(x, .var.name = .var.name)
-    assertListVal(x, "methodMZ", checkmate::assertChoice, choices = c("bins", "suspects", "ms2"), .var.name = .var.name)
-    assertListVal(x, "methodIMS", checkmate::assertChoice, choices = c("bins", "suspects", "ms2"), null.ok = TRUE,
-                  .var.name = .var.name)
+    
+    assertListVal(x, "filter", checkmate::assertChoice, choices = c("none", "suspects", "ms2"), .var.name = .var.name)
+    assertListVal(x, "filterIMS", checkmate::assertChoice, choices = c("none", "suspects", "ms2"), .var.name = .var.name)
     
     assertListVal(x, "mzRange", assertRange, .var.name = .var.name, add = add)
     assertListVal(x, "mzStep", checkmate::assertNumber, lower = 0.000001, finite = TRUE,
@@ -1210,7 +1210,7 @@ assertPiekGenEICParams <- function(x, .var.name = checkmate::vname(x), add = NUL
     assertListVal(x, "topMostEICMZMob", checkmate::assertCount, positive = FALSE, .var.name = .var.name, add = add)
     assertListVal(x, "minEICsIMSPreCheck", checkmate::assertCount, positive = FALSE, .var.name = .var.name, add = add)
     
-    if (x$methodMZ == "suspects")
+    if (x$filter == "suspects")
     {
         assertListVal(x, "rtWindow", checkmate::assertNumber, lower = 0, finite = FALSE, .var.name = .var.name, add = add)
         assertListVal(x, "mzWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
@@ -1220,23 +1220,19 @@ assertPiekGenEICParams <- function(x, .var.name = checkmate::vname(x), add = NUL
         assertListVal(x, "prefCalcChemProps", checkmate::assertFlag, .var.name = .var.name, add = add)
         assertListVal(x, "neutralChemProps", checkmate::assertFlag, .var.name = .var.name, add = add)
     }
-    else if (x$methodMZ == "ms2")
+    else if (x$filter == "ms2")
     {
         assertListVal(x, "rtWindow", checkmate::assertNumber, lower = 0, finite = FALSE, .var.name = .var.name, add = add)
         assertListVal(x, "mzIsoWindow", checkmate::assertNumber, lower = 0, finite = FALSE, .var.name = .var.name, add = add)
         assertListVal(x, "minTIC", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
     }
 
-    if (!is.null(x[["methodIMS"]]))
+    if (x$filterIMS != "none")
     {
-        if (x$methodIMS != "bins" && x$methodIMS != x$methodMZ)
-            stop("'methodIMS' should be set to 'bins' or match 'methodMZ'.", call. = FALSE)
-        
-        if (x$methodIMS %in% c("suspects", "ms2"))
-        {
-            assertListVal(x, "IMSWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name,
-                          add = add)
-        }
+        if (x$filterIMS != x$filter)
+            stop("'filterIMS' should be set to 'none' or match 'filter'.", call. = FALSE)
+        assertListVal(x, "IMSWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name,
+                      add = add)
     }
 }
 

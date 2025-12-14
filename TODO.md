@@ -147,7 +147,12 @@
     - somehow handle cases where...
         1. there is >=1 adjacent feature to the most intense
         2. the most intense groups poorer (more deviation, smaller in size) compared to the adjacent, because the adjacent is closer to the others
-
+    - maybe a comprehensive mode?
+        1. make groups for all features: do as now and take best scoring
+        2. score groups from high to low
+        3. iterate through groups, remove all features from current group that are also in others
+        4. go to step 1, but ignore any features still in groups 
+- select backend for MS and IMS separately? eg SC for MS and OpenTIMS for IMS is probably fastest combo
 
 ## Tests
 

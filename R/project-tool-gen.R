@@ -399,12 +399,13 @@ genScriptFeaturesBlock <- function(ionization, IMS, settingsFeat, generator)
             list(name = "maxFWHM", value = 30, condition = fa == "OpenMS"),
             list(name = "kmeans", value = TRUE, condition = fa == "KPIC2"),
             list(name = "level", value = 1000, condition = fa == "KPIC2"),
+            list(name = "IMS", value = IMS$mode == "direct", condition = IMS$mode != "none"),
             list(name = "genEICParams", value = "genEICParams", condition = fa == "piek"),
             list(name = "peakParams", value = peakParams, condition = fa == "piek"),
             list(name = "suspects", value = suspPiekL,
-                 condition = fa == "piek" && settingsFeat$piekParams$methodMZ == "suspects"),
+                 condition = fa == "piek" && settingsFeat$piekParams$filter == "suspects"),
             list(name = "adduct", value = suspPiekA, quote = TRUE,
-                 condition = fa == "piek" && settingsFeat$piekParams$methodMZ == "suspects"),
+                 condition = fa == "piek" && settingsFeat$piekParams$filter == "suspects"),
             list(name = "doFMF", value = TRUE, condition = fa == "Bruker")
         ))
     }
@@ -419,21 +420,21 @@ genScriptFeaturesBlock <- function(ionization, IMS, settingsFeat, generator)
         
         if (settingsFeat$featAlgo == "piek")
         {
-            mmz <- settingsFeat$piekParams$methodMZ; mims <- settingsFeat$piekParams$methodIMS
+            mmz <- settingsFeat$piekParams$filter; mims <- settingsFeat$piekParams$filterIMS
             def <- list(
-                bins = getPiekEICParams("bins", "bins"),
-                susp = getPiekEICParams("suspects", "suspects"),
-                ms2 = getPiekEICParams("ms2", "ms2")
+                none = getPiekEICParams(),
+                susp = getPiekEICParams(filter = "suspects", filterIMS = "suspects"),
+                ms2 = getPiekEICParams(filter = "ms2", filterIMS = "ms2")
             )
             
             doDirectIMS <- IMS$mode == "direct"
             generator$addCall("genEICParams", "getPiekEICParams", list(
-                list(name = "methodMZ", value = mmz, quote = TRUE),
-                list(name = "methodIMS", value = mims, quote = TRUE, condition = doDirectIMS),
-                list(name = "mzRange", value = def$bins$mzRange, condition = mmz == "bins"),
-                list(name = "mzStep", value = def$bins$mzStep, condition = mmz == "bins"),
-                list(name = "mobRange", value = def$bins$mobRange, condition = mims == "bins" && doDirectIMS),
-                list(name = "mobStep", value = def$bins$mobStep, condition = mims == "bins" && doDirectIMS),
+                list(name = "filter", value = mmz, quote = TRUE),
+                list(name = "filterIMS", value = mims, quote = TRUE, condition = doDirectIMS),
+                list(name = "mzRange", value = def$bins$mzRange),
+                list(name = "mzStep", value = def$bins$mzStep),
+                list(name = "mobRange", value = def$bins$mobRange, condition = doDirectIMS),
+                list(name = "mobStep", value = def$bins$mobStep, condition = doDirectIMS),
                 list(name = "rtWindow", value = def$susp$rtWindow, condition = mmz == "suspects"),
                 list(name = "mzWindow", value = def$susp$mzWindow, condition = mmz == "suspects"),
                 list(name = "IMSWindow", value = def$susp$IMSWindow, condition = mims == "suspects" && doDirectIMS),
@@ -498,7 +499,7 @@ genScriptFeaturesBlock <- function(ionization, IMS, settingsFeat, generator)
     ))
     
     generator$addNL()
-    generator$addComment("Update group centroids")
+    generator$addComment("Update group properties")
     generator$addCall("fGroups", "updateGroups", list(
         list(value = "fGroups"),
         list(name = "what", value = c("ret", "mz", "mobility"), quote = TRUE),
@@ -918,7 +919,7 @@ getScriptCode <- function(CCSCalibrant, anaInfoData, settings, noDate)
     IMSMode <- settings$general$IMS$mode
     doSusps <- settings$features$exSuspList || (ionization != "both" && nzchar(settings$features$suspects$single)) ||
         (ionization == "both" && nzchar(settings$features$suspects$sets$pos))
-    doPiekSusps <- settings$features$featAlgo == "piek" && settings$features$piekParams$methodMZ == "suspects"
+    doPiekSusps <- settings$features$featAlgo == "piek" && settings$features$piekParams$filter == "suspects"
     doFGNorm <- settings$features$fGroupsAdv$featNorm != "none" || settings$features$fGroupsAdv$groupNorm
     doISTDs <- doFGNorm && settings$features$fGroupsAdv$featNorm == "istd"
     doTPs <- nzchar(settings$TP$TPsAlgo)

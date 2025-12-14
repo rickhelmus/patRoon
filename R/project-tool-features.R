@@ -122,12 +122,12 @@ newProjectFeaturesServer <- function(id, ionization, IMSMode, settings)
         )
     }
     
-    getPiekEICIMSMethods <- function(methodMZ)
+    getPiekEICIMSMethods <- function(filter)
     {
-        switch(methodMZ,
-               bins = "bins",
-               suspects = c("bins", "suspects"),
-               ms2 = c("bins", "ms2"))
+        switch(filter,
+               none = "none",
+               suspects = c("none", "suspects"),
+               ms2 = c("none", "ms2"))
     }
     
     moduleServer(id, function(input, output, session)
@@ -201,8 +201,8 @@ newProjectFeaturesServer <- function(id, ionization, IMSMode, settings)
                     width = 600,
                     fillRow(
                         height = 75,
-                        selectInput(ns("methodMZ"), "EIC method (m/z)", c("bins", "suspects", "ms2"),
-                                    selected = rValues$piekParams$methodMZ, width = "95%"),
+                        selectInput(ns("filter"), "EIC filter (m/z)", c("none", "suspects", "ms2"),
+                                    selected = rValues$piekParams$filter, width = "95%"),
                         
                     ),
                     conditionalPanel(
@@ -210,13 +210,13 @@ newProjectFeaturesServer <- function(id, ionization, IMSMode, settings)
                         ns = ns,
                         fillRow(
                             height = 75,
-                            selectInput(ns("methodIMS"), "EIC method (IMS)",
-                                        getPiekEICIMSMethods(rValues$piekParams$methodMZ),
-                                        selected = rValues$piekParams$methodIMS, width = "95%")
+                            selectInput(ns("filterIMS"), "EIC filter (IMS)",
+                                        getPiekEICIMSMethods(rValues$piekParams$filter),
+                                        selected = rValues$piekParams$filterIMS, width = "95%")
                         )
                     ),
                     conditionalPanel(
-                        condition = "input.methodMZ == \"suspects\" && output.ionization != \"both\"",
+                        condition = "input.filter == \"suspects\" && output.ionization != \"both\"",
                         ns = ns,
                         fillRow(
                             height = 75,
@@ -227,7 +227,7 @@ newProjectFeaturesServer <- function(id, ionization, IMSMode, settings)
                         )
                     ),
                     conditionalPanel(
-                        condition = "input.methodMZ == \"suspects\" && output.ionization == \"both\"",
+                        condition = "input.filter == \"suspects\" && output.ionization == \"both\"",
                         ns = ns,
                         fillRow(
                             height = 75,
@@ -260,19 +260,19 @@ newProjectFeaturesServer <- function(id, ionization, IMSMode, settings)
             ))
         })
         
-        observeEvent(input$methodMZ, {
-            ch <- getPiekEICIMSMethods(input$methodMZ)
-            sel <- input$methodIMS
+        observeEvent(input$filter, {
+            ch <- getPiekEICIMSMethods(input$filter)
+            sel <- input$filterIMS
             if (!sel %in% ch)
                 sel <- ch[1]
-            updateSelectInput(session, "methodIMS", choices = ch, selected = sel)
+            updateSelectInput(session, "filterIMS", choices = ch, selected = sel)
         })
         
         observeEvent(input$piekParamsOK, {
             removeModal()
             rValues$piekParams <- list(
-                methodMZ = input$methodMZ,
-                methodIMS = input$methodIMS,
+                filter = input$filter,
+                filterIMS = input$filterIMS,
                 suspects = list(single = input$piekSuspectList,
                                 sets = list(pos = input$piekSuspectListPos, neg = input$piekSuspectListNeg)),
                 peaksAlgo = input$peaksAlgo
@@ -398,7 +398,7 @@ newProjectFeaturesServer <- function(id, ionization, IMSMode, settings)
                     (ionization() == "both" && !nzchar(input$suspectListPos))
                 suspPiekEmpty <- (ionization() != "both" && !nzchar(rValues$piekParams$suspects$single)) ||
                     (ionization() == "both" && !nzchar(rValues$piekParams$suspects$pos))
-                if (input$featAlgo == "piek" && rValues$piekParams$methodMZ == "suspects" && suspEmpty &&
+                if (input$featAlgo == "piek" && rValues$piekParams$filter == "suspects" && suspEmpty &&
                     suspPiekEmpty)
                 {
                     list(title = "No suspect list",
@@ -428,8 +428,8 @@ defaultFeaturesSettings <- function()
     return(list(
         featAlgo = "OpenMS",
         piekParams = list(
-            methodMZ = "bins",
-            methodIMS = "bins",
+            filter = "none",
+            filterIMS = "none",
             suspects = list(single = "", sets = list(pos = "", neg = "")),
             peaksAlgo = "piek"
         ),

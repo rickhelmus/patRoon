@@ -22,7 +22,8 @@
         - mobWindow and IMSWindow now randomly used
         - IMS arg but affects mobility features
         - withMobility vs withIMS
-        - methodMZ and methodIMS --> methodMS+methodIMS or methodMZ+methodMob?
+        - hasMobilities
+        - IMS arg for piek (could be DMA?)
     - mob_area/mob_intensity vs mobmin/mobmax
     - naming: im_collapse and IMSCollapse
 - FIX: IMSRangeParams: in sets workflows, the mz column is taken so relative filtering is done to neutralMasses
@@ -125,12 +126,12 @@
     - mob range: doc that defaults are for TIMS? Or just not give any defaults? Give instrument? Put it in limits?
         - enable EIM summing and smoothing by default for TIMS?
     - split IMSWindow arg for setting mobmin/mobmax? this currently sets very narrow ranges. Same for mz and ms2
-    - change methodMZ/methodIMS to eg filterMZ/filterMob
     - make allowing non-centered features optional? --> see UNDONE comment
     - better error when no adduct is specified if suspect list only contains adduct specific mobilities --> now complains that all values are NA
     - include m/z+mob assignment RT window in feature output? or with debug option?
     - assign mzmin/mzmax for centroid data from basepeaks?
     - dup peaks: make mz and mob window configurable again
+    - remove assignAggr arg(?)
     - intensityBP
         - docs...
         - does current mz/mob split make sense?
@@ -176,6 +177,7 @@
         - mobAssignMethod and mobAssignAggr
         - mz profile & EIM saving, ...
         - assign window & sum windows
+        - extend newProject tests for IMS
 - misc
     - generateAnalysisInfo()?
 - newProject()
@@ -252,6 +254,7 @@
         - explain that sumWindowMZ/sumWindowMob compensate assignment window
         - EICBatchSize: arg description, add notes somewhere on how this and others can be used to tweak mem usage
         - smooth extension defaults to bin size
+        - updates for filter and filterIMS args
     - assignMobilities()
         - refs to paper
         - fGroups method

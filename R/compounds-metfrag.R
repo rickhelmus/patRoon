@@ -85,8 +85,7 @@ unifyMFNames <- function(mfr, scoreTypesMF, adduct)
                  DisorderDisease = "disorderDisease",
                  Identification = "identification",
                  KnownUse = "knownUse",
-                 FPSum = "annoTypeCount", # Nov2019 version (rename to Jan2020 version)
-                 AnnoTypeCount = "annoTypeCount", # Jan2020 version,
+                 AnnoTypeCount = "annoTypeCount", # from Jan2020 version onwards,
                  XLogP = "XlogP",
                  
                  # PubChem OECD PFAS

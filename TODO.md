@@ -16,7 +16,6 @@
         - Windows: for now don't bundle, but install in GHA for testing: https://docs.github.com/en/actions/tutorials/build-and-test-code/python
     - test new/updated patRoonExt deps
 - BUG: annSim.1 column (in formulas?)?
-- fix default IDLs
 - Harmonize/consistent names
     - maxMSRtWindow --> maxMSRTWindow
     - be consistent in mobility vs IMS and mobilograms and EIMs
@@ -430,6 +429,8 @@
 - updateGroups()
 - improved future parallelization, esp reporting
 - FIXED: normInts() produced invalid output if no internal standards were found
+- ID levels: increased 3a lib match threshold to more reasonable value
+- MF: don't use metFusion by default
 
 
 ## Features

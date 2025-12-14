@@ -451,8 +451,6 @@ test_that("IMS tests", {
     fGroupsIMS <- doAssignMobs(fGroupsIMS)
     plistsIMS <- generateMSPeakLists(fGroupsIMS)
     
-    expect_lt(length(generateMSPeakLists(fGroupsIMS, avgFeatParams = getDefAvgPListParams(minAbundanceIMSAbs = 3))), length(plistsIMS))
-    
     # also test this for IMS as frame selection is different
     expect_gt(length(plistsIMS), length(generateMSPeakLists(fGroupsIMS, fixedIsolationWidth = 0.1)))
     expect_lt(length(plistsIMS), length(generateMSPeakLists(fGroupsIMS, fixedIsolationWidth = NA)))

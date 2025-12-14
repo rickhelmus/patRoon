@@ -975,10 +975,9 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRtWindo
                               retainPrecursor = params$retainPrecursor, MSLevel = MSLevel, method = params$method,
                               mzWindow = params$clusterMzWindow, startMobs = ft$mobmin,
                               endMobs = ft$mobmax, minAbundanceRel = params$minAbundanceRel,
-                              minAbundanceAbs = params$minAbundanceAbs, IMSCentroidType = params$IMSCentroidType,
-                              smoothWindowIMS = params$smoothWindowIMS, halfWindowIMS = params$halfWindowIMS,
-                              maxGapIMS = params$maxGapIMS, minAbundanceIMSRel = params$minAbundanceIMSRel,
-                              minAbundanceIMSAbs = params$minAbundanceIMSAbs, topMost = params$topMost,
+                              minAbundanceAbs = params$minAbundanceAbs, smoothWindowIMS = params$smoothWindowIMS,
+                              halfWindowIMS = params$halfWindowIMS, maxGapIMS = params$maxGapIMS,
+                              topMost = params$topMost,
                               minIntensityIMS = params$minIntensityIMS, minIntensityPre = params$minIntensityPre,
                               minIntensityPost = params$minIntensityPost, minBPIntensity = 0)
         names(ret) <- ft$group

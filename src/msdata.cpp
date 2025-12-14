@@ -608,10 +608,8 @@ Rcpp::List getMSPeakLists(const MSReadBackend &backend, const std::vector<Spectr
                           const std::vector<SpectrumRawTypes::Mobility> endMobs,
                           SpectrumRawTypes::PeakAbundance minAbundanceRel,
                           SpectrumRawTypes::PeakAbundance minAbundanceAbs,
-                          const std::string &IMSCentroidType,
                           unsigned smoothWindowIMS, unsigned halfWindowIMS, SpectrumRawTypes::Mass maxGapIMS,
-                          SpectrumRawTypes::PeakAbundance minAbundanceIMSRel,
-                          SpectrumRawTypes::PeakAbundance minAbundanceIMSAbs, unsigned topMost,
+                          unsigned topMost,
                           SpectrumRawTypes::Intensity minIntensityIMS, SpectrumRawTypes::Intensity minIntensityPre,
                           SpectrumRawTypes::Intensity minIntensityPost, SpectrumRawTypes::Intensity minBPIntensity)
 {
@@ -625,7 +623,6 @@ Rcpp::List getMSPeakLists(const MSReadBackend &backend, const std::vector<Spectr
         .setRetainPrecursor(retainPrecursor);
     const auto specFilter = SpectrumRawFilter(baseSpecFilter).setMinIntensity(minIntensityPre);
     const auto specFilterIMS = SpectrumRawFilter(baseSpecFilter);
-    const bool centroidIMS = (IMSCentroidType == "centroid");
     
     // NOTE: for IMS data, averageSpectraRaw() is called which returns a SpectrumRawAveraged. Since we don't care about
     // the additional metadata from this class, we purposely slice it by explicitly specifying the lambda's return type.
@@ -635,19 +632,17 @@ Rcpp::List getMSPeakLists(const MSReadBackend &backend, const std::vector<Spectr
         
         if (hasMob)
         {
-            if (centroidIMS)
-            {
-                const auto specCentr = centroidIMSFrame(spec, makeNumRange(startMobs[e], endMobs[e]), smoothWindowIMS,
-                                                        halfWindowIMS, maxGapIMS);
-                return filterSpectrumRaw(specCentr, specFilter, precursorMZs[e]);
-            }
-            else
+            const auto specCentr = centroidIMSFrame(spec, makeNumRange(startMobs[e], endMobs[e]), smoothWindowIMS,
+                                                    halfWindowIMS, maxGapIMS);
+            return filterSpectrumRaw(specCentr, specFilter, precursorMZs[e]);
+            // UNDONE: below can be used if we ever want to allow clustering of IMS data again
+            /*
             {
                 const auto specf = filterIMSFrame(spec, specFilterIMS, precursorMZs[e],
                                                   makeNumRange(startMobs[e], endMobs[e]));
                 return averageSpectraRaw(specf, frameSubSpecIDs(specf), clMethod, mzWindow, false, minIntensityPre,
                                          minAbundanceIMSRel, minAbundanceIMSAbs);
-            }
+            }*/
         }
         return filterSpectrumRaw(spec, specFilter, precursorMZs[e]);
     };

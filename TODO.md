@@ -128,7 +128,6 @@
     - change methodMZ/methodIMS to eg filterMZ/filterMob
     - make allowing non-centered features optional? --> see UNDONE comment
     - better error when no adduct is specified if suspect list only contains adduct specific mobilities --> now complains that all values are NA
-    - smooth extension: default to bin size instead of defaultLim()?
     - getPiekGenEICParams --> getPiekEICParams
     - include m/z+mob assignment RT window in feature output? or with debug option?
     - assign mzmin/mzmax for centroid data from basepeaks?
@@ -148,7 +147,7 @@
     - somehow handle cases where...
         1. there is >=1 adjacent feature to the most intense
         2. the most intense groups poorer (more deviation, smaller in size) compared to the adjacent, because the adjacent is closer to the others
-- select backend for MS and IMS separately? eg SC for MS and OpenTIMS for IMS is probably fastest combo
+
 
 ## Tests
 
@@ -253,6 +252,7 @@
         - further explain assignMethod/assignAggr, eg guide when to use what depending on frame summing
         - explain that sumWindowMZ/sumWindowMob compensate assignment window
         - EICBatchSize: arg description, add notes somewhere on how this and others can be used to tweak mem usage
+        - smooth extension defaults to bin size
     - assignMobilities()
         - refs to paper
         - fGroups method

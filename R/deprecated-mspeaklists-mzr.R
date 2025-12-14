@@ -232,12 +232,12 @@ setMethod("generateMSPeakListsMzR", "featureGroups", function(fGroups, maxMSRtWi
     resultHashes <- vector("character", anaCount * gCount)
     resultHashCount <- 0
 
-    warning("The withPrecursorMS, minIntensityIMS, minAbundanceIMSRel, and minAbundanceIMSAbs parameters are not ",
+    warning("The withPrecursorMS and IMS related parameters are not ",
             "supported with mzR, they will be ignored. ",
-            "Furthermore, the avgFun parameter was removed, and now default to 'mean'.", call. = FALSE)
+            "Furthermore, the avgFun parameter was removed, and now defaults to 'mean'.", call. = FALSE)
     avgFeatParams <- avgFeatParams[setdiff(names(avgFeatParams),
-                                           c("withPrecursorMS", "minIntensityIMS", "minAbundanceIMSRel",
-                                             "minAbundanceIMSAbs"))]
+                                           c("withPrecursorMS", "minIntensityIMS", "smoothWindowIMS",
+                                             "halfWindowIMS", "maxGapIMS"))]
     avgFeatParams$avgFun <- mean
     
     avgFeatParamsMS <- avgFeatParamsMSMS <-

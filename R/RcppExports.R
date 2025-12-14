@@ -77,8 +77,8 @@ setSpecMetadata <- function(backend, mdMS, mdMSMS) {
     invisible(.Call(`_patRoon_setSpecMetadata`, backend, mdMS, mdMSMS))
 }
 
-getMSPeakLists <- function(backend, startTimes, endTimes, precursorMZs, fixedIsolationWidth, withPrecursor, retainPrecursor, MSLevel, method, mzWindow, startMobs, endMobs, minAbundanceRel, minAbundanceAbs, IMSCentroidType, smoothWindowIMS, halfWindowIMS, maxGapIMS, minAbundanceIMSRel, minAbundanceIMSAbs, topMost, minIntensityIMS, minIntensityPre, minIntensityPost, minBPIntensity) {
-    .Call(`_patRoon_getMSPeakLists`, backend, startTimes, endTimes, precursorMZs, fixedIsolationWidth, withPrecursor, retainPrecursor, MSLevel, method, mzWindow, startMobs, endMobs, minAbundanceRel, minAbundanceAbs, IMSCentroidType, smoothWindowIMS, halfWindowIMS, maxGapIMS, minAbundanceIMSRel, minAbundanceIMSAbs, topMost, minIntensityIMS, minIntensityPre, minIntensityPost, minBPIntensity)
+getMSPeakLists <- function(backend, startTimes, endTimes, precursorMZs, fixedIsolationWidth, withPrecursor, retainPrecursor, MSLevel, method, mzWindow, startMobs, endMobs, minAbundanceRel, minAbundanceAbs, smoothWindowIMS, halfWindowIMS, maxGapIMS, topMost, minIntensityIMS, minIntensityPre, minIntensityPost, minBPIntensity) {
+    .Call(`_patRoon_getMSPeakLists`, backend, startTimes, endTimes, precursorMZs, fixedIsolationWidth, withPrecursor, retainPrecursor, MSLevel, method, mzWindow, startMobs, endMobs, minAbundanceRel, minAbundanceAbs, smoothWindowIMS, halfWindowIMS, maxGapIMS, topMost, minIntensityIMS, minIntensityPre, minIntensityPost, minBPIntensity)
 }
 
 getEIMList <- function(backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, minIntensity, mzExpIMSWindow, compress) {

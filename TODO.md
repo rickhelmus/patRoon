@@ -141,21 +141,9 @@
             - since we have profiles, taking sum intensities makes more sense, as unrelated peaks will be relatively fewer and probably less strongly affect than in centroided data 
 - update featAnn consensus?
 - ADT gives "susp_mobility_susp"/"susp_CCS_susp" cols --> rename
-- MSPL:
-    - do topMost filter after averaging IMS subspectrum? Would be more consistent with HRMS, but may need larger default
-    - finalize centroiding changes
-        - update docs
-        - see if we want to keep both methods
-        - update assertions
-        - somehow handle gapped data? --> update docs/asserts
-        - maybe improve cluster method?
-            - first sum frame spectra
-            - cluster remaining peaks as now
-            - then centroid based on either wt.mean or max
-        - --> recommend centroid for full profile Agilent data and cluster for quasi centroided TIMS data?
-        - --> then add back cluster option for IM collapse
 - EICs
     - are even numbers for smoothing/summing correctly handled?
+- MSPL/IMCollapse: specify default maxGapIMS in limits? Mainly for Agilent, where relatively large numbers are necessary
 - greedy
     - somehow handle cases where...
         1. there is >=1 adjacent feature to the most intense
@@ -214,8 +202,11 @@
 - convert
     - add patRoon 3.0 citation for im_collapse
     - update docs for convertMSFilesIMCollapse() centroiding changes
-- add proper refs to MALDIquant for centroiding
 - update for distance_mean/point clustering
+- update docs for centroiding args
+    - removal of abundance params
+    - for IMCollapse: cluster method/window only used for PASEF precursors
+    - doc new args, explain centroiding, ref to MALDIquant
 - handbook
     - installation
         - add additional external deps, eg Python, TIMS-SDK, c3sdb, PCL/CCS etc

@@ -651,10 +651,6 @@ assertAvgPListParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
                   add = add)
     assertListVal(x, "minAbundanceAbs", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name,
                   add = add)
-    assertListVal(x, "minAbundanceIMSRel", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name,
-                  add = add)
-    assertListVal(x, "minAbundanceIMSAbs", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name,
-                  add = add)
     assertListVal(x, "topMost", checkmate::assertCount, positive = TRUE, .var.name = .var.name, add = add)
     assertListVal(x, "minIntensityPre", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name,
                   add = add)
@@ -666,6 +662,9 @@ assertAvgPListParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
     assertListVal(x, "withPrecursorMS", checkmate::assertFlag, .var.name = .var.name, add = add)
     assertListVal(x, "pruneMissingPrecursorMS", checkmate::assertFlag, .var.name = .var.name, add = add)
     assertListVal(x, "retainPrecursorMSMS", checkmate::assertFlag, .var.name = .var.name, add = add)
+    assertListVal(x, "smoothWindowIMS", checkmate::assertCount, .var.name = .var.name, add = add)
+    assertListVal(x, "halfWindowIMS", checkmate::assertCount, positive = TRUE, .var.name = .var.name, add = add)
+    assertListVal(x, "maxGapIMS", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
 }
 
 assertPListIsolatePrecParams <- function(x, .var.name = checkmate::vname(x), add = NULL)

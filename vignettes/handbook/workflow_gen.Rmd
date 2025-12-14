@@ -376,24 +376,24 @@ The `piek` algorithm was introduced in `patRoon 3.0`, and extends the work done 
 * data from a suspect list (the format follows that of suspect lists for [suspect screening workflows](#suspFormat))
 * data from precursors detected in data-dependent MS/MS experiments (DDA)
 
-The `getPiekGenEICParams()` function is used to create the parameters that are used to generate the EICs. Its output is passed to the `genEICParams` argument to `findFeatures()` function. Similarly, the `getDefPeakParams()` function is used to create the parameters that are used to detect peaks, and its output is passed to the `peakParams` argument of `findFeatures()`.
+The `getPiekEICParams()` function is used to create the parameters that are used to generate the EICs. Its output is passed to the `genEICParams` argument to `findFeatures()` function. Similarly, the `getDefPeakParams()` function is used to create the parameters that are used to detect peaks, and its output is passed to the `peakParams` argument of `findFeatures()`.
 
 Some examples are shown below:
 
 ```{r piek,eval=FALSE}
 # find features from m/z bins with piek's native peak detection algorithm
-genEICParams <- getPiekGenEICParams(methodMZ = "bins")
+genEICParams <- getPiekEICParams(methodMZ = "bins")
 peakParams <- getDefPeakParams("chrom", "piek")
 fList <- findFeatures(anaInfo, "piek", genEICParams = genEICParams, peakParams = peakParams)
 
 # as above, but customize binning
-genEICParams <- getPiekGenEICParams(methodMZ = "bins", mzRange = c(50, 1000), mzStep = 0.01)
+genEICParams <- getPiekEICParams(methodMZ = "bins", mzRange = c(50, 1000), mzStep = 0.01)
 peakParams <- getDefPeakParams("chrom", "piek")
 fList <- findFeatures(anaInfo, "piek", genEICParams = genEICParams, peakParams = peakParams)
 
 # find features from a suspect list with XCMS peak detection
 # see the suspect screening section for more details on the suspect list format
-genEICParams <- getPiekGenEICParams(methodMZ = "suspects")
+genEICParams <- getPiekEICParams(methodMZ = "suspects")
 peakParams <- getDefPeakParams("chrom", "xcms3")
 fList <- findFeatures(anaInfo, "piek", genEICParams = genEICParams, peakParams = peakParams,
                       suspects = suspList, adduct = "[M+H]+")
@@ -401,7 +401,7 @@ fList <- findFeatures(anaInfo, "piek", genEICParams = genEICParams, peakParams =
 # use DDA MS/MS data to find features
 # only find features with data between two and ten minutes retention time.
 # increase minimum spectrum TIC to focus on features with high intensity MS/MS data
-genEICParams <- getPiekGenEICParams(methodMZ = "ms2", retRange = c(120, 600), minTIC = 1E5)
+genEICParams <- getPiekEICParams(methodMZ = "ms2", retRange = c(120, 600), minTIC = 1E5)
 peakParams <- getDefPeakParams("chrom", "openms")
 fList <- findFeatures(anaInfo, "piek", genEICParams = genEICParams, peakParams = peakParams)
 ```

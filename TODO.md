@@ -128,7 +128,6 @@
     - change methodMZ/methodIMS to eg filterMZ/filterMob
     - make allowing non-centered features optional? --> see UNDONE comment
     - better error when no adduct is specified if suspect list only contains adduct specific mobilities --> now complains that all values are NA
-    - getPiekGenEICParams --> getPiekEICParams
     - include m/z+mob assignment RT window in feature output? or with debug option?
     - assign mzmin/mzmax for centroid data from basepeaks?
     - dup peaks: make mz and mob window configurable again

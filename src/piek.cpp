@@ -476,8 +476,7 @@ Rcpp::List doFindPeaksPiek(Rcpp::List EICs, bool fillEICs, double minIntensity, 
 Rcpp::LogicalVector findFeatTableDups(const Rcpp::NumericVector &rts, const Rcpp::NumericVector &rtMins,
                                       const Rcpp::NumericVector &rtMaxs, const Rcpp::NumericVector &mzs,
                                       const Rcpp::NumericVector &mobs, const Rcpp::NumericVector &ints,
-                                      double tolRT, double tolMZ, double tolMob, const Rcpp::LogicalVector &mzCentered,
-                                      const Rcpp::LogicalVector &mobCentered, double prefIntensityRatio)
+                                      double tolRT, double tolMZ, double tolMob)
 {
     // NOTE: rts, mobs and ints are optional
     
@@ -506,11 +505,6 @@ Rcpp::LogicalVector findFeatTableDups(const Rcpp::NumericVector &rts, const Rcpp
     for (size_t i=0; i<intSortedInds.size()-1; ++i)
     {
         const auto indi = intSortedInds[i];
-        const bool mzCenti = mzCentered[indi];
-        const bool mobCenti = (hasMobs) ? mobCentered[indi] : true;
-        const double inteni = ints[indi];
-        bool needCentered = !mzCenti || !mobCenti;
-        size_t partialCentInd = (mzCenti || mobCenti) ? indi : std::numeric_limits<size_t>::max();
         for (size_t j=i+1; j<intSortedInds.size(); ++j)
         {
             const auto indj = intSortedInds[j];
@@ -529,26 +523,7 @@ Rcpp::LogicalVector findFeatTableDups(const Rcpp::NumericVector &rts, const Rcpp
             if (!numberLTE(rtMins[indi], rtMaxs[indj]) || !numberGTE(rtMaxs[indi], rtMins[indj]))
                 continue;
             
-            const bool mzCentj = mzCentered[indj];
-            const bool mobCentj = (hasMobs) ? mobCentered[indj] : true;
-            const double intenj = ints[indj];
-            
-            if (!needCentered || (inteni * prefIntensityRatio) > intenj)
-                ret[indj] = true; // feat i is centered or considerably more intense, so just mark all others as duplicate
-            else if (mzCentj && mobCentj) // i is not centered, but this is --> take this instead
-            {
-                if (partialCentInd != std::numeric_limits<size_t>::max())
-                    ret[partialCentInd] = true; // mark previous partial centered as duplicate
-                ret[indi] = true;
-                needCentered = false;
-            }
-            else if (partialCentInd == std::numeric_limits<size_t>::max() && (mzCentj || mobCentj))
-            {
-                partialCentInd = indj;
-                ret[indi] = true; // prefer the partially centered one
-            }
-            else
-                ret[indj] = true; // we already have a more intense partially intense centered, so mark this as duplicate
+            ret[indj] = true; // less intense duplicate
         }
     }
     

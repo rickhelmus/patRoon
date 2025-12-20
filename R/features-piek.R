@@ -303,8 +303,7 @@ setMethod("delete", "featuresPiek", function(obj, i = NULL, j = NULL, ...)
 #' @export
 findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = NULL, adduct = NULL, IMS = FALSE,
                              assignMethod = "basepeak", assignAggr = "weighted.mean", minIntensityIMS = 25,
-                             prefDupIntensityRatio = 0.5, assignRTWindow = defaultLim("retention", "very_narrow"),
-                             EICBatchSize = Inf, verbose = TRUE)
+                             assignRTWindow = defaultLim("retention", "very_narrow"), EICBatchSize = Inf, verbose = TRUE)
 {
     # UNDONE: add refs to docs, and highlight changes
     # UNDONE: test empties, eg no EICs
@@ -322,8 +321,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
     checkmate::assertFlag(IMS, add = ac)
     checkmate::assertChoice(assignMethod, c("basepeak", "weighted.mean"), add = ac)
     checkmate::assertChoice(assignAggr, c("max", "weighted.mean"), add = ac)
-    aapply(checkmate::assertNumber, . ~ minIntensityIMS + prefDupIntensityRatio + assignRTWindow, lower = 0,
-           finite = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ minIntensityIMS + assignRTWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertNumber(EICBatchSize, lower = 1, finite = FALSE, add = ac)
     checkmate::assertFlag(verbose, add = ac)
     checkmate::reportAssertions(ac)
@@ -379,7 +377,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
     
     cacheDB <- openCacheDBScope()
     baseHash <- makeHash(genEICParams, peakParams, suspects, adduct, assignMethod, assignAggr, minIntensityIMS,
-                         prefDupIntensityRatio, assignRTWindow)
+                         assignRTWindow)
     anaHashes <- getMSFileHashesFromAvailBackend(analysisInfo, needIMS = IMS)
     anaHashes <- sapply(anaHashes, makeHash, baseHash)
     cachedData <- pruneList(loadCacheData("featuresPiek", anaHashes, simplify = FALSE, dbArg = cacheDB))
@@ -544,9 +542,6 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
                 if (IMS)
                     peaks <- assignMZOrMobsToPeaks(peaks, EICInfoBatch, "mobility")
 
-                # UNDONE: for now limit to peaks with centered m/zs and mobilities. Later either:
-                # 1. keep doing this --> update findFeatTableDups() to not bother with centered checks, remove prefDupIntensityRatio
-                # 2. make this optional
                 peaks <- peaks[mzCentered == TRUE]
                 if (IMS)
                     peaks <- peaks[mobilityCentered == TRUE]
@@ -563,9 +558,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
             dups <- findFeatTableDups(peaks$ret, peaks$retmin, peaks$retmax,  peaks$mz,
                                       if (IMS) peaks$mobility else numeric(),
                                       peaks$intensity, defaultLim("retention", "narrow"),
-                                      defaultLim("mz", "medium"), defaultLim("mobility", "medium"),
-                                      peaks$mzCentered, if (IMS) peaks$mobilityCentered else numeric(),
-                                      prefDupIntensityRatio)
+                                      defaultLim("mz", "medium"), defaultLim("mobility", "medium"))
             peaks <- peaks[!dups]
             
             if (genEICParams$filter == "suspects")

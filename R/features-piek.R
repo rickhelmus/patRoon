@@ -158,10 +158,6 @@ setMethod("delete", "featuresPiek", function(obj, i = NULL, j = NULL, ...)
 #'   \code{assignMethod="basepeak"}, then the value of the base peak (=highest intensity peak) from each EIC datapoint
 #'   is taken. If \code{assignMethod="weighted.mean"} then the intensity weighted mean is calculated of the values that
 #'   fall within the EIC bin.
-#' @param assignAggr Should be \code{"max"} or \code{"weighted.mean"}. This parameter sets how the \emph{m/z} or
-#'   mobility values determined for each datapoint (see \code{assignMethod}) are aggregated to determine the final
-#'   feature value. If \code{assignAggr="weighted.mean"} then the intensity weighted mean is used. With
-#'   \code{assignAggr="max"} the data at the the highest intensity of the chromatographic peak is taken.
 #'
 #' @inheritParams findFeatures
 #' @template minIntensityIMS-arg
@@ -302,7 +298,7 @@ setMethod("delete", "featuresPiek", function(obj, i = NULL, j = NULL, ...)
 #'
 #' @export
 findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = NULL, adduct = NULL, IMS = FALSE,
-                             assignMethod = "basepeak", assignAggr = "weighted.mean", minIntensityIMS = 25,
+                             assignMethod = "basepeak", minIntensityIMS = 25,
                              assignRTWindow = defaultLim("retention", "very_narrow"), EICBatchSize = Inf, verbose = TRUE)
 {
     # UNDONE: add refs to docs, and highlight changes
@@ -320,7 +316,6 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
                           add = ac)
     checkmate::assertFlag(IMS, add = ac)
     checkmate::assertChoice(assignMethod, c("basepeak", "weighted.mean"), add = ac)
-    checkmate::assertChoice(assignAggr, c("max", "weighted.mean"), add = ac)
     aapply(checkmate::assertNumber, . ~ minIntensityIMS + assignRTWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertNumber(EICBatchSize, lower = 1, finite = FALSE, add = ac)
     checkmate::assertFlag(verbose, add = ac)
@@ -377,7 +372,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
         genEICParams$retRange <- c(0, 0)
     
     cacheDB <- openCacheDBScope()
-    baseHash <- makeHash(genEICParams, peakParams, suspects, adduct, IMS, assignMethod, assignAggr, minIntensityIMS,
+    baseHash <- makeHash(genEICParams, peakParams, suspects, adduct, IMS, assignMethod, minIntensityIMS,
                          assignRTWindow)
     anaHashes <- getMSFileHashesFromAvailBackend(analysisInfo, needIMS = IMS)
     anaHashes <- sapply(anaHashes, makeHash, baseHash)
@@ -409,27 +404,18 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
     
     assignMZOrMobsToPeaks <- function(peaks, EICInfo, what)
     {
-        chkCol <- paste0(what, if (assignAggr == "max") "BPMax" else "BP")
+        chkCol <- paste0(what, "BP")
         minCol <- if (what == "mz") "mzmin" else "mobmin"
         centCol <- paste0(what, "Centered")
         step <- if (what == "mz") genEICParams$mzStep else genEICParams$mobStep
         peaks[, binStart := EICInfo[match(peaks$EIC_ID, EIC_ID)][[minCol]]]
         peaks[, (centCol) := between(get(chkCol), binStart + step/4, binStart + step/4*3)]
-        if (assignAggr == "max")
-        {
-            if (assignMethod == "basepeak")
-                peaks[, (what) := get(paste0(what, "BPMax"))]
-            else
-                peaks[, (what) := get(paste0(what, "Max"))]
-        }
-        else # assignAggr == "weighted.mean"
-        {
-            if (assignMethod == "basepeak")
-                peaks[, (what) := get(paste0(what, "BP"))]
-            # else already weighted mean
-        }
+        if (assignMethod == "basepeak")
+            peaks[, (what) := get(paste0(what, "BP"))]
+        # else already weighted mean
+        
         # NOTE: centered is kept and removed later to allow filtering redundant peaks
-        peaks[, c(paste0(what, c("BP", "BPMax", "Max")), "binStart") := NULL]
+        peaks[, c(paste0(what, "BP"), "binStart") := NULL]
         return(peaks)
     }
     

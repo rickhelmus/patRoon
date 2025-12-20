@@ -130,7 +130,7 @@
     - include m/z+mob assignment RT window in feature output? or with debug option?
     - assign mzmin/mzmax for centroid data from basepeaks?
     - dup peaks: make mz and mob window configurable again
-    - remove assignAggr arg(?)
+    - rename assignMethod now that assignAggr is removed?
     - intensityBP
         - docs...
         - does current mz/mob split make sense?

@@ -126,7 +126,7 @@
     - mob range: doc that defaults are for TIMS? Or just not give any defaults? Give instrument? Put it in limits?
         - enable EIM summing and smoothing by default for TIMS?
     - split IMSWindow arg for setting mobmin/mobmax? this currently sets very narrow ranges. Same for mz and ms2
-    - make allowing non-centered features optional? --> see UNDONE comment
+    - allow unfiltered features in output with e.g. debug options?
     - better error when no adduct is specified if suspect list only contains adduct specific mobilities --> now complains that all values are NA
     - include m/z+mob assignment RT window in feature output? or with debug option?
     - assign mzmin/mzmax for centroid data from basepeaks?
@@ -152,7 +152,6 @@
         2. score groups from high to low
         3. iterate through groups, remove all features from current group that are also in others
         4. go to step 1, but ignore any features still in groups 
-- select backend for MS and IMS separately? eg SC for MS and OpenTIMS for IMS is probably fastest combo
 
 ## Tests
 

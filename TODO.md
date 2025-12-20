@@ -127,7 +127,6 @@
         - enable EIM summing and smoothing by default for TIMS?
     - split IMSWindow arg for setting mobmin/mobmax? this currently sets very narrow ranges. Same for mz and ms2
     - allow unfiltered features in output with e.g. debug options?
-    - better error when no adduct is specified if suspect list only contains adduct specific mobilities --> now complains that all values are NA
     - include m/z+mob assignment RT window in feature output? or with debug option?
     - assign mzmin/mzmax for centroid data from basepeaks?
     - dup peaks: make mz and mob window configurable again

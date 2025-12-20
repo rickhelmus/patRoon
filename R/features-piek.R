@@ -351,7 +351,8 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
             {
                 if (length(whMissing) == nrow(suspects))
                     stop("The suspect list contains no mobility data! ",
-                         "Please note that CCS data first must be converted to mobilities, e.g. with assignMobilities().",
+                         "Please note that CCS data first must be converted to mobilities, e.g. with assignMobilities(), ",
+                         "and check if the adduct argument is correcttly set for the suspect list.",
                          call. = FALSE)
                 
                 warning(sprintf("The suspect list contains missing mobility data (rows %s), these will be ignored. ",
@@ -376,7 +377,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
         genEICParams$retRange <- c(0, 0)
     
     cacheDB <- openCacheDBScope()
-    baseHash <- makeHash(genEICParams, peakParams, suspects, adduct, assignMethod, assignAggr, minIntensityIMS,
+    baseHash <- makeHash(genEICParams, peakParams, suspects, adduct, IMS, assignMethod, assignAggr, minIntensityIMS,
                          assignRTWindow)
     anaHashes <- getMSFileHashesFromAvailBackend(analysisInfo, needIMS = IMS)
     anaHashes <- sapply(anaHashes, makeHash, baseHash)

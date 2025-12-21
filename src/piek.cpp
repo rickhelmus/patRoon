@@ -473,14 +473,14 @@ Rcpp::List doFindPeaksPiek(Rcpp::List EICs, bool fillEICs, double minIntensity, 
 // utils for findFeaturesPiek()
 
 // [[Rcpp::export]]
-Rcpp::LogicalVector findFeatTableDups(const Rcpp::NumericVector &rts, const Rcpp::NumericVector &rtMins,
+Rcpp::IntegerVector findFeatTableDups(const Rcpp::NumericVector &rts, const Rcpp::NumericVector &rtMins,
                                       const Rcpp::NumericVector &rtMaxs, const Rcpp::NumericVector &mzs,
                                       const Rcpp::NumericVector &mobs, const Rcpp::NumericVector &ints,
                                       double tolRT, double tolMZ, double tolMob)
 {
     // NOTE: rts, mobs and ints are optional
     
-    Rcpp::LogicalVector ret(mzs.size(), false);
+    Rcpp::IntegerVector ret(mzs.size(), 0);
     
     if (mzs.size() < 2)
         return ret; // no duplicates possible
@@ -509,7 +509,7 @@ Rcpp::LogicalVector findFeatTableDups(const Rcpp::NumericVector &rts, const Rcpp
         {
             const auto indj = intSortedInds[j];
             
-            if (ret[indj]) // already marked as duplicate
+            if (ret[indj] != 0) // already marked as duplicate
                 continue;
             
             if (!isSame(rts[indi], rts[indj], tolRT))
@@ -523,7 +523,7 @@ Rcpp::LogicalVector findFeatTableDups(const Rcpp::NumericVector &rts, const Rcpp
             if (!numberLTE(rtMins[indi], rtMaxs[indj]) || !numberGTE(rtMaxs[indi], rtMins[indj]))
                 continue;
             
-            ret[indj] = true; // less intense duplicate
+            ret[indj] = static_cast<int>(indi); // less intense duplicate
         }
     }
     

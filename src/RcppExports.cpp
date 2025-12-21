@@ -648,8 +648,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // findFeatTableDups
-Rcpp::IntegerVector findFeatTableDups(const Rcpp::NumericVector& rts, const Rcpp::NumericVector& rtMins, const Rcpp::NumericVector& rtMaxs, const Rcpp::NumericVector& mzs, const Rcpp::NumericVector& mobs, const Rcpp::NumericVector& ints, double tolRT, double tolMZ, double tolMob);
-RcppExport SEXP _patRoon_findFeatTableDups(SEXP rtsSEXP, SEXP rtMinsSEXP, SEXP rtMaxsSEXP, SEXP mzsSEXP, SEXP mobsSEXP, SEXP intsSEXP, SEXP tolRTSEXP, SEXP tolMZSEXP, SEXP tolMobSEXP) {
+Rcpp::IntegerVector findFeatTableDups(const Rcpp::NumericVector& rts, const Rcpp::NumericVector& rtMins, const Rcpp::NumericVector& rtMaxs, const Rcpp::NumericVector& mzs, const Rcpp::NumericVector& mobs, const Rcpp::NumericVector& ints, double tolRT, double tolMZ, double tolMob, double minPeakOverlap);
+RcppExport SEXP _patRoon_findFeatTableDups(SEXP rtsSEXP, SEXP rtMinsSEXP, SEXP rtMaxsSEXP, SEXP mzsSEXP, SEXP mobsSEXP, SEXP intsSEXP, SEXP tolRTSEXP, SEXP tolMZSEXP, SEXP tolMobSEXP, SEXP minPeakOverlapSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -662,7 +662,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type tolRT(tolRTSEXP);
     Rcpp::traits::input_parameter< double >::type tolMZ(tolMZSEXP);
     Rcpp::traits::input_parameter< double >::type tolMob(tolMobSEXP);
-    rcpp_result_gen = Rcpp::wrap(findFeatTableDups(rts, rtMins, rtMaxs, mzs, mobs, ints, tolRT, tolMZ, tolMob));
+    Rcpp::traits::input_parameter< double >::type minPeakOverlap(minPeakOverlapSEXP);
+    rcpp_result_gen = Rcpp::wrap(findFeatTableDups(rts, rtMins, rtMaxs, mzs, mobs, ints, tolRT, tolMZ, tolMob, minPeakOverlap));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -1031,7 +1032,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_parseFeatConsXMLFile", (DL_FUNC) &_patRoon_parseFeatConsXMLFile, 2},
     {"_patRoon_writeFeatureXML", (DL_FUNC) &_patRoon_writeFeatureXML, 4},
     {"_patRoon_doFindPeaksPiek", (DL_FUNC) &_patRoon_doFindPeaksPiek, 10},
-    {"_patRoon_findFeatTableDups", (DL_FUNC) &_patRoon_findFeatTableDups, 9},
+    {"_patRoon_findFeatTableDups", (DL_FUNC) &_patRoon_findFeatTableDups, 10},
     {"_patRoon_filterEICBins", (DL_FUNC) &_patRoon_filterEICBins, 8},
     {"_patRoon_filterPiekResults", (DL_FUNC) &_patRoon_filterPiekResults, 9},
     {"_patRoon_specDistMatrix", (DL_FUNC) &_patRoon_specDistMatrix, 7},

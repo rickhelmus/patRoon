@@ -255,7 +255,8 @@
         - EICBatchSize: arg description, add notes somewhere on how this and others can be used to tweak mem usage
         - smooth extension defaults to bin size
         - updates for filter and filterIMS args
-        - rtWindowDup, keepDups etc
+        - rtWindowDup, minPeakOverlapDup, keepDups etc
+            - update description how dups are removed
         - match function arg order
     - assignMobilities()
         - refs to paper

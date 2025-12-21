@@ -476,7 +476,7 @@ Rcpp::List doFindPeaksPiek(Rcpp::List EICs, bool fillEICs, double minIntensity, 
 Rcpp::IntegerVector findFeatTableDups(const Rcpp::NumericVector &rts, const Rcpp::NumericVector &rtMins,
                                       const Rcpp::NumericVector &rtMaxs, const Rcpp::NumericVector &mzs,
                                       const Rcpp::NumericVector &mobs, const Rcpp::NumericVector &ints,
-                                      double tolRT, double tolMZ, double tolMob)
+                                      double tolRT, double tolMZ, double tolMob, double minPeakOverlap)
 {
     // NOTE: rts, mobs and ints are optional
     
@@ -505,6 +505,7 @@ Rcpp::IntegerVector findFeatTableDups(const Rcpp::NumericVector &rts, const Rcpp
     for (size_t i=0; i<intSortedInds.size()-1; ++i)
     {
         const auto indi = intSortedInds[i];
+        const auto minOverlapFlank = (rtMaxs[indi] - rtMins[indi]) * (minPeakOverlap / 2.0);
         for (size_t j=i+1; j<intSortedInds.size(); ++j)
         {
             const auto indj = intSortedInds[j];
@@ -519,11 +520,19 @@ Rcpp::IntegerVector findFeatTableDups(const Rcpp::NumericVector &rts, const Rcpp
             if (hasMobs && !isSame(mobs[indi], mobs[indj], tolMob))
                 continue;
             
-            // make sure RT range overlaps
-            if (!numberLTE(rtMins[indi], rtMaxs[indj]) || !numberGTE(rtMaxs[indi], rtMins[indj]))
+            if (minOverlapFlank > 0.0)
+            {
+                // make sure RT range overlaps enough
+                if (!numberLTE(rtMins[indi] + minOverlapFlank, rtMaxs[indj]) ||
+                    !numberGTE(rtMaxs[indi] - minOverlapFlank, rtMins[indj]))
+                    continue;
+            }
+            
+            // make sure RT is inside checked peak
+            if (!numberGTE(rts[indj], rtMins[indi]) || !numberLTE(rts[indj], rtMaxs[indi]))
                 continue;
             
-            ret[indj] = static_cast<int>(indi); // less intense duplicate
+            ret[indj] = static_cast<int>(indi) + 1; // less intense duplicate, +1 to get R range
         }
     }
     

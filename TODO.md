@@ -128,7 +128,6 @@
     - split IMSWindow arg for setting mobmin/mobmax? this currently sets very narrow ranges. Same for mz and ms2
     - allow unfiltered features in output with e.g. debug options?
     - include m/z+mob assignment RT window in feature output? or with debug option?
-    - assign mzmin/mzmax for centroid data from basepeaks?
     - dup peaks: make mz and mob window configurable again
     - rename assignMethod now that assignAggr is removed?
     - intensityBP

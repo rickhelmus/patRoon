@@ -722,7 +722,7 @@ findPeaksInEICs <- function(EICs, peakParams, withMobility, calcStats, assignRTW
             eicWide <- eic[numGTETol(eic[, "time"], retmin) & numLTETol(eic[, "time"], retmax), , drop = FALSE]
             eicAssignMZ <- eicWide[inAssignRange(eicWide[, "time"], ret, retmin, retmax, sumWindowMZ), , drop = FALSE]
             eicAssignMob <- if (haveMobData)
-                eic[inAssignRange(eicWide[, "time"], ret, retmin, retmax, sumWindowMob), , drop = FALSE]
+                eicWide[inAssignRange(eicWide[, "time"], ret, retmin, retmax, sumWindowMob), , drop = FALSE]
 
             if (nrow(eicAssignMZ) == 0 || (haveMobData && nrow(eicAssignMob) == 0))
                 numeric(1)

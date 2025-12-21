@@ -301,7 +301,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, IMS = FALSE
                              assignMethod = "basepeak", assignRTWindow = defaultLim("retention", "very_narrow"),
                              rtWindowDup = defaultLim("retention", "narrow"),
                              mzWindowDup = defaultLim("mz", "medium"),
-                             mobWindowDup = defaultLim("mobility", "medium"),
+                             mobWindowDup = defaultLim("mobility", "medium"), minPeakOverlapDup = 0.25,
                              minIntensityIMS = 25, EICBatchSize = Inf, keepDups = FALSE, verbose = TRUE)
 {
     # UNDONE: add refs to docs, and highlight changes
@@ -321,6 +321,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, IMS = FALSE
     aapply(checkmate::assertNumber, . ~ minIntensityIMS + assignRTWindow + rtWindowDup + mzWindowDup, mobWindowDup,
            lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertChoice(assignMethod, c("basepeak", "weighted.mean"), add = ac)
+    checkmate::assertNumber(minPeakOverlapDup, lower = 0, upper = 1, finite = TRUE, add = ac)
     if (!is.infinite(EICBatchSize))
         checkmate::assertCount(EICBatchSize, positive = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ keepDups + verbose, fixed = list(add = ac))
@@ -378,7 +379,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, IMS = FALSE
     
     cacheDB <- openCacheDBScope()
     baseHash <- makeHash(genEICParams, peakParams, IMS, suspects, adduct, assignMethod, assignRTWindow, rtWindowDup,
-                         mzWindowDup, mobWindowDup, minIntensityIMS, keepDups)
+                         mzWindowDup, mobWindowDup, minPeakOverlapDup, minIntensityIMS, keepDups)
     anaHashes <- getMSFileHashesFromAvailBackend(analysisInfo, needIMS = IMS)
     anaHashes <- sapply(anaHashes, makeHash, baseHash)
     cachedData <- pruneList(loadCacheData("featuresPiek", anaHashes, simplify = FALSE, dbArg = cacheDB))
@@ -560,7 +561,8 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, IMS = FALSE
             dups <- findFeatTableDups(peaksCentered$ret, peaksCentered$retmin, peaksCentered$retmax,
                                       peaksCentered$mz,
                                       if (IMS) peaksCentered$mobility else numeric(),
-                                      peaksCentered$intensity, rtWindowDup, mzWindowDup, mobWindowDup)
+                                      peaksCentered$intensity, rtWindowDup, mzWindowDup, mobWindowDup,
+                                      minPeakOverlapDup)
             if (!keepDups)
                 peaks <- peaks[dups == 0] # peaks == peaksCentered
             else

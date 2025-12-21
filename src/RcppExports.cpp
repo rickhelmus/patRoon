@@ -648,7 +648,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // findFeatTableDups
-Rcpp::LogicalVector findFeatTableDups(const Rcpp::NumericVector& rts, const Rcpp::NumericVector& rtMins, const Rcpp::NumericVector& rtMaxs, const Rcpp::NumericVector& mzs, const Rcpp::NumericVector& mobs, const Rcpp::NumericVector& ints, double tolRT, double tolMZ, double tolMob);
+Rcpp::IntegerVector findFeatTableDups(const Rcpp::NumericVector& rts, const Rcpp::NumericVector& rtMins, const Rcpp::NumericVector& rtMaxs, const Rcpp::NumericVector& mzs, const Rcpp::NumericVector& mobs, const Rcpp::NumericVector& ints, double tolRT, double tolMZ, double tolMob);
 RcppExport SEXP _patRoon_findFeatTableDups(SEXP rtsSEXP, SEXP rtMinsSEXP, SEXP rtMaxsSEXP, SEXP mzsSEXP, SEXP mobsSEXP, SEXP intsSEXP, SEXP tolRTSEXP, SEXP tolMZSEXP, SEXP tolMobSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;

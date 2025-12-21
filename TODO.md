@@ -127,8 +127,6 @@
         - enable EIM summing and smoothing by default for TIMS?
         - or make IMS arg a character, eg "agilent", "bruker"?
     - split IMSWindow arg for setting mobmin/mobmax? this currently sets very narrow ranges. Same for mz and ms2
-    - allow unfiltered features in output with e.g. debug options?
-    - include m/z+mob assignment RT window in feature output? or with debug option?
     - rename assignMethod now that assignAggr is removed?
     - intensityBP
         - docs...
@@ -175,8 +173,8 @@
         - --> check when piek default settings are properly set
     - piek
         - verify removal duplicate features?
-            - can do this when there is an option to not filter features
-        - mobAssignMethod and mobAssignAggr
+            - can do this when there is an option to not filter features --> there is now
+            - combine this with general tests for keepDups
         - mz profile & EIM saving, ...
         - assign window & sum windows
         - extend newProject tests for IMS
@@ -257,7 +255,7 @@
         - EICBatchSize: arg description, add notes somewhere on how this and others can be used to tweak mem usage
         - smooth extension defaults to bin size
         - updates for filter and filterIMS args
-        - rtWindowDup etc
+        - rtWindowDup, keepDups etc
         - match function arg order
     - assignMobilities()
         - refs to paper

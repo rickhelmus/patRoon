@@ -125,10 +125,10 @@
 - feat EICs
     - mob range: doc that defaults are for TIMS? Or just not give any defaults? Give instrument? Put it in limits?
         - enable EIM summing and smoothing by default for TIMS?
+        - or make IMS arg a character, eg "agilent", "bruker"?
     - split IMSWindow arg for setting mobmin/mobmax? this currently sets very narrow ranges. Same for mz and ms2
     - allow unfiltered features in output with e.g. debug options?
     - include m/z+mob assignment RT window in feature output? or with debug option?
-    - dup peaks: make mz and mob window configurable again
     - rename assignMethod now that assignAggr is removed?
     - intensityBP
         - docs...
@@ -257,6 +257,8 @@
         - EICBatchSize: arg description, add notes somewhere on how this and others can be used to tweak mem usage
         - smooth extension defaults to bin size
         - updates for filter and filterIMS args
+        - rtWindowDup etc
+        - match function arg order
     - assignMobilities()
         - refs to paper
         - fGroups method

@@ -720,16 +720,19 @@ findPeaksInEICs <- function(EICs, peakParams, withMobility, calcStats, assignRTW
             eic <- EICs[[EIC_ID]]
             haveMobData <- "mobility" %in% colnames(eic)
             eicWide <- eic[numGTETol(eic[, "time"], retmin) & numLTETol(eic[, "time"], retmax), , drop = FALSE]
-            eicAssignMZ <- eic[inAssignRange(eic[, "time"], ret, retmin, retmax, sumWindowMZ), , drop = FALSE]
+            eicAssignMZ <- eicWide[inAssignRange(eicWide[, "time"], ret, retmin, retmax, sumWindowMZ), , drop = FALSE]
             eicAssignMob <- if (haveMobData)
-                eic[inAssignRange(eic[, "time"], ret, retmin, retmax, sumWindowMob), , drop = FALSE]
+                eic[inAssignRange(eicWide[, "time"], ret, retmin, retmax, sumWindowMob), , drop = FALSE]
 
             if (nrow(eicAssignMZ) == 0 || (haveMobData && nrow(eicAssignMob) == 0))
                 numeric(1)
             else
             {
                 stats <- list(
-                    min(eicWide[, "mzmin"]), max(eicWide[, "mzmax"]),
+                    # for HRMS data we use base peak m/z for boundaries, for IMS-HRMS we take the full profile as data
+                    # is not (fully) centroided
+                    if (haveMobData) min(eicWide[, "mzmin"]) else min(eicWide[, "mzBP"]),
+                    if (haveMobData) max(eicWide[, "mzmax"]) else max(eicWide[, "mzBP"]),
                     weighted.mean(eicAssignMZ[, "mz"], eicAssignMZ[, "intensity"]),
                     weighted.mean(eicAssignMZ[, "mzBP"], eicAssignMZ[, "intensityBP"]))
                 if (!haveMobData)

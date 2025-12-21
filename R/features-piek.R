@@ -297,9 +297,12 @@ setMethod("delete", "featuresPiek", function(obj, i = NULL, j = NULL, ...)
 #' @inherit findFeatures return
 #'
 #' @export
-findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = NULL, adduct = NULL, IMS = FALSE,
-                             assignMethod = "basepeak", minIntensityIMS = 25,
-                             assignRTWindow = defaultLim("retention", "very_narrow"), EICBatchSize = Inf, verbose = TRUE)
+findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, IMS = FALSE, suspects = NULL, adduct = NULL,
+                             assignMethod = "basepeak", assignRTWindow = defaultLim("retention", "very_narrow"),
+                             rtWindowDup = defaultLim("retention", "narrow"),
+                             mzWindowDup = defaultLim("mz", "medium"),
+                             mobWindowDup = defaultLim("mobility", "medium"),
+                             minIntensityIMS = 25, EICBatchSize = Inf, verbose = TRUE)
 {
     # UNDONE: add refs to docs, and highlight changes
     # UNDONE: test empties, eg no EICs
@@ -311,13 +314,15 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, add = ac)
     assertPiekGenEICParams(genEICParams, add = ac)
     assertFindPeakParams(peakParams, add = ac)
+    checkmate::assertFlag(IMS, add = ac)
     if (genEICParams$filter == "suspects")
         assertSuspectList(suspects, needsAdduct = is.null(adduct), skipInvalid = genEICParams$skipInvalid, null.ok = FALSE,
                           add = ac)
-    checkmate::assertFlag(IMS, add = ac)
+    aapply(checkmate::assertNumber, . ~ minIntensityIMS + assignRTWindow + rtWindowDup + mzWindowDup, mobWindowDup,
+           lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertChoice(assignMethod, c("basepeak", "weighted.mean"), add = ac)
-    aapply(checkmate::assertNumber, . ~ minIntensityIMS + assignRTWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
-    checkmate::assertNumber(EICBatchSize, lower = 1, finite = FALSE, add = ac)
+    if (!is.infinite(EICBatchSize))
+        checkmate::assertCount(EICBatchSize, positive = TRUE, add = ac)
     checkmate::assertFlag(verbose, add = ac)
     checkmate::reportAssertions(ac)
     
@@ -372,8 +377,8 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
         genEICParams$retRange <- c(0, 0)
     
     cacheDB <- openCacheDBScope()
-    baseHash <- makeHash(genEICParams, peakParams, suspects, adduct, IMS, assignMethod, minIntensityIMS,
-                         assignRTWindow)
+    baseHash <- makeHash(genEICParams, peakParams, IMS, suspects, adduct, assignMethod, assignRTWindow, rtWindowDup,
+                         mzWindowDup, mobWindowDup, minIntensityIMS)
     anaHashes <- getMSFileHashesFromAvailBackend(analysisInfo, needIMS = IMS)
     anaHashes <- sapply(anaHashes, makeHash, baseHash)
     cachedData <- pruneList(loadCacheData("featuresPiek", anaHashes, simplify = FALSE, dbArg = cacheDB))
@@ -544,8 +549,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, suspects = 
             peaks <- rbindlist(lapply(peaksRes, `[[`, "peaks"), fill = TRUE) # NOTE: need to fill for empties
             dups <- findFeatTableDups(peaks$ret, peaks$retmin, peaks$retmax,  peaks$mz,
                                       if (IMS) peaks$mobility else numeric(),
-                                      peaks$intensity, defaultLim("retention", "narrow"),
-                                      defaultLim("mz", "medium"), defaultLim("mobility", "medium"))
+                                      peaks$intensity, rtWindowDup, mzWindowDup, mobWindowDup)
             peaks <- peaks[!dups]
             
             if (genEICParams$filter == "suspects")

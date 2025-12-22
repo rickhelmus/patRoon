@@ -258,7 +258,7 @@ setMethod("plotHash", "featureGroups", function(x, ...)
 setMethod("plotInt", "featureGroups", function(obj, average = FALSE, averageFunc = mean, areas = FALSE,
                                                normalized = FALSE, xBy = NULL, xNames = TRUE, groupBy = "fGroups",
                                                regression = FALSE, showLegend = FALSE, IMS = "maybe", pch = 20,
-                                               type = if (regression) "p" else "b", lty = 3,
+                                               type = if (regression) "p" else "b", lty = 3, xlim = NULL, ylim = NULL,
                                                col = NULL, plotArgs = NULL, linesArgs = NULL)
 {
     assertIMSArg(IMS)
@@ -272,6 +272,7 @@ setMethod("plotInt", "featureGroups", function(obj, average = FALSE, averageFunc
     checkmate::assertFunction(averageFunc, add = ac)
     assertAnaInfoBy(xBy, anaInfo, FALSE, null.ok = TRUE, add = ac)
     assertAnaInfoBy(groupBy, anaInfo, TRUE, null.ok = TRUE, add = ac)
+    assertXYLim(xlim, ylim, add = ac)
     aapply(checkmate::assertList, . ~ plotArgs + linesArgs, null.ok = TRUE, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
@@ -375,8 +376,12 @@ setMethod("plotInt", "featureGroups", function(obj, average = FALSE, averageFunc
     }
     
     maxX <- if (xNum) max(intTab$x) else uniqueN(intTab$x)
-    do.call(plot, c(list(x = NULL, xlim = c(0, maxX), ylim = c(0, max(intTab[, names(obj), with = FALSE])),
-                         type = "n", xlab = if (xNum) xBy else "", ylab = "Intensity", xaxt = "n"), plotArgs))
+    if (is.null(xlim))
+        xlim <- c(0, maxX)
+    if (is.null(ylim))
+        ylim <- c(0, max(intTab[, names(obj), with = FALSE]))
+    do.call(plot, c(list(x = NULL, xlim = xlim, ylim = ylim, type = "n", xlab = if (xNum) xBy else "",
+                         ylab = "Intensity", xaxt = "n"), plotArgs))
     
     if (xNum)
         axis(1)
@@ -402,7 +407,7 @@ setMethod("plotInt", "featureGroups", function(obj, average = FALSE, averageFunc
             if (!is.null(lm) && !is.na(slope))
             {
                 # from https://stackoverflow.com/a/10046370
-                clip(min(x), max(x), min(y), max(y))
+                clip(max(min(x), usr[1]), min(max(x), usr[2]), max(min(y), usr[3]), min(max(y), usr[4]))
                 abline(lm, col = col)
                 do.call("clip", as.list(usr))  # reset to plot region (from ?clip examples)
             }
@@ -522,7 +527,7 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
     
     tracks <- NULL
     if (!is.null(groupBy))
-        tracks <- list(list(track.height = 0.1, track.margin = c(if (addRetMzPlots) 0.05 else 0.06, 0)))
+        tracks <- list(list(track.height = 0.1, track.margin = c(if (addRetMzPlots) 0.05 else 0.02, 0)))
     if (addRetMzPlots)
         tracks <- c(tracks, list(list(track.height = 0.1, track.margin = c(0.08, 0))))
     
@@ -540,7 +545,7 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
     else
         linkColors <- chordTable[, colFunc(value)]
     
-    cdf <- circlize::chordDiagram(chordTable[, 1:3], annotationTrack = c("grid", "axis"),
+    cdf <- circlize::chordDiagram(chordTable[, 1:3], annotationTrack = c("grid", if (addRetMzPlots) "axis"),
                                   preAllocateTracks = tracks,
                                   grid.col = getBrewerPal(nsamp, "Dark2"),
                                   col = linkColors,

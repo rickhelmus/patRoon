@@ -15,6 +15,7 @@
         - Docker: finish WIP
         - Windows: for now don't bundle, but install in GHA for testing: https://docs.github.com/en/actions/tutorials/build-and-test-code/python
     - test new/updated patRoonExt deps
+    - actually use TDF-SDK from patRoonExt
 - BUG: annSim.1 column (in formulas?)?
 - Harmonize/consistent names
     - maxMSRtWindow --> maxMSRTWindow
@@ -30,6 +31,7 @@
     - maybe add _mz rel column like compounds?
     - actually, the same is the case for the mz filter (also IMS and mz for features) --> maybe just document difference? the actual results will not change much in general
 - TC convert: doc that centroid mode is used for IMS conversion (and/or make it optional?)
+- See why parallel reporting is so slow (on Windows?)
 
 
 ## Maybe
@@ -207,6 +209,7 @@
     - removal of abundance params
     - for IMCollapse: cluster method/window only used for PASEF precursors
     - doc new args, explain centroiding, ref to MALDIquant
+- plotInt(): xlim/ylim
 - handbook
     - installation
         - add additional external deps, eg Python, TIMS-SDK, c3sdb, PCL/CCS etc
@@ -427,6 +430,7 @@
 - FIXED: normInts() produced invalid output if no internal standards were found
 - ID levels: increased 3a lib match threshold to more reasonable value
 - MF: don't use metFusion by default
+- plotInt(): xlim/ylim
 
 
 ## Features

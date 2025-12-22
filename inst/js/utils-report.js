@@ -164,8 +164,11 @@ function updateTabSelFGroupsTPs(rowValues, rowIndex)
     if (Object.keys(reportPlots.TPs).length > 0)
     {
         const specSimEl = document.getElementById('similarity_spec');
-        specSimEl.src = reportPlots.TPs[rowValues.cmpName][rowValues.cmpIndex - 1];
-        specSimEl.style.display = ''; // may have been hidden if a previous img didn't exist
+        if (specSimEl) // null if no similarities were calculated during componentization
+        {
+            specSimEl.src = reportPlots.TPs[rowValues.cmpName][rowValues.cmpIndex - 1];
+            specSimEl.style.display = ''; // may have been hidden if a previous img didn't exist
+        }
     }
     
     if (document.getElementById('similarityTab'))

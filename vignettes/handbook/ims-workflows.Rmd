@@ -338,7 +338,7 @@ Function argument | Description
 `overwrite`       | Set to `TRUE` to overwrite any existing IMS data in the candidate list.
 `IMS`             | For which type of features IMS data should be added to the candidates: `FALSE` (only IMS parents), `TRUE` (only mobility features, default), `"both"` (both IMS parents and mobility features) or `"maybe"` (IMS parents if available, otherwise mobility features).
 
-> **_NOTE_** If [MetFrag] with the [PubChemLite database with CCS][PCLiteCCS-dl] is used for compound annotation, then the mobility data is copied from the database and there is no need to set the `from` argument.
+> **_NOTE_** If [MetFrag] with the [PubChemLite database with CCS][PCLiteCCS-dl] is used for compound annotation, then the CCS data is copied from the database and there is no need to set the `from` argument.
 
 Some examples:
 
@@ -350,7 +350,7 @@ compounds <- assignMobilities(compounds, fGroups, from = "c3sdb", adduct = "[M+H
                               CCSParams = getCCSParams("bruker"))
 
 # generate compound candidates
-# NOTE: if PubChemLite with CCS data is installed, then the mobility data is automatically added
+# NOTE: if PubChemLite with CCS data is installed, then CCS data is automatically added
 compounds <- generateCompounds(fGroups, "metfrag", adduct = "[M+H]+", database = "pubchemlite")
 # overwrite CCS data from a custom library (candidates not in the library will be untouched)
 IMSLib <- data.frame(

@@ -455,13 +455,21 @@ assignTabIMSDeviations <- function(tab, gInfo)
     # used by screening / compounds
     
     tab <- copy(tab)
-    tab[, d_mob := gInfo$mobility[match(group, gInfo$group)] - mobility]
-    tab[, d_mob_rel := d_mob / mobility]
-    if (is.null(gInfo[["CCS"]]))
-        tab[, d_CCS := NA_real_]
+    if (is.null(gInfo[["mobility"]]) || is.null(tab[["mobility"]]))
+        tab[, c("d_mob", "d_mob_rel") := NA_real_]
     else
+    {
+        tab[, d_mob := gInfo$mobility[match(group, gInfo$group)] - mobility]
+        tab[, d_mob_rel := d_mob / mobility]
+    }
+    
+    if (is.null(gInfo[["CCS"]]) || is.null(tab[["CCS"]]))
+        tab[, c("d_CCS", "d_CCS_rel") := NA_real_]
+    else
+    {
         tab[, d_CCS := gInfo$CCS[match(group, gInfo$group)] - CCS]
-    tab[, d_CCS_rel := d_CCS / CCS]
+        tab[, d_CCS_rel := d_CCS / CCS]
+    }
     
     return(tab[])
 }

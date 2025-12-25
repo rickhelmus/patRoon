@@ -789,7 +789,21 @@ setMethod("generateCompoundsMetFrag", "featureGroups", function(fGroups, MSPeakL
     # prune empty/NULL results
     if (length(results) > 0)
         results <- results[sapply(results, function(r) !is.null(r$comptab) && nrow(r$comptab) > 0, USE.NAMES = FALSE)]
-
+    
+    # add CCS deviations if possible
+    hasMobs <- hasMobilities(fGroups) && any(sapply(results, \(r) !is.null(r$comptab[["CCS"]])))
+    if (hasMobs)
+    {
+        results <- Map(names(results), results, f = function(grp, res)
+        {
+            # HACK: temporarily add group to table for assignTabIMSDeviations()
+            ct <- res$comptab
+            ct[, group := grp]
+            res$comptab <- assignTabIMSDeviations(ct, groupInfo(fGroups))[, -"group"]
+            return(res)
+        })
+    }
+    
     ngrp <- length(results)
     printf("Loaded %d compounds from %d features (%.2f%%).\n", sum(unlist(lapply(results, function(r) nrow(r$comptab)))),
            ngrp, if (gCount == 0) 0 else ngrp * 100 / gCount)

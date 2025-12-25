@@ -566,6 +566,7 @@ setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity 
     {
         plF <- copy(pl)
         
+        isAna <- !is.null(ana)
         isReAveraged <- is.null(ana) && reAverage
         
         if (type == "MS")
@@ -574,9 +575,10 @@ setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity 
                 return(FALSE)
             
             plF <- doMSPeakListFilter(plF, absMinIntensity, relMinIntensity, topMostPeaks, NULL, maxMZOverPrec,
-                                      minAbundanceFeatAbs, minAbundanceFeatRel,
-                                      if (is.null(ana)) minAbundanceFGroupAbs else NULL,
-                                      if (is.null(ana)) minAbundanceFGroupRel else NULL,
+                                      if (isAna || !reAverage) minAbundanceFeatAbs,
+                                      if (isAna || !reAverage) minAbundanceFeatRel,
+                                      if (!isAna) minAbundanceFGroupAbs else NULL,
+                                      if (!isAna) minAbundanceFGroupRel else NULL,
                                       deIsotope, removeMZs, TRUE, plF[precursor == TRUE]$mz, mzWindow, negate)
             if (!is.null(isolatePrec))
                 plF <- isolatePrecInMSPeakList(plF, isolatePrec, negate)

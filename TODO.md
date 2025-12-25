@@ -6,6 +6,7 @@
 - BUG: annotatedBy filter incorrectly filters feature level peak lists
     - record group IDs in feature tabs and use them to remove
     - or work with tolerances, so that reAveraged data can work (but may be less accurate)
+    - or just only support filtering grouped lists (and not if reAveraged)?
 - better explain behavior of collapseSuspects=NULL and merging of predicted concs/tox
     - check if ref docs are OK
     - add to handbook
@@ -18,6 +19,7 @@
     - actually use TDF-SDK from patRoonExt
 - BUG: annSim.1 column (in formulas?)?
 - Harmonize/consistent names
+    - minAbundanceFeatAbs/minAbundanceFeatRel --> check features
     - maxMSRtWindow --> maxMSRTWindow
     - be consistent in mobility vs IMS and mobilograms and EIMs
         - mobWindow and IMSWindow now randomly used
@@ -105,6 +107,7 @@
         - is assignMobilities() before TP componentization OK?
             - IMS="maybe", so probably fine?
         - predict CCS for TPs?
+        - don't do CCS prediction with PCL+MetFrag?
 
 ## Param defaults
 
@@ -130,7 +133,6 @@
             - document
 - assignMobilities()
     - susps/compounds: overwrite doesn't overwrite converted mobilities, change?
-    - compounds: call assignTabIMSDeviations() also in generateCompounds with eg PCL? Otherwise doc clearly and check newProject and examples
 - feat EICs
     - mob range: doc that defaults are for TIMS? Or just not give any defaults? Give instrument? Put it in limits?
         - enable EIM summing and smoothing by default for TIMS?
@@ -177,6 +179,7 @@
         - mz profile & EIM saving, ...
         - assign window & sum windows
         - extend newProject tests for IMS
+    - compounds: check if CCS deviations are assigned
 - misc
     - generateAnalysisInfo()?
 - newProject()

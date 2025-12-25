@@ -120,10 +120,6 @@
         - lower mzExpIMSWindow? --> only do it for IMS data
         - default smoothing? different for Agilent? Convert to mobility units?
 
-## TC
-
-- minAbundanceFeatAbs/Rel: does it make sense to also filter fGroup peak lists? If not, remove and update docs.
-
 ## IMS
 
 - findPeaks()
@@ -211,6 +207,9 @@
     - for IMCollapse: cluster method/window only used for PASEF precursors
     - doc new args, explain centroiding, ref to MALDIquant
 - plotInt(): xlim/ylim
+- minAbundanceFeatAbs/Rel: update docs --> only filter group averaged if reAverage = FALSE, ie to allow
+    1. filter group averaged abundances
+    2. only filter ana plists and regenerate from them
 - handbook
     - installation
         - add additional external deps, eg Python, TIMS-SDK, c3sdb, PCL/CCS etc

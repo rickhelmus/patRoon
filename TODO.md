@@ -27,6 +27,9 @@
         - IMS arg for piek (could be DMA?)
     - mob_area/mob_intensity vs mobmin/mobmax
     - naming: im_collapse and IMSCollapse
+    - ADT gives "susp_mobility_susp"/"susp_CCS_susp" cols --> rename
+    - piek: rename assignMethod now that assignAggr is removed?
+    - better names for ims_parent_ID/ims_parent_group?
 - FIX: IMSRangeParams: in sets workflows, the mz column is taken so relative filtering is done to neutralMasses
     - maybe add _mz rel column like compounds?
     - actually, the same is the case for the mz filter (also IMS and mz for features) --> maybe just document difference? the actual results will not change much in general
@@ -78,6 +81,15 @@
 - EIC optims
     - move filling and calcStats to C++? --> return as attributes?
 - plotChroms() etc: mention that only precursors are plot? Now seems confusing as number of fGroups seems less when reporting
+- greedy
+    - somehow handle cases where...
+        1. there is >=1 adjacent feature to the most intense
+        2. the most intense groups poorer (more deviation, smaller in size) compared to the adjacent, because the adjacent is closer to the others
+    - maybe a comprehensive mode?
+        1. make groups for all features: do as now and take best scoring
+        2. score groups from high to low
+        3. iterate through groups, remove all features from current group that are also in others
+        4. go to step 1, but ignore any features still in groups 
 
 
 ## newProject()
@@ -121,7 +133,6 @@
             - report both?
             - document
 - assignMobilities()
-    - better names for ims_parent_ID/ims_parent_group?
     - susps/compounds: overwrite doesn't overwrite converted mobilities, change?
     - compounds: call assignTabIMSDeviations() also in generateCompounds with eg PCL? Otherwise doc clearly and check newProject and examples
 - feat EICs
@@ -129,7 +140,7 @@
         - enable EIM summing and smoothing by default for TIMS?
         - or make IMS arg a character, eg "agilent", "bruker"?
     - split IMSWindow arg for setting mobmin/mobmax? this currently sets very narrow ranges. Same for mz and ms2
-    - rename assignMethod now that assignAggr is removed?
+        - default to half bin widths?
     - intensityBP
         - docs...
         - does current mz/mob split make sense?
@@ -137,19 +148,9 @@
             - otoh, BP single point doesn't make too much sense... maybe only use BP for non-IMS data?
             - since we have profiles, taking sum intensities makes more sense, as unrelated peaks will be relatively fewer and probably less strongly affect than in centroided data 
 - update featAnn consensus?
-- ADT gives "susp_mobility_susp"/"susp_CCS_susp" cols --> rename
 - EICs
     - are even numbers for smoothing/summing correctly handled?
 - MSPL/IMCollapse: specify default maxGapIMS in limits? Mainly for Agilent, where relatively large numbers are necessary
-- greedy
-    - somehow handle cases where...
-        1. there is >=1 adjacent feature to the most intense
-        2. the most intense groups poorer (more deviation, smaller in size) compared to the adjacent, because the adjacent is closer to the others
-    - maybe a comprehensive mode?
-        1. make groups for all features: do as now and take best scoring
-        2. score groups from high to low
-        3. iterate through groups, remove all features from current group that are also in others
-        4. go to step 1, but ignore any features still in groups 
 
 ## Tests
 

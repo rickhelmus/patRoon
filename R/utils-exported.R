@@ -1410,7 +1410,7 @@ convertCCSToMobility <- function(ccs, mz, CCSParams, charge = NULL)
 #' @name assignMobilities_susp
 #' @aliases assignMobilities,data.table-method
 #' @export
-setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFromBy = "InChIKey",
+setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFromBy = "InChIKey1",
                                                      overwrite = FALSE, adducts = c("[M+H]+", "[M-H]-", NA),
                                                      predictAdductOnly = TRUE, CCSParams = NULL,
                                                      prepareChemProps = TRUE, prefCalcChemProps = TRUE,

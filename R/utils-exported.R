@@ -1511,6 +1511,9 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
                     paste0(obj[is.na(SMILES), which = TRUE], collapse = ", "), call. = FALSE)
     }
     
+    getUpdatedCol <- \(col) paste0(".", col, "_updated")
+    predCols <- character()
+    
     if (!is.null(from))
     {
         if (matchFromBy == "InChIKey1" && is.null(obj[["InChIKey1"]]) && !is.null(obj[["InChIKey"]]))
@@ -1619,13 +1622,19 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
         if (is.null(from[[matchFromBy]]))
             stop(sprintf("Column '%s' not found to match data from.", matchFromBy), call. = FALSE)
 
+        emptyVal <- \(x) is.na(x) | (is.character(x) & !nzchar(x))
         for (col in predCols)
         {
-            checkmate::assertNumeric(from[[col]], .var.name = sprintf("from[['%s']]", col))
+            checkmate::assert(
+                checkmate::checkCharacter(from[[col]]),
+                checkmate::checkNumeric(from[[col]]),
+                .var.name = sprintf("from[['%s']]", col), add = ac
+            )
             if (is.null(obj[[col]]))
             {
                 m <- match(obj[[matchFromBy]], from[[matchFromBy]])
                 set(obj, j = col, value = from[[col]][m])
+                set(obj, j = getUpdatedCol(col), value = !emptyVal(from[[col]][m]))
             }
             else if (overwrite || anyNA(obj[[col]]))
             {
@@ -1635,9 +1644,13 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
                 if (!is.character(obj[[col]]) && is.character(from[[col]]))
                     obj[, (col) := as.character(get(col))]
                 
-                emptyVal <- \(x) is.na(x) | (is.character(x) & !nzchar(x))
-                obj[from, (col) := fifelse(!emptyVal(get(paste0("i.", col))) & (overwrite | emptyVal(get(col))),
-                                           get(paste0("i.", col)), get(col)), on = matchFromBy][]
+                obj[from, c(col, getUpdatedCol(col)) := {
+                    doup <- !emptyVal(get(paste0("i.", col))) & (overwrite | emptyVal(get(col)))
+                    upd <- doup & !emptyVal(get(col))
+                    list(fifelse(doup, get(paste0("i.", col)), get(col)), doup)
+                }, on = matchFromBy][]
+                # obj[from, (col) := fifelse(!emptyVal(get(paste0("i.", col))) & (overwrite | emptyVal(get(col))),
+                #                            get(paste0("i.", col)), get(col)), on = matchFromBy][]
             }
         }
     }
@@ -1692,24 +1705,51 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
             }
             else
                 as.adduct(addChr)@charge
-            
+
             if (is.null(obj[[mCol]]))
                 obj[, (mCol) := doConvert("CCS", get(cCol), mzTab[[mzCol]], charges)]
             else if (is.null(obj[[cCol]]))
                 obj[, (cCol) := doConvert("mobility", get(mCol), mzTab[[mzCol]], charges)]
             else # both present: only consider NAs
             {
+                # make sure both are characters if at least one of them is
+                if (is.character(obj[[mCol]]) && !is.character(obj[[cCol]]))
+                    obj[, (cCol) := as.character(get(cCol))]
+                if (!is.character(obj[[mCol]]) && is.character(obj[[cCol]]))
+                    obj[, (mCol) := as.character(get(mCol))]
+                
                 hasVal <- function(x) !is.na(x) & (!is.character(x) | nzchar(x))
                 # temporarily add charges to handle subset assignments below
                 # UNDONE: handle the (unlikely) case that the column is already present?
                 obj[, .charge := charges]
+                # if mob is not present try to convert from CCS and vice versa
                 obj[!hasVal(get(mCol)) & hasVal(get(cCol)), (mCol) := doConvert("CCS", get(cCol), mzTab[[mzCol]], .charge)]
                 obj[hasVal(get(mCol)) & !hasVal(get(cCol)), (cCol) := doConvert("mobility", get(mCol), mzTab[[mzCol]], .charge)]
+                
+                if (overwrite && !is.null(from))
+                {
+                    # if both present and not both updated, convert from updated
+                    mColUp <- getUpdatedCol(mCol); cColUp <- getUpdatedCol(cCol)
+                    mUpdated <- if (is.null(obj[[mColUp]])) rep(FALSE, nrow(obj)) else obj[[mColUp]]
+                    cUpdated <- if (is.null(obj[[cColUp]])) rep(FALSE, nrow(obj)) else obj[[cColUp]]
+                    if (any(mUpdated))
+                    {
+                        obj[hasVal(get(mCol)) & hasVal(get(cCol)) & mUpdated & !cUpdated,
+                            (cCol) := doConvert("mobility", get(mCol), mzTab[[mzCol]], .charge)]
+                    }
+                    if (any(cUpdated))
+                    {
+                        obj[hasVal(get(mCol)) & hasVal(get(cCol)) & !mUpdated & cUpdated,
+                            (mCol) := doConvert("CCS", get(cCol), mzTab[[mzCol]], .charge)]
+                    }
+                }
                 obj[, .charge := NULL]
             }
         }
         printf("Done!\n")
     }
+    
+    obj <- removeDTColumnsIfPresent(obj, getUpdatedCol(predCols))
     
     saveCacheData("assignMobilitiesDT", obj, hash)
     

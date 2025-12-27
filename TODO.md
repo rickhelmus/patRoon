@@ -131,8 +131,6 @@
             - keep doing this?
             - report both?
             - document
-- assignMobilities()
-    - match by IK1 by default?
 - feat EICs
     - mob range: doc that defaults are for TIMS? Or just not give any defaults? Give instrument? Put it in limits?
         - enable EIM summing and smoothing by default for TIMS?
@@ -215,6 +213,7 @@
 - minAbundanceFeatAbs/Rel: update docs --> only filter group averaged if reAverage = FALSE, ie to allow
     1. filter group averaged abundances
     2. only filter ana plists and regenerate from them
+- assignMobilities() susps/compounds: explain why matching by IK1 by default --> helps with matching data, and streoismoers not really distinguishable by CCS
 - handbook
     - installation
         - add additional external deps, eg Python, TIMS-SDK, c3sdb, PCL/CCS etc

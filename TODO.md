@@ -132,7 +132,7 @@
             - report both?
             - document
 - assignMobilities()
-    - susps/compounds: overwrite doesn't overwrite converted mobilities, change?
+    - match by IK1 by default?
 - feat EICs
     - mob range: doc that defaults are for TIMS? Or just not give any defaults? Give instrument? Put it in limits?
         - enable EIM summing and smoothing by default for TIMS?
@@ -149,6 +149,8 @@
 - EICs
     - are even numbers for smoothing/summing correctly handled?
 - MSPL/IMCollapse: specify default maxGapIMS in limits? Mainly for Agilent, where relatively large numbers are necessary
+- only apply IMS mz expansion for IMS features --> add slot
+
 
 ## Tests
 

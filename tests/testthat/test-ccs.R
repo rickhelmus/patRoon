@@ -70,7 +70,7 @@ test_that("assignMobilities() for suspects", {
     # NOTE: row 1 (hydroxy carbamazepine) is not found in PCL
     suspsNoMob <- susps[2:6, -c("mobility_[M+H]+", "CCS_[M+H]+")]
     
-    suspsPredC3SDB <- assignMobilities(suspsNoMob, "c3sdb")
+    suspsPredC3SDB <- assignMobilities(suspsNoMob, "c3sdb", CCSParams = getCCSParams("mason-schamp_1/k"))
     suspsPredPCL <- assignMobilities(suspsNoMob, "pubchemlite")
     suspsPredSelf <- assignMobilities(suspsNoMob, susps)
     
@@ -96,9 +96,12 @@ test_that("assignMobilities() for suspects", {
     
     expect_equal(assignMobilities(suspsNoMob, NULL), suspsNoMob)
     expect_equal(assignMobilities(suspsNoMob, susps, matchFromBy = "SMILES"), suspsPredSelf)
-    expect_equal(assignMobilities(suspsPredC3SDB, susps[, -"mobility_[M+H]+"], overwrite = FALSE), suspsPredC3SDB)
+    expect_equal(assignMobilities(suspsPredC3SDB, susps, overwrite = FALSE), suspsPredC3SDB)
     expect_false(isTRUE(all.equal(assignMobilities(suspsPredC3SDB, susps, overwrite = TRUE), suspsPredC3SDB)))
     expect_equal(assignMobilities(suspsPredC3SDB, susps, overwrite = TRUE)[["CCS_[M+H]+"]], suspsPredSelf[["CCS_[M+H]+"]])
+    # verify that mobilities from overwritten CCSs are also overwritten 
+    expect_equal(assignMobilities(suspsPredC3SDB, susps[, -"mobility_[M+H]+"], overwrite = TRUE, CCSParams = getCCSParams("mason-schamp_1/k"))[["mobility_[M+H]+"]],
+                 assignMobilities(suspsPredSelf[, -"mobility_[M+H]+"], CCSParams = getCCSParams("mason-schamp_1/k"))[["mobility_[M+H]+"]])
     # NOTE: susps CCSs are characters, so type will change
     expect_equal(assignMobilities(suspsPredC3SDB, susps[1:2], overwrite = TRUE)[["CCS_[M+H]+"]][-(1:2)],
                  as.character(suspsPredC3SDB[["CCS_[M+H]+"]][-(1:2)]))

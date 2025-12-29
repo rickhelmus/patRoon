@@ -161,7 +161,7 @@ getCentroidedMSFilesFromAnaInfo <- function(anaInfo, formats = c("mzML", "mzXML"
     return(setNames(msf, anaInfo$analysis))
 }
 
-doGetEICs <- function(anaInfo, EICInfoList, gapFactor, mzExpIMSWindow = 0, minIntensityIMS = 0, mode = "simple",
+doGetEICs <- function(anaInfo, EICInfoList, gapFactor, minIntensityIMS = 0, mode = "simple",
                       sumWindowMZ = defaultLim("retention", "very_narrow"),
                       sumWindowMob = defaultLim("retention", "very_narrow"), smoothWindowMZ = 0, smoothWindowMob = 0,
                       smoothExtMZ = 0, smoothExtMob = 0, saveMZProfiles = FALSE, saveEIMs = FALSE, minEICIntensity = 0,
@@ -183,7 +183,7 @@ doGetEICs <- function(anaInfo, EICInfoList, gapFactor, mzExpIMSWindow = 0, minIn
         if (is.null(cacheDB))
             cacheDB <- openCacheDBScope()
         anaHashes <- getMSFileHashesFromAvailBackend(anaInfo, needIMS = needIMS)
-        baseHash <- makeHash(gapFactor, mzExpIMSWindow, minIntensityIMS, mode, sumWindowMZ, sumWindowMob,
+        baseHash <- makeHash(gapFactor, minIntensityIMS, mode, sumWindowMZ, sumWindowMob,
                              smoothWindowMZ, smoothWindowMob, smoothExtMZ, smoothExtMob, saveMZProfiles,
                              saveEIMs, minEICIntensity, minEICAdjTime, minEICAdjPoints, minEICAdjIntensity, pad,
                              topMost)
@@ -228,10 +228,9 @@ doGetEICs <- function(anaInfo, EICInfoList, gapFactor, mzExpIMSWindow = 0, minIn
             openMSReadBackend(backend, path)
             
             newEICs <- getEICList(backend, ToDo$mzmin, ToDo$mzmax, ToDo$retmin, ToDo$retmax, ToDo$mobmin,
-                                  ToDo$mobmax, gapFactor, mzExpIMSWindow, minIntensityIMS, mode, sumWindowMZ,
-                                  sumWindowMob, smoothWindowMZ, smoothWindowMob, smoothExtMZ, smoothExtMob,
-                                  saveMZProfiles, saveEIMs, pad, minEICIntensity, minEICAdjTime, minEICAdjPoints,
-                                  minEICAdjIntensity, topMost)
+                                  ToDo$mobmax, gapFactor, minIntensityIMS, mode, sumWindowMZ, sumWindowMob,
+                                  smoothWindowMZ, smoothWindowMob, smoothExtMZ, smoothExtMob, saveMZProfiles, saveEIMs,
+                                  pad, minEICIntensity, minEICAdjTime, minEICAdjPoints, minEICAdjIntensity, topMost)
             EICs[!isCached] <- newEICs
             attr(EICs, "allXValues") <- attr(newEICs, "allXValues")
             
@@ -248,8 +247,7 @@ doGetEICs <- function(anaInfo, EICInfoList, gapFactor, mzExpIMSWindow = 0, minIn
     return(allEICs)
 }
 
-doGetEIMs <- function(anaInfo, EIMInfoList, minIntensity, smooth, smLength, sgOrder, mzExpIMSWindow = 0, compress = TRUE,
-                      cacheDB = NULL)
+doGetEIMs <- function(anaInfo, EIMInfoList, minIntensity, smooth, smLength, sgOrder, compress = TRUE, cacheDB = NULL)
 {
     if (length(EIMInfoList) == 0)
         return(list())
@@ -274,7 +272,7 @@ doGetEIMs <- function(anaInfo, EIMInfoList, minIntensity, smooth, smLength, sgOr
         }
         
         # NOTE: subset columns here, so any additional columns from e.g. feature tables are not considered
-        hashes <- EIMInfo[, makeHash(anaHashes[[ana]], minIntensity, smooth, smLength, sgOrder, mzExpIMSWindow, compress, .SD),
+        hashes <- EIMInfo[, makeHash(anaHashes[[ana]], minIntensity, smooth, smLength, sgOrder, compress, .SD),
                           by = seq_len(nrow(EIMInfo)), .SDcols = c("retmin", "retmax", "mzmin", "mzmax", "mobmin",
                                                                    "mobmax")][[2]]
         
@@ -294,7 +292,7 @@ doGetEIMs <- function(anaInfo, EIMInfoList, minIntensity, smooth, smLength, sgOr
         # data.frames directly.
         # NOTE: compression is only done here if we're not smoothing below, otherwise data is compressed after smoothing
         newEIMs <- getEIMList(backend, ToDo$mzmin, ToDo$mzmax, ToDo$retmin, ToDo$retmax, ToDo$mobmin, ToDo$mobmax,
-                              minIntensity, mzExpIMSWindow, compress && !doSmooth)
+                              minIntensity, compress && !doSmooth)
         
         if (doSmooth)
         {

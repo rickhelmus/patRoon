@@ -584,10 +584,10 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
                       const std::vector<SpectrumRawTypes::Time> &endTimes,
                       const std::vector<SpectrumRawTypes::Mobility> &startMobs,
                       const std::vector<SpectrumRawTypes::Mobility> &endMobs,
-                      SpectrumRawTypes::Time gapFactor, SpectrumRawTypes::Mass mzExpIMSWindow,
-                      SpectrumRawTypes::Intensity minIntensityIMS, const std::string &mode = "simple",
-                      SpectrumRawTypes::Time sumWindowMZ = 0, SpectrumRawTypes::Time sumWindowMob = 0,
-                      unsigned smoothWindowMZ = 3, unsigned smoothWindowMob = 3, SpectrumRawTypes::Mass smoothExtMZ = 0,
+                      SpectrumRawTypes::Time gapFactor,  SpectrumRawTypes::Intensity minIntensityIMS,
+                      const std::string &mode = "simple", SpectrumRawTypes::Time sumWindowMZ = 0,
+                      SpectrumRawTypes::Time sumWindowMob = 0, unsigned smoothWindowMZ = 3,
+                      unsigned smoothWindowMob = 3, SpectrumRawTypes::Mass smoothExtMZ = 0,
                       SpectrumRawTypes::Mobility smoothExtMob = 0, bool saveMZProfiles = false, bool saveEIMs = false,
                       bool pad = false, SpectrumRawTypes::Intensity minEICIntensity = 0,
                       SpectrumRawTypes::Time minEICAdjTime = 0, unsigned minEICAdjPoints = 0,
@@ -770,8 +770,8 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
     {
         EIC &eic = allEICs[i];
         
-        const auto mzStart = startMZs[i] - ((anySpecHasMob) ? mzExpIMSWindow : 0.0);
-        const auto mzEnd = endMZs[i] + ((anySpecHasMob) ? mzExpIMSWindow : 0.0);
+        const auto mzStart = startMZs[i];
+        const auto mzEnd = endMZs[i];
         const auto mzExtStart = (mzStart > 0.0) ? (mzStart - smoothExtMZ) : 0.0;
         const auto mzExtEnd = (mzEnd > 0.0) ? mzEnd + smoothExtMZ : 0.0;
         const auto timeStart = (startTimes.size() == 1) ? startTimes[0] : startTimes[i];

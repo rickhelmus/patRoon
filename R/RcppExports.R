@@ -13,8 +13,8 @@ getGroupIDs <- function(featRTs, featMZs, featMobs, ints, anaIDs, repIDs, rtWind
     .Call(`_patRoon_getGroupIDs`, featRTs, featMZs, featMobs, ints, anaIDs, repIDs, rtWindow, mzWindow, mobWindow, weightsList)
 }
 
-getEICList <- function(backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, gapFactor, mzExpIMSWindow, minIntensityIMS, mode = "simple", sumWindowMZ = 0L, sumWindowMob = 0L, smoothWindowMZ = 3L, smoothWindowMob = 3L, smoothExtMZ = 0L, smoothExtMob = 0L, saveMZProfiles = FALSE, saveEIMs = FALSE, pad = FALSE, minEICIntensity = 0L, minEICAdjTime = 0L, minEICAdjPoints = 0L, minEICAdjIntensity = 0L, topMost = 0L) {
-    .Call(`_patRoon_getEICList`, backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, gapFactor, mzExpIMSWindow, minIntensityIMS, mode, sumWindowMZ, sumWindowMob, smoothWindowMZ, smoothWindowMob, smoothExtMZ, smoothExtMob, saveMZProfiles, saveEIMs, pad, minEICIntensity, minEICAdjTime, minEICAdjPoints, minEICAdjIntensity, topMost)
+getEICList <- function(backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, gapFactor, minIntensityIMS, mode = "simple", sumWindowMZ = 0L, sumWindowMob = 0L, smoothWindowMZ = 3L, smoothWindowMob = 3L, smoothExtMZ = 0L, smoothExtMob = 0L, saveMZProfiles = FALSE, saveEIMs = FALSE, pad = FALSE, minEICIntensity = 0L, minEICAdjTime = 0L, minEICAdjPoints = 0L, minEICAdjIntensity = 0L, topMost = 0L) {
+    .Call(`_patRoon_getEICList`, backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, gapFactor, minIntensityIMS, mode, sumWindowMZ, sumWindowMob, smoothWindowMZ, smoothWindowMob, smoothExtMZ, smoothExtMob, saveMZProfiles, saveEIMs, pad, minEICIntensity, minEICAdjTime, minEICAdjPoints, minEICAdjIntensity, topMost)
 }
 
 doFillEIXIntensities <- function(allXValues, xvalues, intensities) {
@@ -81,8 +81,8 @@ getMSPeakLists <- function(backend, startTimes, endTimes, precursorMZs, fixedIso
     .Call(`_patRoon_getMSPeakLists`, backend, startTimes, endTimes, precursorMZs, fixedIsolationWidth, withPrecursor, retainPrecursor, MSLevel, method, mzWindow, startMobs, endMobs, minAbundanceRel, minAbundanceAbs, smoothWindowIMS, halfWindowIMS, maxGapIMS, topMost, minIntensityIMS, minIntensityPre, minIntensityPost, minBPIntensity)
 }
 
-getEIMList <- function(backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, minIntensity, mzExpIMSWindow, compress) {
-    .Call(`_patRoon_getEIMList`, backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, minIntensity, mzExpIMSWindow, compress)
+getEIMList <- function(backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, minIntensity, compress) {
+    .Call(`_patRoon_getEIMList`, backend, startMZs, endMZs, startTimes, endTimes, startMobs, endMobs, minIntensity, compress)
 }
 
 compressEIM <- function(mobilities, intensities) {

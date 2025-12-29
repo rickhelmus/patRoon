@@ -686,7 +686,7 @@ Rcpp::List getEIMList(const MSReadBackend &backend, const std::vector<SpectrumRa
                       const std::vector<SpectrumRawTypes::Time> &endTimes,
                       const std::vector<SpectrumRawTypes::Mobility> &startMobs,
                       const std::vector<SpectrumRawTypes::Mobility> &endMobs,
-                      SpectrumRawTypes::Intensity minIntensity, SpectrumRawTypes::Mass mzExpIMSWindow, bool compress)
+                      SpectrumRawTypes::Intensity minIntensity, bool compress)
 {
     const auto entries = startTimes.size();
     const auto specMeta = backend.getSpecMetadata();
@@ -702,7 +702,7 @@ Rcpp::List getEIMList(const MSReadBackend &backend, const std::vector<SpectrumRa
         size_t size(void) const { return mobilities.size(); }
     };
     
-    const auto &sfunc = [mzExpIMSWindow, &startMZs, &endMZs, &startMobs, &endMobs](const SpectrumRaw &spec, const SpectrumRawSelection &ssel, size_t e)
+    const auto &sfunc = [&startMZs, &endMZs, &startMobs, &endMobs](const SpectrumRaw &spec, const SpectrumRawSelection &ssel, size_t e)
     {
         if (!spec.empty() && !spec.hasMobilities())
             Rcpp::stop("Cannot load mobilogram: no mobility data found!");
@@ -716,10 +716,9 @@ Rcpp::List getEIMList(const MSReadBackend &backend, const std::vector<SpectrumRa
             const auto startInd = std::distance(spec.getMobilities().begin(), it);
             const auto endInd = std::distance(spec.getMobilities().begin(), nextMobIt);
             const auto endMzIt = std::next(spec.getMZs().begin(), endInd);
-            auto mzIt = std::lower_bound(std::next(spec.getMZs().begin(), startInd), endMzIt,
-                                         startMZs[e] - mzExpIMSWindow);
+            auto mzIt = std::lower_bound(std::next(spec.getMZs().begin(), startInd), endMzIt, startMZs[e]);
             SpectrumRawTypes::Intensity curIntensity = 0;
-            for (; mzIt != endMzIt && numberLTE(*mzIt, endMZs[e] + mzExpIMSWindow); ++mzIt)
+            for (; mzIt != endMzIt && numberLTE(*mzIt, endMZs[e]); ++mzIt)
             {
                 curIntensity += spec.getIntensities()[std::distance(spec.getMZs().begin(), mzIt)];
             }

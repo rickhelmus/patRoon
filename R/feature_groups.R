@@ -188,6 +188,10 @@ setMethod("length", "featureGroups", function(x) ncol(x@groups))
 #' @export
 setMethod("hasMobilities", "featureGroups", function(obj) hasMobilities(getFeatures(obj)))
 
+#' @describeIn featureGroups Returns \code{TRUE} if the features were directly generated from IMS data.
+#' @export
+setMethod("fromIMS", "featureGroups", function(obj) fromIMS(getFeatures(obj)))
+
 #' @describeIn featureGroups Shows summary information for this object.
 #' @export
 setMethod("show", "featureGroups", function(object)

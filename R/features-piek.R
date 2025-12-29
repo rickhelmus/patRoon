@@ -394,7 +394,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, IMS = FALSE
     getEICsAna <- function(backend, EICInfo, mode, topMost)
     {
         ret <- getEICList(backend, EICInfo$mzmin, EICInfo$mzmax, genEICParams$retRange[1], genEICParams$retRange[2],
-                          EICInfo$mobmin, EICInfo$mobmax, gapFactor = genEICParams$gapFactor, mzExpIMSWindow = 0,
+                          EICInfo$mobmin, EICInfo$mobmax, gapFactor = genEICParams$gapFactor,
                           minIntensityIMS = minIntensityIMS, mode = mode, sumWindowMZ = genEICParams$sumWindowMZ,
                           sumWindowMob = genEICParams$sumWindowMob, smoothWindowMZ = genEICParams$smoothWindowMZ,
                           smoothExtMZ = genEICParams$smoothExtMZ, smoothWindowMob = genEICParams$smoothWindowMob,
@@ -656,8 +656,8 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, IMS = FALSE
         printFeatStats(fList)
     }
     
-    return(featuresPiek(analysisInfo = analysisInfo, features = fList, hasMobilities = IMS, mzProfiles = mzProfiles,
-                        EIMs = EIMs))
+    return(featuresPiek(analysisInfo = analysisInfo, features = fList, hasMobilities = IMS, fromIMS = IMS,
+                        mzProfiles = mzProfiles, EIMs = EIMs))
 }
 
 #' @param \dots Any additional parameters to be set in the returned parameter list. These will override the defaults.

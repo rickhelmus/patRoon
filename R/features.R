@@ -32,6 +32,8 @@ printFeatStats <- function(fList)
 #'   \code{analysisInfo} method for access.
 #' @slot hasMobilities A \code{logical} that is \code{TRUE} if the features object contain mobility information. Use the
 #'   \code{hasMobilities} method for access.
+#' @slot fromIMS A \code{logical} that is \code{TRUE} if the features object was directly created from IMS data
+#'   (\emph{i.e.} direct mobility assignment workflow). Use the \code{fromIMS} method for access.
 #'
 #' @templateVar seli analyses
 #' @templateVar selOrderi analyses()
@@ -63,7 +65,8 @@ printFeatStats <- function(fList)
 #'
 #' @export
 features <- setClass("features",
-                     slots = c(features = "list", analysisInfo = "data.table", hasMobilities = "logical"),
+                     slots = c(features = "list", analysisInfo = "data.table", hasMobilities = "logical",
+                               fromIMS = "logical"),
                      contains = c("VIRTUAL", "workflowStep"))
 
 setMethod("initialize", "features", function(.Object, ...)
@@ -72,6 +75,8 @@ setMethod("initialize", "features", function(.Object, ...)
     .Object@features <- makeEmptyListNamed(.Object@features)
     if (length(.Object@hasMobilities) == 0)
         .Object@hasMobilities <- FALSE # initialize
+    if (length(.Object@fromIMS) == 0)
+        .Object@fromIMS <- FALSE # the case for most algorithms, so default to FALSE
     return(.Object)
 })
 
@@ -197,6 +202,10 @@ setMethod("replicates", "features", function(obj) unique(analysisInfo(obj)$repli
 #' @describeIn features Returns \code{TRUE} if the features object has mobility information.
 #' @export
 setMethod("hasMobilities", "features", function(obj) obj@hasMobilities)
+
+#' @describeIn features Returns \code{TRUE} if the features object was directly created from IMS data.
+#' @export
+setMethod("fromIMS", "features", function(obj) obj@fromIMS)
 
 #' @describeIn features Returns all feature data in a table.
 #' @export

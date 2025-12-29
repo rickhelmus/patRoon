@@ -120,7 +120,6 @@
     - set default greedy weights
         - also configurable weights for assignMobilities()?
     - tweak default EIMParams
-        - lower mzExpIMSWindow? --> only do it for IMS data
         - default smoothing? different for Agilent? Convert to mobility units?
 
 ## IMS
@@ -147,7 +146,6 @@
 - EICs
     - are even numbers for smoothing/summing correctly handled?
 - MSPL/IMCollapse: specify default maxGapIMS in limits? Mainly for Agilent, where relatively large numbers are necessary
-- only apply IMS mz expansion for IMS features --> add slot
 
 
 ## Tests

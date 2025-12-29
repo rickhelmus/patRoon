@@ -334,24 +334,26 @@ filterEIXs <- function(EIXs, fGroups, analysis = NULL, groupName = NULL, topMost
     return(pruneList(EIXs, checkEmptyElements = TRUE, keepAttr = TRUE))
 }
 
-extendEIXInputTab <- function(tab, type, EIXParams)
+extendEIXInputTab <- function(tab, type, EIXParams, hasMobilities, fromIMS)
 {
     tab <- copy(tab)
     if (type == "EIC")
         tab[, c("retmin", "retmax") := .(retmin - EIXParams$window, retmax + EIXParams$window)]
     else # "EIM"
         tab[, c("mobmin", "mobmax") := .(mobmin - EIXParams$window, mobmax + EIXParams$window)]
+    if (hasMobilities && !fromIMS)
+        tab[, c("mzmin", "mzmax") := .(mzmin - EIXParams$mzExpIMSWindow, mzmax + EIXParams$mzExpIMSWindow)]
     return(tab)
 }
 
 getEICsOREIMs <- function(obj, type, inputTab, EIXParams, ...)
 {
     if (type == "EIC")
-        doGetEICs(analysisInfo(obj), inputTab, EIXParams$gapFactor, EIXParams$mzExpIMSWindow, EIXParams$minIntensityIMS,
+        doGetEICs(analysisInfo(obj), inputTab, EIXParams$gapFactor, EIXParams$minIntensityIMS,
                   ...)
     else # EIM
         doGetEIMs(analysisInfo(obj), inputTab, EIXParams$minIntensityIMS, EIXParams$smooth, EIXParams$smLength,
-                  EIXParams$sgOrder, EIXParams$mzExpIMSWindow, ...)
+                  EIXParams$sgOrder, ...)
 }
 
 setMethod("getFeatureEIXInputTab", "features", function(obj, type, EIXParams, selectFunc)
@@ -376,7 +378,7 @@ setMethod("getFeatureEIXInputTab", "features", function(obj, type, EIXParams, se
         }
         
         tab[, ret := NULL]
-        tab <- extendEIXInputTab(tab, type, EIXParams)
+        tab <- extendEIXInputTab(tab, type, EIXParams, hasMobilities(obj), fromIMS(obj))
 
         return(tab)
     }))
@@ -454,7 +456,7 @@ setMethod("getFeatureEIXInputTab", "featureGroups", function(obj, type, analysis
         }
         
         ret[, ret := NULL]
-        ret <- extendEIXInputTab(ret, type, EIXParams)
+        ret <- extendEIXInputTab(ret, type, EIXParams, hasMobilities(obj), fromIMS(obj))
         
         return(ret)
     }, simplify = FALSE))

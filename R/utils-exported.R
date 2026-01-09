@@ -105,6 +105,7 @@ generateAnalysisInfo <- function(fromRaw = NULL, fromCentroid = NULL, fromProfil
         }
         ret <- data.table(analysis = simplifyAnalysisNames(files))
         ret[, (paste0("path_", type)) := dirname(files)]
+        ret <- unique(ret, by = "analysis") # in case of multiple file formats in the same directory (eg mzML/mzXML)
         return(ret)
     }
     

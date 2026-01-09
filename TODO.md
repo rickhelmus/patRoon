@@ -386,7 +386,7 @@
     - (subsetDTColumnsIfPresent: use order of requested cols instead of original) --> may change column order in some places
     - minIntensity arg for pwiz conversion, set by default
     - getBPCs(): doen't return m/z anymore
-    - SAFD: fileType replaces profPath argument
+    - SAFD: fileType replaces profPath argument, new fileFormats arg
     - patRoon.checkCentroided option removed (not needed anymore, checks are faster now and part of regular reading operations)
 - IMS
     - hasMobilities slot for features

@@ -84,7 +84,7 @@ makeSAFDCommand <- function(inPath, fileName, cent, mzRange, maxNumbIter, maxTPe
 #' @inherit findFeatures return
 #'
 #' @export
-findFeaturesSAFD <- function(analysisInfo, fileType = NULL, mzRange = c(0, 400), 
+findFeaturesSAFD <- function(analysisInfo, fileType = NULL, fileFormats = c("mzXML", "mzML"), mzRange = c(0, 400), 
                              maxNumbIter = 1000, maxTPeakW = 300, resolution = 30000,
                              minMSW = 0.02, RThreshold = 0.75, minInt = 2000,
                              sigIncThreshold = 5, S2N = 2, minPeakWS = 3, verbose = TRUE)
@@ -92,6 +92,7 @@ findFeaturesSAFD <- function(analysisInfo, fileType = NULL, mzRange = c(0, 400),
     ac <- checkmate::makeAssertCollection()
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, add = ac)
     checkmate::assertChoice(fileType, c("centroid", "profile"), null.ok = TRUE, add = ac)
+    checkmate::assertSubset(fileFormats, c("mzML", "mzXML"), empty.ok = FALSE, add = ac)
     checkmate::assertNumeric(mzRange, lower = 0, finite = TRUE, any.missing = FALSE, len = 2, add = ac)
     aapply(checkmate::assertCount, . ~ maxNumbIter + maxTPeakW + resolution + sigIncThreshold +
                S2N, positive = TRUE, fixed = list(add = ac))
@@ -107,16 +108,16 @@ findFeaturesSAFD <- function(analysisInfo, fileType = NULL, mzRange = c(0, 400),
     takeCent <- NULL
     if (is.null(fileType))
     {
-        filePaths <- getMSFilesFromAnaInfo(analysisInfo, "profile", c("mzML", "mzXML"), mustExist = FALSE)
+        filePaths <- getMSFilesFromAnaInfo(analysisInfo, "profile", fileFormats, mustExist = FALSE)
         takeCent <- is.null(filePaths)
         if (takeCent)
-            filePaths <- getCentroidedMSFilesFromAnaInfo(analysisInfo, mustExist = FALSE)
+            filePaths <- getCentroidedMSFilesFromAnaInfo(analysisInfo, fileFormats, mustExist = FALSE)
         if (is.null(filePaths))
             stop("Couldn't find (a complete set) of profile or centroided data", call. = FALSE)
     }
     else
     {
-        filePaths <- getMSFilesFromAnaInfo(analysisInfo, fileType, c("mzML", "mzXML"))
+        filePaths <- getMSFilesFromAnaInfo(analysisInfo, fileType, fileFormats)
         takeCent <- fileType == "centroid"
     }
     

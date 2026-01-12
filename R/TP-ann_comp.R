@@ -214,7 +214,8 @@ getTPsCompounds <- function(annTable, parentRow, TPStructParams, extraOptsFMCSR,
 #'   \item \code{annSim}: the \link[=id-conf]{annotation similarity}
 #'
 #'   \item \code{fitCompound}: the structural fit of the compound candidate into the parent (or vice versa, maximum is
-#'   taken). Calculated as the \code{"Overlap coefficient"} with \code{\link[fmcsR:fmcs]{fmcsR::fmcs}}.
+#'   taken). Calculated as the \code{"Overlap coefficient"} with \code{\link[fmcsR:fmcs]{fmcsR::fmcs}}. The molecular
+#'   data is prepared with \CRANpkg{rcdk} and \pkg{ChemmineR}.
 #'
 #'   \item \code{simSusp}: the maximum structural similarity with TP suspect candidates for this parent, \emph{i.e.}
 #'   obtained from other algorithms of \code{\link{generateTPs}}). The calculation is configured by the
@@ -257,14 +258,15 @@ getTPsCompounds <- function(annTable, parentRow, TPStructParams, extraOptsFMCSR,
 #' @return \code{generateTPsAnnComp} returns an object of the class \code{\link{transformationProductsAnnComp}}. Please
 #'   see its documentation for \emph{e.g.} filtering steps that can be performed on this object.
 #'
-#' @note Setting \code{parallel=TRUE} can speed up calculations considerably on multi-core systems. but will also add to RAM
-#'   usage. Furthermore, parallelization is only favorable for long calculations due to the overhead of setting up
-#'   multiple \R processes.
+#' @note Setting \code{parallel=TRUE} can speed up calculations considerably on multi-core systems. but will also add to
+#'   RAM usage. Furthermore, parallelization is only favorable for long calculations due to the overhead of setting up
+#'   multiple \R processes. Note that the parallel workers must be on the same system, \emph{i.e.} this will not work on
+#'   \emph{e.g.} clusters.
 #'
 #'   It is possible that candidates are equal to their parent. To remove these the \code{removeParentIsomers}
 #'   \code{\link[=filter,transformationProductsStructure-method]{filter}} can be used afterwards.
 #'
-#' @references \insertAllCited{} \cr\cr \insertRef{Wang2013}{patRoon}
+#' @references \insertAllCited{} \cr\cr \insertRef{Wang2013}{patRoon} \cr\cr \addCitations{rcdk} \cr\cr \addCitations{ChemmineR}
 #'
 #' @export
 generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, fGroupsComps = NULL, minRTDiff = 20,

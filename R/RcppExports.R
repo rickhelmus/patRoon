@@ -109,6 +109,10 @@ getChromPoints <- function(backend, startTimes, endTimes, startMZs, endMZs, star
     .Call(`_patRoon_getChromPoints`, backend, startTimes, endTimes, startMZs, endMZs, startMobs, endMobs, withMob)
 }
 
+makeSAFDInput <- function(backend, mzFile, intFile, timeFile, mzStart, mzEnd) {
+    invisible(.Call(`_patRoon_makeSAFDInput`, backend, mzFile, intFile, timeFile, mzStart, mzEnd))
+}
+
 readMSP <- function(file, pc) {
     .Call(`_patRoon_readMSP`, file, pc)
 }
@@ -191,10 +195,6 @@ loadEICIntensities <- function(spectra, featList, rtWindow) {
 
 loadEICs <- function(spectra, rtMins, rtMaxs, mzMins, mzMaxs) {
     .Call(`_patRoon_loadEICs`, spectra, rtMins, rtMaxs, mzMins, mzMaxs)
-}
-
-makeSAFDInput <- function(spectra, mzRange) {
-    .Call(`_patRoon_makeSAFDInput`, spectra, mzRange)
 }
 
 binSpectra <- function(sp1, sp2, shift, precDiff, mzWindow) {

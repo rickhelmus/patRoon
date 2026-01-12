@@ -37,6 +37,7 @@
     - actually, the same is the case for the mz filter (also IMS and mz for features) --> maybe just document difference? the actual results will not change much in general
 - TC convert: doc that centroid mode is used for IMS conversion (and/or make it optional?)
 - See why parallel reporting is so slow (on Windows?)
+- SAFD: remove MS_Import deps, update docs, make CSVs on parallel workers? If not doc that workers must be one same system
 
 
 ## Maybe
@@ -212,6 +213,7 @@
     1. filter group averaged abundances
     2. only filter ana plists and regenerate from them
 - assignMobilities() susps/compounds: explain why matching by IK1 by default --> helps with matching data, and streoismoers not really distinguishable by CCS
+- add docs to piek/MSPL/bgMS2 that profile m/z data is not yet supported
 - handbook
     - installation
         - add additional external deps, eg Python, TIMS-SDK, c3sdb, PCL/CCS etc
@@ -386,10 +388,10 @@
     - (subsetDTColumnsIfPresent: use order of requested cols instead of original) --> may change column order in some places
     - minIntensity arg for pwiz conversion, set by default
     - getBPCs(): doen't return m/z anymore
-    - SAFD: fileType replaces profPath argument, new fileFormats arg
+    - SAFD: fileType replaces profPath argument, new prefCentroid arg, use of msdata, IMS'ish support
     - patRoon.checkCentroided option removed (not needed anymore, checks are faster now and part of regular reading operations)
 - IMS
-    - hasMobilities slot for features
+    - hasMobilities and other slots for features
     - Dietrich features
     - groupInfo is now a DT
     - FIXED: suspect list assertion only checked part of the columns

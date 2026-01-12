@@ -7,8 +7,11 @@ NULL
 
 SAFDMPFinishHandler <- function(cmd)
 {
-    fExt <- if (cmd$cent) "_Cent_report.csv" else "_report.csv"
-    results <- fread(file.path(cmd$outPath, paste0(tools::file_path_sans_ext(cmd$fileName), fExt)))
+    resFile <- if (cmd$cent)
+        file.path(cmd$outPath, paste0(cmd$fileName, "_Cent_report.csv")) # NOTE: here we need the full name...
+    else
+        file.path(cmd$outPath, paste0(tools::file_path_sans_ext(cmd$fileName), "_report.csv"))
+    results <- fread(resFile)
     setnames(results,
              c("Nr", "Rt", "MeasMass", "RtStart", "RtEnd", "MinMass", "MaxMass", "Area", "Int",
                "FeatPurity", "MediRes"),
@@ -36,14 +39,15 @@ setMethod("initialize", "featuresSAFD",
           function(.Object, ...) callNextMethod(.Object, algorithm = "safd", ...))
 
 makeSAFDCommand <- function(inPath, fileName, cent, mzRange, maxNumbIter, maxTPeakW, resolution,
-                            minMSW, RThreshold, minInt, sigIncThreshold, S2N, minPeakWS)
+                            minMSW, RThreshold, minInt, sigIncThreshold, S2N, minPeakWS, centroidMethod, centroidDM,
+                            mzCSV, intCSV, rtCSV)
 {
     # UNDONE: check if julia exists? allow to configure path?
     return(list(command = "julia", args = c(system.file("misc", "runSAFD.jl", package = "patRoon"),
                                             inPath, fileName, cent, mzRange[1], mzRange[2],
                                             maxNumbIter, maxTPeakW, resolution,
                                             minMSW, RThreshold, minInt, sigIncThreshold, S2N,
-                                            minPeakWS),
+                                            minPeakWS, centroidMethod, centroidDM, mzCSV, intCSV, rtCSV),
                 cent = cent, fileName = fileName))
 }
 
@@ -73,6 +77,8 @@ makeSAFDCommand <- function(inPath, fileName, cent, mzRange, maxNumbIter, maxTPe
 #' @param mzRange The \emph{m/z} window to be imported (passed to the \code{import_files_MS1} function).
 #' @param maxNumbIter,maxTPeakW,resolution,minMSW,RThreshold,minInt,sigIncThreshold,S2N,minPeakWS Parameters directly
 #'   passed to the \code{safd_s3D} function.
+#' @param centroidMethod,centroidDM Passed to the \code{safd_s3d_cent} function (\code{method} and \code{mdm} arguments,
+#'   respectively)
 #'
 #' @templateVar what \code{findFeaturesSAFD}
 #' @template uses-multiProc
@@ -84,20 +90,25 @@ makeSAFDCommand <- function(inPath, fileName, cent, mzRange, maxNumbIter, maxTPe
 #' @inherit findFeatures return
 #'
 #' @export
-findFeaturesSAFD <- function(analysisInfo, fileType = NULL, fileFormats = c("mzXML", "mzML"), mzRange = c(0, 400), 
+findFeaturesSAFD <- function(analysisInfo, prefCentroid = FALSE, mzRange = c(0, 400), 
                              maxNumbIter = 1000, maxTPeakW = 300, resolution = 30000,
                              minMSW = 0.02, RThreshold = 0.75, minInt = 2000,
-                             sigIncThreshold = 5, S2N = 2, minPeakWS = 3, verbose = TRUE)
+                             sigIncThreshold = 5, S2N = 2, minPeakWS = 3, centroidMethod = "RFM", centroidDM = 0.005,
+                             verbose = TRUE)
 {
+    # UNDONE: for now don't support centroidMethod = "MDM" as it's a bit of a hassle to pass on the data
+    # UNDONE: centroidDM default is just a dummy value, not sure what would be good...
+    
     ac <- checkmate::makeAssertCollection()
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, add = ac)
-    checkmate::assertChoice(fileType, c("centroid", "profile"), null.ok = TRUE, add = ac)
-    checkmate::assertSubset(fileFormats, c("mzML", "mzXML"), empty.ok = FALSE, add = ac)
+    checkmate::assertFlag(prefCentroid, add = ac)
     checkmate::assertNumeric(mzRange, lower = 0, finite = TRUE, any.missing = FALSE, len = 2, add = ac)
     aapply(checkmate::assertCount, . ~ maxNumbIter + maxTPeakW + resolution + sigIncThreshold +
                S2N, positive = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertCount, . ~ minInt + minPeakWS, fixed = list(add = ac))
     aapply(checkmate::assertNumber, . ~ minMSW + RThreshold, fixed = list(add = ac))
+    checkmate::assertChoice(centroidMethod, c("RFM", "BG", "CT"), add = ac)
+    checkmate::assertNumber(centroidDM, lower = 0, finite = TRUE, add = ac)
     checkmate::assertFlag(verbose, add = ac)
     checkmate::reportAssertions(ac)
     
@@ -105,36 +116,44 @@ findFeaturesSAFD <- function(analysisInfo, fileType = NULL, fileFormats = c("mzX
         stop("First element of mzRange should be smaller than second.")
 
     filePaths <- NULL
-    takeCent <- NULL
-    if (is.null(fileType))
+    takeCent <- FALSE
+    
+    filePathsCentroid <- getCentroidedMSFilesFromAnaInfo(analysisInfo, mustExist = FALSE)
+    if (prefCentroid && !is.null(filePathsCentroid))
     {
-        filePaths <- getMSFilesFromAnaInfo(analysisInfo, "profile", fileFormats, mustExist = FALSE)
-        takeCent <- is.null(filePaths)
-        if (takeCent)
-            filePaths <- getCentroidedMSFilesFromAnaInfo(analysisInfo, fileFormats, mustExist = FALSE)
-        if (is.null(filePaths))
-            stop("Couldn't find (a complete set) of profile or centroided data", call. = FALSE)
+        filePaths <- filePathsCentroid
+        takeCent <- TRUE
     }
     else
     {
-        filePaths <- getMSFilesFromAnaInfo(analysisInfo, fileType, fileFormats)
-        takeCent <- fileType == "centroid"
+        filePaths <- getMSFilesFromAnaInfo(analysisInfo, getMSFileTypes(), lapply(getMSFileTypes(), getMSFileFormats))
+        takeCent <- isTRUE(all.equal(filePaths, filePathsCentroid))
     }
     
     anaCount <- nrow(analysisInfo)
     
     params <- list(takeCent, mzRange, maxNumbIter, maxTPeakW, resolution, minMSW, RThreshold, minInt,
-                   sigIncThreshold, S2N, minPeakWS)
+                   sigIncThreshold, S2N, minPeakWS, centroidMethod, centroidDM)
     
     if (verbose)
         printf("Finding features with SAFD for %d analyses ...\n", anaCount)
 
-    cmdQueue <- Map(analysisInfo$analysis, filePaths, f = function(ana, fp)
+    # UNDONE: do this in prepare func?
+    CSVPaths <- applyMSData(analysisInfo, needTypes = if (takeCent) "centroid", showProgress = FALSE, func = function(ana, path, backend)
     {
-        hash <- makeHash(getMSDataFileHash(fp), params)
-        
-        cmd <- do.call(makeSAFDCommand, c(list(dirname(fp), basename(fp)), params))
-        
+        openMSReadBackend(backend, path)
+        paths <- list(mzCSV = tempfile("mz", fileext = ".csv"), intCSV = tempfile("int", fileext = ".csv"),
+                      rtCSV = tempfile("rt", fileext = ".csv"))
+        makeSAFDInput(backend, paths$mzCSV, paths$intCSV, paths$rtCSV, mzRange[1], mzRange[2])
+        return(paths)
+    })
+    
+    anaHashes <- getMSFileHashesFromAvailBackend(analysisInfo, needTypes = if (takeCent) "centroid")
+    
+    cmdQueue <- Map(analysisInfo$analysis, filePaths, CSVPaths, anaHashes, f = function(ana, fp, cfps, hash)
+    {
+        hash <- makeHash(hash, params)
+        cmd <- do.call(makeSAFDCommand, c(list(dirname(fp), basename(fp)), params, cfps))
         return(c(cmd, list(inputPath = fp, hash = hash, logFile = paste0(ana, ".txt"))))
     })
     

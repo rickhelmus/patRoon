@@ -123,10 +123,11 @@ void MSReadBackendMSTK::generateSpecMetadata(void)
     const bool haveIMS = firstSpec.hasIonMobilityArray(); // UNDONE: this could potentially be a false negative if first spec is empty or is MS2 w/out array
     setHaveIMS(haveIMS);
     
-    if (!haveIMS && firstSpec.getCentroidStatus() != 1)
+    if (getNeedType() == NEED_TYPE::CENTROID && firstSpec.getCentroidStatus() != 1)
         Rcpp::stop("Please make sure that file '%s' is centroided!", getCurrentFile().c_str());
-    
-    if (getNeedIMS() && !haveIMS)
+    if (getNeedType() == NEED_TYPE::PROFILE && firstSpec.getCentroidStatus() == 1)
+        Rcpp::stop("Please make sure that file '%s' is _not_ centroided (profile data)!", getCurrentFile().c_str());
+    if (getNeedType() == NEED_TYPE::IMS && !haveIMS)
         Rcpp::stop("File '%s' does not contain ion mobility data!", getCurrentFile().c_str());
     
     SpectrumRawMetadata meta;

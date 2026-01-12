@@ -532,6 +532,21 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// makeSAFDInput
+void makeSAFDInput(const MSReadBackend& backend, const std::string& mzFile, const std::string& intFile, const std::string& timeFile, SpectrumRawTypes::Mass mzStart, SpectrumRawTypes::Mass mzEnd);
+RcppExport SEXP _patRoon_makeSAFDInput(SEXP backendSEXP, SEXP mzFileSEXP, SEXP intFileSEXP, SEXP timeFileSEXP, SEXP mzStartSEXP, SEXP mzEndSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const MSReadBackend& >::type backend(backendSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type mzFile(mzFileSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type intFile(intFileSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type timeFile(timeFileSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type mzStart(mzStartSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type mzEnd(mzEndSEXP);
+    makeSAFDInput(backend, mzFile, intFile, timeFile, mzStart, mzEnd);
+    return R_NilValue;
+END_RCPP
+}
 // readMSP
 Rcpp::List readMSP(Rcpp::CharacterVector file, Rcpp::LogicalVector pc);
 RcppExport SEXP _patRoon_readMSP(SEXP fileSEXP, SEXP pcSEXP) {
@@ -842,18 +857,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// makeSAFDInput
-Rcpp::List makeSAFDInput(Rcpp::List spectra, Rcpp::NumericVector mzRange);
-RcppExport SEXP _patRoon_makeSAFDInput(SEXP spectraSEXP, SEXP mzRangeSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::List >::type spectra(spectraSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type mzRange(mzRangeSEXP);
-    rcpp_result_gen = Rcpp::wrap(makeSAFDInput(spectra, mzRange));
-    return rcpp_result_gen;
-END_RCPP
-}
 // binSpectra
 Rcpp::DataFrame binSpectra(Rcpp::DataFrame sp1, Rcpp::DataFrame sp2, Rcpp::CharacterVector shift, Rcpp::NumericVector precDiff, Rcpp::NumericVector mzWindow);
 RcppExport SEXP _patRoon_binSpectra(SEXP sp1SEXP, SEXP sp2SEXP, SEXP shiftSEXP, SEXP precDiffSEXP, SEXP mzWindowSEXP) {
@@ -1021,6 +1024,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_getIMSIsolationInfo", (DL_FUNC) &_patRoon_getIMSIsolationInfo, 1},
     {"_patRoon_testMS1Writer", (DL_FUNC) &_patRoon_testMS1Writer, 12},
     {"_patRoon_getChromPoints", (DL_FUNC) &_patRoon_getChromPoints, 8},
+    {"_patRoon_makeSAFDInput", (DL_FUNC) &_patRoon_makeSAFDInput, 6},
     {"_patRoon_readMSP", (DL_FUNC) &_patRoon_readMSP, 2},
     {"_patRoon_writeMSPLibrary", (DL_FUNC) &_patRoon_writeMSPLibrary, 3},
     {"_patRoon_readMoNAJSON", (DL_FUNC) &_patRoon_readMoNAJSON, 1},
@@ -1042,7 +1046,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_testCentroidIMSFrame", (DL_FUNC) &_patRoon_testCentroidIMSFrame, 7},
     {"_patRoon_loadEICIntensities", (DL_FUNC) &_patRoon_loadEICIntensities, 3},
     {"_patRoon_loadEICs", (DL_FUNC) &_patRoon_loadEICs, 5},
-    {"_patRoon_makeSAFDInput", (DL_FUNC) &_patRoon_makeSAFDInput, 2},
     {"_patRoon_binSpectra", (DL_FUNC) &_patRoon_binSpectra, 5},
     {"_patRoon_calcSpecSimilarity", (DL_FUNC) &_patRoon_calcSpecSimilarity, 8},
     {"_patRoon_calcAnnSims", (DL_FUNC) &_patRoon_calcAnnSims, 6},

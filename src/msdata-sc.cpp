@@ -117,10 +117,12 @@ void MSReadBackendSC::generateSpecMetadata(void)
     const bool hasMob = analysis.has_ion_mobility();
     setHaveIMS(hasMob);
 
-    if (!hasMob && analysis.get_spectra_mode({0})[0] != 2)
+    // 2 == centroided, 1 == profile, 0 == unknown?
+    if (getNeedType() == NEED_TYPE::CENTROID && analysis.get_spectra_mode({0})[0] == 1)
         Rcpp::stop("Please make sure that file '%s' is centroided!", getCurrentFile().c_str());
-    
-    if (getNeedIMS() && !hasMob)
+    if (getNeedType() == NEED_TYPE::PROFILE && analysis.get_spectra_mode({0})[0] == 2)
+        Rcpp::stop("Please make sure that file '%s' is _not_ centroided (profile data)!", getCurrentFile().c_str());
+    if (getNeedType() == NEED_TYPE::IMS && !hasMob)
         Rcpp::stop("File '%s' does not contain ion mobility data!", getCurrentFile().c_str());
     
     SpectrumRawMetadata meta;

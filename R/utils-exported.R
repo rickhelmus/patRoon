@@ -502,7 +502,7 @@ getBGMSMSPeaks <- function(anaInfo, replicates = NULL, MSLevel = 2, retentionRan
         mobilityRange <- c(0, 0)
     
     printf("Averaging the spectra for each of the %d analyses\n", nrow(anaInfo))
-    blSpecs <- applyMSData(anaInfo, function(ana, path, backend)
+    blSpecs <- applyMSData(anaInfo, needTypes = c("ims", "centroid"), func = function(ana, path, backend)
     {
         hash <- makeHash(baseHash, getMSDataFileHash(path))
         cached <- loadCacheData("avgBGMSMS", hash, cacheDB)

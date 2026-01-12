@@ -227,7 +227,7 @@ importFeatureXML <- function(ffile)
 # OpenMS doesn't support peak intensities. Estimate them from retention times
 loadIntensities <- function(anaInfo, fList, verbose)
 {
-    applyMSData(anaInfo, fList, types = "centroid", formats = "mzML", showProgress = verbose, func = function(ana, path, backend, fTab)
+    applyMSData(anaInfo, fList, needTypes = "centroid", showProgress = verbose, func = function(ana, path, backend, fTab)
     {
         fTab <- copy(fTab)
         if (nrow(fTab) == 0)

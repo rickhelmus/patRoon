@@ -159,8 +159,7 @@ Rcpp::List loadEICs(Rcpp::List spectra, Rcpp::NumericVector rtMins, Rcpp::Numeri
     return ret;
 }
 
-// [[Rcpp::export]]
-Rcpp::List makeSAFDInput(Rcpp::List spectra, Rcpp::NumericVector mzRange)
+Rcpp::List makeSAFDInputOld(Rcpp::List spectra, Rcpp::NumericVector mzRange)
 {
     const Rcpp::DataFrame specHeader = Rcpp::as<Rcpp::DataFrame>(spectra["header"]);
     const Rcpp::NumericVector hdMSLevels = specHeader["msLevel"];

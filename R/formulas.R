@@ -17,6 +17,7 @@ NULL
 #'   \code{annotations} method for access.
 #'
 #' @param obj,x,object The \code{formulas} object.
+#' @param MSPeakLists The \code{\link{MSPeakLists}} object with relevant spectral data.
 #' @param \dots For \code{plotSpectrum}: Further arguments passed to \code{\link[graphics]{plot}}.
 #'
 #'   For \code{delete}: passed to the function specified as \code{j}.
@@ -280,11 +281,8 @@ setMethod("annotatedPeakList", "formulas", function(obj, index, groupName, analy
 #'   spectra can be compared by specifying a two-sized vector for the \code{index}, \code{groupName} and (if desired)
 #'   \code{analysis} arguments.
 #'
-#' @param analysis A \code{character} specifying the analysis (or analyses when comparing spectra) for which the
-#'   annotated spectrum should be plotted. If \code{NULL} then annotation results for the complete feature group will be
-#'   plotted.
-#' @param title The title of the plot. Set to \code{NULL} for an automatically generated title.
-#'
+#' @templateVar withSpecAna TRUE
+#' @templateVar featAnnArgs TRUE
 #' @template plotSpec-args
 #'
 #' @template specSimParams-arg

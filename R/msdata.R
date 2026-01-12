@@ -27,8 +27,9 @@ NULL
 #'   \item \code{"mzr"}: uses the \CRANpkg{mzR} package to read \file{.mzML} and \file{.mzXML} files. This package was
 #'   more or less the default in \pkg{patRoon} prior to 3.0, and due to its popularity and age is a stable and well
 #'   tested option. The \code{mzr} backend currently reads the complete analysis file at once, which makes it more RAM
-#'   intensive compared to other backends. This backend currently does not support IMS data. Since \pkg{mzR} is a
-#'   dependency of \pkg{patRoon}, no additional installation is necessary.
+#'   intensive compared to other backends. The read data is cached to speed up any subsequent operations that require
+#'   the file data. This backend currently does not support IMS data. Since \pkg{mzR} is a dependency of \pkg{patRoon},
+#'   no additional installation is necessary.
 #'
 #'   \item \code{"mstoolkit"}: Uses the \href{https://github.com/mhoopmann/mstoolkit}{MSToolKit} C++ library to read
 #'   \file{.mzML} and \file{.mzXML} files, including IMS-HRMS data. The \command{MSToolKit} library has been developed

@@ -13,9 +13,10 @@ NULL
 #' \code{compounds} objects are obtained from \link[=generateCompounds]{compound generators}. This class is derived from
 #' the \code{\link{featureAnnotations}} class, please see its documentation for more methods and other details.
 #'
+#' @param obj,object,compounds,x The \code{compound} object.
+#' @param MSPeakLists The \code{\link{MSPeakLists}} object with relevant spectral data.
 #' @param formulas The \code{\link{formulas}} object that should be used for scoring/annotation. For \code{plotSpectrum}
 #'   and \code{annotatedPeakList}: set to \code{NULL} to ignore.
-#' @param obj,object,compounds,x The \code{compound} object.
 #' @param index The numeric index of the candidate structure.
 #'
 #'   For \code{plotStructure} and \code{getMCS}: multiple indices (\emph{i.e.} vector with length >=2) should be
@@ -34,6 +35,7 @@ NULL
 #'
 #'   \setsPassedArgs1{compounds}
 #'
+#' @templateVar featAnnArgs TRUE
 #' @template plotSpec-args
 #'
 #' @templateVar normParam normalizeScores
@@ -475,7 +477,6 @@ setMethod("annotatedPeakList", "compounds", function(obj, index, groupName, MSPe
 #'
 #' @param plotStruct If \code{TRUE} then the candidate structure is drawn in the spectrum. Currently not supported when
 #'   comparing spectra.
-#' @param title The title of the plot. If \code{NULL} a title will be automatically made.
 #' @param maxMolSize Numeric vector of size two with the maximum width/height of the candidate structure (relative to
 #'   the plot size).
 #' @param molRes Numeric vector of size two with the resolution of the candidate structure (in pixels).

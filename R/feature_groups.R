@@ -711,12 +711,13 @@ setMethod("export", "featureGroups", function(obj, type, out, IMS = FALSE)
     }
 })
 
-#' @describeIn featureGroups Obtain a subset with unique feature groups present in one or more specified replicate(s).
-#' @param incomparables Not used.
-#' @param relativeTo A character vector with replicates that should be used for unique comparison. If \code{NULL} then
-#'   all replicates are used for comparison. replicates specified in \code{which} are ignored.
-#' @param outer If \code{TRUE} then only feature groups are kept which do not overlap between the specified replicates
-#'   for the \code{which} parameter.
+#' @describeIn featureGroups Obtain a subset with unique feature groups present in one or more analyses, replicates etc.
+#' @param incomparables Not used. Included for compatibility with the generic.
+#' @param relativeTo A character vector of groupings that should be used for unique comparison. The groupings
+#'   (\emph{e.g.} replicates) are configured by the \code{aggregate} argument. If \code{NULL} then all groupings are
+#'   used for comparison. Data specified in \code{which} are ignored.
+#' @param outer If \code{TRUE} then only feature groups are kept which do not overlap among those present in the
+#'   groupings specified by the \code{which} parameter.
 #' @export
 setMethod("unique", "featureGroups", function(x, incomparables = FALSE, which, aggregate = TRUE, relativeTo = NULL, outer = FALSE)
 {

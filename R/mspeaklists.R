@@ -664,13 +664,9 @@ setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity 
 #' @describeIn MSPeakLists Plots a spectrum using MS or MS/MS peak lists for a given feature group. Two spectra can be
 #'   compared when two feature groups are specified.
 #'
-#' @param groupName The name of the feature group for which a plot should be made. To compare spectra, two group names
-#'   can be specified.
-#' @param analysis The name of the analysis for which a plot should be made. If \code{NULL} then data from the feature
-#'   group averaged peak list is used. When comparing spectra, either \code{NULL} or the analyses for both spectra
-#'   should be specified.
-#' @param title The title of the plot. If \code{NULL} a title will be automatically made.
-#'
+#' @templateVar withSpecAna TRUE
+#' @template plotSpec-args
+#' 
 #' @template plot-lim
 #'
 #' @export

@@ -195,10 +195,6 @@
 ## Docs
 
 - move all plotBPC(), getEIC() etc methods into one doc file?
-- update relativeTo arg (not just replicates)
-- mention that mzR backend caches as loads all at once
-- normalized and showLegend args for plotSpectrum() methods
-- getFMCS(): parallel=TRUE can only work on local machine
 - IMSMatch filter suspect filter: if negation is enabled and minMatches>0 then window match filter is not negated. If both would be negated then we get unexpected results, ie unmatched suspects stay and then the number of matched suspects is unexpectedly higher for minMatches
 - convert
     - add patRoon 3.0 citation for im_collapse
@@ -243,6 +239,9 @@
     - Advanced
         - say something about consensus/comparison?
             - first finish (ref) docs for IMS grouping
+        - parallelization
+            - restructure futures a bit: mainly move clusters from multiproc to beginning
+            - mention that not all support workers on other PCs (which? make a table?)
     - mention somewhere that IM collapse doesn't export MS/MS spectra by default and why
 - update tutorial
 - IMS

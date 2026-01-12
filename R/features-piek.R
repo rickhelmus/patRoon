@@ -380,7 +380,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, IMS = FALSE
     cacheDB <- openCacheDBScope()
     baseHash <- makeHash(genEICParams, peakParams, IMS, suspects, adduct, assignMethod, assignRTWindow, rtWindowDup,
                          mzWindowDup, mobWindowDup, minPeakOverlapDup, minIntensityIMS, keepDups)
-    anaHashes <- getMSFileHashesFromAvailBackend(analysisInfo, needIMS = IMS)
+    anaHashes <- getMSFileHashesFromAvailBackend(analysisInfo, needTypes = if (IMS) "ims" else c("ims", "centroid"))
     anaHashes <- sapply(anaHashes, makeHash, baseHash)
     cachedData <- pruneList(loadCacheData("featuresPiek", anaHashes, simplify = FALSE, dbArg = cacheDB))
     if (length(cachedData) > 0)
@@ -448,7 +448,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, IMS = FALSE
     EIMs <- list()
     if (nrow(anaInfoTBD) > 0)
     {
-        fList <- applyMSData(anaInfoTBD, needIMS = IMS, showProgress = FALSE, func = function(ana, path, backend)
+        fList <- applyMSData(anaInfoTBD, needTypes = if (IMS) "ims" else c("ims", "centroid"), showProgress = FALSE, func = function(ana, path, backend)
         {
             maybePrintf("\n-------\nFinding features for '%s'...\n", ana)
             

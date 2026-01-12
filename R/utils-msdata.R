@@ -130,8 +130,16 @@ getMSFilesFromAnaInfo <- function(anaInfo, types, formats, mustExist = TRUE)
          call. = FALSE)
 }
 
-getMSFileHashesFromAvailBackend <- function(anaInfo, types = getMSFileTypes(), formats = names(MSFileExtensions()),
-                                            needIMS = FALSE)
+noAnaPathsError <- function(needTypes)
+{
+    msg <- "Could not load MS data."
+    if (!is.null(needTypes))
+        msg <- paste(msg, sprintf("Need at least one of the requested data type(s): %s.", paste0(needTypes, collapse = ", ")))
+    stop(msg, " Please ensure all data is present and the \"patRoon.MS.backends\" option is configured properly: see ?patRoon",
+         call. = FALSE)
+}
+
+getMSFileHashesFromAvailBackend <- function(anaInfo, needTypes = NULL)
 {
     backends <- getOption("patRoon.MS.backends", character())
     
@@ -139,7 +147,7 @@ getMSFileHashesFromAvailBackend <- function(anaInfo, types = getMSFileTypes(), f
     {
         if (!backendAvailable(bn))
             next
-        filePaths <- maybeGetMSFiles(bn, anaInfo, types, formats, needIMS)
+        filePaths <- maybeGetMSFiles(bn, anaInfo, needTypes)
         if (!is.null(filePaths))
         {
             if (bn == "opentims")
@@ -148,14 +156,21 @@ getMSFileHashesFromAvailBackend <- function(anaInfo, types = getMSFileTypes(), f
         }
     }
     
-    stop("Failed to load a correct MS read backend. Please ensure patRoon.MS.backends is configured properly. See ?patRoon",
-         call. = FALSE)
+    noAnaPathsError(needTypes)
 }
 
 # shortcut for common case
 getCentroidedMSFilesFromAnaInfo <- function(anaInfo, formats = c("mzML", "mzXML"), mustExist = TRUE)
 {
     msf <- getMSFilesFromAnaInfo(anaInfo, "centroid", formats, mustExist)
+    if (is.null(msf))
+        return(NULL)
+    return(setNames(msf, anaInfo$analysis))
+}
+
+getProfileMSFilesFromAnaInfo <- function(anaInfo, formats = c("mzML", "mzXML"), mustExist = TRUE)
+{
+    msf <- getMSFilesFromAnaInfo(anaInfo, "profile", formats, mustExist)
     if (is.null(msf))
         return(NULL)
     return(setNames(msf, anaInfo$analysis))
@@ -182,14 +197,14 @@ doGetEICs <- function(anaInfo, EICInfoList, gapFactor, minIntensityIMS = 0, mode
     {
         if (is.null(cacheDB))
             cacheDB <- openCacheDBScope()
-        anaHashes <- getMSFileHashesFromAvailBackend(anaInfo, needIMS = needIMS)
+        anaHashes <- getMSFileHashesFromAvailBackend(anaInfo, needTypes = if (needIMS) "ims")
         baseHash <- makeHash(gapFactor, minIntensityIMS, mode, sumWindowMZ, sumWindowMob,
                              smoothWindowMZ, smoothWindowMob, smoothExtMZ, smoothExtMob, saveMZProfiles,
                              saveEIMs, minEICIntensity, minEICAdjTime, minEICAdjPoints, minEICAdjIntensity, pad,
                              topMost)
     }
     
-    allEICs <- applyMSData(anaInfo, EICInfoList, showProgress = TRUE, needIMS = needIMS,
+    allEICs <- applyMSData(anaInfo, EICInfoList, showProgress = TRUE, needTypes = if (needIMS) "ims",
                            func = function(ana, path, backend, EICInfo)
     {
         EICInfo <- copy(EICInfo)
@@ -258,9 +273,9 @@ doGetEIMs <- function(anaInfo, EIMInfoList, minIntensity, smooth, smLength, sgOr
     anaHashes <- NULL
     if (is.null(cacheDB))
         cacheDB <- openCacheDBScope()
-    anaHashes <- getMSFileHashesFromAvailBackend(anaInfo, needIMS = TRUE)
+    anaHashes <- getMSFileHashesFromAvailBackend(anaInfo, needTypes = "ims")
     
-    allEIMs <- applyMSData(anaInfo, EIMInfoList, needIMS = TRUE, func = function(ana, path, backend, EIMInfo)
+    allEIMs <- applyMSData(anaInfo, EIMInfoList, needTypes = "ims", func = function(ana, path, backend, EIMInfo)
     {
         EIMInfo <- copy(EIMInfo)
         for (col in c("mobmin", "mobmax"))
@@ -339,9 +354,9 @@ doGetChromPoints <- function(anaInfo, pointsInfoList)
 
     anaHashes <- NULL
     cacheDB <- openCacheDBScope()
-    anaHashes <- getMSFileHashesFromAvailBackend(anaInfo, needIMS = needIMS)
+    anaHashes <- getMSFileHashesFromAvailBackend(anaInfo, needTypes = if (needIMS) "ims")
 
-    allChromPoints <- applyMSData(anaInfo, pointsInfoList, needIMS = needIMS, func = function(ana, path, backend, pointsInfo)
+    allChromPoints <- applyMSData(anaInfo, pointsInfoList, needTypes = if (needIMS) "ims", func = function(ana, path, backend, pointsInfo)
     {
         pointsInfo <- copy(pointsInfo)
         for (col in c("mobmin", "mobmax"))

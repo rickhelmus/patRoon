@@ -88,14 +88,15 @@ NULL
 
 Rcpp::loadModule("MSReadBackend", TRUE)
 
-maybeGetMSFilesForOTIMS <- function(anaInfo, types, formats, needIMS)
+maybeGetMSFilesForOTIMS <- function(anaInfo, needTypes)
 {
-    if (!"raw" %in% types || !"bruker_ims" %in% formats)
+    if (!"raw" %in% needTypes)
         return(NULL)
     
     ret <- getMSFilesFromAnaInfo(anaInfo, "raw", "bruker_ims", mustExist = FALSE)
     if (!is.null(ret))
     {
+        setattr(ret, "needType", "ims")
         # try to load the Bruker TIMS library
         if (!doInitBrukerLib())
             ret <- NULL
@@ -103,44 +104,63 @@ maybeGetMSFilesForOTIMS <- function(anaInfo, types, formats, needIMS)
     return(ret)
 }
 
-maybeGetMSFilesForMzR <- function(anaInfo, types, formats, needIMS)
+maybeGetMSFilesForMzR <- function(anaInfo, needTypes)
 {
-    if (!"centroid" %in% types || needIMS)
+    if (!any(c("centroid", "profile") %in% needTypes))
         return(NULL)
     if (!requireNamespace("mzR", quietly = TRUE))
         return(NULL) # UNDONE: this will only be relevant when we actually make mzR a soft dependency
-    return(getCentroidedMSFilesFromAnaInfo(anaInfo, formats = intersect(formats, c("mzML", "mzXML")),
-                                           mustExist = FALSE))
+    if ("centroid" %in% needTypes)
+    {
+        ret <- getCentroidedMSFilesFromAnaInfo(anaInfo, mustExist = FALSE)
+        if (!is.null(ret))
+            return(setattr(ret, "needType", "centroid"))
+    }
+    if (is.null(ret) && "profile" %in% needTypes)
+    {
+        ret <- getProfileMSFilesFromAnaInfo(anaInfo, mustExist = FALSE)
+        if (!is.null(ret))
+            return(setattr(ret, "needType", "profile"))
+    }
+    return(NULL)
 }
 
-maybeGetMSFilesForSC <- function(anaInfo, types, formats, needIMS)
+maybeGetMSFilesForSC <- function(anaInfo, needTypes)
 {
     prefIMS <- getOption("patRoon.MS.preferIMS", FALSE)
+    filesIMS <- if ("ims" %in% needTypes) getMSFilesFromAnaInfo(anaInfo, "ims", "mzML", FALSE)
+    filesCentroid <- if ("centroid" %in% needTypes && (is.null(filesIMS) || !prefIMS))
+        getCentroidedMSFilesFromAnaInfo(anaInfo, mustExist = FALSE)
+    filesProfile <- if ("profile" %in% needTypes && (is.null(filesIMS) || !prefIMS) && is.null(filesCentroid))
+        getProfileMSFilesFromAnaInfo(anaInfo, mustExist = FALSE)
     
-    filesIMS <- if ("ims" %in% types || needIMS) getMSFilesFromAnaInfo(anaInfo, "ims", "mzML", FALSE)
-    filesCentroid <- if ("centroid" %in% types && !needIMS && (is.null(filesIMS) || !prefIMS))
-        getCentroidedMSFilesFromAnaInfo(anaInfo, formats = intersect(formats, c("mzML", "mzXML")), mustExist = FALSE)
-    
-    if (!is.null(filesIMS) && !is.null(filesCentroid))
-        return(if (prefIMS) filesIMS else filesCentroid)
+    if (prefIMS && !is.null(filesIMS))
+        return(setattr(filesIMS, "needType", "ims"))
+    if (!is.null(filesCentroid))
+        return(setattr(filesCentroid, "needType", "centroid"))
+    if (!is.null(filesProfile))
+        return(setattr(filesProfile, "needType", "profile"))
     if (!is.null(filesIMS))
-        return(filesIMS)
-    return(filesCentroid)
+        return(setattr(filesIMS, "needType", "ims"))
+    return(NULL)
 }
 
-maybeGetMSFilesForMSTK <- function(anaInfo, types, formats, needIMS)
+maybeGetMSFilesForMSTK <- function(anaInfo, needTypes)
 {
     # so far the same constraints as SC
-    return(maybeGetMSFilesForSC(anaInfo, types, formats, needIMS))
+    return(maybeGetMSFilesForSC(anaInfo, needTypes))
 }
 
-maybeGetMSFiles <- function(bn, ...)
+maybeGetMSFiles <- function(bn, anaInfo, needTypes)
 {
+    if (is.null(needTypes))
+        needTypes <- c("centroid", "profile", "ims")
+    
     return(switch(bn,
-                  opentims = maybeGetMSFilesForOTIMS(...),
-                  mzr = maybeGetMSFilesForMzR(...),
-                  streamcraft = maybeGetMSFilesForSC(...),
-                  mstoolkit = maybeGetMSFilesForMSTK(...),
+                  opentims = maybeGetMSFilesForOTIMS(anaInfo, needTypes),
+                  mzr = maybeGetMSFilesForMzR(anaInfo, needTypes),
+                  streamcraft = maybeGetMSFilesForSC(anaInfo, needTypes),
+                  mstoolkit = maybeGetMSFilesForMSTK(anaInfo, needTypes),
                   NULL))
 }
 createMSBackend <- function(backendName)
@@ -166,7 +186,7 @@ setMSReadBackendMetadata <- function(backend, fileHash, generator, cacheDB = NUL
     
     setSpecMetadata(backend, meta$MS1, meta$MS2)
     
-    if (backend$getNeedIMS())
+    if (backend$getNeedType() == "ims")
     {
         mobilities <- loadCacheData("MSReadBackendMobilities", hash, cacheDB)
         if (is.null(mobilities))
@@ -270,8 +290,15 @@ setMethod("initMSReadBackend", "Rcpp_MSReadBackendMem", function(backend)
         hd <<- as.data.table(mzR::header(msf))
         mzR::close(msf)
         
-        if (!is.null(hd[["centroided"]]) && !all(hd$centroided))
-            stop(sprintf("Please make sure that file '%s' is centroided!", path), call. = FALSE)
+        if (!is.null(hd[["centroided"]]))
+        {
+            # UNDONE: this check my potentially not happen, eg if the same files are set to both profile and centroided data
+            isCentr <- all(hd$centroided)
+            if (backend$getNeedType() == "centroid" && !isCentr)
+                stop(sprintf("Please make sure that file '%s' is centroided!", path), call. = FALSE)
+            if (backend$getNeedType() == "profile" && isCentr)
+                stop(sprintf("Please make sure that file '%s' is profile mode!", path), call. = FALSE)
+        }
         
         setnames(hd, c("acquisitionNum", "retentionTime", "totIonCurrent", "basePeakIntensity"),
                  c("scan", "time", "TIC", "BPC"))
@@ -329,8 +356,7 @@ openMSReadBackend <- function(backend, path)
     return(backend)
 }
 
-applyMSData <- function(anaInfo, func,  ..., types = getMSFileTypes(), formats = names(MSFileExtensions()),
-                        needIMS = FALSE, showProgress = TRUE)
+applyMSData <- function(anaInfo, func,  ..., needTypes = NULL, showProgress = TRUE)
 {
     backends <- getOption("patRoon.MS.backends", character())
     
@@ -339,11 +365,11 @@ applyMSData <- function(anaInfo, func,  ..., types = getMSFileTypes(), formats =
         if (!backendAvailable(bn))
             next
         
-        filePaths <- maybeGetMSFiles(bn, anaInfo, types, formats, needIMS)
+        filePaths <- maybeGetMSFiles(bn, anaInfo, needTypes)
         if (!is.null(filePaths))
         {
             backend <- createMSBackend(bn)
-            backend$setNeedIMS(needIMS)
+            backend$setNeedType(attr(filePaths, "needType"))
             printf("Using '%s' backend for reading MS data.\n", bn) # UNDONE: make printing optional (arg/option?)
             # NOTE: disable future parallelization as the backends are already OpenMP parallelized
             # NOTE: the callback can return cached data so opening the file should happen there.
@@ -352,22 +378,15 @@ applyMSData <- function(anaInfo, func,  ..., types = getMSFileTypes(), formats =
         }
     }
 
-    msg <- "Could not load MS data."
-    if (!setequal(types, getMSFileTypes()))
-        msg <- paste(msg, sprintf("Allowed types: %s.", paste0("\"", types, "\"", collapse = ", ")))
-    if (!setequal(formats, names(MSFileExtensions())))
-        msg <- paste(msg, sprintf("Allowed formats: %s.", paste0("\"", formats, "\"", collapse = ", ")))
-    if (needIMS)
-        msg <- paste(msg, "IMS data is required.")
-    stop(msg, " Please ensure all data is present and the \"patRoon.MS.backends\" option is configured properly: see ?patRoon",
-         call. = FALSE)
+    noAnaPathsError(needTypes)
 }
 
 #' @details The \code{availableBackends} function is used to query the available backends on the system.
 #'
 #' @param anaInfo Optional. If not \code{NULL} then \code{anaInfo} should be a \link[=analysis-information]{analysis
 #'   information} table, and only those backends that can read each of the analyses are returned.
-#' @param needIMS Only applicable if \code{anaInfo} is set: set to \code{TRUE} if IMS data is required.
+#' @param needIMS Only applicable if \code{anaInfo} is set: can be set to \code{"centroid"}, \code{"profile"} and/or
+#'   \code{"ims"} to filter file types.
 #' @param verbose Set to \code{TRUE} to print the status of each backend.
 #'
 #' @return \code{availableBackends} returns (invisibly) a \code{character} vector with the names of the available
@@ -375,10 +394,11 @@ applyMSData <- function(anaInfo, func,  ..., types = getMSFileTypes(), formats =
 #'
 #' @rdname msdata
 #' @export
-availableBackends <- function(anaInfo = NULL, needIMS = FALSE, verbose = TRUE)
+availableBackends <- function(anaInfo = NULL, needTypes = NULL, verbose = TRUE)
 {
     anaInfo <- assertAndPrepareAnaInfo(anaInfo, null.ok = TRUE)
-    checkmate::assertFlag(needIMS)
+    if (!is.null(needTypes))
+        checkmate::assertSubset(needTypes, c("centroid", "profile", "ims"), empty.ok = FALSE)
     checkmate::assertFlag(verbose)
     
     allBackends <- getMSReadBackends()
@@ -388,7 +408,7 @@ availableBackends <- function(anaInfo = NULL, needIMS = FALSE, verbose = TRUE)
     noAnas <- if (is.null(anaInfo))
         character()
     else
-        allBackends[sapply(allBackends, function(b) is.null(maybeGetMSFiles(b, anaInfo, getMSFileTypes(), names(MSFileExtensions()), needIMS)))]
+        allBackends[sapply(allBackends, function(b) is.null(maybeGetMSFiles(b, anaInfo, needTypes)))]
     
     checkAvail <- function(b)
     {

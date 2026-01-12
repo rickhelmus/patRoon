@@ -381,7 +381,7 @@ convertMSFilesIMSCollapse <- function(inFiles, outFiles, typeFrom, formatTo = "m
     mkdirp(anaInfo$path_centroid)
     
     printf("Collapsing all %d analyses ...\n", nrow(anaInfo))
-    applyMSData(anaInfo, anaInfo$path_centroid, needIMS = TRUE, showProgress = TRUE, func = function(ana, path, backend, outd)
+    applyMSData(anaInfo, anaInfo$path_centroid, needTypes = "ims", showProgress = TRUE, func = function(ana, path, backend, outd)
     {
         outp <- file.path(outd, paste0(ana, ".", formatTo))
         

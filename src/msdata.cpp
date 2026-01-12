@@ -7,6 +7,7 @@
 #include <Rcpp.h>
 
 #include <algorithm>
+#include <fstream>
 #include <vector>
 
 #ifdef _OPENMP
@@ -21,6 +22,35 @@
 #include "msdata-sc.h"
 #include "spectrum-raw.h"
 
+void MSReadBackend::setNeedTypeStr(const std::string &t)
+{
+    if (t == "centroid")
+        setNeedType(NEED_TYPE::CENTROID);
+    else if (t == "profile")
+        setNeedType(NEED_TYPE::PROFILE);
+    else if (t == "ims")
+        setNeedType(NEED_TYPE::IMS);
+    else if (t == "none")
+        setNeedType(NEED_TYPE::NONE);
+    else
+        Rcpp::stop("Invalid needType string '%s'!", t.c_str());
+}
+
+std::string MSReadBackend::getNeedTypeStr(void) const
+{
+    switch (getNeedType())
+    {
+        case NEED_TYPE::CENTROID:
+            return "centroid";
+        case NEED_TYPE::PROFILE:
+            return "profile";
+        case NEED_TYPE::IMS:
+            return "ims";
+        case NEED_TYPE::NONE:
+            return "none";
+    }
+    return "none"; // to silence compiler warning
+}
 
 void MSReadBackend::open(const std::string &file)
 {
@@ -69,8 +99,8 @@ std::vector<SpectrumRawTypes::Mobility> MSReadBackend::generateMobilities()
 RCPP_MODULE(MSReadBackend)
 {
     Rcpp::class_<MSReadBackend>("MSReadBackend")
-        .method("setNeedIMS", &MSReadBackend::setNeedIMS)
-        .method("getNeedIMS", &MSReadBackend::getNeedIMS)
+        .method("setNeedType", &MSReadBackend::setNeedTypeStr)
+        .method("getNeedType", &MSReadBackend::getNeedTypeStr)
         .method("getHaveIMS", &MSReadBackend::getHaveIMS)
         .method("open", &MSReadBackend::open)
         .method("close", &MSReadBackend::close)
@@ -1198,4 +1228,92 @@ Rcpp::List getChromPoints(const MSReadBackend &backend, const std::vector<Spectr
     }
 
     return ret;
+}
+
+// [[Rcpp::export]]
+void makeSAFDInput(const MSReadBackend &backend, const std::string &mzFile, const std::string &intFile,
+                   const std::string &timeFile, SpectrumRawTypes::Mass mzStart, SpectrumRawTypes::Mass mzEnd)
+{
+    const auto &meta = backend.getSpecMetadata().first;
+    std::vector<SpectrumRawSelection> sels;
+    for (size_t i=0; i<meta.scans.size(); ++i)
+        sels.emplace_back(i);
+    
+    const auto specFilter = SpectrumRawFilter().setMZRange(mzStart, mzEnd);
+
+    const auto sfunc = [&](const SpectrumRaw &spec, const SpectrumRawSelection &, size_t)
+    {
+        if (!spec.hasMobilities())
+            return filterSpectrumRaw(spec, specFilter, 0.0);
+        
+        std::map<SpectrumRawTypes::Mass, SpectrumRawTypes::Intensity> merged;
+        for (size_t i=0; i<spec.size(); ++i)
+        {
+            if (!numberGTE(spec.getMZs()[i], mzStart) || !numberLTE(spec.getMZs()[i], mzEnd))
+                continue;
+            merged[spec.getMZs()[i]] += spec.getIntensities()[i];
+        }
+        
+        if (merged.empty())
+            return SpectrumRaw();
+        
+        SpectrumRaw mergedSpec(merged.size(), false);
+        size_t ind = 0;
+        for (auto it = merged.cbegin(); it != merged.cend(); ++it, ++ind)
+            mergedSpec.setPeak(ind, it->first, it->second);
+        return mergedSpec;
+    };
+
+    const std::vector<std::vector<SpectrumRawSelection>> selsList(1, std::move(sels));
+    const auto allSpecs = applyMSData<SpectrumRaw>(backend, SpectrumRawTypes::MSLevel::MS1, selsList, sfunc, 0.0,
+                                                   SpectrumRawTypes::MSSortType::MZ)[0];
+
+    size_t rows = allSpecs.size();
+    size_t cols = 0;
+    for (const auto &p : allSpecs)
+        cols = std::max(cols, p.size());
+
+    // Write mz values to CSV
+    std::ofstream mzOut(mzFile);
+    for (size_t i=0; i<rows; ++i)
+    {
+        const auto &mzv = allSpecs[i].getMZs();
+        for (size_t j=0; j<cols; ++j)
+        {
+            if (j > 0)
+                mzOut << ",";
+            if (j < mzv.size())
+                mzOut << mzv[j];
+            else
+                mzOut << 0.0;
+        }
+        mzOut << "\n";
+    }
+    mzOut.close();
+
+    // Write intensity values to CSV
+    std::ofstream intOut(intFile);
+    for (size_t i=0; i<rows; ++i)
+    {
+        const auto &intv = allSpecs[i].getIntensities();
+        for (size_t j=0; j<cols; ++j)
+        {
+            if (j > 0)
+                intOut << ",";
+            if (j < intv.size())
+                intOut << intv[j];
+            else
+                intOut << 0.0;
+        }
+        intOut << "\n";
+    }
+    intOut.close();
+
+    // Write time values to CSV
+    std::ofstream timeOut(timeFile);
+    for (size_t i=0; i<meta.times.size(); ++i)
+    {
+        timeOut << meta.times[i] / 60.0 << "\n";
+    }
+    timeOut.close();
 }

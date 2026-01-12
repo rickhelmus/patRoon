@@ -16,12 +16,14 @@ class MSReadBackend
 {
 protected:
     using ThreadDataType = std::shared_ptr<void>;
+    enum class NEED_TYPE { NONE, CENTROID, PROFILE, IMS };
 
 private:
     std::string currentFile;
     SpectrumRawMetadata specMetadata;
     std::vector<SpectrumRawTypes::Mobility> mobilities;
-    bool needIMS = false, haveIMS = false;
+    NEED_TYPE needType = NEED_TYPE::NONE;
+    bool haveIMS = false;
     
     virtual void doOpen(const std::string &file) = 0;
     virtual void doClose(void) = 0;
@@ -30,7 +32,6 @@ private:
                                        const SpectrumRawSelection &scanSel,
                                        const SpectrumRawTypes::MobilityRange &mobRange,
                                        SpectrumRawTypes::Intensity minIntensityIMS) const = 0;
-    std::vector<SpectrumRawTypes::Mobility> doGetMobilities(void);
     
 protected:
     void setHaveIMS(bool h) { haveIMS = h; }
@@ -40,8 +41,10 @@ public:
     MSReadBackend(const MSReadBackend &) = delete;
     virtual ~MSReadBackend(void) { }
     
-    void setNeedIMS(bool n) { needIMS = n; }
-    bool getNeedIMS(void) const { return needIMS; }
+    NEED_TYPE getNeedType(void) const { return needType; }
+    void setNeedType(NEED_TYPE t) { needType = t; }
+    std::string getNeedTypeStr(void) const;
+    void setNeedTypeStr(const std::string &t);
     bool getHaveIMS(void) const { return haveIMS; }
     void open(const std::string &file);
     void close(void);

@@ -233,23 +233,7 @@
 - IMS
     - piek
         - refs to paper
-        - mention that bins are overlapping and twice as much
-        - summarize code changes and fixes
-        - mention that only mobility column for suspects is used so assignMobilities must be used for CCS conversion
-        - update docs for EIC filtering by suspects/ms2 (also mzIsoWindow, IMSWindow for ms2)
-        - docs for minEICsIMSPreCheck
-        - update docs for topMostEICMZ/topMostEICMZMob
-        - EIM & frame summing and smoothing, and other new options
-        - EIM saving: always stores EIM at feat RT, irrespective of mobAssignMethod/mobAggrMethod
-        - mention that frame data is summed to get mz data?
-        - further explain assignMethod/assignAggr, eg guide when to use what depending on frame summing
-        - explain that sumWindowMZ/sumWindowMob compensate assignment window
-        - EICBatchSize: arg description, add notes somewhere on how this and others can be used to tweak mem usage
-        - smooth extension defaults to bin size
-        - updates for filter and filterIMS args
-        - rtWindowDup, minPeakOverlapDup, keepDups etc
-            - update description how dups are removed
-        - match function arg order
+        - summarize code changes and fixes --> extend?
     - assignMobilities()
         - refs to paper
         - fGroups method
@@ -262,6 +246,7 @@
     - Greedy
         - mention that links are removed for mobility features
         - mention that and why rtalign=FALSE by default
+        - add docs
     - feat consensus
         - doc that all feats must have IMS data. For post workflows, IMS subset could be used
     - note that fallbackEIC only works for EIM mob assignments and setting chromPeakParams is mandatory when fromSuspects=TRUE

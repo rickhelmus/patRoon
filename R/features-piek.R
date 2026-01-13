@@ -106,97 +106,118 @@ setMethod("delete", "featuresPiek", function(obj, i = NULL, j = NULL, ...)
 #'
 #' @details The \code{piek} algorithm extends and improves on the simple and fast feature detection algorithm introduced
 #'   by \insertRef{Dietrich2021}{patRoon}. This algorithm first forms extracted ion chromatograms (EICs) and
-#'   subsequently performs automatic peak detection to generate features. The piek algorithm introduces the following
-#'   improvements and changes: \itemize{
+#'   subsequently performs automatic peak detection to generate features. The \code{piek} algorithm introduces the
+#'   following improvements and changes: \itemize{
 #'
-#'     \item Support for IMS workflows.
+#'     \item Support for IMS-HRMS workflows.
 #'
 #'     \item The \link{msdata} interface is used to efficiently form EICs from the raw data. All the file formats and
-#'     types that are supported by \link{msdata}. This includes IMS data, even if not used for feature detection, which
-#'     allows the use of IMS data directly in non-IMS or \link[=assignMobilities_feat]{post mobility assignment}
-#'     workflows.
-#'
-#'     \item The EICs may be formed by different approaches: \enumerate{
-#'
-#'       \item the use of pre-defined m/z bins with fixed widths. This is the approach of the original algorithm by
-#'       \insertRef{Dietrich2021}{patRoon} and applicable for most workflows.
-#'
-#'       \item the extension of m/z bins with ion mobility data to form two-dimensional bins (m/z + mobility).
-#'
-#'       \item generate EICs from a suspect list (m/z or m/z + mobility)
-#'
-#'       \item generate EICs from the precursor ions that were found in an data-dependent (DDA) MS/MS experiment (m/z)
-#'      or Bruker DDA-PASEF experiment (m/z + mobility)
-#'
-#'     }
+#'     types can be used that are supported by \link{msdata}. This includes IMS data, even if not used for feature
+#'     detection, which allows the use of IMS data directly in non-IMS or \link[=assignMobilities_feat]{post mobility
+#'     assignment} workflows.
+#'     
+#'     \item The EIC binning approach can be extended with the mobility dimension to support \link[=assignMobilities_feat]{direct mobility
+#'     assignment} workflows.
+#'     
+#'     \item The EIC bins can be filtered with suspect or MS2 data to speed up feature detection.
+#'     
+#'     \item Several filters are available to eliminate EICs with are likely devoid of any signal of interest.
 #'
 #'     \item The original peak detection algorithm was further optimized or can be be exchanged with others: see
-#'     \code{\link{getDefPeakParams}} for details. If retention times are available, \emph{i.e.} when EICs are formed
-#'     from the third approach (and retention times are available in the suspect list) or fourth approach, then these
-#'     will be used to filter the detected peaks.
+#'     \code{\link{getDefPeakParams}} for details.
 #'
-#'     \item Several filters are applied to improve the data and reduce redundancy. These are discussed in the next
-#'     sections.
+#'     \item Several filters are available to improve the data and reduce redundancy: \itemize{
+#'     
+#'     \item The original redundancy detection, which performs a second feature detection with EIC bins that are shifted
+#'     by 50\% width and eliminates features with \code{m/z} values outside the center of any bin, was extended for IMS
+#'     support.
+#'
+#'     \item Redundant features across bins are eliminated if with close retention time, \code{m/z}, mobility and
+#'     chromatographic overlap. The most intense feature is kept.
+#'     
+#'     \item Data from suspects or MS2 precursors that was used to pre-filter EICs, can also be used to filter the final
+#'     feature list.
+#'     
+#'     }
+#'     
+#'     \item Various small bug fixes and improvements for the original code.
 #'
 #'   }
-#'
-#'   The inclusion of ion mobility data in the EIC formation initiates a \link[=assignMobilities_feat]{direct mobility
-#'   assignment} workflow. Combinations of these approaches are also possible in IMS workflows
-#'   (see the \verb{EIC formation parameters} section below).
-#'
-#'   The m/z and mobility values (in IMS workflows) assigned to the feature are derived from the weighted mean of the
-#'   base peaks from the EIC data in the retention time range of the feature.
-#'
-#' @param genEICParams A \code{list} of parameters for the EIC generation. See the \verb{EIC formation parameters}
-#'   section below. The \code{getPiekEICParams} is used to generate the parameter list.
+#'   
+#' @param genEICParams A \code{list} of parameters for the EIC generation. See the \verb{EIC generation parameters}
+#'   section below. The \code{getPiekEICParams} function is used to generate the parameter list.
 #' @param peakParams A \code{list} of parameters for the peak detection. See \code{\link{getDefPeakParams}} for details.
-#' @param suspects A suspect list that needs to be specified if EICs are formed from suspect data. See
-#'   \link[=suspect-screening]{suspect screening} for details on the suspect list format.
+#' @param IMS Set to \code{TRUE} to use IMS data to resolve features. This initiates a
+#'   \link[=assignMobilities_feat]{direct mobility assignment} workflow. If \code{IMS=FALSE} then IMS data can still be
+#'   used for feature detection.
+#' @param suspects The suspect list to be used for suspect pre-filtering of EIC bins. See
+#'   \link[=suspect-screening]{suspect screening} for details on the suspect list format and \verb{EIC generation
+#'   parameters} to enable suspect filtering.
+#'   
+#'   \strong{NOTE}: Suspect matching can only be performed by mobilities and not \acronym{CCS} values. The
+#'   \code{\link[=assignMobilities_susp]{assignMobilities}} method should be used to convert any \acronym{CCS} data in
+#'   advance.
 #' @param adduct An \code{\link{adduct}} object (or something that can be converted to it with \code{\link{as.adduct}}).
-#'   Examples: \code{"[M-H]-"}, \code{"[M+Na]+"}. Only needs to be specified when EICs are formed from suspect data.
+#'   Examples: \code{"[M-H]-"}, \code{"[M+Na]+"}. Only needs to be specified if \code{suspects} is set.
 #' @param assignMethod Should be \code{"basepeak"} or \code{"weighted.mean"}. This parameter sets how measured
 #'   \emph{m/z} or mobilities across the EIC datapoints are handled for feature assignment. If
 #'   \code{assignMethod="basepeak"}, then the value of the base peak (=highest intensity peak) from each EIC datapoint
 #'   is taken. If \code{assignMethod="weighted.mean"} then the intensity weighted mean is calculated of the values that
 #'   fall within the EIC bin.
+#' @param assignRTWindow The retention time window (+/- seconds) used for aggregating EIC datapoints to assign feature
+#'   \emph{m/z} and mobility data, using an intensity weighted mean. The maximum window is always bound by the feature
+#'   retention time range. Increasing this number may improve accuracy by averaging more points. However, decreasing the
+#'   window may reduce inaccuracies due to inclusion of data from closely eluting features (with similar \emph{m/z} and
+#'   mobility) or noisy data from the chromatographic peak extremes. If \code{assignRTWindow=0} then only the EIC
+#'   datapoint at the feature retention time is used.
+#'
+#'   The assignment window is automatically adjusted for the values set for \code{sumWindowMZ} and \code{sumWindowMob}
+#'   (see \verb{EIC generation parameters}).
+#' @param rtWindowDup,mzWindowDup,mobWindowDup The retention time (seconds), \emph{m/z} and mobility windows used to
+#'   identify duplicate (redundant) features detected in multiple EIC bins. These values default to
+#'   \code{defaultLim("retention", "very_narrow")}, \code{defaultLim("mz", "medium")} and \code{defaultLim("mobility",
+#'   "medium")}, respectively (see \link{limits}).
+#' @param minPeakOverlapDup The minimum overlap (fraction between 0 and 1) in retention time between two features to be
+#'   considered a duplicate.
+#' @param EICBatchSize The number of EICs to be processed in a single batch. Decreasing this number will reduce memory
+#'   usage, at the cost of speed. Set to \code{Inf} to process all EICs in a single batch.
+#' @param keepDups Set to \code{TRUE} to keep duplicate features and features with non-centered \emph{m/z} or mobility
+#'   values. This is primarily intended for debugging, but can be useful to investigate why features are missing or
+#'   optimize tolerance windows for duplicate feature detection.
 #'
 #' @inheritParams findFeatures
 #' @template minIntensityIMS-arg
 #'
-#' @section EIC formation parameters: The \code{genEICParams} argument to \code{findFeaturesPiek} configures the
-#'   formation of EICs. The \code{getPiekEICParams} function should be used to generate the parameter list.
+#' @section IMS workflows: In IMS workflows (\emph{IMS=TRUE}), a 'pre-check' is performed to avoid excessive numbers of
+#'   two-dimensional bins for EIC formation and peak detection. These EICs are formed by only considering the m/z
+#'   dimension, and subsequently filtered by the parameters described in the \verb{EIC generation parameters} section.
+#'   The final EICs for feature detection are then only formed if they have m/z data that was not removed during the
+#'   pre-check.
+#'
+#'   The \code{m/z} and mobility data from IMS-HRMS data is typically not or partially centroided. The feature
+#'   \code{m/z} and mobility values are derived from \code{m/z} or mobility \emph{versus} intensity profiles. The
+#'   profiles are generated for each EIC timepoint, and the value at the maximum intensity or intensity weighted mean of
+#'   the profile is used to derive the intermediate values (configured by \code{assignMethod}). Several parameters exist
+#'   to improve the profile data (see next section).
+#'
+#' @section EIC generation parameters: The \code{genEICParams} argument to \code{findFeaturesPiek} configures the
+#'   generation of EICs. The \code{getPiekEICParams} function should be used to generate the parameter list.
 #'
 #'   The following general parameters exist: \itemize{
 #'
-#'     \item \code{filter} Sets how m/z data is used for the formation of EICs. Possible values are \code{"bins"} (use
-#'     equally sized m/z bins), \code{"suspects"} (use the unique m/z values from a suspect list) and \code{"ms2"} (use
-#'     the m/z values from the precursors detected in a data-dependent MS/MS experiment).
-#'
-#'     \item \code{filterIMS} Equivalent as \code{filter}, but for ion mobility data. If \code{NULL}, no IMS data will
-#'     be used and no \link[=assignMobilities_feat]{direct mobility assignment} IMS workflow is initiated. Different
-#'     values for \code{filter} and \code{filterIMS} can be specified to combine approaches. The following
-#'     combinations are supported: \itemize{
-#'
-#'       \item \code{filter="bins"} and \code{filterIMS="bins"}
-#'
-#'       \item \code{filter="suspects"} and \code{filterIMS="suspects"}
-#'
-#'       \item \code{filter="suspects"} and \code{filterIMS="bins"}
-#'
-#'       \item \code{filter="ms2"} and \code{filterIMS="ms2"}
-#'
-#'       \item \code{filter="ms2"} and \code{filterIMS="bins"}
-#'
-#'     }
-#'
-#'     Currently only Bruker DDA-PASEF experiments provide the data needed for the \code{"ms2"} approach.
+#'     \item \code{filter} Controls the pre-filtering of EIC bins with \emph{m/z} data. Should be \code{"none"} (no
+#'     filtering), \code{"suspects"} (filter with suspect data) or \code{"ms2"} (filter with data from precursors
+#'     detected in a data-dependent MS/MS experiment).
+#'     
+#'     \item \code{mzRange},\code{mzStep} Configures the formation of \emph{m/z} bins. \code{mzRange} is a numeric
+#'     vector of length two that specifies the min/max \emph{m/z} range. \code{mzStep} specifies the bin widths.
 #'
 #'     \item \code{retRange} A \code{numeric} vector of length two that specifies the retention time range for the EICs.
 #'     Data outside this range is excluded. Set to \code{NULL} to use the full range.
 #'
 #'     \item \code{gapFactor} A \code{numeric} that configures gap filling for EICs. See \code{\link{getDefEICParams}}
 #'     for further details.
-#'
+#'     
 #'     \item \code{minEICIntensity} The minimum intensity of the highest data point in the EIC. Used to filter EICs.
 #'
 #'     \item \code{minEICAdjTime},\code{minEICAdjPoints},\code{minEICAdjIntensity} The EIC should have at least a
@@ -205,95 +226,116 @@ setMethod("delete", "featuresPiek", function(obj, i = NULL, j = NULL, ...)
 #'     \code{minEICAdjPoints} to zero to disable continuity checks for time or data points, respectively. Set
 #'     \code{minEICAdjIntensity} to zero to completely disable continuity checks.
 #'
-#'     \item \code{topMostEIC} Only keep this number of top-most intense EICs. The intensity is derived from the data
+#'     \item \code{topMostEICMZ} Only keep this number of top-most intense EICs. The intensity is derived from the data
 #'     point with the highest intensity in the EIC. Set to zero to always select all EICs.
-#'
-#'     \item \code{topMostEICPre} Equivalent to \code{topMostEIC}, but used for pre-checking EICs in IMS workflows
-#'     (discussed in the next section).
-#'
-#'   }
-#'
-#'   The following parameters are specific for EIC binning: \itemize{
-#'
-#'     \item \code{mzRange},\code{mzStep} Configures the formation of m/z bins. \code{mzRange} is a numeric vector of
-#'     length two that specifies the min/max m/z range. \code{mzStep} specifies the bin widths.
-#'
-#'     \item \code{mobRange},\code{mobStep} Equivalent to above, but for ion mobility binning (\emph{i.e.} if
-#'     \code{filterIMS="bins"}).
+#'     
+#'     For IMS workflows, this parameter is \emph{only} used to limit the number of EICs resulting from the 'pre-check'
+#'     in the \emph{m/z} dimension.
 #'
 #'   }
+#'   
+#'   The following parameters are specifically used for IMS workflows: \itemize{
+#'   
+#'   \item \code{filterIMS} Similar to the \code{filter} parameter, but controls how mobility data is used for pre-filtering of EIC bins.
+#'     
+#'     Different values for \code{filter} and \code{filterIMS} can be specified: \itemize{
 #'
-#'   The following parameters are specifically for EICs from suspect data: \itemize{
+#'       \item \code{filter="none"} and \code{filterIMS="none"}
 #'
-#'     \item \code{rtWindow},\code{mzwindow},\code{IMSWindow}: If retention times are present in the suspect list:
-#'     specify the retention time, m/z and mobility (if \code{filterIMS="suspects"}) tolerance window to match features
-#'     with suspects. This is done when eliminating features with deviating retention times. Set \code{rtWindow=Inf} to
-#'     disable this step.
+#'       \item \code{filter="suspects"} and \code{filterIMS="suspects"}
 #'
-#'     The \code{mzWindow} and \code{IMSWindow} parameters are also used to set the data windows for the EICs.
+#'       \item \code{filter="suspects"} and \code{filterIMS="none"} (only use \emph{m/z} filtering)
 #'
+#'       \item \code{filter="ms2"} and \code{filterIMS="ms2"}
+#'
+#'       \item \code{filter="ms2"} and \code{filterIMS="none"}
+#'
+#'     }
+#'     
+#'     Currently only Bruker DDA-PASEF experiments provide the data needed for \code{"ms2"} filtering.
+#'   
+#'     \item \code{mobRange},\code{mobStep} Equivalent to \code{mzRange} and \code{mzStep}, but for ion mobility binning.
+#'   
+#'     \item \code{sumWindowMZ},\code{sumWindowMob} The retention time window (+/- s) used to sum adjacent datapoints
+#'     for the determination of intermediate EIC \emph{m/z} and mobility values. This data is aggregated to determine
+#'     the final feature values (see also the \code{assignRTWindow} argument). Set to \samp{0} to not sum any adjacent
+#'     timepoints. Larger values can generally improve accuracy for noisy data (\emph{e.g.} from TIMS), but care must be
+#'     taken to stay below the expected minimum chromatographic peak width to avoid inclusion of data from other
+#'     features. Defaults to \code{defaultLim("retention", "very_narrow")} (see \link{limits}).
+#'     
+#'     \item \code{smoothWindowMZ},\code{smoothWindowMob} The window size used to perform centered moving average
+#'     smoothing on intensity data of the \emph{m/z} and mobility profiles used to determine intermediate EIC values.
+#'     Smoothing of noisy data (\emph{e.g.} TIMS) is highly recommended to improve accuracy and consistency. Set to
+#'     \code{0} to disable smoothing.
+#'     
+#'     \item \code{smoothExtMZ},\code{smoothExtMob} The \code{m/z} or mobility window to extend the smoothing at the
+#'     edges of the EIC bin. This is recommended to improve smoothing, \emph{e.g.} when the peak profile is only
+#'     partially captured in the bin. Defaults to the bin width, \emph{i.e.} data from an adjacent bin on each side is
+#'     additionally included for smoothing. The final smoothed data is only taken from the actual EIC bin. Set to
+#'     \code{0} to disable extension.
+#'     
+#'     \item \code{saveMZProfiles},\code{saveEIMs} Set to \code{TRUE} to save the \emph{m/z} and mobility profiles for
+#'     each feature. Only the profiles at the feature retention time is saved. This can be useful for debugging or
+#'     parameter optimization, but will increase memory usage and processing times.
+#'     
+#'     \item \code{topMostEICMob} Equivalent to \code{topMostEICMZ}, used to reduce the final two-dimensional EIC bins
+#'     with \code{m/z} and mobility information.
+#'     
+#'     \item \code{minEICsIMSPreCheck} Only perform the \code{m/z} pre-check if the number of two-dimensional EIC bins
+#'     is at least \code{minEICsIMSPreCheck}.
+#'   
+#'   }
+#'
+#'   The following parameters are specifically for when suspect data is used to pre-filter EIC bins: \itemize{
+#'
+#'     \item \code{rtWindow},\code{mzwindow},\code{IMSWindow}: The retention time, \emph{m/z} and mobility tolerance
+#'     windows for suspect data. These are used for: \enumerate{
+#'     
+#'       \item Pre-filtering of EIC bins with suspect data, \emph{i.e.} larger tolerances will lead to more EIC bins
+#'       being kept. (only applicable for \code{mzWindow} and \code{IMSWindow}).
+#'       
+#'       \item Matching the final features to suspect data. \code{rtWindow=Inf} can be used to disable retention time
+#'       matching.
+#'     
+#'     }
+#'     
 #'     Defaults to \code{defaultLim("retention", "medium")}, \code{defaultLim("mz", "medium")} and
 #'     \code{defaultLim("mobility", "medium")}, see \link{limits}.
 #'
 #'     \item \code{skipInvalid},\code{prefCalcChemProps},\code{neutralChemProps} Controls preparing the suspect list
 #'     data. See \code{\link{screenSuspects}}.
 #'
-#'
 #'   }
 #'
-#'   The following parameters are specifically for EICs from MS/MS data: \itemize{
+#'   The following parameters are specifically for when MS2 data is used to pre-filter EICs: \itemize{
 #'
 #'     \item \code{rtWindow} Eliminates any features without an MS/MS spectrum within this retention time window. Set
 #'     \code{rtWindow=Inf} to disable this filter. Defaults to \code{defaultLim("retention", "very_narrow")} (see
 #'     \link{limits}).
-#'
-#'     \item \code{mzWindow},\code{IMSWindow} The m/z and mobility (if \code{filterIMS="ms2"}) tolerance windows, used to \enumerate{
-#'
-#'       \item match features to MS/MS spectrum retention times (see \code{rtWindow}).
-#'
-#'       \item set the data windows for the EICs.
-#'
-#'       \item used as clustering width to average the m/z and mobility data of MS/MS precursor (see the
-#'       \verb{Elimination and averaging of redundant data} section).
-#'
-#'     }
-#'
-#'     Defaults to \code{defaultLim("mz", "narrow")} and \code{defaultLim("mobility", "medium")} (see \link{limits}).
+#'     
+#'     \item \code{mzIsoWindow} The maximum \emph{m/z} window considered for MS/MS precursors that were isolated by DDA.
+#'     These \emph{m/z} isolation windows are used to pre-filter EICs and match the final features. Setting
+#'     \code{mzIsoWindow} to a value lower than typical instrument isolation windows will make feature detection more
+#'     specific, as features need to be more close to the triggered DDA precursor \code{m/z} values. In contrast, larger
+#'     values for \code{mzIsoWindow} allows to include features that were not specifically targeted by DDA, but may
+#'     still have MS/MS data as their \emph{m/z} could still fall within the MS/MS isolation window. The effective
+#'     window used will never exceed the instrumental isolation window. Setting \code{mzIsoWindow=Inf} will always use
+#'     instrumental windows.
+#'     
+#'     \item \code{IMSWindow} The mobility tolerance window to match DDA MS/MS precursors in IMS workflows. Used for
+#'     pre-filtering EICs and the final features. To match DDA precursor data, the measured mobility range of the
+#'     corresponding MS/MS data is used as the mobility window. This window is then adjusted to be at least +/-
+#'     \code{IMSWindow}. Defaults to \code{defaultLim("mobility", "medium")} (see \link{limits})
 #'
 #'     \item \code{minTIC} The minimum total ion current (TIC) signal for an MS/MS spectrum to be considered. Can be
 #'     increased to eliminate features with low intensity MS/MS data.
 #'
-#'     \item \code{clusterMethod} The clustering method to average MS/MS precursor data (discussed further in the
-#'     \verb{Elimination and averaging of redundant data} section).
-#'
 #'   }
-#'
-#' @section Elimination and averaging of redundant data: If EICs are formed from suspect data, then any duplicates in
-#'   the suspect list are eliminated to avoid duplicate EIC formation. Duplicate suspects are defined by very close m/z
-#'   and mobility (in IMS workflows), with tolerance windows defined by \code{defaultLim("mz", "very_narrow")} and
-#'   \code{defaultLim("mobility", "very_narrow")}, respectively (see \link{limits}).
-#'
-#'   If EICs are formed from MS/MS data, then the m/z and mobility data (in IMS workflows) of the MS/MS precursors are
-#'   clustered and averaged to avoid duplicate EIC formation. The clustering width and method are defined by the
-#'   \code{mzWindow}, \code{IMSWindow} and \code{clusterMethod} parameters, respectively (see previous section and
-#'   \link[=cluster-params]{clustering parameters}).
-#'
-#'   In IMS workflows a 'pre-check' is formed to reduce the number of EICs that should be subjected to peak detection.
-#'   This is especially important when both \code{filter} and \code{filterIMS} are set to \code{"bins"}, as this may
-#'   lead to millions of EIC bins in total. During the pre-check EICs are formed by only considering the m/z dimension,
-#'   and these are subsequently filtered by parameters described in the previous section. The final EICs for feature
-#'   detection are then only formed if they have m/z data that was not removed during the pre-check.
-#'
-#'   After feature detection, duplicate features are detected by very close retention time, m/z, and mobility (in IMS
-#'   workflows), and only the feature with highest intensity is kept. The equivalence is determined from the tolerance
-#'   windows defined by \code{defaultLim("retention", "very_narrow")} \code{defaultLim("mz", "very_narrow")} and
-#'   \code{defaultLim("mobility", "very_narrow")}, respectively (see \link{limits}).
-#'
 #'
 #' @templateVar what \code{findFeaturesPiek}
 #' @templateVar noProfile TRUE
 #' @template uses-msdata
-#' 
+#'
 #' @references \insertAllCited{}
 #'
 #' @inherit findFeatures return
@@ -663,7 +705,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, IMS = FALSE
 }
 
 #' @param \dots Any additional parameters to be set in the returned parameter list. These will override the defaults.
-#'   See the \verb{EIC formation parameters} section for details.
+#'   See the \verb{EIC generation parameters} section for details.
 #'
 #' @return \code{getPiekEICParams} returns a \code{list} of parameters for the EIC generation, which is used to set
 #'   the \code{genEICParams} argument to \code{findFeaturesPiek}.

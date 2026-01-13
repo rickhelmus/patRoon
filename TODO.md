@@ -194,21 +194,8 @@
 ## Docs
 
 - move all plotBPC(), getEIC() etc methods into one doc file?
-- IMSMatch filter suspect filter: if negation is enabled and minMatches>0 then window match filter is not negated. If both would be negated then we get unexpected results, ie unmatched suspects stay and then the number of matched suspects is unexpectedly higher for minMatches
 - convert
     - add patRoon 3.0 citation for im_collapse
-    - update docs for convertMSFilesIMCollapse() centroiding changes
-- update for distance_mean/point clustering
-- update docs for centroiding args
-    - removal of abundance params
-    - for IMCollapse: cluster method/window only used for PASEF precursors
-    - doc new args, explain centroiding, ref to MALDIquant
-- plotInt(): xlim/ylim
-- minAbundanceFeatAbs/Rel: update docs --> only filter group averaged if reAverage = FALSE, ie to allow
-    1. filter group averaged abundances
-    2. only filter ana plists and regenerate from them
-- assignMobilities() susps/compounds: explain why matching by IK1 by default --> helps with matching data, and streoismoers not really distinguishable by CCS
-- add docs to piek/MSPL/bgMS2 that profile m/z data is not yet supported
 - handbook
     - installation
         - add additional external deps, eg Python, TIMS-SDK, c3sdb, PCL/CCS etc

@@ -472,16 +472,26 @@ setMethod("delete", "MSPeakLists", function(obj, i = NULL, j = NULL, k = NULL, r
 #' @param maxMZOverPrec Any mass peaks with an m/z higher than this value (relative to the precursor) will be removed.
 #'   Set to \code{NULL} to ignore.
 #' @param minAbundanceFeatAbs,minAbundanceFeatRel The minimum absolute/relative abundance for a mass peak across spectra
-#'   that are averaged for a feature. The feature group peak lists are also filtered, using the mean averaged peak
-#'   abundance from the peak lists in the group. Set to \code{NULL} to ignore.
+#'   that are averaged for a feature. Setting \code{reAverage} determines if feature group peak lists are also filtered: \itemize{
+#'
+#'   \item \code{reAverage=FALSE} then this filter is also applied to feature group data, using the the mean averaged peak
+#'   abundance from the peak lists in the group.
+#'
+#'   \item \code{reAverage=TRUE} then this filter is \emph{not} applied to the (regenerated) feature group data.
+#'
+#'   }
+#'   In most cases \code{reAverage=TRUE} makes more sense to avoid inconsistent filtering approaches between feature
+#'   and feature group data.
+#'
+#'   Set to \code{NULL} to ignore.
 #' @param minAbundanceFGroupAbs,minAbundanceFGroupRel The minimum absolute/relative abundance of a mass peak across
 #'   spectra that are averaged for a feature group. Set to \code{NULL} to ignore.
 #' @param isolatePrec If not \code{NULL} then value should be a \code{list} with parameters used for isolating the
 #'   precursor and its isotopes in MS peak lists (see \verb{Isolating precursor data}). Alternatively, \code{TRUE} to
 #'   apply the filter with default settings (as given with \code{getDefIsolatePrecParams}).
 #' @param deIsotope Remove any isotopic peaks in peak lists. This may improve data processing steps which do not assume
-#'   the presence of isotopic peaks (e.g. MetFrag for MS/MS). Note that \code{generateMSPeakLists} does not (yet) support
-#'   flagging of isotopes.
+#'   the presence of isotopic peaks (e.g. MetFrag for MS/MS). Note that \code{generateMSPeakLists} does not (yet)
+#'   support flagging of isotopes.
 #' @param removeMZs A set of m/z values to be removed from the peak lists. This is typically used to remove background
 #'   peaks. The m/z values should be specified by either be a \code{numeric} vector or a \code{data.frame} with an
 #'   \code{mz} column. The latter is returned by the \code{\link{getBGMSMSPeaks}} function, which attempts to
@@ -912,6 +922,7 @@ setMethod("spectrumSimilarityMobility", "MSPeakLists", function(obj, fGroups, do
 #'   provide feedback if you feel any functionality is missing.
 #'
 #' @templateVar what \code{generateMSPeakLists}
+#' @templateVar noProfile TRUE
 #' @template uses-msdata
 #'
 #' @section Sets workflows: With a \link[=sets-workflow]{sets workflow}, the feature group averaged peak lists are made

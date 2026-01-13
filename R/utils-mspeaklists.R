@@ -42,9 +42,8 @@ emptyMSPeakList <- function(abundanceColumn, avgCols)
 #' spectra that are averaged. If \code{minAbundanceAbs} exceeds the number of spectra then the threshold is
 #' automatically lowered to the number of spectra.
 #'
-#' \item \code{minAbundanceIMSAbs},\code{minAbundanceIMSRel} Minimum absolute/relative abundance of an MS peak across
-#' the spectra that are summed within an IMS frame. If \code{minAbundanceIMSAbs} exceeds the number of spectra in the
-#' IMS frame then the threshold is automatically lowered to the number of spectra.
+#' \item \code{smoothWindowIMS},\code{halfWindowIMS},\code{maxGapIMS} Parameters used for centroiding \emph{m/z} peaks
+#' from IMS-HRMS data. See \verb{Centroiding IMS data} for more details.
 #'
 #' \item \code{withPrecursorMS} For MS data only: ignore any spectra that do not contain the precursor peak.
 #'
@@ -63,31 +62,53 @@ emptyMSPeakList <- function(abundanceColumn, avgCols)
 #'
 #' }
 #'
-#' The \code{getDefAvgPListParams} function can be used to generate a default parameter list. The current defaults are:
+#' The \code{getDefAvgPListParams} function can be used to generate a default parameter list. The defaults are:
 #'
 #' @eval paste("@@details", getDefAvgPListParamsRD())
 #'
 #' @param \dots Optional named arguments that override defaults.
 #'
+#' @section Centroiding IMS data: With IMS-HRMS data the \emph{m/z} peaks are often not or partially centroided. The
+#'   following steps are performed to centroid the data: \enumerate{
+#'
+#'   \item Sum up mass spectra within an IMS frame. If the feature has mobility data, only spectra within its mobility
+#'   boundaries are considered.
+#'   
+#'   \item Use point-distance clustering (see \link[=cluster-params]{clustering parameters}) with a window defined by
+#'   \code{maxGapIMS} to find related mass signals. This is primarily meant for non-continuous data, \emph{e.g.} due to
+#'   intensity thresholding. \code{maxGapIMS} is defaulted as \code{defaultLim("mz", "medium")} (see \link{limits}).
+#'   
+#'   \item Smooth the intensity data using a centered moving average with window size \code{smoothWindowIMS} (set to
+#'   zero to disable smoothing).
+#'   
+#'   \item Find local maxima within sliding window with +/- \code{halfWindowIMS} points and eliminate non-centroids.
+#'   This algorithm is based on the \code{C_localMaxima} function from \CRANpkg{MALDIquant}.
+#'
+#'   }
+#'
 #' @return \code{getDefAvgPListParams} returns a \code{list} with the peak list averaging parameters.
+#' 
+#' @references \insertRef{Gibb2012}{patRoon}
 #'
 #' @export
 getDefAvgPListParams <- function(...)
 {
-    def <- list(clusterMzWindow = defaultLim("mz", "medium"),
-                topMost = 50,
-                minIntensityPre = 500,
-                minIntensityPost = 500,
-                minAbundanceAbs = 0,
-                minAbundanceRel = 0,
-                smoothWindowIMS = 0,
-                halfWindowIMS = 2,
-                minIntensityIMS = 25,
-                maxGapIMS = defaultLim("mz", "medium"),
-                method = "distance_mean",
-                withPrecursorMS = TRUE,
-                pruneMissingPrecursorMS = TRUE,
-                retainPrecursorMSMS = TRUE)
+    def <- list(
+        method = "distance_mean",
+        clusterMzWindow = defaultLim("mz", "medium"),
+        topMost = 50,
+        minIntensityPre = 500,
+        minIntensityPost = 500,
+        minIntensityIMS = 25,
+        minAbundanceAbs = 0,
+        minAbundanceRel = 0,
+        smoothWindowIMS = 0,
+        halfWindowIMS = 2,
+        maxGapIMS = defaultLim("mz", "medium"),
+        withPrecursorMS = TRUE,
+        pruneMissingPrecursorMS = TRUE,
+        retainPrecursorMSMS = TRUE
+    )
     return(modifyList(def, list(...)))
 }
 
@@ -95,9 +116,9 @@ getDefAvgPListParams <- function(...)
 # nocov start
 getDefAvgPListParamsRD <- function()
 {
-    def <- getDefAvgPListParams()
-    def <- sapply(def, function(v) if (is.character(v)) paste0("\"", v, "\"") else v)
-    return(paste0("\\code{", names(def), "=", def, "}", collapse = "; "))
+    code <- constructive::construct(getDefAvgPListParams())
+    code <- paste0(unlist(code), collapse = "\n")
+    return(paste0("\\preformatted{", code, "}"))
 }
 # nocov end
 

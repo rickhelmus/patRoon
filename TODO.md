@@ -200,6 +200,7 @@
     - installation
         - add additional external deps, eg Python, TIMS-SDK, c3sdb, PCL/CCS etc
     - workflow concepts: maybe mention mobility as possible feature property
+    - add greedy at the right places
     - workflow gen
         - intro
             - update convertMSFiles() in table
@@ -240,18 +241,16 @@
             - add link to piek and import for direct IMS assignment
         - give some notes about sets workflows?
         - mention that fromSuspects only takes suspects assigned to a single fGroup (also in handbook?)
+        - note that fallbackEIC only works for EIM mob assignments and setting chromPeakParams is mandatory when fromSuspects=TRUE
+        - assignMobilities() doesn't do clustering anymore but greedy grouping
+            - maybe remove some fc refs?
     - peakParams
         - refs to paper
         - calcCentroid option
     - Greedy
-        - mention that links are removed for mobility features
-        - mention that and why rtalign=FALSE by default
-        - add docs
+        - add ref to paper
     - feat consensus
         - doc that all feats must have IMS data. For post workflows, IMS subset could be used
-    - note that fallbackEIC only works for EIM mob assignments and setting chromPeakParams is mandatory when fromSuspects=TRUE
-    - assignMobilities() doesn't do clustering anymore but greedy grouping
-        - maybe remove some fc refs?
     - update for MA smoothing for EIMs
     - update docs for importCheckFeaturesSession() (IMSWindow)
     - update docs to also mention patRoonDataIMS

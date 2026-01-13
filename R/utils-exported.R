@@ -611,9 +611,15 @@ getBGMSMSPeaks <- function(anaInfo, replicates = NULL, MSLevel = 2, retentionRan
 #'   \item \code{maxRTWindow} Maximum retention time window (seconds, +/- feature retention time) in which mobilograms
 #'   are collected and averaged. Defaults to \code{defaultLim("retention", "very_narrow")} (see \link{limits}).
 #'
-#'   \item \code{sgOrder},\code{smLength} The order and length of the Savitzky-Golay filter that is applied to smooth
-#'   the EIM. Passed as the \code{p} and \code{n} arguments to the \code{\link[signal:sgolayfilt]{signal::sgolayfilt}}.
-#'   Set either to \code{0} to disable smoothing.
+#'   \item \code{smooth} The smoothing method that is applied to the EIM. Can be \code{"none"} for no smoothing,
+#'   \code{"sg"} for Savitzky-Golay (using \CRANpkg{signal})) or \code{"ma"} for centered moving average (same algorithm
+#'   as used by \code{\link{findFeaturesPiek}}).
+#'
+#'   \item \code{smLength} The smoothing length. If \code{smooth="sg"} then this is passed as the \code{n} argument to
+#'   the \code{\link[signal:sgolayfilt]{signal::sgolayfilt}} function.
+#'
+#'   \item \code{sgOrder} The smoothing order for Savitzky-Golay. Passed as the \code{p} argument to the
+#'   \code{\link[signal:sgolayfilt]{signal::sgolayfilt}} function.
 #'
 #' }
 #'
@@ -759,6 +765,14 @@ getDefTPStructParams <- function(...)
 #'   \item \code{relMinIntensity} the minimum intensity threshold for a peak relative to the highest peak in the same
 #'   chromatogram/mobilogram. This is \emph{e.g.} useful to exclude noise in mobilograms where normally few peaks are
 #'   expected.
+#'
+#'   \item \code{calcCentroid} Controls how the peak centroid is calculated, which is used for retention time or
+#'   mobility determination. Valid values are: \code{"algorithm"} (use the centroid as determined by the algorithm),
+#'   \code{"max"} (use the apex of the peak), \code{"weighted.mean"} (use the intensity weighted mean of all data points
+#'   in the peak) or \code{"centerOfMass"} (use the center of mass or first statistical moment of the peak). The latter
+#'   two might of interest for assymaterical peaks. However, most algorithms, including those not interfaced by
+#'   \pkg{patRoon}, seem to use the peak apex. Hence, \code{calcCentroid="max"} (or \code{calcCentroid="algorithm"}
+#'   which is usually the same) seems a good default for comparative reasons.
 #'
 #'   }
 #'

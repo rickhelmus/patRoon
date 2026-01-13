@@ -290,8 +290,9 @@ setMethod("delete", "featuresPiek", function(obj, i = NULL, j = NULL, ...)
 #'
 #'
 #' @templateVar what \code{findFeaturesPiek}
+#' @templateVar noProfile TRUE
 #' @template uses-msdata
-#'
+#' 
 #' @references \insertAllCited{}
 #'
 #' @inherit findFeatures return

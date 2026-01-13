@@ -226,29 +226,32 @@ NULL
 #' Parameters for clustering data such as mass spectra and mobilograms.
 #'
 #' Different functionality within \pkg{patRoon} uses clustering to group similar data together, for instance, to average
-#' mass spectra or mobilograms. A fast \code{C++} backend based on \CRANpkg{Rcpp} is used to perform the clustering.
+#' mass spectra. A fast \code{C++} backend based on \CRANpkg{Rcpp} is used to perform the clustering.
 #'
-#' The clustering can be configured by the \emph{method} and \emph{window} parameter. The following clustering methods
+#' The clustering can be configured by the \code{method} and \code{window} parameter. The following clustering methods
 #' are available: \itemize{
 #'
 #'   \item \code{"hclust"}: uses hierarchical clustering to find similar data points (using
 #'   \href{https://github.com/cdalitz/hclust-cpp}{hclust-cpp}, which is based on the \CRANpkg{fastcluster} package).
 #'
-#'   \item \code{"distance"}: uses the distance between sorted data points to find close points.
+#'   \item \code{"distance_point"}: uses a maximum distance between adjacent sorted data points to form clusters.
 #'
-#'   \item \code{"bin"}: uses a simple binning approach to cluster similar mass peaks.
+#'   \item \code{"distance_mean"}: uses a maximum distance between the mean of the current cluster and the next sorted
+#'   data point to form clusters.
+#'
+#'   \item \code{"bin"}: uses a simple binning approach to cluster data points.
 #'
 #' }
 #'
 #' The \code{hclust} method may give more accurate results and was the default prior to \pkg{patRoon 3.0}, but is more
-#' computationally demanding and generally unsuitable for IMS workflows due to excessive use of RAM. The \code{distance}
-#' method is now default and suits most cases.
+#' computationally demanding and generally unsuitable for IMS workflows due to excessive use of RAM. The
+#' \code{distance_*} methods are now default and suit most cases.
 #'
-#' The window parameter defines the clustering tolerance. For \code{method="hclust"} this corresponds to the cluster
-#' height, for \code{method="distance"} this value is used to find nearby data points (+/- window) and for
-#' \code{method="bin"} it corresponds to the bin width. Too small windows will prevent clustering close data points
+#' The \code{window} parameter defines the clustering tolerance. For \code{method="hclust"} this corresponds to the
+#' cluster height, for \code{method="distance_*"} methods this value sets the maximum distance between compared data and
+#' for \code{method="bin"} it corresponds to the bin width. Too small windows will prevent clustering close data points
 #' (\emph{e.g.} resulting in split mass peaks in averaged spectra), whereas too big windows may cluster unrelated data
-#' points together.
+#' points together (\emph{e.g.} resulting in mass inaccuracies).
 #'
 #' @section Source: Averaging of mass spectra was originally based on algorithms from the
 #'   \href{https://github.com/zeehio/msProcess}{msProcess} R package (now archived on CRAN).

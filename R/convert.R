@@ -284,16 +284,15 @@ convertMSFilesBruker <- function(inFiles, outFiles, formatTo = "mzML", centroid 
 
 #' @details \code{convertMSFilesIMSCollapse} is used to convert IMS data to data that mimics 'regular' HRMS data by
 #'   collapsing the IMS dimension. The raw data interface of \pkg{patRoon} first sums up all spectra within each IMS
-#'   frame and the resulting data is then exported with the \code{\link[mzR:writeMSData]{mzR::writeMSData}} function.
-#'   This function has several thresholds that may speed up the conversion process and reduce noise, but care should be
-#'   taken that no peaks of interest are lost.
+#'   frame, performs centroiding and finally exports the resulting data with the
+#'   \code{\link[mzR:writeMSData]{mzR::writeMSData}} function. Several thresholds can be set to speed up the conversion
+#'   process and reduce noise, but care should be taken that no mass peaks of interest are lost.
 #'
 #' @param mzRange,mobilityRange A two sized vector specifying the m/z and mobility range to be exported, respectively.
 #'   Set to \code{NULL} to export the full range.
+#' @param smoothWindow,halfWindow,maxGap Centroiding parameters: see \code{\link{getDefAvgPListParams}} for details.
 #' @param clusterMethod,mzWindow The clustering method and window (see \link[=cluster-params]{clustering parameters})
 #'   used to find and combine MS/MS spectra of precursors with close \emph{m/z}.
-#' @param topMost Only consider these top most intense peaks in each spectrum within a frame. Set to \code{NULL} to
-#'   include all peaks.
 #' @param minIntensityIMS The minimum intensity for MS peaks in raw data.
 #' @param includeMSMS Set to \code{TRUE} to include MS/MS spectra in the output. For IMS workflows where IMS data is
 #'   only collapsed to produce compatible data files for feature detection, MS/MS data are not needed and can be
@@ -307,7 +306,7 @@ convertMSFilesBruker <- function(inFiles, outFiles, formatTo = "mzML", centroid 
 #' @export
 convertMSFilesIMSCollapse <- function(inFiles, outFiles, typeFrom, formatTo = "mzML", mzRange = NULL, mobilityRange = NULL,
                                       smoothWindow = 0, halfWindow = 2, maxGap = defaultLim("mz", "medium"),
-                                      clusterMethod = "distance_point", mzWindow = defaultLim("mz", "medium"),
+                                      clusterMethod = "distance_mean", mzWindow = defaultLim("mz", "medium"),
                                       minIntensityIMS = 0, includeMSMS = FALSE, ...)
 {
     ac <- checkmate::makeAssertCollection()

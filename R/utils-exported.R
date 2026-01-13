@@ -473,6 +473,10 @@ getEICs <- function(analysisInfo, ranges, gapFactor = 3, output = "fill", minInt
 #' @return A \code{\link{data.table}} with the detected background peaks and abundance statistics. The table can
 #'   directly be passed to the \code{removeMZs} argument of the \code{\link[=filter,MSPeakLists-method]{filter method for
 #' MSPeakLists}}.
+#' 
+#' @templateVar what \code{getBGMSMSPeaks}
+#' @templateVar noProfile TRUE
+#' @template uses-msdata
 #'
 #' @references \insertRef{Helmus2025}{patRoon}
 #'
@@ -1094,7 +1098,7 @@ getIMSRangeParams <- function(param, lower, upper, mzRelative = FALSE)
 #' The following parameters should be defined: \itemize{
 #'
 #'   \item \code{param} Should be \code{"mobility"} or \code{"CCS"} to match by mobility or \acronym{CCS}, respectively.
-#'   
+#'
 #'   \item \code{window},\code{relative} The \code{window} parameter sets the tolerance window size used for matching.
 #'   If \code{relative=TRUE} then the tolerance is relative (\samp{0-1}). The defaults for \code{window} are
 #'   (see \link{limits}): \itemize{
@@ -1108,7 +1112,7 @@ getIMSRangeParams <- function(param, lower, upper, mzRelative = FALSE)
 #'     \item \code{defaultLim("CCS", "medium_rel")} (\code{param="CCS"} and \code{relative=TRUE})
 #'
 #'   }
-#'   
+#'
 #'   \item \code{minMatches} The minimum number of mobility/\acronym{CCS} matches for a suspect hit. If the number of
 #'   available reference mobility/\acronym{CCS} values in the suspect list is less than \code{minMatches}, then that
 #'   number is used as threshold. Set to \code{0} to disable.
@@ -1121,6 +1125,10 @@ getIMSRangeParams <- function(param, lower, upper, mzRelative = FALSE)
 #'
 #' @param param Should be \code{"mobility"} or \code{"CCS"} to match by mobility or \acronym{CCS}, respectively.
 #' @param \dots optional named arguments that override defaults.
+#'
+#' @note If negation is enabled with suspect filtering and \code{minMatches>0}, then the \code{window} match filter is
+#'   \emph{not} negated. Negating both would lead to unexpected results, \emph{i.e.} suspects outside \code{window} are
+#'   kept and increase the number of matched suspects as seen by the \code{minMatches} filter.
 #'
 #' @export
 getIMSMatchParams <- function(param, ...)
@@ -1383,6 +1391,10 @@ convertCCSToMobility <- function(ccs, mz, CCSParams, charge = NULL)
 #'   \code{"InChIKey"}, \code{"InChIKey1"} (first block InChIKey), \code{"InChI"}, \code{"SMILES"}, \code{"name"}.
 #'   However, this also depends on which columns are available in either of the data sources. \code{InChIKey1} values
 #'   are automatically calculated from \code{InChIKey}s, if possible.
+#'
+#'   Matching by \code{InChiKey1} is recommended by default to allow tolerance between different datasources. Note that
+#'   most compound annotation algorithms also match by \code{InChIKey1} and current IMS resolving power is generally
+#'   insufficient to distinguish the different stereoisomers/tautomers specified by the full \code{InChIKey}.
 #' @param overwrite Set to \code{TRUE} to overwrite any existing suspect IMS data with data from \code{from}.
 #' @param adducts A \code{character} with the adduct(s) to consider for assigning mobility data to suspects and mobility
 #'   <--> \acronym{CCS} conversions. This may be limited by what is available in the data source specified by

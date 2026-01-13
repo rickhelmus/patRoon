@@ -134,14 +134,13 @@
     - mob range: doc that defaults are for TIMS? Or just not give any defaults? Give instrument? Put it in limits?
         - enable EIM summing and smoothing by default for TIMS?
         - or make IMS arg a character, eg "agilent", "bruker"?
-    - split IMSWindow arg for setting mobmin/mobmax? this currently sets very narrow ranges. Same for mz and ms2
-        - default to half bin widths?
     - intensityBP
         - docs...
         - does current mz/mob split make sense?
         - make a non summed intensityBP in IMS mode? mainly for peak finding, but maybe also makes more sense for assignment
             - otoh, BP single point doesn't make too much sense... maybe only use BP for non-IMS data?
             - since we have profiles, taking sum intensities makes more sense, as unrelated peaks will be relatively fewer and probably less strongly affect than in centroided data 
+    - have a default for genEICParams? --> check after defaults/profiles are set
 - update featAnn consensus?
 - EICs
     - are even numbers for smoothing/summing correctly handled?
@@ -246,12 +245,8 @@
             - maybe remove some fc refs?
     - peakParams
         - refs to paper
-        - calcCentroid option
     - Greedy
         - add ref to paper
-    - feat consensus
-        - doc that all feats must have IMS data. For post workflows, IMS subset could be used
-    - update for MA smoothing for EIMs
     - update docs for importCheckFeaturesSession() (IMSWindow)
     - update docs to also mention patRoonDataIMS
 

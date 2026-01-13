@@ -12,6 +12,45 @@ featureGroupsGreedy <- setClass("featureGroupsGreedy", contains = "featureGroups
 setMethod("initialize", "featureGroupsGreedy",
           function(.Object, ...) callNextMethod(.Object, algorithm = "greedy", ...))
 
+#' Group features using greedy algorithm
+#'
+#' Group features using a greedy algorithm that maximizes group scores based on retention time, m/z, mobility, and
+#' intensity similarities.
+#'
+#' @templateVar algo greedy
+#' @templateVar do group features
+#' @templateVar generic groupFeatures
+#' @templateVar algoParam greedy
+#' @template algo_generator
+#'
+#' @details The \code{greedy} algorithm is a simple feature grouping algorithm that can work with both HRMS and IMS-HRMS
+#'   data. The algorithm groups features by iteratively building the best possible groups. Features are processed in
+#'   order of decreasing intensity. For each feature, candidate groups are formed from all other (ungrouped) features
+#'   within the specified retention time, \emph{m/z} and mobility windows. Each candidate group only contains a maximum
+#'   of one feature per analysis. The candidates are then scored and the group with the lowest overall variations in
+#'   retention time, \emph{m/z}, mobility and replicate intensity is then selected. This process is repeated until all
+#'   features have been assigned to a group. The weights for each of the scoring terms can be configured.
+#'
+#' @template feat-arg
+#'
+#' @param rtalign Not yet supported. Provided for consistency with other grouping methods.
+#' @param rtWindow,mzWindow,IMSWindow Numeric tolerances for retention time (seconds), \emph{m/z}, and mobility,
+#'   respectively. The scoring terms are normalized to these values. Defaults to \code{defaultLim("retention",
+#'   "medium")}, \code{defaultLim("mz", "medium")}, and \code{defaultLim("mobility", "medium")}, respectively (see \link{limits}).
+#' @param scoreWeights Numeric vector specifying the scoring weights. Should contain the following named elements:
+#'   \code{"retention"}, \code{"mz"}, \code{"mobility"}, and \code{"intensity"}.
+#'
+#' @inheritParams groupFeatures
+#'
+#' @inherit groupFeatures return
+#'
+#' @note Any links between IMS parents and mobility features are removed. This can occur \emph{e.g.} when \code{greedy}
+#' is used to generate a \link[=featureGroups-compare]{feature consensus} from a \link[=assignMobilities_feat]{post
+#' mobility assignment} workflow.
+#'
+#' @templateVar what groupFeaturesGreedy
+#' @templateVar cl features
+#' @template main-rd-method
 #' @export
 setMethod("groupFeaturesGreedy", "features", function(feat, rtalign = FALSE,
                                                       rtWindow = defaultLim("retention", "medium"),

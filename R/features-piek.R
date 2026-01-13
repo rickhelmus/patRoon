@@ -45,6 +45,7 @@ getPiekEICsInfo <- function(params, IMS, suspects, MS2Info, verbose)
     }
     else if (params$filter == "ms2")
     {
+        # NOTE: MS2Info is already adjusted for mz and mob tolerances
         if (IMS && params$filterIMS ==  "ms2")
             EICInfo[, keep := filterEICBins(mzmin, params$mzStep, mobmin, params$mobStep, MS2Info$mzmin, MS2Info$mzmax,
                                             MS2Info$mobmin, MS2Info$mobmax)]
@@ -462,7 +463,8 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, IMS = FALSE
                     setDT(getIMSIsolationInfo(backend))
                 else
                     setDT(getMSMetadata(backend, 2))
-                setnames(MS2Info, c("mobStart", "mobEnd"), c("mobmin", "mobmax"), skip_absent = TRUE)
+                
+                # reduce m/z tolerance if needed
                 if (!is.finite(genEICParams$mzIsoWindow))
                 {
                     MS2Info[, c("mzmin", "mzmax") := .(precursorMZ - isolationRangeMin,
@@ -470,10 +472,18 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, IMS = FALSE
                 }
                 else
                 {
-                    MS2Info[, c("mzmin", "mzmax") := .(precursorMZ - min(genEICParams$mzIsoWindow, isolationRangeMin),
-                                                       precursorMZ + min(genEICParams$mzIsoWindow, isolationRangeMax))]
+                    MS2Info[, c("mzmin", "mzmax") := .(precursorMZ - pmin(genEICParams$mzIsoWindow, isolationRangeMin),
+                                                       precursorMZ + pmin(genEICParams$mzIsoWindow, isolationRangeMax))]
                 }
                 MS2Info <- MS2Info[TIC >= genEICParams$minTIC]
+                if (IMS)
+                {
+                    setnames(MS2Info, c("mobStart", "mobEnd"), c("mobmin", "mobmax"))
+                    # grow mob tolerance if needed
+                    MS2Info[, mobCenter := (mobmin + mobmax) / 2]
+                    MS2Info[, mobmin := pmin(mobmin, mobCenter - genEICParams$IMSWindow)]
+                    MS2Info[, mobmax := pmax(mobmax, mobCenter + genEICParams$IMSWindow)]
+                }
             }
             
             EICs <- EICInfo <- NULL
@@ -589,17 +599,8 @@ findFeaturesPiek <- function(analysisInfo, genEICParams, peakParams, IMS = FALSE
             else if (genEICParams$filter == "ms2" && is.finite(genEICParams$rtWindow))
             {
                 checkMob <- IMS && genEICParams$filterIMS == "ms2"
-                mobCheckMin <- mobCheckMax <- numeric()
-                if (checkMob)
-                {
-                    mobMeans <- mapply(MS2Info$mobmin, MS2Info$mobmax, FUN = mean)
-                    mobWidths <- (MS2Info$mobmax - MS2Info$mobmin) / 2
-                    mobWidths <- fifelse(mobWidths < genEICParams$IMSWindow, genEICParams$IMSWindow, mobWidths)
-                    mobCheckMin <- mobMeans - mobWidths
-                    mobCheckMax <- mobMeans + mobWidths
-                }
                 keep <- filterPiekResults(peaks$ret, peaks$mz, if (checkMob) peaks$mobility else numeric(),
-                                          MS2Info$time, MS2Info$mzmin, MS2Info$mzmax, mobCheckMin, mobCheckMax,
+                                          MS2Info$time, MS2Info$mzmin, MS2Info$mzmax, MS2Info$mobmin, MS2Info$mobmax,
                                           genEICParams$rtWindow)
                 peaks <- peaks[keep == TRUE]
             }

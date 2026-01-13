@@ -92,11 +92,19 @@ newProjectAnalysesUI <- function(id)
                                          inline = TRUE),
                         ),
                         conditionalPanel(
-                            condition = "input.generateAnaInfo == \"example\"",
+                            condition = "input.generateAnaInfo == \"example\" && output.IMSMode == \"none\"",
                             ns = ns,
                             fillRow(
                                 height = 30,
                                 textNote("Make sure that the patRoonData package is installed.")
+                            )
+                        ),
+                        conditionalPanel(
+                            condition = "input.generateAnaInfo == \"example\" && output.IMSMode != \"none\"",
+                            ns = ns,
+                            fillRow(
+                                height = 30,
+                                textNote("Make sure that the patRoonDataIMS package is installed.")
                             )
                         )
                     ),
@@ -190,7 +198,7 @@ newProjectAnalysesUI <- function(id)
     )
 }
 
-newProjectAnalysesServer <- function(id, ionization, settings)
+newProjectAnalysesServer <- function(id, ionization, IMSMode, settings)
 {
     ns <- NS(id)
     
@@ -543,6 +551,7 @@ newProjectAnalysesServer <- function(id, ionization, settings)
         output$analysisFilesHOT <- rhandsontable::renderRHandsontable(makeAnalysisFilesHOT())
         
         output <- exportShinyOutputVal(output, "ionization", ionization)
+        output <- exportShinyOutputVal(output, "IMSMode", IMSMode)
         
         list(
             valid = reactive({

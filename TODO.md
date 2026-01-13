@@ -37,7 +37,7 @@
     - actually, the same is the case for the mz filter (also IMS and mz for features) --> maybe just document difference? the actual results will not change much in general
 - TC convert: doc that centroid mode is used for IMS conversion (and/or make it optional?)
 - See why parallel reporting is so slow (on Windows?)
-- SAFD: remove MS_Import deps, update docs, make CSVs on parallel workers? If not doc that workers must be one same system
+- SAFD: make CSVs on parallel workers? If not doc that workers must be one same system
 
 
 ## Maybe
@@ -103,7 +103,6 @@
 - remove default limits that are in limits.yml
 - IMS changes
     - Codegen
-        - Select right example anaInfo
         - Add mobility filters for suspects & compounds?
         - is assignMobilities() before TP componentization OK?
             - IMS="maybe", so probably fine?

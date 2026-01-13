@@ -152,7 +152,7 @@ newProjectServer <- function(destPath)
         data$general <- newProjectGeneralServer("general", reactive(loadedSettings$general))
         ionization <- reactive(data$general$settings()$ionization)
         IMSMode <- reactive(data$general$settings()$IMS$mode)
-        data$analyses <- newProjectAnalysesServer("analyses", ionization, reactive(loadedSettings$analyses))
+        data$analyses <- newProjectAnalysesServer("analyses", ionization, IMSMode, reactive(loadedSettings$analyses))
         data$preTreatment <- newProjectPreTreatServer("pretreat", ionization, reactive(loadedSettings$preTreatment))
         data$features <- newProjectFeaturesServer("features", ionization, IMSMode, reactive(loadedSettings$features))
         hasSusp <- reactive({

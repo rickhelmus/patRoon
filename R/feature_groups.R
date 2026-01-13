@@ -1096,7 +1096,7 @@ setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduc
 #'   by the \code{\link{screenSuspects}} function. Hence, the IS specified by the \code{standards} argument should
 #'   follow the format of a \link[=suspect-screening]{suspect list}. Note that labelled elements in IS formulae should
 #'   be specified with the \CRANpkg{rcdk} format, \emph{e.g.} \code{"[13]C"} for 13C, \code{"[2]H"} for a deuterium etc.
-#'   Example IS lists are provided with the \pkg{patRoonData} package.
+#'   Example IS lists are provided with the \pkg{patRoonData} and \pkg{patRoonDataIMS} packages.
 #'
 #'   The assignment of IS to features is automatically performed, using the following criteria: \enumerate{
 #'

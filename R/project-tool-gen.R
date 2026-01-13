@@ -214,9 +214,10 @@ genScriptInitBlock <- function(CCSCalibrant, anaInfoData, settingsGen, settingsA
         }
         else if (settingsAna$generateAnaInfo == "example")
         {
-            generator$addComment("Example data from patRoonData package (triplicate solvent blank + triplicate standard)",
-                       condition = comment)
-            generator$addCall(anaInfoVarName, "patRoonData::exampleAnalysisInfo", list(value = exPol, quote = TRUE))
+            pd <- if (settingsGen$IMS$mode != "none") "patRoonDataIMS" else "patRoonData"
+            generator$addComment(sprintf("Example data from %s package (triplicate solvent blank + triplicate standard)",
+                                        pd), condition = comment)
+            generator$addCall(anaInfoVarName, sprintf("%s::exampleAnalysisInfo", pd), list(value = exPol, quote = TRUE))
         }
         else # none
         {
@@ -299,12 +300,14 @@ genScriptSuspListsBlock <- function(ionization, IMSMode, settingsFeat, doSusps, 
 {
     generator$addHeader("setup suspect lists")
     
+    pd <- if (IMSMode != "none") "patRoonDataIMS" else "patRoonData"
+    
     if (doSusps)
     {
         if (settingsFeat$exSuspList)
         {
             generator$addComment("Get example suspect list")
-            generator$addSuspListEx(ionization, "patRoonData::suspectsPos", "patRoonData::suspectsNeg", "suspList")
+            generator$addSuspListEx(ionization, sprintf("%s::suspectsPos", "%s::suspectsNeg", pd, pd), "suspList")
         }
         else
         {
@@ -371,7 +374,7 @@ genScriptSuspListsBlock <- function(ionization, IMSMode, settingsFeat, doSusps, 
         if (doEx)
         {
             generator$addComment("Get example ISTD list")
-            generator$addSuspListEx(ionization, "patRoonData::ISTDListPos", "patRoonData::ISTDListNeg", "ISTDList")
+            generator$addSuspListEx(ionization, sprintf("%s::ISTDListPos", "%s::ISTDListNeg", pd, pd), "ISTDList")
         }
         else
         {

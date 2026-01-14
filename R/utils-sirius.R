@@ -22,7 +22,7 @@ getSiriusResultPath <- function(outPath, msFName)
 {
     # format is resultno_specname_compoundname, older versions start with 1, newer with 0
     msFName <- basename(tools::file_path_sans_ext(msFName))
-    return(list.files(outPath, pattern = sprintf("[0-9]+_%s_%s", msFName, getSIRIUSCmpName()), full.names = TRUE))
+    return(list.files(outPath, pattern = sprintf("[0-9]+\\Q_%s_%s\\E", msFName, getSIRIUSCmpName()), full.names = TRUE))
 }
 
 getAndPrepareSIRIUSResFiles <- function(resultPath, subDir, ext)

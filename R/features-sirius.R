@@ -32,7 +32,7 @@ loadSIRFeat <- function(json, fileIndex)
 
 SIRFeatMPFinishHandler <- function(cmd)
 {
-    pattern <- paste0("^[[:digit:]]+_", cmd$analysis, "_[[:digit:]]+$")
+    pattern <- paste0("^[[:digit:]]+_\\Q", cmd$analysis, "\\E_[[:digit:]]+$")
     resDirs <- list.files(cmd$outPath, pattern = pattern, full.names = TRUE)
     ret <- rbindlist(lapply(resDirs, function(dir)
     {

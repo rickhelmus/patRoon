@@ -104,7 +104,8 @@ processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
 
             forms <- patRoon:::addMiscFormulaInfo(forms, adduct)
             
-            forms[, rank := NULL]
+            if (!is.null(forms[["rank"]]))
+                forms[, rank := NULL]
             
             forms[, fragInfo := Map(ion_formula, fragInfo, f = function(form, fi)
             {
@@ -322,6 +323,7 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
                 fta <- fta[sapply(fta, hasResults)]
                 return(lapply(fta, "[[", "formtab"))
             })
+            formTable <- pruneList(formTable, TRUE)
             groupFormulas <- generateGroupFormulasByConsensus(formTable,
                                                               lapply(groupFeatIndex(fGroups), function(x) sum(x > 0)),
                                                               featThreshold, featThresholdAnn, gNames)

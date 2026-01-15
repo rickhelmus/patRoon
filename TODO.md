@@ -214,12 +214,9 @@
     - IMS chapter
         - intro
             - make sure to update step numbers of post assignment throughout the chapter if this is changed
-            - table
-                - add more rows, eg for componentization?
-            - mention Waters not yet optimized/supported
         - workflows
             - see which knitr chunks to enable for execution
-            - note that fallbackEIC only works for EIM mob assignments and setting chromPeakParams is mandatory when fromSuspects=TRUE
+            - add more discussion on mz and mob profiles for piek? --> see after settling on instrument default
         - processing
             - evaluate the examples once they can be run
                 - maybe add or improve plotMobilogram examples

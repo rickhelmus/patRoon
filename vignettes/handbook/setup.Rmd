@@ -92,6 +92,20 @@ if (runData)
     fGroupsTPs <- screenSuspects(fGroups, convertToSuspects(TPsBT, includeParents = TRUE), adduct = "[M+H]+", onlyHits = TRUE)
     componTP <- generateComponents(fGroupsTPs, "tp", TPs = TPsBT)
     
+    anaInfoIMS <- patRoonDataIMS::exampleAnalysisInfo()
+    fListIMS <- getFeats(anaInfoIMS)
+    fGroupsIMS <- groupFeatures(fListIMS, "openms")
+    fGroupsIMS <- filter(fGroupsIMS, preAbsMinIntensity = 100, absMinIntensity = 10000,
+                         relMinReplicateAbundance = 1, maxReplicateIntRSD = 0.75,
+                         blankThreshold = 5, removeBlanks = TRUE,
+                         retentionRange = c(120, Inf), mzRange = NULL)
+    fGroupsIMS <- assignMobilities(fGroupsIMS, mobPeakParams = getDefPeakParams("bruker_ims", "piek"),
+                                   chromPeakParams = getDefPeakParams("chrom", "piek"),
+                                   CCSParams = getCCSParams("mason-schamp_1/k"))
+    fGroupsIMS <- screenSuspects(fGroupsIMS, patRoonDataIMS::suspectsPos, adduct = "[M+H]+", onlyHits = TRUE)
+    mslistsIMS <- generateMSPeakLists(fGroupsIMS)
+    compoundsIMS <- generateCompounds(fGroupsIMS, mslistsIMS, "metfrag", database = "pubchemlite", adduct = "[M+H]+")
+    
     mslibraryMSP <- mslibrary <- loadMSLibrary(file.path(vignDir, "..", "tests", "testthat", "test_data",
                                                          "MoNA-export-CASMI_2012.msp"), "msp")
     mslibraryJSON <- loadMSLibrary(file.path(vignDir, "..", "tests", "testthat", "test_data", "MoNA-export-CASMI_2016.json"), "json")

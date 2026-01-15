@@ -522,6 +522,9 @@ getBGMSMSPeaks <- function(anaInfo, replicates = NULL, MSLevel = 2, retentionRan
                                 startMobs = mobilityRange[1], endMobs = mobilityRange[2],
                                 minAbundanceRel = avgSpectraParams$minAbundanceRel,
                                 minAbundanceAbs = avgSpectraParams$minAbundanceAbs,
+                                smoothWindowIMS = avgSpectraParams$smoothWindowIMS,
+                                halfWindowIMS = avgSpectraParams$halfWindowIMS,
+                                maxGapIMS = avgSpectraParams$maxGapIMS,
                                 topMost = avgSpectraParams$topMost,
                                 minIntensityIMS = avgSpectraParams$minIntensityIMS,
                                 minIntensityPre = avgSpectraParams$minIntensityPre,
@@ -1762,12 +1765,12 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
                     if (any(mUpdated))
                     {
                         obj[hasVal(get(mCol)) & hasVal(get(cCol)) & mUpdated & !cUpdated,
-                            (cCol) := doConvert("mobility", get(mCol), mzTab[[mzCol]], .charge)]
+                            (cCol) := doConvert("mobility", get(mCol), mzTab[[mzCol]][match(name, mzTab$name)], .charge)]
                     }
                     if (any(cUpdated))
                     {
                         obj[hasVal(get(mCol)) & hasVal(get(cCol)) & !mUpdated & cUpdated,
-                            (mCol) := doConvert("CCS", get(cCol), mzTab[[mzCol]], .charge)]
+                            (mCol) := doConvert("CCS", get(cCol), mzTab[[mzCol]][match(name, mzTab$name)], .charge)]
                     }
                 }
                 obj[, .charge := NULL]

@@ -18,6 +18,8 @@ The following sections further detail each of these workflows, including the req
 
 > **_NOTE_** While IMS workflows are largely the same as non-IMS workflows, there are some important considerations (outlined in this chapter). It is highly recommended to experiment with the [newProject tool](#newProject) and study the [example workflow](#exIMSWorkflow) to get a feeling of how IMS workflows work.
 
+> **_NOTE_** IMS workflows have been primarily developed with Bruker TIMS and Agilent IMS data. Most of the functionality was designed to be generic and applicable to other IMS data as well, but data from other instruments likely need to be optimized. Furthermore, mobility <--> CCS conversion is not yet supported for other instruments. Contributions to test and extend support for other instruments are _very welcome!_
+
 ### LC-MS workflows with IMS data
 
 In this workflow the raw IMS data is 'collapsed' and is converted in such a way it looks like 'regular' LC-MS data. This is achieved by summing up the mass spectra in each IMS frame and subsequently replacing the IMS frames by the combined spectra. The workflow then proceeds as a regular LC-MS workflow. Hence, this type of workflow does not bring any of the benefits of IMS data, but allows full compatibility with software tools that do not support IMS data. Furthermore, this type of workflow is much less computationally intensive, which makes it suitable for e.g. initial exploration of data.
@@ -56,7 +58,7 @@ Mobility/IMS parent links       | No                  | No                      
 Suspect & compound CCS matching | No                  | Yes                        | Yes
 HRMS cleanup                    | No                  | Yes                        | Yes
 non-IMS feature fallback        | -                   | No                         | Yes
-Supports [sets workflows](#setsWorkflow)^2^ | Yes     | Limited                    | Limited
+Supports [sets workflows](#setsWorkflow)^2^ | Yes     | Limited                    | Moderate
 
 Notes:
 
@@ -218,18 +220,24 @@ The following options exist for the `from` function argument:
 
 Some examples:
 
-```{r assignMobSusps, eval=FALSE}
+```{r assignMobSusps, eval=runData}
+suspList <- patRoonData::suspectsPos[1:4, ]
+
 # adds CCS values from PubChemLite and converts them to mobilities
 suspList <- assignMobilities(suspList, from = "pubchemlite", adducts = c("[M+H]+", "[M+Na]+", "[M+H]-"),
-                             CCSParams = getCCSParams("bruker"))
+                             CCSParams = getCCSParams("mason-schamp_1/k"))
+suspList[, grepl("name|InChIKey|mobility|CCS", colnames(suspList))]
 
-# adds (non-adduct specific) CCS values from custom library
+# overwrites data from custom library
 IMSLib <- data.frame(
-    name = c("Caffeine", "Acetaminophen"), # name column is not mandatory
-    InChIKey = c("RYYVLZVUVIJVGH-UHFFFAOYSA-N", "RZVAJINKPMORJF-UHFFFAOYSA-N"),
-    CCS = c(150, 160)
-))
-suspList <- assignMobilities(suspList, from = IMSLib, adducts = NA)
+    name = c("DEET", "Diglyme"), # (name column is not mandatory)
+    InChIKey1 = c("MMOXZBCLCQITDF", "SBZXBUIDTXKZTM"), # NOTE: matching happens by first-block IK by default
+    "CCS_[M+H]+" = c(150, 160),
+    check.names = FALSE # NOTE: need this to allow special characters in column names (ie in CCS column)
+)
+suspList <- assignMobilities(suspList, from = IMSLib, overwrite = TRUE,
+                             adducts = "[M+H]+", CCSParams = getCCSParams("mason-schamp_1/k"))
+suspList[, grepl("name|InChIKey|mobility|CCS", colnames(suspList))]
 ```
 
 #### Performing suspect screening {#screenIMS}
@@ -354,14 +362,14 @@ Some examples:
 
 ```{r exCompIMS, eval=FALSE}
 # generate compound candidates
-compounds <- generateCompounds(fGroups, "metfrag", adduct = "[M+H]+", database = "comptox")
+compounds <- generateCompounds(fGroups, mslists, "metfrag", adduct = "[M+H]+", database = "comptox")
 # perform CCS prediction with C3SDB and convert the values to mobilities
 compounds <- assignMobilities(compounds, fGroups, from = "c3sdb", adduct = "[M+H]+",
                               CCSParams = getCCSParams("bruker"))
 
 # generate compound candidates
 # NOTE: if PubChemLite with CCS data is installed, then CCS data is automatically added
-compounds <- generateCompounds(fGroups, "metfrag", adduct = "[M+H]+", database = "pubchemlite")
+compounds <- generateCompounds(fGroups, mslists, "metfrag", adduct = "[M+H]+", database = "pubchemlite")
 # overwrite CCS data from a custom library (candidates not in the library will be untouched)
 IMSLib <- data.frame(
     name = c("Caffeine", "Acetaminophen"), # name column is not mandatory
@@ -381,7 +389,7 @@ The number of features in post mobility assignment workflows can be very large, 
 
 ```{r minMobSpecSim, eval=FALSE}
 # generate formulas: copy IMS parent results when the spectral similarity is at least 0.9
-formulas <- generateFormulas(fGroups, "genform", adduct = "[M+H]+", minMobSpecSim = 0.9)
+formulas <- generateFormulas(fGroups, mslists, "genform", adduct = "[M+H]+", minMobSpecSim = 0.9)
 ```
 
 ### Sets workflows {#IMSSetsWorkflow}
@@ -391,6 +399,15 @@ There is basic functionality to combine IMS workflows and [sets workflows](#sets
 Like non-IMS workflows, the `makeSet()` function is used to initialize the sets workflow.
 
 ## Processing data
+
+```{r include=FALSE,eval=runData}
+fGroupsO <- fGroups
+fGroups <- fGroupsIMS
+mslistsO <- mslists
+mslists <- mslistsIMS
+compoundsO <- compounds
+compounds <- compoundsIMS
+```
 
 The data processing functionality of `patRoon` that was [discussed before](#processing) equally applies to IMS workflows. In addition, some extra functionality exists to inspect and filter the data. These are discussed in the next subsections.
 
@@ -413,7 +430,7 @@ The [reporting functionality](#report) of `patRoon` contains various functionali
 
 Some examples are shown below:
 
-```{r exInspPlotIMS, eval=FALSE}
+```{r exInspPlotIMS, eval=runData}
 # plot mobilogram for first feature
 plotMobilograms(fGroups[, 1])
 # plot mobilogram for a mobility feature: this highlights the mobility (range) assigned to the feature
@@ -439,7 +456,7 @@ Filter           | Classes         | Remarks
 
 Some examples are shown below:
 
-```{r exFiltIMS, eval=FALSE}
+```{r exFiltIMS, eval=runData}
 # keep only mobility features
 # NOTE: this effectively results in data that is equal to a direct IMS workflow
 fGroupsMob <- filter(fGroups, IMS = TRUE)
@@ -462,6 +479,13 @@ compoundsF <- filter(compounds, IMSRangeParams = getIMSRangeParams("CCS", 150, 2
 
 # only keep compound candidates with matching CCS (6% tolerance)
 compoundsF <- filter(compounds, IMSMatchParams = getIMSMatchParams("CCS", window = 0.06, relative = TRUE))
+```
+
+
+```{r include=FALSE,eval=runData}
+fGroups <- fGroupsO
+mslists <- mslistsO
+compounds <- compoundsO
 ```
 
 ## Example workflow {#exIMSWorkflow}

@@ -216,13 +216,10 @@
             - make sure to update step numbers of post assignment throughout the chapter if this is changed
             - table
                 - add more rows, eg for componentization?
+            - mention Waters not yet optimized/supported
         - workflows
             - see which knitr chunks to enable for execution
-            - details for IMS grouping
             - note that fallbackEIC only works for EIM mob assignments and setting chromPeakParams is mandatory when fromSuspects=TRUE
-            - mention that fromSuspects only takes suspects assigned to a single fGroup
-            - don't say that fGroups makeSet() is only supported for direct workflows
-            - give some notes about sets workflows? (see ref docs)
         - processing
             - evaluate the examples once they can be run
                 - maybe add or improve plotMobilogram examples

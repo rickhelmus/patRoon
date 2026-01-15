@@ -24,7 +24,7 @@ In this workflow the raw IMS data is 'collapsed' and is converted in such a way 
 
 ### Direct mobility assignment {#directIMS}
 
-This workflow relies on a feature detection algorithm that separates features by ion mobility and assigns the feature mobilities directly during feature detection. In `patRoon` this is currently only supported by the `piek` algorithm or by [importing feature data from other algorithms](#importFeat). None of the feature grouping algorithms currently interfaced by `patRoon` support IMS data. To circumvent this, features with close mobilities are first clustered and then any of the non-IMS algorithms is used to perform sample analysis grouping with each cluster. The grouping results for each cluster are then combined to obtain the final feature groups. Most of the remaining workflow is the same as non-IMS workflows. However, it typically adds steps to calculate CCS values for features and matches these with (predicted) CCS values of suspects and/or compound annotation candidates. Furthermore, the IMS data is internally used to cleanup extracted ion chromatograms and mass spectra, which can improve their visualization and quality of feature annotation.
+This workflow relies on a feature detection algorithm that separates features by ion mobility and assigns the feature mobilities directly during feature detection. In `patRoon` this is currently only supported by the `piek` and `greedy` algorithms or by [importing feature data from other algorithms](#importFeat).Most of the remaining workflow is the same as non-IMS workflows. However, it typically adds steps to calculate CCS values for features and matches these with (predicted) CCS values of suspects and/or compound annotation candidates. Furthermore, the IMS data is internally used to cleanup extracted ion chromatograms and mass spectra, which can improve their visualization and quality of feature annotation.
 
 ### Post mobility assignment {#postIMS}
 
@@ -40,7 +40,7 @@ The mobility assignment consists of the following steps:
 
 All these steps are automatically performed by the `assignMobilities()` method function that will be discussed later.
 
-An advantage of post mobility workflows is the compatibility with any of the feature detection and grouping algorithms supported in `patRoon`. In addition, post assignment is often less computationally intensive than direct mobility assignment workflows. Furthermore, the links between mobility features and IMS parents facilitate the recognition of possible protomers (i.e. redundant features of a same compound with the same retention time and _m/z_ but different mobility) and enables the use of [sets workflows](#setsWorkflow). Finally, post mobility assignment workflows can selectively fallback to 'regular' LC-MS feature data from the IMS parents in steps where this makes more sense, this will be discussed later. Potential disadvantages of post mobility assignment workflows are the reliance on raw data that is with and without IMS dimension, and the mobility assignment typically relies on two steps of peak detection (steps 2 and 4) which may fail with e.g. low intensity data. Nevertheless, this type of workflow is usually recommended for most IMS data processing projects.
+An advantage of post mobility workflows is the compatibility with any of the feature detection and grouping algorithms supported in `patRoon`. In addition, post assignment is often less computationally intensive than direct mobility assignment workflows. Furthermore, the links between mobility features and IMS parents facilitate the recognition of possible protomers (i.e. redundant features of a same compound with the same retention time and _m/z_ but different mobility) and assists in recognizing mobility features across MS polarities in [sets workflows](#setsWorkflow). Finally, post mobility assignment workflows can selectively fallback to 'regular' LC-MS feature data from the IMS parents in steps where this makes more sense, this will be discussed later. Potential disadvantages of post mobility assignment workflows are the reliance on raw data that is with and without IMS dimension, and the mobility assignment typically relies on two steps of peak detection (steps 2 and 4) which may fail with e.g. low intensity data. Nevertheless, this type of workflow is usually recommended for most IMS data processing projects.
 
 ### Summary
 
@@ -49,8 +49,7 @@ The following table summarizes the differences between the three IMS workflows (
 |                               | LC-MS with IMS data | Direct mobility assignment | Post mobility assignment
 ------------------------------- | ------------------- | -------------------------- | --------------------------
 Raw data requirements^1^        | IMS collapsed       | Raw IMS data               | IMS and IMS collapsed raw data
-Feature detection               | Regular non-IMS     | Utilizes IMS separation    | Regular non-IMS
-Feature grouping                | Regular non-IMS     | Regular non-IMS with IMS clustering | Regular non-IMS
+Feature detection and grouping  | Regular non-IMS (all algorithms) | Utilizes IMS separation (few algorithms) | Regular non-IMS (all algorithms)
 Feature mobility assignment     | No                  | During feature detection   | After feature grouping
 Feature CCS assignment          | No                  | Yes                        | Yes
 Mobility/IMS parent links       | No                  | No                         | Yes
@@ -81,37 +80,48 @@ The [data conversion and pre-treatment](#pre-treat) section includes some exampl
 
 In direct IMS workflows the feature detection needs to be aware of the IMS dimension. In `patRoon` this is currently only supported by the `piek` algorithm. Alternatively, feature data from another IMS aware feature detection [can also be imported](#importFeat).
 
-The `piek` algorithm was already [discussed before](#piek). In IMS workflows the `methodIMS` parameter should additionally be configured, and influences the formation of extracted ion chromatograms (EICs) similarly as the `methodMZ` parameter. Like `methodMZ`, it should be set to `"bins"`, `"suspects"` or `"ms2"`. The following combinations of `methodMZ` and `methodIMS` are supported:
+The `piek` algorithm was already [discussed before](#piek). By default, `piek` does not use IMS data for feature detection, even if processing IMS-HRMS data. To enable the use of IMS data, the `IMS` function argument must be set to `TRUE`. The `filterIMS` EIC parameter can be set to filter EIC bins by mobility data, similarly as the `filter` parameter is used to filter the bins by _m/z_. The following combinations of `filter` and `filterIMS` are supported:
 
-`methodMZ`   | `methodIMS`  | EIC formation
+`filter`     | `filterIMS`  | EIC formation
 ------------ | ------------ | -----------------------------------------------------------------------
-`"bins"`     | `"bins"`     | from two dimensional _m/z_ and ion mobility bins.
-`"suspects"` | `"suspects"` | from HRMS and IMS data in a suspect list.
-`"suspects"` | `"bins"`     | from suspect HRMS data that is expanded with IMS bins.
-`"ms2"`      | `"ms2"`      | from the HRMS and IMS data of the precursors detected in Bruker DDA-PASEF MS2 experiments.
-`"ms2"`      | `"bins"`     | from the HRMS data of the precursors detected in Bruker DDA-PASEF MS2 experiments that is expanded with IMS bins.
+`"none"`     | `"none"`     | no filtering.
+`"suspects"` | `"suspects"` | filter by _m/z_ and mobility data in a suspect list.
+`"suspects"` | `"none"`     | only filter by suspect _m/z_ data.
+`"ms2"`      | `"ms2"`      | only keep bins with _m/z_ and mobility data the precursors detected in Bruker DDA-PASEF MS2 experiments.
+`"ms2"`      | `"none"`     | only filter by precursor _m/z_ data.
 
 Some examples are given below:
 
 ```{r exDirectMob, eval=FALSE}
 # comprehensive feature detection from 2 dimensional bins
-genEICParams <- getPiekEICParams(methodMZ = "bins", methodIMS = "bins", mzRange = c(100, 300), mobRange = c(0.5, 1.5))
+genEICParams <- getPiekEICParams(mzRange = c(100, 300), mobRange = c(0.5, 1.5), mzStep = 0.02, mobStep = 0.2)
 peakParams <- getDefPeakParams("chrom", "piek")
-fList <- findFeatures(anaInfo, "piek", genEICParams = genEICParams, peakParams = peakParams)
+fList <- findFeatures(anaInfo, "piek", IMS = TRUE, genEICParams = genEICParams, peakParams = peakParams)
 
 # use PASEF MS2 data to detect features
-genEICParams <- getPiekEICParams(methodMZ = "ms2", methodIMS = "ms2", minTIC = 1000)
-fList <- findFeatures(anaInfo, "piek", genEICParams = genEICParams, peakParams = peakParams)
+genEICParams <- getPiekEICParams(filter = "ms2", filterIMS = "ms2", minTIC = 1000)
+fList <- findFeatures(anaInfo, "piek", IMS = TRUE, genEICParams = genEICParams, peakParams = peakParams)
 
-# combine suspect data with IMS bins (e.g. if suspect list doesn't contain IMS data)
-genEICParams <- getPiekEICParams(methodMZ = "suspects", methodIMS = "bins", mobRange = c(0.5, 1.5))
-fList <- findFeatures(anaInfo, "piek", genEICParams = genEICParams, peakParams = peakParams,
+# only filter by suspect m/z data (e.g. if suspect list doesn't contain IMS data)
+genEICParams <- getPiekEICParams(filter = "suspects", filterIMS = "none", mobRange = c(0.5, 1.5))
+fList <- findFeatures(anaInfo, "piek", IMS = TRUE, genEICParams = genEICParams, peakParams = peakParams,
                       suspects = suspList, adduct = "[M+H]+")
 ```
 
-> **_NOTE_** when both `methodMZ` and `methodIMS` are set to `"bins"` then peak detection will need to cover a very large number of EICs, which can be be quite computationally intensive. Tweaking the EIC filtering parameters can improve the situation, see `?getPiekEICParams` for more details.
+> **_NOTE_** without EIC filtering feature detection can become quite computationally intensive. There are many advanced EIC paramaters that can be tweaked to improve the performance, see `?getPiekEICParams` for more details.
 
-The grouping of features is performed with `groupFeatures()` as in non-IMS workflows. This automatically performs the necessary IMS clustering and grouping steps ([discussed here](#directIMS)).
+The grouping of features in direct mobility assignment workflows is currently only possible with the `greedy` algorithm or by [importing data](#importFeat). The `greedy` algorithm was already [briefly introduced before](#groupFeatures). This algorithm was introduced in `patRoon 3.0` and is a simple and fast grouping algorithm, which also supports IMS data. Its `IMSWindow` argument can be set to configure the mobility grouping tolerance, for instance:
+
+```{r exGroupGreedyIMS, eval=FALSE}
+fGroups <- groupFeaturesGreedy(fList, IMSWindow = 1)
+
+# customize all tolerances and weights
+fGroups <- groupFeaturesGreedy(fList,
+                               rtWindow = 5,
+                               mzWindow = 0.003,
+                               IMSWindow = 0.5,
+                               scoreWeights = c(retention = 1, mz = 3, mobility = 3, intensity = 1))
+```
 
 ### Assigning mobility and CCS values to features {#assignMobFeat}
 
@@ -124,14 +134,14 @@ The most important function arguments are:
 
 Argument                 | Description
 ------------------------ | ------------------------------------------------
-`mobPeaksParams`, `chromPeaksParams` | Parameters for the peak detection in mobilograms and chromatograms, respectively. See `getDefPeakParams()` for more details.
-`EIMParams`, `EICParams` | Parameters for the extraction of ion mobilograms (EIMs) and chromatograms (EICs), respectively. See `getDefEIMParams()` and `getDefEICParams()` for more details.
+`mobPeaksParams`, `chromPeaksParams` | Parameters for the peak detection in mobilograms and chromatograms, respectively. See `?getDefPeakParams()` for more details.
+`EIMParams`, `EICParams` | Parameters for the extraction of ion mobilograms (EIMs) and chromatograms (EICs), respectively. See `?getDefEIMParams()` and `?getDefEICParams()` for more details.
 `fallbackEIC`            | Set to `TRUE` to use the raw EIC data to update properties of mobility features, in case peak detection fails in mobility filtered EICs ([steps 3-4](#postIMS)).
 `fromSuspects`           | _Suspect screening workflows_: Use suspect data for mobility assignment, this is [discussed later](#assignMobFromSusps).
 `IMSMatchParams`         | _Suspect screening workflows_: parameters to match IMS data between features and suspects, this is [discussed later](#screenIMS).
 `CCSParams`              | Parameters for converting mobility <--> CCS values.
 
-The following subsections further discuss the two purposes of `assignMobilities()` in more detail. More details on `assignMobilities()` are found in the reference manual (`?assignMobilities_feat`).
+The following subsections further discuss the two purposes of `assignMobilities()` in more detail. Further details are found in the reference manual (`?assignMobilities_feat`).
 
 #### Feature mobility assignment
 
@@ -201,7 +211,7 @@ Function argument | Description
 
 The following options exist for the `from` function argument:
 
-* `from=NULL` (default): No IMS data is added.
+* `from=NULL` (default): No IMS data is added (but mobility <--> CCS conversion may still occur).
 * `from="pubchemlite"`: IMS data is matched from the [PubChemLite database with CCS][PCLiteCCS-dl] data. See the [Installation chapter](#Installation) for details on how to install the database.
 * `from="c3sdb"`: Uses [C3SDB] to predict CCS values for suspects. See the [Installation chapter](#Installation) for installation details.
 * a `data.table` or `data.frame`: A custom library with IMS data.
@@ -239,7 +249,7 @@ fGroupsScr <- screenSuspects(fGroups, suspects = suspList, adduct = "[M+H]+",
 
 # match suspects on mobility with a +/- 0.1 tolerance
 fGroupsScr <- screenSuspects(fGroups, suspects = suspList, adduct = "[M+H]+",
-                             IMSMatchParams = getIMSMatchParams("mobility", window = 0.1))
+                             IMSMatchParams = getIMSMatchParams("mobility", window = 0.1, relative = FALSE))
 
 # match suspects on CCS with a +/- 6% tolerance
 fGroupsScr <- screenSuspects(fGroups, suspects = suspList, adduct = "[M+H]+",
@@ -257,14 +267,12 @@ fGroupsScr <- assignMobilities(fGroupsScr, mobPeaksParams = getDefPeakParams("br
 
 #### Assigning feature mobilities from suspect data {#assignMobFromSusps}
 
-In post mobility assignment workflows, the `assignMobilities()` method function can also be used to assign feature mobilities from suspect data by setting the `fromSuspects` argument to `TRUE`. This replaces the mobility assignment step from mobilograms ([step 2](#postIMS)), and copies the assigned reference value for a suspect directly to feature data. If both `fromSuspects` and `mobPeaksParams` are set, then the mobility detection from mobilograms is performed in case of missing suspect data. The `IMSRange` function argument is used to derive the mobility range for the feature. Assigning mobilities from suspect data is only supported if the suspect screening was already performed prior to calling `assignMobilities()`.
+In post mobility assignment workflows, the `assignMobilities()` method function can also be used to assign feature mobilities from suspect data by setting the `fromSuspects` argument to `TRUE`. This replaces the mobility assignment step from mobilograms ([step 2](#postIMS)), and copies the assigned reference value for a suspect directly to feature data. If both `fromSuspects` and `mobPeaksParams` are set, then the mobility detection from mobilograms is performed for features without a suspect hit. If a feature has multiple hits, it is unclear which suspect value should be used, and therefore _no_ suspect data will be used for mobility assignment in this case. The `IMSRange` function argument is used to derive the mobility range for the feature. Assigning mobilities from suspect data is only supported if the suspect screening was already performed prior to calling `assignMobilities()`.
 
-Bypassing the need for peak detection for mobility assignment may be advantageous for low intensity features. However, no adjustments are performed for any shifts observed experimentally, hence, the assigned mobility values could be less accurate. Furthermore, the assigned mobility range to the feature may not cover the actual experimental range (i.e. the peak width in a mobilogram). Thus, when intensities are updated for mobility features ([step 4](#postIMS)), these can be superficially low (i.e. partial removal of signal) or high (i.e. inclusion of data of neighboring mobility peaks). With this in mind, this approach is primarily intended for the following scenarios:
+Bypassing the need for peak detection for mobility assignment may be advantageous for low intensity features. However, the mobility values assigned to features are not verified against the raw data. The feature mobility boundaries are also not derived from experimental data, hence, the assigned mobility range to the feature may not cover the actual experimental range (i.e. the peak width in a mobilogram). Thus, when intensities are updated for mobility features ([step 4](#postIMS)), these can be superficially low (i.e. partial removal of signal) or high (i.e. inclusion of data of neighboring mobility peaks). With these limitations in mind, this approach is primarily intended for the following scenarios:
 
 1. The mobility for a suspect is accurately known in advance, and no additional peak detection is needed. In this case the `IMSWindow` argument is typically set to a narrow tolerance window.
 2. There is no interest for accurate mobility (and CCS) assignment, and IMS data should only be used as a rough filtering step. In this scenario the `IMSWindow` argument is typically set to a relatively large tolerance window.
-
-> **_NOTE_** It is strongly recommended to set `fallbackEIC=FALSE` when using `fromSuspects=TRUE`, as otherwise no actual verification steps for the presence of mobility features are performed.
 
 Below are some example of how to use `assignMobilities()` to assign feature mobilities from suspect data:
 
@@ -274,13 +282,15 @@ Below are some example of how to use `assignMobilities()` to assign feature mobi
 fGroups <- screenSuspects(fGroups, suspects = suspList, adduct = "[M+H]+", onlyHits = TRUE)
 
 # scenario #1: assume suspect data is accurate
-fGroups <- assignMobilities(fGroups, fromSuspects = TRUE, IMSWindow = 0.01, fallbackEIC = FALSE)
+fGroups <- assignMobilities(fGroups, fromSuspects = TRUE, IMSWindow = 0.01,
+                            chromPeakParams = getDefPeakParams("chrom", "piek"))
 
 # scenario #2: wide tolerance window, no interest in accurate mobility assignment
-# add fallback to mobility detection for suspects with mobility data
+# add fallback to mobility detection for features with no (or >1) suspect hit or if no suspect mobility data is available
 # set IMSMatchParams to also filter out suspect hits with deviating mobilities
-fGroups <- assignMobilities(fGroups, fromSuspects = TRUE, IMSWindow = 0.1, fallbackEIC = FALSE,
+fGroups <- assignMobilities(fGroups, fromSuspects = TRUE, IMSWindow = 0.1,
                             mobPeaksParams = getDefPeakParams("bruker_ims", "piek"),
+                            chromPeakParams = getDefPeakParams("chrom", "piek"),
                             IMSMatchParams = getIMSMatchParams("CCS"))
 ```
 
@@ -321,7 +331,7 @@ IMS workflows bring several advantages to feature annotation. The `generateMSPea
 
 The `generateMSPeakLists()` function automatically filters MS and MS/MS spectra by mobility data assigned to features, and is therefore used similarly like non-IMS workflows. The function supports Bruker PASEF experiments, and can therefore assign _m/z_ and mobility filtered MS/MS data to features. In post mobility assignment workflows, the MS and MS/MS data that will be assigned to IMS parents are based on combined spectra for each IMS frame.
 
-A few additional averaging parameters (assigned to the `avgFeatParams` and `avgMSParams` arguments) are available in IMS workflows. These are discussed in the reference manual (`?getDefAvgPListParams`).
+A few additional averaging parameters (assigned to the `avgFeatParams` and `avgFGroupParams` arguments) are available in IMS workflows. These are discussed in the reference manual (`?getDefAvgPListParams`).
 
 #### Compound annotation
 
@@ -367,7 +377,7 @@ For more details see the reference manual (`?assignMobilities_comp`).
 
 #### Copying annotation data to mobility features with similar MS/MS data
 
-The number of features in post mobility assignment workflows can be very large, considering that both mobility features and their IMS parents are present. Since formula and compound annotation is largely influenced by MS/MS data, it is possible to skip annotation for mobility features with highly similar MS/MS data as their IMS parent, and copy the annotations from the IMS parent result instead. The `minMobSpecSim` argument to `generateFormulas()` and `generateCompounds()` sets the minimum spectral similarity threshold for when MS/MS data is considered similar.
+The number of features in post mobility assignment workflows can be very large, considering that both mobility features and their IMS parents are present. Since formula and compound annotation is primarily influenced by MS/MS data, it is possible to skip annotation for mobility features with highly similar MS/MS data as their IMS parent, and copy the annotations from the IMS parent result instead. The `minMobSpecSim` argument to `generateFormulas()` and `generateCompounds()` sets the minimum spectral similarity threshold for when MS/MS data is considered similar.
 
 ```{r minMobSpecSim, eval=FALSE}
 # generate formulas: copy IMS parent results when the spectral similarity is at least 0.9
@@ -378,7 +388,7 @@ formulas <- generateFormulas(fGroups, "genform", adduct = "[M+H]+", minMobSpecSi
 
 There is basic functionality to combine IMS workflows and [sets workflows](#setsWorfklow). However, an important limitation currently is that there is no way to group mobility features across the different sets. This is because mobility values among polarities (e.g. `[M+H]+` and `[M-H]-`) typically differ slightly and there is not a straightforward way to normalize for this. However, in post mobility assignment workflows grouping of IMS parents across sets still occurs (similar to non-IMS workflows). Hence, the links between mobility features and IMS parents can still give some indication which mobility features across sets are related. Thus, combined IMS and sets workflows are therefore mainly useful to e.g. process positive and negative sample analyses in one workflow, but lack other advantages of non-IMS sets workflows, such as easily relating features among sets and improving feature annotation with combined positive/negative MS/MS data.
 
-Like non-IMS workflows, the `makeSet()` function is used to initialize the sets workflow. However, the method that [combines feature groups objects](#makeSetFG) is only supported for direct mobility assignment workflows.
+Like non-IMS workflows, the `makeSet()` function is used to initialize the sets workflow.
 
 ## Processing data
 
@@ -487,8 +497,8 @@ suspList <- read.csv("suspects.csv")
 # add CCS data from PubChemLite and convert them to mobilities
 suspList <- assignMobilities(suspList, from = "pubchemlite", adducts = "[M+H]+",
                              CCSParams = CCSParams)
-# screen suspects and only keep fair matches (10% CCS tolerance)
-IMSMatchParams <- getIMSMatchParams("CCS", window = 0.1, relative = TRUE)
+# screen suspects and only keep fair matches (3% CCS tolerance)
+IMSMatchParams <- getIMSMatchParams("CCS", window = 0.03, relative = TRUE)
 fGroups <- screenSuspects(fGroups, suspects = suspList, adduct = "[M+H]+",
                           IMSMatchParams = IMSMatchParams, onlyHits = TRUE)
 

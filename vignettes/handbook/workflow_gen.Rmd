@@ -170,7 +170,7 @@ In `patRoon` a distinction is made between four types of raw data files:
 * **profile**: exported but not centroided (i.e. profile) data files in `mzML` or `mzXML` formats.
 * **ims**: exported ion mobility HRMS data files in the `mzML` format.
 
-Unfortunately, algorithms within the workflow may require different file types/formats, and it is often necessary to [convert raw data](#pre-treat) to one or more other file types/formats. In `patRoon` the choice of file type and format is primarily based on:
+Unfortunately, algorithms within the workflow may require different file types/formats, and it is often necessary to [convert raw data](#pre-treat) to one or more other file types/formats. However, for 'classical' (non_IMS) workflows it is often sufficient to convert `raw` data to `centroid` data in `mzML` format. In `patRoon` the choice of file type and format is primarily based on:
 
 1. The feature detection algorithm that is used. An overview of requirements is [listed in the feature detection section](#findFeat).
 2. The internal code of `patRoon` to process raw data. This is called the `msdata` interface.
@@ -180,7 +180,7 @@ The `msdata` interface is used throughout many operations within `patRoon`, such
 Backend         | Supported file types and formats
 --------------- | --------------------------------------------------------------------------
 `"opentims"`    | Uses [OpenTIMS] for highly efficient reading of raw Bruker TIMS data (only available on Windows and Linux)
-`"mzr"`         | uses [mzR] to read `centroid` files in the `mzML` and `mzXML` formats. This was always used in before `patRoon 3.0`.
+`"mzr"`         | uses [mzR] to read `centroid` files in the `mzML` and `mzXML` formats. This was always used before `patRoon 3.0`.
 `"mstoolkit"`   | Uses [mstoolkit] to read `ims` files (`mzML` format) and `centroid` files in the `mzML` and `mzXML` formats. Requires the [Rmstoolkitlib] `R` package (see the [Installation chapter](#Installation)).
 `"streamcraft"` | Uses [StreamCraft] to read `ims` files (`mzML` format) and `centroid` files in the `mzML` and `mzXML` formats.
 
@@ -235,7 +235,7 @@ The `convertMSFiles()` function supports various algorithms to perform the neces
 
 Algorithm      | Usage                                            | Input file types and formats              | Output file types and formats | Remarks
 -------------- | ------------------------------------------------ | ----------------------------------------- | ----------------------------- | --------------
-[ProteoWizard] | `convertMSFiles(algorithm = "pwiz", ...)`        | all formats and types                     | all except raw
+[ProteoWizard] | `convertMSFiles(algorithm = "pwiz", ...)`        | all formats and types                     | all except raw | most popular and versatile converter
 [OpenMS]       | `convertMSFiles(algorithm = "openms", ...)`      | centroid and profile (`mzML` and `mzXML`) | centroid and profile (`mzML` and `mzXML`) | Does not support centroiding.
 DataAnalysis   | `convertMSFiles(algorithm = "bruker", ...)`      | raw (Bruker `.d`)                         | centroid and profile (`mzML` and `mzXML`)
 IM collapse    | `convertMSFiles(algorithm = "im_collapse", ...)` | raw (Bruker TIMS) and ims (mzML) (uses [msdata](#fileTypes)) | centroid (`mzML` and `mzXML`)
@@ -256,8 +256,6 @@ anaInfoConv <- data.frame(
 anaInfoConv
 ```
 
-The `generateAnalysisInfo()` function supports specifying conversion destination directories through the `convXXX` function arguments (see `?generateAnalysisInfo`). The [newProject() utility](#newProject) will automatically generate a proper analysis information table.
-
 The `convertMSFiles()` takes the analysis information and performs the necessary conversions:
 
 ```{r eval=FALSE}
@@ -272,11 +270,12 @@ convertMSFiles(anaInfo, typeFrom = "raw", formatFrom = "bruker_ims", typeTo = "c
 # convert Agilent IMS-HRMS data to ims data in mzML format
 convertMSFiles(anaInfo, typeFrom = "raw", formatFrom = "agilent_ims", typeTo = "ims", formatTo = "mzML",
                algorithm = "pwiz")
-# ... and then to LC-MS like centroided mzML files
+# ... and then use IM collapse to LC-MS like centroided mzML files
 convertMSFiles(anaInfo, typeFrom = "ims", formatFrom = "mzML", typeTo = "centroid", formatTo = "mzML",
                algorithm = "im_collapse")
 ```
 
+> The [newProject() utility](#newProject) can automatically generate a proper analysis information table and the required code to perform the desired file conversions.
 
 Besides conversion, other types of data pre-treatment may also need to be performed. For instance, [ProteoWizard] can be used to apply various data filters, and several utility functions exist to apply mass re-calibration of Bruker data files.
 
@@ -370,11 +369,12 @@ fListSIRIUS <- findFeatures(anaInfo, "sirius") # SIRIUS
 
 #### Feature detection with piek {#piek}
 
-The `piek` algorithm was introduced in `patRoon 3.0`, and extends the work done by @Dietrich2021. This algorithm finds features from extracted ion chromatograms (EICs) and can use different peak detection algorithms to find features. The EICs can be generated from one of the following:
+The `piek` algorithm was introduced in `patRoon 3.0`, and extends the work done by @Dietrich2021. This algorithm finds features from extracted ion chromatograms (EICs) and can use various peak detection algorithms to find features. The EICs are generated from fixed-width _m/z_ bins, therefore, it is important to define the proper range for the compounds of interest. The feature detection can be speed up by filtering the EIC bins from one of the following:
 
-* fixed-width _m/z_ bins
 * data from a suspect list (the format follows that of suspect lists for [suspect screening workflows](#suspFormat))
 * data from precursors detected in data-dependent MS/MS experiments (DDA)
+
+This will considerably limit the number of EICs that need to be generated and processed.
 
 The `getPiekEICParams()` function is used to create the parameters that are used to generate the EICs. Its output is passed to the `genEICParams` argument to `findFeatures()` function. Similarly, the `getDefPeakParams()` function is used to create the parameters that are used to detect peaks, and its output is passed to the `peakParams` argument of `findFeatures()`.
 
@@ -382,18 +382,18 @@ Some examples are shown below:
 
 ```{r piek,eval=FALSE}
 # find features from m/z bins with piek's native peak detection algorithm
-genEICParams <- getPiekEICParams(methodMZ = "bins")
+genEICParams <- getPiekEICParams()
 peakParams <- getDefPeakParams("chrom", "piek")
 fList <- findFeatures(anaInfo, "piek", genEICParams = genEICParams, peakParams = peakParams)
 
 # as above, but customize binning
-genEICParams <- getPiekEICParams(methodMZ = "bins", mzRange = c(50, 1000), mzStep = 0.01)
+genEICParams <- getPiekEICParams(mzRange = c(50, 1000), mzStep = 0.01)
 peakParams <- getDefPeakParams("chrom", "piek")
 fList <- findFeatures(anaInfo, "piek", genEICParams = genEICParams, peakParams = peakParams)
 
 # find features from a suspect list with XCMS peak detection
 # see the suspect screening section for more details on the suspect list format
-genEICParams <- getPiekEICParams(methodMZ = "suspects")
+genEICParams <- getPiekEICParams(filter = "suspects")
 peakParams <- getDefPeakParams("chrom", "xcms3")
 fList <- findFeatures(anaInfo, "piek", genEICParams = genEICParams, peakParams = peakParams,
                       suspects = suspList, adduct = "[M+H]+")
@@ -401,14 +401,14 @@ fList <- findFeatures(anaInfo, "piek", genEICParams = genEICParams, peakParams =
 # use DDA MS/MS data to find features
 # only find features with data between two and ten minutes retention time.
 # increase minimum spectrum TIC to focus on features with high intensity MS/MS data
-genEICParams <- getPiekEICParams(methodMZ = "ms2", retRange = c(120, 600), minTIC = 1E5)
+genEICParams <- getPiekEICParams(filter = "ms2", retRange = c(120, 600), minTIC = 1E5)
 peakParams <- getDefPeakParams("chrom", "openms")
 fList <- findFeatures(anaInfo, "piek", genEICParams = genEICParams, peakParams = peakParams)
 ```
 
 For more details, please see the reference manual (`?findFeaturesPiek`).
 
-### Feature grouping
+### Feature grouping {#groupFeatures}
 
 For grouping features across analyses several algorithms are supported.
 
@@ -418,11 +418,12 @@ Algorithm        | Usage                                                    | Re
 [XCMS]           | `groupFeatures(algorithm = "xcms", ...)`                 | Uses `xcms::group()` `xcms::retcor()` functions
 [XCMS3]          | `groupFeatures(algorithm = "xcms3", ...)`                | Uses `xcms::groupChromPeaks()` and `xcms::adjustRtime()` functions
 [KPIC2]          | `groupFeatures(algorithm = "kpic2", ...)`                | Uses the [KPIC2] package
+`greedy`         | `groupFeatures(algorithm = "greedy", ...)`               | Introduced in `patRoon 3.0`
 [SIRIUS]         | `groupFeatures(anaInfo, algorithm = "sirius")`           | Finds _and_ groups features with [SIRIUS]
 
 > **_NOTE_**: Grouping features with the `sirius` algorithm will perform both finding and grouping features with [SIRIUS]. This algorithm cannot work with features from another algorithm.
 
-Just like finding features, each algorithm has their own set of parameters. Often the defaults are a good start but it is recommended to have look at them. See `?groupFeatures` for more details. The algorithm used to group features does not have to match to the algorithm that was used to find the features.
+Just like finding features, each algorithm has their own set of parameters. Often the defaults are a good start, but it is recommended to have look at them. See `?groupFeatures` for more details. The algorithm used to group features does not have to match to the algorithm that was used to find the features.
 
 Some examples of grouping features are shown below.
 
@@ -438,6 +439,9 @@ fGroupsXCMS <- groupFeatures(fListEP, "xcms3",
 # group with KPIC2 and set some custom grouping/aligning parameters
 fGroupsKPIC2 <- groupFeatures(fListKPIC2, "kpic2", groupArgs = list(tolerance = c(0.002, 18)),
                               alignArgs = list(move = "loess"))
+# greedy algorithm with custom tolerances and weights
+fGroupsGreedy <- groupFeatures(fListXCMS3, "greedy", rtWindow = 5, mzWindow = 0.003,
+                               scoreWeights = c(retention = 0.5, mz = 3, mobility = 1, intensity = 1))
 fGroupsSIRIUS <- groupFeatures(anaInfo, "sirius") # find/group features with SIRIUS
 ```
 

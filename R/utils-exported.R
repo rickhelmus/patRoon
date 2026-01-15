@@ -1783,6 +1783,7 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
     return(obj[])
 })
 
+#' @param \dots Arguments passed to \code{data.table} method.
 #' @rdname assignMobilities_susp
 #' @aliases assignMobilities,data.frame-method
 #' @export

@@ -53,7 +53,7 @@ NULL
 #' @param showProgress if set to \code{TRUE} then a text progressbar will be displayed when all EICs are being plot. Set
 #'   to \code{"none"} to disable any annotation.
 #' @param \dots passed to \code{\link[base]{plot}} (\code{plot}, \code{plotChroms}, \code{plotMobilograms},
-#'   \code{plotTICs} and \code{plotBPCs}), \code{\link{filled.contour}} (\code{plotChroms3D}), \pkg{\link{VennDiagram}}
+#'   \code{plotTICs} and \code{plotBPCs}), \code{\link{filled.contour}} (\code{plotChroms3D}), \CRANpkg{VennDiagram}
 #'   plotting functions (\code{plotVenn}), \code{\link{chordDiagram}} (\code{plotChord}), \code{\link[UpSetR]{upset}}
 #'   (\code{plotUpSet}).
 #'
@@ -914,7 +914,7 @@ setMethod("plotMobilogramsHash", "featureGroups", function(obj, analysis = analy
              analysisInfo(obj)[analysis %chin% anas])
 })
 
-#' @details \code{plotVenn} plots a Venn diagram (using \pkg{\link{VennDiagram}}) outlining unique and shared feature
+#' @details \code{plotVenn} plots a Venn diagram (using \CRANpkg{VennDiagram}) outlining unique and shared feature
 #'   groups between up to five replicates.
 #' @template plotvenn-ret
 #' 

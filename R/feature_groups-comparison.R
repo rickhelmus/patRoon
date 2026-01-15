@@ -78,25 +78,21 @@ featureGroupsComparisonSet <- setClass("featureGroupsComparisonSet", contains = 
 #'
 #' Functionality to compare feature groups and make a consensus.
 #'
-#' Feature groups objects originating from differing feature finding and/or
-#' grouping algorithms (or their parameters) may be compared to assess their
-#' output and generate a consensus.
+#' Feature groups objects originating from differing feature finding and/or grouping algorithms (or their parameters)
+#' may be compared to assess their output and generate a consensus.
 #'
 #' @param \dots For \code{comparison}: \code{featureGroups} objects that should
 #'   be compared. If the arguments are named (\emph{e.g.} \code{myGroups =
 #'   fGroups}) then these are used for labelling, otherwise objects are
 #'   automatically labelled by their \code{\link{algorithm}}.
 #'
-#'   For \code{plot}, \code{plotVenn}, \code{plotChord}: further options passed
-#'   to \code{plot}, \pkg{\link{VennDiagram}} plotting functions (\emph{e.g.}
-#'   \code{\link{draw.pairwise.venn}}) and \code{\link{chordDiagram}}
-#'   respectively.
+#'   For \code{plot}, \code{plotVenn}, \code{plotChord}: further options passed to \code{plot}, \CRANpkg{VennDiagram}
+#'   plotting functions (\emph{e.g.} \code{\link{draw.pairwise.venn}}) and \code{\link{chordDiagram}} respectively.
 #'
-#'   For \code{plotUpSet}: any further arguments passed to the \code{plotUpSet}
-#'   method defined for \code{\link{featureGroups}}.
-#' @param which A character vector specifying one or more labels of compared
-#'   feature groups. For \code{plotVenn}: if \code{NULL} then all compared
-#'   groups are used.
+#'   For \code{plotUpSet}: any further arguments passed to the \code{plotUpSet} method defined for
+#'   \code{\link{featureGroups}}.
+#' @param which A character vector specifying one or more labels of compared feature groups. For \code{plotVenn}: if
+#'   \code{NULL} then all compared groups are used.
 #'
 #' @name featureGroups-compare
 NULL

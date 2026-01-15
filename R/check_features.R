@@ -346,11 +346,11 @@ checkFeaturesInterface$methods(
 #'   when, for instance, feature group data is re-created with different parameters.
 #'
 #' @param sessionIn,sessionOut The file names for the input and output sessions.
-#' @param rtWindow The retention time window (seconds) used to relate 'old' with 'new' feature groups.
-#' @param mzWindow The \emph{m/z} window (in Da) used to relate 'old' with 'new' feature groups.
+#' @param rtWindow,mzWindow,IMSWindow The retention time (seconds), \emph{m/z} and mobility window (if present) used to
+#'   relate 'old' with 'new' feature groups.
 #' @param overwrite Set to \code{TRUE} to overwrite the output session file if it already exists. If \code{FALSE}, the
 #'   function will stop with an error message.
-#' 
+#'
 #' @rdname check-GUI
 #' @export
 importCheckFeaturesSession <- function(sessionIn, sessionOut, fGroups, rtWindow = defaultLim("retention", "narrow"),

@@ -96,13 +96,13 @@ setGeneric("normInts", function(fGroups, featNorm = "none", groupNorm = FALSE, n
 #' @name featureGroups-class
 setGeneric("concentrations", function(fGroups, ...) standardGeneric("concentrations"))
 
-#' @name featureGroups-class
+#' @name pred-quant
 setGeneric("calculateConcs", function(fGroups, ...) standardGeneric("calculateConcs"))
 
 #' @name featureGroups-class
 setGeneric("toxicities", function(fGroups, ...) standardGeneric("toxicities"))
 
-#' @name featureGroups-class
+#' @name pred-tox
 setGeneric("calculateTox", function(fGroups, ...) standardGeneric("calculateTox"))
 
 #' @name featureGroups-class
@@ -168,6 +168,7 @@ setGeneric("checkFeatures", function(fGroups, session = "checked-features.yml", 
 #'
 #' @references reference \addCitations{xcms}
 #'
+#' @aliases getXCMSSet getXCMSnExp
 #' @name xcms-conv
 setGeneric("getXCMSSet", function(obj, verbose = TRUE, ...) standardGeneric("getXCMSSet"))
 

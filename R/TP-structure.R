@@ -261,13 +261,13 @@ setMethod("plotGraph", "transformationProductsStructure", function(obj, which, c
                   width = width, height = height)
 })
 
-#' @describeIn transformationProductsStructure plots a Venn diagram (using \pkg{\link{VennDiagram}}) outlining unique and shared
-#'   candidates of up to five different \code{featureAnnotations} objects.
+#' @describeIn transformationProductsStructure plots a Venn diagram (using \CRANpkg{VennDiagram}) outlining unique and
+#'   shared candidates of up to five different \code{featureAnnotations} objects.
 #'
 #' @inheritParams plotVenn,featureAnnotations-method
 #'
 #' @template plotvenn-ret
-#' 
+#'
 #' @export
 setMethod("plotVenn", "transformationProductsStructure", function(obj, ..., commonParents = FALSE,
                                                                   labels = NULL, vennArgs = NULL)

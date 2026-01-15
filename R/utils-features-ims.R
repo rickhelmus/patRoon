@@ -260,7 +260,7 @@ updateFGroupsForMobilities <- function(fGroups, IMSWindow, sets)
 {
     # UNDONE: do something more polymorphic than hackish sets arg?
     
-    hash <- makeHash(fGroups, IMSWindow)
+    hash <- makeHash(fGroups, IMSWindow, sets)
     cd <- loadCacheData("updateFGroupsForMobilities", hash)
     if (!is.null(cd))
         return(cd)

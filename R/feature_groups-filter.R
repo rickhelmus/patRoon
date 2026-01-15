@@ -566,7 +566,6 @@ minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, ne
 #' @param groupQualityRange Like \code{featQualityRange}, but filters on group specific or averaged qualities/scores.
 #' @param withIMSParent \IMSWF only keep mobility feature groups with IMS parents, \emph{i.e.} remove all orphans.
 #'   Unaffected by \code{negate=TRUE}.
-#' @param name description
 #' @param checkFeaturesSession If set then features and/or feature groups are removed that were selected for removal
 #'   (see \link{check-GUI}). The session files are typically generated with the \code{\link{checkFeatures}} and
 #'   \code{\link{predictCheckFeaturesSession}} functions. The value of \code{checkFeaturesSession} should either by a

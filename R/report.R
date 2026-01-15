@@ -36,6 +36,7 @@ adjustReportSettings <- function(settings, adjSettings) return(modifyList(settin
 #'   \code{overrideSettings=list(compounds=list(topMost=25))}.
 #'
 #' @template EICParams-arg
+#' @template EIMParams-arg
 #' @template specSimParams-arg
 #' @template parallel-arg
 #'

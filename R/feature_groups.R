@@ -718,6 +718,7 @@ setMethod("export", "featureGroups", function(obj, type, out, IMS = FALSE)
 #'   used for comparison. Data specified in \code{which} are ignored.
 #' @param outer If \code{TRUE} then only feature groups are kept which do not overlap among those present in the
 #'   groupings specified by the \code{which} parameter.
+#' @aliases unique
 #' @export
 setMethod("unique", "featureGroups", function(x, incomparables = FALSE, which, aggregate = TRUE, relativeTo = NULL, outer = FALSE)
 {
@@ -1449,13 +1450,14 @@ setMethod("calculateTox", "featureGroups", function(fGroups, featureAnn)
 #' The \code{assignMobilities} method function for features is used (1) to assign Ion Mobility values and (2) calculate
 #' \acronym{CCS} values from these mobilities.
 #'
-#' In \pkg{patRoon}, two approaches are supported to assign mobilities to features: \emph{direct} and \emph{post}. In
-#' the \emph{direct} approach mobility values are directly assigned during feature detection. This is only supported by
-#' some algorithms (\emph{e.g.} \link[=findFeaturesPiek]{piek}). In the \emph{post} approach, the mobility values are
-#' assigned after feature detection and grouping (and possibly other steps such as filtering). Thus, the \emph{post}
-#' approach is supported by all available feature detection algorithms in \pkg{patRoon}. The \emph{post} approach is
-#' further described below. Only the \acronym{CCS} conversion functionality of \code{assignMobilities} should be used in
-#' \emph{direct} mobility assignment workflows.
+#' In \pkg{patRoon}, two approaches are supported to assign mobilities to features: \emph{direct} and \emph{post}
+#' assignment (\acronym{DMA} and \acronym{PMA}). With the \acronym{DMA} the mobility values are directly assigned during
+#' feature detection. This is currently only supported by the \link[=findFeaturesPiek]{piek} and
+#' \link[=groupFeaturesGreedy]{greedy} algorithms or by \link[=importFeaturesTable]{importing feature data}. With
+#' \acronym{PMA}, the mobility values are assigned after feature detection and grouping (and possibly other steps such
+#' as filtering). Thus, the \acronym{PMA} approach is supported by all available feature detection algorithms in
+#' \pkg{patRoon}. The \acronym{PMA} approach is further described below. Only the \acronym{CCS} conversion functionality
+#' of \code{assignMobilities} should be used in \acronym{PMA} mobility assignment workflows.
 #'
 #' The assignment of \acronym{CCS} values is controlled by the \code{CCSParams} argument (see above).
 #'
@@ -1481,7 +1483,8 @@ setMethod("calculateTox", "featureGroups", function(fGroups, featureAnn)
 #'
 #' @template CCSParams-arg
 #'
-#' @templateVar append Alternatively, set \code{parallel="maybe"} to disable parallelization if this normally will not benefit the algorithm (\emph{i.e.} \code{piek}).
+#' @templateVar append Alternatively, set \code{parallel="maybe"} to disable parallelization if this normally will not
+#'   benefit the algorithm (\emph{i.e.} \code{piek}).
 #' @template parallel-arg
 #'
 #' @section Post mobility assignment: The \emph{post} assignment of mobilities occurs in the following steps:
@@ -1504,11 +1507,11 @@ setMethod("calculateTox", "featureGroups", function(fGroups, featureAnn)
 #'
 #'   \item The feature grouping is updated: the mobility features with close mobilities (defined by \code{IMSWindow})
 #'   within a feature group are split-off into new feature groups and linked to the original \emph{IMS parent} feature
-#'   group. LC-MS properties and most other data such as feature group qualities and scores
-#'   (\code{\link{calculatePeakQualities}}), adduct annotations (\emph{e.g.} \code{\link{selectIons}}), predicted
-#'   concentrations and toxicities (\code{\link{calculateConcs}} and \code{\link{calculateTox}}) and internal standards
-#'   for intensity normalization (\code{\link{normInts}}) are copied from the IMS parents to the mobility feature
-#'   groups.
+#'   group. This is performed by the \link[=groupFeaturesGreedy]{greedy grouping algorithm}. LC-MS properties and most
+#'   other data such as feature group qualities and scores (\code{\link{calculatePeakQualities}}), adduct annotations
+#'   (\emph{e.g.} \code{\link{selectIons}}), predicted concentrations and toxicities (\code{\link{calculateConcs}} and
+#'   \code{\link{calculateTox}}) and internal standards for intensity normalization (\code{\link{normInts}}) are copied
+#'   from the IMS parents to the mobility feature groups.
 #'
 #'   }
 #'
@@ -1526,10 +1529,6 @@ setMethod("calculateTox", "featureGroups", function(fGroups, featureAnn)
 #'
 #' @templateVar what \code{assignMobilities}
 #' @template uses-msdata
-#'
-#' @source The re-grouping of IMS features uses \CRANpkg{fastcluster} to group features with close mobilities.
-#'
-#' @references \addCitations{fastcluster}
 #'
 #' @name assignMobilities_feat
 #' @aliases assignMobilities,featureGroups-method
@@ -1581,6 +1580,7 @@ setMethod("getBPCs", "featureGroups", function(obj, retentionRange = NULL, MSLev
 #'   \code{"mobility"} is specified an no IMS information is present, it will be ignored.
 #' @param intWeight If \code{TRUE}, calculate intensity-weighted means per group; otherwise use simple arithmetic means.
 #'
+#' @aliases updateGroups
 #' @export
 setMethod("updateGroups", "featureGroups", function(fGroups, what = c("ret", "mz", "mobility", "CCS"), intWeight = FALSE)
 {

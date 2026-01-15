@@ -463,7 +463,6 @@ NULL
 #' @template norm-args
 #'
 #' @template specSimParams-arg
-#' @template parallel-arg
 #'
 #' @param obj The object for which identification confidence should be estimated.
 #' @param MSPeakLists,formulas,compounds Annotation data (\code{\link{MSPeakLists}}, \code{\link{formulas}} and
@@ -659,6 +658,7 @@ NULL
 #'   removes all selections for data removal.
 #'
 #' @template EICParams-arg
+#' @template EIMParams-arg
 #' 
 #' @templateVar what these functions
 #' @template uses-msdata

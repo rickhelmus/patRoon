@@ -8,6 +8,10 @@
 #'
 #' @param obj The object to use for analysis information or features/featureGroups.
 #' @param suspects For data.frame method, an optional suspect list data.frame.
+#' 
+#' @templateVar plain TRUE
+#' @template adduct-arg
+#' 
 #' @return A Shiny app object.
 #' @export
 setMethod("launchEICGUI", "data.frame", function(obj, suspects = NULL, adduct = NULL)

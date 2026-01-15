@@ -38,7 +38,7 @@
 - TC convert: doc that centroid mode is used for IMS conversion (and/or make it optional?)
 - See why parallel reporting is so slow (on Windows?)
 - SAFD: make CSVs on parallel workers? If not doc that workers must be one same system
-
+- cleanup launchEICGUI, mention its LLM stuff, add simple docs
 
 ## Maybe
 
@@ -182,6 +182,7 @@
 - newProject()
     - see where testing is slow, possibly disable testServer() on CI?
     - add snapshots
+    - verify that the right patRoonData is used
 - manual checks
     - checkFeatures()/checkComponents() verify if things still work
     - DA features and formulas?
@@ -200,6 +201,7 @@
         - add additional external deps, eg Python, TIMS-SDK, c3sdb, PCL/CCS etc
     - workflow concepts: maybe mention mobility as possible feature property
     - add greedy at the right places
+    - update docs to also mention patRoonDataIMS (if needed)
     - workflow gen
         - intro
             - update convertMSFiles() in table
@@ -218,7 +220,9 @@
             - see which knitr chunks to enable for execution
             - details for IMS grouping
             - note that fallbackEIC only works for EIM mob assignments and setting chromPeakParams is mandatory when fromSuspects=TRUE
+            - mention that fromSuspects only takes suspects assigned to a single fGroup
             - don't say that fGroups makeSet() is only supported for direct workflows
+            - give some notes about sets workflows? (see ref docs)
         - processing
             - evaluate the examples once they can be run
                 - maybe add or improve plotMobilogram examples
@@ -236,19 +240,10 @@
         - summarize code changes and fixes --> extend?
     - assignMobilities()
         - refs to paper
-        - fGroups method
-            - add link to piek and import for direct IMS assignment
-        - give some notes about sets workflows?
-        - mention that fromSuspects only takes suspects assigned to a single fGroup (also in handbook?)
-        - note that fallbackEIC only works for EIM mob assignments and setting chromPeakParams is mandatory when fromSuspects=TRUE
-        - assignMobilities() doesn't do clustering anymore but greedy grouping
-            - maybe remove some fc refs?
     - peakParams
         - refs to paper
     - Greedy
         - add ref to paper
-    - update docs for importCheckFeaturesSession() (IMSWindow)
-    - update docs to also mention patRoonDataIMS
 
 ## NEWS
 

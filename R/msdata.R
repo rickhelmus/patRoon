@@ -386,7 +386,7 @@ applyMSData <- function(anaInfo, func,  ..., needTypes = NULL, showProgress = TR
 #'
 #' @param anaInfo Optional. If not \code{NULL} then \code{anaInfo} should be a \link[=analysis-information]{analysis
 #'   information} table, and only those backends that can read each of the analyses are returned.
-#' @param needIMS Only applicable if \code{anaInfo} is set: can be set to \code{"centroid"}, \code{"profile"} and/or
+#' @param needTypes Only applicable if \code{anaInfo} is set: should be \code{"centroid"}, \code{"profile"} and/or
 #'   \code{"ims"} to filter file types.
 #' @param verbose Set to \code{TRUE} to print the status of each backend.
 #'

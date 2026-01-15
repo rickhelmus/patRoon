@@ -64,21 +64,33 @@ makeSAFDCommand <- function(inPath, fileName, cent, mzRange, maxNumbIter, maxTPe
 #'
 #' @details The support for SAFD is still experimental, and its interface might change in the future.
 #'
-#'   In order to use SAFD, please make sure that its \command{julia} packages are installed and you have verified that
-#'   everything works, \emph{e.g.} by running the test data.
+#'   In order to use SAFD, please make sure that its \command{Julia} packages are installed and you have verified that
+#'   everything works, \emph{e.g.} by running the test data with \command{SAFD}.
 #'
-#'   This algorithm supports profile and centroided MS data. If the use of profile data is desired, centroided data must
-#'   still be available for other functionality of \code{patRoon}.
+#'   As of \pkg{patRoon} \samp{3.0}, \code{findFeaturesSAFD} uses the \link{msdata} interface instead of the
+#'   \pkg{MS_Import.jl} \command{Julia} package to read HRMS data. This means that \pkg{MS_Import.jl} does not need to
+#'   be installed, and all file formats supported by \link{msdata} are also supported for \command{SAFD} feature
+#'   detection. This includes IMS-HRMS data, however, in that case IMS resolved spectra are summed and the IMS dimension
+#'   is removed to make the data compatible for \command{SAFD}.
+#'
+#'   The \command{SAFD} algorithm was primarily developed to detect features in profile \emph{m/z} data, but centroided
+#'   data is also supported. To use profile data, ensure that the paths are correctly set up in the
+#'   \link[=analysis-information]{analysisInfo}. Furthermore, when using profile data you probably also need to specify
+#'   centroided data in the \code{analysisInfo}, as \emph{e.g.} \code{\link{generateMSPeakLists}} currently does not
+#'   support profile data. If IMS-HRMS data is used it is treated as profile data, as this data is typically not or
+#'   partially centroided (\code{generateMSPeakLists} supports IMS-HRMS data directly).
 #'
 #' @inheritParams findFeatures
 #'
-#' @param fileType Should be \code{"centroid"}, \code{"profile"} or \code{NULL}. In the latter case the function will
-#'   first try profiled data and then centroided data.
-#' @param mzRange The \emph{m/z} window to be imported (passed to the \code{import_files_MS1} function).
+#' @param prefCentroid Set to \code{TRUE} to prefer centroided data over other MS data specified in \code{analysisInfo}.
+#'
+#'   \strong{NOTE}: if \code{prefCentroid=FALSE} but the package option \option{patRoon.MS.preferIMS=TRUE} (see
+#'   \code{\link{msdata}}), then centroided data will still be prefferred over IMS data.
+#' @param mzRange The \emph{m/z} window to be imported.
 #' @param maxNumbIter,maxTPeakW,resolution,minMSW,RThreshold,minInt,sigIncThreshold,S2N,minPeakWS Parameters directly
 #'   passed to the \code{safd_s3D} function.
 #' @param centroidMethod,centroidDM Passed to the \code{safd_s3d_cent} function (\code{method} and \code{mdm} arguments,
-#'   respectively)
+#'   respectively).
 #'
 #' @templateVar what \code{findFeaturesSAFD}
 #' @template uses-multiProc

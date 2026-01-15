@@ -301,6 +301,12 @@ setMethod("calculateTox", "featureGroupsSet", function(fGroups, featureAnn)
     return(doCalcToxSets(fGroups, featureAnn))
 })
 
+#' @section Sets workflows: Mobility assignment in a \link[=sets-workflow]{sets workflow} is equivalent to non-sets
+#'   workflows. However, currently there is no (known) way to relate mobilities across MS polarities (+/- mode). Thus,
+#'   mobility features will always be formed for each set separately. However, \emph{IMS parents} will still be grouped
+#'   across polarities (like a non-IMS workflow) and their links to mobility features can therefore be used to relate
+#'   mobility features across MS polarities.
+#'
 #' @rdname assignMobilities_feat
 #' @aliases assignMobilities,featureGroupsSet-method
 #' @export

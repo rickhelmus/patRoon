@@ -438,7 +438,7 @@ setMethod("filter", "featureAnnotations", function(obj, minExplainedPeaks = NULL
     return(obj)
 })
 
-#' @describeIn featureAnnotations plots a Venn diagram (using \pkg{\link{VennDiagram}}) outlining unique and shared
+#' @describeIn featureAnnotations plots a Venn diagram (using \CRANpkg{VennDiagram}) outlining unique and shared
 #'   candidates of up to five different \code{featureAnnotations} objects.
 #'
 #' @param vennArgs A \code{list} with further arguments passed to \pkg{VennDiagram} plotting functions. Set to

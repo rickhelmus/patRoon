@@ -115,14 +115,14 @@ fList <- findFeatures(anaInfo, "piek", IMS = TRUE, genEICParams = genEICParams, 
 The grouping of features in direct mobility assignment workflows is currently only possible with the `greedy` algorithm or by [importing data](#importFeat). The `greedy` algorithm was already [briefly introduced before](#groupFeatures). This algorithm was introduced in `patRoon 3.0` and is a simple and fast grouping algorithm, which also supports IMS data. Its `IMSWindow` argument can be set to configure the mobility grouping tolerance, for instance:
 
 ```{r exGroupGreedyIMS, eval=FALSE}
-fGroups <- groupFeaturesGreedy(fList, IMSWindow = 1)
+fGroups <- groupFeatures(fList, "greedy", IMSWindow = 1)
 
 # customize all tolerances and weights
-fGroups <- groupFeaturesGreedy(fList,
-                               rtWindow = 5,
-                               mzWindow = 0.003,
-                               IMSWindow = 0.5,
-                               scoreWeights = c(retention = 1, mz = 3, mobility = 3, intensity = 1))
+fGroups <- groupFeatures(fList, "greedy",
+                         rtWindow = 5,
+                         mzWindow = 0.003,
+                         IMSWindow = 0.5,
+                         scoreWeights = c(retention = 1, mz = 3, mobility = 3, intensity = 1))
 ```
 
 ### Assigning mobility and CCS values to features {#assignMobFeat}
@@ -339,7 +339,7 @@ IMS workflows bring several advantages to feature annotation. The `generateMSPea
 
 The `generateMSPeakLists()` function automatically filters MS and MS/MS spectra by mobility data assigned to features, and is therefore used similarly like non-IMS workflows. The function supports Bruker PASEF experiments, and can therefore assign _m/z_ and mobility filtered MS/MS data to features. In post mobility assignment workflows, the MS and MS/MS data that will be assigned to IMS parents are based on combined spectra for each IMS frame.
 
-A few additional averaging parameters (assigned to the `avgFeatParams` and `avgFGroupParams` arguments) are available in IMS workflows. These are discussed in the reference manual (`?getDefAvgPListParams`).
+The _m/z_ values in IMS-HRMS data are typically not (e.g. Agilent) or partially (e.g. Bruker) centroided. Since feature annotation algorithms are usually limited to centroided data, `generateMSPeakLists()` performs an additional centroiding step for IMS-HRMS data. The centroiding parameters, and some other advanced IMS specific parameters, are configured through the averaging parameters given to `generateMSPeakLists()` (`avgFeatParams` and `avgFGroupParams` arguments), see the reference manual for more details (`?getDefAvgPListParams`).
 
 #### Compound annotation
 
@@ -411,6 +411,17 @@ compounds <- compoundsIMS
 
 The data processing functionality of `patRoon` that was [discussed before](#processing) equally applies to IMS workflows. In addition, some extra functionality exists to inspect and filter the data. These are discussed in the next subsections.
 
+### Updating feature group properties
+
+The `updateGroups()` function to update feature group properties (retention time and _m/z_) was [briefly introduced before](#updFG). This function can also be used to update the assigned mobilities and CCS values to e.g. improve their accuracy after eliminating unwanted features:
+
+```{r exUpdFGIMS, eval=FALSE}
+fGroups <- filter(fGroups, ...) # perform filtering steps
+
+fGroups <- updateGroups(fGroups) # update all by default: retention time, m/z, mobility and CCS (if present)
+fGroups <- updateGroups(fGroups, what = c("mobility", "CCS")) # only update mobility and CCS
+```
+
 ### Inspecting and plotting data
 
 The `plotMobilograms()` method function is used to plot extracted ion mobilograms (EIMs), and works very similar as the `plotChroms()` function [introduced before](#vis_feat_ann). The function arguments are mostly equal, and the `EIMParams` argument is similarly used to configure advanced parameters (see `?getDefEIMParams` for details).
@@ -431,10 +442,11 @@ The [reporting functionality](#report) of `patRoon` contains various functionali
 Some examples are shown below:
 
 ```{r exInspPlotIMS, eval=runData}
-# plot mobilogram for first feature
-plotMobilograms(fGroups[, 1])
+# plot mobilogram for first IMS parent
+plotMobilograms(fGroups[1, "M146_R301_22"])
 # plot mobilogram for a mobility feature: this highlights the mobility (range) assigned to the feature
-plotMobilograms(fGroups[, 2], showPeakArea = TRUE, showFGroupRect = TRUE)
+# NOTE: the mobility is appended to the feature group name
+plotMobilograms(fGroups[1, "M146_R301_22_I0.57"], showPeakArea = TRUE, showFGroupRect = FALSE)
 
 plot(fGroups, IMS = TRUE) # make a scatter plot with only mobility features
 
@@ -456,7 +468,7 @@ Filter           | Classes         | Remarks
 
 Some examples are shown below:
 
-```{r exFiltIMS, eval=runData}
+```{r exFiltIMS, eval=FALSE}
 # keep only mobility features
 # NOTE: this effectively results in data that is equal to a direct IMS workflow
 fGroupsMob <- filter(fGroups, IMS = TRUE)

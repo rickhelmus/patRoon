@@ -602,6 +602,69 @@ mslists <- delete(mslists, j = function(pl, grp, ana, type)
 formulas <- delete(formulas, j = function(ft, ...) ft$error > 5)
 ```
 
+## Interactively explore and review data {#intReview}
+
+The `checkFeatures` and `checkComponents` functions start a graphical user interface (GUI) which allows you to interactively explore and review feature and components data, respectively.
+
+```{r eval=FALSE}
+checkFeatures(fGroups) # inspect features and feature groups
+checkComponents(componCAM, fGroups) # inspect components
+```
+
+Both functions allow you to easily explore the data in an interactive way. Furthermore, these functions allow you to remove unwanted data. This is useful to remove for example features that are actually noise and feature groups that shouldn't be in the same component. To remove an unwanted feature, feature group or components, simply uncheck its 'keep' checkbox. The next step is to save the selections you made. A _check session_ is a file that stores which data should be removed. Once the session file is saved the `filter` function can be used to actually remove the data:
+
+```{r eval=FALSE}
+fGroupsF <- filter(fGroups, checkFeaturesSession = TRUE)
+componCAMF <- filter(componCAM, checkComponentsSession = TRUE)
+```
+
+If you saved the session and you re-launch the GUI it will restore the selections made earlier. The `clearSession` argument can be used to fully clear a session before starting the GUI, hence, all the data will be restored to their 'keep state'.
+
+```{r eval=FALSE}
+checkFeatures(fGroups, clearSession = TRUE) # start GUI with fresh session
+```
+
+It is also possible to use multiple different sessions. This is especially useful if you do not want to overwrite previous session data or want to inspect different objects. In this case the session file name should be specified:
+
+```{r eval=FALSE}
+checkFeatures(fGroups, "mysession.yml")
+fGroupsF <- filter(fGroups, checkFeaturesSession = "mysession.yml")
+```
+
+The default session names are `"checked-features.yml"` and `"checked-components.yml"` for feature and component data, respectively.
+
+The extension of session file names is `.yml` since the [YAML] file format is used. An advantage of this format is that it is easily readable and editable with a text editor.
+
+Note that the session data is tied to the feature group names of your data. This means that, for instance, when you re-group your feature data after changing some parameters, the session data you prepared earlier cannot be used anymore. Since probably quite some manual work went into creating the session file, a special function is available to import a session that was made for previous data. This function tries its best to guess the new feature group name based on similarity of their retention times and _m/z_ values.
+
+```{r eval=FALSE}
+checkFeatures(fGroups) # do manual inspection
+
+fGroups <- groupFeatures(fList, ...) # re-group with different parameters
+
+importCheckFeaturesSession("checked-features.yml", "checked-features-new.yml", fGroups)
+
+checkFeatures(fGroups, session = "checked-features-new.yml") # inspect new data
+```
+
+Take care to monitor the messages that `importCheckFeaturesSession` may output, as it may be possible that some 'old' feature groups are not found or are matched by multiple candidates of the new dataset.
+
+Some additional parameters exist to the functions described in this section. As usually check the reference manual for more details (_e.g._ `?checkFeatures`).
+
+> **_NOTE_** Although the GUI tools described here allow you to easily filter out results, it is highly recommended to first prioritize your data to avoid doing a lot of unneeded manual work.
+
+## Updating feature group data {#updFG}
+
+The feature group properties such as retention time and _m/z_ are calculated during the feature grouping process. These properties usually represent an average calculated from the features within the group, and are e.g. used to match [suspects](#suspscr). It may be useful to recalculate these values after e.g. filtering noisy features to to improve the accuracy. This is achieved with the `updateGroups` function:
+
+```{r eval=FALSE}
+fGroups <- filter(fGroups, ...) # perform filtering steps
+
+fGroups <- updateGroups(fGroups) # update retention time and m/z by re-averaging data
+fGroups <- updateGroups(fGroups, intWeight = TRUE) # use intensity weighting for averaging
+fGroups <- updateGroups(fGroups, what = c("mz")) # only update m/z values
+```
+
 ## Unique and overlapping features {#unOv}
 
 Often an analysis batch is composed of different sample groups, such as different treatments, influent/effluent etc. In such scenarios it may be interesting to evaluate uniqueness or overlap between these samples. Furthermore, extracting overlapping or unique features is a simple but effective prioritization strategy.
@@ -1013,57 +1076,6 @@ colnames(analysisInfo(fGroupsMeta)) # check if column is removed
 > **_NOTE_** The analysis information is internally stored as a `data.table`. Do not attempt to modify it directly with the reference assignment operator (`:=`) of `data.table`. Instead, alter a copy and replace the table, as demonstrated by the second example above.
 
 The `analysisInfo()<-` function can be used to add, remove or modify any metadata in the analysis information. It is also possible to change other columns such as the `replicate` or `blank` columns. However, it is currently not possible to modify the `analysis` column. Finally, the table rows can be re-ordered to change the order of analyses in the object.
-
-## Interactively explore and review data {#intReview}
-
-The `checkFeatures` and `checkComponents` functions start a graphical user interface (GUI) which allows you to interactively explore and review feature and components data, respectively.
-
-```{r eval=FALSE}
-checkFeatures(fGroups) # inspect features and feature groups
-checkComponents(componCAM, fGroups) # inspect components
-```
-
-Both functions allow you to easily explore the data in an interactive way. Furthermore, these functions allow you to remove unwanted data. This is useful to remove for example features that are actually noise and feature groups that shouldn't be in the same component. To remove an unwanted feature, feature group or components, simply uncheck its 'keep' checkbox. The next step is to save the selections you made. A _check session_ is a file that stores which data should be removed. Once the session file is saved the `filter` function can be used to actually remove the data:
-
-```{r eval=FALSE}
-fGroupsF <- filter(fGroups, checkFeaturesSession = TRUE)
-componCAMF <- filter(componCAM, checkComponentsSession = TRUE)
-```
-
-If you saved the session and you re-launch the GUI it will restore the selections made earlier. The `clearSession` argument can be used to fully clear a session before starting the GUI, hence, all the data will be restored to their 'keep state'.
-
-```{r eval=FALSE}
-checkFeatures(fGroups, clearSession = TRUE) # start GUI with fresh session
-```
-
-It is also possible to use multiple different sessions. This is especially useful if you do not want to overwrite previous session data or want to inspect different objects. In this case the session file name should be specified:
-
-```{r eval=FALSE}
-checkFeatures(fGroups, "mysession.yml")
-fGroupsF <- filter(fGroups, checkFeaturesSession = "mysession.yml")
-```
-
-The default session names are `"checked-features.yml"` and `"checked-components.yml"` for feature and component data, respectively.
-
-The extension of session file names is `.yml` since the [YAML] file format is used. An advantage of this format is that it is easily readable and editable with a text editor.
-
-Note that the session data is tied to the feature group names of your data. This means that, for instance, when you re-group your feature data after changing some parameters, the session data you prepared earlier cannot be used anymore. Since probably quite some manual work went into creating the session file, a special function is available to import a session that was made for previous data. This function tries its best to guess the new feature group name based on similarity of their retention times and _m/z_ values.
-
-```{r eval=FALSE}
-checkFeatures(fGroups) # do manual inspection
-
-fGroups <- groupFeatures(fList, ...) # re-group with different parameters
-
-importCheckFeaturesSession("checked-features.yml", "checked-features-new.yml", fGroups)
-
-checkFeatures(fGroups, session = "checked-features-new.yml") # inspect new data
-```
-
-Take care to monitor the messages that `importCheckFeaturesSession` may output, as it may be possible that some 'old' feature groups are not found or are matched by multiple candidates of the new dataset.
-
-Some additional parameters exist to the functions described in this section. As usually check the reference manual for more details (_e.g._ `?checkFeatures`).
-
-> **_NOTE_** Although the GUI tools described here allow you to easily filter out results, it is highly recommended to first prioritize your data to avoid doing a lot of unneeded manual work.
 
 ## Reporting {#report}
 

@@ -190,9 +190,12 @@ groupPseudoFeatures <- function(pf, groupAlgo, groupArgs)
 #'   \link[=groupFeatures]{regular feature grouping algorithms} so that a
 #'   comparison can be made.
 #'
-#' @param groupAlgo The \code{\link[=groupFeatures]{feature grouping
-#'   algorithm}} that should be used for grouping \emph{pseudo} features (see
-#'   details). Valid values are: \code{"xcms"}, \code{xcms3}, \code{kpic2}, \code{"openms"} or \code{"greedy"}.
+#' @param groupAlgo The \code{\link[=groupFeatures]{feature grouping algorithm}} that should be used for grouping
+#'   \emph{pseudo} features (see details). Valid values are: \code{"xcms"}, \code{xcms3}, \code{kpic2}, \code{"openms"}
+#'   or \code{"greedy"}.
+#'
+#'   \IMSWF For IMS workflows the algorithm selection is equally limited to as what is used by
+#'   \code{\link[=groupFeatures]{feature grouping}}, \emph{i.e.} only \code{greedy} is currently supported.
 #' @param groupArgs A \code{list} containing further parameters for
 #'   \code{\link[=groupFeatures]{feature grouping}}.
 #' @param x,obj The \code{featureGroupsComparison} object.

@@ -6,13 +6,14 @@
 #'
 #' Launches a Shiny app for generating and plotting EICs and EIMs.
 #'
-#' @param obj The object to use for analysis information or features/featureGroups.
-#' @param suspects For data.frame method, an optional suspect list data.frame.
-#' 
+#' @param obj For data.frame method: analysis information data.frame. For other methods: features/featureGroups object.
+#' @param suspects Optional suspect list data.frame (data.frame method only).
+#'
 #' @templateVar plain TRUE
 #' @template adduct-arg
-#' 
+#'
 #' @return A Shiny app object.
+#' @name launchEICGUI
 #' @export
 setMethod("launchEICGUI", "data.frame", function(obj, suspects = NULL, adduct = NULL)
 {
@@ -36,6 +37,8 @@ setMethod("launchEICGUI", "data.frame", function(obj, suspects = NULL, adduct = 
     shiny::shinyApp(gui$ui, gui$server)
 })
 
+#' @rdname launchEICGUI
+#' @export
 setMethod("launchEICGUI", "features", function(obj)
 {
     analysisInfo <- analysisInfo(obj)
@@ -43,6 +46,8 @@ setMethod("launchEICGUI", "features", function(obj)
     shiny::shinyApp(gui$ui, gui$server)
 })
 
+#' @rdname launchEICGUI
+#' @export
 setMethod("launchEICGUI", "featureGroups", function(obj)
 {
     analysisInfo <- analysisInfo(obj)

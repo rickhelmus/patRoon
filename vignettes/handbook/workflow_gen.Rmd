@@ -238,7 +238,7 @@ Algorithm      | Usage                                            | Input file t
 [ProteoWizard] | `convertMSFiles(algorithm = "pwiz", ...)`        | all formats and types                     | all except raw | most popular and versatile converter
 [OpenMS]       | `convertMSFiles(algorithm = "openms", ...)`      | centroid and profile (`mzML` and `mzXML`) | centroid and profile (`mzML` and `mzXML`) | Does not support centroiding.
 DataAnalysis   | `convertMSFiles(algorithm = "bruker", ...)`      | raw (Bruker `.d`)                         | centroid and profile (`mzML` and `mzXML`)
-IM collapse    | `convertMSFiles(algorithm = "im_collapse", ...)` | raw (Bruker TIMS) and ims (mzML) (uses [msdata](#fileTypes)) | centroid (`mzML` and `mzXML`)
+IM collapse    | `convertMSFiles(algorithm = "im_collapse", ...)` | raw (Bruker TIMS) and ims (mzML) (uses [msdata](#fileTypes)) | centroid (`mzML` and `mzXML`) | Omits MS2 data by default.
 [TIMSCONVERT]  | `convertMSFiles(algorithm = "timsconvert", ...)` | raw (Bruker TIMS)                         | centroid, profile, ims (`mzML`)
 
 > **_NOTE_** For the conversion of IMS to centroided data it is highly recommended to use the IM collapse or [TIMSCONVERT] algorithms, as [ProteoWizard] currently does not support accurate centroiding of IMS data. For the conversion of Agilent IMS data, [ProteoWizard] can be used to convert the raw `.d` files to the ims (`mzML`) files, and subsequently IM collapse can be used to convert these to centroided files.
@@ -276,6 +276,8 @@ convertMSFiles(anaInfo, typeFrom = "ims", formatFrom = "mzML", typeTo = "centroi
 ```
 
 > The [newProject() utility](#newProject) can automatically generate a proper analysis information table and the required code to perform the desired file conversions.
+
+> **_NOTE_** The IM collapse algorithm omits MS/MS data by default to save space and speed up file conversion. This algorithm is typically used in [post mobility assignment](#postIMS) IMS workflows, which do not use MS/MS data from centroided files. Set `includeMSMS=TRUE` to include MS/MS data.
 
 Besides conversion, other types of data pre-treatment may also need to be performed. For instance, [ProteoWizard] can be used to apply various data filters, and several utility functions exist to apply mass re-calibration of Bruker data files.
 
@@ -829,6 +831,7 @@ Argument                              | Remarks
 `maxMSRtWindow`                       |  Maximum time window +/- the feature retention time (in seconds) to collect spectra for averaging. Higher values may increase processing times.
 `topMost`                             |  Only retain feature data for no more than this amount analyses with highest intensity. For instance, a value of _1_ will only keep peak lists for the feature with highest intensity in a feature group.  
 `avgFeatParams` and `avgFGroupParams` | Parameters that configure the averaging of feature and feature group peak lists, respectively (discussed below).
+`fixedIsolationWidth`                 |  Sets how For MS/MS spectra are selected: see below.
 
 The parameters passed to `avgFeatParams` and `avgFGroupParams` are passed as a `list` and some typical parameters include:
 
@@ -849,7 +852,15 @@ avgPListParams <- getDefAvgPListParams(clusterMzWindow = 0.001)
 plists <- generateMSPeakLists(fGroups, avgFeatParams = avgPListParams, avgFGroupParams = avgPListParams)
 ```
 
-See `?getDefAvgPListParams` for all possible averaging parameters and `?generateMSPeakLists` for further details.
+See `?getDefAvgPListParams` for all possible averaging parameters.
+
+The `fixedIsolationWidth` argument configures the selection of MS/MS spectra for a feature. This is normally performed by comparing the _m/z_ value of the feature with the _m/z_ values from picked up precursors from DDA experiments. Note that current instruments typically have a relatively large isolation window (e.g. 1-2 Da) to select ions for fragmentation. Therefore, all MS/MS spectra with a precursor _m/z_ within this isolation window are considered to belong to the feature. The `fixedIsolationWidth` argument can be used to override this behavior and can be one of the following:
+
+* `FALSE` (default): MS/MS spectra are selected based on the isolation window recorded by the instrument.
+* a number (e.g. `1`): a fixed value tolerance is used for the precursor selection _m/z_. This can e.g. be used to limit the spectra selection to precursors with a close _m/z_ to that of the feature value. _NOTE_: it is recommended to allow some tolerance, as the recorded precursor _m/z_ values often slightly deviate from the feature _m/z_ values.
+* `NA`: no precursor _m/z_ matching is performed and all MS/MS spectra recorded close to the retention time of the feature are considered for averaging. This is automatically done for 'classical' DIA data without precursor information (i.e. not SWATH).
+
+See `?generateMSPeakLists` for further details.
 
 ### Formulae
 
@@ -1042,14 +1053,14 @@ Level | Description | Rules
 ----- | ----------- | --------------------------------
 1     | Target match               | Retention time deviates <12 seconds from suspect list. At least `3` (or all if the suspect list contains less) fragments from the suspect list must match.
 2a    | Good MS/MS library match   | Candidate is top ranked in the `compounds` results. The `individualMoNAScore` (MetFrag) or `libMatch` (Library algorithm) is at least `0.9` and no other candidates were matched with the MS library.
-3a    | Fair library match | The `individualMoNAScore` or `libMatch` is at least 0.4.
+3a    | Fair library match | The `individualMoNAScore` or `libMatch` is at least 0.7.
 3b    | Known MS/MS match          | At least `3` (or all if the suspect list contains less) fragments from the suspect list must match.
 3c    | Good in-silico MS/MS match | The compound annotation MS/MS similarity (discussed below) is at least `0.7`.
 4a    | Good formula MS/MS match   | Candidate is top ranked, formula annotation MS/MS similarity (discussed below) is at least `0.7` and isotopic match (`isoScore`) of at least 0.5. The latter two scores are at least `0.2` higher than next best ranked candidate.
 4b    | Good formula isotopic pattern match | Candidate is top ranked and isotopic match (`isoScore`) of at least `0.9` and at least `0.2` higher than next best ranked candidate.
 5     | Unknown                    | All else.
 
-> **_NOTE_** The current identification level rules are _only_ optimized for GenForm and MetFrag annotation algorithms.
+> **_NOTE_** The current identification level rules are _only_ optimized when GenForm is used for formula annotation and MetFrag or Library is used for compound annotation.
 
 The `genIDLevelRulesFile()` can be used to inspect the default rules or to create your own rules file, which can subsequently passed to `estimateIDConfidence()` with the `IDFile` argument. A file with defaults is automatically created inside the project directory when using the [newProject tool](#newProject). Note that some rules are limited to suspect annotation.
 

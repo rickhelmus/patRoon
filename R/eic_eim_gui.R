@@ -60,7 +60,6 @@ setMethod("launchEICGUI", "featureGroupsScreening", function(obj)
 
 createEICGUI <- function(obj, analysisInfo, suspects = NULL)
 {
-    
     ui <- shiny::fluidPage(
         shiny::titlePanel("EIC/EIM Viewer"),
         shiny::sidebarLayout(
@@ -72,15 +71,15 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
                         shiny::conditionalPanel(
                             condition = "input.mzMode == 'Range'",
                             shiny::fluidRow(
-                                shiny::column(6, shiny::numericInput("mzmin", "MZ Min", value = 100, min = 0)),
-                                shiny::column(6, shiny::numericInput("mzmax", "MZ Max", value = 200, min = 0))
+                                shiny::column(6, shiny::numericInput("mzMin", "MZ Min", value = 100, min = 0)),
+                                shiny::column(6, shiny::numericInput("mzMax", "MZ Max", value = 200, min = 0))
                             )
                         ),
                         shiny::conditionalPanel(
                             condition = "input.mzMode == 'Center +/- Window'",
                             shiny::fluidRow(
-                                shiny::column(6, shiny::numericInput("mzcenter", "MZ Center", value = 150, min = 0)),
-                                shiny::column(6, shiny::numericInput("mzwindow", "MZ Window", value = 0.005, min = 0))
+                                shiny::column(6, shiny::numericInput("mzCenter", "MZ Center", value = 150, min = 0)),
+                                shiny::column(6, shiny::numericInput("mzWindow", "MZ Window", value = 0.005, min = 0))
                             )
                         ),
                         shiny::conditionalPanel(
@@ -105,15 +104,15 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
                         shiny::conditionalPanel(
                             condition = "input.rtMode == 'Range'",
                             shiny::fluidRow(
-                                shiny::column(6, shiny::numericInput("retmin", "RT Min", value = 0, min = 0)),
-                                shiny::column(6, shiny::numericInput("retmax", "RT Max", value = 1000, min = 0))
+                                shiny::column(6, shiny::numericInput("retMin", "RT Min", value = 0, min = 0)),
+                                shiny::column(6, shiny::numericInput("retMax", "RT Max", value = 1000, min = 0))
                             )
                         ),
                         shiny::conditionalPanel(
                             condition = "input.rtMode == 'Value +/- Window'",
                             shiny::fluidRow(
-                                shiny::column(6, shiny::numericInput("retvalue", "RT Value", value = 5, min = 0)),
-                                shiny::column(6, shiny::numericInput("retwindow", "RT Window", value = 30, min = 0))
+                                shiny::column(6, shiny::numericInput("retValue", "RT Value", value = 5, min = 0)),
+                                shiny::column(6, shiny::numericInput("retWindow", "RT Window", value = 30, min = 0))
                             )
                         )
                     ),
@@ -122,15 +121,15 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
                         shiny::conditionalPanel(
                             condition = "input.mobMode == 'Range'",
                             shiny::fluidRow(
-                                shiny::column(6, shiny::numericInput("mobmin", "Mobility Min", value = 0, min = 0, step = 0.01)),
-                                shiny::column(6, shiny::numericInput("mobmax", "Mobility Max", value = 1.3, min = 0, step = 0.01))
+                                shiny::column(6, shiny::numericInput("mobMin", "Mobility Min", value = 0, min = 0, step = 0.01)),
+                                shiny::column(6, shiny::numericInput("mobMax", "Mobility Max", value = 1.3, min = 0, step = 0.01))
                             )
                         ),
                         shiny::conditionalPanel(
                             condition = "input.mobMode == 'Value +/- Window'",
                             shiny::fluidRow(
-                                shiny::column(6, shiny::numericInput("mobvalue", "Mobility Value", value = 0.5, min = 0, step = 0.01)),
-                                shiny::column(6, shiny::numericInput("mobwindow", "Mobility Window", value = 0.1, min = 0, step = 0.01))
+                                shiny::column(6, shiny::numericInput("mobValue", "Mobility Value", value = 0.5, min = 0, step = 0.01)),
+                                shiny::column(6, shiny::numericInput("mobWindow", "Mobility Window", value = 0.1, min = 0, step = 0.01))
                             )
                         )
                     ),
@@ -146,15 +145,15 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
                             shiny::conditionalPanel(
                                 condition = "input.rtMode == 'Range'",
                                 shiny::fluidRow(
-                                    shiny::column(6, shiny::numericInput("eimRetmin", "EIM RT Min", value = 0, min = 0)),
-                                    shiny::column(6, shiny::numericInput("eimRetmax", "EIM RT Max", value = 10, min = 0))
+                                    shiny::column(6, shiny::numericInput("eimRetMin", "EIM RT Min", value = 0, min = 0)),
+                                    shiny::column(6, shiny::numericInput("eimRetMax", "EIM RT Max", value = 10, min = 0))
                                 )
                             ),
                             shiny::conditionalPanel(
                                 condition = "input.rtMode == 'Value +/- Window'",
                                 shiny::fluidRow(
-                                    shiny::column(6, shiny::numericInput("eimRetvalue", "EIM RT Value", value = 5, min = 0)),
-                                    shiny::column(6, shiny::numericInput("eimRetwindow", "EIM RT Window", value = 15, min = 0))
+                                    shiny::column(6, shiny::numericInput("eimRetValue", "EIM RT Value", value = 5, min = 0)),
+                                    shiny::column(6, shiny::numericInput("eimRetWindow", "EIM RT Window", value = 15, min = 0))
                                 )
                             )
                         ),
@@ -188,7 +187,142 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
     
     server <- function(input, output, session)
     {
-        featureData <- shiny::reactive({
+        computeMzRange <- function(input)
+        {
+            mzMin <- mzMax <- NULL
+            if (input$mzMode == "Range")
+            {
+                mzMin <- input$mzMin
+                mzMax <- input$mzMax
+            }
+            else if (input$mzMode == "Center +/- Window")
+            {
+                mzMin <- input$mzCenter - input$mzWindow
+                mzMax <- input$mzCenter + input$mzWindow
+            }
+            else if (input$mzMode == "Neutral Mass +/- MZ Window")
+            {
+                neutralMass <- input$neutralMass
+                mzVal <- tryCatch(calculateMasses(neutralMass, as.adduct(input$adductNM), "mz"), error = function(e)
+                {
+                    shiny::showNotification("Error calculating MZ from neutral mass and adduct", type = "error")
+                    NA
+                })
+                if (!is.na(mzVal))
+                {
+                    mzMin <- mzVal - input$mzWindowNM
+                    mzMax <- mzVal + input$mzWindowNM
+                }
+            }
+            else if (input$mzMode == "Formula +/- MZ Window")
+            {
+                neutralMass <- tryCatch(getFormulaMass(input$formula), error = function(e)
+                {
+                    shiny::showNotification("Error parsing formula", type = "error")
+                    NA
+                })
+                if (!is.na(neutralMass))
+                {
+                    mzVal <- tryCatch(calculateMasses(neutralMass, as.adduct(input$adductF), "mz"), error = function(e)
+                    {
+                        shiny::showNotification("Error calculating MZ from formula and adduct", type = "error")
+                        NA
+                    })
+                    if (!is.na(mzVal))
+                    {
+                        mzMin <- mzVal - input$mzWindowF
+                        mzMax <- mzVal + input$mzWindowF
+                    }
+                }
+            }
+            if (is.null(mzMin) || is.null(mzMax))
+            {
+                mzMin <- 100
+                mzMax <- 200
+            }
+            list(mzmin = mzMin, mzmax = mzMax)
+        }
+
+        plotPeakOverlay <- function(peaks, mat, xName)
+        {
+            if (!is.null(peaks) && length(peaks) > 0)
+            {
+                for (r in seq_len(nrow(peaks)))
+                {
+                    prow <- peaks[r, ]
+                    sel <- mat[, xName] >= prow$retmin & mat[, xName] <= prow$retmax
+                    EIXFill <- mat[sel, , drop = FALSE]
+                    if (nrow(EIXFill) > 0)
+                    {
+                        col <- adjustcolor("blue", alpha.f = 0.35)
+                        polygon(c(EIXFill[, xName], rev(EIXFill[, xName])),
+                                c(EIXFill[, "intensity"], rep(0, nrow(EIXFill))),
+                                col = col, border = NA)
+                    }
+                }
+            }
+        }
+
+        updateInputsFromFeat <- function(feat)
+        {
+            if (!is.na(feat$mz))
+            {
+                updateNumericInput(session, "mzCenter", value = round(feat$mz, 5))
+                updateNumericInput(session, "mzWindow", value = round((feat$mzmax - feat$mzmin) / 2, 5))
+                updateNumericInput(session, "mzMin", value = round(feat$mzmin, 5))
+                updateNumericInput(session, "mzMax", value = round(feat$mzmax, 5))
+            }
+            if (!is.na(feat$ret))
+            {
+                updateNumericInput(session, "retValue", value = round(feat$ret, 2))
+                updateNumericInput(session, "retWindow", value = max(15, round((feat$retmax - feat$retmin) / 2), 2))
+                updateNumericInput(session, "retMin", value = round(feat$retmin, 2))
+                updateNumericInput(session, "retMax", value = round(feat$retmax, 2))
+                updateNumericInput(session, "eimRetValue", value = round(feat$ret, 2))
+                updateNumericInput(session, "eimRetWindow", value = round((feat$retmax - feat$retmin) / 2, 2))
+                updateNumericInput(session, "eimRetMin", value = round(feat$retmin, 2))
+                updateNumericInput(session, "eimRetMax", value = round(feat$retmax, 2))
+            }
+            if (!is.na(feat$mobility) && !is.na(feat$mobmin))
+            {
+                updateNumericInput(session, "mobValue", value = round(feat$mobility, 3))
+                updateNumericInput(session, "mobWindow", value = round((feat$mobmax - feat$mobmin) / 2, 3))
+                updateNumericInput(session, "mobMin", value = round(feat$mobmin, 3))
+                updateNumericInput(session, "mobMax", value = round(feat$mobmax, 3))
+            }
+        }
+
+        updateInputsFromSuspect <- function(susp)
+        {
+            if (!is.na(susp$mz))
+            {
+                updateNumericInput(session, "mzCenter", value = round(susp$mz, 5))
+                updateNumericInput(session, "mzWindow", value = 0.005)
+                updateNumericInput(session, "mzMin", value = round(susp$mz - 0.005, 5))
+                updateNumericInput(session, "mzMax", value = round(susp$mz + 0.005, 5))
+            }
+            if (!is.null(susp[["rt"]]) && !is.na(susp$rt))
+            {
+                updateNumericInput(session, "retValue", value = round(susp$rt, 2))
+                updateNumericInput(session, "retWindow", value = 15)
+                updateNumericInput(session, "retMin", value = round(susp$rt - 15, 2))
+                updateNumericInput(session, "retMax", value = round(susp$rt + 15, 2))
+                updateNumericInput(session, "eimRetValue", value = round(susp$rt, 2))
+                updateNumericInput(session, "eimRetWindow", value = 15)
+                updateNumericInput(session, "eimRetMin", value = round(susp$rt - 15, 2))
+                updateNumericInput(session, "eimRetMax", value = round(susp$rt + 15, 2))
+            }
+            if (!is.null(susp[["mobility"]]) && !is.na(susp$mobility))
+            {
+                updateNumericInput(session, "mobValue", value = round(susp$mobility, 3))
+                updateNumericInput(session, "mobWindow", value = 0.1)
+                updateNumericInput(session, "mobMin", value = round(susp$mobility - 0.1, 3))
+                updateNumericInput(session, "mobMax", value = round(susp$mobility + 0.1, 3))
+            }
+        }
+
+        featureData <- shiny::reactive(
+        {
             if (is(obj, "features"))
             {
                 ft <- featureTable(obj)[[input$analysis]]
@@ -256,45 +390,17 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
                 feat_full <- ft[group == feat$Group][1]
             }
             if (nrow(feat_full) == 0) return()
-            # Update MZ
-            if (!is.na(feat_full$mz))
-            {
-                updateNumericInput(session, "mzcenter", value = round(feat_full$mz, 5))
-                updateNumericInput(session, "mzwindow", value = round((feat_full$mzmax - feat_full$mzmin) / 2, 5))
-                updateNumericInput(session, "mzmin", value = round(feat_full$mzmin, 5))
-                updateNumericInput(session, "mzmax", value = round(feat_full$mzmax, 5))
-            }
-            # Update RT
-            if (!is.na(feat_full$ret))
-            {
-                updateNumericInput(session, "retvalue", value = round(feat_full$ret, 2))
-                updateNumericInput(session, "retwindow", value = max(15, round((feat_full$retmax - feat_full$retmin) / 2), 2))
-                updateNumericInput(session, "retmin", value = round(feat_full$retmin, 2))
-                updateNumericInput(session, "retmax", value = round(feat_full$retmax, 2))
-                # Update EIM RT to match
-                updateNumericInput(session, "eimRetvalue", value = round(feat_full$ret, 2))
-                updateNumericInput(session, "eimRetwindow", value = round((feat_full$retmax - feat_full$retmin) / 2, 2))
-                updateNumericInput(session, "eimRetmin", value = round(feat_full$retmin, 2))
-                updateNumericInput(session, "eimRetmax", value = round(feat_full$retmax, 2))
-            }
-            # Update Mobility
-            if (!is.na(feat_full$mobility) && !is.na(feat_full$mobmin))
-            {
-                updateNumericInput(session, "mobvalue", value = round(feat_full$mobility, 3))
-                updateNumericInput(session, "mobwindow", value = round((feat_full$mobmax - feat_full$mobmin) / 2, 3))
-                updateNumericInput(session, "mobmin", value = round(feat_full$mobmin, 3))
-                updateNumericInput(session, "mobmax", value = round(feat_full$mobmax, 3))
-            }
+            updateInputsFromFeat(feat_full)
         })
         # Sync EIM RT inputs with EIC RT inputs
-        observeEvent(c(input$retmin, input$retmax), {
-            updateNumericInput(session, "eimRetmin", value = input$retmin)
-            updateNumericInput(session, "eimRetmax", value = input$retmax)
+        observeEvent(c(input$retMin, input$retMax), {
+            updateNumericInput(session, "eimRetMin", value = input$retMin)
+            updateNumericInput(session, "eimRetMax", value = input$retMax)
         })
         
-        observeEvent(c(input$retvalue, input$retwindow), {
-            updateNumericInput(session, "eimRetvalue", value = input$retvalue)
-            updateNumericInput(session, "eimRetwindow", value = input$retwindow)
+        observeEvent(c(input$retValue, input$retWindow), {
+            updateNumericInput(session, "eimRetValue", value = input$retValue)
+            updateNumericInput(session, "eimRetWindow", value = input$retWindow)
         })
         
         suspectData <- shiny::reactive({
@@ -377,64 +483,12 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
                 feat <- ft[group == susp$group][1]
                 if (nrow(feat) > 0)
                 {
-                    # Update from feature
-                    if (!is.na(feat$mz))
-                    {
-                        updateNumericInput(session, "mzcenter", value = round(feat$mz, 5))
-                        updateNumericInput(session, "mzwindow", value = round((feat$mzmax - feat$mzmin) / 2, 5))
-                        updateNumericInput(session, "mzmin", value = round(feat$mzmin, 5))
-                        updateNumericInput(session, "mzmax", value = round(feat$mzmax, 5))
-                    }
-                    if (!is.na(feat$ret))
-                    {
-                        updateNumericInput(session, "retvalue", value = round(feat$ret, 2))
-                        updateNumericInput(session, "retwindow", value = round((feat$retmax - feat$retmin) / 2, 2))
-                        updateNumericInput(session, "retmin", value = round(feat$retmin, 2))
-                        updateNumericInput(session, "retmax", value = round(feat$retmax, 2))
-                        # Update EIM RT
-                        updateNumericInput(session, "eimRetvalue", value = round(feat$ret, 2))
-                        updateNumericInput(session, "eimRetwindow", value = round((feat$retmax - feat$retmin) / 2, 2))
-                        updateNumericInput(session, "eimRetmin", value = round(feat$retmin, 2))
-                        updateNumericInput(session, "eimRetmax", value = round(feat$retmax, 2))
-                    }
-                    if (!is.na(feat$mobility) && !is.na(feat$mobmin))
-                    {
-                        updateNumericInput(session, "mobvalue", value = round(feat$mobility, 3))
-                        updateNumericInput(session, "mobwindow", value = round((feat$mobmax - feat$mobmin) / 2, 3))
-                        updateNumericInput(session, "mobmin", value = round(feat$mobmin, 3))
-                        updateNumericInput(session, "mobmax", value = round(feat$mobmax, 3))
-                    }
+                    updateInputsFromFeat(feat)
                 }
             }
             else
             {
-                # Update from suspect
-                if (!is.na(susp$mz))
-                {
-                    updateNumericInput(session, "mzcenter", value = round(susp$mz, 5))
-                    updateNumericInput(session, "mzwindow", value = 0.005)
-                    updateNumericInput(session, "mzmin", value = round(susp$mz - 0.005, 5))
-                    updateNumericInput(session, "mzmax", value = round(susp$mz + 0.005, 5))
-                }
-                if (!is.null(susp[["rt"]]) && !is.na(susp$rt))
-                {
-                    updateNumericInput(session, "retvalue", value = round(susp$rt, 2))
-                    updateNumericInput(session, "retwindow", value = 15)
-                    updateNumericInput(session, "retmin", value = round(susp$rt - 15, 2))
-                    updateNumericInput(session, "retmax", value = round(susp$rt + 15, 2))
-                    # Update EIM RT
-                    updateNumericInput(session, "eimRetvalue", value = round(susp$rt, 2))
-                    updateNumericInput(session, "eimRetwindow", value = 15)
-                    updateNumericInput(session, "eimRetmin", value = round(susp$rt - 15, 2))
-                    updateNumericInput(session, "eimRetmax", value = round(susp$rt + 15, 2))
-                }
-                if (!is.null(susp[["mobility"]]) && !is.na(susp$mobility))
-                {
-                    updateNumericInput(session, "mobvalue", value = round(susp$mobility, 3))
-                    updateNumericInput(session, "mobwindow", value = 0.1)
-                    updateNumericInput(session, "mobmin", value = round(susp$mobility - 0.1, 3))
-                    updateNumericInput(session, "mobmax", value = round(susp$mobility + 0.1, 3))
-                }
+                updateInputsFromSuspect(susp)
             }
             # Update Adduct and Formula from suspect
             if (!is.null(susp[["adduct"]]) && !is.na(susp$adduct))
@@ -489,69 +543,21 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
             req(input$mzMode, input$rtMode, input$mobMode, input$analysis)
             if (!input$autoGenerate)
                 req(input$generate)
-            
-            mzmin <- mzmax <- NULL
-            if (input$mzMode == "Range")
-            {
-                mzmin <- input$mzmin
-                mzmax <- input$mzmax
-            }
-            else if (input$mzMode == "Center +/- Window")
-            {
-                mzmin <- input$mzcenter - input$mzwindow
-                mzmax <- input$mzcenter + input$mzwindow
-            }
-            else if (input$mzMode == "Neutral Mass +/- MZ Window")
-            {
-                neutralMass <- input$neutralMass
-                mz <- tryCatch(calculateMasses(neutralMass, as.adduct(input$adductNM), "mz"), error = function(e)
-                {
-                    shiny::showNotification("Error calculating MZ from neutral mass and adduct", type = "error")
-                    NA
-                })
-                if (!is.na(mz))
-                {
-                    mzmin <- mz - input$mzWindowNM
-                    mzmax <- mz + input$mzWindowNM
-                }
-            }
-            else if (input$mzMode == "Formula +/- MZ Window")
-            {
-                neutralMass <- tryCatch(getFormulaMass(input$formula), error = function(e)
-                {
-                    shiny::showNotification("Error parsing formula", type = "error")
-                    NA
-                })
-                if (!is.na(neutralMass))
-                {
-                    mz <- tryCatch(calculateMasses(neutralMass, as.adduct(input$adductF), "mz"), error = function(e)
-                    {
-                        shiny::showNotification("Error calculating MZ from formula and adduct", type = "error")
-                        NA
-                    })
-                    if (!is.na(mz))
-                    {
-                        mzmin <- mz - input$mzWindowF
-                        mzmax <- mz + input$mzWindowF
-                    }
-                }
-            }
 
-            if (is.null(mzmin) || is.null(mzmax))
-            {
-                mzmin <- 100
-                mzmax <- 200
-            }
+            mzRange <- computeMzRange(input)
+            mzmin <- mzRange$mzmin
+            mzmax <- mzRange$mzmax
+
             ranges <- data.table::data.table(
                 mzmin = mzmin,
                 mzmax = mzmax,
-                retmin = if (input$rtMode == "Disabled") 0 else if (input$rtMode == "Range") input$retmin else input$retvalue - input$retwindow,
-                retmax = if (input$rtMode == "Disabled") 0 else if (input$rtMode == "Range") input$retmax else input$retvalue + input$retwindow
+                retmin = if (input$rtMode == "Disabled") 0 else if (input$rtMode == "Range") input$retMin else input$retValue - input$retWindow,
+                retmax = if (input$rtMode == "Disabled") 0 else if (input$rtMode == "Range") input$retMax else input$retValue + input$retWindow
             )
             if (input$mobMode != "Disabled")
             {
-                ranges$mobmin <- if (input$mobMode == "Range") input$mobmin else input$mobvalue - input$mobwindow
-                ranges$mobmax <- if (input$mobMode == "Range") input$mobmax else input$mobvalue + input$mobwindow
+                ranges$mobmin <- if (input$mobMode == "Range") input$mobMin else input$mobValue - input$mobWindow
+                ranges$mobmax <- if (input$mobMode == "Range") input$mobMax else input$mobValue + input$mobWindow
             }
             rngList <- list(ranges)
             names(rngList) <- input$analysis
@@ -568,64 +574,18 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
             {
                 return(NULL)
             }
-            mzmin <- mzmax <- NULL
-            if (input$mzMode == "Range")
-            {
-                mzmin <- input$mzmin
-                mzmax <- input$mzmax
-            }
-            else if (input$mzMode == "Center +/- Window")
-            {
-                mzmin <- input$mzcenter - input$mzwindow
-                mzmax <- input$mzcenter + input$mzwindow
-            }
-            else if (input$mzMode == "Neutral Mass +/- MZ Window")
-            {
-                neutralMass <- input$neutralMass
-                mz <- tryCatch(calculateMasses(neutralMass, as.adduct(input$adductNM), "mz"), error = function(e)
-                {
-                    shiny::showNotification("Error calculating MZ from neutral mass and adduct", type = "error")
-                    NA
-                })
-                if (!is.na(mz))
-                {
-                    mzmin <- mz - input$mzWindowNM
-                    mzmax <- mz + input$mzWindowNM
-                }
-            }
-            else if (input$mzMode == "Formula +/- MZ Window")
-            {
-                neutralMass <- tryCatch(getFormulaMass(input$formula), error = function(e)
-                {
-                    shiny::showNotification("Error parsing formula", type = "error")
-                    NA
-                })
-                if (!is.na(neutralMass))
-                {
-                    mz <- tryCatch(calculateMasses(neutralMass, as.adduct(input$adductF), "mz"), error = function(e)
-                    {
-                        shiny::showNotification("Error calculating MZ from formula and adduct", type = "error")
-                        NA
-                    })
-                    if (!is.na(mz))
-                    {
-                        mzmin <- mz - input$mzWindowF
-                        mzmax <- mz + input$mzWindowF
-                    }
-                }
-            }
-            if (is.null(mzmin) || is.null(mzmax))
-            {
-                mzmin <- 100
-                mzmax <- 200
-            }
+
+            mzRange <- computeMzRange(input)
+            mzmin <- mzRange$mzmin
+            mzmax <- mzRange$mzmax
+
             eimInfo <- data.table::data.table(
                 mzmin = mzmin,
                 mzmax = mzmax,
-                retmin = if (input$rtMode == "Disabled") 0 else if (input$rtMode == "Range") input$eimRetmin else input$eimRetvalue - input$eimRetwindow,
-                retmax = if (input$rtMode == "Disabled") 0 else if (input$rtMode == "Range") input$eimRetmax else input$eimRetvalue + input$eimRetwindow,
-                mobmin = if (input$mobMode == "Disabled") 0 else if (input$mobMode == "Range") input$mobmin else input$mobvalue - input$mobwindow,
-                mobmax = if (input$mobMode == "Disabled") 0 else if (input$mobMode == "Range") input$mobmax else input$mobvalue + input$mobwindow
+                retmin = if (input$rtMode == "Disabled") 0 else if (input$rtMode == "Range") input$eimRetMin else input$eimRetValue - input$eimRetWindow,
+                retmax = if (input$rtMode == "Disabled") 0 else if (input$rtMode == "Range") input$eimRetMax else input$eimRetValue + input$eimRetWindow,
+                mobmin = if (input$mobMode == "Disabled") 0 else if (input$mobMode == "Range") input$mobMin else input$mobValue - input$mobWindow,
+                mobmax = if (input$mobMode == "Disabled") 0 else if (input$mobMode == "Range") input$mobMax else input$mobValue + input$mobWindow
             )
             eimList <- list(eimInfo)
             names(eimList) <- input$analysis
@@ -643,66 +603,17 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
                 return(NULL)
             }
 
-            mzmin <- mzmax <- NULL
-            if (input$mzMode == "Range")
-            {
-                mzmin <- input$mzmin
-                mzmax <- input$mzmax
-            }
-            else if (input$mzMode == "Center +/- Window")
-            {
-                mzmin <- input$mzcenter - input$mzwindow
-                mzmax <- input$mzcenter + input$mzwindow
-            }
-            else if (input$mzMode == "Neutral Mass +/- MZ Window")
-            {
-                neutralMass <- input$neutralMass
-                mz <- tryCatch(calculateMasses(neutralMass, as.adduct(input$adductNM), "mz"), error = function(e)
-                {
-                    shiny::showNotification("Error calculating MZ from neutral mass and adduct", type = "error")
-                    NA
-                })
-                if (!is.na(mz))
-                {
-                    mzmin <- mz - input$mzWindowNM
-                    mzmax <- mz + input$mzWindowNM
-                }
-            }
-            else if (input$mzMode == "Formula +/- MZ Window")
-            {
-                neutralMass <- tryCatch(getFormulaMass(input$formula), error = function(e)
-                {
-                    shiny::showNotification("Error parsing formula", type = "error")
-                    NA
-                })
-                if (!is.na(neutralMass))
-                {
-                    mz <- tryCatch(calculateMasses(neutralMass, as.adduct(input$adductF), "mz"), error = function(e)
-                    {
-                        shiny::showNotification("Error calculating MZ from formula and adduct", type = "error")
-                        NA
-                    })
-                    if (!is.na(mz))
-                    {
-                        mzmin <- mz - input$mzWindowF
-                        mzmax <- mz + input$mzWindowF
-                    }
-                }
-            }
-
-            if (is.null(mzmin) || is.null(mzmax))
-            {
-                mzmin <- 100
-                mzmax <- 200
-            }
+            mzRange <- computeMzRange(input)
+            mzmin <- mzRange$mzmin
+            mzmax <- mzRange$mzmax
 
             pointsInfo <- data.table::data.table(
                 mzmin = mzmin,
                 mzmax = mzmax,
-                retmin = if (input$rtMode == "Disabled") 0 else if (input$rtMode == "Range") input$retmin else input$retvalue - input$retwindow,
-                retmax = if (input$rtMode == "Disabled") 0 else if (input$rtMode == "Range") input$retmax else input$retvalue + input$retwindow,
-                mobmin = if (input$mobMode == "Disabled") 0 else if (input$mobMode == "Range") input$mobmin else input$mobvalue - input$mobwindow,
-                mobmax = if (input$mobMode == "Disabled") 0 else if (input$mobMode == "Range") input$mobmax else input$mobvalue + input$mobwindow
+                retmin = if (input$rtMode == "Disabled") 0 else if (input$rtMode == "Range") input$retMin else input$retValue - input$retWindow,
+                retmax = if (input$rtMode == "Disabled") 0 else if (input$rtMode == "Range") input$retMax else input$retValue + input$retWindow,
+                mobmin = if (input$mobMode == "Disabled") 0 else if (input$mobMode == "Range") input$mobMin else input$mobValue - input$mobWindow,
+                mobmax = if (input$mobMode == "Disabled") 0 else if (input$mobMode == "Range") input$mobMax else input$mobValue + input$mobWindow
             )
             
             if (pointsInfo$mobmin == 0 && pointsInfo$mobmax == 0)
@@ -1001,23 +912,8 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
             plot(eic[, "time"], eic[, "intensity"], type = "l", xlab = "Retention Time", ylab = "Intensity",
                  main = "Extracted Ion Chromatogram")
             
-            # overlay detected peaks if present
             peaks <- peaksRV()
-            if (!is.null(peaks) && length(peaks) > 0)
-            {
-                for (r in seq_len(nrow(peaks)))
-                {
-                    prow <- peaks[r, ]
-                    EIXFill <- eic[eic[, "time"] >= prow$retmin & eic[, "time"] <= prow$retmax, , drop = FALSE]
-                    if (nrow(EIXFill) > 0)
-                    {
-                        col <- adjustcolor("blue", alpha.f = 0.35)
-                        polygon(c(EIXFill[, 1], rev(EIXFill[, 1])),
-                                c(EIXFill[, "intensity"], rep(0, nrow(EIXFill))),
-                                col = col, border = NA)
-                    }
-                }
-            }
+            plotPeakOverlay(peaks, eic, "time")
         })
         
         output$eimPlot <- shiny::renderPlot(
@@ -1033,24 +929,8 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
             plot(eim[, "mobility"], eim[, "intensity"], type = "l", xlab = "Mobility", ylab = "Intensity",
                  main = "Extracted Ion Mobilogram")
 
-            # overlay detected peaks if present
             peaks <- peaksRV()
-            if (!is.null(peaks) && length(peaks) > 0)
-            {
-                for (r in seq_len(nrow(peaks)))
-                {
-                    prow <- peaks[r, ]
-                    # peaks detected on EIM were created by renaming mobility -> time, so retmin/retmax are mobility units
-                    EIXFill <- eim[eim[, "mobility"] >= prow$retmin & eim[, "mobility"] <= prow$retmax, , drop = FALSE]
-                    if (nrow(EIXFill) > 0)
-                    {
-                        col <- adjustcolor("blue", alpha.f = 0.35)
-                        polygon(c(EIXFill[, "mobility"], rev(EIXFill[, "mobility"])),
-                                c(EIXFill[, "intensity"], rep(0, nrow(EIXFill))),
-                                col = col, border = NA)
-                    }
-                }
-            }
+            plotPeakOverlay(peaks, eim, "mobility")
         })
 
         output$chromPointsPlot <- shiny::renderPlot(

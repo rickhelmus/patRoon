@@ -38,7 +38,7 @@
 - TC convert: doc that centroid mode is used for IMS conversion (and/or make it optional?)
 - See why parallel reporting is so slow (on Windows?)
 - SAFD: make CSVs on parallel workers? If not doc that workers must be one same system
-- cleanup launchEICGUI, mention its LLM stuff, add simple docs
+- launchEICGUI: mention its LLM stuff
 
 ## Maybe
 

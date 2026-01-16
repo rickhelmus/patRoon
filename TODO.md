@@ -35,10 +35,8 @@
 - FIX: IMSRangeParams: in sets workflows, the mz column is taken so relative filtering is done to neutralMasses
     - maybe add _mz rel column like compounds?
     - actually, the same is the case for the mz filter (also IMS and mz for features) --> maybe just document difference? the actual results will not change much in general
-- TC convert: doc that centroid mode is used for IMS conversion (and/or make it optional?)
 - See why parallel reporting is so slow (on Windows?)
 - SAFD: make CSVs on parallel workers? If not doc that workers must be one same system
-- launchEICGUI: mention its LLM stuff
 
 ## Maybe
 
@@ -141,7 +139,6 @@
             - otoh, BP single point doesn't make too much sense... maybe only use BP for non-IMS data?
             - since we have profiles, taking sum intensities makes more sense, as unrelated peaks will be relatively fewer and probably less strongly affect than in centroided data 
     - have a default for genEICParams? --> check after defaults/profiles are set
-- update featAnn consensus?
 - EICs
     - are even numbers for smoothing/summing correctly handled?
 - MSPL/IMCollapse: specify default maxGapIMS in limits? Mainly for Agilent, where relatively large numbers are necessary

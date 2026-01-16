@@ -6,6 +6,10 @@
 #'
 #' Launches a Shiny app for generating and plotting EICs and EIMs.
 #'
+#' These tools were originally developed as internal tools to debug and explore IMS related algorithms. They were mostly
+#' generated with LLMs, hence, may contain nonsense ansd bugs. Nevertheless, they may be useful for users to explore
+#' EICs and EIMs interactively. Please use with caution and report any issues.
+#'
 #' @param obj For data.frame method: analysis information data.frame. For other methods: features/featureGroups object.
 #' @param suspects Optional suspect list data.frame (data.frame method only).
 #'

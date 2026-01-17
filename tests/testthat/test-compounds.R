@@ -141,6 +141,22 @@ test_that("delete and filter", {
     expect_length(filter(compsExplained, lossElements = "Na0-100", negate = TRUE), 0)
     expect_gt(length(filter(compsExplained, lossElements = "C1-100", negate = TRUE)), 0)
     expect_length(filter(compsExplained, lossElements = "Na1-100", negate = TRUE), length(compsExplained))
+    
+    expect_lt(length(filter(compsExplained, fragFormulas = "C7H7")), length(compsExplained))
+    expect_equal(filter(compsExplained, fragFormulas = "C7H7"), filter(compsExplained, fragFormulas = "H7C7"))
+    expect_length(filter(compsExplained, fragFormulas = "Na"), 0)
+    expect_length(filter(compsExplained, fragFormulas = "Na", negate = TRUE), length(compsExplained))
+    tabF <- as.data.table(filter(compsExplained, fragFormulas = c("C7H7", "C8H2F2NO"), negate = TRUE))
+    expect_all_false(c("C7H7", "C8H2F2NO") %in% tabF$frag_ion_formula)
+    
+    expect_lt(length(filter(compsExplained, lossFormulas = "N2")), length(compsExplained))
+    expect_equal(filter(compsExplained, lossFormulas = "C2H4"), filter(compsExplained, lossFormulas = "H4C2"))
+    expect_gt(length(filter(compsExplained, lossFormulas = c("N2", "C2H4"))),
+              length(filter(compsExplained, lossFormulas = "N2")))
+    expect_length(filter(compsExplained, lossFormulas = "Na"), 0)
+    expect_length(filter(compsExplained, lossFormulas = "Na", negate = TRUE), length(compsExplained))
+    tabF <- as.data.table(filter(compsExplained, lossFormulas = c("N2", "C2H4"), negate = TRUE))
+    expect_all_false(c("N2", "C2H4") %in% tabF$neutral_loss)
 
     expect_lt(length(filter(compsLib, minScore = 0.25)), length(compsLib))
     expect_lt(length(filter(compsLib, minScore = 0.25, negate = TRUE)), length(compsLib))

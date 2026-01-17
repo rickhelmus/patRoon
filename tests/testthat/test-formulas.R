@@ -154,7 +154,23 @@ test_that("delete and filter", {
     expect_length(filter(formsGFWithMSMS, lossElements = "Na1-100", negate = TRUE), length(formsGFWithMSMS))
     expect_length(filter(formsGFMS, lossElements = "C0-100"), 0) # no MS/MS
     expect_length(filter(formsGFMS, lossElements = "C0-100", negate = TRUE), 0)
-
+    
+    expect_lt(length(filter(formsGFWithMSMS, fragFormulas = "C7H7")), length(formsGFWithMSMS))
+    expect_equal(filter(formsGFWithMSMS, fragFormulas = "C7H7"), filter(formsGFWithMSMS, fragFormulas = "H7C7"))
+    expect_length(filter(formsGFWithMSMS, fragFormulas = "Na"), 0)
+    expect_length(filter(formsGFWithMSMS, fragFormulas = "Na", negate = TRUE), length(formsGFWithMSMS))
+    tabF <- as.data.table(filter(formsGFWithMSMS, fragFormulas = c("C7H7", "C6H6N3"), negate = TRUE))
+    expect_all_false(c("C7H7", "C6H6N3") %in% tabF$frag_ion_formula)
+    
+    expect_lt(length(filter(formsGFWithMSMS, lossFormulas = "CH3")), length(formsGFWithMSMS))
+    expect_equal(filter(formsGFWithMSMS, lossFormulas = "CH3"), filter(formsGFWithMSMS, lossFormulas = "H3C"))
+    expect_gt(length(filter(formsGFWithMSMS, lossFormulas = c("CH3", "C2H4"))),
+              length(filter(formsGFWithMSMS, lossFormulas = "CH3")))
+    expect_length(filter(formsGFWithMSMS, lossFormulas = "Na"), 0)
+    expect_length(filter(formsGFWithMSMS, lossFormulas = "Na", negate = TRUE), length(formsGFWithMSMS))
+    tabF <- as.data.table(filter(formsGFWithMSMS, lossFormulas = c("CH3", "C2H4"), negate = TRUE))
+    expect_all_false(c("CH3", "C2H4") %in% tabF$neutral_loss)
+    
     expect_equal(length(groupNames(filter(formsGF, topMost = 1))), length(groupNames(formsGF)))
     expect_gte(length(filter(formsGF, topMost = 1, negate = TRUE)), length(groupNames(formsGF)))
     expect_range(length(filter(formsGF, topMost = 2)),

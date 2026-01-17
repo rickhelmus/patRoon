@@ -263,6 +263,7 @@ Filter                                        | Classes                        |
 `removeMZs`                                   | `MSPeakLists`                  | Removal of [background peaks](#bgMSMS)
 `minExplainedPeaks`                           | `formulas`, `compounds`        | Minimum number of annotated mass peaks
 `elements`, `fragElements`, `lossElements`    | `formulas`, `compounds`        | Restrain elemental composition
+`fragFormulas`, `lossFormulas`                | `formulas`, `compounds`        | Only keep candidates with at least one fragment formula or neutral loss match
 `topMost`                                     | `formulas`, `compounds`        | Only keep highest ranked candidates 
 `minScore`, `minFragScore`, `minFormulaScore` | `compounds`                    | Minimum compound scorings
 `scoreLimits`                                 | `formulas`, `compounds`        | Minimum/Maximum scorings
@@ -296,8 +297,8 @@ formulas <- filter(formulas, elements = c("S1-10", "P1-10"))
 # only keep candidates with MS/MS fragments that contain 1-10 carbons and 0-2 oxygens
 formulas <- filter(formulas, fragElements = "C1-10O0-2")
 
-# only keep candidates with CO2 neutral loss
-formulas <- filter(formulas, lossElements = "CO2")
+# only keep candidates with CO2 or H2O neutral loss
+formulas <- filter(formulas, lossFormulas = c("CO2", "H2O"))
 
 # only keep candidates with formula annotation similarity >=0.6
 formulas <- filter(formulas, scoreLimits = list(annSim = c(0.6, Inf)))

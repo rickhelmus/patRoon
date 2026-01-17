@@ -2,7 +2,6 @@
 
 ## general
 
-- lossElements: handbook suggests it takes a whole formula --> maybe make fragFormula/lossFormula filters?
 - better explain behavior of collapseSuspects=NULL and merging of predicted concs/tox
     - check if ref docs are OK
     - add to handbook
@@ -138,8 +137,6 @@
             - otoh, BP single point doesn't make too much sense... maybe only use BP for non-IMS data?
             - since we have profiles, taking sum intensities makes more sense, as unrelated peaks will be relatively fewer and probably less strongly affect than in centroided data 
     - have a default for genEICParams? --> check after defaults/profiles are set
-- EICs
-    - are even numbers for smoothing/summing correctly handled?
 - MSPL/IMCollapse: specify default maxGapIMS in limits? Mainly for Agilent, where relatively large numbers are necessary
 
 
@@ -369,6 +366,7 @@
 - MF: don't use metFusion by default
 - plotInt(): xlim/ylim
 - MSPL annotationBy filter: clarify/check that it only works on FG MSPL and cannot be combined with reAverage=T
+- fragFormulas and lossFormulas feat annot filters
 
 
 ## Features

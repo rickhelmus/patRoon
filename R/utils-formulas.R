@@ -103,7 +103,7 @@ addFormula <- function(formula1, formula2)
 sortFormula <- function(formula)
 {
     if (!nzchar(formula))
-        return("")
+        return(formula)
     
     fl <- splitFormulaToList(formula)
     el <- names(fl)

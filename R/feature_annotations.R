@@ -321,6 +321,11 @@ setMethod("delete", "featureAnnotations", function(obj, i = NULL, j = NULL, ...)
 #'   that \code{numberPatents} should be at least \samp{10}. Note that a result without a specified scoring is never
 #'   removed. If a score term exists multiple times, \emph{i.e.} due to a consensus, then a candidate is kept if at
 #'   least one of the terms falls within the range. Set to \code{NULL} to skip this filter.
+#' @param fragFormulas,lossFormulas A \code{character} vector with one or more formulae, which are matched to MS/MS
+#'   fragments (\code{fragFormulas}) or neutral losses (\code{lossFormulas}). Candidates are only kept with at least one
+#'   match (if both \code{fragFormulas} and \code{lossFormulas} are set then there must be at least one match from
+#'   both). The input formulae are hill sorted prior to matching. For non-exact matching: see \code{fragElements} and
+#'   \code{lossElements}. Set to \code{NULL} to ignore these filters.
 #' @param topMost Only keep a maximum of \code{topMost} candidates with highest score (or least highest if
 #'   \code{negate=TRUE}). Set to \code{NULL} to ignore.
 #' @param maxLevel Filter by maximum identification level (\emph{e.g.} \code{"3a"}). Set to \code{NULL} to ignore.
@@ -332,14 +337,15 @@ setMethod("delete", "featureAnnotations", function(obj, i = NULL, j = NULL, ...)
 #'
 #' @export
 setMethod("filter", "featureAnnotations", function(obj, minExplainedPeaks = NULL, scoreLimits = NULL, elements = NULL,
-                                                   fragElements = NULL, lossElements = NULL, topMost = NULL, OM = FALSE,
+                                                   fragElements = NULL, lossElements = NULL, fragFormulas = NULL,
+                                                   lossFormulas = NULL, topMost = NULL, OM = FALSE,
                                                    maxLevel = NULL, negate = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertCount, . ~ minExplainedPeaks + topMost, positive = c(FALSE, TRUE),
            null.ok = TRUE, fixed = list(add = ac))
     assertScoreRange(scoreLimits, NULL, add = ac)
-    aapply(checkmate::assertCharacter, . ~ elements + fragElements + lossElements,
+    aapply(checkmate::assertCharacter, . ~ elements + fragElements + lossElements + fragFormulas + lossFormulas,
            min.chars = 1, min.len = 1, null.ok = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertFlag, . ~ OM + negate, fixed = list(add = ac))
     checkmate::assertCount(maxLevel, null.ok = TRUE, add = ac)
@@ -353,6 +359,15 @@ setMethod("filter", "featureAnnotations", function(obj, minExplainedPeaks = NULL
         scoreLimits <- modifyList(if (is.null(scoreLimits)) list() else scoreLimits,
                                   list(explainedPeaks = c(minExplainedPeaks, Inf)))
     mark <- if (negate) function(x) !x else function(x) x
+    
+    checkFormsPresent <- \(forms, checkForms) any(checkForms %in% forms)
+    if (negate)
+        checkFormsPresent <- Negate(checkFormsPresent)
+    
+    if (!is.null(fragFormulas))
+        fragFormulas <- sapply(fragFormulas, simplifyFormula)
+    if (!is.null(lossFormulas))
+        lossFormulas <- sapply(lossFormulas, simplifyFormula)
     
     oldn <- length(obj)
     obj <- delete(obj, j = function(annTable, grp, ...)
@@ -377,7 +392,7 @@ setMethod("filter", "featureAnnotations", function(obj, minExplainedPeaks = NULL
         if (!is.null(elements))
             annTable[keep == TRUE, keep := sapply(neutral_formula, checkFormula, elements, negate)]
         
-        if (!is.null(fragElements) || !is.null(lossElements))
+        if (!is.null(fragElements) || !is.null(lossElements) || !is.null(fragFormulas) || !is.null(lossFormulas))
         {
             annTable[keep == TRUE, keep := sapply(seq_len(nrow(annTable)), function(i)
             {
@@ -387,6 +402,10 @@ setMethod("filter", "featureAnnotations", function(obj, minExplainedPeaks = NULL
                 if (!is.null(fragElements) && !any(sapply(fi$ion_formula, checkFormula, fragElements, negate)))
                     return(FALSE)
                 if (!is.null(lossElements) && !any(sapply(fi$neutral_loss, checkFormula, lossElements, negate)))
+                    return(FALSE)
+                if (!is.null(fragFormulas) && !checkFormsPresent(fi$ion_formula, fragFormulas))
+                    return(FALSE)
+                if (!is.null(lossFormulas) && !checkFormsPresent(fi$neutral_loss, lossFormulas))
                     return(FALSE)
                 return(TRUE)
             })]

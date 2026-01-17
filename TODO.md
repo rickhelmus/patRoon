@@ -3,10 +3,6 @@
 ## general
 
 - lossElements: handbook suggests it takes a whole formula --> maybe make fragFormula/lossFormula filters?
-- BUG: annotatedBy filter incorrectly filters feature level peak lists
-    - record group IDs in feature tabs and use them to remove
-    - or work with tolerances, so that reAveraged data can work (but may be less accurate)
-    - or just only support filtering grouped lists (and not if reAveraged)?
 - better explain behavior of collapseSuspects=NULL and merging of predicted concs/tox
     - check if ref docs are OK
     - add to handbook
@@ -42,6 +38,9 @@
 
 - see if MSPL sets anaInfo can be replaced by non-exported slot with named vector with sets for each ana
     - could be taken from analyses of sets objects
+- support filtering feature level peak lists by annotatedBy filter?
+    - record group IDs in feature tabs and use them to remove
+    - or work with tolerances, so that reAveraged data can work (but may be less accurate)
 - FC: select multiple groups and/or anaInfo cols?
 - groupBy: fGroups --> fGroup for consistency with anaInfo cols? (set/analysis/replicate)
 - report
@@ -369,6 +368,7 @@
 - ID levels: increased 3a lib match threshold to more reasonable value
 - MF: don't use metFusion by default
 - plotInt(): xlim/ylim
+- MSPL annotationBy filter: clarify/check that it only works on FG MSPL and cannot be combined with reAverage=T
 
 
 ## Features

@@ -503,6 +503,10 @@ setMethod("delete", "MSPeakLists", function(obj, i = NULL, j = NULL, k = NULL, r
 #'   \code{negate=TRUE} then only results \emph{without} MS/MS data will be retained.
 #' @param annotatedBy Either a \code{\link{formulas}} or \code{\link{compounds}} object, or a \code{list} with both. Any
 #'   MS/MS peaks that are \emph{not} annotated by any of the candidates in the specified objects are removed.
+#'   
+#'   \strong{NOTE}: the \code{annotatedBy} filter currently only supports filtering peak of feature groups (and not of
+#'   features). Hence, this filter cannot be combined with \code{reAverage=TRUE}. Furthermore, if peak lists are
+#'   re-averaged after application of this filter, any filtered results will be \emph{undone}.
 #' @param retainPrecursor If \code{TRUE} then precursor peaks will never be filtered out from MS/MS peak lists (note
 #'   that precursors are never removed from MS peak lists). The \code{negate} argument does not affect this setting.
 #' @param mzWindow The m/z window used to find peaks to be removed from the \code{removeMZs} filter.
@@ -556,6 +560,12 @@ setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity 
     checkArgForLev(2, "annotatedBy", !is.null(annotatedBy))
     checkArgForLev(2, "retainPrecursor", !retainPrecursor)
     
+    if (!is.null(annotatedBy) && reAverage)
+    {
+        stop("The 'annotatedBy' filter only applies to peak lists of feature groups, and cannot work if reAverage=TRUE",
+             call. = FALSE)
+    }
+    
     if (length(obj) == 0)
         return(obj)
 
@@ -577,7 +587,6 @@ setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity 
         plF <- copy(pl)
         
         isAna <- !is.null(ana)
-        isReAveraged <- is.null(ana) && reAverage
         
         if (type == "MS")
         {
@@ -598,7 +607,7 @@ setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity 
             if (!2 %in% MSLevel)
                 return(FALSE)
             
-            if (!isReAveraged && !is.null(annotatedBy))
+            if (!isAna && !is.null(annotatedBy))
             {
                 allAnnPLIDs <- unique(unlist(lapply(annotatedBy, function(ab)
                 {

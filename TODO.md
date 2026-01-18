@@ -169,7 +169,6 @@
         - mz profile & EIM saving, ...
         - assign window & sum windows
         - extend newProject tests for IMS
-    - compounds: check if CCS deviations are assigned
 - misc
     - generateAnalysisInfo()?
 - newProject()

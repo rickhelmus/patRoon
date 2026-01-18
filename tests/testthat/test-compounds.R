@@ -554,4 +554,11 @@ test_that("IMS tests", {
         expect_equal(compsIMSSim@scoreRanges[[fg]], compsIMSSim@scoreRanges[[parentFG]], tolerance = 1E-6,
                      info = paste0("Score ranges should be equal for fg ", fg))
     }
+    
+    # verify if CCS data is read from compound database (ie PubChemLite)
+    compsIMSDB <- callMF(fGroupsIMS, plistsIMS, db = file.path(getTestDataPath(), "test-mf-db-ccs.csv"))
+    expect_known_value(compsIMSDB, testFile("compounds-mf-ims_ccsdb"))
+    checkmate::expect_names(names(as.data.table(compsIMSDB)), must.include = paste0(c("CCS", "CCS_mz", "d_CCS",
+                                                                                      "d_CCS_rel"),
+                                                                                    "-positive"))
 })

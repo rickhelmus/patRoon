@@ -32,6 +32,8 @@
     - actually, the same is the case for the mz filter (also IMS and mz for features) --> maybe just document difference? the actual results will not change much in general
 - See why parallel reporting is so slow (on Windows?)
 - SAFD: make CSVs on parallel workers? If not doc that workers must be one same system
+- reticulate: use py_require()? doesn't seem to be able handle multiple py versions, so no?
+
 
 ## Maybe
 

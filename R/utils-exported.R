@@ -1579,6 +1579,8 @@ setMethod("assignMobilities", "data.table", function(obj, from = NULL, matchFrom
         {
             if (!is.null(virtualenv))
                 reticulate::use_virtualenv(virtualenv)
+            # reticulate::py_require("git+https://github.com/dylanhross/c3sdb", python_version = "3.12")
+            # reticulate::py_require("numpy==1.26.3")
             py_pickle <- reticulate::import("pickle")
             py_C3SDB <- reticulate::import("c3sdb.ml.data")
             py_bi <- reticulate::import_builtins()

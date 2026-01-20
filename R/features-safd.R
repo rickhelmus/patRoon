@@ -25,9 +25,19 @@ SAFDMPFinishHandler <- function(cmd)
 
 SAFDMPPrepareHandler <- function(cmd)
 {
+    CSVPaths <- applyMSData(cmd$anaInfoRow, needTypes = if (cmd$cent) "centroid", showProgress = FALSE, func = function(ana, path, backend)
+    {
+        openMSReadBackend(backend, path)
+        paths <- list(mzCSV = tempfile("mz", fileext = ".csv"), intCSV = tempfile("int", fileext = ".csv"),
+                      rtCSV = tempfile("rt", fileext = ".csv"))
+        patRoon:::makeSAFDInput(backend, paths$mzCSV, paths$intCSV, paths$rtCSV, cmd$mzRange[1], cmd$mzRange[2])
+        return(paths)
+    })[[1]]
+    
     outp <- tempfile("safd")
     mkdirp(outp)
-    cmd$args <- c(cmd$args, outp)
+    cmd$args <- c(cmd$args, CSVPaths$mzCSV, CSVPaths$intCSV, CSVPaths$rtCSV, outp)
+    
     return(c(cmd, list(outPath = outp)))
 }
 
@@ -39,16 +49,15 @@ setMethod("initialize", "featuresSAFD",
           function(.Object, ...) callNextMethod(.Object, algorithm = "safd", ...))
 
 makeSAFDCommand <- function(inPath, fileName, cent, mzRange, maxNumbIter, maxTPeakW, resolution,
-                            minMSW, RThreshold, minInt, sigIncThreshold, S2N, minPeakWS, centroidMethod, centroidDM,
-                            mzCSV, intCSV, rtCSV)
+                            minMSW, RThreshold, minInt, sigIncThreshold, S2N, minPeakWS, centroidMethod, centroidDM)
 {
     # UNDONE: check if julia exists? allow to configure path?
     return(list(command = "julia", args = c(system.file("misc", "runSAFD.jl", package = "patRoon"),
                                             inPath, fileName, cent, mzRange[1], mzRange[2],
                                             maxNumbIter, maxTPeakW, resolution,
                                             minMSW, RThreshold, minInt, sigIncThreshold, S2N,
-                                            minPeakWS, centroidMethod, centroidDM, mzCSV, intCSV, rtCSV),
-                cent = cent, fileName = fileName))
+                                            minPeakWS, centroidMethod, centroidDM),
+                cent = cent, mzRange = mzRange, fileName = fileName))
 }
 
 #' Find features using SAFD
@@ -85,7 +94,7 @@ makeSAFDCommand <- function(inPath, fileName, cent, mzRange, maxNumbIter, maxTPe
 #' @param prefCentroid Set to \code{TRUE} to prefer centroided data over other MS data specified in \code{analysisInfo}.
 #'
 #'   \strong{NOTE}: if \code{prefCentroid=FALSE} but the package option \option{patRoon.MS.preferIMS=TRUE} (see
-#'   \code{\link{msdata}}), then centroided data will still be prefferred over IMS data.
+#'   \code{\link{msdata}}), then centroided data will still be preferred over IMS data.
 #' @param mzRange The \emph{m/z} window to be imported.
 #' @param maxNumbIter,maxTPeakW,resolution,minMSW,RThreshold,minInt,sigIncThreshold,S2N,minPeakWS Parameters directly
 #'   passed to the \code{safd_s3D} function.
@@ -150,23 +159,13 @@ findFeaturesSAFD <- function(analysisInfo, prefCentroid = FALSE, mzRange = c(0, 
     if (verbose)
         printf("Finding features with SAFD for %d analyses ...\n", anaCount)
 
-    # UNDONE: do this in prepare func?
-    CSVPaths <- applyMSData(analysisInfo, needTypes = if (takeCent) "centroid", showProgress = FALSE, func = function(ana, path, backend)
-    {
-        openMSReadBackend(backend, path)
-        paths <- list(mzCSV = tempfile("mz", fileext = ".csv"), intCSV = tempfile("int", fileext = ".csv"),
-                      rtCSV = tempfile("rt", fileext = ".csv"))
-        makeSAFDInput(backend, paths$mzCSV, paths$intCSV, paths$rtCSV, mzRange[1], mzRange[2])
-        return(paths)
-    })
-    
     anaHashes <- getMSFileHashesFromAvailBackend(analysisInfo, needTypes = if (takeCent) "centroid")
     
-    cmdQueue <- Map(analysisInfo$analysis, filePaths, CSVPaths, anaHashes, f = function(ana, fp, cfps, hash)
+    cmdQueue <- Map(split(analysisInfo, seq_len(nrow(analysisInfo))), filePaths, anaHashes, f = function(ai, fp, hash)
     {
         hash <- makeHash(hash, params)
-        cmd <- do.call(makeSAFDCommand, c(list(dirname(fp), basename(fp)), params, cfps))
-        return(c(cmd, list(inputPath = fp, hash = hash, logFile = paste0(ana, ".txt"))))
+        cmd <- do.call(makeSAFDCommand, c(list(dirname(fp), basename(fp)), params))
+        return(c(cmd, list(anaInfoRow = ai, inputPath = fp, hash = hash, logFile = paste0(ai$analysis, ".txt"))))
     })
     
     fts <- executeMultiProcess(cmdQueue, patRoon:::SAFDMPFinishHandler,

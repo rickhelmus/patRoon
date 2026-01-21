@@ -10,6 +10,11 @@
 * Fix: avoid error when `consensus()` is called with empty objects for a set (issue #144)
 * Fix: workaround for bug in plotting feat optimization results (issue #145)
 * Fix: feature componentization would fail if no annotations were found (reported by Jan Specker)
+* Made featureQualities/featureGroupQualities() more configurable and extandable (suggested by Leon Saal, issue #133/PR #134)
+    - added `featureQualities()` and `featureGroupQualities()` functions to obtain the default qualities and calculation functions used by `MetaClean`
+    - added `getFeatureQualityNames()` generic to obtain the quality/score names for a `features`/`featureGroups` object
+    - added `featureQualities` and `featureGroupQualities` arguments to `calculatePeakQualities()` methods to customize calculation.
+    
 
 
 # patRoon 2.3.4

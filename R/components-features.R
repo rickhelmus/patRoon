@@ -49,7 +49,10 @@ setMethod("initialize", "componentsFeatures", function(.Object, fGroups, minSize
     cmpTab[, fCMPID := paste0(match(analysis, analyses(fGroups)), "-", fCMP)]
 
     # NOTE: abundance only takes assigned features into account, as unassigned won't be present
-    cmpTab[!is.na(adduct_ion), adduct_abundance := sapply(adduct_ion, function(a) sum(a == adduct_ion)) / .N, by = "group"]
+    if (any(!is.na(cmpTab$adduct_ion)))
+        cmpTab[!is.na(adduct_ion), adduct_abundance := sapply(adduct_ion, function(a) sum(a == adduct_ion)) / .N, by = "group"]
+    else
+        cmpTab[, adduct_abundance := NA_real_]
     
     # Filter adducts not abundantly assigned to same feature group
     cmpTab <- cmpTab[is.na(adduct_abundance) | numGTE(adduct_abundance, relMinAdductAbundance)]

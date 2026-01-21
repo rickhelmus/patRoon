@@ -9,6 +9,7 @@
 * Updated PubChem Transformations to 0.2.2
 * Fix: avoid error when `consensus()` is called with empty objects for a set (issue #144)
 * Fix: workaround for bug in plotting feat optimization results (issue #145)
+* Fix: feature componentization would fail if no annotations were found (reported by Jan Specker)
 
 
 # patRoon 2.3.4

@@ -270,7 +270,7 @@ test_that("Feature settings", {
     testNewProj(features = list(featAlgo = "SIRIUS"), name = "features-sirius")
     testNewProj(features = list(featAlgo = "Bruker"), name = "features-bruker")
     
-    testNewProj(features = list(featAlgo = "piek", name = "features-piek"))
+    testNewProj(features = list(featAlgo = "piek"), name = "features-piek")
     testNewProj(features = list(featAlgo = "piek", piekParams = list(peaksAlgo = "openms")),
                 name = "features-piek_openms")
     testNewProj(features = list(featAlgo = "piek", piekParams = list(filter = "suspects",
@@ -283,6 +283,14 @@ test_that("Feature settings", {
                                                                               neg = "suspects-neg")))),
                 name = "features-piek_suspects_sets")
     testNewProj(features = list(featAlgo = "piek", piekParams = list(filter = "ms2")), name = "features-piek_ms2")
+    testNewProj(general = list(IMS = list(mode = "direct")),
+                features = list(featAlgo = "piek", fGroupsAlgo = "Greedy"), name = "features-piek_dma")
+    testNewProj(general = list(IMS = list(mode = "direct")),
+                features = list(featAlgo = "piek", piekParams = list(filter = "ms2"), fGroupsAlgo = "Greedy"),
+                name = "features-piek_dma_ms2")
+    testNewProj(general = list(IMS = list(mode = "direct")),
+                features = list(featAlgo = "piek", piekParams = list(filter = "ms2", filterIMS = "ms2"),
+                                fGroupsAlgo = "Greedy"), name = "features-piek_dma_ms2_ms2")
     
     testNewProj(features = list(fGroupsAlgo = "XCMS"), name = "features-fgroups-xcms")
     testNewProj(features = list(fGroupsAlgo = "KPIC2"), name = "features-fgroups-kpic2")
@@ -313,11 +321,11 @@ test_that("Feature settings", {
     testNewProj(general = list(ionization = "both"), features = list(exSuspList = TRUE),
                 name = "features-suspects_sets_ex")
     
-    testNewProj(general = list(IMS = list(mode = "single")),
-                features = list(exSuspList = TRUE, IMSSuspCCSPred = "c3sdb"),
+    testNewProj(general = list(IMS = list(mode = "direct")),
+                features = list(featAlgo = "piek", fGroupsAlgo = "Greedy", exSuspList = TRUE, IMSSuspCCSPred = "c3sdb"),
                 name = "features-ims_susp_pred")
-    testNewProj(general = list(ionization = "both", IMS = list(mode = "single")),
-                features = list(exSuspList = TRUE, IMSSuspCCSPred = "c3sdb"),
+    testNewProj(general = list(ionization = "both", IMS = list(mode = "direct")),
+                features = list(featAlgo = "piek", fGroupsAlgo = "Greedy", exSuspList = TRUE, IMSSuspCCSPred = "c3sdb"),
                 name = "features-ims_susp_pred_sets")
     
     testNewProj(features = list(fGroupsAdv = list(preIntThr = 3E5, intThr = 3E6, repAbundance = 0.5,

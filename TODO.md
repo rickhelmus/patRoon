@@ -99,6 +99,7 @@
     - conc/norm conc are set to "NA_real_"
 - remove conc column?
 - remove default limits that are in limits.yml
+    - maybe also for piek EIC params if we make profiles?
 - IMS changes
     - Codegen
         - Add mobility filters for suspects & compounds?
@@ -119,6 +120,12 @@
         - also configurable weights for assignMobilities()?
     - tweak default EIMParams
         - default smoothing? different for Agilent? Convert to mobility units?
+- MSPL/IMCollapse: specify default maxGapIMS in limits? Mainly for Agilent, where relatively large numbers are necessary
+- piek
+    - mob range: doc that defaults are for TIMS? Or just not give any defaults? Give instrument? Put it in limits?
+        - enable EIM summing and smoothing by default for TIMS?
+        - or make IMS arg a character, eg "agilent", "bruker"?
+    - have a default for genEICParams? --> check after defaults/profiles are set
 
 ## IMS
 
@@ -129,18 +136,12 @@
             - report both?
             - document
 - feat EICs
-    - mob range: doc that defaults are for TIMS? Or just not give any defaults? Give instrument? Put it in limits?
-        - enable EIM summing and smoothing by default for TIMS?
-        - or make IMS arg a character, eg "agilent", "bruker"?
     - intensityBP
         - docs...
         - does current mz/mob split make sense?
         - make a non summed intensityBP in IMS mode? mainly for peak finding, but maybe also makes more sense for assignment
             - otoh, BP single point doesn't make too much sense... maybe only use BP for non-IMS data?
             - since we have profiles, taking sum intensities makes more sense, as unrelated peaks will be relatively fewer and probably less strongly affect than in centroided data 
-    - have a default for genEICParams? --> check after defaults/profiles are set
-- MSPL/IMCollapse: specify default maxGapIMS in limits? Mainly for Agilent, where relatively large numbers are necessary
-
 
 ## Tests
 
@@ -170,12 +171,11 @@
             - combine this with general tests for keepDups
         - mz profile & EIM saving, ...
         - assign window & sum windows
-        - extend newProject tests for IMS
 - misc
     - generateAnalysisInfo()?
 - newProject()
     - see where testing is slow, possibly disable testServer() on CI?
-    - add snapshots
+    - verify added snapshots
     - verify that the right patRoonData is used
 - manual checks
     - checkFeatures()/checkComponents() verify if things still work

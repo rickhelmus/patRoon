@@ -1,0 +1,48 @@
+
+library(patRoon)
+
+# -------------------------
+# initialization
+# -------------------------
+
+workPath <- "test_temp/test-np/analysis-tab_emb_pos"
+setwd(workPath)
+
+# Create analysis table
+anaInfo <- read.table(header = TRUE, text = "
+        analysis                                                                                  path_centroid path_raw        path_profile        path_ims      replicate         blank
+ 'solvent-pos-1' '/Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/library/patRoonData/extdata/pos'       '' 'converted/profile' 'converted/ims'  'solvent-pos' 'solvent-pos'
+ 'solvent-pos-2' '/Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/library/patRoonData/extdata/pos'       '' 'converted/profile' 'converted/ims'  'solvent-pos' 'solvent-pos'
+ 'solvent-pos-3' '/Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/library/patRoonData/extdata/pos'       '' 'converted/profile' 'converted/ims'  'solvent-pos' 'solvent-pos'
+'standard-pos-1' '/Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/library/patRoonData/extdata/pos'       '' 'converted/profile' 'converted/ims' 'standard-pos' 'solvent-pos'
+'standard-pos-2' '/Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/library/patRoonData/extdata/pos'       '' 'converted/profile' 'converted/ims' 'standard-pos' 'solvent-pos'
+'standard-pos-3' '/Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/library/patRoonData/extdata/pos'       '' 'converted/profile' 'converted/ims' 'standard-pos' 'solvent-pos'
+")
+
+
+# -------------------------
+# features
+# -------------------------
+
+# Find all features
+# NOTE: see the reference manual for many more options
+fList <- findFeatures(anaInfo, "openms", noiseThrInt = 1000, chromSNR = 3, chromFWHM = 5, minFWHM = 1, maxFWHM = 30)
+
+# Group and align features between analyses
+fGroups <- groupFeatures(fList, "openms", rtalign = TRUE)
+
+# Basic rule based filtering
+fGroups <- filter(fGroups, preAbsMinIntensity = 100, absMinIntensity = 10000, relMinReplicateAbundance = 1,
+                  maxReplicateIntRSD = 0.75, blankThreshold = 5, removeBlanks = TRUE, retentionRange = NULL,
+                  mzRange = NULL)
+
+# Update group properties
+fGroups <- updateGroups(fGroups, what = c("ret", "mz", "mobility"), intWeight = FALSE)
+
+# -------------------------
+# reporting
+# -------------------------
+
+# Advanced report settings can be edited in the report.yml file.
+report(fGroups, MSPeakLists = NULL, formulas = NULL, compounds = NULL, components = NULL, settingsFile = "report.yml",
+       openReport = TRUE)

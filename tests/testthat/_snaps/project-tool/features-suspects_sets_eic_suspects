@@ -1,0 +1,67 @@
+
+library(patRoon)
+
+# -------------------------
+# initialization
+# -------------------------
+
+workPath <- "test_temp/test-np/features-suspects_sets_eic_suspects"
+setwd(workPath)
+
+# NOTE: please set to a valid data.frame with analysis information. See ?`analysis-information` for more details.
+anaInfoPos <- data.frame(path_centroid = character(), analysis = character(), replicate = character(),
+                         blank = character())
+anaInfoNeg <- data.frame(path_centroid = character(), analysis = character(), replicate = character(),
+                         blank = character())
+
+# -------------------------
+# setup suspect lists
+# -------------------------
+
+# Load suspect list
+suspListPos <- read.csv("suspectsPos")
+suspListNeg <- read.csv("suspectsNeg")
+
+# Init suspect list for piek
+suspListPiekPos <- read.csv("suspectsEICPos")
+suspListPiekNeg <- read.csv("suspectsEICNeg")
+
+# -------------------------
+# features
+# -------------------------
+
+# Find all features
+# NOTE: see the reference manual for many more options
+genEICParams <- getPiekEICParams(filter = "suspects", mzRange = c(80, 600), mzStep = 0.02, rtWindow = 12,
+                                 mzWindow = 0.005)
+fListPos <- findFeatures(anaInfoPos, "piek", genEICParams = genEICParams,
+                         peakParams = getDefPeakParams("chrom", "piek"), suspects = suspListPiekPos, adduct = "[M+H]+")
+fListNeg <- findFeatures(anaInfoNeg, "piek", genEICParams = genEICParams,
+                         peakParams = getDefPeakParams("chrom", "piek"), suspects = suspListPiekNeg, adduct = "[M-H]-")
+fList <- makeSet(fListPos, fListNeg, adducts = c("[M+H]+", "[M-H]-"))
+
+# Group and align features between analyses
+fGroups <- groupFeatures(fList, "openms", rtalign = TRUE)
+
+# Basic rule based filtering
+fGroups <- filter(fGroups, preAbsMinIntensity = 100, absMinIntensity = 10000, relMinReplicateAbundance = 1,
+                  maxReplicateIntRSD = 0.75, blankThreshold = 5, removeBlanks = TRUE, retentionRange = NULL,
+                  mzRange = NULL)
+
+# Update group properties
+fGroups <- updateGroups(fGroups, what = c("ret", "mz", "mobility"), intWeight = FALSE)
+
+# -------------------------
+# suspect screening
+# -------------------------
+
+# Set onlyHits to FALSE to retain features without suspects (eg for full NTA)
+fGroups <- screenSuspects(fGroups, list(suspListPos, suspListNeg), rtWindow = 12, mzWindow = 0.005, onlyHits = TRUE)
+
+# -------------------------
+# reporting
+# -------------------------
+
+# Advanced report settings can be edited in the report.yml file.
+report(fGroups, MSPeakLists = NULL, formulas = NULL, compounds = NULL, components = NULL, settingsFile = "report.yml",
+       openReport = TRUE)

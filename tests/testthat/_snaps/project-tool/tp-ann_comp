@@ -1,0 +1,83 @@
+
+library(patRoon)
+
+# -------------------------
+# initialization
+# -------------------------
+
+workPath <- "test_temp/test-np/tp-ann_comp"
+setwd(workPath)
+
+# NOTE: please set to a valid data.frame with analysis information. See ?`analysis-information` for more details.
+anaInfo <- data.frame(path_centroid = character(), analysis = character(), replicate = character(), blank = character())
+
+# -------------------------
+# features
+# -------------------------
+
+# Find all features
+# NOTE: see the reference manual for many more options
+fList <- findFeatures(anaInfo, "openms", noiseThrInt = 1000, chromSNR = 3, chromFWHM = 5, minFWHM = 1, maxFWHM = 30)
+
+# Group and align features between analyses
+fGroups <- groupFeatures(fList, "openms", rtalign = TRUE)
+
+# Basic rule based filtering
+fGroups <- filter(fGroups, preAbsMinIntensity = 100, absMinIntensity = 10000, relMinReplicateAbundance = 1,
+                  maxReplicateIntRSD = 0.75, blankThreshold = 5, removeBlanks = TRUE, retentionRange = NULL,
+                  mzRange = NULL)
+
+# Update group properties
+fGroups <- updateGroups(fGroups, what = c("ret", "mz", "mobility"), intWeight = FALSE)
+
+# -------------------------
+# annotation
+# -------------------------
+
+# Retrieve MS peak lists
+avgMSListParams <- getDefAvgPListParams(clusterMzWindow = 0.002)
+mslists <- generateMSPeakLists(fGroups, maxMSRtWindow = 6, avgFeatParams = avgMSListParams,
+                               avgFGroupParams = avgMSListParams)
+# Rule based filtering of MS peak lists. You may want to tweak this. See the manual for more information.
+mslists <- filter(mslists, MSLevel = 2, absMinIntensity = NULL, relMinIntensity = 0.05, topMostPeaks = 25,
+                  maxMZOverPrec = 4)
+
+# Calculate compound structure candidates
+compounds <- generateCompounds(fGroups, mslists, "metfrag", dbRelMzDev = 5, fragRelMzDev = 5, fragAbsMzDev = 0.002,
+                               adduct = "[M+H]+", database = "pubchemlite", maxCandidatesToStop = 2500)
+
+compounds <- estimateIDConfidence(compounds, MSPeakLists = mslists, formulas = NULL, IDFile = "idlevelrules.yml")
+
+# -------------------------
+# transformation products
+# -------------------------
+
+# Load parent suspect list
+suspListParents <- read.csv("suspects")
+
+# Obtain TPs
+TPs <- generateTPs("ann_comp", parents = suspListParents, compounds = compounds, TPsRef = NULL, fGroupsComps = fGroups,
+                   TPStructParams = getDefTPStructParams())
+
+# -------------------------
+# Parent and TP linkage
+# -------------------------
+
+# You probably want to prioritize the data before componentization. Please see the handbook for more info.
+componentsTP <- generateComponents(fGroups, "tp", fGroupsTPs = fGroups, TPs = TPs, MSPeakLists = mslists,
+                                   compounds = compounds)
+
+# You may want to configure the filtering step below. See the manuals for more details.
+componentsTP <- filter(componentsTP, retDirMatch = FALSE, minSpecSim = NULL, minSpecSimPrec = NULL,
+                       minSpecSimBoth = NULL, minFragMatches = NULL, minNLMatches = NULL, formulas = NULL)
+
+# Only keep linked feature groups
+fGroups <- fGroups[results = componentsTP]
+
+# -------------------------
+# reporting
+# -------------------------
+
+# Advanced report settings can be edited in the report.yml file.
+report(fGroups, MSPeakLists = mslists, formulas = NULL, compounds = compounds, components = componentsTP, TPs = TPs,
+       settingsFile = "report.yml", openReport = TRUE)

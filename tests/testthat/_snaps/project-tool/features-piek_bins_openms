@@ -1,0 +1,37 @@
+
+library(patRoon)
+
+# -------------------------
+# initialization
+# -------------------------
+
+workPath <- "test_temp/test-np/features-piek_bins_openms"
+setwd(workPath)
+
+# NOTE: please set to a valid data.frame with analysis information. See ?`analysis-information` for more details.
+anaInfo <- data.frame(path_centroid = character(), analysis = character(), replicate = character(), blank = character())
+
+# -------------------------
+# features
+# -------------------------
+
+# Find all features
+# NOTE: see the reference manual for many more options
+genEICParams <- getPiekGenEICParams(methodMZ = "bins", mzRange = c(80, 600), mzStep = 0.02)
+fList <- findFeatures(anaInfo, "piek", genEICParams = genEICParams, peakParams = getDefPeakParams("chrom", "openms"))
+
+# Group and align features between analyses
+fGroups <- groupFeatures(fList, "openms", rtalign = TRUE)
+
+# Basic rule based filtering
+fGroups <- filter(fGroups, preAbsMinIntensity = 100, absMinIntensity = 10000, relMinReplicateAbundance = 1,
+                  maxReplicateIntRSD = 0.75, blankThreshold = 5, removeBlanks = TRUE, retentionRange = NULL,
+                  mzRange = NULL)
+
+# -------------------------
+# reporting
+# -------------------------
+
+# Advanced report settings can be edited in the report.yml file.
+report(fGroups, MSPeakLists = NULL, formulas = NULL, compounds = NULL, components = NULL, settingsFile = "report.yml",
+       openReport = TRUE)

@@ -307,7 +307,7 @@ genScriptSuspListsBlock <- function(ionization, IMSMode, settingsFeat, doSusps, 
         if (settingsFeat$exSuspList)
         {
             generator$addComment("Get example suspect list")
-            generator$addSuspListEx(ionization, sprintf("%s::suspectsPos", "%s::suspectsNeg", pd, pd), "suspList")
+            generator$addSuspListEx(ionization, sprintf("%s::suspectsPos", pd), sprintf("%s::suspectsNeg", pd), "suspList")
         }
         else
         {
@@ -374,7 +374,7 @@ genScriptSuspListsBlock <- function(ionization, IMSMode, settingsFeat, doSusps, 
         if (doEx)
         {
             generator$addComment("Get example ISTD list")
-            generator$addSuspListEx(ionization, sprintf("%s::ISTDListPos", "%s::ISTDListNeg", pd, pd), "ISTDList")
+            generator$addSuspListEx(ionization, sprintf("%s::ISTDListPos", pd), sprintf("%s::ISTDListNeg", pd), "ISTDList")
         }
         else
         {
@@ -402,7 +402,7 @@ genScriptFeaturesBlock <- function(ionization, IMS, settingsFeat, generator)
             list(name = "maxFWHM", value = 30, condition = fa == "OpenMS"),
             list(name = "kmeans", value = TRUE, condition = fa == "KPIC2"),
             list(name = "level", value = 1000, condition = fa == "KPIC2"),
-            list(name = "IMS", value = IMS$mode == "direct", condition = IMS$mode != "none"),
+            list(name = "IMS", value = IMS$mode == "direct", condition = fa == "piek" && IMS$mode != "none"),
             list(name = "genEICParams", value = "genEICParams", condition = fa == "piek"),
             list(name = "peakParams", value = peakParams, condition = fa == "piek"),
             list(name = "suspects", value = suspPiekL,
@@ -434,10 +434,10 @@ genScriptFeaturesBlock <- function(ionization, IMS, settingsFeat, generator)
             generator$addCall("genEICParams", "getPiekEICParams", list(
                 list(name = "filter", value = mmz, quote = TRUE),
                 list(name = "filterIMS", value = mims, quote = TRUE, condition = doDirectIMS),
-                list(name = "mzRange", value = def$bins$mzRange),
-                list(name = "mzStep", value = def$bins$mzStep),
-                list(name = "mobRange", value = def$bins$mobRange, condition = doDirectIMS),
-                list(name = "mobStep", value = def$bins$mobStep, condition = doDirectIMS),
+                list(name = "mzRange", value = def$none$mzRange),
+                list(name = "mzStep", value = def$none$mzStep),
+                list(name = "mobRange", value = def$none$mobRange, condition = doDirectIMS),
+                list(name = "mobStep", value = def$none$mobStep, condition = doDirectIMS),
                 list(name = "rtWindow", value = def$susp$rtWindow, condition = mmz == "suspects"),
                 list(name = "mzWindow", value = def$susp$mzWindow, condition = mmz == "suspects"),
                 list(name = "IMSWindow", value = def$susp$IMSWindow, condition = mims == "suspects" && doDirectIMS),

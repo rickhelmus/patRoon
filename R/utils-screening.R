@@ -34,8 +34,8 @@ doFGroupScreeningClearMobilities <- function(obj)
 
 doScreeningShow <- function(obj)
 {
-    printf("Suspects: %s (%d hits total)\n", getStrListWithMax(unique(screenInfo(obj)$name), 6, ", "),
-           nrow(screenInfo(obj)))
+    printf("Suspects: %s (%d with %d hits in total)\n", getStrListWithMax(unique(screenInfo(obj)$name), 6, ", "),
+           uniqueN(screenInfo(obj)$name), nrow(screenInfo(obj)))
     printf("Suspects annotated: %s\n", if (isSuspAnnotated(obj)) "yes" else "no")
 }
 
@@ -464,7 +464,8 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, IMSMatchPara
     
     suspectsn <- nrow(suspects)
     foundn <- uniqueN(ret$name)
-    printf("Found %d/%d suspects (%.2f%%)\n", foundn, suspectsn, foundn * 100 / suspectsn)
+    printf("Found %d/%d suspects (%.2f%%) with %d hits in total\n", foundn, suspectsn, foundn * 100 / suspectsn,
+           nrow(ret))
     
     return(ret[])
 }

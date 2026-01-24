@@ -368,6 +368,7 @@
 - plotInt(): xlim/ylim
 - MSPL annotationBy filter: clarify/check that it only works on FG MSPL and cannot be combined with reAverage=T
 - fragFormulas and lossFormulas feat annot filters
+- print unique and total suspect (hits)
 
 
 ## Features

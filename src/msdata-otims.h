@@ -29,7 +29,7 @@ class MSReadBackendOTIMS: public MSReadBackend
                                SpectrumRawTypes::Intensity minIntensityIMS) const override;
     
 public:
-    MSReadBackendOTIMS(void) : MSReadBackend() { setHaveIMS(true); }
+    MSReadBackendOTIMS(void) : MSReadBackend() { }
 };
 
 #else

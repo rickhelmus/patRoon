@@ -115,7 +115,6 @@ void MSReadBackendSC::generateSpecMetadata(void)
     const auto hd = analysis.get_spectra_headers();
     
     const bool hasMob = analysis.has_ion_mobility();
-    setHaveIMS(hasMob);
 
     // 2 == centroided, 1 == profile, 0 == unknown?
     if (getNeedType() == NEED_TYPE::CENTROID && analysis.get_spectra_mode({0})[0] == 1)

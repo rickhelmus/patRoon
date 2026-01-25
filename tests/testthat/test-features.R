@@ -32,11 +32,10 @@ ffPiekMS2XCMS3 <- getPiekHRMS(getPiekEICParams(filter = "ms2"), getDefPeakParams
 ffPiekMS2EP <- getPiekHRMS(getPiekEICParams(filter = "ms2"), getDefPeakParams("chrom", "envipick"))
 
 anaInfoOneIMS <- getTestAnaInfoIMS()[4, ]
-getPiekIMS <- \(genp, ...) getPiek(genp, anaInfoOneIMS, IMS = TRUE, ...)
-ffPiekBinsIMS <- getPiekIMS(getPiekEICParams(mzRange = c(200, 300), mobRange = c(0.6, 0.8)))
-ffPiekSuspIMS <- getPiekIMS(getPiekEICParams(filter = "suspects", filterIMS = "suspects"),
-                            suspects = patRoonDataIMS::suspectsPos, adduct = "[M+H]+")
-ffPiekMS2IMS <- getPiekIMS(getPiekEICParams(filter = "ms2", filterIMS = "ms2"))
+getPiekIMS <- \(...) getPiek(getPiekEICParams(..., IMS = "bruker"), anaInfoOneIMS, suspects = patRoonDataIMS::suspectsPos, adduct = "[M+H]+")
+ffPiekBinsIMS <- getPiekIMS(mzRange = c(200, 300), mobRange = c(0.6, 0.8))
+ffPiekSuspIMS <- getPiekIMS(filter = "suspects", filterIMS = "suspects")
+ffPiekMS2IMS <- getPiekIMS(filter = "ms2", filterIMS = "ms2")
 
 ffOpenMSQ <- calculatePeakQualities(ffOpenMS)
 
@@ -117,9 +116,11 @@ test_that("piek", {
     expect_true(hasMobilities(ffPiekBinsIMS))
     expect_false(hasMobilities(ffPiekBins))
     expect_range(as.data.table(ffPiekBinsIMS)$mz, c(200, 300+0.02))
-    expect_range(as.data.table(ffPiekBinsIMS)$mobility, c(0.6, 0.8+0.04))
-    expect_lte(length(ffPiekSuspIMS), nrow(patRoonData::suspectsPos))
-    expect_gt(length(ffPiekMS2IMS), length(getPiekIMS(getPiekEICParams(filter = "ms2", filterIMS = "ms2", minTIC = 1E5))))
+    expect_range(as.data.table(ffPiekBinsIMS)$mobility, c(0.6, 0.8+0.08)) # +0.08: bin width
+    fgPiekSusp <- screenSuspects(groupFeatures(ffPiekSuspIMS, "greedy"), patRoonDataIMS::suspectsPos)
+    expect_setequal(screenInfo(fgPiekSusp)$name, patRoonDataIMS::suspectsPos$name)
+    expect_setequal(screenInfo(fgPiekSusp)$group, names(fgPiekSusp))
+    expect_gt(length(ffPiekMS2IMS), length(getPiekIMS(filter = "ms2", filterIMS = "ms2", minTIC = 1E5)))
     
     expect_range(as.data.table(getPiekHRMS(getPiekEICParams(filter = "ms2", retRange = c(60, 120))))$ret, c(60, 120))
     expect_lt(length(getPiekHRMS(getPiekEICParams(filter = "ms2", minEICIntensity = 1E5))), length(ffPiekMS2))

@@ -34,11 +34,11 @@ suspListNeg <- assignMobilities(suspListNeg, from = "c3sdb", CCSParams = CCSPara
 
 # Find all features
 # NOTE: see the reference manual for many more options
-genEICParams <- getPiekEICParams(filter = "none", filterIMS = "none", mzRange = c(80, 600), mzStep = 0.02,
-                                 mobRange = c(0.5, 1.3), mobStep = 0.04)
-fListPos <- findFeatures(anaInfoPos, "piek", IMS = TRUE, genEICParams = genEICParams,
+genEICParams <- getPiekEICParams(IMS = "bruker", filter = "none", filterIMS = "none", mzRange = c(80, 800),
+                                 mzStep = 0.02, mobRange = c(0.4, 1.3), mobStep = 0.08)
+fListPos <- findFeatures(anaInfoPos, "piek", genEICParams = genEICParams,
                          peakParams = getDefPeakParams("chrom", "piek"))
-fListNeg <- findFeatures(anaInfoNeg, "piek", IMS = TRUE, genEICParams = genEICParams,
+fListNeg <- findFeatures(anaInfoNeg, "piek", genEICParams = genEICParams,
                          peakParams = getDefPeakParams("chrom", "piek"))
 fList <- makeSet(fListPos, fListNeg, adducts = c("[M+H]+", "[M-H]-"))
 

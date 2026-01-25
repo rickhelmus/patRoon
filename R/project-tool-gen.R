@@ -402,7 +402,6 @@ genScriptFeaturesBlock <- function(ionization, IMS, settingsFeat, generator)
             list(name = "maxFWHM", value = 30, condition = fa == "OpenMS"),
             list(name = "kmeans", value = TRUE, condition = fa == "KPIC2"),
             list(name = "level", value = 1000, condition = fa == "KPIC2"),
-            list(name = "IMS", value = IMS$mode == "direct", condition = fa == "piek" && IMS$mode != "none"),
             list(name = "genEICParams", value = "genEICParams", condition = fa == "piek"),
             list(name = "peakParams", value = peakParams, condition = fa == "piek"),
             list(name = "suspects", value = suspPiekL,
@@ -425,13 +424,14 @@ genScriptFeaturesBlock <- function(ionization, IMS, settingsFeat, generator)
         {
             mmz <- settingsFeat$piekParams$filter; mims <- settingsFeat$piekParams$filterIMS
             def <- list(
-                none = getPiekEICParams(),
-                susp = getPiekEICParams(filter = "suspects", filterIMS = "suspects"),
-                ms2 = getPiekEICParams(filter = "ms2", filterIMS = "ms2")
+                none = getPiekEICParams(IMS = IMS$limits),
+                susp = getPiekEICParams(IMS = IMS$limits, filter = "suspects", filterIMS = "suspects"),
+                ms2 = getPiekEICParams(IMS = IMS$limits, filter = "ms2", filterIMS = "ms2")
             )
             
             doDirectIMS <- IMS$mode == "direct"
             generator$addCall("genEICParams", "getPiekEICParams", list(
+                list(name = "IMS", value = if (doDirectIMS) IMS$limits else FALSE, quote = doDirectIMS, condition = IMS$mode != "none"),
                 list(name = "filter", value = mmz, quote = TRUE),
                 list(name = "filterIMS", value = mims, quote = TRUE, condition = doDirectIMS),
                 list(name = "mzRange", value = def$none$mzRange),

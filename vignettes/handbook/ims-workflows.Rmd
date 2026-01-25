@@ -82,7 +82,7 @@ The [data conversion and pre-treatment](#pre-treat) section includes some exampl
 
 In direct IMS workflows the feature detection needs to be aware of the IMS dimension. In `patRoon` this is currently only supported by the `piek` algorithm. Alternatively, feature data from another IMS aware feature detection [can also be imported](#importFeat).
 
-The `piek` algorithm was already [discussed before](#piek). By default, `piek` does not use IMS data for feature detection, even if processing IMS-HRMS data. To enable the use of IMS data, the `IMS` function argument must be set to `TRUE`. The `filterIMS` EIC parameter can be set to filter EIC bins by mobility data, similarly as the `filter` parameter is used to filter the bins by _m/z_. The following combinations of `filter` and `filterIMS` are supported:
+The `piek` algorithm was already [discussed before](#piek). By default, `piek` does not use IMS data for feature detection, even if processing IMS-HRMS data. To enable the use of IMS data, the `IMS` argument of `getPiekEICParams` must be set, either to `"bruker"` or `"agilent"`. The `filterIMS` EIC parameter can be set to filter EIC bins by mobility data, similarly as the `filter` parameter is used to filter the bins by _m/z_. The following combinations of `filter` and `filterIMS` are supported:
 
 `filter`     | `filterIMS`  | EIC formation
 ------------ | ------------ | -----------------------------------------------------------------------
@@ -96,17 +96,17 @@ Some examples are given below:
 
 ```{r exDirectMob, eval=FALSE}
 # comprehensive feature detection from 2 dimensional bins
-genEICParams <- getPiekEICParams(mzRange = c(100, 300), mobRange = c(0.5, 1.5), mzStep = 0.02, mobStep = 0.2)
+genEICParams <- getPiekEICParams(IMS = "bruker", mzRange = c(100, 300), mobRange = c(0.5, 1.5), mzStep = 0.02, mobStep = 0.2)
 peakParams <- getDefPeakParams("chrom", "piek")
-fList <- findFeatures(anaInfo, "piek", IMS = TRUE, genEICParams = genEICParams, peakParams = peakParams)
+fList <- findFeatures(anaInfo, "piek", genEICParams = genEICParams, peakParams = peakParams)
 
 # use PASEF MS2 data to detect features
-genEICParams <- getPiekEICParams(filter = "ms2", filterIMS = "ms2", minTIC = 1000)
-fList <- findFeatures(anaInfo, "piek", IMS = TRUE, genEICParams = genEICParams, peakParams = peakParams)
+genEICParams <- getPiekEICParams(IMS = "bruker", filter = "ms2", filterIMS = "ms2", minTIC = 1000)
+fList <- findFeatures(anaInfo, "piek", genEICParams = genEICParams, peakParams = peakParams)
 
 # only filter by suspect m/z data (e.g. if suspect list doesn't contain IMS data)
-genEICParams <- getPiekEICParams(filter = "suspects", filterIMS = "none", mobRange = c(0.5, 1.5))
-fList <- findFeatures(anaInfo, "piek", IMS = TRUE, genEICParams = genEICParams, peakParams = peakParams,
+genEICParams <- getPiekEICParams(IMS = "bruker", filter = "suspects", filterIMS = "none", mobRange = c(0.5, 1.5))
+fList <- findFeatures(anaInfo, "piek", genEICParams = genEICParams, peakParams = peakParams,
                       suspects = suspList, adduct = "[M+H]+")
 ```
 

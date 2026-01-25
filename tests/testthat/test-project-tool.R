@@ -128,7 +128,14 @@ testNewProj <- function(..., name, CCSCalib = "", aid = list())
     #                  file = diffp, sep = "\n")
     # expect_snapshot_file(diffp, name = name, cran = TRUE)
     
-    expect_snapshot_file(scriptFile, name = name, cran = TRUE)
+    expect_snapshot_file(scriptFile, name = name, cran = TRUE, transform = function(inp)
+    {
+        inp <- gsub(patRoonData::exampleDataPath("positive"), "<EXAMPLE_DATA_PATH_POS>", inp, fixed = TRUE)
+        inp <- gsub(patRoonData::exampleDataPath("negative"), "<EXAMPLE_DATA_PATH_NEG>", inp, fixed = TRUE)
+        inp <- gsub(patRoonDataIMS::exampleDataPath("positive"), "<EXAMPLE_DATA_PATH_IMS_POS>", inp, fixed = TRUE)
+        inp <- gsub(patRoonDataIMS::exampleDataPath("negative"), "<EXAMPLE_DATA_PATH_IMS_NEG>", inp, fixed = TRUE)
+        return(inp)
+    })
     
     if (settings$analyses$generateAnaInfo == "table")
     {

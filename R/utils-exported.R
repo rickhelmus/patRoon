@@ -895,9 +895,9 @@ getDefPeakParams <- function(type, algorithm, ...)
                    ended = 2
                ),
                piek = list(
-                   minIntensity = 1,
+                   minIntensity = 1000,
                    SN = 3,
-                   peakWidth = c(5, 60),
+                   peakWidth = c(3, 30),
                    RTRange = c(0, Inf),
                    maxPeaksPerSignal = 10
                )
@@ -912,13 +912,11 @@ getDefPeakParams <- function(type, algorithm, ...)
         def <- modifyList(def, switch(
             algorithm,
             openms = list(gaussWidth = 0.02),
-            xcms3 = list(peakwidth = c(0.01, 0.5), prefilter = c(3, 10), firstBaselineCheck = FALSE),
+            xcms3 = list(peakwidth = c(0.02, 0.2), prefilter = c(3, 10), firstBaselineCheck = FALSE),
             envipick = list(drtsmall = 0.2, drtfill = 0.02, drttotal = 1, minint = 10),
-            piek = list(peakWidth = c(0.02, 0.5))
+            piek = list(peakWidth = c(0.01, 0.5))
         ))
-        def$forcePeakWidth = c(0.01, 0.1)
-        def$relMinIntensity <- 0.25
-        def$calcCentroid <- "centerOfMass"
+        def$forcePeakWidth = c(0.01, 0.3)
     }
     else if (type == "agilent_ims")
     {
@@ -926,13 +924,11 @@ getDefPeakParams <- function(type, algorithm, ...)
         def <- modifyList(def, switch(
             algorithm,
             openms = list(gaussWidth = 0.05),
-            xcms3 = list(peakwidth = c(0.1, 5), prefilter = c(3, 10), firstBaselineCheck = FALSE),
+            xcms3 = list(peakwidth = c(0.7, 6), prefilter = c(3, 10), firstBaselineCheck = FALSE),
             envipick = list(drtsmall = 2, drtfill = 0.4, drttotal = 1, minint = 10),
-            piek = list(peakWidth = c(0.2, 5))
+            piek = list(peakWidth = c(0.7, 6))
         ))
-        def$forcePeakWidth = c(0.2, 1)
-        def$relMinIntensity <- 0.25
-        def$calcCentroid <- "centerOfMass"
+        def$forcePeakWidth = c(0.7, 3)
     }
     
     return(modifyList(def, c(list(...), algorithm = algorithm)))

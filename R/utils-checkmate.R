@@ -1181,15 +1181,14 @@ assertIMSMatchParams <- function(x, null.ok = FALSE, .var.name = checkmate::vnam
 assertPiekGenEICParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
 {
     checkmate::assertList(x, .var.name = .var.name)
-    
+
+    # these asserts should fail immediately    
     assertListVal(x, "filter", checkmate::assertChoice, choices = c("none", "suspects", "ms2"), .var.name = .var.name)
     assertListVal(x, "filterIMS", checkmate::assertChoice, choices = c("none", "suspects", "ms2"), .var.name = .var.name)
+    assertListVal(x, "IMS", checkmate::assertFlag, .var.name = .var.name)
     
     assertListVal(x, "mzRange", assertRange, .var.name = .var.name, add = add)
     assertListVal(x, "mzStep", checkmate::assertNumber, lower = 0.000001, finite = TRUE,
-                  .var.name = .var.name, add = add)
-    assertListVal(x, "mobRange", assertRange, .var.name = .var.name, add = add)
-    assertListVal(x, "mobStep", checkmate::assertNumber, lower = 0.000001, finite = TRUE,
                   .var.name = .var.name, add = add)
     
     assertListVal(x, "retRange", assertRange, null.ok = TRUE, .var.name = .var.name, add = add)
@@ -1209,6 +1208,13 @@ assertPiekGenEICParams <- function(x, .var.name = checkmate::vname(x), add = NUL
     assertListVal(x, "topMostEICMZ", checkmate::assertCount, positive = FALSE, .var.name = .var.name, add = add)
     assertListVal(x, "topMostEICMZMob", checkmate::assertCount, positive = FALSE, .var.name = .var.name, add = add)
     assertListVal(x, "minEICsIMSPreCheck", checkmate::assertCount, positive = FALSE, .var.name = .var.name, add = add)
+    
+    if (x$IMS)
+    {
+        assertListVal(x, "mobRange", assertRange, .var.name = .var.name, add = add)
+        assertListVal(x, "mobStep", checkmate::assertNumber, lower = 0.000001, finite = TRUE,
+                      .var.name = .var.name, add = add)
+    }
     
     if (x$filter == "suspects")
     {

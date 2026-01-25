@@ -112,7 +112,7 @@
 
 - don't use defaults for eg feature finding (and grouping)?
 - tweaks
-    - agilent defaults
+    - agilent defaults and bruker for other algos
     - xcms3 for mobilities params seem not working
     - tweak default EIC filtering params, more strict for binning?
         - current defaults way to strict for patRoonData neg samples (for filtering of EICs _and_ peaks)
@@ -121,11 +121,6 @@
     - tweak default EIMParams
         - default smoothing? different for Agilent? Convert to mobility units?
 - MSPL/IMCollapse: specify default maxGapIMS in limits? Mainly for Agilent, where relatively large numbers are necessary
-- piek
-    - mob range: doc that defaults are for TIMS? Or just not give any defaults? Give instrument? Put it in limits?
-        - enable EIM summing and smoothing by default for TIMS?
-        - or make IMS arg a character, eg "agilent", "bruker"?
-    - have a default for genEICParams? --> check after defaults/profiles are set
 
 ## IMS
 
@@ -201,6 +196,7 @@
             - make sure to update step numbers of post assignment throughout the chapter if this is changed
         - workflows
             - add more discussion on mz and mob profiles for piek? --> see after settling on instrument default
+            - check if piek IMS arg is properly updated
     - Advanced
         - parallelization
             - restructure futures a bit: mainly move clusters from multiproc to beginning

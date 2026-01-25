@@ -187,8 +187,7 @@ findPeaksEnviPick <- function(EICs, fillEICs, params, logPath)
         setcolorder(sc, c("m/z", "intensity", "RT"))
         # setorderv(sc, "m/z") # needs to be ordered by mz (but we are using a single dummy value, so no need)
         dummyPL$Scans[[2]] <- as.matrix(sc)
-        dummyPL$EIC_index <- as.matrix(data.table(start_ID = 1, end_ID = length(allTime),
-                                                  number_peaks = length(allTime)))
+        dummyPL$EIC_index <- as.matrix(data.table(start_ID = 1, end_ID = nrow(sc), number_peaks = nrow(sc)))
         
         p <- do.call(enviPick::mzpick, c(list(dummyPL), params))$Peaklist
         if (isTRUE(all.equal(p, 0))) # no results

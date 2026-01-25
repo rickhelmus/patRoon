@@ -389,7 +389,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams = getPiekEICParams(),
                             length(whNotInRange), paste0(whNotInRange, collapse = ", ")),
                     call. = FALSE)
         
-        if (genEICParams$filterIMS == "suspects")
+        if (genEICParams$filterIMS == "suspects" && !isFALSE(genEICParams$IMS))
         {
             suspects[, mobility_susp := selectFromSuspAdductCol(suspects, "mobility", if (!is.null(adduct)) as.character(adduct))]
             whMissing <- which(is.na(suspects$mobility_susp))

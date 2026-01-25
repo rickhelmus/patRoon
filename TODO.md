@@ -112,8 +112,7 @@
 
 - don't use defaults for eg feature finding (and grouping)?
 - tweaks
-    - agilent defaults and bruker for other algos
-    - xcms3 for mobilities params seem not working
+    - agilent defaults
     - tweak default EIC filtering params, more strict for binning?
         - current defaults way to strict for patRoonData neg samples (for filtering of EICs _and_ peaks)
     - set default greedy weights
@@ -196,7 +195,6 @@
             - make sure to update step numbers of post assignment throughout the chapter if this is changed
         - workflows
             - add more discussion on mz and mob profiles for piek? --> see after settling on instrument default
-            - check if piek IMS arg is properly updated
     - Advanced
         - parallelization
             - restructure futures a bit: mainly move clusters from multiproc to beginning

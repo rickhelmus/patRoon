@@ -111,7 +111,6 @@ NULL
 #'   \item \code{patRoon.path.SIRIUS}: The directory in which the SIRIUS binaries are installed. Used by all functions that interface with \command{SIRIUS}, such as \code{\link{generateFormulasSIRIUS}}
 #'   and \code{\link{generateCompoundsSIRIUS}}. Example: \code{"C:/sirius-win64-3.5.1"}. Note that the location of the
 #'   binaries differs for each operating system.
-#'   are installed in different subdirectories for each location inside  this differs for each operating system
 #'
 #'   \item \code{patRoon.path.OpenMS}: The path in which the \command{OpenMS} binaries are installed.
 #'

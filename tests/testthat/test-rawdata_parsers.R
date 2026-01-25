@@ -53,9 +53,9 @@ test_that("availableBackends", {
     aiIMSWithPaths <- \(...) patRoonDataIMS::exampleAnalysisInfo()[, c("analysis", "replicate", "blank", ...)]
     expect_setequal(availableBackends(aiIMSWithPaths("path_centroid"), verbose = FALSE),
                     c("mstoolkit", "streamcraft", "mzr"))
-    expect_setequal(availableBackends(aiIMSWithPaths("path_ims", "path_centroid"), needIMS = FALSE, verbose = FALSE),
+    expect_setequal(availableBackends(aiIMSWithPaths("path_ims", "path_centroid"), verbose = FALSE),
                     c("mstoolkit", "streamcraft", "mzr"))
-    expect_setequal(availableBackends(aiIMSWithPaths("path_ims", "path_centroid"), needIMS = TRUE, verbose = FALSE),
+    expect_setequal(availableBackends(aiIMSWithPaths("path_ims", "path_centroid"), needTypes = "ims", verbose = FALSE),
                     c("mstoolkit", "streamcraft"))
     expect_setequal(availableBackends(aiIMSWithPaths("path_ims"), verbose = FALSE),
                     c("mstoolkit", "streamcraft"))

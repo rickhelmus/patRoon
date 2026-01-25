@@ -668,11 +668,9 @@ aggregateTox <- function(tox, aggrParams, splitSuspects = FALSE)
 findPeaksInEICs <- function(EICs, peakParams, withMobility, calcStats, assignRTWindow, sumWindowMZ, sumWindowMob,
                             logPath, cacheDB = NULL)
 {
-    baseHash <- makeHash(peakParams)
-    
     # NOTE: EICs must be named
     
-    hash <- makeHash(baseHash, EICs, peakParams, withMobility, calcStats, assignRTWindow, sumWindowMZ, sumWindowMob)
+    hash <- makeHash(EICs, peakParams, withMobility, calcStats, assignRTWindow, sumWindowMZ, sumWindowMob)
     cd <- loadCacheData("peaksEIC", hash, cacheDB)
     if (!is.null(cd))
         return(cd)

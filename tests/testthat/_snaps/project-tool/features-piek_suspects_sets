@@ -28,7 +28,7 @@ suspListPiekNeg <- read.csv("suspects-neg")
 
 # Find all features
 # NOTE: see the reference manual for many more options
-genEICParams <- getPiekEICParams(filter = "suspects", mzRange = c(80, 600), mzStep = 0.02, rtWindow = 12,
+genEICParams <- getPiekEICParams(filter = "suspects", mzRange = c(80, 800), mzStep = 0.02, rtWindow = 12,
                                  mzWindow = 0.005)
 fListPos <- findFeatures(anaInfoPos, "piek", genEICParams = genEICParams,
                          peakParams = getDefPeakParams("chrom", "piek"), suspects = suspListPiekPos, adduct = "[M+H]+")

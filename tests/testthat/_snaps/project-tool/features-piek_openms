@@ -17,7 +17,7 @@ anaInfo <- data.frame(path_centroid = character(), analysis = character(), repli
 
 # Find all features
 # NOTE: see the reference manual for many more options
-genEICParams <- getPiekEICParams(filter = "none", mzRange = c(80, 600), mzStep = 0.02)
+genEICParams <- getPiekEICParams(filter = "none", mzRange = c(80, 800), mzStep = 0.02)
 fList <- findFeatures(anaInfo, "piek", genEICParams = genEICParams, peakParams = getDefPeakParams("chrom", "openms"))
 
 # Group and align features between analyses

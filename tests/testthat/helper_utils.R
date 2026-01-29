@@ -53,8 +53,8 @@ getTestFeaturesIMS <- function(anaInfo = getTestAnaInfoIMS(), intThr = 3E4, DMA 
 {
     an <- isAnaInfoNeg(anaInfo)
     featArgs <- list(algorithm = "piek",
-                     genEICParams = getPiekEICParams(IMS = "bruker", mzRange = c(200, 300), mobRange = c(0.5, 0.8),
-                                                     minEICIntensity = intThr),
+                     genEICParams = getPiekEICParams(IMS = if (DMA) "bruker" else FALSE, mzRange = c(200, 300),
+                                                     mobRange = c(0.5, 0.8), minEICIntensity = intThr),
                      peakParams = getDefPeakParams("chrom", "piek", minIntensity = intThr * 0.3))
     if (any(an))
         ret <- makeSet(do.call(findFeatures, c(list(anaInfo[!an, ]), featArgs)),

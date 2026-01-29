@@ -33,6 +33,7 @@
 - See why parallel reporting is so slow (on Windows?)
 - reticulate: use py_require()? doesn't seem to be able handle multiple py versions, so no?
 - MSTK: PR for centroid status buf for mzXML?
+- check why metfusion is still defaulted --> recreate sysdata.rda?
 
 
 ## Maybe
@@ -147,7 +148,6 @@
         - further test bbCID data
             - also mixed bbCID/PASEF file (ie with different segments)
             - are m/z ranges always present?
-        - see if current default abundance threshold is fine
 - msdata
     - new verifyFileForFormat() usage in convertMSFiles()
     - file conversion?
@@ -156,9 +156,6 @@
         - would need raw data for other conversions
         --> check after we have IMS data
 - IMS
-    - more verification that normInts() works before/after assignMobilities()
-        - tests are there now, but 3rd test is failing because ISTD is not found in neg mode
-        - --> check when piek default settings are properly set
     - piek
         - verify removal duplicate features?
             - can do this when there is an option to not filter features --> there is now

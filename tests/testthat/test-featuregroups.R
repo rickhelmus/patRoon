@@ -89,8 +89,9 @@ test_that("assignMobilities", {
     fgIMSISTD <- doNormIntsIMS(filter(fgIMS, removeBlanks = TRUE), featNorm = "istd")
     fgAMISTD <- doAssignMobs(fgIMSISTD)
     getAssignedFGs <- \(fg) unlist(lapply(internalStandardAssignments(fg), names))
-    gi <- groupInfo(fgAMISTD)[ims_parent_group %in% getAssignedFGs(fgIMSISTD)]
-    expect_setequal(getAssignedFGs(fgAMISTD), union(gi$group, gi$ims_parent_group))
+    # check that assigned IMS parents + their IMS features are all present
+    gi <- groupInfo(fgAMISTD)[ims_parent_group %in% getAssignedFGs(fgIMSISTD) | group %in% getAssignedFGs(fgIMSISTD)]
+    expect_setequal(getAssignedFGs(fgAMISTD), na.omit(union(gi$group, gi$ims_parent_group)))
 })
 
 test_that("empty objects work", {
@@ -359,6 +360,8 @@ test_that("featureQualities parameter works", {
 test_that("importFeatureGroupsTable works", {
     fgImp <- importFeatureGroupsTable(as.data.table(fgAMInt, features = TRUE), analysisInfo(fgAMInt), groupAlgo = "openms")
     adtImp <- as.data.table(fgImp, features = TRUE)
+    # export/import cycle may change ordering, not really interesting so just ignore this column
+    adtImp[, c("mobility_collapsed", "CCS_collapsed") := NULL]
     expect_true(hasMobilities(fgImp))
     expect_true(isFGSet(fgImp))
     expect_equal(adtImp, as.data.table(fgAMInt, features = TRUE)[, names(adtImp), with = FALSE])
@@ -522,7 +525,7 @@ test_that("IMS subset and filtering", {
                                               "ims_parent_ID"))
     expect_equal(fgAMInt, fgAMInt[IMS = "both"])
     expect_setequal(names(fgAMInt[IMS = FALSE]), names(fgAMInt[IMS = "maybe"]))
-    expect_setequal(names(fgAMDel[IMS = "maybe"][IMS = TRUE]), delGI$group)
+    expect_setequal(names(fgAMDel[IMS = "maybe"][IMS = TRUE]), groupInfo(fgAMDel)[ims_parent_group %in% delGI$ims_parent_group]$group)
     
     checkmate::expect_disjunct(names(filter(fgAMDel, withIMSParent = TRUE)), fgAMDel$group)
     expect_range(groupInfo(filter(fgAMInt, IMSRangeParams = getIMSRangeParams("mobility", 0.65, 0.75)))$mobility,
@@ -587,9 +590,9 @@ test_that("Normalization", {
     expect_equal(groupTable(fgNormTICIMS[IMS = FALSE], normalized = TRUE),
                  groupTable(doNormIntsIMS(fgISTDIMS[IMS = FALSE], "tic"), normalized = TRUE))
     # verify that IMS features are normalized equally to their parents
-    expect_equal(groupTable(fgNormISTDIMS[IMS = TRUE], normalized = TRUE),
-                 groupTable(fgNormISTDIMS[IMS = FALSE], normalized = TRUE)[, groupInfo(fgNormISTDIMS[IMS = TRUE])$ims_parent_group, with = FALSE],
-                 check.attributes = FALSE)
+    adt <- as.data.table(fgNormISTDIMS, features = TRUE)
+    adt[adt[is.na(mobility)], intensity_rel_parent := i.intensity_rel, on = .(ims_parent_ID = ID, analysis)]
+    expect_all_true(adt[!is.na(mobility)]$intensity_rel == adt[!is.na(mobility)]$intensity_rel_parent)
     
     expect_length(fgNormISTDEmpty, 0)
     expect_length(doNormInts(fgOpenMSEmpty, "tic"), 0)

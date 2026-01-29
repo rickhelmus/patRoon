@@ -499,7 +499,7 @@ MFMPErrorHandler <- function(cmd, exitStatus, retries)
 #'   \option{MetFragPreProcessingCandidateFilter} and \code{MetFragPostProcessingCandidateFilter} options.
 #' @param maxCandidatesToStop If more than this number of candidate structures are found then processing will be aborted
 #'   and no results this feature group will be reported. Low values increase the chance of missing data, whereas too
-#'   high values will use too much computer resources and signficantly slowdown the process. Sets the
+#'   high values will use too much computer resources and significantly slowdown the process. Sets the
 #'   \option{MaxCandidateLimitToStop} option.
 #' @param identifiers A \code{list} containing for each feature group a character vector with database identifiers that
 #'   should be used to find candidates for a feature group (the list should be named by feature group names). If

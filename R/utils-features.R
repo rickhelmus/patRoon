@@ -253,7 +253,7 @@ getDefEIXParams <- function()
         onlyPresent = TRUE,
         mzExpWindow = defaultLim("mz", "very_narrow"),
         mobExpWindow = defaultLim("mobility", "very_narrow"),
-        mzExpmobWindow = defaultLim("mz", "medium"),
+        mzExpMobWindow = defaultLim("mz", "medium"),
         minIntensityIMS = 25,
         setsAdductPos = "[M+H]+",
         setsAdductNeg = "[M-H]-"
@@ -319,7 +319,7 @@ extendEIXInputTab <- function(tab, type, EIXParams, hasIMS, fromIMS)
     else # "EIM"
         tab[, c("mobmin", "mobmax") := .(mobmin - EIXParams$window, mobmax + EIXParams$window)]
     if (hasIMS && !fromIMS)
-        tab[, c("mzmin", "mzmax") := .(mzmin - EIXParams$mzExpmobWindow, mzmax + EIXParams$mzExpmobWindow)]
+        tab[, c("mzmin", "mzmax") := .(mzmin - EIXParams$mzExpMobWindow, mzmax + EIXParams$mzExpMobWindow)]
     return(tab)
 }
 

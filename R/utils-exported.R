@@ -619,10 +619,10 @@ getBGMSMSPeaks <- function(anaInfo, replicates = NULL, MSLevel = 2, retentionRan
 #' if \code{onlyPresent=FALSE} then data is generated for \strong{all} analyses. The latter is handy to evaluate if a
 #' peak was 'missed' during peak detection or removed during \emph{e.g.} filtering.
 #'
-#' \item \code{mzExpmobWindow} \IMSWF Additional \emph{m/z} tolerance on top of the feature limits. This is for IMS
+#' \item \code{mzExpMobWindow} \IMSWF Additional \emph{m/z} tolerance on top of the feature limits. This is for IMS
 #' workflows where features were detected from centroided LC-MS like data, while EICs/EIMs are generated from raw IMS
 #' data. In this case the feature \emph{m/z} limits were derived from centroided data, which typically has smaller
-#' \emph{m/z} deviations across scans compared to IMS data. The \code{mzExpmobWindow} parameter sets an additional
+#' \emph{m/z} deviations across scans compared to IMS data. The \code{mzExpMobWindow} parameter sets an additional
 #' \emph{m/z} tolerance to specifically handle this case. Defaults to \code{defaultLim("mz", "default")} (see
 #' \link{limits}).
 #'

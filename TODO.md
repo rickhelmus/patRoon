@@ -102,8 +102,6 @@
 - don't use defaults for eg feature finding (and grouping)?
 - tweaks
     - agilent defaults
-    - tweak default EIC filtering params, more strict for binning?
-        - current defaults way to strict for patRoonData neg samples (for filtering of EICs _and_ peaks)
     - set default greedy weights
         - also configurable weights for assignMobilities()?
     - tweak default EIMParams

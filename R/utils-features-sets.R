@@ -35,7 +35,7 @@ getAnnotationsFromSetFeatures <- function(fGroups)
     return(ret)
 }
 
-setMethod("doGroupFeatures", "featuresSet", function(feat, grouper, groupAlgo, ..., IMSWindow, verbose)
+setMethod("doGroupFeatures", "featuresSet", function(feat, grouper, groupAlgo, ..., mobWindow, verbose)
 {
     fg <- callNextMethod()
     

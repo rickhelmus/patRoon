@@ -455,13 +455,13 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = NULL
 #' @section Post mobility assignment: \subsection{Suspect screening workflows}{In suspect screening workflows the
 #'   \code{fromSuspects} arguments can be set to alternatively perform mobility assignment directly from the suspect
 #'   list data (replacing Steps 1-2). The feature mobility is simply assigned from the suspect data and the mobility
-#'   range is derived from the \code{IMSWindow} argument. Relationships with IMS parents (Step 2) are similarly formed.
+#'   range is derived from the \code{mobWindow} argument. Relationships with IMS parents (Step 2) are similarly formed.
 #'   An advantage of this approach is that no mobility peak detection is needed, which may useful for low intensity
 #'   features where this could be difficult. Setting \code{fromSuspects=TRUE} is primarily intended for workflows where
 #'   (1) the mobility of a suspect is accurately known upfront or (2) IMS data should only be used as a rough filtering
 #'   step for feature data. In the latter case accurate feature mobility assignment is not of interest and the suspect
 #'   IMS data is typically not accurately known (\emph{e.g.} predicted), hence, for these workflows the tolerance
-#'   specified by \code{IMSWindow} should be increased.
+#'   specified by \code{mobWindow} should be increased.
 #'
 #'   With \code{fromSuspects=TRUE} no mobility peak detection is performed, hence, the actual presence of the feature is
 #'   only verified in Step 3. For this reason, falling back to EIC data (\code{fallbackEIC} argument) is never performed
@@ -482,13 +482,13 @@ setMethod("assignMobilities", "featureGroupsScreening", function(obj, mobPeakPar
                                                                  EICParams = getDefEICParams(),
                                                                  peakRTWindow = defaultLim("retention", "narrow"),
                                                                  fallbackEIC = TRUE, calcArea = "integrate",
-                                                                 IMSWindow = defaultLim("mobility", "medium"),
+                                                                 mobWindow = defaultLim("mobility", "medium"),
                                                                  CCSParams = NULL, parallel = "maybe",
                                                                  fromSuspects = FALSE, IMSMatchParams = NULL)
 {
     ac <- checkmate::makeAssertCollection()
     assertFindMobilitiesArgs(mobPeakParams, chromPeakParams, EIMParams, EICParams, peakRTWindow, fallbackEIC,
-                             calcArea, IMSWindow, CCSParams, parallel, ac)
+                             calcArea, mobWindow, CCSParams, parallel, ac)
     checkmate::assertFlag(fromSuspects, add = ac)
     assertIMSMatchParams(IMSMatchParams, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
@@ -500,13 +500,13 @@ setMethod("assignMobilities", "featureGroupsScreening", function(obj, mobPeakPar
         {
             if (is.null(chromPeakParams))
                 stop("Please set chromPeakParams when fromSuspects=TRUE", call. = FALSE)
-            obj@features <- assignFeatureMobilitiesSuspects(obj@features, screenInfo(obj), IMSWindow)
+            obj@features <- assignFeatureMobilitiesSuspects(obj@features, screenInfo(obj), mobWindow)
         }
         if (!is.null(mobPeakParams))
             obj@features <- assignFeatureMobilitiesPeaks(obj@features, mobPeakParams, EIMParams, parallel)
         obj@features <- reintegrateMobilityFeatures(obj@features, chromPeakParams, EICParams, peakRTWindow, fallbackEIC,
                                                     calcArea, parallel)
-        obj <- updateFGroupsForMobilities(obj, IMSWindow, FALSE)
+        obj <- updateFGroupsForMobilities(obj, mobWindow, FALSE)
     }
 
     if (!is.null(CCSParams))

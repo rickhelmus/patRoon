@@ -570,7 +570,7 @@ assertEIXParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
     
     assertListVal(x, "window", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
     assertListVal(x, "mzExpWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
-    assertListVal(x, "mzExpIMSWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
+    assertListVal(x, "mzExpmobWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
     assertListVal(x, "minIntensityIMS", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
     assertListVal(x, "mobExpWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name, add = add)
     assertListVal(x, "topMost", checkmate::assertCount, positive = TRUE, null.ok = TRUE, .var.name = .var.name,
@@ -1115,13 +1115,13 @@ assertFindPeakParams <- function(x, null.ok = FALSE, .var.name = checkmate::vnam
 }
 
 assertFindMobilitiesArgs <- function(mobPeakParams, chromPeakParams, EIMParams, EICParams, peakRTWindow, fallbackEIC,
-                                     calcArea, IMSWindow, CCSParams, parallel, add = NULL)
+                                     calcArea, mobWindow, CCSParams, parallel, add = NULL)
 {
     assertFindPeakParams(mobPeakParams, null.ok = TRUE, add = add)
     assertFindPeakParams(chromPeakParams, null.ok = TRUE, add = add)
     assertEIMParams(EIMParams, add = add)
     assertEICParams(EICParams, add = add)
-    aapply(checkmate::assertNumber, . ~ peakRTWindow + IMSWindow, finite = TRUE, fixed = list(add = add))
+    aapply(checkmate::assertNumber, . ~ peakRTWindow + mobWindow, finite = TRUE, fixed = list(add = add))
     aapply(checkmate::assertFlag, . ~ fallbackEIC, fixed = list(add = add))
     checkmate::assertChoice(calcArea, c("integrate", "sum"), add = add)
     checkmate::assert(
@@ -1266,7 +1266,7 @@ assertPiekGenEICParams <- function(x, .var.name = checkmate::vname(x), add = NUL
     {
         if (x$filterIMS != x$filter)
             stop("'filterIMS' should be set to 'none' or match 'filter'.", call. = FALSE)
-        assertListVal(x, "IMSWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name,
+        assertListVal(x, "mobWindow", checkmate::assertNumber, lower = 0, finite = TRUE, .var.name = .var.name,
                       add = add)
     }
 }

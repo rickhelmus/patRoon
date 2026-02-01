@@ -715,7 +715,7 @@ setMethod("plotChromsHash", "featureGroups", function(obj, analysis = analyses(o
 #' @param dim3 The third dimension to plot besides retention time and intensity. Can be either \code{"mz"} or
 #'   \code{"mobility"}.
 #' @param showLimits If \code{TRUE}, a rectangle is drawn to indicate the feature limits.
-#' @param rtWindow,mzWindow,IMSWindow Numeric values specifying the window size around the feature for retention time,
+#' @param rtWindow,mzWindow,mobWindow Numeric values specifying the window size around the feature for retention time,
 #'   m/z, and ion mobility respectively. Values \code{>0} will effectively zoom out.
 #' @param gridSize The size of the grid for interpolation.
 #'
@@ -728,7 +728,7 @@ setMethod("plotChroms3D", "featureGroups", function(obj, analysis = analyses(obj
                                                     dim3 = "mz", retMin = FALSE, showLimits = TRUE,
                                                     rtWindow = defaultLim("retention", "medium"),
                                                     mzWindow = defaultLim("mz", "medium"),
-                                                    IMSWindow = defaultLim("mobility", "medium"),
+                                                    mobWindow = defaultLim("mobility", "medium"),
                                                     gridSize = 50, title = NULL, ...)
 {
     if (length(analysis) < 1 || length(groupName) < 1)
@@ -742,7 +742,7 @@ setMethod("plotChroms3D", "featureGroups", function(obj, analysis = analyses(obj
     checkmate::assertChoice(groupName, names(obj), add = ac)
     checkmate::assertChoice(dim3, c("mz", "mobility"), add = ac)
     aapply(checkmate::assertFlag, . ~ retMin + showLimits, fixed = list(add = ac))
-    aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow + IMSWindow, lower = 0, finite = TRUE,
+    aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow + mobWindow, lower = 0, finite = TRUE,
            fixed = list(add = ac))
     checkmate::assertCount(gridSize, positive = TRUE, add = ac)
     checkmate::reportAssertions(ac)
@@ -771,7 +771,7 @@ setMethod("plotChroms3D", "featureGroups", function(obj, analysis = analyses(obj
     hasMobNum <- doMob && !is.na(feat$mobility)
     retmin <- feat$retmin - rtWindow; retmax <- feat$retmax + rtWindow
     mzmin <- feat$mzmin - mzWindow; mzmax <- feat$mzmax + mzWindow
-    mobmin <- if (hasMobNum) feat$mobmin - IMSWindow else 0; mobmax <- if (hasMobNum) feat$mobmax + IMSWindow else 0
+    mobmin <- if (hasMobNum) feat$mobmin - mobWindow else 0; mobmax <- if (hasMobNum) feat$mobmax + mobWindow else 0
     
     pointsInfo <- data.table(retmin = retmin, retmax = retmax, mzmin = mzmin, mzmax = mzmax)
     if (doMob)

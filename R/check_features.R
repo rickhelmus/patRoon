@@ -346,7 +346,7 @@ checkFeaturesInterface$methods(
 #'   when, for instance, feature group data is re-created with different parameters.
 #'
 #' @param sessionIn,sessionOut The file names for the input and output sessions.
-#' @param rtWindow,mzWindow,IMSWindow The retention time (seconds), \emph{m/z} and mobility window (if present) used to
+#' @param rtWindow,mzWindow,mobWindow The retention time (seconds), \emph{m/z} and mobility window (if present) used to
 #'   relate 'old' with 'new' feature groups.
 #' @param overwrite Set to \code{TRUE} to overwrite the output session file if it already exists. If \code{FALSE}, the
 #'   function will stop with an error message.
@@ -354,14 +354,14 @@ checkFeaturesInterface$methods(
 #' @rdname check-GUI
 #' @export
 importCheckFeaturesSession <- function(sessionIn, sessionOut, fGroups, rtWindow = defaultLim("retention", "narrow"),
-                                       mzWindow = defaultLim("mz", "narrow"), IMSWindow = defaultLim("mobility", "narrow"),
-                                       overwrite = FALSE)
+                                       mzWindow = defaultLim("mz", "narrow"),
+                                       mobWindow = defaultLim("mobility", "narrow"), overwrite = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     assertCheckSession(sessionIn, mustExist = TRUE, add = ac)
     assertCheckSession(sessionOut, mustExist = FALSE, add = ac)
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
-    aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow + IMSWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow + mobWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertFlag(overwrite, add = ac)
     checkmate::reportAssertions(ac)
     
@@ -382,7 +382,7 @@ importCheckFeaturesSession <- function(sessionIn, sessionOut, fGroups, rtWindow 
         return(invisible(NULL))
     }
     
-    newGroupsTab <- importCheckUISessionGroups(oldSession, fGroups, rtWindow, mzWindow, IMSWindow)
+    newGroupsTab <- importCheckUISessionGroups(oldSession, fGroups, rtWindow, mzWindow, mobWindow)
     
     if (nrow(newGroupsTab) == 0)
     {

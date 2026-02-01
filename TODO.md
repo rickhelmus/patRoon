@@ -15,7 +15,6 @@
 - BUG: annSim.1 column (in formulas?)?
 - Harmonize/consistent names
     - be consistent in mobility vs IMS and mobilograms and EIMs
-        - mobWindow and IMSWindow now randomly used
         - IMS arg but affects mobility features
         - withMobility vs withIMS
         - hasMobilities

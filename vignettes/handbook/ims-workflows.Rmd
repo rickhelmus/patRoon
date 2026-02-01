@@ -112,16 +112,16 @@ fList <- findFeatures(anaInfo, "piek", genEICParams = genEICParams, peakParams =
 
 > **_NOTE_** without EIC filtering feature detection can become quite computationally intensive. There are many advanced EIC paramaters that can be tweaked to improve the performance, see `?getPiekEICParams` for more details.
 
-The grouping of features in direct mobility assignment workflows is currently only possible with the `greedy` algorithm or by [importing data](#importFeat). The `greedy` algorithm was already [briefly introduced before](#groupFeatures). This algorithm was introduced in `patRoon 3.0` and is a simple and fast grouping algorithm, which also supports IMS data. Its `IMSWindow` argument can be set to configure the mobility grouping tolerance, for instance:
+The grouping of features in direct mobility assignment workflows is currently only possible with the `greedy` algorithm or by [importing data](#importFeat). The `greedy` algorithm was already [briefly introduced before](#groupFeatures). This algorithm was introduced in `patRoon 3.0` and is a simple and fast grouping algorithm, which also supports IMS data. Its `mobWindow` argument can be set to configure the mobility grouping tolerance, for instance:
 
 ```{r exGroupGreedyIMS, eval=FALSE}
-fGroups <- groupFeatures(fList, "greedy", IMSWindow = 1)
+fGroups <- groupFeatures(fList, "greedy", mobWindow = 1)
 
 # customize all tolerances and weights
 fGroups <- groupFeatures(fList, "greedy",
                          rtWindow = 5,
                          mzWindow = 0.003,
-                         IMSWindow = 0.5,
+                         mobWindow = 0.5,
                          scoreWeights = c(retention = 1, mz = 3, mobility = 3, intensity = 1))
 ```
 
@@ -279,8 +279,8 @@ In post mobility assignment workflows, the `assignMobilities()` method function 
 
 Bypassing the need for peak detection for mobility assignment may be advantageous for low intensity features. However, the mobility values assigned to features are not verified against the raw data. The feature mobility boundaries are also not derived from experimental data, hence, the assigned mobility range to the feature may not cover the actual experimental range (i.e. the peak width in a mobilogram). Thus, when intensities are updated for mobility features ([step 4](#postIMS)), these can be superficially low (i.e. partial removal of signal) or high (i.e. inclusion of data of neighboring mobility peaks). With these limitations in mind, this approach is primarily intended for the following scenarios:
 
-1. The mobility for a suspect is accurately known in advance, and no additional peak detection is needed. In this case the `IMSWindow` argument is typically set to a narrow tolerance window.
-2. There is no interest for accurate mobility (and CCS) assignment, and IMS data should only be used as a rough filtering step. In this scenario the `IMSWindow` argument is typically set to a relatively large tolerance window.
+1. The mobility for a suspect is accurately known in advance, and no additional peak detection is needed. In this case the `mobWindow` argument is typically set to a narrow tolerance window.
+2. There is no interest for accurate mobility (and CCS) assignment, and IMS data should only be used as a rough filtering step. In this scenario the `mobWindow` argument is typically set to a relatively large tolerance window.
 
 Below are some example of how to use `assignMobilities()` to assign feature mobilities from suspect data:
 
@@ -290,13 +290,13 @@ Below are some example of how to use `assignMobilities()` to assign feature mobi
 fGroups <- screenSuspects(fGroups, suspects = suspList, adduct = "[M+H]+", onlyHits = TRUE)
 
 # scenario #1: assume suspect data is accurate
-fGroups <- assignMobilities(fGroups, fromSuspects = TRUE, IMSWindow = 0.01,
+fGroups <- assignMobilities(fGroups, fromSuspects = TRUE, mobWindow = 0.01,
                             chromPeakParams = getDefPeakParams("chrom", "piek"))
 
 # scenario #2: wide tolerance window, no interest in accurate mobility assignment
 # add fallback to mobility detection for features with no (or >1) suspect hit or if no suspect mobility data is available
 # set IMSMatchParams to also filter out suspect hits with deviating mobilities
-fGroups <- assignMobilities(fGroups, fromSuspects = TRUE, IMSWindow = 0.1,
+fGroups <- assignMobilities(fGroups, fromSuspects = TRUE, mobWindow = 0.1,
                             mobPeaksParams = getDefPeakParams("bruker_ims", "piek"),
                             chromPeakParams = getDefPeakParams("chrom", "piek"),
                             IMSMatchParams = getIMSMatchParams("CCS"))

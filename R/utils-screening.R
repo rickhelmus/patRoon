@@ -239,7 +239,7 @@ matchIMSScr <- function(scr, gInfo, IMSMatchParams, negate = FALSE)
     return(scr)
 }
 
-assignFeatureMobilitiesSuspects <- function(features, scr, IMSWindow, selectFunc = NULL)
+assignFeatureMobilitiesSuspects <- function(features, scr, mobWindow, selectFunc = NULL)
 {
     printf("Finding mobilities for all features from suspects...\n")
     oldCount <- countMobilityFeatures(features)
@@ -256,7 +256,7 @@ assignFeatureMobilitiesSuspects <- function(features, scr, IMSWindow, selectFunc
     # UNDONE: message which were omitted
     assignedMobilities <- expandSuspMobilities(assignedMobilities)
     assignedMobilities <- assignedMobilities[!is.na(mobility)]
-    assignedMobilities <- assignedMobilities[, .(group, mobility, mobmin = mobility - IMSWindow, mobmax = mobility + IMSWindow)]
+    assignedMobilities <- assignedMobilities[, .(group, mobility, mobmin = mobility - mobWindow, mobmax = mobility + mobWindow)]
     
     features@features <- Map(features@features, names(features@features), f = function(fTable, ana)
     {

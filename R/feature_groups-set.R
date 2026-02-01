@@ -314,13 +314,13 @@ setMethod("assignMobilities", "featureGroupsSet", function(obj, mobPeakParams = 
                                                            EIMParams = getDefEIMParams(), EICParams = getDefEICParams(),
                                                            peakRTWindow = defaultLim("retention", "narrow"),
                                                            fallbackEIC = TRUE, calcArea = "integrate",
-                                                           IMSWindow = defaultLim("mobility", "medium"),
+                                                           mobWindow = defaultLim("mobility", "medium"),
                                                            CCSParams = NULL, parallel = "maybe")
 {
     # NOTE: keep args in sync with other methods
     
     assertFindMobilitiesArgs(mobPeakParams, chromPeakParams, EIMParams, EICParams, peakRTWindow, fallbackEIC,
-                             calcArea, IMSWindow, CCSParams, parallel)
+                             calcArea, mobWindow, CCSParams, parallel)
     
     if (!is.null(mobPeakParams))
     {
@@ -328,7 +328,7 @@ setMethod("assignMobilities", "featureGroupsSet", function(obj, mobPeakParams = 
         obj@features <- assignFeatureMobilitiesPeaks(obj@features, mobPeakParams, EIMParams, parallel)
         obj@features <- reintegrateMobilityFeatures(obj@features, chromPeakParams, EICParams, peakRTWindow, fallbackEIC,
                                                     calcArea, parallel)
-        obj <- updateFGroupsForMobilities(obj, IMSWindow, TRUE)
+        obj <- updateFGroupsForMobilities(obj, mobWindow, TRUE)
     }
     
     if (!is.null(CCSParams))

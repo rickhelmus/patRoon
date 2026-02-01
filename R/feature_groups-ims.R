@@ -16,9 +16,9 @@ setMethod("initialize", "featureGroupsIMS",
 # UNDONE: this was an attempt to use classical grouping algorithms with IMS features. It first clusters all features by
 # mobility and then does the grouping and merges the final groups. The problem is that mobility clustering cannot work
 # well with reasonable amounts of features. Maybe fix this someday?
-setMethod("groupFeaturesIMS", "features", function(feat, grouper, groupAlgo, ..., IMSWindow, verbose)
+setMethod("groupFeaturesIMS", "features", function(feat, grouper, groupAlgo, ..., mobWindow, verbose)
 {
-    hash <- makeHash(feat, groupAlgo, list(...), IMSWindow)
+    hash <- makeHash(feat, groupAlgo, list(...), mobWindow)
     cd <- loadCacheData("groupFeaturesIMS", hash)
     if (!is.null(cd))
         return(cd)
@@ -31,7 +31,7 @@ setMethod("groupFeaturesIMS", "features", function(feat, grouper, groupAlgo, ...
         warning("Any links between IMS parents and mobility features will be removed!", call. = FALSE)
         
     # clusters features with similar mobilities
-    fTableAll <- clusterFTableMobilities(feat, IMSWindow, byGroup = FALSE)
+    fTableAll <- clusterFTableMobilities(feat, mobWindow, byGroup = FALSE)
     
     if (!isFALSE(verbose))
         printf("Grouping features in %d IMS clusters... \n", uniqueN(fTableAll$IMSClust))

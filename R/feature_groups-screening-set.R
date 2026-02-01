@@ -362,13 +362,13 @@ setMethod("assignMobilities", "featureGroupsScreeningSet", function(obj, mobPeak
                                                                     EICParams = getDefEICParams(),
                                                                     peakRTWindow = defaultLim("retention", "narrow"),
                                                                     fallbackEIC = TRUE, calcArea = "integrate",
-                                                                    IMSWindow = defaultLim("mobility", "medium"),
+                                                                    mobWindow = defaultLim("mobility", "medium"),
                                                                     CCSParams = NULL, parallel = "maybe",
                                                                     fromSuspects = FALSE, IMSMatchParams = NULL)
 {
     ac <- checkmate::makeAssertCollection()
     assertFindMobilitiesArgs(mobPeakParams, chromPeakParams, EIMParams, EICParams, peakRTWindow, fallbackEIC,
-                             calcArea, IMSWindow, CCSParams, parallel, ac)
+                             calcArea, mobWindow, CCSParams, parallel, ac)
     checkmate::assertFlag(fromSuspects, add = ac)
     assertIMSMatchParams(IMSMatchParams, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
@@ -386,7 +386,7 @@ setMethod("assignMobilities", "featureGroupsScreeningSet", function(obj, mobPeak
             if (fromSuspects)
             {
                 obj@features <- assignFeatureMobilitiesSuspects(obj@features, screenInfo(unset(obj, s)),
-                                                                IMSWindow,
+                                                                mobWindow,
                                                                 \(ft, a) if (!a %chin% anasSet) ft[0] else ft)
             }
         }
@@ -394,7 +394,7 @@ setMethod("assignMobilities", "featureGroupsScreeningSet", function(obj, mobPeak
             obj@features <- assignFeatureMobilitiesPeaks(obj@features, mobPeakParams, EIMParams, parallel)
         obj@features <- reintegrateMobilityFeatures(obj@features, chromPeakParams, EICParams, peakRTWindow, fallbackEIC,
                                                     calcArea, parallel)
-        obj <- updateFGroupsForMobilities(obj, IMSWindow, TRUE)
+        obj <- updateFGroupsForMobilities(obj, mobWindow, TRUE)
     }
     
     if (!is.null(CCSParams))

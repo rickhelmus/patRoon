@@ -34,7 +34,7 @@ setMethod("initialize", "featureGroupsGreedy",
 #' @template feat-arg
 #'
 #' @param rtalign Not yet supported. Provided for consistency with other grouping methods.
-#' @param rtWindow,mzWindow,IMSWindow Numeric tolerances for retention time (seconds), \emph{m/z}, and mobility,
+#' @param rtWindow,mzWindow,mobWindow Numeric tolerances for retention time (seconds), \emph{m/z}, and mobility,
 #'   respectively. The scoring terms are normalized to these values. Defaults to \code{defaultLim("retention",
 #'   "medium")}, \code{defaultLim("mz", "medium")}, and \code{defaultLim("mobility", "medium")}, respectively (see \link{limits}).
 #' @param scoreWeights Numeric vector specifying the scoring weights. Should contain the following named elements:
@@ -55,13 +55,13 @@ setMethod("initialize", "featureGroupsGreedy",
 setMethod("groupFeaturesGreedy", "features", function(feat, rtalign = FALSE,
                                                       rtWindow = defaultLim("retention", "medium"),
                                                       mzWindow = defaultLim("mz", "medium"),
-                                                      IMSWindow = defaultLim("mobility", "medium"),
+                                                      mobWindow = defaultLim("mobility", "medium"),
                                                       scoreWeights = c(retention = 1, mz = 1, mobility = 1, intensity = 1),
                                                       verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(rtalign, add = ac)
-    aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow + IMSWindow, lower = 0, finite = TRUE,
+    aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow + mobWindow, lower = 0, finite = TRUE,
            fixed = list(add = ac))
     checkmate::assertNumeric(scoreWeights, len = 4, lower = 0, finite = TRUE, any.missing = FALSE, add = ac)
     assertHasNames(scoreWeights, c("retention", "mz", "mobility", "intensity"), add = ac)
@@ -71,13 +71,13 @@ setMethod("groupFeaturesGreedy", "features", function(feat, rtalign = FALSE,
     if (rtalign)
         stop("Retention time alignment (rtalign=TRUE) is not yet supported for greedy grouping!", call. = FALSE)
     
-    return(doGroupFeatures(feat, doGroupFeaturesGreedy, "greedy", rtWindow, mzWindow, IMSWindow, scoreWeights,
+    return(doGroupFeatures(feat, doGroupFeaturesGreedy, "greedy", rtWindow, mzWindow, mobWindow, scoreWeights,
                            verbose = verbose))
 })
 
-doGroupFeaturesGreedy <- function(feat, rtWindow, mzWindow, IMSWindow, scoreWeights, verbose)
+doGroupFeaturesGreedy <- function(feat, rtWindow, mzWindow, mobWindow, scoreWeights, verbose)
 {
-    hash <- makeHash(feat, rtWindow, mzWindow, IMSWindow, scoreWeights)
+    hash <- makeHash(feat, rtWindow, mzWindow, mobWindow, scoreWeights)
     cd <- loadCacheData("groupFeaturesGreedy", hash)
     if (!is.null(cd))
         return(cd)
@@ -106,7 +106,7 @@ doGroupFeaturesGreedy <- function(feat, rtWindow, mzWindow, IMSWindow, scoreWeig
             unreasonableMob <- if (all(is.na(fTable$mobility)))
                 -100
             else
-                max(fTable$mobility, na.rm = TRUE) + (10 * IMSWindow)
+                max(fTable$mobility, na.rm = TRUE) + (10 * mobWindow)
             
             fTable[is.na(mobility), mobility := unreasonableMob]
         }
@@ -118,7 +118,7 @@ doGroupFeaturesGreedy <- function(feat, rtWindow, mzWindow, IMSWindow, scoreWeig
     fTable[, replicate := anaInfo$replicate[match(analysis, anaInfo$analysis)]]
     reps <- replicates(feat)
     fTable[, groupID := getGroupIDs(ret, mz, mobility, intensity, match(analysis, anaInfo$analysis),
-                                    match(replicate, reps), rtWindow, mzWindow, IMSWindow, scoreWeights)]
+                                    match(replicate, reps), rtWindow, mzWindow, mobWindow, scoreWeights)]
 
     if (verbose)
         printf("Done! Found %d groups.\n", if (nrow(fTable) > 0) max(fTable$groupID) else 0L)

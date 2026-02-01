@@ -1518,7 +1518,7 @@ setMethod("calculateTox", "featureGroups", function(fGroups, featureAnn)
 #'   \code{"integrate"} (performs area integration) or \code{"sum"} (sums up all intensity data points). Note: these
 #'   methods may be different than what is used by the feature detection of the IMS parent or the peak detection
 #'   algorithm used for re-integration, hence, comparing areas should be done with care.
-#' @param IMSWindow The mobility tolerance window.
+#' @param mobWindow The mobility tolerance window.
 #'
 #' @template CCSParams-arg
 #'
@@ -1544,7 +1544,7 @@ setMethod("calculateTox", "featureGroups", function(fGroups, featureAnn)
 #'
 #'   \item Any mobility features that could not be re-integrated (either by peak detection or EIC fallback) are removed.
 #'
-#'   \item The feature grouping is updated: the mobility features with close mobilities (defined by \code{IMSWindow})
+#'   \item The feature grouping is updated: the mobility features with close mobilities (defined by \code{mobWindow})
 #'   within a feature group are split-off into new feature groups and linked to the original \emph{IMS parent} feature
 #'   group. This is performed by the \link[=groupFeaturesGreedy]{greedy grouping algorithm}. LC-MS properties and most
 #'   other data such as feature group qualities and scores (\code{\link{calculatePeakQualities}}), adduct annotations
@@ -1576,13 +1576,13 @@ setMethod("assignMobilities", "featureGroups", function(obj, mobPeakParams = NUL
                                                         EIMParams = getDefEIMParams(), EICParams = getDefEICParams(),
                                                         peakRTWindow = defaultLim("retention", "narrow"),
                                                         fallbackEIC = TRUE, calcArea = "integrate",
-                                                        IMSWindow = defaultLim("mobility", "medium"),
+                                                        mobWindow = defaultLim("mobility", "medium"),
                                                         CCSParams = NULL, parallel = "maybe")
 {
     # NOTE: keep args in sync with other methods
     
     assertFindMobilitiesArgs(mobPeakParams, chromPeakParams, EIMParams, EICParams, peakRTWindow, fallbackEIC, calcArea,
-                             IMSWindow, CCSParams, parallel)
+                             mobWindow, CCSParams, parallel)
     
     if (!is.null(mobPeakParams))
     {
@@ -1590,7 +1590,7 @@ setMethod("assignMobilities", "featureGroups", function(obj, mobPeakParams = NUL
         obj@features <- assignFeatureMobilitiesPeaks(obj@features, mobPeakParams, EIMParams, parallel)
         obj@features <- reintegrateMobilityFeatures(obj@features, chromPeakParams, EICParams, peakRTWindow, fallbackEIC,
                                                     calcArea, parallel)
-        obj <- updateFGroupsForMobilities(obj, IMSWindow, FALSE)
+        obj <- updateFGroupsForMobilities(obj, mobWindow, FALSE)
     }
     
     if (!is.null(CCSParams))

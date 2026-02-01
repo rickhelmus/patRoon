@@ -111,7 +111,7 @@ saveCheckSession <- function(session, path, fGroups, type)
     writeYAML(session, path)
 }
 
-importCheckUISessionGroups <- function(oldSession, fGroups, rtWindow, mzWindow, IMSWindow = 0.01)
+importCheckUISessionGroups <- function(oldSession, fGroups, rtWindow, mzWindow, mobWindow)
 {
 
     gInfo <- groupInfo(fGroups)
@@ -135,7 +135,7 @@ importCheckUISessionGroups <- function(oldSession, fGroups, rtWindow, mzWindow, 
             if (is.na(ogtr$mobility))
                 gi <- gi[is.na(mobility)]
             else
-                gi <- gi[!is.na(mobility) & numLTE(abs(mobility - ogtr$mobility), IMSWindow)]
+                gi <- gi[!is.na(mobility) & numLTE(abs(mobility - ogtr$mobility), mobWindow)]
         }
         if (nrow(gi) == 0)
         {

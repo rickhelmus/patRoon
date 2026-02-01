@@ -57,7 +57,7 @@ setMethod("doGroupFeatures", "features", function(feat, grouper, groupAlgo, ...,
     # UNDONE: disabled: groupFeaturesIMS() doesn't really work...
     # if (!hasMobilities(feat))
     #     return(grouper(feat, ..., verbose = verbose))
-    # return(groupFeaturesIMS(feat, grouper, groupAlgo, ..., IMSWindow = IMSWindow, verbose = verbose))
+    # return(groupFeaturesIMS(feat, grouper, groupAlgo, ..., mobWindow = mobWindow, verbose = verbose))
     return(grouper(feat, ..., verbose = verbose))
 })
 
@@ -253,7 +253,7 @@ getDefEIXParams <- function()
         onlyPresent = TRUE,
         mzExpWindow = defaultLim("mz", "very_narrow"),
         mobExpWindow = defaultLim("mobility", "very_narrow"),
-        mzExpIMSWindow = defaultLim("mz", "medium"),
+        mzExpmobWindow = defaultLim("mz", "medium"),
         minIntensityIMS = 25,
         setsAdductPos = "[M+H]+",
         setsAdductNeg = "[M-H]-"
@@ -319,7 +319,7 @@ extendEIXInputTab <- function(tab, type, EIXParams, hasMobilities, fromIMS)
     else # "EIM"
         tab[, c("mobmin", "mobmax") := .(mobmin - EIXParams$window, mobmax + EIXParams$window)]
     if (hasMobilities && !fromIMS)
-        tab[, c("mzmin", "mzmax") := .(mzmin - EIXParams$mzExpIMSWindow, mzmax + EIXParams$mzExpIMSWindow)]
+        tab[, c("mzmin", "mzmax") := .(mzmin - EIXParams$mzExpmobWindow, mzmax + EIXParams$mzExpmobWindow)]
     return(tab)
 }
 

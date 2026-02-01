@@ -32,7 +32,7 @@ getPiekEICsInfo <- function(params, IMS, suspects, MS2Info, verbose)
         if (IMS && params$filterIMS == "suspects")
             EICInfo[, keep := filterEICBins(mzmin, params$mzStep, mobmin, params$mobStep,
                                             suspects$mz - params$mzWindow, suspects$mz + params$mzWindow,
-                                            suspects$mobility - params$IMSWindow, suspects$mobility + params$IMSWindow)]
+                                            suspects$mobility - params$mobWindow, suspects$mobility + params$mobWindow)]
         else
             EICInfo[, keep := filterEICBins(mzmin, params$mzStep, numeric(), 0,
                                             suspects$mz - params$mzWindow, suspects$mz + params$mzWindow, 0, 0)]
@@ -289,11 +289,11 @@ setMethod("delete", "featuresPiek", function(obj, i = NULL, j = NULL, ...)
 #'
 #'   The following parameters are specifically for when suspect data is used to pre-filter EIC bins: \itemize{
 #'
-#'     \item \code{rtWindow},\code{mzwindow},\code{IMSWindow}: The retention time, \emph{m/z} and mobility tolerance
+#'     \item \code{rtWindow},\code{mzwindow},\code{mobWindow}: The retention time, \emph{m/z} and mobility tolerance
 #'     windows for suspect data. These are used for: \enumerate{
 #'     
 #'       \item Pre-filtering of EIC bins with suspect data, \emph{i.e.} larger tolerances will lead to more EIC bins
-#'       being kept. (only applicable for \code{mzWindow} and \code{IMSWindow}).
+#'       being kept. (only applicable for \code{mzWindow} and \code{mobWindow}).
 #'       
 #'       \item Matching the final features to suspect data. \code{rtWindow=Inf} can be used to disable retention time
 #'       matching.
@@ -323,10 +323,10 @@ setMethod("delete", "featuresPiek", function(obj, i = NULL, j = NULL, ...)
 #'     window used will never exceed the instrumental isolation window. Setting \code{mzIsoWindow=Inf} will always use
 #'     instrumental windows.
 #'     
-#'     \item \code{IMSWindow} The mobility tolerance window to match DDA MS/MS precursors in IMS workflows. Used for
+#'     \item \code{mobWindow} The mobility tolerance window to match DDA MS/MS precursors in IMS workflows. Used for
 #'     pre-filtering EICs and the final features. To match DDA precursor data, the measured mobility range of the
 #'     corresponding MS/MS data is used as the mobility window. This window is then adjusted to be at least +/-
-#'     \code{IMSWindow}. Defaults to \code{defaultLim("mobility", "medium")} (see \link{limits})
+#'     \code{mobWindow}. Defaults to \code{defaultLim("mobility", "medium")} (see \link{limits})
 #'
 #'     \item \code{minTIC} The minimum total ion current (TIC) signal for an MS/MS spectrum to be considered. Can be
 #'     increased to eliminate features with low intensity MS/MS data.
@@ -524,8 +524,8 @@ findFeaturesPiek <- function(analysisInfo, genEICParams = getPiekEICParams(),
                     setnames(MS2Info, c("mobStart", "mobEnd"), c("mobmin", "mobmax"))
                     # grow mob tolerance if needed
                     MS2Info[, mobCenter := (mobmin + mobmax) / 2]
-                    MS2Info[, mobmin := pmin(mobmin, mobCenter - genEICParams$IMSWindow)]
-                    MS2Info[, mobmax := pmax(mobmax, mobCenter + genEICParams$IMSWindow)]
+                    MS2Info[, mobmin := pmin(mobmin, mobCenter - genEICParams$mobWindow)]
+                    MS2Info[, mobmax := pmax(mobmax, mobCenter + genEICParams$mobWindow)]
                 }
             }
             
@@ -634,8 +634,8 @@ findFeaturesPiek <- function(analysisInfo, genEICParams = getPiekEICParams(),
                 keep <- filterPiekResults(peaks$ret, peaks$mz, if (checkMob) peaks$mobility else numeric(),
                                           if (checkRT) suspects$rt else numeric(), suspects$mz - genEICParams$mzWindow,
                                           suspects$mz + genEICParams$mzWindow,
-                                          if (checkMob) suspects$mobility - genEICParams$IMSWindow else numeric(),
-                                          if (checkMob) suspects$mobility + genEICParams$IMSWindow else numeric(),
+                                          if (checkMob) suspects$mobility - genEICParams$mobWindow else numeric(),
+                                          if (checkMob) suspects$mobility + genEICParams$mobWindow else numeric(),
                                           genEICParams$rtWindow)
                 peaks <- peaks[keep == TRUE]
             }
@@ -801,7 +801,7 @@ getPiekEICParams <- function(..., IMS = FALSE)
     }
     
     if (ret$filterIMS != "none")
-        maybeSetDefault("IMSWindow", defaultLim("mobility", "medium"))
+        maybeSetDefault("mobWindow", defaultLim("mobility", "medium"))
     
     return(ret)
 }

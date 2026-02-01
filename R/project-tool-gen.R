@@ -440,10 +440,10 @@ genScriptFeaturesBlock <- function(ionization, IMS, settingsFeat, generator)
                 list(name = "mobStep", value = def$none$mobStep, condition = doDirectIMS),
                 list(name = "rtWindow", value = def$susp$rtWindow, condition = mmz == "suspects"),
                 list(name = "mzWindow", value = def$susp$mzWindow, condition = mmz == "suspects"),
-                list(name = "IMSWindow", value = def$susp$IMSWindow, condition = mims == "suspects" && doDirectIMS),
+                list(name = "mobWindow", value = def$susp$mobWindow, condition = mims == "suspects" && doDirectIMS),
                 list(name = "rtWindow", value = def$ms2$rtWindow, condition = mmz == "ms2"),
                 list(name = "mzWindow", value = def$ms2$mzWindow, condition = mmz == "ms2"),
-                list(name = "IMSWindow", value = def$ms2$IMSWindow, condition = mims == "ms2" && doDirectIMS),
+                list(name = "mobWindow", value = def$ms2$mobWindow, condition = mims == "ms2" && doDirectIMS),
                 list(name = "minTIC", value = def$ms2$minTIC, condition = mmz == "ms2")
             ))
         }

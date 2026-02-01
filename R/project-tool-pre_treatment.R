@@ -119,7 +119,7 @@ newProjectPreTreatServer <- function(id, ionization, settings)
                     fillCol(
                         selectInput(ns("convAlgo"), "Algorithm",
                                     c("ProteoWizard" = "pwiz", "OpenMS" = "openms", "Bruker" = "bruker",
-                                      "IM collapse" = "im_collapse", "TIMSCONVERT" = "timsconvert"),
+                                      "IMS collapse" = "imscollapse", "TIMSCONVERT" = "timsconvert"),
                                     multiple = FALSE, width = "100%")
                     ),
                     fillRow(

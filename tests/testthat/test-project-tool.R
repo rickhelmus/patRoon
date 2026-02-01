@@ -255,7 +255,7 @@ test_that("Pre-treatment settings", {
                        to = joinConvTypeFormat("centroid", "mzXML")),
             data.table(algorithm = "bruker", from = joinConvTypeFormat("raw", "bruker"),
                        to = joinConvTypeFormat("profile", "mzML")),
-            data.table(algorithm = "im_collapse", from = joinConvTypeFormat("ims", "mzML"),
+            data.table(algorithm = "imscollapse", from = joinConvTypeFormat("ims", "mzML"),
                        to = joinConvTypeFormat("centroid", "mzML")),
             data.table(algorithm = "timsconvert", from = joinConvTypeFormat("raw", "bruker_ims"),
                        to = joinConvTypeFormat("profile", "mzML"))

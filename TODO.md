@@ -19,11 +19,8 @@
         - IMS arg but affects mobility features
         - withMobility vs withIMS
         - hasMobilities
-        - IMS arg for piek (could be DMA?)
     - mob_area/mob_intensity vs mobmin/mobmax
-    - naming: im_collapse and IMSCollapse
     - ADT gives "susp_mobility_susp"/"susp_CCS_susp" cols --> rename
-    - piek: rename assignMethod now that assignAggr is removed?
     - better names for ims_parent_ID/ims_parent_group?
 - See why parallel reporting is so slow (on Windows?)
 - reticulate: use py_require()? doesn't seem to be able handle multiple py versions, so no?
@@ -117,7 +114,7 @@
         - also configurable weights for assignMobilities()?
     - tweak default EIMParams
         - default smoothing? different for Agilent? Convert to mobility units?
-- MSPL/IMCollapse: specify default maxGapIMS in limits? Mainly for Agilent, where relatively large numbers are necessary
+- MSPL/IMSCollapse: specify default maxGapIMS in limits? Mainly for Agilent, where relatively large numbers are necessary
 
 ## IMS
 
@@ -177,7 +174,7 @@
 
 - move all plotBPC(), getEIC() etc methods into one doc file?
 - convert
-    - add patRoon 3.0 citation for im_collapse
+    - add patRoon 3.0 citation for imscollapse
 - handbook
     - installation
         - add additional external deps, eg Python, TIMS-SDK, c3sdb, PCL/CCS etc

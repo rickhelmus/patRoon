@@ -7,7 +7,7 @@
 #' Conversion of MS analysis files between several open and closed data formats.
 #'
 #' @param algorithm Either \code{"pwiz"} (ProteoWizard), \code{"openms"}, \code{"bruker"} (Bruker DataAnalysis) ,
-#'   \code{"im_collapse"} or \code{"timsconvert"}.
+#'   \code{"imscollapse"} or \code{"timsconvert"}.
 #' @param direction A \code{character} specifying the direction of conversion. Either \code{"input"} or \code{"output"}.
 #' @param inFiles,outFiles A \code{character} vector with input and output files, respectively. Lengths and order should
 #'   be the same.
@@ -69,7 +69,7 @@ getMSConversionTypes <- function(algorithm, direction)
                       pwiz = getMSFileTypes(),
                       openms = c("centroid", "profile"),
                       bruker = "raw",
-                      im_collapse = c("raw", "ims"),
+                      imscollapse = c("raw", "ims"),
                       timsconvert = "raw"))
     }
 
@@ -77,7 +77,7 @@ getMSConversionTypes <- function(algorithm, direction)
                   pwiz = c("centroid", "profile", "ims"),
                   openms = c("centroid"),
                   bruker = c("centroid", "profile"),
-                  im_collapse = "centroid",
+                  imscollapse = "centroid",
                   timsconvert = c("centroid", "profile", "ims")))
 }
 
@@ -99,7 +99,7 @@ getMSConversionFormats <- function(algorithm, direction, type = NULL)
             c("mzML", "mzXML")
         else if (algorithm == "bruker")
             "bruker"
-        else if (algorithm == "im_collapse")
+        else if (algorithm == "imscollapse")
             c("bruker_ims", "mzML")
         else if (algorithm == "timsconvert")
             "bruker_ims"
@@ -313,7 +313,7 @@ convertMSFilesIMSCollapse <- function(inFiles, outFiles, typeFrom, formatTo = "m
     checkmate::assertCharacter(inFiles, min.chars = 1, min.len = 1, add = ac)
     checkmate::assertCharacter(outFiles, min.chars = 1, len = length(inFiles), add = ac)
     checkmate::assertChoice(typeFrom, c("raw", "ims"), add = ac)
-    checkmate::assertChoice(formatTo, getMSConversionFormats("im_collapse", "output"), add = ac)
+    checkmate::assertChoice(formatTo, getMSConversionFormats("imscollapse", "output"), add = ac)
     aapply(checkmate::assertCount, . ~ smoothWindow + halfWindow, positive = c(FALSE, TRUE), fixed = list(add = ac))
     aapply(checkmate::assertNumber, . ~ maxGap + mzWindow + minIntensityIMS, lower = 0, finite = TRUE, fixed = list(add = ac))
     aapply(assertRange, . ~ mzRange + mobilityRange, null.ok = TRUE, fixed = list(add = ac))
@@ -561,7 +561,7 @@ convertMSFilePaths <- function(files, formatFrom, formatTo = "mzML", outPath = N
             convertMSFilesOpenMS(files, output, formatTo, ...)
         else if (algorithm == "bruker")
             convertMSFilesBruker(files, output, formatTo, ...)
-        else if (algorithm == "im_collapse")
+        else if (algorithm == "imscollapse")
             convertMSFilesIMSCollapse(files, output, formatTo = formatTo, ...)
         else # algorithm == "timsconvert"
             convertMSFilesTIMSCONVERT(files, output, formatTo = formatTo, ...)
@@ -622,7 +622,7 @@ convertMSFiles <- function(anaInfo, typeFrom = "raw", typeTo = "centroid", forma
         
         args <- c(args, list(centroid = centroid, IMS = IMS))
     }
-    else if (algorithm == "im_collapse")
+    else if (algorithm == "imscollapse")
         args <- c(args, list(typeFrom = typeFrom))
     else if (algorithm == "timsconvert")
         args <- c(args, list(centroid = typeTo == "centroid", IMS = typeTo == "ims"))

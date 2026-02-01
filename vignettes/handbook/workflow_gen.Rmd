@@ -238,10 +238,10 @@ Algorithm      | Usage                                            | Input file t
 [ProteoWizard] | `convertMSFiles(algorithm = "pwiz", ...)`        | all formats and types                     | all except raw | most popular and versatile converter
 [OpenMS]       | `convertMSFiles(algorithm = "openms", ...)`      | centroid and profile (`mzML` and `mzXML`) | centroid and profile (`mzML` and `mzXML`) | Does not support centroiding.
 DataAnalysis   | `convertMSFiles(algorithm = "bruker", ...)`      | raw (Bruker `.d`)                         | centroid and profile (`mzML` and `mzXML`)
-IM collapse    | `convertMSFiles(algorithm = "im_collapse", ...)` | raw (Bruker TIMS) and ims (mzML) (uses [msdata](#fileTypes)) | centroid (`mzML` and `mzXML`) | Omits MS2 data by default.
+IMS collapse   | `convertMSFiles(algorithm = "imscollapse", ...)` | raw (Bruker TIMS) and ims (mzML) (uses [msdata](#fileTypes)) | centroid (`mzML` and `mzXML`) | Omits MS2 data by default.
 [TIMSCONVERT]  | `convertMSFiles(algorithm = "timsconvert", ...)` | raw (Bruker TIMS)                         | centroid, profile, ims (`mzML`)
 
-> **_NOTE_** For the conversion of IMS to centroided data it is highly recommended to use the IM collapse or [TIMSCONVERT] algorithms, as [ProteoWizard] currently does not support accurate centroiding of IMS data. For the conversion of Agilent IMS data, [ProteoWizard] can be used to convert the raw `.d` files to the ims (`mzML`) files, and subsequently IM collapse can be used to convert these to centroided files.
+> **_NOTE_** For the conversion of IMS to centroided data it is highly recommended to use the IMS collapse or [TIMSCONVERT] algorithms, as [ProteoWizard] currently does not support accurate centroiding of IMS data. For the conversion of Agilent IMS data, [ProteoWizard] can be used to convert the raw `.d` files to the ims (`mzML`) files, and subsequently IMS collapse can be used to convert these to centroided files.
 
 The `convertMSFiles()` function uses the [analysis information](#anaInfo) to locate the input files and the destination paths for the output. The `path_XXX` columns should contain the desired destination directories for those file types that should be exported. For instance:
 
@@ -272,12 +272,12 @@ convertMSFiles(anaInfo, typeFrom = "raw", formatFrom = "agilent_ims", typeTo = "
                algorithm = "pwiz")
 # ... and then use IM collapse to LC-MS like centroided mzML files
 convertMSFiles(anaInfo, typeFrom = "ims", formatFrom = "mzML", typeTo = "centroid", formatTo = "mzML",
-               algorithm = "im_collapse")
+               algorithm = "imscollapse")
 ```
 
 > The [newProject() utility](#newProject) can automatically generate a proper analysis information table and the required code to perform the desired file conversions.
 
-> **_NOTE_** The IM collapse algorithm omits MS/MS data by default to save space and speed up file conversion. This algorithm is typically used in [post mobility assignment](#postIMS) IMS workflows, which do not use MS/MS data from centroided files. Set `includeMSMS=TRUE` to include MS/MS data.
+> **_NOTE_** The IMS collapse algorithm omits MS/MS data by default to save space and speed up file conversion. This algorithm is typically used in [post mobility assignment](#postIMS) IMS workflows, which do not use MS/MS data from centroided files. Set `includeMSMS=TRUE` to include MS/MS data.
 
 Besides conversion, other types of data pre-treatment may also need to be performed. For instance, [ProteoWizard] can be used to apply various data filters, and several utility functions exist to apply mass re-calibration of Bruker data files.
 

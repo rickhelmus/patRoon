@@ -513,7 +513,7 @@ The example below shows a complete IMS workflow which uses post mobility assignm
 convertMSFiles(anaInfo, typeFrom = "raw", formatFrom = "bruker_ims", typeTo = "ims", formatTo = "mzML",
                algorithm = "pwiz")
 convertMSFiles(anaInfo, typeFrom = "ims", formatFrom = "mzML", typeTo = "centroid", formatTo = "mzML",
-               algorithm = "im_collapse")
+               algorithm = "imscollapse")
 
 # perform feature detection and grouping
 fList <- findFeatures(anaInfo, "openms")

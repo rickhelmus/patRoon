@@ -90,7 +90,7 @@ assertMSFileType <- function(x, null.ok = FALSE, .var.name = checkmate::vname(x)
 
 assertMSConvAlgo <- function(x, .var.name = checkmate::vname(x), add = NULL)
 {
-    checkmate::assertChoice(x, c("pwiz", "openms", "bruker", "im_collapse", "timsconvert"), .var.name = .var.name,
+    checkmate::assertChoice(x, c("pwiz", "openms", "bruker", "imscollapse", "timsconvert"), .var.name = .var.name,
                             add = add)
 }
 
@@ -1046,8 +1046,8 @@ assertConvertMSFilesArgs <- function(formatFrom, formatTo, overwrite, algorithm,
                                pwiz = getMSFileFormats(),
                                openms = getMSFileFormats("centroid"),
                                bruker = "bruker",
-                               # NOTE: for im_collapse more specific format checks are done later
-                               im_collapse = c(getMSFileFormats("raw"), getMSFileFormats("ims")),
+                               # NOTE: for imscollapse more specific format checks are done later
+                               imscollapse = c(getMSFileFormats("raw"), getMSFileFormats("ims")),
                                timsconvert = "bruker_ims")
     checkmate::assertChoice(formatFrom, validFormatsFrom, add = add)
 }

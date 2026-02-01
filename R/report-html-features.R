@@ -219,7 +219,7 @@ makeSuspInfoPropTab <- function(tab, id, retMin)
     }
     if (!is.null(tab[["formula"]]))
         set(tab, j = "formula", value = subscriptFormulaHTML(tab$formula))
-    setnames(tab, c("mobility_susp", "CCS_susp"), c("mobility suspect", "CCS suspect"), skip_absent = TRUE)
+    setnames(tab, c("mobility_input", "CCS_input"), c("mobility suspect", "CCS suspect"), skip_absent = TRUE)
     
     ptab <- makePropTab(tab, NULL, "name")
     return(makePropReactable(ptab, id, "name", minPropWidth = 120, minValWidth = 150))

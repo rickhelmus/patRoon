@@ -5,7 +5,7 @@
 local_edition(3) # for snapshots
 
 test_that("CCS conversion works", {
-    susps <- as.data.table(patRoonDataIMS::suspectsPos); setnames(susps, "mobility_[M+H]+", "mobility_susp")
+    susps <- as.data.table(patRoonDataIMS::suspectsPos); setnames(susps, "mobility_[M+H]+", "mobility_input")
     suspsExp <- expandSuspMobilities(susps)
     mzs <- suspsExp$mz
     mobs <- suspsExp$mobility
@@ -142,7 +142,7 @@ test_that("assignMobilities() for suspects", {
     checkmate::expect_character(assignMobilities(suspsMobAllNA, CCSParams = CCSParams)[["mobility_[M+H]+"]], any.missing = FALSE)
     # first suspect has two CCSs
     suspsMob1st <- assignMobilities(susps[1, -"mobility_[M+H]+"], CCSParams = CCSParams)
-    checkmate::expect_data_table(expandSuspMobilities(setnames(suspsMob1st, "CCS_[M+H]+", "CCS_susp")), nrows = 2)
+    checkmate::expect_data_table(expandSuspMobilities(setnames(suspsMob1st, "CCS_[M+H]+", "CCS_input")), nrows = 2)
     suspsCh <- copy(susps); setnames(suspsCh, "CCS_[M+H]+", "CCS_[M+H]2+")
     suspsNoMobCh <- assignMobilities(suspsNoMob, suspsCh, adducts = "[M+H]2+", CCSParams = CCSParams)
     suspsNoMobCh2 <- copy(suspsNoMob); suspsNoMobCh2[, mz := calculateMasses(neutralMass, as.adduct("[M+H]2+"), "mz")]

@@ -391,8 +391,8 @@ findFeaturesPiek <- function(analysisInfo, genEICParams = getPiekEICParams(),
         
         if (genEICParams$filterIMS == "suspects" && !isFALSE(genEICParams$IMS))
         {
-            suspects[, mobility_susp := selectFromSuspAdductCol(suspects, "mobility", if (!is.null(adduct)) as.character(adduct))]
-            whMissing <- which(is.na(suspects$mobility_susp))
+            suspects[, mobility_input := selectFromSuspAdductCol(suspects, "mobility", if (!is.null(adduct)) as.character(adduct))]
+            whMissing <- which(is.na(suspects$mobility_input))
             if (length(whMissing) > 0)
             {
                 if (length(whMissing) == nrow(suspects))

@@ -20,7 +20,6 @@
         - withMobility vs withIMS
         - hasMobilities
     - mob_area/mob_intensity vs mobmin/mobmax
-    - ADT gives "susp_mobility_susp"/"susp_CCS_susp" cols --> rename
     - better names for ims_parent_ID/ims_parent_group?
 - See why parallel reporting is so slow (on Windows?)
 - reticulate: use py_require()? doesn't seem to be able handle multiple py versions, so no?

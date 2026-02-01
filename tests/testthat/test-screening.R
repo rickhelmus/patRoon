@@ -348,7 +348,7 @@ test_that("IMS worfklow", {
     expect_equal(screenInfo(fGroupsAMSusPost),
                  screenInfo(screenSuspects(fGroupsAMNoSus, list(suspsPosNoAdd, suspsNegNoAdd))), tolerance = 1E-6)
     
-    suspsExp <- expandSuspMobilities(setnames(copy(suspsPos), "mobility_[M+H]+", "mobility_susp"))
+    suspsExp <- expandSuspMobilities(setnames(copy(suspsPos), "mobility_[M+H]+", "mobility_input"))
     scrOS <- copy(screenInfo(fGroupsAMOnlySus[IMS = TRUE][, sets = "positive"]))
     scrOS[, fg_mob := groupInfo(fGroupsAMOnlySus)[match(scrOS$group, group)]$mobility]
     expect_equal(scrOS$mobility, scrOS$fg_mob, tolerance = 1E-6)
@@ -442,9 +442,9 @@ test_that("IMS worfklow", {
     fGroupsIMSScrWrongOne <- screenSuspects(fGroupsIMS, list(suspsWrongOnePos, suspsWrongOneNeg), onlyHits = FALSE)
     fGroupsAMWrongOne <- doAssignMobs(fGroupsIMSScrWrongOne)
     IMP <- getIMSMatchParams("mobility", window = 0.02, relative = TRUE, minMatches = 2)
-    expect_true(any(grepl(";", screenInfo(fGroupsAMWrongOne)$mobility_susp)))
-    expect_false(any(grepl(";", screenInfo(doAssignMobs(fGroupsIMSScrWrongOne, IMSMatchParams = IMP))[!is.na(d_mob)]$mobility_susp)))
-    expect_false(any(grepl(";", screenInfo(filter(fGroupsAMWrongOne, IMSMatchParams = IMP))[!is.na(d_mob)]$mobility_susp)))
+    expect_true(any(grepl(";", screenInfo(fGroupsAMWrongOne)$mobility_input)))
+    expect_false(any(grepl(";", screenInfo(doAssignMobs(fGroupsIMSScrWrongOne, IMSMatchParams = IMP))[!is.na(d_mob)]$mobility_input)))
+    expect_false(any(grepl(";", screenInfo(filter(fGroupsAMWrongOne, IMSMatchParams = IMP))[!is.na(d_mob)]$mobility_input)))
     # NOTE: if negate==T then the IMS matching is _not_negated. Since all suspects have only one mobility or otherwise
     # only one is incorrect, the filter shouldn't remove anything.
     expect_equal(screenInfo(filter(fGroupsAMWrongOne, IMSMatchParams = modifyList(IMP, list(minMatches = 0)))),

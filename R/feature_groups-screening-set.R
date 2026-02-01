@@ -10,7 +10,7 @@ NULL
 # merges screening info from screenInfo slots
 mergeScreeningSetInfos <- function(setObjects, sInfos = lapply(setObjects, screenInfo))
 {
-    unCols <- c("rt", "mobility", "CCS", "mobility_susp", "CCS_susp", "formula", "SMILES", "InChI", "InChIKey",
+    unCols <- c("rt", "mobility", "CCS", "mobility_input", "CCS_input", "formula", "SMILES", "InChI", "InChIKey",
                 "neutralMass", "d_rt", "d_mz", "d_mob", "d_mob_rel", "d_CCS", "d_CCS_rel", "LC50_SMILES")
     
     renameDupCols <- function(si, suf, all)

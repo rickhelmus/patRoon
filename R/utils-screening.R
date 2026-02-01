@@ -9,7 +9,7 @@ NULL
 isScreening <- function(fGroups) inherits(fGroups, c("featureGroupsScreening", "featureGroupsScreeningSet"))
 isSuspAnnotated <- function(fGroups) isScreening(fGroups) && !is.null(screenInfo(fGroups)[["estIDLevel"]])
 
-suspMetaDataCols <- function() c("name", "rt", "name_orig", "mz", "mobility_susp", "CCS_susp", "SMILES", "InChI",
+suspMetaDataCols <- function() c("name", "rt", "name_orig", "mz", "mobility_input", "CCS_input", "SMILES", "InChI",
                                  "InChIKey", "formula", "neutralMass", "molNeutralized", "adduct", "fragments_mz",
                                  "fragments_formula")
 suspAnnCols <- function() c("formRank", "compRank", "annSimForm", "annSimComp", "annSimBoth", "maxFrags",
@@ -137,7 +137,7 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid, checkDesc, prefCal
 
 expandSuspMobilities <- function(suspects)
 {
-    hasMob <- !is.null(suspects[["mobility_susp"]]); hasCCS <- !is.null(suspects[["CCS_susp"]])
+    hasMob <- !is.null(suspects[["mobility_input"]]); hasCCS <- !is.null(suspects[["CCS_input"]])
     if (!hasMob && !hasCCS)
         return(copy(suspects))
 
@@ -149,9 +149,9 @@ expandSuspMobilities <- function(suspects)
     }
     
     if (hasMob)
-        verifyCol("mobility_susp", "mobility")
+        verifyCol("mobility_input", "mobility")
     if (hasCCS)
-        verifyCol("CCS_susp", "CCS")
+        verifyCol("CCS_input", "CCS")
     
     if (nrow(suspects) == 0)
     {
@@ -177,8 +177,8 @@ expandSuspMobilities <- function(suspects)
     
     return(rbindlist(lapply(seq_len(nrow(suspects)), function(i)
     {
-        mobs <- if (hasMob) doSplit(suspects$mobility_susp[i]) else NA_real_
-        CCSs <- if (hasCCS) doSplit(suspects$CCS_susp[i]) else NA_real_
+        mobs <- if (hasMob) doSplit(suspects$mobility_input[i]) else NA_real_
+        CCSs <- if (hasCCS) doSplit(suspects$CCS_input[i]) else NA_real_
         if (length(mobs) != length(CCSs) && !checkmate::testScalarNA(mobs) && !checkmate::testScalarNA(CCSs))
             stop(sprintf("The length of mobility and CCS values for suspect '%s' (row %d) differs: %d/%d",
                          suspects$name[i], i, length(mobs), length(CCSs)), call. = FALSE)
@@ -219,14 +219,14 @@ matchIMSScr <- function(scr, gInfo, IMSMatchParams, negate = FALSE)
         scr <- copy(scr)
         scr[, ims_parent_group := gInfo$ims_parent_group[match(group, gInfo$group)]]
         scr[, suspIMSCount := {
-            v <- if (!is.na(mobility_susp[1])) mobility_susp[1] else CCS_susp[1]
+            v <- if (!is.na(mobility_input[1])) mobility_input[1] else CCS_input[1]
             if (is.na(v))
                 0L
             else
                 length(strsplit(v, ";")[[1]])
         }, by = "name"]
         scr[!is.na(ims_parent_group), suspIMSMatches := {
-            uniqueN(if (!is.na(mobility_susp[1])) mobility else CCS)
+            uniqueN(if (!is.na(mobility_input[1])) mobility else CCS)
         }, by = c("ims_parent_group", "name")]
         scr <- if (negate)
             scr[is.na(ims_parent_group) | suspIMSCount < IMSMatchParams$minMatches |
@@ -244,7 +244,7 @@ assignFeatureMobilitiesSuspects <- function(features, scr, IMSWindow, selectFunc
     printf("Finding mobilities for all features from suspects...\n")
     oldCount <- countMobilityFeatures(features)
     
-    if (is.null(scr[["mobility_susp"]]))
+    if (is.null(scr[["mobility_input"]]))
     {
         warning("Cannot load mobilities from suspects: No suspect mobility data", call. = FALSE)
         return(features)
@@ -372,12 +372,12 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, IMSMatchPara
     metaDataCols <- union("rt", intersect(suspMetaDataCols(), names(suspects)))
     
     # HACK: the mobility columns are handled differently
-    metaDataCols <- setdiff(metaDataCols, c("mobility", "mobility_susp", "CCS", "CCS_susp"))
+    metaDataCols <- setdiff(metaDataCols, c("mobility", "mobility_input", "CCS", "CCS_input"))
     
     emptyResult <- data.table()
-    for (col in c(metaDataCols, "mobility_susp", "CCS_susp", "group", "d_rt", "d_mz"))
+    for (col in c(metaDataCols, "mobility_input", "CCS_input", "group", "d_rt", "d_mz"))
     {
-        if (col %in% c("rt", "mz", "neutralMass", "mobility_susp", "CCS_susp", "d_rt", "d_mz"))
+        if (col %in% c("rt", "mz", "neutralMass", "mobility_input", "CCS_input", "d_rt", "d_mz"))
             emptyResult[, (col) := numeric()]
         else
             emptyResult[, (col) := character()]
@@ -436,8 +436,8 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, IMSMatchPara
                     setMetaData(ret, suspects[ti])
 
                     # copy the right mobility and CCS columns from the suspect list
-                    ret[, mobility_susp := selectFromSuspAdductCol(suspects[ti], "mobility", adductTxt, g, annTbl)]
-                    ret[, CCS_susp := selectFromSuspAdductCol(suspects[ti], "CCS", adductTxt, g, annTbl)]
+                    ret[, mobility_input := selectFromSuspAdductCol(suspects[ti], "mobility", adductTxt, g, annTbl)]
+                    ret[, CCS_input := selectFromSuspAdductCol(suspects[ti], "CCS", adductTxt, g, annTbl)]
                     
                     ret[, c("group", "d_rt", "d_mz") := .(g, d_rt = if (hasRT) gret - rt else NA_real_,
                                                           ifelse(is.na(mz), annTbl[group == g]$neutralMass - neutralMass,

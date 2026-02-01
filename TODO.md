@@ -15,8 +15,6 @@
 - BUG: annSim.1 column (in formulas?)?
 - Harmonize/consistent names
     - be consistent in mobility vs IMS and mobilograms and EIMs
-        - IMS arg but affects mobility features
-        - withMobility vs withIMS
         - hasMobilities
     - mob_area/mob_intensity vs mobmin/mobmax
     - better names for ims_parent_ID/ims_parent_group?

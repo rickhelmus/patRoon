@@ -122,7 +122,7 @@ assignFeatureMobilitiesPeaks <- function(features, peakParams, EIMParams, parall
 # split into separate function for future parallelization
 doFindPeaksForReintegration <- function(EICs, peakParams, peakRTWindow, ft, ana, cacheDB)
 {
-    peaks <- findPeaksInEICs(EICs, peakParams, withMobility = FALSE, calcStats = FALSE, assignRTWindow = 0,
+    peaks <- findPeaksInEICs(EICs, peakParams, IMS = FALSE, calcStats = FALSE, assignRTWindow = 0,
                              sumWindowMZ = 0, sumWindowMob = 0,
                              logPath = file.path("log", "assignMobilities", paste0("reintegrate-", ana, ".txt")),
                              cacheDB = cacheDB)

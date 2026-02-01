@@ -642,12 +642,12 @@ aggregateTox <- function(tox, aggrParams, splitSuspects = FALSE)
     return(tox[])
 }
 
-findPeaksInEICs <- function(EICs, peakParams, withMobility, calcStats, assignRTWindow, sumWindowMZ, sumWindowMob,
-                            logPath, cacheDB = NULL)
+findPeaksInEICs <- function(EICs, peakParams, IMS, calcStats, assignRTWindow, sumWindowMZ, sumWindowMob, logPath,
+                            cacheDB = NULL)
 {
     # NOTE: EICs must be named
     
-    hash <- makeHash(EICs, peakParams, withMobility, calcStats, assignRTWindow, sumWindowMZ, sumWindowMob)
+    hash <- makeHash(EICs, peakParams, IMS, calcStats, assignRTWindow, sumWindowMZ, sumWindowMob)
     cd <- loadCacheData("peaksEIC", hash, cacheDB)
     if (!is.null(cd))
         return(cd)
@@ -672,7 +672,7 @@ findPeaksInEICs <- function(EICs, peakParams, withMobility, calcStats, assignRTW
         peaks[, c("retmin", "retmax", "ret", "area", "intensity") := numeric()]
         if (calcStats)
             peaks[, c("mzmin", "mzmax", "mz", "mzBP") := numeric()]
-        if (withMobility)
+        if (IMS)
         {
             if (calcStats)
                 peaks[, c("mobmin", "mobmax") := numeric()]
@@ -726,7 +726,7 @@ findPeaksInEICs <- function(EICs, peakParams, withMobility, calcStats, assignRTW
         }, by = seq_len(nrow(peaks))]
         
         # NOTE: we could also set mobilities after checking if data is available, but then we need to repeat the EIC subsetting above
-        if (!withMobility)
+        if (!IMS)
             peaks[, c("mobmin", "mobmax", "mobility", "mobilityBP") := NULL]
     }
     

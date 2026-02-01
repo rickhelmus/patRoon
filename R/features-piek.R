@@ -581,7 +581,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams = getPiekEICParams(),
                 EICInfoBatch <- EICInfoBatch[EIC_ID %chin% names(EICs)] # omit missing
                 
                 maybePrintf("Finding peaks in remaining %d EICs... ", length(EICs))
-                peaks <- findPeaksInEICs(EICs, peakParams, withMobility = genEICParams$IMS, calcStats = TRUE,
+                peaks <- findPeaksInEICs(EICs, peakParams, IMS = genEICParams$IMS, calcStats = TRUE,
                                          assignRTWindow = assignRTWindow,
                                          sumWindowMZ = if (backend$getHaveIMS()) genEICParams$sumWindowMZ else 0,
                                          sumWindowMob = if (backend$getHaveIMS()) genEICParams$sumWindowMob else 0,

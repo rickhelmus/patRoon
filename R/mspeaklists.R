@@ -947,7 +947,7 @@ setMethod("spectrumSimilarityMobility", "MSPeakLists", function(obj, fGroups, do
 #' @aliases generateMSPeakLists,featureGroups-method
 #'
 #' @export
-setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRtWindow = defaultLim("retention", "narrow"),
+setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRTWindow = defaultLim("retention", "narrow"),
                                                            fixedIsolationWidth = FALSE, topMost = NULL,
                                                            avgFeatParams = getDefAvgPListParams(),
                                                            avgFGroupParams = getDefAvgPListParams())
@@ -955,7 +955,7 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRtWindo
     # UNDONE: FIW=NULL removed all MS1 spectra (no precursors) --> find other way to do this
     
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertNumber(maxMSRtWindow, lower = 0.01, finite = TRUE, null.ok = TRUE, add = ac)
+    checkmate::assertNumber(maxMSRTWindow, lower = 0.01, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assert(
         checkmate::checkFALSE(fixedIsolationWidth),
         checkmate::checkScalarNA(fixedIsolationWidth),
@@ -1023,7 +1023,7 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRtWindo
            length(analyses(fGroups)))
     featurePLs <- applyMSData(analysisInfo(fGroups), fTable, needTypes = if (needIMS) "ims" else c("ims", "centroid"), func = function(ana, path, backend, ft)
     {
-        baseHash <- makeHash(anaHashes[[ana]], maxMSRtWindow, fixedIsolationWidth, topMost, avgFeatParams)
+        baseHash <- makeHash(anaHashes[[ana]], maxMSRTWindow, fixedIsolationWidth, topMost, avgFeatParams)
         
         ft <- copy(ft)
         ft <- subsetDTColumnsIfPresent(ft, c("mz", "ret", "retmin", "retmax", "mobmin", "mobmax", "group"))
@@ -1046,10 +1046,10 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRtWindo
             return(cachedData)
         }
         
-        if (!is.null(maxMSRtWindow))
+        if (!is.null(maxMSRTWindow))
         {
-            ft[, retmin := pmax(retmin, ret - maxMSRtWindow)]
-            ft[, retmax := pmin(retmax, ret + maxMSRtWindow)]
+            ft[, retmin := pmax(retmin, ret - maxMSRTWindow)]
+            ft[, retmax := pmin(retmax, ret + maxMSRTWindow)]
         }
         for (col in c("mobmin", "mobmax"))
         {

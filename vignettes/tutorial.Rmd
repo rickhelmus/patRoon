@@ -257,7 +257,7 @@ The `generateMSPeakLists()` function will perform this action for us and will ge
 
 ```{r MSPeakLists}
 avgPListParams <- getDefAvgPListParams(clusterMzWindow = 0.002)
-mslists <- generateMSPeakLists(fGroups, "mzr", maxMSRtWindow = 5, precursorMzWindow = 4,
+mslists <- generateMSPeakLists(fGroups, "mzr", maxMSRTWindow = 5, precursorMzWindow = 4,
                               avgFeatParams = avgPListParams, avgFGroupParams = avgPListParams)
 ```
 

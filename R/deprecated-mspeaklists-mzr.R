@@ -198,7 +198,7 @@ averageSpectraMZR <- function(spectra, hd, clusterMzWindow, topMost, minIntensit
 #' @template main-rd-method
 #' @keywords internal
 #' @export
-setMethod("generateMSPeakListsMzR", "featureGroups", function(fGroups, maxMSRtWindow = 5,
+setMethod("generateMSPeakListsMzR", "featureGroups", function(fGroups, maxMSRTWindow = 5,
                                                               precursorMzWindow = 4, topMost = NULL,
                                                               avgFeatParams = getDefAvgPListParams(clusterMzWindow = 0.005),
                                                               avgFGroupParams = getDefAvgPListParams(clusterMzWindow = 0.005,
@@ -207,7 +207,7 @@ setMethod("generateMSPeakListsMzR", "featureGroups", function(fGroups, maxMSRtWi
     .Deprecated(old = "generateMSPeakListsMzR", new = "generateMSPeakLists")
     
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertNumber(maxMSRtWindow, lower = 1, finite = TRUE, null.ok = TRUE, add = ac)
+    checkmate::assertNumber(maxMSRTWindow, lower = 1, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertNumber(precursorMzWindow, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertCount(topMost, positive = TRUE, null.ok = TRUE, add = ac)
     assertAvgPListParams(avgFeatParams, add = ac)
@@ -227,7 +227,7 @@ setMethod("generateMSPeakListsMzR", "featureGroups", function(fGroups, maxMSRtWi
         return(MSPeakLists(algorithm = "mzr"))
 
     cacheDB <- openCacheDBScope()
-    setHash <- makeHash(fGroups, maxMSRtWindow, precursorMzWindow, topMost, avgFeatParams)
+    setHash <- makeHash(fGroups, maxMSRTWindow, precursorMzWindow, topMost, avgFeatParams)
     cachedSet <- loadCacheSet("MSPeakListsMzR", setHash, cacheDB)
     resultHashes <- vector("character", anaCount * gCount)
     resultHashCount <- 0
@@ -260,7 +260,7 @@ setMethod("generateMSPeakListsMzR", "featureGroups", function(fGroups, maxMSRtWi
         ana <- anaInfo$analysis[anai]
         spectra <- NULL
 
-        baseHash <- makeHash(ana, maxMSRtWindow, precursorMzWindow, topMost, avgFeatParams)
+        baseHash <- makeHash(ana, maxMSRTWindow, precursorMzWindow, topMost, avgFeatParams)
 
         printf("Loading all MS peak lists for %d feature groups in analysis '%s'...\n", gCount, ana)
         prog <- openProgBar(0, gCount)
@@ -292,8 +292,8 @@ setMethod("generateMSPeakListsMzR", "featureGroups", function(fGroups, maxMSRtWi
                 results <- list(plists = list(), metatadata = list())
 
                 rtRange <- c(ft$retmin, ft$retmax)
-                if (!is.null(maxMSRtWindow) && diff(rtRange) > maxMSRtWindow*2)
-                    rtRange <- c(max(rtRange[1], ft$ret - maxMSRtWindow), min(rtRange[2], ft$ret + maxMSRtWindow))
+                if (!is.null(maxMSRTWindow) && diff(rtRange) > maxMSRTWindow*2)
+                    rtRange <- c(max(rtRange[1], ft$ret - maxMSRTWindow), min(rtRange[2], ft$ret + maxMSRTWindow))
 
                 if (is.null(spectra))
                     spectra <- loadSpectra(filePaths[anai], verbose = FALSE)

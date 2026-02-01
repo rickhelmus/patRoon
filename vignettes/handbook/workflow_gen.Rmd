@@ -828,7 +828,7 @@ There are several common function arguments to `generateMSPeakLists()` that can 
 
 Argument                              | Remarks
 ------------------------------------- |  ----------------------------------------------------------------------
-`maxMSRtWindow`                       |  Maximum time window +/- the feature retention time (in seconds) to collect spectra for averaging. Higher values may increase processing times.
+`maxMSRTWindow`                       |  Maximum time window +/- the feature retention time (in seconds) to collect spectra for averaging. Higher values may increase processing times.
 `topMost`                             |  Only retain feature data for no more than this amount analyses with highest intensity. For instance, a value of _1_ will only keep peak lists for the feature with highest intensity in a feature group.  
 `avgFeatParams` and `avgFGroupParams` | Parameters that configure the averaging of feature and feature group peak lists, respectively (discussed below).
 `fixedIsolationWidth`                 |  Sets how For MS/MS spectra are selected: see below.

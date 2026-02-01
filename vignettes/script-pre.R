@@ -34,7 +34,7 @@ fGroups <- filter(fGroups, preAbsMinIntensity = 100, absMinIntensity = 10000, re
 
 # Retrieve MS peak lists
 avgMSListParams <- getDefAvgPListParams(clusterMzWindow = 0.005)
-mslists <- generateMSPeakLists(fGroups, "mzr", maxMSRtWindow = 5, precursorMzWindow = 4,
+mslists <- generateMSPeakLists(fGroups, "mzr", maxMSRTWindow = 5, precursorMzWindow = 4,
                                avgFeatParams = avgMSListParams,
                                avgFGroupParams = avgMSListParams)
 # Rule based filtering of MS peak lists. You may want to tweak this. See the manual for more information.

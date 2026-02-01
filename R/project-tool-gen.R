@@ -682,7 +682,7 @@ genScriptAnnBlock <- function(ionization, IMS, settingsAnn, adductArg, doSusps, 
     generator$addCall("avgMSListParams", "getDefAvgPListParams", list(name = "clusterMzWindow", value = defaultLim("mz", "narrow")))
     generator$addCall("mslists", "generateMSPeakLists", list(
         list(value = "fGroups"),
-        list(name = "maxMSRtWindow", value = defaultLim("retention", "narrow")),
+        list(name = "maxMSRTWindow", value = defaultLim("retention", "narrow")),
         list(name = "avgFeatParams", value = "avgMSListParams"),
         list(name = "avgFGroupParams", value = "avgMSListParams")
     ))

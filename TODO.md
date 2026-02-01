@@ -14,7 +14,6 @@
     - actually use TDF-SDK from patRoonExt
 - BUG: annSim.1 column (in formulas?)?
 - Harmonize/consistent names
-    - maxMSRtWindow --> maxMSRTWindow
     - be consistent in mobility vs IMS and mobilograms and EIMs
         - mobWindow and IMSWindow now randomly used
         - IMS arg but affects mobility features
@@ -347,6 +346,7 @@
     - removed `analysisInfo` argument from importFeatures()
     - added `table` import (importFeaturesTable() and importFeatureGroupsTable())
 - overWrite --> overwrite for consistency, applies to predictCheckFeaturesSession() and file conversion (clearly doc in NEWS)
+- maxMSRtWindow --> maxMSRTWindow for naming consistency, affects MSPL
 - plotChroms3D()
 - plotSpectrum() methods: normalization and showLegend
 - updateGroups()

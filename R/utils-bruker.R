@@ -516,17 +516,17 @@ generateDAEICsForPeakLists <- function(DA, ana, path, bgsubtr, MSMSType, gNames,
     return(list(MSEIC = MSEIC, MSMSEICs = MSMSEICs))
 }
 
-generateDASpecsForPeakLists <- function(DA, maxMSRtWindow, MSMSType, gNames, featInfo, DAEICs, DAFind)
+generateDASpecsForPeakLists <- function(DA, maxMSRTWindow, MSMSType, gNames, featInfo, DAEICs, DAFind)
 {
     chroms <- DA[["Analyses"]][[DAFind]][["Chromatograms"]]
     specs <- DA[["Analyses"]][[DAFind]][["Spectra"]]
 
     addSpectrum <- function(eic, grp, rt, rtmin, rtmax, mz, mtype)
     {
-        if (!is.null(maxMSRtWindow) && diff(c(rtmin, rtmax) * 2) > maxMSRtWindow*2)
+        if (!is.null(maxMSRTWindow) && diff(c(rtmin, rtmax) * 2) > maxMSRTWindow*2)
         {
-            rtmin <- max(rtmin, rt - maxMSRtWindow)
-            rtmax <- min(rtmax, rt + maxMSRtWindow)
+            rtmin <- max(rtmin, rt - maxMSRTWindow)
+            rtmax <- min(rtmax, rt + maxMSRTWindow)
         }
 
         chroms[[eic]]$ClearRangeSelections()

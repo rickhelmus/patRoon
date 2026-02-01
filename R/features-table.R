@@ -250,7 +250,7 @@ importFeaturesTable <- function(input, analysisInfo, addCols = NULL)
     fTable <- split(input, by = "analysis", keep.by = FALSE)
     fTable <- fTable[anasCommon] # subset and sync to anaInfo order
     
-    constArgs <- list(analysisInfo = analysisInfo, features = fTable, hasMobilities = hasMob)
+    constArgs <- list(analysisInfo = analysisInfo, features = fTable, hasIMS = hasMob)
     ret <- if (hasSets)
         do.call(featuresSet, c(constArgs, list(algorithm = "table-set")))
     else

@@ -35,7 +35,7 @@ setMethod("delete", "featuresXCMS", function(obj, i = NULL, j = NULL, ...)
     old <- obj
     obj <- callNextMethod()
     
-    if (!hasMobilities(obj))
+    if (!hasIMS(obj))
     {
         # simple ana subset
         if (is.null(j) && !setequal(analyses(old), analyses(obj)))

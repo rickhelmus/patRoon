@@ -51,7 +51,7 @@ setMethod("initialize", "featureGroupsXCMS3",
 #' @templateVar cl features
 #' @template main-rd-method
 #' @export
-setMethod("groupFeaturesXCMS3", "features", function(feat, rtalign = !hasMobilities(feat), loadRawData = TRUE,
+setMethod("groupFeaturesXCMS3", "features", function(feat, rtalign = !hasIMS(feat), loadRawData = TRUE,
                                                      groupParam = xcms::PeakDensityParam(sampleGroups = analysisInfo(feat)$replicate),
                                                      preGroupParam = groupParam,
                                                      retAlignParam = xcms::ObiwarpParam(), verbose = TRUE)
@@ -252,7 +252,7 @@ setMethod("delete", "featureGroupsXCMS3", function(obj, ...)
     old <- obj
     obj <- callNextMethod()
 
-    if (!hasMobilities(obj))
+    if (!hasIMS(obj))
     {
         if (length(old) > length(obj))
             obj@xdata <- xcms::filterFeatureDefinitions(obj@xdata, names(old) %chin% names(obj))

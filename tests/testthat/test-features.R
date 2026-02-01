@@ -113,8 +113,8 @@ test_that("piek", {
     expect_equal(ffPiekBins, withOpt(cache.mode="none",
                                      getPiekHRMS(getPiekEICParams(mzRange = c(200, 300)), EICBatchSize = 5E3)))
 
-    expect_true(hasMobilities(ffPiekBinsIMS))
-    expect_false(hasMobilities(ffPiekBins))
+    expect_true(hasIMS(ffPiekBinsIMS))
+    expect_false(hasIMS(ffPiekBins))
     expect_range(as.data.table(ffPiekBinsIMS)$mz, c(200, 300+0.02))
     expect_range(as.data.table(ffPiekBinsIMS)$mobility, c(0.6, 0.8+0.08)) # +0.08: bin width
     fgPiekSusp <- screenSuspects(groupFeatures(ffPiekSuspIMS, "greedy"), patRoonDataIMS::suspectsPos)

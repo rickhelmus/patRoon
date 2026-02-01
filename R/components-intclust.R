@@ -169,7 +169,7 @@ setMethod("generateComponentsIntClust", "featureGroups", function(fGroups, metho
 
     properties <- list(metric = metric, average = average)
     
-    doIMSSel <- IMS != "both" && hasMobilities(fGroups)
+    doIMSSel <- IMS != "both" && hasIMS(fGroups)
     fGroupsOrig <- NULL
     if (doIMSSel)
     {

@@ -152,7 +152,7 @@ setMethod("initialize", "featureGroups", function(.Object, ...)
 
 setMethod("clearMobilities", "featureGroups", function(obj)
 {
-    if (!hasMobilities(obj))
+    if (!hasIMS(obj))
         return(obj)
     
     obj@groupInfo <- removeDTColumnsIfPresent(groupInfo(obj), c("mobility", "CCS", "ims_parent_group"))
@@ -186,7 +186,7 @@ setMethod("length", "featureGroups", function(x) ncol(x@groups))
 
 #' @describeIn featureGroups Returns \code{TRUE} if the feature groups object has ion mobility information.
 #' @export
-setMethod("hasMobilities", "featureGroups", function(obj) hasMobilities(getFeatures(obj)))
+setMethod("hasIMS", "featureGroups", function(obj) hasIMS(getFeatures(obj)))
 
 #' @describeIn featureGroups Returns \code{TRUE} if the features were directly generated from IMS data.
 #' @export
@@ -200,7 +200,7 @@ setMethod("show", "featureGroups", function(object)
     fCount <- length(getFeatures(object)); gCount <- length(object)
     printf("Feature groups: %s (%d total)\n", getStrListWithMax(names(object), 6, ", "), gCount)
     printf("Features: %d (%.1f per group)\n", fCount, if (gCount > 0) fCount / gCount)
-    printf("Has IMS data: %s\n", if (hasMobilities(object)) "yes" else "no")
+    printf("Has IMS data: %s\n", if (hasIMS(object)) "yes" else "no")
     if (length(object) > 0)
     {
         printf("Has normalized intensities: %s\n", as.character(!is.null(featureTable(object)[[1]][["intensity_rel"]])))
@@ -688,7 +688,7 @@ setMethod("export", "featureGroups", function(obj, type, out, IMS = FALSE)
     assertIMSArg(IMS, add = ac)
     checkmate::reportAssertions(ac)
 
-    if (IMS != "both" && hasMobilities(obj))
+    if (IMS != "both" && hasIMS(obj))
     {
         if (!isFALSE(IMS))
             warning("Exporting mobility features is not supported; mobility data will not be exported.", call. = FALSE)
@@ -1238,7 +1238,7 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
         printf("Removed %d non-ubiquitous internal standards\n", sum(!fGroups@ISTDs$group %in% names(fGroupsWithISTD)))
         
         # don't include mobility features
-        if (hasMobilities(fGroups))
+        if (hasIMS(fGroups))
             fGroupsWithISTD <- selectIMSFilter(fGroupsWithISTD, "maybe", verbose = FALSE)
 
         fGroups@ISTDs <- fGroups@ISTDs[group %in% names(fGroupsWithISTD)]
@@ -1287,7 +1287,7 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
     }
     else if (featNorm == "tic")
     {
-        fGroupsInt <- if (hasMobilities(fGroups))
+        fGroupsInt <- if (hasIMS(fGroups))
             selectIMSFilter(fGroups, "maybe", verbose = FALSE) # exclude mobility features
         else
             fGroups
@@ -1343,7 +1343,7 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
     }
     
     # HACK: for mobility features we keep normalization equal to their parents
-    if (hasMobilities(fGroups))
+    if (hasIMS(fGroups))
     {
         updatedFeatures <- lapply(updatedFeatures, function(ft)
         {

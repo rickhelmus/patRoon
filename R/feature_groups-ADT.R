@@ -219,7 +219,7 @@ doFGAADTGroups <- function(fGroups, intColNames, average, averageBy, areas, addQ
     }
     
     ret[, c("group", "ret", "mz") := .(gNames, gInfo$ret, gInfo$mz)]
-    if (hasMobilities(fGroups))
+    if (hasIMS(fGroups))
     {
         cols <- intersect(c("mobility", "CCS", "ims_parent_group"), names(gInfo))
         ret[, (cols) := gInfo[, cols, with = FALSE]]
@@ -419,7 +419,7 @@ doFGAADTFeatures <- function(fGroups, fgTab, intColNames, average, averageBy, ad
         featTab <- unique(featTab, by = by)
     }
     
-    if (IMS %in% c("both", "maybe") && hasMobilities(fGroups))
+    if (IMS %in% c("both", "maybe") && hasIMS(fGroups))
     {
         fTabOrig <- featureTable(fGroupsOrig)
         

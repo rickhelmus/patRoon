@@ -77,7 +77,7 @@ setMethod("generateComponentsSpecClust", "featureGroups", function(fGroups, MSPe
     assertIMSArg(IMS, add = ac)
     checkmate::reportAssertions(ac)
     
-    doIMSSel <- IMS != "both" && hasMobilities(fGroups)
+    doIMSSel <- IMS != "both" && hasIMS(fGroups)
     fGroupsOrig <- NULL
     if (doIMSSel)
     {

@@ -314,7 +314,7 @@ filterFeatAnnConsensus <- function(obj, absMinAbundance, relMinAbundance, unique
 
 getMobFeatAnnSpecSims <- function(MSPeakLists, fGroups, minMobSpecSim, specSimParams, doFGroups = TRUE)
 {
-    if (length(MSPeakLists) == 0 || !hasMobilities(fGroups) || minMobSpecSim == 0)
+    if (length(MSPeakLists) == 0 || !hasIMS(fGroups) || minMobSpecSim == 0)
         return(NULL)
 
     mobSpecSims <- spectrumSimilarityMobility(MSPeakLists, fGroups, MSLevel = 2, warn = FALSE,

@@ -49,7 +49,7 @@ setMethod("initialize", "featureGroupsXCMS",
 #' @templateVar cl features
 #' @template main-rd-method
 #' @export
-setMethod("groupFeaturesXCMS", "features", function(feat, rtalign = !hasMobilities(feat), loadRawData = TRUE,
+setMethod("groupFeaturesXCMS", "features", function(feat, rtalign = !hasIMS(feat), loadRawData = TRUE,
                                                     groupArgs = list(mzwid = 0.015), 
                                                     retcorArgs = list(method = "obiwarp"), verbose = TRUE)
 {
@@ -233,7 +233,7 @@ setMethod("delete", "featureGroupsXCMS", function(obj, ...)
     old <- obj
     obj <- callNextMethod()
     
-    if (!hasMobilities(obj) && length(old) > length(obj))
+    if (!hasIMS(obj) && length(old) > length(obj))
     {
         keep <- names(old) %chin% names(obj)
         xcms::groups(obj@xs) <- xcms::groups(obj@xs)[keep, , drop = FALSE]

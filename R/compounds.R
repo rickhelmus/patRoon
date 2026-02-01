@@ -824,7 +824,7 @@ setMethod("assignMobilities", "compounds", function(obj, fGroups, IMS = TRUE, fr
     if (length(obj) == 0)
         return(obj)
     
-    if (IMS != "both" && hasMobilities(fGroups))
+    if (IMS != "both" && hasIMS(fGroups))
         fGroups <- selectIMSFilter(fGroups, IMS, verbose = FALSE)
     
     gInfo <- groupInfo(fGroups)
@@ -867,7 +867,7 @@ setMethod("assignMobilities", "compounds", function(obj, fGroups, IMS = TRUE, fr
     allTab[, CCS := selectFromSuspAdductCol(allTab, "CCS", adductChr, allTab$group, annotations(fGroups))]
     allTab[, c("mobility_mz", "CCS_mz") := .(mobility / mz, CCS / mz)]
     
-    if (hasMobilities(fGroups))
+    if (hasIMS(fGroups))
         allTab <- assignTabIMSDeviations(allTab, gInfo)
 
     allTabList <- split(allTab, by = "group")

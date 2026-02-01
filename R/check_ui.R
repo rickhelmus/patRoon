@@ -103,7 +103,7 @@ saveCheckSession <- function(session, path, fGroups, type)
     {
         gi <- gInfo[group == grp]
         li <- list(ret = gi$ret, mz = gi$mz, mobility = NA_real_)
-        if (hasMobilities(fGroups) && !is.null(gi[["mobility"]]))
+        if (hasIMS(fGroups) && !is.null(gi[["mobility"]]))
             li$mobility <- gi$mobility
         return(li)
     }, simplify = FALSE)
@@ -118,13 +118,13 @@ importCheckUISessionGroups <- function(oldSession, fGroups, rtWindow, mzWindow, 
 
     oldGroupTab <- rbindlist(oldSession$featureGroups, idcol = "group")
     
-    if (hasMobilities(fGroups) != "mobility" %in% names(oldGroupTab))
+    if (hasIMS(fGroups) != "mobility" %in% names(oldGroupTab))
     {
         warning("The current feature groups or the ones in the session file lack ion mobility information! ",
                 "Matching will be done without considering ion mobility.", call. = FALSE)
     }
     
-    hasMobilityData <- hasMobilities(fGroups) && "mobility" %in% names(oldGroupTab)
+    hasMobilityData <- hasIMS(fGroups) && "mobility" %in% names(oldGroupTab)
 
     warnTol <- FALSE
     newGroups <- setNames(lapply(split(oldGroupTab, seq_len(nrow(oldGroupTab))), function(ogtr)

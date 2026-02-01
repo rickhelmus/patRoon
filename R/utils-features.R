@@ -55,7 +55,7 @@ doSubsetFeaturesByAna <- function(obj, i, ..., reorder, env)
 setMethod("doGroupFeatures", "features", function(feat, grouper, groupAlgo, ..., verbose)
 {
     # UNDONE: disabled: groupFeaturesIMS() doesn't really work...
-    # if (!hasMobilities(feat))
+    # if (!hasIMS(feat))
     #     return(grouper(feat, ..., verbose = verbose))
     # return(groupFeaturesIMS(feat, grouper, groupAlgo, ..., mobWindow = mobWindow, verbose = verbose))
     return(grouper(feat, ..., verbose = verbose))
@@ -164,7 +164,7 @@ doFGroupsFilter <- function(fGroups, what, hashParam, func, cacheCateg = what, a
         ret <- if (length(fGroups) > 0) func(fGroups) else NULL
         if (!is.null(ret))
         {
-            if (applyIMS != "both" && hasMobilities(fGroups))
+            if (applyIMS != "both" && hasIMS(fGroups))
             {
                 # only remove mobility features/feature groups or their parents
                 gInfoKeep <- groupInfo(fGroups)
@@ -311,14 +311,14 @@ filterEIXs <- function(EIXs, fGroups, analysis = NULL, groupName = NULL, topMost
     return(pruneList(EIXs, checkEmptyElements = TRUE, keepAttr = TRUE))
 }
 
-extendEIXInputTab <- function(tab, type, EIXParams, hasMobilities, fromIMS)
+extendEIXInputTab <- function(tab, type, EIXParams, hasIMS, fromIMS)
 {
     tab <- copy(tab)
     if (type == "EIC")
         tab[, c("retmin", "retmax") := .(retmin - EIXParams$window, retmax + EIXParams$window)]
     else # "EIM"
         tab[, c("mobmin", "mobmax") := .(mobmin - EIXParams$window, mobmax + EIXParams$window)]
-    if (hasMobilities && !fromIMS)
+    if (hasIMS && !fromIMS)
         tab[, c("mzmin", "mzmax") := .(mzmin - EIXParams$mzExpmobWindow, mzmax + EIXParams$mzExpmobWindow)]
     return(tab)
 }
@@ -355,7 +355,7 @@ setMethod("getFeatureEIXInputTab", "features", function(obj, type, EIXParams, se
         }
         
         tab[, ret := NULL]
-        tab <- extendEIXInputTab(tab, type, EIXParams, hasMobilities(obj), fromIMS(obj))
+        tab <- extendEIXInputTab(tab, type, EIXParams, hasIMS(obj), fromIMS(obj))
 
         return(tab)
     }))
@@ -433,7 +433,7 @@ setMethod("getFeatureEIXInputTab", "featureGroups", function(obj, type, analysis
         }
         
         ret[, ret := NULL]
-        ret <- extendEIXInputTab(ret, type, EIXParams, hasMobilities(obj), fromIMS(obj))
+        ret <- extendEIXInputTab(ret, type, EIXParams, hasIMS(obj), fromIMS(obj))
         
         return(ret)
     }, simplify = FALSE))
@@ -518,7 +518,7 @@ calcFeatureConcs <- function(fGroups, resp, areas)
     # get concentration data from response factors
     
     gt <- groupTable(fGroups, areas = areas)[, resp$group, with = FALSE]
-    if (hasMobilities(fGroups))
+    if (hasIMS(fGroups))
     {
         # for mobility features, we take parent intensities (if available) as mobility filtering may lead to reduced
         # intensities that currently are not taken into account when calculating response factors

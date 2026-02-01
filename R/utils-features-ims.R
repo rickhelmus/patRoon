@@ -7,13 +7,13 @@ countMobilityFeatures <- function(feat) sum(sapply(featureTable(feat), function(
 
 checkUnsupportedIMS <- function(feat, algorithm)
 {
-    if (hasMobilities(feat))
+    if (hasIMS(feat))
         stop(sprintf("The '%s' algorithm does not support ion mobility data", algorithm), call. = FALSE)
 }
 
 checkAssignedMobilityFGroups <- function(fGroups)
 {
-    if (hasMobilities(fGroups))
+    if (hasIMS(fGroups))
     {
         if (all(!is.na(groupInfo(fGroups)$mobility)))
             stop("There are no feature groups without mobility assignments available for which mobility features can be assigned.", call. = FALSE)
@@ -112,7 +112,7 @@ assignFeatureMobilitiesPeaks <- function(features, peakParams, EIMParams, parall
     features@features <- Map(featureTable(features), peaksList, f = doAssignFeatureMobilities)
     printf("Assigned %d mobility features.\n", countMobilityFeatures(features) - oldCount)
     
-    features@hasMobilities <- TRUE
+    features@hasIMS <- TRUE
     
     saveCacheData("assignFeatureMobilitiesPeaks", features, hash)
     
@@ -369,7 +369,7 @@ updateFGroupsForMobilities <- function(fGroups, mobWindow, sets)
 
 assignFGroupsCCS <- function(fGroups, CCSParams)
 {
-    if (!hasMobilities(fGroups))
+    if (!hasIMS(fGroups))
         stop("Cannot calculate CCS values: feature groups are without mobility assignments", call. = FALSE)
     
     # HACK: may be do some polymorhic things some day...
@@ -411,7 +411,7 @@ assignFGroupsCCS <- function(fGroups, CCSParams)
 # similar to selectIMSFilter(), but for features
 selectIMSFilterFeatures <- function(features, IMS)
 {
-    if (IMS == "both" || !hasMobilities(features))
+    if (IMS == "both" || !hasIMS(features))
         return(features)
     
     features <- delete(features, j = function(fl, ...)

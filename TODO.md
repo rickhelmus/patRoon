@@ -15,7 +15,6 @@
 - BUG: annSim.1 column (in formulas?)?
 - Harmonize/consistent names
     - be consistent in mobility vs IMS and mobilograms and EIMs
-        - hasMobilities
     - mob_area/mob_intensity vs mobmin/mobmax
     - better names for ims_parent_ID/ims_parent_group?
 - See why parallel reporting is so slow (on Windows?)
@@ -23,7 +22,7 @@
 - MSTK: PR for centroid status buf for mzXML?
 - check why metfusion is still defaulted --> recreate sysdata.rda?
     - do so after rebase
-
+- remove rtalign=hasIMS() defaults
 
 ## Maybe
 
@@ -303,7 +302,7 @@
     - SAFD: fileType replaces profPath argument, new prefCentroid arg, use of msdata, IMS'ish support
     - patRoon.checkCentroided option removed (not needed anymore, checks are faster now and part of regular reading operations)
 - IMS
-    - hasMobilities and other slots for features
+    - hasIMS and other slots for features
     - Dietrich features
     - groupInfo is now a DT
     - FIXED: suspect list assertion only checked part of the columns

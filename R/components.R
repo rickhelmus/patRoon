@@ -256,7 +256,7 @@ setMethod("expandForIMS", "components", function(obj, fGroups)
     
     checkmate::assertClass(fGroups, "featureGroups")
     
-    if (!hasMobilities(fGroups))
+    if (!hasIMS(fGroups))
         stop("No mobilities are assigned!", call. = FALSE)
     
     gInfo <- groupInfo(fGroups)

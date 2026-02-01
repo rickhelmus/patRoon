@@ -854,7 +854,7 @@ setMethod("spectrumSimilarityMobility", "MSPeakLists", function(obj, fGroups, do
     checkmate::assertClass(fGroups, "featureGroups")
     aapply(checkmate::assertFlag, . ~ doFGroups + warn)
     
-    if (!hasMobilities(fGroups))
+    if (!hasIMS(fGroups))
         stop("No mobility data available in feature groups.", call. = FALSE)
     
     gInfo <- groupInfo(fGroups)
@@ -1016,7 +1016,7 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRTWindo
     fTable <- featureTable(fGroups)
     gNames <- names(fGroups)
     cacheDB <- openCacheDBScope()
-    needIMS <- hasMobilities(fGroups)
+    needIMS <- hasIMS(fGroups)
     anaHashes <- getMSFileHashesFromAvailBackend(analysisInfo(fGroups), needTypes = if (needIMS) "ims" else c("ims", "centroid"))
     
     printf("Loading all MS peak lists for %d feature groups and %d analyses...\n", length(fGroups),

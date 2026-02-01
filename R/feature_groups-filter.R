@@ -333,7 +333,7 @@ replicateFilter <- function(fGroups, replicates, negate = FALSE, applyIMS = "bot
 
 selectIMSFilter <- function(fGroups, IMS, negate = FALSE, applyIMS = "both", verbose = TRUE, warn = TRUE)
 {
-    if (!hasMobilities(fGroups))
+    if (!hasIMS(fGroups))
     {
         if (warn)
             warning("Cannot apply ims filter: no mobilities assigned", call. = FALSE)
@@ -374,7 +374,7 @@ selectIMSFilter <- function(fGroups, IMS, negate = FALSE, applyIMS = "both", ver
 
 IMSRangeFilter <- function(fGroups, IMSRangeParams, negate, applyIMS = TRUE)
 {
-    if (!hasMobilities(fGroups))
+    if (!hasIMS(fGroups))
         stop("Cannot apply IMS Range filter: no mobilities assigned", call. = FALSE)
 
     gInfo <- groupInfo(fGroups)
@@ -684,7 +684,7 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
     assertApplyIMSArg(applyIMS, add = ac)
     checkmate::reportAssertions(ac)
 
-    if (!hasMobilities(obj))
+    if (!hasIMS(obj))
     {
         if (isTRUE(applyIMS))
             stop("applyIMS == TRUE while no mobilities are assigned", call. = FALSE)

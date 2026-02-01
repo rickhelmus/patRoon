@@ -274,7 +274,7 @@ assignFeatureMobilitiesSuspects <- function(features, scr, mobWindow, selectFunc
     
     printf("Assigned %d mobility features.\n", countMobilityFeatures(features) - oldCount)
     
-    features@hasMobilities <- TRUE
+    features@hasIMS <- TRUE
     
     return(features)
 }
@@ -453,7 +453,7 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, IMSMatchPara
         ret <- rbindlist(retlist, fill = TRUE)
         setcolorder(ret, "name")
         
-        if (hasMobilities(fGroups))
+        if (hasIMS(fGroups))
             ret <- finalizeScreenInfoForIMS(ret, gInfo, IMSMatchParams)
         
         setTxtProgressBar(prog, nrow(suspects))
@@ -543,7 +543,7 @@ doSuspectFilter <- function(obj, onlyHits, IMSMatchParams, selectHitsBy, selectB
                             maxCompRank, minAnnSimForm, minAnnSimComp, minAnnSimBoth, absMinFragMatches,
                             relMinFragMatches, minRF, maxLC50, negate, applyIMS)
 {
-    if (!is.null(IMSMatchParams) && !hasMobilities(obj))
+    if (!is.null(IMSMatchParams) && !hasIMS(obj))
         stop("Cannot apply IMS match filter: no feature mobility data available", call. = FALSE)
 
     if (nrow(screenInfo(obj)) > 0)
@@ -644,7 +644,7 @@ doSuspectFilter <- function(obj, onlyHits, IMSMatchParams, selectHitsBy, selectB
                 filteredSI <- doSelectFilter(filteredSI, "level", "group")
         }
         
-        if (applyIMS != "both" && hasMobilities(obj))
+        if (applyIMS != "both" && hasIMS(obj))
         {
             origSI <- screenInfo(obj)
             rowsRM <- setdiff(seq_len(nrow(origSI)), filteredSI$rowID)

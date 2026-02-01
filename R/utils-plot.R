@@ -4,7 +4,7 @@
 
 prepIMSFGroupsForPlot <- function(fGroups, IMS)
 {
-    if (is.null(IMS) || length(fGroups) == 0 || !hasMobilities(fGroups))
+    if (is.null(IMS) || length(fGroups) == 0 || !hasIMS(fGroups))
         return(fGroups)
     
     ret <- selectIMSFilter(fGroups, IMS = IMS, verbose = FALSE)

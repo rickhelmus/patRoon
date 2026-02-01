@@ -63,9 +63,9 @@ doMakeFeaturesSet <- function(featuresList, adducts)
     # combine (neutralized) features
     combFeatures <- Reduce(modifyList, lapply(neutralizedFeatures, featureTable))
     
-    hasMob <- if (length(featuresList) > 0) any(sapply(featuresList, hasMobilities)) else FALSE
+    hasMob <- if (length(featuresList) > 0) any(sapply(featuresList, hasIMS)) else FALSE
     
-    return(featuresSet(features = combFeatures, analysisInfo = combAnaInfo, hasMobilities = hasMob,
+    return(featuresSet(features = combFeatures, analysisInfo = combAnaInfo, hasIMS = hasMob,
                        algorithm = makeSetAlgorithm(featuresList)))
 }
 
@@ -214,5 +214,5 @@ setMethod("unset", "featuresSet", function(obj, set)
     anaInfo <- copy(analysisInfo(obj))
     anaInfo[, set := NULL]
     return(featuresUnset(features = ionizedFTable, analysisInfo = anaInfo, algorithm = paste0(algorithm(obj), "_unset"),
-                         hasMobilities = hasMobilities(obj)))
+                         hasIMS = hasIMS(obj)))
 })

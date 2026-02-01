@@ -77,7 +77,7 @@ setMethod("delete", "featuresKPIC2", function(obj, i = NULL, j = NULL, ...)
     old <- obj
     obj <- callNextMethod()
 
-    if (!hasMobilities(obj))
+    if (!hasIMS(obj))
     {
         # simple ana subset
         if (is.null(j) && !setequal(analyses(old), analyses(obj)))
@@ -248,7 +248,7 @@ setMethod("getPICSet", "features", function(obj, loadRawData = TRUE, IMS = FALSE
     assertIMSArg(IMS)
     assertEICParams(EICParams)
     
-    if (IMS != "both" && hasMobilities(obj))
+    if (IMS != "both" && hasIMS(obj))
         obj <- selectIMSFilterFeatures(obj, IMS)
     
     anaInfo <- analysisInfo(obj)
@@ -313,7 +313,7 @@ setMethod("getPICSet", "features", function(obj, loadRawData = TRUE, IMS = FALSE
 #' @export
 setMethod("getPICSet", "featuresKPIC2", function(obj, ...)
 {
-    if (hasMobilities(obj))
+    if (hasIMS(obj))
         return(callNextMethod())
     return(unname(obj@picsList))
 })

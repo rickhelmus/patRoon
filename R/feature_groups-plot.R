@@ -747,7 +747,7 @@ setMethod("plotChroms3D", "featureGroups", function(obj, analysis = analyses(obj
     checkmate::assertCount(gridSize, positive = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
-    if (!hasMobilities(obj) && dim3 == "mobility")
+    if (!hasIMS(obj) && dim3 == "mobility")
         stop("There are no mobilities assigned to features.", call. = FALSE)
     
     if (length(obj) == 0)
@@ -865,7 +865,7 @@ setMethod("plotMobilograms", "featureGroups", function(obj, analysis = analyses(
     assertEIMParams(EIMParams, add = ac)
     checkmate::reportAssertions(ac)
     
-    if (!hasMobilities(obj))
+    if (!hasIMS(obj))
         stop("There are no mobilities assigned to features.", call. = FALSE)
     
     if (is.null(EIMs))

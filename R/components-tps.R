@@ -179,7 +179,7 @@ mergeTPComponCandidatesTab <- function(compTab)
 doGenComponentsTPs <- function(fGroups, fGroupsTPs, TPs, MSPeakLists, formulas, compounds, ignoreParents, minRTDiff,
                                specSimParams, IMS)
 {
-    doIMSSel <- IMS != "both" && hasMobilities(fGroups)
+    doIMSSel <- IMS != "both" && hasIMS(fGroups)
     fGroupsTPsOrig <- NULL
     if (doIMSSel)
     {

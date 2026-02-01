@@ -520,7 +520,7 @@ setGeneric("featureTable", function(obj, ...) standardGeneric("featureTable"))
 #' @template generics
 setGeneric("filter", function(obj, ...) standardGeneric("filter"))
 
-#' @templateVar func hasMobilities
+#' @templateVar func fromIMS
 #' @templateVar desc returns \code{TRUE} if the object was directly created from IMS data.
 #' @template generics
 setGeneric("fromIMS", function(obj) standardGeneric("fromIMS"))
@@ -555,10 +555,10 @@ setGeneric("getTICs", function(obj, ...) standardGeneric("getTICs"))
 #' @template generics
 setGeneric("groupNames", function(obj) standardGeneric("groupNames"))
 
-#' @templateVar func hasMobilities
+#' @templateVar func hasIMS
 #' @templateVar desc returns \code{TRUE} if the object has ion mobility values
 #' @template generics
-setGeneric("hasMobilities", function(obj) standardGeneric("hasMobilities"))
+setGeneric("hasIMS", function(obj) standardGeneric("hasIMS"))
 
 #' @templateVar func plotBPCs
 #' @templateVar desc plots base peak chromatogram(s).

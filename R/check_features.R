@@ -203,7 +203,7 @@ checkFeaturesInterface$methods(
         {
             fData[, c("ret", "mz") := .(feat$ret / divret, feat$mz)]
             for (col in c("mobility", "CCS"))
-            if (hasMobilities(fGroups))
+            if (hasIMS(fGroups))
             {
                 if (!is.null(feat[[col]]))
                     fData[, (col) := feat[[col]]]
@@ -247,7 +247,7 @@ checkFeaturesInterface$methods(
         observeEvent(input$fGroupPlotMode, {
             for (type in c("EIC", "EIM"))
             {
-                if (type == "EIM" && !hasMobilities(fGroups))
+                if (type == "EIM" && !hasIMS(fGroups))
                     next
                 if ((input$fGroupPlotMode == "topMostByReplicate" && length(.self[[type]]$topMostRep) == 0) ||
                     (input$fGroupPlotMode == "all" && length(.self[[type]]$all) == 0))
@@ -278,7 +278,7 @@ checkFeaturesInterface$methods(
     
     plotMain = function(input, rValues)
     {
-        doEIM <- hasMobilities(fGroups)
+        doEIM <- hasIMS(fGroups)
         
         getEIX <- function(type)
         {
@@ -448,7 +448,7 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, EICParams
     }
     
     EIC <- prepEIXs("EIC", EICParams)
-    EIM <- if (hasMobilities(fGroups)) prepEIXs("EIM", EIMParams) else list() # UNDONE: also get EIMs if there is IMS raw data?
+    EIM <- if (hasIMS(fGroups)) prepEIXs("EIM", EIMParams) else list() # UNDONE: also get EIMs if there is IMS raw data?
 
     curSession <- NULL
     if (file.exists(session))

@@ -67,8 +67,8 @@ test_that("assignMobilities", {
     fgAMSum <- doAssignMobs(fgIMS, calcArea = "sum")
     fgAMNoEIC <- doAssignMobs(fgIMS, fallbackEIC = FALSE)
     
-    expect_true(hasMobilities(fgAMInt))
-    expect_true(hasMobilities(fgAMEmpty))
+    expect_true(hasIMS(fgAMInt))
+    expect_true(hasIMS(fgAMEmpty))
     checkmate::expect_names(names(groupInfo(fgAMInt)), must.include = c("mobility", "CCS", "ims_parent_group"))
     checkmate::expect_names(names(featureTable(fgAMInt)[[1]]),
                             must.include = c(getMobilityCols(), "CCS", "mob_assign_method", "mob_reintegr_method",
@@ -362,7 +362,7 @@ test_that("importFeatureGroupsTable works", {
     adtImp <- as.data.table(fgImp, features = TRUE)
     # export/import cycle may change ordering, not really interesting so just ignore this column
     adtImp[, c("mobility_collapsed", "CCS_collapsed") := NULL]
-    expect_true(hasMobilities(fgImp))
+    expect_true(hasIMS(fgImp))
     expect_true(isFGSet(fgImp))
     expect_equal(adtImp, as.data.table(fgAMInt, features = TRUE)[, names(adtImp), with = FALSE])
     expect_equal(annotations(fgImp), annotations(fgAMInt))
@@ -518,7 +518,7 @@ test_that("IMS subset and filtering", {
     
     expect_setequal(names(fgAMInt[IMS = TRUE]), groupInfo(fgAMInt)[!is.na(mobility)]$group)
     expect_setequal(names(fgAMInt[IMS = FALSE]), groupInfo(fgAMInt)[is.na(mobility)]$group)
-    expect_false(hasMobilities(fgAMInt[IMS = FALSE]))
+    expect_false(hasIMS(fgAMInt[IMS = FALSE]))
     checkmate::expect_names(names(groupInfo(fgAMInt[IMS = FALSE])), disjunct.from = c("mobility", "CCS", "ims_parent_group"))
     checkmate::expect_names(names(featureTable(fgAMInt[IMS = FALSE])[[1]]),
                             disjunct.from = c(getMobilityCols(), "CCS", "mob_assign_method", "mob_reintegr_method",
@@ -631,8 +631,8 @@ test_that("verify feature group comparison", {
     expect_length(fgCompOneEmpty, 2)
     expect_length(fgCompBothEmpty, 2)
     
-    expect_false(hasMobilities(fGCompOpenMS@comparedFGroups))
-    expect_true(hasMobilities(comparison(fgIMS, fgAMInt, groupAlgo = "greedy")@comparedFGroups))
+    expect_false(hasIMS(fGCompOpenMS@comparedFGroups))
+    expect_true(hasIMS(comparison(fgIMS, fgAMInt, groupAlgo = "greedy")@comparedFGroups))
 })
 
 subFGroups <- fgOpenMS[, 1:25]
@@ -914,5 +914,5 @@ test_that("set unsupported functionality", {
     fGConsIMSNS <- consensus(fGCompIMSNS)
     expect_length(fGConsIMSNS[IMS = TRUE], length(fgAMIntNS[IMS = TRUE]))
     expect_length(fGConsIMSNS[IMS = FALSE], length(fgIMSNS))
-    expect_true(hasMobilities(fGConsIMSNS))
+    expect_true(hasIMS(fGConsIMSNS))
 })

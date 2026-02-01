@@ -21,7 +21,7 @@ getFGReactTab <- function(objects, settings, ...)
         tab[, chrom_small := group]
     if (settings$features$chromatograms$large)
         tab[, chrom_large := group]
-    if (hasMobilities(objects$fGroups))
+    if (hasIMS(objects$fGroups))
     {
         if (settings$features$mobilograms$small)
             tab[, mob_small := group]
@@ -140,7 +140,7 @@ genHTMLReportPlotsMobilogramLarge <- function(grp, fGroups, settings, outPath, E
 {
     gInfo <- groupInfo(fGroups)
     
-    if (!settings$features$mobilograms$large || !hasMobilities(fGroups))
+    if (!settings$features$mobilograms$large || !hasIMS(fGroups))
         return("")
     
     makeHTMLReportPlot("mobilogram_large-", outPath, "plotMobilograms",
@@ -154,7 +154,7 @@ genHTMLReportPlotsMobilogramSmall <- function(grp, fGroups, settings, outPath, E
 {
     gInfo <- groupInfo(fGroups)
     
-    if (!settings$features$mobilograms$small || !hasMobilities(fGroups))
+    if (!settings$features$mobilograms$small || !hasIMS(fGroups))
         return("")
     
     makeHTMLReportPlot("mobilogram_small-", outPath, "plotMobilograms",
@@ -168,7 +168,7 @@ genHTMLReportPlotsMobilogramSmall <- function(grp, fGroups, settings, outPath, E
 
 genHTMLReportPlotsMobilogramsFeatures <- function(grp, fGroups, settings, outPath, EIMs, EIMParams)
 {
-    if (isFALSE(settings$features$mobilograms$features) || !hasMobilities(fGroups))
+    if (isFALSE(settings$features$mobilograms$features) || !hasIMS(fGroups))
         return("")
     
     anas <- analyses(fGroups)
@@ -228,7 +228,7 @@ makeSuspInfoPropTab <- function(tab, id, retMin)
 reportHTMLUtils$methods(
     makeMainResultsFGReactable = function(..., groupMob = TRUE)
     {
-        groupMob <- groupMob && hasMobilities(objects$fGroups) && any(!is.na(groupInfo(objects$fGroups)$ims_parent_group))
+        groupMob <- groupMob && hasIMS(objects$fGroups) && any(!is.na(groupInfo(objects$fGroups)$ims_parent_group))
         makeMainResultsReactable(..., retMin = settings$features$retMin,
                                  groupBy = if (groupMob) "ims_parent_group", defaultExpanded = groupMob)
     },
@@ -380,7 +380,7 @@ reportHTMLUtils$methods(
             colDefs$chromatogram <- reactable::colDef(minWidth = 175, cell = makeReactCellFeatChromMob("chroms"),
                                                       html = TRUE)
         }
-        if (!isFALSE(settings$features$mobilograms$features) && hasMobilities(objects$fGroups))
+        if (!isFALSE(settings$features$mobilograms$features) && hasIMS(objects$fGroups))
         {
             # add EIMs
             tab[, mobilogram := ""] # dummy value, not needed
@@ -477,7 +477,7 @@ reportHTMLUtils$methods(
     
     makeFGToolbar = function(tableID, groupMob)
     {
-        hasMob <- hasMobilities(objects$fGroups)
+        hasMob <- hasIMS(objects$fGroups)
         gb <- if (hasMob && groupMob && any(!is.na(groupInfo(objects$fGroups)$ims_parent_group)))
         {
             list(

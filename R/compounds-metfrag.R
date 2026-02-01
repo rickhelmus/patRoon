@@ -791,7 +791,7 @@ setMethod("generateCompoundsMetFrag", "featureGroups", function(fGroups, MSPeakL
         results <- results[sapply(results, function(r) !is.null(r$comptab) && nrow(r$comptab) > 0, USE.NAMES = FALSE)]
     
     # add CCS properties if possible
-    hasMobs <- hasMobilities(fGroups) && any(sapply(results, \(r) !is.null(r$comptab[["CCS"]])))
+    hasMobs <- hasIMS(fGroups) && any(sapply(results, \(r) !is.null(r$comptab[["CCS"]])))
     if (hasMobs)
     {
         results <- Map(names(results), results, f = function(grp, res)

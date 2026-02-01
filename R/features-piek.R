@@ -703,7 +703,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams = getPiekEICParams(),
         printFeatStats(fList)
     }
     
-    return(featuresPiek(analysisInfo = analysisInfo, features = fList, hasMobilities = genEICParams$IMS,
+    return(featuresPiek(analysisInfo = analysisInfo, features = fList, hasIMS = genEICParams$IMS,
                         fromIMS = genEICParams$IMS, mzProfiles = mzProfiles, EIMs = EIMs))
 }
 

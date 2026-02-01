@@ -192,7 +192,7 @@ importFeatureGroupsTable <- function(input, analysisInfo, addCols = NULL, groupA
     setnames(gInfo, gInfoNumColsPrefix, gInfoNumCols, skip_absent = TRUE)
     setcolorder(gInfo, "CCS", after = last(names(gInfo)), skip_absent = TRUE) # put CCS at the end of the table
     
-    if (hasMobilities(importedFeat) && is.null(gInfo[["ims_parent_group"]]))
+    if (hasIMS(importedFeat) && is.null(gInfo[["ims_parent_group"]]))
         gInfo[, ims_parent_group := NA_character_]
     
     gTable <- data.table(matrix(0, nrow = nrow(analysisInfo), ncol = nrow(gInfo)))

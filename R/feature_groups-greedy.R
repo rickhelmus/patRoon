@@ -83,7 +83,7 @@ doGroupFeaturesGreedy <- function(feat, rtWindow, mzWindow, mobWindow, scoreWeig
         return(cd)
     
     anaInfo <- analysisInfo(feat)
-    hasMob <- hasMobilities(feat)
+    hasMob <- hasIMS(feat)
     sqeps <- sqrt(.Machine$double.eps) # cache for numLTE below
     
     fTable <- as.data.table(feat)

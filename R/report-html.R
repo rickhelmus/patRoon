@@ -280,7 +280,7 @@ doReportHTML <- function(fGroups, MSPeakLists, formulas, compounds, compsCluster
     cat("Done!\n")
 
     EIMs <- NULL
-    if (hasMobilities(fGroups))
+    if (hasIMS(fGroups))
     {
         cat("Loading all EIMs... ")
         EIMParamsForLoading <- EIMParams

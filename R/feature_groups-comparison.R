@@ -154,7 +154,7 @@ convertFGroupsToPseudoFeatures <- function(fGroupsList)
         # dummy area
         ft[, area := intensity * 2.5]
         
-        if (hasMobilities(fGroupsList[[fgi]]))
+        if (hasIMS(fGroupsList[[fgi]]))
         {
             ft[, mobility := gi$mobility]
             ft[, mobmin := mobility - 0.05]
@@ -169,7 +169,7 @@ convertFGroupsToPseudoFeatures <- function(fGroupsList)
 
     anaInfo <- data.table(analysis = fGNames, replicate = fGNames, blank = "", path = ".")
 
-    return(featuresFromFeatGroups(features = flist, analysisInfo = anaInfo, hasMobilities = hasM))
+    return(featuresFromFeatGroups(features = flist, analysisInfo = anaInfo, hasIMS = hasM))
 }
 
 groupPseudoFeatures <- function(pf, groupAlgo, groupArgs)
@@ -228,10 +228,10 @@ setMethod("comparison", "featureGroups", function(..., groupAlgo, groupArgs = li
     return(featureGroupsComparison(fGroupsList = fGroupsList, comparedFGroups = compGroups))
 })
 
-#' @details \code{hasMobilities} returns \code{TRUE} if the object has ion mobility information.
+#' @details \code{hasIMS} returns \code{TRUE} if the object has ion mobility information.
 #' @rdname featureGroups-compare
 #' @export
-setMethod("hasMobilities", "featureGroupsComparison", function(obj) return(hasMobilities(obj@comparedFGroups)))
+setMethod("hasIMS", "featureGroupsComparison", function(obj) return(hasIMS(obj@comparedFGroups)))
 
 #' @details \code{plot} generates an \emph{m/z} \emph{vs} retention time plot.
 #' @param retMin If \code{TRUE} retention times are plotted as minutes (seconds otherwise).
@@ -381,7 +381,7 @@ setMethod("consensus", "featureGroupsComparison", function(obj, absMinAbundance 
             ret[, ID := as.character(seq_len(nrow(ret)))]
 
             colsToAvg <- c("ret", "mz", "area", "retmin", "retmax", "mzmin", "mzmax", "intensity")
-            if (hasMobilities(obj) && all(c("mobility.x", "mobility.y") %in% colnames(ret)))
+            if (hasIMS(obj) && all(c("mobility.x", "mobility.y") %in% colnames(ret)))
                 colsToAvg <- c(colsToAvg, "mobility", "mobmin", "mobmax", if (!is.null(ret[["CCS"]])) "CCS")
 
             for (col in colsToAvg)
@@ -397,7 +397,7 @@ setMethod("consensus", "featureGroupsComparison", function(obj, absMinAbundance 
     allAlgos <- paste0(sapply(fGroupsList, algorithm), collapse = ",")
 
     retFeatures <- featuresConsensus(features = consFeatures, analysisInfo = anaInfo,
-                                     algorithm = allAlgos, hasMobilities = hasMobilities(comparedFGroups))
+                                     algorithm = allAlgos, hasIMS = hasIMS(comparedFGroups))
 
     if (nrow(compFeatInds) == 0) # all input were empty feature groups
         return(featureGroupsConsensus(groups = data.table(), groupInfo = data.table(), features = retFeatures,

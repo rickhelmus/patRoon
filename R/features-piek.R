@@ -683,15 +683,17 @@ findFeaturesPiek <- function(analysisInfo, genEICParams = getPiekEICParams(),
         fList <- fList[analysisInfo$analysis] # put original order
         if (genEICParams$saveMZProfiles)
         {
-            cachedMZProfiles <- pruneList(loadCacheData("featuresPiekMZProfiles", names(cachedData),
+            cachedMZProfiles <- pruneList(loadCacheData("featuresPiekMZProfiles", anaHashes[names(cachedData)],
                                                         simplify = FALSE, dbArg = cacheDB))
+            names(cachedMZProfiles) <- names(cachedData)
             mzProfiles <- c(mzProfiles, cachedMZProfiles)
             mzProfiles <- mzProfiles[analysisInfo$analysis]
         }
         if (genEICParams$saveEIMs)
         {
-            cachedEIMs <- pruneList(loadCacheData("featuresPiekEIMs", names(cachedData),
+            cachedEIMs <- pruneList(loadCacheData("featuresPiekEIMs", anaHashes[names(cachedData)],
                                                   simplify = FALSE, dbArg = cacheDB))
+            names(cachedEIMs) <- names(cachedData)
             EIMs <- c(EIMs, cachedEIMs)
             EIMs <- EIMs[analysisInfo$analysis]
         }
@@ -731,6 +733,9 @@ getPiekEICParams <- function(..., IMS = FALSE)
                 retRange = NULL, gapFactor = 3, saveMZProfiles = FALSE, saveEIMs = FALSE, minEICIntensity = 5000,
                 minEICAdjTime = 0, minEICAdjPoints = 4, minEICAdjIntensity = 250, topMostEICMZ = 10000,
                 topMostEICMZMob = 10000, minEICsIMSPreCheck = 50000)
+    
+    if (!isFALSE(IMS))
+        ret$mobWindow <- defaultLim("mobility", "medium")
     
     if (identical(IMS, "bruker"))
     {
@@ -799,9 +804,6 @@ getPiekEICParams <- function(..., IMS = FALSE)
         maybeSetDefault("mzIsoWindow", 1)
         maybeSetDefault("minTIC", 10000)
     }
-    
-    if (ret$filterIMS != "none")
-        maybeSetDefault("mobWindow", defaultLim("mobility", "medium"))
     
     return(ret)
 }

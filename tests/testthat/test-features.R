@@ -23,18 +23,21 @@ epAnaInfo <- makeMZXMLs(anaInfoOne)
 ffEP <- findFeatures(epAnaInfo, "envipick", minpeak = 25)
 
 getPiek <- \(genp, anaInfo, peakp = getDefPeakParams("chrom", "piek"), ...) findFeatures(anaInfo, "piek", genp, peakp, ...)
-getPiekHRMS <- \(genp, ...) getPiek(genp, anaInfoOne, ...)
+getPiekHRMS <- \(genp, ...) getPiek(genp, anaInfoOne, ..., suspects = patRoonData::suspectsPos, adduct = "[M+H]+")
 ffPiekBins <- getPiekHRMS(getPiekEICParams(mzRange = c(200, 300)))
-ffPiekSusp <- getPiekHRMS(getPiekEICParams(filter = "suspects"), suspects = patRoonData::suspectsPos)
+ffPiekSusp <- getPiekHRMS(getPiekEICParams(filter = "suspects"))
 ffPiekMS2 <- getPiekHRMS(getPiekEICParams(filter = "ms2"))
 ffPiekMS2OpenMS <- getPiekHRMS(getPiekEICParams(filter = "ms2"), getDefPeakParams("chrom", "openms"))
 ffPiekMS2XCMS3 <- getPiekHRMS(getPiekEICParams(filter = "ms2"), getDefPeakParams("chrom", "xcms3"))
 ffPiekMS2EP <- getPiekHRMS(getPiekEICParams(filter = "ms2"), getDefPeakParams("chrom", "envipick"))
 
 anaInfoOneIMS <- getTestAnaInfoIMS()[4, ]
-getPiekIMS <- \(...) getPiek(getPiekEICParams(..., IMS = "bruker"), anaInfoOneIMS, suspects = patRoonDataIMS::suspectsPos, adduct = "[M+H]+")
+getPiekIMS <- \(..., args = list()) do.call(getPiek, c(list(getPiekEICParams(..., IMS = "bruker"), anaInfoOneIMS,
+                                                            suspects = patRoonDataIMS::suspectsPos, adduct = "[M+H]+"),
+                                                       args))
+getPiekSuspIMS <- \(...) getPiekIMS(filter = "suspects", filterIMS = "suspects", ...)
 ffPiekBinsIMS <- getPiekIMS(mzRange = c(200, 300), mobRange = c(0.6, 0.8))
-ffPiekSuspIMS <- getPiekIMS(filter = "suspects", filterIMS = "suspects")
+ffPiekSuspIMS <- getPiekSuspIMS()
 ffPiekMS2IMS <- getPiekIMS(filter = "ms2", filterIMS = "ms2")
 
 ffOpenMSQ <- calculatePeakQualities(ffOpenMS)
@@ -112,7 +115,9 @@ test_that("piek", {
     expect_gt(length(ffPiekMS2), length(getPiekHRMS(getPiekEICParams(filter = "ms2", minTIC = 1E5))))
     expect_equal(ffPiekBins, withOpt(cache.mode="none",
                                      getPiekHRMS(getPiekEICParams(mzRange = c(200, 300)), EICBatchSize = 5E3)))
-
+    expect_false(isTRUE(all.equal(ffPiekMS2, getPiekHRMS(getPiekEICParams(filter = "ms2"), assignRTWindow = 5),
+                                  check.attributes = FALSE)))
+    
     expect_true(hasIMS(ffPiekBinsIMS))
     expect_false(hasIMS(ffPiekBins))
     expect_range(as.data.table(ffPiekBinsIMS)$mz, c(200, 300+0.02))
@@ -126,6 +131,25 @@ test_that("piek", {
     expect_lt(length(getPiekHRMS(getPiekEICParams(filter = "ms2", minEICIntensity = 1E5))), length(ffPiekMS2))
     expect_lt(length(getPiekHRMS(getPiekEICParams(filter = "ms2", topMostEICMZ = 25))), length(ffPiekMS2))
     expect_lte(max(getPiekHRMS(getPiekEICParams(filter = "ms2"), getDefPeakParams("chrom", "piek", forcePeakWidth = c(0, 10)))[[1]][, retmax - retmin]), 10)
+    
+    expect_false(isTRUE(all.equal(ffPiekSuspIMS, getPiekSuspIMS(sumWindowMZ = 10), check.attributes = FALSE)))
+    expect_false(isTRUE(all.equal(ffPiekSuspIMS, getPiekSuspIMS(sumWindowMob = 0.1), check.attributes = FALSE)))
+    expect_false(isTRUE(all.equal(ffPiekSuspIMS, getPiekSuspIMS(smoothWindowMZ = 1), check.attributes = FALSE)))
+    expect_false(isTRUE(all.equal(ffPiekSuspIMS, getPiekSuspIMS(smoothWindowMob = 10), check.attributes = FALSE)))
+    
+    ffPiekDup <- getPiekIMS(filter = "ms2", args = list(keepDups = TRUE))
+    checkmate::expect_names(names(ffPiekDup[[1]]), must.include = c("mzCentered", "dup"))
+    expect_gt(nrow(ffPiekDup[[1]]), nrow(ffPiekSusp[[1]]))
+    expect_lt(length(getPiekIMS(filter = "ms2", filterIMS = "ms2", args = list(rtWindowDup = 300))), length(ffPiekMS2IMS))
+    expect_lt(length(getPiekIMS(filter = "ms2", filterIMS = "ms2", args = list(mzWindowDup = 0.1))), length(ffPiekMS2IMS))
+    expect_lt(length(getPiekIMS(filter = "ms2", filterIMS = "ms2", args = list(mobWindowDup = 0.2))), length(ffPiekMS2IMS))
+    # NOTE: the effect of minPeakOverlapDup is very small it seems...
+    expect_lt(length(getPiekIMS(filter = "ms2", filterIMS = "ms2", args = list(rtWindowDup = 300, minPeakOverlapDup = 0.1))),
+              length(getPiekIMS(filter = "ms2", filterIMS = "ms2", args = list(rtWindowDup = 300, minPeakOverlapDup = 0.9))))
+
+    ffPiekIMSProfs <- getPiekSuspIMS(saveMZProfiles = TRUE, saveEIMs = TRUE)
+    expect_length(ffPiekIMSProfs@mzProfiles[[1]], length(ffPiekIMSProfs[1]))
+    expect_length(ffPiekIMSProfs@EIMs[[1]], length(ffPiekIMSProfs[1]))
 })
 
 test_that("verify empty object can be generated", {

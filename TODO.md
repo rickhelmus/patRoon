@@ -27,9 +27,6 @@
     - ADT gives "susp_mobility_susp"/"susp_CCS_susp" cols --> rename
     - piek: rename assignMethod now that assignAggr is removed?
     - better names for ims_parent_ID/ims_parent_group?
-- FIX: IMSRangeParams: in sets workflows, the mz column is taken so relative filtering is done to neutralMasses
-    - maybe add _mz rel column like compounds?
-    - actually, the same is the case for the mz filter (also IMS and mz for features) --> maybe just document difference? the actual results will not change much in general
 - See why parallel reporting is so slow (on Windows?)
 - reticulate: use py_require()? doesn't seem to be able handle multiple py versions, so no?
 - MSTK: PR for centroid status buf for mzXML?
@@ -92,6 +89,7 @@
         2. score groups from high to low
         3. iterate through groups, remove all features from current group that are also in others
         4. go to step 1, but ignore any features still in groups 
+- mzRange, mzDefectRange and IMSRangeParams use neutral masses instead of m/z values in sets workflows --> change? (now documented)
 
 
 ## newProject()

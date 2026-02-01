@@ -82,6 +82,10 @@ doMakeFeaturesSet <- function(featuresList, adducts)
 #'
 #'   \item \code{filter} and the subset operator (\code{[}) have specific arguments to choose/filter by (feature
 #'   presence in) sets. See the \code{sets} argument description.
+#'   
+#'   \item \strong{Important}: the \code{mzRange}, \code{mzDefectRange} and \code{IMSRangeParams} filters use neutral
+#'   feature masses, whereas non-sets workflows use \emph{m/z} values. Hence, adjust accordingly to avoid (slightly)
+#'   different results!
 #'
 #'   }
 #'

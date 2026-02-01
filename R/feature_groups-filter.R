@@ -19,6 +19,10 @@ NULL
 #' @section Sets workflows: \setsWFChangedMethods{
 #'
 #'   \item \code{filter} has specific arguments to filter by (feature presence in) sets. See the argument descriptions.
+#'   
+#'   \item \strong{Important}: the \code{mzRange}, \code{mzDefectRange} and \code{IMSRangeParams} filters use neutral
+#'   feature masses, whereas non-sets workflows use \emph{m/z} values. Hence, adjust accordingly to avoid (slightly)
+#'   different results!
 #'
 #'   }
 #'

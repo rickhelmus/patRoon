@@ -17,12 +17,13 @@
     - be consistent in mobility vs IMS and mobilograms and EIMs
     - mob_area/mob_intensity vs mobmin/mobmax
     - better names for ims_parent_ID/ims_parent_group?
+    - settle for terminology for IMS parents/IMS features
 - See why parallel reporting is so slow (on Windows?)
 - reticulate: use py_require()? doesn't seem to be able handle multiple py versions, so no?
 - MSTK: PR for centroid status buf for mzXML?
 - check why metfusion is still defaulted --> recreate sysdata.rda?
     - do so after rebase
-- remove rtalign=hasIMS() defaults
+
 
 ## Maybe
 

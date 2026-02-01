@@ -47,7 +47,7 @@ setMethod("initialize", "featureGroupsKPIC2",
 #' @templateVar cl features
 #' @template main-rd-method
 #' @export
-setMethod("groupFeaturesKPIC2", "features", function(feat, rtalign = !hasIMS(feat), loadRawData = TRUE,
+setMethod("groupFeaturesKPIC2", "features", function(feat, rtalign = TRUE, loadRawData = TRUE,
                                                      groupArgs = list(tolerance = c(0.005, 12)),
                                                      alignArgs = list(), verbose = TRUE)
 {

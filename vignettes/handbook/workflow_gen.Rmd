@@ -838,7 +838,7 @@ The parameters passed to `avgFeatParams` and `avgFGroupParams` are passed as a `
 * `clusterMzWindow`: Maximum _m/z_ window used to cluster mass peaks when averaging. May be lowered for HRMS instruments with very high resolution and accuracy.
 * `topMost`: Retain no more than this amount of most intense mass peaks prior to averaging.
 * `minIntensityPre` / `minIntensityPost`: Mass peaks below this intensity will be removed before/after averaging.
-* `minAbundanceAbs` / `minAbundanceRel`: Minimum absolute or relative abundance of a mass peak to be retained after averaging.
+* `absMinAbundance` / `relMinAbundance`: Minimum absolute or relative abundance of a mass peak to be retained after averaging.
 
 Optimizing the thresholds may be useful to remove noise and speed-up the averaging of spectra.
 

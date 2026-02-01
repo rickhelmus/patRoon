@@ -134,7 +134,7 @@ RcppExport SEXP _patRoon_initBrukerLibrary(SEXP pathSEXP, SEXP forceSEXP) {
     if (rcpp_isError_gen) {
         SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
         UNPROTECT(1);
-        (Rf_error)("%s", CHAR(rcpp_msgSEXP_gen));
+        Rf_error("%s", CHAR(rcpp_msgSEXP_gen));
     }
     UNPROTECT(1);
     return rcpp_result_gen;
@@ -170,7 +170,7 @@ RcppExport SEXP _patRoon_getBrukerCCS(SEXP mobsSEXP, SEXP chargesSEXP, SEXP mzsS
     if (rcpp_isError_gen) {
         SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
         UNPROTECT(1);
-        (Rf_error)("%s", CHAR(rcpp_msgSEXP_gen));
+        Rf_error("%s", CHAR(rcpp_msgSEXP_gen));
     }
     UNPROTECT(1);
     return rcpp_result_gen;
@@ -206,7 +206,7 @@ RcppExport SEXP _patRoon_getBrukerMob(SEXP ccssSEXP, SEXP chargesSEXP, SEXP mzsS
     if (rcpp_isError_gen) {
         SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
         UNPROTECT(1);
-        (Rf_error)("%s", CHAR(rcpp_msgSEXP_gen));
+        Rf_error("%s", CHAR(rcpp_msgSEXP_gen));
     }
     UNPROTECT(1);
     return rcpp_result_gen;
@@ -283,8 +283,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // getCollapsedFrame
-Rcpp::DataFrame getCollapsedFrame(const MSReadBackend& backend, int index, SpectrumRawTypes::Mass mzWindow, SpectrumRawTypes::Intensity minIntensityIMS, SpectrumRawTypes::Intensity minIntensityPre, SpectrumRawTypes::PeakAbundance minAbundanceRel, SpectrumRawTypes::PeakAbundance minAbundanceAbs, const std::string& method, double mzMin, double mzMax, double minInt, unsigned topMost, double prec, double mobMin, double mobMax);
-RcppExport SEXP _patRoon_getCollapsedFrame(SEXP backendSEXP, SEXP indexSEXP, SEXP mzWindowSEXP, SEXP minIntensityIMSSEXP, SEXP minIntensityPreSEXP, SEXP minAbundanceRelSEXP, SEXP minAbundanceAbsSEXP, SEXP methodSEXP, SEXP mzMinSEXP, SEXP mzMaxSEXP, SEXP minIntSEXP, SEXP topMostSEXP, SEXP precSEXP, SEXP mobMinSEXP, SEXP mobMaxSEXP) {
+Rcpp::DataFrame getCollapsedFrame(const MSReadBackend& backend, int index, SpectrumRawTypes::Mass mzWindow, SpectrumRawTypes::Intensity minIntensityIMS, SpectrumRawTypes::Intensity minIntensityPre, SpectrumRawTypes::PeakAbundance relMinAbundance, SpectrumRawTypes::PeakAbundance absMinAbundance, const std::string& method, double mzMin, double mzMax, double minInt, unsigned topMost, double prec, double mobMin, double mobMax);
+RcppExport SEXP _patRoon_getCollapsedFrame(SEXP backendSEXP, SEXP indexSEXP, SEXP mzWindowSEXP, SEXP minIntensityIMSSEXP, SEXP minIntensityPreSEXP, SEXP relMinAbundanceSEXP, SEXP absMinAbundanceSEXP, SEXP methodSEXP, SEXP mzMinSEXP, SEXP mzMaxSEXP, SEXP minIntSEXP, SEXP topMostSEXP, SEXP precSEXP, SEXP mobMinSEXP, SEXP mobMaxSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -293,8 +293,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type mzWindow(mzWindowSEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minIntensityIMS(minIntensityIMSSEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minIntensityPre(minIntensityPreSEXP);
-    Rcpp::traits::input_parameter< SpectrumRawTypes::PeakAbundance >::type minAbundanceRel(minAbundanceRelSEXP);
-    Rcpp::traits::input_parameter< SpectrumRawTypes::PeakAbundance >::type minAbundanceAbs(minAbundanceAbsSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::PeakAbundance >::type relMinAbundance(relMinAbundanceSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::PeakAbundance >::type absMinAbundance(absMinAbundanceSEXP);
     Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
     Rcpp::traits::input_parameter< double >::type mzMin(mzMinSEXP);
     Rcpp::traits::input_parameter< double >::type mzMax(mzMaxSEXP);
@@ -303,7 +303,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type prec(precSEXP);
     Rcpp::traits::input_parameter< double >::type mobMin(mobMinSEXP);
     Rcpp::traits::input_parameter< double >::type mobMax(mobMaxSEXP);
-    rcpp_result_gen = Rcpp::wrap(getCollapsedFrame(backend, index, mzWindow, minIntensityIMS, minIntensityPre, minAbundanceRel, minAbundanceAbs, method, mzMin, mzMax, minInt, topMost, prec, mobMin, mobMax));
+    rcpp_result_gen = Rcpp::wrap(getCollapsedFrame(backend, index, mzWindow, minIntensityIMS, minIntensityPre, relMinAbundance, absMinAbundance, method, mzMin, mzMax, minInt, topMost, prec, mobMin, mobMax));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -384,8 +384,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // getMSPeakLists
-Rcpp::List getMSPeakLists(const MSReadBackend& backend, const std::vector<SpectrumRawTypes::Time>& startTimes, const std::vector<SpectrumRawTypes::Time>& endTimes, const std::vector<SpectrumRawTypes::Mass>& precursorMZs, SpectrumRawTypes::Mass fixedIsolationWidth, bool withPrecursor, bool retainPrecursor, int MSLevel, const std::string& method, SpectrumRawTypes::Mass mzWindow, const std::vector<SpectrumRawTypes::Mobility> startMobs, const std::vector<SpectrumRawTypes::Mobility> endMobs, SpectrumRawTypes::PeakAbundance minAbundanceRel, SpectrumRawTypes::PeakAbundance minAbundanceAbs, unsigned smoothWindowIMS, unsigned halfWindowIMS, SpectrumRawTypes::Mass maxGapIMS, unsigned topMost, SpectrumRawTypes::Intensity minIntensityIMS, SpectrumRawTypes::Intensity minIntensityPre, SpectrumRawTypes::Intensity minIntensityPost, SpectrumRawTypes::Intensity minBPIntensity);
-RcppExport SEXP _patRoon_getMSPeakLists(SEXP backendSEXP, SEXP startTimesSEXP, SEXP endTimesSEXP, SEXP precursorMZsSEXP, SEXP fixedIsolationWidthSEXP, SEXP withPrecursorSEXP, SEXP retainPrecursorSEXP, SEXP MSLevelSEXP, SEXP methodSEXP, SEXP mzWindowSEXP, SEXP startMobsSEXP, SEXP endMobsSEXP, SEXP minAbundanceRelSEXP, SEXP minAbundanceAbsSEXP, SEXP smoothWindowIMSSEXP, SEXP halfWindowIMSSEXP, SEXP maxGapIMSSEXP, SEXP topMostSEXP, SEXP minIntensityIMSSEXP, SEXP minIntensityPreSEXP, SEXP minIntensityPostSEXP, SEXP minBPIntensitySEXP) {
+Rcpp::List getMSPeakLists(const MSReadBackend& backend, const std::vector<SpectrumRawTypes::Time>& startTimes, const std::vector<SpectrumRawTypes::Time>& endTimes, const std::vector<SpectrumRawTypes::Mass>& precursorMZs, SpectrumRawTypes::Mass fixedIsolationWidth, bool withPrecursor, bool retainPrecursor, int MSLevel, const std::string& method, SpectrumRawTypes::Mass mzWindow, const std::vector<SpectrumRawTypes::Mobility> startMobs, const std::vector<SpectrumRawTypes::Mobility> endMobs, SpectrumRawTypes::PeakAbundance relMinAbundance, SpectrumRawTypes::PeakAbundance absMinAbundance, unsigned smoothWindowIMS, unsigned halfWindowIMS, SpectrumRawTypes::Mass maxGapIMS, unsigned topMost, SpectrumRawTypes::Intensity minIntensityIMS, SpectrumRawTypes::Intensity minIntensityPre, SpectrumRawTypes::Intensity minIntensityPost, SpectrumRawTypes::Intensity minBPIntensity);
+RcppExport SEXP _patRoon_getMSPeakLists(SEXP backendSEXP, SEXP startTimesSEXP, SEXP endTimesSEXP, SEXP precursorMZsSEXP, SEXP fixedIsolationWidthSEXP, SEXP withPrecursorSEXP, SEXP retainPrecursorSEXP, SEXP MSLevelSEXP, SEXP methodSEXP, SEXP mzWindowSEXP, SEXP startMobsSEXP, SEXP endMobsSEXP, SEXP relMinAbundanceSEXP, SEXP absMinAbundanceSEXP, SEXP smoothWindowIMSSEXP, SEXP halfWindowIMSSEXP, SEXP maxGapIMSSEXP, SEXP topMostSEXP, SEXP minIntensityIMSSEXP, SEXP minIntensityPreSEXP, SEXP minIntensityPostSEXP, SEXP minBPIntensitySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -401,8 +401,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type mzWindow(mzWindowSEXP);
     Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Mobility> >::type startMobs(startMobsSEXP);
     Rcpp::traits::input_parameter< const std::vector<SpectrumRawTypes::Mobility> >::type endMobs(endMobsSEXP);
-    Rcpp::traits::input_parameter< SpectrumRawTypes::PeakAbundance >::type minAbundanceRel(minAbundanceRelSEXP);
-    Rcpp::traits::input_parameter< SpectrumRawTypes::PeakAbundance >::type minAbundanceAbs(minAbundanceAbsSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::PeakAbundance >::type relMinAbundance(relMinAbundanceSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::PeakAbundance >::type absMinAbundance(absMinAbundanceSEXP);
     Rcpp::traits::input_parameter< unsigned >::type smoothWindowIMS(smoothWindowIMSSEXP);
     Rcpp::traits::input_parameter< unsigned >::type halfWindowIMS(halfWindowIMSSEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type maxGapIMS(maxGapIMSSEXP);
@@ -411,7 +411,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minIntensityPre(minIntensityPreSEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minIntensityPost(minIntensityPostSEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minBPIntensity(minBPIntensitySEXP);
-    rcpp_result_gen = Rcpp::wrap(getMSPeakLists(backend, startTimes, endTimes, precursorMZs, fixedIsolationWidth, withPrecursor, retainPrecursor, MSLevel, method, mzWindow, startMobs, endMobs, minAbundanceRel, minAbundanceAbs, smoothWindowIMS, halfWindowIMS, maxGapIMS, topMost, minIntensityIMS, minIntensityPre, minIntensityPost, minBPIntensity));
+    rcpp_result_gen = Rcpp::wrap(getMSPeakLists(backend, startTimes, endTimes, precursorMZs, fixedIsolationWidth, withPrecursor, retainPrecursor, MSLevel, method, mzWindow, startMobs, endMobs, relMinAbundance, absMinAbundance, smoothWindowIMS, halfWindowIMS, maxGapIMS, topMost, minIntensityIMS, minIntensityPre, minIntensityPost, minBPIntensity));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -797,8 +797,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // doAverageSpectraList
-Rcpp::List doAverageSpectraList(Rcpp::List specsList, const std::string& method, SpectrumRawTypes::Mass window, SpectrumRawTypes::Intensity minIntensity, SpectrumRawTypes::PeakAbundance minAbundanceRel, SpectrumRawTypes::PeakAbundance minAbundanceAbs);
-RcppExport SEXP _patRoon_doAverageSpectraList(SEXP specsListSEXP, SEXP methodSEXP, SEXP windowSEXP, SEXP minIntensitySEXP, SEXP minAbundanceRelSEXP, SEXP minAbundanceAbsSEXP) {
+Rcpp::List doAverageSpectraList(Rcpp::List specsList, const std::string& method, SpectrumRawTypes::Mass window, SpectrumRawTypes::Intensity minIntensity, SpectrumRawTypes::PeakAbundance relMinAbundance, SpectrumRawTypes::PeakAbundance absMinAbundance);
+RcppExport SEXP _patRoon_doAverageSpectraList(SEXP specsListSEXP, SEXP methodSEXP, SEXP windowSEXP, SEXP minIntensitySEXP, SEXP relMinAbundanceSEXP, SEXP absMinAbundanceSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -806,9 +806,9 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::Mass >::type window(windowSEXP);
     Rcpp::traits::input_parameter< SpectrumRawTypes::Intensity >::type minIntensity(minIntensitySEXP);
-    Rcpp::traits::input_parameter< SpectrumRawTypes::PeakAbundance >::type minAbundanceRel(minAbundanceRelSEXP);
-    Rcpp::traits::input_parameter< SpectrumRawTypes::PeakAbundance >::type minAbundanceAbs(minAbundanceAbsSEXP);
-    rcpp_result_gen = Rcpp::wrap(doAverageSpectraList(specsList, method, window, minIntensity, minAbundanceRel, minAbundanceAbs));
+    Rcpp::traits::input_parameter< SpectrumRawTypes::PeakAbundance >::type relMinAbundance(relMinAbundanceSEXP);
+    Rcpp::traits::input_parameter< SpectrumRawTypes::PeakAbundance >::type absMinAbundance(absMinAbundanceSEXP);
+    rcpp_result_gen = Rcpp::wrap(doAverageSpectraList(specsList, method, window, minIntensity, relMinAbundance, absMinAbundance));
     return rcpp_result_gen;
 END_RCPP
 }

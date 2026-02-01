@@ -159,13 +159,13 @@ setMethod("averageMSPeakLists", "MSPeakLists", function(obj)
         
         allMSPLMSAvg <- doAvg("MS", obj@avgPeakListArgs$clusterMzWindow, obj@avgPeakListArgs$topMost,
                               obj@avgPeakListArgs$minIntensityPre, obj@avgPeakListArgs$minIntensityPost,
-                              obj@avgPeakListArgs$minAbundanceRel, obj@avgPeakListArgs$minAbundanceAbs,
+                              obj@avgPeakListArgs$relMinAbundance, obj@avgPeakListArgs$absMinAbundance,
                               obj@avgPeakListArgs$method, TRUE, obj@avgPeakListArgs$withPrecursorMS,
                               obj@avgPeakListArgs$pruneMissingPrecursorMS, TRUE)
         
         allMSPLMSMSAvg <- doAvg("MSMS", obj@avgPeakListArgs$clusterMzWindow, obj@avgPeakListArgs$topMost,
                                 obj@avgPeakListArgs$minIntensityPre, obj@avgPeakListArgs$minIntensityPost,
-                                obj@avgPeakListArgs$minAbundanceRel, obj@avgPeakListArgs$minAbundanceAbs,
+                                obj@avgPeakListArgs$relMinAbundance, obj@avgPeakListArgs$absMinAbundance,
                                 obj@avgPeakListArgs$method, TRUE, FALSE, FALSE,
                                 obj@avgPeakListArgs$retainPrecursorMSMS)
 
@@ -471,7 +471,7 @@ setMethod("delete", "MSPeakLists", function(obj, i = NULL, j = NULL, k = NULL, r
 #'   this it will be completely removed. Set to \code{NULL} to ignore.
 #' @param maxMZOverPrec Any mass peaks with an m/z higher than this value (relative to the precursor) will be removed.
 #'   Set to \code{NULL} to ignore.
-#' @param minAbundanceFeatAbs,minAbundanceFeatRel The minimum absolute/relative abundance for a mass peak across spectra
+#' @param absMinAbundanceFeat,relMinAbundanceFeat The minimum absolute/relative abundance for a mass peak across spectra
 #'   that are averaged for a feature. Setting \code{reAverage} determines if feature group peak lists are also filtered: \itemize{
 #'
 #'   \item \code{reAverage=FALSE} then this filter is also applied to feature group data, using the the mean averaged peak
@@ -484,7 +484,7 @@ setMethod("delete", "MSPeakLists", function(obj, i = NULL, j = NULL, k = NULL, r
 #'   and feature group data.
 #'
 #'   Set to \code{NULL} to ignore.
-#' @param minAbundanceFGroupAbs,minAbundanceFGroupRel The minimum absolute/relative abundance of a mass peak across
+#' @param absMinAbundanceFGroup,relMinAbundanceFGroup The minimum absolute/relative abundance of a mass peak across
 #'   spectra that are averaged for a feature group. Set to \code{NULL} to ignore.
 #' @param isolatePrec If not \code{NULL} then value should be a \code{list} with parameters used for isolating the
 #'   precursor and its isotopes in MS peak lists (see \verb{Isolating precursor data}). Alternatively, \code{TRUE} to
@@ -515,8 +515,8 @@ setMethod("delete", "MSPeakLists", function(obj, i = NULL, j = NULL, k = NULL, r
 #' @export
 setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity = NULL, relMinIntensity = NULL,
                                             topMostPeaks = NULL, minPeaks = NULL, maxMZOverPrec = NULL,
-                                            minAbundanceFeatAbs = NULL, minAbundanceFeatRel = NULL,
-                                            minAbundanceFGroupAbs = NULL, minAbundanceFGroupRel = NULL,
+                                            absMinAbundanceFeat = NULL, relMinAbundanceFeat = NULL,
+                                            absMinAbundanceFGroup = NULL, relMinAbundanceFGroup = NULL,
                                             isolatePrec = NULL, deIsotope = FALSE, removeMZs = NULL, withMSMS = FALSE,
                                             annotatedBy = NULL, retainPrecursor = TRUE,
                                             mzWindow = defaultLim("mz", "medium"), reAverage = FALSE, negate = FALSE)
@@ -527,7 +527,7 @@ setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity 
     ac <- checkmate::makeAssertCollection()
     checkmate::assertSubset(MSLevel, 1:2, add = ac)
     aapply(checkmate::assertNumber, . ~ absMinIntensity + relMinIntensity + maxMZOverPrec +
-               minAbundanceFeatAbs + minAbundanceFeatRel +  minAbundanceFGroupAbs + minAbundanceFGroupRel,
+               absMinAbundanceFeat + relMinAbundanceFeat +  absMinAbundanceFGroup + relMinAbundanceFGroup,
            lower = 0, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertCount, . ~ topMostPeaks + minPeaks, positive = TRUE, null.ok = TRUE, fixed = list(add = ac))
     assertPListIsolatePrecParams(isolatePrec, add = ac)
@@ -570,7 +570,7 @@ setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity 
         return(obj)
 
     hash <- makeHash(obj, MSLevel, absMinIntensity, relMinIntensity, topMostPeaks, minPeaks, maxMZOverPrec,
-                     minAbundanceFeatAbs, minAbundanceFeatRel, minAbundanceFGroupAbs, minAbundanceFGroupRel,
+                     absMinAbundanceFeat, relMinAbundanceFeat, absMinAbundanceFGroup, relMinAbundanceFGroup,
                      isolatePrec, deIsotope, removeMZs, withMSMS, annotatedBy, retainPrecursor, mzWindow, reAverage,
                      negate)
     cache <- loadCacheData("filterMSPeakLists", hash)
@@ -594,10 +594,10 @@ setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity 
                 return(FALSE)
             
             plF <- doMSPeakListFilter(plF, absMinIntensity, relMinIntensity, topMostPeaks, NULL, maxMZOverPrec,
-                                      if (isAna || !reAverage) minAbundanceFeatAbs,
-                                      if (isAna || !reAverage) minAbundanceFeatRel,
-                                      if (!isAna) minAbundanceFGroupAbs else NULL,
-                                      if (!isAna) minAbundanceFGroupRel else NULL,
+                                      if (isAna || !reAverage) absMinAbundanceFeat,
+                                      if (isAna || !reAverage) relMinAbundanceFeat,
+                                      if (!isAna) absMinAbundanceFGroup else NULL,
+                                      if (!isAna) relMinAbundanceFGroup else NULL,
                                       deIsotope, removeMZs, TRUE, plF[precursor == TRUE]$mz, mzWindow, negate)
             if (!is.null(isolatePrec))
                 plF <- isolatePrecInMSPeakList(plF, isolatePrec, negate)
@@ -644,9 +644,9 @@ setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity 
                     obj[[grp]]$MS[precursor == TRUE]$mz
             }
             plF <- doMSPeakListFilter(plF, absMinIntensity, relMinIntensity, topMostPeaks, minPeaks, maxMZOverPrec,
-                                      minAbundanceFeatAbs, minAbundanceFeatRel,
-                                      if (is.null(ana)) minAbundanceFGroupAbs else NULL,
-                                      if (is.null(ana)) minAbundanceFGroupRel else NULL,
+                                      absMinAbundanceFeat, relMinAbundanceFeat,
+                                      if (is.null(ana)) absMinAbundanceFGroup else NULL,
+                                      if (is.null(ana)) relMinAbundanceFGroup else NULL,
                                       deIsotope, removeMZs, retainPrecursor, precMZ, mzWindow, negate)
         }
         
@@ -992,8 +992,8 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRtWindo
         ret <- getMSPeakLists(backend, ft$retmin, ft$retmax, ft$mz, fiw, withPrecursor = params$withPrecursor,
                               retainPrecursor = params$retainPrecursor, MSLevel = MSLevel, method = params$method,
                               mzWindow = params$clusterMzWindow, startMobs = ft$mobmin,
-                              endMobs = ft$mobmax, minAbundanceRel = params$minAbundanceRel,
-                              minAbundanceAbs = params$minAbundanceAbs, smoothWindowIMS = params$smoothWindowIMS,
+                              endMobs = ft$mobmax, relMinAbundance = params$relMinAbundance,
+                              absMinAbundance = params$absMinAbundance, smoothWindowIMS = params$smoothWindowIMS,
                               halfWindowIMS = params$halfWindowIMS, maxGapIMS = params$maxGapIMS,
                               topMost = params$topMost,
                               minIntensityIMS = params$minIntensityIMS, minIntensityPre = params$minIntensityPre,

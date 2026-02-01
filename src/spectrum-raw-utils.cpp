@@ -275,8 +275,8 @@ std::vector<double> testClusterNums2(const std::vector<double> &nums, const std:
 SpectrumRawAveraged averageSpectraRaw(const SpectrumRawAveraged &flattenedSpecs, const std::vector<size_t> &specIDs,
                                       clusterMethod method, SpectrumRawTypes::Mass window, bool averageIntensities,
                                       SpectrumRawTypes::Intensity minIntensity,
-                                      SpectrumRawTypes::PeakAbundance minAbundanceRel,
-                                      SpectrumRawTypes::PeakAbundance minAbundanceAbs)
+                                      SpectrumRawTypes::PeakAbundance relMinAbundance,
+                                      SpectrumRawTypes::PeakAbundance absMinAbundance)
 {
     if (flattenedSpecs.empty()) // all spectra are empty
         return SpectrumRawAveraged();
@@ -337,7 +337,7 @@ SpectrumRawAveraged averageSpectraRaw(const SpectrumRawAveraged &flattenedSpecs,
     // sort spectrum && pre-treat
     const auto sortedInds = getSortedInds(binnedSpectrum.getMZs());
     SpectrumRawAveraged sortedSpectrum;
-    minAbundanceAbs = std::min(minAbundanceAbs, static_cast<SpectrumRawTypes::PeakAbundance>(numSpecs));
+    absMinAbundance = std::min(absMinAbundance, static_cast<SpectrumRawTypes::PeakAbundance>(numSpecs));
     for (size_t i=0; i<sortedInds.size(); ++i)
     {
         const auto j = sortedInds[i];
@@ -347,7 +347,7 @@ SpectrumRawAveraged averageSpectraRaw(const SpectrumRawAveraged &flattenedSpecs,
         
         const auto abundanceAbs = static_cast<SpectrumRawTypes::PeakAbundance>(binIDs[j].size());
         const auto abundanceRel = abundanceAbs / static_cast<SpectrumRawTypes::PeakAbundance>(numSpecs);
-        if (abundanceRel < minAbundanceRel || abundanceAbs < minAbundanceAbs)
+        if (abundanceRel < relMinAbundance || abundanceAbs < absMinAbundance)
             continue;
         
         if (alreadyAveraged)
@@ -366,38 +366,38 @@ SpectrumRawAveraged averageSpectraRaw(const SpectrumRawAveraged &flattenedSpecs,
 SpectrumRawAveraged averageSpectraRaw(const SpectrumRaw &flattenedSpecs, const std::vector<size_t> &specIDs,
                                       clusterMethod method, SpectrumRawTypes::Mass window, bool averageIntensities,
                                       SpectrumRawTypes::Intensity minIntensity,
-                                      SpectrumRawTypes::PeakAbundance minAbundanceRel,
-                                      SpectrumRawTypes::PeakAbundance minAbundanceAbs)
+                                      SpectrumRawTypes::PeakAbundance relMinAbundance,
+                                      SpectrumRawTypes::PeakAbundance absMinAbundance)
 {
     return averageSpectraRaw(SpectrumRawAveraged(flattenedSpecs.getMZs(), flattenedSpecs.getIntensities()), specIDs,
-                             method, window, averageIntensities, minIntensity, minAbundanceRel, minAbundanceAbs);
+                             method, window, averageIntensities, minIntensity, relMinAbundance, absMinAbundance);
 }
 
 SpectrumRawAveraged averageSpectraRaw(const std::vector<SpectrumRaw> &spectra, clusterMethod method,
                                       SpectrumRawTypes::Mass window, bool averageIntensities,
                                       SpectrumRawTypes::Intensity minIntensity,
-                                      SpectrumRawTypes::PeakAbundance minAbundanceRel,
-                                      SpectrumRawTypes::PeakAbundance minAbundanceAbs)
+                                      SpectrumRawTypes::PeakAbundance relMinAbundance,
+                                      SpectrumRawTypes::PeakAbundance absMinAbundance)
 {
     return averageSpectraRaw(flattenSpectra(spectra), flattenedSpecIDs(spectra), method, window, averageIntensities,
-                             minIntensity, minAbundanceRel, minAbundanceAbs);
+                             minIntensity, relMinAbundance, absMinAbundance);
 }
 
 SpectrumRawAveraged averageSpectraRaw(const std::vector<SpectrumRawAveraged> &spectra, clusterMethod method,
                                       SpectrumRawTypes::Mass window, bool averageIntensities,
                                       SpectrumRawTypes::Intensity minIntensity,
-                                      SpectrumRawTypes::PeakAbundance minAbundanceRel,
-                                      SpectrumRawTypes::PeakAbundance minAbundanceAbs)
+                                      SpectrumRawTypes::PeakAbundance relMinAbundance,
+                                      SpectrumRawTypes::PeakAbundance absMinAbundance)
 {
     return averageSpectraRaw(flattenSpectra(spectra), flattenedSpecIDs(spectra), method, window, averageIntensities,
-                             minIntensity, minAbundanceRel, minAbundanceAbs);
+                             minIntensity, relMinAbundance, absMinAbundance);
 }
 
 // [[Rcpp::export]]
 Rcpp::List doAverageSpectraList(Rcpp::List specsList, const std::string &method,
                                 SpectrumRawTypes::Mass window, SpectrumRawTypes::Intensity minIntensity,
-                                SpectrumRawTypes::PeakAbundance minAbundanceRel,
-                                SpectrumRawTypes::PeakAbundance minAbundanceAbs)
+                                SpectrumRawTypes::PeakAbundance relMinAbundance,
+                                SpectrumRawTypes::PeakAbundance absMinAbundance)
 {
     const size_t entries = specsList.size();
     const auto clMethod = clustMethodFromStr(method);
@@ -440,8 +440,8 @@ Rcpp::List doAverageSpectraList(Rcpp::List specsList, const std::string &method,
     std::vector<SpectrumRawAveraged> averagedSpecList(entries);
     #pragma omp parallel for
     for (size_t i=0; i<entries; ++i)
-        averagedSpecList[i] = averageSpectraRaw(allSpectra[i], clMethod, window, true, minIntensity, minAbundanceRel,
-                                                minAbundanceAbs);
+        averagedSpecList[i] = averageSpectraRaw(allSpectra[i], clMethod, window, true, minIntensity, relMinAbundance,
+                                                absMinAbundance);
 
     Rcpp::List ret(entries);
     

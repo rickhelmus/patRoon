@@ -14,7 +14,6 @@
     - actually use TDF-SDK from patRoonExt
 - BUG: annSim.1 column (in formulas?)?
 - Harmonize/consistent names
-    - minAbundanceFeatAbs/minAbundanceFeatRel --> check features
     - maxMSRtWindow --> maxMSRTWindow
     - be consistent in mobility vs IMS and mobilograms and EIMs
         - mobWindow and IMSWindow now randomly used
@@ -31,6 +30,7 @@
 - reticulate: use py_require()? doesn't seem to be able handle multiple py versions, so no?
 - MSTK: PR for centroid status buf for mzXML?
 - check why metfusion is still defaulted --> recreate sysdata.rda?
+    - do so after rebase
 
 
 ## Maybe

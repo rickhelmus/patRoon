@@ -528,8 +528,8 @@ getEICs <- function(analysisInfo, ranges, gapFactor = 3, output = "fill", minInt
 #' @export
 getBGMSMSPeaks <- function(anaInfo, replicates = NULL, MSLevel = 2, retentionRange = NULL, mobilityRange = NULL,
                            minBPIntensity = 5000,
-                           avgSpectraParams = getDefAvgPListParams(minAbundanceRel = 0.1, topMost = 25),
-                           avgAnalysesParams = getDefAvgPListParams(minAbundanceRel = 0.8, topMost = 25))
+                           avgSpectraParams = getDefAvgPListParams(relMinAbundance = 0.1, topMost = 25),
+                           avgAnalysesParams = getDefAvgPListParams(relMinAbundance = 0.8, topMost = 25))
 {
     ac <- checkmate::makeAssertCollection()
     anaInfo <- assertAndPrepareAnaInfo(anaInfo, add = ac)
@@ -565,8 +565,8 @@ getBGMSMSPeaks <- function(anaInfo, replicates = NULL, MSLevel = 2, retentionRan
                                 MSLevel = MSLevel, method = avgSpectraParams$method,
                                 mzWindow = avgSpectraParams$clusterMzWindow,
                                 startMobs = mobilityRange[1], endMobs = mobilityRange[2],
-                                minAbundanceRel = avgSpectraParams$minAbundanceRel,
-                                minAbundanceAbs = avgSpectraParams$minAbundanceAbs,
+                                relMinAbundance = avgSpectraParams$relMinAbundance,
+                                absMinAbundance = avgSpectraParams$absMinAbundance,
                                 smoothWindowIMS = avgSpectraParams$smoothWindowIMS,
                                 halfWindowIMS = avgSpectraParams$halfWindowIMS,
                                 maxGapIMS = avgSpectraParams$maxGapIMS,
@@ -584,7 +584,7 @@ getBGMSMSPeaks <- function(anaInfo, replicates = NULL, MSLevel = 2, retentionRan
     printf("Averaging analyses averaged spectra... ")
     ret <- averageSpectraList(list(blSpecs), avgAnalysesParams$clusterMzWindow, avgAnalysesParams$topMost,
                               avgAnalysesParams$minIntensityPre, avgAnalysesParams$minIntensityPost,
-                              avgAnalysesParams$minAbundanceRel, avgAnalysesParams$minAbundanceAbs,
+                              avgAnalysesParams$relMinAbundance, avgAnalysesParams$absMinAbundance,
                               avgAnalysesParams$method, FALSE, FALSE, FALSE, FALSE)[[1]]
     ret[, precursor := NULL]
     setnames(ret, c("abundance_rel", "abundance_abs", "abundance_prev_rel", "abundance_prev_abs"),

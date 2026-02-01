@@ -8,8 +8,8 @@ NULL
 
 # align & average spectra by clustering or between peak distances
 # code inspired from msProcess R package: https://github.com/zeehio/msProcess
-averageSpectra <- function(spectra, clusterMzWindow, topMost, minIntensityPre, minIntensityPost, minAbundanceRel,
-                           minAbundanceAbs, abundanceColumn, avgFun, avgCols, method, assignPrecursor,
+averageSpectra <- function(spectra, clusterMzWindow, topMost, minIntensityPre, minIntensityPost, relMinAbundance,
+                           absMinAbundance, abundanceColumn, avgFun, avgCols, method, assignPrecursor,
                            pruneMissingPrecursor, retainPrecursor)
 {
     if (length(spectra) == 0) # no spectra, return empty spectrum
@@ -79,7 +79,7 @@ averageSpectra <- function(spectra, clusterMzWindow, topMost, minIntensityPre, m
     {
         ret[, (abundanceColumnRel) := .N / spcount, by = "cluster"]
         ret[, (abundanceColumnAbs) := .N, by = "cluster"]
-        ret <- ret[get(abundanceColumnRel) >= minAbundanceRel & get(abundanceColumnAbs) >= minAbundanceAbs]
+        ret <- ret[get(abundanceColumnRel) >= relMinAbundance & get(abundanceColumnAbs) >= absMinAbundance]
     }
     
     ret <- doAvgPL(ret, "cluster", spcount)
@@ -149,8 +149,8 @@ getSpectraHeader <- function(spectra, rtRange, MSLevel, precursor, precursorMzWi
     return(hd)
 }
 
-averageSpectraMZR <- function(spectra, hd, clusterMzWindow, topMost, minIntensityPre, minIntensityPost, minAbundanceRel,
-                              minAbundanceAbs, avgFun, method, precursor, pruneMissingPrecursor, retainPrecursor)
+averageSpectraMZR <- function(spectra, hd, clusterMzWindow, topMost, minIntensityPre, minIntensityPost, relMinAbundance,
+                              absMinAbundance, avgFun, method, precursor, pruneMissingPrecursor, retainPrecursor)
 {
     if (nrow(hd) == 0) # no spectra, return empty spectrum
         return(emptyMSPeakList("abundance", NULL))
@@ -160,8 +160,8 @@ averageSpectraMZR <- function(spectra, hd, clusterMzWindow, topMost, minIntensit
     sp <- lapply(sp, function(spec) setnames(as.data.table(spec), c("mz", "intensity")))
     sp <- lapply(sp, assignPrecursorToMSPeakList, precursor)
     
-    return(averageSpectra(sp, clusterMzWindow, topMost, minIntensityPre, minIntensityPost, minAbundanceRel,
-                          minAbundanceAbs, "abundance", avgFun, NULL, method, TRUE, pruneMissingPrecursor,
+    return(averageSpectra(sp, clusterMzWindow, topMost, minIntensityPre, minIntensityPost, relMinAbundance,
+                          absMinAbundance, "abundance", avgFun, NULL, method, TRUE, pruneMissingPrecursor,
                           retainPrecursor))
 }
 

@@ -38,8 +38,8 @@ emptyMSPeakList <- function(abundanceColumn, avgCols)
 #' \item \code{minIntensityIMS} MS peaks in spectra of raw IMS frames with intensities below this value will be removed
 #' (applied prior to any other treatment steps).
 #'
-#' \item \code{minAbundanceAbs},\code{minAbundanceRel} Minimum absolute/relative abundance of an MS peak across the
-#' spectra that are averaged. If \code{minAbundanceAbs} exceeds the number of spectra then the threshold is
+#' \item \code{absMinAbundance},\code{relMinAbundance} Minimum absolute/relative abundance of an MS peak across the
+#' spectra that are averaged. If \code{absMinAbundance} exceeds the number of spectra then the threshold is
 #' automatically lowered to the number of spectra.
 #'
 #' \item \code{smoothWindowIMS},\code{halfWindowIMS},\code{maxGapIMS} Parameters used for centroiding \emph{m/z} peaks
@@ -100,8 +100,8 @@ getDefAvgPListParams <- function(...)
         minIntensityPre = 500,
         minIntensityPost = 500,
         minIntensityIMS = 25,
-        minAbundanceAbs = 0,
-        minAbundanceRel = 0,
+        absMinAbundance = 0,
+        relMinAbundance = 0,
         smoothWindowIMS = 0,
         halfWindowIMS = 2,
         maxGapIMS = defaultLim("mz", "medium"),
@@ -207,7 +207,7 @@ getDefSpecSimParams <- function(...)
 }
 
 averageSpectraList <- function(spectraList, clusterMzWindow, topMost, minIntensityPre, minIntensityPost,
-                               minAbundanceRel, minAbundanceAbs, method, assignPrecursor, withPrecursor,
+                               relMinAbundance, absMinAbundance, method, assignPrecursor, withPrecursor,
                                pruneMissingPrecursor, retainPrecursor)
 {
     # pre-treat
@@ -231,8 +231,8 @@ averageSpectraList <- function(spectraList, clusterMzWindow, topMost, minIntensi
         })
     })
 
-    averagedSpectra <- doAverageSpectraList(spectraList, method, clusterMzWindow, minIntensityPost, minAbundanceRel,
-                                            minAbundanceAbs)
+    averagedSpectra <- doAverageSpectraList(spectraList, method, clusterMzWindow, minIntensityPost, relMinAbundance,
+                                            absMinAbundance)
 
     # post-treat
     averagedSpectra <- lapply(seq_along(averagedSpectra), function(i)
@@ -349,8 +349,8 @@ deIsotopeMSPeakList <- function(MSPeakList, negate)
     return(MSPeakList[unique_iso])
 }
 
-doMSPeakListFilter <- function(pList, absIntThr, relIntThr, topMost, minPeaks, maxMZOverPrec, minAbundanceFeatAbs,
-                               minAbundanceFeatRel, minAbundanceFGroupAbs, minAbundanceFGroupRel, deIsotope, removeMZs,
+doMSPeakListFilter <- function(pList, absIntThr, relIntThr, topMost, minPeaks, maxMZOverPrec, absMinAbundanceFeat,
+                               relMinAbundanceFeat, absMinAbundanceFGroup, relMinAbundanceFGroup, deIsotope, removeMZs,
                                retainPrecursor, precursorMZ, mzWindow, negate)
 {
     ret <- pList
@@ -379,24 +379,24 @@ doMSPeakListFilter <- function(pList, absIntThr, relIntThr, topMost, minPeaks, m
         ret <- ret[pred(mz)]
     }
     
-    if (!is.null(minAbundanceFeatAbs))
+    if (!is.null(absMinAbundanceFeat))
     {
         if (!is.null(ret[["feat_abundance_abs"]]))
-            ret <- ret[intPred(feat_abundance_abs, minAbundanceFeatAbs)] # averaged PL
+            ret <- ret[intPred(feat_abundance_abs, absMinAbundanceFeat)] # averaged PL
         else
-            ret <- ret[intPred(abundance_abs, minAbundanceFeatAbs)] # feat PL
+            ret <- ret[intPred(abundance_abs, absMinAbundanceFeat)] # feat PL
     }
-    if (!is.null(minAbundanceFeatRel))
+    if (!is.null(relMinAbundanceFeat))
     {
         if (!is.null(ret[["feat_abundance_rel"]]))
-            ret <- ret[intPred(feat_abundance_rel, minAbundanceFeatRel)] # averaged PL
+            ret <- ret[intPred(feat_abundance_rel, relMinAbundanceFeat)] # averaged PL
         else
-            ret <- ret[intPred(abundance_rel, minAbundanceFeatRel)] # feat PL
+            ret <- ret[intPred(abundance_rel, relMinAbundanceFeat)] # feat PL
     }
-    if (!is.null(minAbundanceFGroupAbs) && !is.null(ret[["fgroup_abundance_abs"]]))
-        ret <- ret[intPred(fgroup_abundance_abs, minAbundanceFGroupAbs)]
-    if (!is.null(minAbundanceFGroupRel) && !is.null(ret[["fgroup_abundance_rel"]]))
-        ret <- ret[intPred(fgroup_abundance_rel, minAbundanceFGroupRel)]
+    if (!is.null(absMinAbundanceFGroup) && !is.null(ret[["fgroup_abundance_abs"]]))
+        ret <- ret[intPred(fgroup_abundance_abs, absMinAbundanceFGroup)]
+    if (!is.null(relMinAbundanceFGroup) && !is.null(ret[["fgroup_abundance_rel"]]))
+        ret <- ret[intPred(fgroup_abundance_rel, relMinAbundanceFGroup)]
 
     if (deIsotope)
         ret <- deIsotopeMSPeakList(ret, negate)

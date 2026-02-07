@@ -22,7 +22,7 @@ if (doDataPretreatment)
     convertMSFiles(anaInfo, typeFrom = "raw", formatFrom = "bruker", typeTo = "profile", formatTo = "mzML",
                    algorithm = "bruker", overwrite = FALSE)
     convertMSFiles(anaInfo, typeFrom = "ims", formatFrom = "mzML", typeTo = "centroid", formatTo = "mzML",
-                   algorithm = "im_collapse", overwrite = FALSE)
+                   algorithm = "imscollapse", overwrite = FALSE)
     convertMSFiles(anaInfo, typeFrom = "raw", formatFrom = "bruker_ims", typeTo = "profile", formatTo = "mzML",
                    algorithm = "timsconvert", overwrite = FALSE)
 }

@@ -96,6 +96,8 @@
             - IMS="maybe", so probably fine?
         - predict CCS for TPs?
         - don't do CCS prediction with PCL+MetFrag?
+    - have a IMS$mode == "disabled"? --> mainly to set defaults for piek/MSPL/EIMs
+        - see if we can get some kind of popup
 
 ## Param defaults
 
@@ -103,7 +105,6 @@
 - tweaks
     - set default greedy weights
         - also configurable weights for assignMobilities()?
-- update newProject()/handbook for IMS arg for EIMs and MSPL
 
 ## IMS
 
@@ -158,6 +159,7 @@
 - convert
     - add patRoon 3.0 citation for imscollapse
 - handbook
+    - update for IMS arg for EIMs and MSPL
     - installation
         - add additional external deps, eg Python, TIMS-SDK, c3sdb, PCL/CCS etc
     - workflow concepts: maybe mention mobility as possible feature property

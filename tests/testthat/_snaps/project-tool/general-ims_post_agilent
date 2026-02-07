@@ -11,6 +11,7 @@ setwd(workPath)
 # NOTE: please set to a valid data.frame with analysis information. See ?`analysis-information` for more details.
 anaInfo <- data.frame(path_centroid = character(), analysis = character(), replicate = character(), blank = character())
 
+EIMParams <- getDefEIMParams(IMS = "agilent")
 CCSParams <- getCCSParams(method = "agilent", calibrant = "")
 
 # -------------------------
@@ -37,13 +38,13 @@ fGroups <- updateGroups(fGroups, what = c("ret", "mz", "mobility"), intWeight = 
 # -------------------------
 
 fGroups <- assignMobilities(fGroups, mobPeakParams = getDefPeakParams(type = "agilent_ims", algorithm = "piek"),
-                            chromPeakParams = getDefPeakParams(type = "chrom", algorithm = "piek"), fallbackEIC = TRUE,
-                            calcArea = "integrate", CCSParams = CCSParams)
+                            chromPeakParams = getDefPeakParams(type = "chrom", algorithm = "piek"),
+                            EIMParams = EIMParams, fallbackEIC = TRUE, calcArea = "integrate", CCSParams = CCSParams)
 
 # -------------------------
 # reporting
 # -------------------------
 
 # Advanced report settings can be edited in the report.yml file.
-report(fGroups, MSPeakLists = NULL, formulas = NULL, compounds = NULL, components = NULL, settingsFile = "report.yml",
-       openReport = TRUE)
+report(fGroups, MSPeakLists = NULL, formulas = NULL, compounds = NULL, components = NULL, EIMParams = EIMParams,
+       settingsFile = "report.yml", openReport = TRUE)

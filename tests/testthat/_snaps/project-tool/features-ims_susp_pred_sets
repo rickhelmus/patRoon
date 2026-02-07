@@ -14,6 +14,8 @@ anaInfoPos <- data.frame(path_centroid = character(), analysis = character(), re
 anaInfoNeg <- data.frame(path_centroid = character(), analysis = character(), replicate = character(),
                          blank = character())
 
+EIMParams <- getDefEIMParams(IMS = "bruker")
+
 # -------------------------
 # setup suspect lists
 # -------------------------
@@ -65,5 +67,5 @@ fGroups <- screenSuspects(fGroups, list(suspListPos, suspListNeg), rtWindow = 12
 # -------------------------
 
 # Advanced report settings can be edited in the report.yml file.
-report(fGroups, MSPeakLists = NULL, formulas = NULL, compounds = NULL, components = NULL, settingsFile = "report.yml",
-       openReport = TRUE)
+report(fGroups, MSPeakLists = NULL, formulas = NULL, compounds = NULL, components = NULL, EIMParams = EIMParams,
+       settingsFile = "report.yml", openReport = TRUE)

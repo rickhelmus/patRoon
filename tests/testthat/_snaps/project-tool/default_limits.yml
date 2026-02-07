@@ -14,15 +14,15 @@ mz:
     narrow_rel: 5
     medium_rel: 10
 mobility_bruker:
-    very_narrow: 0.005
-    narrow: 0.01
-    medium: 0.02
+    very_narrow: 0.01
+    narrow: 0.02
+    medium: 0.04
     wide: 0.2
     medium_rel: 0.05
 mobility_agilent:
-    very_narrow: 0.05
-    narrow: 0.1
-    medium: 0.2
+    very_narrow: 0.1
+    narrow: 0.2
+    medium: 0.4
     wide: 2
     medium_rel: 0.05
 CCS:

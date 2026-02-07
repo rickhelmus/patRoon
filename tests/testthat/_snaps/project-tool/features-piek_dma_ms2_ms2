@@ -11,6 +11,8 @@ setwd(workPath)
 # NOTE: please set to a valid data.frame with analysis information. See ?`analysis-information` for more details.
 anaInfo <- data.frame(path_centroid = character(), analysis = character(), replicate = character(), blank = character())
 
+EIMParams <- getDefEIMParams(IMS = "bruker")
+
 # -------------------------
 # features
 # -------------------------
@@ -19,7 +21,7 @@ anaInfo <- data.frame(path_centroid = character(), analysis = character(), repli
 # NOTE: see the reference manual for many more options
 genEICParams <- getPiekEICParams(IMS = "bruker", filter = "ms2", filterIMS = "ms2", mzRange = c(80, 800),
                                  mzStep = 0.02, mobRange = c(0.4, 1.3), mobStep = 0.08, rtWindow = 2, mzWindow = NULL,
-                                 IMSWindow = 0.02, minTIC = 10000)
+                                 mobWindow = 0.04, minTIC = 10000)
 fList <- findFeatures(anaInfo, "piek", genEICParams = genEICParams, peakParams = getDefPeakParams("chrom", "piek"))
 
 # Group and align features between analyses
@@ -38,5 +40,5 @@ fGroups <- updateGroups(fGroups, what = c("ret", "mz", "mobility"), intWeight = 
 # -------------------------
 
 # Advanced report settings can be edited in the report.yml file.
-report(fGroups, MSPeakLists = NULL, formulas = NULL, compounds = NULL, components = NULL, settingsFile = "report.yml",
-       openReport = TRUE)
+report(fGroups, MSPeakLists = NULL, formulas = NULL, compounds = NULL, components = NULL, EIMParams = EIMParams,
+       settingsFile = "report.yml", openReport = TRUE)

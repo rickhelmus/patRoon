@@ -114,7 +114,7 @@ genLimitsFile <- function(out = "limits.yml", IMS = "bruker")
 {
     checkmate::assertString(out, min.chars = 1)
     checkmate::assertPathForOutput(out, overwrite = TRUE)
-    checkmate::assertChoice(IMS, c("bruker", "agilent"))
+    assertIMSType(IMS)
     
     limits <- readYAML(system.file("misc", "limits.yml", package = "patRoon"))
     limits$general$IMS <- IMS

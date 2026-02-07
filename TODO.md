@@ -101,12 +101,9 @@
 
 - don't use defaults for eg feature finding (and grouping)?
 - tweaks
-    - agilent defaults
     - set default greedy weights
         - also configurable weights for assignMobilities()?
-    - tweak default EIMParams
-        - default smoothing? different for Agilent? Convert to mobility units?
-- MSPL/IMSCollapse: specify default maxGapIMS in limits? Mainly for Agilent, where relatively large numbers are necessary
+- update newProject()/handbook for IMS arg for EIMs and MSPL
 
 ## IMS
 

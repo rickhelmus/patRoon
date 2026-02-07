@@ -291,6 +291,8 @@ convertMSFilesBruker <- function(inFiles, outFiles, formatTo = "mzML", centroid 
 #' @param mzRange,mobilityRange A two sized vector specifying the m/z and mobility range to be exported, respectively.
 #'   Set to \code{NULL} to export the full range.
 #' @param smoothWindow,halfWindow,maxGap Centroiding parameters: see \code{\link{getDefAvgPListParams}} for details.
+#'   \strong{NOTE}: As described there, \code{maxGap} may need to be increased for Agilent instruments (\emph{e.g.}
+#'   \samp{0.01}).
 #' @param clusterMethod,mzWindow The clustering method and window (see \link[=cluster-params]{clustering parameters})
 #'   used to find and combine MS/MS spectra of precursors with close \emph{m/z}.
 #' @param minIntensityIMS The minimum intensity for MS peaks in raw data.
@@ -305,7 +307,7 @@ convertMSFilesBruker <- function(inFiles, outFiles, formatTo = "mzML", centroid 
 #' @rdname MSConversion
 #' @export
 convertMSFilesIMSCollapse <- function(inFiles, outFiles, typeFrom, formatTo = "mzML", mzRange = NULL, mobilityRange = NULL,
-                                      smoothWindow = 0, halfWindow = 2, maxGap = defaultLim("mz", "medium"),
+                                      smoothWindow = 0, halfWindow = 2, maxGap = 0.005,
                                       clusterMethod = "distance_mean", mzWindow = defaultLim("mz", "medium"),
                                       minIntensityIMS = 0, includeMSMS = FALSE, ...)
 {

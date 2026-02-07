@@ -696,16 +696,19 @@ getDefEICParams <- function(...)
     return(modifyList(def, mod, keep.null = TRUE))
 }
 
+#' @param IMS A \code{character} that specifies for which IMS instrument defaults are returned. Should be
+#'   \code{"bruker"} or \code{"agilent"}.
 #' @rdname EIXParams
 #' @export
-getDefEIMParams <- function(...)
+getDefEIMParams <- function(..., IMS = "bruker")
 {
+    assertIMSType(IMS)
     def <- getDefEIXParams()
     def <- modifyList(def, list(
         window = defaultLim("mobility", "wide"),
-        maxRTWindow = defaultLim("retention", "wide"),
-        smooth = "sg",
-        smLength = 15,
+        maxRTWindow = defaultLim("retention", "narrow"),
+        smooth = if (IMS == "bruker") "sg" else "none",
+        smLength = if (IMS == "bruker") 15 else 5,
         sgOrder = 3
     ))
     return(modifyList(def, list(...), keep.null = TRUE))

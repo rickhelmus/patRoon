@@ -723,11 +723,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams = getPiekEICParams(),
 #' @export
 getPiekEICParams <- function(..., IMS = FALSE)
 {
-    checkmate::assert(
-        checkmate::checkFALSE(IMS),
-        checkmate::checkChoice(IMS, c("bruker", "agilent")),
-        .var.name = "IMS"
-    )
+    assertIMSType(IMS, withFALSE = TRUE)
     
     ret <- list(filter = "none", filterIMS = "none", IMS = !isFALSE(IMS), mzRange = c(80, 800),
                 retRange = NULL, gapFactor = 3, saveMZProfiles = FALSE, saveEIMs = FALSE, minEICIntensity = 5000,

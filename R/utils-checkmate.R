@@ -1268,6 +1268,20 @@ assertPiekGenEICParams <- function(x, .var.name = checkmate::vname(x), add = NUL
         stop("'filterIMS' should be set to 'none' or match 'filter'.", call. = FALSE)
 }
 
+assertIMSType <- function(x, withFALSE = FALSE, .var.name = checkmate::vname(x), add = NULL)
+{
+    if (withFALSE)
+    {
+        checkmate::assert(
+            checkmate::checkFALSE(x),
+            checkmate::checkChoice(x, c("bruker", "agilent")),
+            .var.name = .var.name, add = add
+        )
+    }
+    else
+        checkmate::assertChoice(x, c("bruker", "agilent"), .var.name = .var.name, add = add)
+}
+
 # from https://github.com/mllg/checkmate/issues/115
 aapply = function(fun, formula, ..., fixed = list())
 {

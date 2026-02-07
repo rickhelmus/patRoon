@@ -62,11 +62,14 @@ emptyMSPeakList <- function(abundanceColumn, avgCols)
 #'
 #' }
 #'
-#' The \code{getDefAvgPListParams} function can be used to generate a default parameter list. The defaults are:
+#' The \code{getDefAvgPListParams} function can be used to generate a default parameter list. The defaults are (with
+#' \code{IMS="bruker"}):
 #'
 #' @eval paste("@@details", getDefAvgPListParamsRD())
 #'
 #' @param \dots Optional named arguments that override defaults.
+#' @param IMS A \code{character} that specifies for which IMS instrument defaults are returned. Should be
+#'   \code{"bruker"} or \code{"agilent"}.
 #'
 #' @section Centroiding IMS data: With IMS-HRMS data the \emph{m/z} peaks are often not or partially centroided. The
 #'   following steps are performed to centroid the data: \enumerate{
@@ -76,7 +79,9 @@ emptyMSPeakList <- function(abundanceColumn, avgCols)
 #'   
 #'   \item Use point-distance clustering (see \link[=cluster-params]{clustering parameters}) with a window defined by
 #'   \code{maxGapIMS} to find related mass signals. This is primarily meant for non-continuous data, \emph{e.g.} due to
-#'   intensity thresholding. \code{maxGapIMS} is defaulted as \code{defaultLim("mz", "medium")} (see \link{limits}).
+#'   intensity thresholding. The \code{maxGapIMS} parameter should be set to a value that represents the maximum
+#'   expected distance between two \emph{m/z} datapoints. For some instruments, such as Agilent IMS-QTOF, this value may
+#'   be higher than expected. For that reason, if \code{IMS="agilent"} then the default is set to \code{0.01}.
 #'   
 #'   \item Smooth the intensity data using a centered moving average with window size \code{smoothWindowIMS} (set to
 #'   zero to disable smoothing).
@@ -91,8 +96,9 @@ emptyMSPeakList <- function(abundanceColumn, avgCols)
 #' @references \insertRef{Gibb2012}{patRoon}
 #'
 #' @export
-getDefAvgPListParams <- function(...)
+getDefAvgPListParams <- function(..., IMS = "bruker")
 {
+    assertIMSType(IMS)
     def <- list(
         method = "distance_mean",
         clusterMzWindow = defaultLim("mz", "medium"),
@@ -104,7 +110,7 @@ getDefAvgPListParams <- function(...)
         relMinAbundance = 0,
         smoothWindowIMS = 0,
         halfWindowIMS = 2,
-        maxGapIMS = defaultLim("mz", "medium"),
+        maxGapIMS = if (IMS == "agilent") 0.01 else 0.005,
         withPrecursorMS = TRUE,
         pruneMissingPrecursorMS = TRUE,
         retainPrecursorMSMS = TRUE

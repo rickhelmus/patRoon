@@ -599,7 +599,7 @@ SpectrumRaw centroidIMSFrame(const SpectrumRaw &frame, const SpectrumRawTypes::M
     const size_t window = halfWindow * 2;
     const size_t padSize = std::max((smoothWindow / 2) + 1, halfWindow);
     
-    std::vector<int> clusts = (maxGap > 0.0) ?
+    const std::vector<int> clusts = (maxGap > 0.0) ?
         // cluster in case of gaps
         clusterNums(mergedSpec.getMZs(), clusterMethod::DISTANCE_POINT, maxGap) :
         // all in one cluster

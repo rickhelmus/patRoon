@@ -773,7 +773,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         const auto mzStart = startMZs[i];
         const auto mzEnd = endMZs[i];
         const auto mzExtStart = (mzStart > 0.0) ? (mzStart - smoothExtMZ) : 0.0;
-        const auto mzExtEnd = (mzEnd > 0.0) ? mzEnd + smoothExtMZ : 0.0;
+        const auto mzExtEnd = (mzEnd > 0.0) ? (mzEnd + smoothExtMZ) : 0.0;
         const auto timeStart = (startTimes.size() == 1) ? startTimes[0] : startTimes[i];
         const auto timeEnd = (endTimes.size() == 1) ? endTimes[0] : endTimes[i];
         const auto mobStart = (anySpecHasMob) ? startMobs[i] : 0.0, mobEnd = (anySpecHasMob) ? endMobs[i] : 0.0;
@@ -783,13 +783,23 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         const auto itStart = std::lower_bound(allPeaksSorted.mzs.cbegin(), allPeaksSorted.mzs.cend(), mzExtStart);
         if (itStart == allPeaksSorted.mzs.cend() || *itStart > mzExtEnd)
             continue;
-        const auto itEnd = std::prev(std::upper_bound(itStart, allPeaksSorted.mzs.cend(), mzExtEnd));
+        const auto itEnd = std::prev((mzExtEnd == 0.0) ?
+                                         allPeaksSorted.mzs.cend() :
+                                         std::upper_bound(itStart, allPeaksSorted.mzs.cend(), mzExtEnd));
         const auto startInd = std::distance(allPeaksSorted.mzs.cbegin(), itStart);
         auto endInd = std::distance(allPeaksSorted.mzs.cbegin(), itEnd);
         if (startInd > endInd)
             endInd = startInd; // only one peak at the end
-        const auto sortedInds = getSortedInds(allPeaksSorted.indices.cbegin() + startInd,
-                                              allPeaksSorted.indices.cbegin() + endInd);
+        
+        // sort subrange of indices to make sure we process peaks in scan order
+        // NOTE: also sort by m/z and mobility to ensure that the order is not affected by eg the inclusion of EICs with
+        // different ranges. It was observed that two mass peaks with the same intensity could affect the basepeak
+        // assignment by inconsistent ordering.
+        const auto sortedInds = (anySpecHasMob) ?
+            getSortedInds3D(allPeaksSorted.indices.cbegin() + startInd, allPeaksSorted.indices.cbegin() + endInd,
+                            allPeaksSorted.mzs.cbegin() + startInd, allPeaksSorted.mobilities.cbegin() + startInd) :
+            getSortedInds2D(allPeaksSorted.indices.cbegin() + startInd, allPeaksSorted.indices.cbegin() + endInd,
+                            allPeaksSorted.mzs.cbegin() + startInd);
         
         eic.setBoundaries(mzStart, mzEnd, mobStart, mobEnd);
         

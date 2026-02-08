@@ -31,10 +31,10 @@ template <typename C> C median(std::vector<C> v)
     return *middleIt;
 }
 
+// get sorted indices
+// inspired from https://stackoverflow.com/a/40183830
 template <typename C, typename F> std::vector<size_t> getSortedInds(const C &cont, F func)
 {
-    // get sorted indices
-    // inspired from https://stackoverflow.com/a/40183830
     std::vector<size_t> ret(cont.size());
     std::iota(ret.begin(), ret.end(), 0);
     std::sort(ret.begin(), ret.end(), [&](size_t i, size_t j) { return func(i, j); });
@@ -43,8 +43,6 @@ template <typename C, typename F> std::vector<size_t> getSortedInds(const C &con
 
 template <typename C> std::vector<size_t> getSortedInds(const C &cont)
 {
-    // get sorted indices
-    // inspired from https://stackoverflow.com/a/40183830
     std::vector<size_t> ret(cont.size());
     std::iota(ret.begin(), ret.end(), 0);
     std::sort(ret.begin(), ret.end(), [&](size_t i, size_t j) { return cont[i] < cont[j]; });
@@ -53,11 +51,33 @@ template <typename C> std::vector<size_t> getSortedInds(const C &cont)
 
 template <typename IT> std::vector<size_t> getSortedInds(const IT &start, const IT &end)
 {
-    // get sorted indices
-    // inspired from https://stackoverflow.com/a/40183830
     std::vector<size_t> ret(std::distance(start, end+1));
     std::iota(ret.begin(), ret.end(), 0);
     std::sort(ret.begin(), ret.end(), [&](size_t i, size_t j) { return *(start + i) < *(start + j); });
+    return ret;
+}
+
+template <typename IT1, typename IT2> std::vector<size_t> getSortedInds2D(const IT1 &start1, const IT1 &end1,
+                                                                          const IT2 &start2)
+{
+    std::vector<size_t> ret(std::distance(start1, end1+1));
+    std::iota(ret.begin(), ret.end(), 0);
+    std::sort(ret.begin(), ret.end(), [&](size_t i, size_t j)
+    {
+        return std::tie(*(start1 + i), *(start2 + i)) < std::tie(*(start1 + j), *(start2 + j));
+    });
+    return ret;
+}
+
+template <typename IT1, typename IT2, typename IT3> std::vector<size_t>
+getSortedInds3D(const IT1 &start1, const IT1 &end1, const IT2 &start2, const IT3 &start3)
+{
+    std::vector<size_t> ret(std::distance(start1, end1+1));
+    std::iota(ret.begin(), ret.end(), 0);
+    std::sort(ret.begin(), ret.end(), [&](size_t i, size_t j)
+    {
+        return std::tie(*(start1 + i), *(start2 + i), *(start3 + i)) < std::tie(*(start1 + j), *(start2 + j), *(start3 + j));
+    });
     return ret;
 }
 

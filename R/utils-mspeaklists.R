@@ -68,8 +68,8 @@ emptyMSPeakList <- function(abundanceColumn, avgCols)
 #' @eval paste("@@details", getDefAvgPListParamsRD())
 #'
 #' @param \dots Optional named arguments that override defaults.
-#' @param IMS A \code{character} that specifies for which IMS instrument defaults are returned. Should be
-#'   \code{"bruker"} or \code{"agilent"}.
+#' 
+#' @template IMSInstr-arg
 #'
 #' @section Centroiding IMS data: With IMS-HRMS data the \emph{m/z} peaks are often not or partially centroided. The
 #'   following steps are performed to centroid the data: \enumerate{
@@ -96,7 +96,7 @@ emptyMSPeakList <- function(abundanceColumn, avgCols)
 #' @references \insertRef{Gibb2012}{patRoon}
 #'
 #' @export
-getDefAvgPListParams <- function(..., IMS = "bruker")
+getDefAvgPListParams <- function(..., IMS = getLimIMS())
 {
     assertIMSType(IMS)
     def <- list(

@@ -70,17 +70,10 @@ getLimitsFile <- function()
     stop("Cannot find limits configuration file!")
 }
 
-#' @details \code{defaultLim} returns the limits for a specific category and tolerance level.
-#' @param category,level The category and level of the limit to be returned. See the detail sections below. For mobility
-#'   related limits, the \code{category="mobility"} (instead of instrument specific categories) should be used.
-#' @rdname limits
-#' @export
-defaultLim <- function(category, level) doDefaultLim(category, level)
-
-defaultLimClosure <- function()
+getLimitsClosure <- function()
 {
     cachedLimits <- cachedFileHash <- NULL
-    function(category, level)
+    function()
     {
         limFile <- getLimitsFile()
         limHash <- makeFileHash(limFile)
@@ -90,15 +83,36 @@ defaultLimClosure <- function()
             cachedLimits <<- assertAndPrepareLimits(cachedLimits)
             cachedFileHash <<- makeFileHash(limFile)
         }
-        
-        checkmate::assertChoice(category, setdiff(names(cachedLimits), "general"))
-        checkmate::assertChoice(level, names(cachedLimits[[category]]))
-        
-        return(cachedLimits[[category]][[level]])
+        return(cachedLimits)
     }
 }
 
-doDefaultLim <- defaultLimClosure()
+doGetLimits <- getLimitsClosure()
+
+
+#' @details \code{defaultLim} returns the limits for a specific category and tolerance level.
+#' @param category,level The category and level of the limit to be returned. See the detail sections below. For mobility
+#'   related limits, the \code{category="mobility"} (instead of instrument specific categories) should be used.
+#' @rdname limits
+#' @export
+defaultLim <- function(category, level)
+{
+    limits <- doGetLimits()
+    checkmate::assertChoice(category, setdiff(names(limits), "general"))
+    checkmate::assertChoice(level, names(limits[[category]]))
+    return(limits[[category]][[level]])
+}
+
+#' @details \code{getLimIMS} returns the type of IMS instrument specified in the limits configuration file. This is used
+#'   to determine which mobility limits to use, and is also used in some other functions to determine the default
+#'   behavior for IMS related processing.
+#' @rdname limits
+#' @export
+getLimIMS <- function()
+{
+    limits <- doGetLimits()
+    return(limits$general$IMS)
+}
 
 #' @details \code{genLimitsFile} generates a new \file{limits.yml} configuration file in the specified path. The file is
 #'   created with the defaults embedded in \pkg{patRoon} (see details below). Generating a custom limits is primarily

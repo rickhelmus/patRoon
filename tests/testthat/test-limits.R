@@ -28,5 +28,8 @@ test_that("limits tests", {
     genLimitsFile(tmpLimitsFileIMSAgilent, "agilent")
     withOpt(path.limits = tmpLimitsFileIMSAgilent, {
         expect_equal(defaultLim("mobility", "narrow"), readYAML(tmpLimitsFile)$mobility_agilent$narrow)
+        expect_equal(getLimIMS(), "agilent")
+        expect_equal(getDefEIMParams(), getDefEIMParams(IMS = "agilent"))
+        expect_equal(getDefAvgPListParams(), getDefAvgPListParams(IMS = "agilent"))
     })
 })

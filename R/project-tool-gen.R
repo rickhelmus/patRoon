@@ -180,8 +180,7 @@ scriptGenerator$methods(
     }
 )
 
-genScriptInitBlock <- function(CCSCalibrant, anaInfoData, settingsGen, settingsAna, settingsPre, doHTMLReport,
-                               generator)
+genScriptInitBlock <- function(CCSCalibrant, anaInfoData, settingsGen, settingsAna, settingsPre, generator)
 {
     addAnaInfo <- function(anaInfoVarName, aid, comment, exPol)
     {
@@ -286,23 +285,14 @@ genScriptInitBlock <- function(CCSCalibrant, anaInfoData, settingsGen, settingsA
         generator$addText("}")
     }
     
-    if (settingsGen$IMS$mode != "none")
+    if (settingsGen$IMS$mode != "none" && settingsGen$IMS$CCSMethod != "none")
     {
-        doEIMPars <- settingsGen$IMS$mode == "post" || doHTMLReport
-        
-        if (doEIMPars || settingsGen$IMS$CCSMethod != "none")
-        {
-            generator$addNL()
-            generator$addCall("EIMParams", "getDefEIMParams", list(
-                list(name = "IMS", value = settingsGen$IMS$limits, quote = TRUE)
-            ), condition = doEIMPars)
-            generator$addCall("CCSParams", "getCCSParams", list(
-                list(name = "method", value = settingsGen$IMS$CCSMethod, quote = TRUE),
-                list(name = "calibrant", value = CCSCalibrant, quote = TRUE,
-                     condition = settingsGen$IMS$CCSMethod == "agilent")
-            ), condition = settingsGen$IMS$CCSMethod != "none")
-        }
-
+        generator$addNL()
+        generator$addCall("CCSParams", "getCCSParams", list(
+            list(name = "method", value = settingsGen$IMS$CCSMethod, quote = TRUE),
+            list(name = "calibrant", value = CCSCalibrant, quote = TRUE,
+                 condition = settingsGen$IMS$CCSMethod == "agilent")
+        ))
     }
 }
 
@@ -412,6 +402,7 @@ genScriptFeaturesBlock <- function(ionization, IMS, settingsFeat, generator)
             list(name = "maxFWHM", value = 30, condition = fa == "OpenMS"),
             list(name = "kmeans", value = TRUE, condition = fa == "KPIC2"),
             list(name = "level", value = 1000, condition = fa == "KPIC2"),
+            list(name = "IMS", value = IMS$mode == "direct", condition = fa == "piek" && IMS$mode != "none"),
             list(name = "genEICParams", value = "genEICParams", condition = fa == "piek"),
             list(name = "peakParams", value = peakParams, condition = fa == "piek"),
             list(name = "suspects", value = suspPiekL,
@@ -434,14 +425,13 @@ genScriptFeaturesBlock <- function(ionization, IMS, settingsFeat, generator)
         {
             mmz <- settingsFeat$piekParams$filter; mims <- settingsFeat$piekParams$filterIMS
             def <- list(
-                none = getPiekEICParams(IMS = IMS$limits),
-                susp = getPiekEICParams(IMS = IMS$limits, filter = "suspects", filterIMS = "suspects"),
-                ms2 = getPiekEICParams(IMS = IMS$limits, filter = "ms2", filterIMS = "ms2")
+                none = getPiekEICParams(),
+                susp = getPiekEICParams(filter = "suspects", filterIMS = "suspects"),
+                ms2 = getPiekEICParams(filter = "ms2", filterIMS = "ms2")
             )
             
             doDirectIMS <- IMS$mode == "direct"
             generator$addCall("genEICParams", "getPiekEICParams", list(
-                list(name = "IMS", value = if (doDirectIMS) IMS$limits else FALSE, quote = doDirectIMS, condition = IMS$mode != "none"),
                 list(name = "filter", value = mmz, quote = TRUE),
                 list(name = "filterIMS", value = mims, quote = TRUE, condition = doDirectIMS),
                 list(name = "mzRange", value = def$none$mzRange),
@@ -672,7 +662,6 @@ genScriptFeatMobBlock <- function(IMS, settingsFeat, doSusps, generator)
                                                     IMS$limits, settingsFeat$IMSPeaksMob)),
         list(name = "chromPeakParams", value = sprintf("getDefPeakParams(type = \"chrom\", algorithm = \"%s\")",
                                                      settingsFeat$IMSPeaksChrom)),
-        list(name = "EIMParams", value = "EIMParams"),
         list(name = "fallbackEIC", value = TRUE),
         list(name = "calcArea", value = "integrate", quote = TRUE),
         list(name = "CCSParams", value = "CCSParams", condition = IMS$CCSMethod != "none"),
@@ -690,10 +679,7 @@ genScriptAnnBlock <- function(ionization, IMS, settingsAnn, adductArg, doSusps, 
     generator$addHeader("annotation")
     
     generator$addComment("Retrieve MS peak lists")
-    generator$addCall("avgMSListParams", "getDefAvgPListParams", list(
-        list(name = "clusterMzWindow", value = defaultLim("mz", "narrow")),
-        list(name = "IMS", value = IMS$limits, quote = TRUE, condition = IMS$mode != "none")
-    ))
+    generator$addCall("avgMSListParams", "getDefAvgPListParams", list(name = "clusterMzWindow", value = defaultLim("mz", "narrow")))
     generator$addCall("mslists", "generateMSPeakLists", list(
         list(value = "fGroups"),
         list(name = "maxMSRTWindow", value = defaultLim("retention", "narrow")),
@@ -878,7 +864,7 @@ genScriptTPCompBlock <- function(doFormAnn, doCompAnn, TPsAlgo, generator)
     generator$addAssignment("fGroups", "fGroups[results = componentsTP]")
 }
 
-genScriptReportBlock <- function(IMS, settingsAnn, settingsReport, doTPs, generator)
+genScriptReportBlock <- function(settingsAnn, settingsReport, doTPs, generator)
 {
     # UNDONE: for now TP components are always reported instead of others
     componVal <- if (doTPs)
@@ -901,7 +887,6 @@ genScriptReportBlock <- function(IMS, settingsAnn, settingsReport, doTPs, genera
             list(name = "compounds", value = "compounds", isNULL = !doComps),
             list(name = "components", value = componVal),
             list(name = "TPs", value = "TPs", condition = doTPs),
-            list(name = "EIMParams", value = "EIMParams", condition = IMS$mode != "none"),
             list(name = "settingsFile", value = "report.yml", quote = TRUE),
             list(name = "openReport", value = TRUE)
         ))
@@ -961,8 +946,7 @@ getScriptCode <- function(CCSCalibrant, anaInfoData, settings, noDate)
     generator$addNL()
     generator$addCall(NULL, "library", list(value = "patRoon"))
     
-    genScriptInitBlock(CCSCalibrant, anaInfoData, settings$general, settings$analyses, settings$preTreatment,
-                       "HTML" %in% settings$report, generator)
+    genScriptInitBlock(CCSCalibrant, anaInfoData, settings$general, settings$analyses, settings$preTreatment, generator)
 
     if (doSusps || doPiekSusps || doISTDs)
         genScriptSuspListsBlock(ionization, IMSMode, settings$features, doSusps, doPiekSusps, doISTDs, generator)
@@ -1001,7 +985,7 @@ getScriptCode <- function(CCSCalibrant, anaInfoData, settings, noDate)
     }
     
     if (length(settings$report$reportGen) > 0)
-        genScriptReportBlock(settings$general$IMS, settings$annotation, settings$report, doTPs, generator)
+        genScriptReportBlock(settings$annotation, settings$report, doTPs, generator)
     
     generator$addNL()
     

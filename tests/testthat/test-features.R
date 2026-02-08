@@ -32,7 +32,7 @@ ffPiekMS2XCMS3 <- getPiekHRMS(getPiekEICParams(filter = "ms2"), getDefPeakParams
 ffPiekMS2EP <- getPiekHRMS(getPiekEICParams(filter = "ms2"), getDefPeakParams("chrom", "envipick"))
 
 anaInfoOneIMS <- getTestAnaInfoIMS()[4, ]
-getPiekIMS <- \(..., args = list()) do.call(getPiek, c(list(getPiekEICParams(..., IMS = "bruker"), anaInfoOneIMS,
+getPiekIMS <- \(..., args = list()) do.call(getPiek, c(list(getPiekEICParams(...), anaInfoOneIMS, IMS = TRUE,
                                                             suspects = patRoonDataIMS::suspectsPos, adduct = "[M+H]+"),
                                                        args))
 getPiekSuspIMS <- \(...) getPiekIMS(filter = "suspects", filterIMS = "suspects", ...)
@@ -132,11 +132,11 @@ test_that("piek", {
     expect_lt(length(getPiekHRMS(getPiekEICParams(filter = "ms2", topMostEICMZ = 25))), length(ffPiekMS2))
     expect_lte(max(getPiekHRMS(getPiekEICParams(filter = "ms2"), getDefPeakParams("chrom", "piek", forcePeakWidth = c(0, 10)))[[1]][, retmax - retmin]), 10)
     
-    expect_false(isTRUE(all.equal(ffPiekSuspIMS, getPiekSuspIMS(sumWindowMZ = 10), check.attributes = FALSE)))
-    expect_false(isTRUE(all.equal(ffPiekSuspIMS, getPiekSuspIMS(sumWindowMob = 0.1), check.attributes = FALSE)))
-    expect_false(isTRUE(all.equal(ffPiekSuspIMS, getPiekSuspIMS(smoothWindowMZ = 1), check.attributes = FALSE)))
-    expect_false(isTRUE(all.equal(ffPiekSuspIMS, getPiekSuspIMS(smoothWindowMob = 10), check.attributes = FALSE)))
-    
+    expect_false(isTRUE(all.equal(ffPiekSuspIMS, getPiekSuspIMS(sumWindowMZ = 10))))
+    expect_false(isTRUE(all.equal(ffPiekSuspIMS, getPiekSuspIMS(sumWindowMob = 10))))
+    expect_false(isTRUE(all.equal(ffPiekSuspIMS, getPiekSuspIMS(smoothWindowMZ = 1))))
+    expect_false(isTRUE(all.equal(ffPiekSuspIMS, getPiekSuspIMS(smoothWindowMob = 10))))
+
     ffPiekDup <- getPiekIMS(filter = "ms2", args = list(keepDups = TRUE))
     checkmate::expect_names(names(ffPiekDup[[1]]), must.include = c("mzCentered", "dup"))
     expect_gt(nrow(ffPiekDup[[1]]), nrow(ffPiekSusp[[1]]))

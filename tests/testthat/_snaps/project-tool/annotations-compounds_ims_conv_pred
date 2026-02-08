@@ -11,7 +11,6 @@ setwd(workPath)
 # NOTE: please set to a valid data.frame with analysis information. See ?`analysis-information` for more details.
 anaInfo <- data.frame(path_centroid = character(), analysis = character(), replicate = character(), blank = character())
 
-EIMParams <- getDefEIMParams(IMS = "bruker")
 CCSParams <- getCCSParams(method = "bruker")
 
 # -------------------------
@@ -38,15 +37,15 @@ fGroups <- updateGroups(fGroups, what = c("ret", "mz", "mobility"), intWeight = 
 # -------------------------
 
 fGroups <- assignMobilities(fGroups, mobPeakParams = getDefPeakParams(type = "bruker_ims", algorithm = "piek"),
-                            chromPeakParams = getDefPeakParams(type = "chrom", algorithm = "piek"),
-                            EIMParams = EIMParams, fallbackEIC = TRUE, calcArea = "integrate", CCSParams = CCSParams)
+                            chromPeakParams = getDefPeakParams(type = "chrom", algorithm = "piek"), fallbackEIC = TRUE,
+                            calcArea = "integrate", CCSParams = CCSParams)
 
 # -------------------------
 # annotation
 # -------------------------
 
 # Retrieve MS peak lists
-avgMSListParams <- getDefAvgPListParams(clusterMzWindow = 0.002, IMS = "bruker")
+avgMSListParams <- getDefAvgPListParams(clusterMzWindow = 0.002)
 mslists <- generateMSPeakLists(fGroups, maxMSRTWindow = 6, avgFeatParams = avgMSListParams,
                                avgFGroupParams = avgMSListParams)
 # Rule based filtering of MS peak lists. You may want to tweak this. See the manual for more information.
@@ -68,4 +67,4 @@ compounds <- estimateIDConfidence(compounds, MSPeakLists = mslists, formulas = N
 
 # Advanced report settings can be edited in the report.yml file.
 report(fGroups, MSPeakLists = mslists, formulas = NULL, compounds = compounds, components = NULL,
-       EIMParams = EIMParams, settingsFile = "report.yml", openReport = TRUE)
+       settingsFile = "report.yml", openReport = TRUE)

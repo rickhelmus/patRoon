@@ -696,11 +696,10 @@ getDefEICParams <- function(...)
     return(modifyList(def, mod, keep.null = TRUE))
 }
 
-#' @param IMS A \code{character} that specifies for which IMS instrument defaults are returned. Should be
-#'   \code{"bruker"} or \code{"agilent"}.
+#' @template IMSInstr-arg
 #' @rdname EIXParams
 #' @export
-getDefEIMParams <- function(..., IMS = "bruker")
+getDefEIMParams <- function(..., IMS = getLimIMS())
 {
     assertIMSType(IMS)
     def <- getDefEIXParams()

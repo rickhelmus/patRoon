@@ -96,8 +96,7 @@
             - IMS="maybe", so probably fine?
         - predict CCS for TPs?
         - don't do CCS prediction with PCL+MetFrag?
-    - have a IMS$mode == "disabled"? --> mainly to set defaults for piek/MSPL/EIMs
-        - see if we can get some kind of popup
+    - make sure that project gen uses right IMS limits for setting defaults --> temporarily override limits.yml?
 
 ## Param defaults
 

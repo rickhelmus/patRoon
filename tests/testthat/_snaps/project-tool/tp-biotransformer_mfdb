@@ -43,7 +43,7 @@ TPs <- generateTPs("biotransformer", parents = suspListParents, type = "env", ge
 
 # Screen TPs
 suspListTPs <- convertToSuspects(TPs, includeParents = FALSE)
-fGroups <- screenSuspects(fGroups, suspListTPs, rtWindow = 12, mzWindow = 0.005, onlyHits = TRUE)
+fGroups <- screenSuspects(fGroups, suspListTPs, onlyHits = TRUE)
 
 # -------------------------
 # annotation
@@ -51,16 +51,14 @@ fGroups <- screenSuspects(fGroups, suspListTPs, rtWindow = 12, mzWindow = 0.005,
 
 # Retrieve MS peak lists
 avgMSListParams <- getDefAvgPListParams(clusterMzWindow = 0.002)
-mslists <- generateMSPeakLists(fGroups, maxMSRTWindow = 6, avgFeatParams = avgMSListParams,
-                               avgFGroupParams = avgMSListParams)
+mslists <- generateMSPeakLists(fGroups, avgFeatParams = avgMSListParams, avgFGroupParams = avgMSListParams)
 # Rule based filtering of MS peak lists. You may want to tweak this. See the manual for more information.
 mslists <- filter(mslists, MSLevel = 2, absMinIntensity = NULL, relMinIntensity = 0.05, topMostPeaks = 25,
                   maxMZOverPrec = 4)
 
 convertToMFDB(TPs, "TP-database.csv", includeParents = TRUE)
 # Calculate compound structure candidates
-compounds <- generateCompounds(fGroups, mslists, "metfrag", dbRelMzDev = 5, fragRelMzDev = 5, fragAbsMzDev = 0.002,
-                               adduct = "[M+H]+", database = "csv",
+compounds <- generateCompounds(fGroups, mslists, "metfrag", adduct = "[M+H]+", database = "csv",
                                extraOpts = list(LocalDatabasePath = "TP-database.csv"), maxCandidatesToStop = 2500)
 
 compounds <- estimateIDConfidence(compounds, MSPeakLists = mslists, formulas = NULL, IDFile = "idlevelrules.yml")

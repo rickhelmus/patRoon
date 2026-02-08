@@ -21,6 +21,7 @@
 - MSTK: PR for centroid status buf for mzXML?
 - check why metfusion is still defaulted --> recreate sysdata.rda?
     - do so after rebase
+- self contained reports by default?
 
 
 ## Maybe
@@ -87,8 +88,6 @@
 - anaInfo.R
     - conc/norm conc are set to "NA_real_"
 - remove conc column?
-- remove default limits that are in limits.yml
-    - maybe also for piek EIC params if we make profiles?
 - IMS changes
     - Codegen
         - Add mobility filters for suspects & compounds?
@@ -96,7 +95,6 @@
             - IMS="maybe", so probably fine?
         - predict CCS for TPs?
         - don't do CCS prediction with PCL+MetFrag?
-    - make sure that project gen uses right IMS limits for setting defaults --> temporarily override limits.yml?
 
 ## Param defaults
 

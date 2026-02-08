@@ -171,8 +171,6 @@ scriptGenerator$methods(
         addCall("fGroups", "screenSuspects", list(
             list(value = "fGroups"),
             list(value = susp),
-            list(name = "rtWindow", value = 12),
-            list(name = "mzWindow", value = 0.005),
             adductArg,
             list(name = "onlyHits", value = oh),
             list(name = "amend", value = am, condition = !is.null(am))
@@ -425,9 +423,9 @@ genScriptFeaturesBlock <- function(ionization, IMS, settingsFeat, generator)
         {
             mmz <- settingsFeat$piekParams$filter; mims <- settingsFeat$piekParams$filterIMS
             def <- list(
-                none = getPiekEICParams(),
-                susp = getPiekEICParams(filter = "suspects", filterIMS = "suspects"),
-                ms2 = getPiekEICParams(filter = "ms2", filterIMS = "ms2")
+                none = getPiekEICParams(IMS = IMS$limits),
+                susp = getPiekEICParams(IMS = IMS$limits, filter = "suspects", filterIMS = "suspects"),
+                ms2 = getPiekEICParams(IMS = IMS$limits, filter = "ms2", filterIMS = "ms2")
             )
             
             doDirectIMS <- IMS$mode == "direct"
@@ -533,9 +531,7 @@ genScriptComponBlock <- function(ionization, settingsAnnon, generator)
         list(name = "ionization", value = ionization, quote = TRUE, condition = ionization != "both"),
         list(name = "rtRange", value = c(-120, 120), condition = settingsAnnon$componAlgo == "nontarget"),
         list(name = "mzRange", value = c(5, 120), condition = settingsAnnon$componAlgo == "nontarget"),
-        list(name = "elements", value = c("C", "H", "O"), quote = TRUE, condition = settingsAnnon$componAlgo == "nontarget"),
-        list(name = "rtDev", value = defaultLim("retention", "wide"), condition = settingsAnnon$componAlgo == "nontarget"),
-        list(name = "absMzDev", value = 0.002, condition = settingsAnnon$componAlgo == "nontarget")
+        list(name = "elements", value = c("C", "H", "O"), quote = TRUE, condition = settingsAnnon$componAlgo == "nontarget")
     ))
     
     if (settingsAnnon$selectIons && settingsAnnon$componAlgo != "nontarget")
@@ -579,8 +575,6 @@ genScriptFGNormBlock <- function(ionization, settingsFeat, adductArg, generator)
         list(name = "ISTDRTWindow", value = 120, condition = settingsFeat$fGroupsAdv$featNorm == "istd"),
         list(name = "ISTDMZWindow", value = 300, condition = settingsFeat$fGroupsAdv$featNorm == "istd"),
         list(name = "minISTDs", value = 3, condition = settingsFeat$fGroupsAdv$featNorm == "istd"),
-        list(name = "rtWindow", value = 12, condition = settingsFeat$fGroupsAdv$featNorm == "istd"),
-        list(name = "mzWindow", value = 0.005, condition = settingsFeat$fGroupsAdv$featNorm == "istd"),
         adductArg
     ))
 }
@@ -682,7 +676,6 @@ genScriptAnnBlock <- function(ionization, IMS, settingsAnn, adductArg, doSusps, 
     generator$addCall("avgMSListParams", "getDefAvgPListParams", list(name = "clusterMzWindow", value = defaultLim("mz", "narrow")))
     generator$addCall("mslists", "generateMSPeakLists", list(
         list(value = "fGroups"),
-        list(name = "maxMSRTWindow", value = defaultLim("retention", "narrow")),
         list(name = "avgFeatParams", value = "avgMSListParams"),
         list(name = "avgFGroupParams", value = "avgMSListParams")
     ))
@@ -705,8 +698,6 @@ genScriptAnnBlock <- function(ionization, IMS, settingsAnn, adductArg, doSusps, 
             list(value = "mslists"),
             list(value = tolower(settingsAnn$formulasAlgo), quote = TRUE),
             list(name = "relMzDev", value = 5, condition = settingsAnn$formulasAlgo != "Bruker"),
-            list(name = "precursorMzSearchWindow", value = defaultLim("mz", "narrow"),
-                 condition = settingsAnn$formulasAlgo == "Bruker"),
             adductArg,
             list(name = "elements", value = "CHNOP", quote = TRUE, condition = settingsAnn$formulasAlgo != "Bruker"),
             list(name = "oc", value = FALSE, condition = settingsAnn$formulasAlgo == "GenForm"),
@@ -733,8 +724,7 @@ genScriptAnnBlock <- function(ionization, IMS, settingsAnn, adductArg, doSusps, 
             generator$addComment("Load MS library. You may want to filter it, please see the manuals for more details.")
             generator$addCall("mslibrary", "loadMSLibrary", list(
                 list(value = settingsAnn$MSLibraryPath, quote = TRUE),
-                list(value = settingsAnn$MSLibraryFormat, quote = TRUE),
-                list(name = "absMzDev", value = 0.002)
+                list(value = settingsAnn$MSLibraryFormat, quote = TRUE)
             ))
         }
         
@@ -756,10 +746,6 @@ genScriptAnnBlock <- function(ionization, IMS, settingsAnn, adductArg, doSusps, 
             list(value = "fGroups"),
             list(value = "mslists"),
             list(value = tolower(settingsAnn$compoundsAlgo), quote = TRUE),
-            list(name = "dbRelMzDev", value = 5, condition = settingsAnn$compoundsAlgo == "MetFrag"),
-            list(name = "fragRelMzDev", value = 5, condition = settingsAnn$compoundsAlgo == "MetFrag"),
-            list(name = "fragAbsMzDev", value = 0.002, condition = settingsAnn$compoundsAlgo == "MetFrag"),
-            list(name = "relMzDev", value = 5, condition = settingsAnn$compoundsAlgo == "SIRIUS"),
             adductArg,
             list(name = "database", value = "pubchemlite", quote = TRUE, condition = settingsAnn$compoundsAlgo == "MetFrag" && !addMFDB),
             list(name = "database", value = "csv", quote = TRUE, condition = addMFDB),
@@ -772,7 +758,6 @@ genScriptAnnBlock <- function(ionization, IMS, settingsAnn, adductArg, doSusps, 
             list(name = "alwaysLogin", value = FALSE, condition = settingsAnn$compoundsAlgo == "SIRIUS"),
             list(name = "MSLibrary", value = "mslibrary", condition = settingsAnn$compoundsAlgo == "Library"),
             list(name = "minSim", value = 0.75, condition = settingsAnn$compoundsAlgo == "Library"),
-            list(name = "absMzDev", value = 0.002, condition = settingsAnn$compoundsAlgo == "Library"),
             list(name = "specSimParams", value = "getDefSpecSimParams()", condition = settingsAnn$compoundsAlgo == "Library"),
             list(name = "setThresholdAnn", value = 0, condition = ionization == "both")
         ))

@@ -43,7 +43,7 @@ fGroups <- updateGroups(fGroups, what = c("ret", "mz", "mobility"), intWeight = 
 
 # NOTE: onlyHits is set to FALSE to ensure TPs can be found below
 # Set adduct to NULL if suspect list contains an adduct column
-fGroups <- screenSuspects(fGroups, suspList, rtWindow = 12, mzWindow = 0.005, adduct = "[M+H]+", onlyHits = FALSE)
+fGroups <- screenSuspects(fGroups, suspList, adduct = "[M+H]+", onlyHits = FALSE)
 
 # -------------------------
 # transformation products
@@ -56,7 +56,7 @@ TPs <- generateTPs("cts", parents = fGroups, transLibrary = "photolysis_ranked",
 # Screen TPs
 suspListTPs <- convertToSuspects(TPs, includeParents = FALSE)
 # Amend with TP screening
-fGroups <- screenSuspects(fGroups, suspListTPs, rtWindow = 12, mzWindow = 0.005, onlyHits = TRUE, amend = TRUE)
+fGroups <- screenSuspects(fGroups, suspListTPs, onlyHits = TRUE, amend = TRUE)
 
 # -------------------------
 # Parent and TP linkage

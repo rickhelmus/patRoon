@@ -5,21 +5,13 @@ library(patRoon)
 # initialization
 # -------------------------
 
-workPath <- "test_temp/test-np/features-norm_istd_ex"
+workPath <- "test_temp/test-np/features-piek_dma_agilent"
 setwd(workPath)
 
 # NOTE: please set to a valid data.frame with analysis information. See ?`analysis-information` for more details.
 anaInfo <- data.frame(path_centroid = character(), analysis = character(), replicate = character(), blank = character())
 
-# -------------------------
-# setup suspect lists
-# -------------------------
-
-# Get example suspect list
-suspList <- patRoonData::suspectsPos
-
-# Get example ISTD list
-ISTDList <- patRoonData::ISTDListPos
+CCSParams <- getCCSParams(method = "agilent", calibrant = "")
 
 # -------------------------
 # features
@@ -27,10 +19,13 @@ ISTDList <- patRoonData::ISTDListPos
 
 # Find all features
 # NOTE: see the reference manual for many more options
-fList <- findFeatures(anaInfo, "openms", noiseThrInt = 1000, chromSNR = 3, chromFWHM = 5, minFWHM = 1, maxFWHM = 30)
+genEICParams <- getPiekEICParams(filter = "none", filterIMS = "none", mzRange = c(80, 800), mzStep = 0.08,
+                                 mobRange = c(10, 30), mobStep = 1)
+fList <- findFeatures(anaInfo, "piek", IMS = TRUE, genEICParams = genEICParams,
+                      peakParams = getDefPeakParams("chrom", "piek"))
 
 # Group and align features between analyses
-fGroups <- groupFeatures(fList, "openms", rtalign = TRUE)
+fGroups <- groupFeatures(fList, "greedy", scoreWeights = c(retention = 1, mz = 1, mobility = 1))
 
 # Basic rule based filtering
 fGroups <- filter(fGroups, preAbsMinIntensity = 100, absMinIntensity = 10000, relMinReplicateAbundance = 1,
@@ -40,22 +35,8 @@ fGroups <- filter(fGroups, preAbsMinIntensity = 100, absMinIntensity = 10000, re
 # Update group properties
 fGroups <- updateGroups(fGroups, what = c("ret", "mz", "mobility"), intWeight = FALSE)
 
-# -------------------------
-# normalization
-# -------------------------
-
-
-# Set adduct to NULL if ISTD list contains an adduct column
-fGroups <- normInts(fGroups, featNorm = "istd", groupNorm = FALSE, normFunc = max, standards = ISTDList,
-                    ISTDRTWindow = 120, ISTDMZWindow = 300, minISTDs = 3, adduct = "[M+H]+")
-
-# -------------------------
-# suspect screening
-# -------------------------
-
-# Set onlyHits to FALSE to retain features without suspects (eg for full NTA)
-# Set adduct to NULL if suspect list contains an adduct column
-fGroups <- screenSuspects(fGroups, suspList, adduct = "[M+H]+", onlyHits = TRUE)
+# Assign CCS values
+fGroups <- assignMobilities(fGroups, CCSParams = CCSParams)
 
 # -------------------------
 # reporting

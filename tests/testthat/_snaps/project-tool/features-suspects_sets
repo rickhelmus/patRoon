@@ -50,7 +50,7 @@ fGroups <- updateGroups(fGroups, what = c("ret", "mz", "mobility"), intWeight = 
 # -------------------------
 
 # Set onlyHits to FALSE to retain features without suspects (eg for full NTA)
-fGroups <- screenSuspects(fGroups, list(suspListPos, suspListNeg), rtWindow = 12, mzWindow = 0.005, onlyHits = TRUE)
+fGroups <- screenSuspects(fGroups, list(suspListPos, suspListNeg), onlyHits = TRUE)
 
 # -------------------------
 # reporting

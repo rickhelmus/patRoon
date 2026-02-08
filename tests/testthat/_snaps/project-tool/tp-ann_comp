@@ -36,15 +36,14 @@ fGroups <- updateGroups(fGroups, what = c("ret", "mz", "mobility"), intWeight = 
 
 # Retrieve MS peak lists
 avgMSListParams <- getDefAvgPListParams(clusterMzWindow = 0.002)
-mslists <- generateMSPeakLists(fGroups, maxMSRTWindow = 6, avgFeatParams = avgMSListParams,
-                               avgFGroupParams = avgMSListParams)
+mslists <- generateMSPeakLists(fGroups, avgFeatParams = avgMSListParams, avgFGroupParams = avgMSListParams)
 # Rule based filtering of MS peak lists. You may want to tweak this. See the manual for more information.
 mslists <- filter(mslists, MSLevel = 2, absMinIntensity = NULL, relMinIntensity = 0.05, topMostPeaks = 25,
                   maxMZOverPrec = 4)
 
 # Calculate compound structure candidates
-compounds <- generateCompounds(fGroups, mslists, "metfrag", dbRelMzDev = 5, fragRelMzDev = 5, fragAbsMzDev = 0.002,
-                               adduct = "[M+H]+", database = "pubchemlite", maxCandidatesToStop = 2500)
+compounds <- generateCompounds(fGroups, mslists, "metfrag", adduct = "[M+H]+", database = "pubchemlite",
+                               maxCandidatesToStop = 2500)
 
 compounds <- estimateIDConfidence(compounds, MSPeakLists = mslists, formulas = NULL, IDFile = "idlevelrules.yml")
 

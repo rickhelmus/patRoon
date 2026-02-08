@@ -49,7 +49,7 @@ fGroups <- updateGroups(fGroups, what = c("ret", "mz", "mobility"), intWeight = 
 
 # Set onlyHits to FALSE to retain features without suspects (eg for full NTA)
 # Set adduct to NULL if suspect list contains an adduct column
-fGroups <- screenSuspects(fGroups, suspList, rtWindow = 12, mzWindow = 0.005, adduct = "[M+H]+", onlyHits = TRUE)
+fGroups <- screenSuspects(fGroups, suspList, adduct = "[M+H]+", onlyHits = TRUE)
 
 # -------------------------
 # reporting

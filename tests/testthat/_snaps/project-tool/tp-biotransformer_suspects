@@ -43,7 +43,7 @@ TPs <- generateTPs("biotransformer", parents = suspListParents, type = "env", ge
 
 # Screen TPs
 suspListTPs <- convertToSuspects(TPs, includeParents = FALSE)
-fGroups <- screenSuspects(fGroups, suspListTPs, rtWindow = 12, mzWindow = 0.005, onlyHits = TRUE)
+fGroups <- screenSuspects(fGroups, suspListTPs, onlyHits = TRUE)
 
 # -------------------------
 # Parent and TP linkage

@@ -39,7 +39,7 @@ TPs <- generateTPs("logic", parents = suspListParents, fGroups, adduct = "[M+H]+
 
 # Screen TPs
 suspListTPs <- convertToSuspects(TPs, includeParents = FALSE)
-fGroups <- screenSuspects(fGroups, suspListTPs, rtWindow = 12, mzWindow = 0.005, adduct = "[M+H]+", onlyHits = TRUE)
+fGroups <- screenSuspects(fGroups, suspListTPs, adduct = "[M+H]+", onlyHits = TRUE)
 
 # -------------------------
 # Parent and TP linkage

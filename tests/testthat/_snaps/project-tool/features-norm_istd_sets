@@ -51,8 +51,7 @@ fGroups <- updateGroups(fGroups, what = c("ret", "mz", "mobility"), intWeight = 
 
 
 fGroups <- normInts(fGroups, featNorm = "istd", groupNorm = FALSE, normFunc = max,
-                    standards = c(ISTDListPos, ISTDListNeg), ISTDRTWindow = 120, ISTDMZWindow = 300, minISTDs = 3,
-                    rtWindow = 12, mzWindow = 0.005)
+                    standards = c(ISTDListPos, ISTDListNeg), ISTDRTWindow = 120, ISTDMZWindow = 300, minISTDs = 3)
 
 # -------------------------
 # reporting

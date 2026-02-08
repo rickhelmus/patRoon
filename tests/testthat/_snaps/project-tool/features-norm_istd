@@ -44,8 +44,7 @@ fGroups <- updateGroups(fGroups, what = c("ret", "mz", "mobility"), intWeight = 
 
 # Set adduct to NULL if ISTD list contains an adduct column
 fGroups <- normInts(fGroups, featNorm = "istd", groupNorm = FALSE, normFunc = max, standards = ISTDList,
-                    ISTDRTWindow = 120, ISTDMZWindow = 300, minISTDs = 3, rtWindow = 12, mzWindow = 0.005,
-                    adduct = "[M+H]+")
+                    ISTDRTWindow = 120, ISTDMZWindow = 300, minISTDs = 3, adduct = "[M+H]+")
 
 # -------------------------
 # reporting

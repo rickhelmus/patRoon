@@ -466,8 +466,8 @@ expect_doppel_same_as <- function(title, titleSameAs, fig)
     expect_doppel(title, fig)
     # HACK: figure out where actual snapshot files are...
     snapDir <- file.path(testthat:::get_snapshotter()$snap_dir, testthat:::get_snapshotter()$file)
-    expect_true(compare_file_text(file.path(snapDir, paste0("sets-", title, ".svg")),
-                                  file.path(snapDir, paste0("sets-", titleSameAs, ".svg"))),
+    expect_true(compare_file_text(file.path(snapDir, paste0(title, ".svg")),
+                                  file.path(snapDir, paste0(titleSameAs, ".svg"))),
                 info = sprintf("snapshots for %s and %s differ", title, titleSameAs))
 }
 

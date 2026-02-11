@@ -486,27 +486,28 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
     eg$SSgauss <- xcms::SSgauss
     withr::local_environment(eg)
     
-    doCalcs <- function(ft, eic, flatf)
+    doCalcs <- function(ft, eic, fq, fqn, fsn, flatf)
     {
         ft <- copy(ft)
         
         if (nrow(ft) == 0)
-            ft[, c(featQualityNames, featScoreNames) := numeric()]
+            ft[, c(fqn, fsn) := numeric()]
         else
         {
             eicat <- attr(eic, "allXValues")
-            ft[, (featQualityNames) := rbindlist(Map(patRoon:::calcFeatQualities, ret, retmin, retmax, intensity, eic,
-                                                     MoreArgs = list(featQualities = featQualities,
-                                                                     featQualityNames = featQualityNames, EICAT = eicat,
-                                                                     flatnessFactoreicat = flatf)))]
-            ft[, (featScoreNames) := Map(patRoon:::scoreFeatQuality, featQualities, .SD), .SDcols = featQualityNames]
+            ft[, (fqn) := rbindlist(Map(patRoon:::calcFeatQualities, ret, retmin, retmax, intensity, eic,
+                                                     MoreArgs = list(featQualities = fq,
+                                                                     featQualityNames = fqn, EICAT = eicat,
+                                                                     flatnessFactor = flatf)))]
+            ft[, (fsn) := Map(patRoon:::scoreFeatQuality, fq, .SD), .SDcols = fqn]
         }
         return(ft)
     }
     
     printf("Calculating feature peak qualities and scores...\n")
 
-    fTable <- doMap(parallel, featureTable(obj)[names(EICs)], EICs, f = doCalcs, MoreArgs = list(flatnessFactor))
+    fTable <- doMap(parallel, featureTable(obj)[names(EICs)], EICs, f = doCalcs,
+                    MoreArgs = list(featQualities, featQualityNames, featScoreNames, flatnessFactor))
     
     if (!is.null(weights))
     {

@@ -705,11 +705,11 @@ test_that("plotting works", {
                                                     groupName = names(subFGroups)[1]))
     # IMS arg: note that all plotting functions use +/- the same mechanism to determine whether to plot IMS or not, so
     # we just test plotChroms() which is slightly more advanced.
-    expect_doppel("eic-sub_imsF", function() plotChroms(subFGroupsIMS, IMS = FALSE))
-    expect_doppel("eic-sub_imsT", function() plotChroms(subFGroupsIMS, IMS = TRUE))
+    expect_doppel("eic-sub-imsf", function() plotChroms(subFGroupsIMS, IMS = FALSE))
+    expect_doppel("eic-sub-imst", function() plotChroms(subFGroupsIMS, IMS = TRUE))
     # groupName should override IMS arg
-    expect_doppel("eic-sub_imsT", function() plotChroms(subFGroupsIMS, groupName = names(subFGroupsIMS[IMS = TRUE]),
-                                                        IMS = FALSE))
+    expect_doppel_same_as("eic-sub-imst-gn", "eic-sub-imst",
+                          \() plotChroms(subFGroupsIMS, groupName = names(subFGroupsIMS[IMS = TRUE]), IMS = FALSE))
 
     expect_doppel("eim-smo_no", function() plotMobilograms(subFGroupsIMSOnly, EIMParams = getDefEIMParams(smooth = "none")))
     expect_doppel("eim-smo_sg", function() plotMobilograms(subFGroupsIMSOnly, EIMParams = getDefEIMParams(smooth = "sg", smLength = 15)))
@@ -721,7 +721,7 @@ test_that("plotting works", {
     expect_doppel("eim-gbr", function() plotMobilograms(subFGroupsIMSOnly, groupBy = "replicate"))
     expect_doppel("eim-gbf", function() plotMobilograms(subFGroupsIMSOnly, groupBy = "fGroups"))
     expect_doppel("eim-ann", function() plotMobilograms(subFGroupsIMSOnly, annotate = "mz"))
-    expect_doppel("eim-ann_mob", function() plotMobilograms(subFGroupsIMSOnly[IMS=TRUE], annotate = "mob"))
+    expect_doppel("eim-ann_mob", function() plotMobilograms(subFGroupsIMSOnly[IMS = TRUE], annotate = "mob"))
     # below two should be mostly the same, but xlim and group rect will be slightly different since subsetting removes
     # some of the feature data that is used to determine the limits for these. For now just compare the two figures
     # manually.

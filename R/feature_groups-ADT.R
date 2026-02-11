@@ -384,13 +384,13 @@ doFGAADTFeatures <- function(fGroups, fgTab, intColNames, average, averageBy, ad
     # 2. otherwise replace the feature score specific properties from the group table, as these are feature averaged
     
     if (!addQualities)
-        featTab <- removeDTColumnsIfPresent(featTab, featureQualityNames(fGroups, group = FALSE))
+        featTab <- removeDTColumnsIfPresent(featTab, getFeatureQualityNames(fGroups, group = FALSE))
     else
-        fgTab <- removeDTColumnsIfPresent(fgTab, featureQualityNames(fGroups, group = FALSE))
+        fgTab <- removeDTColumnsIfPresent(fgTab, getFeatureQualityNames(fGroups, group = FALSE))
     if (!addScores)
-        featTab <- removeDTColumnsIfPresent(featTab, featureQualityNames(fGroups, group = FALSE, scores = TRUE))
+        featTab <- removeDTColumnsIfPresent(featTab, getFeatureQualityNames(fGroups, group = FALSE, scores = TRUE))
     else
-        fgTab <- removeDTColumnsIfPresent(fgTab, featureQualityNames(fGroups, group = FALSE, scores = TRUE))
+        fgTab <- removeDTColumnsIfPresent(fgTab, getFeatureQualityNames(fGroups, group = FALSE, scores = TRUE))
     
     by <- "group"
     if (averageBy != "fGroups")
@@ -498,7 +498,7 @@ doFGAADTFeatures <- function(fGroups, fgTab, intColNames, average, averageBy, ad
     }
     
     # set nice column order
-    qualCols <- c(featureQualityNames(fGroups), featureQualityNames(fGroups, scores = TRUE))
+    qualCols <- c(getFeatureQualityNames(fGroups), getFeatureQualityNames(fGroups, scores = TRUE))
     colord <- c("group", "ims_parent_group", "set", "analysis", "average_group", "replicate", "group_ret",
                 "group_mz", "group_mobility", "group_mobility_collapsed", "ID", "ims_parent_ID", "ret", "mz", "ion_mz",
                 "mobility", "mobility_collapsed", "intensity", "area", "intensity_rel", "area_rel")

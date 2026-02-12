@@ -292,6 +292,8 @@ test_that("Feature settings", {
     testNewProj(features = list(featAlgo = "piek", piekParams = list(filter = "ms2")), name = "features-piek_ms2")
     testNewProj(general = list(IMS = list(mode = "direct")),
                 features = list(featAlgo = "piek", fGroupsAlgo = "Greedy"), name = "features-piek_dma")
+    testNewProj(general = list(IMS = list(mode = "direct", CCSMethod = "agilent", limits = "agilent")),
+                features = list(featAlgo = "piek", fGroupsAlgo = "Greedy"), name = "features-piek_dma_agilent")
     testNewProj(general = list(IMS = list(mode = "direct")),
                 features = list(featAlgo = "piek", piekParams = list(filter = "ms2"), fGroupsAlgo = "Greedy"),
                 name = "features-piek_dma_ms2")

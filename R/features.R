@@ -73,7 +73,6 @@ features <- setClass("features",
 
 setMethod("initialize", "features", function(.Object, ...)
 {
-    args <- list(...)
     .Object <- callNextMethod(.Object, ...)
     .Object@features <- makeEmptyListNamed(.Object@features)
     if (length(.Object@hasIMS) == 0)

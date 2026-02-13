@@ -669,6 +669,7 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
     aapply(assertScoreRange, . ~ featQualityRange + groupQualityRange,
            list(c(getFeatureQualityNames(obj, group = FALSE), getFeatureQualityNames(obj, group = FALSE, scores = TRUE)),
                 c(getFeatureQualityNames(obj), getFeatureQualityNames(obj, scores = TRUE))), fixed = list(add = ac))
+    checkmate::assertCharacter(replicates, min.chars = 1, min.len = 1, any.missing = FALSE, null.ok = TRUE, add = ac)
     assertIMSArg(IMS, null.ok = TRUE, add = ac)
     assertIMSRangeParams(IMSRangeParams, null.ok = TRUE, add = ac)
     checkmate::assert(checkmate::checkNull(results),

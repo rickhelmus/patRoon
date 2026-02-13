@@ -44,6 +44,10 @@ test_that("verify feature grouping output", {
                  groupTable(groupFeatures(fList, "openms",
                                           extraOptsGroup = list("-algorithm:distance_RT:max_difference" = 12))))
     
+    expect_false(isTRUE(all.equal(fgGreedy, groupFeatures(fList, "greedy", scoreWeights = c(retention = 100)))))
+    expect_equal(groupFeatures(fList, "greedy", scoreWeights = c(retention = 100, mz = 1, mobility = 1, intensity = 1)),
+                 groupFeatures(fList, "greedy", scoreWeights = c(retention = 100)))
+    
     expect_known_value(groupTable(fgXCMS3), testFile("fg-xcms3"))
     expect_known_value(groupTable(fgKPIC2), testFile("fg-kpic2"))
     expect_known_value(groupTable(fgGreedy), testFile("fg-greedy"))

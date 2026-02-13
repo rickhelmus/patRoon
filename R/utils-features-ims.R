@@ -225,7 +225,7 @@ reintegrateMobilityFeatures <- function(features, peakParams, EICParams, peakRTW
     return(features)
 }
 
-groupFTableMobilities <- function(feat, mobWindow, byGroup)
+groupFTableMobilities <- function(feat, mobWindow, byGroup, scoreWeights)
 {
     fTableAll <- as.data.table(feat)
     anaInfo <- analysisInfo(feat)
@@ -247,7 +247,7 @@ groupFTableMobilities <- function(feat, mobWindow, byGroup)
         {
             # do a greedy grouping with just mobilities, setting dummy values for RT and mz (we don't want to regroup these)
             getGroupIDs(rep(100, .N), rep(100, .N), mobility, intensity, match(analysis, anaInfo$analysis),
-                        match(replicate, reps), 5, 1, mobWindow, c(retention = 1, mz = 1, mobility = 1, intensity = 1))
+                        match(replicate, reps), 5, 1, mobWindow, scoreWeights)
         }
         paste0(paste0(unlist(.BY), collapse = "_"), "-", cl)
     }, by = byCols]
@@ -256,7 +256,7 @@ groupFTableMobilities <- function(feat, mobWindow, byGroup)
     return(fTableAll)
 }
 
-updateFGroupsForMobilities <- function(fGroups, mobWindow, sets)
+updateFGroupsForMobilities <- function(fGroups, mobWindow, scoreWeights, sets)
 {
     # UNDONE: do something more polymorphic than hackish sets arg?
     
@@ -267,7 +267,7 @@ updateFGroupsForMobilities <- function(fGroups, mobWindow, sets)
     
     # cluster features within original fGroups with similar mobilities together    
     printf("Grouping mobilities... ")
-    fTableAll <- groupFTableMobilities(getFeatures(fGroups), mobWindow, byGroup = TRUE)
+    fTableAll <- groupFTableMobilities(getFeatures(fGroups), mobWindow, byGroup = TRUE, scoreWeights = scoreWeights)
     printf("Done!\n")
     
     printf("Updating feature group data... ")

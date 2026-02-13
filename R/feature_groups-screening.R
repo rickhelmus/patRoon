@@ -483,12 +483,13 @@ setMethod("assignMobilities", "featureGroupsScreening", function(obj, mobPeakPar
                                                                  peakRTWindow = defaultLim("retention", "narrow"),
                                                                  fallbackEIC = TRUE, calcArea = "integrate",
                                                                  mobWindow = defaultLim("mobility", "medium"),
+                                                                 scoreWeights = c(mobility = 1, intensity = 1),
                                                                  CCSParams = NULL, parallel = "maybe",
                                                                  fromSuspects = FALSE, IMSMatchParams = NULL)
 {
     ac <- checkmate::makeAssertCollection()
     assertFindMobilitiesArgs(mobPeakParams, chromPeakParams, EIMParams, EICParams, peakRTWindow, fallbackEIC,
-                             calcArea, mobWindow, CCSParams, parallel, ac)
+                             calcArea, mobWindow, scoreWeights, CCSParams, parallel, ac)
     checkmate::assertFlag(fromSuspects, add = ac)
     assertIMSMatchParams(IMSMatchParams, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
@@ -506,7 +507,7 @@ setMethod("assignMobilities", "featureGroupsScreening", function(obj, mobPeakPar
             obj@features <- assignFeatureMobilitiesPeaks(obj@features, mobPeakParams, EIMParams, parallel)
         obj@features <- reintegrateMobilityFeatures(obj@features, chromPeakParams, EICParams, peakRTWindow, fallbackEIC,
                                                     calcArea, parallel)
-        obj <- updateFGroupsForMobilities(obj, mobWindow, FALSE)
+        obj <- updateFGroupsForMobilities(obj, mobWindow, scoreWeights, FALSE)
     }
 
     if (!is.null(CCSParams))

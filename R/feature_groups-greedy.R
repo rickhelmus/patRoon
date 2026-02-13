@@ -38,7 +38,7 @@ setMethod("initialize", "featureGroupsGreedy",
 #'   respectively. The scoring terms are normalized to these values. Defaults to \code{defaultLim("retention",
 #'   "medium")}, \code{defaultLim("mz", "medium")}, and \code{defaultLim("mobility", "medium")}, respectively (see \link{limits}).
 #' @param scoreWeights Numeric vector specifying the scoring weights. Should contain the following named elements:
-#'   \code{"retention"}, \code{"mz"}, \code{"mobility"}, and \code{"intensity"}.
+#'   \code{"retention"}, \code{"mz"}, \code{"mobility"}, and \code{"intensity"}. Missing elements are defaulted to one.
 #'
 #' @inheritParams groupFeatures
 #'
@@ -63,11 +63,16 @@ setMethod("groupFeaturesGreedy", "features", function(feat, rtalign = FALSE,
     checkmate::assertFlag(rtalign, add = ac)
     aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow + mobWindow, lower = 0, finite = TRUE,
            fixed = list(add = ac))
-    checkmate::assertNumeric(scoreWeights, len = 4, lower = 0, finite = TRUE, any.missing = FALSE, add = ac)
-    assertHasNames(scoreWeights, c("retention", "mz", "mobility", "intensity"), add = ac)
+    assertGreedyScoringWeights(scoreWeights, add = ac)
     checkmate::assertFlag(verbose, add = ac)
     checkmate::reportAssertions(ac)
     
+    if (length(scoreWeights) < 4)
+    {
+        missingWeights <- setdiff(c("retention", "mz", "mobility", "intensity"), names(scoreWeights))
+        scoreWeights[missingWeights] <- 1
+    }
+
     if (rtalign)
         stop("Retention time alignment (rtalign=TRUE) is not yet supported for greedy grouping!", call. = FALSE)
     

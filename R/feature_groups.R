@@ -1519,6 +1519,9 @@ setMethod("calculateTox", "featureGroups", function(fGroups, featureAnn)
 #'   methods may be different than what is used by the feature detection of the IMS parent or the peak detection
 #'   algorithm used for re-integration, hence, comparing areas should be done with care.
 #' @param mobWindow The mobility tolerance window.
+#' @param scoreWeights A \code{numeric} with the weights used by \link[=groupFeaturesGreedy]{greedy grouping}.
+#'   \strong{NOTE}: only the \code{mobility} and \code{intensity} weights are used. See the documentation of
+#'   \code{\link{groupFeaturesGreedy}} for more details on the scoring and grouping.
 #'
 #' @template CCSParams-arg
 #'
@@ -1577,12 +1580,13 @@ setMethod("assignMobilities", "featureGroups", function(obj, mobPeakParams = NUL
                                                         peakRTWindow = defaultLim("retention", "narrow"),
                                                         fallbackEIC = TRUE, calcArea = "integrate",
                                                         mobWindow = defaultLim("mobility", "medium"),
+                                                        scoreWeights = c(mobility = 1, intensity = 1),
                                                         CCSParams = NULL, parallel = "maybe")
 {
     # NOTE: keep args in sync with other methods
     
     assertFindMobilitiesArgs(mobPeakParams, chromPeakParams, EIMParams, EICParams, peakRTWindow, fallbackEIC, calcArea,
-                             mobWindow, CCSParams, parallel)
+                             mobWindow, scoreWeights, CCSParams, parallel)
     
     if (!is.null(mobPeakParams))
     {
@@ -1590,7 +1594,7 @@ setMethod("assignMobilities", "featureGroups", function(obj, mobPeakParams = NUL
         obj@features <- assignFeatureMobilitiesPeaks(obj@features, mobPeakParams, EIMParams, parallel)
         obj@features <- reintegrateMobilityFeatures(obj@features, chromPeakParams, EICParams, peakRTWindow, fallbackEIC,
                                                     calcArea, parallel)
-        obj <- updateFGroupsForMobilities(obj, mobWindow, FALSE)
+        obj <- updateFGroupsForMobilities(obj, mobWindow, scoreWeights, FALSE)
     }
     
     if (!is.null(CCSParams))

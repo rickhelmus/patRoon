@@ -82,8 +82,6 @@
 
 ## newProject()
 
-- anaInfo.R
-    - conc/norm conc are set to "NA_real_"
 - remove conc column?
 - IMS changes
     - Codegen
@@ -93,12 +91,6 @@
         - predict CCS for TPs?
         - don't do CCS prediction with PCL+MetFrag?
 
-## Param defaults
-
-- don't use defaults for eg feature finding (and grouping)?
-- tweaks
-    - set default greedy weights
-        - also configurable weights for assignMobilities()?
 
 ## IMS
 

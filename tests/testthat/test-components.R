@@ -4,6 +4,12 @@
 
 context("components")
 
+getClustObjForCompare <- function(obj)
+{
+    # BUG: testthat suddenly cannot compare distance matrices, so focus on other slots...
+    list(obj@clust, obj@cutClusters, obj@gInfo, obj@properties, obj@altered, obj@componentInfo, obj@components)
+}
+
 # take a blank and standard to have two different replicates
 # set localMZRange=0 to keep isotopes
 fGroups <- getTestFGroups(getTestAnaInfoComponents(), localMZRange = 0)
@@ -41,8 +47,9 @@ test_that("components generation works", {
                        check.attributes = FALSE, tolerance = 0.00001)
     expect_known_value(list(componentTable(compsCAM), componentInfo(compsCAM)), testFile("components-cam"))
     expect_known_value(compsNT, testFile("components-nt"))
-    expect_known_value(compsInt, testFile("components-int"))
-    expect_known_value(compsSpec, testFile("components-spec"))
+    # BUG: testthat suddenly cannot compare distance matrices, so use ADT for reference
+    expect_known_value(getClustObjForCompare(compsInt), testFile("components-int"))
+    expect_known_value(getClustObjForCompare(compsSpec), testFile("components-spec"))
     expect_known_value(compsOpenMS, testFile("components-om"))
 
     expect_length(compsEmpty, 0)
@@ -318,9 +325,10 @@ test_that("IMS tests", {
     
     fGroupsDMA <- getTestFGroupsIMSDMA()[, 1:50]
     compsIMSDMA <- generateComponents(fGroupsDMA, "intclust", average = FALSE)
-    expect_equal(compsIMSDMA, expandForIMS(compsIMSDMA, fGroupsDMA))
+    expect_equal(getClustObjForCompare(compsIMSDMA), getClustObjForCompare(expandForIMS(compsIMSDMA, fGroupsDMA)))
     
-    expect_equal(expComps, generateComponents(fGroupsAM, "intclust", average = FALSE, IMS = F))
+    expect_equal(getClustObjForCompare(expComps),
+                 getClustObjForCompare(generateComponents(fGroupsAM, "intclust", average = FALSE, IMS = F)))
     
     expect_error(expandForIMS(compsIMS, fGroupsAM[, IMS = FALSE]), "No mobilities")
     expect_error(expandForIMS(compsRC, fGroupsSimple), "not supported for this class")

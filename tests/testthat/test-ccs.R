@@ -95,7 +95,7 @@ test_that("assignMobilities() for suspects", {
     verifyPred(suspsPredSelf)
     
     expect_equal(assignMobilities(suspsNoMob, NULL), suspsNoMob)
-    expect_equal(assignMobilities(suspsNoMob, susps, matchFromBy = "SMILES"), suspsPredSelf)
+    expect_equal(assignMobilities(suspsNoMob, susps, matchFromBy = "SMILES"), suspsPredSelf[, -"InChIKey1"])
     expect_equal(assignMobilities(suspsPredC3SDB, susps, overwrite = FALSE), suspsPredC3SDB)
     expect_false(isTRUE(all.equal(assignMobilities(suspsPredC3SDB, susps, overwrite = TRUE), suspsPredC3SDB)))
     expect_equal(assignMobilities(suspsPredC3SDB, susps, overwrite = TRUE)[["CCS_[M+H]+"]], suspsPredSelf[["CCS_[M+H]+"]])

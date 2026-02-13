@@ -7,8 +7,8 @@ NULL
 
 doInitBrukerLib <- function()
 {
-    libp <- getOption("patRoon.path.TDFSDK", "")
-    return(nzchar(libp) && initBrukerLibrary(libp))
+    libp <- getExtDepPath("tdf-sdk", verify = FALSE)
+    return(!is.null(libp) && initBrukerLibrary(libp))
 }
 
 MSFileExtensions <- function()

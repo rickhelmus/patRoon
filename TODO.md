@@ -11,7 +11,6 @@
         - Docker: finish WIP
         - Windows: for now don't bundle, but install in GHA for testing: https://docs.github.com/en/actions/tutorials/build-and-test-code/python
     - test new/updated patRoonExt deps
-    - actually use TDF-SDK from patRoonExt
 - BUG: annSim.1 column (in formulas?)?
 - Harmonize/consistent names
     - better names for ims_parent_ID/ims_parent_group?
@@ -20,7 +19,6 @@
 - reticulate: use py_require()? doesn't seem to be able handle multiple py versions, so no?
 - MSTK: PR for centroid status buf for mzXML?
 - self contained reports by default?
-- update REUSE (incl the toml file)
 
 
 ## Maybe

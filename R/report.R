@@ -58,8 +58,8 @@ adjustReportSettings <- function(settings, adjSettings) return(modifyList(settin
 #'
 #'      \item \code{selfContained}: If \code{true} then the output \file{report.html} embeds all graphics and script
 #'      dependencies. Otherwise these files are read from the \code{report_files/} directory. Self-contained reports are
-#'      easily shared, since only the \file{report.html} needs to be copied. However, they may be slower to generate and
-#'      render, especially when the report contains a lot of data.
+#'      generally smaller and easily shared, since only the \file{report.html} needs to be copied. However, they are
+#'      slower to generate and plots cannot be cached.
 #'
 #'      \item \code{noDate} Set to \code{true} to omit the date from the report. Mainly used for internal purposes.
 #'

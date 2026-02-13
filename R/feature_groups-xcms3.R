@@ -178,7 +178,7 @@ getFeatIndicesFromXCMSnExp <- function(xdata, feat)
         set(ret, j = grp, value = idx)
     }
     
-    ret[is.na(ret)] <- 0
+    setnafill(ret, fill = 0)
 
     return(ret)
 }
@@ -200,7 +200,7 @@ importFeatureGroupsXCMS3FromFeat <- function(xdata, analysisInfo, feat)
         
         groups <- data.table(t(xcms::featureValues(xdata, value = "maxo")))
         setnames(groups, gNames)
-        groups[is.na(groups)] <- 0
+        setnafill(groups, fill = 0)
         
         ftindex <- setnames(getFeatIndicesFromXCMSnExp(xdata, feat), gNames)
     }

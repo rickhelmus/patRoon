@@ -32,7 +32,8 @@ local({
     
     annotateFiles(c("tests/testthat.R", "tests/testthat/*.R"))
     
-    annotateFiles(c("tools/update-license-header.R", "tools/build_flags.R", "data-raw/prepare-data.R"))
+    annotateFiles(c("tools/update-license-header.R", "tools/build_flags.R", "data-raw/prepare-data.R",
+                    "REUSE.toml"))
     
     # verify --> REUSE.toml lists licensisng for other files
     system2("reuse", "lint", stdout = "", stderr = "")

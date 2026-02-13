@@ -53,6 +53,7 @@
 </defs>
 <g clip-path='url(#cpNTkuMDR8NjA3LjI2fDU5LjA0fDUwMi41Ng==)'>
 <line x1='313.29' y1='487.02' x2='313.29' y2='486.13' style='stroke-width: 0.75; stroke: #A6CEE3;' />
+<line x1='442.96' y1='487.02' x2='442.96' y2='486.09' style='stroke-width: 0.75; stroke: #A6CEE3;' />
 <line x1='470.76' y1='487.02' x2='470.76' y2='485.44' style='stroke-width: 0.75; stroke: #A6CEE3;' />
 <line x1='396.68' y1='487.02' x2='396.68' y2='485.31' style='stroke-width: 0.75; stroke: #A6CEE3;' />
 <line x1='164.69' y1='487.02' x2='164.69' y2='485.13' style='stroke-width: 0.75; stroke: #1F78B4;' />
@@ -84,13 +85,15 @@
 <line x1='405.69' y1='487.02' x2='405.69' y2='212.65' style='stroke-width: 0.75; stroke: #FF0000;' />
 </g>
 <g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
-<line x1='59.04' y1='502.56' x2='59.04' y2='212.65' style='stroke-width: 0.75;' />
+<line x1='59.04' y1='487.02' x2='59.04' y2='75.47' style='stroke-width: 0.75;' />
 <line x1='59.04' y1='487.02' x2='51.84' y2='487.02' style='stroke-width: 0.75;' />
 <line x1='59.04' y1='349.84' x2='51.84' y2='349.84' style='stroke-width: 0.75;' />
 <line x1='59.04' y1='212.65' x2='51.84' y2='212.65' style='stroke-width: 0.75;' />
+<line x1='59.04' y1='75.47' x2='51.84' y2='75.47' style='stroke-width: 0.75;' />
 <text transform='translate(41.76,487.02) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>0</text>
 <text transform='translate(41.76,349.84) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='16.68px' lengthAdjust='spacingAndGlyphs'>0.5</text>
 <text transform='translate(41.76,212.65) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>1</text>
+<text transform='translate(41.76,75.47) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='16.68px' lengthAdjust='spacingAndGlyphs'>1.5</text>
 </g>
 <g clip-path='url(#cpNTkuMDR8NjA3LjI2fDU5LjA0fDUwMi41Ng==)'>
 <text transform='translate(167.43,476.90) rotate(-90)' style='font-size: 10.80px; font-family: sans;' textLength='7.80px' lengthAdjust='spacingAndGlyphs'>C</text>

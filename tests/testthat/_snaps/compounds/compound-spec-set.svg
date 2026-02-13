@@ -71,6 +71,7 @@
 <line x1='424.60' y1='487.02' x2='424.60' y2='482.77' style='stroke-width: 0.75; stroke: #BEBEBE;' />
 <line x1='433.67' y1='487.02' x2='433.67' y2='463.87' style='stroke-width: 0.75; stroke: #BEBEBE;' />
 <line x1='433.94' y1='487.02' x2='433.94' y2='472.23' style='stroke-width: 0.75; stroke: #BEBEBE;' />
+<line x1='442.96' y1='487.02' x2='442.96' y2='486.09' style='stroke-width: 0.75; stroke: #BEBEBE;' />
 <line x1='443.29' y1='487.02' x2='443.29' y2='259.88' style='stroke-width: 0.75; stroke: #BEBEBE;' />
 <line x1='452.41' y1='487.02' x2='452.41' y2='432.80' style='stroke-width: 0.75; stroke: #BEBEBE;' />
 <line x1='452.59' y1='487.02' x2='452.59' y2='462.22' style='stroke-width: 0.75; stroke: #BEBEBE;' />
@@ -85,13 +86,19 @@
 <line x1='443.01' y1='487.02' x2='443.01' y2='471.62' style='stroke-width: 0.75; stroke: #BEBEBE;' />
 </g>
 <g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
-<line x1='59.04' y1='502.56' x2='59.04' y2='175.51' style='stroke-width: 0.75;' />
+<line x1='59.04' y1='487.02' x2='59.04' y2='59.04' style='stroke-width: 0.75;' />
 <line x1='59.04' y1='487.02' x2='51.84' y2='487.02' style='stroke-width: 0.75;' />
+<line x1='59.04' y1='409.14' x2='51.84' y2='409.14' style='stroke-width: 0.75;' />
 <line x1='59.04' y1='331.26' x2='51.84' y2='331.26' style='stroke-width: 0.75;' />
+<line x1='59.04' y1='253.38' x2='51.84' y2='253.38' style='stroke-width: 0.75;' />
 <line x1='59.04' y1='175.51' x2='51.84' y2='175.51' style='stroke-width: 0.75;' />
+<line x1='59.04' y1='97.63' x2='51.84' y2='97.63' style='stroke-width: 0.75;' />
 <text transform='translate(41.76,487.02) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>0</text>
+<text transform='translate(41.76,409.14) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='33.37px' lengthAdjust='spacingAndGlyphs'>50000</text>
 <text transform='translate(41.76,331.26) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='33.71px' lengthAdjust='spacingAndGlyphs'>1e+05</text>
+<text transform='translate(41.76,253.38) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='40.05px' lengthAdjust='spacingAndGlyphs'>150000</text>
 <text transform='translate(41.76,175.51) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='33.71px' lengthAdjust='spacingAndGlyphs'>2e+05</text>
+<text transform='translate(41.76,97.63) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='40.05px' lengthAdjust='spacingAndGlyphs'>250000</text>
 </g>
 <g clip-path='url(#cpNTkuMDR8NjA3LjI2fDU5LjA0fDUwMi41Ng==)'>
 <text transform='translate(167.43,476.90) rotate(-90)' style='font-size: 10.80px; font-family: sans;' textLength='7.80px' lengthAdjust='spacingAndGlyphs'>C</text>

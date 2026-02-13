@@ -91,7 +91,7 @@ Rcpp::loadModule("MSReadBackend", TRUE)
 
 maybeGetMSFilesForOTIMS <- function(anaInfo, needTypes)
 {
-    if (!"raw" %in% needTypes)
+    if (!"ims" %in% needTypes)
         return(NULL)
     
     ret <- getMSFilesFromAnaInfo(anaInfo, "raw", "bruker_ims", mustExist = FALSE)

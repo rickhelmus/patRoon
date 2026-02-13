@@ -434,7 +434,7 @@ void EIC::commit(SpectrumRawTypes::Scan curScanInd, SpectrumRawTypes::Time curTi
             startTimeAboveThr = 0.0;
             adjPointsAboveThr = 0;   
         }
-        else
+        if (numberGTE(curPoint.intensity, minAdjIntensity))
         {
             if (minAdjTime > 0.0)
             {
@@ -442,6 +442,8 @@ void EIC::commit(SpectrumRawTypes::Scan curScanInd, SpectrumRawTypes::Time curTi
                     startTimeAboveThr = curTime;
                 else if (numberGTE(curTime - startTimeAboveThr, minAdjTime))
                     enoughTimeAboveThr = true;
+                // Rcpp::Rcout << "above: EIC: " << curTime << "/" << curPoint.intensity << "/" << minAdjTime << "/" <<
+                    // (curTime - startTimeAboveThr) << "/" << startTimeAboveThr << "\n";
             }
             if (minAdjPoints > 0)
             {

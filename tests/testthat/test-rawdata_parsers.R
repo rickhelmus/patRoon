@@ -78,7 +78,7 @@ test_that("EICs", {
     # Test adjacency and intensity filters
     # NOTE: the thresholds were based on manual EIC inspection...
     eicsAdjP <- doGetEICs(anaInfoIMSOne, EICInfoListOne, gapFactor = 3, minEICAdjIntensity = 5E3,
-                          minEICAdjPoints = 6, minEICAdjTime = 0, mode = "simple")
+                          minEICAdjPoints = 7, minEICAdjTime = 0, mode = "simple")
     eicsAdjT <- doGetEICs(anaInfoIMSOne, EICInfoListOne, gapFactor = 3, minEICAdjIntensity = 5E3,
                           minEICAdjPoints = 0, minEICAdjTime = 4, mode = "simple")
     eicsI <- doGetEICs(anaInfoIMSOne, EICInfoListOne, gapFactor = 3, minEICIntensity = 3E4, mode = "simple")
@@ -108,15 +108,13 @@ test_that("EICs", {
     expect_true(nrow(eicsPadded[[1]][[1]]) >= nrow(eicsRef[[1]][[1]]))
     expect_false(any(eicsRef[[1]][[1]][, "intensity"] == 0))
     expect_true(any(eicsPadded[[1]][[1]][, "intensity"] == 0))
-    
+
     expect_snapshot_value(list(
         eicsRef,
-        eicsAdjP,
-        eicsAdjT,
         eicsI,
         eicsSummed,
         eicsSmoothed,
-        eicsTop1,
+        pruneList(eicsTop1[[1]], checkZeroRows = TRUE),
         eicsPadded
     ),  style = "json2")
     

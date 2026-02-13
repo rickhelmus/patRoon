@@ -19,9 +19,8 @@
 - See why parallel reporting is so slow (on Windows?)
 - reticulate: use py_require()? doesn't seem to be able handle multiple py versions, so no?
 - MSTK: PR for centroid status buf for mzXML?
-- check why metfusion is still defaulted --> recreate sysdata.rda?
-    - do so after rebase
 - self contained reports by default?
+- update REUSE (incl the toml file)
 
 
 ## Maybe

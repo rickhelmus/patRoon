@@ -102,11 +102,19 @@
 <line x1='409.33' y1='506.94' x2='409.33' y2='147.38' style='stroke-width: 0.75; stroke: #A6CEE3;' />
 </g>
 <g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
-<line x1='59.04' y1='502.56' x2='59.04' y2='147.38' style='stroke-width: 0.75;' />
-<line x1='59.04' y1='327.16' x2='51.84' y2='327.16' style='stroke-width: 0.75;' />
+<line x1='59.04' y1='502.56' x2='59.04' y2='75.47' style='stroke-width: 0.75;' />
+<line x1='59.04' y1='435.03' x2='51.84' y2='435.03' style='stroke-width: 0.75;' />
+<line x1='59.04' y1='363.11' x2='51.84' y2='363.11' style='stroke-width: 0.75;' />
+<line x1='59.04' y1='291.20' x2='51.84' y2='291.20' style='stroke-width: 0.75;' />
+<line x1='59.04' y1='219.29' x2='51.84' y2='219.29' style='stroke-width: 0.75;' />
 <line x1='59.04' y1='147.38' x2='51.84' y2='147.38' style='stroke-width: 0.75;' />
-<text transform='translate(41.76,327.16) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='16.68px' lengthAdjust='spacingAndGlyphs'>0.5</text>
+<line x1='59.04' y1='75.47' x2='51.84' y2='75.47' style='stroke-width: 0.75;' />
+<text transform='translate(41.76,435.03) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='16.68px' lengthAdjust='spacingAndGlyphs'>0.2</text>
+<text transform='translate(41.76,363.11) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='16.68px' lengthAdjust='spacingAndGlyphs'>0.4</text>
+<text transform='translate(41.76,291.20) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='16.68px' lengthAdjust='spacingAndGlyphs'>0.6</text>
+<text transform='translate(41.76,219.29) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='16.68px' lengthAdjust='spacingAndGlyphs'>0.8</text>
 <text transform='translate(41.76,147.38) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>1</text>
+<text transform='translate(41.76,75.47) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='16.68px' lengthAdjust='spacingAndGlyphs'>1.2</text>
 <line x1='623.39' y1='69.84' x2='639.59' y2='69.84' style='stroke-width: 0.75; stroke: #A6CEE3;' />
 <line x1='623.39' y1='80.64' x2='639.59' y2='80.64' style='stroke-width: 0.75; stroke: #FF0000;' />
 <text x='647.69' y='72.94' style='font-size: 9.00px; fill: #A6CEE3; font-family: sans;' textLength='30.52px' lengthAdjust='spacingAndGlyphs'>positive</text>

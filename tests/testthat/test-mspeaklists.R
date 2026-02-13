@@ -459,14 +459,17 @@ test_that("IMS tests", {
     checkmate::expect_data_table(specSims)
     checkmate::expect_names(names(specSims), identical.to = c("group", "ims_parent_group", "similarity"))
     expect_range(specSims$similarity, c(0, 1))
-    expect_setequal(c(unique(specSims$group), unique(specSims$ims_parent_group)), groupNames(plistsIMS))
+    fgs <- groupNames(plistsIMS)
+    # omit fgs without IMS features (UNDONE: make a filter?)
+    fgs <- intersect(unlist(groupInfo(fGroupsIMS[IMS = TRUE])[, c("group", "ims_parent_group"), with = FALSE]), fgs)
+    expect_setequal(c(unique(specSims$group), unique(specSims$ims_parent_group)), fgs)
     
     specSimsFeats <- spectrumSimilarityMobility(plistsIMS, fGroupsIMS, doFGroups = FALSE)
     checkmate::expect_data_table(specSimsFeats)
     checkmate::expect_names(names(specSimsFeats), identical.to = c("group", "ims_parent_group", "analysis", "similarity"))
     expect_range(specSimsFeats$similarity, c(0, 1))
     expect_true(anyNA(specSimsFeats$similarity)) # since this is sets data the IMS features will only be present in one set
-    expect_setequal(c(unique(specSimsFeats$group), unique(specSimsFeats$ims_parent_group)), groupNames(plistsIMS))
+    expect_setequal(c(unique(specSimsFeats$group), unique(specSimsFeats$ims_parent_group)), fgs)
     
     expect_null(spectrumSimilarityMobility(delete(plistsIMS), fGroupsIMS))
     expect_warning(spectrumSimilarityMobility(plistsIMS, delete(fGroupsIMS)), "No relevant")

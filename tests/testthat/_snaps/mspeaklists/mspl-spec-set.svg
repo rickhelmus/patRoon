@@ -102,15 +102,23 @@
 <line x1='407.91' y1='493.80' x2='407.91' y2='411.05' style='stroke-width: 0.75; stroke: #BEBEBE;' />
 </g>
 <g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
-<line x1='59.04' y1='502.56' x2='59.04' y2='131.14' style='stroke-width: 0.75;' />
+<line x1='59.04' y1='493.80' x2='59.04' y2='70.70' style='stroke-width: 0.75;' />
 <line x1='59.04' y1='493.80' x2='51.84' y2='493.80' style='stroke-width: 0.75;' />
+<line x1='59.04' y1='433.35' x2='51.84' y2='433.35' style='stroke-width: 0.75;' />
 <line x1='59.04' y1='372.91' x2='51.84' y2='372.91' style='stroke-width: 0.75;' />
+<line x1='59.04' y1='312.47' x2='51.84' y2='312.47' style='stroke-width: 0.75;' />
 <line x1='59.04' y1='252.03' x2='51.84' y2='252.03' style='stroke-width: 0.75;' />
+<line x1='59.04' y1='191.58' x2='51.84' y2='191.58' style='stroke-width: 0.75;' />
 <line x1='59.04' y1='131.14' x2='51.84' y2='131.14' style='stroke-width: 0.75;' />
+<line x1='59.04' y1='70.70' x2='51.84' y2='70.70' style='stroke-width: 0.75;' />
 <text transform='translate(41.76,493.80) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>0</text>
+<text transform='translate(41.76,433.35) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='26.70px' lengthAdjust='spacingAndGlyphs'>5000</text>
 <text transform='translate(41.76,372.91) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='33.37px' lengthAdjust='spacingAndGlyphs'>10000</text>
+<text transform='translate(41.76,312.47) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='33.37px' lengthAdjust='spacingAndGlyphs'>15000</text>
 <text transform='translate(41.76,252.03) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='33.37px' lengthAdjust='spacingAndGlyphs'>20000</text>
+<text transform='translate(41.76,191.58) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='33.37px' lengthAdjust='spacingAndGlyphs'>25000</text>
 <text transform='translate(41.76,131.14) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='33.37px' lengthAdjust='spacingAndGlyphs'>30000</text>
+<text transform='translate(41.76,70.70) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='33.37px' lengthAdjust='spacingAndGlyphs'>35000</text>
 <line x1='615.36' y1='69.84' x2='631.56' y2='69.84' style='stroke-width: 0.75; stroke: #BEBEBE;' />
 <line x1='615.36' y1='80.64' x2='631.56' y2='80.64' style='stroke-width: 0.75; stroke: #FF0000;' />
 <text x='639.66' y='72.94' style='font-size: 9.00px; fill: #BEBEBE; font-family: sans;' textLength='46.05px' lengthAdjust='spacingAndGlyphs'>unassigned</text>

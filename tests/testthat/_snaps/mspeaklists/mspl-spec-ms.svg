@@ -112,8 +112,7 @@
 <line x1='333.91' y1='489.17' x2='333.91' y2='413.27' style='stroke-width: 0.75; stroke: #BEBEBE;' />
 <line x1='337.44' y1='489.17' x2='337.44' y2='452.54' style='stroke-width: 0.75; stroke: #BEBEBE;' />
 <line x1='339.25' y1='489.17' x2='339.25' y2='436.98' style='stroke-width: 0.75; stroke: #BEBEBE;' />
-<line x1='341.03' y1='489.17' x2='341.03' y2='417.88' style='stroke-width: 0.75; stroke: #BEBEBE;' />
-<line x1='341.03' y1='489.17' x2='341.03' y2='485.17' style='stroke-width: 0.75; stroke: #BEBEBE;' />
+<line x1='341.03' y1='489.17' x2='341.03' y2='413.88' style='stroke-width: 0.75; stroke: #BEBEBE;' />
 <line x1='344.55' y1='489.17' x2='344.55' y2='485.87' style='stroke-width: 0.75; stroke: #BEBEBE;' />
 <line x1='344.62' y1='489.17' x2='344.62' y2='486.11' style='stroke-width: 0.75; stroke: #BEBEBE;' />
 <line x1='348.07' y1='489.17' x2='348.07' y2='388.13' style='stroke-width: 0.75; stroke: #BEBEBE;' />
@@ -169,7 +168,7 @@
 <line x1='526.23' y1='489.17' x2='526.23' y2='468.15' style='stroke-width: 0.75; stroke: #BEBEBE;' />
 </g>
 <g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
-<line x1='59.04' y1='502.56' x2='59.04' y2='69.18' style='stroke-width: 0.75;' />
+<line x1='59.04' y1='489.17' x2='59.04' y2='69.18' style='stroke-width: 0.75;' />
 <line x1='59.04' y1='489.17' x2='51.84' y2='489.17' style='stroke-width: 0.75;' />
 <line x1='59.04' y1='384.17' x2='51.84' y2='384.17' style='stroke-width: 0.75;' />
 <line x1='59.04' y1='279.18' x2='51.84' y2='279.18' style='stroke-width: 0.75;' />

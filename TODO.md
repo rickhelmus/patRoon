@@ -102,21 +102,6 @@
     - set default greedy weights
         - also configurable weights for assignMobilities()?
 
-## IMS
-
-- findPeaks()
-    - Dietrich
-        - Disabled noise removal for reported intensities/areas
-            - keep doing this?
-            - report both?
-            - document
-- feat EICs
-    - intensityBP
-        - docs...
-        - does current mz/mob split make sense?
-        - make a non summed intensityBP in IMS mode? mainly for peak finding, but maybe also makes more sense for assignment
-            - otoh, BP single point doesn't make too much sense... maybe only use BP for non-IMS data?
-            - since we have profiles, taking sum intensities makes more sense, as unrelated peaks will be relatively fewer and probably less strongly affect than in centroided data 
 
 ## Tests
 
@@ -175,6 +160,8 @@
     - piek
         - refs to paper
         - summarize code changes and fixes --> extend?
+        - intensityBP: clarify that mzBP/mobBP are derived from summed data?
+        - intensitySub/areaSub: baseline subtracted
     - assignMobilities()
         - refs to paper
     - peakParams

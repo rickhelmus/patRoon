@@ -25,7 +25,7 @@ namespace {
  * Convert vector args to const refs
  * Removed unnecessary RcppArmadillo dependencies
  * Converted RT min/max args from scans to times and disable check if its zero
- * Disabled noise removal for reported intensities/areas
+ * Also report intensities/areas without noise removal
  * Converted peakwidth_min and max from ints to doubles
  * Use SpectrumRawTypes for intensity and time vectors
  * Add signal to noise to the output
@@ -36,13 +36,14 @@ namespace {
 
 struct PeakPickingResults
 {
-    std::vector<double> times, timesLeft, timesRight, XICIntensities, noiseDeviations, areas, FWHMsLeft, FWHMsRight,
-                        baselines, signalToNoises;
+    std::vector<double> times, timesLeft, timesRight, intensities, intensitiesSub, noiseDeviations, areas,
+                        areasSub, FWHMsLeft, FWHMsRight, baselines, signalToNoises;
     std::vector<int> scans, scansLeft, scansRight, noiseScans;
     PeakPickingResults(void) = default;
-    PeakPickingResults(size_t s) : times(s), timesLeft(s), timesRight(s), XICIntensities(s), noiseDeviations(s),
-                                   areas(s), FWHMsLeft(s), FWHMsRight(s), baselines(s), signalToNoises(s), scans(s), scansLeft(s),
-                                   scansRight(s), noiseScans(s) { }
+    PeakPickingResults(size_t s) : times(s), timesLeft(s), timesRight(s), intensities(s), intensitiesSub(s),
+                                   noiseDeviations(s), areas(s), areasSub(s), FWHMsLeft(s), FWHMsRight(s),
+                                   baselines(s), signalToNoises(s), scans(s), scansLeft(s), scansRight(s),
+                                   noiseScans(s) { }
 };
 
 PeakPickingResults peakPicking_cpp(const std::vector<SpectrumRawTypes::Intensity> &intensity, const std::vector<SpectrumRawTypes::Time> &scantime,
@@ -319,7 +320,7 @@ PeakPickingResults peakPicking_cpp(const std::vector<SpectrumRawTypes::Intensity
     
     /* delete too broad peaks (2 x FWHM > peakwidth_max) and calculate area*/
     j = 0;
-    std::vector<double> area(anzahlmaxima,0);
+    std::vector<double> area(anzahlmaxima,0), area_noise(anzahlmaxima,0);
 
     for(int i = 0; i < (anzahlmaxima); ++i) {
         if ((FWHM_right[i]-FWHM_left[i])*2 <= peakwidth_max)  {
@@ -333,9 +334,9 @@ PeakPickingResults peakPicking_cpp(const std::vector<SpectrumRawTypes::Intensity
             FWHM_right[j] = FWHM_right[i];
             amountofpeaks[j] = amountofpeaks[i];
             for (int ii = left_end[i]; ii < right_end[i]; ++ii) {
-                // CHANGED: don't subtract noise
-                //if ((intensity[ii] >= noiselevel[i]) && (intensity[ii+1] >= noiselevel[i])) area[j] += ((intensity[ii]-noiselevel[i])+(intensity[ii+1]-noiselevel[i]))*(scantime[ii+1]-scantime[ii])/2;
+                // CHANGED: store noise subtracted and raw areas
                 area[j] += (intensity[ii]+intensity[ii+1])*(scantime[ii+1]-scantime[ii])/2;
+                if ((intensity[ii] >= noiselevel[i]) && (intensity[ii+1] >= noiselevel[i])) area_noise[j] += ((intensity[ii]-noiselevel[i])+(intensity[ii+1]-noiselevel[i]))*(scantime[ii+1]-scantime[ii])/2;
             }
             j++;
         }
@@ -347,7 +348,8 @@ PeakPickingResults peakPicking_cpp(const std::vector<SpectrumRawTypes::Intensity
     for(int i = 0; i < (anzahlmaxima); ++i)
     {
         ret.times[i] = scantime[maxima[i]];
-        ret.XICIntensities[i] = intensity[maxima[i]]; // -noiselevel[i]; --> CHANGED: report raw intensities
+        ret.intensities[i] = intensity[maxima[i]];
+        ret.intensitiesSub[i] = intensity[maxima[i]] -noiselevel[i];
         ret.scans[i] = maxima[i]+1;
         ret.timesLeft[i] = scantime[left_end[i]];
         ret.timesRight[i] = scantime[right_end[i]];
@@ -357,6 +359,7 @@ PeakPickingResults peakPicking_cpp(const std::vector<SpectrumRawTypes::Intensity
         ret.noiseDeviations[i] = noisedeviation[i];
         ret.signalToNoises[i] = signalToNoises[i];
         ret.areas[i] = area[i];
+        ret.areasSub[i] = area_noise[i];
         ret.FWHMsLeft[i] = FWHM_left[i];
         ret.FWHMsRight[i] = FWHM_right[i];
         ret.baselines[i] = noiselevel[i];
@@ -454,7 +457,9 @@ Rcpp::List doFindPeaksPiek(Rcpp::List EICs, bool fillEICs, double minIntensity, 
                                     Rcpp::Named("retmin") = ppresults[i].timesLeft,
                                     Rcpp::Named("retmax") = ppresults[i].timesRight,
                                     Rcpp::Named("area") = ppresults[i].areas,
-                                    Rcpp::Named("intensity") = ppresults[i].XICIntensities,
+                                    Rcpp::Named("areaSub") = ppresults[i].areasSub,
+                                    Rcpp::Named("intensity") = ppresults[i].intensities,
+                                    Rcpp::Named("intensitySub") = ppresults[i].intensitiesSub,
                                     Rcpp::Named("noiseDeviation") = ppresults[i].noiseDeviations,
                                     Rcpp::Named("signalToNoise") = ppresults[i].signalToNoises,
                                     Rcpp::Named("FWHMLeft") = ppresults[i].FWHMsLeft,

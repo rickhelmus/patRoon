@@ -426,26 +426,4 @@ setMethod("compoundViewer", c("featureGroups", "MSPeakLists", "compounds"), func
     runApp(shinyApp(getCompViewerUI(generatePageLabels(names(fGroups)[1], 50)), server))
 })
 
-#' @details \code{groupFeaturesScreening} was replaced by
-#'   \code{\link{screenSuspects}}. Please refer to this function and the
-#'   handbook for the updated interface.
-#'
-#' @param ... Ignore.
-#'
-#' @rdname patRoon-defunct
-#' @keywords internal
-#' @export
-groupFeaturesScreening <- function(...) stop("This function was replaced by screenSuspects(). ",
-                                             "Please see ?screenSuspects and the handbook for the updated interface.")
-
-#' @details \code{checkChromatograms} was replaced by
-#'   \code{\link{checkFeatures}}. Please refer to this function and the
-#'   handbook for the updated interface.
-#'
-#' @rdname patRoon-defunct
-#' @keywords internal
-#' @export
-checkChromatograms <- function(...) stop("This function was replaced by checkFeatures(). ",
-                                         "Please see ?checkFeatures and the handbook for the updated interface.")
-
 # nocov end

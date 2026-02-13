@@ -19,6 +19,7 @@
 - reticulate: use py_require()? doesn't seem to be able handle multiple py versions, so no?
 - MSTK: PR for centroid status buf for mzXML?
 - self contained reports by default?
+- remove deprecated/defunct stuff
 
 
 ## Maybe
@@ -100,6 +101,9 @@
     - set default greedy weights
         - also configurable weights for assignMobilities()?
 
+## IMS
+
+- rename and split assignMobilities()?
 
 ## Tests
 

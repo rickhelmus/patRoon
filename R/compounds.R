@@ -621,15 +621,16 @@ setMethod("predictRespFactors", "compounds", function(obj, fGroups, calibrants, 
     printf("Predicting response factors from SMILES with MS2Quant for %d candidates...\n", length(obj))
     
     annSMI <- lapply(annotations(obj), \(ann) ann$SMILES)
-    preds <- doMap(parallel, split(groupInfo(fGroups), seq_len(length(fGroups))), annSMI,
-                   f = function(gInfo, SMI, calibrants, eluent, organicModifier, pHAq, concUnit)
+    gInfo <- groupInfo(fGroups)
+    preds <- doMap(parallel, split(gInfo[match(groupNames(obj), group)], seq_len(length(groupNames(obj)))), annSMI,
+                   f = function(gi, SMI, calibrants, eluent, organicModifier, pHAq, concUnit)
     {
-        patRoon:::predictRespFactorsSMILES(data.table(group = gInfo$group, SMILES = SMI), gInfo, calibrants,
+        patRoon:::predictRespFactorsSMILES(data.table(group = gi$group, SMILES = SMI), gi, calibrants,
                                            eluent, organicModifier, pHAq, concUnit)
     }, MoreArgs = list(calibrants, eluent, organicModifier, pHAq, concUnit))
 
     MS2QMD <- list()
-    obj@groupAnnotations <- Map(annotatiobs(obj), preds, f = function(ann, res)
+    obj@groupAnnotations <- Map(annotations(obj), preds, f = function(ann, res)
     {
         ann <- copy(ann)
         if (!is.null(ann[["RF_SMILES"]]))

@@ -514,7 +514,7 @@ getFMCS <- function(refSMILES, otherSMILES, parallel, au = 1, bu = 4, matching.m
     # makes aromatic rings look better...
     
     otherSMILESUn <- unique(otherSMILES)
-    SDFPaths <- doMap(parallel, c(refSMILES, otherSMILESUn), prog = FALSE, function(SMI)
+    SDFPaths <- doMap(parallel, c(refSMILES, otherSMILESUn), prog = FALSE, f = function(SMI)
     {
         mol <- patRoon:::getMoleculesFromSMILES(SMI, doTyping = TRUE, emptyIfFails = FALSE)
         if (!patRoon:::isValidMol(mol[[1]]))
@@ -528,12 +528,13 @@ getFMCS <- function(refSMILES, otherSMILES, parallel, au = 1, bu = 4, matching.m
         sdfFile <- tempfile(fileext = ".sdf")
         rcdk::write.molecules(mol, sdfFile, together = TRUE)
         return(sdfFile)
-    }, SIMPLIFY = TRUE)
+    })
+    SDFPaths <- unlist(SDFPaths)
     
     if (is.null(SDFPaths[refSMILES]))
         return(list())
     
-    return(setNames(doMap(parallel, SDFPaths[otherSMILESUn], prog = FALSE, function(p, ref, ...)
+    return(setNames(doMap(parallel, SDFPaths[otherSMILESUn], prog = FALSE, f = function(p, ref, ...)
     {
         oSDF <- ChemmineR::read.SDFset(p)
         f <- fmcsR::fmcs(ref, oSDF[[1]], ...)

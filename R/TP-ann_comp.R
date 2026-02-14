@@ -119,7 +119,8 @@ getTPsCompounds <- function(annTable, parentRow, TPStructParams, extraOptsFMCSR,
                           chem_ID = integer(), generation = integer(), compoundName = character(), SMILES = character(),
                           InChI = character(), InChIKey = character(), formula = character(), annSim = numeric(),
                           fitFormula = numeric(), fitCompound = numeric(), simSusp = numeric(),
-                          simSuspSMILES = numeric(), "simSuspInChI", simSuspInChIKey = numeric(), TPScore = numeric()))
+                          simSuspSMILES = numeric(), simSuspInChI = numeric(), simSuspInChIKey = numeric(),
+                          TPScore = numeric()))
     
     tab <- copy(annTable)
     setnames(tab, "neutral_formula", "formula")
@@ -164,7 +165,7 @@ getTPsCompounds <- function(annTable, parentRow, TPStructParams, extraOptsFMCSR,
             for (r in seq_len(nrow(tab)))
             {
                 set(tab, i = r, j = "simSusp", value = simSuspsWh[[r]]$dist)
-                set(tab, i = r, j = paste0("simSusp", names(simSusps)), value = as.list(simSusps[simSuspsWh[[r]]$wh]))
+                set(tab, i = r, j = names(simSusps), value = as.list(simSusps[simSuspsWh[[r]]$wh]))
             }
             
             tab <- tab[numGTE(NAToZero(simSusp), minSimSusp)]

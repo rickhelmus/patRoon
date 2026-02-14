@@ -233,7 +233,7 @@ generateTPsAnnForm <- function(parents, formulas, minFitFormula = 0.94, skipInva
             {
                 patRoon:::getTPsFormulas(annTable, par$name, par$formula, minFitFormula)
             }, MoreArgs = list(annTable = annTable, minFitFormula = minFitFormula))
-            saveCacheDataList("TPsAnnForm", newResults, hashes[parsTBD[i]], cacheDB)
+            saveCacheDataList("TPsAnnForm", newResults, hashes[parsTBD], cacheDB)
             newResults <- pruneList(newResults, checkZeroRows = TRUE)
         }
         

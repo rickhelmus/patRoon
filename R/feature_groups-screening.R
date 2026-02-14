@@ -489,7 +489,8 @@ setMethod("assignMobilities", "featureGroupsScreening", function(obj, mobPeakPar
 {
     ac <- checkmate::makeAssertCollection()
     assertFindMobilitiesArgs(mobPeakParams, chromPeakParams, EIMParams, EICParams, peakRTWindow, fallbackEIC,
-                             calcArea, mobWindow, scoreWeights, CCSParams, parallel, ac)
+                             calcArea, mobWindow, CCSParams, parallel, ac)
+    scoreWeights <- assertAndPRepGreedyScoringWeights(scoreWeights, add = ac)
     checkmate::assertFlag(fromSuspects, add = ac)
     assertIMSMatchParams(IMSMatchParams, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)

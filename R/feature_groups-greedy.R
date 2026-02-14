@@ -63,16 +63,10 @@ setMethod("groupFeaturesGreedy", "features", function(feat, rtalign = FALSE,
     checkmate::assertFlag(rtalign, add = ac)
     aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow + mobWindow, lower = 0, finite = TRUE,
            fixed = list(add = ac))
-    assertGreedyScoringWeights(scoreWeights, add = ac)
+    scoreWeights <- assertAndPRepGreedyScoringWeights(scoreWeights, add = ac)
     checkmate::assertFlag(verbose, add = ac)
     checkmate::reportAssertions(ac)
     
-    if (length(scoreWeights) < 4)
-    {
-        missingWeights <- setdiff(c("retention", "mz", "mobility", "intensity"), names(scoreWeights))
-        scoreWeights[missingWeights] <- 1
-    }
-
     if (rtalign)
         stop("Retention time alignment (rtalign=TRUE) is not yet supported for greedy grouping!", call. = FALSE)
     

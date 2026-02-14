@@ -1586,7 +1586,8 @@ setMethod("assignMobilities", "featureGroups", function(obj, mobPeakParams = NUL
     # NOTE: keep args in sync with other methods
     
     assertFindMobilitiesArgs(mobPeakParams, chromPeakParams, EIMParams, EICParams, peakRTWindow, fallbackEIC, calcArea,
-                             mobWindow, scoreWeights, CCSParams, parallel)
+                             mobWindow, CCSParams, parallel)
+    scoreWeights <- assertAndPRepGreedyScoringWeights(scoreWeights)
     
     if (!is.null(mobPeakParams))
     {

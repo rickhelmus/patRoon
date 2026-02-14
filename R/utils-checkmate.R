@@ -203,10 +203,18 @@ assertGroupFeatVerbose <- function(x, .var.name = checkmate::vname(x), add = NUL
     # )
 }
 
-assertGreedyScoringWeights <- function(x, .var.name = checkmate::vname(x), add = NULL)
+assertAndPRepGreedyScoringWeights <- function(x, .var.name = checkmate::vname(x), add = NULL)
 {
     checkmate::assertNumeric(x, max.len = 4, lower = 0, finite = TRUE, any.missing = FALSE, add = add)
     assertHasNames(x, c("retention", "mz", "mobility", "intensity"), subset = TRUE, add = add)
+    
+    if ((is.null(add) || length(add$getMessages()) == 0) && length(x) < 4)
+    {
+        missingWeights <- setdiff(c("retention", "mz", "mobility", "intensity"), names(x))
+        x[missingWeights] <- 1
+    }
+    
+    return(x)
 }
 
 assertAnaInfoBy <- function(x, anaInfo, withFGroups, null.ok = FALSE, any.missing = FALSE,
@@ -1121,14 +1129,13 @@ assertFindPeakParams <- function(x, null.ok = FALSE, .var.name = checkmate::vnam
 }
 
 assertFindMobilitiesArgs <- function(mobPeakParams, chromPeakParams, EIMParams, EICParams, peakRTWindow, fallbackEIC,
-                                     calcArea, mobWindow, scoreWeights, CCSParams, parallel, add = NULL)
+                                     calcArea, mobWindow, CCSParams, parallel, add = NULL)
 {
     assertFindPeakParams(mobPeakParams, null.ok = TRUE, add = add)
     assertFindPeakParams(chromPeakParams, null.ok = TRUE, add = add)
     assertEIMParams(EIMParams, add = add)
     assertEICParams(EICParams, add = add)
     aapply(checkmate::assertNumber, . ~ peakRTWindow + mobWindow, finite = TRUE, fixed = list(add = add))
-    assertGreedyScoringWeights(scoreWeights, add = add)
     aapply(checkmate::assertFlag, . ~ fallbackEIC, fixed = list(add = add))
     checkmate::assertChoice(calcArea, c("integrate", "sum"), add = add)
     checkmate::assert(

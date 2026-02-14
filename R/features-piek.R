@@ -727,7 +727,7 @@ getPiekEICParams <- function(..., IMS = getLimIMS())
                 mobRange = c(0.4, 1.3), mobStep = 0.08, sumWindowMZ = defaultLim("retention", "narrow"),
                 sumWindowMob = defaultLim("retention", "narrow"), smoothWindowMZ = 3, smoothWindowMob = 15,
                 retRange = NULL, gapFactor = 3, saveMZProfiles = FALSE, saveEIMs = FALSE, minEICIntensity = 5000,
-                minEICAdjTime = 0, minEICAdjPoints = 4, minEICAdjIntensity = 250, topMostEICMZ = 10000,
+                minEICAdjTime = 0, minEICAdjPoints = 5, minEICAdjIntensity = 250, topMostEICMZ = 10000,
                 topMostEICMZMob = 10000, minEICsIMSPreCheck = 50000)
     
     if (IMS == "agilent")

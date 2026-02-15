@@ -4,6 +4,9 @@
 
 local_edition(3) # for snapshots
 
+# NOTE: OpenTIMS is disabled in setup_all.R, enable it here so we can use it for testing
+withr::local_options(list(patRoon.MS.backends = getMSReadBackends()))
+
 anaInfo <- getTestAnaInfo()
 
 anaInfoOne <- getTestAnaInfo()[4, ]

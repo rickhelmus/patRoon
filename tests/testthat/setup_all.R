@@ -19,6 +19,7 @@ if (doDATests())
 
 options(datatable.auto.index = FALSE) # should make tests more reproducible
 options(patRoon.MP.logPath = FALSE)
+options(patRoon.MS.backends = c("mzr", "mstoolkit"))
 
 # HACK: sometimes plot isn't recognized as an S4 generic
 # setGeneric("plot", function(x, y, ...) standardGeneric("plot"))

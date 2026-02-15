@@ -530,10 +530,10 @@ getOldNewRefs <- function(ref)
     return(list(old = readRDS(oldref), new = readRDS(ref)))
 }
 
-compareRef <- function(ref)
+compareRef <- function(ref, tol = 0.00001)
 {
     on <- getOldNewRefs(ref)
-    waldo::compare(on$old, on$new, tolerance = 0.00001, max_diffs = Inf)
+    waldo::compare(on$old, on$new, tolerance = tol, max_diffs = Inf)
 }
 
 # to compare with old TP components format

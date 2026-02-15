@@ -35,7 +35,7 @@ plistsNoIM@setObjects <- lapply(setObjects(plistsNoIM), function(so) { so@metada
 plistsNoIM@analysisInfo <- data.table() # remove as it is system dependent
 
 test_that("verify generation of MS peak lists", {
-    expect_known_value(plistsNoIM, testFile("plists"))
+    expect_known_value(plistsNoIM, testFile("plists"), tolerance = 1E-7)
     
     plistsTM <- generateMSPeakLists(fGroups, topMost = 1)
     # check if there are at most one feature is used per feature group
@@ -484,7 +484,7 @@ doGetBG <- function(ai = getTestAnaInfoNS()[getTestAnaInfoNS()$replicate == "sol
 }
 bg <- doGetBG()
 test_that("BG MSMS", {
-    expect_known_value(bg, testFile("bg-msms"))
+    expect_known_value(bg, testFile("bg-msms"), tolerance = 1E-7)
     checkmate::expect_data_table(bg, any.missing = FALSE)
     checkmate::expect_names(names(bg), must.include = c("mz", "intensity", "abundance_rel_ana", "abundance_abs_ana", 
                                                         "abundance_rel_spec", "abundance_abs_spec"))

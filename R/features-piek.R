@@ -141,6 +141,10 @@ setMethod("delete", "featuresPiek", function(obj, i = NULL, j = NULL, ...)
 #'     }
 #'
 #'     \item Various small bug fixes and improvements for the original code.
+#'     
+#'     \item The output feature tables contain raw intensities/areas and those subtracted by the estimated noise level
+#'     (\code{intensity}, \code{intensitySub}, \code{area} and \code{areaSub} columns, respectively) and the estimated
+#'     signal to noise (\code{signalToNoise} column).
 #'
 #'   }
 #'

@@ -136,11 +136,6 @@
     - installation
         - verify R installation table when new deps in patRoonDeps are added
 - update tutorial
-- IMS
-    - piek
-        - summarize code changes and fixes --> extend?
-        - intensityBP: clarify that mzBP/mobBP are derived from summed data?
-        - intensitySub/areaSub: baseline subtracted
 - add refs to paper: piek, assignMobilities(), peakParams, greedy, IMSCollapse
 
 ## NEWS

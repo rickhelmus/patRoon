@@ -179,7 +179,7 @@ The `msdata` interface is used throughout many operations within `patRoon`, such
 
 Backend         | Supported file types and formats
 --------------- | --------------------------------------------------------------------------
-`"opentims"`    | Uses [OpenTIMS] for highly efficient reading of raw Bruker TIMS data (only available on Windows and Linux)
+`"opentims"`    | Uses [OpenTIMS] for highly efficient reading of raw Bruker TIMS data (only available on Windows and Linux). Requires the Bruker [TDF-SDK], see the [Installation chapter](#Installation).
 `"mzr"`         | uses [mzR] to read `centroid` files in the `mzML` and `mzXML` formats. This was always used before `patRoon 3.0`.
 `"mstoolkit"`   | Uses [mstoolkit] to read `ims` files (`mzML` format) and `centroid` files in the `mzML` and `mzXML` formats. Requires the [Rmstoolkitlib] `R` package (see the [Installation chapter](#Installation)).
 `"streamcraft"` | Uses [StreamCraft] to read `ims` files (`mzML` format) and `centroid` files in the `mzML` and `mzXML` formats.
@@ -296,8 +296,25 @@ getDACalibrationError(anaInfo) # get calibration error for each analysis
 
 Please see the reference manual for more details (`?convertMSFiles`, ``?`bruker-utils` ``).
 
+## Example data
 
-## Features
+The [patRoonData] and [patRoonDataIMS] packages contain HRMS and IMS-HRMS data, respectively, that can be used to explore the workflow. The data files are already exported in `.mzML` format and therefore ready to use. Furthermore, these packages also contain example suspect and internal standard lists, which will be explained in the next sections. The following functions can be used to obtain the example data:
+
+```{r exampleData,eval=TRUE}
+# get analysis information for example data, which can be used directly for feature detection
+patRoonData::exampleAnalysisInfo("positive")[, c("analysis", "replicate", "blank", "path_centroid")]
+
+# negative ionization IMS data
+patRoonDataIMS::exampleAnalysisInfo("negative")[, c("analysis", "replicate", "blank", "path_ims", "path_centroid")]
+
+# example suspect list
+patRoonData::suspectsPos[1:5, ]
+
+# example internal standards
+patRoonDataIMS::ISTDListPos[1:5, ]
+```
+
+## Features {#features}
 
 Collecting features from the analyses consists of finding all features, grouping them across analyses (optionally after retention time alignment), and if desired suspect screening: 
 

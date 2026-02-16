@@ -40,7 +40,7 @@ formulas <- generateFormulas(..., adduct = "[M-H]-") # same as above
 
 More details can be found in the reference manual (`?adduct` and ``?`adduct-utils` ``).
 
-## Default numeric limits and tolerances
+## Default numeric limits and tolerances {#limits}
 
 The functions in `patRoon` use various numeric limits and tolerances to configure e.g. tolerances applied to match retention times and _m/z_ values. Since `patRoon 3.0` the defaults for these limits are centralized, which simplifies configuration and switching defaults between different HRMS instruments.
 
@@ -905,13 +905,13 @@ For various technical reasons several parallelization techniques are used, these
 
 Multithreading is the most efficient form of parallelization, but is limited to `C/C++` code. In `patRoon` this is realized through the [OpenMP] API. Multithreading is currently only used by the [msdata](#fileTypes) interface to load raw (IMS-)HRMS data and by the `piek`  algorithm for peak detection in chromatograms and mobilograms.
 
-The maximum number of threads used for parallelization is configured through the `patRoon.threads` option. By default it is set to the number of available CPU cores, which results usually in the best performance. However, this could be lowered, for instance, to keep your computer more responsive while processing.
+The maximum number of threads used for parallelization is configured through the `patRoon.threads` option. By default it is set to the number of available CPU cores, which results usually in the best performance. However, this could be lowered, for instance, to keep your computer more responsive or use less RAM while processing data.
 
 ```{r eval=FALSE}
 options(patRoon.threads = 2) # do not use more than two threads
 ```
 
-### Parellization of R functions
+### Parellization of R functions {#futures}
 
 Several functions of `patRoon` support parallelization.
 
@@ -937,7 +937,14 @@ future::plan("multisession", workers = 3)
 fList <- findFeatures(anaInfo, "envipick", parallel = TRUE)
 ```
 
-It is important to properly configure the right future plan. Please see the documentation of the [future] package for more details.
+It is important to properly configure the right future plan. With more advanced configurations it is also possible to perform the the parallelization on one or more external computers. The [future] `R` package supports many approaches, such as cluster computing via multiple networked computers and more advanced HPC approaches such as `slurm` via the [future.batchtools] `R` package. For example, the following configuration uses four nodes on an external computer to perform data processing operations:
+
+```{r eval=FALSE}
+# start a networked cluster with four nodes on PC with hostname "otherpc"
+future::plan("cluster", workers = rep("otherpc", 4)) 
+```
+
+Please see the documentation of the respective packages (_e.g._ [future] and [future.batchtools]) for more details on how to configure the workers.
 
 ### Multiprocessing
 
@@ -947,7 +954,7 @@ Tool                  | Used by                                        | Notes
 --------------------- | ---------------------------------------------- | ---------------------------------
 `msConvert`           | `convertMSFiles(algorithm="pwiz", ...)`        |
 `FileConverter`       | `convertMSFiles(algorithm="openms", ...)`      |
-`TIMSCONVERT`         | `convertMSFiles(algorithm="timsconvert", ...)` | Only if `useTimsTOF=TRUE`
+`TIMSCONVERT`         | `convertMSFiles(algorithm="timsconvert", ...)` | 
 `FeatureFinderMetabo` | `findFeatures(algorithm="openms", ...)`        |
 `julia`               | `findFeatures(algorithm="safd", ...)`          |
 `SIRIUS`              | `findFeatures(algorithm="sirius", ...)`        |
@@ -998,7 +1005,7 @@ The `withOpt` function will temporarily change the given option(s) while executi
 
 #### Multiprocessing with futures
 
-The primary goal of the "future" method is to allow parallel processing on one or more external computers. Since it uses the [future] `R` package, many approaches are supported, such as local parallelization (similar to the `classic` method), cluster computing via multiple networked computers and more advanced HPC approaches such as `slurm` via the [future.batchtools] `R` package. This parallelization method can be activated as follows:
+The primary goal of the "future" method is to use the [future] `R` package to allow parallel processing on one or more external computers, as [discussed before](#futures). For example:
 
 ```{r eval=FALSE}
 options(patRoon.MP.method = "future")
@@ -1011,8 +1018,6 @@ future::plan("cluster", workers = 4)
 # example 2: start a networked cluster with four nodes on PC with hostname "otherpc"
 future::plan("cluster", workers = rep("otherpc", 4)) 
 ```
-
-Please see the documentation of the respective packages (_e.g._ [future] and [future.batchtools]) for more details on how to configure the workers.
 
 The `withOpt()` function introduced in the previous subsection can also be used to temporarily switch between parallelization approaches, for instance:
 
@@ -1046,6 +1051,7 @@ Some important notes when using the `future` parallelization method:
 * If you encounter errors then it may be handy to switch to `future::plan("sequential")` and see if it works or you get more descriptive error messages.
 * In order to restart the nodes, for instance after re-configuring `patRoon`, updating `R` packages etc, simply re-execute `future::plan(...)`.
 * Setting the `future.debug` package option to `TRUE` may give you more insight what is happening to find problems.
+* If external parallel workers are used (e.g. clusters) with `patRoon` functionality that produces output files, then make sure that the output directory is shared between the workers and that the workers have write access to it. This is currently mainly relevant for `convertMSFiles()` and `report()`.
 
 
 ```{r child=file.path(vignDir, "shared", "_refs.Rmd")}

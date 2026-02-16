@@ -2,15 +2,14 @@
 
 ## general
 
-- better explain behavior of collapseSuspects=NULL and merging of predicted concs/tox
-    - check if ref docs are OK
-    - add to handbook
-    - add NEWS
+
 - update patRoonInst/patRoonExt/patRoonData for new deps
     - install timsconvert and c3sdb in Docker and bundle
         - Docker: finish WIP
         - Windows: for now don't bundle, but install in GHA for testing: https://docs.github.com/en/actions/tutorials/build-and-test-code/python
     - test new/updated patRoonExt deps
+    - update PCLiteCCS
+    - update patRoonDeps dependencies for Rmstoolkitlib, reticulate, fmcsR etc
 - BUG: annSim.1 column (in formulas?)?
 - Harmonize/consistent names
     - better names for ims_parent_ID/ims_parent_group?
@@ -128,38 +127,21 @@
 
 ## Docs
 
+- better explain behavior of collapseSuspects=NULL and merging of predicted concs/tox
+    - check if ref docs are OK
+    - add to handbook
+    - add NEWS
 - move all plotBPC(), getEIC() etc methods into one doc file?
-- convert
-    - add patRoon 3.0 citation for imscollapse
 - handbook
-    - update for IMS arg for EIMs and MSPL
     - installation
-        - add additional external deps, eg Python, TIMS-SDK, c3sdb, PCL/CCS etc
-    - workflow concepts: maybe mention mobility as possible feature property
-    - update docs to also mention patRoonDataIMS (if needed)
-        - maybe more clearly introduce both patRoonData and patRoonDataIMS somewhere
-    - IMS chapter
-        - intro
-            - make sure to update step numbers of post assignment throughout the chapter if this is changed
-        - workflows
-            - add more discussion on mz and mob profiles for piek? --> see after settling on instrument default
-    - Advanced
-        - parallelization
-            - restructure futures a bit: mainly move clusters from multiproc to beginning
-            - mention that not all support workers on other PCs (which? make a table?)
+        - verify R installation table when new deps in patRoonDeps are added
 - update tutorial
 - IMS
     - piek
-        - refs to paper
         - summarize code changes and fixes --> extend?
         - intensityBP: clarify that mzBP/mobBP are derived from summed data?
         - intensitySub/areaSub: baseline subtracted
-    - assignMobilities()
-        - refs to paper
-    - peakParams
-        - refs to paper
-    - Greedy
-        - add ref to paper
+- add refs to paper: piek, assignMobilities(), peakParams, greedy, IMSCollapse
 
 ## NEWS
 

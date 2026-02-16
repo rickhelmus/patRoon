@@ -154,13 +154,17 @@ Dependency                          | Remarks
 [OpenBabel]                         | **Highly recommend** Used by e.g. suspect screening to automatically validate and calculate chemical properties such as InChIs and formulae. While optional, highly recommended.
 [Rtools]                            | May be necessary on Window when installing `patRoon` and its `R` dependencies (discussed later).
 [ProteoWizard]                      | Needed for automatic data-pretreatment (e.g. data file conversion and centroiding, Bruker users may use DataAnalysis integration instead).
+[TIMSCONVERT]                       | Recommended to convert Bruker timsTOF data. Needs a Python installation and the `reticulate` R package. The `installTIMSCONVERT()` function can be used to automatically install `TIMSCONVERT` in a virtual Python environment. For manual installation, see the [installation instructions][TC-install] ("Manual installation", the GUI does not provide the necessary files).
 [OpenMS]                            | Recommended. Used for e.g. finding and grouping features.
+[TDF-SDK]                           | Install for directly loading Bruker timsTOF data _via_ the [OpenTIMS backend](#fileTypes).
 [MetFrag CL][MetFragCL]             | Recommended. Used for annotation with MetFrag.
 [MetFrag CompTox DB][CompTox-dl]    | Database files necessary for usage of the [CompTox] database with MetFrag. Note that a recent version  of MetFrag (>=2.4.5) is required. Note that the lists with additions for [smoking metadata][CompTox-smoke] and [wastewater metadata][CompTox-WW] are also supported.
-[MetFrag PubChemLite DB][PCLite-dl] | Database file needed to use [PubChemLite][PCLite-paper] with MetFrag.
+[MetFrag PubChemLite DB][PCLite-dl] | Database file needed to use [PubChemLite][PCLite-paper] with MetFrag. For IMS workflows, see below.
+[MetFrag PubChemLite+CCSbase DB][PCLiteCCS-dl] | Database file needed to use the [PubChemLite+CCSbase][PCLiteCCS-paper] database with MetFrag. This database is recommended for IMS workflows, as it contains CCS values. It will also work for regular HRMS workflows, and is therefore provided by `patRoonExt`.
 [MetFrag PubChem OECD PFAS DB][PC-PFAS] | Database file to use the OECD PFAS database with MetFrag.
 [SIRIUS]                            | For obtaining feature data and formula and/or compound annotation.
 [BioTransformer]                    | For prediction of transformation products. See the [BioTransformer] page for installation details. If you have trouble compiling the jar file you can download it from [here](https://github.com/rickhelmus/patRoonExt/raw/master/tools/biotransformer-3.0.0.jar).
+[C3SDB] (CCSbase)                   | Used for CCS prediction in IMS workflows. Requires a Python 3.12 installation and the `reticulate` R package. The `installC3SDB()` function will automatically install C3SDB in a Python virtual environment.
 [SAFD]                              | For finding features with [SAFD]. Please follow all the installation on the [SAFD webpage][SAFD].
 
 Most of these dependencies are optional and only needed if their algorithms are used during the workflow.
@@ -194,6 +198,7 @@ options(patRoon.path.MetFragPubChemLite = "~/PubChemLite_exposomics_20220429.csv
 options(patRoon.path.MetFragPubChemLite = "~/PubChem_OECDPFAS_largerPFASparts_20220324") # full location to PFAS DB (NOTE: configured like PubChemLite)
 options(patRoon.path.BioTransformer = "~/biotransformer/biotransformer-3.0.0.jar")
 options(patRoon.path.obabel = "C:/Program Files/OpenBabel-3.0.0") # directory with OpenBabel binaries
+options(patRoon.path.TDFSDK = "C:/timsdata/win64/timsdata.dll") # path to TDF-SDK library (.dll or .so)
 ```
 
 These commands have to be executed every time you start a new `R` session (e.g. as part of your script). However, it is probably easier to add them to your `~/.Rprofile` file so that they are executed automatically when you start `R`. If you don't have this file yet you can simply create it yourself (for more information see e.g. [this SO answer](https://stackoverflow.com/a/46819910)).

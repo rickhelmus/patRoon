@@ -1,6 +1,7 @@
 [GHRel]: https://github.com/rickhelmus/patRoon/releases
 [GHPreRel]: https://github.com/rickhelmus/patRoonDeps/releases/tag/prerelease
 [patRoonData]: https://github.com/rickhelmus/patRoonData
+[patRoonDataIMS]: https://github.com/rickhelmus/patRoonDataIMS
 [patRoonInst]: https://github.com/rickhelmus/patRoonInst
 [patRoonExt]: https://github.com/rickhelmus/patRoonExt
 [Adoptium]: https://adoptium.net/
@@ -24,8 +25,9 @@
 [CompTox-WW]: https://zenodo.org/record/3472781#.XnjMAHLvKUk
 [PCLite-dl]: https://zenodo.org/record/6503754
 [PCLite-paper]: https://doi.org/10.1186/s13321-021-00489-0
+[PCLiteCCS-dl]: https://doi.org/10.5281/zenodo.4081056
+[PCLiteCCS-paper]: https://doi.org/10.1021/acs.estlett.4c01003
 [PC-PFAS]: https://zenodo.org/record/6385954
-[PCLiteCCS-dl]: https://zenodo.org/records/15311000
 [csvDB-ex]: https://raw.githubusercontent.com/rickhelmus/patRoon/master/tests/testthat/test_data/test-mf-db-isomers.csv
 [SIRIUS]: https://bio.informatik.uni-jena.de/software/sirius/
 [CSI:FingerID]: https://www.csi-fingerid.uni-jena.de/
@@ -75,8 +77,10 @@
 [MS2Quant]: https://github.com/kruvelab/MS2Quant
 [OpenMP]: https://www.openmp.org/
 [TIMSCONVERT]: https://gtluu.github.io/timsconvert/
+[TC-install]: https://gtluu.github.io/timsconvert/installation.html
 [C3SDB]: https://github.com/dylanhross/c3sdb
 [OpenTIMS]: https://github.com/michalsta/opentims
+[TDF-SDK]: https://www.bruker.com/protected/en/services/software-downloads/mass-spectrometry.html
 [mstoolkit]: https://github.com/mhoopmann/mstoolkit
 [Rmstoolkitlib]: https://github.com/rickhelmus/Rmstoolkitlib
 [StreamCraft]: https://github.com/odea-project/streamcraft

@@ -1,4 +1,4 @@
-# Script automatically generated on Mon Jul 26 14:32:58 2021
+# Script automatically generated on Tue Feb 17 08:05:32 2026
 
 library(patRoon)
 
@@ -25,37 +25,39 @@ fGroups <- groupFeatures(fList, "openms", rtalign = TRUE)
 
 # Basic rule based filtering
 fGroups <- filter(fGroups, preAbsMinIntensity = 100, absMinIntensity = 1E5, relMinReplicateAbundance = 1,
-                  maxReplicateIntRSD = 0.75, blankThreshold = 5, removeBlanks = TRUE,
-                  retentionRange = NULL, mzRange = NULL)
+                  maxReplicateIntRSD = 0.75, blankThreshold = 5, removeBlanks = TRUE, retentionRange = NULL,
+                  mzRange = NULL)
 
-fGroups <- fGroups[, 1:25]
+# Update group properties
+fGroups <- updateGroups(fGroups, what = c("ret", "mz", "mobility"), intWeight = FALSE)
 
 # -------------------------
 # annotation
 # -------------------------
 
 # Retrieve MS peak lists
-avgMSListParams <- getDefAvgPListParams(clusterMzWindow = 0.005)
-mslists <- generateMSPeakLists(fGroups, "mzr", maxMSRTWindow = 5, precursorMzWindow = 4,
-                               avgFeatParams = avgMSListParams,
-                               avgFGroupParams = avgMSListParams)
+avgMSListParams <- getDefAvgPListParams(clusterMzWindow = 0.002)
+mslists <- generateMSPeakLists(fGroups, avgFeatParams = avgMSListParams, avgFGroupParams = avgMSListParams)
 # Rule based filtering of MS peak lists. You may want to tweak this. See the manual for more information.
-mslists <- filter(mslists, relMSMSIntThr = 0.02, topMSMSPeaks = 10)
+mslists <- filter(mslists, MSLevel = 2, absMinIntensity = NULL, relMinIntensity = 0.02, topMostPeaks = 10,
+                  maxMZOverPrec = 4)
 
 # Calculate formula candidates
-formulas <- generateFormulas(fGroups, mslists, "genform", relMzDev = 5, adduct = "[M+H]+", elements = "CHNOPSCl",
-                             oc = FALSE, calculateFeatures = TRUE,
-                             featThresholdAnn = 0.75)
+formulas <- generateFormulas(fGroups, mslists, "genform", adduct = "[M+H]+", elements = "CHNOPSCl", oc = FALSE,
+                             calculateFeatures = FALSE)
+formulas <- estimateIDConfidence(formulas, IDFile = "idlevelrules.yml")
 
 # Calculate compound structure candidates
-compounds <- generateCompounds(fGroups, mslists, "metfrag", dbRelMzDev = 5, fragRelMzDev = 5, fragAbsMzDev = 0.002,
-                               adduct = "[M+H]+", database = "pubchemlite",
+compounds <- generateCompounds(fGroups, mslists, "metfrag", adduct = "[M+H]+", database = "pubchemlite",
                                maxCandidatesToStop = 2500)
 compounds <- addFormulaScoring(compounds, formulas, updateScore = TRUE)
+
+compounds <- estimateIDConfidence(compounds, MSPeakLists = mslists, formulas = formulas, IDFile = "idlevelrules.yml")
 
 # -------------------------
 # reporting
 # -------------------------
 
-report(fGroups, MSPeakLists = mslists, formulas = formulas, compounds = compounds,
-       components = NULL, settingsFile = "report.yml", openReport = TRUE)
+# Advanced report settings can be edited in the report.yml file.
+report(fGroups, MSPeakLists = mslists, formulas = formulas, compounds = compounds, components = NULL,
+       settingsFile = "report.yml", openReport = TRUE)

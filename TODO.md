@@ -135,7 +135,6 @@
 - handbook
     - installation
         - verify R installation table when new deps in patRoonDeps are added
-- update tutorial
 - add refs to paper: piek, assignMobilities(), peakParams, greedy, IMSCollapse
 
 ## NEWS

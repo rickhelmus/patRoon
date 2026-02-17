@@ -18,6 +18,10 @@ knitr::opts_chunk$set(
 
 source(file.path("shared", "init.R"))
 doCompounds <- TRUE # curl::has_internet()
+
+if (file.exists("idlevelrules.yml"))
+    stop("idlevelrules already exists --> remove file to proceed")
+genIDLevelRulesFile("idlevelrules.yml")
 ```
 
 ```{css code=readLines("styles.css"),echo=FALSE}
@@ -87,7 +91,7 @@ For this tutorial make the following selections
 * **Analyses tab** Here you normally select your analyses. However, for this tutorial simply select the _Example data_ option.
 * **Data pre-treatment tab** Since the example data is already ready to use you can simply skip this tab.
 * **Features tab** Leave the default OpenMS algorithm for feature finding and grouping.
-* **Annotation tab** Select _GenForm_, _MetFrag_ and _mzR_ for the formula generation, compound identification and peak list generator options, respectively (note that the last will become visible when selecting either of the other options).
+* **Annotation tab** Select _GenForm_ and _MetFrag_ for the formula and compound annotation algorithms, respectively.
 * **TP screening tab** No need to do anything here for this tutorial.
 * **Reporting tab** Make sure to enable HTML reporting.
 
@@ -125,7 +129,6 @@ library(patRoon)
 workPath <- "C:/my_project"
 setwd(workPath)
 
-
 # Example data from patRoonData package (triplicate solvent blank + triplicate standard)
 anaInfo <- patRoonData::exampleAnalysisInfo("positive")
 ```
@@ -145,9 +148,9 @@ After you ran this part the analysis information should be stored in the `anaInf
 anaInfo
 ```
 
-As you can see the generated `data.frame` consists of four columns:
+As you can see the generated `data.frame` consists of the following columns:
 
-* *path*: the directory path of the file containing the analysis data
+* *path_\**: columns that specify the directory paths to the analysis files, in raw, centroided, profile and ims format. The `path_centroid` column is only used in most workflows.
 * *analysis*: the name of the analysis. This should be the file name _without_ file extension.
 * *replicate*: to which _replicate_ the analysis belongs. All analysis which are replicates of each other get the same name.
 * *blank*: which replicate should be used for blank subtraction.
@@ -157,8 +160,8 @@ The latter two columns are especially important for [data cleanup](#data-cleanup
 In this tutorial the analysis information was just copied directly from [patRoonData]. The `generateAnalysisInfo()` function can be used to generate such a table for your own sample analyses. This function scans a given directory for MS data files and automatically fills in the `path` and `analysis` columns from this information. In addition, you can pass replicate and blank information to this function. Example:
 
 ```{r genAnaInfo}
-generateAnalysisInfo(patRoonData::exampleDataPath(), groups = c(rep("solvent-pos", 3), rep("standard-pos", 3)),
-                     blanks = "solvent")
+generateAnalysisInfo(fromCentroid = patRoonData::exampleDataPath(), replicate = c(rep("solvent-pos", 3), rep("standard-pos", 3)),
+                     blank = "solvent")
 ```
 
 > **_NOTE_** Of course nothing stops you from creating a `data.frame` with analysis information manually within `R` or load the information from a _csv_ file. In fact, when you create a new project with `newProject()` you can select to generate a separate _csv_ file with analysis information (i.e. by filling in the right information in the analysis tab).
@@ -180,11 +183,13 @@ fList <- findFeatures(anaInfo, "openms", noiseThrInt = 1000, chromSNR = 3, chrom
 
 After some processing time (especially for larger datasets), the next step is to _group features_. During this step, features from different analysis are grouped, optionally after alignment of their retention times. This grouping is necessary because it is common that instrumental errors will result in (slight) variations in both retention time and _m/z_ values which may complicate comparison of features between analyses. The resulting groups are referred to as **feature groups** and are crucial input for subsequent workflow steps.
 
-To group features the `groupFeatures()` function is used, which has similar argument requirements as `findFeatures()` and likewise has many more options to tune the process. 
+To group features the `groupFeatures()` function is used:
 
 ```{r fGroups}
 fGroups <- groupFeatures(fList, "openms", rtalign = TRUE)
 ```
+
+The [Handbook] and reference manual (`?findFeatures` and `?groupFeatures`) lists many more algorithms and parameters that can be used for both feature finding and grouping.
 
 ## Data clean-up {#data-cleanup}
 
@@ -201,8 +206,8 @@ fGroups <- filter(fGroups, preAbsMinIntensity = 100, absMinIntensity = 1E5,
 The following filtering steps will be performed:
 
 * Features are removed if their intensity is below a defined intensity threshold (set by `absMinIntensity`). This filter is an effective way to  not only remove 'noisy' data, but, for instance, can also be used to remove any low intensity features which likely miss MS/MS data.
-* If a feature is not ubiquitously present in (part of) replicate analyses it will be filtered out from that replicate. This is controlled by setting `relMinReplicateAbundance`. The value is relative, for instance, a value of `0.5` would mean that a feature needs to be present in half of the replicates. In this tutorial we use a value of `1` which means that a feature should be present in all replicate samples. This is a _very_ effective filter in removing any outliers, for instance, caused by features which don't actually represent a well defined chromatographic peak.
-* Similarly, features with within a replicate are removed if the relative standard deviation (RSD) of their intensities exceeds that of the value set by the `maxReplicateIntRSD` argument.
+* If a feature is not ubiquitously present in (part of) replicate analyses it will be filtered out from that replicate. This is controlled by setting `relMinReplicateAbundance`. The value is relative, for instance, a value of `0.5` would mean that a feature needs to be present in half of the replicates. In this tutorial we use a value of `1` which means that a feature should be present in all replicate samples. This is a _very_ effective filter in removing any false positives, for instance, caused by features which don't actually represent a well defined chromatographic peak.
+* Similarly, the features within a replicate are removed if the relative standard deviation (RSD) of their intensities exceeds that of the value set by the `maxReplicateIntRSD` argument.
 * Features are filtered out that do not have a significantly higher intensity than the blank intensity. This is controlled by `blankThreshold`: the given value of `5` means that the intensity of a feature needs to be at least five times higher compared to the (average) blank signal.
 
 The `removeBlanks` argument tells will remove all blank analyses after filtering. The `retentionRange` and `mzRange` arguments are not used here, but could be used to filter out any features outside a give retention or _m/z_ range. There are many more filters: see `?filter()` for more information.
@@ -212,6 +217,12 @@ As you may have noticed quite a large part of the features are removed as a resu
 <!-- UNDONE: add link below to other vignette when it contains prioritization -->
 
 The next logical step in a non-target workflow is often to perform further prioritization of data. However, this will not be necessary in this tutorial as our samples are just known standard mixtures.
+
+After cleaning up the data, the `updateGroups()` function is called to update the feature group properties (retention time and m/z). This can improve their accuracy, since e.g. false positives don't attribute to the group properties anymore.
+
+```{r updateGroups}
+fGroups <- updateGroups(fGroups, what = c("ret", "mz", "mobility"), intWeight = FALSE)
+```
 
 To simplify processing, we only continue with the first 25 feature groups:
 
@@ -230,7 +241,7 @@ fGroups
 Furthermore, the `as.data.table()` function can be used to have a look at generated feature groups and their intensities (_i.e._ peak heights) across all analyses:
 
 ```{r gTable}
-head(as.data.table(fGroups))
+as.data.table(fGroups)
 ```
 
 An overview of group properties is returned by the `groupInfo()` method:
@@ -253,12 +264,11 @@ Note that we only plot the most intense feature of a feature group here (as set 
 
 After obtaining a good dataset with features of interest we can start moving to find their chemical identity. Before doing so, however, the first step is to extract all relevant MS data that will be used for annotation. The tutorial data was obtained with data-dependent MS/MS, so in the ideal case we can obtain both MS and MS/MS data for each feature group.
 
-The `generateMSPeakLists()` function will perform this action for us and will generate so called _MS peak lists_ in the process. These lists are basically (averaged) spectra in a tabular form. We will use algorithms from the [mzR] package to do so:
+The `generateMSPeakLists()` function will perform this action for us and will generate so called _MS peak lists_ in the process. These lists are basically (averaged) spectra in a tabular form.
 
 ```{r MSPeakLists}
 avgPListParams <- getDefAvgPListParams(clusterMzWindow = 0.002)
-mslists <- generateMSPeakLists(fGroups, "mzr", maxMSRTWindow = 5, precursorMzWindow = 4,
-                              avgFeatParams = avgPListParams, avgFGroupParams = avgPListParams)
+mslists <- generateMSPeakLists(fGroups, avgFeatParams = avgPListParams, avgFGroupParams = avgPListParams)
 ```
 
 Note that we lowered the `clusterMzWindow` value to _0.002_. This window is used during averaging to cluster similar _m/z_ values together. In general the better the resolution of your MS instrument, the lower the value can be set.
@@ -266,48 +276,48 @@ Note that we lowered the `clusterMzWindow` value to _0.002_. This window is used
 Similar to feature groups the `filter()` generic function can be used to clean up the peak lists afterwards:
 
 ```{r MSPLF}
-mslists <- filter(mslists, relMSMSIntThr = 0.02, topMSMSPeaks = 10)
+mslists <- filter(mslists, MSLevel = 2, absMinIntensity = NULL, relMinIntensity = 0.02, topMostPeaks = 10,
+                  maxMZOverPrec = 4)
 ```
 
-Here, all MS/MS mass peaks with intensities below 2% are removed and from the remaining peaks no more than the ten most intense are retained.
+This step removes all MS/MS peaks that are
 
-## Formula calculation
+1. below 2% of the most intense peak in the spectrum (as set by `relMinIntensity`).
+2. more than 4 _m/z_ units above the precursor _m/z_ (as set by `maxMZOverPrec`).
+3. From the remaining peaks, no more than the ten most intense peaks are retained (as set by `topMostPeaks`).
 
-Using the data from the MS peak lists generated during the previous step we can generate a list of formula candidates for each feature group which is based on measured _m/z_ values, isotopic patterns and presence of MS/MS fragments. In this tutorial we will use this data as an extra hint to score candidate chemical structures generated during the next step. The command below will use [GenForm] to perform this step. Again running this code may take some time.
+## Formula annotation
+
+Using the data from the MS peak lists generated during the previous step we can generate a list of formula candidates for each feature group which is based on measured _m/z_ values, isotopic patterns and presence of MS/MS fragments. In this tutorial we will use this data as an extra hint to score candidate chemical structures generated during the next step. The code below will use [GenForm] to perform this step. Again running this code may take some time.
 
 ```{r formulas}
-formulas <- generateFormulas(fGroups, mslists, "genform", relMzDev = 5, adduct = "[M+H]+", elements = "CHNOPSCl",
-                             oc = FALSE, calculateFeatures = TRUE, featThresholdAnn = 0.75)
+formulas <- generateFormulas(fGroups, mslists, "genform", adduct = "[M+H]+", elements = "CHNOPSCl",
+                             oc = FALSE, calculateFeatures = FALSE)
+formulas <- estimateIDConfidence(formulas, IDFile = "idlevelrules.yml")
 ```
 
-Note that you need to change the elements parameter to this function to make sure that formulae with sulfur and chloride (S/Cl) are also accepted. It is highly recommended to limit the elements (by default it is just C, H, N, O and P) as this can significantly reduce processing time and improbable formula candidates. In this tutorial we already knew which compounds to expect so the choice was easy, but often a good guess can be made in advance.
+Note that you may need to change the elements parameter to this function, e.g. here to make sure that formulae with sulfur and chloride (S/Cl) are also calculated. It is highly recommended to limit the elements (by default it is just C, H, N, O and P) as this can significantly reduce processing time and improbable formula candidates. In this tutorial we already knew which compounds to expect so the choice was easy, but often a good guess can be made in advance. The call the `estimateIDConfidence()` function is then used to estimate the confidence of the generated formula candidates based on a set of rules defined in the `idlevelrules.yml` file. This file is based on the [Schymanski ID confidence levels](doi.org/10.1021/es5002105) and can be modified to fit your needs.
 
-> **_NOTE_** The `generateFormulas()` function returns an object that contains formula candidates assigned for each feature group. In the above call the `calculateFeatures` argument is set to `TRUE`: by doing so formulae are first calculated for individual features within a feature group. These results are then used to generate a consensus candidate formula list for the complete feature group. During this process any outliers (defined by `featThresholdAnn`) are automatically removed. In contrast, setting `calculateFeatures` to `FALSE` will calculate formulae directly for feature groups (by using MS peak lists that have been averaged for the whole group). This will be significantly faster, but might produce (slightly) less accurate results.
+## Compound annotation
 
-## Compound identification
-
-<!-- UNDONE Move MF installation to front? -->
-
-Now it is time to actually see what compounds we may be dealing with. In this tutorial we will use [MetFrag] to come up with a list of possible candidates structures for each feature group. Before we can start you have to make sure that MetFrag and the PubChemLite library can be found by `patRoon`. Please see the [Handbook] for installation instructions. 
+Now it is time to actually see what compounds we may be dealing with. In this tutorial we will use [MetFrag] to come up with a list of possible candidate structures for each feature group. Before we can start you have to make sure that MetFrag and the PubChemLite library can be found by `patRoon`. Please see the [Handbook] for installation instructions. 
 
 Then `generateCompounds()` is used to execute MetFrag and generate the `compounds`.
 
 ```{r compounds,eval=doCompounds}
-compounds <- generateCompounds(fGroups, mslists, "metfrag", method = "CL",
-                               dbRelMzDev = 5, fragRelMzDev = 5, fragAbsMzDev = 0.002,
-                               adduct = "[M+H]+", database = "pubchemlite", maxCandidatesToStop = 2500)
+compounds <- generateCompounds(fGroups, mslists, "metfrag", adduct = "[M+H]+", database = "pubchemlite",
+                               maxCandidatesToStop = 2500)
 ```
-
-While `generateCompounds()` is running a list of candidate compound structures will be downloaded for every feature group and ranked according to various scoring parameters.
 
 See `?generateCompounds()` for more information on possible databases and many other parameters that can be set.
 
 > **_NOTE_** This is often one of the most time consuming steps during the workflow. For this reason you should always take care to prioritize your data before running this function!
 
-Finally we use the `addFormulaScoring()` function to improve ranking of candidates by incorporating the formula calculation data from the previous step.
+Finally we use the `addFormulaScoring()` function to improve ranking of candidates by incorporating the formula calculation data from the previous step, and use `estimateIDConfidence()` again to estimate identification confidence levels for each of the candidates.
 
 ```{r fscoring,eval=doCompounds}
 compounds <- addFormulaScoring(compounds, formulas, updateScore = TRUE)
+compounds <- estimateIDConfidence(compounds, MSPeakLists = mslists, formulas = formulas, IDFile = "idlevelrules.yml")
 ```
 
 ```{r noint,include=FALSE,eval=!doCompounds}
@@ -391,4 +401,8 @@ In the previous sections the different parts of the processing script were discu
 
 
 ```{r child="shared/_refs.Rmd"}
+```
+
+```{r cleanup,include=FALSE}
+file.remove("idlevelrules.yml")
 ```

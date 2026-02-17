@@ -5,12 +5,22 @@ library(patRoon)
 # initialization
 # -------------------------
 
-workPath <- "test_temp/test-np/analysis-tab_emb_neg"
+workPath <- "test_temp/test-np/analysis-tab_emb_both"
 setwd(workPath)
 
 # Create analysis table
-anaInfo <- read.table(header = TRUE, text = "
-        analysis                                                            path_centroid path_raw        path_profile        path_ims      replicate         blank
+anaInfoPos <- read.table(header = TRUE, text = "
+        analysis                                                                  path_centroid path_raw        path_profile        path_ims      replicate         blank
+ 'solvent-pos-1' '<EXAMPLE_DATA_PATH_POS>'       '' 'converted/profile' 'converted/ims'  'solvent-pos' 'solvent-pos'
+ 'solvent-pos-2' '<EXAMPLE_DATA_PATH_POS>'       '' 'converted/profile' 'converted/ims'  'solvent-pos' 'solvent-pos'
+ 'solvent-pos-3' '<EXAMPLE_DATA_PATH_POS>'       '' 'converted/profile' 'converted/ims'  'solvent-pos' 'solvent-pos'
+'standard-pos-1' '<EXAMPLE_DATA_PATH_POS>'       '' 'converted/profile' 'converted/ims' 'standard-pos' 'solvent-pos'
+'standard-pos-2' '<EXAMPLE_DATA_PATH_POS>'       '' 'converted/profile' 'converted/ims' 'standard-pos' 'solvent-pos'
+'standard-pos-3' '<EXAMPLE_DATA_PATH_POS>'       '' 'converted/profile' 'converted/ims' 'standard-pos' 'solvent-pos'
+")
+
+anaInfoNeg <- read.table(header = TRUE, text = "
+        analysis                                                                  path_centroid path_raw        path_profile        path_ims      replicate         blank
  'solvent-neg-1' '<EXAMPLE_DATA_PATH_NEG>'       '' 'converted/profile' 'converted/ims'  'solvent-neg' 'solvent-neg'
  'solvent-neg-2' '<EXAMPLE_DATA_PATH_NEG>'       '' 'converted/profile' 'converted/ims'  'solvent-neg' 'solvent-neg'
  'solvent-neg-3' '<EXAMPLE_DATA_PATH_NEG>'       '' 'converted/profile' 'converted/ims'  'solvent-neg' 'solvent-neg'
@@ -26,7 +36,11 @@ anaInfo <- read.table(header = TRUE, text = "
 
 # Find all features
 # NOTE: see the reference manual for many more options
-fList <- findFeatures(anaInfo, "openms", noiseThrInt = 1000, chromSNR = 3, chromFWHM = 5, minFWHM = 1, maxFWHM = 30)
+fListPos <- findFeatures(anaInfoPos, "openms", noiseThrInt = 1000, chromSNR = 3, chromFWHM = 5, minFWHM = 1,
+                         maxFWHM = 30)
+fListNeg <- findFeatures(anaInfoNeg, "openms", noiseThrInt = 1000, chromSNR = 3, chromFWHM = 5, minFWHM = 1,
+                         maxFWHM = 30)
+fList <- makeSet(fListPos, fListNeg, adducts = c("[M+H]+", "[M-H]-"))
 
 # Group and align features between analyses
 fGroups <- groupFeatures(fList, "openms", rtalign = TRUE)

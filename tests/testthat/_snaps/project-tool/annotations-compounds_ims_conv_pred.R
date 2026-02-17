@@ -5,11 +5,13 @@ library(patRoon)
 # initialization
 # -------------------------
 
-workPath <- "test_temp/test-np/annotations-compounds_library"
+workPath <- "test_temp/test-np/annotations-compounds_ims_conv_pred"
 setwd(workPath)
 
 # NOTE: please set to a valid data.frame with analysis information. See ?`analysis-information` for more details.
 anaInfo <- data.frame(path_centroid = character(), analysis = character(), replicate = character(), blank = character())
+
+CCSParams <- getCCSParams(method = "bruker")
 
 # -------------------------
 # features
@@ -31,21 +33,30 @@ fGroups <- filter(fGroups, preAbsMinIntensity = 100, absMinIntensity = 10000, re
 fGroups <- updateGroups(fGroups, what = c("ret", "mz", "mobility"), intWeight = FALSE)
 
 # -------------------------
+# mobility assignment
+# -------------------------
+
+fGroups <- assignMobilities(fGroups, mobPeakParams = getDefPeakParams(type = "bruker_ims", algorithm = "piek"),
+                            chromPeakParams = getDefPeakParams(type = "chrom", algorithm = "piek"), fallbackEIC = TRUE,
+                            calcArea = "integrate", CCSParams = CCSParams)
+
+# -------------------------
 # annotation
 # -------------------------
 
 # Retrieve MS peak lists
-avgMSListParams <- getDefAvgPListParams(clusterMzWindow = 0.002)
+avgMSListParams <- getDefAvgPListParams(clusterMzWindow = 0.005)
 mslists <- generateMSPeakLists(fGroups, avgFeatParams = avgMSListParams, avgFGroupParams = avgMSListParams)
 # Rule based filtering of MS peak lists. You may want to tweak this. See the manual for more information.
 mslists <- filter(mslists, MSLevel = 2, absMinIntensity = NULL, relMinIntensity = 0.05, topMostPeaks = 25,
                   maxMZOverPrec = 4)
 
-# Load MS library. You may want to filter it, please see the manuals for more details.
-mslibrary <- loadMSLibrary("lib", "json")
 # Calculate compound structure candidates
-compounds <- generateCompounds(fGroups, mslists, "library", adduct = "[M+H]+", MSLibrary = mslibrary, minSim = 0.75,
-                               specSimParams = getDefSpecSimParams())
+compounds <- generateCompounds(fGroups, mslists, "metfrag", adduct = "[M+H]+", database = "pubchemlite",
+                               maxCandidatesToStop = 2500)
+
+# Predict and convert mobility and CCS data
+compounds <- assignMobilities(compounds, from = "c3sdb", overwrite = FALSE, adduct = "[M+H]+", CCSParams = CCSParams)
 
 compounds <- estimateIDConfidence(compounds, MSPeakLists = mslists, formulas = NULL, IDFile = "idlevelrules.yml")
 

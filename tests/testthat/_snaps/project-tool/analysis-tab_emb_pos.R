@@ -5,28 +5,18 @@ library(patRoon)
 # initialization
 # -------------------------
 
-workPath <- "test_temp/test-np/analysis-tab_emb_both"
+workPath <- "test_temp/test-np/analysis-tab_emb_pos"
 setwd(workPath)
 
 # Create analysis table
-anaInfoPos <- read.table(header = TRUE, text = "
-        analysis                                                            path_centroid path_raw        path_profile        path_ims      replicate         blank
+anaInfo <- read.table(header = TRUE, text = "
+        analysis                                                                  path_centroid path_raw        path_profile        path_ims      replicate         blank
  'solvent-pos-1' '<EXAMPLE_DATA_PATH_POS>'       '' 'converted/profile' 'converted/ims'  'solvent-pos' 'solvent-pos'
  'solvent-pos-2' '<EXAMPLE_DATA_PATH_POS>'       '' 'converted/profile' 'converted/ims'  'solvent-pos' 'solvent-pos'
  'solvent-pos-3' '<EXAMPLE_DATA_PATH_POS>'       '' 'converted/profile' 'converted/ims'  'solvent-pos' 'solvent-pos'
 'standard-pos-1' '<EXAMPLE_DATA_PATH_POS>'       '' 'converted/profile' 'converted/ims' 'standard-pos' 'solvent-pos'
 'standard-pos-2' '<EXAMPLE_DATA_PATH_POS>'       '' 'converted/profile' 'converted/ims' 'standard-pos' 'solvent-pos'
 'standard-pos-3' '<EXAMPLE_DATA_PATH_POS>'       '' 'converted/profile' 'converted/ims' 'standard-pos' 'solvent-pos'
-")
-
-anaInfoNeg <- read.table(header = TRUE, text = "
-        analysis                                                            path_centroid path_raw        path_profile        path_ims      replicate         blank
- 'solvent-neg-1' '<EXAMPLE_DATA_PATH_NEG>'       '' 'converted/profile' 'converted/ims'  'solvent-neg' 'solvent-neg'
- 'solvent-neg-2' '<EXAMPLE_DATA_PATH_NEG>'       '' 'converted/profile' 'converted/ims'  'solvent-neg' 'solvent-neg'
- 'solvent-neg-3' '<EXAMPLE_DATA_PATH_NEG>'       '' 'converted/profile' 'converted/ims'  'solvent-neg' 'solvent-neg'
-'standard-neg-1' '<EXAMPLE_DATA_PATH_NEG>'       '' 'converted/profile' 'converted/ims' 'standard-neg' 'solvent-neg'
-'standard-neg-2' '<EXAMPLE_DATA_PATH_NEG>'       '' 'converted/profile' 'converted/ims' 'standard-neg' 'solvent-neg'
-'standard-neg-3' '<EXAMPLE_DATA_PATH_NEG>'       '' 'converted/profile' 'converted/ims' 'standard-neg' 'solvent-neg'
 ")
 
 
@@ -36,11 +26,7 @@ anaInfoNeg <- read.table(header = TRUE, text = "
 
 # Find all features
 # NOTE: see the reference manual for many more options
-fListPos <- findFeatures(anaInfoPos, "openms", noiseThrInt = 1000, chromSNR = 3, chromFWHM = 5, minFWHM = 1,
-                         maxFWHM = 30)
-fListNeg <- findFeatures(anaInfoNeg, "openms", noiseThrInt = 1000, chromSNR = 3, chromFWHM = 5, minFWHM = 1,
-                         maxFWHM = 30)
-fList <- makeSet(fListPos, fListNeg, adducts = c("[M+H]+", "[M-H]-"))
+fList <- findFeatures(anaInfo, "openms", noiseThrInt = 1000, chromSNR = 3, chromFWHM = 5, minFWHM = 1, maxFWHM = 30)
 
 # Group and align features between analyses
 fGroups <- groupFeatures(fList, "openms", rtalign = TRUE)

@@ -127,10 +127,6 @@
 
 ## Docs
 
-- better explain behavior of collapseSuspects=NULL and merging of predicted concs/tox
-    - check if ref docs are OK
-    - add to handbook
-    - add NEWS
 - move all plotBPC(), getEIC() etc methods into one doc file?
 - handbook
     - installation

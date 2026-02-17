@@ -5,7 +5,7 @@ library(patRoon)
 # initialization
 # -------------------------
 
-workPath <- "test_temp/test-np/tp-biotransformer_mfdb"
+workPath <- "test_temp/test-np/tp-biotransformer_no_mfdb"
 setwd(workPath)
 
 # NOTE: please set to a valid data.frame with analysis information. See ?`analysis-information` for more details.
@@ -50,16 +50,15 @@ fGroups <- screenSuspects(fGroups, suspListTPs, onlyHits = TRUE)
 # -------------------------
 
 # Retrieve MS peak lists
-avgMSListParams <- getDefAvgPListParams(clusterMzWindow = 0.002)
+avgMSListParams <- getDefAvgPListParams(clusterMzWindow = 0.005)
 mslists <- generateMSPeakLists(fGroups, avgFeatParams = avgMSListParams, avgFGroupParams = avgMSListParams)
 # Rule based filtering of MS peak lists. You may want to tweak this. See the manual for more information.
 mslists <- filter(mslists, MSLevel = 2, absMinIntensity = NULL, relMinIntensity = 0.05, topMostPeaks = 25,
                   maxMZOverPrec = 4)
 
-convertToMFDB(TPs, "TP-database.csv", includeParents = TRUE)
 # Calculate compound structure candidates
-compounds <- generateCompounds(fGroups, mslists, "metfrag", adduct = "[M+H]+", database = "csv",
-                               extraOpts = list(LocalDatabasePath = "TP-database.csv"), maxCandidatesToStop = 2500)
+compounds <- generateCompounds(fGroups, mslists, "metfrag", adduct = "[M+H]+", database = "pubchemlite",
+                               maxCandidatesToStop = 2500)
 
 compounds <- estimateIDConfidence(compounds, MSPeakLists = mslists, formulas = NULL, IDFile = "idlevelrules.yml")
 

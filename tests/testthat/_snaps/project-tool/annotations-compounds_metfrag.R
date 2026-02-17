@@ -5,7 +5,7 @@ library(patRoon)
 # initialization
 # -------------------------
 
-workPath <- "test_temp/test-np/annotations-compounds_sirius_noann"
+workPath <- "test_temp/test-np/annotations-compounds_metfrag"
 setwd(workPath)
 
 # NOTE: please set to a valid data.frame with analysis information. See ?`analysis-information` for more details.
@@ -35,16 +35,17 @@ fGroups <- updateGroups(fGroups, what = c("ret", "mz", "mobility"), intWeight = 
 # -------------------------
 
 # Retrieve MS peak lists
-avgMSListParams <- getDefAvgPListParams(clusterMzWindow = 0.002)
+avgMSListParams <- getDefAvgPListParams(clusterMzWindow = 0.005)
 mslists <- generateMSPeakLists(fGroups, avgFeatParams = avgMSListParams, avgFGroupParams = avgMSListParams)
 # Rule based filtering of MS peak lists. You may want to tweak this. See the manual for more information.
 mslists <- filter(mslists, MSLevel = 2, absMinIntensity = NULL, relMinIntensity = 0.05, topMostPeaks = 25,
                   maxMZOverPrec = 4)
 
 # Calculate compound structure candidates
-# Please see the handbook for SIRIUS login options. If you want to disable automatic login set login=FALSE
-compounds <- generateCompounds(fGroups, mslists, "sirius", adduct = "[M+H]+", fingerIDDatabase = "pubchem",
-                               elements = "CHNOP", profile = "qtof", login = "interactive", alwaysLogin = FALSE)
+compounds <- generateCompounds(fGroups, mslists, "metfrag", adduct = "[M+H]+", database = "pubchemlite",
+                               maxCandidatesToStop = 2500)
+
+compounds <- estimateIDConfidence(compounds, MSPeakLists = mslists, formulas = NULL, IDFile = "idlevelrules.yml")
 
 # -------------------------
 # reporting

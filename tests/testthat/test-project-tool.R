@@ -128,7 +128,7 @@ testNewProj <- function(..., name, CCSCalib = "", aid = list())
     #                  file = diffp, sep = "\n")
     # expect_snapshot_file(diffp, name = name, cran = TRUE)
     
-    expect_snapshot_file(scriptFile, name = name, cran = TRUE, transform = function(inp)
+    expect_snapshot_file(scriptFile, name = paste0(name, ".R"), cran = TRUE, transform = function(inp)
     {
         inp <- gsub(patRoonData::exampleDataPath("positive"), "<EXAMPLE_DATA_PATH_POS>", inp, fixed = TRUE)
         inp <- gsub(patRoonData::exampleDataPath("negative"), "<EXAMPLE_DATA_PATH_NEG>", inp, fixed = TRUE)

@@ -673,7 +673,7 @@ genScriptAnnBlock <- function(ionization, IMS, settingsAnn, adductArg, doSusps, 
     generator$addHeader("annotation")
     
     generator$addComment("Retrieve MS peak lists")
-    generator$addCall("avgMSListParams", "getDefAvgPListParams", list(name = "clusterMzWindow", value = defaultLim("mz", "narrow")))
+    generator$addCall("avgMSListParams", "getDefAvgPListParams", list(name = "clusterMzWindow", value = defaultLim("mz", "medium")))
     generator$addCall("mslists", "generateMSPeakLists", list(
         list(value = "fGroups"),
         list(name = "avgFeatParams", value = "avgMSListParams"),
@@ -697,13 +697,11 @@ genScriptAnnBlock <- function(ionization, IMS, settingsAnn, adductArg, doSusps, 
             list(value = "fGroups"),
             list(value = "mslists"),
             list(value = tolower(settingsAnn$formulasAlgo), quote = TRUE),
-            list(name = "relMzDev", value = 5, condition = settingsAnn$formulasAlgo != "Bruker"),
             adductArg,
             list(name = "elements", value = "CHNOP", quote = TRUE, condition = settingsAnn$formulasAlgo != "Bruker"),
             list(name = "oc", value = FALSE, condition = settingsAnn$formulasAlgo == "GenForm"),
             list(name = "profile", value = "qtof", quote = TRUE, condition = settingsAnn$formulasAlgo == "SIRIUS"),
             list(name = "calculateFeatures", value = "FALSE", condition = settingsAnn$formulasAlgo != "Bruker"),
-            list(name = "featThresholdAnn", value = 0.75),
             list(name = "setThresholdAnn", value = 0, condition = ionization == "both")
         ))
         if ("formulas" %in% settingsAnn$estIDConf)

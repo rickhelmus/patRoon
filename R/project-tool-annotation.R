@@ -35,7 +35,7 @@ newProjectAnnotationUI <- function(id)
             br(),
             fillCol(
                 height = 55,
-                selectInput(ns("formulasAlgo"), "Formula generation",
+                selectInput(ns("formulasAlgo"), "Formula annotation",
                             c("None" = "", "GenForm", "SIRIUS", "Bruker DataAnalysis" = "Bruker"),
                             multiple = FALSE, width = "97.5%")
             ),
@@ -50,7 +50,7 @@ newProjectAnnotationUI <- function(id)
             br(),
             fillCol(
                 height = 60,
-                selectInput(ns("compoundsAlgo"), "Compound identification",
+                selectInput(ns("compoundsAlgo"), "Compound annotation",
                             c("None" = "", "SIRIUS+CSI:FingerID" = "SIRIUS", "MetFrag", "Library"),
                             multiple = FALSE, width = "97.5%")
             ),

@@ -19,7 +19,7 @@ newProjectGeneralUI <- function(id)
                     fillCol(
                         height = 100,
                         textInput(ns("scriptFile"), label = "Script file", width = "90%"),
-                        textNote("Make empty to add code to currently opened file.")
+                        textNote("If empty then code is added to the currently opened file.")
                     )
                 ),
                 hr(),

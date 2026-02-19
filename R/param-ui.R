@@ -2,7 +2,7 @@
 #'
 #' This module provides a user interface for viewing and editing the \code{data}
 #' slot of \code{param} objects. It automatically generates appropriate input
-#' widgets based on the type of each parameter.
+#' widgets based on the parameter definitions.
 #'
 #' @param obj A \code{param} object to edit. If \code{NULL}, a default
 #'   \code{FeatureOpenMSParam} object will be created.
@@ -68,6 +68,11 @@ createParamUI <- function(obj = NULL)
         # Store initial object for reset
         initParam <- initObj
         
+        # Get definitions from current param object
+        getDefinitions <- shiny::reactive({
+            paramRV()@definitions
+        })
+        
         # Get data from current param object
         getData <- shiny::reactive({
             as.list(paramRV())
@@ -75,23 +80,25 @@ createParamUI <- function(obj = NULL)
         
         # Generate dynamic UI for each parameter
         output$paramInputs <- shiny::renderUI({
+            definitions <- getDefinitions()
             data <- getData()
-            paramNames <- names(data)
+            paramNames <- names(definitions)
             
             if (length(paramNames) == 0)
                 return(shiny::helpText("No parameters to display."))
             
             # Create a list to hold all input widgets
             widgets <- lapply(paramNames, function(nm) {
+                def <- definitions[[nm]]
                 val <- data[[nm]]
                 id <- paste0("param_", nm)
                 
-                # Determine widget type based on value
-                widget <- createParamInput(id, nm, val)
+                # Create widget based on definition
+                widget <- createParamInput(id, nm, val, def)
                 
                 # Wrap in a div with some styling
                 shiny::div(
-                    style = "margin-bottom: 15px;",
+                    style = "margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee;",
                     widget
                 )
             })
@@ -101,44 +108,31 @@ createParamUI <- function(obj = NULL)
         
         # Observer to update param object when inputs change
         shiny::observe({
-            data <- getData()
-            paramNames <- names(data)
+            definitions <- getDefinitions()
+            paramNames <- names(definitions)
             
             if (length(paramNames) == 0)
                 return()
             
             # Collect values from inputs
             newData <- lapply(paramNames, function(nm) {
+                def <- definitions[[nm]]
                 id <- paste0("param_", nm)
-                val <- data[[nm]]
                 
-                # Get value based on type
-                if (shiny::isTruthy(input[[id]])) {
-                    if (is.logical(val)) {
-                        return(input[[id]])
-                    } else if (is.numeric(val)) {
-                        return(input[[id]])
-                    } else if (is.character(val)) {
-                        return(input[[id]])
-                    } else {
-                        # Try to parse as JSON for complex types
-                        tryCatch(
-                            jsonlite::fromJSON(input[[id]]),
-                            error = function(e) val
-                        )
-                    }
+                # Get value based on definition type
+                if (shiny::isTruthy(input[[id]]) || def$type == "flag") {
+                    return(getInputValue(id, def, input))
                 }
-                return(val)
+                return(paramRV()@data[[nm]])
             })
             names(newData) <- paramNames
             
-            # Update param object by modifying the data slot directly
+            # Update param object using $<- operator (triggers validation)
             currParam <- paramRV()
-            currData <- currParam@data
             for (nm in paramNames) {
-                currData[[nm]] <- newData[[nm]]
+                # Use $<- for proper validation
+                currParam[[nm]] <- newData[[nm]]
             }
-            currParam@data <- currData
             paramRV(currParam)
         })
         
@@ -147,6 +141,7 @@ createParamUI <- function(obj = NULL)
             p <- paramRV()
             cat(sprintf("Class: %s\n", p@name))
             cat(sprintf("Base name: %s\n", p@baseName))
+            cat(sprintf("Description: %s\n", p@description))
             cat(sprintf("Version: %s\n", p@version))
             cat(sprintf("Date: %s\n", format(p@date)))
         })
@@ -184,7 +179,7 @@ createParamUI <- function(obj = NULL)
         
         # Load param from file
         shiny::observeEvent(input$loadParam, {
-            req(input$loadParam)
+            shiny::req(input$loadParam)
             
             tryCatch({
                 env <- new.env()
@@ -263,95 +258,121 @@ createParamUI <- function(obj = NULL)
     return(list(ui = ui, server = server))
 }
 
-#' Create appropriate input widget for a parameter value
+#' Create appropriate input widget for a parameter based on its definition
 #'
 #' @param id Input ID
 #' @param name Parameter name (label)
 #' @param val Current value
+#' @param def Parameter definition list
 #' @return A Shiny input widget
 #' @noRd
-createParamInput <- function(id, name, val)
+createParamInput <- function(id, name, val, def)
 {
-    # NULL values -> text area for JSON
-    if (is.null(val)) {
-        return(shiny::textAreaInput(id, name, value = "null", rows = 2))
+    # Create label with description
+    label <- shiny::tagList(
+        shiny::strong(name),
+        if (!is.null(def$description) && nchar(def$description) > 0) {
+            shiny::tags$small(
+                style = "display: block; color: #666; font-weight: normal;",
+                def$description
+            )
+        }
+    )
+    
+    # Handle based on definition type
+    if (def$type == "flag") {
+        return(shiny::checkboxInput(id, label, value = isTRUE(val)))
     }
     
-    # Logical/boolean -> checkbox
-    if (is.logical(val) && length(val) == 1) {
-        return(shiny::checkboxInput(id, name, value = val))
-    }
-    
-    # Integer (positive count) -> numeric input with integer constraint
-    if (is.numeric(val) && length(val) == 1 && 
-        name %in% c("traceTermOutliers", "minTraceLength", "maxTraceLength")) {
-        return(shiny::numericInput(id, name, value = val, step = 1))
-    }
-    
-    # Numeric scalar -> numeric input
-    if (is.numeric(val) && length(val) == 1) {
-        # Determine appropriate step based on value magnitude
-        step <- if (abs(val) >= 100) 1 else if (abs(val) >= 1) 0.1 else 0.001
-        return(shiny::numericInput(id, name, value = val, step = step))
-    }
-    
-    # Numeric vector length 2 -> two numeric inputs
-    if (is.numeric(val) && length(val) == 2) {
-        return(shiny::fluidRow(
-            shiny::column(6, shiny::numericInput(paste0(id, "_min"), 
-paste0(name, " (min)"), value = val[1])),
-            shiny::column(6, shiny::numericInput(paste0(id, "_max"), 
-paste0(name, " (max)"), value = val[2]))
+    if (def$type == "choice") {
+        return(shiny::selectInput(
+            id, label, 
+            choices = def$choices, 
+            selected = val
         ))
     }
     
-    # Character choices -> select input
-    if (is.character(val) && length(val) == 1) {
-        choices <- inferChoices(name, val)
-        if (!is.null(choices)) {
-            return(shiny::selectInput(id, name, choices = choices, selected = val))
-        }
-        # Free text fallback for single character
-        return(shiny::textInput(id, name, value = val))
+    if (def$type == "count") {
+        return(shiny::numericInput(
+            id, label,
+            value = val,
+            min = if (isTRUE(def$positive)) 0 else NA,
+            step = 1
+        ))
     }
     
-    # Character vector -> select input with multiple selection
-    if (is.character(val) && length(val) > 0) {
-        return(shiny::selectInput(id, name, choices = val, selected = val, multiple = TRUE))
+    if (def$type == "number") {
+        # Determine bounds
+        min_val <- if (!is.null(def$lower)) def$lower else if (isTRUE(def$positive)) 0 else NA
+        max_val <- if (!is.null(def$upper)) def$upper else NA
+        
+        # Determine step based on value magnitude
+        step <- if (!is.null(val) && abs(val) >= 100) 1 else if (!is.null(val) && abs(val) >= 1) 0.1 else 0.001
+        
+        return(shiny::numericInput(
+            id, label,
+            value = val,
+            min = min_val,
+            max = max_val,
+            step = step
+        ))
     }
     
-    # List -> text area for JSON editing
-    if (is.list(val)) {
+    if (def$type == "list") {
+        # For list types, use text area for JSON editing
         jsonVal <- tryCatch(
             jsonlite::toJSON(val, auto_unbox = TRUE, pretty = TRUE),
-            error = function(e) "{}"
+            error = function(e) if (is.null(val)) "null" else "{}"
         )
         return(shiny::tagList(
-            shiny::strong(name),
+            label,
             shiny::textAreaInput(id, NULL, value = jsonVal, rows = 4, width = "100%")
         ))
     }
     
-    # Fallback: text area for any other type
-    shiny::textAreaInput(id, name, value = paste(as.character(val), collapse = ", "), rows = 2)
+    # Fallback for unknown types: text input
+    shiny::textInput(id, label, value = as.character(val))
 }
 
-#' Infer choice options for known parameters
+#' Get input value based on definition type
 #'
-#' @param name Parameter name
-#' @param val Current value
-#' @return Character vector of choices or NULL
+#' @param id Input ID
+#' @param def Parameter definition list
+#' @param input Shiny input object
+#' @return The parsed value
 #' @noRd
-inferChoices <- function(name, val)
+getInputValue <- function(id, def, input)
 {
-    choices <- switch(name,
-                      "traceTermCriterion" = c("sample_rate", "outliers"),
-                      "widthFiltering" = c("fixed", "adaptive"),
-                      "isotopeFilteringModel" = c("metabolites (5% RMS)", "metabolites (10% RMS)", 
-                                                  "lipids (5% RMS)", "lipids (10% RMS)"),
-                      NULL
-    )
-    return(choices)
+    rawVal <- input[[id]]
+    
+    if (def$type == "flag") {
+        return(isTRUE(rawVal))
+    }
+    
+    if (def$type == "choice") {
+        return(rawVal)
+    }
+    
+    if (def$type == "count") {
+        return(as.integer(rawVal))
+    }
+    
+    if (def$type == "number") {
+        return(as.numeric(rawVal))
+    }
+    
+    if (def$type == "list") {
+        if (is.null(rawVal) || rawVal == "" || rawVal == "null") {
+            return(NULL)
+        }
+        return(tryCatch(
+            jsonlite::fromJSON(rawVal),
+            error = function(e) NULL
+        ))
+    }
+    
+    # Fallback
+    return(rawVal)
 }
 
 #' Launch the parameter configuration UI

@@ -19,8 +19,7 @@ anaInfo <- data.frame(path_centroid = character(), analysis = character(), repli
 suspList <- patRoonDataIMS::suspectsPos
 
 # Add mobility and CCS to suspect list(s)
-suspList <- assignMobilities(suspList, from = "c3sdb", CCSParams = CCSParams, adducts = c("[M+H]+", NA),
-                             overwrite = FALSE)
+suspList <- assignMobilities(suspList, from = "c3sdb", adducts = c("[M+H]+", NA), overwrite = FALSE)
 
 # -------------------------
 # features

@@ -15,9 +15,6 @@ anaInfo <- data.frame(path_centroid = character(), analysis = character(), repli
 # setup suspect lists
 # -------------------------
 
-# Get example suspect list
-suspList <- patRoonData::suspectsPos
-
 # Get example ISTD list
 ISTDList <- patRoonData::ISTDListPos
 
@@ -48,14 +45,6 @@ fGroups <- updateGroups(fGroups, what = c("ret", "mz", "mobility"), intWeight = 
 # Set adduct to NULL if ISTD list contains an adduct column
 fGroups <- normInts(fGroups, featNorm = "istd", groupNorm = FALSE, normFunc = max, standards = ISTDList,
                     ISTDRTWindow = 120, ISTDMZWindow = 300, minISTDs = 3, adduct = "[M+H]+")
-
-# -------------------------
-# suspect screening
-# -------------------------
-
-# Set onlyHits to FALSE to retain features without suspects (eg for full NTA)
-# Set adduct to NULL if suspect list contains an adduct column
-fGroups <- screenSuspects(fGroups, suspList, adduct = "[M+H]+", onlyHits = TRUE)
 
 # -------------------------
 # reporting

@@ -7,7 +7,6 @@
     - install timsconvert and c3sdb in Docker and bundle
         - Docker: finish WIP
         - Windows: for now don't bundle, but install in GHA for testing: https://docs.github.com/en/actions/tutorials/build-and-test-code/python
-    - test new/updated patRoonExt deps
     - update PCLiteCCS
     - update patRoonDeps dependencies for Rmstoolkitlib, reticulate, fmcsR etc
 - BUG: annSim.1 column (in formulas?)?
@@ -115,8 +114,6 @@
     - generateAnalysisInfo()?
 - newProject()
     - see where testing is slow, possibly disable testServer() on CI?
-    - verify added snapshots
-    - verify that the right patRoonData is used
 - manual checks
     - checkFeatures()/checkComponents() verify if things still work
     - DA features and formulas?

@@ -351,7 +351,7 @@ test_that("Feature settings", {
                 features = list(fGroupsAdv = list(featNorm = "istd",
                                                   ISTDLists = list(sets = list(pos = "istd-pos", neg = "istd-neg")))),
                 name = "features-norm_istd_sets")
-    testNewProj(features = list(exSuspList = TRUE, fGroupsAdv = list(featNorm = "istd")),
+    testNewProj(features = list(fGroupsAdv = list(featNorm = "istd")),
                 name = "features-norm_istd_ex")
     testNewProj(features = list(fGroupsAdv = list(featNorm = "tic", groupNorm = TRUE)),
                 name = "features-norm_tic_group")

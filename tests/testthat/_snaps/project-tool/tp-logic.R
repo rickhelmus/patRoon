@@ -35,7 +35,7 @@ fGroups <- updateGroups(fGroups, what = c("ret", "mz", "mobility"), intWeight = 
 # -------------------------
 
 # Obtain TPs
-TPs <- generateTPs("logic", parents = suspListParents, fGroups, adduct = "[M+H]+")
+TPs <- generateTPs("logic", fGroups, adduct = "[M+H]+")
 
 # Screen TPs
 suspListTPs <- convertToSuspects(TPs, includeParents = FALSE)

@@ -23,10 +23,8 @@ suspListPos <- patRoonDataIMS::suspectsPos
 suspListNeg <- patRoonDataIMS::suspectsNeg
 
 # Add mobility and CCS to suspect list(s)
-suspListPos <- assignMobilities(suspListPos, from = "c3sdb", CCSParams = CCSParams, adducts = c("[M+H]+", NA),
-                                overwrite = FALSE)
-suspListNeg <- assignMobilities(suspListNeg, from = "c3sdb", CCSParams = CCSParams, adducts = c("[M-H]-", NA),
-                                overwrite = FALSE)
+suspListPos <- assignMobilities(suspListPos, from = "c3sdb", adducts = c("[M+H]+", NA), overwrite = FALSE)
+suspListNeg <- assignMobilities(suspListNeg, from = "c3sdb", adducts = c("[M-H]-", NA), overwrite = FALSE)
 
 # -------------------------
 # features

@@ -40,4 +40,4 @@ report(fGroups, MSPeakLists = NULL, formulas = NULL, compounds = NULL, component
 
 # Generate reports with legacy interface.
 reportCSV(fGroups, path = "report", formulas = NULL, compounds = NULL, components = NULL)
-reportPDF(fGroups, path = "report", formulas = NULL, compounds = NULL, components = NULL)
+reportPDF(fGroups, path = "report", formulas = NULL, compounds = NULL, MSPeakLists = NULL, components = NULL)

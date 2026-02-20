@@ -23,10 +23,10 @@ getDAAnaInfo <- function(pat = NULL)
     path <- getOption("patRoon.test.DAAnalyses")
     if (is.null(path))
         return(NULL)
-    ret <- generateAnalysisInfo(c(file.path(path, "neg"), file.path(path, "pos")),
-                                groups = c(rep("solvent-neg", 3), rep("standard-neg", 3),
+    ret <- generateAnalysisInfo(fromRaw = c(file.path(path, "neg"), file.path(path, "pos")),
+                                replicate = c(rep("solvent-neg", 3), rep("standard-neg", 3),
                                            rep("solvent-pos", 3), rep("standard-pos", 3)),
-                                blanks = "solvent", formats = "bruker")
+                                blank = "solvent")
     if (!is.null(pat))
         ret <- ret[grepl(pat, ret$analysis), ]
     return(ret)

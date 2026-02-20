@@ -134,6 +134,9 @@ testNewProj <- function(..., name, CCSCalib = "", aid = list())
         inp <- gsub(patRoonData::exampleDataPath("negative"), "<EXAMPLE_DATA_PATH_NEG>", inp, fixed = TRUE)
         inp <- gsub(patRoonDataIMS::exampleDataPath("positive"), "<EXAMPLE_DATA_PATH_IMS_POS>", inp, fixed = TRUE)
         inp <- gsub(patRoonDataIMS::exampleDataPath("negative"), "<EXAMPLE_DATA_PATH_IMS_NEG>", inp, fixed = TRUE)
+        wh <- grepl("path_centroid", inp)
+        inp[wh] <- gsub("\ +", " ", inp[wh]) # remove extra spaces in embedded anaInfo tab for better comparability
+            
         return(inp)
     })
     

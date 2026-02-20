@@ -10,7 +10,7 @@ setwd(workPath)
 
 # Create analysis table
 anaInfoPos <- read.table(header = TRUE, text = "
-        analysis                                                                  path_centroid path_raw        path_profile        path_ims      replicate         blank
+ analysis path_centroid path_raw path_profile path_ims replicate blank
  'solvent-pos-1' '<EXAMPLE_DATA_PATH_POS>'       '' 'converted/profile' 'converted/ims'  'solvent-pos' 'solvent-pos'
  'solvent-pos-2' '<EXAMPLE_DATA_PATH_POS>'       '' 'converted/profile' 'converted/ims'  'solvent-pos' 'solvent-pos'
  'solvent-pos-3' '<EXAMPLE_DATA_PATH_POS>'       '' 'converted/profile' 'converted/ims'  'solvent-pos' 'solvent-pos'
@@ -20,7 +20,7 @@ anaInfoPos <- read.table(header = TRUE, text = "
 ")
 
 anaInfoNeg <- read.table(header = TRUE, text = "
-        analysis                                                                  path_centroid path_raw        path_profile        path_ims      replicate         blank
+ analysis path_centroid path_raw path_profile path_ims replicate blank
  'solvent-neg-1' '<EXAMPLE_DATA_PATH_NEG>'       '' 'converted/profile' 'converted/ims'  'solvent-neg' 'solvent-neg'
  'solvent-neg-2' '<EXAMPLE_DATA_PATH_NEG>'       '' 'converted/profile' 'converted/ims'  'solvent-neg' 'solvent-neg'
  'solvent-neg-3' '<EXAMPLE_DATA_PATH_NEG>'       '' 'converted/profile' 'converted/ims'  'solvent-neg' 'solvent-neg'

@@ -270,8 +270,8 @@ test_that("basic usage", {
     expect_gte(min(as.data.table(filter(TPsBTSuspMore, minSimilarity = 0.5))$similarity), 0.5)
     expect_lt(max(as.data.table(filter(TPsBTSuspMore, minSimilarity = 0.5, negate = TRUE))$similarity), 0.5)
     
-    expect_min_gte(as.data.table(filter(TPsAnnFormSusp, minFitFormula = 0.8))$fitFormula, 0.8)
-    expect_max_lt(as.data.table(filter(TPsAnnFormSusp, minFitFormula = 0.8, negate = TRUE))$fitFormula, 0.8)
+    expect_min_gte(as.data.table(filter(TPsAnnFormSusp, minFitFormula = 0.98))$fitFormula, 0.98)
+    expect_max_lt(as.data.table(filter(TPsAnnFormSusp, minFitFormula = 0.98, negate = TRUE))$fitFormula, 0.98)
     expect_min_gte(as.data.table(filter(TPsAnnFormSusp, minTPScore = 1.2))$TPScore, 1.2)
     expect_max_lt(as.data.table(filter(TPsAnnFormSusp, minTPScore = 1.2, negate = TRUE))$TPScore, 1.2)
     expect_max_lte(sapply(products(filter(TPsAnnFormSusp, topMost = 3)), \(x) max(x[, .N, by = "group"][[2]])), 3)
@@ -286,8 +286,8 @@ test_that("basic usage", {
     testMFDB(TPsLibComp)
     testMFDB(TPsBTComp)
 
-    expect_min_gte(as.data.table(filter(TPsAnnCompSusp, minFitFormula = 0.9))$fitFormula, 0.9)
-    expect_max_lt(as.data.table(filter(TPsAnnCompSusp, minFitFormula = 0.9, negate = TRUE))$fitFormula, 0.9)
+    expect_min_gte(as.data.table(filter(TPsAnnCompSusp, minFitFormula = 0.98))$fitFormula, 0.98)
+    expect_max_lt(as.data.table(filter(TPsAnnCompSusp, minFitFormula = 0.98, negate = TRUE))$fitFormula, 0.98)
     expect_min_gte(as.data.table(filter(TPsAnnCompSusp, minFitCompound = 0.8))$fitCompound, 0.8)
     expect_max_lt(as.data.table(filter(TPsAnnCompSusp, minFitCompound = 0.8, negate = TRUE))$fitCompound, 0.8)
     expect_min_gte(as.data.table(filter(TPsAnnCompScrMFCOS, minSimSusp = 0.9))$simSusp, 0.9)

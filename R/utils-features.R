@@ -107,7 +107,7 @@ calcFeatQualities <- function(featQualities, featQualityNames, ret, retmin, retm
         if (q %in% c("Jaggedness", "Modality"))
             a <- c(a, flatnessFactor)
         qual <- do.call(featQualities[[q]]$func, a)
-        if (q == "GaussianSimilarity" && is.na(qual))
+        if (is.na(qual) && q %in% c("GaussianSimilarity", "Symmetry"))
             qual <- 0
         return(qual)
     }, simplify = FALSE))

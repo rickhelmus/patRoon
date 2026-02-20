@@ -150,6 +150,8 @@ jobs:
     test_bundle:
         needs: build
         runs-on: windows-latest
+        env:
+            GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
         name: Run tests from bundle
         if:  ${{ inputs.makeBundle && inputs.doTests }}
         steps:

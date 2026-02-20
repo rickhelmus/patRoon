@@ -142,7 +142,6 @@ jobs:
                   remotes::install_github("rickhelmus/Rmstoolkitlib")
                   remotes::install_github("rickhelmus/patRoonExt@version20")
                   remotes::install_github("rickhelmus/patRoon@version30")
-                  patRoon::installTIMSCONVERT()
                   patRoon::installC3SDB()
               shell: Rscript {0}
             - uses: r-lib/actions/check-r-package@v2
@@ -205,7 +204,6 @@ jobs:
                   remotes::install_github("rickhelmus/Rmstoolkitlib")
                   remotes::install_github("rickhelmus/patRoonExt@version20")
                   remotes::install_github("rickhelmus/patRoon@version30")
-                  patRoon::installTIMSCONVERT()
                   patRoon::installC3SDB()
               shell: Rscript {0}
             - uses: r-lib/actions/check-r-package@v2

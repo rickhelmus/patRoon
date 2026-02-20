@@ -550,3 +550,22 @@ compareCompRef <- function(ref)
     tabNew <- removeDTColumnsIfPresent(tabNew, c("fragmentMatches", "neutralLossMatches"))
     waldo::compare(tabOld, tabNew, tolerance = 0.001, max_diffs = Inf)
 }
+
+getAllProjectToolDiffs <- function(out)
+{
+    ref <- file.path("tests", "testthat", "_snaps", "project-tool", "default_process.R")
+    allSnaps <- Sys.glob(file.path("tests", "testthat", "_snaps", "project-tool", "*.R"))
+    allSnaps <- setdiff(allSnaps, ref)
+    file.remove(out)
+    for (sn in allSnaps)
+    {
+        cat(
+            sprintf("Snapshot: %s\n", basename(sn)),
+            "----\n",
+            as.character(diffobj::diffFile(ref, sn, pager = "off", format = "raw", mode = "unified", rds = FALSE,
+                                           disp.width = 200)),
+            "----\n",
+            file = out, sep = "\n", append = TRUE
+        )
+    }
+}

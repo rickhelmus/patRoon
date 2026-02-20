@@ -10,12 +10,13 @@ RUN --mount=type=cache,id=cache_apt,target=/var/cache/apt --mount=type=cache,id=
     apt-get install -y --no-install-recommends libssl-dev libssh2-1-dev wget libnode-dev openbabel \
         libxml2-dev openjdk-17-jdk libmagick++-dev pandoc git texinfo libfribidi-dev ghostscript \
         zlib1g-dev libxml2-dev libnetcdf-dev libglpk-dev tzdata libnetcdf-dev netcdf-bin ccache bzip2 \
-        python3-venv python3-pip python3-dev && \
+        python3-venv python3-pip python3-dev libqt6network6t64 libsvm3 libxerces-c3.2t64 libboost-regex1.74.0 \
+        libsnappy1v5 && \
     mkdir -p $SETUPDIR && \
-    wget -P $SETUPDIR https://github.com/OpenMS/OpenMS/releases/download/Release3.0.0/OpenMS-3.0.0-Debian-Linux-x86_64.deb && \
-    apt-get install -y --no-install-recommends $SETUPDIR/OpenMS-3.0.0-Debian-Linux-x86_64.deb && \
+    wget -P $SETUPDIR https://github.com/OpenMS/OpenMS/releases/download/release%2F3.5.0/OpenMS-3.5.0-Debian-Linux-x86_64.deb && \
+    apt-get install -y --no-install-recommends $SETUPDIR/OpenMS-3.5.0-Debian-Linux-x86_64.deb && \
     rm -rf $SETUPDIR && \
-    rm /usr/lib/lib[a-zA-NP-Z]* && \
+    find /usr/lib -maxdepth 1 -type f ! -name 'libO*' ! -name 'libth*' ! -name 'libC*' -print0 | xargs -0 rm && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     echo 'PATH=/home/rstudio/bin:${PATH}' >> /usr/local/lib/R/etc/Renviron && R CMD javareconf
 

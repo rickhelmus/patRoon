@@ -17,4 +17,6 @@ remotes::install_github("rickhelmus/Rmstoolkitlib")
 remotes::install_github("rickhelmus/patRoonExt@version20")
 remotes::install_github("rickhelmus/patRoon@version30")
 # ---
+patRoon::installTIMSCONVERT()
+patRoon::installC3SDB()
 remove.packages("patRoon")

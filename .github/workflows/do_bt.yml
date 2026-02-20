@@ -125,11 +125,21 @@ jobs:
               env:
                   PATROONEXT_CACHE: ${{ github.workspace }}/pExtCache
                   PATROONEXT_NO_METFRAGCT: true
-                  PATROONEXT_NO_METFRAGPCL: true
               run: |
                   print(.libPaths())
                   options(patRoonInst.repos.patRoonDeps = paste0("file:///", normalizePath("patRoonDeps")))
                   patRoonInst::sync(origin = "patRoonDeps", allDeps = TRUE, quiet = FALSE, ignorePkgs = "MetaCleanData")
+                  # UNDONE...
+                  install.packages("reticulate")
+                  BiocManager::install("ChemmineR")
+                  BiocManager::install('fmcsR')
+                  remotes::install_github("rickhelmus/patRoonData@version30")
+                  remotes::install_github("rickhelmus/patRoonDataIMS")
+                  remotes::install_github("rickhelmus/Rmstoolkitlib")
+                  remotes::install_github("rickhelmus/patRoonExt@version20")
+                  remotes::install_github("rickhelmus/patRoon@version30")
+                  patRoon::installTIMSCONVERT()
+                  patRoon::installC3SDB()
               shell: Rscript {0}
             - uses: r-lib/actions/check-r-package@v2
               with:
@@ -174,6 +184,20 @@ jobs:
                       testthat
                       vdiffr
                       covr
+            - name: Install patRoon deps (UNDONE)
+              run: |
+                  # UNDONE...
+                  install.packages("reticulate")
+                  BiocManager::install("ChemmineR")
+                  BiocManager::install('fmcsR')
+                  remotes::install_github("rickhelmus/patRoonData@version30")
+                  remotes::install_github("rickhelmus/patRoonDataIMS")
+                  remotes::install_github("rickhelmus/Rmstoolkitlib")
+                  remotes::install_github("rickhelmus/patRoonExt@version20")
+                  remotes::install_github("rickhelmus/patRoon@version30")
+                  patRoon::installTIMSCONVERT()
+                  patRoon::installC3SDB()
+              shell: Rscript {0}
             - uses: r-lib/actions/check-r-package@v2
               with:
                   args: 'c("--no-manual")'

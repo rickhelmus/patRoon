@@ -121,6 +121,10 @@ jobs:
               with:
                   path: pExtCache
                   key: patRoonExtCache
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: '3.12'
             - name: Install patRoon
               env:
                   PATROONEXT_CACHE: ${{ github.workspace }}/pExtCache
@@ -186,6 +190,10 @@ jobs:
                       testthat
                       vdiffr
                       covr
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: '3.12'
             - name: Install patRoon deps (UNDONE)
               run: |
                   # UNDONE...

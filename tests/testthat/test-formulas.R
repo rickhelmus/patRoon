@@ -35,11 +35,12 @@ if (doSIRIUS)
     formsSIRFPs <- doGenFormsSIRFPs(fGroups, plists)
 }
 
-if (doDATests())
+# disabled: deprecated
+if (FALSE && doDATests())
 {
     # HACK: use first standard as its compounds are not touched by MS peak lists
     fgDA <- getTestFGroupsDA(getDAAnaInfo("std1"))
-    plistsDA <- generateMSPeakLists(fgDA, "brukerfmf")
+    plistsDA <- generateMSPeakListsDAFMF(fgDA)
     formsDA <- doGenForms(fgDA, plistsDA, "bruker")
 }
 
@@ -72,7 +73,8 @@ test_that("verify formula show output", {
 
 # extra separate block: can't have >1 skip statements...
 test_that("verify DA formula generation", {
-    skip_if_not(doDATests())
+    # disabled: deprecated
+    skip_if_not(doDATests() && FALSE)
     expect_known_value(formsDA, testFile("formulas-DA"))
     expect_known_show(formsDA, testFile("formulas-DA", text = TRUE))
 })

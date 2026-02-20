@@ -65,6 +65,7 @@ getEmptyDAFragInfo <- function() data.table(mz = numeric(), ion_formula = charac
 #'
 #' @templateVar what generateFormulasDA
 #' @template main-rd-method
+#' @keywords internal
 #' @export
 setMethod("generateFormulasDA", "featureGroups", function(fGroups, MSPeakLists,
                                                           specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
@@ -74,6 +75,8 @@ setMethod("generateFormulasDA", "featureGroups", function(fGroups, MSPeakLists,
                                                           absAlignMzDev = defaultLim("mz", "narrow"), save = TRUE,
                                                           close = save)
 {
+    .Deprecated(old = "generateFormulasDA", new = "generateFormulas")
+    
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     assertSpecSimParams(specSimParams, add = ac)

@@ -116,7 +116,6 @@
     - see where testing is slow, possibly disable testServer() on CI?
 - manual checks
     - checkFeatures()/checkComponents() verify if things still work
-    - DA features and formulas?
     - manually check all HTML reporting functionality at the end
     - check updates for mobilities to checkFeatures(), checkComponents() and importCheckFeaturesSession()
     - test updated verifyDependencies()
@@ -283,6 +282,7 @@
 - MSPL annotationBy filter: clarify/check that it only works on FG MSPL and cannot be combined with reAverage=T
 - fragFormulas and lossFormulas feat annot filters
 - print unique and total suspect (hits)
+- deprecated generateFormulasDA()
 
 
 ## Features

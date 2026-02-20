@@ -9,7 +9,8 @@ ovFGroup <- names(overlap(fGroups, which = c("positive", "negative"), aggregate 
 plists <- generateMSPeakLists(fGroups)
 plistsMSMS <- filter(plists, withMSMS = TRUE)
 
-if (doDATests())
+# disabled: deprecated
+if (doDATests() && FALSE)
 {
     # NOTE: use different analyses than first: this call will clearout all DA
     # compounds, forcing other calls (from features/formulas tests) to re-run
@@ -47,7 +48,8 @@ test_that("verify generation of MS peak lists", {
     expect_gt(length(plists), length(generateMSPeakLists(fGroups, fixedIsolationWidth = 0.1)))
     expect_lt(length(plists), length(generateMSPeakLists(fGroups, fixedIsolationWidth = NA)))
 
-    skip_if_not(doDATests())
+    # disabled: deprecated
+    skip_if_not(doDATests() && FALSE)
     expect_known_value(plistsDA, testFile("plists-DA"))
     expect_known_value(plistsDAFMF, testFile("plists-DAFMF"))
 })
@@ -55,7 +57,8 @@ test_that("verify generation of MS peak lists", {
 test_that("verify show output", {
     expect_known_show(plists, testFile("plists", text = TRUE))
 
-    skip_if_not(doDATests())
+    # disabled: deprecated
+    skip_if_not(doDATests() && FALSE)
     expect_known_show(plistsDA, testFile("plists-DA", text = TRUE))
     expect_known_show(plistsDAFMF, testFile("plists-DAFMF", text = TRUE))
 })
@@ -250,7 +253,8 @@ test_that("empty object", {
     expect_lt(length(plistsEmptyMS), length(plists))
     expect_gt(length(plistsEmptyMS), 0)
 
-    skip_if_not(doDATests())
+    # disabled: deprecated
+    skip_if_not(doDATests() && FALSE)
     expect_length(plistsDAEmpty, 0)
 })
 

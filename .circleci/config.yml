@@ -179,7 +179,7 @@ workflows:
                     - build
             - docs:
                 requires:
-                    - build
+                    - test
             - cov:
                 requires:
-                    - build
+                    - test

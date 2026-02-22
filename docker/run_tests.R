@@ -3,7 +3,7 @@
 
 install.packages(c("devtools", "vdiffr"))
 
-Sys.setenv(TESTTHAT_CPUS = 3)
+Sys.setenv(TESTTHAT_CPUS = 4)
 Sys.setenv(PATROON_MP_MAXPROCS = 2)
 
 # return failure exit code when tests fail: https://github.com/r-lib/testthat/issues/515

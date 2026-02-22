@@ -20,8 +20,6 @@
 
 class MSReadBackendMSTK: public MSReadBackend
 {
-    static int backends; // UNDONE: for debugging
-
     void doOpen(const std::string &) override { }
     void doClose(void) override { }
     ThreadDataType doGetThreadData(void) const override;
@@ -31,11 +29,7 @@ class MSReadBackendMSTK: public MSReadBackend
                                SpectrumRawTypes::Intensity minIntensityIMS) const override;
     
 public:
-    MSReadBackendMSTK(void) { ++backends; Rcpp::Rcout << "constr: backends:" << backends << "\n"; }
-    ~MSReadBackendMSTK(void) { --backends; Rcpp::Rcout << "destr: backends:" << backends << "\n"; }
-
     void generateSpecMetadata(void);
-    int getBackends(void) const { return backends; }
 };
 
 //void writeMS1SpectraMSTK(std::string path, const std::vector<SpectrumRaw> &spectra, const SpectrumRawMetadataMS &meta);

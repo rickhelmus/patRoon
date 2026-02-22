@@ -2,8 +2,6 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-context("formulas")
-
 fGroups <- getFormFGroups()
 fGroupsEmpty <- getEmptyTestFGroups()
 plists <- generateMSPeakLists(fGroups)
@@ -45,8 +43,8 @@ if (FALSE && doDATests())
 }
 
 test_that("verify formula generation", {
-    expect_known_value(formsGF, testFile("formulas-gf"))
-    expect_known_value(formsGFCF, testFile("formulas-gf_cf"))
+    expect_known_val(formsGF, "formulas-gf")
+    expect_known_val(formsGFCF, "formulas-gf_cf")
     expect_length(formsGFEmpty, 0)
     expect_length(formsGFEmptyPL, 0)
     expect_length(formsGFEmptyPLMS, 0)
@@ -56,44 +54,44 @@ test_that("verify formula generation", {
               length(formsGFCF))
 
     skip_if_not(doSIRIUS)
-    expect_known_value(formsSIR, testFile("formulas-sir"))
+    expect_known_val(formsSIR, "formulas-sir")
     expect_length(formsSIREmpty, 0)
     expect_length(formsSIREmptyPL, 0)
     expect_length(formsSIREmptyPLMS, 0)
-    expect_known_value(formsSIRFPs, testFile("formulas-sir-fps"))
+    expect_known_val(formsSIRFPs, "formulas-sir-fps")
 })
 
 test_that("verify formula show output", {
-    expect_known_show(formsGF, testFile("formulas-gf", text = TRUE))
-    expect_known_show(formsGFCF, testFile("formulas-gf_cf", text = TRUE))
+    expect_known_show(formsGF, "formulas-gf")
+    expect_known_show(formsGFCF, "formulas-gf_cf")
     skip_if_not(doSIRIUS)
-    expect_known_show(formsSIR, testFile("formulas-sir", text = TRUE))
-    expect_known_show(formsSIRFPs, testFile("formulas-sir-fps", text = TRUE))
+    expect_known_show(formsSIR, "formulas-sir")
+    expect_known_show(formsSIRFPs, "formulas-sir-fps")
 })
 
 # extra separate block: can't have >1 skip statements...
 test_that("verify DA formula generation", {
     # disabled: deprecated
     skip_if_not(doDATests() && FALSE)
-    expect_known_value(formsDA, testFile("formulas-DA"))
-    expect_known_show(formsDA, testFile("formulas-DA", text = TRUE))
+    expect_known_val(formsDA, "formulas-DA")
+    expect_known_show(formsDA, "formulas-DA")
 })
 
 test_that("basic subsetting", {
     expect_length(formsGF["nope"], 0)
-    expect_equivalent(groupNames(formsGF[1:2]), groupNames(formsGF)[1:2])
-    expect_equivalent(groupNames(formsGF[groupNames(formsGF)[2:3]]), groupNames(formsGF)[2:3])
-    expect_equivalent(groupNames(formsGF[c(FALSE, TRUE)]), groupNames(formsGF)[c(FALSE, TRUE)])
+    expect_equal(groupNames(formsGF[1:2]), groupNames(formsGF)[1:2])
+    expect_equal(groupNames(formsGF[groupNames(formsGF)[2:3]]), groupNames(formsGF)[2:3])
+    expect_equal(groupNames(formsGF[c(FALSE, TRUE)]), groupNames(formsGF)[c(FALSE, TRUE)])
     expect_equal(length(formsGF[FALSE]), 0)
     expect_length(formsGFEmpty[1:5], 0)
 
-    expect_equivalent(formsGFCF[[2, 5]], annotations(formsGFCF, TRUE)[[2]][[groupNames(formsGFCF)[5]]])
-    expect_equivalent(formsGFCF[[analyses(formsGFCF)[2], groupNames(formsGFCF)[5]]],
+    expect_equal(formsGFCF[[2, 5]], annotations(formsGFCF, TRUE)[[2]][[groupNames(formsGFCF)[5]]])
+    expect_equal(formsGFCF[[analyses(formsGFCF)[2], groupNames(formsGFCF)[5]]],
                       annotations(formsGFCF, TRUE)[[2]][[groupNames(formsGFCF)[5]]])
 
-    expect_equivalent(formsGF[[5]], annotations(formsGF)[[5]])
-    expect_equivalent(formsGF[[groupNames(formsGF)[5]]], annotations(formsGF)[[5]])
-    expect_equivalent(callDollar(formsGF, groupNames(formsGF)[4]), formsGF[[4]])
+    expect_equal(formsGF[[5]], annotations(formsGF)[[5]])
+    expect_equal(formsGF[[groupNames(formsGF)[5]]], annotations(formsGF)[[5]])
+    expect_equal(callDollar(formsGF, groupNames(formsGF)[4]), formsGF[[4]])
 })
 
 test_that("delete and filter", {
@@ -180,7 +178,7 @@ test_that("delete and filter", {
     expect_range(length(filter(formsGF, topMost = 2, negate = TRUE)),
                  c(length(groupNames(formsGF)), length(groupNames(formsGF)) * 2))
 
-    expect_equivalent(filter(formsGF, scoreLimits = list(isoScore = c(-Inf, Inf))), formsGF)
+    expect_equal(filter(formsGF, scoreLimits = list(isoScore = c(-Inf, Inf))), formsGF)
     expect_length(filter(formsGF, scoreLimits = list(isoScore = c(-Inf, Inf)), negate = TRUE), 0)
     expect_lt(length(filter(formsGF, scoreLimits = list(isoScore = c(0.7, Inf)))), length(formsGF))
     expect_lt(length(filter(formsGF, scoreLimits = list(isoScore = c(0.7, Inf)), negate = TRUE)), length(formsGF))
@@ -226,8 +224,8 @@ test_that("consensus works", {
     expect_length(doFormCons(formsGF, formsGFEmpty, MSPeakLists = plists), length(formsGF))
 
     skip_if_not(doSIRIUS)
-    expect_known_value(fCons, testFile("formulas-cons"))
-    expect_known_show(fCons, testFile("formulas-cons", text = TRUE))
+    expect_known_val(fCons, "formulas-cons")
+    expect_known_show(fCons, "formulas-cons")
     expect_setequal(groupNames(doFormCons(formsGF, formsSIR, MSPeakLists = plists)),
                     union(groupNames(formsGF), groupNames(formsSIR)))
     expect_lt(length(doFormCons(formsGF, formsSIR, MSPeakLists = plists, relMinAbundance = 1)), length(fCons))

@@ -5,7 +5,7 @@ library(patRoon)
 # initialization
 # -------------------------
 
-workPath <- "test_temp/test-np/analysis-example"
+workPath <- "<WORK_PATH>/test-np/analysis-example"
 setwd(workPath)
 
 # Example data from patRoonData package (triplicate solvent blank + triplicate standard)

@@ -5,7 +5,7 @@ library(patRoon)
 # initialization
 # -------------------------
 
-workPath <- "test_temp/test-np/features-ims_susp_pred_sets"
+workPath <- "<WORK_PATH>/test-np/features-ims_susp_pred_sets"
 setwd(workPath)
 
 # NOTE: please set to a valid data.frame with analysis information. See ?`analysis-information` for more details.

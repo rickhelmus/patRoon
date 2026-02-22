@@ -2,8 +2,6 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-context("reporting")
-
 fGroups <- getTestFGroups()[1:2, 1:25]
 makeReportHTML(fGroups)
 makeReportHTML(fGroups, path = getWorkPath("reportNoChroms"), overrideSettings = list(features = list(chromatograms = list(large = FALSE, small = FALSE, features = FALSE))))

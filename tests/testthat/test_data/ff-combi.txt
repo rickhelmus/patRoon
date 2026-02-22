@@ -1,1 +1,1 @@
-Done! Filtered 492 (17.96%) features. Remaining: 2248
+A featuresSet objectHierarchy:features    |-- featuresSet---Algorithm: openms-setTotal feature count: 2248Average feature count/analysis: 187Has IMS data: noAnalyses: solvent-pos-1, solvent-pos-2, solvent-pos-3, standard-pos-1, standard-pos-2, standard-pos-3, ... (12 total)Replicates: solvent-pos, standard-pos, solvent-neg, standard-neg (4 total)Replicates used as blank: solvent-pos, solvent-neg (2 total)Sets: positive, negative

@@ -58,6 +58,22 @@ openCacheDB <- function(file = getCacheFile()) DBI::dbConnect(RSQLite::SQLite(),
 closeCacheDB <- function(db) DBI::dbDisconnect(db)
 openCacheDBScope <- withr::local_(function(x, file = getCacheFile()) openCacheDB(file), function(x) closeCacheDB(x))
 
+# Helper to catch "database is locked" errors and convert to warnings
+tryCatchDBLocked <- function(expr, msgPrefix = "Database operation", returnValue = NULL)
+{
+    tryCatch(expr,
+             error = function(e)
+             {
+                 if (grepl("database is locked", conditionMessage(e), ignore.case = TRUE, fixed = TRUE))
+                 {
+                     warning(sprintf("%s failed: database is locked", msgPrefix), call. = FALSE)
+                     return(returnValue)
+                 }
+                 else
+                     stop(e)
+             })
+}
+
 #' @details \code{loadCacheData} Loads cached data from a database.
 #' @param hashes A \code{character} with one more hashes (\emph{e.g.} obtained with \code{makeHash}) of the objects to
 #'   be loaded.
@@ -81,35 +97,37 @@ loadCacheData <- function(category, hashes, dbArg = NULL, simplify = TRUE, fixDT
 
     ret <- setNames(rep(list(NULL), length(hashes)), hashes)
 
-    if (nrow(DBI::dbGetQuery(db, sprintf("SELECT 1 FROM sqlite_master WHERE type='table' AND name='%s'", category))) > 0)
-    {
-        if (length(hashes) == 1) # select only one?
+    tryCatchDBLocked({
+        if (nrow(DBI::dbGetQuery(db, sprintf("SELECT 1 FROM sqlite_master WHERE type='table' AND name='%s'", category))) > 0)
         {
-            df <- DBI::dbGetQuery(db, sprintf("SELECT data FROM %s WHERE hash='%s'", category, hashes))
-            if (nrow(df) > 0)
-                ret[[1]] <- unserialize(fst::decompress_fst(df$data[[1]]))
-        }
-        else
-        {
-            df <- DBI::dbGetQuery(db, sprintf("SELECT hash,data FROM %s WHERE hash IN (%s)", category,
-                                              paste0(sprintf("'%s'", hashes), collapse = ",")))
-
-            if (nrow(df) > 0)
+            if (length(hashes) == 1) # select only one?
             {
-                d <- setNames(lapply(df$data, function(x) unserialize(fst::decompress_fst(x))), df$hash)
-                # NOTE: use [] to keep names so that hashes that are not present are properly named and assigned to NULL
-                ret[] <- d[hashes]
-                if (fixDTs)
+                df <- DBI::dbGetQuery(db, sprintf("SELECT data FROM %s WHERE hash='%s'", category, hashes))
+                if (nrow(df) > 0)
+                    ret[[1]] <- unserialize(fst::decompress_fst(df$data[[1]]))
+            }
+            else
+            {
+                df <- DBI::dbGetQuery(db, sprintf("SELECT hash,data FROM %s WHERE hash IN (%s)", category,
+                                                  paste0(sprintf("'%s'", hashes), collapse = ",")))
+
+                if (nrow(df) > 0)
                 {
-                    # make sure duplicate hashes do not get the same DT object, as this will result in unexpected
-                    # behavior when doing in-place operations
-                    # NOTE: copy() automatically handles nested DTs
-                    dupl <- duplicated(names(ret))
-                    ret[dupl] <- lapply(ret[dupl], data.table::copy)
+                    d <- setNames(lapply(df$data, function(x) unserialize(fst::decompress_fst(x))), df$hash)
+                    # NOTE: use [] to keep names so that hashes that are not present are properly named and assigned to NULL
+                    ret[] <- d[hashes]
+                    if (fixDTs)
+                    {
+                        # make sure duplicate hashes do not get the same DT object, as this will result in unexpected
+                        # behavior when doing in-place operations
+                        # NOTE: copy() automatically handles nested DTs
+                        dupl <- duplicated(names(ret))
+                        ret[dupl] <- lapply(ret[dupl], data.table::copy)
+                    }
                 }
             }
         }
-    }
+    }, msgPrefix = "loadCacheData")
 
     if (fixDTs)
         ret <- recursiveApplyDT(ret, setalloccol, sapply, simplify = FALSE)
@@ -155,27 +173,29 @@ saveCacheDataList <- function(category, dataList, hashes, dbArg = NULL)
     
     RSQLite::sqliteSetBusyHandler(db, 300 * 1000) # UNDONE: make configurable?
     
-    dbWithWriteTransaction(db, {
-        DBI::dbExecute(db, sprintf("CREATE TABLE IF NOT EXISTS %s (hash TEXT UNIQUE, data BLOB)", category))
+    tryCatchDBLocked({
+        dbWithWriteTransaction(db, {
+            DBI::dbExecute(db, sprintf("CREATE TABLE IF NOT EXISTS %s (hash TEXT UNIQUE, data BLOB)", category))
 
-        for (i in seq_along(dataList))
-        {
-            data <- data.frame(d = I(list(fst::compress_fst(serialize(dataList[[i]], NULL, xdr = FALSE)))))
+            for (i in seq_along(dataList))
+            {
+                data <- data.frame(d = I(list(fst::compress_fst(serialize(dataList[[i]], NULL, xdr = FALSE)))))
 
-            # do UPSERT
-            DBI::dbExecute(db, sprintf("INSERT INTO %s VALUES ('%s', :d) ON CONFLICT (hash) DO UPDATE SET data = excluded.data",
-                                       category, hashes[i]), params = data)
-        }
-        
-        # manage amount of multiple rows
-        tabN <- DBI::dbGetQuery(db, sprintf("SELECT Count(*) FROM %s", category))[[1]]
-        if (tabN > getMaxCacheEntries())
-        {
-            # remove first N rows: https://stackoverflow.com/a/10381812 (needs ordering, see bottom comment)
-            DBI::dbExecute(db, sprintf("DELETE FROM %s WHERE rowid IN (SELECT rowid FROM %s ORDER BY rowid LIMIT %d)",
-                                       category, category, tabN - getMaxCacheEntries()))
-        }
-    })
+                # do UPSERT
+                DBI::dbExecute(db, sprintf("INSERT INTO %s VALUES ('%s', :d) ON CONFLICT (hash) DO UPDATE SET data = excluded.data",
+                                           category, hashes[i]), params = data)
+            }
+            
+            # manage amount of multiple rows
+            tabN <- DBI::dbGetQuery(db, sprintf("SELECT Count(*) FROM %s", category))[[1]]
+            if (tabN > getMaxCacheEntries())
+            {
+                # remove first N rows: https://stackoverflow.com/a/10381812 (needs ordering, see bottom comment)
+                DBI::dbExecute(db, sprintf("DELETE FROM %s WHERE rowid IN (SELECT rowid FROM %s ORDER BY rowid LIMIT %d)",
+                                           category, category, tabN - getMaxCacheEntries()))
+            }
+        })
+    }, msgPrefix = "saveCacheData")
     
     invisible(NULL)
 }
@@ -261,31 +281,35 @@ clearCache <- function(what = NULL, file = NULL, vacuum = TRUE)
     else
     {
         db <- openCacheDBScope(file = file)
-        tables <- DBI::dbListTables(db)
+        RSQLite::sqliteSetBusyHandler(db, 300 * 1000) # UNDONE: make configurable?
 
-        if (length(tables) == 0)
-            printf("Cache file is empty, nothing to do ...\n")
-        else if (is.null(what) || !nzchar(what))
-        {
-            tableRows <- unlist(sapply(tables, function(tab) DBI::dbGetQuery(db, sprintf("SELECT Count(*) FROM %s", tab))))
-            printf("Please specify which cache you want to remove. Available are:\n%s",
-                   paste0(sprintf("- %s (%d rows)\n", tables, tableRows), collapse = ""))
-            printf("- all (removes complete cache database)\n")
-        }
-        else
-        {
-            matchedTables <- grep(what, tables, value = TRUE)
-            if (length(matchedTables) == 0)
-                printf("No cache found that matches given pattern. Currently stored caches: %s\n", paste0(tables, collapse = ", "))
+        tryCatchDBLocked({
+            tables <- DBI::dbListTables(db)
+
+            if (length(tables) == 0)
+                printf("Cache file is empty, nothing to do ...\n")
+            else if (is.null(what) || !nzchar(what))
+            {
+                tableRows <- unlist(sapply(tables, function(tab) DBI::dbGetQuery(db, sprintf("SELECT Count(*) FROM %s", tab))))
+                printf("Please specify which cache you want to remove. Available are:\n%s",
+                       paste0(sprintf("- %s (%d rows)\n", tables, tableRows), collapse = ""))
+                printf("- all (removes complete cache database)\n")
+            }
             else
             {
-                for (tab in matchedTables)
-                    DBI::dbExecute(db, sprintf("DROP TABLE IF EXISTS %s", tab))
-                if (vacuum)
-                    DBI::dbExecute(db, "VACUUM")
-                printf("Removed caches: %s\n", paste0(matchedTables, collapse = ", "))
+                matchedTables <- grep(what, tables, value = TRUE)
+                if (length(matchedTables) == 0)
+                    printf("No cache found that matches given pattern. Currently stored caches: %s\n", paste0(tables, collapse = ", "))
+                else
+                {
+                    for (tab in matchedTables)
+                        DBI::dbExecute(db, sprintf("DROP TABLE IF EXISTS %s", tab))
+                    if (vacuum)
+                        DBI::dbExecute(db, "VACUUM")
+                    printf("Removed caches: %s\n", paste0(matchedTables, collapse = ", "))
+                }
             }
-        }
+        }, msgPrefix = "clearCache")
 
     }
     invisible(NULL)

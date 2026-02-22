@@ -5,7 +5,7 @@ library(patRoon)
 # initialization
 # -------------------------
 
-workPath <- "test_temp/test-np/analysis-tab_emb_both"
+workPath <- "<WORK_PATH>/test-np/analysis-tab_emb_both"
 setwd(workPath)
 
 # Create analysis table

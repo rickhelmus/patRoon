@@ -2,8 +2,6 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-context("prepare chem properties")
-
 # row 1: invalid formula
 # row 2: charged molecule
 tab <- data.table(SMILES = c("C1=CC=C2C(=C1)C=CC3=CC=CC=C3N2C(=O)N", "CCCC(=O)[O-]"),

@@ -2,8 +2,6 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-context("compounds")
-
 fGroups <- getCompFGroups()
 
 plists <- generateMSPeakLists(fGroups)
@@ -39,8 +37,8 @@ compsLibEmptyPL <- doGenComps(fGroups, plistsEmpty, "library", MSLibrary = mslib
 
 test_that("verify MetFragCL compound generation", {
     skip_if_not(doMetFrag)
-    expect_known_value(compsMF, testFile("compounds-mf"))
-    expect_known_show(compsMF, testFile("compounds-mf", text = TRUE))
+    expect_known_val(compsMF, "compounds-mf")
+    expect_known_show(compsMF, "compounds-mf")
     expect_length(compsMF, length(groupNames(compsMF))) # should be one compound per feature group
     # make sure that all suspect names correspond to identified compounds
     expect_true(all(sapply(names(ct), function(grp) nrow(ct[[grp]]) == 1 && ct[[grp]]$identifier == screenInfo(fGroups)[group == grp]$name)))
@@ -50,16 +48,16 @@ test_that("verify MetFragCL compound generation", {
 
 test_that("verify SIRIUS compound generation", {
     skip_if_not(doSIRIUS)
-    expect_known_value(compsSIR, testFile("compounds-sir"))
-    expect_known_show(compsSIR, testFile("compounds-sir", text = TRUE))
+    expect_known_val(compsSIR, "compounds-sir")
+    expect_known_show(compsSIR, "compounds-sir")
     expect_length(compsSIREmpty, 0)
     expect_length(compsSIREmptyPL, 0)
     expect_length(doGenComps(fGroups, plistsEmptyMS, "sirius"), 0)
 })
 
 test_that("verify Library compound generation", {
-    expect_known_value(compsLib, testFile("compounds-lib"))
-    expect_known_show(compsLib, testFile("compounds-lib", text = TRUE))
+    expect_known_val(compsLib, "compounds-lib")
+    expect_known_show(compsLib, "compounds-lib")
     expect_length(compsLibEmpty, 0)
     expect_length(compsLibEmptyPL, 0)
     expect_length(doGenComps(fGroups, plistsEmptyMS, "library", MSLibrary = mslibrary), 0)
@@ -107,9 +105,9 @@ test_that("delete and filter", {
     expect_lte(length(filter(comps, minExplainedPeaks = 2)), length(comps))
     expect_length(filter(comps, minExplainedPeaks = 1E6), 0)
     expect_length(filter(compsEmpty, minExplainedPeaks = 2, topMost = 1), 0)
-    expect_equivalent(filter(comps, scoreLimits = list(fragScore = c(-Inf, Inf))), comps)
+    expect_equal(filter(comps, scoreLimits = list(fragScore = c(-Inf, Inf))), comps)
     expect_lte(length(filter(comps, minExplainedPeaks = 2, negate = TRUE)), length(comps))
-    expect_equivalent(filter(comps, minExplainedPeaks = 1E6, negate = TRUE), comps)
+    expect_equal(filter(comps, minExplainedPeaks = 1E6, negate = TRUE), comps)
     expect_length(filter(compsEmpty, minExplainedPeaks = 2, topMost = 1, negate = TRUE), 0)
     expect_length(filter(comps, scoreLimits = list(fragScore = c(-Inf, Inf)), negate = TRUE), 0)
 
@@ -182,15 +180,15 @@ test_that("basic subsetting", {
     skip_if_not(hasCompounds)
 
     expect_length(comps["nope"], 0)
-    expect_equivalent(groupNames(comps[1:2]), groupNames(comps)[1:2])
-    expect_equivalent(groupNames(comps[groupNames(comps)[2:3]]), groupNames(comps)[2:3])
-    expect_equivalent(groupNames(comps[c(FALSE, TRUE)]), groupNames(comps)[c(FALSE, TRUE)])
+    expect_equal(groupNames(comps[1:2]), groupNames(comps)[1:2])
+    expect_equal(groupNames(comps[groupNames(comps)[2:3]]), groupNames(comps)[2:3])
+    expect_equal(groupNames(comps[c(FALSE, TRUE)]), groupNames(comps)[c(FALSE, TRUE)])
     expect_equal(length(comps[FALSE]), 0)
     expect_length(compsEmpty[1:5], 0)
 
-    expect_equivalent(comps[[1]], annotations(comps)[[1]])
-    expect_equivalent(comps[[groupNames(comps)[1]]], annotations(comps)[[1]])
-    expect_equivalent(callDollar(comps, groupNames(comps)[1]), comps[[1]])
+    expect_equal(comps[[1]], annotations(comps)[[1]])
+    expect_equal(comps[[groupNames(comps)[1]]], annotations(comps)[[1]])
+    expect_equal(callDollar(comps, groupNames(comps)[1]), comps[[1]])
 })
 
 test_that("as.data.table() works", {
@@ -338,8 +336,8 @@ test_that("consensus works", {
     expect_length(doCompCons(comps, compsEmpty, MSPeakLists = plists), length(comps))
 
     skip_if_not(doMetFrag && doSIRIUS)
-    expect_known_value(compsCons, testFile("compounds-cons"))
-    expect_known_show(compsCons, testFile("compounds-cons", text = TRUE))
+    expect_known_val(compsCons, "compounds-cons")
+    expect_known_show(compsCons, "compounds-cons")
     expect_lt(length(doCompCons(compsMF, compsSIR, MSPeakLists = plists, relMinAbundance = 1)), length(compsCons))
     expect_length(doCompCons(compsMFEmptyPL, compsSIREmptyPL, MSPeakLists = plists), 0)
 
@@ -507,7 +505,7 @@ test_that("IMS tests", {
     expect_equal(as.data.table(compsIMS), as.data.table(compsIMSAMNop)[, !grep("mob|CCS", names(as.data.table(compsIMSAMNop))), with = FALSE])
     
     compsIMSAM <- doCompAM()
-    expect_known_value(compsIMSAM, testFile("compounds-mf-ims"))
+    expect_known_val(compsIMSAM, "compounds-mf-ims")
     checkmate::expect_names(names(as.data.table(compsIMSAM)), must.include = paste0(c("mobility", "mobility_mz", "CCS",
                                                                                       "CCS_mz", "d_mob", "d_mob_rel",
                                                                                       "d_CCS", "d_CCS_rel"),
@@ -557,7 +555,7 @@ test_that("IMS tests", {
     
     # verify if CCS data is read from compound database (ie PubChemLite)
     compsIMSDB <- callMF(fGroupsIMS, plistsIMS, db = file.path(getTestDataPath(), "test-mf-db-ccs.csv"))
-    expect_known_value(compsIMSDB, testFile("compounds-mf-ims_ccsdb"))
+    expect_known_val(compsIMSDB, "compounds-mf-ims_ccsdb")
     checkmate::expect_names(names(as.data.table(compsIMSDB)), must.include = paste0(c("CCS", "CCS_mz", "d_CCS",
                                                                                       "d_CCS_rel"),
                                                                                     "-positive"))

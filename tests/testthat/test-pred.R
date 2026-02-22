@@ -2,8 +2,6 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-context("prediction")
-
 # NOTE: fGroups, peak lists, annotations should all be in sync with test-formulas/test-compounds
 
 # use example data from MS2Quant: the calibrants/eluent are completely unapplicable to patRoonData, but at least we can
@@ -64,7 +62,7 @@ getMS2QLM <- function(obj) obj@MS2QuantMeta[[1]]$linModel
 RFCol <- getAllSuspCols("RF_SMILES", names(screenInfo(fGroupsComps)), mergedConsensusNames(fGroupsComps))[1]
 
 test_that("Basics for prediction", {
-    expect_known_value(screenInfo(fGroupsComps)[, c(RFCol, "LC50_SMILES"), with = FALSE], testFile("pred-scr"))
+    expect_known_val(screenInfo(fGroupsComps)[, c(RFCol, "LC50_SMILES"), with = FALSE], "pred-scr")
     checkmate::expect_names(names(screenInfo(fGroupsComps)), must.include = c(RFCol, "LC50_SMILES"))
     checkmate::expect_data_table(screenInfo(fGroupsComps)[, c(RFCol, "LC50_SMILES"), with = FALSE],
                                  types = "numeric")
@@ -74,8 +72,8 @@ test_that("Basics for prediction", {
     
     skip_if_not(doSIRIUS)
 
-    expect_known_value(formsTab[, grep("^(RF|LC50)_", names(formsTab), value = TRUE), with = FALSE], testFile("pred-forms"))
-    expect_known_value(compsTab[, grep("^(RF|LC50)_", names(compsTab), value = TRUE), with = FALSE], testFile("pred-comps"))
+    expect_known_val(formsTab[, grep("^(RF|LC50)_", names(formsTab), value = TRUE), with = FALSE], "pred-forms")
+    expect_known_val(compsTab[, grep("^(RF|LC50)_", names(compsTab), value = TRUE), with = FALSE], "pred-comps")
     
     expect_length(grep("^(RF|LC50)_", names(formsTab)), 4)
     expect_length(grep("^(RF|LC50)_", names(compsTab)), 6)
@@ -88,9 +86,9 @@ test_that("Basics for prediction", {
                                     calibConcUnit = "M", type = "both"), NA)
     expect_error(predictTox(compsEmpty), NA)
     
-    expect_equal(getMS2QLM(fGroupsForms), getMS2QLM(fGroupsComps))
-    expect_equal(getMS2QLM(fGroupsForms), getMS2QLM(formsSIR))
-    expect_equal(getMS2QLM(fGroupsForms), getMS2QLM(compsSIR))
+    expect_equal(getMS2QLM(fGroupsForms), getMS2QLM(fGroupsComps), ignore_attr = TRUE)
+    expect_equal(getMS2QLM(fGroupsForms), getMS2QLM(formsSIR), ignore_attr = TRUE)
+    expect_equal(getMS2QLM(fGroupsForms), getMS2QLM(compsSIR), ignore_attr = TRUE)
 })
 
 calibConcs <- data.table(name = "Chloridazon", "standard-pos" = 100)
@@ -104,7 +102,7 @@ test_that("getQuantCalibFromScreening()", {
     expect_equal(mean(calibScr$intensity), calibScrAvg$intensity)
     checkmate::expect_data_table(calibScrAr, nrows = 2)
     expect_true(all(calibScrAr$intensity > calibScr$intensity))
-    expect_equal(calibScr[, -"intensity"], calibScrAr[, -"intensity"], check.attributes = FALSE)
+    expect_equal(calibScr[, -"intensity"], calibScrAr[, -"intensity"], ignore_attr = TRUE)
 })
 
 if (doSIRIUS)
@@ -132,8 +130,8 @@ if (doSIRIUS)
 test_that("Basics for calculation", {
     skip_if_not(doSIRIUS)
     
-    expect_known_value(list(concentrations(fGroupsFormsC), toxicities(fGroupsFormsC)), testFile("calc-forms"))
-    expect_known_value(list(concentrations(fGroupsCompsC), toxicities(fGroupsCompsC)), testFile("calc-comps"))
+    expect_known_val(list(concentrations(fGroupsFormsC), toxicities(fGroupsFormsC)), "calc-forms")
+    expect_known_val(list(concentrations(fGroupsCompsC), toxicities(fGroupsCompsC)), "calc-comps")
     checkmate::expect_data_table(concentrations(fGroupsFormsC), min.rows = 1)
     checkmate::expect_data_table(toxicities(fGroupsFormsC), min.rows = 1)
     checkmate::expect_data_table(concentrations(fGroupsCompsC), min.rows = 1)

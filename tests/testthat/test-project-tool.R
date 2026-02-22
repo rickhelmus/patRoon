@@ -136,7 +136,7 @@ testNewProj <- function(..., name, CCSCalib = "", aid = list())
         inp <- gsub(patRoonDataIMS::exampleDataPath("negative"), "<EXAMPLE_DATA_PATH_IMS_NEG>", inp, fixed = TRUE)
         wh <- grepl("path_centroid", inp)
         inp[wh] <- gsub("\ +", " ", inp[wh]) # remove extra spaces in embedded anaInfo tab for better comparability
-            
+        inp <- gsub(getWorkPath(), "<WORK_PATH>", inp, fixed = TRUE)
         return(inp)
     })
     
@@ -179,7 +179,8 @@ testNewProj <- function(..., name, CCSCalib = "", aid = list())
 }
 
 test_that("Default settings", {
-    expect_snapshot_file(file.path(defaultTestDir, "process.R"), name = "default_process.R", cran = TRUE)
+    expect_snapshot_file(file.path(defaultTestDir, "process.R"), name = "default_process.R", cran = TRUE,
+                         transform = \(inp) gsub(getWorkPath(), "<WORK_PATH>", inp, fixed = TRUE))
     expect_snapshot_file(file.path(defaultTestDir, "report.yml"), name = "default_report.yml", cran = TRUE)
     expect_snapshot_file(file.path(defaultTestDir, "limits.yml"), name = "default_limits.yml", cran = TRUE)
 })
@@ -410,5 +411,9 @@ test_that("Report settings", {
 
 test_that("Old setting conversion", {
     expect_snapshot(readProjectSettings(file.path(getTestDataPath(), "newProject-23.yml"), defaultTestDir),
-                    cran = TRUE)
+                    cran = TRUE, transform = function(inp)
+                    {
+                        inp <- gsub(getWorkPath(), "<WORK_PATH>", inp, fixed = TRUE)
+                        return(inp)
+                    })
 })

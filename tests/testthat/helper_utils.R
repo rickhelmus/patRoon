@@ -6,7 +6,7 @@ getTestDataPathGeneric <- function() "test_data"
 
 getTestDataPath <- function() getTestDataPathGeneric()
 testFile <- function(f, ..., text = FALSE) file.path(getTestDataPath(), paste0(f, ..., if (!text) ".Rds" else ".txt", collapse = ""))
-getWorkPath <- function(file = "", ...) if (nzchar(file)) file.path("test_temp", file, ...) else "test_temp"
+getWorkPath <- function(...) file.path(sprintf("temp_temp-%d", Sys.getpid()), ...)
 
 getTestAnaInfo <- function()
 {
@@ -332,9 +332,39 @@ expect_max_lte <- function(x, thr, na.rm = FALSE) expect_lte(max(x, na.rm = na.r
 expect_max_gt <- function(x, thr, na.rm = FALSE) expect_gt(max(x, na.rm = na.rm), thr)
 expect_max_lt <- function(x, thr, na.rm = FALSE) expect_lt(max(x, na.rm = na.rm), thr)
 
+# NOTE: this mainly is the same as the now deprecated testthat::expect_known_val and snapshots seem a bit clumsy for
+# this.
+expect_known_val <- function(object, file, tolerance = 1E-8, ...)
+{
+    act <- quasi_label(rlang::enquo(object))
+    file <- testFile(file)
+    
+    if (!file.exists(file))
+    {
+        warning("Creating reference value", call. = FALSE)
+        saveRDS(object, file = file)
+        pass()
+    }
+    else
+    {
+        ref <- readRDS(file)
+        cmp <- waldo::compare(ref, object, tolerance = tolerance, ...)
+        if (length(cmp) == 0)
+            pass()
+        else
+        {
+            saveRDS(object, file = file)
+            fail(sprintf("reference value of %s has changed\n%s", act$lab, paste0(cmp, collapse = "\n")))
+        }
+    }
+    
+    invisible(act$val)
+}
+
 expect_known_show <- function(object, file)
 {
     act <- quasi_label(rlang::enquo(object))
+    file <- testFile(file, text = TRUE)
 
     text <- capture_output_lines(show(act$val))
 
@@ -348,15 +378,19 @@ expect_known_show <- function(object, file)
     {
         warning("Creating reference output", call. = FALSE)
         cat(text, file = file)
-        succeed()
+        pass()
     }
     else
     {
         ref <- patRoon:::readAllFile(file)
-        cat(text, file = file)
-
-        cmp <- compare(text, enc2native(ref))
-        expect(cmp$equal, sprintf("show reference of %s has changed\n%s", act$lab, cmp$message))
+        cmp <- waldo::compare(text, ref)
+        if (length(cmp) == 0)
+            pass()
+         else
+         {
+             cat(text, file = file)
+             fail(sprintf("reference output of %s has changed\n%s", act$lab, paste0(cmp, collapse = "\n")))
+         }
     }
 
     invisible(act$val)

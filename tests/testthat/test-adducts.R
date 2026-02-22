@@ -2,10 +2,8 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-context("adducts")
-
 test_that("adduct class and utilities", {
-    expect_known_show(adduct("H"), testFile("adduct-show", text = TRUE))
+    expect_known_show(adduct("H"), "adduct-show")
     
     expect_equal(adduct("H"), as.adduct("[M+H]+"))
     expect_equal(adduct("H"), as.adduct("[M+H]+"))

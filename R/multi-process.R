@@ -91,7 +91,7 @@ executeMultiProcess <- function(commandQueue, finishHandler,
         names(commandQueue) <- seq_along(commandQueue) # setting names makes it easier to split/merge cached results later
     
     cmdNames <- names(commandQueue)
-    cacheDB <- openCacheDBScope()
+    cacheDB <- if (!is.null(cacheName)) openCacheDBScope()
     
     if (!is.null(cacheName))
     {

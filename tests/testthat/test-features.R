@@ -2,8 +2,6 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-context("features")
-
 initXCMS()
 
 anaInfo <- getTestAnaInfo()
@@ -57,14 +55,14 @@ if (doDATests())
 OpenMSFTable <- function(ff) sapply(featureTable(ff), function(fts) fts[, -"ID"], simplify = FALSE)
 
 test_that("verify feature finder output", {
-    expect_known_value(OpenMSFTable(ffOpenMS), testFile("ff-openms"), tolerance = 1E-5) # increased tolerance value for win/lin deviations
-    # expect_known_value(featureTable(ffXCMS), testFile("ff-xcms"))
-    expect_known_value(featureTable(ffXCMS3), testFile("ff-xcms3"))
-    expect_known_value(featureTable(ffEP), testFile("ff-envipick"))
-    expect_known_value(featureTable(ffKPIC2), testFile("ff-kpic2"))
-    expect_known_value(featureTable(ffSIRIUS), testFile("ff-sirius"))
+    expect_known_val(OpenMSFTable(ffOpenMS), "ff-openms", tolerance = 1E-5) # increased tolerance value for win/lin deviations
+    # expect_known_val(featureTable(ffXCMS), "ff-xcms")
+    expect_known_val(featureTable(ffXCMS3), "ff-xcms3")
+    expect_known_val(featureTable(ffEP), "ff-envipick")
+    expect_known_val(featureTable(ffKPIC2), "ff-kpic2")
+    expect_known_val(featureTable(ffSIRIUS), "ff-sirius")
     
-    expect_known_value(OpenMSFTable(ffOpenMSQ), testFile("ff-openms-qual"))
+    expect_known_val(OpenMSFTable(ffOpenMSQ), "ff-openms-qual")
     
     # extraOpts
     expect_equal(OpenMSFTable(ffOpenMS),
@@ -72,43 +70,43 @@ test_that("verify feature finder output", {
                                               extraOpts = list("-algorithm:common:noise_threshold_int" = 30000))))
 
     skip_if_not(doDATests())
-    expect_known_value(featureTable(ffDA), testFile("ff-DA"))
+    expect_known_val(featureTable(ffDA), "ff-DA")
 })
 
 test_that("verify show output", {
-    expect_known_show(ffOpenMS, testFile("ff-show-openms", text = TRUE))
-    # expect_known_show(ffXCMS, testFile("ff-show-xcms", text = TRUE))
-    expect_known_show(ffXCMS3, testFile("ff-show-xcms3", text = TRUE))
-    expect_known_show(ffEP, testFile("ff-show-envipick", text = TRUE))
-    expect_known_show(ffKPIC2, testFile("ff-show-kpic2", text = TRUE))
-    expect_known_show(ffSIRIUS, testFile("ff-show-sirius", text = TRUE))
+    expect_known_show(ffOpenMS, "ff-show-openms")
+    # expect_known_show(ffXCMS, "ff-show-xcms")
+    expect_known_show(ffXCMS3, "ff-show-xcms3")
+    expect_known_show(ffEP, "ff-show-envipick")
+    expect_known_show(ffKPIC2, "ff-show-kpic2")
+    expect_known_show(ffSIRIUS, "ff-show-sirius")
 
-    expect_known_show(ffOpenMSQ, testFile("ff-show-openms-qual", text = TRUE))
+    expect_known_show(ffOpenMSQ, "ff-show-openms-qual")
     
     skip_if_not(doDATests())
-    expect_known_show(ffDA, testFile("ff-DA", text = TRUE))
+    expect_known_show(ffDA, "ff-DA")
 })
 
 test_that("piek", {
-    expect_known_value(featureTable(ffPiekBins), testFile("ff-piek-bins"))
-    expect_known_value(featureTable(ffPiekSusp), testFile("ff-piek-suspects"))
-    expect_known_value(featureTable(ffPiekMS2), testFile("ff-piek-ms2"))
-    expect_known_value(featureTable(ffPiekMS2OpenMS), testFile("ff-piek-ms2-openms"))
-    expect_known_value(featureTable(ffPiekMS2XCMS3), testFile("ff-piek-ms2-xcms3"))
-    expect_known_value(featureTable(ffPiekMS2EP), testFile("ff-piek-ms2-envipick"))
-    expect_known_show(ffPiekBinsIMS, testFile("ff-show-piek-bins-ims", text = TRUE))
-    expect_known_show(ffPiekSuspIMS, testFile("ff-show-piek-suspects-ims", text = TRUE))
-    expect_known_show(ffPiekMS2IMS, testFile("ff-show-piek-ms2-ims", text = TRUE))
+    expect_known_val(featureTable(ffPiekBins), "ff-piek-bins")
+    expect_known_val(featureTable(ffPiekSusp), "ff-piek-suspects")
+    expect_known_val(featureTable(ffPiekMS2), "ff-piek-ms2")
+    expect_known_val(featureTable(ffPiekMS2OpenMS), "ff-piek-ms2-openms")
+    expect_known_val(featureTable(ffPiekMS2XCMS3), "ff-piek-ms2-xcms3")
+    expect_known_val(featureTable(ffPiekMS2EP), "ff-piek-ms2-envipick")
+    expect_known_show(ffPiekBinsIMS, "ff-show-piek-bins-ims")
+    expect_known_show(ffPiekSuspIMS, "ff-show-piek-suspects-ims")
+    expect_known_show(ffPiekMS2IMS, "ff-show-piek-ms2-ims")
     
-    expect_known_show(ffPiekBins, testFile("ff-show-piek-bins", text = TRUE))
-    expect_known_show(ffPiekSusp, testFile("ff-show-piek-suspects", text = TRUE))
-    expect_known_show(ffPiekMS2, testFile("ff-show-piek-ms2", text = TRUE))
-    expect_known_show(ffPiekMS2OpenMS, testFile("ff-show-piek-ms2-openms", text = TRUE))
-    expect_known_show(ffPiekMS2XCMS3, testFile("ff-show-piek-ms2-xcms3", text = TRUE))
-    expect_known_show(ffPiekMS2EP, testFile("ff-show-piek-ms2-envipick", text = TRUE))
-    expect_known_value(featureTable(ffPiekBinsIMS), testFile("ff-piek-bins-ims"))
-    expect_known_value(featureTable(ffPiekSuspIMS), testFile("ff-piek-suspects-ims"))
-    expect_known_value(featureTable(ffPiekMS2IMS), testFile("ff-piek-ms2-ims"))
+    expect_known_show(ffPiekBins, "ff-show-piek-bins")
+    expect_known_show(ffPiekSusp, "ff-show-piek-suspects")
+    expect_known_show(ffPiekMS2, "ff-show-piek-ms2")
+    expect_known_show(ffPiekMS2OpenMS, "ff-show-piek-ms2-openms")
+    expect_known_show(ffPiekMS2XCMS3, "ff-show-piek-ms2-xcms3")
+    expect_known_show(ffPiekMS2EP, "ff-show-piek-ms2-envipick")
+    expect_known_val(featureTable(ffPiekBinsIMS), "ff-piek-bins-ims")
+    expect_known_val(featureTable(ffPiekSuspIMS), "ff-piek-suspects-ims")
+    expect_known_val(featureTable(ffPiekMS2IMS), "ff-piek-ms2-ims")
     
     expect_range(as.data.table(ffPiekBins)$mz, c(200, 300+0.02)) # +0.02: bin width
     expect_lte(length(ffPiekSusp), nrow(patRoonData::suspectsPos))
@@ -164,15 +162,15 @@ test_that("verify empty object can be generated", {
 
 test_that("basic subsetting", {
     expect_length(ffOpenMS["nope"], 0)
-    expect_equivalent(analyses(ffOpenMS[1:2]), anaInfo$analysis[1:2])
-    expect_equivalent(analyses(ffOpenMS[anaInfo$analysis[2:3]]), anaInfo$analysis[2:3])
-    expect_equivalent(analyses(ffOpenMS[c(TRUE, FALSE)]), anaInfo$analysis[c(TRUE, FALSE)])
+    expect_equal(analyses(ffOpenMS[1:2]), anaInfo$analysis[1:2])
+    expect_equal(analyses(ffOpenMS[anaInfo$analysis[2:3]]), anaInfo$analysis[2:3])
+    expect_equal(analyses(ffOpenMS[c(TRUE, FALSE)]), anaInfo$analysis[c(TRUE, FALSE)])
     expect_equal(length(ffOpenMS[FALSE]), 0)
     expect_length(ffEmpty[1:5], 0)
 
-    expect_equivalent(ffOpenMS[[2]], featureTable(ffOpenMS)[[2]])
-    expect_equivalent(ffOpenMS[[analyses(ffOpenMS)[2]]], featureTable(ffOpenMS)[[2]])
-    expect_equivalent(callDollar(ffOpenMS, analyses(ffOpenMS)[2]), ffOpenMS[[2]])
+    expect_equal(ffOpenMS[[2]], featureTable(ffOpenMS)[[2]])
+    expect_equal(ffOpenMS[[analyses(ffOpenMS)[2]]], featureTable(ffOpenMS)[[2]])
+    expect_equal(callDollar(ffOpenMS, analyses(ffOpenMS)[2]), ffOpenMS[[2]])
     
     expect_equal(replicates(ffOpenMS[, ni = replicate == "standard-pos"]), "standard-pos")
 })
@@ -201,25 +199,25 @@ test_that("delete and filter", {
     expect_gte(min(filter(ffOpenMS, relMinIntensity = 0.2)[[1]]$intensity), 0.2 * max(ffOpenMS[[1]]$intensity))
 
     expect_range(filter(ffOpenMS, retentionRange = c(120, 300))[[1]]$ret, c(120, 300))
-    expect_equivalent(filter(ffOpenMS, retentionRange = c(0, Inf)), ffOpenMS)
+    expect_equal(filter(ffOpenMS, retentionRange = c(0, Inf)), ffOpenMS)
     expect_range(filter(ffOpenMS, mzRange = c(200, 300))[[1]]$mz, c(200, 300))
-    expect_equivalent(filter(ffOpenMS, mzRange = c(0, Inf)), ffOpenMS)
+    expect_equal(filter(ffOpenMS, mzRange = c(0, Inf)), ffOpenMS)
     expect_range(filter(ffOpenMS, mzDefectRange = c(0.1, 0.2))[[1]]$mz %% 1, c(0.1, 0.2))
-    expect_equivalent(filter(ffOpenMS, mzDefectRange = c(0, 1)), ffOpenMS)
+    expect_equal(filter(ffOpenMS, mzDefectRange = c(0, 1)), ffOpenMS)
     expect_lt(length(filter(ffOpenMS, chromWidthRange = c(0, 30))), length(ffOpenMS))
-    expect_equivalent(filter(ffOpenMS, chromWidthRange = c(0, Inf)), ffOpenMS)
+    expect_equal(filter(ffOpenMS, chromWidthRange = c(0, Inf)), ffOpenMS)
 
     expect_range(ffOpenMSQFTab[[names(qr)[1]]], qr[[1]])
     expect_range(ffOpenMSQFTab[[names(qr)[2]]], qr[[2]])
     expect_true(all(ffOpenMSQFNTab[[names(qr)[1]]] < qr[[c(1, 1)]] | ffOpenMSQFNTab[[names(qr)[1]]] > qr[[c(1, 2)]]))
     expect_true(all(ffOpenMSQFNTab[[names(qr)[2]]] < qr[[c(2, 1)]] | ffOpenMSQFNTab[[names(qr)[2]]] > qr[[c(2, 2)]]))
     
-    expect_known_output(filter(ffOpenMS, absMinIntensity = 500, retentionRange = c(120, Inf),
-                               mzRange = c(100, 400)),
-                        testFile("ff-combi", text = TRUE))
-    expect_known_output(filter(ffOpenMS, absMinIntensity = 500, retentionRange = c(120, Inf),
-                               mzRange = c(100, 400), negate = TRUE),
-                        testFile("ff-combi-neg", text = TRUE))
+    expect_known_show(filter(ffOpenMS, absMinIntensity = 500, retentionRange = c(120, Inf),
+                             mzRange = c(100, 400)),
+                      "ff-combi")
+    expect_known_show(filter(ffOpenMS, absMinIntensity = 500, retentionRange = c(120, Inf),
+                             mzRange = c(100, 400), negate = TRUE),
+                      "ff-combi-neg")
     expect_length(filter(ffEmpty, absMinIntensity = 500, retentionRange = c(120, Inf),
                          mzRange = c(100, 400)), 0)
     
@@ -227,7 +225,7 @@ test_that("delete and filter", {
                  c(0.65, 0.75))
     expect_range(as.data.table(filter(ffPiekBinsIMS, IMSRangeParams = getIMSRangeParams("mobility", 0.0025, 0.003, TRUE)))[, mobility / mz],
                  c(0.0025, 0.003))
-    expect_equivalent(filter(ffPiekBinsIMS, IMSRangeParams = getIMSRangeParams("mobility", 0, 10)), ffPiekBinsIMS)
+    expect_equal(filter(ffPiekBinsIMS, IMSRangeParams = getIMSRangeParams("mobility", 0, 10)), ffPiekBinsIMS)
     expect_error(filter(ffPiekBinsIMS, IMSRangeParams = getIMSRangeParams("CCS", 0, 1000)), "CCS") # no CCS calculated
 })
 
@@ -255,12 +253,12 @@ test_that("XCMS conversion", {
     expect_equal(nrow(xcms::peaks(XCMSImpKPIC2)), length(ffKPIC2))
     expect_equal(nrow(xcms::peaks(XCMSImpSIRIUS)), length(ffSIRIUS))
     
-    # expect_known_value(xcms::peaks(XCMSImpXCMS), testFile("ff-xcms_import_xcms"))
-    expect_known_value(xcms::peaks(XCMSImpXCMS3), testFile("ff-xcms_import_xcms3"))
-    expect_known_value(xcms::peaks(XCMSImpOpenMS), testFile("ff-xcms_import_openms"))
-    expect_known_value(xcms::peaks(XCMSImpEP), testFile("ff-xcms_import_ep"))
-    expect_known_value(xcms::peaks(XCMSImpKPIC2), testFile("ff-xcms_import_kpic2"))
-    expect_known_value(xcms::peaks(XCMSImpSIRIUS), testFile("ff-xcms_import_sirius"))
+    # expect_known_val(xcms::peaks(XCMSImpXCMS), "ff-xcms_import_xcms")
+    expect_known_val(xcms::peaks(XCMSImpXCMS3), "ff-xcms_import_xcms3")
+    expect_known_val(xcms::peaks(XCMSImpOpenMS), "ff-xcms_import_openms")
+    expect_known_val(xcms::peaks(XCMSImpEP), "ff-xcms_import_ep")
+    expect_known_val(xcms::peaks(XCMSImpKPIC2), "ff-xcms_import_kpic2")
+    expect_known_val(xcms::peaks(XCMSImpSIRIUS), "ff-xcms_import_sirius")
     
     # expect_equal(featMZs(importFeatures(XCMSImpXCMS, "xcms", anaInfoOne)), featMZs(ffXCMS))
     expect_equal(featMZs(importFeatures(XCMSImpXCMS3, "xcms", anaInfoOne)), featMZs(ffXCMS3))
@@ -286,12 +284,12 @@ test_that("XCMS3 conversion", {
     expect_equal(nrow(xcms::chromPeaks(XCMS3ImpKPIC2)), length(ffKPIC2))
     expect_equal(nrow(xcms::chromPeaks(XCMS3ImpSIRIUS)), length(ffSIRIUS))
     
-    # expect_known_value(xcms::chromPeaks(XCMS3ImpXCMS), testFile("ff-xcms3_import_xcms"))
-    expect_known_value(xcms::chromPeaks(XCMS3ImpXCMS3), testFile("ff-xcms3_import_xcms3"))
-    expect_known_value(xcms::chromPeaks(XCMS3ImpOpenMS), testFile("ff-xcms3_import_openms"))
-    expect_known_value(xcms::chromPeaks(XCMS3ImpEP), testFile("ff-xcms3_import_ep"))
-    expect_known_value(xcms::chromPeaks(XCMS3ImpKPIC2), testFile("ff-xcms3_import_kpic2"))
-    expect_known_value(xcms::chromPeaks(XCMS3ImpSIRIUS), testFile("ff-xcms3_import_sirius"))
+    # expect_known_val(xcms::chromPeaks(XCMS3ImpXCMS), "ff-xcms3_import_xcms")
+    expect_known_val(xcms::chromPeaks(XCMS3ImpXCMS3), "ff-xcms3_import_xcms3")
+    expect_known_val(xcms::chromPeaks(XCMS3ImpOpenMS), "ff-xcms3_import_openms")
+    expect_known_val(xcms::chromPeaks(XCMS3ImpEP), "ff-xcms3_import_ep")
+    expect_known_val(xcms::chromPeaks(XCMS3ImpKPIC2), "ff-xcms3_import_kpic2")
+    expect_known_val(xcms::chromPeaks(XCMS3ImpSIRIUS), "ff-xcms3_import_sirius")
     
     # expect_equal(featMZs(importFeatures(XCMS3ImpXCMS, "xcms3", anaInfoOne)), featMZs(ffXCMS))
     expect_equal(featMZs(importFeatures(XCMS3ImpXCMS3, "xcms3", anaInfoOne)), featMZs(ffXCMS3))
@@ -394,7 +392,7 @@ test_that("Sets functionality", {
                  ffOpenMS[[1]]$mz)
     expect_equal(patRoon:::calculateMasses(ffOpenMS[[1]]$mz, as.adduct("[M+H]+"), "mz"), ffOpenMS[[1]]$ion_mz)
     expect_equal(analysisInfo(unset(ffOpenMS, "positive"), TRUE), getTestAnaInfoPos())
-    expect_equivalent(analysisInfo(ffOpenMS[, sets = "positive"])[, -"set"], getTestAnaInfoPos())
+    expect_equal(analysisInfo(ffOpenMS[, sets = "positive"])[, -"set"], getTestAnaInfoPos(), ignore_attr = TRUE)
     expect_equal(unique(ffOpenMS[[1]]$adduct), "[M+H]+")
     expect_equal(sets(filter(ffOpenMS, sets = "positive", negate = TRUE)), "negative")
     expect_length(ffOpenMS[, sets = character()], 0)

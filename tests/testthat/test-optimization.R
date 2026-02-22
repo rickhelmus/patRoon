@@ -2,8 +2,6 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-context("optimization")
-
 initXCMS()
 library(Biobase) # BUG: needed by XCMS with futures...
 
@@ -63,39 +61,39 @@ expInfoPrepForComp <- function(...)
 }
 
 test_that("verify feature optimization output", {
-    expect_known_value(expInfoPrepForComp(ffOptOpenMS, 1, 1), testFile("ff-opt-oms"))
-    # expect_known_show(ffOptOpenMS, testFile("ff-opt-oms-show", text = TRUE))
+    expect_known_val(expInfoPrepForComp(ffOptOpenMS, 1, 1), "ff-opt-oms")
+    # expect_known_show(ffOptOpenMS, "ff-opt-oms-show")
 
-    # expect_known_value(expInfoPrepForComp(ffOptXCMS, 1, 1), testFile("ff-opt-xcms"))
-    # expect_known_show(ffOptXCMS, testFile("ff-opt-xcms-show", text = TRUE))
+    # expect_known_val(expInfoPrepForComp(ffOptXCMS, 1, 1), "ff-opt-xcms")
+    # expect_known_show(ffOptXCMS, "ff-opt-xcms-show")
 
     expect_length(ffOptEmpty, 1)
 
     skip_if(utils::packageVersion("xcms") < "3.10") # output changed a little with 3.10
-    expect_known_value(expInfoPrepForComp(ffOptXCMS3, 1, 1), testFile("ff-opt-xcms3"))
-    # expect_known_show(ffOptXCMS3, testFile("ff-opt-xcms3-show", text = TRUE))
+    expect_known_val(expInfoPrepForComp(ffOptXCMS3, 1, 1), "ff-opt-xcms3")
+    # expect_known_show(ffOptXCMS3, "ff-opt-xcms3-show")
     
     # disabling parallelization slightly changes the output, as this is only for coverage testing we simply skip this check
     skip_if(!doPar)
-    expect_known_value(expInfoPrepForComp(ffOptKPIC2, 1, 1), testFile("ff-opt-kpic2"))    
-    expect_known_value(expInfoPrepForComp(ffOptEnviPick, 1, 1), testFile("ff-opt-ep"))
-    # expect_known_show(ffOptEnviPick, testFile("ff-opt-ep-show", text = TRUE))
+    expect_known_val(expInfoPrepForComp(ffOptKPIC2, 1, 1), "ff-opt-kpic2")    
+    expect_known_val(expInfoPrepForComp(ffOptEnviPick, 1, 1), "ff-opt-ep")
+    # expect_known_show(ffOptEnviPick, "ff-opt-ep-show")
 })
 
 test_that("verify feature group optimization output", {
-    expect_known_value(expInfoPrepForComp(fgOptOpenMS, 1, 1), testFile("fg-opt-oms"))
-    # expect_known_show(fgOptOpenMS, testFile("fg-opt-oms-show", text = TRUE))
+    expect_known_val(expInfoPrepForComp(fgOptOpenMS, 1, 1), "fg-opt-oms")
+    # expect_known_show(fgOptOpenMS, "fg-opt-oms-show")
 
-    # expect_known_value(expInfoPrepForComp(fgOptXCMS, 1, 1), testFile("fg-opt-xcms"))
-    # expect_known_show(fgOptXCMS, testFile("fg-opt-xcms-show", text = TRUE))
+    # expect_known_val(expInfoPrepForComp(fgOptXCMS, 1, 1), "fg-opt-xcms")
+    # expect_known_show(fgOptXCMS, "fg-opt-xcms-show")
     
     skip_if(utils::packageVersion("xcms") < "4.2") # output changed a little
-    expect_known_value(expInfoPrepForComp(fgOptXCMS3, 1, 1), testFile("fg-opt-xcms3"))
-    # expect_known_show(fgOptXCMS3, testFile("fg-opt-xcms3-show", text = TRUE))
+    expect_known_val(expInfoPrepForComp(fgOptXCMS3, 1, 1), "fg-opt-xcms3")
+    # expect_known_show(fgOptXCMS3, "fg-opt-xcms3-show")
     
     # disabling parallelization slightly changes the output, as this is only for coverage testing we simply skip this check
     skip_if(!doPar)
-    expect_known_value(expInfoPrepForComp(fgOptKPIC2, 1, 1), testFile("fg-opt-kpic2"))
+    expect_known_val(expInfoPrepForComp(fgOptKPIC2, 1, 1), "fg-opt-kpic2")
 })
 
 test_that("default param generators", {
@@ -216,12 +214,12 @@ if (verifyWithIPO)
 test_that("IPO verification", {
     skip_if_not(verifyWithIPO)
 
-    expect_equivalent(IPOOptParamsFeat, ownOptParamsFeat)
-    expect_equivalent(unname(IPOResultFeat$best_settings$result[-1]),
+    expect_equal(IPOOptParamsFeat, ownOptParamsFeat)
+    expect_equal(unname(IPOResultFeat$best_settings$result[-1]),
                       as.vector(scores(ownResultFeat), mode = "numeric"))
 
-    expect_equivalent(IPOOptParamsGroup, ownOptParamsGroup)
+    expect_equal(IPOOptParamsGroup, ownOptParamsGroup)
     # not present at IPO doesn't store best. Should be in first experiment for the test case.
-    expect_equivalent(IPOResultGroup[[1]]$max_settings,
+    expect_equal(IPOResultGroup[[1]]$max_settings,
                       experimentInfo(ownResultGroup, 1, 1)$max_settings)
 })

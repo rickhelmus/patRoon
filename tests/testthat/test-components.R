@@ -2,14 +2,6 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-context("components")
-
-getClustObjForCompare <- function(obj)
-{
-    # BUG: testthat suddenly cannot compare distance matrices, so focus on other slots...
-    list(obj@clust, obj@cutClusters, obj@gInfo, obj@properties, obj@altered, obj@componentInfo, obj@components)
-}
-
 # take a blank and standard to have two different replicates
 # set localMZRange=0 to keep isotopes
 fGroups <- getTestFGroups(getTestAnaInfoComponents(), localMZRange = 0)
@@ -43,14 +35,14 @@ compsEmpty2 <- componentsSet(algorithm = "none2", componentInfo = data.table())
 test_that("components generation works", {
     # For RC/CAM: don't store their internal objects as they contain irreproducible file names
     # For RC: don't check attributes as they seem irreproducible
-    expect_known_value(list(componentTable(compsRC), componentInfo(compsRC)), testFile("components-rc"),
-                       check.attributes = FALSE, tolerance = 0.00001)
-    expect_known_value(list(componentTable(compsCAM), componentInfo(compsCAM)), testFile("components-cam"))
-    expect_known_value(compsNT, testFile("components-nt"))
+    expect_known_val(list(componentTable(compsRC), componentInfo(compsRC)), "components-rc",
+                       ignore_attr = TRUE, tolerance = 0.00001)
+    expect_known_val(list(componentTable(compsCAM), componentInfo(compsCAM)), "components-cam")
+    expect_known_val(compsNT, "components-nt")
     # BUG: testthat suddenly cannot compare distance matrices, so use ADT for reference
-    expect_known_value(getClustObjForCompare(compsInt), testFile("components-int"))
-    expect_known_value(getClustObjForCompare(compsSpec), testFile("components-spec"))
-    expect_known_value(compsOpenMS, testFile("components-om"))
+    expect_known_val(compsInt, "components-int")
+    expect_known_val(compsSpec, "components-spec")
+    expect_known_val(compsOpenMS, "components-om")
 
     expect_length(compsEmpty, 0)
     expect_length(generateComponents(fGroupsEmpty, "ramclustr"), 0)
@@ -67,37 +59,37 @@ test_that("components generation works", {
     expect_equal(min(componentInfo(compsOpenMSMS)$size), 3)
     
     # NOTE: can't compare cliqueMS data as it has environments in them that change
-    expect_known_value(list(componentTable(compsClMS), componentInfo(compsClMS)), testFile("components-cm"))
+    expect_known_val(list(componentTable(compsClMS), componentInfo(compsClMS)), "components-cm")
 
     expect_lt(min(as.data.table(compsClMSNoAB)$adduct_abundance, na.rm = TRUE),
               min(as.data.table(compsClMS)$adduct_abundance, na.rm = TRUE))
 })
 
 test_that("verify components show", {
-    expect_known_show(compsRC, testFile("components-rc", text = TRUE))
-    expect_known_show(compsCAM, testFile("components-cam", text = TRUE))
-    expect_known_show(compsInt, testFile("components-int", text = TRUE))
-    expect_known_show(compsSpec, testFile("components-spec", text = TRUE))
-    expect_known_show(compsOpenMS, testFile("components-om", text = TRUE))
+    expect_known_show(compsRC, "components-rc")
+    expect_known_show(compsCAM, "components-cam")
+    expect_known_show(compsInt, "components-int")
+    expect_known_show(compsSpec, "components-spec")
+    expect_known_show(compsOpenMS, "components-om")
     
-    expect_known_show(compsClMS, testFile("components-cm", text = TRUE))
+    expect_known_show(compsClMS, "components-cm")
 })
 
 test_that("basic subsetting", {
     expect_length(compsRC["nope"], 0)
-    expect_equivalent(names(compsRC[1:2]), names(compsRC)[1:2])
-    expect_equivalent(names(compsRC[names(compsRC)[1:2]]), names(compsRC)[1:2])
-    expect_equivalent(names(compsRC[c(FALSE, TRUE)]), names(compsRC)[c(FALSE, TRUE)])
-    expect_equivalent(groupNames(compsRC[, 1:2]), groupNames(compsRC)[1:2])
-    expect_equivalent(groupNames(compsRC[, groupNames(compsRC)[2:3]]), groupNames(compsRC)[2:3])
-    expect_equivalent(groupNames(compsRC[, c(FALSE, TRUE)]), groupNames(compsRC)[c(FALSE, TRUE)])
+    expect_equal(names(compsRC[1:2]), names(compsRC)[1:2])
+    expect_equal(names(compsRC[names(compsRC)[1:2]]), names(compsRC)[1:2])
+    expect_equal(names(compsRC[c(FALSE, TRUE)]), names(compsRC)[c(FALSE, TRUE)])
+    expect_equal(groupNames(compsRC[, 1:2]), groupNames(compsRC)[1:2])
+    expect_equal(groupNames(compsRC[, groupNames(compsRC)[2:3]]), groupNames(compsRC)[2:3])
+    expect_equal(groupNames(compsRC[, c(FALSE, TRUE)]), groupNames(compsRC)[c(FALSE, TRUE)])
     expect_equal(length(compsRC[FALSE]), 0)
     expect_length(compsEmpty[1:5], 0)
 
-    expect_equivalent(compsRC[[1, 1]], componentTable(compsRC)[[1]][group == groupNames(compsRC)[1]])
-    expect_equivalent(compsRC[[names(compsRC)[1], groupNames(compsRC)[1]]], componentTable(compsRC)[[1]][group == groupNames(compsRC)[1]])
-    expect_equivalent(compsRC[[2]], componentTable(compsRC)[[2]])
-    expect_equivalent(callDollar(compsRC, names(compsRC)[3]), compsRC[[3]])
+    expect_equal(compsRC[[1, 1]], componentTable(compsRC)[[1]][group == groupNames(compsRC)[1]])
+    expect_equal(compsRC[[names(compsRC)[1], groupNames(compsRC)[1]]], componentTable(compsRC)[[1]][group == groupNames(compsRC)[1]])
+    expect_equal(compsRC[[2]], componentTable(compsRC)[[2]])
+    expect_equal(callDollar(compsRC, names(compsRC)[3]), compsRC[[3]])
 })
 
 test_that("delete and filter", {
@@ -135,9 +127,9 @@ test_that("delete and filter", {
     expect_lt(length(groupNames(filter(compsRC, adducts = "[M+H]+"))), length(groupNames(compsRC)))
     expect_true(all(sapply(componentTable(filter(compsRC, adducts = "[M+H]+")),
                            function(cmp) all(!is.na(cmp$adduct_ion) & cmp$adduct_ion == "[M+H]+"))))
-    expect_equivalent(filter(compsRC, adducts = FALSE, negate = FALSE),
+    expect_equal(filter(compsRC, adducts = FALSE, negate = FALSE),
                       filter(compsRC, adducts = TRUE, negate = TRUE))
-    expect_equivalent(filter(compsRC, adducts = TRUE, negate = TRUE),
+    expect_equal(filter(compsRC, adducts = TRUE, negate = TRUE),
                       filter(compsRC, adducts = FALSE, negate = FALSE))
     expect_setequal(groupNames(compsRC),
                     c(groupNames(filter(compsRC, adducts = "[M+H]+")),
@@ -150,9 +142,9 @@ test_that("delete and filter", {
     expect_lt(length(groupNames(filter(compsRC, isotopes = 0:1))), length(groupNames(compsRC)))
     expect_true(all(sapply(componentTable(filter(compsRC, isotopes = 0)),
                            function(cmp) all(!is.na(cmp$isonr) & cmp$isonr == 0))))
-    expect_equivalent(filter(compsRC, isotopes = FALSE, negate = FALSE),
+    expect_equal(filter(compsRC, isotopes = FALSE, negate = FALSE),
                       filter(compsRC, isotopes = TRUE, negate = TRUE))
-    expect_equivalent(filter(compsRC, isotopes = TRUE, negate = TRUE),
+    expect_equal(filter(compsRC, isotopes = TRUE, negate = TRUE),
                       filter(compsRC, isotopes = FALSE, negate = FALSE))
     expect_setequal(groupNames(compsRC),
                     c(groupNames(filter(compsRC, isotopes = 0)),
@@ -173,7 +165,7 @@ test_that("delete and filter", {
 test_that("basic usage works", {
     expect_equal(length(unique(as.data.table(compsCAM)$name)), length(compsCAM))
 
-    expect_equivalent(findFGroup(compsCAM, compsCAM[[3]]$group[3])[1], 3) # take element [1]: sets give 2 results
+    expect_equal(findFGroup(compsCAM, compsCAM[[3]]$group[3])[1], 3, ignore_attr = TRUE) # take element [1]: sets give 2 results
     expect_length(findFGroup(compsCAM, "none"), 0)
     expect_length(findFGroup(compsEmpty, "1"), 0)
 })
@@ -184,8 +176,8 @@ test_that("consensus works", {
 })
 
 test_that("clustered components", {
-    expect_equivalent(length(treeCut(compsInt, k = 5)), 5)
-    expect_equivalent(treeCutDynamic(compsInt), compsInt)
+    expect_equal(length(treeCut(compsInt, k = 5)), 5)
+    expect_equal(treeCutDynamic(compsInt), compsInt)
     expect_setequal(groupNames(compsSpec), groupNames(filter(plists, withMSMS = TRUE)))
 })
 
@@ -325,10 +317,9 @@ test_that("IMS tests", {
     
     fGroupsDMA <- getTestFGroupsIMSDMA()[, 1:50]
     compsIMSDMA <- generateComponents(fGroupsDMA, "intclust", average = FALSE)
-    expect_equal(getClustObjForCompare(compsIMSDMA), getClustObjForCompare(expandForIMS(compsIMSDMA, fGroupsDMA)))
+    expect_equal(compsIMSDMA, expandForIMS(compsIMSDMA, fGroupsDMA))
     
-    expect_equal(getClustObjForCompare(expComps),
-                 getClustObjForCompare(generateComponents(fGroupsAM, "intclust", average = FALSE, IMS = F)))
+    expect_equal(expComps, generateComponents(fGroupsAM, "intclust", average = FALSE, IMS = FALSE))
     
     expect_error(expandForIMS(compsIMS, fGroupsAM[, IMS = FALSE]), "No mobilities")
     expect_error(expandForIMS(compsRC, fGroupsSimple), "not supported for this class")

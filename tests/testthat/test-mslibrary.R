@@ -2,8 +2,6 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-context("MS library")
-
 peakCount <- function(msl) sum(sapply(spectra(msl), nrow))
 
 mslibraryMSP <- loadMSLibrary(getMSLibMSPPath(), "msp")
@@ -19,10 +17,10 @@ loadMSPFileWithoutField <- function(field, ...)
 }
 
 test_that("verify library loading", {
-    expect_known_value(mslibraryMSP, testFile("mslibrary-msp"))
-    expect_known_value(mslibraryJSON, testFile("mslibrary-json"))
-    expect_known_show(mslibraryMSP, testFile("mslibrary-msp", text = TRUE))
-    expect_known_show(mslibraryJSON, testFile("mslibrary-json", text = TRUE))
+    expect_known_val(mslibraryMSP, "mslibrary-msp")
+    expect_known_val(mslibraryJSON, "mslibrary-json")
+    expect_known_show(mslibraryMSP, "mslibrary-msp")
+    expect_known_show(mslibraryJSON, "mslibrary-json")
 
     expect_length(loadMSLibrary(emptyFile, "msp"), 0)
     expect_length(loadMSLibrary(emptyFile, "json"), 0)

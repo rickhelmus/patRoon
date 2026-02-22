@@ -5,7 +5,7 @@ library(patRoon)
 # initialization
 # -------------------------
 
-workPath <- "test_temp/test-np/annotations-compounds_ims_conv_pred"
+workPath <- "<WORK_PATH>/test-np/annotations-compounds_ims_conv_pred"
 setwd(workPath)
 
 # NOTE: please set to a valid data.frame with analysis information. See ?`analysis-information` for more details.

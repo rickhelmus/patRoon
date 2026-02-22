@@ -5,12 +5,12 @@ library(patRoon)
 # initialization
 # -------------------------
 
-workPath <- "test_temp/test-np/analysis-tab_R_both"
+workPath <- "<WORK_PATH>/test-np/analysis-tab_R_both"
 setwd(workPath)
 
 # Load analysis table
-anaInfoPos <- eval(parse("test_temp/test-np/analysis-tab_R_both/analyses-pos.R"))
-anaInfoNeg <- eval(parse("test_temp/test-np/analysis-tab_R_both/analyses-neg.R"))
+anaInfoPos <- eval(parse("<WORK_PATH>/test-np/analysis-tab_R_both/analyses-pos.R"))
+anaInfoNeg <- eval(parse("<WORK_PATH>/test-np/analysis-tab_R_both/analyses-neg.R"))
 
 # -------------------------
 # features

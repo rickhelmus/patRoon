@@ -22,7 +22,8 @@ withr::local_options(list(
     patRoon.MP.logPath = FALSE,
     patRoon.MS.backends = c("mzr", "mstoolkit"),
     pkg.build_extra_flags = FALSE,
-    patRoon.progress.opts = list(style = 1)
+    patRoon.progress.opts = list(style = 1),
+    patRoon.MP.maxProcs = Sys.getenv("PATROON_MP_MAXPROCS", getOption("patRoon.MP.maxProcs", 2L))
 ), .local_envir = teardown_env())
 
 if (nzchar(Sys.getenv("PATROON_OPENMS")))

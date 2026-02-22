@@ -2,6 +2,9 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
+if (testthat:::on_ci())
+    withr::local_options(list(patRoon.MP.maxProcs = 1L)) # limit parallelism to avoid RAM issues on CI
+
 fGroups <- getCompFGroups()
 
 plists <- generateMSPeakLists(fGroups)

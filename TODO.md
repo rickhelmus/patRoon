@@ -128,6 +128,7 @@
 - handbook
     - installation
         - verify R installation table when new deps in patRoonDeps are added
+        - mention that for dev PKG_BUILD_EXTRA_FLAGS/pkg.build_extra_flags should be disabled
 - add refs to paper: piek, assignMobilities(), peakParams, greedy, IMSCollapse
 
 ## NEWS

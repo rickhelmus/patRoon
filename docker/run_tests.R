@@ -3,8 +3,10 @@
 
 install.packages(c("devtools", "vdiffr"))
 
+# NOTE: these things need to be set as env vars since parallel testthat seems to ignore options() and .Rprofile
 Sys.setenv(TESTTHAT_CPUS = 4)
 Sys.setenv(PATROON_MP_MAXPROCS = 2)
+Sys.setenv(PKG_BUILD_EXTRA_FLAGS = "false")
 
 # return failure exit code when tests fail: https://github.com/r-lib/testthat/issues/515
 tret <- as.data.frame(devtools::test(reporter = testthat::MultiReporter$new(list(testthat::SummaryReporter$new(),

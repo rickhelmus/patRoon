@@ -10,7 +10,7 @@ jobs:
     build:
         machine:
             image: ubuntu-2004:current
-        resource_class: large
+        resource_class: xlarge.gen2
         <<: *set_dock_env
         steps:
             - checkout
@@ -29,7 +29,7 @@ jobs:
     test:
         machine:
             image: ubuntu-2004:current
-        resource_class: large
+        resource_class: xlarge.gen2
         <<: *set_dock_env
         steps:
             - run:
@@ -61,7 +61,7 @@ jobs:
     docs:
         machine:
             image: ubuntu-2004:current
-        resource_class: large
+        resource_class: xlarge.gen2
         <<: *set_dock_env
         steps:
             - checkout
@@ -88,7 +88,7 @@ jobs:
     cov:
         machine:
             image: ubuntu-2004:current
-        resource_class: large
+        resource_class: xlarge.gen2
         <<: *set_dock_env
         steps:
             - checkout
@@ -105,7 +105,7 @@ jobs:
     deps:
         machine:
             image: ubuntu-2004:current
-        resource_class: large
+        resource_class: xlarge.gen2
         environment:
             DOCKER_BUILDKIT: 1
             BUILDKIT_PROGRESS: plain

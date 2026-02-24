@@ -9,8 +9,8 @@ version: 2.1
 jobs:
     build:
         machine:
-            image: ubuntu-2404:current
-        resource_class: large.gen2
+            image: ubuntu-2004:current
+        resource_class: large
         <<: *set_dock_env
         steps:
             - checkout
@@ -28,8 +28,8 @@ jobs:
                     docker push "${IMAGE_NAME}:${git_sha}-${CIRCLE_BRANCH}"
     test:
         machine:
-            image: ubuntu-2404:current
-        resource_class: large.gen2
+            image: ubuntu-2004:current
+        resource_class: large
         <<: *set_dock_env
         steps:
             - run:
@@ -60,8 +60,8 @@ jobs:
                     fi
     docs:
         machine:
-            image: ubuntu-2404:current
-        resource_class: large.gen2
+            image: ubuntu-2004:current
+        resource_class: large
         <<: *set_dock_env
         steps:
             - checkout
@@ -87,8 +87,8 @@ jobs:
                     git push origin ${CIRCLE_BRANCH}
     cov:
         machine:
-            image: ubuntu-2404:current
-        resource_class: large.gen2
+            image: ubuntu-2004:current
+        resource_class: large
         <<: *set_dock_env
         steps:
             - checkout
@@ -104,8 +104,8 @@ jobs:
                     docker run -e CODECOV_TOKEN -e GITHUB_PAT -e CI -e CIRCLECI -e CIRCLE_BRANCH -e CIRCLE_BUILD_NUM -e CIRCLE_PROJECT_USERNAME -e CIRCLE_PROJECT_REPONAME -e CIRCLE_PR_NUMBER -e CIRCLE_SHA1 --name patroon -t "${IMAGE_NAME}:${git_sha}-${CIRCLE_BRANCH}" /bin/bash -c "cd patRoon; Rscript docker/run_covr.R"
     deps:
         machine:
-            image: ubuntu-2404:current
-        resource_class: large.gen2
+            image: ubuntu-2004:current
+        resource_class: large
         environment:
             DOCKER_BUILDKIT: 1
             BUILDKIT_PROGRESS: plain

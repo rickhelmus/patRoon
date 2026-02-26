@@ -168,7 +168,7 @@ Rcpp::IntegerVector getGroupIDs(const Rcpp::NumericVector &featRTs, const Rcpp::
                                weightsList["intensity"]);
     Rcpp::IntegerVector ret(featRTs.size(), -1);
     int curGroup = 0;
-    const auto intSortedInds = getSortedInds(ints, [&ints](size_t i, size_t j) { return ints[i] > ints[j]; });
+    const auto intSortedInds = getSortedInds(ints, false);
     const auto mzSortedInds = getSortedInds(featMZs);
     
     for (size_t i=0; i<intSortedInds.size(); ++i)
@@ -204,7 +204,8 @@ Rcpp::IntegerVector getGroupIDs(const Rcpp::NumericVector &featRTs, const Rcpp::
         }
         
         std::sort(tentativeGroup.begin(), tentativeGroup.end(),
-            [&ints](const Feature &a, const Feature &b) { return ints[a.featID] > ints[b.featID]; });
+            [&ints](const Feature &a, const Feature &b)
+            { return std::tie(ints[a.featID], a.featID) > std::tie(ints[b.featID], b.featID); });
         
         const auto bestGroup = getBestGroup(tentativeGroup, rtWindow, mzWindow, mobWindow, weights);
         if (bestGroup.empty())

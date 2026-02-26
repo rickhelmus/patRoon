@@ -48,7 +48,7 @@ void SpectrumRaw::sort(SpectrumRawTypes::MSSortType stype)
     {
         return std::tie(mobilities[i], mzs[i]) < std::tie(mobilities[j], mzs[j]);
     };
-    const auto sortedInds = (stype == SpectrumRawTypes::MSSortType::MZ) ? getSortedInds(mzs) : getSortedInds(mzs, mobMZLT);
+    const auto sortedInds = (stype == SpectrumRawTypes::MSSortType::MZ) ? getSortedInds(mzs) : getSortedInds2D(mzs, mobilities);
     
     std::vector<SpectrumRawTypes::Mass> sortedMZs(mzs.size());
     std::vector<SpectrumRawTypes::Intensity> sortedInts(intensities.size());

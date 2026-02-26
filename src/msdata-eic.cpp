@@ -797,7 +797,6 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         // NOTE: also sort by m/z and mobility to ensure that the order is not affected by eg the inclusion of EICs with
         // different ranges. It was observed that two mass peaks with the same intensity could affect the basepeak
         // assignment by inconsistent ordering.
-        // UNDONE: maybe stable sort would be an alternative?
         const auto sortedInds = (anySpecHasMob) ?
             getSortedInds3D(allPeaksSorted.indices.cbegin() + startInd, allPeaksSorted.indices.cbegin() + endInd,
                             allPeaksSorted.mzs.cbegin() + startInd, allPeaksSorted.mobilities.cbegin() + startInd) :

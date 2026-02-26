@@ -660,7 +660,7 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         return specf;
     };
     
-    SimpleTimer timer(true);
+    SimpleTimer timer(false);
     
     // get scan selections: if EICCount is small, we minimize them to save file reads. For larger counts, we just read
     // the full min/max time range, as figuring out the specifics will take relatively long

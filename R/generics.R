@@ -50,7 +50,7 @@ setGeneric("getFeatureEIXs", function(obj, type, ...) standardGeneric("getFeatur
 
 setGeneric("getKeptXCMSPeakInds", function(old, new, xd) standardGeneric("getKeptXCMSPeakInds"))
 
-setGeneric("initMSReadBackend", function(backend) standardGeneric("initMSReadBackend"))
+setGeneric("initMSReadBackend", function(backend, genMobilities) standardGeneric("initMSReadBackend"))
 
 ### Features and feature groups
 

@@ -39,13 +39,15 @@ template <typename C> std::vector<size_t> getSortedInds(const C &cont, bool asce
     std::iota(ret.begin(), ret.end(), 0);
     if (ascending)
     {
-        std::sort(ret.begin(), ret.end(), [&](size_t i, size_t j)
-        { return std::tie(cont[i], i) < std::tie(cont[j], j); });
+        /*std::sort(ret.begin(), ret.end(), [&](size_t i, size_t j)
+        { return std::tie(cont[i], i) < std::tie(cont[j], j); });*/
+         std::stable_sort(ret.begin(), ret.end(), [&](size_t i, size_t j) { return cont[i] < cont[j]; });
     }
     else
     {
-        std::sort(ret.begin(), ret.end(), [&](size_t i, size_t j)
-        { return std::tie(cont[i], i) > std::tie(cont[j], j); });
+        /*std::sort(ret.begin(), ret.end(), [&](size_t i, size_t j)
+        { return std::tie(cont[i], i) > std::tie(cont[j], j); });*/
+        std::stable_sort(ret.begin(), ret.end(), [&](size_t i, size_t j) { return cont[i] > cont[j]; });
     }
     return ret;
 }
@@ -65,8 +67,9 @@ template <typename IT> std::vector<size_t> getSortedInds(const IT &start, const 
 {
     std::vector<size_t> ret(std::distance(start, end + 1));
     std::iota(ret.begin(), ret.end(), 0);
-    std::sort(ret.begin(), ret.end(), [&](size_t i, size_t j)
-    { return std::tie(*(start + i), i) < std::tie(*(start + j), j); });
+    /*std::sort(ret.begin(), ret.end(), [&](size_t i, size_t j)
+    { return std::tie(*(start + i), i) < std::tie(*(start + j), j); });*/
+    std::stable_sort(ret.begin(), ret.end(), [&](size_t i, size_t j) { return *(start + i) < *(start + j); });
     return ret;
 }
 

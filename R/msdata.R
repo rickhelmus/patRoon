@@ -173,7 +173,7 @@ createMSBackend <- function(backendName)
                   mstoolkit = new(MSReadBackendMSTK)))
 }
 
-setMSReadBackendMetadata <- function(backend, fileHash, generator, cacheDB = NULL)
+setMSReadBackendMetadata <- function(backend, fileHash, genMobilities, generator, cacheDB = NULL)
 {
     # NOTE: include class name in hash in case different backends generate different metadata for the same file
     hash <- makeHash(class(backend), fileHash)
@@ -187,7 +187,7 @@ setMSReadBackendMetadata <- function(backend, fileHash, generator, cacheDB = NUL
     
     setSpecMetadata(backend, meta$MS1, meta$MS2)
     
-    if (backend$getNeedType() == "ims")
+    if (genMobilities)
     {
         mobilities <- loadCacheData("MSReadBackendMobilities", hash, cacheDB)
         if (is.null(mobilities))
@@ -201,11 +201,11 @@ setMSReadBackendMetadata <- function(backend, fileHash, generator, cacheDB = NUL
     return(backend)
 }
 
-setMethod("initMSReadBackend", "Rcpp_MSReadBackendOTIMS", function(backend)
+setMethod("initMSReadBackend", "Rcpp_MSReadBackendOTIMS", function(backend, genMobilities)
 {
     fileHash <- getMSDataFileHash(file.path(backend$getCurrentFile(), "analysis.tdf_bin"))
     
-    setMSReadBackendMetadata(backend, fileHash, function()
+    setMSReadBackendMetadata(backend, fileHash, genMobilities, function()
     {
         TIMSDB <- withr::local_db_connection(DBI::dbConnect(RSQLite::SQLite(),
                                                             file.path(backend$getCurrentFile(), "analysis.tdf")))
@@ -277,7 +277,7 @@ setMethod("initMSReadBackend", "Rcpp_MSReadBackendOTIMS", function(backend)
     })
 })
 
-setMethod("initMSReadBackend", "Rcpp_MSReadBackendMem", function(backend)
+setMethod("initMSReadBackend", "Rcpp_MSReadBackendMem", function(backend, genMobilities)
 {
     path <- backend$getCurrentFile()
     hash <- getMSDataFileHash(path)
@@ -285,7 +285,7 @@ setMethod("initMSReadBackend", "Rcpp_MSReadBackendMem", function(backend)
     
     hd <- NULL # might be set below, so we don't need to load it twice
     
-    backend <- setMSReadBackendMetadata(backend, hash, function()
+    backend <- setMSReadBackendMetadata(backend, hash, genMobilities, function()
     {
         msf <- mzR::openMSfile(path)
         hd <<- as.data.table(mzR::header(msf))
@@ -331,29 +331,29 @@ setMethod("initMSReadBackend", "Rcpp_MSReadBackendMem", function(backend)
     return(backend)
 })
 
-setMethod("initMSReadBackend", "Rcpp_MSReadBackendSC", function(backend)
+setMethod("initMSReadBackend", "Rcpp_MSReadBackendSC", function(backend, genMobilities)
 {
-    setMSReadBackendMetadata(backend, getMSDataFileHash(backend$getCurrentFile()), function()
+    setMSReadBackendMetadata(backend, getMSDataFileHash(backend$getCurrentFile()), genMobilities, function()
     {
         backend$generateSpecMetadata()
         return(list(MS1 = getMSMetadata(backend, 1), MS2 = getMSMetadata(backend, 2)))
     })
 })
 
-setMethod("initMSReadBackend", "Rcpp_MSReadBackendMSTK", function(backend)
+setMethod("initMSReadBackend", "Rcpp_MSReadBackendMSTK", function(backend, genMobilities)
 {
-    setMSReadBackendMetadata(backend, getMSDataFileHash(backend$getCurrentFile()), function()
+    setMSReadBackendMetadata(backend, getMSDataFileHash(backend$getCurrentFile()), genMobilities, function()
     {
         backend$generateSpecMetadata()
         return(list(MS1 = getMSMetadata(backend, 1), MS2 = getMSMetadata(backend, 2)))
     })
 })
 
-openMSReadBackend <- function(backend, path)
+openMSReadBackend <- function(backend, path, genMobilities = FALSE)
 {
     setOMPThreads()
     backend$open(path)
-    backend <- initMSReadBackend(backend)
+    backend <- initMSReadBackend(backend, genMobilities)
     return(backend)
 }
 

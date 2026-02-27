@@ -301,7 +301,7 @@ doGetEIMs <- function(anaInfo, EIMInfoList, minIntensity, smooth, smLength, sgOr
 
         ToDo <- EIMInfo[isCached == FALSE]
         
-        openMSReadBackend(backend, path)
+        openMSReadBackend(backend, path, getMobilities = TRUE)
         
         # NOTE: getEIMList() return lists, which are converted to data.frames and is a lot faster than returning
         # data.frames directly.

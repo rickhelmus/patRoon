@@ -348,7 +348,7 @@ expect_known_val <- function(object, file, tolerance = 1E-8, ...)
     else
     {
         ref <- readRDS(file)
-        cmp <- waldo::compare(ref, object, tolerance = tolerance, ...)
+        cmp <- waldo::compare(ref, object, tolerance = tolerance, max_diffs = 25, ...)
         if (length(cmp) == 0)
             pass()
         else

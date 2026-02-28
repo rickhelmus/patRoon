@@ -436,16 +436,16 @@ makeReportHTML <- function(fGroups, path = getWorkPath(), overrideSettings = lis
 
 expect_reportHTML <- function(object)
 {
+    rpFile <- getWorkPath("report.html")
+    unlink(rpFile) # in case it already exists
+    unlink(getWorkPath("report_files"), recursive = TRUE)
+    
     if (FALSE)
     {
         # UNDONE? for now just make the reports once: this saves a lot of time and this test doesn't seem _that_ useful
         # also, unsure about stability for parallel tests
         
         # generate report twice: without and with cached results
-        
-        rpFile <- getWorkPath("report.html")
-        unlink(rpFile) # in case it already exists
-        unlink(getWorkPath("report_files"), recursive = TRUE)
         
         clearCache("reportHTML") # reset cached plots
         act <- quasi_label(rlang::enquo(object))

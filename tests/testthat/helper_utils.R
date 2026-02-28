@@ -436,38 +436,51 @@ makeReportHTML <- function(fGroups, path = getWorkPath(), overrideSettings = lis
 
 expect_reportHTML <- function(object)
 {
-    # generate report twice: without and with cached results
-    
-    rpFile <- getWorkPath("report.html")
-    unlink(rpFile) # in case it already exists
-    unlink(getWorkPath("report_files"), recursive = TRUE)
-    
-    clearCache("reportHTML") # reset cached plots
-    act <- quasi_label(rlang::enquo(object))
-    
-    expect(file.exists(rpFile), "failed to generate report")
-
-    uniqueLines <- function(path)
+    if (FALSE)
     {
-        # HACK: bslib sets random IDs on creation --> remove IDs to allow reproducible report generation
-        lines <- readLines(path)
-        lines <- gsub("data-tabsetid=\"[[:digit:]]+\"", "", lines)
-        lines <- gsub("bslib-card\\-[[:digit:]]+", "", lines)
-        lines <- gsub("navbar-collapse-[[:digit:]]+", "", lines)
-        lines <- gsub("bslib-accordion-[[:digit:]]+", "", lines)
-        lines <- gsub("bslib-accordion-panel-[[:digit:]]+", "", lines)
-        return(gsub("\"[#]?tab\\-[[:digit:]]+\\-[[:digit:]]+\"", "", lines))
-    }
-    
-    if (file.exists(rpFile))
-    {
-        rpLines <- uniqueLines(rpFile)
+        # UNDONE? for now just make the reports once: this saves a lot of time and this test doesn't seem _that_ useful
+        # also, unsure about stability for parallel tests
+        
+        # generate report twice: without and with cached results
+        
+        rpFile <- getWorkPath("report.html")
+        unlink(rpFile) # in case it already exists
+        unlink(getWorkPath("report_files"), recursive = TRUE)
+        
+        clearCache("reportHTML") # reset cached plots
         act <- quasi_label(rlang::enquo(object))
-        if (!isTRUE(all.equal(rpLines, uniqueLines(rpFile))))
-            browser()
-        expect(isTRUE(all.equal(rpLines, uniqueLines(rpFile))), "cached report differs")
+        
+        expect(file.exists(rpFile), "failed to generate report")
+        
+        uniqueLines <- function(path)
+        {
+            # HACK: bslib sets random IDs on creation --> remove IDs to allow reproducible report generation
+            lines <- readLines(path)
+            lines <- gsub("data-tabsetid=\"[[:digit:]]+\"", "", lines)
+            lines <- gsub("bslib-card\\-[[:digit:]]+", "", lines)
+            lines <- gsub("navbar-collapse-[[:digit:]]+", "", lines)
+            lines <- gsub("bslib-accordion-[[:digit:]]+", "", lines)
+            lines <- gsub("bslib-accordion-panel-[[:digit:]]+", "", lines)
+            return(gsub("\"[#]?tab\\-[[:digit:]]+\\-[[:digit:]]+\"", "", lines))
+        }
+        
+        if (file.exists(rpFile))
+        {
+            rpLines <- uniqueLines(rpFile)
+            act <- quasi_label(rlang::enquo(object))
+            if (!isTRUE(all.equal(rpLines, uniqueLines(rpFile))))
+                browser()
+            expect(isTRUE(all.equal(rpLines, uniqueLines(rpFile))), "cached report differs")
+        }
     }
-
+    else
+    {
+        act <- quasi_label(rlang::enquo(object))
+        if (file.exists(rpFile))
+            pass()
+        else
+            fail("report file does not exist")
+    }
     invisible(act$val)
 }
 

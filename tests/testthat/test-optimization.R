@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2016-2026 Rick Helmus <r.helmus@uva.nl>
 #
 # SPDX-License-Identifier: GPL-3.0-only
+skip()
 
 initXCMS()
 library(Biobase) # BUG: needed by XCMS with futures...

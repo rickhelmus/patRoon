@@ -80,6 +80,7 @@ jobs:
         runs-on: windows-latest
         env:
             GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+            TESTTHAT_CPUS: 3
         name: Run tests directly
         if:  ${{ !inputs.makeBundle && inputs.doTests }}
         steps:
@@ -155,7 +156,7 @@ jobs:
         runs-on: windows-latest
         env:
             GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-            TESTTHAT_CPUS: 4
+            TESTTHAT_CPUS: 3
         name: Run tests from bundle
         if:  ${{ inputs.makeBundle && inputs.doTests }}
         steps:

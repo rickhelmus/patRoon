@@ -240,7 +240,7 @@ doGetEICs <- function(anaInfo, EICInfoList, gapFactor, minIntensityIMS = 0, mode
         {
 
             ToDo <- EICInfo[isCached == FALSE]
-            openMSReadBackend(backend, path)
+            openMSReadBackend(backend, path, genMobilities = needIMS && mode == "full")
             
             newEICs <- getEICList(backend, ToDo$mzmin, ToDo$mzmax, ToDo$retmin, ToDo$retmax, ToDo$mobmin,
                                   ToDo$mobmax, gapFactor, minIntensityIMS, mode, sumWindowMZ, sumWindowMob,

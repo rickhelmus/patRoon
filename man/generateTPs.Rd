@@ -8,7 +8,7 @@ generateTPs(algorithm, ...)
 }
 \arguments{
 \item{algorithm}{A character string describing the algorithm that should be
-used: \code{"biotransformer"}, \code{"logic"}, \code{"library"}, \code{"library_formula"}, \code{"cts"}}
+used: \code{"biotransformer"}, \code{"logic"}, \code{"library"}, \code{"library_formula"}, \code{"cts"}, \code{"ann_form"}, \code{"ann_comp"}}
 
 \item{\dots}{Any parameters to be passed to the selected TP generation algorithm.}
 }
@@ -25,8 +25,9 @@ Functionality to automatically obtain transformation products for a given set of
 }
 \seealso{
 The \code{\link{transformationProducts}} output class and its methods and the algorithm specific functions:
-  \code{\link{generateTPsBioTransformer}}, \code{\link{generateTPsLogic}}, \code{\link{generateTPsLibrary}}, \code{\link{generateTPsLibraryFormula}}, \code{\link{generateTPsCTS}}
+  \code{\link{generateTPsBioTransformer}}, \code{\link{generateTPsLogic}}, \code{\link{generateTPsLibrary}}, \code{\link{generateTPsLibraryFormula}}, \code{\link{generateTPsCTS}}, \code{\link{generateTPsAnnForm}}, \code{\link{generateTPsAnnComp}}
 
-The derived class \code{\link{transformationProductsStructure}} for more specific methods to post-process TP
-  data.
+The derived classes \code{\link{transformationProductsFormula}},
+  \code{\link{transformationProductsStructure}}, \code{\link{transformationProductsAnnForm}} and
+  \code{\link{transformationProductsAnnComp}} for more specific methods to post-process TP data.
 }

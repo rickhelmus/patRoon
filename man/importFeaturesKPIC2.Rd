@@ -4,13 +4,14 @@
 \alias{importFeaturesKPIC2}
 \title{Imports features from KPIC2}
 \usage{
-importFeaturesKPIC2(picsList, analysisInfo)
+importFeaturesKPIC2(input, analysisInfo)
 }
 \arguments{
-\item{picsList}{A \code{list} with a \code{pics} objects obtained with \code{\link[KPIC]{getPIC}} or
+\item{input}{A \code{list} with a \code{pics} objects obtained with \code{\link[KPIC]{getPIC}} or
 \code{\link[KPIC]{getPIC.kmeans}} for each analysis.}
 
-\item{analysisInfo}{A \code{data.frame} with \link[=analysis-information]{Analysis information}.}
+\item{analysisInfo}{A \code{data.frame} (or \code{data.table}) with \link[=analysis-information]{Analysis
+information}.}
 }
 \value{
 An object of a class which is derived from \code{\link{features}}.

@@ -25,7 +25,8 @@ feature) are removed prior to similarity calculation.
 
 \item \code{mzWeight},\code{intWeight} Mass and intensity weights used for cosine calculation.
 
-\item \code{absMzDev} Maximum absolute \emph{m/z} deviation between mass peaks, used for binning spectra.
+\item \code{absMzDev} Maximum absolute \emph{m/z} deviation between mass peaks, used for binning spectra. Defaults to
+\code{defaultLim("mz", "medium")} (see \link{limits}).
 
 \item \code{relMinIntensity} The minimum relative intensity for mass peaks (\samp{0-1}). Peaks with lower intensities
 are not considered for similarity calculation. The relative intensities are called after the precursor peak is

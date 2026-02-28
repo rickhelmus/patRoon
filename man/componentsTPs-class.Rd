@@ -9,7 +9,7 @@
 \alias{plotGraph,componentsTPs-method}
 \title{Components based on parent and transformation product (TP) linkage.}
 \usage{
-\S4method{as.data.table}{componentsTPs}(x)
+\S4method{as.data.table}{componentsTPs}(x, candidates = FALSE)
 
 \S4method{filter}{componentsTPs}(
   obj,
@@ -18,6 +18,8 @@
   minSpecSim = NULL,
   minSpecSimPrec = NULL,
   minSpecSimBoth = NULL,
+  minTotFragMatches = NULL,
+  minTotNLMatches = NULL,
   minFragMatches = NULL,
   minNLMatches = NULL,
   formulas = NULL,
@@ -30,19 +32,23 @@
 \arguments{
 \item{x, obj}{A \code{componentsTPs} object.}
 
+\item{candidates}{If \code{TRUE} then candidate specific tables are merged in the result table. See
+\code{\link{generateComponentsTPs}} (\verb{Result columns} section) for more details.}
+
 \item{\dots, verbose}{Further arguments passed to the base \code{\link[=filter,components-method]{filter method}}.}
 
-\item{retDirMatch}{If set to \code{TRUE}, only keep TPs for which the retention time direction (\code{retDir}, see
-Details in \link{componentsTPs}) matches with the observed direction. TPs will never be removed if the
-expected/observed direction is \samp{0} (\emph{i.e.} unknown or not significantly different than the parent).}
+\item{retDirMatch}{If set to \code{TRUE}, only keep TPs for which the \link[=retDir]{retention order direction} from
+feature group data matches that of the expected values from TP data (\code{retDir} and \code{TP_retDir} columns).
+TPs will never be removed if either of the directions is \samp{0} (\emph{i.e.} unknown or not significantly
+different than the parent).}
 
 \item{minSpecSim, minSpecSimPrec, minSpecSimBoth}{The minimum spectral similarity of a TP compared to its parent
 (\samp{0-1}). The \code{minSpecSimPrec} and \code{minSpecSimBoth} apply to binned data that is shifted with the
 \code{"precursor"} and \code{"both"} method, respectively (see \link[=specSimParams]{MS spectral similarity
 parameters} for more details). Set to \code{NULL} to ignore.}
 
-\item{minFragMatches, minNLMatches}{Minimum number of parent/TP fragment and neutral loss matches, respectively. Set
-to \code{NULL} to ignore. See the \verb{Linking parents and transformation products} section in
+\item{minTotFragMatches, minTotNLMatches, minFragMatches, minNLMatches}{Minimum number of (total) parent/TP fragment and
+neutral loss matches. Set to \code{NULL} to ignore. See the \verb{Result columns} section in
 \code{\link{generateComponentsTPs}} for more details.}
 
 \item{formulas}{A \code{\link{formulas}} object. The formula annotation data in this object is to verify if elemental
@@ -83,7 +89,11 @@ and rendered with \pkg{\link{visNetwork}}.
 
 \describe{
 \item{\code{fromTPs}}{A \code{logical} that is \code{TRUE} when the componentization was performed with
-\code{\link{transformationProducts}} data.}
+\code{\link{transformationProducts}} data (\emph{i.e.} the TPs argument was not \code{NULL}).}
+
+\item{\code{parentsFromScreening}}{A \code{logical} that is \code{TRUE} when the parents were obtained from screening data.}
+
+\item{\code{TPsFromScreening}}{A \code{logical} that is \code{TRUE} when the TPs were obtained from screening data.}
 }}
 
 \note{

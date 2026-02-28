@@ -120,6 +120,11 @@ The intensity values for components (used by \code{plotSpectrum}) are set
 When the object is altered (\emph{e.g.} by filtering or subsetting it), methods that need the original
   clustered data such as plotting methods do not work anymore and stop with an error.
 }
+\section{IMS workflows}{
+ When components are re-made by \code{\link{treeCut}} or \code{\link{treeCutDynamic}} any
+  expanded data should be re-added by calling \code{\link{expandForIMS}}.
+}
+
 \section{S4 class hierarchy}{
  \itemize{   \item{\code{\link{components}}}   \itemize{     \item{\strong{\code{\link{componentsClust}}}}     \itemize{       \item{\code{\link{componentsIntClust}}}       \item{\code{\link{componentsSpecClust}}}     }   } }
 }

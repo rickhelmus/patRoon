@@ -4,12 +4,13 @@
 \alias{importFeaturesEnviMass}
 \title{Imports features from enviMass}
 \usage{
-importFeaturesEnviMass(analysisInfo, enviProjPath)
+importFeaturesEnviMass(input, analysisInfo)
 }
 \arguments{
-\item{analysisInfo}{A \code{data.frame} with \link[=analysis-information]{Analysis information}.}
+\item{input}{The path of the enviMass project.}
 
-\item{enviProjPath}{The path of the enviMass project.}
+\item{analysisInfo}{A \code{data.frame} (or \code{data.table}) with \link[=analysis-information]{Analysis
+information}.}
 }
 \value{
 An object of a class which is derived from \code{\link{features}}.

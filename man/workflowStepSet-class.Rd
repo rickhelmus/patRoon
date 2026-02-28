@@ -46,6 +46,6 @@ with the set names.}
 }}
 
 \section{S4 class hierarchy}{
- \itemize{   \item{\strong{\code{\link{workflowStepSet}}}}   \itemize{     \item{\code{\link{componentsSet}}}     \itemize{       \item{\code{\link{componentsNTSet}}}     }     \item{\code{\link{featureGroupsScreeningSet}}}     \item{\code{\link{compoundsSet}}}     \itemize{       \item{\code{\link{compoundsConsensusSet}}}     }     \item{\code{\link{formulasSet}}}     \itemize{       \item{\code{\link{formulasConsensusSet}}}     }     \item{\code{\link{MSPeakListsSet}}}   } }
+ \itemize{   \item{\strong{\code{\link{workflowStepSet}}}}   \itemize{     \item{\code{\link{componentsSet}}}     \itemize{       \item{\code{\link{componentsNTSet}}}     }     \item{\code{\link{compoundsSet}}}     \itemize{       \item{\code{\link{compoundsConsensusSet}}}     }     \item{\code{\link{formulasSet}}}     \itemize{       \item{\code{\link{formulasConsensusSet}}}     }     \item{\code{\link{MSPeakListsSet}}}   } }
 }
 

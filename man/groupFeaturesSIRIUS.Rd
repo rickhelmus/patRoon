@@ -7,7 +7,8 @@
 groupFeaturesSIRIUS(analysisInfo, verbose = TRUE)
 }
 \arguments{
-\item{analysisInfo}{A \code{data.frame} with \link[=analysis-information]{Analysis information}.}
+\item{analysisInfo}{A \code{data.frame} (or \code{data.table}) with \link[=analysis-information]{Analysis
+information}.}
 
 \item{verbose}{if \code{FALSE} then no text output will be shown.}
 }
@@ -27,8 +28,8 @@ Finding and grouping features is done by running the \command{lcms-align} comman
   The MS files should be in the \file{mzML} or \file{mzXML} format. Furthermore, this algorithms requires the
   presence of (data-dependent) MS/MS data.
 
-The input MS data files need to be centroided. The \code{\link{convertMSFiles}} function can be used to
-  centroid data.
+The input MS data files need to be centroided. The \code{\link{convertMSFiles}} function can be used
+  to centroid data.
 }
 \references{
 \insertRef{Dhrkop2019}{patRoon}

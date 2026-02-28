@@ -11,24 +11,26 @@ generateCompoundsLibrary(fGroups, ...)
 \S4method{generateCompoundsLibrary}{featureGroups}(
   fGroups,
   MSPeakLists,
+  specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
   MSLibrary,
   minSim = 0.75,
   minAnnSim = minSim,
-  absMzDev = 0.002,
+  absMzDev = defaultLim("mz", "narrow"),
   adduct = NULL,
   checkIons = "adduct",
   spectrumType = "MS2",
-  specSimParams = getDefSpecSimParams(),
-  specSimParamsLib = getDefSpecSimParams()
+  specSimParamsLib = specSimParams,
+  minMobSpecSim = 0
 )
 
 \S4method{generateCompoundsLibrary}{featureGroupsSet}(
   fGroups,
   MSPeakLists,
+  specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
   MSLibrary,
   minSim = 0.75,
   minAnnSim = minSim,
-  absMzDev = 0.002,
+  absMzDev = defaultLim("mz", "narrow"),
   adduct = NULL,
   ...,
   setThreshold = 0,
@@ -44,6 +46,10 @@ feature groups in the subset are considered.}
 \item{\dots}{\setsWF Further arguments passed to the non-sets workflow method.}
 
 \item{MSPeakLists}{A \code{\link{MSPeakLists}} object that was generated for the supplied \code{fGroups}.}
+
+\item{specSimParams}{A named \code{list} with parameters that influence the calculation of the
+\link[=id-conf]{annotation similarity}. See the \link[=specSimParams]{spectral similarity parameters} documentation
+for more details.}
 
 \item{MSLibrary}{The \code{\link{MSLibrary}} object that should be used to find candidates.}
 
@@ -69,11 +75,16 @@ applied.}
 \item{spectrumType}{A \code{character} vector which limits library records to the given spectrum types
 (\code{Spectrum_type} field, \emph{e.g.} \code{"MS2"}). Set to \code{NULL} to allow all spectrum types.}
 
-\item{specSimParams}{A named \code{list} with parameters that influence the calculation of MS spectra similarities.
-See the \link[=specSimParams]{spectral similarity parameters} documentation for more details.}
+\item{specSimParamsLib}{Like \code{specSimParams}, but these parameters are used for the pre-treatment of library
+spectra (only the \code{removePrecursor}, \code{relMinIntensity} and \code{minPeaks} parameters are used).}
 
-\item{specSimParamsLib}{Like \code{specSimParams}, but these parameters \emph{only} influence pre-treatment of
-library spectra (only the \code{removePrecursor}, \code{relMinIntensity} and \code{minPeaks} parameters are used).}
+\item{minMobSpecSim}{\IMSWF If the spectrum similarity of a mobility feature group compared to its IMS parent (see
+\code{\link[=assignMobilities_feat]{assignMobilities}}) is at least this value, then the mobility feature group
+will not be subjected to the annotation algorithm and all feature annotation properties will be copied from its
+parent. This assumes that feature annotation is primarily influenced by the MS/MS spectrum, and can be used to
+speed up the feature annotation process. All scorings, annotation similarities etc. are copied from the IMS parent.
+The fragment annotations are also copied (\code{fragInfo} result column), however, these are adjusted based on the
+peak list data of the mobility feature group.}
 
 \item{setThreshold}{\setsWF Minimum abundance for a candidate among all sets (\samp{0-1}). For instance, a value of
 \samp{1} means that the candidate needs to be present in all the set data.}
@@ -116,6 +127,10 @@ This method matches measured MS/MS data (peak lists) with those from an MS libra
   selected from criterion #5 above may not contain all the annotation data available from the MS library, annotations
   from other records are also considered (controlled by the \code{minAnnSim} argument). If this leads to different
   annotations for the same mass peak then only the most abundant annotation is kept.
+}
+\note{
+The \code{score}, \code{libMatch} and \code{annSim} output columns are all equal and resemble the spectral
+  similarity between the experimental and library spectra.
 }
 \seealso{
 \code{\link{generateCompounds}} for more details and other algorithms.

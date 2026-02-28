@@ -11,7 +11,8 @@ generateFormulasGenForm(fGroups, ...)
 \S4method{generateFormulasGenForm}{featureGroups}(
   fGroups,
   MSPeakLists,
-  relMzDev = 5,
+  specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
+  relMzDev = defaultLim("mz", "narrow_rel"),
   adduct = NULL,
   elements = "CHNOP",
   hetero = TRUE,
@@ -21,12 +22,13 @@ generateFormulasGenForm(fGroups, ...)
   thrComb = NULL,
   maxCandidates = Inf,
   extraOpts = NULL,
-  calculateFeatures = TRUE,
+  calculateFeatures = FALSE,
   featThreshold = 0,
   featThresholdAnn = 0.75,
-  absAlignMzDev = 0.002,
+  absAlignMzDev = defaultLim("mz", "narrow"),
   MSMode = "both",
   isolatePrec = TRUE,
+  minMobSpecSim = 0,
   timeout = 120,
   topMost = 50,
   batchSize = 8
@@ -35,7 +37,8 @@ generateFormulasGenForm(fGroups, ...)
 \S4method{generateFormulasGenForm}{featureGroupsSet}(
   fGroups,
   MSPeakLists,
-  relMzDev = 5,
+  specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
+  relMzDev = defaultLim("mz", "narrow_rel"),
   adduct = NULL,
   ...,
   setThreshold = 0,
@@ -51,6 +54,10 @@ remaining feature groups in the subset are considered.}
 \item{\dots}{\setsWF Further arguments passed to the non-sets workflow method.}
 
 \item{MSPeakLists}{An \code{\link{MSPeakLists}} object that was generated for the supplied \code{fGroups}.}
+
+\item{specSimParams}{A named \code{list} with parameters that influence the calculation of the
+\link[=id-conf]{annotation similarity}. See the \link[=specSimParams]{spectral similarity parameters} documentation
+for more details.}
 
 \item{relMzDev}{Maximum relative deviation between the measured and candidate formula \emph{m/z} values (in ppm).
 Sets the \option{ppm} command line option.}
@@ -111,6 +118,16 @@ score. The value of \code{isolatePrec} should either be a \code{list} with param
 default parameters or \code{FALSE} for no isolation (\emph{e.g.} when you already performed isolation with the
 \code{filter} method). The \code{z} parameter (charge) is automatically deduced from the adduct used for annotation
 (unless \code{isolatePrec=FALSE}), hence any custom \code{z} setting is ignored.}
+
+\item{minMobSpecSim}{\IMSWF If the spectrum similarity of a mobility feature group compared to its IMS parent (see
+  \code{\link[=assignMobilities_feat]{assignMobilities}}) is at least this value, then the mobility feature group
+  will not be subjected to the annotation algorithm and all feature annotation properties will be copied from its
+  parent. This assumes that feature annotation is primarily influenced by the MS/MS spectrum, and can be used to
+  speed up the feature annotation process. All scorings, annotation similarities etc. are copied from the IMS parent.
+  The fragment annotations are also copied (\code{fragInfo} result column), however, these are adjusted based on the
+  peak list data of the mobility feature group.
+
+  This argument does not affect the annotation results for MS-only formulae.}
 
 \item{timeout}{Maximum time (in seconds) that a \command{GenForm} command is allowed to execute. If this time is
 exceeded a warning is emitted and the command is terminated. See the notes section for more information on the need

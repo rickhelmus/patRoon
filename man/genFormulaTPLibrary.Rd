@@ -20,7 +20,8 @@ be either a suspect list (see \link[=suspect-screening]{suspect screening} for m
 output of \code{\link{screenSuspects}}.}
 
 \item{transformations}{A \code{data.frame} with transformation reactions to be used for calculating the TPs (see
-details below). If \code{NULL}, a default table from Schollee \emph{et al.} is used (see references).}
+details below). If \code{NULL}, a default table from Schollee \emph{et al.} is used, that can be obtained with
+\code{\link{TPLogicTransformations}}.}
 
 \item{minMass}{The minimum mass for a TP to be kept.}
 
@@ -59,9 +60,7 @@ subtraction of elements not present in the parent.
 
   \item \code{sub} The elements that are removed by this reaction (\emph{e.g.} \code{"H2O"}).
 
-  \item \code{retDir} The expected retention time direction relative to the parent (assuming a reversed phase like LC
-  separation). Valid values are: \samp{-1} (elutes before the parent), \samp{1} (elutes after the parent) or \samp{0}
-  (no significant change or unknown).
+  \item \code{retDir} The expected \link[=retDir]{retention order direction}.
 
   }
 }
@@ -73,7 +72,7 @@ subtraction of elements not present in the parent.
 
 \section{Validating and calculating chemical properties}{
  Chemical properties such as \acronym{SMILES},
-  \acronym{InChIKey} and formula in the parent suspect list are automatically validated and calculated if missing/invalid.
+  \acronym{InChIKey} and formulae in the parent suspect list are automatically validated and calculated if missing/invalid.
 
   The internal validation/calculation process performs the following steps: \itemize{
 

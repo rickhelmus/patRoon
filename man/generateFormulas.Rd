@@ -5,9 +5,21 @@
 \alias{generateFormulas,featureGroups-method}
 \title{Automatic chemical formula generation}
 \usage{
-generateFormulas(fGroups, MSPeakLists, algorithm, ...)
+generateFormulas(
+  fGroups,
+  MSPeakLists,
+  algorithm,
+  specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
+  ...
+)
 
-\S4method{generateFormulas}{featureGroups}(fGroups, MSPeakLists, algorithm, ...)
+\S4method{generateFormulas}{featureGroups}(
+  fGroups,
+  MSPeakLists,
+  algorithm,
+  specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
+  ...
+)
 }
 \arguments{
 \item{fGroups}{\code{\link{featureGroups}} object for which formulae should be generated. This should be the same or
@@ -18,6 +30,10 @@ remaining feature groups in the subset are considered.}
 
 \item{algorithm}{A character string describing the algorithm that should be
 used: \code{"bruker"}, \code{"genform"}, \code{"sirius"}}
+
+\item{specSimParams}{A named \code{list} with parameters that influence the calculation of the
+\link[=id-conf]{annotation similarity}. See the \link[=specSimParams]{spectral similarity parameters} documentation
+for more details.}
 
 \item{\dots}{Any parameters to be passed to the selected formula generation algorithm.}
 }

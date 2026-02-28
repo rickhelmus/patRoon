@@ -5,16 +5,16 @@
 \title{Imports feature groups from Bruker ProfileAnalysis}
 \usage{
 importFeatureGroupsBrukerPA(
-  path,
+  input,
   feat,
-  rtWindow = 12,
-  mzWindow = 0.005,
+  rtWindow = defaultLim("retention", "medium"),
+  mzWindow = defaultLim("mz", "medium"),
   intWindow = 5,
   warn = TRUE
 )
 }
 \arguments{
-\item{path}{The file path to a exported 'bucket table' \file{.txt} file from PA.}
+\item{input}{The file path to a exported 'bucket table' \file{.txt} file from PA.}
 
 \item{feat}{The \code{\link{features}} object obtained with \code{\link{findFeaturesBruker}}.}
 

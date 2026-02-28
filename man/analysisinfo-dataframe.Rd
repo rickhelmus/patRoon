@@ -6,6 +6,8 @@
 \alias{getBPCs,data.frame-method}
 \alias{plotTICs,data.frame-method}
 \alias{plotBPCs,data.frame-method}
+\alias{plotTICs,data.table-method}
+\alias{plotBPCs,data.table-method}
 \title{AnalysisInfo data.frame methods}
 \usage{
 \S4method{getTICs}{data.frame}(obj, retentionRange = NULL, MSLevel = 1)
@@ -18,7 +20,7 @@
   MSLevel = 1,
   retMin = FALSE,
   title = NULL,
-  colourBy = c("none", "analyses", "rGroups"),
+  groupBy = NULL,
   showLegend = TRUE,
   xlim = NULL,
   ylim = NULL,
@@ -31,7 +33,33 @@
   MSLevel = 1,
   retMin = FALSE,
   title = NULL,
-  colourBy = c("none", "analyses", "rGroups"),
+  groupBy = NULL,
+  showLegend = TRUE,
+  xlim = NULL,
+  ylim = NULL,
+  ...
+)
+
+\S4method{plotTICs}{data.table}(
+  obj,
+  retentionRange = NULL,
+  MSLevel = 1,
+  retMin = FALSE,
+  title = NULL,
+  groupBy = NULL,
+  showLegend = TRUE,
+  xlim = NULL,
+  ylim = NULL,
+  ...
+)
+
+\S4method{plotBPCs}{data.table}(
+  obj,
+  retentionRange = NULL,
+  MSLevel = 1,
+  retMin = FALSE,
+  title = NULL,
+  groupBy = NULL,
   showLegend = TRUE,
   xlim = NULL,
   ylim = NULL,
@@ -51,8 +79,9 @@ step.}
 
 \item{title}{Character string used for title of the plot. If \code{NULL} a title will be automatically generated.}
 
-\item{colourBy}{Sets the automatic colour selection: "none" for a single 
-colour or "analyses"/"rGroups" for a distinct colour per analysis or analysis replicate group.}
+\item{groupBy}{Specifies how results are grouped in the plot. Should be a name of a column in the
+\link[=analysis-information]{analysis information} table which is used to make analysis groups (\emph{e.g.}
+\code{"replicate"}), or \code{"fGroups"} to group by feature group. Set to \code{NULL} for no grouping.}
 
 \item{showLegend}{Plot a legend if TRUE.}
 
@@ -74,7 +103,15 @@ Various parsing and plotting functions for the analysisInfo data.frame.
 
 \item \code{plotBPCs(data.frame)}: Plots the BPCs of the analyses.
 
+\item \code{plotBPCs(data.table)}: Plots the BPCs of the analyses.
+
 }}
+\section{Use of raw HRMS data}{
+ The \link[=msdata]{raw data interface} of \pkg{patRoon} is used by these functions to
+  process HRMS (or IMS-HRMS) data. Please see \link[=msdata]{its documentation} for more information on the supported
+  formats and available configuration options.
+}
+
 \author{
-Ricardo Cunha, \email{cunha@iuta.de}
+Ricardo Cunha (\email{cunha@iuta.de}) and Rick Helmus (\email{r.helmus@uva.nl})
 }

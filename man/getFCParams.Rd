@@ -4,10 +4,10 @@
 \alias{getFCParams}
 \title{Fold change calculation}
 \usage{
-getFCParams(rGroups, ...)
+getFCParams(replicates, ...)
 }
 \arguments{
-\item{rGroups}{A \code{character} vector with the names of the two replicate groups to be compared.}
+\item{replicates}{A \code{character} vector with the names of the two replicates to be compared.}
 
 \item{\dots}{Optional named arguments that override defaults.}
 }
@@ -15,11 +15,11 @@ getFCParams(rGroups, ...)
 Fold change calculation
 }
 \details{
-Fold change calculation can be used to easily identify significant changes between replicate groups. The
+Fold change calculation can be used to easily identify significant changes between replicates. The
   calculation process is configured through a parameter list, which can be constructed with the \code{getFCParams}
   function. The parameter list has the following entries: \itemize{
 
-  \item \code{rGroups} the name of the two replicate groups to compare (taken from the \code{rGroups} argument to
+  \item \code{replicates} the name of the two replicates to compare (taken from the \code{replicates} argument to
   \code{getFCParams}).
 
   \item \code{thresholdFC}: the threshold log FC for a feature group to be classified as increasing/decreasing.

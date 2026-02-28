@@ -2,14 +2,13 @@
 % Please edit documentation in R/generics.R, R/mspeaklists.R,
 %   R/mspeaklists-set.R, R/utils-mspeaklists.R
 \docType{class}
-\name{peakLists}
-\alias{peakLists}
-\alias{averagedPeakLists}
-\alias{spectrumSimilarity}
+\name{MSPeakLists-class}
 \alias{MSPeakLists-class}
 \alias{MSPeakLists}
 \alias{peakLists,MSPeakLists-method}
+\alias{peakLists}
 \alias{averagedPeakLists,MSPeakLists-method}
+\alias{averagedPeakLists}
 \alias{analyses,MSPeakLists-method}
 \alias{groupNames,MSPeakLists-method}
 \alias{length,MSPeakLists-method}
@@ -22,6 +21,9 @@
 \alias{filter,MSPeakLists-method}
 \alias{plotSpectrum,MSPeakLists-method}
 \alias{spectrumSimilarity,MSPeakLists-method}
+\alias{spectrumSimilarity}
+\alias{spectrumSimilarityMobility,MSPeakLists-method}
+\alias{spectrumSimilarityMobility}
 \alias{MSPeakListsSet-class}
 \alias{MSPeakListsSet}
 \alias{analysisInfo,MSPeakListsSet-method}
@@ -43,6 +45,8 @@ peakLists(obj, ...)
 averagedPeakLists(obj, ...)
 
 spectrumSimilarity(obj, ...)
+
+spectrumSimilarityMobility(obj, ...)
 
 \S4method{peakLists}{MSPeakLists}(obj)
 
@@ -68,19 +72,23 @@ spectrumSimilarity(obj, ...)
 
 \S4method{filter}{MSPeakLists}(
   obj,
-  absMSIntThr = NULL,
-  absMSMSIntThr = NULL,
-  relMSIntThr = NULL,
-  relMSMSIntThr = NULL,
-  topMSPeaks = NULL,
-  topMSMSPeaks = NULL,
-  minMSMSPeaks = NULL,
+  MSLevel = 1:2,
+  absMinIntensity = NULL,
+  relMinIntensity = NULL,
+  topMostPeaks = NULL,
+  minPeaks = NULL,
+  maxMZOverPrec = NULL,
+  absMinAbundanceFeat = NULL,
+  relMinAbundanceFeat = NULL,
+  absMinAbundanceFGroup = NULL,
+  relMinAbundanceFGroup = NULL,
   isolatePrec = NULL,
-  deIsotopeMS = FALSE,
-  deIsotopeMSMS = FALSE,
+  deIsotope = FALSE,
+  removeMZs = NULL,
   withMSMS = FALSE,
   annotatedBy = NULL,
-  retainPrecursorMSMS = TRUE,
+  retainPrecursor = TRUE,
+  mzWindow = defaultLim("mz", "medium"),
   reAverage = FALSE,
   negate = FALSE
 )
@@ -91,9 +99,11 @@ spectrumSimilarity(obj, ...)
   analysis = NULL,
   MSLevel = 1,
   title = NULL,
+  normalized = "multiple",
   specSimParams = getDefSpecSimParams(),
   xlim = NULL,
   ylim = NULL,
+  showLegend = TRUE,
   ...
 )
 
@@ -109,7 +119,9 @@ spectrumSimilarity(obj, ...)
   drop = TRUE
 )
 
-\S4method{analysisInfo}{MSPeakListsSet}(obj)
+\S4method{spectrumSimilarityMobility}{MSPeakLists}(obj, fGroups, doFGroups = TRUE, warn = TRUE, ...)
+
+\S4method{analysisInfo}{MSPeakListsSet}(obj, df = FALSE)
 
 \S4method{show}{MSPeakListsSet}(object)
 
@@ -122,8 +134,11 @@ spectrumSimilarity(obj, ...)
 \S4method{filter}{MSPeakListsSet}(
   obj,
   ...,
+  removeMZs = NULL,
+  withMSMS = FALSE,
   annotatedBy = NULL,
-  retainPrecursorMSMS = TRUE,
+  retainPrecursor = TRUE,
+  mzWindow = defaultLim("mz", "medium"),
   reAverage = FALSE,
   negate = FALSE,
   sets = NULL
@@ -135,6 +150,7 @@ spectrumSimilarity(obj, ...)
   analysis = NULL,
   MSLevel = 1,
   title = NULL,
+  normalized = "multiple",
   specSimParams = getDefSpecSimParams(),
   xlim = NULL,
   ylim = NULL,
@@ -162,7 +178,13 @@ getDefIsolatePrecParams(...)
 \arguments{
 \item{obj, x, object}{The \code{\link{MSPeakLists}} object to access.}
 
-\item{\dots}{Further arguments passed to \code{\link[graphics]{plot}}.
+\item{\dots}{For the \code{"["} operator: ignored.
+
+  For \code{delete}: passed to the function specified as \code{j}.
+  
+  For \code{plotSpectrum}: passed to \code{\link[graphics]{plot}}.
+  
+  For \code{spectrumSimilarityMobility}: passed to \code{spectrumSimilarity}
 
   \setsPassedArgs1{MSPeakLists}}
 
@@ -171,8 +193,8 @@ their index or name, respectively (for the order/names see \code{analyses()/grou
 (similar to regular vectors). If missing all analyses/feature groups are selected.\cr\cr For \code{[[}: should be a scalar value. If \code{j} is not specified, \code{i} selects by feature groups instead.\cr\cr For \code{delete}: The data to remove from. \code{i} are the
 feature groups as numeric index, logical or character, \code{j} the MS peaks as numeric indices (rows). If either is
 \code{NULL} then data for all is removed. \code{j} may also be a function: it will be called for each feature group,
-with the peak list table (a \code{data.table}), feature group name, analysis (\code{NULL} if averaged peak list), type (\code{"MS"} or \code{"MSMS"}) and any other arguments passed as \code{\dots} to \code{delete}. The return value of this
-function specifies the peak list indices (rows) to be removed (specified as an \code{integer} or \code{logical} vector).}
+with the peak list table (a \code{data.table}), feature group name, analysis (\code{NULL} if averaged
+function specifies the peak list indices (rows) to be removed (specified as an \code{integer} or \code{logical}}
 
 \item{reAverage}{Set to \code{TRUE} to regenerate group averaged MS peak lists. \strong{NOTE} it is very important
 that any annotation data relying on MS peak lists (formulae/compounds) are regenerated afterwards! Otherwise it is
@@ -194,50 +216,89 @@ used.}
 should be deleted. If \code{k!=NULL} then deletions will \emph{not} occur on group averaged peak lists. Otherwise,
 if \code{k=NULL} then deletion occurs on \emph{both} group averaged and analysis specific peak lists.}
 
-\item{absMSIntThr, absMSMSIntThr, relMSIntThr, relMSMSIntThr}{Absolute/relative intensity threshold for MS or MS/MS peak
-lists. \code{NULL} for none.}
+\item{MSLevel}{The MS level for which data is plotted or filtered: \samp{1} for regular MS, \samp{2} for MSMS.
 
-\item{topMSPeaks, topMSMSPeaks}{Only consider this amount of MS or MS/MS peaks with highest intensity. \code{NULL} to
-consider all.}
+  For \code{filter}: can also be \code{1:2} to specify both.}
 
-\item{minMSMSPeaks}{If the number of peaks in an MS/MS peak list (\strong{excluding} the precursor peak) is lower
-than this it will be completely removed. Set to \code{NULL} to ignore.}
+\item{absMinIntensity, relMinIntensity}{Absolute/relative intensity threshold for peaks. Set to \code{NULL} for none.}
+
+\item{topMostPeaks}{Only consider this number of most intense peaks. Set to \code{NULL} to consider all.}
+
+\item{minPeaks}{If the number of peaks in an MS/MS peak list (\strong{excluding} the precursor peak) is lower than
+this it will be completely removed. Set to \code{NULL} to ignore.}
+
+\item{maxMZOverPrec}{Any mass peaks with an m/z higher than this value (relative to the precursor) will be removed.
+Set to \code{NULL} to ignore.}
+
+\item{absMinAbundanceFeat, relMinAbundanceFeat}{The minimum absolute/relative abundance for a mass peak across spectra
+  that are averaged for a feature. Setting \code{reAverage} determines if feature group peak lists are also filtered: \itemize{
+
+  \item \code{reAverage=FALSE} then this filter is also applied to feature group data, using the the mean averaged peak
+  abundance from the peak lists in the group.
+
+  \item \code{reAverage=TRUE} then this filter is \emph{not} applied to the (regenerated) feature group data.
+
+  }
+  In most cases \code{reAverage=TRUE} makes more sense to avoid inconsistent filtering approaches between feature
+  and feature group data.
+
+  Set to \code{NULL} to ignore.}
+
+\item{absMinAbundanceFGroup, relMinAbundanceFGroup}{The minimum absolute/relative abundance of a mass peak across
+spectra that are averaged for a feature group. Set to \code{NULL} to ignore.}
 
 \item{isolatePrec}{If not \code{NULL} then value should be a \code{list} with parameters used for isolating the
 precursor and its isotopes in MS peak lists (see \verb{Isolating precursor data}). Alternatively, \code{TRUE} to
 apply the filter with default settings (as given with \code{getDefIsolatePrecParams}).}
 
-\item{deIsotopeMS, deIsotopeMSMS}{Remove any isotopic peaks in MS or MS/MS peak lists. This may improve data
-processing steps which do not assume the presence of isotopic peaks (e.g. MetFrag for MS/MS). Note that
-\code{getMzRPeakLists} does not (yet) support flagging of isotopes.}
+\item{deIsotope}{Remove any isotopic peaks in peak lists. This may improve data processing steps which do not assume
+the presence of isotopic peaks (e.g. MetFrag for MS/MS). Note that \code{generateMSPeakLists} does not (yet)
+support flagging of isotopes.}
+
+\item{removeMZs}{A set of m/z values to be removed from the peak lists. This is typically used to remove background
+  peaks. The m/z values should be specified by either be a \code{numeric} vector or a \code{data.frame} with an
+  \code{mz} column. The latter is returned by the \code{\link{getBGMSMSPeaks}} function, which attempts to
+  automatically detect background peaks.
+
+  \setsWF Should be a \code{list} that specifies the m/z values to be removed (in above mentioned format) for each
+  set. The order should match that of the sets in the \code{MSPeakLists} object.}
 
 \item{withMSMS}{If set to \code{TRUE} then only results will be retained for which MS/MS data is available. if
 \code{negate=TRUE} then only results \emph{without} MS/MS data will be retained.}
 
 \item{annotatedBy}{Either a \code{\link{formulas}} or \code{\link{compounds}} object, or a \code{list} with both. Any
-MS/MS peaks that are \emph{not} annotated by any of the candidates in the specified objects are removed.}
+MS/MS peaks that are \emph{not} annotated by any of the candidates in the specified objects are removed.
 
-\item{retainPrecursorMSMS}{If \code{TRUE} then precursor peaks will never be filtered out from MS/MS peak lists (note
+\strong{NOTE}: the \code{annotatedBy} filter currently only supports filtering peak of feature groups (and not of
+features). Hence, this filter cannot be combined with \code{reAverage=TRUE}. Furthermore, if peak lists are
+re-averaged after application of this filter, any filtered results will be \emph{undone}.}
+
+\item{retainPrecursor}{If \code{TRUE} then precursor peaks will never be filtered out from MS/MS peak lists (note
 that precursors are never removed from MS peak lists). The \code{negate} argument does not affect this setting.}
+
+\item{mzWindow}{The m/z window used to find peaks to be removed from the \code{removeMZs} filter.}
 
 \item{negate}{If \code{TRUE} then filters are applied in opposite manner.}
 
 \item{groupName}{The name of the feature group for which a plot should be made. To compare spectra, two group names
 can be specified.}
 
-\item{analysis}{The name of the analysis for which a plot should be made. If \code{NULL} then data from the feature
-group averaged peak list is used. When comparing spectra, either \code{NULL} or the analyses for both spectra
-should be specified.}
-
-\item{MSLevel}{The MS level: \samp{1} for regular MS, \samp{2} for MSMS.}
+\item{analysis}{The name of the analysis for which a plot should be made. If
+\code{NULL} then data from the feature group averaged peak list is used. When comparing spectra, either
+\code{NULL} or the analyses for both spectra should be specified.}
 
 \item{title}{The title of the plot. If \code{NULL} a title will be automatically made.}
+
+\item{normalized}{Controls intensity normalization. Should be \code{FALSE} (don't normalize), \code{TRUE} (normalize)
+or \code{"multiple"} (only normalizes if multiple spectra are plotted).}
 
 \item{specSimParams}{A named \code{list} with parameters that influence the calculation of MS spectra similarities.
 See the \link[=specSimParams]{spectral similarity parameters} documentation for more details.}
 
 \item{xlim, ylim}{Sets the plot size limits used by
 \code{\link[graphics]{plot}}. Set to \code{NULL} for automatic plot sizing.}
+
+\item{showLegend}{Set to \code{TRUE} to show a legend.}
 
 \item{groupName1, groupName2}{The names of the feature groups for which the comparison should be made. If both
 arguments are specified then a comparison is made with the spectra specified by \code{groupName1} \emph{vs} those
@@ -251,6 +312,13 @@ feature group averaged peak list is used. Otherwise, should be the same length a
 
 \item{NAToZero}{Set to \code{TRUE} to convert \code{NA} similarities (\emph{i.e.} when no similarity could be
 calculated) to zero values.}
+
+\item{doFGroups}{Set to \code{TRUE} to compare spectra of feature groups, \code{FALSE} to compare spectra of
+features.}
+
+\item{warn}{Set to \code{TRUE} to show a warning when no relevant feature group data is found.}
+
+\item{df}{If \code{TRUE} then a \code{data.frame} is returned, otherwise a \code{data.table} is returned.}
 
 \item{sets}{\setsWF A \code{character} with name(s) of the sets to keep (or remove if \code{negate=TRUE}).}
 
@@ -275,6 +343,9 @@ Furthermore, if \code{mirror=TRUE} (and there are two sets in the object) then a
   averaged peak lists in a similar format as \code{peakLists}.
 
 \code{delete} returns the object for which the specified data was removed.
+
+\code{spectrumSimilarityMobility} returns a \code{data.table} with spectral similarities for each IMS parent
+  and feature pair.
 }
 \description{
 Contains all MS (and MS/MS where available) peak lists for a \code{\link{featureGroups}} object.
@@ -324,6 +395,9 @@ are \emph{not} re-averaged by default (see the \code{reAverage} argument). \emph
 compared when two feature groups are specified.
 
 \item \code{spectrumSimilarity(MSPeakLists)}: Calculates the spectral similarity between two or more spectra.
+
+\item \code{spectrumSimilarityMobility(MSPeakLists)}: Calculates the spectral similarity between spectra from IMS features (or feature groups)
+and their IMS parents in post IMS workflows (see \code{\link[=assignMobilities_feat]{assignMobilities}}).
 
 }}
 \section{Slots}{
@@ -406,11 +480,14 @@ for access.}
   \setsWFChangedMethods{
 
   \item \code{filter} and the subset operator (\code{[}) Can be used to select data that is only present for selected
-  sets. The \code{filter} method is applied for each set individually, and afterwards the results are combined again
-  (see \code{\link{generateMSPeakLists}}). Note that this has important implications for \emph{e.g.} relative
-  intensity filters (\code{relMSIntThr}/\code{relMSMSIntThr}), \code{topMSPeaks}/\code{topMSMSPeaks} and
-  \code{minMSMSPeaks}. Similarly, when the \code{annotatedBy} filter is applied, each set specific MS peak list is
-  filtered by the annotation results from only that set.
+  sets (\code{sets} argument).
+
+  \item The \code{filter} method is applied for each set individually, and afterwards the results are combined again
+  (see \code{\link{generateMSPeakLists}}). Note that this has important implications for \emph{e.g.} intensity
+  filters (\code{absMinIntensity}/\code{relMinIntensity}), \code{topMostPeaks} and
+  \code{minPeaks}. Furthermore, when the \code{annotatedBy} filter is applied, each set specific MS peak list is
+  filtered by the annotation results from only that set. Finally, the \code{removeMZs} filter should be set for each
+  set separately.
 
   \item \code{plotSpectrum} Is able to highlight set specific mass peaks (\code{perSet} and \code{mirror} arguments).
 

@@ -4,17 +4,45 @@
 \alias{getEICs}
 \title{Obtains extracted ion chromatograms (EICs)}
 \usage{
-getEICs(file, ranges)
+getEICs(
+  analysisInfo,
+  ranges,
+  gapFactor = 3,
+  output = "fill",
+  minIntensityIMS = 25
+)
 }
 \arguments{
-\item{file}{The file path to the sample analysis data file (\file{.mzXML} or \file{.mzML}).}
+\item{analysisInfo}{A \code{data.frame} (or \code{data.table}) with \link[=analysis-information]{Analysis
+information}.}
 
-\item{ranges}{A \code{data.frame} with \code{numeric} columns \code{"retmin"}, \code{"retmin"}, \code{"mzmin"},
-\code{"mzmax"} with the lower/upper ranges of the retention time and \emph{m/z}.}
+\item{ranges}{A \code{list} with for each analysis a \code{data.frame} with \code{numeric} columns \code{"retmin"},
+\code{"retmax"}, \code{"mzmin"}, \code{"mzmax"} with the lower/upper ranges of the retention time and \emph{m/z}.
+Furthermore, columns \code{"mobmin"} and \code{"mobmax"} can be added for mobility lower/upper ranges in IMS data.}
+
+\item{gapFactor}{A \code{numeric} that configures gap filling. See \code{\link{getDefEICParams}} for more details.}
+
+\item{output}{Should be \code{"fill"}, \code{"pad"} or \code{"raw"}. Internally, EIC data is compressed by omitting
+any zero intensity data points. If \code{output="fill"} then the zero intensity points are re-added to obtain
+continuous chromatograms. If \code{output="pad"} then zero intensity points are only re-added that surround others,
+which is sufficient for \emph{e.g.} plotting. If \code{output="raw"} then the original compressed data is returned.}
+
+\item{minIntensityIMS}{\IMSWF Raw intensity threshold for IMS data. This is primarily intended to speed up raw data
+processing.}
 }
 \value{
-A \code{list} with EIC data for each of the rows in \code{ranges}.
+A \code{list} with for each analysis a \code{list} with EIC data for each of the rows in \code{ranges}.
+
+  If \code{output="raw"} then additional columns with \emph{e.g.} mean-averaged and base peak \emph{m/z} values for
+  each data point are returned. Furthermore, the \code{allXValues} attribute is set that can be used to obtain the
+  original retention time values to reconstruct the original complete chromatogram.
 }
 \description{
-This function generates one or more EIC(s) for given retention time and \emph{m/z} ranges.
+This function generates one or more EIC(s) for given retention time, \emph{m/z} and optionally mobility ranges.
 }
+\section{Use of raw HRMS data}{
+ The \link[=msdata]{raw data interface} of \pkg{patRoon} is used by \code{getEICs} to
+  process HRMS (or IMS-HRMS) data. Please see \link[=msdata]{its documentation} for more information on the supported
+  formats and available configuration options.
+}
+

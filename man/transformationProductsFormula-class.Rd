@@ -59,7 +59,7 @@ with screening results. The graph is rendered with \pkg{\link{visNetwork}}.
 
 }}
 \section{S4 class hierarchy}{
- \itemize{   \item{\code{\link{transformationProducts}}}   \itemize{     \item{\strong{\code{\link{transformationProductsFormula}}}}     \itemize{       \item{\code{\link{transformationProductsLibraryFormula}}}     }   } }
+ \itemize{   \item{\code{\link{transformationProducts}}}   \itemize{     \item{\strong{\code{\link{transformationProductsFormula}}}}     \itemize{       \item{\code{\link{transformationProductsAnnForm}}}       \item{\code{\link{transformationProductsLibraryFormula}}}     }   } }
 }
 
 \seealso{

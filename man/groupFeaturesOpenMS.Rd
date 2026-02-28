@@ -3,7 +3,6 @@
 \name{groupFeaturesOpenMS}
 \alias{groupFeaturesOpenMS}
 \alias{groupFeaturesOpenMS,features-method}
-\alias{groupFeaturesOpenMS,featuresSet-method}
 \title{Group features using OpenMS}
 \usage{
 groupFeaturesOpenMS(feat, ...)
@@ -12,16 +11,14 @@ groupFeaturesOpenMS(feat, ...)
   feat,
   rtalign = TRUE,
   QT = FALSE,
-  maxAlignRT = 30,
-  maxAlignMZ = 0.005,
-  maxGroupRT = 12,
-  maxGroupMZ = 0.005,
+  maxAlignRT = defaultLim("retention", "wide"),
+  maxAlignMZ = defaultLim("mz", "medium"),
+  maxGroupRT = defaultLim("retention", "medium"),
+  maxGroupMZ = defaultLim("mz", "medium"),
   extraOptsRT = NULL,
   extraOptsGroup = NULL,
   verbose = TRUE
 )
-
-\S4method{groupFeaturesOpenMS}{featuresSet}(feat, ..., verbose = TRUE)
 }
 \arguments{
 \item{feat}{The \code{\link{features}} object with the features to be grouped.}
@@ -68,9 +65,8 @@ Retention times may be aligned by the
    TOPP tools.
 }
 \references{
-\insertRef{Rst2016}{patRoon} \cr\cr
-  \href{https://pugixml.org/}{pugixml} (via \href{http://www.rcpp.org/}{Rcpp}) is used to process OpenMS XML output. \cr\cr
-  \addCitations{Rcpp}{1}
+\insertRef{Rst2016}{patRoon} \cr\cr \href{https://pugixml.org/}{pugixml} (via
+  \href{http://www.rcpp.org/}{Rcpp}) is used to process OpenMS XML output. \cr\cr \addCitations{Rcpp}
 }
 \seealso{
 \code{\link{groupFeatures}} for more details and other algorithms.

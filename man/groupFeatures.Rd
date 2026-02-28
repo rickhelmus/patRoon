@@ -17,7 +17,8 @@ groupFeatures(obj, algorithm, ...)
 \link[=analysis-information]{analysis info} to be passed to \code{groupFeaturesSIRIUS}}
 
 \item{algorithm}{A \code{character} that specifies the algorithm to be used: either \code{"openms"}, \code{"xcms"},
-\code{"xcms3"} or \code{"kpic2"} (\code{features method}), or \code{"sirius"} (\code{data.frame} method).}
+\code{"xcms3"}, \code{"kpic2"} or \code{"greedy"} (\code{features} method), or \code{"sirius"} (\code{data.frame}
+method).}
 
 \item{\dots}{Further parameters passed to the selected grouping algorithm.}
 
@@ -48,5 +49,5 @@ The \code{data.frame} method for \code{groupFeatures} is a special case that cur
 }
 \seealso{
 The \code{\link{featureGroups}} output class and its methods and the algorithm specific functions:
-  \code{\link{groupFeaturesOpenMS}}, \code{\link{groupFeaturesXCMS}}, \code{\link{groupFeaturesXCMS3}}, \code{\link{groupFeaturesKPIC2}}, \code{\link{groupFeaturesSIRIUS}}
+  \code{\link{groupFeaturesOpenMS}}, \code{\link{groupFeaturesXCMS}}, \code{\link{groupFeaturesXCMS3}}, \code{\link{groupFeaturesKPIC2}}, \code{\link{groupFeaturesGreedy}}, \code{\link{groupFeaturesSIRIUS}}
 }

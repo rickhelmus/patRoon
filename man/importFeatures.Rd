@@ -4,12 +4,13 @@
 \alias{importFeatures}
 \title{Import features}
 \usage{
-importFeatures(analysisInfo, type, ...)
+importFeatures(input, type, ...)
 }
 \arguments{
-\item{analysisInfo}{A \code{data.frame} with \link[=analysis-information]{Analysis information}.}
+\item{input}{The input object or path that should be imported. See the algorithm specific functions for more details.}
 
-\item{type}{What type of data should be imported: \code{"xcms"}, \code{"xcms3"}, \code{"kpic2"} or \code{"envimass"}.}
+\item{type}{What type of data should be imported: \code{"xcms"}, \code{"xcms3"}, \code{"kpic2"}, \code{"table"}, or
+\code{"envimass"}.}
 
 \item{\dots}{Further arguments passed to the selected import algorithm function.}
 }
@@ -21,12 +22,12 @@ Generic function to import features produced by other software.
 }
 \details{
 \code{importFeatures} is a generic function that will import features by one of the supported algorithms. The actual
-  functionality is provided by algorithm specific functions such as \code{importFeaturesXCMS3} and \code{importFeaturesKPIC2}. While these
+  functionality is provided by algorithm specific functions such as \code{importFeaturesXCMS3} and \code{importFeaturesTable}. While these
   functions may be called directly, \code{importFeatures} provides a generic interface and is therefore usually preferred.
 }
 \seealso{
 The \code{\link{features}} output class and its methods and the algorithm specific functions:
-  \code{\link{importFeaturesXCMS}}, \code{\link{importFeaturesXCMS3}}, \code{\link{importFeaturesKPIC2}}, \code{\link{importFeaturesEnviMass}}
+  \code{\link{importFeaturesXCMS}}, \code{\link{importFeaturesXCMS3}}, \code{\link{importFeaturesKPIC2}}, \code{\link{importFeaturesTable}}, \code{\link{importFeaturesEnviMass}}
 
 \code{\link{findFeatures}} to find new features.
 }

@@ -15,7 +15,8 @@ findFeaturesBruker(
 )
 }
 \arguments{
-\item{analysisInfo}{A \code{data.frame} with \link[=analysis-information]{Analysis information}.}
+\item{analysisInfo}{A \code{data.frame} (or \code{data.table}) with \link[=analysis-information]{Analysis
+information}.}
 
 \item{doFMF}{Run the 'Find Molecular Features' algorithm before loading compounds. Valid options are: \code{"auto"}
 (run FMF automatically if current results indicate it is necessary) and \code{"force"} (run FMF \emph{always}, even

@@ -9,7 +9,7 @@ findFeaturesOpenMS(
   noiseThrInt = 1000,
   chromSNR = 3,
   chromFWHM = 5,
-  mzPPM = 10,
+  mzPPM = defaultLim("mz", "medium_rel"),
   reEstimateMTSD = TRUE,
   traceTermCriterion = "sample_rate",
   traceTermOutliers = 5,
@@ -26,13 +26,13 @@ findFeaturesOpenMS(
   MZScoring13C = FALSE,
   useSmoothedInts = TRUE,
   extraOpts = NULL,
-  intSearchRTWindow = 3,
   useFFMIntensities = FALSE,
   verbose = TRUE
 )
 }
 \arguments{
-\item{analysisInfo}{A \code{data.frame} with \link[=analysis-information]{Analysis information}.}
+\item{analysisInfo}{A \code{data.frame} (or \code{data.table}) with \link[=analysis-information]{Analysis
+information}.}
 
 \item{noiseThrInt}{Noise intensity threshold. Sets \code{algorithm:common:noise_threshold_int} option.}
 
@@ -81,10 +81,6 @@ options specified here will override any of the above. Example:
 \code{extraOpts=list("-algorithm:common:noise_threshold_int"=1000)} (corresponds to setting
 \code{noiseThrInt=1000}). Set to \code{NULL} to ignore.}
 
-\item{intSearchRTWindow}{Retention time window (in seconds, +/- feature retention time) that is used to find the
-closest data point to the retention time to obtain the intensity of a feature (this is needed since OpenMS does not
-provide this data).}
-
 \item{useFFMIntensities}{If \code{TRUE} then peak intensities are directly loaded from \command{FeatureFinderMetabo}
 output. Otherwise, intensities are loaded afterwards from the input \file{mzML} files, which is potentially much
 slower, especially with many analyses files. However, \code{useFFMIntensities=TRUE} is still somewhat experimental,
@@ -110,11 +106,11 @@ This functionality has been tested with OpenMS version >= 2.0. Please make sure 
 
   The file format of analyses must be \file{mzML}.
 
-The input MS data files need to be centroided. The \code{\link{convertMSFiles}} function can be used to
-  centroid data.
+The input MS data files need to be centroided. The \code{\link{convertMSFiles}} function can be used
+  to centroid data.
 }
 \section{Parallelization}{
- \code{findFeaturesOpenMS} uses multiprocessing to parallelize
+ \code{findFeaturesOpenMS} with \code{useFFMIntensities=FALSE} uses multiprocessing to parallelize
   computations. Please see the parallelization section in the handbook for
   more details and \link[=patRoon-package]{patRoon options} for configuration
   options.
@@ -123,10 +119,15 @@ The input MS data files need to be centroided. The \code{\link{convertMSFiles}} 
   computer, even if it is not participating in computations.
 }
 
+\section{Use of raw HRMS data}{
+ The \link[=msdata]{raw data interface} of \pkg{patRoon} is used by \code{findFeaturesOpenMS} with \code{useFFMIntensities=FALSE} to
+  process HRMS (or IMS-HRMS) data. Please see \link[=msdata]{its documentation} for more information on the supported
+  formats and available configuration options.
+}
+
 \references{
-\insertRef{Rst2016}{patRoon} \cr\cr
-  \href{https://pugixml.org/}{pugixml} (via \href{http://www.rcpp.org/}{Rcpp}) is used to process OpenMS XML output. \cr\cr
-  \addCitations{Rcpp}{1}
+\insertRef{Rst2016}{patRoon} \cr\cr \href{https://pugixml.org/}{pugixml} (via
+  \href{http://www.rcpp.org/}{Rcpp}) is used to process OpenMS XML output. \cr\cr \addCitations{Rcpp}
 }
 \seealso{
 \code{\link{findFeatures}} for more details and other algorithms.

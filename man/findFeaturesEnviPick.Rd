@@ -7,11 +7,12 @@
 findFeaturesEnviPick(analysisInfo, ..., parallel = TRUE, verbose = TRUE)
 }
 \arguments{
-\item{analysisInfo}{A \code{data.frame} with \link[=analysis-information]{Analysis information}.}
+\item{analysisInfo}{A \code{data.frame} (or \code{data.table}) with \link[=analysis-information]{Analysis
+information}.}
 
 \item{\dots}{Further parameters passed to \code{\link[enviPick]{enviPickwrap}}.}
 
-\item{parallel}{If set to \code{TRUE} then code is executed in parallel through the \CRANpkg{futures} package. Please
+\item{parallel}{If set to \code{TRUE} then code is executed in parallel through the \CRANpkg{future} package. Please
 see the parallelization section in the handbook for more details.}
 
 \item{verbose}{If set to \code{FALSE} then no text output is shown.}
@@ -26,8 +27,8 @@ Uses the \code{\link[enviPick]{enviPickwrap}} function from the \pkg{enviPick} R
 This function uses enviPick to automatically find features. This function is called when calling \code{findFeatures} with
   \code{algorithm="envipick"}.
 
-The input MS data files need to be centroided. The \code{\link{convertMSFiles}} function can be used to
-  centroid data.
+The input MS data files need to be centroided. The \code{\link{convertMSFiles}} function can be used
+  to centroid data.
 }
 \note{
 The analysis files must be in the \code{mzXML} format.

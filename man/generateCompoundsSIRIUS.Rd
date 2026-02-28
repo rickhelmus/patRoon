@@ -11,7 +11,8 @@ generateCompoundsSIRIUS(fGroups, ...)
 \S4method{generateCompoundsSIRIUS}{featureGroups}(
   fGroups,
   MSPeakLists,
-  relMzDev = 5,
+  specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
+  relMzDev = defaultLim("mz", "narrow_rel"),
   adduct = NULL,
   projectPath = NULL,
   elements = "CHNOP",
@@ -26,6 +27,7 @@ generateCompoundsSIRIUS(fGroups, ...)
   alwaysLogin = FALSE,
   extraOptsGeneral = NULL,
   extraOptsFormula = NULL,
+  minMobSpecSim = 0,
   verbose = TRUE,
   splitBatches = FALSE,
   dryRun = FALSE
@@ -34,7 +36,8 @@ generateCompoundsSIRIUS(fGroups, ...)
 \S4method{generateCompoundsSIRIUS}{featureGroupsSet}(
   fGroups,
   MSPeakLists,
-  relMzDev = 5,
+  specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
+  relMzDev = defaultLim("mz", "narrow_rel"),
   adduct = NULL,
   projectPath = NULL,
   ...,
@@ -51,6 +54,10 @@ feature groups in the subset are considered.}
 \item{\dots}{\setsWF Further arguments passed to the non-sets workflow method.}
 
 \item{MSPeakLists}{A \code{\link{MSPeakLists}} object that was generated for the supplied \code{fGroups}.}
+
+\item{specSimParams}{A named \code{list} with parameters that influence the calculation of the
+\link[=id-conf]{annotation similarity}. See the \link[=specSimParams]{spectral similarity parameters} documentation
+for more details.}
 
 \item{relMzDev}{Maximum relative deviation between the measured and candidate formula \emph{m/z} values (in ppm).
 Sets the \option{--ppm-max} command line option.}
@@ -120,6 +127,14 @@ formulae will be searched. Sets the \option{--candidates} commandline option.}
 options. Otherwise commandline options specified in \code{extraOptsGeneral} are added prior to the \code{formula}
 command, while options specified in \code{extraOptsFormula} are added in afterwards. See the \command{SIRIUS}
 manual for more details. Set to \code{NULL} to ignore.}
+
+\item{minMobSpecSim}{\IMSWF If the spectrum similarity of a mobility feature group compared to its IMS parent (see
+\code{\link[=assignMobilities_feat]{assignMobilities}}) is at least this value, then the mobility feature group
+will not be subjected to the annotation algorithm and all feature annotation properties will be copied from its
+parent. This assumes that feature annotation is primarily influenced by the MS/MS spectrum, and can be used to
+speed up the feature annotation process. All scorings, annotation similarities etc. are copied from the IMS parent.
+The fragment annotations are also copied (\code{fragInfo} result column), however, these are adjusted based on the
+peak list data of the mobility feature group.}
 
 \item{verbose}{If \code{TRUE} then more output is shown in the terminal.}
 

@@ -16,8 +16,8 @@ generateComponentsRAMClustR(fGroups, ...)
   maxt = 12,
   hmax = 0.3,
   normalize = "TIC",
-  absMzDev = 0.002,
-  relMzDev = 5,
+  absMzDev = defaultLim("mz", "narrow"),
+  relMzDev = defaultLim("mz", "narrow_rel"),
   minSize = 2,
   relMinReplicates = 0.5,
   RCExperimentVals = list(design = list(platform = "LC-MS"), instrument = list(ionization
@@ -80,6 +80,12 @@ This method uses the \code{\link[RAMClustR]{ramclustR}} functions for generating
 The default value for  \code{relMinReplicates} results in
   extra filtering, hence, the final results may be different than what the algorithm normally would return.
 }
+\section{IMS workflows}{
+ The componentization algorithm is not aware of the IMS dimension. For this reason, no
+  mobility feature groups will be considered for componentization, and direct IMS workflows (see
+  \code{\link[=assignMobilities_feat]{assignMobilitities}}) are currently not supported.
+}
+
 \section{Sets workflows}{
  In a \link[=sets-workflow]{sets workflow} the componentization is first performed for each
   set independently. The resulting components are then all combined in a \code{\link{componentsSet}} object. Note that

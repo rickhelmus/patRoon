@@ -3,58 +3,92 @@
 \name{generateMSPeakLists}
 \alias{generateMSPeakLists}
 \alias{generateMSPeakLists,featureGroups-method}
+\alias{generateMSPeakLists,featureGroupsSet-method}
 \title{Generation of MS Peak Lists}
 \usage{
-generateMSPeakLists(fGroups, algorithm, ...)
+generateMSPeakLists(fGroups, ...)
 
-\S4method{generateMSPeakLists}{featureGroups}(fGroups, algorithm, ...)
+\S4method{generateMSPeakLists}{featureGroups}(
+  fGroups,
+  maxMSRTWindow = defaultLim("retention", "narrow"),
+  fixedIsolationWidth = FALSE,
+  topMost = NULL,
+  avgFeatParams = getDefAvgPListParams(),
+  avgFGroupParams = getDefAvgPListParams()
+)
+
+\S4method{generateMSPeakLists}{featureGroupsSet}(fGroups, ...)
 }
 \arguments{
-\item{fGroups}{The \code{\link{featureGroups}} object from which MS peak lists should be extracted.}
+\item{fGroups}{The \code{\link{featureGroups}} object for which MS peak lists should be generated.}
 
-\item{algorithm}{A character string describing the algorithm that should be
-used: \code{"bruker"}, \code{"brukerfmf"}, \code{"mzr"}}
+\item{\dots}{\setsWF Further arguments passed to the non-sets workflow method.}
 
-\item{\dots}{Any parameters to be passed to the selected MS peak lists generation algorithm.}
+\item{maxMSRTWindow}{Maximum chromatographic peak window used for spectrum averaging (in seconds, +/- retention
+time). If \code{NULL} all spectra from a feature will be taken into account. Lower to decrease processing time.}
+
+\item{fixedIsolationWidth}{Configures how MS/MS spectra are selected for a feature: \itemize{
+
+  \item \code{NA}: select all spectra unconditionally, \emph{i.e.} ignoring any precursor information of spectra.
+
+  \item \code{FALSE}: select the spectra that were recorded for the feature m/z, using the instrumental precursor
+  isolation window (\emph{e.g.} quadrupole m/z width) as the selection tolerance.
+
+  \item A numeric value: select the spectra that were recorded for the feature m/z within this tolerance window (+/-
+  precursor m/z).
+
+  }
+
+  If no isolation was applied to record MS/MS data (\emph{e.g.} data-independent MS/MS), then all MS/MS spectra will
+  be always be selected.}
+
+\item{topMost}{Only extract MS peak lists from a maximum of \code{topMost} features with highest intensity. If
+\code{NULL} all features will be used.}
+
+\item{avgFeatParams}{Parameters used for averaging MS peak lists of individual features. Analogous to
+\code{avgFGroupParams}.}
+
+\item{avgFGroupParams}{A \code{list} with parameters used for averaging of peak lists for feature groups. See
+\code{\link{getDefAvgPListParams}} for more details.}
 }
 \value{
-A \code{\link{MSPeakLists}} object.
+An \code{\link{MSPeakLists}} object.
 }
 \description{
-Functionality to convert MS and MS/MS data into MS peak lists.
+Functionality to convert MS and MS/MS spectra into MS peak lists.
 }
 \details{
-Formula calculation and identification tools rely on mass spectra that belong to features of interest. For
-processing, MS (and MS/MS) spectra are typically reduced to a table with a column containing measured \emph{m/z}
-values and a column containing their intensities. These 'MS peak lists' can then be used for
-\link[=generateFormulas]{formula generation} and \link[=generateCompounds]{compound generation}.
-
-MS and MS/MS peak lists are first generated for all features (or a subset, if the \code{topMost} argument is set).
-During this step multiple spectra over the feature elution profile are averaged. Subsequently, peak lists will be
-generated for each feature group by averaging peak lists of the features within the group. Functionality that uses
-peak lists will either use data from individual features or from group averaged peak lists. For instance, the former
+Data processing steps that use mass spectral data (\emph{e.g.} \link[=generateFormulas]{formula generation} and
+\link[=generateCompounds]{compound generation}) typically use 'MS peak lists', which are tables storing the
+\emph{m/z}, intensity and other data from the raw mass spectra. The \code{generateMSPeakLists} function generates MS
+and MS/MS peak lists first for all features (or a subset, if the \code{topMost} argument is set). During this step
+multiple spectra over the feature elution profile are averaged. Subsequently, peak lists will be generated for each
+feature group by averaging peak lists of the features within the group. The data processing steps that uses peak
+lists will either use the data from individual features or from group averaged peak lists. For instance, the former
 may be used by formulae calculation, while compound identification and plotting functionality typically uses group
 averaged peak lists.
+}
+\section{Deprecated algorithms}{
+ Prior to \pkg{patRoon} 3.0 the \code{generateMSPeakLists} function was a wrapper to
+  the now deprecated functions \code{\link{generateMSPeakListsMzR}}, \code{\link{generateMSPeakListsDA}} and
+  \code{\link{generateMSPeakListsDAFMF}}. These functions are now unmaintained and may not (fully) work anymore. The
+  current interface is much faster and provides most of the previous functionality (and additional). However, please
+  provide feedback if you feel any functionality is missing.
+}
 
-\code{generateMSPeakLists} is a generic function that will generateMSPeakLists by one of the supported algorithms. The actual
-  functionality is provided by algorithm specific functions such as \code{generateMSPeakListsMzR} and \code{generateMSPeakListsDA}. While these
-  functions may be called directly, \code{generateMSPeakLists} provides a generic interface and is therefore usually preferred.
+\section{Use of raw HRMS data}{
+ The \link[=msdata]{raw data interface} of \pkg{patRoon} is used by \code{generateMSPeakLists} to
+  process HRMS (or IMS-HRMS) data. Please see \link[=msdata]{its documentation} for more information on the supported
+  formats and available configuration options.
+  
+  The use of profile \emph{m/z} HRMS data (not IMS-HRMS) is currently not supported.
 }
-\note{
-In most cases it will be necessary to centroid your MS input files. The only exception is \command{Bruker},
-  however, you will still need centroided \file{mzXML}/\file{mzML} files for \emph{e.g.} plotting chromatograms. In
-  this case the centroided MS files should be stored in the same directory as the raw \command{Bruker} \file{.d}
-  files. The \code{\link{convertMSFiles}} function can be used to centroid data.
-}
+
 \section{Sets workflows}{
  With a \link[=sets-workflow]{sets workflow}, the feature group averaged peak lists are made
   per set. This is important, because for averaging peak lists cannot be mixed, for instance, when different
   ionization modes were used to generate the sets. The group averaged peaklists are then simply combined and labelled
-  in the final peak lists. However, please note that annotation and other functionality typically uses only the set
-  specific peak lists, as this functionality cannot work with mixed peak lists.
+  in the final peak lists. However, annotation and most other functionality typically uses only the (uncombined and)
+  set specific peak lists, as most algorithms cannot work with mixed peak lists.
 }
 
-\seealso{
-The \code{\link{MSPeakLists}} output class and its methods and the algorithm specific functions:
-  \code{\link{generateMSPeakListsDA}}, \code{\link{generateMSPeakListsDAFMF}}, \code{\link{generateMSPeakListsMzR}}
-}

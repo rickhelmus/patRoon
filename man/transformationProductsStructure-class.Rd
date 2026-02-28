@@ -52,7 +52,7 @@
   ...,
   commonParents = FALSE,
   labels = NULL,
-  nsets = length(list(...)) + 1,
+  nsets = NULL,
   nintersects = NA,
   upsetArgs = NULL
 )
@@ -126,7 +126,8 @@ done to avoid long times needed to construct the graph.}
 \item{vennArgs}{A \code{list} with further arguments passed to \pkg{VennDiagram} plotting functions. Set to
 \code{NULL} to ignore.}
 
-\item{nsets, nintersects}{See \code{\link[UpSetR]{upset}}.}
+\item{nsets, nintersects}{See \code{\link[UpSetR]{upset}}. If \code{nsets == NULL} then it will be set to the number
+of compared items.}
 
 \item{upsetArgs}{A list with any further arguments to be passed to
 \code{\link[UpSetR]{upset}}. Set to \code{NULL} to ignore.}
@@ -157,7 +158,7 @@ objects specified in \code{uniqueFrom}.}
 
 \code{plotVenn} (invisibly) returns a list with the following fields: \itemize{
 \item \code{gList} the \code{gList} object that was returned by
-  the utilized \pkg{\link{VennDiagram}} plotting function.
+  the utilized \CRANpkg{VennDiagram} plotting function.
 \item \code{areas} The total area for each plotted group.
 \item \code{intersectionCounts} The number of intersections between groups.
 }
@@ -192,8 +193,8 @@ resulting graph can be browsed interactively and allows exploration of the diffe
 Furthermore, results from \link[=generateComponentsTPs]{TP componentization} can be used to match the hierarchy
 with screening results. The graph is rendered with \pkg{\link{visNetwork}}.
 
-\item \code{plotVenn(transformationProductsStructure)}: plots a Venn diagram (using \pkg{\link{VennDiagram}}) outlining unique and shared
-candidates of up to five different \code{featureAnnotations} objects.
+\item \code{plotVenn(transformationProductsStructure)}: plots a Venn diagram (using \CRANpkg{VennDiagram}) outlining unique and
+shared candidates of up to five different \code{featureAnnotations} objects.
 
 \item \code{plotUpSet(transformationProductsStructure)}: Plots an UpSet diagram (using the \code{\link[UpSetR]{upset}} function)
 outlining unique and shared TPs between different \code{transformationProductsStructure} objects.
@@ -216,7 +217,7 @@ considered to originate from the same (original) parent.
 }
 
 \section{S4 class hierarchy}{
- \itemize{   \item{\code{\link{transformationProducts}}}   \itemize{     \item{\strong{\code{\link{transformationProductsStructure}}}}     \itemize{       \item{\code{\link{transformationProductsStructureConsensus}}}       \item{\code{\link{transformationProductsCTS}}}       \item{\code{\link{transformationProductsBT}}}       \item{\code{\link{transformationProductsLibrary}}}     }   } }
+ \itemize{   \item{\code{\link{transformationProducts}}}   \itemize{     \item{\strong{\code{\link{transformationProductsStructure}}}}     \itemize{       \item{\code{\link{transformationProductsStructureConsensus}}}       \item{\code{\link{transformationProductsCTS}}}       \item{\code{\link{transformationProductsAnnComp}}}       \item{\code{\link{transformationProductsBT}}}       \item{\code{\link{transformationProductsLibrary}}}     }   } }
 }
 
 \references{

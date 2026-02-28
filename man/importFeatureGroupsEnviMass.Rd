@@ -4,10 +4,10 @@
 \alias{importFeatureGroupsEnviMass}
 \title{Imports feature groups from enviMass}
 \usage{
-importFeatureGroupsEnviMass(path, feat, positive)
+importFeatureGroupsEnviMass(input, feat, positive)
 }
 \arguments{
-\item{path}{The path of the enviMass project.}
+\item{input}{The path of the enviMass project.}
 
 \item{feat}{The \code{\link{features}} object obtained with \code{\link{importFeaturesEnviMass}}.}
 

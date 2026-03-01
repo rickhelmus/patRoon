@@ -31,3 +31,5 @@ if (nzchar(Sys.getenv("PATROON_OPENMS")))
 
 # HACK: sometimes plot isn't recognized as an S4 generic
 # setGeneric("plot", function(x, y, ...) standardGeneric("plot"))
+
+BiocParallel::register(BiocParallel::SerialParam())

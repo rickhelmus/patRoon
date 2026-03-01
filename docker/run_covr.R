@@ -1,7 +1,7 @@
 # disable flags as otherwise GenForm doesn't compile
 options(covr.flags = list(CXXFLAGS = '', LDFLAGS = ''))
 
-Sys.setenv(TESTTHAT_CPUS = 4)
+Sys.setenv(TESTTHAT_CPUS = 3)
 
 install.packages(c("testthat", "vdiffr"))
 remotes::install_github("rickhelmus/covr@live-console-update")

@@ -2,8 +2,6 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-local_edition(3) # for snapshots
-
 test_that("CCS conversion works", {
     susps <- as.data.table(patRoonDataIMS::suspectsPos); setnames(susps, "mobility_[M+H]+", "mobility_input")
     suspsExp <- expandSuspMobilities(susps)

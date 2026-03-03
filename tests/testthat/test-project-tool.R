@@ -2,8 +2,6 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-local_edition(3) # for snapshots
-
 testBaseDir <- getWorkPath("test-np")
 defaultTestDir <- file.path(testBaseDir, "default")
 suspectsPaths <- list(

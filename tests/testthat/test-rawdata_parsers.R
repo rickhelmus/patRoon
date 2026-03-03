@@ -2,9 +2,8 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-local_edition(3) # for snapshots
-
 # NOTE: OpenTIMS is disabled in setup_all.R, enable it here so we can use it for testing
+# NOTE: if OpenTIMS is unavailable then snapshots will be slightly different
 withr::local_options(list(patRoon.MS.backends = getMSReadBackends()))
 
 anaInfo <- getTestAnaInfo()

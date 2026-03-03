@@ -5,7 +5,12 @@
 \alias{availableBackends}
 \title{Interface for HRMS and IMS-HRMS raw data}
 \usage{
-availableBackends(anaInfo = NULL, needTypes = NULL, verbose = TRUE)
+availableBackends(
+  anaInfo = NULL,
+  needTypes = NULL,
+  checkOption = TRUE,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{anaInfo}{Optional. If not \code{NULL} then \code{anaInfo} should be a \link[=analysis-information]{analysis
@@ -13,6 +18,9 @@ information} table, and only those backends that can read each of the analyses a
 
 \item{needTypes}{Only applicable if \code{anaInfo} is set: should be \code{"centroid"}, \code{"profile"} and/or
 \code{"ims"} to filter file types.}
+
+\item{checkOption}{Set to \code{TRUE} to only consider backends that are included in the \code{patRoon.MS.backends}
+option.}
 
 \item{verbose}{Set to \code{TRUE} to print the status of each backend.}
 }

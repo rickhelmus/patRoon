@@ -388,6 +388,8 @@ applyMSData <- function(anaInfo, func,  ..., needTypes = NULL, showProgress = TR
 #'   information} table, and only those backends that can read each of the analyses are returned.
 #' @param needTypes Only applicable if \code{anaInfo} is set: should be \code{"centroid"}, \code{"profile"} and/or
 #'   \code{"ims"} to filter file types.
+#' @param checkOption Set to \code{TRUE} to only consider backends that are included in the \code{patRoon.MS.backends}
+#'   option.
 #' @param verbose Set to \code{TRUE} to print the status of each backend.
 #'
 #' @return \code{availableBackends} returns (invisibly) a \code{character} vector with the names of the available
@@ -395,16 +397,20 @@ applyMSData <- function(anaInfo, func,  ..., needTypes = NULL, showProgress = TR
 #'
 #' @rdname msdata
 #' @export
-availableBackends <- function(anaInfo = NULL, needTypes = NULL, verbose = TRUE)
+availableBackends <- function(anaInfo = NULL, needTypes = NULL, checkOption = TRUE, verbose = TRUE)
 {
     anaInfo <- assertAndPrepareAnaInfo(anaInfo, null.ok = TRUE)
     if (!is.null(needTypes))
         checkmate::assertSubset(needTypes, c("centroid", "profile", "ims"), empty.ok = FALSE)
+    checkmate::assertFlag(checkOption)
     checkmate::assertFlag(verbose)
     
     allBackends <- getMSReadBackends()
     
-    unselected <- setdiff(allBackends, getOption("patRoon.MS.backends", character()))
+    unselected <- if (checkOption)
+        setdiff(allBackends, getOption("patRoon.MS.backends", character()))
+    else
+        character()
     notCompiled <- allBackends[!sapply(allBackends, backendAvailable)]
     noAnas <- if (is.null(anaInfo))
         character()

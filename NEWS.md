@@ -91,30 +91,20 @@ which can be used to specify the paths to different types of data. If only a `pa
 * Internal changes
     * the analysis information is now internally stored as `data.table`s for efficiency
     * the `featureGroups` objects do not store analysis information internally anymore, but instead refer to the analysis information stored in the respective `features` object.
-
+* Using sample metadata for grouping and aggregation
+    * New function arguments to group & aggregate data (e.g. `groupBy`, `aggregate`) were added to `unique()`, `overlap()` and plotting functions.
+    * In some cases these replace older function arguments
+        * `plot()`, `plotChroms()`: `groupBy` replaces `colourBy`
+        * `plotVenn()`, `overlap()`, `unique()`, `plotInt()`: `groupBy` replaces `sets`
+        * `plotChord()`: `groupBy` replaces `outerGroups`, `aggregate` replaces `average`
+        * `plotVenn()`, `overlap()`, `plotUpSet()`: `aggregate` replaces possibility to pass a `list` to `which`
+    * `plotInt()`: added function arguments to aggregate data and apply regression (`xBy`, `groupBy`, `regression`)
+    
 The following functions were changed to support the use of sample metadata
 
 
-- generateAnalysisInfo()
-
-
-- plot()/plotChroms()
-    - colourBy --> groupBy
-        - "none" --> NULL
-        - anaInfo col possible
-- plotVenn()/unique()/overlap(): aggregate arg
-- overlap(): which can be NULL
-- plotUpSet():
-    - aggregate arg
-    - nsets can be/defaults to NULL (all methods)
-- plotChord()
-    - aggregate arg (replaces average)
-    - outerGroups --> groupBy and now expects anaInfo column name
 - plotInt()
     - new args: areas, xBy, groupBy, averageFunc, regression
-    - removed sets method, replaced by groupBy
-- plotVenn()/overlap()/unique(): removal of sets arg
-- plotVenn()/overlap/plotUpSet(): removed list arg possibility for which
 - as.data.table()
     - average arg
         - "fGroups" replaces average==T if features==T and also supports features==F
@@ -186,6 +176,9 @@ In most cases `fixedIsolationWidth=FALSE` is recommended.
 
 ## Minor changes and new functionality
 
+- plotUpSet():
+    - nsets can be/defaults to NULL (all methods)
+- overlap(): which can be NULL
 - new/changed PListParams
 - new behavior of getMSFilesFromAnaInfo(): file types are checked one by one to avoid mixes and always checked to be present (mustExist was set a bit randomly...)
 - better checking of analysis file directory checking (verifyFileForFormat())

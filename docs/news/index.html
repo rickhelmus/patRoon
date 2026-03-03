@@ -90,6 +90,338 @@
     </div>
 
     <div class="section level2">
+<h2 class="page-header" data-toc-text="3.0" id="patroon-30">patRoon 3.0<a class="anchor" aria-label="anchor" href="#patroon-30"></a></h2>
+<p>This release adds a significant amount of new functionality and changes. Please see the updated Handbook and sections below for more information.</p>
+<p>Users of previous <code>patRoon</code> versions should inform themselves with the important changes highlighted in the next section. Furthermore, it is highly recommended to remove any cached data, i.e. by running <code>clearCache("all")</code> or manually removing the <code>cache.sqlite</code> file from your project directory.</p>
+<div class="section level3">
+<h3 id="major-new-functionality-3-0">Major new functionality<a class="anchor" aria-label="anchor" href="#major-new-functionality-3-0"></a></h3>
+<div class="section level4">
+<h4 id="ims-workflows-3-0">IMS workflows<a class="anchor" aria-label="anchor" href="#ims-workflows-3-0"></a></h4>
+</div>
+<div class="section level4">
+<h4 id="msdata-interface-3-0">
+<code>msdata</code> interface<a class="anchor" aria-label="anchor" href="#msdata-interface-3-0"></a></h4>
+</div>
+<div class="section level4">
+<h4 id="piek-and-greedy-algorithms-3-0">
+<code>piek</code> and <code>greedy</code> algorithms<a class="anchor" aria-label="anchor" href="#piek-and-greedy-algorithms-3-0"></a></h4>
+</div>
+<div class="section level4">
+<h4 id="sample-metadata-and-analysis-information-3-0">Sample metadata and analysis information<a class="anchor" aria-label="anchor" href="#sample-metadata-and-analysis-information-3-0"></a></h4>
+<ul><li>feature subsetting: ni and reorder args (also reorder sets)</li>
+</ul></div>
+<div class="section level4">
+<h4 id="transformation-products-3-0">Transformation products<a class="anchor" aria-label="anchor" href="#transformation-products-3-0"></a></h4>
+<ul><li>new ann_form/ann_comp args</li>
+</ul></div>
+</div>
+<div class="section level3">
+<h3 id="other-new-functionality-3-0">Other new functionality<a class="anchor" aria-label="anchor" href="#other-new-functionality-3-0"></a></h3>
+<ul><li>updateGroups()</li>
+<li>importFeatures() / importFeatureGroups()</li>
+<li>new filters
+<ul><li>minimum max intensity feature filter</li>
+<li>maxMZOverPrecMS/maxMZOverPrecMSMS MSPL filters</li>
+<li>
+<code>fragFormulas</code> and <code>lossFormulas</code> filters: filter candidates by matching fragment or neutral loss formulae</li>
+<li>…</li>
+</ul></li>
+<li>MS/MS bg subtraction
+<ul><li>abundance filter args</li>
+<li>abundance columns in mspl</li>
+<li>abundance parameter in average params</li>
+<li>getBGMSMSPeaks()</li>
+<li>new/shortened filter() args</li>
+<li>removeMZs and mzWindow filter() args</li>
+</ul></li>
+<li>ID levels formulas/compounds</li>
+<li>reporting
+<ul><li>size optimizations, mainly for self contained (lzstring, no duplicate images)</li>
+<li>interface improvements for TPs</li>
+</ul></li>
+</ul></div>
+<div class="section level3">
+<h3 id="important-changes-3-0">Important changes<a class="anchor" aria-label="anchor" href="#important-changes-3-0"></a></h3>
+<div class="section level4">
+<h4 id="centralized-default-numeric-limits-3-0">Centralized default numeric limits<a class="anchor" aria-label="anchor" href="#centralized-default-numeric-limits-3-0"></a></h4>
+<ul><li>limits</li>
+</ul></div>
+<div class="section level4">
+<h4 id="changed-function-argument-defaults-3-0">Changed function argument defaults<a class="anchor" aria-label="anchor" href="#changed-function-argument-defaults-3-0"></a></h4>
+<ul><li>
+<code><a href="../reference/generateFormulas.html">generateFormulas()</a></code>: <code>calculateFeatures</code> now defaults to <code>FALSE</code>: this usually yields equally valid results and is generally much faster.</li>
+<li>
+<code><a href="../reference/generateCompoundsMetFrag.html">generateCompoundsMetFrag()</a></code>
+<ul><li>the default database was changed from PubChem to PubChemLite, which is much faster and generally more suitable for non-target analysis.</li>
+<li>MetFusion scoring is not used anymore by default. The <code>scoreTypes</code> function argument can be configured to include it again.</li>
+</ul></li>
+<li>
+<code><a href="../reference/generateCompoundsLibrary.html">generateCompoundsLibrary()</a></code>
+<ul><li>
+<code>specSimParamsLib</code> now defaults to the value for <code>specSimParams</code>
+</li>
+<li>
+<code>specSimParams</code> now defaults to removing the precursor mass peak</li>
+</ul></li>
+<li>Identification confidence levels: increased 3a library match threshold to a more reasonable value (from 0.4 to 0.7)</li>
+</ul></div>
+<div class="section level4">
+<h4 id="changed-naming-3-0">Changed naming<a class="anchor" aria-label="anchor" href="#changed-naming-3-0"></a></h4>
+<ul><li>The use of “replicate groups” was changed to “replicates” throughout the whole code and documentation for consistency and clarity. Some important changes include
+<ul><li>The <code>group</code> column in the analysis information should now be named <code>replicate</code>. If only the old column name is present it will still be used, with a warning.</li>
+<li>
+<code>replicateGroups()</code> was renamed to <code><a href="../reference/generics.html">replicates()</a></code>
+</li>
+<li>
+<code>replicateGroupSubtract()</code> was renamed to <code><a href="../reference/feature-filtering.html">replicateSubtract()</a></code>
+</li>
+<li>The <code>rGroups</code> argument to <code>[</code> and <code><a href="../reference/generics.html">filter()</a></code> was renamed to <code>replicates</code>.</li>
+<li>The <code>topMostByRGroup</code> EIC parameter was renamed to <code>topMostByReplicate</code>
+</li>
+</ul></li>
+<li>The <code><a href="../reference/patRoon-deprecated.html">annotateSuspects()</a></code> function was renamed to <code><a href="../reference/id-conf.html">estimateIDConfidence()</a></code> for consistency with ID level estimation functionality for formulae and compounds.</li>
+<li>
+<code>overWrite</code> –&gt; <code>overwrite</code> for consistency, applies to <code><a href="../reference/check-GUI.html">predictCheckFeaturesSession()</a></code> and file conversion functions</li>
+<li>
+<code><a href="../reference/generateMSPeakLists.html">generateMSPeakLists()</a></code>: <code>maxMSRtWindow</code> was renamed to <code>maxMSRTWindow</code> for consistency</li>
+<li>
+<code><a href="../reference/generics.html">plotInt()</a></code>: <code>xnames</code> –&gt; <code>xNames</code>
+</li>
+<li>EIC parameters (<code><a href="../reference/EIXParams.html">getDefEICParams()</a></code>): <code>retWindow</code> –&gt; <code>window</code>
+</li>
+<li>log P values are now consistently stored in <code>"logP"</code> columns, affects results for compound annotations and transformation products</li>
+</ul></div>
+<div class="section level4">
+<h4 id="analysis-information-and-use-of-sample-metadata-3-0">Analysis information and use of sample metadata<a class="anchor" aria-label="anchor" href="#analysis-information-and-use-of-sample-metadata-3-0"></a></h4>
+<p>Several changes were made to the analysis information tables to improve support for different file formats and allow the use of sample metadata (as introduced before). See the updated Handbook for more details.</p>
+<ul><li>The <code>path</code> column is replaced by four different columns: <code>path_raw</code>, <code>path_centroid</code>, <code>path_profile</code> and <code>path_ims</code>, which can be used to specify the paths to different types of data. If only a <code>path</code> column is present, it will be used as <code>path_centroid</code> with a warning.</li>
+<li>The <code>group</code> column should now be named <code>replicate</code>.</li>
+<li>Any additional columns can be included and will be kept and can be used for post-process feature data (see below).</li>
+<li>A new function was added to adjust analysis information during the workfow (<code>analysisInfo()&lt;-</code>).</li>
+<li>Similarly, the new <code>reorder</code> argument to <code>[</code> can be used to reorder the sample analyses, which may e.g. be usful for plotting.</li>
+<li>The <code><a href="../reference/analysis-information.html">generateAnalysisInfo()</a></code> function was updated for these changes: please see the updated [Handbook] for its new interface.</li>
+<li>Internal changes
+<ul><li>the analysis information is now internally stored as <code>data.table</code>s for efficiency</li>
+<li>the <code>featureGroups</code> objects do not store analysis information internally anymore, but instead refer to the analysis information stored in the respective <code>features</code> object.</li>
+</ul></li>
+</ul><p>The following functions were changed to support the use of sample metadata</p>
+<ul><li><p>generateAnalysisInfo()</p></li>
+<li>
+<p>plot()/plotChroms()</p>
+<ul><li>colourBy –&gt; groupBy
+<ul><li>“none” –&gt; NULL</li>
+<li>anaInfo col possible</li>
+</ul></li>
+</ul></li>
+<li><p>plotVenn()/unique()/overlap(): aggregate arg</p></li>
+<li><p>overlap(): which can be NULL</p></li>
+<li>
+<p>plotUpSet():</p>
+<ul><li>aggregate arg</li>
+<li>nsets can be/defaults to NULL (all methods)</li>
+</ul></li>
+<li>
+<p>plotChord()</p>
+<ul><li>aggregate arg (replaces average)</li>
+<li>outerGroups –&gt; groupBy and now expects anaInfo column name</li>
+</ul></li>
+<li>
+<p>plotInt()</p>
+<ul><li>new args: areas, xBy, groupBy, averageFunc, regression</li>
+<li>removed sets method, replaced by groupBy</li>
+</ul></li>
+<li><p>plotVenn()/overlap()/unique(): removal of sets arg</p></li>
+<li><p>plotVenn()/overlap/plotUpSet(): removed list arg possibility for which</p></li>
+<li>
+<p>as.data.table()</p>
+<ul><li>average arg
+<ul><li>“fGroups” replaces average==T if features==T and also supports features==F</li>
+</ul></li>
+<li>regressionBy arg</li>
+<li>updates for changed regression arg and conc_reg –&gt; x_reg</li>
+</ul></li>
+</ul></div>
+<div class="section level4">
+<h4 id="ms-peak-lists-3-0">MS peak lists<a class="anchor" aria-label="anchor" href="#ms-peak-lists-3-0"></a></h4>
+<ul><li>The <code><a href="../reference/generateMSPeakLists.html">generateMSPeakLists()</a></code> function now uses the <code>msdata</code> interface to read raw data. The old backends (mzR and DataAnalysis) are now deprecated and should not be used anymore. For this reason, the <code>algorithm</code> function argument was removed and the <code><a href="../reference/generateMSPeakListsMzR.html">generateMSPeakListsMzR()</a></code>, <code><a href="../reference/generateMSPeakListsDA.html">generateMSPeakListsDA()</a></code>, <code><a href="../reference/generateMSPeakListsDAFMF.html">generateMSPeakListsDAFMF()</a></code> functions are now marked as deprecated.</li>
+<li>The <code>precursorMzWindow</code> is replaced by the <code>fixedIsolationWidth</code> function argument, with slightly different behavior. In most cases <code>fixedIsolationWidth=FALSE</code> is recommended.</li>
+<li>The averaging of spectra is now intensity weighted.</li>
+<li>The default method to average spectra was changed from hierarchical clustering (<code>"hclust"</code>) to distance based averaging (<code>"distance_mean"</code>), which is faster and more suitable for large datasets such as IMS data.</li>
+<li>The <code>"distance"</code> averaging method was renamed to <code>"distance_point"</code>.</li>
+</ul></div>
+<div class="section level4">
+<h4 id="other-3-0">Other<a class="anchor" aria-label="anchor" href="#other-3-0"></a></h4>
+<ul><li>MSFileFormats() –&gt; replaced by getMSConversionFormats() + getMSFileFormats()</li>
+<li>
+<code><a href="../reference/generateFormulasDA.html">generateFormulasDA()</a></code> deprecated –&gt; use GenForm or SIRIUS for formula generation</li>
+<li>updated convertMSFilesXXX() functions, including changed args
+<ul><li>algo specific functions are now exported</li>
+</ul></li>
+<li>Features
+<ul><li>Importing feature data
+<ul><li>made interface if both function more consistent: same (order) of arguments</li>
+<li>added XCMS, XCMS3 and KPIC2 to importFeatureGroups()</li>
+<li>renamed <code>path</code> to more generic <code>input</code>
+</li>
+<li>removed <code>analysisInfo</code> argument from importFeatures()</li>
+<li>added <code>table</code> import (importFeaturesTable() and importFeatureGroupsTable())</li>
+</ul></li>
+<li>groupInfo is now a DT</li>
+<li>sets annSims are now max value (as is done now for forms/comps)</li>
+<li>as.data.table()
+<ul><li>regression for features==F&amp;&amp;average==T: use average conc instead of first of each replicate</li>
+<li>FC now possible with features==T</li>
+<li>adduct column now split for features</li>
+<li>anaInfoCols arg</li>
+<li>intensity cols are suffixed
+<ul><li>clarify that same columns are used for areas?</li>
+</ul></li>
+<li>adduct column: now split per set and renamed to group_adduct</li>
+<li>added susp_bestEstIDLevel column</li>
+<li>moved docs to new page with all as.data.table() methods</li>
+</ul></li>
+<li>SAFD algorithm (<code><a href="../reference/findFeaturesSAFD.html">findFeaturesSAFD()</a></code>)
+<ul><li>The <code>msdata</code> interface is now used to load raw data instead of interfacing with the <code>MS_import.jl</code> package. As a result:
+<ul><li>
+<code>MS_import.jl</code> does not need to be installed anymore.</li>
+<li>Reading data is expected to be faster.</li>
+<li>This adds support for other data formats such as mzML.</li>
+<li>Very basic support for files with ion mobility data: these can be used for feature detection, but the IMS dimension will be ignored.</li>
+</ul></li>
+<li>The <code>profPath</code> function argument is removed, as this information should now be specified in the analysis information (see above).</li>
+<li>Added <code>prefCentroid</code>, <code>centroidMethod</code> and <code>centroidDM</code> function arguments</li>
+</ul></li>
+</ul></li>
+<li>Feature annotation
+<ul><li>annotateSuspects()/estimateIDConfidence() now copies annSims from feat annotations instead of calculating
+<ul><li>change in func args</li>
+<li>annSimBoth is copied, so needs to be present in compounds (ie from IDLs)</li>
+</ul></li>
+</ul></li>
+<li>Transformation products
+<ul><li>generateComponentsTPs()
+<ul><li>new args</li>
+<li>as.data.table candidates arg</li>
+<li>candidate specific frag/NL matches, also filter</li>
+<li>new slots</li>
+</ul></li>
+<li>generateTPs()
+<ul><li>consistent calculation and configuration of logP/retDir calculation for all TP structure algos</li>
+<li>TPStructParams</li>
+<li>log P tolerance for retDir calculation –&gt; default enabled and has a large effect vs prev results –&gt; doc how to revert to old behavior?</li>
+</ul></li>
+</ul></li>
+</ul></div>
+</div>
+<div class="section level3">
+<h3 id="minor-changes-and-new-functionality-3-0">Minor changes and new functionality<a class="anchor" aria-label="anchor" href="#minor-changes-and-new-functionality-3-0"></a></h3>
+<ul><li><p>new/changed PListParams</p></li>
+<li><p>new behavior of getMSFilesFromAnaInfo(): file types are checked one by one to avoid mixes and always checked to be present (mustExist was set a bit randomly…)</p></li>
+<li><p>better checking of analysis file directory checking (verifyFileForFormat())</p></li>
+<li><p>(optimized getEICFGroupInfo() substantially)</p></li>
+<li><p>getPICSet() isn’t limited by centroided data anymore</p></li>
+<li><p>EICParams for getPICSet() and calculatePeakQualities() (needed for m/z IMS expansion)</p></li>
+<li><p>(subsetDTColumnsIfPresent: use order of requested cols instead of original) –&gt; may change column order in some places</p></li>
+<li><p>minIntensity arg for pwiz conversion</p></li>
+<li><p>getBPCs(): doen’t return m/z anymore</p></li>
+<li><p>patRoon.checkCentroided option removed (not needed anymore, checks are faster now and part of regular reading operations)</p></li>
+<li><p>sets features: ion_mz column</p></li>
+<li><p>sets fGroups: ion_mz column in <a href="https://github.com/annotations" class="external-link">@annotations</a></p></li>
+<li><p>annSuspects should be faster now (no need to calc annSims, and estIDLevel is faster)</p></li>
+<li>
+<p>Features</p>
+<ul><li>Made feature qualities more configurable and extendable (suggested by Leon Saal, issue <a href="https://github.com/rickhelmus/patRoon/issues/133" class="external-link">#133</a>/PR <a href="https://github.com/rickhelmus/patRoon/issues/134" class="external-link">#134</a>)
+<ul><li>added <code><a href="../reference/feature-quality.html">featureQualities()</a></code> and <code><a href="../reference/feature-quality.html">featureGroupQualities()</a></code> functions to obtain the default qualities and calculation functions used by <code>MetaClean</code>
+</li>
+<li>added <code><a href="../reference/generics.html">getFeatureQualityNames()</a></code> generic to obtain the quality/score names for a <code>features</code>/<code>featureGroups</code> object</li>
+<li>added <code>featureQualities</code> and <code>featureGroupQualities</code> arguments to <code><a href="../reference/generics.html">calculatePeakQualities()</a></code> methods to customize calculation.</li>
+</ul></li>
+<li>The <code><a href="../reference/generics.html">delete()</a></code> method function for suspect screening results can now remove suspect hits through the <code>k</code> function argument</li>
+<li>loading OpenMS peak intensities is now much faster and removed now unneeded intSearchRTWindow function argument</li>
+<li>feature ID column is now always of character type</li>
+<li>optimized suspect screening</li>
+<li>The unique and total suspects/suspect hits are now (consistently) printed</li>
+<li>
+<code><a href="../reference/generics.html">plotInt()</a></code>: <code>xlim</code> and <code>ylim</code> function arguments</li>
+<li>
+<code><a href="../reference/generics.html">plotChroms3D()</a></code> function to plot 3D feature data (retention, intensity and m/z or mobility)</li>
+<li>
+<code><a href="../reference/generics.html">filter()</a></code>: <code>removeISTDs</code> and <code>onlyHits</code> are now cached like other filters</li>
+<li>
+<code><a href="../reference/generics.html">as.data.table()</a></code> columns with text data are now collapsed instead of removed if <code>features=TRUE</code> and results are averaged</li>
+<li>The class for suspect screening+sets workflows (<code>featureGroupsScreeningSet</code>) doesn’t have setObjects anymore, which makes common operations faster</li>
+</ul></li>
+<li>
+<p>Feature annotation</p>
+<ul><li>
+<code><a href="../reference/generics.html">plotSpectrum()</a></code>: <code>normalization</code> and <code>showLegend</code> function arguments</li>
+</ul></li>
+<li>
+<p>Components</p>
+<ul><li>components from <code>nontarget</code>: renamed “rt” column to “ret” for consistency</li>
+</ul></li>
+<li>
+<p>Misc</p>
+<ul><li>
+<code>patRoon.cache.maxEntries</code> package option (issue <a href="https://github.com/rickhelmus/patRoon/issues/139" class="external-link">#139</a>)</li>
+<li>Updated PubChem Transformations to 0.2.2</li>
+<li>The default metabolic logic transformations are now accessible through the <code><a href="../reference/TPLogicTransformations.html">TPLogicTransformations()</a></code> function.</li>
+<li>optimized future parallelization</li>
+<li>MS2Quant metadata is now also stored for sets workflow data (<code>MS2QuantMeta</code> slots for <code>fGroupsScreeningSet</code>, <code>formulasSet</code> and <code>compoundsSet</code>)</li>
+</ul></li>
+</ul></div>
+<div class="section level3">
+<h3 id="fixes-3-0">Fixes<a class="anchor" aria-label="anchor" href="#fixes-3-0"></a></h3>
+<ul><li><p>sets workflows/screening: fixed getAllSuspCols() –&gt; may affect formRank/compRank, filter() and reporting</p></li>
+<li>
+<p>Features</p>
+<ul><li>Fixed: syncing of xdata slots imported XCMS features that are not sorted by analysis (eg after peak filling) (issue <a href="https://github.com/rickhelmus/patRoon/issues/141" class="external-link">#141</a>)</li>
+<li>
+<code><a href="../reference/featureGroups-class.html">normInts()</a></code> changes (feedback Jan Specker)
+<ul><li>Fixed: <code>groupNorm=TRUE</code> now correctly handles zero values which would result in <code>NaN</code> values</li>
+<li>Changed: <code>norm_conc</code> is set to one if all are values are NA (default for <code><a href="../reference/newProject.html">newProject()</a></code>)</li>
+</ul></li>
+<li>Fixed: workaround for bug in plotting feature optimization results (issue <a href="https://github.com/rickhelmus/patRoon/issues/145" class="external-link">#145</a>)</li>
+<li>Fixed: <code>featureGroups</code> annotations slot is properly updated if all features are removed from a set</li>
+<li>Fixed: <code><a href="../reference/generics.html">as.data.table()</a></code> method for <code>features</code>: properly handle empty objects</li>
+<li>Fixed: KPIC2 grouping would error when there are no results</li>
+<li>Fixed: KPIC2/XCMS/XCMS3 grouping would error when there are no results</li>
+<li>Fixed: getXCMSnExp with loadRawData=FALSE set additional metadata so that e.g. analysis subsetting works</li>
+<li>Fixed: feature filter didn’t hash <code>qualityRange</code>
+</li>
+<li>Fixed: <code><a href="../reference/featureGroups-class.html">normInts()</a></code> produced invalid output if no internal standards were found</li>
+<li>Fixed: <code>fGroupsScreeningSet</code> now correctly stores RF_SMILES per set</li>
+<li>Fixed: suspect list verification only checked part of the columns</li>
+<li>Fixed: <code><a href="../reference/generics.html">plotVenn()</a></code> now warns when there are too many groups, instead of erroring</li>
+</ul></li>
+<li>
+<p>Feature annotation</p>
+<ul><li>Fixed: SIRIUS with <code>calculateFeatures=TRUE</code> could sometimes fail due to file name truncation</li>
+<li>Fixed: <code><a href="../reference/generics.html">filter()</a></code> method for <code>MSPeakListsSet</code>: properly handle case where <code>sets</code> argument is combined with other filters.</li>
+<li>Fixed: avoid error when <code><a href="../reference/generics.html">consensus()</a></code> is called with empty objects for a set (issue <a href="https://github.com/rickhelmus/patRoon/issues/144" class="external-link">#144</a>)</li>
+<li>Fixed: don’t try to do multiprocess parallelization for non-local databases (e.g. PubChem) to avoid connection errors</li>
+<li>
+<code>annotationBy</code> filter for MS peak lists: clarify and verify that it only works on group averaged peak lists and cannot be combined with <code>reAverage=TRUE</code>
+</li>
+</ul></li>
+<li>
+<p>Components</p>
+<ul><li>Fixed: reporting components from <code>cliqueMS</code> and suspect screened features would fail (reported by Jan Specker)</li>
+<li>Fixed: feature componentization would fail if no annotations were found (reported by Jan Specker)</li>
+</ul></li>
+<li>
+<p>Misc</p>
+<ul><li>Fixed: <code><a href="../reference/reporting.html">report()</a></code>: don’t show (empty) annotations column in feature data if no feature annotations are present</li>
+<li>Fixed: <code><a href="../reference/reporting.html">report()</a></code>: TP graphs were generated for components with absent (parent) fGroups</li>
+<li>Fixed: <code><a href="../reference/reporting.html">report()</a></code>: candidate column in CSV of quant/tox prediction tables now don’t contain image link columns</li>
+<li>Fixed: The <code>removeTPIsomers</code> filter for <code>transformationProductsStructure</code> didn’t actually apply the <code>removeDuplicates</code> filter.</li>
+<li>Fixed: <code><a href="../reference/newProject.html">newProject()</a></code>: don’t break long lines of text strings</li>
+<li>Fixed: <code><a href="../reference/newProject.html">newProject()</a></code>: XCMS3/KPIC2 groupFeatures tried to do RT alignment in sets worfklow</li>
+<li>Fixed: Sets names are now checked to not contain any special characters (besides underscores). Automatic labels are now separated by underscores instead of dots.</li>
+</ul></li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="page-header" data-toc-text="2.3.4" id="patroon-234">patRoon 2.3.4<a class="anchor" aria-label="anchor" href="#patroon-234"></a></h2>
 <div class="section level3">
 <h3 id="important-changes-2-3-4">Important changes<a class="anchor" aria-label="anchor" href="#important-changes-2-3-4"></a></h3>

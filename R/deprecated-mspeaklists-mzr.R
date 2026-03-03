@@ -6,6 +6,8 @@
 #' @include mspeaklists.R
 NULL
 
+# nocov start
+
 # align & average spectra by clustering or between peak distances
 # code inspired from msProcess R package: https://github.com/zeehio/msProcess
 averageSpectra <- function(spectra, clusterMzWindow, topMost, minIntensityPre, minIntensityPost, relMinAbundance,
@@ -340,3 +342,5 @@ setMethod("generateMSPeakListsMzR", "featureGroupsSet", function(fGroups, ...)
 {
     generateMSPeakListsSet(fGroups, generateMSPeakListsMzR, ...)
 })
+
+# nocov end

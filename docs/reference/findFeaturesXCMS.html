@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.0</span>
       </span>
     </div>
 
@@ -103,7 +103,8 @@
 
 
 <dl><dt id="arg-analysisinfo">analysisInfo<a class="anchor" aria-label="anchor" href="#arg-analysisinfo"></a></dt>
-<dd><p>A <code>data.frame</code> with <a href="analysis-information.html">Analysis information</a>.</p></dd>
+<dd><p>A <code>data.frame</code> (or <code>data.table</code>) with <a href="analysis-information.html">Analysis
+information</a>.</p></dd>
 
 
 <dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
@@ -129,8 +130,8 @@
 <p>This function uses the legacy interface of <span class="pkg">xcms</span>. It is recommended to use
   <code><a href="findFeaturesXCMS3.html">findFeaturesXCMS3</a></code> instead.</p>
 <p>The file format of analyses must be <code>mzML</code> or <code>mzXML</code>.</p>
-<p>The input MS data files need to be centroided. The <code><a href="convertMSFiles.html">convertMSFiles</a></code> function can be used to
-  centroid data.</p>
+<p>The input MS data files need to be centroided. The <code><a href="MSConversion.html">convertMSFiles</a></code> function can be used
+  to centroid data.</p>
     </div>
     <div id="references">
     <h2>References</h2>

@@ -1,0 +1,14 @@
+---
+title: "report"
+output:
+    html_document:
+        mathjax: null
+        fig_mobile: false
+        dev: svg
+        includes:
+            before_body: modal.html
+---
+
+```{r, echo=FALSE,warning=FALSE,message=FALSE}
+utils$genMainUI()
+```

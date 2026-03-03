@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.0</span>
       </span>
     </div>
 
@@ -95,7 +95,7 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">getDefAvgPListParams</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">getDefAvgPListParams</span><span class="op">(</span><span class="va">...</span>, IMS <span class="op">=</span> <span class="fu"><a href="limits.html">getLimIMS</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -104,6 +104,11 @@
 
 <dl><dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Optional named arguments that override defaults.</p></dd>
+
+
+<dt id="arg-ims">IMS<a class="anchor" aria-label="anchor" href="#arg-ims"></a></dt>
+<dd><p>A <code>character</code> that specifies for which IMS instrument defaults are returned. Should be
+<code>"bruker"</code> or <code>"agilent"</code>. Defaults to what is specified in <a href="limits.html">limits</a>.</p></dd>
 
 </dl></div>
     <div id="value">
@@ -114,48 +119,74 @@
     <h2>Details</h2>
     <p>The parameters set used for averaging peak lists are set by the <code>avgFeatParams</code> and <code>avgFGroupParams</code>
 arguments to <code><a href="generateMSPeakLists.html">generateMSPeakLists</a></code> and its related algorithm specific functions. The parameters are
-specified as a named <code>list</code> with the following values:</p><ul><li><p><code>clusterMzWindow</code> <em>m/z</em> window (in Da) used for clustering <em>m/z</em> values when spectra are
-averaged. For <code>method="hclust"</code> this corresponds to the cluster height, while for <code>method="distance"</code> this
-value is used to find nearby masses (+/- window).  Too small windows will prevent clustering <em>m/z</em> values (thus
-erroneously treating equal masses along spectra as different), whereas too big windows may cluster unrelated
-<em>m/z</em> values from different or even the same spectrum together.</p></li>
+specified as a named <code>list</code> with the following values:</p><ul><li><p><code>method</code>,<code>clusterMzWindow</code> The cluster method and window (see <a href="cluster-params.html">clustering
+parameters</a>) used to average mass spectra. <code>clusterMzWindow</code> is defaulted as <code>defaultLim("mz", "medium")</code> (see
+<a href="limits.html">limits</a>).</p></li>
 <li><p><code>topMost</code> Only retain this maximum number of MS peaks when generating averaged spectra. Lowering this
 number may exclude more irrelevant (noisy) MS peaks and decrease processing time, whereas higher values may avoid
 excluding lower intense MS peaks that may still be of interest.</p></li>
 <li><p><code>minIntensityPre</code> MS peaks with intensities below this value will be removed (applied prior to selection
-by <code>topMost</code>) before averaging.</p></li>
-<li><p><code>minIntensityPost</code> MS peaks with intensities below this value will be removed after averaging.</p></li>
-<li><p><code>avgFun</code> Function that is used to calculate average <em>m/z</em> values.</p></li>
-<li><p><code>method</code> Method used for producing averaged MS spectra. Valid values are <code>"hclust"</code>, used for
-hierarchical clustering (using the <span class="pkg">fastcluster</span> package), and <code>"distance"</code>, to use the between peak
-distance. The latter method may reduces processing time and memory requirements, at the potential cost of reduced
-accuracy.</p></li>
+by <code>topMost</code> and averaging).</p></li>
+<li><p><code>minIntensityPost</code> MS peaks with intensities below this value will be removed (after averaging).</p></li>
+<li><p><code>minIntensityIMS</code> MS peaks in spectra of raw IMS frames with intensities below this value will be removed
+(applied prior to any other treatment steps).</p></li>
+<li><p><code>absMinAbundance</code>,<code>relMinAbundance</code> Minimum absolute/relative abundance of an MS peak across the
+spectra that are averaged. If <code>absMinAbundance</code> exceeds the number of spectra then the threshold is
+automatically lowered to the number of spectra.</p></li>
+<li><p><code>smoothWindowIMS</code>,<code>halfWindowIMS</code>,<code>maxGapIMS</code> Parameters used for centroiding <em>m/z</em> peaks
+from IMS-HRMS data. See <code>Centroiding IMS data</code> for more details.</p></li>
+<li><p><code>withPrecursorMS</code> For MS data only: ignore any spectra that do not contain the precursor peak.</p>
+<p>For IMS data this excludes MS spectra within an IMS frame that do not contain the precursor peak, typically due to
+  mobility separation. Hence, setting this option performs some crude cleanup of MS spectra, even for features for
+  which no mobilities were assigned (<em>e.g.</em> non-IMS workflows).</p></li>
 <li><p><code>pruneMissingPrecursorMS</code> For MS data only: if <code>TRUE</code> then peak lists without a precursor peak are
 removed. Note that even when this is set to <code>FALSE</code>, functionality that relies on MS (not MS/MS) peak lists
-(<em>e.g.</em> formulae calulcation) will still skip calculation if a precursor is not found.</p></li>
+(<em>e.g.</em> formulae calculation) will still skip calculation if a precursor is not found.</p></li>
 <li><p><code>retainPrecursorMSMS</code> For MS/MS data only: if <code>TRUE</code> then always retain the precursor mass peak even
 if is not amongst the <code>topMost</code> peaks. Note that MS precursor mass peaks are always kept. Furthermore, note that
 precursor peaks in both MS and MS/MS data may still be removed by intensity thresholds (this is unlike the
 <code><a href="MSPeakLists-class.html">filter</a></code> method function).</p></li>
-</ul><p>The <code>getDefAvgPListParams</code> function can be used to generate a default parameter list. The current defaults are:</p>
-<p><code>clusterMzWindow=0.005</code>; <code>topMost=50</code>; <code>minIntensityPre=500</code>; <code>minIntensityPost=500</code>; <code>avgFun=mean</code>; <code>method="hclust"</code>; <code>pruneMissingPrecursorMS=TRUE</code>; <code>retainPrecursorMSMS=TRUE</code></p>
+</ul><p>The <code>getDefAvgPListParams</code> function can be used to generate a default parameter list. The defaults are (with
+<code>IMS="bruker"</code>):</p>
+<div class="sourceCode"><pre><code><span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  method <span class="op">=</span> <span class="st">"distance_mean"</span>,</span>
+<span>  clusterMzWindow <span class="op">=</span> <span class="fl">0.005</span>,</span>
+<span>  topMost <span class="op">=</span> <span class="fl">50</span>,</span>
+<span>  minIntensityPre <span class="op">=</span> <span class="fl">500</span>,</span>
+<span>  minIntensityPost <span class="op">=</span> <span class="fl">500</span>,</span>
+<span>  minIntensityIMS <span class="op">=</span> <span class="fl">25</span>,</span>
+<span>  absMinAbundance <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  relMinAbundance <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  smoothWindowIMS <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  halfWindowIMS <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  maxGapIMS <span class="op">=</span> <span class="fl">0.005</span>,</span>
+<span>  withPrecursorMS <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  pruneMissingPrecursorMS <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  retainPrecursorMSMS <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+
     </div>
-    <div id="note">
-    <h2>Note</h2>
-    <p>With Bruker algorithms these parameters only control generation of feature groups averaged peak lists: how peak
-  lists for features are generated is controlled by DataAnalysis.</p>
-    </div>
-    <div id="source">
-    <h2>Source</h2>
-    <p>Averaging of mass spectra algorithms used by are based on the
-  <a href="https://github.com/zeehio/msProcess" class="external-link">msProcess</a> R package (now archived on CRAN).</p>
-    </div>
+    <div id="centroiding-ims-data">
+    <h2>Centroiding IMS data</h2>
+    <p>With IMS-HRMS data the <em>m/z</em> peaks are often not or partially centroided. The
+  following steps are performed to centroid the data:</p><ol><li><p>Sum up mass spectra within an IMS frame. If the feature has mobility data, only spectra within its mobility
+  boundaries are considered.</p></li>
+<li><p>Use point-distance clustering (see <a href="cluster-params.html">clustering parameters</a>) with a window defined by
+  <code>maxGapIMS</code> to find related mass signals. This is primarily meant for non-continuous data, <em>e.g.</em> due to
+  intensity thresholding. The <code>maxGapIMS</code> parameter should be set to a value that represents the maximum
+  expected distance between two <em>m/z</em> datapoints. For some instruments, such as Agilent IMS-QTOF, this value may
+  be higher than expected. For that reason, if <code>IMS="agilent"</code> then the default is set to <code>0.01</code>.</p></li>
+<li><p>Smooth the intensity data using a centered moving average with window size <code>smoothWindowIMS</code> (set to
+  zero to disable smoothing).</p></li>
+<li><p>Find local maxima within sliding window with +/- <code>halfWindowIMS</code> points and eliminate non-centroids.
+  This algorithm is based on the <code>C_localMaxima</code> function from <a href="https://CRAN.R-project.org/package=MALDIquant" class="external-link"><span class="pkg">MALDIquant</span></a>.</p></li>
+</ol></div>
     <div id="references">
     <h2>References</h2>
-    <p>Müllner D (2013).
-“fastcluster: Fast Hierarchical, Agglomerative Clustering Routines for R and Python.”
-<em>Journal of Statistical Software</em>, <b>53</b>(9), 1–18.
-<a href="https://doi.org/10.18637/jss.v053.i09" class="external-link">doi:10.18637/jss.v053.i09</a>
+    <p>Gibb S, Strimmer K (2012).
+“MALDIquant: a versatile R package for the analysis of mass spectrometry data.”
+<em>Bioinformatics</em>, <b>28</b>(17), 2270–2271.
+<a href="https://doi.org/10.1093/bioinformatics/bts447" class="external-link">doi:10.1093/bioinformatics/bts447</a>
 .</p>
     </div>
 

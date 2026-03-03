@@ -18,7 +18,7 @@ MS2Tox package."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.0</span>
       </span>
     </div>
 
@@ -87,7 +87,7 @@ MS2Tox package."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Functionality to predict toxicities</h1>
-    <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/main.R" class="external-link"><code>R/main.R</code></a>, <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/feature_groups.R" class="external-link"><code>R/feature_groups.R</code></a>, <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/feature_groups-set.R" class="external-link"><code>R/feature_groups-set.R</code></a>, and 7 more</small>
+    <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/generics.R" class="external-link"><code>R/generics.R</code></a>, <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/main.R" class="external-link"><code>R/main.R</code></a>, <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/feature_groups.R" class="external-link"><code>R/feature_groups.R</code></a>, and 8 more</small>
     <div class="hidden name"><code>pred-tox.Rd</code></div>
     </div>
 
@@ -97,7 +97,9 @@ MS2Tox package."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for class 'featureGroups'</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">calculateTox</span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
 <span><span class="fu">calculateTox</span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">featureAnn</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'featureGroupsSet'</span></span>
@@ -120,7 +122,7 @@ MS2Tox package."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/
 <span><span class="fu">calculateTox</span><span class="op">(</span><span class="va">fGroups</span>, featureAnn <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'featureGroupsScreeningSet'</span></span>
-<span><span class="fu"><a href="generics.html">predictTox</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu"><a href="generics.html">predictTox</a></span><span class="op">(</span><span class="va">obj</span>, LC50Mode <span class="op">=</span> <span class="st">"static"</span>, concUnit <span class="op">=</span> <span class="st">"ugL"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'featureGroupsScreeningSet'</span></span>
 <span><span class="fu">calculateTox</span><span class="op">(</span><span class="va">fGroups</span>, featureAnn <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
@@ -146,6 +148,10 @@ MS2Tox package."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/
 <dd><p>For <code>predictTox</code> methods for feature annotations: The <code><a href="featureGroups-class.html">featureGroups</a></code> object for
   which the annotations were performed.</p>
 <p>For <code>calculateTox</code>: The <code><a href="featureGroups-class.html">featureGroups</a></code> object for which toxicities should be assigned.</p></dd>
+
+
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>(<strong>sets workflow</strong>) Further arguments passed to the non-sets workflow method.</p></dd>
 
 
 <dt id="arg-featureann">featureAnn<a class="anchor" aria-label="anchor" href="#arg-featureann"></a></dt>
@@ -176,12 +182,8 @@ by adding normalized values of the response factor (weighted by <span class="opt
 
 
 <dt id="arg-parallel">parallel<a class="anchor" aria-label="anchor" href="#arg-parallel"></a></dt>
-<dd><p>If set to <code>TRUE</code> then code is executed in parallel through the <a href="https://CRAN.R-project.org/package=futures" class="external-link"><span class="pkg">futures</span></a> package. Please
+<dd><p>If set to <code>TRUE</code> then code is executed in parallel through the <a href="https://CRAN.R-project.org/package=future" class="external-link"><span class="pkg">future</span></a> package. Please
 see the parallelization section in the handbook for more details.</p></dd>
-
-
-<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>(<strong>sets workflow</strong>) Further arguments passed to the non-sets workflow method.</p></dd>
 
 
 <dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
@@ -246,7 +248,7 @@ from <acronym>SMILES</acronym> data.</p></li>
   screening results and/or feature annotation data. If multiple toxicities were predicted for the same feature
   group, for instance when multiple annotation candidates or suspect hits for this feature group are present, then a
   toxicities is assigned for all toxicities. These values can later be easily aggregated with <em>e.g.</em> the
-  <a href="featureGroups-class.html">as.data.table</a> function.</p>
+  <a href="feature-table.html">as.data.table</a> function.</p>
     </div>
     <div id="references">
     <h2>References</h2>

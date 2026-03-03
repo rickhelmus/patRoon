@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.0</span>
       </span>
     </div>
 
@@ -86,7 +86,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Base features class</h1>
-    <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/features.R" class="external-link"><code>R/features.R</code></a>, <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/features-set.R" class="external-link"><code>R/features-set.R</code></a>, <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/features-bruker.R" class="external-link"><code>R/features-bruker.R</code></a>, and 7 more</small>
+    <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/features.R" class="external-link"><code>R/features.R</code></a>, <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/features-set.R" class="external-link"><code>R/features-set.R</code></a>, <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/features-bruker.R" class="external-link"><code>R/features-bruker.R</code></a>, and 9 more</small>
     <div class="hidden name"><code>features-class.Rd</code></div>
     </div>
 
@@ -105,13 +105,25 @@
 <span><span class="fu"><a href="generics.html">featureTable</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'features'</span></span>
-<span><span class="fu"><a href="generics.html">analysisInfo</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span><span class="fu"><a href="generics.html">analysisInfo</a></span><span class="op">(</span><span class="va">obj</span>, df <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'features'</span></span>
+<span><span class="fu"><a href="generics.html">getFeatureQualityNames</a></span><span class="op">(</span><span class="va">obj</span>, scores <span class="op">=</span> <span class="cn">FALSE</span>, totScore <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'features'</span></span>
+<span><span class="fu"><a href="generics.html">analysisInfo</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'features'</span></span>
 <span><span class="fu"><a href="generics.html">analyses</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'features'</span></span>
-<span><span class="fu"><a href="generics.html">replicateGroups</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span><span class="fu"><a href="generics.html">replicates</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'features'</span></span>
+<span><span class="fu"><a href="generics.html">hasIMS</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'features'</span></span>
+<span><span class="fu"><a href="generics.html">fromIMS</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'features'</span></span>
 <span><span class="fu"><a href="generics.html">as.data.table</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
@@ -125,12 +137,13 @@
 <span>  mzRange <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  mzDefectRange <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  chromWidthRange <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  IMSRangeParams <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  qualityRange <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  negate <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'features,ANY,missing,missing'</span></span>
-<span><span class="va">x</span><span class="op">[</span><span class="va">i</span>, <span class="va">j</span>, <span class="va">...</span>, drop <span class="op">=</span> <span class="cn">TRUE</span><span class="op">]</span></span>
+<span><span class="va">x</span><span class="op">[</span><span class="va">i</span>, <span class="va">j</span>, <span class="va">...</span>, <span class="va">ni</span>, reorder <span class="op">=</span> <span class="cn">FALSE</span>, drop <span class="op">=</span> <span class="cn">TRUE</span><span class="op">]</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'features,ANY,missing'</span></span>
 <span><span class="va">x</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span></span>
@@ -142,7 +155,14 @@
 <span><span class="fu"><a href="generics.html">delete</a></span><span class="op">(</span><span class="va">obj</span>, i <span class="op">=</span> <span class="cn">NULL</span>, j <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'features'</span></span>
-<span><span class="fu"><a href="generics.html">calculatePeakQualities</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">weights</span>, <span class="va">flatnessFactor</span>, parallel <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="generics.html">calculatePeakQualities</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  <span class="va">weights</span>,</span>
+<span>  <span class="va">flatnessFactor</span>,</span>
+<span>  featureQualities <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  EICParams <span class="op">=</span> <span class="fu"><a href="EIXParams.html">getDefEICParams</a></span><span class="op">(</span>window <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>,</span>
+<span>  parallel <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'features'</span></span>
 <span><span class="fu"><a href="generics.html">getTICs</a></span><span class="op">(</span><span class="va">obj</span>, retentionRange <span class="op">=</span> <span class="cn">NULL</span>, MSLevel <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
@@ -157,7 +177,7 @@
 <span>  MSLevel <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  retMin <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  colourBy <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"analyses"</span>, <span class="st">"rGroups"</span><span class="op">)</span>,</span>
+<span>  groupBy <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  showLegend <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  xlim <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -171,7 +191,7 @@
 <span>  MSLevel <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  retMin <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  colourBy <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"analyses"</span>, <span class="st">"rGroups"</span><span class="op">)</span>,</span>
+<span>  groupBy <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  showLegend <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  xlim <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -188,7 +208,7 @@
 <span><span class="fu"><a href="generics.html">as.data.table</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'featuresSet,ANY,missing,missing'</span></span>
-<span><span class="va">x</span><span class="op">[</span><span class="va">i</span>, <span class="va">...</span>, sets <span class="op">=</span> <span class="cn">NULL</span>, drop <span class="op">=</span> <span class="cn">TRUE</span><span class="op">]</span></span>
+<span><span class="va">x</span><span class="op">[</span><span class="va">i</span>, <span class="va">...</span>, sets <span class="op">=</span> <span class="cn">NULL</span>, reorder <span class="op">=</span> <span class="cn">FALSE</span>, drop <span class="op">=</span> <span class="cn">TRUE</span><span class="op">]</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'featuresSet'</span></span>
 <span><span class="fu"><a href="generics.html">filter</a></span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span>, negate <span class="op">=</span> <span class="cn">FALSE</span>, sets <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
@@ -198,6 +218,12 @@
 <span></span>
 <span><span class="co"># S4 method for class 'featuresKPIC2'</span></span>
 <span><span class="fu"><a href="generics.html">delete</a></span><span class="op">(</span><span class="va">obj</span>, i <span class="op">=</span> <span class="cn">NULL</span>, j <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featuresPiek'</span></span>
+<span><span class="fu"><a href="generics.html">delete</a></span><span class="op">(</span><span class="va">obj</span>, i <span class="op">=</span> <span class="cn">NULL</span>, j <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featuresXCMS'</span></span>
+<span><span class="fu"><a href="generics.html">analysisInfo</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'featuresXCMS'</span></span>
 <span><span class="fu"><a href="generics.html">delete</a></span><span class="op">(</span><span class="va">obj</span>, i <span class="op">=</span> <span class="cn">NULL</span>, j <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
@@ -214,6 +240,22 @@
 <dd><p><code>features</code> object to be accessed</p></dd>
 
 
+<dt id="arg-df">df<a class="anchor" aria-label="anchor" href="#arg-df"></a></dt>
+<dd><p>If <code>TRUE</code> then the returned value is a <code>data.frame</code>, otherwise a <code>data.table</code>.</p></dd>
+
+
+<dt id="arg-scores">scores<a class="anchor" aria-label="anchor" href="#arg-scores"></a></dt>
+<dd><p>If <code>TRUE</code> the score names are returned, otherwise the quality names.</p></dd>
+
+
+<dt id="arg-totscore">totScore<a class="anchor" aria-label="anchor" href="#arg-totscore"></a></dt>
+<dd><p>If <code>TRUE</code> (and <code>scores=TRUE</code>) then the name of the total score is included.</p></dd>
+
+
+<dt id="arg-value">value<a class="anchor" aria-label="anchor" href="#arg-value"></a></dt>
+<dd><p>A <code>data.frame</code> or <code>data.table</code> with the new analysis information.</p></dd>
+
+
 <dt id="arg-absminintensity-relminintensity">absMinIntensity, relMinIntensity<a class="anchor" aria-label="anchor" href="#arg-absminintensity-relminintensity"></a></dt>
 <dd><p>Minimum absolute/relative intensity for features to be kept. The relative
 intensity is determined from the feature with highest intensity (within the same analysis). Set to <samp>0</samp> or <code>NULL</code> to skip this step.</p></dd>
@@ -226,10 +268,15 @@ Features outside this range will be removed. Should be a numeric vector with len
 values. The maximum can be <code>Inf</code> to specify no maximum range. Set to <code>NULL</code> to skip this step.</p></dd>
 
 
+<dt id="arg-imsrangeparams">IMSRangeParams<a class="anchor" aria-label="anchor" href="#arg-imsrangeparams"></a></dt>
+<dd><p>(<strong>IMS workflow</strong>) A <code>list</code> with parameters to be used for filtering IMS range data. See
+<code><a href="getIMSRangeParams.html">getIMSRangeParams</a></code> for details and how to make such a parameter list.</p></dd>
+
+
 <dt id="arg-qualityrange">qualityRange<a class="anchor" aria-label="anchor" href="#arg-qualityrange"></a></dt>
 <dd><p>Used to filter features by their peak qualities/scores
 (see <code><a href="generics.html">calculatePeakQualities</a></code>). Should be a named <code>list</code> with min/max ranges for each
-quality/score to be filtered (the <code><a href="featureQualityNames.html">featureQualityNames</a></code> function can be used to obtain valid names).
+quality/score to be filtered (the <code><a href="generics.html">getFeatureQualityNames</a></code> function can be used to obtain valid names).
 Example: <code>qualityRange=list(ModalityScore=c(0.3, Inf),
 SymmetryScore=c(0.5, Inf))</code>. Set to <code>NULL</code> to ignore.</p></dd>
 
@@ -254,8 +301,23 @@ function specifies the feature indices (rows) to be removed (specified as an <co
 <p>For <a href="sets-workflow.html">sets workflow</a> methods: further arguments passed to the base <code>features</code> method.</p></dd>
 
 
+<dt id="arg-ni">ni<a class="anchor" aria-label="anchor" href="#arg-ni"></a></dt>
+<dd><p>Optional argument. An expression used for subsetting the analyses. The
+<a href="analysis-information.html">analysis information</a> is first subset and the remaining rows are used to determine for
+which analyses the results should be kept. The unevaluated <code>ni</code> expression is used to set the <code>i</code>
+argument of the subset operator of <a href="https://CRAN.R-project.org/package=data.table" class="external-link"><span class="pkg">data.table</span></a>, which therefore brings the advanced subsetting
+capabilities of <a href="https://CRAN.R-project.org/package=data.table" class="external-link"><span class="pkg">data.table</span></a> (see the
+<code><a href="https://rdrr.io/pkg/data.table/man/data.table.html" class="external-link">data.table</a></code> documentation for more details). For instance, <code>fList[replicate ==
+"standard"]</code> would subset all analyses assigned with the replicate <code>"standard"</code>.</p></dd>
+
+
+<dt id="arg-reorder">reorder<a class="anchor" aria-label="anchor" href="#arg-reorder"></a></dt>
+<dd><p>If <code>TRUE</code> then the order of the analyses is changed to match the order of the <code>i</code> argument.</p>
+<p>(<strong>sets workflow</strong>) If the <code>sets</code> argument is specified (and <code>i</code> is not) then the order of sets is changed instead.</p></dd>
+
+
 <dt id="arg-drop">drop<a class="anchor" aria-label="anchor" href="#arg-drop"></a></dt>
-<dd><p>ignored.</p></dd>
+<dd><p>Ignored.</p></dd>
 
 
 <dt id="arg-name">name<a class="anchor" aria-label="anchor" href="#arg-name"></a></dt>
@@ -273,14 +335,25 @@ Example: <code>weights=c(ApexBoundaryRatioScore=0.5, GaussianSimilarityScore=2)<
 <code><a href="https://rdrr.io/pkg/MetaClean/man/calculateJaggedness.html" class="external-link">calculateJaggedness</a></code> and <code><a href="https://rdrr.io/pkg/MetaClean/man/calculateModality.html" class="external-link">calculateModality</a></code>.</p></dd>
 
 
+<dt id="arg-featurequalities">featureQualities<a class="anchor" aria-label="anchor" href="#arg-featurequalities"></a></dt>
+<dd><p>Specifies which feature qualities to calculate. Can be <code>NULL</code> (default, calculates all
+qualities), a <code>character</code> vector with names of qualities to calculate (e.g., <code>c("FWHM2Base",
+"Symmetry")</code>), or a <code>list</code> of custom quality definitions. See the
+<code><a href="feature-quality.html">featureQualities</a></code> function for more details.</p></dd>
+
+
+<dt id="arg-eicparams">EICParams<a class="anchor" aria-label="anchor" href="#arg-eicparams"></a></dt>
+<dd><p>A named <code>list</code> with parameters used for extracted ion chromatogram (EIC) creation. See the
+<a href="EIXParams.html">EIC parameters</a> documentation for more details.</p></dd>
+
+
 <dt id="arg-parallel">parallel<a class="anchor" aria-label="anchor" href="#arg-parallel"></a></dt>
-<dd><p>If set to <code>TRUE</code> then code is executed in parallel through the <a href="https://CRAN.R-project.org/package=futures" class="external-link"><span class="pkg">futures</span></a> package. Please
+<dd><p>If set to <code>TRUE</code> then code is executed in parallel through the <a href="https://CRAN.R-project.org/package=future" class="external-link"><span class="pkg">future</span></a> package. Please
 see the parallelization section in the handbook for more details.</p></dd>
 
 
 <dt id="arg-mslevel">MSLevel<a class="anchor" aria-label="anchor" href="#arg-mslevel"></a></dt>
-<dd><p>Integer vector with the ms levels (i.e., 1 for MS1 and 2 for MS2)
-to obtain TIC traces.</p></dd>
+<dd><p>Integer vector with the ms levels (i.e., 1 for MS1 and 2 for MS2) to obtain traces.</p></dd>
 
 
 <dt id="arg-retmin">retMin<a class="anchor" aria-label="anchor" href="#arg-retmin"></a></dt>
@@ -291,9 +364,10 @@ to obtain TIC traces.</p></dd>
 <dd><p>Character string used for title of the plot. If <code>NULL</code> a title will be automatically generated.</p></dd>
 
 
-<dt id="arg-colourby">colourBy<a class="anchor" aria-label="anchor" href="#arg-colourby"></a></dt>
-<dd><p>Sets the automatic colour selection: "none" for a single colour or "analyses"/"rGroups" for a
-distinct colour per analysis or analysis replicate group.</p></dd>
+<dt id="arg-groupby">groupBy<a class="anchor" aria-label="anchor" href="#arg-groupby"></a></dt>
+<dd><p>Specifies how results are grouped in the plot. Should be a name of a column in the
+<a href="analysis-information.html">analysis information</a> table which is used to make analysis groups (<em>e.g.</em>
+<code>"replicate"</code>), or <code>"fGroups"</code> to group by feature group. Set to <code>NULL</code> for no grouping.</p></dd>
 
 
 <dt id="arg-showlegend">showLegend<a class="anchor" aria-label="anchor" href="#arg-showlegend"></a></dt>
@@ -318,10 +392,7 @@ distinct colour per analysis or analysis replicate group.</p></dd>
     <h2>Value</h2>
     <p><code>featureTable</code>: A <code>list</code> containing a
   <code>data.table</code> for each analysis with feature data</p>
-<p><code>analysisInfo</code>: A <code>data.frame</code> containing a column with
-  analysis name (<code>analysis</code>), its path (<code>path</code>), and other columns
-  such as replicate group name (<code>group</code>) and blank reference
-  (<code>blank</code>).</p>
+<p><code>analysisInfo</code>: The <a href="analysis-information.html">analysis information</a> of this <code>features</code> object.</p>
 <p><code>delete</code> returns the object for which the specified data was removed.</p>
 <p><code>calculatePeakQualities</code> returns a modified object amended with peak qualities and scores.</p>
     </div>
@@ -338,10 +409,14 @@ analyses. The class is <code>virtual</code> and derived objects are created by '
 <li><p><code>show(features)</code>: Shows summary information for this object.</p></li>
 <li><p><code>featureTable(features)</code>: Get table with feature information</p></li>
 <li><p><code>analysisInfo(features)</code>: Get analysis information</p></li>
+<li><p><code>getFeatureQualityNames(features)</code>: Returns the present chromatographic peak quality and score names for features.</p></li>
+<li><p><code>analysisInfo(features) &lt;- value</code>: Modifies analysis information</p></li>
 <li><p><code>analyses(features)</code>: returns a <code>character</code> vector with the names of the
 analyses for which data is present in this object.</p></li>
-<li><p><code>replicateGroups(features)</code>: returns a <code>character</code> vector with the names of the
-replicate groups for which data is present in this object.</p></li>
+<li><p><code>replicates(features)</code>: returns a <code>character</code> vector with the names of the
+replicates for which data is present in this object.</p></li>
+<li><p><code>hasIMS(features)</code>: Returns <code>TRUE</code> if the features object has mobility information.</p></li>
+<li><p><code>fromIMS(features)</code>: Returns <code>TRUE</code> if the features object was directly created from IMS data.</p></li>
 <li><p><code>as.data.table(features)</code>: Returns all feature data in a table.</p></li>
 <li><p><code>filter(features)</code>: Performs common rule based filtering of features. Note
 that this (and much more) functionality is also provided by the
@@ -352,14 +427,11 @@ amounts of features.</p></li>
 <li><p><code>x[[i</code>: Extract a feature table for an analysis.</p></li>
 <li><p><code>$</code>: Extract a feature table for an analysis.</p></li>
 <li><p><code>delete(features)</code>: Completely deletes specified features.</p></li>
-<li><p><code>calculatePeakQualities(features)</code>: Calculates peak qualities for each feature. This uses
-<a href="https://github.com/KelseyChetnik/MetaClean/" class="external-link">MetaClean</a> <span style="R">R</span> package to calculate the following metrics:
-<code>Apex-Boundary Ratio</code>, <code>FWHM2Base</code>, <code>Jaggedness</code>, <code>Modality</code>, <code>Symmetry</code>, <code>Gaussian
-Similarity</code>, <code>Sharpness</code>, <code>Triangle Peak Area Similarity Ratio</code> and <code>Zig-Zag index</code>. Please see the
-<span class="pkg">MetaClean</span> publication (referenced below) for more details. For each metric, an additional score is calculated
-by normalizing all feature values (unless the quality metric definition has a fixed range) and scale from <samp>0</samp>
-(worst) to <samp>1</samp> (best). Then, a <code>totalScore</code> for each feature is calculated by the (weighted) sum of all
-score values.</p></li>
+<li><p><code>calculatePeakQualities(features)</code>: Calculates peak qualities for each feature. Please see the
+<code><a href="feature-quality.html">featureQualities</a></code> function and <span class="pkg">MetaClean</span> publication (referenced below) for
+more details. For each metric, an additional score is calculated by normalizing all feature values (unless the
+quality metric definition has a fixed range) and scale from <samp>0</samp> (worst) to <samp>1</samp> (best). Then, a
+<code>totalScore</code> for each feature is calculated by the (weighted) sum of all score values.</p></li>
 <li><p><code>getTICs(features)</code>: Obtain the total ion chromatogram/s (TICs) of the analyses.</p></li>
 <li><p><code>getBPCs(features)</code>: Obtain the base peak chromatogram/s (BPCs) of the analyses.</p></li>
 <li><p><code>plotTICs(features)</code>: Plots the TICs of the analyses.</p></li>
@@ -374,14 +446,30 @@ score values.</p></li>
 
 
 <dt><code>analysisInfo</code></dt>
-<dd><p>Analysis group information. Use the <code>analysisInfo</code> method for access.</p></dd>
+<dd><p>A <code>data.table</code> with the <a href="analysis-information.html">analysis information</a>. Use the
+<code>analysisInfo</code> method for access.</p></dd>
+
+
+<dt><code>featureQualityNames</code></dt>
+<dd><p>Character vector with the names of the chromatographic peak quality metrics that are
+present.</p></dd>
+
+
+<dt><code>hasIMS</code></dt>
+<dd><p>A <code>logical</code> that is <code>TRUE</code> if the features object contain mobility/CCS information. Use the
+<code>hasIMS</code> method for access.</p></dd>
+
+
+<dt><code>fromIMS</code></dt>
+<dd><p>A <code>logical</code> that is <code>TRUE</code> if the features object was directly created from IMS data
+(<em>i.e.</em> direct mobility assignment workflow). Use the <code>fromIMS</code> method for access.</p></dd>
 
 
 </dl></div>
     <div id="note">
     <h2>Note</h2>
-    <p>For <code>calculatePeakQualities</code>: sometimes <span class="pkg">MetaClean</span> may return <code>NA</code> for the <code>Gaussian
-  Similarity</code> metric, in which case it will be set to <samp>0</samp>.</p>
+    <p>For <code>calculatePeakQualities</code>: sometimes <span class="pkg">MetaClean</span> may return <code>NA</code> for the <em>Gaussian
+  Similarity</em> and <em>Symmetry</em> metrics, in which case it will be set to <samp>0</samp>.</p>
     </div>
     <div id="s-class-hierarchy">
     <h2>S4 class hierarchy</h2>
@@ -393,14 +481,22 @@ score values.</p></li>
 <li><p><code>featuresEnviPick</code></p></li>
 <li><p><code>featuresKPIC2</code></p></li>
 <li><p><code>featuresOpenMS</code></p></li>
+<li><p><code>featuresPiek</code></p></li>
 <li><p><code>featuresSAFD</code></p></li>
 <li><p><code>featuresSIRIUS</code></p></li>
-<li><p><code><a href="suspect-screening.html">featuresBrukerTASQ</a></code></p></li>
+<li><p><code>featuresTable</code></p></li>
+<li><p><code><a href="importFeatureGroupsBrukerTASQ.html">featuresBrukerTASQ</a></code></p></li>
 <li><p><code>featuresXCMS</code></p></li>
 <li><p><code>featuresXCMS3</code></p></li>
 </ul></li>
 </ul></li>
 </ul></div>
+    <div id="use-of-raw-hrms-data">
+    <h2>Use of raw HRMS data</h2>
+    <p>The <a href="msdata.html">raw data interface</a> of <span class="pkg">patRoon</span> is used by <code>calculatePeakQualities</code> and TIC/BPC related functions to
+  process HRMS (or IMS-HRMS) data. Please see <a href="msdata.html">its documentation</a> for more information on the supported
+  formats and available configuration options.</p>
+    </div>
     <div id="sets-workflows">
     <h2>Sets workflows</h2>
     <p>The <code>featuresSet</code> class is applicable for <a href="sets-workflow.html">sets workflows</a>. This class is derived from <code>features</code> and therefore largely follows the same user interface.</p>
@@ -409,6 +505,9 @@ score values.</p></li>
   <code>makeSet</code>) are used to convert all feature masses to ionic <em>m/z</em> values.</p></li>
 </ul><p>The following methods are changed or with new functionality:</p><ul><li><p><code>filter</code> and the subset operator (<code>[</code>) have specific arguments to choose/filter by (feature
   presence in) sets. See the <code>sets</code> argument description.</p></li>
+<li><p><strong>Important</strong>: the <code>mzRange</code>, <code>mzDefectRange</code> and <code>IMSRangeParams</code> filters use neutral
+  feature masses, whereas non-sets workflows use <em>m/z</em> values. Hence, adjust accordingly to avoid (slightly)
+  different results!</p></li>
 </ul></div>
     <div id="references">
     <h2>References</h2>

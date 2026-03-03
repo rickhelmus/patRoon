@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.0</span>
       </span>
     </div>
 
@@ -112,10 +112,9 @@
 
 
 <dl><dt id="arg-parents">parents<a class="anchor" aria-label="anchor" href="#arg-parents"></a></dt>
-<dd><p>The parents for which transformation products should be obtained. This should be either a suspect list
-(see <a href="suspect-screening.html">suspect screening</a> for more information) or the resulting output of
-<code><a href="suspect-screening.html">screenSuspects</a></code>. The suspect (hits) are used as parents. If <code>NULL</code> then TPs for all parents in
-the library are obtained.</p></dd>
+<dd><p>The parents for which transformation products should be obtained. This can be</p><ul><li><p>a suspect list (see <a href="suspect-screening.html">suspect screening</a> for more information)</p></li>
+<li><p>the output of <code><a href="suspect-screening.html">screenSuspects</a></code> in which case the suspects hits are used as parents</p></li>
+</ul><p>The parents need to have formula information available.</p></dd>
 
 
 <dt id="arg-tplibrary">TPLibrary<a class="anchor" aria-label="anchor" href="#arg-tplibrary"></a></dt>
@@ -183,11 +182,12 @@ the first is considered.</p></dd>
     <p>The <code>TPLibrary</code> argument is used to specify a custom TP library. This should be a
   <code>data.frame</code> where each row specifies a TP for a parent, with the following columns:</p><ul><li><p><code>parent_name</code> and <code>TP_name</code>: The name of the parent/TP.</p></li>
 <li><p><code>parent_formula</code> and <code>TP_formula</code> The formula of the parent/TP structure.</p></li>
-<li><p><code>retDir</code> The retention direction of the TP compared to its parent: <samp>-1</samp> (elutes before), <samp>1</samp>
-  (elutes after) or <samp>0</samp> (elutes similarly or unknown). If not specified then the <code>log P</code> values below may
-  be used to calculate retention time directions. (<strong>optional</strong>)</p></li>
+<li><p><code>retDir</code> The expected <a href="retDir.html">retention order direction</a>. (<strong>optional</strong>)</p>
+<p>For <code>generateTPsLibrary</code>: If not specified or <code>forceCalcRetDir=TRUE</code> from
+  <code><a href="getDefTPStructParams.html">TPStructParams</a></code>, then the <code>log P</code> values below may be used to calculate
+  retention order directions.</p></li>
 <li><p><code>parent_LogP</code> and <code>TP_LogP</code> The <code>log P</code> values for the parent/TP. (<strong>optional</strong>)</p></li>
-<li><p><code>LogPDiff</code> The difference between parent and TP <code>Log P</code> values. Ignored if <em>both</em>
+<li><p><code>logPDiff</code> The difference between parent and TP <code>Log P</code> values. Ignored if <em>both</em>
   <code>parent_LogP</code> and <code>TP_LogP</code> are specified. (<strong>optional</strong>)</p></li>
 </ul><p>Other columns are allowed, and will be included in the final object. Multiple TPs for a single parent are specified
   by repeating the value within <code>parent_</code> columns.</p>
@@ -195,7 +195,7 @@ the first is considered.</p></dd>
     <div id="validating-and-calculating-chemical-properties">
     <h2>Validating and calculating chemical properties</h2>
     <p>Chemical properties such as <acronym>SMILES</acronym>,
-  <acronym>InChIKey</acronym> and formula in the parent suspect list are automatically validated and calculated if missing/invalid.</p>
+  <acronym>InChIKey</acronym> and formulae in the parent suspect list are automatically validated and calculated if missing/invalid.</p>
 <p>The internal validation/calculation process performs the following steps:</p><ul><li><p>Validation of <acronym>SMILES</acronym>, <acronym>InChI</acronym>, <acronym>InChIKey</acronym> and formula data (if present). Invalid
   entries will be set to <code>NA</code>.</p></li>
 <li><p>If <code>neutralChemProps=TRUE</code> then chemical data (<acronym>SMILES</acronym>, formulae etc.) is neutralized by

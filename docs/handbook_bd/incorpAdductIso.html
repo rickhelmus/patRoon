@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>4.5 Incorporating adduct and isotopic data | patRoon handbook</title>
-  <meta name="description" content="4.5 Incorporating adduct and isotopic data | patRoon handbook" />
+  <title>4.7 Incorporating adduct and isotopic data | patRoon handbook</title>
+  <meta name="description" content="4.7 Incorporating adduct and isotopic data | patRoon handbook" />
   <meta name="generator" content="bookdown 0.46 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="4.5 Incorporating adduct and isotopic data | patRoon handbook" />
+  <meta property="og:title" content="4.7 Incorporating adduct and isotopic data | patRoon handbook" />
   <meta property="og:type" content="book" />
   
   
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="4.5 Incorporating adduct and isotopic data | patRoon handbook" />
+  <meta name="twitter:title" content="4.7 Incorporating adduct and isotopic data | patRoon handbook" />
   
   
   
@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2025-12-10" />
+<meta name="date" content="2026-03-03" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -58,16 +58,16 @@
 <script src="libs/viz-1.8.2/viz.js"></script>
 <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
 <script src="libs/grViz-binding-1.0.11/grViz.js"></script>
-<link href="libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet" />
+<link href="libs/htmltools-fill-0.5.9/fill.css" rel="stylesheet" />
 <link href="libs/vis-9.1.0/vis-network.min.css" rel="stylesheet" />
 <script src="libs/vis-9.1.0/vis-network.min.js"></script>
 <script src="libs/visNetwork-binding-2.1.4/visNetwork.js"></script>
-<script src="libs/plotly-binding-4.11.0/plotly.js"></script>
+<script src="libs/plotly-binding-4.12.0/plotly.js"></script>
 <script src="libs/typedarray-0.1/typedarray.min.js"></script>
 <link href="libs/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet" />
 <script src="libs/crosstalk-1.2.2/js/crosstalk.min.js"></script>
-<link href="libs/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css" rel="stylesheet" />
-<script src="libs/plotly-main-2.11.1/plotly-latest.min.js"></script>
+<link href="libs/plotly-htmlwidgets-css-2.25.2/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="libs/plotly-main-2.25.2/plotly-latest.min.js"></script>
 
 
 <style type="text/css">
@@ -200,43 +200,47 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="4.1.1" data-path="introduction-1.html"><a href="introduction-1.html#workflow-functions"><i class="fa fa-check"></i><b>4.1.1</b> Workflow functions</a></li>
 <li class="chapter" data-level="4.1.2" data-path="introduction-1.html"><a href="introduction-1.html#workflow-output"><i class="fa fa-check"></i><b>4.1.2</b> Workflow output</a></li>
-<li class="chapter" data-level="4.1.3" data-path="introduction-1.html"><a href="introduction-1.html#overview-of-all-functions-and-their-output"><i class="fa fa-check"></i><b>4.1.3</b> Overview of all functions and their output</a></li>
+<li class="chapter" data-level="4.1.3" data-path="introduction-1.html"><a href="introduction-1.html#overview-of-workflow-functions-and-their-output"><i class="fa fa-check"></i><b>4.1.3</b> Overview of workflow functions and their output</a></li>
 </ul></li>
-<li class="chapter" data-level="4.2" data-path="preparations.html"><a href="preparations.html"><i class="fa fa-check"></i><b>4.2</b> Preparations</a>
+<li class="chapter" data-level="4.2" data-path="newProject.html"><a href="newProject.html"><i class="fa fa-check"></i><b>4.2</b> Data processing projects</a></li>
+<li class="chapter" data-level="4.3" data-path="sample-analyses.html"><a href="sample-analyses.html"><i class="fa fa-check"></i><b>4.3</b> Sample analyses</a>
 <ul>
-<li class="chapter" data-level="4.2.1" data-path="preparations.html"><a href="preparations.html#data-pre-treatment"><i class="fa fa-check"></i><b>4.2.1</b> Data pre-treatment</a></li>
-<li class="chapter" data-level="4.2.2" data-path="preparations.html"><a href="preparations.html#anaInfo"><i class="fa fa-check"></i><b>4.2.2</b> Analysis information</a></li>
-<li class="chapter" data-level="4.2.3" data-path="preparations.html"><a href="preparations.html#newProject"><i class="fa fa-check"></i><b>4.2.3</b> Automatic project generation with newProject()</a></li>
+<li class="chapter" data-level="4.3.1" data-path="sample-analyses.html"><a href="sample-analyses.html#fileTypes"><i class="fa fa-check"></i><b>4.3.1</b> Analysis file types and formats and the <code>msdata</code> interface</a></li>
+<li class="chapter" data-level="4.3.2" data-path="sample-analyses.html"><a href="sample-analyses.html#anaInfo"><i class="fa fa-check"></i><b>4.3.2</b> Analysis information</a></li>
+<li class="chapter" data-level="4.3.3" data-path="sample-analyses.html"><a href="sample-analyses.html#pre-treat"><i class="fa fa-check"></i><b>4.3.3</b> Data conversion and pre-treatment</a></li>
 </ul></li>
-<li class="chapter" data-level="4.3" data-path="features.html"><a href="features.html"><i class="fa fa-check"></i><b>4.3</b> Features</a>
+<li class="chapter" data-level="4.4" data-path="example-data.html"><a href="example-data.html"><i class="fa fa-check"></i><b>4.4</b> Example data</a></li>
+<li class="chapter" data-level="4.5" data-path="features.html"><a href="features.html"><i class="fa fa-check"></i><b>4.5</b> Features</a>
 <ul>
-<li class="chapter" data-level="4.3.1" data-path="features.html"><a href="features.html#finding-and-grouping-features"><i class="fa fa-check"></i><b>4.3.1</b> Finding and grouping features</a></li>
-<li class="chapter" data-level="4.3.2" data-path="features.html"><a href="features.html#suspscr"><i class="fa fa-check"></i><b>4.3.2</b> Suspect screening</a></li>
+<li class="chapter" data-level="4.5.1" data-path="features.html"><a href="features.html#findFeat"><i class="fa fa-check"></i><b>4.5.1</b> Finding features</a></li>
+<li class="chapter" data-level="4.5.2" data-path="features.html"><a href="features.html#groupFeatures"><i class="fa fa-check"></i><b>4.5.2</b> Feature grouping</a></li>
+<li class="chapter" data-level="4.5.3" data-path="features.html"><a href="features.html#suspscr"><i class="fa fa-check"></i><b>4.5.3</b> Suspect screening</a></li>
+<li class="chapter" data-level="4.5.4" data-path="features.html"><a href="features.html#importFeat"><i class="fa fa-check"></i><b>4.5.4</b> Importing feature data</a></li>
 </ul></li>
-<li class="chapter" data-level="4.4" data-path="componentization.html"><a href="componentization.html"><i class="fa fa-check"></i><b>4.4</b> Componentization</a>
+<li class="chapter" data-level="4.6" data-path="componentization.html"><a href="componentization.html"><i class="fa fa-check"></i><b>4.6</b> Componentization</a>
 <ul>
-<li class="chapter" data-level="4.4.1" data-path="componentization.html"><a href="componentization.html#componentsChrom"><i class="fa fa-check"></i><b>4.4.1</b> Features with similar chromatographic behaviour</a></li>
-<li class="chapter" data-level="4.4.2" data-path="componentization.html"><a href="componentization.html#homologues-series"><i class="fa fa-check"></i><b>4.4.2</b> Homologues series</a></li>
-<li class="chapter" data-level="4.4.3" data-path="componentization.html"><a href="componentization.html#compClust"><i class="fa fa-check"></i><b>4.4.3</b> Intensity and MS/MS similarity</a></li>
+<li class="chapter" data-level="4.6.1" data-path="componentization.html"><a href="componentization.html#componentsChrom"><i class="fa fa-check"></i><b>4.6.1</b> Features with similar chromatographic behaviour</a></li>
+<li class="chapter" data-level="4.6.2" data-path="componentization.html"><a href="componentization.html#homologues-series"><i class="fa fa-check"></i><b>4.6.2</b> Homologues series</a></li>
+<li class="chapter" data-level="4.6.3" data-path="componentization.html"><a href="componentization.html#compClust"><i class="fa fa-check"></i><b>4.6.3</b> Intensity and MS/MS similarity</a></li>
 </ul></li>
-<li class="chapter" data-level="4.5" data-path="incorpAdductIso.html"><a href="incorpAdductIso.html"><i class="fa fa-check"></i><b>4.5</b> Incorporating adduct and isotopic data</a>
+<li class="chapter" data-level="4.7" data-path="incorpAdductIso.html"><a href="incorpAdductIso.html"><i class="fa fa-check"></i><b>4.7</b> Incorporating adduct and isotopic data</a>
 <ul>
-<li class="chapter" data-level="4.5.1" data-path="incorpAdductIso.html"><a href="incorpAdductIso.html#selecting-features-with-preferential-adductsisotopes"><i class="fa fa-check"></i><b>4.5.1</b> Selecting features with preferential adducts/isotopes</a></li>
-<li class="chapter" data-level="4.5.2" data-path="incorpAdductIso.html"><a href="incorpAdductIso.html#setting-adduct-annotations-for-feature-groups"><i class="fa fa-check"></i><b>4.5.2</b> Setting adduct annotations for feature groups</a></li>
-<li class="chapter" data-level="4.5.3" data-path="incorpAdductIso.html"><a href="incorpAdductIso.html#useAdductAnn"><i class="fa fa-check"></i><b>4.5.3</b> Using adduct annotations in the workflow</a></li>
+<li class="chapter" data-level="4.7.1" data-path="incorpAdductIso.html"><a href="incorpAdductIso.html#selecting-features-with-preferential-adductsisotopes"><i class="fa fa-check"></i><b>4.7.1</b> Selecting features with preferential adducts/isotopes</a></li>
+<li class="chapter" data-level="4.7.2" data-path="incorpAdductIso.html"><a href="incorpAdductIso.html#setting-adduct-annotations-for-feature-groups"><i class="fa fa-check"></i><b>4.7.2</b> Setting adduct annotations for feature groups</a></li>
+<li class="chapter" data-level="4.7.3" data-path="incorpAdductIso.html"><a href="incorpAdductIso.html#useAdductAnn"><i class="fa fa-check"></i><b>4.7.3</b> Using adduct annotations in the workflow</a></li>
 </ul></li>
-<li class="chapter" data-level="4.6" data-path="annotation.html"><a href="annotation.html"><i class="fa fa-check"></i><b>4.6</b> Annotation</a>
+<li class="chapter" data-level="4.8" data-path="annotation.html"><a href="annotation.html"><i class="fa fa-check"></i><b>4.8</b> Annotation</a>
 <ul>
-<li class="chapter" data-level="4.6.1" data-path="annotation.html"><a href="annotation.html#ms-peak-lists"><i class="fa fa-check"></i><b>4.6.1</b> MS peak lists</a></li>
-<li class="chapter" data-level="4.6.2" data-path="annotation.html"><a href="annotation.html#formulae"><i class="fa fa-check"></i><b>4.6.2</b> Formulae</a></li>
-<li class="chapter" data-level="4.6.3" data-path="annotation.html"><a href="annotation.html#compounds"><i class="fa fa-check"></i><b>4.6.3</b> Compounds</a></li>
-<li class="chapter" data-level="4.6.4" data-path="annotation.html"><a href="annotation.html#suspAnn"><i class="fa fa-check"></i><b>4.6.4</b> Suspect annotation</a></li>
-<li class="chapter" data-level="4.6.5" data-path="annotation.html"><a href="annotation.html#SIRLogin"><i class="fa fa-check"></i><b>4.6.5</b> Account login for SIRIUS</a></li>
+<li class="chapter" data-level="4.8.1" data-path="annotation.html"><a href="annotation.html#MSPL"><i class="fa fa-check"></i><b>4.8.1</b> MS peak lists</a></li>
+<li class="chapter" data-level="4.8.2" data-path="annotation.html"><a href="annotation.html#formulae"><i class="fa fa-check"></i><b>4.8.2</b> Formulae</a></li>
+<li class="chapter" data-level="4.8.3" data-path="annotation.html"><a href="annotation.html#compounds"><i class="fa fa-check"></i><b>4.8.3</b> Compounds</a></li>
+<li class="chapter" data-level="4.8.4" data-path="annotation.html"><a href="annotation.html#estIDConf"><i class="fa fa-check"></i><b>4.8.4</b> Estimation of identification confidence</a></li>
+<li class="chapter" data-level="4.8.5" data-path="annotation.html"><a href="annotation.html#SIRLogin"><i class="fa fa-check"></i><b>4.8.5</b> Account login for SIRIUS</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="processing.html"><a href="processing.html"><i class="fa fa-check"></i><b>5</b> Processing workflow data</a>
 <ul>
-<li class="chapter" data-level="5.1" data-path="inspecting-results.html"><a href="inspecting-results.html"><i class="fa fa-check"></i><b>5.1</b> Inspecting results</a></li>
+<li class="chapter" data-level="5.1" data-path="procInspect.html"><a href="procInspect.html"><i class="fa fa-check"></i><b>5.1</b> Inspecting results</a></li>
 <li class="chapter" data-level="5.2" data-path="filtering.html"><a href="filtering.html"><i class="fa fa-check"></i><b>5.2</b> Filtering</a>
 <ul>
 <li class="chapter" data-level="5.2.1" data-path="filtering.html"><a href="filtering.html#features-1"><i class="fa fa-check"></i><b>5.2.1</b> Features</a></li>
@@ -250,20 +254,26 @@ div.csl-indent {
 <li class="chapter" data-level="5.3.1" data-path="subset.html"><a href="subset.html#prioritization-workflow"><i class="fa fa-check"></i><b>5.3.1</b> Prioritization workflow</a></li>
 </ul></li>
 <li class="chapter" data-level="5.4" data-path="deleting-data.html"><a href="deleting-data.html"><i class="fa fa-check"></i><b>5.4</b> Deleting data</a></li>
-<li class="chapter" data-level="5.5" data-path="unOv.html"><a href="unOv.html"><i class="fa fa-check"></i><b>5.5</b> Unique and overlapping features</a></li>
-<li class="chapter" data-level="5.6" data-path="specSim.html"><a href="specSim.html"><i class="fa fa-check"></i><b>5.6</b> MS similarity</a></li>
-<li class="chapter" data-level="5.7" data-path="visualization.html"><a href="visualization.html"><i class="fa fa-check"></i><b>5.7</b> Visualization</a>
+<li class="chapter" data-level="5.5" data-path="intReview.html"><a href="intReview.html"><i class="fa fa-check"></i><b>5.5</b> Interactively explore and review data</a></li>
+<li class="chapter" data-level="5.6" data-path="updFG.html"><a href="updFG.html"><i class="fa fa-check"></i><b>5.6</b> Updating feature group data</a></li>
+<li class="chapter" data-level="5.7" data-path="unOv.html"><a href="unOv.html"><i class="fa fa-check"></i><b>5.7</b> Unique and overlapping features</a></li>
+<li class="chapter" data-level="5.8" data-path="specSim.html"><a href="specSim.html"><i class="fa fa-check"></i><b>5.8</b> MS similarity</a></li>
+<li class="chapter" data-level="5.9" data-path="visualization.html"><a href="visualization.html"><i class="fa fa-check"></i><b>5.9</b> Visualization</a>
 <ul>
-<li class="chapter" data-level="5.7.1" data-path="visualization.html"><a href="visualization.html#vis_feat_ann"><i class="fa fa-check"></i><b>5.7.1</b> Features and annatation data</a></li>
-<li class="chapter" data-level="5.7.2" data-path="visualization.html"><a href="visualization.html#visComp"><i class="fa fa-check"></i><b>5.7.2</b> Overlapping and unique data</a></li>
-<li class="chapter" data-level="5.7.3" data-path="visualization.html"><a href="visualization.html#ms-similarity"><i class="fa fa-check"></i><b>5.7.3</b> MS similarity</a></li>
-<li class="chapter" data-level="5.7.4" data-path="visualization.html"><a href="visualization.html#plotClust"><i class="fa fa-check"></i><b>5.7.4</b> Hierarchical clustering results</a></li>
-<li class="chapter" data-level="5.7.5" data-path="visualization.html"><a href="visualization.html#generating-eics-in-dataanalysis"><i class="fa fa-check"></i><b>5.7.5</b> Generating EICs in DataAnalysis</a></li>
+<li class="chapter" data-level="5.9.1" data-path="visualization.html"><a href="visualization.html#vis_feat_ann"><i class="fa fa-check"></i><b>5.9.1</b> Features and annatation data</a></li>
+<li class="chapter" data-level="5.9.2" data-path="visualization.html"><a href="visualization.html#visComp"><i class="fa fa-check"></i><b>5.9.2</b> Overlapping and unique data</a></li>
+<li class="chapter" data-level="5.9.3" data-path="visualization.html"><a href="visualization.html#ms-similarity"><i class="fa fa-check"></i><b>5.9.3</b> MS similarity</a></li>
+<li class="chapter" data-level="5.9.4" data-path="visualization.html"><a href="visualization.html#plotClust"><i class="fa fa-check"></i><b>5.9.4</b> Hierarchical clustering results</a></li>
+<li class="chapter" data-level="5.9.5" data-path="visualization.html"><a href="visualization.html#generating-eics-in-dataanalysis"><i class="fa fa-check"></i><b>5.9.5</b> Generating EICs in DataAnalysis</a></li>
 </ul></li>
-<li class="chapter" data-level="5.8" data-path="intReview.html"><a href="intReview.html"><i class="fa fa-check"></i><b>5.8</b> Interactively explore and review data</a></li>
-<li class="chapter" data-level="5.9" data-path="report.html"><a href="report.html"><i class="fa fa-check"></i><b>5.9</b> Reporting</a>
+<li class="chapter" data-level="5.10" data-path="useMeta.html"><a href="useMeta.html"><i class="fa fa-check"></i><b>5.10</b> Use and modify sample analysis metadata</a>
 <ul>
-<li class="chapter" data-level="5.9.1" data-path="report.html"><a href="report.html#legacy-interface"><i class="fa fa-check"></i><b>5.9.1</b> Legacy interface</a></li>
+<li class="chapter" data-level="5.10.1" data-path="useMeta.html"><a href="useMeta.html#grouping-and-aggregating-data"><i class="fa fa-check"></i><b>5.10.1</b> Grouping and aggregating data</a></li>
+<li class="chapter" data-level="5.10.2" data-path="useMeta.html"><a href="useMeta.html#modifying-analysis-information"><i class="fa fa-check"></i><b>5.10.2</b> Modifying analysis information</a></li>
+</ul></li>
+<li class="chapter" data-level="5.11" data-path="report.html"><a href="report.html"><i class="fa fa-check"></i><b>5.11</b> Reporting</a>
+<ul>
+<li class="chapter" data-level="5.11.1" data-path="report.html"><a href="report.html#legacy-interface"><i class="fa fa-check"></i><b>5.11.1</b> Legacy interface</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="6" data-path="setsWorkflow.html"><a href="setsWorkflow.html"><i class="fa fa-check"></i><b>6</b> Sets workflows</a>
@@ -278,7 +288,7 @@ div.csl-indent {
 <li class="chapter" data-level="6.4" data-path="processing-data.html"><a href="processing-data.html"><i class="fa fa-check"></i><b>6.4</b> Processing data</a></li>
 <li class="chapter" data-level="6.5" data-path="advanced.html"><a href="advanced.html"><i class="fa fa-check"></i><b>6.5</b> Advanced</a>
 <ul>
-<li class="chapter" data-level="6.5.1" data-path="advanced.html"><a href="advanced.html#initiating-a-sets-workflow-from-feature-groups"><i class="fa fa-check"></i><b>6.5.1</b> Initiating a sets workflow from feature groups</a></li>
+<li class="chapter" data-level="6.5.1" data-path="advanced.html"><a href="advanced.html#makeSetFG"><i class="fa fa-check"></i><b>6.5.1</b> Initiating a sets workflow from feature groups</a></li>
 <li class="chapter" data-level="6.5.2" data-path="advanced.html"><a href="advanced.html#inspecting-and-converting-set-objects"><i class="fa fa-check"></i><b>6.5.2</b> Inspecting and converting set objects</a></li>
 </ul></li>
 </ul></li>
@@ -286,15 +296,15 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="7.1" data-path="genTPs.html"><a href="genTPs.html"><i class="fa fa-check"></i><b>7.1</b> Obtaining transformation product data</a>
 <ul>
-<li class="chapter" data-level="7.1.1" data-path="genTPs.html"><a href="genTPs.html#parent-input"><i class="fa fa-check"></i><b>7.1.1</b> Parent input</a></li>
-<li class="chapter" data-level="7.1.2" data-path="genTPs.html"><a href="genTPs.html#processing-data-1"><i class="fa fa-check"></i><b>7.1.2</b> Processing data</a></li>
-<li class="chapter" data-level="7.1.3" data-path="genTPs.html"><a href="genTPs.html#TPsCustom"><i class="fa fa-check"></i><b>7.1.3</b> (Custom) Libraries and transformations</a></li>
+<li class="chapter" data-level="7.1.1" data-path="genTPs.html"><a href="genTPs.html#TPsCustom"><i class="fa fa-check"></i><b>7.1.1</b> (Custom) Libraries and transformations</a></li>
+<li class="chapter" data-level="7.1.2" data-path="genTPs.html"><a href="genTPs.html#TPsAnn"><i class="fa fa-check"></i><b>7.1.2</b> TPs from feature annotation candidates</a></li>
+<li class="chapter" data-level="7.1.3" data-path="genTPs.html"><a href="genTPs.html#TPsProc"><i class="fa fa-check"></i><b>7.1.3</b> Processing data</a></li>
 </ul></li>
 <li class="chapter" data-level="7.2" data-path="linking-parent-and-transformation-product-features.html"><a href="linking-parent-and-transformation-product-features.html"><i class="fa fa-check"></i><b>7.2</b> Linking parent and transformation product features</a>
 <ul>
 <li class="chapter" data-level="7.2.1" data-path="linking-parent-and-transformation-product-features.html"><a href="linking-parent-and-transformation-product-features.html#componentization-2"><i class="fa fa-check"></i><b>7.2.1</b> Componentization</a></li>
-<li class="chapter" data-level="7.2.2" data-path="linking-parent-and-transformation-product-features.html"><a href="linking-parent-and-transformation-product-features.html#TPsProc"><i class="fa fa-check"></i><b>7.2.2</b> Processing data</a></li>
-<li class="chapter" data-level="7.2.3" data-path="linking-parent-and-transformation-product-features.html"><a href="linking-parent-and-transformation-product-features.html#omitting-transformation-product-input"><i class="fa fa-check"></i><b>7.2.3</b> Omitting transformation product input</a></li>
+<li class="chapter" data-level="7.2.2" data-path="linking-parent-and-transformation-product-features.html"><a href="linking-parent-and-transformation-product-features.html#TPCompProc"><i class="fa fa-check"></i><b>7.2.2</b> Processing data</a></li>
+<li class="chapter" data-level="7.2.3" data-path="linking-parent-and-transformation-product-features.html"><a href="linking-parent-and-transformation-product-features.html#TPsOmit"><i class="fa fa-check"></i><b>7.2.3</b> Omitting transformation product input</a></li>
 <li class="chapter" data-level="7.2.4" data-path="linking-parent-and-transformation-product-features.html"><a href="linking-parent-and-transformation-product-features.html#reporting-tp-components"><i class="fa fa-check"></i><b>7.2.4</b> Reporting TP components</a></li>
 </ul></li>
 <li class="chapter" data-level="7.3" data-path="TPsExamples.html"><a href="TPsExamples.html"><i class="fa fa-check"></i><b>7.3</b> Example workflows</a>
@@ -305,48 +315,81 @@ div.csl-indent {
 <li class="chapter" data-level="7.3.4" data-path="TPsExamples.html"><a href="TPsExamples.html#TPsEx4"><i class="fa fa-check"></i><b>7.3.4</b> Non-target screening of TPs by annotation similarities</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="8" data-path="advanced_usage.html"><a href="advanced_usage.html"><i class="fa fa-check"></i><b>8</b> Advanced usage</a>
+<li class="chapter" data-level="8" data-path="ion-mobility-spectrometry-ims-hrms-workflows.html"><a href="ion-mobility-spectrometry-ims-hrms-workflows.html"><i class="fa fa-check"></i><b>8</b> Ion mobility spectrometry (IMS-HRMS) workflows</a>
 <ul>
-<li class="chapter" data-level="8.1" data-path="adducts.html"><a href="adducts.html"><i class="fa fa-check"></i><b>8.1</b> Adducts</a></li>
-<li class="chapter" data-level="8.2" data-path="fNorm.html"><a href="fNorm.html"><i class="fa fa-check"></i><b>8.2</b> Feature intensity normalization</a>
+<li class="chapter" data-level="8.1" data-path="IMSWorkflow.html"><a href="IMSWorkflow.html"><i class="fa fa-check"></i><b>8.1</b> Introduction</a>
 <ul>
-<li class="chapter" data-level="8.2.1" data-path="fNorm.html"><a href="fNorm.html#feature-normalization"><i class="fa fa-check"></i><b>8.2.1</b> Feature normalization</a></li>
-<li class="chapter" data-level="8.2.2" data-path="fNorm.html"><a href="fNorm.html#group-normalization"><i class="fa fa-check"></i><b>8.2.2</b> Group normalization</a></li>
-<li class="chapter" data-level="8.2.3" data-path="fNorm.html"><a href="fNorm.html#using-normalized-intensities"><i class="fa fa-check"></i><b>8.2.3</b> Using normalized intensities</a></li>
-<li class="chapter" data-level="8.2.4" data-path="fNorm.html"><a href="fNorm.html#default-normalization"><i class="fa fa-check"></i><b>8.2.4</b> Default normalization</a></li>
+<li class="chapter" data-level="8.1.1" data-path="IMSWorkflow.html"><a href="IMSWorkflow.html#lc-ms-workflows-with-ims-data"><i class="fa fa-check"></i><b>8.1.1</b> LC-MS workflows with IMS data</a></li>
+<li class="chapter" data-level="8.1.2" data-path="IMSWorkflow.html"><a href="IMSWorkflow.html#directIMS"><i class="fa fa-check"></i><b>8.1.2</b> Direct mobility assignment</a></li>
+<li class="chapter" data-level="8.1.3" data-path="IMSWorkflow.html"><a href="IMSWorkflow.html#postIMS"><i class="fa fa-check"></i><b>8.1.3</b> Post mobility assignment</a></li>
+<li class="chapter" data-level="8.1.4" data-path="IMSWorkflow.html"><a href="IMSWorkflow.html#summary"><i class="fa fa-check"></i><b>8.1.4</b> Summary</a></li>
 </ul></li>
-<li class="chapter" data-level="8.3" data-path="fOpt.html"><a href="fOpt.html"><i class="fa fa-check"></i><b>8.3</b> Feature parameter optimization</a>
+<li class="chapter" data-level="8.2" data-path="performing-ims-workflows.html"><a href="performing-ims-workflows.html"><i class="fa fa-check"></i><b>8.2</b> Performing IMS workflows</a>
 <ul>
-<li class="chapter" data-level="8.3.1" data-path="fOpt.html"><a href="fOpt.html#parameter-sets"><i class="fa fa-check"></i><b>8.3.1</b> Parameter sets</a></li>
-<li class="chapter" data-level="8.3.2" data-path="fOpt.html"><a href="fOpt.html#processing-optmization-results"><i class="fa fa-check"></i><b>8.3.2</b> Processing optmization results</a></li>
+<li class="chapter" data-level="8.2.1" data-path="performing-ims-workflows.html"><a href="performing-ims-workflows.html#limitsIMS"><i class="fa fa-check"></i><b>8.2.1</b> Parameter defaults</a></li>
+<li class="chapter" data-level="8.2.2" data-path="performing-ims-workflows.html"><a href="performing-ims-workflows.html#raw-data"><i class="fa fa-check"></i><b>8.2.2</b> Raw data</a></li>
+<li class="chapter" data-level="8.2.3" data-path="performing-ims-workflows.html"><a href="performing-ims-workflows.html#direct-mobility-assignment-dma-workflows"><i class="fa fa-check"></i><b>8.2.3</b> Direct mobility assignment (DMA) workflows</a></li>
+<li class="chapter" data-level="8.2.4" data-path="performing-ims-workflows.html"><a href="performing-ims-workflows.html#post-mobility-assignment-pma-workflows"><i class="fa fa-check"></i><b>8.2.4</b> Post mobility assignment (PMA) workflows</a></li>
+<li class="chapter" data-level="8.2.5" data-path="performing-ims-workflows.html"><a href="performing-ims-workflows.html#mobCCSConv"><i class="fa fa-check"></i><b>8.2.5</b> Mobility and CCS conversion</a></li>
+<li class="chapter" data-level="8.2.6" data-path="performing-ims-workflows.html"><a href="performing-ims-workflows.html#IMSSuspScr"><i class="fa fa-check"></i><b>8.2.6</b> Suspect screening</a></li>
+<li class="chapter" data-level="8.2.7" data-path="performing-ims-workflows.html"><a href="performing-ims-workflows.html#componentization-3"><i class="fa fa-check"></i><b>8.2.7</b> Componentization</a></li>
+<li class="chapter" data-level="8.2.8" data-path="performing-ims-workflows.html"><a href="performing-ims-workflows.html#annotation-2"><i class="fa fa-check"></i><b>8.2.8</b> Annotation</a></li>
+<li class="chapter" data-level="8.2.9" data-path="performing-ims-workflows.html"><a href="performing-ims-workflows.html#IMSSetsWorkflow"><i class="fa fa-check"></i><b>8.2.9</b> Sets workflows</a></li>
 </ul></li>
-<li class="chapter" data-level="8.4" data-path="peakQual.html"><a href="peakQual.html"><i class="fa fa-check"></i><b>8.4</b> Chromatographic peak qualities</a>
+<li class="chapter" data-level="8.3" data-path="processing-data-1.html"><a href="processing-data-1.html"><i class="fa fa-check"></i><b>8.3</b> Processing data</a>
 <ul>
-<li class="chapter" data-level="8.4.1" data-path="peakQual.html"><a href="peakQual.html#applying-machine-learning-with-metaclean"><i class="fa fa-check"></i><b>8.4.1</b> Applying machine learning with MetaClean</a></li>
+<li class="chapter" data-level="8.3.1" data-path="processing-data-1.html"><a href="processing-data-1.html#updating-feature-group-properties"><i class="fa fa-check"></i><b>8.3.1</b> Updating feature group properties</a></li>
+<li class="chapter" data-level="8.3.2" data-path="processing-data-1.html"><a href="processing-data-1.html#inspecting-and-plotting-data"><i class="fa fa-check"></i><b>8.3.2</b> Inspecting and plotting data</a></li>
+<li class="chapter" data-level="8.3.3" data-path="processing-data-1.html"><a href="processing-data-1.html#IMSFiltering"><i class="fa fa-check"></i><b>8.3.3</b> Subsetting and filtering data</a></li>
 </ul></li>
-<li class="chapter" data-level="8.5" data-path="exporting-and-converting-feature-data.html"><a href="exporting-and-converting-feature-data.html"><i class="fa fa-check"></i><b>8.5</b> Exporting and converting feature data</a></li>
-<li class="chapter" data-level="8.6" data-path="consensus.html"><a href="consensus.html"><i class="fa fa-check"></i><b>8.6</b> Algorithm consensus</a></li>
-<li class="chapter" data-level="8.7" data-path="MSLibraries.html"><a href="MSLibraries.html"><i class="fa fa-check"></i><b>8.7</b> MS libraries</a></li>
-<li class="chapter" data-level="8.8" data-path="compclust.html"><a href="compclust.html"><i class="fa fa-check"></i><b>8.8</b> Compound clustering</a></li>
-<li class="chapter" data-level="8.9" data-path="feature-regression-analysis.html"><a href="feature-regression-analysis.html"><i class="fa fa-check"></i><b>8.9</b> Feature regression analysis</a></li>
-<li class="chapter" data-level="8.10" data-path="pred.html"><a href="pred.html"><i class="fa fa-check"></i><b>8.10</b> Predicting toxicities and concentrations (MS2Tox and MS2Quant integration)</a>
+<li class="chapter" data-level="8.4" data-path="exIMSWorkflow.html"><a href="exIMSWorkflow.html"><i class="fa fa-check"></i><b>8.4</b> Example workflow</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="advanced_usage.html"><a href="advanced_usage.html"><i class="fa fa-check"></i><b>9</b> Advanced usage</a>
 <ul>
-<li class="chapter" data-level="8.10.1" data-path="pred.html"><a href="pred.html#predicting-toxicities"><i class="fa fa-check"></i><b>8.10.1</b> Predicting toxicities</a></li>
-<li class="chapter" data-level="8.10.2" data-path="pred.html"><a href="pred.html#predicting-concentrations"><i class="fa fa-check"></i><b>8.10.2</b> Predicting concentrations</a></li>
-<li class="chapter" data-level="8.10.3" data-path="pred.html"><a href="pred.html#toxicity-and-concentration-units"><i class="fa fa-check"></i><b>8.10.3</b> Toxicity and concentration units</a></li>
-<li class="chapter" data-level="8.10.4" data-path="pred.html"><a href="pred.html#inspecting-predicted-values"><i class="fa fa-check"></i><b>8.10.4</b> Inspecting predicted values</a></li>
-<li class="chapter" data-level="8.10.5" data-path="pred.html"><a href="pred.html#using-predicted-values-to-prioritize-data"><i class="fa fa-check"></i><b>8.10.5</b> Using predicted values to prioritize data</a></li>
-</ul></li>
-<li class="chapter" data-level="8.11" data-path="FCCalc.html"><a href="FCCalc.html"><i class="fa fa-check"></i><b>8.11</b> Fold changes</a></li>
-<li class="chapter" data-level="8.12" data-path="caching.html"><a href="caching.html"><i class="fa fa-check"></i><b>8.12</b> Caching</a></li>
-<li class="chapter" data-level="8.13" data-path="parallelization.html"><a href="parallelization.html"><i class="fa fa-check"></i><b>8.13</b> Parallelization</a>
+<li class="chapter" data-level="9.1" data-path="adducts.html"><a href="adducts.html"><i class="fa fa-check"></i><b>9.1</b> Adducts</a></li>
+<li class="chapter" data-level="9.2" data-path="limits.html"><a href="limits.html"><i class="fa fa-check"></i><b>9.2</b> Default numeric limits and tolerances</a></li>
+<li class="chapter" data-level="9.3" data-path="fNorm.html"><a href="fNorm.html"><i class="fa fa-check"></i><b>9.3</b> Feature intensity normalization</a>
 <ul>
-<li class="chapter" data-level="8.13.1" data-path="parallelization.html"><a href="parallelization.html#parellization-of-r-functions"><i class="fa fa-check"></i><b>8.13.1</b> Parellization of R functions</a></li>
-<li class="chapter" data-level="8.13.2" data-path="parallelization.html"><a href="parallelization.html#multiprocessing"><i class="fa fa-check"></i><b>8.13.2</b> Multiprocessing</a></li>
-<li class="chapter" data-level="8.13.3" data-path="parallelization.html"><a href="parallelization.html#notes-when-using-parallelization-with-futures"><i class="fa fa-check"></i><b>8.13.3</b> Notes when using parallelization with futures</a></li>
+<li class="chapter" data-level="9.3.1" data-path="fNorm.html"><a href="fNorm.html#feature-normalization"><i class="fa fa-check"></i><b>9.3.1</b> Feature normalization</a></li>
+<li class="chapter" data-level="9.3.2" data-path="fNorm.html"><a href="fNorm.html#group-normalization"><i class="fa fa-check"></i><b>9.3.2</b> Group normalization</a></li>
+<li class="chapter" data-level="9.3.3" data-path="fNorm.html"><a href="fNorm.html#using-normalized-intensities"><i class="fa fa-check"></i><b>9.3.3</b> Using normalized intensities</a></li>
+<li class="chapter" data-level="9.3.4" data-path="fNorm.html"><a href="fNorm.html#default-normalization"><i class="fa fa-check"></i><b>9.3.4</b> Default normalization</a></li>
+<li class="chapter" data-level="9.3.5" data-path="fNorm.html"><a href="fNorm.html#ims-workflows"><i class="fa fa-check"></i><b>9.3.5</b> IMS workflows</a></li>
+</ul></li>
+<li class="chapter" data-level="9.4" data-path="fOpt.html"><a href="fOpt.html"><i class="fa fa-check"></i><b>9.4</b> Feature parameter optimization</a>
+<ul>
+<li class="chapter" data-level="9.4.1" data-path="fOpt.html"><a href="fOpt.html#parameter-sets"><i class="fa fa-check"></i><b>9.4.1</b> Parameter sets</a></li>
+<li class="chapter" data-level="9.4.2" data-path="fOpt.html"><a href="fOpt.html#processing-optmization-results"><i class="fa fa-check"></i><b>9.4.2</b> Processing optmization results</a></li>
+</ul></li>
+<li class="chapter" data-level="9.5" data-path="peakQual.html"><a href="peakQual.html"><i class="fa fa-check"></i><b>9.5</b> Chromatographic peak qualities</a>
+<ul>
+<li class="chapter" data-level="9.5.1" data-path="peakQual.html"><a href="peakQual.html#applying-machine-learning-with-metaclean"><i class="fa fa-check"></i><b>9.5.1</b> Applying machine learning with MetaClean</a></li>
+</ul></li>
+<li class="chapter" data-level="9.6" data-path="exportFeat.html"><a href="exportFeat.html"><i class="fa fa-check"></i><b>9.6</b> Exporting and converting feature data</a></li>
+<li class="chapter" data-level="9.7" data-path="consensus.html"><a href="consensus.html"><i class="fa fa-check"></i><b>9.7</b> Algorithm consensus</a></li>
+<li class="chapter" data-level="9.8" data-path="bgMSMS.html"><a href="bgMSMS.html"><i class="fa fa-check"></i><b>9.8</b> Background removal in MS/MS data</a></li>
+<li class="chapter" data-level="9.9" data-path="MSLibraries.html"><a href="MSLibraries.html"><i class="fa fa-check"></i><b>9.9</b> MS libraries</a></li>
+<li class="chapter" data-level="9.10" data-path="compclust.html"><a href="compclust.html"><i class="fa fa-check"></i><b>9.10</b> Compound clustering</a></li>
+<li class="chapter" data-level="9.11" data-path="feature-regression-analysis.html"><a href="feature-regression-analysis.html"><i class="fa fa-check"></i><b>9.11</b> Feature regression analysis</a></li>
+<li class="chapter" data-level="9.12" data-path="pred.html"><a href="pred.html"><i class="fa fa-check"></i><b>9.12</b> Predicting toxicities and concentrations (MS2Tox and MS2Quant integration)</a>
+<ul>
+<li class="chapter" data-level="9.12.1" data-path="pred.html"><a href="pred.html#predicting-toxicities"><i class="fa fa-check"></i><b>9.12.1</b> Predicting toxicities</a></li>
+<li class="chapter" data-level="9.12.2" data-path="pred.html"><a href="pred.html#predicting-concentrations"><i class="fa fa-check"></i><b>9.12.2</b> Predicting concentrations</a></li>
+<li class="chapter" data-level="9.12.3" data-path="pred.html"><a href="pred.html#toxicity-and-concentration-units"><i class="fa fa-check"></i><b>9.12.3</b> Toxicity and concentration units</a></li>
+<li class="chapter" data-level="9.12.4" data-path="pred.html"><a href="pred.html#inspecting-predicted-values"><i class="fa fa-check"></i><b>9.12.4</b> Inspecting predicted values</a></li>
+<li class="chapter" data-level="9.12.5" data-path="pred.html"><a href="pred.html#using-predicted-values-to-prioritize-data"><i class="fa fa-check"></i><b>9.12.5</b> Using predicted values to prioritize data</a></li>
+</ul></li>
+<li class="chapter" data-level="9.13" data-path="FCCalc.html"><a href="FCCalc.html"><i class="fa fa-check"></i><b>9.13</b> Fold changes</a></li>
+<li class="chapter" data-level="9.14" data-path="caching.html"><a href="caching.html"><i class="fa fa-check"></i><b>9.14</b> Caching</a></li>
+<li class="chapter" data-level="9.15" data-path="parallelization.html"><a href="parallelization.html"><i class="fa fa-check"></i><b>9.15</b> Parallelization</a>
+<ul>
+<li class="chapter" data-level="9.15.1" data-path="parallelization.html"><a href="parallelization.html#multithreading"><i class="fa fa-check"></i><b>9.15.1</b> Multithreading</a></li>
+<li class="chapter" data-level="9.15.2" data-path="parallelization.html"><a href="parallelization.html#futures"><i class="fa fa-check"></i><b>9.15.2</b> Parellization of R functions</a></li>
+<li class="chapter" data-level="9.15.3" data-path="parallelization.html"><a href="parallelization.html#multiprocessing"><i class="fa fa-check"></i><b>9.15.3</b> Multiprocessing</a></li>
+<li class="chapter" data-level="9.15.4" data-path="parallelization.html"><a href="parallelization.html#notes-when-using-parallelization-with-futures"><i class="fa fa-check"></i><b>9.15.4</b> Notes when using parallelization with futures</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="9" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>9</b> References</a></li>
+<li class="chapter" data-level="10" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>10</b> References</a></li>
 </ul>
 
       </nav>
@@ -364,11 +407,11 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="incorpAdductIso" class="section level2 hasAnchor" number="4.5">
-<h2><span class="header-section-number">4.5</span> Incorporating adduct and isotopic data<a href="incorpAdductIso.html#incorpAdductIso" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="incorpAdductIso" class="section level2 hasAnchor" number="4.7">
+<h2><span class="header-section-number">4.7</span> Incorporating adduct and isotopic data<a href="incorpAdductIso.html#incorpAdductIso" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>With mass spectrometry it is common that multiple <em>m/z</em> values are detected for a single compound. These may be different adducts (e.g. <code>[M+H]+</code>, <code>[M+Na]+</code>, <code>[M-H]-</code>), the different isotopes of the molecule or a combination thereof. When multiple <em>m/z</em> values are measured for the same compound, the feature finding algorithm may yield a distinct feature for each, which adds complexity to the data. In <a href="componentization.html#componentsChrom">the previous section</a> it was discussed how componentization can help to find feature groups that belong to the same adduct and/or isotope clusters. This section explains how this data can be used to simplify the feature dataset. Furthermore, this section also covers adduct annotations for feature groups which may improve and simplify the general workflow.</p>
-<div id="selecting-features-with-preferential-adductsisotopes" class="section level3 hasAnchor" number="4.5.1">
-<h3><span class="header-section-number">4.5.1</span> Selecting features with preferential adducts/isotopes<a href="incorpAdductIso.html#selecting-features-with-preferential-adductsisotopes" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="selecting-features-with-preferential-adductsisotopes" class="section level3 hasAnchor" number="4.7.1">
+<h3><span class="header-section-number">4.7.1</span> Selecting features with preferential adducts/isotopes<a href="incorpAdductIso.html#selecting-features-with-preferential-adductsisotopes" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The <code>selectIons</code> function forms the bridge between feature group and componentization data. This function uses the adduct and isotope annotations to select <em>preferential</em> feature groups. For adduct clusters this means that only the feature group that has a preferential adduct (e.g. <code>[M+H]+</code>) is kept while others (e.g. <code>[M+Na]+</code>) are removed. If none of the adduct annotations are considered preferential, the most intense feature group is kept instead. For isotopic clusters typically only the feature group with the monoisotopic mass (i.e. <em>M0</em>) is kept.</p>
 <p>The behavior of <code>selectIons</code> is configurable with the following parameters:</p>
 <table>
@@ -400,31 +443,31 @@ div.csl-indent {
 <p>In case componentization did not lead to an adduct annotation for a feature group it will never be removed and simply be annotated with the preferential adduct. Similarly, when no isotope annotations are available and <code>onlyMonoIso=TRUE</code>, the feature group will not be removed.</p>
 <p>Although <code>selectIons</code> operates fairly conservative, it is still recommended to verify the componentization results in advance, for instance with the <code>checkComponents</code> function <a href="intReview.html#intReview">discussed here</a>. Furthermore, the next subsection explains how adduct annotations can be corrected manually if needed.</p>
 <p>An example usage is shown below.</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="incorpAdductIso.html#cb28-1" tabindex="-1"></a>fGroupsSel <span class="ot">&lt;-</span> <span class="fu">selectIons</span>(fGroups, componCAM, <span class="st">&quot;[M+H]+&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="incorpAdductIso.html#cb43-1" tabindex="-1"></a>fGroupsSel <span class="ot">&lt;-</span> <span class="fu">selectIons</span>(fGroups, componCAM, <span class="st">&quot;[M+H]+&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; No isotope annotations available!
 #&gt; Removed 21 feature groups detected as unwanted adducts/isotopes
 #&gt; Annotated 13 feature groups with adducts
 #&gt;  Remaining 110 feature groups set as default adduct [M+H]+</code></pre>
 </div>
-<div id="setting-adduct-annotations-for-feature-groups" class="section level3 hasAnchor" number="4.5.2">
-<h3><span class="header-section-number">4.5.2</span> Setting adduct annotations for feature groups<a href="incorpAdductIso.html#setting-adduct-annotations-for-feature-groups" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="setting-adduct-annotations-for-feature-groups" class="section level3 hasAnchor" number="4.7.2">
+<h3><span class="header-section-number">4.7.2</span> Setting adduct annotations for feature groups<a href="incorpAdductIso.html#setting-adduct-annotations-for-feature-groups" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The <code>adducts()</code> function can be used to obtain a character vector with adduct annotations for each feature group. When no adduct annotations are available it will simply return an empty character vector.</p>
 <p>When the <code>selectIons</code> function is used it will automatically add adduct annotations based on the componentization data. In addition, the <code>adducts()&lt;-</code> function can be used to manually add or change adduct annotations.</p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="incorpAdductIso.html#cb30-1" tabindex="-1"></a><span class="fu">adducts</span>(fGroups) <span class="co"># no adduct annotations</span></span></code></pre></div>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="incorpAdductIso.html#cb45-1" tabindex="-1"></a><span class="fu">adducts</span>(fGroups) <span class="co"># no adduct annotations</span></span></code></pre></div>
 <pre><code>#&gt; character(0)</code></pre>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="incorpAdductIso.html#cb32-1" tabindex="-1"></a><span class="fu">adducts</span>(fGroupsSel)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>] <span class="co"># adduct annotations set by selectIons()</span></span></code></pre></div>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="incorpAdductIso.html#cb47-1" tabindex="-1"></a><span class="fu">adducts</span>(fGroupsSel)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>] <span class="co"># adduct annotations set by selectIons()</span></span></code></pre></div>
 <pre><code>#&gt; M109_R192_20 M111_R330_23 M114_R269_25 M116_R317_29 M120_R268_30 
 #&gt;     &quot;[M+H]+&quot;     &quot;[M+H]+&quot;     &quot;[M+H]+&quot;     &quot;[M+H]+&quot;     &quot;[M+K]+&quot;</code></pre>
-<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="incorpAdductIso.html#cb34-1" tabindex="-1"></a><span class="fu">adducts</span>(fGroupsSel)[<span class="dv">3</span>] <span class="ot">&lt;-</span> <span class="st">&quot;[M+Na]+&quot;</span> <span class="co"># modify annotation</span></span>
-<span id="cb34-2"><a href="incorpAdductIso.html#cb34-2" tabindex="-1"></a><span class="fu">adducts</span>(fGroupsSel)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>] <span class="co"># verify</span></span></code></pre></div>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="incorpAdductIso.html#cb49-1" tabindex="-1"></a><span class="fu">adducts</span>(fGroupsSel)[<span class="dv">3</span>] <span class="ot">&lt;-</span> <span class="st">&quot;[M+Na]+&quot;</span> <span class="co"># modify annotation</span></span>
+<span id="cb49-2"><a href="incorpAdductIso.html#cb49-2" tabindex="-1"></a><span class="fu">adducts</span>(fGroupsSel)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>] <span class="co"># verify</span></span></code></pre></div>
 <pre><code>#&gt; M109_R192_20 M111_R330_23 M114_R269_25 M116_R317_29 M120_R268_30 
 #&gt;     &quot;[M+H]+&quot;     &quot;[M+H]+&quot;    &quot;[M+Na]+&quot;     &quot;[M+H]+&quot;     &quot;[M+K]+&quot;</code></pre>
 <blockquote>
 <p><strong><em>NOTE</em></strong> Adduct annotations are always available with <a href="setsWorkflow.html#setsWorkflow">sets workflows</a>.</p>
 </blockquote>
 </div>
-<div id="useAdductAnn" class="section level3 hasAnchor" number="4.5.3">
-<h3><span class="header-section-number">4.5.3</span> Using adduct annotations in the workflow<a href="incorpAdductIso.html#useAdductAnn" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="useAdductAnn" class="section level3 hasAnchor" number="4.7.3">
+<h3><span class="header-section-number">4.7.3</span> Using adduct annotations in the workflow<a href="incorpAdductIso.html#useAdductAnn" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>When feature groups have adduct annotations available this may simplify and improve the workflow. The <code>adduct</code> and <code>ionization</code> arguments used for suspect screening, formula/compound annotation and some componentization algorithms do not have to be set anymore, since this data can be obtained from the adduct annotations. Furthermore, these algorithms may improve their results, since the algorithms are now able to use adduct information for each feature group individually, instead of assuming that all feature groups have the same adduct.</p>
 </div>
 </div>

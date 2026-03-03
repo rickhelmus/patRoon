@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.0</span>
       </span>
     </div>
 
@@ -101,25 +101,27 @@
 <span><span class="fu">generateCompoundsLibrary</span><span class="op">(</span></span>
 <span>  <span class="va">fGroups</span>,</span>
 <span>  <span class="va">MSPeakLists</span>,</span>
+<span>  specSimParams <span class="op">=</span> <span class="fu"><a href="specSimParams.html">getDefSpecSimParams</a></span><span class="op">(</span>removePrecursor <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
 <span>  <span class="va">MSLibrary</span>,</span>
 <span>  minSim <span class="op">=</span> <span class="fl">0.75</span>,</span>
 <span>  minAnnSim <span class="op">=</span> <span class="va">minSim</span>,</span>
-<span>  absMzDev <span class="op">=</span> <span class="fl">0.002</span>,</span>
+<span>  absMzDev <span class="op">=</span> <span class="fu"><a href="limits.html">defaultLim</a></span><span class="op">(</span><span class="st">"mz"</span>, <span class="st">"narrow"</span><span class="op">)</span>,</span>
 <span>  adduct <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  checkIons <span class="op">=</span> <span class="st">"adduct"</span>,</span>
 <span>  spectrumType <span class="op">=</span> <span class="st">"MS2"</span>,</span>
-<span>  specSimParams <span class="op">=</span> <span class="fu"><a href="specSimParams.html">getDefSpecSimParams</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  specSimParamsLib <span class="op">=</span> <span class="fu"><a href="specSimParams.html">getDefSpecSimParams</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  specSimParamsLib <span class="op">=</span> <span class="va">specSimParams</span>,</span>
+<span>  minMobSpecSim <span class="op">=</span> <span class="fl">0</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'featureGroupsSet'</span></span>
 <span><span class="fu">generateCompoundsLibrary</span><span class="op">(</span></span>
 <span>  <span class="va">fGroups</span>,</span>
 <span>  <span class="va">MSPeakLists</span>,</span>
+<span>  specSimParams <span class="op">=</span> <span class="fu"><a href="specSimParams.html">getDefSpecSimParams</a></span><span class="op">(</span>removePrecursor <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
 <span>  <span class="va">MSLibrary</span>,</span>
 <span>  minSim <span class="op">=</span> <span class="fl">0.75</span>,</span>
 <span>  minAnnSim <span class="op">=</span> <span class="va">minSim</span>,</span>
-<span>  absMzDev <span class="op">=</span> <span class="fl">0.002</span>,</span>
+<span>  absMzDev <span class="op">=</span> <span class="fu"><a href="limits.html">defaultLim</a></span><span class="op">(</span><span class="st">"mz"</span>, <span class="st">"narrow"</span><span class="op">)</span>,</span>
 <span>  adduct <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  setThreshold <span class="op">=</span> <span class="fl">0</span>,</span>
@@ -144,6 +146,12 @@ feature groups in the subset are considered.</p></dd>
 
 <dt id="arg-mspeaklists">MSPeakLists<a class="anchor" aria-label="anchor" href="#arg-mspeaklists"></a></dt>
 <dd><p>A <code><a href="MSPeakLists-class.html">MSPeakLists</a></code> object that was generated for the supplied <code>fGroups</code>.</p></dd>
+
+
+<dt id="arg-specsimparams">specSimParams<a class="anchor" aria-label="anchor" href="#arg-specsimparams"></a></dt>
+<dd><p>A named <code>list</code> with parameters that influence the calculation of the
+<a href="id-conf.html">annotation similarity</a>. See the <a href="specSimParams.html">spectral similarity parameters</a> documentation
+for more details.</p></dd>
 
 
 <dt id="arg-mslibrary">MSLibrary<a class="anchor" aria-label="anchor" href="#arg-mslibrary"></a></dt>
@@ -183,14 +191,19 @@ applied.</p></dd>
 (<code>Spectrum_type</code> field, <em>e.g.</em> <code>"MS2"</code>). Set to <code>NULL</code> to allow all spectrum types.</p></dd>
 
 
-<dt id="arg-specsimparams">specSimParams<a class="anchor" aria-label="anchor" href="#arg-specsimparams"></a></dt>
-<dd><p>A named <code>list</code> with parameters that influence the calculation of MS spectra similarities.
-See the <a href="specSimParams.html">spectral similarity parameters</a> documentation for more details.</p></dd>
-
-
 <dt id="arg-specsimparamslib">specSimParamsLib<a class="anchor" aria-label="anchor" href="#arg-specsimparamslib"></a></dt>
-<dd><p>Like <code>specSimParams</code>, but these parameters <em>only</em> influence pre-treatment of
-library spectra (only the <code>removePrecursor</code>, <code>relMinIntensity</code> and <code>minPeaks</code> parameters are used).</p></dd>
+<dd><p>Like <code>specSimParams</code>, but these parameters are used for the pre-treatment of library
+spectra (only the <code>removePrecursor</code>, <code>relMinIntensity</code> and <code>minPeaks</code> parameters are used).</p></dd>
+
+
+<dt id="arg-minmobspecsim">minMobSpecSim<a class="anchor" aria-label="anchor" href="#arg-minmobspecsim"></a></dt>
+<dd><p>(<strong>IMS workflow</strong>) If the spectrum similarity of a mobility feature group compared to its IMS parent (see
+<code><a href="assignMobilities_feat.html">assignMobilities</a></code>) is at least this value, then the mobility feature group
+will not be subjected to the annotation algorithm and all feature annotation properties will be copied from its
+parent. This assumes that feature annotation is primarily influenced by the MS/MS spectrum, and can be used to
+speed up the feature annotation process. All scorings, annotation similarities etc. are copied from the IMS parent.
+The fragment annotations are also copied (<code>fragInfo</code> result column), however, these are adjusted based on the
+peak list data of the mobility feature group.</p></dd>
 
 
 <dt id="arg-setthreshold">setThreshold<a class="anchor" aria-label="anchor" href="#arg-setthreshold"></a></dt>
@@ -227,6 +240,11 @@ averaged.</p></dd>
   selected from criterion #5 above may not contain all the annotation data available from the MS library, annotations
   from other records are also considered (controlled by the <code>minAnnSim</code> argument). If this leads to different
   annotations for the same mass peak then only the most abundant annotation is kept.</p>
+    </div>
+    <div id="note">
+    <h2>Note</h2>
+    <p>The <code>score</code>, <code>libMatch</code> and <code>annSim</code> output columns are all equal and resemble the spectral
+  similarity between the experimental and library spectra.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>

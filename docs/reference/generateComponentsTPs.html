@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.0</span>
       </span>
     </div>
 
@@ -101,26 +101,28 @@
 <span><span class="fu">generateComponentsTPs</span><span class="op">(</span></span>
 <span>  <span class="va">fGroups</span>,</span>
 <span>  fGroupsTPs <span class="op">=</span> <span class="va">fGroups</span>,</span>
-<span>  ignoreParents <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  TPs <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  MSPeakLists <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  formulas <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  compounds <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ignoreParents <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  minRTDiff <span class="op">=</span> <span class="fl">20</span>,</span>
-<span>  specSimParams <span class="op">=</span> <span class="fu"><a href="specSimParams.html">getDefSpecSimParams</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  specSimParams <span class="op">=</span> <span class="fu"><a href="specSimParams.html">getDefSpecSimParams</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  IMS <span class="op">=</span> <span class="st">"maybe"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'featureGroupsSet'</span></span>
 <span><span class="fu">generateComponentsTPs</span><span class="op">(</span></span>
 <span>  <span class="va">fGroups</span>,</span>
 <span>  fGroupsTPs <span class="op">=</span> <span class="va">fGroups</span>,</span>
-<span>  ignoreParents <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  TPs <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  MSPeakLists <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  formulas <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  compounds <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ignoreParents <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  minRTDiff <span class="op">=</span> <span class="fl">20</span>,</span>
-<span>  specSimParams <span class="op">=</span> <span class="fu"><a href="specSimParams.html">getDefSpecSimParams</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  specSimParams <span class="op">=</span> <span class="fu"><a href="specSimParams.html">getDefSpecSimParams</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  IMS <span class="op">=</span> <span class="st">"maybe"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -143,11 +145,6 @@ the <code>fGroups</code> argument. Otherwise, <code>fGroups</code> should only c
 <code>fGroups</code> and <code>fGroupsTPs</code> <em>must</em> be a subset of the same <code><a href="featureGroups-class.html">featureGroups</a></code> object.</p></dd>
 
 
-<dt id="arg-ignoreparents">ignoreParents<a class="anchor" aria-label="anchor" href="#arg-ignoreparents"></a></dt>
-<dd><p>If <code>TRUE</code> then feature groups present in both <code>fGroups</code> and <code>fGroupsTPs</code> are not
-considered as TPs.</p></dd>
-
-
 <dt id="arg-tps">TPs<a class="anchor" aria-label="anchor" href="#arg-tps"></a></dt>
 <dd><p>A <code><a href="transformationProducts-class.html">transformationProducts</a></code> object. Set to <code>NULL</code> to perform linking without this data.</p></dd>
 
@@ -158,14 +155,28 @@ object to calculate MS/MS or annotation similarities between parents and TPs. If
 calculated. For more details see the <code>Linking parents and transformation products</code> section below.</p></dd>
 
 
+<dt id="arg-ignoreparents">ignoreParents<a class="anchor" aria-label="anchor" href="#arg-ignoreparents"></a></dt>
+<dd><p>If <code>TRUE</code> then feature groups present in both <code>fGroups</code> and <code>fGroupsTPs</code> are not
+considered as TPs.</p></dd>
+
+
 <dt id="arg-minrtdiff">minRTDiff<a class="anchor" aria-label="anchor" href="#arg-minrtdiff"></a></dt>
-<dd><p>Minimum retention time (in seconds) difference between the parent and a TP to determine whether a TP
-elutes prior/after the parent (to calculate <code>retDir</code> values, see Details in <a href="componentsTPs-class.html">componentsTPs</a>))</p></dd>
+<dd><p>Minimum retention time (in seconds) difference between the parent and a TP to calculate the
+<a href="retDir.html">retention order direction</a>.</p></dd>
 
 
 <dt id="arg-specsimparams">specSimParams<a class="anchor" aria-label="anchor" href="#arg-specsimparams"></a></dt>
 <dd><p>A named <code>list</code> with parameters that influence the calculation of MS spectra similarities.
 See the <a href="specSimParams.html">spectral similarity parameters</a> documentation for more details.</p></dd>
+
+
+<dt id="arg-ims">IMS<a class="anchor" aria-label="anchor" href="#arg-ims"></a></dt>
+<dd><p>(<strong>IMS workflow</strong>) Specifies which feature groups are considered for componentization in IMS workflows. The following options
+  are valid:</p><ul><li><p><code>"both"</code>: Selects IMS and non-IMS features.</p></li>
+<li><p><code>"maybe"</code>: Selects non-IMS features and IMS features without assigned IMS parent.</p></li>
+<li><p><code>FALSE</code>: Selects only non-IMS features.</p></li>
+<li><p><code>TRUE</code>: Selects only IMS features.</p></li>
+</ul></dd>
 
 </dl></div>
     <div id="value">
@@ -194,14 +205,15 @@ See the <a href="specSimParams.html">spectral similarity parameters</a> document
   the feature groups for TPs are taken from <code>fGroupsTPs</code>. If a feature group occurs in both variables, it may
   therefore be considered as both a parent or TP.</p>
 <p>If transformation product data is given, <em>i.e.</em> the <code>TPs</code> argument is set, then a suspect screening of
-  the TPs must be performed in advance (see <code><a href="suspect-screening.html">screenSuspects</a></code> and <code><a href="generics.html">convertToSuspects</a></code> to
-  create the suspect list). Furthermore, if TPs were generated with <code><a href="generateTPsBioTransformer.html">generateTPsBioTransformer</a></code> or
-  <code><a href="generateTPsLibrary.html">generateTPsLibrary</a></code> then the suspect screening must also include the parents (<em>e.g.</em> by setting
-  <code>includeParents=TRUE</code> when calling <code>convertToSuspects</code> or by amending results by setting
-  <code>amend=TRUE</code> to <code>screenSuspects</code>). The suspect screening is necessary for the componentization algorithm
-  to map the feature groups of the parent or TP. If the the suspect screening yields multiple TP hits, all will be
-  reported. Similarly, if the suspect screening contains multiple hits for a parent, a component is made for each of
-  the parent hits.</p>
+  the parents and/or TPs may need to be performed in advance to facilitate linkage. This depends on the algorithm
+  that was used to generate the TPs:</p><ul><li><p>the parents need to be screened for all algorithms except <code>logic</code> (<code><a href="generateTPsLogic.html">generateTPsLogic</a></code>)</p></li>
+<li><p>the TPs need to be screened for all algorithms except <code>ann_form</code> and <code>ann_comp</code>
+    (<code><a href="generateTPsAnnForm.html">generateTPsAnnForm</a></code> and <code><a href="generateTPsAnnComp.html">generateTPsAnnComp</a></code>).</p></li>
+</ul><p>See <code><a href="suspect-screening.html">screenSuspects</a></code> to perform the screening and <code><a href="generics.html">convertToSuspects</a></code> to create the suspect
+  list. To include parents make sure to set <code>includeParents=TRUE</code> when calling <code>convertToSuspects</code> or first
+  screen for the parents and then amend the screening object with TP screening results by setting <code>amend=TRUE</code>
+  to <code>screenSuspects</code>. If the the suspect screening yields multiple TP hits, all will be reported. Similarly, if
+  the suspect screening contains multiple hits for a parent, a component is made for each of the parent hits.</p>
 <p>In case no transformation product data is provided (<code>TPs=NULL</code>), the componentization algorithm simply assumes
   that each feature group from <code>fGroupsTPs</code> is a potential TP for every parent feature group in <code>fGroups</code>.
   For this reason, it is highly recommended to specify which feature groups are parents/TPs (see the
@@ -209,27 +221,49 @@ See the <a href="specSimParams.html">spectral similarity parameters</a> document
   only retaining TPs that have high annotation similarity with their parents (see the
   <code><a href="componentsTPs-class.html">filter</a></code> method for <code><a href="componentsTPs-class.html">componentsTPs</a></code>).</p>
 <p>A typical way to distinguish which feature groups are parents or TPs from two different (groups of) samples is by
-  calculating Fold Changes (see the <code><a href="featureGroups-class.html">as.data.table</a></code> method for
+  calculating Fold Changes (see the <code><a href="feature-table.html">as.data.table</a></code> method for
   feature groups and <code><a href="generics.html">plotVolcano</a></code>). Of course, other statistical techniques from <span style="R">R</span> are also suitable.</p>
-<p>During componentization, several characteristics are calculated which may be useful for post-processing:</p><ul><li><p><code>specSimilarity</code>: the MS/MS spectral similarity between the feature groups of the TP and its parent
-  (<samp>0-1</samp>).</p></li>
+    </div>
+    <div id="result-columns">
+    <h2>Result columns</h2>
+    <p>During componentization, several characteristics are calculated which may be useful for
+  post-processing. These can be obtained with <em>e.g.</em>
+  <code><a href="componentsTPs-class.html">as.data.table</a></code> or <code><a href="components-class.html">componentTable</a></code>. The properties
+  are either reported for each feature group in a component, or for each candidate of a feature group in a component
+  (only if <code>TPs</code> was set).</p>
+<p>The following properties may be reported for each feature group:</p><ul><li><p><code>specSimilarity</code>: the MS/MS spectral similarity between the feature groups of the TP and its parent
+    (<samp>0-1</samp>).</p></li>
 <li><p><code>specSimilarityPrec</code>,<code>specSimilarityBoth</code>: as <code>specSimilarity</code>, but calculated with binned
-  data using the <code>"precursor"</code> and <code>"both"</code> method, respectively (see <a href="specSimParams.html">MS spectral
-  similarity parameters</a> for more details).</p></li>
-<li><p><code>fragmentMatches</code> The number of MS/MS fragment formula annotations that overlap between the TP and
-  parent. If both the <code>formulas</code> and <code>compounds</code> arguments are specified then the annotation data is pooled
-  prior to calculation. Note that only unique matches are counted. Furthermore, note that annotations from <em>all</em>
-  candidates are considered, even if the formula/structure of the parent/TP is known. Hence, <code>fragmentMatches</code>
-  is mainly useful when little or no chemical information is known on the parents/TPs, <em>i.e.</em>, when
-  <code>TPs=NULL</code> or originates from <code><a href="generateTPsLogic.html">generateTPsLogic</a></code>. Since annotations for all candidates are used,
-  it is highly recommended that the annotation objects are first processed with the <code><a href="generics.html">filter</a></code> method, for
-  instance, to select only the top ranked candidates.</p></li>
-<li><p><code>neutralLossMatches</code> As <code>fragmentMatches</code>, but counting overlapping neutral loss formulae.</p></li>
-<li><p><code>retDir</code> The retention time direction of the TP relative to its parent. See Details in
-  <a href="componentsTPs-class.html">componentsTPs</a>. If TP data was specified, the expected direction is stored in <code>TP_retDir</code>.</p></li>
-<li><p><code>retDiff</code>,<code>mzDiff</code>,<code>formulaDiff</code> The retention time, <em>m/z</em> and formula difference between
-  the parent and TP (latter only available if data TP formula is available).</p></li>
+    data using the <code>"precursor"</code> and <code>"both"</code> method, respectively (see <a href="specSimParams.html">MS spectral
+    similarity parameters</a> for more details).</p></li>
+<li><p><code>totalFragmentMatches</code> The total number of MS/MS fragment annotations that overlap between <em>all</em>
+    feature annotation candidates for the TP feature group and the feature annotations specifically for the parent
+    (based on the assigned fragment formula). If both the <code>formulas</code> and <code>compounds</code> arguments are
+    specified then the annotation data is pooled prior to calculation. Each unique match is only counted once.</p></li>
+<li><p><code>totalNeutralLossMatches</code> As <code>totalFragmentMatches</code>, but counting overlapping neutral loss
+    formulae.</p></li>
+<li><p><code>retDir</code>,<code>TP_retDir</code> The <a href="retDir.html">retention order direction</a> derived from the feature groups
+    (<code>retDir</code>) or the (expected) value from TP data (<code>TP_retDir</code>).</p></li>
+<li><p><code>retDiff</code>,<code>mzDiff</code>, The retention time and <em>m/z</em> difference between the parent and TP.</p></li>
+</ul><p>The candidate specific properties are stored inside the <code>candidates</code> column in component tables, and can be
+  obtained with <code>as.data.table</code> by setting <code>candidates=TRUE</code>. The following properties may be present:</p><ul><li><p><code>fragmentMatches</code>,<code>neutralLossMatches</code> As <code>totalFragmentMatches</code> and
+    <code>totalNeutralLossMatches</code>, but only considering the feature annotations specifically for this candidate.</p></li>
+<li><p><code>formulaDiff</code> The formula difference between the parent and TP (if formula data is available).</p></li>
+<li><p><code>TPScore</code>,<code>annSim</code>,<code>fitFormula</code>,<code>fitCompound</code>,<code>simSusps</code>: TP scoring properties,
+    see <code><a href="generateTPsAnnForm.html">generateTPsAnnForm</a></code> and <code><a href="generateTPsAnnComp.html">generateTPsAnnComp</a></code>.</p></li>
 </ul></div>
+    <div id="ims-workflows">
+    <h2>IMS workflows</h2>
+    <p>In IMS workflows with post mobility assignment (see
+  <code><a href="assignMobilities_feat.html">assignMobilities</a></code>) it may be necessary to call <code><a href="components-class.html">expandForIMS</a></code> when
+  componentization was performed <em>prior</em> to mobility assignments, see its documentation for more details.</p>
+<p>If mobilities were already assigned prior to componentization, then the <code>IMS</code> argument selects which feature
+  groups are subjected to componentization. Data for mobility feature groups that were not considered (<em>i.e.</em>
+  when <code>IMS</code> is <code>FALSE</code> or <code>"maybe"</code>), will be expanded similarly as is done by
+  <code><a href="components-class.html">expandForIMS</a></code>.</p>
+<p><strong>NOTE</strong>: IMS expansion by <code><a href="components-class.html">expandForIMS</a></code> only expands results for TP
+  candidates, <em>i.e.</em> no new components from parents assigned to mobility feature groups will be added.</p>
+    </div>
     <div id="sets-workflows">
     <h2>Sets workflows</h2>
     <p>In a <a href="sets-workflow.html">sets workflow</a> the component tables are amended with extra

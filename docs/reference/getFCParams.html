@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.0</span>
       </span>
     </div>
 
@@ -95,15 +95,15 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">getFCParams</span><span class="op">(</span><span class="va">rGroups</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">getFCParams</span><span class="op">(</span><span class="va">replicates</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
 
 
-<dl><dt id="arg-rgroups">rGroups<a class="anchor" aria-label="anchor" href="#arg-rgroups"></a></dt>
-<dd><p>A <code>character</code> vector with the names of the two replicate groups to be compared.</p></dd>
+<dl><dt id="arg-replicates">replicates<a class="anchor" aria-label="anchor" href="#arg-replicates"></a></dt>
+<dd><p>A <code>character</code> vector with the names of the two replicates to be compared.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -112,9 +112,9 @@
 </dl></div>
     <div id="details">
     <h2>Details</h2>
-    <p>Fold change calculation can be used to easily identify significant changes between replicate groups. The
-  calculation process is configured through a paramater list, which can be constructed with the <code>getFCParams</code>
-  function. The parameter list has the following entries:</p><ul><li><p><code>rGroups</code> the name of the two replicate groups to compare (taken from the <code>rGroups</code> argument to
+    <p>Fold change calculation can be used to easily identify significant changes between replicates. The
+  calculation process is configured through a parameter list, which can be constructed with the <code>getFCParams</code>
+  function. The parameter list has the following entries:</p><ul><li><p><code>replicates</code> the name of the two replicates to compare (taken from the <code>replicates</code> argument to
   <code>getFCParams</code>).</p></li>
 <li><p><code>thresholdFC</code>: the threshold log FC for a feature group to be classified as increasing/decreasing.</p></li>
 <li><p><code>thresholdPV</code>: the threshold log P for a feature group to be significantly different.</p></li>

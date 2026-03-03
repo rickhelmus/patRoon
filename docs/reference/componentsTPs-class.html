@@ -19,7 +19,7 @@ more details, see generateComponentsTPs."><!-- mathjax --><script src="https://c
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.0</span>
       </span>
     </div>
 
@@ -100,7 +100,7 @@ more details, see <code><a href="generateComponentsTPs.html">generateComponentsT
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for class 'componentsTPs'</span></span>
-<span><span class="fu"><a href="generics.html">as.data.table</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span><span class="fu"><a href="generics.html">as.data.table</a></span><span class="op">(</span><span class="va">x</span>, candidates <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'componentsTPs'</span></span>
 <span><span class="fu"><a href="generics.html">filter</a></span><span class="op">(</span></span>
@@ -110,6 +110,8 @@ more details, see <code><a href="generateComponentsTPs.html">generateComponentsT
 <span>  minSpecSim <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  minSpecSimPrec <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  minSpecSimBoth <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  minTotFragMatches <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  minTotNLMatches <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  minFragMatches <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  minNLMatches <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  formulas <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -129,14 +131,20 @@ more details, see <code><a href="generateComponentsTPs.html">generateComponentsT
 <dd><p>A <code>componentsTPs</code> object.</p></dd>
 
 
+<dt id="arg-candidates">candidates<a class="anchor" aria-label="anchor" href="#arg-candidates"></a></dt>
+<dd><p>If <code>TRUE</code> then candidate specific tables are merged in the result table. See
+<code><a href="generateComponentsTPs.html">generateComponentsTPs</a></code> (<code>Result columns</code> section) for more details.</p></dd>
+
+
 <dt id="arg--verbose">..., verbose<a class="anchor" aria-label="anchor" href="#arg--verbose"></a></dt>
 <dd><p>Further arguments passed to the base <code><a href="components-class.html">filter method</a></code>.</p></dd>
 
 
 <dt id="arg-retdirmatch">retDirMatch<a class="anchor" aria-label="anchor" href="#arg-retdirmatch"></a></dt>
-<dd><p>If set to <code>TRUE</code>, only keep TPs for which the retention time direction (<code>retDir</code>, see
-Details in componentsTPs) matches with the observed direction. TPs will never be removed if the
-expected/observed direction is <samp>0</samp> (<em>i.e.</em> unknown or not significantly different than the parent).</p></dd>
+<dd><p>If set to <code>TRUE</code>, only keep TPs for which the <a href="retDir.html">retention order direction</a> from
+feature group data matches that of the expected values from TP data (<code>retDir</code> and <code>TP_retDir</code> columns).
+TPs will never be removed if either of the directions is <samp>0</samp> (<em>i.e.</em> unknown or not significantly
+different than the parent).</p></dd>
 
 
 <dt id="arg-minspecsim-minspecsimprec-minspecsimboth">minSpecSim, minSpecSimPrec, minSpecSimBoth<a class="anchor" aria-label="anchor" href="#arg-minspecsim-minspecsimprec-minspecsimboth"></a></dt>
@@ -146,9 +154,9 @@ expected/observed direction is <samp>0</samp> (<em>i.e.</em> unknown or not sign
 parameters</a> for more details). Set to <code>NULL</code> to ignore.</p></dd>
 
 
-<dt id="arg-minfragmatches-minnlmatches">minFragMatches, minNLMatches<a class="anchor" aria-label="anchor" href="#arg-minfragmatches-minnlmatches"></a></dt>
-<dd><p>Minimum number of parent/TP fragment and neutral loss matches, respectively. Set
-to <code>NULL</code> to ignore. See the <code>Linking parents and transformation products</code> section in
+<dt id="arg-mintotfragmatches-mintotnlmatches-minfragmatches-minnlmatches">minTotFragMatches, minTotNLMatches, minFragMatches, minNLMatches<a class="anchor" aria-label="anchor" href="#arg-mintotfragmatches-mintotnlmatches-minfragmatches-minnlmatches"></a></dt>
+<dd><p>Minimum number of (total) parent/TP fragment and
+neutral loss matches. Set to <code>NULL</code> to ignore. See the <code>Result columns</code> section in
 <code><a href="generateComponentsTPs.html">generateComponentsTPs</a></code> for more details.</p></dd>
 
 
@@ -193,7 +201,15 @@ and rendered with <span class="pkg">visNetwork</span>.</p></li>
 
 <dl><dt><code>fromTPs</code></dt>
 <dd><p>A <code>logical</code> that is <code>TRUE</code> when the componentization was performed with
-<code><a href="transformationProducts-class.html">transformationProducts</a></code> data.</p></dd>
+<code><a href="transformationProducts-class.html">transformationProducts</a></code> data (<em>i.e.</em> the TPs argument was not <code>NULL</code>).</p></dd>
+
+
+<dt><code>parentsFromScreening</code></dt>
+<dd><p>A <code>logical</code> that is <code>TRUE</code> when the parents were obtained from screening data.</p></dd>
+
+
+<dt><code>TPsFromScreening</code></dt>
+<dd><p>A <code>logical</code> that is <code>TRUE</code> when the TPs were obtained from screening data.</p></dd>
 
 
 </dl></div>
@@ -219,10 +235,10 @@ Csárdi G, Nepusz T (2006).
 “The igraph software package for complex network research.”
 <em>InterJournal</em>, <b>Complex Systems</b>, 1695.
 <a href="https://igraph.org" class="external-link">https://igraph.org</a>.<br><br>
-Csárdi G, Nepusz T, Traag V, Horvát S, Zanini F, Noom D, Müller K, Schoch D, Salmon M (2025).
+Csárdi G, Nepusz T, Traag V, Horvát S, Zanini F, Noom D, Müller K, Schoch D, Salmon M (2026).
 <em>igraph: Network Analysis and Visualization in R</em>.
 <a href="https://doi.org/10.5281/zenodo.7682609" class="external-link">doi:10.5281/zenodo.7682609</a>
-, R package version 2.2.1, <a href="https://CRAN.R-project.org/package=igraph" class="external-link">https://CRAN.R-project.org/package=igraph</a>.</p>
+, R package version 2.2.2, <a href="https://CRAN.R-project.org/package=igraph" class="external-link">https://CRAN.R-project.org/package=igraph</a>.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.0</span>
       </span>
     </div>
 
@@ -95,19 +95,20 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">importFeatures</span><span class="op">(</span><span class="va">analysisInfo</span>, <span class="va">type</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">importFeatures</span><span class="op">(</span><span class="va">input</span>, <span class="va">type</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
 
 
-<dl><dt id="arg-analysisinfo">analysisInfo<a class="anchor" aria-label="anchor" href="#arg-analysisinfo"></a></dt>
-<dd><p>A <code>data.frame</code> with <a href="analysis-information.html">Analysis information</a>.</p></dd>
+<dl><dt id="arg-input">input<a class="anchor" aria-label="anchor" href="#arg-input"></a></dt>
+<dd><p>The input object or path that should be imported. See the algorithm specific functions for more details.</p></dd>
 
 
 <dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
-<dd><p>What type of data should be imported: <code>"xcms"</code>, <code>"xcms3"</code>, <code>"kpic2"</code> or <code>"envimass"</code>.</p></dd>
+<dd><p>What type of data should be imported: <code>"xcms"</code>, <code>"xcms3"</code>, <code>"kpic2"</code>, <code>"table"</code>, or
+<code>"envimass"</code>.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -121,13 +122,13 @@
     <div id="details">
     <h2>Details</h2>
     <p><code>importFeatures</code> is a generic function that will import features by one of the supported algorithms. The actual
-  functionality is provided by algorithm specific functions such as <code>importFeaturesXCMS3</code> and <code>importFeaturesKPIC2</code>. While these
+  functionality is provided by algorithm specific functions such as <code>importFeaturesXCMS3</code> and <code>importFeaturesTable</code>. While these
   functions may be called directly, <code>importFeatures</code> provides a generic interface and is therefore usually preferred.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
     <div class="dont-index"><p>The <code><a href="features-class.html">features</a></code> output class and its methods and the algorithm specific functions:
-  <code><a href="importFeaturesXCMS.html">importFeaturesXCMS</a></code>, <code><a href="importFeaturesXCMS3.html">importFeaturesXCMS3</a></code>, <code><a href="importFeaturesKPIC2.html">importFeaturesKPIC2</a></code>, <code><a href="importFeaturesEnviMass.html">importFeaturesEnviMass</a></code></p>
+  <code><a href="importFeaturesXCMS.html">importFeaturesXCMS</a></code>, <code><a href="importFeaturesXCMS3.html">importFeaturesXCMS3</a></code>, <code><a href="importFeaturesKPIC2.html">importFeaturesKPIC2</a></code>, <code><a href="importFeaturesTable.html">importFeaturesTable</a></code>, <code><a href="importFeaturesEnviMass.html">importFeaturesEnviMass</a></code></p>
 <p><code><a href="findFeatures.html">findFeatures</a></code> to find new features.</p></div>
     </div>
 

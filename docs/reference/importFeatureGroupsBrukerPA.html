@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.0</span>
       </span>
     </div>
 
@@ -96,10 +96,10 @@
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">importFeatureGroupsBrukerPA</span><span class="op">(</span></span>
-<span>  <span class="va">path</span>,</span>
+<span>  <span class="va">input</span>,</span>
 <span>  <span class="va">feat</span>,</span>
-<span>  rtWindow <span class="op">=</span> <span class="fl">12</span>,</span>
-<span>  mzWindow <span class="op">=</span> <span class="fl">0.005</span>,</span>
+<span>  rtWindow <span class="op">=</span> <span class="fu"><a href="limits.html">defaultLim</a></span><span class="op">(</span><span class="st">"retention"</span>, <span class="st">"medium"</span><span class="op">)</span>,</span>
+<span>  mzWindow <span class="op">=</span> <span class="fu"><a href="limits.html">defaultLim</a></span><span class="op">(</span><span class="st">"mz"</span>, <span class="st">"medium"</span><span class="op">)</span>,</span>
 <span>  intWindow <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>  warn <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -109,7 +109,7 @@
     <h2>Arguments</h2>
 
 
-<dl><dt id="arg-path">path<a class="anchor" aria-label="anchor" href="#arg-path"></a></dt>
+<dl><dt id="arg-input">input<a class="anchor" aria-label="anchor" href="#arg-input"></a></dt>
 <dd><p>The file path to a exported 'bucket table' <code class="file">.txt</code> file from PA.</p></dd>
 
 

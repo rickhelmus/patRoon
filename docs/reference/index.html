@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.0</span>
       </span>
     </div>
 
@@ -93,17 +93,33 @@
           <p class="section-desc"></p>
         </th>
       </tr></tbody><tbody><tr><td>
-          <p><code><a href="EICParams.html">getDefEICParams()</a></code> </p>
+          <p><code><a href="C3SDBAdducts.html">C3SDBAdducts()</a></code> </p>
         </td>
-        <td><p>Extracted Ion Chromatogram parameters</p></td>
+        <td><p>Returns the adducts supported by C3SDB</p></td>
+      </tr><tr><td>
+          <p><code><a href="CCS-Conversion.html">convertMobilityToCCS()</a></code> <code><a href="CCS-Conversion.html">convertCCSToMobility()</a></code> </p>
+        </td>
+        <td><p>Conversion between mobility and CCS</p></td>
+      </tr><tr><td>
+          <p><code><a href="EIXParams.html">getDefEICParams()</a></code> <code><a href="EIXParams.html">getDefEIMParams()</a></code> </p>
+        </td>
+        <td><p>Extracted Ion Chromatogram and Mobilogram parameters</p></td>
+      </tr><tr><td>
+          <p><code><a href="MSConversion.html">getMSConversionTypes()</a></code> <code><a href="MSConversion.html">getMSConversionFormats()</a></code> <code><a href="MSConversion.html">convertMSFilesPWiz()</a></code> <code><a href="MSConversion.html">convertMSFilesOpenMS()</a></code> <code><a href="MSConversion.html">convertMSFilesBruker()</a></code> <code><a href="MSConversion.html">convertMSFilesIMSCollapse()</a></code> <code><a href="MSConversion.html">convertMSFilesTIMSCONVERT()</a></code> <code><a href="MSConversion.html">convertMSFilePaths()</a></code> <code><a href="MSConversion.html">convertMSFiles()</a></code> </p>
+        </td>
+        <td><p>MS data conversion</p></td>
       </tr><tr><td>
           <p><code><a href="MSLibrary-class.html">records()</a></code> <code><a href="MSLibrary-class.html">spectra()</a></code> <code><a href="MSLibrary-class.html">length(<i>&lt;MSLibrary&gt;</i>)</a></code> <code><a href="MSLibrary-class.html">names(<i>&lt;MSLibrary&gt;</i>)</a></code> <code><a href="MSLibrary-class.html">show(<i>&lt;MSLibrary&gt;</i>)</a></code> <code><a href="MSLibrary-class.html">`[`(<i>&lt;MSLibrary&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;missing&gt;</i>,<i>&lt;missing&gt;</i>)</a></code> <code><a href="MSLibrary-class.html">`[[`(<i>&lt;MSLibrary&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;missing&gt;</i>)</a></code> <code><a href="MSLibrary-class.html">`$`(<i>&lt;MSLibrary&gt;</i>)</a></code> <code><a href="MSLibrary-class.html">as.data.table(<i>&lt;MSLibrary&gt;</i>)</a></code> <code><a href="MSLibrary-class.html">delete(<i>&lt;MSLibrary&gt;</i>)</a></code> <code><a href="MSLibrary-class.html">filter(<i>&lt;MSLibrary&gt;</i>)</a></code> <code><a href="MSLibrary-class.html">convertToSuspects(<i>&lt;MSLibrary&gt;</i>)</a></code> <code><a href="MSLibrary-class.html">export(<i>&lt;MSLibrary&gt;</i>)</a></code> <code><a href="MSLibrary-class.html">merge(<i>&lt;MSLibrary&gt;</i>,<i>&lt;MSLibrary&gt;</i>)</a></code> </p>
         </td>
         <td><p>Class to store data from a loaded MS library</p></td>
       </tr><tr><td>
-          <p><code><a href="MSPeakLists-class.html">peakLists()</a></code> <code><a href="MSPeakLists-class.html">averagedPeakLists()</a></code> <code><a href="MSPeakLists-class.html">spectrumSimilarity()</a></code> <code><a href="MSPeakLists-class.html">analyses(<i>&lt;MSPeakLists&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">groupNames(<i>&lt;MSPeakLists&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">length(<i>&lt;MSPeakLists&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">show(<i>&lt;MSPeakLists&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">`[`(<i>&lt;MSPeakLists&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;missing&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">`[[`(<i>&lt;MSPeakLists&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;ANY&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">`$`(<i>&lt;MSPeakLists&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">as.data.table(<i>&lt;MSPeakLists&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">delete(<i>&lt;MSPeakLists&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">filter(<i>&lt;MSPeakLists&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">plotSpectrum(<i>&lt;MSPeakLists&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">analysisInfo(<i>&lt;MSPeakListsSet&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">show(<i>&lt;MSPeakListsSet&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">`[`(<i>&lt;MSPeakListsSet&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;missing&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">as.data.table(<i>&lt;MSPeakListsSet&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">delete(<i>&lt;MSPeakListsSet&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">filter(<i>&lt;MSPeakListsSet&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">plotSpectrum(<i>&lt;MSPeakListsSet&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">unset(<i>&lt;MSPeakListsSet&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">getDefIsolatePrecParams()</a></code> </p>
+          <p><code><a href="MSPeakLists-class.html">peakLists()</a></code> <code><a href="MSPeakLists-class.html">averagedPeakLists()</a></code> <code><a href="MSPeakLists-class.html">spectrumSimilarity()</a></code> <code><a href="MSPeakLists-class.html">spectrumSimilarityMobility()</a></code> <code><a href="MSPeakLists-class.html">analyses(<i>&lt;MSPeakLists&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">groupNames(<i>&lt;MSPeakLists&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">length(<i>&lt;MSPeakLists&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">show(<i>&lt;MSPeakLists&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">`[`(<i>&lt;MSPeakLists&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;missing&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">`[[`(<i>&lt;MSPeakLists&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;ANY&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">`$`(<i>&lt;MSPeakLists&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">as.data.table(<i>&lt;MSPeakLists&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">delete(<i>&lt;MSPeakLists&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">filter(<i>&lt;MSPeakLists&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">plotSpectrum(<i>&lt;MSPeakLists&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">analysisInfo(<i>&lt;MSPeakListsSet&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">show(<i>&lt;MSPeakListsSet&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">`[`(<i>&lt;MSPeakListsSet&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;missing&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">as.data.table(<i>&lt;MSPeakListsSet&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">delete(<i>&lt;MSPeakListsSet&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">filter(<i>&lt;MSPeakListsSet&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">plotSpectrum(<i>&lt;MSPeakListsSet&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">unset(<i>&lt;MSPeakListsSet&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">getDefIsolatePrecParams()</a></code> </p>
         </td>
         <td><p>Class containing MS Peak Lists</p></td>
+      </tr><tr><td>
+          <p><code><a href="TPLogicTransformations.html">TPLogicTransformations()</a></code> </p>
+        </td>
+        <td><p>Obtain default rules for metabolic logic</p></td>
       </tr><tr><td>
           <p><code><a href="adduct-class.html">adduct()</a></code> <code><a href="adduct-class.html">show(<i>&lt;adduct&gt;</i>)</a></code> <code><a href="adduct-class.html">as.character(<i>&lt;adduct&gt;</i>)</a></code> </p>
         </td>
@@ -117,9 +133,21 @@
         </td>
         <td><p>Properties of sample analyses</p></td>
       </tr><tr><td>
-          <p><code><a href="analysisinfo-dataframe.html">getTICs(<i>&lt;data.frame&gt;</i>)</a></code> <code><a href="analysisinfo-dataframe.html">getBPCs(<i>&lt;data.frame&gt;</i>)</a></code> <code><a href="analysisinfo-dataframe.html">plotTICs(<i>&lt;data.frame&gt;</i>)</a></code> <code><a href="analysisinfo-dataframe.html">plotBPCs(<i>&lt;data.frame&gt;</i>)</a></code> </p>
+          <p><code><a href="analysisinfo-dataframe.html">getTICs(<i>&lt;data.frame&gt;</i>)</a></code> <code><a href="analysisinfo-dataframe.html">getBPCs(<i>&lt;data.frame&gt;</i>)</a></code> <code><a href="analysisinfo-dataframe.html">plotTICs(<i>&lt;data.frame&gt;</i>)</a></code> <code><a href="analysisinfo-dataframe.html">plotBPCs(<i>&lt;data.frame&gt;</i>)</a></code> <code><a href="analysisinfo-dataframe.html">plotTICs(<i>&lt;data.table&gt;</i>)</a></code> <code><a href="analysisinfo-dataframe.html">plotBPCs(<i>&lt;data.table&gt;</i>)</a></code> </p>
         </td>
         <td><p>AnalysisInfo data.frame methods</p></td>
+      </tr><tr><td>
+          <p><code><a href="assignMobilities_comp.html">assignMobilities(<i>&lt;compounds&gt;</i>)</a></code> <code><a href="assignMobilities_comp.html">assignMobilities(<i>&lt;compoundsSet&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Assign IMS data to a <code>compounds</code> object.</p></td>
+      </tr><tr><td>
+          <p><code><a href="assignMobilities_feat.html">assignMobilities(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="assignMobilities_feat.html">assignMobilities(<i>&lt;featureGroupsSet&gt;</i>)</a></code> <code><a href="assignMobilities_feat.html">assignMobilities(<i>&lt;featureGroupsScreening&gt;</i>)</a></code> <code><a href="assignMobilities_feat.html">assignMobilities(<i>&lt;featureGroupsScreeningSet&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Assign Ion Mobility and <acronym>CCS</acronym> values to features</p></td>
+      </tr><tr><td>
+          <p><code><a href="assignMobilities_susp.html">assignMobilities(<i>&lt;data.table&gt;</i>)</a></code> <code><a href="assignMobilities_susp.html">assignMobilities(<i>&lt;data.frame&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Assign IMS data to suspects</p></td>
       </tr><tr><td>
           <p><code><a href="bruker-utils.html">showDataAnalysis()</a></code> <code><a href="bruker-utils.html">setDAMethod()</a></code> <code><a href="bruker-utils.html">revertDAAnalyses()</a></code> <code><a href="bruker-utils.html">recalibrarateDAFiles()</a></code> <code><a href="bruker-utils.html">getDACalibrationError()</a></code> <code><a href="bruker-utils.html">addDAEIC()</a></code> <code><a href="bruker-utils.html">addAllDAEICs()</a></code> </p>
         </td>
@@ -133,7 +161,11 @@
         </td>
         <td><p>Interactive GUI utilities to check workflow data</p></td>
       </tr><tr><td>
-          <p><code><a href="components-class.html">componentTable()</a></code> <code><a href="components-class.html">componentInfo()</a></code> <code><a href="components-class.html">findFGroup()</a></code> <code><a href="components-class.html">groupNames(<i>&lt;components&gt;</i>)</a></code> <code><a href="components-class.html">length(<i>&lt;components&gt;</i>)</a></code> <code><a href="components-class.html">names(<i>&lt;components&gt;</i>)</a></code> <code><a href="components-class.html">show(<i>&lt;components&gt;</i>)</a></code> <code><a href="components-class.html">`[`(<i>&lt;components&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;missing&gt;</i>)</a></code> <code><a href="components-class.html">`[[`(<i>&lt;components&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;ANY&gt;</i>)</a></code> <code><a href="components-class.html">`$`(<i>&lt;components&gt;</i>)</a></code> <code><a href="components-class.html">delete(<i>&lt;components&gt;</i>)</a></code> <code><a href="components-class.html">as.data.table(<i>&lt;components&gt;</i>)</a></code> <code><a href="components-class.html">filter(<i>&lt;components&gt;</i>)</a></code> <code><a href="components-class.html">plotSpectrum(<i>&lt;components&gt;</i>)</a></code> <code><a href="components-class.html">plotChroms(<i>&lt;components&gt;</i>)</a></code> <code><a href="components-class.html">consensus(<i>&lt;components&gt;</i>)</a></code> <code><a href="components-class.html">show(<i>&lt;componentsFeatures&gt;</i>)</a></code> <code><a href="components-class.html">show(<i>&lt;componentsSet&gt;</i>)</a></code> <code><a href="components-class.html">`[`(<i>&lt;componentsSet&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;missing&gt;</i>)</a></code> <code><a href="components-class.html">filter(<i>&lt;componentsSet&gt;</i>)</a></code> <code><a href="components-class.html">delete(<i>&lt;componentsSet&gt;</i>)</a></code> <code><a href="components-class.html">consensus(<i>&lt;componentsSet&gt;</i>)</a></code> <code><a href="components-class.html">unset(<i>&lt;componentsSet&gt;</i>)</a></code> </p>
+          <p><code><a href="cluster-params.html">cluster-params</a></code> </p>
+        </td>
+        <td><p>Clustering parameters</p></td>
+      </tr><tr><td>
+          <p><code><a href="components-class.html">componentTable()</a></code> <code><a href="components-class.html">componentInfo()</a></code> <code><a href="components-class.html">findFGroup()</a></code> <code><a href="components-class.html">expandForIMS()</a></code> <code><a href="components-class.html">groupNames(<i>&lt;components&gt;</i>)</a></code> <code><a href="components-class.html">length(<i>&lt;components&gt;</i>)</a></code> <code><a href="components-class.html">names(<i>&lt;components&gt;</i>)</a></code> <code><a href="components-class.html">show(<i>&lt;components&gt;</i>)</a></code> <code><a href="components-class.html">`[`(<i>&lt;components&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;missing&gt;</i>)</a></code> <code><a href="components-class.html">`[[`(<i>&lt;components&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;ANY&gt;</i>)</a></code> <code><a href="components-class.html">`$`(<i>&lt;components&gt;</i>)</a></code> <code><a href="components-class.html">delete(<i>&lt;components&gt;</i>)</a></code> <code><a href="components-class.html">as.data.table(<i>&lt;components&gt;</i>)</a></code> <code><a href="components-class.html">filter(<i>&lt;components&gt;</i>)</a></code> <code><a href="components-class.html">plotSpectrum(<i>&lt;components&gt;</i>)</a></code> <code><a href="components-class.html">plotChroms(<i>&lt;components&gt;</i>)</a></code> <code><a href="components-class.html">consensus(<i>&lt;components&gt;</i>)</a></code> <code><a href="components-class.html">show(<i>&lt;componentsFeatures&gt;</i>)</a></code> <code><a href="components-class.html">show(<i>&lt;componentsSet&gt;</i>)</a></code> <code><a href="components-class.html">`[`(<i>&lt;componentsSet&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;missing&gt;</i>)</a></code> <code><a href="components-class.html">filter(<i>&lt;componentsSet&gt;</i>)</a></code> <code><a href="components-class.html">delete(<i>&lt;componentsSet&gt;</i>)</a></code> <code><a href="components-class.html">consensus(<i>&lt;componentsSet&gt;</i>)</a></code> <code><a href="components-class.html">unset(<i>&lt;componentsSet&gt;</i>)</a></code> </p>
         </td>
         <td><p>Component class</p></td>
       </tr><tr><td>
@@ -181,15 +213,11 @@
         </td>
         <td><p>Compounds class for SIRIUS results.</p></td>
       </tr><tr><td>
-          <p><code><a href="convertMSFiles.html">MSFileFormats()</a></code> <code><a href="convertMSFiles.html">convertMSFiles()</a></code> </p>
-        </td>
-        <td><p>MS data conversion</p></td>
-      </tr><tr><td>
           <p><code><a href="defaultOpenMSAdducts.html">defaultOpenMSAdducts()</a></code> </p>
         </td>
         <td><p>Default adducts for OpenMS componentization</p></td>
       </tr><tr><td>
-          <p><code><a href="feature-filtering.html">replicateGroupSubtract()</a></code> <code><a href="feature-filtering.html">filter(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="feature-filtering.html">filter(<i>&lt;featureGroupsSet&gt;</i>)</a></code> </p>
+          <p><code><a href="feature-filtering.html">replicateSubtract()</a></code> <code><a href="feature-filtering.html">filter(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="feature-filtering.html">filter(<i>&lt;featureGroupsSet&gt;</i>)</a></code> </p>
         </td>
         <td><p>Filtering of grouped features</p></td>
       </tr><tr><td>
@@ -197,19 +225,27 @@
         </td>
         <td><p>Optimization of feature finding and grouping parameters</p></td>
       </tr><tr><td>
-          <p><code><a href="feature-plotting.html">plot(<i>&lt;featureGroups&gt;</i>,<i>&lt;missing&gt;</i>)</a></code> <code><a href="feature-plotting.html">plotInt(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="feature-plotting.html">plotInt(<i>&lt;featureGroupsSet&gt;</i>)</a></code> <code><a href="feature-plotting.html">plotChord(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="feature-plotting.html">plotChroms(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="feature-plotting.html">plotVenn(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="feature-plotting.html">plotVenn(<i>&lt;featureGroupsSet&gt;</i>)</a></code> <code><a href="feature-plotting.html">plotUpSet(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="feature-plotting.html">plotVolcano(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="feature-plotting.html">plotGraph(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="feature-plotting.html">plotGraph(<i>&lt;featureGroupsSet&gt;</i>)</a></code> </p>
+          <p><code><a href="feature-plotting.html">plotMobilograms()</a></code> <code><a href="feature-plotting.html">plot(<i>&lt;featureGroups&gt;</i>,<i>&lt;missing&gt;</i>)</a></code> <code><a href="feature-plotting.html">plotInt(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="feature-plotting.html">plotChord(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="feature-plotting.html">plotChroms(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="feature-plotting.html">plotChroms3D(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="feature-plotting.html">plotChroms3D(<i>&lt;featureGroupsSet&gt;</i>)</a></code> <code><a href="feature-plotting.html">plotVenn(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="feature-plotting.html">plotUpSet(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="feature-plotting.html">plotVolcano(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="feature-plotting.html">plotGraph(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="feature-plotting.html">plotGraph(<i>&lt;featureGroupsSet&gt;</i>)</a></code> <code><a href="feature-plotting.html">plotTICs(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="feature-plotting.html">plotBPCs(<i>&lt;featureGroups&gt;</i>)</a></code> </p>
         </td>
         <td><p>Plotting of grouped features</p></td>
+      </tr><tr><td>
+          <p><code><a href="feature-quality.html">featureQualities()</a></code> <code><a href="feature-quality.html">featureGroupQualities()</a></code> <code><a href="feature-quality.html">featureQualityNames()</a></code> </p>
+        </td>
+        <td><p>Feature quality definitions and utilities</p></td>
+      </tr><tr><td>
+          <p><code><a href="feature-table.html">as.data.table(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="feature-table.html">as.data.table(<i>&lt;featureGroupsScreening&gt;</i>)</a></code> <code><a href="feature-table.html">as.data.table(<i>&lt;featureGroupsScreeningSet&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Feature group to table conversion</p></td>
       </tr><tr><td>
           <p><code><a href="featureAnnotations-class.html">annotations(<i>&lt;featureAnnotations&gt;</i>)</a></code> <code><a href="featureAnnotations-class.html">groupNames(<i>&lt;featureAnnotations&gt;</i>)</a></code> <code><a href="featureAnnotations-class.html">length(<i>&lt;featureAnnotations&gt;</i>)</a></code> <code><a href="featureAnnotations-class.html">`[`(<i>&lt;featureAnnotations&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;missing&gt;</i>,<i>&lt;missing&gt;</i>)</a></code> <code><a href="featureAnnotations-class.html">`[[`(<i>&lt;featureAnnotations&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;missing&gt;</i>)</a></code> <code><a href="featureAnnotations-class.html">`$`(<i>&lt;featureAnnotations&gt;</i>)</a></code> <code><a href="featureAnnotations-class.html">as.data.table(<i>&lt;featureAnnotations&gt;</i>)</a></code> <code><a href="featureAnnotations-class.html">delete(<i>&lt;featureAnnotations&gt;</i>)</a></code> <code><a href="featureAnnotations-class.html">filter(<i>&lt;featureAnnotations&gt;</i>)</a></code> <code><a href="featureAnnotations-class.html">plotVenn(<i>&lt;featureAnnotations&gt;</i>)</a></code> <code><a href="featureAnnotations-class.html">plotUpSet(<i>&lt;featureAnnotations&gt;</i>)</a></code> </p>
         </td>
         <td><p>Base feature annotations class</p></td>
       </tr><tr><td>
-          <p><code><a href="featureGroups-class.html">groupTable()</a></code> <code><a href="featureGroups-class.html">groupFeatIndex()</a></code> <code><a href="featureGroups-class.html">groupInfo()</a></code> <code><a href="featureGroups-class.html">unique()</a></code> <code><a href="featureGroups-class.html">overlap()</a></code> <code><a href="featureGroups-class.html">selectIons()</a></code> <code><a href="featureGroups-class.html">groupQualities()</a></code> <code><a href="featureGroups-class.html">groupScores()</a></code> <code><a href="featureGroups-class.html">internalStandards()</a></code> <code><a href="featureGroups-class.html">internalStandardAssignments()</a></code> <code><a href="featureGroups-class.html">normInts()</a></code> <code><a href="featureGroups-class.html">names(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">analyses(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">replicateGroups(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">groupNames(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">length(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">show(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">analysisInfo(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">featureTable(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">getFeatures(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">annotations(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">adducts(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">`adducts&lt;-`(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">concentrations(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">toxicities(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">`[`(<i>&lt;featureGroups&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;missing&gt;</i>)</a></code> <code><a href="featureGroups-class.html">`[[`(<i>&lt;featureGroups&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;ANY&gt;</i>)</a></code> <code><a href="featureGroups-class.html">`$`(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">delete(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">export(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">as.data.table(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">calculatePeakQualities(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">getTICs(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">getBPCs(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">sets(<i>&lt;featureGroupsSet&gt;</i>)</a></code> <code><a href="featureGroups-class.html">adducts(<i>&lt;featureGroupsSet&gt;</i>)</a></code> <code><a href="featureGroups-class.html">`adducts&lt;-`(<i>&lt;featureGroupsSet&gt;</i>)</a></code> <code><a href="featureGroups-class.html">delete(<i>&lt;featureGroupsSet&gt;</i>)</a></code> <code><a href="featureGroups-class.html">show(<i>&lt;featureGroupsSet&gt;</i>)</a></code> <code><a href="featureGroups-class.html">featureTable(<i>&lt;featureGroupsSet&gt;</i>)</a></code> <code><a href="featureGroups-class.html">`[`(<i>&lt;featureGroupsSet&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;missing&gt;</i>)</a></code> <code><a href="featureGroups-class.html">export(<i>&lt;featureGroupsSet&gt;</i>)</a></code> <code><a href="featureGroups-class.html">unset(<i>&lt;featureGroupsSet&gt;</i>)</a></code> <code><a href="featureGroups-class.html">delete(<i>&lt;featureGroupsKPIC2&gt;</i>)</a></code> <code><a href="featureGroups-class.html">plotTICs(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">plotBPCs(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">delete(<i>&lt;featureGroupsXCMS&gt;</i>)</a></code> <code><a href="featureGroups-class.html">delete(<i>&lt;featureGroupsXCMS3&gt;</i>)</a></code> </p>
+          <p><code><a href="featureGroups-class.html">groupTable()</a></code> <code><a href="featureGroups-class.html">groupFeatIndex()</a></code> <code><a href="featureGroups-class.html">groupInfo()</a></code> <code><a href="featureGroups-class.html">unique()</a></code> <code><a href="featureGroups-class.html">overlap()</a></code> <code><a href="featureGroups-class.html">selectIons()</a></code> <code><a href="featureGroups-class.html">groupQualities()</a></code> <code><a href="featureGroups-class.html">groupScores()</a></code> <code><a href="featureGroups-class.html">internalStandards()</a></code> <code><a href="featureGroups-class.html">internalStandardAssignments()</a></code> <code><a href="featureGroups-class.html">normInts()</a></code> <code><a href="featureGroups-class.html">concentrations()</a></code> <code><a href="featureGroups-class.html">toxicities()</a></code> <code><a href="featureGroups-class.html">updateGroups()</a></code> <code><a href="featureGroups-class.html">names(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">analyses(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">replicates(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">groupNames(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">length(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">hasIMS(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">fromIMS(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">show(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">analysisInfo(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">`analysisInfo&lt;-`(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">featureTable(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">getFeatures(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">getFeatureQualityNames(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">annotations(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">adducts(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">`adducts&lt;-`(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">`[`(<i>&lt;featureGroups&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;missing&gt;</i>)</a></code> <code><a href="featureGroups-class.html">`[[`(<i>&lt;featureGroups&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;ANY&gt;</i>)</a></code> <code><a href="featureGroups-class.html">`$`(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">delete(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">export(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">calculatePeakQualities(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">getTICs(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">getBPCs(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">sets(<i>&lt;featureGroupsSet&gt;</i>)</a></code> <code><a href="featureGroups-class.html">adducts(<i>&lt;featureGroupsSet&gt;</i>)</a></code> <code><a href="featureGroups-class.html">`adducts&lt;-`(<i>&lt;featureGroupsSet&gt;</i>)</a></code> <code><a href="featureGroups-class.html">delete(<i>&lt;featureGroupsSet&gt;</i>)</a></code> <code><a href="featureGroups-class.html">show(<i>&lt;featureGroupsSet&gt;</i>)</a></code> <code><a href="featureGroups-class.html">featureTable(<i>&lt;featureGroupsSet&gt;</i>)</a></code> <code><a href="featureGroups-class.html">`[`(<i>&lt;featureGroupsSet&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;missing&gt;</i>)</a></code> <code><a href="featureGroups-class.html">export(<i>&lt;featureGroupsSet&gt;</i>)</a></code> <code><a href="featureGroups-class.html">unset(<i>&lt;featureGroupsSet&gt;</i>)</a></code> <code><a href="featureGroups-class.html">delete(<i>&lt;featureGroupsKPIC2&gt;</i>)</a></code> <code><a href="featureGroups-class.html">`analysisInfo&lt;-`(<i>&lt;featureGroupsXCMS&gt;</i>)</a></code> <code><a href="featureGroups-class.html">delete(<i>&lt;featureGroupsXCMS&gt;</i>)</a></code> <code><a href="featureGroups-class.html">delete(<i>&lt;featureGroupsXCMS3&gt;</i>)</a></code> </p>
         </td>
         <td><p>Base class for grouped features.</p></td>
       </tr><tr><td>
-          <p><code><a href="featureGroups-compare.html">comparison()</a></code> <code><a href="featureGroups-compare.html">plot(<i>&lt;featureGroupsComparison&gt;</i>,<i>&lt;missing&gt;</i>)</a></code> <code><a href="featureGroups-compare.html">plotVenn(<i>&lt;featureGroupsComparison&gt;</i>)</a></code> <code><a href="featureGroups-compare.html">plotUpSet(<i>&lt;featureGroupsComparison&gt;</i>)</a></code> <code><a href="featureGroups-compare.html">plotChord(<i>&lt;featureGroupsComparison&gt;</i>)</a></code> <code><a href="featureGroups-compare.html">consensus(<i>&lt;featureGroupsComparison&gt;</i>)</a></code> <code><a href="featureGroups-compare.html">consensus(<i>&lt;featureGroupsComparisonSet&gt;</i>)</a></code> </p>
+          <p><code><a href="featureGroups-compare.html">comparison()</a></code> <code><a href="featureGroups-compare.html">hasIMS(<i>&lt;featureGroupsComparison&gt;</i>)</a></code> <code><a href="featureGroups-compare.html">plot(<i>&lt;featureGroupsComparison&gt;</i>,<i>&lt;missing&gt;</i>)</a></code> <code><a href="featureGroups-compare.html">plotVenn(<i>&lt;featureGroupsComparison&gt;</i>)</a></code> <code><a href="featureGroups-compare.html">plotUpSet(<i>&lt;featureGroupsComparison&gt;</i>)</a></code> <code><a href="featureGroups-compare.html">plotChord(<i>&lt;featureGroupsComparison&gt;</i>)</a></code> <code><a href="featureGroups-compare.html">consensus(<i>&lt;featureGroupsComparison&gt;</i>)</a></code> <code><a href="featureGroups-compare.html">consensus(<i>&lt;featureGroupsComparisonSet&gt;</i>)</a></code> </p>
         </td>
         <td><p>Comparing feature groups</p></td>
       </tr><tr><td>
@@ -217,15 +253,11 @@
         </td>
         <td><p>Feature groups comparison class</p></td>
       </tr><tr><td>
-          <p><code><a href="featureGroupsScreening-class.html">screenInfo()</a></code> <code><a href="featureGroupsScreening-class.html">annotateSuspects()</a></code> <code><a href="featureGroupsScreening-class.html">show(<i>&lt;featureGroupsScreening&gt;</i>)</a></code> <code><a href="featureGroupsScreening-class.html">`[`(<i>&lt;featureGroupsScreening&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;missing&gt;</i>)</a></code> <code><a href="featureGroupsScreening-class.html">delete(<i>&lt;featureGroupsScreening&gt;</i>)</a></code> <code><a href="featureGroupsScreening-class.html">as.data.table(<i>&lt;featureGroupsScreening&gt;</i>)</a></code> <code><a href="featureGroupsScreening-class.html">filter(<i>&lt;featureGroupsScreening&gt;</i>)</a></code> <code><a href="featureGroupsScreening-class.html">show(<i>&lt;featureGroupsScreeningSet&gt;</i>)</a></code> <code><a href="featureGroupsScreening-class.html">`[`(<i>&lt;featureGroupsScreeningSet&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;missing&gt;</i>)</a></code> <code><a href="featureGroupsScreening-class.html">delete(<i>&lt;featureGroupsScreeningSet&gt;</i>)</a></code> <code><a href="featureGroupsScreening-class.html">as.data.table(<i>&lt;featureGroupsScreeningSet&gt;</i>)</a></code> <code><a href="featureGroupsScreening-class.html">filter(<i>&lt;featureGroupsScreeningSet&gt;</i>)</a></code> <code><a href="featureGroupsScreening-class.html">unset(<i>&lt;featureGroupsScreeningSet&gt;</i>)</a></code> </p>
+          <p><code><a href="featureGroupsScreening-class.html">screenInfo()</a></code> <code><a href="featureGroupsScreening-class.html">show(<i>&lt;featureGroupsScreening&gt;</i>)</a></code> <code><a href="featureGroupsScreening-class.html">`[`(<i>&lt;featureGroupsScreening&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;missing&gt;</i>)</a></code> <code><a href="featureGroupsScreening-class.html">delete(<i>&lt;featureGroupsScreening&gt;</i>)</a></code> <code><a href="featureGroupsScreening-class.html">filter(<i>&lt;featureGroupsScreening&gt;</i>)</a></code> <code><a href="featureGroupsScreening-class.html">show(<i>&lt;featureGroupsScreeningSet&gt;</i>)</a></code> <code><a href="featureGroupsScreening-class.html">`[`(<i>&lt;featureGroupsScreeningSet&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;missing&gt;</i>)</a></code> <code><a href="featureGroupsScreening-class.html">delete(<i>&lt;featureGroupsScreeningSet&gt;</i>)</a></code> <code><a href="featureGroupsScreening-class.html">filter(<i>&lt;featureGroupsScreeningSet&gt;</i>)</a></code> <code><a href="featureGroupsScreening-class.html">unset(<i>&lt;featureGroupsScreeningSet&gt;</i>)</a></code> </p>
         </td>
         <td><p>Class for suspect screened feature groups.</p></td>
       </tr><tr><td>
-          <p><code><a href="featureQualityNames.html">featureQualityNames()</a></code> </p>
-        </td>
-        <td><p>Returns chromatographic peak quality and score names for features and/or feature groups.</p></td>
-      </tr><tr><td>
-          <p><code><a href="features-class.html">length(<i>&lt;features&gt;</i>)</a></code> <code><a href="features-class.html">show(<i>&lt;features&gt;</i>)</a></code> <code><a href="features-class.html">featureTable(<i>&lt;features&gt;</i>)</a></code> <code><a href="features-class.html">analysisInfo(<i>&lt;features&gt;</i>)</a></code> <code><a href="features-class.html">analyses(<i>&lt;features&gt;</i>)</a></code> <code><a href="features-class.html">replicateGroups(<i>&lt;features&gt;</i>)</a></code> <code><a href="features-class.html">as.data.table(<i>&lt;features&gt;</i>)</a></code> <code><a href="features-class.html">filter(<i>&lt;features&gt;</i>)</a></code> <code><a href="features-class.html">`[`(<i>&lt;features&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;missing&gt;</i>,<i>&lt;missing&gt;</i>)</a></code> <code><a href="features-class.html">`[[`(<i>&lt;features&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;missing&gt;</i>)</a></code> <code><a href="features-class.html">`$`(<i>&lt;features&gt;</i>)</a></code> <code><a href="features-class.html">delete(<i>&lt;features&gt;</i>)</a></code> <code><a href="features-class.html">calculatePeakQualities(<i>&lt;features&gt;</i>)</a></code> <code><a href="features-class.html">getTICs(<i>&lt;features&gt;</i>)</a></code> <code><a href="features-class.html">getBPCs(<i>&lt;features&gt;</i>)</a></code> <code><a href="features-class.html">plotTICs(<i>&lt;features&gt;</i>)</a></code> <code><a href="features-class.html">plotBPCs(<i>&lt;features&gt;</i>)</a></code> <code><a href="features-class.html">sets(<i>&lt;featuresSet&gt;</i>)</a></code> <code><a href="features-class.html">show(<i>&lt;featuresSet&gt;</i>)</a></code> <code><a href="features-class.html">as.data.table(<i>&lt;featuresSet&gt;</i>)</a></code> <code><a href="features-class.html">`[`(<i>&lt;featuresSet&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;missing&gt;</i>,<i>&lt;missing&gt;</i>)</a></code> <code><a href="features-class.html">filter(<i>&lt;featuresSet&gt;</i>)</a></code> <code><a href="features-class.html">unset(<i>&lt;featuresSet&gt;</i>)</a></code> <code><a href="features-class.html">delete(<i>&lt;featuresKPIC2&gt;</i>)</a></code> <code><a href="features-class.html">delete(<i>&lt;featuresXCMS&gt;</i>)</a></code> <code><a href="features-class.html">delete(<i>&lt;featuresXCMS3&gt;</i>)</a></code> </p>
+          <p><code><a href="features-class.html">length(<i>&lt;features&gt;</i>)</a></code> <code><a href="features-class.html">show(<i>&lt;features&gt;</i>)</a></code> <code><a href="features-class.html">featureTable(<i>&lt;features&gt;</i>)</a></code> <code><a href="features-class.html">analysisInfo(<i>&lt;features&gt;</i>)</a></code> <code><a href="features-class.html">getFeatureQualityNames(<i>&lt;features&gt;</i>)</a></code> <code><a href="features-class.html">`analysisInfo&lt;-`(<i>&lt;features&gt;</i>)</a></code> <code><a href="features-class.html">analyses(<i>&lt;features&gt;</i>)</a></code> <code><a href="features-class.html">replicates(<i>&lt;features&gt;</i>)</a></code> <code><a href="features-class.html">hasIMS(<i>&lt;features&gt;</i>)</a></code> <code><a href="features-class.html">fromIMS(<i>&lt;features&gt;</i>)</a></code> <code><a href="features-class.html">as.data.table(<i>&lt;features&gt;</i>)</a></code> <code><a href="features-class.html">filter(<i>&lt;features&gt;</i>)</a></code> <code><a href="features-class.html">`[`(<i>&lt;features&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;missing&gt;</i>,<i>&lt;missing&gt;</i>)</a></code> <code><a href="features-class.html">`[[`(<i>&lt;features&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;missing&gt;</i>)</a></code> <code><a href="features-class.html">`$`(<i>&lt;features&gt;</i>)</a></code> <code><a href="features-class.html">delete(<i>&lt;features&gt;</i>)</a></code> <code><a href="features-class.html">calculatePeakQualities(<i>&lt;features&gt;</i>)</a></code> <code><a href="features-class.html">getTICs(<i>&lt;features&gt;</i>)</a></code> <code><a href="features-class.html">getBPCs(<i>&lt;features&gt;</i>)</a></code> <code><a href="features-class.html">plotTICs(<i>&lt;features&gt;</i>)</a></code> <code><a href="features-class.html">plotBPCs(<i>&lt;features&gt;</i>)</a></code> <code><a href="features-class.html">sets(<i>&lt;featuresSet&gt;</i>)</a></code> <code><a href="features-class.html">show(<i>&lt;featuresSet&gt;</i>)</a></code> <code><a href="features-class.html">as.data.table(<i>&lt;featuresSet&gt;</i>)</a></code> <code><a href="features-class.html">`[`(<i>&lt;featuresSet&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;missing&gt;</i>,<i>&lt;missing&gt;</i>)</a></code> <code><a href="features-class.html">filter(<i>&lt;featuresSet&gt;</i>)</a></code> <code><a href="features-class.html">unset(<i>&lt;featuresSet&gt;</i>)</a></code> <code><a href="features-class.html">delete(<i>&lt;featuresKPIC2&gt;</i>)</a></code> <code><a href="features-class.html">delete(<i>&lt;featuresPiek&gt;</i>)</a></code> <code><a href="features-class.html">`analysisInfo&lt;-`(<i>&lt;featuresXCMS&gt;</i>)</a></code> <code><a href="features-class.html">delete(<i>&lt;featuresXCMS&gt;</i>)</a></code> <code><a href="features-class.html">delete(<i>&lt;featuresXCMS3&gt;</i>)</a></code> </p>
         </td>
         <td><p>Base features class</p></td>
       </tr><tr><td>
@@ -248,6 +280,10 @@
           <p><code><a href="findFeaturesOpenMS.html">findFeaturesOpenMS()</a></code> </p>
         </td>
         <td><p>Find features using OpenMS</p></td>
+      </tr><tr><td>
+          <p><code><a href="findFeaturesPiek.html">findFeaturesPiek()</a></code> <code><a href="findFeaturesPiek.html">getPiekEICParams()</a></code> </p>
+        </td>
+        <td><p>Find features using piek</p></td>
       </tr><tr><td>
           <p><code><a href="findFeaturesSAFD.html">findFeaturesSAFD()</a></code> </p>
         </td>
@@ -337,10 +373,6 @@
         </td>
         <td><p>Automatic chemical formula generation</p></td>
       </tr><tr><td>
-          <p><code><a href="generateFormulasDA.html">generateFormulasDA()</a></code> </p>
-        </td>
-        <td><p>Generate formula with Bruker DataAnalysis</p></td>
-      </tr><tr><td>
           <p><code><a href="generateFormulasGenForm.html">generateFormulasGenForm()</a></code> </p>
         </td>
         <td><p>Generate formula with GenForm</p></td>
@@ -353,21 +385,17 @@
         </td>
         <td><p>Generation of MS Peak Lists</p></td>
       </tr><tr><td>
-          <p><code><a href="generateMSPeakListsDA.html">generateMSPeakListsDA()</a></code> </p>
-        </td>
-        <td><p>Generate peak lists with Bruker DataAnalysis</p></td>
-      </tr><tr><td>
-          <p><code><a href="generateMSPeakListsDAFMF.html">generateMSPeakListsDAFMF()</a></code> </p>
-        </td>
-        <td><p>Generate peak lists with Bruker DataAnalysis from bruker features</p></td>
-      </tr><tr><td>
-          <p><code><a href="generateMSPeakListsMzR.html">generateMSPeakListsMzR()</a></code> </p>
-        </td>
-        <td><p>Generate peak lists with mzR</p></td>
-      </tr><tr><td>
           <p><code><a href="generateTPs.html">generateTPs()</a></code> </p>
         </td>
         <td><p>Generation of transformation products (TPs)</p></td>
+      </tr><tr><td>
+          <p><code><a href="generateTPsAnnComp.html">generateTPsAnnComp()</a></code> </p>
+        </td>
+        <td><p>Obtain transformation products (TPs) from compound annotation candidates</p></td>
+      </tr><tr><td>
+          <p><code><a href="generateTPsAnnForm.html">generateTPsAnnForm()</a></code> </p>
+        </td>
+        <td><p>Obtain transformation products (TPs) from formula annotation candidates</p></td>
       </tr><tr><td>
           <p><code><a href="generateTPsBioTransformer.html">generateTPsBioTransformer()</a></code> </p>
         </td>
@@ -389,13 +417,29 @@
         </td>
         <td><p>Obtain transformation products (TPs) with metabolic logic</p></td>
       </tr><tr><td>
-          <p><code><a href="generics.html">adducts()</a></code> <code><a href="generics.html">`adducts&lt;-`()</a></code> <code><a href="generics.html">algorithm()</a></code> <code><a href="generics.html">analysisInfo()</a></code> <code><a href="generics.html">analyses()</a></code> <code><a href="generics.html">annotatedPeakList()</a></code> <code><a href="generics.html">annotations()</a></code> <code><a href="generics.html">calculatePeakQualities()</a></code> <code><a href="generics.html">clusterProperties()</a></code> <code><a href="generics.html">clusters()</a></code> <code><a href="generics.html">consensus()</a></code> <code><a href="generics.html">convertToMFDB()</a></code> <code><a href="generics.html">convertToSuspects()</a></code> <code><a href="generics.html">cutClusters()</a></code> <code><a href="generics.html">defaultExclNormScores()</a></code> <code><a href="generics.html">export()</a></code> <code><a href="generics.html">featureTable()</a></code> <code><a href="generics.html">filter()</a></code> <code><a href="generics.html">getBPCs()</a></code> <code><a href="generics.html">getFeatures()</a></code> <code><a href="generics.html">getMCS()</a></code> <code><a href="generics.html">getTICs()</a></code> <code><a href="generics.html">groupNames()</a></code> <code><a href="generics.html">plotBPCs()</a></code> <code><a href="generics.html">plotChord()</a></code> <code><a href="generics.html">plotChroms()</a></code> <code><a href="generics.html">plotGraph()</a></code> <code><a href="generics.html">plotInt()</a></code> <code><a href="generics.html">plotScores()</a></code> <code><a href="generics.html">plotSilhouettes()</a></code> <code><a href="generics.html">plotSpectrum()</a></code> <code><a href="generics.html">plotStructure()</a></code> <code><a href="generics.html">plotTICs()</a></code> <code><a href="generics.html">plotVenn()</a></code> <code><a href="generics.html">plotUpSet()</a></code> <code><a href="generics.html">predictRespFactors()</a></code> <code><a href="generics.html">predictTox()</a></code> <code><a href="generics.html">delete()</a></code> <code><a href="generics.html">plotVolcano()</a></code> <code><a href="generics.html">replicateGroups()</a></code> <code><a href="generics.html">setObjects()</a></code> <code><a href="generics.html">sets()</a></code> <code><a href="generics.html">treeCut()</a></code> <code><a href="generics.html">treeCutDynamic()</a></code> <code><a href="generics.html">unset()</a></code> </p>
+          <p><code><a href="generics.html">adducts()</a></code> <code><a href="generics.html">`adducts&lt;-`()</a></code> <code><a href="generics.html">algorithm()</a></code> <code><a href="generics.html">analysisInfo()</a></code> <code><a href="generics.html">`analysisInfo&lt;-`()</a></code> <code><a href="generics.html">analyses()</a></code> <code><a href="generics.html">annotatedPeakList()</a></code> <code><a href="generics.html">annotations()</a></code> <code><a href="generics.html">assignMobilities()</a></code> <code><a href="generics.html">calculatePeakQualities()</a></code> <code><a href="generics.html">clusterProperties()</a></code> <code><a href="generics.html">clusters()</a></code> <code><a href="generics.html">consensus()</a></code> <code><a href="generics.html">convertToMFDB()</a></code> <code><a href="generics.html">convertToSuspects()</a></code> <code><a href="generics.html">cutClusters()</a></code> <code><a href="generics.html">defaultExclNormScores()</a></code> <code><a href="generics.html">export()</a></code> <code><a href="generics.html">featureTable()</a></code> <code><a href="generics.html">filter()</a></code> <code><a href="generics.html">fromIMS()</a></code> <code><a href="generics.html">getBPCs()</a></code> <code><a href="generics.html">getFeatures()</a></code> <code><a href="generics.html">getFeatureQualityNames()</a></code> <code><a href="generics.html">getMCS()</a></code> <code><a href="generics.html">getTICs()</a></code> <code><a href="generics.html">groupNames()</a></code> <code><a href="generics.html">hasIMS()</a></code> <code><a href="generics.html">plotBPCs()</a></code> <code><a href="generics.html">plotChord()</a></code> <code><a href="generics.html">plotChroms()</a></code> <code><a href="generics.html">plotChroms3D()</a></code> <code><a href="generics.html">plotGraph()</a></code> <code><a href="generics.html">plotInt()</a></code> <code><a href="generics.html">plotScores()</a></code> <code><a href="generics.html">plotSilhouettes()</a></code> <code><a href="generics.html">plotSpectrum()</a></code> <code><a href="generics.html">plotStructure()</a></code> <code><a href="generics.html">plotTICs()</a></code> <code><a href="generics.html">plotVenn()</a></code> <code><a href="generics.html">plotUpSet()</a></code> <code><a href="generics.html">predictRespFactors()</a></code> <code><a href="generics.html">predictTox()</a></code> <code><a href="generics.html">delete()</a></code> <code><a href="generics.html">plotVolcano()</a></code> <code><a href="generics.html">replicates()</a></code> <code><a href="generics.html">setObjects()</a></code> <code><a href="generics.html">sets()</a></code> <code><a href="generics.html">treeCut()</a></code> <code><a href="generics.html">treeCutDynamic()</a></code> <code><a href="generics.html">unset()</a></code> </p>
         </td>
         <td><p>Miscellaneous generics</p></td>
+      </tr><tr><td>
+          <p><code><a href="getBGMSMSPeaks.html">getBGMSMSPeaks()</a></code> </p>
+        </td>
+        <td><p>Background MS/MS peak detection</p></td>
+      </tr><tr><td>
+          <p><code><a href="getCCSParams.html">getCCSParams()</a></code> </p>
+        </td>
+        <td><p>Parameters for CCS calculation</p></td>
       </tr><tr><td>
           <p><code><a href="getDefAvgPListParams.html">getDefAvgPListParams()</a></code> </p>
         </td>
         <td><p>Parameters for averaging MS peak list data</p></td>
+      </tr><tr><td>
+          <p><code><a href="getDefPeakParams.html">getDefPeakParams()</a></code> </p>
+        </td>
+        <td><p>Peak detection parameters</p></td>
+      </tr><tr><td>
+          <p><code><a href="getDefTPStructParams.html">getDefTPStructParams()</a></code> </p>
+        </td>
+        <td><p>Parameters to handle TP data with structural information</p></td>
       </tr><tr><td>
           <p><code><a href="getEICs.html">getEICs()</a></code> </p>
         </td>
@@ -405,9 +449,29 @@
         </td>
         <td><p>Fold change calculation</p></td>
       </tr><tr><td>
+          <p><code><a href="getIMSMatchParams.html">getIMSMatchParams()</a></code> </p>
+        </td>
+        <td><p>Parameters for IMS matching</p></td>
+      </tr><tr><td>
+          <p><code><a href="getIMSRangeParams.html">getIMSRangeParams()</a></code> </p>
+        </td>
+        <td><p>Parameters to specify a IMS data range</p></td>
+      </tr><tr><td>
+          <p><code><a href="getMSFileFormats.html">getMSFileFormats()</a></code> </p>
+        </td>
+        <td><p>Get supported MS file formats</p></td>
+      </tr><tr><td>
+          <p><code><a href="getMSFileTypes.html">getMSFileTypes()</a></code> </p>
+        </td>
+        <td><p>Get supported MS file types</p></td>
+      </tr><tr><td>
           <p><code><a href="groupFeatures.html">groupFeatures()</a></code> </p>
         </td>
         <td><p>Grouping of features</p></td>
+      </tr><tr><td>
+          <p><code><a href="groupFeaturesGreedy.html">groupFeaturesGreedy()</a></code> </p>
+        </td>
+        <td><p>Group features using greedy algorithm</p></td>
       </tr><tr><td>
           <p><code><a href="groupFeaturesKPIC2.html">groupFeaturesKPIC2()</a></code> </p>
         </td>
@@ -429,6 +493,10 @@
         </td>
         <td><p>Group features using XCMS (new interface)</p></td>
       </tr><tr><td>
+          <p><code><a href="id-conf.html">estimateIDConfidence()</a></code> <code><a href="id-conf.html">numericIDLevel()</a></code> <code><a href="id-conf.html">genIDLevelRulesFile()</a></code> </p>
+        </td>
+        <td><p>Identification confidence estimation</p></td>
+      </tr><tr><td>
           <p><code><a href="importFeatureGroups.html">importFeatureGroups()</a></code> </p>
         </td>
         <td><p>Import feature groups from files</p></td>
@@ -448,6 +516,10 @@
           <p><code><a href="importFeatureGroupsKPIC2.html">importFeatureGroupsKPIC2()</a></code> </p>
         </td>
         <td><p>Imports feature groups from KPIC2</p></td>
+      </tr><tr><td>
+          <p><code><a href="importFeatureGroupsTable.html">importFeatureGroupsTable()</a></code> </p>
+        </td>
+        <td><p>Import feature groups from a table</p></td>
       </tr><tr><td>
           <p><code><a href="importFeatureGroupsXCMS.html">importFeatureGroupsXCMS()</a></code> </p>
         </td>
@@ -469,6 +541,10 @@
         </td>
         <td><p>Imports features from KPIC2</p></td>
       </tr><tr><td>
+          <p><code><a href="importFeaturesTable.html">importFeaturesTable()</a></code> </p>
+        </td>
+        <td><p>Import features from a table</p></td>
+      </tr><tr><td>
           <p><code><a href="importFeaturesXCMS.html">importFeaturesXCMS()</a></code> </p>
         </td>
         <td><p>Imports features from XCMS (old interface)</p></td>
@@ -477,9 +553,25 @@
         </td>
         <td><p>Imports features from XCMS (new interface)</p></td>
       </tr><tr><td>
+          <p><code><a href="installC3SDB.html">installC3SDB()</a></code> </p>
+        </td>
+        <td><p>Automatically installs C3SDB</p></td>
+      </tr><tr><td>
+          <p><code><a href="installTIMSCONVERT.html">installTIMSCONVERT()</a></code> </p>
+        </td>
+        <td><p>Automatically installs TIMSCONVERT</p></td>
+      </tr><tr><td>
           <p><code><a href="kpic2-conv.html">getPICSet()</a></code> </p>
         </td>
         <td><p>Conversion to KPIC2 objects</p></td>
+      </tr><tr><td>
+          <p><code><a href="launchEICGUI.html">launchEICGUI(<i>&lt;data.frame&gt;</i>)</a></code> <code><a href="launchEICGUI.html">launchEICGUI(<i>&lt;features&gt;</i>)</a></code> <code><a href="launchEICGUI.html">launchEICGUI(<i>&lt;featureGroups&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Launch EIC/EIM GUI</p></td>
+      </tr><tr><td>
+          <p><code><a href="limits.html">defaultLim()</a></code> <code><a href="limits.html">getLimIMS()</a></code> <code><a href="limits.html">genLimitsFile()</a></code> </p>
+        </td>
+        <td><p>Default limits and tolerances</p></td>
       </tr><tr><td>
           <p><code><a href="loadMSLibrary.html">loadMSLibrary()</a></code> </p>
         </td>
@@ -497,6 +589,10 @@
         </td>
         <td><p>Initiate sets workflows</p></td>
       </tr><tr><td>
+          <p><code><a href="msdata.html">availableBackends()</a></code> </p>
+        </td>
+        <td><p>Interface for HRMS and IMS-HRMS raw data</p></td>
+      </tr><tr><td>
           <p><code><a href="newProject.html">newProject()</a></code> </p>
         </td>
         <td><p>Easily create new <span class="pkg">patRoon</span> projects</p></td>
@@ -513,11 +609,11 @@
         </td>
         <td><p>Parameters to aggregate concentrations/toxicity values assigned to feature groups</p></td>
       </tr><tr><td>
-          <p><code><a href="pred-quant.html">calculateConcs(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="pred-quant.html">calculateConcs(<i>&lt;featureGroupsSet&gt;</i>)</a></code> <code><a href="pred-quant.html">predictRespFactors(<i>&lt;compounds&gt;</i>)</a></code> <code><a href="pred-quant.html">predictRespFactors(<i>&lt;featureGroupsScreening&gt;</i>)</a></code> <code><a href="pred-quant.html">calculateConcs(<i>&lt;featureGroupsScreening&gt;</i>)</a></code> <code><a href="pred-quant.html">predictRespFactors(<i>&lt;featureGroupsScreeningSet&gt;</i>)</a></code> <code><a href="pred-quant.html">calculateConcs(<i>&lt;featureGroupsScreeningSet&gt;</i>)</a></code> <code><a href="pred-quant.html">predictRespFactors(<i>&lt;compoundsSet&gt;</i>)</a></code> <code><a href="pred-quant.html">predictRespFactors(<i>&lt;compoundsSIRIUS&gt;</i>)</a></code> <code><a href="pred-quant.html">predictRespFactors(<i>&lt;formulasSet&gt;</i>)</a></code> <code><a href="pred-quant.html">predictRespFactors(<i>&lt;formulasSIRIUS&gt;</i>)</a></code> <code><a href="pred-quant.html">getQuantCalibFromScreening()</a></code> </p>
+          <p><code><a href="pred-quant.html">calculateConcs()</a></code> <code><a href="pred-quant.html">predictRespFactors(<i>&lt;compounds&gt;</i>)</a></code> <code><a href="pred-quant.html">predictRespFactors(<i>&lt;featureGroupsScreening&gt;</i>)</a></code> <code><a href="pred-quant.html">predictRespFactors(<i>&lt;featureGroupsScreeningSet&gt;</i>)</a></code> <code><a href="pred-quant.html">predictRespFactors(<i>&lt;compoundsSet&gt;</i>)</a></code> <code><a href="pred-quant.html">predictRespFactors(<i>&lt;compoundsSIRIUS&gt;</i>)</a></code> <code><a href="pred-quant.html">predictRespFactors(<i>&lt;formulasSet&gt;</i>)</a></code> <code><a href="pred-quant.html">predictRespFactors(<i>&lt;formulasSIRIUS&gt;</i>)</a></code> <code><a href="pred-quant.html">getQuantCalibFromScreening()</a></code> </p>
         </td>
         <td><p>Functionality to predict quantitative data</p></td>
       </tr><tr><td>
-          <p><code><a href="pred-tox.html">calculateTox(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="pred-tox.html">calculateTox(<i>&lt;featureGroupsSet&gt;</i>)</a></code> <code><a href="pred-tox.html">predictTox(<i>&lt;compounds&gt;</i>)</a></code> <code><a href="pred-tox.html">predictTox(<i>&lt;featureGroupsScreening&gt;</i>)</a></code> <code><a href="pred-tox.html">calculateTox(<i>&lt;featureGroupsScreening&gt;</i>)</a></code> <code><a href="pred-tox.html">predictTox(<i>&lt;featureGroupsScreeningSet&gt;</i>)</a></code> <code><a href="pred-tox.html">calculateTox(<i>&lt;featureGroupsScreeningSet&gt;</i>)</a></code> <code><a href="pred-tox.html">predictTox(<i>&lt;compoundsSet&gt;</i>)</a></code> <code><a href="pred-tox.html">predictTox(<i>&lt;compoundsSIRIUS&gt;</i>)</a></code> <code><a href="pred-tox.html">predictTox(<i>&lt;formulasSet&gt;</i>)</a></code> <code><a href="pred-tox.html">predictTox(<i>&lt;formulasSIRIUS&gt;</i>)</a></code> </p>
+          <p><code><a href="pred-tox.html">calculateTox()</a></code> <code><a href="pred-tox.html">predictTox(<i>&lt;compounds&gt;</i>)</a></code> <code><a href="pred-tox.html">predictTox(<i>&lt;featureGroupsScreening&gt;</i>)</a></code> <code><a href="pred-tox.html">predictTox(<i>&lt;featureGroupsScreeningSet&gt;</i>)</a></code> <code><a href="pred-tox.html">predictTox(<i>&lt;compoundsSet&gt;</i>)</a></code> <code><a href="pred-tox.html">predictTox(<i>&lt;compoundsSIRIUS&gt;</i>)</a></code> <code><a href="pred-tox.html">predictTox(<i>&lt;formulasSet&gt;</i>)</a></code> <code><a href="pred-tox.html">predictTox(<i>&lt;formulasSIRIUS&gt;</i>)</a></code> </p>
         </td>
         <td><p>Functionality to predict toxicities</p></td>
       </tr><tr><td>
@@ -525,13 +621,17 @@
         </td>
         <td><p>Prints all the package options of <code>patRoon</code> and their currently set values.</p></td>
       </tr><tr><td>
-          <p><code><a href="reporting-legacy.html">reportCSV()</a></code> <code><a href="reporting-legacy.html">reportPDF()</a></code> <code><a href="reporting-legacy.html">reportHTML()</a></code> </p>
+          <p><code><a href="reporting-legacy.html">reportCSV()</a></code> <code><a href="reporting-legacy.html">reportPDF()</a></code> </p>
         </td>
         <td><p>Report feature group data (legacy interface)</p></td>
       </tr><tr><td>
           <p><code><a href="reporting.html">report()</a></code> <code><a href="reporting.html">genReportSettingsFile()</a></code> </p>
         </td>
         <td><p>Report workflow data</p></td>
+      </tr><tr><td>
+          <p><code><a href="retDir.html">retDir</a></code> </p>
+        </td>
+        <td><p>Retention order direction</p></td>
       </tr><tr><td>
           <p><code><a href="sets-workflow.html">sets-workflow</a></code> </p>
         </td>
@@ -541,13 +641,21 @@
         </td>
         <td><p>MS spectral similarity calculation parameters</p></td>
       </tr><tr><td>
-          <p><code><a href="suspect-screening.html">screenSuspects()</a></code> <code><a href="suspect-screening.html">numericIDLevel()</a></code> <code><a href="suspect-screening.html">genIDLevelRulesFile()</a></code> </p>
+          <p><code><a href="suspect-screening.html">screenSuspects()</a></code> </p>
         </td>
         <td><p>Target and suspect screening</p></td>
       </tr><tr><td>
           <p><code><a href="transformationProducts-class.html">parents()</a></code> <code><a href="transformationProducts-class.html">products()</a></code> <code><a href="transformationProducts-class.html">length(<i>&lt;transformationProducts&gt;</i>)</a></code> <code><a href="transformationProducts-class.html">names(<i>&lt;transformationProducts&gt;</i>)</a></code> <code><a href="transformationProducts-class.html">show(<i>&lt;transformationProducts&gt;</i>)</a></code> <code><a href="transformationProducts-class.html">`[`(<i>&lt;transformationProducts&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;missing&gt;</i>,<i>&lt;missing&gt;</i>)</a></code> <code><a href="transformationProducts-class.html">`[[`(<i>&lt;transformationProducts&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;missing&gt;</i>)</a></code> <code><a href="transformationProducts-class.html">`$`(<i>&lt;transformationProducts&gt;</i>)</a></code> <code><a href="transformationProducts-class.html">as.data.table(<i>&lt;transformationProducts&gt;</i>)</a></code> <code><a href="transformationProducts-class.html">convertToSuspects(<i>&lt;transformationProducts&gt;</i>)</a></code> <code><a href="transformationProducts-class.html">delete(<i>&lt;transformationProducts&gt;</i>)</a></code> <code><a href="transformationProducts-class.html">filter(<i>&lt;transformationProducts&gt;</i>)</a></code> </p>
         </td>
         <td><p>Base transformation products (TP) class</p></td>
+      </tr><tr><td>
+          <p><code><a href="transformationProductsAnnComp-class.html">filter(<i>&lt;transformationProductsAnnComp&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Transformation products obtained from compound annotations</p></td>
+      </tr><tr><td>
+          <p><code><a href="transformationProductsAnnForm-class.html">filter(<i>&lt;transformationProductsAnnForm&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Transformation products obtained from formula annotations</p></td>
       </tr><tr><td>
           <p><code><a href="transformationProductsFormula-class.html">plotGraph(<i>&lt;transformationProductsFormula&gt;</i>)</a></code> </p>
         </td>

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.0</span>
       </span>
     </div>
 
@@ -102,7 +102,7 @@
 <span>  neutralChemProps <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  potAdducts <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  potAdductsLib <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  absMzDev <span class="op">=</span> <span class="fl">0.002</span>,</span>
+<span>  absMzDev <span class="op">=</span> <span class="fu"><a href="limits.html">defaultLim</a></span><span class="op">(</span><span class="st">"mz"</span>, <span class="st">"narrow"</span><span class="op">)</span>,</span>
 <span>  calcSPLASH <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -210,7 +210,7 @@ for more details.</p></dd>
     <div id="validating-and-calculating-chemical-properties">
     <h2>Validating and calculating chemical properties</h2>
     <p>Chemical properties such as <acronym>SMILES</acronym>,
-  <acronym>InChIKey</acronym> and formula in the MS library are automatically validated and calculated if missing/invalid.</p>
+  <acronym>InChIKey</acronym> and formulae in the MS library are automatically validated and calculated if missing/invalid.</p>
 <p>The internal validation/calculation process performs the following steps:</p><ul><li><p>Validation of <acronym>SMILES</acronym>, <acronym>InChI</acronym>, <acronym>InChIKey</acronym> and formula data (if present). Invalid
   entries will be set to <code>NA</code>.</p></li>
 <li><p>If <code>neutralChemProps=TRUE</code> then chemical data (<acronym>SMILES</acronym>, formulae etc.) is neutralized by
@@ -257,9 +257,9 @@ Eddelbuettel D, François R (2011).
 <em>Journal of Statistical Software</em>, <b>40</b>(8), 1–18.
 <a href="https://doi.org/10.18637/jss.v040.i08" class="external-link">doi:10.18637/jss.v040.i08</a>
 .<br><br>
-Eddelbuettel D, Francois R, Allaire J, Ushey K, Kou Q, Russell N, Ucar I, Bates D, Chambers J (2025).
+Eddelbuettel D, Francois R, Allaire J, Ushey K, Kou Q, Russell N, Ucar I, Bates D, Chambers J (2026).
 <em>Rcpp: Seamless R and C++ Integration</em>.
-R package version 1.1.0, <a href="https://www.rcpp.org" class="external-link">https://www.rcpp.org</a>.</p>
+R package version 1.1.1, <a href="https://www.rcpp.org" class="external-link">https://www.rcpp.org</a>.</p>
 <p>OBoyle NM, Banck M, James CA, Morley C, Vandermeersch T, Hutchison GR (2011).
 “Open Babel: An open chemical toolbox.”
 <em>Journal of Cheminformatics</em>, <b>3</b>(1).

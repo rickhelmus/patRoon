@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.0</span>
       </span>
     </div>
 
@@ -264,7 +264,7 @@
 <li>The configuration of reporting parameters was simplified and is now achieved through a <code>YAML</code> file.</li>
 <li>And many other improvements…</li>
 </ul><p>An example can be seen from the <a href="https://rickhelmus.github.io/patRoon/examples/report.html">report output of the tutorial</a>.</p>
-<p>The new reporting interface is used with the new <code><a href="../reference/reporting.html">report()</a></code> method function. All the documentation was updated to reflect these changes. The now ‘legacy’ report interface (<code><a href="../reference/reporting-legacy.html">reportCSV()</a></code>, <code><a href="../reference/reporting-legacy.html">reportPDF()</a></code> and <code><a href="../reference/reporting-legacy.html">reportHTML()</a></code>) is still available for backwards compatibility and may still be of interest as the new interface currently only supports the HTML format.</p>
+<p>The new reporting interface is used with the new <code><a href="../reference/reporting.html">report()</a></code> method function. All the documentation was updated to reflect these changes. The now ‘legacy’ report interface (<code><a href="../reference/reporting-legacy.html">reportCSV()</a></code>, <code><a href="../reference/reporting-legacy.html">reportPDF()</a></code> and <code><a href="../reference/patRoon-deprecated.html">reportHTML()</a></code>) is still available for backwards compatibility and may still be of interest as the new interface currently only supports the HTML format.</p>
 <p>The new reporting functionality obviously did not yet underwent years of usage and feedback. Hence, please report any bugs and suggestions you may have!</p>
 </div>
 <div class="section level4">
@@ -285,7 +285,7 @@
 <h4 id="other-2-2">Other<a class="anchor" aria-label="anchor" href="#other-2-2"></a></h4>
 <p>Other important changes include:</p>
 <ul><li>Features
-<ul><li>Common parameters for creation of extracted ion chromatograms (EICs), such as <code>topMost</code> and <code>onlyPresent</code>, are now combined in a parameter list. The parameter list is specified with the new <code>EICParams</code> argument to functions such as <code><a href="../reference/generics.html">plotChroms()</a></code> and <code><a href="../reference/reporting.html">report()</a></code>. A list with default parameter values is generated with the <code><a href="../reference/EICParams.html">getDefEICParams()</a></code> function. More information can be found in the reference manual: <code><a href="../reference/EICParams.html">?EICParams</a></code>.</li>
+<ul><li>Common parameters for creation of extracted ion chromatograms (EICs), such as <code>topMost</code> and <code>onlyPresent</code>, are now combined in a parameter list. The parameter list is specified with the new <code>EICParams</code> argument to functions such as <code><a href="../reference/generics.html">plotChroms()</a></code> and <code><a href="../reference/reporting.html">report()</a></code>. A list with default parameter values is generated with the <code><a href="../reference/EIXParams.html">getDefEICParams()</a></code> function. More information can be found in the reference manual: <code>?EICParams</code>.</li>
 <li>The order of some of the arguments to the <code><a href="../reference/generics.html">plotChroms()</a></code> method for <code>featureGroups</code> was changed.</li>
 <li>
 <code><a href="../reference/makeSet.html">makeSet()</a></code> method for <code>featureGroups</code> (and related functions <code><a href="../reference/generics.html">adducts()</a></code> and <code><a href="../reference/featureGroups-class.html">selectIons()</a></code>): the original set specific feature groups are now combined to create the final feature groups, instead of grouping features from all sets at once. This prevents rare cases where features with different adduct assignments in the same set would be grouped together (i.e. if their neutral mass would be the same). Note that this change probably will produce slightly different results. This change required the addition of a new slot <code>annotationsChanged</code> to <code>featureGroupsSet</code> for internal usage by the <code>adducts()&lt;-</code> method.</li>
@@ -377,7 +377,7 @@
 <li>Suspects
 <ul><li>Annotation similarities are now calculated with spectral similarity C++ code used by other functionality in patRoon, which is faster and allows more configuration options. Consequently, the <code>specSimParams</code> argument replaces the <code>relMinMSMSIntensity</code> and <code>simMSMSMethod</code> arguments.</li>
 <li>
-<code><a href="../reference/featureGroupsScreening-class.html">annotateSuspects()</a></code>: log if the suspect formula/compound data could not be matched with feature annotations</li>
+<code><a href="../reference/patRoon-deprecated.html">annotateSuspects()</a></code>: log if the suspect formula/compound data could not be matched with feature annotations</li>
 </ul></li>
 <li>TPs
 <ul><li>The format of the <code>formulaDiff</code> column in TP component results was changed to more easily identify elemental losses/gains.</li>
@@ -394,9 +394,9 @@
 <div class="section level3">
 <h3 id="fixes-2-2">Fixes<a class="anchor" aria-label="anchor" href="#fixes-2-2"></a></h3>
 <ul><li>
-<code><a href="../reference/reporting-legacy.html">reportHTML()</a></code>
-<ul><li>Fixed: <code>EICOnlyPresent</code> argument to <code><a href="../reference/reporting-legacy.html">reportHTML()</a></code> is effective again</li>
-<li>Fixed: <code><a href="../reference/reporting-legacy.html">reportHTML()</a></code> could show plots of wrong TP results</li>
+<code><a href="../reference/patRoon-deprecated.html">reportHTML()</a></code>
+<ul><li>Fixed: <code>EICOnlyPresent</code> argument to <code><a href="../reference/patRoon-deprecated.html">reportHTML()</a></code> is effective again</li>
+<li>Fixed: <code><a href="../reference/patRoon-deprecated.html">reportHTML()</a></code> could show plots of wrong TP results</li>
 </ul></li>
 <li>
 <code><a href="../reference/newProject.html">newProject()</a></code>
@@ -439,7 +439,7 @@
 </li>
 <li>SIRUS
 <ul><li>Fixed: Features with data offsets are now properly loaded.</li>
-<li>Fixed: zero intensity precursor peaks returned by SIRIUS compound annotation were not removed, resulting in errors with <code><a href="../reference/featureGroupsScreening-class.html">annotateSuspects()</a></code> (issue <a href="https://github.com/rickhelmus/patRoon/issues/54" class="external-link">#54</a>). Suspects</li>
+<li>Fixed: zero intensity precursor peaks returned by SIRIUS compound annotation were not removed, resulting in errors with <code><a href="../reference/patRoon-deprecated.html">annotateSuspects()</a></code> (issue <a href="https://github.com/rickhelmus/patRoon/issues/54" class="external-link">#54</a>). Suspects</li>
 </ul></li>
 <li>Fixed: warnings generated during suspect screening for very large suspect list could lead to very high memory usage and R errors.</li>
 <li>remove bogus <code>higherThanNext</code> setting from estimated ID level 4a</li>
@@ -448,7 +448,7 @@
 <li>Fixed: <code><a href="../reference/generics.html">unset()</a></code> for <code>featureGroupsScreeningSet</code> resulted in loss of group quality scores and internal standard assignments</li>
 <li>Fix: If a suspect list does not contain SMILES and formulas then InChIs were not used to calculate the missing formula data. (issue <a href="https://github.com/rickhelmus/patRoon/issues/54" class="external-link">#54</a>)</li>
 <li>
-<code><a href="../reference/featureGroupsScreening-class.html">annotateSuspects()</a></code>
+<code><a href="../reference/patRoon-deprecated.html">annotateSuspects()</a></code>
 <ul><li>Fixes for consensus annotation results (issue <a href="https://github.com/rickhelmus/patRoon/issues/54" class="external-link">#54</a>)</li>
 <li>Sets workflows now separate log files for each set.</li>
 <li>Fixed: annotation similarities didn’t properly handle results from <code><a href="../reference/generateCompoundsLibrary.html">generateCompoundsLibrary()</a></code> if the library did not contain peak formula annotations.</li>
@@ -460,7 +460,7 @@
 </ul></li>
 <li>Fix: multiprocessing with classic: don’t try to capture output when logging is disabled</li>
 <li>Small fixes and improvements for verification of parameter lists</li>
-<li>Fixed: <code><a href="../reference/convertMSFiles.html">convertMSFiles()</a></code> if the <code>analysisInfo</code> argument is set and <code>outPath</code> is set with a length &gt;1 then the wrong output path could be used.</li>
+<li>Fixed: <code><a href="../reference/MSConversion.html">convertMSFiles()</a></code> if the <code>analysisInfo</code> argument is set and <code>outPath</code> is set with a length &gt;1 then the wrong output path could be used.</li>
 <li>Installation script: increase download timeout to avoid (unclear) errors when the script is downloading large file (issue <a href="https://github.com/rickhelmus/patRoon/issues/76" class="external-link">#76</a>).</li>
 </ul></div>
 </div>
@@ -513,7 +513,7 @@
 <li>The <code>library</code> algorithm now caches its results and supports multiple transformation generations (<code>generations</code> argument).</li>
 </ul></li>
 <li>
-<code><a href="../reference/reporting-legacy.html">reportHTML()</a></code>
+<code><a href="../reference/patRoon-deprecated.html">reportHTML()</a></code>
 <ul><li>Improved layout for TP reporting</li>
 <li>Plotting of transformation hierarchies (requires setting the new <code>TPs</code> argument).</li>
 <li>All reported feature information (chromatograms etc) are now placed inside a new menu</li>
@@ -551,8 +551,8 @@
 <ul><li>Fixed: <code>convertMFDB()</code> now always collapses duplicates, not just for <code>biotransformer</code> results.</li>
 <li>Fixed: <code>biotransformer</code>: <code>retDir</code> is now derived from the <em>original</em> parent, i.e. not its direct parent</li>
 </ul></li>
-<li>Fixed: <code><a href="../reference/reporting-legacy.html">reportHTML()</a></code> now properly subscripts negative element counts in formulas</li>
-<li>Fixed: <code><a href="../reference/reporting-legacy.html">reportHTML()</a></code> improve handling of missing or split compound identifiers when generating URL links</li>
+<li>Fixed: <code><a href="../reference/patRoon-deprecated.html">reportHTML()</a></code> now properly subscripts negative element counts in formulas</li>
+<li>Fixed: <code><a href="../reference/patRoon-deprecated.html">reportHTML()</a></code> improve handling of missing or split compound identifiers when generating URL links</li>
 <li>Fixed: annotatedPeakList() for <code>compounds</code>: avoid _unset suffixes in mergedBy column from data of sets workflows</li>
 <li>Fixed: <code><a href="../reference/newProject.html">newProject()</a></code>: loading analysis info from CSV now works again on Windows</li>
 <li>More workarounds to avoid <code>NA</code> exit codes on Linux systems</li>
@@ -583,7 +583,7 @@
 <li>Many small textual improvements were made in the process</li>
 </ul></li>
 <li>Fixed: the <code><a href="../reference/findFeaturesKPIC2.html">findFeaturesKPIC2()</a></code> and <code><a href="../reference/importFeaturesKPIC2.html">importFeaturesKPIC2()</a></code> now have correct casing (was lower case ‘f’)</li>
-<li>Fixed: some function arguments for <code><a href="../reference/convertMSFiles.html">convertMSFiles()</a></code> were not properly verified</li>
+<li>Fixed: some function arguments for <code><a href="../reference/MSConversion.html">convertMSFiles()</a></code> were not properly verified</li>
 <li>More checks to verify if input mzML/mzXML data actually exists</li>
 <li>Improved reference documentation for <code>analysis-information</code> (issue <a href="https://github.com/rickhelmus/patRoon/issues/33" class="external-link">#33</a>)</li>
 <li>Handbook: detailed overview of all workflow functions and classes (issue <a href="https://github.com/rickhelmus/patRoon/issues/41" class="external-link">#41</a>, special thanks to @@hechth)</li>
@@ -604,11 +604,11 @@
 <code><a href="../reference/suspect-screening.html">screenSuspects()</a></code> with sets workflows: don’t warn about set specific suspect data if all data is NA</li>
 <li>
 <code><a href="../reference/check-GUI.html">checkFeatures()</a></code>/<code><a href="../reference/check-GUI.html">checkComponents()</a></code> now cleanup unavailable selections when saving the session</li>
-<li>Fixed: <code><a href="../reference/reporting-legacy.html">reportHTML()</a></code>: Don’t try to report TP components if no data is available</li>
+<li>Fixed: <code><a href="../reference/patRoon-deprecated.html">reportHTML()</a></code>: Don’t try to report TP components if no data is available</li>
 <li>
 <code>formulasSet</code> method for <code><a href="../reference/generics.html">plotSpectrum()</a></code>: don’t try to plot a comparison plot for candidates without MS/MS data</li>
 <li>
-<code><a href="../reference/reporting-legacy.html">reportHTML()</a></code> don’t try to plot a comparison plot for formula candidates without MS/MS data</li>
+<code><a href="../reference/patRoon-deprecated.html">reportHTML()</a></code> don’t try to plot a comparison plot for formula candidates without MS/MS data</li>
 </ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="2.0" id="patroon-20">patRoon 2.0<a class="anchor" aria-label="anchor" href="#patroon-20"></a></h2>
@@ -661,7 +661,7 @@
 </div>
 <div class="section level4">
 <h4 id="data-curation-2-0">Data curation<a class="anchor" aria-label="anchor" href="#data-curation-2-0"></a></h4>
-<p>Interactive curation of feature data with <code><a href="../reference/patRoon-defunct.html">checkChromatograms()</a></code> was replaced with <code><a href="../reference/check-GUI.html">checkFeatures()</a></code>, which is much faster, is better suitable for larger datasets, customizable and has an improved user interface. Furthermore, this tool can be used for training/assessing <code>MetaClean</code> models. Similarly, <code><a href="../reference/check-GUI.html">checkComponents()</a></code> is a function that allows interactive curation of component data.</p>
+<p>Interactive curation of feature data with <code>checkChromatograms()</code> was replaced with <code><a href="../reference/check-GUI.html">checkFeatures()</a></code>, which is much faster, is better suitable for larger datasets, customizable and has an improved user interface. Furthermore, this tool can be used for training/assessing <code>MetaClean</code> models. Similarly, <code><a href="../reference/check-GUI.html">checkComponents()</a></code> is a function that allows interactive curation of component data.</p>
 <p>The <code><a href="../reference/generics.html">delete()</a></code> generic function allows straightforward deletion of parts of the workflow data, such as features, components and annotations. Furthermore, this function makes it easy to implement customized filters.</p>
 </div>
 <div class="section level4">
@@ -688,7 +688,7 @@
 <li>
 <code>topMostByRGroup/EICTopMostByRGroup</code> arguments for plotting/reporting EIC data of only the top most intense replicate(s).</li>
 <li>
-<code><a href="../reference/reporting-legacy.html">reportHTML()</a></code> now only plots the EIC of the most intense feature of each replicate group (i.e. <code>EICTopMostByRGroup=TRUE</code> and <code>EICTopMost=1</code>).</li>
+<code><a href="../reference/patRoon-deprecated.html">reportHTML()</a></code> now only plots the EIC of the most intense feature of each replicate group (i.e. <code>EICTopMostByRGroup=TRUE</code> and <code>EICTopMost=1</code>).</li>
 <li>
 <code>XCMS3</code>
 <ul><li>
@@ -705,7 +705,7 @@
 <li>
 <code>OpenMS</code> feature finding: <code>useFFMIntensities</code> argument to speed up intensity loading (experimental).</li>
 <li>
-<code><a href="../reference/reporting-legacy.html">reportHTML()</a></code> now reports general feature information in a separate tab.</li>
+<code><a href="../reference/patRoon-deprecated.html">reportHTML()</a></code> now reports general feature information in a separate tab.</li>
 <li>Feature groups: <code>results</code> argument to <code>[</code> (subset) and <code><a href="../reference/generics.html">filter()</a></code> to quickly synchronize feature groups between objects (e.g. to quickly remove feature groups without annotation results).</li>
 </ul></li>
 <li>Annotation
@@ -729,7 +729,7 @@
 <code>groupFeatures</code>: renamed the <code>feat</code> argument to <code>obj</code>.</li>
 <li>Improved performance for some feature group filters.</li>
 <li>
-<code><a href="../reference/reporting-legacy.html">reportHTML()</a></code>: EICs are shared between tabs to avoid duplicated plotting</li>
+<code><a href="../reference/patRoon-deprecated.html">reportHTML()</a></code>: EICs are shared between tabs to avoid duplicated plotting</li>
 <li>The <code>features</code> object embedded in <code>featureGroups</code> objects is now synchronized, and any features not present in any group are removed accordingly. This reduces memory usage and indirectly causes <code><a href="../reference/reporting-legacy.html">reportCSV()</a></code> to only report features still present.</li>
 <li>
 <code><a href="../reference/generics.html">plotInt()</a></code>: now has <code>xnames</code> and <code>showLegend</code> arguments to adjust plotting.</li>
@@ -776,7 +776,7 @@
 <li>The <code>suspFormRank</code> and <code>suspCompRank</code> suspect annotation data columns were renamed to <code>formRank</code>/<code>suspCompRank</code> (the previous change made prefixing unnecessary).</li>
 <li>Several updates for Bruker TASQ import.</li>
 <li>
-<code>logPath</code> argument for <code><a href="../reference/featureGroupsScreening-class.html">annotateSuspects()</a></code> to specify the file path for log files are disable logging completely.</li>
+<code>logPath</code> argument for <code><a href="../reference/patRoon-deprecated.html">annotateSuspects()</a></code> to specify the file path for log files are disable logging completely.</li>
 <li>suspect names are now trimmed to 150 characters to avoid logging issues on e.g. Windows</li>
 </ul></li>
 <li>Components
@@ -829,7 +829,7 @@
 <li>Fixed: <code><a href="../reference/generateMSPeakListsDAFMF.html">generateMSPeakListsDAFMF()</a></code> potentially used wrong DA compound data in case features were filtered.</li>
 </ul></li>
 <li>Suspect screening
-<ul><li>Fixed: <code><a href="../reference/suspect-screening.html">numericIDLevel()</a></code> now properly handles <code>NA</code> values.</li>
+<ul><li>Fixed: <code><a href="../reference/id-conf.html">numericIDLevel()</a></code> now properly handles <code>NA</code> values.</li>
 <li>
 <code><a href="../reference/importFeatureGroupsBrukerTASQ.html">importFeatureGroupsBrukerTASQ()</a></code>: Improved handling of absent analyses in imported results files.</li>
 <li>Fixed: Automatic <em>m/z</em> calculation for suspects
@@ -871,10 +871,10 @@
 <li>MCS calculation: handle <code>NULL</code> values that may occasionally be returned by <code><a href="https://rdrr.io/pkg/rcdk/man/get.mcs.html" class="external-link">rcdk::get.mcs</a></code>
 </li>
 <li>Fixed: intensity filter failed if previous filters lead to zero feature groups.</li>
-<li>Fixed: <code><a href="../reference/reporting-legacy.html">reportHTML()</a></code> annotation table was paged.</li>
+<li>Fixed: <code><a href="../reference/patRoon-deprecated.html">reportHTML()</a></code> annotation table was paged.</li>
 <li>Fixed: Check final path lengths of log files and truncate where necessary (reported by Corey Griffith)</li>
 <li>Fixed: in some cases the checking of <code>analysisInfo</code> validity may result in an error (reported by Tiago Sobreira)</li>
-<li>Fixed: <code><a href="../reference/convertMSFiles.html">convertMSFiles()</a></code> error with <code>dirs=TRUE</code> (reported by Tiago Sobreira)</li>
+<li>Fixed: <code><a href="../reference/MSConversion.html">convertMSFiles()</a></code> error with <code>dirs=TRUE</code> (reported by Tiago Sobreira)</li>
 <li>Small updates/fixes for <code>installPatRoon()</code>
 </li>
 <li>Fixed: <code><a href="../reference/suspect-screening.html">screenSuspects()</a></code> did not take <code>onlyHits</code> into account for caching</li>
@@ -890,7 +890,7 @@
 <p>Change your existing code, e.g.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">scr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/suspect-screening.html">screenSuspects</a></span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">suspectList</span>, <span class="va">...</span><span class="op">)</span></span>
-<span><span class="va">fGroupsScr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/patRoon-defunct.html">groupFeaturesScreening</a></span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">scr</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">fGroupsScr</span> <span class="op">&lt;-</span> <span class="fu">groupFeaturesScreening</span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">scr</span><span class="op">)</span></span></code></pre></div>
 <p>to</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fGroupsScr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/suspect-screening.html">screenSuspects</a></span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">suspectList</span>, <span class="va">...</span>, onlyHits <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
@@ -900,14 +900,14 @@
 <li>The feature groups are <em>not</em> renamed tot the suspect name anymore. If you quickly want to assess which suspects were found, use the <code><a href="../reference/featureGroupsScreening-class.html">screenInfo()</a></code> or <code><a href="../reference/generics.html">as.data.table()</a></code> methods.</li>
 <li>Subsetting of suspsect screening results can be done with the <code>suspects</code> argument to <code>[</code>, e.g. <code>fGroupsScr[, suspects = "carbamazepine"]</code>
 </li>
-<li>A new method, <code><a href="../reference/featureGroupsScreening-class.html">annotateSuspects()</a></code>, allows combining the annotation workflow data (peak lists, formulas, compounds) to perform a detailed annotation for the suspects found during the workflow. This method calculates properties such as
+<li>A new method, <code><a href="../reference/patRoon-deprecated.html">annotateSuspects()</a></code>, allows combining the annotation workflow data (peak lists, formulas, compounds) to perform a detailed annotation for the suspects found during the workflow. This method calculates properties such as
 <ul><li>Rankings: where is the suspect formula/compound ranked in the candidates from the workflow data</li>
 <li>Annotation similarity: how well does the MS/MS spectrum of the suspect matches with formula/compound annotations.</li>
 <li>An <em>estimation</em> of identification levels to assist in quickly evaluating how well the suspect was annotated. The rules for identification levels are fully configurable.</li>
 </ul></li>
 <li>A dedicated <code><a href="../reference/generics.html">filter()</a></code> method for suspect screening results, which allows you to easily prioritize data, for instance, by selecting minimum annotation ranks and similarities, identification levels and automatically choosing the best match in case multiple suspects are assigned to one feature (and vice versa).</li>
 <li>A dedicated <code><a href="../reference/generics.html">as.data.table()</a></code> method and reporting functionality for suspect screening results to quickly inspect their annotation data.</li>
-<li>Please refer to the updated suspect screening sections in the handbook and <code><a href="../reference/suspect-screening.html">?screenSuspects</a></code> and <code><a href="../reference/featureGroupsScreening-class.html">?annotateSuspects</a></code> for more information.</li>
+<li>Please refer to the updated suspect screening sections in the handbook and <code><a href="../reference/suspect-screening.html">?screenSuspects</a></code> and <code><a href="../reference/patRoon-deprecated.html">?annotateSuspects</a></code> for more information.</li>
 </ul></li>
 <li>Changes to suspect lists
 <ul><li>Whenever possible, suspect information such as formulae, neutral masses, InChIKeys etc will be calculated for the input suspect list (obtainable afterwards with <code><a href="../reference/featureGroupsScreening-class.html">screenInfo()</a></code>).</li>
@@ -919,7 +919,7 @@
 <li>The <code>individualMoNAScore</code> MetFrag scoring is now enabled by default.</li>
 </ul><p>Other changes</p>
 <ul><li>
-<code><a href="../reference/reporting-legacy.html">reportHTML()</a></code> now allows toggling visibility for the columns shown in the feature annotation table.</li>
+<code><a href="../reference/patRoon-deprecated.html">reportHTML()</a></code> now allows toggling visibility for the columns shown in the feature annotation table.</li>
 <li>The <code><a href="../reference/generics.html">plotVenn()</a></code> method for <code>featureGroups</code> now allows to compare combinations of multiple replicate groups with each other. See <code><a href="../reference/generics.html">?plotVenn</a></code> for more information.</li>
 <li>Fix: locating <code>SIRIUS</code> binary on <code>macOS</code> did not work properly</li>
 <li>Fix: timeout warning for <code>GenForm</code> resulted in an error (<a href="https://github.com/rickhelmus/patRoon/issues/18" class="external-link uri">https://github.com/rickhelmus/patRoon/issues/18</a>)</li>
@@ -928,7 +928,7 @@
     <div class="section level2">
 <h2 class="page-header" data-toc-text="1.1" id="patroon-11">patRoon 1.1<a class="anchor" aria-label="anchor" href="#patroon-11"></a></h2>
 <ul><li>
-<strong>IMPORTANT</strong>: The <code><a href="../reference/patRoon-deprecated.html">plotEIC()</a></code>, <code><a href="../reference/patRoon-deprecated.html">groups()</a></code> and <code><a href="../reference/patRoon-deprecated.html">plotSpec()</a></code> methods were renamed to <code><a href="../reference/generics.html">plotChroms()</a></code>, <code><a href="../reference/featureGroups-class.html">groupTable()</a></code> and <code><a href="../reference/generics.html">plotSpectrum()</a></code>. This was done to avoid name clashes with <code>XCMS</code> and <code>CAMERA</code>. The old functions still work (with a warning), but please update your scripts as these will be removed in the future.</li>
+<strong>IMPORTANT</strong>: The <code>plotEIC()</code>, <code>groups()</code> and <code>plotSpec()</code> methods were renamed to <code><a href="../reference/generics.html">plotChroms()</a></code>, <code><a href="../reference/featureGroups-class.html">groupTable()</a></code> and <code><a href="../reference/generics.html">plotSpectrum()</a></code>. This was done to avoid name clashes with <code>XCMS</code> and <code>CAMERA</code>. The old functions still work (with a warning), but please update your scripts as these will be removed in the future.</li>
 <li>
 <strong>IMPORTANT</strong>: Major changes to the parallelization functionality
 <ul><li>
@@ -956,13 +956,13 @@
 </ul></li>
 <li>Finding features with <code>OpenMS</code>: potentially large temporary files are removed when possible to avoid clogging up disk space (especially relevant on some Linux systems where <code>/tmp</code> is small).</li>
 <li>Several packages such as <code>XCMS</code> are not attached by default, which significantly speeds up loading <code>patRoon</code> (e.g. with <code><a href="https://rdrr.io/r/base/library.html" class="external-link">library()</a></code>).</li>
-<li>The <code><a href="../reference/patRoon-defunct.html">compoundViewer()</a></code> function was marked as defunct, as it hasn;t been working for some time and its functionality is largely replaced by <code><a href="../reference/reporting-legacy.html">reportHTML()</a></code>.</li>
+<li>The <code><a href="../reference/patRoon-defunct.html">compoundViewer()</a></code> function was marked as defunct, as it hasn;t been working for some time and its functionality is largely replaced by <code><a href="../reference/patRoon-deprecated.html">reportHTML()</a></code>.</li>
 <li>
 <code><a href="../reference/generateComponentsNontarget.html">generateComponentsNontarget()</a></code>: update homolog statistics for merged series.</li>
 <li>
-<code><a href="../reference/patRoon-defunct.html">checkChromatograms()</a></code>: fix error when <code>fGroups</code> has only one replicate group</li>
+<code>checkChromatograms()</code>: fix error when <code>fGroups</code> has only one replicate group</li>
 <li>
-<code><a href="../reference/convertMSFiles.html">convertMSFiles()</a></code>: If <code>algorithm="pwiz"</code> and vendor centroiding is used then any extra filters are now correctly put after the <code>peakPicking</code> filter.</li>
+<code><a href="../reference/MSConversion.html">convertMSFiles()</a></code>: If <code>algorithm="pwiz"</code> and vendor centroiding is used then any extra filters are now correctly put after the <code>peakPicking</code> filter.</li>
 <li>
 <code><a href="../reference/xcms-conv.html">getXCMSnExp()</a></code> is now properly exported and documented.</li>
 </ul></div>
@@ -972,13 +972,13 @@
 <li>Updated support for latest PubChemLite</li>
 <li>The <code>annoTypeCount</code> score for annotated compounds with PubChemLite is now not normalized by default anymore when reporting results.</li>
 <li>
-<code><a href="../reference/reporting-legacy.html">reportHTML()</a></code> now correctly handles relative paths while opening the final report in a browser.</li>
+<code><a href="../reference/patRoon-deprecated.html">reportHTML()</a></code> now correctly handles relative paths while opening the final report in a browser.</li>
 </ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="1.0.3" id="patroon-103">patRoon 1.0.3<a class="anchor" aria-label="anchor" href="#patroon-103"></a></h2>
 <ul><li>
 <code>componentsNT</code>: include algorithm data returned by <code><a href="https://rdrr.io/pkg/nontarget/man/homol.search.html" class="external-link">nontarget::homol.search</a></code> in <code>homol</code> slot (suggested by Vittorio Albergamo)</li>
-<li>several <code><a href="../reference/convertMSFiles.html">convertMSFiles()</a></code> fixes (issue <a href="https://github.com/rickhelmus/patRoon/issues/14" class="external-link">#14</a>)
+<li>several <code><a href="../reference/MSConversion.html">convertMSFiles()</a></code> fixes (issue <a href="https://github.com/rickhelmus/patRoon/issues/14" class="external-link">#14</a>)
 <ul><li>prevent error when no input files are found</li>
 <li>only allow one input/output format (didn’t properly work before)</li>
 <li>recognize that Waters files are directories</li>
@@ -1008,11 +1008,11 @@
 <li>Improved handling of empty feature groups objects when reporting</li>
 <li>Fixed: <code><a href="../reference/reporting-legacy.html">reportPDF()</a></code> may report formula annotated spectra of results not present in input <code>featureGroups</code>
 </li>
-<li>Fixed: Loading <code>data.table</code> data from cache now calls <code><a href="https://rdatatable.gitlab.io/data.table/reference/truelength.html" class="external-link">data.table::setalloccol()</a></code> to ensure proper behavior if <code><a href="https://rdatatable.gitlab.io/data.table/reference/assign.html" class="external-link">data.table::set()</a></code> is called on cached data.</li>
+<li>Fixed: Loading <code>data.table</code> data from cache now calls <code><a href="https://rdrr.io/pkg/data.table/man/truelength.html" class="external-link">data.table::setalloccol()</a></code> to ensure proper behavior if <code><a href="https://rdrr.io/pkg/data.table/man/assign.html" class="external-link">data.table::set()</a></code> is called on cached data.</li>
 <li>Fixed: plotSpec() for <code>compounds</code> with <code>useGGPlot2=TRUE</code> would try to plot formulas for non-annotated peaks (resulting in many extra diagonal lines)<br></li>
 <li>Fixed: some functions involved in caching plot data for HTML reports sometimes returned invalid data.</li>
 <li>Fixed: EICs plotted by <code><a href="../reference/reporting-legacy.html">reportPDF()</a></code> where not properly placed in a grid (as specified by <code>EICGrid</code> argument)</li>
-<li>Small tweaks/fixes for <code><a href="../reference/reporting-legacy.html">reportHTML()</a></code>
+<li>Small tweaks/fixes for <code><a href="../reference/patRoon-deprecated.html">reportHTML()</a></code>
 <ul><li>now displays subscripted neutral formulae</li>
 <li>Fixed: x axis title of EICs in annotation tab was cut-off</li>
 <li>Fixed: The rt vs mz plot in the summary page now uses minutes for retention times if <code>retMin=TRUE</code>
@@ -1053,9 +1053,9 @@
 <li>
 <code><a href="../reference/componentsIntClust-class.html">plotHeatMap()</a></code> with <code>interactive=TRUE</code>: switch from now removed <code>d3heatmap</code> package to <code>heatmaply</code>
 </li>
-<li>Fixed: <code><a href="../reference/reporting-legacy.html">reportHTML()</a></code> didn’t split PubChem URLs when multiple identifiers were reported.</li>
+<li>Fixed: <code><a href="../reference/patRoon-deprecated.html">reportHTML()</a></code> didn’t split PubChem URLs when multiple identifiers were reported.</li>
 <li>
-<code>PWizBatchSize</code> argument for <code><a href="../reference/convertMSFiles.html">convertMSFiles()</a></code>
+<code>PWizBatchSize</code> argument for <code><a href="../reference/MSConversion.html">convertMSFiles()</a></code>
 </li>
 </ul></div>
 <div class="section level3">
@@ -1067,11 +1067,11 @@
 <ul><li>now correctly takes retention times of suspects into account when creating feature groups.</li>
 <li>retention times / <em>m/z</em> values are now averaged over grouped suspects.</li>
 </ul></li>
-<li>The <code><a href="../reference/generics.html">plot()</a></code> method for <code>featureGroups</code> now allows drawing legends when <code>colourBy="fGroups"</code> and sets <code>colourBy="none"</code> by default, both for consistency with <code><a href="../reference/patRoon-deprecated.html">plotEIC()</a></code>.</li>
+<li>The <code><a href="../reference/generics.html">plot()</a></code> method for <code>featureGroups</code> now allows drawing legends when <code>colourBy="fGroups"</code> and sets <code>colourBy="none"</code> by default, both for consistency with <code>plotEIC()</code>.</li>
 <li>All documentation is now available as PDF files on the website (<a href="https://rickhelmus.github.io/patRoon/" class="uri">https://rickhelmus.github.io/patRoon/</a>)</li>
 <li>
 <code><a href="../reference/newProject.html">newProject()</a></code> now uses XCMS3 algorithms instead of the older XCMS interface.</li>
-<li>Fixed: features in objects generated by <code>xcms</code> (not <code>xcms3</code>) could not be subset with zero analyses (which resulted in errors by e.g. <code><a href="../reference/featureGroups-class.html">unique()</a></code> and <code><a href="../reference/reporting-legacy.html">reportHTML()</a></code>). Reported by Corey Griffith.</li>
+<li>Fixed: features in objects generated by <code>xcms</code> (not <code>xcms3</code>) could not be subset with zero analyses (which resulted in errors by e.g. <code><a href="../reference/featureGroups-class.html">unique()</a></code> and <code><a href="../reference/patRoon-deprecated.html">reportHTML()</a></code>). Reported by Corey Griffith.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="march-1-0">March 2020<a class="anchor" aria-label="anchor" href="#march-1-0"></a></h3>
@@ -1088,7 +1088,7 @@
 <li>related CIDs are now reported for PubChemLite results.</li>
 <li>MetFrag compound generation: removed <code>addTrivialNames</code> option as it never worked very well.</li>
 <li>
-<code><a href="../reference/reporting-legacy.html">reportHTML()</a></code>: only components with reported feature groups are now reported.</li>
+<code><a href="../reference/patRoon-deprecated.html">reportHTML()</a></code>: only components with reported feature groups are now reported.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="february-1-0">February 2020<a class="anchor" aria-label="anchor" href="#february-1-0"></a></h3>
@@ -1166,7 +1166,7 @@
 <strong>IMPORTANT</strong> Several things are renamed for clarity/consistency
 <ul><li>The column to specify replicate groups for blank subtraction in the analysis information is re-named from <code>ref</code> to <code>blank</code>. Similarly, the <code>refs</code> argument to <code><a href="../reference/analysis-information.html">generateAnalysisInfo()</a></code> is now called <code>blanks</code>.</li>
 <li>
-<code><a href="../reference/patRoon-deprecated.html">reportMD()</a></code> is renamed to <code><a href="../reference/reporting-legacy.html">reportHTML()</a></code>
+<code>reportMD()</code> is renamed to <code><a href="../reference/patRoon-deprecated.html">reportHTML()</a></code>
 </li>
 <li>
 <code><a href="../reference/generics.html">filter()</a></code> method for <code>formulas</code>: <code>minExplainedFragPeaks</code> is now called <code>minExplainedPeaks</code>
@@ -1177,7 +1177,7 @@
 </ul></li>
 <li>Fixed incorrect selection after feature table (or other interactive tables) have been manually re-ordered (reported by Thanh Wang)</li>
 <li>
-<code><a href="../reference/patRoon-deprecated.html">groups()</a></code> and <code><a href="../reference/generics.html">as.data.table()</a></code> methods for <code>featureGroups</code>: optionally consider feature areas instead of peak intensities.</li>
+<code>groups()</code> and <code><a href="../reference/generics.html">as.data.table()</a></code> methods for <code>featureGroups</code>: optionally consider feature areas instead of peak intensities.</li>
 <li>
 <code><a href="../reference/generics.html">plotSilhouettes()</a></code> method for <code>compoundsCluster</code>
 </li>
@@ -1212,18 +1212,18 @@
 <div class="section level3">
 <h3 id="march-1-0-1">March 2019<a class="anchor" aria-label="anchor" href="#march-1-0-1"></a></h3>
 <ul><li>
-<code><a href="../reference/patRoon-deprecated.html">reportMD()</a></code>: most time consuming plots are now cached. Hence, re-reporting should be signficiantly faster now.</li>
+<code>reportMD()</code>: most time consuming plots are now cached. Hence, re-reporting should be signficiantly faster now.</li>
 <li>Updates to MS data file conversion:
 <ul><li>
-<code><a href="../reference/convertMSFiles.html">convertMSFiles()</a></code> now (optionally) takes analysis information (<code>anaInfo</code>) for file input.</li>
+<code><a href="../reference/MSConversion.html">convertMSFiles()</a></code> now (optionally) takes analysis information (<code>anaInfo</code>) for file input.</li>
 <li>
-<code><a href="../reference/convertMSFiles.html">convertMSFiles()</a></code> now supports Bruker DataAnalysis as conversion algorithm (replaces now deprecated <code><a href="../reference/patRoon-deprecated.html">exportDAFiles()</a></code> function).</li>
+<code><a href="../reference/MSConversion.html">convertMSFiles()</a></code> now supports Bruker DataAnalysis as conversion algorithm (replaces now deprecated <code>exportDAFiles()</code> function).</li>
 <li>
-<code><a href="../reference/convertMSFiles.html">MSFileFormats()</a></code> function to list supported input conversion formats.</li>
+<code>MSFileFormats()</code> function to list supported input conversion formats.</li>
 <li>
-<code><a href="../reference/analysis-information.html">generateAnalysisInfo()</a></code> now recognizes more file formats. This is mainly useful so its output can be used with <code><a href="../reference/convertMSFiles.html">convertMSFiles()</a></code>.</li>
+<code><a href="../reference/analysis-information.html">generateAnalysisInfo()</a></code> now recognizes more file formats. This is mainly useful so its output can be used with <code><a href="../reference/MSConversion.html">convertMSFiles()</a></code>.</li>
 <li>
-<code><a href="../reference/convertMSFiles.html">convertMSFiles()</a></code> now has the <code>centroid</code> argument to more easily perform centroiding.</li>
+<code><a href="../reference/MSConversion.html">convertMSFiles()</a></code> now has the <code>centroid</code> argument to more easily perform centroiding.</li>
 </ul></li>
 <li>Updates to <code><a href="../reference/newProject.html">newProject()</a></code>:
 <ul><li>The analyses selector recognizes more data file formats. This way you can select analyses that have not been converted yet.</li>
@@ -1245,10 +1245,10 @@
 <li>plotScores(): Option to only report scorings that have been used for ranking</li>
 <li>as.data.table()/as.data.frame() method for compounds: optionally normalize scores.</li>
 <li>
-<code><a href="../reference/reporting-legacy.html">reportPDF()</a></code>/<code><a href="../reference/patRoon-deprecated.html">reportMD()</a></code> now report only 5 top most candidate compounds by default (controlled by <code>compoundsTopMost</code> argument).</li>
+<code><a href="../reference/reporting-legacy.html">reportPDF()</a></code>/<code>reportMD()</code> now report only 5 top most candidate compounds by default (controlled by <code>compoundsTopMost</code> argument).</li>
 <li>metadata for MS peak lists</li>
 <li>
-<code><a href="../reference/patRoon-deprecated.html">plotSpec()</a></code> now displays subscripted formulae</li>
+<code>plotSpec()</code> now displays subscripted formulae</li>
 <li>
 <strong>IMPORTANT</strong> Several major changes were made to the <code><a href="../reference/generics.html">filter()</a></code> methods for <code>features</code> and <code>featureGroups</code>. Please carefully read the updated documentation for these methods! (i.e. <code><a href="../reference/features-class.html">?`filter,features-method`</a></code> and <code><a href="../reference/feature-filtering.html">?`filter,featureGroups-method`</a></code>).
 <ul><li>Most argument have been renamed for consistency, simplicity and clarity.</li>
@@ -1284,13 +1284,13 @@
 <code>topMostFormulas</code> argument for SIRIUS compound generation.</li>
 <li>Fixed GenForm ranking in case both MS and MS/MS formulae are present.</li>
 <li>
-<code><a href="../reference/reporting-legacy.html">reportPDF()</a></code>/<code><a href="../reference/patRoon-deprecated.html">reportMD()</a></code> now report only 5 top most candidate formulae by default (controlled by <code>formulasTopMost</code> argument).</li>
+<code><a href="../reference/reporting-legacy.html">reportPDF()</a></code>/<code>reportMD()</code> now report only 5 top most candidate formulae by default (controlled by <code>formulasTopMost</code> argument).</li>
 <li>Added <code><a href="../reference/verifyDependencies.html">verifyDependencies()</a></code> function to let the user verify if external tools can be found.</li>
-<li>The meaning of the <code>dirs</code> argument to <code><a href="../reference/convertMSFiles.html">convertMSFiles()</a></code> was slightly changed: if <code>TRUE</code> (the default) the input can either be paths to analyses files or to directories containing the analyses files.</li>
+<li>The meaning of the <code>dirs</code> argument to <code><a href="../reference/MSConversion.html">convertMSFiles()</a></code> was slightly changed: if <code>TRUE</code> (the default) the input can either be paths to analyses files or to directories containing the analyses files.</li>
 <li>More effective locating ProteoWizard binaries by using the Windows registry.</li>
 <li>Nicer default graphics for <code>featureGroups</code> method for <code><a href="../reference/generics.html">plot()</a></code>.</li>
 <li>
-<code><a href="../reference/patRoon-deprecated.html">reportMD()</a></code>: Don’t plot Chord if &lt;3 (non-empty) replicate groups are available.</li>
+<code>reportMD()</code>: Don’t plot Chord if &lt;3 (non-empty) replicate groups are available.</li>
 <li>All <code><a href="../reference/generics.html">filter()</a></code> methods now support negation by <code>negate</code> argument.</li>
 </ul></div>
 <div class="section level3">
@@ -1299,7 +1299,7 @@
 <li>Various tweaks for plotEIC() and plotSpec() methods</li>
 <li>Various small additions to newProject()</li>
 <li>
-<code><a href="../reference/patRoon-deprecated.html">reportMD()</a></code>: added table with annotated fragments for compounds/formulas</li>
+<code>reportMD()</code>: added table with annotated fragments for compounds/formulas</li>
 <li>
 <code><a href="../reference/generics.html">consensus()</a></code> updates
 <ul><li>
@@ -1327,7 +1327,7 @@
 <li>
 <strong>IMPORTANT</strong> Several changes were made to the MetFrag compound generation interface in order to simplify it and make it more generic. See <code><a href="../reference/generateCompounds.html">?generateCompounds</a></code> for more details (notably the Scorings section).</li>
 <li>More MS peak list updates
-<ul><li>Precursor peaks are now flagged in MS peak list data and <code><a href="../reference/patRoon-deprecated.html">plotSpec()</a></code>
+<ul><li>Precursor peaks are now flagged in MS peak list data and <code>plotSpec()</code>
 </li>
 <li>Prune MS peak lists (not MS/MS) if no precursor could be determined (enabled by default, see <code>pruneMissingPrecursorMS</code> option in <code><a href="../reference/generateMSPeakLists.html">?generateMSPeakLists</a></code>).</li>
 <li>Better retain precursor peaks after filtering steps: only intensity thresholds may remove precursors (always for MS data, optional for MS/MS with <code>retainPrecursorMSMS</code> function arguments, see <code><a href="../reference/MSPeakLists-class.html">?MSPeakLists</a></code> and <code><a href="../reference/generateMSPeakLists.html">?generateMSPeakLists</a></code>).</li>
@@ -1369,7 +1369,7 @@
 <li>
 <code><a href="../reference/generateCompounds.html">generateCompounds()</a></code> and plotting functionality now uses averaged group peak lists instead of peak list of most intense analysis.</li>
 <li>
-<code><a href="../reference/patRoon-deprecated.html">plotSpec()</a></code> method for MSPeakLists: plot (non-annotated) MS and MS/MS spectra.</li>
+<code>plotSpec()</code> method for MSPeakLists: plot (non-annotated) MS and MS/MS spectra.</li>
 <li>Minimum intensity filter option that is applied after averaging.</li>
 <li>Now uses “hclust” method for averaging by default, which now uses the <a href="https://cran.r-project.org/web/packages/fastcluster/index.html" class="external-link">fastcluster</a> package.</li>
 </ul></li>
@@ -1446,7 +1446,7 @@
 <h3 id="may-1-0-2">May 2018<a class="anchor" aria-label="anchor" href="#may-1-0-2"></a></h3>
 <ul><li>Added compound clustering (see makeHCluster method for compounds). This is an useful tool to get an overview of all the candidate chemical structures after compound identification. The clustering will reduce data complexity. Furthermore, maximum common sucstructures (MCS) can be calculated and plotted for each cluster to get a quick impression of the different structures of candidates.</li>
 <li>Added function arguments checks using <a href="https://github.com/mllg/checkmate" class="external-link">checkmate</a>. This guards all exported functions and methods from wrong user input arguments. If any problems are found (e.g. a wrong data type or range was specified) then the user is informed about this and what kind of input is to be expected.</li>
-<li>Added workaround (removed latex dependencies added automatically by <code>kableExtra</code> package) that may cause memory leakage when <code><a href="../reference/patRoon-deprecated.html">reportMD()</a></code> is called repeatedly.</li>
+<li>Added workaround (removed latex dependencies added automatically by <code>kableExtra</code> package) that may cause memory leakage when <code>reportMD()</code> is called repeatedly.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="april-1-0-2">April 2018<a class="anchor" aria-label="anchor" href="#april-1-0-2"></a></h3>

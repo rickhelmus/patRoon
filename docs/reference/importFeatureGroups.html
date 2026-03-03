@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.0</span>
       </span>
     </div>
 
@@ -95,20 +95,20 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">importFeatureGroups</span><span class="op">(</span><span class="va">path</span>, <span class="va">type</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">importFeatureGroups</span><span class="op">(</span><span class="va">input</span>, <span class="va">type</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
 
 
-<dl><dt id="arg-path">path<a class="anchor" aria-label="anchor" href="#arg-path"></a></dt>
-<dd><p>The path that should be used for importing. See the algorithm specific functions for more details.</p></dd>
+<dl><dt id="arg-input">input<a class="anchor" aria-label="anchor" href="#arg-input"></a></dt>
+<dd><p>The input object or path that should be imported. See the algorithm specific functions for more details.</p></dd>
 
 
 <dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
-<dd><p>Which file type should be imported: <code>"brukerpa"</code> (Bruker ProfileAnalysis), <code>"brukertasq"</code>
-(Bruker TASQ) or <code>"envimass"</code> (<span class="pkg">enviMass</span>).</p></dd>
+<dd><p>What type of data should be imported: <code>"xcms"</code>, <code>"xcms3"</code>, <code>"kpic2"</code>, <code>"table"</code>,
+<code>"brukerpa"</code> (Bruker ProfileAnalysis), <code>"brukertasq"</code> (Bruker TASQ) or <code>"envimass"</code>.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -122,16 +122,14 @@
     <div id="details">
     <h2>Details</h2>
     <p><code>importFeatureGroups</code> is a generic function that will import feature groups from files by one of the supported algorithms. The actual
-  functionality is provided by algorithm specific functions such as <code>importFeatureGroupsBrukerTASQ</code> and <code>importFeatureGroupsBrukerPA</code>. While these
+  functionality is provided by algorithm specific functions such as <code>importFeatureGroupsXCMS3</code> and <code>importFeatureGroupsTable</code>. While these
   functions may be called directly, <code>importFeatureGroups</code> provides a generic interface and is therefore usually preferred.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
     <div class="dont-index"><p>The <code><a href="featureGroups-class.html">featureGroups</a></code> output class and its methods and the algorithm specific functions:
-  <code><a href="importFeatureGroupsBrukerPA.html">importFeatureGroupsBrukerPA</a></code>, <code><a href="importFeatureGroupsBrukerTASQ.html">importFeatureGroupsBrukerTASQ</a></code>, <code><a href="importFeatureGroupsEnviMass.html">importFeatureGroupsEnviMass</a></code></p>
-<p><code><a href="groupFeatures.html">groupFeatures</a></code> to group features. Other import functions:
-  <code><a href="importFeatureGroupsXCMS.html">importFeatureGroupsXCMS</a></code>, <code><a href="importFeatureGroupsXCMS3.html">importFeatureGroupsXCMS3</a></code> and
-  <code><a href="importFeatureGroupsKPIC2.html">importFeatureGroupsKPIC2</a></code>.</p></div>
+  <code><a href="importFeatureGroupsXCMS.html">importFeatureGroupsXCMS</a></code>, <code><a href="importFeatureGroupsXCMS3.html">importFeatureGroupsXCMS3</a></code>, <code><a href="importFeatureGroupsKPIC2.html">importFeatureGroupsKPIC2</a></code>, <code><a href="importFeatureGroupsTable.html">importFeatureGroupsTable</a></code>, <code><a href="importFeatureGroupsBrukerPA.html">importFeatureGroupsBrukerPA</a></code>, <code><a href="importFeatureGroupsBrukerTASQ.html">importFeatureGroupsBrukerTASQ</a></code>, <code><a href="importFeatureGroupsEnviMass.html">importFeatureGroupsEnviMass</a></code></p>
+<p><code><a href="groupFeatures.html">groupFeatures</a></code> to group features.</p></div>
     </div>
 
   </div>

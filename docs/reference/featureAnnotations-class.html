@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.0</span>
       </span>
     </div>
 
@@ -136,8 +136,11 @@
 <span>  elements <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  fragElements <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  lossElements <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  fragFormulas <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  lossFormulas <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  topMost <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  OM <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  maxLevel <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  negate <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -149,7 +152,7 @@
 <span>  <span class="va">obj</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  labels <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  nsets <span class="op">=</span> <span class="fu"><a href="generics.html">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1</span>,</span>
+<span>  nsets <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  nintersects <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  upsetArgs <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -276,9 +279,21 @@ if at least one of the fragment formulae follow (or not follow if
 used format.</p></dd>
 
 
+<dt id="arg-fragformulas-lossformulas">fragFormulas, lossFormulas<a class="anchor" aria-label="anchor" href="#arg-fragformulas-lossformulas"></a></dt>
+<dd><p>A <code>character</code> vector with one or more formulae, which are matched to MS/MS
+fragments (<code>fragFormulas</code>) or neutral losses (<code>lossFormulas</code>). Candidates are only kept with at least one
+match (if both <code>fragFormulas</code> and <code>lossFormulas</code> are set then there must be at least one match from
+both). The input formulae are hill sorted prior to matching. For non-exact matching: see <code>fragElements</code> and
+<code>lossElements</code>. Set to <code>NULL</code> to ignore these filters.</p></dd>
+
+
 <dt id="arg-topmost">topMost<a class="anchor" aria-label="anchor" href="#arg-topmost"></a></dt>
 <dd><p>Only keep a maximum of <code>topMost</code> candidates with highest score (or least highest if
 <code>negate=TRUE</code>). Set to <code>NULL</code> to ignore.</p></dd>
+
+
+<dt id="arg-maxlevel">maxLevel<a class="anchor" aria-label="anchor" href="#arg-maxlevel"></a></dt>
+<dd><p>Filter by maximum identification level (<em>e.g.</em> <code>"3a"</code>). Set to <code>NULL</code> to ignore.</p></dd>
 
 
 <dt id="arg-negate">negate<a class="anchor" aria-label="anchor" href="#arg-negate"></a></dt>
@@ -295,7 +310,8 @@ used format.</p></dd>
 
 
 <dt id="arg-nsets-nintersects">nsets, nintersects<a class="anchor" aria-label="anchor" href="#arg-nsets-nintersects"></a></dt>
-<dd><p>See <code><a href="https://rdrr.io/pkg/UpSetR/man/upset.html" class="external-link">upset</a></code>.</p></dd>
+<dd><p>See <code><a href="https://rdrr.io/pkg/UpSetR/man/upset.html" class="external-link">upset</a></code>. If <code>nsets == NULL</code> then it will be set to the number
+of compared items.</p></dd>
 
 
 <dt id="arg-upsetargs">upsetArgs<a class="anchor" aria-label="anchor" href="#arg-upsetargs"></a></dt>
@@ -309,7 +325,7 @@ used format.</p></dd>
 <p><code>delete</code> returns the object for which the specified data was removed.</p>
 <p><code>filter</code> returns a filtered <code>featureAnnotations</code> object.</p>
 <p><code>plotVenn</code> (invisibly) returns a list with the following fields:</p><ul><li><p><code>gList</code> the <code>gList</code> object that was returned by
-  the utilized <span class="pkg">VennDiagram</span> plotting function.</p></li>
+  the utilized <a href="https://CRAN.R-project.org/package=VennDiagram" class="external-link"><span class="pkg">VennDiagram</span></a> plotting function.</p></li>
 <li><p><code>areas</code> The total area for each plotted group.</p></li>
 <li><p><code>intersectionCounts</code> The number of intersections between groups.</p></li>
 </ul><p>The order for the <code>areas</code> and <code>intersectionCounts</code> fields is the same as the parameter order
@@ -337,7 +353,7 @@ information such as element counts.</p></li>
 <li><p><code>delete(featureAnnotations)</code>: Completely deletes specified annotations.</p></li>
 <li><p><code>filter(featureAnnotations)</code>: Provides rule based filtering for feature group annotations. Useful to eliminate
 unlikely candidates and speed up further processing.</p></li>
-<li><p><code>plotVenn(featureAnnotations)</code>: plots a Venn diagram (using <span class="pkg">VennDiagram</span>) outlining unique and shared
+<li><p><code>plotVenn(featureAnnotations)</code>: plots a Venn diagram (using <a href="https://CRAN.R-project.org/package=VennDiagram" class="external-link"><span class="pkg">VennDiagram</span></a>) outlining unique and shared
 candidates of up to five different <code>featureAnnotations</code> objects.</p></li>
 <li><p><code>plotUpSet(featureAnnotations)</code>: plots an UpSet diagram (using the <code><a href="https://rdrr.io/pkg/UpSetR/man/upset.html" class="external-link">upset</a></code> function) outlining
 unique and shared candidates between different <code>featureAnnotations</code> objects.</p></li>

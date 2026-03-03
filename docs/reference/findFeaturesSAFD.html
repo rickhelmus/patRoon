@@ -18,7 +18,7 @@ still experimental. Please see the details below."><!-- mathjax --><script src="
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.0</span>
       </span>
     </div>
 
@@ -99,7 +99,7 @@ still experimental. Please see the details below.</p>
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">findFeaturesSAFD</span><span class="op">(</span></span>
 <span>  <span class="va">analysisInfo</span>,</span>
-<span>  profPath <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  prefCentroid <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  mzRange <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">400</span><span class="op">)</span>,</span>
 <span>  maxNumbIter <span class="op">=</span> <span class="fl">1000</span>,</span>
 <span>  maxTPeakW <span class="op">=</span> <span class="fl">300</span>,</span>
@@ -110,6 +110,8 @@ still experimental. Please see the details below.</p>
 <span>  sigIncThreshold <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>  S2N <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  minPeakWS <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  centroidMethod <span class="op">=</span> <span class="st">"RFM"</span>,</span>
+<span>  centroidDM <span class="op">=</span> <span class="fl">0.005</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -119,21 +121,28 @@ still experimental. Please see the details below.</p>
 
 
 <dl><dt id="arg-analysisinfo">analysisInfo<a class="anchor" aria-label="anchor" href="#arg-analysisinfo"></a></dt>
-<dd><p>A <code>data.frame</code> with <a href="analysis-information.html">Analysis information</a>.</p></dd>
+<dd><p>A <code>data.frame</code> (or <code>data.table</code>) with <a href="analysis-information.html">Analysis
+information</a>.</p></dd>
 
 
-<dt id="arg-profpath">profPath<a class="anchor" aria-label="anchor" href="#arg-profpath"></a></dt>
-<dd><p>A <code>character</code> vector with paths to the profile MS data for each analysis (will be re-cycled if
-necessary). See the <code>Using SAFD</code> section for more details.</p></dd>
+<dt id="arg-prefcentroid">prefCentroid<a class="anchor" aria-label="anchor" href="#arg-prefcentroid"></a></dt>
+<dd><p>Set to <code>TRUE</code> to prefer centroided data over other MS data specified in <code>analysisInfo</code>.</p>
+<p><strong>NOTE</strong>: if <code>prefCentroid=FALSE</code> but the package option <span class="option">patRoon.MS.preferIMS=TRUE</span> (see
+  <code><a href="msdata.html">msdata</a></code>), then centroided data will still be preferred over IMS data.</p></dd>
 
 
 <dt id="arg-mzrange">mzRange<a class="anchor" aria-label="anchor" href="#arg-mzrange"></a></dt>
-<dd><p>The <em>m/z</em> window to be imported (passed to the <code>import_files_MS1</code> function).</p></dd>
+<dd><p>The <em>m/z</em> window to be imported.</p></dd>
 
 
 <dt id="arg-maxnumbiter-maxtpeakw-resolution-minmsw-rthreshold-minint-sigincthreshold-s-n-minpeakws">maxNumbIter, maxTPeakW, resolution, minMSW, RThreshold, minInt, sigIncThreshold, S2N, minPeakWS<a class="anchor" aria-label="anchor" href="#arg-maxnumbiter-maxtpeakw-resolution-minmsw-rthreshold-minint-sigincthreshold-s-n-minpeakws"></a></dt>
 <dd><p>Parameters directly
 passed to the <code>safd_s3D</code> function.</p></dd>
+
+
+<dt id="arg-centroidmethod-centroiddm">centroidMethod, centroidDM<a class="anchor" aria-label="anchor" href="#arg-centroidmethod-centroiddm"></a></dt>
+<dd><p>Passed to the <code>safd_s3d_cent</code> function (<code>method</code> and <code>mdm</code> arguments,
+respectively).</p></dd>
 
 
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
@@ -149,14 +158,19 @@ passed to the <code>safd_s3D</code> function.</p></dd>
     <p>This function uses SAFD to automatically find features. This function is called when calling <code>findFeatures</code> with
   <code>algorithm="safd"</code>.</p>
 <p>The support for SAFD is still experimental, and its interface might change in the future.</p>
-<p>In order to use SAFD, please make sure that its <code>julia</code> packages are installed and you have verified that
-  everything works, <em>e.g.</em> by running the test data.</p>
-<p>This algorithm supports profile and centroided MS data. If the use of profile data is desired, centroided data
-  must still be available for other functionality of <code>patRoon</code>. The centroided data is specified through the
-  'regular' <a href="analysis-information.html">analysis info</a> mechanism. The location to any profile data is specified
-  through the <code>profPath</code> argument (<code>NULL</code> for no profile data). The base file names (<em>i.e.</em> the file
-  name without path and extension) of both centroid and profile data must be the same. Furthermore, the format of the
-  profile data must be <code class="file">mzXML</code>.</p>
+<p>In order to use SAFD, please make sure that its <code class="command">Julia</code> packages are installed and you have verified that
+  everything works, <em>e.g.</em> by running the test data with <code class="command">SAFD</code>.</p>
+<p>As of <span class="pkg">patRoon</span> <samp>3.0</samp>, <code>findFeaturesSAFD</code> uses the <a href="msdata.html">msdata</a> interface instead of the
+  <span class="pkg">MS_Import.jl</span> <code class="command">Julia</code> package to read HRMS data. This means that <span class="pkg">MS_Import.jl</span> does not need to
+  be installed, and all file formats supported by <a href="msdata.html">msdata</a> are also supported for <code class="command">SAFD</code> feature
+  detection. This includes IMS-HRMS data, however, in that case IMS resolved spectra are summed and the IMS dimension
+  is removed to make the data compatible for <code class="command">SAFD</code>.</p>
+<p>The <code class="command">SAFD</code> algorithm was primarily developed to detect features in profile <em>m/z</em> data, but centroided
+  data is also supported. To use profile data, ensure that the paths are correctly set up in the
+  <a href="analysis-information.html">analysisInfo</a>. Furthermore, when using profile data you probably also need to specify
+  centroided data in the <code>analysisInfo</code>, as <em>e.g.</em> <code><a href="generateMSPeakLists.html">generateMSPeakLists</a></code> currently does not
+  support profile data. If IMS-HRMS data is used it is treated as profile data, as this data is typically not or
+  partially centroided (<code>generateMSPeakLists</code> supports IMS-HRMS data directly).</p>
     </div>
     <div id="parallelization">
     <h2>Parallelization</h2>

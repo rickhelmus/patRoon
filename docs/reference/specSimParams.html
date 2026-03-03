@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.0</span>
       </span>
     </div>
 
@@ -113,7 +113,8 @@
 <li><p><code>removePrecursor</code> If <code>TRUE</code> then precursor peaks (<em>i.e.</em> the mass peak corresponding to the
 feature) are removed prior to similarity calculation.</p></li>
 <li><p><code>mzWeight</code>,<code>intWeight</code> Mass and intensity weights used for cosine calculation.</p></li>
-<li><p><code>absMzDev</code> Maximum absolute <em>m/z</em> deviation between mass peaks, used for binning spectra.</p></li>
+<li><p><code>absMzDev</code> Maximum absolute <em>m/z</em> deviation between mass peaks, used for binning spectra. Defaults to
+<code>defaultLim("mz", "medium")</code> (see <a href="limits.html">limits</a>).</p></li>
 <li><p><code>relMinIntensity</code> The minimum relative intensity for mass peaks (<samp>0-1</samp>). Peaks with lower intensities
 are not considered for similarity calculation. The relative intensities are called after the precursor peak is
 removed when <code>removePrecursor=TRUE</code>.</p></li>

@@ -1,32 +1,109 @@
 # patRoon 3.0
 
 This release adds a significant amount of new functionality and changes. Please see the updated Handbook and sections
-below for more information.
-
-Users of previous `patRoon` versions should inform themselves with the important changes highlighted in the next
-section. Furthermore, it is highly recommended to remove any cached data, i.e. by running `clearCache("all")` or
-manually removing the `cache.sqlite` file from your project directory.
+below for more information. Users of previous `patRoon` versions should inform themselves with the important changes
+highlighted in the next section.
 
 ## Upgrading notes
 
-- do estimateIDConfidence() in advance for suspects
+This releases adds changes to various functions to improve consistency and support new functionality. While care was
+taken to avoid breaking changes, some changes will affect existing workflows. Below is a summary of important points.
 
+* As usual, the caching format was changed, so it is important to clear the cache when updating to this release. This can
+be done by running `clearCache("all")` or manually removing the `cache.sqlite` file from your project directory.
+* The analysis information table format was changed to support new functionality, file formats and cleanup.
+    1. Rename the `"group"` column to `"replicate"`
+    2. Adjust the `path` column to the new format: `path_raw`, `path_centroid`, `path_profile` and `path_ims`. Often,
+renaming `path` to `path_centroid` is sufficient.
+* The `generateAnalysisInfo()` function was updated for the new format. The `fromXXX` function arguments need to be set
+properly. See `?generateAnalysisInfo` for more details.
+* The `convertMSFiles()` interface has various small changes to simplify its usage and extend support. For instance:
+
+    ```r
+    # pre 3.0
+    convertMSFiles(anaInfo = anaInfo, from = "bruker", to = "mzML", algorithm = "pwiz", centroid = "vendor",
+                   overWrite = FALSE)
+    # 3.0
+    convertMSFiles(anaInfo, typeFrom = "raw", formatFrom = "bruker", typeTo = "centroid", formatTo = "mzML",
+                   algorithm = "pwiz", overwrite = FALSE)
+    ```
+
+    Please see `?convertMSFiles` for more details.
+
+* MS peak list generation: the previous backends ("algorithms") are now deprecated and no algorithm argument
+should be specified. The interface was also simplfied. See (`?generateMSPeakLists` for details). E.g.:
+
+    ```r
+    # pre 3.0
+    mslists <- generateMSPeakLists(fGroups, "mzr", maxMSRtWindow = 5, precursorMzWindow = 4, avgFeatParams = ...,
+                                   avgFGroupParams = ...)
+    # 3.0
+    mslists <- generateMSPeakLists(fGroups, maxMSRTWindow = 5, avgFeatParams = ..., avgFGroupParams = ...)
+    ```
+
+* The filtering of MS peak list was simplified and is now done per MS level (see `?MSPeakLists` for details):
+
+    ```r
+    # pre 3.0
+    mslists <- filter(mslists, relMSMSIntThr = 0.05, topMSMSPeaks = 25, ...)
+    # 3.0
+    mslists <- filter(mslists, msLevel = 2, relMinIntensity = 0.05, topMost = 25, ...)
+    ```
+* The estimation of identification confidence levels was extended beyond suspect screening workflows. The
+`annotateSuspects()` function was renamed to `estimateIDConfidence()`. This function should also be used to estimate ID
+levels for feature annotation candidates. See `?estimateIDConfidence` for details. Eg:
+
+    ```r
+    # pre 3.0
+    fGroups <- annotateSuspects(fGroups, formulas = formulas, compounds = compounds, MSPeakLists = mslists,
+                                IDFile = "idlevelrules.yml")
+    # 3.0
+    formulas <- estimateIDConfidence(formulas, IDFile = "idlevelrules.yml")
+    compounds <- estimateIDConfidence(compounds, MSPeakLists = mslists, formulas = formulas, IDFile = "idlevelrules.yml")
+    fGroups <- estimateIDConfidence(fGroups, formulas = formulas, compounds = compounds, MSPeakLists = mslists,
+                                    IDFile = "idlevelrules.yml")
+    ```
+    
+* The default rules for ID level estimation was changed for level 3a. Either re-generate the file by running
+`genIDLevelRulesFile("idlevelrules.yml")` or update the existing file by changing the `individualMoNAScore` and `libMatch` thresholds
+to 0.7.
+
+* The report configuration file was updated. Run the following to update an existing file:
+
+    ```r
+    genReportSettingsFile("report.yml", baseFrom = "report.yml")
+    ```
+
+* The default numeric limits were centralized (discussed further below). To generate a new file for configuration:
+
+    ```r
+    genLimitsFile()
+    ```
+    
+    See `?limits` for details.
+
+* Several defaults and names for function arguments were changed (discussed further below).
+
+Please read the remaining sections below and updated documentation for more details and changes. Furthermore, it may be
+useful to compare the script output of `newProject()` to see how these changes may affect your workflow. Finally, feel
+free to contact or create a GitHub issue when in doubt.
 
 ## Major new functionality
 
 ### IMS workflows
 
-The 3.0 release is primarily centered around support ion mobility separation (IMS) coupled to HRMS workflows. This
+The 3.0 release is primarily centered around supporting ion mobility separation (IMS) coupled to HRMS workflows. This
 technique brings several important benefits for NTA, such as an additional parameter for feature annotation (collision
 cross section or CCS), cleaning up of HRMS data to improve feature detection and annotation, improved separation of
 compounds with equal or close m/z and support of rapid and selective MS/MS (PASEF). The complete workflow was upgraded
-to support IMS-HRMS data and make use of the benefits from this technique. Please see the new IMS chapter in the Handbook.
+to support IMS-HRMS data and make use of the benefits from this technique. Please see the new IMS chapter in the
+Handbook for further details.
 
 ### `msdata` interface
 
-A new raw data interface was introduced to efficiently read complex raw data. The primary motivation was to support the
-complexity and specific formatting of IMS-HRMS data, but the applied optimizations also benefit classcial HRMS
-workflows. More information on `msdata` and its configuration is detailed in the Handbook.
+The new `msdata` raw data interface was introduced to efficiently read complex raw data. The primary motivation was to
+support the complexity and specific formatting of IMS-HRMS data, but the applied optimizations also benefit classical
+HRMS workflows. More information on `msdata` and its configuration is detailed in the Handbook.
 
 **NOTE**: due to (slight) changes rounding numerical data there may be slight differences in EICs, spectra and feature data compared to the old interface.
 
@@ -36,7 +113,7 @@ This release adds the newly developed `piek` algorithm, which is a simple, flexi
 features in both HRMS and IMS-HRMS data. Furthermore, the `greedy` algorithm was added to provide fast grouping of
 features across samples and also supports both HRMS and IMS-HRMS data. Both algorithms are embedded in `patRoon 3.0` and
 therefore don't need any installation of external software. See the Handbook and reference manual (`?findFeaturesPiek`
-and `groupFeaturesGreedy`) for further details.
+and `?groupFeaturesGreedy`) for further details.
 
 ### Sample metadata and analysis information
 
@@ -50,9 +127,10 @@ metadata. Furthermore, see below for more details which functions were changed.
 
 ### Transformation products
 
-Two new algorithms were added for finding transformation products: `"ann_form"` and `"ann_comp"`. These algorithms use
-data from a thorough feature annotation of unknown features, to find candidates with plausible formulae or structures
-compared to given parents. The algorithms were based on the work described in 10.1021/acs.est.4c09121.
+Two new algorithms were added for finding transformation products: `"ann_form"` (`generateTPsAnnForm()`) and
+`"ann_comp"` (`generateTPsAnnComp()`). These algorithms use data from a thorough feature annotation of unknown features
+to find candidate TPs and are eg scored on their 'fit' to given parents. The algorithms were based on the work described
+in 10.1021/acs.est.4c09121.
 
 ## Other new functionality
 
@@ -68,13 +146,16 @@ Several new data filters were added throughout the workflow:
 * `maxMZOverPrec`: eliminate peaks with higher m/z values than precursors in MS2 data.
 * `fragFormulas` and `lossFormulas`: filter candidates by matching fragment or neutral loss formulae.
 
-This release adds the MS2 background subtraction and identification confidence level estimation for unknowns described
-in 10.1021/acs.est.4c09121. The latter functionality allows the estimation of ID levels for formula and compound
-candidates obtained during feature annotation. The approach is similar (but optimized) compared to the previously
-introduced system for suspect screening workflows. Similar filters existing to remove candidates with poor ID levels.
+This release adds approaches to subtract MS2 background and estimate identification confidence levels unknowns, as
+described in 10.1021/acs.est.4c09121. The latter functionality allows the estimation of ID levels for formula and
+compound candidates obtained during feature annotation. The approach is similar (but optimized) compared to the
+previously introduced system for suspect screening workflows. Similar filters existing to remove candidates with poor ID
+levels. See the updated Handbook and reference manual (`?getBGMSMSPeaks` and `?estimateIDConfidence`) for more details.
 
-The code behind `newProject()` and `report()` was considerably optimized and improved. Furthermore, various improvements
-were made for the reporting interface, to reduce file size, and improve self-contained report files.
+The code behind `newProject()` and `report()` was considerably optimized and improved. The `newProject()` function was
+updated to support all the new functionality introduced in `patRoon 3.0`. The reporting interface was improved in
+various ways, and the output files are smaller due to lzstring compression and optimizations were applied for
+self-contained report files.
 
 Finally, the `updateGroups()` method function was added to re-calculate feature group properties (RT, m/z and mobility).
 This function is primarily intended to be used after filtering steps of feature data. Re-calculating aforementioned
@@ -130,7 +211,7 @@ which can be used to specify the paths to different types of data. If only a `pa
 * Any additional columns with free-form data can be included and can be used to post-process feature data (see below).
 * A new function was added to adjust analysis information during the workfow (`analysisInfo()<-`).
 * Similarly, the new `reorder` argument to `[` can be used to reorder the sample analyses, which may e.g. be useful for plotting.
-* The `generateAnalysisInfo()` function was updated for the changes: please see the updated [Handbook] for its new interface.
+* The `generateAnalysisInfo()` function was updated for the changes: please see `?generateAnalysisInfo` for its new interface.
 * Using sample metadata for grouping and aggregation
     * New function arguments to group & aggregate data (e.g. `groupBy`, `aggregate`) were added to `unique()`, `overlap()` and plotting functions.
     * In some cases these replace older function arguments
@@ -142,7 +223,7 @@ which can be used to specify the paths to different types of data. If only a `pa
             * the `average` argument can now be used to average by grouping specified by metadata columns.
             * `average` can now be set to `fGroups` to average all properties for each feature group (works if `features=TRUE` or `features=FALSE`).
             * The `anaInfoCols` argument can be used to add metadata to the output table.
-* The subset operator for features and feature groups (`[`) now supports subsetting by sample metadata and other data in the analysis information with the new `ni` argument. This approach was based on data is subset with `data.table`.
+* The subset operator for features and feature groups (`[`) now supports subsetting by sample metadata and other data in the analysis information with the new `ni` argument. This approach was based on how data is subset with `data.table`.
 * Using sample metadata for linear regression of feature intensities
     * The `as.data.table()` and `plotInt()` functions were updated to improve support for linear regression. These functions can now use any sample metadata column(s) to easily perform a linear regression versus feature intensities/areas.
     * `plotInt()`: see the `xBy`, `groupBy` and `regression` function arguments.
@@ -220,25 +301,25 @@ In most cases `fixedIsolationWidth=FALSE` is recommended.
         * added `getFeatureQualityNames()` generic to obtain the quality/score names for a `features`/`featureGroups` object
         * added `featureQualities` and `featureGroupQualities` arguments to `calculatePeakQualities()` methods to customize calculation.
     * The `delete()` method function for suspect screening results can now remove suspect hits through the `k` function argument
-    * loading OpenMS peak intensities is now much faster and removed now unneeded intSearchRTWindow function argument
-    * feature ID column is now always of character type
-    * optimized suspect screening
+    * Loading OpenMS peak intensities is now much faster and removed now unneeded intSearchRTWindow function argument
+    * Feature ID column is now always of character type
+    * Optimized suspect screening
     * The unique and total suspects/suspect hits are now (consistently) printed
     * `plotInt()`: added `areas`, `averageFunc`, `xlim` and `ylim` function arguments
     * `plotChroms3D()` function to plot 3D feature data (retention, intensity and m/z or mobility)
     * `filter()`: `removeISTDs` and `onlyHits` are now cached like other filters
     * `as.data.table()`
-        * columns with text data are now collapsed instead of removed if `features=TRUE` and results are averaged
+        * Columns with text data are now collapsed instead of removed if `features=TRUE` and results are averaged
         * Fold Change calculation is now possible if `features==TRUE`
         * The `adduct` column is split per set and renamed to `group_adduct` if `features=TRUE`
         * The intensity and area columns are now suffixed (`_intensity`/`_area`) if `features=FALSE`.
         * added susp_bestEstIDLevel column
         * moved all docs to new page with all as.data.table() methods: see ``?`feature-table` ``
-    * `overlap()` `which` can be set to `NULL` to consider all compared data groups.
+    * `overlap()`: `which` can be set to `NULL` to consider all compared data groups.
     * Gathering of feature data for EIC construction was considerably optimized.
     * `getPICSet()` can now import features from non-centroid or IMS data
     *  `getPICSet()` and `calculatePeakQualities()` now gain `EICParams` function arguments to configure EIC construction.
-    * The `ion_mz` is column to feature tables and annotations, which represents the original m/z of the ion in sets workflows.
+    * A new `ion_mz` column is added to feature tables and annotations, which represents the original m/z of the ion in sets workflows.
     * The class for suspect screening+sets workflows (`featureGroupsScreeningSet`) doesn't have setObjects anymore, which makes common operations faster
     * Changes related to support IMS workflows
         * the `features` class gained `hasIMS` and `fromIMS` slots and method accessors.

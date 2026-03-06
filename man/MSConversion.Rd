@@ -9,7 +9,7 @@
 \alias{convertMSFilesBruker}
 \alias{convertMSFilesIMSCollapse}
 \alias{convertMSFilesTIMSCONVERT}
-\alias{convertMSFilePaths}
+\alias{convertMSFilesPaths}
 \alias{convertMSFiles}
 \title{MS data conversion}
 \usage{
@@ -61,7 +61,7 @@ convertMSFilesTIMSCONVERT(
   virtualenv = "patRoon-TIMSCONVERT"
 )
 
-convertMSFilePaths(
+convertMSFilesPaths(
   files,
   formatFrom,
   formatTo = "mzML",
@@ -149,7 +149,7 @@ perform 'classical LC-MS workflows' with IMS data.}
 \item{\dots}{For \code{convertMSFilesIMSCollapse}: further arguments passed to
   \code{\link[mzR:writeMSData]{mzR::writeMSData}}.
 
-  For \code{convertMSFilePaths} and \code{convertMSFiles}: further arguments passed to algorithm specific conversion
+  For \code{convertMSFilesPaths} and \code{convertMSFiles}: further arguments passed to algorithm specific conversion
   functions.}
 
 \item{centroidRaw}{Only applicable if \code{IMS=FALSE}. Sets the \code{mode} parameter of \command{TIMSCONVERT}:
@@ -206,10 +206,10 @@ Conversion of MS analysis files between several open and closed data formats.
   \href{https://gtluu.github.io/timsconvert/}{TIMSCONVERT}. The \code{\link{installTIMSCONVERT}} function can be used
   to automatically install \command{TIMSCONVERT}.
 
-\code{convertMSFilePaths} is a wrapper function that simplifies the use of algorithm specific MS conversion
+\code{convertMSFilesPaths} is a wrapper function that simplifies the use of algorithm specific MS conversion
   functions, such as \code{convertMSFilesPWiz}, and \code{convertMSFilesTIMSCONVERT}.
 
-\code{convertMSFiles} is a wrapper function that simplifies the use of \code{convertMSFilePaths}.
+\code{convertMSFiles} is a wrapper function that simplifies the use of \code{convertMSFilesPaths}.
 }
 \section{Parallelization}{
  \code{convertMSFilesPWiz}, \code{convertMSFilesOpenMS} and \code{convertMSFilesTIMSCONVERT} uses multiprocessing to parallelize

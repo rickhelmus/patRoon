@@ -37,7 +37,7 @@
 #' @param \dots For \code{convertMSFilesIMSCollapse}: further arguments passed to
 #'   \code{\link[mzR:writeMSData]{mzR::writeMSData}}.
 #'
-#'   For \code{convertMSFilePaths} and \code{convertMSFiles}: further arguments passed to algorithm specific conversion
+#'   For \code{convertMSFilesPaths} and \code{convertMSFiles}: further arguments passed to algorithm specific conversion
 #'   functions.
 #'
 #' @templateVar what \code{convertMSFilesPWiz}, \code{convertMSFilesOpenMS} and \code{convertMSFilesTIMSCONVERT}
@@ -492,7 +492,7 @@ convertMSFilesTIMSCONVERT <- function(inFiles, outFiles, formatTo = "mzML", cent
     invisible(NULL)
 }
 
-#' @details \code{convertMSFilePaths} is a wrapper function that simplifies the use of algorithm specific MS conversion
+#' @details \code{convertMSFilesPaths} is a wrapper function that simplifies the use of algorithm specific MS conversion
 #'   functions, such as \code{convertMSFilesPWiz}, and \code{convertMSFilesTIMSCONVERT}.
 #'
 #' @param files,dirs The \code{files} argument should be a \code{character} vector with input files. If \code{files}
@@ -502,7 +502,7 @@ convertMSFilesTIMSCONVERT <- function(inFiles, outFiles, formatTo = "mzML", cent
 #'
 #' @rdname MSConversion
 #' @export
-convertMSFilePaths <- function(files, formatFrom, formatTo = "mzML", outPath = NULL, dirs = TRUE, overwrite = FALSE,
+convertMSFilesPaths <- function(files, formatFrom, formatTo = "mzML", outPath = NULL, dirs = TRUE, overwrite = FALSE,
                                algorithm = "pwiz", ...)
 {
     ac <- checkmate::makeAssertCollection()
@@ -570,7 +570,7 @@ convertMSFilePaths <- function(files, formatFrom, formatTo = "mzML", outPath = N
     }
 }
 
-#' @details \code{convertMSFiles} is a wrapper function that simplifies the use of \code{convertMSFilePaths}.
+#' @details \code{convertMSFiles} is a wrapper function that simplifies the use of \code{convertMSFilesPaths}.
 #'
 #' @param anaInfo An \link[=analysis-information]{analysis info table} that is used to retrieve the input files. The
 #'   paths set by \code{path_centroid}, \code{path_profile} and \code{path_ims} are used to determine the output
@@ -629,5 +629,5 @@ convertMSFiles <- function(anaInfo, typeFrom = "raw", typeTo = "centroid", forma
     else if (algorithm == "timsconvert")
         args <- c(args, list(centroid = typeTo == "centroid", IMS = typeTo == "ims"))
     
-    do.call(convertMSFilePaths, args)
+    do.call(convertMSFilesPaths, args)
 }

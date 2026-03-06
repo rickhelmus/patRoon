@@ -391,6 +391,12 @@ test_that("TP settings", {
     testNewProj(annotations = list(compoundsAlgo = "MetFrag"),
                 TPs = list(TPsAlgo = "biotransformer", TPGenInput = "suspects", TPSuspectList = "suspects",
                            TPDoMFDB = FALSE), name = "tp-biotransformer_no_mfdb")
+    testNewProj(general = list(IMS = list(mode = "direct")),
+                features = list(featAlgo = "piek", fGroupsAlgo = "Greedy"),
+                annotations = list(compoundsAlgo = "MetFrag"),
+                TPs = list(TPsAlgo = "biotransformer", TPGenInput = "suspects", TPSuspectList = "suspects",
+                           suspCCSPred = "c3sdb"),
+                name = "tp-biotransformer_ims")
     testNewProj(features = list(exSuspList = TRUE),
                 TPs = list(TPsAlgo = "cts", TPGenInput = "screening"), name = "tp-cts_scr")
     testNewProj(TPs = list(TPsAlgo = "library", TPGenInput = "all"), name = "tp-library")

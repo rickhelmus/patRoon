@@ -270,6 +270,9 @@
       $TPs$TPDoMFDB
       [1] FALSE
       
+      $TPs$suspCCSPred
+      [1] "none"
+      
       
       $report
       $report$reportGen

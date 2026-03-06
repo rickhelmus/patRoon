@@ -78,18 +78,6 @@
 - mzRange, mzDefectRange and IMSRangeParams use neutral masses instead of m/z values in sets workflows --> change? (now documented)
 
 
-## newProject()
-
-- remove conc column?
-- IMS changes
-    - Codegen
-        - Add mobility filters for suspects & compounds?
-        - is assignMobilities() before TP componentization OK?
-            - IMS="maybe", so probably fine?
-        - predict CCS for TPs?
-        - don't do CCS prediction with PCL+MetFrag?
-
-
 ## IMS
 
 - rename and split assignMobilities()?
@@ -119,7 +107,6 @@
     - checkFeatures()/checkComponents() verify if things still work
     - manually check all HTML reporting functionality at the end
     - check updates for mobilities to checkFeatures(), checkComponents() and importCheckFeaturesSession()
-    - test updated verifyDependencies()
 
 
 ## Docs

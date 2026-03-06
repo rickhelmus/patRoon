@@ -596,7 +596,7 @@ genScriptScreenBlock <- function(ionization, settingsFeat, adductArg, amendScrFo
         generator$addScreenCall("list(suspListPos, suspListNeg)", adductArg, !amendScrForTPs)
 }
 
-genScriptTPInitBlock <- function(ionization, settingsTP, adductArg, amendScrForTPs, generator)
+genScriptTPInitBlock <- function(ionization, IMS, settingsTP, adductArg, amendScrForTPs, generator)
 {
     adductArg$condition <- adductArg$condition && settingsTP$TPsAlgo == "logic"
     
@@ -639,6 +639,16 @@ genScriptTPInitBlock <- function(ionization, settingsTP, adductArg, amendScrForT
             list(value = "TPs"),
             list(name = "includeParents", value = FALSE)
         ))
+        if (IMS$mode != "none" && settingsTP$suspCCSPred != "none")
+        {
+            generator$addCall("suspListTPs", "assignMobilities", list(
+                list(value = "suspListTPs"),
+                list(name = "from", value = settingsTP$suspCCSPred, quote = TRUE),
+                list(name = "CCSParams", value = "CCSParams", condition = IMS$CCSMethod != "none"),
+                list(name = "adducts", value = c('"[M+H]+"', '"[M-H]-"', NA)),
+                list(name = "overwrite", value = FALSE)
+            ))
+        }
         if (amendScrForTPs)
             generator$addComment("Amend with TP screening")
         generator$addScreenCall("suspListTPs", adductArg, am = if (amendScrForTPs) TRUE else NULL)
@@ -947,7 +957,7 @@ getScriptCode <- function(CCSCalibrant, anaInfoData, settings, noDate)
     # NOTE: we do TPs from ann_form/ann_comp later as it needs feature annotations (and doesn't need screening of TP
     # suspects)
     if (doTPs && !doTPsAnn)
-        genScriptTPInitBlock(ionization, settings$TP, adductArg, amendScrForTPs, generator)
+        genScriptTPInitBlock(ionization, settings$general$IMS, settings$TP, adductArg, amendScrForTPs, generator)
     
     if (settings$general$IMS$mode == "post")
         genScriptFeatMobBlock(settings$general$IMS, settings$features, doSusps, generator)
@@ -961,7 +971,7 @@ getScriptCode <- function(CCSCalibrant, anaInfoData, settings, noDate)
     if (doTPs)
     {
         if (doTPsAnn)
-            genScriptTPInitBlock(ionization, settings$TP, adductArg, amendScrForTPs, generator)
+            genScriptTPInitBlock(ionization, settings$general$IMS, settings$TP, adductArg, amendScrForTPs, generator)
         genScriptTPCompBlock(nzchar(settings$annotation$formulasAlgo), nzchar(settings$annotation$compoundsAlgo),
                              settings$TP$TPsAlgo, generator)
     }

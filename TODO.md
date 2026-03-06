@@ -129,17 +129,10 @@
     - installation
         - verify R installation table when new deps in patRoonDeps are added
         - mention that for dev PKG_BUILD_EXTRA_FLAGS/pkg.build_extra_flags should be disabled
+    - check: are TP docs updated for ADT(candidates=T)? And getDefTPStructParams()?
 - add refs to paper: piek, assignMobilities(), peakParams, greedy, IMSCollapse
+    - also in in NEWS (IMS, msdata etc)?
 
-## NEWS
-
-- IMS
-    - mzExpIMSWindow EIXParam
-    - hasIMS and other slots for features
-    - plotChroms(): annotate now has mob option
-    - IMS arg for [, filter(), plotting functions, ADT, getQuantCalibFromScreening(), export(), getXCMS...()
-    - applyIMS arg for all fGroups filter methods
-    - withIMSParent arg for filter()
 
 ## Features
 

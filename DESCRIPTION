@@ -142,7 +142,8 @@ Suggests:
     MS2Tox,
     ChemmineR,
     fmcsR,
-    reticulate
+    reticulate,
+    Rmstoolkitlib
 LinkingTo:
     Rcpp,
     rapidjsonr

@@ -9,8 +9,8 @@ highlighted in the next section.
 This releases adds changes to various functions to improve consistency and support new functionality. While care was
 taken to avoid breaking changes, some changes will affect existing workflows. Below is a summary of important points.
 
-* As usual, the caching format was changed, so it is important to clear the cache when updating to this release. This can
-be done by running `clearCache("all")` or manually removing the `cache.sqlite` file from your project directory.
+* It is important to clear the cache when updating to this release. This can be done by running `clearCache("all")`
+or manually removing the `cache.sqlite` file from your project directory.
 * The analysis information table format was changed to support new functionality, file formats and cleanup.
     1. Rename the `"group"` column to `"replicate"`
     2. Adjust the `path` column to the new format: `path_raw`, `path_centroid`, `path_profile` and `path_ims`. Often,
@@ -41,7 +41,7 @@ should be specified. The interface was also simplfied. See (`?generateMSPeakList
     mslists <- generateMSPeakLists(fGroups, maxMSRTWindow = 5, avgFeatParams = ..., avgFGroupParams = ...)
     ```
 
-* The filtering of MS peak list was simplified and is now done per MS level (see `?MSPeakLists` for details):
+* The filtering of MS peak lists is simplified and is now done per MS level (see `?MSPeakLists` for details):
 
     ```r
     # pre 3.0
@@ -103,7 +103,8 @@ Handbook for further details.
 
 The new `msdata` raw data interface was introduced to efficiently read complex raw data. The primary motivation was to
 support the complexity and specific formatting of IMS-HRMS data, but the applied optimizations also benefit classical
-HRMS workflows. More information on `msdata` and its configuration is detailed in the Handbook.
+HRMS workflows. More information on `msdata` and its configuration is detailed in the Handbook and reference manual
+(`?msdata`).
 
 **NOTE**: due to (slight) changes rounding numerical data there may be slight differences in EICs, spectra and feature data compared to the old interface.
 
@@ -120,24 +121,29 @@ and `?groupFeaturesGreedy`) for further details.
 A lot of existing functionality was upgraded to support the use of sample metadata in post-processing operations, such
 as easily making sample groups from metadata for plotting and aggregation of data. Furthermore, the (previously very
 basic) support for applying linear regression to eg prioritize feature data was improved considerably, and was primarily
-motivated to improve feature prioritization of unknown transformation products (see 10.1021/acs.est.4c09121). Finally,
-functionality was added to easily subset features from metadata and update the analysis information in feature objects,
-e.g. to add or modify sample metadata. The Handbook was updated with a new subsection to demonstrate the use of sample
-metadata. Furthermore, see below for more details which functions were changed.
+motivated to improve feature prioritization of unknown transformation products (see
+[10.1021/acs.est.4c09121](http://doi.org/10.1021/acs.est.4c09121)). Finally, functionality was added to easily subset features
+from metadata and update the analysis information in feature objects, e.g. to add or modify sample metadata. The
+Handbook was updated with a new subsection to demonstrate the use of sample metadata. Furthermore, see below for more
+details which functions were changed.
 
 ### Transformation products
 
 Two new algorithms were added for finding transformation products: `"ann_form"` (`generateTPsAnnForm()`) and
 `"ann_comp"` (`generateTPsAnnComp()`). These algorithms use data from a thorough feature annotation of unknown features
 to find candidate TPs and are eg scored on their 'fit' to given parents. The algorithms were based on the work described
-in 10.1021/acs.est.4c09121.
+in [10.1021/acs.est.4c09121](http://doi.org/10.1021/acs.est.4c09121).
 
 ## Other new functionality
+
+### Importing feature data
 
 Support was added to import features from external data sources (which has been requested for a very long time!). The
 new functions `importFeaturesTable()` and `importFeaturesGroupsTable()` provide a way to import tabular data with raw or
 sample grouped features, respectively. See the updated Handbook and reference manual (`?importFeaturesTable` and
 `?importFeatureGroupsTable`) for more details.
+
+### New data filters
 
 Several new data filters were added throughout the workflow:
 
@@ -146,22 +152,26 @@ Several new data filters were added throughout the workflow:
 * `maxMZOverPrec`: eliminate peaks with higher m/z values than precursors in MS2 data.
 * `fragFormulas` and `lossFormulas`: filter candidates by matching fragment or neutral loss formulae.
 
+### MS2 background subtraction and ID confidence estimation for unknowns
+
 This release adds approaches to subtract MS2 background and estimate identification confidence levels unknowns, as
 described in 10.1021/acs.est.4c09121. The latter functionality allows the estimation of ID levels for formula and
 compound candidates obtained during feature annotation. The approach is similar (but optimized) compared to the
 previously introduced system for suspect screening workflows. Similar filters existing to remove candidates with poor ID
 levels. See the updated Handbook and reference manual (`?getBGMSMSPeaks` and `?estimateIDConfidence`) for more details.
 
+### Improvements for reporting and project creation
+
 The code behind `newProject()` and `report()` was considerably optimized and improved. The `newProject()` function was
 updated to support all the new functionality introduced in `patRoon 3.0`. The reporting interface was improved in
 various ways, and the output files are smaller due to lzstring compression and optimizations were applied for
 self-contained report files.
 
-Finally, the `updateGroups()` method function was added to re-calculate feature group properties (RT, m/z and mobility).
+### Updating feature group properties
+
+The new `updateGroups()` method function re-calculates feature group properties (RT, m/z and mobility).
 This function is primarily intended to be used after filtering steps of feature data. Re-calculating aforementioned
 properties can then be improved by exclusion of e.g. noisy features.
-
-Besides these there are _many_ more changes and new functionality. These are summarized in the next sections.
 
 
 ## Important changes
@@ -170,10 +180,10 @@ Besides these there are _many_ more changes and new functionality. These are sum
 
 The defaults for common numerical limits and thresholds (retention time, m/z and mobility) are now moved to a separate
 'limits file'. This simplifies the configuration of these parameters and avoids the need to configure them throughout
-all functions in the workflow. As a result, some default values may have been changed slightly for consistency. See the
+all functions in the workflow. As a result, some default values may have been slightly changed for consistency. See the
 Limits section in the Advanced chapter of the updated Handbook for more information.
 
-### Changed function argument defaults
+### Changed defaults
 
 * `generateFormulas()`: `calculateFeatures` now defaults to `FALSE`: this usually yields equally valid results and is generally much faster.
 * `generateCompoundsMetFrag()`
@@ -181,7 +191,7 @@ Limits section in the Advanced chapter of the updated Handbook for more informat
     * MetFusion scoring is not used anymore by default. The `scoreTypes` function argument can be configured to include it again.
 * `generateCompoundsLibrary()`
     * `specSimParamsLib` now defaults to the value for `specSimParams`
-    * `specSimParams` now defaults to removing the precursor mass peak
+    * `specSimParams` now defaults to excluding the precursor mass peak
 * Identification confidence levels: increased 3a library match threshold to a more reasonable value (from 0.4 to 0.7)
 
 
@@ -219,10 +229,10 @@ which can be used to specify the paths to different types of data. If only a `pa
         * `plotVenn()`, `overlap()`, `unique()`, `plotInt()`: `groupBy` replaces `sets`
         * `plotChord()`: `groupBy` replaces `outerGroups`, `aggregate` replaces `average`
         * `plotVenn()`, `overlap()`, `plotUpSet()`: `aggregate` replaces possibility to pass a `list` to `which`
-        * `as.data.table()`
-            * the `average` argument can now be used to average by grouping specified by metadata columns.
-            * `average` can now be set to `fGroups` to average all properties for each feature group (works if `features=TRUE` or `features=FALSE`).
-            * The `anaInfoCols` argument can be used to add metadata to the output table.
+    * `as.data.table()`
+        * the `average` argument can now be used to average by grouping specified by metadata columns.
+        * `average` can now be set to `fGroups` to average all properties for each feature group (works if `features=TRUE` or `features=FALSE`).
+        * The `anaInfoCols` argument can be used to add metadata to the output table.
 * The subset operator for features and feature groups (`[`) now supports subsetting by sample metadata and other data in the analysis information with the new `ni` argument. This approach was based on how data is subset with `data.table`.
 * Using sample metadata for linear regression of feature intensities
     * The `as.data.table()` and `plotInt()` functions were updated to improve support for linear regression. These functions can now use any sample metadata column(s) to easily perform a linear regression versus feature intensities/areas.
@@ -230,7 +240,7 @@ which can be used to specify the paths to different types of data. If only a `pa
     * `as.data.table()`: see the `regressionBy` function argument
     * `as.data.table()`: the `conc_reg` column was renamed to `x_reg`.
 * Internal changes
-    * the analysis information is now internally stored as `data.table`s for efficiency
+    * the analysis information is now internally stored as a `data.table` for efficiency.
     * the `featureGroups` objects do not store analysis information internally anymore, but instead refer to the analysis information stored in the respective `features` object.
     
 
@@ -241,7 +251,7 @@ DataAnalysis) are now deprecated and should not be used anymore. For this reason
 `generateMSPeakLists()` was removed and the `generateMSPeakListsMzR()`, `generateMSPeakListsDA()`,
 `generateMSPeakListsDAFMF()` functions are now marked as deprecated.
 * The `precursorMzWindow` is replaced by the `fixedIsolationWidth` function argument, with slightly different behavior.
-In most cases `fixedIsolationWidth=FALSE` is recommended.
+In most cases `fixedIsolationWidth=FALSE` is recommended: this automatically detects the used isolation window for DDA and disables it for DIA.
 * The averaging of spectra is now intensity weighted.
 * The parameters to average spectra were changed and extended (see ?`getDefAvgPListParams`)
     * The default method was changed from hierarchical clustering (`"hclust"`) to distance based averaging (`"distance_mean"`), which is faster and more suitable for large datasets such as IMS data.
@@ -252,7 +262,7 @@ In most cases `fixedIsolationWidth=FALSE` is recommended.
 ### Other
 
 * File conversion & raw data
-    * The interface for the `convertMSFiles()` was updated and split See the updated documentation (`?MSConversion`) for more details.
+    * The interface for the `convertMSFiles()` was updated and split. See the updated documentation (`?MSConversion`) for more details.
         * Algorithm specific functions are now exported: `convertMSFilesPwiz()`, `convertMSFilesBruker()`, `convertMSFilesOpenMS()`.
         * New algorithms were introduced for IMS conversion: `"timsconvert"` (`convertMSFilesTIMSCONVERT()`) and `"imscollapse"` (`convertMSFilesIMSCollapse()`).
         * **IMPORTANT** The low level functionality of `convertMSFiles()` function was split in to `convertMSFilesPaths()`. In most cases, `convertMSFiles()` is still used, but use `convertMSFilesPaths()` if file conversion should occur directly from file paths instead of a given analysis information table.
@@ -284,7 +294,7 @@ In most cases `fixedIsolationWidth=FALSE` is recommended.
         * For TP algorithms that work with possibly multiple candidates for a feature group, the candidates are stored in a separate table in the `candidates` column.
         * The `as.data.table()` function for TP components does not include candidates anymore by default: set `candidates=TRUE` to include them.
     * generateTPs()
-        * consistent calculation and configuration of log P / retDir calculations for all algorithms. Hence, results may differ.
+        * consistent calculation and configuration of log P / retDir calculations for all algorithms. Hence, results may differ compared to earlier `patRoon` versions.
         * Advanced parameters for calculation of log P values, structural similarity etc should now be configured through the `TPStructParams` function argument (see `?getDefTPStructParams`).
         * The retention direction calculation now also takes into account a minimum log P difference (besides minimum retention time). This will typically lead to different (but more reasonable) results. This can be disabled through the aforementioned `TPStructParams`.
 
@@ -300,27 +310,27 @@ In most cases `fixedIsolationWidth=FALSE` is recommended.
         * added `featureQualities()` and `featureGroupQualities()` functions to obtain the default qualities and calculation functions used by `MetaClean`
         * added `getFeatureQualityNames()` generic to obtain the quality/score names for a `features`/`featureGroups` object
         * added `featureQualities` and `featureGroupQualities` arguments to `calculatePeakQualities()` methods to customize calculation.
-    * The `delete()` method function for suspect screening results can now remove suspect hits through the `k` function argument
-    * Loading OpenMS peak intensities is now much faster and removed now unneeded intSearchRTWindow function argument
-    * Feature ID column is now always of character type
-    * Optimized suspect screening
-    * The unique and total suspects/suspect hits are now (consistently) printed
-    * `plotInt()`: added `areas`, `averageFunc`, `xlim` and `ylim` function arguments
-    * `plotChroms3D()` function to plot 3D feature data (retention, intensity and m/z or mobility)
-    * `filter()`: `removeISTDs` and `onlyHits` are now cached like other filters
+    * The `delete()` method function for suspect screening results can now remove suspect hits through the `k` function argument.
+    * Loading OpenMS peak intensities is now much faster and removed now unneeded intSearchRTWindow function argument.
+    * Feature ID column is now always of character type.
+    * Optimized suspect screening.
+    * The unique and total suspects/suspect hits are now (consistently) printed.
+    * `plotInt()`: added `areas`, `averageFunc`, `xlim` and `ylim` function arguments.
+    * `plotChroms3D()` function to plot 3D feature data (retention, intensity and m/z or mobility).
+    * `filter()`: `removeISTDs` and `onlyHits` are now cached like other filters.
     * `as.data.table()`
-        * Columns with text data are now collapsed instead of removed if `features=TRUE` and results are averaged
-        * Fold Change calculation is now possible if `features==TRUE`
+        * Columns with text data are now collapsed instead of removed if `features=TRUE` and results are averaged.
+        * Fold change calculation is now possible if `features==TRUE`.
         * The `adduct` column is split per set and renamed to `group_adduct` if `features=TRUE`
         * The intensity and area columns are now suffixed (`_intensity`/`_area`) if `features=FALSE`.
-        * added susp_bestEstIDLevel column
-        * moved all docs to new page with all as.data.table() methods: see ``?`feature-table` ``
+        * added `susp_bestEstIDLevel` column.
+        * moved all docs to new page with all `as.data.table()` methods: see ``?`feature-table` ``.
     * `overlap()`: `which` can be set to `NULL` to consider all compared data groups.
     * Gathering of feature data for EIC construction was considerably optimized.
     * `getPICSet()` can now import features from non-centroid or IMS data
     *  `getPICSet()` and `calculatePeakQualities()` now gain `EICParams` function arguments to configure EIC construction.
     * A new `ion_mz` column is added to feature tables and annotations, which represents the original m/z of the ion in sets workflows.
-    * The class for suspect screening+sets workflows (`featureGroupsScreeningSet`) doesn't have setObjects anymore, which makes common operations faster
+    * The class for suspect screening+sets workflows (`featureGroupsScreeningSet`) doesn't have `setObjects` anymore, which makes common operations faster
     * Changes related to support IMS workflows
         * the `features` class gained `hasIMS` and `fromIMS` slots and method accessors.
         * Several new advanced and IMS specific EIC parameters: see `?getDefEICParams`. 
@@ -329,59 +339,59 @@ In most cases `fixedIsolationWidth=FALSE` is recommended.
         * `filter()`: `applyIMS` to selectively apply filtering to features with or without IMS data.
         * `filter()`: `withIMSParent` filter to only keep features with IMS parents.
 * Feature annotation
-    * `plotSpectrum()`: `normalization` and `showLegend` function arguments
+    * `plotSpectrum()`: `normalization` and `showLegend` function arguments.
     * `estimateIDConfidence()` (previously `annotateSuspects`) is now faster.
 * Components
-    * components from `nontarget`: renamed "rt" column to "ret" for consistency
+    * components from `nontarget`: renamed "rt" column to "ret" for consistency.
 * Transformation products
     * `generateComponentsTPs()`
-        * slightly changed function argument order
+        * slightly changed function argument order.
         * The fragment and neutral loss matches are now calculated for all candidates (as done previously) and per candidate.
-        * `filter()` can now filter fragment and neutral loss matches per candidate
+        * `filter()` can now filter fragment and neutral loss matches per candidate.
         * The `componentsTPs` gained a few new slots, primarily for reporting.
 * Misc
-    * `patRoon.cache.maxEntries` package option (issue #139)
-    * Updated PubChem Transformations to 0.2.2
+    * `patRoon.cache.maxEntries` package option (issue #139).
+    * Updated PubChem Transformations to 0.2.2.
     * The default metabolic logic transformations are now accessible through the `TPLogicTransformations()` function.
-    * optimized future parallelization
-    * MS2Quant metadata is now also stored for sets workflow data (`MS2QuantMeta` slots for `fGroupsScreeningSet`, `formulasSet` and `compoundsSet`)
+    * Optimized future parallelization.
+    * MS2Quant metadata is now also stored for sets workflow data (`MS2QuantMeta` slots for `fGroupsScreeningSet`, `formulasSet` and `compoundsSet`).
     * `plotUpSet()` The `nsets` argument now defaults to `NULL`, meaning it will be set to the number of compared items.
 
 ## Fixes
 
 * Features
-    * Fixed: syncing of xdata slots imported XCMS features that are not sorted by analysis (eg after peak filling) (issue #141)
+    * Fixed: syncing of `xdata` slots imported XCMS features that are not sorted by analysis (eg after peak filling) (issue #141).
     * `normInts()` changes (feedback Jan Specker)
-        - Fixed: `groupNorm=TRUE` now correctly handles zero values which would result in `NaN` values
-        - Changed: `norm_conc` is set to one if all are values are NA (default for `newProject()`)
-    * Fixed: workaround for bug in plotting feature optimization results (issue #145)
-    * Fixed: `featureGroups` annotations slot is properly updated if all features are removed from a set
-    * Fixed: `as.data.table()` method for `features`: properly handle empty objects
-    * Fixed: KPIC2 grouping would error when there are no results
-    * Fixed: KPIC2/XCMS/XCMS3 grouping would error when there are no results
-    * Fixed: `getXCMSnExp()` with `loadRawData=FALSE` now sets additional metadata so that e.g. analysis subsetting works
-    * Fixed: feature filter didn't hash `qualityRange`
-    * Fixed: `normInts()` produced invalid output if no internal standards were found
-    * Fixed: `fGroupsScreeningSet` now correctly stores RF_SMILES per set
-    * Fixed: suspect list verification only checked part of the columns
-    * Fixed: `plotVenn()` now warns when there are too many groups, instead of erroring
+        - Fixed: `groupNorm=TRUE` now correctly handles zero values which would result in `NaN` values.
+        - Changed: `norm_conc` is set to one if all are values are NA (default for `newProject()`).
+    * Fixed: workaround for bug in plotting feature optimization results (issue #145).
+    * Fixed: `featureGroups` annotations slot is properly updated if all features are removed from a set.
+    * Fixed: `as.data.table()` method for `features`: properly handle empty objects.
+    * Fixed: KPIC2 grouping would error when there are no results.
+    * Fixed: KPIC2/XCMS/XCMS3 grouping would error when there are no results.
+    * Fixed: `getXCMSnExp()` with `loadRawData=FALSE` now sets additional metadata so that e.g. analysis subsetting works.
+    * Fixed: feature filter didn't hash `qualityRange`.
+    * Fixed: `normInts()` produced invalid output if no internal standards were found.
+    * Fixed: Sets worklfows: `RF_SMILES` is now stored correctly per set.
+    * Fixed: suspect list verification only checked part of the columns.
+    * Fixed: `plotVenn()` now warns when there are too many groups, instead of erroring.
     * Fixed: Properly select all suspect column in sets workflows, which previously might yield in improper results when calculating suspect annotation data, filtering and reporting.
 * Feature annotation
-    * Fixed: SIRIUS with `calculateFeatures=TRUE` could sometimes fail due to file name truncation
+    * Fixed: SIRIUS with `calculateFeatures=TRUE` could sometimes fail due to file name truncation.
     * Fixed: `filter()` method for `MSPeakListsSet`: properly handle case where `sets` argument is combined with other filters.
-    * Fixed: avoid error when `consensus()` is called with empty objects for a set (issue #144)
-    * Fixed: don't try to do multiprocess parallelization for non-local databases (e.g. PubChem) to avoid connection errors
-    * `annotationBy` filter for MS peak lists: clarify and verify that it only works on group averaged peak lists and cannot be combined with `reAverage=TRUE`
+    * Fixed: avoid error when `consensus()` is called with empty objects for a set (issue #144).
+    * Fixed: `generateCompoundsMetFrag()`: don't try to do multiprocess parallelization for non-local databases (e.g. PubChem) to avoid connection errors.
+    * `annotationBy` filter for MS peak lists: clarify and verify that it only works on group averaged peak lists and cannot be combined with `reAverage=TRUE`.
 * Components
-    * Fixed: reporting components from `cliqueMS` and suspect screened features would fail (reported by Jan Specker)
-    * Fixed: feature componentization would fail if no annotations were found (reported by Jan Specker)
+    * Fixed: reporting components from `cliqueMS` and suspect screened features would fail (reported by Jan Specker).
+    * Fixed: feature componentization would fail if no annotations were found (reported by Jan Specker).
 * Misc
-    * Fixed: `report()`: don't show (empty) annotations column in feature data if no feature annotations are present
-    * Fixed: `report()`: TP graphs were generated for components with absent (parent) fGroups
-    * Fixed: `report()`: candidate column in CSV of quant/tox prediction tables now don't contain image link columns
+    * Fixed: `report()`: don't show (empty) annotations column in feature data if no feature annotations are present.
+    * Fixed: `report()`: TP graphs were generated for components with absent (parent) fGroups.
+    * Fixed: `report()`: candidate column in CSV of quant/tox prediction tables now don't contain image link columns.
     * Fixed: The `removeTPIsomers` filter for `transformationProductsStructure` didn't actually apply the `removeDuplicates` filter.
-    * Fixed: `newProject()`: don't break long lines of text strings
-    * Fixed: `newProject()`: XCMS3/KPIC2 groupFeatures tried to do RT alignment in sets worfklow
+    * Fixed: `newProject()`: don't break long lines of text strings.
+    * Fixed: `newProject()`: XCMS3/KPIC2 groupFeatures tried to do RT alignment in sets worfklow.
     * Fixed: Sets names are now checked to not contain any special characters (besides underscores). Automatic labels are now separated by underscores instead of dots.
 
 

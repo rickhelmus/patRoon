@@ -143,7 +143,7 @@
 <span>  virtualenv <span class="op">=</span> <span class="st">"patRoon-TIMSCONVERT"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">convertMSFilePaths</span><span class="op">(</span></span>
+<span><span class="fu">convertMSFilesPaths</span><span class="op">(</span></span>
 <span>  <span class="va">files</span>,</span>
 <span>  <span class="va">formatFrom</span>,</span>
 <span>  formatTo <span class="op">=</span> <span class="st">"mzML"</span>,</span>
@@ -262,7 +262,7 @@ perform 'classical LC-MS workflows' with IMS data.</p></dd>
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>For <code>convertMSFilesIMSCollapse</code>: further arguments passed to
   <code><a href="https://rdrr.io/pkg/ProtGenerics/man/protgenerics.html" class="external-link">mzR::writeMSData</a></code>.</p>
-<p>For <code>convertMSFilePaths</code> and <code>convertMSFiles</code>: further arguments passed to algorithm specific conversion
+<p>For <code>convertMSFilesPaths</code> and <code>convertMSFiles</code>: further arguments passed to algorithm specific conversion
   functions.</p></dd>
 
 
@@ -327,9 +327,9 @@ algorithms.</p></dd>
 <p><code>convertMSFilesTIMSCONVERT</code> converts and pre-treats TIMS data with
   <a href="https://gtluu.github.io/timsconvert/" class="external-link">TIMSCONVERT</a>. The <code><a href="installTIMSCONVERT.html">installTIMSCONVERT</a></code> function can be used
   to automatically install <code class="command">TIMSCONVERT</code>.</p>
-<p><code>convertMSFilePaths</code> is a wrapper function that simplifies the use of algorithm specific MS conversion
+<p><code>convertMSFilesPaths</code> is a wrapper function that simplifies the use of algorithm specific MS conversion
   functions, such as <code>convertMSFilesPWiz</code>, and <code>convertMSFilesTIMSCONVERT</code>.</p>
-<p><code>convertMSFiles</code> is a wrapper function that simplifies the use of <code>convertMSFilePaths</code>.</p>
+<p><code>convertMSFiles</code> is a wrapper function that simplifies the use of <code>convertMSFilesPaths</code>.</p>
     </div>
     <div id="parallelization">
     <h2>Parallelization</h2>

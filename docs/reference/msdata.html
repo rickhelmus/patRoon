@@ -95,7 +95,12 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">availableBackends</span><span class="op">(</span>anaInfo <span class="op">=</span> <span class="cn">NULL</span>, needTypes <span class="op">=</span> <span class="cn">NULL</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">availableBackends</span><span class="op">(</span></span>
+<span>  anaInfo <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  needTypes <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  checkOption <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -110,6 +115,11 @@ information</a> table, and only those backends that can read each of the analyse
 <dt id="arg-needtypes">needTypes<a class="anchor" aria-label="anchor" href="#arg-needtypes"></a></dt>
 <dd><p>Only applicable if <code>anaInfo</code> is set: should be <code>"centroid"</code>, <code>"profile"</code> and/or
 <code>"ims"</code> to filter file types.</p></dd>
+
+
+<dt id="arg-checkoption">checkOption<a class="anchor" aria-label="anchor" href="#arg-checkoption"></a></dt>
+<dd><p>Set to <code>TRUE</code> to only consider backends that are included in the <code>patRoon.MS.backends</code>
+option.</p></dd>
 
 
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>

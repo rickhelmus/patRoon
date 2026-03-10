@@ -121,6 +121,7 @@
 <div class="section level2">
 <h2 id="project-news">Project news<a class="anchor" aria-label="anchor" href="#project-news"></a>
 </h2>
+<p><strong>March 2026</strong> <code>patRoon 3.0.0</code> is released! This a <strong>major</strong> release which adds ion mobility separation (IMS) support, new algorithms for feature and transformation product detection, use of sample metadata and many other improvements. Please see the <a href="https://github.com/rickhelmus/patRoon/blob/master/NEWS.md" class="external-link">Project NEWS</a> for more details and important notes on upgrading to <code>patRoon 3.0</code>.</p>
 <p><strong>September 2025</strong> <code>patRoon 2.3.4</code> is now released. This is a small maintenance release which includes an important fix for <code>MS2Tox</code> and various other fixes. Please see the <a href="https://github.com/rickhelmus/patRoon/blob/master/NEWS.md" class="external-link">Project NEWS</a> for more details.</p>
 <p><strong>October 2024</strong> <code>patRoon 2.3.3</code> is now released. This is a small maintenance release which correct the SIRIUS login procedure and comes with several other bug fixes. Please see the <a href="https://github.com/rickhelmus/patRoon/blob/master/NEWS.md" class="external-link">Project NEWS</a> for more details.</p>
 <p><strong>July 2024</strong> <code>patRoon 2.3.2</code> is now released. This is a small maintenance release with several important bug fixes and new functions to inspect raw MS data (thanks to Ricardo Cunha). Please see the <a href="https://github.com/rickhelmus/patRoon/blob/master/NEWS.md" class="external-link">Project NEWS</a> for more details.</p>
@@ -134,7 +135,7 @@
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
 <p>Mass spectrometry based non-target analysis is used to screen large numbers of chemicals simultaneously. For this purpose, high resolution mass spectrometry instruments are used which are typically coupled (or <em>hyphenated</em>) with chromatography (<em>e.g.</em> LC or GC). The size and complexity of resulting data makes manual processing impractical. Many software tools were/are developed to facilitate a more automated approach. However, these tools are generally not optimized for environmental workflows and/or only implement parts of the functionality required.</p>
-<p><code>patRoon</code> combines established software tools with novel functionality in order to provide comprehensive NTA workflows. The different algorithms are provided through a consistent interface, which removes the need to know all the details of each individual software tool and performing tedious data conversions during the workflow. The table below outlines the major functionality of <code>patRoon</code>.</p>
+<p><code>patRoon</code> combines established software tools with novel functionality in order to provide comprehensive NTA workflows. The different algorithms are provided through a consistent interface, which removes the need to know all the details of each individual software tool and performing tedious data conversions during the workflow. <code>patRoon</code> is vendor agnostic and includes novel functionality, such as combining positive and negative ionization data, estimating identification levels, transformation product screening, and use of ion mobility separation data to improve data processing. The table below outlines the major functionality of <code>patRoon</code>.</p>
 <table class="table">
 <colgroup>
 <col width="18%">
@@ -151,32 +152,35 @@
 <td>Raw data pre-treatment</td>
 <td>MS format conversion (e.g. vendor to <code>mzML</code>) and calibration.</td>
 <td>
-<a href="http://proteowizard.sourceforge.net/" class="external-link">ProteoWizard</a>, <a href="http://openms.de/" class="external-link">OpenMS</a>, <a href="https://www.bruker.com/" class="external-link">DataAnalysis</a>
+<a href="http://proteowizard.sourceforge.net/" class="external-link">ProteoWizard</a>, <a href="http://openms.de/" class="external-link">OpenMS</a>, <a href="https://www.bruker.com/" class="external-link">DataAnalysis</a>, <a href="https://gtluu.github.io/timsconvert/" class="external-link">TIMSCONVERT</a>, Native</td>
+</tr>
+<tr>
+<td>Raw data processing</td>
+<td>Processing of raw data (e.g. spectra, EICs, mobilograms, smoothing).</td>
+<td>Native (<code>msdata</code>), via <a href="https://github.com/sneumann/mzR/" class="external-link">mzR</a>, <a href="https://github.com/michalsta/opentims" class="external-link">OpenTIMS</a>, <a href="https://github.com/mhoopmann/mstoolkit" class="external-link">MSToolkit</a>, <a href="https://github.com/odea-project/StreamCraft" class="external-link">StreamCraft</a>
 </td>
 </tr>
 <tr>
 <td>Feature extraction</td>
 <td>Finding features and grouping them across analyses.</td>
-<td>
-<a href="https://github.com/sneumann/xcms" class="external-link">XCMS</a>, <a href="http://openms.de/" class="external-link">OpenMS</a>, <a href="https://cran.r-project.org/web/packages/enviPick/index.html" class="external-link">enviPick</a>, <a href="https://www.bruker.com/" class="external-link">DataAnalysis</a>, <a href="https://github.com/hcji/KPIC2" class="external-link">KPIC2</a>, <a href="https://bio.informatik.uni-jena.de/software/sirius/" class="external-link">SIRIUS</a>, <a href="https://bitbucket.org/SSamanipour/safd.jl/src/master/" class="external-link">SAFD</a>
+<td>Native (<code>piek</code>, <code>greedy</code>), <a href="https://github.com/sneumann/xcms" class="external-link">XCMS</a>, <a href="http://openms.de/" class="external-link">OpenMS</a>, <a href="https://cran.r-project.org/web/packages/enviPick/index.html" class="external-link">enviPick</a>, <a href="https://www.bruker.com/" class="external-link">DataAnalysis</a>, <a href="https://github.com/hcji/KPIC2" class="external-link">KPIC2</a>, <a href="https://bio.informatik.uni-jena.de/software/sirius/" class="external-link">SIRIUS</a>, <a href="https://bitbucket.org/SSamanipour/safd.jl/src/master/" class="external-link">SAFD</a>
 </td>
 </tr>
 <tr>
 <td>Suspect screening</td>
-<td>Finding features with suspected presence by MS and chromatographic data. Estimation of identification confidence levels.</td>
+<td>Finding features with suspected presence by MS and chromatographic data.</td>
 <td>Native</td>
 </tr>
 <tr>
 <td>MS data extraction</td>
 <td>Automatic extraction and averaging of feature MS(/MS) peak lists.</td>
-<td>Native, <a href="https://github.com/sneumann/mzR/" class="external-link">mzR</a>, <a href="https://www.bruker.com/" class="external-link">DataAnalysis</a>
-</td>
+<td>Native</td>
 </tr>
 <tr>
 <td>Formula annotation</td>
 <td>Automatic calculation of formula candidates for features.</td>
 <td>
-<a href="https://sourceforge.net/projects/genform" class="external-link">GenForm</a>, <a href="https://bio.informatik.uni-jena.de/software/sirius/" class="external-link">SIRIUS</a>, <a href="https://www.bruker.com/" class="external-link">DataAnalysis</a>
+<a href="https://sourceforge.net/projects/genform" class="external-link">GenForm</a>, <a href="https://bio.informatik.uni-jena.de/software/sirius/" class="external-link">SIRIUS</a>
 </td>
 </tr>
 <tr>
@@ -184,6 +188,11 @@
 <td>Automatic (<em>in silico</em>) compound annotation of features.</td>
 <td>
 <a href="http://c-ruttkies.github.io/MetFrag/" class="external-link">MetFrag</a>, <a href="https://bio.informatik.uni-jena.de/software/sirius/" class="external-link">SIRIUS</a>, Native</td>
+</tr>
+<tr>
+<td>ID confidence</td>
+<td>Automatic estimation of confidence levels.</td>
+<td>Native</td>
 </tr>
 <tr>
 <td>Componentization &amp; adduct annotation</td>
@@ -205,7 +214,12 @@
 <td>Transformation product (TP) screening</td>
 <td>Automatic screening of TPs using library/<em>in-silico</em> data, MS similarities and classifications. Tools to improve compound TP annotation.</td>
 <td>
-<a href="https://bitbucket.org/djoumbou/biotransformer/src/master/" class="external-link">BioTransformer</a>, <a href="https://doi.org/10.5281/zenodo.5644560" class="external-link">PubChemLite</a>, Native</td>
+<a href="https://bitbucket.org/djoumbou/biotransformer/src/master/" class="external-link">BioTransformer</a>, <a href="https://qed.epa.gov/cts/" class="external-link">CTS</a>, <a href="https://doi.org/10.5281/zenodo.5644560" class="external-link">PubChemLite</a>, Native</td>
+</tr>
+<tr>
+<td>IMS-HRMS workflows</td>
+<td>Support for ion mobility separation and CCS data</td>
+<td>Native</td>
 </tr>
 <tr>
 <td>Reporting</td>
@@ -232,13 +246,13 @@
 <ul>
 <li>
 <code>patRoon</code> is implemented as an <a href="https://www.r-project.org/" class="external-link">R</a> package, which allows easy interfacing with the many other <code>R</code> based MS tools and other data processing functionality from <code>R</code>.</li>
-<li>Fully open-source (GPLv3).</li>
+<li>Fully open-source (GPLv3), <a href="https://reuse.software/" class="external-link">REUSE compliant</a>.</li>
 <li>Developed on Windows, Linux and macOS</li>
 <li>S4 classes and generics are used to implement a consistent interface to all supported algorithms.</li>
 <li>Continuous integration is used to automatically perform unit tests, update the <a href="https://rickhelmus.github.io/patRoon/">Website</a> and documentation, and maintaining installation resources such as the <a href="https://github.com/rickhelmus/patRoonDeps" class="external-link">patRoonDeps repository</a>, <a href="https://uva-hva.gitlab.host/R.Helmus/patroon/container_registry/2" class="external-link">Docker image</a> and <code>patRoon</code> bundle (see <a href="https://rickhelmus.github.io/patRoon/handbook_bd/installation.html">the handbook</a> for more details).</li>
-<li>Supports all major instrument vendor input formats (through usage of <a href="http://proteowizard.sourceforge.net/" class="external-link">ProteoWizard</a> and <a href="https://www.bruker.com/" class="external-link">DataAnalysis</a>).</li>
 <li>Optimizations
 <ul>
+<li>The <code>msdata</code> raw data interface is highly optimized and developed in C++ with OpenMP multi-threading.</li>
 <li>
 <code>data.table</code> is used internally as a generally much more efficient alternative to <code>data.frame</code>.</li>
 <li>The <a href="https://github.com/r-lib/processx" class="external-link">processx</a> and <a href="https://github.com/HenrikBengtsson/future" class="external-link">future</a> <code>R</code> packages are used for parallelization.</li>

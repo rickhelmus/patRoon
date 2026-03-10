@@ -14,6 +14,8 @@ specTROmetry nOn-target aNalysis_.
 
 ## Project news
 
+**March 2026** `patRoon 3.0.0` is released! This a **major** release which adds ion mobility separation (IMS) support, new algorithms for feature and transformation product detection, use of sample metadata and many other improvements. Please see the [Project NEWS][NEWS] for more details and important notes on upgrading to `patRoon 3.0`.
+
 **September 2025** `patRoon 2.3.4` is now released. This is a small maintenance release which includes an important fix for `MS2Tox` and various other fixes. Please see the [Project NEWS][NEWS] for more details.
 
 **October 2024** `patRoon 2.3.3` is now released. This is a small maintenance release which correct the SIRIUS login procedure and comes with several other bug fixes. Please see the [Project NEWS][NEWS] for more details.
@@ -43,21 +45,26 @@ optimized for environmental workflows and/or only implement parts of the functio
 
 `patRoon` combines established software tools with novel functionality in order to provide comprehensive NTA workflows.
 The different algorithms are provided through a consistent interface, which removes the need to know all the details of
-each individual software tool and performing tedious data conversions during the workflow. The table below outlines the
-major functionality of `patRoon`.
+each individual software tool and performing tedious data conversions during the workflow. `patRoon` is vendor agnostic
+and includes novel functionality, such as combining positive and negative ionization data, estimating identification
+levels, transformation product screening, and use of ion mobility separation data to improve data processing. The table
+below outlines the major functionality of `patRoon`.
 
 Functionality | Description | Algorithms
 ---------------------- | ------------------------------------------------------------------------ | -----------------------
-Raw data pre-treatment | MS format conversion (e.g. vendor to `mzML`) and calibration.            | [ProteoWizard], [OpenMS], [DataAnalysis]
-Feature extraction     | Finding features and grouping them across analyses.                      | [XCMS], [OpenMS], [enviPick], [DataAnalysis], [KPIC2], [SIRIUS], [SAFD]
-Suspect screening      | Finding features with suspected presence by MS and chromatographic data. Estimation of identification confidence levels. | Native
-MS data extraction     | Automatic extraction and averaging of feature MS(/MS) peak lists.        | Native, [mzR], [DataAnalysis]
-Formula annotation     | Automatic calculation of formula candidates for features.                | [GenForm], [SIRIUS], [DataAnalysis]
+Raw data pre-treatment | MS format conversion (e.g. vendor to `mzML`) and calibration.            | [ProteoWizard], [OpenMS], [DataAnalysis], [TIMSCONVERT], Native
+Raw data processing    | Processing of raw data (e.g. spectra, EICs, mobilograms, smoothing).     | Native (`msdata`), via [mzR], [OpenTIMS], [MSToolkit], [StreamCraft]
+Feature extraction     | Finding features and grouping them across analyses.                      | Native (`piek`, `greedy`), [XCMS], [OpenMS], [enviPick], [DataAnalysis], [KPIC2], [SIRIUS], [SAFD]
+Suspect screening      | Finding features with suspected presence by MS and chromatographic data. | Native
+MS data extraction     | Automatic extraction and averaging of feature MS(/MS) peak lists.        | Native
+Formula annotation     | Automatic calculation of formula candidates for features.                | [GenForm], [SIRIUS]
 Compound annotation    | Automatic (_in silico_) compound annotation of features.                 | [MetFrag], [SIRIUS], Native
+ID confidence          | Automatic estimation of confidence levels                                | Native
 Componentization & adduct annotation | Grouping of related features based on chemistry (e.g. isotopes, adducts and homologs), hierarchical clustering or MS/MS similarity into components. Using adduct and isotope annotations for prioritizing features and improving formula/compound annotations. | [RAMClustR], [CAMERA], [nontarget R package][nontarget], [OpenMS], [cliqueMS], Native
 Combining algorithms   | Combine data from different algorithms (e.g. features, annotations) and generate a consensus. | Native
 _Sets workflows_       | Simultaneous processing and combining +/- MS ionization data             | Native
-Transformation product (TP) screening | Automatic screening of TPs using library/_in-silico_ data, MS similarities and classifications. Tools to improve compound TP annotation. | [BioTransformer], [PubChemLite][PubChemLiteTR], Native
+Transformation product (TP) screening | Automatic screening of TPs using library/_in-silico_ data, MS similarities and classifications. Tools to improve compound TP annotation. | [BioTransformer], [CTS], [PubChemLite][PubChemLiteTR], Native
+IMS-HRMS workflows     | Support for ion mobility separation and CCS data                         | Native
 Reporting              | Automatic reporting of all important workflow data. An example HTML report can be viewed [here][example]. | Native
 Data clean-up & prioritization | Filters for blanks, replicates, intensity thresholds, neutral losses, annotation scores, identification levels and many more. | Native
 Data curation          | Several graphical interactive tools and functions to inspect and remove unwanted data. | Native
@@ -69,12 +76,12 @@ workflow steps are optional, fully configurable and algorithms can easily be mix
 ## Implementation details
 
 * `patRoon` is implemented as an [R] package, which allows easy interfacing with the many other `R` based MS tools and other data processing functionality from `R`.
-* Fully open-source (GPLv3).
+* Fully open-source (GPLv3), [REUSE compliant](https://reuse.software/).
 * Developed on Windows, Linux and macOS
 * S4 classes and generics are used to implement a consistent interface to all supported algorithms.
 * Continuous integration is used to automatically perform unit tests, update the [Website][ghweb] and documentation, and maintaining installation resources such as the [patRoonDeps repository][patRoonDeps], [Docker image][DockerImg] and `patRoon` bundle (see [the handbook][handbook-inst] for more details).
-* Supports all major instrument vendor input formats (through usage of [ProteoWizard] and [DataAnalysis]).
 * Optimizations
+    * The `msdata` raw data interface is highly optimized and developed in C++ with OpenMP multi-threading.
     * `data.table` is used internally as a generally much more efficient alternative to `data.frame`.
     * The [processx] and [future] `R` packages are used for parallelization.
     * Results from workflow steps are cached within a [SQLite] database to avoid repeated computations.
@@ -134,7 +141,6 @@ For bug reports, code contributions (pull requests), questions, suggestions and 
 [KPIC2]: https://github.com/hcji/KPIC2
 [SAFD]: https://bitbucket.org/SSamanipour/safd.jl/src/master/
 [DataAnalysis]: https://www.bruker.com/
-[ProfileAnalysis]: https://www.bruker.com/
 [mzR]: https://github.com/sneumann/mzR/
 [GenForm]: https://sourceforge.net/projects/genform
 [SIRIUS]: https://bio.informatik.uni-jena.de/software/sirius/
@@ -167,3 +173,7 @@ For bug reports, code contributions (pull requests), questions, suggestions and 
 [reactable]: https://glin.github.io/reactable/
 [MS2Tox]: https://github.com/kruvelab/MS2Tox
 [MS2Quant]: https://github.com/kruvelab/MS2Quant
+[TIMSCONVERT]: https://gtluu.github.io/timsconvert/
+[OpenTIMS]: https://github.com/michalsta/opentims
+[MSToolkit]: https://github.com/mhoopmann/mstoolkit
+[StreamCraft]: https://github.com/odea-project/StreamCraft

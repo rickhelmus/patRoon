@@ -104,9 +104,7 @@
 - newProject()
     - see where testing is slow, possibly disable testServer() on CI?
 - manual checks
-    - checkFeatures()/checkComponents() verify if things still work
     - manually check all HTML reporting functionality at the end
-    - check updates for mobilities to checkFeatures(), checkComponents() and importCheckFeaturesSession()
 
 
 ## Docs

@@ -1,6 +1,6 @@
 # patRoon 3.0
 
-This release adds a significant amount of new functionality and changes. Please see the updated Handbook and sections
+This release adds a significant amount of new functionality and changes. Please see the updated [Handbook] and sections
 below for more information. Users of previous `patRoon` versions should inform themselves with the important changes
 highlighted in the next section.
 
@@ -97,14 +97,14 @@ technique brings several important benefits for NTA, such as an additional param
 cross section or CCS), cleaning up of HRMS data to improve feature detection and annotation, improved separation of
 compounds with equal or close m/z and support of rapid and selective MS/MS (PASEF). The complete workflow was upgraded
 to support IMS-HRMS data and make use of the benefits from this technique. Please see the new IMS chapter in the
-Handbook for further details.
+[Handbook][Handbook-IMS] for further details.
 
 ### `msdata` interface
 
 The new `msdata` raw data interface was introduced to efficiently read complex raw data. The primary motivation was to
 support the complexity and specific formatting of IMS-HRMS data, but the applied optimizations also benefit classical
-HRMS workflows. More information on `msdata` and its configuration is detailed in the Handbook and reference manual
-(`?msdata`).
+HRMS workflows. More information on `msdata` and its configuration is detailed in the [Handbook][Handbook-msdata] and
+reference manual (`?msdata`).
 
 **NOTE**: due to (slight) changes rounding numerical data there may be slight differences in EICs, spectra and feature data compared to the old interface.
 
@@ -113,8 +113,8 @@ HRMS workflows. More information on `msdata` and its configuration is detailed i
 This release adds the newly developed `piek` algorithm, which is a simple, flexible and fast algorithm for detecting
 features in both HRMS and IMS-HRMS data. Furthermore, the `greedy` algorithm was added to provide fast grouping of
 features across samples and also supports both HRMS and IMS-HRMS data. Both algorithms are embedded in `patRoon 3.0` and
-therefore don't need any installation of external software. See the Handbook and reference manual (`?findFeaturesPiek`
-and `?groupFeaturesGreedy`) for further details.
+therefore don't need any installation of external software. See the [Handbook][Handbook-features] and reference manual
+(`?findFeaturesPiek` and `?groupFeaturesGreedy`) for further details.
 
 ### Sample metadata and analysis information
 
@@ -122,10 +122,10 @@ A lot of existing functionality was upgraded to support the use of sample metada
 as easily making sample groups from metadata for plotting and aggregation of data. Furthermore, the (previously very
 basic) support for applying linear regression to eg prioritize feature data was improved considerably, and was primarily
 motivated to improve feature prioritization of unknown transformation products (see
-[10.1021/acs.est.4c09121](http://doi.org/10.1021/acs.est.4c09121)). Finally, functionality was added to easily subset features
-from metadata and update the analysis information in feature objects, e.g. to add or modify sample metadata. The
-Handbook was updated with a new subsection to demonstrate the use of sample metadata. Furthermore, see below for more
-details which functions were changed.
+[10.1021/acs.est.4c09121](http://doi.org/10.1021/acs.est.4c09121)). Finally, functionality was added to easily subset
+features from metadata and update the analysis information in feature objects, e.g. to add or modify sample metadata.
+The [Handbook][Handbook-meta] was updated with a new subsection to demonstrate the use of sample metadata.
+Furthermore, see below for more details which functions were changed.
 
 ### Transformation products
 
@@ -140,8 +140,8 @@ in [10.1021/acs.est.4c09121](http://doi.org/10.1021/acs.est.4c09121).
 
 Support was added to import features from external data sources (which has been requested for a very long time!). The
 new functions `importFeaturesTable()` and `importFeaturesGroupsTable()` provide a way to import tabular data with raw or
-sample grouped features, respectively. See the updated Handbook and reference manual (`?importFeaturesTable` and
-`?importFeatureGroupsTable`) for more details.
+sample grouped features, respectively. See the updated [Handbook][Handbook-importFeat] and reference manual
+(`?importFeaturesTable` and `?importFeatureGroupsTable`) for more details.
 
 ### New data filters
 
@@ -158,7 +158,7 @@ This release adds approaches to subtract MS2 background and estimate identificat
 described in 10.1021/acs.est.4c09121. The latter functionality allows the estimation of ID levels for formula and
 compound candidates obtained during feature annotation. The approach is similar (but optimized) compared to the
 previously introduced system for suspect screening workflows. Similar filters existing to remove candidates with poor ID
-levels. See the updated Handbook and reference manual (`?getBGMSMSPeaks` and `?estimateIDConfidence`) for more details.
+levels. See the updated [Handbook] and reference manual (`?getBGMSMSPeaks` and `?estimateIDConfidence`) for more details.
 
 ### Improvements for reporting and project creation
 
@@ -181,7 +181,7 @@ properties can then be improved by exclusion of e.g. noisy features.
 The defaults for common numerical limits and thresholds (retention time, m/z and mobility) are now moved to a separate
 'limits file'. This simplifies the configuration of these parameters and avoids the need to configure them throughout
 all functions in the workflow. As a result, some default values may have been slightly changed for consistency. See the
-Limits section in the Advanced chapter of the updated Handbook for more information.
+Limits section in the updated [Handbook][Handbook-lim] for more information.
 
 ### Changed defaults
 
@@ -213,7 +213,7 @@ Limits section in the Advanced chapter of the updated Handbook for more informat
 
 ### Analysis information and use of sample metadata
 
-Several changes were made to the analysis information tables to improve support for different file formats and allow the use of sample metadata (as introduced before). See the updated Handbook for more details.
+Several changes were made to the analysis information tables to improve support for different file formats and allow the use of sample metadata (as introduced before). See the updated [Handbook] for more details.
 
 * The `path` column is replaced by four different columns: `path_raw`, `path_centroid`, `path_profile` and `path_ims`,
 which can be used to specify the paths to different types of data. If only a `path` column is present, it will be used as `path_centroid` with a warning.
@@ -287,7 +287,7 @@ In most cases `fixedIsolationWidth=FALSE` is recommended: this automatically det
     * `estimateIDConfidence()` (previously `annotateSuspects()`) now copies annotation similarities from feature annotations instead of calculating them from scratch. As a result:
         * The `specSimParams` argument was removed.
         * **IMPORTANT**: `estimateIDConfidence()` should be used to calculate annotation similarities for `formulas` and `compounds` objects in advance.
-        * See the updated Handbook section on identification confifdence estimation for more details.
+        * See the updated [Handbook][Handbook-IDConf] section on identification confidence estimation for more details.
 * Transformation products
     * `generateComponentsTPs()`: the internal representation of results are stored differently.
         * The component result table contains for each row a result for one feature group (similar to other components results).
@@ -1529,3 +1529,11 @@ Other changes
 [PCLite-dl]: https://zenodo.org/record/6503754
 [MS2Tox]: https://github.com/kruvelab/MS2Tox
 [MS2Quant]: https://github.com/kruvelab/MS2Quant
+[Handbook]: https://rickhelmus.github.io/patRoon/handbook_bd/index.html
+[Handbook-IMS]: https://rickhelmus.github.io/patRoon/handbook_bd/IMSWorkflow.html
+[Handbook-msdata]: https://rickhelmus.github.io/patRoon/handbook_bd/sample-analyses.html#fileTypes
+[Handbook-features]: https://rickhelmus.github.io/patRoon/handbook_bd/features.html#features
+[Handbook-meta]: https://rickhelmus.github.io/patRoon/handbook_bd/useMeta.html#useMeta
+[Handbook-importFeat]: https://rickhelmus.github.io/patRoon/handbook_bd/features.html#importFeat
+[Handbook-lim]: https://rickhelmus.github.io/patRoon/handbook_bd/limits.html
+[Handbook-IDConf]: https://rickhelmus.github.io/patRoon/handbook_bd/annotation.html#estIDConf

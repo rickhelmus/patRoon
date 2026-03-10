@@ -59,7 +59,7 @@ Suspect screening      | Finding features with suspected presence by MS and chro
 MS data extraction     | Automatic extraction and averaging of feature MS(/MS) peak lists.        | Native
 Formula annotation     | Automatic calculation of formula candidates for features.                | [GenForm], [SIRIUS]
 Compound annotation    | Automatic (_in silico_) compound annotation of features.                 | [MetFrag], [SIRIUS], Native
-ID confidence          | Automatic estimation of confidence levels                                | Native
+ID confidence          | Automatic estimation of confidence levels.                               | Native
 Componentization & adduct annotation | Grouping of related features based on chemistry (e.g. isotopes, adducts and homologs), hierarchical clustering or MS/MS similarity into components. Using adduct and isotope annotations for prioritizing features and improving formula/compound annotations. | [RAMClustR], [CAMERA], [nontarget R package][nontarget], [OpenMS], [cliqueMS], Native
 Combining algorithms   | Combine data from different algorithms (e.g. features, annotations) and generate a consensus. | Native
 _Sets workflows_       | Simultaneous processing and combining +/- MS ionization data             | Native

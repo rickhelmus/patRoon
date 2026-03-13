@@ -142,8 +142,8 @@ importParam <- function(type, inFile)
     return(ret)
 }
 
-FeatureOpenMSParam <- setClass("FeatureOpenMSParam", contains = "param")
-setMethod("initialize", "FeatureOpenMSParam", function(.Object, ...)
+FeaturesOpenMSParam <- setClass("FeaturesOpenMSParam", contains = "param")
+setMethod("initialize", "FeaturesOpenMSParam", function(.Object, ...)
 {
     defs <- list(
         noiseThrInt = list(
@@ -284,7 +284,7 @@ setMethod("initialize", "FeatureOpenMSParam", function(.Object, ...)
         )
     )
 
-    callNextMethod(.Object, name = "FeatureOpenMSParam", baseName = "FeatureOpenMSParam",
+    callNextMethod(.Object, name = "FeaturesOpenMSParam", baseName = "FeaturesOpenMSParam",
                    description = "Parameters for OpenMS feature detection", version = "1.0",
                    definitions = defs, ...)
 })

@@ -5,7 +5,7 @@
 #' widgets based on the parameter definitions.
 #'
 #' @param obj A \code{param} object to edit. If \code{NULL}, a default
-#'   \code{FeatureOpenMSParam} object will be created.
+#'   \code{FeaturesOpenMSParam} object will be created.
 #'
 #' @return A list containing \code{ui} and \code{server} components that can be
 #'   passed to \code{shiny::shinyApp()}.
@@ -13,7 +13,7 @@
 #' @examples
 #' \dontrun{
 #' library(shiny)
-#' paramObj <- FeatureOpenMSParam()
+#' paramObj <- FeaturesOpenMSParam()
 #' gui <- createParamUI(paramObj)
 #' shinyApp(gui$ui, gui$server)
 #' }
@@ -22,7 +22,7 @@
 createParamUI <- function(obj = NULL)
 {
     if (is.null(obj))
-        obj <- FeatureOpenMSParam()
+        obj <- FeaturesOpenMSParam()
     
     # Store initial object for reset functionality
     initObj <- obj
@@ -378,7 +378,7 @@ getInputValue <- function(id, def, input)
 #' Launch the parameter configuration UI
 #'
 #' @param obj A \code{param} object to edit. If \code{NULL}, a default
-#'   \code{FeatureOpenMSParam} object will be created.
+#'   \code{FeaturesOpenMSParam} object will be created.
 #'
 #' @return This function launches a Shiny app and does not return.
 #'
@@ -388,7 +388,7 @@ getInputValue <- function(id, def, input)
 #' configureParams()
 #'
 #' # Launch with existing parameters
-#' params <- FeatureOpenMSParam()
+#' params <- FeaturesOpenMSParam()
 #' configureParams(params)
 #' }
 #'

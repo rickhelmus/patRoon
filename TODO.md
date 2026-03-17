@@ -17,6 +17,7 @@
 - See why parallel reporting is so slow (on Windows?)
 - reticulate: use py_require()? doesn't seem to be able handle multiple py versions, so no?
 - MSTK: PR for centroid status buf for mzXML?
+    - saxmzxmlhandler.cpp L158: spec->setCentroid((bool)atoi(getAttrValue("centroided",attr)));
 
 
 ## Maybe

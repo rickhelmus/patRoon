@@ -49,12 +49,12 @@
   </clipPath>
 </defs>
 <g clip-path='url(#cpMC4wMHw0MjEuNTV8MC4wMHwyODguMDA=)'>
-<text x='199.19' y='33.42' style='font-size: 14.40px; font-family: "Nimbus Sans";' textLength='10.39px' lengthAdjust='spacingAndGlyphs'>C</text>
-<text x='209.58' y='33.42' style='font-size: 14.40px; font-family: "Nimbus Sans";' textLength='10.39px' lengthAdjust='spacingAndGlyphs'>H</text>
-<text x='219.97' y='36.06' style='font-size: 10.08px; font-family: "Nimbus Sans";' textLength='5.61px' lengthAdjust='spacingAndGlyphs'>9</text>
-<text x='225.57' y='33.42' style='font-size: 14.40px; font-family: "Nimbus Sans";' textLength='10.39px' lengthAdjust='spacingAndGlyphs'>N</text>
-<text x='235.96' y='36.06' style='font-size: 10.08px; font-family: "Nimbus Sans";' textLength='5.61px' lengthAdjust='spacingAndGlyphs'>6</text>
-<text x='241.56' y='33.42' style='font-size: 14.40px; font-family: "Nimbus Sans";' textLength='9.59px' lengthAdjust='spacingAndGlyphs'>P</text>
+<text x='199.19' y='33.20' style='font-size: 14.40px; font-family: "Nimbus Sans";' textLength='10.39px' lengthAdjust='spacingAndGlyphs'>C</text>
+<text x='209.58' y='33.20' style='font-size: 14.40px; font-family: "Nimbus Sans";' textLength='10.39px' lengthAdjust='spacingAndGlyphs'>H</text>
+<text x='219.97' y='36.27' style='font-size: 10.08px; font-family: "Nimbus Sans";' textLength='5.61px' lengthAdjust='spacingAndGlyphs'>9</text>
+<text x='225.57' y='33.20' style='font-size: 14.40px; font-family: "Nimbus Sans";' textLength='10.39px' lengthAdjust='spacingAndGlyphs'>N</text>
+<text x='235.96' y='36.27' style='font-size: 10.08px; font-family: "Nimbus Sans";' textLength='5.61px' lengthAdjust='spacingAndGlyphs'>6</text>
+<text x='241.56' y='33.20' style='font-size: 14.40px; font-family: "Nimbus Sans";' textLength='9.59px' lengthAdjust='spacingAndGlyphs'>P</text>
 <text x='225.18' y='269.28' text-anchor='middle' style='font-size: 12.00px; font-family: "Nimbus Sans";' textLength='19.34px' lengthAdjust='spacingAndGlyphs'>m/z</text>
 <text transform='translate(12.96,136.80) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Nimbus Sans";' textLength='44.72px' lengthAdjust='spacingAndGlyphs'>Intensity</text>
 </g>
@@ -84,12 +84,12 @@
 <text transform='translate(41.76,137.23) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Nimbus Sans";' textLength='33.36px' lengthAdjust='spacingAndGlyphs'>10000</text>
 </g>
 <g clip-path='url(#cpNTkuMDR8MzkxLjMxfDU5LjA0fDIxNC41Ng==)'>
-<text transform='translate(310.28,173.55) rotate(-90)' style='font-size: 10.80px; font-family: "Nimbus Sans";' textLength='7.80px' lengthAdjust='spacingAndGlyphs'>C</text>
-<text transform='translate(310.28,165.75) rotate(-90)' style='font-size: 10.80px; font-family: "Nimbus Sans";' textLength='7.80px' lengthAdjust='spacingAndGlyphs'>H</text>
-<text transform='translate(312.26,157.96) rotate(-90)' style='font-size: 7.56px; font-family: "Nimbus Sans";' textLength='8.41px' lengthAdjust='spacingAndGlyphs'>10</text>
-<text transform='translate(310.28,149.55) rotate(-90)' style='font-size: 10.80px; font-family: "Nimbus Sans";' textLength='7.80px' lengthAdjust='spacingAndGlyphs'>N</text>
-<text transform='translate(312.26,141.75) rotate(-90)' style='font-size: 7.56px; font-family: "Nimbus Sans";' textLength='4.20px' lengthAdjust='spacingAndGlyphs'>6</text>
-<text transform='translate(310.28,137.55) rotate(-90)' style='font-size: 10.80px; font-family: "Nimbus Sans";' textLength='7.20px' lengthAdjust='spacingAndGlyphs'>P</text>
+<text transform='translate(310.12,173.55) rotate(-90)' style='font-size: 10.80px; font-family: "Nimbus Sans";' textLength='7.80px' lengthAdjust='spacingAndGlyphs'>C</text>
+<text transform='translate(310.12,165.75) rotate(-90)' style='font-size: 10.80px; font-family: "Nimbus Sans";' textLength='7.80px' lengthAdjust='spacingAndGlyphs'>H</text>
+<text transform='translate(312.41,157.96) rotate(-90)' style='font-size: 7.56px; font-family: "Nimbus Sans";' textLength='8.41px' lengthAdjust='spacingAndGlyphs'>10</text>
+<text transform='translate(310.12,149.55) rotate(-90)' style='font-size: 10.80px; font-family: "Nimbus Sans";' textLength='7.80px' lengthAdjust='spacingAndGlyphs'>N</text>
+<text transform='translate(312.41,141.75) rotate(-90)' style='font-size: 7.56px; font-family: "Nimbus Sans";' textLength='4.20px' lengthAdjust='spacingAndGlyphs'>6</text>
+<text transform='translate(310.12,137.55) rotate(-90)' style='font-size: 10.80px; font-family: "Nimbus Sans";' textLength='7.20px' lengthAdjust='spacingAndGlyphs'>P</text>
 </g>
 <g clip-path='url(#cpMC4wMHw1MDQuMDB8MC4wMHwyODguMDA=)'>
 <line x1='399.41' y1='69.84' x2='415.61' y2='69.84' style='stroke-width: 0.75; stroke: #BEBEBE;' />

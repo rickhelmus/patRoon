@@ -429,7 +429,7 @@ test_that("plotting works", {
     expect_error(plotUpSet(compsMF, compsSIREmpty))
     
     # plotting structure seems to be difficult to do reproducible between systems, so disable for vdiffr now...
-    skip_unless_r(">=4.5.3")
+    skip_unless_r(">= 4.5.3")
     expect_doppel("compound-spec", function() plotSpectrum(compsMFIso, 1, anPLGroup, plists, plotStruct = FALSE))
     expect_doppel("compound-spec_sim", function() plotSpectrum(compsMFIso, index = c(1, 1), c(anPLGroup, anPLGroup2),
                                                                MSPeakLists = plists, plotStruct = FALSE))
@@ -465,7 +465,7 @@ test_that("sets functionality", {
     expect_gt(length(setObjects(compsSIR)[[2]]@fingerprints), 0)
     testSIRFPSubset(setObjects(compsSIR)[[1]])
     
-    skip_unless_r(">=4.5.3")
+    skip_unless_r(">= 4.5.3")
     expect_doppel("compound-spec-set", function() plotSpectrum(compsMFIso, 1, anPLGroup, plists, plotStruct = FALSE,
                                                                perSet = FALSE))
     expect_doppel("compound-spec-set-perset", function() plotSpectrum(compsMFIso, 1, anPLGroup, plists,

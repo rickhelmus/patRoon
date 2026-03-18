@@ -310,7 +310,7 @@ test_that("plotting works", {
     expect_equal(expect_plot(plotVenn(formsGF, formsSIR))$intersectionCounts,
                  length(doFormCons(formsGF, formsSIR, MSPeakLists = plists, relMinAbundance = 1)))
     
-    skip_unless_r(">=4.5.3")
+    skip_unless_r(">= 4.5.3")
     expect_doppel("form-spec", function() plotSpectrum(formsGFWithMSMS, index = 1, anPLGroup, MSPeakLists = plists))
     expect_doppel("form-spec_sim", function() plotSpectrum(formsGFWithMSMS, index = c(1, 1), c(anPLGroup, anPLGroup2),
                                                            MSPeakLists = plists))
@@ -343,7 +343,7 @@ test_that("sets functionality", {
     expect_gt(length(setObjects(formsSIRFPs)[[2]]@fingerprints), 0)
     testSIRFPSubset(setObjects(formsSIRFPs)[[1]])
 
-    skip_unless_r(">=4.5.3")
+    skip_unless_r(">= 4.5.3")
     expect_doppel("form-spec-set", function() plotSpectrum(formsGFWithMSMS, index = 1, anPLGroup, MSPeakLists = plists,
                                                            perSet = FALSE))
     expect_doppel("form-spec-set-perset", function() plotSpectrum(formsGFWithMSMS, index = 1, anPLGroup,

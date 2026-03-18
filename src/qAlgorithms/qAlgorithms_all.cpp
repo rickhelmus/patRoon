@@ -1,0 +1,5 @@
+#include "cephes.cpp"
+#include "liberfc_reduced.cpp"
+#include "qalgorithms_patroon.cpp"
+#include "qalgorithms_qpeaks.cpp"
+#include "qalgorithms_utils.cpp"

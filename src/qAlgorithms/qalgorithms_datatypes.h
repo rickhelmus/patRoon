@@ -6,7 +6,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h> // INFINITY and other number macros
 #include <string>
-#include <qalgorithms_utils.h>
+#include "qalgorithms_utils.h"
 
 /*  This file includes the structs used for data management in qAlgorithms.
     Anything required by multiple parts of the full program should be listed here.

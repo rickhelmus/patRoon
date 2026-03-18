@@ -8,7 +8,6 @@ SRC=$(wildcard GenForm-svn/*.cpp)
 OBJECTS_GF=$(SRC:.cpp=.o)
 DEST_GF=GenForm
 
-CXX_STD = CXX14
 PKG_LIBS = $(SHLIB_OPENMP_CXXFLAGS) -lz
 PKG_CXXFLAGS = $(SHLIB_OPENMP_CXXFLAGS)
 

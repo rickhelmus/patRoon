@@ -408,12 +408,6 @@ anPLGroup2 <- screenInfo(fGroups)[name == "DEET"]$group
 test_that("plotting works", {
     skip_if_not(doMetFrag)
 
-    # plotting structure seems to be difficult to do reproducible between systems, so disable for vdiffr now...
-    expect_doppel("compound-spec", function() plotSpectrum(compsMFIso, 1, anPLGroup, plists, plotStruct = FALSE))
-    expect_doppel("compound-spec_sim", function() plotSpectrum(compsMFIso, index = c(1, 1), c(anPLGroup, anPLGroup2),
-                                                               MSPeakLists = plists, plotStruct = FALSE))
-    expect_plot(plotSpectrum(compsMFIso, 1, anPLGroup, plists, plotStruct = TRUE))
-
     # plotStructure gives an empty plot??
     # expect_doppel("struct", function() plotStructure(compsMFIso, 1, names(annotations(compsMFIso))[1]))
     expect_plot(plotStructure(compsMFIso, 1, anPLGroup))
@@ -433,6 +427,13 @@ test_that("plotting works", {
     expect_ggplot(plotUpSet(compsMF, compsSIR))
     expect_error(plotUpSet(compsMFEmpty, compsSIREmpty))
     expect_error(plotUpSet(compsMF, compsSIREmpty))
+    
+    # plotting structure seems to be difficult to do reproducible between systems, so disable for vdiffr now...
+    skip_unless_r(">=4.5.3")
+    expect_doppel("compound-spec", function() plotSpectrum(compsMFIso, 1, anPLGroup, plists, plotStruct = FALSE))
+    expect_doppel("compound-spec_sim", function() plotSpectrum(compsMFIso, index = c(1, 1), c(anPLGroup, anPLGroup2),
+                                                               MSPeakLists = plists, plotStruct = FALSE))
+    expect_plot(plotSpectrum(compsMFIso, 1, anPLGroup, plists, plotStruct = TRUE))
 })
 
 fgOneEmptySet <- makeOneEmptySetFGroups(fGroups)
@@ -458,18 +459,19 @@ test_that("sets functionality", {
                             must.include = paste0("fragScore-", sets(compsAvgSpecCols)[1]))
     checkmate::expect_names(names(as.data.table(compsAvgSpecCols)), must.include = "fragScore")
     
+    skip_if_not(doSIRIUS)
+    
+    expect_gt(length(setObjects(compsSIR)[[1]]@fingerprints), 0)
+    expect_gt(length(setObjects(compsSIR)[[2]]@fingerprints), 0)
+    testSIRFPSubset(setObjects(compsSIR)[[1]])
+    
+    skip_unless_r(">=4.5.3")
     expect_doppel("compound-spec-set", function() plotSpectrum(compsMFIso, 1, anPLGroup, plists, plotStruct = FALSE,
                                                                perSet = FALSE))
     expect_doppel("compound-spec-set-perset", function() plotSpectrum(compsMFIso, 1, anPLGroup, plists,
                                                                       plotStruct = FALSE, perSet = TRUE, mirror = FALSE))
     expect_doppel("compound-spec-set-mirror", function() plotSpectrum(compsMFIso, 1, anPLGroup, plists,
                                                                       plotStruct = FALSE, perSet = TRUE, mirror = TRUE))
-    
-    skip_if_not(doSIRIUS)
-    
-    expect_gt(length(setObjects(compsSIR)[[1]]@fingerprints), 0)
-    expect_gt(length(setObjects(compsSIR)[[2]]@fingerprints), 0)
-    testSIRFPSubset(setObjects(compsSIR)[[1]])
 })
 
 compsUS <- unset(comps, "positive")

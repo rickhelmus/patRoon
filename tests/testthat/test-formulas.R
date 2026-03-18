@@ -292,9 +292,6 @@ test_that("reporting empty objects works", {
 
 anPLGroup2 <- screenInfo(fGroups)[name == "DEET"]$group
 test_that("plotting works", {
-    expect_doppel("form-spec", function() plotSpectrum(formsGFWithMSMS, index = 1, anPLGroup, MSPeakLists = plists))
-    expect_doppel("form-spec_sim", function() plotSpectrum(formsGFWithMSMS, index = c(1, 1), c(anPLGroup, anPLGroup2),
-                                                           MSPeakLists = plists))
 
     expect_doppel("form-scores", function() plotScores(formsGFWithMSMS, index = 1, anPLGroup))
 
@@ -312,6 +309,11 @@ test_that("plotting works", {
 
     expect_equal(expect_plot(plotVenn(formsGF, formsSIR))$intersectionCounts,
                  length(doFormCons(formsGF, formsSIR, MSPeakLists = plists, relMinAbundance = 1)))
+    
+    skip_unless_r(">=4.5.3")
+    expect_doppel("form-spec", function() plotSpectrum(formsGFWithMSMS, index = 1, anPLGroup, MSPeakLists = plists))
+    expect_doppel("form-spec_sim", function() plotSpectrum(formsGFWithMSMS, index = c(1, 1), c(anPLGroup, anPLGroup2),
+                                                           MSPeakLists = plists))
 })
 
 fgOneEmptySet <- makeOneEmptySetFGroups(fGroups)
@@ -335,18 +337,19 @@ test_that("sets functionality", {
                             must.include = paste0("isoScore-", sets(formsGFAvgSpecCols)[1]))
     checkmate::expect_names(names(as.data.table(formsGFAvgSpecCols)), must.include = "isoScore")
     
+    skip_if_not(doSIRIUS)
+    
+    expect_gt(length(setObjects(formsSIRFPs)[[1]]@fingerprints), 0)
+    expect_gt(length(setObjects(formsSIRFPs)[[2]]@fingerprints), 0)
+    testSIRFPSubset(setObjects(formsSIRFPs)[[1]])
+
+    skip_unless_r(">=4.5.3")
     expect_doppel("form-spec-set", function() plotSpectrum(formsGFWithMSMS, index = 1, anPLGroup, MSPeakLists = plists,
                                                            perSet = FALSE))
     expect_doppel("form-spec-set-perset", function() plotSpectrum(formsGFWithMSMS, index = 1, anPLGroup,
                                                                   MSPeakLists = plists, perSet = TRUE, mirror = FALSE))
     expect_doppel("form-spec-set-mirror", function() plotSpectrum(formsGFWithMSMS, index = 1, anPLGroup,
                                                                   MSPeakLists = plists, perSet = TRUE, mirror = TRUE))
-    
-    skip_if_not(doSIRIUS)
-    
-    expect_gt(length(setObjects(formsSIRFPs)[[1]]@fingerprints), 0)
-    expect_gt(length(setObjects(formsSIRFPs)[[2]]@fingerprints), 0)
-    testSIRFPSubset(setObjects(formsSIRFPs)[[1]])
 })
 
 formsGFMSUS <- unset(formsGFMS, "positive")

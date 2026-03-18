@@ -5,7 +5,7 @@ library(patRoon)
 # initialization
 # -------------------------
 
-workPath <- "test_temp/test-np/report-html_legacy_csv_pdf"
+workPath <- "<WORK_PATH>/test-np/report-html_legacy_csv_pdf"
 setwd(workPath)
 
 # NOTE: please set to a valid data.frame with analysis information. See ?`analysis-information` for more details.
@@ -40,4 +40,4 @@ report(fGroups, MSPeakLists = NULL, formulas = NULL, compounds = NULL, component
 
 # Generate reports with legacy interface.
 reportCSV(fGroups, path = "report", formulas = NULL, compounds = NULL, components = NULL)
-reportPDF(fGroups, path = "report", formulas = NULL, compounds = NULL, components = NULL)
+reportPDF(fGroups, path = "report", formulas = NULL, compounds = NULL, MSPeakLists = NULL, components = NULL)

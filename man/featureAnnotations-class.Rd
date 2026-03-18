@@ -49,8 +49,11 @@
   elements = NULL,
   fragElements = NULL,
   lossElements = NULL,
+  fragFormulas = NULL,
+  lossFormulas = NULL,
   topMost = NULL,
   OM = FALSE,
+  maxLevel = NULL,
   negate = FALSE
 )
 
@@ -60,7 +63,7 @@
   obj,
   ...,
   labels = NULL,
-  nsets = length(list(...)) + 1,
+  nsets = NULL,
   nintersects = NA,
   upsetArgs = NULL
 )
@@ -157,8 +160,16 @@ if at least one of the fragment formulae follow (or not follow if
 \code{negate=TRUE}) the given restrictions. See \code{elements} for the
 used format.}
 
+\item{fragFormulas, lossFormulas}{A \code{character} vector with one or more formulae, which are matched to MS/MS
+fragments (\code{fragFormulas}) or neutral losses (\code{lossFormulas}). Candidates are only kept with at least one
+match (if both \code{fragFormulas} and \code{lossFormulas} are set then there must be at least one match from
+both). The input formulae are hill sorted prior to matching. For non-exact matching: see \code{fragElements} and
+\code{lossElements}. Set to \code{NULL} to ignore these filters.}
+
 \item{topMost}{Only keep a maximum of \code{topMost} candidates with highest score (or least highest if
 \code{negate=TRUE}). Set to \code{NULL} to ignore.}
+
+\item{maxLevel}{Filter by maximum identification level (\emph{e.g.} \code{"3a"}). Set to \code{NULL} to ignore.}
 
 \item{negate}{If \code{TRUE} then filters are applied in opposite manner.}
 
@@ -167,7 +178,8 @@ used format.}
 \item{vennArgs}{A \code{list} with further arguments passed to \pkg{VennDiagram} plotting functions. Set to
 \code{NULL} to ignore.}
 
-\item{nsets, nintersects}{See \code{\link[UpSetR]{upset}}.}
+\item{nsets, nintersects}{See \code{\link[UpSetR]{upset}}. If \code{nsets == NULL} then it will be set to the number
+of compared items.}
 
 \item{upsetArgs}{A list with any further arguments to be passed to
 \code{\link[UpSetR]{upset}}. Set to \code{NULL} to ignore.}
@@ -181,7 +193,7 @@ used format.}
 
 \code{plotVenn} (invisibly) returns a list with the following fields: \itemize{
 \item \code{gList} the \code{gList} object that was returned by
-  the utilized \pkg{\link{VennDiagram}} plotting function.
+  the utilized \CRANpkg{VennDiagram} plotting function.
 \item \code{areas} The total area for each plotted group.
 \item \code{intersectionCounts} The number of intersections between groups.
 }
@@ -221,7 +233,7 @@ information such as element counts.
 \item \code{filter(featureAnnotations)}: Provides rule based filtering for feature group annotations. Useful to eliminate
 unlikely candidates and speed up further processing.
 
-\item \code{plotVenn(featureAnnotations)}: plots a Venn diagram (using \pkg{\link{VennDiagram}}) outlining unique and shared
+\item \code{plotVenn(featureAnnotations)}: plots a Venn diagram (using \CRANpkg{VennDiagram}) outlining unique and shared
 candidates of up to five different \code{featureAnnotations} objects.
 
 \item \code{plotUpSet(featureAnnotations)}: plots an UpSet diagram (using the \code{\link[UpSetR]{upset}} function) outlining

@@ -18,7 +18,7 @@ http://ipb-halle.github.io/MetFrag/)."><!-- mathjax --><script src="https://cdnj
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.0</span>
       </span>
     </div>
 
@@ -103,16 +103,17 @@ http://ipb-halle.github.io/MetFrag/)."><!-- mathjax --><script src="https://cdnj
 <span><span class="fu">generateCompoundsMetFrag</span><span class="op">(</span></span>
 <span>  <span class="va">fGroups</span>,</span>
 <span>  <span class="va">MSPeakLists</span>,</span>
+<span>  specSimParams <span class="op">=</span> <span class="fu"><a href="specSimParams.html">getDefSpecSimParams</a></span><span class="op">(</span>removePrecursor <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"CL"</span>,</span>
 <span>  timeout <span class="op">=</span> <span class="fl">300</span>,</span>
 <span>  timeoutRetries <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  errorRetries <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  topMost <span class="op">=</span> <span class="fl">100</span>,</span>
-<span>  dbRelMzDev <span class="op">=</span> <span class="fl">5</span>,</span>
-<span>  fragRelMzDev <span class="op">=</span> <span class="fl">5</span>,</span>
-<span>  fragAbsMzDev <span class="op">=</span> <span class="fl">0.002</span>,</span>
+<span>  dbRelMzDev <span class="op">=</span> <span class="fu"><a href="limits.html">defaultLim</a></span><span class="op">(</span><span class="st">"mz"</span>, <span class="st">"narrow_rel"</span><span class="op">)</span>,</span>
+<span>  fragRelMzDev <span class="op">=</span> <span class="fu"><a href="limits.html">defaultLim</a></span><span class="op">(</span><span class="st">"mz"</span>, <span class="st">"narrow_rel"</span><span class="op">)</span>,</span>
+<span>  fragAbsMzDev <span class="op">=</span> <span class="fu"><a href="limits.html">defaultLim</a></span><span class="op">(</span><span class="st">"mz"</span>, <span class="st">"narrow"</span><span class="op">)</span>,</span>
 <span>  adduct <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  database <span class="op">=</span> <span class="st">"pubchem"</span>,</span>
+<span>  database <span class="op">=</span> <span class="st">"pubchemlite"</span>,</span>
 <span>  extendedPubChem <span class="op">=</span> <span class="st">"auto"</span>,</span>
 <span>  chemSpiderToken <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  scoreTypes <span class="op">=</span> <span class="fu"><a href="compoundScorings.html">compoundScorings</a></span><span class="op">(</span><span class="st">"metfrag"</span>, <span class="va">database</span>, onlyDefault <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">$</span><span class="va">name</span>,</span>
@@ -121,21 +122,23 @@ http://ipb-halle.github.io/MetFrag/)."><!-- mathjax --><script src="https://cdnj
 <span>  postProcessingFilters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"InChIKeyFilter"</span><span class="op">)</span>,</span>
 <span>  maxCandidatesToStop <span class="op">=</span> <span class="fl">2500</span>,</span>
 <span>  identifiers <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  extraOpts <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  extraOpts <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  minMobSpecSim <span class="op">=</span> <span class="fl">0</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'featureGroupsSet'</span></span>
 <span><span class="fu">generateCompoundsMetFrag</span><span class="op">(</span></span>
 <span>  <span class="va">fGroups</span>,</span>
 <span>  <span class="va">MSPeakLists</span>,</span>
+<span>  specSimParams <span class="op">=</span> <span class="fu"><a href="specSimParams.html">getDefSpecSimParams</a></span><span class="op">(</span>removePrecursor <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"CL"</span>,</span>
 <span>  timeout <span class="op">=</span> <span class="fl">300</span>,</span>
 <span>  timeoutRetries <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  errorRetries <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  topMost <span class="op">=</span> <span class="fl">100</span>,</span>
-<span>  dbRelMzDev <span class="op">=</span> <span class="fl">5</span>,</span>
-<span>  fragRelMzDev <span class="op">=</span> <span class="fl">5</span>,</span>
-<span>  fragAbsMzDev <span class="op">=</span> <span class="fl">0.002</span>,</span>
+<span>  dbRelMzDev <span class="op">=</span> <span class="fu"><a href="limits.html">defaultLim</a></span><span class="op">(</span><span class="st">"mz"</span>, <span class="st">"narrow_rel"</span><span class="op">)</span>,</span>
+<span>  fragRelMzDev <span class="op">=</span> <span class="fu"><a href="limits.html">defaultLim</a></span><span class="op">(</span><span class="st">"mz"</span>, <span class="st">"narrow_rel"</span><span class="op">)</span>,</span>
+<span>  fragAbsMzDev <span class="op">=</span> <span class="fu"><a href="limits.html">defaultLim</a></span><span class="op">(</span><span class="st">"mz"</span>, <span class="st">"narrow"</span><span class="op">)</span>,</span>
 <span>  adduct <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  setThreshold <span class="op">=</span> <span class="fl">0</span>,</span>
@@ -160,6 +163,12 @@ feature groups in the subset are considered.</p></dd>
 
 <dt id="arg-mspeaklists">MSPeakLists<a class="anchor" aria-label="anchor" href="#arg-mspeaklists"></a></dt>
 <dd><p>A <code><a href="MSPeakLists-class.html">MSPeakLists</a></code> object that was generated for the supplied <code>fGroups</code>.</p></dd>
+
+
+<dt id="arg-specsimparams">specSimParams<a class="anchor" aria-label="anchor" href="#arg-specsimparams"></a></dt>
+<dd><p>A named <code>list</code> with parameters that influence the calculation of the
+<a href="id-conf.html">annotation similarity</a>. See the <a href="specSimParams.html">spectral similarity parameters</a> documentation
+for more details.</p></dd>
 
 
 <dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
@@ -254,7 +263,7 @@ information refer to the <code>Candidate Filters</code> section on the
 <dt id="arg-maxcandidatestostop">maxCandidatesToStop<a class="anchor" aria-label="anchor" href="#arg-maxcandidatestostop"></a></dt>
 <dd><p>If more than this number of candidate structures are found then processing will be aborted
 and no results this feature group will be reported. Low values increase the chance of missing data, whereas too
-high values will use too much computer resources and signficantly slowdown the process. Sets the
+high values will use too much computer resources and significantly slowdown the process. Sets the
 <span class="option">MaxCandidateLimitToStop</span> option.</p></dd>
 
 
@@ -273,6 +282,16 @@ option.</p></dd>
 <a href="http://ipb-halle.github.io/MetFrag/projects/metfragr/" class="external-link">MetFragR</a> and
 <a href="http://ipb-halle.github.io/MetFrag/projects/metfragcl/" class="external-link">MetFrag CL</a> homepages for all available options. Set
 to <code>NULL</code> to ignore.</p></dd>
+
+
+<dt id="arg-minmobspecsim">minMobSpecSim<a class="anchor" aria-label="anchor" href="#arg-minmobspecsim"></a></dt>
+<dd><p>(<strong>IMS workflow</strong>) If the spectrum similarity of a mobility feature group compared to its IMS parent (see
+<code><a href="assignMobilities_feat.html">assignMobilities</a></code>) is at least this value, then the mobility feature group
+will not be subjected to the annotation algorithm and all feature annotation properties will be copied from its
+parent. This assumes that feature annotation is primarily influenced by the MS/MS spectrum, and can be used to
+speed up the feature annotation process. All scorings, annotation similarities etc. are copied from the IMS parent.
+The fragment annotations are also copied (<code>fragInfo</code> result column), however, these are adjusted based on the
+peak list data of the mobility feature group.</p></dd>
 
 
 <dt id="arg-setthreshold">setThreshold<a class="anchor" aria-label="anchor" href="#arg-setthreshold"></a></dt>
@@ -309,15 +328,15 @@ averaged.</p></dd>
     <h2>Scorings</h2>
     <p><code class="command">MetFrag</code> supports <em>many</em> different scorings to rank candidates. The
   <code><a href="compoundScorings.html">compoundScorings</a></code> function can be used to get an overview: (some columns are omitted)</p>
-<p></p><table class="table table"><tr><td><strong>name</strong></td><td><strong>metfrag</strong></td><td><strong>database</strong></td></tr><tr><td>score</td><td>Score</td><td></td></tr><tr><td>fragScore</td><td>FragmenterScore</td><td></td></tr><tr><td>metFusionScore</td><td>OfflineMetFusionScore</td><td></td></tr><tr><td>individualMoNAScore</td><td>OfflineIndividualMoNAScore</td><td></td></tr><tr><td>numberPatents</td><td>PubChemNumberPatents</td><td>pubchem</td></tr><tr><td>numberPatents</td><td>Patent_Count</td><td>pubchemlite</td></tr><tr><td>pubMedReferences</td><td>PubChemNumberPubMedReferences</td><td>pubchem</td></tr><tr><td>pubMedReferences</td><td>ChemSpiderNumberPubMedReferences</td><td>chemspider</td></tr><tr><td>pubMedReferences</td><td>NUMBER_OF_PUBMED_ARTICLES</td><td>comptox</td></tr><tr><td>pubMedReferences</td><td>PubMed_Count</td><td>pubchemlite</td></tr><tr><td>extReferenceCount</td><td>ChemSpiderNumberExternalReferences</td><td>chemspider</td></tr><tr><td>dataSourceCount</td><td>ChemSpiderDataSourceCount</td><td>chemspider</td></tr><tr><td>referenceCount</td><td>ChemSpiderReferenceCount</td><td>chemspider</td></tr><tr><td>RSCCount</td><td>ChemSpiderRSCCount</td><td>chemspider</td></tr><tr><td>smartsInclusionScore</td><td>SmartsSubstructureInclusionScore</td><td></td></tr><tr><td>smartsExclusionScore</td><td>SmartsSubstructureExclusionScore</td><td></td></tr><tr><td>suspectListScore</td><td>SuspectListScore</td><td></td></tr><tr><td>retentionTimeScore</td><td>RetentionTimeScore</td><td></td></tr><tr><td>CPDATCount</td><td>CPDAT_COUNT</td><td>comptox</td></tr><tr><td>TOXCASTActive</td><td>TOXCAST_PERCENT_ACTIVE</td><td>comptox</td></tr><tr><td>dataSources</td><td>DATA_SOURCES</td><td>comptox</td></tr><tr><td>pubChemDataSources</td><td>PUBCHEM_DATA_SOURCES</td><td>comptox</td></tr><tr><td>EXPOCASTPredExpo</td><td>EXPOCAST_MEDIAN_EXPOSURE_PREDICTION_MG/KG-BW/DAY</td><td>comptox</td></tr><tr><td>ECOTOX</td><td>ECOTOX</td><td>comptox</td></tr><tr><td>NORMANSUSDAT</td><td>NORMANSUSDAT</td><td>comptox</td></tr><tr><td>MASSBANKEU</td><td>MASSBANKEU</td><td>comptox</td></tr><tr><td>TOX21SL</td><td>TOX21SL</td><td>comptox</td></tr><tr><td>TOXCAST</td><td>TOXCAST</td><td>comptox</td></tr><tr><td>KEMIMARKET</td><td>KEMIMARKET</td><td>comptox</td></tr><tr><td>MZCLOUD</td><td>MZCLOUD</td><td>comptox</td></tr><tr><td>pubMedNeuro</td><td>PubMedNeuro</td><td>comptox</td></tr><tr><td>CIGARETTES</td><td>CIGARETTES</td><td>comptox</td></tr><tr><td>INDOORCT16</td><td>INDOORCT16</td><td>comptox</td></tr><tr><td>SRM2585DUST</td><td>SRM2585DUST</td><td>comptox</td></tr><tr><td>SLTCHEMDB</td><td>SLTCHEMDB</td><td>comptox</td></tr><tr><td>THSMOKE</td><td>THSMOKE</td><td>comptox</td></tr><tr><td>ITNANTIBIOTIC</td><td>ITNANTIBIOTIC</td><td>comptox</td></tr><tr><td>STOFFIDENT</td><td>STOFFIDENT</td><td>comptox</td></tr><tr><td>KEMIMARKET_EXPO</td><td>KEMIMARKET_EXPO</td><td>comptox</td></tr><tr><td>KEMIMARKET_HAZ</td><td>KEMIMARKET_HAZ</td><td>comptox</td></tr><tr><td>REACH2017</td><td>REACH2017</td><td>comptox</td></tr><tr><td>KEMIWW_WDUIndex</td><td>KEMIWW_WDUIndex</td><td>comptox</td></tr><tr><td>KEMIWW_StpSE</td><td>KEMIWW_StpSE</td><td>comptox</td></tr><tr><td>KEMIWW_SEHitsOverDL</td><td>KEMIWW_SEHitsOverDL</td><td>comptox</td></tr><tr><td>ZINC15PHARMA</td><td>ZINC15PHARMA</td><td>comptox</td></tr><tr><td>PFASMASTER</td><td>PFASMASTER</td><td>comptox</td></tr><tr><td>peakFingerprintScore</td><td>AutomatedPeakFingerprintAnnotationScore</td><td></td></tr><tr><td>lossFingerprintScore</td><td>AutomatedLossFingerprintAnnotationScore</td><td></td></tr><tr><td>agroChemInfo</td><td>AgroChemInfo</td><td>pubchemlite</td></tr><tr><td>bioPathway</td><td>BioPathway</td><td>pubchemlite</td></tr><tr><td>drugMedicInfo</td><td>DrugMedicInfo</td><td>pubchemlite</td></tr><tr><td>foodRelated</td><td>FoodRelated</td><td>pubchemlite</td></tr><tr><td>pharmacoInfo</td><td>PharmacoInfo</td><td>pubchemlite</td></tr><tr><td>safetyInfo</td><td>SafetyInfo</td><td>pubchemlite</td></tr><tr><td>toxicityInfo</td><td>ToxicityInfo</td><td>pubchemlite</td></tr><tr><td>knownUse</td><td>KnownUse</td><td>pubchemlite</td></tr><tr><td>disorderDisease</td><td>DisorderDisease</td><td>pubchemlite</td></tr><tr><td>identification</td><td>Identification</td><td>pubchemlite</td></tr><tr><td>annoTypeCount</td><td>FPSum</td><td>pubchemlite</td></tr><tr><td>annoTypeCount</td><td>AnnoTypeCount</td><td>pubchemlite</td></tr><tr><td>annotHitCount</td><td>AnnotHitCount</td><td>pubchemlite</td></tr></table><p>In addition, the <code><a href="compoundScorings.html">compoundScorings</a></code> function is also useful to programmatically
+<p></p><table class="table table"><tr><td><strong>name</strong></td><td><strong>metfrag</strong></td><td><strong>database</strong></td></tr><tr><td>score</td><td>Score</td><td></td></tr><tr><td>fragScore</td><td>FragmenterScore</td><td></td></tr><tr><td>metFusionScore</td><td>OfflineMetFusionScore</td><td></td></tr><tr><td>individualMoNAScore</td><td>OfflineIndividualMoNAScore</td><td></td></tr><tr><td>numberPatents</td><td>PubChemNumberPatents</td><td>pubchem</td></tr><tr><td>numberPatents</td><td>Patent_Count</td><td>pubchemlite</td></tr><tr><td>pubMedReferences</td><td>PubChemNumberPubMedReferences</td><td>pubchem</td></tr><tr><td>pubMedReferences</td><td>ChemSpiderNumberPubMedReferences</td><td>chemspider</td></tr><tr><td>pubMedReferences</td><td>NUMBER_OF_PUBMED_ARTICLES</td><td>comptox</td></tr><tr><td>pubMedReferences</td><td>PubMed_Count</td><td>pubchemlite</td></tr><tr><td>extReferenceCount</td><td>ChemSpiderNumberExternalReferences</td><td>chemspider</td></tr><tr><td>dataSourceCount</td><td>ChemSpiderDataSourceCount</td><td>chemspider</td></tr><tr><td>referenceCount</td><td>ChemSpiderReferenceCount</td><td>chemspider</td></tr><tr><td>RSCCount</td><td>ChemSpiderRSCCount</td><td>chemspider</td></tr><tr><td>smartsInclusionScore</td><td>SmartsSubstructureInclusionScore</td><td></td></tr><tr><td>smartsExclusionScore</td><td>SmartsSubstructureExclusionScore</td><td></td></tr><tr><td>suspectListScore</td><td>SuspectListScore</td><td></td></tr><tr><td>retentionTimeScore</td><td>RetentionTimeScore</td><td></td></tr><tr><td>CPDATCount</td><td>CPDAT_COUNT</td><td>comptox</td></tr><tr><td>TOXCASTActive</td><td>TOXCAST_PERCENT_ACTIVE</td><td>comptox</td></tr><tr><td>dataSources</td><td>DATA_SOURCES</td><td>comptox</td></tr><tr><td>pubChemDataSources</td><td>PUBCHEM_DATA_SOURCES</td><td>comptox</td></tr><tr><td>EXPOCASTPredExpo</td><td>EXPOCAST_MEDIAN_EXPOSURE_PREDICTION_MG/KG-BW/DAY</td><td>comptox</td></tr><tr><td>ECOTOX</td><td>ECOTOX</td><td>comptox</td></tr><tr><td>NORMANSUSDAT</td><td>NORMANSUSDAT</td><td>comptox</td></tr><tr><td>MASSBANKEU</td><td>MASSBANKEU</td><td>comptox</td></tr><tr><td>TOX21SL</td><td>TOX21SL</td><td>comptox</td></tr><tr><td>TOXCAST</td><td>TOXCAST</td><td>comptox</td></tr><tr><td>KEMIMARKET</td><td>KEMIMARKET</td><td>comptox</td></tr><tr><td>MZCLOUD</td><td>MZCLOUD</td><td>comptox</td></tr><tr><td>pubMedNeuro</td><td>PubMedNeuro</td><td>comptox</td></tr><tr><td>CIGARETTES</td><td>CIGARETTES</td><td>comptox</td></tr><tr><td>INDOORCT16</td><td>INDOORCT16</td><td>comptox</td></tr><tr><td>SRM2585DUST</td><td>SRM2585DUST</td><td>comptox</td></tr><tr><td>SLTCHEMDB</td><td>SLTCHEMDB</td><td>comptox</td></tr><tr><td>THSMOKE</td><td>THSMOKE</td><td>comptox</td></tr><tr><td>ITNANTIBIOTIC</td><td>ITNANTIBIOTIC</td><td>comptox</td></tr><tr><td>STOFFIDENT</td><td>STOFFIDENT</td><td>comptox</td></tr><tr><td>KEMIMARKET_EXPO</td><td>KEMIMARKET_EXPO</td><td>comptox</td></tr><tr><td>KEMIMARKET_HAZ</td><td>KEMIMARKET_HAZ</td><td>comptox</td></tr><tr><td>REACH2017</td><td>REACH2017</td><td>comptox</td></tr><tr><td>KEMIWW_WDUIndex</td><td>KEMIWW_WDUIndex</td><td>comptox</td></tr><tr><td>KEMIWW_StpSE</td><td>KEMIWW_StpSE</td><td>comptox</td></tr><tr><td>KEMIWW_SEHitsOverDL</td><td>KEMIWW_SEHitsOverDL</td><td>comptox</td></tr><tr><td>ZINC15PHARMA</td><td>ZINC15PHARMA</td><td>comptox</td></tr><tr><td>PFASMASTER</td><td>PFASMASTER</td><td>comptox</td></tr><tr><td>peakFingerprintScore</td><td>AutomatedPeakFingerprintAnnotationScore</td><td></td></tr><tr><td>lossFingerprintScore</td><td>AutomatedLossFingerprintAnnotationScore</td><td></td></tr><tr><td>agroChemInfo</td><td>AgroChemInfo</td><td>pubchemlite</td></tr><tr><td>bioPathway</td><td>BioPathway</td><td>pubchemlite</td></tr><tr><td>drugMedicInfo</td><td>DrugMedicInfo</td><td>pubchemlite</td></tr><tr><td>foodRelated</td><td>FoodRelated</td><td>pubchemlite</td></tr><tr><td>pharmacoInfo</td><td>PharmacoInfo</td><td>pubchemlite</td></tr><tr><td>safetyInfo</td><td>SafetyInfo</td><td>pubchemlite</td></tr><tr><td>toxicityInfo</td><td>ToxicityInfo</td><td>pubchemlite</td></tr><tr><td>knownUse</td><td>KnownUse</td><td>pubchemlite</td></tr><tr><td>disorderDisease</td><td>DisorderDisease</td><td>pubchemlite</td></tr><tr><td>identification</td><td>Identification</td><td>pubchemlite</td></tr><tr><td>annoTypeCount</td><td>AnnoTypeCount</td><td>pubchemlite</td></tr><tr><td>annotHitCount</td><td>AnnotHitCount</td><td>pubchemlite</td></tr></table><p>In addition, the <code><a href="compoundScorings.html">compoundScorings</a></code> function is also useful to programmatically
   generate a set of scorings to be used for ranking with <code class="command">MetFrag</code>. For instance, the following can be given
   to the <code>scoreTypes</code> argument to use all default scorings for PubChem: <code>compoundScorings("metfrag",
   "pubchem", onlyDefault=TRUE)$name</code>.</p>
 <p>For all <code class="command">MetFrag</code> scoring types refer to the <code>Candidate Scores</code> section on the
   <a href="http://ipb-halle.github.io/MetFrag/projects/metfragr/" class="external-link">MetFragR homepage</a>.</p>
     </div>
-    <div id="usage-of-metfrag-databases">
-    <h2>Usage of MetFrag databases</h2>
+    <div id="metfrag-databases">
+    <h2>MetFrag databases</h2>
     <p>When <code>database="chemspider"</code> setting the <code>chemSpiderToken</code> argument is
   mandatory.</p>
 <p>If a local database is chosen via <code>sdf</code>, <code>psv</code>, or <code>csv</code> then its file location should be set with
@@ -327,6 +346,11 @@ averaged.</p></dd>
   file location must be specified as above or by setting the
   <code>patRoon.path.MetFragPubChemLite</code>/<code>patRoon.path.MetFragCompTox</code> option. See the installation section in
   the handbook for more details.</p>
+<p>If <code>database="pubchemlite"</code> and the local file has <acronym>CCS</acronym> predictions (see
+  <a href="https://zenodo.org/records/15311000" class="external-link">https://zenodo.org/records/15311000</a>), then <acronym>CCS</acronym> values will be copied from the corresponding adduct
+  of the feature groups (or as specified by the <code>adduct</code> argument). These can be converted to mobilities with
+  <code><a href="assignMobilities_comp.html">assignMobilities</a></code> and used for candidate filtering with
+  <code><a href="compounds-class.html">filter</a></code>.</p>
     </div>
     <div id="parallelization">
     <h2>Parallelization</h2>
@@ -341,6 +365,8 @@ averaged.</p></dd>
   (<span class="option">patRoon.path.MetFragPubChemLite</span> and <span class="option">patRoon.path.MetFragCompTox</span>) or made available by installing
   the <span class="pkg">patRoonExt</span> package. Note that these files must <em>also</em> be present on the local host computer, even if
   it is not participating in computations.</p>
+<p>If the compound database is <em>not</em> local, <em>e.g.</em> <code>database="pubchem"</code>, then parallelization is
+  disabled to avoid connection errors that typically occur otherwise.</p>
     </div>
     <div id="references">
     <h2>References</h2>
@@ -348,7 +374,23 @@ averaged.</p></dd>
 “MetFrag relaunched: incorporating strategies beyond in silico fragmentation.”
 <em>Journal of Cheminformatics</em>, <b>8</b>(1).
 <a href="https://doi.org/10.1186/s13321-016-0115-9" class="external-link">doi:10.1186/s13321-016-0115-9</a>
-.</p>
+.
+ <br><br> Schymanski EL, Kondić T, Neumann S, Thiessen PA, Zhang J, Bolton EE (2021).
+“Empowering large chemical knowledge bases for exposomics: PubChemLite meets MetFrag.”
+<em>Journal of Cheminformatics</em>, <b>13</b>(1).
+ISSN 1758-2946, <a href="https://doi.org/10.1186/s13321-021-00489-0" class="external-link">doi:10.1186/s13321-021-00489-0</a>
+, <a href="http://dx.doi.org/10.1186/s13321-021-00489-0" class="external-link">http://dx.doi.org/10.1186/s13321-021-00489-0</a>.
+ <br><br>
+  Elapavalore A, Ross DH, Grouès V, Aurich D, Krinsky AM, Kim S, Thiessen PA, Zhang J, Dodds JN, Baker ES, Bolton EE, Xu L, Schymanski EL (2025).
+“PubChemLite Plus Collision Cross Section (CCS) Values for Enhanced Interpretation of Nontarget Environmental Data.”
+<em>Environmental Science &amp; Technology Letters</em>, <b>12</b>(2), 166–174.
+ISSN 2328-8930, <a href="https://doi.org/10.1021/acs.estlett.4c01003" class="external-link">doi:10.1021/acs.estlett.4c01003</a>
+, <a href="http://dx.doi.org/10.1021/acs.estlett.4c01003" class="external-link">http://dx.doi.org/10.1021/acs.estlett.4c01003</a>.
+ <br><br> Ross DH, Cho JH, Xu L (2020).
+“Breaking Down Structural Diversity for Comprehensive Prediction of Ion-Neutral Collision Cross Sections.”
+<em>Analytical Chemistry</em>, <b>92</b>(6), 4548–4557.
+ISSN 1520-6882, <a href="https://doi.org/10.1021/acs.analchem.9b05772" class="external-link">doi:10.1021/acs.analchem.9b05772</a>
+, <a href="http://dx.doi.org/10.1021/acs.analchem.9b05772" class="external-link">http://dx.doi.org/10.1021/acs.analchem.9b05772</a>.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>

@@ -11,25 +11,27 @@ generateComponentsTPs(fGroups, ...)
 \S4method{generateComponentsTPs}{featureGroups}(
   fGroups,
   fGroupsTPs = fGroups,
-  ignoreParents = FALSE,
   TPs = NULL,
   MSPeakLists = NULL,
   formulas = NULL,
   compounds = NULL,
+  ignoreParents = FALSE,
   minRTDiff = 20,
-  specSimParams = getDefSpecSimParams()
+  specSimParams = getDefSpecSimParams(),
+  IMS = "maybe"
 )
 
 \S4method{generateComponentsTPs}{featureGroupsSet}(
   fGroups,
   fGroupsTPs = fGroups,
-  ignoreParents = FALSE,
   TPs = NULL,
   MSPeakLists = NULL,
   formulas = NULL,
   compounds = NULL,
+  ignoreParents = FALSE,
   minRTDiff = 20,
-  specSimParams = getDefSpecSimParams()
+  specSimParams = getDefSpecSimParams(),
+  IMS = "maybe"
 )
 }
 \arguments{
@@ -42,20 +44,33 @@ transformation products. If a distinction between parents and TPs is not yet kno
 the \code{fGroups} argument. Otherwise, \code{fGroups} should only contain the parent feature groups, and both
 \code{fGroups} and \code{fGroupsTPs} \emph{must} be a subset of the same \code{\link{featureGroups}} object.}
 
-\item{ignoreParents}{If \code{TRUE} then feature groups present in both \code{fGroups} and \code{fGroupsTPs} are not
-considered as TPs.}
-
 \item{TPs}{A \code{\link{transformationProducts}} object. Set to \code{NULL} to perform linking without this data.}
 
 \item{MSPeakLists, formulas, compounds}{A \code{\link{MSPeakLists}}/\code{\link{formulas}}/\code{\link{compounds}}
 object to calculate MS/MS or annotation similarities between parents and TPs. If \code{NULL} then this data is not
 calculated. For more details see the \verb{Linking parents and transformation products} section below.}
 
-\item{minRTDiff}{Minimum retention time (in seconds) difference between the parent and a TP to determine whether a TP
-elutes prior/after the parent (to calculate \code{retDir} values, see Details in \link{componentsTPs}))}
+\item{ignoreParents}{If \code{TRUE} then feature groups present in both \code{fGroups} and \code{fGroupsTPs} are not
+considered as TPs.}
+
+\item{minRTDiff}{Minimum retention time (in seconds) difference between the parent and a TP to calculate the
+\link[=retDir]{retention order direction}.}
 
 \item{specSimParams}{A named \code{list} with parameters that influence the calculation of MS spectra similarities.
 See the \link[=specSimParams]{spectral similarity parameters} documentation for more details.}
+
+\item{IMS}{\IMSWF Specifies which feature groups are considered for componentization in IMS workflows. The following options
+  are valid: \itemize{
+
+  \item \code{"both"}: Selects IMS and non-IMS features.
+
+  \item \code{"maybe"}: Selects non-IMS features and IMS features without assigned IMS parent.
+
+  \item \code{FALSE}: Selects only non-IMS features.
+
+  \item \code{TRUE}: Selects only IMS features.
+
+  }}
 }
 \value{
 The components are stored in objects derived from \code{\link{componentsTPs}}.
@@ -84,14 +99,20 @@ The \code{shift} parameter of \code{specSimParams} is ignored by \code{generateC
   therefore be considered as both a parent or TP.
 
   If transformation product data is given, \emph{i.e.} the \code{TPs} argument is set, then a suspect screening of
-  the TPs must be performed in advance (see \code{\link{screenSuspects}} and \code{\link{convertToSuspects}} to
-  create the suspect list). Furthermore, if TPs were generated with \code{\link{generateTPsBioTransformer}} or
-  \code{\link{generateTPsLibrary}} then the suspect screening must also include the parents (\emph{e.g.} by setting
-  \code{includeParents=TRUE} when calling \code{convertToSuspects} or by amending results by setting
-  \code{amend=TRUE} to \code{screenSuspects}). The suspect screening is necessary for the componentization algorithm
-  to map the feature groups of the parent or TP. If the the suspect screening yields multiple TP hits, all will be
-  reported. Similarly, if the suspect screening contains multiple hits for a parent, a component is made for each of
-  the parent hits.
+  the parents and/or TPs may need to be performed in advance to facilitate linkage. This depends on the algorithm
+  that was used to generate the TPs: \itemize{
+
+    \item the parents need to be screened for all algorithms except \code{logic} (\code{\link{generateTPsLogic}})
+
+    \item the TPs need to be screened for all algorithms except \code{ann_form} and \code{ann_comp}
+    (\code{\link{generateTPsAnnForm}} and \code{\link{generateTPsAnnComp}}).
+  }
+
+  See \code{\link{screenSuspects}} to perform the screening and \code{\link{convertToSuspects}} to create the suspect
+  list. To include parents make sure to set \code{includeParents=TRUE} when calling \code{convertToSuspects} or first
+  screen for the parents and then amend the screening object with TP screening results by setting \code{amend=TRUE}
+  to \code{screenSuspects}. If the the suspect screening yields multiple TP hits, all will be reported. Similarly, if
+  the suspect screening contains multiple hits for a parent, a component is made for each of the parent hits.
 
   In case no transformation product data is provided (\code{TPs=NULL}), the componentization algorithm simply assumes
   that each feature group from \code{fGroupsTPs} is a potential TP for every parent feature group in \code{fGroups}.
@@ -103,34 +124,65 @@ The \code{shift} parameter of \code{specSimParams} is ignored by \code{generateC
   A typical way to distinguish which feature groups are parents or TPs from two different (groups of) samples is by
   calculating Fold Changes (see the \code{\link[=as.data.table,featureGroups-method]{as.data.table}} method for
   feature groups and \code{\link{plotVolcano}}). Of course, other statistical techniques from \R are also suitable.
+}
 
-  During componentization, several characteristics are calculated which may be useful for post-processing: \itemize{
+\section{Result columns}{
+ During componentization, several characteristics are calculated which may be useful for
+  post-processing. These can be obtained with \emph{e.g.}
+  \code{\link[=as.data.table,componentsTPs-method]{as.data.table}} or \code{\link{componentTable}}. The properties
+  are either reported for each feature group in a component, or for each candidate of a feature group in a component
+  (only if \code{TPs} was set).
 
-  \item \code{specSimilarity}: the MS/MS spectral similarity between the feature groups of the TP and its parent
-  (\samp{0-1}).
+  The following properties may be reported for each feature group: \itemize{
 
-  \item \code{specSimilarityPrec},\code{specSimilarityBoth}: as \code{specSimilarity}, but calculated with binned
-  data using the \code{"precursor"} and \code{"both"} method, respectively (see \link[=specSimParams]{MS spectral
-  similarity parameters} for more details).
+    \item \code{specSimilarity}: the MS/MS spectral similarity between the feature groups of the TP and its parent
+    (\samp{0-1}).
 
-  \item \code{fragmentMatches} The number of MS/MS fragment formula annotations that overlap between the TP and
-  parent. If both the \code{formulas} and \code{compounds} arguments are specified then the annotation data is pooled
-  prior to calculation. Note that only unique matches are counted. Furthermore, note that annotations from \emph{all}
-  candidates are considered, even if the formula/structure of the parent/TP is known. Hence, \code{fragmentMatches}
-  is mainly useful when little or no chemical information is known on the parents/TPs, \emph{i.e.}, when
-  \code{TPs=NULL} or originates from \code{\link{generateTPsLogic}}. Since annotations for all candidates are used,
-  it is highly recommended that the annotation objects are first processed with the \code{\link{filter}} method, for
-  instance, to select only the top ranked candidates.
+    \item \code{specSimilarityPrec},\code{specSimilarityBoth}: as \code{specSimilarity}, but calculated with binned
+    data using the \code{"precursor"} and \code{"both"} method, respectively (see \link[=specSimParams]{MS spectral
+    similarity parameters} for more details).
 
-  \item \code{neutralLossMatches} As \code{fragmentMatches}, but counting overlapping neutral loss formulae.
+    \item \code{totalFragmentMatches} The total number of MS/MS fragment annotations that overlap between \emph{all}
+    feature annotation candidates for the TP feature group and the feature annotations specifically for the parent
+    (based on the assigned fragment formula). If both the \code{formulas} and \code{compounds} arguments are
+    specified then the annotation data is pooled prior to calculation. Each unique match is only counted once.
 
-  \item \code{retDir} The retention time direction of the TP relative to its parent. See Details in
-  \link{componentsTPs}. If TP data was specified, the expected direction is stored in \code{TP_retDir}.
+    \item \code{totalNeutralLossMatches} As \code{totalFragmentMatches}, but counting overlapping neutral loss
+    formulae.
 
-  \item \code{retDiff},\code{mzDiff},\code{formulaDiff} The retention time, \emph{m/z} and formula difference between
-  the parent and TP (latter only available if data TP formula is available).
+    \item \code{retDir},\code{TP_retDir} The \link[=retDir]{retention order direction} derived from the feature groups
+    (\code{retDir}) or the (expected) value from TP data (\code{TP_retDir}).
+
+    \item \code{retDiff},\code{mzDiff}, The retention time and \emph{m/z} difference between the parent and TP.
 
   }
+
+  The candidate specific properties are stored inside the \code{candidates} column in component tables, and can be
+  obtained with \code{as.data.table} by setting \code{candidates=TRUE}. The following properties may be present: \itemize{
+
+    \item \code{fragmentMatches},\code{neutralLossMatches} As \code{totalFragmentMatches} and
+    \code{totalNeutralLossMatches}, but only considering the feature annotations specifically for this candidate.
+
+    \item \code{formulaDiff} The formula difference between the parent and TP (if formula data is available).
+
+    \item \code{TPScore},\code{annSim},\code{fitFormula},\code{fitCompound},\code{simSusps}: TP scoring properties,
+    see \code{\link{generateTPsAnnForm}} and \code{\link{generateTPsAnnComp}}.
+
+  }
+}
+
+\section{IMS workflows}{
+ In IMS workflows with post mobility assignment (see
+  \code{\link[=assignMobilities_feat]{assignMobilities}}) it may be necessary to call \code{\link{expandForIMS}} when
+  componentization was performed \emph{prior} to mobility assignments, see its documentation for more details.
+
+  If mobilities were already assigned prior to componentization, then the \code{IMS} argument selects which feature
+  groups are subjected to componentization. Data for mobility feature groups that were not considered (\emph{i.e.}
+  when \code{IMS} is \code{FALSE} or \code{"maybe"}), will be expanded similarly as is done by
+  \code{\link{expandForIMS}}.
+
+ \strong{NOTE}: IMS expansion by \code{\link{expandForIMS}} only expands results for TP
+  candidates, \emph{i.e.} no new components from parents assigned to mobility feature groups will be added.
 }
 
 \section{Sets workflows}{

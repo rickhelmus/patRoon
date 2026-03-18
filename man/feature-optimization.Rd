@@ -67,7 +67,7 @@ neededless long optimization procedures. In IPO this was fixed to \samp{50}.}
 
 \item{maxModelDeviation}{See the \verb{Potential suboptimal results by optimization model} section below.}
 
-\item{parallel}{If set to \code{TRUE} then code is executed in parallel through the \CRANpkg{futures} package. Please
+\item{parallel}{If set to \code{TRUE} then code is executed in parallel through the \CRANpkg{future} package. Please
 see the parallelization section in the handbook for more details.}
 
 \item{anaInfo}{\link[=analysis-information]{Analysis info table} (passed to \code{\link{findFeatures}}).}

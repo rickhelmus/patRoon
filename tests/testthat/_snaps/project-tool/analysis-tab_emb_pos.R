@@ -5,12 +5,12 @@ library(patRoon)
 # initialization
 # -------------------------
 
-workPath <- "test_temp/test-np/analysis-tab_emb_pos"
+workPath <- "<WORK_PATH>/test-np/analysis-tab_emb_pos"
 setwd(workPath)
 
 # Create analysis table
 anaInfo <- read.table(header = TRUE, text = "
-        analysis                                                                  path_centroid path_raw        path_profile        path_ims      replicate         blank
+ analysis path_centroid path_raw path_profile path_ims replicate blank
  'solvent-pos-1' '<EXAMPLE_DATA_PATH_POS>'       '' 'converted/profile' 'converted/ims'  'solvent-pos' 'solvent-pos'
  'solvent-pos-2' '<EXAMPLE_DATA_PATH_POS>'       '' 'converted/profile' 'converted/ims'  'solvent-pos' 'solvent-pos'
  'solvent-pos-3' '<EXAMPLE_DATA_PATH_POS>'       '' 'converted/profile' 'converted/ims'  'solvent-pos' 'solvent-pos'

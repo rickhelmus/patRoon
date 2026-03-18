@@ -28,7 +28,8 @@ removed.}
   adduct annotations will then always be used.}
 
 \item{transformations}{A \code{data.frame} with transformation reactions to be used for calculating the TPs (see
-details below). If \code{NULL}, a default table from Schollee \emph{et al.} is used (see references).}
+details below). If \code{NULL}, a default table from Schollee \emph{et al.} is used, that can be obtained with
+\code{\link{TPLogicTransformations}}.}
 }
 \value{
 A \code{\link{transformationProducts}} (derived) object containing all generated TPs.
@@ -56,9 +57,7 @@ With this algorithm TPs are predicted from common (environmental) chemical react
 
   \item \code{sub} The elements that are removed by this reaction (\emph{e.g.} \code{"H2O"}).
 
-  \item \code{retDir} The expected retention time direction relative to the parent (assuming a reversed phase like LC
-  separation). Valid values are: \samp{-1} (elutes before the parent), \samp{1} (elutes after the parent) or \samp{0}
-  (no significant change or unknown).
+  \item \code{retDir} The expected \link[=retDir]{retention order direction}.
 
   }
 }

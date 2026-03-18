@@ -14,7 +14,7 @@ on:
 jobs:
     build-test-matrix: # based on https://stackoverflow.com/a/75337311
         strategy:
-            fail-fast: true
+            fail-fast: false
             matrix:
                 R: [ 'release', 'oldrel' ]
         name: Build ${{ matrix.R }}

@@ -18,7 +18,7 @@ from known adducts, isotopes and in-source fragments."><!-- mathjax --><script s
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.0</span>
       </span>
     </div>
 
@@ -169,6 +169,12 @@ within a component are not taken in to account. See note below.</p></dd>
     <h2>Note</h2>
     <p>The default value for <code>minSize</code> and <code>relMinReplicates</code> results in
   extra filtering, hence, the final results may be different than what the algorithm normally would return.</p>
+    </div>
+    <div id="ims-workflows">
+    <h2>IMS workflows</h2>
+    <p>The componentization algorithm is not aware of the IMS dimension. For this reason, no
+  mobility feature groups will be considered for componentization, and direct IMS workflows (see
+  <code><a href="assignMobilities_feat.html">assignMobilitities</a></code>) are currently not supported.</p>
     </div>
     <div id="sets-workflows">
     <h2>Sets workflows</h2>

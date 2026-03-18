@@ -17,8 +17,8 @@ generateComponentsOpenMS(fGroups, ...)
   qTry = "heuristic",
   potentialAdducts = NULL,
   minRTOverlap = 0.66,
-  retWindow = 1,
-  absMzDev = 0.005,
+  retWindow = defaultLim("retention", "very_narrow"),
+  absMzDev = defaultLim("mz", "medium"),
   minSize = 2,
   relMinAdductAbundance = 0.75,
   adductConflictsUsePref = TRUE,
@@ -77,8 +77,8 @@ currently not supported).}
   0.2))}}
 
 \item{minRTOverlap, retWindow}{Sets feature retention tolerances when grouping features. Sets the
-\command{"algorithm:MetaboliteFeatureDeconvolution:retention_max_diff"} and
-\command{algorithm:MetaboliteFeatureDeconvolution:min_rt_overlap} options.}
+\command{algorithm:MetaboliteFeatureDeconvolution:min_rt_overlap} and
+\command{"algorithm:MetaboliteFeatureDeconvolution:retention_max_diff"} options.}
 
 \item{absMzDev}{Maximum absolute \emph{m/z} deviation. Sets the \command{algorithm:MetaboliteFeatureDeconvolution:mass_max_diff} option}
 
@@ -149,6 +149,12 @@ Features that show highly similar chromatographic elution profiles are grouped, 
   \item the \code{minSize} filter is applied.
 
   }
+}
+
+\section{IMS workflows}{
+ The componentization algorithm is not aware of the IMS dimension. For this reason, no
+  mobility feature groups will be considered for componentization, and direct IMS workflows (see
+  \code{\link[=assignMobilities_feat]{assignMobilitities}}) are currently not supported.
 }
 
 \section{Sets workflows}{

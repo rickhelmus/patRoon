@@ -501,7 +501,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams = getPiekEICParams(),
         {
             maybePrintf("\n-------\nFinding features for '%s'...\n", ana)
             
-            openMSReadBackend(backend, path)
+            openMSReadBackend(backend, path, genMobilities = IMS)
          
             MS2Info <- NULL
             if (genEICParams$filter == "ms2")

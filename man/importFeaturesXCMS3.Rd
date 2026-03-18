@@ -4,12 +4,13 @@
 \alias{importFeaturesXCMS3}
 \title{Imports features from XCMS (new interface)}
 \usage{
-importFeaturesXCMS3(xdata, analysisInfo)
+importFeaturesXCMS3(input, analysisInfo)
 }
 \arguments{
-\item{xdata}{An \code{\link{XCMSnExp}} object.}
+\item{input}{An \code{\link{XCMSnExp}} object.}
 
-\item{analysisInfo}{A \code{data.frame} with \link[=analysis-information]{Analysis information}.}
+\item{analysisInfo}{A \code{data.frame} (or \code{data.table}) with \link[=analysis-information]{Analysis
+information}.}
 }
 \value{
 An object of a class which is derived from \code{\link{features}}.

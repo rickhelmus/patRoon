@@ -37,7 +37,10 @@ dumpPkgOpts <- function(printFunc)
     {
         msg <- sprintf("- %s: %s", opt, paste0('"', getOption(opt), '"', collapse = ", "))
         if (opt == "patRoon.MS.backends")
-            msg <- paste(msg, sprintf("(available: %s)", paste0('"', availableBackends(verbose = FALSE), '"', collapse = ", ")))
+        {
+            ab <- availableBackends(checkOption = FALSE, verbose = FALSE)
+            msg <- paste(msg, sprintf("(available: %s)", paste0('"', ab, '"', collapse = ", ")))
+        }
         printFunc(msg)
     }
 }

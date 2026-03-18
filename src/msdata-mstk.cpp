@@ -78,8 +78,6 @@ SpectrumRaw getMSTKSpec(MSToolkit::MSReader *msr, const std::string &file, Spect
 }
 
 
-int MSReadBackendMSTK::backends = 0;
-
 // [[Rcpp::interfaces(r, cpp)]]
 
 MSReadBackend::ThreadDataType MSReadBackendMSTK::doGetThreadData(void) const

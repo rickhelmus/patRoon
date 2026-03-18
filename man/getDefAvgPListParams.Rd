@@ -4,10 +4,13 @@
 \alias{getDefAvgPListParams}
 \title{Parameters for averaging MS peak list data}
 \usage{
-getDefAvgPListParams(...)
+getDefAvgPListParams(..., IMS = getLimIMS())
 }
 \arguments{
 \item{\dots}{Optional named arguments that override defaults.}
+
+\item{IMS}{A \code{character} that specifies for which IMS instrument defaults are returned. Should be
+\code{"bruker"} or \code{"agilent"}. Defaults to what is specified in \link{limits}.}
 }
 \value{
 \code{getDefAvgPListParams} returns a \code{list} with the peak list averaging parameters.
@@ -20,31 +23,38 @@ The parameters set used for averaging peak lists are set by the \code{avgFeatPar
 arguments to \code{\link{generateMSPeakLists}} and its related algorithm specific functions. The parameters are
 specified as a named \code{list} with the following values: \itemize{
 
-\item \code{clusterMzWindow} \emph{m/z} window (in Da) used for clustering \emph{m/z} values when spectra are
-averaged. For \code{method="hclust"} this corresponds to the cluster height, while for \code{method="distance"} this
-value is used to find nearby masses (+/- window).  Too small windows will prevent clustering \emph{m/z} values (thus
-erroneously treating equal masses along spectra as different), whereas too big windows may cluster unrelated
-\emph{m/z} values from different or even the same spectrum together.
+\item \code{method},\code{clusterMzWindow} The cluster method and window (see \link[=cluster-params]{clustering
+parameters}) used to average mass spectra. \code{clusterMzWindow} is defaulted as \code{defaultLim("mz", "medium")} (see
+\link{limits}).
 
 \item \code{topMost} Only retain this maximum number of MS peaks when generating averaged spectra. Lowering this
 number may exclude more irrelevant (noisy) MS peaks and decrease processing time, whereas higher values may avoid
 excluding lower intense MS peaks that may still be of interest.
 
 \item \code{minIntensityPre} MS peaks with intensities below this value will be removed (applied prior to selection
-by \code{topMost}) before averaging.
+by \code{topMost} and averaging).
 
-\item \code{minIntensityPost} MS peaks with intensities below this value will be removed after averaging.
+\item \code{minIntensityPost} MS peaks with intensities below this value will be removed (after averaging).
 
-\item \code{avgFun} Function that is used to calculate average \emph{m/z} values.
+\item \code{minIntensityIMS} MS peaks in spectra of raw IMS frames with intensities below this value will be removed
+(applied prior to any other treatment steps).
 
-\item \code{method} Method used for producing averaged MS spectra. Valid values are \code{"hclust"}, used for
-hierarchical clustering (using the \pkg{\link{fastcluster}} package), and \code{"distance"}, to use the between peak
-distance. The latter method may reduces processing time and memory requirements, at the potential cost of reduced
-accuracy.
+\item \code{absMinAbundance},\code{relMinAbundance} Minimum absolute/relative abundance of an MS peak across the
+spectra that are averaged. If \code{absMinAbundance} exceeds the number of spectra then the threshold is
+automatically lowered to the number of spectra.
+
+\item \code{smoothWindowIMS},\code{halfWindowIMS},\code{maxGapIMS} Parameters used for centroiding \emph{m/z} peaks
+from IMS-HRMS data. See \verb{Centroiding IMS data} for more details.
+
+\item \code{withPrecursorMS} For MS data only: ignore any spectra that do not contain the precursor peak.
+
+  For IMS data this excludes MS spectra within an IMS frame that do not contain the precursor peak, typically due to
+  mobility separation. Hence, setting this option performs some crude cleanup of MS spectra, even for features for
+  which no mobilities were assigned (\emph{e.g.} non-IMS workflows).
 
 \item \code{pruneMissingPrecursorMS} For MS data only: if \code{TRUE} then peak lists without a precursor peak are
 removed. Note that even when this is set to \code{FALSE}, functionality that relies on MS (not MS/MS) peak lists
-(\emph{e.g.} formulae calulcation) will still skip calculation if a precursor is not found.
+(\emph{e.g.} formulae calculation) will still skip calculation if a precursor is not found.
 
 \item \code{retainPrecursorMSMS} For MS/MS data only: if \code{TRUE} then always retain the precursor mass peak even
 if is not amongst the \code{topMost} peaks. Note that MS precursor mass peaks are always kept. Furthermore, note that
@@ -53,19 +63,48 @@ precursor peaks in both MS and MS/MS data may still be removed by intensity thre
 
 }
 
-The \code{getDefAvgPListParams} function can be used to generate a default parameter list. The current defaults are:
+The \code{getDefAvgPListParams} function can be used to generate a default parameter list. The defaults are (with
+\code{IMS="bruker"}):
 
-\code{clusterMzWindow=0.005}; \code{topMost=50}; \code{minIntensityPre=500}; \code{minIntensityPost=500}; \code{avgFun=mean}; \code{method="hclust"}; \code{pruneMissingPrecursorMS=TRUE}; \code{retainPrecursorMSMS=TRUE}
+\preformatted{list(
+  method = "distance_mean",
+  clusterMzWindow = 0.005,
+  topMost = 50,
+  minIntensityPre = 500,
+  minIntensityPost = 500,
+  minIntensityIMS = 25,
+  absMinAbundance = 0,
+  relMinAbundance = 0,
+  smoothWindowIMS = 0,
+  halfWindowIMS = 2,
+  maxGapIMS = 0.005,
+  withPrecursorMS = TRUE,
+  pruneMissingPrecursorMS = TRUE,
+  retainPrecursorMSMS = TRUE
+)}
 }
-\note{
-With Bruker algorithms these parameters only control generation of feature groups averaged peak lists: how peak
-  lists for features are generated is controlled by DataAnalysis.
-}
-\section{Source}{
- Averaging of mass spectra algorithms used by are based on the
-  \href{https://github.com/zeehio/msProcess}{msProcess} R package (now archived on CRAN).
+\section{Centroiding IMS data}{
+ With IMS-HRMS data the \emph{m/z} peaks are often not or partially centroided. The
+  following steps are performed to centroid the data: \enumerate{
+
+  \item Sum up mass spectra within an IMS frame. If the feature has mobility data, only spectra within its mobility
+  boundaries are considered.
+  
+  \item Use point-distance clustering (see \link[=cluster-params]{clustering parameters}) with a window defined by
+  \code{maxGapIMS} to find related mass signals. This is primarily meant for non-continuous data, \emph{e.g.} due to
+  intensity thresholding. The \code{maxGapIMS} parameter should be set to a value that represents the maximum
+  expected distance between two \emph{m/z} datapoints. For some instruments, such as Agilent IMS-QTOF, this value may
+  be higher than expected. For that reason, if \code{IMS="agilent"} then the default is set to \code{0.01}.
+  
+  \item Smooth the intensity data using a centered moving average with window size \code{smoothWindowIMS} (set to
+  zero to disable smoothing).
+  
+  \item Find local maxima within sliding window with +/- \code{halfWindowIMS} points and eliminate non-centroids.
+  This algorithm is based on the \code{C_localMaxima} function from \CRANpkg{MALDIquant}.
+
+  }
 }
 
 \references{
-\addCitations{fastcluster}
+\insertRef{Gibb2012}{patRoon}
 }

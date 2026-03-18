@@ -62,6 +62,12 @@ The specified \code{featureGroups} object is automatically converted to an \code
 The default value for \code{minSize} and \code{relMinReplicates} results in
   extra filtering, hence, the final results may be different than what the algorithm normally would return.
 }
+\section{IMS workflows}{
+ The componentization algorithm is not aware of the IMS dimension. For this reason, no
+  mobility feature groups will be considered for componentization, and direct IMS workflows (see
+  \code{\link[=assignMobilities_feat]{assignMobilitities}}) are currently not supported.
+}
+
 \section{Sets workflows}{
  In a \link[=sets-workflow]{sets workflow} the componentization is first performed for each
   set independently. The resulting components are then all combined in a \code{\link{componentsSet}} object. Note that

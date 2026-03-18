@@ -76,10 +76,12 @@
   analysis = NULL,
   MSPeakLists,
   title = NULL,
+  normalized = "multiple",
   specSimParams = getDefSpecSimParams(),
   mincex = 0.9,
   xlim = NULL,
   ylim = NULL,
+  showLegend = TRUE,
   ...
 )
 
@@ -95,6 +97,8 @@
 \S4method{consensus}{formulas}(
   obj,
   ...,
+  MSPeakLists,
+  specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
   absMinAbundance = NULL,
   relMinAbundance = NULL,
   uniqueFrom = NULL,
@@ -118,10 +122,12 @@
   analysis = NULL,
   MSPeakLists,
   title = NULL,
+  normalized = "multiple",
   specSimParams = getDefSpecSimParams(),
   mincex = 0.9,
   xlim = NULL,
   ylim = NULL,
+  showLegend = TRUE,
   perSet = TRUE,
   mirror = TRUE,
   ...
@@ -132,6 +138,8 @@
 \S4method{consensus}{formulasSet}(
   obj,
   ...,
+  MSPeakLists,
+  specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
   absMinAbundance = NULL,
   relMinAbundance = NULL,
   uniqueFrom = NULL,
@@ -205,28 +213,33 @@ characterization. Setting this to \code{TRUE} disables reporting of most other d
 this case \code{groupName} and \code{analysis} (if not \code{NULL}) should specify values for the spectra to
 compare.}
 
-\item{groupName}{The name of the feature group (or feature groups when comparing spectra) to which the candidate
-belongs.}
+\item{groupName}{The name of the feature group for which a plot should be made. To compare spectra, two group names
+can be specified.}
 
-\item{analysis}{A \code{character} specifying the analysis (or analyses when comparing spectra) for which the
-annotated spectrum should be plotted. If \code{NULL} then annotation results for the complete feature group will be
-plotted.}
+\item{analysis}{The name of the analysis for which a plot should be made. If
+\code{NULL} then data from the feature group averaged peak list is used. When comparing spectra, either
+\code{NULL} or the analyses for both spectra should be specified.}
 
-\item{MSPeakLists}{The \code{\link{MSPeakLists}} object that was used to generate the candidate}
+\item{MSPeakLists}{The \code{\link{MSPeakLists}} object with relevant spectral data.}
 
 \item{onlyAnnotated}{Set to \code{TRUE} to filter out any peaks that could
 not be annotated.}
 
-\item{title}{The title of the plot. Set to \code{NULL} for an automatically generated title.}
+\item{title}{The title of the plot. If \code{NULL} a title will be automatically made.}
+
+\item{normalized}{Controls intensity normalization. Should be \code{FALSE} (don't normalize), \code{TRUE} (normalize)
+or \code{"multiple"} (only normalizes if multiple spectra are plotted).}
 
 \item{specSimParams}{A named \code{list} with parameters that influence the calculation of MS spectra similarities.
 See the \link[=specSimParams]{spectral similarity parameters} documentation for more details.}
 
-\item{mincex}{The formula annotation labels are automatically scaled. The \code{mincex} argument forces a minimum
-\code{cex} value for readability.}
+\item{mincex}{The formula annotation labels are automatically scaled. The
+\code{mincex} argument forces a minimum \code{cex} value for readability.}
 
 \item{xlim, ylim}{Sets the plot size limits used by
 \code{\link[graphics]{plot}}. Set to \code{NULL} for automatic plot sizing.}
+
+\item{showLegend}{Set to \code{TRUE} to show a legend.}
 
 \item{absMinAbundance, relMinAbundance}{Minimum absolute or relative
 (\samp{0-1}) abundance across objects for a result to be kept. For
@@ -340,6 +353,9 @@ passed when this object was created by \code{\link{generateFormulas}}.}
 
 \item{\code{origFGNames}}{\setsWF The original (order of) names of the \code{\link{featureGroups}} object that was used to
 create this object.}
+
+\item{\code{MS2QuantMeta}}{\setsWF A named \code{list} with for each set the metadata from \pkg{MS2Quant} filled in by
+\code{predictRespFactors}.}
 }}
 
 \section{S4 class hierarchy}{

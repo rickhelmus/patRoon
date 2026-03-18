@@ -18,7 +18,7 @@ CSI:FingerID for compound annotation."><!-- mathjax --><script src="https://cdnj
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.0</span>
       </span>
     </div>
 
@@ -103,7 +103,8 @@ CSI:FingerID for compound annotation."><!-- mathjax --><script src="https://cdnj
 <span><span class="fu">generateCompoundsSIRIUS</span><span class="op">(</span></span>
 <span>  <span class="va">fGroups</span>,</span>
 <span>  <span class="va">MSPeakLists</span>,</span>
-<span>  relMzDev <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  specSimParams <span class="op">=</span> <span class="fu"><a href="specSimParams.html">getDefSpecSimParams</a></span><span class="op">(</span>removePrecursor <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>  relMzDev <span class="op">=</span> <span class="fu"><a href="limits.html">defaultLim</a></span><span class="op">(</span><span class="st">"mz"</span>, <span class="st">"narrow_rel"</span><span class="op">)</span>,</span>
 <span>  adduct <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  projectPath <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  elements <span class="op">=</span> <span class="st">"CHNOP"</span>,</span>
@@ -118,6 +119,7 @@ CSI:FingerID for compound annotation."><!-- mathjax --><script src="https://cdnj
 <span>  alwaysLogin <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  extraOptsGeneral <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  extraOptsFormula <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  minMobSpecSim <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  splitBatches <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  dryRun <span class="op">=</span> <span class="cn">FALSE</span></span>
@@ -127,7 +129,8 @@ CSI:FingerID for compound annotation."><!-- mathjax --><script src="https://cdnj
 <span><span class="fu">generateCompoundsSIRIUS</span><span class="op">(</span></span>
 <span>  <span class="va">fGroups</span>,</span>
 <span>  <span class="va">MSPeakLists</span>,</span>
-<span>  relMzDev <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  specSimParams <span class="op">=</span> <span class="fu"><a href="specSimParams.html">getDefSpecSimParams</a></span><span class="op">(</span>removePrecursor <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>  relMzDev <span class="op">=</span> <span class="fu"><a href="limits.html">defaultLim</a></span><span class="op">(</span><span class="st">"mz"</span>, <span class="st">"narrow_rel"</span><span class="op">)</span>,</span>
 <span>  adduct <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  projectPath <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span>,</span>
@@ -153,6 +156,12 @@ feature groups in the subset are considered.</p></dd>
 
 <dt id="arg-mspeaklists">MSPeakLists<a class="anchor" aria-label="anchor" href="#arg-mspeaklists"></a></dt>
 <dd><p>A <code><a href="MSPeakLists-class.html">MSPeakLists</a></code> object that was generated for the supplied <code>fGroups</code>.</p></dd>
+
+
+<dt id="arg-specsimparams">specSimParams<a class="anchor" aria-label="anchor" href="#arg-specsimparams"></a></dt>
+<dd><p>A named <code>list</code> with parameters that influence the calculation of the
+<a href="id-conf.html">annotation similarity</a>. See the <a href="specSimParams.html">spectral similarity parameters</a> documentation
+for more details.</p></dd>
 
 
 <dt id="arg-relmzdev">relMzDev<a class="anchor" aria-label="anchor" href="#arg-relmzdev"></a></dt>
@@ -240,6 +249,16 @@ formulae will be searched. Sets the <span class="option">--candidates</span> com
 options. Otherwise commandline options specified in <code>extraOptsGeneral</code> are added prior to the <code>formula</code>
 command, while options specified in <code>extraOptsFormula</code> are added in afterwards. See the <code class="command">SIRIUS</code>
 manual for more details. Set to <code>NULL</code> to ignore.</p></dd>
+
+
+<dt id="arg-minmobspecsim">minMobSpecSim<a class="anchor" aria-label="anchor" href="#arg-minmobspecsim"></a></dt>
+<dd><p>(<strong>IMS workflow</strong>) If the spectrum similarity of a mobility feature group compared to its IMS parent (see
+<code><a href="assignMobilities_feat.html">assignMobilities</a></code>) is at least this value, then the mobility feature group
+will not be subjected to the annotation algorithm and all feature annotation properties will be copied from its
+parent. This assumes that feature annotation is primarily influenced by the MS/MS spectrum, and can be used to
+speed up the feature annotation process. All scorings, annotation similarities etc. are copied from the IMS parent.
+The fragment annotations are also copied (<code>fragInfo</code> result column), however, these are adjusted based on the
+peak list data of the mobility feature group.</p></dd>
 
 
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>

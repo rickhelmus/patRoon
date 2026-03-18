@@ -118,19 +118,19 @@ importCheckUISessionGroups <- function(oldSession, fGroups, rtWindow, mzWindow, 
 
     oldGroupTab <- rbindlist(oldSession$featureGroups, idcol = "group")
     
-    if (hasIMS(fGroups) != "mobility" %in% names(oldGroupTab))
+    hasMobilityData <- "mobility" %in% names(oldGroupTab) && !all(is.na(oldGroupTab$mobility))
+    
+    if (hasIMS(fGroups) != hasMobilityData)
     {
         warning("The current feature groups or the ones in the session file lack ion mobility information! ",
                 "Matching will be done without considering ion mobility.", call. = FALSE)
     }
-    
-    hasMobilityData <- hasIMS(fGroups) && "mobility" %in% names(oldGroupTab)
 
     warnTol <- FALSE
     newGroups <- setNames(lapply(split(oldGroupTab, seq_len(nrow(oldGroupTab))), function(ogtr)
     {
         gi <- gInfo[numLTE(abs(ret - ogtr$ret), rtWindow) & numLTE(abs(mz - ogtr$mz), mzWindow)]
-        if (hasMobilityData)
+        if (hasIMS(fGroups) && hasMobilityData)
         {
             if (is.na(ogtr$mobility))
                 gi <- gi[is.na(mobility)]

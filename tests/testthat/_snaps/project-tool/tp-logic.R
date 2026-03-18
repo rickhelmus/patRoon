@@ -5,7 +5,7 @@ library(patRoon)
 # initialization
 # -------------------------
 
-workPath <- "test_temp/test-np/tp-logic"
+workPath <- "<WORK_PATH>/test-np/tp-logic"
 setwd(workPath)
 
 # NOTE: please set to a valid data.frame with analysis information. See ?`analysis-information` for more details.
@@ -35,7 +35,7 @@ fGroups <- updateGroups(fGroups, what = c("ret", "mz", "mobility"), intWeight = 
 # -------------------------
 
 # Obtain TPs
-TPs <- generateTPs("logic", parents = suspListParents, fGroups, adduct = "[M+H]+")
+TPs <- generateTPs("logic", fGroups, adduct = "[M+H]+")
 
 # Screen TPs
 suspListTPs <- convertToSuspects(TPs, includeParents = FALSE)

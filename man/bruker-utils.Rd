@@ -25,7 +25,7 @@ addDAEIC(
   analysis,
   path,
   mz,
-  mzWindow = 0.005,
+  mzWindow = defaultLim("mz", "medium"),
   ctype = "EIC",
   mtype = "MS",
   polarity = "both",
@@ -39,7 +39,7 @@ addDAEIC(
 
 addAllDAEICs(
   fGroups,
-  mzWindow = 0.005,
+  mzWindow = defaultLim("mz", "medium"),
   ctype = "EIC",
   bgsubtr = FALSE,
   name = TRUE,

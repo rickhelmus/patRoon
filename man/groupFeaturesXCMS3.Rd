@@ -12,7 +12,7 @@ groupFeaturesXCMS3(feat, ...)
   feat,
   rtalign = TRUE,
   loadRawData = TRUE,
-  groupParam = xcms::PeakDensityParam(sampleGroups = analysisInfo(feat)$group),
+  groupParam = xcms::PeakDensityParam(sampleGroups = analysisInfo(feat)$replicate),
   preGroupParam = groupParam,
   retAlignParam = xcms::ObiwarpParam(),
   verbose = TRUE
@@ -20,7 +20,7 @@ groupFeaturesXCMS3(feat, ...)
 
 \S4method{groupFeaturesXCMS3}{featuresSet}(
   feat,
-  groupParam = xcms::PeakDensityParam(sampleGroups = analysisInfo(feat)$group),
+  groupParam = xcms::PeakDensityParam(sampleGroups = analysisInfo(feat)$replicate),
   verbose = TRUE
 )
 }

@@ -445,7 +445,7 @@ setMethod("delete", "features", function(obj, i = NULL, j = NULL, ...)
 #' @return \code{calculatePeakQualities} returns a modified object amended with peak qualities and scores.
 #'
 #' @note For \code{calculatePeakQualities}: sometimes \pkg{MetaClean} may return \code{NA} for the \emph{Gaussian
-#'   Similarity} metric, in which case it will be set to \samp{0}.
+#'   Similarity} and \emph{Symmetry} metrics, in which case it will be set to \samp{0}.
 #' @export
 setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessFactor, featureQualities = NULL,
                                                          EICParams = getDefEICParams(window = 0), parallel = TRUE)

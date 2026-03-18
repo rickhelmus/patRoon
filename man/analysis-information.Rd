@@ -7,37 +7,38 @@
 \title{Properties of sample analyses}
 \usage{
 generateAnalysisInfo(
-  paths,
-  groups = "",
-  blanks = "",
-  concs = NULL,
-  norm_concs = NULL,
-  formats = MSFileFormats()
+  fromRaw = NULL,
+  fromCentroid = NULL,
+  fromProfile = NULL,
+  fromIMS = NULL,
+  convCentroid = NULL,
+  convProfile = NULL,
+  convIMS = NULL,
+  ...
 )
 
 generateAnalysisInfoFromEnviMass(path)
 }
 \arguments{
-\item{paths}{A character vector containing one or more file paths that should be used for finding the analyses.}
+\item{fromRaw, fromCentroid, fromProfile, fromIMS}{One or more file paths that should be used for finding analyses that
+are stored as raw, centroided, profile or IMS data, respectively (see details below). Set to \code{NULL} to skip
+file detection for a particular file type.}
 
-\item{groups, blanks}{An (optional) character vector containing replicate groups and blanks, respectively (will be
-recycled). If \code{groups} is an empty character string (\code{""}) the analysis name will be set as replicate
-group.}
+\item{convCentroid, convProfile, convIMS}{These arguments specify the \link[=MSConversion]{MS file conversion}
+destination paths for centroided, profile and IMS data, respectively. These paths are used for those analyses for
+which no file with a particular file type could be found in the directories specified by the respective
+\code{from*} arguments. Set to \code{NULL} to not set any destination directory. If multiple paths are specified
+then these will be recycled to fill the table rows.}
 
-\item{concs}{An optional numeric vector containing concentration values for each analysis. Can be \code{NA} if
-unknown. If the length of \code{concs} is less than the number of analyses the remainders will be set to \code{NA}.
-Set to \code{NULL} to not include concentration data.}
-
-\item{norm_concs}{An optional numeric vector containing concentrations used for \emph{feature normalization} (see the
-\verb{Feature intensity normalization} section in the \link[=featureGroups-class]{featureGroups documentation}).
-\code{NA} values are allowed for analyses that should not be normalized (\emph{e.g.} because no IS is present). If
-the length of \code{norm_concs} is less than the number of analyses the remainders will be set to \code{NA}. Set to
-\code{NULL} to not include normalization concentration data.}
-
-\item{formats}{A character vector of analyses file types to consider. Analyses not present in these formats will be
-ignored. For valid values see \code{\link{MSFileFormats}}.}
+\item{\dots}{Any other columns that should be added to the analysis information table, such as \code{replicate} and
+\code{blank}. The arguments specified by \dots should be named. Vectors are recycled to the number of rows of the
+table.}
 
 \item{path}{The path of the enviMass project.}
+}
+\value{
+\code{generateAnalysisInformation} returns a \code{data.frame} with automatically generated analysis
+  information.
 }
 \description{
 Properties for the sample analyses used in the workflow and utilities to automatically generate this information.
@@ -46,28 +47,89 @@ Properties for the sample analyses used in the workflow and utilities to automat
 In \pkg{patRoon} a \emph{sample analysis}, or simply \emph{analysis}, refers to a single MS analysis file (sometimes
 also called \emph{sample} or \emph{file}). The \emph{analysis information} summarizes several properties for the
 analyses, and is used in various steps throughout the workflow, such as \code{\link{findFeatures}}, averaging
-intensities of feature groups and blank subtraction. This information should be in a \code{data.frame}, with the
-following columns:
+intensities of feature groups and blank subtraction. The analysis information should be a \code{data.frame} or
+\code{data.table} with a set of mandatory and optional columns (described below).
+
+\code{generateAnalysisInfo} is an utility function that automatically generates analysis information. It
+  scans given directories for analysis files, and uses this to automatically fill in the \code{analysis} and
+  \code{path_*} columns. This function automatically groups together analyses that are stored with different file
+  types and formats (see further details below).
+
+\code{generateAnalysisInfoFromEnviMass} loads analysis information
+  from an \pkg{enviMass} project. Note: this funtionality has only been
+  tested with older versions of \pkg{enviMass}.
+}
+\section{Mandatory analysis information columns}{
+
+
+  The following columns should be present in the analysis information:
 
 \itemize{
 
-\item \code{path} the full path to the directory of the analysis.
+\item \code{path_raw}, \code{path_centroid}, \code{path_profile}, \code{path_ims} Specifies the directory path for
+the raw, centroided, profile and IMS data, respectively. See below for more details. At least one column should not
+be empty for each row.
 
-\item \code{analysis} the file name \strong{without} extension. Must be \strong{unique}, even if the \code{path} is
-different.
+\item \code{analysis} the file name \strong{without} extension and without directory path. Must be \strong{unique}
+across all table rows.
 
-\item \code{group} name of \emph{replicate group}. A replicate group is used to group analyses together that are
-replicates of each other. Thus, the \code{group} column for all  analyses considered to be belonging to the same
-replicate group should have an equal (but unique) value. Used for \emph{e.g.} averaging and
+\item \code{replicate} name of the \emph{replicate}. Used to group analyses together that are
+replicates of each other. Thus, the \code{replicate} column for all analyses considered to be belonging to the same
+replicate should have an equal (but unique) value. Used for \emph{e.g.} averaging and
 \code{\link[=filter,featureGroups-method]{filter}}.
 
-\item \code{blank} all analyses within this replicate group are used by the \code{featureGroups} method of
+\item \code{blank} all analyses within this replicate are used by the \code{featureGroups} method of
 \code{\link[=filter,featureGroups-method]{filter}} for blank subtraction. Multiple entries can be entered by
-separation with a comma.
+separation with a comma. May be empty (\code{""}) if no blank subtraction is desired.
+
+}
+}
+
+\section{Analysis paths, file types and file formats}{
+
+
+  Depending on the workflow step, different \emph{file types} for the same analysis may be required.
+
+\itemize{
+
+\item \code{raw} Specifies the directory to raw HRMS files (\emph{e.g.} \file{.raw}, \file{.d}). This is used by
+\emph{e.g.} \link[=MSConversion]{conversion of raw MS data} and the \link[=msdata]{OpenTIMS backend}.
+
+\item \code{centroid} Specifies the directory to centroided and exported HRMS files (\file{.mzML}, \file{.mzXML}).
+These files are required by most feature finding algorithms.
+
+\item \code{profile} Specifies the directory to exported but not centroided (\emph{i.e.} profile) HRMS data files
+(\file{.mzML}, \file{.mzXML}). This is currently only used by \code{\link{findFeaturesSAFD}}.
+
+\item \code{ims} Specifies the directory to exported IMS-HRMS data (\file{.mzML}). This is required in IMS workflows,
+unless raw IMS-HRMS data is directly loaded with the \link[=msdata]{OpenTIMS backend}. See \emph{e.g.}
+\code{\link[=assignMobilities_feat]{assignMobilities}} for more details.
+
+}
+
+  Some workflows may require multiple \emph{file formats} for a same \emph{file type}. In this case, the file formats
+  should be stored within the same directory specified by the respective \code{path_*} column. For instance, if
+  feature finding algorithms from \link[=findFeaturesOpenMS]{OpenMS} and \link[=findFeaturesEnviPick]{enviPick} are
+  mixed then centroided \file{.mzML} and \file{.mzXML} files are needed, and files with both file formats must be
+  stored in the directory specified by \code{path_centroid}.
+
+  If non-raw data files are not yet present and should be exported by \link[=MSConversion]{MS file conversion}, then
+  \code{path_centroid}, \code{path_profile} and \code{path_ims} should specify the desired destination paths of the
+  converted files.
+}
+
+\section{Optional columns and sample metadata}{
+
+
+  The following columns may need to be present:
+
+\itemize{
 
 \item \code{conc} a numeric value specifying the 'concentration' for the analysis. This can be actually any kind of
 numeric value such as exposure time, dilution factor or anything else which may be used to form a linear
-relationship.
+relationship. This is used by the \code{\link[=as.data.table,featureGroups-method]{as.data.table}} method if
+\code{regression=TRUE}. As of \pkg{patRoon} version 3.0, any other column than \code{"conc"} can be used by setting
+its name with the \code{regression} argument.
 
 \item \code{norm_conc} a numeric value specifying the \emph{normalization concentration} for the analysis. See the
 \verb{Feature intensity normalization} section in the \link[=featureGroups-class]{featureGroups documentation}) for
@@ -75,27 +137,7 @@ more details.
 
 }
 
-Most workflows steps work with \file{mzXML} and \file{mzML} file formats. However, some algorithms only support
-support one format (\emph{e.g.} \code{\link{findFeaturesOpenMS}}, \code{\link{findFeaturesEnviPick}}) or a
-proprietary format (\code{\link{findFeaturesBruker}}). To mix such algorithms in the same workflow, the analyses
-should be present in all required formats within the \emph{same} directory as specified by the \code{path} column.
-
-Each analysis should only be specified \emph{once} in the analysis information, even if multiple file formats are
-available. The \code{path} and \code{analysis} columns are internally used by \pkg{patRoon} to automatically find the
-path of analysis files with the required format.
-
-The \code{group} column is \emph{mandatory} and needs to be non-empty for each analysis. The \code{blank} column
-should also be present, however, this may be empty (\code{""}) for analyses where no blank subtraction should occur.
-The \code{conc} column is only required when obtaining regression information is desired with the
-\code{\link[=as.data.table,featureGroups-method]{as.data.table}} method. Similarly, the \code{norm_conc} is only
-necessary for the \code{\link{normInts}} method.
-
-\code{generateAnalysisInfo} is an utility function that automatically generates a \code{data.frame} with
-  analysis information. It scans the directories specified from the \code{paths} argument for analyses, and uses this
-  to automatically fill in the \code{analysis} and \code{path} columns. Furthermore, this function also correctly
-  handles analyses which are available in multiple formats.
-
-\code{generateAnalysisInfoFromEnviMass} loads analysis information
-  from an \pkg{enviMass} project. Note: this funtionality has only been
-  tested with older versions of \pkg{enviMass}.
+  Any other columns that are present will be added to the \code{features} and \code{featureGroups} objects as
+  metadata. This metadata can be used \emph{e.g.} in various plotting and data subsetting functions.
 }
+

@@ -11,16 +11,17 @@ generateCompoundsMetFrag(fGroups, ...)
 \S4method{generateCompoundsMetFrag}{featureGroups}(
   fGroups,
   MSPeakLists,
+  specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
   method = "CL",
   timeout = 300,
   timeoutRetries = 2,
   errorRetries = 2,
   topMost = 100,
-  dbRelMzDev = 5,
-  fragRelMzDev = 5,
-  fragAbsMzDev = 0.002,
+  dbRelMzDev = defaultLim("mz", "narrow_rel"),
+  fragRelMzDev = defaultLim("mz", "narrow_rel"),
+  fragAbsMzDev = defaultLim("mz", "narrow"),
   adduct = NULL,
-  database = "pubchem",
+  database = "pubchemlite",
   extendedPubChem = "auto",
   chemSpiderToken = "",
   scoreTypes = compoundScorings("metfrag", database, onlyDefault = TRUE)$name,
@@ -29,20 +30,22 @@ generateCompoundsMetFrag(fGroups, ...)
   postProcessingFilters = c("InChIKeyFilter"),
   maxCandidatesToStop = 2500,
   identifiers = NULL,
-  extraOpts = NULL
+  extraOpts = NULL,
+  minMobSpecSim = 0
 )
 
 \S4method{generateCompoundsMetFrag}{featureGroupsSet}(
   fGroups,
   MSPeakLists,
+  specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
   method = "CL",
   timeout = 300,
   timeoutRetries = 2,
   errorRetries = 2,
   topMost = 100,
-  dbRelMzDev = 5,
-  fragRelMzDev = 5,
-  fragAbsMzDev = 0.002,
+  dbRelMzDev = defaultLim("mz", "narrow_rel"),
+  fragRelMzDev = defaultLim("mz", "narrow_rel"),
+  fragAbsMzDev = defaultLim("mz", "narrow"),
   adduct = NULL,
   ...,
   setThreshold = 0,
@@ -58,6 +61,10 @@ feature groups in the subset are considered.}
 \item{\dots}{\setsWF Further arguments passed to the non-sets workflow method.}
 
 \item{MSPeakLists}{A \code{\link{MSPeakLists}} object that was generated for the supplied \code{fGroups}.}
+
+\item{specSimParams}{A named \code{list} with parameters that influence the calculation of the
+\link[=id-conf]{annotation similarity}. See the \link[=specSimParams]{spectral similarity parameters} documentation
+for more details.}
 
 \item{method}{Which method should be used for MetFrag execution: \code{"CL"} for \command{MetFragCL} and \code{"R"}
 for \command{MetFragR}. The former is usually much faster and recommended.}
@@ -121,7 +128,7 @@ information refer to the \verb{Candidate Filters} section on the
 
 \item{maxCandidatesToStop}{If more than this number of candidate structures are found then processing will be aborted
 and no results this feature group will be reported. Low values increase the chance of missing data, whereas too
-high values will use too much computer resources and signficantly slowdown the process. Sets the
+high values will use too much computer resources and significantly slowdown the process. Sets the
 \option{MaxCandidateLimitToStop} option.}
 
 \item{identifiers}{A \code{list} containing for each feature group a character vector with database identifiers that
@@ -136,6 +143,14 @@ option.}
 \href{http://ipb-halle.github.io/MetFrag/projects/metfragr/}{MetFragR} and
 \href{http://ipb-halle.github.io/MetFrag/projects/metfragcl/}{MetFrag CL} homepages for all available options. Set
 to \code{NULL} to ignore.}
+
+\item{minMobSpecSim}{\IMSWF If the spectrum similarity of a mobility feature group compared to its IMS parent (see
+\code{\link[=assignMobilities_feat]{assignMobilities}}) is at least this value, then the mobility feature group
+will not be subjected to the annotation algorithm and all feature annotation properties will be copied from its
+parent. This assumes that feature annotation is primarily influenced by the MS/MS spectrum, and can be used to
+speed up the feature annotation process. All scorings, annotation similarities etc. are copied from the IMS parent.
+The fragment annotations are also copied (\code{fragInfo} result column), however, these are adjusted based on the
+peak list data of the mobility feature group.}
 
 \item{setThreshold}{\setsWF Minimum abundance for a candidate among all sets (\samp{0-1}). For instance, a value of
 \samp{1} means that the candidate needs to be present in all the set data.}
@@ -228,7 +243,6 @@ Several online compound databases such as \href{https://pubchem.ncbi.nlm.nih.gov
   knownUse             \tab KnownUse                                         \tab pubchemlite       \cr
   disorderDisease      \tab DisorderDisease                                  \tab pubchemlite       \cr
   identification       \tab Identification                                   \tab pubchemlite       \cr
-  annoTypeCount        \tab FPSum                                            \tab pubchemlite       \cr
   annoTypeCount        \tab AnnoTypeCount                                    \tab pubchemlite       \cr
   annotHitCount        \tab AnnotHitCount                                    \tab pubchemlite       
 }
@@ -242,7 +256,7 @@ Several online compound databases such as \href{https://pubchem.ncbi.nlm.nih.gov
   \href{http://ipb-halle.github.io/MetFrag/projects/metfragr/}{MetFragR homepage}.
 }
 
-\section{Usage of MetFrag databases}{
+\section{MetFrag databases}{
  When \code{database="chemspider"} setting the \code{chemSpiderToken} argument is
   mandatory.
 
@@ -254,6 +268,12 @@ Several online compound databases such as \href{https://pubchem.ncbi.nlm.nih.gov
   file location must be specified as above or by setting the
   \code{patRoon.path.MetFragPubChemLite}/\code{patRoon.path.MetFragCompTox} option. See the installation section in
   the handbook for more details.
+
+  If \code{database="pubchemlite"} and the local file has \acronym{CCS} predictions (see
+  \url{https://zenodo.org/records/15311000}), then \acronym{CCS} values will be copied from the corresponding adduct
+  of the feature groups (or as specified by the \code{adduct} argument). These can be converted to mobilities with
+  \code{\link[=assignMobilities_comp]{assignMobilities}} and used for candidate filtering with
+  \code{\link[=filter,compounds-method]{filter}}.
 }
 
 \section{Parallelization}{
@@ -269,10 +289,14 @@ Several online compound databases such as \href{https://pubchem.ncbi.nlm.nih.gov
   (\option{patRoon.path.MetFragPubChemLite} and \option{patRoon.path.MetFragCompTox}) or made available by installing
   the \pkg{patRoonExt} package. Note that these files must \emph{also} be present on the local host computer, even if
   it is not participating in computations.
+
+  If the compound database is \emph{not} local, \emph{e.g.} \code{database="pubchem"}, then parallelization is
+  disabled to avoid connection errors that typically occur otherwise.
 }
 
 \references{
-\insertRef{Ruttkies2016}{patRoon}
+\insertRef{Ruttkies2016}{patRoon} \cr\cr \insertRef{Schymanski2021}{patRoon} \cr\cr
+  \insertRef{Elapavalore2025}{patRoon} \cr\cr \insertRef{Ross2020}{patRoon}
 }
 \seealso{
 \code{\link{generateCompounds}} for more details and other algorithms.

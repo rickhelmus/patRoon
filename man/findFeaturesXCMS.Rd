@@ -7,7 +7,8 @@
 findFeaturesXCMS(analysisInfo, method = "centWave", ..., verbose = TRUE)
 }
 \arguments{
-\item{analysisInfo}{A \code{data.frame} with \link[=analysis-information]{Analysis information}.}
+\item{analysisInfo}{A \code{data.frame} (or \code{data.table}) with \link[=analysis-information]{Analysis
+information}.}
 
 \item{method}{The method setting used by XCMS peak finding, see \code{\link[xcms:findPeaks-methods]{xcms::findPeaks}}}
 
@@ -30,8 +31,8 @@ This function uses the legacy interface of \pkg{xcms}. It is recommended to use
 
   The file format of analyses must be \code{mzML} or \code{mzXML}.
 
-The input MS data files need to be centroided. The \code{\link{convertMSFiles}} function can be used to
-  centroid data.
+The input MS data files need to be centroided. The \code{\link{convertMSFiles}} function can be used
+  to centroid data.
 }
 \references{
 \addCitations{xcms}

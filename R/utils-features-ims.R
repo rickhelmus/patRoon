@@ -260,7 +260,7 @@ updateFGroupsForMobilities <- function(fGroups, mobWindow, scoreWeights, sets)
 {
     # UNDONE: do something more polymorphic than hackish sets arg?
     
-    hash <- makeHash(fGroups, mobWindow, sets)
+    hash <- makeHash(fGroups, mobWindow, scoreWeights, sets)
     cd <- loadCacheData("updateFGroupsForMobilities", hash)
     if (!is.null(cd))
         return(cd)

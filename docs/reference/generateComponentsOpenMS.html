@@ -19,7 +19,7 @@ utility (see http://www.openms.de) to generate components."><!-- mathjax --><scr
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.0</span>
       </span>
     </div>
 
@@ -111,8 +111,8 @@ utility (see <a href="http://www.openms.de" class="external-link">http://www.ope
 <span>  qTry <span class="op">=</span> <span class="st">"heuristic"</span>,</span>
 <span>  potentialAdducts <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  minRTOverlap <span class="op">=</span> <span class="fl">0.66</span>,</span>
-<span>  retWindow <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  absMzDev <span class="op">=</span> <span class="fl">0.005</span>,</span>
+<span>  retWindow <span class="op">=</span> <span class="fu"><a href="limits.html">defaultLim</a></span><span class="op">(</span><span class="st">"retention"</span>, <span class="st">"very_narrow"</span><span class="op">)</span>,</span>
+<span>  absMzDev <span class="op">=</span> <span class="fu"><a href="limits.html">defaultLim</a></span><span class="op">(</span><span class="st">"mz"</span>, <span class="st">"medium"</span><span class="op">)</span>,</span>
 <span>  minSize <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  relMinAdductAbundance <span class="op">=</span> <span class="fl">0.75</span>,</span>
 <span>  adductConflictsUsePref <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -189,8 +189,8 @@ currently not supported).</p></dd>
 
 <dt id="arg-minrtoverlap-retwindow">minRTOverlap, retWindow<a class="anchor" aria-label="anchor" href="#arg-minrtoverlap-retwindow"></a></dt>
 <dd><p>Sets feature retention tolerances when grouping features. Sets the
-<code class="command">"algorithm:MetaboliteFeatureDeconvolution:retention_max_diff"</code> and
-<code class="command">algorithm:MetaboliteFeatureDeconvolution:min_rt_overlap</code> options.</p></dd>
+<code class="command">algorithm:MetaboliteFeatureDeconvolution:min_rt_overlap</code> and
+<code class="command">"algorithm:MetaboliteFeatureDeconvolution:retention_max_diff"</code> options.</p></dd>
 
 
 <dt id="arg-absmzdev">absMzDev<a class="anchor" aria-label="anchor" href="#arg-absmzdev"></a></dt>
@@ -264,6 +264,12 @@ components</code> section for more details.</p></dd>
 <li><p>If a feature group occurs in multiple components it will be removed completely.</p></li>
 <li><p>the <code>minSize</code> filter is applied.</p></li>
 </ol></div>
+    <div id="ims-workflows">
+    <h2>IMS workflows</h2>
+    <p>The componentization algorithm is not aware of the IMS dimension. For this reason, no
+  mobility feature groups will be considered for componentization, and direct IMS workflows (see
+  <code><a href="assignMobilities_feat.html">assignMobilitities</a></code>) are currently not supported.</p>
+    </div>
     <div id="sets-workflows">
     <h2>Sets workflows</h2>
     <p>In a <a href="sets-workflow.html">sets workflow</a> the componentization is first performed for each

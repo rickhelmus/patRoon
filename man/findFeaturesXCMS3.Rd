@@ -12,7 +12,8 @@ findFeaturesXCMS3(
 )
 }
 \arguments{
-\item{analysisInfo}{A \code{data.frame} with \link[=analysis-information]{Analysis information}.}
+\item{analysisInfo}{A \code{data.frame} (or \code{data.table}) with \link[=analysis-information]{Analysis
+information}.}
 
 \item{param}{The method parameters used by XCMS peak finding, see
 \code{\link[xcms:findChromPeaks]{xcms::findChromPeaks}}}
@@ -33,8 +34,8 @@ This function uses XCMS3 to automatically find features. This function is called
 
 The file format of analyses must be \code{mzML} or \code{mzXML}.
 
-The input MS data files need to be centroided. The \code{\link{convertMSFiles}} function can be used to
-  centroid data.
+The input MS data files need to be centroided. The \code{\link{convertMSFiles}} function can be used
+  to centroid data.
 }
 \references{
 \addCitations{xcms}

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.0</span>
       </span>
     </div>
 
@@ -86,7 +86,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Plotting of grouped features</h1>
-    <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/feature_groups-plot.R" class="external-link"><code>R/feature_groups-plot.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/generics.R" class="external-link"><code>R/generics.R</code></a>, <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/feature_groups-plot.R" class="external-link"><code>R/feature_groups-plot.R</code></a></small>
     <div class="hidden name"><code>feature-plotting.Rd</code></div>
     </div>
 
@@ -95,13 +95,16 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for class 'featureGroups,missing'</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plotMobilograms</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups,missing'</span></span>
 <span><span class="fu"><a href="generics.html">plot</a></span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
-<span>  colourBy <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"rGroups"</span>, <span class="st">"fGroups"</span><span class="op">)</span>,</span>
+<span>  groupBy <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  onlyUnique <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  retMin <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  showLegend <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  IMS <span class="op">=</span> <span class="st">"maybe"</span>,</span>
 <span>  col <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  pch <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -111,31 +114,23 @@
 <span><span class="fu"><a href="generics.html">plotInt</a></span><span class="op">(</span></span>
 <span>  <span class="va">obj</span>,</span>
 <span>  average <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  averageFunc <span class="op">=</span> <span class="va">mean</span>,</span>
+<span>  areas <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  normalized <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  xnames <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  xBy <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  xNames <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  groupBy <span class="op">=</span> <span class="st">"fGroups"</span>,</span>
+<span>  regression <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  showLegend <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  IMS <span class="op">=</span> <span class="st">"maybe"</span>,</span>
 <span>  pch <span class="op">=</span> <span class="fl">20</span>,</span>
-<span>  type <span class="op">=</span> <span class="st">"b"</span>,</span>
+<span>  type <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="va">regression</span><span class="op">)</span> <span class="st">"p"</span> <span class="kw">else</span> <span class="st">"b"</span>,</span>
 <span>  lty <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  xlim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  col <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  plotArgs <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  linesArgs <span class="op">=</span> <span class="cn">NULL</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S4 method for class 'featureGroupsSet'</span></span>
-<span><span class="fu"><a href="generics.html">plotInt</a></span><span class="op">(</span></span>
-<span>  <span class="va">obj</span>,</span>
-<span>  average <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  normalized <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  xnames <span class="op">=</span> <span class="op">!</span><span class="va">sets</span>,</span>
-<span>  showLegend <span class="op">=</span> <span class="va">sets</span>,</span>
-<span>  pch <span class="op">=</span> <span class="fl">20</span>,</span>
-<span>  type <span class="op">=</span> <span class="st">"b"</span>,</span>
-<span>  lty <span class="op">=</span> <span class="fl">3</span>,</span>
-<span>  col <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  plotArgs <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  linesArgs <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  sets <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'featureGroups'</span></span>
@@ -143,9 +138,10 @@
 <span>  <span class="va">obj</span>,</span>
 <span>  addSelfLinks <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  addRetMzPlots <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  average <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  outerGroups <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  aggregate <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  groupBy <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  addIntraOuterGroupLinks <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  IMS <span class="op">=</span> <span class="st">"maybe"</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -158,12 +154,13 @@
 <span>  showPeakArea <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  showFGroupRect <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  colourBy <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"rGroups"</span>, <span class="st">"fGroups"</span><span class="op">)</span>,</span>
+<span>  groupBy <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  showLegend <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  annotate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"ret"</span>, <span class="st">"mz"</span><span class="op">)</span>,</span>
+<span>  annotate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"ret"</span>, <span class="st">"mz"</span>, <span class="st">"mob"</span><span class="op">)</span>,</span>
 <span>  intMax <span class="op">=</span> <span class="st">"eic"</span>,</span>
-<span>  EICParams <span class="op">=</span> <span class="fu"><a href="EICParams.html">getDefEICParams</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  EICParams <span class="op">=</span> <span class="fu"><a href="EIXParams.html">getDefEICParams</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  showProgress <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  IMS <span class="op">=</span> <span class="st">"maybe"</span>,</span>
 <span>  xlim <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  EICs <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -171,13 +168,56 @@
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'featureGroups'</span></span>
-<span><span class="fu"><a href="generics.html">plotVenn</a></span><span class="op">(</span><span class="va">obj</span>, which <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu"><a href="generics.html">plotChroms3D</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  analysis <span class="op">=</span> <span class="fu"><a href="generics.html">analyses</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span>,</span>
+<span>  groupName <span class="op">=</span> <span class="fu"><a href="generics.html">names</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span>,</span>
+<span>  dim3 <span class="op">=</span> <span class="st">"mz"</span>,</span>
+<span>  retMin <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  showLimits <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  rtWindow <span class="op">=</span> <span class="fu"><a href="limits.html">defaultLim</a></span><span class="op">(</span><span class="st">"retention"</span>, <span class="st">"medium"</span><span class="op">)</span>,</span>
+<span>  mzWindow <span class="op">=</span> <span class="fu"><a href="limits.html">defaultLim</a></span><span class="op">(</span><span class="st">"mz"</span>, <span class="st">"medium"</span><span class="op">)</span>,</span>
+<span>  mobWindow <span class="op">=</span> <span class="fu"><a href="limits.html">defaultLim</a></span><span class="op">(</span><span class="st">"mobility"</span>, <span class="st">"medium"</span><span class="op">)</span>,</span>
+<span>  gridSize <span class="op">=</span> <span class="fl">50</span>,</span>
+<span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'featureGroupsSet'</span></span>
-<span><span class="fu"><a href="generics.html">plotVenn</a></span><span class="op">(</span><span class="va">obj</span>, which <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span>, sets <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="generics.html">plotChroms3D</a></span><span class="op">(</span><span class="va">obj</span>, analysis <span class="op">=</span> <span class="fu"><a href="generics.html">analyses</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'featureGroups'</span></span>
-<span><span class="fu"><a href="generics.html">plotUpSet</a></span><span class="op">(</span><span class="va">obj</span>, which <span class="op">=</span> <span class="cn">NULL</span>, nsets <span class="op">=</span> <span class="fu"><a href="generics.html">length</a></span><span class="op">(</span><span class="va">which</span><span class="op">)</span>, nintersects <span class="op">=</span> <span class="cn">NA</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">plotMobilograms</span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  analysis <span class="op">=</span> <span class="fu"><a href="generics.html">analyses</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span>,</span>
+<span>  groupName <span class="op">=</span> <span class="fu"><a href="generics.html">names</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span>,</span>
+<span>  showPeakArea <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  showFGroupRect <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  groupBy <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  showLegend <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  annotate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"ret"</span>, <span class="st">"mz"</span>, <span class="st">"mob"</span><span class="op">)</span>,</span>
+<span>  EIMParams <span class="op">=</span> <span class="fu"><a href="EIXParams.html">getDefEIMParams</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  showProgress <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  xlim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  EIMs <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
+<span><span class="fu"><a href="generics.html">plotVenn</a></span><span class="op">(</span><span class="va">obj</span>, which <span class="op">=</span> <span class="cn">NULL</span>, aggregate <span class="op">=</span> <span class="cn">TRUE</span>, IMS <span class="op">=</span> <span class="st">"maybe"</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
+<span><span class="fu"><a href="generics.html">plotUpSet</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  which <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  aggregate <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  IMS <span class="op">=</span> <span class="st">"maybe"</span>,</span>
+<span>  nsets <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  nintersects <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'featureGroups'</span></span>
 <span><span class="fu"><a href="generics.html">plotVolcano</a></span><span class="op">(</span></span>
@@ -186,6 +226,7 @@
 <span>  showLegend <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  averageFunc <span class="op">=</span> <span class="va">mean</span>,</span>
 <span>  normalized <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  IMS <span class="op">=</span> <span class="st">"maybe"</span>,</span>
 <span>  col <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  pch <span class="op">=</span> <span class="fl">19</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -195,21 +236,65 @@
 <span><span class="fu"><a href="generics.html">plotGraph</a></span><span class="op">(</span><span class="va">obj</span>, onlyPresent <span class="op">=</span> <span class="cn">TRUE</span>, width <span class="op">=</span> <span class="cn">NULL</span>, height <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'featureGroupsSet'</span></span>
-<span><span class="fu"><a href="generics.html">plotGraph</a></span><span class="op">(</span><span class="va">obj</span>, onlyPresent <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">set</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="generics.html">plotGraph</a></span><span class="op">(</span><span class="va">obj</span>, onlyPresent <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">set</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
+<span><span class="fu"><a href="generics.html">plotTICs</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  retentionRange <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  MSLevel <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  retMin <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  groupBy <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  showLegend <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  xlim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
+<span><span class="fu"><a href="generics.html">plotBPCs</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  retentionRange <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  MSLevel <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  retMin <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  groupBy <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  showLegend <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  xlim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
 
 
-<dl><dt id="arg-colourby">colourBy<a class="anchor" aria-label="anchor" href="#arg-colourby"></a></dt>
-<dd><p>Sets the automatic colour selection: <code>"none"</code> for a single colour or
-<code>"rGroups"</code>/<code>"fGroups"</code> for a distinct colour per replicate/feature group.</p></dd>
+<dl><dt id="arg-obj-x">obj, x<a class="anchor" aria-label="anchor" href="#arg-obj-x"></a></dt>
+<dd><p><code>featureGroups</code> object to be used for plotting.</p></dd>
+
+
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>passed to <code><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></code> (<code>plot</code>, <code>plotChroms</code>, <code>plotMobilograms</code>,
+<code>plotTICs</code> and <code>plotBPCs</code>), <code><a href="https://rdrr.io/r/graphics/filled.contour.html" class="external-link">filled.contour</a></code> (<code>plotChroms3D</code>), <a href="https://CRAN.R-project.org/package=VennDiagram" class="external-link"><span class="pkg">VennDiagram</span></a>
+plotting functions (<code>plotVenn</code>), <code>chordDiagram</code> (<code>plotChord</code>), <code><a href="https://rdrr.io/pkg/UpSetR/man/upset.html" class="external-link">upset</a></code>
+(<code>plotUpSet</code>).</p></dd>
+
+
+<dt id="arg-groupby">groupBy<a class="anchor" aria-label="anchor" href="#arg-groupby"></a></dt>
+<dd><p>Specifies how results are grouped in the plot. Should be a name of a column in the
+  <a href="analysis-information.html">analysis information</a> table which is used to make analysis groups (<em>e.g.</em>
+  <code>"replicate"</code>). Set to <code>NULL</code> for no grouping. The <code>groupBy</code> argument can also be set to
+  <code>"fGroups"</code> to group by feature groups (except <code>plotChord</code>).</p>
+<p>For <code>plotInt</code>: see the <code>Data aggregation in intensity plots</code> section for more details.</p>
+<p>For <code>plotChord</code>: the grouping is used to generate 'outer groups'.</p></dd>
 
 
 <dt id="arg-onlyunique">onlyUnique<a class="anchor" aria-label="anchor" href="#arg-onlyunique"></a></dt>
-<dd><p>If <code>TRUE</code> and <code>colourBy="rGroups"</code> then only
-feature groups that are unique to a replicate group are plotted.</p></dd>
+<dd><p>If <code>TRUE</code> and <code>groupBy</code> is set to a column name of the
+<a href="analysis-information.html">analysis information</a> then only feature groups that are unique to a replicate are
+plotted.</p></dd>
 
 
 <dt id="arg-retmin">retMin<a class="anchor" aria-label="anchor" href="#arg-retmin"></a></dt>
@@ -220,44 +305,62 @@ feature groups that are unique to a replicate group are plotted.</p></dd>
 <dd><p>Plot a legend if <code>TRUE</code>.</p></dd>
 
 
+<dt id="arg-ims">IMS<a class="anchor" aria-label="anchor" href="#arg-ims"></a></dt>
+<dd><p>(<strong>IMS workflow</strong>) Specifies which feature groups are considered for plotting in IMS workflows. The following options
+  are valid:</p><ul><li><p><code>"both"</code>: Selects IMS and non-IMS features.</p></li>
+<li><p><code>"maybe"</code>: Selects non-IMS features and IMS features without assigned IMS parent.</p></li>
+<li><p><code>FALSE</code>: Selects only non-IMS features.</p></li>
+<li><p><code>TRUE</code>: Selects only IMS features.</p></li>
+</ul><p>For <code>plotChroms</code>: if the <code>groupName</code> argument is set to a subset of the feature groups, then the <code>IMS</code> argument is forced to <code>"both"</code> to ensure that the selected feature groups are plotted.</p></dd>
+
+
 <dt id="arg-col">col<a class="anchor" aria-label="anchor" href="#arg-col"></a></dt>
 <dd><p>Colour(s) used. If <code>col=NULL</code> then colours are automatically generated.</p></dd>
 
 
 <dt id="arg-pch-type-lty">pch, type, lty<a class="anchor" aria-label="anchor" href="#arg-pch-type-lty"></a></dt>
-<dd><p>Common plotting parameters passed to <em>e.g.</em> <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></code>. For <code>plot</code>:
-if <code>pch=NULL</code> then values are automatically assigned.</p></dd>
-
-
-<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>passed to <code><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></code> (<code>plot</code>, <code>plotChroms</code>, <code>plotTICs</code> and
-<code>plotBPCs</code>), <span class="pkg">VennDiagram</span> plotting functions (<code>plotVenn</code>), <code>chordDiagram</code>
-(<code>plotChord</code>) or <code><a href="https://rdrr.io/pkg/UpSetR/man/upset.html" class="external-link">upset</a></code> (<code>plotUpSet</code>).</p></dd>
-
-
-<dt id="arg-obj-x">obj, x<a class="anchor" aria-label="anchor" href="#arg-obj-x"></a></dt>
-<dd><p><code>featureGroups</code> object to be used for plotting.</p></dd>
+<dd><p>Common plotting parameters passed to <em>e.g.</em> <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></code>.</p>
+<p>For <code>plot</code>: if <code>pch=NULL</code> then values are automatically assigned.</p>
+<p>for <code>plotInt</code>: the <code>type</code> argument defaults to single points (<code>"p"</code>) when <code>regression=TRUE</code>,
+  and lines+points (<code>"b"</code>) otherwise. For non-aggregated data, it probably makes more sense to set <em>e.g.</em>
+  <code>type="p"</code> to avoid lines being drawn to points with equal x-values.</p></dd>
 
 
 <dt id="arg-average">average<a class="anchor" aria-label="anchor" href="#arg-average"></a></dt>
-<dd><p>If <code>TRUE</code> then data within replicate groups are averaged.</p>
-<p>For <code>as.data.table</code>: if <code>features=TRUE</code> other feature properties are also averaged.</p></dd>
+<dd><p>Controls plot data averaging: see the <code>Data aggregation in intensity plots</code> section.</p></dd>
 
 
-<dt id="arg-xnames">xnames<a class="anchor" aria-label="anchor" href="#arg-xnames"></a></dt>
-<dd><p>Plot analysis (or replicate group if <code>average=TRUE</code>) names on the x axis.</p></dd>
+<dt id="arg-averagefunc-normalized">averageFunc, normalized<a class="anchor" aria-label="anchor" href="#arg-averagefunc-normalized"></a></dt>
+<dd><p>Used for intensity data treatment, see the documentation for the
+<code><a href="feature-table.html">as.data.table method</a></code>.</p></dd>
+
+
+<dt id="arg-areas">areas<a class="anchor" aria-label="anchor" href="#arg-areas"></a></dt>
+<dd><p>Set to <code>TRUE</code> to use feature areas instead of peak intensities for plotting.</p></dd>
+
+
+<dt id="arg-xby">xBy<a class="anchor" aria-label="anchor" href="#arg-xby"></a></dt>
+<dd><p>Controls x-value grouping in the plot: see the <code>Data aggregation in intensity plots</code> section.</p></dd>
+
+
+<dt id="arg-xnames">xNames<a class="anchor" aria-label="anchor" href="#arg-xnames"></a></dt>
+<dd><p>Plot names (<code>xNames=TRUE</code>) or a number sequence (<code>xNames=FALSE</code>) on the x axis.</p></dd>
+
+
+<dt id="arg-regression">regression<a class="anchor" aria-label="anchor" href="#arg-regression"></a></dt>
+<dd><p>If <code>TRUE</code> then a regression line is plotted for each group, using the x values set by
+<code>xBy</code> (see <code>Data aggregation in intensity plots</code>). if <code>showLegend=TRUE</code> then the R-squared value is
+show in the legend for each group (unless there are multiple feature groups and <code>groupBy != "fGroups"</code>).</p></dd>
+
+
+<dt id="arg-xlim-ylim">xlim, ylim<a class="anchor" aria-label="anchor" href="#arg-xlim-ylim"></a></dt>
+<dd><p>Sets the plot size limits used by
+<code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></code>. Set to <code>NULL</code> for automatic plot sizing.</p></dd>
 
 
 <dt id="arg-plotargs-linesargs">plotArgs, linesArgs<a class="anchor" aria-label="anchor" href="#arg-plotargs-linesargs"></a></dt>
 <dd><p>A <code>list</code> with further arguments passed to <code><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></code> and
 <code><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></code>, respectively.</p></dd>
-
-
-<dt id="arg-sets">sets<a class="anchor" aria-label="anchor" href="#arg-sets"></a></dt>
-<dd><p>(<strong>sets workflow</strong>) For <code>plotInt</code>: if <code>TRUE</code> then feature intensities are plot per set (order follows the
-  <a href="analysis-information.html">analysis information</a>).</p>
-<p>For <code>plotVenn</code>: If <code>TRUE</code> then the <code>which</code> argument changes its meaning and is used to specify the
-  names of the sets to be compared.</p></dd>
 
 
 <dt id="arg-addselflinks">addSelfLinks<a class="anchor" aria-label="anchor" href="#arg-addselflinks"></a></dt>
@@ -270,13 +373,10 @@ represent non-shared data.</p></dd>
 retention time scatter plots.</p></dd>
 
 
-<dt id="arg-outergroups">outerGroups<a class="anchor" aria-label="anchor" href="#arg-outergroups"></a></dt>
-<dd><p>Character vector of names to be used as outer groups. The
-values in the specified vector should be named by analysis names
-(<code>average</code> set to <code>FALSE</code>) or replicate group names
-(<code>average</code> set to <code>TRUE</code>), for instance: <code>c(analysis1 =
-"group1", analysis2 = "group1", analysis3 = "group2")</code>. Set to <code>NULL</code>
-to disable outer groups.</p></dd>
+<dt id="arg-aggregate">aggregate<a class="anchor" aria-label="anchor" href="#arg-aggregate"></a></dt>
+<dd><p>Specifies how data should be aggregated prior to comparison. Set to <code>FALSE</code> to compare
+analyses, <code>TRUE</code> to compare replicates or to the name of a column in the <a href="analysis-information.html">analysis
+information</a> to compare by a custom grouping of analyses.</p></dd>
 
 
 <dt id="arg-addintraoutergrouplinks">addIntraOuterGroupLinks<a class="anchor" aria-label="anchor" href="#arg-addintraoutergrouplinks"></a></dt>
@@ -285,20 +385,24 @@ outer groups.</p></dd>
 
 
 <dt id="arg-analysis-groupname">analysis, groupName<a class="anchor" aria-label="anchor" href="#arg-analysis-groupname"></a></dt>
-<dd><p><code>character</code> vector with the analyses/group names to be considered for plotting.
-Compared to subsetting the <code>featureGroups</code> object (<code>obj</code>) upfront this is slightly faster and (if
-<code>onlyPresent=FALSE</code>) allows plotting chromatograms for feature groups where none of the specified analyses
-contain the feature (which is impossible otherwise since subsetting leads to removal of 'empty' feature groups).</p></dd>
+<dd><p><code>character</code> vector with the analyses/group names to be considered for plotting.</p>
+<p>For <code>plotChroms</code> and <code>plotMobilograms</code>: Compared to subsetting the <code>featureGroups</code> object
+  (<code>obj</code>) upfront this is slightly faster. Furthermore, if <code>onlyPresent=FALSE</code> in <code>EICParams</code> or
+  <code>EIMParams</code>, this allows plotting chromatograms for feature groups where none of the specified analyses
+  contain the feature (which is impossible otherwise since subsetting leads to removal of 'empty' feature groups).
+  For IMS workflows: if <code>IMS!="both"</code> then the <code>analysis</code> and <code>groupName</code> arguments are adjusted for
+  the remaining data after IMS selection.</p>
+<p>For <code>plotChroms3D</code>: a single analysis and group name should be specified (unless <code>obj</code> contains only a
+  single feature, <em>e.g.</em> created as <code>fGroups[1, 1]</code>).</p></dd>
 
 
 <dt id="arg-showpeakarea">showPeakArea<a class="anchor" aria-label="anchor" href="#arg-showpeakarea"></a></dt>
-<dd><p>Set to <code>TRUE</code> to display integrated chromatographic peak ranges by filling (shading) their
-areas.</p></dd>
+<dd><p>Set to <code>TRUE</code> to display integrated peak ranges by filling (shading) their areas.</p></dd>
 
 
 <dt id="arg-showfgrouprect">showFGroupRect<a class="anchor" aria-label="anchor" href="#arg-showfgrouprect"></a></dt>
-<dd><p>Set to <code>TRUE</code> to mark the full retention/intensity range of all features within a feature
-group by drawing a rectangle around it.</p></dd>
+<dd><p>Set to <code>TRUE</code> to mark the full integration/intensity range of all features within a
+feature group by drawing a rectangle around it.</p></dd>
 
 
 <dt id="arg-title">title<a class="anchor" aria-label="anchor" href="#arg-title"></a></dt>
@@ -306,8 +410,8 @@ group by drawing a rectangle around it.</p></dd>
 
 
 <dt id="arg-annotate">annotate<a class="anchor" aria-label="anchor" href="#arg-annotate"></a></dt>
-<dd><p>If set to <code>"ret"</code> and/or <code>"mz"</code> then retention and/or <em>m/z</em> values will be drawn for
-each plotted feature group.</p></dd>
+<dd><p>Set to <code>"ret"</code>, <code>"mz"</code> and/or <code>"mob"</code> to annotate peaks with the retention time,
+<em>m/z</em> and/or ion mobility (if available) feature group values, respectively.</p></dd>
 
 
 <dt id="arg-intmax">intMax<a class="anchor" aria-label="anchor" href="#arg-intmax"></a></dt>
@@ -317,7 +421,7 @@ each plotted feature group.</p></dd>
 
 <dt id="arg-eicparams">EICParams<a class="anchor" aria-label="anchor" href="#arg-eicparams"></a></dt>
 <dd><p>A named <code>list</code> with parameters used for extracted ion chromatogram (EIC) creation. See the
-<a href="EICParams.html">EIC parameters</a> documentation for more details.</p></dd>
+<a href="EIXParams.html">EIC parameters</a> documentation for more details.</p></dd>
 
 
 <dt id="arg-showprogress">showProgress<a class="anchor" aria-label="anchor" href="#arg-showprogress"></a></dt>
@@ -325,35 +429,45 @@ each plotted feature group.</p></dd>
 to <code>"none"</code> to disable any annotation.</p></dd>
 
 
-<dt id="arg-xlim-ylim">xlim, ylim<a class="anchor" aria-label="anchor" href="#arg-xlim-ylim"></a></dt>
-<dd><p>Sets the plot size limits used by
-<code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></code>. Set to <code>NULL</code> for automatic plot sizing.</p></dd>
-
-
-<dt id="arg-eics">EICs<a class="anchor" aria-label="anchor" href="#arg-eics"></a></dt>
+<dt id="arg-eics-eims">EICs, EIMs<a class="anchor" aria-label="anchor" href="#arg-eics-eims"></a></dt>
 <dd><p>Internal parameter for now and should be kept at <code>NULL</code> (default).</p></dd>
 
 
+<dt id="arg-dim-">dim3<a class="anchor" aria-label="anchor" href="#arg-dim-"></a></dt>
+<dd><p>The third dimension to plot besides retention time and intensity. Can be either <code>"mz"</code> or
+<code>"mobility"</code>.</p></dd>
+
+
+<dt id="arg-showlimits">showLimits<a class="anchor" aria-label="anchor" href="#arg-showlimits"></a></dt>
+<dd><p>If <code>TRUE</code>, a rectangle is drawn to indicate the feature limits.</p></dd>
+
+
+<dt id="arg-rtwindow-mzwindow-mobwindow">rtWindow, mzWindow, mobWindow<a class="anchor" aria-label="anchor" href="#arg-rtwindow-mzwindow-mobwindow"></a></dt>
+<dd><p>Numeric values specifying the window size around the feature for retention time,
+m/z, and ion mobility respectively. Values <code>&gt;0</code> will effectively zoom out.</p></dd>
+
+
+<dt id="arg-gridsize">gridSize<a class="anchor" aria-label="anchor" href="#arg-gridsize"></a></dt>
+<dd><p>The size of the grid for interpolation.</p></dd>
+
+
+<dt id="arg-eimparams">EIMParams<a class="anchor" aria-label="anchor" href="#arg-eimparams"></a></dt>
+<dd><p>A named <code>list</code> with parameters used for extracted ion mobilogram (EIM) creation. See the
+<a href="EIXParams.html">EIM parameters</a> documentation for more details.</p></dd>
+
+
 <dt id="arg-which">which<a class="anchor" aria-label="anchor" href="#arg-which"></a></dt>
-<dd><p>A character vector with replicate groups used for comparison. Set to <code>NULL</code> to ignore.</p>
-<p>For <code>plotVenn</code>: alternatively a named <code>list</code> containing elements of <code>character</code> vectors with
-  replicate groups to compare. For instance, <code>which=list(infl = c("influent-A", "influent-B"), effl =
-  c("effluent-A", "effluent-B"))</code>, will compare the features in replicate groups <samp>"influent-A/B"</samp> against those
-  in <samp>"effluent-A/B"</samp>. The names of the list are used for labelling in the plot, and will be made automatically
-  if not specified.</p></dd>
+<dd><p>A character vector with the selection to compare (<em>e.g.</em> replicates, as set by the <code>aggregate</code>
+argument). Set to <code>NULL</code> to select everything.</p></dd>
 
 
 <dt id="arg-nsets-nintersects">nsets, nintersects<a class="anchor" aria-label="anchor" href="#arg-nsets-nintersects"></a></dt>
-<dd><p>See <code><a href="https://rdrr.io/pkg/UpSetR/man/upset.html" class="external-link">upset</a></code>.</p></dd>
+<dd><p>See <code><a href="https://rdrr.io/pkg/UpSetR/man/upset.html" class="external-link">upset</a></code>. If <code>nsets == NULL</code> then it will be set to the number
+of compared items.</p></dd>
 
 
 <dt id="arg-fcparams">FCParams<a class="anchor" aria-label="anchor" href="#arg-fcparams"></a></dt>
 <dd><p>A parameter list to calculate Fold change data. See <code>getFCParams</code> for more details.</p></dd>
-
-
-<dt id="arg-averagefunc-normalized">averageFunc, normalized<a class="anchor" aria-label="anchor" href="#arg-averagefunc-normalized"></a></dt>
-<dd><p>Used for intensity data treatment, see the documentation for the
-<code><a href="featureGroups-class.html">as.data.table method</a></code>.</p></dd>
 
 
 <dt id="arg-onlypresent">onlyPresent<a class="anchor" aria-label="anchor" href="#arg-onlypresent"></a></dt>
@@ -369,11 +483,22 @@ input object (which may be otherwise be removed by <em>e.g.</em> subsetting or
 <dt id="arg-set">set<a class="anchor" aria-label="anchor" href="#arg-set"></a></dt>
 <dd><p>(<strong>sets workflow</strong>) The set for which data must be plotted.</p></dd>
 
+
+<dt id="arg-retentionrange">retentionRange<a class="anchor" aria-label="anchor" href="#arg-retentionrange"></a></dt>
+<dd><p>Range of retention time (in seconds) to collect TIC traces. Should be a numeric vector with
+length of two containing the min/max values. Set to NULL to ignore.</p></dd>
+
+
+<dt id="arg-mslevel">MSLevel<a class="anchor" aria-label="anchor" href="#arg-mslevel"></a></dt>
+<dd><p>Integer vector with the ms levels (i.e., 1 for MS1 and 2 for MS2) to obtain TIC traces.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p><code>plotVenn</code> (invisibly) returns a list with the following fields:</p><ul><li><p><code>gList</code> the <code>gList</code> object that was returned by
-  the utilized <span class="pkg">VennDiagram</span> plotting function.</p></li>
+    <p><code>plotChroms3D</code> returns the interpolated grid used for plotting (generated with
+  <a href="https://rdrr.io/pkg/MBA/man/mba.surf.html" class="external-link">mba.surf</a>).</p>
+<p><code>plotVenn</code> (invisibly) returns a list with the following fields:</p><ul><li><p><code>gList</code> the <code>gList</code> object that was returned by
+  the utilized <a href="https://CRAN.R-project.org/package=VennDiagram" class="external-link"><span class="pkg">VennDiagram</span></a> plotting function.</p></li>
 <li><p><code>areas</code> The total area for each plotted group.</p></li>
 <li><p><code>intersectionCounts</code> The number of intersections between groups.</p></li>
 </ul><p>The order for the <code>areas</code> and <code>intersectionCounts</code> fields is the same as the parameter order
@@ -383,35 +508,64 @@ from the used plotting function (see <em>e.g.</em> <code>draw.pairwise.venn</cod
     </div>
     <div id="details">
     <h2>Details</h2>
-    <p><code>plot</code> Generates an <em>m/z</em> <em>vs</em> retention time
-  plot for all featue groups. Optionally highlights unique/overlapping
-  presence amongst replicate groups.</p>
-<p><code>plotInt</code> Generates a line plot for the (averaged) intensity of feature groups within all analyses</p>
+    <p><code>plot</code> Generates an <em>m/z</em> <em>vs</em> retention time plot for all featue groups. Optionally
+  highlights unique/overlapping presence amongst replicates.</p>
+<p><code>plotInt</code> Generates a line plot with feature intensities.</p>
 <p><code>plotChord</code> Generates a chord diagram which can be used to
   visualize shared presence of feature groups between analyses or replicate
   groups. In addition, analyses/replicates sharing similar properties
   (<em>e.g.</em> location, age, type) may be grouped to enhance visualization
   between these 'outer groups'.</p>
 <p><code>plotChroms</code> Plots extracted ion chromatograms (EICs) of feature groups.</p>
-<p><code>plotVenn</code> plots a Venn diagram (using <span class="pkg">VennDiagram</span>) outlining unique and shared feature
-  groups between up to five replicate groups.</p>
+<p><code>plotChroms3D</code> generates a 3D plot of chromatographic data for a single feature group in a single
+  analysis. The plot shows retention time on the x-axis, m/z or mobility on the y-axis, and intensity as color in a
+  contour plot. The plot is made with the <code><a href="https://rdrr.io/r/graphics/filled.contour.html" class="external-link">filled.contour</a></code> function.</p>
+<p><code>plotMobilograms</code> Plots extracted ion mobilograms (EIMs) of feature groups.</p>
+<p><code>plotVenn</code> plots a Venn diagram (using <a href="https://CRAN.R-project.org/package=VennDiagram" class="external-link"><span class="pkg">VennDiagram</span></a>) outlining unique and shared feature
+  groups between up to five replicates.</p>
 <p><code>plotUpSet</code> plots an UpSet diagram (using the <code><a href="https://rdrr.io/pkg/UpSetR/man/upset.html" class="external-link">upset</a></code> function) outlining unique
-  and shared feature groups between given replicate groups.</p>
+  and shared feature groups between given replicates.</p>
 <p><code>plotVolcano</code> Plots Fold change data in a 'Volcano plot'.</p>
 <p><code>plotGraph</code> generates an interactive network plot which is used to explore internal standard (IS)
   assignments to each feature group. This requires the availability of IS assignments, see the documentation for
   <code><a href="featureGroups-class.html">normInts</a></code> for details. The graph is rendered with <span class="pkg">visNetwork</span>.</p>
+<p><code>plotTICs</code> Plots the total ion chromatogram/s (TICs) of the analyses.</p>
+<p><code>plotTICs</code> Plots the base peak chromatogram/s (BPCs) of the analyses.</p>
+    </div>
+    <div id="use-of-raw-hrms-data">
+    <h2>Use of raw HRMS data</h2>
+    <p>The <a href="msdata.html">raw data interface</a> of <span class="pkg">patRoon</span> is used by <code>plotChroms</code>, <code>plotMobilograms</code>, <code>plotTICs</code> and <code>plotBPCs</code> to
+  process HRMS (or IMS-HRMS) data. Please see <a href="msdata.html">its documentation</a> for more information on the supported
+  formats and available configuration options.</p>
     </div>
     <div id="sets-workflows">
     <h2>Sets workflows</h2>
-    <p>The following methods are changed or with new functionality:</p><ul><li><p><code>plotVenn</code> and <code>plotInt</code> allow to handle data per set. See the <code>sets</code> argument description.</p></li>
-<li><p><code>plotGraph</code> only plots data per set, and requires the <code>set</code> argument to be set.</p></li>
+    <p>The following methods are changed or with new functionality:</p><ul><li><p><code>plotGraph</code> only plots data per set, and requires the <code>set</code> argument to be set.</p></li>
+</ul><p>In sets workflows the <a href="analysis-information.html">analysis information</a> contains an additional <code>"set"</code>
+  column, which can be used for arguments that involve grouping of analyses. For instance, if <code>groupBy="set"</code>
+  then plotting data is grouped per set.</p>
+    </div>
+    <div id="data-aggregation-in-intensity-plots">
+    <h2>Data aggregation in intensity plots</h2>
+    <p>the <code>average</code>, <code>xBy</code> and <code>groupBy</code> arguments control how
+  data is aggregated in intensity plots:</p><ul><li><p><code>average</code>: controls the averaging of feature intensities prior to plotting.</p></li>
+<li><p><code>xBy</code>: can map the x value of individual points to analysis metadata. For example, exposure time or
+  sample location. Non-numeric values are allowed (unless <code>regression=TRUE</code>).</p></li>
+<li><p><code>groupBy</code>: controls the grouping of points in the plot. Equal groups are plotted in sequence so they can
+  be connected with lines and are coloured equally. Examples include experiment type or feature groups.</p></li>
+</ul><p>The following values are valid:</p><ul><li><p><code>FALSE</code> (<code>average</code>) or <code>NULL</code> (<code>xBy</code> and <code>groupBy</code>): aggregation is disabled.</p></li>
+<li><p><code>TRUE</code> (only <code>average</code>): results are averaged for each replicate</p></li>
+<li><p>a name of a column in the <a href="analysis-information.html">analysis information</a>: results are aggregated for
+  analyses with the same table column value.</p></li>
+<li><p><code>"fGroups"</code> (only <code>groupBy</code>): plots are grouped by feature groups.</p></li>
 </ul></div>
     <div id="references">
     <h2>References</h2>
     <p>Gu Z, Gu L, Eils R, Schlesner M, Brors B (2014).
 “circlize implements and enhances circular visualization in R.”
-<em>Bioinformatics</em>, <b>30</b>, 2811-2812.</p>
+<em>Bioinformatics</em>.
+<a href="https://doi.org/10.1093/bioinformatics/btu393" class="external-link">doi:10.1093/bioinformatics/btu393</a>
+, <a href="https://doi.org/10.1093/bioinformatics/btu393" class="external-link">https://doi.org/10.1093/bioinformatics/btu393</a>.</p>
 <p>Conway JR, Lex A, Gehlenborg N (2017).
 “UpSetR: an R package for the visualization of intersecting sets and their properties.”
 <em>Bioinformatics</em>, <b>33</b>(18), 2938-2940.

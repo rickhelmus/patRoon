@@ -5,12 +5,12 @@ library(patRoon)
 # initialization
 # -------------------------
 
-workPath <- "test_temp/test-np/analysis-tab_csv_both"
+workPath <- "<WORK_PATH>/test-np/analysis-tab_csv_both"
 setwd(workPath)
 
 # Load analysis table
-anaInfoPos <- read.csv("test_temp/test-np/analysis-tab_csv_both/analyses-pos.csv")
-anaInfoNeg <- read.csv("test_temp/test-np/analysis-tab_csv_both/analyses-neg.csv")
+anaInfoPos <- read.csv("<WORK_PATH>/test-np/analysis-tab_csv_both/analyses-pos.csv")
+anaInfoNeg <- read.csv("<WORK_PATH>/test-np/analysis-tab_csv_both/analyses-neg.csv")
 
 # -------------------------
 # features

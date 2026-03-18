@@ -7,10 +7,11 @@
 findFeatures(analysisInfo, algorithm, ..., verbose = TRUE)
 }
 \arguments{
-\item{analysisInfo}{A \code{data.frame} with \link[=analysis-information]{Analysis information}.}
+\item{analysisInfo}{A \code{data.frame} (or \code{data.table}) with \link[=analysis-information]{Analysis
+information}.}
 
 \item{algorithm}{A character string describing the algorithm that should be
-used: \code{"bruker"}, \code{"openms"}, \code{"xcms"}, \code{"xcms3"}, \code{"envipick"}, \code{"sirius"}, \code{"kpic2"}, \code{"safd"}}
+used: \code{"bruker"}, \code{"openms"}, \code{"xcms"}, \code{"xcms3"}, \code{"envipick"}, \code{"sirius"}, \code{"kpic2"}, \code{"safd"}, \code{"piek"}}
 
 \item{\dots}{Further parameters passed to the selected feature finding algorithms.}
 
@@ -42,5 +43,5 @@ In most cases it will be necessary to centroid your MS input files. The only exc
 }
 \seealso{
 The \code{\link{features}} output class and its methods and the algorithm specific functions:
-  \code{\link{findFeaturesBruker}}, \code{\link{findFeaturesOpenMS}}, \code{\link{findFeaturesXCMS}}, \code{\link{findFeaturesXCMS3}}, \code{\link{findFeaturesEnviPick}}, \code{\link{findFeaturesSIRIUS}}, \code{\link{findFeaturesKPIC2}}, \code{\link{findFeaturesSAFD}}
+  \code{\link{findFeaturesBruker}}, \code{\link{findFeaturesOpenMS}}, \code{\link{findFeaturesXCMS}}, \code{\link{findFeaturesXCMS3}}, \code{\link{findFeaturesEnviPick}}, \code{\link{findFeaturesSIRIUS}}, \code{\link{findFeaturesKPIC2}}, \code{\link{findFeaturesSAFD}}, \code{\link{findFeaturesPiek}}
 }

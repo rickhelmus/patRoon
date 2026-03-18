@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.0</span>
       </span>
     </div>
 
@@ -95,10 +95,22 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">generateFormulas</span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">MSPeakLists</span>, <span class="va">algorithm</span>, <span class="va">...</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">generateFormulas</span><span class="op">(</span></span>
+<span>  <span class="va">fGroups</span>,</span>
+<span>  <span class="va">MSPeakLists</span>,</span>
+<span>  <span class="va">algorithm</span>,</span>
+<span>  specSimParams <span class="op">=</span> <span class="fu"><a href="specSimParams.html">getDefSpecSimParams</a></span><span class="op">(</span>removePrecursor <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'featureGroups'</span></span>
-<span><span class="fu">generateFormulas</span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">MSPeakLists</span>, <span class="va">algorithm</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">generateFormulas</span><span class="op">(</span></span>
+<span>  <span class="va">fGroups</span>,</span>
+<span>  <span class="va">MSPeakLists</span>,</span>
+<span>  <span class="va">algorithm</span>,</span>
+<span>  specSimParams <span class="op">=</span> <span class="fu"><a href="specSimParams.html">getDefSpecSimParams</a></span><span class="op">(</span>removePrecursor <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -118,6 +130,12 @@ remaining feature groups in the subset are considered.</p></dd>
 <dt id="arg-algorithm">algorithm<a class="anchor" aria-label="anchor" href="#arg-algorithm"></a></dt>
 <dd><p>A character string describing the algorithm that should be
 used: <code>"bruker"</code>, <code>"genform"</code>, <code>"sirius"</code></p></dd>
+
+
+<dt id="arg-specsimparams">specSimParams<a class="anchor" aria-label="anchor" href="#arg-specsimparams"></a></dt>
+<dd><p>A named <code>list</code> with parameters that influence the calculation of the
+<a href="id-conf.html">annotation similarity</a>. See the <a href="specSimParams.html">spectral similarity parameters</a> documentation
+for more details.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>

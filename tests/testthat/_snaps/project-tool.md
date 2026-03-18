@@ -6,7 +6,7 @@
     Output
       $general
       $general$destination
-      [1] "test_temp/test-np/default"
+      [1] "<WORK_PATH>/test-np/default"
       
       $general$scriptFile
       [1] "process-mod.R"
@@ -269,6 +269,9 @@
       
       $TPs$TPDoMFDB
       [1] FALSE
+      
+      $TPs$suspCCSPred
+      [1] "none"
       
       
       $report

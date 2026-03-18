@@ -161,7 +161,8 @@ newProjectServer <- function(destPath)
         })
         data$annotations <- newProjectAnnotationServer("annotation", hasSusp, IMSMode, reactive(loadedSettings$annotations))
         data$TPs <- newProjectTPServer("tp", hasSusp, reactive(data$annotations$settings()$formulasAlgo),
-                                       reactive(data$annotations$settings()$compoundsAlgo), reactive(loadedSettings$TPs))
+                                       reactive(data$annotations$settings()$compoundsAlgo), IMSMode,
+                                       reactive(loadedSettings$TPs))
         data$report <- newProjectReportServer("report", reactive(loadedSettings$report))
         
         getSettings <- function() sapply(data, \(d) d$settings(), simplify = FALSE)

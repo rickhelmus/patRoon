@@ -2,8 +2,6 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-context("TPs")
-
 fGroups <- getCompFGroups()
 
 suspL <- patRoonData::suspectsPos[patRoonData::suspectsPos$name %in% screenInfo(fGroups)$name, ]
@@ -79,31 +77,31 @@ if (doMetFrag)
 }
 
 test_that("verify TP generation", {
-    expect_known_value(TPsLogic, testFile("tp-logic"))
-    expect_known_value(TPsLibPC, testFile("tp-lib_pc"))
-    expect_known_value(TPsLibSusp, testFile("tp-lib_susp"))
-    expect_known_value(TPsLibScr, testFile("tp-lib_scr"))
-    expect_known_value(TPsLibCustom, testFile("tp-lib_custom"))
-    expect_known_value(TPsLibForm, testFile("tp-lib_form"))
-    expect_known_value(TPsLibFormSusp, testFile("tp-lib_form_susp"))
-    expect_known_value(TPsLibFormScr, testFile("tp-lib_form_scr"))
-    expect_known_value(TPsBTSusp, testFile("tp-bt_susp"))
-    expect_known_value(TPsBTScr, testFile("tp-bt_scr"))
-    expect_known_value(TPsAnnFormSusp, testFile("tp-ann_form_susp"))
-    expect_known_value(TPsAnnFormScr, testFile("tp-ann_form_scr"))
-    expect_known_value(TPsAnnCompSusp, testFile("tp-ann_comp_susp"))
-    expect_known_value(TPsAnnCompScr, testFile("tp-ann_comp_scr"))
+    expect_known_val(TPsLogic, "tp-logic")
+    expect_known_val(TPsLibPC, "tp-lib_pc")
+    expect_known_val(TPsLibSusp, "tp-lib_susp")
+    expect_known_val(TPsLibScr, "tp-lib_scr")
+    expect_known_val(TPsLibCustom, "tp-lib_custom")
+    expect_known_val(TPsLibForm, "tp-lib_form")
+    expect_known_val(TPsLibFormSusp, "tp-lib_form_susp")
+    expect_known_val(TPsLibFormScr, "tp-lib_form_scr")
+    expect_known_val(TPsBTSusp, "tp-bt_susp")
+    expect_known_val(TPsBTScr, "tp-bt_scr")
+    expect_known_val(TPsAnnFormSusp, "tp-ann_form_susp")
+    expect_known_val(TPsAnnFormScr, "tp-ann_form_scr")
+    expect_known_val(TPsAnnCompSusp, "tp-ann_comp_susp")
+    expect_known_val(TPsAnnCompScr, "tp-ann_comp_scr")
     
-    expect_known_show(TPsLogic, testFile("tp-logic", text = TRUE))
-    expect_known_show(TPsLibPC, testFile("tp-lib_pc", text = TRUE))
-    expect_known_show(TPsLibSusp, testFile("tp-lib_susp", text = TRUE))
-    expect_known_show(TPsLibScr, testFile("tp-lib_scr", text = TRUE))
-    expect_known_show(TPsBTSusp, testFile("tp-bt_susp", text = TRUE))
-    expect_known_show(TPsBTScr, testFile("tp-bt_scr", text = TRUE))
-    expect_known_show(TPsAnnFormSusp, testFile("tp-ann_form_susp", text = TRUE))
-    expect_known_show(TPsAnnFormScr, testFile("tp-ann_form_scr", text = TRUE))
-    expect_known_show(TPsAnnCompSusp, testFile("tp-ann_comp_susp", text = TRUE))
-    expect_known_show(TPsAnnCompScr, testFile("tp-ann_comp_scr", text = TRUE))
+    expect_known_show(TPsLogic, "tp-logic")
+    expect_known_show(TPsLibPC, "tp-lib_pc")
+    expect_known_show(TPsLibSusp, "tp-lib_susp")
+    expect_known_show(TPsLibScr, "tp-lib_scr")
+    expect_known_show(TPsBTSusp, "tp-bt_susp")
+    expect_known_show(TPsBTScr, "tp-bt_scr")
+    expect_known_show(TPsAnnFormSusp, "tp-ann_form_susp")
+    expect_known_show(TPsAnnFormScr, "tp-ann_form_scr")
+    expect_known_show(TPsAnnCompSusp, "tp-ann_comp_susp")
+    expect_known_show(TPsAnnCompScr, "tp-ann_comp_scr")
     
     expect_setequal(parents(TPsLogic)$name, names(fGroups))
     checkmate::expect_names(names(parents(TPsLogic)), permutation.of = c("name", "rt", "neutralMass"))
@@ -157,10 +155,10 @@ test_that("verify TP generation", {
     
     skip_if_not(doMetFrag)
 
-    expect_known_value(TPsLibComp, testFile("tp-lib_comp"))
-    expect_known_value(TPsBTComp, testFile("tp-bt_comp"))
-    expect_known_show(TPsLibComp, testFile("tp-lib_comp", text = TRUE))
-    expect_known_show(TPsBTComp, testFile("tp-bt_comp", text = TRUE))
+    expect_known_val(TPsLibComp, "tp-lib_comp")
+    expect_known_val(TPsBTComp, "tp-bt_comp")
+    expect_known_show(TPsLibComp, "tp-lib_comp")
+    expect_known_show(TPsBTComp, "tp-bt_comp")
 
     checkmate::expect_names(parents(TPsLibComp)$name, subset.of = as.data.table(compsMF)$identifier)
     checkmate::expect_names(parents(TPsBTComp)$name, subset.of = as.data.table(compsMF)$identifier)
@@ -186,13 +184,13 @@ test_that("verify TP generation", {
     expect_length(TPsAnnCompEmpty2, 0)
     
     skip_if_not(doCTS)
-    expect_known_value(TPsCTSSusp, testFile("tp-cts_susp"))
-    expect_known_value(TPsCTSScr, testFile("tp-cts_scr"))
-    expect_known_show(TPsCTSSusp, testFile("tp-cts_susp", text = TRUE))
-    expect_known_show(TPsCTSScr, testFile("tp-cts_scr", text = TRUE))
+    expect_known_val(TPsCTSSusp, "tp-cts_susp")
+    expect_known_val(TPsCTSScr, "tp-cts_scr")
+    expect_known_show(TPsCTSSusp, "tp-cts_susp")
+    expect_known_show(TPsCTSScr, "tp-cts_scr")
     expect_length(TPsCTSEmpty, 0)
-    expect_known_value(TPsCTSComp, testFile("tp-cts_comp"))
-    expect_known_show(TPsCTSComp, testFile("tp-cts_comp", text = TRUE))
+    expect_known_val(TPsCTSComp, "tp-cts_comp")
+    expect_known_show(TPsCTSComp, "tp-cts_comp")
     checkmate::expect_names(parents(TPsCTSComp)$name, subset.of = as.data.table(compsMF)$identifier)
     expect_length(TPsCTSCompEmpty, 0)
 })
@@ -225,15 +223,15 @@ TPsAnnCompFiltMFCOS <- if (doMetFrag) filter(TPsAnnCompSusp, minFitCompOrSimSusp
 
 test_that("basic usage", {
     expect_length(TPsLogic["nope"], 0)
-    expect_equivalent(names(TPsLogic[1:2]), pnames[1:2])
-    expect_equivalent(names(TPsLogic[pnames[2:3]]), pnames[2:3])
-    expect_equivalent(names(TPsLogic[c(TRUE, FALSE)]), pnames[c(TRUE, FALSE)])
+    expect_equal(names(TPsLogic[1:2]), pnames[1:2])
+    expect_equal(names(TPsLogic[pnames[2:3]]), pnames[2:3])
+    expect_equal(names(TPsLogic[c(TRUE, FALSE)]), pnames[c(TRUE, FALSE)])
     expect_equal(length(TPsLogic[FALSE]), 0)
     expect_length(TPsLogicEmpty[1:5], 0)
     
-    expect_equivalent(TPsLogic[[2]], products(TPsLogic)[[2]])
-    expect_equivalent(TPsLogic[[names(TPsLogic)[2]]], products(TPsLogic)[[2]])
-    expect_equivalent(callDollar(TPsLogic, names(TPsLogic)[2]), TPsLogic[[2]])
+    expect_equal(TPsLogic[[2]], products(TPsLogic)[[2]])
+    expect_equal(TPsLogic[[names(TPsLogic)[2]]], products(TPsLogic)[[2]])
+    expect_equal(callDollar(TPsLogic, names(TPsLogic)[2]), TPsLogic[[2]])
     
     expect_equal(nrow(as.data.table(TPsLogic)), length(TPsLogic))
     
@@ -270,8 +268,8 @@ test_that("basic usage", {
     expect_gte(min(as.data.table(filter(TPsBTSuspMore, minSimilarity = 0.5))$similarity), 0.5)
     expect_lt(max(as.data.table(filter(TPsBTSuspMore, minSimilarity = 0.5, negate = TRUE))$similarity), 0.5)
     
-    expect_min_gte(as.data.table(filter(TPsAnnFormSusp, minFitFormula = 0.8))$fitFormula, 0.8)
-    expect_max_lt(as.data.table(filter(TPsAnnFormSusp, minFitFormula = 0.8, negate = TRUE))$fitFormula, 0.8)
+    expect_min_gte(as.data.table(filter(TPsAnnFormSusp, minFitFormula = 0.98))$fitFormula, 0.98)
+    expect_max_lt(as.data.table(filter(TPsAnnFormSusp, minFitFormula = 0.98, negate = TRUE))$fitFormula, 0.98)
     expect_min_gte(as.data.table(filter(TPsAnnFormSusp, minTPScore = 1.2))$TPScore, 1.2)
     expect_max_lt(as.data.table(filter(TPsAnnFormSusp, minTPScore = 1.2, negate = TRUE))$TPScore, 1.2)
     expect_max_lte(sapply(products(filter(TPsAnnFormSusp, topMost = 3)), \(x) max(x[, .N, by = "group"][[2]])), 3)
@@ -286,8 +284,8 @@ test_that("basic usage", {
     testMFDB(TPsLibComp)
     testMFDB(TPsBTComp)
 
-    expect_min_gte(as.data.table(filter(TPsAnnCompSusp, minFitFormula = 0.9))$fitFormula, 0.9)
-    expect_max_lt(as.data.table(filter(TPsAnnCompSusp, minFitFormula = 0.9, negate = TRUE))$fitFormula, 0.9)
+    expect_min_gte(as.data.table(filter(TPsAnnCompSusp, minFitFormula = 0.98))$fitFormula, 0.98)
+    expect_max_lt(as.data.table(filter(TPsAnnCompSusp, minFitFormula = 0.98, negate = TRUE))$fitFormula, 0.98)
     expect_min_gte(as.data.table(filter(TPsAnnCompSusp, minFitCompound = 0.8))$fitCompound, 0.8)
     expect_max_lt(as.data.table(filter(TPsAnnCompSusp, minFitCompound = 0.8, negate = TRUE))$fitCompound, 0.8)
     expect_min_gte(as.data.table(filter(TPsAnnCompScrMFCOS, minSimSusp = 0.9))$simSusp, 0.9)
@@ -330,8 +328,8 @@ collapsedTPLen <- function(TPs) sum(sapply(products(TPs), function(x) uniqueN(x$
 test_that("consensus works", {
     expect_length(consensus(TPsLibScr, TPsBTEmpty), collapsedTPLen(TPsLibScr))
     
-    expect_known_value(TPsCons, testFile("TPs-cons"))
-    expect_known_show(TPsCons, testFile("TPs-cons", text = TRUE))
+    expect_known_val(TPsCons, "TPs-cons")
+    expect_known_show(TPsCons, "TPs-cons")
     expect_setequal(names(consensus(TPsLibScr, TPsBTScr)), union(names(TPsLibScr), names(TPsBTScr)))
     expect_lt(length(consensus(TPsLibScr, TPsBTScr, relMinAbundance = 1)), collapsedTPLen(TPsCons))
     expect_length(consensus(TPsLibEmpty, TPsBTEmpty), 0)
@@ -407,19 +405,19 @@ if (doMetFrag)
 }
 
 test_that("TP componentization", {
-    expect_known_value(componTPsNone, testFile("tp-compon-none"))
-    expect_known_value(componTPsLogic, testFile("tp-compon-logic"))
-    expect_known_value(componTPsLib, testFile("tp-compon-lib"))
-    expect_known_value(componTPsLibForm, testFile("tp-compon-lib_form"))
-    expect_known_value(componTPsBT, testFile("tp-compon-bt"))
-    expect_known_value(componTPsAnnForm, testFile("tp-compon-ann_form"))
+    expect_known_val(componTPsNone, "tp-compon-none")
+    expect_known_val(componTPsLogic, "tp-compon-logic")
+    expect_known_val(componTPsLib, "tp-compon-lib")
+    expect_known_val(componTPsLibForm, "tp-compon-lib_form")
+    expect_known_val(componTPsBT, "tp-compon-bt")
+    expect_known_val(componTPsAnnForm, "tp-compon-ann_form")
     
-    expect_known_show(componTPsNone, testFile("tp-compon-none", text = TRUE))
-    expect_known_show(componTPsLogic, testFile("tp-compon-logic", text = TRUE))
-    expect_known_show(componTPsLib, testFile("tp-compon-lib", text = TRUE))
-    expect_known_show(componTPsLibForm, testFile("tp-compon-lib_form", text = TRUE))
-    expect_known_show(componTPsBT, testFile("tp-compon-bt", text = TRUE))
-    expect_known_show(componTPsAnnForm, testFile("tp-compon-ann_form", text = TRUE))
+    expect_known_show(componTPsNone, "tp-compon-none")
+    expect_known_show(componTPsLogic, "tp-compon-logic")
+    expect_known_show(componTPsLib, "tp-compon-lib")
+    expect_known_show(componTPsLibForm, "tp-compon-lib_form")
+    expect_known_show(componTPsBT, "tp-compon-bt")
+    expect_known_show(componTPsAnnForm, "tp-compon-ann_form")
     
     expect_equal(nrow(as.data.table(componTPsNone)), length(groupNames(componTPsNone))^2)
     expect_length(intersect(componentInfo(componTPsNoneTPDiff)$parent_group, groupNames(componTPsNoneTPDiff)), 0)
@@ -444,13 +442,13 @@ test_that("TP componentization", {
     
     skip_if_not(doMetFrag)
     
-    expect_known_value(componTPsAnn, testFile("tp-compon-ann"))
-    expect_known_value(componTPsAnnPL, testFile("tp-compon-ann_pl"))
-    expect_known_value(componTPsAnnComp, testFile("tp-compon-ann_comp"))
-    
-    expect_known_show(componTPsAnn, testFile("tp-compon-ann", text = TRUE))
-    expect_known_show(componTPsAnnPL, testFile("tp-compon-ann_pl", text = TRUE))
-    expect_known_show(componTPsAnnComp, testFile("tp-compon-ann_comp", text = TRUE))
+    expect_known_val(componTPsAnn, "tp-compon-ann")
+    expect_known_val(componTPsAnnPL, "tp-compon-ann_pl")
+    expect_known_val(componTPsAnnComp, "tp-compon-ann_comp")
+
+    expect_known_show(componTPsAnn, "tp-compon-ann")
+    expect_known_show(componTPsAnnPL, "tp-compon-ann_pl")
+    expect_known_show(componTPsAnnComp, "tp-compon-ann_comp")
     
     checkmate::expect_names(names(as.data.table(componTPsAnn)), must.include = c("specSimilarity", "specSimilarityPrec",
                                                                                  "specSimilarityBoth",
@@ -471,8 +469,8 @@ test_that("TP componentization", {
                             must.include = c("fitFormula", "fitCompound", "simSusp", "annSim", "TPScore"))
         
     skip_if_not(doCTS)
-    expect_known_value(componTPsCTS, testFile("tp-compon-cts"))
-    expect_known_show(componTPsCTS, testFile("tp-compon-cts", text = TRUE))
+    expect_known_val(componTPsCTS, "tp-compon-cts")
+    expect_known_show(componTPsCTS, "tp-compon-cts")
 })
 
 getMinCompTblVal <- function(x, field) min(as.data.table(x, candidates = TRUE)[[field]], na.rm = TRUE)

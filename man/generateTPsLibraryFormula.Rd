@@ -16,10 +16,19 @@ generateTPsLibraryFormula(
 )
 }
 \arguments{
-\item{parents}{The parents for which transformation products should be obtained. This should be either a suspect list
-(see \link[=suspect-screening]{suspect screening} for more information) or the resulting output of
-\code{\link{screenSuspects}}. The suspect (hits) are used as parents. If \code{NULL} then TPs for all parents in
-the library are obtained.}
+\item{parents}{The parents for which transformation products should be obtained. This can be \itemize{
+
+  \item a suspect list (see \link[=suspect-screening]{suspect screening} for more information)
+
+  \item the output of \code{\link{screenSuspects}} in which case the suspects hits are used as parents
+
+  
+
+  
+
+  }
+
+  The parents need to have formula information available.}
 
 \item{TPLibrary}{A \code{data.frame}. See the details below.}
 
@@ -76,13 +85,15 @@ Unlike \code{\link{generateTPsLibrary}}, this function defaults the \code{matchP
 
   \item \code{parent_formula} and \code{TP_formula} The formula of the parent/TP structure.
 
-  \item \code{retDir} The retention direction of the TP compared to its parent: \samp{-1} (elutes before), \samp{1}
-  (elutes after) or \samp{0} (elutes similarly or unknown). If not specified then the \code{log P} values below may
-  be used to calculate retention time directions. (\strong{optional})
+  \item \code{retDir} The expected \link[=retDir]{retention order direction}. (\strong{optional})
 
+  For \code{generateTPsLibrary}: If not specified or \code{forceCalcRetDir=TRUE} from
+  \code{\link[=getDefTPStructParams]{TPStructParams}}, then the \code{log P} values below may be used to calculate
+  retention order directions.
+  
   \item \code{parent_LogP} and \code{TP_LogP} The \code{log P} values for the parent/TP. (\strong{optional})
 
-  \item \code{LogPDiff} The difference between parent and TP \code{Log P} values. Ignored if \emph{both}
+  \item \code{logPDiff} The difference between parent and TP \code{Log P} values. Ignored if \emph{both}
   \code{parent_LogP} and \code{TP_LogP} are specified. (\strong{optional})
 
   }
@@ -93,7 +104,7 @@ Unlike \code{\link{generateTPsLibrary}}, this function defaults the \code{matchP
 
 \section{Validating and calculating chemical properties}{
  Chemical properties such as \acronym{SMILES},
-  \acronym{InChIKey} and formula in the parent suspect list are automatically validated and calculated if missing/invalid.
+  \acronym{InChIKey} and formulae in the parent suspect list are automatically validated and calculated if missing/invalid.
 
   The internal validation/calculation process performs the following steps: \itemize{
 

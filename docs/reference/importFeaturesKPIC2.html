@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.0</span>
       </span>
     </div>
 
@@ -95,20 +95,21 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">importFeaturesKPIC2</span><span class="op">(</span><span class="va">picsList</span>, <span class="va">analysisInfo</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">importFeaturesKPIC2</span><span class="op">(</span><span class="va">input</span>, <span class="va">analysisInfo</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
 
 
-<dl><dt id="arg-picslist">picsList<a class="anchor" aria-label="anchor" href="#arg-picslist"></a></dt>
+<dl><dt id="arg-input">input<a class="anchor" aria-label="anchor" href="#arg-input"></a></dt>
 <dd><p>A <code>list</code> with a <code>pics</code> objects obtained with <code><a href="https://rdrr.io/pkg/KPIC/man/getPIC.html" class="external-link">getPIC</a></code> or
 <code><a href="https://rdrr.io/pkg/KPIC/man/getPIC.kmeans.html" class="external-link">getPIC.kmeans</a></code> for each analysis.</p></dd>
 
 
 <dt id="arg-analysisinfo">analysisInfo<a class="anchor" aria-label="anchor" href="#arg-analysisinfo"></a></dt>
-<dd><p>A <code>data.frame</code> with <a href="analysis-information.html">Analysis information</a>.</p></dd>
+<dd><p>A <code>data.frame</code> (or <code>data.table</code>) with <a href="analysis-information.html">Analysis
+information</a>.</p></dd>
 
 </dl></div>
     <div id="value">

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.0</span>
       </span>
     </div>
 
@@ -144,10 +144,12 @@
 <span>  analysis <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">MSPeakLists</span>,</span>
 <span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  normalized <span class="op">=</span> <span class="st">"multiple"</span>,</span>
 <span>  specSimParams <span class="op">=</span> <span class="fu"><a href="specSimParams.html">getDefSpecSimParams</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  mincex <span class="op">=</span> <span class="fl">0.9</span>,</span>
 <span>  xlim <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  showLegend <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -165,6 +167,8 @@
 <span><span class="fu"><a href="generics.html">consensus</a></span><span class="op">(</span></span>
 <span>  <span class="va">obj</span>,</span>
 <span>  <span class="va">...</span>,</span>
+<span>  <span class="va">MSPeakLists</span>,</span>
+<span>  specSimParams <span class="op">=</span> <span class="fu"><a href="specSimParams.html">getDefSpecSimParams</a></span><span class="op">(</span>removePrecursor <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
 <span>  absMinAbundance <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  relMinAbundance <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  uniqueFrom <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -193,10 +197,12 @@
 <span>  analysis <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">MSPeakLists</span>,</span>
 <span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  normalized <span class="op">=</span> <span class="st">"multiple"</span>,</span>
 <span>  specSimParams <span class="op">=</span> <span class="fu"><a href="specSimParams.html">getDefSpecSimParams</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  mincex <span class="op">=</span> <span class="fl">0.9</span>,</span>
 <span>  xlim <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  showLegend <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  perSet <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  mirror <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -209,6 +215,8 @@
 <span><span class="fu"><a href="generics.html">consensus</a></span><span class="op">(</span></span>
 <span>  <span class="va">obj</span>,</span>
 <span>  <span class="va">...</span>,</span>
+<span>  <span class="va">MSPeakLists</span>,</span>
+<span>  specSimParams <span class="op">=</span> <span class="fu"><a href="specSimParams.html">getDefSpecSimParams</a></span><span class="op">(</span>removePrecursor <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
 <span>  absMinAbundance <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  relMinAbundance <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  uniqueFrom <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -303,18 +311,18 @@ compare.</p></dd>
 
 
 <dt id="arg-groupname">groupName<a class="anchor" aria-label="anchor" href="#arg-groupname"></a></dt>
-<dd><p>The name of the feature group (or feature groups when comparing spectra) to which the candidate
-belongs.</p></dd>
+<dd><p>The name of the feature group for which a plot should be made. To compare spectra, two group names
+can be specified.</p></dd>
 
 
 <dt id="arg-analysis">analysis<a class="anchor" aria-label="anchor" href="#arg-analysis"></a></dt>
-<dd><p>A <code>character</code> specifying the analysis (or analyses when comparing spectra) for which the
-annotated spectrum should be plotted. If <code>NULL</code> then annotation results for the complete feature group will be
-plotted.</p></dd>
+<dd><p>The name of the analysis for which a plot should be made. If
+<code>NULL</code> then data from the feature group averaged peak list is used. When comparing spectra, either
+<code>NULL</code> or the analyses for both spectra should be specified.</p></dd>
 
 
 <dt id="arg-mspeaklists">MSPeakLists<a class="anchor" aria-label="anchor" href="#arg-mspeaklists"></a></dt>
-<dd><p>The <code><a href="MSPeakLists-class.html">MSPeakLists</a></code> object that was used to generate the candidate</p></dd>
+<dd><p>The <code><a href="MSPeakLists-class.html">MSPeakLists</a></code> object with relevant spectral data.</p></dd>
 
 
 <dt id="arg-onlyannotated">onlyAnnotated<a class="anchor" aria-label="anchor" href="#arg-onlyannotated"></a></dt>
@@ -323,7 +331,12 @@ not be annotated.</p></dd>
 
 
 <dt id="arg-title">title<a class="anchor" aria-label="anchor" href="#arg-title"></a></dt>
-<dd><p>The title of the plot. Set to <code>NULL</code> for an automatically generated title.</p></dd>
+<dd><p>The title of the plot. If <code>NULL</code> a title will be automatically made.</p></dd>
+
+
+<dt id="arg-normalized">normalized<a class="anchor" aria-label="anchor" href="#arg-normalized"></a></dt>
+<dd><p>Controls intensity normalization. Should be <code>FALSE</code> (don't normalize), <code>TRUE</code> (normalize)
+or <code>"multiple"</code> (only normalizes if multiple spectra are plotted).</p></dd>
 
 
 <dt id="arg-specsimparams">specSimParams<a class="anchor" aria-label="anchor" href="#arg-specsimparams"></a></dt>
@@ -332,13 +345,17 @@ See the <a href="specSimParams.html">spectral similarity parameters</a> document
 
 
 <dt id="arg-mincex">mincex<a class="anchor" aria-label="anchor" href="#arg-mincex"></a></dt>
-<dd><p>The formula annotation labels are automatically scaled. The <code>mincex</code> argument forces a minimum
-<code>cex</code> value for readability.</p></dd>
+<dd><p>The formula annotation labels are automatically scaled. The
+<code>mincex</code> argument forces a minimum <code>cex</code> value for readability.</p></dd>
 
 
 <dt id="arg-xlim-ylim">xlim, ylim<a class="anchor" aria-label="anchor" href="#arg-xlim-ylim"></a></dt>
 <dd><p>Sets the plot size limits used by
 <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></code>. Set to <code>NULL</code> for automatic plot sizing.</p></dd>
+
+
+<dt id="arg-showlegend">showLegend<a class="anchor" aria-label="anchor" href="#arg-showlegend"></a></dt>
+<dd><p>Set to <code>TRUE</code> to show a legend.</p></dd>
 
 
 <dt id="arg-absminabundance-relminabundance">absMinAbundance, relMinAbundance<a class="anchor" aria-label="anchor" href="#arg-absminabundance-relminabundance"></a></dt>
@@ -476,6 +493,11 @@ passed when this object was created by <code><a href="generateFormulas.html">gen
 <dt><code>origFGNames</code></dt>
 <dd><p>(<strong>sets workflow</strong>) The original (order of) names of the <code><a href="featureGroups-class.html">featureGroups</a></code> object that was used to
 create this object.</p></dd>
+
+
+<dt><code>MS2QuantMeta</code></dt>
+<dd><p>(<strong>sets workflow</strong>) A named <code>list</code> with for each set the metadata from <span class="pkg">MS2Quant</span> filled in by
+<code>predictRespFactors</code>.</p></dd>
 
 
 </dl></div>

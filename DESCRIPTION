@@ -142,20 +142,14 @@ Suggests:
     MS2Tox,
     ChemmineR,
     fmcsR,
-    reticulate
+    reticulate,
+    Rmstoolkitlib
 LinkingTo:
     Rcpp,
     rapidjsonr
-Config/Needs/pdeps:
-    RDCOMClient,
-    enviPick,
-    nontarget,
-    InterpretMSSpectrum,
-    RAMClustR,
-    KPIC,
-    cliqueMS,
-    MetaClean,
-    splashR
+Config/testthat/edition: 3
+Config/testthat/parallel: true
+Config/testthat/start-first: feature*, screening, compounds, components, tp, formulas, pred, mspeaklists, project-tool, report
 RdMacros:
     Rdpack
 Collate: 
@@ -219,6 +213,7 @@ Collate:
     'convert.R'
     'defunct.R'
     'utils-bruker.R'
+    'deprecated-formulas-bruker.R'
     'deprecated-mspeaklists-bruker.R'
     'deprecated-mspeaklists-mzr.R'
     'deprecated.R'
@@ -262,7 +257,6 @@ Collate:
     'features-tasq.R'
     'features-xcms.R'
     'features-xcms3.R'
-    'formulas-bruker.R'
     'formulas-genform.R'
     'formulas-set.R'
     'formulas-sirius.R'

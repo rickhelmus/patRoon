@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.0</span>
       </span>
     </div>
 
@@ -105,7 +105,8 @@
 <span>  specSimParams <span class="op">=</span> <span class="fu"><a href="specSimParams.html">getDefSpecSimParams</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  maxTreeHeight <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  deepSplit <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  minModuleSize <span class="op">=</span> <span class="fl">1</span></span>
+<span>  minModuleSize <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  IMS <span class="op">=</span> <span class="st">"maybe"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -140,6 +141,15 @@ See the <a href="specSimParams.html">spectral similarity parameters</a> document
 <dd><p>Arguments used by
 <code>cutreeDynamicTree</code>.</p></dd>
 
+
+<dt id="arg-ims">IMS<a class="anchor" aria-label="anchor" href="#arg-ims"></a></dt>
+<dd><p>(<strong>IMS workflow</strong>) Specifies which feature groups are considered for componentization in IMS workflows. The following options
+  are valid:</p><ul><li><p><code>"both"</code>: Selects IMS and non-IMS features.</p></li>
+<li><p><code>"maybe"</code>: Selects non-IMS features and IMS features without assigned IMS parent.</p></li>
+<li><p><code>FALSE</code>: Selects only non-IMS features.</p></li>
+<li><p><code>TRUE</code>: Selects only IMS features.</p></li>
+</ul></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
@@ -152,6 +162,16 @@ See the <a href="specSimParams.html">spectral similarity parameters</a> document
 <p>The similarities are converted to a distance matrix and used as input for hierarchical clustering, and the
   resulting dendrogram is automatically cut with <code>cutreeDynamicTree</code>. The clustering is performed with
   <code><a href="https://rdrr.io/pkg/fastcluster/man/hclust.html" class="external-link">fastcluster::hclust</a></code>.</p>
+    </div>
+    <div id="ims-workflows">
+    <h2>IMS workflows</h2>
+    <p>In IMS workflows with post mobility assignment (see
+  <code><a href="assignMobilities_feat.html">assignMobilities</a></code>) it may be necessary to call <code><a href="components-class.html">expandForIMS</a></code> when
+  componentization was performed <em>prior</em> to mobility assignments, see its documentation for more details.</p>
+<p>If mobilities were already assigned prior to componentization, then the <code>IMS</code> argument selects which feature
+  groups are subjected to componentization. Data for mobility feature groups that were not considered (<em>i.e.</em>
+  when <code>IMS</code> is <code>FALSE</code> or <code>"maybe"</code>), will be expanded similarly as is done by
+  <code><a href="components-class.html">expandForIMS</a></code>.</p>
     </div>
     <div id="sets-workflows">
     <h2>Sets workflows</h2>

@@ -2,8 +2,6 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-context("multiproc")
-
 # handy tool from processx
 px <- paste0(
     system.file(package = "processx", "bin", "px"),

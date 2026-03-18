@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.0</span>
       </span>
     </div>
 
@@ -131,7 +131,7 @@
 <span>  <span class="va">...</span>,</span>
 <span>  commonParents <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  labels <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  nsets <span class="op">=</span> <span class="fu"><a href="generics.html">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1</span>,</span>
+<span>  nsets <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  nintersects <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  upsetArgs <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
@@ -248,7 +248,8 @@ done to avoid long times needed to construct the graph.</p></dd>
 
 
 <dt id="arg-nsets-nintersects">nsets, nintersects<a class="anchor" aria-label="anchor" href="#arg-nsets-nintersects"></a></dt>
-<dd><p>See <code><a href="https://rdrr.io/pkg/UpSetR/man/upset.html" class="external-link">upset</a></code>.</p></dd>
+<dd><p>See <code><a href="https://rdrr.io/pkg/UpSetR/man/upset.html" class="external-link">upset</a></code>. If <code>nsets == NULL</code> then it will be set to the number
+of compared items.</p></dd>
 
 
 <dt id="arg-upsetargs">upsetArgs<a class="anchor" aria-label="anchor" href="#arg-upsetargs"></a></dt>
@@ -286,7 +287,7 @@ objects specified in <code>uniqueFrom</code>.</p></dd>
     <p><code>filter</code> returns a filtered <code>transformationProductsStructure</code> object.</p>
 <p><code>plotGraph</code> returns the result of <code>visNetwork</code>.</p>
 <p><code>plotVenn</code> (invisibly) returns a list with the following fields:</p><ul><li><p><code>gList</code> the <code>gList</code> object that was returned by
-  the utilized <span class="pkg">VennDiagram</span> plotting function.</p></li>
+  the utilized <a href="https://CRAN.R-project.org/package=VennDiagram" class="external-link"><span class="pkg">VennDiagram</span></a> plotting function.</p></li>
 <li><p><code>areas</code> The total area for each plotted group.</p></li>
 <li><p><code>intersectionCounts</code> The number of intersections between groups.</p></li>
 </ul><p>The order for the <code>areas</code> and <code>intersectionCounts</code> fields is the same as the parameter order
@@ -314,8 +315,8 @@ database. Any duplicate TPs (formed by different pathways or parents) will be me
 resulting graph can be browsed interactively and allows exploration of the different TP formation pathways.
 Furthermore, results from <a href="generateComponentsTPs.html">TP componentization</a> can be used to match the hierarchy
 with screening results. The graph is rendered with <span class="pkg">visNetwork</span>.</p></li>
-<li><p><code>plotVenn(transformationProductsStructure)</code>: plots a Venn diagram (using <span class="pkg">VennDiagram</span>) outlining unique and shared
-candidates of up to five different <code>featureAnnotations</code> objects.</p></li>
+<li><p><code>plotVenn(transformationProductsStructure)</code>: plots a Venn diagram (using <a href="https://CRAN.R-project.org/package=VennDiagram" class="external-link"><span class="pkg">VennDiagram</span></a>) outlining unique and
+shared candidates of up to five different <code>featureAnnotations</code> objects.</p></li>
 <li><p><code>plotUpSet(transformationProductsStructure)</code>: Plots an UpSet diagram (using the <code><a href="https://rdrr.io/pkg/UpSetR/man/upset.html" class="external-link">upset</a></code> function)
 outlining unique and shared TPs between different <code>transformationProductsStructure</code> objects.</p></li>
 <li><p><code>consensus(transformationProductsStructure)</code>: Generates a consensus from different
@@ -339,6 +340,7 @@ considered to originate from the same (original) parent.</p></li>
     <h2>S4 class hierarchy</h2>
     <p></p><ul><li><p><code><a href="transformationProducts-class.html">transformationProducts</a></code></p><ul><li><p><strong><code>transformationProductsStructure</code></strong></p><ul><li><p><code>transformationProductsStructureConsensus</code></p></li>
 <li><p><code>transformationProductsCTS</code></p></li>
+<li><p><code><a href="transformationProductsAnnComp-class.html">transformationProductsAnnComp</a></code></p></li>
 <li><p><code>transformationProductsBT</code></p></li>
 <li><p><code>transformationProductsLibrary</code></p></li>
 </ul></li>

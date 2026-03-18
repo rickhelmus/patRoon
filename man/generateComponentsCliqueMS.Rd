@@ -15,7 +15,7 @@ generateComponentsCliqueMS(fGroups, ...)
   maxGrade = 2,
   ppm = 10,
   adductInfo = NULL,
-  absMzDev = 0.005,
+  absMzDev = defaultLim("mz", "medium"),
   minSize = 2,
   relMinAdductAbundance = 0.75,
   adductConflictsUsePref = TRUE,
@@ -72,7 +72,7 @@ components} section for more details.}
 \code{\link[cliqueMS:getCliques]{cliqueMS::getCliques}}, \code{\link[cliqueMS:getIsotopes]{cliqueMS::getIsotopes}}
 and \code{\link[cliqueMS:getAnnotation]{cliqueMS::getAnnotation}}, respectively. Set to \code{NULL} to ignore.}
 
-\item{parallel}{If set to \code{TRUE} then code is executed in parallel through the \CRANpkg{futures} package. Please
+\item{parallel}{If set to \code{TRUE} then code is executed in parallel through the \CRANpkg{future} package. Please
 see the parallelization section in the handbook for more details.}
 }
 \value{
@@ -122,6 +122,12 @@ The grouping of features in each component ('clique') is based on high similarit
   \item the \code{minSize} filter is applied.
 
   }
+}
+
+\section{IMS workflows}{
+ The componentization algorithm is not aware of the IMS dimension. For this reason, no
+  mobility feature groups will be considered for componentization, and direct IMS workflows (see
+  \code{\link[=assignMobilities_feat]{assignMobilitities}}) are currently not supported.
 }
 
 \section{Sets workflows}{

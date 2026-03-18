@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>4.3 Features | patRoon handbook</title>
-  <meta name="description" content="4.3 Features | patRoon handbook" />
+  <title>4.5 Features | patRoon handbook</title>
+  <meta name="description" content="4.5 Features | patRoon handbook" />
   <meta name="generator" content="bookdown 0.46 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="4.3 Features | patRoon handbook" />
+  <meta property="og:title" content="4.5 Features | patRoon handbook" />
   <meta property="og:type" content="book" />
   
   
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="4.3 Features | patRoon handbook" />
+  <meta name="twitter:title" content="4.5 Features | patRoon handbook" />
   
   
   
@@ -23,14 +23,14 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2025-12-10" />
+<meta name="date" content="2026-03-17" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="preparations.html"/>
+<link rel="prev" href="example-data.html"/>
 <link rel="next" href="componentization.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
@@ -58,16 +58,16 @@
 <script src="libs/viz-1.8.2/viz.js"></script>
 <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
 <script src="libs/grViz-binding-1.0.11/grViz.js"></script>
-<link href="libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet" />
+<link href="libs/htmltools-fill-0.5.9/fill.css" rel="stylesheet" />
 <link href="libs/vis-9.1.0/vis-network.min.css" rel="stylesheet" />
 <script src="libs/vis-9.1.0/vis-network.min.js"></script>
 <script src="libs/visNetwork-binding-2.1.4/visNetwork.js"></script>
-<script src="libs/plotly-binding-4.11.0/plotly.js"></script>
+<script src="libs/plotly-binding-4.12.0/plotly.js"></script>
 <script src="libs/typedarray-0.1/typedarray.min.js"></script>
 <link href="libs/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet" />
 <script src="libs/crosstalk-1.2.2/js/crosstalk.min.js"></script>
-<link href="libs/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css" rel="stylesheet" />
-<script src="libs/plotly-main-2.11.1/plotly-latest.min.js"></script>
+<link href="libs/plotly-htmlwidgets-css-2.25.2/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="libs/plotly-main-2.25.2/plotly-latest.min.js"></script>
 
 
 <style type="text/css">
@@ -200,43 +200,47 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="4.1.1" data-path="introduction-1.html"><a href="introduction-1.html#workflow-functions"><i class="fa fa-check"></i><b>4.1.1</b> Workflow functions</a></li>
 <li class="chapter" data-level="4.1.2" data-path="introduction-1.html"><a href="introduction-1.html#workflow-output"><i class="fa fa-check"></i><b>4.1.2</b> Workflow output</a></li>
-<li class="chapter" data-level="4.1.3" data-path="introduction-1.html"><a href="introduction-1.html#overview-of-all-functions-and-their-output"><i class="fa fa-check"></i><b>4.1.3</b> Overview of all functions and their output</a></li>
+<li class="chapter" data-level="4.1.3" data-path="introduction-1.html"><a href="introduction-1.html#overview-of-workflow-functions-and-their-output"><i class="fa fa-check"></i><b>4.1.3</b> Overview of workflow functions and their output</a></li>
 </ul></li>
-<li class="chapter" data-level="4.2" data-path="preparations.html"><a href="preparations.html"><i class="fa fa-check"></i><b>4.2</b> Preparations</a>
+<li class="chapter" data-level="4.2" data-path="newProject.html"><a href="newProject.html"><i class="fa fa-check"></i><b>4.2</b> Data processing projects</a></li>
+<li class="chapter" data-level="4.3" data-path="sample-analyses.html"><a href="sample-analyses.html"><i class="fa fa-check"></i><b>4.3</b> Sample analyses</a>
 <ul>
-<li class="chapter" data-level="4.2.1" data-path="preparations.html"><a href="preparations.html#data-pre-treatment"><i class="fa fa-check"></i><b>4.2.1</b> Data pre-treatment</a></li>
-<li class="chapter" data-level="4.2.2" data-path="preparations.html"><a href="preparations.html#anaInfo"><i class="fa fa-check"></i><b>4.2.2</b> Analysis information</a></li>
-<li class="chapter" data-level="4.2.3" data-path="preparations.html"><a href="preparations.html#newProject"><i class="fa fa-check"></i><b>4.2.3</b> Automatic project generation with newProject()</a></li>
+<li class="chapter" data-level="4.3.1" data-path="sample-analyses.html"><a href="sample-analyses.html#fileTypes"><i class="fa fa-check"></i><b>4.3.1</b> Analysis file types and formats and the <code>msdata</code> interface</a></li>
+<li class="chapter" data-level="4.3.2" data-path="sample-analyses.html"><a href="sample-analyses.html#anaInfo"><i class="fa fa-check"></i><b>4.3.2</b> Analysis information</a></li>
+<li class="chapter" data-level="4.3.3" data-path="sample-analyses.html"><a href="sample-analyses.html#pre-treat"><i class="fa fa-check"></i><b>4.3.3</b> Data conversion and pre-treatment</a></li>
 </ul></li>
-<li class="chapter" data-level="4.3" data-path="features.html"><a href="features.html"><i class="fa fa-check"></i><b>4.3</b> Features</a>
+<li class="chapter" data-level="4.4" data-path="example-data.html"><a href="example-data.html"><i class="fa fa-check"></i><b>4.4</b> Example data</a></li>
+<li class="chapter" data-level="4.5" data-path="features.html"><a href="features.html"><i class="fa fa-check"></i><b>4.5</b> Features</a>
 <ul>
-<li class="chapter" data-level="4.3.1" data-path="features.html"><a href="features.html#finding-and-grouping-features"><i class="fa fa-check"></i><b>4.3.1</b> Finding and grouping features</a></li>
-<li class="chapter" data-level="4.3.2" data-path="features.html"><a href="features.html#suspscr"><i class="fa fa-check"></i><b>4.3.2</b> Suspect screening</a></li>
+<li class="chapter" data-level="4.5.1" data-path="features.html"><a href="features.html#findFeat"><i class="fa fa-check"></i><b>4.5.1</b> Finding features</a></li>
+<li class="chapter" data-level="4.5.2" data-path="features.html"><a href="features.html#groupFeatures"><i class="fa fa-check"></i><b>4.5.2</b> Feature grouping</a></li>
+<li class="chapter" data-level="4.5.3" data-path="features.html"><a href="features.html#suspscr"><i class="fa fa-check"></i><b>4.5.3</b> Suspect screening</a></li>
+<li class="chapter" data-level="4.5.4" data-path="features.html"><a href="features.html#importFeat"><i class="fa fa-check"></i><b>4.5.4</b> Importing feature data</a></li>
 </ul></li>
-<li class="chapter" data-level="4.4" data-path="componentization.html"><a href="componentization.html"><i class="fa fa-check"></i><b>4.4</b> Componentization</a>
+<li class="chapter" data-level="4.6" data-path="componentization.html"><a href="componentization.html"><i class="fa fa-check"></i><b>4.6</b> Componentization</a>
 <ul>
-<li class="chapter" data-level="4.4.1" data-path="componentization.html"><a href="componentization.html#componentsChrom"><i class="fa fa-check"></i><b>4.4.1</b> Features with similar chromatographic behaviour</a></li>
-<li class="chapter" data-level="4.4.2" data-path="componentization.html"><a href="componentization.html#homologues-series"><i class="fa fa-check"></i><b>4.4.2</b> Homologues series</a></li>
-<li class="chapter" data-level="4.4.3" data-path="componentization.html"><a href="componentization.html#compClust"><i class="fa fa-check"></i><b>4.4.3</b> Intensity and MS/MS similarity</a></li>
+<li class="chapter" data-level="4.6.1" data-path="componentization.html"><a href="componentization.html#componentsChrom"><i class="fa fa-check"></i><b>4.6.1</b> Features with similar chromatographic behaviour</a></li>
+<li class="chapter" data-level="4.6.2" data-path="componentization.html"><a href="componentization.html#homologues-series"><i class="fa fa-check"></i><b>4.6.2</b> Homologues series</a></li>
+<li class="chapter" data-level="4.6.3" data-path="componentization.html"><a href="componentization.html#compClust"><i class="fa fa-check"></i><b>4.6.3</b> Intensity and MS/MS similarity</a></li>
 </ul></li>
-<li class="chapter" data-level="4.5" data-path="incorpAdductIso.html"><a href="incorpAdductIso.html"><i class="fa fa-check"></i><b>4.5</b> Incorporating adduct and isotopic data</a>
+<li class="chapter" data-level="4.7" data-path="incorpAdductIso.html"><a href="incorpAdductIso.html"><i class="fa fa-check"></i><b>4.7</b> Incorporating adduct and isotopic data</a>
 <ul>
-<li class="chapter" data-level="4.5.1" data-path="incorpAdductIso.html"><a href="incorpAdductIso.html#selecting-features-with-preferential-adductsisotopes"><i class="fa fa-check"></i><b>4.5.1</b> Selecting features with preferential adducts/isotopes</a></li>
-<li class="chapter" data-level="4.5.2" data-path="incorpAdductIso.html"><a href="incorpAdductIso.html#setting-adduct-annotations-for-feature-groups"><i class="fa fa-check"></i><b>4.5.2</b> Setting adduct annotations for feature groups</a></li>
-<li class="chapter" data-level="4.5.3" data-path="incorpAdductIso.html"><a href="incorpAdductIso.html#useAdductAnn"><i class="fa fa-check"></i><b>4.5.3</b> Using adduct annotations in the workflow</a></li>
+<li class="chapter" data-level="4.7.1" data-path="incorpAdductIso.html"><a href="incorpAdductIso.html#selecting-features-with-preferential-adductsisotopes"><i class="fa fa-check"></i><b>4.7.1</b> Selecting features with preferential adducts/isotopes</a></li>
+<li class="chapter" data-level="4.7.2" data-path="incorpAdductIso.html"><a href="incorpAdductIso.html#setting-adduct-annotations-for-feature-groups"><i class="fa fa-check"></i><b>4.7.2</b> Setting adduct annotations for feature groups</a></li>
+<li class="chapter" data-level="4.7.3" data-path="incorpAdductIso.html"><a href="incorpAdductIso.html#useAdductAnn"><i class="fa fa-check"></i><b>4.7.3</b> Using adduct annotations in the workflow</a></li>
 </ul></li>
-<li class="chapter" data-level="4.6" data-path="annotation.html"><a href="annotation.html"><i class="fa fa-check"></i><b>4.6</b> Annotation</a>
+<li class="chapter" data-level="4.8" data-path="annotation.html"><a href="annotation.html"><i class="fa fa-check"></i><b>4.8</b> Annotation</a>
 <ul>
-<li class="chapter" data-level="4.6.1" data-path="annotation.html"><a href="annotation.html#ms-peak-lists"><i class="fa fa-check"></i><b>4.6.1</b> MS peak lists</a></li>
-<li class="chapter" data-level="4.6.2" data-path="annotation.html"><a href="annotation.html#formulae"><i class="fa fa-check"></i><b>4.6.2</b> Formulae</a></li>
-<li class="chapter" data-level="4.6.3" data-path="annotation.html"><a href="annotation.html#compounds"><i class="fa fa-check"></i><b>4.6.3</b> Compounds</a></li>
-<li class="chapter" data-level="4.6.4" data-path="annotation.html"><a href="annotation.html#suspAnn"><i class="fa fa-check"></i><b>4.6.4</b> Suspect annotation</a></li>
-<li class="chapter" data-level="4.6.5" data-path="annotation.html"><a href="annotation.html#SIRLogin"><i class="fa fa-check"></i><b>4.6.5</b> Account login for SIRIUS</a></li>
+<li class="chapter" data-level="4.8.1" data-path="annotation.html"><a href="annotation.html#MSPL"><i class="fa fa-check"></i><b>4.8.1</b> MS peak lists</a></li>
+<li class="chapter" data-level="4.8.2" data-path="annotation.html"><a href="annotation.html#formulae"><i class="fa fa-check"></i><b>4.8.2</b> Formulae</a></li>
+<li class="chapter" data-level="4.8.3" data-path="annotation.html"><a href="annotation.html#compounds"><i class="fa fa-check"></i><b>4.8.3</b> Compounds</a></li>
+<li class="chapter" data-level="4.8.4" data-path="annotation.html"><a href="annotation.html#estIDConf"><i class="fa fa-check"></i><b>4.8.4</b> Estimation of identification confidence</a></li>
+<li class="chapter" data-level="4.8.5" data-path="annotation.html"><a href="annotation.html#SIRLogin"><i class="fa fa-check"></i><b>4.8.5</b> Account login for SIRIUS</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="processing.html"><a href="processing.html"><i class="fa fa-check"></i><b>5</b> Processing workflow data</a>
 <ul>
-<li class="chapter" data-level="5.1" data-path="inspecting-results.html"><a href="inspecting-results.html"><i class="fa fa-check"></i><b>5.1</b> Inspecting results</a></li>
+<li class="chapter" data-level="5.1" data-path="procInspect.html"><a href="procInspect.html"><i class="fa fa-check"></i><b>5.1</b> Inspecting results</a></li>
 <li class="chapter" data-level="5.2" data-path="filtering.html"><a href="filtering.html"><i class="fa fa-check"></i><b>5.2</b> Filtering</a>
 <ul>
 <li class="chapter" data-level="5.2.1" data-path="filtering.html"><a href="filtering.html#features-1"><i class="fa fa-check"></i><b>5.2.1</b> Features</a></li>
@@ -250,20 +254,26 @@ div.csl-indent {
 <li class="chapter" data-level="5.3.1" data-path="subset.html"><a href="subset.html#prioritization-workflow"><i class="fa fa-check"></i><b>5.3.1</b> Prioritization workflow</a></li>
 </ul></li>
 <li class="chapter" data-level="5.4" data-path="deleting-data.html"><a href="deleting-data.html"><i class="fa fa-check"></i><b>5.4</b> Deleting data</a></li>
-<li class="chapter" data-level="5.5" data-path="unOv.html"><a href="unOv.html"><i class="fa fa-check"></i><b>5.5</b> Unique and overlapping features</a></li>
-<li class="chapter" data-level="5.6" data-path="specSim.html"><a href="specSim.html"><i class="fa fa-check"></i><b>5.6</b> MS similarity</a></li>
-<li class="chapter" data-level="5.7" data-path="visualization.html"><a href="visualization.html"><i class="fa fa-check"></i><b>5.7</b> Visualization</a>
+<li class="chapter" data-level="5.5" data-path="intReview.html"><a href="intReview.html"><i class="fa fa-check"></i><b>5.5</b> Interactively explore and review data</a></li>
+<li class="chapter" data-level="5.6" data-path="updFG.html"><a href="updFG.html"><i class="fa fa-check"></i><b>5.6</b> Updating feature group data</a></li>
+<li class="chapter" data-level="5.7" data-path="unOv.html"><a href="unOv.html"><i class="fa fa-check"></i><b>5.7</b> Unique and overlapping features</a></li>
+<li class="chapter" data-level="5.8" data-path="specSim.html"><a href="specSim.html"><i class="fa fa-check"></i><b>5.8</b> MS similarity</a></li>
+<li class="chapter" data-level="5.9" data-path="visualization.html"><a href="visualization.html"><i class="fa fa-check"></i><b>5.9</b> Visualization</a>
 <ul>
-<li class="chapter" data-level="5.7.1" data-path="visualization.html"><a href="visualization.html#vis_feat_ann"><i class="fa fa-check"></i><b>5.7.1</b> Features and annatation data</a></li>
-<li class="chapter" data-level="5.7.2" data-path="visualization.html"><a href="visualization.html#visComp"><i class="fa fa-check"></i><b>5.7.2</b> Overlapping and unique data</a></li>
-<li class="chapter" data-level="5.7.3" data-path="visualization.html"><a href="visualization.html#ms-similarity"><i class="fa fa-check"></i><b>5.7.3</b> MS similarity</a></li>
-<li class="chapter" data-level="5.7.4" data-path="visualization.html"><a href="visualization.html#plotClust"><i class="fa fa-check"></i><b>5.7.4</b> Hierarchical clustering results</a></li>
-<li class="chapter" data-level="5.7.5" data-path="visualization.html"><a href="visualization.html#generating-eics-in-dataanalysis"><i class="fa fa-check"></i><b>5.7.5</b> Generating EICs in DataAnalysis</a></li>
+<li class="chapter" data-level="5.9.1" data-path="visualization.html"><a href="visualization.html#vis_feat_ann"><i class="fa fa-check"></i><b>5.9.1</b> Features and annatation data</a></li>
+<li class="chapter" data-level="5.9.2" data-path="visualization.html"><a href="visualization.html#visComp"><i class="fa fa-check"></i><b>5.9.2</b> Overlapping and unique data</a></li>
+<li class="chapter" data-level="5.9.3" data-path="visualization.html"><a href="visualization.html#ms-similarity"><i class="fa fa-check"></i><b>5.9.3</b> MS similarity</a></li>
+<li class="chapter" data-level="5.9.4" data-path="visualization.html"><a href="visualization.html#plotClust"><i class="fa fa-check"></i><b>5.9.4</b> Hierarchical clustering results</a></li>
+<li class="chapter" data-level="5.9.5" data-path="visualization.html"><a href="visualization.html#generating-eics-in-dataanalysis"><i class="fa fa-check"></i><b>5.9.5</b> Generating EICs in DataAnalysis</a></li>
 </ul></li>
-<li class="chapter" data-level="5.8" data-path="intReview.html"><a href="intReview.html"><i class="fa fa-check"></i><b>5.8</b> Interactively explore and review data</a></li>
-<li class="chapter" data-level="5.9" data-path="report.html"><a href="report.html"><i class="fa fa-check"></i><b>5.9</b> Reporting</a>
+<li class="chapter" data-level="5.10" data-path="useMeta.html"><a href="useMeta.html"><i class="fa fa-check"></i><b>5.10</b> Use and modify sample analysis metadata</a>
 <ul>
-<li class="chapter" data-level="5.9.1" data-path="report.html"><a href="report.html#legacy-interface"><i class="fa fa-check"></i><b>5.9.1</b> Legacy interface</a></li>
+<li class="chapter" data-level="5.10.1" data-path="useMeta.html"><a href="useMeta.html#grouping-and-aggregating-data"><i class="fa fa-check"></i><b>5.10.1</b> Grouping and aggregating data</a></li>
+<li class="chapter" data-level="5.10.2" data-path="useMeta.html"><a href="useMeta.html#modifying-analysis-information"><i class="fa fa-check"></i><b>5.10.2</b> Modifying analysis information</a></li>
+</ul></li>
+<li class="chapter" data-level="5.11" data-path="report.html"><a href="report.html"><i class="fa fa-check"></i><b>5.11</b> Reporting</a>
+<ul>
+<li class="chapter" data-level="5.11.1" data-path="report.html"><a href="report.html#legacy-interface"><i class="fa fa-check"></i><b>5.11.1</b> Legacy interface</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="6" data-path="setsWorkflow.html"><a href="setsWorkflow.html"><i class="fa fa-check"></i><b>6</b> Sets workflows</a>
@@ -278,7 +288,7 @@ div.csl-indent {
 <li class="chapter" data-level="6.4" data-path="processing-data.html"><a href="processing-data.html"><i class="fa fa-check"></i><b>6.4</b> Processing data</a></li>
 <li class="chapter" data-level="6.5" data-path="advanced.html"><a href="advanced.html"><i class="fa fa-check"></i><b>6.5</b> Advanced</a>
 <ul>
-<li class="chapter" data-level="6.5.1" data-path="advanced.html"><a href="advanced.html#initiating-a-sets-workflow-from-feature-groups"><i class="fa fa-check"></i><b>6.5.1</b> Initiating a sets workflow from feature groups</a></li>
+<li class="chapter" data-level="6.5.1" data-path="advanced.html"><a href="advanced.html#makeSetFG"><i class="fa fa-check"></i><b>6.5.1</b> Initiating a sets workflow from feature groups</a></li>
 <li class="chapter" data-level="6.5.2" data-path="advanced.html"><a href="advanced.html#inspecting-and-converting-set-objects"><i class="fa fa-check"></i><b>6.5.2</b> Inspecting and converting set objects</a></li>
 </ul></li>
 </ul></li>
@@ -286,15 +296,15 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="7.1" data-path="genTPs.html"><a href="genTPs.html"><i class="fa fa-check"></i><b>7.1</b> Obtaining transformation product data</a>
 <ul>
-<li class="chapter" data-level="7.1.1" data-path="genTPs.html"><a href="genTPs.html#parent-input"><i class="fa fa-check"></i><b>7.1.1</b> Parent input</a></li>
-<li class="chapter" data-level="7.1.2" data-path="genTPs.html"><a href="genTPs.html#processing-data-1"><i class="fa fa-check"></i><b>7.1.2</b> Processing data</a></li>
-<li class="chapter" data-level="7.1.3" data-path="genTPs.html"><a href="genTPs.html#TPsCustom"><i class="fa fa-check"></i><b>7.1.3</b> (Custom) Libraries and transformations</a></li>
+<li class="chapter" data-level="7.1.1" data-path="genTPs.html"><a href="genTPs.html#TPsCustom"><i class="fa fa-check"></i><b>7.1.1</b> (Custom) Libraries and transformations</a></li>
+<li class="chapter" data-level="7.1.2" data-path="genTPs.html"><a href="genTPs.html#TPsAnn"><i class="fa fa-check"></i><b>7.1.2</b> TPs from feature annotation candidates</a></li>
+<li class="chapter" data-level="7.1.3" data-path="genTPs.html"><a href="genTPs.html#TPsProc"><i class="fa fa-check"></i><b>7.1.3</b> Processing data</a></li>
 </ul></li>
 <li class="chapter" data-level="7.2" data-path="linking-parent-and-transformation-product-features.html"><a href="linking-parent-and-transformation-product-features.html"><i class="fa fa-check"></i><b>7.2</b> Linking parent and transformation product features</a>
 <ul>
 <li class="chapter" data-level="7.2.1" data-path="linking-parent-and-transformation-product-features.html"><a href="linking-parent-and-transformation-product-features.html#componentization-2"><i class="fa fa-check"></i><b>7.2.1</b> Componentization</a></li>
-<li class="chapter" data-level="7.2.2" data-path="linking-parent-and-transformation-product-features.html"><a href="linking-parent-and-transformation-product-features.html#TPsProc"><i class="fa fa-check"></i><b>7.2.2</b> Processing data</a></li>
-<li class="chapter" data-level="7.2.3" data-path="linking-parent-and-transformation-product-features.html"><a href="linking-parent-and-transformation-product-features.html#omitting-transformation-product-input"><i class="fa fa-check"></i><b>7.2.3</b> Omitting transformation product input</a></li>
+<li class="chapter" data-level="7.2.2" data-path="linking-parent-and-transformation-product-features.html"><a href="linking-parent-and-transformation-product-features.html#TPCompProc"><i class="fa fa-check"></i><b>7.2.2</b> Processing data</a></li>
+<li class="chapter" data-level="7.2.3" data-path="linking-parent-and-transformation-product-features.html"><a href="linking-parent-and-transformation-product-features.html#TPsOmit"><i class="fa fa-check"></i><b>7.2.3</b> Omitting transformation product input</a></li>
 <li class="chapter" data-level="7.2.4" data-path="linking-parent-and-transformation-product-features.html"><a href="linking-parent-and-transformation-product-features.html#reporting-tp-components"><i class="fa fa-check"></i><b>7.2.4</b> Reporting TP components</a></li>
 </ul></li>
 <li class="chapter" data-level="7.3" data-path="TPsExamples.html"><a href="TPsExamples.html"><i class="fa fa-check"></i><b>7.3</b> Example workflows</a>
@@ -305,48 +315,81 @@ div.csl-indent {
 <li class="chapter" data-level="7.3.4" data-path="TPsExamples.html"><a href="TPsExamples.html#TPsEx4"><i class="fa fa-check"></i><b>7.3.4</b> Non-target screening of TPs by annotation similarities</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="8" data-path="advanced_usage.html"><a href="advanced_usage.html"><i class="fa fa-check"></i><b>8</b> Advanced usage</a>
+<li class="chapter" data-level="8" data-path="ion-mobility-spectrometry-ims-hrms-workflows.html"><a href="ion-mobility-spectrometry-ims-hrms-workflows.html"><i class="fa fa-check"></i><b>8</b> Ion mobility spectrometry (IMS-HRMS) workflows</a>
 <ul>
-<li class="chapter" data-level="8.1" data-path="adducts.html"><a href="adducts.html"><i class="fa fa-check"></i><b>8.1</b> Adducts</a></li>
-<li class="chapter" data-level="8.2" data-path="fNorm.html"><a href="fNorm.html"><i class="fa fa-check"></i><b>8.2</b> Feature intensity normalization</a>
+<li class="chapter" data-level="8.1" data-path="IMSWorkflow.html"><a href="IMSWorkflow.html"><i class="fa fa-check"></i><b>8.1</b> Introduction</a>
 <ul>
-<li class="chapter" data-level="8.2.1" data-path="fNorm.html"><a href="fNorm.html#feature-normalization"><i class="fa fa-check"></i><b>8.2.1</b> Feature normalization</a></li>
-<li class="chapter" data-level="8.2.2" data-path="fNorm.html"><a href="fNorm.html#group-normalization"><i class="fa fa-check"></i><b>8.2.2</b> Group normalization</a></li>
-<li class="chapter" data-level="8.2.3" data-path="fNorm.html"><a href="fNorm.html#using-normalized-intensities"><i class="fa fa-check"></i><b>8.2.3</b> Using normalized intensities</a></li>
-<li class="chapter" data-level="8.2.4" data-path="fNorm.html"><a href="fNorm.html#default-normalization"><i class="fa fa-check"></i><b>8.2.4</b> Default normalization</a></li>
+<li class="chapter" data-level="8.1.1" data-path="IMSWorkflow.html"><a href="IMSWorkflow.html#lc-ms-workflows-with-ims-data"><i class="fa fa-check"></i><b>8.1.1</b> LC-MS workflows with IMS data</a></li>
+<li class="chapter" data-level="8.1.2" data-path="IMSWorkflow.html"><a href="IMSWorkflow.html#directIMS"><i class="fa fa-check"></i><b>8.1.2</b> Direct mobility assignment</a></li>
+<li class="chapter" data-level="8.1.3" data-path="IMSWorkflow.html"><a href="IMSWorkflow.html#postIMS"><i class="fa fa-check"></i><b>8.1.3</b> Post mobility assignment</a></li>
+<li class="chapter" data-level="8.1.4" data-path="IMSWorkflow.html"><a href="IMSWorkflow.html#summary"><i class="fa fa-check"></i><b>8.1.4</b> Summary</a></li>
 </ul></li>
-<li class="chapter" data-level="8.3" data-path="fOpt.html"><a href="fOpt.html"><i class="fa fa-check"></i><b>8.3</b> Feature parameter optimization</a>
+<li class="chapter" data-level="8.2" data-path="performing-ims-workflows.html"><a href="performing-ims-workflows.html"><i class="fa fa-check"></i><b>8.2</b> Performing IMS workflows</a>
 <ul>
-<li class="chapter" data-level="8.3.1" data-path="fOpt.html"><a href="fOpt.html#parameter-sets"><i class="fa fa-check"></i><b>8.3.1</b> Parameter sets</a></li>
-<li class="chapter" data-level="8.3.2" data-path="fOpt.html"><a href="fOpt.html#processing-optmization-results"><i class="fa fa-check"></i><b>8.3.2</b> Processing optmization results</a></li>
+<li class="chapter" data-level="8.2.1" data-path="performing-ims-workflows.html"><a href="performing-ims-workflows.html#limitsIMS"><i class="fa fa-check"></i><b>8.2.1</b> Parameter defaults</a></li>
+<li class="chapter" data-level="8.2.2" data-path="performing-ims-workflows.html"><a href="performing-ims-workflows.html#raw-data"><i class="fa fa-check"></i><b>8.2.2</b> Raw data</a></li>
+<li class="chapter" data-level="8.2.3" data-path="performing-ims-workflows.html"><a href="performing-ims-workflows.html#direct-mobility-assignment-dma-workflows"><i class="fa fa-check"></i><b>8.2.3</b> Direct mobility assignment (DMA) workflows</a></li>
+<li class="chapter" data-level="8.2.4" data-path="performing-ims-workflows.html"><a href="performing-ims-workflows.html#post-mobility-assignment-pma-workflows"><i class="fa fa-check"></i><b>8.2.4</b> Post mobility assignment (PMA) workflows</a></li>
+<li class="chapter" data-level="8.2.5" data-path="performing-ims-workflows.html"><a href="performing-ims-workflows.html#mobCCSConv"><i class="fa fa-check"></i><b>8.2.5</b> Mobility and CCS conversion</a></li>
+<li class="chapter" data-level="8.2.6" data-path="performing-ims-workflows.html"><a href="performing-ims-workflows.html#IMSSuspScr"><i class="fa fa-check"></i><b>8.2.6</b> Suspect screening</a></li>
+<li class="chapter" data-level="8.2.7" data-path="performing-ims-workflows.html"><a href="performing-ims-workflows.html#componentization-3"><i class="fa fa-check"></i><b>8.2.7</b> Componentization</a></li>
+<li class="chapter" data-level="8.2.8" data-path="performing-ims-workflows.html"><a href="performing-ims-workflows.html#annotation-2"><i class="fa fa-check"></i><b>8.2.8</b> Annotation</a></li>
+<li class="chapter" data-level="8.2.9" data-path="performing-ims-workflows.html"><a href="performing-ims-workflows.html#IMSSetsWorkflow"><i class="fa fa-check"></i><b>8.2.9</b> Sets workflows</a></li>
 </ul></li>
-<li class="chapter" data-level="8.4" data-path="peakQual.html"><a href="peakQual.html"><i class="fa fa-check"></i><b>8.4</b> Chromatographic peak qualities</a>
+<li class="chapter" data-level="8.3" data-path="processing-data-1.html"><a href="processing-data-1.html"><i class="fa fa-check"></i><b>8.3</b> Processing data</a>
 <ul>
-<li class="chapter" data-level="8.4.1" data-path="peakQual.html"><a href="peakQual.html#applying-machine-learning-with-metaclean"><i class="fa fa-check"></i><b>8.4.1</b> Applying machine learning with MetaClean</a></li>
+<li class="chapter" data-level="8.3.1" data-path="processing-data-1.html"><a href="processing-data-1.html#updating-feature-group-properties"><i class="fa fa-check"></i><b>8.3.1</b> Updating feature group properties</a></li>
+<li class="chapter" data-level="8.3.2" data-path="processing-data-1.html"><a href="processing-data-1.html#inspecting-and-plotting-data"><i class="fa fa-check"></i><b>8.3.2</b> Inspecting and plotting data</a></li>
+<li class="chapter" data-level="8.3.3" data-path="processing-data-1.html"><a href="processing-data-1.html#IMSFiltering"><i class="fa fa-check"></i><b>8.3.3</b> Subsetting and filtering data</a></li>
 </ul></li>
-<li class="chapter" data-level="8.5" data-path="exporting-and-converting-feature-data.html"><a href="exporting-and-converting-feature-data.html"><i class="fa fa-check"></i><b>8.5</b> Exporting and converting feature data</a></li>
-<li class="chapter" data-level="8.6" data-path="consensus.html"><a href="consensus.html"><i class="fa fa-check"></i><b>8.6</b> Algorithm consensus</a></li>
-<li class="chapter" data-level="8.7" data-path="MSLibraries.html"><a href="MSLibraries.html"><i class="fa fa-check"></i><b>8.7</b> MS libraries</a></li>
-<li class="chapter" data-level="8.8" data-path="compclust.html"><a href="compclust.html"><i class="fa fa-check"></i><b>8.8</b> Compound clustering</a></li>
-<li class="chapter" data-level="8.9" data-path="feature-regression-analysis.html"><a href="feature-regression-analysis.html"><i class="fa fa-check"></i><b>8.9</b> Feature regression analysis</a></li>
-<li class="chapter" data-level="8.10" data-path="pred.html"><a href="pred.html"><i class="fa fa-check"></i><b>8.10</b> Predicting toxicities and concentrations (MS2Tox and MS2Quant integration)</a>
+<li class="chapter" data-level="8.4" data-path="exIMSWorkflow.html"><a href="exIMSWorkflow.html"><i class="fa fa-check"></i><b>8.4</b> Example workflow</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="advanced_usage.html"><a href="advanced_usage.html"><i class="fa fa-check"></i><b>9</b> Advanced usage</a>
 <ul>
-<li class="chapter" data-level="8.10.1" data-path="pred.html"><a href="pred.html#predicting-toxicities"><i class="fa fa-check"></i><b>8.10.1</b> Predicting toxicities</a></li>
-<li class="chapter" data-level="8.10.2" data-path="pred.html"><a href="pred.html#predicting-concentrations"><i class="fa fa-check"></i><b>8.10.2</b> Predicting concentrations</a></li>
-<li class="chapter" data-level="8.10.3" data-path="pred.html"><a href="pred.html#toxicity-and-concentration-units"><i class="fa fa-check"></i><b>8.10.3</b> Toxicity and concentration units</a></li>
-<li class="chapter" data-level="8.10.4" data-path="pred.html"><a href="pred.html#inspecting-predicted-values"><i class="fa fa-check"></i><b>8.10.4</b> Inspecting predicted values</a></li>
-<li class="chapter" data-level="8.10.5" data-path="pred.html"><a href="pred.html#using-predicted-values-to-prioritize-data"><i class="fa fa-check"></i><b>8.10.5</b> Using predicted values to prioritize data</a></li>
-</ul></li>
-<li class="chapter" data-level="8.11" data-path="FCCalc.html"><a href="FCCalc.html"><i class="fa fa-check"></i><b>8.11</b> Fold changes</a></li>
-<li class="chapter" data-level="8.12" data-path="caching.html"><a href="caching.html"><i class="fa fa-check"></i><b>8.12</b> Caching</a></li>
-<li class="chapter" data-level="8.13" data-path="parallelization.html"><a href="parallelization.html"><i class="fa fa-check"></i><b>8.13</b> Parallelization</a>
+<li class="chapter" data-level="9.1" data-path="adducts.html"><a href="adducts.html"><i class="fa fa-check"></i><b>9.1</b> Adducts</a></li>
+<li class="chapter" data-level="9.2" data-path="limits.html"><a href="limits.html"><i class="fa fa-check"></i><b>9.2</b> Default numeric limits and tolerances</a></li>
+<li class="chapter" data-level="9.3" data-path="fNorm.html"><a href="fNorm.html"><i class="fa fa-check"></i><b>9.3</b> Feature intensity normalization</a>
 <ul>
-<li class="chapter" data-level="8.13.1" data-path="parallelization.html"><a href="parallelization.html#parellization-of-r-functions"><i class="fa fa-check"></i><b>8.13.1</b> Parellization of R functions</a></li>
-<li class="chapter" data-level="8.13.2" data-path="parallelization.html"><a href="parallelization.html#multiprocessing"><i class="fa fa-check"></i><b>8.13.2</b> Multiprocessing</a></li>
-<li class="chapter" data-level="8.13.3" data-path="parallelization.html"><a href="parallelization.html#notes-when-using-parallelization-with-futures"><i class="fa fa-check"></i><b>8.13.3</b> Notes when using parallelization with futures</a></li>
+<li class="chapter" data-level="9.3.1" data-path="fNorm.html"><a href="fNorm.html#feature-normalization"><i class="fa fa-check"></i><b>9.3.1</b> Feature normalization</a></li>
+<li class="chapter" data-level="9.3.2" data-path="fNorm.html"><a href="fNorm.html#group-normalization"><i class="fa fa-check"></i><b>9.3.2</b> Group normalization</a></li>
+<li class="chapter" data-level="9.3.3" data-path="fNorm.html"><a href="fNorm.html#using-normalized-intensities"><i class="fa fa-check"></i><b>9.3.3</b> Using normalized intensities</a></li>
+<li class="chapter" data-level="9.3.4" data-path="fNorm.html"><a href="fNorm.html#default-normalization"><i class="fa fa-check"></i><b>9.3.4</b> Default normalization</a></li>
+<li class="chapter" data-level="9.3.5" data-path="fNorm.html"><a href="fNorm.html#ims-workflows"><i class="fa fa-check"></i><b>9.3.5</b> IMS workflows</a></li>
+</ul></li>
+<li class="chapter" data-level="9.4" data-path="fOpt.html"><a href="fOpt.html"><i class="fa fa-check"></i><b>9.4</b> Feature parameter optimization</a>
+<ul>
+<li class="chapter" data-level="9.4.1" data-path="fOpt.html"><a href="fOpt.html#parameter-sets"><i class="fa fa-check"></i><b>9.4.1</b> Parameter sets</a></li>
+<li class="chapter" data-level="9.4.2" data-path="fOpt.html"><a href="fOpt.html#processing-optmization-results"><i class="fa fa-check"></i><b>9.4.2</b> Processing optmization results</a></li>
+</ul></li>
+<li class="chapter" data-level="9.5" data-path="peakQual.html"><a href="peakQual.html"><i class="fa fa-check"></i><b>9.5</b> Chromatographic peak qualities</a>
+<ul>
+<li class="chapter" data-level="9.5.1" data-path="peakQual.html"><a href="peakQual.html#applying-machine-learning-with-metaclean"><i class="fa fa-check"></i><b>9.5.1</b> Applying machine learning with MetaClean</a></li>
+</ul></li>
+<li class="chapter" data-level="9.6" data-path="exportFeat.html"><a href="exportFeat.html"><i class="fa fa-check"></i><b>9.6</b> Exporting and converting feature data</a></li>
+<li class="chapter" data-level="9.7" data-path="consensus.html"><a href="consensus.html"><i class="fa fa-check"></i><b>9.7</b> Algorithm consensus</a></li>
+<li class="chapter" data-level="9.8" data-path="bgMSMS.html"><a href="bgMSMS.html"><i class="fa fa-check"></i><b>9.8</b> Background removal in MS/MS data</a></li>
+<li class="chapter" data-level="9.9" data-path="MSLibraries.html"><a href="MSLibraries.html"><i class="fa fa-check"></i><b>9.9</b> MS libraries</a></li>
+<li class="chapter" data-level="9.10" data-path="compclust.html"><a href="compclust.html"><i class="fa fa-check"></i><b>9.10</b> Compound clustering</a></li>
+<li class="chapter" data-level="9.11" data-path="feature-regression-analysis.html"><a href="feature-regression-analysis.html"><i class="fa fa-check"></i><b>9.11</b> Feature regression analysis</a></li>
+<li class="chapter" data-level="9.12" data-path="pred.html"><a href="pred.html"><i class="fa fa-check"></i><b>9.12</b> Predicting toxicities and concentrations (MS2Tox and MS2Quant integration)</a>
+<ul>
+<li class="chapter" data-level="9.12.1" data-path="pred.html"><a href="pred.html#predicting-toxicities"><i class="fa fa-check"></i><b>9.12.1</b> Predicting toxicities</a></li>
+<li class="chapter" data-level="9.12.2" data-path="pred.html"><a href="pred.html#predicting-concentrations"><i class="fa fa-check"></i><b>9.12.2</b> Predicting concentrations</a></li>
+<li class="chapter" data-level="9.12.3" data-path="pred.html"><a href="pred.html#toxicity-and-concentration-units"><i class="fa fa-check"></i><b>9.12.3</b> Toxicity and concentration units</a></li>
+<li class="chapter" data-level="9.12.4" data-path="pred.html"><a href="pred.html#inspecting-predicted-values"><i class="fa fa-check"></i><b>9.12.4</b> Inspecting predicted values</a></li>
+<li class="chapter" data-level="9.12.5" data-path="pred.html"><a href="pred.html#using-predicted-values-to-prioritize-data"><i class="fa fa-check"></i><b>9.12.5</b> Using predicted values to prioritize data</a></li>
+</ul></li>
+<li class="chapter" data-level="9.13" data-path="FCCalc.html"><a href="FCCalc.html"><i class="fa fa-check"></i><b>9.13</b> Fold changes</a></li>
+<li class="chapter" data-level="9.14" data-path="caching.html"><a href="caching.html"><i class="fa fa-check"></i><b>9.14</b> Caching</a></li>
+<li class="chapter" data-level="9.15" data-path="parallelization.html"><a href="parallelization.html"><i class="fa fa-check"></i><b>9.15</b> Parallelization</a>
+<ul>
+<li class="chapter" data-level="9.15.1" data-path="parallelization.html"><a href="parallelization.html#multithreading"><i class="fa fa-check"></i><b>9.15.1</b> Multithreading</a></li>
+<li class="chapter" data-level="9.15.2" data-path="parallelization.html"><a href="parallelization.html#futures"><i class="fa fa-check"></i><b>9.15.2</b> Parellization of R functions</a></li>
+<li class="chapter" data-level="9.15.3" data-path="parallelization.html"><a href="parallelization.html#multiprocessing"><i class="fa fa-check"></i><b>9.15.3</b> Multiprocessing</a></li>
+<li class="chapter" data-level="9.15.4" data-path="parallelization.html"><a href="parallelization.html#notes-when-using-parallelization-with-futures"><i class="fa fa-check"></i><b>9.15.4</b> Notes when using parallelization with futures</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="9" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>9</b> References</a></li>
+<li class="chapter" data-level="10" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>10</b> References</a></li>
 </ul>
 
       </nav>
@@ -364,24 +407,26 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="features" class="section level2 hasAnchor" number="4.3">
-<h2><span class="header-section-number">4.3</span> Features<a href="features.html#features" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="features" class="section level2 hasAnchor" number="4.5">
+<h2><span class="header-section-number">4.5</span> Features<a href="features.html#features" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Collecting features from the analyses consists of finding all features, grouping them across analyses (optionally after retention time alignment), and if desired suspect screening:</p>
-<div id="htmlwidget-dc3baf2d9011cf86be6d" style="width:500px;height:70px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-dc3baf2d9011cf86be6d">{"x":{"diagram":"\ndigraph Features {\n  graph [ rankdir = LR, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Find features\" -> \"Group features\"\n    \"Suspect screening\"\n    \"Group features\" -> \"Suspect screening\" [style=dashed]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
-<div id="finding-and-grouping-features" class="section level3 hasAnchor" number="4.3.1">
-<h3><span class="header-section-number">4.3.1</span> Finding and grouping features<a href="features.html#finding-and-grouping-features" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="htmlwidget-5b6f4e8408c73a49ab16" style="width:500px;height:70px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-5b6f4e8408c73a49ab16">{"x":{"diagram":"\ndigraph Features {\n  graph [ rankdir = LR, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Find features\" -> \"Group features\"\n    \"Suspect screening\"\n    \"Group features\" -> \"Suspect screening\" [style=dashed]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="findFeat" class="section level3 hasAnchor" number="4.5.1">
+<h3><span class="header-section-number">4.5.1</span> Finding features<a href="features.html#findFeat" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Several algorithms are available for finding features. These are listed in the table below alongside their usage and general remarks.</p>
 <table>
 <colgroup>
-<col width="21%" />
-<col width="58%" />
-<col width="19%" />
+<col width="13%" />
+<col width="37%" />
+<col width="25%" />
+<col width="24%" />
 </colgroup>
 <thead>
 <tr class="header">
 <th>Algorithm</th>
 <th>Usage</th>
+<th>Input</th>
 <th>Remarks</th>
 </tr>
 </thead>
@@ -389,61 +434,62 @@ div.csl-indent {
 <tr class="odd">
 <td><a href="http://openms.de/">OpenMS</a></td>
 <td><code>findFeatures(algorithm = "openms", ...)</code></td>
-<td>Uses the <a href="https://abibuilder.cs.uni-tuebingen.de/archive/openms/Documentation/nightly/html/TOPP_FeatureFinderMetabo.html">FeatureFinderMetabo</a> algorithm</td>
+<td>centroid (<code>mzML</code>)</td>
+<td>Uses <a href="https://abibuilder.cs.uni-tuebingen.de/archive/openms/Documentation/nightly/html/TOPP_FeatureFinderMetabo.html">FeatureFinderMetabo</a></td>
 </tr>
 <tr class="even">
 <td><a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS</a></td>
 <td><code>findFeatures(algorithm = "xcms", ...)</code></td>
-<td>Uses <code>xcms::xcmsSet()</code> function</td>
+<td>centroid (<code>mzML</code> or <code>mzXML</code>)</td>
+<td>Uses <code>xcms::xcmsSet()</code></td>
 </tr>
 <tr class="odd">
-<td><a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS</a> (import)</td>
-<td><code>importFeatures(algorithm = "xcms", ...)</code></td>
-<td>Imports an existing <code>xcmsSet</code> object</td>
-</tr>
-<tr class="even">
 <td><a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS3</a></td>
 <td><code>findFeatures(algorithm = "xcms3", ...)</code></td>
-<td>Uses <code>xcms::findChromPeaks()</code> from the new XCMS3 interface</td>
-</tr>
-<tr class="odd">
-<td><a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS3</a> (import)</td>
-<td><code>importFeatures(algorithm = "xcms3", ...)</code></td>
-<td>Imports an existing <code>XCMSnExp</code> object</td>
+<td>centroid (<code>mzML</code> or <code>mzXML</code>)</td>
+<td>Uses <code>xcms::findChromPeaks()</code></td>
 </tr>
 <tr class="even">
+<td><code>piek</code></td>
+<td><code>findFeatures(algorithm = "piek", ...)</code></td>
+<td>raw data loaded with <a href="sample-analyses.html#fileTypes">msdata</a></td>
+<td>Introduced in <code>patRoon 3.0</code></td>
+</tr>
+<tr class="odd">
 <td><a href="https://cran.r-project.org/web/packages/enviPick/index.html">enviPick</a></td>
 <td><code>findFeatures(algorithm = "envipick", ...)</code></td>
+<td>centroid (<code>mzXML</code>)</td>
 <td>Uses <code>enviPick::enviPickwrap()</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="https://github.com/hcji/KPIC2">KPIC2</a></td>
 <td><code>findFeatures(algorithm = "kpic2", ...)</code></td>
-<td>Uses the <a href="https://github.com/hcji/KPIC2">KPIC2</a> <code>R</code> package</td>
-</tr>
-<tr class="even">
-<td><a href="https://github.com/hcji/KPIC2">KPIC2</a> (import)</td>
-<td><code>importFeatures(algorithm = "kpic2", ...)</code></td>
-<td>Imports features from <a href="https://github.com/hcji/KPIC2">KPIC2</a></td>
+<td>centroid (<code>mzML</code> or <code>mzXML</code>)</td>
+<td></td>
 </tr>
 <tr class="odd">
 <td><a href="https://bio.informatik.uni-jena.de/software/sirius/">SIRIUS</a></td>
 <td><code>findFeatures(algorithm = "sirius", ...)</code></td>
-<td>Uses <a href="https://bio.informatik.uni-jena.de/software/sirius/">SIRIUS</a> to find features</td>
+<td>centroid (<code>mzML</code> or <code>mzXML</code>)</td>
+<td></td>
 </tr>
 <tr class="even">
 <td><a href="https://bitbucket.org/SSamanipour/safd.jl/src/master/">SAFD</a></td>
 <td><code>findFeatures(algorithm = "safd", ...)</code></td>
-<td>Uses the <a href="https://bitbucket.org/SSamanipour/safd.jl/src/master/">SAFD</a> algorithm (experimental)</td>
+<td>centroid or profile (<code>mzXML</code>)</td>
+<td><strong>Experimental</strong></td>
 </tr>
 <tr class="odd">
 <td>DataAnalysis</td>
 <td><code>findFeatures(algorithm = "bruker", ...)</code></td>
+<td>raw (Bruker <code>.d</code>)</td>
 <td>Uses Find Molecular Features from DataAnalysis (Bruker only)</td>
 </tr>
 </tbody>
 </table>
-<p>Most often the performance of these algorithms heavily depend on the data and parameter settings that are used. Since obtaining a good feature dataset is crucial for the rest of the workflow, it is highly recommended to experiment with different settings (this process can also be automated, see <a href="fOpt.html#fOpt">the feature optimization section</a> for more details). Some common parameters to look at are listed in the table below. However, there are many more parameters that can be set, please see the reference documentation for these (e.g. <code>?findFeatures</code>).</p>
+<p>The feature finding algorithms have different requirements on the data file types and formats (<em>Input</em> column). See the <a href="sample-analyses.html#pre-treat">data conversion section</a> to perform data conversion.</p>
+<p>When using the <a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS</a> algorithms both the ‘classical’ interface and latest <code>XCMS3</code> interfaces are supported. The implementation and functionality is largely the same within <code>patRoon</code>, however, the latter is recommended as the classical interface is not further developed anymore.</p>
+<p>Most often the performance of these algorithms heavily depends on the data and parameter settings that are used. Since obtaining a good feature dataset is crucial for the rest of the workflow, it is highly recommended to experiment with different settings (this process can also be automated, see <a href="fOpt.html#fOpt">the feature optimization section</a> for more details). Some common parameters to look at are listed in the table below. However, there are many more parameters that can be set, please see the reference documentation for these (e.g. <code>?findFeatures</code>).</p>
 <table>
 <colgroup>
 <col width="16%" />
@@ -458,41 +504,91 @@ div.csl-indent {
 <tbody>
 <tr class="odd">
 <td><a href="http://openms.de/">OpenMS</a></td>
-<td><code>noiseThrInt</code>, <code>chromSNR</code>, <code>chromFWHM</code>, <code>mzPPM</code>, <code>minFWHM</code>, <code>maxFWHM</code> (see <code>?findFeatures</code>)</td>
+<td><code>noiseThrInt</code>, <code>chromSNR</code>, <code>chromFWHM</code>, <code>mzPPM</code>, <code>minFWHM</code>, <code>maxFWHM</code> (see <code>?findFeaturesOpenMS</code>)</td>
 </tr>
 <tr class="even">
 <td><a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS</a> / <a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS3</a></td>
 <td><code>peakwidth</code>, <code>mzdiff</code>, <code>prefilter</code>, <code>noise</code> (assuming default <code>centWave</code> algorithm, see <code>?findPeaks.centWave</code> / <code>?CentWaveParam</code>)</td>
 </tr>
 <tr class="odd">
+<td><code>piek</code></td>
+<td><code>genEICParams</code>, <code>peakParams</code>, see next section and <code>?findFeaturesPiek</code></td>
+</tr>
+<tr class="even">
 <td><a href="https://cran.r-project.org/web/packages/enviPick/index.html">enviPick</a></td>
 <td><code>dmzgap</code>, <code>dmzdens</code>, <code>drtgap</code>, <code>drtsmall</code>, <code>drtdens</code>, <code>drtfill</code>, <code>drttotal</code>, <code>minpeak</code>, <code>minint</code>, <code>maxint</code> (see <code>?enviPickwrap</code>)</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="https://github.com/hcji/KPIC2">KPIC2</a></td>
 <td><code>kmeans</code>, <code>level</code>, <code>min_snr</code> (see <code>?findFeatures</code> and <code>?getPIC</code> / <code>?getPIC.kmeans</code>)</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="https://bio.informatik.uni-jena.de/software/sirius/">SIRIUS</a></td>
 <td>The <code>sirius</code> algorithm is currently parameterless</td>
 </tr>
-<tr class="even">
-<td><a href="https://bitbucket.org/SSamanipour/safd.jl/src/master/">SAFD</a></td>
-<td><code>mzRange</code>, <code>maxNumbIter</code>, <code>resolution</code>, <code>minInt</code> (see <code>?findFeatures</code>)</td>
-</tr>
 <tr class="odd">
+<td><a href="https://bitbucket.org/SSamanipour/safd.jl/src/master/">SAFD</a></td>
+<td><code>mzRange</code>, <code>maxNumbIter</code>, <code>resolution</code>, <code>minInt</code> (see <code>?findFeaturesSAFD</code>)</td>
+</tr>
+<tr class="even">
 <td>DataAnalysis</td>
 <td>See <em>Find</em> -&gt; <em>Parameters…</em> -&gt; <em>Molecular Features</em> in DataAnalysis.</td>
 </tr>
 </tbody>
 </table>
 <blockquote>
-<p><strong><em>NOTE</em></strong> Support for SAFD is still experimental and some extra work is required to set everything up. Please see the reference documentation for this algorithm (<code>?findFeatures</code>).</p>
-</blockquote>
-<blockquote>
 <p><strong><em>NOTE</em></strong> DataAnalysis feature settings have to be configured in DataAnalysis prior to calling <code>findFeatures()</code>.</p>
 </blockquote>
-<p>Similarly, for grouping features across analyses several algorithms are supported.</p>
+<p>Some examples of finding features are shown below.</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="features.html#cb29-1" tabindex="-1"></a><span class="co"># The anaInfo variable contains analysis information, see the previous section</span></span>
+<span id="cb29-2"><a href="features.html#cb29-2" tabindex="-1"></a></span>
+<span id="cb29-3"><a href="features.html#cb29-3" tabindex="-1"></a><span class="co"># Finding features</span></span>
+<span id="cb29-4"><a href="features.html#cb29-4" tabindex="-1"></a>fListOMS <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfo, <span class="st">&quot;openms&quot;</span>) <span class="co"># OpenMS, with default settings</span></span>
+<span id="cb29-5"><a href="features.html#cb29-5" tabindex="-1"></a>fListOMS2 <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfo, <span class="st">&quot;openms&quot;</span>, <span class="at">noiseThrInt =</span> <span class="dv">500</span>, <span class="at">chromSNR =</span> <span class="dv">10</span>) <span class="co"># OpenMS, adjusted minimum intensity and S/N</span></span>
+<span id="cb29-6"><a href="features.html#cb29-6" tabindex="-1"></a>fListXCMS <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfo, <span class="st">&quot;xcms&quot;</span>, <span class="at">ppm =</span> <span class="dv">10</span>) <span class="co"># XCMS</span></span>
+<span id="cb29-7"><a href="features.html#cb29-7" tabindex="-1"></a>fListXCMS3 <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfo, <span class="st">&quot;xcms3&quot;</span>, <span class="fu">CentWaveParam</span>(<span class="at">peakwidth =</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">15</span>))) <span class="co"># XCMS3</span></span>
+<span id="cb29-8"><a href="features.html#cb29-8" tabindex="-1"></a>fListEP <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfo, <span class="st">&quot;envipick&quot;</span>, <span class="at">minint =</span> <span class="fl">1E3</span>) <span class="co"># enviPick</span></span>
+<span id="cb29-9"><a href="features.html#cb29-9" tabindex="-1"></a>fListKPIC2 <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfo, <span class="st">&quot;kpic2&quot;</span>, <span class="at">kmeans =</span> <span class="cn">TRUE</span>, <span class="at">level =</span> <span class="fl">1E4</span>) <span class="co"># KPIC2</span></span>
+<span id="cb29-10"><a href="features.html#cb29-10" tabindex="-1"></a>fListSIRIUS <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfo, <span class="st">&quot;sirius&quot;</span>) <span class="co"># SIRIUS</span></span></code></pre></div>
+<div id="piek" class="section level4 hasAnchor" number="4.5.1.1">
+<h4><span class="header-section-number">4.5.1.1</span> Feature detection with piek<a href="features.html#piek" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>The <code>piek</code> algorithm was introduced in <code>patRoon 3.0</code>, and extends the work done by <span class="citation">Dietrich et al. (<a href="#ref-Dietrich2021">2021</a>)</span>. This algorithm finds features from extracted ion chromatograms (EICs) and can use various peak detection algorithms to find features. The EICs are generated from fixed-width <em>m/z</em> bins, therefore, it is important to define the proper range for the compounds of interest. The feature detection can be speed up by filtering the EIC bins from one of the following:</p>
+<ul>
+<li>data from a suspect list (the format follows that of suspect lists for <a href="features.html#suspFormat">suspect screening workflows</a>)</li>
+<li>data from precursors detected in data-dependent MS/MS experiments (DDA)</li>
+</ul>
+<p>This will considerably limit the number of EICs that need to be generated and processed.</p>
+<p>The <code>getPiekEICParams()</code> function is used to create the parameters that are used to generate the EICs. Its output is passed to the <code>genEICParams</code> argument to <code>findFeatures()</code> function. Similarly, the <code>getDefPeakParams()</code> function is used to create the parameters that are used to detect peaks, and its output is passed to the <code>peakParams</code> argument of <code>findFeatures()</code>.</p>
+<p>Some examples are shown below:</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="features.html#cb30-1" tabindex="-1"></a><span class="co"># find features from m/z bins with piek&#39;s native peak detection algorithm</span></span>
+<span id="cb30-2"><a href="features.html#cb30-2" tabindex="-1"></a>genEICParams <span class="ot">&lt;-</span> <span class="fu">getPiekEICParams</span>()</span>
+<span id="cb30-3"><a href="features.html#cb30-3" tabindex="-1"></a>peakParams <span class="ot">&lt;-</span> <span class="fu">getDefPeakParams</span>(<span class="st">&quot;chrom&quot;</span>, <span class="st">&quot;piek&quot;</span>)</span>
+<span id="cb30-4"><a href="features.html#cb30-4" tabindex="-1"></a>fList <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfo, <span class="st">&quot;piek&quot;</span>, <span class="at">genEICParams =</span> genEICParams, <span class="at">peakParams =</span> peakParams)</span>
+<span id="cb30-5"><a href="features.html#cb30-5" tabindex="-1"></a></span>
+<span id="cb30-6"><a href="features.html#cb30-6" tabindex="-1"></a><span class="co"># as above, but customize binning</span></span>
+<span id="cb30-7"><a href="features.html#cb30-7" tabindex="-1"></a>genEICParams <span class="ot">&lt;-</span> <span class="fu">getPiekEICParams</span>(<span class="at">mzRange =</span> <span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">1000</span>), <span class="at">mzStep =</span> <span class="fl">0.01</span>)</span>
+<span id="cb30-8"><a href="features.html#cb30-8" tabindex="-1"></a>peakParams <span class="ot">&lt;-</span> <span class="fu">getDefPeakParams</span>(<span class="st">&quot;chrom&quot;</span>, <span class="st">&quot;piek&quot;</span>)</span>
+<span id="cb30-9"><a href="features.html#cb30-9" tabindex="-1"></a>fList <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfo, <span class="st">&quot;piek&quot;</span>, <span class="at">genEICParams =</span> genEICParams, <span class="at">peakParams =</span> peakParams)</span>
+<span id="cb30-10"><a href="features.html#cb30-10" tabindex="-1"></a></span>
+<span id="cb30-11"><a href="features.html#cb30-11" tabindex="-1"></a><span class="co"># find features from a suspect list with XCMS peak detection</span></span>
+<span id="cb30-12"><a href="features.html#cb30-12" tabindex="-1"></a><span class="co"># see the suspect screening section for more details on the suspect list format</span></span>
+<span id="cb30-13"><a href="features.html#cb30-13" tabindex="-1"></a>genEICParams <span class="ot">&lt;-</span> <span class="fu">getPiekEICParams</span>(<span class="at">filter =</span> <span class="st">&quot;suspects&quot;</span>)</span>
+<span id="cb30-14"><a href="features.html#cb30-14" tabindex="-1"></a>peakParams <span class="ot">&lt;-</span> <span class="fu">getDefPeakParams</span>(<span class="st">&quot;chrom&quot;</span>, <span class="st">&quot;xcms3&quot;</span>)</span>
+<span id="cb30-15"><a href="features.html#cb30-15" tabindex="-1"></a>fList <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfo, <span class="st">&quot;piek&quot;</span>, <span class="at">genEICParams =</span> genEICParams, <span class="at">peakParams =</span> peakParams,</span>
+<span id="cb30-16"><a href="features.html#cb30-16" tabindex="-1"></a>                      <span class="at">suspects =</span> suspList, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>)</span>
+<span id="cb30-17"><a href="features.html#cb30-17" tabindex="-1"></a></span>
+<span id="cb30-18"><a href="features.html#cb30-18" tabindex="-1"></a><span class="co"># use DDA MS/MS data to find features</span></span>
+<span id="cb30-19"><a href="features.html#cb30-19" tabindex="-1"></a><span class="co"># only find features with data between two and ten minutes retention time.</span></span>
+<span id="cb30-20"><a href="features.html#cb30-20" tabindex="-1"></a><span class="co"># increase minimum spectrum TIC to focus on features with high intensity MS/MS data</span></span>
+<span id="cb30-21"><a href="features.html#cb30-21" tabindex="-1"></a>genEICParams <span class="ot">&lt;-</span> <span class="fu">getPiekEICParams</span>(<span class="at">filter =</span> <span class="st">&quot;ms2&quot;</span>, <span class="at">retRange =</span> <span class="fu">c</span>(<span class="dv">120</span>, <span class="dv">600</span>), <span class="at">minTIC =</span> <span class="fl">1E5</span>)</span>
+<span id="cb30-22"><a href="features.html#cb30-22" tabindex="-1"></a>peakParams <span class="ot">&lt;-</span> <span class="fu">getDefPeakParams</span>(<span class="st">&quot;chrom&quot;</span>, <span class="st">&quot;openms&quot;</span>)</span>
+<span id="cb30-23"><a href="features.html#cb30-23" tabindex="-1"></a>fList <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfo, <span class="st">&quot;piek&quot;</span>, <span class="at">genEICParams =</span> genEICParams, <span class="at">peakParams =</span> peakParams)</span></code></pre></div>
+<p>For more details, please see the reference manual (<code>?findFeaturesPiek</code>).</p>
+</div>
+</div>
+<div id="groupFeatures" class="section level3 hasAnchor" number="4.5.2">
+<h3><span class="header-section-number">4.5.2</span> Feature grouping<a href="features.html#groupFeatures" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>For grouping features across analyses several algorithms are supported.</p>
 <table>
 <colgroup>
 <col width="14%" />
@@ -518,19 +614,9 @@ div.csl-indent {
 <td>Uses <code>xcms::group()</code> <code>xcms::retcor()</code> functions</td>
 </tr>
 <tr class="odd">
-<td><a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS</a> (import)</td>
-<td><code>importFeatureGroupsXCMS(...)</code></td>
-<td>Imports an existing <code>xcmsSet</code> object.</td>
-</tr>
-<tr class="even">
 <td><a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS3</a></td>
 <td><code>groupFeatures(algorithm = "xcms3", ...)</code></td>
 <td>Uses <code>xcms::groupChromPeaks()</code> and <code>xcms::adjustRtime()</code> functions</td>
-</tr>
-<tr class="odd">
-<td><a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS3</a> (import)</td>
-<td><code>importFeatureGroupsXCMS3(...)</code></td>
-<td>Imports an existing <code>XCMSnExp</code> object.</td>
 </tr>
 <tr class="even">
 <td><a href="https://github.com/hcji/KPIC2">KPIC2</a></td>
@@ -538,117 +624,151 @@ div.csl-indent {
 <td>Uses the <a href="https://github.com/hcji/KPIC2">KPIC2</a> package</td>
 </tr>
 <tr class="odd">
-<td><a href="https://github.com/hcji/KPIC2">KPIC2</a> (import)</td>
-<td><code>importFeatureGroupsKPIC2(...)</code></td>
-<td>Imports a <code>PIC set</code> object</td>
+<td><code>greedy</code></td>
+<td><code>groupFeatures(algorithm = "greedy", ...)</code></td>
+<td>Introduced in <code>patRoon 3.0</code></td>
 </tr>
 <tr class="even">
 <td><a href="https://bio.informatik.uni-jena.de/software/sirius/">SIRIUS</a></td>
 <td><code>groupFeatures(anaInfo, algorithm = "sirius")</code></td>
 <td>Finds <em>and</em> groups features with <a href="https://bio.informatik.uni-jena.de/software/sirius/">SIRIUS</a></td>
 </tr>
-<tr class="odd">
-<td>ProfileAnalysis</td>
-<td><code>importFeatureGroups(algorithm = "brukerpa", ...)</code></td>
-<td>Import <code>.csv</code> file exported from Bruker ProfileAnalysis</td>
-</tr>
-<tr class="even">
-<td>TASQ</td>
-<td><code>importFeatureGroups(algorithm = "brukertasq", ...)</code></td>
-<td>Imports a <em>Global result table</em> (exported to Excel file and then saved as <code>.csv</code> file)</td>
-</tr>
 </tbody>
 </table>
 <blockquote>
 <p><strong><em>NOTE</em></strong>: Grouping features with the <code>sirius</code> algorithm will perform both finding and grouping features with <a href="https://bio.informatik.uni-jena.de/software/sirius/">SIRIUS</a>. This algorithm cannot work with features from another algorithm.</p>
 </blockquote>
-<p>Just like finding features, each algorithm has their own set of parameters. Often the defaults are a good start but it is recommended to have look at them. See <code>?groupFeatures</code> for more details.</p>
-<p>When using the <a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS</a> algorithms both the ‘classical’ interface and latest <code>XCMS3</code> interfaces are supported. Currently, both interfaces are mostly the same regarding functionalities and implementation. However, since future developments of XCMS are primarily focused the latter this interface is recommended.</p>
-<p>Some examples of finding and grouping features are shown below.</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="features.html#cb17-1" tabindex="-1"></a><span class="co"># The anaInfo variable contains analysis information, see the previous section</span></span>
-<span id="cb17-2"><a href="features.html#cb17-2" tabindex="-1"></a></span>
-<span id="cb17-3"><a href="features.html#cb17-3" tabindex="-1"></a><span class="co"># Finding features</span></span>
-<span id="cb17-4"><a href="features.html#cb17-4" tabindex="-1"></a>fListOMS <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfo, <span class="st">&quot;openms&quot;</span>) <span class="co"># OpenMS, with default settings</span></span>
-<span id="cb17-5"><a href="features.html#cb17-5" tabindex="-1"></a>fListOMS2 <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfo, <span class="st">&quot;openms&quot;</span>, <span class="at">noiseThrInt =</span> <span class="dv">500</span>, <span class="at">chromSNR =</span> <span class="dv">10</span>) <span class="co"># OpenMS, adjusted minimum intensity and S/N</span></span>
-<span id="cb17-6"><a href="features.html#cb17-6" tabindex="-1"></a>fListXCMS <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfo, <span class="st">&quot;xcms&quot;</span>, <span class="at">ppm =</span> <span class="dv">10</span>) <span class="co"># XCMS</span></span>
-<span id="cb17-7"><a href="features.html#cb17-7" tabindex="-1"></a>fListXCMSImp <span class="ot">&lt;-</span> <span class="fu">importFeatures</span>(anaInfo, <span class="st">&quot;xcms&quot;</span>, xset) <span class="co"># import XCMS xcmsSet object</span></span>
-<span id="cb17-8"><a href="features.html#cb17-8" tabindex="-1"></a>fListXCMS3 <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfo, <span class="st">&quot;xcms3&quot;</span>, <span class="fu">CentWaveParam</span>(<span class="at">peakwidth =</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">15</span>))) <span class="co"># XCMS3</span></span>
-<span id="cb17-9"><a href="features.html#cb17-9" tabindex="-1"></a>fListEP <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfo, <span class="st">&quot;envipick&quot;</span>, <span class="at">minint =</span> <span class="fl">1E3</span>) <span class="co"># enviPick</span></span>
-<span id="cb17-10"><a href="features.html#cb17-10" tabindex="-1"></a>fListKPIC2 <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfo, <span class="st">&quot;kpic2&quot;</span>, <span class="at">kmeans =</span> <span class="cn">TRUE</span>, <span class="at">level =</span> <span class="fl">1E4</span>) <span class="co"># KPIC2</span></span>
-<span id="cb17-11"><a href="features.html#cb17-11" tabindex="-1"></a>fListSIRIUS <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfo, <span class="st">&quot;sirius&quot;</span>) <span class="co"># SIRIUS</span></span>
-<span id="cb17-12"><a href="features.html#cb17-12" tabindex="-1"></a></span>
-<span id="cb17-13"><a href="features.html#cb17-13" tabindex="-1"></a><span class="co"># Grouping features</span></span>
-<span id="cb17-14"><a href="features.html#cb17-14" tabindex="-1"></a>fGroupsOMS <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(fListOMS, <span class="st">&quot;openms&quot;</span>) <span class="co"># OpenMS grouping, default settings</span></span>
-<span id="cb17-15"><a href="features.html#cb17-15" tabindex="-1"></a>fGroupsOMS2 <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(fListOMS2, <span class="st">&quot;openms&quot;</span>, <span class="at">rtalign =</span> <span class="cn">FALSE</span>) <span class="co"># OpenMS grouping, no RT alignment</span></span>
-<span id="cb17-16"><a href="features.html#cb17-16" tabindex="-1"></a>fGroupsOMS3 <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(fListXCMS, <span class="st">&quot;openms&quot;</span>, <span class="at">maxGroupRT =</span> <span class="dv">6</span>) <span class="co"># group XCMS features with OpenMS, adjusted grouping parameter</span></span>
-<span id="cb17-17"><a href="features.html#cb17-17" tabindex="-1"></a><span class="co"># group enviPick features with XCMS3, disable minFraction</span></span>
-<span id="cb17-18"><a href="features.html#cb17-18" tabindex="-1"></a>fGroupsXCMS <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(fListEP, <span class="st">&quot;xcms3&quot;</span>,</span>
-<span id="cb17-19"><a href="features.html#cb17-19" tabindex="-1"></a>                             xcms<span class="sc">::</span><span class="fu">PeakDensityParam</span>(<span class="at">sampleGroups =</span> analInfo<span class="sc">$</span>group,</span>
-<span id="cb17-20"><a href="features.html#cb17-20" tabindex="-1"></a>                                                    <span class="at">minFraction =</span> <span class="dv">0</span>))</span>
-<span id="cb17-21"><a href="features.html#cb17-21" tabindex="-1"></a><span class="co"># group with KPIC2 and set some custom grouping/aligning parameters</span></span>
-<span id="cb17-22"><a href="features.html#cb17-22" tabindex="-1"></a>fGroupsKPIC2 <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(fListKPIC2, <span class="st">&quot;kpic2&quot;</span>, <span class="at">groupArgs =</span> <span class="fu">list</span>(<span class="at">tolerance =</span> <span class="fu">c</span>(<span class="fl">0.002</span>, <span class="dv">18</span>)),</span>
-<span id="cb17-23"><a href="features.html#cb17-23" tabindex="-1"></a>                              <span class="at">alignArgs =</span> <span class="fu">list</span>(<span class="at">move =</span> <span class="st">&quot;loess&quot;</span>))</span>
-<span id="cb17-24"><a href="features.html#cb17-24" tabindex="-1"></a>fGroupsSIRIUS <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(anaInfo, <span class="st">&quot;sirius&quot;</span>) <span class="co"># find/group features with SIRIUS</span></span></code></pre></div>
+<p>Just like finding features, each algorithm has their own set of parameters. Often the defaults are a good start, but it is recommended to have look at them. See <code>?groupFeatures</code> for more details. The algorithm used to group features does not have to match to the algorithm that was used to find the features.</p>
+<p>Some examples of grouping features are shown below.</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="features.html#cb31-1" tabindex="-1"></a><span class="co"># Group features, using the fList objects created in the previous feature finding section</span></span>
+<span id="cb31-2"><a href="features.html#cb31-2" tabindex="-1"></a>fGroupsOMS <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(fListOMS, <span class="st">&quot;openms&quot;</span>) <span class="co"># OpenMS grouping, default settings</span></span>
+<span id="cb31-3"><a href="features.html#cb31-3" tabindex="-1"></a>fGroupsOMS2 <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(fListOMS2, <span class="st">&quot;openms&quot;</span>, <span class="at">rtalign =</span> <span class="cn">FALSE</span>) <span class="co"># OpenMS grouping, no RT alignment</span></span>
+<span id="cb31-4"><a href="features.html#cb31-4" tabindex="-1"></a>fGroupsOMS3 <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(fListXCMS, <span class="st">&quot;openms&quot;</span>, <span class="at">maxGroupRT =</span> <span class="dv">6</span>) <span class="co"># group XCMS features with OpenMS, adjusted grouping parameter</span></span>
+<span id="cb31-5"><a href="features.html#cb31-5" tabindex="-1"></a><span class="co"># group enviPick features with XCMS3, disable minFraction</span></span>
+<span id="cb31-6"><a href="features.html#cb31-6" tabindex="-1"></a>fGroupsXCMS <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(fListEP, <span class="st">&quot;xcms3&quot;</span>,</span>
+<span id="cb31-7"><a href="features.html#cb31-7" tabindex="-1"></a>                             xcms<span class="sc">::</span><span class="fu">PeakDensityParam</span>(<span class="at">sampleGroups =</span> analInfo<span class="sc">$</span>replicate,</span>
+<span id="cb31-8"><a href="features.html#cb31-8" tabindex="-1"></a>                                                    <span class="at">minFraction =</span> <span class="dv">0</span>))</span>
+<span id="cb31-9"><a href="features.html#cb31-9" tabindex="-1"></a><span class="co"># group with KPIC2 and set some custom grouping/aligning parameters</span></span>
+<span id="cb31-10"><a href="features.html#cb31-10" tabindex="-1"></a>fGroupsKPIC2 <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(fListKPIC2, <span class="st">&quot;kpic2&quot;</span>, <span class="at">groupArgs =</span> <span class="fu">list</span>(<span class="at">tolerance =</span> <span class="fu">c</span>(<span class="fl">0.002</span>, <span class="dv">18</span>)),</span>
+<span id="cb31-11"><a href="features.html#cb31-11" tabindex="-1"></a>                              <span class="at">alignArgs =</span> <span class="fu">list</span>(<span class="at">move =</span> <span class="st">&quot;loess&quot;</span>))</span>
+<span id="cb31-12"><a href="features.html#cb31-12" tabindex="-1"></a><span class="co"># greedy algorithm with custom tolerances and weights</span></span>
+<span id="cb31-13"><a href="features.html#cb31-13" tabindex="-1"></a>fGroupsGreedy <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(fListXCMS3, <span class="st">&quot;greedy&quot;</span>, <span class="at">rtWindow =</span> <span class="dv">5</span>, <span class="at">mzWindow =</span> <span class="fl">0.003</span>,</span>
+<span id="cb31-14"><a href="features.html#cb31-14" tabindex="-1"></a>                               <span class="at">scoreWeights =</span> <span class="fu">c</span>(<span class="at">retention =</span> <span class="fl">0.5</span>, <span class="at">mz =</span> <span class="dv">3</span>, <span class="at">mobility =</span> <span class="dv">1</span>, <span class="at">intensity =</span> <span class="dv">1</span>))</span>
+<span id="cb31-15"><a href="features.html#cb31-15" tabindex="-1"></a>fGroupsSIRIUS <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(anaInfo, <span class="st">&quot;sirius&quot;</span>) <span class="co"># find/group features with SIRIUS</span></span></code></pre></div>
 </div>
-<div id="suspscr" class="section level3 hasAnchor" number="4.3.2">
-<h3><span class="header-section-number">4.3.2</span> Suspect screening<a href="features.html#suspscr" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>After features have been grouped a so called suspect screening step may be performed to find features that may correspond to suspects within a given suspect list. The <code>screenSuspects()</code> function is used for this purpose, for instance:</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="features.html#cb18-1" tabindex="-1"></a>suspects <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">name =</span> <span class="fu">c</span>(<span class="st">&quot;1H-benzotriazole&quot;</span>, <span class="st">&quot;N-Phenyl urea&quot;</span>, <span class="st">&quot;2-Hydroxyquinoline&quot;</span>),</span>
-<span id="cb18-2"><a href="features.html#cb18-2" tabindex="-1"></a>                       <span class="at">mz =</span> <span class="fu">c</span>(<span class="fl">120.0556</span>, <span class="fl">137.0709</span>, <span class="fl">146.0600</span>))</span>
-<span id="cb18-3"><a href="features.html#cb18-3" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroups, suspects)</span></code></pre></div>
-<div id="suspFormat" class="section level4 hasAnchor" number="4.3.2.1">
-<h4><span class="header-section-number">4.3.2.1</span> Suspect list format<a href="features.html#suspFormat" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div id="suspscr" class="section level3 hasAnchor" number="4.5.3">
+<h3><span class="header-section-number">4.5.3</span> Suspect screening<a href="features.html#suspscr" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>After features have been grouped a so called <em>suspect screening</em> step may be performed. During this step a <em>suspect list</em> is used to screen the detected features and match them to the suspects in the list. Suspect screening can simplify the identification of unknown features, and can simplify the overall workflow by removing the features without matches. The <code>screenSuspects()</code> function is used for this purpose, for instance:</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="features.html#cb32-1" tabindex="-1"></a><span class="co"># Perform a very basic suspect screening workflow. The suspects are matched by m/z values, and any non-hits are removed.</span></span>
+<span id="cb32-2"><a href="features.html#cb32-2" tabindex="-1"></a>suspects <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">name =</span> <span class="fu">c</span>(<span class="st">&quot;1H-benzotriazole&quot;</span>, <span class="st">&quot;N-Phenyl urea&quot;</span>, <span class="st">&quot;2-Hydroxyquinoline&quot;</span>),</span>
+<span id="cb32-3"><a href="features.html#cb32-3" tabindex="-1"></a>                       <span class="at">mz =</span> <span class="fu">c</span>(<span class="fl">120.0556</span>, <span class="fl">137.0709</span>, <span class="fl">146.0600</span>))</span>
+<span id="cb32-4"><a href="features.html#cb32-4" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroups, suspects, <span class="at">onlyHits =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div id="suspFormat" class="section level4 hasAnchor" number="4.5.3.1">
+<h4><span class="header-section-number">4.5.3.1</span> Suspect list format<a href="features.html#suspFormat" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>The example above has a very simple suspect list with just three compounds. The format of the suspect list is quite flexible, and can contain the following columns:</p>
 <ul>
 <li><code>name</code>: The name of the suspect. Mandatory and should be unique and file-name compatible (if not, the name will be automatically re-named to make it compatible).</li>
 <li><code>rt</code>: The retention time in seconds. Optional. If specified any feature groups with a different retention time will not be considered to match suspects.</li>
 <li><code>mz</code>, <code>SMILES</code>, <code>InChI</code>, <code>formula</code>, <code>neutralMass</code>: <em>at least</em> one of these columns must hold data for each suspect row. The <code>mz</code> column specifies the ionized mass of the suspect. If this is not available then data from any of the other columns is used to determine the suspect mass.</li>
 <li><code>adduct</code>: The adduct of the suspect. Optional. Set this if you are sure that a suspect should be matched by a particular adduct ion and no data in the <code>mz</code> column is available.</li>
-<li><code>fragments_mz</code> and <code>fragments_formula</code>: optional columns that may assist <a href="annotation.html#suspAnn">suspect annotation</a>.</li>
+<li><code>fragments_mz</code> and <code>fragments_formula</code>: optional columns that may assist <a href="annotation.html#estIDConf">ID confidence estimation</a>.</li>
+<li><code>mobility</code> and <code>CCS</code> columns: these are for <a href="IMSWorkflow.html#IMSWorkflow">IMS workflows</a> and can increase the confidence of a suspect match. This is discussed <a href="performing-ims-workflows.html#IMSSuspScr">here</a>.</li>
 </ul>
 <p>In most cases a suspect list is best made as a <code>csv</code> file which can then be imported with e.g. the <code>read.csv()</code> function. This is exactly what happen when you specify a suspect list when using the <code>newProject()</code> function.</p>
-<p>Quite often, the ionized masses are not readily available and these have to be calculated. In this case, data in any of the <code>SMILES</code>/<code>InChI</code>/<code>formula</code>/<code>neutralMass</code> columns should be provided. Whenever possible, it is <em>strongly</em> recommended to fill in <code>SMILES</code> column (or <code>InChI</code>), as this will assist <a href="annotation.html#suspAnn">annotation</a>. Applying this to the above example:</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="features.html#cb19-1" tabindex="-1"></a>suspects <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">name =</span> <span class="fu">c</span>(<span class="st">&quot;1H-benzotriazole&quot;</span>, <span class="st">&quot;N-Phenyl urea&quot;</span>, <span class="st">&quot;2-Hydroxyquinoline&quot;</span>),</span>
-<span id="cb19-2"><a href="features.html#cb19-2" tabindex="-1"></a>                       <span class="at">SMILES =</span> <span class="fu">c</span>(<span class="st">&quot;[nH]1nnc2ccccc12&quot;</span>, <span class="st">&quot;NC(=O)Nc1ccccc1&quot;</span>, <span class="st">&quot;Oc1ccc2ccccc2n1&quot;</span>))</span>
-<span id="cb19-3"><a href="features.html#cb19-3" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroups, suspects, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>)</span></code></pre></div>
+<p>Quite often, the ionized masses are not readily available and these have to be calculated. In this case, data in any of the <code>SMILES</code>/<code>InChI</code>/<code>formula</code>/<code>neutralMass</code> columns should be provided. Whenever possible, it is <em>strongly</em> recommended to fill in <code>SMILES</code> column (or <code>InChI</code>), as this will assist <a href="annotation.html#estIDConf">ID confidence estimation</a>. Applying this to the above example:</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="features.html#cb33-1" tabindex="-1"></a>suspects <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">name =</span> <span class="fu">c</span>(<span class="st">&quot;1H-benzotriazole&quot;</span>, <span class="st">&quot;N-Phenyl urea&quot;</span>, <span class="st">&quot;2-Hydroxyquinoline&quot;</span>),</span>
+<span id="cb33-2"><a href="features.html#cb33-2" tabindex="-1"></a>                       <span class="at">SMILES =</span> <span class="fu">c</span>(<span class="st">&quot;[nH]1nnc2ccccc12&quot;</span>, <span class="st">&quot;NC(=O)Nc1ccccc1&quot;</span>, <span class="st">&quot;Oc1ccc2ccccc2n1&quot;</span>))</span>
+<span id="cb33-3"><a href="features.html#cb33-3" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroups, suspects, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>, <span class="at">onlyHits =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <pre><code>#&gt; Calculating/Validating chemical data... Done!
 #&gt; ================================================================================
-#&gt; Found 3/3 suspects (100.00%)</code></pre>
+#&gt; Found 3/3 suspects (100.00%) with 5 hits in total</code></pre>
 <blockquote>
 <p><strong><em>NOTE</em></strong>: It is highly recommended to install <a href="https://github.com/openbabel/openbabel">OpenBabel</a> to automatically validate and amend chemical properties such as SMILES, InChI, formulae etc in the suspect list.</p>
 </blockquote>
 <p>Since suspect matching now occurs by the neutral mass it is required that the adduct information for the feature groups are set. This is done either by setting the <code>adduct</code> function argument to <code>screenSuspects</code> or by <a href="incorpAdductIso.html#incorpAdductIso">feature group adduct annotations</a>.</p>
 <p>Finally, when the adduct is known for a suspect it can be specified in the suspect list:</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="features.html#cb21-1" tabindex="-1"></a><span class="co"># Aldicarb is measured with a sodium adduct.</span></span>
-<span id="cb21-2"><a href="features.html#cb21-2" tabindex="-1"></a>suspects <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">name =</span> <span class="fu">c</span>(<span class="st">&quot;1H-benzotriazole&quot;</span>, <span class="st">&quot;N-Phenyl urea&quot;</span>, <span class="st">&quot;Aldicarb&quot;</span>),</span>
-<span id="cb21-3"><a href="features.html#cb21-3" tabindex="-1"></a>                       <span class="at">SMILES =</span> <span class="fu">c</span>(<span class="st">&quot;[nH]1nnc2ccccc12&quot;</span>, <span class="st">&quot;NC(=O)Nc1ccccc1&quot;</span>, <span class="st">&quot;CC(C)(C=NOC(=O)NC)SC&quot;</span>),</span>
-<span id="cb21-4"><a href="features.html#cb21-4" tabindex="-1"></a>                       <span class="at">adduct =</span> <span class="fu">c</span>(<span class="st">&quot;[M+H]+&quot;</span>, <span class="st">&quot;[M+H]+&quot;</span>, <span class="st">&quot;[M+Na]+&quot;</span>))</span>
-<span id="cb21-5"><a href="features.html#cb21-5" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroups, suspects)</span></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="features.html#cb35-1" tabindex="-1"></a><span class="co"># Aldicarb is measured with a sodium adduct.</span></span>
+<span id="cb35-2"><a href="features.html#cb35-2" tabindex="-1"></a>suspects <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">name =</span> <span class="fu">c</span>(<span class="st">&quot;1H-benzotriazole&quot;</span>, <span class="st">&quot;N-Phenyl urea&quot;</span>, <span class="st">&quot;Aldicarb&quot;</span>),</span>
+<span id="cb35-3"><a href="features.html#cb35-3" tabindex="-1"></a>                       <span class="at">SMILES =</span> <span class="fu">c</span>(<span class="st">&quot;[nH]1nnc2ccccc12&quot;</span>, <span class="st">&quot;NC(=O)Nc1ccccc1&quot;</span>, <span class="st">&quot;CC(C)(C=NOC(=O)NC)SC&quot;</span>),</span>
+<span id="cb35-4"><a href="features.html#cb35-4" tabindex="-1"></a>                       <span class="at">adduct =</span> <span class="fu">c</span>(<span class="st">&quot;[M+H]+&quot;</span>, <span class="st">&quot;[M+H]+&quot;</span>, <span class="st">&quot;[M+Na]+&quot;</span>))</span>
+<span id="cb35-5"><a href="features.html#cb35-5" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroups, suspects, <span class="at">onlyHits =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <p>To summarize:</p>
 <ul>
 <li>If a suspect has data in the <code>mz</code> column it will be directly matched with the <em>m/z</em> value of a feature group.</li>
 <li>Otherwise, if the suspect has data in the <code>adduct</code> column, the <code>m/z</code> value for the suspect is calculated from its neutral mass and the adduct and then matched with the <code>m/z</code> of a feature group.</li>
 <li>Otherwise, suspects and feature groups are matched by their the neutral mass.</li>
 </ul>
-<p>The <code>fragments_mz</code> and <code>fragments_formula</code> columns in the suspect list can be used to specify known fragments for a suspect, which can help <a href="annotation.html#suspAnn">suspect annotation</a>. The former specifies the ionized <em>m/z</em> of known MS/MS peaks, whereas the second specifies known formulas. Multiple values can be given by separating them with a semicolon:</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="features.html#cb22-1" tabindex="-1"></a>suspects <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">name =</span> <span class="fu">c</span>(<span class="st">&quot;1H-benzotriazole&quot;</span>, <span class="st">&quot;N-Phenyl urea&quot;</span>, <span class="st">&quot;2-Hydroxyquinoline&quot;</span>),</span>
-<span id="cb22-2"><a href="features.html#cb22-2" tabindex="-1"></a>                       <span class="at">SMILES =</span> <span class="fu">c</span>(<span class="st">&quot;[nH]1nnc2ccccc12&quot;</span>, <span class="st">&quot;NC(=O)Nc1ccccc1&quot;</span>, <span class="st">&quot;Oc1ccc2ccccc2n1&quot;</span>),</span>
-<span id="cb22-3"><a href="features.html#cb22-3" tabindex="-1"></a>                       <span class="at">fragments_formula =</span> <span class="fu">c</span>(<span class="st">&quot;C6H6N&quot;</span>, <span class="st">&quot;C6H8N;C7H6NO&quot;</span>, <span class="st">&quot;&quot;</span>),</span>
-<span id="cb22-4"><a href="features.html#cb22-4" tabindex="-1"></a>                       <span class="at">fragments_mz =</span> <span class="fu">c</span>(<span class="st">&quot;&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="st">&quot;118.0652&quot;</span>))</span></code></pre></div>
+<p>The <code>fragments_mz</code> and <code>fragments_formula</code> columns in the suspect list can be used to specify known fragments for a suspect, which can help <a href="annotation.html#estIDConf">ID confidence estimation for suspects</a>. The former specifies the ionized <em>m/z</em> of known MS/MS peaks, whereas the second specifies known formulas. Multiple values can be given by separating them with a semicolon:</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="features.html#cb36-1" tabindex="-1"></a>suspects <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">name =</span> <span class="fu">c</span>(<span class="st">&quot;1H-benzotriazole&quot;</span>, <span class="st">&quot;N-Phenyl urea&quot;</span>, <span class="st">&quot;2-Hydroxyquinoline&quot;</span>),</span>
+<span id="cb36-2"><a href="features.html#cb36-2" tabindex="-1"></a>                       <span class="at">SMILES =</span> <span class="fu">c</span>(<span class="st">&quot;[nH]1nnc2ccccc12&quot;</span>, <span class="st">&quot;NC(=O)Nc1ccccc1&quot;</span>, <span class="st">&quot;Oc1ccc2ccccc2n1&quot;</span>),</span>
+<span id="cb36-3"><a href="features.html#cb36-3" tabindex="-1"></a>                       <span class="at">fragments_formula =</span> <span class="fu">c</span>(<span class="st">&quot;C6H6N&quot;</span>, <span class="st">&quot;C6H8N;C7H6NO&quot;</span>, <span class="st">&quot;&quot;</span>),</span>
+<span id="cb36-4"><a href="features.html#cb36-4" tabindex="-1"></a>                       <span class="at">fragments_mz =</span> <span class="fu">c</span>(<span class="st">&quot;&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="st">&quot;118.0652&quot;</span>))</span></code></pre></div>
 </div>
-<div id="removing-feature-groups-without-hits" class="section level4 hasAnchor" number="4.3.2.2">
-<h4><span class="header-section-number">4.3.2.2</span> Removing feature groups without hits<a href="features.html#removing-feature-groups-without-hits" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div id="removing-feature-groups-without-hits" class="section level4 hasAnchor" number="4.5.3.2">
+<h4><span class="header-section-number">4.5.3.2</span> Removing feature groups without hits<a href="features.html#removing-feature-groups-without-hits" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>Note that any feature groups that were not matched to a suspect are <em>not</em> removed by default. If you want to remove these, you can use the <code>onlyHits</code> parameter:</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="features.html#cb23-1" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroups, suspects, <span class="at">onlyHits =</span> <span class="cn">TRUE</span>) <span class="co"># remove any non-hits immediately</span></span></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="features.html#cb37-1" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroups, suspects, <span class="at">onlyHits =</span> <span class="cn">TRUE</span>) <span class="co"># remove any non-hits immediately</span></span></code></pre></div>
 <p>The advantage of removing non-hits is that it may significantly reduce the complexity of your dataset. On the other hand, retaining all features allows you to mix a full non-target analysis with a suspect screening workflow. The <code>filter()</code> function (discussed <a href="filtering.html#filtering">here</a>) can also be used to remove feature groups without a hit at a later stage.</p>
 </div>
-<div id="combining-screening-results" class="section level4 hasAnchor" number="4.3.2.3">
-<h4><span class="header-section-number">4.3.2.3</span> Combining screening results<a href="features.html#combining-screening-results" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div id="combining-screening-results" class="section level4 hasAnchor" number="4.5.3.3">
+<h4><span class="header-section-number">4.5.3.3</span> Combining screening results<a href="features.html#combining-screening-results" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>The <code>amend</code> function argument to <code>screenSuspects</code> can be used to combine screening results from different suspect lists.</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="features.html#cb24-1" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroups, suspects)</span>
-<span id="cb24-2"><a href="features.html#cb24-2" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroupsSusp, suspects2, <span class="at">onlyHits =</span> <span class="cn">TRUE</span>, <span class="at">amend =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="features.html#cb38-1" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroups, suspects)</span>
+<span id="cb38-2"><a href="features.html#cb38-2" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroupsSusp, suspects2, <span class="at">onlyHits =</span> <span class="cn">TRUE</span>, <span class="at">amend =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <p>In this example the suspect lists defined in <code>suspects</code> and <code>suspects2</code> are both used for screening. By setting <code>amend=TRUE</code> the original screening results (i.e. from <code>suspects</code>) are preserved. Note that <code>onlyHits</code> should only be set in the final call to <code>screenSuspects</code> to ensure that all feature groups are screened.</p>
 </div>
+</div>
+<div id="importFeat" class="section level3 hasAnchor" number="4.5.4">
+<h3><span class="header-section-number">4.5.4</span> Importing feature data<a href="features.html#importFeat" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The <code>importFeatures()</code> and <code>importFeatureGroups()</code> functions can be used to import existing feature data. This is useful when you have already performed feature finding and/or grouping with another software or package, or when you want to use features from a previous workflow run.</p>
+<p>The most important input types are:</p>
+<table>
+<colgroup>
+<col width="16%" />
+<col width="83%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Input type</th>
+<th>Remarks</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>"xcms"</code></td>
+<td>Imports an <code>xcmsSet</code> object from <a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS</a>.</td>
+</tr>
+<tr class="even">
+<td><code>"xcms3"</code></td>
+<td>Imports an <code>XCMSnExp</code> object from <a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS</a>.</td>
+</tr>
+<tr class="odd">
+<td><code>"kpic2"</code></td>
+<td>Imports a <code>PIC set</code> object from <a href="https://github.com/hcji/KPIC2">KPIC2</a>.</td>
+</tr>
+<tr class="even">
+<td><code>"table"</code></td>
+<td>Imports data from a table (e.g. <code>data.frame</code> or <code>.csv</code> file).</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>table</code> input type allows the import of data from any external feature detection algorithm, and follows the the format of the <code>as.data.table()</code> function <a href="procInspect.html#procInspect">introduced later</a>.</p>
+<p>A workflow where data is first exported and later re-imported can be useful to modify feature data outside <code>patRoon</code>. For instance, the <a href="exportFeat.html#exportFeat">export functionality</a> can be used to export <code>XCMS</code> feature data, process it with <a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS</a> and then re-import it with <code>importFeatures()</code> or <code>importFeatureGroups</code> to continue the <code>patRoon</code> workflow. Similarly, the <code>as.data.table()</code> function can be used to export feature data to a <code>data.table</code>, which can then be modified and re-imported.</p>
+<p>Some examples are shown below:</p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="features.html#cb39-1" tabindex="-1"></a>fListXCMSImp <span class="ot">&lt;-</span> <span class="fu">importFeatures</span>(xset, <span class="st">&quot;xcms&quot;</span>, anaInfo) <span class="co"># import XCMS xcmsSet object</span></span>
+<span id="cb39-2"><a href="features.html#cb39-2" tabindex="-1"></a>fGroupsXCMS3 <span class="ot">&lt;-</span> <span class="fu">importFeatureGroups</span>(xs, <span class="st">&quot;xcms3&quot;</span>, anaInfo) <span class="co"># import XCMSnExp object with grouped features</span></span>
+<span id="cb39-3"><a href="features.html#cb39-3" tabindex="-1"></a></span>
+<span id="cb39-4"><a href="features.html#cb39-4" tabindex="-1"></a><span class="co"># export, modify and re-import features</span></span>
+<span id="cb39-5"><a href="features.html#cb39-5" tabindex="-1"></a>fListTab <span class="ot">&lt;-</span> <span class="fu">as.data.table</span>(fList)</span>
+<span id="cb39-6"><a href="features.html#cb39-6" tabindex="-1"></a>fListTab[, mz <span class="sc">:=</span> mz <span class="sc">*</span> <span class="fl">1.0001</span>] <span class="co"># modify the m/z values</span></span>
+<span id="cb39-7"><a href="features.html#cb39-7" tabindex="-1"></a>fList <span class="ot">&lt;-</span> <span class="fu">importFeatures</span>(fListTab, <span class="st">&quot;table&quot;</span>, anaInfo) <span class="co"># re-import the modified features</span></span></code></pre></div>
+<p>See the reference manual for more details, especially for tabular data import (<code>?importFeatures</code>, <code>?importFeatureGroups</code>).</p>
+</div>
+</div>
+<h3>References</h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-Dietrich2021" class="csl-entry">
+Dietrich, Christian, Arne Wick, and Thomas A. Ternes. 2021. <span>“Open-Source Feature Detection for Non-Target LC–MS Analytics.”</span> <em>Rapid Communications in Mass Spectrometry</em> 36 (2). <a href="https://doi.org/10.1002/rcm.9206">https://doi.org/10.1002/rcm.9206</a>.
 </div>
 </div>
             </section>
@@ -656,7 +776,7 @@ div.csl-indent {
           </div>
         </div>
       </div>
-<a href="preparations.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="example-data.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
 <a href="componentization.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>

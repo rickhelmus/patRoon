@@ -2,13 +2,6 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-context("compounds clustering")
-
-getClustObjForCompare <- function(obj)
-{
-    # BUG: testthat suddenly cannot compare distance matrices, so focus on other slots...
-    list(obj@clusters, obj@SMILES, obj@cutClusters, obj@properties)
-}
 
 hasMetfrag <- TRUE # !is.null(getOption("patRoon.path.MetFragCL")) && nzchar(getOption("patRoon.path.MetFragCL"))
 
@@ -27,22 +20,22 @@ if (hasMetfrag)
 test_that("verify compound cluster generation", {
     skip_if_not(hasMetfrag)
 
-    expect_known_value(getClustObjForCompare(compsClust), testFile("compounds-clust"))
-    expect_known_show(compsClust, testFile("compounds-clust", text = TRUE))
+    expect_known_val(compsClust, "compounds-clust")
+    expect_known_show(compsClust, "compounds-clust")
     # should have clusters for same number of feature groups with compounds
     expect_length(clusters(compsClust), length(annotations(compounds)))
 
     expect_length(compsClustEmpty, 0)
-    expect_known_show(compsClustEmpty, testFile("compounds-clust-empty", text = TRUE))
+    expect_known_show(compsClustEmpty, "compounds-clust-empty")
 })
 
 test_that("basic subsetting", {
     skip_if_not(hasMetfrag)
 
     expect_length(compsClust["nope"], 0)
-    expect_equivalent(groupNames(compsClust[1:2]), groupNames(compsClust)[1:2])
-    expect_equivalent(groupNames(compsClust[groupNames(compsClust)[2:3]]), groupNames(compsClust)[2:3])
-    expect_equivalent(groupNames(compsClust[c(FALSE, TRUE)]), groupNames(compsClust)[c(FALSE, TRUE)])
+    expect_equal(groupNames(compsClust[1:2]), groupNames(compsClust)[1:2])
+    expect_equal(groupNames(compsClust[groupNames(compsClust)[2:3]]), groupNames(compsClust)[2:3])
+    expect_equal(groupNames(compsClust[c(FALSE, TRUE)]), groupNames(compsClust)[c(FALSE, TRUE)])
     expect_equal(length(compsClust[FALSE]), 0)
     expect_length(compsClustEmpty[1:5], 0)
 })
@@ -50,9 +43,8 @@ test_that("basic subsetting", {
 test_that("override cutting clusters work", {
     skip_if_not(hasMetfrag)
 
-    expect_equivalent(lengths(treeCut(compsClust, k = 2, groupName = firstGroup))[1], 2)
-    expect_equal(getClustObjForCompare(treeCutDynamic(compsClust, groupName = firstGroup)),
-                 getClustObjForCompare(compsClust))
+    expect_equal(lengths(treeCut(compsClust, k = 2, groupName = firstGroup))[1], 2, ignore_attr = TRUE)
+    expect_equal(treeCutDynamic(compsClust, groupName = firstGroup), compsClust)
 })
 
 test_that("plotting works", {

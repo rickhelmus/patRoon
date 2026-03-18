@@ -4,22 +4,29 @@
 \alias{importFeatureGroupsXCMS}
 \title{Imports feature groups from XCMS (old interface)}
 \usage{
-importFeatureGroupsXCMS(xs, analysisInfo)
+importFeatureGroupsXCMS(input, analysisInfo)
 }
 \arguments{
-\item{xs}{An \code{\link{xcmsSet}} object.}
+\item{input}{An \code{\link{xcmsSet}} object.}
 
-\item{analysisInfo}{A \code{data.frame} with \link[=analysis-information]{Analysis information}.}
+\item{analysisInfo}{A \code{data.frame} (or \code{data.table}) with \link[=analysis-information]{Analysis
+information}.}
 }
 \value{
 An object of a class which is derived from \code{\link{featureGroups}}.
 }
 \description{
-Imports grouped features from a legacy \code{\link{xcmsSet}} object from the \pkg{xcms} package.
+Imports feature groups from XCMS (old interface)
+}
+\details{
+This function imports data from XCMS. This function is called when calling \code{importFeatureGroups} with
+  \code{type="xcms"}.
 }
 \references{
 \addCitations{xcms}
 }
 \seealso{
-\code{\link{importFeaturesXCMS3}} and \code{\link{groupFeatures}}
+\code{\link{importFeatureGroups}} for more details and other algorithms.
+
+\code{\link{groupFeaturesXCMS}}
 }

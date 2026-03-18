@@ -5,7 +5,7 @@ library(patRoon)
 # initialization
 # -------------------------
 
-workPath <- "test_temp/test-np/annotations-compon_camera_nosel"
+workPath <- "<WORK_PATH>/test-np/annotations-compon_camera_nosel"
 setwd(workPath)
 
 # NOTE: please set to a valid data.frame with analysis information. See ?`analysis-information` for more details.

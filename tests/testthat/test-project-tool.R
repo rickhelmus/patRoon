@@ -2,8 +2,6 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-local_edition(3) # for snapshots
-
 testBaseDir <- getWorkPath("test-np")
 defaultTestDir <- file.path(testBaseDir, "default")
 suspectsPaths <- list(
@@ -134,6 +132,9 @@ testNewProj <- function(..., name, CCSCalib = "", aid = list())
         inp <- gsub(patRoonData::exampleDataPath("negative"), "<EXAMPLE_DATA_PATH_NEG>", inp, fixed = TRUE)
         inp <- gsub(patRoonDataIMS::exampleDataPath("positive"), "<EXAMPLE_DATA_PATH_IMS_POS>", inp, fixed = TRUE)
         inp <- gsub(patRoonDataIMS::exampleDataPath("negative"), "<EXAMPLE_DATA_PATH_IMS_NEG>", inp, fixed = TRUE)
+        wh <- grepl("path_centroid", inp)
+        inp[wh] <- gsub("\ +", " ", inp[wh]) # remove extra spaces in embedded anaInfo tab for better comparability
+        inp <- gsub(getWorkPath(), "<WORK_PATH>", inp, fixed = TRUE)
         return(inp)
     })
     
@@ -176,7 +177,8 @@ testNewProj <- function(..., name, CCSCalib = "", aid = list())
 }
 
 test_that("Default settings", {
-    expect_snapshot_file(file.path(defaultTestDir, "process.R"), name = "default_process.R", cran = TRUE)
+    expect_snapshot_file(file.path(defaultTestDir, "process.R"), name = "default_process.R", cran = TRUE,
+                         transform = \(inp) gsub(getWorkPath(), "<WORK_PATH>", inp, fixed = TRUE))
     expect_snapshot_file(file.path(defaultTestDir, "report.yml"), name = "default_report.yml", cran = TRUE)
     expect_snapshot_file(file.path(defaultTestDir, "limits.yml"), name = "default_limits.yml", cran = TRUE)
 })
@@ -348,7 +350,7 @@ test_that("Feature settings", {
                 features = list(fGroupsAdv = list(featNorm = "istd",
                                                   ISTDLists = list(sets = list(pos = "istd-pos", neg = "istd-neg")))),
                 name = "features-norm_istd_sets")
-    testNewProj(features = list(exSuspList = TRUE, fGroupsAdv = list(featNorm = "istd")),
+    testNewProj(features = list(fGroupsAdv = list(featNorm = "istd")),
                 name = "features-norm_istd_ex")
     testNewProj(features = list(fGroupsAdv = list(featNorm = "tic", groupNorm = TRUE)),
                 name = "features-norm_tic_group")
@@ -389,6 +391,12 @@ test_that("TP settings", {
     testNewProj(annotations = list(compoundsAlgo = "MetFrag"),
                 TPs = list(TPsAlgo = "biotransformer", TPGenInput = "suspects", TPSuspectList = "suspects",
                            TPDoMFDB = FALSE), name = "tp-biotransformer_no_mfdb")
+    testNewProj(general = list(IMS = list(mode = "direct")),
+                features = list(featAlgo = "piek", fGroupsAlgo = "Greedy"),
+                annotations = list(compoundsAlgo = "MetFrag"),
+                TPs = list(TPsAlgo = "biotransformer", TPGenInput = "suspects", TPSuspectList = "suspects",
+                           suspCCSPred = "c3sdb"),
+                name = "tp-biotransformer_ims")
     testNewProj(features = list(exSuspList = TRUE),
                 TPs = list(TPsAlgo = "cts", TPGenInput = "screening"), name = "tp-cts_scr")
     testNewProj(TPs = list(TPsAlgo = "library", TPGenInput = "all"), name = "tp-library")
@@ -407,5 +415,9 @@ test_that("Report settings", {
 
 test_that("Old setting conversion", {
     expect_snapshot(readProjectSettings(file.path(getTestDataPath(), "newProject-23.yml"), defaultTestDir),
-                    cran = TRUE)
+                    cran = TRUE, transform = function(inp)
+                    {
+                        inp <- gsub(getWorkPath(), "<WORK_PATH>", inp, fixed = TRUE)
+                        return(inp)
+                    })
 })

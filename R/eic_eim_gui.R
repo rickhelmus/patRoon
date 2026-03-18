@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
+# nocov start
+
 #' Launch EIC/EIM GUI
 #'
 #' Launches a Shiny app for generating and plotting EICs and EIMs.
@@ -959,3 +961,5 @@ createEICGUI <- function(obj, analysisInfo, suspects = NULL)
     
     return(list(ui = ui, server = server))
 }
+
+# nocov end

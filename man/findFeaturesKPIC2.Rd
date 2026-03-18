@@ -14,7 +14,8 @@ findFeaturesKPIC2(
 )
 }
 \arguments{
-\item{analysisInfo}{A \code{data.frame} with \link[=analysis-information]{Analysis information}.}
+\item{analysisInfo}{A \code{data.frame} (or \code{data.table}) with \link[=analysis-information]{Analysis
+information}.}
 
 \item{kmeans}{If \code{TRUE} then \code{\link[KPIC]{getPIC.kmeans}} is used to obtain PICs, otherwise it is
 \code{\link[KPIC]{getPIC}}.}
@@ -23,7 +24,7 @@ findFeaturesKPIC2(
 
 \item{\dots}{Further parameters passed to \code{\link[KPIC]{getPIC}}/\code{\link[KPIC]{getPIC.kmeans}}}
 
-\item{parallel}{If set to \code{TRUE} then code is executed in parallel through the \CRANpkg{futures} package. Please
+\item{parallel}{If set to \code{TRUE} then code is executed in parallel through the \CRANpkg{future} package. Please
 see the parallelization section in the handbook for more details.}
 
 \item{verbose}{If set to \code{FALSE} then no text output is shown.}
@@ -40,8 +41,8 @@ This function uses KPIC2 to automatically find features. This function is called
 
 The MS files should be in the \code{mzML} or \code{mzXML} format.
 
-The input MS data files need to be centroided. The \code{\link{convertMSFiles}} function can be used to
-  centroid data.
+The input MS data files need to be centroided. The \code{\link{convertMSFiles}} function can be used
+  to centroid data.
 }
 \references{
 \insertRef{Ji2017}{patRoon}

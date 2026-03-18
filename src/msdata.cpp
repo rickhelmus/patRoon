@@ -118,7 +118,6 @@ RCPP_MODULE(MSReadBackend)
         .derives<MSReadBackend>("MSReadBackend")
         .constructor()
         .method("generateSpecMetadata", &MSReadBackendMSTK::generateSpecMetadata)
-        .method("getBackends", &MSReadBackendMSTK::getBackends)
     ;
     Rcpp::class_<MSReadBackendOTIMS>("MSReadBackendOTIMS")
         .derives<MSReadBackend>("MSReadBackend")

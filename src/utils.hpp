@@ -33,27 +33,43 @@ template <typename C> C median(std::vector<C> v)
 
 // get sorted indices
 // inspired from https://stackoverflow.com/a/40183830
-template <typename C, typename F> std::vector<size_t> getSortedInds(const C &cont, F func)
+template <typename C> std::vector<size_t> getSortedInds(const C &cont, bool ascending = true)
 {
     std::vector<size_t> ret(cont.size());
     std::iota(ret.begin(), ret.end(), 0);
-    std::sort(ret.begin(), ret.end(), [&](size_t i, size_t j) { return func(i, j); });
+    if (ascending)
+    {
+        /*std::sort(ret.begin(), ret.end(), [&](size_t i, size_t j)
+        { return std::tie(cont[i], i) < std::tie(cont[j], j); });*/
+         std::stable_sort(ret.begin(), ret.end(), [&](size_t i, size_t j) { return cont[i] < cont[j]; });
+    }
+    else
+    {
+        /*std::sort(ret.begin(), ret.end(), [&](size_t i, size_t j)
+        { return std::tie(cont[i], i) > std::tie(cont[j], j); });*/
+        std::stable_sort(ret.begin(), ret.end(), [&](size_t i, size_t j) { return cont[i] > cont[j]; });
+    }
     return ret;
 }
 
-template <typename C> std::vector<size_t> getSortedInds(const C &cont)
+template <typename C1, typename C2> std::vector<size_t> getSortedInds2D(const C1 &cont1, const C2 &cont2)
 {
-    std::vector<size_t> ret(cont.size());
+    std::vector<size_t> ret(cont1.size());
     std::iota(ret.begin(), ret.end(), 0);
-    std::sort(ret.begin(), ret.end(), [&](size_t i, size_t j) { return cont[i] < cont[j]; });
+    std::sort(ret.begin(), ret.end(), [&](size_t i, size_t j)
+    {
+        return std::tie(cont1[i], cont2[i], i) < std::tie(cont1[j], cont2[j], j);
+    });
     return ret;
 }
 
 template <typename IT> std::vector<size_t> getSortedInds(const IT &start, const IT &end)
 {
-    std::vector<size_t> ret(std::distance(start, end+1));
+    std::vector<size_t> ret(std::distance(start, end + 1));
     std::iota(ret.begin(), ret.end(), 0);
-    std::sort(ret.begin(), ret.end(), [&](size_t i, size_t j) { return *(start + i) < *(start + j); });
+    /*std::sort(ret.begin(), ret.end(), [&](size_t i, size_t j)
+    { return std::tie(*(start + i), i) < std::tie(*(start + j), j); });*/
+    std::stable_sort(ret.begin(), ret.end(), [&](size_t i, size_t j) { return *(start + i) < *(start + j); });
     return ret;
 }
 
@@ -64,7 +80,7 @@ template <typename IT1, typename IT2> std::vector<size_t> getSortedInds2D(const 
     std::iota(ret.begin(), ret.end(), 0);
     std::sort(ret.begin(), ret.end(), [&](size_t i, size_t j)
     {
-        return std::tie(*(start1 + i), *(start2 + i)) < std::tie(*(start1 + j), *(start2 + j));
+        return std::tie(*(start1 + i), *(start2 + i), i) < std::tie(*(start1 + j), *(start2 + j), j);
     });
     return ret;
 }
@@ -76,7 +92,7 @@ getSortedInds3D(const IT1 &start1, const IT1 &end1, const IT2 &start2, const IT3
     std::iota(ret.begin(), ret.end(), 0);
     std::sort(ret.begin(), ret.end(), [&](size_t i, size_t j)
     {
-        return std::tie(*(start1 + i), *(start2 + i), *(start3 + i)) < std::tie(*(start1 + j), *(start2 + j), *(start3 + j));
+        return std::tie(*(start1 + i), *(start2 + i), *(start3 + i), i) < std::tie(*(start1 + j), *(start2 + j), *(start3 + j), j);
     });
     return ret;
 }

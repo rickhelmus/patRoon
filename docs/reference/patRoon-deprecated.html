@@ -18,7 +18,7 @@ future."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mat
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.0</span>
       </span>
     </div>
 
@@ -97,25 +97,9 @@ future.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">reportMD</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">reportHTML</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">exportDAFiles</span><span class="op">(</span></span>
-<span>  <span class="va">anaInfo</span>,</span>
-<span>  format <span class="op">=</span> <span class="st">"mzML"</span>,</span>
-<span>  exportLine <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  outPath <span class="op">=</span> <span class="va">anaInfo</span><span class="op">$</span><span class="va">path</span>,</span>
-<span>  overWrite <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">plotEIC</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">groups</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">plotSpec</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">formulaTable</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">compoundTable</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">annotateSuspects</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -125,39 +109,12 @@ future.</p>
 <dl><dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Passed to successor function.</p></dd>
 
-
-<dt id="arg-format">format<a class="anchor" aria-label="anchor" href="#arg-format"></a></dt>
-<dd><p>The output format of exported files. Should be either
-<code>"mzXML"</code>, <code>"mzML"</code> or <code>"mzData"</code>.</p></dd>
-
-
-<dt id="arg-exportline">exportLine<a class="anchor" aria-label="anchor" href="#arg-exportline"></a></dt>
-<dd><p>Export line spectra (<code>TRUE</code>) or profile spectra
-(<code>FALSE</code>). Usually line spectra are preferred, since profile spectra
-use signficantly more disk space and increase required memory during
-processing.</p></dd>
-
-
-<dt id="arg-outpath">outPath<a class="anchor" aria-label="anchor" href="#arg-outpath"></a></dt>
-<dd><p>Character vector of output paths for exported analyses. Will
-be recycled if necessary.</p></dd>
-
-
-<dt id="arg-overwrite">overWrite<a class="anchor" aria-label="anchor" href="#arg-overwrite"></a></dt>
-<dd><p>If <code>TRUE</code> existing files will be overwritten.</p></dd>
-
 </dl></div>
     <div id="details">
     <h2>Details</h2>
-    <p><code>reportMD</code> performs HTML reporting, please use
-  <code><a href="reporting-legacy.html">reportHTML</a></code> instead.</p>
-<p><code>exportDAFiles</code> will export a set of analyses either in
-  <code class="file">.mzXML</code> or <code class="file">.mzML</code> formats.</p>
-<p>Please use <code><a href="generics.html">plotChroms</a></code> instead.</p>
-<p>Please use <code><a href="featureGroups-class.html">groupTable</a></code> instead.</p>
-<p>Please use <code><a href="generics.html">plotSpectrum</a></code> instead.</p>
-<p>Please use <code><a href="generics.html">annotations</a></code> instead.</p>
-<p>Please use <code><a href="generics.html">annotations</a></code> instead.</p>
+    <p><code>reportHTML</code> performs HTML reporting, please use
+  <code><a href="reporting.html">report</a></code> instead.</p>
+<p>Please use <code><a href="id-conf.html">estimateIDConfidence</a></code> instead.</p>
     </div>
 
   </div>

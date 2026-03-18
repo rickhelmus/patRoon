@@ -505,7 +505,7 @@ Rcpp::IntegerVector findFeatTableDups(const Rcpp::NumericVector &rts, const Rcpp
     };
 
     const bool hasMobs = mobs.size() > 0;
-    const auto intSortedInds = getSortedInds(ints, [&ints](size_t i, size_t j) { return ints[i] > ints[j]; });
+    const auto intSortedInds = getSortedInds(ints, false);
     
     for (size_t i=0; i<intSortedInds.size()-1; ++i)
     {

@@ -5,7 +5,7 @@ library(patRoon)
 # initialization
 # -------------------------
 
-workPath <- "test_temp/test-np/analysis-dyn"
+workPath <- "<WORK_PATH>/test-np/analysis-dyn"
 setwd(workPath)
 
 anaInfo <- generateAnalysisInfo(fromRaw = "raw", fromCentroid = "centroid", fromProfile = "profile", fromIMS = "ims",

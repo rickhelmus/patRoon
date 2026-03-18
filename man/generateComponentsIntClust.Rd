@@ -15,7 +15,8 @@ generateComponentsIntClust(fGroups, ...)
   average = TRUE,
   maxTreeHeight = 1,
   deepSplit = TRUE,
-  minModuleSize = 1
+  minModuleSize = 1,
+  IMS = "maybe"
 )
 }
 \arguments{
@@ -33,6 +34,19 @@ normalization and averaging of data.}
 
 \item{maxTreeHeight, deepSplit, minModuleSize}{Arguments used by
 \code{\link{cutreeDynamicTree}}.}
+
+\item{IMS}{\IMSWF Specifies which feature groups are considered for componentization in IMS workflows. The following options
+  are valid: \itemize{
+
+  \item \code{"both"}: Selects IMS and non-IMS features.
+
+  \item \code{"maybe"}: Selects non-IMS features and IMS features without assigned IMS parent.
+
+  \item \code{FALSE}: Selects only non-IMS features.
+
+  \item \code{TRUE}: Selects only IMS features.
+
+  }}
 }
 \value{
 The components are stored in objects derived from \code{\link{componentsIntClust}}.
@@ -50,6 +64,17 @@ Hierarchical clustering is performed on normalized (and optionally replicate ave
   \code{\link[fastcluster:hclust]{fastcluster::hclust}}. The clustering of the resulting components can be further
   visualized and modified using the methods defined for \code{\link{componentsIntClust}}.
 }
+\section{IMS workflows}{
+ In IMS workflows with post mobility assignment (see
+  \code{\link[=assignMobilities_feat]{assignMobilities}}) it may be necessary to call \code{\link{expandForIMS}} when
+  componentization was performed \emph{prior} to mobility assignments, see its documentation for more details.
+
+  If mobilities were already assigned prior to componentization, then the \code{IMS} argument selects which feature
+  groups are subjected to componentization. Data for mobility feature groups that were not considered (\emph{i.e.}
+  when \code{IMS} is \code{FALSE} or \code{"maybe"}), will be expanded similarly as is done by
+  \code{\link{expandForIMS}}.
+}
+
 \section{Sets workflows}{
  In a \link[=sets-workflow]{sets workflow} normalization of feature intensities occur per
   set.

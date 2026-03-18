@@ -24,7 +24,7 @@ MSFileExtensions <- function()
          mzXML = "mzXML")
 }
 
-getMSReadBackends <- function() c("opentims", "mzr", "mstoolkit", "streamcraft")
+getMSReadBackends <- function() c("mzr", "mstoolkit", "streamcraft", "opentims")
 
 getMSDataFileHash <- function(path)
 {
@@ -240,7 +240,7 @@ doGetEICs <- function(anaInfo, EICInfoList, gapFactor, minIntensityIMS = 0, mode
         {
 
             ToDo <- EICInfo[isCached == FALSE]
-            openMSReadBackend(backend, path)
+            openMSReadBackend(backend, path, genMobilities = needIMS && mode == "full")
             
             newEICs <- getEICList(backend, ToDo$mzmin, ToDo$mzmax, ToDo$retmin, ToDo$retmax, ToDo$mobmin,
                                   ToDo$mobmax, gapFactor, minIntensityIMS, mode, sumWindowMZ, sumWindowMob,
@@ -301,7 +301,7 @@ doGetEIMs <- function(anaInfo, EIMInfoList, minIntensity, smooth, smLength, sgOr
 
         ToDo <- EIMInfo[isCached == FALSE]
         
-        openMSReadBackend(backend, path)
+        openMSReadBackend(backend, path, genMobilities = TRUE)
         
         # NOTE: getEIMList() return lists, which are converted to data.frames and is a lot faster than returning
         # data.frames directly.

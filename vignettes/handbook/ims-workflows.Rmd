@@ -18,7 +18,7 @@ The following sections further detail each of these workflows, including the req
 
 > **_NOTE_** While IMS workflows are largely the same as non-IMS workflows, there are some important considerations (outlined in this chapter). It is highly recommended to experiment with the [newProject tool](#newProject) and study the [example workflow](#exIMSWorkflow) to get a feeling of how IMS workflows work.
 
-> **_NOTE_** IMS workflows have been primarily developed with Bruker TIMS and Agilent IMS data. Most of the functionality was designed to be generic and applicable to other IMS data as well, but data from other instruments likely need to be optimized. Furthermore, mobility <--> CCS conversion is not yet supported for other instruments. Contributions to test and extend support for other instruments are _very welcome!_
+> **_NOTE_** IMS workflows have been primarily developed with Bruker TIMS and Agilent IMS data. Most of the functionality was designed to be generic and applicable to other IMS data as well, but data from other instruments likely need to be optimized. Furthermore, mobility and CCS conversion is not yet supported for other instruments. Contributions to test and extend support for other instruments are _very welcome!_
 
 ### LC-MS workflows with IMS data
 
@@ -211,18 +211,18 @@ fGroups <- assignMobilities(fGroups, ..., EIMParams = getDefEIMParams(IMS = "agi
 
 Further details are found in the reference manual (`?assignMobilities_feat`).
 
-### Mobility <--> CCS conversion {#mobCCSConv}
+### Mobility and CCS conversion {#mobCCSConv}
 
-Conversion of mobility <--> CCS values in DMA and PMA workflows is performed with the `assignMobilities()` function introduced in the previous section, and is activated if its `CCSParams` function argument is set. This argument should be assigned with a `list` that contains the parameters to configure the conversions process. The parameters are instrument specific and the parameter list can be obtained with the `getCCSParams()` function. The most important arguments for `getCCSParams()` are:
+Conversion of mobility and CCS values in DMA and PMA workflows is performed with the `assignMobilities()` function introduced in the previous section, and is activated if its `CCSParams` function argument is set. This argument should be assigned with a `list` that contains the parameters to configure the conversions process. The parameters are instrument specific and the parameter list can be obtained with the `getCCSParams()` function. The most important arguments for `getCCSParams()` are:
 
 Function argument | Description
 ----------------- | ---------------------------------------------------------------
 `method`          | Specifies the conversion method. Valid values are: `"bruker"`, `"mason-schamp_k"` `"mason-schamp_1/k"` or `"agilent"`.
 `calibrant`       | Specifies the calibrant file or parameters if `method="agilent"`.
 
-The function currently only supports Bruker TIMS and Agilent IMS data (contributions to Waters data and information are _very welcome!_). For Bruker TIMS instruments, the `method` should be set to `"bruker"` or `"mason-schamp_1/k"`. The former relies on the Bruker TDF-SDK (see the [Installation](#Installation) chapter to install it). The latter doesn't, but may give very minor differences in the results compared to how Bruker software performs its calculations. For Agilent IMS data, the `method` should be set to `"agilent"` and the `calibrant` argument should be set to configure the calibration settings. The value for `calibrant` is either a file path to the `.d` or `‘OverrideImsCal.xml` file that should be used for re-calibration, or a `list` with the elements `massGas`, `TFix` and `beta`. It is recommended to read the reference manual for the `getCCSParams()` function for more details (`?getCCSParams`).
+The function currently only supports Bruker TIMS and Agilent IMS data (contributions to Waters data and information are _very welcome!_). For Bruker TIMS instruments, the `method` should be set to `"bruker"` or `"mason-schamp_1/k"`. The former relies on the Bruker TDF-SDK (see the [Installation](#Installation) chapter to install it). The latter doesn't, but may give very minor differences in the results compared to how Bruker software performs its calculations. For Agilent IMS data, the `method` should be set to `"agilent"` and the `calibrant` argument should be set to configure the calibration settings. The value for `calibrant` is either a file path to the `.d` or `OverrideImsCal.xml` file that should be used for re-calibration, or a `list` with the elements `massGas`, `TFix` and `beta`. It is recommended to read the reference manual for the `getCCSParams()` function for more details (`?getCCSParams`).
 
-Some examples of how to use `assignMobilities()` for mobility <--> CCS conversion are given below:
+Some examples of how to use `assignMobilities()` for mobility and CCS conversion are given below:
 
 ```{r exMobCCS, eval=FALSE}
 # conversion of Bruker TIMS data using the TDF-SDK
@@ -259,12 +259,12 @@ Function argument | Description
 ----------------- | ---------------------------------------------------------------
 `from`            | Specifies from where IMS data is added. See below for more details.
 `adducts`         | Specifies for which adducts IMS data is added or converted. A `character` vector with multiple values is allowed. Include `NA` to also consider the usage of non-adduct specific data. Any adducts specified in the suspect list (`adduct` column) are always considered.
-`CCSParams`       | Parameters for the mobility <--> CCS conversions. See [its previous introduction](#mobCCSConv).
+`CCSParams`       | Parameters for the mobility and CCS conversions. See [its previous introduction](#mobCCSConv).
 `overwrite`       | Set to `TRUE` to overwrite any existing IMS data in the suspect list.
 
 The following options exist for the `from` function argument:
 
-* `from=NULL` (default): No IMS data is added (but mobility <--> CCS conversion may still occur).
+* `from=NULL` (default): No IMS data is added (but mobility and CCS conversion may still occur).
 * `from="pubchemlite"`: IMS data is matched from the [PubChemLite database with CCS][PCLiteCCS-dl] data. See the [Installation chapter](#Installation) for details on how to install the database.
 * `from="c3sdb"`: Uses [C3SDB] to predict CCS values for suspects. See the [Installation chapter](#Installation) for installation details.
 * a `data.table` or `data.frame`: A custom library with IMS data.
@@ -401,7 +401,7 @@ see the reference manual for more details (`?getDefAvgPListParams`).
 
 #### Compound annotation
 
-Candidates from compound annotations can be matched with IMS data for features, similarly as was discussed for [candidates from suspect screening](#IMSSuspScr). The `assignMobilities()` method function works similarly to assign IMS data to candidates and perform mobility <--> CCS conversions. The `filter()` method function can subsequently be used to eliminate candidates that match poorly with features ([discussed later](#IMSFiltering)).
+Candidates from compound annotations can be matched with IMS data for features, similarly as was discussed for [candidates from suspect screening](#IMSSuspScr). The `assignMobilities()` method function works similarly to assign IMS data to candidates and perform mobility and CCS conversions. The `filter()` method function can subsequently be used to eliminate candidates that match poorly with features ([discussed later](#IMSFiltering)).
 
 The `assignMobilities()` function has similar arguments as the method for suspect screening:
 
@@ -410,7 +410,7 @@ Function argument | Description
 `fGroups`         | The feature groups for which the `compounds` were generated.
 `from`            | Specifies from where IMS data is added. See [the suspects section](#assignMobSusps) for more details.
 `adduct`          | Should match the value of the `adduct` argument that was passed to `generateCompounds()`. Set to `NULL` if [adduct annotations are available for features](#incorpAdductIso) or in [sets workflows](#setsWorkflow).
-`CCSParams`       | Parameters for the mobility <--> CCS conversions. See [the previous discussion](#mobCCSConv).
+`CCSParams`       | Parameters for the mobility and CCS conversions. See [the previous discussion](#mobCCSConv).
 `overwrite`       | Set to `TRUE` to overwrite any existing IMS data in the candidate list.
 `IMS`             | For which type of features IMS data should be added to the candidates: `FALSE` (only IMS parents), `TRUE` (only mobility features, default), `"both"` (both IMS parents and mobility features) or `"maybe"` (IMS parents if available, otherwise mobility features).
 

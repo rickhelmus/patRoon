@@ -267,7 +267,7 @@ getTPsCompounds <- function(annTable, parentRow, TPStructParams, extraOptsFMCSR,
 #'   It is possible that candidates are equal to their parent. To remove these the \code{removeParentIsomers}
 #'   \code{\link[=filter,transformationProductsStructure-method]{filter}} can be used afterwards.
 #'
-#' @references \insertAllCited{} \cr\cr \insertRef{Wang2013}{patRoon} \cr\cr \addCitations{rcdk} \cr\cr \addCitations{ChemmineR}
+#' @references \insertAllCited{} \cr\cr \insertRef{Wang2013}{patRoon} \cr\cr \addCitations{rcdk} \cr\cr \insertRef{Cao2008}{patRoon}
 #'
 #' @export
 generateTPsAnnComp <- function(parents, compounds, TPsRef = NULL, fGroupsComps = NULL, minRTDiff = 20,

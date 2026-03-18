@@ -56,7 +56,7 @@ with the \pkg{\link{igraph}} package and rendered with
 \section{Slots}{
 
 \describe{
-\item{\code{homol}}{A \code{list} with \code{homol} objects for each replicate group
+\item{\code{homol}}{A \code{list} with \code{homol} objects for each replicate
 as returned by \code{\link[nontarget]{homol.search}}}
 }}
 

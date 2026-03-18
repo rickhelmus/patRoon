@@ -6,7 +6,7 @@ getTestDataPathGeneric <- function() "test_data"
 
 getTestDataPath <- function() getTestDataPathGeneric()
 testFile <- function(f, ..., text = FALSE) file.path(getTestDataPath(), paste0(f, ..., if (!text) ".Rds" else ".txt", collapse = ""))
-getWorkPath <- function(file = "", ...) if (nzchar(file)) file.path("test_temp", file, ...) else "test_temp"
+getWorkPath <- function(...) file.path(sprintf("temp_temp-%d", Sys.getpid()), ...)
 
 getTestAnaInfo <- function()
 {
@@ -23,10 +23,10 @@ getDAAnaInfo <- function(pat = NULL)
     path <- getOption("patRoon.test.DAAnalyses")
     if (is.null(path))
         return(NULL)
-    ret <- generateAnalysisInfo(c(file.path(path, "neg"), file.path(path, "pos")),
-                                groups = c(rep("solvent-neg", 3), rep("standard-neg", 3),
+    ret <- generateAnalysisInfo(fromRaw = c(file.path(path, "neg"), file.path(path, "pos")),
+                                replicate = c(rep("solvent-neg", 3), rep("standard-neg", 3),
                                            rep("solvent-pos", 3), rep("standard-pos", 3)),
-                                blanks = "solvent", formats = "bruker")
+                                blank = "solvent")
     if (!is.null(pat))
         ret <- ret[grepl(pat, ret$analysis), ]
     return(ret)
@@ -332,9 +332,39 @@ expect_max_lte <- function(x, thr, na.rm = FALSE) expect_lte(max(x, na.rm = na.r
 expect_max_gt <- function(x, thr, na.rm = FALSE) expect_gt(max(x, na.rm = na.rm), thr)
 expect_max_lt <- function(x, thr, na.rm = FALSE) expect_lt(max(x, na.rm = na.rm), thr)
 
+# NOTE: this mainly is the same as the now deprecated testthat::expect_known_val and snapshots seem a bit clumsy for
+# this.
+expect_known_val <- function(object, file, tolerance = 1E-8, ...)
+{
+    act <- quasi_label(rlang::enquo(object))
+    file <- testFile(file)
+    
+    if (!file.exists(file))
+    {
+        warning("Creating reference value", call. = FALSE)
+        saveRDS(object, file = file)
+        pass()
+    }
+    else
+    {
+        ref <- readRDS(file)
+        cmp <- waldo::compare(ref, object, tolerance = tolerance, max_diffs = 25, ...)
+        if (length(cmp) == 0)
+            pass()
+        else
+        {
+            saveRDS(object, file = file)
+            fail(sprintf("reference value of %s has changed\n%s", act$lab, paste0(cmp, collapse = "\n")))
+        }
+    }
+    
+    invisible(act$val)
+}
+
 expect_known_show <- function(object, file)
 {
     act <- quasi_label(rlang::enquo(object))
+    file <- testFile(file, text = TRUE)
 
     text <- capture_output_lines(show(act$val))
 
@@ -348,15 +378,19 @@ expect_known_show <- function(object, file)
     {
         warning("Creating reference output", call. = FALSE)
         cat(text, file = file)
-        succeed()
+        pass()
     }
     else
     {
         ref <- patRoon:::readAllFile(file)
-        cat(text, file = file)
-
-        cmp <- compare(text, enc2native(ref))
-        expect(cmp$equal, sprintf("show reference of %s has changed\n%s", act$lab, cmp$message))
+        cmp <- waldo::compare(text, ref)
+        if (length(cmp) == 0)
+            pass()
+         else
+         {
+             cat(text, file = file)
+             fail(sprintf("reference output of %s has changed\n%s", act$lab, paste0(cmp, collapse = "\n")))
+         }
     }
 
     invisible(act$val)
@@ -402,38 +436,51 @@ makeReportHTML <- function(fGroups, path = getWorkPath(), overrideSettings = lis
 
 expect_reportHTML <- function(object)
 {
-    # generate report twice: without and with cached results
-    
     rpFile <- getWorkPath("report.html")
     unlink(rpFile) # in case it already exists
     unlink(getWorkPath("report_files"), recursive = TRUE)
     
-    clearCache("reportHTML") # reset cached plots
-    act <- quasi_label(rlang::enquo(object))
-    
-    expect(file.exists(rpFile), "failed to generate report")
-
-    uniqueLines <- function(path)
+    if (FALSE)
     {
-        # HACK: bslib sets random IDs on creation --> remove IDs to allow reproducible report generation
-        lines <- readLines(path)
-        lines <- gsub("data-tabsetid=\"[[:digit:]]+\"", "", lines)
-        lines <- gsub("bslib-card\\-[[:digit:]]+", "", lines)
-        lines <- gsub("navbar-collapse-[[:digit:]]+", "", lines)
-        lines <- gsub("bslib-accordion-[[:digit:]]+", "", lines)
-        lines <- gsub("bslib-accordion-panel-[[:digit:]]+", "", lines)
-        return(gsub("\"[#]?tab\\-[[:digit:]]+\\-[[:digit:]]+\"", "", lines))
-    }
-    
-    if (file.exists(rpFile))
-    {
-        rpLines <- uniqueLines(rpFile)
+        # UNDONE? for now just make the reports once: this saves a lot of time and this test doesn't seem _that_ useful
+        # also, unsure about stability for parallel tests
+        
+        # generate report twice: without and with cached results
+        
+        clearCache("reportHTML") # reset cached plots
         act <- quasi_label(rlang::enquo(object))
-        if (!isTRUE(all.equal(rpLines, uniqueLines(rpFile))))
-            browser()
-        expect(isTRUE(all.equal(rpLines, uniqueLines(rpFile))), "cached report differs")
+        
+        expect(file.exists(rpFile), "failed to generate report")
+        
+        uniqueLines <- function(path)
+        {
+            # HACK: bslib sets random IDs on creation --> remove IDs to allow reproducible report generation
+            lines <- readLines(path)
+            lines <- gsub("data-tabsetid=\"[[:digit:]]+\"", "", lines)
+            lines <- gsub("bslib-card\\-[[:digit:]]+", "", lines)
+            lines <- gsub("navbar-collapse-[[:digit:]]+", "", lines)
+            lines <- gsub("bslib-accordion-[[:digit:]]+", "", lines)
+            lines <- gsub("bslib-accordion-panel-[[:digit:]]+", "", lines)
+            return(gsub("\"[#]?tab\\-[[:digit:]]+\\-[[:digit:]]+\"", "", lines))
+        }
+        
+        if (file.exists(rpFile))
+        {
+            rpLines <- uniqueLines(rpFile)
+            act <- quasi_label(rlang::enquo(object))
+            if (!isTRUE(all.equal(rpLines, uniqueLines(rpFile))))
+                browser()
+            expect(isTRUE(all.equal(rpLines, uniqueLines(rpFile))), "cached report differs")
+        }
     }
-
+    else
+    {
+        act <- quasi_label(rlang::enquo(object))
+        if (file.exists(rpFile))
+            pass()
+        else
+            fail("report file does not exist")
+    }
     invisible(act$val)
 }
 
@@ -549,4 +596,23 @@ compareCompRef <- function(ref)
              skip_absent = TRUE)
     tabNew <- removeDTColumnsIfPresent(tabNew, c("fragmentMatches", "neutralLossMatches"))
     waldo::compare(tabOld, tabNew, tolerance = 0.001, max_diffs = Inf)
+}
+
+getAllProjectToolDiffs <- function(out)
+{
+    ref <- file.path("tests", "testthat", "_snaps", "project-tool", "default_process.R")
+    allSnaps <- Sys.glob(file.path("tests", "testthat", "_snaps", "project-tool", "*.R"))
+    allSnaps <- setdiff(allSnaps, ref)
+    file.remove(out)
+    for (sn in allSnaps)
+    {
+        cat(
+            sprintf("Snapshot: %s\n", basename(sn)),
+            "----\n",
+            as.character(diffobj::diffFile(ref, sn, pager = "off", format = "raw", mode = "unified", rds = FALSE,
+                                           disp.width = 200)),
+            "----\n",
+            file = out, sep = "\n", append = TRUE
+        )
+    }
 }

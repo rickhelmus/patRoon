@@ -2,8 +2,7 @@
 % Please edit documentation in R/generics.R, R/compounds.R, R/compounds-set.R,
 %   R/compounds-sirius.R
 \docType{class}
-\name{addFormulaScoring}
-\alias{addFormulaScoring}
+\name{compounds-class}
 \alias{compounds-class}
 \alias{compounds}
 \alias{compoundsConsensus-class}
@@ -14,6 +13,7 @@
 \alias{identifiers}
 \alias{filter,compounds-method}
 \alias{addFormulaScoring,compounds-method}
+\alias{addFormulaScoring}
 \alias{getMCS,compounds-method}
 \alias{plotStructure,compounds-method}
 \alias{plotScores,compounds-method}
@@ -59,6 +59,8 @@ addFormulaScoring(
   minFragScore = NULL,
   minFormulaScore = NULL,
   scoreLimits = NULL,
+  IMSRangeParams = NULL,
+  IMSMatchParams = NULL,
   ...
 )
 
@@ -99,10 +101,12 @@ addFormulaScoring(
   formulas = NULL,
   plotStruct = FALSE,
   title = NULL,
+  normalized = "multiple",
   specSimParams = getDefSpecSimParams(),
   mincex = 0.9,
   xlim = NULL,
   ylim = NULL,
+  showLegend = TRUE,
   maxMolSize = c(0.2, 0.4),
   molRes = c(100, 100),
   ...
@@ -111,6 +115,8 @@ addFormulaScoring(
 \S4method{consensus}{compounds}(
   obj,
   ...,
+  MSPeakLists,
+  specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
   absMinAbundance = NULL,
   relMinAbundance = NULL,
   uniqueFrom = NULL,
@@ -135,10 +141,12 @@ addFormulaScoring(
   formulas = NULL,
   plotStruct = FALSE,
   title = NULL,
+  normalized = "multiple",
   specSimParams = getDefSpecSimParams(),
   mincex = 0.9,
   xlim = NULL,
   ylim = NULL,
+  showLegend = TRUE,
   maxMolSize = c(0.2, 0.4),
   molRes = c(100, 100),
   perSet = TRUE,
@@ -158,6 +166,8 @@ addFormulaScoring(
 \S4method{consensus}{compoundsSet}(
   obj,
   ...,
+  MSPeakLists,
+  specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
   absMinAbundance = NULL,
   relMinAbundance = NULL,
   uniqueFrom = NULL,
@@ -193,6 +203,12 @@ by adding normalized values of the formula score (weighted by \option{formulaSco
 respectively. Set to \code{NULL} to ignore. The \code{scoreLimits} argument allows for more advanced score
 filtering.}
 
+\item{IMSRangeParams}{\IMSWF A \code{list} with parameters to be used for filtering IMS range data. See
+\code{\link{getIMSRangeParams}} for details and how to make such a parameter list.}
+
+\item{IMSMatchParams}{\IMSWF A \code{list} with parameters to be used for matching IMS data. See
+\code{\link{getIMSMatchParams}} for details and how to make such a parameter list.}
+
 \item{\dots}{For \code{plotSpectrum}: Further arguments passed to \code{\link[graphics]{plot}}.
 
   For \code{delete}: passed to the function specified as \code{j}.
@@ -212,8 +228,8 @@ filtering.}
   For \code{plotSpectrum}: two indices can be specified to compare spectra. In this case \code{groupName} should
   specify values for the spectra to compare.}
 
-\item{groupName}{The name of the feature group (or feature groups when comparing spectra) to which the candidate
-belongs.}
+\item{groupName}{The name of the feature group for which a plot should be made. To compare spectra, two group names
+can be specified.}
 
 \item{width, height}{The dimensions (in pixels) of the raster image that
 should be plotted.}
@@ -244,7 +260,7 @@ results were removed after they were generated (\emph{e.g.} by use of
 have been used to rank data (see the \code{scoreTypes} argument to
 \code{\link{generateCompoundsMetFrag}} for more details).}
 
-\item{MSPeakLists}{The \code{\link{MSPeakLists}} object that was used to generate the candidate}
+\item{MSPeakLists}{The \code{\link{MSPeakLists}} object with relevant spectral data.}
 
 \item{onlyAnnotated}{Set to \code{TRUE} to filter out any peaks that could
 not be annotated.}
@@ -254,14 +270,19 @@ comparing spectra.}
 
 \item{title}{The title of the plot. If \code{NULL} a title will be automatically made.}
 
+\item{normalized}{Controls intensity normalization. Should be \code{FALSE} (don't normalize), \code{TRUE} (normalize)
+or \code{"multiple"} (only normalizes if multiple spectra are plotted).}
+
 \item{specSimParams}{A named \code{list} with parameters that influence the calculation of MS spectra similarities.
 See the \link[=specSimParams]{spectral similarity parameters} documentation for more details.}
 
-\item{mincex}{The formula annotation labels are automatically scaled. The \code{mincex} argument forces a minimum
-\code{cex} value for readability.}
+\item{mincex}{The formula annotation labels are automatically scaled. The
+\code{mincex} argument forces a minimum \code{cex} value for readability.}
 
 \item{xlim, ylim}{Sets the plot size limits used by
 \code{\link[graphics]{plot}}. Set to \code{NULL} for automatic plot sizing.}
+
+\item{showLegend}{Set to \code{TRUE} to show a legend.}
 
 \item{maxMolSize}{Numeric vector of size two with the maximum width/height of the candidate structure (relative to
 the plot size).}
@@ -387,7 +408,9 @@ the \code{rank} columns.
 \section{Slots}{
 
 \describe{
-\item{\code{MS2QuantMeta}}{Metadata from \pkg{MS2Quant} filled in by \code{predictRespFactors}.}
+\item{\code{MS2QuantMeta}}{Metadata from \pkg{MS2Quant} filled in by \code{predictRespFactors}.
+
+\setsWF A named \code{list} with the metadata stored for each set.}
 
 \item{\code{setThreshold,setThresholdAnn,setAvgSpecificScores}}{\setsWF A copy of the equally named arguments that were
 passed when this object was created by \code{\link{generateCompounds}}.}
@@ -401,6 +424,14 @@ The values ranges in the \code{scoreLimits} slot, which are used for normalizati
   \emph{original} scorings when the compounds were generated (\emph{prior} to employing the \code{topMost} filter to
   \code{\link{generateCompounds}}).
 }
+\section{IMS workflows}{
+ In IMS workflows, reference IMS data to candidates can be assigned with
+  \code{\link[=assignMobilities_comp]{assignMobilities}} method function. Furthermore, \acronym{CCS} values may be
+  assigned directly to candidates with \code{\link{generateCompounds}} if \code{database="pubchemlite"}.
+
+  This data can be used to prioritize candidates with the \code{IMSMatchParams} and \code{IMSRangeParams} filters.
+}
+
 \section{S4 class hierarchy}{
  \itemize{   \item{\code{\link{featureAnnotations}}}   \itemize{     \item{\strong{\code{\link{compounds}}}}     \itemize{       \item{\code{\link{compoundsConsensus}}}       \item{\code{\link{compoundsMF}}}       \item{\code{\link{compoundsSet}}}       \itemize{         \item{\code{\link{compoundsConsensusSet}}}       }       \item{\code{\link{compoundsUnset}}}       \item{\code{\link{compoundsSIRIUS}}}     }   } }
 }

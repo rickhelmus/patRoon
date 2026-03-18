@@ -2,8 +2,6 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-context("feature groups")
-
 initXCMS()
 
 fList <- getTestFeatures(noiseThrInt = 1E5)
@@ -33,8 +31,8 @@ fgAMEmpty <- doAssignMobs(fgIMSEmpty)
 fgOpenMSEmptyQ <- calculatePeakQualities(fgOpenMSEmpty)
 
 test_that("verify feature grouping output", {
-    expect_known_value(groupTable(fgOpenMS), testFile("fg-openms"))
-    expect_known_value(groupTable(fgXCMS), testFile("fg-xcms"))
+    expect_known_val(groupTable(fgOpenMS), "fg-openms")
+    expect_known_val(groupTable(fgXCMS), "fg-xcms")
     
     # extraOpts
     expect_equal(groupTable(fgOpenMS),
@@ -48,23 +46,23 @@ test_that("verify feature grouping output", {
     expect_equal(groupFeatures(fList, "greedy", scoreWeights = c(retention = 100, mz = 1, mobility = 1, intensity = 1)),
                  groupFeatures(fList, "greedy", scoreWeights = c(retention = 100)))
     
-    expect_known_value(groupTable(fgXCMS3), testFile("fg-xcms3"))
-    expect_known_value(groupTable(fgKPIC2), testFile("fg-kpic2"))
-    expect_known_value(groupTable(fgGreedy), testFile("fg-greedy"))
-    expect_known_value(groupTable(fgSIRIUS), testFile("fg-sirius"))
-    expect_known_value(groupTable(fgAMInt), testFile("fg-am"))
-    expect_known_value(groupTable(fgOpenMSQ), testFile("fg-openms-qual"))
+    expect_known_val(groupTable(fgXCMS3), "fg-xcms3")
+    expect_known_val(groupTable(fgKPIC2), "fg-kpic2")
+    expect_known_val(groupTable(fgGreedy), "fg-greedy")
+    expect_known_val(groupTable(fgSIRIUS), "fg-sirius")
+    expect_known_val(groupTable(fgAMInt), "fg-am")
+    expect_known_val(groupTable(fgOpenMSQ), "fg-openms-qual")
 })
 
 test_that("verify show output", {
-    expect_known_show(fgOpenMS, testFile("fg-show-openms", text = TRUE))
-    expect_known_show(fgXCMS, testFile("fg-show-xcms", text = TRUE))
-    expect_known_show(fgXCMS3, testFile("fg-show-xcms3", text = TRUE))
-    expect_known_show(fgKPIC2, testFile("fg-show-kpic2", text = TRUE))
-    expect_known_show(fgGreedy, testFile("fg-show-greedy", text = TRUE))
-    expect_known_show(fgSIRIUS, testFile("fg-show-sirius", text = TRUE))
-    expect_known_show(fgAMInt, testFile("fg-show-am", text = TRUE))
-    expect_known_show(fgOpenMSQ, testFile("fg-show-openms-qual", text = TRUE))
+    expect_known_show(fgOpenMS, "fg-show-openms")
+    expect_known_show(fgXCMS, "fg-show-xcms")
+    expect_known_show(fgXCMS3, "fg-show-xcms3")
+    expect_known_show(fgKPIC2, "fg-show-kpic2")
+    expect_known_show(fgGreedy, "fg-show-greedy")
+    expect_known_show(fgSIRIUS, "fg-show-sirius")
+    expect_known_show(fgAMInt, "fg-show-am")
+    expect_known_show(fgOpenMSQ, "fg-show-openms-qual")
 })
 
 test_that("assignMobilities", {
@@ -79,7 +77,7 @@ test_that("assignMobilities", {
                                              "ims_parent_ID"))
     expect_false(isTRUE(all.equal(featureTable(fgAMInt)[[4]][!is.na(mobility)]$area,
                                   featureTable(fgAMSum)[[4]][!is.na(mobility)]$area)))
-    expect_equivalent(featureTable(fgAMInt)[[4]][!is.na(mobility), -"area"],
+    expect_equal(featureTable(fgAMInt)[[4]][!is.na(mobility), -"area"],
                       featureTable(fgAMSum)[[4]][!is.na(mobility), -"area"])
     expect_setequal(featureTable(fgAMInt[IMS=TRUE])[[4]]$mob_reintegr_method, c("EIC", "peak"))
     expect_setequal(featureTable(fgAMNoEIC[IMS=TRUE])[[4]]$mob_reintegr_method, c("peak"))
@@ -129,19 +127,19 @@ test_that("basic subsetting", {
     expect_length(fgOpenMS[, 1:50], 50)
     expect_length(fgOpenMS[, "nope"], 0)
     expect_length(fgOpenMS["nope"], 0)
-    expect_equivalent(getAnaInfo(fgOpenMS[1:3]), getTestAnaInfo()[1:3, ])
-    expect_equivalent(getAnaInfo(fgOpenMS[c(TRUE, TRUE, FALSE, TRUE, FALSE, TRUE)]),
-                      getTestAnaInfo()[c(TRUE, TRUE, FALSE, TRUE, FALSE, TRUE), ])
-    expect_equivalent(getAnaInfo(fgOpenMS[getTestAnaInfo()$analysis[4:6]]), getTestAnaInfo()[4:6, ])
+    expect_equal(getAnaInfo(fgOpenMS[1:3]), getTestAnaInfo()[1:3, ], ignore_attr = TRUE)
+    expect_equal(getAnaInfo(fgOpenMS[c(TRUE, TRUE, FALSE, TRUE, FALSE, TRUE)]),
+                      getTestAnaInfo()[c(TRUE, TRUE, FALSE, TRUE, FALSE, TRUE), ], ignore_attr = TRUE)
+    expect_equal(getAnaInfo(fgOpenMS[getTestAnaInfo()$analysis[4:6]]), getTestAnaInfo()[4:6, ], ignore_attr = TRUE)
     expect_equal(length(fgOpenMS[FALSE]), 0)
     expect_length(fgOpenMSEmpty[, 1:50], 0)
 
     expect_length(fgOpenMS[[1]], length(analyses(fgOpenMS)))
     expect_length(fgOpenMS[[1, 1]], 1)
-    expect_equivalent(fgOpenMS[[4, 50]], groupTable(fgOpenMS)[[4, 50]])
-    expect_equivalent(fgOpenMS[[analyses(fgOpenMS)[4], names(fgOpenMS)[50]]], groupTable(fgOpenMS)[[4, 50]])
-    expect_equivalent(fgOpenMS[[4]], groupTable(fgOpenMS)[[4]])
-    expect_equivalent(callDollar(fgOpenMS, names(fgOpenMS)[4]), fgOpenMS[[4]])
+    expect_equal(fgOpenMS[[4, 50]], groupTable(fgOpenMS)[[4, 50]])
+    expect_equal(fgOpenMS[[analyses(fgOpenMS)[4], names(fgOpenMS)[50]]], groupTable(fgOpenMS)[[4, 50]])
+    expect_equal(fgOpenMS[[4]], groupTable(fgOpenMS)[[4]])
+    expect_equal(callDollar(fgOpenMS, names(fgOpenMS)[4]), fgOpenMS[[4]])
     
     expect_equal(replicates(fgOpenMS[, replicates = "standard-pos"]), "standard-pos")
     expect_equal(replicates(fgOpenMS[, ni = replicate == "standard-pos"]), "standard-pos")
@@ -179,12 +177,12 @@ test_that("XCMS conversion", {
     expect_equal(nrow(xcms::groups(XCMSImpGreedy)), length(getExpFG(fgGreedy)))
     expect_equal(nrow(xcms::groups(XCMSImpSIRIUS)), length(getExpFG(fgSIRIUS)))
     
-    expect_known_value(xcms::groups(XCMSImpXCMS), testFile("fg-xcms_import_xcms"))
-    expect_known_value(xcms::groups(XCMSImpXCMS3), testFile("fg-xcms_import_xcms3"))
-    expect_known_value(xcms::groups(XCMSImpOpenMS), testFile("fg-xcms_import_openms"))
-    expect_known_value(xcms::groups(XCMSImpKPIC2), testFile("fg-xcms_import_kpic2"))
-    expect_known_value(xcms::groups(XCMSImpGreedy), testFile("fg-xcms_import_greedy"))
-    expect_known_value(xcms::groups(XCMSImpSIRIUS), testFile("fg-xcms_import_sirius"))
+    expect_known_val(xcms::groups(XCMSImpXCMS), "fg-xcms_import_xcms")
+    expect_known_val(xcms::groups(XCMSImpXCMS3), "fg-xcms_import_xcms3")
+    expect_known_val(xcms::groups(XCMSImpOpenMS), "fg-xcms_import_openms")
+    expect_known_val(xcms::groups(XCMSImpKPIC2), "fg-xcms_import_kpic2")
+    expect_known_val(xcms::groups(XCMSImpGreedy), "fg-xcms_import_greedy")
+    expect_known_val(xcms::groups(XCMSImpSIRIUS), "fg-xcms_import_sirius")
     
     expect_equal(unname(groupTable(importFeatureGroups(XCMSImpXCMS, "xcms", getExpAnaInfo()))),
                  unname(groupTable(getExpFG(fgXCMS))))
@@ -218,13 +216,13 @@ test_that("XCMS3 conversion", {
     expect_equal(nrow(xcms::featureDefinitions(XCMS3ImpGreedy)), length(getExpFG(fgGreedy)))
     expect_equal(nrow(xcms::featureDefinitions(XCMS3ImpSIRIUS)), length(getExpFG(fgSIRIUS)))
     
-    expect_known_value(xcms::featureDefinitions(XCMS3ImpXCMS), testFile("fg-xcms3_import_xcms"))
-    expect_known_value(xcms::featureDefinitions(XCMS3ImpXCMS3), testFile("fg-xcms3_import_xcms3"))
-    expect_known_value(xcms::featureDefinitions(XCMS3ImpOpenMS), testFile("fg-xcms3_import_openms"))
-    expect_known_value(xcms::featureDefinitions(XCMS3ImpKPIC2), testFile("fg-xcms3_import_kpic2"))
-    expect_known_value(xcms::featureDefinitions(XCMS3ImpGreedy), testFile("fg-xcms3_import_greedy"))
-    expect_known_value(xcms::featureDefinitions(XCMS3ImpSIRIUS)[, names(xcms::featureDefinitions(XCMS3ImpSIRIUS)) != "peakidx"],
-                       testFile("fg-xcms3_import_sirius")) # NOTE: peakidx not consistent
+    expect_known_val(xcms::featureDefinitions(XCMS3ImpXCMS), "fg-xcms3_import_xcms")
+    expect_known_val(xcms::featureDefinitions(XCMS3ImpXCMS3), "fg-xcms3_import_xcms3")
+    expect_known_val(xcms::featureDefinitions(XCMS3ImpOpenMS), "fg-xcms3_import_openms")
+    expect_known_val(xcms::featureDefinitions(XCMS3ImpKPIC2), "fg-xcms3_import_kpic2")
+    expect_known_val(xcms::featureDefinitions(XCMS3ImpGreedy), "fg-xcms3_import_greedy")
+    expect_known_val(xcms::featureDefinitions(XCMS3ImpSIRIUS)[, names(xcms::featureDefinitions(XCMS3ImpSIRIUS)) != "peakidx"],
+                       "fg-xcms3_import_sirius") # NOTE: peakidx not consistent
     
     expect_equal(unname(groupTable(importFeatureGroups(XCMS3ImpXCMS, "xcms3", getExpAnaInfo()))),
                  unname(groupTable(getExpFG(fgXCMS))))
@@ -395,10 +393,10 @@ test_that("unique works", {
     expect_equal(unique(fgOpenMS, aggregate = FALSE,
                         which = analysisInfo(fgOpenMS)[replicate == "standard-pos"]$analysis),
                  unique(fgOpenMS, aggregate = TRUE, which = "standard-pos"))
-    expect_equivalent(unique(fgOpenMS, which = "standard-pos"),
+    expect_equal(unique(fgOpenMS, which = "standard-pos"),
                       unique(fgOpenMS, which = "standard-pos",
                              relativeTo = setdiff(replicates(fgOpenMS), "standard-pos")))
-    expect_equivalent(unique(fgOpenMS, which = "standard-pos"), unique(fgOpenMS, which = "standard-pos", outer = TRUE))
+    expect_equal(unique(fgOpenMS, which = "standard-pos"), unique(fgOpenMS, which = "standard-pos", outer = TRUE))
     expect_lt(length(unique(fgOpenMS, which = "standard-pos")), length(fgOpenMS))
     expect_equal(length(unique(fgOpenMS, which = replicates(fgOpenMS))), length(fgOpenMS))
     expect_lt(length(unique(fgOpenMS, which = replicates(fgOpenMS), outer = TRUE)), length(fgOpenMS))
@@ -460,14 +458,14 @@ test_that("delete and filter", {
                            function(x) max(x) >= (0.5 * max(groupTable(fgOpenMS))))))
 
     expect_range(groupInfo(filter(fgOpenMS, retentionRange = c(120, 200)))$ret, c(120, 200))
-    # expect_equivalent(filter(fgOpenMS, retentionRange = c(0, Inf)), fgOpenMS)
-    expect_equivalent(filter(fgXCMS3, retentionRange = c(0, Inf)), fgXCMS3) # NOTE: cannot use OpenMS as it may  yield negative RTs...
+    # expect_equal(filter(fgOpenMS, retentionRange = c(0, Inf)), fgOpenMS)
+    expect_equal(filter(fgXCMS3, retentionRange = c(0, Inf)), fgXCMS3) # NOTE: cannot use OpenMS as it may  yield negative RTs...
     expect_range(groupInfo(filter(fgOpenMS, mzRange = c(200, 300)))$mz, c(200, 300))
-    expect_equivalent(filter(fgOpenMS, mzRange = c(0, Inf)), fgOpenMS)
+    expect_equal(filter(fgOpenMS, mzRange = c(0, Inf)), fgOpenMS)
     expect_range(groupInfo(filter(fgOpenMS, mzDefectRange = c(0.1, 0.2)))$mz %% 1, c(0.1, 0.2))
-    expect_equivalent(filter(fgOpenMS, mzDefectRange = c(0, 1)), fgOpenMS)
+    expect_equal(filter(fgOpenMS, mzDefectRange = c(0, 1)), fgOpenMS)
     expect_lt(length(filter(fgOpenMS, chromWidthRange = c(0, 30))), length(fgOpenMS))
-    expect_equivalent(filter(fgOpenMS, chromWidthRange = c(0, Inf)), fgOpenMS)
+    expect_equal(filter(fgOpenMS, chromWidthRange = c(0, Inf)), fgOpenMS)
 
     expect_identical(replicates(filter(fgOpenMS, replicates = "standard-pos")), "standard-pos")
     expect_identical(replicates(fgOpenMS[, replicates = "standard-pos"]), "standard-pos")
@@ -490,22 +488,22 @@ test_that("delete and filter", {
     expect_true(all(groupScores(fgOpenMSQFGN)[[names(qr)[2]]] < qr[[c(2, 1)]] |
                         groupScores(fgOpenMSQFGN)[[names(qr)[2]]] > qr[[c(2, 2)]]))
 
-    expect_known_output(filter(fgOpenMS, relMinAnalyses = 0.5), testFile("fgf-minana-rel", text = TRUE))
-    expect_known_output(filter(fgOpenMS, absMinAnalyses = 3), testFile("fgf-minana-abs", text = TRUE))
-    expect_known_output(filter(fgOpenMS, relMinReplicates = 1), testFile("fgf-minrep-rel", text = TRUE))
-    expect_known_output(filter(fgOpenMS, absMinReplicates = 2), testFile("fgf-minrep-abs", text = TRUE))
-    expect_known_output(filter(fgOpenMS, relMinFeatures = 0.75), testFile("fgf-minfeat-rel", text = TRUE))
-    expect_known_output(filter(fgOpenMS, absMinFeatures = 450), testFile("fgf-minfeat-abs", text = TRUE))
-    expect_known_output(filter(fgOpenMS, relMinReplicateAbundance = 1), testFile("fgf-minrepabu-rel", text = TRUE))
-    expect_known_output(filter(fgOpenMS, absMinReplicateAbundance = 3), testFile("fgf-minrepabu-abs", text = TRUE))
-    expect_known_output(filter(fgOpenMS, maxReplicateIntRSD = 0.5), testFile("fgf-reprsd", text = TRUE))
-    expect_known_output(filter(fgOpenMS, blankThreshold = 5), testFile("fgf-bl", text = TRUE))
-    expect_known_output(filter(fgOpenMS, absMinIntensity = 1500, blankThreshold = 5,
-                               retentionRange = c(120, Inf), relMinReplicateAbundance = 1),
-                        testFile("fgf-combi", text = TRUE))
-    expect_known_output(filter(fgOpenMS, absMinIntensity = 1500, blankThreshold = 5,
-                               retentionRange = c(120, Inf), relMinReplicateAbundance = 1, negate = TRUE),
-                        testFile("fgf-combi-neg", text = TRUE))
+    expect_known_show(filter(fgOpenMS, relMinAnalyses = 0.5), "fgf-minana-rel")
+    expect_known_show(filter(fgOpenMS, absMinAnalyses = 3), "fgf-minana-abs")
+    expect_known_show(filter(fgOpenMS, relMinReplicates = 1), "fgf-minrep-rel")
+    expect_known_show(filter(fgOpenMS, absMinReplicates = 2), "fgf-minrep-abs")
+    expect_known_show(filter(fgOpenMS, relMinFeatures = 0.75), "fgf-minfeat-rel")
+    expect_known_show(filter(fgOpenMS, absMinFeatures = 450), "fgf-minfeat-abs")
+    expect_known_show(filter(fgOpenMS, relMinReplicateAbundance = 1), "fgf-minrepabu-rel")
+    expect_known_show(filter(fgOpenMS, absMinReplicateAbundance = 3), "fgf-minrepabu-abs")
+    expect_known_show(filter(fgOpenMS, maxReplicateIntRSD = 0.5), "fgf-reprsd")
+    expect_known_show(filter(fgOpenMS, blankThreshold = 5), "fgf-bl")
+    expect_known_show(filter(fgOpenMS, absMinIntensity = 1500, blankThreshold = 5,
+                             retentionRange = c(120, Inf), relMinReplicateAbundance = 1),
+                      "fgf-combi")
+    expect_known_show(filter(fgOpenMS, absMinIntensity = 1500, blankThreshold = 5,
+                             retentionRange = c(120, Inf), relMinReplicateAbundance = 1, negate = TRUE),
+                      "fgf-combi-neg")
     expect_length(filter(fgOpenMSEmpty, absMinIntensity = 1500, blankThreshold = 5,
                          retentionRange = c(120, Inf), relMinReplicateAbundance = 1), 0)
 })
@@ -613,11 +611,11 @@ fgCompOneEmpty <- comparison(openms = fgOpenMS, xcms = fgXCMSEmpty, groupAlgo = 
 fgCompBothEmpty <- comparison(openms = fgOpenMSEmpty, xcms = fgXCMSEmpty, groupAlgo = "openms")
 
 test_that("verify feature group comparison", {
-    expect_known_value(groupTable(fGCompOpenMS@comparedFGroups), testFile("fg-comp-openms"))
-    expect_known_value(groupTable(fGCompXCMS@comparedFGroups), testFile("fg-comp-xcms"))
-    expect_known_value(groupTable(fGCompXCMS3@comparedFGroups), testFile("fg-comp-xcms3"))
-    expect_known_value(groupTable(fGCompKPIC2@comparedFGroups), testFile("fg-comp-kpic2"))
-    expect_known_value(groupTable(fGCompGreedy@comparedFGroups), testFile("fg-comp-greedy"))
+    expect_known_val(groupTable(fGCompOpenMS@comparedFGroups), "fg-comp-openms")
+    expect_known_val(groupTable(fGCompXCMS@comparedFGroups), "fg-comp-xcms")
+    expect_known_val(groupTable(fGCompXCMS3@comparedFGroups), "fg-comp-xcms3")
+    expect_known_val(groupTable(fGCompKPIC2@comparedFGroups), "fg-comp-kpic2", ignore_attr = TRUE)
+    expect_known_val(groupTable(fGCompGreedy@comparedFGroups), "fg-comp-greedy")
 
     expect_named(fGCompOpenMS, c("openms", "xcms"))
     expect_named(fGCompXCMS, c("openms", "xcms"))
@@ -627,10 +625,10 @@ test_that("verify feature group comparison", {
     expect_named(fGCompOpenMS[1], "openms")
     expect_named(fGCompOpenMS[2], "xcms")
 
-    expect_equivalent(fGCompOpenMS[[1]], fgOpenMS)
-    expect_equivalent(fGCompOpenMS[[names(fGCompOpenMS)[2]]], fgXCMS)
-    expect_equivalent(fGCompOpenMS[[names(fGCompOpenMS)[2]]], fgXCMS)
-    expect_equivalent(callDollar(fGCompOpenMS, names(fGCompOpenMS)[1]), fgOpenMS)
+    expect_equal(fGCompOpenMS[[1]], fgOpenMS)
+    expect_equal(fGCompOpenMS[[names(fGCompOpenMS)[2]]], fgXCMS)
+    expect_equal(fGCompOpenMS[[names(fGCompOpenMS)[2]]], fgXCMS)
+    expect_equal(callDollar(fGCompOpenMS, names(fGCompOpenMS)[1]), fgOpenMS)
 
     expect_length(fgCompOneEmpty, 2)
     expect_length(fgCompBothEmpty, 2)
@@ -793,7 +791,7 @@ test_that("sets functionality", {
     expect_equal(patRoon:::calculateMasses(groupInfo(unset(fgOpenMS, "positive"))$mz, as.adduct("[M+H]+"), "neutral"),
                  groupInfo(fgOpenMS[, sets = "positive"])$mz)
     expect_equal(analysisInfo(unset(fgOpenMS, "positive"), TRUE), getTestAnaInfoPos())
-    expect_equivalent(analysisInfo(fgOpenMS[, sets = "positive"], FALSE)[, -"set"], getTestAnaInfoPos())
+    expect_equal(analysisInfo(fgOpenMS[, sets = "positive"], FALSE)[, -"set"], getTestAnaInfoPos(), ignore_attr = TRUE)
     expect_setequal(annotations(fgOpenMS)$adduct, c("[M+H]+", "[M-H]-"))
     expect_equal(fgOpenMS, fgOpenMS[, sets = sets(fgOpenMS)])
     expect_equal(sets(fgOpenMS[, sets = "positive"]), "positive")
@@ -884,7 +882,7 @@ test_that("set unsupported functionality", {
     expect_length(adducts(fgNSAnn), length(fgNSAnn))
     expect_length(adducts(fgNSAnn2), length(fgNSAnn2))
     expect_setequal(adducts(fgNSAnn), "[M+H]+")
-    expect_equal(adducts(fgNSAnn2)[3], "[M+K]+", check.attributes = FALSE)
+    expect_equal(adducts(fgNSAnn2)[3], "[M+K]+", ignore_attr = TRUE)
     # verify neutral masses
     expect_true(all(sapply(seq_len(nrow(annotations(fgNSAnn2))), function(i)
     {
@@ -893,7 +891,7 @@ test_that("set unsupported functionality", {
                                 groupInfo(fgNSAnn2)[match(ann$group, group)]$mz)))
     })))
 
-    expect_known_value(groupTable(fGConsNS), testFile("fg-comp-cons"))
+    expect_known_val(groupTable(fGConsNS), "fg-comp-cons")
     
     expect_lt(length(consensus(fGCompNS, relMinAbundance = 1)), length(fGConsNS))
     

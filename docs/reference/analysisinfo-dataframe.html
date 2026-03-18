@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.0</span>
       </span>
     </div>
 
@@ -108,7 +108,7 @@
 <span>  MSLevel <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  retMin <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  colourBy <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"analyses"</span>, <span class="st">"rGroups"</span><span class="op">)</span>,</span>
+<span>  groupBy <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  showLegend <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  xlim <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -122,7 +122,35 @@
 <span>  MSLevel <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  retMin <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  colourBy <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"analyses"</span>, <span class="st">"rGroups"</span><span class="op">)</span>,</span>
+<span>  groupBy <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  showLegend <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  xlim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'data.table'</span></span>
+<span><span class="fu"><a href="generics.html">plotTICs</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  retentionRange <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  MSLevel <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  retMin <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  groupBy <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  showLegend <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  xlim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'data.table'</span></span>
+<span><span class="fu"><a href="generics.html">plotBPCs</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  retentionRange <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  MSLevel <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  retMin <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  groupBy <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  showLegend <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  xlim <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -156,9 +184,10 @@ step.</p></dd>
 <dd><p>Character string used for title of the plot. If <code>NULL</code> a title will be automatically generated.</p></dd>
 
 
-<dt id="arg-colourby">colourBy<a class="anchor" aria-label="anchor" href="#arg-colourby"></a></dt>
-<dd><p>Sets the automatic colour selection: "none" for a single
-colour or "analyses"/"rGroups" for a distinct colour per analysis or analysis replicate group.</p></dd>
+<dt id="arg-groupby">groupBy<a class="anchor" aria-label="anchor" href="#arg-groupby"></a></dt>
+<dd><p>Specifies how results are grouped in the plot. Should be a name of a column in the
+<a href="analysis-information.html">analysis information</a> table which is used to make analysis groups (<em>e.g.</em>
+<code>"replicate"</code>), or <code>"fGroups"</code> to group by feature group. Set to <code>NULL</code> for no grouping.</p></dd>
 
 
 <dt id="arg-showlegend">showLegend<a class="anchor" aria-label="anchor" href="#arg-showlegend"></a></dt>
@@ -181,10 +210,17 @@ colour or "analyses"/"rGroups" for a distinct colour per analysis or analysis re
 <li><p><code>getBPCs(data.frame)</code>: Obtain the base peak chromatogram/s (BPCs) of the analyses.</p></li>
 <li><p><code>plotTICs(data.frame)</code>: Plots the TICs of the analyses.</p></li>
 <li><p><code>plotBPCs(data.frame)</code>: Plots the BPCs of the analyses.</p></li>
+<li><p><code>plotBPCs(data.table)</code>: Plots the BPCs of the analyses.</p></li>
 </ul></div>
+    <div id="use-of-raw-hrms-data">
+    <h2>Use of raw HRMS data</h2>
+    <p>The <a href="msdata.html">raw data interface</a> of <span class="pkg">patRoon</span> is used by these functions to
+  process HRMS (or IMS-HRMS) data. Please see <a href="msdata.html">its documentation</a> for more information on the supported
+  formats and available configuration options.</p>
+    </div>
     <div id="author">
     <h2>Author</h2>
-    <p>Ricardo Cunha, <a href="mailto:cunha@iuta.de">cunha@iuta.de</a></p>
+    <p>Ricardo Cunha (<a href="mailto:cunha@iuta.de">cunha@iuta.de</a>) and Rick Helmus (<a href="mailto:r.helmus@uva.nl">r.helmus@uva.nl</a>)</p>
     </div>
 
   </div>

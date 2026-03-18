@@ -5,7 +5,7 @@ library(patRoon)
 # initialization
 # -------------------------
 
-workPath <- "test_temp/test-np/features-ims_susp_pred"
+workPath <- "<WORK_PATH>/test-np/features-ims_susp_pred"
 setwd(workPath)
 
 # NOTE: please set to a valid data.frame with analysis information. See ?`analysis-information` for more details.
@@ -19,8 +19,7 @@ anaInfo <- data.frame(path_centroid = character(), analysis = character(), repli
 suspList <- patRoonDataIMS::suspectsPos
 
 # Add mobility and CCS to suspect list(s)
-suspList <- assignMobilities(suspList, from = "c3sdb", CCSParams = CCSParams, adducts = c("[M+H]+", NA),
-                             overwrite = FALSE)
+suspList <- assignMobilities(suspList, from = "c3sdb", adducts = c("[M+H]+", NA), overwrite = FALSE)
 
 # -------------------------
 # features

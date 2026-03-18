@@ -2,14 +2,13 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-context("MS peak lists")
-
 fGroups <- getTestFGroups(getTestAnaInfoAnn())[, 1:100]
 ovFGroup <- names(overlap(fGroups, which = c("positive", "negative"), aggregate = "set"))[1]
 plists <- generateMSPeakLists(fGroups)
 plistsMSMS <- filter(plists, withMSMS = TRUE)
 
-if (doDATests())
+# disabled: deprecated
+if (doDATests() && FALSE)
 {
     # NOTE: use different analyses than first: this call will clearout all DA
     # compounds, forcing other calls (from features/formulas tests) to re-run
@@ -35,7 +34,7 @@ plistsNoIM@setObjects <- lapply(setObjects(plistsNoIM), function(so) { so@metada
 plistsNoIM@analysisInfo <- data.table() # remove as it is system dependent
 
 test_that("verify generation of MS peak lists", {
-    expect_known_value(plistsNoIM, testFile("plists"), tolerance = 1E-7)
+    expect_known_val(plistsNoIM, "plists", tolerance = 1E-7)
     
     plistsTM <- generateMSPeakLists(fGroups, topMost = 1)
     # check if there are at most one feature is used per feature group
@@ -47,17 +46,19 @@ test_that("verify generation of MS peak lists", {
     expect_gt(length(plists), length(generateMSPeakLists(fGroups, fixedIsolationWidth = 0.1)))
     expect_lt(length(plists), length(generateMSPeakLists(fGroups, fixedIsolationWidth = NA)))
 
-    skip_if_not(doDATests())
-    expect_known_value(plistsDA, testFile("plists-DA"))
-    expect_known_value(plistsDAFMF, testFile("plists-DAFMF"))
+    # disabled: deprecated
+    skip_if_not(doDATests() && FALSE)
+    expect_known_val(plistsDA, "plists-DA")
+    expect_known_val(plistsDAFMF, "plists-DAFMF")
 })
 
 test_that("verify show output", {
-    expect_known_show(plists, testFile("plists", text = TRUE))
+    expect_known_show(plists, "plists")
 
-    skip_if_not(doDATests())
-    expect_known_show(plistsDA, testFile("plists-DA", text = TRUE))
-    expect_known_show(plistsDAFMF, testFile("plists-DAFMF", text = TRUE))
+    # disabled: deprecated
+    skip_if_not(doDATests() && FALSE)
+    expect_known_show(plistsDA, "plists-DA")
+    expect_known_show(plistsDAFMF, "plists-DAFMF")
 })
 
 checkIntLimit <- function(plists, relative, doMin, doMSMS, plistsOrig = NULL)
@@ -250,28 +251,29 @@ test_that("empty object", {
     expect_lt(length(plistsEmptyMS), length(plists))
     expect_gt(length(plistsEmptyMS), 0)
 
-    skip_if_not(doDATests())
+    # disabled: deprecated
+    skip_if_not(doDATests() && FALSE)
     expect_length(plistsDAEmpty, 0)
 })
 
 test_that("basic functionality", {
     expect_length(plists["nope"], 0)
-    expect_equivalent(analyses(plists[1:2]), analyses(fGroups)[1:2])
-    expect_equivalent(analyses(plists[analyses(fGroups)[1:2]]), analyses(fGroups)[1:2])
-    expect_equivalent(analyses(plists[c(FALSE, TRUE)]), analyses(fGroups)[c(FALSE, TRUE)])
-    expect_equivalent(groupNames(plists[, 1:2]), groupNames(plists)[1:2])
-    expect_equivalent(groupNames(plists[, groupNames(plists)[2:3]]), groupNames(plists)[2:3])
-    expect_equivalent(groupNames(plists[, c(FALSE, TRUE)]), groupNames(plists)[c(FALSE, TRUE)])
-    expect_equivalent(plists[1:2, reAverage = FALSE][[ovFGroup]], plists[[ovFGroup]])
+    expect_equal(analyses(plists[1:2]), analyses(fGroups)[1:2])
+    expect_equal(analyses(plists[analyses(fGroups)[1:2]]), analyses(fGroups)[1:2])
+    expect_equal(analyses(plists[c(FALSE, TRUE)]), analyses(fGroups)[c(FALSE, TRUE)])
+    expect_equal(groupNames(plists[, 1:2]), groupNames(plists)[1:2])
+    expect_equal(groupNames(plists[, groupNames(plists)[2:3]]), groupNames(plists)[2:3])
+    expect_equal(groupNames(plists[, c(FALSE, TRUE)]), groupNames(plists)[c(FALSE, TRUE)])
+    expect_equal(plists[1:2, reAverage = FALSE][[ovFGroup]], plists[[ovFGroup]])
     expect_false(isTRUE(all.equal(plists[1:2, reAverage = TRUE][[ovFGroup]], plists[[ovFGroup]])))
     expect_equal(length(plists[FALSE, reAverage = TRUE]), 0)
     expect_length(plistsEmpty[1:5], 0)
 
-    expect_equivalent(plists[[2, 15]], peakLists(plists)[[2]][[groupNames(plists)[15]]])
-    expect_equivalent(plists[[analyses(plists)[2], groupNames(plists)[15]]], peakLists(plists)[[2]][[groupNames(plists)[15]]])
+    expect_equal(plists[[2, 15]], peakLists(plists)[[2]][[groupNames(plists)[15]]])
+    expect_equal(plists[[analyses(plists)[2], groupNames(plists)[15]]], peakLists(plists)[[2]][[groupNames(plists)[15]]])
 
-    expect_equivalent(plists[[20]], averagedPeakLists(plists)[[groupNames(plists)[20]]])
-    expect_equivalent(plists[[groupNames(plists)[20]]], averagedPeakLists(plists)[[groupNames(plists)[20]]])
+    expect_equal(plists[[20]], averagedPeakLists(plists)[[groupNames(plists)[20]]])
+    expect_equal(plists[[groupNames(plists)[20]]], averagedPeakLists(plists)[[groupNames(plists)[20]]])
 
     expect_equal(nrow(as.data.table(plists, averaged = TRUE)),
                  sum(unlist(recursiveApplyDT(averagedPeakLists(plists), nrow))))
@@ -429,7 +431,7 @@ plotSetSpecFG <- groupNames(setObjects(plistsMSMS)[[2]])[12]
 
 test_that("sets functionality", {
     expect_equal(analysisInfo(plists[, sets = "positive"])[, -"set"], getTestAnaInfoPos(getTestAnaInfoAnn()),
-                 check.attributes = FALSE)
+                 ignore_attr = TRUE)
     expect_equal(plists, plists[, sets = sets(plists)])
     expect_length(plists[, sets = character()], 0)
     expect_equal(sets(filter(plists, sets = "positive", negate = TRUE)), "negative")
@@ -484,7 +486,7 @@ doGetBG <- function(ai = getTestAnaInfoNS()[getTestAnaInfoNS()$replicate == "sol
 }
 bg <- doGetBG()
 test_that("BG MSMS", {
-    expect_known_value(bg, testFile("bg-msms"), tolerance = 1E-7)
+    expect_known_val(bg, "bg-msms", tolerance = 1E-7)
     checkmate::expect_data_table(bg, any.missing = FALSE)
     checkmate::expect_names(names(bg), must.include = c("mz", "intensity", "abundance_rel_ana", "abundance_abs_ana", 
                                                         "abundance_rel_spec", "abundance_abs_spec"))

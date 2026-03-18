@@ -2,8 +2,6 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-context("screening")
-
 susps <- as.data.table(patRoonData::suspectsPos)
 # take subset of suspects to speed things up a bit
 # 2-OH quinoline: isomers present, handy for tests below.
@@ -51,7 +49,7 @@ fGroupsScrNoRTDup <- makeFakeHit(fGroupsScrNoRT)
 
 test_that("suspect screening is OK", {
     checkmate::expect_subset(scr$name, susps$name)
-    expect_known_value(scr, testFile("screening"))
+    expect_known_val(scr, "screening")
     expect_setequal(names(fGroupsScr), screenInfo(fGroupsScr)$group)
 
     # check suspects without retention
@@ -152,7 +150,7 @@ getMaxScrCol <- function(ann, col) max(getAllSuspVals(ann, col), na.rm = TRUE)
 test_that("Suspect annotation works", {
     skip_if_not(hasMF)
     
-    expect_known_value(screenInfo(fGroupsAnnMF), testFile("screen-ann-MF"))
+    expect_known_val(screenInfo(fGroupsAnnMF), "screen-ann-MF")
     
     expect_equal(minIDLevel(fGroupsAnnNothing), 5)
     expect_equal(minIDLevel(fGroupsOnlyForms), 4)
@@ -181,9 +179,9 @@ if (hasMF)
 test_that("Screen filters", {
     skip_if_not(hasMF)
     
-    expect_known_value(as.data.table(selectedHitsInt, collapseSuspects = NULL), testFile("screen-ann-sel-hits_int"))
-    expect_known_value(as.data.table(selectedHitsLev, collapseSuspects = NULL), testFile("screen-ann-sel-hits_lev"))
-    expect_known_value(as.data.table(selectedFGroupsLev, collapseSuspects = NULL), testFile("screen-ann-sel-groups"))
+    expect_known_val(as.data.table(selectedHitsInt, collapseSuspects = NULL), "screen-ann-sel-hits_int")
+    expect_known_val(as.data.table(selectedHitsLev, collapseSuspects = NULL), "screen-ann-sel-hits_lev")
+    expect_known_val(as.data.table(selectedFGroupsLev, collapseSuspects = NULL), "screen-ann-sel-groups")
     
     # mean intensities should be increased when selecting a group for this suspect
     expect_lt(mean(as.matrix(as.data.table(fGroupsAnnNoRT, collapseSuspects = NULL)[susp_name == "2-Hydroxyquinoline",
@@ -222,9 +220,9 @@ if (hasMF)
 test_that("Negated screen filters", {
     skip_if_not(hasMF)
     
-    expect_known_value(as.data.table(selectedNegHitsInt, collapseSuspects = NULL), testFile("screen-ann-sel-neg-hits_int"))
-    expect_known_value(as.data.table(selectedNegHitsLev, collapseSuspects = NULL), testFile("screen-ann-sel-neg-hits_lev"))
-    expect_known_value(as.data.table(selectedNegFGroupsLev, collapseSuspects = NULL), testFile("screen-ann-sel-neg-groups"))
+    expect_known_val(as.data.table(selectedNegHitsInt, collapseSuspects = NULL), "screen-ann-sel-neg-hits_int")
+    expect_known_val(as.data.table(selectedNegHitsLev, collapseSuspects = NULL), "screen-ann-sel-neg-hits_lev")
+    expect_known_val(as.data.table(selectedNegFGroupsLev, collapseSuspects = NULL), "screen-ann-sel-neg-groups")
     
     # as above, but opposite
     expect_gt(mean(as.matrix(as.data.table(fGroupsAnnNoRT, collapseSuspects = NULL)[susp_name == "2-Hydroxyquinoline",
@@ -283,11 +281,11 @@ test_that("Empty objects", {
 test_that("Addition works", {
     # repeated screening shouldn't change object
     expect_equal(scr, screenInfo(doScreen(fGroupsScr, susps, onlyHits = TRUE, amend = TRUE)),
-                 check.attributes = FALSE)
+                 ignore_attr = TRUE)
     expect_equal(scr, screenInfo(doScreen(fGroupsScrEmpty, susps, onlyHits = TRUE, amend = TRUE)),
-                 check.attributes = FALSE)
+                 ignore_attr = TRUE)
     expect_equal(scr, screenInfo(doScreen(doScreen(fGroups, susps[1:3]), susps[-(1:3)], onlyHits = TRUE, amend = TRUE))[order(name)],
-                 check.attributes = FALSE)
+                 ignore_attr = TRUE)
 })
 
 if (hasMF)
@@ -323,9 +321,9 @@ test_that("IMS worfklow", {
     fGroupsAMNoSus <- doAssignMobs(fGroupsIMS)
     fGroupsAMSusPost <- screenSuspects(fGroupsAMNoSus, list(suspsPos, suspsNeg), onlyHits = FALSE)
     
-    expect_known_value(as.data.table(fGroupsAM, collapseSuspects = NULL), testFile("susp-ims-am"))
-    expect_known_value(as.data.table(fGroupsAMOnlySus, collapseSuspects = NULL), testFile("susp-ims-am_only"))
-    expect_known_value(as.data.table(fGroupsAMSusPost, collapseSuspects = NULL), testFile("susp-ims-post"))
+    expect_known_val(as.data.table(fGroupsAM, collapseSuspects = NULL), "susp-ims-am")
+    expect_known_val(as.data.table(fGroupsAMOnlySus, collapseSuspects = NULL), "susp-ims-am_only")
+    expect_known_val(as.data.table(fGroupsAMSusPost, collapseSuspects = NULL), "susp-ims-post")
     
     expect_setequal(as.data.table(fGroupsAM, features = TRUE, collapseSuspects = NULL)$mob_assign_method, c(NA, "peak", "suspect"))
     expect_setequal(as.data.table(fGroupsAMOnlySus, features = TRUE, collapseSuspects = NULL)$mob_assign_method, c(NA, "suspect"))
@@ -455,15 +453,15 @@ test_that("IMS worfklow", {
     checkmate::expect_numeric(scr[!is.na(d_mob)]$matchCount, upper = 1)
     scrPre <- screenInfo(fGroupsAMWrongOne)
     scrPost <- screenInfo(screenSuspects(fGroupsAMNoSus, list(suspsWrongOnePos, suspsWrongOneNeg)))
-    expect_equal(scrPre[order(group)], scrPost[order(group)][, names(scrPre), with = FALSE], check.attributes = FALSE)
+    expect_equal(scrPre[order(group)], scrPost[order(group)][, names(scrPre), with = FALSE], ignore_attr = TRUE)
 })
 
 test_that("sets functionality", {
     # some tests from feature groups to ensure proper subsetting/unsetting
     expect_equal(analysisInfo(unset(fGroupsScr, "positive"), TRUE), getTestAnaInfoPos(getTestAnaInfoAnn()),
-                 check.attributes = FALSE)
+                 ignore_attr = TRUE)
     expect_equal(analysisInfo(fGroupsScr[, sets = "positive"], FALSE)[, -"set"], getTestAnaInfoPos(getTestAnaInfoAnn()),
-                 check.attributes = FALSE)
+                 ignore_attr = TRUE)
     expect_setequal(unique(annotations(fGroupsScr)$adduct), c("[M+H]+", "[M-H]-"))
     expect_equal(fGroupsScr, fGroupsScr[, sets = sets(fGroupsScr)])
     expect_length(fGroupsScr[, sets = character()], 0)
@@ -497,12 +495,12 @@ fGroupsTQNoRT <- filter(fGroupsTQNoRT, blankThreshold = 5, removeBlanks = TRUE)
 
 test_that("TASQ import works", {
     expect_equal(unique(getTQAnalytes(TQFile)), names(fGroupsTQ))
-    expect_known_value(groupTable(fGroupsTQ), testFile("susp-tasq"))
-    expect_known_value(groupInfo(fGroupsTQ), testFile("susp-tasq-gi"))
-    expect_known_show(fGroupsTQ, testFile("susp-tasq", text = TRUE))
+    expect_known_val(groupTable(fGroupsTQ), "susp-tasq")
+    expect_known_val(groupInfo(fGroupsTQ), "susp-tasq-gi")
+    expect_known_show(fGroupsTQ, "susp-tasq")
     
     expect_lt(length(unique(getTQAnalytes(TQFileNoRT))), length(fGroupsTQNoRT))
-    expect_known_value(groupTable(fGroupsTQNoRT), testFile("susp-tasq-nort"))
-    expect_known_value(groupInfo(fGroupsTQNoRT), testFile("susp-tasq-nort-gi"))
-    expect_known_show(fGroupsTQNoRT, testFile("susp-tasq-nort", text = TRUE))
+    expect_known_val(groupTable(fGroupsTQNoRT), "susp-tasq-nort")
+    expect_known_val(groupInfo(fGroupsTQNoRT), "susp-tasq-nort-gi")
+    expect_known_show(fGroupsTQNoRT, "susp-tasq-nort")
 })

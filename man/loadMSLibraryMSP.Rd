@@ -15,7 +15,7 @@ loadMSLibraryMSP(
   neutralChemProps = FALSE,
   potAdducts = TRUE,
   potAdductsLib = TRUE,
-  absMzDev = 0.002,
+  absMzDev = defaultLim("mz", "narrow"),
   calcSPLASH = TRUE
 )
 }
@@ -123,7 +123,7 @@ The mass spectrum parser currently only supports space separated entries (MSP fo
 
 \section{Validating and calculating chemical properties}{
  Chemical properties such as \acronym{SMILES},
-  \acronym{InChIKey} and formula in the MS library are automatically validated and calculated if missing/invalid.
+  \acronym{InChIKey} and formulae in the MS library are automatically validated and calculated if missing/invalid.
 
   The internal validation/calculation process performs the following steps: \itemize{
 

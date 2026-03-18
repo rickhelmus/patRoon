@@ -18,7 +18,7 @@ SIRIUS+CSI:FingerID fingerprints using the MS2Quant package."><!-- mathjax --><s
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.0</span>
       </span>
     </div>
 
@@ -87,7 +87,7 @@ SIRIUS+CSI:FingerID fingerprints using the MS2Quant package."><!-- mathjax --><s
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Functionality to predict quantitative data</h1>
-    <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/main.R" class="external-link"><code>R/main.R</code></a>, <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/feature_groups.R" class="external-link"><code>R/feature_groups.R</code></a>, <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/feature_groups-set.R" class="external-link"><code>R/feature_groups-set.R</code></a>, and 8 more</small>
+    <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/generics.R" class="external-link"><code>R/generics.R</code></a>, <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/main.R" class="external-link"><code>R/main.R</code></a>, <a href="https://github.com/rickhelmus/patRoon/blob/HEAD/R/feature_groups.R" class="external-link"><code>R/feature_groups.R</code></a>, and 9 more</small>
     <div class="hidden name"><code>pred-quant.Rd</code></div>
     </div>
 
@@ -97,7 +97,9 @@ SIRIUS+CSI:FingerID fingerprints using the MS2Quant package."><!-- mathjax --><s
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for class 'featureGroups'</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">calculateConcs</span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'featureGroups'</span></span>
 <span><span class="fu">calculateConcs</span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">featureAnn</span>, areas <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'featureGroupsSet'</span></span>
@@ -169,7 +171,13 @@ SIRIUS+CSI:FingerID fingerprints using the MS2Quant package."><!-- mathjax --><s
 <span>  calibConcUnit <span class="op">=</span> <span class="va">concUnit</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">getQuantCalibFromScreening</span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">concs</span>, areas <span class="op">=</span> <span class="cn">FALSE</span>, average <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">getQuantCalibFromScreening</span><span class="op">(</span></span>
+<span>  <span class="va">fGroups</span>,</span>
+<span>  <span class="va">concs</span>,</span>
+<span>  areas <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  average <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  IMS <span class="op">=</span> <span class="st">"maybe"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -182,6 +190,10 @@ SIRIUS+CSI:FingerID fingerprints using the MS2Quant package."><!-- mathjax --><s
 <p>For <code>calculateConcs</code>: The <code><a href="featureGroups-class.html">featureGroups</a></code> object for which concentrations should be calculated.</p>
 <p>For <code>getQuantCalibFromScreening</code>: A feature groups object screened for the calibrants with
   <code><a href="suspect-screening.html">screenSuspects</a></code>.</p></dd>
+
+
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>(<strong>sets workflow</strong>) Further arguments passed to the non-sets workflow method.</p></dd>
 
 
 <dt id="arg-featureann">featureAnn<a class="anchor" aria-label="anchor" href="#arg-featureann"></a></dt>
@@ -238,12 +250,8 @@ by adding normalized values of the response factor (weighted by <span class="opt
 
 
 <dt id="arg-parallel">parallel<a class="anchor" aria-label="anchor" href="#arg-parallel"></a></dt>
-<dd><p>If set to <code>TRUE</code> then code is executed in parallel through the <a href="https://CRAN.R-project.org/package=futures" class="external-link"><span class="pkg">futures</span></a> package. Please
+<dd><p>If set to <code>TRUE</code> then code is executed in parallel through the <a href="https://CRAN.R-project.org/package=future" class="external-link"><span class="pkg">future</span></a> package. Please
 see the parallelization section in the handbook for more details.</p></dd>
-
-
-<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>(<strong>sets workflow</strong>) Further arguments passed to the non-sets workflow method.</p></dd>
 
 
 <dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
@@ -256,7 +264,16 @@ fingerprints), <code>"SMILES"</code> or <code>"both"</code>. Only relevant for <
 
 
 <dt id="arg-average">average<a class="anchor" aria-label="anchor" href="#arg-average"></a></dt>
-<dd><p>Set to <code>TRUE</code> to average intensity values within replicate groups.</p></dd>
+<dd><p>Set to <code>TRUE</code> to average intensity values within replicates.</p></dd>
+
+
+<dt id="arg-ims">IMS<a class="anchor" aria-label="anchor" href="#arg-ims"></a></dt>
+<dd><p>(<strong>IMS workflow</strong>) Specifies which feature groups are considered for generating calibrant data in IMS workflows. The following options
+  are valid:</p><ul><li><p><code>"both"</code>: Selects IMS and non-IMS features.</p></li>
+<li><p><code>"maybe"</code>: Selects non-IMS features and IMS features without assigned IMS parent.</p></li>
+<li><p><code>FALSE</code>: Selects only non-IMS features.</p></li>
+<li><p><code>TRUE</code>: Selects only IMS features.</p></li>
+</ul><p>Best to keep this <code>"maybe"</code>, as calibration typically doesn't support IMS filtered data.</p></dd>
 
 </dl></div>
     <div id="value">
@@ -278,7 +295,7 @@ with the <code>calculateConcs</code> method function.</p>
     <p>The <a href="https://CRAN.R-project.org/package=rcdk" class="external-link"><span class="pkg">rcdk</span></a> package and <a href="https://github.com/openbabel/openbabel" class="external-link">OpenBabel</a> tool are used
   internally to calculate molecular weights. Please make sure that <code class="command">OpenBabel</code> is installed.</p>
 <p><span class="pkg">MS2Quant</span> currently <em>only</em> supports <samp>M+H</samp> and <samp>M+</samp> adducts when performing predictions with
-  <code class="command">SIRIUS:FingerID</code> fingerprints. Predictions for candidates with other adducts, including <samp>M-H]</samp>, are
+  <code class="command">SIRIUS:FingerID</code> fingerprints. Predictions for candidates with other adducts, including <samp>M-H</samp>, are
   skipped with a warning.</p>
     </div>
     <div id="calibration">
@@ -307,10 +324,10 @@ with the <code>calculateConcs</code> method function.</p>
   <code>getQuantCalibFromScreening</code> function still requires you to specify concentration data, which is achieved via
   the <code>concs</code> argument. This should be a <code>data.frame</code> with a column <code>name</code> corresponding to the
   calibrant name (<em>i.e.</em> same as used by <code>screenSuspects</code> above) and columns with concentration data. The
-  latter columns specify the concentrations of a calibrant in different replicate groups (as defined in the
+  latter columns specify the concentrations of a calibrant in different replicates (as defined in the
   <a href="analysis-information.html">analysis information</a>). The concentration columns should be named after the
-  corresponding replicate group. Only those replicate groups that should be used for calibration need to be included.
-  Furthermore, <code>NA</code> values can be used if a replicate group should be ignored for a specific calibrant.</p>
+  corresponding replicate. Only those replicates that should be used for calibration need to be included.
+  Furthermore, <code>NA</code> values can be used if a replicate should be ignored for a specific calibrant.</p>
     </div>
     <div id="predicting-response-factors">
     <h2>Predicting response factors</h2>
@@ -351,7 +368,13 @@ from <acronym>SMILES</acronym> data.</p></li>
   screening results and/or feature annotation data. If multiple response factors were predicted for the same feature
   group, for instance when multiple annotation candidates or suspect hits for this feature group are present, then a
   concentrations is assigned for all response factors. These values can later be easily aggregated with <em>e.g.</em> the
-  <a href="featureGroups-class.html">as.data.table</a> function.</p>
+  <a href="feature-table.html">as.data.table</a> function.</p>
+<p>In IMS workflows with post mobility assignments (see
+  <code><a href="assignMobilities_feat.html">assignMobilities</a></code>), the intensities of <em>IMS parents</em> are used for the
+  calculation of concentrations for mobility features (as calibration typically does not consider differences due to
+  mobility filtering). However, the response factor assigned to mobility features are still used. This may yield
+  small differences compared to workflows where concentrations are assigned prior to mobility assignments, as
+  <code>assignMobilities</code> simply copies concentrations from IMS parents to mobility features.</p>
     </div>
     <div id="references">
     <h2>References</h2>

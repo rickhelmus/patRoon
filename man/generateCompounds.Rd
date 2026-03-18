@@ -5,9 +5,21 @@
 \alias{generateCompounds,featureGroups-method}
 \title{Automatic compound annotation}
 \usage{
-generateCompounds(fGroups, MSPeakLists, algorithm, ...)
+generateCompounds(
+  fGroups,
+  MSPeakLists,
+  algorithm,
+  specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
+  ...
+)
 
-\S4method{generateCompounds}{featureGroups}(fGroups, MSPeakLists, algorithm, ...)
+\S4method{generateCompounds}{featureGroups}(
+  fGroups,
+  MSPeakLists,
+  algorithm,
+  specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
+  ...
+)
 }
 \arguments{
 \item{fGroups}{\code{\link{featureGroups}} object which should be annotated. This should be the same or a subset of
@@ -18,6 +30,10 @@ feature groups in the subset are considered.}
 
 \item{algorithm}{A character string describing the algorithm that should be
 used: \code{"metfrag"}, \code{"sirius"}, \code{"library"}}
+
+\item{specSimParams}{A named \code{list} with parameters that influence the calculation of the
+\link[=id-conf]{annotation similarity}. See the \link[=specSimParams]{spectral similarity parameters} documentation
+for more details.}
 
 \item{\dots}{Any parameters to be passed to the selected compound generation algorithm.}
 }

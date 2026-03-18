@@ -4,13 +4,13 @@
 \alias{importFeatureGroups}
 \title{Import feature groups from files}
 \usage{
-importFeatureGroups(path, type, ...)
+importFeatureGroups(input, type, ...)
 }
 \arguments{
-\item{path}{The path that should be used for importing. See the algorithm specific functions for more details.}
+\item{input}{The input object or path that should be imported. See the algorithm specific functions for more details.}
 
-\item{type}{Which file type should be imported: \code{"brukerpa"} (Bruker ProfileAnalysis), \code{"brukertasq"}
-(Bruker TASQ) or \code{"envimass"} (\pkg{enviMass}).}
+\item{type}{What type of data should be imported: \code{"xcms"}, \code{"xcms3"}, \code{"kpic2"}, \code{"table"},
+\code{"brukerpa"} (Bruker ProfileAnalysis), \code{"brukertasq"} (Bruker TASQ) or \code{"envimass"}.}
 
 \item{\dots}{Further arguments passed to the selected import algorithm function.}
 }
@@ -22,14 +22,12 @@ Generic function to import feature groups produced by other software from files.
 }
 \details{
 \code{importFeatureGroups} is a generic function that will import feature groups from files by one of the supported algorithms. The actual
-  functionality is provided by algorithm specific functions such as \code{importFeatureGroupsBrukerTASQ} and \code{importFeatureGroupsBrukerPA}. While these
+  functionality is provided by algorithm specific functions such as \code{importFeatureGroupsXCMS3} and \code{importFeatureGroupsTable}. While these
   functions may be called directly, \code{importFeatureGroups} provides a generic interface and is therefore usually preferred.
 }
 \seealso{
 The \code{\link{featureGroups}} output class and its methods and the algorithm specific functions:
-  \code{\link{importFeatureGroupsBrukerPA}}, \code{\link{importFeatureGroupsBrukerTASQ}}, \code{\link{importFeatureGroupsEnviMass}}
+  \code{\link{importFeatureGroupsXCMS}}, \code{\link{importFeatureGroupsXCMS3}}, \code{\link{importFeatureGroupsKPIC2}}, \code{\link{importFeatureGroupsTable}}, \code{\link{importFeatureGroupsBrukerPA}}, \code{\link{importFeatureGroupsBrukerTASQ}}, \code{\link{importFeatureGroupsEnviMass}}
 
-\code{\link{groupFeatures}} to group features. Other import functions:
-  \code{\link{importFeatureGroupsXCMS}}, \code{\link{importFeatureGroupsXCMS3}} and
-  \code{\link{importFeatureGroupsKPIC2}}.
+\code{\link{groupFeatures}} to group features.
 }

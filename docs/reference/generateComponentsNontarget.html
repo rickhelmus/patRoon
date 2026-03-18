@@ -18,7 +18,7 @@ components by unsupervised detection of homologous series."><!-- mathjax --><scr
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.0</span>
       </span>
     </div>
 
@@ -106,9 +106,9 @@ components by unsupervised detection of homologous series.</p>
 <span>  rtRange <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">120</span>, <span class="fl">120</span><span class="op">)</span>,</span>
 <span>  mzRange <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">120</span><span class="op">)</span>,</span>
 <span>  elements <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"C"</span>, <span class="st">"H"</span>, <span class="st">"O"</span><span class="op">)</span>,</span>
-<span>  rtDev <span class="op">=</span> <span class="fl">30</span>,</span>
-<span>  absMzDev <span class="op">=</span> <span class="fl">0.002</span>,</span>
-<span>  absMzDevLink <span class="op">=</span> <span class="va">absMzDev</span> <span class="op">*</span> <span class="fl">2</span>,</span>
+<span>  rtDev <span class="op">=</span> <span class="fu"><a href="limits.html">defaultLim</a></span><span class="op">(</span><span class="st">"retention"</span>, <span class="st">"wide"</span><span class="op">)</span>,</span>
+<span>  absMzDev <span class="op">=</span> <span class="fu"><a href="limits.html">defaultLim</a></span><span class="op">(</span><span class="st">"mz"</span>, <span class="st">"narrow"</span><span class="op">)</span>,</span>
+<span>  absMzDevLink <span class="op">=</span> <span class="fu"><a href="limits.html">defaultLim</a></span><span class="op">(</span><span class="st">"mz"</span>, <span class="st">"medium"</span><span class="op">)</span>,</span>
 <span>  traceHack <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Version.html" class="external-link">R.Version</a></span><span class="op">(</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"major"</span>, <span class="st">"minor"</span><span class="op">)</span><span class="op">]</span> <span class="op">&gt;=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
@@ -182,8 +182,8 @@ enabled by default on these R versions, implements a (messy) workaround
     <p>This function uses nontarget to generate components. This function is called when calling <code>generateComponents</code> with
   <code>algorithm="nontarget"</code>.</p>
 <p>In the first step the <code><a href="https://rdrr.io/pkg/nontarget/man/homol.search.html" class="external-link">homol.search</a></code> function is used to detect all homologous series
-  within each replicate group (analyses within each replicate group are averaged prior to detection). Then,
-  homologous series across replicate groups are merged in case of full overlap or when merging of partial overlapping
+  within each replicate (analyses within each replicate are averaged prior to detection). Then,
+  homologous series across replicates are merged in case of full overlap or when merging of partial overlapping
   series causes no conflicts.</p>
     </div>
     <div id="sets-workflows">
@@ -193,6 +193,12 @@ enabled by default on these R versions, implements a (messy) workaround
   the components themselves are never merged. The components are renamed to include the set name from which they were
   generated (<em>e.g.</em> <code>"CMP1"</code> becomes <code>"CMP1-positive"</code>).</p>
 <p>The output class supports additional methods such as <code>plotGraph</code>.</p>
+    </div>
+    <div id="ims-workflows">
+    <h2>IMS workflows</h2>
+    <p>The componentization algorithm is not aware of the IMS dimension. For this reason, no
+  mobility feature groups will be considered for componentization, and direct IMS workflows (see
+  <code><a href="assignMobilities_feat.html">assignMobilitities</a></code>) are currently not supported.</p>
     </div>
     <div id="references">
     <h2>References</h2>

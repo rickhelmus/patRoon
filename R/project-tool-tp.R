@@ -19,7 +19,7 @@ newProjectTPUI <- function(id)
         fillCol(
             flex = NA,
             fillCol(
-                height = 100,
+                flex = NA,
                 fillRow(
                     height = 75,
                     selectInput(ns("TPsAlgo"), "TP algorithm",
@@ -28,19 +28,12 @@ newProjectTPUI <- function(id)
                                   "From formula annotations" = "ann_form",
                                   "From compound annotations" = "ann_comp"), width = "95%")
                 ),
-                conditionalPanel(
-                    condition = "['biotransformer', 'cts', 'library'].includes(input.TPsAlgo)",
-                    ns = ns,
-                    fillRow(
-                        height = 25,
-                        checkboxInput(ns("TPDoMFDB"), "Generate TP MetFrag database", TRUE)
-                    )
-                )
             ),
             conditionalPanel(
                 condition = "input.TPsAlgo != '' && input.TPsAlgo != 'logic'",
                 ns = ns,
                 fillRow(
+                    height = 75,
                     selectInput(ns("TPGenInput"), "Parent input", getTPGenInputs(FALSE), width = "95%"),
                     conditionalPanel(
                         condition = "input.TPGenInput == \"suspects\"",
@@ -52,12 +45,25 @@ newProjectTPUI <- function(id)
                         )
                     )
                 )
+            ),
+            conditionalPanel(
+                condition = "['biotransformer', 'cts', 'library'].includes(input.TPsAlgo)",
+                ns = ns,
+                fillRow(
+                    height = 125,
+                    checkboxInput(ns("TPDoMFDB"), "Generate TP MetFrag database", TRUE),
+                    conditionalPanel(
+                        condition = "output.IMSMode != 'none'",
+                        ns = ns,
+                        radioButtons(ns("suspCCSPred"), "CCS prediction TP suspects", getCCSPredSelections())
+                    )
+                )
             )
         )
     )
 }
 
-newProjectTPServer <- function(id, hasSuspects, formulasAlgo, compoundsAlgo, settings)
+newProjectTPServer <- function(id, hasSuspects, formulasAlgo, compoundsAlgo, IMSMode, settings)
 {
     moduleServer(id, function(input, output, session)
     {
@@ -66,6 +72,7 @@ newProjectTPServer <- function(id, hasSuspects, formulasAlgo, compoundsAlgo, set
             updateSelectInput(session, "TPGenInput", selected = settings()$TPGenInput)
             updateTextInput(session, "TPSuspectList", value = settings()$TPSuspectList)
             updateCheckboxInput(session, "TPDoMFDB", value = settings()$TPDoMFDB)
+            updateRadioButtons(session, "suspCCSPred", selected = settings()$suspCCSPred)
         })
         
         observeEvent(input$TPsAlgo, {
@@ -82,6 +89,8 @@ newProjectTPServer <- function(id, hasSuspects, formulasAlgo, compoundsAlgo, set
         })
         
         observeEvent(input$TPSuspButton, selectSuspList(session, "TPSuspectList"))
+        
+        output <- exportShinyOutputVal(output, "IMSMode", IMSMode)
         
         list(
             valid = reactive({
@@ -107,7 +116,8 @@ newProjectTPServer <- function(id, hasSuspects, formulasAlgo, compoundsAlgo, set
                 TPsAlgo = input$TPsAlgo,
                 TPGenInput = input$TPGenInput,
                 TPSuspectList = input$TPSuspectList,
-                TPDoMFDB = input$TPDoMFDB
+                TPDoMFDB = input$TPDoMFDB,
+                suspCCSPred = input$suspCCSPred
             ))
         )
     })
@@ -115,7 +125,7 @@ newProjectTPServer <- function(id, hasSuspects, formulasAlgo, compoundsAlgo, set
 
 defaultTPSettings <- function()
 {
-    return(list(TPsAlgo = "", TPGenInput = "suspects", TPSuspectList = "", TPDoMFDB = TRUE))
+    return(list(TPsAlgo = "", TPGenInput = "suspects", TPSuspectList = "", TPDoMFDB = TRUE, suspCCSPred = "none"))
 }
 
 upgradeTPsSettings <- function(settings)

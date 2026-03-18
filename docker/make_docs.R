@@ -24,6 +24,9 @@ tinytex::tlmgr_install("pdfcrop")
 webshot::install_phantomjs()
 Sys.setenv(PATH = paste0(Sys.getenv("PATH"), ":", "/home/rstudio/bin"))
 
+# BUG: somehow the OpenTIMS backends leads to strange bookdown errors, so disable it...
+options(patRoon.MS.backends = c("mzr", "mstoolkit"))
+
 pkgdown::clean_site()
 pkgdown::build_site(examples = FALSE)
 

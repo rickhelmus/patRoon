@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.0</span>
       </span>
     </div>
 
@@ -103,12 +103,13 @@
 
 
 <dl><dt id="arg-analysisinfo">analysisInfo<a class="anchor" aria-label="anchor" href="#arg-analysisinfo"></a></dt>
-<dd><p>A <code>data.frame</code> with <a href="analysis-information.html">Analysis information</a>.</p></dd>
+<dd><p>A <code>data.frame</code> (or <code>data.table</code>) with <a href="analysis-information.html">Analysis
+information</a>.</p></dd>
 
 
 <dt id="arg-algorithm">algorithm<a class="anchor" aria-label="anchor" href="#arg-algorithm"></a></dt>
 <dd><p>A character string describing the algorithm that should be
-used: <code>"bruker"</code>, <code>"openms"</code>, <code>"xcms"</code>, <code>"xcms3"</code>, <code>"envipick"</code>, <code>"sirius"</code>, <code>"kpic2"</code>, <code>"safd"</code></p></dd>
+used: <code>"bruker"</code>, <code>"openms"</code>, <code>"xcms"</code>, <code>"xcms3"</code>, <code>"envipick"</code>, <code>"sirius"</code>, <code>"kpic2"</code>, <code>"safd"</code>, <code>"piek"</code></p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -140,12 +141,12 @@ dependent upon applied analysis methodology and instrumentation.</p>
     <p>In most cases it will be necessary to centroid your MS input files. The only exception is <code class="command">Bruker</code>,
   however, you will still need centroided <code class="file">mzXML</code>/<code class="file">mzML</code> files for <em>e.g.</em> plotting chromatograms. In
   this case the centroided MS files should be stored in the same directory as the raw <code class="command">Bruker</code> <code class="file">.d</code>
-  files. The <code><a href="convertMSFiles.html">convertMSFiles</a></code> function can be used to centroid data.</p>
+  files. The <code><a href="MSConversion.html">convertMSFiles</a></code> function can be used to centroid data.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
     <div class="dont-index"><p>The <code><a href="features-class.html">features</a></code> output class and its methods and the algorithm specific functions:
-  <code><a href="findFeaturesBruker.html">findFeaturesBruker</a></code>, <code><a href="findFeaturesOpenMS.html">findFeaturesOpenMS</a></code>, <code><a href="findFeaturesXCMS.html">findFeaturesXCMS</a></code>, <code><a href="findFeaturesXCMS3.html">findFeaturesXCMS3</a></code>, <code><a href="findFeaturesEnviPick.html">findFeaturesEnviPick</a></code>, <code><a href="findFeaturesSIRIUS.html">findFeaturesSIRIUS</a></code>, <code><a href="findFeaturesKPIC2.html">findFeaturesKPIC2</a></code>, <code><a href="findFeaturesSAFD.html">findFeaturesSAFD</a></code></p></div>
+  <code><a href="findFeaturesBruker.html">findFeaturesBruker</a></code>, <code><a href="findFeaturesOpenMS.html">findFeaturesOpenMS</a></code>, <code><a href="findFeaturesXCMS.html">findFeaturesXCMS</a></code>, <code><a href="findFeaturesXCMS3.html">findFeaturesXCMS3</a></code>, <code><a href="findFeaturesEnviPick.html">findFeaturesEnviPick</a></code>, <code><a href="findFeaturesSIRIUS.html">findFeaturesSIRIUS</a></code>, <code><a href="findFeaturesKPIC2.html">findFeaturesKPIC2</a></code>, <code><a href="findFeaturesSAFD.html">findFeaturesSAFD</a></code>, <code><a href="findFeaturesPiek.html">findFeaturesPiek</a></code></p></div>
     </div>
 
   </div>

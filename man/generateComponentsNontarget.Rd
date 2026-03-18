@@ -14,9 +14,9 @@ generateComponentsNontarget(fGroups, ...)
   rtRange = c(-120, 120),
   mzRange = c(5, 120),
   elements = c("C", "H", "O"),
-  rtDev = 30,
-  absMzDev = 0.002,
-  absMzDevLink = absMzDev * 2,
+  rtDev = defaultLim("retention", "wide"),
+  absMzDev = defaultLim("mz", "narrow"),
+  absMzDevLink = defaultLim("mz", "medium"),
   traceHack = all(R.Version()[c("major", "minor")] >= c(3, 4)),
   ...
 )
@@ -69,8 +69,8 @@ This function uses nontarget to generate components. This function is called whe
   \code{algorithm="nontarget"}.
 
 In the first step the \code{\link[nontarget]{homol.search}} function is used to detect all homologous series
-  within each replicate group (analyses within each replicate group are averaged prior to detection). Then,
-  homologous series across replicate groups are merged in case of full overlap or when merging of partial overlapping
+  within each replicate (analyses within each replicate are averaged prior to detection). Then,
+  homologous series across replicates are merged in case of full overlap or when merging of partial overlapping
   series causes no conflicts.
 }
 \section{Sets workflows}{
@@ -80,6 +80,12 @@ In the first step the \code{\link[nontarget]{homol.search}} function is used to 
   generated (\emph{e.g.} \code{"CMP1"} becomes \code{"CMP1-positive"}).
 
  The output class supports additional methods such as \code{plotGraph}.
+}
+
+\section{IMS workflows}{
+ The componentization algorithm is not aware of the IMS dimension. For this reason, no
+  mobility feature groups will be considered for componentization, and direct IMS workflows (see
+  \code{\link[=assignMobilities_feat]{assignMobilitities}}) are currently not supported.
 }
 
 \references{

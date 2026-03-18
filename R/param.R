@@ -35,6 +35,8 @@ setValidity("param", function(object)
                 args$lower <- def$lower
             if (!is.null(def$upper))
                 args$upper <- def$upper
+            if (!is.null(def$finite))
+                args$finite <- def$finite
             do.call(checkmate::assertNumber, c(args, list(add = ac)))
         }
         else if (def$type == "flag")
@@ -289,3 +291,107 @@ setMethod("initialize", "FeaturesOpenMSParam", function(.Object, ...)
                    definitions = defs, ...)
 })
 
+
+FeaturesPiekParam <- setClass("FeaturesPiekParam", contains = "param")
+setMethod("initialize", "FeaturesPiekParam", function(.Object, ...)
+{
+    defs <- list(
+        genEICParams = list(
+            default = getPiekEICParams(),
+            description = "Parameters for EIC generation (use getPiekEICParams())",
+            type = "list",
+            null.ok = FALSE
+        ),
+        peakParams = list(
+            default = getDefPeakParams("chrom", "piek"),
+            description = "Parameters for peak detection (use getDefPeakParams())",
+            type = "list",
+            null.ok = FALSE
+        ),
+        IMS = list(
+            default = FALSE,
+            description = "Use ion mobility separation (IMS)",
+            type = "flag"
+        ),
+        assignMethod = list(
+            default = "basepeak",
+            description = "Method to assign m/z/mobility across EIC datapoints",
+            type = "choice",
+            choices = c("basepeak", "weighted.mean")
+        ),
+        assignRTWindow = list(
+            default = defaultLim("retention", "very_narrow"),
+            description = "Retention time window (+/- s) for assignment",
+            type = "number",
+            lower = 0,
+            finite = TRUE
+        ),
+        rtWindowDup = list(
+            default = defaultLim("retention", "narrow"),
+            description = "RT window for duplicate feature detection",
+            type = "number",
+            lower = 0,
+            finite = TRUE
+        ),
+        mzWindowDup = list(
+            default = defaultLim("mz", "medium"),
+            description = "m/z window for duplicate feature detection",
+            type = "number",
+            lower = 0,
+            finite = TRUE
+        ),
+        mobWindowDup = list(
+            default = defaultLim("mobility", "medium"),
+            description = "Mobility window for duplicate feature detection",
+            type = "number",
+            lower = 0,
+            finite = TRUE
+        ),
+        minPeakOverlapDup = list(
+            default = 0.25,
+            description = "Minimum retention time overlap (fraction) to consider duplicates",
+            type = "number",
+            lower = 0,
+            upper = 1,
+            finite = TRUE
+        ),
+        minIntensityIMS = list(
+            default = 25,
+            description = "Minimum intensity for IMS datapoints",
+            type = "number",
+            positive = TRUE,
+            finite = TRUE
+        ),
+        EICBatchSize = list(
+            default = Inf,
+            description = "Number of EICs processed per batch",
+            type = "number",
+            positive = TRUE,
+            finite = FALSE
+        ),
+        keepDups = list(
+            default = FALSE,
+            description = "Keep duplicate / non-centered features",
+            type = "flag"
+        ),
+        verbose = list(
+            default = TRUE,
+            description = "Verbose output",
+            type = "flag"
+        )
+    )
+
+    callNextMethod(.Object, name = "FeaturesPiekParam", baseName = "FeaturesPiekParam",
+                   description = "Parameters for piek feature detection", version = "1.0",
+                   definitions = defs, ...)
+})
+
+setValidity("FeaturesPiekParam", function(object)
+{
+    ac <- checkmate::makeAssertCollection()
+    assertPiekGenEICParams(object@data$genEICParams, .var.name = "genEICParams", add = ac)
+    assertFindPeakParams(object@data$peakParams, .var.name = "peakParams", add = ac)
+    
+    OK <- tryCatch(checkmate::reportAssertions(ac), error = function(e) e)
+    return(OK)
+})

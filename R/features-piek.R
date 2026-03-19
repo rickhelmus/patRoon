@@ -666,7 +666,7 @@ findFeaturesPiek <- function(analysisInfo, genEICParams = getPiekEICParams(),
             
             peaks[, EIC_ID := NULL][]
             if (IMS)
-                peaks[, ims_parent_ID := NA_character_]
+                peaks[, ims_precursor_ID := NA_character_]
             
             return(peaks)
         })

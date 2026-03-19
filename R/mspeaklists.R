@@ -858,7 +858,7 @@ setMethod("spectrumSimilarityMobility", "MSPeakLists", function(obj, fGroups, do
         stop("No mobility data available in feature groups.", call. = FALSE)
     
     gInfo <- groupInfo(fGroups)
-    gInfo <- gInfo[group %chin% groupNames(obj) & (group %chin% ims_parent_group | ims_parent_group %chin% group)]
+    gInfo <- gInfo[group %chin% groupNames(obj) & (group %chin% ims_precursor_group | ims_precursor_group %chin% group)]
     anas <- analyses(obj)
     
     if (nrow(gInfo) == 0)
@@ -868,21 +868,21 @@ setMethod("spectrumSimilarityMobility", "MSPeakLists", function(obj, fGroups, do
         return(NULL)
     }
     
-    return(rbindlist(lapply(gInfo[is.na(ims_parent_group)]$group, function(g)
+    return(rbindlist(lapply(gInfo[is.na(ims_precursor_group)]$group, function(g)
     {
-        mg <- gInfo[ims_parent_group == g]$group
+        mg <- gInfo[ims_precursor_group == g]$group
         
         if (doFGroups)
         {
             s <- spectrumSimilarity(obj, groupName1 = mg, groupName2 = g, ..., drop = FALSE)
-            return(data.table(group = mg, ims_parent_group = g, similarity = s[, 1]))
+            return(data.table(group = mg, ims_precursor_group = g, similarity = s[, 1]))
         }
         
         rbindlist(lapply(anas, function(a)
         {
             s <- spectrumSimilarity(obj, groupName1 = mg, groupName2 = g, analysis1 = rep(a, length(mg)),
                                     analysis2 = a, ..., drop = FALSE)
-            return(data.table(group = mg, ims_parent_group = g, analysis = a, similarity = s[, 1]))
+            return(data.table(group = mg, ims_precursor_group = g, analysis = a, similarity = s[, 1]))
         }))
     })))
 })

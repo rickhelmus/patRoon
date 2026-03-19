@@ -102,20 +102,20 @@ setMethod("initialize", "featureAnnotations", function(.Object, specSimParams, M
     
     if (!is.null(mobSpecSims))
     {
-        mss <- mobSpecSims[ims_parent_group %chin% groupNames(.Object)]
+        mss <- mobSpecSims[ims_precursor_group %chin% groupNames(.Object)]
         if (nrow(mss) > 0)
         {
-            .Object@groupAnnotations[mss$group] <- copy(.Object@groupAnnotations[mss$ims_parent_group])
+            .Object@groupAnnotations[mss$group] <- copy(.Object@groupAnnotations[mss$ims_precursor_group])
             .Object@groupAnnotations[mss$group] <- updateFragInfosForCopiedMobResults(.Object@groupAnnotations[mss$group],
                                                                                       averagedPeakLists(MSPeakLists))
-            .Object@scoreRanges[mss$group] <- copy(.Object@scoreRanges[mss$ims_parent_group])
+            .Object@scoreRanges[mss$group] <- copy(.Object@scoreRanges[mss$ims_precursor_group])
             
             # sync order
             .Object@groupAnnotations <- .Object@groupAnnotations[intersect(gNames, groupNames(.Object))]
             .Object@scoreRanges <- .Object@scoreRanges[intersect(gNames, groupNames(.Object))]
 
             printf("Copied %d results to %d mobility feature groups with similar MS2 spectra.\n",
-                   sum(sapply(.Object@groupAnnotations[unique(mss$ims_parent_group)], nrow)), nrow(mss))
+                   sum(sapply(.Object@groupAnnotations[unique(mss$ims_precursor_group)], nrow)), nrow(mss))
         }
     }
     

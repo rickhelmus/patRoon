@@ -221,7 +221,7 @@ doFGAADTGroups <- function(fGroups, intColNames, average, averageBy, areas, addQ
     ret[, c("group", "ret", "mz") := .(gNames, gInfo$ret, gInfo$mz)]
     if (hasIMS(fGroups))
     {
-        cols <- intersect(c("mobility", "CCS", "ims_parent_group"), names(gInfo))
+        cols <- intersect(c("mobility", "CCS", "ims_precursor_group"), names(gInfo))
         ret[, (cols) := gInfo[, cols, with = FALSE]]
         if (IMS %in% c("both", "maybe"))
         {
@@ -233,7 +233,7 @@ doFGAADTGroups <- function(fGroups, intColNames, average, averageBy, areas, addQ
                     ret[!is.na(get(coln)), (paste0(coln, "_collapsed")) := as.character(round(get(coln), digits))]
                     ret[is.na(get(coln)), (paste0(coln, "_collapsed")) := sapply(group, function(g)
                     {
-                        paste0(round(gInfoOrig[ims_parent_group == g][[coln]], digits), collapse = ",")
+                        paste0(round(gInfoOrig[ims_precursor_group == g][[coln]], digits), collapse = ",")
                     })]
                 }
             }
@@ -243,7 +243,7 @@ doFGAADTGroups <- function(fGroups, intColNames, average, averageBy, areas, addQ
             doCollapse("CCS", 3)
         }
     }
-    setcolorder(ret, intersect(c("group", "ims_parent_group", "ret", "mz", "mobility", "mobility_collapsed", "CCS",
+    setcolorder(ret, intersect(c("group", "ims_precursor_group", "ret", "mz", "mobility", "mobility_collapsed", "CCS",
                                  "CCS_collapsed"), names(ret)))
     
     if (addQualities)
@@ -433,7 +433,7 @@ doFGAADTFeatures <- function(fGroups, fgTab, intColNames, average, averageBy, ad
             featTab[!is.na(get(col)), (paste0(col, "_collapsed")) := as.character(round(get(col), digits))]
             featTab[is.na(get(col)), (paste0(col, "_collapsed")) := mapply(ID, analysis, FUN = function(i, a)
             {
-                paste0(round(fTabOrig[[a]][ims_parent_ID == i][[col]], digits), collapse = ",")
+                paste0(round(fTabOrig[[a]][ims_precursor_ID == i][[col]], digits), collapse = ",")
             })]
         }        
     }
@@ -499,8 +499,8 @@ doFGAADTFeatures <- function(fGroups, fgTab, intColNames, average, averageBy, ad
     
     # set nice column order
     qualCols <- c(getFeatureQualityNames(fGroups), getFeatureQualityNames(fGroups, scores = TRUE))
-    colord <- c("group", "ims_parent_group", "set", "analysis", "average_group", "replicate", "group_ret",
-                "group_mz", "group_mobility", "group_mobility_collapsed", "ID", "ims_parent_ID", "ret", "mz", "ion_mz",
+    colord <- c("group", "ims_precursor_group", "set", "analysis", "average_group", "replicate", "group_ret",
+                "group_mz", "group_mobility", "group_mobility_collapsed", "ID", "ims_precursor_ID", "ret", "mz", "ion_mz",
                 "mobility", "mobility_collapsed", "intensity", "area", "intensity_rel", "area_rel")
     colord <- c(colord, setdiff(names(featTab), c(colord, qualCols)))
     colord <- c(colord, grep("group_(ion_mz|adduct)", names(fgTab), value = TRUE), "neutralMass", "x_reg",

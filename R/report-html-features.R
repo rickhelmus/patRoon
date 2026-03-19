@@ -11,10 +11,10 @@ getFGReactTab <- function(objects, settings, ...)
     tab <- as.data.table(objects$fGroups, qualities = "score", average = TRUE,
                          concAggrParams = settings$features$aggregateConcs, toxAggrParams = settings$features$aggregateTox, ...)
     
-    if (!is.null(tab[["ims_parent_group"]]) && any(!is.na(tab$ims_parent_group)))
+    if (!is.null(tab[["ims_precursor_group"]]) && any(!is.na(tab$ims_precursor_group)))
     {
         # link IMS parents to themselves and assign orphans to "none" for grouping
-        tab[is.na(ims_parent_group), ims_parent_group := fifelse(is.na(mobility), group, "none")]
+        tab[is.na(ims_precursor_group), ims_precursor_group := fifelse(is.na(mobility), group, "none")]
     }
     
     if (settings$features$chromatograms$small)
@@ -228,9 +228,9 @@ makeSuspInfoPropTab <- function(tab, id, retMin)
 reportHTMLUtils$methods(
     makeMainResultsFGReactable = function(..., groupMob = TRUE)
     {
-        groupMob <- groupMob && hasIMS(objects$fGroups) && any(!is.na(groupInfo(objects$fGroups)$ims_parent_group))
+        groupMob <- groupMob && hasIMS(objects$fGroups) && any(!is.na(groupInfo(objects$fGroups)$ims_precursor_group))
         makeMainResultsReactable(..., retMin = settings$features$retMin,
-                                 groupBy = if (groupMob) "ims_parent_group", defaultExpanded = groupMob)
+                                 groupBy = if (groupMob) "ims_precursor_group", defaultExpanded = groupMob)
     },
 
     genMainTablePlain = function()
@@ -478,11 +478,11 @@ reportHTMLUtils$methods(
     makeFGToolbar = function(tableID, groupMob)
     {
         hasMob <- hasIMS(objects$fGroups)
-        gb <- if (hasMob && groupMob && any(!is.na(groupInfo(objects$fGroups)$ims_parent_group)))
+        gb <- if (hasMob && groupMob && any(!is.na(groupInfo(objects$fGroups)$ims_precursor_group)))
         {
             list(
                 list(value = "", name = "None"),
-                list(value = "ims_parent_group", name = "IMS parent group")
+                list(value = "ims_precursor_group", name = "IMS parent group")
             )
         }
         chromMobTitle <- if (hasMob && settings$features$chromatograms$large && settings$features$mobilograms$large)
@@ -491,7 +491,7 @@ reportHTMLUtils$methods(
             "Large mobilograms"
         else if (settings$features$chromatograms$large)
             "Large chromatograms"
-        makeToolbar(tableID, groupBy = gb, groupByDef = "ims_parent_group", columnToggles = list(
+        makeToolbar(tableID, groupBy = gb, groupByDef = "ims_precursor_group", columnToggles = list(
             list(value = "group", name = "Group info", checked = TRUE),
             list(value = "intensities", name = "Intensities", checked = TRUE),
             maybeInclUI(hasConcs(), list(value = "concentrations", name = "Concentrations",

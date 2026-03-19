@@ -306,7 +306,7 @@ test_that("IMS tests", {
         cmp <- expComps[[cmpi]]
         for (fg in cmp$group)
         {
-            parentFG <- gInfo[group == fg]$ims_parent_group
+            parentFG <- gInfo[group == fg]$ims_precursor_group
             if (is.na(parentFG))
                 next
             expect_equal(cmp[group == fg][, -"group"], cmp[group == parentFG][, -"group"],

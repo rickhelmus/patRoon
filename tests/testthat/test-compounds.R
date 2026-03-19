@@ -544,7 +544,7 @@ test_that("IMS tests", {
     gInfo <- groupInfo(fGroupsIMS)
     for (fg in groupNames(compsIMSSim))
     {
-        parentFG <- gInfo[group == fg]$ims_parent_group
+        parentFG <- gInfo[group == fg]$ims_precursor_group
         # skip if no parent or identical MS2
         if (is.na(parentFG) || isTRUE(all.equal(plistsIMS[[fg]]$MSMS, plistsIMS[[parentFG]]$MSMS, tolerance = 1E-6)))
             next

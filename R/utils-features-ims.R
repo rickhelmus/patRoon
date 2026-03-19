@@ -30,8 +30,8 @@ doAssignFeatureMobilities <- function(fTable, mobTable)
     fTable[, ord := seq_len(.N)]
     
     mobTable <- copy(mobTable)
-    mobTable[, mobOrd := seq_len(.N), by = "ims_parent_ID"]
-    mobTable[, ID := appendMobToName(ims_parent_ID, mobility)]
+    mobTable[, mobOrd := seq_len(.N), by = "ims_precursor_ID"]
+    mobTable[, ID := appendMobToName(ims_precursor_ID, mobility)]
     
     if (nrow(mobTable) == 0)
     {
@@ -39,7 +39,7 @@ doAssignFeatureMobilities <- function(fTable, mobTable)
         {
             # at least initialize columns
             mobNumCols <- intersect(getMobilityCols(), names(mobTable))
-            fTable[, ims_parent_ID := NA_character_]
+            fTable[, ims_precursor_ID := NA_character_]
             fTable[, (mobNumCols) := NA_real_]
             fTable[, mob_assign_method := NA_character_]
         }
@@ -48,12 +48,12 @@ doAssignFeatureMobilities <- function(fTable, mobTable)
     {
         # add feature data: merge fTable, while making sure that no columns overlap
         mobTable <- merge(mobTable, fTable[, c("ID", setdiff(names(fTable), names(mobTable))), with = FALSE],
-                          by.x = "ims_parent_ID", by.y = "ID", sort = FALSE)
+                          by.x = "ims_precursor_ID", by.y = "ID", sort = FALSE)
         setcolorder(mobTable, names(fTable))
         
         # merge mobility features
         fTable <- rbind(fTable, mobTable, fill = TRUE)
-        fTable[is.na(mobility), ims_parent_ID := NA_character_]
+        fTable[is.na(mobility), ims_precursor_ID := NA_character_]
         
         setorderv(fTable, c("ord", "mobOrd"), na.last = FALSE)
     }
@@ -74,14 +74,14 @@ doFindPeaksForMobilities <- function(EIMs, ana, peakParams)
         # pretend we have EICs so we can find peaks
         EIMs <- lapply(EIMs, \(e) { colnames(e)[1] <- "time"; e })
         peaksList <- findPeaks(EIMs, FALSE, peakParams, file.path("log", "assignMobilities", paste0("mobilogram_peaks-", ana, ".txt")))
-        peaksTable <- rbindlist(peaksList, idcol = "ims_parent_ID")
+        peaksTable <- rbindlist(peaksList, idcol = "ims_precursor_ID")
         setnames(peaksTable, c("ret", "retmin", "retmax", "area", "intensity"), mobNumCols, skip_absent = TRUE)
         # NOTE: we subset columns here to remove any algo specific columns that may also be present in the feature
         # table (UNDONE?)
-        peaksTable <- subsetDTColumnsIfPresent(peaksTable, c(mobNumCols, "ims_parent_ID"))
+        peaksTable <- subsetDTColumnsIfPresent(peaksTable, c(mobNumCols, "ims_precursor_ID"))
     }
     if (length(peaksTable) == 0)
-        peaksTable <- data.table()[, (mobNumCols) := numeric()][, ims_parent_ID := character()]
+        peaksTable <- data.table()[, (mobNumCols) := numeric()][, ims_precursor_ID := character()]
     
     peaksTable[, mob_assign_method := "peak"]
     
@@ -102,7 +102,7 @@ assignFeatureMobilitiesPeaks <- function(features, peakParams, EIMParams, parall
     oldCount <- countMobilityFeatures(features)
     
     # skip any mobility features and IMS parents
-    EIMSelFunc <- \(tab) if (is.null(tab[["mobility"]])) tab else tab[is.na(mobility) & !ID %chin% ims_parent_ID]
+    EIMSelFunc <- \(tab) if (is.null(tab[["mobility"]])) tab else tab[is.na(mobility) & !ID %chin% ims_precursor_ID]
     allEIMs <- getFeatureEIXs(features, "EIM", EIXParams = EIMParams, selectFunc = EIMSelFunc, compress = FALSE)
     
     if (identical(parallel, "maybe"))
@@ -274,14 +274,14 @@ updateFGroupsForMobilities <- function(fGroups, mobWindow, scoreWeights, sets)
     
     # prepare group info
     gMobInfo <- fTableAll[, .(mobility = mean(mobility)), by = c("group", "IMSGroup")]
-    setnames(gMobInfo, "group", "ims_parent_group")
-    gMobInfo[is.na(mobility), group := ims_parent_group]
-    gMobInfo[!is.na(mobility), group := appendMobToName(ims_parent_group, mobility)]
+    setnames(gMobInfo, "group", "ims_precursor_group")
+    gMobInfo[is.na(mobility), group := ims_precursor_group]
+    gMobInfo[!is.na(mobility), group := appendMobToName(ims_precursor_group, mobility)]
     
     # update features
-    setnames(fTableAll, "group", "ims_parent_group") # UNDONE: better colname
-    fTableAll[gMobInfo, group := i.group, on = c("ims_parent_group", "IMSGroup")]
-    fTableAllClean <- removeDTColumnsIfPresent(fTableAll, c("IMSGroup", "set", "ims_parent_group"))
+    setnames(fTableAll, "group", "ims_precursor_group") # UNDONE: better colname
+    fTableAll[gMobInfo, group := i.group, on = c("ims_precursor_group", "IMSGroup")]
+    fTableAllClean <- removeDTColumnsIfPresent(fTableAll, c("IMSGroup", "set", "ims_precursor_group"))
     fTable <- split(fTableAllClean, by = "analysis", keep.by = FALSE)
     # NOTE: the above will not restore any empty feature tables
     missingAna <- setdiff(analyses(fGroups), names(fTable))
@@ -291,10 +291,10 @@ updateFGroupsForMobilities <- function(fGroups, mobWindow, scoreWeights, sets)
     
     # update gInfo
     gInfo <- copy(groupInfo(fGroups))
-    setnames(gInfo, "group", "ims_parent_group")
-    gInfo <- merge(gInfo, gMobInfo, by = "ims_parent_group", sort = FALSE)
-    setcolorder(gInfo, c("group", "ret", "mz", "mobility", "ims_parent_group"))
-    gInfo[is.na(mobility), ims_parent_group := NA_character_]
+    setnames(gInfo, "group", "ims_precursor_group")
+    gInfo <- merge(gInfo, gMobInfo, by = "ims_precursor_group", sort = FALSE)
+    setcolorder(gInfo, c("group", "ret", "mz", "mobility", "ims_precursor_group"))
+    gInfo[is.na(mobility), ims_precursor_group := NA_character_]
     fGroups@groupInfo <- gInfo[, -"IMSGroup"]
     
     # re-fill group table
@@ -325,7 +325,7 @@ updateFGroupsForMobilities <- function(fGroups, mobWindow, scoreWeights, sets)
             # slots are all data.tables with group column
             d <- rbindlist(lapply(split(d, seq_len(nrow(d))), function(r)
             {
-                og <- gInfo[!is.na(mobility) & ims_parent_group == r$group]$group
+                og <- gInfo[!is.na(mobility) & ims_precursor_group == r$group]$group
                 rbind(r, data.table(group = og, r[, -"group"]))
             }))
             
@@ -347,9 +347,9 @@ updateFGroupsForMobilities <- function(fGroups, mobWindow, scoreWeights, sets)
         
         addMobISTDAssigns <- function(ISA)
         {
-            gi <- gInfo[group %chin% names(ISA) | ims_parent_group %chin% names(ISA)]
+            gi <- gInfo[group %chin% names(ISA) | ims_precursor_group %chin% names(ISA)]
             mobFGs <- gi[!is.na(mobility)]$group
-            mobFGParents <- gi[!is.na(mobility)]$ims_parent_group
+            mobFGParents <- gi[!is.na(mobility)]$ims_precursor_group
             setNames(ISA[mobFGParents], mobFGs)
         }
         
@@ -421,7 +421,7 @@ selectIMSFilterFeatures <- function(features, IMS)
         else if (isFALSE(IMS))
             !is.na(fl$mobility)
         else # "maybe"
-            !is.na(fl$mobility) & fl$ims_parent_ID %chin% fl$ID
+            !is.na(fl$mobility) & fl$ims_precursor_ID %chin% fl$ID
     })
     
     if (isFALSE(IMS))
@@ -433,10 +433,10 @@ selectIMSFilterFeatures <- function(features, IMS)
 expandTableForIMSFGroups <- function(tab, gInfo)
 {
     # map all fGroups to copy: these are all mobility fGroups that are not orphans
-    gInfo <- gInfo[group %chin% tab$group | ims_parent_group %chin% tab$group]
+    gInfo <- gInfo[group %chin% tab$group | ims_precursor_group %chin% tab$group]
     tab <- copy(tab)
     tab[, orderOrig := seq_len(.N)]
-    imspars <- fifelse(is.na(gInfo$ims_parent_group), gInfo$group, gInfo$ims_parent_group)
+    imspars <- fifelse(is.na(gInfo$ims_precursor_group), gInfo$group, gInfo$ims_precursor_group)
     expanded <- rbindlist(lapply(seq_len(nrow(tab)), function(row)
     {
         rowTab <- tab[row]

@@ -348,9 +348,9 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
     
     if (!is.null(mobSpecSims))
     {
-        mss <- mobSpecSims[ims_parent_group %chin% names(ret@fingerprints)]
+        mss <- mobSpecSims[ims_precursor_group %chin% names(ret@fingerprints)]
         if (nrow(mss) > 0)
-            ret@fingerprints[mss$group] <- copy(ret@fingerprints[mss$ims_parent_group])
+            ret@fingerprints[mss$group] <- copy(ret@fingerprints[mss$ims_precursor_group])
     }
     
     return(ret)

@@ -27,7 +27,7 @@ setMethod("groupFeaturesIMS", "features", function(feat, grouper, groupAlgo, ...
     fTable <- featureTable(feat)
     fTableAll <- as.data.table(feat)
     
-    if (any(!is.na(fTableAll$ims_parent_ID)))
+    if (any(!is.na(fTableAll$ims_precursor_ID)))
         warning("Any links between IMS parents and mobility features will be removed!", call. = FALSE)
         
     # clusters features with similar mobilities
@@ -71,7 +71,7 @@ setMethod("groupFeaturesIMS", "features", function(feat, grouper, groupAlgo, ...
     })]
     
     gInfo <- subsetDTColumnsIfPresent(copy(fgInfoAll), c("group_ims", "ret", "mz", "mobility", "CCS"))
-    gInfo[, ims_parent_group := NA_character_]
+    gInfo[, ims_precursor_group := NA_character_]
     setnames(gInfo, "group_ims", "group")
     setcolorder(gInfo, "CCS", after = last(names(gInfo)), skip_absent = TRUE) # put CCS at the end of the table
     

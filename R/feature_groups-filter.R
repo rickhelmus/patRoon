@@ -359,9 +359,9 @@ selectIMSFilter <- function(fGroups, IMS, negate = FALSE, applyIMS = "both", ver
         else if (IMS == "maybe")
         {
             if (negate)
-                gInfoDel[is.na(mobility) | !ims_parent_group %chin% names(fGroups)]
+                gInfoDel[is.na(mobility) | !ims_precursor_group %chin% names(fGroups)]
             else
-                gInfoDel[!is.na(mobility) & ims_parent_group %chin% names(fGroups)]
+                gInfoDel[!is.na(mobility) & ims_precursor_group %chin% names(fGroups)]
         }
         return(list(delete = list(j = gInfoDel$group)))
     }, "IMS_selection", applyIMS = "both", verbose = verbose)
@@ -748,7 +748,7 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
     if (withIMSParent)
     {
         gInfoIMS <- groupInfo(obj)[!is.na(mobility)]
-        obj <- delete(obj, j = gInfoIMS[!ims_parent_group %chin% names(obj)]$group)
+        obj <- delete(obj, j = gInfoIMS[!ims_precursor_group %chin% names(obj)]$group)
     }
     if (removeBlanks)
         obj <- replicateFilter(obj, unique(unlist(strsplit(analysisInfo(obj)$blank, ","))), negate = !negate)

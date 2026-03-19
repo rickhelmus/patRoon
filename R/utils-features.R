@@ -523,11 +523,11 @@ calcFeatureConcs <- function(fGroups, resp, areas)
         # for mobility features, we take parent intensities (if available) as mobility filtering may lead to reduced
         # intensities that currently are not taken into account when calculating response factors
         # UNDONE: make this configurable?
-        gInfoChange <- groupInfo(fGroups)[!is.na(mobility) & group %chin% resp$group & ims_parent_group %chin% group]
+        gInfoChange <- groupInfo(fGroups)[!is.na(mobility) & group %chin% resp$group & ims_precursor_group %chin% group]
         if (nrow(gInfoChange) > 0)
         {
             for (grpi in seq_len(nrow(gInfoChange)))
-                set(gt, j = gInfoChange$group[grpi], value = fGroups[[gInfoChange$ims_parent_group[grpi]]])
+                set(gt, j = gInfoChange$group[grpi], value = fGroups[[gInfoChange$ims_precursor_group[grpi]]])
         }
     }
     

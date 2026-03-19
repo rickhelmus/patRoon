@@ -66,7 +66,7 @@ setMethod("initialize", "featuresTable", function(.Object, ...) callNextMethod(.
 #'     \item \code{mob_area} and \code{mob_intensity}: the peak area and intensity of the peak in the mobilogram for the
 #'     feature. (\strong{optional})
 #'
-#'     \item \code{ims_parent_ID}: the ID of the IMS parent in a \link[=assignMobilities_feat]{post mobility assignment}
+#'     \item \code{ims_precursor_ID}: the ID of the IMS parent in a \link[=assignMobilities_feat]{post mobility assignment}
 #'     workflow. (\strong{optional})
 #'
 #'     \item \code{mob_assign_method}: a string that names the method used to assign the mobility to the feature.
@@ -128,7 +128,7 @@ importFeaturesTable <- function(input, analysisInfo, addCols = NULL)
         addCols <- setdiff(addCols, internalColsPresent)
     }
 
-    mobCols <- c("mobility", "mobmin", "mobmax", "mob_area", "mob_intensity", "ims_parent_ID", "mob_assign_method",
+    mobCols <- c("mobility", "mobmin", "mobmax", "mob_area", "mob_intensity", "ims_precursor_ID", "mob_assign_method",
                  "mob_reintegr_method", "CCS")
     setsCols <- c("set", "adduct", "ion_mz")
     
@@ -173,8 +173,8 @@ importFeaturesTable <- function(input, analysisInfo, addCols = NULL)
         maybeAddCol("mobmax", mobility + defaultLim("mobility", "narrow"), am = TRUE)
         maybeAddCol("mob_area", NA_real_, am = TRUE)
         maybeAddCol("mob_intensity", NA_real_, am = TRUE)
-        if (is.null(input[["ims_parent_ID"]]))
-            input[, ims_parent_ID := NA_character_]
+        if (is.null(input[["ims_precursor_ID"]]))
+            input[, ims_precursor_ID := NA_character_]
         if (is.null(input[["mob_assign_method"]]))
             input[, mob_assign_method := NA_character_]
         if (is.null(input[["mob_reintegr_method"]]))

@@ -155,7 +155,7 @@ setMethod("clearMobilities", "featureGroups", function(obj)
     if (!hasIMS(obj))
         return(obj)
     
-    obj@groupInfo <- removeDTColumnsIfPresent(groupInfo(obj), c("mobility", "CCS", "ims_parent_group"))
+    obj@groupInfo <- removeDTColumnsIfPresent(groupInfo(obj), c("mobility", "CCS", "ims_precursor_group"))
     obj@features <- clearMobilities(getFeatures(obj))
     return(obj)
 })
@@ -1348,8 +1348,8 @@ setMethod("normInts", "featureGroups", function(fGroups, featNorm, groupNorm, no
         updatedFeatures <- lapply(updatedFeatures, function(ft)
         {
             ft <- copy(ft)
-            ft[!is.na(mobility) & !is.na(ims_parent_ID) & ims_parent_ID %chin% ID, c("intensity_rel", "area_rel") := {
-                pid <- ims_parent_ID
+            ft[!is.na(mobility) & !is.na(ims_precursor_ID) & ims_precursor_ID %chin% ID, c("intensity_rel", "area_rel") := {
+                pid <- ims_precursor_ID
                 ft[match(pid, ID, nomatch = 0), c("intensity_rel", "area_rel")]
             }]
         })

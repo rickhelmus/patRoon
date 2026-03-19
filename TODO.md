@@ -4,15 +4,11 @@
 
 
 - update patRoonInst/patRoonExt/patRoonData for new deps
-    - install timsconvert and c3sdb in Docker and bundle
-        - Docker: finish WIP
-        - Windows: for now don't bundle, but install in GHA for testing: https://docs.github.com/en/actions/tutorials/build-and-test-code/python
     - update PCLiteCCS and update relevant README
     - update patRoonDeps dependencies for Rmstoolkitlib, reticulate, fmcsR etc
     - remove current hack to get in new deps for GHA and CircleCI
 - BUG: annSim.1 column (in formulas?)?
 - Harmonize/consistent names
-    - better names for ims_parent_ID/ims_parent_group?
     - settle for terminology for IMS parents/IMS features
 - See why parallel reporting is so slow (on Windows?)
 - reticulate: use py_require()? doesn't seem to be able handle multiple py versions, so no?

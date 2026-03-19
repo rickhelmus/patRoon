@@ -126,7 +126,7 @@ doGroupFeaturesGreedy <- function(feat, rtWindow, mzWindow, mobWindow, scoreWeig
     if (hasMob)
     {
         gInfo[, mobility := fTable[, mean(mobility_orig), by = "groupID"][[2]]]
-        gInfo[, ims_parent_group := NA_character_]
+        gInfo[, ims_precursor_group := NA_character_]
         if (!is.null(fTable[["CCS"]]))
             gInfo[, CCS := fTable[, mean(CCS), by = "groupID"][[2]]]
         setorderv(gInfo, c("mz", "ret", "mobility"), na.last = FALSE)
@@ -155,12 +155,12 @@ doGroupFeaturesGreedy <- function(feat, rtWindow, mzWindow, mobWindow, scoreWeig
         
     gInfo[, groupID := NULL]
     
-    if (hasMob && any(!is.na(fTable$ims_parent_ID)))
+    if (hasMob && any(!is.na(fTable$ims_precursor_ID)))
     {
         fTableNoIMSPar <- lapply(featureTable(feat), function(ft)
         {
             ft <- copy(ft)
-            ft[, ims_parent_ID := NA_character_]
+            ft[, ims_precursor_ID := NA_character_]
             return(ft)
         })
         featureTable(feat) <- fTableNoIMSPar

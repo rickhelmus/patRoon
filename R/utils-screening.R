@@ -210,14 +210,14 @@ matchIMSScr <- function(scr, gInfo, IMSMatchParams, negate = FALSE)
     
     if (IMSMatchParams$minMatches > 0)
     {
-        if (all(is.na(gInfo$ims_parent_group)))
+        if (all(is.na(gInfo$ims_precursor_group)))
         {
             warning("No IMS parent group assignments available, cannot apply minMatches filter", call. = FALSE)
             return(scr)
         }
         
         scr <- copy(scr)
-        scr[, ims_parent_group := gInfo$ims_parent_group[match(group, gInfo$group)]]
+        scr[, ims_precursor_group := gInfo$ims_precursor_group[match(group, gInfo$group)]]
         scr[, suspIMSCount := {
             v <- if (!is.na(mobility_input[1])) mobility_input[1] else CCS_input[1]
             if (is.na(v))
@@ -225,16 +225,16 @@ matchIMSScr <- function(scr, gInfo, IMSMatchParams, negate = FALSE)
             else
                 length(strsplit(v, ";")[[1]])
         }, by = "name"]
-        scr[!is.na(ims_parent_group), suspIMSMatches := {
+        scr[!is.na(ims_precursor_group), suspIMSMatches := {
             uniqueN(if (!is.na(mobility_input[1])) mobility else CCS)
-        }, by = c("ims_parent_group", "name")]
+        }, by = c("ims_precursor_group", "name")]
         scr <- if (negate)
-            scr[is.na(ims_parent_group) | suspIMSCount < IMSMatchParams$minMatches |
+            scr[is.na(ims_precursor_group) | suspIMSCount < IMSMatchParams$minMatches |
                        suspIMSMatches < IMSMatchParams$minMatches]
         else
-            scr[is.na(ims_parent_group) | suspIMSCount < IMSMatchParams$minMatches |
+            scr[is.na(ims_precursor_group) | suspIMSCount < IMSMatchParams$minMatches |
                        suspIMSMatches >= IMSMatchParams$minMatches]
-        scr <- removeDTColumnsIfPresent(scr, c("suspIMSCount", "suspIMSMatches", "ims_parent_group"))
+        scr <- removeDTColumnsIfPresent(scr, c("suspIMSCount", "suspIMSMatches", "ims_precursor_group"))
     }
     return(scr)
 }
@@ -265,9 +265,9 @@ assignFeatureMobilitiesSuspects <- function(features, scr, mobWindow, selectFunc
         if (!is.null(selectFunc))
             mobTable <- selectFunc(mobTable, ana)
         if (nrow(mobTable) == 0)
-            mobTable[, ims_parent_ID := character()]
+            mobTable[, ims_precursor_ID := character()]
         else
-            mobTable[, ims_parent_ID := fTable[match(mobTable$group, group, nomatch = 0)]$ID][, group := NULL]
+            mobTable[, ims_precursor_ID := fTable[match(mobTable$group, group, nomatch = 0)]$ID][, group := NULL]
         mobTable[, c("mob_area", "mob_intensity", "mob_assign_method") := .(NA_real_, NA_real_, "suspect")]
         return(doAssignFeatureMobilities(fTable, mobTable))
     })
@@ -296,7 +296,7 @@ finalizeScreenInfoForIMS <- function(scr, gInfo, IMSMatchParams)
     scr[, CCS_group := NA_real_]
     if (!is.null(gInfo[["CCS"]]))
         scr[, CCS_group := gInfo$CCS[match(group, gInfo$group)]]
-    scr[, ims_parent_group := gInfo$ims_parent_group[match(group, gInfo$group)]]
+    scr[, ims_precursor_group := gInfo$ims_precursor_group[match(group, gInfo$group)]]
 
     assignClosest <- function(col, groupVal, scrGroup, scrName)
     {
@@ -326,7 +326,7 @@ finalizeScreenInfoForIMS <- function(scr, gInfo, IMSMatchParams)
     if (!is.null(IMSMatchParams))
         scr <- matchIMSScr(scr, gInfo, IMSMatchParams)
 
-    return(removeDTColumnsIfPresent(scr, c("mob_group", "CCS_group", "ims_parent_group")))
+    return(removeDTColumnsIfPresent(scr, c("mob_group", "CCS_group", "ims_precursor_group")))
 }
 
 selectFromSuspAdductCol <- function(tab, col, adductChrDef, gNames = NULL, fgAnn = data.table())

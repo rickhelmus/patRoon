@@ -71,10 +71,10 @@ test_that("assignMobilities", {
     
     expect_true(hasIMS(fgAMInt))
     expect_true(hasIMS(fgAMEmpty))
-    checkmate::expect_names(names(groupInfo(fgAMInt)), must.include = c("mobility", "CCS", "ims_parent_group"))
+    checkmate::expect_names(names(groupInfo(fgAMInt)), must.include = c("mobility", "CCS", "ims_precursor_group"))
     checkmate::expect_names(names(featureTable(fgAMInt)[[1]]),
                             must.include = c(getMobilityCols(), "CCS", "mob_assign_method", "mob_reintegr_method",
-                                             "ims_parent_ID"))
+                                             "ims_precursor_ID"))
     expect_false(isTRUE(all.equal(featureTable(fgAMInt)[[4]][!is.na(mobility)]$area,
                                   featureTable(fgAMSum)[[4]][!is.na(mobility)]$area)))
     expect_equal(featureTable(fgAMInt)[[4]][!is.na(mobility), -"area"],
@@ -92,8 +92,8 @@ test_that("assignMobilities", {
     fgAMISTD <- doAssignMobs(fgIMSISTD)
     getAssignedFGs <- \(fg) unlist(lapply(internalStandardAssignments(fg), names))
     # check that assigned IMS parents + their IMS features are all present
-    gi <- groupInfo(fgAMISTD)[ims_parent_group %in% getAssignedFGs(fgIMSISTD) | group %in% getAssignedFGs(fgIMSISTD)]
-    expect_setequal(getAssignedFGs(fgAMISTD), na.omit(union(gi$group, gi$ims_parent_group)))
+    gi <- groupInfo(fgAMISTD)[ims_precursor_group %in% getAssignedFGs(fgIMSISTD) | group %in% getAssignedFGs(fgIMSISTD)]
+    expect_setequal(getAssignedFGs(fgAMISTD), na.omit(union(gi$group, gi$ims_precursor_group)))
 })
 
 test_that("empty objects work", {
@@ -516,18 +516,18 @@ test_that("replicate subtraction", {
 
 test_that("IMS subset and filtering", {
     delGI <- groupInfo(fgAMInt)[!is.na(mobility)][2:10]
-    fgAMDel <- delete(fgAMInt, j = delGI$ims_parent_group)
+    fgAMDel <- delete(fgAMInt, j = delGI$ims_precursor_group)
     
     expect_setequal(names(fgAMInt[IMS = TRUE]), groupInfo(fgAMInt)[!is.na(mobility)]$group)
     expect_setequal(names(fgAMInt[IMS = FALSE]), groupInfo(fgAMInt)[is.na(mobility)]$group)
     expect_false(hasIMS(fgAMInt[IMS = FALSE]))
-    checkmate::expect_names(names(groupInfo(fgAMInt[IMS = FALSE])), disjunct.from = c("mobility", "CCS", "ims_parent_group"))
+    checkmate::expect_names(names(groupInfo(fgAMInt[IMS = FALSE])), disjunct.from = c("mobility", "CCS", "ims_precursor_group"))
     checkmate::expect_names(names(featureTable(fgAMInt[IMS = FALSE])[[1]]),
                             disjunct.from = c(getMobilityCols(), "CCS", "mob_assign_method", "mob_reintegr_method",
-                                              "ims_parent_ID"))
+                                              "ims_precursor_ID"))
     expect_equal(fgAMInt, fgAMInt[IMS = "both"])
     expect_setequal(names(fgAMInt[IMS = FALSE]), names(fgAMInt[IMS = "maybe"]))
-    expect_setequal(names(fgAMDel[IMS = "maybe"][IMS = TRUE]), groupInfo(fgAMDel)[ims_parent_group %in% delGI$ims_parent_group]$group)
+    expect_setequal(names(fgAMDel[IMS = "maybe"][IMS = TRUE]), groupInfo(fgAMDel)[ims_precursor_group %in% delGI$ims_precursor_group]$group)
     
     checkmate::expect_disjunct(names(filter(fgAMDel, withIMSParent = TRUE)), fgAMDel$group)
     expect_range(groupInfo(filter(fgAMInt, IMSRangeParams = getIMSRangeParams("mobility", 0.65, 0.75)))$mobility,
@@ -593,7 +593,7 @@ test_that("Normalization", {
                  groupTable(doNormIntsIMS(fgISTDIMS[IMS = FALSE], "tic"), normalized = TRUE))
     # verify that IMS features are normalized equally to their parents
     adt <- as.data.table(fgNormISTDIMS, features = TRUE)
-    adt[adt[is.na(mobility)], intensity_rel_parent := i.intensity_rel, on = .(ims_parent_ID = ID, analysis)]
+    adt[adt[is.na(mobility)], intensity_rel_parent := i.intensity_rel, on = .(ims_precursor_ID = ID, analysis)]
     expect_all_true(adt[!is.na(mobility)]$intensity_rel == adt[!is.na(mobility)]$intensity_rel_parent)
     
     expect_length(fgNormISTDEmpty, 0)

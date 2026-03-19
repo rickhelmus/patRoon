@@ -75,13 +75,13 @@ setMethod("initialize", "formulas", function(.Object, specSimParams, MSPeakLists
         copied <- 0
         .Object@featureFormulas <- Map(.Object@featureFormulas, names(.Object@featureFormulas), f = function(fa, ana)
         {
-            mssa <- mobSpecSimsAna[analysis == ana & ims_parent_group %chin% names(fa)]
+            mssa <- mobSpecSimsAna[analysis == ana & ims_precursor_group %chin% names(fa)]
             if (nrow(mssa) > 0)
             {
-                fa[mssa$group] <- copy(fa[mssa$ims_parent_group])
+                fa[mssa$group] <- copy(fa[mssa$ims_precursor_group])
                 fa[mssa$group] <- updateFragInfosForCopiedMobResults(fa[mssa$group], peakLists(MSPeakLists)[[ana]])
                 fa <- fa[intersect(gNames, names(fa))] # sync order
-                copied <<- copied + sum(sapply(fa[unique(mssa$ims_parent_group)], nrow))
+                copied <<- copied + sum(sapply(fa[unique(mssa$ims_precursor_group)], nrow))
             }
             return(fa)
         })

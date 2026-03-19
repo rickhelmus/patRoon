@@ -370,9 +370,9 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
     
     if (getFingerprints && !is.null(mobSpecSims))
     {
-        mss <- mobSpecSims[ims_parent_group %chin% names(ret@fingerprints)]
+        mss <- mobSpecSims[ims_precursor_group %chin% names(ret@fingerprints)]
         if (nrow(mss) > 0)
-            ret@fingerprints[mss$group] <- copy(ret@fingerprints[mss$ims_parent_group])
+            ret@fingerprints[mss$group] <- copy(ret@fingerprints[mss$ims_precursor_group])
     }
     
     return(ret)

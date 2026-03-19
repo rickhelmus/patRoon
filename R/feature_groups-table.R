@@ -44,7 +44,7 @@ setMethod("initialize", "featureGroupsTable",
 #'     \item \code{group_mobility},\code{group_CCS}: the mobility and \acronym{CCS} assigned to the feature group. Will
 #'     be calculated from mean values of feature data if missing. (\strong{optional})
 #'
-#'     \item \code{ims_parent_group}: a string naming the IMS parent group of the feature group (\code{NA} if none or
+#'     \item \code{ims_precursor_group}: a string naming the IMS parent group of the feature group (\code{NA} if none or
 #'     not a mobility feature). (\strong{optional})
 #'
 #'   }
@@ -111,7 +111,7 @@ importFeatureGroupsTable <- function(input, analysisInfo, addCols = NULL, groupA
     for (col in gInfoNumColsPrefix)
         assertListVal(input, col, checkmate::assertNumeric, any.missing = col %in% c("group_mobility", "group_CCS"),
                       finite = TRUE, add = ac, mustExist = FALSE)
-    assertListVal(input, "ims_parent_group", checkmate::assertCharacter, any.missing = TRUE, min.chars = 1, add = ac,
+    assertListVal(input, "ims_precursor_group", checkmate::assertCharacter, any.missing = TRUE, min.chars = 1, add = ac,
                   mustExist = FALSE)
     
     if (hasSets)
@@ -188,12 +188,12 @@ importFeatureGroupsTable <- function(input, analysisInfo, addCols = NULL, groupA
     }
     
     gInfo <- unique(input, by = "group")
-    gInfo <- subsetDTColumnsIfPresent(gInfo, c("group", gInfoNumColsPrefix, "ims_parent_group"))
+    gInfo <- subsetDTColumnsIfPresent(gInfo, c("group", gInfoNumColsPrefix, "ims_precursor_group"))
     setnames(gInfo, gInfoNumColsPrefix, gInfoNumCols, skip_absent = TRUE)
     setcolorder(gInfo, "CCS", after = last(names(gInfo)), skip_absent = TRUE) # put CCS at the end of the table
     
-    if (hasIMS(importedFeat) && is.null(gInfo[["ims_parent_group"]]))
-        gInfo[, ims_parent_group := NA_character_]
+    if (hasIMS(importedFeat) && is.null(gInfo[["ims_precursor_group"]]))
+        gInfo[, ims_precursor_group := NA_character_]
     
     gTable <- data.table(matrix(0, nrow = nrow(analysisInfo), ncol = nrow(gInfo)))
     setnames(gTable, gInfo$group)

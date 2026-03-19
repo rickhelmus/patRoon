@@ -325,7 +325,7 @@ test_that("importFeaturesTable", {
                             must.include = c(mandCols, calcCols, setsCols))
     
     mandColsIMS <- c(mandCols, "mobility")
-    calcColsIMS <- c(calcCols, "mobmin", "mobmax", "mob_intensity", "mob_area", "ims_parent_ID", "mob_assign_method", "mob_reintegr_method")
+    calcColsIMS <- c(calcCols, "mobmin", "mobmax", "mob_intensity", "mob_area", "ims_precursor_ID", "mob_assign_method", "mob_reintegr_method")
     checkmate::expect_names(names(as.data.table(importFeaturesTable(as.data.table(ffPiekSuspIMS)[, mandColsIMS, with = FALSE], analysisInfo(ffPiekSuspIMS)))),
                             must.include = c(mandColsIMS, calcColsIMS))
     

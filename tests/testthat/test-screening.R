@@ -448,8 +448,8 @@ test_that("IMS worfklow", {
     expect_equal(screenInfo(filter(fGroupsAMWrongOne, IMSMatchParams = modifyList(IMP, list(minMatches = 0)))),
                  screenInfo(filter(fGroupsAMWrongOne, IMSMatchParams = IMP, negate = TRUE)))
     scr <- copy(screenInfo(filter(fGroupsAM, IMSMatchParams = IMP, negate = TRUE)))
-    scr[, ims_parent_group := groupInfo(fGroupsAM)$ims_parent_group[match(group, groupInfo(fGroupsAM)$group)]]
-    scr[, matchCount := uniqueN(mobility), by = c("ims_parent_group", "name")]
+    scr[, ims_precursor_group := groupInfo(fGroupsAM)$ims_precursor_group[match(group, groupInfo(fGroupsAM)$group)]]
+    scr[, matchCount := uniqueN(mobility), by = c("ims_precursor_group", "name")]
     checkmate::expect_numeric(scr[!is.na(d_mob)]$matchCount, upper = 1)
     scrPre <- screenInfo(fGroupsAMWrongOne)
     scrPost <- screenInfo(screenSuspects(fGroupsAMNoSus, list(suspsWrongOnePos, suspsWrongOneNeg)))

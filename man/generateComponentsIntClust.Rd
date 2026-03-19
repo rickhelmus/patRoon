@@ -40,7 +40,7 @@ normalization and averaging of data.}
 
   \item \code{"both"}: Selects IMS and non-IMS features.
 
-  \item \code{"maybe"}: Selects non-IMS features and IMS features without assigned IMS parent.
+  \item \code{"maybe"}: Selects non-IMS features and IMS features without assigned IMS precursor.
 
   \item \code{FALSE}: Selects only non-IMS features.
 
@@ -70,7 +70,7 @@ Hierarchical clustering is performed on normalized (and optionally replicate ave
   componentization was performed \emph{prior} to mobility assignments, see its documentation for more details.
 
   If mobilities were already assigned prior to componentization, then the \code{IMS} argument selects which feature
-  groups are subjected to componentization. Data for mobility feature groups that were not considered (\emph{i.e.}
+  groups are subjected to componentization. Data for IMS feature groups that were not considered (\emph{i.e.}
   when \code{IMS} is \code{FALSE} or \code{"maybe"}), will be expanded similarly as is done by
   \code{\link{expandForIMS}}.
 }

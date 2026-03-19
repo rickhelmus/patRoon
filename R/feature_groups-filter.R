@@ -568,7 +568,7 @@ minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, ne
 #' @param removeISTDs If \code{TRUE} then all feature groups marked as internal standard (IS) are removed. This requires
 #'   IS assignments done by \code{\link{normInts}}, see its documentation for more details.
 #' @param groupQualityRange Like \code{featQualityRange}, but filters on group specific or averaged qualities/scores.
-#' @param withIMSParent \IMSWF only keep mobility feature groups with IMS parents, \emph{i.e.} remove all orphans.
+#' @param withIMSPrecursor \IMSWF only keep IMS feature groups with IMS precursors, \emph{i.e.} remove all orphans.
 #'   Unaffected by \code{negate=TRUE}.
 #' @param checkFeaturesSession If set then features and/or feature groups are removed that were selected for removal
 #'   (see \link{check-GUI}). The session files are typically generated with the \code{\link{checkFeatures}} and
@@ -580,7 +580,7 @@ minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, ne
 #'   parameters} for more information.
 #' @param removeNA Set to \code{TRUE} to remove \code{NA} values. Currently only applicable to the concentration and
 #'   toxicity filters.
-#' @param applyIMS \IMSWF whether the filters are only applied to IMS parents (\code{applyIMS=FALSE}), only to mobility
+#' @param applyIMS \IMSWF whether the filters are only applied to IMS precursors (\code{applyIMS=FALSE}), only to IMS
 #'   features (\code{applyIMS=TRUE}) or to both (\code{applyIMS="both"}). Other feature groups will always be kept. The
 #'   \code{negate} option does not affect \code{applyIMS}.
 #'
@@ -649,7 +649,7 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
                                               maxReplicateIntRSD = NULL, blankThreshold = NULL,
                                               retentionRange = NULL, mzRange = NULL, mzDefectRange = NULL,
                                               chromWidthRange = NULL, featQualityRange = NULL, groupQualityRange = NULL,
-                                              replicates = NULL, IMS = NULL, withIMSParent = FALSE, IMSRangeParams = NULL,
+                                              replicates = NULL, IMS = NULL, withIMSPrecursor = FALSE, IMSRangeParams = NULL,
                                               results = NULL, removeBlanks = FALSE, removeISTDs = FALSE,
                                               checkFeaturesSession = NULL, predAggrParams = getDefPredAggrParams(),
                                               removeNA = FALSE, negate = FALSE, applyIMS = "both")
@@ -678,7 +678,7 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
                       checkmate::checkList(results, c("featureAnnotations", "components"), any.missing = FALSE,
                                            min.len = 1),
                       .var.name = "results")
-    aapply(checkmate::assertFlag, . ~ withIMSParent + removeBlanks + removeISTDs + removeNA + negate, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ withIMSPrecursor + removeBlanks + removeISTDs + removeNA + negate, fixed = list(add = ac))
     if (!is.logical(checkFeaturesSession))
         assertCheckSession(checkFeaturesSession, mustExist = TRUE,  null.ok = TRUE, add = ac)
     assertPredAggrParams(predAggrParams, add = ac)
@@ -689,8 +689,8 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
     {
         if (isTRUE(applyIMS))
             stop("applyIMS == TRUE while no mobilities are assigned", call. = FALSE)
-        if (withIMSParent)
-            stop("withIMSParent == TRUE while no mobilities are assigned", call. = FALSE)
+        if (withIMSPrecursor)
+            stop("withIMSPrecursor == TRUE while no mobilities are assigned", call. = FALSE)
     }
     
     if (length(obj) == 0)
@@ -745,7 +745,7 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
     obj <- maybeDoFilter(resultsFilter, results)
     
     # NOTE: for the next two don't have to use doFGroupFilter() as applyIMS is not relevant
-    if (withIMSParent)
+    if (withIMSPrecursor)
     {
         gInfoIMS <- groupInfo(obj)[!is.na(mobility)]
         obj <- delete(obj, j = gInfoIMS[!ims_precursor_group %chin% names(obj)]$group)

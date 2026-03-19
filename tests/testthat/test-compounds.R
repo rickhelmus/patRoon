@@ -537,24 +537,24 @@ test_that("IMS tests", {
     compsIMSAMF3 <- filter(compsIMSAM, IMSRangeParam = getIMSRangeParams("CCS", 0.62, 0.65, TRUE))
     expect_range(as.data.table(compsIMSAMF3[IMSFGs])[["CCS_mz-positive"]], c(0.62, 0.65))
 
-    # test minMobSpecSim
+    # test minIMSSpecSim
     # NOTE: the principle is the same for formulas, so we just test only for compounds here. Copying fingerprints is not
     # tested, but follows some principle as other slot copying
-    compsIMSSim <- callMF(fGroupsIMS, plistsIMS, minMobSpecSim = 0.01) # do almost zero threshold so everything should be copied (zero disables)
+    compsIMSSim <- callMF(fGroupsIMS, plistsIMS, minIMSSpecSim = 0.01) # do almost zero threshold so everything should be copied (zero disables)
     gInfo <- groupInfo(fGroupsIMS)
     for (fg in groupNames(compsIMSSim))
     {
-        parentFG <- gInfo[group == fg]$ims_precursor_group
-        # skip if no parent or identical MS2
-        if (is.na(parentFG) || isTRUE(all.equal(plistsIMS[[fg]]$MSMS, plistsIMS[[parentFG]]$MSMS, tolerance = 1E-6)))
+        precFG <- gInfo[group == fg]$ims_precursor_group
+        # skip if no precursor or identical MS2
+        if (is.na(precFG) || isTRUE(all.equal(plistsIMS[[fg]]$MSMS, plistsIMS[[precFG]]$MSMS, tolerance = 1E-6)))
             next
         # all should be copied except fragInfo
         fiCols <- getMergedConsCols("fragInfo", names(compsIMSSim[[1]]), mergedConsensusNames(compsIMSSim))
-        expect_equal(removeDTColumnsIfPresent(compsIMSSim[[fg]], fiCols), removeDTColumnsIfPresent(compsIMSSim[[parentFG]], fiCols), tolerance = 1E-6,
+        expect_equal(removeDTColumnsIfPresent(compsIMSSim[[fg]], fiCols), removeDTColumnsIfPresent(compsIMSSim[[precFG]], fiCols), tolerance = 1E-6,
                      info = paste0("Compound info should be equal for fg ", fg))
-        checkmate::expect_character(all.equal(subsetDTColumnsIfPresent(compsIMSSim[[fg]], fiCols), subsetDTColumnsIfPresent(compsIMSSim[[parentFG]], fiCols), tolerance = 1E-6),
+        checkmate::expect_character(all.equal(subsetDTColumnsIfPresent(compsIMSSim[[fg]], fiCols), subsetDTColumnsIfPresent(compsIMSSim[[precFG]], fiCols), tolerance = 1E-6),
                                     info = paste0("Fragment info should differ for fg ", fg))
-        expect_equal(compsIMSSim@scoreRanges[[fg]], compsIMSSim@scoreRanges[[parentFG]], tolerance = 1E-6,
+        expect_equal(compsIMSSim@scoreRanges[[fg]], compsIMSSim@scoreRanges[[precFG]], tolerance = 1E-6,
                      info = paste0("Score ranges should be equal for fg ", fg))
     }
     

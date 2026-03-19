@@ -337,7 +337,7 @@ In most cases `fixedIsolationWidth=FALSE` is recommended: this automatically det
         * `plotChroms()`: support annotation of mobility values (besides RT and m/z).
         * `IMS` argument for many functions (`[`, `filter()`, plotting functions, `as.data.table()`, ...) which configures the usage of features with and/or without IMS data.
         * `filter()`: `applyIMS` to selectively apply filtering to features with or without IMS data.
-        * `filter()`: `withIMSParent` filter to only keep features with IMS parents.
+        * `filter()`: `withIMSPrecursor` filter to only keep features with IMS precursors.
 * Feature annotation
     * `plotSpectrum()`: `normalization` and `showLegend` function arguments.
     * `estimateIDConfidence()` (previously `annotateSuspects`) is now faster.

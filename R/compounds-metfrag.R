@@ -280,7 +280,7 @@ initMetFragCLCommand <- function(mfSettings, spec, mfBin)
 }
 
 generateMetFragRunData <- function(fGroups, MSPeakLists, mfSettings, extDB, topMost, identifiers, method,
-                                   adduct, database, errorRetries, timeoutRetries, mobSpecSims)
+                                   adduct, database, errorRetries, timeoutRetries, IMSSpecSims)
 {
     gNames <- names(fGroups)
     gTable <- groupTable(fGroups)
@@ -303,7 +303,7 @@ generateMetFragRunData <- function(fGroups, MSPeakLists, mfSettings, extDB, topM
         if (is.null(spec))
             return(NULL)
         
-        if (!is.null(mobSpecSims) && grp %chin% mobSpecSims$group)
+        if (!is.null(IMSSpecSims) && grp %chin% IMSSpecSims$group)
             return(NULL)
 
         mfSettings$IonizedPrecursorMass <- MSPeakLists[[grp]]$MS[precursor == TRUE]$mz
@@ -516,7 +516,7 @@ MFMPErrorHandler <- function(cmd, exitStatus, retries)
 #' @template adduct-arg
 #' @template comp_algo-args
 #' @template specSimParams_annSim-arg
-#' @template minMobSpecSim-arg
+#' @template minIMSSpecSim-arg
 #'
 #' @inheritParams generateCompounds
 #'
@@ -586,7 +586,7 @@ setMethod("generateCompoundsMetFrag", "featureGroups", function(fGroups, MSPeakL
                                                                 preProcessingFilters = c("UnconnectedCompoundFilter", "IsotopeFilter"),
                                                                 postProcessingFilters = c("InChIKeyFilter"),
                                                                 maxCandidatesToStop = 2500, identifiers = NULL,
-                                                                extraOpts = NULL, minMobSpecSim = 0)
+                                                                extraOpts = NULL, minIMSSpecSim = 0)
 {
     if (method == "R")
         checkPackage("metfRag", "c-ruttkies/MetFragR")
@@ -611,7 +611,7 @@ setMethod("generateCompoundsMetFrag", "featureGroups", function(fGroups, MSPeakL
     checkmate::assertNumeric(scoreWeights, lower = 0, finite = TRUE, any.missing = FALSE, min.len = 1, add = ac)
     aapply(checkmate::assertList, . ~ identifiers + extraOpts, any.missing = FALSE,
            names = "unique", null.ok = TRUE, fixed = list(add = ac))
-    checkmate::assertNumber(minMobSpecSim, lower = 0, add = ac)
+    checkmate::assertNumber(minIMSSpecSim, lower = 0, add = ac)
 
     compsScores <- compoundScorings("metfrag", database)
     isLocalDB <- isLocalMetFragDB(database)
@@ -694,16 +694,16 @@ setMethod("generateCompoundsMetFrag", "featureGroups", function(fGroups, MSPeakL
         mfSettings <- modifyList(mfSettings, extraOpts)
     }
 
-    setHash <- makeHash(fGroups, pLists, method, mfSettings, topMost, identifiers, minMobSpecSim)
+    setHash <- makeHash(fGroups, pLists, method, mfSettings, topMost, identifiers, minIMSSpecSim)
     if (!is.null(extDB))
         setHash <- makeHash(setHash, makeFileHash(extDB))
 
-    mobSpecSims <- getMobFeatAnnSpecSims(MSPeakLists, fGroups, minMobSpecSim, specSimParams)
+    IMSSpecSims <- getIMSFeatAnnSpecSims(MSPeakLists, fGroups, minIMSSpecSim, specSimParams)
 
     printf("Identifying %d feature groups with MetFrag...\n", gCount)
 
     runData <- generateMetFragRunData(fGroups, MSPeakLists, mfSettings, extDB, topMost, identifiers, method,
-                                      adduct, database, errorRetries, timeoutRetries, mobSpecSims)
+                                      adduct, database, errorRetries, timeoutRetries, IMSSpecSims)
 
     if (method == "CL")
     {
@@ -823,7 +823,7 @@ setMethod("generateCompoundsMetFrag", "featureGroups", function(fGroups, MSPeakL
 
     return(compoundsMF(groupAnnotations = lapply(results, "[[", "comptab"), scoreTypes = scoreTypes,
                        scoreRanges = scoreRanges, settings = mfSettings, MSPeakLists = MSPeakLists,
-                       specSimParams = specSimParams, mobSpecSims = mobSpecSims, gNames = names(fGroups)))
+                       specSimParams = specSimParams, IMSSpecSims = IMSSpecSims, gNames = names(fGroups)))
 })
 
 #' @template featAnnSets-gen_args

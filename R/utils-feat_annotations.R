@@ -312,14 +312,14 @@ filterFeatAnnConsensus <- function(obj, absMinAbundance, relMinAbundance, unique
     return(obj)
 }
 
-getMobFeatAnnSpecSims <- function(MSPeakLists, fGroups, minMobSpecSim, specSimParams, doFGroups = TRUE)
+getIMSFeatAnnSpecSims <- function(MSPeakLists, fGroups, minIMSSpecSim, specSimParams, doFGroups = TRUE)
 {
-    if (length(MSPeakLists) == 0 || !hasIMS(fGroups) || minMobSpecSim == 0)
+    if (length(MSPeakLists) == 0 || !hasIMS(fGroups) || minIMSSpecSim == 0)
         return(NULL)
 
-    mobSpecSims <- spectrumSimilarityMobility(MSPeakLists, fGroups, MSLevel = 2, warn = FALSE,
+    IMSSpecSims <- spectrumSimilarityIMS(MSPeakLists, fGroups, MSLevel = 2, warn = FALSE,
                                               specSimParams = specSimParams, doFGroups = doFGroups)
-    return(mobSpecSims[!is.na(similarity) & numGTE(similarity, minMobSpecSim)])
+    return(IMSSpecSims[!is.na(similarity) & numGTE(similarity, minIMSSpecSim)])
 }
 
 updateFragInfosForCopiedMobResults <- function(annList, MSPL)

@@ -304,7 +304,7 @@ runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, resNames, profile, add
 
 doSIRIUS <- function(fGroups, MSPeakLists, doFeatures, profile, adduct, relMzDev, elements,
                      database, noise, cores, withFingerID, fingerIDDatabase, topMost, projectPath, login, alwaysLogin,
-                     extraOptsGeneral, extraOptsFormula, mobSpecSims, mobSpecSimsAna, verbose, cacheName, processFunc,
+                     extraOptsGeneral, extraOptsFormula, IMSSpecSims, IMSSpecSimsAna, verbose, cacheName, processFunc,
                      processArgs, splitBatches, dryRun)
 {
     if (length(MSPeakLists) == 0)
@@ -319,7 +319,7 @@ doSIRIUS <- function(fGroups, MSPeakLists, doFeatures, profile, adduct, relMzDev
     baseHash <- makeHash(profile, relMzDev, elements, database, noise,
                          withFingerID, fingerIDDatabase, topMost, extraOptsGeneral,
                          extraOptsFormula, processArgs)
-    setHash <- makeHash(MSPeakLists, baseHash, doFeatures, mobSpecSims, mobSpecSimsAna)
+    setHash <- makeHash(MSPeakLists, baseHash, doFeatures, IMSSpecSims, IMSSpecSimsAna)
     cachedSet <- loadCacheSet(cacheName, setHash, cacheDB)
     
     if (doFeatures)
@@ -342,9 +342,9 @@ doSIRIUS <- function(fGroups, MSPeakLists, doFeatures, profile, adduct, relMzDev
             return(!is.na(anai) && ftind[[grp]][anai] != 0)
         })]
 
-        if (!is.null(mobSpecSimsAna))
+        if (!is.null(IMSSpecSimsAna))
         {
-            flPLMeta[mobSpecSimsAna, keep := FALSE, on = c("group", "analysis")]
+            flPLMeta[IMSSpecSimsAna, keep := FALSE, on = c("group", "analysis")]
             flPLMeta <- flPLMeta[is.na(keep)][, keep := NULL]
         }
         
@@ -353,8 +353,8 @@ doSIRIUS <- function(fGroups, MSPeakLists, doFeatures, profile, adduct, relMzDev
     else
     {
         flattenedPLists <- averagedPeakLists(MSPeakLists)
-        if (!is.null(mobSpecSims))
-            flattenedPLists <- flattenedPLists[!names(flattenedPLists) %chin% mobSpecSims$group]
+        if (!is.null(IMSSpecSims))
+            flattenedPLists <- flattenedPLists[!names(flattenedPLists) %chin% IMSSpecSims$group]
         flPLMeta <- data.table(name = names(flattenedPLists), group = names(flattenedPLists))
     }
     

@@ -57,7 +57,7 @@ newProjectFeaturesUI <- function(id)
                             height = 130,
                             selectInput(ns("IMSPeaksMob"), "Mobility peak detection", getPeakAlgoSelections(),
                                         width = "90%"),
-                            selectInput(ns("IMSPeaksChrom"), "Mobility feature peak re-integration",
+                            selectInput(ns("IMSPeaksChrom"), "IMS feature peak re-integration",
                                         c(None = "", getPeakAlgoSelections()), width = "90%")
                         )
                     )

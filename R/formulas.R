@@ -50,7 +50,7 @@ formulas <- setClass("formulas", slots = c(featureFormulas = "list"),
                      contains = "featureAnnotations")
 
 setMethod("initialize", "formulas", function(.Object, specSimParams, MSPeakLists, ..., gNames = NULL,
-                                             mobSpecSimsAna = NULL)
+                                             IMSSpecSimsAna = NULL)
 {
     .Object <- callNextMethod(.Object, specSimParams = specSimParams, MSPeakLists = MSPeakLists, ..., gNames = gNames)
 
@@ -70,12 +70,12 @@ setMethod("initialize", "formulas", function(.Object, specSimParams, MSPeakLists
     
     .Object@groupAnnotations <- lapply(.Object@groupAnnotations, function(ann) ann[, UID := neutral_formula])
     
-    if (!is.null(mobSpecSimsAna))
+    if (!is.null(IMSSpecSimsAna))
     {
         copied <- 0
         .Object@featureFormulas <- Map(.Object@featureFormulas, names(.Object@featureFormulas), f = function(fa, ana)
         {
-            mssa <- mobSpecSimsAna[analysis == ana & ims_precursor_group %chin% names(fa)]
+            mssa <- IMSSpecSimsAna[analysis == ana & ims_precursor_group %chin% names(fa)]
             if (nrow(mssa) > 0)
             {
                 fa[mssa$group] <- copy(fa[mssa$ims_precursor_group])
@@ -85,8 +85,8 @@ setMethod("initialize", "formulas", function(.Object, specSimParams, MSPeakLists
             }
             return(fa)
         })
-        printf("Copied %d feature formula results for in total %d mobility features with similar MS2 spectra.\n",
-               copied, nrow(mobSpecSimsAna))
+        printf("Copied %d feature formula results for in total %d IMS features with similar MS2 spectra.\n",
+               copied, nrow(IMSSpecSimsAna))
     }
     
     return(.Object)

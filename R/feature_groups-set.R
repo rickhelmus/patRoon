@@ -303,9 +303,9 @@ setMethod("calculateTox", "featureGroupsSet", function(fGroups, featureAnn)
 
 #' @section Sets workflows: Mobility assignment in a \link[=sets-workflow]{sets workflow} is equivalent to non-sets
 #'   workflows. However, currently there is no (known) way to relate mobilities across MS polarities (+/- mode). Thus,
-#'   mobility features will always be formed for each set separately. However, \emph{IMS parents} will still be grouped
-#'   across polarities (like a non-IMS workflow) and their links to mobility features can therefore be used to relate
-#'   mobility features across MS polarities.
+#'   IMS features will always be formed for each set separately. However, \emph{IMS precursors} will still be grouped
+#'   across polarities (like a non-IMS workflow) and their links to IMS features can therefore be used to relate
+#'   IMS features across MS polarities.
 #'
 #' @rdname assignMobilities_feat
 #' @aliases assignMobilities,featureGroupsSet-method
@@ -326,10 +326,10 @@ setMethod("assignMobilities", "featureGroupsSet", function(obj, mobPeakParams = 
     
     if (!is.null(mobPeakParams))
     {
-        obj <- checkAssignedMobilityFGroups(obj)
+        obj <- checkAssignedIMSFGroups(obj)
         obj@features <- assignFeatureMobilitiesPeaks(obj@features, mobPeakParams, EIMParams, parallel)
-        obj@features <- reintegrateMobilityFeatures(obj@features, chromPeakParams, EICParams, peakRTWindow, fallbackEIC,
-                                                    calcArea, parallel)
+        obj@features <- reintegrateIMSFeatures(obj@features, chromPeakParams, EICParams, peakRTWindow, fallbackEIC,
+                                               calcArea, parallel)
         obj <- updateFGroupsForMobilities(obj, mobWindow, scoreWeights, TRUE)
     }
     

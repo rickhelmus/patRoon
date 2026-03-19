@@ -763,7 +763,7 @@ setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked = TRUE, width =
 #' @template compon_ims_expand
 #'
 #' @section IMS workflows: \strong{NOTE}: IMS expansion by \code{\link{expandForIMS}} only expands results for TP
-#'   candidates, \emph{i.e.} no new components from parents assigned to mobility feature groups will be added.
+#'   candidates, \emph{i.e.} no new components from parents assigned to IMS feature groups will be added.
 #'
 #'
 #' @section Sets workflows: In a \link[=sets-workflow]{sets workflow} the component tables are amended with extra

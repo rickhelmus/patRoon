@@ -134,7 +134,7 @@ omitMobFGroupsForComponentization <- function(fGroups)
 {
     if (hasIMS(fGroups))
     {
-        printf("NOTE: mobility feature groups will be omitted from componentization\n")
+        printf("NOTE: IMS feature groups will be omitted from componentization\n")
         fGroups <- selectIMSFilter(fGroups, IMS = FALSE, verbose = FALSE)
     }
     return(fGroups)

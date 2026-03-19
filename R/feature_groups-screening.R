@@ -403,7 +403,7 @@ setMethod("estimateIDConfidence", "featureGroupsScreening", function(obj, MSPeak
 #' @param maxLC50 Filter suspect hits by the given maximum toxicity (LC50) (as calculated by
 #'   \code{\link[=predictTox]{predictTox}}). Set to \code{NULL} to ignore.
 #' @param negate If set to \code{TRUE} then filtering operations are performed in opposite manner.
-#' @param applyIMS \IMSWF whether the filters are only applied to IMS parents (\code{applyIMS=FALSE}), only to mobility
+#' @param applyIMS \IMSWF whether the filters are only applied to IMS precursors (\code{applyIMS=FALSE}), only to IMS
 #'   features (\code{applyIMS=TRUE}) or to both (\code{applyIMS="both"}). Other feature groups will always be kept. The
 #'   \code{negate} option does not affect \code{applyIMS}.
 #'
@@ -455,7 +455,7 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = NULL
 #' @section Post mobility assignment: \subsection{Suspect screening workflows}{In suspect screening workflows the
 #'   \code{fromSuspects} arguments can be set to alternatively perform mobility assignment directly from the suspect
 #'   list data (replacing Steps 1-2). The feature mobility is simply assigned from the suspect data and the mobility
-#'   range is derived from the \code{mobWindow} argument. Relationships with IMS parents (Step 2) are similarly formed.
+#'   range is derived from the \code{mobWindow} argument. Relationships with IMS precursors (Step 2) are similarly formed.
 #'   An advantage of this approach is that no mobility peak detection is needed, which may useful for low intensity
 #'   features where this could be difficult. Setting \code{fromSuspects=TRUE} is primarily intended for workflows where
 #'   (1) the mobility of a suspect is accurately known upfront or (2) IMS data should only be used as a rough filtering
@@ -465,12 +465,12 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = NULL
 #'
 #'   With \code{fromSuspects=TRUE} no mobility peak detection is performed, hence, the actual presence of the feature is
 #'   only verified in Step 3. For this reason, falling back to EIC data (\code{fallbackEIC} argument) is never performed
-#'   for mobility features from suspects, and \code{chromPeakParams} must always be defined to allow chromatographic
+#'   for IMS features from suspects, and \code{chromPeakParams} must always be defined to allow chromatographic
 #'   peak detection.
 #'
 #'   If both \code{fromSuspects} and \code{mobPeakParams} are set, regular mobility assignment (Steps 1-2) is performed
 #'   for features without suspect hit. If multiple suspects were assigned to a feature group then suspect data is
-#'   \emph{never} used to form mobility features.}
+#'   \emph{never} used to form IMS features.}
 #'
 #' @template IMSMatchParams-arg
 #'
@@ -497,7 +497,7 @@ setMethod("assignMobilities", "featureGroupsScreening", function(obj, mobPeakPar
 
     if (!is.null(mobPeakParams) || fromSuspects)
     {
-        obj <- checkAssignedMobilityFGroups(obj)
+        obj <- checkAssignedIMSFGroups(obj)
         if (fromSuspects)
         {
             if (is.null(chromPeakParams))
@@ -506,8 +506,8 @@ setMethod("assignMobilities", "featureGroupsScreening", function(obj, mobPeakPar
         }
         if (!is.null(mobPeakParams))
             obj@features <- assignFeatureMobilitiesPeaks(obj@features, mobPeakParams, EIMParams, parallel)
-        obj@features <- reintegrateMobilityFeatures(obj@features, chromPeakParams, EICParams, peakRTWindow, fallbackEIC,
-                                                    calcArea, parallel)
+        obj@features <- reintegrateIMSFeatures(obj@features, chromPeakParams, EICParams, peakRTWindow, fallbackEIC,
+                                               calcArea, parallel)
         obj <- updateFGroupsForMobilities(obj, mobWindow, scoreWeights, FALSE)
     }
 

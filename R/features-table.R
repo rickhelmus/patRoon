@@ -66,8 +66,8 @@ setMethod("initialize", "featuresTable", function(.Object, ...) callNextMethod(.
 #'     \item \code{mob_area} and \code{mob_intensity}: the peak area and intensity of the peak in the mobilogram for the
 #'     feature. (\strong{optional})
 #'
-#'     \item \code{ims_precursor_ID}: the ID of the IMS parent in a \link[=assignMobilities_feat]{post mobility assignment}
-#'     workflow. (\strong{optional})
+#'     \item \code{ims_precursor_ID}: the ID of the IMS precursor in a \link[=assignMobilities_feat]{post mobility
+#'     assignment} workflow. (\strong{optional})
 #'
 #'     \item \code{mob_assign_method}: a string that names the method used to assign the mobility to the feature.
 #'     (\strong{optional})

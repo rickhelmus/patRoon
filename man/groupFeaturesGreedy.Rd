@@ -53,7 +53,7 @@ The \code{greedy} algorithm is a simple feature grouping algorithm that can work
   features have been assigned to a group. The weights for each of the scoring terms can be configured.
 }
 \note{
-Any links between IMS parents and mobility features are removed. This can occur \emph{e.g.} when \code{greedy}
+Any links between IMS precursors and IMS features are removed. This can occur \emph{e.g.} when \code{greedy}
 is used to generate a \link[=featureGroups-compare]{feature consensus} from a \link[=assignMobilities_feat]{post
 mobility assignment} workflow.
 }

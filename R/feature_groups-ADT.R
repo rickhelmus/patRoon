@@ -91,7 +91,7 @@ NULL
 #'
 #' @section IMS workflows: If the \code{IMS} argument is set to \code{"both"} or \code{"maybe"} then
 #'   \code{"mobility_collapsed"} and \code{"CCS_collapsed"} columns will be added that summarize all
-#'   mobility/\acronym{CCS} values of the mobility features (or feature groups) assigned to this IMS parent. These
+#'   mobility/\acronym{CCS} values of the IMS features (or IMS feature groups) assigned to this IMS precursor. These
 #'   numbers are currently rounded to \samp{3} decimals.
 #'
 #'

@@ -44,7 +44,7 @@ setMethod("initialize", "featureGroupsGreedy",
 #'
 #' @inherit groupFeatures return
 #'
-#' @note Any links between IMS parents and mobility features are removed. This can occur \emph{e.g.} when \code{greedy}
+#' @note Any links between IMS precursors and IMS features are removed. This can occur \emph{e.g.} when \code{greedy}
 #' is used to generate a \link[=featureGroups-compare]{feature consensus} from a \link[=assignMobilities_feat]{post
 #' mobility assignment} workflow.
 #'
@@ -164,7 +164,7 @@ doGroupFeaturesGreedy <- function(feat, rtWindow, mzWindow, mobWindow, scoreWeig
             return(ft)
         })
         featureTable(feat) <- fTableNoIMSPar
-        warning("Any links between IMS parents and mobility features are removed!", call. = FALSE)
+        warning("Any links between IMS precursors and IMS features are removed!", call. = FALSE)
     }
     
     ret <- featureGroupsGreedy(groups = gTable, groupInfo = gInfo, features = feat, ftindex = ftindex)

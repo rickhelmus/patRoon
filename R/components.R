@@ -22,7 +22,7 @@ NULL
 #' @param obj,object,x The \code{component} object.
 #' @param fGroups The \code{\link{featureGroups}} object that was used to generate the components.
 #'
-#'   For \code{expandForIMS}, this should be the \code{featureGroups} object that contains the post mobility feature
+#'   For \code{expandForIMS}, this should be the \code{featureGroups} object that contains the post IMS feature
 #'   groups.
 #' @param index The index of the component. Can be a numeric index or a character with its name.
 #' @param \dots For \code{delete}: passed to the function specified as \code{j}.
@@ -234,16 +234,16 @@ setMethod("as.data.table", "components", function(x)
     return(ret)
 })
 
-#' @describeIn components Expands the components data for mobility feature groups. See the \verb{IMS expansion} section
+#' @describeIn components Expands the components data for IMS feature groups. See the \verb{IMS expansion} section
 #'   below.
 #'
 #' @section IMS expansion: In IMS workflows with post mobility assignment (see
 #'   \code{\link[=assignMobilities_feat]{assignMobilities}}), specifically when the assignment occurs \emph{after}
-#'   generation of the components, it may be desired to copy the results of the IMS parents to the mobility feature
+#'   generation of the components, it may be desired to copy the results of the IMS precursors to the IMS feature
 #'   groups. For instance, for components from \link[=generateComponentsIntClust]{intensity clusters} or
-#'   \link[=generateComponentsTPs]{TPs} one could assume that results for mobility feature groups will be largely the
-#'   same as their IMS parents. The \code{expandForIMS} method function is used to \emph{expand} the original
-#'   \code{components} object by adding in mobility feature groups with data copied from their IMS parents.
+#'   \link[=generateComponentsTPs]{TPs} one could assume that results for IMS feature groups will be largely the
+#'   same as their IMS precursors. The \code{expandForIMS} method function is used to \emph{expand} the original
+#'   \code{components} object by adding in IMS feature groups with data copied from their IMS precursors.
 #'
 #'   Currently, only components generated with \code{\link{generateComponentsIntClust}},
 #'   \code{\link{generateComponentsSpecClust}} and \code{\link{generateComponentsTPs}} support this operation.
@@ -261,7 +261,7 @@ setMethod("expandForIMS", "components", function(obj, fGroups)
     
     gInfo <- groupInfo(fGroups)
     
-    obj@components <- lapply(componentTable(obj), expandTableForIMSFGroups, gInfo) # copy results for mobility fGroups
+    obj@components <- lapply(componentTable(obj), expandTableForIMSFGroups, gInfo) # copy results for IMS fGroups
     obj@componentInfo[, size := sapply(componentTable(obj), nrow)][] # update sizes
     
     return(obj)

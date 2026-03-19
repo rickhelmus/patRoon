@@ -403,7 +403,7 @@ predictRespFactorsSMILES <- function(fgSMILESTab, gInfo, calibrants, eluent, org
     fgSMILESTab[, area := 1] # NOTE: we set the area to one to easily get the response factor
     fgSMILESTab[, hash := makeHash(baseHash, retention_time, SMILES), by = seq_len(nrow(fgSMILESTab))] 
 
-    # NOTE: for mobility feature groups, hashes can be the same as there could be duplicated RTs
+    # NOTE: for IMS feature groups, hashes can be the same as there could be duplicated RTs
     cachedData <- pruneList(loadCacheData("RF_SMILES", fgSMILESTab$hash, simplify = FALSE))
     fgSMILESTabTODO <- fgSMILESTab[!hash %in% names(cachedData)]
     

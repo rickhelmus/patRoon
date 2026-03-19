@@ -170,7 +170,7 @@ function specifies the feature groups to be removed (same format as \code{j}).}
 
 \item{fGroups}{The \code{\link{featureGroups}} object that was used to generate the components.
 
-  For \code{expandForIMS}, this should be the \code{featureGroups} object that contains the post mobility feature
+  For \code{expandForIMS}, this should be the \code{featureGroups} object that contains the post IMS feature
   groups.}
 
 \item{size}{Should be a two sized vector with the minimum/maximum size of a component. Set to \code{NULL} to ignore.}
@@ -256,7 +256,7 @@ feature groups for which data is present in this object.
 
 \item \code{as.data.table(components)}: Returns all component data in a table.
 
-\item \code{expandForIMS(components)}: Expands the components data for mobility feature groups. See the \verb{IMS expansion} section
+\item \code{expandForIMS(components)}: Expands the components data for IMS feature groups. See the \verb{IMS expansion} section
 below.
 
 \item \code{filter(components)}: Provides rule based filtering for components.
@@ -297,11 +297,11 @@ For \code{plotChroms}: The \code{topMost} and \code{topMostByReplicate} EIC para
 \section{IMS expansion}{
  In IMS workflows with post mobility assignment (see
   \code{\link[=assignMobilities_feat]{assignMobilities}}), specifically when the assignment occurs \emph{after}
-  generation of the components, it may be desired to copy the results of the IMS parents to the mobility feature
+  generation of the components, it may be desired to copy the results of the IMS precursors to the IMS feature
   groups. For instance, for components from \link[=generateComponentsIntClust]{intensity clusters} or
-  \link[=generateComponentsTPs]{TPs} one could assume that results for mobility feature groups will be largely the
-  same as their IMS parents. The \code{expandForIMS} method function is used to \emph{expand} the original
-  \code{components} object by adding in mobility feature groups with data copied from their IMS parents.
+  \link[=generateComponentsTPs]{TPs} one could assume that results for IMS feature groups will be largely the
+  same as their IMS precursors. The \code{expandForIMS} method function is used to \emph{expand} the original
+  \code{components} object by adding in IMS feature groups with data copied from their IMS precursors.
 
   Currently, only components generated with \code{\link{generateComponentsIntClust}},
   \code{\link{generateComponentsSpecClust}} and \code{\link{generateComponentsTPs}} support this operation.

@@ -156,7 +156,7 @@ specified in the \code{fragments_*} columns of the suspect list. Set to \code{NU
 
 \item{negate}{If set to \code{TRUE} then filtering operations are performed in opposite manner.}
 
-\item{applyIMS}{\IMSWF whether the filters are only applied to IMS parents (\code{applyIMS=FALSE}), only to mobility
+\item{applyIMS}{\IMSWF whether the filters are only applied to IMS precursors (\code{applyIMS=FALSE}), only to IMS
 features (\code{applyIMS=TRUE}) or to both (\code{applyIMS="both"}). Other feature groups will always be kept. The
 \code{negate} option does not affect \code{applyIMS}.}
 

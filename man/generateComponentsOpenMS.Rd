@@ -153,7 +153,7 @@ Features that show highly similar chromatographic elution profiles are grouped, 
 
 \section{IMS workflows}{
  The componentization algorithm is not aware of the IMS dimension. For this reason, no
-  mobility feature groups will be considered for componentization, and direct IMS workflows (see
+  IMS feature groups will be considered for componentization, and direct IMS workflows (see
   \code{\link[=assignMobilities_feat]{assignMobilitities}}) are currently not supported.
 }
 

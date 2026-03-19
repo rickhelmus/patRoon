@@ -166,7 +166,7 @@ doFGroupsFilter <- function(fGroups, what, hashParam, func, cacheCateg = what, a
         {
             if (applyIMS != "both" && hasIMS(fGroups))
             {
-                # only remove mobility features/feature groups or their parents
+                # only remove IMS features/feature groups or their precursors
                 gInfoKeep <- groupInfo(fGroups)
                 gInfoKeep <- if (applyIMS) gInfoKeep[is.na(mobility)] else gInfoKeep[!is.na(mobility)]
                 
@@ -520,7 +520,7 @@ calcFeatureConcs <- function(fGroups, resp, areas)
     gt <- groupTable(fGroups, areas = areas)[, resp$group, with = FALSE]
     if (hasIMS(fGroups))
     {
-        # for mobility features, we take parent intensities (if available) as mobility filtering may lead to reduced
+        # for IMS features, we take precursor intensities (if available) as IMS filtering may lead to reduced
         # intensities that currently are not taken into account when calculating response factors
         # UNDONE: make this configurable?
         gInfoChange <- groupInfo(fGroups)[!is.na(mobility) & group %chin% resp$group & ims_precursor_group %chin% group]

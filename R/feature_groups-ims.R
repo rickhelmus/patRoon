@@ -28,7 +28,7 @@ setMethod("groupFeaturesIMS", "features", function(feat, grouper, groupAlgo, ...
     fTableAll <- as.data.table(feat)
     
     if (any(!is.na(fTableAll$ims_precursor_ID)))
-        warning("Any links between IMS parents and mobility features will be removed!", call. = FALSE)
+        warning("Any links between IMS precursors and IMS features will be removed!", call. = FALSE)
         
     # clusters features with similar mobilities
     fTableAll <- clusterFTableMobilities(feat, mobWindow, byGroup = FALSE)

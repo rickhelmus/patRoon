@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 getMobilityCols <- function() c("mobility", "mobmin", "mobmax", "mob_area", "mob_intensity")
-countMobilityFeatures <- function(feat) sum(sapply(featureTable(feat), function(ft) sum(!is.null(ft[["mobility"]]) & !is.na(ft$mobility))))
+countIMSFeatures <- function(feat) sum(sapply(featureTable(feat), function(ft) sum(!is.null(ft[["mobility"]]) & !is.na(ft$mobility))))
 
 checkUnsupportedIMS <- function(feat, algorithm)
 {
@@ -11,14 +11,14 @@ checkUnsupportedIMS <- function(feat, algorithm)
         stop(sprintf("The '%s' algorithm does not support ion mobility data", algorithm), call. = FALSE)
 }
 
-checkAssignedMobilityFGroups <- function(fGroups)
+checkAssignedIMSFGroups <- function(fGroups)
 {
     if (hasIMS(fGroups))
     {
         if (all(!is.na(groupInfo(fGroups)$mobility)))
-            stop("There are no feature groups without mobility assignments available for which mobility features can be assigned.", call. = FALSE)
+            stop("There are no feature groups without mobility assignments available for which IMS features can be assigned.", call. = FALSE)
         
-        warning("Mobility features already have been assigned, these will be cleared now!", call. = FALSE)
+        warning("IMS features already have been assigned, these will be cleared now!", call. = FALSE)
         fGroups <- selectIMSFilter(fGroups, IMS = FALSE, verbose = FALSE)
     }
     return(fGroups)
@@ -51,7 +51,7 @@ doAssignFeatureMobilities <- function(fTable, mobTable)
                           by.x = "ims_precursor_ID", by.y = "ID", sort = FALSE)
         setcolorder(mobTable, names(fTable))
         
-        # merge mobility features
+        # merge IMS features
         fTable <- rbind(fTable, mobTable, fill = TRUE)
         fTable[is.na(mobility), ims_precursor_ID := NA_character_]
         
@@ -99,9 +99,9 @@ assignFeatureMobilitiesPeaks <- function(features, peakParams, EIMParams, parall
     EIMParams$topMost <- NULL; EIMParams$onlyPresent <- TRUE
     
     printf("Finding mobilities for all features from mobilogram peaks...\n")
-    oldCount <- countMobilityFeatures(features)
+    oldCount <- countIMSFeatures(features)
     
-    # skip any mobility features and IMS parents
+    # skip any IMS features and IMS precursors
     EIMSelFunc <- \(tab) if (is.null(tab[["mobility"]])) tab else tab[is.na(mobility) & !ID %chin% ims_precursor_ID]
     allEIMs <- getFeatureEIXs(features, "EIM", EIXParams = EIMParams, selectFunc = EIMSelFunc, compress = FALSE)
     
@@ -110,7 +110,7 @@ assignFeatureMobilitiesPeaks <- function(features, peakParams, EIMParams, parall
     peaksList <- doMap(parallel, allEIMs, analyses(features), f = patRoon:::doFindPeaksForMobilities,
                        MoreArgs = list(peakParams = peakParams))
     features@features <- Map(featureTable(features), peaksList, f = doAssignFeatureMobilities)
-    printf("Assigned %d mobility features.\n", countMobilityFeatures(features) - oldCount)
+    printf("Assigned %d IMS features.\n", countIMSFeatures(features) - oldCount)
     
     features@hasIMS <- TRUE
     
@@ -137,11 +137,11 @@ doFindPeaksForReintegration <- function(EICs, peakParams, peakRTWindow, ft, ana,
 
 
 # UNDONE: make this an exported method?
-reintegrateMobilityFeatures <- function(features, peakParams, EICParams, peakRTWindow, fallbackEIC, calcArea, parallel)
+reintegrateIMSFeatures <- function(features, peakParams, EICParams, peakRTWindow, fallbackEIC, calcArea, parallel)
 {
     cacheDB <- openCacheDBScope()
     hash <- makeHash(features, peakParams, EICParams, peakRTWindow, fallbackEIC, calcArea)
-    cd <- loadCacheData("reintegrateMobilityFeatures", hash, cacheDB)
+    cd <- loadCacheData("reintegrateIMSFeatures", hash, cacheDB)
     if (!is.null(cd))
         return(cd)
     
@@ -179,7 +179,7 @@ reintegrateMobilityFeatures <- function(features, peakParams, EICParams, peakRTW
         else
             peakIDs <- character()
         
-        # only keep IMS parents and those updated from a new peak
+        # only keep IMS precursors and those updated from a new peak
         ft[, keep := ((is.null(ft[["mobility"]]) | is.na(mobility))) | ID %chin% peakIDs]
         
         if (fallbackEIC)
@@ -220,7 +220,7 @@ reintegrateMobilityFeatures <- function(features, peakParams, EICParams, peakRTW
     printf("Re-integrated %d features (%d from newly found peaks, %d from EICs and removed %d unassigned)\n",
            updatedFeatsFromEICs + updatedFeatsFromPeaks, updatedFeatsFromPeaks, updatedFeatsFromEICs, notAssigned)
     
-    saveCacheData("reintegrateMobilityFeatures", features, hash)
+    saveCacheData("reintegrateIMSFeatures", features, hash)
     
     return(features)
 }
@@ -318,7 +318,7 @@ updateFGroupsForMobilities <- function(fGroups, mobWindow, scoreWeights, sets)
         d <- slot(fGroups, sl)
         if (length(d) > 0)
         {
-            printf("NOTE: copying parent data from %s\n", sl)
+            printf("NOTE: copying IMS precursor data from %s\n", sl)
             if (nrow(d) == 0)
                 next # skip, otherwise we end up with a null DT (ie columns removed)
             
@@ -343,14 +343,14 @@ updateFGroupsForMobilities <- function(fGroups, mobWindow, scoreWeights, sets)
     
     if (length(internalStandardAssignments(fGroups)) > 0)
     {
-        # copy parent IS assignments
+        # copy IMS precursor IS assignments
         
         addMobISTDAssigns <- function(ISA)
         {
             gi <- gInfo[group %chin% names(ISA) | ims_precursor_group %chin% names(ISA)]
             mobFGs <- gi[!is.na(mobility)]$group
-            mobFGParents <- gi[!is.na(mobility)]$ims_precursor_group
-            setNames(ISA[mobFGParents], mobFGs)
+            mobFGPrecursors <- gi[!is.na(mobility)]$ims_precursor_group
+            setNames(ISA[mobFGPrecursors], mobFGs)
         }
         
         if (sets)

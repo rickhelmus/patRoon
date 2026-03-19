@@ -20,7 +20,7 @@ generateCompoundsLibrary(fGroups, ...)
   checkIons = "adduct",
   spectrumType = "MS2",
   specSimParamsLib = specSimParams,
-  minMobSpecSim = 0
+  minIMSSpecSim = 0
 )
 
 \S4method{generateCompoundsLibrary}{featureGroupsSet}(
@@ -78,13 +78,13 @@ applied.}
 \item{specSimParamsLib}{Like \code{specSimParams}, but these parameters are used for the pre-treatment of library
 spectra (only the \code{removePrecursor}, \code{relMinIntensity} and \code{minPeaks} parameters are used).}
 
-\item{minMobSpecSim}{\IMSWF If the spectrum similarity of a mobility feature group compared to its IMS parent (see
-\code{\link[=assignMobilities_feat]{assignMobilities}}) is at least this value, then the mobility feature group
-will not be subjected to the annotation algorithm and all feature annotation properties will be copied from its
-parent. This assumes that feature annotation is primarily influenced by the MS/MS spectrum, and can be used to
-speed up the feature annotation process. All scorings, annotation similarities etc. are copied from the IMS parent.
-The fragment annotations are also copied (\code{fragInfo} result column), however, these are adjusted based on the
-peak list data of the mobility feature group.}
+\item{minIMSSpecSim}{\IMSWF If the spectrum similarity of an IMS feature group compared to its IMS precursor (see
+\code{\link[=assignMobilities_feat]{assignMobilities}}) is at least this value, then the IMS feature group will not
+be subjected to the annotation algorithm and all feature annotation properties will be copied from its precursor.
+This assumes that feature annotation is primarily influenced by the MS/MS spectrum, and can be used to speed up the
+feature annotation process. All scorings, annotation similarities etc. are copied from the IMS precursor. The
+fragment annotations are also copied (\code{fragInfo} result column), however, these are adjusted based on the peak
+list data of the IMS feature group.}
 
 \item{setThreshold}{\setsWF Minimum abundance for a candidate among all sets (\samp{0-1}). For instance, a value of
 \samp{1} means that the candidate needs to be present in all the set data.}

@@ -249,10 +249,10 @@ test_that("IMS tests", {
     expect_setequal(toxicities(fGroupsIMS)$group, names(fGroupsIMS))
     
     gInfo <- groupInfo(fGroupsIMS)
-    for (fg in unique(gInfo[!is.na(ims_parent_group)]$group))
+    for (fg in unique(gInfo[!is.na(ims_precursor_group)]$group))
     {
-        parentFG <- gInfo[group == fg]$ims_parent_group
-        expect_equal(concentrations(fGroupsIMS)[group == fg][, -"group"], concentrations(fGroupsIMS)[group == parentFG][, -"group"])
-        expect_equal(toxicities(fGroupsIMS)[group == fg][, -"group"], toxicities(fGroupsIMS)[group == parentFG][, -"group"])
+        precFG <- gInfo[group == fg]$ims_precursor_group
+        expect_equal(concentrations(fGroupsIMS)[group == fg][, -"group"], concentrations(fGroupsIMS)[group == precFG][, -"group"])
+        expect_equal(toxicities(fGroupsIMS)[group == fg][, -"group"], toxicities(fGroupsIMS)[group == precFG][, -"group"])
     }
 })

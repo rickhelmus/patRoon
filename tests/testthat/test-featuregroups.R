@@ -91,7 +91,7 @@ test_that("assignMobilities", {
     fgIMSISTD <- doNormIntsIMS(filter(fgIMS, removeBlanks = TRUE), featNorm = "istd")
     fgAMISTD <- doAssignMobs(fgIMSISTD)
     getAssignedFGs <- \(fg) unlist(lapply(internalStandardAssignments(fg), names))
-    # check that assigned IMS parents + their IMS features are all present
+    # check that assigned IMS precursors + their IMS features are all present
     gi <- groupInfo(fgAMISTD)[ims_precursor_group %in% getAssignedFGs(fgIMSISTD) | group %in% getAssignedFGs(fgIMSISTD)]
     expect_setequal(getAssignedFGs(fgAMISTD), na.omit(union(gi$group, gi$ims_precursor_group)))
 })
@@ -529,7 +529,7 @@ test_that("IMS subset and filtering", {
     expect_setequal(names(fgAMInt[IMS = FALSE]), names(fgAMInt[IMS = "maybe"]))
     expect_setequal(names(fgAMDel[IMS = "maybe"][IMS = TRUE]), groupInfo(fgAMDel)[ims_precursor_group %in% delGI$ims_precursor_group]$group)
     
-    checkmate::expect_disjunct(names(filter(fgAMDel, withIMSParent = TRUE)), fgAMDel$group)
+    checkmate::expect_disjunct(names(filter(fgAMDel, withIMSPrecursor = TRUE)), fgAMDel$group)
     expect_range(groupInfo(filter(fgAMInt, IMSRangeParams = getIMSRangeParams("mobility", 0.65, 0.75)))$mobility,
                  c(0.65, 0.75))
     expect_range(groupInfo(filter(fgAMInt, IMSRangeParams = getIMSRangeParams("mobility", 0.0025, 0.003, TRUE)))[, mobility / mz],
@@ -591,10 +591,10 @@ test_that("Normalization", {
                  groupTable(doNormIntsIMS(fgISTDIMS[IMS = FALSE], "istd"), normalized = TRUE))
     expect_equal(groupTable(fgNormTICIMS[IMS = FALSE], normalized = TRUE),
                  groupTable(doNormIntsIMS(fgISTDIMS[IMS = FALSE], "tic"), normalized = TRUE))
-    # verify that IMS features are normalized equally to their parents
+    # verify that IMS features are normalized equally to their precursors
     adt <- as.data.table(fgNormISTDIMS, features = TRUE)
-    adt[adt[is.na(mobility)], intensity_rel_parent := i.intensity_rel, on = .(ims_precursor_ID = ID, analysis)]
-    expect_all_true(adt[!is.na(mobility)]$intensity_rel == adt[!is.na(mobility)]$intensity_rel_parent)
+    adt[adt[is.na(mobility)], intensity_rel_precursor := i.intensity_rel, on = .(ims_precursor_ID = ID, analysis)]
+    expect_all_true(adt[!is.na(mobility)]$intensity_rel == adt[!is.na(mobility)]$intensity_rel_precursor)
     
     expect_length(fgNormISTDEmpty, 0)
     expect_length(doNormInts(fgOpenMSEmpty, "tic"), 0)

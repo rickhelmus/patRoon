@@ -79,7 +79,7 @@ specified columns should be numeric. Set to \code{NULL} to ignore.}
 
   \item \code{"both"}: Selects IMS and non-IMS features.
 
-  \item \code{"maybe"}: Selects non-IMS features and IMS features without assigned IMS parent.
+  \item \code{"maybe"}: Selects non-IMS features and IMS features without assigned IMS precursor.
 
   \item \code{FALSE}: Selects only non-IMS features.
 
@@ -145,7 +145,7 @@ suspect names and other properties and annotation data.
 \section{IMS workflows}{
  If the \code{IMS} argument is set to \code{"both"} or \code{"maybe"} then
   \code{"mobility_collapsed"} and \code{"CCS_collapsed"} columns will be added that summarize all
-  mobility/\acronym{CCS} values of the mobility features (or feature groups) assigned to this IMS parent. These
+  mobility/\acronym{CCS} values of the IMS features (or IMS feature groups) assigned to this IMS precursor. These
   numbers are currently rounded to \samp{3} decimals.
 }
 

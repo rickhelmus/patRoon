@@ -306,12 +306,12 @@ test_that("IMS tests", {
         cmp <- expComps[[cmpi]]
         for (fg in cmp$group)
         {
-            parentFG <- gInfo[group == fg]$ims_precursor_group
-            if (is.na(parentFG))
+            precFG <- gInfo[group == fg]$ims_precursor_group
+            if (is.na(precFG))
                 next
-            expect_equal(cmp[group == fg][, -"group"], cmp[group == parentFG][, -"group"],
-                         info = sprintf("Component %s: group %s matches parent %s",
-                                        names(expComps)[cmpi], fg, parentFG))
+            expect_equal(cmp[group == fg][, -"group"], cmp[group == precFG][, -"group"],
+                         info = sprintf("Component %s: group %s matches precursor %s",
+                                        names(expComps)[cmpi], fg, precFG))
         }
     }
     

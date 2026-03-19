@@ -22,8 +22,8 @@
 \alias{plotSpectrum,MSPeakLists-method}
 \alias{spectrumSimilarity,MSPeakLists-method}
 \alias{spectrumSimilarity}
-\alias{spectrumSimilarityMobility,MSPeakLists-method}
-\alias{spectrumSimilarityMobility}
+\alias{spectrumSimilarityIMS,MSPeakLists-method}
+\alias{spectrumSimilarityIMS}
 \alias{MSPeakListsSet-class}
 \alias{MSPeakListsSet}
 \alias{analysisInfo,MSPeakListsSet-method}
@@ -46,7 +46,7 @@ averagedPeakLists(obj, ...)
 
 spectrumSimilarity(obj, ...)
 
-spectrumSimilarityMobility(obj, ...)
+spectrumSimilarityIMS(obj, ...)
 
 \S4method{peakLists}{MSPeakLists}(obj)
 
@@ -119,7 +119,7 @@ spectrumSimilarityMobility(obj, ...)
   drop = TRUE
 )
 
-\S4method{spectrumSimilarityMobility}{MSPeakLists}(obj, fGroups, doFGroups = TRUE, warn = TRUE, ...)
+\S4method{spectrumSimilarityIMS}{MSPeakLists}(obj, fGroups, doFGroups = TRUE, warn = TRUE, ...)
 
 \S4method{analysisInfo}{MSPeakListsSet}(obj, df = FALSE)
 
@@ -184,7 +184,7 @@ getDefIsolatePrecParams(...)
   
   For \code{plotSpectrum}: passed to \code{\link[graphics]{plot}}.
   
-  For \code{spectrumSimilarityMobility}: passed to \code{spectrumSimilarity}
+  For \code{spectrumSimilarityIMS}: passed to \code{spectrumSimilarity}
 
   \setsPassedArgs1{MSPeakLists}}
 
@@ -344,8 +344,8 @@ Furthermore, if \code{mirror=TRUE} (and there are two sets in the object) then a
 
 \code{delete} returns the object for which the specified data was removed.
 
-\code{spectrumSimilarityMobility} returns a \code{data.table} with spectral similarities for each IMS parent
-  and feature pair.
+\code{spectrumSimilarityIMS} returns a \code{data.table} with spectral similarities for each IMS
+  precursor and feature pair.
 }
 \description{
 Contains all MS (and MS/MS where available) peak lists for a \code{\link{featureGroups}} object.
@@ -396,8 +396,8 @@ compared when two feature groups are specified.
 
 \item \code{spectrumSimilarity(MSPeakLists)}: Calculates the spectral similarity between two or more spectra.
 
-\item \code{spectrumSimilarityMobility(MSPeakLists)}: Calculates the spectral similarity between spectra from IMS features (or feature groups)
-and their IMS parents in post IMS workflows (see \code{\link[=assignMobilities_feat]{assignMobilities}}).
+\item \code{spectrumSimilarityIMS(MSPeakLists)}: Calculates the spectral similarity between spectra from IMS features (or feature groups)
+and their IMS precursors in post mobility workflows (see \code{\link[=assignMobilities_feat]{assignMobilities}}).
 
 }}
 \section{Slots}{

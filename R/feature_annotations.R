@@ -69,7 +69,7 @@ featureAnnotations <- setClass("featureAnnotations",
                                slots = c(groupAnnotations = "list", scoreTypes = "character", scoreRanges = "list"),
                                contains = c("workflowStep", "VIRTUAL"))
 
-setMethod("initialize", "featureAnnotations", function(.Object, specSimParams, MSPeakLists, ..., mobSpecSims = NULL,
+setMethod("initialize", "featureAnnotations", function(.Object, specSimParams, MSPeakLists, ..., IMSSpecSims = NULL,
                                                        gNames = NULL)
 {
     .Object <- callNextMethod(.Object, ...)
@@ -100,9 +100,9 @@ setMethod("initialize", "featureAnnotations", function(.Object, specSimParams, M
         printf(" Done!\n")
     }
     
-    if (!is.null(mobSpecSims))
+    if (!is.null(IMSSpecSims))
     {
-        mss <- mobSpecSims[ims_precursor_group %chin% groupNames(.Object)]
+        mss <- IMSSpecSims[ims_precursor_group %chin% groupNames(.Object)]
         if (nrow(mss) > 0)
         {
             .Object@groupAnnotations[mss$group] <- copy(.Object@groupAnnotations[mss$ims_precursor_group])
@@ -114,7 +114,7 @@ setMethod("initialize", "featureAnnotations", function(.Object, specSimParams, M
             .Object@groupAnnotations <- .Object@groupAnnotations[intersect(gNames, groupNames(.Object))]
             .Object@scoreRanges <- .Object@scoreRanges[intersect(gNames, groupNames(.Object))]
 
-            printf("Copied %d results to %d mobility feature groups with similar MS2 spectra.\n",
+            printf("Copied %d results to %d IMS feature groups with similar MS2 spectra.\n",
                    sum(sapply(.Object@groupAnnotations[unique(mss$ims_precursor_group)], nrow)), nrow(mss))
         }
     }

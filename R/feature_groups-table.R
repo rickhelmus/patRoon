@@ -44,8 +44,8 @@ setMethod("initialize", "featureGroupsTable",
 #'     \item \code{group_mobility},\code{group_CCS}: the mobility and \acronym{CCS} assigned to the feature group. Will
 #'     be calculated from mean values of feature data if missing. (\strong{optional})
 #'
-#'     \item \code{ims_precursor_group}: a string naming the IMS parent group of the feature group (\code{NA} if none or
-#'     not a mobility feature). (\strong{optional})
+#'     \item \code{ims_precursor_group}: a string naming the IMS precursor feature group of the feature group (\code{NA}
+#'     if none or not a IMS feature). (\strong{optional})
 #'
 #'   }
 #'

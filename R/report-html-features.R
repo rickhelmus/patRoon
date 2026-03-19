@@ -13,7 +13,7 @@ getFGReactTab <- function(objects, settings, ...)
     
     if (!is.null(tab[["ims_precursor_group"]]) && any(!is.na(tab$ims_precursor_group)))
     {
-        # link IMS parents to themselves and assign orphans to "none" for grouping
+        # link IMS precursors to themselves and assign orphans to "none" for grouping
         tab[is.na(ims_precursor_group), ims_precursor_group := fifelse(is.na(mobility), group, "none")]
     }
     
@@ -482,7 +482,7 @@ reportHTMLUtils$methods(
         {
             list(
                 list(value = "", name = "None"),
-                list(value = "ims_precursor_group", name = "IMS parent group")
+                list(value = "ims_precursor_group", name = "IMS precursor group")
             )
         }
         chromMobTitle <- if (hasMob && settings$features$chromatograms$large && settings$features$mobilograms$large)

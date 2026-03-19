@@ -9,7 +9,7 @@ NULL
 IMSRestoreNote <- function(gInfo)
 {
     if (!is.null(gInfo[["mobility"]]))
-        printf("NOTE: you may need to call expandForIMS() to restore mobility feature groups in the new components.\n")
+        printf("NOTE: you may need to call expandForIMS() to restore IMS feature groups in the new components.\n")
 }
 
 genClustComponents <- function(cutClusters, gInfo)

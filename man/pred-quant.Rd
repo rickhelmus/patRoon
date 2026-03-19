@@ -151,7 +151,7 @@ fingerprints), \code{"SMILES"} or \code{"both"}. Only relevant for \code{\link{c
 
   \item \code{"both"}: Selects IMS and non-IMS features.
 
-  \item \code{"maybe"}: Selects non-IMS features and IMS features without assigned IMS parent.
+  \item \code{"maybe"}: Selects non-IMS features and IMS features without assigned IMS precursor.
 
   \item \code{FALSE}: Selects only non-IMS features.
 
@@ -280,11 +280,11 @@ from \acronym{SMILES} data.
   \link[=as.data.table,featureGroups-method]{as.data.table} function.
 
  In IMS workflows with post mobility assignments (see
-  \code{\link[=assignMobilities_feat]{assignMobilities}}), the intensities of \emph{IMS parents} are used for the
-  calculation of concentrations for mobility features (as calibration typically does not consider differences due to
-  mobility filtering). However, the response factor assigned to mobility features are still used. This may yield
+  \code{\link[=assignMobilities_feat]{assignMobilities}}), the intensities of \emph{IMS precursors} are used for the
+  calculation of concentrations for IMS features (as calibration typically does not consider differences due to
+  mobility filtering). However, the response factor assigned to IMS features are still used. This may yield
   small differences compared to workflows where concentrations are assigned prior to mobility assignments, as
-  \code{assignMobilities} simply copies concentrations from IMS parents to mobility features.
+  \code{assignMobilities} simply copies concentrations from IMS precursors to IMS features.
 }
 
 \references{

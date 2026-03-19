@@ -380,7 +380,7 @@ setMethod("assignMobilities", "featureGroupsScreeningSet", function(obj, mobPeak
     
     if (!is.null(mobPeakParams) || fromSuspects)
     {
-        obj <- checkAssignedMobilityFGroups(obj)
+        obj <- checkAssignedIMSFGroups(obj)
         anaInfo <- analysisInfo(obj)
         for (s in sets(obj))
         {
@@ -394,8 +394,8 @@ setMethod("assignMobilities", "featureGroupsScreeningSet", function(obj, mobPeak
         }
         if (!is.null(mobPeakParams))
             obj@features <- assignFeatureMobilitiesPeaks(obj@features, mobPeakParams, EIMParams, parallel)
-        obj@features <- reintegrateMobilityFeatures(obj@features, chromPeakParams, EICParams, peakRTWindow, fallbackEIC,
-                                                    calcArea, parallel)
+        obj@features <- reintegrateIMSFeatures(obj@features, chromPeakParams, EICParams, peakRTWindow, fallbackEIC,
+                                               calcArea, parallel)
         obj <- updateFGroupsForMobilities(obj, mobWindow, scoreWeights, TRUE)
     }
     
@@ -408,8 +408,8 @@ setMethod("assignMobilities", "featureGroupsScreeningSet", function(obj, mobPeak
     mySets <- sets(obj)
     fgSetNames <- sapply(mySets, function(s) names(obj[, sets = s]), simplify = FALSE)
 
-    # Prune hits that are not actually in set: the data for mobility feature groups is copied from their parents, while
-    # the actual mobility feature group may not be in the same sets.
+    # Prune hits that are not actually in set: the data for IMS feature groups is copied from their precursors, while
+    # the actual IMS feature group may not be in the same sets.
     for (i in seq_len(nrow(scr)))
     {
         curSets <- unlist(strsplit(scr$sets[i], ",", fixed = TRUE))

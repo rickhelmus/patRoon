@@ -42,7 +42,7 @@ replicateSubtract(fGroups, replicates, threshold = 0)
   groupQualityRange = NULL,
   replicates = NULL,
   IMS = NULL,
-  withIMSParent = FALSE,
+  withIMSPrecursor = FALSE,
   IMSRangeParams = NULL,
   results = NULL,
   removeBlanks = FALSE,
@@ -142,7 +142,7 @@ SymmetryScore=c(0.5, Inf))}. Set to \code{NULL} to ignore.}
 
   \item \code{"both"}: Selects IMS and non-IMS features.
 
-  \item \code{"maybe"}: Selects non-IMS features and IMS features without assigned IMS parent.
+  \item \code{"maybe"}: Selects non-IMS features and IMS features without assigned IMS precursor.
 
   \item \code{FALSE}: Selects only non-IMS features.
 
@@ -152,7 +152,7 @@ SymmetryScore=c(0.5, Inf))}. Set to \code{NULL} to ignore.}
 
   Set to \code{NULL} to ignore.}
 
-\item{withIMSParent}{\IMSWF only keep mobility feature groups with IMS parents, \emph{i.e.} remove all orphans.
+\item{withIMSPrecursor}{\IMSWF only keep IMS feature groups with IMS precursors, \emph{i.e.} remove all orphans.
 Unaffected by \code{negate=TRUE}.}
 
 \item{IMSRangeParams}{\IMSWF A \code{list} with parameters to be used for filtering IMS range data. See
@@ -186,7 +186,7 @@ toxicity filters.}
 
 \item{negate}{If set to \code{TRUE} then filtering operations are performed in opposite manner.}
 
-\item{applyIMS}{\IMSWF whether the filters are only applied to IMS parents (\code{applyIMS=FALSE}), only to mobility
+\item{applyIMS}{\IMSWF whether the filters are only applied to IMS precursors (\code{applyIMS=FALSE}), only to IMS
 features (\code{applyIMS=TRUE}) or to both (\code{applyIMS="both"}). Other feature groups will always be kept. The
 \code{negate} option does not affect \code{applyIMS}.}
 

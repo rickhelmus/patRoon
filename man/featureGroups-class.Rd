@@ -396,7 +396,7 @@ capabilities of \CRANpkg{data.table} (see the
 
   \item \code{"both"}: Selects IMS and non-IMS features.
 
-  \item \code{"maybe"}: Selects non-IMS features and IMS features without assigned IMS parent.
+  \item \code{"maybe"}: Selects non-IMS features and IMS features without assigned IMS precursor.
 
   \item \code{FALSE}: Selects only non-IMS features.
 
@@ -722,10 +722,10 @@ by \code{adducts<-} and \code{selectIons} when these methods perform a re-groupi
   still occurs automatically if \code{normInts} was not called when a method is executed that requests normalized
   data.
 
-  In IMS workflows with post mobility assignment (see \link[=assignMobilities_feat]{assignMobilities}), any mobility
+  In IMS workflows with post mobility assignment (see \link[=assignMobilities_feat]{assignMobilities}), any IMS
   features are excluded for the assignment of internal standards (\code{featNorm="istd"}) or calculation of TICs
-  (\code{featNorm="tic"}). Furthermore, the normalized intensities and areas for mobility features are copied from
-  their IMS parents.
+  (\code{featNorm="tic"}). Furthermore, the normalized intensities and areas for IMS features are copied from
+  their IMS precursors.
 }
 
 \section{Sets workflows}{

@@ -309,7 +309,7 @@ processGenFormResultFile <- function(file, isMSMS, adduct, topMost)
 #' @template form_algo-args
 #' 
 #' @templateVar append This argument does not affect the annotation results for MS-only formulae.
-#' @template minMobSpecSim-arg
+#' @template minIMSSpecSim-arg
 #'
 #' @inheritParams generateFormulas
 #'
@@ -349,7 +349,7 @@ setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLi
                                                                calculateFeatures = FALSE, featThreshold = 0,
                                                                featThresholdAnn = 0.75,
                                                                absAlignMzDev = defaultLim("mz", "narrow"),
-                                                               MSMode = "both", isolatePrec = TRUE, minMobSpecSim = 0,
+                                                               MSMode = "both", isolatePrec = TRUE, minIMSSpecSim = 0,
                                                                timeout = 120, topMost = 50, batchSize = 8)
 {
     if (is.infinite(maxCandidates))
@@ -368,7 +368,7 @@ setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLi
            fixed = list(add = ac))
     checkmate::assertChoice(MSMode, c("ms", "msms", "both"), add = ac)
     checkmate::assertCharacter(extraOpts, null.ok = TRUE, add = ac)
-    checkmate::assertNumber(minMobSpecSim, lower = 0, add = ac)
+    checkmate::assertNumber(minIMSSpecSim, lower = 0, add = ac)
     checkmate::assertCount(topMost, positive = TRUE, add = ac)
     checkmate::assertCount(batchSize, positive = TRUE, add = ac)
     
@@ -413,18 +413,18 @@ setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLi
     
     formTable <- list()
     baseHash <- makeHash(mainArgs, MSMode, isolatePrec, topMost)
-    setHash <- makeHash(fGroups, MSPeakLists, baseHash, minMobSpecSim)
-    mobSpecSims <- getMobFeatAnnSpecSims(MSPeakLists, fGroups, minMobSpecSim, specSimParams)
-    mobSpecSimsAna <- if (calculateFeatures)
-        getMobFeatAnnSpecSims(MSPeakLists, fGroups, minMobSpecSim, specSimParams, doFGroups = FALSE)
+    setHash <- makeHash(fGroups, MSPeakLists, baseHash, minIMSSpecSim)
+    IMSSpecSims <- getIMSFeatAnnSpecSims(MSPeakLists, fGroups, minIMSSpecSim, specSimParams)
+    IMSSpecSimsAna <- if (calculateFeatures)
+        getIMSFeatAnnSpecSims(MSPeakLists, fGroups, minIMSSpecSim, specSimParams, doFGroups = FALSE)
     
     # ana is optional and not used when only calculating group average formulas
     doGenForm <- function(groupPeakLists, ana)
     {
-        if (is.null(ana) && !is.null(mobSpecSims))
-            groupPeakLists <- groupPeakLists[setdiff(names(groupPeakLists), mobSpecSims$group)]
-        else if (!is.null(ana) && !is.null(mobSpecSimsAna))
-            groupPeakLists <- groupPeakLists[setdiff(names(groupPeakLists), mobSpecSimsAna[analysis == ana]$group)]
+        if (is.null(ana) && !is.null(IMSSpecSims))
+            groupPeakLists <- groupPeakLists[setdiff(names(groupPeakLists), IMSSpecSims$group)]
+        else if (!is.null(ana) && !is.null(IMSSpecSimsAna))
+            groupPeakLists <- groupPeakLists[setdiff(names(groupPeakLists), IMSSpecSimsAna[analysis == ana]$group)]
         
         if (!is.null(ana))
             printf("Loading all formulas for analysis '%s'...\n", ana)
@@ -478,8 +478,8 @@ setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLi
     groupFormulas <- setFormulaPLID(groupFormulas, MSPeakLists, absAlignMzDev)
     
     return(formulas(groupAnnotations = groupFormulas, featureFormulas = formTable, algorithm = "genform",
-                    MSPeakLists = MSPeakLists, specSimParams = specSimParams, mobSpecSims = mobSpecSims,
-                    mobSpecSimsAna = mobSpecSimsAna, gNames = names(fGroups)))
+                    MSPeakLists = MSPeakLists, specSimParams = specSimParams, IMSSpecSims = IMSSpecSims,
+                    IMSSpecSimsAna = IMSSpecSimsAna, gNames = names(fGroups)))
 })
 
 #' @template featAnnSets-gen_args

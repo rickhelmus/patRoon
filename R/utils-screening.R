@@ -212,7 +212,7 @@ matchIMSScr <- function(scr, gInfo, IMSMatchParams, negate = FALSE)
     {
         if (all(is.na(gInfo$ims_precursor_group)))
         {
-            warning("No IMS parent group assignments available, cannot apply minMatches filter", call. = FALSE)
+            warning("No IMS precursor group assignments available, cannot apply minMatches filter", call. = FALSE)
             return(scr)
         }
         
@@ -242,7 +242,7 @@ matchIMSScr <- function(scr, gInfo, IMSMatchParams, negate = FALSE)
 assignFeatureMobilitiesSuspects <- function(features, scr, mobWindow, selectFunc = NULL)
 {
     printf("Finding mobilities for all features from suspects...\n")
-    oldCount <- countMobilityFeatures(features)
+    oldCount <- countIMSFeatures(features)
     
     if (is.null(scr[["mobility_input"]]))
     {
@@ -272,7 +272,7 @@ assignFeatureMobilitiesSuspects <- function(features, scr, mobWindow, selectFunc
         return(doAssignFeatureMobilities(fTable, mobTable))
     })
     
-    printf("Assigned %d mobility features.\n", countMobilityFeatures(features) - oldCount)
+    printf("Assigned %d IMS features.\n", countIMSFeatures(features) - oldCount)
     
     features@hasIMS <- TRUE
     

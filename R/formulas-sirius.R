@@ -246,7 +246,7 @@ setMethod("predictTox", "formulasSIRIUS", function(obj, LC50Mode = "static", con
 #' @template adduct-arg
 #' @templateVar algo sirius
 #' @template form_algo-args
-#' @template minMobSpecSim-arg
+#' @template minIMSSpecSim-arg
 #'
 #' @inheritParams generateFormulas
 #'
@@ -269,7 +269,7 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
                                                               calculateFeatures = FALSE, featThreshold = 0,
                                                               featThresholdAnn = 0.75,
                                                               absAlignMzDev = defaultLim("mz", "narrow"),
-                                                              minMobSpecSim = 0, verbose = TRUE, splitBatches = FALSE,
+                                                              minIMSSpecSim = 0, verbose = TRUE, splitBatches = FALSE,
                                                               dryRun = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
@@ -287,7 +287,7 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
     aapply(checkmate::assertCharacter, . ~ extraOptsGeneral + extraOptsFormula, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertFlag(getFingerprints, add = ac)
     checkmate::assertFlag(calculateFeatures, add = ac)
-    aapply(checkmate::assertNumber, . ~ featThreshold + featThresholdAnn + absAlignMzDev + minMobSpecSim,
+    aapply(checkmate::assertNumber, . ~ featThreshold + featThresholdAnn + absAlignMzDev + minIMSSpecSim,
            lower = 0, upper = 1, fixed = list(add = ac))
     checkmate::assertFlag(verbose, add = ac)
     checkmate::assertFlag(splitBatches, add = ac)
@@ -307,15 +307,15 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
     gNames <- names(fGroups)
     gCount <- length(fGroups)
     
-    mobSpecSims <- getMobFeatAnnSpecSims(MSPeakLists, fGroups, minMobSpecSim, specSimParams)
-    mobSpecSimsAna <- if (calculateFeatures)
-        getMobFeatAnnSpecSims(MSPeakLists, fGroups, minMobSpecSim, specSimParams, doFGroups = FALSE)
+    IMSSpecSims <- getIMSFeatAnnSpecSims(MSPeakLists, fGroups, minIMSSpecSim, specSimParams)
+    IMSSpecSimsAna <- if (calculateFeatures)
+        getIMSFeatAnnSpecSims(MSPeakLists, fGroups, minIMSSpecSim, specSimParams, doFGroups = FALSE)
     
     printf("Processing %d feature groups with SIRIUS...\n---\n", gCount)
     formTable <- doSIRIUS(fGroups, MSPeakLists, calculateFeatures, profile, adduct, relMzDev, elements,
                           database, noise, cores, if (getFingerprints) "fingerprint" else "none", NULL, topMost,
-                          projectPath, login, alwaysLogin, extraOptsGeneral, extraOptsFormula, mobSpecSims,
-                          mobSpecSimsAna, verbose, "formulasSIRIUS", patRoon:::processSIRIUSFormulas, NULL,
+                          projectPath, login, alwaysLogin, extraOptsGeneral, extraOptsFormula, IMSSpecSims,
+                          IMSSpecSimsAna, verbose, "formulasSIRIUS", patRoon:::processSIRIUSFormulas, NULL,
                           splitBatches, dryRun)
     
     groupFormulas <- fingerprints <- list()
@@ -366,11 +366,11 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
     
     ret <- formulasSIRIUS(groupAnnotations = groupFormulas, featureFormulas = formTable, fingerprints = fingerprints,
                           algorithm = "sirius", MSPeakLists = MSPeakLists, specSimParams = specSimParams,
-                          mobSpecSims = mobSpecSims, mobSpecSimsAna = mobSpecSimsAna, gNames = names(fGroups))
+                          IMSSpecSims = IMSSpecSims, IMSSpecSimsAna = IMSSpecSimsAna, gNames = names(fGroups))
     
-    if (getFingerprints && !is.null(mobSpecSims))
+    if (getFingerprints && !is.null(IMSSpecSims))
     {
-        mss <- mobSpecSims[ims_precursor_group %chin% names(ret@fingerprints)]
+        mss <- IMSSpecSims[ims_precursor_group %chin% names(ret@fingerprints)]
         if (nrow(mss) > 0)
             ret@fingerprints[mss$group] <- copy(ret@fingerprints[mss$ims_precursor_group])
     }

@@ -275,3 +275,14 @@ For more details, please refer to the reference manual (`?patRoonInst::legacy`).
 
 ```{r child=file.path(vignDir, "shared", "_refs.Rmd")}
 ```
+
+## Developers: devtools / pkgload
+
+If you are a developer and using the `load_all()` function from `devtools` or `pkgload` to load `patRoon`, it is highly recommended to disable debug compilation flags as this considerably degrades performance:
+
+```{r eval=FALSE}
+# disable debug flags via package options
+options(pkg.build_extra_flags = FALSE)
+# disable debug flags via environment variable, may be more reliable with e.g. testthat
+Sys.setenv(PKG_BUILD_EXTRA_FLAGS = "false")
+```

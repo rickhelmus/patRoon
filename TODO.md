@@ -72,9 +72,6 @@
 - mzRange, mzDefectRange and IMSRangeParams use neutral masses instead of m/z values in sets workflows --> change? (now documented)
 
 
-## IMS
-
-- rename and split assignMobilities()?
 
 ## Tests
 
@@ -107,8 +104,6 @@
 - handbook
     - installation
         - verify R installation table when new deps in patRoonDeps are added
-        - mention that for dev PKG_BUILD_EXTRA_FLAGS/pkg.build_extra_flags should be disabled
-    - check: are TP docs updated for ADT(candidates=T)? And getDefTPStructParams()?
     - add links in NEWS to relevant sections --> verify when site is up
 - add refs to paper: piek, assignMobilities(), peakParams, greedy, IMSCollapse
     - also in in NEWS (IMS, msdata etc)?

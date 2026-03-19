@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2026-03-18" />
+<meta name="date" content="2026-03-19" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -192,6 +192,7 @@ div.csl-indent {
 <li class="chapter" data-level="2.3.3" data-path="reg_inst.html"><a href="reg_inst.html#verifying-the-installation"><i class="fa fa-check"></i><b>2.3.3</b> Verifying the installation</a></li>
 </ul></li>
 <li class="chapter" data-level="2.4" data-path="managing-legacy-installations.html"><a href="managing-legacy-installations.html"><i class="fa fa-check"></i><b>2.4</b> Managing legacy installations</a></li>
+<li class="chapter" data-level="2.5" data-path="developers-devtools-pkgload.html"><a href="developers-devtools-pkgload.html"><i class="fa fa-check"></i><b>2.5</b> Developers: devtools / pkgload</a></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path="workflow-concepts.html"><a href="workflow-concepts.html"><i class="fa fa-check"></i><b>3</b> Workflow concepts</a></li>
 <li class="chapter" data-level="4" data-path="generating-workflow-data.html"><a href="generating-workflow-data.html"><i class="fa fa-check"></i><b>4</b> Generating workflow data</a>
@@ -411,14 +412,14 @@ div.csl-indent {
 <h2><span class="header-section-number">5.2</span> Filtering<a href="filtering.html#filtering" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>During a non-target workflow it is not uncommon that some kind of data-cleanup is necessary. Datasets are often highly complex, which makes separating data of interest from the rest highly important. Furthermore, general cleanup typically improves the quality of the dataset, for instance by removing low scoring annotation results or features that are unlikely to be ‘correct’ (e.g. noise or present in blanks). For this reason <code>patRoon</code> supports <em>many</em> different filters that easily clean data produced during the workflow in a highly customizable way.</p>
 <p>All major workflow objects (e.g. <code>featureGroups</code>, <code>compounds</code>, <code>components</code> etc.) support filtering operations by the <code>filter()</code> generic. This function takes the object to be filtered as first argument and any remaining arguments describe the desired filter options. The <code>filter()</code> generic function then returns the modified object back. Some examples are shown below.</p>
-<div class="sourceCode" id="cb101"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb101-1"><a href="filtering.html#cb101-1" tabindex="-1"></a><span class="co"># remove low intensity (&lt;500) features</span></span>
-<span id="cb101-2"><a href="filtering.html#cb101-2" tabindex="-1"></a>features <span class="ot">&lt;-</span> <span class="fu">filter</span>(features, <span class="at">absMinIntensity =</span> <span class="dv">500</span>)</span>
-<span id="cb101-3"><a href="filtering.html#cb101-3" tabindex="-1"></a></span>
-<span id="cb101-4"><a href="filtering.html#cb101-4" tabindex="-1"></a><span class="co"># remove features with intensities lower than 5 times the blank</span></span>
-<span id="cb101-5"><a href="filtering.html#cb101-5" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">blankThreshold =</span> <span class="dv">5</span>)</span>
-<span id="cb101-6"><a href="filtering.html#cb101-6" tabindex="-1"></a></span>
-<span id="cb101-7"><a href="filtering.html#cb101-7" tabindex="-1"></a><span class="co"># only retain compounds with &gt;1 explained MS/MS peaks</span></span>
-<span id="cb101-8"><a href="filtering.html#cb101-8" tabindex="-1"></a>compounds <span class="ot">&lt;-</span> <span class="fu">filter</span>(compounds, <span class="at">minExplainedPeaks =</span> <span class="dv">1</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb102"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb102-1"><a href="filtering.html#cb102-1" tabindex="-1"></a><span class="co"># remove low intensity (&lt;500) features</span></span>
+<span id="cb102-2"><a href="filtering.html#cb102-2" tabindex="-1"></a>features <span class="ot">&lt;-</span> <span class="fu">filter</span>(features, <span class="at">absMinIntensity =</span> <span class="dv">500</span>)</span>
+<span id="cb102-3"><a href="filtering.html#cb102-3" tabindex="-1"></a></span>
+<span id="cb102-4"><a href="filtering.html#cb102-4" tabindex="-1"></a><span class="co"># remove features with intensities lower than 5 times the blank</span></span>
+<span id="cb102-5"><a href="filtering.html#cb102-5" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">blankThreshold =</span> <span class="dv">5</span>)</span>
+<span id="cb102-6"><a href="filtering.html#cb102-6" tabindex="-1"></a></span>
+<span id="cb102-7"><a href="filtering.html#cb102-7" tabindex="-1"></a><span class="co"># only retain compounds with &gt;1 explained MS/MS peaks</span></span>
+<span id="cb102-8"><a href="filtering.html#cb102-8" tabindex="-1"></a>compounds <span class="ot">&lt;-</span> <span class="fu">filter</span>(compounds, <span class="at">minExplainedPeaks =</span> <span class="dv">1</span>)</span></code></pre></div>
 <p>The following sections will provide a more detailed overview of available data filters.</p>
 <blockquote>
 <p><strong><em>NOTE</em></strong> Some other <code>R</code> packages (notably <code>dplyr</code>) also provide a <code>filter()</code> generic function. To use the <code>filter()</code> function from different packages you may need to explicitly specify which one to use in your script. This can be done by prefixing it with the package name, e.g. <code>patRoon::filter(...)</code>, <code>dplyr::filter(...)</code> etc.</p>
@@ -505,41 +506,41 @@ div.csl-indent {
 <p>Application of filters to feature data is important for (environmental) non-target analysis. Especially blank and replicate filters (i.e. <code>blankThreshold</code> and <code>absMinReplicateAbundance</code>/<code>relMinReplicateAbundance</code>) are important filters and are highly recommended to always apply for cleaning up your dataset.</p>
 <p>All filters are available for feature group data, whereas only a subset is available for feature objects. The main reason is that other filters need grouping of features between analyses. Regardless, in <code>patRoon</code> filtering feature data is less important, and typically only needed when the number of features are extremely large and direct grouping is undesired.</p>
 <p>From the table above you can notice that many filters concern both <em>absolute</em> and <em>relative</em> data (i.e. as prefixed with <code>abs</code> and <code>rel</code>). When a relative filter is used the value is scaled between <em>0</em> and <em>1</em>. For instance:</p>
-<div class="sourceCode" id="cb102"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb102-1"><a href="filtering.html#cb102-1" tabindex="-1"></a><span class="co"># remove features not present in at least half of the analyses within a replicate</span></span>
-<span id="cb102-2"><a href="filtering.html#cb102-2" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">relMinReplicateAbundance =</span> <span class="fl">0.5</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb103"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb103-1"><a href="filtering.html#cb103-1" tabindex="-1"></a><span class="co"># remove features not present in at least half of the analyses within a replicate</span></span>
+<span id="cb103-2"><a href="filtering.html#cb103-2" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">relMinReplicateAbundance =</span> <span class="fl">0.5</span>)</span></code></pre></div>
 <p>An advantage of relative filters is that you will not have to worry about the data size involved. For instance, in the above example the filter always takes half of the number of analyses within a replicate, even when replicates have different number of analyses.</p>
 <p>Note that multiple filters can be specified at once. Especially for feature group data the order of filtering may impact the final results, this is explained further in the reference manual (i.e. <code>?`feature-filtering`</code>).</p>
 <p>Some examples are shown below.</p>
-<div class="sourceCode" id="cb103"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb103-1"><a href="filtering.html#cb103-1" tabindex="-1"></a><span class="co"># filter features prior to grouping: remove any features eluting before first 2 minutes</span></span>
-<span id="cb103-2"><a href="filtering.html#cb103-2" tabindex="-1"></a>fList <span class="ot">&lt;-</span> <span class="fu">filter</span>(fList, <span class="at">retentionRange =</span> <span class="fu">c</span>(<span class="dv">120</span>, <span class="cn">Inf</span>))</span>
-<span id="cb103-3"><a href="filtering.html#cb103-3" tabindex="-1"></a></span>
-<span id="cb103-4"><a href="filtering.html#cb103-4" tabindex="-1"></a><span class="co"># common filters for feature groups</span></span>
-<span id="cb103-5"><a href="filtering.html#cb103-5" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups,</span>
-<span id="cb103-6"><a href="filtering.html#cb103-6" tabindex="-1"></a>                  <span class="at">absMinIntensity =</span> <span class="dv">500</span>, <span class="co"># remove features &lt;500 intensity</span></span>
-<span id="cb103-7"><a href="filtering.html#cb103-7" tabindex="-1"></a>                  <span class="at">relMinReplicateAbundance =</span> <span class="dv">1</span>, <span class="co"># features should be in all analysis of replicates</span></span>
-<span id="cb103-8"><a href="filtering.html#cb103-8" tabindex="-1"></a>                  <span class="at">maxReplicateIntRSD =</span> <span class="fl">0.75</span>, <span class="co"># remove features with intensity RSD in replicates &gt;75%</span></span>
-<span id="cb103-9"><a href="filtering.html#cb103-9" tabindex="-1"></a>                  <span class="at">blankThreshold =</span> <span class="dv">5</span>, <span class="co"># remove features &lt;5x intensity of (average) blank intensity</span></span>
-<span id="cb103-10"><a href="filtering.html#cb103-10" tabindex="-1"></a>                  <span class="at">removeBlanks =</span> <span class="cn">TRUE</span>) <span class="co"># remove blank analyses from object afterwards</span></span>
-<span id="cb103-11"><a href="filtering.html#cb103-11" tabindex="-1"></a></span>
-<span id="cb103-12"><a href="filtering.html#cb103-12" tabindex="-1"></a><span class="co"># filter by feature properties</span></span>
-<span id="cb103-13"><a href="filtering.html#cb103-13" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups,</span>
-<span id="cb103-14"><a href="filtering.html#cb103-14" tabindex="-1"></a>                  <span class="at">mzDefectRange =</span> <span class="fu">c</span>(<span class="fl">0.8</span>, <span class="fl">0.9</span>),</span>
-<span id="cb103-15"><a href="filtering.html#cb103-15" tabindex="-1"></a>                  <span class="at">chromWidthRange =</span> <span class="fu">c</span>(<span class="dv">6</span>, <span class="dv">120</span>))</span>
-<span id="cb103-16"><a href="filtering.html#cb103-16" tabindex="-1"></a></span>
-<span id="cb103-17"><a href="filtering.html#cb103-17" tabindex="-1"></a><span class="co"># remove features not present in at least 3 analyses</span></span>
-<span id="cb103-18"><a href="filtering.html#cb103-18" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">absMinAnalyses =</span> <span class="dv">3</span>)</span>
-<span id="cb103-19"><a href="filtering.html#cb103-19" tabindex="-1"></a></span>
-<span id="cb103-20"><a href="filtering.html#cb103-20" tabindex="-1"></a><span class="co"># remove features not present in at least 20% of all replicates</span></span>
-<span id="cb103-21"><a href="filtering.html#cb103-21" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">relMinReplicates =</span> <span class="fl">0.2</span>)</span>
-<span id="cb103-22"><a href="filtering.html#cb103-22" tabindex="-1"></a></span>
-<span id="cb103-23"><a href="filtering.html#cb103-23" tabindex="-1"></a><span class="co"># only keep data present in replicates &quot;repl1&quot; and &quot;repl2&quot;</span></span>
-<span id="cb103-24"><a href="filtering.html#cb103-24" tabindex="-1"></a><span class="co"># all other features and analyses will be removed</span></span>
-<span id="cb103-25"><a href="filtering.html#cb103-25" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">replicates =</span> <span class="fu">c</span>(<span class="st">&quot;repl1&quot;</span>, <span class="st">&quot;repl2&quot;</span>))</span>
-<span id="cb103-26"><a href="filtering.html#cb103-26" tabindex="-1"></a></span>
-<span id="cb103-27"><a href="filtering.html#cb103-27" tabindex="-1"></a><span class="co"># only keep feature groups with compound annotations</span></span>
-<span id="cb103-28"><a href="filtering.html#cb103-28" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">results =</span> compounds)</span>
-<span id="cb103-29"><a href="filtering.html#cb103-29" tabindex="-1"></a><span class="co"># only keep feature groups with formula or compound annotations</span></span>
-<span id="cb103-30"><a href="filtering.html#cb103-30" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">results =</span> <span class="fu">list</span>(formulas, compounds))</span></code></pre></div>
+<div class="sourceCode" id="cb104"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb104-1"><a href="filtering.html#cb104-1" tabindex="-1"></a><span class="co"># filter features prior to grouping: remove any features eluting before first 2 minutes</span></span>
+<span id="cb104-2"><a href="filtering.html#cb104-2" tabindex="-1"></a>fList <span class="ot">&lt;-</span> <span class="fu">filter</span>(fList, <span class="at">retentionRange =</span> <span class="fu">c</span>(<span class="dv">120</span>, <span class="cn">Inf</span>))</span>
+<span id="cb104-3"><a href="filtering.html#cb104-3" tabindex="-1"></a></span>
+<span id="cb104-4"><a href="filtering.html#cb104-4" tabindex="-1"></a><span class="co"># common filters for feature groups</span></span>
+<span id="cb104-5"><a href="filtering.html#cb104-5" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups,</span>
+<span id="cb104-6"><a href="filtering.html#cb104-6" tabindex="-1"></a>                  <span class="at">absMinIntensity =</span> <span class="dv">500</span>, <span class="co"># remove features &lt;500 intensity</span></span>
+<span id="cb104-7"><a href="filtering.html#cb104-7" tabindex="-1"></a>                  <span class="at">relMinReplicateAbundance =</span> <span class="dv">1</span>, <span class="co"># features should be in all analysis of replicates</span></span>
+<span id="cb104-8"><a href="filtering.html#cb104-8" tabindex="-1"></a>                  <span class="at">maxReplicateIntRSD =</span> <span class="fl">0.75</span>, <span class="co"># remove features with intensity RSD in replicates &gt;75%</span></span>
+<span id="cb104-9"><a href="filtering.html#cb104-9" tabindex="-1"></a>                  <span class="at">blankThreshold =</span> <span class="dv">5</span>, <span class="co"># remove features &lt;5x intensity of (average) blank intensity</span></span>
+<span id="cb104-10"><a href="filtering.html#cb104-10" tabindex="-1"></a>                  <span class="at">removeBlanks =</span> <span class="cn">TRUE</span>) <span class="co"># remove blank analyses from object afterwards</span></span>
+<span id="cb104-11"><a href="filtering.html#cb104-11" tabindex="-1"></a></span>
+<span id="cb104-12"><a href="filtering.html#cb104-12" tabindex="-1"></a><span class="co"># filter by feature properties</span></span>
+<span id="cb104-13"><a href="filtering.html#cb104-13" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups,</span>
+<span id="cb104-14"><a href="filtering.html#cb104-14" tabindex="-1"></a>                  <span class="at">mzDefectRange =</span> <span class="fu">c</span>(<span class="fl">0.8</span>, <span class="fl">0.9</span>),</span>
+<span id="cb104-15"><a href="filtering.html#cb104-15" tabindex="-1"></a>                  <span class="at">chromWidthRange =</span> <span class="fu">c</span>(<span class="dv">6</span>, <span class="dv">120</span>))</span>
+<span id="cb104-16"><a href="filtering.html#cb104-16" tabindex="-1"></a></span>
+<span id="cb104-17"><a href="filtering.html#cb104-17" tabindex="-1"></a><span class="co"># remove features not present in at least 3 analyses</span></span>
+<span id="cb104-18"><a href="filtering.html#cb104-18" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">absMinAnalyses =</span> <span class="dv">3</span>)</span>
+<span id="cb104-19"><a href="filtering.html#cb104-19" tabindex="-1"></a></span>
+<span id="cb104-20"><a href="filtering.html#cb104-20" tabindex="-1"></a><span class="co"># remove features not present in at least 20% of all replicates</span></span>
+<span id="cb104-21"><a href="filtering.html#cb104-21" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">relMinReplicates =</span> <span class="fl">0.2</span>)</span>
+<span id="cb104-22"><a href="filtering.html#cb104-22" tabindex="-1"></a></span>
+<span id="cb104-23"><a href="filtering.html#cb104-23" tabindex="-1"></a><span class="co"># only keep data present in replicates &quot;repl1&quot; and &quot;repl2&quot;</span></span>
+<span id="cb104-24"><a href="filtering.html#cb104-24" tabindex="-1"></a><span class="co"># all other features and analyses will be removed</span></span>
+<span id="cb104-25"><a href="filtering.html#cb104-25" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">replicates =</span> <span class="fu">c</span>(<span class="st">&quot;repl1&quot;</span>, <span class="st">&quot;repl2&quot;</span>))</span>
+<span id="cb104-26"><a href="filtering.html#cb104-26" tabindex="-1"></a></span>
+<span id="cb104-27"><a href="filtering.html#cb104-27" tabindex="-1"></a><span class="co"># only keep feature groups with compound annotations</span></span>
+<span id="cb104-28"><a href="filtering.html#cb104-28" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">results =</span> compounds)</span>
+<span id="cb104-29"><a href="filtering.html#cb104-29" tabindex="-1"></a><span class="co"># only keep feature groups with formula or compound annotations</span></span>
+<span id="cb104-30"><a href="filtering.html#cb104-30" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">results =</span> <span class="fu">list</span>(formulas, compounds))</span></code></pre></div>
 </div>
 <div id="suspect-screening" class="section level3 hasAnchor" number="5.2.2">
 <h3><span class="header-section-number">5.2.2</span> Suspect screening<a href="filtering.html#suspect-screening" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -595,13 +596,13 @@ div.csl-indent {
 </blockquote>
 <p>The <code>selectHitsBy</code> and <code>selectBestFGroups</code> filters are useful to remove duplicate hits, i.e. the same suspect assigned to multiple feature groups or multiple suspects assigned to the same feature group, respectively. The former selects based on either best identification level (<code>selectHitsBy="level"</code>) or highest mean intensity (<code>selectHitsBy="intensity"</code>). The <code>selectBestFGroups</code> can only be <code>TRUE</code>/<code>FALSE</code> and always selects by best identification level.</p>
 <p>Some examples are shown below.</p>
-<div class="sourceCode" id="cb104"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb104-1"><a href="filtering.html#cb104-1" tabindex="-1"></a><span class="co"># only keep feature groups assigned to at least one suspect</span></span>
-<span id="cb104-2"><a href="filtering.html#cb104-2" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsSusp, <span class="at">onlyHits =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb104-3"><a href="filtering.html#cb104-3" tabindex="-1"></a><span class="co"># remove duplicate suspect to feature group matches and keep the best</span></span>
-<span id="cb104-4"><a href="filtering.html#cb104-4" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsSusp, <span class="at">selectHitsBy =</span> <span class="st">&quot;level&quot;</span>)</span>
-<span id="cb104-5"><a href="filtering.html#cb104-5" tabindex="-1"></a><span class="co"># remove suspect hits with ID levels &gt;3 and make sure no feature groups</span></span>
-<span id="cb104-6"><a href="filtering.html#cb104-6" tabindex="-1"></a><span class="co"># are present without suspect hits afterwards</span></span>
-<span id="cb104-7"><a href="filtering.html#cb104-7" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsSusp, <span class="at">maxLevel =</span> <span class="dv">3</span>, <span class="at">onlyHits =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb105"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb105-1"><a href="filtering.html#cb105-1" tabindex="-1"></a><span class="co"># only keep feature groups assigned to at least one suspect</span></span>
+<span id="cb105-2"><a href="filtering.html#cb105-2" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsSusp, <span class="at">onlyHits =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb105-3"><a href="filtering.html#cb105-3" tabindex="-1"></a><span class="co"># remove duplicate suspect to feature group matches and keep the best</span></span>
+<span id="cb105-4"><a href="filtering.html#cb105-4" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsSusp, <span class="at">selectHitsBy =</span> <span class="st">&quot;level&quot;</span>)</span>
+<span id="cb105-5"><a href="filtering.html#cb105-5" tabindex="-1"></a><span class="co"># remove suspect hits with ID levels &gt;3 and make sure no feature groups</span></span>
+<span id="cb105-6"><a href="filtering.html#cb105-6" tabindex="-1"></a><span class="co"># are present without suspect hits afterwards</span></span>
+<span id="cb105-7"><a href="filtering.html#cb105-7" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsSusp, <span class="at">maxLevel =</span> <span class="dv">3</span>, <span class="at">onlyHits =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 </div>
 <div id="annotation-1" class="section level3 hasAnchor" number="5.2.3">
 <h3><span class="header-section-number">5.2.3</span> Annotation<a href="filtering.html#annotation-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -700,49 +701,49 @@ div.csl-indent {
 <p>Several intensity related filters are available to clean-up MS peak list data. For instance, the <code>topMSPeaks</code>/<code>topMSMSPeaks</code> filters provide a simple way to remove noisy data by only retaining a defined number of most intense mass peaks. Note that none of these filters will remove the precursor mass peak of the feature itself.</p>
 <p>The filters applicable to formula and compound annotation generally concern minimal scoring or chemical properties. The former is useful to remove unlikely candidates, whereas the second is useful to focus on certain study specific chemical properties (e.g. known neutral losses).</p>
 <p>Common examples are shown below.</p>
-<div class="sourceCode" id="cb105"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb105-1"><a href="filtering.html#cb105-1" tabindex="-1"></a><span class="co"># intensity filtering</span></span>
-<span id="cb105-2"><a href="filtering.html#cb105-2" tabindex="-1"></a>mslists <span class="ot">&lt;-</span> <span class="fu">filter</span>(mslists, <span class="at">MSLevel =</span> <span class="dv">1</span>, <span class="co"># only MS1 data</span></span>
-<span id="cb105-3"><a href="filtering.html#cb105-3" tabindex="-1"></a>                  <span class="at">absMinIntensity =</span> <span class="dv">500</span>, <span class="co"># minimum mass peak intensity of 500</span></span>
-<span id="cb105-4"><a href="filtering.html#cb105-4" tabindex="-1"></a>                  <span class="at">relMinIntensity =</span> <span class="fl">0.1</span>) <span class="co"># and minimum mass peak intensity of 10%</span></span>
-<span id="cb105-5"><a href="filtering.html#cb105-5" tabindex="-1"></a></span>
-<span id="cb105-6"><a href="filtering.html#cb105-6" tabindex="-1"></a><span class="co"># only retain 10 most intense mass peaks (MS and MS/MS)</span></span>
-<span id="cb105-7"><a href="filtering.html#cb105-7" tabindex="-1"></a><span class="co"># (feature mass is always retained)</span></span>
-<span id="cb105-8"><a href="filtering.html#cb105-8" tabindex="-1"></a>mslists <span class="ot">&lt;-</span> <span class="fu">filter</span>(mslists, <span class="at">MSLevel =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="at">topMostPeaks =</span> <span class="dv">10</span>)</span>
-<span id="cb105-9"><a href="filtering.html#cb105-9" tabindex="-1"></a></span>
-<span id="cb105-10"><a href="filtering.html#cb105-10" tabindex="-1"></a><span class="co"># remove MS/MS peaks without compound annotations</span></span>
-<span id="cb105-11"><a href="filtering.html#cb105-11" tabindex="-1"></a>mslists <span class="ot">&lt;-</span> <span class="fu">filter</span>(mslists, <span class="at">MSLevel =</span> <span class="dv">2</span>, <span class="at">annotatedBy =</span> compounds)</span>
-<span id="cb105-12"><a href="filtering.html#cb105-12" tabindex="-1"></a></span>
-<span id="cb105-13"><a href="filtering.html#cb105-13" tabindex="-1"></a><span class="co"># remove MS/MS peaks not annotated by either a formula or compound candidate</span></span>
-<span id="cb105-14"><a href="filtering.html#cb105-14" tabindex="-1"></a>mslists <span class="ot">&lt;-</span> <span class="fu">filter</span>(mslists, <span class="at">MSLevel =</span> <span class="dv">2</span>, <span class="at">annotatedBy =</span> <span class="fu">list</span>(formulas, compounds))</span>
-<span id="cb105-15"><a href="filtering.html#cb105-15" tabindex="-1"></a></span>
-<span id="cb105-16"><a href="filtering.html#cb105-16" tabindex="-1"></a><span class="co"># only keep formulae with 1-10 sulphur or phosphorus elements</span></span>
-<span id="cb105-17"><a href="filtering.html#cb105-17" tabindex="-1"></a>formulas <span class="ot">&lt;-</span> <span class="fu">filter</span>(formulas, <span class="at">elements =</span> <span class="fu">c</span>(<span class="st">&quot;S1-10&quot;</span>, <span class="st">&quot;P1-10&quot;</span>))</span>
-<span id="cb105-18"><a href="filtering.html#cb105-18" tabindex="-1"></a></span>
-<span id="cb105-19"><a href="filtering.html#cb105-19" tabindex="-1"></a><span class="co"># only keep candidates with MS/MS fragments that contain 1-10 carbons and 0-2 oxygens</span></span>
-<span id="cb105-20"><a href="filtering.html#cb105-20" tabindex="-1"></a>formulas <span class="ot">&lt;-</span> <span class="fu">filter</span>(formulas, <span class="at">fragElements =</span> <span class="st">&quot;C1-10O0-2&quot;</span>)</span>
-<span id="cb105-21"><a href="filtering.html#cb105-21" tabindex="-1"></a></span>
-<span id="cb105-22"><a href="filtering.html#cb105-22" tabindex="-1"></a><span class="co"># only keep candidates with CO2 or H2O neutral loss</span></span>
-<span id="cb105-23"><a href="filtering.html#cb105-23" tabindex="-1"></a>formulas <span class="ot">&lt;-</span> <span class="fu">filter</span>(formulas, <span class="at">lossFormulas =</span> <span class="fu">c</span>(<span class="st">&quot;CO2&quot;</span>, <span class="st">&quot;H2O&quot;</span>))</span>
-<span id="cb105-24"><a href="filtering.html#cb105-24" tabindex="-1"></a></span>
-<span id="cb105-25"><a href="filtering.html#cb105-25" tabindex="-1"></a><span class="co"># only keep candidates with formula annotation similarity &gt;=0.6</span></span>
-<span id="cb105-26"><a href="filtering.html#cb105-26" tabindex="-1"></a>formulas <span class="ot">&lt;-</span> <span class="fu">filter</span>(formulas, <span class="at">scoreLimits =</span> <span class="fu">list</span>(<span class="at">annSim =</span> <span class="fu">c</span>(<span class="fl">0.6</span>, <span class="cn">Inf</span>)))</span>
-<span id="cb105-27"><a href="filtering.html#cb105-27" tabindex="-1"></a></span>
-<span id="cb105-28"><a href="filtering.html#cb105-28" tabindex="-1"></a><span class="co"># only keep the 15 highest ranked candidates with at least 1 annotated MS/MS peak</span></span>
-<span id="cb105-29"><a href="filtering.html#cb105-29" tabindex="-1"></a>compounds <span class="ot">&lt;-</span> <span class="fu">filter</span>(compounds, <span class="at">minExplainedPeaks =</span> <span class="dv">1</span>, <span class="at">topMost =</span> <span class="dv">15</span>)</span>
-<span id="cb105-30"><a href="filtering.html#cb105-30" tabindex="-1"></a></span>
-<span id="cb105-31"><a href="filtering.html#cb105-31" tabindex="-1"></a><span class="co"># minimum in-silico score</span></span>
-<span id="cb105-32"><a href="filtering.html#cb105-32" tabindex="-1"></a>compounds <span class="ot">&lt;-</span> <span class="fu">filter</span>(compounds, <span class="at">minFragScore =</span> <span class="dv">10</span>)</span>
-<span id="cb105-33"><a href="filtering.html#cb105-33" tabindex="-1"></a></span>
-<span id="cb105-34"><a href="filtering.html#cb105-34" tabindex="-1"></a><span class="co"># candidate should be referenced in at least 1 patent</span></span>
-<span id="cb105-35"><a href="filtering.html#cb105-35" tabindex="-1"></a><span class="co"># (only works if database lists number of patents, e.g. PubChem)</span></span>
-<span id="cb105-36"><a href="filtering.html#cb105-36" tabindex="-1"></a>compounds <span class="ot">&lt;-</span> <span class="fu">filter</span>(compounds,</span>
-<span id="cb105-37"><a href="filtering.html#cb105-37" tabindex="-1"></a>                    <span class="at">scoreLimits =</span> <span class="fu">list</span>(<span class="at">numberPatents =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="cn">Inf</span>)))</span>
-<span id="cb105-38"><a href="filtering.html#cb105-38" tabindex="-1"></a></span>
-<span id="cb105-39"><a href="filtering.html#cb105-39" tabindex="-1"></a><span class="co"># only keep candidates with formula annotation similarity &gt;=0.8 and</span></span>
-<span id="cb105-40"><a href="filtering.html#cb105-40" tabindex="-1"></a><span class="co"># compound annotation similarity &gt;= 0.7</span></span>
-<span id="cb105-41"><a href="filtering.html#cb105-41" tabindex="-1"></a><span class="co"># (requires that estimateIDConfidence() was called on the compounds objects)</span></span>
-<span id="cb105-42"><a href="filtering.html#cb105-42" tabindex="-1"></a>compounds <span class="ot">&lt;-</span> <span class="fu">filter</span>(compounds,</span>
-<span id="cb105-43"><a href="filtering.html#cb105-43" tabindex="-1"></a>                    <span class="at">scoreLimits =</span> <span class="fu">list</span>(<span class="at">annSimForm =</span> <span class="fu">c</span>(<span class="fl">0.8</span>, <span class="cn">Inf</span>), <span class="at">annSim =</span> <span class="fu">c</span>(<span class="fl">0.7</span>, <span class="cn">Inf</span>)))</span></code></pre></div>
+<div class="sourceCode" id="cb106"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb106-1"><a href="filtering.html#cb106-1" tabindex="-1"></a><span class="co"># intensity filtering</span></span>
+<span id="cb106-2"><a href="filtering.html#cb106-2" tabindex="-1"></a>mslists <span class="ot">&lt;-</span> <span class="fu">filter</span>(mslists, <span class="at">MSLevel =</span> <span class="dv">1</span>, <span class="co"># only MS1 data</span></span>
+<span id="cb106-3"><a href="filtering.html#cb106-3" tabindex="-1"></a>                  <span class="at">absMinIntensity =</span> <span class="dv">500</span>, <span class="co"># minimum mass peak intensity of 500</span></span>
+<span id="cb106-4"><a href="filtering.html#cb106-4" tabindex="-1"></a>                  <span class="at">relMinIntensity =</span> <span class="fl">0.1</span>) <span class="co"># and minimum mass peak intensity of 10%</span></span>
+<span id="cb106-5"><a href="filtering.html#cb106-5" tabindex="-1"></a></span>
+<span id="cb106-6"><a href="filtering.html#cb106-6" tabindex="-1"></a><span class="co"># only retain 10 most intense mass peaks (MS and MS/MS)</span></span>
+<span id="cb106-7"><a href="filtering.html#cb106-7" tabindex="-1"></a><span class="co"># (feature mass is always retained)</span></span>
+<span id="cb106-8"><a href="filtering.html#cb106-8" tabindex="-1"></a>mslists <span class="ot">&lt;-</span> <span class="fu">filter</span>(mslists, <span class="at">MSLevel =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="at">topMostPeaks =</span> <span class="dv">10</span>)</span>
+<span id="cb106-9"><a href="filtering.html#cb106-9" tabindex="-1"></a></span>
+<span id="cb106-10"><a href="filtering.html#cb106-10" tabindex="-1"></a><span class="co"># remove MS/MS peaks without compound annotations</span></span>
+<span id="cb106-11"><a href="filtering.html#cb106-11" tabindex="-1"></a>mslists <span class="ot">&lt;-</span> <span class="fu">filter</span>(mslists, <span class="at">MSLevel =</span> <span class="dv">2</span>, <span class="at">annotatedBy =</span> compounds)</span>
+<span id="cb106-12"><a href="filtering.html#cb106-12" tabindex="-1"></a></span>
+<span id="cb106-13"><a href="filtering.html#cb106-13" tabindex="-1"></a><span class="co"># remove MS/MS peaks not annotated by either a formula or compound candidate</span></span>
+<span id="cb106-14"><a href="filtering.html#cb106-14" tabindex="-1"></a>mslists <span class="ot">&lt;-</span> <span class="fu">filter</span>(mslists, <span class="at">MSLevel =</span> <span class="dv">2</span>, <span class="at">annotatedBy =</span> <span class="fu">list</span>(formulas, compounds))</span>
+<span id="cb106-15"><a href="filtering.html#cb106-15" tabindex="-1"></a></span>
+<span id="cb106-16"><a href="filtering.html#cb106-16" tabindex="-1"></a><span class="co"># only keep formulae with 1-10 sulphur or phosphorus elements</span></span>
+<span id="cb106-17"><a href="filtering.html#cb106-17" tabindex="-1"></a>formulas <span class="ot">&lt;-</span> <span class="fu">filter</span>(formulas, <span class="at">elements =</span> <span class="fu">c</span>(<span class="st">&quot;S1-10&quot;</span>, <span class="st">&quot;P1-10&quot;</span>))</span>
+<span id="cb106-18"><a href="filtering.html#cb106-18" tabindex="-1"></a></span>
+<span id="cb106-19"><a href="filtering.html#cb106-19" tabindex="-1"></a><span class="co"># only keep candidates with MS/MS fragments that contain 1-10 carbons and 0-2 oxygens</span></span>
+<span id="cb106-20"><a href="filtering.html#cb106-20" tabindex="-1"></a>formulas <span class="ot">&lt;-</span> <span class="fu">filter</span>(formulas, <span class="at">fragElements =</span> <span class="st">&quot;C1-10O0-2&quot;</span>)</span>
+<span id="cb106-21"><a href="filtering.html#cb106-21" tabindex="-1"></a></span>
+<span id="cb106-22"><a href="filtering.html#cb106-22" tabindex="-1"></a><span class="co"># only keep candidates with CO2 or H2O neutral loss</span></span>
+<span id="cb106-23"><a href="filtering.html#cb106-23" tabindex="-1"></a>formulas <span class="ot">&lt;-</span> <span class="fu">filter</span>(formulas, <span class="at">lossFormulas =</span> <span class="fu">c</span>(<span class="st">&quot;CO2&quot;</span>, <span class="st">&quot;H2O&quot;</span>))</span>
+<span id="cb106-24"><a href="filtering.html#cb106-24" tabindex="-1"></a></span>
+<span id="cb106-25"><a href="filtering.html#cb106-25" tabindex="-1"></a><span class="co"># only keep candidates with formula annotation similarity &gt;=0.6</span></span>
+<span id="cb106-26"><a href="filtering.html#cb106-26" tabindex="-1"></a>formulas <span class="ot">&lt;-</span> <span class="fu">filter</span>(formulas, <span class="at">scoreLimits =</span> <span class="fu">list</span>(<span class="at">annSim =</span> <span class="fu">c</span>(<span class="fl">0.6</span>, <span class="cn">Inf</span>)))</span>
+<span id="cb106-27"><a href="filtering.html#cb106-27" tabindex="-1"></a></span>
+<span id="cb106-28"><a href="filtering.html#cb106-28" tabindex="-1"></a><span class="co"># only keep the 15 highest ranked candidates with at least 1 annotated MS/MS peak</span></span>
+<span id="cb106-29"><a href="filtering.html#cb106-29" tabindex="-1"></a>compounds <span class="ot">&lt;-</span> <span class="fu">filter</span>(compounds, <span class="at">minExplainedPeaks =</span> <span class="dv">1</span>, <span class="at">topMost =</span> <span class="dv">15</span>)</span>
+<span id="cb106-30"><a href="filtering.html#cb106-30" tabindex="-1"></a></span>
+<span id="cb106-31"><a href="filtering.html#cb106-31" tabindex="-1"></a><span class="co"># minimum in-silico score</span></span>
+<span id="cb106-32"><a href="filtering.html#cb106-32" tabindex="-1"></a>compounds <span class="ot">&lt;-</span> <span class="fu">filter</span>(compounds, <span class="at">minFragScore =</span> <span class="dv">10</span>)</span>
+<span id="cb106-33"><a href="filtering.html#cb106-33" tabindex="-1"></a></span>
+<span id="cb106-34"><a href="filtering.html#cb106-34" tabindex="-1"></a><span class="co"># candidate should be referenced in at least 1 patent</span></span>
+<span id="cb106-35"><a href="filtering.html#cb106-35" tabindex="-1"></a><span class="co"># (only works if database lists number of patents, e.g. PubChem)</span></span>
+<span id="cb106-36"><a href="filtering.html#cb106-36" tabindex="-1"></a>compounds <span class="ot">&lt;-</span> <span class="fu">filter</span>(compounds,</span>
+<span id="cb106-37"><a href="filtering.html#cb106-37" tabindex="-1"></a>                    <span class="at">scoreLimits =</span> <span class="fu">list</span>(<span class="at">numberPatents =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="cn">Inf</span>)))</span>
+<span id="cb106-38"><a href="filtering.html#cb106-38" tabindex="-1"></a></span>
+<span id="cb106-39"><a href="filtering.html#cb106-39" tabindex="-1"></a><span class="co"># only keep candidates with formula annotation similarity &gt;=0.8 and</span></span>
+<span id="cb106-40"><a href="filtering.html#cb106-40" tabindex="-1"></a><span class="co"># compound annotation similarity &gt;= 0.7</span></span>
+<span id="cb106-41"><a href="filtering.html#cb106-41" tabindex="-1"></a><span class="co"># (requires that estimateIDConfidence() was called on the compounds objects)</span></span>
+<span id="cb106-42"><a href="filtering.html#cb106-42" tabindex="-1"></a>compounds <span class="ot">&lt;-</span> <span class="fu">filter</span>(compounds,</span>
+<span id="cb106-43"><a href="filtering.html#cb106-43" tabindex="-1"></a>                    <span class="at">scoreLimits =</span> <span class="fu">list</span>(<span class="at">annSimForm =</span> <span class="fu">c</span>(<span class="fl">0.8</span>, <span class="cn">Inf</span>), <span class="at">annSim =</span> <span class="fu">c</span>(<span class="fl">0.7</span>, <span class="cn">Inf</span>)))</span></code></pre></div>
 <blockquote>
 <p><strong><em>NOTE</em></strong> As of <code>patRoon 2.0</code> MS peak lists are <strong>not</strong> re-generated after a filtering operation (unless the <code>reAverage</code> parameter is explicity set to <code>TRUE</code>). The reason for this change is that re-averaging invalidates any formula/compound annotation data (e.g. used for plotting and reporting) that were generated prior to the filter operation.</p>
 </blockquote>
@@ -778,24 +779,24 @@ div.csl-indent {
 </table>
 <p>Note that these filters are only applied if the components contain the data the filter works on. For instance, filtering by adducts will <em>not</em> affect components obtained from homologous series.</p>
 <p>As before, some typical examples are shown below.</p>
-<div class="sourceCode" id="cb106"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb106-1"><a href="filtering.html#cb106-1" tabindex="-1"></a><span class="co"># only keep components with at least 4 features</span></span>
-<span id="cb106-2"><a href="filtering.html#cb106-2" tabindex="-1"></a>componInt <span class="ot">&lt;-</span> <span class="fu">filter</span>(componInt, <span class="at">minSize =</span> <span class="dv">4</span>)</span>
-<span id="cb106-3"><a href="filtering.html#cb106-3" tabindex="-1"></a></span>
-<span id="cb106-4"><a href="filtering.html#cb106-4" tabindex="-1"></a><span class="co"># remove all features from components are not annotated as an adduct</span></span>
-<span id="cb106-5"><a href="filtering.html#cb106-5" tabindex="-1"></a>componRC <span class="ot">&lt;-</span> <span class="fu">filter</span>(componRC, <span class="at">adducts =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb106-6"><a href="filtering.html#cb106-6" tabindex="-1"></a></span>
-<span id="cb106-7"><a href="filtering.html#cb106-7" tabindex="-1"></a><span class="co"># only keep protonated and sodium adducts</span></span>
-<span id="cb106-8"><a href="filtering.html#cb106-8" tabindex="-1"></a>componRC <span class="ot">&lt;-</span> <span class="fu">filter</span>(componRC, <span class="at">adducts =</span> <span class="fu">c</span>(<span class="st">&quot;[M+H]+&quot;</span>, <span class="st">&quot;[M+Na]+&quot;</span>))</span>
-<span id="cb106-9"><a href="filtering.html#cb106-9" tabindex="-1"></a></span>
-<span id="cb106-10"><a href="filtering.html#cb106-10" tabindex="-1"></a><span class="co"># remove all features not recognized as isotopes</span></span>
-<span id="cb106-11"><a href="filtering.html#cb106-11" tabindex="-1"></a>componRC <span class="ot">&lt;-</span> <span class="fu">filter</span>(componRC, <span class="at">isotopes =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb106-12"><a href="filtering.html#cb106-12" tabindex="-1"></a></span>
-<span id="cb106-13"><a href="filtering.html#cb106-13" tabindex="-1"></a><span class="co"># only keep monoisotopic mass</span></span>
-<span id="cb106-14"><a href="filtering.html#cb106-14" tabindex="-1"></a>componRC <span class="ot">&lt;-</span> <span class="fu">filter</span>(componRC, <span class="at">isotopes =</span> <span class="dv">0</span>)</span>
-<span id="cb106-15"><a href="filtering.html#cb106-15" tabindex="-1"></a></span>
-<span id="cb106-16"><a href="filtering.html#cb106-16" tabindex="-1"></a><span class="co"># min/max rt/mz increments for homologs</span></span>
-<span id="cb106-17"><a href="filtering.html#cb106-17" tabindex="-1"></a>componNT <span class="ot">&lt;-</span> <span class="fu">filter</span>(componNT, <span class="at">rtIncrement =</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">30</span>),</span>
-<span id="cb106-18"><a href="filtering.html#cb106-18" tabindex="-1"></a>                   <span class="at">mzIncrement =</span> <span class="fu">c</span>(<span class="dv">16</span>, <span class="dv">50</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb107"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb107-1"><a href="filtering.html#cb107-1" tabindex="-1"></a><span class="co"># only keep components with at least 4 features</span></span>
+<span id="cb107-2"><a href="filtering.html#cb107-2" tabindex="-1"></a>componInt <span class="ot">&lt;-</span> <span class="fu">filter</span>(componInt, <span class="at">minSize =</span> <span class="dv">4</span>)</span>
+<span id="cb107-3"><a href="filtering.html#cb107-3" tabindex="-1"></a></span>
+<span id="cb107-4"><a href="filtering.html#cb107-4" tabindex="-1"></a><span class="co"># remove all features from components are not annotated as an adduct</span></span>
+<span id="cb107-5"><a href="filtering.html#cb107-5" tabindex="-1"></a>componRC <span class="ot">&lt;-</span> <span class="fu">filter</span>(componRC, <span class="at">adducts =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb107-6"><a href="filtering.html#cb107-6" tabindex="-1"></a></span>
+<span id="cb107-7"><a href="filtering.html#cb107-7" tabindex="-1"></a><span class="co"># only keep protonated and sodium adducts</span></span>
+<span id="cb107-8"><a href="filtering.html#cb107-8" tabindex="-1"></a>componRC <span class="ot">&lt;-</span> <span class="fu">filter</span>(componRC, <span class="at">adducts =</span> <span class="fu">c</span>(<span class="st">&quot;[M+H]+&quot;</span>, <span class="st">&quot;[M+Na]+&quot;</span>))</span>
+<span id="cb107-9"><a href="filtering.html#cb107-9" tabindex="-1"></a></span>
+<span id="cb107-10"><a href="filtering.html#cb107-10" tabindex="-1"></a><span class="co"># remove all features not recognized as isotopes</span></span>
+<span id="cb107-11"><a href="filtering.html#cb107-11" tabindex="-1"></a>componRC <span class="ot">&lt;-</span> <span class="fu">filter</span>(componRC, <span class="at">isotopes =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb107-12"><a href="filtering.html#cb107-12" tabindex="-1"></a></span>
+<span id="cb107-13"><a href="filtering.html#cb107-13" tabindex="-1"></a><span class="co"># only keep monoisotopic mass</span></span>
+<span id="cb107-14"><a href="filtering.html#cb107-14" tabindex="-1"></a>componRC <span class="ot">&lt;-</span> <span class="fu">filter</span>(componRC, <span class="at">isotopes =</span> <span class="dv">0</span>)</span>
+<span id="cb107-15"><a href="filtering.html#cb107-15" tabindex="-1"></a></span>
+<span id="cb107-16"><a href="filtering.html#cb107-16" tabindex="-1"></a><span class="co"># min/max rt/mz increments for homologs</span></span>
+<span id="cb107-17"><a href="filtering.html#cb107-17" tabindex="-1"></a>componNT <span class="ot">&lt;-</span> <span class="fu">filter</span>(componNT, <span class="at">rtIncrement =</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">30</span>),</span>
+<span id="cb107-18"><a href="filtering.html#cb107-18" tabindex="-1"></a>                   <span class="at">mzIncrement =</span> <span class="fu">c</span>(<span class="dv">16</span>, <span class="dv">50</span>))</span></code></pre></div>
 <blockquote>
 <p><strong><em>NOTE</em></strong> As mentioned before, components are still in a relative young development phase and results should always be verified!</p>
 </blockquote>
@@ -803,23 +804,23 @@ div.csl-indent {
 <div id="negation" class="section level3 hasAnchor" number="5.2.5">
 <h3><span class="header-section-number">5.2.5</span> Negation<a href="filtering.html#negation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>All filters support <em>negation</em>: if enabled all specified filters will be executed in an opposite manner. Negation may not be so commonly used, but allows greater flexibility which is sometimes needed for advanced filtering steps. Furthermore, it is also useful to specifically isolate the data that otherwise would have been removed. Some examples are shown below.</p>
-<div class="sourceCode" id="cb107"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb107-1"><a href="filtering.html#cb107-1" tabindex="-1"></a><span class="co"># keep all features/analyses _not_ present from replicates &quot;repl1&quot; and &quot;repl2&quot;</span></span>
-<span id="cb107-2"><a href="filtering.html#cb107-2" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">replicates =</span> <span class="fu">c</span>(<span class="st">&quot;repl1&quot;</span>, <span class="st">&quot;repl2&quot;</span>), <span class="at">negate =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb107-3"><a href="filtering.html#cb107-3" tabindex="-1"></a></span>
-<span id="cb107-4"><a href="filtering.html#cb107-4" tabindex="-1"></a><span class="co"># only retain features with a mass defect outside 0.8-0.9</span></span>
-<span id="cb107-5"><a href="filtering.html#cb107-5" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">mzDefectRange =</span> <span class="fu">c</span>(<span class="fl">0.8</span>, <span class="fl">0.9</span>), <span class="at">negate =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb107-6"><a href="filtering.html#cb107-6" tabindex="-1"></a></span>
-<span id="cb107-7"><a href="filtering.html#cb107-7" tabindex="-1"></a><span class="co"># remove duplicate suspect hits and only keep the _worst_ hit</span></span>
-<span id="cb107-8"><a href="filtering.html#cb107-8" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsSusp, <span class="at">selectHitsBy =</span> <span class="st">&quot;level&quot;</span>, <span class="at">negate =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb107-9"><a href="filtering.html#cb107-9" tabindex="-1"></a></span>
-<span id="cb107-10"><a href="filtering.html#cb107-10" tabindex="-1"></a><span class="co"># remove candidates with CO2 neutral loss</span></span>
-<span id="cb107-11"><a href="filtering.html#cb107-11" tabindex="-1"></a>formulas <span class="ot">&lt;-</span> <span class="fu">filter</span>(formulas, <span class="at">lossElements =</span> <span class="st">&quot;CO2&quot;</span>, <span class="at">negate =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb107-12"><a href="filtering.html#cb107-12" tabindex="-1"></a></span>
-<span id="cb107-13"><a href="filtering.html#cb107-13" tabindex="-1"></a><span class="co"># select 15 worst ranked candidates</span></span>
-<span id="cb107-14"><a href="filtering.html#cb107-14" tabindex="-1"></a>compounds <span class="ot">&lt;-</span> <span class="fu">filter</span>(compounds, <span class="at">topMost =</span> <span class="dv">15</span>, <span class="at">negate =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb107-15"><a href="filtering.html#cb107-15" tabindex="-1"></a></span>
-<span id="cb107-16"><a href="filtering.html#cb107-16" tabindex="-1"></a><span class="co"># only keep components with &lt;5 features</span></span>
-<span id="cb107-17"><a href="filtering.html#cb107-17" tabindex="-1"></a>componInt <span class="ot">&lt;-</span> <span class="fu">filter</span>(componInt, <span class="at">minSize =</span> <span class="dv">5</span>, <span class="at">negate =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb108"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb108-1"><a href="filtering.html#cb108-1" tabindex="-1"></a><span class="co"># keep all features/analyses _not_ present from replicates &quot;repl1&quot; and &quot;repl2&quot;</span></span>
+<span id="cb108-2"><a href="filtering.html#cb108-2" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">replicates =</span> <span class="fu">c</span>(<span class="st">&quot;repl1&quot;</span>, <span class="st">&quot;repl2&quot;</span>), <span class="at">negate =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb108-3"><a href="filtering.html#cb108-3" tabindex="-1"></a></span>
+<span id="cb108-4"><a href="filtering.html#cb108-4" tabindex="-1"></a><span class="co"># only retain features with a mass defect outside 0.8-0.9</span></span>
+<span id="cb108-5"><a href="filtering.html#cb108-5" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">mzDefectRange =</span> <span class="fu">c</span>(<span class="fl">0.8</span>, <span class="fl">0.9</span>), <span class="at">negate =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb108-6"><a href="filtering.html#cb108-6" tabindex="-1"></a></span>
+<span id="cb108-7"><a href="filtering.html#cb108-7" tabindex="-1"></a><span class="co"># remove duplicate suspect hits and only keep the _worst_ hit</span></span>
+<span id="cb108-8"><a href="filtering.html#cb108-8" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsSusp, <span class="at">selectHitsBy =</span> <span class="st">&quot;level&quot;</span>, <span class="at">negate =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb108-9"><a href="filtering.html#cb108-9" tabindex="-1"></a></span>
+<span id="cb108-10"><a href="filtering.html#cb108-10" tabindex="-1"></a><span class="co"># remove candidates with CO2 neutral loss</span></span>
+<span id="cb108-11"><a href="filtering.html#cb108-11" tabindex="-1"></a>formulas <span class="ot">&lt;-</span> <span class="fu">filter</span>(formulas, <span class="at">lossElements =</span> <span class="st">&quot;CO2&quot;</span>, <span class="at">negate =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb108-12"><a href="filtering.html#cb108-12" tabindex="-1"></a></span>
+<span id="cb108-13"><a href="filtering.html#cb108-13" tabindex="-1"></a><span class="co"># select 15 worst ranked candidates</span></span>
+<span id="cb108-14"><a href="filtering.html#cb108-14" tabindex="-1"></a>compounds <span class="ot">&lt;-</span> <span class="fu">filter</span>(compounds, <span class="at">topMost =</span> <span class="dv">15</span>, <span class="at">negate =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb108-15"><a href="filtering.html#cb108-15" tabindex="-1"></a></span>
+<span id="cb108-16"><a href="filtering.html#cb108-16" tabindex="-1"></a><span class="co"># only keep components with &lt;5 features</span></span>
+<span id="cb108-17"><a href="filtering.html#cb108-17" tabindex="-1"></a>componInt <span class="ot">&lt;-</span> <span class="fu">filter</span>(componInt, <span class="at">minSize =</span> <span class="dv">5</span>, <span class="at">negate =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 </div>
 </div>
             </section>

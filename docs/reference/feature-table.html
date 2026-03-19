@@ -195,7 +195,7 @@ specified columns should be numeric. Set to <code>NULL</code> to ignore.</p></dd
 <dt id="arg-ims">IMS<a class="anchor" aria-label="anchor" href="#arg-ims"></a></dt>
 <dd><p>(<strong>IMS workflow</strong>) Specifies which feature groups are considered to be returned in IMS workflows. The following options
   are valid:</p><ul><li><p><code>"both"</code>: Selects IMS and non-IMS features.</p></li>
-<li><p><code>"maybe"</code>: Selects non-IMS features and IMS features without assigned IMS parent.</p></li>
+<li><p><code>"maybe"</code>: Selects non-IMS features and IMS features without assigned IMS precursor.</p></li>
 <li><p><code>FALSE</code>: Selects only non-IMS features.</p></li>
 <li><p><code>TRUE</code>: Selects only IMS features.</p></li>
 </ul></dd>
@@ -261,7 +261,7 @@ suspect names and other properties and annotation data.</p>
     <h2>IMS workflows</h2>
     <p>If the <code>IMS</code> argument is set to <code>"both"</code> or <code>"maybe"</code> then
   <code>"mobility_collapsed"</code> and <code>"CCS_collapsed"</code> columns will be added that summarize all
-  mobility/<acronym>CCS</acronym> values of the mobility features (or feature groups) assigned to this IMS parent. These
+  mobility/<acronym>CCS</acronym> values of the IMS features (or IMS feature groups) assigned to this IMS precursor. These
   numbers are currently rounded to <samp>3</samp> decimals.</p>
     </div>
     <div id="sets-workflows">

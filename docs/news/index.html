@@ -440,7 +440,7 @@
 <li>
 <code><a href="../reference/generics.html">filter()</a></code>: <code>applyIMS</code> to selectively apply filtering to features with or without IMS data.</li>
 <li>
-<code><a href="../reference/generics.html">filter()</a></code>: <code>withIMSParent</code> filter to only keep features with IMS parents.</li>
+<code><a href="../reference/generics.html">filter()</a></code>: <code>withIMSPrecursor</code> filter to only keep features with IMS precursors.</li>
 </ul></li>
 </ul></li>
 <li>Feature annotation
@@ -468,6 +468,7 @@
 <li>Updated PubChem Transformations to 0.2.2.</li>
 <li>The default metabolic logic transformations are now accessible through the <code><a href="../reference/TPLogicTransformations.html">TPLogicTransformations()</a></code> function.</li>
 <li>Optimized future parallelization.</li>
+<li>Disabled parallelization for reporting by default, as it can (still) result in worse performance (e.g. seen on Windows).</li>
 <li>MS2Quant metadata is now also stored for sets workflow data (<code>MS2QuantMeta</code> slots for <code>fGroupsScreeningSet</code>, <code>formulasSet</code> and <code>compoundsSet</code>).</li>
 <li>
 <code><a href="../reference/generics.html">plotUpSet()</a></code> The <code>nsets</code> argument now defaults to <code>NULL</code>, meaning it will be set to the number of compared items.</li>
@@ -511,6 +512,8 @@
 <ul><li>Fixed: <code><a href="../reference/reporting.html">report()</a></code>: don’t show (empty) annotations column in feature data if no feature annotations are present.</li>
 <li>Fixed: <code><a href="../reference/reporting.html">report()</a></code>: TP graphs were generated for components with absent (parent) fGroups.</li>
 <li>Fixed: <code><a href="../reference/reporting.html">report()</a></code>: candidate column in CSV of quant/tox prediction tables now don’t contain image link columns.</li>
+<li>Fixed: <code><a href="../reference/reporting.html">report()</a></code>: the <code>onlyUsedScorings</code> options was ignored.</li>
+<li>Fixed: <code><a href="../reference/reporting.html">report()</a></code>: <em>Report settings</em> manual section was slightly outdated with missing settings.</li>
 <li>Fixed: The <code>removeTPIsomers</code> filter for <code>transformationProductsStructure</code> didn’t actually apply the <code>removeDuplicates</code> filter.</li>
 <li>Fixed: <code><a href="../reference/newProject.html">newProject()</a></code>: don’t break long lines of text strings.</li>
 <li>Fixed: <code><a href="../reference/newProject.html">newProject()</a></code>: XCMS3/KPIC2 groupFeatures tried to do RT alignment in sets worfklow.</li>

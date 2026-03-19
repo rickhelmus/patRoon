@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2026-03-18" />
+<meta name="date" content="2026-03-19" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -192,6 +192,7 @@ div.csl-indent {
 <li class="chapter" data-level="2.3.3" data-path="reg_inst.html"><a href="reg_inst.html#verifying-the-installation"><i class="fa fa-check"></i><b>2.3.3</b> Verifying the installation</a></li>
 </ul></li>
 <li class="chapter" data-level="2.4" data-path="managing-legacy-installations.html"><a href="managing-legacy-installations.html"><i class="fa fa-check"></i><b>2.4</b> Managing legacy installations</a></li>
+<li class="chapter" data-level="2.5" data-path="developers-devtools-pkgload.html"><a href="developers-devtools-pkgload.html"><i class="fa fa-check"></i><b>2.5</b> Developers: devtools / pkgload</a></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path="workflow-concepts.html"><a href="workflow-concepts.html"><i class="fa fa-check"></i><b>3</b> Workflow concepts</a></li>
 <li class="chapter" data-level="4" data-path="generating-workflow-data.html"><a href="generating-workflow-data.html"><i class="fa fa-check"></i><b>4</b> Generating workflow data</a>
@@ -412,33 +413,33 @@ div.csl-indent {
 <div id="makeSetFG" class="section level3 hasAnchor" number="6.5.1">
 <h3><span class="header-section-number">6.5.1</span> Initiating a sets workflow from feature groups<a href="advanced.html#makeSetFG" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The <code>makeSet</code> function can also be used to initiate a sets workflow from feature groups:</p>
-<div class="sourceCode" id="cb222"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb222-1"><a href="advanced.html#cb222-1" tabindex="-1"></a><span class="co"># as before ...</span></span>
-<span id="cb222-2"><a href="advanced.html#cb222-2" tabindex="-1"></a>anaInfoPos <span class="ot">&lt;-</span> patRoonData<span class="sc">::</span><span class="fu">exampleAnalysisInfo</span>(<span class="st">&quot;positive&quot;</span>)</span>
-<span id="cb222-3"><a href="advanced.html#cb222-3" tabindex="-1"></a>anaInfoNeg <span class="ot">&lt;-</span> patRoonData<span class="sc">::</span><span class="fu">exampleAnalysisInfo</span>(<span class="st">&quot;negative&quot;</span>)</span>
-<span id="cb222-4"><a href="advanced.html#cb222-4" tabindex="-1"></a>fListPos <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfoPos, <span class="st">&quot;openms&quot;</span>)</span>
-<span id="cb222-5"><a href="advanced.html#cb222-5" tabindex="-1"></a>fListNeg <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfoNeg, <span class="st">&quot;openms&quot;</span>)</span>
-<span id="cb222-6"><a href="advanced.html#cb222-6" tabindex="-1"></a></span>
-<span id="cb222-7"><a href="advanced.html#cb222-7" tabindex="-1"></a>fGroupsPos <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(fListPos, <span class="st">&quot;openms&quot;</span>)</span>
-<span id="cb222-8"><a href="advanced.html#cb222-8" tabindex="-1"></a>fGroupsNeg <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(fListNeg, <span class="st">&quot;openms&quot;</span>)</span>
-<span id="cb222-9"><a href="advanced.html#cb222-9" tabindex="-1"></a></span>
-<span id="cb222-10"><a href="advanced.html#cb222-10" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">makeSet</span>(fGroupsPos, fGroupsNeg, <span class="at">groupAlgo =</span> <span class="st">&quot;openms&quot;</span>,</span>
-<span id="cb222-11"><a href="advanced.html#cb222-11" tabindex="-1"></a>                   <span class="at">adducts =</span> <span class="fu">c</span>(<span class="st">&quot;[M+H]+&quot;</span>, <span class="st">&quot;[M-H]-&quot;</span>))</span>
-<span id="cb222-12"><a href="advanced.html#cb222-12" tabindex="-1"></a></span>
-<span id="cb222-13"><a href="advanced.html#cb222-13" tabindex="-1"></a><span class="co"># do rest of the workflow...</span></span></code></pre></div>
+<div class="sourceCode" id="cb223"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb223-1"><a href="advanced.html#cb223-1" tabindex="-1"></a><span class="co"># as before ...</span></span>
+<span id="cb223-2"><a href="advanced.html#cb223-2" tabindex="-1"></a>anaInfoPos <span class="ot">&lt;-</span> patRoonData<span class="sc">::</span><span class="fu">exampleAnalysisInfo</span>(<span class="st">&quot;positive&quot;</span>)</span>
+<span id="cb223-3"><a href="advanced.html#cb223-3" tabindex="-1"></a>anaInfoNeg <span class="ot">&lt;-</span> patRoonData<span class="sc">::</span><span class="fu">exampleAnalysisInfo</span>(<span class="st">&quot;negative&quot;</span>)</span>
+<span id="cb223-4"><a href="advanced.html#cb223-4" tabindex="-1"></a>fListPos <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfoPos, <span class="st">&quot;openms&quot;</span>)</span>
+<span id="cb223-5"><a href="advanced.html#cb223-5" tabindex="-1"></a>fListNeg <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfoNeg, <span class="st">&quot;openms&quot;</span>)</span>
+<span id="cb223-6"><a href="advanced.html#cb223-6" tabindex="-1"></a></span>
+<span id="cb223-7"><a href="advanced.html#cb223-7" tabindex="-1"></a>fGroupsPos <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(fListPos, <span class="st">&quot;openms&quot;</span>)</span>
+<span id="cb223-8"><a href="advanced.html#cb223-8" tabindex="-1"></a>fGroupsNeg <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(fListNeg, <span class="st">&quot;openms&quot;</span>)</span>
+<span id="cb223-9"><a href="advanced.html#cb223-9" tabindex="-1"></a></span>
+<span id="cb223-10"><a href="advanced.html#cb223-10" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">makeSet</span>(fGroupsPos, fGroupsNeg, <span class="at">groupAlgo =</span> <span class="st">&quot;openms&quot;</span>,</span>
+<span id="cb223-11"><a href="advanced.html#cb223-11" tabindex="-1"></a>                   <span class="at">adducts =</span> <span class="fu">c</span>(<span class="st">&quot;[M+H]+&quot;</span>, <span class="st">&quot;[M-H]-&quot;</span>))</span>
+<span id="cb223-12"><a href="advanced.html#cb223-12" tabindex="-1"></a></span>
+<span id="cb223-13"><a href="advanced.html#cb223-13" tabindex="-1"></a><span class="co"># do rest of the workflow...</span></span></code></pre></div>
 <p>In this case <code>makeSet</code> takes the positive and negative features, neutralizes them and creates new feature groups by grouping the original set specific groups (with the algorithm specified by <code>groupAlgo</code>).</p>
 <p>While this option involves some extra steps, an advantage is that allows processing the feature data before they are combined, e.g.:</p>
-<div class="sourceCode" id="cb223"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb223-1"><a href="advanced.html#cb223-1" tabindex="-1"></a>fGroupsPos <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(fListPos, <span class="st">&quot;openms&quot;</span>)</span>
-<span id="cb223-2"><a href="advanced.html#cb223-2" tabindex="-1"></a>fGroupsNeg <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(fListNeg, <span class="st">&quot;openms&quot;</span>)</span>
-<span id="cb223-3"><a href="advanced.html#cb223-3" tabindex="-1"></a></span>
-<span id="cb223-4"><a href="advanced.html#cb223-4" tabindex="-1"></a><span class="co"># apply intensity theshold filters. Lower threshold for negative.</span></span>
-<span id="cb223-5"><a href="advanced.html#cb223-5" tabindex="-1"></a>fGroupsPos <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsPos, <span class="at">absMinIntensity =</span> <span class="fl">1E4</span>)</span>
-<span id="cb223-6"><a href="advanced.html#cb223-6" tabindex="-1"></a>fGroupsNeg <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsNeg, <span class="at">absMinIntensity =</span> <span class="fl">1E3</span>)</span>
-<span id="cb223-7"><a href="advanced.html#cb223-7" tabindex="-1"></a></span>
-<span id="cb223-8"><a href="advanced.html#cb223-8" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">makeSet</span>(fGroupsPos, fGroupsNeg, <span class="at">groupAlgo =</span> <span class="st">&quot;openms&quot;</span>,</span>
-<span id="cb223-9"><a href="advanced.html#cb223-9" tabindex="-1"></a>                   <span class="at">adducts =</span> <span class="fu">c</span>(<span class="st">&quot;[M+H]+&quot;</span>, <span class="st">&quot;[M-H]-&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb224"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb224-1"><a href="advanced.html#cb224-1" tabindex="-1"></a>fGroupsPos <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(fListPos, <span class="st">&quot;openms&quot;</span>)</span>
+<span id="cb224-2"><a href="advanced.html#cb224-2" tabindex="-1"></a>fGroupsNeg <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(fListNeg, <span class="st">&quot;openms&quot;</span>)</span>
+<span id="cb224-3"><a href="advanced.html#cb224-3" tabindex="-1"></a></span>
+<span id="cb224-4"><a href="advanced.html#cb224-4" tabindex="-1"></a><span class="co"># apply intensity theshold filters. Lower threshold for negative.</span></span>
+<span id="cb224-5"><a href="advanced.html#cb224-5" tabindex="-1"></a>fGroupsPos <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsPos, <span class="at">absMinIntensity =</span> <span class="fl">1E4</span>)</span>
+<span id="cb224-6"><a href="advanced.html#cb224-6" tabindex="-1"></a>fGroupsNeg <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroupsNeg, <span class="at">absMinIntensity =</span> <span class="fl">1E3</span>)</span>
+<span id="cb224-7"><a href="advanced.html#cb224-7" tabindex="-1"></a></span>
+<span id="cb224-8"><a href="advanced.html#cb224-8" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">makeSet</span>(fGroupsPos, fGroupsNeg, <span class="at">groupAlgo =</span> <span class="st">&quot;openms&quot;</span>,</span>
+<span id="cb224-9"><a href="advanced.html#cb224-9" tabindex="-1"></a>                   <span class="at">adducts =</span> <span class="fu">c</span>(<span class="st">&quot;[M+H]+&quot;</span>, <span class="st">&quot;[M-H]-&quot;</span>))</span></code></pre></div>
 <p>Visually, this workflow looks like this:</p>
-<div id="htmlwidget-eef38dbb5a5fa06a1c60" style="width:250px;height:300px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-eef38dbb5a5fa06a1c60">{"x":{"diagram":"\ndigraph Workflow {\n  graph [ rankdir = TB, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 0.6,\n         fontsize = 16,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Find features (+)\" -> \"Group features (+)\" -> \"filter (+)\" -> \"makeSet\"\n    \"Find features (-)\" -> \"Group features (-)\" -> \"filter (-)\" -> \"makeSet\"\n    \"makeSet\" -> \"...\"\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-4f816c189cda231a33d3" style="width:250px;height:300px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-4f816c189cda231a33d3">{"x":{"diagram":"\ndigraph Workflow {\n  graph [ rankdir = TB, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 0.6,\n         fontsize = 16,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Find features (+)\" -> \"Group features (+)\" -> \"filter (+)\" -> \"makeSet\"\n    \"Find features (-)\" -> \"Group features (-)\" -> \"filter (-)\" -> \"makeSet\"\n    \"makeSet\" -> \"...\"\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p>Of course, any other processing steps on the feature groups data such as subsetting and <a href="intReview.html#intReview">visually checking features</a> are also possible before the sets workflow is initiated. Furthermore, it is also possible to perform <a href="incorpAdductIso.html#incorpAdductIso">adduct annotations</a> prior to grouping, which is an alternative way to improve neutralization to what <a href="setsAdducts.html#setsAdducts">was discussed before</a>.</p>
 </div>
 <div id="inspecting-and-converting-set-objects" class="section level3 hasAnchor" number="6.5.2">

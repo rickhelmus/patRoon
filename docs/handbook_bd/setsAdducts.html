@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2026-03-18" />
+<meta name="date" content="2026-03-19" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -192,6 +192,7 @@ div.csl-indent {
 <li class="chapter" data-level="2.3.3" data-path="reg_inst.html"><a href="reg_inst.html#verifying-the-installation"><i class="fa fa-check"></i><b>2.3.3</b> Verifying the installation</a></li>
 </ul></li>
 <li class="chapter" data-level="2.4" data-path="managing-legacy-installations.html"><a href="managing-legacy-installations.html"><i class="fa fa-check"></i><b>2.4</b> Managing legacy installations</a></li>
+<li class="chapter" data-level="2.5" data-path="developers-devtools-pkgload.html"><a href="developers-devtools-pkgload.html"><i class="fa fa-check"></i><b>2.5</b> Developers: devtools / pkgload</a></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path="workflow-concepts.html"><a href="workflow-concepts.html"><i class="fa fa-check"></i><b>3</b> Workflow concepts</a></li>
 <li class="chapter" data-level="4" data-path="generating-workflow-data.html"><a href="generating-workflow-data.html"><i class="fa fa-check"></i><b>4</b> Generating workflow data</a>
@@ -411,33 +412,33 @@ div.csl-indent {
 <h2><span class="header-section-number">6.3</span> Selecting adducts to improve grouping<a href="setsAdducts.html#setsAdducts" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The <code>selectIons()</code> and <code>adduct()</code> functions <a href="incorpAdductIso.html#incorpAdductIso">discussed before</a> can also improve sets workflows. This is because the adduct annotations can be used to improve feature neutralization, which in turn will improve grouping features between positive and negative ionization data. Once adduct annotations are set the features will be re-neutralized and re-grouped.</p>
 <p>A typical workflow with <code>selectIons</code> looks like this:</p>
-<div id="htmlwidget-8c4c842661a18dbbab99" style="width:250px;height:350px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-8c4c842661a18dbbab99">{"x":{"diagram":"\ndigraph Workflow {\n  graph [ rankdir = TB, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 0.6,\n         fontsize = 16,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Pre-treatment (+)\" -> \"Find features (+)\" -> \"makeSet\"\n    \"Pre-treatment (-)\" -> \"Find features (-)\" -> \"makeSet\"\n    \"makeSet\" -> \"Group features\" -> Componentization -> selectIons -> \"Annotation, ...\"\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
-<div class="sourceCode" id="cb210"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb210-1"><a href="setsAdducts.html#cb210-1" tabindex="-1"></a><span class="co"># as before ...</span></span>
-<span id="cb210-2"><a href="setsAdducts.html#cb210-2" tabindex="-1"></a>anaInfoPos <span class="ot">&lt;-</span> patRoonData<span class="sc">::</span><span class="fu">exampleAnalysisInfo</span>(<span class="st">&quot;positive&quot;</span>)</span>
-<span id="cb210-3"><a href="setsAdducts.html#cb210-3" tabindex="-1"></a>anaInfoNeg <span class="ot">&lt;-</span> patRoonData<span class="sc">::</span><span class="fu">exampleAnalysisInfo</span>(<span class="st">&quot;negative&quot;</span>)</span>
-<span id="cb210-4"><a href="setsAdducts.html#cb210-4" tabindex="-1"></a>fListPos <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfoPos, <span class="st">&quot;openms&quot;</span>)</span>
-<span id="cb210-5"><a href="setsAdducts.html#cb210-5" tabindex="-1"></a>fListNeg <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfoNeg, <span class="st">&quot;openms&quot;</span>)</span>
-<span id="cb210-6"><a href="setsAdducts.html#cb210-6" tabindex="-1"></a></span>
-<span id="cb210-7"><a href="setsAdducts.html#cb210-7" tabindex="-1"></a>fGroupsPos <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(fListPos, <span class="st">&quot;openms&quot;</span>)</span>
-<span id="cb210-8"><a href="setsAdducts.html#cb210-8" tabindex="-1"></a>fGroupsNeg <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(fListNeg, <span class="st">&quot;openms&quot;</span>)</span>
-<span id="cb210-9"><a href="setsAdducts.html#cb210-9" tabindex="-1"></a>fList <span class="ot">&lt;-</span> <span class="fu">makeSet</span>(fListPos, fListNeg, <span class="at">adducts =</span> <span class="fu">c</span>(<span class="st">&quot;[M+H]+&quot;</span>, <span class="st">&quot;[M-H]-&quot;</span>))</span>
-<span id="cb210-10"><a href="setsAdducts.html#cb210-10" tabindex="-1"></a></span>
-<span id="cb210-11"><a href="setsAdducts.html#cb210-11" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(fList, <span class="st">&quot;openms&quot;</span>)</span>
-<span id="cb210-12"><a href="setsAdducts.html#cb210-12" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">absMinIntensity =</span> <span class="dv">10000</span>, <span class="at">relMinReplicateAbundance =</span> <span class="dv">1</span>, <span class="at">maxReplicateIntRSD =</span> <span class="fl">0.75</span>,</span>
-<span id="cb210-13"><a href="setsAdducts.html#cb210-13" tabindex="-1"></a>                  <span class="at">blankThreshold =</span> <span class="dv">5</span>, <span class="at">removeBlanks =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb210-14"><a href="setsAdducts.html#cb210-14" tabindex="-1"></a></span>
-<span id="cb210-15"><a href="setsAdducts.html#cb210-15" tabindex="-1"></a>components <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;openms&quot;</span>)</span>
-<span id="cb210-16"><a href="setsAdducts.html#cb210-16" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">selectIons</span>(fGroups, components, <span class="fu">c</span>(<span class="st">&quot;[M+H]+&quot;</span>, <span class="st">&quot;[M-H]-&quot;</span>))</span>
-<span id="cb210-17"><a href="setsAdducts.html#cb210-17" tabindex="-1"></a></span>
-<span id="cb210-18"><a href="setsAdducts.html#cb210-18" tabindex="-1"></a><span class="co"># do rest of the workflow...</span></span></code></pre></div>
+<div id="htmlwidget-7c0cadfb2c4ee4542a5c" style="width:250px;height:350px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-7c0cadfb2c4ee4542a5c">{"x":{"diagram":"\ndigraph Workflow {\n  graph [ rankdir = TB, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 0.6,\n         fontsize = 16,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Pre-treatment (+)\" -> \"Find features (+)\" -> \"makeSet\"\n    \"Pre-treatment (-)\" -> \"Find features (-)\" -> \"makeSet\"\n    \"makeSet\" -> \"Group features\" -> Componentization -> selectIons -> \"Annotation, ...\"\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div class="sourceCode" id="cb211"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb211-1"><a href="setsAdducts.html#cb211-1" tabindex="-1"></a><span class="co"># as before ...</span></span>
+<span id="cb211-2"><a href="setsAdducts.html#cb211-2" tabindex="-1"></a>anaInfoPos <span class="ot">&lt;-</span> patRoonData<span class="sc">::</span><span class="fu">exampleAnalysisInfo</span>(<span class="st">&quot;positive&quot;</span>)</span>
+<span id="cb211-3"><a href="setsAdducts.html#cb211-3" tabindex="-1"></a>anaInfoNeg <span class="ot">&lt;-</span> patRoonData<span class="sc">::</span><span class="fu">exampleAnalysisInfo</span>(<span class="st">&quot;negative&quot;</span>)</span>
+<span id="cb211-4"><a href="setsAdducts.html#cb211-4" tabindex="-1"></a>fListPos <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfoPos, <span class="st">&quot;openms&quot;</span>)</span>
+<span id="cb211-5"><a href="setsAdducts.html#cb211-5" tabindex="-1"></a>fListNeg <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfoNeg, <span class="st">&quot;openms&quot;</span>)</span>
+<span id="cb211-6"><a href="setsAdducts.html#cb211-6" tabindex="-1"></a></span>
+<span id="cb211-7"><a href="setsAdducts.html#cb211-7" tabindex="-1"></a>fGroupsPos <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(fListPos, <span class="st">&quot;openms&quot;</span>)</span>
+<span id="cb211-8"><a href="setsAdducts.html#cb211-8" tabindex="-1"></a>fGroupsNeg <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(fListNeg, <span class="st">&quot;openms&quot;</span>)</span>
+<span id="cb211-9"><a href="setsAdducts.html#cb211-9" tabindex="-1"></a>fList <span class="ot">&lt;-</span> <span class="fu">makeSet</span>(fListPos, fListNeg, <span class="at">adducts =</span> <span class="fu">c</span>(<span class="st">&quot;[M+H]+&quot;</span>, <span class="st">&quot;[M-H]-&quot;</span>))</span>
+<span id="cb211-10"><a href="setsAdducts.html#cb211-10" tabindex="-1"></a></span>
+<span id="cb211-11"><a href="setsAdducts.html#cb211-11" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(fList, <span class="st">&quot;openms&quot;</span>)</span>
+<span id="cb211-12"><a href="setsAdducts.html#cb211-12" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">absMinIntensity =</span> <span class="dv">10000</span>, <span class="at">relMinReplicateAbundance =</span> <span class="dv">1</span>, <span class="at">maxReplicateIntRSD =</span> <span class="fl">0.75</span>,</span>
+<span id="cb211-13"><a href="setsAdducts.html#cb211-13" tabindex="-1"></a>                  <span class="at">blankThreshold =</span> <span class="dv">5</span>, <span class="at">removeBlanks =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb211-14"><a href="setsAdducts.html#cb211-14" tabindex="-1"></a></span>
+<span id="cb211-15"><a href="setsAdducts.html#cb211-15" tabindex="-1"></a>components <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;openms&quot;</span>)</span>
+<span id="cb211-16"><a href="setsAdducts.html#cb211-16" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">selectIons</span>(fGroups, components, <span class="fu">c</span>(<span class="st">&quot;[M+H]+&quot;</span>, <span class="st">&quot;[M-H]-&quot;</span>))</span>
+<span id="cb211-17"><a href="setsAdducts.html#cb211-17" tabindex="-1"></a></span>
+<span id="cb211-18"><a href="setsAdducts.html#cb211-18" tabindex="-1"></a><span class="co"># do rest of the workflow...</span></span></code></pre></div>
 <p>The first part of the workflow is exactly the same as was introduced in the beginning of this chapter. Furthermore, note that for sets workflows, <code>selectIons</code> needs a preferential adduct for each set.</p>
 <p>The <code>adducts</code> function can also be used to obtain and modify adduct annotations. For sets workflows, these functions operate <em>per set</em>:</p>
-<div class="sourceCode" id="cb211"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb211-1"><a href="setsAdducts.html#cb211-1" tabindex="-1"></a><span class="fu">adducts</span>(fGroups, <span class="at">set =</span> <span class="st">&quot;positive&quot;</span>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span>
-<span id="cb211-2"><a href="setsAdducts.html#cb211-2" tabindex="-1"></a><span class="fu">adducts</span>(fGroups, <span class="at">set =</span> <span class="st">&quot;positive&quot;</span>)[<span class="dv">4</span>] <span class="ot">&lt;-</span> <span class="st">&quot;[M+K]+&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb212"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb212-1"><a href="setsAdducts.html#cb212-1" tabindex="-1"></a><span class="fu">adducts</span>(fGroups, <span class="at">set =</span> <span class="st">&quot;positive&quot;</span>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span>
+<span id="cb212-2"><a href="setsAdducts.html#cb212-2" tabindex="-1"></a><span class="fu">adducts</span>(fGroups, <span class="at">set =</span> <span class="st">&quot;positive&quot;</span>)[<span class="dv">4</span>] <span class="ot">&lt;-</span> <span class="st">&quot;[M+K]+&quot;</span></span></code></pre></div>
 <p>If you want to modify annotations for multiple sets, it is best to delay the re-gouping step:</p>
-<div class="sourceCode" id="cb212"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb212-1"><a href="setsAdducts.html#cb212-1" tabindex="-1"></a><span class="fu">adducts</span>(fGroups, <span class="at">set =</span> <span class="st">&quot;positive&quot;</span>, <span class="at">reGroup =</span> <span class="cn">FALSE</span>)[<span class="dv">4</span>] <span class="ot">&lt;-</span> <span class="st">&quot;[M+K]+&quot;</span></span>
-<span id="cb212-2"><a href="setsAdducts.html#cb212-2" tabindex="-1"></a><span class="fu">adducts</span>(fGroups, <span class="at">set =</span> <span class="st">&quot;negative&quot;</span>, <span class="at">reGroup =</span> <span class="cn">TRUE</span>)[<span class="dv">10</span>] <span class="ot">&lt;-</span> <span class="st">&quot;[M-H2O]-&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb213"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb213-1"><a href="setsAdducts.html#cb213-1" tabindex="-1"></a><span class="fu">adducts</span>(fGroups, <span class="at">set =</span> <span class="st">&quot;positive&quot;</span>, <span class="at">reGroup =</span> <span class="cn">FALSE</span>)[<span class="dv">4</span>] <span class="ot">&lt;-</span> <span class="st">&quot;[M+K]+&quot;</span></span>
+<span id="cb213-2"><a href="setsAdducts.html#cb213-2" tabindex="-1"></a><span class="fu">adducts</span>(fGroups, <span class="at">set =</span> <span class="st">&quot;negative&quot;</span>, <span class="at">reGroup =</span> <span class="cn">TRUE</span>)[<span class="dv">10</span>] <span class="ot">&lt;-</span> <span class="st">&quot;[M-H2O]-&quot;</span></span></code></pre></div>
 <p>Setting <code>reGroup=FALSE</code> will not perform any re-neutralization and re-grouping, which preserves feature group names and safes processing time. However, it is <strong>crucial</strong> that the re-grouping step is eventually performed at the end.</p>
 </div>
             </section>

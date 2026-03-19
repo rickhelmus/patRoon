@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2026-03-18" />
+<meta name="date" content="2026-03-19" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -192,6 +192,7 @@ div.csl-indent {
 <li class="chapter" data-level="2.3.3" data-path="reg_inst.html"><a href="reg_inst.html#verifying-the-installation"><i class="fa fa-check"></i><b>2.3.3</b> Verifying the installation</a></li>
 </ul></li>
 <li class="chapter" data-level="2.4" data-path="managing-legacy-installations.html"><a href="managing-legacy-installations.html"><i class="fa fa-check"></i><b>2.4</b> Managing legacy installations</a></li>
+<li class="chapter" data-level="2.5" data-path="developers-devtools-pkgload.html"><a href="developers-devtools-pkgload.html"><i class="fa fa-check"></i><b>2.5</b> Developers: devtools / pkgload</a></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path="workflow-concepts.html"><a href="workflow-concepts.html"><i class="fa fa-check"></i><b>3</b> Workflow concepts</a></li>
 <li class="chapter" data-level="4" data-path="generating-workflow-data.html"><a href="generating-workflow-data.html"><i class="fa fa-check"></i><b>4</b> Generating workflow data</a>
@@ -452,55 +453,55 @@ div.csl-indent {
 </table>
 <p>Most of these arguments are optional, and if not specified this part of the workflow is simply not reported. This also means that reporting can be performed at every stage during the workflow, which, for instance, can be useful to quickly inspect results when testing out various settings to generate workflow data. More advanced arguments to <code>report()</code> are discussed in the reference manual (<code>?reporting</code>).</p>
 <p>Some examples:</p>
-<div class="sourceCode" id="cb203"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb203-1"><a href="report.html#cb203-1" tabindex="-1"></a><span class="fu">report</span>(fGroups) <span class="co"># only report feature groups</span></span>
-<span id="cb203-2"><a href="report.html#cb203-2" tabindex="-1"></a><span class="fu">report</span>(fGroups[, <span class="dv">1</span><span class="sc">:</span><span class="dv">50</span>]) <span class="co"># same, but only first 50, e.g. to do a quick inspection</span></span>
-<span id="cb203-3"><a href="report.html#cb203-3" tabindex="-1"></a></span>
-<span id="cb203-4"><a href="report.html#cb203-4" tabindex="-1"></a><span class="co"># include feature annotations</span></span>
-<span id="cb203-5"><a href="report.html#cb203-5" tabindex="-1"></a><span class="fu">report</span>(fGroups, <span class="at">MSPeakLists =</span> mslists, <span class="at">formulas =</span> formulas, <span class="at">compounds =</span> compounds)</span>
-<span id="cb203-6"><a href="report.html#cb203-6" tabindex="-1"></a></span>
-<span id="cb203-7"><a href="report.html#cb203-7" tabindex="-1"></a><span class="co"># TP screening</span></span>
-<span id="cb203-8"><a href="report.html#cb203-8" tabindex="-1"></a><span class="fu">report</span>(fGroups, <span class="at">MSPeakLists =</span> mslists, <span class="at">formulas =</span> formulas, <span class="at">compounds =</span> compounds,</span>
-<span id="cb203-9"><a href="report.html#cb203-9" tabindex="-1"></a>           <span class="at">components =</span> componentsTP, <span class="at">TPs =</span> TPs)</span></code></pre></div>
+<div class="sourceCode" id="cb204"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb204-1"><a href="report.html#cb204-1" tabindex="-1"></a><span class="fu">report</span>(fGroups) <span class="co"># only report feature groups</span></span>
+<span id="cb204-2"><a href="report.html#cb204-2" tabindex="-1"></a><span class="fu">report</span>(fGroups[, <span class="dv">1</span><span class="sc">:</span><span class="dv">50</span>]) <span class="co"># same, but only first 50, e.g. to do a quick inspection</span></span>
+<span id="cb204-3"><a href="report.html#cb204-3" tabindex="-1"></a></span>
+<span id="cb204-4"><a href="report.html#cb204-4" tabindex="-1"></a><span class="co"># include feature annotations</span></span>
+<span id="cb204-5"><a href="report.html#cb204-5" tabindex="-1"></a><span class="fu">report</span>(fGroups, <span class="at">MSPeakLists =</span> mslists, <span class="at">formulas =</span> formulas, <span class="at">compounds =</span> compounds)</span>
+<span id="cb204-6"><a href="report.html#cb204-6" tabindex="-1"></a></span>
+<span id="cb204-7"><a href="report.html#cb204-7" tabindex="-1"></a><span class="co"># TP screening</span></span>
+<span id="cb204-8"><a href="report.html#cb204-8" tabindex="-1"></a><span class="fu">report</span>(fGroups, <span class="at">MSPeakLists =</span> mslists, <span class="at">formulas =</span> formulas, <span class="at">compounds =</span> compounds,</span>
+<span id="cb204-9"><a href="report.html#cb204-9" tabindex="-1"></a>           <span class="at">components =</span> componentsTP, <span class="at">TPs =</span> TPs)</span></code></pre></div>
 <p>The report itself is primarily configured through a <em>report settings file</em>, which is an easily editable <a href="https://en.wikipedia.org/wiki/YAML">YAML</a> file. The default file is as follows:</p>
-<div class="sourceCode" id="cb204"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb204-1"><a href="report.html#cb204-1" tabindex="-1"></a><span class="fu">general</span><span class="kw">:</span></span>
-<span id="cb204-2"><a href="report.html#cb204-2" tabindex="-1"></a><span class="at">    </span><span class="fu">version</span><span class="kw">:</span><span class="at"> </span><span class="dv">3</span></span>
-<span id="cb204-3"><a href="report.html#cb204-3" tabindex="-1"></a><span class="at">    </span><span class="fu">format</span><span class="kw">:</span><span class="at"> html</span></span>
-<span id="cb204-4"><a href="report.html#cb204-4" tabindex="-1"></a><span class="at">    </span><span class="fu">path</span><span class="kw">:</span><span class="at"> report</span></span>
-<span id="cb204-5"><a href="report.html#cb204-5" tabindex="-1"></a><span class="at">    </span><span class="fu">keepUnusedPlots</span><span class="kw">:</span><span class="at"> </span><span class="dv">7</span></span>
-<span id="cb204-6"><a href="report.html#cb204-6" tabindex="-1"></a><span class="at">    </span><span class="fu">selfContained</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
-<span id="cb204-7"><a href="report.html#cb204-7" tabindex="-1"></a><span class="at">    </span><span class="fu">noDate</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
-<span id="cb204-8"><a href="report.html#cb204-8" tabindex="-1"></a><span class="fu">summary</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at"> chord</span><span class="kw">,</span><span class="at"> venn</span><span class="kw">,</span><span class="at"> upset </span><span class="kw">]</span></span>
-<span id="cb204-9"><a href="report.html#cb204-9" tabindex="-1"></a><span class="fu">features</span><span class="kw">:</span></span>
-<span id="cb204-10"><a href="report.html#cb204-10" tabindex="-1"></a><span class="at">    </span><span class="fu">retMin</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
-<span id="cb204-11"><a href="report.html#cb204-11" tabindex="-1"></a><span class="at">    </span><span class="fu">chromatograms</span><span class="kw">:</span></span>
-<span id="cb204-12"><a href="report.html#cb204-12" tabindex="-1"></a><span class="at">        </span><span class="fu">large</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
-<span id="cb204-13"><a href="report.html#cb204-13" tabindex="-1"></a><span class="at">        </span><span class="fu">small</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
-<span id="cb204-14"><a href="report.html#cb204-14" tabindex="-1"></a><span class="at">        </span><span class="fu">features</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
-<span id="cb204-15"><a href="report.html#cb204-15" tabindex="-1"></a><span class="at">        </span><span class="fu">intMax</span><span class="kw">:</span><span class="at"> eic</span></span>
-<span id="cb204-16"><a href="report.html#cb204-16" tabindex="-1"></a><span class="at">    </span><span class="fu">mobilograms</span><span class="kw">:</span></span>
-<span id="cb204-17"><a href="report.html#cb204-17" tabindex="-1"></a><span class="at">        </span><span class="fu">large</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
-<span id="cb204-18"><a href="report.html#cb204-18" tabindex="-1"></a><span class="at">        </span><span class="fu">small</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
-<span id="cb204-19"><a href="report.html#cb204-19" tabindex="-1"></a><span class="at">        </span><span class="fu">features</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
-<span id="cb204-20"><a href="report.html#cb204-20" tabindex="-1"></a><span class="at">    </span><span class="fu">intensityPlots</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
-<span id="cb204-21"><a href="report.html#cb204-21" tabindex="-1"></a><span class="at">    </span><span class="fu">aggregateConcs</span><span class="kw">:</span><span class="at"> mean</span></span>
-<span id="cb204-22"><a href="report.html#cb204-22" tabindex="-1"></a><span class="at">    </span><span class="fu">aggregateTox</span><span class="kw">:</span><span class="at"> mean</span></span>
-<span id="cb204-23"><a href="report.html#cb204-23" tabindex="-1"></a><span class="fu">MSPeakLists</span><span class="kw">:</span></span>
-<span id="cb204-24"><a href="report.html#cb204-24" tabindex="-1"></a><span class="at">    </span><span class="fu">spectra</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
-<span id="cb204-25"><a href="report.html#cb204-25" tabindex="-1"></a><span class="fu">formulas</span><span class="kw">:</span></span>
-<span id="cb204-26"><a href="report.html#cb204-26" tabindex="-1"></a><span class="at">    </span><span class="fu">include</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
-<span id="cb204-27"><a href="report.html#cb204-27" tabindex="-1"></a><span class="at">    </span><span class="fu">normalizeScores</span><span class="kw">:</span><span class="at"> max</span></span>
-<span id="cb204-28"><a href="report.html#cb204-28" tabindex="-1"></a><span class="at">    </span><span class="fu">exclNormScores</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at"> </span><span class="kw">]</span></span>
-<span id="cb204-29"><a href="report.html#cb204-29" tabindex="-1"></a><span class="at">    </span><span class="fu">topMost</span><span class="kw">:</span><span class="at"> </span><span class="dv">25</span></span>
-<span id="cb204-30"><a href="report.html#cb204-30" tabindex="-1"></a><span class="fu">compounds</span><span class="kw">:</span></span>
-<span id="cb204-31"><a href="report.html#cb204-31" tabindex="-1"></a><span class="at">    </span><span class="fu">normalizeScores</span><span class="kw">:</span><span class="at"> max</span></span>
-<span id="cb204-32"><a href="report.html#cb204-32" tabindex="-1"></a><span class="at">    </span><span class="fu">exclNormScores</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at"> score</span><span class="kw">,</span><span class="at"> individualMoNAScore</span><span class="kw">,</span><span class="at"> annoTypeCount</span><span class="kw">,</span><span class="at"> annotHitCount</span><span class="kw">,</span><span class="at"> libMatch </span><span class="kw">]</span></span>
-<span id="cb204-33"><a href="report.html#cb204-33" tabindex="-1"></a><span class="at">    </span><span class="fu">onlyUsedScorings</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
-<span id="cb204-34"><a href="report.html#cb204-34" tabindex="-1"></a><span class="at">    </span><span class="fu">topMost</span><span class="kw">:</span><span class="at"> </span><span class="dv">25</span></span>
-<span id="cb204-35"><a href="report.html#cb204-35" tabindex="-1"></a><span class="fu">TPs</span><span class="kw">:</span></span>
-<span id="cb204-36"><a href="report.html#cb204-36" tabindex="-1"></a><span class="at">    </span><span class="fu">graphs</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
-<span id="cb204-37"><a href="report.html#cb204-37" tabindex="-1"></a><span class="at">    </span><span class="fu">graphStructuresMax</span><span class="kw">:</span><span class="at"> </span><span class="dv">25</span></span>
-<span id="cb204-38"><a href="report.html#cb204-38" tabindex="-1"></a><span class="fu">internalStandards</span><span class="kw">:</span></span>
-<span id="cb204-39"><a href="report.html#cb204-39" tabindex="-1"></a><span class="at">    </span><span class="fu">graph</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span></code></pre></div>
+<div class="sourceCode" id="cb205"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb205-1"><a href="report.html#cb205-1" tabindex="-1"></a><span class="fu">general</span><span class="kw">:</span></span>
+<span id="cb205-2"><a href="report.html#cb205-2" tabindex="-1"></a><span class="at">    </span><span class="fu">version</span><span class="kw">:</span><span class="at"> </span><span class="dv">3</span></span>
+<span id="cb205-3"><a href="report.html#cb205-3" tabindex="-1"></a><span class="at">    </span><span class="fu">format</span><span class="kw">:</span><span class="at"> html</span></span>
+<span id="cb205-4"><a href="report.html#cb205-4" tabindex="-1"></a><span class="at">    </span><span class="fu">path</span><span class="kw">:</span><span class="at"> report</span></span>
+<span id="cb205-5"><a href="report.html#cb205-5" tabindex="-1"></a><span class="at">    </span><span class="fu">keepUnusedPlots</span><span class="kw">:</span><span class="at"> </span><span class="dv">7</span></span>
+<span id="cb205-6"><a href="report.html#cb205-6" tabindex="-1"></a><span class="at">    </span><span class="fu">selfContained</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
+<span id="cb205-7"><a href="report.html#cb205-7" tabindex="-1"></a><span class="at">    </span><span class="fu">noDate</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
+<span id="cb205-8"><a href="report.html#cb205-8" tabindex="-1"></a><span class="fu">summary</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at"> chord</span><span class="kw">,</span><span class="at"> venn</span><span class="kw">,</span><span class="at"> upset </span><span class="kw">]</span></span>
+<span id="cb205-9"><a href="report.html#cb205-9" tabindex="-1"></a><span class="fu">features</span><span class="kw">:</span></span>
+<span id="cb205-10"><a href="report.html#cb205-10" tabindex="-1"></a><span class="at">    </span><span class="fu">retMin</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb205-11"><a href="report.html#cb205-11" tabindex="-1"></a><span class="at">    </span><span class="fu">chromatograms</span><span class="kw">:</span></span>
+<span id="cb205-12"><a href="report.html#cb205-12" tabindex="-1"></a><span class="at">        </span><span class="fu">large</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb205-13"><a href="report.html#cb205-13" tabindex="-1"></a><span class="at">        </span><span class="fu">small</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb205-14"><a href="report.html#cb205-14" tabindex="-1"></a><span class="at">        </span><span class="fu">features</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
+<span id="cb205-15"><a href="report.html#cb205-15" tabindex="-1"></a><span class="at">        </span><span class="fu">intMax</span><span class="kw">:</span><span class="at"> eic</span></span>
+<span id="cb205-16"><a href="report.html#cb205-16" tabindex="-1"></a><span class="at">    </span><span class="fu">mobilograms</span><span class="kw">:</span></span>
+<span id="cb205-17"><a href="report.html#cb205-17" tabindex="-1"></a><span class="at">        </span><span class="fu">large</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb205-18"><a href="report.html#cb205-18" tabindex="-1"></a><span class="at">        </span><span class="fu">small</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb205-19"><a href="report.html#cb205-19" tabindex="-1"></a><span class="at">        </span><span class="fu">features</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
+<span id="cb205-20"><a href="report.html#cb205-20" tabindex="-1"></a><span class="at">    </span><span class="fu">intensityPlots</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
+<span id="cb205-21"><a href="report.html#cb205-21" tabindex="-1"></a><span class="at">    </span><span class="fu">aggregateConcs</span><span class="kw">:</span><span class="at"> mean</span></span>
+<span id="cb205-22"><a href="report.html#cb205-22" tabindex="-1"></a><span class="at">    </span><span class="fu">aggregateTox</span><span class="kw">:</span><span class="at"> mean</span></span>
+<span id="cb205-23"><a href="report.html#cb205-23" tabindex="-1"></a><span class="fu">MSPeakLists</span><span class="kw">:</span></span>
+<span id="cb205-24"><a href="report.html#cb205-24" tabindex="-1"></a><span class="at">    </span><span class="fu">spectra</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb205-25"><a href="report.html#cb205-25" tabindex="-1"></a><span class="fu">formulas</span><span class="kw">:</span></span>
+<span id="cb205-26"><a href="report.html#cb205-26" tabindex="-1"></a><span class="at">    </span><span class="fu">include</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb205-27"><a href="report.html#cb205-27" tabindex="-1"></a><span class="at">    </span><span class="fu">normalizeScores</span><span class="kw">:</span><span class="at"> max</span></span>
+<span id="cb205-28"><a href="report.html#cb205-28" tabindex="-1"></a><span class="at">    </span><span class="fu">exclNormScores</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at"> </span><span class="kw">]</span></span>
+<span id="cb205-29"><a href="report.html#cb205-29" tabindex="-1"></a><span class="at">    </span><span class="fu">topMost</span><span class="kw">:</span><span class="at"> </span><span class="dv">25</span></span>
+<span id="cb205-30"><a href="report.html#cb205-30" tabindex="-1"></a><span class="fu">compounds</span><span class="kw">:</span></span>
+<span id="cb205-31"><a href="report.html#cb205-31" tabindex="-1"></a><span class="at">    </span><span class="fu">normalizeScores</span><span class="kw">:</span><span class="at"> max</span></span>
+<span id="cb205-32"><a href="report.html#cb205-32" tabindex="-1"></a><span class="at">    </span><span class="fu">exclNormScores</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at"> score</span><span class="kw">,</span><span class="at"> individualMoNAScore</span><span class="kw">,</span><span class="at"> annoTypeCount</span><span class="kw">,</span><span class="at"> annotHitCount</span><span class="kw">,</span><span class="at"> libMatch </span><span class="kw">]</span></span>
+<span id="cb205-33"><a href="report.html#cb205-33" tabindex="-1"></a><span class="at">    </span><span class="fu">onlyUsedScorings</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb205-34"><a href="report.html#cb205-34" tabindex="-1"></a><span class="at">    </span><span class="fu">topMost</span><span class="kw">:</span><span class="at"> </span><span class="dv">25</span></span>
+<span id="cb205-35"><a href="report.html#cb205-35" tabindex="-1"></a><span class="fu">TPs</span><span class="kw">:</span></span>
+<span id="cb205-36"><a href="report.html#cb205-36" tabindex="-1"></a><span class="at">    </span><span class="fu">graphs</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb205-37"><a href="report.html#cb205-37" tabindex="-1"></a><span class="at">    </span><span class="fu">graphStructuresMax</span><span class="kw">:</span><span class="at"> </span><span class="dv">25</span></span>
+<span id="cb205-38"><a href="report.html#cb205-38" tabindex="-1"></a><span class="fu">internalStandards</span><span class="kw">:</span></span>
+<span id="cb205-39"><a href="report.html#cb205-39" tabindex="-1"></a><span class="at">    </span><span class="fu">graph</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span></code></pre></div>
 <p>A detailed description for all the settings can be found in the reference manual (<code>?reporting</code>). The table below summarizes the most interesting options:</p>
 <table>
 <colgroup>
@@ -533,7 +534,7 @@ div.csl-indent {
 </tbody>
 </table>
 <p>When the <a href="newProject.html#newProject">newProject tool</a> is used to create a new <code>patRoon</code> project a template settings file (<code>report.yml</code>) is automatically created. Otherwise, this file can be generated with the <code>genReportSettingsFile()</code> function. Simply running this function without any arguments is enough:</p>
-<div class="sourceCode" id="cb205"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb205-1"><a href="report.html#cb205-1" tabindex="-1"></a><span class="fu">genReportSettingsFile</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb206"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb206-1"><a href="report.html#cb206-1" tabindex="-1"></a><span class="fu">genReportSettingsFile</span>()</span></code></pre></div>
 <div id="legacy-interface" class="section level3 hasAnchor" number="5.11.1">
 <h3><span class="header-section-number">5.11.1</span> Legacy interface<a href="report.html#legacy-interface" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The legacy interface was the default reporting interface for <code>patRoon</code> versions older than <code>2.2</code>. The interface now mainly serves for backward compatibility reasons, but may still be useful since the new interface does not (yet) support all the formats from the legacy interface. The following three reporting functions are available:</p>
@@ -579,17 +580,17 @@ div.csl-indent {
 </tbody>
 </table>
 <p>Some typical examples:</p>
-<div class="sourceCode" id="cb206"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb206-1"><a href="report.html#cb206-1" tabindex="-1"></a><span class="fu">reportPDF</span>(fGroups) <span class="co"># only report feature data</span></span>
-<span id="cb206-2"><a href="report.html#cb206-2" tabindex="-1"></a><span class="co"># generate PDFs with feature and compound annotation data</span></span>
-<span id="cb206-3"><a href="report.html#cb206-3" tabindex="-1"></a><span class="fu">reportPDF</span>(fGroups, <span class="at">compounds =</span> compounds, <span class="at">MSPeakLists =</span> mslists)</span>
-<span id="cb206-4"><a href="report.html#cb206-4" tabindex="-1"></a><span class="fu">reportCSV</span>(fGroups, <span class="at">path =</span> <span class="st">&quot;myReport&quot;</span>) <span class="co"># change destination path</span></span>
-<span id="cb206-5"><a href="report.html#cb206-5" tabindex="-1"></a></span>
-<span id="cb206-6"><a href="report.html#cb206-6" tabindex="-1"></a><span class="co"># generate report with all workflow types and increase maximum number of</span></span>
-<span id="cb206-7"><a href="report.html#cb206-7" tabindex="-1"></a><span class="co"># compound candidates to top 10</span></span>
-<span id="cb206-8"><a href="report.html#cb206-8" tabindex="-1"></a><span class="fu">reportPDF</span>(fGroups, <span class="at">formulas =</span> formulas, <span class="at">compounds =</span> compounds,</span>
-<span id="cb206-9"><a href="report.html#cb206-9" tabindex="-1"></a>          <span class="at">components =</span> components, <span class="at">MSPeakLists =</span> mslists,</span>
-<span id="cb206-10"><a href="report.html#cb206-10" tabindex="-1"></a>          <span class="at">compsCluster =</span> compsClust,</span>
-<span id="cb206-11"><a href="report.html#cb206-11" tabindex="-1"></a>          <span class="at">compoundsTopMost =</span> <span class="dv">10</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb207"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb207-1"><a href="report.html#cb207-1" tabindex="-1"></a><span class="fu">reportPDF</span>(fGroups) <span class="co"># only report feature data</span></span>
+<span id="cb207-2"><a href="report.html#cb207-2" tabindex="-1"></a><span class="co"># generate PDFs with feature and compound annotation data</span></span>
+<span id="cb207-3"><a href="report.html#cb207-3" tabindex="-1"></a><span class="fu">reportPDF</span>(fGroups, <span class="at">compounds =</span> compounds, <span class="at">MSPeakLists =</span> mslists)</span>
+<span id="cb207-4"><a href="report.html#cb207-4" tabindex="-1"></a><span class="fu">reportCSV</span>(fGroups, <span class="at">path =</span> <span class="st">&quot;myReport&quot;</span>) <span class="co"># change destination path</span></span>
+<span id="cb207-5"><a href="report.html#cb207-5" tabindex="-1"></a></span>
+<span id="cb207-6"><a href="report.html#cb207-6" tabindex="-1"></a><span class="co"># generate report with all workflow types and increase maximum number of</span></span>
+<span id="cb207-7"><a href="report.html#cb207-7" tabindex="-1"></a><span class="co"># compound candidates to top 10</span></span>
+<span id="cb207-8"><a href="report.html#cb207-8" tabindex="-1"></a><span class="fu">reportPDF</span>(fGroups, <span class="at">formulas =</span> formulas, <span class="at">compounds =</span> compounds,</span>
+<span id="cb207-9"><a href="report.html#cb207-9" tabindex="-1"></a>          <span class="at">components =</span> components, <span class="at">MSPeakLists =</span> mslists,</span>
+<span id="cb207-10"><a href="report.html#cb207-10" tabindex="-1"></a>          <span class="at">compsCluster =</span> compsClust,</span>
+<span id="cb207-11"><a href="report.html#cb207-11" tabindex="-1"></a>          <span class="at">compoundsTopMost =</span> <span class="dv">10</span>)</span></code></pre></div>
 
 </div>
 </div>

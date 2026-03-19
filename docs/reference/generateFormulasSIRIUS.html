@@ -120,7 +120,7 @@
 <span>  featThreshold <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  featThresholdAnn <span class="op">=</span> <span class="fl">0.75</span>,</span>
 <span>  absAlignMzDev <span class="op">=</span> <span class="fu"><a href="limits.html">defaultLim</a></span><span class="op">(</span><span class="st">"mz"</span>, <span class="st">"narrow"</span><span class="op">)</span>,</span>
-<span>  minMobSpecSim <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  minIMSSpecSim <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  splitBatches <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  dryRun <span class="op">=</span> <span class="cn">FALSE</span></span>
@@ -272,14 +272,14 @@ values of annotated MS/MS fragments may slightly deviate from those of the corre
 <code>absAlignMzDev</code> argument specifies the maximum <em>m/z</em> window used to re-align the mass peaks.</p></dd>
 
 
-<dt id="arg-minmobspecsim">minMobSpecSim<a class="anchor" aria-label="anchor" href="#arg-minmobspecsim"></a></dt>
-<dd><p>(<strong>IMS workflow</strong>) If the spectrum similarity of a mobility feature group compared to its IMS parent (see
-<code><a href="assignMobilities_feat.html">assignMobilities</a></code>) is at least this value, then the mobility feature group
-will not be subjected to the annotation algorithm and all feature annotation properties will be copied from its
-parent. This assumes that feature annotation is primarily influenced by the MS/MS spectrum, and can be used to
-speed up the feature annotation process. All scorings, annotation similarities etc. are copied from the IMS parent.
-The fragment annotations are also copied (<code>fragInfo</code> result column), however, these are adjusted based on the
-peak list data of the mobility feature group.</p></dd>
+<dt id="arg-minimsspecsim">minIMSSpecSim<a class="anchor" aria-label="anchor" href="#arg-minimsspecsim"></a></dt>
+<dd><p>(<strong>IMS workflow</strong>) If the spectrum similarity of an IMS feature group compared to its IMS precursor (see
+<code><a href="assignMobilities_feat.html">assignMobilities</a></code>) is at least this value, then the IMS feature group will not
+be subjected to the annotation algorithm and all feature annotation properties will be copied from its precursor.
+This assumes that feature annotation is primarily influenced by the MS/MS spectrum, and can be used to speed up the
+feature annotation process. All scorings, annotation similarities etc. are copied from the IMS precursor. The
+fragment annotations are also copied (<code>fragInfo</code> result column), however, these are adjusted based on the peak
+list data of the IMS feature group.</p></dd>
 
 
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>

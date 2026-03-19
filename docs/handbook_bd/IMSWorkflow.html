@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2026-03-18" />
+<meta name="date" content="2026-03-19" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -192,6 +192,7 @@ div.csl-indent {
 <li class="chapter" data-level="2.3.3" data-path="reg_inst.html"><a href="reg_inst.html#verifying-the-installation"><i class="fa fa-check"></i><b>2.3.3</b> Verifying the installation</a></li>
 </ul></li>
 <li class="chapter" data-level="2.4" data-path="managing-legacy-installations.html"><a href="managing-legacy-installations.html"><i class="fa fa-check"></i><b>2.4</b> Managing legacy installations</a></li>
+<li class="chapter" data-level="2.5" data-path="developers-devtools-pkgload.html"><a href="developers-devtools-pkgload.html"><i class="fa fa-check"></i><b>2.5</b> Developers: devtools / pkgload</a></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path="workflow-concepts.html"><a href="workflow-concepts.html"><i class="fa fa-check"></i><b>3</b> Workflow concepts</a></li>
 <li class="chapter" data-level="4" data-path="generating-workflow-data.html"><a href="generating-workflow-data.html"><i class="fa fa-check"></i><b>4</b> Generating workflow data</a>
@@ -442,12 +443,12 @@ div.csl-indent {
 <ol style="list-style-type: decimal">
 <li>Feature detection and grouping is performed with classical algorithms like regular LC-MS workflows.</li>
 <li>Extracted ion mobilograms are generated for each feature and automatic peak detection is used to detect mobilities.</li>
-<li>Each of the detected mobilities for a feature are used to generate a new set of <em>mobility features</em>. These features inherit their properties from the original features, which are referred to as <em>IMS parents</em>. A link is formed between the mobility features and the IMS parent.</li>
-<li>The mobility feature data such as retention time and intensities is updated from mobility filtered extracted ion chromatograms. Any features that could not be detected from the filtered data are removed.</li>
-<li>The feature groups are updated with IMS data and similar links between <em>mobility feature groups</em> and <em>IMS parents</em> are formed.</li>
+<li>Each of the detected mobilities for a feature are used to generate a new set of <em>IMS features</em>. These features inherit their properties from the original features, which are referred to as <em>IMS precursors</em>. A link is formed between the IMS features and the IMS precursor.</li>
+<li>The IMS feature data such as retention time and intensities is updated from mobility filtered extracted ion chromatograms. Any features that could not be detected from the filtered data are removed.</li>
+<li>The feature groups are updated with IMS data and similar links between <em>IMS feature groups</em> and <em>IMS precursors</em> are formed.</li>
 </ol>
 <p>All these steps are automatically performed by the <code>assignMobilities()</code> method function that will be discussed later.</p>
-<p>An advantage of post mobility workflows is the compatibility with any of the feature detection and grouping algorithms supported in <code>patRoon</code>. In addition, post assignment is often less computationally intensive than direct mobility assignment workflows. Furthermore, the links between mobility features and IMS parents facilitate the recognition of possible protomers (i.e. redundant features of a same compound with the same retention time and <em>m/z</em> but different mobility) and assists in recognizing mobility features across MS polarities in <a href="setsWorkflow.html#setsWorkflow">sets workflows</a>. Finally, post mobility assignment workflows can selectively fallback to ‘regular’ LC-MS feature data from the IMS parents in steps where this makes more sense, this will be discussed later. Potential disadvantages of post mobility assignment workflows are the reliance on raw data that is with and without IMS dimension, and the mobility assignment typically relies on two steps of peak detection (steps 2 and 4) which may fail with e.g. low intensity data. Nevertheless, this type of workflow is usually recommended for most IMS data processing projects.</p>
+<p>An advantage of post mobility workflows is the compatibility with any of the feature detection and grouping algorithms supported in <code>patRoon</code>. In addition, post assignment is often less computationally intensive than direct mobility assignment workflows. Furthermore, the links between IMS features and IMS precursors facilitate the recognition of possible protomers (i.e. redundant features of a same compound with the same retention time and <em>m/z</em> but different mobility) and assists in recognizing IMS features across MS polarities in <a href="setsWorkflow.html#setsWorkflow">sets workflows</a>. Finally, post mobility assignment workflows can selectively fallback to ‘regular’ LC-MS feature data from the IMS precursors in steps where this makes more sense, this will be discussed later. Potential disadvantages of post mobility assignment workflows are the reliance on raw data that is with and without IMS dimension, and the mobility assignment typically relies on two steps of peak detection (steps 2 and 4) which may fail with e.g. low intensity data. Nevertheless, this type of workflow is usually recommended for most IMS data processing projects.</p>
 </div>
 <div id="summary" class="section level3 hasAnchor" number="8.1.4">
 <h3><span class="header-section-number">8.1.4</span> Summary<a href="IMSWorkflow.html#summary" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -493,7 +494,7 @@ div.csl-indent {
 <td>Yes</td>
 </tr>
 <tr class="odd">
-<td>Mobility/IMS parent links</td>
+<td>IMS precursor links</td>
 <td>No</td>
 <td>No</td>
 <td>Yes</td>

@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2026-03-18" />
+<meta name="date" content="2026-03-19" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -192,6 +192,7 @@ div.csl-indent {
 <li class="chapter" data-level="2.3.3" data-path="reg_inst.html"><a href="reg_inst.html#verifying-the-installation"><i class="fa fa-check"></i><b>2.3.3</b> Verifying the installation</a></li>
 </ul></li>
 <li class="chapter" data-level="2.4" data-path="managing-legacy-installations.html"><a href="managing-legacy-installations.html"><i class="fa fa-check"></i><b>2.4</b> Managing legacy installations</a></li>
+<li class="chapter" data-level="2.5" data-path="developers-devtools-pkgload.html"><a href="developers-devtools-pkgload.html"><i class="fa fa-check"></i><b>2.5</b> Developers: devtools / pkgload</a></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path="workflow-concepts.html"><a href="workflow-concepts.html"><i class="fa fa-check"></i><b>3</b> Workflow concepts</a></li>
 <li class="chapter" data-level="4" data-path="generating-workflow-data.html"><a href="generating-workflow-data.html"><i class="fa fa-check"></i><b>4</b> Generating workflow data</a>
@@ -417,21 +418,21 @@ div.csl-indent {
 </ul>
 <p>In addition, most algorithms only accept a limited set of possible adducts, which do not necessarily all overlap with each other. The <code>GenFormAdducts()</code> and <code>MetFragAdducts()</code> functions list the possible adducts for <code>GenForm</code> and <code>MetFrag</code>, respectively.</p>
 <p>In order to simplify the situation <code>patRoon</code> internally uses its own format and converts it automatically to the algorithm specific format when necessary. Furthermore, during conversion it checks if the specified adduct format is actually allowed by the algorithm. Adducts in <code>patRoon</code> are stored in the <code>adduct</code> S4 class. Objects from this class specify which elements are added and/or subtracted, the final charge and the number of molecules present in the adduct (e.g. <em>2</em> for a dimer).</p>
-<div class="sourceCode" id="cb288"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb288-1"><a href="adducts.html#cb288-1" tabindex="-1"></a><span class="fu">adduct</span>(<span class="at">add =</span> <span class="st">&quot;H&quot;</span>) <span class="co"># [M+H]+</span></span>
-<span id="cb288-2"><a href="adducts.html#cb288-2" tabindex="-1"></a><span class="fu">adduct</span>(<span class="at">sub =</span> <span class="st">&quot;H&quot;</span>, <span class="at">charge =</span> <span class="sc">-</span><span class="dv">1</span>) <span class="co"># [M-H]-</span></span>
-<span id="cb288-3"><a href="adducts.html#cb288-3" tabindex="-1"></a><span class="fu">adduct</span>(<span class="at">add =</span> <span class="st">&quot;K&quot;</span>, <span class="at">sub =</span> <span class="st">&quot;H2&quot;</span>, <span class="at">charge =</span> <span class="sc">-</span><span class="dv">1</span>) <span class="co"># [M+K-H2]-</span></span>
-<span id="cb288-4"><a href="adducts.html#cb288-4" tabindex="-1"></a><span class="fu">adduct</span>(<span class="at">add =</span> <span class="st">&quot;H3&quot;</span>, <span class="at">charge =</span> <span class="dv">3</span>) <span class="co"># [M+H3]3+</span></span>
-<span id="cb288-5"><a href="adducts.html#cb288-5" tabindex="-1"></a><span class="fu">adduct</span>(<span class="at">add =</span> <span class="st">&quot;H&quot;</span>, <span class="at">molMult =</span> <span class="dv">2</span>) <span class="co"># [2M+H]+</span></span></code></pre></div>
+<div class="sourceCode" id="cb289"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb289-1"><a href="adducts.html#cb289-1" tabindex="-1"></a><span class="fu">adduct</span>(<span class="at">add =</span> <span class="st">&quot;H&quot;</span>) <span class="co"># [M+H]+</span></span>
+<span id="cb289-2"><a href="adducts.html#cb289-2" tabindex="-1"></a><span class="fu">adduct</span>(<span class="at">sub =</span> <span class="st">&quot;H&quot;</span>, <span class="at">charge =</span> <span class="sc">-</span><span class="dv">1</span>) <span class="co"># [M-H]-</span></span>
+<span id="cb289-3"><a href="adducts.html#cb289-3" tabindex="-1"></a><span class="fu">adduct</span>(<span class="at">add =</span> <span class="st">&quot;K&quot;</span>, <span class="at">sub =</span> <span class="st">&quot;H2&quot;</span>, <span class="at">charge =</span> <span class="sc">-</span><span class="dv">1</span>) <span class="co"># [M+K-H2]-</span></span>
+<span id="cb289-4"><a href="adducts.html#cb289-4" tabindex="-1"></a><span class="fu">adduct</span>(<span class="at">add =</span> <span class="st">&quot;H3&quot;</span>, <span class="at">charge =</span> <span class="dv">3</span>) <span class="co"># [M+H3]3+</span></span>
+<span id="cb289-5"><a href="adducts.html#cb289-5" tabindex="-1"></a><span class="fu">adduct</span>(<span class="at">add =</span> <span class="st">&quot;H&quot;</span>, <span class="at">molMult =</span> <span class="dv">2</span>) <span class="co"># [2M+H]+</span></span></code></pre></div>
 <p>A more easy way to generate adduct objects is by using the <code>as.adduct()</code> function:</p>
-<div class="sourceCode" id="cb289"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb289-1"><a href="adducts.html#cb289-1" tabindex="-1"></a><span class="fu">as.adduct</span>(<span class="st">&quot;[M+H]+&quot;</span>)</span>
-<span id="cb289-2"><a href="adducts.html#cb289-2" tabindex="-1"></a><span class="fu">as.adduct</span>(<span class="st">&quot;[M+H2]2+&quot;</span>)</span>
-<span id="cb289-3"><a href="adducts.html#cb289-3" tabindex="-1"></a><span class="fu">as.adduct</span>(<span class="st">&quot;[2M+H]+&quot;</span>)</span>
-<span id="cb289-4"><a href="adducts.html#cb289-4" tabindex="-1"></a><span class="fu">as.adduct</span>(<span class="st">&quot;[M-H]-&quot;</span>)</span>
-<span id="cb289-5"><a href="adducts.html#cb289-5" tabindex="-1"></a><span class="fu">as.adduct</span>(<span class="st">&quot;+H&quot;</span>, <span class="at">format =</span> <span class="st">&quot;genform&quot;</span>)</span>
-<span id="cb289-6"><a href="adducts.html#cb289-6" tabindex="-1"></a><span class="fu">as.adduct</span>(<span class="dv">1</span>, <span class="at">isPositive =</span> <span class="cn">TRUE</span>, <span class="at">format =</span> <span class="st">&quot;metfrag&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb290"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb290-1"><a href="adducts.html#cb290-1" tabindex="-1"></a><span class="fu">as.adduct</span>(<span class="st">&quot;[M+H]+&quot;</span>)</span>
+<span id="cb290-2"><a href="adducts.html#cb290-2" tabindex="-1"></a><span class="fu">as.adduct</span>(<span class="st">&quot;[M+H2]2+&quot;</span>)</span>
+<span id="cb290-3"><a href="adducts.html#cb290-3" tabindex="-1"></a><span class="fu">as.adduct</span>(<span class="st">&quot;[2M+H]+&quot;</span>)</span>
+<span id="cb290-4"><a href="adducts.html#cb290-4" tabindex="-1"></a><span class="fu">as.adduct</span>(<span class="st">&quot;[M-H]-&quot;</span>)</span>
+<span id="cb290-5"><a href="adducts.html#cb290-5" tabindex="-1"></a><span class="fu">as.adduct</span>(<span class="st">&quot;+H&quot;</span>, <span class="at">format =</span> <span class="st">&quot;genform&quot;</span>)</span>
+<span id="cb290-6"><a href="adducts.html#cb290-6" tabindex="-1"></a><span class="fu">as.adduct</span>(<span class="dv">1</span>, <span class="at">isPositive =</span> <span class="cn">TRUE</span>, <span class="at">format =</span> <span class="st">&quot;metfrag&quot;</span>)</span></code></pre></div>
 <p>In fact, the <code>adduct</code> argument to workflow functions such as <code>generateFormulas()</code> and <code>generateCompounds()</code> is automatically converted to an <code>adduct</code> class with the <code>as.adduct()</code> function if necessary:</p>
-<div class="sourceCode" id="cb290"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb290-1"><a href="adducts.html#cb290-1" tabindex="-1"></a>formulas <span class="ot">&lt;-</span> <span class="fu">generateFormulas</span>(..., <span class="at">adduct =</span> <span class="fu">adduct</span>(<span class="at">sub =</span> <span class="st">&quot;H&quot;</span>, <span class="at">charge =</span> <span class="sc">-</span><span class="dv">1</span>))</span>
-<span id="cb290-2"><a href="adducts.html#cb290-2" tabindex="-1"></a>formulas <span class="ot">&lt;-</span> <span class="fu">generateFormulas</span>(..., <span class="at">adduct =</span> <span class="st">&quot;[M-H]-&quot;</span>) <span class="co"># same as above</span></span></code></pre></div>
+<div class="sourceCode" id="cb291"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb291-1"><a href="adducts.html#cb291-1" tabindex="-1"></a>formulas <span class="ot">&lt;-</span> <span class="fu">generateFormulas</span>(..., <span class="at">adduct =</span> <span class="fu">adduct</span>(<span class="at">sub =</span> <span class="st">&quot;H&quot;</span>, <span class="at">charge =</span> <span class="sc">-</span><span class="dv">1</span>))</span>
+<span id="cb291-2"><a href="adducts.html#cb291-2" tabindex="-1"></a>formulas <span class="ot">&lt;-</span> <span class="fu">generateFormulas</span>(..., <span class="at">adduct =</span> <span class="st">&quot;[M-H]-&quot;</span>) <span class="co"># same as above</span></span></code></pre></div>
 <p>More details can be found in the reference manual (<code>?adduct</code> and <code>?`adduct-utils`</code>).</p>
 </div>
             </section>

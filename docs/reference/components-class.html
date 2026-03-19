@@ -252,7 +252,7 @@ function specifies the feature groups to be removed (same format as <code>j</cod
 
 <dt id="arg-fgroups">fGroups<a class="anchor" aria-label="anchor" href="#arg-fgroups"></a></dt>
 <dd><p>The <code><a href="featureGroups-class.html">featureGroups</a></code> object that was used to generate the components.</p>
-<p>For <code>expandForIMS</code>, this should be the <code>featureGroups</code> object that contains the post mobility feature
+<p>For <code>expandForIMS</code>, this should be the <code>featureGroups</code> object that contains the post IMS feature
   groups.</p></dd>
 
 
@@ -352,7 +352,7 @@ feature groups for which data is present in this object.</p></li>
 <li><p><code>$</code>: Extracts a component table by component name.</p></li>
 <li><p><code>delete(components)</code>: Completely deletes specified (parts of) components.</p></li>
 <li><p><code>as.data.table(components)</code>: Returns all component data in a table.</p></li>
-<li><p><code>expandForIMS(components)</code>: Expands the components data for mobility feature groups. See the <code>IMS expansion</code> section
+<li><p><code>expandForIMS(components)</code>: Expands the components data for IMS feature groups. See the <code>IMS expansion</code> section
 below.</p></li>
 <li><p><code>filter(components)</code>: Provides rule based filtering for components.</p></li>
 <li><p><code>findFGroup(components)</code>: Returns the component id(s) to which a feature group
@@ -408,11 +408,11 @@ merge similar components.</p></li>
     <h2>IMS expansion</h2>
     <p>In IMS workflows with post mobility assignment (see
   <code><a href="assignMobilities_feat.html">assignMobilities</a></code>), specifically when the assignment occurs <em>after</em>
-  generation of the components, it may be desired to copy the results of the IMS parents to the mobility feature
+  generation of the components, it may be desired to copy the results of the IMS precursors to the IMS feature
   groups. For instance, for components from <a href="generateComponentsIntClust.html">intensity clusters</a> or
-  <a href="generateComponentsTPs.html">TPs</a> one could assume that results for mobility feature groups will be largely the
-  same as their IMS parents. The <code>expandForIMS</code> method function is used to <em>expand</em> the original
-  <code>components</code> object by adding in mobility feature groups with data copied from their IMS parents.</p>
+  <a href="generateComponentsTPs.html">TPs</a> one could assume that results for IMS feature groups will be largely the
+  same as their IMS precursors. The <code>expandForIMS</code> method function is used to <em>expand</em> the original
+  <code>components</code> object by adding in IMS feature groups with data copied from their IMS precursors.</p>
 <p>Currently, only components generated with <code><a href="generateComponentsIntClust.html">generateComponentsIntClust</a></code>,
   <code><a href="generateComponentsSpecClust.html">generateComponentsSpecClust</a></code> and <code><a href="generateComponentsTPs.html">generateComponentsTPs</a></code> support this operation.</p>
     </div>

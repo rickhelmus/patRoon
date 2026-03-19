@@ -485,7 +485,7 @@ capabilities of <a href="https://CRAN.R-project.org/package=data.table" class="e
 <dt id="arg-ims">IMS<a class="anchor" aria-label="anchor" href="#arg-ims"></a></dt>
 <dd><p>(<strong>IMS workflow</strong>) Specifies which feature groups are considered to be kept (<code>"["</code>) or exported (<code>export</code>) in IMS workflows. The following options
   are valid:</p><ul><li><p><code>"both"</code>: Selects IMS and non-IMS features.</p></li>
-<li><p><code>"maybe"</code>: Selects non-IMS features and IMS features without assigned IMS parent.</p></li>
+<li><p><code>"maybe"</code>: Selects non-IMS features and IMS features without assigned IMS precursor.</p></li>
 <li><p><code>FALSE</code>: Selects only non-IMS features.</p></li>
 <li><p><code>TRUE</code>: Selects only IMS features.</p></li>
 </ul><p>For <code>"["</code>: Leave unassigned to perform no IMS selection.
@@ -836,10 +836,10 @@ by <code>adducts&lt;-</code> and <code>selectIons</code> when these methods perf
   aforementioned normalization methods. Group normalization was the only method with <span class="pkg">patRoon</span> <samp>&lt;2.1</samp>, and
   still occurs automatically if <code>normInts</code> was not called when a method is executed that requests normalized
   data.</p>
-<p>In IMS workflows with post mobility assignment (see <a href="assignMobilities_feat.html">assignMobilities</a>), any mobility
+<p>In IMS workflows with post mobility assignment (see <a href="assignMobilities_feat.html">assignMobilities</a>), any IMS
   features are excluded for the assignment of internal standards (<code>featNorm="istd"</code>) or calculation of TICs
-  (<code>featNorm="tic"</code>). Furthermore, the normalized intensities and areas for mobility features are copied from
-  their IMS parents.</p>
+  (<code>featNorm="tic"</code>). Furthermore, the normalized intensities and areas for IMS features are copied from
+  their IMS precursors.</p>
     </div>
     <div id="sets-workflows">
     <h2>Sets workflows</h2>

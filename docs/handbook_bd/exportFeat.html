@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2026-03-18" />
+<meta name="date" content="2026-03-19" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -192,6 +192,7 @@ div.csl-indent {
 <li class="chapter" data-level="2.3.3" data-path="reg_inst.html"><a href="reg_inst.html#verifying-the-installation"><i class="fa fa-check"></i><b>2.3.3</b> Verifying the installation</a></li>
 </ul></li>
 <li class="chapter" data-level="2.4" data-path="managing-legacy-installations.html"><a href="managing-legacy-installations.html"><i class="fa fa-check"></i><b>2.4</b> Managing legacy installations</a></li>
+<li class="chapter" data-level="2.5" data-path="developers-devtools-pkgload.html"><a href="developers-devtools-pkgload.html"><i class="fa fa-check"></i><b>2.5</b> Developers: devtools / pkgload</a></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path="workflow-concepts.html"><a href="workflow-concepts.html"><i class="fa fa-check"></i><b>3</b> Workflow concepts</a></li>
 <li class="chapter" data-level="4" data-path="generating-workflow-data.html"><a href="generating-workflow-data.html"><i class="fa fa-check"></i><b>4</b> Generating workflow data</a>
@@ -412,24 +413,24 @@ div.csl-indent {
 <p>The feature group data obtained during the workflow can be exported to various formats with the <code>export()</code> generic function. There are currently three formats supported: <code>"brukerpa"</code> (Bruker ProfileAnalysis), <code>"brukertasq"</code> (Bruker TASQ) and <code>"mzmine"</code> (mzMine). The former exports a ‘bucket table’ which can be loaded in ProfileAnalysis, the second and third export a target list that can be processed with TASQ and mzMine, respectively.</p>
 <p>The <code>getXCMSSet()</code> function converts a <code>features</code> or <code>featureGroups</code> object to an <code>xcmsSet</code> object which can be used for further processing with <a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">xcms</a>. Similarly, the <code>getXCMSnExp()</code> function can be used for conversion to an XCMS3 style <code>XCMSnExp</code> object, and the <code>getPICSet()</code> function can be used to convert <code>features</code> to <a href="https://github.com/hcji/KPIC2">KPIC2</a> data.</p>
 <blockquote>
-<p><strong><em>NOTE</em></strong> None of the exporting and conversion functions support data from <a href="setsWorkflow.html#setsWorkflow">sets workflows</a> or <a href="IMSWorkflow.html#IMSWorkflow">IMS workflows</a>. For this reason, the <code>set</code> argument must be given to specify for which features should be exported in sets workflows, and any mobility features will <em>not</em> be exported.</p>
+<p><strong><em>NOTE</em></strong> None of the exporting and conversion functions support data from <a href="setsWorkflow.html#setsWorkflow">sets workflows</a> or <a href="IMSWorkflow.html#IMSWorkflow">IMS workflows</a>. For this reason, the <code>set</code> argument must be given to specify for which features should be exported in sets workflows, and any IMS features will <em>not</em> be exported.</p>
 </blockquote>
 <p>Some examples for these functions are shown below.</p>
-<div class="sourceCode" id="cb340"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb340-1"><a href="exportFeat.html#cb340-1" tabindex="-1"></a><span class="fu">export</span>(fGroups, <span class="st">&quot;brukertasq&quot;</span>, <span class="at">out =</span> <span class="st">&quot;my_targets.csv&quot;</span>)</span>
-<span id="cb340-2"><a href="exportFeat.html#cb340-2" tabindex="-1"></a></span>
-<span id="cb340-3"><a href="exportFeat.html#cb340-3" tabindex="-1"></a><span class="co"># convert features to xcmsSet.</span></span>
-<span id="cb340-4"><a href="exportFeat.html#cb340-4" tabindex="-1"></a><span class="co"># </span><span class="al">NOTE</span><span class="co">: loadRawData should only be FALSE when the analysis data files cannot be</span></span>
-<span id="cb340-5"><a href="exportFeat.html#cb340-5" tabindex="-1"></a><span class="co"># loaded by the algorithm (e.g. when features were obtained with DataAnalysis and data was not exported to mz(X)ML)</span></span>
-<span id="cb340-6"><a href="exportFeat.html#cb340-6" tabindex="-1"></a>xset <span class="ot">&lt;-</span> <span class="fu">getXCMSSet</span>(fList, <span class="at">loadRawData =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb340-7"><a href="exportFeat.html#cb340-7" tabindex="-1"></a>xsetg <span class="ot">&lt;-</span> <span class="fu">getXCMSSet</span>(fGroups, <span class="at">loadRawData =</span> <span class="cn">TRUE</span>) <span class="co"># get grouped xcmsSet</span></span>
-<span id="cb340-8"><a href="exportFeat.html#cb340-8" tabindex="-1"></a></span>
-<span id="cb340-9"><a href="exportFeat.html#cb340-9" tabindex="-1"></a><span class="co"># using the new XCMS3 interface</span></span>
-<span id="cb340-10"><a href="exportFeat.html#cb340-10" tabindex="-1"></a>xdata <span class="ot">&lt;-</span> <span class="fu">getXCMSnExp</span>(fList)</span>
-<span id="cb340-11"><a href="exportFeat.html#cb340-11" tabindex="-1"></a>xdata <span class="ot">&lt;-</span> <span class="fu">getXCMSnExp</span>(fGroups)</span>
-<span id="cb340-12"><a href="exportFeat.html#cb340-12" tabindex="-1"></a>xdataPos <span class="ot">&lt;-</span> <span class="fu">getXCMSnExp</span>(fGroupsSet, <span class="at">set =</span> <span class="st">&quot;positive&quot;</span>) <span class="co"># sets workflow</span></span>
-<span id="cb340-13"><a href="exportFeat.html#cb340-13" tabindex="-1"></a></span>
-<span id="cb340-14"><a href="exportFeat.html#cb340-14" tabindex="-1"></a><span class="co"># KPIC2 conversion. Like XCMS it optionally loads the raw data.</span></span>
-<span id="cb340-15"><a href="exportFeat.html#cb340-15" tabindex="-1"></a>picSet <span class="ot">&lt;-</span> <span class="fu">getPICSet</span>(fList, <span class="at">loadRawData =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb341"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb341-1"><a href="exportFeat.html#cb341-1" tabindex="-1"></a><span class="fu">export</span>(fGroups, <span class="st">&quot;brukertasq&quot;</span>, <span class="at">out =</span> <span class="st">&quot;my_targets.csv&quot;</span>)</span>
+<span id="cb341-2"><a href="exportFeat.html#cb341-2" tabindex="-1"></a></span>
+<span id="cb341-3"><a href="exportFeat.html#cb341-3" tabindex="-1"></a><span class="co"># convert features to xcmsSet.</span></span>
+<span id="cb341-4"><a href="exportFeat.html#cb341-4" tabindex="-1"></a><span class="co"># </span><span class="al">NOTE</span><span class="co">: loadRawData should only be FALSE when the analysis data files cannot be</span></span>
+<span id="cb341-5"><a href="exportFeat.html#cb341-5" tabindex="-1"></a><span class="co"># loaded by the algorithm (e.g. when features were obtained with DataAnalysis and data was not exported to mz(X)ML)</span></span>
+<span id="cb341-6"><a href="exportFeat.html#cb341-6" tabindex="-1"></a>xset <span class="ot">&lt;-</span> <span class="fu">getXCMSSet</span>(fList, <span class="at">loadRawData =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb341-7"><a href="exportFeat.html#cb341-7" tabindex="-1"></a>xsetg <span class="ot">&lt;-</span> <span class="fu">getXCMSSet</span>(fGroups, <span class="at">loadRawData =</span> <span class="cn">TRUE</span>) <span class="co"># get grouped xcmsSet</span></span>
+<span id="cb341-8"><a href="exportFeat.html#cb341-8" tabindex="-1"></a></span>
+<span id="cb341-9"><a href="exportFeat.html#cb341-9" tabindex="-1"></a><span class="co"># using the new XCMS3 interface</span></span>
+<span id="cb341-10"><a href="exportFeat.html#cb341-10" tabindex="-1"></a>xdata <span class="ot">&lt;-</span> <span class="fu">getXCMSnExp</span>(fList)</span>
+<span id="cb341-11"><a href="exportFeat.html#cb341-11" tabindex="-1"></a>xdata <span class="ot">&lt;-</span> <span class="fu">getXCMSnExp</span>(fGroups)</span>
+<span id="cb341-12"><a href="exportFeat.html#cb341-12" tabindex="-1"></a>xdataPos <span class="ot">&lt;-</span> <span class="fu">getXCMSnExp</span>(fGroupsSet, <span class="at">set =</span> <span class="st">&quot;positive&quot;</span>) <span class="co"># sets workflow</span></span>
+<span id="cb341-13"><a href="exportFeat.html#cb341-13" tabindex="-1"></a></span>
+<span id="cb341-14"><a href="exportFeat.html#cb341-14" tabindex="-1"></a><span class="co"># KPIC2 conversion. Like XCMS it optionally loads the raw data.</span></span>
+<span id="cb341-15"><a href="exportFeat.html#cb341-15" tabindex="-1"></a>picSet <span class="ot">&lt;-</span> <span class="fu">getPICSet</span>(fList, <span class="at">loadRawData =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 </div>
             </section>
 

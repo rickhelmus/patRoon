@@ -130,7 +130,7 @@
 <span>  groupQualityRange <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  replicates <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  IMS <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  withIMSParent <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  withIMSPrecursor <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  IMSRangeParams <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  results <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  removeBlanks <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -270,14 +270,14 @@ SymmetryScore=c(0.5, Inf))</code>. Set to <code>NULL</code> to ignore.</p></dd>
 <dt id="arg-ims">IMS<a class="anchor" aria-label="anchor" href="#arg-ims"></a></dt>
 <dd><p>(<strong>IMS workflow</strong>) Specifies which feature groups are considered to be kept in IMS workflows. The following options
   are valid:</p><ul><li><p><code>"both"</code>: Selects IMS and non-IMS features.</p></li>
-<li><p><code>"maybe"</code>: Selects non-IMS features and IMS features without assigned IMS parent.</p></li>
+<li><p><code>"maybe"</code>: Selects non-IMS features and IMS features without assigned IMS precursor.</p></li>
 <li><p><code>FALSE</code>: Selects only non-IMS features.</p></li>
 <li><p><code>TRUE</code>: Selects only IMS features.</p></li>
 </ul><p>Set to <code>NULL</code> to ignore.</p></dd>
 
 
-<dt id="arg-withimsparent">withIMSParent<a class="anchor" aria-label="anchor" href="#arg-withimsparent"></a></dt>
-<dd><p>(<strong>IMS workflow</strong>) only keep mobility feature groups with IMS parents, <em>i.e.</em> remove all orphans.
+<dt id="arg-withimsprecursor">withIMSPrecursor<a class="anchor" aria-label="anchor" href="#arg-withimsprecursor"></a></dt>
+<dd><p>(<strong>IMS workflow</strong>) only keep IMS feature groups with IMS precursors, <em>i.e.</em> remove all orphans.
 Unaffected by <code>negate=TRUE</code>.</p></dd>
 
 
@@ -329,7 +329,7 @@ toxicity filters.</p></dd>
 
 
 <dt id="arg-applyims">applyIMS<a class="anchor" aria-label="anchor" href="#arg-applyims"></a></dt>
-<dd><p>(<strong>IMS workflow</strong>) whether the filters are only applied to IMS parents (<code>applyIMS=FALSE</code>), only to mobility
+<dd><p>(<strong>IMS workflow</strong>) whether the filters are only applied to IMS precursors (<code>applyIMS=FALSE</code>), only to IMS
 features (<code>applyIMS=TRUE</code>) or to both (<code>applyIMS="both"</code>). Other feature groups will always be kept. The
 <code>negate</code> option does not affect <code>applyIMS</code>.</p></dd>
 

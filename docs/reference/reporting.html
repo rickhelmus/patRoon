@@ -112,7 +112,7 @@ annotations, and TPs.</p>
 <span>  specSimParams <span class="op">=</span> <span class="fu"><a href="specSimParams.html">getDefSpecSimParams</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  clearPath <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  openReport <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  parallel <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  parallel <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  overrideSettings <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -132,7 +132,7 @@ annotations, and TPs.</p>
 <span>  specSimParams <span class="op">=</span> <span class="fu"><a href="specSimParams.html">getDefSpecSimParams</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  clearPath <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  openReport <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  parallel <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  parallel <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  overrideSettings <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -188,7 +188,8 @@ See the <a href="specSimParams.html">spectral similarity parameters</a> document
 
 <dt id="arg-parallel">parallel<a class="anchor" aria-label="anchor" href="#arg-parallel"></a></dt>
 <dd><p>If set to <code>TRUE</code> then code is executed in parallel through the <a href="https://CRAN.R-project.org/package=future" class="external-link"><span class="pkg">future</span></a> package. Please
-see the parallelization section in the handbook for more details.</p></dd>
+see the parallelization section in the handbook for more details.</p>
+<p><strong>NOTE</strong>: parallelization is disabled by default, as it may slow down reporting on some systems (<em>e.g.</em> Windows) and under some circumstances. It is best to experiment with this setting to see if it speeds up report generation for your system and data.</p></dd>
 
 
 <dt id="arg-overridesettings">overrideSettings<a class="anchor" aria-label="anchor" href="#arg-overridesettings"></a></dt>
@@ -227,17 +228,18 @@ generated during the workflow, such as features, their annotations and TP screen
     <h2>Report settings</h2>
     <p>The report generation can be customized with a variety of settings that are read from a
   <code class="file">YAML</code> file. This is especially useful if you want to change more advanced settings or want to add or remove
-  the parts that are reported The report settings file is specified through the <code>settingsFile</code> argument. If not
+  the parts that are reported. The report settings file is specified through the <code>settingsFile</code> argument. If not
   specified then default settings will be used. To ease creation of a new template settings file, the
   <code>genReportSettingsFile</code> function can be used.</p>
-<p>The following settings are currently available:</p><ul><li><p>General</p><ul><li><p><code>format</code>: the report format. Currently this can only be <code>"html"</code>.</p></li>
+<p>The following settings are currently available:</p><ul><li><p>General</p><ul><li><p><code>version</code>: version of the settings file.</p></li>
+<li><p><code>format</code>: the report format. Currently this can only be <code>"html"</code>.</p></li>
 <li><p><code>path</code>: the destination path (ignored if the <code>path</code> argument is specified).</p></li>
 <li><p><code>keepUnusedPlots</code>: the number of days that unused plot files are kept (see <code>Plot file caching</code>).</p></li>
 <li><p><code>selfContained</code>: If <code>true</code> then the output <code class="file">report.html</code> embeds all graphics and script
      dependencies. Otherwise these files are read from the <code>report_files/</code> directory. Self-contained reports are
      generally smaller and easily shared, since only the <code class="file">report.html</code> needs to be copied. However, they are
      slower to generate and plots cannot be cached.</p></li>
-<li><p><code>noDate</code> Set to <code>true</code> to omit the date from the report. Mainly used for internal purposes.</p></li>
+<li><p><code>noDate</code>: Set to <code>true</code> to omit the date from the report. Mainly used for internal purposes.</p></li>
 </ul></li>
 <li><p><code>summary</code>: defines the plots on the summary page: <code>chord</code>, <code>venn</code> and/or <code>upset</code>.</p></li>
 <li><p><code>features</code></p><ul><li><p><code>retMin</code>: if <code>true</code> then retention times are reported in minutes.</p></li>
@@ -249,18 +251,24 @@ generated during the workflow, such as features, their annotations and TP screen
 <li><p><code>intMax</code>: Method to determine the maximum intensity plot range: <code>eic</code> or <code>feature</code>.
          Sets the <code>intMax</code> argument to <code>plotChroms</code>.</p></li>
 </ul></li>
+<li><p><code>mobilograms</code></p><ul><li><p><code>large</code>, <code>small</code>, <code>features</code>: inclusion of mobilogram plots, see <code>chromatograms</code> above.</p></li>
+</ul></li>
 <li><p><code>intensityPlots</code>: inclusion of intensity trend plots.</p></li>
+<li><p><code>aggregateConcs</code>, <code>aggregateTox</code>: function name used for concentration and toxicity aggregation,
+     <em>e.g.</em> <code>mean</code>.</p></li>
 </ul></li>
 <li><p><code>MSPeakLists</code></p><ul><li><p><code>spectra</code>: inclusion of MS and MS/MS spectra (not annotated).</p></li>
 </ul></li>
 <li><p><code>formulas</code></p><ul><li><p><code>include</code>: whether formula results are reported (formula view). If <code>false</code> then the input
      <code>formulas</code> object is still used to amend <em>e.g.</em> compound annotated spectra.</p></li>
-<li><p><code>normalizeScores</code>, <code>exclNormScores</code>: controls score normalization, sets the equally named
-     arguments to <em>e.g.</em> <code><a href="generics.html">plotScores</a></code>.</p></li>
-<li><p><code>topMost</code> only report this number of top ranked candidates. This number can be lowered to speed-up
+<li><p><code>normalizeScores</code>, <code>exclNormScores</code>: controls score normalization and which score fields to
+     exclude from normalization; these are forwarded to <em>e.g.</em> <code>plotScores</code>.</p></li>
+<li><p><code>topMost</code>: only report this number of top ranked candidates. This number can be lowered to speed-up
      report generation.</p></li>
 </ul></li>
 <li><p><code>compounds</code></p><ul><li><p><code>normalizeScores</code>, <code>exclNormScores</code>, <code>topMost</code>: same as <code>formulas</code>, see above.</p></li>
+<li><p><code>onlyUsedScorings</code>: if <code>true</code> only scorings used by the current dataset are considered when
+     normalizing or reporting compound scores.</p></li>
 </ul></li>
 <li><p><code>TPs</code></p><ul><li><p><code>graphs</code>: inclusion of TP hierarchy graphs (generated with <code><a href="generics.html">plotGraph</a></code>).</p></li>
 <li><p><code>graphStructuresMax</code>: maximum number of structures to plot in hierarchy graphs (sets

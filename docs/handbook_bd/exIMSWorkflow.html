@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2026-03-18" />
+<meta name="date" content="2026-03-19" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -192,6 +192,7 @@ div.csl-indent {
 <li class="chapter" data-level="2.3.3" data-path="reg_inst.html"><a href="reg_inst.html#verifying-the-installation"><i class="fa fa-check"></i><b>2.3.3</b> Verifying the installation</a></li>
 </ul></li>
 <li class="chapter" data-level="2.4" data-path="managing-legacy-installations.html"><a href="managing-legacy-installations.html"><i class="fa fa-check"></i><b>2.4</b> Managing legacy installations</a></li>
+<li class="chapter" data-level="2.5" data-path="developers-devtools-pkgload.html"><a href="developers-devtools-pkgload.html"><i class="fa fa-check"></i><b>2.5</b> Developers: devtools / pkgload</a></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path="workflow-concepts.html"><a href="workflow-concepts.html"><i class="fa fa-check"></i><b>3</b> Workflow concepts</a></li>
 <li class="chapter" data-level="4" data-path="generating-workflow-data.html"><a href="generating-workflow-data.html"><i class="fa fa-check"></i><b>4</b> Generating workflow data</a>
@@ -413,51 +414,51 @@ div.csl-indent {
 <blockquote>
 <p><strong><em>NOTE</em></strong> The <a href="newProject.html#newProject">newProject tool</a> tool supports the creation of IMS workflows, and makes it easy to to create and explore different types of IMS workflows.</p>
 </blockquote>
-<div class="sourceCode" id="cb286"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb286-1"><a href="exIMSWorkflow.html#cb286-1" tabindex="-1"></a><span class="co"># anaInfo should be a data.frame with the analysis information</span></span>
-<span id="cb286-2"><a href="exIMSWorkflow.html#cb286-2" tabindex="-1"></a></span>
-<span id="cb286-3"><a href="exIMSWorkflow.html#cb286-3" tabindex="-1"></a><span class="co"># convert raw data to ims and to centroid data</span></span>
-<span id="cb286-4"><a href="exIMSWorkflow.html#cb286-4" tabindex="-1"></a><span class="fu">convertMSFiles</span>(anaInfo, <span class="at">typeFrom =</span> <span class="st">&quot;raw&quot;</span>, <span class="at">formatFrom =</span> <span class="st">&quot;bruker_ims&quot;</span>, <span class="at">typeTo =</span> <span class="st">&quot;ims&quot;</span>, <span class="at">formatTo =</span> <span class="st">&quot;mzML&quot;</span>,</span>
-<span id="cb286-5"><a href="exIMSWorkflow.html#cb286-5" tabindex="-1"></a>               <span class="at">algorithm =</span> <span class="st">&quot;pwiz&quot;</span>)</span>
-<span id="cb286-6"><a href="exIMSWorkflow.html#cb286-6" tabindex="-1"></a><span class="fu">convertMSFiles</span>(anaInfo, <span class="at">typeFrom =</span> <span class="st">&quot;ims&quot;</span>, <span class="at">formatFrom =</span> <span class="st">&quot;mzML&quot;</span>, <span class="at">typeTo =</span> <span class="st">&quot;centroid&quot;</span>, <span class="at">formatTo =</span> <span class="st">&quot;mzML&quot;</span>,</span>
-<span id="cb286-7"><a href="exIMSWorkflow.html#cb286-7" tabindex="-1"></a>               <span class="at">algorithm =</span> <span class="st">&quot;imscollapse&quot;</span>)</span>
-<span id="cb286-8"><a href="exIMSWorkflow.html#cb286-8" tabindex="-1"></a></span>
-<span id="cb286-9"><a href="exIMSWorkflow.html#cb286-9" tabindex="-1"></a><span class="co"># perform feature detection and grouping</span></span>
-<span id="cb286-10"><a href="exIMSWorkflow.html#cb286-10" tabindex="-1"></a>fList <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfo, <span class="st">&quot;openms&quot;</span>)</span>
-<span id="cb286-11"><a href="exIMSWorkflow.html#cb286-11" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(fList, <span class="st">&quot;openms&quot;</span>)</span>
-<span id="cb286-12"><a href="exIMSWorkflow.html#cb286-12" tabindex="-1"></a></span>
-<span id="cb286-13"><a href="exIMSWorkflow.html#cb286-13" tabindex="-1"></a><span class="co"># perform basic filtering</span></span>
-<span id="cb286-14"><a href="exIMSWorkflow.html#cb286-14" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">absMinIntensity =</span> <span class="fl">1E4</span>, <span class="at">relMinReplicateAbundance =</span> <span class="dv">1</span>)</span>
-<span id="cb286-15"><a href="exIMSWorkflow.html#cb286-15" tabindex="-1"></a></span>
-<span id="cb286-16"><a href="exIMSWorkflow.html#cb286-16" tabindex="-1"></a><span class="co"># assign mobilities and CCS values</span></span>
-<span id="cb286-17"><a href="exIMSWorkflow.html#cb286-17" tabindex="-1"></a>CCSParams <span class="ot">&lt;-</span> <span class="fu">getCCSParams</span>(<span class="st">&quot;mason-schamp_1/k&quot;</span>)</span>
-<span id="cb286-18"><a href="exIMSWorkflow.html#cb286-18" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">assignMobilities</span>(fGroups, <span class="at">mobPeaksParams =</span> <span class="fu">getDefPeakParams</span>(<span class="st">&quot;bruker_ims&quot;</span>, <span class="st">&quot;piek&quot;</span>),</span>
-<span id="cb286-19"><a href="exIMSWorkflow.html#cb286-19" tabindex="-1"></a>                            <span class="at">chromPeaksParams =</span> <span class="fu">getDefPeakParams</span>(<span class="st">&quot;chrom&quot;</span>, <span class="st">&quot;piek&quot;</span>),</span>
-<span id="cb286-20"><a href="exIMSWorkflow.html#cb286-20" tabindex="-1"></a>                            <span class="at">CCSParams =</span> CCSParams)</span>
-<span id="cb286-21"><a href="exIMSWorkflow.html#cb286-21" tabindex="-1"></a></span>
-<span id="cb286-22"><a href="exIMSWorkflow.html#cb286-22" tabindex="-1"></a><span class="co"># suspect screening</span></span>
-<span id="cb286-23"><a href="exIMSWorkflow.html#cb286-23" tabindex="-1"></a>suspList <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;suspects.csv&quot;</span>)</span>
-<span id="cb286-24"><a href="exIMSWorkflow.html#cb286-24" tabindex="-1"></a><span class="co"># add CCS data from PubChemLite and convert them to mobilities</span></span>
-<span id="cb286-25"><a href="exIMSWorkflow.html#cb286-25" tabindex="-1"></a>suspList <span class="ot">&lt;-</span> <span class="fu">assignMobilities</span>(suspList, <span class="at">from =</span> <span class="st">&quot;pubchemlite&quot;</span>, <span class="at">adducts =</span> <span class="st">&quot;[M+H]+&quot;</span>,</span>
-<span id="cb286-26"><a href="exIMSWorkflow.html#cb286-26" tabindex="-1"></a>                             <span class="at">CCSParams =</span> CCSParams)</span>
-<span id="cb286-27"><a href="exIMSWorkflow.html#cb286-27" tabindex="-1"></a><span class="co"># screen suspects and only keep fair matches (3% CCS tolerance)</span></span>
-<span id="cb286-28"><a href="exIMSWorkflow.html#cb286-28" tabindex="-1"></a>IMSMatchParams <span class="ot">&lt;-</span> <span class="fu">getIMSMatchParams</span>(<span class="st">&quot;CCS&quot;</span>, <span class="at">window =</span> <span class="fl">0.03</span>, <span class="at">relative =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb286-29"><a href="exIMSWorkflow.html#cb286-29" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroups, <span class="at">suspects =</span> suspList, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>,</span>
-<span id="cb286-30"><a href="exIMSWorkflow.html#cb286-30" tabindex="-1"></a>                          <span class="at">IMSMatchParams =</span> IMSMatchParams, <span class="at">onlyHits =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb286-31"><a href="exIMSWorkflow.html#cb286-31" tabindex="-1"></a></span>
-<span id="cb286-32"><a href="exIMSWorkflow.html#cb286-32" tabindex="-1"></a><span class="co"># perform feature annotation</span></span>
-<span id="cb286-33"><a href="exIMSWorkflow.html#cb286-33" tabindex="-1"></a>mslists <span class="ot">&lt;-</span> <span class="fu">generateMSPeakLists</span>(fGroups)</span>
-<span id="cb286-34"><a href="exIMSWorkflow.html#cb286-34" tabindex="-1"></a>formulas <span class="ot">&lt;-</span> <span class="fu">generateFormulas</span>(fGroups, mslists, <span class="st">&quot;genform&quot;</span>, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>)</span>
-<span id="cb286-35"><a href="exIMSWorkflow.html#cb286-35" tabindex="-1"></a><span class="co"># skip compound annotation for mobility features with similar MS/MS data as their IMS parent</span></span>
-<span id="cb286-36"><a href="exIMSWorkflow.html#cb286-36" tabindex="-1"></a>compounds <span class="ot">&lt;-</span> <span class="fu">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>, <span class="at">database =</span> <span class="st">&quot;pubchemlite&quot;</span>,</span>
-<span id="cb286-37"><a href="exIMSWorkflow.html#cb286-37" tabindex="-1"></a>                               <span class="at">minMobSpecSim =</span> <span class="fl">0.9</span>)</span>
-<span id="cb286-38"><a href="exIMSWorkflow.html#cb286-38" tabindex="-1"></a><span class="co"># </span><span class="al">NOTE</span><span class="co">: assume that PubChemLite with CCS data is installed, so only mobility conversions needs to be applied</span></span>
-<span id="cb286-39"><a href="exIMSWorkflow.html#cb286-39" tabindex="-1"></a>compounds <span class="ot">&lt;-</span> <span class="fu">assignMobilities</span>(compounds, fGroups, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>, <span class="at">CCSParams =</span> CCSParams)</span>
-<span id="cb286-40"><a href="exIMSWorkflow.html#cb286-40" tabindex="-1"></a><span class="co"># filter out deviating candidates</span></span>
-<span id="cb286-41"><a href="exIMSWorkflow.html#cb286-41" tabindex="-1"></a>compounds <span class="ot">&lt;-</span> <span class="fu">filter</span>(compounds, <span class="at">IMSMatchParams =</span> IMSMatchParams)</span>
-<span id="cb286-42"><a href="exIMSWorkflow.html#cb286-42" tabindex="-1"></a></span>
-<span id="cb286-43"><a href="exIMSWorkflow.html#cb286-43" tabindex="-1"></a><span class="fu">report</span>(fGroups, mslists, formulas, compounds)</span></code></pre></div>
+<div class="sourceCode" id="cb287"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb287-1"><a href="exIMSWorkflow.html#cb287-1" tabindex="-1"></a><span class="co"># anaInfo should be a data.frame with the analysis information</span></span>
+<span id="cb287-2"><a href="exIMSWorkflow.html#cb287-2" tabindex="-1"></a></span>
+<span id="cb287-3"><a href="exIMSWorkflow.html#cb287-3" tabindex="-1"></a><span class="co"># convert raw data to ims and to centroid data</span></span>
+<span id="cb287-4"><a href="exIMSWorkflow.html#cb287-4" tabindex="-1"></a><span class="fu">convertMSFiles</span>(anaInfo, <span class="at">typeFrom =</span> <span class="st">&quot;raw&quot;</span>, <span class="at">formatFrom =</span> <span class="st">&quot;bruker_ims&quot;</span>, <span class="at">typeTo =</span> <span class="st">&quot;ims&quot;</span>, <span class="at">formatTo =</span> <span class="st">&quot;mzML&quot;</span>,</span>
+<span id="cb287-5"><a href="exIMSWorkflow.html#cb287-5" tabindex="-1"></a>               <span class="at">algorithm =</span> <span class="st">&quot;pwiz&quot;</span>)</span>
+<span id="cb287-6"><a href="exIMSWorkflow.html#cb287-6" tabindex="-1"></a><span class="fu">convertMSFiles</span>(anaInfo, <span class="at">typeFrom =</span> <span class="st">&quot;ims&quot;</span>, <span class="at">formatFrom =</span> <span class="st">&quot;mzML&quot;</span>, <span class="at">typeTo =</span> <span class="st">&quot;centroid&quot;</span>, <span class="at">formatTo =</span> <span class="st">&quot;mzML&quot;</span>,</span>
+<span id="cb287-7"><a href="exIMSWorkflow.html#cb287-7" tabindex="-1"></a>               <span class="at">algorithm =</span> <span class="st">&quot;imscollapse&quot;</span>)</span>
+<span id="cb287-8"><a href="exIMSWorkflow.html#cb287-8" tabindex="-1"></a></span>
+<span id="cb287-9"><a href="exIMSWorkflow.html#cb287-9" tabindex="-1"></a><span class="co"># perform feature detection and grouping</span></span>
+<span id="cb287-10"><a href="exIMSWorkflow.html#cb287-10" tabindex="-1"></a>fList <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfo, <span class="st">&quot;openms&quot;</span>)</span>
+<span id="cb287-11"><a href="exIMSWorkflow.html#cb287-11" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(fList, <span class="st">&quot;openms&quot;</span>)</span>
+<span id="cb287-12"><a href="exIMSWorkflow.html#cb287-12" tabindex="-1"></a></span>
+<span id="cb287-13"><a href="exIMSWorkflow.html#cb287-13" tabindex="-1"></a><span class="co"># perform basic filtering</span></span>
+<span id="cb287-14"><a href="exIMSWorkflow.html#cb287-14" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">absMinIntensity =</span> <span class="fl">1E4</span>, <span class="at">relMinReplicateAbundance =</span> <span class="dv">1</span>)</span>
+<span id="cb287-15"><a href="exIMSWorkflow.html#cb287-15" tabindex="-1"></a></span>
+<span id="cb287-16"><a href="exIMSWorkflow.html#cb287-16" tabindex="-1"></a><span class="co"># assign mobilities and CCS values</span></span>
+<span id="cb287-17"><a href="exIMSWorkflow.html#cb287-17" tabindex="-1"></a>CCSParams <span class="ot">&lt;-</span> <span class="fu">getCCSParams</span>(<span class="st">&quot;mason-schamp_1/k&quot;</span>)</span>
+<span id="cb287-18"><a href="exIMSWorkflow.html#cb287-18" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">assignMobilities</span>(fGroups, <span class="at">mobPeaksParams =</span> <span class="fu">getDefPeakParams</span>(<span class="st">&quot;bruker_ims&quot;</span>, <span class="st">&quot;piek&quot;</span>),</span>
+<span id="cb287-19"><a href="exIMSWorkflow.html#cb287-19" tabindex="-1"></a>                            <span class="at">chromPeaksParams =</span> <span class="fu">getDefPeakParams</span>(<span class="st">&quot;chrom&quot;</span>, <span class="st">&quot;piek&quot;</span>),</span>
+<span id="cb287-20"><a href="exIMSWorkflow.html#cb287-20" tabindex="-1"></a>                            <span class="at">CCSParams =</span> CCSParams)</span>
+<span id="cb287-21"><a href="exIMSWorkflow.html#cb287-21" tabindex="-1"></a></span>
+<span id="cb287-22"><a href="exIMSWorkflow.html#cb287-22" tabindex="-1"></a><span class="co"># suspect screening</span></span>
+<span id="cb287-23"><a href="exIMSWorkflow.html#cb287-23" tabindex="-1"></a>suspList <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;suspects.csv&quot;</span>)</span>
+<span id="cb287-24"><a href="exIMSWorkflow.html#cb287-24" tabindex="-1"></a><span class="co"># add CCS data from PubChemLite and convert them to mobilities</span></span>
+<span id="cb287-25"><a href="exIMSWorkflow.html#cb287-25" tabindex="-1"></a>suspList <span class="ot">&lt;-</span> <span class="fu">assignMobilities</span>(suspList, <span class="at">from =</span> <span class="st">&quot;pubchemlite&quot;</span>, <span class="at">adducts =</span> <span class="st">&quot;[M+H]+&quot;</span>,</span>
+<span id="cb287-26"><a href="exIMSWorkflow.html#cb287-26" tabindex="-1"></a>                             <span class="at">CCSParams =</span> CCSParams)</span>
+<span id="cb287-27"><a href="exIMSWorkflow.html#cb287-27" tabindex="-1"></a><span class="co"># screen suspects and only keep fair matches (3% CCS tolerance)</span></span>
+<span id="cb287-28"><a href="exIMSWorkflow.html#cb287-28" tabindex="-1"></a>IMSMatchParams <span class="ot">&lt;-</span> <span class="fu">getIMSMatchParams</span>(<span class="st">&quot;CCS&quot;</span>, <span class="at">window =</span> <span class="fl">0.03</span>, <span class="at">relative =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb287-29"><a href="exIMSWorkflow.html#cb287-29" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">screenSuspects</span>(fGroups, <span class="at">suspects =</span> suspList, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>,</span>
+<span id="cb287-30"><a href="exIMSWorkflow.html#cb287-30" tabindex="-1"></a>                          <span class="at">IMSMatchParams =</span> IMSMatchParams, <span class="at">onlyHits =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb287-31"><a href="exIMSWorkflow.html#cb287-31" tabindex="-1"></a></span>
+<span id="cb287-32"><a href="exIMSWorkflow.html#cb287-32" tabindex="-1"></a><span class="co"># perform feature annotation</span></span>
+<span id="cb287-33"><a href="exIMSWorkflow.html#cb287-33" tabindex="-1"></a>mslists <span class="ot">&lt;-</span> <span class="fu">generateMSPeakLists</span>(fGroups)</span>
+<span id="cb287-34"><a href="exIMSWorkflow.html#cb287-34" tabindex="-1"></a>formulas <span class="ot">&lt;-</span> <span class="fu">generateFormulas</span>(fGroups, mslists, <span class="st">&quot;genform&quot;</span>, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>)</span>
+<span id="cb287-35"><a href="exIMSWorkflow.html#cb287-35" tabindex="-1"></a><span class="co"># skip compound annotation for IMS features with similar MS/MS data as their IMS precursor</span></span>
+<span id="cb287-36"><a href="exIMSWorkflow.html#cb287-36" tabindex="-1"></a>compounds <span class="ot">&lt;-</span> <span class="fu">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>, <span class="at">database =</span> <span class="st">&quot;pubchemlite&quot;</span>,</span>
+<span id="cb287-37"><a href="exIMSWorkflow.html#cb287-37" tabindex="-1"></a>                               <span class="at">minIMSSpecSim =</span> <span class="fl">0.9</span>)</span>
+<span id="cb287-38"><a href="exIMSWorkflow.html#cb287-38" tabindex="-1"></a><span class="co"># </span><span class="al">NOTE</span><span class="co">: assume that PubChemLite with CCS data is installed, so only mobility conversions needs to be applied</span></span>
+<span id="cb287-39"><a href="exIMSWorkflow.html#cb287-39" tabindex="-1"></a>compounds <span class="ot">&lt;-</span> <span class="fu">assignMobilities</span>(compounds, fGroups, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>, <span class="at">CCSParams =</span> CCSParams)</span>
+<span id="cb287-40"><a href="exIMSWorkflow.html#cb287-40" tabindex="-1"></a><span class="co"># filter out deviating candidates</span></span>
+<span id="cb287-41"><a href="exIMSWorkflow.html#cb287-41" tabindex="-1"></a>compounds <span class="ot">&lt;-</span> <span class="fu">filter</span>(compounds, <span class="at">IMSMatchParams =</span> IMSMatchParams)</span>
+<span id="cb287-42"><a href="exIMSWorkflow.html#cb287-42" tabindex="-1"></a></span>
+<span id="cb287-43"><a href="exIMSWorkflow.html#cb287-43" tabindex="-1"></a><span class="fu">report</span>(fGroups, mslists, formulas, compounds)</span></code></pre></div>
 <p>The <a href="https://github.com/rickhelmus/patRoonDataIMS">patRoonDataIMS</a> package contains example data and can be used to run this workflow. The data is already converted to various formats, therefore, the <code>convertMSFiles()</code> steps can be skipped when using this data. To use its data, simply assign the anaInfo variable:</p>
-<div class="sourceCode" id="cb287"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb287-1"><a href="exIMSWorkflow.html#cb287-1" tabindex="-1"></a>anaInfo <span class="ot">&lt;-</span> patRoonDataIMS<span class="sc">::</span><span class="fu">exampleAnalysisInfo</span>(<span class="st">&quot;positive&quot;</span>) <span class="co"># positive IMS-HRMS data</span></span></code></pre></div>
+<div class="sourceCode" id="cb288"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb288-1"><a href="exIMSWorkflow.html#cb288-1" tabindex="-1"></a>anaInfo <span class="ot">&lt;-</span> patRoonDataIMS<span class="sc">::</span><span class="fu">exampleAnalysisInfo</span>(<span class="st">&quot;positive&quot;</span>) <span class="co"># positive IMS-HRMS data</span></span></code></pre></div>
 
 </div>
 <!-- </div> -->

@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2026-03-18" />
+<meta name="date" content="2026-03-19" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -192,6 +192,7 @@ div.csl-indent {
 <li class="chapter" data-level="2.3.3" data-path="reg_inst.html"><a href="reg_inst.html#verifying-the-installation"><i class="fa fa-check"></i><b>2.3.3</b> Verifying the installation</a></li>
 </ul></li>
 <li class="chapter" data-level="2.4" data-path="managing-legacy-installations.html"><a href="managing-legacy-installations.html"><i class="fa fa-check"></i><b>2.4</b> Managing legacy installations</a></li>
+<li class="chapter" data-level="2.5" data-path="developers-devtools-pkgload.html"><a href="developers-devtools-pkgload.html"><i class="fa fa-check"></i><b>2.5</b> Developers: devtools / pkgload</a></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path="workflow-concepts.html"><a href="workflow-concepts.html"><i class="fa fa-check"></i><b>3</b> Workflow concepts</a></li>
 <li class="chapter" data-level="4" data-path="generating-workflow-data.html"><a href="generating-workflow-data.html"><i class="fa fa-check"></i><b>4</b> Generating workflow data</a>
@@ -410,8 +411,8 @@ div.csl-indent {
 <div id="example-data" class="section level2 hasAnchor" number="4.4">
 <h2><span class="header-section-number">4.4</span> Example data<a href="example-data.html#example-data" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The <a href="https://github.com/rickhelmus/patRoonData">patRoonData</a> and <a href="https://github.com/rickhelmus/patRoonDataIMS">patRoonDataIMS</a> packages contain HRMS and IMS-HRMS data, respectively, that can be used to explore the workflow. The data files are already exported in <code>.mzML</code> format and therefore ready to use. Furthermore, these packages also contain example suspect and internal standard lists, which will be explained in the next sections. The following functions can be used to obtain the example data:</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="example-data.html#cb21-1" tabindex="-1"></a><span class="co"># get analysis information for example data, which can be used directly for feature detection</span></span>
-<span id="cb21-2"><a href="example-data.html#cb21-2" tabindex="-1"></a>patRoonData<span class="sc">::</span><span class="fu">exampleAnalysisInfo</span>(<span class="st">&quot;positive&quot;</span>)[, <span class="fu">c</span>(<span class="st">&quot;analysis&quot;</span>, <span class="st">&quot;replicate&quot;</span>, <span class="st">&quot;blank&quot;</span>, <span class="st">&quot;path_centroid&quot;</span>)]</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="example-data.html#cb22-1" tabindex="-1"></a><span class="co"># get analysis information for example data, which can be used directly for feature detection</span></span>
+<span id="cb22-2"><a href="example-data.html#cb22-2" tabindex="-1"></a>patRoonData<span class="sc">::</span><span class="fu">exampleAnalysisInfo</span>(<span class="st">&quot;positive&quot;</span>)[, <span class="fu">c</span>(<span class="st">&quot;analysis&quot;</span>, <span class="st">&quot;replicate&quot;</span>, <span class="st">&quot;blank&quot;</span>, <span class="st">&quot;path_centroid&quot;</span>)]</span></code></pre></div>
 <pre><code>#&gt;         analysis    replicate       blank                                         path_centroid
 #&gt; 1  solvent-pos-1  solvent-pos solvent-pos /usr/local/lib/R/site-library/patRoonData/extdata/pos
 #&gt; 2  solvent-pos-2  solvent-pos solvent-pos /usr/local/lib/R/site-library/patRoonData/extdata/pos
@@ -419,8 +420,8 @@ div.csl-indent {
 #&gt; 4 standard-pos-1 standard-pos solvent-pos /usr/local/lib/R/site-library/patRoonData/extdata/pos
 #&gt; 5 standard-pos-2 standard-pos solvent-pos /usr/local/lib/R/site-library/patRoonData/extdata/pos
 #&gt; 6 standard-pos-3 standard-pos solvent-pos /usr/local/lib/R/site-library/patRoonData/extdata/pos</code></pre>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="example-data.html#cb23-1" tabindex="-1"></a><span class="co"># negative ionization IMS data</span></span>
-<span id="cb23-2"><a href="example-data.html#cb23-2" tabindex="-1"></a>patRoonDataIMS<span class="sc">::</span><span class="fu">exampleAnalysisInfo</span>(<span class="st">&quot;negative&quot;</span>)[, <span class="fu">c</span>(<span class="st">&quot;analysis&quot;</span>, <span class="st">&quot;replicate&quot;</span>, <span class="st">&quot;blank&quot;</span>, <span class="st">&quot;path_ims&quot;</span>, <span class="st">&quot;path_centroid&quot;</span>)]</span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="example-data.html#cb24-1" tabindex="-1"></a><span class="co"># negative ionization IMS data</span></span>
+<span id="cb24-2"><a href="example-data.html#cb24-2" tabindex="-1"></a>patRoonDataIMS<span class="sc">::</span><span class="fu">exampleAnalysisInfo</span>(<span class="st">&quot;negative&quot;</span>)[, <span class="fu">c</span>(<span class="st">&quot;analysis&quot;</span>, <span class="st">&quot;replicate&quot;</span>, <span class="st">&quot;blank&quot;</span>, <span class="st">&quot;path_ims&quot;</span>, <span class="st">&quot;path_centroid&quot;</span>)]</span></code></pre></div>
 <pre><code>#&gt;         analysis    replicate     blank                                                          path_ims                                                          path_centroid
 #&gt; 1    blank-neg-1    blank-neg blank-neg /usr/local/lib/R/site-library/patRoonDataIMS/extdata/negative/ims /usr/local/lib/R/site-library/patRoonDataIMS/extdata/negative/centroid
 #&gt; 2    blank-neg-2    blank-neg blank-neg /usr/local/lib/R/site-library/patRoonDataIMS/extdata/negative/ims /usr/local/lib/R/site-library/patRoonDataIMS/extdata/negative/centroid
@@ -428,16 +429,16 @@ div.csl-indent {
 #&gt; 4 standard-neg-1 standard-neg blank-neg /usr/local/lib/R/site-library/patRoonDataIMS/extdata/negative/ims /usr/local/lib/R/site-library/patRoonDataIMS/extdata/negative/centroid
 #&gt; 5 standard-neg-2 standard-neg blank-neg /usr/local/lib/R/site-library/patRoonDataIMS/extdata/negative/ims /usr/local/lib/R/site-library/patRoonDataIMS/extdata/negative/centroid
 #&gt; 6 standard-neg-3 standard-neg blank-neg /usr/local/lib/R/site-library/patRoonDataIMS/extdata/negative/ims /usr/local/lib/R/site-library/patRoonDataIMS/extdata/negative/centroid</code></pre>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="example-data.html#cb25-1" tabindex="-1"></a><span class="co"># example suspect list</span></span>
-<span id="cb25-2"><a href="example-data.html#cb25-2" tabindex="-1"></a>patRoonData<span class="sc">::</span>suspectsPos[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, ]</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="example-data.html#cb26-1" tabindex="-1"></a><span class="co"># example suspect list</span></span>
+<span id="cb26-2"><a href="example-data.html#cb26-2" tabindex="-1"></a>patRoonData<span class="sc">::</span>suspectsPos[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, ]</span></code></pre></div>
 <pre><code>#&gt;            name       mz    rt                           SMILES
 #&gt; 1          DEET 192.1383 355.8          CCN(CC)C(=O)c1cccc(c1)C
 #&gt; 2       Diglyme 135.1016 252.0                        COCCOCCOC
 #&gt; 3 Dimethametryn 256.1590 372.6 CCNc1nc(nc(n1)SC)N[C@@H](C)C(C)C
 #&gt; 4       Irgarol 254.1434 370.8    CC(C)(C)Nc1nc(nc(n1)SC)NC2CC2
 #&gt; 5    Prometryne 242.1434 364.8    CC(C)NC1=NC(=NC(=N1)SC)NC(C)C</code></pre>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="example-data.html#cb27-1" tabindex="-1"></a><span class="co"># example internal standards</span></span>
-<span id="cb27-2"><a href="example-data.html#cb27-2" tabindex="-1"></a>patRoonDataIMS<span class="sc">::</span>ISTDListPos[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, ]</span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="example-data.html#cb28-1" tabindex="-1"></a><span class="co"># example internal standards</span></span>
+<span id="cb28-2"><a href="example-data.html#cb28-2" tabindex="-1"></a>patRoonDataIMS<span class="sc">::</span>ISTDListPos[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, ]</span></code></pre></div>
 <pre><code>#&gt;                  name       mz     rt          formula SMILES mobility_[M+H]+ InChI InChIKey neutralMass                        CCS_[M+H]+
 #&gt; 1 1H-benzotriazole-D4 124.0807 248.10      C6H1[2]H4N3   &lt;NA&gt;           0.544  &lt;NA&gt;     &lt;NA&gt;    123.0735                  120.542960528345
 #&gt; 2         Atenolol-D7 274.2143 199.34  C14H15[2]H7N2O3   &lt;NA&gt;     0.756;1.017  &lt;NA&gt;     &lt;NA&gt;    273.2070   158.848376201002;213.6888870323

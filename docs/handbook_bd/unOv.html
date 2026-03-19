@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2026-03-18" />
+<meta name="date" content="2026-03-19" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -192,6 +192,7 @@ div.csl-indent {
 <li class="chapter" data-level="2.3.3" data-path="reg_inst.html"><a href="reg_inst.html#verifying-the-installation"><i class="fa fa-check"></i><b>2.3.3</b> Verifying the installation</a></li>
 </ul></li>
 <li class="chapter" data-level="2.4" data-path="managing-legacy-installations.html"><a href="managing-legacy-installations.html"><i class="fa fa-check"></i><b>2.4</b> Managing legacy installations</a></li>
+<li class="chapter" data-level="2.5" data-path="developers-devtools-pkgload.html"><a href="developers-devtools-pkgload.html"><i class="fa fa-check"></i><b>2.5</b> Developers: devtools / pkgload</a></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path="workflow-concepts.html"><a href="workflow-concepts.html"><i class="fa fa-check"></i><b>3</b> Workflow concepts</a></li>
 <li class="chapter" data-level="4" data-path="generating-workflow-data.html"><a href="generating-workflow-data.html"><i class="fa fa-check"></i><b>4</b> Generating workflow data</a>
@@ -453,21 +454,21 @@ div.csl-indent {
 </tbody>
 </table>
 <p>Some examples:</p>
-<div class="sourceCode" id="cb121"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb121-1"><a href="unOv.html#cb121-1" tabindex="-1"></a><span class="co"># only keep features uniquely present in replicate &quot;repl1&quot;</span></span>
-<span id="cb121-2"><a href="unOv.html#cb121-2" tabindex="-1"></a>fGroupsUn1 <span class="ot">&lt;-</span> <span class="fu">unique</span>(fGroups, <span class="at">which =</span> <span class="st">&quot;repl1&quot;</span>, <span class="at">aggregate =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb121-3"><a href="unOv.html#cb121-3" tabindex="-1"></a><span class="co"># only keep features in repl1/repl2 which are not in repl3</span></span>
-<span id="cb121-4"><a href="unOv.html#cb121-4" tabindex="-1"></a>fGroupsUn2 <span class="ot">&lt;-</span> <span class="fu">unique</span>(fGroups, <span class="at">which =</span> <span class="fu">c</span>(<span class="st">&quot;repl1&quot;</span>, <span class="st">&quot;repl2&quot;</span>), <span class="at">aggregate =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb121-5"><a href="unOv.html#cb121-5" tabindex="-1"></a>                     <span class="at">relativeTo =</span> <span class="st">&quot;repl3&quot;</span>)</span>
-<span id="cb121-6"><a href="unOv.html#cb121-6" tabindex="-1"></a><span class="co"># only keep features that are only present in repl1 OR repl2</span></span>
-<span id="cb121-7"><a href="unOv.html#cb121-7" tabindex="-1"></a>fGroupsUn3 <span class="ot">&lt;-</span> <span class="fu">unique</span>(fGroups, <span class="at">which =</span> <span class="fu">c</span>(<span class="st">&quot;repl1&quot;</span>, <span class="st">&quot;repl2&quot;</span>), <span class="at">aggregate =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb121-8"><a href="unOv.html#cb121-8" tabindex="-1"></a>                     <span class="at">outer =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb121-9"><a href="unOv.html#cb121-9" tabindex="-1"></a></span>
-<span id="cb121-10"><a href="unOv.html#cb121-10" tabindex="-1"></a><span class="co"># only keep features overlapping in repl1/repl2</span></span>
-<span id="cb121-11"><a href="unOv.html#cb121-11" tabindex="-1"></a>fGroupsOv1 <span class="ot">&lt;-</span> <span class="fu">overlap</span>(fGroups, <span class="at">which =</span> <span class="fu">c</span>(<span class="st">&quot;repl1&quot;</span>, <span class="st">&quot;repl2&quot;</span>), <span class="at">aggregate =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb121-12"><a href="unOv.html#cb121-12" tabindex="-1"></a><span class="co"># only keep features overlapping in repl1/repl2 AND are not present in any other</span></span>
-<span id="cb121-13"><a href="unOv.html#cb121-13" tabindex="-1"></a><span class="co"># replicate</span></span>
-<span id="cb121-14"><a href="unOv.html#cb121-14" tabindex="-1"></a>fGroupsOv2 <span class="ot">&lt;-</span> <span class="fu">overlap</span>(fGroups, <span class="at">which =</span> <span class="fu">c</span>(<span class="st">&quot;repl1&quot;</span>, <span class="st">&quot;repl2&quot;</span>), <span class="at">aggregate =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb121-15"><a href="unOv.html#cb121-15" tabindex="-1"></a>                      <span class="at">exclusive =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb122"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb122-1"><a href="unOv.html#cb122-1" tabindex="-1"></a><span class="co"># only keep features uniquely present in replicate &quot;repl1&quot;</span></span>
+<span id="cb122-2"><a href="unOv.html#cb122-2" tabindex="-1"></a>fGroupsUn1 <span class="ot">&lt;-</span> <span class="fu">unique</span>(fGroups, <span class="at">which =</span> <span class="st">&quot;repl1&quot;</span>, <span class="at">aggregate =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb122-3"><a href="unOv.html#cb122-3" tabindex="-1"></a><span class="co"># only keep features in repl1/repl2 which are not in repl3</span></span>
+<span id="cb122-4"><a href="unOv.html#cb122-4" tabindex="-1"></a>fGroupsUn2 <span class="ot">&lt;-</span> <span class="fu">unique</span>(fGroups, <span class="at">which =</span> <span class="fu">c</span>(<span class="st">&quot;repl1&quot;</span>, <span class="st">&quot;repl2&quot;</span>), <span class="at">aggregate =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb122-5"><a href="unOv.html#cb122-5" tabindex="-1"></a>                     <span class="at">relativeTo =</span> <span class="st">&quot;repl3&quot;</span>)</span>
+<span id="cb122-6"><a href="unOv.html#cb122-6" tabindex="-1"></a><span class="co"># only keep features that are only present in repl1 OR repl2</span></span>
+<span id="cb122-7"><a href="unOv.html#cb122-7" tabindex="-1"></a>fGroupsUn3 <span class="ot">&lt;-</span> <span class="fu">unique</span>(fGroups, <span class="at">which =</span> <span class="fu">c</span>(<span class="st">&quot;repl1&quot;</span>, <span class="st">&quot;repl2&quot;</span>), <span class="at">aggregate =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb122-8"><a href="unOv.html#cb122-8" tabindex="-1"></a>                     <span class="at">outer =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb122-9"><a href="unOv.html#cb122-9" tabindex="-1"></a></span>
+<span id="cb122-10"><a href="unOv.html#cb122-10" tabindex="-1"></a><span class="co"># only keep features overlapping in repl1/repl2</span></span>
+<span id="cb122-11"><a href="unOv.html#cb122-11" tabindex="-1"></a>fGroupsOv1 <span class="ot">&lt;-</span> <span class="fu">overlap</span>(fGroups, <span class="at">which =</span> <span class="fu">c</span>(<span class="st">&quot;repl1&quot;</span>, <span class="st">&quot;repl2&quot;</span>), <span class="at">aggregate =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb122-12"><a href="unOv.html#cb122-12" tabindex="-1"></a><span class="co"># only keep features overlapping in repl1/repl2 AND are not present in any other</span></span>
+<span id="cb122-13"><a href="unOv.html#cb122-13" tabindex="-1"></a><span class="co"># replicate</span></span>
+<span id="cb122-14"><a href="unOv.html#cb122-14" tabindex="-1"></a>fGroupsOv2 <span class="ot">&lt;-</span> <span class="fu">overlap</span>(fGroups, <span class="at">which =</span> <span class="fu">c</span>(<span class="st">&quot;repl1&quot;</span>, <span class="st">&quot;repl2&quot;</span>), <span class="at">aggregate =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb122-15"><a href="unOv.html#cb122-15" tabindex="-1"></a>                      <span class="at">exclusive =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <p>Note that several plotting functions that are <a href="visualization.html#visComp">discussed in the visualization section</a> can also assist in determining overlap and uniqueness of features.</p>
 </div>
             </section>

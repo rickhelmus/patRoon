@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2026-03-18" />
+<meta name="date" content="2026-03-19" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -192,6 +192,7 @@ div.csl-indent {
 <li class="chapter" data-level="2.3.3" data-path="reg_inst.html"><a href="reg_inst.html#verifying-the-installation"><i class="fa fa-check"></i><b>2.3.3</b> Verifying the installation</a></li>
 </ul></li>
 <li class="chapter" data-level="2.4" data-path="managing-legacy-installations.html"><a href="managing-legacy-installations.html"><i class="fa fa-check"></i><b>2.4</b> Managing legacy installations</a></li>
+<li class="chapter" data-level="2.5" data-path="developers-devtools-pkgload.html"><a href="developers-devtools-pkgload.html"><i class="fa fa-check"></i><b>2.5</b> Developers: devtools / pkgload</a></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path="workflow-concepts.html"><a href="workflow-concepts.html"><i class="fa fa-check"></i><b>3</b> Workflow concepts</a></li>
 <li class="chapter" data-level="4" data-path="generating-workflow-data.html"><a href="generating-workflow-data.html"><i class="fa fa-check"></i><b>4</b> Generating workflow data</a>
@@ -518,31 +519,31 @@ div.csl-indent {
 <p>Each algorithm supports many different parameters that may significantly influence the (quality of the) output. For instance, care has to be taken to avoid ‘over-clustering’ of feature groups which do not belong in the same component. This is often easily visible since the chromatographic peaks poorly overlap or are shaped differently. The <code>checkComponents</code> function (discussed <a href="intReview.html#intReview">here</a>) can be used to quickly verify componentization results. For a complete listing all arguments see the reference manual (e.g. <code>?generateComponents</code>).</p>
 <p>Once the components with adduct and isotopes annotations are generated this data can be <a href="incorpAdductIso.html#incorpAdductIso">used to prioritize and improve the workflow</a>.</p>
 <p>Some example usage is shown below.</p>
-<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="componentization.html#cb40-1" tabindex="-1"></a><span class="co"># Use CAMERA with defaults</span></span>
-<span id="cb40-2"><a href="componentization.html#cb40-2" tabindex="-1"></a>componCAM <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;camera&quot;</span>, <span class="at">ionization =</span> <span class="st">&quot;positive&quot;</span>)</span>
-<span id="cb40-3"><a href="componentization.html#cb40-3" tabindex="-1"></a></span>
-<span id="cb40-4"><a href="componentization.html#cb40-4" tabindex="-1"></a><span class="co"># CAMERA with customized settings</span></span>
-<span id="cb40-5"><a href="componentization.html#cb40-5" tabindex="-1"></a>componCAM2 <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;camera&quot;</span>, <span class="at">ionization =</span> <span class="st">&quot;positive&quot;</span>,</span>
-<span id="cb40-6"><a href="componentization.html#cb40-6" tabindex="-1"></a>                                 <span class="at">extraOpts =</span> <span class="fu">list</span>(<span class="at">mzabs =</span> <span class="fl">0.001</span>, <span class="at">sigma =</span> <span class="dv">5</span>))</span>
-<span id="cb40-7"><a href="componentization.html#cb40-7" tabindex="-1"></a></span>
-<span id="cb40-8"><a href="componentization.html#cb40-8" tabindex="-1"></a><span class="co"># Use RAMClustR with customized parameters</span></span>
-<span id="cb40-9"><a href="componentization.html#cb40-9" tabindex="-1"></a>componRC <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;ramclustr&quot;</span>, <span class="at">ionization =</span> <span class="st">&quot;positive&quot;</span>, <span class="at">hmax =</span> <span class="fl">0.4</span>,</span>
-<span id="cb40-10"><a href="componentization.html#cb40-10" tabindex="-1"></a>                               <span class="at">extraOptsRC =</span> <span class="fu">list</span>(<span class="at">cor.method =</span> <span class="st">&quot;spearman&quot;</span>),</span>
-<span id="cb40-11"><a href="componentization.html#cb40-11" tabindex="-1"></a>                               <span class="at">extraOptsFM =</span> <span class="fu">list</span>(<span class="at">ppm.error =</span> <span class="dv">5</span>))</span>
-<span id="cb40-12"><a href="componentization.html#cb40-12" tabindex="-1"></a></span>
-<span id="cb40-13"><a href="componentization.html#cb40-13" tabindex="-1"></a><span class="co"># OpenMS with customized parameters</span></span>
-<span id="cb40-14"><a href="componentization.html#cb40-14" tabindex="-1"></a>componOpenMS <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;openms&quot;</span>, <span class="at">ionization =</span> <span class="st">&quot;positive&quot;</span>, <span class="at">chargeMax =</span> <span class="dv">2</span>,</span>
-<span id="cb40-15"><a href="componentization.html#cb40-15" tabindex="-1"></a>                                   <span class="at">absMzDev =</span> <span class="fl">0.002</span>)</span>
-<span id="cb40-16"><a href="componentization.html#cb40-16" tabindex="-1"></a></span>
-<span id="cb40-17"><a href="componentization.html#cb40-17" tabindex="-1"></a><span class="co"># cliqueMS with default parameters</span></span>
-<span id="cb40-18"><a href="componentization.html#cb40-18" tabindex="-1"></a>componCliqueMS <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;cliquems&quot;</span>, <span class="at">ionization =</span> <span class="st">&quot;negative&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="componentization.html#cb41-1" tabindex="-1"></a><span class="co"># Use CAMERA with defaults</span></span>
+<span id="cb41-2"><a href="componentization.html#cb41-2" tabindex="-1"></a>componCAM <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;camera&quot;</span>, <span class="at">ionization =</span> <span class="st">&quot;positive&quot;</span>)</span>
+<span id="cb41-3"><a href="componentization.html#cb41-3" tabindex="-1"></a></span>
+<span id="cb41-4"><a href="componentization.html#cb41-4" tabindex="-1"></a><span class="co"># CAMERA with customized settings</span></span>
+<span id="cb41-5"><a href="componentization.html#cb41-5" tabindex="-1"></a>componCAM2 <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;camera&quot;</span>, <span class="at">ionization =</span> <span class="st">&quot;positive&quot;</span>,</span>
+<span id="cb41-6"><a href="componentization.html#cb41-6" tabindex="-1"></a>                                 <span class="at">extraOpts =</span> <span class="fu">list</span>(<span class="at">mzabs =</span> <span class="fl">0.001</span>, <span class="at">sigma =</span> <span class="dv">5</span>))</span>
+<span id="cb41-7"><a href="componentization.html#cb41-7" tabindex="-1"></a></span>
+<span id="cb41-8"><a href="componentization.html#cb41-8" tabindex="-1"></a><span class="co"># Use RAMClustR with customized parameters</span></span>
+<span id="cb41-9"><a href="componentization.html#cb41-9" tabindex="-1"></a>componRC <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;ramclustr&quot;</span>, <span class="at">ionization =</span> <span class="st">&quot;positive&quot;</span>, <span class="at">hmax =</span> <span class="fl">0.4</span>,</span>
+<span id="cb41-10"><a href="componentization.html#cb41-10" tabindex="-1"></a>                               <span class="at">extraOptsRC =</span> <span class="fu">list</span>(<span class="at">cor.method =</span> <span class="st">&quot;spearman&quot;</span>),</span>
+<span id="cb41-11"><a href="componentization.html#cb41-11" tabindex="-1"></a>                               <span class="at">extraOptsFM =</span> <span class="fu">list</span>(<span class="at">ppm.error =</span> <span class="dv">5</span>))</span>
+<span id="cb41-12"><a href="componentization.html#cb41-12" tabindex="-1"></a></span>
+<span id="cb41-13"><a href="componentization.html#cb41-13" tabindex="-1"></a><span class="co"># OpenMS with customized parameters</span></span>
+<span id="cb41-14"><a href="componentization.html#cb41-14" tabindex="-1"></a>componOpenMS <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;openms&quot;</span>, <span class="at">ionization =</span> <span class="st">&quot;positive&quot;</span>, <span class="at">chargeMax =</span> <span class="dv">2</span>,</span>
+<span id="cb41-15"><a href="componentization.html#cb41-15" tabindex="-1"></a>                                   <span class="at">absMzDev =</span> <span class="fl">0.002</span>)</span>
+<span id="cb41-16"><a href="componentization.html#cb41-16" tabindex="-1"></a></span>
+<span id="cb41-17"><a href="componentization.html#cb41-17" tabindex="-1"></a><span class="co"># cliqueMS with default parameters</span></span>
+<span id="cb41-18"><a href="componentization.html#cb41-18" tabindex="-1"></a>componCliqueMS <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;cliquems&quot;</span>, <span class="at">ionization =</span> <span class="st">&quot;negative&quot;</span>)</span></code></pre></div>
 </div>
 <div id="homologues-series" class="section level3 hasAnchor" number="4.6.2">
 <h3><span class="header-section-number">4.6.2</span> Homologues series<a href="componentization.html#homologues-series" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Homologues series can be automatically detected by interfacing with the <a href="https://cran.r-project.org/web/packages/nontarget/index.html">nontarget</a> R package. Components are made from feature groups that show increasing <em>m/z</em> and retention time values. Series are first detected within each replicate. Afterwards, series from all replicates are linked in case (partial) overlap occurs and this overlap consists of the <em>same</em> feature groups (see figure below). Linked series are then finally merged if this will not cause any conflicts with other series: such a conflict typically occurs when two series are not only linked to each other.</p>
 <div class="figure"><span style="display:block;" id="fig:HS"></span>
-<div id="htmlwidget-44f672c4a1351c1e1aac" style="width:600px;height:250px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-44f672c4a1351c1e1aac">{"x":{"diagram":"\ndigraph Homologs {\n  graph [ rankdir = LR, compound = true, style = invis ]\n  node [ shape = oval,\n         fixedsize = true,\n         width = 2.3,\n         height = 0.8,\n         fontsize = 25,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n  subgraph cluster3 {\n    I [fillcolor=skyblue]; J [fillcolor=skyblue]; K [fillcolor=skyblue]\n    G -> H -> I -> J -> K [style=invis]\n  }\n\n  subgraph cluster4 {\n    _I [label=I, fillcolor=skyblue]; X [fillcolor=indianred1]; _K [label=K, fillcolor=skyblue]\n    _I -> X -> _K -> L [style=invis]\n  }\n\n  H -> _I [ltail=cluster3, lhead=cluster4, style=invis]\n  \n  I -> _I [constraint=false, style=dashed, arrowhead=none]\n  K -> _K [constraint=false, style=dashed, arrowhead=none]\n  \n  subgraph cluster1 {\n    C [fillcolor=skyblue]; D [fillcolor=skyblue]\n    A -> B -> C -> D [style=invis]\n  }\n\n  subgraph cluster2 {\n    _C [label=C, fillcolor=skyblue]; _D [label=D, fillcolor=skyblue]\n    _C -> _D -> E -> F [style=invis]\n  }\n  \n  B -> _C [ltail=cluster1, lhead=cluster2, style=invis]\n\n  C -> _C [constraint=false, style=dashed, arrowhead=none]\n  D -> _D [constraint=false, style=dashed, arrowhead=none]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-4ff0d68c343fedcbd6a4" style="width:600px;height:250px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-4ff0d68c343fedcbd6a4">{"x":{"diagram":"\ndigraph Homologs {\n  graph [ rankdir = LR, compound = true, style = invis ]\n  node [ shape = oval,\n         fixedsize = true,\n         width = 2.3,\n         height = 0.8,\n         fontsize = 25,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n  subgraph cluster3 {\n    I [fillcolor=skyblue]; J [fillcolor=skyblue]; K [fillcolor=skyblue]\n    G -> H -> I -> J -> K [style=invis]\n  }\n\n  subgraph cluster4 {\n    _I [label=I, fillcolor=skyblue]; X [fillcolor=indianred1]; _K [label=K, fillcolor=skyblue]\n    _I -> X -> _K -> L [style=invis]\n  }\n\n  H -> _I [ltail=cluster3, lhead=cluster4, style=invis]\n  \n  I -> _I [constraint=false, style=dashed, arrowhead=none]\n  K -> _K [constraint=false, style=dashed, arrowhead=none]\n  \n  subgraph cluster1 {\n    C [fillcolor=skyblue]; D [fillcolor=skyblue]\n    A -> B -> C -> D [style=invis]\n  }\n\n  subgraph cluster2 {\n    _C [label=C, fillcolor=skyblue]; _D [label=D, fillcolor=skyblue]\n    _C -> _D -> E -> F [style=invis]\n  }\n  \n  B -> _C [ltail=cluster1, lhead=cluster2, style=invis]\n\n  C -> _C [constraint=false, style=dashed, arrowhead=none]\n  D -> _D [constraint=false, style=dashed, arrowhead=none]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p class="caption">
 Figure 4.2: <strong>Linking of homologues series</strong> top: partial overlap and will be linked; bottom: no linkage due to different feature in overlapping series.
 </p>
@@ -583,12 +584,12 @@ Figure 4.2: <strong>Linking of homologues series</strong> top: partial overlap a
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="componentization.html#cb41-1" tabindex="-1"></a><span class="co"># default settings</span></span>
-<span id="cb41-2"><a href="componentization.html#cb41-2" tabindex="-1"></a>componNT <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;nontarget&quot;</span>, <span class="at">ionization =</span> <span class="st">&quot;positive&quot;</span>)</span>
-<span id="cb41-3"><a href="componentization.html#cb41-3" tabindex="-1"></a></span>
-<span id="cb41-4"><a href="componentization.html#cb41-4" tabindex="-1"></a><span class="co"># customized settings</span></span>
-<span id="cb41-5"><a href="componentization.html#cb41-5" tabindex="-1"></a>componNT2 <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;nontarget&quot;</span>, <span class="at">ionization =</span> <span class="st">&quot;positive&quot;</span>,</span>
-<span id="cb41-6"><a href="componentization.html#cb41-6" tabindex="-1"></a>                                <span class="at">elements =</span> <span class="fu">c</span>(<span class="st">&quot;C&quot;</span>, <span class="st">&quot;H&quot;</span>), <span class="at">rtRange =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">60</span>, <span class="dv">60</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="componentization.html#cb42-1" tabindex="-1"></a><span class="co"># default settings</span></span>
+<span id="cb42-2"><a href="componentization.html#cb42-2" tabindex="-1"></a>componNT <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;nontarget&quot;</span>, <span class="at">ionization =</span> <span class="st">&quot;positive&quot;</span>)</span>
+<span id="cb42-3"><a href="componentization.html#cb42-3" tabindex="-1"></a></span>
+<span id="cb42-4"><a href="componentization.html#cb42-4" tabindex="-1"></a><span class="co"># customized settings</span></span>
+<span id="cb42-5"><a href="componentization.html#cb42-5" tabindex="-1"></a>componNT2 <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;nontarget&quot;</span>, <span class="at">ionization =</span> <span class="st">&quot;positive&quot;</span>,</span>
+<span id="cb42-6"><a href="componentization.html#cb42-6" tabindex="-1"></a>                                <span class="at">elements =</span> <span class="fu">c</span>(<span class="st">&quot;C&quot;</span>, <span class="st">&quot;H&quot;</span>), <span class="at">rtRange =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">60</span>, <span class="dv">60</span>))</span></code></pre></div>
 </div>
 <div id="compClust" class="section level3 hasAnchor" number="4.6.3">
 <h3><span class="header-section-number">4.6.3</span> Intensity and MS/MS similarity<a href="componentization.html#compClust" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -656,17 +657,17 @@ Figure 4.2: <strong>Linking of homologues series</strong> top: partial overlap a
 </table>
 <p>The components are generated by automatically assigning clusters using the <a href="https://cran.r-project.org/package=dynamicTreeCut">dynamicTreeCut</a> <code>R</code> package. However, the cluster assignment can be performed manually or with different parameters, as is demonstrated below.</p>
 <p>The resulting components are stored in an object from the <code>componentsIntClust</code> or <code>componentsSpecClust</code> S4 class, which are both derived from the <code>componentsClust</code> class (which in turn is derived from the <code>components</code> class). Several methods are defined that can be used on these objects to re-assign clusters, perform plotting operations and so on. Below are some examples. For plotting see the relevant <a href="visualization.html#plotClust">visualization section</a>. More info can be found in the reference manual (e.g. <code>?componentsIntClust</code>, <code>?componentsSpecClust</code> and <code>?componentsClust</code>).</p>
-<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="componentization.html#cb42-1" tabindex="-1"></a><span class="co"># generate intensity profile components with default settings</span></span>
-<span id="cb42-2"><a href="componentization.html#cb42-2" tabindex="-1"></a>componInt <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;intclust&quot;</span>)</span>
-<span id="cb42-3"><a href="componentization.html#cb42-3" tabindex="-1"></a></span>
-<span id="cb42-4"><a href="componentization.html#cb42-4" tabindex="-1"></a><span class="co"># manually re-assign clusters</span></span>
-<span id="cb42-5"><a href="componentization.html#cb42-5" tabindex="-1"></a>componInt <span class="ot">&lt;-</span> <span class="fu">treeCut</span>(componInt, <span class="at">k =</span> <span class="dv">10</span>)</span>
-<span id="cb42-6"><a href="componentization.html#cb42-6" tabindex="-1"></a></span>
-<span id="cb42-7"><a href="componentization.html#cb42-7" tabindex="-1"></a><span class="co"># automatic re-assignment of clusters (adjusted max tree height)</span></span>
-<span id="cb42-8"><a href="componentization.html#cb42-8" tabindex="-1"></a>componInt <span class="ot">&lt;-</span> <span class="fu">treeCutDynamic</span>(componInt, <span class="at">maxTreeHeight =</span> <span class="fl">0.7</span>)</span>
-<span id="cb42-9"><a href="componentization.html#cb42-9" tabindex="-1"></a></span>
-<span id="cb42-10"><a href="componentization.html#cb42-10" tabindex="-1"></a><span class="co"># MS/MS similarity components</span></span>
-<span id="cb42-11"><a href="componentization.html#cb42-11" tabindex="-1"></a>componMSMS <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;specclust&quot;</span>, <span class="at">MSPeakLists =</span> mslists)</span></code></pre></div>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="componentization.html#cb43-1" tabindex="-1"></a><span class="co"># generate intensity profile components with default settings</span></span>
+<span id="cb43-2"><a href="componentization.html#cb43-2" tabindex="-1"></a>componInt <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;intclust&quot;</span>)</span>
+<span id="cb43-3"><a href="componentization.html#cb43-3" tabindex="-1"></a></span>
+<span id="cb43-4"><a href="componentization.html#cb43-4" tabindex="-1"></a><span class="co"># manually re-assign clusters</span></span>
+<span id="cb43-5"><a href="componentization.html#cb43-5" tabindex="-1"></a>componInt <span class="ot">&lt;-</span> <span class="fu">treeCut</span>(componInt, <span class="at">k =</span> <span class="dv">10</span>)</span>
+<span id="cb43-6"><a href="componentization.html#cb43-6" tabindex="-1"></a></span>
+<span id="cb43-7"><a href="componentization.html#cb43-7" tabindex="-1"></a><span class="co"># automatic re-assignment of clusters (adjusted max tree height)</span></span>
+<span id="cb43-8"><a href="componentization.html#cb43-8" tabindex="-1"></a>componInt <span class="ot">&lt;-</span> <span class="fu">treeCutDynamic</span>(componInt, <span class="at">maxTreeHeight =</span> <span class="fl">0.7</span>)</span>
+<span id="cb43-9"><a href="componentization.html#cb43-9" tabindex="-1"></a></span>
+<span id="cb43-10"><a href="componentization.html#cb43-10" tabindex="-1"></a><span class="co"># MS/MS similarity components</span></span>
+<span id="cb43-11"><a href="componentization.html#cb43-11" tabindex="-1"></a>componMSMS <span class="ot">&lt;-</span> <span class="fu">generateComponents</span>(fGroups, <span class="st">&quot;specclust&quot;</span>, <span class="at">MSPeakLists =</span> mslists)</span></code></pre></div>
 </div>
 </div>
             </section>

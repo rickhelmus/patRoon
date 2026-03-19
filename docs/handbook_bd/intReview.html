@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2026-03-18" />
+<meta name="date" content="2026-03-19" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -192,6 +192,7 @@ div.csl-indent {
 <li class="chapter" data-level="2.3.3" data-path="reg_inst.html"><a href="reg_inst.html#verifying-the-installation"><i class="fa fa-check"></i><b>2.3.3</b> Verifying the installation</a></li>
 </ul></li>
 <li class="chapter" data-level="2.4" data-path="managing-legacy-installations.html"><a href="managing-legacy-installations.html"><i class="fa fa-check"></i><b>2.4</b> Managing legacy installations</a></li>
+<li class="chapter" data-level="2.5" data-path="developers-devtools-pkgload.html"><a href="developers-devtools-pkgload.html"><i class="fa fa-check"></i><b>2.5</b> Developers: devtools / pkgload</a></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path="workflow-concepts.html"><a href="workflow-concepts.html"><i class="fa fa-check"></i><b>3</b> Workflow concepts</a></li>
 <li class="chapter" data-level="4" data-path="generating-workflow-data.html"><a href="generating-workflow-data.html"><i class="fa fa-check"></i><b>4</b> Generating workflow data</a>
@@ -410,26 +411,26 @@ div.csl-indent {
 <div id="intReview" class="section level2 hasAnchor" number="5.5">
 <h2><span class="header-section-number">5.5</span> Interactively explore and review data<a href="intReview.html#intReview" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The <code>checkFeatures</code> and <code>checkComponents</code> functions start a graphical user interface (GUI) which allows you to interactively explore and review feature and components data, respectively.</p>
-<div class="sourceCode" id="cb115"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb115-1"><a href="intReview.html#cb115-1" tabindex="-1"></a><span class="fu">checkFeatures</span>(fGroups) <span class="co"># inspect features and feature groups</span></span>
-<span id="cb115-2"><a href="intReview.html#cb115-2" tabindex="-1"></a><span class="fu">checkComponents</span>(componCAM, fGroups) <span class="co"># inspect components</span></span></code></pre></div>
+<div class="sourceCode" id="cb116"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb116-1"><a href="intReview.html#cb116-1" tabindex="-1"></a><span class="fu">checkFeatures</span>(fGroups) <span class="co"># inspect features and feature groups</span></span>
+<span id="cb116-2"><a href="intReview.html#cb116-2" tabindex="-1"></a><span class="fu">checkComponents</span>(componCAM, fGroups) <span class="co"># inspect components</span></span></code></pre></div>
 <p>Both functions allow you to easily explore the data in an interactive way. Furthermore, these functions allow you to remove unwanted data. This is useful to remove for example features that are actually noise and feature groups that shouldn’t be in the same component. To remove an unwanted feature, feature group or components, simply uncheck its ‘keep’ checkbox. The next step is to save the selections you made. A <em>check session</em> is a file that stores which data should be removed. Once the session file is saved the <code>filter</code> function can be used to actually remove the data:</p>
-<div class="sourceCode" id="cb116"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb116-1"><a href="intReview.html#cb116-1" tabindex="-1"></a>fGroupsF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">checkFeaturesSession =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb116-2"><a href="intReview.html#cb116-2" tabindex="-1"></a>componCAMF <span class="ot">&lt;-</span> <span class="fu">filter</span>(componCAM, <span class="at">checkComponentsSession =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb117"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb117-1"><a href="intReview.html#cb117-1" tabindex="-1"></a>fGroupsF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">checkFeaturesSession =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb117-2"><a href="intReview.html#cb117-2" tabindex="-1"></a>componCAMF <span class="ot">&lt;-</span> <span class="fu">filter</span>(componCAM, <span class="at">checkComponentsSession =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <p>If you saved the session and you re-launch the GUI it will restore the selections made earlier. The <code>clearSession</code> argument can be used to fully clear a session before starting the GUI, hence, all the data will be restored to their ‘keep state’.</p>
-<div class="sourceCode" id="cb117"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb117-1"><a href="intReview.html#cb117-1" tabindex="-1"></a><span class="fu">checkFeatures</span>(fGroups, <span class="at">clearSession =</span> <span class="cn">TRUE</span>) <span class="co"># start GUI with fresh session</span></span></code></pre></div>
+<div class="sourceCode" id="cb118"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb118-1"><a href="intReview.html#cb118-1" tabindex="-1"></a><span class="fu">checkFeatures</span>(fGroups, <span class="at">clearSession =</span> <span class="cn">TRUE</span>) <span class="co"># start GUI with fresh session</span></span></code></pre></div>
 <p>It is also possible to use multiple different sessions. This is especially useful if you do not want to overwrite previous session data or want to inspect different objects. In this case the session file name should be specified:</p>
-<div class="sourceCode" id="cb118"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb118-1"><a href="intReview.html#cb118-1" tabindex="-1"></a><span class="fu">checkFeatures</span>(fGroups, <span class="st">&quot;mysession.yml&quot;</span>)</span>
-<span id="cb118-2"><a href="intReview.html#cb118-2" tabindex="-1"></a>fGroupsF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">checkFeaturesSession =</span> <span class="st">&quot;mysession.yml&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb119-1"><a href="intReview.html#cb119-1" tabindex="-1"></a><span class="fu">checkFeatures</span>(fGroups, <span class="st">&quot;mysession.yml&quot;</span>)</span>
+<span id="cb119-2"><a href="intReview.html#cb119-2" tabindex="-1"></a>fGroupsF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">checkFeaturesSession =</span> <span class="st">&quot;mysession.yml&quot;</span>)</span></code></pre></div>
 <p>The default session names are <code>"checked-features.yml"</code> and <code>"checked-components.yml"</code> for feature and component data, respectively.</p>
 <p>The extension of session file names is <code>.yml</code> since the <a href="https://en.wikipedia.org/wiki/YAML">YAML</a> file format is used. An advantage of this format is that it is easily readable and editable with a text editor.</p>
 <p>Note that the session data is tied to the feature group names of your data. This means that, for instance, when you re-group your feature data after changing some parameters, the session data you prepared earlier cannot be used anymore. Since probably quite some manual work went into creating the session file, a special function is available to import a session that was made for previous data. This function tries its best to guess the new feature group name based on similarity of their retention times and <em>m/z</em> values.</p>
-<div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb119-1"><a href="intReview.html#cb119-1" tabindex="-1"></a><span class="fu">checkFeatures</span>(fGroups) <span class="co"># do manual inspection</span></span>
-<span id="cb119-2"><a href="intReview.html#cb119-2" tabindex="-1"></a></span>
-<span id="cb119-3"><a href="intReview.html#cb119-3" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(fList, ...) <span class="co"># re-group with different parameters</span></span>
-<span id="cb119-4"><a href="intReview.html#cb119-4" tabindex="-1"></a></span>
-<span id="cb119-5"><a href="intReview.html#cb119-5" tabindex="-1"></a><span class="fu">importCheckFeaturesSession</span>(<span class="st">&quot;checked-features.yml&quot;</span>, <span class="st">&quot;checked-features-new.yml&quot;</span>, fGroups)</span>
-<span id="cb119-6"><a href="intReview.html#cb119-6" tabindex="-1"></a></span>
-<span id="cb119-7"><a href="intReview.html#cb119-7" tabindex="-1"></a><span class="fu">checkFeatures</span>(fGroups, <span class="at">session =</span> <span class="st">&quot;checked-features-new.yml&quot;</span>) <span class="co"># inspect new data</span></span></code></pre></div>
+<div class="sourceCode" id="cb120"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb120-1"><a href="intReview.html#cb120-1" tabindex="-1"></a><span class="fu">checkFeatures</span>(fGroups) <span class="co"># do manual inspection</span></span>
+<span id="cb120-2"><a href="intReview.html#cb120-2" tabindex="-1"></a></span>
+<span id="cb120-3"><a href="intReview.html#cb120-3" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(fList, ...) <span class="co"># re-group with different parameters</span></span>
+<span id="cb120-4"><a href="intReview.html#cb120-4" tabindex="-1"></a></span>
+<span id="cb120-5"><a href="intReview.html#cb120-5" tabindex="-1"></a><span class="fu">importCheckFeaturesSession</span>(<span class="st">&quot;checked-features.yml&quot;</span>, <span class="st">&quot;checked-features-new.yml&quot;</span>, fGroups)</span>
+<span id="cb120-6"><a href="intReview.html#cb120-6" tabindex="-1"></a></span>
+<span id="cb120-7"><a href="intReview.html#cb120-7" tabindex="-1"></a><span class="fu">checkFeatures</span>(fGroups, <span class="at">session =</span> <span class="st">&quot;checked-features-new.yml&quot;</span>) <span class="co"># inspect new data</span></span></code></pre></div>
 <p>Take care to monitor the messages that <code>importCheckFeaturesSession</code> may output, as it may be possible that some ‘old’ feature groups are not found or are matched by multiple candidates of the new dataset.</p>
 <p>Some additional parameters exist to the functions described in this section. As usually check the reference manual for more details (<em>e.g.</em> <code>?checkFeatures</code>).</p>
 <blockquote>

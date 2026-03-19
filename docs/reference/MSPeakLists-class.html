@@ -101,7 +101,7 @@
 <span></span>
 <span><span class="fu">spectrumSimilarity</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">spectrumSimilarityMobility</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">spectrumSimilarityIMS</span><span class="op">(</span><span class="va">obj</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'MSPeakLists'</span></span>
 <span><span class="fu">peakLists</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
@@ -189,7 +189,7 @@
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'MSPeakLists'</span></span>
-<span><span class="fu">spectrumSimilarityMobility</span><span class="op">(</span><span class="va">obj</span>, <span class="va">fGroups</span>, doFGroups <span class="op">=</span> <span class="cn">TRUE</span>, warn <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">spectrumSimilarityIMS</span><span class="op">(</span><span class="va">obj</span>, <span class="va">fGroups</span>, doFGroups <span class="op">=</span> <span class="cn">TRUE</span>, warn <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'MSPeakListsSet'</span></span>
 <span><span class="fu"><a href="generics.html">analysisInfo</a></span><span class="op">(</span><span class="va">obj</span>, df <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
@@ -267,7 +267,7 @@
 <dd><p>For the <code>"["</code> operator: ignored.</p>
 <p>For <code>delete</code>: passed to the function specified as <code>j</code>.</p>
 <p>For <code>plotSpectrum</code>: passed to <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></code>.</p>
-<p>For <code>spectrumSimilarityMobility</code>: passed to <code>spectrumSimilarity</code></p>
+<p>For <code>spectrumSimilarityIMS</code>: passed to <code>spectrumSimilarity</code></p>
 <p>For <a href="sets-workflow.html">sets workflow</a> methods: further arguments passed to the base <code>MSPeakLists</code> method.</p></dd>
 
 
@@ -492,8 +492,8 @@ Furthermore, if <code>mirror=TRUE</code> (and there are two sets in the object) 
 <p><code>averagedPeakLists</code> returns a nested list of feature group
   averaged peak lists in a similar format as <code>peakLists</code>.</p>
 <p><code>delete</code> returns the object for which the specified data was removed.</p>
-<p><code>spectrumSimilarityMobility</code> returns a <code>data.table</code> with spectral similarities for each IMS parent
-  and feature pair.</p>
+<p><code>spectrumSimilarityIMS</code> returns a <code>data.table</code> with spectral similarities for each IMS
+  precursor and feature pair.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -528,8 +528,8 @@ are <em>not</em> re-averaged by default (see the <code>reAverage</code> argument
 <li><p><code>plotSpectrum(MSPeakLists)</code>: Plots a spectrum using MS or MS/MS peak lists for a given feature group. Two spectra can be
 compared when two feature groups are specified.</p></li>
 <li><p><code>spectrumSimilarity(MSPeakLists)</code>: Calculates the spectral similarity between two or more spectra.</p></li>
-<li><p><code>spectrumSimilarityMobility(MSPeakLists)</code>: Calculates the spectral similarity between spectra from IMS features (or feature groups)
-and their IMS parents in post IMS workflows (see <code><a href="assignMobilities_feat.html">assignMobilities</a></code>).</p></li>
+<li><p><code>spectrumSimilarityIMS(MSPeakLists)</code>: Calculates the spectral similarity between spectra from IMS features (or feature groups)
+and their IMS precursors in post mobility workflows (see <code><a href="assignMobilities_feat.html">assignMobilities</a></code>).</p></li>
 </ul></div>
     <div id="slots">
     <h2>Slots</h2>

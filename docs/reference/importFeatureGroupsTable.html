@@ -151,8 +151,8 @@ unused and dummy values can be set here, such as <code>groupAlgo="openms", group
     Will be calculated from mean values of feature data if missing. (<strong>optional</strong>)</p></li>
 </ul><p>For data from an <a href="assignMobilities_feat.html">IMS workflow</a>, the following additional columns are relevant:</p><ul><li><p><code>group_mobility</code>,<code>group_CCS</code>: the mobility and <acronym>CCS</acronym> assigned to the feature group. Will
     be calculated from mean values of feature data if missing. (<strong>optional</strong>)</p></li>
-<li><p><code>ims_parent_group</code>: a string naming the IMS parent group of the feature group (<code>NA</code> if none or
-    not a mobility feature). (<strong>optional</strong>)</p></li>
+<li><p><code>ims_precursor_group</code>: a string naming the IMS precursor feature group of the feature group (<code>NA</code>
+    if none or not a IMS feature). (<strong>optional</strong>)</p></li>
 </ul><p>For data from a <a href="sets-workflow.html">sets workflow</a>, the following additional columns are relevant:</p><ul><li><p><code>group_ion_mz-&lt;set&gt;</code>,<code>group_neutralMass</code>,<code>group_adduct-&lt;set&gt;</code>: the ion m/z, neutral mass and
     adduct assigned to the feature group. Columns should be present for each set (<em>e.g.</em>
     <code>ion_mz-positive</code>). Missing columns will be calculated from feature data. <strong>NOTE</strong> If feature columns

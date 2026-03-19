@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2026-03-18" />
+<meta name="date" content="2026-03-19" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -192,6 +192,7 @@ div.csl-indent {
 <li class="chapter" data-level="2.3.3" data-path="reg_inst.html"><a href="reg_inst.html#verifying-the-installation"><i class="fa fa-check"></i><b>2.3.3</b> Verifying the installation</a></li>
 </ul></li>
 <li class="chapter" data-level="2.4" data-path="managing-legacy-installations.html"><a href="managing-legacy-installations.html"><i class="fa fa-check"></i><b>2.4</b> Managing legacy installations</a></li>
+<li class="chapter" data-level="2.5" data-path="developers-devtools-pkgload.html"><a href="developers-devtools-pkgload.html"><i class="fa fa-check"></i><b>2.5</b> Developers: devtools / pkgload</a></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path="workflow-concepts.html"><a href="workflow-concepts.html"><i class="fa fa-check"></i><b>3</b> Workflow concepts</a></li>
 <li class="chapter" data-level="4" data-path="generating-workflow-data.html"><a href="generating-workflow-data.html"><i class="fa fa-check"></i><b>4</b> Generating workflow data</a>
@@ -472,10 +473,10 @@ div.csl-indent {
 </ul>
 <p>If a workflow requires multiple file formats of a same file type, e.g. centroided <code>mzML</code> and <code>mzXML</code> files, then simply store both file formats in the directory specified in the <code>path_XXX</code> column. If data needs to be exported (discussed in the next section), simply assign its <em>destination path</em> to the respective <code>path_XXX</code> column.</p>
 <p>The analysis information table can be manually constructed in <code>R</code> (e.g. through import of an <code>CSV</code> file), through a graphical interface with <code>newProject()</code> (<a href="newProject.html#newProject">discussed previously</a>) or automatically by the <code>generateAnalysisInfo()</code> function. Here is an example of the latter for the example data in the <code>patRoonData</code> package:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="sample-analyses.html#cb13-1" tabindex="-1"></a><span class="co"># Take example data from patRoonData package (triplicate solvent blank + triplicate standard)</span></span>
-<span id="cb13-2"><a href="sample-analyses.html#cb13-2" tabindex="-1"></a><span class="fu">generateAnalysisInfo</span>(<span class="at">fromCentroid =</span> patRoonData<span class="sc">::</span><span class="fu">exampleDataPath</span>(),</span>
-<span id="cb13-3"><a href="sample-analyses.html#cb13-3" tabindex="-1"></a>                     <span class="at">replicate =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">&quot;solvent-pos&quot;</span>, <span class="dv">3</span>), <span class="fu">rep</span>(<span class="st">&quot;standard-pos&quot;</span>, <span class="dv">3</span>)),</span>
-<span id="cb13-4"><a href="sample-analyses.html#cb13-4" tabindex="-1"></a>                     <span class="at">blank =</span> <span class="st">&quot;solvent-pos&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="sample-analyses.html#cb14-1" tabindex="-1"></a><span class="co"># Take example data from patRoonData package (triplicate solvent blank + triplicate standard)</span></span>
+<span id="cb14-2"><a href="sample-analyses.html#cb14-2" tabindex="-1"></a><span class="fu">generateAnalysisInfo</span>(<span class="at">fromCentroid =</span> patRoonData<span class="sc">::</span><span class="fu">exampleDataPath</span>(),</span>
+<span id="cb14-3"><a href="sample-analyses.html#cb14-3" tabindex="-1"></a>                     <span class="at">replicate =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">&quot;solvent-pos&quot;</span>, <span class="dv">3</span>), <span class="fu">rep</span>(<span class="st">&quot;standard-pos&quot;</span>, <span class="dv">3</span>)),</span>
+<span id="cb14-4"><a href="sample-analyses.html#cb14-4" tabindex="-1"></a>                     <span class="at">blank =</span> <span class="st">&quot;solvent-pos&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt;         analysis                                         path_centroid path_raw path_profile path_ims    replicate       blank
 #&gt; 1  solvent-pos-1 /usr/local/lib/R/site-library/patRoonData/extdata/pos                                 solvent-pos solvent-pos
 #&gt; 2  solvent-pos-2 /usr/local/lib/R/site-library/patRoonData/extdata/pos                                 solvent-pos solvent-pos
@@ -485,12 +486,12 @@ div.csl-indent {
 #&gt; 6 standard-pos-3 /usr/local/lib/R/site-library/patRoonData/extdata/pos                                standard-pos solvent-pos</code></pre>
 <p>(Note that for the example data the <code>patRoonData::exampleAnalysisInfo()</code> function can also be used.)</p>
 <p>It is possible to add more columns to the analysis information: these can be used to attach additional metadata to each sample analysis. These columns can be added later to the table, or specified directly to <code>generateAnalysisInfo()</code>:</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="sample-analyses.html#cb15-1" tabindex="-1"></a><span class="co"># As above, but add some (nonsensical) metadata: location and exposure</span></span>
-<span id="cb15-2"><a href="sample-analyses.html#cb15-2" tabindex="-1"></a><span class="fu">generateAnalysisInfo</span>(<span class="at">fromCentroid =</span> patRoonData<span class="sc">::</span><span class="fu">exampleDataPath</span>(),</span>
-<span id="cb15-3"><a href="sample-analyses.html#cb15-3" tabindex="-1"></a>                     <span class="at">replicate =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">&quot;solvent-pos&quot;</span>, <span class="dv">3</span>), <span class="fu">rep</span>(<span class="st">&quot;standard-pos&quot;</span>, <span class="dv">3</span>)),</span>
-<span id="cb15-4"><a href="sample-analyses.html#cb15-4" tabindex="-1"></a>                     <span class="at">blank =</span> <span class="st">&quot;solvent-pos&quot;</span>,</span>
-<span id="cb15-5"><a href="sample-analyses.html#cb15-5" tabindex="-1"></a>                     <span class="at">location =</span> <span class="fu">c</span>(<span class="st">&quot;NL&quot;</span>, <span class="st">&quot;NL&quot;</span>, <span class="st">&quot;NL&quot;</span>, <span class="st">&quot;DE&quot;</span>, <span class="st">&quot;DE&quot;</span>, <span class="st">&quot;DE&quot;</span>),</span>
-<span id="cb15-6"><a href="sample-analyses.html#cb15-6" tabindex="-1"></a>                     <span class="at">exposure =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="sample-analyses.html#cb16-1" tabindex="-1"></a><span class="co"># As above, but add some (nonsensical) metadata: location and exposure</span></span>
+<span id="cb16-2"><a href="sample-analyses.html#cb16-2" tabindex="-1"></a><span class="fu">generateAnalysisInfo</span>(<span class="at">fromCentroid =</span> patRoonData<span class="sc">::</span><span class="fu">exampleDataPath</span>(),</span>
+<span id="cb16-3"><a href="sample-analyses.html#cb16-3" tabindex="-1"></a>                     <span class="at">replicate =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">&quot;solvent-pos&quot;</span>, <span class="dv">3</span>), <span class="fu">rep</span>(<span class="st">&quot;standard-pos&quot;</span>, <span class="dv">3</span>)),</span>
+<span id="cb16-4"><a href="sample-analyses.html#cb16-4" tabindex="-1"></a>                     <span class="at">blank =</span> <span class="st">&quot;solvent-pos&quot;</span>,</span>
+<span id="cb16-5"><a href="sample-analyses.html#cb16-5" tabindex="-1"></a>                     <span class="at">location =</span> <span class="fu">c</span>(<span class="st">&quot;NL&quot;</span>, <span class="st">&quot;NL&quot;</span>, <span class="st">&quot;NL&quot;</span>, <span class="st">&quot;DE&quot;</span>, <span class="st">&quot;DE&quot;</span>, <span class="st">&quot;DE&quot;</span>),</span>
+<span id="cb16-6"><a href="sample-analyses.html#cb16-6" tabindex="-1"></a>                     <span class="at">exposure =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>))</span></code></pre></div>
 <pre><code>#&gt;         analysis                                         path_centroid path_raw path_profile path_ims    replicate       blank location exposure
 #&gt; 1  solvent-pos-1 /usr/local/lib/R/site-library/patRoonData/extdata/pos                                 solvent-pos solvent-pos       NL        0
 #&gt; 2  solvent-pos-2 /usr/local/lib/R/site-library/patRoonData/extdata/pos                                 solvent-pos solvent-pos       NL        0
@@ -564,32 +565,32 @@ div.csl-indent {
 <p><strong><em>NOTE</em></strong> For the conversion of IMS to centroided data it is highly recommended to use the IMS collapse or <a href="https://gtluu.github.io/timsconvert/">TIMSCONVERT</a> algorithms, as <a href="http://proteowizard.sourceforge.net/">ProteoWizard</a> currently does not support accurate centroiding of IMS data. For the conversion of Agilent IMS data, <a href="http://proteowizard.sourceforge.net/">ProteoWizard</a> can be used to convert the raw <code>.d</code> files to the ims (<code>mzML</code>) files, and subsequently IMS collapse can be used to convert these to centroided files.</p>
 </blockquote>
 <p>The <code>convertMSFiles()</code> function uses the <a href="sample-analyses.html#anaInfo">analysis information</a> to locate the input files and the destination paths for the output. The <code>path_XXX</code> columns should contain the desired destination directories for those file types that should be exported. For instance:</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="sample-analyses.html#cb17-1" tabindex="-1"></a>anaInfoConv <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb17-2"><a href="sample-analyses.html#cb17-2" tabindex="-1"></a>    <span class="at">analysis =</span> <span class="fu">c</span>(<span class="st">&quot;sample1&quot;</span>, <span class="st">&quot;sample2&quot;</span>),</span>
-<span id="cb17-3"><a href="sample-analyses.html#cb17-3" tabindex="-1"></a>    <span class="at">replicate =</span> <span class="st">&quot;replicate&quot;</span>,</span>
-<span id="cb17-4"><a href="sample-analyses.html#cb17-4" tabindex="-1"></a>    <span class="at">blank =</span> <span class="st">&quot;&quot;</span>,</span>
-<span id="cb17-5"><a href="sample-analyses.html#cb17-5" tabindex="-1"></a>    <span class="at">path_raw =</span> <span class="st">&quot;raw_files&quot;</span>, <span class="co"># directory containing the raw HRMS instrument files (.d, .raw, ...)</span></span>
-<span id="cb17-6"><a href="sample-analyses.html#cb17-6" tabindex="-1"></a>    <span class="at">path_centroid =</span> <span class="st">&quot;centroid_files&quot;</span> <span class="co"># destination directory where the centroided files will be placed</span></span>
-<span id="cb17-7"><a href="sample-analyses.html#cb17-7" tabindex="-1"></a>)</span>
-<span id="cb17-8"><a href="sample-analyses.html#cb17-8" tabindex="-1"></a>anaInfoConv</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="sample-analyses.html#cb18-1" tabindex="-1"></a>anaInfoConv <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb18-2"><a href="sample-analyses.html#cb18-2" tabindex="-1"></a>    <span class="at">analysis =</span> <span class="fu">c</span>(<span class="st">&quot;sample1&quot;</span>, <span class="st">&quot;sample2&quot;</span>),</span>
+<span id="cb18-3"><a href="sample-analyses.html#cb18-3" tabindex="-1"></a>    <span class="at">replicate =</span> <span class="st">&quot;replicate&quot;</span>,</span>
+<span id="cb18-4"><a href="sample-analyses.html#cb18-4" tabindex="-1"></a>    <span class="at">blank =</span> <span class="st">&quot;&quot;</span>,</span>
+<span id="cb18-5"><a href="sample-analyses.html#cb18-5" tabindex="-1"></a>    <span class="at">path_raw =</span> <span class="st">&quot;raw_files&quot;</span>, <span class="co"># directory containing the raw HRMS instrument files (.d, .raw, ...)</span></span>
+<span id="cb18-6"><a href="sample-analyses.html#cb18-6" tabindex="-1"></a>    <span class="at">path_centroid =</span> <span class="st">&quot;centroid_files&quot;</span> <span class="co"># destination directory where the centroided files will be placed</span></span>
+<span id="cb18-7"><a href="sample-analyses.html#cb18-7" tabindex="-1"></a>)</span>
+<span id="cb18-8"><a href="sample-analyses.html#cb18-8" tabindex="-1"></a>anaInfoConv</span></code></pre></div>
 <pre><code>#&gt;   analysis replicate blank  path_raw  path_centroid
 #&gt; 1  sample1 replicate       raw_files centroid_files
 #&gt; 2  sample2 replicate       raw_files centroid_files</code></pre>
 <p>The <code>convertMSFiles()</code> takes the analysis information and performs the necessary conversions:</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="sample-analyses.html#cb19-1" tabindex="-1"></a><span class="co"># Convert thermo raw files to centroided mzML files</span></span>
-<span id="cb19-2"><a href="sample-analyses.html#cb19-2" tabindex="-1"></a><span class="fu">convertMSFiles</span>(anaInfo, <span class="at">typeFrom =</span> <span class="st">&quot;raw&quot;</span>, <span class="at">formatFrom =</span> <span class="st">&quot;thermo&quot;</span>, <span class="at">typeTo =</span> <span class="st">&quot;centroid&quot;</span>, <span class="at">formatTo =</span> <span class="st">&quot;mzML&quot;</span>,</span>
-<span id="cb19-3"><a href="sample-analyses.html#cb19-3" tabindex="-1"></a>               <span class="at">algorithm =</span> <span class="st">&quot;pwiz&quot;</span>)</span>
-<span id="cb19-4"><a href="sample-analyses.html#cb19-4" tabindex="-1"></a></span>
-<span id="cb19-5"><a href="sample-analyses.html#cb19-5" tabindex="-1"></a><span class="co"># convert TIMS data to LC-MS like centroided data</span></span>
-<span id="cb19-6"><a href="sample-analyses.html#cb19-6" tabindex="-1"></a><span class="fu">convertMSFiles</span>(anaInfo, <span class="at">typeFrom =</span> <span class="st">&quot;raw&quot;</span>, <span class="at">formatFrom =</span> <span class="st">&quot;bruker_ims&quot;</span>, <span class="at">typeTo =</span> <span class="st">&quot;centroid&quot;</span>, <span class="at">formatTo =</span> <span class="st">&quot;mzML&quot;</span>,</span>
-<span id="cb19-7"><a href="sample-analyses.html#cb19-7" tabindex="-1"></a>               <span class="at">algorithm =</span> <span class="st">&quot;timsconvert&quot;</span>)</span>
-<span id="cb19-8"><a href="sample-analyses.html#cb19-8" tabindex="-1"></a></span>
-<span id="cb19-9"><a href="sample-analyses.html#cb19-9" tabindex="-1"></a><span class="co"># convert Agilent IMS-HRMS data to ims data in mzML format</span></span>
-<span id="cb19-10"><a href="sample-analyses.html#cb19-10" tabindex="-1"></a><span class="fu">convertMSFiles</span>(anaInfo, <span class="at">typeFrom =</span> <span class="st">&quot;raw&quot;</span>, <span class="at">formatFrom =</span> <span class="st">&quot;agilent_ims&quot;</span>, <span class="at">typeTo =</span> <span class="st">&quot;ims&quot;</span>, <span class="at">formatTo =</span> <span class="st">&quot;mzML&quot;</span>,</span>
-<span id="cb19-11"><a href="sample-analyses.html#cb19-11" tabindex="-1"></a>               <span class="at">algorithm =</span> <span class="st">&quot;pwiz&quot;</span>)</span>
-<span id="cb19-12"><a href="sample-analyses.html#cb19-12" tabindex="-1"></a><span class="co"># ... and then use IM collapse to LC-MS like centroided mzML files</span></span>
-<span id="cb19-13"><a href="sample-analyses.html#cb19-13" tabindex="-1"></a><span class="fu">convertMSFiles</span>(anaInfo, <span class="at">typeFrom =</span> <span class="st">&quot;ims&quot;</span>, <span class="at">formatFrom =</span> <span class="st">&quot;mzML&quot;</span>, <span class="at">typeTo =</span> <span class="st">&quot;centroid&quot;</span>, <span class="at">formatTo =</span> <span class="st">&quot;mzML&quot;</span>,</span>
-<span id="cb19-14"><a href="sample-analyses.html#cb19-14" tabindex="-1"></a>               <span class="at">algorithm =</span> <span class="st">&quot;imscollapse&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="sample-analyses.html#cb20-1" tabindex="-1"></a><span class="co"># Convert thermo raw files to centroided mzML files</span></span>
+<span id="cb20-2"><a href="sample-analyses.html#cb20-2" tabindex="-1"></a><span class="fu">convertMSFiles</span>(anaInfo, <span class="at">typeFrom =</span> <span class="st">&quot;raw&quot;</span>, <span class="at">formatFrom =</span> <span class="st">&quot;thermo&quot;</span>, <span class="at">typeTo =</span> <span class="st">&quot;centroid&quot;</span>, <span class="at">formatTo =</span> <span class="st">&quot;mzML&quot;</span>,</span>
+<span id="cb20-3"><a href="sample-analyses.html#cb20-3" tabindex="-1"></a>               <span class="at">algorithm =</span> <span class="st">&quot;pwiz&quot;</span>)</span>
+<span id="cb20-4"><a href="sample-analyses.html#cb20-4" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="sample-analyses.html#cb20-5" tabindex="-1"></a><span class="co"># convert TIMS data to LC-MS like centroided data</span></span>
+<span id="cb20-6"><a href="sample-analyses.html#cb20-6" tabindex="-1"></a><span class="fu">convertMSFiles</span>(anaInfo, <span class="at">typeFrom =</span> <span class="st">&quot;raw&quot;</span>, <span class="at">formatFrom =</span> <span class="st">&quot;bruker_ims&quot;</span>, <span class="at">typeTo =</span> <span class="st">&quot;centroid&quot;</span>, <span class="at">formatTo =</span> <span class="st">&quot;mzML&quot;</span>,</span>
+<span id="cb20-7"><a href="sample-analyses.html#cb20-7" tabindex="-1"></a>               <span class="at">algorithm =</span> <span class="st">&quot;timsconvert&quot;</span>)</span>
+<span id="cb20-8"><a href="sample-analyses.html#cb20-8" tabindex="-1"></a></span>
+<span id="cb20-9"><a href="sample-analyses.html#cb20-9" tabindex="-1"></a><span class="co"># convert Agilent IMS-HRMS data to ims data in mzML format</span></span>
+<span id="cb20-10"><a href="sample-analyses.html#cb20-10" tabindex="-1"></a><span class="fu">convertMSFiles</span>(anaInfo, <span class="at">typeFrom =</span> <span class="st">&quot;raw&quot;</span>, <span class="at">formatFrom =</span> <span class="st">&quot;agilent_ims&quot;</span>, <span class="at">typeTo =</span> <span class="st">&quot;ims&quot;</span>, <span class="at">formatTo =</span> <span class="st">&quot;mzML&quot;</span>,</span>
+<span id="cb20-11"><a href="sample-analyses.html#cb20-11" tabindex="-1"></a>               <span class="at">algorithm =</span> <span class="st">&quot;pwiz&quot;</span>)</span>
+<span id="cb20-12"><a href="sample-analyses.html#cb20-12" tabindex="-1"></a><span class="co"># ... and then use IM collapse to LC-MS like centroided mzML files</span></span>
+<span id="cb20-13"><a href="sample-analyses.html#cb20-13" tabindex="-1"></a><span class="fu">convertMSFiles</span>(anaInfo, <span class="at">typeFrom =</span> <span class="st">&quot;ims&quot;</span>, <span class="at">formatFrom =</span> <span class="st">&quot;mzML&quot;</span>, <span class="at">typeTo =</span> <span class="st">&quot;centroid&quot;</span>, <span class="at">formatTo =</span> <span class="st">&quot;mzML&quot;</span>,</span>
+<span id="cb20-14"><a href="sample-analyses.html#cb20-14" tabindex="-1"></a>               <span class="at">algorithm =</span> <span class="st">&quot;imscollapse&quot;</span>)</span></code></pre></div>
 <blockquote>
 <p>The <a href="newProject.html#newProject">newProject() utility</a> can automatically generate a proper analysis information table and the required code to perform the desired file conversions.</p>
 </blockquote>
@@ -597,16 +598,16 @@ div.csl-indent {
 <p><strong><em>NOTE</em></strong> The IMS collapse algorithm omits MS/MS data by default to save space and speed up file conversion. This algorithm is typically used in <a href="IMSWorkflow.html#postIMS">post mobility assignment</a> IMS workflows, which do not use MS/MS data from centroided files. Set <code>includeMSMS=TRUE</code> to include MS/MS data.</p>
 </blockquote>
 <p>Besides conversion, other types of data pre-treatment may also need to be performed. For instance, <a href="http://proteowizard.sourceforge.net/">ProteoWizard</a> can be used to apply various data filters, and several utility functions exist to apply mass re-calibration of Bruker data files.</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="sample-analyses.html#cb20-1" tabindex="-1"></a><span class="co"># Use ProteoWizard to perform conversion and apply a filter to only keep MS 1 data</span></span>
-<span id="cb20-2"><a href="sample-analyses.html#cb20-2" tabindex="-1"></a><span class="co"># See http://proteowizard.sourceforge.net/tools/msconvert.html for supported filters</span></span>
-<span id="cb20-3"><a href="sample-analyses.html#cb20-3" tabindex="-1"></a><span class="fu">convertMSFiles</span>(anaInfo, <span class="at">typeFrom =</span> <span class="st">&quot;raw&quot;</span>, <span class="at">formatFrom =</span> <span class="st">&quot;thermo&quot;</span>, <span class="at">typeTo =</span> <span class="st">&quot;centroid&quot;</span>, <span class="at">formatTo =</span> <span class="st">&quot;mzML&quot;</span>,</span>
-<span id="cb20-4"><a href="sample-analyses.html#cb20-4" tabindex="-1"></a>               <span class="at">algorithm =</span> <span class="st">&quot;pwiz&quot;</span>, <span class="at">filters =</span> <span class="st">&quot;msLevel 1&quot;</span>)</span>
-<span id="cb20-5"><a href="sample-analyses.html#cb20-5" tabindex="-1"></a></span>
-<span id="cb20-6"><a href="sample-analyses.html#cb20-6" tabindex="-1"></a><span class="co"># perform m/z re-calibration of Bruker data (should be performed prior to file conversion!)</span></span>
-<span id="cb20-7"><a href="sample-analyses.html#cb20-7" tabindex="-1"></a><span class="co"># </span><span class="al">NOTE</span><span class="co">: this requires Bruker DataAnalysis</span></span>
-<span id="cb20-8"><a href="sample-analyses.html#cb20-8" tabindex="-1"></a><span class="fu">setDAMethod</span>(anaInfo, <span class="st">&quot;path/to/DAMethod.m&quot;</span>) <span class="co"># configure Bruker files with given method that has automatic calibration configured</span></span>
-<span id="cb20-9"><a href="sample-analyses.html#cb20-9" tabindex="-1"></a><span class="fu">recalibrarateDAFiles</span>(anaInfo) <span class="co"># trigger re-calibration for each analysis</span></span>
-<span id="cb20-10"><a href="sample-analyses.html#cb20-10" tabindex="-1"></a><span class="fu">getDACalibrationError</span>(anaInfo) <span class="co"># get calibration error for each analysis</span></span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="sample-analyses.html#cb21-1" tabindex="-1"></a><span class="co"># Use ProteoWizard to perform conversion and apply a filter to only keep MS 1 data</span></span>
+<span id="cb21-2"><a href="sample-analyses.html#cb21-2" tabindex="-1"></a><span class="co"># See http://proteowizard.sourceforge.net/tools/msconvert.html for supported filters</span></span>
+<span id="cb21-3"><a href="sample-analyses.html#cb21-3" tabindex="-1"></a><span class="fu">convertMSFiles</span>(anaInfo, <span class="at">typeFrom =</span> <span class="st">&quot;raw&quot;</span>, <span class="at">formatFrom =</span> <span class="st">&quot;thermo&quot;</span>, <span class="at">typeTo =</span> <span class="st">&quot;centroid&quot;</span>, <span class="at">formatTo =</span> <span class="st">&quot;mzML&quot;</span>,</span>
+<span id="cb21-4"><a href="sample-analyses.html#cb21-4" tabindex="-1"></a>               <span class="at">algorithm =</span> <span class="st">&quot;pwiz&quot;</span>, <span class="at">filters =</span> <span class="st">&quot;msLevel 1&quot;</span>)</span>
+<span id="cb21-5"><a href="sample-analyses.html#cb21-5" tabindex="-1"></a></span>
+<span id="cb21-6"><a href="sample-analyses.html#cb21-6" tabindex="-1"></a><span class="co"># perform m/z re-calibration of Bruker data (should be performed prior to file conversion!)</span></span>
+<span id="cb21-7"><a href="sample-analyses.html#cb21-7" tabindex="-1"></a><span class="co"># </span><span class="al">NOTE</span><span class="co">: this requires Bruker DataAnalysis</span></span>
+<span id="cb21-8"><a href="sample-analyses.html#cb21-8" tabindex="-1"></a><span class="fu">setDAMethod</span>(anaInfo, <span class="st">&quot;path/to/DAMethod.m&quot;</span>) <span class="co"># configure Bruker files with given method that has automatic calibration configured</span></span>
+<span id="cb21-9"><a href="sample-analyses.html#cb21-9" tabindex="-1"></a><span class="fu">recalibrarateDAFiles</span>(anaInfo) <span class="co"># trigger re-calibration for each analysis</span></span>
+<span id="cb21-10"><a href="sample-analyses.html#cb21-10" tabindex="-1"></a><span class="fu">getDACalibrationError</span>(anaInfo) <span class="co"># get calibration error for each analysis</span></span></code></pre></div>
 <p>Please see the reference manual for more details (<code>?convertMSFiles</code>, <code>?`bruker-utils`</code>).</p>
 </div>
 </div>

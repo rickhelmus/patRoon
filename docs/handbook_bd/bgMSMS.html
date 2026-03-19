@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2026-03-18" />
+<meta name="date" content="2026-03-19" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -192,6 +192,7 @@ div.csl-indent {
 <li class="chapter" data-level="2.3.3" data-path="reg_inst.html"><a href="reg_inst.html#verifying-the-installation"><i class="fa fa-check"></i><b>2.3.3</b> Verifying the installation</a></li>
 </ul></li>
 <li class="chapter" data-level="2.4" data-path="managing-legacy-installations.html"><a href="managing-legacy-installations.html"><i class="fa fa-check"></i><b>2.4</b> Managing legacy installations</a></li>
+<li class="chapter" data-level="2.5" data-path="developers-devtools-pkgload.html"><a href="developers-devtools-pkgload.html"><i class="fa fa-check"></i><b>2.5</b> Developers: devtools / pkgload</a></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path="workflow-concepts.html"><a href="workflow-concepts.html"><i class="fa fa-check"></i><b>3</b> Workflow concepts</a></li>
 <li class="chapter" data-level="4" data-path="generating-workflow-data.html"><a href="generating-workflow-data.html"><i class="fa fa-check"></i><b>4</b> Generating workflow data</a>
@@ -411,13 +412,13 @@ div.csl-indent {
 <h2><span class="header-section-number">9.8</span> Background removal in MS/MS data<a href="bgMSMS.html#bgMSMS" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Even if data-dependent acquisition (DDA) is used to acquire MS/MS data, there may still be a substantial number of background peaks present in the MS/MS spectra. The <a href="filtering.html#filtering">filtering section</a> introduced several filters to remove these.</p>
 <p>Another approach to remove background is to identify frequently occurring background peaks, which typically are a sign of contamination in the analytical system, and subsequently remove these. The <code>getBGMSMSPeaks()</code> function inspects all MS/MS data in a set of blank analyses and identifies frequently occurring peaks.</p>
-<div class="sourceCode" id="cb342"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb342-1"><a href="bgMSMS.html#cb342-1" tabindex="-1"></a><span class="co"># get background MS/MS peaks from blank analyses</span></span>
-<span id="cb342-2"><a href="bgMSMS.html#cb342-2" tabindex="-1"></a>bgPeaks <span class="ot">&lt;-</span> <span class="fu">getBGMSMSPeaks</span>(anaInfo, <span class="at">replicates =</span> <span class="st">&quot;solvent-pos&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb343"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb343-1"><a href="bgMSMS.html#cb343-1" tabindex="-1"></a><span class="co"># get background MS/MS peaks from blank analyses</span></span>
+<span id="cb343-2"><a href="bgMSMS.html#cb343-2" tabindex="-1"></a>bgPeaks <span class="ot">&lt;-</span> <span class="fu">getBGMSMSPeaks</span>(anaInfo, <span class="at">replicates =</span> <span class="st">&quot;solvent-pos&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; Averaging the spectra for each of the 3 analyses
 #&gt; Using &#39;mzr&#39; backend for reading MS data.
 #&gt; ================================================================================
 #&gt; Averaging analyses averaged spectra... Done!</code></pre>
-<div class="sourceCode" id="cb344"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb344-1"><a href="bgMSMS.html#cb344-1" tabindex="-1"></a>bgPeaks</span></code></pre></div>
+<div class="sourceCode" id="cb345"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb345-1"><a href="bgMSMS.html#cb345-1" tabindex="-1"></a>bgPeaks</span></code></pre></div>
 <pre><code>#&gt;            mz intensity abundance_rel_ana abundance_abs_ana abundance_rel_spec abundance_abs_spec
 #&gt;         &lt;num&gt;     &lt;num&gt;             &lt;num&gt;             &lt;num&gt;              &lt;num&gt;              &lt;num&gt;
 #&gt;  1:  98.97532  6325.059                 1                 3          0.4669805           233.3333
@@ -433,8 +434,8 @@ div.csl-indent {
 #&gt; 23: 181.02875  3742.822                 1                 3          0.2401476           120.0000</code></pre>
 <p>The <code>replicates</code> function argument tells which analyses are used for blank subtraction, in the above example all the analyses with the replicate set to “solvent-pos” are used. It is also possible to specify multiple replicate names. Typically, you will choose sample analyses here that did not undergo any sample preparation, such as pure solvent blanks.</p>
 <p>The <code>filter()</code> function is then used to remove these peaks in the peak list data.</p>
-<div class="sourceCode" id="cb346"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb346-1"><a href="bgMSMS.html#cb346-1" tabindex="-1"></a><span class="co"># remove background peaks from MS/MS spectra</span></span>
-<span id="cb346-2"><a href="bgMSMS.html#cb346-2" tabindex="-1"></a>mslists <span class="ot">&lt;-</span> <span class="fu">filter</span>(mslists, <span class="at">removeMZs =</span> bgPeaks)</span></code></pre></div>
+<div class="sourceCode" id="cb347"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb347-1"><a href="bgMSMS.html#cb347-1" tabindex="-1"></a><span class="co"># remove background peaks from MS/MS spectra</span></span>
+<span id="cb347-2"><a href="bgMSMS.html#cb347-2" tabindex="-1"></a>mslists <span class="ot">&lt;-</span> <span class="fu">filter</span>(mslists, <span class="at">removeMZs =</span> bgPeaks)</span></code></pre></div>
 <p>The <code>removeMZs</code> filter removes all the MS/MS peaks from the <code>mz</code> column. You can also specify a vector with <em>m/z</em> values to remove, for instance, if you identified background peaks by other means than the <code>getBGMSMSPeaks()</code> function.</p>
 <p>For more details, see the reference manual (<code>?getBGMSMSPeaks</code>).</p>
 </div>

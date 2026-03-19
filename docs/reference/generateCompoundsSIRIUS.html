@@ -119,7 +119,7 @@ CSI:FingerID for compound annotation."><!-- mathjax --><script src="https://cdnj
 <span>  alwaysLogin <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  extraOptsGeneral <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  extraOptsFormula <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  minMobSpecSim <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  minIMSSpecSim <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  splitBatches <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  dryRun <span class="op">=</span> <span class="cn">FALSE</span></span>
@@ -251,14 +251,14 @@ command, while options specified in <code>extraOptsFormula</code> are added in a
 manual for more details. Set to <code>NULL</code> to ignore.</p></dd>
 
 
-<dt id="arg-minmobspecsim">minMobSpecSim<a class="anchor" aria-label="anchor" href="#arg-minmobspecsim"></a></dt>
-<dd><p>(<strong>IMS workflow</strong>) If the spectrum similarity of a mobility feature group compared to its IMS parent (see
-<code><a href="assignMobilities_feat.html">assignMobilities</a></code>) is at least this value, then the mobility feature group
-will not be subjected to the annotation algorithm and all feature annotation properties will be copied from its
-parent. This assumes that feature annotation is primarily influenced by the MS/MS spectrum, and can be used to
-speed up the feature annotation process. All scorings, annotation similarities etc. are copied from the IMS parent.
-The fragment annotations are also copied (<code>fragInfo</code> result column), however, these are adjusted based on the
-peak list data of the mobility feature group.</p></dd>
+<dt id="arg-minimsspecsim">minIMSSpecSim<a class="anchor" aria-label="anchor" href="#arg-minimsspecsim"></a></dt>
+<dd><p>(<strong>IMS workflow</strong>) If the spectrum similarity of an IMS feature group compared to its IMS precursor (see
+<code><a href="assignMobilities_feat.html">assignMobilities</a></code>) is at least this value, then the IMS feature group will not
+be subjected to the annotation algorithm and all feature annotation properties will be copied from its precursor.
+This assumes that feature annotation is primarily influenced by the MS/MS spectrum, and can be used to speed up the
+feature annotation process. All scorings, annotation similarities etc. are copied from the IMS precursor. The
+fragment annotations are also copied (<code>fragInfo</code> result column), however, these are adjusted based on the peak
+list data of the IMS feature group.</p></dd>
 
 
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>

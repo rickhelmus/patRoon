@@ -23,14 +23,14 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2026-03-18" />
+<meta name="date" content="2026-03-19" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="managing-legacy-installations.html"/>
+<link rel="prev" href="developers-devtools-pkgload.html"/>
 <link rel="next" href="generating-workflow-data.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
@@ -192,6 +192,7 @@ div.csl-indent {
 <li class="chapter" data-level="2.3.3" data-path="reg_inst.html"><a href="reg_inst.html#verifying-the-installation"><i class="fa fa-check"></i><b>2.3.3</b> Verifying the installation</a></li>
 </ul></li>
 <li class="chapter" data-level="2.4" data-path="managing-legacy-installations.html"><a href="managing-legacy-installations.html"><i class="fa fa-check"></i><b>2.4</b> Managing legacy installations</a></li>
+<li class="chapter" data-level="2.5" data-path="developers-devtools-pkgload.html"><a href="developers-devtools-pkgload.html"><i class="fa fa-check"></i><b>2.5</b> Developers: devtools / pkgload</a></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path="workflow-concepts.html"><a href="workflow-concepts.html"><i class="fa fa-check"></i><b>3</b> Workflow concepts</a></li>
 <li class="chapter" data-level="4" data-path="generating-workflow-data.html"><a href="generating-workflow-data.html"><i class="fa fa-check"></i><b>4</b> Generating workflow data</a>
@@ -415,8 +416,8 @@ div.csl-indent {
 <!-- - show images of feature definition etc? -->
 <p>In a non-target workflow both chromatographic and mass spectral data is automatically processed in order to provide a comprehensive chemical characterization of your samples. While the exact workflow is typically dependent on the type of study, it generally involves of the following steps:</p>
 <!-- UNDONE: include other data processing steps here? -->
-<div id="htmlwidget-37847ae20d83e740f8f8" style="width:750px;height:250px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-37847ae20d83e740f8f8">{"x":{"diagram":"\ndigraph workflow {\n  graph [ rankdir = LR, compound = true, style = invis ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.8,\n         height = 1,\n         fontsize = 20,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n  subgraph cluster1 {\n    \"Data pre-treatment\" -> \"Find features\"\n    \"Find features\" -> \"Group features\"\n  }\n\n  subgraph cluster2 {\n    \"Suspect screening\" -> \"Group features\" [minlen=3, style=dashed]\n    \"Find features\" -> \"Suspect screening\" [style=invis]\n    \"Group features\" -> \"Suspect screening\" [style=dashed]\n  }\n\n  subgraph cluster3 {\n    Componentization\n  }\n  \n  subgraph cluster4 {\n    graph [style = dashed ]\n    color=blue\n    \"MS peak lists\" \"Formula annotation\"  \"Compound Annotation\"\n  }\n\n  \"Group features\" -> \"Componentization\" [ltail=cluster1, lhead=cluster3, style=dashed, dir=both, minlen=3]\n  \"Group features\" -> \"Formula annotation\" [ltail=cluster1, lhead=cluster4, style=dashed, minlen=3]\n  \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-0babbaf8ce470fc006a7" style="width:750px;height:250px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-0babbaf8ce470fc006a7">{"x":{"diagram":"\ndigraph workflow {\n  graph [ rankdir = LR, compound = true, style = invis ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.8,\n         height = 1,\n         fontsize = 20,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n  subgraph cluster1 {\n    \"Data pre-treatment\" -> \"Find features\"\n    \"Find features\" -> \"Group features\"\n  }\n\n  subgraph cluster2 {\n    \"Suspect screening\" -> \"Group features\" [minlen=3, style=dashed]\n    \"Find features\" -> \"Suspect screening\" [style=invis]\n    \"Group features\" -> \"Suspect screening\" [style=dashed]\n  }\n\n  subgraph cluster3 {\n    Componentization\n  }\n  \n  subgraph cluster4 {\n    graph [style = dashed ]\n    color=blue\n    \"MS peak lists\" \"Formula annotation\"  \"Compound Annotation\"\n  }\n\n  \"Group features\" -> \"Componentization\" [ltail=cluster1, lhead=cluster3, style=dashed, dir=both, minlen=3]\n  \"Group features\" -> \"Formula annotation\" [ltail=cluster1, lhead=cluster4, style=dashed, minlen=3]\n  \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p>Note that <code>patRoon</code> supports flexible composition of workflows. In the scheme above you can recognize optional steps by a <em>dashed line</em>. The inclusion of each step is only necessary if a further steps depends on its data. For instance, annotation and componentization do not depend on each other and can therefore be executed in any order or simply be omitted. A brief description of all steps is given below.</p>
 <p>During <strong>data pre-treatment</strong> raw MS data is prepared for further analysis. A common need for this step is to convert the data to an open format so that other tools are able to process it. Other pre-treatment steps may involve re-calibration of <em>m/z</em> data or performing advanced filtering operations.</p>
 <p>The next step is to extract <strong>features</strong> from the data. While different terminologies are used, a feature in <code>patRoon</code> refers to a single chromatographic peak in an extracted ion chromatogram for a single <em>m/z</em> value (within a defined tolerance). Hence, a feature contains both chromatographic data (e.g. retention time and peak height) and mass spectral data (e.g. the accurate <em>m/z</em>). Note that with mass spectrometry multiple <em>m/z</em> values may be detected for a single compound as a result of adduct formation, natural isotopes and/or in-source fragments. Some algorithms may try to combine these different masses in a single feature. However, in <code>patRoon</code> we generally assume this is not the case (and may optionally be done afterwards during the componentization step described below). Features are sometimes simply referred to as ‘peaks’.</p>
@@ -442,7 +443,7 @@ div.csl-indent {
           </div>
         </div>
       </div>
-<a href="managing-legacy-installations.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="developers-devtools-pkgload.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
 <a href="generating-workflow-data.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>

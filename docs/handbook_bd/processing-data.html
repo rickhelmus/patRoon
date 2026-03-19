@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2026-03-18" />
+<meta name="date" content="2026-03-19" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -192,6 +192,7 @@ div.csl-indent {
 <li class="chapter" data-level="2.3.3" data-path="reg_inst.html"><a href="reg_inst.html#verifying-the-installation"><i class="fa fa-check"></i><b>2.3.3</b> Verifying the installation</a></li>
 </ul></li>
 <li class="chapter" data-level="2.4" data-path="managing-legacy-installations.html"><a href="managing-legacy-installations.html"><i class="fa fa-check"></i><b>2.4</b> Managing legacy installations</a></li>
+<li class="chapter" data-level="2.5" data-path="developers-devtools-pkgload.html"><a href="developers-devtools-pkgload.html"><i class="fa fa-check"></i><b>2.5</b> Developers: devtools / pkgload</a></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path="workflow-concepts.html"><a href="workflow-concepts.html"><i class="fa fa-check"></i><b>3</b> Workflow concepts</a></li>
 <li class="chapter" data-level="4" data-path="generating-workflow-data.html"><a href="generating-workflow-data.html"><i class="fa fa-check"></i><b>4</b> Generating workflow data</a>
@@ -410,13 +411,13 @@ div.csl-indent {
 <div id="processing-data" class="section level2 hasAnchor" number="6.4">
 <h2><span class="header-section-number">6.4</span> Processing data<a href="processing-data.html#processing-data" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>All data objects that are generated during a sets workflow <em>inherit</em> from the classes from a ‘regular’ workflow. This means that, with some minor exceptions, <em>all</em> of the data processing functionality discussed in the <a href="processing.html#processing">previous chapter</a> (e.g. subsetting, inspection, filtering, plotting, reporting) is also applicable to a sets workflow. In addition, data from sets workflows also bring some additional data processing functionality. Some examples:</p>
-<div class="sourceCode" id="cb213"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb213-1"><a href="processing-data.html#cb213-1" tabindex="-1"></a><span class="co"># only keep feature groups that have positive data</span></span>
-<span id="cb213-2"><a href="processing-data.html#cb213-2" tabindex="-1"></a>fGroupsPos <span class="ot">&lt;-</span> fGroups[, sets <span class="ot">=</span> <span class="st">&quot;positive&quot;</span>]</span>
-<span id="cb213-3"><a href="processing-data.html#cb213-3" tabindex="-1"></a><span class="co"># only keep feature groups with features present in all sets</span></span>
-<span id="cb213-4"><a href="processing-data.html#cb213-4" tabindex="-1"></a>fGroupsF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">relMinSets =</span> <span class="dv">1</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb214"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb214-1"><a href="processing-data.html#cb214-1" tabindex="-1"></a><span class="co"># only keep feature groups that have positive data</span></span>
+<span id="cb214-2"><a href="processing-data.html#cb214-2" tabindex="-1"></a>fGroupsPos <span class="ot">&lt;-</span> fGroups[, sets <span class="ot">=</span> <span class="st">&quot;positive&quot;</span>]</span>
+<span id="cb214-3"><a href="processing-data.html#cb214-3" tabindex="-1"></a><span class="co"># only keep feature groups with features present in all sets</span></span>
+<span id="cb214-4"><a href="processing-data.html#cb214-4" tabindex="-1"></a>fGroupsF <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">relMinSets =</span> <span class="dv">1</span>)</span></code></pre></div>
 <pre><code>#&gt; Applying minimum sets filter... Done! Filtered 3407 (88.84%) features and 809 (94.07%) feature groups. Remaining: 428 features in 51 groups.</code></pre>
-<div class="sourceCode" id="cb215"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb215-1"><a href="processing-data.html#cb215-1" tabindex="-1"></a><span class="co"># In sets workflows, the m/z values of features are &#39;neutralized&#39;, the `ion_mz` columns contains the original &#39;ionized&#39; m/z values.</span></span>
-<span id="cb215-2"><a href="processing-data.html#cb215-2" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroups)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="fu">c</span>(<span class="st">&quot;group&quot;</span>, <span class="st">&quot;mz&quot;</span>, <span class="st">&quot;ion_mz-positive&quot;</span>, <span class="st">&quot;ion_mz-negative&quot;</span>)]</span></code></pre></div>
+<div class="sourceCode" id="cb216"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb216-1"><a href="processing-data.html#cb216-1" tabindex="-1"></a><span class="co"># In sets workflows, the m/z values of features are &#39;neutralized&#39;, the `ion_mz` columns contains the original &#39;ionized&#39; m/z values.</span></span>
+<span id="cb216-2"><a href="processing-data.html#cb216-2" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroups)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="fu">c</span>(<span class="st">&quot;group&quot;</span>, <span class="st">&quot;mz&quot;</span>, <span class="st">&quot;ion_mz-positive&quot;</span>, <span class="st">&quot;ion_mz-negative&quot;</span>)]</span></code></pre></div>
 <pre><code>#&gt;        group       mz ion_mz-positive ion_mz-negative
 #&gt;       &lt;char&gt;    &lt;num&gt;           &lt;num&gt;           &lt;num&gt;
 #&gt; 1:  M98_R7_1 97.96702              NA        96.95974
@@ -424,8 +425,8 @@ div.csl-indent {
 #&gt; 3: M98_R10_3 97.96709              NA        96.95981
 #&gt; 4:  M98_R5_4 97.96769        98.97497        96.96042
 #&gt; 5: M98_R14_5 97.96787        98.97515        96.96060</code></pre>
-<div class="sourceCode" id="cb217"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb217-1"><a href="processing-data.html#cb217-1" tabindex="-1"></a><span class="co"># Inspect set specific data.</span></span>
-<span id="cb217-2"><a href="processing-data.html#cb217-2" tabindex="-1"></a><span class="fu">as.data.table</span>(compounds)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="fu">c</span>(<span class="st">&quot;group&quot;</span>, <span class="st">&quot;score-positive&quot;</span>, <span class="st">&quot;score-negative&quot;</span>, <span class="st">&quot;compoundName&quot;</span>, <span class="st">&quot;set&quot;</span>)]</span></code></pre></div>
+<div class="sourceCode" id="cb218"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb218-1"><a href="processing-data.html#cb218-1" tabindex="-1"></a><span class="co"># Inspect set specific data.</span></span>
+<span id="cb218-2"><a href="processing-data.html#cb218-2" tabindex="-1"></a><span class="fu">as.data.table</span>(compounds)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="fu">c</span>(<span class="st">&quot;group&quot;</span>, <span class="st">&quot;score-positive&quot;</span>, <span class="st">&quot;score-negative&quot;</span>, <span class="st">&quot;compoundName&quot;</span>, <span class="st">&quot;set&quot;</span>)]</span></code></pre></div>
 <pre><code>#&gt;            group score-positive score-negative                                     compoundName               set
 #&gt;           &lt;char&gt;          &lt;num&gt;          &lt;num&gt;                                           &lt;char&gt;            &lt;char&gt;
 #&gt; 1: M198_R317_273      3.5190115       4.569478              3-(4-chlorophenyl)-1,1-dimethylurea positive,negative
@@ -434,18 +435,18 @@ div.csl-indent {
 #&gt; 4: M198_R317_273      1.1464384       1.275575              3-(3-chlorophenyl)-1,1-dimethylurea positive,negative
 #&gt; 5: M198_R317_273      0.9982564       1.127393                   1-(4-chlorophenyl)-3-ethylurea positive,negative</code></pre>
 <p>In sets workflows the <a href="sample-analyses.html#anaInfo">analysis information</a> is amended with a <code>set</code> column to specify the set each analysis belongs to. Just like <a href="useMeta.html#useMeta">other columns</a> in the analysis information, the <code>set</code> column can be used to group and aggregate data:</p>
-<div class="sourceCode" id="cb219"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb219-1"><a href="processing-data.html#cb219-1" tabindex="-1"></a><span class="co"># only keep feature groups with features present in both polarities</span></span>
-<span id="cb219-2"><a href="processing-data.html#cb219-2" tabindex="-1"></a>fGroupsPosNeg <span class="ot">&lt;-</span> <span class="fu">overlap</span>(fGroups, <span class="at">which =</span> <span class="fu">c</span>(<span class="st">&quot;positive&quot;</span>, <span class="st">&quot;negative&quot;</span>), <span class="at">aggregate =</span> <span class="st">&quot;set&quot;</span>)</span>
-<span id="cb219-3"><a href="processing-data.html#cb219-3" tabindex="-1"></a><span class="co"># only keep feature groups with features that are present only in positive mode</span></span>
-<span id="cb219-4"><a href="processing-data.html#cb219-4" tabindex="-1"></a>fGroupsOnlyPos <span class="ot">&lt;-</span> <span class="fu">unique</span>(fGroups, <span class="at">which =</span> <span class="st">&quot;positive&quot;</span>, <span class="at">aggregate =</span> <span class="st">&quot;set&quot;</span>)</span>
-<span id="cb219-5"><a href="processing-data.html#cb219-5" tabindex="-1"></a></span>
-<span id="cb219-6"><a href="processing-data.html#cb219-6" tabindex="-1"></a><span class="fu">plotVenn</span>(fGroups, <span class="at">aggregate =</span> <span class="st">&quot;set&quot;</span>, <span class="at">margin =</span> <span class="fl">0.1</span>) <span class="co"># compare positive/negative features</span></span></code></pre></div>
+<div class="sourceCode" id="cb220"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb220-1"><a href="processing-data.html#cb220-1" tabindex="-1"></a><span class="co"># only keep feature groups with features present in both polarities</span></span>
+<span id="cb220-2"><a href="processing-data.html#cb220-2" tabindex="-1"></a>fGroupsPosNeg <span class="ot">&lt;-</span> <span class="fu">overlap</span>(fGroups, <span class="at">which =</span> <span class="fu">c</span>(<span class="st">&quot;positive&quot;</span>, <span class="st">&quot;negative&quot;</span>), <span class="at">aggregate =</span> <span class="st">&quot;set&quot;</span>)</span>
+<span id="cb220-3"><a href="processing-data.html#cb220-3" tabindex="-1"></a><span class="co"># only keep feature groups with features that are present only in positive mode</span></span>
+<span id="cb220-4"><a href="processing-data.html#cb220-4" tabindex="-1"></a>fGroupsOnlyPos <span class="ot">&lt;-</span> <span class="fu">unique</span>(fGroups, <span class="at">which =</span> <span class="st">&quot;positive&quot;</span>, <span class="at">aggregate =</span> <span class="st">&quot;set&quot;</span>)</span>
+<span id="cb220-5"><a href="processing-data.html#cb220-5" tabindex="-1"></a></span>
+<span id="cb220-6"><a href="processing-data.html#cb220-6" tabindex="-1"></a><span class="fu">plotVenn</span>(fGroups, <span class="at">aggregate =</span> <span class="st">&quot;set&quot;</span>, <span class="at">margin =</span> <span class="fl">0.1</span>) <span class="co"># compare positive/negative features</span></span></code></pre></div>
 <p><img src="handbook_files/figure-html/setsProcMeta-1.png" alt="" width="50%" /></p>
-<div class="sourceCode" id="cb220"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb220-1"><a href="processing-data.html#cb220-1" tabindex="-1"></a><span class="fu">plotChord</span>(fGroups, <span class="at">aggregate =</span> <span class="cn">TRUE</span>, <span class="at">groupBy =</span> <span class="st">&quot;set&quot;</span>) <span class="co"># compare replicate aggregated positive/negative features</span></span></code></pre></div>
+<div class="sourceCode" id="cb221"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb221-1"><a href="processing-data.html#cb221-1" tabindex="-1"></a><span class="fu">plotChord</span>(fGroups, <span class="at">aggregate =</span> <span class="cn">TRUE</span>, <span class="at">groupBy =</span> <span class="st">&quot;set&quot;</span>) <span class="co"># compare replicate aggregated positive/negative features</span></span></code></pre></div>
 <p><img src="handbook_files/figure-html/setsProcMeta-2.png" alt="" width="50%" /></p>
-<div class="sourceCode" id="cb221"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb221-1"><a href="processing-data.html#cb221-1" tabindex="-1"></a><span class="co"># plot annotated positive/negative mirror spectrum</span></span>
-<span id="cb221-2"><a href="processing-data.html#cb221-2" tabindex="-1"></a><span class="fu">plotSpectrum</span>(compounds, <span class="at">index =</span> <span class="dv">1</span>, <span class="at">groupName =</span> <span class="st">&quot;M198_R317_273&quot;</span>, <span class="at">MSPeakLists =</span> mslists,</span>
-<span id="cb221-3"><a href="processing-data.html#cb221-3" tabindex="-1"></a>             <span class="at">plotStruct =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb222"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb222-1"><a href="processing-data.html#cb222-1" tabindex="-1"></a><span class="co"># plot annotated positive/negative mirror spectrum</span></span>
+<span id="cb222-2"><a href="processing-data.html#cb222-2" tabindex="-1"></a><span class="fu">plotSpectrum</span>(compounds, <span class="at">index =</span> <span class="dv">1</span>, <span class="at">groupName =</span> <span class="st">&quot;M198_R317_273&quot;</span>, <span class="at">MSPeakLists =</span> mslists,</span>
+<span id="cb222-3"><a href="processing-data.html#cb222-3" tabindex="-1"></a>             <span class="at">plotStruct =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <p><img src="handbook_files/figure-html/setsProcMeta-3.png" alt="" width="50%" /></p>
 <p>The reference manual for the workflow objects contains specific notes applicable to sets workflows (<code>?featureGroups</code>, <code>?compounds</code> etc).</p>
 </div>

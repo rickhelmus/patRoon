@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2026-03-18" />
+<meta name="date" content="2026-03-19" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -192,6 +192,7 @@ div.csl-indent {
 <li class="chapter" data-level="2.3.3" data-path="reg_inst.html"><a href="reg_inst.html#verifying-the-installation"><i class="fa fa-check"></i><b>2.3.3</b> Verifying the installation</a></li>
 </ul></li>
 <li class="chapter" data-level="2.4" data-path="managing-legacy-installations.html"><a href="managing-legacy-installations.html"><i class="fa fa-check"></i><b>2.4</b> Managing legacy installations</a></li>
+<li class="chapter" data-level="2.5" data-path="developers-devtools-pkgload.html"><a href="developers-devtools-pkgload.html"><i class="fa fa-check"></i><b>2.5</b> Developers: devtools / pkgload</a></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path="workflow-concepts.html"><a href="workflow-concepts.html"><i class="fa fa-check"></i><b>3</b> Workflow concepts</a></li>
 <li class="chapter" data-level="4" data-path="generating-workflow-data.html"><a href="generating-workflow-data.html"><i class="fa fa-check"></i><b>4</b> Generating workflow data</a>
@@ -410,11 +411,11 @@ div.csl-indent {
 <div id="useMeta" class="section level2 hasAnchor" number="5.10">
 <h2><span class="header-section-number">5.10</span> Use and modify sample analysis metadata<a href="useMeta.html#useMeta" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The <a href="sample-analyses.html#anaInfo">analysis information</a> section briefly introduced the incorporation of sample metadata. For instance, consider the following analysis information for a degradation experiment:</p>
-<div class="sourceCode" id="cb180"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb180-1"><a href="useMeta.html#cb180-1" tabindex="-1"></a><span class="co"># create analysis information: for demonstrative purposes we just base it on the example data</span></span>
-<span id="cb180-2"><a href="useMeta.html#cb180-2" tabindex="-1"></a>anaInfoMeta <span class="ot">&lt;-</span> anaInfo</span>
-<span id="cb180-3"><a href="useMeta.html#cb180-3" tabindex="-1"></a>anaInfoMeta<span class="sc">$</span>experiment <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;UV&quot;</span>, <span class="st">&quot;UV&quot;</span>, <span class="st">&quot;H2O2&quot;</span>, <span class="st">&quot;H2O2&quot;</span>, <span class="st">&quot;O3&quot;</span>, <span class="st">&quot;O3&quot;</span>)</span>
-<span id="cb180-4"><a href="useMeta.html#cb180-4" tabindex="-1"></a>anaInfoMeta<span class="sc">$</span>exposure <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">30</span>, <span class="dv">0</span>, <span class="dv">10</span>) <span class="co"># time in minutes</span></span>
-<span id="cb180-5"><a href="useMeta.html#cb180-5" tabindex="-1"></a>anaInfoMeta[, <span class="fu">c</span>(<span class="st">&quot;analysis&quot;</span>, <span class="st">&quot;experiment&quot;</span>, <span class="st">&quot;exposure&quot;</span>)]</span></code></pre></div>
+<div class="sourceCode" id="cb181"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb181-1"><a href="useMeta.html#cb181-1" tabindex="-1"></a><span class="co"># create analysis information: for demonstrative purposes we just base it on the example data</span></span>
+<span id="cb181-2"><a href="useMeta.html#cb181-2" tabindex="-1"></a>anaInfoMeta <span class="ot">&lt;-</span> anaInfo</span>
+<span id="cb181-3"><a href="useMeta.html#cb181-3" tabindex="-1"></a>anaInfoMeta<span class="sc">$</span>experiment <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;UV&quot;</span>, <span class="st">&quot;UV&quot;</span>, <span class="st">&quot;H2O2&quot;</span>, <span class="st">&quot;H2O2&quot;</span>, <span class="st">&quot;O3&quot;</span>, <span class="st">&quot;O3&quot;</span>)</span>
+<span id="cb181-4"><a href="useMeta.html#cb181-4" tabindex="-1"></a>anaInfoMeta<span class="sc">$</span>exposure <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">30</span>, <span class="dv">0</span>, <span class="dv">10</span>) <span class="co"># time in minutes</span></span>
+<span id="cb181-5"><a href="useMeta.html#cb181-5" tabindex="-1"></a>anaInfoMeta[, <span class="fu">c</span>(<span class="st">&quot;analysis&quot;</span>, <span class="st">&quot;experiment&quot;</span>, <span class="st">&quot;exposure&quot;</span>)]</span></code></pre></div>
 <pre><code>#&gt;         analysis experiment exposure
 #&gt; 1  solvent-pos-1         UV        0
 #&gt; 2  solvent-pos-2         UV       10
@@ -423,8 +424,8 @@ div.csl-indent {
 #&gt; 5 standard-pos-2         O3        0
 #&gt; 6 standard-pos-3         O3       10</code></pre>
 <p>As <a href="procInspect.html#procInspect">briefly mentioned before</a>, the <code>analysisInfo()</code> function can be used query the analysis information of a workflow object.</p>
-<div class="sourceCode" id="cb182"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb182-1"><a href="useMeta.html#cb182-1" tabindex="-1"></a><span class="co"># fGroupsMeta is a feature groups object with the anaInfoMeta as analysis information</span></span>
-<span id="cb182-2"><a href="useMeta.html#cb182-2" tabindex="-1"></a><span class="fu">analysisInfo</span>(fGroupsMeta)[, <span class="fu">c</span>(<span class="st">&quot;analysis&quot;</span>, <span class="st">&quot;experiment&quot;</span>, <span class="st">&quot;exposure&quot;</span>)]</span></code></pre></div>
+<div class="sourceCode" id="cb183"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb183-1"><a href="useMeta.html#cb183-1" tabindex="-1"></a><span class="co"># fGroupsMeta is a feature groups object with the anaInfoMeta as analysis information</span></span>
+<span id="cb183-2"><a href="useMeta.html#cb183-2" tabindex="-1"></a><span class="fu">analysisInfo</span>(fGroupsMeta)[, <span class="fu">c</span>(<span class="st">&quot;analysis&quot;</span>, <span class="st">&quot;experiment&quot;</span>, <span class="st">&quot;exposure&quot;</span>)]</span></code></pre></div>
 <pre><code>#&gt;          analysis experiment exposure
 #&gt;            &lt;char&gt;     &lt;char&gt;    &lt;num&gt;
 #&gt; 1:  solvent-pos-1         UV        0
@@ -434,15 +435,15 @@ div.csl-indent {
 #&gt; 5: standard-pos-2         O3        0
 #&gt; 6: standard-pos-3         O3       10</code></pre>
 <p>The <code>ni</code> argument can be used to easily subset a features and feature groups objects. It works very similar as subsetting a <code>data.table</code> with the <code>i</code> argument.</p>
-<div class="sourceCode" id="cb184"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb184-1"><a href="useMeta.html#cb184-1" tabindex="-1"></a><span class="fu">analyses</span>(fGroupsMeta[<span class="at">ni =</span> experiment <span class="sc">==</span> <span class="st">&quot;H2O2&quot;</span>])</span></code></pre></div>
+<div class="sourceCode" id="cb185"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb185-1"><a href="useMeta.html#cb185-1" tabindex="-1"></a><span class="fu">analyses</span>(fGroupsMeta[<span class="at">ni =</span> experiment <span class="sc">==</span> <span class="st">&quot;H2O2&quot;</span>])</span></code></pre></div>
 <pre><code>#&gt; [1] &quot;solvent-pos-3&quot;  &quot;standard-pos-1&quot;</code></pre>
-<div class="sourceCode" id="cb186"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb186-1"><a href="useMeta.html#cb186-1" tabindex="-1"></a><span class="fu">analyses</span>(fGroupsMeta[<span class="at">ni =</span> exposure <span class="sc">&gt;=</span> <span class="dv">20</span>])</span></code></pre></div>
+<div class="sourceCode" id="cb187"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb187-1"><a href="useMeta.html#cb187-1" tabindex="-1"></a><span class="fu">analyses</span>(fGroupsMeta[<span class="at">ni =</span> exposure <span class="sc">&gt;=</span> <span class="dv">20</span>])</span></code></pre></div>
 <pre><code>#&gt; [1] &quot;solvent-pos-3&quot;  &quot;standard-pos-1&quot;</code></pre>
-<div class="sourceCode" id="cb188"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb188-1"><a href="useMeta.html#cb188-1" tabindex="-1"></a><span class="co"># we can also use standard analysis information columns</span></span>
-<span id="cb188-2"><a href="useMeta.html#cb188-2" tabindex="-1"></a><span class="fu">analyses</span>(fGroups[<span class="at">ni =</span> replicate <span class="sc">==</span> <span class="st">&quot;standard-pos&quot;</span>])</span></code></pre></div>
+<div class="sourceCode" id="cb189"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb189-1"><a href="useMeta.html#cb189-1" tabindex="-1"></a><span class="co"># we can also use standard analysis information columns</span></span>
+<span id="cb189-2"><a href="useMeta.html#cb189-2" tabindex="-1"></a><span class="fu">analyses</span>(fGroups[<span class="at">ni =</span> replicate <span class="sc">==</span> <span class="st">&quot;standard-pos&quot;</span>])</span></code></pre></div>
 <pre><code>#&gt; [1] &quot;standard-pos-1&quot; &quot;standard-pos-2&quot; &quot;standard-pos-3&quot;</code></pre>
 <p>The <code>anaInfoCols</code> argument can be used to add metadata to the output table generated by <code>as.data.table()</code> (and <code>as.data.frame()</code>).</p>
-<div class="sourceCode" id="cb190"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb190-1"><a href="useMeta.html#cb190-1" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroupsMeta, <span class="at">features =</span> <span class="cn">TRUE</span>, <span class="at">anaInfoCols =</span> <span class="fu">c</span>(<span class="st">&quot;experiment&quot;</span>, <span class="st">&quot;exposure&quot;</span>))[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, .(group, analysis, anaInfo_experiment, anaInfo_exposure)]</span></code></pre></div>
+<div class="sourceCode" id="cb191"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb191-1"><a href="useMeta.html#cb191-1" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroupsMeta, <span class="at">features =</span> <span class="cn">TRUE</span>, <span class="at">anaInfoCols =</span> <span class="fu">c</span>(<span class="st">&quot;experiment&quot;</span>, <span class="st">&quot;exposure&quot;</span>))[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, .(group, analysis, anaInfo_experiment, anaInfo_exposure)]</span></code></pre></div>
 <pre><code>#&gt;        group       analysis anaInfo_experiment anaInfo_exposure
 #&gt;       &lt;char&gt;         &lt;char&gt;             &lt;char&gt;            &lt;num&gt;
 #&gt; 1: M99_R14_1  solvent-pos-1                 UV                0
@@ -485,7 +486,7 @@ div.csl-indent {
 </tbody>
 </table>
 <p>Some examples are shown below.</p>
-<div class="sourceCode" id="cb192"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb192-1"><a href="useMeta.html#cb192-1" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroupsMeta, <span class="at">average =</span> <span class="st">&quot;experiment&quot;</span>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>] <span class="co"># average intensities by experiment</span></span></code></pre></div>
+<div class="sourceCode" id="cb193"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb193-1"><a href="useMeta.html#cb193-1" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroupsMeta, <span class="at">average =</span> <span class="st">&quot;experiment&quot;</span>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>] <span class="co"># average intensities by experiment</span></span></code></pre></div>
 <pre><code>#&gt;         group       ret        mz UV_intensity H2O2_intensity O3_intensity
 #&gt;        &lt;char&gt;     &lt;num&gt;     &lt;num&gt;        &lt;num&gt;          &lt;num&gt;        &lt;num&gt;
 #&gt; 1:  M99_R14_1 13.643769  98.97530       363518         325318       297774
@@ -493,11 +494,11 @@ div.csl-indent {
 #&gt; 3:  M100_R7_3  7.042372 100.11197       349810         283356       278576
 #&gt; 4:  M100_R5_4  5.020052 100.11198            0              0        41400
 #&gt; 5: M100_R28_5 27.729320 100.11203       302680         303282       275468</code></pre>
-<div class="sourceCode" id="cb194"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb194-1"><a href="useMeta.html#cb194-1" tabindex="-1"></a><span class="fu">plotVenn</span>(fGroupsMeta, <span class="at">aggregate =</span> <span class="st">&quot;experiment&quot;</span>) <span class="co"># compare feature presence by experiment</span></span></code></pre></div>
+<div class="sourceCode" id="cb195"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb195-1"><a href="useMeta.html#cb195-1" tabindex="-1"></a><span class="fu">plotVenn</span>(fGroupsMeta, <span class="at">aggregate =</span> <span class="st">&quot;experiment&quot;</span>) <span class="co"># compare feature presence by experiment</span></span></code></pre></div>
 <p><img src="handbook_files/figure-html/metaBy-1.png" alt="" width="50%" /></p>
-<div class="sourceCode" id="cb195"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb195-1"><a href="useMeta.html#cb195-1" tabindex="-1"></a><span class="fu">plotChord</span>(fGroupsMeta, <span class="at">aggregate =</span> <span class="cn">FALSE</span>, <span class="at">groupBy =</span> <span class="st">&quot;experiment&quot;</span>) <span class="co"># group feature overlap by experiment</span></span></code></pre></div>
+<div class="sourceCode" id="cb196"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb196-1"><a href="useMeta.html#cb196-1" tabindex="-1"></a><span class="fu">plotChord</span>(fGroupsMeta, <span class="at">aggregate =</span> <span class="cn">FALSE</span>, <span class="at">groupBy =</span> <span class="st">&quot;experiment&quot;</span>) <span class="co"># group feature overlap by experiment</span></span></code></pre></div>
 <p><img src="handbook_files/figure-html/metaBy-2.png" alt="" width="50%" /></p>
-<div class="sourceCode" id="cb196"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb196-1"><a href="useMeta.html#cb196-1" tabindex="-1"></a><span class="fu">plotChroms</span>(fGroupsMeta[, <span class="dv">320</span>], <span class="at">groupBy =</span> <span class="st">&quot;experiment&quot;</span>, <span class="at">showLegend =</span> <span class="cn">TRUE</span>) <span class="co"># EICs grouped by experiment</span></span></code></pre></div>
+<div class="sourceCode" id="cb197"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb197-1"><a href="useMeta.html#cb197-1" tabindex="-1"></a><span class="fu">plotChroms</span>(fGroupsMeta[, <span class="dv">320</span>], <span class="at">groupBy =</span> <span class="st">&quot;experiment&quot;</span>, <span class="at">showLegend =</span> <span class="cn">TRUE</span>) <span class="co"># EICs grouped by experiment</span></span></code></pre></div>
 <pre><code>#&gt; Using &#39;mzr&#39; backend for reading MS data.
 #&gt; ================================================================================</code></pre>
 <p><img src="handbook_files/figure-html/metaBy-3.png" alt="" width="50%" /></p>
@@ -505,15 +506,15 @@ div.csl-indent {
 <div id="modifying-analysis-information" class="section level3 hasAnchor" number="5.10.2">
 <h3><span class="header-section-number">5.10.2</span> Modifying analysis information<a href="useMeta.html#modifying-analysis-information" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The analysis information in <code>features</code> and <code>featureGroups</code> objects can be modified with in two ways. The first is to use the subset operator (<code>[</code>]) to re-order the analyses within the object. This may be useful, for instance, to change the order in plots:</p>
-<div class="sourceCode" id="cb198"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb198-1"><a href="useMeta.html#cb198-1" tabindex="-1"></a>fGroupsToPlot <span class="ot">&lt;-</span> fGroupsMeta[, <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>]</span>
-<span id="cb198-2"><a href="useMeta.html#cb198-2" tabindex="-1"></a><span class="fu">plotInt</span>(fGroupsToPlot, <span class="at">average =</span> <span class="cn">FALSE</span>) <span class="co"># default order</span></span>
-<span id="cb198-3"><a href="useMeta.html#cb198-3" tabindex="-1"></a>fGroupsReverse <span class="ot">&lt;-</span> fGroupsToPlot[<span class="fu">rev</span>(<span class="fu">analyses</span>(fGroupsToPlot)), reorder <span class="ot">=</span> <span class="cn">TRUE</span>]</span>
-<span id="cb198-4"><a href="useMeta.html#cb198-4" tabindex="-1"></a><span class="fu">plotInt</span>(fGroupsReverse, <span class="at">average =</span> <span class="cn">FALSE</span>) <span class="co"># reversed order</span></span></code></pre></div>
+<div class="sourceCode" id="cb199"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb199-1"><a href="useMeta.html#cb199-1" tabindex="-1"></a>fGroupsToPlot <span class="ot">&lt;-</span> fGroupsMeta[, <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>]</span>
+<span id="cb199-2"><a href="useMeta.html#cb199-2" tabindex="-1"></a><span class="fu">plotInt</span>(fGroupsToPlot, <span class="at">average =</span> <span class="cn">FALSE</span>) <span class="co"># default order</span></span>
+<span id="cb199-3"><a href="useMeta.html#cb199-3" tabindex="-1"></a>fGroupsReverse <span class="ot">&lt;-</span> fGroupsToPlot[<span class="fu">rev</span>(<span class="fu">analyses</span>(fGroupsToPlot)), reorder <span class="ot">=</span> <span class="cn">TRUE</span>]</span>
+<span id="cb199-4"><a href="useMeta.html#cb199-4" tabindex="-1"></a><span class="fu">plotInt</span>(fGroupsReverse, <span class="at">average =</span> <span class="cn">FALSE</span>) <span class="co"># reversed order</span></span></code></pre></div>
 <p><img src="handbook_files/figure-html/AnaReorder-1.png" alt="" width="50%" /><img src="handbook_files/figure-html/AnaReorder-2.png" alt="" width="50%" /></p>
 <p>The second option is to modify the analysis information table itself by using the <code>analysisInfo()&lt;-</code> assignment method function.</p>
-<div class="sourceCode" id="cb199"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb199-1"><a href="useMeta.html#cb199-1" tabindex="-1"></a><span class="co"># add pH column</span></span>
-<span id="cb199-2"><a href="useMeta.html#cb199-2" tabindex="-1"></a><span class="fu">analysisInfo</span>(fGroupsMeta)<span class="sc">$</span>pH <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">7.0</span>, <span class="fl">7.0</span>, <span class="fl">3.5</span>, <span class="fl">3.5</span>, <span class="fl">2.0</span>, <span class="fl">2.0</span>)</span>
-<span id="cb199-3"><a href="useMeta.html#cb199-3" tabindex="-1"></a><span class="fu">analysisInfo</span>(fGroupsMeta)[, .(analysis, experiment, exposure, pH)]</span></code></pre></div>
+<div class="sourceCode" id="cb200"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb200-1"><a href="useMeta.html#cb200-1" tabindex="-1"></a><span class="co"># add pH column</span></span>
+<span id="cb200-2"><a href="useMeta.html#cb200-2" tabindex="-1"></a><span class="fu">analysisInfo</span>(fGroupsMeta)<span class="sc">$</span>pH <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">7.0</span>, <span class="fl">7.0</span>, <span class="fl">3.5</span>, <span class="fl">3.5</span>, <span class="fl">2.0</span>, <span class="fl">2.0</span>)</span>
+<span id="cb200-3"><a href="useMeta.html#cb200-3" tabindex="-1"></a><span class="fu">analysisInfo</span>(fGroupsMeta)[, .(analysis, experiment, exposure, pH)]</span></code></pre></div>
 <pre><code>#&gt;          analysis experiment exposure    pH
 #&gt;            &lt;char&gt;     &lt;char&gt;    &lt;num&gt; &lt;num&gt;
 #&gt; 1:  solvent-pos-1         UV        0   7.0
@@ -522,11 +523,11 @@ div.csl-indent {
 #&gt; 4: standard-pos-1       H2O2       30   3.5
 #&gt; 5: standard-pos-2         O3        0   2.0
 #&gt; 6: standard-pos-3         O3       10   2.0</code></pre>
-<div class="sourceCode" id="cb201"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb201-1"><a href="useMeta.html#cb201-1" tabindex="-1"></a><span class="co"># and remove it: take a copy, modify and replace it</span></span>
-<span id="cb201-2"><a href="useMeta.html#cb201-2" tabindex="-1"></a>tab <span class="ot">&lt;-</span> data.table<span class="sc">::</span><span class="fu">copy</span>(<span class="fu">analysisInfo</span>(fGroupsMeta))</span>
-<span id="cb201-3"><a href="useMeta.html#cb201-3" tabindex="-1"></a>tab[, pH <span class="sc">:=</span> <span class="cn">NULL</span>] <span class="co"># remove pH column</span></span>
-<span id="cb201-4"><a href="useMeta.html#cb201-4" tabindex="-1"></a><span class="fu">analysisInfo</span>(fGroupsMeta) <span class="ot">&lt;-</span> tab</span>
-<span id="cb201-5"><a href="useMeta.html#cb201-5" tabindex="-1"></a><span class="fu">colnames</span>(<span class="fu">analysisInfo</span>(fGroupsMeta)) <span class="co"># check if column is removed</span></span></code></pre></div>
+<div class="sourceCode" id="cb202"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb202-1"><a href="useMeta.html#cb202-1" tabindex="-1"></a><span class="co"># and remove it: take a copy, modify and replace it</span></span>
+<span id="cb202-2"><a href="useMeta.html#cb202-2" tabindex="-1"></a>tab <span class="ot">&lt;-</span> data.table<span class="sc">::</span><span class="fu">copy</span>(<span class="fu">analysisInfo</span>(fGroupsMeta))</span>
+<span id="cb202-3"><a href="useMeta.html#cb202-3" tabindex="-1"></a>tab[, pH <span class="sc">:=</span> <span class="cn">NULL</span>] <span class="co"># remove pH column</span></span>
+<span id="cb202-4"><a href="useMeta.html#cb202-4" tabindex="-1"></a><span class="fu">analysisInfo</span>(fGroupsMeta) <span class="ot">&lt;-</span> tab</span>
+<span id="cb202-5"><a href="useMeta.html#cb202-5" tabindex="-1"></a><span class="fu">colnames</span>(<span class="fu">analysisInfo</span>(fGroupsMeta)) <span class="co"># check if column is removed</span></span></code></pre></div>
 <pre><code>#&gt; [1] &quot;analysis&quot;      &quot;path_centroid&quot; &quot;path_raw&quot;      &quot;path_profile&quot;  &quot;path_ims&quot;      &quot;replicate&quot;     &quot;blank&quot;         &quot;experiment&quot;    &quot;exposure&quot;</code></pre>
 <blockquote>
 <p><strong><em>NOTE</em></strong> The analysis information is internally stored as a <code>data.table</code>. Do not attempt to modify it directly with the reference assignment operator (<code>:=</code>) of <code>data.table</code>. Instead, alter a copy and replace the table, as demonstrated by the second example above.</p>

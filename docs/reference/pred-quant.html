@@ -270,7 +270,7 @@ fingerprints), <code>"SMILES"</code> or <code>"both"</code>. Only relevant for <
 <dt id="arg-ims">IMS<a class="anchor" aria-label="anchor" href="#arg-ims"></a></dt>
 <dd><p>(<strong>IMS workflow</strong>) Specifies which feature groups are considered for generating calibrant data in IMS workflows. The following options
   are valid:</p><ul><li><p><code>"both"</code>: Selects IMS and non-IMS features.</p></li>
-<li><p><code>"maybe"</code>: Selects non-IMS features and IMS features without assigned IMS parent.</p></li>
+<li><p><code>"maybe"</code>: Selects non-IMS features and IMS features without assigned IMS precursor.</p></li>
 <li><p><code>FALSE</code>: Selects only non-IMS features.</p></li>
 <li><p><code>TRUE</code>: Selects only IMS features.</p></li>
 </ul><p>Best to keep this <code>"maybe"</code>, as calibration typically doesn't support IMS filtered data.</p></dd>
@@ -370,11 +370,11 @@ from <acronym>SMILES</acronym> data.</p></li>
   concentrations is assigned for all response factors. These values can later be easily aggregated with <em>e.g.</em> the
   <a href="feature-table.html">as.data.table</a> function.</p>
 <p>In IMS workflows with post mobility assignments (see
-  <code><a href="assignMobilities_feat.html">assignMobilities</a></code>), the intensities of <em>IMS parents</em> are used for the
-  calculation of concentrations for mobility features (as calibration typically does not consider differences due to
-  mobility filtering). However, the response factor assigned to mobility features are still used. This may yield
+  <code><a href="assignMobilities_feat.html">assignMobilities</a></code>), the intensities of <em>IMS precursors</em> are used for the
+  calculation of concentrations for IMS features (as calibration typically does not consider differences due to
+  mobility filtering). However, the response factor assigned to IMS features are still used. This may yield
   small differences compared to workflows where concentrations are assigned prior to mobility assignments, as
-  <code>assignMobilities</code> simply copies concentrations from IMS parents to mobility features.</p>
+  <code>assignMobilities</code> simply copies concentrations from IMS precursors to IMS features.</p>
     </div>
     <div id="references">
     <h2>References</h2>

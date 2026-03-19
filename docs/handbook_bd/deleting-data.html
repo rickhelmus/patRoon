@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2026-03-18" />
+<meta name="date" content="2026-03-19" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -192,6 +192,7 @@ div.csl-indent {
 <li class="chapter" data-level="2.3.3" data-path="reg_inst.html"><a href="reg_inst.html#verifying-the-installation"><i class="fa fa-check"></i><b>2.3.3</b> Verifying the installation</a></li>
 </ul></li>
 <li class="chapter" data-level="2.4" data-path="managing-legacy-installations.html"><a href="managing-legacy-installations.html"><i class="fa fa-check"></i><b>2.4</b> Managing legacy installations</a></li>
+<li class="chapter" data-level="2.5" data-path="developers-devtools-pkgload.html"><a href="developers-devtools-pkgload.html"><i class="fa fa-check"></i><b>2.5</b> Developers: devtools / pkgload</a></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path="workflow-concepts.html"><a href="workflow-concepts.html"><i class="fa fa-check"></i><b>3</b> Workflow concepts</a></li>
 <li class="chapter" data-level="4" data-path="generating-workflow-data.html"><a href="generating-workflow-data.html"><i class="fa fa-check"></i><b>4</b> Generating workflow data</a>
@@ -448,44 +449,44 @@ div.csl-indent {
 </tbody>
 </table>
 <p>If <code>i</code>, <code>j</code> and/or <code>k</code> is not specified (<code>NULL</code>) then data is removed for the complete selection. Some examples are shown below:</p>
-<div class="sourceCode" id="cb113"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb113-1"><a href="deleting-data.html#cb113-1" tabindex="-1"></a><span class="co"># delete 2nd feature in analysis-1</span></span>
-<span id="cb113-2"><a href="deleting-data.html#cb113-2" tabindex="-1"></a>fList <span class="ot">&lt;-</span> <span class="fu">delete</span>(fList, <span class="at">i =</span> <span class="st">&quot;analysis-1&quot;</span>, <span class="at">j =</span> <span class="dv">2</span>)</span>
-<span id="cb113-3"><a href="deleting-data.html#cb113-3" tabindex="-1"></a><span class="co"># delete first ten features in all analyses</span></span>
-<span id="cb113-4"><a href="deleting-data.html#cb113-4" tabindex="-1"></a>fList <span class="ot">&lt;-</span> <span class="fu">delete</span>(fList, <span class="at">i =</span> <span class="cn">NULL</span>, <span class="at">j =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>)</span>
-<span id="cb113-5"><a href="deleting-data.html#cb113-5" tabindex="-1"></a></span>
-<span id="cb113-6"><a href="deleting-data.html#cb113-6" tabindex="-1"></a><span class="co"># completely remove third+fourth analyses from feature groups</span></span>
-<span id="cb113-7"><a href="deleting-data.html#cb113-7" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">delete</span>(fGroups, <span class="at">i =</span> <span class="dv">3</span><span class="sc">:</span><span class="dv">4</span>)</span>
-<span id="cb113-8"><a href="deleting-data.html#cb113-8" tabindex="-1"></a><span class="co"># delete specific feature group</span></span>
-<span id="cb113-9"><a href="deleting-data.html#cb113-9" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">delete</span>(fGroups, <span class="at">j =</span> <span class="st">&quot;M120_R268_30&quot;</span>)</span>
-<span id="cb113-10"><a href="deleting-data.html#cb113-10" tabindex="-1"></a><span class="co"># delete range of feature groups</span></span>
-<span id="cb113-11"><a href="deleting-data.html#cb113-11" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">delete</span>(fGroups, <span class="at">j =</span> <span class="dv">500</span><span class="sc">:</span><span class="dv">750</span>)</span>
-<span id="cb113-12"><a href="deleting-data.html#cb113-12" tabindex="-1"></a></span>
-<span id="cb113-13"><a href="deleting-data.html#cb113-13" tabindex="-1"></a><span class="co"># remove all hits for atrazine</span></span>
-<span id="cb113-14"><a href="deleting-data.html#cb113-14" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">delete</span>(<span class="at">k =</span> <span class="st">&quot;atrazine&quot;</span>)</span>
-<span id="cb113-15"><a href="deleting-data.html#cb113-15" tabindex="-1"></a><span class="co"># for a specific feature group</span></span>
-<span id="cb113-16"><a href="deleting-data.html#cb113-16" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">delete</span>(<span class="at">j =</span> <span class="st">&quot;M120_R268_30&quot;</span>, <span class="at">k =</span> <span class="st">&quot;atrazine&quot;</span>)</span>
-<span id="cb113-17"><a href="deleting-data.html#cb113-17" tabindex="-1"></a><span class="co"># remove all hits for a feature group</span></span>
-<span id="cb113-18"><a href="deleting-data.html#cb113-18" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">delete</span>(<span class="at">j =</span> <span class="st">&quot;M120_R268_30&quot;</span>, <span class="at">k =</span> <span class="cn">NA</span>)</span>
-<span id="cb113-19"><a href="deleting-data.html#cb113-19" tabindex="-1"></a></span>
-<span id="cb113-20"><a href="deleting-data.html#cb113-20" tabindex="-1"></a><span class="co"># remove all MS peak lists for a feature group</span></span>
-<span id="cb113-21"><a href="deleting-data.html#cb113-21" tabindex="-1"></a>mslists <span class="ot">&lt;-</span> <span class="fu">delete</span>(mslists, <span class="at">i =</span> <span class="st">&quot;M120_R268_30&quot;</span>)</span>
-<span id="cb113-22"><a href="deleting-data.html#cb113-22" tabindex="-1"></a><span class="co"># removes the first 5 peaks in all peak lists</span></span>
-<span id="cb113-23"><a href="deleting-data.html#cb113-23" tabindex="-1"></a>mslists <span class="ot">&lt;-</span> <span class="fu">delete</span>(mslists, <span class="at">j =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>)</span>
-<span id="cb113-24"><a href="deleting-data.html#cb113-24" tabindex="-1"></a><span class="co"># remove all MS peak lists for a specific analysis</span></span>
-<span id="cb113-25"><a href="deleting-data.html#cb113-25" tabindex="-1"></a>mslists <span class="ot">&lt;-</span> <span class="fu">delete</span>(mslists, <span class="at">k =</span> <span class="st">&quot;standard-pos-1&quot;</span>)</span>
-<span id="cb113-26"><a href="deleting-data.html#cb113-26" tabindex="-1"></a></span>
-<span id="cb113-27"><a href="deleting-data.html#cb113-27" tabindex="-1"></a><span class="co"># remove all results for a feature group</span></span>
-<span id="cb113-28"><a href="deleting-data.html#cb113-28" tabindex="-1"></a>formulas <span class="ot">&lt;-</span> <span class="fu">delete</span>(formulas, <span class="at">i =</span> <span class="st">&quot;M120_R268_30&quot;</span>)</span>
-<span id="cb113-29"><a href="deleting-data.html#cb113-29" tabindex="-1"></a></span>
-<span id="cb113-30"><a href="deleting-data.html#cb113-30" tabindex="-1"></a><span class="co"># remove top candidate for all feature groups</span></span>
-<span id="cb113-31"><a href="deleting-data.html#cb113-31" tabindex="-1"></a>compounds <span class="ot">&lt;-</span> <span class="fu">delete</span>(compounds, <span class="at">j =</span> <span class="dv">1</span>)</span>
-<span id="cb113-32"><a href="deleting-data.html#cb113-32" tabindex="-1"></a></span>
-<span id="cb113-33"><a href="deleting-data.html#cb113-33" tabindex="-1"></a><span class="co"># remove a component</span></span>
-<span id="cb113-34"><a href="deleting-data.html#cb113-34" tabindex="-1"></a>components <span class="ot">&lt;-</span> <span class="fu">delete</span>(components, <span class="at">i =</span> <span class="st">&quot;CMP1&quot;</span>)</span>
-<span id="cb113-35"><a href="deleting-data.html#cb113-35" tabindex="-1"></a><span class="co"># remove specific feature group from a component</span></span>
-<span id="cb113-36"><a href="deleting-data.html#cb113-36" tabindex="-1"></a>components <span class="ot">&lt;-</span> <span class="fu">delete</span>(components, <span class="at">i =</span> <span class="st">&quot;CMP1&quot;</span>, <span class="at">j =</span> <span class="st">&quot;M120_R268_30&quot;</span>)</span>
-<span id="cb113-37"><a href="deleting-data.html#cb113-37" tabindex="-1"></a><span class="co"># remove specific feature group from all components</span></span>
-<span id="cb113-38"><a href="deleting-data.html#cb113-38" tabindex="-1"></a>components <span class="ot">&lt;-</span> <span class="fu">delete</span>(components, <span class="at">j =</span> <span class="st">&quot;M120_R268_30&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb114"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb114-1"><a href="deleting-data.html#cb114-1" tabindex="-1"></a><span class="co"># delete 2nd feature in analysis-1</span></span>
+<span id="cb114-2"><a href="deleting-data.html#cb114-2" tabindex="-1"></a>fList <span class="ot">&lt;-</span> <span class="fu">delete</span>(fList, <span class="at">i =</span> <span class="st">&quot;analysis-1&quot;</span>, <span class="at">j =</span> <span class="dv">2</span>)</span>
+<span id="cb114-3"><a href="deleting-data.html#cb114-3" tabindex="-1"></a><span class="co"># delete first ten features in all analyses</span></span>
+<span id="cb114-4"><a href="deleting-data.html#cb114-4" tabindex="-1"></a>fList <span class="ot">&lt;-</span> <span class="fu">delete</span>(fList, <span class="at">i =</span> <span class="cn">NULL</span>, <span class="at">j =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>)</span>
+<span id="cb114-5"><a href="deleting-data.html#cb114-5" tabindex="-1"></a></span>
+<span id="cb114-6"><a href="deleting-data.html#cb114-6" tabindex="-1"></a><span class="co"># completely remove third+fourth analyses from feature groups</span></span>
+<span id="cb114-7"><a href="deleting-data.html#cb114-7" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">delete</span>(fGroups, <span class="at">i =</span> <span class="dv">3</span><span class="sc">:</span><span class="dv">4</span>)</span>
+<span id="cb114-8"><a href="deleting-data.html#cb114-8" tabindex="-1"></a><span class="co"># delete specific feature group</span></span>
+<span id="cb114-9"><a href="deleting-data.html#cb114-9" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">delete</span>(fGroups, <span class="at">j =</span> <span class="st">&quot;M120_R268_30&quot;</span>)</span>
+<span id="cb114-10"><a href="deleting-data.html#cb114-10" tabindex="-1"></a><span class="co"># delete range of feature groups</span></span>
+<span id="cb114-11"><a href="deleting-data.html#cb114-11" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">delete</span>(fGroups, <span class="at">j =</span> <span class="dv">500</span><span class="sc">:</span><span class="dv">750</span>)</span>
+<span id="cb114-12"><a href="deleting-data.html#cb114-12" tabindex="-1"></a></span>
+<span id="cb114-13"><a href="deleting-data.html#cb114-13" tabindex="-1"></a><span class="co"># remove all hits for atrazine</span></span>
+<span id="cb114-14"><a href="deleting-data.html#cb114-14" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">delete</span>(<span class="at">k =</span> <span class="st">&quot;atrazine&quot;</span>)</span>
+<span id="cb114-15"><a href="deleting-data.html#cb114-15" tabindex="-1"></a><span class="co"># for a specific feature group</span></span>
+<span id="cb114-16"><a href="deleting-data.html#cb114-16" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">delete</span>(<span class="at">j =</span> <span class="st">&quot;M120_R268_30&quot;</span>, <span class="at">k =</span> <span class="st">&quot;atrazine&quot;</span>)</span>
+<span id="cb114-17"><a href="deleting-data.html#cb114-17" tabindex="-1"></a><span class="co"># remove all hits for a feature group</span></span>
+<span id="cb114-18"><a href="deleting-data.html#cb114-18" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">delete</span>(<span class="at">j =</span> <span class="st">&quot;M120_R268_30&quot;</span>, <span class="at">k =</span> <span class="cn">NA</span>)</span>
+<span id="cb114-19"><a href="deleting-data.html#cb114-19" tabindex="-1"></a></span>
+<span id="cb114-20"><a href="deleting-data.html#cb114-20" tabindex="-1"></a><span class="co"># remove all MS peak lists for a feature group</span></span>
+<span id="cb114-21"><a href="deleting-data.html#cb114-21" tabindex="-1"></a>mslists <span class="ot">&lt;-</span> <span class="fu">delete</span>(mslists, <span class="at">i =</span> <span class="st">&quot;M120_R268_30&quot;</span>)</span>
+<span id="cb114-22"><a href="deleting-data.html#cb114-22" tabindex="-1"></a><span class="co"># removes the first 5 peaks in all peak lists</span></span>
+<span id="cb114-23"><a href="deleting-data.html#cb114-23" tabindex="-1"></a>mslists <span class="ot">&lt;-</span> <span class="fu">delete</span>(mslists, <span class="at">j =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>)</span>
+<span id="cb114-24"><a href="deleting-data.html#cb114-24" tabindex="-1"></a><span class="co"># remove all MS peak lists for a specific analysis</span></span>
+<span id="cb114-25"><a href="deleting-data.html#cb114-25" tabindex="-1"></a>mslists <span class="ot">&lt;-</span> <span class="fu">delete</span>(mslists, <span class="at">k =</span> <span class="st">&quot;standard-pos-1&quot;</span>)</span>
+<span id="cb114-26"><a href="deleting-data.html#cb114-26" tabindex="-1"></a></span>
+<span id="cb114-27"><a href="deleting-data.html#cb114-27" tabindex="-1"></a><span class="co"># remove all results for a feature group</span></span>
+<span id="cb114-28"><a href="deleting-data.html#cb114-28" tabindex="-1"></a>formulas <span class="ot">&lt;-</span> <span class="fu">delete</span>(formulas, <span class="at">i =</span> <span class="st">&quot;M120_R268_30&quot;</span>)</span>
+<span id="cb114-29"><a href="deleting-data.html#cb114-29" tabindex="-1"></a></span>
+<span id="cb114-30"><a href="deleting-data.html#cb114-30" tabindex="-1"></a><span class="co"># remove top candidate for all feature groups</span></span>
+<span id="cb114-31"><a href="deleting-data.html#cb114-31" tabindex="-1"></a>compounds <span class="ot">&lt;-</span> <span class="fu">delete</span>(compounds, <span class="at">j =</span> <span class="dv">1</span>)</span>
+<span id="cb114-32"><a href="deleting-data.html#cb114-32" tabindex="-1"></a></span>
+<span id="cb114-33"><a href="deleting-data.html#cb114-33" tabindex="-1"></a><span class="co"># remove a component</span></span>
+<span id="cb114-34"><a href="deleting-data.html#cb114-34" tabindex="-1"></a>components <span class="ot">&lt;-</span> <span class="fu">delete</span>(components, <span class="at">i =</span> <span class="st">&quot;CMP1&quot;</span>)</span>
+<span id="cb114-35"><a href="deleting-data.html#cb114-35" tabindex="-1"></a><span class="co"># remove specific feature group from a component</span></span>
+<span id="cb114-36"><a href="deleting-data.html#cb114-36" tabindex="-1"></a>components <span class="ot">&lt;-</span> <span class="fu">delete</span>(components, <span class="at">i =</span> <span class="st">&quot;CMP1&quot;</span>, <span class="at">j =</span> <span class="st">&quot;M120_R268_30&quot;</span>)</span>
+<span id="cb114-37"><a href="deleting-data.html#cb114-37" tabindex="-1"></a><span class="co"># remove specific feature group from all components</span></span>
+<span id="cb114-38"><a href="deleting-data.html#cb114-38" tabindex="-1"></a>components <span class="ot">&lt;-</span> <span class="fu">delete</span>(components, <span class="at">j =</span> <span class="st">&quot;M120_R268_30&quot;</span>)</span></code></pre></div>
 <p>The value set to the <code>j</code> and <code>k</code> (for suspect screening results) can also be a function: the function called repeatedly on parts of the data to select what should be deleted. How the function is called and what it should return depends on the workflow data class:</p>
 <table>
 <colgroup>
@@ -542,24 +543,24 @@ div.csl-indent {
 </tbody>
 </table>
 <p>Some examples for this:</p>
-<div class="sourceCode" id="cb114"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb114-1"><a href="deleting-data.html#cb114-1" tabindex="-1"></a><span class="co"># remove features with intensities below 5000</span></span>
-<span id="cb114-2"><a href="deleting-data.html#cb114-2" tabindex="-1"></a>fList <span class="ot">&lt;-</span> <span class="fu">delete</span>(fList, <span class="at">j =</span> <span class="cf">function</span>(f, ...) f<span class="sc">$</span>intensity <span class="sc">&lt;=</span> <span class="fl">5E3</span>)</span>
-<span id="cb114-3"><a href="deleting-data.html#cb114-3" tabindex="-1"></a></span>
-<span id="cb114-4"><a href="deleting-data.html#cb114-4" tabindex="-1"></a><span class="co"># same, but for features in all feature groups from specific analyses</span></span>
-<span id="cb114-5"><a href="deleting-data.html#cb114-5" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">delete</span>(fGroups, <span class="at">i =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="at">j =</span> <span class="cf">function</span>(g, ...) g <span class="sc">&lt;=</span> <span class="fl">5E3</span>)</span>
-<span id="cb114-6"><a href="deleting-data.html#cb114-6" tabindex="-1"></a></span>
-<span id="cb114-7"><a href="deleting-data.html#cb114-7" tabindex="-1"></a><span class="co"># remove hits for suspects with mass above 400 Da</span></span>
-<span id="cb114-8"><a href="deleting-data.html#cb114-8" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">delete</span>(fGroupsSusp, <span class="at">k =</span> <span class="cf">function</span>(tab) tab<span class="sc">$</span>neutralMass <span class="sc">&gt;</span> <span class="dv">400</span>)</span>
-<span id="cb114-9"><a href="deleting-data.html#cb114-9" tabindex="-1"></a></span>
-<span id="cb114-10"><a href="deleting-data.html#cb114-10" tabindex="-1"></a>mslists <span class="ot">&lt;-</span> <span class="fu">delete</span>(mslists, <span class="at">j =</span> <span class="cf">function</span>(pl, grp, ana, type)</span>
-<span id="cb114-11"><a href="deleting-data.html#cb114-11" tabindex="-1"></a>{</span>
-<span id="cb114-12"><a href="deleting-data.html#cb114-12" tabindex="-1"></a>    <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(ana) <span class="sc">||</span> type <span class="sc">==</span> <span class="st">&quot;MS&quot;</span>)</span>
-<span id="cb114-13"><a href="deleting-data.html#cb114-13" tabindex="-1"></a>        <span class="fu">return</span>(<span class="cn">FALSE</span>) <span class="co"># only delete peaks from group averaged MS/MS peak lists</span></span>
-<span id="cb114-14"><a href="deleting-data.html#cb114-14" tabindex="-1"></a>    <span class="fu">return</span>(pl<span class="sc">$</span>mz <span class="sc">&gt;</span> <span class="dv">500</span>) <span class="co"># remove peaks with m/z &gt; 500</span></span>
-<span id="cb114-15"><a href="deleting-data.html#cb114-15" tabindex="-1"></a>})</span>
-<span id="cb114-16"><a href="deleting-data.html#cb114-16" tabindex="-1"></a></span>
-<span id="cb114-17"><a href="deleting-data.html#cb114-17" tabindex="-1"></a><span class="co"># remove formula candidates with high relative mass deviation</span></span>
-<span id="cb114-18"><a href="deleting-data.html#cb114-18" tabindex="-1"></a>formulas <span class="ot">&lt;-</span> <span class="fu">delete</span>(formulas, <span class="at">j =</span> <span class="cf">function</span>(ft, ...) ft<span class="sc">$</span>error <span class="sc">&gt;</span> <span class="dv">5</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb115"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb115-1"><a href="deleting-data.html#cb115-1" tabindex="-1"></a><span class="co"># remove features with intensities below 5000</span></span>
+<span id="cb115-2"><a href="deleting-data.html#cb115-2" tabindex="-1"></a>fList <span class="ot">&lt;-</span> <span class="fu">delete</span>(fList, <span class="at">j =</span> <span class="cf">function</span>(f, ...) f<span class="sc">$</span>intensity <span class="sc">&lt;=</span> <span class="fl">5E3</span>)</span>
+<span id="cb115-3"><a href="deleting-data.html#cb115-3" tabindex="-1"></a></span>
+<span id="cb115-4"><a href="deleting-data.html#cb115-4" tabindex="-1"></a><span class="co"># same, but for features in all feature groups from specific analyses</span></span>
+<span id="cb115-5"><a href="deleting-data.html#cb115-5" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">delete</span>(fGroups, <span class="at">i =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="at">j =</span> <span class="cf">function</span>(g, ...) g <span class="sc">&lt;=</span> <span class="fl">5E3</span>)</span>
+<span id="cb115-6"><a href="deleting-data.html#cb115-6" tabindex="-1"></a></span>
+<span id="cb115-7"><a href="deleting-data.html#cb115-7" tabindex="-1"></a><span class="co"># remove hits for suspects with mass above 400 Da</span></span>
+<span id="cb115-8"><a href="deleting-data.html#cb115-8" tabindex="-1"></a>fGroupsSusp <span class="ot">&lt;-</span> <span class="fu">delete</span>(fGroupsSusp, <span class="at">k =</span> <span class="cf">function</span>(tab) tab<span class="sc">$</span>neutralMass <span class="sc">&gt;</span> <span class="dv">400</span>)</span>
+<span id="cb115-9"><a href="deleting-data.html#cb115-9" tabindex="-1"></a></span>
+<span id="cb115-10"><a href="deleting-data.html#cb115-10" tabindex="-1"></a>mslists <span class="ot">&lt;-</span> <span class="fu">delete</span>(mslists, <span class="at">j =</span> <span class="cf">function</span>(pl, grp, ana, type)</span>
+<span id="cb115-11"><a href="deleting-data.html#cb115-11" tabindex="-1"></a>{</span>
+<span id="cb115-12"><a href="deleting-data.html#cb115-12" tabindex="-1"></a>    <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(ana) <span class="sc">||</span> type <span class="sc">==</span> <span class="st">&quot;MS&quot;</span>)</span>
+<span id="cb115-13"><a href="deleting-data.html#cb115-13" tabindex="-1"></a>        <span class="fu">return</span>(<span class="cn">FALSE</span>) <span class="co"># only delete peaks from group averaged MS/MS peak lists</span></span>
+<span id="cb115-14"><a href="deleting-data.html#cb115-14" tabindex="-1"></a>    <span class="fu">return</span>(pl<span class="sc">$</span>mz <span class="sc">&gt;</span> <span class="dv">500</span>) <span class="co"># remove peaks with m/z &gt; 500</span></span>
+<span id="cb115-15"><a href="deleting-data.html#cb115-15" tabindex="-1"></a>})</span>
+<span id="cb115-16"><a href="deleting-data.html#cb115-16" tabindex="-1"></a></span>
+<span id="cb115-17"><a href="deleting-data.html#cb115-17" tabindex="-1"></a><span class="co"># remove formula candidates with high relative mass deviation</span></span>
+<span id="cb115-18"><a href="deleting-data.html#cb115-18" tabindex="-1"></a>formulas <span class="ot">&lt;-</span> <span class="fu">delete</span>(formulas, <span class="at">j =</span> <span class="cf">function</span>(ft, ...) ft<span class="sc">$</span>error <span class="sc">&gt;</span> <span class="dv">5</span>)</span></code></pre></div>
 </div>
             </section>
 

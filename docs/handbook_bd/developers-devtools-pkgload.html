@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>6.1 Initiating a sets workflow | patRoon handbook</title>
-  <meta name="description" content="6.1 Initiating a sets workflow | patRoon handbook" />
+  <title>2.5 Developers: devtools / pkgload | patRoon handbook</title>
+  <meta name="description" content="2.5 Developers: devtools / pkgload | patRoon handbook" />
   <meta name="generator" content="bookdown 0.46 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="6.1 Initiating a sets workflow | patRoon handbook" />
+  <meta property="og:title" content="2.5 Developers: devtools / pkgload | patRoon handbook" />
   <meta property="og:type" content="book" />
   
   
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="6.1 Initiating a sets workflow | patRoon handbook" />
+  <meta name="twitter:title" content="2.5 Developers: devtools / pkgload | patRoon handbook" />
   
   
   
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="setsWorkflow.html"/>
-<link rel="next" href="generating-sets-workflow-data.html"/>
+<link rel="prev" href="managing-legacy-installations.html"/>
+<link rel="next" href="workflow-concepts.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -408,63 +408,23 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="initiating-a-sets-workflow" class="section level2 hasAnchor" number="6.1">
-<h2><span class="header-section-number">6.1</span> Initiating a sets workflow<a href="initiating-a-sets-workflow.html#initiating-a-sets-workflow" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>A sets workflow is not much different than a ‘regular’ (or non-sets) workflow. For instance, consider the following workflow:</p>
-<div class="sourceCode" id="cb208"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb208-1"><a href="initiating-a-sets-workflow.html#cb208-1" tabindex="-1"></a>anaInfo <span class="ot">&lt;-</span> patRoonData<span class="sc">::</span><span class="fu">exampleAnalysisInfo</span>(<span class="st">&quot;positive&quot;</span>)</span>
-<span id="cb208-2"><a href="initiating-a-sets-workflow.html#cb208-2" tabindex="-1"></a>fList <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfo, <span class="st">&quot;openms&quot;</span>)</span>
-<span id="cb208-3"><a href="initiating-a-sets-workflow.html#cb208-3" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(fList, <span class="st">&quot;openms&quot;</span>)</span>
-<span id="cb208-4"><a href="initiating-a-sets-workflow.html#cb208-4" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">absMinIntensity =</span> <span class="dv">10000</span>, <span class="at">relMinReplicateAbundance =</span> <span class="dv">1</span>, <span class="at">maxReplicateIntRSD =</span> <span class="fl">0.75</span>,</span>
-<span id="cb208-5"><a href="initiating-a-sets-workflow.html#cb208-5" tabindex="-1"></a>                  <span class="at">blankThreshold =</span> <span class="dv">5</span>, <span class="at">removeBlanks =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb208-6"><a href="initiating-a-sets-workflow.html#cb208-6" tabindex="-1"></a></span>
-<span id="cb208-7"><a href="initiating-a-sets-workflow.html#cb208-7" tabindex="-1"></a>mslists <span class="ot">&lt;-</span> <span class="fu">generateMSPeakLists</span>(fGroups)</span>
-<span id="cb208-8"><a href="initiating-a-sets-workflow.html#cb208-8" tabindex="-1"></a>formulas <span class="ot">&lt;-</span> <span class="fu">generateFormulas</span>(fGroups, mslists, <span class="st">&quot;genform&quot;</span>, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>)</span>
-<span id="cb208-9"><a href="initiating-a-sets-workflow.html#cb208-9" tabindex="-1"></a>compounds <span class="ot">&lt;-</span> <span class="fu">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="at">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>)</span>
-<span id="cb208-10"><a href="initiating-a-sets-workflow.html#cb208-10" tabindex="-1"></a></span>
-<span id="cb208-11"><a href="initiating-a-sets-workflow.html#cb208-11" tabindex="-1"></a><span class="fu">report</span>(fGroups, <span class="at">MSPeakLists =</span> mslists, <span class="at">formulas =</span> formulas, <span class="at">compounds =</span> compounds)</span></code></pre></div>
-<p>This example uses the example data from <a href="https://github.com/rickhelmus/patRoonData">patRoonData</a> to obtain a feature group dataset, which is cleaned-up afterwards. Then, feature groups are annotated and all the results are reported.</p>
-<p>Converting this to a <em>sets workflow</em>:</p>
-<div class="sourceCode" id="cb209"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb209-1"><a href="initiating-a-sets-workflow.html#cb209-1" tabindex="-1"></a>anaInfoPos <span class="ot">&lt;-</span> patRoonData<span class="sc">::</span><span class="fu">exampleAnalysisInfo</span>(<span class="st">&quot;positive&quot;</span>)</span>
-<span id="cb209-2"><a href="initiating-a-sets-workflow.html#cb209-2" tabindex="-1"></a>anaInfoNeg <span class="ot">&lt;-</span> patRoonData<span class="sc">::</span><span class="fu">exampleAnalysisInfo</span>(<span class="st">&quot;negative&quot;</span>)</span>
-<span id="cb209-3"><a href="initiating-a-sets-workflow.html#cb209-3" tabindex="-1"></a>fListPos <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfoPos, <span class="st">&quot;openms&quot;</span>)</span>
-<span id="cb209-4"><a href="initiating-a-sets-workflow.html#cb209-4" tabindex="-1"></a>fListNeg <span class="ot">&lt;-</span> <span class="fu">findFeatures</span>(anaInfoNeg, <span class="st">&quot;openms&quot;</span>)</span>
-<span id="cb209-5"><a href="initiating-a-sets-workflow.html#cb209-5" tabindex="-1"></a>fList <span class="ot">&lt;-</span> <span class="fu">makeSet</span>(fListPos, fListNeg, <span class="at">adducts =</span> <span class="fu">c</span>(<span class="st">&quot;[M+H]+&quot;</span>, <span class="st">&quot;[M-H]-&quot;</span>))</span>
-<span id="cb209-6"><a href="initiating-a-sets-workflow.html#cb209-6" tabindex="-1"></a></span>
-<span id="cb209-7"><a href="initiating-a-sets-workflow.html#cb209-7" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">groupFeatures</span>(fList, <span class="st">&quot;openms&quot;</span>)</span>
-<span id="cb209-8"><a href="initiating-a-sets-workflow.html#cb209-8" tabindex="-1"></a>fGroups <span class="ot">&lt;-</span> <span class="fu">filter</span>(fGroups, <span class="at">absMinIntensity =</span> <span class="dv">10000</span>, <span class="at">relMinReplicateAbundance =</span> <span class="dv">1</span>, <span class="at">maxReplicateIntRSD =</span> <span class="fl">0.75</span>,</span>
-<span id="cb209-9"><a href="initiating-a-sets-workflow.html#cb209-9" tabindex="-1"></a>                  <span class="at">blankThreshold =</span> <span class="dv">5</span>, <span class="at">removeBlanks =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb209-10"><a href="initiating-a-sets-workflow.html#cb209-10" tabindex="-1"></a></span>
-<span id="cb209-11"><a href="initiating-a-sets-workflow.html#cb209-11" tabindex="-1"></a>mslists <span class="ot">&lt;-</span> <span class="fu">generateMSPeakLists</span>(fGroups)</span>
-<span id="cb209-12"><a href="initiating-a-sets-workflow.html#cb209-12" tabindex="-1"></a>formulas <span class="ot">&lt;-</span> <span class="fu">generateFormulas</span>(fGroups, mslists, <span class="st">&quot;genform&quot;</span>)</span>
-<span id="cb209-13"><a href="initiating-a-sets-workflow.html#cb209-13" tabindex="-1"></a>compounds <span class="ot">&lt;-</span> <span class="fu">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>)</span>
-<span id="cb209-14"><a href="initiating-a-sets-workflow.html#cb209-14" tabindex="-1"></a></span>
-<span id="cb209-15"><a href="initiating-a-sets-workflow.html#cb209-15" tabindex="-1"></a><span class="fu">report</span>(fGroups, <span class="at">MSPeakLists =</span> mslists, <span class="at">formulas =</span> formulas, <span class="at">compounds =</span> compounds)</span></code></pre></div>
-<p>This workflow will do all the steps for positive <em>and</em> negative data.</p>
-<div id="htmlwidget-8d6bf98aacbc6769a881" style="width:250px;height:300px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-8d6bf98aacbc6769a881">{"x":{"diagram":"\ndigraph Workflow {\n  graph [ rankdir = TB, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 0.6,\n         fontsize = 16,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Pre-treatment (+)\" -> \"Find features (+)\" -> \"makeSet\"\n    \"Pre-treatment (-)\" -> \"Find features (-)\" -> \"makeSet\"\n    \"makeSet\" -> \"Group features\" -> \"Annotation, ...\"\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
-<p>Only a few modifications were necessary:</p>
-<ul>
-<li>The <a href="sample-analyses.html#anaInfo">analysis information</a> is obtained for positive and negative data (i.e. per set)</li>
-<li>Features are found for each set separately.</li>
-<li><code>makeSet</code> is used to combine the feature data</li>
-<li>There is no need to specify the adduct anymore in the annotation steps.</li>
-</ul>
-<blockquote>
-<p><strong><em>NOTE</em></strong> The <code>analysis</code> names for the <a href="sample-analyses.html#anaInfo">analysis information</a> must be <em>unique</em> for each row, even among sets. Furthermore, replicates should not contain analyses from different sets.</p>
-</blockquote>
-<p>The key principle to make sets workflows work is performed by <code>makeSet</code>. This method function takes different <code>features</code> objects (or <code>featureGroups</code>, discussed later) to combine the feature data across sets. During this step features are <em>neutralized</em>: the feature <em>m/z</em> data is converted to neutral feature masses. This step ensures that when features are grouped with <code>groupFeatures</code>, its algorithms are able to find the same feature among different sets, even when different MS ionization modes were used during acquisition. However, please note that (currently) no additional chromatographic alignment steps between sets are performed. For this reason, the chromatographic methodology that is used to acquire the data must be the same for all sets.</p>
-<p>The feature neutralization step relies on adduct data. In the example above, it is simply assumed that all features measured with positive mode are protonated (M+H) species, and all negative features are deprotonated (M-H). It is also possible to use <a href="incorpAdductIso.html#incorpAdductIso">adduct annotations</a> for neutralization; this is discussed later.</p>
-<blockquote>
-<p><strong><em>NOTE</em></strong> The <a href="newProject.html#newProject">newProject tool</a> can be used to easily generate a sets workflow. Simply select “both” for the <em>Ionization</em> option.</p>
-</blockquote>
+<div id="developers-devtools-pkgload" class="section level2 hasAnchor" number="2.5">
+<h2><span class="header-section-number">2.5</span> Developers: devtools / pkgload<a href="developers-devtools-pkgload.html#developers-devtools-pkgload" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>If you are a developer and using the <code>load_all()</code> function from <code>devtools</code> or <code>pkgload</code> to load <code>patRoon</code>, it is highly recommended to disable debug compilation flags as this considerably degrades performance:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="developers-devtools-pkgload.html#cb12-1" tabindex="-1"></a><span class="co"># disable debug flags via package options</span></span>
+<span id="cb12-2"><a href="developers-devtools-pkgload.html#cb12-2" tabindex="-1"></a><span class="fu">options</span>(<span class="at">pkg.build_extra_flags =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb12-3"><a href="developers-devtools-pkgload.html#cb12-3" tabindex="-1"></a><span class="co"># disable debug flags via environment variable, may be more reliable with e.g. testthat</span></span>
+<span id="cb12-4"><a href="developers-devtools-pkgload.html#cb12-4" tabindex="-1"></a><span class="fu">Sys.setenv</span>(<span class="at">PKG_BUILD_EXTRA_FLAGS =</span> <span class="st">&quot;false&quot;</span>)</span></code></pre></div>
+
 </div>
+<!-- </div> -->
             </section>
 
           </div>
         </div>
       </div>
-<a href="setsWorkflow.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="generating-sets-workflow-data.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="managing-legacy-installations.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="workflow-concepts.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

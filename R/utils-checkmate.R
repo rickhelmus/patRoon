@@ -895,6 +895,7 @@ assertAndPrepareReportSettings <- function(settings, setAggr = TRUE)
     assertNormalizationMethod(settings$compounds$normalizeScores, add = ac)
     settings$compounds$exclNormScores <- emptyListToVec(settings$compounds$exclNormScores, character())
     checkmate::assertCharacter(settings$compounds$exclNormScores, min.chars = 1, any.missing = FALSE, add = ac)
+    checkmate::assertFlag(settings$compounds$onlyUsedScorings, add = ac)
     checkmate::assertCount(settings$compounds$topMost, positive = TRUE, add = ac)
     
     checkmate::assertList(settings$TPs)

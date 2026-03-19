@@ -22,7 +22,7 @@ report(
   specSimParams = getDefSpecSimParams(),
   clearPath = FALSE,
   openReport = TRUE,
-  parallel = TRUE,
+  parallel = FALSE,
   overrideSettings = list()
 )
 
@@ -41,7 +41,7 @@ report(
   specSimParams = getDefSpecSimParams(),
   clearPath = FALSE,
   openReport = TRUE,
-  parallel = TRUE,
+  parallel = FALSE,
   overrideSettings = list()
 )
 
@@ -74,7 +74,9 @@ See the \link[=specSimParams]{spectral similarity parameters} documentation for 
 \item{openReport}{If set to \code{TRUE} then the output report file will be opened with the system browser.}
 
 \item{parallel}{If set to \code{TRUE} then code is executed in parallel through the \CRANpkg{future} package. Please
-see the parallelization section in the handbook for more details.}
+see the parallelization section in the handbook for more details.
+
+\strong{NOTE}: parallelization is disabled by default, as it may slow down reporting on some systems (\emph{e.g.} Windows) and under some circumstances. It is best to experiment with this setting to see if it speeds up report generation for your system and data.}
 
 \item{overrideSettings}{A \code{list} with settings that override those from the report settings file. Example:
 \code{overrideSettings=list(compounds=list(topMost=25))}.}

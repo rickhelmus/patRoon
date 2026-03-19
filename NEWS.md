@@ -354,6 +354,7 @@ In most cases `fixedIsolationWidth=FALSE` is recommended: this automatically det
     * Updated PubChem Transformations to 0.2.2.
     * The default metabolic logic transformations are now accessible through the `TPLogicTransformations()` function.
     * Optimized future parallelization.
+    * Disabled parallelization for reporting by default, as it can (still) result in worse performance (e.g. seen on Windows).
     * MS2Quant metadata is now also stored for sets workflow data (`MS2QuantMeta` slots for `fGroupsScreeningSet`, `formulasSet` and `compoundsSet`).
     * `plotUpSet()` The `nsets` argument now defaults to `NULL`, meaning it will be set to the number of compared items.
 

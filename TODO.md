@@ -8,7 +8,6 @@
     - update patRoonDeps dependencies for Rmstoolkitlib, reticulate, fmcsR etc
     - remove current hack to get in new deps for GHA and CircleCI
 - BUG: annSim.1 column (in formulas?)?
-- See why parallel reporting is so slow (on Windows?)
 - reticulate: use py_require()? doesn't seem to be able handle multiple py versions, so no?
 - MSTK: PR for centroid status buf for mzXML?
     - saxmzxmlhandler.cpp L158: spec->setCentroid((bool)atoi(getAttrValue("centroided",attr)));

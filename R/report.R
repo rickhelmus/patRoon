@@ -38,6 +38,8 @@ adjustReportSettings <- function(settings, adjSettings) return(modifyList(settin
 #' @template EICParams-arg
 #' @template EIMParams-arg
 #' @template specSimParams-arg
+#' 
+#' @templateVar append \strong{NOTE}: parallelization is disabled by default, as it may slow down reporting on some systems (\emph{e.g.} Windows) and under some circumstances. It is best to experiment with this setting to see if it speeds up report generation for your system and data.
 #' @template parallel-arg
 #'
 #' @section Report settings: The report generation can be customized with a variety of settings that are read from a

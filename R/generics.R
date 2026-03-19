@@ -385,7 +385,7 @@ setGeneric("report", function(fGroups, MSPeakLists = NULL, formulas = NULL, comp
                               path = NULL, EICParams = getDefEICParams(topMost = 1, topMostByReplicate = TRUE),
                               EIMParams = getDefEIMParams(topMost = 1, topMostByReplicate = TRUE),
                               specSimParams = getDefSpecSimParams(), clearPath = FALSE, openReport = TRUE,
-                              parallel = TRUE, overrideSettings = list()) standardGeneric("report"))
+                              parallel = FALSE, overrideSettings = list()) standardGeneric("report"))
 
 
 ### Misc.

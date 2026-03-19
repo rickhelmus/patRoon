@@ -231,7 +231,7 @@ genHTMLReportPlotsCompounds <- function(grp, compounds, MSPeakLists, formulas, s
         makeHTMLReportPlot("comp-scores", outPath, "plotScores",
                            list(compounds, index, grp, normalizeScores = settings$compounds$normalizeScores,
                                 excludeNormScores = settings$compounds$exclNormScores,
-                                onlyUsed = settings$compounds$onlyUsedScores),
+                                onlyUsed = settings$compounds$onlyUsedScorings),
                            parParams = list(mar = c(4.1, 4.1, 0.4, 0.2)), width = 7, height = 4, pointsize = 16)
     })
     

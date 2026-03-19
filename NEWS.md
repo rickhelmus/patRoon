@@ -389,7 +389,8 @@ In most cases `fixedIsolationWidth=FALSE` is recommended: this automatically det
     * Fixed: `report()`: don't show (empty) annotations column in feature data if no feature annotations are present.
     * Fixed: `report()`: TP graphs were generated for components with absent (parent) fGroups.
     * Fixed: `report()`: candidate column in CSV of quant/tox prediction tables now don't contain image link columns.
-    * Fixed: `report()`: the `onlyUsedScorings` options was ignored.    
+    * Fixed: `report()`: the `onlyUsedScorings` options was ignored.
+    * Fixed: `report()`: _Report settings_ manual section was slightly outdated with missing settings.
     * Fixed: The `removeTPIsomers` filter for `transformationProductsStructure` didn't actually apply the `removeDuplicates` filter.
     * Fixed: `newProject()`: don't break long lines of text strings.
     * Fixed: `newProject()`: XCMS3/KPIC2 groupFeatures tried to do RT alignment in sets worfklow.

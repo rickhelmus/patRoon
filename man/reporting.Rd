@@ -110,13 +110,15 @@ No data will be reported for feature groups in any of the reported objects (\cod
 \section{Report settings}{
  The report generation can be customized with a variety of settings that are read from a
   \file{YAML} file. This is especially useful if you want to change more advanced settings or want to add or remove
-  the parts that are reported The report settings file is specified through the \code{settingsFile} argument. If not
+  the parts that are reported. The report settings file is specified through the \code{settingsFile} argument. If not
   specified then default settings will be used. To ease creation of a new template settings file, the
   \code{genReportSettingsFile} function can be used.
 
   The following settings are currently available: \itemize{
 
   \item General \itemize{
+
+     \item \code{version}: version of the settings file.
 
      \item \code{format}: the report format. Currently this can only be \code{"html"}.
 
@@ -129,7 +131,7 @@ No data will be reported for feature groups in any of the reported objects (\cod
      generally smaller and easily shared, since only the \file{report.html} needs to be copied. However, they are
      slower to generate and plots cannot be cached.
 
-     \item \code{noDate} Set to \code{true} to omit the date from the report. Mainly used for internal purposes.
+     \item \code{noDate}: Set to \code{true} to omit the date from the report. Mainly used for internal purposes.
 
   }
 
@@ -154,7 +156,16 @@ No data will be reported for feature groups in any of the reported objects (\cod
 
      }
 
+     \item \code{mobilograms} \itemize{
+
+         \item \code{large}, \code{small}, \code{features}: inclusion of mobilogram plots, see \code{chromatograms} above.
+
+     }
+
      \item \code{intensityPlots}: inclusion of intensity trend plots.
+
+     \item \code{aggregateConcs}, \code{aggregateTox}: function name used for concentration and toxicity aggregation,
+     \emph{e.g.} \code{mean}.
 
   }
 
@@ -169,10 +180,10 @@ No data will be reported for feature groups in any of the reported objects (\cod
      \item \code{include}: whether formula results are reported (formula view). If \code{false} then the input
      \code{formulas} object is still used to amend \emph{e.g.} compound annotated spectra.
 
-     \item \code{normalizeScores}, \code{exclNormScores}: controls score normalization, sets the equally named
-     arguments to \emph{e.g.} \code{\link{plotScores}}.
+     \item \code{normalizeScores}, \code{exclNormScores}: controls score normalization and which score fields to
+     exclude from normalization; these are forwarded to \emph{e.g.} \code{plotScores}.
 
-     \item \code{topMost} only report this number of top ranked candidates. This number can be lowered to speed-up
+     \item \code{topMost}: only report this number of top ranked candidates. This number can be lowered to speed-up
      report generation.
 
   }
@@ -180,6 +191,9 @@ No data will be reported for feature groups in any of the reported objects (\cod
   \item \code{compounds} \itemize{
 
      \item \code{normalizeScores}, \code{exclNormScores}, \code{topMost}: same as \code{formulas}, see above.
+
+     \item \code{onlyUsedScorings}: if \code{true} only scorings used by the current dataset are considered when
+     normalizing or reporting compound scores.
 
   }
 

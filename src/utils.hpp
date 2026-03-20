@@ -65,7 +65,7 @@ template <typename C1, typename C2> std::vector<size_t> getSortedInds2D(const C1
 
 template <typename IT> std::vector<size_t> getSortedInds(const IT &start, const IT &end)
 {
-    std::vector<size_t> ret(std::distance(start, end + 1));
+    std::vector<size_t> ret(std::distance(start, end));
     std::iota(ret.begin(), ret.end(), 0);
     /*std::sort(ret.begin(), ret.end(), [&](size_t i, size_t j)
     { return std::tie(*(start + i), i) < std::tie(*(start + j), j); });*/
@@ -76,7 +76,7 @@ template <typename IT> std::vector<size_t> getSortedInds(const IT &start, const 
 template <typename IT1, typename IT2> std::vector<size_t> getSortedInds2D(const IT1 &start1, const IT1 &end1,
                                                                           const IT2 &start2)
 {
-    std::vector<size_t> ret(std::distance(start1, end1+1));
+    std::vector<size_t> ret(std::distance(start1, end1));
     std::iota(ret.begin(), ret.end(), 0);
     std::sort(ret.begin(), ret.end(), [&](size_t i, size_t j)
     {
@@ -88,7 +88,7 @@ template <typename IT1, typename IT2> std::vector<size_t> getSortedInds2D(const 
 template <typename IT1, typename IT2, typename IT3> std::vector<size_t>
 getSortedInds3D(const IT1 &start1, const IT1 &end1, const IT2 &start2, const IT3 &start3)
 {
-    std::vector<size_t> ret(std::distance(start1, end1+1));
+    std::vector<size_t> ret(std::distance(start1, end1));
     std::iota(ret.begin(), ret.end(), 0);
     std::sort(ret.begin(), ret.end(), [&](size_t i, size_t j)
     {

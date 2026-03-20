@@ -396,7 +396,8 @@ setMethod("convertToSuspects", "MSLibrary", function(obj, adduct, spectrumType =
         averagedSpecs <- averageSpectraList(allSpecs, avgSpecParams$clusterMzWindow, avgSpecParams$topMost,
                                             avgSpecParams$minIntensityPre, avgSpecParams$minIntensityPost,
                                             avgSpecParams$relMinAbundance, avgSpecParams$absMinAbundance,
-                                            avgSpecParams$method, FALSE, FALSE, FALSE, FALSE)
+                                            avgSpecParams$minRelCumIntensity, avgSpecParams$method, FALSE, FALSE, FALSE,
+                                            FALSE)
         names(averagedSpecs) <- names(allSpecs)
         
         ret[, fragments_mz := {

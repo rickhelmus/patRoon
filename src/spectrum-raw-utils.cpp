@@ -147,7 +147,7 @@ SpectrumRaw filterSpectrumRaw(const SpectrumRaw &spectrum, const SpectrumRawFilt
     
     SpectrumRaw ret;
     SpectrumRawTypes::Intensity minInt = filter.minIntensity;
-    const bool doTopMost = filter.topMost != 0 && ((endInd - startInd) + 1) > filter.topMost;
+    const bool doTopMost = filter.topMost != 0 && ((endInd - startInd) > filter.topMost);
     const bool hasMob = spectrum.hasMobilities();
     
     if (doTopMost)
@@ -159,9 +159,28 @@ SpectrumRaw filterSpectrumRaw(const SpectrumRaw &spectrum, const SpectrumRawFilt
         minInt = std::max(minInt, topMostInts.back());
     }
     
+    std::vector<float> relCumInts;
+    if (filter.minRelCumIntensity > 0.0 && (endInd - startInd) > 1)
+    {
+        const auto tic = std::accumulate(spectrum.getIntensities().begin() + startInd,
+                                         spectrum.getIntensities().begin() + endInd, 0.0);
+        const auto sortedInds = getSortedInds(spectrum.getIntensities().begin() + startInd,
+                                              spectrum.getIntensities().begin() + endInd);
+        relCumInts.resize(endInd - startInd);
+        SpectrumRawTypes::Intensity cumInt = 0.0;
+        for (size_t i=0; i<sortedInds.size(); ++i)
+        {
+            cumInt += spectrum.getIntensities()[startInd + sortedInds[i]];
+            relCumInts[sortedInds[i]] = static_cast<float>(cumInt / tic);
+        }
+    }
+    
     bool addedPrec = false;
     for (size_t i=startInd; i<endInd; ++i)
     {
+        if (!relCumInts.empty() && relCumInts[i - startInd] < filter.minRelCumIntensity)
+            continue;
+        
         if (spectrum.getIntensities()[i] >= minInt)
         {
             if (hasMob)

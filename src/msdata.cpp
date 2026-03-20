@@ -636,11 +636,11 @@ Rcpp::List getMSPeakLists(const MSReadBackend &backend, const std::vector<Spectr
                           const std::vector<SpectrumRawTypes::Mobility> startMobs,
                           const std::vector<SpectrumRawTypes::Mobility> endMobs,
                           SpectrumRawTypes::PeakAbundance relMinAbundance,
-                          SpectrumRawTypes::PeakAbundance absMinAbundance,
+                          SpectrumRawTypes::PeakAbundance absMinAbundance, float minRelCumIntensity,
                           unsigned smoothWindowIMS, unsigned halfWindowIMS, SpectrumRawTypes::Mass maxGapIMS,
-                          unsigned topMost,
-                          SpectrumRawTypes::Intensity minIntensityIMS, SpectrumRawTypes::Intensity minIntensityPre,
-                          SpectrumRawTypes::Intensity minIntensityPost, SpectrumRawTypes::Intensity minBPIntensity)
+                          unsigned topMost, SpectrumRawTypes::Intensity minIntensityIMS,
+                          SpectrumRawTypes::Intensity minIntensityPre, SpectrumRawTypes::Intensity minIntensityPost,
+                          SpectrumRawTypes::Intensity minBPIntensity)
 {
     const auto entries = startTimes.size();
     const auto clMethod = clustMethodFromStr(method);
@@ -648,10 +648,11 @@ Rcpp::List getMSPeakLists(const MSReadBackend &backend, const std::vector<Spectr
     const auto specMeta = backend.getSpecMetadata();
     const auto baseSpecFilter = SpectrumRawFilter()
         .setTopMost(topMost)
+        .setMinRelCumIntensity(minRelCumIntensity)
         .setWithPrecursor(withPrecursor)
         .setRetainPrecursor(retainPrecursor);
     const auto specFilter = SpectrumRawFilter(baseSpecFilter).setMinIntensity(minIntensityPre);
-    const auto specFilterIMS = SpectrumRawFilter(baseSpecFilter);
+    //const auto specFilterIMS = SpectrumRawFilter(baseSpecFilter);
     
     // NOTE: for IMS data, averageSpectraRaw() is called which returns a SpectrumRawAveraged. Since we don't care about
     // the additional metadata from this class, we purposely slice it by explicitly specifying the lambda's return type.

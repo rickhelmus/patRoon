@@ -785,13 +785,11 @@ Rcpp::List getEICList(const MSReadBackend &backend, const std::vector<SpectrumRa
         const auto itStart = std::lower_bound(allPeaksSorted.mzs.cbegin(), allPeaksSorted.mzs.cend(), mzExtStart);
         if (itStart == allPeaksSorted.mzs.cend() || *itStart > mzExtEnd)
             continue;
-        const auto itEnd = std::prev((mzExtEnd == 0.0) ?
-                                         allPeaksSorted.mzs.cend() :
-                                         std::upper_bound(itStart, allPeaksSorted.mzs.cend(), mzExtEnd));
+        const auto itEnd = (mzExtEnd == 0.0) ?
+                                 allPeaksSorted.mzs.cend() :
+                                 std::upper_bound(itStart, allPeaksSorted.mzs.cend(), mzExtEnd);
         const auto startInd = std::distance(allPeaksSorted.mzs.cbegin(), itStart);
-        auto endInd = std::distance(allPeaksSorted.mzs.cbegin(), itEnd);
-        if (startInd > endInd)
-            endInd = startInd; // only one peak at the end
+        const auto endInd = std::distance(allPeaksSorted.mzs.cbegin(), itEnd);
         
         // sort subrange of indices to make sure we process peaks in scan order
         // NOTE: also sort by m/z and mobility to ensure that the order is not affected by eg the inclusion of EICs with

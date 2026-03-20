@@ -160,13 +160,13 @@ setMethod("averageMSPeakLists", "MSPeakLists", function(obj)
         allMSPLMSAvg <- doAvg("MS", obj@avgPeakListArgs$clusterMzWindow, obj@avgPeakListArgs$topMost,
                               obj@avgPeakListArgs$minIntensityPre, obj@avgPeakListArgs$minIntensityPost,
                               obj@avgPeakListArgs$relMinAbundance, obj@avgPeakListArgs$absMinAbundance,
-                              obj@avgPeakListArgs$method, TRUE, obj@avgPeakListArgs$withPrecursorMS,
-                              obj@avgPeakListArgs$pruneMissingPrecursorMS, TRUE)
+                              obj@avgPeakListArgs$minRelCumIntensity, obj@avgPeakListArgs$method, TRUE,
+                              obj@avgPeakListArgs$withPrecursorMS, obj@avgPeakListArgs$pruneMissingPrecursorMS, TRUE)
         
         allMSPLMSMSAvg <- doAvg("MSMS", obj@avgPeakListArgs$clusterMzWindow, obj@avgPeakListArgs$topMost,
                                 obj@avgPeakListArgs$minIntensityPre, obj@avgPeakListArgs$minIntensityPost,
                                 obj@avgPeakListArgs$relMinAbundance, obj@avgPeakListArgs$absMinAbundance,
-                                obj@avgPeakListArgs$method, TRUE, FALSE, FALSE,
+                                obj@avgPeakListArgs$minRelCumIntensity, obj@avgPeakListArgs$method, TRUE, FALSE, FALSE,
                                 obj@avgPeakListArgs$retainPrecursorMSMS)
 
         avgPLists <- sapply(gNames, function(grp)
@@ -486,6 +486,9 @@ setMethod("delete", "MSPeakLists", function(obj, i = NULL, j = NULL, k = NULL, r
 #'   Set to \code{NULL} to ignore.
 #' @param absMinAbundanceFGroup,relMinAbundanceFGroup The minimum absolute/relative abundance of a mass peak across
 #'   spectra that are averaged for a feature group. Set to \code{NULL} to ignore.
+#' @param relMinCumIntensity The minimum relative cumulative intensity of the peaks. For instance, a value of
+#'   \samp{0.95} means that only the most intense peaks that together account for 95\% of the total intensity are
+#'   retained. Set to \code{NULL} to ignore.
 #' @param isolatePrec If not \code{NULL} then value should be a \code{list} with parameters used for isolating the
 #'   precursor and its isotopes in MS peak lists (see \verb{Isolating precursor data}). Alternatively, \code{TRUE} to
 #'   apply the filter with default settings (as given with \code{getDefIsolatePrecParams}).
@@ -517,9 +520,10 @@ setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity 
                                             topMostPeaks = NULL, minPeaks = NULL, maxMZOverPrec = NULL,
                                             absMinAbundanceFeat = NULL, relMinAbundanceFeat = NULL,
                                             absMinAbundanceFGroup = NULL, relMinAbundanceFGroup = NULL,
-                                            isolatePrec = NULL, deIsotope = FALSE, removeMZs = NULL, withMSMS = FALSE,
-                                            annotatedBy = NULL, retainPrecursor = TRUE,
-                                            mzWindow = defaultLim("mz", "medium"), reAverage = FALSE, negate = FALSE)
+                                            relMinCumIntensity = NULL, isolatePrec = NULL, deIsotope = FALSE,
+                                            removeMZs = NULL, withMSMS = FALSE, annotatedBy = NULL,
+                                            retainPrecursor = TRUE, mzWindow = defaultLim("mz", "medium"),
+                                            reAverage = FALSE, negate = FALSE)
 {
     if (is.logical(isolatePrec) && isolatePrec == TRUE)
         isolatePrec <- getDefIsolatePrecParams()
@@ -530,6 +534,7 @@ setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity 
                absMinAbundanceFeat + relMinAbundanceFeat +  absMinAbundanceFGroup + relMinAbundanceFGroup,
            lower = 0, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertCount, . ~ topMostPeaks + minPeaks, positive = TRUE, null.ok = TRUE, fixed = list(add = ac))
+    checkmate::assertNumber(relMinCumIntensity, lower = 0, upper = 1, finite = TRUE, null.ok = TRUE, add = ac)
     assertPListIsolatePrecParams(isolatePrec, add = ac)
     aapply(checkmate::assertFlag, . ~ deIsotope + withMSMS + retainPrecursor + reAverage + negate,
            fixed = list(add = ac))
@@ -571,8 +576,8 @@ setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity 
 
     hash <- makeHash(obj, MSLevel, absMinIntensity, relMinIntensity, topMostPeaks, minPeaks, maxMZOverPrec,
                      absMinAbundanceFeat, relMinAbundanceFeat, absMinAbundanceFGroup, relMinAbundanceFGroup,
-                     isolatePrec, deIsotope, removeMZs, withMSMS, annotatedBy, retainPrecursor, mzWindow, reAverage,
-                     negate)
+                     relMinCumIntensity, isolatePrec, deIsotope, removeMZs, withMSMS, annotatedBy, retainPrecursor,
+                     mzWindow, reAverage, negate)
     cache <- loadCacheData("filterMSPeakLists", hash)
     if (!is.null(cache))
         return(cache)
@@ -598,7 +603,8 @@ setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity 
                                       if (isAna || !reAverage) relMinAbundanceFeat,
                                       if (!isAna) absMinAbundanceFGroup else NULL,
                                       if (!isAna) relMinAbundanceFGroup else NULL,
-                                      deIsotope, removeMZs, TRUE, plF[precursor == TRUE]$mz, mzWindow, negate)
+                                      relMinCumIntensity, deIsotope, removeMZs, TRUE, plF[precursor == TRUE]$mz,
+                                      mzWindow, negate)
             if (!is.null(isolatePrec))
                 plF <- isolatePrecInMSPeakList(plF, isolatePrec, negate)
         }
@@ -647,7 +653,8 @@ setMethod("filter", "MSPeakLists", function(obj, MSLevel = 1:2, absMinIntensity 
                                       absMinAbundanceFeat, relMinAbundanceFeat,
                                       if (is.null(ana)) absMinAbundanceFGroup else NULL,
                                       if (is.null(ana)) relMinAbundanceFGroup else NULL,
-                                      deIsotope, removeMZs, retainPrecursor, precMZ, mzWindow, negate)
+                                      relMinCumIntensity, deIsotope, removeMZs, retainPrecursor, precMZ, mzWindow,
+                                      negate)
         }
         
         return(!pl$ID %in% plF$ID)
@@ -952,8 +959,6 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRTWindo
                                                            avgFeatParams = getDefAvgPListParams(),
                                                            avgFGroupParams = getDefAvgPListParams())
 {
-    # UNDONE: FIW=NULL removed all MS1 spectra (no precursors) --> find other way to do this
-    
     ac <- checkmate::makeAssertCollection()
     checkmate::assertNumber(maxMSRTWindow, lower = 0.01, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assert(
@@ -993,9 +998,9 @@ setMethod("generateMSPeakLists", "featureGroups", function(fGroups, maxMSRTWindo
                               retainPrecursor = params$retainPrecursor, MSLevel = MSLevel, method = params$method,
                               mzWindow = params$clusterMzWindow, startMobs = ft$mobmin,
                               endMobs = ft$mobmax, relMinAbundance = params$relMinAbundance,
-                              absMinAbundance = params$absMinAbundance, smoothWindowIMS = params$smoothWindowIMS,
-                              halfWindowIMS = params$halfWindowIMS, maxGapIMS = params$maxGapIMS,
-                              topMost = params$topMost,
+                              absMinAbundance = params$absMinAbundance, minRelCumIntensity = params$minRelCumIntensity,
+                              smoothWindowIMS = params$smoothWindowIMS, halfWindowIMS = params$halfWindowIMS,
+                              maxGapIMS = params$maxGapIMS, topMost = params$topMost,
                               minIntensityIMS = params$minIntensityIMS, minIntensityPre = params$minIntensityPre,
                               minIntensityPost = params$minIntensityPost, minBPIntensity = 0)
         names(ret) <- ft$group

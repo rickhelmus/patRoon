@@ -149,6 +149,7 @@ Several new data filters were added throughout the workflow:
 
 * `absMinMaxIntensity` and `relMinMaxIntensity`: filter features by their maximum intensity across samples (suggested by Nienke Meekel).
 * Peak abundance filters for MS peak lists to eliminate low abundance peaks across averaged spectra.
+* `minRelCumIntensity` spectrum averaging and `filter()` parameter to filter MS peaks by their cumulative intensity in the spectrum (suggested by Leon Saal, issue #150).
 * `maxMZOverPrec`: eliminate peaks with higher m/z values than precursors in MS2 data.
 * `fragFormulas` and `lossFormulas`: filter candidates by matching fragment or neutral loss formulae.
 

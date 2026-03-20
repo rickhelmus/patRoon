@@ -152,7 +152,6 @@ testMSPLCumInt <- function(obj, orig, avg, thr, negate = FALSE)
     tabOrig[order(intensity), cumInt := cumsum(intensity) / sum(intensity), by = by]
     tab[tabOrig, cumInt := i.cumInt, on = c(by, "ID")]
     tab <- tab[precursor == FALSE] # might've been re-added
-    browser()
     if (negate)
         expect_lte(max(tab$cumInt), thr)
     else

@@ -199,7 +199,8 @@ genHTMLReportPlotsFormulas <- function(grp, formulas, MSPeakLists, settings, out
     {
         makeHTMLReportPlot("form-scores", outPath, "plotScores",
                            list(formulas, index, grp, normalizeScores = settings$formulas$normalizeScores,
-                                excludeNormScores = settings$formulas$exclNormScores), width = 6, height = 5)
+                                excludeNormScores = settings$formulas$exclNormScores),
+                           parParams = list(mar = c(4.1, 3, 1, 0.2)), width = 6, height = 5)
     })
     
         
@@ -232,7 +233,7 @@ genHTMLReportPlotsCompounds <- function(grp, compounds, MSPeakLists, formulas, s
                            list(compounds, index, grp, normalizeScores = settings$compounds$normalizeScores,
                                 excludeNormScores = settings$compounds$exclNormScores,
                                 onlyUsed = settings$compounds$onlyUsedScorings),
-                           parParams = list(mar = c(4.1, 4.1, 0.4, 0.2)), width = 7, height = 4, pointsize = 16)
+                           parParams = list(mar = c(4.1, 3, 1, 0.2)), width = 7, height = 4, pointsize = 16)
     })
     
     return(ret)

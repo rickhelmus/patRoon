@@ -417,7 +417,7 @@ reportHTMLUtils$methods(
         concs <- prepFGPredUID(concentrations(objects$fGroups), objects)
 
         colDefs <- list(
-            group = reactable::colDef(show = FALSE),
+            group = reactable::colDef(show = FALSE, filterMethod = getReactFilterMethodExact()),
             candidate = reactable::colDef(html = TRUE, cell = htmlwidgets::JS("reactCellPredCand")),
             candidate_UID = reactable::colDef(show = FALSE)
         )
@@ -436,7 +436,7 @@ reportHTMLUtils$methods(
         tox <- prepFGPredUID(toxicities(objects$fGroups), objects)
         
         colDefs <- list(
-            group = reactable::colDef(show = FALSE),
+            group = reactable::colDef(show = FALSE, filterMethod = getReactFilterMethodExact()),
             candidate = reactable::colDef(html = TRUE, cell = htmlwidgets::JS("reactCellPredCand")),
             candidate_UID = reactable::colDef(show = FALSE),
             LC50 = reactable::colDef(format = reactable::colFormat(digits = 2))
@@ -482,7 +482,7 @@ reportHTMLUtils$methods(
         {
             list(
                 list(value = "", name = "None"),
-                list(value = "ims_precursor_group", name = "IMS precursor group")
+                list(value = "ims_precursor_group", name = "IMS precursor")
             )
         }
         chromMobTitle <- if (hasMob && settings$features$chromatograms$large && settings$features$mobilograms$large)

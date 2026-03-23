@@ -82,7 +82,7 @@ doAnnotatePeakList <- function(spec, fragInfo, onlyAnnotated)
         {
             byx <- c(byx, "set"); byy <- c(byy, "set")
         }
-        spec <- tryCatch(merge(spec, fi, all.x = TRUE, by.x = byx, by.y = byy, sort = FALSE), error = function(...) FALSE)
+        spec <- merge(spec, fi, all.x = TRUE, by.x = byx, by.y = byy, sort = FALSE)
         set(spec, i = which(is.na(spec$annotated)), j = "annotated", value = FALSE)
     }
     

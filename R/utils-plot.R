@@ -391,7 +391,7 @@ makeScoresPlot <- function(scoreTable, mcn)
     oldp <- par(no.readonly = TRUE)
     maxStrW <- max(strwidth(unique(scores$type), units = 'in', cex = 0.9)) + 0.5
     omai <- par("mai")
-    par(mai = c(maxStrW, 0.5, omai[3], 0))
+    par(mai = c(max(maxStrW, omai[1]), omai[2], omai[3], omai[4]))
     
     if (isMerged)
         cols <- getBrewerPal(length(unique(scores$merged)), "Paired")

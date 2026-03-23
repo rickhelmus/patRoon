@@ -384,6 +384,7 @@ In most cases `fixedIsolationWidth=FALSE` is recommended: this automatically det
     * Fixed: avoid error when `consensus()` is called with empty objects for a set (issue #144).
     * Fixed: `generateCompoundsMetFrag()`: don't try to do multiprocess parallelization for non-local databases (e.g. PubChem) to avoid connection errors.
     * `annotationBy` filter for MS peak lists: clarify and verify that it only works on group averaged peak lists and cannot be combined with `reAverage=TRUE`.
+    * Fixed: `plotScores()`: does now take `mar`/`mai` of `par()` parameters into account.
 * Components
     * Fixed: reporting components from `cliqueMS` and suspect screened features would fail (reported by Jan Specker).
     * Fixed: feature componentization would fail if no annotations were found (reported by Jan Specker).

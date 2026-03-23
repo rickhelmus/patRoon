@@ -389,6 +389,8 @@ makeMainResultsReactable <- function(tab, tabName, retMin, colGroupOrder = NULL,
     
     onClick <- htmlwidgets::JS(sprintf("function(rowInfo, column)
 {
+    if (rowInfo.index == undefined)
+        return; // don't process clicks of parent rows 
     Reactable.setMeta('%s', { selectedRow: rowInfo.index });
     %s(rowInfo.values, rowInfo.index);
 }", id, updateRowFunc))

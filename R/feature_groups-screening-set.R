@@ -493,7 +493,8 @@ setMethod("unset", "featureGroupsScreeningSet", function(obj, set)
     sInfo <- copy(screenInfo(obj))
     if (length(sInfo) > 0)
     {
-        sInfo <- removeDTColumnsIfPresent(sInfo, c("formRank", "compRank", "estIDLevel", "sets"))
+        sInfo <- removeDTColumnsIfPresent(sInfo, c("formRank", "compRank", "estIDLevel", "annSimForm", "annSimComp",
+                                                   "annSimBoth", "sets"))
         # restore set specific columns
         setnames(sInfo, sub(paste0("\\-", set, "$"), "", names(sInfo)))
     }

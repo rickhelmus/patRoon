@@ -118,7 +118,7 @@ mergeScreenInfoWithDT <- function(tab, scrInfo, collapseSuspects, onlyHits)
     {
         scrInfo[, susp_name := paste0(susp_name, collapse = collapseSuspects), by = "susp_group"]
         if (!is.null(scrInfo[["susp_estIDLevel"]]))
-            scrInfo[, susp_bestEstIDLevel := getBestIDLevel(scrInfo$susp_estIDLevel), by = "susp_group"]
+            scrInfo[, susp_bestEstIDLevel := getBestIDLevel(susp_estIDLevel), by = "susp_group"]
         # only keep unique and remove suspect specific columns
         scrInfo <- unique(subsetDTColumnsIfPresent(scrInfo, c("susp_group", "susp_name", "susp_bestEstIDLevel")),
                           by = "susp_group")

@@ -46,57 +46,52 @@ genTPSpecSimilarities <- function(obj, groupName1, groupName2, specSimParams, ..
 
 genTPAnnSimilarities <- function(parentFG, TPFGs, MSPeakLists, formulas, compounds)
 {
-    getAllAnnPLs <- function(grp)
+    getAllFragNLs <- function(grp)
     {
-        annPLsForm <- annPLsComp <- NULL
-        
-        if (!is.null(formulas) && !is.null(formulas[[grp]]))
+        getAllFNs <- function(obj)
         {
-            annPLsForm <- rbindlist(pruneList(lapply(seq_len(nrow(formulas[[grp]])), function(i)
+            FNs <- if (is.null(obj) || is.null(obj[[grp]]))
+                list()
+            else
             {
-                annotatedPeakList(formulas, index = i, groupName = grp, MSPeakLists = MSPeakLists,
-                                  onlyAnnotated = TRUE)
-            })), fill = TRUE)
+                pruneList(lapply(seq_len(nrow(obj[[grp]])), function(i)
+                {
+                    fi <- getFragInfo(obj, groupName = grp, index = i)
+                    if (is.null(fi))
+                        return(NULL)
+                    return(list(ion_formula = fi$ion_formula, neutral_loss = fi$neutral_loss))
+                }))
+            }
+            return(list(frags = unique(unlist(lapply(FNs, `[[`, "ion_formula"))),
+                        nls = unique(unlist(lapply(FNs, `[[`, "neutral_loss")))))
         }
         
-        if (!is.null(compounds) && !is.null(compounds[[grp]]))
-        {
-            annPLsComp <- rbindlist(pruneList(lapply(seq_len(nrow(compounds[[grp]])), function(i)
-            {
-                # NOTE: we don't set formulas as we handle them separately in order to get all their results as well
-                annotatedPeakList(compounds, index = i, groupName = grp, MSPeakLists = MSPeakLists, formulas = NULL,
-                                  onlyAnnotated = TRUE)
-            })), fill = TRUE)
-        }
-        
-        # NOTE: use rbindlist to force DT method, which has the fill argument we need
-        # NOTE: rbind/rbindlist deals with NULLs
-        return(rbindlist(list(annPLsForm, annPLsComp), fill = TRUE)) 
+        return(list(frags = union(getAllFNs(formulas)$frags, getAllFNs(compounds)$frags),
+                    nls = union(getAllFNs(formulas)$nls, getAllFNs(compounds)$nls)))
     }
     
-    annPLParent <- getAllAnnPLs(parentFG)
+    fragNLsParent <- getAllFragNLs(parentFG)
     
-    if (is.null(annPLParent))
+    if (length(fragNLsParent) == 0)
         return(list(totalFragmentMatches = rep(NA_integer_, length(TPFGs)),
                     totalNeutralLossMatches = rep(NA_integer_, length(TPFGs))))
     
-    parentFrags <- unique(annPLParent$ion_formula); parentNLs <- unique(annPLParent$neutral_loss)
-    annPLTPs <- lapply(TPFGs, getAllAnnPLs)
-    fragMatches <- sapply(annPLTPs, function(ann)
-    {
-        if (is.null(ann))
-            return(NA_integer_)
-        return(sum(unique(ann$ion_formula) %chin% parentFrags))
-    })
-    NLMatches <- sapply(annPLTPs, function(ann)
-    {
-        if (is.null(ann))
-            return(NA_integer_)
-        return(sum(unique(ann$neutral_loss) %chin% parentNLs))
-    })
+    fragNLsTPs <- lapply(TPFGs, getAllFragNLs)
     
-    return(list(totalFragmentMatches = fragMatches,
-                totalNeutralLossMatches = NLMatches))
+    fragMatches <- sapply(fragNLsTPs, function(fn)
+    {
+        if (length(fn$frags) == 0)
+            return(NA_integer_)
+        return(sum(unique(fn$frags) %chin% fragNLsParent$frags))
+    })
+    NLMatches <- sapply(fragNLsTPs, function(fn)
+    {
+        if (length(fn$nls) == 0)
+            return(NA_integer_)
+        return(sum(unique(fn$nls) %chin% fragNLsParent$nls))
+    })
+
+    return(list(totalFragmentMatches = fragMatches, totalNeutralLossMatches = NLMatches))
 }
 
 getTPComponCandidatesScr <- function(prods, TPGroups, MSPeakLists, formulas, compounds, parFG, parFormula, parIK)

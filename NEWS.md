@@ -350,6 +350,7 @@ In most cases `fixedIsolationWidth=FALSE` is recommended: this automatically det
         * The fragment and neutral loss matches are now calculated for all candidates (as done previously) and per candidate.
         * `filter()` can now filter fragment and neutral loss matches per candidate.
         * The `componentsTPs` gained a few new slots, primarily for reporting.
+        * Optimized calculation of total fragment and neutral loss matches
 * Misc
     * `patRoon.cache.maxEntries` package option (issue #139).
     * Updated PubChem Transformations to 0.2.2.
@@ -388,6 +389,9 @@ In most cases `fixedIsolationWidth=FALSE` is recommended: this automatically det
 * Components
     * Fixed: reporting components from `cliqueMS` and suspect screened features would fail (reported by Jan Specker).
     * Fixed: feature componentization would fail if no annotations were found (reported by Jan Specker).
+* TPs
+    * Fixed: The `removeTPIsomers` filter for `transformationProductsStructure` didn't actually apply the `removeDuplicates` filter.
+    * `generateComponentsTPs()`: if no TP annotations are available then total fragment/neutral loss matches are reported as NA instead of zero.
 * Misc
     * Fixed: `report()`: don't show (empty) annotations column in feature data if no feature annotations are present.
     * Fixed: `report()`: TP graphs were generated for components with absent (parent) fGroups.

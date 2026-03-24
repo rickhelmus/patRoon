@@ -59,11 +59,16 @@ genTPAnnSimilarities <- function(parentFG, TPFGs, MSPeakLists, formulas, compoun
                     fi <- getFragInfo(obj, groupName = grp, index = i)
                     if (is.null(fi))
                         return(NULL)
-                    return(list(ion_formula = fi$ion_formula, neutral_loss = fi$neutral_loss))
+                    return(list(ion_formula = fi$ion_formula, neutral_loss = fi[nzchar(neutral_loss)]$neutral_loss))
                 }))
             }
-            return(list(frags = unique(unlist(lapply(FNs, `[[`, "ion_formula"))),
-                        nls = unique(unlist(lapply(FNs, `[[`, "neutral_loss")))))
+            ret <- list(frags = unique(unlist(lapply(FNs, `[[`, "ion_formula"))),
+                        nls = unique(unlist(lapply(FNs, `[[`, "neutral_loss"))))
+            if (length(ret$frags) == 0)
+                ret$frags <- character()
+            if (length(ret$nls) == 0)
+                ret$nls <- character()
+            return(ret)
         }
         
         return(list(frags = union(getAllFNs(formulas)$frags, getAllFNs(compounds)$frags),
@@ -111,24 +116,26 @@ getTPComponCandidatesScr <- function(prods, TPGroups, MSPeakLists, formulas, com
     if (!is.null(tab[["formula"]]) && !is.null(parFormula))
         tab[, formulaDiff := sapply(formula, getFormulaDiffText, form2 = parFormula)]
 
-    getAnnPL <- function(featAnn, grp, UID, ...)
+    getFragNLsObj <- function(featAnn, grp, UID, ...)
     {
         if (is.null(UID) || is.null(featAnn) || is.null(MSPeakLists) || !grp %chin% groupNames(featAnn))
             return(NULL)
         wh <- which(UID == featAnn[[grp]]$UID)
         if (length(wh) == 0)
             return(NULL)
-        return(annotatedPeakList(featAnn, groupName = grp, index = wh, MSPeakLists = MSPeakLists, onlyAnnotated = TRUE,
-                                 ...))
+        fi <- getFragInfo(featAnn, groupName = grp, index = wh)
+        return(list(frags = fi$ion_formula, nls = fi[nzchar(neutral_loss)]$neutral_loss))
     }
     getFragNLs <- function(grp, InChIKey, formula)
     {
-        fAPL <- getAnnPL(formulas, grp, formula)
-        cAPL <- getAnnPL(compounds, grp, getIKBlock1(InChIKey))
-        APL <- rbindlist(list(fAPL, cAPL), fill = TRUE)
-        if (nrow(APL) == 0)
-            return(NULL)
-        return(unique(APL[, c("ion_formula", "neutral_loss"), with = FALSE]))
+        ret <- list(frags = character(), nls = character())
+        formsFN <- getFragNLsObj(formulas, grp, formula)
+        if (!is.null(formsFN))
+            ret <- list(frags = formsFN$frags, nls = formsFN$nls)
+        compsFN <- getFragNLsObj(compounds, grp, getIKBlock1(InChIKey))
+        if (!is.null(compsFN))
+            ret <- list(frags = union(ret$frags, compsFN$frags), nls = union(ret$nls, compsFN$nls))
+        return(ret)
     }
 
     hasForm <- !is.null(tab[["formula"]]); hasIK <- !is.null(tab[["InChIKey"]])
@@ -136,14 +143,14 @@ getTPComponCandidatesScr <- function(prods, TPGroups, MSPeakLists, formulas, com
     {
         parFragNLs <- getFragNLs(parFG, parIK, parFormula)    
         
-        if (!is.null(parFragNLs) && nrow(parFragNLs) > 0)
+        if (length(parFragNLs$frags) > 0 || length(parFragNLs$nls) > 0)
         {
             tab[, c("fragmentMatches", "neutralLossMatches") := {
                 fragNLs <- getFragNLs(TPGroups[.I], if (hasIK) NAToNULL(InChIKey) else NULL,
                                       if (hasForm) NAToNULL(formula) else NULL)
-                if (!is.null(fragNLs) && nrow(fragNLs) > 0)
-                    list(sum(fragNLs$ion_formula %chin% parFragNLs$ion_formula),
-                         sum(fragNLs$neutral_loss %chin% parFragNLs$neutral_loss))
+                if (length(fragNLs$frags) > 0 || length(fragNLs$nls) > 0)
+                    list(sum(fragNLs$frags %chin% parFragNLs$frags),
+                         sum(fragNLs$nls %chin% parFragNLs$nls))
                 else
                     list(NA_integer_, NA_integer_)
             }, by = seq_len(nrow(tab))]

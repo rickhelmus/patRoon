@@ -12,7 +12,6 @@
 - MSTK: PR for centroid status buf for mzXML?
     - saxmzxmlhandler.cpp L158: spec->setCentroid((bool)atoi(getAttrValue("centroided",attr)));
 - cache estIDConf()
-- similarly optimize getTPComponCandidatesScr() for frag/NL matches
 
 
 ## Maybe

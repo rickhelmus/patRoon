@@ -172,7 +172,7 @@ setMethod("plotSpectrum", "formulasSet", function(obj, index, groupName, analysi
         {
             # convert candidate index to non set version by using the ranks
             usInds <- lapply(theSets, function(s) obj[[groupName[nr]]][[paste0("rank-", s)]][index[nr]])
-            skip <- sapply(usInds, is.null)
+            skip <- sapply(usInds, is.null) | sapply(usMSPL, \(mspl) is.null(mspl[[groupName[nr]]]) || is.null(mspl[[groupName[nr]]][["MSMS"]]))
             binPLs <- sapply(binnedPLs[!skip], "[[", nr, simplify = FALSE)
             annPLs <- Map(usObj[!skip], usInds[!skip], usMSPL[!skip], f = annotatedPeakList,
                           MoreArgs = list(groupName = groupName[nr], analysis = analysis[nr]))

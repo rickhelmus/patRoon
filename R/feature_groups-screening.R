@@ -246,7 +246,7 @@ setMethod("estimateIDConfidence", "featureGroupsScreening", function(obj, MSPeak
 
     hash <- makeHash(obj, MSPeakLists, formulas, compounds, absMzDev, checkFragments, formulasNormalizeScores,
                      compoundsNormalizeScores, makeFileHash(IDFile))
-    cd <- loadCacheData("estimateIDConfidence", hash)
+    cd <- loadCacheData("estimateIDConfidenceScr", hash)
     if (!is.null(cd))
         return(cd)
     
@@ -257,7 +257,6 @@ setMethod("estimateIDConfidence", "featureGroupsScreening", function(obj, MSPeak
         cat("No suspect hits, nothing to annotate")
         return(obj)
     }
-        
         
     mzWithin <- function(mz1, mz2) abs(mz1 - mz2) <= absMzDev
 
@@ -372,7 +371,7 @@ setMethod("estimateIDConfidence", "featureGroupsScreening", function(obj, MSPeak
     
     close(prog)
     
-    saveCacheData("estimateIDConfidence", obj, hash)
+    saveCacheData("estimateIDConfidenceScr", obj, hash)
     
     return(obj)
 })

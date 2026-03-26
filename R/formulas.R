@@ -441,6 +441,11 @@ setMethod("estimateIDConfidence", "formulas", function(obj, absMzDev = defaultLi
         assertCanCreateDir(logPath, add = ac)
     checkmate::reportAssertions(ac)
     
+    hash <- makeHash(obj, absMzDev, normalizeScores, makeFileHash(IDFile))
+    cd <- loadCacheData("estimateIDConfidenceFormulas", hash)
+    if (!is.null(cd))
+        return(cd)
+    
     IDLevelRules <- readIDLRules(IDFile)
     
     mFormNames <- mergedConsensusNames(obj)
@@ -473,6 +478,8 @@ setMethod("estimateIDConfidence", "formulas", function(obj, absMzDev = defaultLi
         }, by = seq_len(nrow(ann))]
         return(ann)
     })
+    
+    saveCacheData("estimateIDConfidenceFormulas", obj, hash)
     
     return(obj)
 })

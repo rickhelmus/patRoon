@@ -440,8 +440,8 @@ div.csl-indent {
 <span id="cb209-14"><a href="initiating-a-sets-workflow.html#cb209-14" tabindex="-1"></a></span>
 <span id="cb209-15"><a href="initiating-a-sets-workflow.html#cb209-15" tabindex="-1"></a><span class="fu">report</span>(fGroups, <span class="at">MSPeakLists =</span> mslists, <span class="at">formulas =</span> formulas, <span class="at">compounds =</span> compounds)</span></code></pre></div>
 <p>This workflow will do all the steps for positive <em>and</em> negative data.</p>
-<div id="htmlwidget-2c5eb47db372276c4eff" style="width:250px;height:300px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-2c5eb47db372276c4eff">{"x":{"diagram":"\ndigraph Workflow {\n  graph [ rankdir = TB, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 0.6,\n         fontsize = 16,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Pre-treatment (+)\" -> \"Find features (+)\" -> \"makeSet\"\n    \"Pre-treatment (-)\" -> \"Find features (-)\" -> \"makeSet\"\n    \"makeSet\" -> \"Group features\" -> \"Annotation, ...\"\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-c5fdbf1ba482fcf4074f" style="width:250px;height:300px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-c5fdbf1ba482fcf4074f">{"x":{"diagram":"\ndigraph Workflow {\n  graph [ rankdir = TB, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 0.6,\n         fontsize = 16,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Pre-treatment (+)\" -> \"Find features (+)\" -> \"makeSet\"\n    \"Pre-treatment (-)\" -> \"Find features (-)\" -> \"makeSet\"\n    \"makeSet\" -> \"Group features\" -> \"Annotation, ...\"\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p>Only a few modifications were necessary:</p>
 <ul>
 <li>The <a href="sample-analyses.html#anaInfo">analysis information</a> is obtained for positive and negative data (i.e. per set)</li>

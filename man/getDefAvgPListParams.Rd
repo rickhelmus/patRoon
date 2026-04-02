@@ -43,6 +43,8 @@ by \code{topMost} and averaging).
 spectra that are averaged. If \code{absMinAbundance} exceeds the number of spectra then the threshold is
 automatically lowered to the number of spectra.
 
+\item \code{minRelCumIntensity} Minimum relative cumulative intensity of an MS peak in the averaged spectrum.
+
 \item \code{smoothWindowIMS},\code{halfWindowIMS},\code{maxGapIMS} Parameters used for centroiding \emph{m/z} peaks
 from IMS-HRMS data. See \verb{Centroiding IMS data} for more details.
 
@@ -75,6 +77,7 @@ The \code{getDefAvgPListParams} function can be used to generate a default param
   minIntensityIMS = 25,
   absMinAbundance = 0,
   relMinAbundance = 0,
+  minRelCumIntensity = 0,
   smoothWindowIMS = 0,
   halfWindowIMS = 2,
   maxGapIMS = 0.005,

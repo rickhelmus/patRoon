@@ -82,6 +82,7 @@ spectrumSimilarityIMS(obj, ...)
   relMinAbundanceFeat = NULL,
   absMinAbundanceFGroup = NULL,
   relMinAbundanceFGroup = NULL,
+  relMinCumIntensity = NULL,
   isolatePrec = NULL,
   deIsotope = FALSE,
   removeMZs = NULL,
@@ -246,6 +247,10 @@ Set to \code{NULL} to ignore.}
 
 \item{absMinAbundanceFGroup, relMinAbundanceFGroup}{The minimum absolute/relative abundance of a mass peak across
 spectra that are averaged for a feature group. Set to \code{NULL} to ignore.}
+
+\item{relMinCumIntensity}{The minimum relative cumulative intensity of the peaks. For instance, a value of
+\samp{0.95} means that only the most intense peaks that together account for 95\% of the total intensity are
+retained. Set to \code{NULL} to ignore.}
 
 \item{isolatePrec}{If not \code{NULL} then value should be a \code{list} with parameters used for isolating the
 precursor and its isotopes in MS peak lists (see \verb{Isolating precursor data}). Alternatively, \code{TRUE} to

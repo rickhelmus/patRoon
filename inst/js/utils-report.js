@@ -569,7 +569,7 @@ function toggleTabFilters(tableID, e)
 
 function annTableHasSuspects(ann)
 {
-    return Reactable.getInstance(ann + "Tab").allColumns.includes("suspect");
+    return Reactable.getInstance(ann + "Tab").allColumns.map(ac => ac.id).includes("suspect");
 }
 
 function applyAnnSuspFilter(ann, suspect = undefined)

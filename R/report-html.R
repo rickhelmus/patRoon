@@ -89,7 +89,7 @@ generateHTMLReportPlots <- function(fGroups, MSPeakLists, formulas, compounds, c
         }
         if ("venn" %in% settings$summary && aggrLen < 6)
         {
-            ret$overview$venn <- makeHTMLReportPlot("venn", outPath, "plotVenn", list(fGroups, aggregate = aggr),
+            ret$overview$venn <- makeHTMLReportPlot("venn", outPath, "plotVenn", list(fGroups, aggregate = aggr, margin = 0.1),
                                                     width = 7, height = 7)
         }
         

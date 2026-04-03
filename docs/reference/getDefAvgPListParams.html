@@ -133,6 +133,7 @@ by <code>topMost</code> and averaging).</p></li>
 <li><p><code>absMinAbundance</code>,<code>relMinAbundance</code> Minimum absolute/relative abundance of an MS peak across the
 spectra that are averaged. If <code>absMinAbundance</code> exceeds the number of spectra then the threshold is
 automatically lowered to the number of spectra.</p></li>
+<li><p><code>minRelCumIntensity</code> Minimum relative cumulative intensity of an MS peak in the averaged spectrum.</p></li>
 <li><p><code>smoothWindowIMS</code>,<code>halfWindowIMS</code>,<code>maxGapIMS</code> Parameters used for centroiding <em>m/z</em> peaks
 from IMS-HRMS data. See <code>Centroiding IMS data</code> for more details.</p></li>
 <li><p><code>withPrecursorMS</code> For MS data only: ignore any spectra that do not contain the precursor peak.</p>
@@ -157,6 +158,7 @@ precursor peaks in both MS and MS/MS data may still be removed by intensity thre
 <span>  minIntensityIMS <span class="op">=</span> <span class="fl">25</span>,</span>
 <span>  absMinAbundance <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  relMinAbundance <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  minRelCumIntensity <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  smoothWindowIMS <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  halfWindowIMS <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  maxGapIMS <span class="op">=</span> <span class="fl">0.005</span>,</span>

@@ -149,6 +149,7 @@
 <span>  relMinAbundanceFeat <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  absMinAbundanceFGroup <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  relMinAbundanceFGroup <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  relMinCumIntensity <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  isolatePrec <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  deIsotope <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  removeMZs <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -349,6 +350,12 @@ Set to <code>NULL</code> to ignore.</p></dd>
 <dt id="arg-absminabundancefgroup-relminabundancefgroup">absMinAbundanceFGroup, relMinAbundanceFGroup<a class="anchor" aria-label="anchor" href="#arg-absminabundancefgroup-relminabundancefgroup"></a></dt>
 <dd><p>The minimum absolute/relative abundance of a mass peak across
 spectra that are averaged for a feature group. Set to <code>NULL</code> to ignore.</p></dd>
+
+
+<dt id="arg-relmincumintensity">relMinCumIntensity<a class="anchor" aria-label="anchor" href="#arg-relmincumintensity"></a></dt>
+<dd><p>The minimum relative cumulative intensity of the peaks. For instance, a value of
+<samp>0.95</samp> means that only the most intense peaks that together account for 95% of the total intensity are
+retained. Set to <code>NULL</code> to ignore.</p></dd>
 
 
 <dt id="arg-isolateprec">isolatePrec<a class="anchor" aria-label="anchor" href="#arg-isolateprec"></a></dt>

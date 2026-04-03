@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='432.00pt' height='288.00pt' viewBox='0 0 432.00 288.00'>
+<g class='svglite'>
+<defs>
+  <style type='text/css'><![CDATA[
+    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {
+      fill: none;
+      stroke: #000000;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-miterlimit: 10.00;
+    }
+    .svglite text {
+      white-space: pre;
+    }
+    .svglite g.glyphgroup path {
+      fill: inherit;
+      stroke: none;
+    }
+  ]]></style>
+</defs>
+<rect width='100%' height='100%' style='stroke: none; fill: none;'/>
+<defs>
+  <clipPath id='cpMC4wMHw0MzIuMDB8MC4wMHwyODguMDA='>
+    <rect x='0.00' y='0.00' width='432.00' height='288.00' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMC4wMHw0MzIuMDB8MC4wMHwyODguMDA=)'>
+<line x1='93.52' y1='209.28' x2='288.29' y2='209.28' style='stroke-width: 0.75;' />
+<line x1='93.52' y1='209.28' x2='93.52' y2='218.88' style='stroke-width: 0.75;' />
+<line x1='125.98' y1='209.28' x2='125.98' y2='218.88' style='stroke-width: 0.75;' />
+<line x1='158.44' y1='209.28' x2='158.44' y2='218.88' style='stroke-width: 0.75;' />
+<line x1='190.90' y1='209.28' x2='190.90' y2='218.88' style='stroke-width: 0.75;' />
+<line x1='223.37' y1='209.28' x2='223.37' y2='218.88' style='stroke-width: 0.75;' />
+<line x1='255.83' y1='209.28' x2='255.83' y2='218.88' style='stroke-width: 0.75;' />
+<line x1='288.29' y1='209.28' x2='288.29' y2='218.88' style='stroke-width: 0.75;' />
+<text x='93.52' y='243.84' text-anchor='middle' style='font-size: 16.00px; font-family: "Nimbus Sans";' textLength='22.23px' lengthAdjust='spacingAndGlyphs'>5.0</text>
+<text x='158.44' y='243.84' text-anchor='middle' style='font-size: 16.00px; font-family: "Nimbus Sans";' textLength='22.23px' lengthAdjust='spacingAndGlyphs'>5.4</text>
+<text x='223.37' y='243.84' text-anchor='middle' style='font-size: 16.00px; font-family: "Nimbus Sans";' textLength='22.23px' lengthAdjust='spacingAndGlyphs'>5.8</text>
+<text x='288.29' y='243.84' text-anchor='middle' style='font-size: 16.00px; font-family: "Nimbus Sans";' textLength='22.23px' lengthAdjust='spacingAndGlyphs'>6.2</text>
+<line x1='78.72' y1='201.67' x2='78.72' y2='22.03' style='stroke-width: 0.75;' />
+<line x1='78.72' y1='201.67' x2='69.12' y2='201.67' style='stroke-width: 0.75;' />
+<line x1='78.72' y1='156.76' x2='69.12' y2='156.76' style='stroke-width: 0.75;' />
+<line x1='78.72' y1='111.85' x2='69.12' y2='111.85' style='stroke-width: 0.75;' />
+<line x1='78.72' y1='66.94' x2='69.12' y2='66.94' style='stroke-width: 0.75;' />
+<line x1='78.72' y1='22.03' x2='69.12' y2='22.03' style='stroke-width: 0.75;' />
+<text transform='translate(55.68,201.67) rotate(-90)' text-anchor='middle' style='font-size: 16.00px; font-family: "Nimbus Sans";' textLength='8.89px' lengthAdjust='spacingAndGlyphs'>0</text>
+<text transform='translate(55.68,156.76) rotate(-90)' text-anchor='middle' style='font-size: 16.00px; font-family: "Nimbus Sans";' textLength='44.45px' lengthAdjust='spacingAndGlyphs'>50000</text>
+<text transform='translate(55.68,66.94) rotate(-90)' text-anchor='middle' style='font-size: 16.00px; font-family: "Nimbus Sans";' textLength='53.34px' lengthAdjust='spacingAndGlyphs'>150000</text>
+<polyline points='78.72,3.84 78.72,209.28 309.64,209.28 ' style='stroke-width: 0.75;' />
+</g>
+<defs>
+  <clipPath id='cpMC4wMHwzMTMuNDh8MC4wMHwyODguMDA='>
+    <rect x='0.00' y='0.00' width='313.48' height='288.00' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMC4wMHwzMTMuNDh8MC4wMHwyODguMDA=)'>
+<text x='194.18' y='282.24' text-anchor='middle' style='font-size: 16.00px; font-family: "Nimbus Sans";' textLength='147.78px' lengthAdjust='spacingAndGlyphs'>Retention time (min.)</text>
+<text transform='translate(17.28,106.56) rotate(-90)' text-anchor='middle' style='font-size: 16.00px; font-family: "Nimbus Sans";' textLength='59.61px' lengthAdjust='spacingAndGlyphs'>Intensity</text>
+</g>
+<defs>
+  <clipPath id='cpNzguNzJ8MzA5LjY0fDMuODR8MjA5LjI4'>
+    <rect x='78.72' y='3.84' width='230.92' height='205.44' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNzguNzJ8MzA5LjY0fDMuODR8MjA5LjI4)'>
+<polyline points='89.95,201.67 91.79,201.67 101.04,201.67 102.88,201.67 105.44,197.19 107.61,201.67 109.45,201.67 112.42,201.67 114.27,201.67 116.20,197.36 119.00,196.35 121.36,193.47 123.90,190.27 126.47,170.42 128.84,135.37 131.09,87.18 133.01,74.36 135.38,90.99 136.99,118.73 139.67,201.67 142.17,168.10 144.79,174.14 147.09,179.26 149.82,182.45 152.25,185.04 154.43,187.05 156.83,188.69 158.90,189.92 160.98,189.09 163.02,191.77 164.63,192.63 166.37,190.54 168.24,193.85 169.82,192.09 172.08,168.51 174.16,78.79 176.20,28.74 178.81,80.05 180.57,128.24 182.36,164.32 184.00,177.81 185.62,187.33 187.65,192.00 190.15,195.20 192.71,195.15 194.64,194.48 197.06,196.54 198.80,196.69 201.52,197.74 204.22,197.84 205.83,197.55 207.93,196.69 209.95,195.91 212.14,196.66 214.02,196.82 215.90,195.66 217.75,196.84 219.93,197.60 221.99,197.12 224.73,190.81 226.44,201.67 228.29,158.82 230.08,201.67 232.37,176.06 234.57,192.24 237.27,194.66 239.67,196.77 242.28,197.94 244.94,197.74 247.36,197.15 249.76,196.82 251.56,197.91 254.13,197.83 256.42,197.84 258.72,198.63 260.71,199.09 262.41,201.67 266.03,201.67 268.60,198.91 270.73,201.67 272.52,198.42 274.47,201.67 276.69,197.63 279.25,201.67 281.80,198.97 284.03,201.67 285.88,201.67 292.27,201.67 294.11,201.67 295.96,198.49 297.84,201.67 299.73,198.23 ' style='stroke-width: 0.75; stroke: #A6CEE3;' />
+<rect x='168.43' y='28.74' width='51.50' height='172.93' style='stroke-width: 0.75; stroke: #FF0000; stroke-dasharray: 1.00,3.00;' />
+</g>
+<g clip-path='url(#cpMC4wMHw0MzIuMDB8MC4wMHwyODguMDA=)'>
+<line x1='320.44' y1='18.24' x2='342.04' y2='18.24' style='stroke-width: 0.75; stroke: #A6CEE3;' />
+<text x='352.84' y='22.61' style='font-size: 12.00px;fill: #A6CEE3; font-family: "Nimbus Sans";' textLength='69.92px' lengthAdjust='spacingAndGlyphs'>standard-pos</text>
+</g>
+</g>
+</svg>

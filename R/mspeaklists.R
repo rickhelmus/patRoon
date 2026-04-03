@@ -227,7 +227,7 @@ setMethod("groupNames", "MSPeakLists", function(obj) names(obj@averagedPeakLists
 
 #' @describeIn MSPeakLists Obtain total number of \emph{m/z} values.
 #' @export
-setMethod("length", "MSPeakLists", function(x) sum(unlist(recursiveApplyDT(x@peakLists, nrow))))
+setMethod("length", "MSPeakLists", function(x) sum(unlist(recursiveApplyDT(pruneList(x@peakLists), nrow))))
 
 #' @describeIn MSPeakLists Shows summary information for this object.
 #' @export

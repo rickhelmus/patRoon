@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2026-04-03" />
+<meta name="date" content="2026-04-04" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -411,8 +411,8 @@ div.csl-indent {
 <div id="annotation" class="section level2 hasAnchor" number="4.8">
 <h2><span class="header-section-number">4.8</span> Annotation<a href="annotation.html#annotation" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The annotation consists of collecting MS peak lists, formula and/or compound annotations and finally estimation of identification confidence for the candidates (including suspects):</p>
-<div id="htmlwidget-06efd5294b8d883b82c7" style="width:500px;height:120px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-06efd5294b8d883b82c7">{"x":{"diagram":"\ndigraph Annotation {\n  graph [ rankdir = LR ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.5,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"MS peak lists\" -> \"Formula annotation\"\n    \"MS peak lists\" -> \"Compound annotation\"\n    \"Formula annotation\":n -> \"ID confidence est\":n [style = dotted]\n    \"Compound annotation\":s -> \"ID confidence est\":s [style = dotted]\n    \"Formula annotation\":e -> \"Compound annotation\":e [style = dotted, constraint = false]\n    \"ID confidence est\":e -> \"Suspects\":w [style = dotted; dir=back]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-c483f8cf3394fafd0059" style="width:500px;height:120px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-c483f8cf3394fafd0059">{"x":{"diagram":"\ndigraph Annotation {\n  graph [ rankdir = LR ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.5,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"MS peak lists\" -> \"Formula annotation\"\n    \"MS peak lists\" -> \"Compound annotation\"\n    \"Formula annotation\":n -> \"ID confidence est\":n [style = dotted]\n    \"Compound annotation\":s -> \"ID confidence est\":s [style = dotted]\n    \"Formula annotation\":e -> \"Compound annotation\":e [style = dotted, constraint = false]\n    \"ID confidence est\":e -> \"Suspects\":w [style = dotted; dir=back]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p>Note that compound annotation is not dependent upon formula annotation. However, formula data can be used to improve ranking of candidates afterwards by the <code>addFormulaScoring()</code> function, which will be discussed later in this section. The estimation of ID confidence is optional, and can be performed for candidates from formula annotations, compounds annotations and suspect matches.</p>
 <div id="MSPL" class="section level3 hasAnchor" number="4.8.1">
 <h3><span class="header-section-number">4.8.1</span> MS peak lists<a href="annotation.html#MSPL" class="anchor-section" aria-label="Anchor link to header"></a></h3>

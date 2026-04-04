@@ -1120,7 +1120,7 @@ setMethod("plotGraph", "featureGroups", function(obj, onlyPresent = TRUE, width 
 
     gr <- visNetwork::visNetwork(nodes, edges, width = width, height = height,
                                  submain = paste0("Explore connections by dragging/zooming/selecting.<br>",
-                                                  "Smaller retention time difference have wider edges."))
+                                                  "Smaller retention time differences have wider edges."))
     if (nrow(edges) > 0)
     {
         gr <- gr %>%

@@ -334,11 +334,21 @@ doReportHTML <- function(fGroups, MSPeakLists, formulas, compounds, compsCluster
     
     outputFile <- file.path(path, "report.html")
     
+    # HACK: the default post processor is _very_ slow for large reports: it does a lot of regexing in order to try to
+    # fix img paths. We don't actually need that, so just make it a noop. NOTE: resolve_output_format() is called here
+    # to make sure that report files are still being copied, which does not seem to happen when using
+    # rmarkdown::html_document().
+    hd <- rmarkdown::resolve_output_format(file.path(workPath, "report.Rmd"), output_format = "html_document",
+                                           output_options = list(self_contained = settings$general$selfContained))
+    hd$post_processor <- function(metadata, input_file, output_file, clean, verbose)
+    {
+        return(output_file)
+    }
+    
     # normalize cache path so it can be used in report working directory
     withr::with_options(list(patRoon.cache.fileName = normalizePath(getOption("patRoon.cache.fileName")),
                              patRoon.progress.opts = list(file = stderr())),
-                        rmarkdown::render(file.path(workPath, "report.Rmd"), output_file = outputFile,
-                                          output_options = list(self_contained = settings$general$selfContained),
+                        rmarkdown::render(file.path(workPath, "report.Rmd"), hd, output_file = outputFile,
                                           quiet = TRUE, envir = reportEnv))
     
     if (openReport)

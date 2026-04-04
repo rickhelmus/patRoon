@@ -69,7 +69,7 @@ makeReactCellAnnotations <- function()
 
 makeReactCellStructure <- function()
 {
-    return(getReactCellImgJS(sprintf("'src=\"' + reportPlots.structs[ci.value] + '\"'"),
+    return(getReactCellImgJS(sprintf("'src=\"' + (reportPlots.structs[ci.value] || '') + '\"'"),
            maxHeight = 300))
 }
 
@@ -763,7 +763,7 @@ reportHTMLUtils$methods(
                         bsCardBodyNoFill(
                             makeToolbar("compoundsTab", groupBy = list(
                                 list(value = "", name = "None"),
-                                list(value = "neutral_formula", "Formula")
+                                list(value = "neutral_formula", name = "Formula")
                             ), tagsPreButtons = htmltools::tagList(
                                 htmltools::tags$input(type = "checkbox", id = "compounds-susp_only",
                                                       detailsView = suspInfoView,

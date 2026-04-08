@@ -102,6 +102,18 @@
 </li>
 <li>Adjust the <code>path</code> column to the new format: <code>path_raw</code>, <code>path_centroid</code>, <code>path_profile</code> and <code>path_ims</code>. Often, renaming <code>path</code> to <code>path_centroid</code> is sufficient.</li>
 </ol></li>
+<li>
+<p>The following packages should be updated or installed</p>
+<ul><li>
+<code>patRoonData</code>: to ensure compatibility with <code>patRoon 3.0</code>, e.g. <code>remotes::install_github("rickhelmus/patRoonData")</code>.</li>
+<li>
+<code>patRoonExt</code>: to ensure the latest versions of external dependencies and availability of IMS specifics, e.g. <code>remotes::install_github("rickhelmus/patRoonExt")</code>.</li>
+<li>
+<code>Rmstoolkitlib</code>: this is needed if you want to use the new <code>mstoolkit</code> raw data backend. This should be installed <em>before</em> installing <code>patRoon</code>, e.g. <code>remotes::install_github("rickhelmus/Rmstoolkitlib")</code>.</li>
+<li>
+<code>patRoonDataIMS</code>: to install demo IMS-HRMS data, e.g. <code>remotes::install_github("rickhelmus/patRoonDataIMS")</code>.</li>
+<li>See the Installation chapter in the updated <a href="https://rickhelmus.github.io/patRoon/handbook_bd/index.html">Handbook</a> for more details and installation options.</li>
+</ul></li>
 <li><p>The <code><a href="../reference/analysis-information.html">generateAnalysisInfo()</a></code> function was updated for the new format. The <code>fromXXX</code> function arguments need to be set properly. See <code><a href="../reference/analysis-information.html">?generateAnalysisInfo</a></code> for more details.</p></li>
 <li>
 <p>The <code><a href="../reference/MSConversion.html">convertMSFiles()</a></code> interface has various small changes to simplify its usage and extend support. For instance:</p>
@@ -468,7 +480,7 @@
 <li>Misc
 <ul><li>
 <code>patRoon.cache.maxEntries</code> package option (issue <a href="https://github.com/rickhelmus/patRoon/issues/139" class="external-link">#139</a>).</li>
-<li>Updated PubChem Transformations to 0.2.2.</li>
+<li>Updated PubChem Transformations to 0.2.3.</li>
 <li>The default metabolic logic transformations are now accessible through the <code><a href="../reference/TPLogicTransformations.html">TPLogicTransformations()</a></code> function.</li>
 <li>Optimized future parallelization.</li>
 <li>Disabled parallelization for reporting by default, as it can (still) result in worse performance (e.g. seen on Windows).</li>

@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2026-04-04" />
+<meta name="date" content="2026-04-08" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -188,7 +188,7 @@ div.csl-indent {
 <li class="chapter" data-level="2.3" data-path="reg_inst.html"><a href="reg_inst.html"><i class="fa fa-check"></i><b>2.3</b> Regular R installation</a>
 <ul>
 <li class="chapter" data-level="2.3.1" data-path="reg_inst.html"><a href="reg_inst.html#auto_inst"><i class="fa fa-check"></i><b>2.3.1</b> Automatic installation</a></li>
-<li class="chapter" data-level="2.3.2" data-path="reg_inst.html"><a href="reg_inst.html#manual-installation"><i class="fa fa-check"></i><b>2.3.2</b> Manual installation</a></li>
+<li class="chapter" data-level="2.3.2" data-path="reg_inst.html"><a href="reg_inst.html#man_inst"><i class="fa fa-check"></i><b>2.3.2</b> Manual installation</a></li>
 <li class="chapter" data-level="2.3.3" data-path="reg_inst.html"><a href="reg_inst.html#verifying-the-installation"><i class="fa fa-check"></i><b>2.3.3</b> Verifying the installation</a></li>
 </ul></li>
 <li class="chapter" data-level="2.4" data-path="managing-legacy-installations.html"><a href="managing-legacy-installations.html"><i class="fa fa-check"></i><b>2.4</b> Managing legacy installations</a></li>
@@ -417,6 +417,9 @@ div.csl-indent {
 <div id="auto_inst" class="section level3 hasAnchor" number="2.3.1">
 <h3><span class="header-section-number">2.3.1</span> Automatic installation<a href="reg_inst.html#auto_inst" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The <a href="https://github.com/rickhelmus/patRoonInst">patRoonInst</a> auxiliary package simplifies the installation process. This package automatically installs all <code>R</code> package dependencies, including those unavailable from regular repositories such as CRAN and BiocConductor. Furthermore, <code>patRoonInst</code> installs <a href="https://github.com/rickhelmus/patRoonExt">patRoonExt</a>, an <code>R</code> package that bundles most common dependencies external to the <code>R</code> environment (e.g. <a href="http://ipb-halle.github.io/MetFrag/">MetFrag</a>, <a href="http://openms.de/">OpenMS</a> etc).</p>
+<blockquote>
+<p><strong><em>NOTE</em></strong> <a href="http://proteowizard.sourceforge.net/">ProteoWizard</a> needs to be installed manually due to license restrictions. See the <a href="reg_inst.html#man_inst">manual installation</a> section for further details.</p>
+</blockquote>
 <p>The first step is to install <code>patRoonInst</code>:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="reg_inst.html#cb3-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;patRoonInst&quot;</span>, <span class="at">repos =</span> <span class="fu">c</span>(<span class="st">&#39;https://rickhelmus.r-universe.dev&#39;</span>, <span class="st">&#39;https://cloud.r-project.org&#39;</span>))</span>
 <span id="cb3-2"><a href="reg_inst.html#cb3-2" tabindex="-1"></a></span>
@@ -449,8 +452,8 @@ div.csl-indent {
 <span id="cb6-2"><a href="reg_inst.html#cb6-2" tabindex="-1"></a>patRoonInst<span class="sc">::</span><span class="fu">sync</span>(<span class="at">allDeps =</span> <span class="cn">FALSE</span>) <span class="co"># synchronize only direct dependencies</span></span></code></pre></div>
 <p>More options are available to customize the installation, see the reference manual (<code>?patRoonInst::install</code>) for more details.</p>
 </div>
-<div id="manual-installation" class="section level3 hasAnchor" number="2.3.2">
-<h3><span class="header-section-number">2.3.2</span> Manual installation<a href="reg_inst.html#manual-installation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="man_inst" class="section level3 hasAnchor" number="2.3.2">
+<h3><span class="header-section-number">2.3.2</span> Manual installation<a href="reg_inst.html#man_inst" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>A manual installation starts with installing external dependencies, followed by <code>R</code> dependencies and <code>patRoon</code> itself.</p>
 <div id="external-non-r-dependencies" class="section level4 hasAnchor" number="2.3.2.1">
 <h4><span class="header-section-number">2.3.2.1</span> External (non-R) dependencies<a href="reg_inst.html#external-non-r-dependencies" class="anchor-section" aria-label="Anchor link to header"></a></h4>
@@ -1015,7 +1018,7 @@ no
 no
 </td>
 <td style="text-align:left;">
-<code>remotes::install_github('rickhelmus/patRoonDataIMS')</code>
+<code>remotes::install_github('rickhelmus/patRoonDataIMS@main')</code>
 </td>
 </tr>
 <tr>

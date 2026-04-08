@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2026-04-04" />
+<meta name="date" content="2026-04-08" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -188,7 +188,7 @@ div.csl-indent {
 <li class="chapter" data-level="2.3" data-path="reg_inst.html"><a href="reg_inst.html"><i class="fa fa-check"></i><b>2.3</b> Regular R installation</a>
 <ul>
 <li class="chapter" data-level="2.3.1" data-path="reg_inst.html"><a href="reg_inst.html#auto_inst"><i class="fa fa-check"></i><b>2.3.1</b> Automatic installation</a></li>
-<li class="chapter" data-level="2.3.2" data-path="reg_inst.html"><a href="reg_inst.html#manual-installation"><i class="fa fa-check"></i><b>2.3.2</b> Manual installation</a></li>
+<li class="chapter" data-level="2.3.2" data-path="reg_inst.html"><a href="reg_inst.html#man_inst"><i class="fa fa-check"></i><b>2.3.2</b> Manual installation</a></li>
 <li class="chapter" data-level="2.3.3" data-path="reg_inst.html"><a href="reg_inst.html#verifying-the-installation"><i class="fa fa-check"></i><b>2.3.3</b> Verifying the installation</a></li>
 </ul></li>
 <li class="chapter" data-level="2.4" data-path="managing-legacy-installations.html"><a href="managing-legacy-installations.html"><i class="fa fa-check"></i><b>2.4</b> Managing legacy installations</a></li>
@@ -430,10 +430,10 @@ div.csl-indent {
 <pre><code>#&gt;            group score-positive score-negative                                     compoundName               set
 #&gt;           &lt;char&gt;          &lt;num&gt;          &lt;num&gt;                                           &lt;char&gt;            &lt;char&gt;
 #&gt; 1: M198_R317_273      3.5190115       4.569478              3-(4-chlorophenyl)-1,1-dimethylurea positive,negative
-#&gt; 2: M198_R317_273      2.4032797       1.446595 5-[[(2R)-azetidin-2-yl]methoxy]-2-chloropyridine positive,negative
-#&gt; 3: M198_R317_273      1.2527474       1.350450         1-(3-chloro-4-methylphenyl)-3-methylurea positive,negative
-#&gt; 4: M198_R317_273      1.1464384       1.275575              3-(3-chlorophenyl)-1,1-dimethylurea positive,negative
-#&gt; 5: M198_R317_273      0.9982564       1.127393                   1-(4-chlorophenyl)-3-ethylurea positive,negative</code></pre>
+#&gt; 2: M198_R317_273      2.5198763       1.563191 5-[[(2R)-azetidin-2-yl]methoxy]-2-chloropyridine positive,negative
+#&gt; 3: M198_R317_273      1.2528529       1.350556         1-(3-chloro-4-methylphenyl)-3-methylurea positive,negative
+#&gt; 4: M198_R317_273      1.1469202       1.276057              3-(3-chlorophenyl)-1,1-dimethylurea positive,negative
+#&gt; 5: M198_R317_273      0.9981602       1.127297                   1-(4-chlorophenyl)-3-ethylurea positive,negative</code></pre>
 <p>In sets workflows the <a href="sample-analyses.html#anaInfo">analysis information</a> is amended with a <code>set</code> column to specify the set each analysis belongs to. Just like <a href="useMeta.html#useMeta">other columns</a> in the analysis information, the <code>set</code> column can be used to group and aggregate data:</p>
 <div class="sourceCode" id="cb220"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb220-1"><a href="processing-data.html#cb220-1" tabindex="-1"></a><span class="co"># only keep feature groups with features present in both polarities</span></span>
 <span id="cb220-2"><a href="processing-data.html#cb220-2" tabindex="-1"></a>fGroupsPosNeg <span class="ot">&lt;-</span> <span class="fu">overlap</span>(fGroups, <span class="at">which =</span> <span class="fu">c</span>(<span class="st">&quot;positive&quot;</span>, <span class="st">&quot;negative&quot;</span>), <span class="at">aggregate =</span> <span class="st">&quot;set&quot;</span>)</span>

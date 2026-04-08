@@ -23,7 +23,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2026-04-04" />
+<meta name="date" content="2026-04-08" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -188,7 +188,7 @@ div.csl-indent {
 <li class="chapter" data-level="2.3" data-path="reg_inst.html"><a href="reg_inst.html"><i class="fa fa-check"></i><b>2.3</b> Regular R installation</a>
 <ul>
 <li class="chapter" data-level="2.3.1" data-path="reg_inst.html"><a href="reg_inst.html#auto_inst"><i class="fa fa-check"></i><b>2.3.1</b> Automatic installation</a></li>
-<li class="chapter" data-level="2.3.2" data-path="reg_inst.html"><a href="reg_inst.html#manual-installation"><i class="fa fa-check"></i><b>2.3.2</b> Manual installation</a></li>
+<li class="chapter" data-level="2.3.2" data-path="reg_inst.html"><a href="reg_inst.html#man_inst"><i class="fa fa-check"></i><b>2.3.2</b> Manual installation</a></li>
 <li class="chapter" data-level="2.3.3" data-path="reg_inst.html"><a href="reg_inst.html#verifying-the-installation"><i class="fa fa-check"></i><b>2.3.3</b> Verifying the installation</a></li>
 </ul></li>
 <li class="chapter" data-level="2.4" data-path="managing-legacy-installations.html"><a href="managing-legacy-installations.html"><i class="fa fa-check"></i><b>2.4</b> Managing legacy installations</a></li>
@@ -492,17 +492,17 @@ div.csl-indent {
 <span id="cb69-2"><a href="procInspect.html#cb69-2" tabindex="-1"></a>fList[[<span class="st">&quot;standard-pos-1&quot;</span>]][, <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]</span></code></pre></div>
 <pre><code>#&gt;                          ID     ret        mz       area intensity  retmin
 #&gt;                      &lt;char&gt;   &lt;num&gt;     &lt;num&gt;      &lt;num&gt;     &lt;num&gt;   &lt;num&gt;
-#&gt;   1: f_16347712658720538540  14.139  98.97533 4778875.00    330176   5.945
-#&gt;   2: f_10395879499927939455   4.750  98.97542   96640.85    125856   4.351
-#&gt;   3:   f_453007312256804411   7.144 100.11199  470442.00    283356   5.945
-#&gt;   4: f_17185811996419289811  28.127 100.11208 5225358.00    304644  11.141
-#&gt;   5:  f_6923213961671746702   4.550 100.11208  168080.50     76724   1.961
+#&gt;   1:  f_4232806698149760419  14.139  98.97533 4778875.00    330176   5.945
+#&gt;   2: f_14882746253687013806   4.750  98.97542   96640.85    125856   4.351
+#&gt;   3: f_16682098354710394155   7.144 100.11199  470442.00    283356   5.945
+#&gt;   4: f_13995426688177709511  28.127 100.11208 5225358.00    304644  11.141
+#&gt;   5: f_13829096361419556271   4.550 100.11208  168080.50     76724   1.961
 #&gt;  ---                                                                      
-#&gt; 543:  f_2689651329902935219 383.363 415.21303  364565.80    135352 381.122
-#&gt; 544:  f_7335751044087049528   9.143 425.15511  415152.60    121928   8.143
-#&gt; 545: f_14461495817845968238 319.805 425.18879  732124.40    210844 317.060
-#&gt; 546:  f_3994796688206637648  10.142 427.03246  365056.90    114896   8.143
-#&gt; 547:  f_3073950847809437369   9.143 433.00456 3165097.00    946000   8.143</code></pre>
+#&gt; 543: f_13168328237471625054 383.363 415.21303  364565.80    135352 381.122
+#&gt; 544:  f_2439056283487317965   9.143 425.15511  415152.60    121928   8.143
+#&gt; 545: f_10389192741939298084 319.805 425.18879  732124.40    210844 317.060
+#&gt; 546:  f_9282486000926943124  10.142 427.03246  365056.90    114896   8.143
+#&gt; 547:  f_9837132258956386493   9.143 433.00456 3165097.00    946000   8.143</code></pre>
 <div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb71-1"><a href="procInspect.html#cb71-1" tabindex="-1"></a><span class="co"># Feature group intensities</span></span>
 <span id="cb71-2"><a href="procInspect.html#cb71-2" tabindex="-1"></a>fGroups<span class="sc">$</span>M120_R268_30</span></code></pre></div>
 <pre><code>#&gt; [1] 264836 245372 216560</code></pre>
@@ -532,15 +532,15 @@ div.csl-indent {
 <pre><code>#&gt;     explainedPeaks     score neutralMass                   SMILES
 #&gt;              &lt;int&gt;     &lt;num&gt;       &lt;num&gt;                   &lt;char&gt;
 #&gt;  1:              0 3.0000000    119.0483        C1=CC2=NNN=C2C=C1
-#&gt;  2:              0 0.7542007    119.0483      C1=CC2=C(N=C1)N=CN2
-#&gt;  3:              0 0.4403258    119.0483        C1=CNC2=CN=CN=C21
-#&gt;  4:              0 0.3780081    119.0483      C1=CC2=C(C=NN2)N=C1
-#&gt;  5:              0 0.3366106    119.0483      C1=CN2C(=CC=N2)N=C1
+#&gt;  2:              0 0.7285793    119.0483      C1=CC2=C(N=C1)N=CN2
+#&gt;  3:              0 0.4262336    119.0483        C1=CNC2=CN=CN=C21
+#&gt;  4:              0 0.3712626    119.0483      C1=CC2=C(C=NN2)N=C1
+#&gt;  5:              0 0.3356653    119.0483      C1=CN2C(=CC=N2)N=C1
 #&gt; ---                                                              
-#&gt; 37:              0 0.1259247    119.0483          C1=CN=CN=C1CC#N
-#&gt; 38:              0 0.1258830    119.0483        CC1=CN=CC(=N1)C#N
-#&gt; 39:              0 0.1250904    119.0483          CC1=CN=CN=C1C#N
-#&gt; 40:              0 0.1250209    119.0483          C#CC1=NC=CN=C1N
+#&gt; 37:              0 0.1259205    119.0483        CC1=CN=CC(=N1)C#N
+#&gt; 38:              0 0.1257969    119.0483          C1=CN=CN=C1CC#N
+#&gt; 39:              0 0.1250824    119.0483          CC1=CN=CN=C1C#N
+#&gt; 40:              0 0.1250137    119.0483          C#CC1=NC=CN=C1N
 #&gt; 41:              0 0.1250000    119.0483 C1=CC(=[N+]=[N-])C=CC1=N</code></pre>
 <div class="sourceCode" id="cb81"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb81-1"><a href="procInspect.html#cb81-1" tabindex="-1"></a><span class="co"># get a table with information of a component</span></span>
 <span id="cb81-2"><a href="procInspect.html#cb81-2" tabindex="-1"></a>components[[<span class="st">&quot;CMP7&quot;</span>]][, <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]</span></code></pre></div>
@@ -562,17 +562,17 @@ div.csl-indent {
 <span id="cb83-2"><a href="procInspect.html#cb83-2" tabindex="-1"></a><span class="fu">as.data.table</span>(fList)[, <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]</span></code></pre></div>
 <pre><code>#&gt;             analysis                     ID     ret        mz      area intensity
 #&gt;               &lt;char&gt;                 &lt;char&gt;   &lt;num&gt;     &lt;num&gt;     &lt;num&gt;     &lt;num&gt;
-#&gt;    1:  solvent-pos-1 f_12860273722894428192  13.176  98.97537 4345232.0    391476
-#&gt;    2:  solvent-pos-1  f_9596132961704643617   7.181 100.11197  797112.1    426956
-#&gt;    3:  solvent-pos-1  f_6371335420420248621 192.178 100.11211 9609998.0    750532
-#&gt;    4:  solvent-pos-1  f_6506496206746423615  19.171 100.11217 5784411.0    370376
-#&gt;    5:  solvent-pos-1  f_5121157124211719533   4.786 100.11220  551723.6    567312
+#&gt;    1:  solvent-pos-1 f_11604688393433660807  13.176  98.97537 4345232.0    391476
+#&gt;    2:  solvent-pos-1 f_13795944494377381066   7.181 100.11197  797112.1    426956
+#&gt;    3:  solvent-pos-1  f_9994115579808516414 192.178 100.11211 9609998.0    750532
+#&gt;    4:  solvent-pos-1  f_7616357632595552956  19.171 100.11217 5784411.0    370376
+#&gt;    5:  solvent-pos-1 f_14235772935233178535   4.786 100.11220  551723.6    567312
 #&gt;   ---                                                                            
-#&gt; 2922: standard-pos-3  f_2042036435154018996 318.892 425.18866  666531.5    232636
-#&gt; 2923: standard-pos-3 f_10839998681702082513   9.114 427.03242  362024.1    114744
-#&gt; 2924: standard-pos-3 f_15164217360460697802 318.892 427.18678  200193.5     77768
-#&gt; 2925: standard-pos-3  f_8695446765189507635 382.682 432.23984  217612.9     97648
-#&gt; 2926: standard-pos-3  f_4776065115895602396   9.114 433.00457 3086864.0    912920</code></pre>
+#&gt; 2922: standard-pos-3  f_9650600993545486389 318.892 425.18866  666531.5    232636
+#&gt; 2923: standard-pos-3  f_7973765326008001809   9.114 427.03242  362024.1    114744
+#&gt; 2924: standard-pos-3 f_13437633323133925028 318.892 427.18678  200193.5     77768
+#&gt; 2925: standard-pos-3 f_12182984943585750598 382.682 432.23984  217612.9     97648
+#&gt; 2926: standard-pos-3  f_3361210316269368642   9.114 433.00457 3086864.0    912920</code></pre>
 <div class="sourceCode" id="cb85"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb85-1"><a href="procInspect.html#cb85-1" tabindex="-1"></a><span class="co"># Returns group info and intensity values for each feature group</span></span>
 <span id="cb85-2"><a href="procInspect.html#cb85-2" tabindex="-1"></a><span class="fu">as.data.table</span>(fGroups, <span class="at">average =</span> <span class="cn">TRUE</span>) <span class="co"># average intensities for replicates</span></span></code></pre></div>
 <pre><code>#&gt;              group      ret       mz standard-pos_intensity
@@ -628,16 +628,16 @@ div.csl-indent {
 <pre><code>#&gt;              group explainedPeaks     score neutralMass
 #&gt;             &lt;char&gt;          &lt;int&gt;     &lt;num&gt;       &lt;num&gt;
 #&gt;   1:  M120_R268_30              0 3.0000000    119.0483
-#&gt;   2:  M120_R268_30              0 0.7542007    119.0483
-#&gt;   3:  M120_R268_30              0 0.4403258    119.0483
-#&gt;   4:  M120_R268_30              0 0.3780081    119.0483
-#&gt;   5:  M120_R268_30              0 0.3366106    119.0483
+#&gt;   2:  M120_R268_30              0 0.7285793    119.0483
+#&gt;   3:  M120_R268_30              0 0.4262336    119.0483
+#&gt;   4:  M120_R268_30              0 0.3712626    119.0483
+#&gt;   5:  M120_R268_30              0 0.3356653    119.0483
 #&gt;  ---                                                   
-#&gt; 293: M192_R355_191              1 0.7481879    191.1310
-#&gt; 294: M192_R355_191              1 0.7443703    191.1310
-#&gt; 295: M192_R355_191              1 0.7442086    191.1310
-#&gt; 296: M192_R355_191              1 0.7437880    191.1310
-#&gt; 297: M192_R355_191              1 0.7437233    191.1310</code></pre>
+#&gt; 293: M192_R355_191              1 0.7620768    191.1310
+#&gt; 294: M192_R355_191              1 0.7620768    191.1310
+#&gt; 295: M192_R355_191              1 0.7620768    191.1310
+#&gt; 296: M192_R355_191              1 0.7620768    191.1310
+#&gt; 297: M192_R355_191              1 0.7620768    191.1310</code></pre>
 <div class="sourceCode" id="cb95"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb95-1"><a href="procInspect.html#cb95-1" tabindex="-1"></a><span class="co"># Returns table with all components (including feature group info, annotations etc)</span></span>
 <span id="cb95-2"><a href="procInspect.html#cb95-2" tabindex="-1"></a><span class="fu">as.data.table</span>(components)[, <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]</span></code></pre></div>
 <pre><code>#&gt;       name  cmp_ret cmp_retsd       neutral_mass       analysis  size

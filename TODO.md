@@ -95,8 +95,6 @@
 ## Docs
 
 - move all plotBPC(), getEIC() etc methods into one doc file?
-- handbook
-    - add links in NEWS to relevant sections --> verify when site is up
 - add refs to paper: piek, assignMobilities(), peakParams, greedy, IMSCollapse
     - also in in NEWS (IMS, msdata etc)?
 

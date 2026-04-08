@@ -10,7 +10,7 @@ The first strategy is recommended if you are using Windows and are new to `R`, o
 
 ## patRoon Bundle {#pBundle}
 
-The `patRoon` bundle contains an almost full `patRoon` installation, including `R`, all `R` package dependencies and external software dependencies such as Java JDK, [MetFrag] and various compound libraries etc. Currently, only [ProteoWizard] may need to be [installed manually](#inst_man_ext).
+The `patRoon` bundle contains an almost full `patRoon` installation, including `R`, all `R` package dependencies and external software dependencies such as Java JDK, [MetFrag] and various compound libraries etc. Currently, only [ProteoWizard] and [patRoonDataIMS] are not included in the bundle due to licensing and size issues, respectively. See the [regular installation](#reg_inst) section for further details on how to install these.
 
 The bundles are automatically generated and tested, and can be obtained from [the release page on GitHub][GHRel] for released versions of `patRoon` and [the latest pre-release on GitHub][GHPreRel] for the latest snapshot. 
 
@@ -91,6 +91,8 @@ A 'regular' installation involves installing `patRoon` and its dependencies usin
 
 The [patRoonInst] auxiliary package simplifies the installation process. This package automatically installs all `R` package dependencies, including those unavailable from regular repositories such as CRAN and BiocConductor. Furthermore, `patRoonInst` installs [patRoonExt], an `R` package that bundles most common dependencies external to the `R` environment (e.g. [MetFrag], [OpenMS] etc).
 
+> **_NOTE_** [ProteoWizard] needs to be installed manually due to license restrictions. See the [manual installation](#man_inst) section for further details.
+
 The first step is to install `patRoonInst`:
 
 ```{r eval=FALSE}
@@ -140,7 +142,7 @@ patRoonInst::sync(allDeps = FALSE) # synchronize only direct dependencies
 
 More options are available to customize the installation, see the reference manual (`?patRoonInst::install`) for more details.
 
-### Manual installation
+### Manual installation {#man_inst}
 
 A manual installation starts with installing external dependencies, followed by `R` dependencies and `patRoon` itself.
 

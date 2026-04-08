@@ -186,8 +186,9 @@ jobs:
               uses: actions/setup-python@v5
               with:
                   python-version: '3.12'
-            - name: Install C3SDB
+            - name: Install further deps
               run: |
+                  remotes::install_github("rickhelmus/patRoonDataIMS")
                   patRoon::installC3SDB()
                   cat("Done!\n")
               shell: Rscript {0}

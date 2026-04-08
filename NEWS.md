@@ -15,6 +15,12 @@ or manually removing the `cache.sqlite` file from your project directory.
     1. Rename the `"group"` column to `"replicate"`
     2. Adjust the `path` column to the new format: `path_raw`, `path_centroid`, `path_profile` and `path_ims`. Often,
 renaming `path` to `path_centroid` is sufficient.
+* The following packages should be updated or installed
+    * `patRoonData`: to ensure compatibility with `patRoon 3.0`, e.g. `remotes::install_github("rickhelmus/patRoonData")`.
+    * `patRoonExt`: to ensure the latest versions of external dependencies and availability of IMS specifics, e.g. `remotes::install_github("rickhelmus/patRoonExt")`.
+    * `Rmstoolkitlib`: this is needed if you want to use the new `mstoolkit` raw data backend. This should be installed _before_ installing `patRoon`, e.g. `remotes::install_github("rickhelmus/Rmstoolkitlib")`.
+    * `patRoonDataIMS`: to install demo IMS-HRMS data, e.g. `remotes::install_github("rickhelmus/patRoonDataIMS")`.
+    * See the Installation chapter in the updated [Handbook] for more details and installation options.
 * The `generateAnalysisInfo()` function was updated for the new format. The `fromXXX` function arguments need to be set
 properly. See `?generateAnalysisInfo` for more details.
 * The `convertMSFiles()` interface has various small changes to simplify its usage and extend support. For instance:

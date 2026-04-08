@@ -14,7 +14,7 @@ specTROmetry nOn-target aNalysis_.
 
 ## Project news
 
-**March 2026** `patRoon 3.0.0` is released! This a **major** release which adds ion mobility separation (IMS) support, new algorithms for feature and transformation product detection, use of sample metadata and many other improvements. Please see the [Project NEWS][NEWS] for more details and important notes on upgrading to `patRoon 3.0`.
+**April 2026** `patRoon 3.0.0` is released! This a **major** release which adds ion mobility separation (IMS) support, new algorithms for feature and transformation product detection, use of sample metadata and many other improvements. Please see the [Project NEWS][NEWS] for more details and important notes on upgrading to `patRoon 3.0`.
 
 **September 2025** `patRoon 2.3.4` is now released. This is a small maintenance release which includes an important fix for `MS2Tox` and various other fixes. Please see the [Project NEWS][NEWS] for more details.
 

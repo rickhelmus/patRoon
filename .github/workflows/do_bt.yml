@@ -190,18 +190,10 @@ jobs:
               uses: actions/setup-python@v5
               with:
                   python-version: '3.12'
-            - name: Install patRoon deps (UNDONE)
+            - name: Install C3SDB
               run: |
-                  # UNDONE...
-                  install.packages("reticulate")
-                  BiocManager::install("ChemmineR")
-                  BiocManager::install('fmcsR')
-                  remotes::install_github("rickhelmus/patRoonData@version30")
-                  remotes::install_github("rickhelmus/patRoonDataIMS")
-                  remotes::install_github("rickhelmus/Rmstoolkitlib")
-                  remotes::install_github("rickhelmus/patRoonExt@version20")
-                  remotes::install_github("rickhelmus/patRoon@version30")
                   patRoon::installC3SDB()
+                  cat("Done!\n")
               shell: Rscript {0}
             - uses: r-lib/actions/check-r-package@v2
               with:

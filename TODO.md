@@ -3,9 +3,6 @@
 ## general
 
 
-- update patRoonInst/patRoonExt/patRoonData for new deps
-    - update patRoonDeps dependencies for Rmstoolkitlib, reticulate, fmcsR etc
-    - remove current hack to get in new deps for GHA and CircleCI
 - BUG: annSim.1 column (in formulas?)?
 - reticulate: use py_require()? doesn't seem to be able handle multiple py versions, so no?
 - MSTK: PR for centroid status buf for mzXML?

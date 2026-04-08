@@ -4,7 +4,6 @@
 
 
 - update patRoonInst/patRoonExt/patRoonData for new deps
-    - update PCLiteCCS and update relevant README
     - update patRoonDeps dependencies for Rmstoolkitlib, reticulate, fmcsR etc
     - remove current hack to get in new deps for GHA and CircleCI
 - BUG: annSim.1 column (in formulas?)?
@@ -94,16 +93,12 @@
     - generateAnalysisInfo()?
 - newProject()
     - see where testing is slow, possibly disable testServer() on CI?
-- manual checks
-    - manually check all HTML reporting functionality at the end
 
 
 ## Docs
 
 - move all plotBPC(), getEIC() etc methods into one doc file?
 - handbook
-    - installation
-        - verify R installation table when new deps in patRoonDeps are added
     - add links in NEWS to relevant sections --> verify when site is up
 - add refs to paper: piek, assignMobilities(), peakParams, greedy, IMSCollapse
     - also in in NEWS (IMS, msdata etc)?

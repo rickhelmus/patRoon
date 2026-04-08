@@ -359,7 +359,7 @@ In most cases `fixedIsolationWidth=FALSE` is recommended: this automatically det
         * Optimized calculation of total fragment and neutral loss matches
 * Misc
     * `patRoon.cache.maxEntries` package option (issue #139).
-    * Updated PubChem Transformations to 0.2.2.
+    * Updated PubChem Transformations to 0.2.3.
     * The default metabolic logic transformations are now accessible through the `TPLogicTransformations()` function.
     * Optimized future parallelization.
     * Disabled parallelization for reporting by default, as it can (still) result in worse performance (e.g. seen on Windows).

@@ -66,3 +66,8 @@ precedence = "closest"
 SPDX-FileCopyrightText = "2025 StreamFind"
 SPDX-License-Identifier = "MIT"
 
+[[annotations]]
+path = ["src/qAlgorithms/**"]
+precedence = "closest"
+SPDX-FileCopyrightText = "2024-2026 Daniel Höhn"
+SPDX-License-Identifier = "GPL-3.0-only"

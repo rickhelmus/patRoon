@@ -36,6 +36,6 @@ ARG GIT_BRANCH=master
 ENV GIT_BRANCH=${GIT_BRANCH}
 RUN --mount=type=cache,id=ccache,target=/home/rstudio/ccache,uid=1000,gid=1000 Rscript install_deps.R && rm -f install_deps.R DESCRIPTION
 
-RUN rm -rf /home/rstudio/.R/Makevars
+RUN Rscript -e 'remove.packages("patRoon")' && rm -rf /home/rstudio/.R/Makevars
 
 CMD ["R"]

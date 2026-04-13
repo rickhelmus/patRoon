@@ -1,3 +1,29 @@
+defaultParam <- setClass("defaultParam", slots = c(dummy = "ANY"))
+DEFAULT <- defaultParam()
+isDefault <- function(x) inherits(x, "defaultParam")
+
+paramListFillDefaults <- function(paramList, definitions)
+{
+    fillDefaults <- function(li, defs)
+    {
+        Map(names(li), li, f = function(name, value)
+        {
+            if (isDefault(value))
+                return(defs[[name]])
+            else if (is.list(value) && !is.data.frame(value))
+                return(fillDefaults(value, defs[[name]]))
+            else
+                return(value)
+        })
+    }
+    return(fillDefaults(paramList, sapply(definitions, "[[", "default", simplify = FALSE)))
+}
+
+setMethod("show", "defaultParam", function(object)
+{
+    printf("A %s object.\n", class(object))
+})
+
 param <- setClass("param", slots = c(name = "character", baseName = "ANY", description = "character",
                                      version = "character", date = "POSIXct", definitions = "list", data = "list"),
                   contains = "VIRTUAL")
@@ -5,8 +31,16 @@ param <- setClass("param", slots = c(name = "character", baseName = "ANY", descr
 setMethod("initialize", "param", function(.Object, name, baseName, description, version,
           definitions, ...)
 {
-    # construct data from definition defaults
+    # construct template data with defaults
+    makeDefsFromList <- function(li)
+    {
+        sapply(li, function(e)
+        {
+            return(if (is.list(e) && !is.data.frame(e)) makeDefsFromList(e) else DEFAULT)
+        }, simplify = FALSE)
+    }
     data <- sapply(definitions, "[[", "default", simplify = FALSE)
+    data <- makeDefsFromList(data)
     data <- modifyList(data, list(...), keep.null = TRUE)
  
     callNextMethod(.Object, name = name, baseName = baseName, description = description, version = version,
@@ -18,10 +52,13 @@ setValidity("param", function(object)
     ac <- checkmate::makeAssertCollection()
     
     # Automated validation using definitions
-    for (param_name in names(object@definitions)) {
+    for (param_name in names(object@definitions))
+    {
         def <- object@definitions[[param_name]]
         value <- object@data[[param_name]]
         
+        if (isDefault(value))
+            next
         if (is.null(value) && def$type == "list" && def$null.ok)
             next
         
@@ -61,8 +98,8 @@ setValidity("param", function(object)
     return(OK)
 })
 
-setAs("param", "list", function(from) from@data)
-setMethod("as.list", "param", function(x, ...) x@data)
+setMethod("as.list", "param", function(x, fill = TRUE) if (fill) paramListFillDefaults(x@data, x@definitions) else x@data)
+setAs("param", "list", function(from) as.list(from))
 
 setMethod("show", "param", function(object)
 {
@@ -147,6 +184,7 @@ importParam <- function(type, inFile)
 FeaturesOpenMSParam <- setClass("FeaturesOpenMSParam", contains = "param")
 setMethod("initialize", "FeaturesOpenMSParam", function(.Object, ...)
 {
+    # UNDONE: move defs to global list, so it is RO and can be shared between objects
     defs <- list(
         noiseThrInt = list(
             default = 1000,
@@ -388,9 +426,11 @@ setMethod("initialize", "FeaturesPiekParam", function(.Object, ...)
 
 setValidity("FeaturesPiekParam", function(object)
 {
+    parsFilled <- paramListFillDefaults(object@data, object@definitions)
+    
     ac <- checkmate::makeAssertCollection()
-    assertPiekGenEICParams(object@data$genEICParams, .var.name = "genEICParams", add = ac)
-    assertFindPeakParams(object@data$peakParams, .var.name = "peakParams", add = ac)
+    assertPiekGenEICParams(parsFilled$genEICParams, .var.name = "genEICParams", add = ac)
+    assertFindPeakParams(parsFilled$peakParams, .var.name = "peakParams", add = ac)
     
     OK <- tryCatch(checkmate::reportAssertions(ac), error = function(e) e)
     return(OK)

@@ -690,6 +690,46 @@ annotatedMSMSSimilarity <- function(annPL, specSimParams)
 }
 
 # used as predictTox method definitions
+doPredictBCFSuspects <-  function(obj, species = "Cyprinus carpio", topMost = TRUE, N = 10000, cutoff = 0.5)
+{
+    # UNDONE: support threshold arg? seems only one option now
+    # UNDONE: merge most of this with doPredictToxSuspects()
+    
+    checkPackage("fishFingers", "drewszabo/fishFingers")
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertString(species, add = ac)
+    checkmate::assertFlag(topMost, add = ac)
+    checkmate::assertInt(N, lower = 1, add = ac)
+    checkmate::assertNumber(cutoff, lower = 0, upper = 1, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (length(obj) == 0)
+        return(obj)
+    
+    scr <- screenInfo(obj)
+    if (is.null(scr[["SMILES"]]) || all(is.na(scr$SMILES)))
+        stop("Suspects lack necessary SMILES information to perform calculations, aborting...", call. = FALSE)
+    if (any(is.na(scr$SMILES)))
+        warning("Some suspect SMILES are NA and will be ignored", call. = FALSE)
+    
+    # avoid duplicate calculations if there happen to be suspects with the same SMILES
+    inpSMILES <- unique(screenInfo(obj)$SMILES)
+    inpSMILES <- inpSMILES[!is.na(inpSMILES)]
+    
+    printf("Predicting bio concentration factors from SMILES with fishFingers for %d suspects...\n", length(inpSMILES))
+    pr <- predictBCFSMILES(inpSMILES, species, topMost, N, cutoff)
+    
+    if (!is.null(scr[["BCF_SMILES"]]))
+        scr[, BCF_SMILES := NULL] # clearout for merge below
+    scr <- merge(scr, pr, by = "SMILES", sort = FALSE, all.x = TRUE)
+    
+    obj@screenInfo <- scr
+    
+    return(obj)
+}
+
+# used as predictTox method definitions
 doPredictToxSuspects <-  function(obj, LC50Mode = "static", concUnit = "ugL")
 {
     checkPackage("MS2Tox", "kruvelab/MS2Tox")

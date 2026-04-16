@@ -390,6 +390,46 @@ prepareChemTable <- function(chemData, prefCalcChemProps, neutralChemProps, verb
     return(chemData[])
 }
 
+predictBCFSMILES <- function(SMILES, species, topMost, N, cutoff)
+{
+    if (length(SMILES) == 0)
+        return(data.table(SMILES = character(), BCF_SMILES = character()))
+    
+    hashes <- sapply(SMILES, makeHash, species, topMost, N, cutoff)
+    cachedData <- pruneList(loadCacheData("BCF_SMILES", hashes, simplify = FALSE))
+    indsTODO <- which(!hashes %in% names(cachedData))
+    hashesTODO <- hashes[indsTODO]
+    
+    BCFs <- NULL
+    if (length(indsTODO) > 0)
+    {
+        # FPs <- doMap(TRUE, fishFingers::generate_fingerprints, SMILES[indsTODO], prog = FALSE, stripEnv = FALSE)
+        FPs <- fishFingers::generate_fingerprints(SMILES[indsTODO])
+        BCFs <- fishFingers::predict_bcf_fps("smiles", fingerprints = FPs, species = species, topMost = topMost, N = N,
+                                             cutoff = cutoff)
+        BCFs <- data.table(SMILES = SMILES[indsTODO], BCF_SMILES = BCFs)
+        for (i in seq_len(nrow(BCFs)))
+            saveCacheData("BCF_SMILES", BCFs$SMILES[i], hashesTODO[i])
+    }
+    
+    if (length(cachedData) > 0)
+    {
+        cachedBCFs <- rbindlist(lapply(cachedData, function(cd) data.table(BCF_SMILES = cd)), idcol = "hash")
+        cachedBCFs[, SMILES := ..SMILES[match(hash, hashes)]]
+        cachedBCFs[, hash := NULL]
+        
+        if (is.null(BCFs))
+            BCFs <- cachedBCFs
+        else
+        {
+            BCFs <- rbind(BCFs, cachedBCFs)
+            BCFs <- BCFs[match(inp$SMILES, SMILES)] # sync order
+        }
+    }
+    
+    return(BCFs[])
+}
+
 predictRespFactorsSMILES <- function(fgSMILESTab, gInfo, calibrants, eluent, organicModifier, pHAq, concUnit)
 {
     # UNDONE: OpenBabel references in ref docs

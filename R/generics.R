@@ -630,6 +630,11 @@ setGeneric("plotVenn", function(obj, ...) standardGeneric("plotVenn"))
 #' @template generics
 setGeneric("plotUpSet", function(obj, ...) standardGeneric("plotUpSet"))
 
+#' @templateVar func predictBCF
+#' @templateVar desc Prediction of bio concentration factors.
+#' @template generics
+setGeneric("predictBCF", function(obj, ...) standardGeneric("predictBCF"))
+
 #' @templateVar func predictRespFactors
 #' @templateVar desc Prediction of response factors.
 #' @template generics

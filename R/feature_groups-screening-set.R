@@ -316,6 +316,10 @@ setMethod("filter", "featureGroupsScreeningSet", function(obj, ..., onlyHits = N
     return(obj)
 })
 
+#' @rdname pred-bcf
+#' @export
+setMethod("predictBCF", "featureGroupsScreeningSet", doPredictBCFSuspects)
+
 #' @rdname pred-quant
 #' @export
 setMethod("predictRespFactors", "featureGroupsScreeningSet", function(obj, calibrants, ...)

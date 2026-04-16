@@ -149,6 +149,10 @@ setMethod("predictRespFactors", "featureGroupsScreening", function(obj, calibran
     return(obj)
 })
 
+#' @rdname pred-bcf
+#' @export
+setMethod("predictBCF", "featureGroupsScreening", doPredictBCFSuspects)
+
 #' @rdname pred-tox
 #' @export
 setMethod("predictTox", "featureGroupsScreening", doPredictToxSuspects)

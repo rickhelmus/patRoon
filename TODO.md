@@ -1,4 +1,6 @@
 - predictTox() for compounds: invert when adding MF score?
+- calculateBCF() methods and relevant slots
+- SIRIUS support
 
 # Priority
 

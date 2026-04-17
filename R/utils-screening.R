@@ -690,7 +690,7 @@ annotatedMSMSSimilarity <- function(annPL, specSimParams)
 }
 
 # used as predictTox method definitions
-doPredictBCFSuspects <-  function(obj, species = "Cyprinus carpio", topMost = TRUE, N = 10000, cutoff = 0.5)
+doPredictBCFSuspects <-  function(obj, species = "Cyprinus carpio", N = 10000, cutoff = 0.5)
 {
     # UNDONE: support threshold arg? seems only one option now
     # UNDONE: merge most of this with doPredictToxSuspects()
@@ -699,7 +699,6 @@ doPredictBCFSuspects <-  function(obj, species = "Cyprinus carpio", topMost = TR
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assertString(species, add = ac)
-    checkmate::assertFlag(topMost, add = ac)
     checkmate::assertInt(N, lower = 1, add = ac)
     checkmate::assertNumber(cutoff, lower = 0, upper = 1, add = ac)
     checkmate::reportAssertions(ac)
@@ -718,7 +717,7 @@ doPredictBCFSuspects <-  function(obj, species = "Cyprinus carpio", topMost = TR
     inpSMILES <- inpSMILES[!is.na(inpSMILES)]
     
     printf("Predicting bio concentration factors from SMILES with fishFingers for %d suspects...\n", length(inpSMILES))
-    pr <- predictBCFSMILES(inpSMILES, species, topMost, N, cutoff)
+    pr <- predictBCFSMILES(inpSMILES, species, N, cutoff)
     
     if (!is.null(scr[["BCF_SMILES"]]))
         scr[, BCF_SMILES := NULL] # clearout for merge below

@@ -597,7 +597,7 @@ setMethod("plotSpectrumHash", "compounds", function(obj, index, groupName, MSPea
 
 #' @rdname pred-tox
 #' @export
-setMethod("predictBCF", "compounds", function(obj, species = "Cyprinus carpio", topMost = TRUE, N = 10000, cutoff = 0.5,
+setMethod("predictBCF", "compounds", function(obj, species = "Cyprinus carpio", N = 10000, cutoff = 0.5,
                                               updateScore = FALSE, scoreWeight = 1, parallel = TRUE)
 {
     # UNDONE: support threshold arg? seems only one option now
@@ -606,7 +606,6 @@ setMethod("predictBCF", "compounds", function(obj, species = "Cyprinus carpio", 
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assertString(species, add = ac)
-    checkmate::assertFlag(topMost, add = ac)
     checkmate::assertInt(N, lower = 1, add = ac)
     checkmate::assertNumber(cutoff, lower = 0, upper = 1, add = ac)
     aapply(checkmate::assertFlag, . ~ updateScore + parallel, fixed = list(add = ac))
@@ -618,16 +617,15 @@ setMethod("predictBCF", "compounds", function(obj, species = "Cyprinus carpio", 
     
     printf("Predicting BCF values from SMILES with fishFingers for %d candidates...\n", length(obj))
     
-    obj@groupAnnotations <- doMap(parallel, groupNames(obj), annotations(obj), f = function(grp, ann, species, topMost,
-                                                                                            N, cutoff)
+    obj@groupAnnotations <- doMap(parallel, groupNames(obj), annotations(obj), f = function(grp, ann, species, N, cutoff)
     {
         ann <- copy(ann)
-        pr <- predictBCFSMILES(ann$SMILES, species, topMost, N, cutoff)
+        pr <- predictBCFSMILES(ann$SMILES, species, N, cutoff)
         if (!is.null(ann[["BCF_SMILES"]]))
             ann[, BCF_SMILES := NULL] # clearout for merge below
         ann <- merge(ann, pr, by = "SMILES", sort = FALSE, all.x = TRUE)
         return(ann)
-    }, MoreArgs = list(species, topMost, N, cutoff))
+    }, MoreArgs = list(species, N, cutoff))
 
     return(addCompoundScore(obj, "BCF_SMILES", updateScore, scoreWeight))
 })

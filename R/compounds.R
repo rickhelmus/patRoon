@@ -595,6 +595,43 @@ setMethod("plotSpectrumHash", "compounds", function(obj, index, groupName, MSPea
     return(makeHash(cRow, fRow, getSpec(MSPeakLists, groupName, 2, NULL), plotStruct, title, normalized, mincex, xlim, ylim, ...))
 })
 
+#' @rdname pred-tox
+#' @export
+setMethod("predictBCF", "compounds", function(obj, species = "Cyprinus carpio", topMost = TRUE, N = 10000, cutoff = 0.5,
+                                              updateScore = FALSE, scoreWeight = 1, parallel = TRUE)
+{
+    # UNDONE: support threshold arg? seems only one option now
+    
+    checkPackage("fishFingers", "drewszabo/fishFingers")
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertString(species, add = ac)
+    checkmate::assertFlag(topMost, add = ac)
+    checkmate::assertInt(N, lower = 1, add = ac)
+    checkmate::assertNumber(cutoff, lower = 0, upper = 1, add = ac)
+    aapply(checkmate::assertFlag, . ~ updateScore + parallel, fixed = list(add = ac))
+    checkmate::assertNumber(scoreWeight, finite = TRUE, lower = 1, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (length(obj) == 0)
+        return(obj)
+    
+    printf("Predicting BCF values from SMILES with fishFingers for %d candidates...\n", length(obj))
+    
+    obj@groupAnnotations <- doMap(parallel, groupNames(obj), annotations(obj), f = function(grp, ann, species, topMost,
+                                                                                            N, cutoff)
+    {
+        ann <- copy(ann)
+        pr <- predictBCFSMILES(ann$SMILES, species, topMost, N, cutoff)
+        if (!is.null(ann[["BCF_SMILES"]]))
+            ann[, BCF_SMILES := NULL] # clearout for merge below
+        ann <- merge(ann, pr, by = "SMILES", sort = FALSE, all.x = TRUE)
+        return(ann)
+    }, MoreArgs = list(species, topMost, N, cutoff))
+
+    return(addCompoundScore(obj, "BCF_SMILES", updateScore, scoreWeight))
+})
+
 #' @rdname pred-quant
 #' @export
 setMethod("predictRespFactors", "compounds", function(obj, fGroups, calibrants, eluent, organicModifier, pHAq,

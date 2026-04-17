@@ -215,6 +215,10 @@ setMethod("annotatedPeakList", "formulasSet", function(obj, index, groupName, an
     return(callNextMethod())
 })
 
+#' @rdname pred-bcf
+#' @export
+setMethod("predictBCF", "formulasSet", doFeatAnnPredictBCFSets)
+
 #' @rdname pred-quant
 #' @export
 setMethod("predictRespFactors", "formulasSet", doFeatAnnPredictRFSets)

@@ -474,6 +474,12 @@ doFeatAnnMCNSetsCons <- function(obj, sets)
     return(obj@mergedConsensusNames)
 }
 
+doFeatAnnPredictToxSets <- function(obj, ...)
+{
+    obj@setObjects <- lapply(setObjects(obj), predictBCF, ...)
+    return(updateSetConsensus(obj))
+}
+
 doFeatAnnPredictRFSets <- function(obj, fGroups, calibrants, ...)
 {
     checkmate::assertClass(fGroups, "featureGroupsSet")

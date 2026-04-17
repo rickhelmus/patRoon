@@ -1,3 +1,5 @@
+- predictTox() for compounds: invert when adding MF score?
+
 # Priority
 
 ## general

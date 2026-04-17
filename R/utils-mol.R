@@ -409,13 +409,13 @@ predictBCFSMILES <- function(SMILES, species, topMost, N, cutoff)
                                              cutoff = cutoff)
         BCFs <- data.table(SMILES = SMILES[indsTODO], BCF_SMILES = BCFs)
         for (i in seq_len(nrow(BCFs)))
-            saveCacheData("BCF_SMILES", BCFs$SMILES[i], hashesTODO[i])
+            saveCacheData("BCF_SMILES", BCFs$BCF_SMILES[i], hashesTODO[i])
     }
     
     if (length(cachedData) > 0)
     {
         cachedBCFs <- rbindlist(lapply(cachedData, function(cd) data.table(BCF_SMILES = cd)), idcol = "hash")
-        cachedBCFs[, SMILES := ..SMILES[match(hash, hashes)]]
+        cachedBCFs[, SMILES := SMI[match(hash, hashes)], env = list(SMI = "SMILES")]
         cachedBCFs[, hash := NULL]
         
         if (is.null(BCFs))
@@ -423,7 +423,7 @@ predictBCFSMILES <- function(SMILES, species, topMost, N, cutoff)
         else
         {
             BCFs <- rbind(BCFs, cachedBCFs)
-            BCFs <- BCFs[match(inp$SMILES, SMILES)] # sync order
+            BCFs <- BCFs[match(SMI, SMILES), env = list(SMI = "SMILES")] # sync order
         }
     }
     

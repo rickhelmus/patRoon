@@ -154,14 +154,17 @@ setMethod("export", "param", function(obj, type, out)
         data = obj@data
     )
     
-    # prep defaults
-    exp$data <- rapply(exp$data, classes = "defaultParam", how = "replace", function(x)
+    if (type != "R")
     {
-        if (type == "json") jsonlite::unbox("__default") else "__default"
-    })
+        # prep defaults
+        exp$data <- rapply(exp$data, classes = "defaultParam", how = "replace", function(x)
+        {
+            if (type == "json") jsonlite::unbox("__default") else "__default"
+        })
+    }
     
     if (type == "R")
-        constructive::construct_dump(list(param = exp), out)
+        constructive::construct_dump(list(param = exp), out, data = list(DEFAULT = DEFAULT))
     else if (type == "json")
     {
         # unbox scalars
@@ -176,7 +179,7 @@ setMethod("export", "param", function(obj, type, out)
         jsonlite::write_json(exp, out, pretty = TRUE)
     }
     else if (type == "yaml")
-        yaml::write_yaml(exp, out)
+        yaml::write_yaml(exp, out) # UNDONE: keep this? Format is probably only suitable for simple params
 })
 
 importParam <- function(type, inFile)

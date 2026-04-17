@@ -109,7 +109,8 @@ setMethod("show", "param", function(object)
     printf("Version: %s\n", object@version)
     printf("Date created: %s\n", format(object@date))
     printf("Parameters (%d in total)\n", length(object@definitions))
-    print(data.table(parameter = names(object@definitions), value = sapply(object@data, as.character),
+    # UNDONE: mark defaults
+    print(data.table(parameter = names(object@definitions), value = sapply(as.list(object), as.character),
                      description = sapply(object@definitions, "[[", "description")))
 })
 
@@ -152,10 +153,28 @@ setMethod("export", "param", function(obj, type, out)
         date = obj@date,
         data = obj@data
     )
+    
+    # prep defaults
+    exp$data <- rapply(exp$data, classes = "defaultParam", how = "replace", function(x)
+    {
+        if (type == "json") jsonlite::unbox("__default") else "__default"
+    })
+    
     if (type == "R")
         constructive::construct_dump(list(param = exp), out)
     else if (type == "json")
+    {
+        # unbox scalars
+        n <- c("name", "classType", "version", "date")
+        exp[n] <- lapply(exp[n], jsonlite::unbox)
+        exp$data <- Map(names(exp$data), exp$data, f = function(name, value)
+        {
+            if (obj@definitions[[name]]$type %in% c("number", "string", "flag", "choice", "count"))
+                value <- jsonlite::unbox(value)
+            return(value)
+        })
         jsonlite::write_json(exp, out, pretty = TRUE)
+    }
     else if (type == "yaml")
         yaml::write_yaml(exp, out)
 })
@@ -169,6 +188,13 @@ importParam <- function(type, inFile)
         jsonlite::read_json(inFile, simplifyVector = TRUE)
     else # if (type == "yaml")
         yaml::read_yaml(inFile)
+    
+    imp <- rapply(imp, classes = "character", how = "replace", f = function(x)
+    {
+        if (x == "__default")
+            x <- DEFAULT
+        return(x)
+    })
     
     ret <- new(imp$class)
     ret@version <- imp$version

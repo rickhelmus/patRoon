@@ -598,10 +598,10 @@ setMethod("plotBPCs", "features", function(obj, retentionRange = NULL, MSLevel =
 #' @return An object of a class which is derived from \code{\link{features}}.
 #'
 #' @export
-findFeatures <- function(analysisInfo, algorithm, ..., verbose = TRUE)
+setMethod("findFeatures", "data.frame", function(obj, algorithm, ..., verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
-    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, add = ac)
+    obj <- assertAndPrepareAnaInfo(obj, add = ac)
     checkmate::assertChoice(algorithm, c("bruker", "openms", "xcms", "xcms3", "envipick", "sirius", "kpic2", "safd",
                                          "piek"), add = ac)
     checkmate::assertFlag(verbose, add = ac)
@@ -618,8 +618,8 @@ findFeatures <- function(analysisInfo, algorithm, ..., verbose = TRUE)
                 safd = findFeaturesSAFD,
                 piek = findFeaturesPiek)
 
-    f(analysisInfo, ..., verbose = verbose)
-}
+    f(obj, ..., verbose = verbose)
+})
 
 #' Import features
 #'

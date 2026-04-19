@@ -1,3 +1,9 @@
+# workflow
+
+- findFeatures: update docs (fix analysisInfo --> obj), NEWS
+- don't include param, move to algo files (eg features-openms)
+
+
 # Priority
 
 ## general

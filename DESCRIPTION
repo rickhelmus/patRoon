@@ -243,6 +243,7 @@ Collate:
     'features-bruker.R'
     'features-envipick.R'
     'features-kpic2.R'
+    'param.R'
     'features-openms.R'
     'features-optimize.R'
     'features-optimize-envipick.R'
@@ -268,6 +269,7 @@ Collate:
     'multi-process-classic.R'
     'multi-process-future.R'
     'multi-process.R'
+    'param-ui.R'
     'peaks.R'
     'project-tool-analyses.R'
     'project-tool-annotation.R'
@@ -304,5 +306,6 @@ Collate:
     'utils-progress.R'
     'utils-sets.R'
     'utils-xcms.R'
+    'workflow.R'
     'zzz.R'
 VignetteBuilder: knitr

@@ -4,6 +4,7 @@
 
 #' @include features.R
 #' @include main.R
+#' @include param.R
 NULL
 
 #' @rdname features-class
@@ -173,6 +174,11 @@ findFeaturesOpenMS <- function(analysisInfo, noiseThrInt = 1000, chromSNR = 3, c
 
     return(featuresOpenMS(analysisInfo = analysisInfo, features = fList))
 }
+
+setMethod("findFeaturesP", c("data.frame", "FeaturesOpenMSParam"), function(obj, param)
+{
+    do.call(findFeaturesOpenMS, c(list(obj), as.list(param)))
+})
 
 getOpenMSFFCommand <- function(datafile, out, noiseThrInt, chromSNR, chromFWHM, mzPPM, reEstimateMTSD,
                                traceTermCriterion, traceTermOutliers, minSampleRate,

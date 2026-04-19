@@ -24,7 +24,7 @@ setMethod("show", "defaultParam", function(object)
     printf("A %s object.\n", class(object))
 })
 
-param <- setClass("param", slots = c(name = "character", baseName = "ANY", description = "character",
+param <- setClass("param", slots = c(name = "character", baseName = "character", description = "character",
                                      version = "character", date = "POSIXct", definitions = "list", data = "list"),
                   contains = "VIRTUAL")
 

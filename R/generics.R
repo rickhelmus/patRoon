@@ -116,6 +116,12 @@ setGeneric("plotMobilograms", function(obj, ...) standardGeneric("plotMobilogram
 #' @name kpic2-conv
 setGeneric("getPICSet", function(obj, ...) standardGeneric("getPICSet"))
 
+#' @rdname features
+setGeneric("findFeatures", function(obj, ...) standardGeneric("findFeatures"))
+
+#' @rdname features
+setGeneric("findFeaturesP", function(obj, param, ...) standardGeneric("findFeaturesP"))
+
 #' @name groupFeatures
 setGeneric("groupFeatures", function(obj, algorithm, ...) standardGeneric("groupFeatures"))
 

@@ -29,7 +29,7 @@ param <- setClass("param", slots = c(name = "character", baseName = "character",
                   contains = "VIRTUAL")
 
 setMethod("initialize", "param", function(.Object, name, baseName, description, version,
-          definitions, ...)
+          definitions, ..., template = character())
 {
     # construct template data with defaults
     makeDefsFromList <- function(li)

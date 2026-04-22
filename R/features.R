@@ -598,7 +598,7 @@ setMethod("plotBPCs", "features", function(obj, retentionRange = NULL, MSLevel =
 #' @return An object of a class which is derived from \code{\link{features}}.
 #'
 #' @export
-setMethod("findFeatures", "data.frame", function(obj, algorithm, ..., verbose = TRUE)
+findFeatures <- function(obj, algorithm, ..., verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     obj <- assertAndPrepareAnaInfo(obj, add = ac)
@@ -619,6 +619,25 @@ setMethod("findFeatures", "data.frame", function(obj, algorithm, ..., verbose = 
                 piek = findFeaturesPiek)
 
     f(obj, ..., verbose = verbose)
+}
+
+# NOTE: obj is not dispatched, we only want to pass through here so it works with both anaInfo and workflow input
+setMethod("findFeaturesP", c("ANY", "character"), function(obj, param, ...)
+{
+    checkmate::assertChoice(param, c("bruker", "openms", "xcms", "xcms3", "envipick", "sirius", "kpic2", "safd", "piek"))
+    
+    f <- switch(param,
+                bruker = findFeaturesBrukerP,
+                openms = findFeaturesPOpenMS,
+                xcms = findFeaturesXCMSP,
+                xcms3 = findFeaturesXCMS3P,
+                envipick = findFeaturesEnviPickP,
+                sirius = findFeaturesSIRIUSP,
+                kpic2 = findFeaturesKPIC2P,
+                safd = findFeaturesSAFDP,
+                piek = findFeaturesPiekP)
+    
+    f(obj, ...)
 })
 
 #' Import features

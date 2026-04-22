@@ -307,5 +307,6 @@ Collate:
     'utils-sets.R'
     'utils-xcms.R'
     'workflow.R'
+    'workflow-wrappers.R'
     'zzz.R'
 VignetteBuilder: knitr

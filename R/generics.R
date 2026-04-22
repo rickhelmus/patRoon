@@ -116,11 +116,11 @@ setGeneric("plotMobilograms", function(obj, ...) standardGeneric("plotMobilogram
 #' @name kpic2-conv
 setGeneric("getPICSet", function(obj, ...) standardGeneric("getPICSet"))
 
-#' @rdname features
-setGeneric("findFeatures", function(obj, ...) standardGeneric("findFeatures"))
-
-#' @rdname features
+#' @rdname findFeatures
 setGeneric("findFeaturesP", function(obj, param, ...) standardGeneric("findFeaturesP"))
+
+#' @rdname findFeaturesOpenMS
+setGeneric("findFeaturesPOpenMS", function(obj, ...) standardGeneric("findFeaturesPOpenMS"))
 
 #' @name groupFeatures
 setGeneric("groupFeatures", function(obj, algorithm, ...) standardGeneric("groupFeatures"))
@@ -393,6 +393,9 @@ setGeneric("report", function(fGroups, MSPeakLists = NULL, formulas = NULL, comp
                               specSimParams = getDefSpecSimParams(), clearPath = FALSE, openReport = TRUE,
                               parallel = FALSE, overrideSettings = list()) standardGeneric("report"))
 
+### Workflow
+
+setGeneric("templateDir", function(obj) standardGeneric("templateDir"))
 
 ### Misc.
 

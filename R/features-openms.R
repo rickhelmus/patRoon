@@ -175,8 +175,15 @@ findFeaturesOpenMS <- function(analysisInfo, noiseThrInt = 1000, chromSNR = 3, c
     return(featuresOpenMS(analysisInfo = analysisInfo, features = fList))
 }
 
-setMethod("findFeaturesP", c("data.frame", "FeaturesOpenMSParam"), function(obj, param)
+setMethod("findFeaturesPOpenMS", "data.frame", function(obj, param, ...)
 {
+    # UNDONE: adjust param for ...
+    do.call(findFeaturesOpenMS, c(list(obj), as.list(param)))
+})
+
+setMethod("findFeaturesP", c("data.frame", "FeaturesOpenMSParam"), function(obj, param, ...)
+{
+    # UNDONE: merge with above or make util
     do.call(findFeaturesOpenMS, c(list(obj), as.list(param)))
 })
 

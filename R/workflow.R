@@ -7,7 +7,8 @@ setOptClass("compounds")
 
 workflow <- setClass("workflow", slots = c(analysisInfo = "data.table", features = "featuresOpt",
                                            fGroups = "featureGroupsOpt", MSPeakLists = "MSPeakListsOpt",
-                                           formulas = "formulasOpt", compounds = "compoundsOpt"))
+                                           formulas = "formulasOpt", compounds = "compoundsOpt",
+                                           templateDir = "character"))
 
 setMethod("initialize", "workflow", function(.Object, analysisInfo, ...)
 {
@@ -23,13 +24,4 @@ setMethod("analysisInfo", "workflow", function(obj, df = FALSE)
     return(if (df) as.data.frame(obj@analysisInfo) else obj@analysisInfo)
 })
 
-setMethod("findFeatures", "workflow", function(obj, ...)
-{
-    obj@features <- findFeatures(analysisInfo(obj), ...)
-    return(obj)
-})
-
-setMethod("findFeaturesP", c("workflow", "ANY"), function(obj, param, ...)
-{
-    findFeaturesP(analysisInfo(obj), param, ...)
-})
+setMethod("templateDir", "workflow", function(obj) obj@templateDir)

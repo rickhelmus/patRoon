@@ -47,6 +47,8 @@ setGeneric("plot")
 
 setGeneric("merge") # sometimes its not yet
 
+setGeneric("as.list")
+
 #### Generics
 
 #' @include generics.R

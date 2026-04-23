@@ -25,3 +25,11 @@ setMethod("findFeaturesP", c("workflow", "FeaturesOpenMSParam"),
 #' @rdname findFeaturesOpenMS
 setMethod("findFeaturesPOpenMS", "workflow",
           \(obj, param = NULL, ...) doWfFeat(obj, algo = "OpenMS", param = param, ...))
+
+#' @rdname findFeaturesXCMS3
+setMethod("findFeaturesP", c("workflow", "FeaturesXCMS3Param"),
+          \(obj, param = NULL, ...) doWfFeat(obj, algo = "XCMS3", param = param, ...))
+
+#' @rdname findFeaturesXCMS3
+setMethod("findFeaturesPXCMS3", "workflow",
+          \(obj, param = NULL, ...) doWfFeat(obj, algo = "XCMS3", param = param, ...))

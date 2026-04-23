@@ -464,3 +464,58 @@ setValidity("FeaturesPiekParam", function(object)
     OK <- tryCatch(checkmate::reportAssertions(ac), error = function(e) e)
     return(OK)
 })
+
+
+FeaturesXCMS3Param <- setClass("FeaturesXCMS3Param", contains = "param")
+setMethod("initialize", "FeaturesXCMS3Param", function(.Object, ...)
+{
+    defs <- list(
+        algo = list(
+            default = "CentWave",
+            description = "Algorithm to use for feature detection",
+            type = "choice",
+            choices = c("CentWave", "CentWavePredIso", "MatchedFilter", "Massifquant", "MSW")
+        ),
+        CentWaveParam = list(
+            default = as(xcms::CentWaveParam(), "list"),
+            description = "CentWave XCMS parameters (use xcms::CentWaveParam())",
+            type = "list"
+        ),
+        CentWavePredIsoParam = list(
+            default = as(xcms::CentWavePredIsoParam(), "list"),
+            description = "CentWavePredIso XCMS parameters (use xcms::CentWavePredIsoParam())",
+            type = "list"
+        ),
+        MatchedFilterParam = list(
+            default = as(xcms::MatchedFilterParam(), "list"),
+            description = "MatchedFilter XCMS parameters (use xcms::MatchedFilterParam())",
+            type = "list"
+        ),
+        MassifQuantParam = list(
+            default = as(xcms::MassifquantParam(), "list"),
+            description = "MassifQuant XCMS parameters (use xcms::MassifquantParam())",
+            type = "list"
+        ),
+        MSWParam = list(
+            default = as(xcms::MSWParam(), "list"),
+            description = "MSW XCMS parameters (use xcms::MSWParam())",
+            type = "list"
+        ),
+        extraOpts = list(
+            default = NULL,
+            description = "List with extra options passed to xcms::findChromPeaks()",
+            type = "list",
+            names = "unique",
+            null.ok = TRUE
+        ),
+        verbose = list(
+            default = TRUE,
+            description = "Verbose output",
+            type = "flag"
+        )
+    )
+    
+    callNextMethod(.Object, name = "FeaturesXCMS3Param", baseName = "FeaturesXCMS3Param",
+                   description = "Parameters for XCMS3 feature detection", version = "1.0",
+                   definitions = defs, ...)
+})

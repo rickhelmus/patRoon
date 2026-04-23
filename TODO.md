@@ -4,6 +4,10 @@
 - don't include param, move to algo files (eg features-openms)
 - doc new generics
 
+## Params
+
+- XCMS3: make XCMS3 param defaults nested (like now) or one default for whole param? Or make it an option, also applicable to other params?
+
 
 # Priority
 

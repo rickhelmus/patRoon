@@ -1,8 +1,8 @@
 # patRoon 3.0
 
-This release adds a significant amount of new functionality and changes. Please see the updated [Handbook] and sections
-below for more information. Users of previous `patRoon` versions should inform themselves with the important changes
-highlighted in the next section.
+This release adds a significant amount of new functionality and changes. Please see the updated [Handbook],
+[pre-print][preprint3], and sections below for more information. Users of previous `patRoon` versions should inform
+themselves with the important changes highlighted in the next section.
 
 ## Upgrading notes
 
@@ -1552,3 +1552,4 @@ Other changes
 [Handbook-importFeat]: https://rickhelmus.github.io/patRoon/handbook_bd/features.html#importFeat
 [Handbook-lim]: https://rickhelmus.github.io/patRoon/handbook_bd/limits.html
 [Handbook-IDConf]: https://rickhelmus.github.io/patRoon/handbook_bd/annotation.html#estIDConf
+[preprint3]: https://doi.org/10.21203/rs.3.rs-9517980/v1

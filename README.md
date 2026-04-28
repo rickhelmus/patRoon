@@ -125,6 +125,8 @@ screening](https://doi.org/10.1186/s13321-020-00477-w). _Journal of Cheminformat
 Rick Helmus, Bas van de Velde, Andrea M. Brunner, Thomas L. ter Laak, Annemarie P. van Wezel and Emma L. Schymanski.
 [patRoon 2.0: Improved non-target analysis workflows including automated transformation product screening]( https://doi.org/10.21105/joss.04029). _Journal of Open Source Software_, 7(71), 4029
 
+Rick Helmus, Jan C. Specker, Christine Gallampois and Emma L. Schymanski. [patRoon 3.0: Enhanced non-target analysis workflows with ion mobility separation and other major improvements](https://doi.org/10.21203/rs.3.rs-9517980/v1) _PREPRINT at Research Square_
+
 `patRoon` builds on many open-source software tools and open data sources. Therefore, it is important to also cite their
 work when using these algorithms via `patRoon`.
 

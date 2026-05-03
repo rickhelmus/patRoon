@@ -1,3 +1,8 @@
+# DEVEL
+
+* Fixed: `getEICs()` output was returned as nested matrices when `output="fill"`
+
+
 # patRoon 3.0
 
 This release adds a significant amount of new functionality and changes. Please see the updated [Handbook],

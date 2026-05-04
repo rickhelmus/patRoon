@@ -1,3 +1,10 @@
+# Compon
+
+## NEWS
+
+- EIXParam window param can be Inf
+
+
 # Priority
 
 ## general

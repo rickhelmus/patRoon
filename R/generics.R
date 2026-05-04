@@ -245,6 +245,9 @@ setGeneric("generateComponentsCliqueMS", function(fGroups, ...) standardGeneric(
 #' @rdname generateComponentsSpecClust
 setGeneric("generateComponentsSpecClust", function(fGroups, ...) standardGeneric("generateComponentsSpecClust"))
 
+#' @rdname generateComponentsNet
+setGeneric("generateComponentsNet", function(fGroups, ...) standardGeneric("generateComponentsNet"))
+
 #' @param \dots Further arguments specified to the methods.
 #' @rdname generateComponentsTPs
 setGeneric("generateComponentsTPs", function(fGroups, ...) standardGeneric("generateComponentsTPs"))

@@ -314,10 +314,11 @@ filterEIXs <- function(EIXs, fGroups, analysis = NULL, groupName = NULL, topMost
 extendEIXInputTab <- function(tab, type, EIXParams, hasIMS, fromIMS)
 {
     tab <- copy(tab)
-    if (type == "EIC")
-        tab[, c("retmin", "retmax") := .(retmin - EIXParams$window, retmax + EIXParams$window)]
-    else # "EIM"
-        tab[, c("mobmin", "mobmax") := .(mobmin - EIXParams$window, mobmax + EIXParams$window)]
+    xcols <- if (type == "EIC") c("retmin", "retmax") else c("mobmin", "mobmax")
+    if (is.infinite(EIXParams$window))
+        tab[, (xcols) := 0]
+    else
+        tab[, (xcols) := .(get(xcols[1]) - EIXParams$window, get(xcols[2]) + EIXParams$window)]
     if (hasIMS && !fromIMS)
         tab[, c("mzmin", "mzmax") := .(mzmin - EIXParams$mzExpMobWindow, mzmax + EIXParams$mzExpMobWindow)]
     return(tab)

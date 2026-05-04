@@ -8,8 +8,8 @@ NULL
 getNetCompHClust <- function(rmat)
 {
     distm <- as.dist(1 - abs(rmat))
-    hc <- hclust(distm, method = "complete") # UNDONE: make method configurable?
-    ct <- cutree(hc, h = 0.9)
+    hc <- fastcluster::hclust(distm, method = "complete") # UNDONE: make method configurable?
+    ct <- cutree(hc, h = 0.95) # make configurable/same as applied to rmat
     clIDs <- sort(unique(ct))
     return(lapply(clIDs, \(id) names(ct[ct == id])))
 }
@@ -57,10 +57,14 @@ makeCompNetFeatures <- function(fTable, EICs)
     # UNDONE: handle new deps
     
     eicm <- do.call(cbind, lapply(EICs, \(eic) eic[, "intensity"]))
-    corr <- Hmisc::rcorr(eicm, type = "pearson")
     
-    rmat <- corr$r
-    rmat[rmat < 0.9 | corr$P >= 0.05] <- 0 # UNDONE: make configurable
+    corr <- Hmisc::rcorr(eicm, type = "pearson")
+    # rmat <- corr$r
+    # rmat[rmat < 0.95 | corr$P >= 0.05] <- 0 # UNDONE: make configurable
+    # diag(rmat) <- 0
+
+    rmat <- proxy::simil(eicm, method = "cosine", by_rows = FALSE) |> as.matrix()
+    rmat[rmat < 0.95] <- 0 # UNDONE: make configurable
     diag(rmat) <- 0
     
     graph <- igraph::graph_from_adjacency_matrix(rmat, mode = "undirected", weighted = TRUE, diag = FALSE)
@@ -81,9 +85,12 @@ setMethod("initialize", "componentsNet",
 #' @export
 setMethod("expandForIMS", "componentsNet", function(obj, ...) cannotExpandComponIMS(obj))
 
-setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization = NULL)
+setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization = NULL, minSize = 2)
 {
     # checkPackage("cliqueMS", "rickhelmus/cliqueMS") # UNDONE
+    
+    # UNDONE: asserts
+    checkmate::assertCount(minSize, positive = TRUE)
     
     fTable <- featureTable(fGroups)
     
@@ -105,9 +112,71 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
     })
     
     compsFeats <- Map(fTable, EICs, f = makeCompNetFeatures)
+    
+    # generate consensus components: calculate pairwise grouping of features across analyses
+    
+    gCount <- length(fGroups)
+    gNames <- names(fGroups)
+    coCount <- matrix(0, nrow = gCount, ncol = gCount, dimnames = list(gNames, gNames))
+    coPossible <- matrix(0, nrow = gCount, ncol = gCount, dimnames = list(gNames, gNames))
+    
+    for (ana in analyses(fGroups))
+    {
+        for (cmp in compsFeats[[ana]]$components)
+        {
+            for (fgi in cmp)
+            {
+                for (fgj in cmp)
+                {
+                    coCount[fgi, fgj] <- coCount[fgi, fgj] + 1
+                    if (fgi != fgj)
+                        coCount[fgj, fgi] <- coCount[fgj, fgi] + 1
+                }
+            }
+        }
+        
+        ft <- fTable[[ana]]
+        for (fgi in ft$group)
+        {
+            for (fgj in ft$group)
+            {
+                coPossible[fgi, fgj] <- coPossible[fgi, fgj] + 1
+                if (fgi != fgj)
+                    coPossible[fgj, fgi] <- coPossible[fgj, fgi] + 1
+            }
+        }
+    }
+    
+    coFrac <- coCount / coPossible
+    distm <- as.dist(1 - coFrac)
+    hc <- fastcluster::hclust(distm, method = "complete") # UNDONE: make configurable
+    ct <- cutree(hc, h = 0.5) # UNDONE: make configurable
+    
+    gInfo <- groupInfo(fGroups)
+    componList <- lapply(sort(unique(ct)), function(id)
+    {
+        tab <- data.table(group = names(ct)[ct == id])
+        tab[, c("ret", "mz") := .(gInfo$ret[match(group, gInfo$group)], gInfo$mz[match(group, gInfo$group)])]
+        # UNDONE: add more metadata?
+    })
+    
+    if (length(componList) > 0)
+    {
+        componList <- calculateComponentIntensities(componList, fGroups)
+        names(componList) <- paste0("CMP", seq_along(componList))
+    }
+    
+    # UNDONE: also filter feature components by size? Then also need to update graphs for plotting
+    componList <- componList[sapply(componList, nrow) >= minSize]
+    
+    cInfo <- data.table(name = names(componList), cmp_ret = sapply(componList, function(cmp) mean(cmp$ret)),
+                        cmp_retsd = sapply(componList, function(cmp) sd(cmp$ret)),
+                        # neutral_mass = sapply(componList, function(cmp) mean(cmp$neutralMass)),
+                        size = sapply(componList, nrow))
+    
     return(componentsNet(featureComponents = sapply(compsFeats, "[[", "components", simplify = FALSE),
                          featureGraphs = sapply(compsFeats, "[[", "graph", simplify = FALSE),
-                         componentInfo = data.table(), components = list()))
+                         componentInfo = cInfo, components = componList))
 })
 
 setMethod("plotGraph", "componentsNet", function(obj, analysis)

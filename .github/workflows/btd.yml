@@ -30,7 +30,7 @@ jobs:
         name: Update patRoonDeps
         if: github.ref == 'refs/heads/master'
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6
               with:
                   repository: rickhelmus/patRoonDeps
                   token: ${{ secrets.PAT }}

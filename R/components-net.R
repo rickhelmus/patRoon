@@ -68,9 +68,23 @@ makeCompNetFeatures <- function(fTable, EICs)
     diag(rmat) <- 0
     
     graph <- igraph::graph_from_adjacency_matrix(rmat, mode = "undirected", weighted = TRUE, diag = FALSE)
-    comps <- getNetCompCliques(graph) #getNetCompCommunity(graph) #getNetCompHCS(graph) #getNetCompHClust(rmat)
+    compList <- getNetCompCommunity(graph) #getNetCompCliques(graph)  #getNetCompHCS(graph) #getNetCompHClust(rmat)
     
-    return(list(graph = graph, components = comps))
+    compTabs <- lapply(compList, function(grps)
+    {
+        if (length(grps) == 1)
+            return(data.table(group = grps, degree = 0, corMin = NA_real_, corMax = NA_real_, corMean = NA_real_))
+        
+        subg <- igraph::induced_subgraph(graph, grps)
+        
+        tab <- data.table(group = grps, degree = igraph::degree(subg, normalized = TRUE))
+        weights <- sapply(grps, \(g) igraph::E(subg)[igraph::incident(subg, g)]$weight, simplify = FALSE)
+        weights <- lapply(weights, function(w) w[w > 0])
+        tab[, c("corMin", "corMax", "corMean") := .(sapply(weights, min), sapply(weights, max), sapply(weights, mean))]
+        return(tab)
+    })
+    
+    return(list(graph = graph, components = compTabs))
 }
 
 #' @rdname components-class
@@ -112,6 +126,7 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
     })
     
     compsFeats <- Map(fTable, EICs, f = makeCompNetFeatures)
+    compsFeatsTabs <- sapply(compsFeats, "[[", "components", simplify = FALSE)
     
     # generate consensus components: calculate pairwise grouping of features across analyses
     
@@ -124,9 +139,9 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
     {
         for (cmp in compsFeats[[ana]]$components)
         {
-            for (fgi in cmp)
+            for (fgi in cmp$group)
             {
-                for (fgj in cmp)
+                for (fgj in cmp$group)
                 {
                     coCount[fgi, fgj] <- coCount[fgi, fgj] + 1
                     if (fgi != fgj)
@@ -153,10 +168,21 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
     ct <- cutree(hc, h = 0.5) # UNDONE: make configurable
     
     gInfo <- groupInfo(fGroups)
+    allFeatCompTab <- rbindlist(lapply(compsFeatsTabs, \(x) rbindlist(x, idcol = "compID")), idcol = "analysis")
     componList <- lapply(sort(unique(ct)), function(id)
     {
         tab <- data.table(group = names(ct)[ct == id])
         tab[, c("ret", "mz") := .(gInfo$ret[match(group, gInfo$group)], gInfo$mz[match(group, gInfo$group)])]
+        tab[, c("degreeMin", "degreeMax", "degreeMean", "corMin", "corMax", "corMean") := {
+            fct <- allFeatCompTab[group %chin% grp, env = I(list(grp = group))]
+            cors <- if (all(is.na(fct$corMin)))
+                .(NA_real_, NA_real_, NA_real_)
+            else
+                .(min(fct$corMin, na.rm = TRUE), max(fct$corMax, na.rm = TRUE), mean(fct$corMean, na.rm = TRUE))
+            c(.(min(fct$degree), max(fct$degree), mean(fct$degree)), cors)
+        }, by = "group"]
+        
+        return(tab)
         # UNDONE: add more metadata?
     })
     
@@ -174,7 +200,7 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
                         # neutral_mass = sapply(componList, function(cmp) mean(cmp$neutralMass)),
                         size = sapply(componList, nrow))
     
-    return(componentsNet(featureComponents = sapply(compsFeats, "[[", "components", simplify = FALSE),
+    return(componentsNet(featureComponents = compsFeatsTabs,
                          featureGraphs = sapply(compsFeats, "[[", "graph", simplify = FALSE),
                          componentInfo = cInfo, components = componList))
 })
@@ -185,7 +211,7 @@ setMethod("plotGraph", "componentsNet", function(obj, analysis)
     
     data <- visNetwork::toVisNetworkData(obj@featureGraphs[[analysis]])
     nodes <- as.data.table(data$nodes)
-    nodes[, group := sapply(id, \(x) which(sapply(obj@featureComponents[[analysis]], \(y) x %in% y))[1])]
+    nodes[, group := sapply(id, \(x) which(sapply(obj@featureComponents[[analysis]], \(y) x %chin% y$group))[1])]
     edges <- data$edges
     edges$value <- edges$weight; edges$title <- round(edges$weight, 2)
     nodes <- nodes[id %in% c(edges$from, edges$to)] # UNDONE: remove singletons during componentization

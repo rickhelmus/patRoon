@@ -87,6 +87,47 @@ makeCompNetFeatures <- function(fTable, EICs)
     return(list(graph = graph, components = compTabs))
 }
 
+annotateCompNetNontarget <- function(componList, iso, add, ...)
+{
+    # UNDONE: check deps
+    
+    epEnv <- new.env()
+    if (is.null(iso)) # UNDONE: doc that this is the default
+    {
+        data(isotopes, package = "enviPat", envir = epEnv)
+        iso <- nontarget::make.isos(epEnv$isotopes)
+    }
+    if (is.null(add)) # UNDONE: doc that this is the default
+    {
+        data(adducts, package = "enviPat", envir = epEnv)
+        add <- epEnv$adducts
+    }
+    
+    componList <- lapply(componList, function(comp)
+    {
+        comp <- copy(comp)
+
+        # UNDONE: configurable args        
+        ps <- nontarget::pattern.search(comp[, .(mz, intensity, ret)], iso = iso)
+        # NOTE: nontarget::adduct.search() calls stop() when there are no results ...
+        as <- tryCatch(nontarget::adduct.search(comp[, .(mz, intensity, ret)], adducts = add),
+                       error = function(...) NULL)
+        cb <- nontarget::combine(ps, as)
+        browser()
+        # comp[, c("isogroup", "isonr", "charge") := {
+        #     ps <- nontarget::pattern.search(featureTable(fGroups)[[1]][group %in% group]$mz, iso = iso)
+        #     if (nrow(ps) == 0)
+        #         .(NA_real_, NA_real_, NA_real_)
+        #     else
+        #         .(ps$isogroup, ps$isonr, ps$charge)
+        # }, by = "group"]
+        
+        return(comp)
+    })
+    
+    return(componList)
+}
+
 #' @rdname components-class
 #' @export
 componentsNet <- setClass("componentsNet", slots = c(featureComponents = "list", featureGraphs = "list"),
@@ -188,12 +229,17 @@ setMethod("generateComponentsNet", "featureGroups", function(fGroups, ionization
     
     if (length(componList) > 0)
     {
+        # UNDONE: this will take mean feature intensities of _all_ features in the group, including those not in any
+        # feature component.
         componList <- calculateComponentIntensities(componList, fGroups)
         names(componList) <- paste0("CMP", seq_along(componList))
     }
     
     # UNDONE: also filter feature components by size? Then also need to update graphs for plotting
     componList <- componList[sapply(componList, nrow) >= minSize]
+    
+    # UNDONE
+    componList <- annotateCompNetNontarget(componList, iso = NULL, add = NULL)
     
     cInfo <- data.table(name = names(componList), cmp_ret = sapply(componList, function(cmp) mean(cmp$ret)),
                         cmp_retsd = sapply(componList, function(cmp) sd(cmp$ret)),

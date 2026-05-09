@@ -73,6 +73,7 @@ reportHTMLUtils$methods(
         # HACK: if all intensities are one than these are dummy values (eg with intclust components)
         if (all(ctab$intensity == 1))
             ctab[, intensity := NULL]
+        ctab <- removeDTColumnsIfPresent(ctab, c("ret", "mz")) # omit double comp/fgroup cols
         
         ftab <- getFGReactTab(objects, settings)
         

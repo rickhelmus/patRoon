@@ -1,6 +1,7 @@
 # DEVEL
 
 * Fixed: `getEICs()` output was returned as nested matrices when `output="fill"`
+* Fixed: `report()`: component table lacked ret and m/z columns
 
 
 # patRoon 3.0

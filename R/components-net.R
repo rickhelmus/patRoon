@@ -90,6 +90,8 @@ makeCompNetFeatures <- function(fTable, EICs)
 annotateCompNetNontarget <- function(componList, iso, add, ...)
 {
     # UNDONE: check deps
+    # UNDONE: increase default mass tolerances
+    # UNDONE: ignore ret
     
     epEnv <- new.env()
     if (is.null(iso)) # UNDONE: doc that this is the default
@@ -106,13 +108,15 @@ annotateCompNetNontarget <- function(componList, iso, add, ...)
     componList <- lapply(componList, function(comp)
     {
         comp <- copy(comp)
+        compS <- comp[, c("mz", "intensity", "ret"), with = FALSE]
 
         # UNDONE: configurable args        
-        ps <- nontarget::pattern.search(comp[, .(mz, intensity, ret)], iso = iso)
+        ps <- nontarget::pattern.search(compS, iso = iso)
         # NOTE: nontarget::adduct.search() calls stop() when there are no results ...
-        as <- tryCatch(nontarget::adduct.search(comp[, .(mz, intensity, ret)], adducts = add),
-                       error = function(...) NULL)
-        cb <- nontarget::combine(ps, as)
+        as <- tryCatch(nontarget::adduct.search(compS, adducts = add), error = function(...) NULL)
+        ads <- setDT(as$adducts[as$adducts[["adduct(s)"]] != "none", ])
+        ads[, group := comp$group[ads$`peak ID`]]
+        ads[, adduct := sub("<.*", "", `adduct(s)`)]
         browser()
         # comp[, c("isogroup", "isonr", "charge") := {
         #     ps <- nontarget::pattern.search(featureTable(fGroups)[[1]][group %in% group]$mz, iso = iso)

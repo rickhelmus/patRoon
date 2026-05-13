@@ -80,7 +80,7 @@ checkPackage <- function(pkg, gh = NULL, ghSubDir = NULL, bioc = FALSE)
     {
         if (!is.null(gh))
         {
-            args <- if (!is.null(ghSubDir)) sprintf("'%s', subdir = '%s')", gh, ghSubDir) else sprintf("'%s'", gh)
+            args <- if (!is.null(ghSubDir)) sprintf("'%s', subdir = '%s'", gh, ghSubDir) else sprintf("'%s'", gh)
             stop(sprintf("Please install %s from github: remotes::install_github(%s)", pkg, args), call. = FALSE)
         }
         else if (bioc)

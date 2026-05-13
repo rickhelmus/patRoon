@@ -560,7 +560,7 @@ newProjectAnalysesServer <- function(id, ionization, IMSMode, settings)
                 {
                     for (pol in c("positive", "negative"))
                     {
-                        if (nrow(anaInfoTabs[[pol]]) == 0 && input$ionization %in% c(pol, "both"))
+                        if (nrow(rValues$anaInfoTabs[[pol]]) == 0 && ionization() %in% c(pol, "both"))
                         {
                             ret <- list(title = "No analyses", msg = paste0("Please select some analyses for ", pol, " mode!"))
                             break

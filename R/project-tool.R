@@ -113,7 +113,7 @@ newProjectServer <- function(destPath)
                                                            "Yes", "No"))
     }
     
-    checkExistingAnaInfo <- function(settingsGen, settingsAna)
+    checkExistingAnaInfo <- function(settingsGen, settingsAna, input)
     {
         if (settingsAna$generateAnaInfo == "table")
         {
@@ -186,7 +186,7 @@ newProjectServer <- function(destPath)
             {}
             else if (!checkExistingScript(data$general$settings()))
             {}
-            else if (!checkExistingAnaInfo(data$general$settings(), data$analyses$settings()))
+            else if (!checkExistingAnaInfo(data$general$settings(), data$analyses$settings(), input))
             {}
             else
             {

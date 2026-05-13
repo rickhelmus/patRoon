@@ -2,6 +2,7 @@
 
 * Fixed: `getEICs()` output was returned as nested matrices when `output="fill"`
 * Fixed: `report()`: component table lacked ret and m/z columns
+* Fixed: `newProject()`: misc fixes when creating a project that loads analyses from a table (issue #154). 
 
 
 # patRoon 3.0

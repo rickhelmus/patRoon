@@ -146,7 +146,8 @@ Suggests:
     proxy,
     Hmisc,
     RBGL,
-    InterpretMSSpectrum
+    InterpretMSSpectrum,
+    RSirius
 LinkingTo:
     Rcpp,
     rapidjsonr

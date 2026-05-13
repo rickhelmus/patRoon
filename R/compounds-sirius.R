@@ -372,3 +372,90 @@ setMethod("generateCompoundsSIRIUS", "featureGroupsSet", function(fGroups, MSPea
                          setAvgSpecificScores = setAvgSpecificScores, setArgs = sa)
 })
 
+# UNDONE
+generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
+                                      ..., adduct = NULL, minIMSSpecSim = 0, verbose = TRUE)
+{
+    # UNDONE: check which options to put back and how to configure them
+    # UNDONE: error handling for SIRIUS API calls
+    # UNDONE: handle login
+    
+    checkPackage("RSirius", "sirius-ms/sirius-client-openAPI", ghSubDir = "client-api_r/generated")
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
+    assertSpecSimParams(specSimParams, add = ac)
+    checkmate::assertNumber(minIMSSpecSim, lower = 0, finite = TRUE, add = ac)
+    checkmate::assertFlag(verbose, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (length(fGroups) == 0)
+        return(compoundsSIRIUS(algorithm = "sirius"))
+    
+    adduct <- checkAndToAdduct(adduct, fGroups)
+    
+    if (verbose)
+        printf("Processing %d feature groups with SIRIUS+CSI:FingerID...\n", length(fGroups))
+    
+    sdk <- RSirius::SiriusSDK$new()
+    # UNDONE: make this configurable
+    # UNDONE: somehow default to a new SIRIUS instance? May make more sense for unattended processing?
+    SIRIUSAPI <- sdk$attach_or_start_sirius()
+    
+    projectID <- "patRoonProjectID" # UNDONE: customizeable?
+    projectPath <- tempfile("patRoonSIRIUS", fileext = ".sirius") # UNDONE: customizable?
+    SIRIUSAPI$projects_api$CreateProject(projectID, projectPath)
+    
+    makeSIRSpec <- function(pl, lev, pmz)
+    {
+        peaks <- Map(pl$mz, pl$intensity, f = RSirius::SimplePeak$new)
+        ret <- RSirius::BasicSpectrum$new(msLevel = lev, peaks = peaks)
+        if (lev > 1)
+            ret$precursorMz = pmz
+        return(ret)
+    }
+    SIRFeatList <- sapply(names(fGroups), function(fg)
+    {
+        if (is.null(MSPeakLists[[fg]][["MS"]]) || is.null(MSPeakLists[[fg]][["MSMS"]]) ||
+            !any(MSPeakLists[[fg]][["MS"]]$precursor))
+            return(NULL)
+        plmz <- MSPeakLists[[fg]]$MS[precursor == TRUE]$mz
+        # UNDONE: properly set adducts (are spaces needed?)
+        RSirius::FeatureImport$new(externalFeatureId = fg, ionMass = plmz, detectedAdducts = list("[M + H]+"),
+                                   charge = 1L, mergedMs1 = makeSIRSpec(MSPeakLists[[fg]]$MS, 1L, plmz),
+                                   ms2Spectra = list(makeSIRSpec(MSPeakLists[[fg]]$MSMS, 2L, plmz)))
+    }, simplify = FALSE)
+    SIRFeatList <- pruneList(SIRFeatList)
+    SIRIUSAPI$features_api$AddAlignedFeatures(project_id = projectID, SIRFeatList)
+    
+    # UNDONE: make this somehow configurable
+    jobConfig <- SIRIUSAPI$jobs_api$GetDefaultJobConfig(include_config_map = FALSE)
+    jobConfig$spectraSearchParams$enabled <- FALSE
+    jobConfig$formulaIdParams$enabled <- TRUE
+    jobConfig$structureDbSearchParams$enabled <- TRUE
+    jobConfig$canopusParams$enabled <- TRUE # fails if disabled...
+    jobConfig$msNovelistParams$enabled <- FALSE
+    job <- SIRIUSAPI$jobs_api$StartJob(projectID, jobConfig)
+    
+    printf("Waiting for the SIRIUS job to finish")
+    while(!SIRIUSAPI$jobs_api$GetJob(projectID, job$id)$progress$state %in% c("CANCELED", "FAILED", "DONE"))
+    {
+        Sys.sleep(1)
+        printf(".")
+    }
+    printf(" done!\n")
+    
+    SIRFeatsImported <- SIRIUSAPI$features_api$GetAlignedFeatures(projectID)
+    
+    # SIRIUSAPI$features_api$GetFormulaCandidates(projectID, SIRFeatsImported[[1]]$alignedFeatureId)
+    # SIRIUSAPI$features_api$GetStructureCandidates(projectID, SIRFeats[[1]]$alignedFeatureId)
+    # gives R error bug if candidate has no FPs
+    # SIRIUSAPI$features_api$GetFingerprintPrediction(projectID, SIRFeats[[1]]$alignedFeatureId, "842378230734549303")
+    
+    # SIRIUSAPI$features_api$GetFormulaAnnotatedMsMsData(projectID, SIRFeats[[1]]$alignedFeatureId, "842378230734549303")
+    # SIRIUSAPI$features_api$GetFormulaAnnotatedSpectrum(projectID, SIRFeats[[1]]$alignedFeatureId, "842378230734549303")
+
+    browser()
+    SIRIUSAPI$projects_api$CloseProject(projectID)
+    
+}

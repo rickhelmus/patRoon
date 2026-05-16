@@ -378,7 +378,8 @@ compoundsSIRIUS6 <- setClass("compoundsSIRIUS6", contains = "compounds")
 
 # UNDONE
 generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
-                                      ..., adduct = NULL, minIMSSpecSim = 0, verbose = TRUE)
+                                      ..., adduct = NULL, minIMSSpecSim = 0, projectPath = NULL, runMode = "execute",
+                                      SIRIUSAPI = NULL, SIRIUSPath = NULL, verbose = TRUE)
 {
     # UNDONE: check which options to put back and how to configure them
     # UNDONE: error handling for SIRIUS API calls
@@ -386,6 +387,8 @@ generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getD
     # UNDONE: add fingerprints
     # UNDONE: handle IMSSpecSims
     # UNDONE: add database column --> once links are fixed and once configs are defined
+    # SDK/API opts: SDK remote address, attach or new instance, path for new instance, port for new instance, shutdown?
+    # UNDONE: replace SIRIUSPath by patRoonExt
     
     checkPackage("RSirius", "sirius-ms/sirius-client-openAPI", ghSubDir = "client-api_r/generated")
     
@@ -393,26 +396,61 @@ generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getD
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     assertSpecSimParams(specSimParams, add = ac)
     checkmate::assertNumber(minIMSSpecSim, lower = 0, finite = TRUE, add = ac)
+    checkmate::assert(
+        checkmate::checkPathForOutput(projectPath, overwrite = TRUE, extension = "sirius"),
+        checkmate::checkNull(projectPath),
+        .var.name = "projectPath", add = ac
+    )
+    checkmate::assertChoice(runMode, c("execute", "read"), add = ac)
+    checkmate::assertClass(SIRIUSAPI, "rsirius_api", null.ok = TRUE, add = ac)
     checkmate::assertFlag(verbose, add = ac)
     checkmate::reportAssertions(ac)
     
     if (length(fGroups) == 0)
-        return(compoundsSIRIUS(algorithm = "sirius"))
+        return(compoundsSIRIUS6(algorithm = "sirius6"))
     
     adduct <- checkAndToAdduct(adduct, fGroups)
     
     if (verbose)
         printf("Processing %d feature groups with SIRIUS+CSI:FingerID...\n", length(fGroups))
     
-    sdk <- RSirius::SiriusSDK$new()
-    # UNDONE: make this configurable
-    # UNDONE: somehow default to a new SIRIUS instance? May make more sense for unattended processing?
-    SIRIUSAPI <- sdk$attach_or_start_sirius()
+    projectID <- if (!is.null(projectPath) && length(names(projectPath) > 0)) names(projectPath)[1] else "patRoonProjectID"
+
+    if (is.null(SIRIUSAPI))
+    {
+        sdk <- RSirius::SiriusSDK$new()
+        # UNDONE: make this configurable?
+        # UNDONE: somehow default to a new SIRIUS instance? May make more sense for unattended processing?
+        # SIRIUSAPI <- sdk$attach_or_start_sirius()
+        SIRIUSAPI <- sdk$attach_to_sirius()
+        shutdownSIR <- FALSE
+        if (is.null(SIRIUSAPI))
+        {
+            SIRIUSAPI <- sdk$start_sirius(sirius_path = SIRIUSPath)
+            shutdownSIR <- TRUE
+        }
+        on.exit({
+            tryCatch({
+                SIRIUSAPI$projects_api$CloseProject(projectID)
+                if (shutdownSIR)
+                    sdk$shutdown_sirius()
+            }, error = function(e) NULL)
+        }, add = TRUE)
+    }
     
-    projectID <- "patRoonProjectID" # UNDONE: customizeable?
-    projectPath <- tempfile("patRoonSIRIUS", fileext = ".sirius") # UNDONE: customizable?
-    SIRIUSAPI$projects_api$CreateProject(projectID, projectPath)
-    
+    projectPath <- if (is.null(projectPath))
+        tempfile("patRoonSIRIUS", fileext = ".sirius")
+    else
+        normalizePath(projectPath, mustWork = FALSE, winslash = "/")
+
+    if (file.exists(projectPath) && runMode == "read")
+        SIRIUSAPI$projects_api$OpenProject(projectID, projectPath)
+    else
+    {
+        unlink(projectPath)
+        SIRIUSAPI$projects_api$CreateProject(projectID, projectPath)
+    }
+
     makeSIRSpec <- function(pl, lev, pmz)
     {
         peaks <- Map(pl$mz, pl$intensity, f = RSirius::SimplePeak$new)
@@ -421,46 +459,59 @@ generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getD
             ret$precursorMz = pmz
         return(ret)
     }
-    SIRFeatList <- sapply(names(fGroups), function(fg)
+    
+    if (runMode == "execute")
     {
-        if (is.null(MSPeakLists[[fg]][["MS"]]) || is.null(MSPeakLists[[fg]][["MSMS"]]) ||
-            !any(MSPeakLists[[fg]][["MS"]]$precursor))
-            return(NULL)
-        plmz <- MSPeakLists[[fg]]$MS[precursor == TRUE]$mz
-        # UNDONE: properly set adducts (are spaces needed?)
-        RSirius::FeatureImport$new(externalFeatureId = fg, ionMass = plmz, detectedAdducts = list("[M + H]+"),
-                                   charge = 1L, mergedMs1 = makeSIRSpec(MSPeakLists[[fg]]$MS, 1L, plmz),
-                                   ms2Spectra = list(makeSIRSpec(MSPeakLists[[fg]]$MSMS, 2L, plmz)))
-    }, simplify = FALSE)
-    SIRFeatList <- pruneList(SIRFeatList)
-    SIRIUSAPI$features_api$AddAlignedFeatures(project_id = projectID, SIRFeatList)
-    
-    # UNDONE: make this somehow configurable
-    jobConfig <- SIRIUSAPI$jobs_api$GetDefaultJobConfig(include_config_map = FALSE)
-    jobConfig$spectraSearchParams$enabled <- FALSE
-    jobConfig$formulaIdParams$enabled <- TRUE
-    jobConfig$structureDbSearchParams$enabled <- TRUE
-    jobConfig$canopusParams$enabled <- TRUE # fails if disabled...
-    jobConfig$msNovelistParams$enabled <- FALSE
-    
-    printf("Running SIRIUS job...\n")
-    job <- SIRIUSAPI$jobs_api$StartJob(projectID, jobConfig)
-    
-    getJobProg <- function() SIRIUSAPI$jobs_api$GetJob(projectID, job$id)$progress
-    
-    jp <- getJobProg()
-    maxp <- jp$maxProgress # this can change during the job?? Just stick with it here so we always end up with 100%...
-    prog <- openProgBar(0, maxp)
-    while (!jp$state %in% c("CANCELED", "FAILED", "DONE"))
-    {
-        Sys.sleep(1)
+        SIRFeatList <- sapply(names(fGroups), function(fg)
+        {
+            if (is.null(MSPeakLists[[fg]][["MS"]]) || is.null(MSPeakLists[[fg]][["MSMS"]]) ||
+                !any(MSPeakLists[[fg]][["MS"]]$precursor))
+                return(NULL)
+            plmz <- MSPeakLists[[fg]]$MS[precursor == TRUE]$mz
+            # UNDONE: properly set adducts (are spaces needed?)
+            RSirius::FeatureImport$new(externalFeatureId = fg, ionMass = plmz, detectedAdducts = list("[M+Na]+"),
+                                       charge = 1L, mergedMs1 = makeSIRSpec(MSPeakLists[[fg]]$MS, 1L, plmz),
+                                       ms2Spectra = list(makeSIRSpec(MSPeakLists[[fg]]$MSMS, 2L, plmz)))
+        }, simplify = FALSE)
+        SIRFeatList <- pruneList(SIRFeatList)
+        
+        if (length(SIRFeatList) == 0)
+            return(compoundsSIRIUS6(algorithm = "sirius6"))
+        
+        SIRIUSAPI$features_api$AddAlignedFeatures(project_id = projectID, SIRFeatList)
+        
+        # UNDONE: make this somehow configurable
+        jobConfig <- SIRIUSAPI$jobs_api$GetDefaultJobConfig(include_config_map = FALSE)
+        jobConfig$spectraSearchParams$enabled <- FALSE
+        jobConfig$formulaIdParams$enabled <- TRUE
+        jobConfig$structureDbSearchParams$enabled <- TRUE
+        jobConfig$canopusParams$enabled <- TRUE # fails if disabled...
+        jobConfig$msNovelistParams$enabled <- FALSE
+        
+        printf("Running SIRIUS job...\n")
+        job <- SIRIUSAPI$jobs_api$StartJob(projectID, jobConfig)
+        
+        getJobProg <- function() SIRIUSAPI$jobs_api$GetJob(projectID, job$id)$progress
+        
         jp <- getJobProg()
-        setTxtProgressBar(prog, jp$currentProgress)
+        # NOTE: maxProgress can change during the job execution, so we normalize the current progress to it at each update
+        prog <- openProgBar(0, 1)
+        while (!jp$state %in% c("CANCELED", "FAILED", "DONE"))
+        {
+            Sys.sleep(1)
+            jp <- getJobProg()
+            setTxtProgressBar(prog, jp$currentProgress / jp$maxProgress)
+        }
+        setTxtProgressBar(prog, 1)
+        close(prog)
     }
-    setTxtProgressBar(prog, maxp)
-    close(prog)
-    
+
     SIRFeatListImp <- SIRIUSAPI$features_api$GetAlignedFeatures(projectID)
+    names(SIRFeatListImp) <- sapply(SIRFeatListImp, \(f) if (is.null(f$externalFeatureId)) NA_character_ else f$externalFeatureId)
+    SIRFeatListImp <- SIRFeatListImp[intersect(names(fGroups), names(SIRFeatListImp))] # sync and only keep relevant
+
+    if (length(SIRFeatListImp) == 0)
+        return(compoundsSIRIUS6(algorithm = "sirius6"))
     
     # SIRIUSAPI$features_api$GetFormulaCandidates(projectID, SIRFeatsImported[[1]]$alignedFeatureId)
     # SIRIUSAPI$features_api$GetStructureCandidates(projectID, SIRFeats[[1]]$alignedFeatureId)
@@ -470,7 +521,7 @@ generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getD
     # SIRIUSAPI$features_api$GetFormulaAnnotatedMsMsData(projectID, SIRFeats[[1]]$alignedFeatureId, "842378230734549303")
     # SIRIUSAPI$features_api$GetFormulaAnnotatedSpectrum(projectID, SIRFeats[[1]]$alignedFeatureId, "842378230734549303")
 
-    compTabs <- lapply(SIRFeatListImp, function(fi)
+    compTabs <- sapply(SIRFeatListImp, function(fi)
     {
         # BUG: opt_fields doesn't seem to do anything
         structCands <- SIRIUSAPI$features_api$GetStructureCandidates(projectID, fi$alignedFeatureId,
@@ -515,11 +566,9 @@ generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getD
         
         tab <- removeDTColumnsIfPresent(tab, "formulaId")
         return(tab)
-    })
-    compTabs <- pruneList(setNames(compTabs, names(SIRFeatList)), checkZeroRows = TRUE)
+    }, simplify = FALSE)
+    compTabs <- pruneList(compTabs, checkZeroRows = TRUE)
     scRanges <- sapply(compTabs, \(ct) list(score = range(ct$score)), simplify = FALSE)
-    
-    SIRIUSAPI$projects_api$CloseProject(projectID)
     
     if (verbose)
     {

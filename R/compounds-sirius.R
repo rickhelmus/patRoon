@@ -376,6 +376,39 @@ setMethod("generateCompoundsSIRIUS", "featureGroupsSet", function(fGroups, MSPea
 #' @export
 compoundsSIRIUS6 <- setClass("compoundsSIRIUS6", contains = "compounds")
 
+doSIRIUS60Login <- function(login, force, SIRIUSAPI)
+{
+    if (isFALSE(login))
+        return(invisible(NULL)) # no need to do anything
+    
+    isLoggedIn <- SIRIUSAPI$login_and_account_api$IsLoggedIn()
+    
+    if (length(login) == 1 && login == "check" && !isLoggedIn)
+        stop("There is no active SIRIUS login. Please consult the SIRIUS documentation and patRoon handbook for details.")
+    
+    else if (force || !isLoggedIn)
+    {
+        if (length(login) == 1 && login == "interactive")
+        {
+            if (!interactive())
+                stop("Cannot perform interactive login in non-interactive R sessions!", call. = FALSE)
+            
+            # NOTE: if "username" is part of the prompt then the RStudio backend of getPass won't hide the text input
+            login <- c(username = getPass::getPass("Please enter your SIRIUS username", noblank = TRUE),
+                       password = getPass::getPass("Please enter your SIRIUS password", noblank = TRUE))
+        }
+        
+        if (!"username" %in% names(login) || !nzchar(login["username"]))
+            stop("Please provide the username of your SIRIUS account", call. = FALSE)
+        if (!"password" %in% names(login) || !nzchar(login["password"]))
+            stop("Please provide the password of your SIRIUS account", call. = FALSE)
+        
+        SIRCreds <- RSirius::AccountCredentials$new(username = login["username"], password = login["password"])
+        SIRIUSAPI$login_and_account_api$Login(accept_terms = TRUE, account_credentials = SIRCreds)
+    }
+    invisible(NULL)
+}
+
 startSIRIUS <- function(path)
 {
     checkPackage("RSirius", "sirius-ms/sirius-client-openAPI", ghSubDir = "client-api_r/generated")
@@ -403,15 +436,18 @@ startSIRIUS <- function(path)
 
 # UNDONE
 generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getDefSpecSimParams(removePrecursor = TRUE),
-                                      ..., adduct = NULL, config = NULL, minIMSSpecSim = 0, projectPath = NULL,
+                                      ..., adduct = NULL, config = NULL, login = "check", alwaysLogin = FALSE,
+                                      minIMSSpecSim = 0, projectPath = NULL,
                                       runMode = "execute", SIRIUSAPI = NULL, SIRIUSPath = NULL, verbose = TRUE)
 {
     # UNDONE: error handling for SIRIUS API calls
-    # UNDONE: handle login
+    # UNDONE: handle login --> do for getSIRConfig()
     # UNDONE: add fingerprints
-    # UNDONE: handle IMSSpecSims
+    # UNDONE: handle IMSSpecSims: test and add to hash
     # UNDONE: add database column --> once links are fixed and once configs are defined
     # UNDONE: replace SIRIUSPath by patRoonExt
+    # UNDONE: caching
+    # UNDONE: doc that logging in means accepting terms?
     
     checkPackage("RSirius", "sirius-ms/sirius-client-openAPI", ghSubDir = "client-api_r/generated")
     
@@ -419,6 +455,8 @@ generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getD
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     assertSpecSimParams(specSimParams, add = ac)
     checkmate::assertR6(config, null.ok = TRUE, add = ac)
+    assertSIRIUSLogin(login, add = ac)
+    checkmate::assertFlag(alwaysLogin, add = ac)
     checkmate::assertNumber(minIMSSpecSim, lower = 0, finite = TRUE, add = ac)
     checkmate::assert(
         checkmate::checkPathForOutput(projectPath, overwrite = TRUE, extension = "sirius"),
@@ -438,6 +476,8 @@ generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getD
     
     adduct <- checkAndToAdduct(adduct, fGroups)
     
+    IMSSpecSims <- getIMSFeatAnnSpecSims(MSPeakLists, fGroups, minIMSSpecSim, specSimParams)
+    
     if (verbose)
         printf("Processing %d feature groups with SIRIUS+CSI:FingerID...\n", length(fGroups))
     
@@ -445,6 +485,8 @@ generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getD
 
     if (is.null(SIRIUSAPI))
         SIRIUSAPI <- startSIRIUS(SIRIUSPath)
+    
+    doSIRIUS60Login(login, alwaysLogin, SIRIUSAPI)
     
     projectPath <- if (is.null(projectPath))
         tempfile("patRoonSIRIUS", fileext = ".sirius")
@@ -472,6 +514,9 @@ generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getD
     {
         SIRFeatList <- sapply(names(fGroups), function(fg)
         {
+            if (!is.null(IMSSpecSims) && fg %chin% IMSSpecSims$group)
+                return(NULL)
+            
             if (is.null(MSPeakLists[[fg]][["MS"]]) || is.null(MSPeakLists[[fg]][["MSMS"]]) ||
                 !any(MSPeakLists[[fg]][["MS"]]$precursor))
                 return(NULL)
@@ -584,8 +629,7 @@ generateCompoundsSIRIUS60 <- function(fGroups, MSPeakLists, specSimParams = getD
     
     return(compoundsSIRIUS6(groupAnnotations = compTabs, scoreTypes = "score", scoreRanges = scRanges,
                            algorithm = "sirius6", MSPeakLists = MSPeakLists, specSimParams = specSimParams,
-                           IMSSpecSims = getIMSFeatAnnSpecSims(MSPeakLists, fGroups, minIMSSpecSim, specSimParams),
-                           gNames = names(fGroups)))
+                           IMSSpecSims = IMSSpecSims, gNames = names(fGroups)))
 }
 
 #' @export
